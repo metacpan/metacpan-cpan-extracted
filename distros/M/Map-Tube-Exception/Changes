@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.16  Sun Apr 15 21:20:00 2018
+      - Added exceptions for Invalid line/station structure.
+
 3.15  Sun Mar 11 09:25:00 2018
       - Used namespace::autoclean instead.
 

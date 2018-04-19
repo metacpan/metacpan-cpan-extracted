@@ -4,13 +4,13 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Catalyst-Plugin-Session-Store-Redis",
    "prereqs" : {
@@ -26,7 +26,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Redis" : "0"
+            "Catalyst::Plugin::Session::Store" : "0",
+            "Class::Data::Inheritable" : "0",
+            "MRO::Compat" : "0",
+            "Redis" : "0",
+            "Try::Tiny" : "0"
          }
       }
    },
@@ -38,7 +42,7 @@
          "web" : "https://github.com/domm/Catalyst-Plugin-Session-Store-Redis"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
+   "version" : "0.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

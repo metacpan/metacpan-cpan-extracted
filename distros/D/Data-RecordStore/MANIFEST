@@ -1,7 +1,6 @@
 bin/record_store_convert
 bin/recordstore_explorer
 Build.PL
-CHANGELOG
 IDEAS.txt
 lib/Data/RecordStore.pm
 LICENSE

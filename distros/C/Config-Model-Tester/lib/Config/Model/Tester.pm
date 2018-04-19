@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.005';
+$Config::Model::Tester::VERSION = '3.006';
 use warnings;
 use strict;
 use locale;
@@ -27,6 +27,8 @@ use Test::File::Contents ;
 use Test::Differences;
 use Test::Memory::Cycle ;
 use Test::Log::Log4perl;
+
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
 Test::Log::Log4perl->ignore_priority("info");
 
@@ -604,28 +606,39 @@ sub create_model_object {
 }
 
 sub run_tests {
-    my ( $arg, $test_only_app, $do ) = @_;
+    my ( $test_only_app, $do, $trace, $wr_root );
+    if (@_) {
+        my $arg;
+        note ("Calling run_tests with argument is deprecated");
+        ( $arg, $test_only_app, $do ) = @_;
 
-    my $log = 0;
+        my $log = 0;
 
-    my $trace = ($arg =~ /t/) ? 1 : 0;
-    $log  = 1 if $arg =~ /l/;
+        $trace = ($arg =~ /t/) ? 1 : 0;
+        $log  = 1 if $arg =~ /l/;
 
-    my $log4perl_user_conf_file = ($ENV{HOME} || '') . '/.log4config-model';
+        my $log4perl_user_conf_file = ($ENV{HOME} || '') . '/.log4config-model';
 
-    if ( $log and -e $log4perl_user_conf_file ) {
-        Log::Log4perl::init($log4perl_user_conf_file);
+        if ( $log and -e $log4perl_user_conf_file ) {
+            Log::Log4perl::init($log4perl_user_conf_file);
+        }
+        else {
+            Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
+        }
+
+        Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+
+        ok( 1, "compiled" );
+
+        # pseudo root where config files are written by config-model
+        $wr_root = path('wr_root');
     }
     else {
-        Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
+        ($model, $trace) = init_test();
+        ( $test_only_app, $do)  = @ARGV;
+        # pseudo root where config files are written by config-model
+        $wr_root = setup_test_dir();
     }
-
-    Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-    ok( 1, "compiled" );
-
-    # pseudo root where config files are written by config-model
-    my $wr_root = path('wr_root');
 
     my @group_of_tests = grep { /-test-conf.pl$/ } glob("t/model_tests.d/*");
 
@@ -656,22 +669,23 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.005
+version 3.006
 
 =head1 SYNOPSIS
 
- # in t/model_test.t
+In your test file (typically C<t/model_test.t>):
+
  use warnings;
  use strict;
 
  use Config::Model::Tester ;
  use ExtUtils::testlib;
 
- my $arg = shift || ''; # typically e t l
- my $test_only_app = shift || ''; # only run one set of test
- my $do = shift ; # select subtests to run with a regexp
+ run_tests() ;
 
- run_tests($arg, $test_only_app, $do) ;
+Run tests with:
+
+ perl t/model_test.t [ --log ] [--error] [--trace] [ subtest [ test_case ] ]
 
 =head1 DESCRIPTION
 
@@ -681,9 +695,9 @@ cases per model.
 
 A specific layout for test files must be followed.
 
-=head2 Test specification
+=head2 Sub test specification
 
-Each set of test is defined in a file like:
+Each subtest is defined in a file like:
 
  t/model_tests.d/<app-name>-test-conf.pl
 
@@ -711,15 +725,15 @@ C<lib/Config/Model/system.d/lcdproc>
  t
  |-- model_test.t
  \-- model_tests.d           # do not change directory name
-     |-- lcdproc-test-conf.pl   # test specification for lcdproc app
+     |-- lcdproc-test-conf.pl   # subtest specification for lcdproc app
      \-- lcdproc-examples
-         |-- t0              # subtest t0
-         \-- LCDD-0.5.5      # subtest for older LCDproc
+         |-- t0              # test case t0
+         \-- LCDD-0.5.5      # test case for older LCDproc
 
-Test specification is written in C<lcdproc-test-conf.pl> file (i.e. this
+Subtest specification is written in C<lcdproc-test-conf.pl> file (i.e. this
 modules looks for files named  like C<< <app-name>-test-conf.pl> >>).
 
-Subtests data is proviced in files in directory C<lcdproc-examples> (
+Subtests data is provided in files in directory C<lcdproc-examples> (
 i.e. this modules looks for test data in directory
 C<< <model-name>-examples> >>. C<lcdproc-test-conf.pl> contains
 instructions so that each file will be used as a C</etc/LCDd.conf>
@@ -743,10 +757,10 @@ C<dpkg-test-conf.pl> will contain instructions so that each directory
 under C<dpkg-examples> will be used.
 
  t/model_tests.d
- \-- dpkg-test-conf.pl         # test specification
+ \-- dpkg-test-conf.pl         # subtest specification
  \-- dpkg-examples
-     \-- libversion            # example subdir, used as subtest name
-         \-- debian            # directory for one test case
+     \-- libversion            # example subdir, used as test case name
+         \-- debian            # directory for used by test case
              |-- changelog
              |-- compat
              |-- control
@@ -810,18 +824,18 @@ See the actual L<Ssh and Sshd model tests|https://github.com/dod38fr/config-mode
 
 =head2 Basic test specification
 
-Each model test is specified in C<< <model>-test-conf.pl >>. This file
+Each model subtest is specified in C<< <model>-test-conf.pl >>. This file
 contains a set of global variables. (yes, global variables are often bad ideas
 in programs, but they are handy for tests):
 
- # config file name (used to copy test case into test wr_root directory)
+ # config file name (used to copy test case into test wr_root/model_tests directory)
  $conf_file_name = "fstab" ;
  # config dir where to copy the file (optional)
  #$conf_dir = "etc" ;
  # home directory for this test
  $home_for_test = '/home/joe' ;
 
-Here, C<t0> file will be copied in C<wr_root/test-t0/etc/fstab>.
+Here, C<t0> file will be copied in C<wr_root/model_tests/test-t0/etc/fstab>.
 
  # config model name to test
  $model_to_test = "Fstab" ;
@@ -926,7 +940,7 @@ C<< <model-to-test>-test-conf.pl >>:
 
 =item *
 
-Setup test in C<< wr_root/<subtest name>/ >>. If your configuration file layout depend
+Setup test in C<< wr_root/model_tests/<subtest name>/ >>. If your configuration file layout depend
 on the target system, you will have to specify the path using C<setup> parameter.
 See L</"Test file layout depending on system">.
 
@@ -1126,7 +1140,7 @@ Verify annotation extracted from the configuration file comments:
 
 =item *
 
-Write back the config data in C<< wr_root/<subtest name>/ >>.
+Write back the config data in C<< wr_root/model_tests/<subtest name>/ >>.
 Note that write back is forced, so the tested configuration files are
 written back even if the configuration values were not changed during the test.
 
@@ -1182,8 +1196,8 @@ adding a file can be done with C<push>.
 
 =item *
 
-Copy all config data from C<< wr_root/<subtest name>/ >>
-to C<< wr_root/<subtest name>-w/ >>. This steps is necessary
+Copy all config data from C<< wr_root/model_tests/<subtest name>/ >>
+to C<< wr_root/model_tests/<subtest name>-w/ >>. This steps is necessary
 to check that configuration written back has the same content as
 the original configuration.
 

@@ -549,6 +549,8 @@ _modinv(Class,x,y)
       /* Inverse doesn't exist. Return both values undefined. */
       PUSHs ( &PL_sv_undef );
       PUSHs ( &PL_sv_undef );
+      mpz_clear(*RETVAL);
+      free(RETVAL);
       }
     else
       {

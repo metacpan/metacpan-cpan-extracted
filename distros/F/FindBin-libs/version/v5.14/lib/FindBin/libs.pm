@@ -1084,9 +1084,20 @@ For the moment, at least, this seems to work.
 
 =head1 SEE ALSO
 
-=head2 Module::FromPerlVer
+=over 4
+
+=item Module::FromPerlVer
 
 Explains where the installed version comes from.
+
+=item File::Copy::Recursive
+
+Note: Due to issues with File::Copy::Recusive, this is
+using File::Copy::Recursive::Reduced and a version directory
+for the moment. Once the Recursive module has been dealt with
+Module::FromPerlVer shoud Just Work.
+
+=back
 
 =head2 Cwd
 

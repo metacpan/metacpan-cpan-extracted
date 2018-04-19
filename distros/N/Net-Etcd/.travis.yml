@@ -3,15 +3,31 @@ addons:
   hosts:
     - travis1.local
     - travis1
+    - etcd1
 env:
   global:
-    - ETCD_VER=v3.3.0-rc.4
-    - ETCDCTL_API=3
-    - ETCD_TEST_HOST=127.0.0.1
-    - ETCD_TEST_PORT=2379
-    - ETCD_TEST_CAPATH=$BUILD_DIR/t/tls/ca.pem
-    - RELEASE_TESTING=1
     - PATH=$PATH:/tmp/test-etcd/
+    - ETCD_VER=v3.3.3
+    - ETCDCTL_API=3
+    - ETCD_TEST_HOST=etcd1
+    - ETCD_TEST_PORT=2379
+    - RELEASE_TESTING=1
+    - ETCD_NAME=member1
+    - ETCD_DEBUG=1
+    - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+    - ETCD_ADVERTISE_CLIENT_URLS=https://etcd1:2379
+    - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd1:2380
+    - ETCD_LISTEN_PEER_URLS=https://etcd1:2380
+    - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+    - ETCD_PEER_KEY_FILE=${TRAVIS_BUILD_DIR}/t/tls/etcd1-key.pem
+    - ETCD_PEER_CERT_FILE=${TRAVIS_BUILD_DIR}/t/tls/etcd1.pem
+    - ETCD_CERT_FILE=${TRAVIS_BUILD_DIR}/t/tls/server.pem
+    - ETCD_KEY_FILE=${TRAVIS_BUILD_DIR}/t/tls/server-key.pem
+    - ETCD_TRUSTED_CA_FILE=${TRAVIS_BUILD_DIR}/t/tls/ca.pem
+    - ETCD_CLIENT_CERT_FILE=${TRAVIS_BUILD_DIR}/t/tls/client.pem
+    - ETCD_CLIENT_KEY_FILE=${TRAVIS_BUILD_DIR}/t/tls/client-key.pem
+    - ETCD_CLIENT_CA_FILE=${TRAVIS_BUILD_DIR}/t/tls/ca.pem
+    - ETCD_PEER_CLIENT_CERT_AUTH=1
 language: perl
 perl:
   - "5.24"
@@ -42,7 +58,7 @@ install:
   - cpan-install --deps
   - cpan-install --coverage
 script:
-  - /tmp/test-etcd/etcd --name member1 --cert-file=$BUILD_DIR/t/tls/server.pem --key-file=$BUILD_DIR/t/tls/server-key.pem --advertise-client-urls=https://127.0.0.1:2379 --listen-client-urls=https://127.0.0.1:2379 &
+  - /tmp/test-etcd/etcd &
   - sleep 3
   - perl Makefile.PL
   - make

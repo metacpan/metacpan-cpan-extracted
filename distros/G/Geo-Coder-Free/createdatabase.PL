@@ -71,28 +71,37 @@ my %zipcodes = (
 	'80645' => { city => 'La Salle', county => 'Weld' },
 	'80650' => { city => 'Pierce', county => 'Weld' },
 );
+my %supported_countries = (
+	'au' => 1,
+	'ca' => 1,
+	'us' => 1,
+);
+
 my %postcodes = ();
 my $current_state;
 my %global_md5s;
 my %state_md5s;
 my %queued_commits;
 
-exit(0) if($ENV{'AUTOMATED_TESTING'});
-
 if(!-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
 	(system('bash bin/createdatabase') == 0)
 		or warn "Can't create the SQLite database - expect poor performance";
 
 	if(-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
+		if(-r 'blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
+			unlink('blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
+		}
 		copy('lib/Geo/Coder/Free/MaxMind/databases/cities.sql', 'blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql')
-			or die "Can't copy SQLite file to blib";
+			or die "Can't copy SQLite file to blib: $!";
 	}
 }
+
+exit(0) if($ENV{'AUTOMATED_TESTING'});
 
 if(my $oa = $ENV{'OPENADDR_HOME'}) {
 	# Import openaddresses.io data into an SQLite database
 	# TODO: download and unzip the files from results.openaddresses.io
-	# TODO: only US and Canadian data is supported at the moment
+	# TODO: only Australian, US and Canadian data is supported at the moment
 
 	my $sqlite_file = "$oa/openaddresses.sql";
 	if(!-r $sqlite_file) {
@@ -202,364 +211,177 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			print "\n";
 			my @components = split(/\//, $f);
 			if(my $country = $components[0]) {
+				next unless($supported_countries{lc($country)});
+
 				my $query;
-				my $state = uc($components[1]);
-				my $file = $components[2];
+				my $state;
+				my $file;
+				if($components[1] =~ /\.csv$/) {
+					$file = $components[1];
+				} else {
+					$state = uc($components[1]);
+					$file = $components[2];
+				}
 
-				if($country eq 'us') {
+				my $csv = Text::CSV->new({
+					# sep_char => $sep_char,
+					allow_loose_quotes => 1,
+					blank_is_undef => 1,
+					empty_is_undef => 1,
+					binary => 1,
 					# Workaround for https://github.com/openaddresses/openaddresses/issues/3905
-					my @data;
-					if($csv_file =~ /us\/ne\/dawes/) {
-						open(my $pin, '-|', "grep -v \\\\\\\\ $csv_file");
+					# escape_char => '\\',	# Put back once issue 3905 has been fixed
+				});
 
-						@data = @{xsv_slurp(
-							shape => 'aoh',
-							text_csv => {
-								# sep_char => $sep_char,
-								allow_loose_quotes => 1,
-								blank_is_undef => 1,
-								empty_is_undef => 1,
-								binary => 1,
-								# escape_char => '\\',	# Put back once issue 3905 has been fixed
-							},
-							handle => $pin
-						)};
-						close $pin;
-					} else {
-						@data = @{xsv_slurp(
-							shape => 'aoh',
-							text_csv => {
-								# sep_char => $sep_char,
-								allow_loose_quotes => 1,
-								blank_is_undef => 1,
-								empty_is_undef => 1,
-								binary => 1,
-								# escape_char => '\\',	# Put back once issue 3905 has been fixed
-							},
-							file => $csv_file
-						)};
-					}
-					my $rows_count = scalar(@data);
-					foreach my $row(@data) {
-						my $city = $row->{'CITY'};
-						my $county;
-						if(defined($city) && ($file !~ /^statewide/)) {
-							if($file =~ /^city_of_(.+).csv$/) {
-								$city = $1;
-							} elsif($file =~ /^town_of_(.+).csv$/) {
-								$city = $1;
-							} elsif($file =~ /^(.+)_borough.csv$/) {
-								$city = $1;
-							} else {
-								$county = $file;
-								$county =~ s/\.csv$//;
-							}
+				open(my $fin, '<', $csv_file);
+				my $head = $csv->getline($fin);
+				$csv->column_names($head);
+
+				my $inserts = 0;
+
+				while(my $row = $csv->getline_hr($fin)) {
+					my $city = $row->{'CITY'};
+					my $county;
+					if(($file !~ /^statewide/) && ($file !~ /^province/)) {
+						if($file =~ /^city_of_(.+).csv$/) {
+							$city = $1;
+						} elsif($file =~ /^town_of_(.+).csv$/) {
+							$city = $1;
+						} elsif($file =~ /^(.+)_borough.csv$/) {
+							$city = $1;
+						} elsif(!defined($city)) {
+							$city = $file;
+							$city =~ s/\.csv$//;
 						} else {
-							if(!defined($city)) {
-								if($file =~ /^city_of_(.+).csv$/) {
-									$city = $1;
-								} elsif($file =~ /^town_of_(.+).csv$/) {
-									$city = $1;
-								} elsif($file =~ /^(.+)_borough.csv$/) {
-									$city = $1;
-								}
-							}
-							if((!defined($city)) && ($file !~ /^statewide/)) {
-								$city = $file;
-							}
-							my $zip = $row->{'POSTCODE'};
-							if((!defined($city)) && defined($zip) && (my $info = $zipcodes{$zip})) {
-								$city = $info->{'city'};
-								$county = $info->{'county'};
-							}
-							if((!defined($city)) && defined($zip) && ($zip =~ /^(\d{5})/)) {
-								$zip = $1;
-								my $res = $ua->get("http://api.zippopotam.us/us/$zip");
-								my $rc = JSON->new()->utf8()->decode($res->content());
-								if(!defined($rc)) {
-									# print "\n", Data::Dumper->new([\$row])->Dump();
-									next;
-								}
-								my $place = @{$rc->{'places'}}[0];
-								if(!$place) {
-									# print "\n", Data::Dumper->new([\$row])->Dump();
-									next;
-								}
-								$city = uc($place->{'place name'});
-								$zipcodes{$zip} = { 'city' => $city };
-								# print "$zip => $city\n";
-								my %columns = (
-									'COUNTRY' => 'US',
-									'STATE' => $state,
-									'CITY' => $city,
-									'LAT' => $place->{'latitude'},
-									'LON' => $place->{'longitude'},
-								);
-								if($city) {
-									# Counties and states alone have already been read in
-									$columns{'COUNTY'} = $county;
-									# print "$zip => $query\n";
-									insert($dbh, \%columns);
-								}
-							}
-							if(!defined($city)) {
-								next if(!$zip);
-								next if($zip !~ /^\d{5}/);
+							$county = $file;
+							$county =~ s/\.csv$//;
+						}
+					}
+					if(!defined($city)) {
+						my $zip = $row->{'POSTCODE'};
+						if((!defined($city)) && defined($zip) && (my $info = $zipcodes{$zip})) {
+							$city = $info->{'city'};
+							$county = $info->{'county'};
+						}
+						if((!defined($city)) && defined($zip) && ($zip =~ /^(\d{5})/)) {
+							$zip = $1;
+							my $res = $ua->get("http://api.zippopotam.us/$country/$zip");
+							my $rc = JSON->new()->utf8()->decode($res->content());
+							if(!defined($rc)) {
 								# print "\n", Data::Dumper->new([\$row])->Dump();
-								$dbh->disconnect();
-								die $csv_file;
+								next;
 							}
-						}
-						$city =~ s/\.csv$//;
-						$city =~ s/_/ /g;
-						$city =~ s/\-/ /g;
-						$city =~ s/\./ /g;
-						$city = uc($city);
-						$city =~ s/\s+BORO$//;
-						$city =~ s/\s+TWP$//;
-						$city =~ s/^TOWN\s+OF\s+//;
-						$city =~ s/^CITY\s+OF\s+//;
-						$city =~ s/^TOWNSHIP\s+OF\s+//;
-						my $street = $row->{'STREET'};
-						if($street) {
-							$street = uc($street);
-							if($street =~ /(.+)\s+STREET$/) {
-								$street = "$1 ST";
-							} elsif($street =~ /(.+)\s+ROAD$/) {
-								$street = "$1 RD";
-							} elsif($street =~ /(.+)\s+AVENUE$/) {
-								$street = "$1 AVE";
-							} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-								$street = "$1 AVE $2";
-							} elsif($street =~ /(.+)\s+CT$/) {
-								$street = "$1 COURT";
-							} elsif($street =~ /(.+)\s+CIRCLE$/) {
-								$street = "$1 CIR";
+							my $place = @{$rc->{'places'}}[0];
+							if(!$place) {
+								# print "\n", Data::Dumper->new([\$row])->Dump();
+								next;
 							}
-							$street =~ s/^0+//;	# Turn 04th St into 4th St
-						}
-						if($file =~ /^(.+)_county.csv$/) {
-							$county = $1;
-						}
-						if(!defined($county)) {
-							if($city =~ /(.+)\s+COUNTY$/i) {
-								$county = $1;
-								$city = undef;
-							}
-						}
-						if((!defined($county)) && ($row->{'DISTRICT'}) && ($row->{'DISTRICT'} ne $state)) {
-							if($row->{'DISTRICT'} !~ /^\d+$/) {
-								$county = $row->{'DISTRICT'};
-							}
-						}
-						if($county) {
-							$county = uc($county);
-							$county =~ s/_/ /g;
-							$county =~ s/\s+COUNTY$//;
-							if($city) {
-								if($city =~ /\s+COUNTY$/i) {
-									my $tmp = $city;
-									$city = $county;
-									$county = $tmp;
-								}
-								if(($city eq $county) ||
-								   ($city eq "$county COUNTY") ||
-								   ($county eq "$city COUNTY")) {
-									$city = undef;
-								}
-							}
-						}
-						if($state eq 'IN') {
-							if(defined($city) && ($city eq 'FW')) {
-								$city = 'FORT WAYNE';
-								$county = 'ALLEN';
-							} elsif(defined($county) && ($county eq 'LAPORTE')) {
-								$county = 'LA PORTE';
-							}
-						} elsif($state eq 'MO') {
-							if(defined($city) && ($city eq 'SAINT LOUIS')) {
-								$city = 'ST. LOUIS';
-								$county = undef;
-							}
-						}
-						if(($city && ($city !~ /^\s+$/)) || $county) {
-							# Counties and states alone have already been read in
+							$city = uc($place->{'place name'});
+							$zipcodes{$zip} = { 'city' => $city };
+							# print "$zip => $city\n";
 							my %columns = (
-								'COUNTRY' => 'US',
-								'CITY' => $city,
+								'COUNTRY' => uc($country),
 								'STATE' => $state,
-								'COUNTY' => $county,
-								'STREET' => $street
+								'CITY' => $city,
+								'LAT' => $place->{'latitude'},
+								'LON' => $place->{'longitude'},
 							);
-							if($street) {
-								$row->{'STREET'} =~ s/\s\s+/ /g;
-							}
-							foreach my $c('LAT', 'LON', 'NUMBER') {
-								$columns{$c} = delete $row->{$c};
-							}
-							insert($dbh, \%columns);
-							if(delete($columns{'COUNTY'})) {
+							if($city) {
+								# Counties and states alone have already been read in
+								$columns{'COUNTY'} = $county;
+								# print "$zip => $query\n";
 								insert($dbh, \%columns);
-							}
-							if(delete($columns{'NUMBER'})) {
-								# Match somewhere in the street when number isn't known
-								insert($dbh, \%columns);
-								if(delete($columns{'STREET'})) {
-									# Match somewhere in the city when street isn't known
-									insert($dbh, \%columns);
-								}
+								$inserts++;
 							}
 						}
-						flush_queue($dbh) if($rows_count > MAX_INSERT_COUNT);
+						if(!defined($city)) {
+							next if(!$zip);
+							next if($zip !~ /^\d{5}/);
+							# print "\n", Data::Dumper->new([\$row])->Dump();
+							$dbh->disconnect();
+							die $csv_file;
+						}
 					}
-				} elsif($country eq 'ca') {
-					# TODO: remove duplication with the US code
-					my @data = @{xsv_slurp(
-						shape => 'aoh',
-						text_csv => {
-							# sep_char => $sep_char,
-							allow_loose_quotes => 1,
-							blank_is_undef => 1,
-							empty_is_undef => 1,
-							binary => 1,
-							escape_char => '\\',	# Put back once issue 3905 has been fixed
-						},
-						file => $csv_file
-					)};
-					my $rows_count = scalar(@data);
-					foreach my $row(@data) {
-						my $city = $row->{'CITY'};
-						my $county;
-						if(defined($city) && ($file !~ /^province/)) {
-							if($file =~ /^city_of_(.+).csv$/) {
-								$city = $1;
-							} elsif($file =~ /^town_of_(.+).csv$/) {
-								$city = $1;
-							} elsif($file =~ /^(.+)_borough.csv$/) {
-								$city = $1;
-							} else {
-								$county = $file;
-								$county =~ s/\.csv$//;
-							}
-						} else {
-							if(!defined($city)) {
-								if($file =~ /^city_of_(.+).csv$/) {
-									$city = $1;
-								} elsif($file =~ /^town_of_(.+).csv$/) {
-									$city = $1;
-								} elsif($file =~ /^(.+)_borough.csv$/) {
-									$city = $1;
-								}
-							}
-							if((!defined($city)) && ($file !~ /^province/)) {
-								$city = $file;
-							}
-							my $postcode = $row->{'POSTCODE'};
-							if((!defined($city)) && defined($postcode) && (my $info = $postcodes{$postcode})) {
-								$city = $info->{'city'};
-								$county = $info->{'county'};
-							}
-							if((!defined($city)) && defined($postcode) && ($postcode =~ /^(\[A-Z]\d[A-Z])/)) {
-								$postcode = $1;
-								my $res = $ua->get("http://api.zippopotam.us/ca/$postcode");
-								my $rc = JSON->new()->utf8()->decode($res->content());
-								if(!defined($rc)) {
-									# print "\n", Data::Dumper->new([\$row])->Dump();
-									next;
-								}
-								my $place = @{$rc->{'places'}}[0];
-								if(!$place) {
-									# print "\n", Data::Dumper->new([\$row])->Dump();
-									next;
-								}
-								$city = uc($place->{'place name'});
-								$postcodes{$postcode} = { 'city' => $city };
-								# print "$postcode => $city\n";
-								my %columns = (
-									'COUNTRY' => 'CA',
-									'STATE' => $state,
-									'CITY' => $city,
-									'LAT' => $place->{'latitude'},
-									'LON' => $place->{'longitude'},
-								);
-								if($city) {
-									# Counties and states alone have already been read in
-									$columns{'COUNTY'} = $county;
-									# print "$postcode => $query\n";
-									insert($dbh, \%columns);
-								}
-							}
-							if(!defined($city)) {
-								next if(!$postcode);
-								next if($postcode !~ /^[A-Z]\d[A-Z]/);
-								# print "\n", Data::Dumper->new([\$row])->Dump();
-								$dbh->disconnect();
-								die $csv_file;
-							}
+					$city =~ s/\.csv$//;
+					$city =~ s/_/ /g;
+					$city =~ s/\-/ /g;
+					$city =~ s/\./ /g;
+					$city = uc($city);
+					$city =~ s/\s+BORO$//;
+					$city =~ s/\s+TWP$//;
+					$city =~ s/^TOWN\s+OF\s+//;
+					$city =~ s/^CITY\s+OF\s+//;
+					$city =~ s/^TOWNSHIP\s+OF\s+//;
+					my $street = $row->{'STREET'};
+					if($street) {
+						$street = uc($street);
+						if($street =~ /(.+)\s+STREET$/) {
+							$street = "$1 ST";
+						} elsif($street =~ /(.+)\s+ROAD$/) {
+							$street = "$1 RD";
+						} elsif($street =~ /(.+)\s+AVENUE$/) {
+							$street = "$1 AVE";
+						} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
+							$street = "$1 AVE $2";
+						} elsif($street =~ /(.+)\s+CT$/) {
+							$street = "$1 COURT";
+						} elsif($street =~ /(.+)\s+CIRCLE$/) {
+							$street = "$1 CIR";
 						}
-						$city =~ s/\.csv$//;
-						$city =~ s/_/ /g;
-						$city =~ s/\-/ /g;
-						$city =~ s/\./ /g;
-						$city = uc($city);
-						$city =~ s/\s+BORO$//;
-						$city =~ s/\s+TWP$//;
-						$city =~ s/^TOWN\s+OF\s+//;
-						$city =~ s/^CITY\s+OF\s+//;
-						$city =~ s/^TOWNSHIP\s+OF\s+//;
-						my $street = $row->{'STREET'};
-						if($street) {
-							$street = uc($street);
-							if($street =~ /(.+)\s+STREET$/) {
-								$street = "$1 ST";
-							} elsif($street =~ /(.+)\s+ROAD$/) {
-								$street = "$1 RD";
-							} elsif($street =~ /(.+)\s+AVENUE$/) {
-								$street = "$1 AVE";
-							} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-								$street = "$1 AVE $2";
-							} elsif($street =~ /(.+)\s+CT$/) {
-								$street = "$1 COURT";
-							} elsif($street =~ /(.+)\s+CIRCLE$/) {
-								$street = "$1 CIR";
-							}
-							$street =~ s/^0+//;	# Turn 04th St into 4th St
-						}
-						if($file =~ /^(.+)_county.csv$/) {
+						$street =~ s/^0+//;	# Turn 04th St into 4th St
+					}
+					if($file =~ /^(.+)[_\-]county.csv$/) {
+						$county = $1;
+					} elsif(!defined($county)) {
+						if($city =~ /(.+)\s+COUNTY$/i) {
 							$county = $1;
+							$city = undef;
 						}
-						if(!defined($county)) {
-							if($city =~ /(.+)\s+COUNTY$/i) {
-								$county = $1;
+					}
+					if((!defined($county)) && $row->{'DISTRICT'} && ($row->{'DISTRICT'} ne $state)) {
+						if($row->{'DISTRICT'} !~ /^\d+$/) {
+							$county = $row->{'DISTRICT'};
+						}
+					}
+					if($county) {
+						$county = uc($county);
+						$county =~ s/_/ /g;
+						$county =~ s/\s+COUNTY$//;
+						if($city) {
+							if($city =~ /\s+COUNTY$/i) {
+								my $tmp = $city;
+								$city = $county;
+								$county = $tmp;
+							}
+							if(($city eq $county) ||
+							   ($city eq "$county COUNTY") ||
+							   ($county eq "$city COUNTY")) {
 								$city = undef;
 							}
 						}
-						if((!defined($county)) && ($row->{'DISTRICT'}) && ($row->{'DISTRICT'} ne $state)) {
-							if($row->{'DISTRICT'} !~ /^\d+$/) {
-								$county = $row->{'DISTRICT'};
-							}
+					}
+					if(!defined($state)) {
+						$state = $row->{'REGION'};
+					}
+					if($state eq 'IN') {
+						if(defined($city) && ($city eq 'FW')) {
+							$city = 'FORT WAYNE';
+							$county = 'ALLEN';
+						} elsif(defined($county) && ($county eq 'LAPORTE')) {
+							$county = 'LA PORTE';
 						}
-						if($county) {
-							$county = uc($county);
-							$county =~ s/_/ /g;
-							$county =~ s/\s+COUNTY$//;
-							if($city) {
-								if($city =~ /\s+COUNTY$/i) {
-									my $tmp = $city;
-									$city = $county;
-									$county = $tmp;
-								}
-								if(($city eq $county) ||
-								   ($city eq "$county COUNTY") ||
-								   ($county eq "$city COUNTY")) {
-									$city = undef;
-								}
-							}
+					} elsif($state eq 'MO') {
+						if(defined($city) && ($city eq 'SAINT LOUIS')) {
+							$city = 'ST. LOUIS';
+							$county = undef;
 						}
+					}
+					if(($city && ($city !~ /^\s+$/)) || $county) {
+						# Counties and states alone have already been read in
 						my %columns = (
-							'COUNTRY' => 'CA',
-							'STATE' => $state,
+							'COUNTRY' => uc($country),
 							'CITY' => $city,
+							'STATE' => $state,
 							'COUNTY' => $county,
 							'STREET' => $street
 						);
@@ -570,21 +392,25 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 							$columns{$c} = delete $row->{$c};
 						}
 						insert($dbh, \%columns);
+						$inserts++;
 						if(delete($columns{'COUNTY'})) {
 							insert($dbh, \%columns);
+							$inserts++;
 						}
 						if(delete($columns{'NUMBER'})) {
 							# Match somewhere in the street when number isn't known
 							insert($dbh, \%columns);
-							if(delete($columns{'STREET'})) {
+							$inserts++;
+							if($city && delete($columns{'STREET'})) {
 								# Match somewhere in the city when street isn't known
-								# TODO:  Work out a way to only do this once
-								#	Could maintain a list of hashes and remove
-								#	it all when starting a new province
 								insert($dbh, \%columns);
+								$inserts++;
 							}
 						}
-						flush_queue($dbh) if($rows_count > MAX_INSERT_COUNT);
+					}
+					if($inserts >= MAX_INSERT_COUNT) {
+						flush_queue($dbh);
+						$inserts = 0;
 					}
 				}
 			}
@@ -716,7 +542,7 @@ sub flush_queue
 			$query = 'INSERT INTO openaddresses(';
 			foreach my $column(@columns) {
 				$query .= "$column,";
-			};
+			}
 			$query .= 'MD5) VALUES (';
 		} else {
 			$query .= ',(';

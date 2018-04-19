@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0001';
+our $VERSION = '0.0002';
 
 use Math::GMPz qw< :mpz >;
 

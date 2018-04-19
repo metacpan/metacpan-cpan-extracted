@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Tr::Title;
 # This file auto generated from Data\common\transforms\tr-Title.xml
-#	on Fri 29 Apr  6:48:50 pm GMT
+#	on Fri 13 Apr  6:59:58 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -35,37 +36,37 @@ has 'transforms' => (
 			type => 'conversion',
 			data => [
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:İ)),
+					replace => q(İ),
 					result  => q(i),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:I)),
+					replace => q(I),
 					result  => q(ı),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:(.))),
+					replace => q((.)),
 					result  => q(&Any-Lower($1)),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:i)),
+					replace => q(i),
 					result  => q(İ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:(\p{Lowercase}))),
+					replace => q(([:Lowercase:])),
 					result  => q(&Any-Upper($1)),
 					revisit => 0,
 				},

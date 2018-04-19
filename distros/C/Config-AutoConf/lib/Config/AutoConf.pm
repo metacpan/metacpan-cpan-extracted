@@ -92,7 +92,7 @@ Config::AutoConf - A module to implement some of AutoConf macros in pure perl.
 
 =cut
 
-our $VERSION = '0.315';
+our $VERSION = '0.316';
 $VERSION = eval $VERSION;
 
 =head1 ABSTRACT
@@ -3157,9 +3157,10 @@ Prepend -llibrary to LIBS for the first library found to contain function.
 
 If linking with library results in unresolved symbols that would be
 resolved by linking with additional libraries, give those libraries as
-the I<other-libraries> argument: e.g., C<[qw(Xt X11)]>. Otherwise, this
-method fails to detect that function is present, because linking the
-test program always fails with unresolved symbols.
+the I<other-libraries> argument: e.g., C<[qw(Xt X11)]> or C<[qw(intl),
+qw(intl iconv)]>. Otherwise, this method fails to detect that function
+is present, because linking the test program always fails with unresolved
+symbols.
 
 The result of this test is cached in the ac_cv_search_function variable
 as "none required" if function is already available, as C<0> if no
@@ -3198,29 +3199,45 @@ sub search_libs
 
         my @save_libs = @{$self->{extra_libs}};
         my $have_lib  = 0;
-        foreach my $libstest (undef, @$libs)
-        {
-            # XXX would local work on array refs? can we omit @save_libs?
-            $self->{extra_libs} = [@save_libs];
-            defined($libstest) and unshift(@{$self->{extra_libs}}, $libstest, @other_libs);
+
+        my $if_else_sub = sub {
+            my ($libstest, @other) = @_;
+            defined($libstest) and unshift(@{$self->{extra_libs}}, $libstest, @other);
             $self->link_if_else(
                 $conftest,
                 {
                     (
                         $options->{action_on_lib_true} && "CODE" eq ref $options->{action_on_lib_true}
-                        ? (action_on_true => sub { $options->{action_on_lib_true}->($libstest, @other_libs, @_) })
+                        ? (action_on_true => sub { $options->{action_on_lib_true}->($libstest, @other, @_) })
                         : ()
                     ),
                     (
                         $options->{action_on_lib_false} && "CODE" eq ref $options->{action_on_lib_false}
-                        ? (action_on_false => sub { $options->{action_on_lib_false}->($libstest, @other_libs, @_) })
+                        ? (action_on_false => sub { $options->{action_on_lib_false}->($libstest, @other, @_) })
                         : ()
                     ),
                 }
-              )
-              and ($have_lib = defined($libstest) ? $libstest : "none required")
-              and last;
+            ) and ($have_lib = defined($libstest) ? $libstest : "none required");
+        };
+
+      LIBTEST:
+        foreach my $libstest (undef, @$libs)
+        {
+            # XXX would local work on array refs? can we omit @save_libs?
+            $self->{extra_libs} = [@save_libs];
+            if (defined $libstest and scalar(@other_libs) > 1 and ref($other_libs[0]) eq "ARRAY")
+            {
+                foreach my $ol (@other_libs)
+                {
+                    $if_else_sub->($libstest, @{$ol}) and last LIBTEST;
+                }
+            }
+            else
+            {
+                $if_else_sub->($libstest, @other_libs) and last LIBTEST;
+            }
         }
+
         $self->{extra_libs} = [@save_libs];
 
               $have_lib
@@ -3356,6 +3373,8 @@ sub check_lm
 Search for pkg-config flags for package as specified. The flags which are
 extracted are C<--cflags> and C<--libs>. The extracted flags are appended
 to the global C<extra_compile_flags> and C<extra_link_flags>, respectively.
+In case, no I<package configuration> matching given criteria could be found,
+return a C<false> value (C<0>).
 
 Call it with the package you're looking for and optional callback whether
 found or not.
@@ -3378,7 +3397,7 @@ sub _pkg_config_flag
       capture { system($_pkg_config_prog, @pkg_config_args); };
     chomp $stdout;
     0 == $exit and return $stdout;
-    return;
+    return $exit;
 }
 
 sub pkg_config_package_flags
@@ -3396,25 +3415,35 @@ sub pkg_config_package_flags
         my (@pkg_cflags, @pkg_libs);
 
         (my $ENV_CFLAGS = $package) =~ s/^(\w+).*?$/$1_CFLAGS/;
+        (my $ENV_LIBS   = $package) =~ s/^(\w+).*?$/$1_LIBS/;
+
+        my $pkg_exists = 0 + (
+                 defined $ENV{$ENV_CFLAGS}
+              or defined $ENV{$ENV_LIBS}
+              or _pkg_config_flag($package, "--exists") eq ""
+        );
+        looks_like_number($pkg_exists) and $pkg_exists == 0 and return 0;
+
         my $CFLAGS =
           defined $ENV{$ENV_CFLAGS}
           ? $ENV{$ENV_CFLAGS}
           : _pkg_config_flag($package, "--cflags");
-        $CFLAGS and @pkg_cflags = (
+        $CFLAGS and not looks_like_number($CFLAGS) and @pkg_cflags = (
             map { $_ =~ s/^\s+//; $_ =~ s/\s+$//; Text::ParseWords::shellwords $_; }
               split(m/\n/, $CFLAGS)
         ) and push @{$self->{extra_preprocess_flags}}, @pkg_cflags;
 
-        (my $ENV_LIBS = $package) =~ s/^(\w+).*?$/$1_LIBS/;
         # do not separate between libs and extra (for now) - they come with -l prepended
         my $LIBS =
           defined $ENV{$ENV_LIBS}
           ? $ENV{$ENV_LIBS}
           : _pkg_config_flag($package, "--libs");
-        $LIBS and @pkg_libs = (
+        $LIBS and not looks_like_number($LIBS) and @pkg_libs = (
             map { $_ =~ s/^\s+//; $_ =~ s/\s+$//; Text::ParseWords::shellwords $_; }
               split(m/\n/, $LIBS)
-        ) and push @{$self->{extra_link_flags}}, @pkg_libs;
+        );
+        @pkg_libs and push @{$self->{extra_link_flags}}, grep { $_ !~ m/^-l/ } @pkg_libs;
+        @pkg_libs and push @{$self->{extra_libs}}, map { (my $l = $_) =~ s/^-l//; $l } grep { $_ =~ m/^-l/ } @pkg_libs;
 
         my $pkg_config_flags = join(" ", @pkg_cflags, @pkg_libs);
 

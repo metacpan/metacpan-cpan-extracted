@@ -30,7 +30,7 @@ my %args = (
         'File::Path' => '0',
         'XSLoader' => '0',
         'parent' => '0',
-        'perl' => '5.008005',
+        'perl' => '5.008001',
     },
 
     recommends => {
@@ -45,7 +45,7 @@ my %args = (
     test_requires => {
         'Capture::Tiny' => '0',
         'Cwd::Guard' => '0',
-        'File::Copy::Recursive' => '0',
+        'File::Copy::Recursive::Reduced' => '0.002',
         'File::Spec::Functions' => '0',
         'File::Temp' => '0',
         'Test::More' => '0.98',
@@ -56,7 +56,6 @@ my %args = (
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
     PL_files => {},
 
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',

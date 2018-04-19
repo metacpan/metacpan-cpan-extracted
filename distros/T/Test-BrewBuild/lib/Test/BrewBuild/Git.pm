@@ -6,8 +6,9 @@ use Capture::Tiny qw(:all);
 use Carp qw(croak);
 use Logging::Simple;
 use LWP::Simple qw(head);
+use Test::BrewBuild::Regex;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 my $log;
 
@@ -64,7 +65,7 @@ sub name {
 
     $log->child('name')->_6("converting repository link to repo name");
 
-    if ($repo =~ m!.*/(.*?)(?:\.git)*$!){
+    if ($repo =~ m!${ re_git('extract_repo_name') }!){
         $log->child('name')->_6("repo link converted to $1");
         return $1;
     }
@@ -84,6 +85,10 @@ sub clone {
     my $output = capture_merged {
         `"$git" clone $repo`;
     };
+
+    if ($output =~ /fatal/){
+        croak "fatal error cloning $repo, can't clone...\n";
+    }
 
     return $output;
 }
@@ -131,7 +136,7 @@ sub revision {
 
         capture_stderr {
             my $sums = `"$git" ls-remote $repo`;
-            if ($sums =~ /([A-F0-9]{40})\s+HEAD/i){
+            if ($sums =~ /${ re_git('extract_commit_csum') }/){
                 $csum = $1;
             }
         }

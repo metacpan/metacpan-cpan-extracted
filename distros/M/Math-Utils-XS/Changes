@@ -1,0 +1,16 @@
+0.000005    2018-04-18
+            * More fixes for floating point comparisons.
+
+0.000004    2018-04-17
+            * Use the C library for floor and ceil.
+            * Improve docs.
+
+0.000003    2018-04-17
+            * Fix comparisons in tests to account for floating point rounding
+              errors.
+
+0.000002    2018-04-16
+            * Update test dependencies.
+
+0.000001    2018-04-16
+            * Initial release.

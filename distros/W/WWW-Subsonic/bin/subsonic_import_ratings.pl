@@ -209,7 +209,7 @@ subsonic_import_ratings.pl - Import Ratings from an iTunes Library XML Export to
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

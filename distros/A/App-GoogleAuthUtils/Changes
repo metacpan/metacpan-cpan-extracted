@@ -1,3 +1,25 @@
+0.004   2018-04-18 (PERLANCAR)
+
+	- Try using qrencode before using online encoder.
+
+	- [doc] Mention App::QRCodeUtils.
+
+
+0.003   2018-04-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [ux] Make CLI not read config/env.
+
+	- Tweak Rinci example spec.
+
+
+0.002   2018-04-14 (PERLANCAR)
+
+	- If qrencode is installed, use it instead of using online
+	  generator.
+
+
 0.001   2018-02-08 (PERLANCAR)
 
         - First release.

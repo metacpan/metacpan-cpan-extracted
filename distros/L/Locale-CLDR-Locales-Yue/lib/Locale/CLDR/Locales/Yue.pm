@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Yue - Package for language Cantonese
 
 package Locale::CLDR::Locales::Yue;
 # This file auto generated from Data\common\main\yue.xml
-#	on Fri 29 Apr  7:32:24 pm GMT
+#	on Fri 13 Apr  7:34:34 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -500,12 +501,12 @@ has 'algorithmic_number_format_data' => (
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 				'max' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 			},
 		},
@@ -617,12 +618,12 @@ has 'algorithmic_number_format_data' => (
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 				'max' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 			},
 		},
@@ -729,12 +730,12 @@ has 'algorithmic_number_format_data' => (
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 				'max' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 			},
 		},
@@ -841,12 +842,12 @@ has 'algorithmic_number_format_data' => (
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 				'max' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 			},
 		},
@@ -859,7 +860,7 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'1000' => {
 					base_value => q(1000),
@@ -916,11 +917,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=#,##0.#=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=#,##0.#=),
 				},
 			},
 		},
@@ -1056,6 +1057,7 @@ has 'display_name_language' => (
  				'cps' => '卡皮茲文',
  				'cr' => '克裡文',
  				'crh' => '克里米亞半島的土耳其文；克里米亞半島的塔塔爾文',
+ 				'crs' => '法語克里奧爾混合語',
  				'cs' => '捷克文',
  				'csb' => '卡舒布文',
  				'cu' => '宗教斯拉夫文',
@@ -1361,6 +1363,7 @@ has 'display_name_language' => (
  				'pap' => '帕皮阿門托文',
  				'pau' => '帛琉文',
  				'pcd' => '庇卡底文',
+ 				'pcm' => '尼日利亞皮欽語',
  				'pdc' => '賓夕法尼亞德文',
  				'pdt' => '門諾低地德文',
  				'peo' => '古波斯文',
@@ -1612,6 +1615,7 @@ has 'display_name_script' => (
  			'Grek' => '希臘文',
  			'Gujr' => '古吉拉特文',
  			'Guru' => '古魯穆奇文',
+ 			'Hanb' => '漢語注音',
  			'Hang' => '韓文字',
  			'Hani' => '漢語',
  			'Hano' => '哈努諾文',
@@ -1627,6 +1631,7 @@ has 'display_name_script' => (
  			'Hung' => '古匈牙利文',
  			'Inds' => '印度河流域（哈拉帕文）',
  			'Ital' => '古意大利文',
+ 			'Jamo' => '韓文字母',
  			'Java' => '爪哇文',
  			'Jpan' => '日文',
  			'Jurc' => '女真文字',
@@ -1728,6 +1733,7 @@ has 'display_name_script' => (
  			'Yiii' => '彞文',
  			'Zinh' => '繼承文字（Unicode）',
  			'Zmth' => '數學符號',
+ 			'Zsye' => '表情符號',
  			'Zsym' => '符號',
  			'Zxxx' => '非書寫語言',
  			'Zyyy' => '一般文字',
@@ -1837,7 +1843,8 @@ has 'display_name_region' => (
  			'CW' => '庫拉索',
  			'CX' => '聖誕島',
  			'CY' => '賽普勒斯',
- 			'CZ' => '捷克共和國',
+ 			'CZ' => '捷克',
+ 			'CZ@alt=variant' => '捷克共和國',
  			'DE' => '德國',
  			'DG' => '迪亞哥加西亞島',
  			'DJ' => '吉布地',
@@ -1854,6 +1861,7 @@ has 'display_name_region' => (
  			'ES' => '西班牙',
  			'ET' => '衣索比亞',
  			'EU' => '歐盟',
+ 			'EZ' => '歐元區',
  			'FI' => '芬蘭',
  			'FJ' => '斐濟',
  			'FK' => '福克蘭群島',
@@ -2026,6 +2034,7 @@ has 'display_name_region' => (
  			'UA' => '烏克蘭',
  			'UG' => '烏干達',
  			'UM' => '美國本土外小島嶼',
+ 			'UN' => '聯合國',
  			'US' => '美國',
  			'US@alt=short' => '美國',
  			'UY' => '烏拉圭',
@@ -2126,11 +2135,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => '曆法',
+ 			'cf' => '貨幣格式',
  			'colalternate' => '略過符號排序',
  			'colbackwards' => '反向重音排序',
  			'colcasefirst' => '大寫/小寫排列',
  			'colcaselevel' => '區分大小寫排序',
- 			'colhiraganaquaternary' => '假名排序',
  			'collation' => '排序',
  			'colnormalization' => '正規化排序',
  			'colnumeric' => '數字排序',
@@ -2142,7 +2151,6 @@ has 'display_name_key' => (
  			'numbers' => '數字',
  			'timezone' => '時區',
  			'va' => '區域變異',
- 			'variabletop' => '以符號排序',
  			'x' => '專用區',
 
 		}
@@ -2175,6 +2183,10 @@ has 'display_name_type' => (
  				'persian' => q{波斯曆},
  				'roc' => q{民國曆},
  			},
+ 			'cf' => {
+ 				'account' => q{會計貨幣格式},
+ 				'standard' => q{標準貨幣格式},
+ 			},
  			'colalternate' => {
  				'non-ignorable' => q{排序符號},
  				'shifted' => q{略過符號排序},
@@ -2191,10 +2203,6 @@ has 'display_name_type' => (
  			'colcaselevel' => {
  				'no' => q{不分大小寫排序},
  				'yes' => q{依大小寫排序},
- 			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{個別排序假名},
- 				'yes' => q{分別排序假名},
  			},
  			'collation' => {
  				'big5han' => q{繁體中文排序 - Big5},
@@ -2229,6 +2237,11 @@ has 'display_name_type' => (
  				'secondary' => q{排序重音},
  				'tertiary' => q{排序重音/大小寫/全半形},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{全形},
+ 				'hwidth' => q{半形},
+ 				'npinyin' => q{數值},
+ 			},
  			'hc' => {
  				'h11' => q{12 小時制 (0–11)},
  				'h12' => q{12 小時制 (1–12)},
@@ -2239,6 +2252,10 @@ has 'display_name_type' => (
  				'loose' => q{寬鬆換行樣式},
  				'normal' => q{一般換行樣式},
  				'strict' => q{強制換行樣式},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{美國地名委員會},
+ 				'ungegn' => q{聯合國地名專家組},
  			},
  			'ms' => {
  				'metric' => q{公制},
@@ -2327,27 +2344,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => '美國地名委員會',
- 			'numeric' => '數值',
- 			'tone' => '聲調',
- 			'ungegn' => '聯合國地名專家組',
- 			'x-accents' => '重音',
- 			'x-fullwidth' => '全形',
- 			'x-halfwidth' => '半形',
- 			'x-jamo' => '韓文字母',
- 			'x-pinyin' => '拼音',
- 			'x-publishing' => '出版',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -2371,10 +2367,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[乍 仂 伏 佐 侶 僳 兆 兌 兹 别 券 勳 卑 卞 占 叶 堤 墎 壤 奥 孜 峇 嶼 巽 栗 楔 涅 渾 澎 燦 狄 琳 瑚 甫 碑 礁 芒 苗 茨 蓬 蚩 蜀 裘 謬 酋 隴])},
+			auxiliary => qr{[乍 仂 伏 佐 侶 僳 兆 兌 兹 凸 别 券 勳 卑 卞 占 叶 嘅 堤 墎 壤 奥 孜 峇 嶼 巽 栗 楔 涅 渾 澎 灘 燦 狄 琳 瑚 甫 碑 礁 纜 艇 芒 苗 茨 蓬 蚩 蜀 裘 謬 酋 隴 雀 髪]},
 			index => ['一', '丁', '丈', '不', '且', '丞', '並', '串', '乘', '乾', '亂', '亭', '傀', '僎', '僵', '儐', '償', '儳', '儷', '儻', '叢', '嚴', '囌', '囑', '廳'],
-			main => qr{(?^u:[一 丁 七 丈-不 丑 且 世 丘 丙 丟 並 中 串 丸 丹 主 乃 久 么 之 乎 乏 乖 乘 乙 九 也 乾 亂 了 予 事 二 于 云 互 五 井 些 亞 亡 交-亦 亨 享 京 亮 人 什 仁 仇 今 介 仍 仔 他 付 仙 代-以 仰 仲 件 任 份 企 伊 伍 伐 休 伙 伯 估 伴 伸 似 伽 但 佈 佉 位-住 佔 何 余 佛 作 你 佩 佳 使 來 例 供 依 侯 侵 便 係-俄 俊 俗 保 俠 信 修 俱 俾 個 倍 們 倒 候 倚 借 倫 值 假 偉 偏 做 停 健 側-偷 傑 備 傢 傣 傲 傳 傷 傻 傾 僅 像 僑 僧 價 儀 億 儒 儘 優 允 元-充 兇-光 克 免 兒 兔 入 內-兩 八-兮 共 兵-典 兼 冊 再 冒 冠 冬 冰 冷 准 凌 凝 凡 凰 凱 出 函 刀 分 切 刊 列 初 判 別 利 刪 到 制 刷 刺 刻 則 剌 前 剛 剩 剪 副 割 創 劃 劇 劉 劍 力 功 加 助-劫 勁 勇 勉 勒 動 務 勝 勞 勢 勤 勵 勸 勿 包 匈 化 北 匹 區 十 千 升 午 半 卒-協 南 博 卜 卡 卯-危 即 卷 卻 厄 厘 厚 原 厭 厲 去 參 又 及 友 反 叔 取 受 口-另 只-叭 可 台 史 右 司 吃 各 合-吊 同-后 吐-吒 君 吝-吠 否 吧 含 吳 吵 吸 吹 吾 呀 呂 呆 告 呢 周 味 呵 呼 命 和 咖 咦 咧 咪 咬 咱 哀 品 哇-哉 哎 員 哥 哦 哩 哪 哭 哲 唉 唐 唔 唬 售 唯 唱 唷 唸 商 啊 問 啟 啡 啥 啦 啪 喀 喂 善 喇 喊 喔 喜 喝 喬 單 喵 嗎 嗚 嗨 嗯 嘆 嘉 嘗 嘛 嘴 嘻 嘿 器 噴 嚇 嚴 囉 四 回 因 困 固 圈 國 圍 園 圓 圖 團 圜 土 在 圭 地 圾 址 均 坎 坐 坡 坤 坦 坪 垂 垃 型 埃 城 埔 域 執 培 基 堂 堅 堆 堡 堪 報 場 塊 塔 塗 塞 填 塵 境 增 墨 墮 壁 壇 壓 壘 壞 壢 士 壬 壯 壽 夏 夕 外 多 夜 夠 夢 夥 大 天-夫 央 失 夷 夸 夾 奇-奉 奎 奏 契 奔 套 奧 奪 奮 女 奴 奶 她 好 如 妙 妝 妥 妨 妮 妳 妹 妻 姆 姊 始 姐 姑 姓 委 姿 威 娃 娘 娛 婁 婆 婚 婦 媒 媽 嫌 嫩 子 孔 字 存 孝 孟 季 孤 孩 孫 學 它 宅 宇-安 宋 完 宏 宗-宜 客-室 宮 害 家 容 宿 寂 寄-密 富 寒 寞 察 寢 實-審 寫 寬 寮 寵 寶 封 射 將 專 尊 尋 對-小 少 尖 尚 尤 就 尺 尼 尾 局 屁 居 屆 屋 屏 展 屠 層 屬 山 岡 岩 岸 峰 島 峽 崇 崙 崴 嵐 嶺 川 州 巡 工-巨 巫 差 己-巴 巷 市 布 希 帕 帖 帛 帝 帥 師 席 帳 帶 常 帽 幅 幕 幣 幫 干-年 幸 幹 幻-幾 庇 床 序 底 店 庚 府 度 座 庫 庭 康 庸 廉 廖 廠 廢 廣 廳 延 廷 建 弄 式 引 弗 弘 弟 弦 弱 張 強 彈 彊 彌 彎 彝 彞 形 彥 彩 彬 彭 彰 影 役 彼 往 征 待 很 律 後 徐-徒 得 從 復 微 徵 德 徹 心 必 忌 忍 志-忙 忠 快 念 忽 怎 怒 怕 怖 思 怡 急 性 怨 怪 恆 恐 恢 恥 恨 恩 恭 息 恰 悅 悉 悔 悟 悠 您 悲 悶 情 惑 惜 惠 惡 惱 想 惹 愁 愈 愉 意 愚 愛 感 慈 態 慕 慘 慢 慣 慧 慮 慰 慶 慾 憂 憐 憑 憲 憶 憾 懂 應 懶 懷 懼 戀 戈 戊 戌 成-戒 或 截 戰 戲 戴 戶 房-扁 扇 手 才 扎 打 托 扣 扥 扭 扯 批 找-技 抄 把 抓 投 抗 折 披 抬 抱 抵 抹 抽 拆 拉 拋 拍 拏 拒 拔 拖 招 拜 括 拳 拼 拾 拿 持 指 按 挑 挖 挪 振 挺 捐 捕 捨 捲 捷 掃 授 掉 掌 排 掛 採 探 接 控 推 措 描 提 插 揚 換 握 揮 援 損 搖 搜 搞 搬 搭 搶 摘 摩 摸 撐 撒 撞 撣 撥 播 撾 撿 擁 擇 擊 擋 操 擎 擔 據 擠 擦 擬 擴 擺 擾 攝 支 收 改 攻 放 政 故 效 敍 敏 救 敗-教 敝 敢 散 敦 敬 整 敵 數 文 斐 斗 料 斯 新 斷 方 於 施 旁 旅 旋 族 旗 既 日 旦 早 旭 旺 昂 昆 昇 昌 明 昏 易 星 映 春 昨 昭 是 時 晉 晒 晚 晨 普 景 晴 晶 智 暑 暖 暗 暫 暴 曆 曉 曰 曲 更 書 曼 曾-最 會 月 有 朋 服 朗 望 朝 期 木 未-札 朱 朵 杉 李 材 村 杜 束 杯-東 松 板 析 林 果 枝 架 柏 某 染 柔 查 柬 柯 柳 柴 校 核 根 格 桃 案 桌 桑 梁 梅 條 梨 梯 械 梵 棄 棉 棋 棒 棚 森 椅 植 椰 楊 楓 楚 業 極 概 榜 榮 構 槍 樂 樓 標 樞 模 樣 樹 橋 機 橫 檀 檔 檢 欄 權 次 欣 欲 欺 欽 款 歉 歌 歐 歡-武 歲 歷 歸 死 殊 殘 段 殺 殼 毀 毅 母 每 毒 比 毛 毫 氏 民 氣 水 永 求 汗 汝 江-污 汪 汶 決 汽 沃 沈 沉 沒 沖 沙 河 油 治 沿 況 泉 泊 法 泡 波 泥 注 泰 泳 洋 洗 洛 洞 洩 洪 洲 活 洽 派 流 浦 浩 浪 浮 海 涇-涉 涯 液 涵 涼 淑 淚 淡 淨 深 混 淺 清 減 渡 測 港 游 湖 湯 源 準 溝 溪 溫 滄 滅 滋 滑 滴 滾 滿 漂 漏 演 漠 漢 漫 漲 漸 潔 潘 潛 潮 澤 澳 激 濃 濟 濤 濫 濱 瀏 灌 灣 火 灰 災 炎 炮 炸 為 烈 烏 烤 無 焦 然 煙 煞 照 煩 熊 熟 熱 燃 燈 燒 營 爆 爐 爛 爪 爬 爭 爵 父 爸 爺 爽 爾 牆-版 牌 牙 牛 牠 牧 物 牲 特 牽 犧 犯 狀 狂 狐 狗 狠 狼 猛 猜 猴 猶 獄 獅 獎 獨 獲 獸 獻 玄 率 玉 王 玩 玫 玲 玻 珊 珍 珠 珥 班 現 球 理 琉 琪 琴 瑙 瑜 瑞 瑟 瑤 瑪 瑰 環 瓜 瓦 瓶 甘 甚 甜 生 產 用 田-申 男 甸 界 留 畢 略 番 畫 異 當 疆 疏 疑 疼 病 痕 痛 痴 瘋 療 癡 癸 登-百 的 皆 皇 皮 盃 益 盛 盜 盟 盡 監 盤 盧 目 盲 直 相 盼 盾 省 眉 看 真 眠 眼 眾 睛 睡 督 瞧 瞭 矛 矣 知 短 石 砂 砍 研 砲 破 硬 碎 碗 碟 碧 碩 碰 確 碼 磁 磨 磯 礎 礙 示 社 祕 祖 祚 祛 祝 神 祥 票 祿 禁 禍-福 禪 禮 秀 私 秋 科 秒 秘 租 秤 秦 移 稅 程 稍 種 稱 稿 穆 穌 積 穩 究 穹 空 穿 突 窗 窩 窮 窶 立 站 竟 章 童 端 競 竹 笑 笛 符 笨 第 筆 等 筋 答 策 简 算 管 箭 箱 節 範 篇 築 簡 簫 簽 簿 籃 籌 籍 籤 米 粉 粗 粵 精 糊 糕 糟 系 糾 紀 約 紅 納 紐 純 紙-紛 素 索 紫 累 細 紹 終 組 結 絕 絡 給 統 絲 經 綜 綠 維 綱 網 緊 緒 線 緣 編 緩 緬 緯 練 縛 縣 縮 縱 總 績 繁 繆 織 繞 繪 繳 繼 續 缸 缺 罕 罪 置 罰 署 罵 罷 羅 羊 美 羞 群 義 羽 翁 習 翔 翰 翹 翻 翼 耀 老 考 者 而 耍 耐 耗 耳 耶 聊 聖 聚 聞 聯 聰 聲 職 聽 肉 肚 股 肥 肩 肯 育 背 胎 胖 胞 胡 胸 能 脆 脫 腓 腔 腦 腰 腳 腿 膽 臉 臘 臣 臥 臨 自 臭 至 致 臺 與-舊 舌 舍 舒 舞 舟 航 般 船 艦 良 色 艾 芝 芬 花 芳 若 苦 英 茅 茫 茲 茶 草 荒 荷 荼 莉 莊 莎 莫 菜 菩 華 菲 萄 萊 萬 落 葉 著 葛 葡 蒂 蒙 蒲 蒼 蓋 蓮 蔕 蔡 蔣 蕭 薄 薦 薩 薪 藉 藍 藏 藝 藤 藥 蘆 蘇 蘭 虎 處 虛 號 虧 蛇 蛋 蛙 蜂 蜜 蝶 融 螢 蟲 蟹 蠍 蠻 血 行 術 街 衛 衝 衡 衣 表 袋 被 裁 裂 裕 補 裝 裡 製 複 褲 西 要 覆 見 規 視 親 覺 覽 觀 角 解 觸 言 訂 計 訊 討 訓 託 記 訥 訪 設 許 訴 註 証 評 詞 詢 試 詩 話-詳 誇 誌 認 誓 誕 語 誠 誤 說 誰 課 誼 調 談 請 諒 論 諸 諺 諾 謀 謂 講 謝 證 識 譜 警 譯 議 護 譽 讀 變 讓 讚 谷 豆 豈 豐 象 豪 豬 貌 貓 貝 貞 負-貢 貨 貪-責 貴 買 費 貼 賀 資 賈 賓 賜 賞 賢-賤 賦 質 賭 賴 賺 購 賽 贈 贊 贏 赤 赫 走 起 超 越 趕 趙 趣 趨 足 跌 跎 跑 距 跟 跡 路 跳 踏 踢 蹟 蹤 躍 身 躲 車 軌 軍 軒 軟 較 載 輔 輕 輛 輝 輩 輪 輯 輸 轉 轟 辛 辦 辨 辭 辯-農 迅 迎 近 返 迦 迪 迫 述 迴 迷 追 退 送 逃 逆 透 逐 途 這-逛 逝 速 造 逢 連 週 進 逸 逼 遇 遊 運 遍 過 道-違 遙 遜 遠 適 遭 遮 遲 遷 選 遺 避-邁 還 邊 邏 那 邦 邪 邱 郎 部 郭 郵 都 鄂 鄉 鄭 鄰 酉 配 酒 酷 酸 醉 醒 醜 醫 采 釋-量 金 針 釣 鈴 鉢 銀 銅 銖 銘 銳 銷 鋒 鋼 錄 錢 錦 錫 錯 鍋 鍵 鍾 鎊 鎖 鎮 鏡 鐘 鐵 鑑 長 門 閃 閉 開 閏 閒 間 閣 閱 闆 闊 闍 闐 關 闡 防 阻 阿 陀 附 降 限 院-除 陪 陰 陳 陵-陸 陽 隆 隊 階 隔 際 障 隨 險 隱 隻 雄-集 雉 雖 雙 雜 雞 離 難 雨 雪 雲 零 雷 電 需 震 霍 霧 露 霸 霹 靂 靈 青 靖 靜 非 靠 面 革 靼 鞋 韃 韋 韓 音 韻 響 頁 頂 項 順 須 預 頑 頓 頗 領 頞 頭 頻 顆 題 額 顏 願 類 顧 顯 風 飄 飛 食 飯 飲 飽 飾 餅 養 餐 餘 館 首 香 馬 駐 駕 駛 騎 騙 騷 驅 驗 驚 骨 體 高 髮 鬆 鬥 鬧 鬱 鬼 魁 魂 魅 魔 魚 魯 鮮 鳥 鳳 鳴 鴻 鵝 鷹 鹿 麗 麥 麵 麻 麼 黃 黎 黑 默 點 黨 鼓 鼠 鼻 齊 齋 齒 齡 龍 龜])},
-			punctuation => qr{(?^u:[‾ ﹉﹊﹋﹌ _ ＿ ﹍﹎﹏ ︳︴ \- － ﹣ ‐ – ︲ — ﹘ ︱ , ， ﹐ 、 ﹑ ; ； ﹔ \: ： ﹕ ! ！ ﹗ ? ？ ﹖ . ． ﹒ ‥ ︰ … 。 · ＇ ‘ ’ " ＂ “ ” 〝 〞 ( （ ﹙ ︵ ) ） ﹚ ︶ \[ ［ \] ］ \{ ｛ ﹛ ︷ \} ｝ ﹜ ︸ 〈 ︿ 〉 ﹀ 《 ︽ 》 ︾ 「 ﹁ 」 ﹂ 『 ﹃ 』 ﹄ 【 ︻ 】 ︼ 〔 ﹝ ︹ 〕 ﹞ ︺ § @ ＠ ﹫ * ＊ ﹡ / ／ \\ ＼ ﹨ \& ＆ ﹠ # ＃ ﹟ % ％ ﹪ ‰ † ‡ ‧ ′ ″ ‵ 〃 ※])},
+			main => qr{[一 丁 七 丈-不 丑 且 世 丘 丙 丟 並 中 串 丸 丹 主 乃 久 么 之 乎 乏 乖 乘 乙 九 也 乾 亂 了 予 事 二 于 云 互 五 井 些 亞 亡 交-亦 亨 享 京 亮 人 什 仁 仇 今 介 仍 仔 他 付 仙 代-以 仰 仲 件 任 份 企 伊 伍 伐 休 伙 伯 估 伴 伸 似 伽 但 佈 佉 位-住 佔 何 余 佛 作 你 佩 佳 使 來 例 供 依 侯 侵 便 係-俄 俊 俗 保 俠 信 修 俱 俾 個 倍 們 倒 候 倚 借 倫 值 假 偉 偏 做 停 健 側-偷 傑 備 傢 傣 傲 傳 傷 傻 傾 僅 像 僑 僧 價 儀 億 儒 儘 優 允 元-充 兇-光 克 免 兒 兔 入 內-兩 八-兮 共 兵-典 兼 冊 再 冒 冠 冬 冰 冷 准 凌 凝 凡 凰 凱 出 函 刀 分 切 刊 列 初 判 別 利 刪 到 制 刷 刺 刻 則 剌 前 剛 剩 剪 副 割 創 劃 劇 劉 劍 力 功 加 助-劫 勁 勇 勉 勒 動 務 勝 勞 勢 勤 勵 勸 勿 包 匈 化 北 匹 區 十 千 升 午 半 卒-協 南 博 卜 卡 卯-危 即 卷 卻 厄 厘 厚 原 厭 厲 去 參 又 及 友 反 叔 取 受 口-另 只-叭 可 台 史 右 司 吃 各 合-吊 同-后 吐-吒 君 吝-吠 否 吧 含 吳 吵 吸 吹 吾 呀 呂 呆 告 呢 周 味 呵 呼 命 和 咖 咦 咧 咪 咬 咱 哀 品 哇-哉 哎 員 哥 哦 哩 哪 哭 哲 唉 唐 唔 唬 售 唯 唱 唷 唸 商 啊 問 啟 啡 啥 啦 啪 喀 喂 善 喇 喊 喔 喜 喝 喬 單 喵 嗎 嗚 嗨 嗯 嘆 嘉 嘗 嘛 嘴 嘻 嘿 器 噴 嚇 嚴 囉 四 回 因 困 固 圈 國 圍 園 圓 圖 團 圜 土 在 圭 地 圾 址 均 坎 坐 坡 坤 坦 坪 垂 垃 型 埃 城 埔 域 執 培 基 堂 堅 堆 堡 堪 報 場 塊 塔 塗 塞 填 塵 境 增 墨 墮 壁 壇 壓 壘 壞 壢 士 壬 壯 壽 夏 夕 外 多 夜 夠 夢 夥 大 天-夫 央 失 夷 夸 夾 奇-奉 奎 奏 契 奔 套 奧 奪 奮 女 奴 奶 她 好 如 妙 妝 妥 妨 妮 妳 妹 妻 姆 姊 始 姐 姑 姓 委 姿 威 娃 娘 娛 婁 婆 婚 婦 媒 媽 嫌 嫩 子 孔 字 存 孝 孟 季 孤 孩 孫 學 它 宅 宇-安 宋 完 宏 宗-宜 客-室 宮 害 家 容 宿 寂 寄-密 富 寒 寞 察 寢 實-審 寫 寬 寮 寵 寶 封 射 將 專 尊 尋 對-小 少 尖 尚 尤 就 尺 尼 尾 局 屁 居 屆 屋 屏 展 屠 層 屬 山 岡 岩 岸 峰 島 峽 崇 崙 崴 嵐 嶺 川 州 巡 工-巨 巫 差 己-巴 巷 市 布 希 帕 帖 帛 帝 帥 師 席 帳 帶 常 帽 幅 幕 幣 幫 干-年 幸 幹 幻-幾 庇 床 序 底 店 庚 府 度 座 庫 庭 康 庸 廉 廖 廠 廢 廣 廳 延 廷 建 弄 式 引 弗 弘 弟 弦 弱 張 強 彈 彊 彌 彎 彝 彞 形 彥 彩 彬 彭 彰 影 役 彼 往 征 待 很 律 後 徐-徒 得 從 復 微 徵 德 徹 心 必 忌 忍 志-忙 忠 快 念 忽 怎 怒 怕 怖 思 怡 急 性 怨 怪 恆 恐 恢 恥 恨 恩 恭 息 恰 悅 悉 悔 悟 悠 您 悲 悶 情 惑 惜 惠 惡 惱 想 惹 愁 愈 愉 意 愚 愛 感 慈 態 慕 慘 慢 慣 慧 慮 慰 慶 慾 憂 憐 憑 憲 憶 憾 懂 應 懶 懷 懼 戀 戈 戊 戌 成-戒 或 截 戰 戲 戴 戶 房-扁 扇 手 才 扎 打 托 扣 扥 扭 扯 批 找-技 抄 把 抓 投 抗 折 披 抬 抱 抵 抹 抽 拆 拉 拋 拍 拏 拒 拔 拖 招 拜 括 拳 拼 拾 拿 持 指 按 挑 挖 挪 振 挺 捐 捕 捨 捲 捷 掃 授 掉 掌 排 掛 採 探 接 控 推 措 描 提 插 揚 換 握 揮 援 損 搖 搜 搞 搬 搭 搶 摘 摩 摸 撐 撒 撞 撣 撥 播 撾 撿 擁 擇 擊 擋 操 擎 擔 據 擠 擦 擬 擴 擺 擾 攝 支 收 改 攻 放 政 故 效 敍 敏 救 敗-教 敝 敢 散 敦 敬 整 敵 數 文 斐 斗 料 斯 新 斷 方 於 施 旁 旅 旋 族 旗 既 日 旦 早 旭 旺 昂 昆 昇 昌 明 昏 易 星 映 春 昨 昭 是 時 晉 晒 晚 晨 普 景 晴 晶 智 暑 暖 暗 暫 暴 曆 曉 曰 曲 更 書 曼 曾-最 會 月 有 朋 服 朗 望 朝 期 木 未-札 朱 朵 杉 李 材 村 杜 束 杯-東 松 板 析 林 果 枝 架 柏 某 染 柔 查 柬 柯 柳 柴 校 核 根 格 桃 案 桌 桑 梁 梅 條 梨 梯 械 梵 棄 棉 棋 棒 棚 森 椅 植 椰 楊 楓 楚 業 極 概 榜 榮 構 槍 樂 樓 標 樞 模 樣 樹 橋 機 橫 檀 檔 檢 欄 權 次 欣 欲 欺 欽 款 歉 歌 歐 歡-武 歲 歷 歸 死 殊 殘 段 殺 殼 毀 毅 母 每 毒 比 毛 毫 氏 民 氣 水 永 求 汗 汝 江-污 汪 汶 決 汽 沃 沈 沉 沒 沖 沙 河 油 治 沿 況 泉 泊 法 泡 波 泥 注 泰 泳 洋 洗 洛 洞 洩 洪 洲 活 洽 派 流 浦 浩 浪 浮 海 涇-涉 涯 液 涵 涼 淑 淚 淡 淨 深 混 淺 清 減 渡 測 港 游 湖 湯 源 準 溝 溪 溫 滄 滅 滋 滑 滴 滾 滿 漂 漏 演 漠 漢 漫 漲 漸 潔 潘 潛 潮 澤 澳 激 濃 濟 濤 濫 濱 瀏 灌 灣 火 灰 災 炎 炮 炸 為 烈 烏 烤 無 焦 然 煙 煞 照 煩 熊 熟 熱 燃 燈 燒 營 爆 爐 爛 爪 爬 爭 爵 父 爸 爺 爽 爾 牆-版 牌 牙 牛 牠 牧 物 牲 特 牽 犧 犯 狀 狂 狐 狗 狠 狼 猛 猜 猴 猶 獄 獅 獎 獨 獲 獸 獻 玄 率 玉 王 玩 玫 玲 玻 珊 珍 珠 珥 班 現 球 理 琉 琪 琴 瑙 瑜 瑞 瑟 瑤 瑪 瑰 環 瓜 瓦 瓶 甘 甚 甜 生 產 用 田-申 男 甸 界 留 畢 略 番 畫 異 當 疆 疏 疑 疼 病 痕 痛 痴 瘋 療 癡 癸 登-百 的 皆 皇 皮 盃 益 盛 盜 盟 盡 監 盤 盧 目 盲 直 相 盼 盾 省 眉 看 真 眠 眼 眾 睛 睡 督 瞧 瞭 矛 矣 知 短 石 砂 砍 研 砲 破 硬 碎 碗 碟 碧 碩 碰 確 碼 磁 磨 磯 礎 礙 示 社 祕 祖 祚 祛 祝 神 祥 票 祿 禁 禍-福 禪 禮 秀 私 秋 科 秒 秘 租 秤 秦 移 稅 程 稍 種 稱 稿 穆 穌 積 穩 究 穹 空 穿 突 窗 窩 窮 窶 立 站 竟 章 童 端 競 竹 笑 笛 符 笨 第 筆 等 筋 答 策 简 算 管 箭 箱 節 範 篇 築 簡 簫 簽 簿 籃 籌 籍 籤 米 粉 粗 粵 精 糊 糕 糟 系 糾 紀 約 紅 納 紐 純 紙-紛 素 索 紫 累 細 紹 終 組 結 絕 絡 給 統 絲 經 綜 綠 維 綱 網 緊 緒 線 緣 編 緩 緬 緯 練 縛 縣 縮 縱 總 績 繁 繆 織 繞 繪 繳 繼 續 缸 缺 罕 罪 置 罰 署 罵 罷 羅 羊 美 羞 群 義 羽 翁 習 翔 翰 翹 翻 翼 耀 老 考 者 而 耍 耐 耗 耳 耶 聊 聖 聚 聞 聯 聰 聲 職 聽 肉 肚 股 肥 肩 肯 育 背 胎 胖 胞 胡 胸 能 脆 脫 腓 腔 腦 腰 腳 腿 膽 臉 臘 臣 臥 臨 自 臭 至 致 臺 與-舊 舌 舍 舒 舞 舟 航 般 船 艦 良 色 艾 芝 芬 花 芳 若 苦 英 茅 茫 茲 茶 草 荒 荷 荼 莉 莊 莎 莫 菜 菩 華 菲 萄 萊 萬 落 葉 著 葛 葡 蒂 蒙 蒲 蒼 蓋 蓮 蔕 蔡 蔣 蕭 薄 薦 薩 薪 藉 藍 藏 藝 藤 藥 蘆 蘇 蘭 虎 處 虛 號 虧 蛇 蛋 蛙 蜂 蜜 蝶 融 螢 蟲 蟹 蠍 蠻 血 行 術 街 衛 衝 衡 衣 表 袋 被 裁 裂 裕 補 裝 裡 製 複 褲 西 要 覆 見 規 視 親 覺 覽 觀 角 解 觸 言 訂 計 訊 討 訓 託 記 訥 訪 設 許 訴 註 証 評 詞 詢 試 詩 話-詳 誇 誌 認 誓 誕 語 誠 誤 說 誰 課 誼 調 談 請 諒 論 諸 諺 諾 謀 謂 講 謝 證 識 譜 警 譯 議 護 譽 讀 變 讓 讚 谷 豆 豈 豐 象 豪 豬 貌 貓 貝 貞 負-貢 貨 貪-責 貴 買 費 貼 賀 資 賈 賓 賜 賞 賢-賤 賦 質 賭 賴 賺 購 賽 贈 贊 贏 赤 赫 走 起 超 越 趕 趙 趣 趨 足 跌 跎 跑 距 跟 跡 路 跳 踏 踢 蹟 蹤 躍 身 躲 車 軌 軍 軒 軟 較 載 輔 輕 輛 輝 輩 輪 輯 輸 轉 轟 辛 辦 辨 辭 辯-農 迅 迎 近 返 迦 迪 迫 述 迴 迷 追 退 送 逃 逆 透 逐 途 這-逛 逝 速 造 逢 連 週 進 逸 逼 遇 遊 運 遍 過 道-違 遙 遜 遠 適 遭 遮 遲 遷 選 遺 避-邁 還 邊 邏 那 邦 邪 邱 郎 部 郭 郵 都 鄂 鄉 鄭 鄰 酉 配 酒 酷 酸 醉 醒 醜 醫 采 釋-量 金 針 釣 鈴 鉢 銀 銅 銖 銘 銳 銷 鋒 鋼 錄 錢 錦 錫 錯 鍋 鍵 鍾 鎊 鎖 鎮 鏡 鐘 鐵 鑑 長 門 閃 閉 開 閏 閒 間 閣 閱 闆 闊 闍 闐 關 闡 防 阻 阿 陀 附 降 限 院-除 陪 陰 陳 陵-陸 陽 隆 隊 階 隔 際 障 隨 險 隱 隻 雄-集 雉 雖 雙 雜 雞 離 難 雨 雪 雲 零 雷 電 需 震 霍 霧 露 霸 霹 靂 靈 青 靖 靜 非 靠 面 革 靼 鞋 韃 韋 韓 音 韻 響 頁 頂 項 順 須 預 頑 頓 頗 領 頞 頭 頻 顆 題 額 顏 願 類 顧 顯 風 飄 飛 食 飯 飲 飽 飾 餅 養 餐 餘 館 首 香 馬 駐 駕 駛 騎 騙 騷 驅 驗 驚 骨 體 高 髮 鬆 鬥 鬧 鬱 鬼 魁 魂 魅 魔 魚 魯 鮮 鳥 鳳 鳴 鴻 鵝 鷹 鹿 麗 麥 麵 麻 麼 黃 黎 黑 默 點 黨 鼓 鼠 鼻 齊 齋 齒 齡 龍 龜]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9 〇 一 七 三 九 二 五 八 六 四]},
+			punctuation => qr{[‾ ﹉﹊﹋﹌ _ ＿ ﹍﹎﹏ ︳︴ \- － ﹣ ‐ – ︲ — ﹘ ︱ , ， ﹐ 、 ﹑ ; ； ﹔ \: ： ﹕ ! ！ ﹗ ? ？ ﹖ . ． ﹒ ‥ ︰ … 。 · ＇ ‘ ’ " ＂ “ ” 〝 〞 ( （ ﹙ ︵ ) ） ﹚ ︶ \[ ［ \] ］ \{ ｛ ﹛ ︷ \} ｝ ﹜ ︸ 〈 ︿ 〉 ﹀ 《 ︽ 》 ︾ 「 ﹁ 」 ﹂ 『 ﹃ 』 ﹄ 【 ︻ 】 ︼ 〔 ﹝ ︹ 〕 ﹞ ︺ § @ ＠ ﹫ * ＊ ﹡ / ／ \\ ＼ ﹨ \& ＆ ﹠ # ＃ ﹟ % ％ ﹪ ‰ † ‡ ‧ ′ ″ ‵ 〃 ※]},
 		};
 	},
 EOT
@@ -2457,8 +2454,8 @@ has 'units' => (
 						'other' => q({0} 英畝),
 					},
 					'acre-foot' => {
-						'name' => q(英畝英尺),
-						'other' => q({0} 英畝英尺),
+						'name' => q(英畝英呎),
+						'other' => q({0} 英畝英呎),
 					},
 					'ampere' => {
 						'name' => q(安培),
@@ -2497,7 +2494,7 @@ has 'units' => (
 						'other' => q({0} 克拉),
 					},
 					'celsius' => {
-						'name' => q(攝氏度數),
+						'name' => q(攝氏),
 						'other' => q(攝氏 {0} 度),
 					},
 					'centiliter' => {
@@ -2505,8 +2502,8 @@ has 'units' => (
 						'other' => q({0} 釐升),
 					},
 					'centimeter' => {
-						'name' => q(公分),
-						'other' => q({0} 公分),
+						'name' => q(厘米),
+						'other' => q({0} 厘米),
 						'per' => q(每厘米 {0}),
 					},
 					'century' => {
@@ -2520,25 +2517,25 @@ has 'units' => (
 						'west' => q(西經{0}),
 					},
 					'cubic-centimeter' => {
-						'name' => q(立方公分),
-						'other' => q({0} 立方公分),
+						'name' => q(立方厘米),
+						'other' => q({0} 立方厘米),
 						'per' => q(每立方厘米 {0}),
 					},
 					'cubic-foot' => {
-						'name' => q(立方英尺),
-						'other' => q({0} 立方英尺),
+						'name' => q(立方英呎),
+						'other' => q({0} 立方英呎),
 					},
 					'cubic-inch' => {
-						'name' => q(立方英寸),
-						'other' => q({0} 立方英寸),
+						'name' => q(立方英吋),
+						'other' => q({0} 立方英吋),
 					},
 					'cubic-kilometer' => {
 						'name' => q(立方公里),
 						'other' => q({0} 立方公里),
 					},
 					'cubic-meter' => {
-						'name' => q(立方公尺),
-						'other' => q({0} 立方公尺),
+						'name' => q(立方米),
+						'other' => q({0} 立方米),
 						'per' => q(每立方米 {0}),
 					},
 					'cubic-mile' => {
@@ -2555,11 +2552,12 @@ has 'units' => (
 					},
 					'cup-metric' => {
 						'name' => q(公制量杯),
+						'other' => q({0} 公制杯),
 					},
 					'day' => {
 						'name' => q(天),
 						'other' => q({0} 天),
-						'per' => q(每日 {0}),
+						'per' => q(每天 {0}),
 					},
 					'deciliter' => {
 						'name' => q(公合),
@@ -2574,7 +2572,7 @@ has 'units' => (
 						'other' => q({0} 度),
 					},
 					'fahrenheit' => {
-						'name' => q(華氏度數),
+						'name' => q(華氏),
 						'other' => q(華氏 {0} 度),
 					},
 					'fathom' => {
@@ -2586,13 +2584,13 @@ has 'units' => (
 						'other' => q({0} 液盎司),
 					},
 					'foodcalorie' => {
-						'name' => q(卡路里),
+						'name' => q(大卡),
 						'other' => q({0} 大卡),
 					},
 					'foot' => {
-						'name' => q(英尺),
-						'other' => q({0} 英尺),
-						'per' => q(每呎 {0}),
+						'name' => q(英呎),
+						'other' => q({0} 英呎),
+						'per' => q(每英呎 {0}),
 					},
 					'furlong' => {
 						'name' => q(化朗),
@@ -2606,6 +2604,11 @@ has 'units' => (
 						'name' => q(加侖),
 						'other' => q({0} 加侖),
 						'per' => q(每加侖 {0}),
+					},
+					'gallon-imperial' => {
+						'name' => q(英制加侖),
+						'other' => q({0} 英制加侖),
+						'per' => q(每英制加侖 {0}),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2649,8 +2652,8 @@ has 'units' => (
 						'other' => q({0} 赫茲),
 					},
 					'horsepower' => {
-						'name' => q(馬力),
-						'other' => q({0} 匹馬力),
+						'name' => q(匹),
+						'other' => q({0} 匹),
 					},
 					'hour' => {
 						'name' => q(小時),
@@ -2658,13 +2661,13 @@ has 'units' => (
 						'per' => q(每小時 {0}),
 					},
 					'inch' => {
-						'name' => q(英寸),
-						'other' => q({0} 英寸),
-						'per' => q(每吋 {0}),
+						'name' => q(英吋),
+						'other' => q({0} 英吋),
+						'per' => q(每英吋 {0}),
 					},
 					'inch-hg' => {
-						'name' => q(英寸汞柱),
-						'other' => q({0} 英寸汞柱),
+						'name' => q(英吋汞柱),
+						'other' => q({0} 英吋汞柱),
 					},
 					'joule' => {
 						'name' => q(焦耳),
@@ -2687,8 +2690,8 @@ has 'units' => (
 						'other' => q({0} kB),
 					},
 					'kilocalorie' => {
-						'name' => q(千卡路里),
-						'other' => q({0} 千卡路里),
+						'name' => q(千卡),
+						'other' => q({0} 千卡),
 					},
 					'kilogram' => {
 						'name' => q(公斤),
@@ -2709,7 +2712,7 @@ has 'units' => (
 						'per' => q(每公里 {0}),
 					},
 					'kilometer-per-hour' => {
-						'name' => q(每小時公里),
+						'name' => q(公里/小時),
 						'other' => q(每小時 {0} 公里),
 					},
 					'kilowatt' => {
@@ -2734,12 +2737,12 @@ has 'units' => (
 						'per' => q(每公升 {0}),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(每 100 公里公升),
-						'other' => q(每 100 公里 {0} 公升),
+						'name' => q(公升/100 公里),
+						'other' => q({0} 公升/100 公里),
 					},
 					'liter-per-kilometer' => {
-						'name' => q(每公里公升),
-						'other' => q(每公里 {0} 公升),
+						'name' => q(公升/公里),
+						'other' => q({0} 公升/公里),
 					},
 					'lux' => {
 						'name' => q(勒克斯),
@@ -2766,16 +2769,16 @@ has 'units' => (
 						'other' => q({0} 百萬瓦特),
 					},
 					'meter' => {
-						'name' => q(公尺),
-						'other' => q({0} 公尺),
+						'name' => q(米),
+						'other' => q({0} 米),
 						'per' => q(每米 {0}),
 					},
 					'meter-per-second' => {
-						'name' => q(每秒公尺),
+						'name' => q(米/秒),
 						'other' => q(每秒 {0} 米),
 					},
 					'meter-per-second-squared' => {
-						'name' => q(每平方秒公尺),
+						'name' => q(米/平方秒),
 						'other' => q(每平方秒 {0} 米),
 					},
 					'metric-ton' => {
@@ -2799,11 +2802,15 @@ has 'units' => (
 						'other' => q({0} 英里),
 					},
 					'mile-per-gallon' => {
-						'name' => q(每加侖英里),
-						'other' => q(每加侖 {0} 英里),
+						'name' => q(英里/加侖),
+						'other' => q({0} 英里/加侖),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(英里/英制加侖),
+						'other' => q({0} 英里/英制加侖),
 					},
 					'mile-per-hour' => {
-						'name' => q(每小時英里),
+						'name' => q(英里/小時),
 						'other' => q(每小時 {0} 英里),
 					},
 					'mile-scandinavian' => {
@@ -2822,17 +2829,25 @@ has 'units' => (
 						'name' => q(毫克),
 						'other' => q({0} 毫克),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(毫克/公合),
+						'other' => q({0} 毫克/公合),
+					},
 					'milliliter' => {
 						'name' => q(毫升),
 						'other' => q({0} 毫升),
 					},
 					'millimeter' => {
-						'name' => q(公釐),
-						'other' => q({0} 公釐),
+						'name' => q(毫米),
+						'other' => q({0} 毫米),
 					},
 					'millimeter-of-mercury' => {
 						'name' => q(毫米汞柱),
 						'other' => q({0} 毫米汞柱),
+					},
+					'millimole-per-liter' => {
+						'name' => q(毫摩爾/公升),
+						'other' => q({0} 毫摩爾/公升),
 					},
 					'millisecond' => {
 						'name' => q(毫秒),
@@ -2869,17 +2884,21 @@ has 'units' => (
 						'other' => q({0} 歐姆),
 					},
 					'ounce' => {
-						'name' => q(盎司),
-						'other' => q({0} 盎司),
+						'name' => q(安士),
+						'other' => q({0} 安士),
 						'per' => q(每安士 {0}),
 					},
 					'ounce-troy' => {
-						'name' => q(金衡盎司),
-						'other' => q({0} 金衡盎司),
+						'name' => q(金衡安士),
+						'other' => q({0} 金衡安士),
 					},
 					'parsec' => {
 						'name' => q(秒差距),
 						'other' => q({0} 秒差距),
+					},
+					'part-per-million' => {
+						'name' => q(百萬分率),
+						'other' => q({0} 百萬分率),
 					},
 					'per' => {
 						'1' => q(每 {1} {0}),
@@ -2896,13 +2915,17 @@ has 'units' => (
 						'name' => q(公制品脫),
 						'other' => q({0} 公制品脫),
 					},
+					'point' => {
+						'name' => q(點),
+						'other' => q({0} 點),
+					},
 					'pound' => {
 						'name' => q(磅),
 						'other' => q({0} 磅),
 						'per' => q(每磅 {0}),
 					},
 					'pound-per-square-inch' => {
-						'name' => q(每平方英寸磅力),
+						'name' => q(磅力/平方英吋),
 						'other' => q(每平方吋 {0} 磅),
 					},
 					'quart' => {
@@ -2914,7 +2937,7 @@ has 'units' => (
 						'other' => q({0} 弧度),
 					},
 					'revolution' => {
-						'name' => q(圈數),
+						'name' => q(圈),
 						'other' => q({0} 圈),
 					},
 					'second' => {
@@ -2923,31 +2946,33 @@ has 'units' => (
 						'per' => q(每秒 {0}),
 					},
 					'square-centimeter' => {
-						'name' => q(平方公分),
-						'other' => q({0} 平方公分),
+						'name' => q(平方厘米),
+						'other' => q({0} 平方厘米),
 						'per' => q(每平方厘米 {0}),
 					},
 					'square-foot' => {
-						'name' => q(平方英尺),
-						'other' => q({0} 平方英尺),
+						'name' => q(平方英呎),
+						'other' => q({0} 平方英呎),
 					},
 					'square-inch' => {
-						'name' => q(平方英寸),
-						'other' => q({0} 平方英寸),
-						'per' => q(每平方吋 {0}),
+						'name' => q(平方英吋),
+						'other' => q({0} 平方英吋),
+						'per' => q(每平方英吋 {0}),
 					},
 					'square-kilometer' => {
 						'name' => q(平方公里),
 						'other' => q({0} 平方公里),
+						'per' => q(每平方公里 {0}),
 					},
 					'square-meter' => {
-						'name' => q(平方公尺),
-						'other' => q({0} 平方公尺),
+						'name' => q(平方米),
+						'other' => q({0} 平方米),
 						'per' => q(每平方米 {0}),
 					},
 					'square-mile' => {
 						'name' => q(平方英里),
 						'other' => q({0} 平方英里),
+						'per' => q(每平方英里 {0}),
 					},
 					'square-yard' => {
 						'name' => q(平方碼),
@@ -2988,7 +3013,7 @@ has 'units' => (
 					'week' => {
 						'name' => q(週),
 						'other' => q({0} 週),
-						'per' => q(每星期 {0}),
+						'per' => q(每週 {0}),
 					},
 					'yard' => {
 						'name' => q(碼),
@@ -3043,8 +3068,8 @@ has 'units' => (
 						'other' => q({0}cL),
 					},
 					'centimeter' => {
-						'name' => q(公分),
-						'other' => q({0}公分),
+						'name' => q(厘米),
+						'other' => q({0} 厘米),
 					},
 					'coordinate' => {
 						'east' => q(東經{0}),
@@ -3078,7 +3103,7 @@ has 'units' => (
 					},
 					'day' => {
 						'name' => q(天),
-						'other' => q({0}天),
+						'other' => q({0} 天),
 					},
 					'deciliter' => {
 						'other' => q({0}dL),
@@ -3129,7 +3154,7 @@ has 'units' => (
 					},
 					'gram' => {
 						'name' => q(克),
-						'other' => q({0}克),
+						'other' => q({0} 克),
 					},
 					'hectare' => {
 						'other' => q({0}公頃),
@@ -3148,7 +3173,7 @@ has 'units' => (
 					},
 					'hour' => {
 						'name' => q(小時),
-						'other' => q({0}時),
+						'other' => q({0} 小時),
 					},
 					'inch' => {
 						'other' => q({0}吋),
@@ -3177,7 +3202,7 @@ has 'units' => (
 					},
 					'kilogram' => {
 						'name' => q(公斤),
-						'other' => q({0}公斤),
+						'other' => q({0} 公斤),
 					},
 					'kilohertz' => {
 						'other' => q({0}kHz),
@@ -3187,7 +3212,7 @@ has 'units' => (
 					},
 					'kilometer' => {
 						'name' => q(公里),
-						'other' => q({0}公里),
+						'other' => q({0} 公里),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(公里/小時),
@@ -3204,11 +3229,11 @@ has 'units' => (
 					},
 					'liter' => {
 						'name' => q(公升),
-						'other' => q({0}升),
+						'other' => q({0} 公升),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(升/100公里),
-						'other' => q(每100公里{0}升),
+						'name' => q(公升/100 公里),
+						'other' => q({0}L/100km),
 					},
 					'liter-per-kilometer' => {
 						'other' => q({0}L/km),
@@ -3232,8 +3257,8 @@ has 'units' => (
 						'other' => q({0}MW),
 					},
 					'meter' => {
-						'name' => q(公尺),
-						'other' => q({0}公尺),
+						'name' => q(米),
+						'other' => q({0} 米),
 					},
 					'meter-per-second' => {
 						'other' => q({0}m/s),
@@ -3275,26 +3300,26 @@ has 'units' => (
 						'other' => q({0}mL),
 					},
 					'millimeter' => {
-						'name' => q(公釐),
-						'other' => q({0}公釐),
+						'name' => q(毫米),
+						'other' => q({0} 毫米),
 					},
 					'millimeter-of-mercury' => {
 						'other' => q({0}mmHg),
 					},
 					'millisecond' => {
 						'name' => q(毫秒),
-						'other' => q({0}毫秒),
+						'other' => q({0} 毫秒),
 					},
 					'milliwatt' => {
 						'other' => q({0}mW),
 					},
 					'minute' => {
 						'name' => q(分鐘),
-						'other' => q({0}分),
+						'other' => q({0} 分鐘),
 					},
 					'month' => {
 						'name' => q(月),
-						'other' => q({0}月),
+						'other' => q({0} 個月),
 					},
 					'nanometer' => {
 						'other' => q({0}nm),
@@ -3340,7 +3365,7 @@ has 'units' => (
 					},
 					'second' => {
 						'name' => q(秒),
-						'other' => q({0}秒),
+						'other' => q({0} 秒),
 					},
 					'square-centimeter' => {
 						'other' => q({0}cm²),
@@ -3390,14 +3415,14 @@ has 'units' => (
 					},
 					'week' => {
 						'name' => q(週),
-						'other' => q({0}週),
+						'other' => q({0} 週),
 					},
 					'yard' => {
 						'other' => q({0}碼),
 					},
 					'year' => {
 						'name' => q(年),
-						'other' => q({0}年),
+						'other' => q({0} 年),
 					},
 				},
 				'short' => {
@@ -3406,8 +3431,8 @@ has 'units' => (
 						'other' => q({0} 英畝),
 					},
 					'acre-foot' => {
-						'name' => q(英畝英尺),
-						'other' => q({0} 英畝英尺),
+						'name' => q(英畝英呎),
+						'other' => q({0} 英畝英呎),
 					},
 					'ampere' => {
 						'name' => q(安培),
@@ -3439,7 +3464,7 @@ has 'units' => (
 					},
 					'calorie' => {
 						'name' => q(卡路里),
-						'other' => q({0} 卡),
+						'other' => q({0} 卡路里),
 					},
 					'carat' => {
 						'name' => q(克拉),
@@ -3454,8 +3479,8 @@ has 'units' => (
 						'other' => q({0} 釐升),
 					},
 					'centimeter' => {
-						'name' => q(公分),
-						'other' => q({0} 公分),
+						'name' => q(厘米),
+						'other' => q({0} 厘米),
 						'per' => q(每厘米{0}),
 					},
 					'century' => {
@@ -3469,25 +3494,25 @@ has 'units' => (
 						'west' => q(西經{0}),
 					},
 					'cubic-centimeter' => {
-						'name' => q(立方公分),
-						'other' => q({0} 立方公分),
+						'name' => q(立方厘米),
+						'other' => q({0} 立方厘米),
 						'per' => q(每立方厘米{0}),
 					},
 					'cubic-foot' => {
-						'name' => q(立方英尺),
-						'other' => q({0} 立方英尺),
+						'name' => q(立方英呎),
+						'other' => q({0} 立方英呎),
 					},
 					'cubic-inch' => {
-						'name' => q(立方英寸),
-						'other' => q({0} 立方英寸),
+						'name' => q(立方英吋),
+						'other' => q({0} 立方英吋),
 					},
 					'cubic-kilometer' => {
 						'name' => q(立方公里),
 						'other' => q({0} 立方公里),
 					},
 					'cubic-meter' => {
-						'name' => q(立方公尺),
-						'other' => q({0} 立方公尺),
+						'name' => q(立方米),
+						'other' => q({0} 立方米),
 						'per' => q(每立方米{0}),
 					},
 					'cubic-mile' => {
@@ -3509,7 +3534,7 @@ has 'units' => (
 					'day' => {
 						'name' => q(天),
 						'other' => q({0} 天),
-						'per' => q(每日{0}),
+						'per' => q(每天{0}),
 					},
 					'deciliter' => {
 						'name' => q(公合),
@@ -3540,9 +3565,9 @@ has 'units' => (
 						'other' => q({0} 大卡),
 					},
 					'foot' => {
-						'name' => q(英尺),
-						'other' => q({0} 呎),
-						'per' => q(每呎{0}),
+						'name' => q(英呎),
+						'other' => q({0} 英呎),
+						'per' => q(每英呎{0}),
 					},
 					'furlong' => {
 						'name' => q(化朗),
@@ -3556,6 +3581,11 @@ has 'units' => (
 						'name' => q(加侖),
 						'other' => q({0} 加侖),
 						'per' => q(每加侖{0}),
+					},
+					'gallon-imperial' => {
+						'name' => q(英制加侖),
+						'other' => q({0} 英制加侖),
+						'per' => q(每英制加侖{0}),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -3608,25 +3638,25 @@ has 'units' => (
 						'per' => q(每小時{0}),
 					},
 					'inch' => {
-						'name' => q(英寸),
-						'other' => q({0} 吋),
-						'per' => q(每吋{0}),
+						'name' => q(英吋),
+						'other' => q({0} 英吋),
+						'per' => q(每英吋{0}),
 					},
 					'inch-hg' => {
-						'name' => q(英寸汞柱),
-						'other' => q({0} 英寸汞柱),
+						'name' => q(英吋汞柱),
+						'other' => q({0} 英吋汞柱),
 					},
 					'joule' => {
 						'name' => q(焦耳),
-						'other' => q({0} 焦),
+						'other' => q({0} 焦耳),
 					},
 					'karat' => {
 						'name' => q(克拉),
 						'other' => q({0} 克拉),
 					},
 					'kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
+						'name' => q(克耳文),
+						'other' => q({0} 克耳文),
 					},
 					'kilobit' => {
 						'name' => q(kb),
@@ -3663,8 +3693,8 @@ has 'units' => (
 						'other' => q(每小時{0}公里),
 					},
 					'kilowatt' => {
-						'name' => q(千瓦),
-						'other' => q({0} 千瓦),
+						'name' => q(千瓦特),
+						'other' => q({0} 千瓦特),
 					},
 					'kilowatt-hour' => {
 						'name' => q(千瓦小時),
@@ -3680,16 +3710,16 @@ has 'units' => (
 					},
 					'liter' => {
 						'name' => q(公升),
-						'other' => q({0} 升),
-						'per' => q(每升{0}),
+						'other' => q({0} 公升),
+						'per' => q(每公升{0}),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(升/100 公里),
-						'other' => q(每100公里 {0} 升),
+						'name' => q(公升/100 公里),
+						'other' => q({0} 公升/100 公里),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(公升/公里),
-						'other' => q(每公里{0}公升),
+						'other' => q({0} 公升/公里),
 					},
 					'lux' => {
 						'name' => q(勒克斯),
@@ -3712,20 +3742,20 @@ has 'units' => (
 						'other' => q({0} 兆升),
 					},
 					'megawatt' => {
-						'name' => q(百萬瓦),
-						'other' => q({0} 百萬瓦),
+						'name' => q(百萬瓦特),
+						'other' => q({0} 百萬瓦特),
 					},
 					'meter' => {
-						'name' => q(公尺),
-						'other' => q({0} 公尺),
+						'name' => q(米),
+						'other' => q({0} 米),
 						'per' => q(每米{0}),
 					},
 					'meter-per-second' => {
-						'name' => q(公尺/秒),
+						'name' => q(米/秒),
 						'other' => q(每秒{0}米),
 					},
 					'meter-per-second-squared' => {
-						'name' => q(公尺/平方秒),
+						'name' => q(米/平方秒),
 						'other' => q(每平方秒{0}米),
 					},
 					'metric-ton' => {
@@ -3750,7 +3780,11 @@ has 'units' => (
 					},
 					'mile-per-gallon' => {
 						'name' => q(英里/加侖),
-						'other' => q(每加侖{0}英里),
+						'other' => q({0} 英里/加侖),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(英里/英制加侖),
+						'other' => q({0} 英里/英制加侖),
 					},
 					'mile-per-hour' => {
 						'name' => q(英里/小時),
@@ -3772,25 +3806,33 @@ has 'units' => (
 						'name' => q(毫克),
 						'other' => q({0} 毫克),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(毫克/公合),
+						'other' => q({0} 毫克/公合),
+					},
 					'milliliter' => {
 						'name' => q(毫升),
 						'other' => q({0} 毫升),
 					},
 					'millimeter' => {
-						'name' => q(公釐),
-						'other' => q({0} 公釐),
+						'name' => q(毫米),
+						'other' => q({0} 毫米),
 					},
 					'millimeter-of-mercury' => {
 						'name' => q(毫米汞柱),
 						'other' => q({0} 毫米汞柱),
+					},
+					'millimole-per-liter' => {
+						'name' => q(毫摩爾/公升),
+						'other' => q({0} 毫摩爾/公升),
 					},
 					'millisecond' => {
 						'name' => q(毫秒),
 						'other' => q({0} 毫秒),
 					},
 					'milliwatt' => {
-						'name' => q(毫瓦),
-						'other' => q({0} 毫瓦),
+						'name' => q(毫瓦特),
+						'other' => q({0} 毫瓦特),
 					},
 					'minute' => {
 						'name' => q(分鐘),
@@ -3819,17 +3861,21 @@ has 'units' => (
 						'other' => q({0} 歐姆),
 					},
 					'ounce' => {
-						'name' => q(盎司),
-						'other' => q({0} 盎司),
+						'name' => q(安士),
+						'other' => q({0} 安士),
 						'per' => q(每安士{0}),
 					},
 					'ounce-troy' => {
-						'name' => q(金衡盎司),
-						'other' => q({0} 金衡盎司),
+						'name' => q(金衡安士),
+						'other' => q({0} 金衡安士),
 					},
 					'parsec' => {
 						'name' => q(秒差距),
 						'other' => q({0} 秒差距),
+					},
+					'part-per-million' => {
+						'name' => q(百萬分率),
+						'other' => q({0} 百萬分率),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -3846,13 +3892,17 @@ has 'units' => (
 						'name' => q(公制品脫),
 						'other' => q({0} 公制品脫),
 					},
+					'point' => {
+						'name' => q(點),
+						'other' => q({0} 點),
+					},
 					'pound' => {
 						'name' => q(磅),
 						'other' => q({0} 磅),
 						'per' => q(每磅{0}),
 					},
 					'pound-per-square-inch' => {
-						'name' => q(磅力/平方英寸),
+						'name' => q(磅力/平方英吋),
 						'other' => q(每平方吋{0}磅),
 					},
 					'quart' => {
@@ -3864,7 +3914,7 @@ has 'units' => (
 						'other' => q({0} 弧度),
 					},
 					'revolution' => {
-						'name' => q(圈數),
+						'name' => q(圈),
 						'other' => q({0} 圈),
 					},
 					'second' => {
@@ -3873,31 +3923,33 @@ has 'units' => (
 						'per' => q(每秒{0}),
 					},
 					'square-centimeter' => {
-						'name' => q(平方公分),
-						'other' => q({0} 平方公分),
+						'name' => q(平方厘米),
+						'other' => q({0} 平方厘米),
 						'per' => q(每平方厘米{0}),
 					},
 					'square-foot' => {
-						'name' => q(平方英尺),
-						'other' => q({0} 平方英尺),
+						'name' => q(平方英呎),
+						'other' => q({0} 平方英呎),
 					},
 					'square-inch' => {
-						'name' => q(平方英寸),
-						'other' => q({0} 平方英寸),
-						'per' => q(每平方吋{0}),
+						'name' => q(平方英吋),
+						'other' => q({0} 平方英吋),
+						'per' => q(每平方英吋{0}),
 					},
 					'square-kilometer' => {
 						'name' => q(平方公里),
 						'other' => q({0} 平方公里),
+						'per' => q(每平方公里{0}),
 					},
 					'square-meter' => {
-						'name' => q(平方公尺),
-						'other' => q({0} 平方公尺),
+						'name' => q(平方米),
+						'other' => q({0} 平方米),
 						'per' => q(每平方米{0}),
 					},
 					'square-mile' => {
 						'name' => q(平方英里),
 						'other' => q({0} 平方英里),
+						'per' => q(每平方英里{0}),
 					},
 					'square-yard' => {
 						'name' => q(平方碼),
@@ -3933,7 +3985,7 @@ has 'units' => (
 					},
 					'watt' => {
 						'name' => q(瓦特),
-						'other' => q({0} 瓦),
+						'other' => q({0} 瓦特),
 					},
 					'week' => {
 						'name' => q(週),
@@ -4007,11 +4059,30 @@ has finance_numbering_system => (
 	default		=> 'hantfin',
 );
 
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 1,
+);
+
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'hanidec' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'minusSign' => q(-),
+			'nan' => q(非數值),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+		},
 		'latn' => {
 			'decimal' => q(.),
 			'exponential' => q(E),
@@ -4073,7 +4144,7 @@ has 'number_formats' => (
 					'other' => '000兆',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -4156,14 +4227,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -4175,6 +4246,15 @@ has 'number_currency_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'hanidec' => {
+			'pattern' => {
+				'default' => {
+					'standard' => {
+						'positive' => '¤#,##0.00',
+					},
+				},
+			},
+		},
 		'latn' => {
 			'pattern' => {
 				'default' => {
@@ -4574,11 +4654,18 @@ has 'currencies' => (
 				'other' => q(白俄羅斯新盧布 \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(白俄羅斯盧布),
 				'other' => q(白俄羅斯盧布),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(白俄羅斯盧布 \(2000–2016\)),
+				'other' => q(白俄羅斯盧布 \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -4642,6 +4729,13 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(智利披索),
 				'other' => q(智利披索),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(人民幣 \(離岸\)),
+				'other' => q(人民幣 \(離岸\)),
 			},
 		},
 		'CNX' => {
@@ -5546,8 +5640,8 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(秘魯新太陽幣),
-				'other' => q(秘魯新太陽幣),
+				'currency' => q(秘魯太陽幣),
+				'other' => q(秘魯太陽幣),
 			},
 		},
 		'PES' => {
@@ -5887,7 +5981,7 @@ has 'currencies' => (
 			},
 		},
 		'TWD' => {
-			symbol => '$',
+			symbol => 'NT$',
 			display_name => {
 				'currency' => q(新台幣),
 				'other' => q(新台幣),
@@ -7425,13 +7519,13 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => '週一',
-						tue => '週二',
-						wed => '週三',
-						thu => '週四',
-						fri => '週五',
-						sat => '週六',
-						sun => '週日'
+						mon => '星期一',
+						tue => '星期二',
+						wed => '星期三',
+						thu => '星期四',
+						fri => '星期五',
+						sat => '星期六',
+						sun => '星期日'
 					},
 					narrow => {
 						mon => '一',
@@ -7463,13 +7557,13 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					abbreviated => {
-						mon => '週一',
-						tue => '週二',
-						wed => '週三',
-						thu => '週四',
-						fri => '週五',
-						sat => '週六',
-						sun => '週日'
+						mon => '星期一',
+						tue => '星期二',
+						wed => '星期三',
+						thu => '星期四',
+						fri => '星期五',
+						sat => '星期六',
+						sun => '星期日'
 					},
 					narrow => {
 						mon => '一',
@@ -7510,10 +7604,10 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => '1季',
-						1 => '2季',
-						2 => '3季',
-						3 => '4季'
+					abbreviated => {0 => '第1季',
+						1 => '第2季',
+						2 => '第3季',
+						3 => '第4季'
 					},
 					narrow => {0 => '1',
 						1 => '2',
@@ -7527,10 +7621,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => '1季',
-						1 => '2季',
-						2 => '3季',
-						3 => '4季'
+					abbreviated => {0 => '第1季',
+						1 => '第2季',
+						2 => '第3季',
+						3 => '第4季'
 					},
 					narrow => {0 => '1',
 						1 => '2',
@@ -7557,255 +7651,31 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'japanese') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'chinese') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'evening1' if $time >= 1900
 						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
@@ -7814,30 +7684,30 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
@@ -7845,31 +7715,31 @@ has 'day_period_data' => (
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
@@ -7877,31 +7747,31 @@ has 'day_period_data' => (
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'ethiopic') {
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
@@ -7910,30 +7780,126 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'dangi') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 					return 'evening1' if $time >= 1900
 						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
 						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
@@ -7942,30 +7908,158 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 					return 'evening1' if $time >= 1900
 						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
 						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
 					return 'morning1' if $time >= 500
 						&& $time < 800;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'selection') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
 					return 'morning2' if $time >= 800
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
@@ -7991,66 +8085,70 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{中午},
-					'evening1' => q{夜晚},
-					'am' => q{上午},
+					'morning1' => q{清晨},
+					'night1' => q{凌晨},
 					'pm' => q{下午},
-					'morning2' => q{朝早},
-					'afternoon2' => q{下晝},
-					'night1' => q{凌晨},
-					'morning1' => q{清晨},
 					'midnight' => q{午夜},
-				},
-				'narrow' => {
-					'am' => q{朝早},
-					'pm' => q{下晝},
+					'afternoon2' => q{下晝},
+					'am' => q{上午},
+					'morning2' => q{朝早},
 					'evening1' => q{夜晚},
-					'afternoon1' => q{中午},
-					'afternoon2' => q{下晝},
-					'morning2' => q{朝早},
-					'midnight' => q{午夜},
-					'morning1' => q{清晨},
-					'night1' => q{凌晨},
 				},
 				'wide' => {
-					'am' => q{上午},
+					'afternoon2' => q{下晝},
+					'midnight' => q{午夜},
 					'pm' => q{下午},
+					'night1' => q{凌晨},
 					'afternoon1' => q{中午},
+					'morning1' => q{清晨},
+					'am' => q{上午},
 					'evening1' => q{夜晚},
 					'morning2' => q{朝早},
+				},
+				'narrow' => {
+					'am' => q{上午},
+					'morning2' => q{朝早},
+					'evening1' => q{夜晚},
 					'afternoon2' => q{下晝},
-					'morning1' => q{清晨},
-					'night1' => q{凌晨},
+					'pm' => q{下午},
 					'midnight' => q{午夜},
+					'night1' => q{凌晨},
+					'morning1' => q{清晨},
+					'afternoon1' => q{中午},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'afternoon1' => q{中午},
+					'morning2' => q{朝早},
+					'am' => q{上午},
 					'evening1' => q{夜晚},
 					'night1' => q{凌晨},
+					'afternoon1' => q{中午},
 					'morning1' => q{清晨},
+					'afternoon2' => q{下晝},
 					'midnight' => q{午夜},
+					'pm' => q{下午},
+				},
+				'wide' => {
 					'morning2' => q{朝早},
+					'am' => q{上午},
+					'evening1' => q{夜晚},
+					'morning1' => q{清晨},
+					'afternoon1' => q{中午},
+					'night1' => q{凌晨},
+					'midnight' => q{午夜},
+					'pm' => q{下午},
 					'afternoon2' => q{下晝},
 				},
 				'narrow' => {
-					'am' => q{朝早},
-					'pm' => q{下午},
-					'afternoon1' => q{中午},
-					'evening1' => q{夜晚},
-					'afternoon2' => q{下晝},
 					'morning2' => q{朝早},
-					'morning1' => q{夜晚},
+					'am' => q{上午},
+					'evening1' => q{夜晚},
 					'night1' => q{凌晨},
-					'midnight' => q{下晝},
-				},
-				'wide' => {
-					'afternoon1' => q{中午},
-					'evening1' => q{夜晚},
-					'afternoon2' => q{下晝},
-					'morning2' => q{朝早},
 					'morning1' => q{清晨},
-					'night1' => q{凌晨},
+					'afternoon1' => q{中午},
+					'afternoon2' => q{下晝},
+					'pm' => q{下午},
 					'midnight' => q{午夜},
 				},
 			},
@@ -8523,7 +8621,57 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'islamic' => {
+		'gregorian' => {
+			Bh => q{Bh時},
+			Bhm => q{Bh:mm},
+			Bhms => q{Bh:mm:ss},
+			E => q{ccc},
+			EBhm => q{E Bh:mm},
+			EBhms => q{E Bh:mm:ss},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d E},
+			Ehm => q{E ah:mm},
+			Ehms => q{E ah:mm:ss},
+			Gy => q{Gy年},
+			GyMMM => q{Gy年M月},
+			GyMMMEd => q{Gy年M月d日 E},
+			GyMMMd => q{Gy年M月d日},
+			H => q{H時},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss [v]},
+			Hmv => q{HH:mm [v]},
+			M => q{M月},
+			MEd => q{M/d（E）},
+			MMM => q{LLL},
+			MMMEd => q{M月d日 E},
+			MMMMW => q{M月第W個星期},
+			MMMMd => q{M月d日},
+			MMMd => q{M月d日},
+			MMdd => q{MM/dd},
+			Md => q{M/d},
+			d => q{d日},
+			h => q{ah時},
+			hm => q{ah:mm},
+			hms => q{ah:mm:ss},
+			hmsv => q{ah:mm:ss [v]},
+			hmv => q{ah:mm [v]},
+			ms => q{mm:ss},
+			y => q{y年},
+			yM => q{y/M},
+			yMEd => q{y/M/d（E）},
+			yMM => q{y/MM},
+			yMMM => q{y年M月},
+			yMMMEd => q{y年M月d日 E},
+			yMMMM => q{y年M月},
+			yMMMd => q{y年M月d日},
+			yMd => q{y/M/d},
+			yQQQ => q{y年QQQ},
+			yQQQQ => q{y年QQQQ},
+			yw => q{Y年第w個星期},
+		},
+		'buddhist' => {
 			Ed => q{d日（E）},
 			Gy => q{Gy年},
 			GyMMM => q{Gy年M月},
@@ -8549,32 +8697,48 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{Gy年QQQ},
 			yyyyQQQQ => q{Gy年QQQQ},
 		},
-		'roc' => {
+		'generic' => {
+			Bh => q{Bh時},
+			Bhm => q{Bh:mm},
+			Bhms => q{Bh:mm:ss},
 			E => q{ccc},
-			Ed => q{d日（E）},
-			Gy => q{Gy年},
-			GyMMM => q{Gy年M月},
-			GyMMMEd => q{Gy年M月d日E},
-			GyMMMd => q{Gy年M月d日},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d E},
+			Ehm => q{ah:mmE},
+			Ehms => q{ah:mm:ssE},
+			Gy => q{G y年},
+			GyMMM => q{G y年M月},
+			GyMMMEd => q{G y年M月d日 E},
+			GyMMMd => q{G y年M月d日},
+			H => q{H時},
+			Hm => q{H:mm},
+			Hms => q{H:mm:ss},
 			M => q{M月},
 			MEd => q{M/d（E）},
 			MMM => q{LLL},
-			MMMEd => q{M月d日E},
+			MMMEd => q{M月d日 E},
 			MMMMd => q{M月d日},
 			MMMd => q{M月d日},
 			Md => q{M/d},
 			d => q{d日},
-			y => q{Gy年},
-			yyyy => q{Gy年},
-			yyyyM => q{Gy/M},
-			yyyyMEd => q{Gy/M/d（E）},
-			yyyyMMM => q{Gy年M月},
-			yyyyMMMEd => q{Gy年M月d日E},
-			yyyyMMMM => q{Gy年M月},
-			yyyyMMMd => q{Gy年M月d日},
-			yyyyMd => q{Gy/M/d},
-			yyyyQQQ => q{Gy年QQQ},
-			yyyyQQQQ => q{Gy年QQQQ},
+			h => q{ah時},
+			hm => q{ah:mm},
+			hms => q{ah:mm:ss},
+			ms => q{mm:ss},
+			y => q{G y年},
+			yyyy => q{G y年},
+			yyyyM => q{G y/M},
+			yyyyMEd => q{G y/M/d（E）},
+			yyyyMMM => q{G y年M月},
+			yyyyMMMEd => q{G y年M月d日 E},
+			yyyyMMMM => q{G y年M月},
+			yyyyMMMd => q{G y年M月d日},
+			yyyyMd => q{G y/M/d},
+			yyyyQQQ => q{G y年QQQ},
+			yyyyQQQQ => q{G y年QQQQ},
 		},
 		'japanese' => {
 			Ed => q{d日（E）},
@@ -8609,84 +8773,8 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{Gy年QQQ},
 			yyyyQQQQ => q{Gy年QQQQ},
 		},
-		'generic' => {
+		'roc' => {
 			E => q{ccc},
-			Ed => q{d E},
-			Gy => q{G y年},
-			GyMMM => q{G y年M月},
-			GyMMMEd => q{G y年M月d日 E},
-			GyMMMd => q{G y年M月d日},
-			H => q{H時},
-			Hm => q{H:mm},
-			Hms => q{H:mm:ss},
-			M => q{M月},
-			MEd => q{M/d（E）},
-			MMM => q{LLL},
-			MMMEd => q{M月d日 E},
-			MMMMd => q{M月d日},
-			MMMd => q{M月d日},
-			Md => q{M/d},
-			d => q{d日},
-			h => q{ah時},
-			hm => q{ah:mm},
-			hms => q{ah:mm:ss},
-			ms => q{mm:ss},
-			y => q{G y年},
-			yyyy => q{G y年},
-			yyyyM => q{G y/M},
-			yyyyMEd => q{G y/M/d（E）},
-			yyyyMMM => q{G y年M月},
-			yyyyMMMEd => q{G y年M月d日 E},
-			yyyyMMMM => q{G y年M月},
-			yyyyMMMd => q{G y年M月d日},
-			yyyyMd => q{G y/M/d},
-			yyyyQQQ => q{G y年QQQ},
-			yyyyQQQQ => q{G y年QQQQ},
-		},
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d E},
-			Ehm => q{E ah:mm},
-			Ehms => q{E ah:mm:ss},
-			Gy => q{Gy年},
-			GyMMM => q{Gy年M月},
-			GyMMMEd => q{Gy年M月d日 E},
-			GyMMMd => q{Gy年M月d日},
-			H => q{H時},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss [v]},
-			Hmv => q{HH:mm [v]},
-			M => q{M月},
-			MEd => q{M/d（E）},
-			MMM => q{LLL},
-			MMMEd => q{M月d日 E},
-			MMMMd => q{M月d日},
-			MMMd => q{M月d日},
-			MMdd => q{MM/dd},
-			Md => q{M/d},
-			d => q{d日},
-			h => q{ah時},
-			hm => q{ah:mm},
-			hms => q{ah:mm:ss},
-			hmsv => q{ah:mm:ss [v]},
-			hmv => q{ah:mm [v]},
-			ms => q{mm:ss},
-			y => q{y年},
-			yM => q{y/M},
-			yMEd => q{y/M/d（E）},
-			yMM => q{y/MM},
-			yMMM => q{y年M月},
-			yMMMEd => q{y年M月d日 E},
-			yMMMM => q{y年M月},
-			yMMMd => q{y年M月d日},
-			yMd => q{y/M/d},
-			yQQQ => q{y年QQQ},
-			yQQQQ => q{y年QQQQ},
-		},
-		'buddhist' => {
 			Ed => q{d日（E）},
 			Gy => q{Gy年},
 			GyMMM => q{Gy年M月},
@@ -8742,6 +8830,32 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{rU年QQQQ},
 			yyyyQQQQ => q{rU年QQQQ},
 		},
+		'islamic' => {
+			Ed => q{d日（E）},
+			Gy => q{Gy年},
+			GyMMM => q{Gy年M月},
+			GyMMMEd => q{Gy年M月d日E},
+			GyMMMd => q{Gy年M月d日},
+			M => q{M月},
+			MEd => q{M/d（E）},
+			MMM => q{LLL},
+			MMMEd => q{M月d日E},
+			MMMMd => q{M月d日},
+			MMMd => q{M月d日},
+			Md => q{M/d},
+			d => q{d日},
+			y => q{Gy年},
+			yyyy => q{Gy年},
+			yyyyM => q{Gy/M},
+			yyyyMEd => q{Gy/M/d（E）},
+			yyyyMMM => q{Gy年M月},
+			yyyyMMMEd => q{Gy年M月d日E},
+			yyyyMMMM => q{Gy年M月},
+			yyyyMMMd => q{Gy年M月d日},
+			yyyyMd => q{Gy/M/d},
+			yyyyQQQ => q{Gy年QQQ},
+			yyyyQQQQ => q{Gy年QQQQ},
+		},
 	} },
 );
 
@@ -8761,104 +8875,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm [v]},
-				m => q{HH:mm–HH:mm [v]},
-			},
-			Hv => {
-				H => q{HH–HH [v]},
-			},
-			M => {
-				M => q{M月至M月},
-			},
-			MEd => {
-				M => q{d/M (E) 至 d/M (E)},
-				d => q{d/M (E) 至 d/M (E)},
-			},
-			MMM => {
-				M => q{LLL至LLL},
-			},
-			MMMEd => {
-				M => q{M月d日E至M月d日E},
-				d => q{M月d日E至d日E},
-			},
-			MMMM => {
-				M => q{LLLL至LLLL},
-			},
-			MMMd => {
-				M => q{M月d日至M月d日},
-				d => q{M月d日至d日},
-			},
-			Md => {
-				M => q{M/d至M/d},
-				d => q{M/d至M/d},
-			},
-			d => {
-				d => q{d日至d日},
-			},
-			fallback => '{0}至{1}',
-			h => {
-				a => q{ah時至ah時},
-				h => q{ah時至h時},
-			},
-			hm => {
-				a => q{ah:mm至ah:mm},
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				a => q{ah:mm至ah:mm [v]},
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				a => q{ah時至ah時 [v]},
-				h => q{ah時至h時 [v]},
-			},
-			y => {
-				y => q{G y至y},
-			},
-			yM => {
-				M => q{G y/M至y/M},
-				y => q{G y/M至y/M},
-			},
-			yMEd => {
-				M => q{G y/M/dE至y/M/dE},
-				d => q{G y/M/dE至y/M/dE},
-				y => q{G y/M/dE至y/M/dE},
-			},
-			yMMM => {
-				M => q{G y年M月至M月},
-				y => q{G y年M月至y年M月},
-			},
-			yMMMEd => {
-				M => q{G y年M月d日E至M月d日E},
-				d => q{G y年M月d日E至d日E},
-				y => q{G y年M月d日E至y年M月d日E},
-			},
-			yMMMM => {
-				M => q{G y年M月至M月},
-				y => q{G y年M月至y年M月},
-			},
-			yMMMd => {
-				M => q{G y年M月d日至M月d日},
-				d => q{G y年M月d日至d日},
-				y => q{G y年M月d日至y年M月d日},
-			},
-			yMd => {
-				M => q{G y/M/d至y/M/d},
-				d => q{G y/M/d至y/M/d},
-				y => q{G y/M/d至y/M/d},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -8955,6 +8971,104 @@ has 'datetime_formats_interval' => (
 				M => q{y/M/d至y/M/d},
 				d => q{y/M/d至y/M/d},
 				y => q{y/M/d至y/M/d},
+			},
+		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm [v]},
+				m => q{HH:mm–HH:mm [v]},
+			},
+			Hv => {
+				H => q{HH–HH [v]},
+			},
+			M => {
+				M => q{M月至M月},
+			},
+			MEd => {
+				M => q{d/M (E) 至 d/M (E)},
+				d => q{d/M (E) 至 d/M (E)},
+			},
+			MMM => {
+				M => q{LLL至LLL},
+			},
+			MMMEd => {
+				M => q{M月d日E至M月d日E},
+				d => q{M月d日E至d日E},
+			},
+			MMMM => {
+				M => q{LLLL至LLLL},
+			},
+			MMMd => {
+				M => q{M月d日至M月d日},
+				d => q{M月d日至d日},
+			},
+			Md => {
+				M => q{M/d至M/d},
+				d => q{M/d至M/d},
+			},
+			d => {
+				d => q{d日至d日},
+			},
+			fallback => '{0}至{1}',
+			h => {
+				a => q{ah時至ah時},
+				h => q{ah時至h時},
+			},
+			hm => {
+				a => q{ah:mm至ah:mm},
+				h => q{ah:mm至h:mm},
+				m => q{ah:mm至h:mm},
+			},
+			hmv => {
+				a => q{ah:mm至ah:mm [v]},
+				h => q{ah:mm至h:mm [v]},
+				m => q{ah:mm至h:mm [v]},
+			},
+			hv => {
+				a => q{ah時至ah時 [v]},
+				h => q{ah時至h時 [v]},
+			},
+			y => {
+				y => q{G y至y},
+			},
+			yM => {
+				M => q{G y/M至y/M},
+				y => q{G y/M至y/M},
+			},
+			yMEd => {
+				M => q{G y/M/dE至y/M/dE},
+				d => q{G y/M/dE至y/M/dE},
+				y => q{G y/M/dE至y/M/dE},
+			},
+			yMMM => {
+				M => q{G y年M月至M月},
+				y => q{G y年M月至y年M月},
+			},
+			yMMMEd => {
+				M => q{G y年M月d日E至M月d日E},
+				d => q{G y年M月d日E至d日E},
+				y => q{G y年M月d日E至y年M月d日E},
+			},
+			yMMMM => {
+				M => q{G y年M月至M月},
+				y => q{G y年M月至y年M月},
+			},
+			yMMMd => {
+				M => q{G y年M月d日至M月d日},
+				d => q{G y年M月d日至d日},
+				y => q{G y年M月d日至y年M月d日},
+			},
+			yMd => {
+				M => q{G y/M/d至y/M/d},
+				d => q{G y/M/d至y/M/d},
+				y => q{G y/M/d至y/M/d},
 			},
 		},
 		'chinese' => {
@@ -9331,19 +9445,19 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
 		regionFormat => q({0}時間),
-		regionFormat => q({0} (+1)),
-		regionFormat => q({0} (+0)),
+		regionFormat => q({0}夏令時間),
+		regionFormat => q({0}標準時間),
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(艾克夏令時間),
-				'generic' => q(艾克時間),
-				'standard' => q(艾克標準時間),
+				'daylight' => q#艾克夏令時間#,
+				'generic' => q#艾克時間#,
+				'standard' => q#艾克標準時間#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(阿富汗時間),
+				'standard' => q#阿富汗時間#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -9504,45 +9618,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(中非時間),
+				'standard' => q#中非時間#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(東非時間),
+				'standard' => q#東非時間#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(南非標準時間),
+				'standard' => q#南非標準時間#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(西非夏令時間),
-				'generic' => q(西非時間),
-				'standard' => q(西非標準時間),
+				'daylight' => q#西非夏令時間#,
+				'generic' => q#西非時間#,
+				'standard' => q#西非標準時間#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(阿拉斯加夏令時間),
-				'generic' => q(阿拉斯加時間),
-				'standard' => q(阿拉斯加標準時間),
+				'daylight' => q#阿拉斯加夏令時間#,
+				'generic' => q#阿拉斯加時間#,
+				'standard' => q#阿拉斯加標準時間#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(阿拉木圖夏令時間),
-				'generic' => q(阿拉木圖時間),
-				'standard' => q(阿拉木圖標準時間),
+				'daylight' => q#阿拉木圖夏令時間#,
+				'generic' => q#阿拉木圖時間#,
+				'standard' => q#阿拉木圖標準時間#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(亞馬遜夏令時間),
-				'generic' => q(亞馬遜時間),
-				'standard' => q(亞馬遜標準時間),
+				'daylight' => q#亞馬遜夏令時間#,
+				'generic' => q#亞馬遜時間#,
+				'standard' => q#亞馬遜標準時間#,
 			},
 		},
 		'America/Adak' => {
@@ -9688,6 +9802,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#薩爾瓦多#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#納爾遜堡#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#福塔力莎#,
@@ -9890,6 +10007,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#波多黎各#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#蓬塔阿雷納斯#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#雨河鎮#,
 		},
@@ -9985,37 +10105,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(中部夏令時間),
-				'generic' => q(中部時間),
-				'standard' => q(中部標準時間),
+				'daylight' => q#中部夏令時間#,
+				'generic' => q#中部時間#,
+				'standard' => q#中部標準時間#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(東部夏令時間),
-				'generic' => q(東部時間),
-				'standard' => q(東部標準時間),
+				'daylight' => q#東部夏令時間#,
+				'generic' => q#東部時間#,
+				'standard' => q#東部標準時間#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(山區夏令時間),
-				'generic' => q(山區時間),
-				'standard' => q(山區標準時間),
+				'daylight' => q#山區夏令時間#,
+				'generic' => q#山區時間#,
+				'standard' => q#山區標準時間#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(太平洋夏令時間),
-				'generic' => q(太平洋時間),
-				'standard' => q(太平洋標準時間),
+				'daylight' => q#太平洋夏令時間#,
+				'generic' => q#太平洋時間#,
+				'standard' => q#太平洋標準時間#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(阿那底河夏令時間),
-				'generic' => q(阿納德爾時間),
-				'standard' => q(阿那底河標準時間),
+				'daylight' => q#阿那底河夏令時間#,
+				'generic' => q#阿納德爾時間#,
+				'standard' => q#阿那底河標準時間#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -10053,30 +10173,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(阿皮亞夏令時間),
-				'generic' => q(阿皮亞時間),
-				'standard' => q(阿皮亞標準時間),
+				'daylight' => q#阿皮亞夏令時間#,
+				'generic' => q#阿皮亞時間#,
+				'standard' => q#阿皮亞標準時間#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(阿克陶夏令時間),
-				'generic' => q(阿克陶時間),
-				'standard' => q(阿克陶標準時間),
+				'daylight' => q#阿克陶夏令時間#,
+				'generic' => q#阿克陶時間#,
+				'standard' => q#阿克陶標準時間#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(阿克托比夏令時間),
-				'generic' => q(阿克托比時間),
-				'standard' => q(阿克托比標準時間),
+				'daylight' => q#阿克托比夏令時間#,
+				'generic' => q#阿克托比時間#,
+				'standard' => q#阿克托比標準時間#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(阿拉伯夏令時間),
-				'generic' => q(阿拉伯時間),
-				'standard' => q(阿拉伯標準時間),
+				'daylight' => q#阿拉伯夏令時間#,
+				'generic' => q#阿拉伯時間#,
+				'standard' => q#阿拉伯標準時間#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -10084,23 +10204,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(阿根廷夏令時間),
-				'generic' => q(阿根廷時間),
-				'standard' => q(阿根廷標準時間),
+				'daylight' => q#阿根廷夏令時間#,
+				'generic' => q#阿根廷時間#,
+				'standard' => q#阿根廷標準時間#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(阿根廷西部夏令時間),
-				'generic' => q(阿根廷西部時間),
-				'standard' => q(阿根廷西部標準時間),
+				'daylight' => q#阿根廷西部夏令時間#,
+				'generic' => q#阿根廷西部時間#,
+				'standard' => q#阿根廷西部標準時間#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(亞美尼亞夏令時間),
-				'generic' => q(亞美尼亞時間),
-				'standard' => q(亞美尼亞標準時間),
+				'daylight' => q#亞美尼亞夏令時間#,
+				'generic' => q#亞美尼亞時間#,
+				'standard' => q#亞美尼亞標準時間#,
 			},
 		},
 		'Asia/Aden' => {
@@ -10124,6 +10244,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#阿什哈巴特#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#阿特勞#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#巴格達#,
 		},
@@ -10135,6 +10258,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#曼谷#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#巴爾瑙爾#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#貝魯特#,
@@ -10171,6 +10297,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#杜桑貝#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#法馬古斯塔#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#加薩#,
@@ -10313,6 +10442,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#東京#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#托木斯克#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#烏蘭巴托#,
 		},
@@ -10339,9 +10471,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(大西洋夏令時間),
-				'generic' => q(大西洋時間),
-				'standard' => q(大西洋標準時間),
+				'daylight' => q#大西洋夏令時間#,
+				'generic' => q#大西洋時間#,
+				'standard' => q#大西洋標準時間#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -10412,176 +10544,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(澳洲中部夏令時間),
-				'generic' => q(澳洲中部時間),
-				'standard' => q(澳洲中部標準時間),
+				'daylight' => q#澳洲中部夏令時間#,
+				'generic' => q#澳洲中部時間#,
+				'standard' => q#澳洲中部標準時間#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(澳洲中西部夏令時間),
-				'generic' => q(澳洲中西部時間),
-				'standard' => q(澳洲中西部標準時間),
+				'daylight' => q#澳洲中西部夏令時間#,
+				'generic' => q#澳洲中西部時間#,
+				'standard' => q#澳洲中西部標準時間#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(澳洲東部夏令時間),
-				'generic' => q(澳洲東部時間),
-				'standard' => q(澳洲東部標準時間),
+				'daylight' => q#澳洲東部夏令時間#,
+				'generic' => q#澳洲東部時間#,
+				'standard' => q#澳洲東部標準時間#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(澳洲西部夏令時間),
-				'generic' => q(澳洲西部時間),
-				'standard' => q(澳洲西部標準時間),
+				'daylight' => q#澳洲西部夏令時間#,
+				'generic' => q#澳洲西部時間#,
+				'standard' => q#澳洲西部標準時間#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(亞塞拜然夏令時間),
-				'generic' => q(亞塞拜然時間),
-				'standard' => q(亞塞拜然標準時間),
+				'daylight' => q#亞塞拜然夏令時間#,
+				'generic' => q#亞塞拜然時間#,
+				'standard' => q#亞塞拜然標準時間#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(亞速爾群島夏令時間),
-				'generic' => q(亞速爾群島時間),
-				'standard' => q(亞速爾群島標準時間),
+				'daylight' => q#亞速爾群島夏令時間#,
+				'generic' => q#亞速爾群島時間#,
+				'standard' => q#亞速爾群島標準時間#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(孟加拉夏令時間),
-				'generic' => q(孟加拉時間),
-				'standard' => q(孟加拉標準時間),
+				'daylight' => q#孟加拉夏令時間#,
+				'generic' => q#孟加拉時間#,
+				'standard' => q#孟加拉標準時間#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(不丹時間),
+				'standard' => q#不丹時間#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(玻利維亞時間),
+				'standard' => q#玻利維亞時間#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(巴西利亞夏令時間),
-				'generic' => q(巴西利亞時間),
-				'standard' => q(巴西利亞標準時間),
+				'daylight' => q#巴西利亞夏令時間#,
+				'generic' => q#巴西利亞時間#,
+				'standard' => q#巴西利亞標準時間#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(汶萊時間),
+				'standard' => q#汶萊時間#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(維德角夏令時間),
-				'generic' => q(維德角時間),
-				'standard' => q(維德角標準時間),
+				'daylight' => q#維德角夏令時間#,
+				'generic' => q#維德角時間#,
+				'standard' => q#維德角標準時間#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(凱西站時間),
+				'standard' => q#凱西站時間#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(查莫洛時間),
+				'standard' => q#查莫洛時間#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(查坦群島夏令時間),
-				'generic' => q(查坦群島時間),
-				'standard' => q(查坦群島標準時間),
+				'daylight' => q#查坦群島夏令時間#,
+				'generic' => q#查坦群島時間#,
+				'standard' => q#查坦群島標準時間#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(智利夏令時間),
-				'generic' => q(智利時間),
-				'standard' => q(智利標準時間),
+				'daylight' => q#智利夏令時間#,
+				'generic' => q#智利時間#,
+				'standard' => q#智利標準時間#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(中國夏令時間),
-				'generic' => q(中國時間),
-				'standard' => q(中國標準時間),
+				'daylight' => q#中國夏令時間#,
+				'generic' => q#中國時間#,
+				'standard' => q#中國標準時間#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(喬巴山夏令時間),
-				'generic' => q(喬巴山時間),
-				'standard' => q(喬巴山標準時間),
+				'daylight' => q#喬巴山夏令時間#,
+				'generic' => q#喬巴山時間#,
+				'standard' => q#喬巴山標準時間#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(聖誕島時間),
+				'standard' => q#聖誕島時間#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(科科斯群島時間),
+				'standard' => q#科科斯群島時間#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(哥倫比亞夏令時間),
-				'generic' => q(哥倫比亞時間),
-				'standard' => q(哥倫比亞標準時間),
+				'daylight' => q#哥倫比亞夏令時間#,
+				'generic' => q#哥倫比亞時間#,
+				'standard' => q#哥倫比亞標準時間#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(庫克群島半夏令時間),
-				'generic' => q(庫克群島時間),
-				'standard' => q(庫克群島標準時間),
+				'daylight' => q#庫克群島半夏令時間#,
+				'generic' => q#庫克群島時間#,
+				'standard' => q#庫克群島標準時間#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(古巴夏令時間),
-				'generic' => q(古巴時間),
-				'standard' => q(古巴標準時間),
+				'daylight' => q#古巴夏令時間#,
+				'generic' => q#古巴時間#,
+				'standard' => q#古巴標準時間#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(戴維斯時間),
+				'standard' => q#戴維斯時間#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(杜蒙杜比爾時間),
+				'standard' => q#杜蒙杜比爾時間#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(東帝汶時間),
+				'standard' => q#東帝汶時間#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(復活節島夏令時間),
-				'generic' => q(復活節島時間),
-				'standard' => q(復活節島標準時間),
+				'daylight' => q#復活節島夏令時間#,
+				'generic' => q#復活節島時間#,
+				'standard' => q#復活節島標準時間#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(厄瓜多時間),
+				'standard' => q#厄瓜多時間#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#協調世界時間#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -10592,6 +10729,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#安道爾#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#阿斯特拉罕#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#雅典#,
@@ -10626,7 +10766,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#都柏林#,
 			long => {
-				'daylight' => q(愛爾蘭標準時間),
+				'daylight' => q#愛爾蘭標準時間#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -10653,6 +10793,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#基輔#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#基洛夫#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#里斯本#,
 		},
@@ -10662,7 +10805,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#倫敦#,
 			long => {
-				'daylight' => q(英國夏令時間),
+				'daylight' => q#英國夏令時間#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -10713,6 +10856,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#塞拉耶佛#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#薩拉托夫#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#辛非洛浦#,
 		},
@@ -10730,6 +10876,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#地拉那#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#烏里揚諾夫斯克#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#烏茲哥洛#,
@@ -10763,134 +10912,134 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(中歐夏令時間),
-				'generic' => q(中歐時間),
-				'standard' => q(中歐標準時間),
+				'daylight' => q#中歐夏令時間#,
+				'generic' => q#中歐時間#,
+				'standard' => q#中歐標準時間#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(東歐夏令時間),
-				'generic' => q(東歐時間),
-				'standard' => q(東歐標準時間),
+				'daylight' => q#東歐夏令時間#,
+				'generic' => q#東歐時間#,
+				'standard' => q#東歐標準時間#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(歐洲遠東時間),
+				'standard' => q#歐洲遠東時間#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(西歐夏令時間),
-				'generic' => q(西歐時間),
-				'standard' => q(西歐標準時間),
+				'daylight' => q#西歐夏令時間#,
+				'generic' => q#西歐時間#,
+				'standard' => q#西歐標準時間#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(福克蘭群島夏令時間),
-				'generic' => q(福克蘭群島時間),
-				'standard' => q(福克蘭群島標準時間),
+				'daylight' => q#福克蘭群島夏令時間#,
+				'generic' => q#福克蘭群島時間#,
+				'standard' => q#福克蘭群島標準時間#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(斐濟夏令時間),
-				'generic' => q(斐濟時間),
-				'standard' => q(斐濟標準時間),
+				'daylight' => q#斐濟夏令時間#,
+				'generic' => q#斐濟時間#,
+				'standard' => q#斐濟標準時間#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(法屬圭亞那時間),
+				'standard' => q#法屬圭亞那時間#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(法國南方及南極時間),
+				'standard' => q#法國南方及南極時間#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(格林威治標準時間),
+				'standard' => q#格林威治標準時間#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(加拉巴哥群島時間),
+				'standard' => q#加拉巴哥群島時間#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(甘比爾群島時間),
+				'standard' => q#甘比爾群島時間#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(喬治亞夏令時間),
-				'generic' => q(喬治亞時間),
-				'standard' => q(喬治亞標準時間),
+				'daylight' => q#喬治亞夏令時間#,
+				'generic' => q#喬治亞時間#,
+				'standard' => q#喬治亞標準時間#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(吉爾伯特群島時間),
+				'standard' => q#吉爾伯特群島時間#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(格陵蘭東部夏令時間),
-				'generic' => q(格陵蘭東部時間),
-				'standard' => q(格陵蘭東部標準時間),
+				'daylight' => q#格陵蘭東部夏令時間#,
+				'generic' => q#格陵蘭東部時間#,
+				'standard' => q#格陵蘭東部標準時間#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(格陵蘭西部夏令時間),
-				'generic' => q(格陵蘭西部時間),
-				'standard' => q(格陵蘭西部標準時間),
+				'daylight' => q#格陵蘭西部夏令時間#,
+				'generic' => q#格陵蘭西部時間#,
+				'standard' => q#格陵蘭西部標準時間#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(關島標準時間),
+				'standard' => q#關島標準時間#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(波斯灣海域標準時間),
+				'standard' => q#波斯灣海域標準時間#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(蓋亞那時間),
+				'standard' => q#蓋亞那時間#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(夏威夷-阿留申夏令時間),
-				'generic' => q(夏威夷-阿留申時間),
-				'standard' => q(夏威夷-阿留申標準時間),
+				'daylight' => q#夏威夷-阿留申夏令時間#,
+				'generic' => q#夏威夷-阿留申時間#,
+				'standard' => q#夏威夷-阿留申標準時間#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(香港夏令時間),
-				'generic' => q(香港時間),
-				'standard' => q(香港標準時間),
+				'daylight' => q#香港夏令時間#,
+				'generic' => q#香港時間#,
+				'standard' => q#香港標準時間#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(科布多夏令時間),
-				'generic' => q(科布多時間),
-				'standard' => q(科布多標準時間),
+				'daylight' => q#科布多夏令時間#,
+				'generic' => q#科布多時間#,
+				'standard' => q#科布多標準時間#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(印度標準時間),
+				'standard' => q#印度標準時間#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -10928,264 +11077,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(印度洋時間),
+				'standard' => q#印度洋時間#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(印度支那時間),
+				'standard' => q#印度支那時間#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(印尼中部時間),
+				'standard' => q#印尼中部時間#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(印尼東部時間),
+				'standard' => q#印尼東部時間#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(印尼西部時間),
+				'standard' => q#印尼西部時間#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(伊朗夏令時間),
-				'generic' => q(伊朗時間),
-				'standard' => q(伊朗標準時間),
+				'daylight' => q#伊朗夏令時間#,
+				'generic' => q#伊朗時間#,
+				'standard' => q#伊朗標準時間#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(伊爾庫次克夏令時間),
-				'generic' => q(伊爾庫次克時間),
-				'standard' => q(伊爾庫次克標準時間),
+				'daylight' => q#伊爾庫次克夏令時間#,
+				'generic' => q#伊爾庫次克時間#,
+				'standard' => q#伊爾庫次克標準時間#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(以色列夏令時間),
-				'generic' => q(以色列時間),
-				'standard' => q(以色列標準時間),
+				'daylight' => q#以色列夏令時間#,
+				'generic' => q#以色列時間#,
+				'standard' => q#以色列標準時間#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(日本夏令時間),
-				'generic' => q(日本時間),
-				'standard' => q(日本標準時間),
+				'daylight' => q#日本夏令時間#,
+				'generic' => q#日本時間#,
+				'standard' => q#日本標準時間#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(彼得羅巴甫洛夫斯克日光節約時間),
-				'generic' => q(彼得羅巴甫洛夫斯克時間),
-				'standard' => q(彼得羅巴甫洛夫斯克標準時間),
+				'daylight' => q#彼得羅巴甫洛夫斯克日光節約時間#,
+				'generic' => q#彼得羅巴甫洛夫斯克時間#,
+				'standard' => q#彼得羅巴甫洛夫斯克標準時間#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(東哈薩克時間),
+				'standard' => q#東哈薩克時間#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(西哈薩克時間),
+				'standard' => q#西哈薩克時間#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(韓國夏令時間),
-				'generic' => q(韓國時間),
-				'standard' => q(韓國標準時間),
+				'daylight' => q#韓國夏令時間#,
+				'generic' => q#韓國時間#,
+				'standard' => q#韓國標準時間#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(科斯瑞時間),
+				'standard' => q#科斯瑞時間#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(克拉斯諾亞爾斯克夏令時間),
-				'generic' => q(克拉斯諾亞爾斯克時間),
-				'standard' => q(克拉斯諾亞爾斯克標準時間),
+				'daylight' => q#克拉斯諾亞爾斯克夏令時間#,
+				'generic' => q#克拉斯諾亞爾斯克時間#,
+				'standard' => q#克拉斯諾亞爾斯克標準時間#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(吉爾吉斯時間),
+				'standard' => q#吉爾吉斯時間#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(蘭卡時間),
+				'standard' => q#蘭卡時間#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(萊恩群島時間),
+				'standard' => q#萊恩群島時間#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(豪勳爵島夏令時間),
-				'generic' => q(豪勳爵島時間),
-				'standard' => q(豪勳爵島標準時間),
+				'daylight' => q#豪勳爵島夏令時間#,
+				'generic' => q#豪勳爵島時間#,
+				'standard' => q#豪勳爵島標準時間#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(澳門夏令時間),
-				'generic' => q(澳門時間),
-				'standard' => q(澳門標準時間),
+				'daylight' => q#澳門夏令時間#,
+				'generic' => q#澳門時間#,
+				'standard' => q#澳門標準時間#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(麥覺理時間),
+				'standard' => q#麥覺理時間#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(馬加丹夏令時間),
-				'generic' => q(馬加丹時間),
-				'standard' => q(馬加丹標準時間),
+				'daylight' => q#馬加丹夏令時間#,
+				'generic' => q#馬加丹時間#,
+				'standard' => q#馬加丹標準時間#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(馬來西亞時間),
+				'standard' => q#馬來西亞時間#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(馬爾地夫時間),
+				'standard' => q#馬爾地夫時間#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(馬可薩斯時間),
+				'standard' => q#馬可薩斯時間#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(馬紹爾群島時間),
+				'standard' => q#馬紹爾群島時間#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(模里西斯夏令時間),
-				'generic' => q(模里西斯時間),
-				'standard' => q(模里西斯標準時間),
+				'daylight' => q#模里西斯夏令時間#,
+				'generic' => q#模里西斯時間#,
+				'standard' => q#模里西斯標準時間#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(莫森時間),
+				'standard' => q#莫森時間#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(墨西哥西北部夏令時間),
-				'generic' => q(墨西哥西北部時間),
-				'standard' => q(墨西哥西北部標準時間),
+				'daylight' => q#墨西哥西北部夏令時間#,
+				'generic' => q#墨西哥西北部時間#,
+				'standard' => q#墨西哥西北部標準時間#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(墨西哥太平洋夏令時間),
-				'generic' => q(墨西哥太平洋時間),
-				'standard' => q(墨西哥太平洋標準時間),
+				'daylight' => q#墨西哥太平洋夏令時間#,
+				'generic' => q#墨西哥太平洋時間#,
+				'standard' => q#墨西哥太平洋標準時間#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(烏蘭巴托夏令時間),
-				'generic' => q(烏蘭巴托時間),
-				'standard' => q(烏蘭巴托標準時間),
+				'daylight' => q#烏蘭巴托夏令時間#,
+				'generic' => q#烏蘭巴托時間#,
+				'standard' => q#烏蘭巴托標準時間#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(莫斯科夏令時間),
-				'generic' => q(莫斯科時間),
-				'standard' => q(莫斯科標準時間),
+				'daylight' => q#莫斯科夏令時間#,
+				'generic' => q#莫斯科時間#,
+				'standard' => q#莫斯科標準時間#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(緬甸時間),
+				'standard' => q#緬甸時間#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(諾魯時間),
+				'standard' => q#諾魯時間#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(尼泊爾時間),
+				'standard' => q#尼泊爾時間#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(新喀里多尼亞群島夏令時間),
-				'generic' => q(新喀里多尼亞時間),
-				'standard' => q(新喀里多尼亞標準時間),
+				'daylight' => q#新喀里多尼亞群島夏令時間#,
+				'generic' => q#新喀里多尼亞時間#,
+				'standard' => q#新喀里多尼亞標準時間#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(紐西蘭夏令時間),
-				'generic' => q(紐西蘭時間),
-				'standard' => q(紐西蘭標準時間),
+				'daylight' => q#紐西蘭夏令時間#,
+				'generic' => q#紐西蘭時間#,
+				'standard' => q#紐西蘭標準時間#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(紐芬蘭夏令時間),
-				'generic' => q(紐芬蘭時間),
-				'standard' => q(紐芬蘭標準時間),
+				'daylight' => q#紐芬蘭夏令時間#,
+				'generic' => q#紐芬蘭時間#,
+				'standard' => q#紐芬蘭標準時間#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(紐埃島時間),
+				'standard' => q#紐埃島時間#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(諾福克島時間),
+				'standard' => q#諾福克島時間#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(費爾南多 - 迪諾羅尼亞夏令時間),
-				'generic' => q(費爾南多 - 迪諾羅尼亞時間),
-				'standard' => q(費爾南多 - 迪諾羅尼亞標準時間),
+				'daylight' => q#費爾南多 - 迪諾羅尼亞夏令時間#,
+				'generic' => q#費爾南多 - 迪諾羅尼亞時間#,
+				'standard' => q#費爾南多 - 迪諾羅尼亞標準時間#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(北馬里亞納群島時間),
+				'standard' => q#北馬里亞納群島時間#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(新西伯利亞夏令時間),
-				'generic' => q(新西伯利亞時間),
-				'standard' => q(新西伯利亞標準時間),
+				'daylight' => q#新西伯利亞夏令時間#,
+				'generic' => q#新西伯利亞時間#,
+				'standard' => q#新西伯利亞標準時間#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(鄂木斯克夏令時間),
-				'generic' => q(鄂木斯克時間),
-				'standard' => q(鄂木斯克標準時間),
+				'daylight' => q#鄂木斯克夏令時間#,
+				'generic' => q#鄂木斯克時間#,
+				'standard' => q#鄂木斯克標準時間#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -11307,245 +11456,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(巴基斯坦夏令時間),
-				'generic' => q(巴基斯坦時間),
-				'standard' => q(巴基斯坦標準時間),
+				'daylight' => q#巴基斯坦夏令時間#,
+				'generic' => q#巴基斯坦時間#,
+				'standard' => q#巴基斯坦標準時間#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(帛琉時間),
+				'standard' => q#帛琉時間#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(巴布亞紐幾內亞時間),
+				'standard' => q#巴布亞紐幾內亞時間#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(巴拉圭夏令時間),
-				'generic' => q(巴拉圭時間),
-				'standard' => q(巴拉圭標準時間),
+				'daylight' => q#巴拉圭夏令時間#,
+				'generic' => q#巴拉圭時間#,
+				'standard' => q#巴拉圭標準時間#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(秘魯夏令時間),
-				'generic' => q(秘魯時間),
-				'standard' => q(秘魯標準時間),
+				'daylight' => q#秘魯夏令時間#,
+				'generic' => q#秘魯時間#,
+				'standard' => q#秘魯標準時間#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(菲律賓夏令時間),
-				'generic' => q(菲律賓時間),
-				'standard' => q(菲律賓標準時間),
+				'daylight' => q#菲律賓夏令時間#,
+				'generic' => q#菲律賓時間#,
+				'standard' => q#菲律賓標準時間#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(鳳凰群島時間),
+				'standard' => q#鳳凰群島時間#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(聖皮埃爾和密克隆群島夏令時間),
-				'generic' => q(聖皮埃爾和密克隆群島時間),
-				'standard' => q(聖皮埃爾和密克隆群島標準時間),
+				'daylight' => q#聖皮埃爾和密克隆群島夏令時間#,
+				'generic' => q#聖皮埃爾和密克隆群島時間#,
+				'standard' => q#聖皮埃爾和密克隆群島標準時間#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(皮特肯時間),
+				'standard' => q#皮特肯時間#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(波納佩時間),
+				'standard' => q#波納佩時間#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#平壤時間#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(克孜勒奧爾達夏令時間),
-				'generic' => q(克孜勒奧爾達時間),
-				'standard' => q(克孜勒奧爾達標準時間),
+				'daylight' => q#克孜勒奧爾達夏令時間#,
+				'generic' => q#克孜勒奧爾達時間#,
+				'standard' => q#克孜勒奧爾達標準時間#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(留尼旺時間),
+				'standard' => q#留尼旺時間#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(羅瑟拉時間),
+				'standard' => q#羅瑟拉時間#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(庫頁島夏令時間),
-				'generic' => q(庫頁島時間),
-				'standard' => q(庫頁島標準時間),
+				'daylight' => q#庫頁島夏令時間#,
+				'generic' => q#庫頁島時間#,
+				'standard' => q#庫頁島標準時間#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(薩馬拉夏令時間),
-				'generic' => q(薩馬拉時間),
-				'standard' => q(薩馬拉標準時間),
+				'daylight' => q#薩馬拉夏令時間#,
+				'generic' => q#薩馬拉時間#,
+				'standard' => q#薩馬拉標準時間#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(薩摩亞夏令時間),
-				'generic' => q(薩摩亞時間),
-				'standard' => q(薩摩亞標準時間),
+				'daylight' => q#薩摩亞夏令時間#,
+				'generic' => q#薩摩亞時間#,
+				'standard' => q#薩摩亞標準時間#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(塞席爾時間),
+				'standard' => q#塞席爾時間#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(新加坡標準時間),
+				'standard' => q#新加坡標準時間#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(索羅門群島時間),
+				'standard' => q#索羅門群島時間#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(南喬治亞時間),
+				'standard' => q#南喬治亞時間#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(蘇利南時間),
+				'standard' => q#蘇利南時間#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(昭和基地時間),
+				'standard' => q#昭和基地時間#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(大溪地時間),
+				'standard' => q#大溪地時間#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(台北夏令時間),
-				'generic' => q(台北時間),
-				'standard' => q(台北標準時間),
+				'daylight' => q#台北夏令時間#,
+				'generic' => q#台北時間#,
+				'standard' => q#台北標準時間#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(塔吉克時間),
+				'standard' => q#塔吉克時間#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(托克勞群島時間),
+				'standard' => q#托克勞群島時間#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(東加夏令時間),
-				'generic' => q(東加時間),
-				'standard' => q(東加標準時間),
+				'daylight' => q#東加夏令時間#,
+				'generic' => q#東加時間#,
+				'standard' => q#東加標準時間#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(楚克島時間),
+				'standard' => q#楚克島時間#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(土庫曼夏令時間),
-				'generic' => q(土庫曼時間),
-				'standard' => q(土庫曼標準時間),
+				'daylight' => q#土庫曼夏令時間#,
+				'generic' => q#土庫曼時間#,
+				'standard' => q#土庫曼標準時間#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(吐瓦魯時間),
+				'standard' => q#吐瓦魯時間#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(烏拉圭夏令時間),
-				'generic' => q(烏拉圭時間),
-				'standard' => q(烏拉圭標準時間),
+				'daylight' => q#烏拉圭夏令時間#,
+				'generic' => q#烏拉圭時間#,
+				'standard' => q#烏拉圭標準時間#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(烏茲別克夏令時間),
-				'generic' => q(烏茲別克時間),
-				'standard' => q(烏茲別克標準時間),
+				'daylight' => q#烏茲別克夏令時間#,
+				'generic' => q#烏茲別克時間#,
+				'standard' => q#烏茲別克標準時間#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(萬那杜夏令時間),
-				'generic' => q(萬那杜時間),
-				'standard' => q(萬那杜標準時間),
+				'daylight' => q#萬那杜夏令時間#,
+				'generic' => q#萬那杜時間#,
+				'standard' => q#萬那杜標準時間#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(委內瑞拉時間),
+				'standard' => q#委內瑞拉時間#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(海參崴夏令時間),
-				'generic' => q(海參崴時間),
-				'standard' => q(海參崴標準時間),
+				'daylight' => q#海參崴夏令時間#,
+				'generic' => q#海參崴時間#,
+				'standard' => q#海參崴標準時間#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(伏爾加格勒夏令時間),
-				'generic' => q(伏爾加格勒時間),
-				'standard' => q(伏爾加格勒標準時間),
+				'daylight' => q#伏爾加格勒夏令時間#,
+				'generic' => q#伏爾加格勒時間#,
+				'standard' => q#伏爾加格勒標準時間#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(沃斯托克時間),
+				'standard' => q#沃斯托克時間#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(威克島時間),
+				'standard' => q#威克島時間#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(瓦利斯和富圖納群島時間),
+				'standard' => q#瓦利斯和富圖納群島時間#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(雅庫次克夏令時間),
-				'generic' => q(雅庫次克時間),
-				'standard' => q(雅庫次克標準時間),
+				'daylight' => q#雅庫次克夏令時間#,
+				'generic' => q#雅庫次克時間#,
+				'standard' => q#雅庫次克標準時間#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(葉卡捷琳堡夏令時間),
-				'generic' => q(葉卡捷琳堡時間),
-				'standard' => q(葉卡捷琳堡標準時間),
+				'daylight' => q#葉卡捷琳堡夏令時間#,
+				'generic' => q#葉卡捷琳堡時間#,
+				'standard' => q#葉卡捷琳堡標準時間#,
 			},
 		},
 	 } }

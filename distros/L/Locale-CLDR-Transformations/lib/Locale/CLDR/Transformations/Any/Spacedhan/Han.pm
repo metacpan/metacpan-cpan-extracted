@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Spacedhan::Han;
 # This file auto generated from Data\common\transforms\Han-Spacedhan.xml
-#	on Fri 29 Apr  6:48:42 pm GMT
+#	on Fri 13 Apr  6:59:52 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -35,16 +36,16 @@ has 'transforms' => (
 			type => 'conversion',
 			data => [
 				{
-					before  => q((?^u:\p{Letter}\p{Mark}*)),
-					after   => q((?^u:\p{Ideographic})),
-					replace => q((?^u:\')),
+					before  => q(\p{Letter}\p{Mark}*),
+					after   => q(\p{Ideographic}),
+					replace => q(\'),
 					result  => q(),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{Ideographic})),
-					after   => q((?^u:\p{Letter})),
-					replace => q((?^u:\')),
+					before  => q(\p{Ideographic}),
+					after   => q(\p{Letter}),
+					replace => q(\'),
 					result  => q(),
 					revisit => 0,
 				},

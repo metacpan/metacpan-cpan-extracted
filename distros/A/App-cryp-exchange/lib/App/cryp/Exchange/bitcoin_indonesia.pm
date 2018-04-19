@@ -1,7 +1,7 @@
 package App::cryp::Exchange::bitcoin_indonesia;
 
-our $DATE = '2018-04-04'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-04-12'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use Role::Tiny::With;
 with 'App::cryp::Role::Exchange';
 
 sub new {
-    require Finance::BTCIndo;
+    require Finance::Indodax;
 
     my ($class, %args) = @_;
 
@@ -20,7 +20,7 @@ sub new {
             unless $args{api_key} && $args{api_secret};
     }
 
-    $args{_client} = Finance::BTCIndo->new(
+    $args{_client} = Finance::Indodax->new(
         key => $args{api_key},
         secret => $args{api_secret},
     );
@@ -32,8 +32,8 @@ sub data_native_pair_separator { '_' }
 
 sub data_canonical_currencies {
     state $data = do {
-        require App::btcindo;
-        my %hash = %App::btcindo::Canonical_Currencies;
+        require App::indodax;
+        my %hash = %App::indodax::Canonical_Currencies;
         for my $k (keys %hash) {
             $hash{uc $k} = uc(delete $hash{$k});
         }
@@ -44,8 +44,8 @@ sub data_canonical_currencies {
 
 sub data_reverse_canonical_currencies {
     state $data = do {
-        require App::btcindo;
-        my %hash = %App::btcindo::Rev_Canonical_Currencies;
+        require App::indodax;
+        my %hash = %App::indodax::Rev_Canonical_Currencies;
         for my $k (keys %hash) {
             $hash{uc $k} = uc(delete $hash{$k});
         }
@@ -57,11 +57,11 @@ sub data_reverse_canonical_currencies {
 sub list_pairs {
     my ($self, %args) = @_;
 
-    require App::btcindo;
+    require App::indodax;
     # XXX in the future, we will put the master data here instead of in
-    # App::btcindo
+    # App::indodax
 
-    my $res = App::btcindo::pairs();
+    my $res = App::indodax::pairs();
     return $res unless $res->[0] == 200;
 
     my @res;
@@ -92,29 +92,7 @@ sub get_order_book {
     eval { $res = $self->{_client}->get_depth(pair => $pair) };
     return [500, "Died: $@"] if $@;
 
-    my @res;
-    {
-        last if $args{type} && $args{type} ne 'buy';
-        for my $rec (@{ $res->{buy} }) {
-            push @res, {
-                type   => "buy",
-                price  => $rec->[0],
-                amount => $rec->[1],
-            };
-        }
-    }
-    {
-        last if $args{type} && $args{type} ne 'sell';
-        for my $rec (@{ $res->{sell} }) {
-            push @res, {
-                type   => "sell",
-                price  => $rec->[0],
-                amount => $rec->[1],
-            };
-        }
-    }
-
-    [200, "OK", \@res];
+    [200, "OK", $res];
 }
 
 1;
@@ -132,7 +110,7 @@ App::cryp::Exchange::bitcoin_indonesia - Interact with Bitcoin Indonesia
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cryp::Exchange::bitcoin_indonesia (from Perl distribution App-cryp-exchange), released on 2018-04-04.
+This document describes version 0.002 of App::cryp::Exchange::bitcoin_indonesia (from Perl distribution App-cryp-exchange), released on 2018-04-12.
 
 =for Pod::Coverage ^(.+)$
 

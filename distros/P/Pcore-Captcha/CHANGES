@@ -1,3 +1,7 @@
+v1.3.2 2018-04-12T18:25:10Z
+ - result pragma replaced
+ - access to http status using hash key
+
 v1.3.1 2018-04-05T06:28:08Z
  - dist.perl renamed to dist.yaml
  - src formatted

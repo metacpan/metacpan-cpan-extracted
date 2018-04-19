@@ -1,0 +1,11 @@
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+cpanfile
+lib/Crypt/OpenSSL/Guess.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

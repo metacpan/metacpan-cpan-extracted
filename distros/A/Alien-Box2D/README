@@ -3,7 +3,7 @@ NAME
     <http://box2d.org/>
 
 VERSION
-    Version 0.105
+    Version 0.106
 
 SYNOPSIS
     You can use Alien::Box2D in your module that needs to link with *Box2D*

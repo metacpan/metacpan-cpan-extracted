@@ -1,6 +1,7 @@
 use utf8;
+use 5.010;
 package Text::Continuation::Parser;
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 use warnings;
 use strict;
 use Carp qw(croak);
@@ -92,7 +93,7 @@ Text::Continuation::Parser - Parse files with continuation lines
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 

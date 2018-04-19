@@ -1,7 +1,7 @@
 package Acme::CPANAuthors::Indonesian;
 
-our $DATE = '2017-09-26'; # DATE
-our $VERSION = '0.050'; # VERSION
+our $DATE = '2018-04-11'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use Acme::CPANAuthors::Register (
     DNS         => 'Daniel Sirait',
     EDPRATOMO   => 'Edwin Pratomo',
     HASANT      => 'Hasanuddin Tamir',
+    HEINCE      => 'Heince Kurniawan',
     PERLANCAR   => 'perlancar',
     SHARYANTO   => 'Steven Haryanto',
     YUSRIDEB    => 'Achmad Yusri Affandi',
@@ -30,7 +31,7 @@ Acme::CPANAuthors::Indonesian - We are Indonesian CPAN authors (Kami para penuli
 
 =head1 VERSION
 
-This document describes version 0.050 of Acme::CPANAuthors::Indonesian (from Perl distribution Acme-CPANAuthors-Indonesian), released on 2017-09-26.
+This document describes version 0.051 of Acme::CPANAuthors::Indonesian (from Perl distribution Acme-CPANAuthors-Indonesian), released on 2018-04-11.
 
 =head1 SYNOPSIS
 
@@ -64,7 +65,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANA
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Acme-CPANAuthors-Indonesian>.
+Source repository is at L<https://github.com/perlancar/perl-Acme-CPANAuthors-Indonesian>.
 
 =head1 BUGS
 
@@ -84,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

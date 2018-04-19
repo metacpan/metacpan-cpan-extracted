@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ta::Any::Sg - Package for language Tamil
 
 package Locale::CLDR::Locales::Ta::Any::Sg;
 # This file auto generated from Data\common\main\ta_SG.xml
-#	on Fri 29 Apr  7:28:02 pm GMT
+#	on Fri 13 Apr  7:30:27 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -29,14 +30,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -85,17 +86,17 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'India' => {
 			short => {
-				'standard' => q(∅∅∅),
+				'standard' => q#∅∅∅#,
 			},
 		},
 		'Malaysia' => {
 			short => {
-				'standard' => q(MYT),
+				'standard' => q#MYT#,
 			},
 		},
 		'Singapore' => {
 			short => {
-				'standard' => q(SGT),
+				'standard' => q#SGT#,
 			},
 		},
 	 } }

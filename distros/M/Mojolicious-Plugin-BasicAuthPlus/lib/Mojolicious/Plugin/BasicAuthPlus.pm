@@ -6,7 +6,7 @@ use Authen::Simple::Password;
 use Authen::Simple::Passwd;
 use Net::LDAP;
 
-our $VERSION = '0.11.0';
+our $VERSION = '0.11.1';
 
 sub register {
     my ($plugin, $app) = @_;
@@ -144,8 +144,10 @@ sub _check_ldap {
                 verify  => $params->{tls_verify} // 'optional',
                 cafile  => $params->{cafile} // '',
             );
-            if ($mesg->is_error) {
-                $c->app->log->warn("$@") if $logging;
+            if ($mesg->code) {
+            	my $text = "start_tls() failed for $params->{host}. " .
+            		"[$mesg->code] $mesg->error_name: $mesg->error_text" ;
+                $c->app->log->warn( $text ) if $logging;
                 $ldap->unbind;
                 return 0;
             }
@@ -246,7 +248,7 @@ Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 =head1 VERSION
 
-Version 0.11.0
+Version 0.11.1
 
 =head1 SYNOPSIS
 
@@ -656,15 +658,15 @@ Brad Robertson <blr@cpan.org>
 
 =head1 CONTRIBUTORS
 
-In alphabetical order:
-
 =over 2
 
-G.Y. Park
+Nicolas Georges
 
 Jay Mortensen
 
-Nicolas Georges
+Mark Muldoon
+
+G.Y. Park
 
 =back
 

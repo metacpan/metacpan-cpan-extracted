@@ -1,4 +1,10 @@
-Revision history for Data-Sah-CoerceRule-array-str_comma_sep
+0.006   2018-04-17 (PERLANCAR)
+
+        - No functional changes.
+
+	- [doc] Mention related coerce rules: array::str_int_range &
+	  array_str_int_range_and_comma_sep.
+
 
 0.005   2016-05-23 (PERLANCAR)
 

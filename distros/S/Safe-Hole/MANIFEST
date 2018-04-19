@@ -10,3 +10,4 @@ t/00-load.t
 t/01-hole.t
 t/98-pod-coverage.t
 t/99-pod.t
+META.json

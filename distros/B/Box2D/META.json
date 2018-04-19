@@ -4,7 +4,7 @@
       "Kartik Thakore <kthakore@CPAN.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "perl_5"
    ],
@@ -17,34 +17,33 @@
       "build" : {
          "requires" : {
             "Alien::Box2D" : "0.103",
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::Typemap::Basic" : "0.04",
             "ExtUtils::Typemap::ObjectMap" : "0",
             "ExtUtils::Typemap::STL::String" : "0.04",
-            "ExtUtils::XSpp" : "0.16",
+            "ExtUtils::XSpp" : "0.18",
             "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Box2D" : "0.103",
-            "ExtUtils::CppGuess" : "0.07",
+            "Alien::Box2D" : "0.106",
+            "ExtUtils::CppGuess" : "0.12",
             "Module::Build" : "0.38",
-            "Module::Build::WithXSpp" : "0.11"
+            "Module::Build::WithXSpp" : "0.14"
          }
       }
    },
    "provides" : {
       "Box2D" : {
          "file" : "lib/Box2D.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Box2D::b2ContactListener" : {
-         "file" : "lib/Box2D/b2ContactListener.pm",
-         "version" : 0
+         "file" : "lib/Box2D/b2ContactListener.pm"
       },
       "Box2D::b2RayCastCallback" : {
-         "file" : "lib/Box2D/b2RayCastCallback.pm",
-         "version" : 0
+         "file" : "lib/Box2D/b2RayCastCallback.pm"
       }
    },
    "release_status" : "stable",
@@ -59,5 +58,6 @@
          "url" : "https://github.com/PerlGameDev/Box2D-perl"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

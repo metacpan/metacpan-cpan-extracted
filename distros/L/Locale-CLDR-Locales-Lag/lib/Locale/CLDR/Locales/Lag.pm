@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Lag - Package for language Langi
 
 package Locale::CLDR::Locales::Lag;
 # This file auto generated from Data\common\main\lag.xml
-#	on Fri 29 Apr  7:14:15 pm GMT
+#	on Fri 13 Apr  7:17:57 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -328,7 +329,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'Ɨ', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ʉ', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a á b c d e é f g h i í ɨ j k l m n o ó p q r s t u ú ʉ v w x y z])},
+			main => qr{[a á b c d e é f g h i í ɨ j k l m n o ó p q r s t u ú ʉ v w x y z]},
 		};
 	},
 EOT
@@ -892,7 +893,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -915,7 +916,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

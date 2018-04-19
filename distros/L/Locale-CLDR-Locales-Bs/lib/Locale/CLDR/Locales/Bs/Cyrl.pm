@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Bs::Cyrl - Package for language Bosnian
 
 package Locale::CLDR::Locales::Bs::Cyrl;
 # This file auto generated from Data\common\main\bs_Cyrl.xml
-#	on Fri 29 Apr  6:54:36 pm GMT
+#	on Fri 13 Apr  7:03:53 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -78,7 +79,7 @@ has 'display_name_language' => (
  				'bal' => 'балучи',
  				'ban' => 'балинезијски',
  				'bas' => 'баса',
- 				'be' => 'белоруски',
+ 				'be' => 'бјелоруски',
  				'bej' => 'беја',
  				'bem' => 'бемба',
  				'bg' => 'бугарски',
@@ -118,14 +119,13 @@ has 'display_name_language' => (
  				'crh' => 'кримеански турски',
  				'cs' => 'чешки',
  				'csb' => 'кашубијански',
- 				'cu' => 'старословенски',
+ 				'cu' => 'старославенски',
  				'cv' => 'чувашки',
  				'cy' => 'велшки',
  				'da' => 'дански',
  				'dak' => 'дакота',
  				'dar' => 'даргва',
- 				'de' => 'немачки',
- 				'de_AT' => 'Аустријски немачки',
+ 				'de' => 'њемачки',
  				'de_CH' => 'Швајцарски високи немачки',
  				'del' => 'делавер',
  				'den' => 'славски',
@@ -138,6 +138,7 @@ has 'display_name_language' => (
  				'dv' => 'дивехијски',
  				'dyu' => 'ђула',
  				'dz' => 'џонга',
+ 				'ebu' => 'ембу',
  				'ee' => 'еве',
  				'efi' => 'ефикски',
  				'egy' => 'староегипатски',
@@ -145,15 +146,11 @@ has 'display_name_language' => (
  				'el' => 'грчки',
  				'elx' => 'еламитски',
  				'en' => 'енглески',
- 				'en_AU' => 'Аустралијски енглески',
- 				'en_CA' => 'Канадски енглески',
- 				'en_GB' => 'Британски енглески',
- 				'en_US' => 'САД енглески',
+ 				'en_GB@alt=short' => 'енглески (УК)',
+ 				'en_US@alt=short' => 'енглески (САД)',
  				'enm' => 'средњи енглески',
  				'eo' => 'есперанто',
  				'es' => 'шпански',
- 				'es_419' => 'Латино-амерички шпански',
- 				'es_ES' => 'Иберијски шпански',
  				'et' => 'естонски',
  				'eu' => 'баскијски',
  				'ewo' => 'евондо',
@@ -162,13 +159,11 @@ has 'display_name_language' => (
  				'fat' => 'фанти',
  				'ff' => 'фулах',
  				'fi' => 'фински',
- 				'fil' => 'тагалог',
+ 				'fil' => 'филипински',
  				'fj' => 'фиджијски',
  				'fo' => 'фарски',
  				'fon' => 'фон',
  				'fr' => 'француски',
- 				'fr_CA' => 'Канадски француски',
- 				'fr_CH' => 'Швајцарски француски',
  				'frm' => 'средњи француски',
  				'fro' => 'старофранцуски',
  				'frr' => 'северно-фризијски',
@@ -191,7 +186,7 @@ has 'display_name_language' => (
  				'got' => 'готски',
  				'grb' => 'гребо',
  				'grc' => 'старогрчки',
- 				'gsw' => 'швајцарски немачки',
+ 				'gsw' => 'њемачки (Швицарска)',
  				'gu' => 'гуџарати',
  				'gv' => 'манкс',
  				'gwi' => 'гвич’ин',
@@ -209,7 +204,7 @@ has 'display_name_language' => (
  				'ht' => 'хаитски',
  				'hu' => 'мађарски',
  				'hup' => 'хупа',
- 				'hy' => 'јерменски',
+ 				'hy' => 'ерменски',
  				'hz' => 'хереро',
  				'ia' => 'интерлингва',
  				'iba' => 'ибан',
@@ -258,6 +253,7 @@ has 'display_name_language' => (
  				'krl' => 'карелијски',
  				'kru' => 'курукх',
  				'ks' => 'кашмирски',
+ 				'ksb' => 'шамбала',
  				'ku' => 'курдски',
  				'kum' => 'кумик',
  				'kut' => 'кутенаи',
@@ -283,7 +279,7 @@ has 'display_name_language' => (
  				'lun' => 'лунда',
  				'luo' => 'луо',
  				'lus' => 'лушаи',
- 				'lv' => 'летонски',
+ 				'lv' => 'латвијски',
  				'mad' => 'мадурешки',
  				'mag' => 'магахи',
  				'mai' => 'маитили',
@@ -318,7 +314,7 @@ has 'display_name_language' => (
  				'na' => 'науру',
  				'nap' => 'неаполитански',
  				'nb' => 'норвешки бокмал',
- 				'nd' => 'северни ндебеле',
+ 				'nd' => 'сјеверни ндебеле',
  				'nds' => 'ниски немачки',
  				'ne' => 'непалски',
  				'new' => 'невари',
@@ -333,7 +329,7 @@ has 'display_name_language' => (
  				'non' => 'стари норски',
  				'nqo' => 'н’ко',
  				'nr' => 'јужни ндебеле',
- 				'nso' => 'северни сото',
+ 				'nso' => 'сјеверни сото',
  				'nv' => 'навахо',
  				'nwc' => 'класични невари',
  				'ny' => 'њања',
@@ -363,8 +359,6 @@ has 'display_name_language' => (
  				'ps' => 'паштунски',
  				'ps@alt=variant' => 'пашто',
  				'pt' => 'португалски',
- 				'pt_BR' => 'Бразилски португалски',
- 				'pt_PT' => 'Иберијски португалски',
  				'qu' => 'квенча',
  				'raj' => 'рађастани',
  				'rap' => 'рапануи',
@@ -388,7 +382,7 @@ has 'display_name_language' => (
  				'scn' => 'сицилијански',
  				'sco' => 'шкотски',
  				'sd' => 'синди',
- 				'se' => 'северни сами',
+ 				'se' => 'сјеверни сами',
  				'sel' => 'селкап',
  				'sg' => 'санго',
  				'sga' => 'староирски',
@@ -397,7 +391,7 @@ has 'display_name_language' => (
  				'si' => 'сингалески',
  				'sid' => 'сидамо',
  				'sk' => 'словачки',
- 				'sl' => 'словеначки',
+ 				'sl' => 'словенски',
  				'sm' => 'самоански',
  				'sma' => 'јужни сами',
  				'smj' => 'луле сами',
@@ -456,7 +450,7 @@ has 'display_name_language' => (
  				'uga' => 'угаритски',
  				'uk' => 'украјински',
  				'umb' => 'умбунду',
- 				'und' => 'непознат или неважећи језик',
+ 				'und' => 'непознати језик',
  				'ur' => 'урду',
  				'uz' => 'узбечки',
  				'vai' => 'ваи',
@@ -480,6 +474,7 @@ has 'display_name_language' => (
  				'zap' => 'запотечки',
  				'zbl' => 'блисимболи',
  				'zen' => 'зенага',
+ 				'zgh' => 'стандардни марокански тамазигт',
  				'zh' => 'кинески',
  				'zh_Hans' => 'кинески (поједностављен)',
  				'zh_Hant' => 'кинески (традиционални)',
@@ -526,7 +521,7 @@ has 'display_name_script' => (
  			'Cirt' => 'цирт писмо',
  			'Copt' => 'коптичко писмо',
  			'Cprt' => 'кипарско писмо',
- 			'Cyrl' => 'Ћирилица',
+ 			'Cyrl' => 'ћирилица',
  			'Cyrs' => 'Старословенска црквена ћирилица',
  			'Deva' => 'Деванагари',
  			'Dsrt' => 'Дезерет',
@@ -555,6 +550,7 @@ has 'display_name_script' => (
  			'Hung' => 'старомађарско писмо',
  			'Inds' => 'индушко писмо',
  			'Ital' => 'стари италик',
+ 			'Jamo' => 'Џамо',
  			'Java' => 'јаванско писмо',
  			'Jpan' => 'јапанско писмо',
  			'Kali' => 'кајах-ли писмо',
@@ -568,7 +564,7 @@ has 'display_name_script' => (
  			'Laoo' => 'лаошко писмо',
  			'Latf' => 'латиница (фрактур варијанта)',
  			'Latg' => 'галска латиница',
- 			'Latn' => 'Латиница',
+ 			'Latn' => 'латиница',
  			'Lepc' => 'лепча писмо',
  			'Limb' => 'лимбу писмо',
  			'Lina' => 'линеарно А писмо',
@@ -633,9 +629,9 @@ has 'display_name_script' => (
  			'Zinh' => 'наследно писмо',
  			'Zmth' => 'математичка нотација',
  			'Zsym' => 'симболи',
- 			'Zxxx' => 'Неписани језик',
+ 			'Zxxx' => 'неписани језик',
  			'Zyyy' => 'заједничко писмо',
- 			'Zzzz' => 'Непознато или неважеће писмо',
+ 			'Zzzz' => 'непознато писмо',
 
 			);
 			if ( @_ ) {
@@ -652,7 +648,7 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'001' => 'Свет',
+			'001' => 'Свијет',
  			'002' => 'Африка',
  			'003' => 'Северноамерички континент',
  			'005' => 'Јужна Америка',
@@ -660,7 +656,7 @@ has 'display_name_region' => (
  			'011' => 'Западна Африка',
  			'013' => 'Централна Америка',
  			'014' => 'Источна Африка',
- 			'015' => 'Северна Африка',
+ 			'015' => 'Сјеверна Африка',
  			'017' => 'Централна Африка',
  			'018' => 'Јужна Африка',
  			'019' => 'Америке',
@@ -679,17 +675,17 @@ has 'display_name_region' => (
  			'145' => 'Западна Азија',
  			'150' => 'Европа',
  			'151' => 'Источна Европа',
- 			'154' => 'Северна Европа',
+ 			'154' => 'Сјеверна Европа',
  			'155' => 'Западна Европа',
  			'419' => 'Латинска Америка',
  			'AC' => 'Острво Асенсион',
  			'AD' => 'Андора',
  			'AE' => 'Уједињени Арапски Емирати',
- 			'AF' => 'Авганистан',
+ 			'AF' => 'Афганистан',
  			'AG' => 'Антигва и Барбуда',
  			'AI' => 'Ангвила',
  			'AL' => 'Албанија',
- 			'AM' => 'Арменија',
+ 			'AM' => 'Ерменија',
  			'AO' => 'Ангола',
  			'AQ' => 'Антарктик',
  			'AR' => 'Аргентина',
@@ -697,7 +693,7 @@ has 'display_name_region' => (
  			'AT' => 'Аустрија',
  			'AU' => 'Аустралија',
  			'AW' => 'Аруба',
- 			'AX' => 'Аландска острва',
+ 			'AX' => 'Оландска острва',
  			'AZ' => 'Азербејџан',
  			'BA' => 'Босна и Херцеговина',
  			'BB' => 'Барбадос',
@@ -709,25 +705,27 @@ has 'display_name_region' => (
  			'BI' => 'Бурунди',
  			'BJ' => 'Бенин',
  			'BL' => 'Свети Бартоломеј',
- 			'BM' => 'Бермуда',
+ 			'BM' => 'Бермуди',
  			'BN' => 'Брунеј',
  			'BO' => 'Боливија',
+ 			'BQ' => 'Карипска Холандија',
  			'BR' => 'Бразил',
  			'BS' => 'Бахами',
  			'BT' => 'Бутан',
- 			'BV' => 'Буве Острва',
+ 			'BV' => 'Острво Буве',
  			'BW' => 'Боцвана',
- 			'BY' => 'Белорусија',
- 			'BZ' => 'Белизе',
+ 			'BY' => 'Бјелорусија',
+ 			'BZ' => 'Белиз',
  			'CA' => 'Канада',
  			'CC' => 'Кокос (Келинг) Острва',
- 			'CD' => 'Конго - Киншаса',
- 			'CD@alt=variant' => 'Конго (ДРК)',
- 			'CF' => 'Централно Афричка Република',
- 			'CG' => 'Конго - Бразавил',
- 			'CG@alt=variant' => 'Конго (Република)',
- 			'CH' => 'Швајцарска',
+ 			'CD' => 'Демократска Република Конго',
+ 			'CD@alt=variant' => 'ДР Конго',
+ 			'CF' => 'Средњоафричка Република',
+ 			'CG' => 'Конго',
+ 			'CG@alt=variant' => 'Република Конго',
+ 			'CH' => 'Швицарска',
  			'CI' => 'Обала Слоноваче',
+ 			'CI@alt=variant' => 'Обала Бјелокости',
  			'CK' => 'Кукова Острва',
  			'CL' => 'Чиле',
  			'CM' => 'Камерун',
@@ -736,11 +734,13 @@ has 'display_name_region' => (
  			'CP' => 'Острво Клипертон',
  			'CR' => 'Костарика',
  			'CU' => 'Куба',
- 			'CV' => 'Капе Верде',
- 			'CX' => 'Божићна острва',
+ 			'CV' => 'Зеленортска Острва',
+ 			'CW' => 'Курасао',
+ 			'CX' => 'Божићно острво',
  			'CY' => 'Кипар',
  			'CZ' => 'Чешка',
- 			'DE' => 'Немачка',
+ 			'CZ@alt=variant' => 'Чешка Република',
+ 			'DE' => 'Њемачка',
  			'DG' => 'Дијего Гарсија',
  			'DJ' => 'Џибути',
  			'DK' => 'Данска',
@@ -755,34 +755,36 @@ has 'display_name_region' => (
  			'ER' => 'Еритреја',
  			'ES' => 'Шпанија',
  			'ET' => 'Етиопија',
- 			'EU' => 'Европска Унија',
+ 			'EU' => 'Европска унија',
+ 			'EZ' => 'Еурозона',
  			'FI' => 'Финска',
  			'FJ' => 'Фиџи',
  			'FK' => 'Фокландска острва',
  			'FK@alt=variant' => 'Фокландска (Малвинска) острва',
  			'FM' => 'Микронезија',
- 			'FO' => 'Фарска Острва',
+ 			'FO' => 'Фарска острва',
  			'FR' => 'Француска',
  			'GA' => 'Габон',
- 			'GB' => 'Велика Британија',
+ 			'GB' => 'Уједињено Краљевство',
+ 			'GB@alt=short' => 'УК',
  			'GD' => 'Гренада',
  			'GE' => 'Грузија',
  			'GF' => 'Француска Гвајана',
- 			'GG' => 'Гурнси',
+ 			'GG' => 'Гернзи',
  			'GH' => 'Гана',
  			'GI' => 'Гибралтар',
  			'GL' => 'Гренланд',
  			'GM' => 'Гамбија',
  			'GN' => 'Гвинеја',
  			'GP' => 'Гваделупе',
- 			'GQ' => 'Екваторијална Гвинеја',
+ 			'GQ' => 'Екваторска Гвинеја',
  			'GR' => 'Грчка',
  			'GS' => 'Јужна Џорџија и Јужна Сендвич Острва',
  			'GT' => 'Гватемала',
  			'GU' => 'Гуам',
- 			'GW' => 'Гвинеја-Бисао',
+ 			'GW' => 'Гвинеја-Бисау',
  			'GY' => 'Гвајана',
- 			'HK' => 'Хонг Конг С. А. Р. Кина',
+ 			'HK' => 'Хонг Конг (САР Кина)',
  			'HK@alt=short' => 'Хонг Конг',
  			'HM' => 'Херд и Мекдоналд Острва',
  			'HN' => 'Хондурас',
@@ -793,14 +795,14 @@ has 'display_name_region' => (
  			'ID' => 'Индонезија',
  			'IE' => 'Ирска',
  			'IL' => 'Израел',
- 			'IM' => 'Острво Ман',
+ 			'IM' => 'Острво Мен',
  			'IN' => 'Индија',
  			'IO' => 'Британска територија у Индијском океану',
  			'IQ' => 'Ирак',
  			'IR' => 'Иран',
  			'IS' => 'Исланд',
  			'IT' => 'Италија',
- 			'JE' => 'Џерси',
+ 			'JE' => 'Џерзи',
  			'JM' => 'Јамајка',
  			'JO' => 'Јордан',
  			'JP' => 'Јапан',
@@ -808,38 +810,39 @@ has 'display_name_region' => (
  			'KG' => 'Киргизстан',
  			'KH' => 'Камбоџа',
  			'KI' => 'Кирибати',
- 			'KM' => 'Коморска Острва',
- 			'KN' => 'Сент Китс и Невис',
- 			'KP' => 'Северна Кореја',
+ 			'KM' => 'Комори',
+ 			'KN' => 'Свети Кристофор и Невис',
+ 			'KP' => 'Сјеверна Кореја',
  			'KR' => 'Јужна Кореја',
  			'KW' => 'Кувајт',
- 			'KY' => 'Кајманска Острва',
+ 			'KY' => 'Кајманска острва',
  			'KZ' => 'Казахстан',
  			'LA' => 'Лаос',
  			'LB' => 'Либан',
- 			'LC' => 'Сент Луција',
+ 			'LC' => 'Света Луција',
  			'LI' => 'Лихтенштајн',
  			'LK' => 'Шри Ланка',
  			'LR' => 'Либерија',
  			'LS' => 'Лесото',
  			'LT' => 'Литванија',
  			'LU' => 'Луксембург',
- 			'LV' => 'Летонија',
+ 			'LV' => 'Латвија',
  			'LY' => 'Либија',
  			'MA' => 'Мароко',
  			'MC' => 'Монако',
  			'MD' => 'Молдавија',
  			'ME' => 'Црна Гора',
- 			'MF' => 'Сент Мартин',
+ 			'MF' => 'Свети Мартин',
  			'MG' => 'Мадагаскар',
  			'MH' => 'Маршалска Острва',
  			'MK' => 'Македонија',
+ 			'MK@alt=variant' => 'Македонија (БЈР)',
  			'ML' => 'Мали',
- 			'MM' => 'Мијанмар (Бурма)',
+ 			'MM' => 'Мјанмар',
  			'MN' => 'Монголија',
- 			'MO' => 'Макао С. А. Р. Кина',
+ 			'MO' => 'Макао (САР Кина)',
  			'MO@alt=short' => 'Макао',
- 			'MP' => 'Северна Маријанска Острва',
+ 			'MP' => 'Сјеверна Маријанска острва',
  			'MQ' => 'Мартиник',
  			'MR' => 'Мауританија',
  			'MS' => 'Монсерат',
@@ -853,7 +856,7 @@ has 'display_name_region' => (
  			'NA' => 'Намибија',
  			'NC' => 'Нова Каледонија',
  			'NE' => 'Нигер',
- 			'NF' => 'Норфолк Острво',
+ 			'NF' => 'Острво Норфолк',
  			'NG' => 'Нигерија',
  			'NI' => 'Никарагва',
  			'NL' => 'Холандија',
@@ -872,9 +875,9 @@ has 'display_name_region' => (
  			'PL' => 'Пољска',
  			'PM' => 'Сен Пјер и Микелон',
  			'PN' => 'Питкерн',
- 			'PR' => 'Порто Рико',
+ 			'PR' => 'Порторико',
  			'PS' => 'Палестинске територије',
- 			'PT' => 'Португалија',
+ 			'PT' => 'Португал',
  			'PW' => 'Палау',
  			'PY' => 'Парагвај',
  			'QA' => 'Катар',
@@ -890,9 +893,9 @@ has 'display_name_region' => (
  			'SD' => 'Судан',
  			'SE' => 'Шведска',
  			'SG' => 'Сингапур',
- 			'SH' => 'Света Јелена',
+ 			'SH' => 'Света Хелена',
  			'SI' => 'Словенија',
- 			'SJ' => 'Свалбард и Јанмајен Острва',
+ 			'SJ' => 'Свалбард и Јан Мајен',
  			'SK' => 'Словачка',
  			'SL' => 'Сијера Леоне',
  			'SM' => 'Сан Марино',
@@ -900,10 +903,10 @@ has 'display_name_region' => (
  			'SO' => 'Сомалија',
  			'SR' => 'Суринам',
  			'SS' => 'Јужни Судан',
- 			'ST' => 'Сао Томе и Принципе',
+ 			'ST' => 'Свети Тома и Принцип',
  			'SV' => 'Салвадор',
  			'SY' => 'Сирија',
- 			'SZ' => 'Свазиленд',
+ 			'SZ' => 'Свази',
  			'TA' => 'Тристан да Куња',
  			'TC' => 'Туркс и Кајкос Острва',
  			'TD' => 'Чад',
@@ -924,18 +927,21 @@ has 'display_name_region' => (
  			'UA' => 'Украјина',
  			'UG' => 'Уганда',
  			'UM' => 'Мања удаљена острва САД',
+ 			'UN' => 'Уједињене нације',
  			'US' => 'Сједињене Америчке Државе',
+ 			'US@alt=short' => 'САД',
  			'UY' => 'Уругвај',
  			'UZ' => 'Узбекистан',
  			'VA' => 'Ватикан',
- 			'VC' => 'Сент Винсент и Гренадини',
+ 			'VC' => 'Свети Винсент и Гренадини',
  			'VE' => 'Венецуела',
- 			'VG' => 'Британска Девичанска Острва',
- 			'VI' => 'С.А.Д. Девичанска Острва',
+ 			'VG' => 'Британска Дјевичанска острва',
+ 			'VI' => 'Америчка Дјевичанска острва',
  			'VN' => 'Вијетнам',
  			'VU' => 'Вануату',
- 			'WF' => 'Валис и Футуна Острва',
+ 			'WF' => 'Валис и Футуна',
  			'WS' => 'Самоа',
+ 			'XK' => 'Косово',
  			'YE' => 'Јемен',
  			'YT' => 'Мајоте',
  			'ZA' => 'Јужноафричка Република',
@@ -1039,6 +1045,15 @@ has 'display_name_type' => (
  				'traditional' => q{Традиционално сортирање},
  				'unihan' => q{Редослед сортирања радикалним цртицама},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{пуна ширина},
+ 				'hwidth' => q{пола ширине},
+ 				'npinyin' => q{Нумеричка},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{БГН (BGN)},
+ 				'ungegn' => q{УНГЕГН (BGN)},
+ 			},
  			'numbers' => {
  				'arab' => q{арапско-индијске цифре},
  				'arabext' => q{продужене арапско-индијске цифре},
@@ -1095,27 +1110,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'БГН (BGN)',
- 			'numeric' => 'Нумеричка',
- 			'tone' => 'Тон',
- 			'ungegn' => 'УНГЕГН (BGN)',
- 			'x-accents' => 'Акценти',
- 			'x-fullwidth' => 'пуна ширина',
- 			'x-halfwidth' => 'пола ширине',
- 			'x-jamo' => 'Џамо',
- 			'x-pinyin' => 'Пинјин',
- 			'x-publishing' => 'Издавачки',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1140,7 +1134,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['А', 'Б', 'В', 'Г', 'Д', 'Ђ', 'Е', 'Ж', 'З', 'И', 'Ј', 'К', 'Л', 'Љ', 'М', 'Н', 'Њ', 'О', 'П', 'Р', 'С', 'Т', 'Ћ', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Џ', 'Ш'],
-			main => qr{(?^u:[а б в г д ђ е ж з и ј к л љ м н њ о п р с т ћ у ф х ц ч џ ш])},
+			main => qr{[а б в г д ђ е ж з и ј к л љ м н њ о п р с т ћ у ф х ц ч џ ш]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1326,6 +1321,7 @@ has 'number_symbols' => (
 			'perMille' => q(‰),
 			'percentSign' => q(%),
 			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
 		},
 	} }
 );
@@ -1398,7 +1394,7 @@ has 'number_formats' => (
 					'other' => '000 бил',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -1529,14 +1525,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -1990,12 +1986,20 @@ has 'currencies' => (
 				'other' => q(белоруских нових рубљи),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(Белоруска рубља),
 				'few' => q(белоруске рубље),
 				'one' => q(белоруска рубља),
 				'other' => q(белоруске рубље),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(Белоруска рубља \(2000–2016\)),
+				'few' => q(белоруске рубље \(2000–2016\)),
+				'one' => q(белоруска рубља \(2000–2016\)),
+				'other' => q(белоруске рубље \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3091,18 +3095,18 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(Перуански нуево сол),
-				'few' => q(перуанска нуево сола),
-				'one' => q(перуански нуево сол),
-				'other' => q(перуанских нуево сола),
-			},
-		},
-		'PES' => {
-			display_name => {
 				'currency' => q(Перуански сол),
 				'few' => q(перуанска сола),
 				'one' => q(перуански сол),
 				'other' => q(перуанских сола),
+			},
+		},
+		'PES' => {
+			display_name => {
+				'currency' => q(Перуански сол \(1863–1965\)),
+				'few' => q(перуанска сола \(1863–1965\)),
+				'one' => q(перуански сол \(1863–1965\)),
+				'other' => q(перуанских сола \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -3963,7 +3967,7 @@ has 'calendar_months' => (
 							'мај',
 							'јун',
 							'јул',
-							'авг',
+							'ауг',
 							'сеп',
 							'окт',
 							'нов',
@@ -3982,7 +3986,7 @@ has 'calendar_months' => (
 							'мај',
 							'јуни',
 							'јули',
-							'август',
+							'аугуст',
 							'септембар',
 							'октобар',
 							'новембар',
@@ -3994,6 +3998,21 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'ауг'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'ј',
@@ -4008,6 +4027,21 @@ has 'calendar_months' => (
 							'о',
 							'н',
 							'д'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'аугуст'
 						],
 						leap => [
 							
@@ -4174,13 +4208,13 @@ has 'calendar_days' => (
 						sun => 'нед'
 					},
 					wide => {
-						mon => 'понедељак',
+						mon => 'понедјељак',
 						tue => 'уторак',
 						wed => 'сриједа',
 						thu => 'четвртак',
 						fri => 'петак',
 						sat => 'субота',
-						sun => 'недеља'
+						sun => 'недјеља'
 					},
 				},
 				'stand-alone' => {
@@ -4192,6 +4226,9 @@ has 'calendar_days' => (
 						fri => 'п',
 						sat => 'с',
 						sun => 'н'
+					},
+					wide => {
+						sun => 'недјеља'
 					},
 				},
 			},
@@ -4244,276 +4281,276 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'persian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'roc') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'japanese') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -4572,8 +4609,8 @@ has 'eras' => (
 				'1' => 'н.е.'
 			},
 			wide => {
-				'0' => 'Пре нове ере',
-				'1' => 'Нове ере'
+				'0' => 'прије нове ере',
+				'1' => 'нове ере'
 			},
 		},
 		'hebrew' => {
@@ -4957,6 +4994,35 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			Ed => q{E, d.},
+			Gy => q{y. G},
+			GyMMM => q{MMM y. G},
+			GyMMMEd => q{E, dd. MMM y. G},
+			GyMMMd => q{dd. MMM y. G},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, dd.MM.},
+			MMM => q{LLL},
+			MMMEd => q{E, dd. MMM},
+			MMMd => q{dd. MMM},
+			Md => q{dd.MM.},
+			d => q{d},
+			h => q{hh a},
+			hm => q{hh:mm a},
+			hms => q{hh:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y.},
+			yM => q{MM.y.},
+			yMEd => q{E, dd.MM.y.},
+			yMMM => q{MMM y.},
+			yMMMEd => q{E, dd. MMM y.},
+			yMMMd => q{dd. MMM y.},
+			yMd => q{dd.MM.y.},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+		},
 		'generic' => {
 			Ed => q{E, d.},
 			Gy => q{y. G},
@@ -4986,35 +5052,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyMd => q{dd.MM.y. G},
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
-		},
-		'gregorian' => {
-			Ed => q{E, d.},
-			Gy => q{y. G},
-			GyMMM => q{MMM y. G},
-			GyMMMEd => q{E, dd. MMM y. G},
-			GyMMMd => q{dd. MMM y. G},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, dd.MM.},
-			MMM => q{LLL},
-			MMMEd => q{E, dd. MMM},
-			MMMd => q{dd. MMM},
-			Md => q{dd.MM.},
-			d => q{d},
-			h => q{hh a},
-			hm => q{hh:mm a},
-			hms => q{hh:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y.},
-			yM => q{MM.y.},
-			yMEd => q{E, dd.MM.y.},
-			yMMM => q{MMM y.},
-			yMMMEd => q{E, dd. MMM y.},
-			yMMMd => q{dd. MMM y.},
-			yMd => q{dd.MM.y.},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 		},
 		'islamic' => {
 			Ed => q{E, dd.},
@@ -5056,101 +5093,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E, d.M – E, d.M},
-				d => q{E, d.M – E, d.M},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E, dd. MMM – E, dd. MMM},
-				d => q{E, dd. – E, dd. MMM},
-			},
-			MMMd => {
-				M => q{dd. MMM – dd. MMM},
-				d => q{dd.–dd. MMM},
-			},
-			Md => {
-				M => q{d.M – d.M},
-				d => q{d.M – d.M},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} - {1}',
-			h => {
-				a => q{hh a – hh a},
-				h => q{hh–hh a},
-			},
-			hm => {
-				a => q{hh:mm a – hh:mm a},
-				h => q{hh:mm–hh:mm a},
-				m => q{hh:mm–hh:mm a},
-			},
-			hmv => {
-				a => q{hh:mm a – hh:mm a v},
-				h => q{hh:mm–hh:mm a v},
-				m => q{hh:mm–hh:mm a v},
-			},
-			hv => {
-				a => q{hh a – hh a v},
-				h => q{hh–hh a v},
-			},
-			y => {
-				y => q{y–y G},
-			},
-			yM => {
-				M => q{MM.–MM. y. G},
-				y => q{MM.y. – MM.y. G},
-			},
-			yMEd => {
-				M => q{E, d.M.y. – E, d.M.y. G},
-				d => q{E, d.M.y. – E, d.M.y. G},
-				y => q{E, d.M.y. – E, d.M.y. G},
-			},
-			yMMM => {
-				M => q{MMM–MMM y. G},
-				y => q{MMM y. – MMM y. G},
-			},
-			yMMMEd => {
-				M => q{E, dd. MMM – E, dd. MMM y. G},
-				d => q{E, dd. – E, dd. MMM y. G},
-				y => q{E, dd. MMM y. – E, dd. MMM y. G},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM y. G},
-				y => q{MMMM y. – MMMM y. G},
-			},
-			yMMMd => {
-				M => q{dd. MMM – dd. MMM y. G},
-				d => q{dd.–dd. MMM y. G},
-				y => q{dd. MMM y. – dd. MMM y. G},
-			},
-			yMd => {
-				M => q{d.M.y. – d.M.y. G},
-				d => q{d.M.y. – d.M.y. G},
-				y => q{d.M.y. – d.M.y. G},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -5246,6 +5188,101 @@ has 'datetime_formats_interval' => (
 				y => q{d.M.y. – d.M.y.},
 			},
 		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E, d.M – E, d.M},
+				d => q{E, d.M – E, d.M},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E, dd. MMM – E, dd. MMM},
+				d => q{E, dd. – E, dd. MMM},
+			},
+			MMMd => {
+				M => q{dd. MMM – dd. MMM},
+				d => q{dd.–dd. MMM},
+			},
+			Md => {
+				M => q{d.M – d.M},
+				d => q{d.M – d.M},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} - {1}',
+			h => {
+				a => q{hh a – hh a},
+				h => q{hh–hh a},
+			},
+			hm => {
+				a => q{hh:mm a – hh:mm a},
+				h => q{hh:mm–hh:mm a},
+				m => q{hh:mm–hh:mm a},
+			},
+			hmv => {
+				a => q{hh:mm a – hh:mm a v},
+				h => q{hh:mm–hh:mm a v},
+				m => q{hh:mm–hh:mm a v},
+			},
+			hv => {
+				a => q{hh a – hh a v},
+				h => q{hh–hh a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{MM.–MM. y. G},
+				y => q{MM.y. – MM.y. G},
+			},
+			yMEd => {
+				M => q{E, d.M.y. – E, d.M.y. G},
+				d => q{E, d.M.y. – E, d.M.y. G},
+				y => q{E, d.M.y. – E, d.M.y. G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y. G},
+				y => q{MMM y. – MMM y. G},
+			},
+			yMMMEd => {
+				M => q{E, dd. MMM – E, dd. MMM y. G},
+				d => q{E, dd. – E, dd. MMM y. G},
+				y => q{E, dd. MMM y. – E, dd. MMM y. G},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y. G},
+				y => q{MMMM y. – MMMM y. G},
+			},
+			yMMMd => {
+				M => q{dd. MMM – dd. MMM y. G},
+				d => q{dd.–dd. MMM y. G},
+				y => q{dd. MMM y. – dd. MMM y. G},
+			},
+			yMd => {
+				M => q{d.M.y. – d.M.y. G},
+				d => q{d.M.y. – d.M.y. G},
+				y => q{d.M.y. – d.M.y. G},
+			},
+		},
 	} },
 );
 
@@ -5260,14 +5297,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Акре летње рачунање времена),
-				'generic' => q(Акре време),
-				'standard' => q(Акре стандардно време),
+				'daylight' => q#Акре летње рачунање времена#,
+				'generic' => q#Акре време#,
+				'standard' => q#Акре стандардно време#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Авганистанско време),
+				'standard' => q#Авганистанско време#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -5425,45 +5462,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Централно-афричко време),
+				'standard' => q#Централно-афричко време#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Источно-афричко време),
+				'standard' => q#Источно-афричко време#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Јужно-афричко време),
+				'standard' => q#Јужно-афричко време#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Западно-афричко летње рачунање времена),
-				'generic' => q(Западно-афричко време),
-				'standard' => q(Западно-афричко стандардно време),
+				'daylight' => q#Западно-афричко летње рачунање времена#,
+				'generic' => q#Западно-афричко време#,
+				'standard' => q#Западно-афричко стандардно време#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Аљашко летње време),
-				'generic' => q(Аљашко време),
-				'standard' => q(Аљашко стандардно време),
+				'daylight' => q#Аљашко летње време#,
+				'generic' => q#Аљашко време#,
+				'standard' => q#Аљашко стандардно време#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Алмати летње рачунање времена),
-				'generic' => q(Алмати време),
-				'standard' => q(Алмати стандардно време),
+				'daylight' => q#Алмати летње рачунање времена#,
+				'generic' => q#Алмати време#,
+				'standard' => q#Алмати стандардно време#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Амазон летње рачунање времена),
-				'generic' => q(Амазон време),
-				'standard' => q(Амазон стандардно време),
+				'daylight' => q#Амазон летње рачунање времена#,
+				'generic' => q#Амазон време#,
+				'standard' => q#Амазон стандардно време#,
 			},
 		},
 		'America/Adak' => {
@@ -5879,37 +5916,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Централно летње рачунање времена),
-				'generic' => q(Централно време),
-				'standard' => q(Централно стандардно време),
+				'daylight' => q#Централно летње рачунање времена#,
+				'generic' => q#Централно време#,
+				'standard' => q#Централно стандардно време#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Источно летње рачунање времена),
-				'generic' => q(Источно време),
-				'standard' => q(Источно стандардно време),
+				'daylight' => q#Источно летње рачунање времена#,
+				'generic' => q#Источно време#,
+				'standard' => q#Источно стандардно време#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Планинско летње рачунање времена),
-				'generic' => q(Планинско време),
-				'standard' => q(Планинско стандардно време),
+				'daylight' => q#Планинско летње рачунање времена#,
+				'generic' => q#Планинско време#,
+				'standard' => q#Планинско стандардно време#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Пацифичко летње рачунање времена),
-				'generic' => q(Пацифичко време),
-				'standard' => q(Пацифичко стандардно време),
+				'daylight' => q#Пацифичко летње рачунање времена#,
+				'generic' => q#Пацифичко време#,
+				'standard' => q#Пацифичко стандардно време#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Анадир летње рачунање времена),
-				'generic' => q(Анадир време),
-				'standard' => q(Анадир стандардно време),
+				'daylight' => q#Анадир летње рачунање времена#,
+				'generic' => q#Анадир време#,
+				'standard' => q#Анадир стандардно време#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -5941,23 +5978,23 @@ has 'time_zone_names' => (
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Акватау летње рачунање времена),
-				'generic' => q(Акватау време),
-				'standard' => q(Акватау стандардно време),
+				'daylight' => q#Акватау летње рачунање времена#,
+				'generic' => q#Акватау време#,
+				'standard' => q#Акватау стандардно време#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Акутобе летње рачунање времена),
-				'generic' => q(Акутобе време),
-				'standard' => q(Акутобе стандардно време),
+				'daylight' => q#Акутобе летње рачунање времена#,
+				'generic' => q#Акутобе време#,
+				'standard' => q#Акутобе стандардно време#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Арабијско летње рачунање времена),
-				'generic' => q(Арабијско време),
-				'standard' => q(Арабијско стандардно време),
+				'daylight' => q#Арабијско летње рачунање времена#,
+				'generic' => q#Арабијско време#,
+				'standard' => q#Арабијско стандардно време#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -5965,23 +6002,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Аргентина летње рачунање времена),
-				'generic' => q(Аргентина време),
-				'standard' => q(Аргентина стандардно време),
+				'daylight' => q#Аргентина летње рачунање времена#,
+				'generic' => q#Аргентина време#,
+				'standard' => q#Аргентина стандардно време#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Западна Аргентина летње рачунање времена),
-				'generic' => q(Западна Аргентина време),
-				'standard' => q(Западна Аргентина стандардно време),
+				'daylight' => q#Западна Аргентина летње рачунање времена#,
+				'generic' => q#Западна Аргентина време#,
+				'standard' => q#Западна Аргентина стандардно време#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Арменија летње рачунање времена),
-				'generic' => q(Арменија време),
-				'standard' => q(Арменија стандардно време),
+				'daylight' => q#Арменија летње рачунање времена#,
+				'generic' => q#Арменија време#,
+				'standard' => q#Арменија стандардно време#,
 			},
 		},
 		'Asia/Aden' => {
@@ -6202,9 +6239,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Атланско лтње рачунање времена),
-				'generic' => q(Атланско време),
-				'standard' => q(Атланско стандардно време),
+				'daylight' => q#Атланско лтње рачунање времена#,
+				'generic' => q#Атланско време#,
+				'standard' => q#Атланско стандардно време#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -6275,171 +6312,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Аустралијско централно летње рачунање времена),
-				'generic' => q(Аустралијско централно време),
-				'standard' => q(Аустралијско централно стандардно време),
+				'daylight' => q#Аустралијско централно летње рачунање времена#,
+				'generic' => q#Аустралијско централно време#,
+				'standard' => q#Аустралијско централно стандардно време#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Аустралијско централно западно летње рачунање времена),
-				'generic' => q(Аустралијско централно западно време),
-				'standard' => q(Аустралијско централно западно стандардно време),
+				'daylight' => q#Аустралијско централно западно летње рачунање времена#,
+				'generic' => q#Аустралијско централно западно време#,
+				'standard' => q#Аустралијско централно западно стандардно време#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Аустралијско источно летње рачунање времена),
-				'generic' => q(Аустралијско источно време),
-				'standard' => q(Аустралијско источно стандардно време),
+				'daylight' => q#Аустралијско источно летње рачунање времена#,
+				'generic' => q#Аустралијско источно време#,
+				'standard' => q#Аустралијско источно стандардно време#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Аустралијско западно летње рачунање времена),
-				'generic' => q(Аустралијско западно време),
-				'standard' => q(Аустралијско западно стандардно време),
+				'daylight' => q#Аустралијско западно летње рачунање времена#,
+				'generic' => q#Аустралијско западно време#,
+				'standard' => q#Аустралијско западно стандардно време#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Азербејџан летње рачунање времена),
-				'generic' => q(Азербејџан време),
-				'standard' => q(Азербејџан стандардно време),
+				'daylight' => q#Азербејџан летње рачунање времена#,
+				'generic' => q#Азербејџан време#,
+				'standard' => q#Азербејџан стандардно време#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Азори летње рачунање времена),
-				'generic' => q(Азори време),
-				'standard' => q(Азори стандардно време),
+				'daylight' => q#Азори летње рачунање времена#,
+				'generic' => q#Азори време#,
+				'standard' => q#Азори стандардно време#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Бангладеш летње рачунање времена),
-				'generic' => q(Бангладеш време),
-				'standard' => q(Бангладеш стандардно време),
+				'daylight' => q#Бангладеш летње рачунање времена#,
+				'generic' => q#Бангладеш време#,
+				'standard' => q#Бангладеш стандардно време#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Бутан време),
+				'standard' => q#Бутан време#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Боливија време),
+				'standard' => q#Боливија време#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Бразилија летње рачунање времена),
-				'generic' => q(Бразилија време),
-				'standard' => q(Бразилија стандардно време),
+				'daylight' => q#Бразилија летње рачунање времена#,
+				'generic' => q#Бразилија време#,
+				'standard' => q#Бразилија стандардно време#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Брунеј Дарусалум време),
+				'standard' => q#Брунеј Дарусалум време#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Зеленортско летње рачунање времена),
-				'generic' => q(Зелениртско време),
-				'standard' => q(Зелениртско стандардно време),
+				'daylight' => q#Зеленортско летње рачунање времена#,
+				'generic' => q#Зелениртско време#,
+				'standard' => q#Зелениртско стандардно време#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Чаморо време),
+				'standard' => q#Чаморо време#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Чатам летње рачунање времена),
-				'generic' => q(Чатам време),
-				'standard' => q(Чатам стандардно време),
+				'daylight' => q#Чатам летње рачунање времена#,
+				'generic' => q#Чатам време#,
+				'standard' => q#Чатам стандардно време#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Чиле летње рачунање времена),
-				'generic' => q(Чиле време),
-				'standard' => q(Чиле стандардно време),
+				'daylight' => q#Чиле летње рачунање времена#,
+				'generic' => q#Чиле време#,
+				'standard' => q#Чиле стандардно време#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Кина летње рачунање времена),
-				'generic' => q(Кина време),
-				'standard' => q(Кинеско стандардно време),
+				'daylight' => q#Кина летње рачунање времена#,
+				'generic' => q#Кина време#,
+				'standard' => q#Кинеско стандардно време#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Чојбалсан летње рачунање времена),
-				'generic' => q(Чојбалсан време),
-				'standard' => q(Чојбалсан стандардно време),
+				'daylight' => q#Чојбалсан летње рачунање времена#,
+				'generic' => q#Чојбалсан време#,
+				'standard' => q#Чојбалсан стандардно време#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Божићна острва време),
+				'standard' => q#Божићна острва време#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Кокос (Келинг) Острва време),
+				'standard' => q#Кокос (Келинг) Острва време#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Колумбија летње рачунање времена),
-				'generic' => q(Колумбија време),
-				'standard' => q(Колумбија стандардно време),
+				'daylight' => q#Колумбија летње рачунање времена#,
+				'generic' => q#Колумбија време#,
+				'standard' => q#Колумбија стандардно време#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Кукова острва полу-летње рачунање времена),
-				'generic' => q(Кукова острва време),
-				'standard' => q(Кукова острва стандардно време),
+				'daylight' => q#Кукова острва полу-летње рачунање времена#,
+				'generic' => q#Кукова острва време#,
+				'standard' => q#Кукова острва стандардно време#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Куба летње рачунање времена),
-				'generic' => q(Куба време),
-				'standard' => q(Куба стандардно време),
+				'daylight' => q#Куба летње рачунање времена#,
+				'generic' => q#Куба време#,
+				'standard' => q#Куба стандардно време#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Дејвис време),
+				'standard' => q#Дејвис време#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Димон д’Урвил време),
+				'standard' => q#Димон д’Урвил време#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Источни тимор време),
+				'standard' => q#Источни тимор време#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Ускршња острва летње рачунање времена),
-				'generic' => q(Ускршња острва време),
-				'standard' => q(Ускршња острва стандардно време),
+				'daylight' => q#Ускршња острва летње рачунање времена#,
+				'generic' => q#Ускршња острва време#,
+				'standard' => q#Ускршња острва стандардно време#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Еквадор време),
+				'standard' => q#Еквадор време#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -6612,129 +6649,129 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Средњеевропско летње рачунање времена),
-				'generic' => q(Средњеевропско време),
-				'standard' => q(Средњеевропско стандардно време),
+				'daylight' => q#Средњеевропско летње рачунање времена#,
+				'generic' => q#Средњеевропско време#,
+				'standard' => q#Средњеевропско стандардно време#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Источноевропско летње рачунање времена),
-				'generic' => q(Источноевропско време),
-				'standard' => q(Источноевропско стандардно време),
+				'daylight' => q#Источноевропско летње рачунање времена#,
+				'generic' => q#Источноевропско време#,
+				'standard' => q#Источноевропско стандардно време#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Западноевропско летње рачунање времена),
-				'generic' => q(Западноевропско време),
-				'standard' => q(Западноевропско стандардно време),
+				'daylight' => q#Западноевропско летње рачунање времена#,
+				'generic' => q#Западноевропско време#,
+				'standard' => q#Западноевропско стандардно време#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Фолкландска Острва летње рачунање времена),
-				'generic' => q(Фолкландска Острва време),
-				'standard' => q(Фолкландска Острва стандардно време),
+				'daylight' => q#Фолкландска Острва летње рачунање времена#,
+				'generic' => q#Фолкландска Острва време#,
+				'standard' => q#Фолкландска Острва стандардно време#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Фиџи летње рачунање времена),
-				'generic' => q(Фиџи време),
-				'standard' => q(Фиџи стандардно време),
+				'daylight' => q#Фиџи летње рачунање времена#,
+				'generic' => q#Фиџи време#,
+				'standard' => q#Фиџи стандардно време#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Француска Гвајана време),
+				'standard' => q#Француска Гвајана време#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Француско јужно и антарктичко време),
+				'standard' => q#Француско јужно и антарктичко време#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Гринвич средње време),
+				'standard' => q#Гринвич средње време#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Галапагос време),
+				'standard' => q#Галапагос време#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Гамбијер време),
+				'standard' => q#Гамбијер време#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Грузија летње рачунање времена),
-				'generic' => q(Грузија време),
-				'standard' => q(Грузија стандардно време),
+				'daylight' => q#Грузија летње рачунање времена#,
+				'generic' => q#Грузија време#,
+				'standard' => q#Грузија стандардно време#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Гилберт острва време),
+				'standard' => q#Гилберт острва време#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Источни Гренланд летње рачунање времена),
-				'generic' => q(Источни Гренланд време),
-				'standard' => q(Источни Гренланд стандардно време),
+				'daylight' => q#Источни Гренланд летње рачунање времена#,
+				'generic' => q#Источни Гренланд време#,
+				'standard' => q#Источни Гренланд стандардно време#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Западни Гренланд летње рачунање времена),
-				'generic' => q(Западни Гренланд време),
-				'standard' => q(Западни Гренланд стандардно време),
+				'daylight' => q#Западни Гренланд летње рачунање времена#,
+				'generic' => q#Западни Гренланд време#,
+				'standard' => q#Западни Гренланд стандардно време#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Гуам стандардно време),
+				'standard' => q#Гуам стандардно време#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Залив време),
+				'standard' => q#Залив време#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Гвајана време),
+				'standard' => q#Гвајана време#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Хавајско-алеутско летње рачунање времена),
-				'generic' => q(Хавајско-алеутско време),
-				'standard' => q(Хавајско-алеутско стандардно време),
+				'daylight' => q#Хавајско-алеутско летње рачунање времена#,
+				'generic' => q#Хавајско-алеутско време#,
+				'standard' => q#Хавајско-алеутско стандардно време#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Хонгконшко летње рачунање времена),
-				'generic' => q(Хонг Конг време),
-				'standard' => q(Хонг Конг стандардно време),
+				'daylight' => q#Хонгконшко летње рачунање времена#,
+				'generic' => q#Хонг Конг време#,
+				'standard' => q#Хонг Конг стандардно време#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Ховд летње рачунање времена),
-				'generic' => q(Ховд време),
-				'standard' => q(Ховд стандардно време),
+				'daylight' => q#Ховд летње рачунање времена#,
+				'generic' => q#Ховд време#,
+				'standard' => q#Ховд стандардно време#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Индијско стандардно време),
+				'standard' => q#Индијско стандардно време#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -6772,250 +6809,250 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Индијско океанско време),
+				'standard' => q#Индијско океанско време#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Индокина време),
+				'standard' => q#Индокина време#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Централно-индонезијско време),
+				'standard' => q#Централно-индонезијско време#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Источно-индонезијско време),
+				'standard' => q#Источно-индонезијско време#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Западно-индонезијско време),
+				'standard' => q#Западно-индонезијско време#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Иран летње рачунање времена),
-				'generic' => q(Иран време),
-				'standard' => q(Иран стандардно време),
+				'daylight' => q#Иран летње рачунање времена#,
+				'generic' => q#Иран време#,
+				'standard' => q#Иран стандардно време#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Иркуцк летње рачунање времена),
-				'generic' => q(Иркуцк време),
-				'standard' => q(Иркуцк стандардно време),
+				'daylight' => q#Иркуцк летње рачунање времена#,
+				'generic' => q#Иркуцк време#,
+				'standard' => q#Иркуцк стандардно време#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Израелско летње рачунање времена),
-				'generic' => q(Израелско време),
-				'standard' => q(Израелско стандардно време),
+				'daylight' => q#Израелско летње рачунање времена#,
+				'generic' => q#Израелско време#,
+				'standard' => q#Израелско стандардно време#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Јапанско летње рачунање времена),
-				'generic' => q(Јапанско време),
-				'standard' => q(Јапанско стандардно време),
+				'daylight' => q#Јапанско летње рачунање времена#,
+				'generic' => q#Јапанско време#,
+				'standard' => q#Јапанско стандардно време#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Петропавловско-камчатско летње рачунање вемена),
-				'generic' => q(Петропавловско-камчатско време),
-				'standard' => q(Петропавловско-камчатско стандардно време),
+				'daylight' => q#Петропавловско-камчатско летње рачунање вемена#,
+				'generic' => q#Петропавловско-камчатско време#,
+				'standard' => q#Петропавловско-камчатско стандардно време#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Источно-казахстанско време),
+				'standard' => q#Источно-казахстанско време#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Западно-казахстанско време),
+				'standard' => q#Западно-казахстанско време#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Корејско летње рачунање времена),
-				'generic' => q(Кореја време),
-				'standard' => q(Корејско стандардно време),
+				'daylight' => q#Корејско летње рачунање времена#,
+				'generic' => q#Кореја време#,
+				'standard' => q#Корејско стандардно време#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Кошре време),
+				'standard' => q#Кошре време#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Краснојарск летње рачунање времена),
-				'generic' => q(Краснојарск време),
-				'standard' => q(Краснојарск стандардно време),
+				'daylight' => q#Краснојарск летње рачунање времена#,
+				'generic' => q#Краснојарск време#,
+				'standard' => q#Краснојарск стандардно време#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Киргизстан време),
+				'standard' => q#Киргизстан време#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Шри Ланка време),
+				'standard' => q#Шри Ланка време#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Лине Острва време),
+				'standard' => q#Лине Острва време#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Лорд Хов летње рачунање времена),
-				'generic' => q(Лорд Хов време),
-				'standard' => q(Лорд Хов стандардно време),
+				'daylight' => q#Лорд Хов летње рачунање времена#,
+				'generic' => q#Лорд Хов време#,
+				'standard' => q#Лорд Хов стандардно време#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Макао летње рачунање вемена),
-				'generic' => q(Макао време),
-				'standard' => q(Макао стандардно време),
+				'daylight' => q#Макао летње рачунање вемена#,
+				'generic' => q#Макао време#,
+				'standard' => q#Макао стандардно време#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Макверијско време),
+				'standard' => q#Макверијско време#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Магадан летње рачунање вемена),
-				'generic' => q(Магадан време),
-				'standard' => q(Магадан стандардно време),
+				'daylight' => q#Магадан летње рачунање вемена#,
+				'generic' => q#Магадан време#,
+				'standard' => q#Магадан стандардно време#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Малезија време),
+				'standard' => q#Малезија време#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Малдиви време),
+				'standard' => q#Малдиви време#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Маркиз време),
+				'standard' => q#Маркиз време#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Маршалска Острва време),
+				'standard' => q#Маршалска Острва време#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Маурицијус летње рачунање времена),
-				'generic' => q(Маурицијус време),
-				'standard' => q(Маурицијус стандардно време),
+				'daylight' => q#Маурицијус летње рачунање времена#,
+				'generic' => q#Маурицијус време#,
+				'standard' => q#Маурицијус стандардно време#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Мосон време),
+				'standard' => q#Мосон време#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Улан Батор летње рачунање времена),
-				'generic' => q(Улан Батор време),
-				'standard' => q(Улан Батор стандардно време),
+				'daylight' => q#Улан Батор летње рачунање времена#,
+				'generic' => q#Улан Батор време#,
+				'standard' => q#Улан Батор стандардно време#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Москва летње рачунање времена),
-				'generic' => q(Москва време),
-				'standard' => q(Москва стандардно време),
+				'daylight' => q#Москва летње рачунање времена#,
+				'generic' => q#Москва време#,
+				'standard' => q#Москва стандардно време#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Мијанмар време),
+				'standard' => q#Мијанмар време#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Науру време),
+				'standard' => q#Науру време#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Непал време),
+				'standard' => q#Непал време#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Нова Каледонија летње рачунање времена),
-				'generic' => q(Нова Каледонија време),
-				'standard' => q(Нова Каледонија стандардно време),
+				'daylight' => q#Нова Каледонија летње рачунање времена#,
+				'generic' => q#Нова Каледонија време#,
+				'standard' => q#Нова Каледонија стандардно време#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Нови Зеланд летње рачунање времена),
-				'generic' => q(Нови Зеланд време),
-				'standard' => q(Нови Зеланд стандардно време),
+				'daylight' => q#Нови Зеланд летње рачунање времена#,
+				'generic' => q#Нови Зеланд време#,
+				'standard' => q#Нови Зеланд стандардно време#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Њуфаундленд летње рачунање времена),
-				'generic' => q(Њуфаундленд време),
-				'standard' => q(Њуфаундленд стандардно време),
+				'daylight' => q#Њуфаундленд летње рачунање времена#,
+				'generic' => q#Њуфаундленд време#,
+				'standard' => q#Њуфаундленд стандардно време#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Ниуе време),
+				'standard' => q#Ниуе време#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Норфолк Острво време),
+				'standard' => q#Норфолк Острво време#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Фернандо де Нороња летње рачунање времена),
-				'generic' => q(Фернандо де Нороња време),
-				'standard' => q(Фернандо де Нороња стандардно време),
+				'daylight' => q#Фернандо де Нороња летње рачунање времена#,
+				'generic' => q#Фернандо де Нороња време#,
+				'standard' => q#Фернандо де Нороња стандардно време#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Северна Маријанска Острва време),
+				'standard' => q#Северна Маријанска Острва време#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Новосибирск летње рачунање времена),
-				'generic' => q(Новосибирск време),
-				'standard' => q(Новосибирск стандардно време),
+				'daylight' => q#Новосибирск летње рачунање времена#,
+				'generic' => q#Новосибирск време#,
+				'standard' => q#Новосибирск стандардно време#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Омск летње рачунање времена),
-				'generic' => q(Омск време),
-				'standard' => q(Омск стандардно време),
+				'daylight' => q#Омск летње рачунање времена#,
+				'generic' => q#Омск време#,
+				'standard' => q#Омск стандардно време#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -7134,245 +7171,245 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Пакистан летње рачунање времена),
-				'generic' => q(Пакистан време),
-				'standard' => q(Пакистан стандардно време),
+				'daylight' => q#Пакистан летње рачунање времена#,
+				'generic' => q#Пакистан време#,
+				'standard' => q#Пакистан стандардно време#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Палау време),
+				'standard' => q#Палау време#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Папуа Нова Гвинеја време),
+				'standard' => q#Папуа Нова Гвинеја време#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Парагвај летње рачунање времена),
-				'generic' => q(Парагвај време),
-				'standard' => q(Парагвај стандардно време),
+				'daylight' => q#Парагвај летње рачунање времена#,
+				'generic' => q#Парагвај време#,
+				'standard' => q#Парагвај стандардно време#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Перу летње рачунање времена),
-				'generic' => q(Перу време),
-				'standard' => q(Перу стандардно време),
+				'daylight' => q#Перу летње рачунање времена#,
+				'generic' => q#Перу време#,
+				'standard' => q#Перу стандардно време#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Филипини летње рачунање времена),
-				'generic' => q(Филипини време),
-				'standard' => q(Филипини стандардно време),
+				'daylight' => q#Филипини летње рачунање времена#,
+				'generic' => q#Филипини време#,
+				'standard' => q#Филипини стандардно време#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Феникс острва време),
+				'standard' => q#Феникс острва време#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Сен Пјер и Микелон летње рачунање вемена),
-				'generic' => q(Сен Пјер и Микелон време),
-				'standard' => q(Сен Пјер и Микелон стандардно време),
+				'daylight' => q#Сен Пјер и Микелон летње рачунање вемена#,
+				'generic' => q#Сен Пјер и Микелон време#,
+				'standard' => q#Сен Пјер и Микелон стандардно време#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Питкерн време),
+				'standard' => q#Питкерн време#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Понапе време),
+				'standard' => q#Понапе време#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Кизилорда летње рачунање времена),
-				'generic' => q(Кизилорда време),
-				'standard' => q(Кизилорда стандардно време),
+				'daylight' => q#Кизилорда летње рачунање времена#,
+				'generic' => q#Кизилорда време#,
+				'standard' => q#Кизилорда стандардно време#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Реинион време),
+				'standard' => q#Реинион време#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Ротера време),
+				'standard' => q#Ротера време#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Сахалин летње рачунање времена),
-				'generic' => q(Сахалин време),
-				'standard' => q(Сахалин стандардно време),
+				'daylight' => q#Сахалин летње рачунање времена#,
+				'generic' => q#Сахалин време#,
+				'standard' => q#Сахалин стандардно време#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Самара летње рачунање времена),
-				'generic' => q(Самара време),
-				'standard' => q(Самара стандардно време),
+				'daylight' => q#Самара летње рачунање времена#,
+				'generic' => q#Самара време#,
+				'standard' => q#Самара стандардно време#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Самоа летње рачунање времена),
-				'generic' => q(Самоа време),
-				'standard' => q(Самоа стандардно време),
+				'daylight' => q#Самоа летње рачунање времена#,
+				'generic' => q#Самоа време#,
+				'standard' => q#Самоа стандардно време#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Сејшели време),
+				'standard' => q#Сејшели време#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Сингапур стандардно време),
+				'standard' => q#Сингапур стандардно време#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Соломонска Острва време),
+				'standard' => q#Соломонска Острва време#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Јужна Џорџија време),
+				'standard' => q#Јужна Џорџија време#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Суринам време),
+				'standard' => q#Суринам време#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Шова време),
+				'standard' => q#Шова време#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Тахити време),
+				'standard' => q#Тахити време#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Таипеи летње рачунање времена),
-				'generic' => q(Таипеи време),
-				'standard' => q(Таипеи стандардно веме),
+				'daylight' => q#Таипеи летње рачунање времена#,
+				'generic' => q#Таипеи време#,
+				'standard' => q#Таипеи стандардно веме#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Таџикистан време),
+				'standard' => q#Таџикистан време#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Токелау време),
+				'standard' => q#Токелау време#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Тонга летње рачунање времена),
-				'generic' => q(Тонга време),
-				'standard' => q(Тонга стандардно време),
+				'daylight' => q#Тонга летње рачунање времена#,
+				'generic' => q#Тонга време#,
+				'standard' => q#Тонга стандардно време#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Трук време),
+				'standard' => q#Трук време#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Туркменистан летње рачунање времена),
-				'generic' => q(Туркменистан време),
-				'standard' => q(Туркменистан стандардно време),
+				'daylight' => q#Туркменистан летње рачунање времена#,
+				'generic' => q#Туркменистан време#,
+				'standard' => q#Туркменистан стандардно време#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Тувалу време),
+				'standard' => q#Тувалу време#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Уругвај летње рачунање времена),
-				'generic' => q(Уругвај време),
-				'standard' => q(Уругвај стандардно време),
+				'daylight' => q#Уругвај летње рачунање времена#,
+				'generic' => q#Уругвај време#,
+				'standard' => q#Уругвај стандардно време#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Узбекистан летње рачунање времена),
-				'generic' => q(Узбекистан време),
-				'standard' => q(Узбекистан стандардно време),
+				'daylight' => q#Узбекистан летње рачунање времена#,
+				'generic' => q#Узбекистан време#,
+				'standard' => q#Узбекистан стандардно време#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Вануату летње рачунање времена),
-				'generic' => q(Вануату време),
-				'standard' => q(Вануату стандардно време),
+				'daylight' => q#Вануату летње рачунање времена#,
+				'generic' => q#Вануату време#,
+				'standard' => q#Вануату стандардно време#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Венецуела време),
+				'standard' => q#Венецуела време#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Владивосток летње рачунање времена),
-				'generic' => q(Владивосток време),
-				'standard' => q(Владивосток стандардно време),
+				'daylight' => q#Владивосток летње рачунање времена#,
+				'generic' => q#Владивосток време#,
+				'standard' => q#Владивосток стандардно време#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Волгоград летње рачунање времена),
-				'generic' => q(Волгоград време),
-				'standard' => q(Волгоград стандардно време),
+				'daylight' => q#Волгоград летње рачунање времена#,
+				'generic' => q#Волгоград време#,
+				'standard' => q#Волгоград стандардно време#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Восток време),
+				'standard' => q#Восток време#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Вејк острво време),
+				'standard' => q#Вејк острво време#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Валис и Футуна Острва време),
+				'standard' => q#Валис и Футуна Острва време#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Јакутск летње рачунање времена),
-				'generic' => q(Јакутск време),
-				'standard' => q(Јакутск стандардно време),
+				'daylight' => q#Јакутск летње рачунање времена#,
+				'generic' => q#Јакутск време#,
+				'standard' => q#Јакутск стандардно време#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Јекатеринбург летње рачунање времена),
-				'generic' => q(Јекатеринбург време),
-				'standard' => q(Јекатеринбург стандардно време),
+				'daylight' => q#Јекатеринбург летње рачунање времена#,
+				'generic' => q#Јекатеринбург време#,
+				'standard' => q#Јекатеринбург стандардно време#,
 			},
 		},
 	 } }

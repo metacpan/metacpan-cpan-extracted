@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 lib/MooseX/SingleArg.pm
 lib/MooseX/SingleArg/Meta/Class.pm
 lib/MooseX/SingleArg/Meta/Object.pm

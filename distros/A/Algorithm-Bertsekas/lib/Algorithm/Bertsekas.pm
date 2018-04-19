@@ -7,30 +7,41 @@ use diagnostics;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw( auction );
-our $VERSION = '0.46';
+our $VERSION = '0.81';
 
 #Variables global to the package	
 my $maximize_total_benefit;
 my $matrix_spaces;     # used to print messages on the screen
 my $decimals;          # the number of digits after the decimal point
 my $max_matrix_value;
-my $need_transpose = 0;
-my $inicial_price;
-my $iter_count_global = 0;
-my $iter_count_local  = 0;
-my ( $array1_size, $array2_size, $min_size, $max_size, $original_max_size, $epsilon_scaling );
-my ( %assignned_object, %assignned_person, %price_object, %objects_desired_by_this );
-my %index_correlation;
+my $need_transpose;
+my ( $array1_size, $array2_size, $min_size, $max_size, $original_max_size );
+my ( $inicial_price, $iter_count_global, $iter_count_local, $epsilon_scaling );
+my ( $target, $output );
+my ( %index_correlation, %assignned_object, %assignned_person, %price_object );
+my ( %objects_desired_by_this, %locked_list, %seen_person );
 
-sub auction { #							=> default values
+sub auction { #						=> default values
 	my %args = ( matrix_ref				=> undef,     # reference to array: matrix N x M			                                     
 				maximize_total_benefit  => 0,         # 0: minimize_total_benefit ; 1: maximize_total_benefit
 				inicial_stepsize        => undef,     # auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M)				
 				inicial_price           => 0,
-				verbose                 => 3,         # level of verbosity, 0: quiet; 1, 2, 3, 4, 5, 8, 10: debug information.
+				verbose                 => 3,         # level of verbosity, 0: quiet; 1, 2, 3, 4, 5, 8, 9, 10: debug information.
 				@_,                                   # argument pair list goes here
 				);
        
+	$max_matrix_value = 0;
+	$iter_count_global = 0;
+	$epsilon_scaling = 0;
+	$need_transpose = 0;
+	%index_correlation = ();
+	%assignned_object = ();
+	%assignned_person = ();
+	%price_object = ();
+	%objects_desired_by_this = ();
+	%locked_list = ();
+	%seen_person = ();
+	
 	my @matrix_input = @{$args{matrix_ref}};          # Input: Reference to the input matrix (NxM) = $min_size x $max_size
    
 	$array1_size = $#matrix_input + 1;
@@ -39,6 +50,18 @@ sub auction { #							=> default values
 	$min_size = $array1_size < $array2_size ? $array1_size : $array2_size ; # square matrix --> $min_size = $max_size and $array1_size = $array2_size
 	$max_size = $array1_size < $array2_size ? $array2_size : $array1_size ;
 	$original_max_size = $max_size;
+
+	$target = 'auction-' . $array1_size . 'x' . $array2_size . '-output.txt' ;
+	
+	if ( $args{verbose} >= 8 ){ # print the verbose messages to $output file.
+		print "\n verbose = $args{verbose} ---> print the verbose messages to <$target> file \n";
+		if ( open ( $output, '>', $target ) ) {
+			print "\n *** Open <$target> for writing. *** \n";
+		} else {
+			$args{verbose} = 7;
+			warn "\n *** Could not open <$target> for writing: $! *** \n";			
+		}
+	}	
    
 	$maximize_total_benefit = $args{maximize_total_benefit};
    
@@ -71,17 +94,18 @@ sub auction { #							=> default values
 	delete_multiple_columns( \@matrix, $args{verbose} ) if ( $min_size >= 2 and $min_size != $max_size );
      
 	# epsilon is the stepsize and auction algorithm terminates with a feasible assignment if the problem data are integer and epsilon < 1/min(N,M).
-	# There is a trade-off between runtime and the chosen stepsize. Using the largest possible increment accelerates the algorithm.
-   
+	# There is a trade-off between runtime and the chosen stepsize. Using the largest possible increment accelerates the algorithm.  
+	
 	$inicial_price    = $args{inicial_price};
 	$price_object{$_} = $inicial_price for ( 0 .. $max_size - 1 );
-   
+	#$price_object{$_} = sprintf( "%.0f", rand($max_matrix_value) ) for ( 0 .. $max_size - 1 ); # random values for initial prices	
+	
 	# inicial epsilon value
-	my $epsilon = ($max_matrix_value/2) * exp ( -1 * $max_size/$min_size );  # exp (1) = e = 2.71828182845905
+	my $epsilon = int (($max_matrix_value/2) * exp ( -1 * $max_size/$min_size ));  # exp (1) = e = 2.71828182845905
 	   $epsilon = $args{inicial_stepsize} if ( defined $args{inicial_stepsize} );
 	   $epsilon = 1/(1+$min_size) if ($epsilon < 1/$min_size);
     
-	my ( @assignment, @prices, %same_benefit );
+	my ( @assignment, @prices );
 	my $feasible_assignment_condition = 0;
 
 	# The preceding observations suggest the idea of epsilon-scaling, which consists of applying the algorithm several times, 
@@ -91,13 +115,14 @@ sub auction { #							=> default values
    
 		%assignned_object = ();
 		%assignned_person = ();
+		%seen_person = ();
 		$epsilon_scaling++;
 		$iter_count_local = 0;
 
 		while ( (scalar keys %assignned_person) < $max_size ){ # while there is at least one element not assigned.
          
 			$iter_count_global++;
-			$iter_count_local++;		
+			$iter_count_local++;
 			
 			auctionRound( \@matrix, $epsilon, $args{verbose} );
 		 
@@ -107,17 +132,17 @@ sub auction { #							=> default values
 				foreach my $per ( sort { $a <=> $b } keys %assignned_person){ push @assignment, $assignned_person{$per}; }
 				foreach my $obj ( sort { $a <=> $b } keys %price_object    ){ push @prices, $price_object{$obj}; }
 				my $assig_count = scalar @assignment;
-				print " *** \$iter_count_global = $iter_count_global ; \$assig_count = $assig_count ; \$epsilon = $epsilon ; \@assignment = (@assignment) ; \@prices = (@prices) \n\n";
+				print $output " *** \$iter_count_global = $iter_count_global ; \$assig_count = $assig_count ; \$epsilon = $epsilon ; \@assignment = (@assignment) ; \@prices = (@prices) \n\n";
 			
 				for my $i ( -1 .. $#matrix ) {
-					if ($i >= 0){ printf " %2s  [", $i; } else{ printf "object"; }
+					if ($i >= 0){ printf $output " %2s  [", $i; } else{ printf $output "object"; }
 					for my $j ( 0 .. $#{$matrix[$i]} ) {
-						if ($i >= 0){ printf(" %${matrix_spaces}.${decimals}f", $matrix[$i]->[$j]); } else{ printf(" %${matrix_spaces}.0f", $j); }
-						if ( defined $assignned_person{$i} and $j == $assignned_person{$i} ){ print "**"; } else{ print "  "; }
+						if ($i >= 0){ printf $output (" %${matrix_spaces}.${decimals}f", $matrix[$i]->[$j]); } else{ printf $output (" %${matrix_spaces}.0f", $j); }
+						if ( defined $assignned_person{$i} and $j == $assignned_person{$i} ){ print $output "**"; } else{ print $output "  "; }
 					}
-					if ($i >= 0){ print "]\n"; } else{ print "\n\n"; }
+					if ($i >= 0){ print $output "]\n"; } else{ print $output "\n\n"; }
 				}		
-			}		 
+			}			
 		}
 		
 		$epsilon = $epsilon / 4 ; # (1/2): smooth convergence	  
@@ -161,7 +186,7 @@ sub auction { #							=> default values
 	}}   
    
 	if ( $args{verbose} >= 8 ){
-		printf "\n\$optimal_benefit = $optimal_benefit ; \$iter_count_global = $iter_count_global ; \$epsilon = %.4g ; \@output_index = (@output_index) ; \@assignment = (@assignment) ; \@prices = (@prices) \n", $epsilon; 
+		printf $output "\n\$optimal_benefit = $optimal_benefit ; \$iter_count_global = $iter_count_global ; \$epsilon = %.4g ; \@output_index = (@output_index) ; \@assignment = (@assignment) ; \@prices = (@prices) \n", $epsilon; 
 	}   
 	print_screen_messages( \@matrix, \@matrix_index, \@matrix_input, \@output_index, $optimal_benefit, $args{verbose}, $epsilon ) ;
        
@@ -210,7 +235,7 @@ sub delete_multiple_columns { # if the column elements do not change the final r
       for my $i ( 0 .. $#{$matrix_ref} ) {
          print " [";
          for my $j ( 0 .. $#{$matrix_ref->[$i]} ) {
-            printf(" %2.0f", $matrix_ref->[$i]->[$j] );
+            printf (" %${matrix_spaces}.${decimals}f", $matrix_ref->[$i]->[$j] );
 			if ( defined $intersection_columns{$j} and $intersection_columns{$j} == $min_size ){ print "**"; } else{ print "  "; }
          }
          print "]\n";
@@ -242,13 +267,13 @@ sub delete_multiple_columns { # if the column elements do not change the final r
 		for my $i ( 0 .. $#{$matrix_ref} ) {
 			print " [";
 			for my $j ( 0 .. $#{$matrix_ref->[$i]} ) {
-				printf(" %2.0f  ", $matrix_ref->[$i]->[$j] );
+				printf (" %${matrix_spaces}.${decimals}f  ", $matrix_ref->[$i]->[$j] );
 			}
 			print "]\n";
 		}
 		print "\n";
 	}
-   
+
 	$max_size = $max_size - $number_of_columns_deleted;
 }
 
@@ -407,18 +432,18 @@ sub get_matrix_info {
 sub auctionRound {
 	my ( $matrix_ref, $epsilon, $verbose ) = @_;
 	my @matrix = @$matrix_ref;
-	my ( %info, %seen_bid );
+	my %info;
 
 	if ( $verbose >= 8 ){
-		print "\n Start: Matrix Size N x M: $min_size x $max_size ; Num Iterations: $iter_count_global ; epsilon_scaling = $epsilon_scaling ; iter_count_local = $iter_count_local ; epsilon: $epsilon \n";
+		print $output "\n Start: Matrix Size N x M: $min_size x $max_size ; Num Iterations: $iter_count_global ; epsilon_scaling = $epsilon_scaling ; iter_count_local = $iter_count_local ; epsilon: $epsilon \n";
 		foreach my $person ( sort { $a <=> $b } keys %assignned_person ){
 			my $object = $assignned_person{$person};
-			printf " \$assignned_person{%3s} --> object %3s --> \$price_object{%3s} = $price_object{$object} \n", $person, $object, $object;
+			printf $output " \$assignned_person{%3s} --> object %3s --> \$price_object{%3s} = $price_object{$object} \n", $person, $object, $object;
 		}
 		foreach my $object ( sort { $a <=> $b } keys %price_object ){
-			printf " \$price_object{%3s} = $price_object{$object} \n", $object;
+			printf $output " \$price_object{%3s} = $price_object{$object} \n", $object;
 		}
-		print "\n";
+		print $output "\n";
 	}
    
 	my $seen_ghost;
@@ -435,102 +460,269 @@ sub auctionRound {
 			##  |  person 2          price_2_0
 			##  |  ...
 			##  i  person (N - 1)    price_i_0	
-			
+
 			my ( $Opt01ObjForPersonI, $Opt02ObjForPersonI, $Opt03ObjForPersonI );
 			my ( $Opt01ValForPersonI, $Opt02ValForPersonI, $Opt03ValForPersonI ) = ( -10 * exp ($max_matrix_value), -10 * exp ($max_matrix_value), -10 * exp ($max_matrix_value) );
-			my ( $bid01ForPersonI, $bid02ForPersonI );
-            
-			# The working sets @objects_with_greater_benefits are updated dynamically by $objects_desired_by_this{$person} considering the price update of objects.
-			# For each person, the Current Value $curVal of the most desired objects contained in @objects_with_greater_benefits tend to converge to a specific value.
 			
-			my @objects_with_greater_benefits = keys %{$objects_desired_by_this{$person}}; # sort { $a <=> $b }			
-			my @updated_price = grep { $objects_desired_by_this{$person}{$_} == $price_object{$_} } @objects_with_greater_benefits;
+			my ( $Opt01ObjForPersonI_new_list, $Opt02ObjForPersonI_new_list, $Opt03ObjForPersonI_new_list );
+			my ( $Opt01ValForPersonI_new_list, $Opt02ValForPersonI_new_list, $Opt03ValForPersonI_new_list ) = ( -10 * exp ($max_matrix_value), -10 * exp ($max_matrix_value), -10 * exp ($max_matrix_value) );
+
+			my $bid01ForPersonI;
+			my %current_value;
+			my @updated_price;
+			
+			$seen_ghost++ if ( not defined $matrix[$person] and $min_size < $max_size );						
+
+			# The @objects_with_greater_benefits list are updated dynamically by $objects_desired_by_this{$person} by considering the current price (or current value) of objects.		
+			# For each person, the Current Value $current_value{$object} of the most desired objects contained in the @objects_with_greater_benefits list tends to converge to a specific value.
+			
+			my @objects_with_greater_benefits = keys %{$objects_desired_by_this{$person}}; # sort { $a <=> $b }
 			
 			# There is at least one object in the @objects_with_greater_benefits list whose price is updated ? use old list : generate new list;
-
-			for my $object ( @updated_price >= 1 ? @objects_with_greater_benefits : ( 0 .. $max_size - 1 ) )		
-			#for my $object ( 0 .. $max_size - 1 )			
+			
+			for my $object ( @objects_with_greater_benefits )  # use old list	
 			{				
-				$seen_ghost++ if ( not defined $matrix[$person] and $min_size < $max_size );
+				my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object];
+				$current_value{$object} = $matrix_value - $price_object{$object};
 				
-				my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object] ;
-				
-				my $curVal = $matrix_value - $price_object{$object};
-				
-				if ( $curVal > $Opt01ValForPersonI )
+				push @updated_price, $object if ( $objects_desired_by_this{$person}{$object} == $current_value{$object} );
+
+				if ( $current_value{$object} > $Opt01ValForPersonI ) # search for the best 3 objects
 				{
 					$Opt03ValForPersonI = $Opt02ValForPersonI;
 					$Opt03ObjForPersonI = $Opt02ObjForPersonI;
 					$Opt02ValForPersonI = $Opt01ValForPersonI;
 					$Opt02ObjForPersonI = $Opt01ObjForPersonI;
-					$Opt01ValForPersonI = $curVal;
+					$Opt01ValForPersonI = $current_value{$object};
 					$Opt01ObjForPersonI = $object;
 				}
-				elsif ( $curVal > $Opt02ValForPersonI )
+				elsif ( $current_value{$object} > $Opt02ValForPersonI )
 				{
 					$Opt03ValForPersonI = $Opt02ValForPersonI;
 					$Opt03ObjForPersonI = $Opt02ObjForPersonI;
-					$Opt02ValForPersonI = $curVal;
+					$Opt02ValForPersonI = $current_value{$object};
 					$Opt02ObjForPersonI = $object;
 				}
-				elsif ( $curVal > $Opt03ValForPersonI )
+				elsif ( $current_value{$object} > $Opt03ValForPersonI )
 				{
-					$Opt03ValForPersonI = $curVal;
+					$Opt03ValForPersonI = $current_value{$object};
 					$Opt03ObjForPersonI = $object;
 				}
 				
 				if ( $verbose >= 8 ){
-					printf " personI = %3s ; objectJ = %3s ; Current Value %12.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f \n", $person, $object, $curVal, $person, $object, $matrix_value, $object, $price_object{$object};
+					printf $output " personI = %3s ; objectJ = %3s ; Current Value %12.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f <old list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
+					$person, $object, $current_value{$object}, $person, $object, $matrix_value, $object, $price_object{$object}, 
+					$Opt01ValForPersonI, defined $Opt01ObjForPersonI ? $Opt01ObjForPersonI : '', 
+					$Opt02ValForPersonI, defined $Opt02ObjForPersonI ? $Opt02ObjForPersonI : '', 
+					$Opt03ValForPersonI, defined $Opt03ObjForPersonI ? $Opt03ObjForPersonI : '';
+				}
+			}
+			
+			if ( not @updated_price and not $locked_list{$person} ) # if all prices are outdated
+			{				
+				if ( $epsilon_scaling <= 2 or $epsilon > 256 )
+				{
+					for my $object ( 0 .. $max_size - 1 ) # generate new list
+					{
+						next if ( defined $current_value{$object} );
+					
+						my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object];				
+						$current_value{$object} = $matrix_value - $price_object{$object};
+				
+						if ( $current_value{$object} > $Opt01ValForPersonI_new_list ) # to find the best 3 objects in the complementary subset <new list>
+						{
+							$Opt03ValForPersonI_new_list = $Opt02ValForPersonI_new_list;
+							$Opt03ObjForPersonI_new_list = $Opt02ObjForPersonI_new_list;
+							$Opt02ValForPersonI_new_list = $Opt01ValForPersonI_new_list;
+							$Opt02ObjForPersonI_new_list = $Opt01ObjForPersonI_new_list;
+							$Opt01ValForPersonI_new_list = $current_value{$object};
+							$Opt01ObjForPersonI_new_list = $object;
+						}
+						elsif ( $current_value{$object} > $Opt02ValForPersonI_new_list )
+						{
+							$Opt03ValForPersonI_new_list = $Opt02ValForPersonI_new_list;
+							$Opt03ObjForPersonI_new_list = $Opt02ObjForPersonI_new_list;
+							$Opt02ValForPersonI_new_list = $current_value{$object};
+							$Opt02ObjForPersonI_new_list = $object;
+						}
+						elsif ( $current_value{$object} > $Opt03ValForPersonI_new_list )
+						{
+							$Opt03ValForPersonI_new_list = $current_value{$object};
+							$Opt03ObjForPersonI_new_list = $object;
+						}
+
+						if ( $verbose >= 8 ){
+							printf $output " personI = %3s ; objectJ = %3s ; Current Value %12.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f <new list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
+							$person, $object, $current_value{$object}, $person, $object, $matrix_value, $object, $price_object{$object}, 
+							$Opt01ValForPersonI_new_list, defined $Opt01ObjForPersonI_new_list ? $Opt01ObjForPersonI_new_list : '', 
+							$Opt02ValForPersonI_new_list, defined $Opt02ObjForPersonI_new_list ? $Opt02ObjForPersonI_new_list : '', 
+							$Opt03ValForPersonI_new_list, defined $Opt03ObjForPersonI_new_list ? $Opt03ObjForPersonI_new_list : '';
+						}				
+					}
+				} 
+				elsif ( ($epsilon_scaling >= 3 and $epsilon_scaling <= 5) or $epsilon > 16 ) # in most cases, only one object is found in the complementary subset <new list> that has high value.
+				{
+					for my $object ( 0 .. $max_size - 1 ) # generate new list
+					{
+						next if ( defined $current_value{$object} );
+					
+						my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object];				
+						$current_value{$object} = $matrix_value - $price_object{$object};
+				
+						if ( $current_value{$object} > $Opt01ValForPersonI_new_list ) # to find the best 2 objects in the complementary subset <new list>
+						{
+							$Opt02ValForPersonI_new_list = $Opt01ValForPersonI_new_list;
+							$Opt02ObjForPersonI_new_list = $Opt01ObjForPersonI_new_list;
+							$Opt01ValForPersonI_new_list = $current_value{$object};
+							$Opt01ObjForPersonI_new_list = $object;
+						}
+						elsif ( $current_value{$object} > $Opt02ValForPersonI_new_list )
+						{
+							$Opt02ValForPersonI_new_list = $current_value{$object};
+							$Opt02ObjForPersonI_new_list = $object;
+						}
+
+						if ( $verbose >= 8 ){
+							printf $output " personI = %3s ; objectJ = %3s ; Current Value %12.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f <new list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
+							$person, $object, $current_value{$object}, $person, $object, $matrix_value, $object, $price_object{$object}, 
+							$Opt01ValForPersonI_new_list, defined $Opt01ObjForPersonI_new_list ? $Opt01ObjForPersonI_new_list : '', 
+							$Opt02ValForPersonI_new_list, defined $Opt02ObjForPersonI_new_list ? $Opt02ObjForPersonI_new_list : '', 
+							$Opt03ValForPersonI_new_list, defined $Opt03ObjForPersonI_new_list ? $Opt03ObjForPersonI_new_list : '';
+						}				
+					}
+				}
+				elsif ( $epsilon_scaling >= 6 ) # in most cases, only one object is found in the complementary subset <new list> that has high value.
+				{
+					for my $object ( 0 .. $max_size - 1 ) # generate new list
+					{
+						next if ( defined $current_value{$object} );
+					
+						my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object];				
+						$current_value{$object} = $matrix_value - $price_object{$object};
+				
+						if ( $current_value{$object} > $Opt01ValForPersonI_new_list ) # to find the best object in the complementary subset <new list>
+						{
+							$Opt01ValForPersonI_new_list = $current_value{$object};
+							$Opt01ObjForPersonI_new_list = $object;
+						}
+
+						if ( $verbose >= 8 ){
+							printf $output " personI = %3s ; objectJ = %3s ; Current Value %12.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f <new list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
+							$person, $object, $current_value{$object}, $person, $object, $matrix_value, $object, $price_object{$object}, 
+							$Opt01ValForPersonI_new_list, defined $Opt01ObjForPersonI_new_list ? $Opt01ObjForPersonI_new_list : '', 
+							$Opt02ValForPersonI_new_list, defined $Opt02ObjForPersonI_new_list ? $Opt02ObjForPersonI_new_list : '', 
+							$Opt03ValForPersonI_new_list, defined $Opt03ObjForPersonI_new_list ? $Opt03ObjForPersonI_new_list : '';
+						}				
+					}
+				}			
+				
+				# to find the best 3 out of 6 objects
+
+				if ( $Opt01ValForPersonI_new_list > $Opt01ValForPersonI )
+				{
+					$Opt03ValForPersonI = $Opt02ValForPersonI;
+					$Opt03ObjForPersonI = $Opt02ObjForPersonI;
+					$Opt02ValForPersonI = $Opt01ValForPersonI;
+					$Opt02ObjForPersonI = $Opt01ObjForPersonI;
+					$Opt01ValForPersonI = $Opt01ValForPersonI_new_list;
+					$Opt01ObjForPersonI = $Opt01ObjForPersonI_new_list;
+				}
+				elsif ( $Opt01ValForPersonI_new_list > $Opt02ValForPersonI )
+				{
+					$Opt03ValForPersonI = $Opt02ValForPersonI;
+					$Opt03ObjForPersonI = $Opt02ObjForPersonI;
+					$Opt02ValForPersonI = $Opt01ValForPersonI_new_list;
+					$Opt02ObjForPersonI = $Opt01ObjForPersonI_new_list;
+				}
+				elsif ( $Opt01ValForPersonI_new_list > $Opt03ValForPersonI )
+				{
+					$Opt03ValForPersonI = $Opt01ValForPersonI_new_list;
+					$Opt03ObjForPersonI = $Opt01ObjForPersonI_new_list;
+				}
+ 
+				if ( $Opt02ValForPersonI_new_list > $Opt02ValForPersonI )
+				{
+					$Opt03ValForPersonI = $Opt02ValForPersonI;
+					$Opt03ObjForPersonI = $Opt02ObjForPersonI;
+					$Opt02ValForPersonI = $Opt02ValForPersonI_new_list;
+					$Opt02ObjForPersonI = $Opt02ObjForPersonI_new_list;
+				}
+				elsif ( $Opt02ValForPersonI_new_list > $Opt03ValForPersonI )
+				{
+					$Opt03ValForPersonI = $Opt02ValForPersonI_new_list;
+					$Opt03ObjForPersonI = $Opt02ObjForPersonI_new_list;
+				}
+
+				if ( $Opt03ValForPersonI_new_list > $Opt03ValForPersonI )
+				{
+					$Opt03ValForPersonI = $Opt03ValForPersonI_new_list;
+					$Opt03ObjForPersonI = $Opt03ObjForPersonI_new_list;
 				}				
 			}
 			
 			$bid01ForPersonI = $Opt01ValForPersonI - $Opt02ValForPersonI + $epsilon;
 			
-			# Stores the bidding info for future use
-			$info{$Opt01ObjForPersonI}{$bid01ForPersonI} = $person if ( not defined $info{$Opt01ObjForPersonI}{$bid01ForPersonI} ); # get only one person with this bid			
-
-			if ( $max_size >= 10 ){
-			
-				$bid02ForPersonI = $Opt02ValForPersonI - $Opt03ValForPersonI + $epsilon; # calculate $bid02ForPersonI to try to predict the values of the next round
-				$bid02ForPersonI = 2 * $epsilon if ( $Opt01ValForPersonI > ($Opt02ValForPersonI + $epsilon) or $Opt02ValForPersonI > ($Opt03ValForPersonI + $epsilon) );
-			
-				$info{$Opt02ObjForPersonI}{$bid02ForPersonI} = $person if ( ++$seen_bid{$Opt01ObjForPersonI}{$bid01ForPersonI} >= 2 );				
-					
-				if ( @updated_price == 0 ){ # if all prices are outdated
+			if ( (not defined $info{$Opt01ObjForPersonI}) || ($bid01ForPersonI > $info{$Opt01ObjForPersonI}{'bid'}) ) 
+			{			
+				$info{$Opt01ObjForPersonI}{'bid'   } = $bid01ForPersonI; # Stores the bidding info for future use
+				$info{$Opt01ObjForPersonI}{'person'} = $person;
 				
-					$objects_desired_by_this{$person}{$_} = $price_object{$_} for ( @objects_with_greater_benefits ); # update prices for all objects in the list
-					
-					delete $objects_desired_by_this{$person} if ( $epsilon_scaling % 3 == 0 and @objects_with_greater_benefits > 3 * $epsilon_scaling ) ; # delete old list
-
-					$objects_desired_by_this{$person}{$Opt01ObjForPersonI} = $price_object{$Opt01ObjForPersonI}; # information about the most desired objects
-					$objects_desired_by_this{$person}{$Opt02ObjForPersonI} = $price_object{$Opt02ObjForPersonI} if (defined $Opt02ObjForPersonI);
-					$objects_desired_by_this{$person}{$Opt03ObjForPersonI} = $price_object{$Opt03ObjForPersonI} if (defined $Opt03ObjForPersonI);					
+				#printf " object = %3s ; person = %3s ; Max bid = %12.5f \n", $Opt01ObjForPersonI, $info{$Opt01ObjForPersonI}{'person'}, $info{$Opt01ObjForPersonI}{'bid'}; sleep 1;
+			}
+			
+			if ( $epsilon_scaling >= 6 and $epsilon_scaling % 2 == 0 and not $seen_person{$person}++ ) # filter the old list
+			{					
+				for my $object ( @objects_with_greater_benefits ){ # frequently check the quality of objects in the old list
+					next if ( $current_value{$object} >= $Opt03ValForPersonI );
+					next unless ( ($Opt03ValForPersonI - $current_value{$object}) > 2 * $min_size * $epsilon ); # critical value ($min_size * $epsilon) and safety margin (2).
+					delete $objects_desired_by_this{$person}{$object}; # delete objects of little benefit from the old list
+					printf $output "<> PersonI = %3s ; *** delete the object %3s from the old list *** \n", $person, $object if ( $verbose >= 8 );
 				}
+			}
+					
+			if ( not @updated_price ) # if all prices are outdated
+			{			
+				for my $object ( @objects_with_greater_benefits ){
+					next unless ( defined $objects_desired_by_this{$person}{$object} );
+					$objects_desired_by_this{$person}{$object} = $current_value{$object}; # update current values for all objects in the old list	
+				}
+					
+				if ( defined $Opt01ObjForPersonI_new_list and $Opt03ValForPersonI == $Opt01ValForPersonI_new_list and defined $objects_desired_by_this{$person}{$Opt03ObjForPersonI} )
+				{
+					$objects_desired_by_this{$person}{$Opt01ObjForPersonI_new_list} = $current_value{$Opt01ObjForPersonI_new_list}; # add object to list
+					printf $output "<> PersonI = %3s ; *** add object %3s to the old list *** \n", $person, $Opt01ObjForPersonI_new_list if ( $verbose >= 8 );
+				}
+
+				$locked_list{$person}++ if ( $epsilon_scaling >= 6 ); # Lock the old list. 6 is the minimum $epsilon_scaling enough to find a possible solution?			
+					
+				$objects_desired_by_this{$person}{$Opt01ObjForPersonI} = $current_value{$Opt01ObjForPersonI}; # information about the most desired objects
+				$objects_desired_by_this{$person}{$Opt02ObjForPersonI} = $current_value{$Opt02ObjForPersonI} if (defined $Opt02ObjForPersonI);
+				$objects_desired_by_this{$person}{$Opt03ObjForPersonI} = $current_value{$Opt03ObjForPersonI} if (defined $Opt03ObjForPersonI);					
 			}
 			
 			if ( $verbose >= 8 ){
 				my @old_list = sort { $a <=> $b } @objects_with_greater_benefits;
 				my @new_list = sort { $a <=> $b } keys %{$objects_desired_by_this{$person}};
 				my @best_3_objects = ( $Opt01ObjForPersonI, $Opt02ObjForPersonI, $Opt03ObjForPersonI );
+				my $msg = $locked_list{$person} ? '[locked list] ' : '';
 
-				printf "<> PersonI = %3s ; %3s objects desired by this person (old list) = (@old_list) ; objects whose prices are still updated = (@updated_price) : %2s >= 1 ? \n", $person, scalar @old_list, scalar @updated_price;
-				printf "<> PersonI = %3s ; %3s objects desired by this person (new list) = (@new_list) ; \@best_3_objects = (@best_3_objects) \n", $person, scalar @new_list if ( defined $Opt03ObjForPersonI );
-				printf "<> PersonI = %3s chose ObjectJ = %3s ; \$bid01ForPersonI %10.5f = \$Opt01ValForPersonI %.5f - \$Opt02ValForPersonI %.5f + \$epsilon %.5f \n", $person, $Opt01ObjForPersonI, $bid01ForPersonI, $Opt01ValForPersonI, $Opt02ValForPersonI, $epsilon;
-				printf "<> PersonI = %3s chose ObjectJ = %3s ; \$bid02ForPersonI %10.5f = \$Opt02ValForPersonI %.5f - \$Opt03ValForPersonI %.5f + \$epsilon %.5f \n", $person, $Opt02ObjForPersonI, $bid02ForPersonI, $Opt02ValForPersonI, $Opt03ValForPersonI, $epsilon if ( defined $bid02ForPersonI );
+				printf $output "<> PersonI = %3s ; %3s objects desired by this person (old list) = (@old_list) ; objects whose current values are still updated = (@updated_price) : %2s >= 1 ? \n", $person, scalar @old_list, scalar @updated_price;
+				printf $output "<> PersonI = %3s ; %3s objects desired by this person (new list) = (@new_list) $msg; \@best_3_objects = (@best_3_objects) \n", $person, scalar @new_list if ( defined $Opt03ObjForPersonI );
+				printf $output "<> PersonI = %3s chose ObjectJ = %3s ; \$bid01ForPersonI %10.5f = \$Opt01ValForPersonI %.5f - \$Opt02ValForPersonI %.5f + \$epsilon %.5f \n", $person, $Opt01ObjForPersonI, $bid01ForPersonI, $Opt01ValForPersonI, $Opt02ValForPersonI, $epsilon;
 			}
 		}
 	}
 	
-	foreach my $object ( keys %info ){                                 # for each object, choose only the first bid.
-	foreach my $bid    ( sort { $b <=> $a } keys %{$info{$object}} ){  # descending order!!! --> the first bid is the highest bid.
-	
-		my $person       = $info{$object}{$bid};		
+	foreach my $object ( keys %info ){
+		my $bid    = $info{$object}{'bid'   };
+		my $person = $info{$object}{'person'};
+		
 		my $other_person = $assignned_object{$object}; # Find the other person who has objectJ and make them unassigned
 	   	   	   
 		if ( defined $other_person ) {
 		  
 			if ( $verbose >= 8 ){
-				print " ***--> PersonI $person was assigned objectJ $object. Before that, remove the objectJ $object from personI $other_person  --> delete \$assignned_person{$other_person} \n";
+				print $output " ***--> PersonI $person was assigned objectJ $object. Before that, remove the objectJ $object from personI $other_person  --> delete \$assignned_person{$other_person} \n";
 			}
 		  
 			# The other person that was assigned to objectJ at the beginning of the iteration (if any) 
@@ -548,22 +740,20 @@ sub auctionRound {
 		$price_object{$object} += $bid;
 	   
 		if ( $verbose >= 8 ){
-			printf " --> Assigning to personI = %2s the objectJ = %2s with highestBidForJ = %10.5f and update the price vector ; \$assignned_person{%2s} = %2s ; \$price_object{%2s} = %.5f \n", $person, $object, $bid, $person, $assignned_person{$person}, $object, $price_object{$object};	
+			printf $output " --> Assigning to personI = %3s the objectJ = %3s with highestBidForJ = %10.5f and update the price vector ; \$assignned_person{%3s} = %3s ; \$price_object{%3s} = %.5f \n", $person, $object, $bid, $person, $assignned_person{$person}, $object, $price_object{$object};	
 		}
-	   
-		last;  # next object, choose only the highest bid for each object
-	}}
+	}
 	
 	if ( $verbose >= 9 ){
-		print "\n Final: Matrix Size N x M: $min_size x $max_size ; Num Iterations: $iter_count_global ; epsilon_scaling = $epsilon_scaling ; iter_count_local = $iter_count_local ; epsilon: $epsilon \n";
+		print $output "\n Final: Matrix Size N x M: $min_size x $max_size ; Num Iterations: $iter_count_global ; epsilon_scaling = $epsilon_scaling ; iter_count_local = $iter_count_local ; epsilon: $epsilon \n";
 		foreach my $person ( sort { $a <=> $b } keys %assignned_person ){
 			my $object = $assignned_person{$person};
-			printf " \$assignned_person{%3s} --> object %3s --> \$price_object{%3s} = $price_object{$object} \n", $person, $object, $object;
+			printf $output " \$assignned_person{%3s} --> object %3s --> \$price_object{%3s} = $price_object{$object} \n", $person, $object, $object;
 		}
 		foreach my $object ( sort { $a <=> $b } keys %price_object ){
-			printf " \$price_object{%3s} = $price_object{$object} \n", $object;
+			printf $output " \$price_object{%3s} = $price_object{$object} \n", $object;
 		}
-		print "\n";
+		print $output "\n";
 	}
 
 }
@@ -605,9 +795,10 @@ __END__
 
  use Algorithm::Bertsekas qw(auction);
  
- Example 1: Minimize the total benefit.
- my @array1 = ( 22, 15, 98,  1 );
- my @array2 = ( 72, 99, 29, 88, 12, 26, 41 );
+ Example 1: Find the nearest neighbor, Minimize the total benefit.
+
+ my @array1 = ( 893, 401, 902, 576, 767, 917, 76, 464, 124, 207, 125, 530 );
+ my @array2 = ( 161, 559, 247, 478, 456 );
 
  my @input_matrix;
  for my $i ( 0 .. $#array1 ){
@@ -619,53 +810,74 @@ __END__
    }
    push @input_matrix, \@weight_function;
  }
-
-      72 99 29 88 12 26 41
-
- 22 [ 50 77  7 66 10  4 19 ]
- 15 [ 57 84 14 73  3 11 26 ]
- 98 [ 26  1 69 10 86 72 57 ]
-  1 [ 71 98 28 87 11 25 40 ]
   
+       161 559 247 478 456
+
+ 893 [ 732 334 646 415 437 ]
+ 401 [ 240 158 154  77  55 ]
+ 902 [ 741 343 655 424 446 ]
+ 576 [ 415  17 329  98 120 ]
+ 767 [ 606 208 520 289 311 ]
+ 917 [ 756 358 670 439 461 ]
+  76 [  85 483 171 402 380 ]
+ 464 [ 303  95 217  14   8 ]
+ 124 [  37 435 123 354 332 ]
+ 207 [  46 352  40 271 249 ]
+ 125 [  36 434 122 353 331 ]
+ 530 [ 369  29 283  52  74 ]
+ 
  my ( $optimal, $assignment_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 5 );
   
  Objective: to Minimize the total benefit
- Number of left nodes: 4
- Number of right nodes: 7
- Number of edges: 28
+ Number of left nodes: 12
+ Number of right nodes: 5
+ Number of edges: 60
 
  Solution:
- Optimal assignment: sum of values = 30
- Feasible assignment condition: stepsize = 0.2 < 1/4 = 0.25
- Number of iterations: 15
+ Optimal assignment: sum of values = 153
+ Feasible assignment condition: stepsize = 0.1667 < 1/5 = 0.2
+ Number of iterations: 50
 
- row index    = [ 0  1  2  3  4  5  6 ]
- column index = [ 2  5  1  4  0  6  3 ]
- matrix value = [ 7 11  1 11          ]
+ row index    = [  0   1   2   3   4   5   6   7   8   9  10  11 ]
+ column index = [  9   8  10   1   5  11   7   4   6   2   0   3 ]
+ matrix value = [             17               8      40  36  52 ]
 
- modified matrix 4 x 7:
- [ 48   21   91** 32   88   94   79  ]
- [ 41   14   84   25   95   87** 72  ]
- [ 72   97** 29   88   12   26   41  ]
- [ 27    0   70   11   87** 73   58  ]
+ modified matrix 5 x 9:
+ [ 516   341   150   671   453   719   710   720** 387  ]
+ [ 598   739** 548   273   661   321   404   322   727  ]
+ [ 602   427   236   585   539   633   716** 634   473  ]
+ [ 679   658   467   354   742   402   485   403   704**]
+ [ 701   636   445   376   748** 424   507   425   682  ]
 
- original matrix 4 x 7 with solution:
- [ 50   77    7** 66   10    4   19  ]
- [ 57   84   14   73    3   11** 26  ]
- [ 26    1** 69   10   86   72   57  ]
- [ 71   98   28   87   11** 25   40  ]
+ original matrix 12 x 5 with solution:
+ [ 732   334   646   415   437  ]
+ [ 240   158   154    77    55  ]
+ [ 741   343   655   424   446  ]
+ [ 415    17** 329    98   120  ]
+ [ 606   208   520   289   311  ]
+ [ 756   358   670   439   461  ]
+ [  85   483   171   402   380  ]
+ [ 303    95   217    14     8**]
+ [  37   435   123   354   332  ]
+ [  46   352    40** 271   249  ]
+ [  36** 434   122   353   331  ]
+ [ 369    29   283    52**  74  ]
 
  Pairs (in ascending order of matrix values):
-   indices ( 2, 1 ), matrix value =  1 ; sum of values =  1
-   indices ( 0, 2 ), matrix value =  7 ; sum of values =  8
-   indices ( 1, 5 ), matrix value = 11 ; sum of values = 19
-   indices ( 3, 4 ), matrix value = 11 ; sum of values = 30
-   indices ( 4, 0 ), matrix value =    ; sum of values = 30
-   indices ( 5, 6 ), matrix value =    ; sum of values = 30
-   indices ( 6, 3 ), matrix value =    ; sum of values = 30  
+   indices (  7,  4 ), matrix value =   8 ; sum of values =     8
+   indices (  3,  1 ), matrix value =  17 ; sum of values =    25
+   indices ( 10,  0 ), matrix value =  36 ; sum of values =    61
+   indices (  9,  2 ), matrix value =  40 ; sum of values =   101
+   indices ( 11,  3 ), matrix value =  52 ; sum of values =   153
+   indices (  0,  9 ), matrix value =     ; sum of values =   153
+   indices (  1,  8 ), matrix value =     ; sum of values =   153
+   indices (  2, 10 ), matrix value =     ; sum of values =   153
+   indices (  4,  5 ), matrix value =     ; sum of values =   153
+   indices (  5, 11 ), matrix value =     ; sum of values =   153
+   indices (  6,  7 ), matrix value =     ; sum of values =   153
+   indices (  8,  6 ), matrix value =     ; sum of values =   153
   
  Example 2: Maximize the total benefit.
- Alternatively, we can define the matrix with its elements:
  
  my $N = 10;
  my $M = 10;
@@ -675,11 +887,13 @@ __END__
  for my $i ( 0 .. $N - 1 ){
    my @weight_function;		   
    for my $j ( 0 .. $M - 1 ){
-	  my $weight = sprintf( "%.0f", rand($r) );
+      my $weight = sprintf( "%.0f", rand($r) );
       push @weight_function, $weight;
    }
    push @input_matrix, \@weight_function;
  }
+ 
+ Alternatively, we can define the matrix with its elements:
 
  my @input_matrix = ( 
  [  84,  94,  75,  56,  66,  95,  39,  53,  73,   4 ],
@@ -757,7 +971,7 @@ __END__
  maximize_total_benefit => 0,    0: minimize the total benefit ; 1: maximize the total benefit.
  inicial_stepsize       => 1,    auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M).
  inicial_price          => 0,			
- verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 5, 8, 10: debug information.
+ verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 5, 8, 9, 10: debug information.
 
 =head1 EXPORT
 
@@ -796,7 +1010,7 @@ __END__
 =head1 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	April 6, 2018
+	April 19, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

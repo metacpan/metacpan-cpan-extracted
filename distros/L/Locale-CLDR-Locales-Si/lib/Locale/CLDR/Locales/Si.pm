@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Si - Package for language Sinhala
 
 package Locale::CLDR::Locales::Si;
 # This file auto generated from Data\common\main\si.xml
-#	on Fri 29 Apr  7:24:07 pm GMT
+#	on Fri 13 Apr  7:27:46 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -44,53 +45,89 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'ab' => 'ඇබ්කාසියානු',
+				'aa' => 'අෆාර්',
+ 				'ab' => 'ඇබ්කාසියානු',
+ 				'ace' => 'අචයිනිස්',
+ 				'ada' => 'අඩන්ග්මෙ',
+ 				'ady' => 'අඩිඝෙ',
  				'aeb' => 'ටියුනිසියනු අරාබි',
- 				'af' => 'අප්‍රිකානු',
+ 				'af' => 'අෆ්රිකාන්ස්',
  				'agq' => 'ඇගම්',
+ 				'ain' => 'අයිනු',
  				'ak' => 'අකාන්',
+ 				'ale' => 'ඇලුඑට්',
+ 				'alt' => 'සතර්න් අල්ටය්',
  				'am' => 'ඇම්හාරික්',
+ 				'an' => 'ඇරගොනීස්',
+ 				'anp' => 'අන්ගික',
  				'ar' => 'අරාබි',
- 				'ar_001' => 'නවීන සම්මත අරාබි',
+ 				'ar_001' => 'නූතන සම්මත අරාබි',
  				'arn' => 'මපුචෙ',
- 				'as' => 'ඇසමියානු',
+ 				'arp' => 'ඇරපහො',
+ 				'as' => 'ඇසෑම්',
  				'asa' => 'අසු',
+ 				'ast' => 'ඇස්ටියුරියන්',
+ 				'av' => 'ඇවරික්',
+ 				'awa' => 'අවදි',
+ 				'ay' => 'අයිමරා',
  				'az' => 'අසර්බයිජාන්',
  				'az@alt=short' => 'අසීරී',
  				'ba' => 'බාෂ්කිර්',
+ 				'ban' => 'බැලිනීස්',
+ 				'bas' => 'බසා',
  				'be' => 'බෙලරුසියානු',
  				'bem' => 'බෙම්බා',
  				'bez' => 'බෙනා',
  				'bg' => 'බල්ගේරියානු',
  				'bgn' => 'බටහිර බලොචි',
+ 				'bho' => 'බොජ්පුරි',
+ 				'bi' => 'බිස්ලමා',
+ 				'bin' => 'බිනි',
+ 				'bla' => 'සික්සිකා',
  				'bm' => 'බම්බරා',
  				'bn' => 'බෙංගාලි',
  				'bo' => 'ටිබෙට්',
  				'br' => 'බ්‍රේටොන්',
  				'brx' => 'බොඩො',
  				'bs' => 'බොස්නියානු',
+ 				'bug' => 'බුගිනීස්',
+ 				'byn' => 'බ්ලින්',
  				'ca' => 'කැටලන්',
  				'ce' => 'චෙච්නියානු',
+ 				'ceb' => 'සෙබුඅනො',
  				'cgg' => 'චිගා',
+ 				'ch' => 'චමොරො',
+ 				'chk' => 'චූකීස්',
+ 				'chm' => 'මරි',
+ 				'cho' => 'චොක්ටොව්',
  				'chr' => 'චෙරොකී',
+ 				'chy' => 'චෙයෙන්නෙ',
  				'ckb' => 'සොරානි කුර්දිෂ්',
- 				'co' => 'ක්‍රොඑශියානු',
- 				'cs' => 'චෙත්',
+ 				'co' => 'කෝසිකානු',
+ 				'crs' => 'සෙසෙල්ව ක්‍රොල් ෆ්‍රෙන්ච්',
+ 				'cs' => 'චෙක්',
+ 				'cu' => 'චර්ච් ස්ලැවික්',
  				'cv' => 'චවේෂ්',
- 				'cy' => 'වේල්ස්',
+ 				'cy' => 'වෙල්ෂ්',
  				'da' => 'ඩැනිශ්',
+ 				'dak' => 'ඩකොටා',
+ 				'dar' => 'ඩාර්ග්වා',
  				'dav' => 'ටයිටා',
  				'de' => 'ජර්මන්',
  				'de_AT' => 'ඔස්ට්‍රියානු ජර්මන්',
  				'de_CH' => 'ස්විස් උසස් ජර්මන්',
- 				'dje' => 'ෆර්මා',
+ 				'dgr' => 'ඩොග්‍රිබ්',
+ 				'dje' => 'සර්මා',
  				'dsb' => 'පහළ සෝබියානු',
  				'dua' => 'ඩුආලා',
- 				'dv' => 'දිවෙහි',
+ 				'dv' => 'ඩිවෙහි',
  				'dyo' => 'ජොල-ෆෝනියි',
  				'dz' => 'ඩිසොන්කා',
+ 				'dzg' => 'ඩසාගා',
  				'ebu' => 'එම්බු',
  				'ee' => 'ඉව්',
+ 				'efi' => 'එෆික්',
+ 				'eka' => 'එකජුක්',
  				'el' => 'ග්‍රීක',
  				'en' => 'ඉංග්‍රීසි',
  				'en_AU' => 'ඕස්ට්‍රේලියානු ඉංග්‍රීසි',
@@ -105,128 +142,223 @@ has 'display_name_language' => (
  				'es_ES' => 'යුරෝපීය ස්පාඤ්ඤ',
  				'es_MX' => 'මෙක්සිකානු ස්පාඤ්ඤ',
  				'et' => 'එස්තෝනියානු',
- 				'eu' => 'බොස්කෝ',
+ 				'eu' => 'බාස්ක්',
+ 				'ewo' => 'එවොන්ඩො',
  				'fa' => 'පර්සියානු',
+ 				'ff' => 'ෆුලාහ්',
  				'fi' => 'ෆින්ලන්ත',
  				'fil' => 'පිලිපීන',
  				'fj' => 'ෆීජි',
  				'fo' => 'ෆාරෝස්',
+ 				'fon' => 'ෆොන්',
  				'fr' => 'ප්‍රංශ',
  				'fr_CA' => 'කැනේඩියානු ප්‍රංශ',
  				'fr_CH' => 'ස්විස් ප්‍රංශ',
+ 				'fur' => 'ෆ්‍රියුලියන්',
  				'fy' => 'බටහිර ෆ්‍රිසියානු',
  				'ga' => 'අයර්ලන්ත',
+ 				'gaa' => 'ගා',
  				'gag' => 'ගගාස්',
+ 				'gan' => 'ගැන් චයිනිස්',
+ 				'gd' => 'ස්කොට්ටිශ් ගෙලික්',
+ 				'gez' => 'ගීස්',
+ 				'gil' => 'ගිල්බර්ටීස්',
  				'gl' => 'ගැලීසියානු',
  				'gn' => 'ගුවාරනි',
- 				'gsw' => 'ස්විස් ජර්මනි',
+ 				'gor' => 'ගොරොන්ටාලො',
+ 				'gsw' => 'ස්විස් ජර්මානු',
  				'gu' => 'ගුජරාටි',
  				'guz' => 'ගුසී',
  				'gv' => 'මැන්ක්ස්',
+ 				'gwi' => 'ග්විචින්',
  				'ha' => 'හෝසා',
+ 				'hak' => 'හකා චයිනිස්',
  				'haw' => 'හවායි',
  				'he' => 'හීබෲ',
  				'hi' => 'හින්දි',
- 				'hr' => 'ක්‍රෝයේශියානු',
+ 				'hil' => 'හිලිගෙනන්',
+ 				'hmn' => 'මොන්ග්',
+ 				'hr' => 'කෝඒෂියානු',
  				'hsb' => 'ඉහළ සෝබියානු',
+ 				'hsn' => 'සියැන් චීන',
  				'ht' => 'හයිටි',
  				'hu' => 'හන්ගේරියානු',
+ 				'hup' => 'හුපා',
  				'hy' => 'ආර්මේනියානු',
+ 				'hz' => 'හෙරෙරො',
+ 				'ia' => 'ඉන්ටලින්ගුආ',
+ 				'iba' => 'ඉබන්',
+ 				'ibb' => 'ඉබිබියො',
  				'id' => 'ඉන්දුනීසියානු',
  				'ig' => 'ඉග්බෝ',
  				'ii' => 'සිචුආන් යී',
+ 				'ilo' => 'ඉලොකො',
+ 				'inh' => 'ඉන්ගුෂ්',
+ 				'io' => 'ඉඩො',
  				'is' => 'අයිස්ලන්ත',
  				'it' => 'ඉතාලි',
  				'iu' => 'ඉනුක්ටිටුට්',
  				'ja' => 'ජපන්',
+ 				'jbo' => 'ලොජ්බන්',
  				'jgo' => 'නොම්බා',
  				'jmc' => 'මැකාමී',
  				'jv' => 'ජාවා',
  				'ka' => 'ජෝර්ජියානු',
- 				'kab' => 'කැබලා',
+ 				'kab' => 'කාබිල්',
+ 				'kac' => 'කචින්',
+ 				'kaj' => 'ජ්ජු',
  				'kam' => 'කැම්බා',
+ 				'kbd' => 'කබාර්ඩියන්',
+ 				'kcg' => 'ට්යප්',
  				'kde' => 'මැකොන්ඩ්',
- 				'kea' => 'කබුවෙර්ඩියානෝ',
+ 				'kea' => 'කබුවෙර්ඩියානු',
+ 				'kfo' => 'කොරො',
+ 				'kha' => 'ඛසි',
  				'khq' => 'කොයිරා චිනි',
  				'ki' => 'කිකුයු',
+ 				'kj' => 'කුයන්යමා',
  				'kk' => 'කසාඛ්',
+ 				'kkj' => 'කකො',
  				'kl' => 'කලාලිසට්',
  				'kln' => 'කලෙන්ජන්',
  				'km' => 'කමර්',
+ 				'kmb' => 'කිම්බුන්ඩු',
  				'kn' => 'කණ්ණඩ',
  				'ko' => 'කොරියානු',
  				'koi' => 'කොමි-පර්මියාක්',
  				'kok' => 'කොන්කනි',
+ 				'kpe' => 'ක්පෙලෙ',
+ 				'kr' => 'කනුරි',
+ 				'krc' => 'කරන්චි-බාකර්',
+ 				'krl' => 'කැරෙලියන්',
+ 				'kru' => 'කුරුඛ්',
  				'ks' => 'කාෂ්මීර්',
  				'ksb' => 'ශාම්බලා',
  				'ksf' => 'බාෆියා',
+ 				'ksh' => 'කොලොග්නියන්',
  				'ku' => 'කුර්දි',
+ 				'kum' => 'කුමික්',
+ 				'kv' => 'කොමි',
  				'kw' => 'කෝනීසියානු',
  				'ky' => 'කිර්ගිස්',
  				'la' => 'ලතින්',
+ 				'lad' => 'ලඩිනො',
  				'lag' => 'ලංගි',
  				'lb' => 'ලක්සැම්බර්ග්',
+ 				'lez' => 'ලෙස්ගියන්',
  				'lg' => 'ගන්ඩා',
+ 				'li' => 'ලිම්බර්ගිශ්',
  				'lkt' => 'ලකොට',
  				'ln' => 'ලින්ගලා',
  				'lo' => 'ලාඕ',
+ 				'loz' => 'ලොසි',
  				'lrc' => 'උතුරු ලුරි',
  				'lt' => 'ලිතුවේනියානු',
- 				'lu' => 'ලු',
+ 				'lu' => 'ලුබා-කටන්ගා',
+ 				'lua' => 'ලුබ-ලුලුඅ',
+ 				'lun' => 'ලුන්ඩ',
  				'luo' => 'ලුඔ',
+ 				'lus' => 'මිසො',
  				'luy' => 'ලුයියා',
  				'lv' => 'ලැට්වියානු',
+ 				'mad' => 'මදුරීස්',
+ 				'mag' => 'මඝහි',
+ 				'mai' => 'මයිතිලි',
+ 				'mak' => 'මකාසාර්',
  				'mas' => 'මසායි',
+ 				'mdf' => 'මොක්ශා',
+ 				'men' => 'මෙන්ඩෙ',
  				'mer' => 'මෙරු',
  				'mfe' => 'මොරිස්යෙම්',
  				'mg' => 'මලගාසි',
  				'mgh' => 'මඛුවා-මීටෝ',
  				'mgo' => 'මෙටා',
+ 				'mh' => 'මාශලීස්',
  				'mi' => 'මාවොරි',
+ 				'mic' => 'මික්මැක්',
+ 				'min' => 'මිනන්ග්කබාවු',
  				'mk' => 'මැසිඩෝනියානු',
  				'ml' => 'මලයාලම්',
  				'mn' => 'මොංගෝලියානු',
+ 				'mni' => 'මනිපුරි',
  				'moh' => 'මොහොව්ක්',
+ 				'mos' => 'මොස්සි',
  				'mr' => 'මරාති',
  				'ms' => 'මැලේ',
  				'mt' => 'මොල්ටිස්',
  				'mua' => 'මුන්ඩන්',
+ 				'mul' => 'බහු භාෂා',
+ 				'mus' => 'ක්‍රීක්',
+ 				'mwl' => 'මිරන්ඩීස්',
  				'my' => 'බුරුම',
+ 				'myv' => 'එර්ස්යා',
  				'mzn' => 'මැසන්ඩරනි',
+ 				'na' => 'නෞරු',
+ 				'nan' => 'මින් නන් චයිනිස්',
+ 				'nap' => 'නියාපොලිටන්',
  				'naq' => 'නාමා',
- 				'nb' => 'නෝවේජියානු බොක්මාල්',
+ 				'nb' => 'නෝර්වීජියානු බොක්මල්',
  				'nd' => 'උතුරු එන්ඩිබෙලෙ',
  				'nds' => 'පහළ ජර්මන්',
  				'nds_NL' => 'පහළ සැක්සන්',
  				'ne' => 'නේපාල',
+ 				'new' => 'නෙවාරි',
+ 				'ng' => 'න්ඩොන්ගා',
+ 				'nia' => 'නියාස්',
+ 				'niu' => 'නියුඑන්',
  				'nl' => 'ලන්දේසි',
  				'nl_BE' => 'ෆ්ලෙමිශ්',
  				'nmg' => 'කුවාසිඔ',
- 				'nn' => 'නොවේර්ජියානු නයිනෝර්ස්ක්',
+ 				'nn' => 'නෝර්වීජියානු නයිනෝර්ස්ක්',
+ 				'nnh' => 'න්ගියාම්බූන්',
+ 				'nog' => 'නොගායි',
  				'nqo' => 'එන්‘කෝ',
+ 				'nr' => 'සෞත් ඩ්බේල්',
+ 				'nso' => 'නොදර්න් සොතො',
  				'nus' => 'නොයර්',
- 				'nyn' => 'නයන්කොළේ',
+ 				'nv' => 'නවාජො',
+ 				'ny' => 'න්යන්ජා',
+ 				'nyn' => 'නයන්කෝලෙ',
+ 				'oc' => 'ඔසිටාන්',
  				'om' => 'ඔරොමෝ',
  				'or' => 'ඔරියා',
- 				'pa' => 'ජන්ජාබි',
+ 				'os' => 'ඔසිටෙක්',
+ 				'pa' => 'පන්ජාබි',
+ 				'pag' => 'පන්ගසීනන්',
+ 				'pam' => 'පන්පන්ග',
+ 				'pap' => 'පපියමෙන්ටො',
+ 				'pau' => 'පලවුවන්',
+ 				'pcm' => 'නෛජීරියන් පෙන්ගින්',
  				'pl' => 'පෝලන්ත',
+ 				'prg' => 'පෘශියන්',
  				'ps' => 'පෂ්ටො',
  				'pt' => 'පෘතුගීසි',
  				'pt_BR' => 'බ්‍රසීල පෘතුගීසි',
  				'pt_PT' => 'යුරෝපීය පෘතුගීසි',
  				'qu' => 'ක්වීචුවා',
  				'quc' => 'කියිචේ',
+ 				'rap' => 'රපනුයි',
+ 				'rar' => 'රරොටොන්ගන්',
  				'rm' => 'රොමෑන්ශ්',
  				'rn' => 'රුන්ඩි',
  				'ro' => 'රොමේනියානු',
- 				'ro_MD' => 'මොල්ඩෝවාව',
+ 				'ro_MD' => 'මොල්ඩවිආනු',
  				'rof' => 'රෝම්බෝ',
+ 				'root' => 'රූට්',
  				'ru' => 'රුසියානු',
+ 				'rup' => 'ඇරොමානියානු',
  				'rw' => 'කින්යර්වන්ඩා',
  				'rwk' => 'ර්වා',
  				'sa' => 'සංස්කෘත',
+ 				'sad' => 'සන්ඩවෙ',
+ 				'sah' => 'සඛා',
  				'saq' => 'සම්බුරු',
+ 				'sat' => 'සෑන්ටලි',
+ 				'sba' => 'න්ගම්බෙ',
  				'sbp' => 'සංගු',
+ 				'sc' => 'සාර්ඩිනිඅන්',
+ 				'scn' => 'සිසිලියන්',
+ 				'sco' => 'ස්කොට්ස්',
  				'sd' => 'සින්ධි',
  				'sdh' => 'දකුණු කුර්දි',
  				'se' => 'උතුරු සාමි',
@@ -234,52 +366,90 @@ has 'display_name_language' => (
  				'ses' => 'කෝයිරාබොරො සෙන්නි',
  				'sg' => 'සන්ග්‍රෝ',
  				'shi' => 'ටචේල්හිට්',
+ 				'shn' => 'ශාන්',
  				'si' => 'සිංහල',
  				'sk' => 'ස්ලෝවැක්',
  				'sl' => 'ස්ලෝවේනියානු',
+ 				'sm' => 'සෑමොඅන්',
  				'sma' => 'දකුණු සාමි',
  				'smj' => 'ලුලේ සාමි',
  				'smn' => 'ඉනාරි සාමි',
  				'sms' => 'ස්කොල්ට් සාමි',
  				'sn' => 'ශෝනා',
+ 				'snk' => 'සොනින්කෙ',
  				'so' => 'සෝමාලි',
  				'sq' => 'ඇල්බේනියානු',
  				'sr' => 'සර්බියානු',
+ 				'srn' => 'ස්‍රන් ටොන්ගො',
+ 				'ss' => 'ස්වති',
+ 				'ssy' => 'සහො',
+ 				'st' => 'සතර්න් සොතො',
  				'su' => 'සන්ඩනීසියානු',
+ 				'suk' => 'සුකුමා',
  				'sv' => 'ස්වීඩන්',
  				'sw' => 'ස්වාහිලි',
- 				'sw_CD' => 'කොන්ගෝ ස්වාහිලි',
+ 				'sw_CD' => 'කොංගෝ ස්වාහිලි',
+ 				'swb' => 'කොමොරියන්',
+ 				'syr' => 'ස්‍රයෑක්',
  				'ta' => 'දෙමළ',
  				'te' => 'තෙළිඟු',
+ 				'tem' => 'ටිම්නෙ',
  				'teo' => 'ටෙසෝ',
+ 				'tet' => 'ටේටම්',
  				'tg' => 'ටජික්',
  				'th' => 'තායි',
  				'ti' => 'ටිග්‍රින්යා',
+ 				'tig' => 'ටීග්‍රෙ',
  				'tk' => 'ටර්ක්මෙන්',
+ 				'tlh' => 'ක්ලින්ගොන්',
+ 				'tn' => 'ස්වනා',
  				'to' => 'ටොංගා',
+ 				'tpi' => 'ටොක් පිසින්',
  				'tr' => 'තුර්කි',
+ 				'trv' => 'ටරොකො',
+ 				'ts' => 'සොන්ග',
  				'tt' => 'ටාටර්',
+ 				'tum' => 'ටුම්බුකා',
+ 				'tvl' => 'ටුවාලු',
  				'twq' => 'ටසවාක්',
+ 				'ty' => 'ටහිටියන්',
+ 				'tyv' => 'ටුවිනියන්',
  				'tzm' => 'මධ්‍යම ඇට්ලස් ටමසිට්',
+ 				'udm' => 'අඩ්මර්ට්',
  				'ug' => 'උයිගර්',
  				'uk' => 'යුක්රේනියානු',
+ 				'umb' => 'උබුන්ඩු',
  				'und' => 'නොදන්නා භාෂාව',
  				'ur' => 'උර්දු',
  				'uz' => 'උස්බෙක්',
  				'vai' => 'වයි',
+ 				've' => 'වෙන්ඩා',
  				'vi' => 'වියට්නාම්',
+ 				'vo' => 'වොලපූක්',
  				'vun' => 'වුන්ජෝ',
+ 				'wa' => 'වෑලූන්',
+ 				'wae' => 'වොල්සර්',
+ 				'wal' => 'වොලෙට්ට',
+ 				'war' => 'වොරෙය්',
  				'wbp' => 'වොපිරි',
  				'wo' => 'වොලොෆ්',
+ 				'wuu' => 'වූ චයිනිස්',
+ 				'xal' => 'කල්මික්',
  				'xh' => 'ශෝසා',
  				'xog' => 'සොගා',
+ 				'yav' => 'යන්ග්බෙන්',
+ 				'ybb' => 'යෙම්බා',
+ 				'yi' => 'යිඩිශ්',
  				'yo' => 'යොරූබා',
+ 				'yue' => 'කැන්ටොනීස්',
  				'zgh' => 'සම්මත මොරොක්කෝ ටමසිග්ත්',
  				'zh' => 'චීන',
- 				'zh_Hans' => 'සුළුකළ චීන',
+ 				'zh_Hans' => 'සරල චීන',
  				'zh_Hant' => 'සාම්ප්‍රදායික චීන',
  				'zu' => 'සුලු',
+ 				'zun' => 'සුනි',
  				'zxx' => 'වාග් විද්‍යා අන්තර්ගතයක් නැත',
+ 				'zza' => 'සාසා',
 
 			);
 			if (@_) {
@@ -309,6 +479,7 @@ has 'display_name_script' => (
  			'Grek' => 'ග්‍රීක',
  			'Gujr' => 'ගුජරාටි',
  			'Guru' => 'ගුර්මුඛි',
+ 			'Hanb' => 'හැන්ඩ්බ්',
  			'Hang' => 'හැන්ගුල්',
  			'Hani' => 'හන්',
  			'Hans' => 'සුළුකළ',
@@ -317,6 +488,8 @@ has 'display_name_script' => (
  			'Hant@alt=stand-alone' => 'සම්ප්‍රදායික හෑන්',
  			'Hebr' => 'හීබෲ',
  			'Hira' => 'හිරඟනා',
+ 			'Hrkt' => 'ජෑපනීස් සිලබරීස්',
+ 			'Jamo' => 'ජාමො',
  			'Jpan' => 'ජපන්',
  			'Kana' => 'කතකනා',
  			'Khmr' => 'කමර්',
@@ -334,6 +507,8 @@ has 'display_name_script' => (
  			'Thaa' => 'තාන',
  			'Thai' => 'තායි',
  			'Tibt' => 'ටි‍බෙට්',
+ 			'Zmth' => 'ගනිතමය සංකේත',
+ 			'Zsye' => 'ඉමොජි',
  			'Zsym' => 'සංකේත',
  			'Zxxx' => 'අලිඛිත',
  			'Zyyy' => 'පොදු.',
@@ -398,11 +573,11 @@ has 'display_name_region' => (
  			'AS' => 'ඇමරිකානු සැමෝවාව',
  			'AT' => 'ඔස්ට්‍රියාව',
  			'AU' => 'ඕස්ට්‍රේලියාව',
- 			'AW' => 'අරුබාව',
+ 			'AW' => 'අරූබා',
  			'AX' => 'ඕලන්ඩ් දූපත්',
  			'AZ' => 'අසර්බයිජානය',
  			'BA' => 'බොස්නියාව සහ හර්සගොවීනාව',
- 			'BB' => 'බාර්බඩෝස්',
+ 			'BB' => 'බාබඩෝස්',
  			'BD' => 'බංග්ලාදේශය',
  			'BE' => 'බෙල්ජියම',
  			'BF' => 'බර්කිනා ෆාසෝ',
@@ -461,6 +636,7 @@ has 'display_name_region' => (
  			'ES' => 'ස්පාඤ්ඤය',
  			'ET' => 'ඉතියෝපියාව',
  			'EU' => 'යුරෝපා සංගමය',
+ 			'EZ' => 'යුරෝ කලාපය',
  			'FI' => 'ෆින්ලන්තය',
  			'FJ' => 'ෆීජී',
  			'FK' => 'ෆෝක්ලන්ත දූපත්',
@@ -533,7 +709,7 @@ has 'display_name_region' => (
  			'LV' => 'ලැට්වියාව',
  			'LY' => 'ලිබියාව',
  			'MA' => 'මොරොක්කෝව',
- 			'MC' => 'මොනැකෝව',
+ 			'MC' => 'මොනාකෝව',
  			'MD' => 'මොල්ඩෝවාව',
  			'ME' => 'මොන්ටෙනීග්‍රෝ',
  			'MF' => 'ශාන්ත මාර්ටින්',
@@ -634,6 +810,8 @@ has 'display_name_region' => (
  			'UA' => 'යුක්රේනය',
  			'UG' => 'උගන්ඩාව',
  			'UM' => 'එක්සත් ජනපද ඈත දූපත්',
+ 			'UN' => 'එක්සත් ජාතීන්',
+ 			'UN@alt=short' => 'එක්සත් ජාතීන්',
  			'US' => 'එක්සත් ජනපදය',
  			'US@alt=short' => 'එ.ජ',
  			'UY' => 'උරුගුවේ',
@@ -666,6 +844,7 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'දින දර්ශනය',
+ 			'cf' => 'මුදල් ආකෘති',
  			'collation' => 'පෙළගැස්ම',
  			'currency' => 'විනිමය',
  			'hc' => 'පැය චක්‍රය',
@@ -695,6 +874,10 @@ has 'display_name_type' => (
  				'japanese' => q{ජපන් දින දර්ශනය},
  				'persian' => q{පර්සියානු දින දර්ශනය},
  				'roc' => q{මින්ගා දින දර්ශනය},
+ 			},
+ 			'cf' => {
+ 				'account' => q{ගිණුම්කරණ මුදල් ආකෘති},
+ 				'standard' => q{සම්මත මුදල් ආකෘති},
  			},
  			'collation' => {
  				'dictionary' => q{ශබ්දකෝෂ පෙළගැස්ම},
@@ -797,9 +980,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[​‌‍ ඎ ඏ ඐ ඦ ෳ])},
+			auxiliary => qr{[​‌‍ ඎ ඏ ඐ ඦ ෳ]},
 			index => ['අ', 'ආ', 'ඇ', 'ඈ', 'ඉ', 'ඊ', 'උ', 'ඌ', 'ඍ', 'එ', 'ඒ', 'ඓ', 'ඔ', 'ඕ', 'ඖ', 'ක', 'ඛ', 'ග', 'ඝ', 'ඞ', 'ඟ', 'ච', 'ඡ', 'ජ', 'ඣ', 'ඥ', 'ඤ', 'ට', 'ඨ', 'ඩ', 'ඪ', 'ණ', 'ඬ', 'ත', 'ථ', 'ද', 'ධ', 'න', 'ඳ', 'ප', 'ඵ', 'බ', 'භ', 'ම', 'ඹ', 'ය', 'ර', 'ල', 'ව', 'ශ', 'ෂ', 'ස', 'හ', 'ළ', 'ෆ'],
-			main => qr{(?^u:[අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ එ ඒ ඓ ඔ ඕ ඖ ං ඃ ක ඛ ග ඝ ඞ ඟ ච ඡ ජ ඣ ඥ ඤ ට ඨ ඩ ඪ ණ ඬ ත ථ ද ධ න ඳ ප ඵ බ භ ම ඹ ය ර ල ව ශ ෂ ස හ ළ ෆ ා ැ ෑ ි ී ු ූ ෘ ෲ ෟ ෙ ේ ෛ ො ෝ ෞ ්])},
+			main => qr{[අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ එ ඒ ඓ ඔ ඕ ඖ ං ඃ ක ඛ ග ඝ ඞ ඟ ච ඡ ජ ඣ ඥ ඤ ට ඨ ඩ ඪ ණ ඬ ත ථ ද ධ න ඳ ප ඵ බ භ ම ඹ ය ර ල ව ශ ෂ ස හ ළ ෆ ා ැ ෑ ි ී ු ූ ෘ ෲ ෟ ෙ ේ ෛ ො ෝ ෞ ්]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1054,6 +1239,12 @@ has 'units' => (
 						'other' => q(ගැලුම් {0}),
 						'per' => q(ගැලුමට {0}),
 					},
+					'gallon-imperial' => {
+						'name' => q(ඉම්පීරියල් ගැලුම්),
+						'one' => q({0} ඉම්පී. ගැලුම),
+						'other' => q({0} ඉම්පී. ගැලුම්),
+						'per' => q(ඉම්පීරියල් ගැලුමකට {0}),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -1282,9 +1473,9 @@ has 'units' => (
 						'other' => q(මයික්‍රෝමීටර {0}),
 					},
 					'microsecond' => {
-						'name' => q(මයික්‍රෝ තත්පර),
-						'one' => q(මයික්‍රෝ තත්පර {0}),
-						'other' => q(මයික්‍රෝ තත්පර {0}),
+						'name' => q(මයික්‍රොතත්පර),
+						'one' => q(මයික්‍රොතත්පර {0}),
+						'other' => q(මයික්‍රොතත්පර {0}),
 					},
 					'mile' => {
 						'name' => q(සැතපුම්),
@@ -1295,6 +1486,11 @@ has 'units' => (
 						'name' => q(ගැලුමට හැතැප්ම),
 						'one' => q(ගැලුමට හැතැප්ම {0}),
 						'other' => q(ගැලුමට හැතැප්ම {0}),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(ඉම්පීරියල් ගැලුමට හැතැප්ම),
+						'one' => q({0} ඉම්පීරියල් ගැලුමට හැතැප්ම),
+						'other' => q({0} ඉම්පීරියල් ගැලුමට හැතැප්ම),
 					},
 					'mile-per-hour' => {
 						'name' => q(පැයට සැතපුම්),
@@ -1321,6 +1517,11 @@ has 'units' => (
 						'one' => q(මිලිග්‍රෑම් {0}),
 						'other' => q(මිලිග්‍රෑම් {0}),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(ඩෙසිලීටරයකට මිලිග්‍රෑම්),
+						'one' => q(ඩෙසිලීටරයකට මිලිග්‍රෑම් {0}),
+						'other' => q(ඩෙසිලීටරයකට මිලිග්‍රෑම් {0}),
+					},
 					'milliliter' => {
 						'name' => q(මිලිලීටර්),
 						'one' => q(මිලිලීටර් {0}),
@@ -1335,6 +1536,11 @@ has 'units' => (
 						'name' => q(රසදිය මිලිමීටර),
 						'one' => q(රසදිය මිලිමීටර {0}),
 						'other' => q(රසදිය මිලිමීටර {0}),
+					},
+					'millimole-per-liter' => {
+						'name' => q(ලීටරයකට මිලිමෝල්),
+						'one' => q(ලීටරයකට මිලිමෝල් {0}),
+						'other' => q(ලීටරයකට මිලිමෝල් {0}),
 					},
 					'millisecond' => {
 						'name' => q(මිලිතත්පර),
@@ -1394,6 +1600,11 @@ has 'units' => (
 						'one' => q(පාර්සෙක් {0}),
 						'other' => q(පාර්සෙක් {0}),
 					},
+					'part-per-million' => {
+						'name' => q(මිලියනයට කොටස්),
+						'one' => q(මිලියනයට කොටස් {0}),
+						'other' => q(මිලියනයට කොටස් {0}),
+					},
 					'per' => {
 						'1' => q({1} ට {0} බැගින්),
 					},
@@ -1411,6 +1622,11 @@ has 'units' => (
 						'name' => q(මෙට්‍රික් පයින්ට්),
 						'one' => q(මෙට්‍රික් පයින්ට් {0}),
 						'other' => q(මෙට්‍රික් පයින්ට් {0}),
+					},
+					'point' => {
+						'name' => q(පොයින්ට්),
+						'one' => q(පොයින්ට් {0}),
+						'other' => q(පොයින්ට් {0}),
 					},
 					'pound' => {
 						'name' => q(රාත්තල්),
@@ -1465,6 +1681,7 @@ has 'units' => (
 						'name' => q(වර්ග කිලෝමීටර්),
 						'one' => q(වර්ග කිලෝමීටර් {0}),
 						'other' => q(වර්ග කිලෝමීටර් {0}),
+						'per' => q({0} කට වර්ග කිලෝමීටර්),
 					},
 					'square-meter' => {
 						'name' => q(වර්ග මීටර්),
@@ -1476,6 +1693,7 @@ has 'units' => (
 						'name' => q(වර්ග සැතපුම්),
 						'one' => q(වර්ග සැතපුම් {0}),
 						'other' => q(වර්ග සැතපුම් {0}),
+						'per' => q({0} කට වර්ග සැතපුම්),
 					},
 					'square-yard' => {
 						'name' => q(වර්ග යාර),
@@ -1612,8 +1830,8 @@ has 'units' => (
 					},
 					'hour' => {
 						'name' => q(පැය),
-						'one' => q(පැ {0}),
-						'other' => q(පැ {0}),
+						'one' => q(පැය {0}),
+						'other' => q(පැය {0}),
 					},
 					'inch' => {
 						'one' => q({0}″),
@@ -1684,8 +1902,8 @@ has 'units' => (
 					},
 					'millisecond' => {
 						'name' => q(මිලිතත්),
-						'one' => q(මි.ත {0}),
-						'other' => q(මි.ත {0}),
+						'one' => q(මිලිතත් {0}),
+						'other' => q(මිලිතත් {0}),
 					},
 					'minute' => {
 						'name' => q(මිනි),
@@ -1930,6 +2148,12 @@ has 'units' => (
 						'other' => q(ගැලු {0}),
 						'per' => q({0}/ගැලු),
 					},
+					'gallon-imperial' => {
+						'name' => q(ඉම්පී. ගැ),
+						'one' => q({0} ගැ ඉම්පී.),
+						'other' => q({0} ගැ ඉම්පී.),
+						'per' => q({0}/ ගැ ඉම්පී.),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -1959,7 +2183,7 @@ has 'units' => (
 						'name' => q(ග්‍රෑම්),
 						'one' => q(ග්‍රෑ. {0}),
 						'other' => q(ග්‍රෑ. {0}),
-						'per' => q({0}/g),
+						'per' => q({0}/ග්‍රෑ.),
 					},
 					'hectare' => {
 						'name' => q(හෙක්ටයාර්),
@@ -1990,7 +2214,7 @@ has 'units' => (
 						'name' => q(පැය),
 						'one' => q(පැය {0}),
 						'other' => q(පැය {0}),
-						'per' => q(පැට {0}),
+						'per' => q(පැයට {0}),
 					},
 					'inch' => {
 						'name' => q(අඟල්),
@@ -2037,7 +2261,7 @@ has 'units' => (
 						'name' => q(කි.ග්‍රෑ.),
 						'one' => q(කි.ග්‍රෑ. {0}),
 						'other' => q(කි.ග්‍රෑ. {0}),
-						'per' => q({0}/kg),
+						'per' => q({0}/කි.ග්‍රෑ.),
 					},
 					'kilohertz' => {
 						'name' => q(කිහස්),
@@ -2158,9 +2382,9 @@ has 'units' => (
 						'other' => q(මමී {0}),
 					},
 					'microsecond' => {
-						'name' => q(මතත්),
-						'one' => q(මත {0}),
-						'other' => q(මත {0}),
+						'name' => q(මයික්‍රොතත්),
+						'one' => q(මයික්‍රොතත් {0}),
+						'other' => q(මයික්‍රොතත් {0}),
 					},
 					'mile' => {
 						'name' => q(සැතපුම්),
@@ -2171,6 +2395,11 @@ has 'units' => (
 						'name' => q(හැතැප්ම/ගැලු),
 						'one' => q(හැගැ {0}),
 						'other' => q(හැගැ {0}),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(හැතැප්ම/ගැලුම්),
+						'one' => q({0} ගැහැ),
+						'other' => q({0} ගැහැ),
 					},
 					'mile-per-hour' => {
 						'name' => q(පැයට සැතපුම්),
@@ -2197,6 +2426,11 @@ has 'units' => (
 						'one' => q(මිග්‍රෑ {0}),
 						'other' => q(මිග්‍රෑ {0}),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(මිග්‍රෑ/ඩෙලි),
+						'one' => q({0} මිග්‍රෑ/ඩෙලි),
+						'other' => q({0} මිග්‍රෑ/ඩෙලි),
+					},
 					'milliliter' => {
 						'name' => q(මිලී),
 						'one' => q(මිලී {0}),
@@ -2212,10 +2446,15 @@ has 'units' => (
 						'one' => q(ර මිමී {0}),
 						'other' => q(ර මිමී {0}),
 					},
+					'millimole-per-liter' => {
+						'name' => q(මිලිමෝල්/ලීටර්),
+						'one' => q({0} මිමෝල්/ලී),
+						'other' => q({0} මිමෝල්/ලී),
+					},
 					'millisecond' => {
 						'name' => q(මිලිතත්පර),
-						'one' => q(මි.ත {0}),
-						'other' => q(මි.ත {0}),
+						'one' => q(මිලිතත් {0}),
+						'other' => q(මිලිතත් {0}),
 					},
 					'milliwatt' => {
 						'name' => q(මිවො),
@@ -2258,7 +2497,7 @@ has 'units' => (
 						'name' => q(අවුස),
 						'one' => q(අවුස {0}),
 						'other' => q(අවුස {0}),
-						'per' => q({0}/oz),
+						'per' => q({0}/අවුස),
 					},
 					'ounce-troy' => {
 						'name' => q(අවුස ට්‍රෝයි),
@@ -2269,6 +2508,11 @@ has 'units' => (
 						'name' => q(පාර්සෙක්),
 						'one' => q(පාසෙ {0}),
 						'other' => q(පාසෙ {0}),
+					},
+					'part-per-million' => {
+						'name' => q(කොටස්/මිලියනය),
+						'one' => q({0} මිලිකො),
+						'other' => q({0} මිලිකො),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -2288,11 +2532,16 @@ has 'units' => (
 						'one' => q(මෙපට් {0}),
 						'other' => q(මෙපට් {0}),
 					},
+					'point' => {
+						'name' => q(පොයින්ට්),
+						'one' => q(පො {0}),
+						'other' => q(පො {0}),
+					},
 					'pound' => {
 						'name' => q(රාත්තල්),
 						'one' => q(රා {0}),
 						'other' => q(රා {0}),
-						'per' => q({0}/lb),
+						'per' => q({0}/රා),
 					},
 					'pound-per-square-inch' => {
 						'name' => q(වඅ රා),
@@ -2318,7 +2567,7 @@ has 'units' => (
 						'name' => q(තත්පර),
 						'one' => q(තත් {0}),
 						'other' => q(තත් {0}),
-						'per' => q(තය {0}),
+						'per' => q(තත්පරයට {0}),
 					},
 					'square-centimeter' => {
 						'name' => q(වසෙ),
@@ -2341,6 +2590,7 @@ has 'units' => (
 						'name' => q(ව.කී),
 						'one' => q(ව.කී {0}),
 						'other' => q(ව.කී {0}),
+						'per' => q({0} කට වර්ග කිලෝමීටර්),
 					},
 					'square-meter' => {
 						'name' => q(වර්ග මීටර්),
@@ -2352,6 +2602,7 @@ has 'units' => (
 						'name' => q(වර්ග සැතපුම්),
 						'one' => q(ව.සැ {0}),
 						'other' => q(ව.සැ {0}),
+						'per' => q({0} කට ව.සැ),
 					},
 					'square-yard' => {
 						'name' => q(වර්ග යාර),
@@ -2538,7 +2789,7 @@ has 'number_formats' => (
 					'other' => 'ට්‍රි000',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -2645,14 +2896,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#',
+					'default' => '#',
 				},
 			},
 		},
@@ -2869,12 +3120,20 @@ has 'currencies' => (
 				'other' => q(බොට්ස්වානා පුලා),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(බෙලරූස් රූබල්),
 				'one' => q(බෙලරූස් රූබල්),
 				'other' => q(බෙලරූස් රූබල්),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(බෙලරූස් රූබල් \(2000–2016\)),
+				'one' => q(බෙලරූස් රූබල් \(2000–2016\)),
+				'other' => q(බෙලරූස් රූබල් \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -2915,6 +3174,13 @@ has 'currencies' => (
 				'currency' => q(චිලි පැසෝ),
 				'one' => q(චිලි පැසෝ),
 				'other' => q(චිලි පැසෝ),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(චීන යුආන් \(එතෙර\)),
+				'one' => q(චීන යුආන් \(එතෙර\)),
+				'other' => q(චීන යුආන් \(එතෙර\)),
 			},
 		},
 		'CNY' => {
@@ -3533,9 +3799,9 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(පේරු නියුවෝ සොල්),
-				'one' => q(පේරු නියුවෝ සොල්),
-				'other' => q(පේරු නියුවෝ සොල්),
+				'currency' => q(පේරු සොල්),
+				'one' => q(පේරු සොල්),
+				'other' => q(පේරු සොල්),
 			},
 		},
 		'PGK' => {
@@ -4216,67 +4482,67 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'night2' if $time >= 0
-						&& $time < 100;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'night2' if $time >= 0
+						&& $time < 100;
+					return 'morning1' if $time >= 100
+						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night2' if $time >= 0
-						&& $time < 100;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 100
+						&& $time < 600;
+					return 'night2' if $time >= 0
+						&& $time < 100;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'night2' if $time >= 0
-						&& $time < 100;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'night2' if $time >= 0
+						&& $time < 100;
+					return 'morning1' if $time >= 100
+						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night2' if $time >= 0
-						&& $time < 100;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 100
+						&& $time < 600;
+					return 'night2' if $time >= 0
+						&& $time < 100;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 				}
 				last SWITCH;
 				}
@@ -4296,79 +4562,79 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{ප.ව.},
+				'wide' => {
 					'am' => q{පෙ.ව.},
-					'afternoon1' => q{දවල්},
+					'morning2' => q{උදේ},
 					'evening1' => q{හවස},
-					'night1' => q{රෑ},
-					'noon' => q{මධ්‍යාහ්නය},
-					'morning1' => q{පාන්දර},
 					'night2' => q{මැදියමට පසු},
 					'midnight' => q{මැදියම},
-					'morning2' => q{උදේ},
+					'pm' => q{ප.ව.},
+					'night1' => q{රෑ},
+					'noon' => q{මධ්‍යාහ්නය},
+					'afternoon1' => q{දවල්},
+					'morning1' => q{පාන්දර},
 				},
 				'narrow' => {
-					'pm' => q{ප},
+					'night2' => q{මැ},
 					'am' => q{පෙ},
-					'afternoon1' => q{ද},
+					'morning2' => q{උ},
 					'evening1' => q{හ},
-					'night1' => q{රෑ},
+					'afternoon1' => q{ද},
 					'morning1' => q{පා},
 					'noon' => q{ම},
-					'night2' => q{මැ},
+					'night1' => q{රෑ},
+					'pm' => q{ප},
 					'midnight' => q{මැ},
-					'morning2' => q{උ},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'night1' => q{රෑ},
 					'noon' => q{මධ්‍යාහ්නය},
 					'morning1' => q{පාන්දර},
+					'afternoon1' => q{දවල්},
+					'pm' => q{ප.ව.},
 					'midnight' => q{මැදියම},
 					'night2' => q{මැදියමට පසු},
-					'morning2' => q{උදේ},
-					'pm' => q{ප.ව.},
 					'am' => q{පෙ.ව.},
-					'afternoon1' => q{දවල්},
+					'morning2' => q{උදේ},
 					'evening1' => q{හවස},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'midnight' => q{මැදියම},
+				'narrow' => {
+					'morning2' => q{උදේ},
+					'am' => q{පෙ.ව.},
+					'evening1' => q{හවස},
 					'night2' => q{මැදියමට පසු},
+					'pm' => q{ප.ව.},
+					'midnight' => q{මැදියම},
+					'afternoon1' => q{දවල්},
 					'morning1' => q{පාන්දර},
 					'night1' => q{රෑ},
 					'noon' => q{මධ්‍යාහ්නය},
-					'morning2' => q{උදේ},
-					'pm' => q{ප.ව.},
-					'am' => q{පෙ.ව.},
-					'evening1' => q{හවස},
-					'afternoon1' => q{දවල්},
-				},
-				'narrow' => {
-					'evening1' => q{හ},
-					'afternoon1' => q{ද},
-					'pm' => q{ප},
-					'am' => q{පෙ},
-					'night2' => q{මැ},
-					'midnight' => q{මැ},
-					'morning1' => q{පා},
-					'night1' => q{රෑ},
-					'noon' => q{ද},
-					'morning2' => q{උ},
 				},
 				'wide' => {
+					'morning1' => q{පාන්දර},
+					'afternoon1' => q{දවල්},
+					'noon' => q{මධ්‍යාහ්නය},
+					'night1' => q{රෑ},
+					'pm' => q{ප.ව.},
 					'midnight' => q{මැදියම},
 					'night2' => q{මැදියමට පසු},
-					'morning1' => q{පාන්දර},
-					'night1' => q{රෑ},
-					'noon' => q{මධ්‍යාහ්නය},
+					'am' => q{පෙ.ව.},
+					'evening1' => q{හවස},
+					'morning2' => q{උදේ},
+				},
+				'abbreviated' => {
+					'night2' => q{මැදියමට පසු},
+					'am' => q{පෙ.ව.},
 					'morning2' => q{උදේ},
 					'evening1' => q{හවස},
+					'night1' => q{රෑ},
+					'noon' => q{මධ්‍යාහ්නය},
 					'afternoon1' => q{දවල්},
+					'morning1' => q{පාන්දර},
 					'pm' => q{ප.ව.},
-					'am' => q{පෙ.ව.},
+					'midnight' => q{මැදියම},
 				},
 			},
 		},
@@ -4456,50 +4722,18 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH.mm},
-			EHms => q{E HH.mm.ss},
-			Ed => q{d E},
-			Ehm => q{E a h.mm},
-			Ehms => q{E a h.mm.ss},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH.mm},
-			Hms => q{HH.mm.ss},
-			Hmsv => q{HH.mm.ss v},
-			Hmv => q{HH.mm v},
-			M => q{L},
-			MEd => q{M-d, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M-d},
-			d => q{d},
-			h => q{a h},
-			hm => q{a h.mm},
-			hms => q{a h.mm.ss},
-			hmsv => q{h.mm.ss a v},
-			hmv => q{h.mm a v},
-			ms => q{mm.ss},
-			y => q{y},
-			yM => q{y-M},
-			yMEd => q{y-M-d, E},
-			yMMM => q{y MMM},
-			yMMMEd => q{y MMM d, E},
-			yMMMM => q{y MMMM},
-			yMMMd => q{y MMM d},
-			yMd => q{y-M-d},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
-		},
 		'generic' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
 			E => q{ccc},
+			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{G y},
 			GyMMM => q{G y MMM},
 			GyMMMEd => q{G y MMM d, E},
@@ -4531,6 +4765,54 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH.mm},
+			EHms => q{E HH.mm.ss},
+			Ed => q{d E},
+			Ehm => q{E a h.mm},
+			Ehms => q{E a h.mm.ss},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH.mm},
+			Hms => q{HH.mm.ss},
+			Hmsv => q{HH.mm.ss v},
+			Hmv => q{HH.mm v},
+			M => q{L},
+			MEd => q{M-d, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d E},
+			MMMMW => q{MMM සතිය W},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M-d},
+			d => q{d},
+			h => q{a h},
+			hm => q{a h.mm},
+			hms => q{a h.mm.ss},
+			hmsv => q{h.mm.ss a v},
+			hmv => q{h.mm a v},
+			ms => q{mm.ss},
+			y => q{y},
+			yM => q{y-M},
+			yMEd => q{y-M-d, E},
+			yMMM => q{y MMM},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y MMMM},
+			yMMMd => q{y MMM d},
+			yMd => q{y-M-d},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{Y සතිය w},
+		},
 	} },
 );
 
@@ -4550,101 +4832,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH.mm–HH.mm},
-				m => q{HH.mm–HH.mm},
-			},
-			Hmv => {
-				H => q{HH.mm–HH.mm v},
-				m => q{HH.mm–HH.mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{M-d, E – M-d, E},
-				d => q{M-d, E – M-d, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM-dd, E – MMM-dd, E},
-				d => q{MMM-d, E – MMM-d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{M-d – M-d},
-				d => q{M-d – M-d},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
-			},
-			hm => {
-				a => q{a h.mm – a h.mm},
-				h => q{a h.mm – h.mm},
-				m => q{a h.mm – h.mm},
-			},
-			hmv => {
-				a => q{a h.mm – a h.mm v},
-				h => q{a h.mm – h.mm v},
-				m => q{a h.mm – h.mm v},
-			},
-			hv => {
-				a => q{a h – a h v},
-				h => q{a h – h v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{y-M-d, E – y-M-d, E},
-				d => q{y-M-d, E – y-M-d, E},
-				y => q{y-M-d, E – y-M-d, E},
-			},
-			yMMM => {
-				M => q{y MMM–MMM},
-				y => q{y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{y MMM d, E – y MMM d, E},
-				d => q{y MMM d, E – y MMM d, E},
-				y => q{y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{y MMMM – MMMM},
-				y => q{y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{y MMM d – MMM d},
-				d => q{y MMM d – d},
-				y => q{y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{y-M-d – y-M-d},
-				d => q{y-M-d – y-M-d},
-				y => q{y-M-d – y-M-d},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -4740,6 +4927,101 @@ has 'datetime_formats_interval' => (
 				y => q{G y-M-d – y-M-d},
 			},
 		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH.mm–HH.mm},
+				m => q{HH.mm–HH.mm},
+			},
+			Hmv => {
+				H => q{HH.mm–HH.mm v},
+				m => q{HH.mm–HH.mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{M-d, E – M-d, E},
+				d => q{M-d, E – M-d, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM-dd, E – MMM-dd, E},
+				d => q{MMM-d, E – MMM-d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{M-d – M-d},
+				d => q{M-d – M-d},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{a h – a h},
+				h => q{a h–h},
+			},
+			hm => {
+				a => q{a h.mm – a h.mm},
+				h => q{a h.mm – h.mm},
+				m => q{a h.mm – h.mm},
+			},
+			hmv => {
+				a => q{a h.mm – a h.mm v},
+				h => q{a h.mm – h.mm v},
+				m => q{a h.mm – h.mm v},
+			},
+			hv => {
+				a => q{a h – a h v},
+				h => q{a h – h v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{y-M-d, E – y-M-d, E},
+				d => q{y-M-d, E – y-M-d, E},
+				y => q{y-M-d, E – y-M-d, E},
+			},
+			yMMM => {
+				M => q{y MMM–MMM},
+				y => q{y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{y MMM d, E – y MMM d, E},
+				d => q{y MMM d, E – y MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{y MMMM – MMMM},
+				y => q{y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{y MMM d – MMM d},
+				d => q{y MMM d – d},
+				y => q{y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{y-M-d – y-M-d},
+				d => q{y-M-d – y-M-d},
+				y => q{y-M-d – y-M-d},
+			},
+		},
 	} },
 );
 
@@ -4757,7 +5039,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(ඇෆ්ගනිස්ථාන වේලාව),
+				'standard' => q#ඇෆ්ගනිස්ථාන වේලාව#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -4918,38 +5200,38 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(මධ්‍යම අප්‍රිකානු වේලාව),
+				'standard' => q#මධ්‍යම අප්‍රිකානු වේලාව#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(නැගෙනහිර අප්‍රිකානු වේලාව),
+				'standard' => q#නැගෙනහිර අප්‍රිකානු වේලාව#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(දකුණු අප්‍රිකානු වේලාව),
+				'standard' => q#දකුණු අප්‍රිකානු වේලාව#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(බටහිර අප්‍රිකානු ග්‍රීෂ්ම කාලය),
-				'generic' => q(බටහිර අප්‍රිකානු වේලාව),
-				'standard' => q(බටහිර අප්‍රිකානු සම්මත වේලාව),
+				'daylight' => q#බටහිර අප්‍රිකානු ග්‍රීෂ්ම කාලය#,
+				'generic' => q#බටහිර අප්‍රිකානු වේලාව#,
+				'standard' => q#බටහිර අප්‍රිකානු සම්මත වේලාව#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(ඇලස්කා දිවාආලෝක වේලාව),
-				'generic' => q(ඇලස්කා වේලාව),
-				'standard' => q(ඇලස්කා සම්මත වේලාව),
+				'daylight' => q#ඇලස්කා දිවාආලෝක වේලාව#,
+				'generic' => q#ඇලස්කා වේලාව#,
+				'standard' => q#ඇලස්කා සම්මත වේලාව#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(ඇමර්සන් ග්‍රීෂ්ම කාලය),
-				'generic' => q(ඇමර්සන් වේලාව),
-				'standard' => q(ඇමර්සන් සම්මත වේලාව),
+				'daylight' => q#ඇමර්සන් ග්‍රීෂ්ම කාලය#,
+				'generic' => q#ඇමර්සන් වේලාව#,
+				'standard' => q#ඇමර්සන් සම්මත වේලාව#,
 			},
 		},
 		'America/Adak' => {
@@ -5007,7 +5289,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#බෙලෙම්#,
 		},
 		'America/Belize' => {
-			exemplarCity => q#බේලිස්#,
+			exemplarCity => q#බෙලීස්#,
 		},
 		'America/Blanc-Sablon' => {
 			exemplarCity => q#බ්ලැන්ක්-සැබ්ලන්#,
@@ -5095,6 +5377,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#එල්සැල්වදෝර්#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#ෆෝට් නෙල්සන්#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#ෆොර්ටලේසා#,
@@ -5297,6 +5582,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#පුවටොරිකෝව#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#පුන්ටා ඇරිනාස්#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#රෙයිනි ගඟ#,
 		},
@@ -5388,34 +5676,34 @@ has 'time_zone_names' => (
 			exemplarCity => q#යකුටට්#,
 		},
 		'America/Yellowknife' => {
-			exemplarCity => q#යෙලෝනයිෆ#,
+			exemplarCity => q#යෙලෝනයිෆ්#,
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(උතුරු ඇමරිකානු මධ්‍යම දිවාආලෝක වේලාව),
-				'generic' => q(උතුරු ඇමරිකානු මධ්‍යම වේලාව),
-				'standard' => q(උතුරු ඇමරිකානු මධ්‍යම සම්මත වේලාව),
+				'daylight' => q#උතුරු ඇමරිකානු මධ්‍යම දිවාආලෝක වේලාව#,
+				'generic' => q#උතුරු ඇමරිකානු මධ්‍යම වේලාව#,
+				'standard' => q#උතුරු ඇමරිකානු මධ්‍යම සම්මත වේලාව#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(උතුරු ඇමරිකානු නැගෙනහිර දිවාආලෝක වේලාව),
-				'generic' => q(උතුරු ඇමරිකානු නැගෙනහිර වේලාව),
-				'standard' => q(උතුරු ඇමරිකානු නැගෙනහිර සම්මත වේලාව),
+				'daylight' => q#උතුරු ඇමරිකානු නැගෙනහිර දිවාආලෝක වේලාව#,
+				'generic' => q#උතුරු ඇමරිකානු නැගෙනහිර වේලාව#,
+				'standard' => q#උතුරු ඇමරිකානු නැගෙනහිර සම්මත වේලාව#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(උතුරු ඇමරිකානු කඳුකර දිවාආලෝක වේලාව),
-				'generic' => q(උතුරු ඇමරිකානු කඳුකර වේලාව),
-				'standard' => q(උතුරු ඇමරිකානු කඳුකර සම්මත වේලාව),
+				'daylight' => q#උතුරු ඇමරිකානු කඳුකර දිවාආලෝක වේලාව#,
+				'generic' => q#උතුරු ඇමරිකානු කඳුකර වේලාව#,
+				'standard' => q#උතුරු ඇමරිකානු කඳුකර සම්මත වේලාව#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(උතුරු ඇමරිකානු පැසිෆික් දිවාආලෝක වේලාව),
-				'generic' => q(උතුරු ඇමරිකානු පැසිෆික් වේලාව),
-				'standard' => q(උතුරු ඇමරිකානු පැසිෆික් සම්මත වේලාව),
+				'daylight' => q#උතුරු ඇමරිකානු පැසිෆික් දිවාආලෝක වේලාව#,
+				'generic' => q#උතුරු ඇමරිකානු පැසිෆික් වේලාව#,
+				'standard' => q#උතුරු ඇමරිකානු පැසිෆික් සම්මත වේලාව#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -5453,16 +5741,16 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(අපියා දිවා වේලාව),
-				'generic' => q(අපියා වේලාව),
-				'standard' => q(අපියා සම්මත වේලාව),
+				'daylight' => q#අපියා දිවා වේලාව#,
+				'generic' => q#අපියා වේලාව#,
+				'standard' => q#අපියා සම්මත වේලාව#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(අරාබි දහවල් වේලාව),
-				'generic' => q(අරාබි වේලාව),
-				'standard' => q(අරාබි සම්මත වේලාව),
+				'daylight' => q#අරාබි දහවල් වේලාව#,
+				'generic' => q#අරාබි වේලාව#,
+				'standard' => q#අරාබි සම්මත වේලාව#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -5470,23 +5758,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(ආර්ජන්ටිනා ග්‍රීෂ්ම කාලය),
-				'generic' => q(ආර්ජන්ටිනා වේලාව),
-				'standard' => q(ආර්ජන්ටිනා සම්මත වේලාව),
+				'daylight' => q#ආර්ජන්ටිනා ග්‍රීෂ්ම කාලය#,
+				'generic' => q#ආර්ජන්ටිනා වේලාව#,
+				'standard' => q#ආර්ජන්ටිනා සම්මත වේලාව#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(බටහිර ආර්ජන්ටිනා ග්‍රීෂ්ම කාලය),
-				'generic' => q(බටහිර ආර්ජන්ටිනා වේලාව),
-				'standard' => q(බටහිර ආර්ජන්ටිනා සම්මත වේලාව),
+				'daylight' => q#බටහිර ආර්ජන්ටිනා ග්‍රීෂ්ම කාලය#,
+				'generic' => q#බටහිර ආර්ජන්ටිනා වේලාව#,
+				'standard' => q#බටහිර ආර්ජන්ටිනා සම්මත වේලාව#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(ආමේනියානු ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ආමේනියානු වේලාව),
-				'standard' => q(ආමේනියානු සම්මත වේලාව),
+				'daylight' => q#ආමේනියානු ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ආමේනියානු වේලාව#,
+				'standard' => q#ආමේනියානු සම්මත වේලාව#,
 			},
 		},
 		'Asia/Aden' => {
@@ -5510,6 +5798,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#අශ්ගබැට්#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#ඇටිරවු#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#බැග්ඩෑඩ්#,
 		},
@@ -5521,6 +5812,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#බැංකොක්#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#බර්නෞල්#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#බීරුට්#,
@@ -5557,6 +5851,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#ඩුශන්බේ#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#ෆැමගුස්ටා#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#ගාසා#,
@@ -5699,6 +5996,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#ටෝකියෝ#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#ටොම්ස්ක්#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#උලාන්බාටර්#,
 		},
@@ -5725,16 +6025,16 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(අත්ලාන්තික් දිවාආලෝක වේලාව),
-				'generic' => q(අත්ලාන්තික් වේලාව),
-				'standard' => q(අත්ලාන්තික් සම්මත වේලාව),
+				'daylight' => q#අත්ලාන්තික් දිවාආලෝක වේලාව#,
+				'generic' => q#අත්ලාන්තික් වේලාව#,
+				'standard' => q#අත්ලාන්තික් සම්මත වේලාව#,
 			},
 		},
 		'Atlantic/Azores' => {
 			exemplarCity => q#ඇසොරේ#,
 		},
 		'Atlantic/Bermuda' => {
-			exemplarCity => q#බර්මියුඩාව#,
+			exemplarCity => q#බර්මියුඩා#,
 		},
 		'Atlantic/Canary' => {
 			exemplarCity => q#කැනරි#,
@@ -5798,171 +6098,176 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(මධ්‍යම ඔස්ට්‍රේලියානු දහවල් වේලාව),
-				'generic' => q(මධ්‍යම ඕස්ට්‍රේලියානු වේලාව),
-				'standard' => q(ඕස්ට්‍රේලියානු සම්මත වේලාව),
+				'daylight' => q#මධ්‍යම ඔස්ට්‍රේලියානු දහවල් වේලාව#,
+				'generic' => q#මධ්‍යම ඕස්ට්‍රේලියානු වේලාව#,
+				'standard' => q#ඕස්ට්‍රේලියානු සම්මත වේලාව#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(මධ්‍යම බටහිර ඔස්ට්‍රේලියානු දහවල් වේලාව),
-				'generic' => q(මධ්‍යම බටහිර ඔස්ට්‍රේලියානු වේලාව),
-				'standard' => q(මධ්‍යම බටහිර ඔස්ට්‍රේලියානු සම්මත වේලාව),
+				'daylight' => q#මධ්‍යම බටහිර ඔස්ට්‍රේලියානු දහවල් වේලාව#,
+				'generic' => q#මධ්‍යම බටහිර ඔස්ට්‍රේලියානු වේලාව#,
+				'standard' => q#මධ්‍යම බටහිර ඔස්ට්‍රේලියානු සම්මත වේලාව#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(නැඟෙනහිර ඕස්ට්‍රේලියානු දහවල් වේලාව),
-				'generic' => q(නැගෙනහිර ඕස්ට්‍රේලියානු වේලාව),
-				'standard' => q(නැගෙනහිර ඕස්ට්‍රේලියානු සම්මත වේලාව),
+				'daylight' => q#නැඟෙනහිර ඕස්ට්‍රේලියානු දහවල් වේලාව#,
+				'generic' => q#නැගෙනහිර ඕස්ට්‍රේලියානු වේලාව#,
+				'standard' => q#නැගෙනහිර ඕස්ට්‍රේලියානු සම්මත වේලාව#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(බටහිර ඔස්ට්‍රේලියානු දහවල් වේලාව),
-				'generic' => q(බටහිර ඕස්ට්‍රේලියානු වේලාව),
-				'standard' => q(බටහිර ඕස්ට්‍රේලියානු සම්මත වේලාව),
+				'daylight' => q#බටහිර ඔස්ට්‍රේලියානු දහවල් වේලාව#,
+				'generic' => q#බටහිර ඕස්ට්‍රේලියානු වේලාව#,
+				'standard' => q#බටහිර ඕස්ට්‍රේලියානු සම්මත වේලාව#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(අසර්බයිජාන් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(අසර්බයිජාන් වේලාව),
-				'standard' => q(අසර්බයිජාන් සම්මත වේලාව),
+				'daylight' => q#අසර්බයිජාන් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#අසර්බයිජාන් වේලාව#,
+				'standard' => q#අසර්බයිජාන් සම්මත වේලාව#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(ඇසොර්ස් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ඇසොර්ස් වේලාව),
-				'standard' => q(ඇසොර්ස් සම්මත වේලාව),
+				'daylight' => q#ඇසොර්ස් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ඇසොර්ස් වේලාව#,
+				'standard' => q#ඇසොර්ස් සම්මත වේලාව#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(බංගලාදේශ ග්‍රීෂ්ම කාලය),
-				'generic' => q(බංගලාදේශ වේලාව),
-				'standard' => q(බංගලාදේශ සම්මත වේලාව),
+				'daylight' => q#බංගලාදේශ ග්‍රීෂ්ම කාලය#,
+				'generic' => q#බංගලාදේශ වේලාව#,
+				'standard' => q#බංගලාදේශ සම්මත වේලාව#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(භුතාන වේලාව),
+				'standard' => q#භුතාන වේලාව#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(බොලිවියා වේලාව),
+				'standard' => q#බොලිවියා වේලාව#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(බ්‍රසීල ග්‍රීෂ්ම කාලය),
-				'generic' => q(බ්‍රසීල වේලාව),
-				'standard' => q(බ්‍රසීල සම්මත වේලාව),
+				'daylight' => q#බ්‍රසීල ග්‍රීෂ්ම කාලය#,
+				'generic' => q#බ්‍රසීල වේලාව#,
+				'standard' => q#බ්‍රසීල සම්මත වේලාව#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(බෘනායි දරුස්සලාම් වේලාව),
+				'standard' => q#බෘනායි දරුස්සලාම් වේලාව#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(කේප්වේඩ් ග්‍රීෂ්ම කාලය),
-				'generic' => q(කේප්වේඩ් වේලාව),
-				'standard' => q(කේප්වේඩ් සම්මත වේලාව),
+				'daylight' => q#කේප්වේඩ් ග්‍රීෂ්ම කාලය#,
+				'generic' => q#කේප්වේඩ් වේලාව#,
+				'standard' => q#කේප්වේඩ් සම්මත වේලාව#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(චමොරෝ වේලාව),
+				'standard' => q#චමොරෝ වේලාව#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(චැතම් දිවා වේලාව),
-				'generic' => q(චැතම් වේලාව),
-				'standard' => q(චැතම් සම්මත වේලාව),
+				'daylight' => q#චැතම් දිවා වේලාව#,
+				'generic' => q#චැතම් වේලාව#,
+				'standard' => q#චැතම් සම්මත වේලාව#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(චිලී ග්‍රීෂ්ම කාලය),
-				'generic' => q(චිලී වේලාව),
-				'standard' => q(චිලී සම්මත වේලාව),
+				'daylight' => q#චිලී ග්‍රීෂ්ම කාලය#,
+				'generic' => q#චිලී වේලාව#,
+				'standard' => q#චිලී සම්මත වේලාව#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(චීන දහවල් වේලාව),
-				'generic' => q(චීන වේලාව),
-				'standard' => q(චීන සම්මත වේලාව),
+				'daylight' => q#චීන දහවල් වේලාව#,
+				'generic' => q#චීන වේලාව#,
+				'standard' => q#චීන සම්මත වේලාව#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(චොයිබල්සාන් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(චොයිබල්සාන් වේලාව),
-				'standard' => q(චොයිබල්සාන් සම්මත වේලාව),
+				'daylight' => q#චොයිබල්සාන් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#චොයිබල්සාන් වේලාව#,
+				'standard' => q#චොයිබල්සාන් සම්මත වේලාව#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(ක්‍රිස්මස් දුපත් වේලාව),
+				'standard' => q#ක්‍රිස්මස් දුපත් වේලාව#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(කොකෝස් දුපත් වේලාව),
+				'standard' => q#කොකෝස් දුපත් වේලාව#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(කොලොම්බියා ග්‍රීෂ්ම කාලය),
-				'generic' => q(කොලොම්බියා වේලාව),
-				'standard' => q(කොලොම්බියා සම්මත වේලාව),
+				'daylight' => q#කොලොම්බියා ග්‍රීෂ්ම කාලය#,
+				'generic' => q#කොලොම්බියා වේලාව#,
+				'standard' => q#කොලොම්බියා සම්මත වේලාව#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(කුක් දුපත් භාග ග්‍රීෂ්ම වේලාව),
-				'generic' => q(කුක් දුපත් වේලාව),
-				'standard' => q(කුක් දුපත් සම්මත වේලාව),
+				'daylight' => q#කුක් දුපත් භාග ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#කුක් දුපත් වේලාව#,
+				'standard' => q#කුක් දුපත් සම්මත වේලාව#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(කියුබානු දිවාආලෝක වේලාව),
-				'generic' => q(කියුබානු වේලාව),
-				'standard' => q(කියුබානු සම්මත වේලාව),
+				'daylight' => q#කියුබානු දිවාආලෝක වේලාව#,
+				'generic' => q#කියුබානු වේලාව#,
+				'standard' => q#කියුබානු සම්මත වේලාව#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(ඩාවිස් වේලාව),
+				'standard' => q#ඩාවිස් වේලාව#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(දුමොන්ත්-ඩ්උර්විල් වේලාව),
+				'standard' => q#දුමොන්ත්-ඩ්උර්විල් වේලාව#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(නැගෙනහිර ටිමෝර් වේලාව),
+				'standard' => q#නැගෙනහිර ටිමෝර් වේලාව#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(ඊස්ටර් දූපත් ග්‍රීෂ්ම කාලය),
-				'generic' => q(ඊස්ටර් දූපත් වේලාව),
-				'standard' => q(ඊස්ටර් දූපත් සම්මත වේලාව),
+				'daylight' => q#ඊස්ටර් දූපත් ග්‍රීෂ්ම කාලය#,
+				'generic' => q#ඊස්ටර් දූපත් වේලාව#,
+				'standard' => q#ඊස්ටර් දූපත් සම්මත වේලාව#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ඉක්වදෝර් වේලාව),
+				'standard' => q#ඉක්වදෝර් වේලාව#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#සමකක්ෂ සාර්ව වේලාව#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -5973,6 +6278,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#ඇන්ඩෝරාව#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#අස්ට්‍රඛාන්#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#ඇතැන්ස්#,
@@ -6007,7 +6315,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#ඩබ්ලින්#,
 			long => {
-				'daylight' => q(අයර්ලන්ත ගිම්හාන කාලය),
+				'daylight' => q#අයර්ලන්ත සම්මත වේලාව#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -6034,6 +6342,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#කිව්#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#කිරොව්#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#ලිස්බන්#,
 		},
@@ -6043,7 +6354,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#ලන්ඩන්#,
 			long => {
-				'daylight' => q(බ්‍රිතාන්‍ය ගිම්හාන කාලය),
+				'daylight' => q#බ්‍රිතාන්‍ය ගිම්හාන වේලාව#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -6094,6 +6405,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#සරාජෙවෝ#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#සරටොව්#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#සිම්ෆෙරෝපොල්#,
 		},
@@ -6111,6 +6425,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#ටිරානේ#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#උල්යනොව්ස්ක්#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#උස්ගොරෝඩ්#,
@@ -6144,129 +6461,129 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(මධ්‍යම යුරෝපීය ග්‍රීෂ්ම වේලාව),
-				'generic' => q(මධ්‍යම යුරෝපීය වේලාව),
-				'standard' => q(මධ්‍යම යුරෝපීය සම්මත වේලාව),
+				'daylight' => q#මධ්‍යම යුරෝපීය ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#මධ්‍යම යුරෝපීය වේලාව#,
+				'standard' => q#මධ්‍යම යුරෝපීය සම්මත වේලාව#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(නැගෙනහිර යුරෝපීය ග්‍රීෂ්ම වේලාව),
-				'generic' => q(නැගෙනහිර යුරෝපීය වේලාව),
-				'standard' => q(නැගෙනහිර යුරෝපීය සම්මත වේලාව),
+				'daylight' => q#නැගෙනහිර යුරෝපීය ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#නැගෙනහිර යුරෝපීය වේලාව#,
+				'standard' => q#නැගෙනහිර යුරෝපීය සම්මත වේලාව#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(තවත්-නැගෙනහිර යුරෝපීය වේලාව),
+				'standard' => q#තවත්-නැගෙනහිර යුරෝපීය වේලාව#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(බටහිර යුරෝපීය ග්‍රීෂ්ම වේලාව),
-				'generic' => q(බටහිර යුරෝපීය වේලාව),
-				'standard' => q(බටහිර යුරෝපීය සම්මත වේලාව),
+				'daylight' => q#බටහිර යුරෝපීය ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#බටහිර යුරෝපීය වේලාව#,
+				'standard' => q#බටහිර යුරෝපීය සම්මත වේලාව#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(ෆෝක්ලන්ඩ් දූපත් ග්‍රීෂ්ම කාලය),
-				'generic' => q(ෆෝක්ලන්ඩ් දූපත් වේලාව),
-				'standard' => q(ෆෝක්ලන්ඩ් දූපත් සම්මත වේලාව),
+				'daylight' => q#ෆෝක්ලන්ඩ් දූපත් ග්‍රීෂ්ම කාලය#,
+				'generic' => q#ෆෝක්ලන්ඩ් දූපත් වේලාව#,
+				'standard' => q#ෆෝක්ලන්ඩ් දූපත් සම්මත වේලාව#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(ෆිජි ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ෆිජි වේලාව),
-				'standard' => q(ෆිජි සම්මත වේලාව),
+				'daylight' => q#ෆිජි ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ෆිජි වේලාව#,
+				'standard' => q#ෆිජි සම්මත වේලාව#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(ප්‍රංශ ගයනා වේලාව),
+				'standard' => q#ප්‍රංශ ගයනා වේලාව#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(ප්‍රංශ දකුණුදිග සහ ඇන්ටාර්ක්ටික් වේලාව),
+				'standard' => q#ප්‍රංශ දකුණුදිග සහ ඇන්ටාර්ක්ටික් වේලාව#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(ග්‍රිනිච් මධ්‍යම වේලාව),
+				'standard' => q#ග්‍රිනිච් මධ්‍යම වේලාව#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(ගලපගොස් වේලාව),
+				'standard' => q#ගලපගොස් වේලාව#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(ගැම්බියර් වේලාව),
+				'standard' => q#ගැම්බියර් වේලාව#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(ජෝර්ජියානු ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ජෝර්ජියානු වේලාව),
-				'standard' => q(ජෝර්ජියානු සම්මත වේලාව),
+				'daylight' => q#ජෝර්ජියානු ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ජෝර්ජියානු වේලාව#,
+				'standard' => q#ජෝර්ජියානු සම්මත වේලාව#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(ගිල්බර්ට් දුපත් වේලාව),
+				'standard' => q#ගිල්බර්ට් දුපත් වේලාව#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(නැගෙනහිර ග්‍රීන්ලන්ත ග්‍රීෂ්ම කාලය),
-				'generic' => q(නැගෙනහිර ග්‍රීන්ලන්ත වේලාව),
-				'standard' => q(නැගෙනහිර ග්‍රීන්ලන්ත සම්මත වේලාව),
+				'daylight' => q#නැගෙනහිර ග්‍රීන්ලන්ත ග්‍රීෂ්ම කාලය#,
+				'generic' => q#නැගෙනහිර ග්‍රීන්ලන්ත වේලාව#,
+				'standard' => q#නැගෙනහිර ග්‍රීන්ලන්ත සම්මත වේලාව#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(බටහිර ග්‍රීන්ලන්ත ග්‍රීෂ්ම කාලය),
-				'generic' => q(බටහිර ග්‍රීන්ලන්ත වේලාව),
-				'standard' => q(බටහිර ග්‍රීන්ලන්ත සම්මත වේලාව),
+				'daylight' => q#බටහිර ග්‍රීන්ලන්ත ග්‍රීෂ්ම කාලය#,
+				'generic' => q#බටහිර ග්‍රීන්ලන්ත වේලාව#,
+				'standard' => q#බටහිර ග්‍රීන්ලන්ත සම්මත වේලාව#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(ගල්ෆ් වේලාව),
+				'standard' => q#ගල්ෆ් වේලාව#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(ගයනා වේලාව),
+				'standard' => q#ගයනා වේලාව#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(හවායි-අලෙයුතියාන් දිවාආලෝක වේලාව),
-				'generic' => q(හවායි-අලෙයුතියාන් වේලාව),
-				'standard' => q(හවායි-අලෙයුතියාන් සම්මත වේලාව),
+				'daylight' => q#හවායි-අලෙයුතියාන් දිවාආලෝක වේලාව#,
+				'generic' => q#හවායි-අලෙයුතියාන් වේලාව#,
+				'standard' => q#හවායි-අලෙයුතියාන් සම්මත වේලාව#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(හොංකොං ග්‍රීෂ්ම වේලාව),
-				'generic' => q(හොංකොං වේලාව),
-				'standard' => q(හොංකොං සම්මත වේලාව),
+				'daylight' => q#හොංකොං ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#හොංකොං වේලාව#,
+				'standard' => q#හොංකොං සම්මත වේලාව#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(හොව්ඩ් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(හොව්ඩ් වේලාව),
-				'standard' => q(හොව්ඩ් සම්මත වේලාව),
+				'daylight' => q#හොව්ඩ් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#හොව්ඩ් වේලාව#,
+				'standard' => q#හොව්ඩ් සම්මත වේලාව#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(ඉන්දියානු වේලාව),
+				'standard' => q#ඉන්දියානු වේලාව#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -6304,245 +6621,245 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(ඉන්දියන් සාගර වේලාව),
+				'standard' => q#ඉන්දියන් සාගර වේලාව#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(ඉන්දුචීන වේලාව),
+				'standard' => q#ඉන්දුචීන වේලාව#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(මධ්‍යම ඉන්දුනීසියානු වේලාව),
+				'standard' => q#මධ්‍යම ඉන්දුනීසියානු වේලාව#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(නැගෙනහිර ඉන්දුනීසියානු වේලාව),
+				'standard' => q#නැගෙනහිර ඉන්දුනීසියානු වේලාව#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(බටහිර ඉන්දුනීසියානු වේලාව),
+				'standard' => q#බටහිර ඉන්දුනීසියානු වේලාව#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(ඉරාන දිවා කාලය),
-				'generic' => q(ඉරාන වේලාව),
-				'standard' => q(ඉරාන සම්මත වේලාව),
+				'daylight' => q#ඉරාන දිවා කාලය#,
+				'generic' => q#ඉරාන වේලාව#,
+				'standard' => q#ඉරාන සම්මත වේලාව#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(ඉර්කුට්ස්ක් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ඉර්කුට්ස්ක් වේලාව),
-				'standard' => q(ඉර්කුට්ස්ක් සම්මත වේලාව),
+				'daylight' => q#ඉර්කුට්ස්ක් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ඉර්කුට්ස්ක් වේලාව#,
+				'standard' => q#ඉර්කුට්ස්ක් සම්මත වේලාව#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(ඊශ්‍රායල දහවල් වේලාව),
-				'generic' => q(ඊශ්‍රායල වේලාව),
-				'standard' => q(ඊශ්‍රායල සම්මත වේලාව),
+				'daylight' => q#ඊශ්‍රායල දහවල් වේලාව#,
+				'generic' => q#ඊශ්‍රායල වේලාව#,
+				'standard' => q#ඊශ්‍රායල සම්මත වේලාව#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(ජපාන දහවල් වේලාව),
-				'generic' => q(ජපාන වේලාව),
-				'standard' => q(ජපාන සම්මත වේලාව),
+				'daylight' => q#ජපාන දහවල් වේලාව#,
+				'generic' => q#ජපාන වේලාව#,
+				'standard' => q#ජපාන සම්මත වේලාව#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(නැගෙනහිර කසකස්තාන වේලාව),
+				'standard' => q#නැගෙනහිර කසකස්තාන වේලාව#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(බටහිර කසකස්තාන වේලාව),
+				'standard' => q#බටහිර කසකස්තාන වේලාව#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(කොරියානු දහවල් වේලාව),
-				'generic' => q(කොරියානු වේලාව),
-				'standard' => q(කොරියානු සම්මත වේලාව),
+				'daylight' => q#කොරියානු දහවල් වේලාව#,
+				'generic' => q#කොරියානු වේලාව#,
+				'standard' => q#කොරියානු සම්මත වේලාව#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(කොස්රේ වේලාව),
+				'standard' => q#කොස්රේ වේලාව#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(ක්‍රස්නොයාර්ස්ක් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ක්‍රස්නොයාර්ස්ක් වේලාව),
-				'standard' => q(ක්‍රස්නොයාර්ස්ක් සම්මත වේලාව),
+				'daylight' => q#ක්‍රස්නොයාර්ස්ක් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ක්‍රස්නොයාර්ස්ක් වේලාව#,
+				'standard' => q#ක්‍රස්නොයාර්ස්ක් සම්මත වේලාව#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(කිර්ගිස්තාන වේලාව),
+				'standard' => q#කිර්ගිස්තාන වේලාව#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(ශ්‍රී ලංකා වේලාව),
+				'standard' => q#ශ්‍රී ලංකා වේලාව#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(ලයින් දුපත් වේලාව),
+				'standard' => q#ලයින් දුපත් වේලාව#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(ලෝර්ඩ් හෝව් දිවා වේලාව),
-				'generic' => q(ලෝර්ඩ් හෝව් වේලාව),
-				'standard' => q(ලෝර්ඩ් හෝව් සම්මත වේලාව),
+				'daylight' => q#ලෝර්ඩ් හෝව් දිවා වේලාව#,
+				'generic' => q#ලෝර්ඩ් හෝව් වේලාව#,
+				'standard' => q#ලෝර්ඩ් හෝව් සම්මත වේලාව#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(මැක්කුඅරි දුපත් වේලාව),
+				'standard' => q#මැක්කුඅරි දුපත් වේලාව#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(මෙගඩන් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(මෙගඩන් වේලාව),
-				'standard' => q(මෙගඩන් සම්මත වේලාව),
+				'daylight' => q#මෙගඩන් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#මෙගඩන් වේලාව#,
+				'standard' => q#මෙගඩන් සම්මත වේලාව#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(මැලේසියානු වේලාව),
+				'standard' => q#මැලේසියානු වේලාව#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(මාලදිවයින් වේලාව),
+				'standard' => q#මාලදිවයින් වේලාව#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(මාර්කුඑසාස් වේලාව),
+				'standard' => q#මාර්කුඑසාස් වේලාව#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(මාර්ෂල් දුපත් වේලාව),
+				'standard' => q#මාර්ෂල් දුපත් වේලාව#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(මුරුසි ග්‍රීෂ්ම කාලය),
-				'generic' => q(මුරුසි වේලාව),
-				'standard' => q(මුරුසි සම්මත වේලාව),
+				'daylight' => q#මුරුසි ග්‍රීෂ්ම කාලය#,
+				'generic' => q#මුරුසි වේලාව#,
+				'standard' => q#මුරුසි සම්මත වේලාව#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(මොව්සන් වේලාව),
+				'standard' => q#මොව්සන් වේලාව#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(වයඹ මෙක්සිකෝ දිවාආලෝක වේලාව),
-				'generic' => q(වයඹ මෙක්සිකෝ වේලාව),
-				'standard' => q(වයඹ මෙක්සිකෝ සම්මත වේලාව),
+				'daylight' => q#වයඹ මෙක්සිකෝ දිවාආලෝක වේලාව#,
+				'generic' => q#වයඹ මෙක්සිකෝ වේලාව#,
+				'standard' => q#වයඹ මෙක්සිකෝ සම්මත වේලාව#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(මෙක්සිකෝ පැසිෆික් දිවාආලෝක වේලාව),
-				'generic' => q(මෙක්සිකෝ පැසිෆික් වේලාව),
-				'standard' => q(මෙක්සිකෝ පැසිෆික් සම්මත වේලාව),
+				'daylight' => q#මෙක්සිකෝ පැසිෆික් දිවාආලෝක වේලාව#,
+				'generic' => q#මෙක්සිකෝ පැසිෆික් වේලාව#,
+				'standard' => q#මෙක්සිකෝ පැසිෆික් සම්මත වේලාව#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(උලාන් බාටර් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(උලාන් බාටර් වේලාව),
-				'standard' => q(උලාන් බාටර් සම්මත වේලාව),
+				'daylight' => q#උලාන් බාටර් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#උලාන් බාටර් වේලාව#,
+				'standard' => q#උලාන් බාටර් සම්මත වේලාව#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(මොස්කව් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(මොස්කව් වේලාව),
-				'standard' => q(මොස්කව් සම්මත වේලාව),
+				'daylight' => q#මොස්කව් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#මොස්කව් වේලාව#,
+				'standard' => q#මොස්කව් සම්මත වේලාව#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(මියන්මාර් වේලාව),
+				'standard' => q#මියන්මාර් වේලාව#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(නාවුරු වේලාව),
+				'standard' => q#නාවුරු වේලාව#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(නේපාල වේලාව),
+				'standard' => q#නේපාල වේලාව#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(නව සෙලඩොනියානු ග්‍රීෂ්ම වේලාව),
-				'generic' => q(නව සෙලඩොනියානු වේලාව),
-				'standard' => q(නව සෙලඩොනියානු සම්මත වේලාව),
+				'daylight' => q#නව සෙලඩොනියානු ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#නව සෙලඩොනියානු වේලාව#,
+				'standard' => q#නව සෙලඩොනියානු සම්මත වේලාව#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(නවසීලන්ත දිවා වේලාව),
-				'generic' => q(නවසීලන්ත වේලාව),
-				'standard' => q(නවසීලන්ත සම්මත වේලාව),
+				'daylight' => q#නවසීලන්ත දිවා වේලාව#,
+				'generic' => q#නවසීලන්ත වේලාව#,
+				'standard' => q#නවසීලන්ත සම්මත වේලාව#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(නිව්ෆවුන්ලන්ත දිවාආලෝක වේලාව),
-				'generic' => q(නිව්ෆවුන්ලන්ත වේලාව),
-				'standard' => q(නිව්ෆවුන්ලන්ත සම්මත වේලාව),
+				'daylight' => q#නිව්ෆවුන්ලන්ත දිවාආලෝක වේලාව#,
+				'generic' => q#නිව්ෆවුන්ලන්ත වේලාව#,
+				'standard' => q#නිව්ෆවුන්ලන්ත සම්මත වේලාව#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(නියු වේලාව),
+				'standard' => q#නියු වේලාව#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(නොෆොල්ක් දුපත් වේලාව),
+				'standard' => q#නොෆොල්ක් දුපත් වේලාව#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(ෆර්නැන්ඩෝ ඩි නොරොන්හා ග්‍රීෂ්ම කාලය),
-				'generic' => q(ෆර්නැන්ඩෝ ඩි නොරොන්හා වේලාව),
-				'standard' => q(ෆර්නැන්ඩෝ ඩි නොරොන්හා සම්මත වේලාව),
+				'daylight' => q#ෆර්නැන්ඩෝ ඩි නොරොන්හා ග්‍රීෂ්ම කාලය#,
+				'generic' => q#ෆර්නැන්ඩෝ ඩි නොරොන්හා වේලාව#,
+				'standard' => q#ෆර්නැන්ඩෝ ඩි නොරොන්හා සම්මත වේලාව#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(නොවසිබිර්ස්ක් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(නොවසිබිර්ස්ක් වේලාව),
-				'standard' => q(නොවසිබිර්ස්ක් සම්මත වේලාව),
+				'daylight' => q#නොවසිබිර්ස්ක් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#නොවසිබිර්ස්ක් වේලාව#,
+				'standard' => q#නොවසිබිර්ස්ක් සම්මත වේලාව#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(ඔම්ස්ක් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ඔම්ස්ක් වේලාව),
-				'standard' => q(ඔම්ස්ක් සම්මත වේලාව),
+				'daylight' => q#ඔම්ස්ක් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ඔම්ස්ක් වේලාව#,
+				'standard' => q#ඔම්ස්ක් සම්මත වේලාව#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -6664,231 +6981,236 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(පාකිස්ථාන ග්‍රීෂ්ම කාලය),
-				'generic' => q(පාකිස්ථාන වේලාව),
-				'standard' => q(පාකිස්ථාන සම්මත වේලාව),
+				'daylight' => q#පාකිස්ථාන ග්‍රීෂ්ම කාලය#,
+				'generic' => q#පාකිස්ථාන වේලාව#,
+				'standard' => q#පාකිස්ථාන සම්මත වේලාව#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(පලාවු වේලාව),
+				'standard' => q#පලාවු වේලාව#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(පැපුවා නිව් ගිනීයා වේලාව),
+				'standard' => q#පැපුවා නිව් ගිනීයා වේලාව#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(පැරගුවේ ග්‍රීෂ්ම කාලය),
-				'generic' => q(පැරගුවේ වේලාව),
-				'standard' => q(පැරගුවේ සම්මත වේලාව),
+				'daylight' => q#පැරගුවේ ග්‍රීෂ්ම කාලය#,
+				'generic' => q#පැරගුවේ වේලාව#,
+				'standard' => q#පැරගුවේ සම්මත වේලාව#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(පේරු ග්‍රීෂ්ම කාලය),
-				'generic' => q(පේරු වේලාව),
-				'standard' => q(පේරු සම්මත වේලාව),
+				'daylight' => q#පේරු ග්‍රීෂ්ම කාලය#,
+				'generic' => q#පේරු වේලාව#,
+				'standard' => q#පේරු සම්මත වේලාව#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(පිලිපීන ග්‍රීෂ්ම වේලාව),
-				'generic' => q(පිලිපීන වේලාව),
-				'standard' => q(පිලිපීන සම්මත වේලාව),
+				'daylight' => q#පිලිපීන ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#පිලිපීන වේලාව#,
+				'standard' => q#පිලිපීන සම්මත වේලාව#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(ෆීනික්ස් දුපත් වේලාව),
+				'standard' => q#ෆීනික්ස් දුපත් වේලාව#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(ශාන්ත පියරේ සහ මැකෝලන් දිවාආලෝක වේලාව),
-				'generic' => q(ශාන්ත පියරේ සහ මැකෝලන් වේලාව),
-				'standard' => q(ශාන්ත පියරේ සහ මැකෝලන් සම්මත වේලාව),
+				'daylight' => q#ශාන්ත පියරේ සහ මැකෝලන් දිවාආලෝක වේලාව#,
+				'generic' => q#ශාන්ත පියරේ සහ මැකෝලන් වේලාව#,
+				'standard' => q#ශාන්ත පියරේ සහ මැකෝලන් සම්මත වේලාව#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(පිට්කෙයාන් වේලාව),
+				'standard' => q#පිට්කෙයාන් වේලාව#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(පොනපේ වේලාව),
+				'standard' => q#පොනපේ වේලාව#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#ප්යොන්ග්යන් වේලාව#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(රියුනියන් වේලාව),
+				'standard' => q#රියුනියන් වේලාව#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(රොතෙරා වේලාව),
+				'standard' => q#රොතෙරා වේලාව#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(සඛලින් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(සඛලින් වේලාව),
-				'standard' => q(සඛලින් සම්මත වේලාව),
+				'daylight' => q#සඛලින් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#සඛලින් වේලාව#,
+				'standard' => q#සඛලින් සම්මත වේලාව#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(සැමෝවා ග්‍රීෂ්ම වේලාව),
-				'generic' => q(සැමෝවා වේලාව),
-				'standard' => q(සැමෝවා සම්මත වේලාව),
+				'daylight' => q#සැමෝවා ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#සැමෝවා වේලාව#,
+				'standard' => q#සැමෝවා සම්මත වේලාව#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(සීෂෙල්ස් වේලාව),
+				'standard' => q#සීෂෙල්ස් වේලාව#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(සිංගප්පුරු වේලාව),
+				'standard' => q#සිංගප්පුරු වේලාව#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(සොලොමන් දූපත් වේලාව),
+				'standard' => q#සොලොමන් දූපත් වේලාව#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(දකුණු ජෝජියා වේලාව),
+				'standard' => q#දකුණු ජෝජියා වේලාව#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(සුරිනාම වේලාව),
+				'standard' => q#සුරිනාම වේලාව#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(ස්යෝවා වේලාව),
+				'standard' => q#ස්යෝවා වේලාව#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(ටාහිටි වේලාව),
+				'standard' => q#ටාහිටි වේලාව#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(තායිපේ දහවල් වේලාව),
-				'generic' => q(තායිපේ වේලාව),
-				'standard' => q(තායිපේ සම්මත වේලාව),
+				'daylight' => q#තායිපේ දහවල් වේලාව#,
+				'generic' => q#තායිපේ වේලාව#,
+				'standard' => q#තායිපේ සම්මත වේලාව#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(ටජිකිස්තාන වේලාව),
+				'standard' => q#ටජිකිස්තාන වේලාව#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(ටොකෙලාවු වේලාව),
+				'standard' => q#ටොකෙලාවු වේලාව#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(ටොංගා ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ටොංගා වේලාව),
-				'standard' => q(ටොංගා සම්මත වේලාව),
+				'daylight' => q#ටොංගා ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ටොංගා වේලාව#,
+				'standard' => q#ටොංගා සම්මත වේලාව#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(චුක් වේලාව),
+				'standard' => q#චුක් වේලාව#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(ටර්ක්මෙනිස්තාන ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ටර්ක්මෙනිස්තාන වේලාව),
-				'standard' => q(ටර්ක්මෙනිස්තාන සම්මත වේලාව),
+				'daylight' => q#ටර්ක්මෙනිස්තාන ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ටර්ක්මෙනිස්තාන වේලාව#,
+				'standard' => q#ටර්ක්මෙනිස්තාන සම්මත වේලාව#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(ටුවාලු වේලාව),
+				'standard' => q#ටුවාලු වේලාව#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(උරුගුවේ ග්‍රීෂ්ම කාලය),
-				'generic' => q(උරුගුවේ වේලාව),
-				'standard' => q(උරුගුවේ සම්මත වේලාව),
+				'daylight' => q#උරුගුවේ ග්‍රීෂ්ම කාලය#,
+				'generic' => q#උරුගුවේ වේලාව#,
+				'standard' => q#උරුගුවේ සම්මත වේලාව#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(උස්බෙකිස්තාන ග්‍රීෂ්ම වේලාව),
-				'generic' => q(උස්බෙකිස්තාන වේලාව),
-				'standard' => q(උස්බෙකිස්තාන සම්මත වේලාව),
+				'daylight' => q#උස්බෙකිස්තාන ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#උස්බෙකිස්තාන වේලාව#,
+				'standard' => q#උස්බෙකිස්තාන සම්මත වේලාව#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(වනුආටු ගිම්හාන වේලාව),
-				'generic' => q(වනුආටු වේලාව),
-				'standard' => q(වනුආටු සම්මත වේලාව),
+				'daylight' => q#වනුආටු ගිම්හාන වේලාව#,
+				'generic' => q#වනුආටු වේලාව#,
+				'standard' => q#වනුආටු සම්මත වේලාව#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(වෙනිසියුලා වේලාව),
+				'standard' => q#වෙනිසියුලා වේලාව#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(ව්ලදිවෝස්ටෝක් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(ව්ලදිවෝස්ටෝක් වේලාව),
-				'standard' => q(ව්ලදිවෝස්ටෝක් සම්මත වේලාව),
+				'daylight' => q#ව්ලදිවෝස්ටෝක් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#ව්ලදිවෝස්ටෝක් වේලාව#,
+				'standard' => q#ව්ලදිවෝස්ටෝක් සම්මත වේලාව#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(වොල්ගොග්‍රාඩ් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(වොල්ගොග්‍රාඩ් වේලාව),
-				'standard' => q(වොල්ගොග්‍රාඩ් සම්මත වේලාව),
+				'daylight' => q#වොල්ගොග්‍රාඩ් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#වොල්ගොග්‍රාඩ් වේලාව#,
+				'standard' => q#වොල්ගොග්‍රාඩ් සම්මත වේලාව#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(වොස්ටොක් වේලාව),
+				'standard' => q#වොස්ටොක් වේලාව#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(වේක් දූපත් වේලාව),
+				'standard' => q#වේක් දූපත් වේලාව#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(වැලිස් සහ ෆුටුනා වේලාව),
+				'standard' => q#වැලිස් සහ ෆුටුනා වේලාව#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(යකුට්ස්ක් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(යකුට්ස්ක් වේලාව),
-				'standard' => q(යකුට්ස්ක් සම්මත වේලාව),
+				'daylight' => q#යකුට්ස්ක් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#යකුට්ස්ක් වේලාව#,
+				'standard' => q#යකුට්ස්ක් සම්මත වේලාව#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(යෙකටෙරින්බර්ග් ග්‍රීෂ්ම වේලාව),
-				'generic' => q(යෙකටෙරින්බර්ග් වේලාව),
-				'standard' => q(යෙකටෙරින්බර්ග් සම්මත වේලාව),
+				'daylight' => q#යෙකටෙරින්බර්ග් ග්‍රීෂ්ම වේලාව#,
+				'generic' => q#යෙකටෙරින්බර්ග් වේලාව#,
+				'standard' => q#යෙකටෙරින්බර්ග් සම්මත වේලාව#,
 			},
 		},
 	 } }

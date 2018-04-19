@@ -70,7 +70,7 @@ use AnyEvent::Util ();
 
 use Errno ();
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 =head2 METHODS
 
@@ -188,6 +188,8 @@ sub new {
    # to versions of itself older than 3.0.
    my ($client, $server) = AnyEvent::Util::portable_socketpair
       or croak "unable to create AnyEvent::DBI communications pipe: $!";
+
+   AnyEvent::fh_unblock $client;
 
    my $fork = delete $arg{fork_template};
 

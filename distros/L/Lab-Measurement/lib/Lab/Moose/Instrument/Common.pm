@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::Common;
 #ABSTRACT: Role for common commands declared mandatory by IEEE 488.2
-$Lab::Moose::Instrument::Common::VERSION = '3.630';
+$Lab::Moose::Instrument::Common::VERSION = '3.631';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -73,7 +73,7 @@ Lab::Moose::Instrument::Common - Role for common commands declared mandatory by 
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 METHODS
 

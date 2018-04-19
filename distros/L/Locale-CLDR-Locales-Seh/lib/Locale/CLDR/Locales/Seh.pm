@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Seh - Package for language Sena
 
 package Locale::CLDR::Locales::Seh;
 # This file auto generated from Data\common\main\seh.xml
-#	on Fri 29 Apr  7:23:59 pm GMT
+#	on Fri 13 Apr  7:27:40 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,7 +328,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a á à â ã b c ç d e é ê f g h i í j k l m n o ó ò ô õ p q r s t u ú v w x y z])},
+			main => qr{[a á à â ã b c ç d e é ê f g h i í j k l m n o ó ò ô õ p q r s t u ú v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

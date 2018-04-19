@@ -3,15 +3,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 99;
+use Test::More tests => 98;
 
 use Math::BigInt::Lite;
 
 my $c = 'Math::BigInt::Lite';
 my $mbi = 'Math::BigInt';
 
-is(Math::BigInt::Lite->config()->{version}, $Math::BigInt::VERSION);
-is(Math::BigInt::Lite->config()->{version_lite}, $Math::BigInt::Lite::VERSION);
+is(Math::BigInt::Lite->config("version"), $Math::BigInt::Lite::VERSION,
+   qq|Math::BigInt::Lite->config("version")|);
 
 my ($x, $y, $z);
 

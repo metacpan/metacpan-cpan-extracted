@@ -1,23 +1,25 @@
 package Pcore::RPC::Tmpl;
 
 use Pcore;
-use Pcore::AE::Handle;
 use AnyEvent::Util;
 use Pcore::Util::Data qw[from_cbor];
 
 our ( $CPID, $R, $W, $QUEUE );
 
 END {
-    kill 'KILL', $CPID if defined $CPID;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+    kill 'TERM', $CPID if defined $CPID;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 }
 
-_fork_template();
+_fork_tmpl();
 
-sub _fork_template {
+sub _fork_tmpl {
     my ( $r1, $w1 ) = AnyEvent::Util::portable_pipe();
     ( my $r2, $W ) = AnyEvent::Util::portable_pipe();
 
     if ( $CPID = fork ) {
+        Pcore::_CORE_INIT_AFTER_FORK();
+
+        require Pcore::AE::Handle;
 
         # parent
         close $w1 or die $!;
@@ -67,10 +69,11 @@ sub _fork_template {
 }
 
 sub _tmpl_proc ( $r, $w ) {
-    require Pcore::RPC::Server;
 
     # child
     $0 = 'Pcore::RPC::Tmpl';    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+    local $SIG{TERM} = sub { exit 128 + 15 };
 
     while (1) {
         sysread $r, my $len, 4 or die $!;
@@ -80,6 +83,8 @@ sub _tmpl_proc ( $r, $w ) {
         if ( !fork ) {
             close $r or die $!;
 
+            undef $SIG{TERM};
+
             _rpc_proc( $w, P->data->from_cbor($data) );
         }
     }
@@ -88,10 +93,14 @@ sub _tmpl_proc ( $r, $w ) {
 }
 
 sub _rpc_proc ( $w, $data ) {
+    Pcore::_CORE_INIT_AFTER_FORK();
+
+    require Pcore::RPC::Server;
+
     $0 = $data->{type};    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     # redefine watcher in the forked process
-    $SIG->{TERM} = AE::signal TERM => sub { POSIX::_exit 128 + 15 };
+    $SIG->{TERM} = AE::signal TERM => sub { exit 128 + 15 };
 
     P->class->load( $data->{type} );
 
@@ -111,6 +120,7 @@ sub run ( $type, $args, $cb ) {
         id        => $id,
         scandeps  => $ENV->{SCAN_DEPS} ? 1 : undef,
         type      => $type,
+        parent_id => $args->{parent_id},
         listen    => $args->{listen},
         token     => $args->{token},
         buildargs => $args->{buildargs},
@@ -132,6 +142,16 @@ sub DESTROY ($self) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 20, 96               | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

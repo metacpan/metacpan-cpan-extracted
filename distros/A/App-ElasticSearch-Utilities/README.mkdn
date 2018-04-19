@@ -4,7 +4,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 # VERSION
 
-version 5.5
+version 5.6
 
 # SYNOPSIS
 
@@ -334,7 +334,7 @@ can all be set in the globals file.
 
         '*'    expanded to '.*'
         'ANY'  expanded to '.*'
-        'DATE' expanded to a pattern to match a date, based on datesep
+        'DATE' expanded to a pattern to match a date,
 
     The indexes are compared against this pattern.
 
@@ -483,7 +483,7 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/App-ElasticSearch-Utilities](http://metacpan.org/release/App-ElasticSearch-Utilities)
+    [https://metacpan.org/release/App-ElasticSearch-Utilities](https://metacpan.org/release/App-ElasticSearch-Utilities)
 
 - RT: CPAN's Bug Tracker
 

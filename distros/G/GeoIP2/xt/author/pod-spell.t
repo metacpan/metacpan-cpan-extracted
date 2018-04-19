@@ -33,6 +33,7 @@ Client
 ConnectionType
 Continent
 Country
+Cronin
 Database
 Dave
 Domain
@@ -112,6 +113,8 @@ Oschwald
 Oschwald's
 Oxfordshire
 
+Patrick
+PatrickCronin
 PayPal
 Postal
 Ragwitz

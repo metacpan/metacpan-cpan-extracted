@@ -44,7 +44,6 @@
             "File::HomeDir" : "0",
             "File::Path" : "0",
             "Hash::Merge" : "0.12",
-            "IO::File" : "0",
             "JSON" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
@@ -75,6 +74,7 @@
             "Config::Model::Tester" : "2.062",
             "Config::Model::Tester::Setup" : "0",
             "File::Copy" : "0",
+            "IO::File" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::File::Contents" : "0",
@@ -98,7 +98,7 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.120",
+   "version" : "2.122",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Es::Any::Uy - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Uy;
 # This file auto generated from Data\common\main\es_UY.xml
-#	on Fri 29 Apr  7:00:53 pm GMT
+#	on Fri 13 Apr  7:08:41 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -170,24 +171,24 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
@@ -201,6 +202,40 @@ around day_period_data => sub {
 	my ($orig, $self) = @_;
 	return $self->$orig;
 };
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'wide' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+				'abbreviated' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+			},
+			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+				'wide' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
+				'narrow' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+			},
+		},
+	} },
+);
 
 has 'eras' => (
 	is			=> 'ro',
@@ -273,9 +308,9 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Uruguay' => {
 			short => {
-				'daylight' => q(UYST),
-				'generic' => q(UYT),
-				'standard' => q(UYT),
+				'daylight' => q#UYST#,
+				'generic' => q#UYT#,
+				'standard' => q#UYT#,
 			},
 		},
 	 } }

@@ -1,20 +1,23 @@
 package Struct::Match;
-use 5.006; use strict; use warnings; no warnings qw(void); use utf8; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; no warnings qw(void); use utf8; our $VERSION = '0.04';
 use Combine::Keys qw/combine_keys/; use base 'Import::Export';
 our %STRUCT; our %EX = ('match' => ['all'], '%STRUCT' => ['struct', 'all']); 
 BEGIN {
 	%STRUCT = (
-		SCALAR => sub {my $q = quotemeta($_[1]); $_[0] =~ m±^($q)$±;},
-		HASH => sub {$STRUCT{ADDR}($_[0], $_[1]) or do { match($_[0]->{$_}, $_[1]->{$_}) or return for combine_keys($_[0], $_[1]); 1 };},
-		ARRAY => sub {my $c = scalar @{$_[0]}; $STRUCT{ADDR}($_[0], $_[1]) or $c == scalar @{$_[1]} && (grep { match($_[0]->[$_], $_[1]->[$_] ) } 0 .. ($c - 1)) == $c and 1;},
-		ADDR => sub {0 + $_[0] == 0 + $_[1];}, # thou shall not pass/work if the object has + overloaded
-		CHECK => sub {my $t = $STRUCT{REFTYPE}($_[0]); $t eq $STRUCT{REFTYPE}($_[1]) && $STRUCT{$t}($_[0], $_[1]);},
+		SCALAR => sub {my $s; $STRUCT{SAME}($_[1], 'SCALAR') and do { $s = quotemeta($_[1]) } && $_[0] =~ m†^($s)$†;},
+		HASH => sub {$STRUCT{SAME}($_[1], 'HASH') and $STRUCT{ADDR}($_[0], $_[1]) || do {exists $_[0]->{$_} && exists $_[1]->{$_} && match($_[0]->{$_}, $_[1]->{$_}) or return for combine_keys($_[0], $_[1]); 1};},
+		ARRAY => sub {$STRUCT{SAME}($_[1], 'ARRAY') and ($STRUCT{ADDR}($_[0], $_[1]) or (grep { exists $_[0]->[$_] && exists $_[1]->[$_] && match($_[0]->[$_], $_[1]->[$_]) } 0 .. $#{$_[1]}) == scalar @{$_[0]});},
+		ADDR => sub {$STRUCT{SAME}($_[1], 'ADDR') && 0 + $_[0] == 0 + $_[1];}, # thou shall not pass/work if the object has + overloaded
+		CHECK => sub {my $t = $STRUCT{REFTYPE}($_[0]); $STRUCT{SAME}($_[1], $t) && $STRUCT{$t}($_[0], $_[1]);},
 		REFTYPE => sub {eval { $_[0]->[0] } ? 'ARRAY' : eval { $_[0]->{shamed}; 1 } ? 'HASH' : 'ADDR';},
-		REF => sub { my $r = ref($_[0]); $r && (exists $STRUCT{$r} &&  $r || 'CHECK') or 'SCALAR'; }
+		REF => sub { my $r = ref($_[0]); $r and (exists $STRUCT{$r} && $r || 'CHECK') or 'SCALAR'; },
+		SAME => sub { my $s = $STRUCT{REF}($_[0]); $s eq 'CHECK' && do { $s = $STRUCT{REFTYPE}($_[0]) }; $s eq $_[1]; },
+		QUOTE => sub { return quotemeta($_[0]) }
 		# currently we do not care about CODE|GLOB|REF|LVALUE|FORMAT|IO|VSTRING|Regexp.. other than doing ref address check hushh
 	);
 }
-sub match { my $o = $STRUCT{REF}($_[0]); $o eq $STRUCT{REF}($_[1]) && $STRUCT{$o}($_[0], $_[1]) or $_[2] && $o eq 'CHECK' && 1 or 0; }
+
+sub match { my $o = $STRUCT{REF}($_[0]); $STRUCT{$o}($_[0], $_[1]) or $_[2] && $o eq 'CHECK' && 1 or 0; }
 
 __END__
 
@@ -24,7 +27,7 @@ Struct::Match - Exact Match (SCALAR|HASH|ARRAY)'s.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

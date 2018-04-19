@@ -26,9 +26,8 @@ my $app = <: $module_name :>->new( {    #
             ssl    => 0,
         },
         api => {
-
-            # connect => $cfg->{_}->{auth},
-            rpc => {
+            connect => $cfg->{_}->{auth},
+            rpc     => {
                 workers => undef,
                 argon   => {
                     argon2_time        => 3,
@@ -44,11 +43,9 @@ my $app = <: $module_name :>->new( {    #
 
 my $cv = AE::cv;
 
-$app->run( sub ($app) {
-    $app->start_nginx();
+$app->run;
 
-    return;
-} );
+$app->start_nginx;
 
 $cv->recv;
 

@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "File::Copy::Recursive" : "0",
-            "Getopt::Std" : "0",
+            "Getopt::Long" : "0",
             "Log::Log4perl" : "1.11",
             "Path::Tiny" : "0",
             "Test::Differences" : "0",
@@ -54,7 +54,7 @@
          "web" : "http://github.com/dod38fr/config-model-tester.git"
       }
    },
-   "version" : "3.005",
+   "version" : "3.006",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

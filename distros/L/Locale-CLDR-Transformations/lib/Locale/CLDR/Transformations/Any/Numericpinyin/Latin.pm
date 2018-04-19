@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Numericpinyin::Latin;
 # This file auto generated from Data\common\transforms\Latin-NumericPinyin.xml
-#	on Fri 29 Apr  6:48:44 pm GMT
+#	on Fri 13 Apr  6:59:54 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -39,30 +40,30 @@ has 'transforms' => (
 			type => 'conversion',
 			data => [
 				{
-					before  => q((?^u:\p{letter})),
+					before  => q(\p{letter}),
 					after   => q(),
-					replace => q((?^u:([1-5]))),
+					replace => q(([1-5])),
 					result  => q(&NumericPinyin-Pinyin($1)),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:([aAeEiIoOuU \{ ü \} \{ Ü \} vV])((?[[a-z A-Z] - ([aAeEiIoOuU \{ ü \} \{ Ü \} vV])])*)([1-5]))),
+					replace => q(([aAeEiIoOuU \N{U+75.308} \N{U+55.308} vV])((?:(?![aAeEiIoOuU\N{U+75.308}\N{U+55.308}vV])[a-zA-Z])*)([1-5])),
 					result  => q($1&NumericPinyin-Pinyin($3)$2),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:([oO])((?[[aAeEiIoOuU \{ ü \} \{ Ü \} vV]-[aeAE]])*(?[[a-z A-Z] - ([aAeEiIoOuU \{ ü \} \{ Ü \} vV])])*)([1-5]))),
+					replace => q(([oO])((?:(?![aeAE])[aAeEiIoOuU\N{U+75.308}\N{U+55.308}vV])*(?:(?![aAeEiIoOuU\N{U+75.308}\N{U+55.308}vV])[a-zA-Z])*)([1-5])),
 					result  => q($1&NumericPinyin-Pinyin($3)$2),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:([aAeE])([aAeEiIoOuU \{ ü \} \{ Ü \} vV]*(?[[a-z A-Z] - ([aAeEiIoOuU \{ ü \} \{ Ü \} vV])])*)([1-5]))),
+					replace => q(([aAeE])([aAeEiIoOuU \N{U+75.308} \N{U+55.308} vV]*(?:(?![aAeEiIoOuU\N{U+75.308}\N{U+55.308}vV])[a-zA-Z])*)([1-5])),
 					result  => q($1&NumericPinyin-Pinyin($3)$2),
 					revisit => 0,
 				},

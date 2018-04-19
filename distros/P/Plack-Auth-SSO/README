@@ -44,6 +44,25 @@ SYNOPSIS
                 #not authenticated: do your internal work
                 #..
     
+                #authentication done in external application code, but here something went wrong..
+                unless ( $ok ) {
+    
+                    #error is set in auth_sso_error..
+                    $self->set_auth_sso_error(
+                        $session,
+                        {
+                            package => __PACKAGE__,
+                            package_id => $self->id,
+                            type => "connection_failed",
+                            content => ""
+                        }
+                    );
+    
+                    #user is redirected to error_path
+                    return [ 302, [ Location => $self->uri_for($self->error_path) ], [] ];
+    
+                }
+    
                 #everything ok: set auth_sso
                 $self->set_auth_sso(
                     $session,
@@ -82,7 +101,8 @@ SYNOPSIS
     
                 session_key => "auth_sso",
                 authorization_path => "/auth/myssoauth/callback",
-                uri_base => "http://localhost:5001"
+                uri_base => "http://localhost:5001",
+                error_path => "/auth/error"
     
             )->to_app;
     
@@ -102,6 +122,24 @@ SYNOPSIS
                 #process auth_sso (white list, roles ..)
     
                 [ 200, ["Content-Type" => "text/html"], ["logged in!"] ];
+    
+            };
+    
+            mount "/auth/error" => sub {
+    
+                my $env = shift;
+                my $session = Plack::Session->new($env);
+                my $auth_sso_error = $session->get("auth_sso_error");
+    
+                unless ( $auth_sso_error ) {
+    
+                    return [ 302, [ Location => $self->uri_for( "/" ) ], [] ];
+    
+                }
+    
+                [ 200, [ "Content-Type" => "text/plain" ], [
+                    $auth_sso_error->{content}
+                ]];
     
             };
     
@@ -179,6 +217,26 @@ CONFIG
       When authentication succeeds, this application should redirect you
       here
 
+    error_path
+
+      (internal) path of the error route. This path will be prepended by
+      "uri_base" to create the full url.
+
+      When authentication fails, this application should redirect you here
+
+      The implementor should expect this in the session key
+      "auth_sso_error" ( "_error" is appended to the configured session_key
+      ):
+
+          {
+              package => "Plack::Auth::SSO::TYPE",
+              package_id => "Plack::Auth::SSO::TYPE",
+              type => "my-error-type",
+              content => "Something went terribly wrong!"
+          }
+
+      Error types should be documented by the implementor.
+
     uri_for( path )
 
       method that prepends your path with "uri_base".
@@ -223,6 +281,23 @@ METHODS
             uid => "<uid>",
             info => {},
             extra => {}
+        }
+
+ get_auth_sso_error($plack_session)
+
+    get saved SSO error response from your session
+
+ set_auth_sso_error($plack_session,$hash)
+
+    save SSO error response to your session
+
+    $hash should be a hash ref, and look like this:
+
+        {
+            package => __PACKAGE__,
+            package_id => __PACKAGE__ ,
+            type => "my-type",
+            content => "my-content"
         }
 
 EXAMPLES

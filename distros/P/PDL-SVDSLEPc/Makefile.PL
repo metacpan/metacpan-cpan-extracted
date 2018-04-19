@@ -2,7 +2,7 @@ use PDL::Core::Dev;
 use ExtUtils::MakeMaker;
 
 ##-- read in user variables
-do "Config.PL";
+do "./Config.PL";
 die "$0: reading 'Config.PL' failed: $@" if ($@);
 
 ##-- pdlmaker stuff
@@ -60,7 +60,7 @@ SVDSLEPC_CCFLAGS = $::cconfig{SVDSLEPC_CCFLAGS}
 SVDSLEPC_LDFLAGS  = $::cconfig{SVDSLEPC_LDFLAGS}
 
 #CCFLAGS_perl := \${CCFLAGS}
-include \$(SLEPC_DIR)/conf/slepc_variables
+include \$(SLEPC_DIR)/lib/slepc/conf/slepc_variables
 
 ##-- restore cached variables
 GZIP := \${GZIP_SAVE}

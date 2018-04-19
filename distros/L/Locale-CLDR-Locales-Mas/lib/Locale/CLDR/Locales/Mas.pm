@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Mas - Package for language Masai
 
 package Locale::CLDR::Locales::Mas;
 # This file auto generated from Data\common\main\mas.xml
-#	on Fri 29 Apr  7:16:09 pm GMT
+#	on Fri 13 Apr  7:19:13 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -339,9 +340,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[f q v x z])},
+			auxiliary => qr{[f q v x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'G', 'H', 'I', 'Ɨ', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'Ʉ', 'W', 'Y'],
-			main => qr{(?^u:[a á à â ā b c d e é è ê ē ɛ g h i í ì î ī ɨ j k l m n {ny} ŋ o ó ò ô ō ɔ p r {rr} s {sh} t u ú ù û ū ʉ {ʉ́} w {wu} y {yi}])},
+			main => qr{[a á à â ā b c d e é è ê ē ɛ g h i í ì î ī ɨ j k l m n {ny} ŋ o ó ò ô ō ɔ p r {rr} s {sh} t u ú ù û ū ʉ {ʉ́} w {wu} y {yi}]},
 		};
 	},
 EOT
@@ -819,11 +820,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{Ɛndámâ},
-					'am' => q{Ɛnkakɛnyá},
-				},
 				'abbreviated' => {
+					'am' => q{Ɛnkakɛnyá},
+					'pm' => q{Ɛndámâ},
+				},
+				'wide' => {
 					'am' => q{Ɛnkakɛnyá},
 					'pm' => q{Ɛndámâ},
 				},

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Yo::Any::Bj - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo::Any::Bj;
 # This file auto generated from Data\common\main\yo_BJ.xml
-#	on Fri 29 Apr  7:32:23 pm GMT
+#	on Fri 13 Apr  7:34:32 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -262,7 +263,6 @@ has 'display_name_region' => (
  			'US' => 'Orílɛ́ède Orilɛede Amerika',
  			'UY' => 'Orílɛ́ède Nruguayi',
  			'UZ' => 'Orílɛ́ède Nshibɛkisitani',
- 			'VA' => 'Orílɛ́ède Fatikani',
  			'VC' => 'Orílɛ́ède Fisɛnnti ati Genadina',
  			'VE' => 'Orílɛ́ède Fɛnɛshuɛla',
  			'VG' => 'Orílɛ́ède Etíkun Fágínì ti ìlú Bírítísì',
@@ -290,7 +290,7 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			main => qr{(?^u:[a á à b d e é è ɛ {ɛ́} {ɛ̀} f g {gb} h i í ì j k l m n o ó ò ɔ {ɔ́} {ɔ̀} p r s {sh} t u ú ù w y])},
+			main => qr{[a á à b d e é è ɛ {ɛ́} {ɛ̀} f g {gb} h i í ì j k l m n o ó ò ɔ {ɔ́} {ɔ̀} p r s {sh} t u ú ù w y]},
 		};
 	},
 EOT
@@ -634,6 +634,46 @@ has 'calendar_months' => (
 						],
 					},
 				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'Shɛ́rɛ́',
+							'Èrèlè',
+							'Ɛrɛ̀nà',
+							'Ìgbé',
+							'Ɛ̀bibi',
+							'Òkúdu',
+							'Agɛmɔ',
+							'Ògún',
+							'Owewe',
+							'Ɔ̀wàrà',
+							'Bélú',
+							'Ɔ̀pɛ̀'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'Oshù Shɛ́rɛ́',
+							'Oshù Èrèlè',
+							'Oshù Ɛrɛ̀nà',
+							'Oshù Ìgbé',
+							'Oshù Ɛ̀bibi',
+							'Oshù Òkúdu',
+							'Oshù Agɛmɔ',
+							'Oshù Ògún',
+							'Oshù Owewe',
+							'Oshù Ɔ̀wàrà',
+							'Oshù Bélú',
+							'Oshù Ɔ̀pɛ̀'
+						],
+						leap => [
+							
+						],
+					},
+				},
 			},
 	} },
 );
@@ -646,6 +686,44 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
+						mon => 'Ajé',
+						tue => 'Ìsɛ́gun',
+						wed => 'Ɔjɔ́rú',
+						thu => 'Ɔjɔ́bɔ',
+						fri => 'Ɛtì',
+						sat => 'Àbámɛ́ta',
+						sun => 'Àìkú'
+					},
+					short => {
+						mon => 'Ajé',
+						tue => 'Ìsɛ́gun',
+						wed => 'Ɔjɔ́rú',
+						thu => 'Ɔjɔ́bɔ',
+						fri => 'Ɛtì',
+						sat => 'Àbámɛ́ta',
+						sun => 'Àìkú'
+					},
+					wide => {
+						mon => 'Ɔjɔ́ Ajé',
+						tue => 'Ɔjɔ́ Ìsɛ́gun',
+						wed => 'Ɔjɔ́rú',
+						thu => 'Ɔjɔ́bɔ',
+						fri => 'Ɔjɔ́ Ɛtì',
+						sat => 'Ɔjɔ́ Àbámɛ́ta',
+						sun => 'Ɔjɔ́ Àìkú'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						mon => 'Ajé',
+						tue => 'Ìsɛ́gun',
+						wed => 'Ɔjɔ́rú',
+						thu => 'Ɔjɔ́bɔ',
+						fri => 'Ɛtì',
+						sat => 'Àbámɛ́ta',
+						sun => 'Àìkú'
+					},
+					short => {
 						mon => 'Ajé',
 						tue => 'Ìsɛ́gun',
 						wed => 'Ɔjɔ́rú',
@@ -681,6 +759,13 @@ has 'calendar_quarters' => (
 						3 => 'Kɔ́tà Kɛrin'
 					},
 				},
+				'stand-alone' => {
+					wide => {0 => 'Kɔ́tà Kínní',
+						1 => 'Kɔ́tà Kejì',
+						2 => 'Kɔ́à Keta',
+						3 => 'Kɔ́tà Kɛrin'
+					},
+				},
 			},
 	} },
 );
@@ -692,11 +777,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'wide' => {
+					'am' => q{Àárɔ̀},
+					'pm' => q{Ɔ̀sán},
+				},
+				'narrow' => {
+					'am' => q{Àárɔ̀},
+					'pm' => q{Ɔ̀sán},
+				},
+				'abbreviated' => {
+					'pm' => q{Ɔ̀sán},
+					'am' => q{Àárɔ̀},
+				},
+			},
+			'stand-alone' => {
 				'abbreviated' => {
 					'pm' => q{Ɔ̀sán},
 					'am' => q{Àárɔ̀},
 				},
 				'wide' => {
+					'pm' => q{Ɔ̀sán},
+					'am' => q{Àárɔ̀},
+				},
+				'narrow' => {
 					'am' => q{Àárɔ̀},
 					'pm' => q{Ɔ̀sán},
 				},

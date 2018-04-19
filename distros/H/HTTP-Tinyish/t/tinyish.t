@@ -38,6 +38,10 @@ for my $backend (@backends) {
         like $res->{content}, qr/Comprehensive/i;
     }
 
+    $res = HTTP::Tinyish->new->get("http://example.invalid");
+    is $res->{status}, 599;
+    ok !$res->{success};
+
     $res = HTTP::Tinyish->new->head("http://httpbin.org/headers");
     is $res->{status}, 200;
 
@@ -49,7 +53,7 @@ for my $backend (@backends) {
     is_deeply decode_json($res->{content})->{form}, { foo => "1", bar => "2" };
 
  SKIP: {
-        skip "HTTP::Tiny's chunked upload is not supported by httpbin.", 1 if $backend =~ /HTTPTiny/;
+        skip "HTTP::Tiny's and LWP's chunked uploads are not supported by httpbin.", 1 if $backend =~ /HTTPTiny|LWP/;
         my @data = ("xyz\n", "xyz");
         $res = HTTP::Tinyish->new(timeout => 1)->post("http://httpbin.org/post", {
             headers => { 'Content-Type' => 'application/octet-stream' },
@@ -72,7 +76,10 @@ for my $backend (@backends) {
 
     $res = HTTP::Tinyish->new(default_headers => { "Foo" => "Bar", Dnt => "1" })
       ->get("http://httpbin.org/headers", { headers => { "Foo" => ["Bar", "Baz"] } });
-    is decode_json($res->{content})->{headers}{Foo}, "Bar,Baz";
+ SKIP: {
+        skip "httpbin does not support multiple headers", 1;
+        is decode_json($res->{content})->{headers}{Foo}, "Bar,Baz";
+    }
     is decode_json($res->{content})->{headers}{Dnt}, "1";
 
     my $fn = tempdir(CLEANUP => 1) . "/index.html";
@@ -86,6 +93,11 @@ for my $backend (@backends) {
         is $res->{status}, 304;
         ok $res->{success};
     }
+
+    my $fn = tempdir(CLEANUP => 1) . "/index.html";
+    $res = HTTP::Tinyish->new->mirror("http://example.invalid", $fn);
+    is $res->{status}, 599;
+    ok !$res->{success};
 
     $res = HTTP::Tinyish->new(agent => "Menlo/1")->get("http://httpbin.org/user-agent");
     is_deeply decode_json($res->{content}), { 'user-agent' => "Menlo/1" };

@@ -4,7 +4,7 @@
       "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,18 +32,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::BigInt" : "1.999718",
+            "Math::BigInt" : "1.999812",
             "Math::BigRat" : "0.12",
             "perl" : "5.01"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.47"
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.49",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "0.50",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

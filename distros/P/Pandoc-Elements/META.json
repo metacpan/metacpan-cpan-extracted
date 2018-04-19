@@ -40,8 +40,9 @@
             "Hash::MultiValue" : "0.06",
             "IPC::Run3" : "0",
             "JSON" : "0",
+            "JSON::PP" : "0",
             "List::Util" : "0",
-            "Pandoc" : "v0.6.0",
+            "Pandoc" : "v0.7.2",
             "Pod::Simple" : "3.08",
             "Pod::Usage" : "0",
             "Scalar::Util" : "0",
@@ -52,7 +53,8 @@
          "requires" : {
             "Test::Exception" : "0",
             "Test::More" : "0.96",
-            "Test::Output" : "0"
+            "Test::Output" : "0",
+            "Test::Warnings" : "0"
          }
       }
    },
@@ -68,10 +70,11 @@
          "web" : "https://github.com/nichtich/Pandoc-Elements"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_contributors" : [
       "Benct Philip Jonsson <bpjonsson@gmail.com>",
-      "Jakob Voß <jakob.voss@gbv.de>"
+      "Jakob Voß <jakob.voss@gbv.de>",
+      "TakeAsh <take@TakeAsh.net>"
    ]
 }
 

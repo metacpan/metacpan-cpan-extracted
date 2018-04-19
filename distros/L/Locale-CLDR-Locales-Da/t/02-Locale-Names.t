@@ -25,7 +25,7 @@ is ($locale->region_name('wibble'), 'Ukendt område', 'Invalid Region name');
 is ($locale->variant_name('AREVMDA'), 'vestarmensk', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'klingon', 'Language alias');
-is ($locale->region_name('BQ'), 'De Nederlandske Antiller', 'Region alias');
+is ($locale->region_name('BQ'), 'De tidligere Nederlandske Antiller', 'Region alias');
 is ($locale->region_name('830'), 'Ukendt område', 'Region alias');
 is ($locale->variant_name('BOKMAL'), '', 'Variant alias');
 is ($locale->key_name('ca'), 'kalender', 'Key name');

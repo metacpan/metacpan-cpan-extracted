@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::Overdue;
-$Koha::Contrib::Tamil::Overdue::VERSION = '0.054';
+$Koha::Contrib::Tamil::Overdue::VERSION = '0.055';
 use Moose;
 use Modern::Perl;
 use YAML qw/ Dump LoadFile /;
@@ -35,18 +35,16 @@ has tx => ( is => 'rw', isa => 'Text::Xslate' );
 has now => (
     is => 'rw',
     isa => 'Str',
-    default => sub {
-        my $self = shift;
-        DateTime->DefaultLocale( $self->c->{date}->{locale} );
-        my $d = DateTime->now()->strftime( $self->c->{date}->{now} );
-        $d =~ s/  / /g;
-        return $d;
-    }
 );
 
 
 sub BUILD {
     my $self = shift;
+
+    DateTime->DefaultLocale( $self->c->{date}->{locale} );
+    my $d = DateTime->now()->strftime( $self->c->{date}->{now} );
+    $d =~ s/  / /g;
+    $self->now( $d );
 
     $self->tx( Text::Xslate->new(
         path => $self->c->{dirs}->{template},
@@ -344,7 +342,7 @@ Koha::Contrib::Tamil::Overdue
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 ATTRIBUTES
 

@@ -30,7 +30,7 @@ Static Methods
         sequence, then a false value is returned.
 
     random_pseudo_bytes (IV num_bytes)
-        This function, is similar to c<random_bytes>, but the resulting
+        This function, is similar to "random_bytes", but the resulting
         sequence of bytes are not necessarily unpredictable. They can be
         used for non-cryptographic purposes and for certain purposes in
         cryptographic protocols, but usually not for key generation etc.

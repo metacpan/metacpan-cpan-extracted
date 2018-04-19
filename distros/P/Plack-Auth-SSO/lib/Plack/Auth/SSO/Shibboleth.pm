@@ -9,7 +9,7 @@ use Plack::Request;
 use Plack::Session;
 use JSON;
 
-our $VERSION = "0.0132";
+our $VERSION = "0.0133";
 
 with "Plack::Auth::SSO";
 
@@ -177,6 +177,14 @@ It inherits all configuration options from its parent.
 =head1 CONFIG
 
 =over 4
+
+=item error_path
+
+This option is inherited by its parent class L<Plack::Auth::SSO>, but cannot be used unfortunately
+
+because an SP will never allow an invalid request to be passed to the backend. This should be configured in
+
+/etc/shibboleth/shibboleth2.xml ( cf. https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPErrors ).
 
 =item request_type
 

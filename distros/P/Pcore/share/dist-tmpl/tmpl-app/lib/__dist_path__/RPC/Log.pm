@@ -19,12 +19,7 @@ sub BUILD ( $self, $args ) {
 
             my $values->@{qw[created channel level title data]} = ( SQL [ 'to_timestamp(', \$ev->{timestamp}, ')' ], $ev->@{qw[channel level title]}, $data );
 
-            $self->{util}->{dbh}->do(
-                [ q[INSERT INTO "log"], VALUES [$values] ],
-                sub ( $dbh, $res, $data ) {
-                    return;
-                }
-            );
+            $self->{util}->{dbh}->do( [ q[INSERT INTO "log"], VALUES [$values] ] );
 
             return;
         }
@@ -42,7 +37,7 @@ sub BUILD ( $self, $args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 50                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 54 does not match the package declaration       |
+## |    1 | 45                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 49 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

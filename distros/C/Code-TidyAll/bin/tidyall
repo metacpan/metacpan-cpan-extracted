@@ -7,7 +7,7 @@ use Getopt::Long;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 my $usage = '
 Usage: tidyall [options] [file] ...
@@ -248,7 +248,7 @@ distribution comes with plugins for:
 
 Perl: L<perlcritic|Code::TidyAll::Plugin::PerlCritic>,
 L<perltidy|Code::TidyAll::Plugin::PerlTidy>,
-L<perltidy-sweet|Code::TidyAll::Plugin::PerlTidy::Sweetened>
+L<perltidy-sweet|Code::TidyAll::Plugin::PerlTidySweet>
 
 =item *
 

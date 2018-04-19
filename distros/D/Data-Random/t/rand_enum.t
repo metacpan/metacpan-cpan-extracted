@@ -41,4 +41,10 @@ foreach my $charset ( keys %charsets ) {
     ok($pass);
 }
 
+{
+    my $char = rand_enum($charsets{d});
+    ok $char, 'Can omit "set" if using an array ref';
+    ok exists $valid_chars{d}->{ $char }, 'Got a valid random character';
+}
+
 done_testing;

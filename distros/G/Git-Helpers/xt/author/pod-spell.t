@@ -25,7 +25,12 @@ Phair
 Philippe
 Weyl
 book
+cpan
 cweyl
+delete
+gh
 lib
 olaf
 phair
+script
+travis

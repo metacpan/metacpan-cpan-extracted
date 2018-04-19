@@ -13,43 +13,41 @@ configure {
 };
 
 share {
-  requires 'Path::Tiny'  => 0;
+  requires 'Path::Tiny' => 0;
 
   start_url 'https://github.com/premake/premake-core/releases';
 
+  my $source = 'src';
+  for ($^O) {
+    $source = 'macosx'  if /darwin/;
+    $source = 'windows' if /MSWin32/;
+    $source = 'linux'   if /linux/;
+  }
+
+  my $format = ($source =~ /(linux|macosx)/) ? 'tar.gz' : 'zip';
+
   plugin Download => (
-    filter  => qr/premake-[0-9.]+(-[a-z0-9]+)?-src\.zip$/,
-    version => qr/premake-([0-9.]+(?:-[a-z0-9]+)?)/,
+    filter  => qr/premake-5[0-9.]+(-[a-z0-9]+)?-$source\.$format$/,
+    version => qr/premake-(5[0-9.]+(?:-[a-z0-9]+)?)/,
   );
 
   plugin 'Decode::HTML';
-  plugin 'Extract' => 'zip';
+  plugin 'Extract' => $format;
 
   build sub {
     my ($build) = @_;
 
-    my $platform = 'unix';
-    for ($^O) {
-      $platform = 'macosx'  if /darwin/;
-      $platform = 'bsd'     if /bsd/;
-      $platform = 'windows' if /MSWin32/;
-    }
-
-    # Somehow changing directory with A::B's 'cd'
-    # does not work in this case. 'No such directory', it says.
-    my $src_dir = Path::Tiny::path($build->install_prop->{extract})
-      ->child('build', "gmake.$platform");
-
-    local $CWD = $src_dir->stringify;
-    $build->system('%{make}', 'config=release');
+    my $executable = 'premake5' . ($source eq 'windows' ? '.exe' : '');
+    my $binary = ($source eq 'src')
+      ? build_from_source($build, $executable)
+      : Path::Tiny::path( $build->install_prop->{extract} )
+          ->child($executable);
 
     # premake5 makefiles do not define an install target
-    my $bindir = Path::Tiny::path($build->install_prop->{prefix}, 'bin');
+    my $bindir = Path::Tiny::path( $build->install_prop->{prefix}, 'bin' );
     $bindir->mkpath;
 
-    my $target = $bindir->child('premake5');
-    my $binary = Path::Tiny::path($build->install_prop->{extract})
-      ->child('bin', 'release', 'premake5');
+    my $target = $bindir->child($executable);
 
     $binary->copy($target);
     $target->chmod(0755);
@@ -69,4 +67,26 @@ gather sub {
 
   my ($version) = $stdout =~ /premake5 \(.*\) ([0-9.]+(?:-[a-z0-9]+)?)/;
   $build->runtime_prop->{version} = $version || 'unknown';
+};
+
+sub build_from_source {
+  my ($build, $executable) = @_;
+
+  my $platform = 'unix';
+  for ($^O) {
+    $platform = 'macosx'  if /darwin/;
+    $platform = 'bsd'     if /bsd/;
+    $platform = 'windows' if /MSWin32/;
+  }
+
+  # Somehow changing directory with A::B's 'cd'
+  # does not work in this case. 'No such directory', it says.
+  my $src_dir = Path::Tiny::path( $build->install_prop->{extract} )
+    ->child('build', "gmake.$platform");
+
+  local $CWD = $src_dir->stringify;
+  $build->system('%{make}', 'config=release');
+
+  return Path::Tiny::path( $build->install_prop->{extract} )
+    ->child('bin', 'release', $executable);
 }

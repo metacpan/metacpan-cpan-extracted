@@ -149,8 +149,8 @@ sub mirror ( $target, $url, @args ) {
     $args{headers}->{IF_MODIFIED_SINCE} = P->date->from_epoch( [ stat $target ]->[9] )->to_http_date if !$args{no_cache} && -f $target;
 
     $args{on_finish} = sub ($res) {
-        if ( $res->status == 200 ) {
-            P->file->move( $res->body->path, $target );
+        if ( $res->{status} == 200 ) {
+            P->file->move( $res->{body}->path, $target );
 
             if ( my $last_modified = $res->headers->{LAST_MODIFIED} ) {
                 my $mtime = P->date->parse($last_modified)->at_utc->epoch;
@@ -250,26 +250,23 @@ sub request {
         }
     }
 
-    # blocking cv
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
     # on_finish wrapper
     my $before_finish = delete $args{before_finish};
 
     my $on_finish = delete $args{on_finish};
 
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
+
     $args{on_finish} = sub ($res) {
 
         # rewind body fh
-        $res->body->seek( 0, 0 ) if $res->{body} && is_glob $res->{body};
+        $res->{body}->seek( 0, 0 ) if $res->{body} && is_glob $res->{body};
 
         # before_finish callback
         $before_finish->($res) if $before_finish;
 
         # on_finish callback
-        $on_finish->($res) if $on_finish;
-
-        $blocking_cv->send($res) if $blocking_cv;
+        $rouse_cb ? $on_finish ? $rouse_cb->( $on_finish->($res) ) : $rouse_cb->($res) : $on_finish ? $on_finish->($res) : ();
 
         return;
     };
@@ -277,7 +274,7 @@ sub request {
     # throw request
     Pcore::HTTP::Util::http_request( \%args );
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub _get_on_progress_cb (%args) {
@@ -308,7 +305,7 @@ sub _get_on_progress_cb (%args) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 106                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 170                  | Subroutines::ProhibitExcessComplexity - Subroutine "request" with high complexity score (33)                   |
+## |    3 | 170                  | Subroutines::ProhibitExcessComplexity - Subroutine "request" with high complexity score (34)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 156                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

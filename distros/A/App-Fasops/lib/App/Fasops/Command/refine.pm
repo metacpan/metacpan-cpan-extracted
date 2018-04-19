@@ -11,7 +11,9 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'realign blocked fasta file with external programs';
+sub abstract {
+    return 'realign blocked fasta file with external programs';
+}
 
 sub opt_spec {
     return (
@@ -36,13 +38,17 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "List of msa:\n";
-    $desc .= "\t* mafft\n";
-    $desc .= "\t* muscle\n";
-    $desc .= "\t* clustalw\n";
-    $desc .= "\t* none:\tmeans skip realigning\n";
-    $desc .= "\t<infile> are paths to blocked fasta files, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= <<'MARKDOWN';
+
+* List of msa:
+    * mafft
+    * muscle
+    * clustalw
+    * none: means skip realigning
+* <infile> are paths to blocked fasta files, .fas.gz is supported
+* infile == stdin means reading from STDIN
+
+MARKDOWN
 
     return $desc;
 }

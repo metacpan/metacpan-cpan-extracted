@@ -7,7 +7,11 @@ use base qw{ PPIx::Regexp::Support };
 
 use Carp qw{ carp croak confess };
 use PPIx::Regexp::Constant qw{
+    ARRAY_REF
+    CODE_REF
+    HASH_REF
     MINIMUM_PERL
+    REGEXP_REF
     TOKEN_LITERAL
     TOKEN_UNKNOWN
 };
@@ -44,7 +48,7 @@ use PPIx::Regexp::Token::Whitespace		();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -111,7 +115,7 @@ defined $DEFAULT_POSTDEREF
 	$errstr = undef;
 
 	exists $args{default_modifiers}
-	    and 'ARRAY' ne ref $args{default_modifiers}
+	    and ARRAY_REF ne ref $args{default_modifiers}
 	    and do {
 		$errstr = 'default_modifiers must be an array reference';
 		return;
@@ -211,7 +215,7 @@ sub cookie {
 	or confess "Programming error - undefined cookie name";
     @args or return $self->{cookie}{$name};
     my $cookie = shift @args;
-    if ( ref $cookie eq 'CODE' ) {
+    if ( CODE_REF eq ref $cookie ) {
 	return ( $self->{cookie}{$name} = $cookie );
     } elsif ( defined $cookie ) {
 	confess "Programming error - cookie must be CODE ref or undef";
@@ -227,7 +231,7 @@ sub default_modifiers {
 
 sub __effective_modifiers {
     my ( $self ) = @_;
-    'HASH' eq ref $self->{effective_modifiers}
+    HASH_REF eq ref $self->{effective_modifiers}
 	or return {};
     return { %{ $self->{effective_modifiers} } };
 }
@@ -307,7 +311,7 @@ sub find_matching_delimiter {
 sub find_regexp {
     my ( $self, $regexp ) = @_;
 
-    ref $regexp eq 'Regexp'
+    REGEXP_REF eq ref $regexp
 	or confess
 	'Argument is a ', ( ref $regexp || 'scalar' ), ' not a Regexp';
 
@@ -473,6 +477,15 @@ sub modifier_pop {
     return;
 }
 
+sub modifier_seen {
+    my ( $self, $modifier ) = @_;
+    foreach my $mod ( reverse @{ $self->{modifiers} } ) {
+	exists $mod->{$modifier}
+	    and return 1;
+    }
+    return;
+}
+
 sub next_token {
     my ( $self ) = @_;
 
@@ -592,7 +605,7 @@ sub prior_significant_token {
 	    $iterator = sub {
 		return shift @eles;
 	    };
-	} elsif ( 'CODE' ne ref $iterator ) {
+	} elsif ( CODE_REF ne ref $iterator ) {
 	    confess 'Programming error - Iterator not understood';
 	}
 
@@ -1320,6 +1333,9 @@ appears. In this case an exception will be thrown if you specify a
 multi-character modifier (e.g.  C<'ee*'>), or if you specify one of the
 match semantics modifiers (e.g.  C<'a*'>).
 
+If called by an external tokenizer, this method returns true if if the
+given modifier was true at the current point in the tokenization.
+
 =head2 next_token
 
  my $token = $tokenizer->next_token();
@@ -1553,6 +1569,17 @@ whose content is ')'.
 
 Note that this method will never pop the last modifier item off the
 stack, to guard against unmatched right parentheses.
+
+=head2 modifier_seen
+
+ $tokenizer->modifier_seen( 'i' )
+     and print "/i was seen at some point.\n";
+
+Unlike L<modifier()|/modifier>, this method returns a true value if the
+given modifier has been seen in any scope visible from the current
+location in the parse. There is no magic for group match semantics (
+/a, /aa, /d, /l, /u) or modifiers that can be repeated, like /x and /xx,
+or /e and /ee.
 
 =head2 peek
 

@@ -59,7 +59,7 @@ else {
     like ($ret[5], qr/.*?::.*?::.*?/, "Module name");
     like ($ret[6], qr/.*?:: \w+/, "run ok");
 
-    like ($ret[7], qr/.*?::.*?::.*?/, "Module name");
+    like ($ret[7], qr/.*?::.*?(?:::.*?)?/, "Module name");
     like ($ret[8], qr/.*?:: \w+/, "run ok");
 }
 

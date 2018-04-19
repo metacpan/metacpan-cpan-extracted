@@ -1,3 +1,6 @@
+0.55 - always use qacct status info as to augment drmaa status info
+       the drmaa status info doesn't return everything, especially 'host'
+
 0.54 - added another out of memory test
 
 0.53 - force explicit use of /bin/bash for running script

@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Es_419::Ar;
 # This file auto generated from Data\common\transforms\es_419-ar.xml
-#	on Fri 29 Apr  6:48:47 pm GMT
+#	on Fri 13 Apr  6:59:56 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -43,9 +44,9 @@ has 'transforms' => (
 			type => 'conversion',
 			data => [
 				{
-					before  => q((?^u:[^ \p{L} \p{M} \p{N}][^Vowel])),
-					after   => q((?^u:(?[![i e o u a]])*[i e o u a])),
-					replace => q((?^u:e)),
+					before  => q([^ \p{L} \p{M} \p{N}][^Vowel]),
+					after   => q((?:(?![ieoua])(?s:.))*[i e o u a]),
+					replace => q(e),
 					result  => q(ə),
 					revisit => 0,
 				},

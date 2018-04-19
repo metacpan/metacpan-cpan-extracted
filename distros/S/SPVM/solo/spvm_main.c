@@ -18,7 +18,8 @@
 #include "spvm_opcode_builder.h"
 #include "spvm_jitcode_builder.h"
 
-#include "lib_native/SPVM/CORE.native/CORE.c"
+#include "lib_native/SPVM/Std/IO.native/IO.c"
+#include "lib_native/SPVM/Std/Time.native/Time.c"
 
 #include <spvm_api.h>
 
@@ -50,6 +51,12 @@ int main(int argc, char *argv[])
   if (compiler->error_count > 0) {
     exit(1);
   }
+  else {
+#ifdef DEBUG
+    // Dump spvm information
+    SPVM_DUMPER_dump_all(compiler);
+#endif
+  }
   
   // Build bytecode
   SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
@@ -65,38 +72,18 @@ int main(int argc, char *argv[])
         // Sub abs name
         const char* sub_abs_name = sub->abs_name;
         
-        if (strcmp(sub_abs_name, "CORE::print") == 0) {
-          sub->native_address = SPVM__CORE__print;
+        if (strcmp(sub_abs_name, "Std::IO::print") == 0) {
+          sub->native_address = SPVM__Std__IO__print;
         }
-        else if (strcmp(sub_abs_name, "CORE::warn") == 0) {
-          sub->native_address = SPVM__CORE__warn;
+        else if (strcmp(sub_abs_name, "Std::IO::warn") == 0) {
+          sub->native_address = SPVM__Std__IO__warn;
         }
-        else if (strcmp(sub_abs_name, "CORE::time") == 0) {
-          sub->native_address = SPVM__CORE__time;
-        }
-        else if (strcmp(sub_abs_name, "CORE::sum_int") == 0) {
-          sub->native_address = SPVM__CORE__sum_int;
-        }
-        else if (strcmp(sub_abs_name, "CORE::test1") == 0) {
-          sub->native_address = SPVM__CORE__test1;
-        }
-        else if (strcmp(sub_abs_name, "CORE::test2") == 0) {
-          sub->native_address = SPVM__CORE__test2;
+        else if (strcmp(sub_abs_name, "Std::Time::time") == 0) {
+          sub->native_address = SPVM__Std__Time__time;
         }
       }
     }
   }
-  
-  if (compiler->error_count > 0) {
-    return 1;
-  }
-  else {
-#ifdef DEBUG
-    // Dump spvm information
-    SPVM_DUMPER_dump_all(compiler);
-#endif
-  }
-
   
   // Create run-time
   SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);

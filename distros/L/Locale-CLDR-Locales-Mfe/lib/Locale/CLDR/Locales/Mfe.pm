@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Mfe - Package for language Morisyen
 
 package Locale::CLDR::Locales::Mfe;
 # This file auto generated from Data\common\main\mfe.xml
-#	on Fri 29 Apr  7:16:12 pm GMT
+#	on Fri 13 Apr  7:19:15 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -328,7 +329,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p r s t u v w x y z])},
+			main => qr{[a b c d e f g h i j k l m n o p r s t u v w x y z]},
+			numbers => qr{[  \- . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -940,6 +942,19 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 	} },
 );
 

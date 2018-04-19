@@ -3,14 +3,14 @@
 use strict;
 use warnings;
 
-our ($CLASS, $CALC);
+our ($CLASS, $LIB);
 
 ##############################################################################
 # for testing inheritance of _swap
 
 package Math::Foo;
 
-use Math::BigInt lib => $main::CALC;
+use Math::BigInt lib => $main::LIB;
 our @ISA = qw/Math::BigInt/;
 
 use overload
@@ -33,7 +33,7 @@ sub _swap {
 ##############################################################################
 package main;
 
-is($CLASS->config('lib'), $CALC, "$CLASS->config('lib')");
+is($CLASS->config('lib'), $LIB, "$CLASS->config('lib')");
 
 my ($x, $y, $z, @args, $try, $got, $want);
 my ($f, $round_mode, $expected_class);
@@ -77,29 +77,27 @@ while (<DATA>) {
     } elsif ($f eq "bone") {
         $try .= qq| \$x->bone("$args[1]");|;
     # some unary ops
-    } elsif ($f =~ /^b(nan|floor|ceil|int|sstr|neg|abs|sgn|inc|dec|not|sqrt|fac)$/) {
+    } elsif ($f =~ /^b(nan|floor|ceil|int|sstr|neg|abs|sgn|inc|dec|not|sqrt|exp|fac)$/) {
         $try .= " \$x->$f();";
-    # overloaded functions
-    } elsif ($f =~ /^(log|exp|sin|cos|atan2|int|neg|abs|sqrt)$/) {
-        $try .= " \$x = $f(\$x);";
     } elsif ($f =~ /^(numify|length|stringify)$/) {
         $try .= " \$x->$f();";
     } elsif ($f =~ /^(to|as)_(hex|oct|bin)$/) {
         $try .= " \$x->$f();";
-    } elsif ($f eq "exponent") {
-        # ->bstr() to see if an object is returned
-        $try .= ' $x = $x->exponent()->bstr();';
-    } elsif ($f eq "mantissa") {
-        # ->bstr() to see if an object is returned
-        $try .= ' $x = $x->mantissa()->bstr();';
+    # overloaded functions
+    } elsif ($f =~ /^(log|exp|sin|cos|atan2|int|neg|abs|sqrt)$/) {
+        $try .= " \$x = $f(\$x);";
     } elsif ($f eq "parts") {
         $try .= ' ($m, $e) = $x->parts();';
         # ->bstr() to see if an object is returned
         $try .= ' $m = $m->bstr(); $m = "NaN" if !defined $m;';
         $try .= ' $e = $e->bstr(); $e = "NaN" if !defined $e;';
         $try .= ' "$m,$e";';
-    } elsif ($f eq "bexp") {
-        $try .= " \$x->bexp();";
+    } elsif ($f eq "exponent") {
+        # ->bstr() to see if an object is returned
+        $try .= ' $x = $x->exponent()->bstr();';
+    } elsif ($f eq "mantissa") {
+        # ->bstr() to see if an object is returned
+        $try .= ' $x = $x->mantissa()->bstr();';
     } elsif ($f eq "bpi") {
         $try .= " $CLASS\->bpi(\$x);";
     } else {
@@ -561,9 +559,9 @@ is($CLASS->blsft(2**13, $CLASS->new(1)), 2**14,
 
 $z = 1050000000000000;          # may be int on systems with 64bit?
 $x = $CLASS->new($z);
-is($x->bsstr(), '105e+13',	# not 1.05e+15
+is($x->bsstr(), '105e+13',      # not 1.05e+15
    qq|\$x = $CLASS->new($z); \$x->bsstr() = "105e+13"|);
-$z = 1e+129;			# definitely a float (may fail on UTS)
+$z = 1e+129;                    # definitely a float (may fail on UTS)
 # don't compare to $z, since some Perl versions stringify $z into something
 # like '1.e+129' or something equally ugly
 SKIP:{
@@ -577,7 +575,7 @@ SKIP:{
 ###############################################################################
 # test for whitespace including newlines to be handled correctly
 
-# is($Math::BigInt::strict, 1);		# the default
+# is($Math::BigInt::strict, 1);         # the default
 
 foreach my $c (qw/1 12 123 1234 12345 123456 1234567
                   12345678 123456789 1234567890/)
@@ -653,12 +651,12 @@ is($x,        2,       "2 >>= 18 with $CLASS objects");
 # inheritance and overriding of _swap
 
 $x = Math::Foo->new(5);
-$x = $x - 8;		# 8 - 5 instead of 5-8
+$x = $x - 8;            # 8 - 5 instead of 5-8
 is($x, 3, '$x = Math::Foo->new(5); $x = $x - 8; $x = 3');
 is(ref($x), 'Math::Foo', '$x is an object of class "Math::Foo"');
 
 $x = Math::Foo->new(5);
-$x = 8 - $x;		# 5 - 8 instead of 8 - 5
+$x = 8 - $x;            # 5 - 8 instead of 8 - 5
 is($x, -3, '$x = Math::Foo->new(5); $x = 8 - $x; $x = -3');
 is(ref($x), 'Math::Foo', '$x is an object of class "Math::Foo"');
 
@@ -680,7 +678,7 @@ require Config;
 SKIP: {
     skip("no 64 bit integer support", 4)
       if ! $Config::Config{use64bitint} || ! $Config::Config{use64bitall}
-          || $] <= 5.006002;
+          || "$]" < 5.007001;
 
     # The following should not give "1.84467440737096e+19".
 
@@ -702,13 +700,13 @@ SKIP: {
 
 SKIP: {
     # skip GMP, Pari et al.
-    skip("skipping tests not intended for the backend $CALC", 50)
-      unless $CALC =~ /^Math::BigInt::(Bare|Fast)?Calc$/;
+    skip("skipping tests not intended for the backend $LIB", 50)
+      unless $LIB =~ /^Math::BigInt::(Bare|Fast)?Calc$/;
 
     ###########################################################################
     # check proper length of internal arrays
 
-    my $bl = $CALC->_base_len();
+    my $bl = $LIB->_base_len();
     my $BASE = '9' x $bl;
     my $MAX = $BASE;
     $BASE++;
@@ -786,7 +784,7 @@ SKIP: {
 
     # construct a number with a zero-hole of BASE_LEN_SMALL
     {
-        my @bl = $CALC->_base_len();
+        my @bl = $LIB->_base_len();
         my $bl = $bl[5];
 
         $x = '1' x $bl . '0' x $bl . '1' x $bl . '0' x $bl;
@@ -935,7 +933,7 @@ SKIP: {
 sub is_valid {
     my ($x, $f) = @_;
 
-    my $e = 0;			# error?
+    my $e = 0;                  # error?
 
     # allow the check to pass for all Lite, and all MBI and subclasses
     # ok as reference?
@@ -948,7 +946,7 @@ sub is_valid {
             if $e eq '0' && $x->{sign} !~ /^(\+|-|\+inf|-inf|NaN)$/;
 
         $e = "-0 is invalid!" if $e ne '0' && $x->{sign} eq '-' && $x == 0;
-        $e = $CALC->_check($x->{value}) if $e eq '0';
+        $e = $LIB->_check($x->{value}) if $e eq '0';
     }
 
     # test done, see if error did crop up
@@ -997,9 +995,9 @@ __DATA__
 
 &blog
 #
-NaNlog:2:NaN
-122:NaNlog:NaN
-NaNlog1:NaNlog:NaN
+invalid:2:NaN
+122:invalid:NaN
+invalid:invalid:NaN
 #
 122:inf:0
 inf:122:inf
@@ -1069,7 +1067,7 @@ inf:inf:NaN
 1:0
 +inf:0
 -inf:1
-NaNneg:0
+invalid:0
 
 &is_positive
 0:0
@@ -1077,12 +1075,12 @@ NaNneg:0
 1:1
 +inf:1
 -inf:0
-NaNneg:0
+invalid:0
 
 &is_int
 -inf:0
 +inf:0
-NaNis_int:0
+invalid:0
 1:1
 0:1
 123e12:1
@@ -1126,9 +1124,9 @@ abc:0
 -987654321:+123456789:1
 -123:+4567889:-1
 # NaNs
-acmpNaN:123:
-123:acmpNaN:
-acmpNaN:acmpNaN:
+invalid:123:
+123:invalid:
+invalid:invalid:
 # infinity
 +inf:+inf:0
 -inf:-inf:0
@@ -1390,8 +1388,8 @@ abc:NaN
 &bone
 2:+:1
 2:-:-1
-boneNaN:-:-1
-boneNaN:+:1
+invalid:-:-1
+invalid:+:1
 2:abc:1
 3::1
 
@@ -1500,7 +1498,7 @@ bsstrabc:NaN
 -100:-100
 
 &bneg
-bnegNaN:NaN
+invalid:NaN
 +inf:-inf
 -inf:inf
 abd:NaN
@@ -1511,7 +1509,7 @@ abd:NaN
 -123456789:123456789
 
 &babs
-babsNaN:NaN
+invalid:NaN
 +inf:inf
 -inf:inf
 0:0
@@ -1529,9 +1527,9 @@ NaN:NaN
 -123456789:-1
 
 &bcmp
-bcmpNaN:bcmpNaN:
-bcmpNaN:0:
-0:bcmpNaN:
+invalid:invalid:
+invalid:0:
+0:invalid:
 0:0:0
 -1:0:-1
 0:-1:1
@@ -1597,10 +1595,10 @@ abc:0:NaN
 -inf:+inf:NaN
 +inf:+inf:inf
 -inf:-inf:-inf
-baddNaN:+inf:NaN
-baddNaN:+inf:NaN
-+inf:baddNaN:NaN
--inf:baddNaN:NaN
+invalid:+inf:NaN
+invalid:+inf:NaN
++inf:invalid:NaN
+-inf:invalid:NaN
 0:0:0
 1:0:1
 0:1:1
@@ -1724,10 +1722,10 @@ abc:abc:0:NaN
 abc:+0:0:NaN
 +0:abc:0:NaN
 +0:0:abc:NaN
-NaNmul:+inf:0:NaN
-NaNmul:-inf:0:NaN
--inf:NaNmul:0:NaN
-+inf:NaNmul:0:NaN
+invalid:+inf:0:NaN
+invalid:-inf:0:NaN
+-inf:invalid:0:NaN
++inf:invalid:0:NaN
 +inf:+inf:0:inf
 +inf:-inf:0:-inf
 -inf:+inf:0:-inf
@@ -1784,10 +1782,10 @@ NaNmul:-inf:0:NaN
 abc:abc:NaN
 abc:+0:NaN
 +0:abc:NaN
-NaNmul:+inf:NaN
-NaNmul:-inf:NaN
--inf:NaNmul:NaN
-+inf:NaNmul:NaN
+invalid:+inf:NaN
+invalid:-inf:NaN
+-inf:invalid:NaN
++inf:invalid:NaN
 +inf:+inf:inf
 +inf:-inf:-inf
 -inf:+inf:-inf
@@ -2814,7 +2812,7 @@ abc:NaN,NaN
 
 &bfac
 -1:NaN
-NaNfac:NaN
+invalid:NaN
 +inf:inf
 -inf:NaN
 0:1
@@ -2835,71 +2833,127 @@ NaNfac:NaN
 69:171122452428141311372468338881272839092270544893520369393648040923257279754140647424000000000000000
 
 &bpow
+#
 abc:12:NaN
 12:abc:NaN
+#
+#
+-inf:-inf:0
+-inf:-3:0
+-inf:-2:0
+-inf:-1:0
+-inf:0:NaN
+-inf:1:-inf
+-inf:2:inf
+-inf:3:-inf
+-inf:inf:inf    # complex infinity
+-inf:NaN:NaN
+#
+-3:-inf:0
+-3:-3:NaN
+-3:-2:NaN
+-3:-1:NaN
+-3:0:1
+-3:1:-3
+-3:2:9
+-3:3:-27
+-3:inf:inf      # complex infinity
+-3:NaN:NaN
+#
+-2:-inf:0
+-2:-3:NaN
+-2:-2:NaN
+-2:-1:NaN
+-2:0:1
+-2:1:-2
+-2:2:4
+-2:3:-8
+-2:inf:inf      # complex infinity
+-2:NaN:NaN
+#
+-1:-inf:NaN
+-1:-3:-1
+-1:-2:1
+-1:-1:-1
+-1:0:1
+-1:1:-1
+-1:2:1
+-1:3:-1
+-1:inf:NaN
+-1:NaN:NaN
+#
+0:-inf:inf      # complex infinity
+0:-3:inf        # complex infinity
+0:-2:inf        # complex infinity
+0:-1:inf        # complex infinity
 0:0:1
 0:1:0
 0:2:0
-0:-1:inf
-0:-2:inf
+0:3:0
+0:inf:0
+0:NaN:NaN
+#
+1:-inf:1
+1:-3:1
+1:-2:1
+1:-1:1
 1:0:1
 1:1:1
 1:2:1
 1:3:1
-1:-1:1
-1:-2:1
-1:-3:1
+1:inf:1
+1:NaN:NaN
+#
+2:-inf:0
+2:-3:NaN
+2:-2:NaN
+2:-1:NaN
 2:0:1
 2:1:2
 2:2:4
 2:3:8
+2:inf:inf
+2:NaN:NaN
+#
+3:-inf:0
+3:-3:NaN
+3:-2:NaN
+3:-1:NaN
+3:0:1
+3:1:3
+3:2:9
 3:3:27
--2:2:4
--2:3:-8
--2:4:16
--2:5:-32
-2:-1:NaN
--2:-1:NaN
-2:-2:NaN
--2:-2:NaN
-# inf tests
+3:inf:inf
+3:NaN:NaN
+#
+inf:-inf:0
+inf:-3:0
+inf:-2:0
+inf:-1:0
+inf:0:NaN
+inf:1:inf
+inf:2:inf
+inf:3:inf
+inf:inf:inf
+inf:NaN:NaN
+#
+NaN:-inf:NaN
+NaN:-3:NaN
+NaN:-2:NaN
+NaN:-1:NaN
+NaN:0:NaN
+NaN:1:NaN
+NaN:2:NaN
+NaN:3:NaN
+NaN:inf:NaN
+NaN:NaN:NaN
+#
 +inf:1234500012:inf
 -inf:1234500012:inf
 -inf:1234500013:-inf
-+inf:-12345000123:inf
--inf:-12345000123:-inf
-#  -inf * -inf = inf
--inf:2:inf
--inf:0:NaN
--inf:-1:0
--inf:inf:NaN
-2:inf:inf
-2:-inf:0
-0:inf:0
-0:-inf:inf
--1:-inf:NaN
--1:inf:NaN
--2:inf:NaN
--2:-inf:0
-NaN:inf:NaN
-NaN:-inf:NaN
--inf:NaN:NaN
-inf:NaN:NaN
-inf:-inf:NaN
-1:inf:1
-1:-inf:1
-# 1 ** -x => 1 / (1 ** x)
--1:0:1
--2:0:1
--1:1:-1
--1:2:1
--1:3:-1
--1:4:1
--1:5:-1
--1:-1:-1
--1:-2:1
--1:-3:-1
--1:-4:1
++inf:-12345000123:0
+-inf:-12345000123:0
+#
 10:2:100
 10:3:1000
 10:4:10000
@@ -2910,11 +2964,8 @@ inf:-inf:NaN
 10:9:1000000000
 10:20:100000000000000000000
 123456:2:15241383936
--2:2:4
--2:3:-8
 -2:4:16
 -2:5:-32
--3:2:9
 -3:3:-27
 -3:4:81
 -3:5:-243
@@ -3084,7 +3135,7 @@ NaN:1:NaN
 &bround
 $round_mode("trunc")
 0:12:0
-NaNbround:12:NaN
+invalid:12:NaN
 +inf:12:inf
 -inf:12:-inf
 1234:0:1234
@@ -3185,7 +3236,7 @@ $round_mode("common")
 
 &is_zero
 0:1
-NaNzero:0
+invalid:0
 +inf:0
 -inf:0
 123:0
@@ -3194,7 +3245,7 @@ NaNzero:0
 
 &is_one
 0:0
-NaNone:0
+invalid:0
 +inf:0
 -inf:0
 1:1
@@ -3205,7 +3256,7 @@ NaNone:0
 # floor, ceil, and int are pretty pointless in integer space, but play safe
 &bfloor
 0:0
-NaNfloor:NaN
+invalid:NaN
 +inf:inf
 -inf:-inf
 -1:-1
@@ -3215,7 +3266,7 @@ NaNfloor:NaN
 abc:NaN
 
 &bceil
-NaNceil:NaN
+invalid:NaN
 +inf:inf
 -inf:-inf
 0:0
@@ -3244,7 +3295,7 @@ NaN:NaN
 0x123456789123456789:0x123456789123456789
 +inf:inf
 -inf:-inf
-NaNas_hex:NaN
+invalid:NaN
 
 &as_bin
 128:0b10000000
@@ -3256,7 +3307,7 @@ NaNas_hex:NaN
 0x123456789123456789:0b100100011010001010110011110001001000100100011010001010110011110001001
 +inf:inf
 -inf:-inf
-NaNas_bin:NaN
+invalid:NaN
 
 &as_oct
 128:0200
@@ -3268,7 +3319,42 @@ NaNas_bin:NaN
 0x123456789123456789:044321263611044321263611
 +inf:inf
 -inf:-inf
-NaNas_oct:NaN
+invalid:NaN
+
+&to_hex
+128:80
+-128:-80
+0:0
+-0:0
+1:1
+0x123456789123456789:123456789123456789
++inf:inf
+-inf:-inf
+invalid:NaN
+
+&to_bin
+128:10000000
+-128:-10000000
+0:0
+-0:0
+1:1
+0b1010111101010101010110110110110110101:1010111101010101010110110110110110101
+0x123456789123456789:100100011010001010110011110001001000100100011010001010110011110001001
++inf:inf
+-inf:-inf
+invalid:NaN
+
+&to_oct
+128:200
+-128:-200
+0:0
+-0:0
+1:1
+0b1010111101010101010110110110110110101:1275252666665
+0x123456789123456789:44321263611044321263611
++inf:inf
+-inf:-inf
+invalid:NaN
 
 # overloaded functions
 &log

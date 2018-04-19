@@ -3,11 +3,12 @@ Build.PL
 Changes
 lib/Code/TidyAll/Plugin/JSBeautifier.pm
 lib/JavaScript/Beautifier.pm
-Makefile.PL
+lib/JavaScript/Packer1.pm
+LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
-README
+README.md
 t/00-load.t
 t/01-javascript-beauty.t
 t/pod.t

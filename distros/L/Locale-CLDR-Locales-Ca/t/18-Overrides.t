@@ -90,11 +90,11 @@ $era = $locale->era_stand_alone_narrow();
 is_deeply ($era, [ 'AH' ], 'Islamic Era stand alone narrow');
 
 my $day_period_data = $locale->get_day_period('0000');
-is($day_period_data, 'a. m.', 'Islamic Day period data AM');
+is($day_period_data, 'mitjanit', 'Islamic Day period data AM');
 $day_period_data = $locale->get_day_period('1200');
-is($day_period_data, 'p. m.', 'Islamic Day period data Noon');
+is($day_period_data, 'migdia', 'Islamic Day period data Noon');
 $day_period_data = $locale->get_day_period('1800');
-is($day_period_data, 'p. m.', 'Islamic Day period data PM');
+is($day_period_data, 'tarda', 'Islamic Day period data PM');
 
 my $date_format = $locale->date_format_full;
 is($date_format, "EEEE, d MMMM 'de' y", 'Islamic Date Format Full');

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Mgo - Package for language Metaʼ
 
 package Locale::CLDR::Locales::Mgo;
 # This file auto generated from Data\common\main\mgo.xml
-#	on Fri 29 Apr  7:16:16 pm GMT
+#	on Fri 13 Apr  7:19:18 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -113,10 +114,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[c h l q v x])},
+			auxiliary => qr{[c h l q v x]},
 			index => ['A', 'B', '{CH}', 'D', 'E', 'Ə', 'F', 'G', '{GH}', 'I', 'J', 'K', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Z', 'ʼ'],
-			main => qr{(?^u:[a à b {ch} d e è ə {ə̀} f g {gh} i ì j k m n ŋ o ò ɔ {ɔ̀} p r s t u ù w y z ʼ])},
-			punctuation => qr{(?^u:[, ; \: ! ? . ' ‘ ’ " “ ”])},
+			main => qr{[a à b {ch} d e è ə {ə̀} f g {gh} i ì j k m n ŋ o ò ɔ {ɔ̀} p r s t u ù w y z ʼ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[, ; \: ! ? . ' ‘ ’ " “ ”]},
 		};
 	},
 EOT
@@ -282,21 +284,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},

@@ -64,7 +64,7 @@ is_deeply ($am_pm, { am => 'A.M.', pm => 'G.M.' }, 'Islamic AM PM format abbrevi
 $am_pm = $locale->am_pm_format_narrow();
 is_deeply ($am_pm, { am => 'am', pm => 'gm' }, 'Islamic AM PM format narrow');
 $am_pm = $locale->am_pm_stand_alone_wide();
-is_deeply ($am_pm, { am => 'a-raok merenn', pm => 'goude merenn' }, 'Islamic AM PM stand alone wide');
+is_deeply ($am_pm, { am => 'A.M.', pm => 'G.M.' }, 'Islamic AM PM stand alone wide');
 $am_pm = $locale->am_pm_stand_alone_abbreviated();
 is_deeply ($am_pm, { am => 'A.M.', pm => 'G.M.' }, 'Islamic AM PM stand alone abbreviated');
 $am_pm = $locale->am_pm_stand_alone_narrow();

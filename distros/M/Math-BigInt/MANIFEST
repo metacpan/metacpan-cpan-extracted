@@ -19,8 +19,6 @@ NEW
 README
 t/00sig.t
 t/01load.t
-t/02pod.t
-t/03podcov.t
 t/_e_math.t
 t/alias.inc
 t/author-batan-mbf.t
@@ -32,6 +30,7 @@ t/author-bmod-bdiv-mbi.t
 t/author-bnok-mbi.t
 t/author-bpi-mbf.t
 t/author-btmod-btdiv-mbi.t
+t/author-constructors-a-p-r.t
 t/author-lib-arithmetic-binary-_add.dat
 t/author-lib-arithmetic-binary-_add.t
 t/author-lib-arithmetic-binary-_div.dat
@@ -190,6 +189,11 @@ t/nparts-mbf.t
 t/nparts-mbi.t
 t/objectify_mbf.t
 t/objectify_mbi.t
+t/release-cpan-changes.t
+t/release-pod-coverage.t
+t/release-pod.t
+t/release-portability.t
+t/release-whitespaces.t
 t/req_mbf0.t
 t/req_mbf1.t
 t/req_mbfa.t

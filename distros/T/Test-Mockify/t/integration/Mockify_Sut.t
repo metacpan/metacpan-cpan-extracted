@@ -119,12 +119,11 @@ sub test_ErrorOnMockSutMethod {
     my $self = shift;
     my $SubTestName = (caller(0))[3];
 
-        my $Mockify = Test::Mockify::Sut->new('t::TestDummies::DummyImportToolsUser_Static');
-        throws_ok( sub { $Mockify->mock('OverrideDummyFunctionUser') },
-                       qr/It is not possible to mock a method of your SUT. Don't mock the code you like to test./sm,
-                       "$SubTestName - Prove the error when try to mock a method of the SUT"
-             );
-        ;
+    my $Mockify = Test::Mockify::Sut->new('t::TestDummies::DummyImportToolsUser_Static');
+    $Mockify->mock('OverrideDummyFunctionUser')->when()->thenReturn('dummy');
+    my $Sut = $Mockify->getMockObject();
+    is($Sut->OverrideDummyFunctionUser(), 'dummy', "$SubTestName - Prove that the mock also works");
+
 }
 #----------------------------------------------------------------------------------------
 sub _createFakeModuleForMockifyTest {

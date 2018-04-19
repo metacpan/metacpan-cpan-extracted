@@ -1,0 +1,14 @@
+Changes
+lib/File/Copy/Recursive/Reduced.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001-fcopy.t
+t/002-dircopy.t
+t/lib/Helper.pm
+t/lib/MockHomeDir.pm
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

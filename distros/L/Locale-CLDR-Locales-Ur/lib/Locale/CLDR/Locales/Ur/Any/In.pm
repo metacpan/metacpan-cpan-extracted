@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ur::Any::In - Package for language Urdu
 
 package Locale::CLDR::Locales::Ur::Any::In;
 # This file auto generated from Data\common\main\ur_IN.xml
-#	on Fri 29 Apr  7:31:13 pm GMT
+#	on Fri 13 Apr  7:33:44 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -28,15 +29,17 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'af' => 'افریقی',
- 				'ar_001' => 'جدید معیاری عربی',
- 				'co' => 'کارسیکائی',
+				'ar_001' => 'جدید معیاری عربی',
+ 				'awa' => 'اودھی',
+ 				'ckb' => 'سورانی کردی',
  				'dje' => 'زرمہ',
- 				'en_GB@alt=short' => 'برطانوی انگریزی',
- 				'en_US@alt=short' => 'امریکی انگریزی',
+ 				'hr' => 'کروشین',
+ 				'jv' => 'جاوانیز',
+ 				'ka' => 'جارجيائى',
+ 				'kl' => 'کلالیسٹ',
  				'kn' => 'کنڑ',
  				'ku' => 'کرد',
- 				'lv' => 'لٹويای',
+ 				'mag' => 'مگہی',
  				'zgh' => 'معیاری مراقشی تمازیقی',
  				'zh_Hans' => 'آسان چینی',
 
@@ -59,7 +62,6 @@ has 'display_name_region' => (
  			'AX' => 'جزائر آلینڈ',
  			'BV' => 'جزیرہ بوویت',
  			'CC' => 'جزائر (کیلنگ) کوکوس',
- 			'CI' => 'کوت داوواغ',
  			'CK' => 'جزائر کک',
  			'CP' => 'جزیرہ کلپرٹن',
  			'DG' => 'ڈیگو گارشیا',
@@ -149,6 +151,23 @@ has 'default_numbering_system' => (
 	default		=> 'arabext',
 );
 
+has 'number_currency_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'arabext' => {
+			'pattern' => {
+				'default' => {
+					'standard' => {
+						'positive' => '¤ #,##,##0.00',
+					},
+				},
+			},
+		},
+} },
+);
+
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -221,118 +240,6 @@ has 'currencies' => (
 );
 
 
-has 'day_period_data' => (
-	is			=> 'ro',
-	isa			=> CodeRef,
-	init_arg	=> undef,
-	default		=> sub { sub {
-		# Time in hhmm format
-		my ($self, $type, $time, $day_period_type) = @_;
-		$day_period_type //= 'default';
-		SWITCH:
-		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'afternoon2' if $time >= 1600
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1600
-						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				last SWITCH;
-				}
-		}
-	} },
-);
-
-around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
-};
-
-has 'eras' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'generic' => {
-		},
-	} },
-);
-
-has 'date_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'generic' => {
-			'short' => q{d/M/yy GGGGG},
-		},
-	} },
-);
-
-has 'time_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'generic' => {
-		},
-	} },
-);
-
-has 'datetime_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'generic' => {
-		},
-	} },
-);
-
-has 'datetime_formats_available_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
-has 'datetime_formats_append_item' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
-has 'datetime_formats_interval' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
 has 'time_zone_names' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -343,7 +250,7 @@ has 'time_zone_names' => (
 		regionFormat => q({0} معیاری وقت),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(افغانستان ٹائم),
+				'standard' => q#افغانستان ٹائم#,
 			},
 		},
 		'Africa/Accra' => {
@@ -351,9 +258,9 @@ has 'time_zone_names' => (
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(ایمیزون سمر ٹائم),
-				'generic' => q(ایمیزون ٹائم),
-				'standard' => q(ایمیزون سٹینڈرڈ ٹائم),
+				'daylight' => q#ایمیزون سمر ٹائم#,
+				'generic' => q#ایمیزون ٹائم#,
+				'standard' => q#ایمیزون سٹینڈرڈ ٹائم#,
 			},
 		},
 		'America/Cambridge_Bay' => {
@@ -376,83 +283,80 @@ has 'time_zone_names' => (
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(عرب ڈے لائٹ ٹائم),
-				'generic' => q(عرب ٹائم),
-				'standard' => q(عرب سٹینڈرڈ ٹائم),
+				'daylight' => q#عرب ڈے لائٹ ٹائم#,
+				'generic' => q#عرب ٹائم#,
+				'standard' => q#عرب سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(مغربی ارجنٹینا سمر ٹائم),
-				'generic' => q(مغربی ارجنٹینا ٹائم),
-				'standard' => q(مغربی ارجنٹینا سٹینڈرڈ ٹائم),
+				'daylight' => q#مغربی ارجنٹینا سمر ٹائم#,
+				'generic' => q#مغربی ارجنٹینا ٹائم#,
+				'standard' => q#مغربی ارجنٹینا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(آرمینیا سمر ٹائم),
-				'generic' => q(آرمینیا ٹائم),
-				'standard' => q(آرمینیا سٹینڈرڈ ٹائم),
+				'daylight' => q#آرمینیا سمر ٹائم#,
+				'generic' => q#آرمینیا ٹائم#,
+				'standard' => q#آرمینیا سٹینڈرڈ ٹائم#,
 			},
-		},
-		'Asia/Dubai' => {
-			exemplarCity => q#دبئی#,
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(آذربائیجان سمر ٹائم),
-				'generic' => q(آذربائیجان ٹائم),
-				'standard' => q(آذربائیجان سٹینڈرڈ ٹائم),
+				'daylight' => q#آذربائیجان سمر ٹائم#,
+				'generic' => q#آذربائیجان ٹائم#,
+				'standard' => q#آذربائیجان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(بنگلہ دیش سمر ٹائم),
-				'generic' => q(بنگلہ دیش ٹائم),
-				'standard' => q(بنگلہ دیش سٹینڈرڈ ٹائم),
+				'daylight' => q#بنگلہ دیش سمر ٹائم#,
+				'generic' => q#بنگلہ دیش ٹائم#,
+				'standard' => q#بنگلہ دیش سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(بھوٹان ٹائم),
+				'standard' => q#بھوٹان ٹائم#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(بولیویا ٹائم),
+				'standard' => q#بولیویا ٹائم#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(برازیلیا سمر ٹائم),
-				'generic' => q(برازیلیا ٹائم),
-				'standard' => q(برازیلیا سٹینڈرڈ ٹائم),
+				'daylight' => q#برازیلیا سمر ٹائم#,
+				'generic' => q#برازیلیا ٹائم#,
+				'standard' => q#برازیلیا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(چلی سمر ٹائم),
-				'generic' => q(چلی ٹائم),
-				'standard' => q(چلی سٹینڈرڈ ٹائم),
+				'daylight' => q#چلی سمر ٹائم#,
+				'generic' => q#چلی ٹائم#,
+				'standard' => q#چلی سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(کولمبیا سمر ٹائم),
-				'generic' => q(کولمبیا ٹائم),
-				'standard' => q(کولمبیا سٹینڈرڈ ٹائم),
+				'daylight' => q#کولمبیا سمر ٹائم#,
+				'generic' => q#کولمبیا ٹائم#,
+				'standard' => q#کولمبیا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(ایسٹر آئلینڈ سمر ٹائم),
-				'generic' => q(ایسٹر آئلینڈ ٹائم),
-				'standard' => q(ایسٹر آئلینڈ سٹینڈرڈ ٹائم),
+				'daylight' => q#ایسٹر آئلینڈ سمر ٹائم#,
+				'generic' => q#ایسٹر آئلینڈ ٹائم#,
+				'standard' => q#ایسٹر آئلینڈ سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ایکواڈور ٹائم),
+				'standard' => q#ایکواڈور ٹائم#,
 			},
 		},
 		'Europe/Budapest' => {
@@ -460,178 +364,178 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(وسطی یورپ کا موسم گرما کا وقت),
-				'generic' => q(وسطی یورپ کا وقت),
-				'standard' => q(وسطی یورپ کا معیاری وقت),
+				'daylight' => q#وسطی یورپ کا موسم گرما کا وقت#,
+				'generic' => q#وسطی یورپ کا وقت#,
+				'standard' => q#وسطی یورپ کا معیاری وقت#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(فاک لینڈ آئلینڈز سمر ٹائم),
-				'generic' => q(فاک لینڈ آئلینڈز ٹائم),
-				'standard' => q(فاک لینڈ آئلینڈز سٹینڈرڈ ٹائم),
+				'daylight' => q#فاک لینڈ آئلینڈز سمر ٹائم#,
+				'generic' => q#فاک لینڈ آئلینڈز ٹائم#,
+				'standard' => q#فاک لینڈ آئلینڈز سٹینڈرڈ ٹائم#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(فرینچ گیانا ٹائم),
+				'standard' => q#فرینچ گیانا ٹائم#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(گرین وچ مین ٹائم),
+				'standard' => q#گرین وچ مین ٹائم#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(گالاپاگوز ٹائم),
+				'standard' => q#گالاپاگوز ٹائم#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(جارجیا سمر ٹائم),
-				'generic' => q(جارجیا ٹائم),
-				'standard' => q(جارجیا سٹینڈرڈ ٹائم),
+				'daylight' => q#جارجیا سمر ٹائم#,
+				'generic' => q#جارجیا ٹائم#,
+				'standard' => q#جارجیا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(خلیج سٹینڈرڈ ٹائم),
+				'standard' => q#خلیج سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(گیانا ٹائم),
+				'standard' => q#گیانا ٹائم#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(انڈیا سٹینڈرڈ ٹائم),
+				'standard' => q#انڈیا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(ایران ڈے لائٹ ٹائم),
-				'generic' => q(ایران ٹائم),
-				'standard' => q(ایران سٹینڈرڈ ٹائم),
+				'daylight' => q#ایران ڈے لائٹ ٹائم#,
+				'generic' => q#ایران ٹائم#,
+				'standard' => q#ایران سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(اسرائیل ڈے لائٹ ٹائم),
-				'generic' => q(اسرائیل ٹائم),
-				'standard' => q(اسرائیل سٹینڈرڈ ٹائم),
+				'daylight' => q#اسرائیل ڈے لائٹ ٹائم#,
+				'generic' => q#اسرائیل ٹائم#,
+				'standard' => q#اسرائیل سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(مشرقی قزاخستان ٹائم),
+				'standard' => q#مشرقی قزاخستان ٹائم#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(مغربی قزاخستان ٹائم),
+				'standard' => q#مغربی قزاخستان ٹائم#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(کرغستان ٹائم),
+				'standard' => q#کرغستان ٹائم#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(مکوآری آئلینڈ ٹائم),
+				'standard' => q#مکوآری آئلینڈ ٹائم#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(مالدیپ ٹائم),
+				'standard' => q#مالدیپ ٹائم#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(نیپال ٹائم),
+				'standard' => q#نیپال ٹائم#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(نیوزی لینڈ ڈے لائٹ ٹائم),
-				'generic' => q(نیوزی لینڈ ٹائم),
-				'standard' => q(نیوزی لینڈ سٹینڈرڈ ٹائم),
+				'daylight' => q#نیوزی لینڈ ڈے لائٹ ٹائم#,
+				'generic' => q#نیوزی لینڈ ٹائم#,
+				'standard' => q#نیوزی لینڈ سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(فرنانڈو ڈی نورونہا سمر ٹائم),
-				'generic' => q(فرنانڈو ڈی نورنہا ٹائم),
-				'standard' => q(فرنانڈو ڈی نورنہا سٹینڈرڈ ٹائم),
+				'daylight' => q#فرنانڈو ڈی نورونہا سمر ٹائم#,
+				'generic' => q#فرنانڈو ڈی نورنہا ٹائم#,
+				'standard' => q#فرنانڈو ڈی نورنہا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(پاکستان سمر ٹائم),
-				'generic' => q(پاکستان ٹائم),
-				'standard' => q(پاکستان سٹینڈرڈ ٹائم),
+				'daylight' => q#پاکستان سمر ٹائم#,
+				'generic' => q#پاکستان ٹائم#,
+				'standard' => q#پاکستان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(پیراگوئے سمر ٹائم),
-				'generic' => q(پیراگوئے ٹائم),
-				'standard' => q(پیراگوئے سٹینڈرڈ ٹائم),
+				'daylight' => q#پیراگوئے سمر ٹائم#,
+				'generic' => q#پیراگوئے ٹائم#,
+				'standard' => q#پیراگوئے سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(پیرو سمر ٹائم),
-				'generic' => q(پیرو ٹائم),
-				'standard' => q(پیرو سٹینڈرڈ ٹائم),
+				'daylight' => q#پیرو سمر ٹائم#,
+				'generic' => q#پیرو ٹائم#,
+				'standard' => q#پیرو سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(روتھیرا ٹائم),
+				'standard' => q#روتھیرا ٹائم#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(سورینام ٹائم),
+				'standard' => q#سورینام ٹائم#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(تاجکستان ٹائم),
+				'standard' => q#تاجکستان ٹائم#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(ترکمانستان سمر ٹائم),
-				'generic' => q(ترکمانستان ٹائم),
-				'standard' => q(ترکمانستان سٹینڈرڈ ٹائم),
+				'daylight' => q#ترکمانستان سمر ٹائم#,
+				'generic' => q#ترکمانستان ٹائم#,
+				'standard' => q#ترکمانستان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(یوروگوئے سمر ٹائم),
-				'generic' => q(یوروگوئے ٹائم),
-				'standard' => q(یوروگوئے سٹینڈرڈ ٹائم),
+				'daylight' => q#یوروگوئے سمر ٹائم#,
+				'generic' => q#یوروگوئے ٹائم#,
+				'standard' => q#یوروگوئے سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(ازبکستان سمر ٹائم),
-				'generic' => q(ازبکستان ٹائم),
-				'standard' => q(ازبکستان سٹینڈرڈ ٹائم),
+				'daylight' => q#ازبکستان سمر ٹائم#,
+				'generic' => q#ازبکستان ٹائم#,
+				'standard' => q#ازبکستان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(وینزوئیلا ٹائم),
+				'standard' => q#وینزوئیلا ٹائم#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(ووسٹاک ٹائم),
+				'standard' => q#ووسٹاک ٹائم#,
 			},
 		},
 	 } }

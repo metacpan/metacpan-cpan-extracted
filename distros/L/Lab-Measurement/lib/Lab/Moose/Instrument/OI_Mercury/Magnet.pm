@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.630';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.631';
 #ABSTRACT: Oxford Instruments Mercury Cryocontrol magnet power supply
 
 use 5.010;
@@ -424,7 +424,7 @@ sub sweep_to_field {
     my $point = delete $args{target};
     my $rate  = delete $args{rate};
 
-    $self->config_sweep( points => $point, rates => $rate, %args );
+    $self->config_sweep( point => $point, rate => $rate, %args );
 
     $self->trg(%args);
 
@@ -436,11 +436,11 @@ sub sweep_to_field {
 sub config_sweep {
     my ( $self, %args ) = validated_hash(
         \@_,
-        points => { isa => 'Num' },
-        rates  => { isa => 'Num' },
+        point => { isa => 'Num' },
+        rate  => { isa => 'Num' },
     );
-    my $target = delete $args{points};
-    my $rate   = delete $args{rates};
+    my $target = delete $args{point};
+    my $rate   = delete $args{rate};
 
     my $setrate = $self->oim_set_field_sweeprate( value => $rate, %args );
     my $setpoint = $self->oim_set_field_setpoint( value => $target, %args );
@@ -539,7 +539,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury Cryocont
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 SYNOPSIS
 

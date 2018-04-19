@@ -1,0 +1,51 @@
+NAME
+    Data::Sah::CoerceRule::array::str_int_range - Coerce array of ints from
+    string in the form of "INT1-INT2"
+
+VERSION
+    This document describes version 0.001 of
+    Data::Sah::CoerceRule::array::str_int_range (from Perl distribution
+    Data-Sah-CoerceRule-array-str_int_range), released on 2018-04-17.
+
+DESCRIPTION
+    This distribution contains Data::Sah coercion rule to coerce array of
+    ints from string in the form of "INT1-INT2" string. The rule is not
+    enabled by default. You can enable it in a schema using e.g.:
+
+     ["array*", of=>"int", "x.coerce_rules"=>["str_int_range"]]
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-CoerceRule-array-str_int_range>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_int_ran
+    ge>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceRule-a
+    rray-str_int_range>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Sah::CoerceRule::array::str_comma_sep
+
+    Data::Sah::CoerceRule::array::str_int_range_and_comma_sep
+
+    Data::Sah::Coerce
+
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,23 +1,79 @@
 README for Lab::Measurement
------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
-Lab::Measurement allows to perform test and measurement tasks with Perl scripts. It
-provides an interface to several instrumentation control backends, as e.g. LinuxGPIB or
-National Instruments' NI-VISA library. Dedicated instrument driver classes relieve the
-user from taking care for internal details.
+Lab::Measurement allows to perform test and measurement tasks with Perl scripts.
+It provides an interface to several instrumentation control backends, as e.g.
+LinuxGPIB or National Instruments' NI-VISA library. Dedicated instrument driver
+classes relieve the user from taking care for internal details.
 
-See https://www.labmeasurement.de/ for further information, including installation
-instructions.
+See https://www.labmeasurement.de/ for further information.
+
+
+INSTALLATION
+=========================
+
+The Lab::Measurement package is distributed on the Comprehensive Perl Archive
+Network (CPAN). A general introduction to the installation of CPAN modules is
+provided in [1]. Essentially, Lab::Measurement can be installed by any CPAN
+client software distributed for Perl.
+
+An example using the cpanminus CPAN client would be to use the commands
+
+1) optionally, to download and install cpanminus if not present on the system
+ $ cpan App::cpanminus
+
+2) to download and install Lab::Measurement and its dependencies
+ $ cpanm Lab::Measurement
+
+at the command-line prompt (e.g. bash on Linux or cmd.exe on MS Windows). The
+CPAN client will download and install Lab::Measurement from CPAN and will
+optionally verify the installation by running the module's unit tests.
+
+Perl installation variants may additionally provide graphical installers for
+accessing CPAN (e.g., ActivePerl for Windows) or integrate installation of Perl
+modules into the package management of the operating system (e.g.,
+Lab::Measurement is packaged for Gentoo Linux).
+
+Depending on the used hardware, additional Perl back-end modules such as
+LinuxGPIB, Lab::VISA, or Lab::VXI11 may be needed on your system. Back-end
+specific documentation and installation instructions are provided in [2].
+
+
+USAGE
+=========================
+
+Lab::Measurement is a library of Perl modules, for use by measurement scripts.
+Any such Perl script is executed by running
+
+ $ perl script.pl
+
+with the command-line prompt.
+
+Examples of measurement scripts using the Lab::Measurement module libraries can
+be found in the Lab::Measurement tutorial [3]. It can also be read after
+Lab::Measurement installation by running on the command-line
+
+ $ perldoc Lab::Measurement::Tutorial
+
+
+REFERENCES
+=========================
+
+[1] http://www.cpan.org/modules/INSTALL.html
+[2] https://metacpan.org/pod/Lab::Measurement::Backends
+[3] https://metacpan.org/pod/Lab::Measurement::Tutorial
+
 
 COPYRIGHT AND LICENCE
+=========================
 
 Copyright (C) 2004-2018 the Lab::Measurement team
   For a detailed list of authors, please see the Git commit log.
 
-This library is free software; you can redistribute it and/or modify it under the same 
-terms as Perl itself, either Perl version 5.8.3 or, at your option, any later version 
-of Perl 5 you may have available.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.3 or, at your option, any
+later version of Perl 5 you may have available.
 
-With the current license terms of Perl this means you have the choice of any version of
-the GNU General Public License or of the Artistic License. See COPYING, COPYING.GPL-2,
-and COPYING.Artistic for the details.
+With the current license terms of Perl this means you have the choice of any
+version of the GNU General Public License or of the Artistic License. See
+COPYING, COPYING.GPL-2, and COPYING.Artistic for the details.

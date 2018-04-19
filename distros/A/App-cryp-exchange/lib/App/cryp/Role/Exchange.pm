@@ -1,7 +1,7 @@
 package App::cryp::Role::Exchange;
 
-our $DATE = '2018-04-04'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-04-12'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,7 +44,7 @@ sub to_native_currency {
 sub to_canonical_pair {
     my ($self, $pair) = @_;
 
-    my ($cur1, $cur2) = $pair =~ /(\w+)[\W_](\w+)/
+    my ($cur1, $cur2) = $pair =~ /([\w\$]+)[\W_]([\w\$]+)/
         or die "Invalid pair '$pair'";
     sprintf "%s/%s",
         $self->to_canonical_currency($cur1),
@@ -77,7 +77,7 @@ App::cryp::Role::Exchange - Role for interacting with an exchange
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-04-04.
+This document describes version 0.002 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-04-12.
 
 =head1 DESCRIPTION
 
@@ -219,11 +219,23 @@ Usage:
 
  $xchg->get_order_book => [$status, $reason, $payload, \%resmeta]
 
-Method should return payload as an array of hashrefs. Each hashref (record)
-should contain these keys: C<type> (str, either "buy" or "sell"), C<price>
-(float), C<amount> (float). Buy (bid, purchase) records must be sorted from
-highest price to lowest price. Sell (ask, offer) records must be sorted from
-lowest price to highest.
+Method should return this payload:
+
+ {
+     buy => [
+         [100, 10 ] , # price, amount
+         [ 99,  4.1], # price, amount
+         ...
+     ],
+     sell => [
+         [101  , 5.5], # price, amount
+         [101.5, 3.1], # price, amount
+         ...
+     ],
+ }
+
+Buy (bid, purchase) records must be sorted from highest price to lowest price.
+Sell (ask, offer) records must be sorted from lowest price to highest.
 
 Known options:
 
@@ -232,11 +244,6 @@ Known options:
 =item * pair
 
 String. Pair.
-
-=item * type
-
-String. Can be set to "buy" or "sell" to filter only return buy records or sell
-records respectively.
 
 =back
 

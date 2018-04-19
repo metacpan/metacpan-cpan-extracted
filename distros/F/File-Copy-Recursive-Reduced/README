@@ -1,0 +1,41 @@
+README for Perl extension File-Copy-Recursive-Reduced
+  File-Copy-Recursive-Reduced is a Perl library which provides
+  subroutines exported on request which are intended to serve as
+  drop-in replacements for certain subroutines found in CPAN
+  distribution File-Copy-Recursive
+  <http://search.cpan.org/~dmuey/File-Copy-Recursive-0.40/> (FCR).
+
+ What Problem Does This Library Address?
+  Because of certain problems in FCR, it is currently (April 2018)
+  failing to install on several important operating systems
+  including FreeBSD and Windows. As a consequence, other CPAN
+  distributions which have a direct or indirect dependency on
+  File-Copy-Recursive (*e.g.*, CPAN-Reporter, DateTime,
+  Dist-Zilla) are failing to install on those platforms as well.
+
+  Such failures are "silent" in the sense that CPANtesters
+  installations generate no report authors when a distribution's
+  upstream dependencies fail to install. No report to the
+  CPANtesters database means no email notification to CPAN
+  authors. So many authors may be unaware that their distributions
+  are currently failing to install on important platforms.
+
+  A patch has been submitted to address the problems in FCR.
+  However, until it is applied and a new CPAN release made,
+  consumers of FCR should consider using the replacement functions
+  exported by File-Copy-Recursive-Reduced.
+
+ Install
+  This library can be installed in the customary way, *i.e.,* by a
+  CPAN installer program such as cpan or cpanm or by satisfying
+  its prerequisites (Capture::Tiny and Path::Tiny, for the test
+  suite only) and then calling:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  For further information, after installation call "perldoc
+  File::Copy::Recursive::Reduced".
+

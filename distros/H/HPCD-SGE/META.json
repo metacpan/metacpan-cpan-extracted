@@ -52,7 +52,7 @@
    "provides" : {
       "HPCD::SGE" : {
          "file" : "lib/HPCD/SGE.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       },
       "HPCD::SGE::DRMAACheck" : {
          "file" : "lib/HPCD/SGE/DRMAACheck.pm"
@@ -85,6 +85,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

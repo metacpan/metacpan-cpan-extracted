@@ -12,7 +12,7 @@ our @ISA = qw{ Exporter };
 use HTTP::Date;
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.

@@ -1,6 +1,6 @@
 package Pcore::API::Moz::Account;
 
-use Pcore -class, -result, -const;
+use Pcore -class, -res, -const;
 use Pcore::Util::Data qw[to_b64 to_uri to_json from_json];
 use Pcore::Util::Digest qw[hmac_sha1];
 
@@ -51,15 +51,15 @@ sub get_url_metrics ( $self, $domains, $metric, $cb ) {
             useragent       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
             cookies         => $self->{_cookies},
             proxy           => $proxy,
-            on_finish       => sub ($res) {
+            sub ($res) {
                 if ( !$res ) {
-                    $cb->( result [ $res->status, $res->reason ] );
+                    $cb->( res [ $res->{status}, $res->{reason} ] );
                 }
                 else {
-                    my $json = eval { from_json $res->body->$* };
+                    my $json = eval { from_json $res->{body}->$* };
 
                     if ($@) {
-                        $cb->( result [ 500, 'Invalid JSON body' ] );
+                        $cb->( res [ 500, 'Invalid JSON body' ] );
                     }
                     else {
                         my $data;
@@ -68,7 +68,7 @@ sub get_url_metrics ( $self, $domains, $metric, $cb ) {
                             $data->{ $domains->[$i] } = $json->[$i];
                         }
 
-                        $cb->( result 200, $data );
+                        $cb->( res 200, $data );
                     }
                 }
 

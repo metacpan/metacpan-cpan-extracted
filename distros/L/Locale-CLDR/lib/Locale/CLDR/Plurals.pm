@@ -1,16 +1,17 @@
 package Locale::CLDR::Plurals;
 # This file auto generated from Data\common\supplemental\ordinals.xml
-#	on Fri 29 Apr  6:48:34 pm GMT
+#	on Fri 13 Apr  6:59:46 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -65,6 +66,78 @@ my %_plurals = (
 			},
 		},
 		ar => {
+			few => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n % 100 == $_} (3..10)) ;
+			},
+			many => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n % 100 == $_} (11..99)) ;
+			},
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (1)) ;
+			},
+			two => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (2)) ;
+			},
+			zero => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (0)) ;
+			},
+		},
+		ars => {
 			few => sub {
 				
 				my $number = shift;
@@ -1378,6 +1451,22 @@ my %_plurals = (
 				return  scalar (grep {$i == $_} (0,1)) ;
 			},
 		},
+		io => {
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
+			},
+		},
 		is => {
 			one => sub {
 				
@@ -2527,7 +2616,7 @@ my %_plurals = (
 				my $w = length $t;
 				$t ||= 0;
 
-				return  scalar (grep {$n == $_} (0..2)) && ! scalar (grep {$n == $_} (2)) ;
+				return  scalar (grep {$i == $_} (0..1)) ;
 			},
 		},
 		pt_PT => {
@@ -2543,7 +2632,7 @@ my %_plurals = (
 				my $w = length $t;
 				$t ||= 0;
 
-				return  scalar (grep {$n == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
+				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
 			},
 		},
 		rm => {
@@ -2669,6 +2758,22 @@ my %_plurals = (
 			},
 		},
 		saq => {
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (1)) ;
+			},
+		},
+		sd => {
 			one => sub {
 				
 				my $number = shift;
@@ -4394,6 +4499,64 @@ my %_plurals = (
 				return  scalar (grep {$n == $_} (1..4)) ;
 			},
 		},
+		or => {
+			few => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (4)) ;
+			},
+			many => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (6)) ;
+			},
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (1,5,7..9)) ;
+			},
+			two => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (2,3)) ;
+			},
+		},
 		ro => {
 			one => sub {
 				
@@ -4454,6 +4617,22 @@ my %_plurals = (
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1,2)) && ! scalar (grep {$n % 100 == $_} (11,12)) ;
+			},
+		},
+		tk => {
+			few => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n % 10 == $_} (6,9)) ||  scalar (grep {$n == $_} (10)) ;
 			},
 		},
 		tl => {
@@ -4529,6 +4708,15 @@ my %_plural_ranges = (
 			other => 'other',
 		},
 	},
+	ak => {
+		one => {
+			one => 'other',
+			other => 'other',
+		},
+		other => {
+			other => 'other',
+		},
+	},
 	am => {
 		one => {
 			one => 'one',
@@ -4575,11 +4763,46 @@ my %_plural_ranges = (
 			two => 'zero',
 		},
 	},
+	as => {
+		one => {
+			one => 'one',
+			other => 'other',
+		},
+		other => {
+			other => 'other',
+		},
+	},
 	az => {
 		one => {
 			other => 'other',
 		},
 		other => {
+			one => 'one',
+			other => 'other',
+		},
+	},
+	be => {
+		few => {
+			few => 'few',
+			many => 'many',
+			one => 'one',
+			other => 'other',
+		},
+		many => {
+			few => 'few',
+			many => 'many',
+			one => 'one',
+			other => 'other',
+		},
+		one => {
+			few => 'few',
+			many => 'many',
+			one => 'one',
+			other => 'other',
+		},
+		other => {
+			few => 'few',
+			many => 'many',
 			one => 'one',
 			other => 'other',
 		},
@@ -4787,7 +5010,45 @@ my %_plural_ranges = (
 			other => 'other',
 		},
 	},
+	ga => {
+		few => {
+			few => 'few',
+			many => 'many',
+			other => 'other',
+		},
+		many => {
+			many => 'many',
+			other => 'other',
+		},
+		one => {
+			few => 'few',
+			many => 'many',
+			other => 'other',
+			two => 'two',
+		},
+		other => {
+			few => 'few',
+			many => 'many',
+			one => 'one',
+			other => 'other',
+			two => 'two',
+		},
+		two => {
+			few => 'few',
+			many => 'many',
+			other => 'other',
+		},
+	},
 	gl => {
+		one => {
+			other => 'other',
+		},
+		other => {
+			one => 'one',
+			other => 'other',
+		},
+	},
+	gsw => {
 		one => {
 			other => 'other',
 		},
@@ -4872,6 +5133,15 @@ my %_plural_ranges = (
 	},
 	id => {
 		other => {
+			other => 'other',
+		},
+	},
+	io => {
+		one => {
+			other => 'other',
+		},
+		other => {
+			one => 'other',
 			other => 'other',
 		},
 	},
@@ -5067,12 +5337,22 @@ my %_plural_ranges = (
 			other => 'other',
 		},
 	},
+	or => {
+		one => {
+			one => 'other',
+			other => 'other',
+		},
+		other => {
+			other => 'other',
+		},
+	},
 	pa => {
 		one => {
 			one => 'one',
 			other => 'other',
 		},
 		other => {
+			one => 'one',
 			other => 'other',
 		},
 	},
@@ -5100,12 +5380,21 @@ my %_plural_ranges = (
 			other => 'other',
 		},
 	},
-	pt => {
+	ps => {
 		one => {
+			one => 'one',
 			other => 'other',
 		},
 		other => {
+			other => 'other',
+		},
+	},
+	pt => {
+		one => {
 			one => 'one',
+			other => 'other',
+		},
+		other => {
 			other => 'other',
 		},
 	},
@@ -5147,6 +5436,15 @@ my %_plural_ranges = (
 			few => 'few',
 			many => 'many',
 			one => 'one',
+			other => 'other',
+		},
+	},
+	sd => {
+		one => {
+			one => 'other',
+			other => 'other',
+		},
+		other => {
 			other => 'other',
 		},
 	},
@@ -5277,6 +5575,15 @@ my %_plural_ranges = (
 			other => 'other',
 		},
 	},
+	tk => {
+		one => {
+			other => 'other',
+		},
+		other => {
+			one => 'one',
+			other => 'other',
+		},
+	},
 	tr => {
 		one => {
 			other => 'other',
@@ -5340,6 +5647,11 @@ my %_plural_ranges = (
 		},
 	},
 	vi => {
+		other => {
+			other => 'other',
+		},
+	},
+	yue => {
 		other => {
 			other => 'other',
 		},

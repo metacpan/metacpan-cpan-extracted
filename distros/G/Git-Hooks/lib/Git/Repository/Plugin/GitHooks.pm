@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.9.2';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.9.3';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -725,7 +725,7 @@ sub fault {
     my $msg;
 
     {
-        my $prefix = $info->{prefix} || caller(1);
+        my $prefix = $info->{prefix} || caller;
         my @context;
         if (my $commit = $info->{commit}) {
             $commit = $commit->commit
@@ -836,7 +836,8 @@ sub get_commits {
 
         # We're going to use the "git rev-list" command for that. As you can
         # read on its documentation, the syntax to specify this set of
-        # commits is this: "--not --all $new_commit ^$old_commit".
+        # commits is this:
+        # "--not --branches --tags --not $new_commit ^$old_commit".
 
         # However, there are some special cases...
 
@@ -847,25 +848,34 @@ sub get_commits {
 
         return if $new_commit eq $git->undef_commit;
 
-        # When we're called in a post-receive or post-update hook, the
-        # pushed references already point to $new_commit. So, in these cases
-        # the "--not --all" options to git-rev-list would exclude from the
-        # results all commits reachable from $new_commit, which is exactly
-        # what we don't want... In order to avoid that we can't use these
-        # options directly with git-rev-list. Instead, we use the
-        # git-rev-parse command to get a list of all commits directly
-        # reachable by existing references. Then we'll see if we have to
-        # remove any commit from that list.
+        # The @excludes list will contain the arguments to git-log necessary to
+        # exclude from $new_commit history all commits already reachable by any
+        # other reference.
+        my @excludes;
 
-        my @excludes = $git->run(qw/rev-parse --not --all/);
+        if ($git->{_plugin_githooks}{hookname} !~ /^post-/) {
+            # In pre-* hooks (e.g., pre-receive, update) we can use the '--not
+            # --branches --tags' arguments.
+            @excludes = qw/--not --branches --tags --not/;
+        } else {
+            # When we're called in a post-receive or post-update hook, the
+            # pushed references already point to $new_commit. So, in these cases
+            # the "--not --branches --tags" options would exclude from the
+            # results all commits reachable from $new_commit, which is exactly
+            # what we don't want... In order to avoid that we can't use these
+            # options directly with git-log. Instead, we use the git-rev-parse
+            # command to get a list of all commits directly reachable by
+            # existing references.  Then we'll see if we have to remove any
+            # commit from that list.
 
-        if ($git->{_plugin_githooks}{hookname} =~ /^post-(?:receive|update)$/) {
-            # We can't simply remove $new_commit from @excludes because it
+            @excludes = $git->run(qw/rev-parse --not --branches --tags/);
+
+            # But we can't simply remove $new_commit from @excludes because it
             # can be reachable by other references. This can happen, for
             # instance, when one creates a new branch and pushes it before
-            # making any commits to it. So, we only remove it if it's
-            # reachable by a single reference, which must be the reference
-            # being pushed.
+            # making any commits to it or when one pushes a branch after a
+            # fast-forward merge. So, we only remove it if it's reachable by a
+            # single reference, which must be the reference being pushed.
 
             if ($git->version_ge('2.7.0')) {
                 # The --points-at option was implemented in this version of Git
@@ -876,11 +886,11 @@ sub get_commits {
                     @excludes = grep {$_ ne "^$new_commit"} @excludes;
                 }
             } else {
-                # I couldn't find a direct way to see how many refs point to
-                # $new_commit in older Gits. So, I use the porcelain git-log
-                # command with a format that shows the decoration for a single
-                # commit, which returns something like:
-                # (HEAD -> next, tag: v2.2.0, origin/next)
+                # KLUDGE: I couldn't find a direct way to see how many refs
+                # point to $new_commit in older Gits. So, I use the porcelain
+                # git-log command with a format that shows the decoration for a
+                # single commit, which returns something like: (HEAD -> next,
+                # tag: v2.2.0, origin/next)
                 my $decoration = $git->run(qw/log -n1 --format=%d/, $new_commit);
                 $decoration =~ s/HEAD,\s*//;
 
@@ -891,18 +901,18 @@ sub get_commits {
                     @excludes = grep {$_ ne "^$new_commit"} @excludes;
                 }
             }
+
+            # And we have to make sure $old_commit is on the list, as --not
+            # --branches --tags wouldn't bring it when we're being called in a
+            # post-receive or post-update hook.
+
+            push @excludes, "^$old_commit" unless $old_commit eq $git->undef_commit;
         }
-
-        # And we have to make sure $old_commit is on the list, as --not
-        # --all wouldn't bring it when we're being called in a post-receive
-        # or post-update hook.
-
-        push @excludes, "^$old_commit" unless $old_commit eq $git->undef_commit;
 
         my @arguments;
 
         push @arguments, @$options if defined $options;
-        push @arguments, $new_commit, @excludes;
+        push @arguments, @excludes, $new_commit;
         push @arguments, '--', @$paths if defined $paths;
 
         $cache->{$range} = [$git->log(@arguments)];
@@ -1473,6 +1483,7 @@ sub grok_acls {
     foreach ($git->get_config($cfg => 'acl')) {
         my %acl;
         if (/^\s*(allow|deny)\s+([$actions]+)\s+(\S+)/) {
+            $acl{acl}    = $_;
             $acl{allow}  = $1 eq 'allow';
             $acl{action} = $2;
             my $spec     = $3;
@@ -1514,7 +1525,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.9.2
+version 2.9.3
 
 =head1 SYNOPSIS
 
@@ -2231,6 +2242,36 @@ So, the B<last> RULE matching the action, the file, and the user, tells if the
 operation is allowed or denied.
 
 If no RULE matches the operation, it is allowed by default.
+
+In the returned list, each ACL is represented by a hash with the following keys:
+
+=over
+
+=item * B<acl>
+
+Contains the original representation of the ACL, which is useful in producing
+error messages.
+
+=item * B<allow>
+
+A boolean telling if the ACL is an "allow".
+
+=item * B<action>
+
+The string representation of the action (e.g. 'AMD' or 'CRUD').
+
+=item * B<spec>
+
+The spec, which can be either a string or a pre-compiled regex object.
+
+=item * B<who>
+
+The name of a user or of a group.
+
+=back
+
+As an optimization, only ACLs matching the current user, either explicitly or by
+not having a WHO part, are returned in the list.
 
 =head1 SEE ALSO
 

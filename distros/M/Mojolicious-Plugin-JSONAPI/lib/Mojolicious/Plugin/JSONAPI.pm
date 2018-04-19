@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '1.1';
+$Mojolicious::Plugin::JSONAPI::VERSION = '1.2';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -182,7 +182,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -367,5 +367,9 @@ Available in controllers:
  $c->resource_documents($dbix_resultset, $options);
 
 See L<resource_documents|https://metacpan.org/pod/JSONAPI::Document#resource_documents(DBIx::Class::Row-$row,-HashRef-$options)> for usage.
+
+=head1 LICENSE
+
+This code is available under the Perl 5 License.
 
 =cut

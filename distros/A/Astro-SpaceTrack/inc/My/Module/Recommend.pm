@@ -25,6 +25,11 @@ my @optionals = (
       gpg2. If you do not intend to make use of the identity file,
       Config::Identity is not needed.
 EOD
+    __any( 'Browser::Open'		=> <<'EOD' ),
+      This module is being phased in as the only supported way to
+      display web-based help. If you intend to leave the 'webcmd'
+      attribute false, this module is not needed.
+EOD
     __any( 'Time::HiRes'		=> <<'EOD' ),
       This module is used for more precise throttling of Space Track
       requests. The code will work without it, but the less precise

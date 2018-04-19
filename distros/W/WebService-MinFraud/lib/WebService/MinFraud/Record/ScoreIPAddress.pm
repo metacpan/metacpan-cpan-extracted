@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::ScoreIPAddress;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 with 'WebService::MinFraud::Role::Record::HasRisk';
 
@@ -23,7 +23,7 @@ WebService::MinFraud::Record::ScoreIPAddress - Contains data for the IP address'
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
   my $request    = { device => { ip_address => '24.24.24.24' } };

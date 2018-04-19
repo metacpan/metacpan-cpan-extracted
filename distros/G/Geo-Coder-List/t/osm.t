@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 31;
+use Test::Most tests => 33;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 OSM: {
 	SKIP: {
-		skip 'Test requires Internet access', 29 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 31 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::OSM;
@@ -31,7 +31,7 @@ OSM: {
 
 		if($@) {
 			diag('Geo::Coder::OSM not installed - skipping tests');
-			skip 'Geo::Coder::OSM not installed', 29;
+			skip 'Geo::Coder::OSM not installed', 31;
 		} else {
 			diag("Using Geo::Coder::OSM $Geo::Coder::OSM::VERSION");
 		}
@@ -76,10 +76,18 @@ OSM: {
 		ok($location->{address}{country_code} eq 'us');
 		like($location->{address}{country}, qr/United States/, 'check USA');
 
-		# Check list context finds both Portland, ME and Portland, OR
-		my @locations = $geocoderlist->geocode('Portland, USA');
-
+		my @locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
 		my $count = scalar(@locations);
+		ok($count == 0);
+
+		@locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
+		$count = scalar(@locations);
+		ok($count == 0);
+
+		# Check list context finds both Portland, ME and Portland, OR
+		@locations = $geocoderlist->geocode('Portland, USA');
+
+		$count = scalar(@locations);
 
 		ok($count > 1);
 		is(ref($locations[0]->{'geocoder'}), 'Geo::Coder::OSM', 'Verify OSM encoder is used');

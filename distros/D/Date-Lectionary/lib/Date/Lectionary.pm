@@ -25,11 +25,11 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180410
+Version 1.20180417
 
 =cut
 
-use version; our $VERSION = version->declare("v1.20180410");
+use version; our $VERSION = version->declare("v1.20180417");
 
 =head1 SYNOPSIS
 
@@ -289,7 +289,7 @@ L<http://search.cpan.org/dist/Date-Lectionary/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
 
 =head1 LICENSE
 

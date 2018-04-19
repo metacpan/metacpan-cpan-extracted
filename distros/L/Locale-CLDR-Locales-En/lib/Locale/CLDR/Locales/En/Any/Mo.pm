@@ -6,17 +6,18 @@ Locale::CLDR::Locales::En::Any::Mo - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Mo;
 # This file auto generated from Data\common\main\en_MO.xml
-#	on Fri 29 Apr  6:59:51 pm GMT
+#	on Fri 13 Apr  7:08:00 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -40,16 +41,16 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Hong_Kong' => {
 			short => {
-				'daylight' => q(HKST),
-				'generic' => q(HKT),
-				'standard' => q(HKT),
+				'daylight' => q#HKST#,
+				'generic' => q#HKT#,
+				'standard' => q#HKT#,
 			},
 		},
 		'Macau' => {
 			short => {
-				'daylight' => q(MDT),
-				'generic' => q(MST),
-				'standard' => q(MST),
+				'daylight' => q#MDT#,
+				'generic' => q#MST#,
+				'standard' => q#MST#,
 			},
 		},
 	 } }

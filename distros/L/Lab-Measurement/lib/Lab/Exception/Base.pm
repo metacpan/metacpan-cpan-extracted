@@ -1,6 +1,6 @@
 package Lab::Exception::Base;
 #ABSTRACT: Exception base class
-$Lab::Exception::Base::VERSION = '3.630';
+$Lab::Exception::Base::VERSION = '3.631';
 #
 # This is for comfy optional adding of custom methods via our own exception base class later
 #
@@ -45,7 +45,7 @@ Lab::Exception::Base - Exception base class
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 COPYRIGHT AND LICENSE
 

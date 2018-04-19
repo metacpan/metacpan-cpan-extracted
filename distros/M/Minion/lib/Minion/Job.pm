@@ -8,6 +8,14 @@ has [qw(args id minion retries task)];
 
 sub app { shift->minion->app }
 
+sub execute {
+  my $self = shift;
+  return eval {
+    $self->minion->tasks->{$self->emit('start')->task}->($self, @{$self->args});
+    !!$self->emit('finish');
+  } ? undef : $@;
+}
+
 sub fail {
   my ($self, $err) = (shift, shift // 'Unknown error');
   my $ok = $self->minion->backend->fail_job($self->id, $self->retries, $err);
@@ -32,7 +40,10 @@ sub is_finished {
   return 1;
 }
 
-sub note { $_[0]->minion->backend->note($_[0]->id, @_[1, 2]) }
+sub note {
+  my $self = shift;
+  return $self->minion->backend->note($self->id, {@_});
+}
 
 sub perform {
   my $self = shift;
@@ -56,8 +67,12 @@ sub start {
   die "Can't fork: $!" unless defined(my $pid = fork);
   return $self->emit(spawn => $pid) if $self->{pid} = $pid;
 
+  # Reset event loop
+  Mojo::IOLoop->reset;
+  local @{$SIG}{qw(CHLD INT TERM QUIT)} = ('default') x 4;
+
   # Child
-  $self->_run;
+  if (defined(my $err = $self->execute)) { $self->fail($err) }
   POSIX::_exit(0);
 }
 
@@ -67,22 +82,6 @@ sub _handle {
   my $self = shift;
   $self->emit(reap => $self->{pid});
   $? ? $self->fail("Non-zero exit status (@{[$? >> 8]})") : $self->finish;
-}
-
-sub _run {
-  my $self = shift;
-
-  return undef if eval {
-
-    # Reset event loop
-    Mojo::IOLoop->reset;
-    local @{$SIG}{qw(CHLD INT TERM QUIT)} = ('default') x 4;
-    $self->minion->tasks->{$self->emit('start')->task}->($self, @{$self->args});
-
-    1;
-  };
-  $self->fail(my $err = $@);
-  return $err;
 }
 
 1;
@@ -121,6 +120,23 @@ after it has transitioned to the C<failed> state.
   $job->on(failed => sub {
     my ($job, $err) = @_;
     say "Something went wrong: $err";
+  });
+
+=head2 finish
+
+  $job->on(finish => sub {
+    my $job = shift;
+    ...
+  });
+
+Emitted in the process performing this job if the task was successful. Note that
+this event is EXPERIMENTAL and might change without warning!
+
+  $job->on(finish => sub {
+    my $job  = shift;
+    my $id   = $job->id;
+    my $task = $job->task;
+    $job->app->log->debug(qq{Job "$id" was performed with task "$task"});
   });
 
 =head2 finished
@@ -237,6 +253,17 @@ Get application from L<Minion/"app">.
 
   # Longer version
   my $app = $job->minion->app;
+
+=head2 execute
+
+  my $err = $job->execute;
+
+Perform job in this process and return C<undef> if the task was successful or an
+exception otherwise.
+
+  # Perform job in foreground
+  if (my $err = $job->execute) { $job->fail($err) }
+  else                         { $job->finish }
 
 =head2 fail
 
@@ -387,12 +414,12 @@ Check if job performed with L</"start"> is finished.
 
 =head2 note
 
-  my $bool = $job->note(foo => 'bar');
+  my $bool = $job->note(mojo => 'rocks', minion => 'too');
 
-Change a metadata field for this job. The new value will get serialized by
-L<Minion/"backend"> (often with L<Mojo::JSON>), so you shouldn't send objects
-and be careful with binary data, nested data structures with hash and array
-references are fine though.
+Change one or more metadata fields for this job. The new values will get
+serialized by L<Minion/"backend"> (often with L<Mojo::JSON>), so you shouldn't
+send objects and be careful with binary data, nested data structures with hash
+and array references are fine though.
 
   # Share progress information
   $job->note(progress => 95);

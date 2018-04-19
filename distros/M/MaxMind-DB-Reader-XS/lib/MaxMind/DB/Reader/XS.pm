@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000004';
+our $VERSION = '1.000005';
 
 use 5.010000;
 
@@ -124,7 +124,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 =head1 VERSION
 
-version 1.000004
+version 1.000005
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,8 @@ See L<MaxMind::DB::Reader> for API details.
 
 =for Pod::Coverage BUILD DEMOLISH
 
+=for :stopwords PPA
+
 =head1 VERSIONING POLICY
 
 This module uses semantic versioning as described by
@@ -156,6 +158,23 @@ If you're running into install errors under Mac OS X, you may need to force a
 build of the 64 bit binary. For example, if you're installing via C<cpanm>:
 
     ARCHFLAGS="-arch x86_64" cpanm MaxMind::DB::Reader::XS
+
+=head1 UBUNTU SUPPORT
+
+The version of libmaxminddb that is available by default with Ubuntu may be
+too old for this level of MaxMind::DB::Reader::XS.  However, we do maintain a
+Launchpad PPA for all supported levels of Ubuntu.
+
+    https://launchpad.net/~maxmind/+archive/ubuntu/ppa
+
+Please visit the PPA page for more information, or, to configure your system,
+run as root:
+
+    # apt-add-repository ppa:maxmind/ppa
+    # apt-get update
+
+The PPA is now configured, and you may install (or upgrade) the libmaxminddb
+library via the usual apt commands.
 
 =head1 SUPPORT
 
@@ -184,13 +203,17 @@ Ran Eilam <reilam@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Florian Ragwitz Greg Oschwald Olaf Alders
+=for stopwords Andy Jack Chris Weyl Florian Ragwitz Greg Oschwald Hidenori Sugiyama Olaf Alders
 
 =over 4
 
 =item *
 
 Andy Jack <github@veracity.ca>
+
+=item *
+
+Chris Weyl <cweyl@alumni.drew.edu>
 
 =item *
 
@@ -202,13 +225,17 @@ Greg Oschwald <goschwald@maxmind.com>
 
 =item *
 
+Hidenori Sugiyama <madogiwa@gmail.com>
+
+=item *
+
 Olaf Alders <oalders@maxmind.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2017 by MaxMind, Inc.
+This software is Copyright (c) 2013 - 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-BasicAuthPlus
 
+0.11.1 2018-04-16
+  - Changed error check for start_tls() (patch from Mark Muldoon)
+
 0.11.0 2018-03-21
   - Now use Net::LDAP directly instead of Authen::Simple::LDAP.
   - Fixed support for TLS using Net::LDAP's start_tls method.

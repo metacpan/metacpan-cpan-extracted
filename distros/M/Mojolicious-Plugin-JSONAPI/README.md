@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 1.1
+version 1.2
 
 # SYNOPSIS
 
@@ -181,3 +181,7 @@ Available in controllers:
     $c->resource_documents($dbix_resultset, $options);
 
 See [resource\_documents](https://metacpan.org/pod/JSONAPI::Document#resource_documents\(DBIx::Class::Row-$row,-HashRef-$options\)) for usage.
+
+# LICENSE
+
+This code is available under the Perl 5 License.

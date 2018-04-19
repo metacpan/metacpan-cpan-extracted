@@ -1,9 +1,48 @@
 ==================================================
-Changes from 2016-03-17 00:00:00 +0000 to present.
+Changes from 2016-04-13 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.5 at 2018-03-17 06:01:47 +0000
+version 5.6 at 2018-04-13 18:20:21 +0000
+----------------------------------------
+
+  Change: fcb981c7ea59b5e3ac5f9c5b2ae3cf34e1fad5a3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-13 20:20:03 +0000
+
+    Documentation fixup with the latest pod tooling 
+
+  Change: 2d9fce9813a585ff3115bfdce4b6b46a09192bf7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-13 10:57:03 +0000
+
+    Don't track the local TODO file 
+
+  Change: 7727fd81af17556c54e9c911d507efcd20266765
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-13 10:54:44 +0000
+
+    Ready for 5.6 Release
+
+    * Remove overzealous debugging messages * Tweak es-storage-data.pl to
+    provide full details via --all * Change the way
+    es-daily-index-maintenance.pl complains when --master--only is set. *
+    Documentation updated 
+
+  Change: 1b06f8ce6a574e34acea51938193d7590c6c24f9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-17 00:49:08 +0000
+
+    Docs updated added --view base to es-storage-data.pl 
+
+  Change: 0cf82d70c23104b590f29b4551612578541cbb6a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-17 00:39:18 +0000
+
+    Get es-storage-data.pl working on modern ElasticSearch 
+
+----------------------------------------
+version 5.5 at 2018-03-17 06:01:25 +0000
 ----------------------------------------
 
   Change: 757dec9e648d077759da9a19ebdf3ed343df82f1
@@ -365,79 +404,6 @@ version 5.0 at 2016-08-19 03:50:24 +0000
 
     Version Numbers Updated 
 
-----------------------------------------
-version 4.7 at 2016-04-07 21:18:28 +0000
-----------------------------------------
-
-  Change: d0b56b67bed7fc2716d20ba5d5ed4e173d094998
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-07 14:18:28 +0000
-
-    Updated mailmap 
-
-  Change: 25d120f1b42ff24ad1273b902b2e3794a2144912
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-07 14:16:12 +0000
-
-    Fix logic for field hunting in the es_index_fields() routine.
-
-    This now returns all the fields and any unique aliases reliably. 
-
-  Change: 8c08c833958b3c4f99ed5d870defe48d0f4176da
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-07 12:43:57 +0000
-
-    Add the ability to skip either add or remove step of alias management. 
-
-  Change: f846dca1c844b2ca6313be422621548a9eef3a8f
-  Author: Daniel Ostermeier <dostermeier@ml815921.corpad.adbkng.com>
-  Date : 2016-04-07 14:36:34 +0000
-
-    Don't die when no hits are returned 
-
-  Change: 5b27011ba8797dc908f4dd703c31ffa9045553d3
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-04 11:10:59 +0000
-
-    Version Bump for 4.6 Release. 
-
-  Change: 11a69078d4ae7f6a09ee89dcdd5222498f213e13
-  Author: Kang-min Liu <gugod@gugod.org>
-  Date : 2016-03-23 16:01:52 +0000
-
-    fix es-copy-index.pl when `--mapping` is not given.
-
-    When `--mapping` is not given, the process to retrieve current index
-    mapping was wrong and retrive a blank hash instead. So this was broken:
-
-    es-copy-index --from es-01 --to es-02 --source log.20160323
-
-    This commit does an additional query for mapping when `--mapping` is not
-    given. 
-
-----------------------------------------
-version 4.6 at 2016-04-04 18:06:24 +0000
-----------------------------------------
-
-  Change: c6874602274828fbb242777a2438b9516f9f6a82
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-04 11:06:24 +0000
-
-    Use DateTime for tests for accurately representing the index name. 
-
-  Change: 6beb23d8c76f19310d6352c7b3e10a5f19bafa60
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-04-04 11:06:00 +0000
-
-    Fix calls to timelocal with gmtime to handle weird date bug with localtime
-    reporting fewer days than expected. 
-
-  Change: a0b12324f6b57b45442e4110ebfa7828813ab652
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-03-05 21:34:36 +0000
-
-    Version 4.5 docs. 
-
 =================================================
-Plus 51 releases after 2016-03-17 00:00:00 +0000.
+Plus 56 releases after 2016-04-13 00:00:00 +0000.
 =================================================

@@ -58,6 +58,11 @@ and bug reports are mainly tracked. Bug reports can also be sent through the
 CPAN RT system, or by mail directly to the developers at the addresses below,
 although these will not be as closely tracked.
 
+Development uses [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla), and is tracked in the `master` branch of the
+code repository. Code contributions can be made directly on that branch (which
+will likely require you to use Dist::Zilla), or on the `build` branch of the,
+which holds the built code and has no need for development tools.
+
 # AUTHOR
 
 - José Joaquín Atria <jjatria@cpan.org>

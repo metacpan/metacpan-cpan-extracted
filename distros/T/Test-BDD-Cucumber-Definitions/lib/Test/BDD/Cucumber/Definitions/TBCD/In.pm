@@ -10,7 +10,7 @@ use Test::BDD::Cucumber::Definitions::Struct::In;
 use Test::BDD::Cucumber::Definitions::Var::In;
 use Test::BDD::Cucumber::Definitions::Zip::In;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 sub import {
     Test::BDD::Cucumber::Definitions::File::In->import;

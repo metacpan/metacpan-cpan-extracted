@@ -18,32 +18,42 @@ sub register {
   push @{$app->renderer->paths}, $resources->child('templates')->to_string;
 
   # Routes
-  $prefix->get('/')->to(template => 'minion/dashboard')
-    ->name('minion_dashboard');
-  $prefix->get('/stats' => \&_stats)->name('minion_stats');
-  $prefix->get('/jobs'  => \&_list_jobs)->name('minion_jobs');
+  $prefix->get('/'        => \&_dashboard)->name('minion_dashboard');
+  $prefix->get('/stats'   => \&_stats)->name('minion_stats');
+  $prefix->get('/history' => \&_history)->name('minion_history');
+  $prefix->get('/jobs'    => \&_list_jobs)->name('minion_jobs');
   $prefix->patch('/jobs' => \&_manage_jobs)->name('minion_manage_jobs');
   $prefix->get('/locks' => \&_list_locks)->name('minion_locks');
   $prefix->delete('/locks' => \&_unlock)->name('minion_unlock');
   $prefix->get('/workers' => \&_list_workers)->name('minion_workers');
 }
 
+sub _dashboard {
+  my $c       = shift;
+  my $history = $c->minion->backend->history;
+  $c->render('minion/dashboard', history => $history);
+}
+
+sub _history {
+  my $c = shift;
+  $c->render(json => $c->minion->history);
+}
+
 sub _list_jobs {
   my $c = shift;
 
-  my $validation = $c->validation;
-  $validation->optional('id');
-  $validation->optional('limit')->num;
-  $validation->optional('offset')->num;
-  $validation->optional('queue');
-  $validation->optional('state')->in(qw(active failed finished inactive));
-  $validation->optional('task');
+  my $v = $c->validation;
+  $v->optional('id');
+  $v->optional('limit')->num;
+  $v->optional('offset')->num;
+  $v->optional('queue');
+  $v->optional('state')->in(qw(active failed finished inactive));
+  $v->optional('task');
   my $options = {};
-  $options->{$_} = $validation->param($_) for qw(queue state task);
-  $options->{ids} = $validation->every_param('id')
-    if $validation->is_valid('id');
-  my $limit  = $validation->param('limit')  || 10;
-  my $offset = $validation->param('offset') || 0;
+  $v->is_valid($_) && ($options->{"${_}s"} = $v->every_param($_))
+    for qw(id queue state task);
+  my $limit  = $v->param('limit')  || 10;
+  my $offset = $v->param('offset') || 0;
 
   my $results = $c->minion->backend->list_jobs($offset, $limit, $options);
   $c->render(
@@ -58,13 +68,14 @@ sub _list_jobs {
 sub _list_locks {
   my $c = shift;
 
-  my $validation = $c->validation;
-  $validation->optional('limit')->num;
-  $validation->optional('offset')->num;
-  $validation->optional('name');
-  my $options = {name => $validation->param('name')};
-  my $limit  = $validation->param('limit')  || 10;
-  my $offset = $validation->param('offset') || 0;
+  my $v = $c->validation;
+  $v->optional('limit')->num;
+  $v->optional('offset')->num;
+  $v->optional('name');
+  my $options = {};
+  $options->{names} = $v->every_param('name') if $v->is_valid('name');
+  my $limit  = $v->param('limit')  || 10;
+  my $offset = $v->param('offset') || 0;
 
   my $results = $c->minion->backend->list_locks($offset, $limit, $options);
   $c->render(
@@ -79,15 +90,14 @@ sub _list_locks {
 sub _list_workers {
   my $c = shift;
 
-  my $validation = $c->validation;
-  $validation->optional('id');
-  $validation->optional('limit')->num;
-  $validation->optional('offset')->num;
-  my $limit  = $validation->param('limit')  || 10;
-  my $offset = $validation->param('offset') || 0;
+  my $v = $c->validation;
+  $v->optional('id');
+  $v->optional('limit')->num;
+  $v->optional('offset')->num;
+  my $limit  = $v->param('limit')  || 10;
+  my $offset = $v->param('offset') || 0;
   my $options = {};
-  $options->{ids} = $validation->every_param('id')
-    if $validation->is_valid('id');
+  $options->{ids} = $v->every_param('id') if $v->is_valid('id');
 
   my $results = $c->minion->backend->list_workers($offset, $limit, $options);
   $c->render(
@@ -102,15 +112,15 @@ sub _list_workers {
 sub _manage_jobs {
   my $c = shift;
 
-  my $validation = $c->validation;
-  $validation->required('id');
-  $validation->required('do')->in('remove', 'retry', 'stop');
+  my $v = $c->validation;
+  $v->required('id');
+  $v->required('do')->in('remove', 'retry', 'stop');
 
-  $c->redirect_to('minion_jobs') if $validation->has_error;
+  $c->redirect_to('minion_jobs') if $v->has_error;
 
   my $minion = $c->minion;
-  my $ids    = $validation->every_param('id');
-  my $do     = $validation->param('do');
+  my $ids    = $v->every_param('id');
+  my $do     = $v->param('do');
   if ($do eq 'retry') {
     my $fail = grep { $minion->job($_)->retry ? () : 1 } @$ids;
     if   ($fail) { $c->flash(danger  => "Couldn't retry all jobs.") }
@@ -137,12 +147,12 @@ sub _stats {
 sub _unlock {
   my $c = shift;
 
-  my $validation = $c->validation;
-  $validation->required('name');
+  my $v = $c->validation;
+  $v->required('name');
 
-  $c->redirect_to('minion_locks') if $validation->has_error;
+  $c->redirect_to('minion_locks') if $v->has_error;
 
-  my $names  = $validation->every_param('name');
+  my $names  = $v->every_param('name');
   my $minion = $c->minion;
   $minion->unlock($_) for @$names;
   $c->flash(success => 'All selected named locks released.');

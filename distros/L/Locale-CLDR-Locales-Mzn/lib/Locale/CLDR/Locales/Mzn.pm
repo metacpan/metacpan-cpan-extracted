@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Mzn - Package for language Mazanderani
 
 package Locale::CLDR::Locales::Mzn;
 # This file auto generated from Data\common\main\mzn.xml
-#	on Fri 29 Apr  7:18:38 pm GMT
+#	on Fri 13 Apr  7:21:03 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -685,10 +686,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[‌‍‎‏ َ ُ ِ ْ ٖ ٰ إ ك ى ي])},
+			auxiliary => qr{[‌‍‎‏ َ ُ ِ ْ ٖ ٰ إ ك ى ي]},
 			index => ['آ', 'ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'ه', 'و', 'ی'],
-			main => qr{(?^u:[ً ٌ ٍ ّ ٔ ء آ أ ؤ ئ ا ب پ ة ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ه و ی])},
-			punctuation => qr{(?^u:[\- ‐ ، ٫ ٬ ؛ \: ! ؟ . … ‹ › « » ( ) \[ \] * / \\])},
+			main => qr{[ً ٌ ٍ ّ ٔ ء آ أ ؤ ئ ا ب پ ة ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ه و ی]},
+			punctuation => qr{[\- ‐ ، ٫ ٬ ؛ \: ! ؟ . … ‹ › « » ( ) \[ \] * / \\]},
 		};
 	},
 EOT
@@ -1836,11 +1837,18 @@ has 'currencies' => (
 				'other' => q(بوتساوانای ِپولا),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(بلاروس ِروبل),
 				'other' => q(بلاروس ِروبل),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(بلاروس ِروبل \(۲۰۰۰–۲۰۱۶\)),
+				'other' => q(بلاروس ِروبل \(۲۰۰۰–۲۰۱۶\)),
 			},
 		},
 		'BZD' => {
@@ -2392,8 +2400,8 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(پروی ِنوئوو سول),
-				'other' => q(پروی ِنوئوو سول),
+				'currency' => q(پروی ِسول),
+				'other' => q(پروی ِسول),
 			},
 		},
 		'PHP' => {

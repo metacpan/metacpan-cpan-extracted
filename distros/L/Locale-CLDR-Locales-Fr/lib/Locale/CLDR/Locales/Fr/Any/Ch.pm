@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Fr::Any::Ch - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Ch;
 # This file auto generated from Data\common\main\fr_CH.xml
-#	on Fri 29 Apr  7:04:09 pm GMT
+#	on Fri 13 Apr  7:10:54 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -25,7 +26,7 @@ has 'valid_algorithmic_formats' => (
 	is => 'ro',
 	isa => ArrayRef,
 	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-ordinal-masculine-plural','spellout-ordinal-masculine','spellout-ordinal-feminine-plural','spellout-ordinal-feminine','digits-ordinal-masculine','digits-ordinal-feminine','digits-ordinal' ]},
+	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-ordinal-masculine-plural','spellout-ordinal-masculine','spellout-ordinal-feminine-plural','spellout-ordinal-feminine' ]},
 );
 
 has 'algorithmic_number_format_data' => (
@@ -104,104 +105,6 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(12),
 					divisor => q(10),
 					rule => q(' =%%spellout-ordinal=),
-				},
-			},
-		},
-		'digits-ordinal' => {
-			'public' => {
-				'0' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(=%digits-ordinal-masculine=),
-				},
-				'max' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(=%digits-ordinal-masculine=),
-				},
-			},
-		},
-		'digits-ordinal-feminine' => {
-			'public' => {
-				'-x' => {
-					divisor => q(1),
-					rule => q(−→→),
-				},
-				'0' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(=#,##0==%%dord-femabbrev=),
-				},
-				'max' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(=#,##0==%%dord-femabbrev=),
-				},
-			},
-		},
-		'digits-ordinal-masculine' => {
-			'public' => {
-				'-x' => {
-					divisor => q(1),
-					rule => q(−→→),
-				},
-				'0' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(=#,##0==%%dord-mascabbrev=),
-				},
-				'max' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(=#,##0==%%dord-mascabbrev=),
-				},
-			},
-		},
-		'dord-femabbrev' => {
-			'private' => {
-				'0' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(e),
-				},
-				'1' => {
-					base_value => q(1),
-					divisor => q(1),
-					rule => q(re),
-				},
-				'2' => {
-					base_value => q(2),
-					divisor => q(1),
-					rule => q(e),
-				},
-				'max' => {
-					base_value => q(2),
-					divisor => q(1),
-					rule => q(e),
-				},
-			},
-		},
-		'dord-mascabbrev' => {
-			'private' => {
-				'0' => {
-					base_value => q(0),
-					divisor => q(1),
-					rule => q(e),
-				},
-				'1' => {
-					base_value => q(1),
-					divisor => q(1),
-					rule => q(er),
-				},
-				'2' => {
-					base_value => q(2),
-					divisor => q(1),
-					rule => q(e),
-				},
-				'max' => {
-					base_value => q(2),
-					divisor => q(1),
-					rule => q(e),
 				},
 			},
 		},
@@ -745,7 +648,7 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'1100' => {
 					base_value => q(1100),
@@ -1085,29 +988,15 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'sdh' => 'kurde méridional',
+				'gu' => 'goudjrati',
+ 				'pdc' => 'allemand de Pennsylvanie',
+ 				'sdh' => 'kurde méridional',
 
 			);
 			if (@_) {
 				return $languages{$_[0]};
 			}
 			return \%languages;
-		}
-	},
-);
-
-has 'display_name_region' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'057' => 'Région micronésienne',
- 			'MK@alt=variant' => 'A.R. yougoslave de Macédoine',
- 			'QO' => 'Régions éloignées de l’Océanie',
- 			'SX' => 'Sint Maarten',
- 			'ZZ' => 'Région indéterminée',
-
 		}
 	},
 );
@@ -1132,7 +1021,7 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
-			'decimal' => q(.),
+			'currencyDecimal' => q(.),
 		},
 	} }
 );
@@ -1145,7 +1034,7 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -1161,8 +1050,8 @@ has 'number_currency_formats' => (
 			'pattern' => {
 				'default' => {
 					'standard' => {
-						'negative' => '¤-#,##0.00',
-						'positive' => '¤ #,##0.00',
+						'negative' => '-#,##0.00 ¤',
+						'positive' => '#,##0.00 ¤ ',
 					},
 				},
 			},
@@ -1180,53 +1069,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 0
 						&& $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 0
 						&& $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -1238,6 +1127,42 @@ around day_period_data => sub {
 	my ($orig, $self) = @_;
 	return $self->$orig;
 };
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'evening1' => q{du soir},
+					'midnight' => q{min.},
+					'afternoon1' => q{de l’ap.m.},
+					'morning1' => q{du mat.},
+					'night1' => q{du mat.},
+					'noon' => q{midi},
+				},
+				'narrow' => {
+					'evening1' => q{du soir},
+					'midnight' => q{min.},
+					'afternoon1' => q{de l’ap.m.},
+					'morning1' => q{du mat.},
+					'noon' => q{midi},
+					'night1' => q{du mat.},
+				},
+			},
+			'stand-alone' => {
+				'narrow' => {
+					'midnight' => q{min.},
+				},
+				'abbreviated' => {
+					'midnight' => q{min.},
+				},
+			},
+		},
+	} },
+);
 
 has 'eras' => (
 	is			=> 'ro',
@@ -1258,7 +1183,7 @@ has 'date_formats' => (
 	default		=> sub { {
 		'generic' => {
 			'full' => q{EEEE, d MMMM y G},
-			'short' => q{dd.MM.yy GGGGG},
+			'short' => q{dd.MM.y GGGGG},
 		},
 		'gregorian' => {
 			'full' => q{EEEE, d MMMM y},
@@ -1297,13 +1222,21 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			MMdd => q{dd.MM},
-			yMM => q{MM.y},
-		},
 		'gregorian' => {
+			MEd => q{E, dd.MM.},
 			MMdd => q{dd.MM},
-			yMM => q{MM.y},
+			Md => q{dd.MM.},
+			yM => q{MM.y},
+			yMEd => q{E, dd.MM.y},
+			yMd => q{dd.MM.y},
+		},
+		'generic' => {
+			MEd => q{E, dd.MM.},
+			MMdd => q{dd.MM},
+			Md => q{dd.MM.},
+			yM => q{MM.y GGGGG},
+			yMEd => q{E, dd.MM.y GGGGG},
+			yMd => q{dd.MM.y GGGGG},
 		},
 	} },
 );
@@ -1321,6 +1254,30 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			MEd => {
+				M => q{E, dd.MM – E, dd.MM},
+				d => q{E, dd.MM – E, dd.MM},
+			},
+			Md => {
+				M => q{dd.MM – dd.MM},
+				d => q{dd.MM – dd.MM},
+			},
+			yM => {
+				M => q{MM.y – MM.y},
+				y => q{MM.y – MM.y},
+			},
+			yMEd => {
+				M => q{E, dd.MM.y – E, dd.MM.y},
+				d => q{E, dd.MM.y – E, dd.MM.y},
+				y => q{E, dd.MM.y – E, dd.MM.y},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y},
+				d => q{dd.MM.y – dd.MM.y},
+				y => q{dd.MM.y – dd.MM.y},
+			},
+		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -1368,13 +1325,13 @@ has 'datetime_formats_interval' => (
 				h => q{h–h a v},
 			},
 			yM => {
-				M => q{MM.y – MM.y G},
-				y => q{MM.y – MM.y G},
+				M => q{MM.y – MM.y GGGGG},
+				y => q{MM.y – MM.y GGGGG},
 			},
 			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y G},
-				d => q{E, dd.MM.y – E, dd.MM.y G},
-				y => q{E, dd.MM.y – E, dd.MM.y G},
+				M => q{E, dd.MM.y – E, dd.MM.y GGGGG},
+				d => q{E, dd.MM.y – E, dd.MM.y GGGGG},
+				y => q{E, dd.MM.y – E, dd.MM.y GGGGG},
 			},
 			yMMM => {
 				y => q{MMM y 'a'` MMM y G},
@@ -1389,79 +1346,9 @@ has 'datetime_formats_interval' => (
 				y => q{d MMM y 'au' d MMM y G},
 			},
 			yMd => {
-				M => q{dd.MM.y – dd.MM.y G},
-				d => q{dd.MM.y – dd.MM.y G},
-				y => q{dd.MM.y – dd.MM.y G},
-			},
-		},
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			MEd => {
-				M => q{E, dd.MM – E, dd.MM},
-				d => q{E, dd.MM – E, dd.MM},
-			},
-			MMMEd => {
-				M => q{E, d MMM 'au' E, d MMM},
-				d => q{E, d 'au' E, d MMM},
-			},
-			MMMd => {
-				M => q{d MMM 'au' d MMM},
-			},
-			Md => {
-				M => q{dd.MM – dd.MM},
-				d => q{dd.MM – dd.MM},
-			},
-			fallback => 'du {0} au {1}',
-			h => {
-				h => q{h–h a},
-			},
-			hm => {
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				h => q{h–h a v},
-			},
-			yM => {
-				M => q{MM.y – MM.y},
-				y => q{MM.y – MM.y},
-			},
-			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y},
-				d => q{E, dd.MM.y – E, dd.MM.y},
-				y => q{E, dd.MM.y – E, dd.MM.y},
-			},
-			yMMM => {
-				y => q{MMM y 'a'` MMM y},
-			},
-			yMMMEd => {
-				M => q{E, d MMM 'au' E, d MMM y},
-				d => q{E, d 'au' E, d MMM y},
-				y => q{E, d MMM y 'au' E, d MMM y},
-			},
-			yMMMd => {
-				M => q{d MMM 'au' d MMM y},
-				y => q{d MMM y 'au' d MMM y},
-			},
-			yMd => {
-				M => q{dd.MM.y – dd.MM.y},
-				d => q{dd.MM.y – dd.MM.y},
-				y => q{dd.MM.y – dd.MM.y},
+				M => q{dd.MM.y – dd.MM.y GGGGG},
+				d => q{dd.MM.y – dd.MM.y GGGGG},
+				y => q{dd.MM.y – dd.MM.y GGGGG},
 			},
 		},
 	} },

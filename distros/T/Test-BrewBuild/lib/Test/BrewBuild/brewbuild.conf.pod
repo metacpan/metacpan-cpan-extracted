@@ -50,6 +50,16 @@ Default is 0. Range is 0-7.
 
 Default off. Perls 5.8.x and lower will be installed if you set this to 1.
 
+=head3 nocache
+
+Default is off (0). Send in a true value to disable the caching of
+Perl/Berrybrew available/list information.
+
+=head3 revdep
+
+Default is off (0). Send in a true value to run reverse dependency tests on the
+current distribution being tested.
+
 =head2 [dispatch]
 
 Configuration for the dispatcher,
@@ -61,12 +71,6 @@ A comma delimited list of test servers to dispatch to. Example:
 
     testers = 127.0.0.1, 10.5.5.5:9999
 
-=head3 cmd
-
-The C<brewbuild> command string you want to use as default. Example:
-
-    cmd = brewbuild -r -R -d 7
-
 =head3 repo
 
 The repo to default to. If not specified here or at the command-line, we'll
@@ -74,11 +78,40 @@ default to looking for a repository in your current working directory. Example:
 
     repo = https://github.com/stevieb9/p5-test-brewbuild
 
+=head3 cmd
+
+The C<brewbuild> command string you want to use as default. Example:
+
+    cmd = brewbuild -r -R -d 7
+
+=head3 forks
+
+Default is 4. Send in a positive integer to run that many parallel dispatch
+processes.
+
 =head3 auto_sleep
 
 When using an auto dispatch run (eg: C<bbdispatch --auto>), the integer value of
 this directive specifies how many seconds to sleep in between each build run
 sent to the testers.
+
+=head3 rpi
+
+Default is off (0). Set to a true value to enable RPi-specific testing.
+(ie. You're running on a Pi and have an LCD connected for test statistics).
+
+=head3 rpi_lcd_rows
+
+Defaults to 4. Only other valid number of rows is 2.
+
+=head3 rpi_lcd_cols
+
+Defaults to 20. Only other valid number of columns is 16.
+
+=head3 debug
+
+Defaults to off (0). Set to any number 0-7 to enable that level of debugging
+output.
 
 =head2 [tester]
 
@@ -97,3 +130,24 @@ Specify the IP address you want your tester to listen on. Example:
 Which port should your tester listen on? Example:
 
     port = 9999
+
+=head3 logfile
+
+Defaults to undefined. Send in the name of a writable file location and we'll
+output our debug data to this file.
+
+=head3 auto
+
+Defaults to undefined. Send in a true value to have the Tester run in
+automated Continuous Integration mode.
+
+=head3 csum
+
+Defaults to undefined. This is used in conjunction with C<auto>.
+
+If set to a true value, we'll run in CI mode even if no new commits have been
+made to the repository.
+
+=head3 debug
+
+Defaults to off (0). Set to 0-7 to enable that level of debug output.

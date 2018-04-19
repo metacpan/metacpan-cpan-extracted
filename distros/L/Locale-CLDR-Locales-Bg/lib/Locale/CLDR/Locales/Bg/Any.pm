@@ -1,11 +1,11 @@
 package Locale::CLDR::Locales::Bg::Any;
 
 # This file auto generated
-#	on Fri 29 Apr  6:52:56 pm GMT
+#	on Fri 13 Apr  7:02:47 am GMT
 
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';

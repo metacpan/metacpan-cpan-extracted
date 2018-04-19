@@ -1,0 +1,7 @@
+severity = 5
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Graphics::Grid::Setup Graphics::Grid::Class Graphics::Grid::Role
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Graphics::Grid::Setup Graphics::Grid::Class Graphics::Grid::Role

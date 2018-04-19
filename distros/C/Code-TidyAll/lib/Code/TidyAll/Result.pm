@@ -9,7 +9,7 @@ use Specio::Library::String;
 
 use Moo;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 has error => (
     is  => 'ro',
@@ -54,7 +54,7 @@ Code::TidyAll::Result - Result returned from processing a file/source
 
 =head1 VERSION
 
-version 0.69
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2017 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2018 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

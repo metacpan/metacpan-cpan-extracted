@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.012';
+our $VERSION = '2.013';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.012
+Version 2.013
 
 =cut
 
@@ -140,7 +140,7 @@ The menu entries of the table menu:
 
 Selecting the prompt line (the database name) opens a menu with this entries:
 
-=head4 CREATE Table
+=head4 Create Table
 
 Selecting I<CREATE Table> opens a sub-menu with this entries:
 
@@ -194,25 +194,25 @@ edit statements. Adding a statement can be done by entering a string via C<readl
 list of the temporary saved statements. (The last 20 statements from a printed table are saved in memory until the current
 database goes out of scope).
 
-=head4 Tables
+=head3 Tables
 
 Choosing a table leads to the I<SQL Menu>.
 
-=head4 SQ
+=head3 SQ
 
 Choosing this entry allows one to enter a sub-query instead of table name.
 
 This entry is available only if L<Subqueries as table> is enabled.
 
-=head4 Join
+=head3 Join
 
 Join tables.
 
-=head4 Union
+=head3 Union
 
 Combine the result from multiple SELECT statements.
 
-=head4 Settings
+=head3 Settings
 
 See L<DB Settings>.
 

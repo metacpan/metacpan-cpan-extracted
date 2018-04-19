@@ -65,6 +65,7 @@ lib/Config/Model/ValueComputer.pm
 lib/Config/Model/WarpedNode.pm
 lib/Config/Model/Warper.pm
 lib/Config/Model/application.d/multistrap
+lib/Config/Model/log4perl.conf
 lib/Config/Model/models/Fstab.pl
 lib/Config/Model/models/Fstab.pod
 lib/Config/Model/models/Fstab/CommonOptions.pl
@@ -85,6 +86,7 @@ lib/Config/Model/models/PopCon.pl
 lib/Config/Model/models/PopCon.pod
 lib/Config/Model/system.d/fstab
 lib/Config/Model/system.d/popcon
+t/README.pod
 t/accept.t
 t/annotation.t
 t/apply_fix.t

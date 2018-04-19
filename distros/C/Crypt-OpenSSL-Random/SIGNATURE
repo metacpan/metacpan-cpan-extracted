@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,14 +15,14 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 5dd03065ad95845ec70baa4c92c396dc3ef15efb .gitignore
-SHA1 08abd75288dd37cd47759350231019971fac0ebe Changes
+SHA1 d8dd2754b4be39dc38e56d170d91d850c0544fe0 Changes
 SHA1 78f7d31b9283b034cf19e61bc70d24bb38581b1e LICENSE
 SHA1 d1b344f1315cebc307771957afb228ff85a5eb2c MANIFEST
-SHA1 c1fda3f4031b9e29ba2db59cd48634a60c02c0a9 META.json
-SHA1 c23742068502cfe87a62eb8242537dc1aaaa9728 META.yml
-SHA1 2ddcb73e7e3c11d765bef06138bc39edef47de2d Makefile.PL
-SHA1 8f52106f62863a9cf6476d203a73b80b6cabb884 README
-SHA1 b1d2bc41303dc9e99cff816c13ede60ea1e13aad Random.pm
+SHA1 1a124a18efcb36b117353df552b4b205bae73036 META.json
+SHA1 3d28858a6dc777a667e1c0d5098db9ed039a947e META.yml
+SHA1 952c5a7ab166bbb84b083194b58ad938acc9d488 Makefile.PL
+SHA1 adde4138362d420b3262fa08289190ab1de3dbe7 README
+SHA1 63974136c6c7baae9fbfe0818b3a9b389a1015ce Random.pm
 SHA1 96741e2c68170512e8fc38829466d1e041c3a3ec Random.xs
 SHA1 43295de162f592dd4ebfde6e424d22aedac03423 hints/MSWin32.pl
 SHA1 fa94838ecdaeccd2bf162caf7014a624dc1e66a7 t/0-basic.t
@@ -33,9 +33,8 @@ SHA1 ade48e2b6098a0a329312543e1451e7e7fb7bc5f t/z_perl_minimum_version.t
 SHA1 1dbe44e2091ab84d8462fda2052e35bf1354d963 t/z_pod-coverage.t
 SHA1 c8aa3903d3aba84c19bbd94d677620c758fa07d5 t/z_pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlYW6ykACgkQmm2SYo/9yULu0ACfYWNIctH936cviqVv09qYga4m
-JHAAn3eqbNM7tBiPjrZsrJ98A7xYRIur
-=seXL
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWtYxdAAKCRCabZJij/3J
+QuiQAJ93DV0reJEbfhiP7wy2NisKa6VS0gCeLUxFC8mS7zS3nENsWuIMNUgZjuY=
+=84oS
 -----END PGP SIGNATURE-----

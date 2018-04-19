@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 0.3;
+our $VERSION  = 0.4;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -72,7 +72,7 @@ App::Git::Workflow::Command::SinceRelease - Finds out how many commits a branch 
 
 =head1 VERSION
 
-This documentation refers to git-since-release version 0.3
+This documentation refers to git-since-release version 0.4
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use warnings;
 use Config;
 use Math::NV qw(:all);
 
-print "1..1\n";
+print "1..2\n";
 
 my $prec = mant_dig();
 
@@ -27,6 +27,14 @@ else {
     warn "\nExpected either 113 or 106 or 64\nGot $prec\n";
     print "not ok 1\n";
   }
+}
+
+$prec = 2098 if $prec == 106;
+
+if($prec == $Math::MPFR::BITS) {print "ok 2\n"}
+else {
+  warn "\n $prec != $Math::MPFR::BITS\n";
+  print "not ok 2\n";
 }
 
 warn "\n\$Config{nvtype} is $Config{nvtype} and mantissa precision is $prec bits\n";

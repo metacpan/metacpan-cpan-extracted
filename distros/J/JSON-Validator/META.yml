@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/json-validator/issues
   homepage: https://github.com/jhthorsen/json-validator
   repository: https://github.com/jhthorsen/json-validator.git
-version: '2.06'
+version: '2.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

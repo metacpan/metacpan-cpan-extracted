@@ -1,10 +1,81 @@
-2017-03-15 v1.999811 pjacklam
+1.999813 2018-04-18
 
- * Fix an old in the Math::BigFloat methods as_hex(), as_oct(), and as_bin()
-   methods resulting in loss of accuracy. This bug was introduced in bug in
-   Math-BigInt-1.76. Due to a naive copy and paste by me, and lack of tests,
-   this bug was also present in the newer to_hex(), to_oct(), and to_bin()
-   methods. This shows the bug, as it did not print "0xffff...":
+ * Fix CPAN RT #125108. Remove test files try.pl, t/author-bpi-big-mbf.t, and
+   t/release-unused-vars.t, which were included in the 1.999812 distribution by
+   accident.
+
+1.999812 2018-04-17
+
+ * Fix CPAN RT #120351 regarding bpow(). Add test.
+
+ * Fix CPAN RT #120717 regarding tests now that '.' is not in @INC by default.
+
+ * Fix CPAN RT #122756 regarding testing for 64 bit integer support.
+
+ * Fix case when both accuracy and precision are set, resulting in a NaN. This
+   closes CPAN RT #124790.
+
+ * Fix typo in one of the change log entries for version 1.999811.
+
+ * Clearify documentation of rounding modes.
+
+ * Update the documentation of configuration parameters.
+
+ * Fix rounding and accuracy in bpi(). Extra digits in intermediate computation
+   were not used, causing the last digits to be inaccurate. In addition, the
+   rounding was incorrect in some cases.
+
+ * Use config() as a method, rather than a function. Also use config("xyz")
+   rather than config()->{xyz}.
+
+ * Correct more of the problems with rounding in the constructors. If rounding
+   arguments are given as arguments to the constructor, the constructor should
+   assign those values to the instance. If no rounding arguments are given, and
+   the constructor is called as a class method, the class rounding variables
+   should be assigned to the instance. Added test file
+   t/author-constructors-a-p-r.t to replace t/author-constructors-a-p.t, but
+   lots of tests are failing and (for now) commented out.
+
+ * Remove statements used for debugging.
+
+ * Fix typos.
+
+ * Cleaner log/exp-related code in Math::BigFloat.
+
+ * Remove unused variables.
+
+ * Add test file t/release-portability.t.
+
+ * Add test file t/release-whitespaces.t.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+ * Reformat CHANGES to match the specification in CPAN::Changes::Spec and
+   CPAN::Meta::Spec.
+
+ * Expand tabs to spaces and clean up whitepace.
+
+ * Include tests that were previously commented out.
+
+ * Use $LIB as the variable name for backend math library.
+
+ * Import "carp" and "croak" from the Carp module.
+
+ * Math::BigInt isa Exporter, so Math::BigInt should require Exporter.
+   Math::BigFloat has Math::BigInt in @ISA, so it doesn't need to require
+   Exporter.
+
+ * Don't load Test::More when it isn't really needed. This speeds up processing
+   of author test files when they are skipped.
+
+1.999811 2017-03-15 pjacklam
+
+ * Fix an old bug in the Math::BigFloat methods as_hex(), as_oct(), and
+   as_bin() methods resulting in loss of accuracy. This bug was introduced in
+   bug in Math-BigInt-1.76. Due to a naive copy and paste by me, and lack of
+   tests, this bug was also present in the newer to_hex(), to_oct(), and
+   to_bin() methods. This shows the bug, as it did not print "0xffff...":
 
        print Math::BigFloat -> from_hex("f" x 30) -> as_hex();
 
@@ -17,7 +88,7 @@
 
  * "Synchronize" tests and code formatting in bigintpm.inc and bigfltpm.inc.
 
-2017-03-01 v1.999810 pjacklam
+1.999810 2017-03-01 pjacklam
 
  * CPAN RT #120240 revealed that the problems with undefined values is still
    present. After a close examination, I believe the only way to get this
@@ -35,7 +106,7 @@
 
  * Fix CPAN RT #120242 rearding c3 method resolution.
 
-2017-02-10 v1.999809 pjacklam
+1.999809 2017-02-10 pjacklam
 
  * When a new method is added to Math::BigInt or Math::BigFloat, and this new
    method requires a new backend library method, die with a suitable error
@@ -54,7 +125,7 @@
    Lucas numbers, respectively. Document both methods in POD. Add test files
    author-lib-arithmetic-unary-_fib.t and author-lib-arithmetic-unary-_lucas.t.
 
-2017-01-11 v1.999808 pjacklam
+1.999808 2017-01-11 pjacklam
 
  * In Math::BigInt and Math::BigFloat, add methods bdfac() for double
    factorial. Add tests for this method.
@@ -85,7 +156,7 @@
    from_oct(), and from_bin().  Add tests to verify. This is a regressions
    (CPAN RT #119805).
 
-2016-12-23 v1.999807 pjacklam
+1.999807 2016-12-23 pjacklam
 
  * Add a message to Makefile.PL recommending upgrade if old libraries are
    installed. This message is more or less equivalent to the one appearing in
@@ -129,14 +200,14 @@
  * More diagnostic output is displayed by the author test files if the
    AUTHOR_DEBUGGING environment variable is set.
 
-2016-12-13 v1.999806 pjacklam
+1.999806 2016-12-13 pjacklam
 
  * Add more logic to Makefile.PL regarding INSTALLDIRS (CPAN RT #119199
    and #119225).
 
  * In the TODO file, remove stuff that has been implemented.
 
-2016-12-11 v1.999805 pjacklam
+1.999805 2016-12-11 pjacklam
 
  * Fix Makefile.PL so that this module installs over the core version.
 
@@ -147,7 +218,7 @@
  * Remove t/Math/BigFloat/#Subclass.pm#, which is an Emacs temporary file
    included by accident.
 
-2016-12-07 v1.999804 pjacklam
+1.999804 2016-12-07 pjacklam
 
  * Implement as_bytes(), as requested (CPAN RT 119096). Also implement the
    inverse conversion from_bytes(). This applies to Math::BigInt only. (Alas,
@@ -173,7 +244,7 @@
 
  * Add POD coverage testing of Math::BigInt::Lib to t/03podcov.t.
 
-2016-12-03 v1.999803 pjacklam
+1.999803 2016-12-03 pjacklam
 
  * Remove BENCHMARK file. The information was obsolete.
 
@@ -187,7 +258,7 @@
 
  * Inform that the TODO file is not up to date.
 
-2016-11-28 v1.999802 pjacklam
+1.999802 2016-11-28 pjacklam
 
  * When bzero(), bone(), binf(), and bnan() are used as constructors, don't
    check whether the class allows the object to be modified. A constructor
@@ -197,7 +268,7 @@
  * Improve bgcd() and blcm(). This applies to both Math::BigInt and
    Math::BigFloat.
 
-2016-11-23 v1.999801 pjacklam
+1.999801 2016-11-23 pjacklam
 
  * Fix, hopefully once and for all, the longstanding problem of handling undef
    as an operand to mathematical methods. The only method that accepts undef as
@@ -235,7 +306,7 @@
    if the specified library can't be loaded rather than using the fallback
    library.
 
-2016-11-15 v1.999800 pjacklam
+1.999800 2016-11-15 pjacklam
 
  * Upgrade bundled Module::Install from version 1.16 to version 1.17.
 
@@ -268,19 +339,19 @@
  * Use Config::Tiny and an .ini file to handle the library specific
    configuration for the author-lib*.t test files.
 
-2016-11-04 v1.999727 pjacklam
+1.999727 2016-11-04 pjacklam
 
  * Skip test exceeding the range of VAX floating point number in t/bigintpm.inc
    (CPAN RT 118468).
 
  * Fix typo in lib/Math/BigInt.pm (CPAN RT 118550).
 
-2016-07-15 v1.999726 pjacklam
+1.999726 2016-07-15 pjacklam
 
  * Re-insert Math::BigFloat->DESTROY, which was accidentally removed in
    v1.999725.
 
-2016-07-13 v1.999725 pjacklam
+1.999725 2016-07-13 pjacklam
 
 Changes:
 
@@ -342,7 +413,7 @@ Fixes:
    creates objects with leading zeros, so until that is fixed, we can't remove
    all the "0 + ..." etc. until Math::BigInt::FastCalc has been modified.
 
-2016-06-19 v1.999724 pjacklam
+1.999724 2016-06-19 pjacklam
 
  * In Math/BigInt.pm and Math/BigFloat.pm, correct and improve to the
    documentation, e.g., reorder the methods so that methods that belogin
@@ -354,7 +425,7 @@ Fixes:
 
  * In Math/BigInt/Calc.pm, reformat the code.
 
-2016-06-09 v1.999723 pjacklam
+1.999723 2016-06-09 pjacklam
 
  * Add Math::BigInt and Math::BigFloat methods bnstr(), bestr(), and bdstr(),
    as well as corresponding methods nparts(), eparts(), and dparts(). Also add
@@ -365,24 +436,24 @@ Fixes:
 
  * Fix documentation errors.
 
-2016-04-26 v1.999722 pjacklam
+1.999722 2016-04-26 pjacklam
 
  * Fix bug in bone() and binf() when used as a function. The error caused
    warnings about using an unitialized variable. This fix applies to both
    Math::BigInt and Math::BigFloat.
 
-2016-04-26 v1.999721 pjacklam
+1.999721 2016-04-26 pjacklam
 
  * Prevent Math::BigFloat methods band(), bior(), bxor(), and bnot() from
    modifying unmodifiable objects.
 
-2016-04-26 v1.999720 pjacklam
+1.999720 2016-04-26 pjacklam
 
  * Overloaded 'int' should not modify it's argument.
 
  * Better documentation of blsft() and brsft().
 
-2016-04-25 v1.999719 pjacklam
+1.999719 2016-04-25 pjacklam
 
  * Revert the change to Math::BigFloat's blsft() and brsft() methods, which
    truncated the input (and output) to integers. However, now convert the base
@@ -399,7 +470,7 @@ Fixes:
  * The first output argument from objectify() is the class name, so use the
    variable name $class, not $self.
 
-2016-04-22 v1.999718 pjacklam
+1.999718 2016-04-22 pjacklam
 
  * Improve documentation on large, unquoted input values to Math::BigInt.
 
@@ -460,7 +531,7 @@ Fixes:
 
  * Improve test descriptions in t/mbimbf.inc.
 
-2016-04-16 v1.999717 pjacklam
+1.999717 2016-04-16 pjacklam
 
  * Using new() with an undefined argument no longer gives a warning. Explicit
    use of this is discouraged, but it is sometimes used by the modules
@@ -469,7 +540,7 @@ Fixes:
 
  * Avoid using L<> around e-mail addressess in POD.
 
-2016-04-03 v1.999716 pjacklam
+1.999716 2016-04-03 pjacklam
 
  * $x->new(...) can no longer be used to assign a value to $x. This was a
    mistake introduced in v1.999712. As the name "new" implies, it should always
@@ -494,7 +565,7 @@ Fixes:
 
  * Improved wording and fixed typos in earlier changelog entries.
 
-2016-01-05 v1.999715 pjacklam
+1.999715 2016-01-05 pjacklam
 
  * Fix Math::BigFloat->bexp() based on patch by DANAJ (Dana Jacobsen).
 
@@ -507,7 +578,7 @@ Fixes:
 
  * Wrap long line in the CHANGES file.
 
-2016-01-03 v1.999714 pjacklam
+1.999714 2016-01-03 pjacklam
 
  * Add code to speed up Math::BigFloat->batan(). Thanks to DANAJ (Dana
    Jacobsen) for the patch.
@@ -527,13 +598,13 @@ Fixes:
  * Minor simplifications in Math::BigInt->as_oct() and
    Math::BigInt::Calc::_as_oct().
 
-2015-12-31 v1.999713 pjacklam
+1.999713 2015-12-31 pjacklam
 
  * Fix Math::BigInt->new(), which had a faulty handling in the shortcut for
    non-zero scalar integers with no non-zero exponent, like "12", "12.000",
    "12e3", and "12.000e4". Added tests for this in t/bigintpm.inc.
 
-2015-12-29 v1.999712 pjacklam
+1.999712 2015-12-29 pjacklam
 
  * Fix bug in internal function _e_add() and _e_sub() which causes it to return
    "-0" in some cases.
@@ -587,7 +658,7 @@ Fixes:
    (Dana Jacobsen) for the patch. This was not intended to be added before the
    next release, but was included in this release by accident.
 
-2015-11-12 v1.999710 pjacklam
+1.999710 2015-11-12 pjacklam
 
  * New method Math::BigFloat -> from_hex() which supports hexadecimal floating
    point numbers, e.g., "0x1.999ap-4".
@@ -596,7 +667,7 @@ Fixes:
 
  * Add 'from_hex' and 'from_bin' to list of methods in the Math::BigInt POD.
 
-2015-11-06 v1.999709 pjacklam
+1.999709 2015-11-06 pjacklam
 
  * Represent and return zero as 0E0, not 0E1. The old POD said "A zero is
    represented and returned as 0E1, not 0E0 (after Knuth)." I find no
@@ -608,7 +679,7 @@ Fixes:
 
  * Required version of Test::More is 0.9301.
 
-2015-11-03 v1.999708 pjacklam
+1.999708 2015-11-03 pjacklam
 
  * Use bxxx() method names consistently, rather than mixing bxxx() and fxxx()
    in code and test files. The fxxx() methods for Math::BigFloat objects are
@@ -628,7 +699,7 @@ Fixes:
  * Use Math::Complex::Inf() in testfiles also (for generating Perl scalar
    infinity) since it is more portable.
 
-2015-10-29 v1.999707 pjacklam
+1.999707 2015-10-29 pjacklam
 
  * Add dependency on Math::Complex 1.39 for Math::Complex::Inf(), which is
    used for numifying infinity.
@@ -650,20 +721,20 @@ Fixes:
 
  * Moved 'Test::More' from 'build_requires' to 'test_requires' in Makefile.PL.
 
-2015-10-28 v1.999706 pjacklam
+1.999706 2015-10-28 pjacklam
 
  * Correct release date of v1.999705 in CHANGES.
 
  * Add code and tests for numify() on non-finite objects.
 
-2015-10-26 v1.999705 pjacklam
+1.999705 2015-10-26 pjacklam
 
  * Avoid using "my" in a false conditional. See "Deprecated use of my() in
    false conditional" in perldiag(1).
 
  * Faster algorithm for bpi() when accuracy is >= 1000.
 
-2015-09-25 v1.999704 pjacklam
+1.999704 2015-09-25 pjacklam
 
  * objectify() in lib/Math/BigInt.pm now uses 'isa' not 'eq' to check object
    relationship. This is necessary for correct handling of subclasses.
@@ -678,7 +749,7 @@ Fixes:
 
  * Add test files t/objectify_mbf.t and t/objectify_mbi.t.
 
-2015-09-21 v1.999703 pjacklam
+1.999703 2015-09-21 pjacklam
 
  * Fix blog() in Math::BigInt and Math::BigFloat to work correctly regardless
    of the base.
@@ -691,7 +762,7 @@ Fixes:
  * Add test files t/blog-mbf.t and t/blog-mbi.t for better testing of the
    blog() methods.
 
-2015-09-17 v1.999702 pjacklam
+1.999702 2015-09-17 pjacklam
 
  * The overloaded log() is a unary operator, so don't pass additional
    arguments.
@@ -707,7 +778,7 @@ Fixes:
 
  * Improve descriptions of a few tests.
 
-2015-09-11 v1.999701 pjacklam
+1.999701 2015-09-11 pjacklam
 
  * The POD documentation, as well as the comments in the code, said that
    $x->bdiv($y) in list context should return quotient $q and remainder $r so
@@ -745,7 +816,8 @@ Fixes:
    Math-BigInt distribution and the backend distributions are as few and as
    small as possible. This makes for easier release management.
 
-2015-08-12 v1.9997 pjacklam
+1.9997 2015-08-12 pjacklam
+
  CHANGES
   * Add recent changes.
  t/bigintpm.inc
@@ -753,14 +825,16 @@ Fixes:
  t/upgrade.inc
   * Correct spelling errors.
 
-2015-08-12 v1.9996 pjacklam
+1.9996 2015-08-12 pjacklam
+
  CHANGES
   * Add recent changes.
   * Use present tense in change descriptions.
  lib/Math/BigInt.pm
   * Change incorrect use of ok() to is() in example.
 
-2015-08-11 v1.9995 pjacklam
+1.9995 2015-08-11 pjacklam
+
  CHANGES
   * Move changes that were incorrectly reported as being for the release 1.9994
     when they were in fact for release 1.9993.
@@ -769,7 +843,8 @@ Fixes:
   * Break lines to avoid lines with more than 80 characters.
   * Improve objectify() for better handling of subclasses.
 
-2015-08-10 v1.9994 pjacklam
+1.9994 2015-08-10 pjacklam
+
  CHANGES
   * Add recent changes.
  lib/Math/BigFloat.pm
@@ -784,7 +859,8 @@ Fixes:
  inc/Module/Install*
   * Upgrade bundled Module::Install from version 1.08 to version 1.16.
 
-2014-04-03 v1.9993 pjacklam
+1.9993 2014-04-03 pjacklam
+
  BUGS
   * Add reference to CPAN RT for the Math-BigInt distro.
  CHANGES
@@ -829,7 +905,7 @@ Fixes:
  inc/Module/Install*
   * Upgrade bundled Module::Install from version 1.01 to version 1.08.
 
-2012-12-10 v1.9997_11 pjacklam
+1.9997_11 2012-12-10 pjacklam
 
 This release introduces no changes in the library code, i.e., the .pm files in
 the 'lib' directory, but there are a lot of changes in the test files. Since
@@ -868,7 +944,8 @@ there are so many changes, I let this be a development release.
 
  * Wrap (most) lines to fit 80 columns in test files.
 
-2011-09-04 v1.997 pjacklam
+1.997 2011-09-04 pjacklam
+
  * Document actual behaviour of from_xxx() methods. [perl #85334] (Peter John
    Acklam)
  * Make bmuladd() able to handle third arg properly. [perl #85482] (Peter John
@@ -885,12 +962,14 @@ there are so many changes, I let this be a development release.
    generated by the end user at configure time after any dynamic dependencies
    are known. (Peter John Acklam)
 
-2011-02-26 v1.993 pjacklam
+1.993 2011-02-26 pjacklam
+
  * Change default backend library from Math::BigInt::FastCalc to
    Math::BigInt::Calc, which is included in the Math-BigInt distro. This
    avoids recursive distribution dependency (RT #65976) (Peter John Acklam).
 
-2011-02-18 v1.992 pjacklam
+1.992 2011-02-18 pjacklam
+
  * Math::BigInt::Calc->_nok(): Use symmetry property nok(n,k) = nok(n,n-k) to
    speed up execution when k is large. Also general code cleanup. (Peter John
    Acklam).
@@ -915,13 +994,15 @@ there are so many changes, I let this be a development release.
  * Clean up code and add more code comments (Peter John Acklam).
  * Fix typos (Peter John Acklam).
 
-2011-02-05 v1.991 pjacklam
+1.991 2011-02-05 pjacklam
+
  * Add workaround for library inconsistencies (Math::BigInt::Calc vs.
    Math::BigInt::GMP). This makes older versions of Math::BigInt::GMP
    work with latest version of Math::BigInt (Peter John Acklam).
  * Correct and extend API documentation (Peter John Acklam).
 
-2011-01-29 v1.99_05 pjacklam
+1.99_05 2011-01-29 pjacklam
+
  * Fix typos (reminder -> remainder etc.) (Peter John Acklam)
  * Fix Math::BigInt::Calc::_num returning NaN, not Inf, when it overflowed
    (Peter John Acklam) (Closes: RT #25274).
@@ -943,51 +1024,61 @@ Math::* in the Perl core, see HISTORY.
 ##############################################################################
 Math::BigInt::Calc:
 
-2007-09-16 v0.52 Tels
+0.52 2007-09-16 Tels
+
  * fix 64bit ints on Perl v5.8.0 (thanx zefram)
 
-2007-05-30 v0.51 Tels
+0.51 2007-05-30 Tels
+
  * use CORE::hex() instead of hex() to help bigint/bignum/bigrat
  * use 9 digit parts on 64bit integer or long double systems
 
-2007-05-05 v0.50 Tels
+0.50 2007-05-05 Tels
+
  * speed up _mul() by "use integer;"
  * we do not need to remove zeros after mul()
  * implement an alternative algorithm for _fac()
 
-2007-04-16 v0.49 Tels
+0.49 2007-04-16 Tels
+
  * API version 2.0 support: add _1ex(), _alen()
  * make _fac() about twice as fast
 
-2007-01-27 v0.48 Tels
+0.48 2007-01-27 Tels
+
  * support for octal numbers
 
-2005-05-17 v0.47 Tels
+0.47 2005-05-17 Tels
+
  * remove shortcut in div(), it wasn't working properly
 
-2005-03-29 v0.46 Tels
+0.46 2005-03-29 Tels
+
  * avoid crash in FastCalc by making $BASE and $BASE_LEN use vars qw//;
 
-2005-03-20 v0.45 Tels
+0.45 2005-03-20 Tels
+
  * fix the div() shortcut for short numbers to actually work
 
-2005-01-01 v0.44 Tels
+0.44 2005-01-01 Tels
+
  * small cleanups
  * shortcut for numbers of same length in _div, where X > Y
 
-2004-10-10 v0.42 Tels
+0.42 2004-10-10 Tels
+
  * fix critical bug in _from_hex() with parts that were to big for one part
    (introduced in v1.72, thanx Mark Lakata for finding it!)
 
-2004-07-30 v0.41 Tels
+0.41 2004-07-30 Tels
+
  * from_hex() convert 28 bits (vs 16) at a time, faster (helps from_bin(), too)
  * potential bug in padding with '0' in _digit()
  * fixed undef warnings in fceil(0.222222222222...) (thanx kenny!)
-
-2004-04-05 v0.41a Tels (not released)
  * removed the unused integer-detection code and combined the two BEGIN blocks
 
-2004-03-12 v0.40 Tels
+0.40 2004-03-12 Tels
+
  * added: api_version(), _ten(), _two(), _is_ten(), _is_two(), _gcd()
  * streamlined: is_foo() methods
  * _new() takes scalar, not scalar ref
@@ -997,10 +1088,12 @@ Math::BigInt::Calc:
  * _ior(): forgot to calculate the proper sing of result, making, for
     instance, 30 | -4 go wrong
 
-2004-01-25 v0.39 Tels (not released)
+0.39 2004-01-25 Tels (not released)
+
  * _zeros(0) is 0, not 1
 
-2003-12-30 v0.38 Tels
+0.38 2003-12-30 Tels
+
  * guess _log_int() result based on $base if $base < $BASE
  * _pow() handle cases 0 ** Y, 1 ** Y, X ** 0 and X ** 1
  * _new(): shortcut for short numbers, makes MBI->new() about 20% faster
@@ -1008,7 +1101,8 @@ Math::BigInt::Calc:
    the pattern /^0b1(0+)/ (missing '$' in regexp) and after fixing this
    it was dead slow for large numbers.
 
-2003-12-11 v0.37 Tels
+0.37 2003-12-11 Tels
+
  * implemented _log_int() with a simple and fast "iterative" method
  * fixed bug in _root(): int() rounds sometimes wrong, so use sprintf()
  * _as_bin() and _as_hex() are faster (for small values) due to inlining
@@ -1024,84 +1118,102 @@ Math::BigInt::Calc:
  * implemented _log_int(), which is simple and very fast
  * implemented the missing pieces for _root() (which is quite fast)
 
-2003-08-31 v0.36 Tels
+0.36 2003-08-31 Tels
+
  * fixed a bug in div_use_div() that computed remainder wrong if X == X and
    X was very large
  * fixed a off-by-one error discovered with mbi_rand.t in _div_use_XXX()
    (one internal in $x overflowed, thus the wrong computation)
 
-2003-07-06 v0.35 Tels
+0.35 2003-07-06 Tels
+
  * fixed a bug in _floor() which caused ffloor(0.1234567) to fail.
    (Thanx to cpan@ali.as for finding it and sending a fix/testcases)
  * make _as_hex() and _as_bin() handle 0, and make them faster for very
    short numbers (less than BASE_LEN digits)
 
-2002-09-27 v0.34 Tels
+0.34 2002-09-27 Tels
+
  * fixed bug in mul_use_div() shortcut that used * $RBASE instead of / $MBASE
  * $caught & 1 != 0 vs ($caught & 1) != 0 (changed to $caught != 2)
  * $i %= $MBASE does not work on ARM (v5.003), so make it $i -= $car * $MBASE
  * removed unused LEN_CONVERT code (smaller memory footprint)
 
-2002-09-09 v0.33 Tels
+0.33 2002-09-09 Tels
+
  * _fac() keep $n as scalar if possible
  * test for when to USE_MUL or not was inverted
  * _mul() is about 6 times faster if $y is small and $x is big
 
-2002-08-21 v0.32 Tels
+0.32 2002-08-21 Tels
+
  * fixed bug in _rsft() that did not set result to 0 in some cases
  * _modinv() now works, thanx to the all-positive algorithm
  * much more tests in bigintc.t (taken over from FastCalc)
 
-2002-08-13 v0.31 Tels
+0.31 2002-08-13 Tels
+
  * _acmp() no longer calls _len() => tad faster
  * some cleanup of old code, added some more comments
 
-2002-06-10 v0.30 Tels
+0.30 2002-06-10 Tels
+
  * undef mul/div in case Calc.pm get's loaded twice
  * fix in _as_hex() and _as_bin() for older Perls
  * speedups in _pow() and _modpow()
 
-2002-06-09 v0.29 Tels
+0.29 2002-06-09 Tels
+
  * filled in _modpow()
 
-2002-05-30 v0.28 Tels
+0.28 2002-05-30 Tels
+
  * added _modinv(), _modpow() (not yet implemented)
 
-2002-03-17 v0.26 Tels
+0.26 2002-03-17 Tels
+
  * a fix in _rsft() that left empty array instead of (0)
  * a fix in _sub(): early out made -1 + 100000000001 == 0 (if length($y) > 8)
 
-2002-03-03 v0.25 Tels
+0.25 2002-03-03 Tels
+
  * started _square() (not done yet)
 
-2002-02-27 v0.24 Tels
+0.24 2002-02-27 Tels
+
  * streamlined _mod() shortcuts
  * _div() has shortcut if $y is very small
 
-2002-02-24 v0.23 Tels
+0.23 2002-02-24 Tels
+
  * from_bin() repack input and use from_hex(): twice as fast
 
-2002-02-10 v0.22 Tels
+0.22 2002-02-10 Tels
+
  * _sqrt1() => _sqrt() (oups)
  * much better guess for _sqrt() resulting in faster sqrt
  * added _fac()
 
-2002-01-07 v0.20 Tels
+0.20 2002-01-07 Tels
+
  * better detection of higher-int-only base (but disabled due to failures)
  * streamlined converting
  * turned dual-basis off by default (now 7-7 on 32 bit and 9-9 on most 64 it)
  * _str() uses int() on first part to avoid '0000' instead of '0'
 
-2001-12-23 v0.19 Tels
+0.19 2001-12-23 Tels
+
  * first working version of using two different bases: one for mul/div, the
    other for all other ops, including converting via _to_large()/_to_small()
 
-2001-12-20 v0.18 Tels
+0.18 2001-12-20 Tels
+
  * added _as_hex() and _as_bin() with 16 bit chunks
  * from_bin() now uses oct() and 16 bits per iteration
  * removed needless return statements
 
-2001-12-06 v0.17 Tels
+0.17 2001-12-06 Tels
+
  * added _sqrt() for more speed
  * _sqrt() shortcut for small (< $BASE) numbers for better performance
  * shortcut in _mul for small numbers (< $BASE_LEN2)
@@ -1112,38 +1224,48 @@ Math::BigInt::Calc:
  * cap of 5 for BASE for UTS and UNICOS/Cray
  * better test to find out what BASE should be (use +0.0 to force floats)
 
-2001-11-19 v0.16 Tels
+0.16 2001-11-19 Tels
+
  * fixed comments a bit
  * finished _mod() when $y < $BASE and $BASE % $y != 0 and $BASE % $y != 1
  * streamlined _mod() loops a bit
  * added _pow() for faster bpow()
  * small fix to make 5.005_03 happy ($x = shift @prod vs $x = shift @prod || 0)
 
-2001-11-11 v0.15 Tels
+0.15 2001-11-11 Tels
+
  * added _dec() and _inc() for much faster $x++ and $x--
 
-2001-11-04 v0.14 Tels
+0.14 2001-11-04 Tels
+
  * added _mod() for faster $x % $y
 
-2001-10-23 v0.13 Tels
+0.13 2001-10-23 Tels
+
  * better detection of BASELEN by matching against expected pattern
 
-2001-10-03 v0.12 Tels
+0.12 2001-10-03 Tels
+
  * _div: 99999 => $BASE-1 ($MAX_VAL), that made some div's fail if $BASE != 5
 
-2001-09-07 v0.11 Tels
+0.11 2001-09-07 Tels
+
  * automatically USE_MUL or USE_DIV
 
-2001-08-24 v0.10 Tels
+0.10 2001-08-24 Tels
+
  * no longer export anything, ignore import calls
 
-2001-07-20 v0.09 Tels
+0.09 2001-07-20 Tels
+
  * don't use warnings for older Perls
 
-2001-07-15 v0.08 Tels
+0.08 2001-07-15 Tels
+
  * fixed bug in mul() shortcut
 
-2001-07-15 v0.07 Tels
+0.07 2001-07-15 Tels
+
  * applied Philip Newtons spelling and doc patch(s)
  * accidentally had the old, slow mul() code in. Oups.
  * fixed also a bug in that new code
@@ -1151,69 +1273,84 @@ Math::BigInt::Calc:
  * first argument is always classname, so removed checks and shift
  * shift in base ten by _lsft() and _rsft()
 
-2001-07-09 v0.06 Tels
+0.06 2001-07-09 Tels
+
  * first release
 
 ##############################################################################
 Math::BigInt::CalcEmu:
 
-2004-03-12 v0.04 Tels
+0.04 2004-03-12 Tels
+
  * removed unnec. emulation routines (all except _signed_foo)
 
-2004-01-13 v0.03 Tels
+0.03 2004-01-13 Tels
+
  * $VERSION was overriding the $VERSION from MBI (Thanx Gisle Aas!)
 
-2003-12-30 v0.02 Tels
+0.02 2003-12-30 Tels
+
  * the code in Calc::_root() uses now sprintf(), but the one in Emu was not
 
-2003-12-26 v0.01 Tels
+0.01 2003-12-26 Tels
+
  * first version, taken over all the code from BigInt
 
 ##############################################################################
 Math::BigInt::Scalar:
 
-2002-01-07 v0.11 Tels
+0.11 2002-01-07 Tels
+
  * fixed version
  * added DESCRIPTION section to stop pod2man complaining
  * added _dec, _inc
 
-2001-08-24 v0.10 Tels
+0.10 2001-08-24 Tels
+
  * no longer export anything, ignore import calls
 
-2001-07-20 v0.06 Tels
+0.06 2001-07-20 Tels
+
  * don't use warnings for older Perls
 
-2001-07-15 v0.05 Tels
+0.05 2001-07-15 Tels
+
  * first argument is always classname, so removed checks and shift
 
-2001-07-09 v0.04 Tels
+0.04 2001-07-09 Tels
+
  * first release
 
 ##############################################################################
 Math::BigFloat:
 
-2008-04-20 v1.60 Tels
+1.60 2008-04-20 Tels
+
  * fix #34459: bsqrt() breaks on floats with enough digits (Thanx Niko Tyni!)
  * fix #35238: batan2() handles inf/+inf wrong
  * fix #35162: MBI segfault (as_number(Math::BigRat()) was wrong)
 
-2007-06-30 v1.58 Tels
+1.58 2007-06-30 Tels
+
  * remove Exporer from @ISA
  * support config('lib') as shortcut for config()->{lib}
  * add bpi(), bcos(), bsin(), batan(), batan2() methods
  * add bmuladd()
  * streamline the is_xxx() and copy() methods
 
-2007-05-05 v1.57 Tels
+1.57 2007-05-05 Tels
+
  * add bnok() method (n over k)
  * add all the missing modify() hooks
 
-2007-04-16 v1.55 Tels
+1.55 2007-04-16 Tels
+
  * make bexp() much faster (esp. under GMP) by caching the first coefficients
    and rewriting the inner loop
  * support "try" and "only" in import()
 
-2007-04-09 v1.54 Tels
+1.54 2007-04-09 Tels
+
  * fix bug #21747: Re: weirdity in bignum... (powers and high precision):
    infinite loops for blog() (and consequently bpow()) if you requested
    an accuracy greater than 67 digits (uses _log() now, and not blog())
@@ -1226,32 +1363,38 @@ Math::BigFloat:
    about a factor of 5 faster when N >= 10 or N <= 0.1
  * add bexp()
 
-2007-03-04 v1.53 Tels
+1.53 2007-03-04 Tels
+
  * fix #25144: [PATCH] Math::BigFloat->new considers any reference a BigInt
    (Thanx mschwern!)
  * fix bug #13866: NaN (in bignum queue)
  * fix bug #21586: Incorrect result when comparing with NaN
  * fix bug #15896: "==" overloading is broken for "NaN"
 
-2007-01-27 v1.52 Tels
+1.52 2007-01-27 Tels
+
  * fix brsft() and bpow() in list context only return on number (bug #21413)
  * make as_int() return a BigInt, too (not just as_number()) (bug #21412)
  * add as_oct()
  * bpow(): handle negative X and negative Y (instead of returning NaN)
 
-2005-04-10 v1.51 Tels
+1.51 2005-04-10 Tels
+
  * fix new() to work with Math::BigInt::Pari
 
-2005-03-29 v1.50 Tels
+1.50 2005-03-29 Tels
+
  * fix rounding doc, add notes about prevision vs. accuracy
  * set FastCalc as default (we still use whatever MBI uses)
 
-2005-03-20 v1.49 Tels
+1.49 2005-03-20 Tels
+
  * remove dependecy on Scalar::Util in bdiv()
  * bdiv() cache result of "!$y->is_one()" for wantarray case to make
    ($res,$rem) = $x->bdiv($y); about 10% faster
 
-2005-01-01 v1.48 Tels
+1.48 2005-01-01 Tels
+
  * use new interface to _scale_a() and _scale_p() in BigInt
  * add bneg() and inline is_zero() in it, making it 1.6 times faster
  * replace ref($_[0]) w/ undef when it isn't actually needed. This
@@ -1259,16 +1402,19 @@ Math::BigFloat:
  * use MBI::_register_callback() to get notified of lib changes
  * bgcd()/blcm() never worked, so fix them for integers and add tests
 
-2004-10-10 v1.47 Tels
+1.47 2004-10-10 Tels
+
  * inf/NaN fixes for bpow()
  * eliminate the need for _zeros() in new() (speed-up for GMP et. al.)
  * eliminate _is_zero() in new() (small speed up)
  * added shortcut for simple numbers in new() (speed up)
 
-2004-08-13 v1.46 Tels
+1.46 2004-08-13 Tels
+
  * blog(10,10) ($x == $y) returned '1.0000...' instead of '1'
 
-2004-07-30 v1.45 Tels
+1.45 2004-07-30 Tels
+
  * simple inherit bsub() from BigInt, also fixes bsub() failing under
    $x -= $x - Thanx Peter J. Acklam!
  * bdiv() failed when passed a variable twice (thanx Peter J. Acklam!)
@@ -1276,25 +1422,29 @@ Math::BigFloat:
    bround() due to constructing a fake BigInt instead of going via ->new()
  * fixed undef warnings in bpow(0,$y) ($y non-integer) (thanx kenny!)
 
-2004-03-12 v1.44 Tels
+1.44 2004-03-12 Tels
+
  * bpow() computed -X ** Y wrong for Y that are odd
  * use $HALF instead of 0.5 to speed up broot()
  * use Calc instead of BigInt for parts, that makes it roughly 2x faster
    it also saves memory (419 vs. 767 bytes per (small number) object)
  * bmod() did needlessly test for NaN arguments twice
 
-2004-01-13 v1.43 Tels
+1.43 2004-01-13 Tels
+
  * small fixes in AUTOLOAD
  * delete $x->{_a} vs. $x->{_a} = undef to save memory
 
-2003-12-30 v1.42 Tels
+1.42 2003-12-30 Tels
+
  * ffac(inf) is inf, not NaN
  * flog() calculate integer result first, and if it fits, return it
    this makes it much faster in case the result is a perfect integer
  * require (instead of use) Exporter
  * froot() calculates an integer result first, and it if fits, returns it
 
-2003-12-11 v1.41 Tels
+1.41 2003-12-11 Tels
+
  * flog(): 0.5, 0.25, 0.125, 2, 4 and 8 were not scaled properly back to
    1, instead they remained 0.5 and 2, respectively. This was a '<' vs.
    '>=' respective '<' vs. '<=' issue. No other values are affected
@@ -1306,16 +1456,19 @@ Math::BigFloat:
  * bfac() slightly faster for small arguments
  * downgrading to bigint failed for .2e2 (produced 200 vs. 20)
 
-2003-09-23 v1.40 Tels
+1.40 2003-09-23 Tels
+
  * bstr(): removed unnec. BigInt math and inlined is_zero() => great speedup
    (10% to factor 6.5 depending on input)
  * replace $self->_one() by $self->bone()
 
-2003-07-06 v1.39 Tels
+1.39 2003-07-06 Tels
+
  * $x->blog($base) can handle a $base which is a Math::Bigint
  * replace die() with Carp::croak
 
-2002-11-03 v1.39 Tels
+1.39 2002-11-03 Tels
+
  * $x->bpow($y,0), $x->blog($base,0) and $x->bdiv($y,0) were still not doing
     the right thing and no tests caught it *sigh*
  * blog():
@@ -1341,7 +1494,8 @@ Math::BigFloat:
  * spellings of Bigint => BigInt
  * simplify config() by using SUPER::config()
 
-2002-09-08 v1.38 Tels
+1.38 2002-09-08 Tels
+
  * fix that bsqrt() would hang for certain inputs. Instead of using Newton's,
    we now rely on the fact that sqrt(x*y) = sqrt(x) * sqrt(y) by setting y to
    100. This removes the while loop entirely and makes it much faster while
@@ -1351,10 +1505,12 @@ Math::BigFloat:
  * ditto for $x->bpow($y,0), $x->blog($base,0) and $x->bdiv($y,0)
  * use File::Spec was needless, since it was required later on again
 
-2002-08-20 v1.37 Tels
+1.37 2002-08-20 Tels
+
  * bcmp()/bacmp() upgrade now if requested
 
-2002-08-13 v1.36 Tels
+1.36 2002-08-13 Tels
+
  * as_hex() and as_bin() work now at least for inf, NaN and integers
  * fixed bsstr() (and thus also numify()) for negative numbers - Ouch!
  * $x->new("0.02"); $x->accuracy($a); $x->bdiv($y,$d) failed to round
@@ -1362,7 +1518,8 @@ Math::BigFloat:
  * numify() returned '+inf' instead of 'inf'
  * (more) tests for bsstr(), numify(), as_hex(), as_bin
 
-2002-07-07 v1.35 Tels
+1.35 2002-07-07 Tels
+
  * bfround() used accidentally BigInt math; is now about 5.6 times faster for
    small numbers
  * bdiv()/badd() etc skip objectify() if possible and are thus faster
@@ -1370,21 +1527,26 @@ Math::BigFloat:
  * $x->bmod() was not modifying $x in place when returning NaN/inf/-inf
  * avoid unec. calls to objectify() for binary op's
 
-2002-06-10 v1.34 Tels
+1.34 2002-06-10 Tels
+
  * upgrade used badd() instead of bmul() inside bmul() (again! arg!)
 
-2002-06-09 v1.33 Tels
+1.33 2002-06-09 Tels
+
  * import() fixed for older Perls
 
-2002-05-19 v1.32 Tels
+1.32 2002-05-19 Tels
+
  * upgrade used badd() instead of bmul() inside bmul()
  * bpow() now uses slower, but more correct way for fractions (this needs work)
 
-2002-03-03 v1.31 Tels
+1.31 2002-03-03 Tels
+
  * bpow() can handle second arguments beeing non-integer (f.i. 2 ** 0.2)
  * $x->bpow(0.5) optimized to $x->bsqrt();
 
-2002-02-25 v1.30 Tels
+1.30 2002-02-25 Tels
+
  * bug in bsub() with not rounding when $x->bsub(0) was also in MBF
  * bcmp() and bacmp() 5 times faster due to numify() (might have now impose a
    limit on exponent - but I couldn't find a test that breaks it)
@@ -1396,21 +1558,25 @@ Math::BigFloat:
  * $x->badd(0) forgot to round $x
  * downgrade and upgrade are valid methods for inheritance
 
-2002-02-24 v1.29 Tels
+1.29 2002-02-24 Tels
+
  * overload for 'log' now inherited by BigInt
  * _binf(), _bnan(), _bone() and _bzero() instead of longer bone() etc
  * inf/NaN fixes from v1.51 were missing for BigFloat
  * bdiv() upgrades if applicable
 
-2002-02-16 v1.28 Tels
+1.28 2002-02-16 Tels
+
  * fixed use Math::BigFloat ':constant';
  * fixed flog() function to calc right result, honour rounding-globals
 
-2002-02-10 v1.27 Tels (forgot to increase version)
+1.27 2002-02-10 Tels (forgot to increase version)
+
  * ffac()
  * various: disable Math::BigInt::upgrade to avoid deep recursion
 
-2002-01-06 v1.27 Tels
+1.27 2002-01-06 Tels
+
  * overload for log() and flog()/blog()
  * bzero()/bone() handling of A & P was broken
  * bround()/bfround() handling of zeros forgot to set A & P
@@ -1420,7 +1586,8 @@ Math::BigFloat:
  * fsqrt(): calc 4 more digits for rounding, not 1 (endless looping otherwise)
  * fmod() now actually works
 
-2001-12-06 v1.26 Tels
+1.26 2001-12-06 Tels
+
  * fneg() failed (now hand up to MBI)
  * frsft() and flsft() were no aliases to brsft() and blsft()
  * fone() was no alias for bone()
@@ -1432,51 +1599,60 @@ Math::BigFloat:
  * bzero(), bone(): take additional A and P and store 'em
  * bnan(), binf(): clear A and P
 
-2001-11-18 v1.25 Tels
+1.25 2001-11-18 Tels
+
  * streamlining fixes in new() were missing
  * further streamlining in new() for 12345e1234 cases (fraction part empty)
  * added $rnd_mode support for compatibility
  * replaced the 'laber schwad blah blah' pod section by a pointer to MBI
 
-2001-11-11 v1.24 Tels
+1.24 2001-11-11 Tels
+
  * bacmp() fix for +-inf
  * streamlined new()
  * faster finc()/fdec()
 
-2001-10-05 v1.23 Tels
+1.23 2001-10-05 Tels
+
  * fixed facmp() (was broken the same way as fcmp())
  * more rounding fixes from John P.
 
-2001-10-03 v1.22 Tels
+1.22 2001-10-03 Tels
+
  * Quite a lot of rounding fixes
  * $x->bnorm() is 4 times faster if $x == 0
  * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op)
  * added as_number()
 
-2001-09-03 v1.21 Tels
+1.21 2001-09-03 Tels
+
  * serious bug in bcmp() caused 1.5 to be greater than 2. Yikes!
  * bcmp() did not only return -1,0,1 and undef but other values, too
  * new('inf') produced NaN (was expecting '+inf')
  * exponent(), mantissa() & parts() failed or returned scalars for inf,-inf,NaN
  * include finf in AUTOLOAD list
 
-2001-08-03 v1.20 Tels
+1.20 2001-08-03 Tels
+
  * streamlined bcmp
  * drop leading '+' for inf
 
-2001-08-02 v1.19 Tels
+1.19 2001-08-02 Tels
+
  * 123/+-inf => 0, test for that and -1,0 / NaN => NaN
  * +123 / 0 => +inf, -123 / 0 => -inf (was missing in MBF)
  * fixed +-inf handling in bacmp/bcmp/bsub/badd/bdiv and tests for that
  * padd bstr() output of numbers with set A or P
  * remove bfloat() (Math::BigInt->bfloat() did not work, anyway, see bint())
 
-2001-07-15 v1.17 Tels
+1.17 2001-07-15 Tels
+
  * applied Philip Newtons spelling and doc patch(s)
  * added bone()
  * tests for bnan() and bone()
 
-2001-07-09 v1.16 Tels
+1.16 2001-07-09 Tels
+
  * is_positive(), is_negative()
  * various pod fixes (overlong =item, spelling erorrs etc)
  * removed internal _set() and the tests for it
@@ -1484,10 +1660,12 @@ Math::BigFloat:
  * nailed the bug in fdiv() that caused fsqrt() to fail. fsqr() works now, too.
  * more tests
 
-2001-06-15 v1.15 Tels
+1.15 2001-06-15 Tels
+
  * added bfloor(), bceil()
 
-2001-06-13 1.14 Tels:
+1.14 2001-06-13 Tels
+
  * accuracy/precision rounding after fdiv() was missing
  * binary integer input (0b01110 etc)
  * A/P rounding after fdiv() was missing
@@ -1499,7 +1677,7 @@ Math::BigFloat:
  * added is_inf(), binf() and some support for +-inf in new(), bsstr() etc
  * added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(), bsstr()
 
-2001-06-09 1.13 Tels:
+1.13 2001-06-09 Tels:
  * adjusted fdiv() so that it now works proper with old testcases
  * (except a few nits, see testsuite and ACCURACY)
  * fdiv() in listmode (uses non-working fmod())
@@ -1509,63 +1687,88 @@ Math::BigFloat:
  * hexadecimal integer input (0xdeadbeef)
  * is_one() for -1 was wrongly true, tests for is_one()
 
-2001-05-11 1.12 Tels
+1.12 2001-05-11 Tels
  * taken over testsuite from John P.
  * added tests for compare with fraction
  * fixed fcmp/fround/ffround
  * added accuracy/precision/fallback/round_mode
  * bsstr('NaN') returned 'NaNeNaN'
 
-2001-05-09 1.11: bug bcmp() (1e-08 was < 0, aka fractions were broken)
+1.11 2001-05-09
 
-2001-05-07 1.10: Tom's round fixes (minus one nit)
-                 new: .xxx, -.xxx, +.xxx etc are valid inputs, while
-                 '.', 'x x x' and 'Exxx' are now invalid
-                 finally got rid of C&P of overload section and clone()
+ * bug bcmp() (1e-08 was < 0, aka fractions were broken)
 
-2001-04-23 1.09: length() in list context return length of mantissa & exponent
-                 bug in bstr() for '0.x' style strings
-                 added bsqrt()
-                 workaround for Perl v5.6.0 overload-bool bug (via MBI)
-                 fixed rounding
+1.10 2001-05-07
 
-2001-04-18 1.08: exponent(), mantissa() and parts() now return BigInt's
-                 bnorm: 0Ey => 0E1 (was wrongly 0E0)
-                 fixed is_zero()
-                 added bround() and bfround() (only truncate mode)
-                 fixed bug in bstr() for 1.203E-2 style numbers (Thanx Tom!)
+ * Tom's round fixes (minus one nit)
+ * new: .xxx, -.xxx, +.xxx etc are valid inputs, while '.', 'x x x' and 'Exxx'
+   are now invalid
+ * finally got rid of C&P of overload section and clone()
 
-2001-04-07 1.07: bug in bstr() for 0.xxx style numbers, as well as for "-xxx"
-                 babs(), bneg(), bint() work now
-                 empty stubs for bsqrt(), bround() and bmod()
-                 exponent(), mantissa(), parts() work now as expected
+1.09 2001-04-23
 
-2001-04-05 1.06: bstr() returns NaN for NaN's
-                 renamed _norm to bnorm, added it to AUTOLOAD for compatibility
-                 fixed bug Math::BigFloat->new(Math::BigInt->new(3));
-                 bug mul/div when second arg was BigInt
-                 bdiv() works now with precision
-                 precision()
-                 doc about mixing different objects in overloaded math
+ * length() in list context return length of mantissa & exponent
+ * bug in bstr() for '0.x' style strings
+ * added bsqrt()
+ * workaround for Perl v5.6.0 overload-bool bug (via MBI)
+ * fixed rounding
 
-2001-03-31 1.05: fixed bstr() and bsstr()
-                 added AUTOLOAD for fxxx() to work as well as bxxx()
-                 enhanced and fixed testsuite for mul/cmp/add/new
+1.08 2001-04-18
 
-2001-03-27 1.04: bmul/bdiv/cmp work now, better _norm()
+ * exponent(), mantissa() and parts() now return BigInt's
+ * bnorm: 0Ey => 0E1 (was wrongly 0E0)
+ * fixed is_zero()
+ * added bround() and bfround() (only truncate mode)
+ * fixed bug in bstr() for 1.203E-2 style numbers (Thanx Tom!)
 
-2001-03-06 1.03: layed more foundations (mul() etc)
+1.07 2001-04-07
 
-2001-02-24 1.02: add()/sub() should work now
+ * bug in bstr() for 0.xxx style numbers, as well as for "-xxx"
+ * babs(), bneg(), bint() work now
+ * empty stubs for bsqrt(), bround() and bmod()
+ * exponent(), mantissa(), parts() work now as expected
 
-2001-02-22 1.01: new() and bstr() work now (sort of)
+1.06 2001-04-05
 
-2001-02-18 1.00: started work
+ * bstr() returns NaN for NaN's
+ * renamed _norm to bnorm, added it to AUTOLOAD for compatibility
+ * fixed bug Math::BigFloat->new(Math::BigInt->new(3));
+ * bug mul/div when second arg was BigInt
+ * bdiv() works now with precision
+ * precision()
+ * doc about mixing different objects in overloaded math
+
+1.05 2001-03-31
+
+ * fixed bstr() and bsstr()
+ * added AUTOLOAD for fxxx() to work as well as bxxx()
+ * enhanced and fixed testsuite for mul/cmp/add/new
+
+1.04 2001-03-27
+
+ * bmul/bdiv/cmp work now, better _norm()
+
+1.03 2001-03-06
+
+ * layed more foundations (mul() etc)
+
+1.02 2001-02-24
+
+ * add()/sub() should work now
+
+1.01 2001-02-22
+
+ * new() and bstr() work now (sort of)
+
+1.00 2001-02-18
+
+ * started work
 
 ##############################################################################
 Math::BigInt:
 
-2010-11-15 v1.99 rafl
+1.99 2010-11-15 rafl
+
  * Stop as_int/as_number from losing precision (Peter John Acklam)
    (Closes: RT#43694)
  * Fix Math::BigInt::Calc::_modpow for (0 ** $x) % $y, with $x > 0
@@ -1573,7 +1776,8 @@ Math::BigInt:
  * Stop $x -> bmodpow(1, 1) from failing when $x is large (Peter John Acklam)
    (Closes: RT#62949).
 
-2010-11-08 v1.98 rafl
+1.98 2010-11-08 rafl
+
  * Fix from_bin() documentation error (Peter John Acklam) (Closes: RT#61845).
  * Make as_int($inf) return inf, not NaN (Peter John Acklam) (Closes RT#62101).
  * Fix various typos in documentation and tests (Peter John Acklam)
@@ -1581,44 +1785,55 @@ Math::BigInt:
  * Make digit($n) return 0 for "out of range"-digits (Peter John Acklam)
    (Closes RT#61812).
 
-2010-11-07 v1.97 rafl
+1.97 2010-11-07 rafl
+
  * Reorder the list return of Math::BigInt::Calc::_base_len() (Nicholas Clark)
    This change requires an update of Math::BigInt::FastCalc to version 0.24.
  * Fix segfault when upgrading irrational numbers (Father Chrysostomos)
 
-2010-09-28 v1.96 rafl
+1.96 2010-09-28 rafl
+
  * Various documentation fixes provided by gregor herrmann
 
-2010-09-14 v1.95 rafl
+1.95 2010-09-14 rafl
+
  * Re-upload v1.94 as a stable release
 
-2010-09-13 v1.94 rafl DEVELOPMENT RELEASE
+1.94 2010-09-13 rafl DEVELOPMENT RELEASE
+
  * Attempt to fix Math::BigInt::Lite failures
 
-2010-09-13 v1.93 rafl
+1.93 2010-09-13 rafl
+
  * Depend on perl >= 5.6.2
  * Remove obsolete core test directory boilerplate
  * Convert from Test to Test::More
 
-2010-09-10 v1.92 rafl
+1.92 2010-09-10 rafl
+
  * re-upload v1.91 with a fixed SIGNATURE
 
-2010-09-10 v1.91 rafl
+1.91 2010-09-10 rafl
+
  * fix various documentation bugs
 
-2010-09-03 v1.90 rafl
+1.90 2010-09-03 rafl
+
  * fix bnok() for k==0 and k==n-1
 
-2008-04-20 v1.89 Tels
+1.89 2008-04-20 Tels
+
  * fix #35238: batan2() handles inf/+inf wrong
 
-2007-09-22 v1.88 Tels
+1.88 2007-09-22 Tels
+
  * fix wide ints on Perl v5.8.0 (Thanx zefram!)
  * minimum required is Perl v5.6 (tested by zefram)
  * _find_round_parameters(), _scale_a() and _scale_p(): trunc A/P to integers
  * fix from_oct(), from_bin() and from_hex()
 
-2007-06-30 v1.87 Tels
+1.87 2007-06-30 Tels
+
  * fix undef base in blog()
  * support config('lib') as shortcut for config()->{lib}
  * _find_round_parameters(): convert $a & $p to normal scalars, or bad
@@ -1627,28 +1842,35 @@ Math::BigInt:
  * add bmuladd()
  * streamline the is_xxx() and copy() methods
 
-2007-05-05 v1.86 Tels
+1.86 2007-05-05 Tels
+
  * bump version
 
-2007-05-05 v1.85 Tels
+1.85 2007-05-05 Tels
+
  * bump version
 
-2007-05-04 v1.84 Tels
+1.84 2007-05-04 Tels
+
  * add bnok() method (n over k)
 
-2007-04-16 v1.83 Tels
+1.83 2007-04-16 Tels
+
  * bump version
 
-2007-04-09 v1.82 Tels
+1.82 2007-04-09 Tels
+
  * use $CALC->_zeros() directly (instead _trailing_zeros()) to speed up
    exponent() and mantissa()
  * fix documentation that blsft() and brsft() default to base 2 (not 10)
  * add bexp() and fix overloading for exp()
 
-2007-03-16 v1.81 Tels
+1.81 2007-03-16 Tels
+
  * no code change, just a package update
 
-2007-03-04 v1.80 Tels
+1.80 2007-03-04 Tels
+
  * require Perl v5.6.2 as minimum
  * fix bug #24969 (Can't use an undefined value as an ARRAY reference)
  * fix bug #12857: Subclasses and overload
@@ -1656,10 +1878,12 @@ Math::BigInt:
  * fix bug #21586: Incorrect result when comparing with NaN
  * fix bug #15896: "==" overloading is broken for "NaN"
 
-2007-02-02 v1.79 Tels
+1.79 2007-02-02 Tels
+
  * fix typos
 
-2007-01-27 v1.78 Tels
+1.78 2007-01-27 Tels
+
  * implement "try" and "only" as replacements for "lib"
  * make 'use Math::BigInt lib => "foo"' warn if foo cannot be loaded and a
    fallback occurs
@@ -1671,20 +1895,24 @@ Math::BigInt:
  * add from_hex(), from_oct(), and from_bin()
  * add as_oct()
 
-2005-05-17 v1.77 Tels
+1.77 2005-05-17 Tels
+
  * bump version
 
-2005-04-10 v1.76 Tels
+1.76 2005-04-10 Tels
+
  * fix rounding doc, add notes about prevision vs. accuracy
  * trap inf and -inf in new()
  * load FastCalc as default
 
-2005-03-20 v1.75 Tels
+1.75 2005-03-20 Tels
+
  * use a trick to remove the dependency on Scalar::Util in bsub()
  * fix atan2(), it did not preserve the order of arguments
    (Thanx to Ambros & Zaxo for report and patch!)
 
-2005-01-01 v1.74 Tels
+1.74 2005-01-01 Tels
+
  * streamline _scale_a() and _scale_p() for more speed in rounding
  * remove the now unnec. support for MB_NEVER_ROUND and {_f}, this
    makes all ops that call round() a tad faster (one exists is
@@ -1702,21 +1930,25 @@ Math::BigInt:
  * streamline bmod() a bit
  * fix blog() constructing arguments (broke Math::BigInt::Constant)
 
-2004-10-10 v1.73 Tels
+1.73 2004-10-10 Tels
+
  * overloading of <<= and >>= makes these ops about 10% faster and fixes the
    problem that "$a <<= 2" would create a different object for $a to point to
  * quite a lot of fixes for NaN/inf handling in bpow() (bmul already did it
    right) - bug report by jeff at thekidders com and Hugo - Thank you!
 
-2004-07-13 v1.72 Tels
+1.72 2004-07-13 Tels
+
  * no changes
 
-2004-07-08 v1.71 Tels
+1.71 2004-07-08 Tels
+
  * fixed bsub() failing under $x -= $x; Thanx Peter J. Acklam!
  * _scan_for_nonzero() reuses length/stringform of $x and is thus faster, this
    helps rounding if the number after the roundposition is '5'
 
-2004-03-12 v1.70 Tels
+1.70 2004-03-12 Tels
+
  * bpow() computed -X ** Y wrong for Y that are odd
  * 0 ** -Y => +inf (was NaN) due to 0 ** -Y => 1/0**Y => 1/0 => +inf
  * fixed bug in perl -Mbignum -le 'print 2 ** 46 * 3' under Bigint::Lite
@@ -1726,13 +1958,15 @@ Math::BigInt:
  * make the synopsis actually runnable (Thanx Paul McCarthy)
  * blcm(): handle a list of strings (instead one obj and some strings), too
 
-2004-01-13 v1.69 Tels
+1.69 2004-01-13 Tels
+
  * bacmp(+-$x,-inf) was wrong (Thanx William T. Morgan!)
  * digit($x,$y) segfaulted under 5.6.1 if $y was a BigInt
  * blog() was missing the modify() check (breaking MBI::Constant)
  * delete $x->{_a} vs. $x->{_a} = undef to save memory
 
-2003-12-26 v1.68 Tels
+1.68 2003-12-26 Tels
+
  * bfac(inf) is inf, not NaN
  * added alias names: as_int() (as_number()), is_pos(), is_neg() and doc
  * factored out all the emulation code and moved it to Math::BigInt::CalcEmu
@@ -1745,7 +1979,8 @@ Math::BigInt:
    for small numbers
  * streamlined exponent() (parts() benefits from this, too)
 
-2003-12-02 v1.67 Tels
+1.67 2003-12-02 Tels
+
  * overload for cos/sin/exp/atan2 to make cos(Math::BigInt->new(...)) work
  * implemented blog() with a simple and fast "iterative" method
  * use _log_int() in $CALC if possible
@@ -1763,7 +1998,8 @@ Math::BigInt:
  * bfac(): do 0 or 1 check only if CALC cannot do _fac() (thus faster)
  * removed a needless _copy in bmod() with negative arguments (slightly faster)
 
-2003-09-01 v1.66 Tels
+1.66 2003-09-01 Tels
+
  * document accepted inputs better
  * fix wrong upgrade and undef-parameter handling in broot()
  * implement broot() if lib doesn't have a _root() routine for $y that are
@@ -1772,7 +2008,8 @@ Math::BigInt:
  * remove needless _one(): 3% speedup for binc()
  * remove needless _swap(): 1% (Calc) - 6% (GMP) speedup for overloaded math
 
-2003-07-13 v1.65 Tels
+1.65 2003-07-13 Tels
+
  * document that config() can set certain values
  * replace die() with Carp::croak()
  * remove needless is_zero() check in as_bin() and as_hex(), making them
@@ -1780,7 +2017,8 @@ Math::BigInt:
  * Fixed the infinite recursion in bignum. See http://xrl.us/k6y
  * fix handling of 0e999, 0e-999 etc
 
-2002-11-03 v1.64 Tels
+1.64 2002-11-03 Tels
+
  * removed needless "my $c = ...;" statements in binf() and bnan()
  * forgot () around "$x->{_f} & MB_NEVER_ROUND"
  * bsqrt(inf) == inf, not NaN
@@ -1795,24 +2033,28 @@ Math::BigInt:
  * spellings of Bigint => BigInt
  * _find_rounding_parameters(): set $a to undef if it is 0
 
-2002-09-08 v1.63 Tels
+1.63 2002-09-08 Tels
+
  * bsqrt() did not modify $x but returned new object when lib does not have
    a _sqrt() routine (BareCalc, BitVect and Pari are affected, Calc, FastCalc
    and GMP were not)
 
-2002-08-21 v1.62 Tels
+1.62 2002-08-21 Tels
+
  * bcmp()/bacmp() upgrade now if requested
  * bmodinv() uses an all-positive algorithm, speeding it up by about 5-8%
    and allowing to implement the same algorithm in Calc for factor 4 speedup
 
-2002-08-13 v1.61 Tels
+1.61 2002-08-13 Tels
+
  * tests for bsstr()/numify() with negative/special inputs
  * bround() keeps $scale as scalar for speed and less problems
  * fix for trailing newlines in input
  * some doc fixes (especially return values of is_foo() methods)
  * make testsuite so that it will pass under FastCalc easily
 
-2002-07-07 v1.60 Tels
+1.60 2002-07-07 Tels
+
  * shortcuts to avoid calls to objectify for add/sub/mul/div/mod/pow/bcmp etc
  * fix overloaded bcmp() so that the objectify()-avoidance kicks in
  * avoid calling round() when BigFloat requested 'no rounding please'
@@ -1825,28 +2067,34 @@ Math::BigInt:
    to the requested A/P/R; the same ops also forgot to take $y into account
  * doc for accuracy()/precision()
 
-2002-06-10 v1.59 Tels
+1.59 2002-06-10 Tels
+
  * pod fixes for bmodpow()/bmodinv()
  * fix in as_hex() and as_bin() for older Perls
  * speedups in bpow(), bmodin() and bmodpow()
 
-2002-06-09 v1.58 Tels
+1.58 2002-06-09 Tels
+
  * invalid inputs with two dot's (1.2.3 or 1..2 etc) are now really invalid
 
-2002-05-30 v1.57 Tels
+1.57 2002-05-30 Tels
+
  * fixed objectify() to make "perl -Mbigrat -le 'print 1+2/3'" work
  * added bmodpow() and bmodinv() as (not-working yet) stubs
 
-2002-03-17 v1.56 Tels
+1.56 2002-03-17 Tels
+
  * documented config()
  * simplified import() logic a bit
  * changed some isa->($upgrade) => !$isa->($self);
 
-2002-03-17 v1.55 Tels
+1.55 2002-03-17 Tels
+
  * :constant picks up binary/hexadecimal constants
  * Math::BigInt->digit(123) works now
 
-2002-03-03 v1.54 Tels
+1.54 2002-03-03 Tels
+
  * really fixed overlong pod =item
  * downgrade() and upgrade() with undef as argument didn't clear the variable
  * bmul() upgrades if second argument is non-integer
@@ -1855,23 +2103,27 @@ Math::BigInt:
  * objectify disable downgrade (for MBF)
  * new() twice as fast due to shortcut simple numbers, save _split() & _round()
 
-2002-02-27 v1.53 Tels
+1.53 2002-02-27 Tels
+
  * precisision typo
  * fixed overlong pod =item
  * added downgrade()
 
-2002-02-24 v1.52 Tels
+1.52 2002-02-24 Tels
+
  * hooks for _bin(), _bnan(), _bone() and _bzero()
  * =head2 section for accuracy
 
-2002-02-16 v1.51 Tels
+1.51 2002-02-16 Tels
+
  * fixed bfround(-x) (f.i. 0.004->bfround(-2) resulted in 0.01, not 0.00)
  * bfround(x) rounded at wrong place (off by one)
  * calling bfround(x) rounded further and further instead of keeping result
  * blog() upgrades if requested
  * added doc stub for every public function
 
-2002-02-10 v1.50 Tels
+1.50 2002-02-10 Tels
+
  * bfac() and hook for _fac() in libs
  * documented sub-classing and auto-upgrade
  * < 4 test in bsqrt() after the CALC call for more performance
@@ -1881,7 +2133,8 @@ Math::BigInt:
  * small optimization in bdiv() regarding abs($x) < abs($y)
  * brsft() for negative numbers in base 2 was completely wrong
 
-2002-01-07 v1.49 Tels
+1.49 2002-01-07 Tels
+
  * as_hex() and as_bin() use 16 instead of 8 bits per iteration
  * overload for log() and blog()
  * tricks to make 'require Math::BigInt' and 'use Math::BigInt();' work again
@@ -1892,7 +2145,8 @@ Math::BigInt:
  * round() now uses string-add to make it almost twice as fast
  * bnot() did round twice
 
-2001-12-06 v1.48 Tels
+1.48 2001-12-06 Tels
+
  * fixed pod in many places
  * bmod: use round(), not bround()
  * bsqrt: use _sqrt() from lib, if possible
@@ -1904,29 +2158,34 @@ Math::BigInt:
  * bzero(), bone(): take additional A and P and store 'em
  * bnan(), binf(): clear A and P
 
-2001-11-18 v1.47 Tels
+1.47 2001-11-18 Tels
+
  * added $rnd_mode support for compatibility
  * two 'my $t = ... if ..;' cases to 'my $t; $t = ... if ...;'
  * added overload for %=, |=, &= and ^= for more speed
  * _split(): check for 1e2e3 and reject it
 
-2001-11-11 v1.46 Tels
+1.46 2001-11-11 Tels
+
  * binc(),bdec() use lib (via _inc(),_dec()) => faster (see BENCHMARK)
  * avoid the unnec. rounding bsub()/binc()/bdec() (badd() already took care)
  * made bsub() faster by removing the bneg() overhead from it
 
-2001-11-04 v1.45 Tels
+1.45 2001-11-04 Tels
+
  * tests run now in subclass, too
  * bmod() can use _mod in lib
  * lots of tests fixed (assumed wrong base etc) and added
  * bpow() about 10-15% faster for small numbers (like 2 ** 150, 3 * 200 etc)
 
-2001-10-05 v1.43 Tels
+1.43 2001-10-05 Tels
+
  * $x->bround($n) is 43 times faster if $n > $x->{_a} (no-op)
  * Heaploads of rounding fixes (and tests)
  * Test for 99999-bug in Calc
 
-2001-09-03 v1.42 Tels
+1.42 2001-09-03 Tels
+
  * bug in overload section causing performance losses in subclasses
  * call $CALC->import() with list of libs
  * odd numbers never have trailing zeros, so don't convert them to DEC to look
@@ -1935,27 +2194,32 @@ Math::BigInt:
  * new('inf') produced NaN (was expecting '+inf')
  * exponent(), mantissa() & parts() failed or returned scalars for inf,-inf,NaN
 
-2001-08-08 v1.41 Tels
+1.41 2001-08-08 Tels
+
  * fixed inf test (coredumps)
 
-2001-08-03 v1.40 Tels
+1.40 2001-08-03 Tels
+
  * bxor(-$x,-$y) was broken (and not tested *sigh*)
  * streamlined bcmp
  * drop leading '+' for inf
  * bxor(), band(), bior() with negative arguments don't get passed to lib
    (makes it work with BitVect, Pari, GMP etc)
 
-2001-08-02 v1.39 Tels
+1.39 2001-08-02 Tels
+
  * fixed history (duh!)
  * assign return values from $CALC back to $x->{value}
  * fixed +-inf handling in a lot of places and tests for that
  * band(), bxor() and bior() now work with negative inputs
  * remove bint() (Math::BigFloat->bint() just DNDWIM and no sense, either)
 
-2001-07-15 v1.38 Tels
+1.38 2001-07-15 Tels
+
  * test for mul() shortcut
 
-2001-07-15 v1.37 Tels
+1.37 2001-07-15 Tels
+
  * applied Philip Newtons spelling and doc patch(s)
  * Benjamin Trott: _split() is faster for numbers that need no splitting
  * Benjamin Trott: don't take shortcut in badd(), or Pari won't work
@@ -1968,7 +2232,8 @@ Math::BigInt:
  * Math::BigInt::Calc now determines biggest $BASE to use. Default should now
    be 1e7 on most systems, giving 20% to 40% speedups.
 
-2001-07-04 v1.36 Tels
+1.36 2001-07-04 Tels
+
  * is_positive(), is_negative()
  * various pod fixes (overlong =item, spelling erorrs etc)
  * torn out the bones from under the flesh and moved them to Math::BigInt::Calc
@@ -1977,17 +2242,20 @@ Math::BigInt:
  * removed internal _set() and tests for it
  * +-inf handling in bcmp(), bpow()
 
-2001-06-15 v1.35 Tels
+1.35 2001-06-15 Tels
+
  * added bfloor(), bceil()
  * fixed bior(), bxor(), band() for $x->bxxx(NaN,0), added modify() to them
 
-2001-06-13 v1.34 Tels
+1.34 2001-06-13 Tels
+
  * binary integer input (0b01110 etc)
  * fixed: '-0x0' left '-0'
  * added is_inf(), binf() and some support for +-inf in new(), bsstr() etc
  * added tests for is_odd(), is_even(), _set() and is_zero(), is_inf(), bsstr()
 
-2001-06-09 v1.33 Tels
+1.33 2001-06-09 Tels
+
  * bround() no longer uses 10 ** $pad and is thus much faster when rounding up
  * fixed and added rounding benchmark (did time bmul instead bround)
  * blsft(),brsft(): can work in different bases, check against invalid
@@ -1999,10 +2267,12 @@ Math::BigInt:
  * tests for is_one()
  * hexadecimal integer input (0xcafebabe etc)
 
-2001-05-11 v1.32 Tels
+1.32 2001-05-11 Tels
+
  * added accuracy/precision/fallback/round_mode
 
-2001-05-08 v1.31 Tels
+1.31 2001-05-08 Tels
+
  * _ between digits now accepted, ' ' no longer valid inside (but at front/end)
  * Exxx is NaN, and no longer produces warning
  * .xxx style numbers are valid input
@@ -2011,7 +2281,8 @@ Math::BigInt:
  * removed clone()
  * added bsstr()
 
-2001-04-23 v1.3 Tels
+1.3 2001-04-23 Tels
+
  * added (compatible to MBF) mantissa(), exponent() & parts() as well as tests
  * _trailing_zeros()
  * fixed as_number() to return copy of BigInt
@@ -2021,27 +2292,32 @@ Math::BigInt:
  * added bsqrt()
  * workaround coredump bug in bool() for v5.6.1
 
-2001-04-07 v1.23 Tels
+1.23 2001-04-07 Tels
+
  * spelling errors in pod
 
-2001-04-05 v1.22 Tels
+1.22 2001-04-05 Tels
+
  * documented Peters OS/390 patch/changes (fix was in for quite some time)
  * fixed bug Math::BigInt->new(Math::BigFloat->new(3));
  * objectify() with other objects than BigInt as further args, copy() etc
  * $x->digit($n) to query fast value of Nth digit
  * as_number()
 
-2001-03-30 v1.21 Tels
+1.21 2001-03-30 Tels
+
  * bool() works now under 5_005
  * bug in bsub where numbers with at least 6 trailing digits after any op failed
 
-2001-03-24 v1.20 Tels
+1.20 2001-03-24 Tels
+
  * added: is_nan()
  * bug in bmod/bdiv, I forgot some cases with negatives. Thanx to Bruce Fields!
  * documented ':constant' and eval() crash on Perl 5.00x
  * documented BigInts behaviour of bmod/bdiv and use integer
 
-2001-03-09 v1.16 Tels
+1.16 2001-03-09 Tels
+
  * Math::BigInt::badd(4,5) and Math::SomeChildOfBI->badd(4,5) work now
  * '$x = scalar (**|%|+|-|*|\) $object;' failed (was not tested, either)
  * 'if ($x)' is now O(1) instead of O(N) and at least twice as fast
@@ -2054,7 +2330,8 @@ Math::BigInt:
  * $x->numify() (for $array[$x] = 0; etc) is much faster now
  * added caveat documentation for $x = -$x; and $x *= string1 operator string2;
 
-2001-02-24 v1.15 Tels
+1.15 2001-02-24 Tels
+
  * $x / $x is now a lot faster (more O(1) than O(N))
  * 10 ** $x is now a lot faster (more O(N/5) instead of O(N))
  * overload of **= makes $x **= $y faster
@@ -2063,7 +2340,8 @@ Math::BigInt:
  * added $x->length() and test for it; fixed _digits() (was off by 1)
  * objectify() was not exported, added tests for objectify()
 
-2001-02-21 v1.14 Tels
+1.14 2001-02-21 Tels
+
  * overload +=, -=, *= and /= for about 20-30% more speed if both args have
    roughly same length
  * shortcut in add() makes $x += $y; $x -= $y; for large $x and small $y
@@ -2071,10 +2349,12 @@ Math::BigInt:
  * fixed (non-critical) bug that caused objectify in numify/bool/stringify to
    create scratch objects from undef params.
 
-2001-02-18 v1.13 Tels
+1.13 2001-02-18 Tels
+
  * got rid of duplicated copy() code in new()
 
-2001-02-16 v1.12 Tels
+1.12 2001-02-16 Tels
+
  * accidentally dropped self-multiply test in bigintpm.t
  * fixed bug in overloading cmp
  * after correcting the overload for 'cmp', I got a lot of test failings and
@@ -2089,7 +2369,8 @@ Math::BigInt:
    BigInts behave now transparently like build-in scalars in integer/string
    context ;o)
 
-2001-02-14 v1.11 Tels (first release)
+1.11 2001-02-14 Tels (first release)
+
  * fixed bug in band(), bxor(), etc that used badd($x, fixed_number_here);
  * since subclasses might not be happy with fixed numbers, make sure we pass
    BigInts all the time if using something like $someclass->badd();
@@ -2097,35 +2378,44 @@ Math::BigInt:
  * bxor/band/bior work now correctly for subclasses
  * ++ and -- are now a tad (ca 5%) faster
 
-2000-11-24 v1.10 Tels
+1.10 2000-11-24 Tels
+
  * finally made it Math::BigInt (w/o trailing 's')
 
-2000-11-23 v1.09 Tels
+1.09 2000-11-23 Tels
+
  * fixed bug in bmul (and thus bpow) (self multiply works now)
 
-2000-11-22 v1.08 Tels
+1.08 2000-11-22 Tels
+
  * fixed all but one test (band bior bxor etc)
 
-2000-11-20 v1.07 Tels
+1.07 2000-11-20 Tels
+
  * objectify fixed to not make copies and work with subclasses
 
-2000-11-19 v1.06 Tels
+1.06 2000-11-19 Tels
+
  * 7 tests remain
  * bgcd accepts lists, added blcm
 
-2000-11-16 v1.05 Tels
+1.05 2000-11-16 Tels
+
  * 8 tests remain
  * new copies _all_ fields, not only Math::Bigint ones
 
-2000-11-15 v1.04 Tels
+1.04 2000-11-15 Tels
+
  * fixed bigintpm to test '++' and '--' properly
  * done div, fixed mul/bpow (13 tests remain)
 
-2000-11-14 v1.03 Tels
+1.03 2000-11-14 Tels
+
  * x**0 => 1 (instead of x)
  * fixed bigintpm to include bpow, binc, bdec, new() test
 
-2000-11-13 v1.02 Tels
+1.02 2000-11-13 Tels
+
  * fixed sub and mul (sort of)
  * found out that "$wanted = shift || return bzero()" causes a call to numify,
  * testing for undefined fixes this problem (but might waste more time for

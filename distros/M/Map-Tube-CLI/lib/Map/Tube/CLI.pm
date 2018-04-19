@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.42';
+$Map::Tube::CLI::VERSION   = '0.44';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.42
+Version 0.44
 
 =cut
 
@@ -131,6 +131,8 @@ sure you have the latest maps when you install.
 =item * L<London|Map::Tube::London>
 
 =item * L<Lyon|Map::Tube::Lyon>
+
+=item * L<Madrid|Map::Tube::Madrid>
 
 =item * L<Malaga|Map::Tube::Malaga>
 
@@ -337,6 +339,7 @@ sub _supported_maps {
         'KUALALUMPUR'     => 'Map::Tube::KualaLumpur',
         'LONDON'          => 'Map::Tube::London',
         'LYON'            => 'Map::Tube::Lyon',
+        'MADRID'          => 'Map::Tube::Madrid',
         'MALAGA'          => 'Map::Tube::Malaga',
         'MILAN'           => 'Map::Tube::Milan',
         'MINSK'           => 'Map::Tube::Minsk',

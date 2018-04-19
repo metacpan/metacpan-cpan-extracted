@@ -1,6 +1,6 @@
 package Lab::Instrument::Lakeshore224;
 #ABSTRACT: Lake Shore 224 temperature monitor
-$Lab::Instrument::Lakeshore224::VERSION = '3.630';
+$Lab::Instrument::Lakeshore224::VERSION = '3.631';
 use strict;
 
 use Lab::Instrument;
@@ -314,7 +314,7 @@ Lab::Instrument::Lakeshore224 - Lake Shore 224 temperature monitor
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 COPYRIGHT AND LICENSE
 

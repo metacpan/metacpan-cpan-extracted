@@ -82,6 +82,12 @@ use <?= $project->build_class ?>;
 use File::Basename;
 use File::Spec;
 
+? if ( @{ $project->unsupported->os } ) {
+?   for my $os ( @{ $project->unsupported->os } ) {
+die "OS unsupported\n" if $^O eq <?= B::perlstring($os) ?>;
+?   }
+
+? }
 ? if ( @{ $project->requires_external_bin || [] } ) {
 use Devel::CheckBin;
 
@@ -133,7 +139,9 @@ my %args = (
     allow_pureperl => <?= $project->allow_pureperl ?>,
 
     script_files => [<?= $project->script_files ?>],
+? if ($project->c_source) {
     c_source     => [qw(<?= $project->c_source ?>)],
+? }
     PL_files => <?= Data::Dumper::Dumper($project->PL_files) ?>,
 
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',

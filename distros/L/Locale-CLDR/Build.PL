@@ -16,6 +16,7 @@ my $builder = Module::Build->new(
         'DateTime::Locale'          => 0,
         'namespace::autoclean'      => 0.16,
         'List::MoreUtils'           => 0,
+		'Unicode::Regex::Set'		=> 0,
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
     dist_version_from   => 'lib/Locale/CLDR.pm',

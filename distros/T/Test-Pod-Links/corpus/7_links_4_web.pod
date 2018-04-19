@@ -1,0 +1,19 @@
+=head1 NAME
+
+Test::Pod::Links - a valid pod file
+
+=head1 DESCRIPTION
+
+This is a pod file with 7 links, 4 web.
+
+=head1 SEE ALSO
+
+L<Perl|https://www.perl.com/>,
+L<Test::Pod::Links>,
+L<"The Perl language"|https://www.perl.com/>,
+L<Pod::Simple/"SEE ALSO">,
+L<"Comprehensive Perl Archive Network"|https://www.cpan.org/>,
+L<https://metacpan.org/>,
+L<"HTTP::Tiny - A small, simple, correct HTTPE<sol>1.1 client"|HTTP::Tiny/AUTHORS>
+
+=cut

@@ -1,7 +1,7 @@
 package Random::Any;
 
-our $DATE = '2018-01-02'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-04-18'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -29,18 +29,20 @@ sub import {
         }
     }
 
+    $warn = $ENV{PERL_RANDOM_ANY_WARN} unless defined $warn;
+
     unless ($sub) {
-        if (eval { require Math::Random::Secure; 1 }) {
-            $sub = \&Math::Random::Secure::rand;
+        if (eval { require Data::Entropy::Algorithms; 1 }) {
+            $sub = \&Data::Entropy::Algorithms::rand;
         } else {
-            warn __PACKAGE__ . ": Math::Random::Secure is not available: $@, falling back on builtin rand()" if $warn;
+            warn __PACKAGE__ . ": Data::Entropy::Algorithms is not available: $@, falling back on builtin rand()" if $warn;
             $sub = \&CORE::rand;
         }
     }
 }
 
 1;
-# ABSTRACT: Try to use Math::Random::Secure::rand(), fallback on builtin rand()
+# ABSTRACT: Try to use Data::Entropy::Algorithms::rand(), fallback on builtin rand()
 
 __END__
 
@@ -50,11 +52,11 @@ __END__
 
 =head1 NAME
 
-Random::Any - Try to use Math::Random::Secure::rand(), fallback on builtin rand()
+Random::Any - Try to use Data::Entropy::Algorithms::rand(), fallback on builtin rand()
 
 =head1 VERSION
 
-This document describes version 0.003 of Random::Any (from Perl distribution Random-Any), released on 2018-01-02.
+This document describes version 0.004 of Random::Any (from Perl distribution Random-Any), released on 2018-04-18.
 
 =head1 SYNOPSIS
 
@@ -65,18 +67,25 @@ This document describes version 0.003 of Random::Any (from Perl distribution Ran
 =head1 DESCRIPTION
 
 This module provides a single export C<rand()> that tries to use
-L<Math::Random::Secure>'s C<rand()> first and, if that module is not available,
-falls back on the builtin rand().
+L<Data::Entropy::Algorithms>'s C<rand()> first and, if that module is not
+available, falls back on the builtin rand().
 
 =head1 EXPORTS
 
 =head2 -warn => bool
 
-Can be set to true to emit a warning if Math::Random::Secure is not available.
+Can be set to true to emit a warning if Data::Entropy::Algorithms is not
+available.
 
 =head1 FUNCTIONS
 
 =head2 rand
+
+=head1 ENVIRONMENT
+
+=head2 PERL_RANDOM_ANY_WARN
+
+Bool. Can be set to provide default value for C<-warn>.
 
 =head1 HOMEPAGE
 
@@ -84,7 +93,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Random-Any
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Random-Any>.
+Source repository is at L<https://github.com///git@github.com/perlancar/perl-Random-Any>.
 
 =head1 BUGS
 
@@ -96,7 +105,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Math::Random::Secure>
+L<Data::Entropy::Algorithms>
 
 =head1 AUTHOR
 

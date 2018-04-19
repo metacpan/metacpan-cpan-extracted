@@ -32,11 +32,11 @@ Geo::Coder::Free::Maxmind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -110,6 +110,8 @@ sub geocode {
 	my %param;
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location)');
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
@@ -127,7 +129,7 @@ sub geocode {
 		return $known_locations{$location};
 	}
 
-	return unless($location =~ /,/);	# Not well formed, or an attempt to the the location of an entire country
+	return unless($location =~ /,/);	# Not well formed, or an attempt to find the location of an entire country
 
 	my $county;
 	my $state;

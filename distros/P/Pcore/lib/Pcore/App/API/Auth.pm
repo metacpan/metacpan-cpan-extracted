@@ -1,6 +1,6 @@
 package Pcore::App::API::Auth;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::App::API qw[:CONST];
 use Pcore::App::API::Auth::Request;
 use Pcore::Util::Scalar qw[is_blessed_ref is_plain_coderef];
@@ -46,32 +46,27 @@ sub TO_DUMP ( $self, $dumper, @ ) {
     return $res, $tags;
 }
 
-sub api_can_call ( $self, $method_id, $cb ) {
+sub api_can_call ( $self, $method_id ) {
     if ( $self->{is_authenticated} ) {
-        $self->{app}->{api}->authenticate_private(
-            $self->{private_token},
-            sub ($auth) {
-                $auth->_check_permissions( $method_id, $cb );
+        $self->{app}->{api}->authenticate_private( $self->{private_token}, my $rouse_cb = Coro::rouse_cb );
 
-                return;
-            }
-        );
+        my $auth = Coro::rouse_wait $rouse_cb;
+
+        return $auth->_check_permissions($method_id);
     }
     else {
-        $self->_check_permissions( $method_id, $cb );
+        return $self->_check_permissions($method_id);
     }
-
-    return;
 }
 
-sub _check_permissions ( $self, $method_id, $cb ) {
+sub _check_permissions ( $self, $method_id ) {
 
     # find method
     my $method_cfg = $self->{app}->{api}->{map}->{method}->{$method_id};
 
     # method wasn't found
     if ( !$method_cfg ) {
-        $cb->( result [ 404, qq[Method "$method_id" was not found] ] );
+        return res [ 404, qq[Method "$method_id" was not found] ];
     }
 
     # method was found
@@ -79,34 +74,30 @@ sub _check_permissions ( $self, $method_id, $cb ) {
 
         # user is root, method authentication is not required
         if ( $self->{is_root} ) {
-            $cb->( result 200 );
+            return res 200;
         }
 
         # method has no permissions, authorization is not required
         elsif ( !$method_cfg->{permissions} ) {
-            $cb->( result 200 );
+            return res 200;
         }
 
         # auth has no permisisons, api call is forbidden
         elsif ( !$self->{permissions} ) {
-            $cb->( result [ 403, qq[Insufficient permissions for method "$method_id"] ] );
+            return res [ 403, qq[Insufficient permissions for method "$method_id"] ];
         }
 
         # compare permissions
         else {
             for my $role_name ( $method_cfg->{permissions}->@* ) {
                 if ( exists $self->{permissions}->{$role_name} ) {
-                    $cb->( result 200 );
-
-                    return;
+                    return res 200;
                 }
             }
 
-            $cb->( result [ 403, qq[Insufficient permissions for method "$method_id"] ] );
+            return res [ 403, qq[Insufficient permissions for method "$method_id"] ];
         }
     }
-
-    return;
 }
 
 sub api_call ( $self, $method_id, @ ) {
@@ -126,26 +117,32 @@ sub api_call ( $self, $method_id, @ ) {
 }
 
 sub api_call_arrayref ( $self, $method_id, $args, $cb = undef ) {
-    $self->api_can_call(
-        $method_id,
-        sub ($can_call) {
-            if ( !$can_call ) {
-                $cb->($can_call) if $cb;
-            }
-            else {
-                my $map = $self->{app}->{api}->{map};
+    my $can_call = $self->api_can_call($method_id);
 
-                # get method
-                my $method_cfg = $map->{method}->{$method_id};
+    if ( !$can_call ) {
+        $cb->($can_call) if defined $cb;
 
-                my $obj = $map->{obj}->{ $method_cfg->{class_name} };
+        return $can_call;
+    }
+    else {
+        my $map = $self->{app}->{api}->{map};
 
-                my $method_name = $method_cfg->{local_method_name};
+        # get method
+        my $method_cfg = $map->{method}->{$method_id};
 
+        my $obj = $map->{obj}->{ $method_cfg->{class_name} };
+
+        my $method_name = $method_cfg->{local_method_name};
+
+        if ( defined wantarray ) {
+            my $rouse_cb = Coro::rouse_cb;
+
+            # destroy req instance after call
+            {
                 # create API request
                 my $req = bless {
                     auth => $self,
-                    _cb  => $cb,
+                    _cb  => $rouse_cb,
                   },
                   'Pcore::App::API::Auth::Request';
 
@@ -155,11 +152,27 @@ sub api_call_arrayref ( $self, $method_id, $args, $cb = undef ) {
                 }
             }
 
+            my $res = Coro::rouse_wait $rouse_cb;
+
+            return $cb ? $cb->($res) : $res;
+        }
+        else {
+
+            # create API request
+            my $req = bless {
+                auth => $self,
+                _cb  => $cb,
+              },
+              'Pcore::App::API::Auth::Request';
+
+            # call method
+            if ( !eval { $obj->$method_name( $req, $args ? $args->@* : () ); 1 } ) {
+                $@->sendlog if $@;
+            }
+
             return;
         }
-    );
-
-    return;
+    }
 }
 
 1;

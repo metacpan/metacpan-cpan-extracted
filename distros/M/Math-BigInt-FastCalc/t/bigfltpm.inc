@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-our ($CLASS, $CALC);
+our ($CLASS, $LIB);
 
-is($CLASS->config('lib'), $CALC, "$CLASS->config('lib')");
+is($CLASS->config('lib'), $LIB, "$CLASS->config('lib')");
 
 my ($x, $y, $z, @args, $try, $want, $got);
 my ($f, $setup);
@@ -23,7 +23,6 @@ while (<DATA>) {
     if (/^\$/) {
         $setup = $_;
         $setup =~ s/\$/\$${CLASS}::/g;  # round_mode, div_scale
-        #print "\$setup== $setup\n";
         next;
     }
 
@@ -38,7 +37,7 @@ while (<DATA>) {
     $try = qq|\$x = $CLASS->new("$args[0]");|;
     if ($f eq "bnorm") {
         $try .= qq| \$x;|;
-    } elsif ($f =~ /^is_(zero|one|negative|positive|odd|even|nan|int)$/) {
+    } elsif ($f =~ /^is_(zero|one|odd|even|negative|positive|nan|int)$/) {
         $try .= qq| \$x->$f();|;
     } elsif ($f eq "is_inf") {
         $try .= qq| \$x->is_inf("$args[1]");|;
@@ -50,8 +49,12 @@ while (<DATA>) {
         $try .= qq| \$x->accuracy($args[1]); \$x->precision($args[2]);|;
         $try .= ' $x->bstr();';
     # some unary ops
-    } elsif ($f =~ /^b(nan|sstr|neg|floor|ceil|int|abs)$/) {
+    } elsif ($f =~ /^b(nan|floor|ceil|int|sstr|neg|abs|sgn|inc|dec|not|sqrt|exp|fac)$/) {
         $try .= qq| \$x->$f();|;
+    } elsif ($f =~ /^(numify|length|as_number)$/) {
+        $try .= qq| \$x->$f();|;
+    } elsif ($f =~ /^(to|as)_(hex|oct|bin)$/) {
+        $try .= " \$x->$f();";
     # overloaded functions
     } elsif ($f =~ /^(log|exp|sin|cos|atan2|int|neg|abs|sqrt)$/) {
         $try .= qq| \$x = $f(\$x);|;
@@ -65,14 +68,8 @@ while (<DATA>) {
     } elsif ($f eq "mantissa") {
         # ->bstr() to see if an object is returned
         $try .= ' $x->mantissa()->bstr();';
-    } elsif ($f =~ /^(numify|length|as_number|as_hex|as_bin)$/) {
-        $try .= qq| \$x->$f();|;
     } elsif ($f eq "bpi") {
         $try .= qq| $CLASS->bpi(\$x);|;
-    } elsif ($f eq "binc") {
-        $try .= ' $x->binc();';
-    } elsif ($f eq "bdec") {
-        $try .= ' $x->bdec();';
     } elsif ($f eq "bround") {
         $try .= qq| $setup; \$x->bround($args[1]);|;
     } elsif ($f eq "bfround") {
@@ -170,7 +167,7 @@ while (<DATA>) {
             if (ref($got) eq $CLASS) {
                 # float numbers are normalized (for now), so mantissa shouldn't
                 # have trailing zeros print $got->_trailing_zeros(), "\n";
-                is($CALC->_zeros($got->{_m}), 0, $try);
+                is($LIB->_zeros($got->{_m}), 0, $try);
             }
         }
     }                           # end pattern or string
@@ -257,8 +254,8 @@ is($CLASS->binf("+"),    "inf",  qq|$CLASS->binf("+")|);
 is($CLASS->binf("-"),    "-inf", qq|$CLASS->binf("-")|);
 is($CLASS->binf("-inf"), "-inf", qq|$CLASS->binf("-inf")|);
 
-$CLASS->accuracy(undef);	# reset
-$CLASS->precision(undef);	# reset
+$CLASS->accuracy(undef);        # reset
+$CLASS->precision(undef);       # reset
 
 ###############################################################################
 # bsqrt() with set global A/P or A/P enabled on $x, also a test whether bsqrt()
@@ -666,7 +663,7 @@ $div_scale = 40
 1::0
 
 &brsft
-NaNbrsft:2:NaN
+invalid:2:NaN
 0:2:0
 1:1:0.5
 2:1:1
@@ -675,7 +672,7 @@ NaNbrsft:2:NaN
 32:3:4
 
 &blsft
-NaNblsft:0:NaN
+invalid:0:NaN
 2:1:4
 4:3:32
 5:3:40
@@ -685,7 +682,7 @@ NaNblsft:0:NaN
 &bnorm
 1:1
 -0:0
-bnormNaN:NaN
+invalid:NaN
 +inf:inf
 -inf:-inf
 123:123
@@ -771,20 +768,74 @@ NaN:NaN
 3:abc:inf
 
 &as_hex
+128:0x80
+-128:-0x80
+0:0x0
+-0:0x0
+1:0x1
+0x123456789123456789:0x123456789123456789
 +inf:inf
 -inf:-inf
-hexNaN:NaN
-0:0x0
-5:0x5
--5:-0x5
+invalid:NaN
 
 &as_bin
+128:0b10000000
+-128:-0b10000000
+0:0b0
+-0:0b0
+1:0b1
+0b1010111101010101010110110110110110101:0b1010111101010101010110110110110110101
+0x123456789123456789:0b100100011010001010110011110001001000100100011010001010110011110001001
 +inf:inf
 -inf:-inf
-hexNaN:NaN
-0:0b0
-5:0b101
--5:-0b101
+invalid:NaN
+
+&as_oct
+128:0200
+-128:-0200
+0:00
+-0:00
+1:01
+0b1010111101010101010110110110110110101:01275252666665
+0x123456789123456789:044321263611044321263611
++inf:inf
+-inf:-inf
+invalid:NaN
+
+&to_hex
+128:80
+-128:-80
+0:0
+-0:0
+1:1
+0x123456789123456789:123456789123456789
++inf:inf
+-inf:-inf
+invalid:NaN
+
+&to_bin
+128:10000000
+-128:-10000000
+0:0
+-0:0
+1:1
+0b1010111101010101010110110110110110101:1010111101010101010110110110110110101
+0x123456789123456789:100100011010001010110011110001001000100100011010001010110011110001001
++inf:inf
+-inf:-inf
+invalid:NaN
+
+&to_oct
+128:200
+-128:-200
+0:0
+-0:0
+1:1
+0b1010111101010101010110110110110110101:1275252666665
+0x123456789123456789:44321263611044321263611
++inf:inf
+-inf:-inf
+invalid:NaN
 
 &numify
 # uses bsstr() so 5 => 5e+0 to be compatible w/ Perls output
@@ -891,44 +942,227 @@ abc:NaN
 -4e-1111:-0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004
 
 &bpow
-NaN:1:NaN
-1:NaN:NaN
-NaN:-1:NaN
--1:NaN:NaN
-NaN:-21:NaN
--21:NaN:NaN
-NaN:21:NaN
-21:NaN:NaN
-0:0:1
-0:1:0
-0:9:0
-0:-2:inf
-2:2:4
-1:2:1
-1:3:1
--1:2:1
--1:3:-1
-123.456:2:15241.383936
-2:-2:0.25
-2:-3:0.125
-128:-2:0.00006103515625
+#
 abc:123.456:NaN
 123.456:abc:NaN
-+inf:123.45:inf
--inf:123.45:-inf
-+inf:-123.45:inf
--inf:-123.45:-inf
--2:2:4
--2:3:-8
--2:4:16
--2:5:-32
+#
+-inf:-inf:0
+-inf:-3:0
+-inf:-2:0
+-inf:-1.5:0
+-inf:-1:0
+-inf:-0.5:0
+-inf:0:NaN
+-inf:0.5:inf    # directed infinity
+-inf:1:-inf
+-inf:1.5:inf    # directed infinity
+-inf:2:inf
+-inf:3:-inf
+-inf:inf:inf    # complex infinity
+-inf:NaN:NaN
+#
+-3:-inf:0
+-3:-3:-0.03703703703703703703703703703703703703704
+-3:-2:0.1111111111111111111111111111111111111111
+-3:-1.5:NaN
+-3:-1:-0.3333333333333333333333333333333333333333
+-3:-0.5:NaN
+-3:0:1
+-3:0.5:NaN
+-3:1:-3
+-3:1.5:NaN
 -3:2:9
 -3:3:-27
--3:4:81
--3:5:-243
-# 2 ** 0.5 == sqrt(2)
-#     1.41..7 and not 1.4170 since fallback (bsqrt(9) is '3', not 3.0...0)
+-3:inf:inf      # complex infinity
+-3:NaN:NaN
+#
+-2:-inf:0
+-2:-3:-0.125
+-2:-2:0.25
+-2:-1.5:NaN
+-2:-1:-0.5
+-2:-0.5:NaN
+-2:0:1
+-2:0.5:NaN
+-2:1:-2
+-2:1.5:NaN
+-2:2:4
+-2:3:-8
+-2:inf:inf      # complex infinity
+-2:NaN:NaN
+#
+-1.5:-inf:0
+-1.5:-3:-0.2962962962962962962962962962962962962963
+-1.5:-2:0.4444444444444444444444444444444444444444
+-1.5:-1.5:NaN
+-1.5:-1:-0.6666666666666666666666666666666666666667
+-1.5:-0.5:NaN
+-1.5:0:1
+-1.5:0.5:NaN
+-1.5:1:-1.5
+-1.5:1.5:NaN
+-1.5:2:2.25
+-1.5:3:-3.375
+-1.5:inf:inf    # complex infinity
+-1.5:NaN:NaN
+#
+-1:-inf:NaN
+-1:-3:-1
+-1:-2:1
+-1:-1.5:NaN
+-1:-1:-1
+-1:-0.5:NaN
+-1:0:1
+-1:0.5:NaN
+-1:1:-1
+-1:1.5:NaN
+-1:2:1
+-1:3:-1
+-1:inf:NaN
+-1:NaN:NaN
+#
+-0.5:-inf:inf   # complex infinity
+-0.5:-3:-8
+-0.5:-2:4
+-0.5:-1.5:NaN
+-0.5:-1:-2
+-0.5:-0.5:NaN
+-0.5:0:1
+-0.5:0.5:NaN
+-0.5:1:-0.5
+-0.5:1.5:NaN
+-0.5:2:0.25
+-0.5:3:-0.125
+-0.5:inf:0
+-0.5:NaN:NaN
+#
+0:-inf:inf      # complex infinity
+0:-3:inf        # complex infinity
+0:-2:inf        # complex infinity
+0:-1.5:inf      # complex infinity
+0:-1:inf        # complex infinity
+0:-0.5:inf      # complex infinity
+0:0:1
+0:0.5:0
+0:1:0
+0:1.5:0
+0:2:0
+0:3:0
+0:inf:0
+0:NaN:NaN
+#
+0.5:-inf:inf
+0.5:-3:8
+0.5:-2:4
+0.5:-1.5:2.828427124746190097603377448419396157139
+0.5:-1:2
+0.5:-0.5:1.41421356237309504880168872420969807857
+0.5:0:1
+0.5:0.5:0.7071067811865475244008443621048490392848
+0.5:1:0.5
+0.5:1.5:0.3535533905932737622004221810524245196424
+0.5:2:0.25
+0.5:3:0.125
+0.5:inf:0
+0.5:NaN:NaN
+#
+1:-inf:1
+1:-3:1
+1:-2:1
+1:-1.5:1
+1:-1:1
+1:-0.5:1
+1:0:1
+1:0.5:1
+1:1:1
+1:1.5:1
+1:2:1
+1:3:1
+1:inf:1
+1:NaN:NaN
+#
+1.5:-inf:0
+1.5:-3:0.2962962962962962962962962962962962962963
+1.5:-2:0.4444444444444444444444444444444444444444
+1.5:-1.5:0.5443310539518173551549520166013091982147
+1.5:-1:0.6666666666666666666666666666666666666667
+1.5:-0.5:0.816496580927726032732428024901963797322
+1.5:0:1
+1.5:0.5:1.224744871391589049098642037352945695983
+1.5:1:1.5
+1.5:1.5:1.837117307087383573647963056029418543974
+1.5:2:2.25
+1.5:3:3.375
+1.5:inf:inf
+1.5:NaN:NaN
+#
+2:-inf:0
+2:-3:0.125
+2:-2:0.25
+2:-1.5:0.3535533905932737622004221810524245196424
+2:-1:0.5
+2:-0.5:0.7071067811865475244008443621048490392848
+2:0:1
 2:0.5:1.41421356237309504880168872420969807857
+2:1:2
+2:1.5:2.828427124746190097603377448419396157139
+2:2:4
+2:3:8
+2:inf:inf
+2:NaN:NaN
+#
+3:-inf:0
+3:-3:0.03703703703703703703703703703703703703704
+3:-2:0.1111111111111111111111111111111111111111
+3:-1.5:0.1924500897298752548363829268339858185492
+3:-1:0.3333333333333333333333333333333333333333
+3:-0.5:0.5773502691896257645091487805019574556476
+3:0:1
+3:0.5:1.732050807568877293527446341505872366943
+3:1:3
+3:1.5:5.196152422706631880582339024517617100828
+3:2:9
+3:3:27
+3:inf:inf
+3:NaN:NaN
+#
+inf:-inf:0
+inf:-3:0
+inf:-2:0
+inf:-1.5:0
+inf:-1:0
+inf:-0.5:0
+inf:0:NaN
+inf:0.5:inf
+inf:1:inf
+inf:1.5:inf
+inf:2:inf
+inf:3:inf
+inf:inf:inf
+inf:NaN:NaN
+#
+NaN:-inf:NaN
+NaN:-3:NaN
+NaN:-2:NaN
+NaN:-1.5:NaN
+NaN:-1:NaN
+NaN:-0.5:NaN
+NaN:0:NaN
+NaN:0.5:NaN
+NaN:1:NaN
+NaN:1.5:NaN
+NaN:2:NaN
+NaN:3:NaN
+NaN:inf:NaN
+NaN:NaN:NaN
+#
+123.456:2:15241.383936
+128:-2:0.00006103515625
+#
++inf:123.45:inf
+-inf:123.45:inf     # directed infinity
++inf:-123.45:0
+-inf:-123.45:0
 #2:0.2:1.148698354997035006798626946777927589444
 #6:1.5:14.6969384566990685891837044482353483518
 $div_scale = 20
@@ -936,7 +1170,7 @@ $div_scale = 20
 $div_scale = 40
 
 &bneg
-bnegNaN:NaN
+invalid:NaN
 +inf:-inf
 -inf:inf
 +0:0
@@ -948,7 +1182,7 @@ bnegNaN:NaN
 -123456.789:123456.789
 
 &babs
-babsNaN:NaN
+invalid:NaN
 +inf:inf
 -inf:inf
 +0:0
@@ -964,7 +1198,7 @@ $round_mode = "trunc"
 +inf:5:inf
 -inf:5:-inf
 0:5:0
-NaNfround:5:NaN
+invalid:5:NaN
 +10123456789:5:10123000000
 -10123456789:5:-10123000000
 +10123456789.123:5:10123000000
@@ -1040,7 +1274,7 @@ $round_mode = "trunc"
 +inf:5:inf
 -inf:5:-inf
 0:5:0
-NaNffround:5:NaN
+invalid:5:NaN
 +1.23:-1:1.2
 +1.234:-1:1.2
 +1.2345:-1:1.2
@@ -1172,9 +1406,9 @@ $round_mode = "even"
 0.01234567:-12:0.012345670000
 
 &bcmp
-bcmpNaN:bcmpNaN:
-bcmpNaN:+0:
-+0:bcmpNaN:
+invalid:invalid:
+invalid:+0:
++0:invalid:
 +0:+0:0
 -1:+0:-1
 +0:-1:1
@@ -1245,9 +1479,9 @@ NaN:inf:
 NaN:-inf:
 
 &bacmp
-bcmpNaN:bcmpNaN:
-bcmpNaN:+0:
-+0:bcmpNaN:
+invalid:invalid:
+invalid:+0:
++0:invalid:
 +0:+0:0
 -1:+0:1
 +0:-1:-1
@@ -1314,13 +1548,13 @@ bcmpNaN:+0:
 5:-inf:-1
 -1:-inf:-1
 # return undef
-+inf:bacmpNaN:
-bacmpNaN:inf:
--inf:bacmpNaN:
-bacmpNaN:-inf:
++inf:invalid:
+invalid:inf:
+-inf:invalid:
+invalid:-inf:
 
 &bdec
-bdecNaN:NaN
+invalid:NaN
 +inf:inf
 -inf:-inf
 +0:-1
@@ -1336,7 +1570,7 @@ bdecNaN:NaN
 99:98
 
 &binc
-bincNaN:NaN
+invalid:NaN
 +inf:inf
 -inf:-inf
 +0:1
@@ -1358,10 +1592,10 @@ abc:+0:NaN
 -inf:+inf:NaN
 +inf:+inf:inf
 -inf:-inf:-inf
-baddNaN:+inf:NaN
-baddNaN:+inf:NaN
-+inf:baddNaN:NaN
--inf:baddNaN:NaN
+invalid:+inf:NaN
+invalid:+inf:NaN
++inf:invalid:NaN
+-inf:invalid:NaN
 +0:+0:0
 +1:+0:1
 +0:+1:1
@@ -1406,10 +1640,10 @@ abc:+0:NaN
 -inf:+inf:-inf
 +inf:+inf:NaN
 -inf:-inf:NaN
-baddNaN:+inf:NaN
-baddNaN:+inf:NaN
-+inf:baddNaN:NaN
--inf:baddNaN:NaN
+invalid:+inf:NaN
+invalid:+inf:NaN
++inf:invalid:NaN
+-inf:invalid:NaN
 +0:+0:0
 +1:+0:1
 +0:+1:-1
@@ -1450,10 +1684,10 @@ abc:abc:0:NaN
 abc:+0:0:NaN
 +0:abc:0:NaN
 +0:0:abc:NaN
-NaNmul:+inf:0:NaN
-NaNmul:-inf:0:NaN
--inf:NaNmul:0:NaN
-+inf:NaNmul:0:NaN
+invalid:+inf:0:NaN
+invalid:-inf:0:NaN
+-inf:invalid:0:NaN
++inf:invalid:0:NaN
 +inf:+inf:0:inf
 +inf:-inf:0:-inf
 -inf:+inf:0:-inf
@@ -1518,10 +1752,10 @@ NaNmul:-inf:0:NaN
 abc:abc:NaN
 abc:+0:NaN
 +0:abc:NaN
-+inf:NaNmul:NaN
-+inf:NaNmul:NaN
-NaNmul:+inf:NaN
-NaNmul:-inf:NaN
++inf:invalid:NaN
++inf:invalid:NaN
+invalid:+inf:NaN
+invalid:-inf:NaN
 +inf:+inf:inf
 +inf:-inf:-inf
 +inf:-inf:-inf
@@ -1899,7 +2133,7 @@ abc:0
 2:0
 
 &is_int
-NaNis_int:0
+invalid:0
 0:1
 1:1
 2:1
@@ -1955,7 +2189,7 @@ NaN:0
 123:123 0
 -123:-123 0
 -1200:-12 2
-NaNparts:NaN NaN
+invalid:NaN NaN
 +inf:inf inf
 -inf:-inf inf
 
@@ -1967,7 +2201,7 @@ NaNparts:NaN NaN
 -1200:2
 +inf:inf
 -inf:inf
-NaNexponent:NaN
+invalid:NaN
 
 &mantissa
 0:0
@@ -1977,7 +2211,7 @@ NaNexponent:NaN
 -1200:-12
 +inf:inf
 -inf:-inf
-NaNmantissa:NaN
+invalid:NaN
 
 &length
 123:3
@@ -1987,7 +2221,7 @@ NaNmantissa:NaN
 12345678901234567890:20
 
 &is_zero
-NaNzero:0
+invalid:0
 +inf:0
 -inf:0
 0:1
@@ -1995,7 +2229,7 @@ NaNzero:0
 1:0
 
 &is_one
-NaNone:0
+invalid:0
 +inf:0
 -inf:0
 0:0

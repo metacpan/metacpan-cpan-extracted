@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Lg - Package for language Ganda
 
 package Locale::CLDR::Locales::Lg;
 # This file auto generated from Data\common\main\lg.xml
-#	on Fri 29 Apr  7:14:35 pm GMT
+#	on Fri 13 Apr  7:18:09 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[h q x])},
+			auxiliary => qr{[h q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g i j k l m n {ny} ŋ o p r s t u v w y z])},
+			main => qr{[a b c d e f g i j k l m n {ny} ŋ o p r s t u v w y z]},
 		};
 	},
 EOT

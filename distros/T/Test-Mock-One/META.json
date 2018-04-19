@@ -57,7 +57,6 @@
             "Carp" : "0",
             "Exporter" : "0",
             "List::Util" : "1.33",
-            "Scalar::Util" : "0",
             "Test::Builder" : "0",
             "overload" : "0",
             "perl" : "5.010",
@@ -87,7 +86,7 @@
          "web" : "https://gitlab.com/waterkip/test-mock-one"
       }
    },
-   "version" : "0.008",
+   "version" : "0.010",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

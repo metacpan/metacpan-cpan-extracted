@@ -6,7 +6,6 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-README
 dist.ini
 include/argon2.h
 lib/Crypt/Argon2.pm
@@ -25,6 +24,5 @@ src/ref.h
 src/thread.c
 src/thread.h
 t/test.t
-xt/author/00-compile.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

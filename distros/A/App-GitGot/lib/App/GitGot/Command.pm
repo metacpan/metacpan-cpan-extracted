@@ -1,6 +1,6 @@
 package App::GitGot::Command;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::VERSION = '1.335';
+$App::GitGot::Command::VERSION = '1.336';
 # ABSTRACT: Base class for App::GitGot commands
 use 5.014;
 
@@ -586,7 +586,7 @@ App::GitGot::Command - Base class for App::GitGot commands
 
 =head1 VERSION
 
-version 1.335
+version 1.336
 
 =head1 METHODS
 

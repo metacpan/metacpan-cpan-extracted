@@ -27,13 +27,13 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "Config-Model-Tester",
-  "dist_version" => "3.005",
+  "dist_version" => "3.006",
   "license" => "lgpl",
   "module_name" => "Config::Model::Tester",
   "recursive_test_files" => 1,
   "requires" => {
     "File::Copy::Recursive" => 0,
-    "Getopt::Std" => 0,
+    "Getopt::Long" => 0,
     "Log::Log4perl" => "1.11",
     "Path::Tiny" => 0,
     "Test::Differences" => 0,

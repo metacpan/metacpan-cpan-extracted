@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.120';
+$Config::Model::Node::VERSION = '2.122';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -687,7 +687,10 @@ sub fetch_element {
     if ($self->{status}{$element_name} eq 'deprecated' and $check eq 'yes' ) {
         # FIXME elaborate more ? or include parameter description ??
         if ($::_use_log4perl_to_warn) {
-            $logger->warn("Element '$element_name' of node '", $self->name, "' is deprecated") if $check eq 'yes';
+            $user_logger->warn(
+                "Element '$element_name' of node '", $self->name, "' is deprecated"
+            )
+                if $check eq 'yes';
         }
         else {
             warn("Element '$element_name' of node '", $self->name, "' is deprecated\n") if $check eq 'yes';
@@ -820,7 +823,7 @@ sub _get_accepted_data {
             if ($dist < 3) {
                 my $best = $tld->dld_best_match($tld_arg);
                 if ($::_use_log4perl_to_warn) {
-                    $logger->warn("Warning: ".$self->location
+                    $user_logger->warn("Warning: ".$self->location
                     ." '$name' is confusingly close to '$best' (edit distance is $dist)."
                     ." Is there a typo ?");
                 }
@@ -1220,7 +1223,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

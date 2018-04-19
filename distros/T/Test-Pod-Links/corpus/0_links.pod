@@ -1,0 +1,9 @@
+=head1 NAME
+
+Test::Pod::Links - a valid pod file
+
+=head1 DESCRIPTION
+
+This is a pod file with zero links.
+
+=cut

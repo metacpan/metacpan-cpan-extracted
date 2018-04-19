@@ -6,21 +6,70 @@ Locale::CLDR::Locales::Es::Any::Ar - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Ar;
 # This file auto generated from Data\common\main\es_AR.xml
-#	on Fri 29 Apr  7:00:38 pm GMT
+#	on Fri 13 Apr  7:08:32 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Es::Any::419');
+has 'display_name_language' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub { 
+		 sub {
+			 my %languages = (
+				'ace' => 'acehnés',
+ 				'arp' => 'arapaho',
+ 				'bho' => 'bhojpuri',
+ 				'eu' => 'euskera',
+ 				'grc' => 'griego antiguo',
+ 				'lo' => 'lao',
+ 				'nso' => 'sotho septentrional',
+ 				'pa' => 'punyabí',
+ 				'ss' => 'siswati',
+ 				'sw' => 'suajili',
+ 				'sw_CD' => 'suajili del Congo',
+ 				'tn' => 'setswana',
+ 				'wo' => 'wolof',
+ 				'zgh' => 'tamazight marroquí estándar',
+
+			);
+			if (@_) {
+				return $languages{$_[0]};
+			}
+			return \%languages;
+		}
+	},
+);
+
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { 
+		{
+			'BA' => 'Bosnia y Herzegovina',
+ 			'GB@alt=short' => 'RU',
+ 			'TA' => 'Tristán de Acuña',
+ 			'TL' => 'Timor-Leste',
+ 			'UM' => 'Islas menores alejadas de EE. UU.',
+ 			'VI' => 'Islas Vírgenes de EE. UU.',
+
+		}
+	},
+);
+
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -95,6 +144,7 @@ has 'units' => (
 						'name' => q(años),
 						'one' => q({0} año),
 						'other' => q({0} años),
+						'per' => q({0}/a),
 					},
 				},
 			} }
@@ -151,6 +201,51 @@ has 'currencies' => (
 );
 
 
+has 'calendar_days' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					narrow => {
+						mon => 'L',
+						tue => 'M',
+						wed => 'M',
+						thu => 'J',
+						fri => 'V',
+						sat => 'S',
+						sun => 'D'
+					},
+				},
+			},
+	} },
+);
+
+has 'calendar_quarters' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					wide => {0 => '1.er trimestre',
+						1 => '2.º trimestre',
+						2 => '3.er trimestre',
+						3 => '4.º trimestre'
+					},
+				},
+				'stand-alone' => {
+					wide => {0 => '1.er trimestre',
+						1 => '2.º trimestre',
+						2 => '3.er trimestre',
+						3 => '4.º trimestre'
+					},
+				},
+			},
+	} },
+);
+
 has 'day_period_data' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -161,49 +256,49 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
@@ -225,24 +320,38 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'night1' => q{noche},
-					'morning1' => q{madrugada},
-					'noon' => q{mediodía},
-					'morning2' => q{mañana},
-					'evening1' => q{tarde},
-				},
 				'wide' => {
-					'morning2' => q{mañana},
+					'morning1' => q{madrugada},
 					'night1' => q{noche},
 					'noon' => q{mediodía},
-					'morning1' => q{madrugada},
 					'evening1' => q{tarde},
+					'pm' => q{p. m.},
+					'morning2' => q{mañana},
+					'am' => q{a. m.},
+				},
+				'abbreviated' => {
+					'morning2' => q{mañana},
+					'evening1' => q{tarde},
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+					'noon' => q{mediodía},
+					'night1' => q{noche},
+					'morning1' => q{madrugada},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+				'wide' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
 				'narrow' => {
 					'noon' => q{m.},
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
 			},
 		},
@@ -308,12 +417,16 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			GyMMMEd => q{E, d 'de' MMM 'de' y G},
+			GyMMMd => q{d MMM y G},
 			Hmsv => q{HH:mm:ss v},
+			Hmsvvvv => q{HH:mm:ss (vvvv)},
 			Hmv => q{HH:mm v},
 			MEd => q{E d-M},
 			hms => q{hh:mm:ss},
 			yM => q{M-y},
 			yMEd => q{E, d/M/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, d MMM y},
 			yMMMd => q{d 'de' MMM 'de' y},
 		},
 	} },
@@ -378,7 +491,6 @@ has 'datetime_formats_interval' => (
 				y => q{MMM 'de' y 'a' MMM 'de' y G},
 			},
 			yMMMEd => {
-				M => q{E d 'de' MMM 'al' E d 'de' MMM 'de' y G},
 				d => q{E d 'al' E d 'de' MMM 'de' y G},
 				y => q{E d 'de' MMM 'de' y 'al' E d 'de' MMM 'de' y G},
 			},
@@ -393,6 +505,9 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
 			Hm => {
 				H => q{HH:mm–HH:mm},
 				m => q{HH:mm–HH:mm},
@@ -421,9 +536,18 @@ has 'datetime_formats_interval' => (
 				d => q{dd/MM – dd/MM},
 			},
 			fallback => '{0} a el {1}',
+			h => {
+				a => q{h a – h a},
+			},
 			hm => {
 				h => q{h:mm–h:mm a},
 				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
 			},
 			yM => {
 				M => q{MM/y – MM/y},
@@ -466,16 +590,16 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Argentina' => {
 			short => {
-				'daylight' => q(ARST),
-				'generic' => q(ART),
-				'standard' => q(ART),
+				'daylight' => q#ARST#,
+				'generic' => q#ART#,
+				'standard' => q#ART#,
 			},
 		},
 		'Argentina_Western' => {
 			short => {
-				'daylight' => q(WARST),
-				'generic' => q(WART),
-				'standard' => q(WART),
+				'daylight' => q#WARST#,
+				'generic' => q#WART#,
+				'standard' => q#WART#,
 			},
 		},
 	 } }

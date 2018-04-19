@@ -6,31 +6,37 @@ use Net::Etcd;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
+use Cwd;
 
 my $config;
+my $dir = getcwd;
 
-if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT}) {
-    $config->{host}   = $ENV{ETCD_TEST_HOST};
-    $config->{port}   = $ENV{ETCD_TEST_PORT};
-    $config->{cacert} = $ENV{ETCD_TEST_CAPATH} if $ENV{ETCD_TEST_CAPATH};
+if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT} ) {
+    $config->{host}      = $ENV{ETCD_TEST_HOST};
+    $config->{port}      = $ENV{ETCD_TEST_PORT};
+    $config->{ca_file}   = $ENV{ETCD_CLIENT_CA_FILE} || "$dir/t/tls/ca.pem";
+    $config->{key_file}  = $ENV{ETCD_CLIENT_KEY_FILE} || "$dir/t/tls/client-key.pem";
+    $config->{cert_file} = $ENV{ETCD_CLIENT_CERT_FILE} || "$dir/t/tls/client.pem";
+    $config->{ssl}       = 1;
     plan tests => 14;
 }
 else {
-    plan skip_all => "Please set environment variable ETCD_TEST_HOST and ETCD_TEST_PORT.";
+    plan skip_all =>
+      "Please set environment variable ETCD_TEST_HOST and ETCD_TEST_PORT.";
 }
 
-my ($put, $comp, $range, @op, @compare, $txn);
-my $etcd = Net::Etcd->new( $config );
+my ( $put, $comp, $range, @op, @compare, $txn );
+my $etcd = Net::Etcd->new($config);
 
-my @chars = ("A".."Z", "a".."z");
+my @chars = ( "A" .. "Z", "a" .. "z" );
 
 # gen random key so we can kee[ it realz
 my $rand_key;
-$rand_key .= $chars[rand @chars] for 1..8;
+$rand_key .= $chars[ rand @chars ] for 1 .. 8;
 
 lives_ok(
     sub {
-        $put = $etcd->put( { key => $rand_key , value => 'randy' } );
+        $put = $etcd->put( { key => $rand_key, value => 'randy' } );
     },
     "put random key"
 );
@@ -57,7 +63,6 @@ lives_ok(
 
 #print STDERR Dumper($put);
 
-
 lives_ok(
     sub {
         push @op, $etcd->op( { request_put => $put } );
@@ -69,7 +74,15 @@ lives_ok(
 
 lives_ok(
     sub {
-        push @compare, $etcd->compare( { key => 'foozilla', result => 'EQUAL', target => 'VALUE', value => 'baz' });
+        push @compare,
+          $etcd->compare(
+            {
+                key    => 'foozilla',
+                result => 'EQUAL',
+                target => 'VALUE',
+                value  => 'baz'
+            }
+          );
     },
     "compare create"
 );
@@ -94,14 +107,20 @@ undef $txn;
 
 lives_ok(
     sub {
-        $comp =  $etcd->compare( { key => $rand_key, target => 'CREATE', result => 'NOT_EQUAL', create_revision => '0' });
+        $comp = $etcd->compare(
+            {
+                key             => $rand_key,
+                target          => 'CREATE',
+                result          => 'NOT_EQUAL',
+                create_revision => '0'
+            }
+        );
         push @compare, $comp;
     },
     "compare create"
 );
 
 #print STDERR Dumper($comp);
-
 
 lives_ok(
     sub {
@@ -125,6 +144,7 @@ lives_ok(
 );
 
 cmp_ok( $txn->is_success, '==', 1, "txn create cleanup success" );
+
 #print STDERR Dumper($txn);
 
 1;

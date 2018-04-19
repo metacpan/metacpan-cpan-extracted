@@ -1,0 +1,24 @@
+Geo-Privacy
+
+A very simple tool to help determine if a given country is subject to GDPR or
+other privacy regulations.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 Dan Wright
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

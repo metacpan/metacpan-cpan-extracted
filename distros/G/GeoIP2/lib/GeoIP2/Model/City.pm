@@ -3,7 +3,7 @@ package GeoIP2::Model::City;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -36,7 +36,7 @@ GeoIP2::Model::City - Model class for GeoIP2 Precision: City and GeoIP2 City
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ version 2.005000
   use GeoIP2::WebService::Client;
 
   my $client = GeoIP2::WebService::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
 

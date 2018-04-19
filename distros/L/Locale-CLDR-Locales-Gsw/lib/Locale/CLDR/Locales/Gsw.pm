@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Gsw - Package for language Swiss German
 
 package Locale::CLDR::Locales::Gsw;
 # This file auto generated from Data\common\main\gsw.xml
-#	on Fri 29 Apr  7:06:04 pm GMT
+#	on Fri 13 Apr  7:12:11 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1057,9 +1058,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ā æ ç é è ĕ ê ë ē í ì ĭ î ï ī ñ ó ò ŏ ô ø ō œ ú ù ŭ û ū ÿ])},
+			auxiliary => qr{[á à ă â å ā æ ç é è ĕ ê ë ē í ì ĭ î ï ī ñ ó ò ŏ ô ø ō œ ú ù ŭ û ū ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a ä b c d e f g h i j k l m n o ö p q r s t u ü v w x y z])},
+			main => qr{[a ä b c d e f g h i j k l m n o ö p q r s t u ü v w x y z]},
+			numbers => qr{[. ’ % ‰ + − 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1811,169 +1813,169 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'one' => '0 tsd',
-					'other' => '0 tsd',
+					'one' => '0 Tsg'.'',
+					'other' => '0 Tsg'.'',
 				},
 				'10000' => {
-					'one' => '00 tsd',
-					'other' => '00 tsd',
+					'one' => '00 Tsg'.'',
+					'other' => '00 Tsg'.'',
 				},
 				'100000' => {
-					'one' => '000 tsd',
-					'other' => '000 tsd',
+					'one' => '000 Tsg'.'',
+					'other' => '000 Tsg'.'',
 				},
 				'1000000' => {
-					'one' => '0 Mio',
-					'other' => '0 Mio',
+					'one' => '0 Mio'.'',
+					'other' => '0 Mio'.'',
 				},
 				'10000000' => {
-					'one' => '00 Mio',
-					'other' => '00 Mio',
+					'one' => '00 Mio'.'',
+					'other' => '00 Mio'.'',
 				},
 				'100000000' => {
-					'one' => '000 Mio',
-					'other' => '000 Mio',
+					'one' => '000 Mio'.'',
+					'other' => '000 Mio'.'',
 				},
 				'1000000000' => {
-					'one' => '0 Mrd',
-					'other' => '0 Mrd',
+					'one' => '0 Mrd'.'',
+					'other' => '0 Mrd'.'',
 				},
 				'10000000000' => {
-					'one' => '00 Mrd',
-					'other' => '00 Mrd',
+					'one' => '00 Mrd'.'',
+					'other' => '00 Mrd'.'',
 				},
 				'100000000000' => {
-					'one' => '000 Mrd',
-					'other' => '000 Mrd',
+					'one' => '000 Mrd'.'',
+					'other' => '000 Mrd'.'',
 				},
 				'1000000000000' => {
-					'one' => '0 Bio',
-					'other' => '0 Bio',
+					'one' => '0 Bio'.'',
+					'other' => '0 Bio'.'',
 				},
 				'10000000000000' => {
-					'one' => '00 Bio',
-					'other' => '00 Bio',
+					'one' => '00 Bio'.'',
+					'other' => '00 Bio'.'',
 				},
 				'100000000000000' => {
-					'one' => '000 Bio',
-					'other' => '000 Bio',
+					'one' => '000 Bio'.'',
+					'other' => '000 Bio'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
 				'1000' => {
-					'one' => '0 tausend',
-					'other' => '0 tausend',
+					'one' => '0 Tuusig',
+					'other' => '0 Tuusig',
 				},
 				'10000' => {
-					'one' => '00 tausend',
-					'other' => '00 tausend',
+					'one' => '00 Tuusig',
+					'other' => '00 Tuusig',
 				},
 				'100000' => {
-					'one' => '000 tausend',
-					'other' => '000 tausend',
+					'one' => '000 Tuusig',
+					'other' => '000 Tuusig',
 				},
 				'1000000' => {
-					'one' => '0 Million',
-					'other' => '0 Millionen',
+					'one' => '0 Millioon',
+					'other' => '0 Millioone',
 				},
 				'10000000' => {
-					'one' => '00 Million',
-					'other' => '00 Millionen',
+					'one' => '00 Millioon',
+					'other' => '00 Millioone',
 				},
 				'100000000' => {
-					'one' => '000 Million',
-					'other' => '000 Millionen',
+					'one' => '000 Millioon',
+					'other' => '000 Millioone',
 				},
 				'1000000000' => {
 					'one' => '0 Milliarde',
-					'other' => '0 Milliarden',
+					'other' => '0 Milliarde',
 				},
 				'10000000000' => {
 					'one' => '00 Milliarde',
-					'other' => '00 Milliarden',
+					'other' => '00 Milliarde',
 				},
 				'100000000000' => {
 					'one' => '000 Milliarde',
-					'other' => '000 Milliarden',
+					'other' => '000 Milliarde',
 				},
 				'1000000000000' => {
-					'one' => '0 Billion',
-					'other' => '0 Billionen',
+					'one' => '0 Billioon',
+					'other' => '0 Billioone',
 				},
 				'10000000000000' => {
-					'one' => '00 Billion',
-					'other' => '00 Billionen',
+					'one' => '00 Billioon',
+					'other' => '00 Billioone',
 				},
 				'100000000000000' => {
-					'one' => '000 Billion',
-					'other' => '000 Billionen',
+					'one' => '000 Billioon',
+					'other' => '000 Billioone',
 				},
 			},
 			'short' => {
 				'1000' => {
-					'one' => '0 tsd',
-					'other' => '0 tsd',
+					'one' => '0 Tsg'.'',
+					'other' => '0 Tsg'.'',
 				},
 				'10000' => {
-					'one' => '00 tsd',
-					'other' => '00 tsd',
+					'one' => '00 Tsg'.'',
+					'other' => '00 Tsg'.'',
 				},
 				'100000' => {
-					'one' => '000 tsd',
-					'other' => '000 tsd',
+					'one' => '000 Tsg'.'',
+					'other' => '000 Tsg'.'',
 				},
 				'1000000' => {
-					'one' => '0 Mio',
-					'other' => '0 Mio',
+					'one' => '0 Mio'.'',
+					'other' => '0 Mio'.'',
 				},
 				'10000000' => {
-					'one' => '00 Mio',
-					'other' => '00 Mio',
+					'one' => '00 Mio'.'',
+					'other' => '00 Mio'.'',
 				},
 				'100000000' => {
-					'one' => '000 Mio',
-					'other' => '000 Mio',
+					'one' => '000 Mio'.'',
+					'other' => '000 Mio'.'',
 				},
 				'1000000000' => {
-					'one' => '0 Mrd',
-					'other' => '0 Mrd',
+					'one' => '0 Mrd'.'',
+					'other' => '0 Mrd'.'',
 				},
 				'10000000000' => {
-					'one' => '00 Mrd',
-					'other' => '00 Mrd',
+					'one' => '00 Mrd'.'',
+					'other' => '00 Mrd'.'',
 				},
 				'100000000000' => {
-					'one' => '000 Mrd',
-					'other' => '000 Mrd',
+					'one' => '000 Mrd'.'',
+					'other' => '000 Mrd'.'',
 				},
 				'1000000000000' => {
-					'one' => '0 Bio',
-					'other' => '0 Bio',
+					'one' => '0 Bio'.'',
+					'other' => '0 Bio'.'',
 				},
 				'10000000000000' => {
-					'one' => '00 Bio',
-					'other' => '00 Bio',
+					'one' => '00 Bio'.'',
+					'other' => '00 Bio'.'',
 				},
 				'100000000000000' => {
-					'one' => '000 Bio',
-					'other' => '000 Bio',
+					'one' => '000 Bio'.'',
+					'other' => '000 Bio'.'',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -2314,16 +2316,23 @@ has 'currencies' => (
 		},
 		'BYB' => {
 			display_name => {
-				'currency' => q(Belarus-Rubel \(alt\)),
-				'one' => q(Belarus-Rubel \(alt\)),
-				'other' => q(Belarus-Rubel \(alt\)),
+				'currency' => q(Belarus-Rubel \(1994–1999\)),
+				'one' => q(Belarus-Rubel \(1994–1999\)),
+				'other' => q(Belarus-Rubel \(1994–1999\)),
+			},
+		},
+		'BYN' => {
+			display_name => {
+				'currency' => q(Belarus Rubel),
+				'one' => q(Belarus-Rubel),
+				'other' => q(Belarus-Rubel),
 			},
 		},
 		'BYR' => {
 			display_name => {
-				'currency' => q(Belarus Rubel \(nöi\)),
-				'one' => q(Belarus-Rubel \(nöi\)),
-				'other' => q(Belarus-Rubel \(nöi\)),
+				'currency' => q(Belarus Rubel \(2000–2016\)),
+				'one' => q(Belarus-Rubel \(2000–2016\)),
+				'other' => q(Belarus-Rubel \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3211,16 +3220,16 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(Nöie Sol),
-				'one' => q(Nöie Sol),
-				'other' => q(Nöii Sol),
+				'currency' => q(Sol),
+				'one' => q(Sol),
+				'other' => q(Sol),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(Sol),
-				'one' => q(Sol),
-				'other' => q(Sol),
+				'currency' => q(Sol \(1863–1965\)),
+				'one' => q(Sol \(1863–1965\)),
+				'other' => q(Sol \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -4011,6 +4020,112 @@ has 'calendar_quarters' => (
 	} },
 );
 
+has 'day_period_data' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub { sub {
+		# Time in hhmm format
+		my ($self, $type, $time, $day_period_type) = @_;
+		$day_period_type //= 'default';
+		SWITCH:
+		for ($type) {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+				}
+				if($day_period_type eq 'selection') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+				}
+				if($day_period_type eq 'selection') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+				}
+				if($day_period_type eq 'selection') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+		}
+	} },
+);
+
+around day_period_data => sub {
+	my ($orig, $self) = @_;
+	return $self->$orig;
+};
+
 has 'day_periods' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -4018,19 +4133,37 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{nam.},
-					'am' => q{vorm.},
-				},
 				'abbreviated' => {
-					'pm' => q{n.m.},
-					'am' => q{v.m.},
+					'evening1' => q{zaabig},
+					'am' => q{vorm.},
+					'morning1' => q{am Morge},
+					'afternoon1' => q{zmittag},
+					'night1' => q{znacht},
+					'pm' => q{nam.},
+					'midnight' => q{Mitternacht},
+					'afternoon2' => q{am Namittag},
+				},
+				'wide' => {
+					'evening1' => q{zaabig},
+					'am' => q{am Vormittag},
+					'afternoon2' => q{am Namittag},
+					'pm' => q{am Namittag},
+					'midnight' => q{Mitternacht},
+					'night1' => q{znacht},
+					'morning1' => q{am Morge},
+					'afternoon1' => q{zmittag},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
+					'evening1' => q{Aabig},
 					'am' => q{Vormittag},
+					'afternoon1' => q{Mittag},
+					'morning1' => q{Morge},
+					'night1' => q{Nacht},
 					'pm' => q{Namittag},
+					'midnight' => q{Mitternacht},
+					'afternoon2' => q{Namittag},
 				},
 			},
 		},
@@ -4126,7 +4259,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d.},
 			H => q{H},
 			Hm => q{HH:mm},
@@ -4155,7 +4288,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d.},
 			H => q{H},
 			Hm => q{HH:mm},
@@ -4200,7 +4333,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -4298,7 +4431,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -4409,14 +4542,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Acre-Summerziit),
-				'generic' => q(Acre-Ziit),
-				'standard' => q(Acre-Schtandardziit),
+				'daylight' => q#Acre-Summerziit#,
+				'generic' => q#Acre-Ziit#,
+				'standard' => q#Acre-Schtandardziit#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Afghanischtan-Ziit),
+				'standard' => q#Afghanischtan-Ziit#,
 			},
 		},
 		'Africa/Accra' => {
@@ -4454,45 +4587,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Zentralafrikanischi Ziit),
+				'standard' => q#Zentralafrikanischi Ziit#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Oschtafrikanischi Ziit),
+				'standard' => q#Oschtafrikanischi Ziit#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Süüdafrikanischi ziit),
+				'standard' => q#Süüdafrikanischi ziit#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Weschtafrikanischi Summerziit),
-				'generic' => q(Weschtafrikanischi Ziit),
-				'standard' => q(Weschtafrikanischi Schtandardziit),
+				'daylight' => q#Weschtafrikanischi Summerziit#,
+				'generic' => q#Weschtafrikanischi Ziit#,
+				'standard' => q#Weschtafrikanischi Schtandardziit#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Alaska-Summerziit),
-				'generic' => q(Alaska-Ziit),
-				'standard' => q(Alaska-Schtandardziit),
+				'daylight' => q#Alaska-Summerziit#,
+				'generic' => q#Alaska-Ziit#,
+				'standard' => q#Alaska-Schtandardziit#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Almaty-Summerziit),
-				'generic' => q(Almaty-Ziit),
-				'standard' => q(Almaty-Schtandardziit),
+				'daylight' => q#Almaty-Summerziit#,
+				'generic' => q#Almaty-Ziit#,
+				'standard' => q#Almaty-Schtandardziit#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazonas-Summerziit),
-				'generic' => q(Amazonas-Ziit),
-				'standard' => q(Amazonas-Schtandardziit),
+				'daylight' => q#Amazonas-Summerziit#,
+				'generic' => q#Amazonas-Ziit#,
+				'standard' => q#Amazonas-Schtandardziit#,
 			},
 		},
 		'America/Asuncion' => {
@@ -4539,9 +4672,9 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Amerika-Zentraal Summerziit),
-				'generic' => q(Amerika-Zentraal Ziit),
-				'standard' => q(Amerika-Zentraal Schtandardziit),
+				'daylight' => q#Amerika-Zentraal Summerziit#,
+				'generic' => q#Amerika-Zentraal Ziit#,
+				'standard' => q#Amerika-Zentraal Schtandardziit#,
 			},
 		},
 		'Antarctica/DumontDUrville' => {
@@ -4708,38 +4841,38 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Mitteleuropäischi Summerziit),
-				'generic' => q(Mitteleuropäischi Ziit),
-				'standard' => q(Mitteleuropäischi Schtandardziit),
+				'daylight' => q#Mitteleuropäischi Summerziit#,
+				'generic' => q#Mitteleuropäischi Ziit#,
+				'standard' => q#Mitteleuropäischi Schtandardziit#,
 			},
 			short => {
-				'daylight' => q(MESZ),
-				'generic' => q(MEZ),
-				'standard' => q(MEZ),
+				'daylight' => q#MESZ#,
+				'generic' => q#MEZ#,
+				'standard' => q#MEZ#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Oschteuropäischi Summerziit),
-				'generic' => q(Oschteuropäischi Ziit),
-				'standard' => q(Oschteuropäischi Schtandardziit),
+				'daylight' => q#Oschteuropäischi Summerziit#,
+				'generic' => q#Oschteuropäischi Ziit#,
+				'standard' => q#Oschteuropäischi Schtandardziit#,
 			},
 			short => {
-				'daylight' => q(OESZ),
-				'generic' => q(OEZ),
-				'standard' => q(OEZ),
+				'daylight' => q#OESZ#,
+				'generic' => q#OEZ#,
+				'standard' => q#OEZ#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Weschteuropäischi Summerziit),
-				'generic' => q(Weschteuropäischi Ziit),
-				'standard' => q(Weschteuropäischi Schtandardziit),
+				'daylight' => q#Weschteuropäischi Summerziit#,
+				'generic' => q#Weschteuropäischi Ziit#,
+				'standard' => q#Weschteuropäischi Schtandardziit#,
 			},
 			short => {
-				'daylight' => q(WESZ),
-				'generic' => q(WEZ),
-				'standard' => q(WEZ),
+				'daylight' => q#WESZ#,
+				'generic' => q#WEZ#,
+				'standard' => q#WEZ#,
 			},
 		},
 		'Indian/Christmas' => {
@@ -4756,9 +4889,9 @@ has 'time_zone_names' => (
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskauer Summerziit),
-				'generic' => q(Moskauer Ziit),
-				'standard' => q(Moskauer Schtandardziit),
+				'daylight' => q#Moskauer Summerziit#,
+				'generic' => q#Moskauer Ziit#,
+				'standard' => q#Moskauer Schtandardziit#,
 			},
 		},
 		'Pacific/Easter' => {

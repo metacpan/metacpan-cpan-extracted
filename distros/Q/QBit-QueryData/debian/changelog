@@ -1,3 +1,11 @@
+libqbit-querydata-perl (0.011) raring; urgency=low
+
+  * speed up filters
+
+  * function - ok
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 14 Apr 2018 19:58:22 +0300
+
 libqbit-querydata-perl (0.010) raring; urgency=low
 
   * fix aggregation

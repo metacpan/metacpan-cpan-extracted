@@ -1,13 +1,13 @@
 package Map::Tube::Exception::FoundUnsupportedMapDataFormat;
 $Map::Tube::Exception::FoundUnsupportedMapDataFormat::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::FoundUnsupportedMapDataFormat::VERSION = '3.15';
+$Map::Tube::Exception::FoundUnsupportedMapDataFormat::VERSION = '3.16';
 =head1 NAME
 
 Map::Tube::Exception::FoundUnsupportedMapDataFormat - Represent 'found unsupported map data format' exception.
 
 =head1 VERSION
 
-version 3.15
+version 3.16
 
 =cut
 

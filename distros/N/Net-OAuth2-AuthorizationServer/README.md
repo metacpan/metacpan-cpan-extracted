@@ -11,7 +11,7 @@ Authorization Server
 
 # VERSION
 
-0.16
+0.17
 
 # SYNOPSIS
 
@@ -72,7 +72,9 @@ With contributions from:
 
 Martin Renvoize - `martin.renvoize@ptfs-europe.com`
 
-Pierre VIGIER `pierre.vigier@gmail.com`
+Pierre VIGIER - `pierre.vigier@gmail.com`
+
+Ian Sillitoe - [https://github.com/sillitoe](https://github.com/sillitoe)
 
 # LICENSE
 

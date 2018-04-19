@@ -6,17 +6,18 @@ Locale::CLDR::Locales::En::Any::Mt - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Mt;
 # This file auto generated from Data\common\main\en_MT.xml
-#	on Fri 29 Apr  6:59:52 pm GMT
+#	on Fri 13 Apr  7:08:00 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -45,51 +46,51 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -163,15 +164,15 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			MMMd => q{dd MMM},
-			yMMMEd => q{E, dd MMM y},
-			yMMMd => q{dd MMM y},
-		},
 		'generic' => {
 			MMMd => q{dd MMM},
 			yyyyMMMEd => q{E, dd MMM y G},
 			yyyyMMMd => q{dd MMM y G},
+		},
+		'gregorian' => {
+			MMMd => q{dd MMM},
+			yMMMEd => q{E, dd MMM y},
+			yMMMd => q{dd MMM y},
 		},
 	} },
 );
@@ -189,25 +190,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			MEd => {
-				M => q{E, dd/MM – E, dd/MM},
-				d => q{E, dd/MM – E, dd/MM},
-			},
-			MMMEd => {
-				M => q{E, dd MMM – E, dd MMM},
-				d => q{E, dd – E, dd MMM},
-			},
-			MMMd => {
-				M => q{dd MMM – dd MMM},
-				d => q{dd – dd MMM},
-			},
-			yMMMd => {
-				M => q{dd MMM – dd MMM y},
-				d => q{dd – dd MMM y},
-				y => q{dd MMM y – dd MMM y},
-			},
-		},
 		'generic' => {
 			MEd => {
 				M => q{E, dd/MM – E, dd/MM},
@@ -239,6 +221,25 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM/y – dd/MM/y G},
 				d => q{dd/MM/y – dd/MM/y G},
 				y => q{dd/MM/y – dd/MM/y G},
+			},
+		},
+		'gregorian' => {
+			MEd => {
+				M => q{E, dd/MM – E, dd/MM},
+				d => q{E, dd/MM – E, dd/MM},
+			},
+			MMMEd => {
+				M => q{E, dd MMM – E, dd MMM},
+				d => q{E, dd – E, dd MMM},
+			},
+			MMMd => {
+				M => q{dd MMM – dd MMM},
+				d => q{dd – dd MMM},
+			},
+			yMMMd => {
+				M => q{dd MMM – dd MMM y},
+				d => q{dd – dd MMM y},
+				y => q{dd MMM y – dd MMM y},
 			},
 		},
 	} },

@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "locale",
       "CLDR",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Locale-CLDR-Locales-Ca",
    "prereqs" : {
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.29.0",
+            "Locale::CLDR" : "v0.32.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,31 +46,31 @@
    "provides" : {
       "Locale::CLDR::Locales::Ca" : {
          "file" : "lib/Locale/CLDR/Locales/Ca.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Ca::Any" : {
          "file" : "lib/Locale/CLDR/Locales/Ca/Any.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Ca::Any::Ad" : {
          "file" : "lib/Locale/CLDR/Locales/Ca/Any/Ad.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Ca::Any::Es" : {
          "file" : "lib/Locale/CLDR/Locales/Ca/Any/Es.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Ca::Any::Es::Valencia" : {
          "file" : "lib/Locale/CLDR/Locales/Ca/Any/Es/Valencia.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Ca::Any::Fr" : {
          "file" : "lib/Locale/CLDR/Locales/Ca/Any/Fr.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Ca::Any::It" : {
          "file" : "lib/Locale/CLDR/Locales/Ca/Any/It.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       }
    },
    "release_status" : "stable",
@@ -83,5 +83,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.29.0"
+   "version" : "v0.32.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

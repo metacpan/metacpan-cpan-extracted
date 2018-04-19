@@ -1,0 +1,80 @@
+{
+   "abstract" : "Test Pod for invalid HTTP/S links",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Pod-Links",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0.014",
+            "Pod::Simple::SimpleTree" : "0",
+            "Safe::Isa" : "0",
+            "Test::Builder" : "0",
+            "Test::Pod" : "0",
+            "URI" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "FindBin" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::Fatal" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0.88",
+            "Test::TempDir::Tiny" : "0",
+            "autodie" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Pod::Links" : {
+         "file" : "lib/Test/Pod/Links.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skirmess/Test-Pod-Links/issues"
+      },
+      "homepage" : "https://github.com/skirmess/Test-Pod-Links",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skirmess/Test-Pod-Links.git",
+         "web" : "https://github.com/skirmess/Test-Pod-Links"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

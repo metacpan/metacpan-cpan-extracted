@@ -1,5 +1,9 @@
 Revision history for AnyEvent::DBI
 
+3.03 Thu Apr 19 06:24:14 CEST 2018
+	- the main process socket was not actually set to nonblocking mode,
+          causing lockups under load (reported by Felix Ostmann).
+
 3.02 Mon Sep  4 13:45:56 CEST 2017
 	- fixed module version mismatch (reported by Martin Barth).
 

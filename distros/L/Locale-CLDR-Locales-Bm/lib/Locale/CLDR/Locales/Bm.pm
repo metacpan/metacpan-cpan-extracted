@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Bm - Package for language Bambara
 
 package Locale::CLDR::Locales::Bm;
 # This file auto generated from Data\common\main\bm.xml
-#	on Fri 29 Apr  6:52:56 pm GMT
+#	on Fri 13 Apr  7:02:47 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q v x])},
+			auxiliary => qr{[q v x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e ɛ f g h i j k l m n ɲ ŋ o ɔ p r s t u w y z])},
+			main => qr{[a b c d e ɛ f g h i j k l m n ɲ ŋ o ɔ p r s t u w y z]},
 		};
 	},
 EOT
@@ -952,6 +953,19 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 	} },
 );
 

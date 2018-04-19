@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ee - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee;
 # This file auto generated from Data\common\main\ee.xml
-#	on Fri 29 Apr  6:58:19 pm GMT
+#	on Fri 13 Apr  7:06:55 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -411,11 +412,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -1366,10 +1367,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[ă â å ä ā æ c ç ĕ ê ë ĭ î ï j ñ ŏ ô ö ø œ q ŭ û ü ÿ])},
+			auxiliary => qr{[ă â å ä ā æ c ç ĕ ê ë ĭ î ï j ñ ŏ ô ö ø œ q ŭ û ü ÿ]},
 			index => ['A', 'B', 'D', 'Ɖ', 'E', 'Ɛ', 'F', 'Ƒ', 'G', 'Ɣ', 'H', 'X', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'Ʋ', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a á à ã b d ɖ e é è ẽ ɛ {ɛ́} {ɛ̀} {ɛ̃} f ƒ g ɣ h x i í ì ĩ k l m n ŋ o ó ò õ ɔ {ɔ́} {ɔ̀} {ɔ̃} p r s t u ú ù ũ v ʋ w y z])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″])},
+			main => qr{[a á à ã b d ɖ e é è ẽ ɛ {ɛ́} {ɛ̀} {ɛ̃} f ƒ g ɣ h x i í ì ĩ k l m n ŋ o ó ò õ ɔ {ɔ́} {ɔ̀} {ɔ̃} p r s t u ú ù ũ v ʋ w y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1591,13 +1593,29 @@ has 'listPatterns' => (
 		} }
 );
 
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 3,
+);
+
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'minusSign' => q(-),
 			'nan' => q(mnn),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
 		},
 	} }
 );
@@ -1608,6 +1626,59 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
+			'default' => {
+				'1000' => {
+					'one' => '0K',
+					'other' => '0K',
+				},
+				'10000' => {
+					'one' => '00K',
+					'other' => '00K',
+				},
+				'100000' => {
+					'one' => '000K',
+					'other' => '000K',
+				},
+				'1000000' => {
+					'one' => '0M',
+					'other' => '0M',
+				},
+				'10000000' => {
+					'one' => '00M',
+					'other' => '00M',
+				},
+				'100000000' => {
+					'one' => '000M',
+					'other' => '000M',
+				},
+				'1000000000' => {
+					'one' => '0B',
+					'other' => '0B',
+				},
+				'10000000000' => {
+					'one' => '00B',
+					'other' => '00B',
+				},
+				'100000000000' => {
+					'one' => '000B',
+					'other' => '000B',
+				},
+				'1000000000000' => {
+					'one' => '0T',
+					'other' => '0T',
+				},
+				'10000000000000' => {
+					'one' => '00T',
+					'other' => '00T',
+				},
+				'100000000000000' => {
+					'one' => '000T',
+					'other' => '000T',
+				},
+				'standard' => {
+					'default' => '#,##0.###',
+				},
+			},
 			'long' => {
 				'1000' => {
 					'one' => 'akpe 0',
@@ -1634,28 +1705,28 @@ has 'number_formats' => (
 					'other' => 'miliɔn 000',
 				},
 				'1000000000' => {
-					'one' => 'miliɔn 0000',
-					'other' => 'miliɔn 0000',
-				},
-				'10000000000' => {
-					'one' => 'miliɔn 00000',
-					'other' => 'miliɔn 00000',
-				},
-				'100000000000' => {
-					'one' => 'miliɔn 000000',
-					'other' => 'miliɔn 000000',
-				},
-				'1000000000000' => {
 					'one' => 'biliɔn 0',
 					'other' => 'biliɔn 0',
 				},
-				'10000000000000' => {
+				'10000000000' => {
 					'one' => 'biliɔn 00',
 					'other' => 'biliɔn 00',
 				},
-				'100000000000000' => {
+				'100000000000' => {
 					'one' => 'biliɔn 000',
 					'other' => 'biliɔn 000',
+				},
+				'1000000000000' => {
+					'one' => '0 triliɔn',
+					'other' => '0 triliɔn',
+				},
+				'10000000000000' => {
+					'one' => 'triliɔn 00',
+					'other' => 'triliɔn 00',
+				},
+				'100000000000000' => {
+					'one' => 'triliɔn 000',
+					'other' => 'triliɔn 000',
 				},
 			},
 			'short' => {
@@ -1684,28 +1755,42 @@ has 'number_formats' => (
 					'other' => '000M',
 				},
 				'1000000000' => {
-					'one' => '0000M',
-					'other' => '0000M',
-				},
-				'10000000000' => {
-					'one' => '00000M',
-					'other' => '00000M',
-				},
-				'100000000000' => {
-					'one' => '000000M',
-					'other' => '000000M',
-				},
-				'1000000000000' => {
 					'one' => '0B',
 					'other' => '0B',
 				},
-				'10000000000000' => {
+				'10000000000' => {
 					'one' => '00B',
 					'other' => '00B',
 				},
-				'100000000000000' => {
+				'100000000000' => {
 					'one' => '000B',
 					'other' => '000B',
+				},
+				'1000000000000' => {
+					'one' => '0T',
+					'other' => '0T',
+				},
+				'10000000000000' => {
+					'one' => '00T',
+					'other' => '00T',
+				},
+				'100000000000000' => {
+					'one' => '000T',
+					'other' => '000T',
+				},
+			},
+		},
+		percentFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '#,##0%',
+				},
+			},
+		},
+		scientificFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '#E0',
 				},
 			},
 		},
@@ -1774,6 +1859,7 @@ has 'currencies' => (
 			},
 		},
 		'ALL' => {
+			symbol => 'ALL',
 			display_name => {
 				'currency' => q(albaniaga lek),
 				'one' => q(albaniaga lek),
@@ -1788,10 +1874,11 @@ has 'currencies' => (
 			},
 		},
 		'ANG' => {
+			symbol => 'ANG',
 			display_name => {
-				'currency' => q(nedalands antilleaga guilder),
-				'one' => q(nedalands antilleaga guilder),
-				'other' => q(nedalands antilleaga guilder),
+				'currency' => q(netherlands antilleaga guilder),
+				'one' => q(netherlands antilleaga guilder),
+				'other' => q(netherlands antilleaga guilder),
 			},
 		},
 		'AOA' => {
@@ -1851,6 +1938,7 @@ has 'currencies' => (
 			},
 		},
 		'ARS' => {
+			symbol => 'ARS',
 			display_name => {
 				'currency' => q(argentinaga peso),
 				'one' => q(argentinaga peso),
@@ -1873,6 +1961,7 @@ has 'currencies' => (
 			},
 		},
 		'AWG' => {
+			symbol => 'AWG',
 			display_name => {
 				'currency' => q(arubaga lorin),
 				'one' => q(arubaga florin),
@@ -1901,6 +1990,7 @@ has 'currencies' => (
 			},
 		},
 		'BAM' => {
+			symbol => 'BAM',
 			display_name => {
 				'currency' => q(bosnia-herzegovinaga convertible mark),
 				'one' => q(bosnia-herzegovinaga convertible mark),
@@ -1915,10 +2005,11 @@ has 'currencies' => (
 			},
 		},
 		'BBD' => {
+			symbol => 'BBD',
 			display_name => {
-				'currency' => q(barbadiaga dollar),
-				'one' => q(barbadiaga dollar),
-				'other' => q(barbadiaga dollar),
+				'currency' => q(barbadosga dollar),
+				'one' => q(barbadosga dollar),
+				'other' => q(barbadosga dollar),
 			},
 		},
 		'BDT' => {
@@ -1964,6 +2055,7 @@ has 'currencies' => (
 			},
 		},
 		'BGN' => {
+			symbol => 'BGN',
 			display_name => {
 				'currency' => q(bulgariaga lev),
 				'one' => q(bulgariaga lev),
@@ -1992,6 +2084,7 @@ has 'currencies' => (
 			},
 		},
 		'BMD' => {
+			symbol => 'BMD',
 			display_name => {
 				'currency' => q(bermudaga dollar),
 				'one' => q(bermudaga dollar),
@@ -2006,6 +2099,7 @@ has 'currencies' => (
 			},
 		},
 		'BOB' => {
+			symbol => 'BOB',
 			display_name => {
 				'currency' => q(boliviaga boliviano),
 				'one' => q(boliviaga boliviano),
@@ -2057,9 +2151,9 @@ has 'currencies' => (
 		'BRL' => {
 			symbol => 'R$',
 			display_name => {
-				'currency' => q(Braziliaga real),
-				'one' => q(Brazilga real),
-				'other' => q(Braziliaga real),
+				'currency' => q(braziliaga real),
+				'one' => q(braziliaga real),
+				'other' => q(braziliaga real),
 			},
 		},
 		'BRN' => {
@@ -2084,10 +2178,11 @@ has 'currencies' => (
 			},
 		},
 		'BSD' => {
+			symbol => 'BSD',
 			display_name => {
-				'currency' => q(bahamiaga dollar),
-				'one' => q(bahamiaga dollar),
-				'other' => q(bahamiaga dollar),
+				'currency' => q(bahamasga dollar),
+				'one' => q(bahamasga dollar),
+				'other' => q(bahamasga dollar),
 			},
 		},
 		'BTN' => {
@@ -2118,14 +2213,23 @@ has 'currencies' => (
 				'other' => q(belarusiaga ruble yeyetɔ \(1994–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(belarusiaga ruble),
 				'one' => q(belarusiaga ruble),
 				'other' => q(belarusiaga rublewo),
 			},
 		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(belarusiaga ruble \(2000–2016\)),
+				'one' => q(belarusiaga ruble \(2000–2016\)),
+				'other' => q(belarusiaga rublewo \(2000–2016\)),
+			},
+		},
 		'BZD' => {
+			symbol => 'BZD',
 			display_name => {
 				'currency' => q(belizega dollar),
 				'one' => q(belizega dollar),
@@ -2135,9 +2239,9 @@ has 'currencies' => (
 		'CAD' => {
 			symbol => 'CA$',
 			display_name => {
-				'currency' => q(Canadaga dollar),
-				'one' => q(Canadaga dollar),
-				'other' => q(Canadaga dollar),
+				'currency' => q(canadaga dollar),
+				'one' => q(canadaga dollar),
+				'other' => q(canadaga dollar),
 			},
 		},
 		'CDF' => {
@@ -2157,9 +2261,9 @@ has 'currencies' => (
 		'CHF' => {
 			symbol => 'CHF',
 			display_name => {
-				'currency' => q(Swissga franc),
-				'one' => q(Swissga franc),
-				'other' => q(Swissga franc),
+				'currency' => q(switzerlandga franc),
+				'one' => q(switzerlandga franc),
+				'other' => q(switzerlandga franc),
 			},
 		},
 		'CHW' => {
@@ -2184,10 +2288,11 @@ has 'currencies' => (
 			},
 		},
 		'CLP' => {
+			symbol => 'CLP',
 			display_name => {
-				'currency' => q(tsilega peso),
-				'one' => q(tsilega peso),
-				'other' => q(tsilega pesowo),
+				'currency' => q(chilega peso),
+				'one' => q(chilega peso),
+				'other' => q(chilega peso),
 			},
 		},
 		'CNX' => {
@@ -2206,10 +2311,11 @@ has 'currencies' => (
 			},
 		},
 		'COP' => {
+			symbol => 'COP',
 			display_name => {
-				'currency' => q(kolombiaga peso),
-				'one' => q(kolombiaga peso),
-				'other' => q(kolombiaga peso),
+				'currency' => q(colombiaga peso),
+				'one' => q(colombiaga peso),
+				'other' => q(colombiaga peso),
 			},
 		},
 		'COU' => {
@@ -2220,10 +2326,11 @@ has 'currencies' => (
 			},
 		},
 		'CRC' => {
+			symbol => 'CRC',
 			display_name => {
-				'currency' => q(kosta rikaga kolón),
-				'one' => q(kosta rikaga kolón),
-				'other' => q(kosta rikaga kolón),
+				'currency' => q(costa ricaga colón),
+				'one' => q(costa ricaga colón),
+				'other' => q(costa ricaga colón),
 			},
 		},
 		'CSD' => {
@@ -2241,17 +2348,19 @@ has 'currencies' => (
 			},
 		},
 		'CUC' => {
+			symbol => 'CUC',
 			display_name => {
-				'currency' => q(kubaga convertible peso),
-				'one' => q(kubaga convertible peso),
-				'other' => q(kubaga convertible peso),
+				'currency' => q(cubaga convertible peso),
+				'one' => q(cubaga convertible peso),
+				'other' => q(cubaga convertible peso),
 			},
 		},
 		'CUP' => {
+			symbol => 'CUP',
 			display_name => {
-				'currency' => q(kubaga peso),
-				'one' => q(kubaga peso),
-				'other' => q(kubaga peso),
+				'currency' => q(cubaga peso),
+				'one' => q(cubaga peso),
+				'other' => q(cubaga peso),
 			},
 		},
 		'CVE' => {
@@ -2269,10 +2378,11 @@ has 'currencies' => (
 			},
 		},
 		'CZK' => {
+			symbol => 'CZK',
 			display_name => {
-				'currency' => q(tsɛk repɔblikga koruna),
-				'one' => q(tsɛk repɔblikga koruna),
-				'other' => q(tsɛk repɔblikga koruna),
+				'currency' => q(czechga koruna),
+				'one' => q(czechga koruna),
+				'other' => q(czechga koruna),
 			},
 		},
 		'DDM' => {
@@ -2299,12 +2409,13 @@ has 'currencies' => (
 		'DKK' => {
 			symbol => 'DKK',
 			display_name => {
-				'currency' => q(Denmarkga krone),
-				'one' => q(Denmarkga krone),
-				'other' => q(Denmarkga krone),
+				'currency' => q(denmarkga krone),
+				'one' => q(denmarkga krone),
+				'other' => q(denmarkga krone),
 			},
 		},
 		'DOP' => {
+			symbol => 'DOP',
 			display_name => {
 				'currency' => q(dominicaga peso),
 				'one' => q(dominikaga peso),
@@ -2404,10 +2515,11 @@ has 'currencies' => (
 			},
 		},
 		'FKP' => {
+			symbol => 'FKP',
 			display_name => {
-				'currency' => q(falklanɖ ƒudomekpo dukɔwo ƒe ga pound),
-				'one' => q(falkland ƒudomekpo dukɔwo ƒe ga pound),
-				'other' => q(falkland ƒudomekpo dukɔwo ƒe ga pound),
+				'currency' => q(falkland islands pound),
+				'one' => q(falkland islands pound),
+				'other' => q(falkland islands pound),
 			},
 		},
 		'FRF' => {
@@ -2420,9 +2532,9 @@ has 'currencies' => (
 		'GBP' => {
 			symbol => '£',
 			display_name => {
-				'currency' => q(Britishga pound),
-				'one' => q(Britishga pound),
-				'other' => q(Britishga pound),
+				'currency' => q(britainga pound),
+				'one' => q(britainga pound),
+				'other' => q(britainga pound),
 			},
 		},
 		'GEK' => {
@@ -2455,10 +2567,11 @@ has 'currencies' => (
 			},
 		},
 		'GIP' => {
+			symbol => 'GIP',
 			display_name => {
-				'currency' => q(gilbrataga pound),
-				'one' => q(gilbrataga pound),
-				'other' => q(gilbrataga pound),
+				'currency' => q(gilbratarga pound),
+				'one' => q(gilbratarga pound),
+				'other' => q(gilbratarga pound),
 			},
 		},
 		'GMD' => {
@@ -2497,6 +2610,7 @@ has 'currencies' => (
 			},
 		},
 		'GTQ' => {
+			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(guatemalaga quetzal),
 				'one' => q(guatemalaga quetzal),
@@ -2518,6 +2632,7 @@ has 'currencies' => (
 			},
 		},
 		'GYD' => {
+			symbol => 'GYD',
 			display_name => {
 				'currency' => q(guyanaga dollar),
 				'one' => q(guyanaga dollar),
@@ -2533,6 +2648,7 @@ has 'currencies' => (
 			},
 		},
 		'HNL' => {
+			symbol => 'HNL',
 			display_name => {
 				'currency' => q(honduraga lempira),
 				'one' => q(honduraga lempira),
@@ -2547,13 +2663,15 @@ has 'currencies' => (
 			},
 		},
 		'HRK' => {
+			symbol => 'HRK',
 			display_name => {
-				'currency' => q(kroatiaga kuna),
-				'one' => q(kroatiaga kuna),
-				'other' => q(kroatiaga kuna),
+				'currency' => q(croatiaga kuna),
+				'one' => q(croatiaga kuna),
+				'other' => q(croatiaga kuna),
 			},
 		},
 		'HTG' => {
+			symbol => 'HTG',
 			display_name => {
 				'currency' => q(haitiga gourde),
 				'one' => q(haitiga gourde),
@@ -2561,6 +2679,7 @@ has 'currencies' => (
 			},
 		},
 		'HUF' => {
+			symbol => 'HUF',
 			display_name => {
 				'currency' => q(hungariaga forint),
 				'one' => q(hungariaga forint),
@@ -2634,10 +2753,11 @@ has 'currencies' => (
 			},
 		},
 		'ISK' => {
+			symbol => 'ISK',
 			display_name => {
-				'currency' => q(aiselandga króna),
-				'one' => q(aiselandga króna),
-				'other' => q(aiselandga krónur),
+				'currency' => q(icelandga króna),
+				'one' => q(icelandga króna),
+				'other' => q(icelandga króna),
 			},
 		},
 		'ITL' => {
@@ -2648,10 +2768,11 @@ has 'currencies' => (
 			},
 		},
 		'JMD' => {
+			symbol => 'JMD',
 			display_name => {
-				'currency' => q(dzamaikaga dollar),
-				'one' => q(dzamaikaga dollar),
-				'other' => q(dzamaikaga dollar),
+				'currency' => q(jamaicaga dollar),
+				'one' => q(jamaicaga dollar),
+				'other' => q(jamaicaga dollar),
 			},
 		},
 		'JOD' => {
@@ -2734,10 +2855,11 @@ has 'currencies' => (
 			},
 		},
 		'KYD' => {
+			symbol => 'KYD',
 			display_name => {
-				'currency' => q(kayman ƒudomekpoga dollar),
-				'one' => q(kayman ƒudomekpoga dollar),
-				'other' => q(kayman ƒudomekpoga dollar),
+				'currency' => q(cayman islandsga dollar),
+				'one' => q(cayman islandsga dollar),
+				'other' => q(cayman islandsga dollar),
 			},
 		},
 		'KZT' => {
@@ -2867,6 +2989,7 @@ has 'currencies' => (
 			},
 		},
 		'MDL' => {
+			symbol => 'MDL',
 			display_name => {
 				'currency' => q(moldovaga leu),
 				'one' => q(moldovaga leu),
@@ -2888,10 +3011,11 @@ has 'currencies' => (
 			},
 		},
 		'MKD' => {
+			symbol => 'MKD',
 			display_name => {
-				'currency' => q(makedoniaga denar),
+				'currency' => q(marcedoniaga denar),
 				'one' => q(makedoniaga denar),
-				'other' => q(makedoniaga denari),
+				'other' => q(marcedoniaga denar),
 			},
 		},
 		'MKN' => {
@@ -2974,9 +3098,9 @@ has 'currencies' => (
 		'MXN' => {
 			symbol => 'MX$',
 			display_name => {
-				'currency' => q(Mexicoga peso),
-				'one' => q(Mexicoga peso),
-				'other' => q(Mexicoga peso),
+				'currency' => q(mexicoga peso),
+				'one' => q(mexicoga peso),
+				'other' => q(mexicoga peso),
 			},
 		},
 		'MYR' => {
@@ -3013,10 +3137,11 @@ has 'currencies' => (
 			},
 		},
 		'NIO' => {
+			symbol => 'NIO',
 			display_name => {
-				'currency' => q(nikaraguaga córdoba),
-				'one' => q(nikaraguaga córdoba),
-				'other' => q(nikaraguaga córdoba),
+				'currency' => q(nicaraguaga córdoba),
+				'one' => q(nicaraguaga córdoba),
+				'other' => q(nicaraguaga córdoba),
 			},
 		},
 		'NLG' => {
@@ -3029,9 +3154,9 @@ has 'currencies' => (
 		'NOK' => {
 			symbol => 'NOK',
 			display_name => {
-				'currency' => q(Norwayga krone),
-				'one' => q(Norwayga krone),
-				'other' => q(Norwayga krone),
+				'currency' => q(norwayga krone),
+				'one' => q(norwayga krone),
+				'other' => q(norwayga krone),
 			},
 		},
 		'NPR' => {
@@ -3057,6 +3182,7 @@ has 'currencies' => (
 			},
 		},
 		'PAB' => {
+			symbol => 'PAB',
 			display_name => {
 				'currency' => q(panamaga balboa),
 				'one' => q(panamaga balboa),
@@ -3071,17 +3197,18 @@ has 'currencies' => (
 			},
 		},
 		'PEN' => {
+			symbol => 'PEN',
 			display_name => {
-				'currency' => q(peruga nuevo sol),
-				'one' => q(peruga nuevo sol),
-				'other' => q(peruga nuevo sol),
+				'currency' => q(peruga sol),
+				'one' => q(peruga sol),
+				'other' => q(peruga sol),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(peruga nuevo sol \(1863–1965\)),
-				'one' => q(peruga nuevo sol \(1863–1965\)),
-				'other' => q(peruga nuevo sol \(1863–1965\)),
+				'currency' => q(peruga sol \(1863–1965\)),
+				'one' => q(peruga sol \(1863–1965\)),
+				'other' => q(peruga sol \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -3106,8 +3233,9 @@ has 'currencies' => (
 			},
 		},
 		'PLN' => {
+			symbol => 'PLN',
 			display_name => {
-				'currency' => q(polanɖga zloty),
+				'currency' => q(polandga zloty),
 				'one' => q(polandga zloty),
 				'other' => q(polandga zloty),
 			},
@@ -3127,6 +3255,7 @@ has 'currencies' => (
 			},
 		},
 		'PYG' => {
+			symbol => 'PYG',
 			display_name => {
 				'currency' => q(paraguayga guarani),
 				'one' => q(paraguayga guarani),
@@ -3155,6 +3284,7 @@ has 'currencies' => (
 			},
 		},
 		'RON' => {
+			symbol => 'RON',
 			display_name => {
 				'currency' => q(romaniaga leu),
 				'one' => q(romaniaga leu),
@@ -3162,6 +3292,7 @@ has 'currencies' => (
 			},
 		},
 		'RSD' => {
+			symbol => 'RSD',
 			display_name => {
 				'currency' => q(serbiaga dinar),
 				'one' => q(serbiaga dinar),
@@ -3171,9 +3302,9 @@ has 'currencies' => (
 		'RUB' => {
 			symbol => 'RUB',
 			display_name => {
-				'currency' => q(Russiaga ruble),
-				'one' => q(Russiaga ruble),
-				'other' => q(Russiaga ruble),
+				'currency' => q(russiaga ruble),
+				'one' => q(russiaga ruble),
+				'other' => q(russiaga ruble),
 			},
 		},
 		'RUR' => {
@@ -3236,9 +3367,9 @@ has 'currencies' => (
 		'SEK' => {
 			symbol => 'SEK',
 			display_name => {
-				'currency' => q(Swedishga krone),
-				'one' => q(Swedishga krone),
-				'other' => q(Swedishga krone),
+				'currency' => q(swedenga krone),
+				'one' => q(swedenga krone),
+				'other' => q(swedenga krone),
 			},
 		},
 		'SGD' => {
@@ -3284,6 +3415,7 @@ has 'currencies' => (
 			},
 		},
 		'SRD' => {
+			symbol => 'SRD',
 			display_name => {
 				'currency' => q(surinamga dollar),
 				'one' => q(surinamga dollar),
@@ -3412,10 +3544,11 @@ has 'currencies' => (
 			},
 		},
 		'TTD' => {
+			symbol => 'TTD',
 			display_name => {
-				'currency' => q(trinidad kple tobagoga dollar),
-				'one' => q(trinidad kple tobagoga dollar),
-				'other' => q(trinidad kple tobagoga dollar),
+				'currency' => q(trinidad & tobagoga dollar),
+				'one' => q(trinidad & tobagoga dollar),
+				'other' => q(trinidad & tobagoga dollar),
 			},
 		},
 		'TWD' => {
@@ -3434,6 +3567,7 @@ has 'currencies' => (
 			},
 		},
 		'UAH' => {
+			symbol => 'UAH',
 			display_name => {
 				'currency' => q(ukrainega hryvnia),
 				'one' => q(ukrainega hryvnia),
@@ -3464,9 +3598,9 @@ has 'currencies' => (
 		'USD' => {
 			symbol => 'US$',
 			display_name => {
-				'currency' => q(US ga dollar),
-				'one' => q(US ga dollar),
-				'other' => q(US ga dollar),
+				'currency' => q(us ga dollar),
+				'one' => q(us ga dollar),
+				'other' => q(us ga dollar),
 			},
 		},
 		'USN' => {
@@ -3498,6 +3632,7 @@ has 'currencies' => (
 			},
 		},
 		'UYU' => {
+			symbol => 'UYU',
 			display_name => {
 				'currency' => q(uruguayga peso),
 				'one' => q(uruguayga peso),
@@ -3519,6 +3654,7 @@ has 'currencies' => (
 			},
 		},
 		'VEF' => {
+			symbol => 'VEF',
 			display_name => {
 				'currency' => q(venezuelaga bolívar),
 				'one' => q(venezuelaga bolívar),
@@ -3606,9 +3742,9 @@ has 'currencies' => (
 		'XCD' => {
 			symbol => 'EC$',
 			display_name => {
-				'currency' => q(ɣedzeƒe caribbeaga dollar),
-				'one' => q(ɣedzeƒe karibbeaga dollar),
-				'other' => q(ɣedzeƒe karibbeaga dollar),
+				'currency' => q(east caribbeanga dollar),
+				'one' => q(east caribbeanga dollar),
+				'other' => q(east caribbeanga dollar),
 			},
 		},
 		'XDR' => {
@@ -4671,373 +4807,373 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
+			if ($_ eq 'hebrew') {
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
 				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'chinese') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'japanese') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
+			if ($_ eq 'indian') {
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
+			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 500;
-					return 'morning2' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'morning2' if $time >= 500
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning1' if $time >= 400
+						&& $time < 500;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'morning1' if $time >= 400
 						&& $time < 500;
 				}
@@ -5059,39 +5195,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'afternoon2' => q{ɣetrɔ},
-					'morning2' => q{ŋdi},
-					'night1' => q{zã},
-					'morning1' => q{fɔŋli},
-					'evening1' => q{fiẽ},
-					'afternoon1' => q{ŋdɔ},
-					'am' => q{ŋdi},
-					'pm' => q{ɣetrɔ},
-				},
 				'wide' => {
-					'afternoon1' => q{ŋdɔ},
-					'evening1' => q{fiẽ},
 					'am' => q{ŋdi},
-					'pm' => q{ɣetrɔ},
-					'afternoon2' => q{ɣetrɔ},
+					'evening1' => q{fiẽ},
 					'morning2' => q{ŋdi},
-					'morning1' => q{fɔŋli},
 					'night1' => q{zã},
+					'afternoon1' => q{ŋdɔ},
+					'morning1' => q{fɔŋli},
+					'afternoon2' => q{ɣetrɔ},
+					'pm' => q{ɣetrɔ},
 				},
 				'narrow' => {
-					'pm' => q{ɣ},
+					'morning2' => q{ŋdi},
+					'evening1' => q{fiẽ},
 					'am' => q{ŋ},
+					'afternoon2' => q{ɣetrɔ},
+					'pm' => q{ɣ},
+					'night1' => q{zã},
+					'afternoon1' => q{ŋdɔ},
+					'morning1' => q{fɔŋli},
+				},
+				'abbreviated' => {
+					'night1' => q{zã},
+					'morning1' => q{fɔŋli},
+					'afternoon1' => q{ŋdɔ},
+					'afternoon2' => q{ɣetrɔ},
+					'pm' => q{ɣetrɔ},
+					'am' => q{ŋdi},
+					'morning2' => q{ŋdi},
+					'evening1' => q{fiẽ},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{ɣ},
-					'am' => q{ŋ},
+				'abbreviated' => {
+					'am' => q{ŋdi},
+					'morning2' => q{ŋdi},
+					'evening1' => q{fiẽ},
+					'pm' => q{ɣetrɔ},
+					'afternoon2' => q{ɣetrɔ},
+					'afternoon1' => q{ŋdɔ},
+					'morning1' => q{fɔŋli},
+					'night1' => q{zã},
 				},
 				'wide' => {
+					'evening1' => q{fiẽ},
 					'am' => q{ŋdi},
+					'morning2' => q{ŋdi},
+					'night1' => q{zã},
+					'morning1' => q{fɔŋli},
+					'afternoon1' => q{ŋdɔ},
+					'afternoon2' => q{ɣetrɔ},
 					'pm' => q{ɣetrɔ},
+				},
+				'narrow' => {
+					'morning2' => q{ŋdi},
+					'am' => q{ŋ},
+					'evening1' => q{fiẽ},
+					'night1' => q{zã},
+					'morning1' => q{fɔŋli},
+					'afternoon1' => q{ŋdɔ},
+					'afternoon2' => q{ɣetrɔ},
+					'pm' => q{ɣ},
 				},
 			},
 		},
@@ -5115,7 +5279,7 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'hY',
+				'0' => 'HYV',
 				'1' => 'Yŋ'
 			},
 			narrow => {
@@ -5123,8 +5287,8 @@ has 'eras' => (
 				'1' => 'Yŋ'
 			},
 			wide => {
-				'0' => 'Hafi Yesu Va Do ŋgɔ',
-				'1' => 'Yesu Ŋɔli'
+				'0' => 'Hafi Yesu Va',
+				'1' => 'Yesu ŋɔli'
 			},
 		},
 		'hebrew' => {
@@ -5249,10 +5413,10 @@ has 'datetime_formats' => (
 		'ethiopic' => {
 		},
 		'generic' => {
-			'full' => q{{0} {1}},
-			'long' => q{{0} {1}},
-			'medium' => q{{0} {1}},
-			'short' => q{{0} {1}},
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
 			'full' => q{{0} {1}},
@@ -5280,7 +5444,20 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'roc' => {
+			MMMEd => q{E MMM d 'lia'},
+			h => q{a 'ga' h},
+			hm => q{a 'ga' h:mm},
+			hms => q{a 'ga' h:mm:ss},
+			ms => q{'aɖabaƒoƒo' mm:ss},
+		},
+		'japanese' => {
+			MMMEd => q{E MMM d 'lia'},
+			hms => q{a 'ga' h:mm:ss},
+			ms => q{'aɖabaƒoƒo' mm:ss},
+		},
 		'generic' => {
+			E => q{ccc},
 			Ed => q{E d},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
@@ -5315,8 +5492,14 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
+			Bh => q{'ga' h 'le' B 'me'},
+			Bhm => q{'ga' h 'aɖabaƒoƒo' mm 'le' B 'me'},
+			Bhms => q{h:mm:ss 'le' B 'me'},
+			E => q{ccc},
+			EBhm => q{'ga' h:mm 'le' E B 'me'},
+			EBhms => q{'ga' h:mm:ss 'le' E B 'me'},
+			EHm => q{E 'ga' HH:mm},
+			EHms => q{E 'ga' HH:mm:ss},
 			Ed => q{E d},
 			Ehm => q{E a 'ga' h:mm},
 			Ehms => q{E a 'ga' h:mm:ss},
@@ -5327,11 +5510,14 @@ has 'datetime_formats_available_formats' => (
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
+			Hmsv => q{'ga' HH:mm:ss 'le' v},
+			Hmv => q{'ga' HH:mm 'le' v},
 			M => q{L},
 			MEd => q{E, M/d},
 			MMM => q{LLL},
 			MMMEd => q{E, MMM d 'lia'},
 			MMMMEd => q{E, MMMM d 'lia'},
+			MMMMW => q{MMMM 'ƒe' 'kɔsiɖa' W 'lia'},
 			MMMMd => q{MMMM d 'lia'},
 			MMMd => q{MMM d 'lia'},
 			Md => q{M/d},
@@ -5339,6 +5525,8 @@ has 'datetime_formats_available_formats' => (
 			h => q{a 'ga' h},
 			hm => q{a 'ga' h:mm},
 			hms => q{a 'ga' h:mm:ss},
+			hmsv => q{a 'ga' h:mm:ss 'le' v},
+			hmv => q{a 'ga' h:mm 'le' v},
 			ms => q{'aɖabaƒoƒo' mm:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -5350,24 +5538,13 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{M/d/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{'kɔsiɖa' w 'lia' 'le' 'ƒe' Y 'me'},
 		},
 		'buddhist' => {
 			h => q{a 'ga' h},
 			hm => q{a 'ga' h: 'aɖabaƒoƒo' mm},
 			hms => q{a 'ga' h: 'aɖabaƒoƒo' mm:ss},
 			ms => q{'ga' mm:ss},
-		},
-		'japanese' => {
-			MMMEd => q{E MMM d 'lia'},
-			hms => q{a 'ga' h:mm:ss},
-			ms => q{'aɖabaƒoƒo' mm:ss},
-		},
-		'roc' => {
-			MMMEd => q{E MMM d 'lia'},
-			h => q{a 'ga' h},
-			hm => q{a 'ga' h:mm},
-			hms => q{a 'ga' h:mm:ss},
-			ms => q{'aɖabaƒoƒo' mm:ss},
 		},
 	} },
 );
@@ -5377,6 +5554,9 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Timezone' => '{0} {1}',
+		},
 	} },
 );
 
@@ -5584,1795 +5764,2250 @@ has 'time_zone_names' => (
 	init_arg	=> undef,
 	default	=> sub { {
 		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
+		gmtFormat => q({0} GMT),
 		gmtZeroFormat => q(GMT),
-		regionFormat => q({0}),
-		regionFormat => q({0}),
-		regionFormat => q({0}),
+		regionFormat => q({0} gaƒoƒo me),
+		regionFormat => q({0} kele gaƒoƒo me),
+		regionFormat => q({0} nutome gaƒoƒo me),
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Eker dzomeŋɔli gaƒoƒome),
-				'generic' => q(Eker gaƒoƒome),
-				'standard' => q(Eker gaƒoƒoɖoanyime),
+				'daylight' => q#Eker dzomeŋɔli gaƒoƒome#,
+				'generic' => q#Eker gaƒoƒome#,
+				'standard' => q#Eker gaƒoƒoɖoanyime#,
+			},
+		},
+		'Afghanistan' => {
+			long => {
+				'standard' => q#Afghanistan gaƒoƒo me#,
 			},
 		},
 		'Africa/Abidjan' => {
-			exemplarCity => q#Abidzan nutomegaƒoƒome#,
+			exemplarCity => q#Abidjan#,
 		},
 		'Africa/Accra' => {
-			exemplarCity => q#Gɛ̃ nutomegaƒoƒome#,
+			exemplarCity => q#Accra#,
 		},
 		'Africa/Addis_Ababa' => {
-			exemplarCity => q#Addis Ababa nutomegaƒoƒome#,
+			exemplarCity => q#Addis Ababa#,
 		},
 		'Africa/Algiers' => {
-			exemplarCity => q#Algiers nutomegaƒoƒome#,
+			exemplarCity => q#Algiers#,
 		},
 		'Africa/Asmera' => {
-			exemplarCity => q#Asmara nutomegaƒoƒome#,
+			exemplarCity => q#Asmara#,
 		},
 		'Africa/Bamako' => {
-			exemplarCity => q#Bamako nutomegaƒoƒome#,
+			exemplarCity => q#Bamako#,
 		},
 		'Africa/Bangui' => {
-			exemplarCity => q#Bangui nutomegaƒoƒome#,
+			exemplarCity => q#Bangui#,
 		},
 		'Africa/Banjul' => {
-			exemplarCity => q#Bandzul nutomegaƒoƒome#,
+			exemplarCity => q#Banjul#,
 		},
 		'Africa/Bissau' => {
-			exemplarCity => q#Bisao nutomegaƒoƒome#,
+			exemplarCity => q#Bissau#,
 		},
 		'Africa/Blantyre' => {
-			exemplarCity => q#Blantaire nutomegaƒoƒome#,
+			exemplarCity => q#Blantyre#,
 		},
 		'Africa/Brazzaville' => {
-			exemplarCity => q#Brazzaville nutomegaƒoƒome#,
+			exemplarCity => q#Brazzaville#,
 		},
 		'Africa/Bujumbura' => {
-			exemplarCity => q#Budzumbura nutomegaƒoƒome#,
+			exemplarCity => q#Bujumbura#,
 		},
 		'Africa/Cairo' => {
-			exemplarCity => q#Kairo nutomegaƒoƒome#,
+			exemplarCity => q#Cairo#,
 		},
 		'Africa/Casablanca' => {
-			exemplarCity => q#Kasablanka nutomegaƒoƒome#,
+			exemplarCity => q#Casablanca#,
 		},
 		'Africa/Ceuta' => {
-			exemplarCity => q#Keuta nutomegaƒoƒome#,
+			exemplarCity => q#Ceuta#,
 		},
 		'Africa/Conakry' => {
-			exemplarCity => q#Konakry nutomegaƒoƒome#,
+			exemplarCity => q#Conakry#,
 		},
 		'Africa/Dakar' => {
-			exemplarCity => q#Dakar nutomegaƒoƒome#,
+			exemplarCity => q#Dakar#,
 		},
 		'Africa/Dar_es_Salaam' => {
-			exemplarCity => q#Dar es Salam nutomegaƒoƒome#,
+			exemplarCity => q#Dar es Salaam#,
 		},
 		'Africa/Djibouti' => {
-			exemplarCity => q#Dzibuti nutomegaƒoƒome#,
+			exemplarCity => q#Djibouti#,
 		},
 		'Africa/Douala' => {
-			exemplarCity => q#Doula nutomegaƒoƒome#,
+			exemplarCity => q#Douala#,
 		},
 		'Africa/El_Aaiun' => {
-			exemplarCity => q#El Aaiun nutomegaƒoƒome#,
+			exemplarCity => q#El Aaiun#,
 		},
 		'Africa/Freetown' => {
-			exemplarCity => q#Freetown nutomegaƒoƒome#,
+			exemplarCity => q#Freetown#,
 		},
 		'Africa/Gaborone' => {
-			exemplarCity => q#Gaborone nutomegaƒoƒome#,
+			exemplarCity => q#Gaborone#,
 		},
 		'Africa/Harare' => {
-			exemplarCity => q#Harare nutomegaƒoƒome#,
+			exemplarCity => q#Harare#,
 		},
 		'Africa/Johannesburg' => {
-			exemplarCity => q#Yohannesburg nutomegaƒoƒome#,
+			exemplarCity => q#Johannesburg#,
+		},
+		'Africa/Juba' => {
+			exemplarCity => q#Juba#,
 		},
 		'Africa/Kampala' => {
-			exemplarCity => q#Kampala nutomegaƒoƒome#,
+			exemplarCity => q#Kampala#,
 		},
 		'Africa/Khartoum' => {
-			exemplarCity => q#Khartoum nutomegaƒoƒome#,
+			exemplarCity => q#Khartoum#,
 		},
 		'Africa/Kigali' => {
-			exemplarCity => q#Kigali nutomegaƒoƒome#,
+			exemplarCity => q#Kigali#,
 		},
 		'Africa/Kinshasa' => {
-			exemplarCity => q#Kinshasa nutomegaƒoƒome#,
+			exemplarCity => q#Kinshasa#,
 		},
 		'Africa/Lagos' => {
-			exemplarCity => q#Lagos nutomegaƒoƒome#,
+			exemplarCity => q#Lagos#,
 		},
 		'Africa/Libreville' => {
-			exemplarCity => q#Libreville nutomegaƒoƒome#,
+			exemplarCity => q#Libreville#,
 		},
 		'Africa/Lome' => {
-			exemplarCity => q#Lome nutomegaƒoƒome#,
+			exemplarCity => q#Lome#,
 		},
 		'Africa/Luanda' => {
-			exemplarCity => q#Luanda nutomegaƒoƒome#,
+			exemplarCity => q#Luanda#,
 		},
 		'Africa/Lubumbashi' => {
-			exemplarCity => q#Lubumbashi nutomegaƒoƒome#,
+			exemplarCity => q#Lubumbashi#,
 		},
 		'Africa/Lusaka' => {
-			exemplarCity => q#Lusaka nutomegaƒoƒome#,
+			exemplarCity => q#Lusaka#,
 		},
 		'Africa/Malabo' => {
-			exemplarCity => q#Malabo nutomegaƒoƒome#,
+			exemplarCity => q#Malabo#,
 		},
 		'Africa/Maputo' => {
-			exemplarCity => q#Maputo nutomegaƒoƒome#,
+			exemplarCity => q#Maputo#,
 		},
 		'Africa/Maseru' => {
-			exemplarCity => q#Maseru nutomegaƒoƒome#,
+			exemplarCity => q#Maseru#,
 		},
 		'Africa/Mbabane' => {
-			exemplarCity => q#Mbabane nutomegaƒoƒome#,
+			exemplarCity => q#Mbabane#,
 		},
 		'Africa/Mogadishu' => {
-			exemplarCity => q#Mogadishu nutomegaƒoƒome#,
+			exemplarCity => q#Mogadishu#,
 		},
 		'Africa/Monrovia' => {
-			exemplarCity => q#Monrovia nutomegaƒoƒome#,
+			exemplarCity => q#Monrovia#,
 		},
 		'Africa/Nairobi' => {
-			exemplarCity => q#Nairobi nutomegaƒoƒome#,
+			exemplarCity => q#Nairobi#,
 		},
 		'Africa/Ndjamena' => {
-			exemplarCity => q#Ndzamena nutomegaƒoƒome#,
+			exemplarCity => q#Ndjamena#,
 		},
 		'Africa/Niamey' => {
-			exemplarCity => q#Niamey nutomegaƒoƒome#,
+			exemplarCity => q#Niamey#,
 		},
 		'Africa/Nouakchott' => {
-			exemplarCity => q#Nouakchott nutomegaƒoƒome#,
+			exemplarCity => q#Nouakchott#,
 		},
 		'Africa/Ouagadougou' => {
-			exemplarCity => q#Ouagadugu nutomegaƒoƒome#,
+			exemplarCity => q#Ouagadougou#,
 		},
 		'Africa/Porto-Novo' => {
-			exemplarCity => q#Pɔto-Novo nutomegaƒoƒome#,
+			exemplarCity => q#Porto-Novo#,
 		},
 		'Africa/Sao_Tome' => {
-			exemplarCity => q#Sao Tome nutomegaƒoƒome#,
+			exemplarCity => q#Sao Tome#,
 		},
 		'Africa/Tripoli' => {
-			exemplarCity => q#Tripoli nutomegaƒoƒome#,
+			exemplarCity => q#Tripoli#,
 		},
 		'Africa/Tunis' => {
-			exemplarCity => q#Tunis nutomegaƒoƒome#,
+			exemplarCity => q#Tunis#,
 		},
 		'Africa/Windhoek' => {
-			exemplarCity => q#Windhoek nutomegaƒoƒome#,
+			exemplarCity => q#Windhoek#,
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Titina Afrika gaƒoƒome),
+				'standard' => q#Central Africa gaƒoƒo me#,
 			},
 			short => {
-				'standard' => q(CAT),
+				'standard' => q#CAT#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Ɣedzeƒe Africa gaƒoƒome),
+				'standard' => q#East Africa gaƒoƒo me#,
 			},
 			short => {
-				'standard' => q(EAT),
+				'standard' => q#EAT#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Anyiehe Africa gaƒoƒome),
+				'standard' => q#South Africa nutome gaƒoƒo me#,
 			},
 			short => {
-				'standard' => q(SAST),
+				'standard' => q#SAST#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Ɣetoɖoƒe Africa ŋkekeme gaƒoƒome),
-				'generic' => q(Ɣetoɖoƒe Africa gaƒoƒome),
-				'standard' => q(Ɣetoɖoƒe Afrika gaƒoƒoɖoanyime),
+				'daylight' => q#West Africa dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#West Africa gaƒoƒo me#,
+				'standard' => q#West Africa nutome gaƒoƒo me#,
 			},
 			short => {
-				'daylight' => q(WAST),
-				'generic' => q(WAT),
-				'standard' => q(WAT),
+				'daylight' => q#WAST#,
+				'generic' => q#WAT#,
+				'standard' => q#WAT#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Alaska ŋkekeme gaƒoƒome),
-				'generic' => q(Alaska gaƒoƒome),
-				'standard' => q(Alaska gaƒoƒoɖoanyime),
+				'daylight' => q#Alaska kele gaƒoƒo me#,
+				'generic' => q#Alaska gaƒoƒome#,
+				'standard' => q#Alaska nutome gaƒoƒo me#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Almati dzomeŋɔli gaƒoƒome),
-				'generic' => q(Almati gaƒoƒome),
-				'standard' => q(Almati gaƒoƒoɖoanyime),
+				'daylight' => q#Almati dzomeŋɔli gaƒoƒome#,
+				'generic' => q#Almati gaƒoƒome#,
+				'standard' => q#Almati gaƒoƒoɖoanyime#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazon dzomeŋɔli gaƒoƒome),
-				'generic' => q(Amazon gaƒoƒome),
-				'standard' => q(Amazon gaƒoƒoɖoanyime),
+				'daylight' => q#Amazon dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Amazon gaƒoƒome#,
+				'standard' => q#Amazon nutome gaƒoƒo me#,
 			},
 		},
 		'America/Adak' => {
-			exemplarCity => q#Adak nutomegaƒoƒome#,
+			exemplarCity => q#Adak#,
 		},
 		'America/Anchorage' => {
-			exemplarCity => q#Anchorage nutomegaƒoƒome#,
+			exemplarCity => q#Anchorage#,
 		},
 		'America/Anguilla' => {
-			exemplarCity => q#Anguilla nutomegaƒoƒome#,
+			exemplarCity => q#Anguilla#,
 		},
 		'America/Antigua' => {
-			exemplarCity => q#Antigua nutomegaƒoƒome#,
+			exemplarCity => q#Antigua#,
 		},
 		'America/Araguaina' => {
-			exemplarCity => q#Araguaina nutomegaƒoƒome#,
+			exemplarCity => q#Araguaina#,
 		},
 		'America/Argentina/La_Rioja' => {
-			exemplarCity => q#La Rioha nutomegaƒoƒome#,
+			exemplarCity => q#La Rioja#,
 		},
 		'America/Argentina/Rio_Gallegos' => {
-			exemplarCity => q#Rio Gallegos nutomegaƒoƒome#,
+			exemplarCity => q#Rio Gallegos#,
 		},
 		'America/Argentina/Salta' => {
-			exemplarCity => q#Salta nutomegaƒoƒome#,
+			exemplarCity => q#Salta#,
 		},
 		'America/Argentina/San_Juan' => {
-			exemplarCity => q#San Dzuan nutomegaƒoƒome#,
+			exemplarCity => q#San Juan#,
 		},
 		'America/Argentina/San_Luis' => {
-			exemplarCity => q#San Luis nutomegaƒoƒome#,
+			exemplarCity => q#San Luis#,
 		},
 		'America/Argentina/Tucuman' => {
-			exemplarCity => q#Tukuman nutomegaƒoƒome#,
+			exemplarCity => q#Tucuman#,
 		},
 		'America/Argentina/Ushuaia' => {
-			exemplarCity => q#Ushuaia nutomegaƒoƒome#,
+			exemplarCity => q#Ushuaia#,
 		},
 		'America/Aruba' => {
-			exemplarCity => q#Aruba nutomegaƒoƒome#,
+			exemplarCity => q#Aruba#,
 		},
 		'America/Asuncion' => {
-			exemplarCity => q#Asunsion nutomegaƒoƒome#,
+			exemplarCity => q#Asuncion#,
 		},
 		'America/Bahia' => {
-			exemplarCity => q#Bahia nutomegaƒoƒome#,
+			exemplarCity => q#Bahia#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#Bahia Banderas#,
 		},
 		'America/Barbados' => {
-			exemplarCity => q#Barbados nutomegaƒoƒome#,
+			exemplarCity => q#Barbados#,
 		},
 		'America/Belem' => {
-			exemplarCity => q#Belem nutomegaƒoƒome#,
+			exemplarCity => q#Belem#,
 		},
 		'America/Belize' => {
-			exemplarCity => q#Belize nutomegaƒoƒome#,
+			exemplarCity => q#Belize#,
 		},
 		'America/Blanc-Sablon' => {
-			exemplarCity => q#Blank-Sablon nutomegaƒoƒome#,
+			exemplarCity => q#Blanc-Sablon#,
 		},
 		'America/Boa_Vista' => {
-			exemplarCity => q#Boa Vista nutomegaƒoƒome#,
+			exemplarCity => q#Boa Vista#,
 		},
 		'America/Bogota' => {
-			exemplarCity => q#Bogota nutomegaƒoƒome#,
+			exemplarCity => q#Bogota#,
 		},
 		'America/Boise' => {
-			exemplarCity => q#Boise nutomegaƒoƒome#,
+			exemplarCity => q#Boise#,
 		},
 		'America/Buenos_Aires' => {
-			exemplarCity => q#Buenos Aires nutomegaƒoƒome#,
+			exemplarCity => q#Buenos Aires#,
 		},
 		'America/Cambridge_Bay' => {
-			exemplarCity => q#Kambridge Bay nutomegaƒoƒome#,
+			exemplarCity => q#Cambridge Bay#,
 		},
 		'America/Campo_Grande' => {
-			exemplarCity => q#Kampo Grande nutomegaƒoƒome#,
+			exemplarCity => q#Campo Grande#,
 		},
 		'America/Cancun' => {
-			exemplarCity => q#Kankun nutomegaƒoƒome#,
+			exemplarCity => q#Cancun#,
 		},
 		'America/Caracas' => {
-			exemplarCity => q#Karakas nutomegaƒoƒome#,
+			exemplarCity => q#Caracas#,
 		},
 		'America/Catamarca' => {
-			exemplarCity => q#Katamaka nutomegaƒoƒome#,
+			exemplarCity => q#Catamarca#,
 		},
 		'America/Cayenne' => {
-			exemplarCity => q#Kayenne nutomegaƒoƒome#,
+			exemplarCity => q#Cayenne#,
 		},
 		'America/Cayman' => {
-			exemplarCity => q#Keman nutomegaƒoƒome#,
+			exemplarCity => q#Cayman#,
 		},
 		'America/Chicago' => {
-			exemplarCity => q#Tsikago nutomegaƒoƒome#,
+			exemplarCity => q#Chicago#,
 		},
 		'America/Chihuahua' => {
-			exemplarCity => q#Tsihuahua nutomegaƒoƒome#,
+			exemplarCity => q#Chihuahua#,
 		},
 		'America/Coral_Harbour' => {
-			exemplarCity => q#Atikokannutomegaƒoƒome#,
+			exemplarCity => q#Atikokan#,
 		},
 		'America/Cordoba' => {
-			exemplarCity => q#Kɔdoba nutomegaƒoƒome#,
+			exemplarCity => q#Cordoba#,
 		},
 		'America/Costa_Rica' => {
-			exemplarCity => q#Kɔsta Rika nutomegaƒoƒome#,
+			exemplarCity => q#Costa Rica#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#Creston#,
 		},
 		'America/Cuiaba' => {
-			exemplarCity => q#Kuiaba nutomegaƒoƒome#,
+			exemplarCity => q#Cuiaba#,
 		},
 		'America/Curacao' => {
-			exemplarCity => q#Kurakao nutomegaƒoƒome#,
+			exemplarCity => q#Curacao#,
 		},
 		'America/Danmarkshavn' => {
-			exemplarCity => q#Danmarkshavn nutomegaƒoƒome#,
+			exemplarCity => q#Danmarkshavn#,
 		},
 		'America/Dawson' => {
-			exemplarCity => q#Dɔwson nutomegaƒoƒome#,
+			exemplarCity => q#Dawson#,
 		},
 		'America/Dawson_Creek' => {
-			exemplarCity => q#Dawson Krik nutomegaƒoƒome#,
+			exemplarCity => q#Dawson Creek#,
 		},
 		'America/Denver' => {
-			exemplarCity => q#Denva nutomegaƒoƒome#,
+			exemplarCity => q#Denver#,
 		},
 		'America/Detroit' => {
-			exemplarCity => q#Detrɔit nutomegaƒoƒome#,
+			exemplarCity => q#Detroit#,
 		},
 		'America/Dominica' => {
-			exemplarCity => q#Dominika nutomegaƒoƒome#,
+			exemplarCity => q#Dominica#,
 		},
 		'America/Edmonton' => {
-			exemplarCity => q#Edmonton nutomegaƒoƒome#,
+			exemplarCity => q#Edmonton#,
 		},
 		'America/Eirunepe' => {
-			exemplarCity => q#Eirunepe nutomegaƒoƒome#,
+			exemplarCity => q#Eirunepe#,
 		},
 		'America/El_Salvador' => {
-			exemplarCity => q#El Salvadɔ nutomegaƒoƒome#,
+			exemplarCity => q#El Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
-			exemplarCity => q#Fortaleza nutomegaƒoƒome#,
+			exemplarCity => q#Fortaleza#,
 		},
 		'America/Glace_Bay' => {
-			exemplarCity => q#Glaise Bay nutomegaƒoƒome#,
+			exemplarCity => q#Glace Bay#,
 		},
 		'America/Godthab' => {
-			exemplarCity => q#Godthab nutomegaƒoƒome#,
+			exemplarCity => q#Nuuk#,
 		},
 		'America/Goose_Bay' => {
-			exemplarCity => q#Guse Bay nutomegaƒoƒome#,
+			exemplarCity => q#Goose Bay#,
 		},
 		'America/Grand_Turk' => {
-			exemplarCity => q#Grand Tɛk nutomegaƒoƒome#,
+			exemplarCity => q#Grand Turk#,
 		},
 		'America/Grenada' => {
-			exemplarCity => q#Grenada nutomegaƒoƒome#,
+			exemplarCity => q#Grenada#,
 		},
 		'America/Guadeloupe' => {
-			exemplarCity => q#Guadelupe nutomegaƒoƒome#,
+			exemplarCity => q#Guadeloupe#,
 		},
 		'America/Guatemala' => {
-			exemplarCity => q#Guatemala nutomegaƒoƒome#,
+			exemplarCity => q#Guatemala#,
 		},
 		'America/Guayaquil' => {
-			exemplarCity => q#Guayakuil nutomegaƒoƒome#,
+			exemplarCity => q#Guayaquil#,
 		},
 		'America/Guyana' => {
-			exemplarCity => q#Gayana nutomegaƒoƒome#,
+			exemplarCity => q#Guyana#,
 		},
 		'America/Halifax' => {
-			exemplarCity => q#Halifaks nutomegaƒoƒome#,
+			exemplarCity => q#Halifax#,
 		},
 		'America/Havana' => {
-			exemplarCity => q#Havana nutomegaƒoƒome#,
+			exemplarCity => q#Havana#,
 		},
 		'America/Hermosillo' => {
-			exemplarCity => q#Hermosillo nutomegaƒoƒome#,
+			exemplarCity => q#Hermosillo#,
 		},
 		'America/Indiana/Knox' => {
-			exemplarCity => q#Knox, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Knox, Indiana#,
 		},
 		'America/Indiana/Marengo' => {
-			exemplarCity => q#Marengo, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Marengo, Indiana#,
 		},
 		'America/Indiana/Petersburg' => {
-			exemplarCity => q#Petersburg, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Petersburg, Indiana#,
 		},
 		'America/Indiana/Tell_City' => {
-			exemplarCity => q#Telldugã, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Tell City, Indiana#,
 		},
 		'America/Indiana/Vevay' => {
-			exemplarCity => q#Vevay, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Vevay, Indiana#,
 		},
 		'America/Indiana/Vincennes' => {
-			exemplarCity => q#Vinsennes, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Vincennes, Indiana#,
 		},
 		'America/Indiana/Winamac' => {
-			exemplarCity => q#Winamak, Indiana nutomegaƒoƒome#,
+			exemplarCity => q#Winamac, Indiana#,
 		},
 		'America/Indianapolis' => {
-			exemplarCity => q#Indianapolis nutomegaƒoƒome#,
+			exemplarCity => q#Indianapolis#,
 		},
 		'America/Inuvik' => {
-			exemplarCity => q#Inuvik nutomegaƒoƒome#,
+			exemplarCity => q#Inuvik#,
 		},
 		'America/Iqaluit' => {
-			exemplarCity => q#Ikaluit nutomegaƒoƒome#,
+			exemplarCity => q#Iqaluit#,
 		},
 		'America/Jamaica' => {
-			exemplarCity => q#Dzamaika nutomegaƒoƒome#,
+			exemplarCity => q#Jamaica#,
 		},
 		'America/Jujuy' => {
-			exemplarCity => q#Dzudzoi nutomegaƒoƒome#,
+			exemplarCity => q#Jujuy#,
 		},
 		'America/Juneau' => {
-			exemplarCity => q#Dzuneau nutomegaƒoƒome#,
+			exemplarCity => q#Juneau#,
 		},
 		'America/Kentucky/Monticello' => {
-			exemplarCity => q#Montisello, Kentaki nutomegaƒoƒome#,
+			exemplarCity => q#Monticello, Kentucky#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#Kralendijk#,
 		},
 		'America/La_Paz' => {
-			exemplarCity => q#La Paz nutomegaƒoƒome#,
+			exemplarCity => q#La Paz#,
 		},
 		'America/Lima' => {
-			exemplarCity => q#Lima nutomegaƒoƒome#,
+			exemplarCity => q#Lima#,
 		},
 		'America/Los_Angeles' => {
-			exemplarCity => q#Los Angeles nutomegaƒoƒome#,
+			exemplarCity => q#Los Angeles#,
 		},
 		'America/Louisville' => {
-			exemplarCity => q#Louisville nutomegaƒoƒome#,
+			exemplarCity => q#Louisville#,
 		},
 		'America/Lower_Princes' => {
-			exemplarCity => q#Lowa Prins Kɔta nutomegaƒoƒome#,
+			exemplarCity => q#Lower Prince’s Quarter#,
 		},
 		'America/Maceio' => {
-			exemplarCity => q#Maseio nutomegaƒoƒome#,
+			exemplarCity => q#Maceio#,
 		},
 		'America/Managua' => {
-			exemplarCity => q#Managua nutomegaƒoƒome#,
+			exemplarCity => q#Managua#,
 		},
 		'America/Manaus' => {
-			exemplarCity => q#Manaus nutomegaƒoƒome#,
+			exemplarCity => q#Manaus#,
 		},
 		'America/Marigot' => {
-			exemplarCity => q#Marigot nutomegaƒoƒome#,
+			exemplarCity => q#Marigot#,
 		},
 		'America/Martinique' => {
-			exemplarCity => q#Martinik nutomegaƒoƒome#,
+			exemplarCity => q#Martinique#,
+		},
+		'America/Matamoros' => {
+			exemplarCity => q#Matamoros#,
 		},
 		'America/Mazatlan' => {
-			exemplarCity => q#Mazatlan nutomegaƒoƒome#,
+			exemplarCity => q#Mazatlan#,
 		},
 		'America/Mendoza' => {
-			exemplarCity => q#Mendoza nutomegaƒoƒome#,
+			exemplarCity => q#Mendoza#,
 		},
 		'America/Menominee' => {
-			exemplarCity => q#Menomini nutomegaƒoƒome#,
+			exemplarCity => q#Menominee#,
 		},
 		'America/Merida' => {
-			exemplarCity => q#Merida nutomegaƒoƒome#,
+			exemplarCity => q#Merida#,
+		},
+		'America/Metlakatla' => {
+			exemplarCity => q#Metlakatla#,
 		},
 		'America/Mexico_City' => {
-			exemplarCity => q#Meksikodugã nutomegaƒoƒome#,
+			exemplarCity => q#Mexico City#,
 		},
 		'America/Miquelon' => {
-			exemplarCity => q#Miquelon nutomegaƒoƒome#,
+			exemplarCity => q#Miquelon#,
 		},
 		'America/Moncton' => {
-			exemplarCity => q#Moncton nutomegaƒoƒome#,
+			exemplarCity => q#Moncton#,
 		},
 		'America/Monterrey' => {
-			exemplarCity => q#Monterrey nutomegaƒoƒome#,
+			exemplarCity => q#Monterrey#,
 		},
 		'America/Montevideo' => {
-			exemplarCity => q#Montevideo nutomegaƒoƒome#,
+			exemplarCity => q#Montevideo#,
 		},
 		'America/Montserrat' => {
-			exemplarCity => q#Montserrat nutomegaƒoƒome#,
+			exemplarCity => q#Montserrat#,
 		},
 		'America/Nassau' => {
-			exemplarCity => q#Nassau nutomegaƒoƒome#,
+			exemplarCity => q#Nassau#,
 		},
 		'America/New_York' => {
-			exemplarCity => q#New York nutomegaƒoƒome#,
+			exemplarCity => q#New York#,
 		},
 		'America/Nipigon' => {
-			exemplarCity => q#Nipigon nutomegaƒoƒome#,
+			exemplarCity => q#Nipigon#,
 		},
 		'America/Nome' => {
-			exemplarCity => q#Nome nutomegaƒoƒome#,
+			exemplarCity => q#Nome#,
 		},
 		'America/Noronha' => {
-			exemplarCity => q#Noronha nutomegaƒoƒome#,
+			exemplarCity => q#Noronha#,
 		},
 		'America/North_Dakota/Beulah' => {
-			exemplarCity => q#Beulah, North Dakota nutomegaƒoƒome#,
+			exemplarCity => q#Beulah, North Dakota#,
 		},
 		'America/North_Dakota/Center' => {
-			exemplarCity => q#Titina, North Dakota nutomegaƒoƒome#,
+			exemplarCity => q#Center, North Dakota#,
 		},
 		'America/North_Dakota/New_Salem' => {
-			exemplarCity => q#New Salem, North Dakota nutomegaƒoƒome#,
+			exemplarCity => q#New Salem, North Dakota#,
+		},
+		'America/Ojinaga' => {
+			exemplarCity => q#Ojinaga#,
 		},
 		'America/Panama' => {
-			exemplarCity => q#Panama nutomegaƒoƒome#,
+			exemplarCity => q#Panama#,
 		},
 		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnirtung nutomegaƒoƒome#,
+			exemplarCity => q#Pangnirtung#,
 		},
 		'America/Paramaribo' => {
-			exemplarCity => q#Paramaribo nutomegaƒoƒome#,
+			exemplarCity => q#Paramaribo#,
 		},
 		'America/Phoenix' => {
-			exemplarCity => q#Foenix nutomegaƒoƒome#,
+			exemplarCity => q#Phoenix#,
 		},
 		'America/Port-au-Prince' => {
-			exemplarCity => q#Pɔrt-au-Princenutomegaƒoƒome#,
+			exemplarCity => q#Port-au-Prince#,
 		},
 		'America/Port_of_Spain' => {
-			exemplarCity => q#Pɔrt of Spain nutomegaƒoƒome#,
+			exemplarCity => q#Port of Spain#,
 		},
 		'America/Porto_Velho' => {
-			exemplarCity => q#Pɔrto Velho nutomegaƒoƒome#,
+			exemplarCity => q#Porto Velho#,
 		},
 		'America/Puerto_Rico' => {
-			exemplarCity => q#Puerto Riko nutomegaƒoƒome#,
+			exemplarCity => q#Puerto Rico#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
 		},
 		'America/Rainy_River' => {
-			exemplarCity => q#Raini Riva nutomegaƒoƒome#,
+			exemplarCity => q#Rainy River#,
 		},
 		'America/Rankin_Inlet' => {
-			exemplarCity => q#Rankin Inlet nutomegaƒoƒome#,
+			exemplarCity => q#Rankin Inlet#,
 		},
 		'America/Recife' => {
-			exemplarCity => q#Resife nutomegaƒoƒome#,
+			exemplarCity => q#Recife#,
 		},
 		'America/Regina' => {
-			exemplarCity => q#Regina nutomegaƒoƒome#,
+			exemplarCity => q#Regina#,
 		},
 		'America/Resolute' => {
-			exemplarCity => q#Resolute nutomegaƒoƒome#,
+			exemplarCity => q#Resolute#,
 		},
 		'America/Rio_Branco' => {
-			exemplarCity => q#Rio Branko nutomegaƒoƒome#,
+			exemplarCity => q#Rio Branco#,
 		},
 		'America/Santarem' => {
-			exemplarCity => q#Santarem nutomegaƒoƒome#,
+			exemplarCity => q#Santarem#,
 		},
 		'America/Santiago' => {
-			exemplarCity => q#Santiago nutomegaƒoƒome#,
+			exemplarCity => q#Santiago#,
 		},
 		'America/Santo_Domingo' => {
-			exemplarCity => q#Santo Domingo nutomegaƒoƒome#,
+			exemplarCity => q#Santo Domingo#,
 		},
 		'America/Sao_Paulo' => {
-			exemplarCity => q#Sao Paulo nutomegaƒoƒome#,
+			exemplarCity => q#Sao Paulo#,
 		},
 		'America/Scoresbysund' => {
-			exemplarCity => q#Skɔsbisund nutomegaƒoƒome#,
+			exemplarCity => q#Ittoqqortoormiit#,
+		},
+		'America/Sitka' => {
+			exemplarCity => q#Sitka#,
 		},
 		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthelemy nutomegaƒoƒome#,
+			exemplarCity => q#St. Barthelemy#,
 		},
 		'America/St_Johns' => {
-			exemplarCity => q#St. Yohannes nutomegaƒoƒome#,
+			exemplarCity => q#St. John’s#,
 		},
 		'America/St_Kitts' => {
-			exemplarCity => q#St. Kitis nutomegaƒoƒome#,
+			exemplarCity => q#St. Kitts#,
 		},
 		'America/St_Lucia' => {
-			exemplarCity => q#St. Lusia nutomegaƒoƒome#,
+			exemplarCity => q#St. Lucia#,
 		},
 		'America/St_Thomas' => {
-			exemplarCity => q#St. Toma nutomegaƒoƒome#,
+			exemplarCity => q#St. Thomas#,
 		},
 		'America/St_Vincent' => {
-			exemplarCity => q#St. Vincent nutomegaƒoƒome#,
+			exemplarCity => q#St. Vincent#,
 		},
 		'America/Swift_Current' => {
-			exemplarCity => q#Swift Kurrent nutomegaƒoƒome#,
+			exemplarCity => q#Swift Current#,
 		},
 		'America/Tegucigalpa' => {
-			exemplarCity => q#Tegukigalpa nutomegaƒoƒome#,
+			exemplarCity => q#Tegucigalpa#,
 		},
 		'America/Thule' => {
-			exemplarCity => q#Thule nutomegaƒoƒome#,
+			exemplarCity => q#Thule#,
 		},
 		'America/Thunder_Bay' => {
-			exemplarCity => q#Thunder Bay nutomegaƒoƒome#,
+			exemplarCity => q#Thunder Bay#,
 		},
 		'America/Tijuana' => {
-			exemplarCity => q#Tihuana nutomegaƒoƒome#,
+			exemplarCity => q#Tijuana#,
 		},
 		'America/Toronto' => {
-			exemplarCity => q#Toronto nutomegaƒoƒome#,
+			exemplarCity => q#Toronto#,
 		},
 		'America/Tortola' => {
-			exemplarCity => q#Tɔtola nutomegaƒoƒome#,
+			exemplarCity => q#Tortola#,
 		},
 		'America/Vancouver' => {
-			exemplarCity => q#Vankouver nutomegaƒoƒome#,
+			exemplarCity => q#Vancouver#,
 		},
 		'America/Whitehorse' => {
-			exemplarCity => q#Whitehorse nutomegaƒoƒome#,
+			exemplarCity => q#Whitehorse#,
 		},
 		'America/Winnipeg' => {
-			exemplarCity => q#Winnipeg nutomegaƒoƒome#,
+			exemplarCity => q#Winnipeg#,
 		},
 		'America/Yakutat' => {
-			exemplarCity => q#Yakutat nutomegaƒoƒome#,
+			exemplarCity => q#Yakutat#,
 		},
 		'America/Yellowknife' => {
-			exemplarCity => q#Yellownaif nutomegaƒoƒome#,
+			exemplarCity => q#Yellowknife#,
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Titina America ŋkekeme gaƒoƒome),
-				'generic' => q(Titina America gaƒoƒome),
-				'standard' => q(Titina America gaƒoƒoɖoanyime),
+				'daylight' => q#Titina America kele gaƒoƒo me#,
+				'generic' => q#Titina America gaƒoƒome#,
+				'standard' => q#Titina America nutome gaƒoƒo me#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Ɣedzeƒe America ŋkekeme gaƒoƒome),
-				'generic' => q(Ɣedzeƒe America gaƒoƒome),
-				'standard' => q(Ɣedzeƒe America gaƒoƒoɖoanyime),
+				'daylight' => q#Eastern America kele gaƒoƒo me#,
+				'generic' => q#Eastern America gaƒoƒo me#,
+				'standard' => q#Eastern America nutome gaƒoƒo me#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(America Todzidukɔwo ƒe ŋkekme gaƒoƒome),
-				'generic' => q(America Todzidukɔwo ƒe gaƒoƒome),
-				'standard' => q(America Todzidukɔwo ƒe gaƒoƒoɖoanyime),
+				'daylight' => q#Mountain kele gaƒoƒo me#,
+				'generic' => q#Mountain gaƒoƒo me#,
+				'standard' => q#Mountain nutome gaƒoƒo me#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Pacific ŋkekme gaƒoƒome),
-				'generic' => q(Pacific gaƒoƒome),
-				'standard' => q(Pacific gaƒoƒoɖoanyime),
+				'daylight' => q#Pacific kele gaƒoƒo me#,
+				'generic' => q#Pacific gaƒoƒome#,
+				'standard' => q#Pacific nutome gaƒoƒo me#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadir ŋkekeme gaƒoƒome),
-				'generic' => q(Anadir gaƒoƒome),
-				'standard' => q(Anadir gaƒoƒoɖoanyime),
+				'daylight' => q#Anadir ŋkekeme gaƒoƒome#,
+				'generic' => q#Anadir gaƒoƒome#,
+				'standard' => q#Anadir gaƒoƒoɖoanyime#,
 			},
 		},
 		'Antarctica/Casey' => {
-			exemplarCity => q#Kasey nutomegaƒoƒome#,
+			exemplarCity => q#Casey#,
 		},
 		'Antarctica/Davis' => {
-			exemplarCity => q#Davis nutomegaƒoƒome#,
+			exemplarCity => q#Davis#,
 		},
 		'Antarctica/DumontDUrville' => {
-			exemplarCity => q#Dumont d’Urville nutomegaƒoƒome#,
+			exemplarCity => q#Dumont d’Urville#,
+		},
+		'Antarctica/Macquarie' => {
+			exemplarCity => q#Macquarie#,
 		},
 		'Antarctica/Mawson' => {
-			exemplarCity => q#Mawson nutomegaƒoƒome#,
+			exemplarCity => q#Mawson#,
 		},
 		'Antarctica/McMurdo' => {
-			exemplarCity => q#MacMurdo nutomegaƒoƒome#,
+			exemplarCity => q#McMurdo#,
 		},
 		'Antarctica/Palmer' => {
-			exemplarCity => q#Palmer nutomegaƒoƒome#,
+			exemplarCity => q#Palmer#,
 		},
 		'Antarctica/Rothera' => {
-			exemplarCity => q#Rothera nutomegaƒoƒome#,
+			exemplarCity => q#Rothera#,
 		},
 		'Antarctica/Syowa' => {
-			exemplarCity => q#Syowa nutomegaƒoƒome#,
+			exemplarCity => q#Syowa#,
+		},
+		'Antarctica/Troll' => {
+			exemplarCity => q#Troll#,
 		},
 		'Antarctica/Vostok' => {
-			exemplarCity => q#Vostok nutomegaƒoƒome#,
+			exemplarCity => q#Vostok#,
+		},
+		'Apia' => {
+			long => {
+				'daylight' => q#Apia kele gaƒoƒo me#,
+				'generic' => q#Apia gaƒoƒo me#,
+				'standard' => q#Apia nutome gaƒoƒo me#,
+			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Aktau dzomeŋɔli gaƒoƒome),
-				'generic' => q(Aktau gaƒoƒome),
-				'standard' => q(Aktau gaƒoƒoɖoanyime),
+				'daylight' => q#Aktau dzomeŋɔli gaƒoƒome#,
+				'generic' => q#Aktau gaƒoƒome#,
+				'standard' => q#Aktau gaƒoƒoɖoanyime#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Akttobe gaƒoƒome),
-				'generic' => q(Aktobe gaƒoƒome),
-				'standard' => q(Aktobe gaƒoƒoɖoanyime),
+				'daylight' => q#Akttobe gaƒoƒome#,
+				'generic' => q#Aktobe gaƒoƒome#,
+				'standard' => q#Aktobe gaƒoƒoɖoanyime#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabia ŋkekeme gaƒoƒome),
-				'generic' => q(Arabia gaƒoƒome),
-				'standard' => q(Arabia gaƒoƒoɖoanyime),
+				'daylight' => q#Arabia dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Arabia gaƒoƒo me#,
+				'standard' => q#Arabia nutome gaƒoƒo me#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
-			exemplarCity => q#Longyearbiyen nutomegaƒoƒome#,
+			exemplarCity => q#Longyearbyen#,
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentina dzomeŋɔli gaƒoƒome),
-				'generic' => q(Argentina gaƒoƒome),
-				'standard' => q(Argentina gaƒoƒoɖoanyime),
+				'daylight' => q#Argentina dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Argentina gaƒoƒo me#,
+				'standard' => q#Argentina nutome gaƒoƒo me#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Ɣetoɖoƒe Argentina dzomeŋɔli gaƒoƒome),
-				'generic' => q(Ɣetoɖoƒe Argentina gaƒoƒome),
-				'standard' => q(Ɣetoɖoƒe Argentina gaƒoƒoɖoanyime),
+				'daylight' => q#Ɣetoɖoƒe Argentina dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Ɣetoɖoƒe Argentina gaƒoƒo me#,
+				'standard' => q#Ɣetoɖoƒe Argentina nutome gaƒoƒo me#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Armenia dzomeŋɔli gaƒoƒome),
-				'generic' => q(Armenia gaƒoƒome),
-				'standard' => q(Armenia gaƒoƒoɖoanyime),
+				'daylight' => q#Armenia dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Armenia gaƒoƒo me#,
+				'standard' => q#Armenia nutome gaƒoƒo me#,
 			},
 		},
 		'Asia/Aden' => {
-			exemplarCity => q#Aden nutomegaƒoƒome#,
+			exemplarCity => q#Aden#,
 		},
 		'Asia/Almaty' => {
-			exemplarCity => q#Almati nutomegaƒoƒome#,
+			exemplarCity => q#Almaty#,
 		},
 		'Asia/Amman' => {
-			exemplarCity => q#Amman nutomegaƒoƒome#,
+			exemplarCity => q#Amman#,
 		},
 		'Asia/Anadyr' => {
-			exemplarCity => q#Anadir nutomegaƒoƒome#,
+			exemplarCity => q#Anadyr#,
 		},
 		'Asia/Aqtau' => {
-			exemplarCity => q#Aktau nutomegaƒoƒome#,
+			exemplarCity => q#Aqtau#,
 		},
 		'Asia/Aqtobe' => {
-			exemplarCity => q#Aktobe nutomegaƒoƒome#,
+			exemplarCity => q#Aqtobe#,
 		},
 		'Asia/Ashgabat' => {
-			exemplarCity => q#Ashgabat nutomegaƒoƒome#,
+			exemplarCity => q#Ashgabat#,
+		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
 		},
 		'Asia/Baghdad' => {
-			exemplarCity => q#Baghdad nutomegaƒoƒome#,
+			exemplarCity => q#Baghdad#,
 		},
 		'Asia/Bahrain' => {
-			exemplarCity => q#Bahrain nutomegaƒoƒome#,
+			exemplarCity => q#Bahrain#,
 		},
 		'Asia/Baku' => {
-			exemplarCity => q#Baku nutomegaƒoƒome#,
+			exemplarCity => q#Baku#,
 		},
 		'Asia/Bangkok' => {
-			exemplarCity => q#Bangkok nutomegaƒoƒome#,
+			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
-			exemplarCity => q#Beirut nutomegaƒoƒome#,
+			exemplarCity => q#Beirut#,
 		},
 		'Asia/Bishkek' => {
-			exemplarCity => q#Bishkek nutomegaƒoƒome#,
+			exemplarCity => q#Bishkek#,
 		},
 		'Asia/Brunei' => {
-			exemplarCity => q#Brunei nutomegaƒoƒome#,
+			exemplarCity => q#Brunei#,
 		},
 		'Asia/Calcutta' => {
-			exemplarCity => q#Kolkata nutomegaƒoƒome#,
+			exemplarCity => q#Kolkata#,
+		},
+		'Asia/Chita' => {
+			exemplarCity => q#Chita#,
 		},
 		'Asia/Choibalsan' => {
-			exemplarCity => q#Tsoibalsan nutomegaƒoƒome#,
+			exemplarCity => q#Choibalsan#,
 		},
 		'Asia/Colombo' => {
-			exemplarCity => q#Kolombo nutomegaƒoƒome#,
+			exemplarCity => q#Colombo#,
 		},
 		'Asia/Damascus' => {
-			exemplarCity => q#Damaskus nutomegaƒoƒome#,
+			exemplarCity => q#Damascus#,
 		},
 		'Asia/Dhaka' => {
-			exemplarCity => q#Dhaka nutomegaƒoƒome#,
+			exemplarCity => q#Dhaka#,
 		},
 		'Asia/Dili' => {
-			exemplarCity => q#Dili nutomegaƒoƒome#,
+			exemplarCity => q#Dili#,
 		},
 		'Asia/Dubai' => {
-			exemplarCity => q#Dubai nutomegaƒoƒome#,
+			exemplarCity => q#Dubai#,
 		},
 		'Asia/Dushanbe' => {
-			exemplarCity => q#Dutsanbe nutomegaƒoƒome#,
+			exemplarCity => q#Dushanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
-			exemplarCity => q#Gaza nutomegaƒoƒome#,
+			exemplarCity => q#Gaza#,
+		},
+		'Asia/Hebron' => {
+			exemplarCity => q#Hebron#,
 		},
 		'Asia/Hong_Kong' => {
-			exemplarCity => q#Hɔng Kɔng nutomegaƒoƒome#,
+			exemplarCity => q#Hong Kong#,
 		},
 		'Asia/Hovd' => {
-			exemplarCity => q#Hovd nutomegaƒoƒome#,
+			exemplarCity => q#Hovd#,
 		},
 		'Asia/Irkutsk' => {
-			exemplarCity => q#Irkutsk nutomegaƒoƒome#,
+			exemplarCity => q#Irkutsk#,
 		},
 		'Asia/Jakarta' => {
-			exemplarCity => q#Dzakarta nutomegaƒoƒome#,
+			exemplarCity => q#Jakarta#,
 		},
 		'Asia/Jayapura' => {
-			exemplarCity => q#Dzayapura nutomegaƒoƒome#,
+			exemplarCity => q#Jayapura#,
 		},
 		'Asia/Jerusalem' => {
-			exemplarCity => q#Yerusalem nutomegaƒoƒome#,
+			exemplarCity => q#Jerusalem#,
 		},
 		'Asia/Kabul' => {
-			exemplarCity => q#Kabul nutomegaƒoƒome#,
+			exemplarCity => q#Kabul#,
 		},
 		'Asia/Kamchatka' => {
-			exemplarCity => q#Kamtsatka nutomegaƒoƒome#,
+			exemplarCity => q#Kamchatka#,
 		},
 		'Asia/Karachi' => {
-			exemplarCity => q#Karatsi nutomegaƒoƒome#,
+			exemplarCity => q#Karachi#,
 		},
 		'Asia/Katmandu' => {
 			exemplarCity => q#Kathmandu nutomegaƒoƒome#,
 		},
+		'Asia/Khandyga' => {
+			exemplarCity => q#Khandyga#,
+		},
 		'Asia/Krasnoyarsk' => {
-			exemplarCity => q#Krasnoyarsk nutomegaƒoƒome#,
+			exemplarCity => q#Krasnoyarsk#,
 		},
 		'Asia/Kuala_Lumpur' => {
-			exemplarCity => q#Kuala Lumpur nutomegaƒoƒome#,
+			exemplarCity => q#Kuala Lumpur#,
 		},
 		'Asia/Kuching' => {
-			exemplarCity => q#Kutsing nutomegaƒoƒome#,
+			exemplarCity => q#Kuching#,
 		},
 		'Asia/Kuwait' => {
-			exemplarCity => q#Kuwait nutomegaƒoƒome#,
+			exemplarCity => q#Kuwait#,
 		},
 		'Asia/Macau' => {
-			exemplarCity => q#Macau nutomegaƒoƒome#,
+			exemplarCity => q#Macau#,
 		},
 		'Asia/Magadan' => {
-			exemplarCity => q#Magadan nutomegaƒoƒome#,
+			exemplarCity => q#Magadan#,
 		},
 		'Asia/Makassar' => {
-			exemplarCity => q#Makassar nutomegaƒoƒome#,
+			exemplarCity => q#Makassar#,
 		},
 		'Asia/Manila' => {
-			exemplarCity => q#Manila nutomegaƒoƒome#,
+			exemplarCity => q#Manila#,
 		},
 		'Asia/Muscat' => {
-			exemplarCity => q#Muskat nutomegaƒoƒome#,
+			exemplarCity => q#Muscat#,
 		},
 		'Asia/Nicosia' => {
-			exemplarCity => q#Nikosia nutomegaƒoƒome#,
+			exemplarCity => q#Nicosia#,
+		},
+		'Asia/Novokuznetsk' => {
+			exemplarCity => q#Novokuznetsk#,
 		},
 		'Asia/Novosibirsk' => {
-			exemplarCity => q#Novosibirsk nutomegaƒoƒome#,
+			exemplarCity => q#Novosibirsk#,
 		},
 		'Asia/Omsk' => {
-			exemplarCity => q#Omsk nutomegaƒoƒome#,
+			exemplarCity => q#Omsk#,
 		},
 		'Asia/Oral' => {
-			exemplarCity => q#Oral nutomegaƒoƒome#,
+			exemplarCity => q#Oral#,
 		},
 		'Asia/Phnom_Penh' => {
-			exemplarCity => q#Nɔm Penh nutomegaƒoƒome#,
+			exemplarCity => q#Phnom Penh#,
 		},
 		'Asia/Pontianak' => {
-			exemplarCity => q#Pontianak nutomegaƒoƒome#,
+			exemplarCity => q#Pontianak#,
 		},
 		'Asia/Pyongyang' => {
-			exemplarCity => q#Piongyang nutomegaƒoƒome#,
+			exemplarCity => q#Pyongyang#,
 		},
 		'Asia/Qatar' => {
-			exemplarCity => q#Katar nutomegaƒoƒome#,
+			exemplarCity => q#Qatar#,
 		},
 		'Asia/Qyzylorda' => {
-			exemplarCity => q#Kizilɔda nutomegaƒoƒome#,
+			exemplarCity => q#Qyzylorda#,
 		},
 		'Asia/Rangoon' => {
-			exemplarCity => q#Rangoon nutomegaƒoƒome#,
+			exemplarCity => q#Yangon#,
 		},
 		'Asia/Riyadh' => {
-			exemplarCity => q#Riyadh nutomegaƒoƒome#,
+			exemplarCity => q#Riyadh#,
 		},
 		'Asia/Saigon' => {
-			exemplarCity => q#Ho Tsi Minh nutomegaƒoƒome#,
+			exemplarCity => q#Ho Chi Minh#,
 		},
 		'Asia/Sakhalin' => {
-			exemplarCity => q#Sakhalin nutomegaƒoƒome#,
+			exemplarCity => q#Sakhalin#,
 		},
 		'Asia/Samarkand' => {
-			exemplarCity => q#Samarkand nutomegaƒoƒome#,
+			exemplarCity => q#Samarkand#,
 		},
 		'Asia/Seoul' => {
-			exemplarCity => q#Seoul nutomegaƒoƒome#,
+			exemplarCity => q#Seoul#,
 		},
 		'Asia/Shanghai' => {
-			exemplarCity => q#Shanghai nutomegaƒoƒome#,
+			exemplarCity => q#Shanghai#,
 		},
 		'Asia/Singapore' => {
-			exemplarCity => q#Singapore nutomegaƒoƒome#,
+			exemplarCity => q#Singapore#,
+		},
+		'Asia/Srednekolymsk' => {
+			exemplarCity => q#Srednekolymsk#,
 		},
 		'Asia/Taipei' => {
-			exemplarCity => q#Taipei nutomegaƒoƒome#,
+			exemplarCity => q#Taipei#,
 		},
 		'Asia/Tashkent' => {
-			exemplarCity => q#Tashkent nutomegaƒoƒome#,
+			exemplarCity => q#Tashkent#,
 		},
 		'Asia/Tbilisi' => {
-			exemplarCity => q#Tbilisi nutomegaƒoƒome#,
+			exemplarCity => q#Tbilisi#,
 		},
 		'Asia/Tehran' => {
-			exemplarCity => q#Tehran nutomegaƒoƒome#,
+			exemplarCity => q#Tehran#,
 		},
 		'Asia/Thimphu' => {
-			exemplarCity => q#Timfu nutomegaƒoƒome#,
+			exemplarCity => q#Thimphu#,
 		},
 		'Asia/Tokyo' => {
-			exemplarCity => q#Tokio nutomegaƒoƒome#,
+			exemplarCity => q#Tokyo#,
+		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
 		},
 		'Asia/Ulaanbaatar' => {
-			exemplarCity => q#Ulaanbaatar nutomegaƒoƒome#,
+			exemplarCity => q#Ulaanbaatar#,
 		},
 		'Asia/Urumqi' => {
-			exemplarCity => q#Urumqi nutomegaƒoƒome#,
+			exemplarCity => q#Urumqi#,
+		},
+		'Asia/Ust-Nera' => {
+			exemplarCity => q#Ust-Nera#,
 		},
 		'Asia/Vientiane' => {
-			exemplarCity => q#Vientiane nutomegaƒoƒome#,
+			exemplarCity => q#Vientiane#,
 		},
 		'Asia/Vladivostok' => {
-			exemplarCity => q#Vladivostok nutomegaƒoƒome#,
+			exemplarCity => q#Vladivostok#,
 		},
 		'Asia/Yakutsk' => {
-			exemplarCity => q#Yakutsk nutomegaƒoƒome#,
+			exemplarCity => q#Yakutsk#,
 		},
 		'Asia/Yekaterinburg' => {
-			exemplarCity => q#Yekaterinburg nutomegaƒoƒome#,
+			exemplarCity => q#Yekaterinburg#,
 		},
 		'Asia/Yerevan' => {
-			exemplarCity => q#Yerevan nutomegaƒoƒome#,
+			exemplarCity => q#Yerevan#,
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlantic ŋkekeme gaƒoƒome),
-				'generic' => q(Atlantic gaƒoƒome),
-				'standard' => q(Atlantic gaƒoƒoɖoanyime),
+				'daylight' => q#Atlantic kele gaƒoƒome#,
+				'generic' => q#Atlantic gaƒoƒome#,
+				'standard' => q#Atlantic nutome gaƒoƒome#,
 			},
 		},
 		'Atlantic/Azores' => {
-			exemplarCity => q#Azores nutomegaƒoƒome#,
+			exemplarCity => q#Azores#,
 		},
 		'Atlantic/Bermuda' => {
-			exemplarCity => q#Bermuda nutomegaƒoƒome#,
+			exemplarCity => q#Bermuda#,
 		},
 		'Atlantic/Canary' => {
-			exemplarCity => q#Kanari nutomegaƒoƒome#,
+			exemplarCity => q#Canary#,
 		},
 		'Atlantic/Cape_Verde' => {
-			exemplarCity => q#Kape Verde nutomegaƒoƒome#,
+			exemplarCity => q#Cape Verde#,
 		},
 		'Atlantic/Faeroe' => {
-			exemplarCity => q#Faroe nutomegaƒoƒome#,
+			exemplarCity => q#Faroe#,
 		},
 		'Atlantic/Madeira' => {
-			exemplarCity => q#Madeira nutomegaƒoƒome#,
+			exemplarCity => q#Madeira#,
 		},
 		'Atlantic/Reykjavik' => {
-			exemplarCity => q#Reykjavik nutomegaƒoƒome#,
+			exemplarCity => q#Reykjavik#,
 		},
 		'Atlantic/South_Georgia' => {
-			exemplarCity => q#Anyiehe Georgia nutomegaƒoƒome#,
+			exemplarCity => q#South Georgia#,
 		},
 		'Atlantic/St_Helena' => {
-			exemplarCity => q#St. Helena nutomegaƒoƒome#,
+			exemplarCity => q#St. Helena#,
 		},
 		'Atlantic/Stanley' => {
-			exemplarCity => q#Stanley nutomegaƒoƒome#,
+			exemplarCity => q#Stanley#,
 		},
 		'Australia/Adelaide' => {
-			exemplarCity => q#Adelaide nutomegaƒoƒome#,
+			exemplarCity => q#Adelaide#,
 		},
 		'Australia/Brisbane' => {
-			exemplarCity => q#Brisbane nutomegaƒoƒome#,
+			exemplarCity => q#Brisbane#,
 		},
 		'Australia/Broken_Hill' => {
-			exemplarCity => q#Broken Hill nutomegaƒoƒome#,
+			exemplarCity => q#Broken Hill#,
 		},
 		'Australia/Currie' => {
-			exemplarCity => q#Kurrie nutomegaƒoƒome#,
+			exemplarCity => q#Currie#,
 		},
 		'Australia/Darwin' => {
-			exemplarCity => q#Darwin nutomegaƒoƒome#,
+			exemplarCity => q#Darwin#,
 		},
 		'Australia/Eucla' => {
-			exemplarCity => q#Eucla nutomegaƒoƒome#,
+			exemplarCity => q#Eucla#,
 		},
 		'Australia/Hobart' => {
-			exemplarCity => q#Hobart nutomegaƒoƒome#,
+			exemplarCity => q#Hobart#,
 		},
 		'Australia/Lindeman' => {
-			exemplarCity => q#Lindeman nutomegaƒoƒome#,
+			exemplarCity => q#Lindeman#,
 		},
 		'Australia/Lord_Howe' => {
-			exemplarCity => q#Lɔd Howe nutomegaƒoƒome#,
+			exemplarCity => q#Lord Howe#,
 		},
 		'Australia/Melbourne' => {
-			exemplarCity => q#Melbourne nutomegaƒoƒome#,
+			exemplarCity => q#Melbourne#,
 		},
 		'Australia/Perth' => {
-			exemplarCity => q#Perth nutomegaƒoƒome#,
+			exemplarCity => q#Perth#,
 		},
 		'Australia/Sydney' => {
-			exemplarCity => q#Sidney nutomegaƒoƒome#,
+			exemplarCity => q#Sydney#,
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Titina Australia ŋkekeme gaƒoƒome),
-				'generic' => q(Titina Australia gaƒoƒome),
-				'standard' => q(Titina Australia gaƒoƒoɖoanyime),
+				'daylight' => q#Australian Central dzomeli gaƒoƒo me#,
+				'generic' => q#Central Australia gaƒoƒo me#,
+				'standard' => q#Australian Central nutome gaƒoƒo me#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Australia ɣetoɖofe ŋkekeme gaƒoƒome),
-				'generic' => q(Australia ɣetoɖofe gaƒoƒome),
-				'standard' => q(Australia ɣetoɖofe gaƒoƒoɖoanyime),
+				'daylight' => q#Australian Central Western kele gaƒoƒo me#,
+				'generic' => q#Australian Central Australia ɣetoɖofe gaƒoƒo me#,
+				'standard' => q#Australian Central Western nutome gaƒoƒo me#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Ɣedzeƒe Australia ŋkekeme gaƒoƒome),
-				'generic' => q(Ɣedzeƒe Australia gaƒoƒome),
-				'standard' => q(Ɣedzeƒe Australia gaƒoƒoɖoanyime),
+				'daylight' => q#Australian Eastern kele gaƒoƒo me#,
+				'generic' => q#Eastern Australia gaƒoƒo me#,
+				'standard' => q#Australian Eastern nutome gaƒoƒo me#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Ɣetoɖoƒe Australia ŋkekeme gaƒoƒome),
-				'generic' => q(Ɣetoɖoƒe Australia gaƒoƒome),
-				'standard' => q(Ɣetoɖoƒe Australia gaƒoƒoɖoanyime),
+				'daylight' => q#Australian Western kele gaƒoƒo me#,
+				'generic' => q#Western Australia gaƒoƒo me#,
+				'standard' => q#Australian Western nutome gaƒoƒo me#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Azerbaidzan dzomeŋɔli gaƒoƒome),
-				'generic' => q(Azerbaidzan gaƒoƒome),
-				'standard' => q(Azerbaidzan gaƒoƒoɖoanyime),
+				'daylight' => q#Azerbaijan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Azerbaijan gaƒoƒo me#,
+				'standard' => q#Azerbaijan nutome gaƒoƒo me#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Azores dzomeŋɔli gaƒoƒome),
-				'generic' => q(Azores gaƒoƒome),
-				'standard' => q(Azores gaƒoƒoɖoanyime),
+				'daylight' => q#Azores dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Azores gaƒoƒo me#,
+				'standard' => q#Azores nutome gaƒoƒo me#,
+			},
+		},
+		'Bangladesh' => {
+			long => {
+				'daylight' => q#Bangladesh dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Bangladesh gaƒoƒo me#,
+				'standard' => q#Bangladesh nutome gaƒoƒo me#,
+			},
+		},
+		'Bhutan' => {
+			long => {
+				'standard' => q#Bhutan gaƒoƒo me#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Bolivia gaƒoƒome),
+				'standard' => q#Bolivia gaƒoƒo me#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brasilia dzomeŋɔli gaƒoƒome),
-				'generic' => q(Brasilia gaƒoƒome),
-				'standard' => q(Brasilia gaƒoƒoɖoanyime),
+				'daylight' => q#Brasilia dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Brasilia gaƒoƒo me#,
+				'standard' => q#Brasilia nutome gaƒoƒo me#,
+			},
+		},
+		'Brunei' => {
+			long => {
+				'standard' => q#Brunei Darussalam gaƒoƒo me#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Kep Verde dzomeŋɔli gaƒoƒome),
-				'generic' => q(Kep Verde gaƒoƒome),
-				'standard' => q(Kep Verde gaƒoƒoɖoanyime),
+				'daylight' => q#Cape Verde dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Cape Verde gaƒoƒo me#,
+				'standard' => q#Cape Verde nutome gaƒoƒo me#,
+			},
+		},
+		'Chamorro' => {
+			long => {
+				'standard' => q#Chamorro gaƒoƒo me#,
+			},
+		},
+		'Chatham' => {
+			long => {
+				'daylight' => q#Chatham kele gaƒoƒo me#,
+				'generic' => q#Chatham gaƒoƒo me#,
+				'standard' => q#Chatham nutome gaƒoƒo me#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Tsile dzomeŋɔli gaƒoƒome),
-				'generic' => q(Tsile gaƒoƒo me),
-				'standard' => q(Tsile gaƒoƒoɖoanyime),
+				'daylight' => q#Chile dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Chile gaƒoƒo me#,
+				'standard' => q#Chile nutome gaƒoƒo me#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(China ŋkekeme gaƒoƒome),
-				'generic' => q(China gaƒoƒome),
-				'standard' => q(China gaƒoƒoɖoanyime),
+				'daylight' => q#China kele gaƒoƒo me#,
+				'generic' => q#China gaƒoƒo me#,
+				'standard' => q#China nutome gaƒoƒo me#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Tsoibalsan dzomeŋɔli gaƒoƒome),
-				'generic' => q(Tsoibalsan gaƒoƒome),
-				'standard' => q(Tsoibalsan gaƒoƒoɖoanyime),
+				'daylight' => q#Choibalsan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Choibalsan gaƒoƒo me#,
+				'standard' => q#Choibalsan nutome gaƒoƒo me#,
+			},
+		},
+		'Christmas' => {
+			long => {
+				'standard' => q#Christmas Island gaƒoƒo me#,
+			},
+		},
+		'Cocos' => {
+			long => {
+				'standard' => q#Cocos Islands gaƒoƒo me#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolombia dzomeŋɔli gaƒoƒome),
-				'generic' => q(Kolombia gaƒoƒome),
-				'standard' => q(Kolombia gaƒoƒoɖoanyime),
+				'daylight' => q#Colombia dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Colombia gaƒoƒo me#,
+				'standard' => q#Colombia nutome gaƒoƒo me#,
+			},
+		},
+		'Cook' => {
+			long => {
+				'daylight' => q#Cook Islands dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Cook Islands gaƒoƒo me#,
+				'standard' => q#Cook Islands nutome gaƒoƒo me#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kuba ŋkekeme gaƒoƒome),
-				'generic' => q(Kuba gaƒoƒome),
-				'standard' => q(Kuba gaƒoƒoɖoanyime),
+				'daylight' => q#Cuba kele gaƒoƒome#,
+				'generic' => q#Cuba gaƒoƒome#,
+				'standard' => q#Cuba nutome gaƒoƒome#,
+			},
+		},
+		'Davis' => {
+			long => {
+				'standard' => q#Davis gaƒoƒo me#,
+			},
+		},
+		'DumontDUrville' => {
+			long => {
+				'standard' => q#Dumont-d’Urville gaƒoƒo me#,
+			},
+		},
+		'East_Timor' => {
+			long => {
+				'standard' => q#East Timor gaƒoƒo me#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Easter Ƒudomekpodukɔ ƒe dzomeŋɔli gaƒoƒome),
-				'generic' => q(Easter Ƒudomekpodukɔ ƒe gaƒoƒome),
-				'standard' => q(Easter Ƒudomekpodukɔ ƒe gaƒoƒoɖoanyime),
+				'daylight' => q#Easter Island dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Easter Island gaƒoƒo me#,
+				'standard' => q#Easter Island nutome gaƒoƒo me#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ikuedɔ dzomeŋɔli gaƒoƒome),
+				'standard' => q#Ecuador gaƒoƒo me#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Xexeme gaƒoƒoɖoanyi me#,
 			},
 		},
 		'Etc/Unknown' => {
-			exemplarCity => q#du manya#,
+			exemplarCity => q#Du manya#,
 		},
 		'Europe/Amsterdam' => {
-			exemplarCity => q#Amsterdam nutomegaƒoƒome#,
+			exemplarCity => q#Amsterdam#,
 		},
 		'Europe/Andorra' => {
-			exemplarCity => q#Andorra nutomegaƒoƒome#,
+			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrakhan#,
 		},
 		'Europe/Athens' => {
-			exemplarCity => q#Atens nutomegaƒoƒome#,
+			exemplarCity => q#Athens#,
 		},
 		'Europe/Belgrade' => {
-			exemplarCity => q#Belgrade nutomegaƒoƒome#,
+			exemplarCity => q#Belgrade#,
 		},
 		'Europe/Berlin' => {
-			exemplarCity => q#Berlin nutomegaƒoƒome#,
+			exemplarCity => q#Berlin#,
 		},
 		'Europe/Bratislava' => {
-			exemplarCity => q#Bratislava nutomegaƒoƒome#,
+			exemplarCity => q#Bratislava#,
 		},
 		'Europe/Brussels' => {
-			exemplarCity => q#Brussels nutomegaƒoƒome#,
+			exemplarCity => q#Brussels#,
 		},
 		'Europe/Bucharest' => {
-			exemplarCity => q#Bukarest nutomegaƒoƒome#,
+			exemplarCity => q#Bucharest#,
 		},
 		'Europe/Budapest' => {
-			exemplarCity => q#Budapest nutomegaƒoƒome#,
+			exemplarCity => q#Budapest#,
+		},
+		'Europe/Busingen' => {
+			exemplarCity => q#Busingen#,
 		},
 		'Europe/Chisinau' => {
-			exemplarCity => q#Tsisinau nutomegaƒoƒome#,
+			exemplarCity => q#Chisinau#,
 		},
 		'Europe/Copenhagen' => {
-			exemplarCity => q#Kopenhagen nutomegaƒoƒome#,
+			exemplarCity => q#Copenhagen#,
 		},
 		'Europe/Dublin' => {
-			exemplarCity => q#Dublin nutomegaƒoƒome#,
+			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(Irelanɖ dzomeŋɔli gaƒoƒome),
+				'daylight' => q#Ireland nutome gaƒoƒo me#,
 			},
 		},
 		'Europe/Gibraltar' => {
-			exemplarCity => q#Gibraltar nutomegaƒoƒome#,
+			exemplarCity => q#Gibraltar#,
 		},
 		'Europe/Guernsey' => {
-			exemplarCity => q#Guernse nutomegaƒoƒome#,
+			exemplarCity => q#Guernsey#,
 		},
 		'Europe/Helsinki' => {
-			exemplarCity => q#Helsinki nutomegaƒoƒome#,
+			exemplarCity => q#Helsinki#,
 		},
 		'Europe/Isle_of_Man' => {
-			exemplarCity => q#Aisle of Man nutomegaƒoƒome#,
+			exemplarCity => q#Isle of Man#,
 		},
 		'Europe/Istanbul' => {
-			exemplarCity => q#Istanbul nutomegaƒoƒome#,
+			exemplarCity => q#Istanbul#,
 		},
 		'Europe/Jersey' => {
-			exemplarCity => q#Jɛse nutomegaƒoƒome#,
+			exemplarCity => q#Jersey#,
 		},
 		'Europe/Kaliningrad' => {
-			exemplarCity => q#Kaliningrad nutomegaƒoƒome#,
+			exemplarCity => q#Kaliningrad#,
 		},
 		'Europe/Kiev' => {
-			exemplarCity => q#Kiev nutmegaƒoƒome#,
+			exemplarCity => q#Kiev#,
+		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
 		},
 		'Europe/Lisbon' => {
-			exemplarCity => q#Lisbon nutomegaƒoƒome#,
+			exemplarCity => q#Lisbon#,
 		},
 		'Europe/Ljubljana' => {
-			exemplarCity => q#Lubliana nutomegaƒoƒome#,
+			exemplarCity => q#Ljubljana#,
 		},
 		'Europe/London' => {
-			exemplarCity => q#London nutomegaƒoƒome#,
+			exemplarCity => q#London#,
 			long => {
-				'daylight' => q(Britain dzomeŋɔli gaƒoƒome),
+				'daylight' => q#British dzomeŋɔli gaƒoƒo me#,
 			},
 		},
 		'Europe/Luxembourg' => {
-			exemplarCity => q#Lazembɔg nutomegaƒoƒome#,
+			exemplarCity => q#Luxembourg#,
 		},
 		'Europe/Madrid' => {
-			exemplarCity => q#Madrid nutomegaƒoƒome#,
+			exemplarCity => q#Madrid#,
 		},
 		'Europe/Malta' => {
-			exemplarCity => q#Malta nutomegaƒoƒome#,
+			exemplarCity => q#Malta#,
 		},
 		'Europe/Mariehamn' => {
-			exemplarCity => q#Mariehamn nutomegaƒoƒome#,
+			exemplarCity => q#Mariehamn#,
 		},
 		'Europe/Minsk' => {
-			exemplarCity => q#Minsk nutomegaƒoƒome#,
+			exemplarCity => q#Minsk#,
 		},
 		'Europe/Monaco' => {
-			exemplarCity => q#Monaco nutomegaƒoƒome#,
+			exemplarCity => q#Monaco#,
 		},
 		'Europe/Moscow' => {
-			exemplarCity => q#Moscow nutomegaƒoƒome#,
+			exemplarCity => q#Moscow#,
 		},
 		'Europe/Oslo' => {
-			exemplarCity => q#Oslo nutomegaƒoƒome#,
+			exemplarCity => q#Oslo#,
 		},
 		'Europe/Paris' => {
-			exemplarCity => q#Paris nutomegaƒoƒome#,
+			exemplarCity => q#Paris#,
 		},
 		'Europe/Podgorica' => {
-			exemplarCity => q#Podgorika nutomegaƒoƒome#,
+			exemplarCity => q#Podgorica#,
 		},
 		'Europe/Prague' => {
-			exemplarCity => q#Prague nutomegaƒoƒome#,
+			exemplarCity => q#Prague#,
 		},
 		'Europe/Riga' => {
-			exemplarCity => q#Riga nutomegaƒoƒome#,
+			exemplarCity => q#Riga#,
 		},
 		'Europe/Rome' => {
-			exemplarCity => q#Roma nutomegaƒoƒome#,
+			exemplarCity => q#Rome#,
 		},
 		'Europe/Samara' => {
-			exemplarCity => q#Samara nutomegaƒoƒome#,
+			exemplarCity => q#Samara#,
 		},
 		'Europe/San_Marino' => {
-			exemplarCity => q#San Marino nutomegaƒoƒome#,
+			exemplarCity => q#San Marino#,
 		},
 		'Europe/Sarajevo' => {
-			exemplarCity => q#Sarayevo nutomegaƒoƒome#,
+			exemplarCity => q#Sarajevo#,
+		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
 		},
 		'Europe/Simferopol' => {
-			exemplarCity => q#Simferopol nutomegaƒoƒome#,
+			exemplarCity => q#Simferopol#,
 		},
 		'Europe/Skopje' => {
-			exemplarCity => q#Skopie nutomegaƒoƒome#,
+			exemplarCity => q#Skopje#,
 		},
 		'Europe/Sofia' => {
-			exemplarCity => q#Sofia nutomegaƒoƒome#,
+			exemplarCity => q#Sofia#,
 		},
 		'Europe/Stockholm' => {
-			exemplarCity => q#Stockholm nutomegaƒoƒome#,
+			exemplarCity => q#Stockholm#,
 		},
 		'Europe/Tallinn' => {
-			exemplarCity => q#Tallinn nutomegaƒoƒome#,
+			exemplarCity => q#Tallinn#,
 		},
 		'Europe/Tirane' => {
-			exemplarCity => q#Tirane nutomegaƒoƒome#,
+			exemplarCity => q#Tirane#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ulyanovsk#,
 		},
 		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhgorod nutomegaƒoƒome#,
+			exemplarCity => q#Uzhgorod#,
 		},
 		'Europe/Vaduz' => {
-			exemplarCity => q#Vaduz nutomegaƒoƒome#,
+			exemplarCity => q#Vaduz#,
 		},
 		'Europe/Vatican' => {
-			exemplarCity => q#Vatikan nutomegaƒoƒome#,
+			exemplarCity => q#Vatican#,
 		},
 		'Europe/Vienna' => {
-			exemplarCity => q#Vienna nutomegaƒoƒome#,
+			exemplarCity => q#Vienna#,
 		},
 		'Europe/Vilnius' => {
-			exemplarCity => q#Vilnius nutomegaƒoƒome#,
+			exemplarCity => q#Vilnius#,
 		},
 		'Europe/Volgograd' => {
-			exemplarCity => q#Volgograd nutomegaƒoƒome#,
+			exemplarCity => q#Volgograd#,
 		},
 		'Europe/Warsaw' => {
-			exemplarCity => q#Wɔsɔw nutomegaƒoƒome#,
+			exemplarCity => q#Warsaw#,
 		},
 		'Europe/Zagreb' => {
-			exemplarCity => q#Zagreb nutomegaƒoƒome#,
+			exemplarCity => q#Zagreb#,
 		},
 		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporozhiye nutomegaƒoƒome#,
+			exemplarCity => q#Zaporozhye#,
 		},
 		'Europe/Zurich' => {
-			exemplarCity => q#Zurich nutomegaƒoƒome#,
+			exemplarCity => q#Zurich#,
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Titina Europe ŋkekeme gaƒoƒome),
-				'generic' => q(Titina Europe gaƒoƒome),
-				'standard' => q(Titina Europe gaƒoƒoɖoanyime),
+				'daylight' => q#Central Europe dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Central Europe gaƒoƒo me#,
+				'standard' => q#Central Europe nutome gaƒoƒo me#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Ɣedzeƒe Europe ŋkekeme gaƒoƒome),
-				'generic' => q(Ɣedzeƒe Europe gaƒoƒome),
-				'standard' => q(Ɣedzeƒe Europe gaƒoƒoɖoanyime),
+				'daylight' => q#Ɣedzeƒe Europe ŋkekeme gaƒoƒome#,
+				'generic' => q#Ɣedzeƒe Europe gaƒoƒome#,
+				'standard' => q#Ɣedzeƒe Europe gaƒoƒoɖoanyime#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Ɣetoɖoƒe Europe ŋkekeme gaƒoƒome),
-				'generic' => q(Ɣetoɖoƒe Europe gaƒoƒome),
-				'standard' => q(Ɣetoɖoƒe Europe gaƒoƒoɖoanyime),
+				'daylight' => q#Western Europe dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Western Europe gaƒoƒo me#,
+				'standard' => q#Western Europe nutome gaƒoƒo me#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Fɔlklanɖ Ƒudomekpodukɔ ƒe dzomeŋɔli gaƒoƒome),
-				'generic' => q(Fɔlklanɖ Ƒudomekpodukɔ ƒe gaƒoƒome),
-				'standard' => q(Fɔlklanɖ Ƒudomekpodukɔ ƒe gaƒoƒoɖoanyime),
+				'daylight' => q#Falkland Islands dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Falkland Islands gaƒoƒo me#,
+				'standard' => q#Falkland Islands nutome gaƒoƒo me#,
+			},
+		},
+		'Fiji' => {
+			long => {
+				'daylight' => q#Fiji dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Fiji gaƒoƒo me#,
+				'standard' => q#Fiji nutome gaƒoƒo me#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Frentsi Guiana gaƒoƒome),
+				'standard' => q#French Guiana gaƒoƒo me#,
+			},
+		},
+		'French_Southern' => {
+			long => {
+				'standard' => q#French Southern & Antarctic gaƒoƒo me#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwich gaƒoƒome),
+				'standard' => q#Greenwich gaƒoƒo me#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Galapagos gaƒoƒome),
+				'standard' => q#Galapagos gaƒoƒo me#,
+			},
+		},
+		'Gambier' => {
+			long => {
+				'standard' => q#Gambier gaƒoƒo me#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Dzɔdzia dzomeŋɔli gaƒoƒome),
-				'generic' => q(Dzɔdzia gaƒoƒome),
-				'standard' => q(Dzɔdzia gaƒoƒoɖoanyime),
+				'daylight' => q#Georgia dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Georgia gaƒoƒo me#,
+				'standard' => q#Georgia nutome gaƒoƒo me#,
+			},
+		},
+		'Gilbert_Islands' => {
+			long => {
+				'standard' => q#Gilbert Islands gaƒoƒo me#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Ɣedzeƒe Grinlanɖ dzomeŋɔli gaƒoƒome),
-				'generic' => q(Ɣedzeƒe Grinlanɖ gaƒoƒome),
-				'standard' => q(Ɣedzeƒe Grinlanɖ gaƒoƒoɖoanyime),
+				'daylight' => q#East Greenland dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#East Greenland gaƒoƒome#,
+				'standard' => q#East Greenland nutome gaƒoƒo me#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Ɣetoɖoƒe Grinlanɖ dzomeŋɔli gaƒoƒome),
-				'generic' => q(Ɣetoɖoƒe Grinlanɖ gaƒoƒome),
-				'standard' => q(Ɣetoɖoƒe Grinlanɖ gaƒoƒoɖoanyime),
+				'daylight' => q#West Greenland kele gaƒoƒo me#,
+				'generic' => q#West Greenland gaƒoƒo me#,
+				'standard' => q#West Greenland nutome gaƒoƒo me#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Gulf gaƒoƒome),
+				'standard' => q#Gulf nutome gaƒoƒo me#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Gayana gaƒoƒome),
+				'standard' => q#Guyana gaƒoƒo me#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Hawaii-Aleutia ŋkekeme gaƒoƒome),
-				'generic' => q(Hawaii-Aleutia gaƒoƒome),
-				'standard' => q(Hawaii-Aleutia gaƒoƒoɖoanyime),
+				'daylight' => q#Hawaii-Aleutia kele gaƒoƒo me#,
+				'generic' => q#Hawaii-Aleutia gaƒoƒo me#,
+				'standard' => q#Hawaii-Aleutia nutome gaƒoƒo me#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Hɔng Kɔng dzomeŋɔli gaƒoƒome),
-				'generic' => q(Hɔng Kɔng gaƒoƒome),
-				'standard' => q(Hɔng Kɔng gaƒoƒoɖoanyi me),
+				'daylight' => q#Hong Kong dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Hong Kong gaƒoƒo me#,
+				'standard' => q#Hong Kong nutome gaƒoƒo me#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Hoved dzomeŋɔli gaƒoƒome),
-				'generic' => q(Hoved gaƒoƒome),
-				'standard' => q(Hoved gaƒoƒoɖoanyime),
+				'daylight' => q#Hovd dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Hovd gaƒoƒo me#,
+				'standard' => q#Hovd nutome gaƒoƒo me#,
+			},
+		},
+		'India' => {
+			long => {
+				'standard' => q#India gaƒoƒo me#,
 			},
 		},
 		'Indian/Antananarivo' => {
-			exemplarCity => q#Antananarivo nutomegaƒoƒome#,
+			exemplarCity => q#Antananarivo#,
 		},
 		'Indian/Chagos' => {
-			exemplarCity => q#Tsagos nutomegaƒoƒome#,
+			exemplarCity => q#Chagos#,
 		},
 		'Indian/Christmas' => {
-			exemplarCity => q#Kristmas nutomegaƒoƒome#,
+			exemplarCity => q#Christmas#,
 		},
 		'Indian/Cocos' => {
-			exemplarCity => q#Kokos nutomegaƒoƒome#,
+			exemplarCity => q#Cocos#,
 		},
 		'Indian/Comoro' => {
-			exemplarCity => q#Komoro nutomegaƒoƒome#,
+			exemplarCity => q#Comoro#,
 		},
 		'Indian/Kerguelen' => {
-			exemplarCity => q#Kerguelen nutomegaƒoƒome#,
+			exemplarCity => q#Kerguelen#,
 		},
 		'Indian/Mahe' => {
-			exemplarCity => q#Mahe nutomegaƒoƒome#,
+			exemplarCity => q#Mahe#,
 		},
 		'Indian/Maldives' => {
-			exemplarCity => q#Maldives nutomegaƒoƒome#,
+			exemplarCity => q#Maldives#,
 		},
 		'Indian/Mauritius' => {
-			exemplarCity => q#Mauritius nutomegaƒoƒome#,
+			exemplarCity => q#Mauritius#,
 		},
 		'Indian/Mayotte' => {
-			exemplarCity => q#Mayotte nutomegaƒoƒome#,
+			exemplarCity => q#Mayotte#,
 		},
 		'Indian/Reunion' => {
-			exemplarCity => q#Reunion nutomegaƒoƒome#,
+			exemplarCity => q#Reunion#,
+		},
+		'Indian_Ocean' => {
+			long => {
+				'standard' => q#Indian Ocean gaƒoƒo me#,
+			},
+		},
+		'Indochina' => {
+			long => {
+				'standard' => q#Indonesia gaƒoƒo me#,
+			},
+		},
+		'Indonesia_Central' => {
+			long => {
+				'standard' => q#Central Indonesia gaƒoƒo me#,
+			},
+		},
+		'Indonesia_Eastern' => {
+			long => {
+				'standard' => q#Eastern Indonesia gaƒoƒo me#,
+			},
+		},
+		'Indonesia_Western' => {
+			long => {
+				'standard' => q#Western Indonesia gaƒoƒo me#,
+			},
+		},
+		'Iran' => {
+			long => {
+				'daylight' => q#Iran kele gaƒoƒo me#,
+				'generic' => q#Iran gaƒoƒo me#,
+				'standard' => q#Iran nutome gaƒoƒo me#,
+			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkusk dzomeŋɔli gaƒoƒome),
-				'generic' => q(Irkusk gaƒoƒome),
-				'standard' => q(Irkusk gaƒoƒoɖoanyime),
+				'daylight' => q#Irkutsk dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Irkutsk gaƒoƒo me#,
+				'standard' => q#Irkutsk nutome gaƒoƒo me#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Israel ŋkekeme gaƒoƒome),
-				'generic' => q(Israel gaƒoƒome),
-				'standard' => q(Israel gaƒoƒoɖoanyime),
+				'daylight' => q#Israel kele gaƒoƒo me#,
+				'generic' => q#Israel gaƒoƒo me#,
+				'standard' => q#Israel nutome gaƒoƒo me#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japan ŋkekeme gaƒoƒome),
-				'generic' => q(Japan gaƒoƒome),
-				'standard' => q(Japan gaƒoƒoɖanyime),
+				'daylight' => q#Japan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Japan gaƒoƒo me#,
+				'standard' => q#Japan nutome gaƒoƒo me#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Petropavlovsk-Kamtsatski ŋkekeme gaƒoƒome),
-				'generic' => q(Petropavlovsk-Kamtsatski gaƒoƒome),
-				'standard' => q(Petropavlovsk-Kamtsatski gaƒoƒoɖoanyime),
+				'daylight' => q#Petropavlovsk-Kamtsatski ŋkekeme gaƒoƒome#,
+				'generic' => q#Petropavlovsk-Kamtsatski gaƒoƒome#,
+				'standard' => q#Petropavlovsk-Kamtsatski gaƒoƒoɖoanyime#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Ɣedzeƒe Kazakstan gaƒoƒome),
+				'standard' => q#East Kazakhstan gaƒoƒo me#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Ɣetoɖoƒe Kazakstan gaƒoƒome),
+				'standard' => q#West Kazakhstan gaƒoƒo me#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Korea ŋkekeme gaƒoƒome),
-				'generic' => q(Korea gaƒoƒome),
-				'standard' => q(Korea gaƒoƒoɖoanyime),
+				'daylight' => q#Korea dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Korea gaƒoƒo me#,
+				'standard' => q#Korea nutome gaƒoƒo me#,
+			},
+		},
+		'Kosrae' => {
+			long => {
+				'standard' => q#Kosrae gaƒoƒo me#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnoyarsk dzomeŋɔli gaƒoƒome),
-				'generic' => q(Krasnoyarsk gaƒoƒome),
-				'standard' => q(Krasnoyarsk gaƒoƒoɖoanyime),
+				'daylight' => q#Krasnoyarsk dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Krasnoyarsk gaƒoƒo me#,
+				'standard' => q#Krasnoyarsk nutome gaƒoƒo me#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Kirgistan gaƒoƒome),
+				'standard' => q#Kyrgystan gaƒoƒo me#,
+			},
+		},
+		'Line_Islands' => {
+			long => {
+				'standard' => q#Line Islands gaƒoƒo me#,
+			},
+		},
+		'Lord_Howe' => {
+			long => {
+				'daylight' => q#Lord Howe kele gaƒoƒo me#,
+				'generic' => q#Lord Howe gaƒoƒo me#,
+				'standard' => q#Lord Howe nutome gaƒoƒo me#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Makau ŋkekeme gaƒoƒome),
-				'generic' => q(Makau gaƒoƒome),
-				'standard' => q(Makau gaƒoƒoɖoanyime),
+				'daylight' => q#Makau ŋkekeme gaƒoƒome#,
+				'generic' => q#Makau gaƒoƒome#,
+				'standard' => q#Makau gaƒoƒoɖoanyime#,
+			},
+		},
+		'Macquarie' => {
+			long => {
+				'standard' => q#Macquarie Island gaƒoƒo me#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadan dzomeŋɔli gaƒoƒome),
-				'generic' => q(Magadan gaƒoƒome),
-				'standard' => q(Magadan gaƒoƒoɖoanyime),
+				'daylight' => q#Magadan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Magadan gaƒoƒo me#,
+				'standard' => q#Magadan nutome gaƒoƒo me#,
+			},
+		},
+		'Malaysia' => {
+			long => {
+				'standard' => q#Malaysia gaƒoƒo me#,
+			},
+		},
+		'Maldives' => {
+			long => {
+				'standard' => q#Maldives gaƒoƒo me#,
+			},
+		},
+		'Marquesas' => {
+			long => {
+				'standard' => q#Marquesas gaƒoƒo me#,
+			},
+		},
+		'Marshall_Islands' => {
+			long => {
+				'standard' => q#Marshall Islands gaƒoƒo me#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mɔritius dzomeŋɔli gaƒoƒome),
-				'generic' => q(Mɔritius gaƒoƒome),
-				'standard' => q(Mɔritius gaƒoƒoɖoanyime),
+				'daylight' => q#Mauritius dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Mauritius gaƒoƒo me#,
+				'standard' => q#Mauritius nutome gaƒoƒo me#,
+			},
+		},
+		'Mawson' => {
+			long => {
+				'standard' => q#Mawson gaƒoƒo me#,
+			},
+		},
+		'Mexico_Northwest' => {
+			long => {
+				'daylight' => q#Northwest Mexico kele gaƒoƒo me#,
+				'generic' => q#Northwest Mexico gaƒoƒo me#,
+				'standard' => q#Northwest Mexico nutome gaƒoƒo me#,
+			},
+		},
+		'Mexico_Pacific' => {
+			long => {
+				'daylight' => q#Mexican Pacific kele gaƒoƒome#,
+				'generic' => q#Mexican Pacific gaƒoƒo me#,
+				'standard' => q#Mexican Pacific nutome gaƒoƒo me#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulan Batɔ dzomeŋɔli gaƒoƒome),
-				'generic' => q(Ulan Batɔ gaƒoƒome),
-				'standard' => q(Ulan Batɔ gaƒoƒoɖoanyime),
+				'daylight' => q#Ulan Bator dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Ulan Bator gaƒoƒo me#,
+				'standard' => q#Ulan Bator nutome gaƒoƒo me#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moscow ŋkekeme gaƒoƒome),
-				'generic' => q(Moscow gaƒoƒome),
-				'standard' => q(Moscow gaƒoƒoɖoanyime),
+				'daylight' => q#Moscow dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Moscow gaƒoƒo me#,
+				'standard' => q#Moscow nutome gaƒoƒo me#,
+			},
+		},
+		'Myanmar' => {
+			long => {
+				'standard' => q#Myanmar gaƒoƒo me#,
+			},
+		},
+		'Nauru' => {
+			long => {
+				'standard' => q#Nauru gaƒoƒo me#,
+			},
+		},
+		'Nepal' => {
+			long => {
+				'standard' => q#Nepal gaƒoƒo me#,
+			},
+		},
+		'New_Caledonia' => {
+			long => {
+				'daylight' => q#New Caledonia dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#New Caledonia gaƒoƒo me#,
+				'standard' => q#New Caledonia nutome gaƒoƒo me#,
+			},
+		},
+		'New_Zealand' => {
+			long => {
+				'daylight' => q#New Zealand kele gaƒoƒo me#,
+				'generic' => q#New Zealand gaƒoƒo me#,
+				'standard' => q#New Zealand nutome gaƒoƒo me#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Niufaunɖlanɖ ŋkekeme gaƒoƒome),
-				'generic' => q(Niufaunɖlanɖ gaƒoƒome),
-				'standard' => q(Niufaunɖlanɖ gaƒoƒoɖoanyime),
+				'daylight' => q#Newfoundland kele gaƒoƒome#,
+				'generic' => q#Newfoundland gaƒoƒome#,
+				'standard' => q#Newfoundland nutome gaƒoƒome#,
+			},
+		},
+		'Niue' => {
+			long => {
+				'standard' => q#Niue gaƒoƒo me#,
+			},
+		},
+		'Norfolk' => {
+			long => {
+				'standard' => q#Norfolk Island gaƒoƒo me#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Fernando de Noronha dzomeŋɔli gaƒoƒome),
-				'generic' => q(Fernando de Noronha gaƒoƒome),
-				'standard' => q(Fernando de Noronha gaƒoƒoɖoanyime),
+				'daylight' => q#Fernando de Noronha dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Fernando de Noronha gaƒoƒo me#,
+				'standard' => q#Fernando de Noronha nutome gaƒoƒo me#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Novosibirsk dzomeŋɔli gaƒoƒome),
-				'generic' => q(Novosibirsk gaƒoƒome),
-				'standard' => q(Novosibirsk gaƒoƒoɖoanyime),
+				'daylight' => q#Novosibirsk dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Novosibirsk gaƒoƒo me#,
+				'standard' => q#Novosibirsk nutome gaƒoƒo me#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omsk dzomeŋɔli gaƒoƒome),
-				'generic' => q(Omsk gaƒoƒome),
-				'standard' => q(Omsk gaƒoƒoɖoanyime),
+				'daylight' => q#Omsk dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Omsk gaƒoƒo me#,
+				'standard' => q#Omsk nutome gaƒoƒo me#,
 			},
 		},
 		'Pacific/Apia' => {
-			exemplarCity => q#Apia nutomegaƒoƒome#,
+			exemplarCity => q#Apia#,
+		},
+		'Pacific/Auckland' => {
+			exemplarCity => q#Auckland#,
+		},
+		'Pacific/Bougainville' => {
+			exemplarCity => q#Bougainville#,
 		},
 		'Pacific/Chatham' => {
-			exemplarCity => q#Tsatham nutomegaƒoƒome#,
+			exemplarCity => q#Chatham#,
 		},
 		'Pacific/Easter' => {
-			exemplarCity => q#Easter nutomegaƒoƒome#,
+			exemplarCity => q#Easter#,
 		},
 		'Pacific/Efate' => {
-			exemplarCity => q#Efate nutomegaƒoƒome#,
+			exemplarCity => q#Efate#,
 		},
 		'Pacific/Enderbury' => {
-			exemplarCity => q#Enderburi nutomegaƒoƒome#,
+			exemplarCity => q#Enderbury#,
 		},
 		'Pacific/Fakaofo' => {
-			exemplarCity => q#Fakaofo nutomegaƒoƒome#,
+			exemplarCity => q#Fakaofo#,
 		},
 		'Pacific/Fiji' => {
-			exemplarCity => q#Fidzi nutomegaƒoƒome#,
+			exemplarCity => q#Fiji#,
 		},
 		'Pacific/Funafuti' => {
-			exemplarCity => q#Funafuti nutomegaƒoƒome#,
+			exemplarCity => q#Funafuti#,
 		},
 		'Pacific/Galapagos' => {
-			exemplarCity => q#Galapagos nutomegaƒoƒome#,
+			exemplarCity => q#Galapagos#,
 		},
 		'Pacific/Gambier' => {
-			exemplarCity => q#Gambier nutomegaƒoƒome#,
+			exemplarCity => q#Gambier#,
 		},
 		'Pacific/Guadalcanal' => {
-			exemplarCity => q#Guadalkanal nutomegaƒoƒome#,
+			exemplarCity => q#Guadalcanal#,
 		},
 		'Pacific/Guam' => {
-			exemplarCity => q#Guam nutomegaƒoƒome#,
+			exemplarCity => q#Guam#,
 		},
 		'Pacific/Honolulu' => {
-			exemplarCity => q#Honolulu nutomegaƒoƒome#,
+			exemplarCity => q#Honolulu#,
 		},
 		'Pacific/Johnston' => {
-			exemplarCity => q#Yohanneston nutomegaƒoƒome#,
+			exemplarCity => q#Johnston#,
 		},
 		'Pacific/Kiritimati' => {
-			exemplarCity => q#Kiritimati nutomegaƒoƒome#,
+			exemplarCity => q#Kiritimati#,
 		},
 		'Pacific/Kosrae' => {
-			exemplarCity => q#Kosrae nutomegaƒoƒome#,
+			exemplarCity => q#Kosrae#,
 		},
 		'Pacific/Kwajalein' => {
-			exemplarCity => q#Kwadzalein nutomegaƒoƒome#,
+			exemplarCity => q#Kwajalein#,
+		},
+		'Pacific/Majuro' => {
+			exemplarCity => q#Majuro#,
 		},
 		'Pacific/Marquesas' => {
-			exemplarCity => q#Markuesas nutomegaƒoƒome#,
+			exemplarCity => q#Marquesas#,
 		},
 		'Pacific/Midway' => {
-			exemplarCity => q#Midway nutomegaƒoƒome#,
+			exemplarCity => q#Midway#,
 		},
 		'Pacific/Nauru' => {
-			exemplarCity => q#Nauru nutomegaƒoƒome#,
+			exemplarCity => q#Nauru#,
 		},
 		'Pacific/Niue' => {
-			exemplarCity => q#Niue nutomegaƒoƒome#,
+			exemplarCity => q#Niue#,
 		},
 		'Pacific/Norfolk' => {
-			exemplarCity => q#Nɔfɔlk nutomegaƒoƒome#,
+			exemplarCity => q#Norfolk#,
 		},
 		'Pacific/Noumea' => {
-			exemplarCity => q#Numea nutomegaƒoƒome#,
+			exemplarCity => q#Noumea#,
 		},
 		'Pacific/Pago_Pago' => {
-			exemplarCity => q#Pago Pago nutomegaƒoƒome#,
+			exemplarCity => q#Pago Pago#,
 		},
 		'Pacific/Palau' => {
-			exemplarCity => q#Palau nutomegaƒoƒome#,
+			exemplarCity => q#Palau#,
 		},
 		'Pacific/Pitcairn' => {
-			exemplarCity => q#Pitkairn nutomegaƒoƒome#,
+			exemplarCity => q#Pitcairn#,
 		},
 		'Pacific/Ponape' => {
-			exemplarCity => q#Pohnpei nutomegaƒoƒome#,
+			exemplarCity => q#Pohnpei#,
 		},
 		'Pacific/Port_Moresby' => {
-			exemplarCity => q#Pɔrt Moresbynutomegaƒoƒome#,
+			exemplarCity => q#Port Moresby#,
 		},
 		'Pacific/Rarotonga' => {
-			exemplarCity => q#Rarotonga nutomegaƒoƒome#,
+			exemplarCity => q#Rarotonga#,
 		},
 		'Pacific/Saipan' => {
-			exemplarCity => q#Saipan nutomegaƒoƒome#,
+			exemplarCity => q#Saipan#,
+		},
+		'Pacific/Tahiti' => {
+			exemplarCity => q#Tahiti#,
 		},
 		'Pacific/Tarawa' => {
-			exemplarCity => q#Tarawa nutomegaƒoƒome#,
+			exemplarCity => q#Tarawa#,
 		},
 		'Pacific/Tongatapu' => {
-			exemplarCity => q#Tongatapu nutomegaƒoƒome#,
+			exemplarCity => q#Tongatapu#,
 		},
 		'Pacific/Truk' => {
-			exemplarCity => q#Tsuuk nutomegaƒoƒome#,
+			exemplarCity => q#Chuuk#,
 		},
 		'Pacific/Wake' => {
-			exemplarCity => q#Wake nutomegaƒoƒome#,
+			exemplarCity => q#Wake#,
 		},
 		'Pacific/Wallis' => {
-			exemplarCity => q#Wallis nutomegaƒoƒome#,
+			exemplarCity => q#Wallis#,
+		},
+		'Pakistan' => {
+			long => {
+				'daylight' => q#Pakistan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Pakistan gaƒoƒo me#,
+				'standard' => q#Pakistan nutome gaƒoƒo me#,
+			},
+		},
+		'Palau' => {
+			long => {
+				'standard' => q#Palau gaƒoƒo me#,
+			},
+		},
+		'Papua_New_Guinea' => {
+			long => {
+				'standard' => q#Papua New Guinea gaƒoƒo me#,
+			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraguai dzomeŋɔli gaƒoƒome),
-				'generic' => q(Paraguai gaƒoƒome),
-				'standard' => q(Paraguai gaƒoƒoɖoanyime),
+				'daylight' => q#Paraguay dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Paraguay gaƒoƒo me#,
+				'standard' => q#Paraguay nutome gaƒoƒo me#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peru dzomeŋɔli gaƒoƒome),
-				'generic' => q(Peru gaƒoƒome),
-				'standard' => q(Peru gaƒoƒoɖoanyime),
+				'daylight' => q#Peru dzomeŋɔli gaƒoƒome#,
+				'generic' => q#Peru gaƒoƒo me#,
+				'standard' => q#Peru nutome gaƒoƒo me#,
+			},
+		},
+		'Philippines' => {
+			long => {
+				'daylight' => q#Philippine dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Philippine gaƒoƒo me#,
+				'standard' => q#Philippine nutome gaƒoƒo me#,
+			},
+		},
+		'Phoenix_Islands' => {
+			long => {
+				'standard' => q#Phoenix Islands gaƒoƒo me#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Saint Pierre kple Mikuelon ŋkekeme gaƒoƒome),
-				'generic' => q(Saint Pierre kple Mikuelon gaƒoƒome),
-				'standard' => q(Saint Pierre kple Mikuelon gaƒoƒoɖoanyime),
+				'daylight' => q#St. Pierre & Miquelon kele gaƒoƒome#,
+				'generic' => q#St. Pierre & Miquelon gaƒoƒome#,
+				'standard' => q#St. Pierre & Miquelon nutome gaƒoƒome#,
+			},
+		},
+		'Pitcairn' => {
+			long => {
+				'standard' => q#Pitcairn gaƒoƒo me#,
+			},
+		},
+		'Ponape' => {
+			long => {
+				'standard' => q#Ponape gaƒoƒo me#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Pyongyang gaƒoƒo me#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Kizilɔrda dzomeŋɔli gaƒoƒome),
-				'generic' => q(Kizilɔrda gaƒoƒome),
-				'standard' => q(Kizilɔrda gaƒoƒoɖoanyime),
+				'daylight' => q#Kizilɔrda dzomeŋɔli gaƒoƒome#,
+				'generic' => q#Kizilɔrda gaƒoƒome#,
+				'standard' => q#Kizilɔrda gaƒoƒoɖoanyime#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Reunion gaƒoƒome),
+				'standard' => q#Reunion gaƒoƒo me#,
+			},
+		},
+		'Rothera' => {
+			long => {
+				'standard' => q#Rothera gaƒoƒo me#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Sahalin dzomeŋɔli gaƒoƒome),
-				'generic' => q(Sahalin gaƒoƒome),
-				'standard' => q(Sakhalin gaƒoƒoɖoanyime),
+				'daylight' => q#Sakhalin dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Sakhalin gaƒoƒo me#,
+				'standard' => q#Sakhalin nutome gaƒoƒo me#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samara ŋkekeme gaƒoƒome),
-				'generic' => q(Samara gaƒoƒome),
-				'standard' => q(Samara gaƒoƒoɖoanyime),
+				'daylight' => q#Samara ŋkekeme gaƒoƒome#,
+				'generic' => q#Samara gaƒoƒome#,
+				'standard' => q#Samara gaƒoƒoɖoanyime#,
+			},
+		},
+		'Samoa' => {
+			long => {
+				'daylight' => q#Samoa kele gaƒoƒo me#,
+				'generic' => q#Samoa gaƒoƒo me#,
+				'standard' => q#Samoa nutome gaƒoƒo me#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Sɛtsels gaƒoƒome),
+				'standard' => q#Seychelles gaƒoƒo me#,
+			},
+		},
+		'Singapore' => {
+			long => {
+				'standard' => q#Singapore nutome gaƒoƒo me#,
+			},
+		},
+		'Solomon' => {
+			long => {
+				'standard' => q#Solomon Islands gaƒoƒo me#,
+			},
+		},
+		'South_Georgia' => {
+			long => {
+				'standard' => q#South Georgia gaƒoƒo me#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Suriname gaƒoƒome),
+				'standard' => q#Suriname gaƒoƒome#,
+			},
+		},
+		'Syowa' => {
+			long => {
+				'standard' => q#Syowa gaƒoƒo me#,
+			},
+		},
+		'Tahiti' => {
+			long => {
+				'standard' => q#Tahiti gaƒoƒo me#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taipei ŋkekeme gaƒoƒome),
-				'generic' => q(Taipei gaƒoƒome),
-				'standard' => q(Taipei gaƒoƒoɖoanyime),
+				'daylight' => q#Taipei kele gaƒoƒo me#,
+				'generic' => q#Taipei gaƒoƒo me#,
+				'standard' => q#Taipei nutome gaƒoƒo me#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tadzikistan gaƒoƒome),
+				'standard' => q#Tajikistan gaƒoƒo me#,
+			},
+		},
+		'Tokelau' => {
+			long => {
+				'standard' => q#Tokelau gaƒoƒo me#,
+			},
+		},
+		'Tonga' => {
+			long => {
+				'daylight' => q#Tonga dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Tonga gaƒoƒo me#,
+				'standard' => q#Tonga nutome gaƒoƒo me#,
+			},
+		},
+		'Truk' => {
+			long => {
+				'standard' => q#Chuuk gaƒoƒo me#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Tɛkmenistan dzomeŋɔli gaƒoƒome),
-				'generic' => q(Tɛkmenistan gaƒoƒome),
-				'standard' => q(Tɛkmenistan gaƒoƒoɖoanyime),
+				'daylight' => q#Turkmenistan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Turkmenistan gaƒoƒo me#,
+				'standard' => q#Turkmenistan nutome gaƒoƒo me#,
+			},
+		},
+		'Tuvalu' => {
+			long => {
+				'standard' => q#Tuvalu gaƒoƒo me#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Uruguai dzomeŋɔli gaƒoƒome),
-				'generic' => q(Uruguai gaƒoƒome),
-				'standard' => q(Uruguai gaƒoƒoɖoanyime),
+				'daylight' => q#Uruguay dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Uruguay gaƒoƒo me#,
+				'standard' => q#Uruguay nutome gaƒoƒo me#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Uzbekistan dzomeŋɔli gaƒoƒome),
-				'generic' => q(Uzbekistan gaƒoƒome),
-				'standard' => q(Uzbekistan gaƒoƒoɖoanyime),
+				'daylight' => q#Uzbekistan dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Uzbekistan gaƒoƒo me#,
+				'standard' => q#Uzbekistan nutome gaƒoƒo me#,
+			},
+		},
+		'Vanuatu' => {
+			long => {
+				'daylight' => q#Vanuatu dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Vanuatu gaƒoƒo me#,
+				'standard' => q#Vanuatu nutome gaƒoƒo me#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Venezuela gaƒoƒome),
+				'standard' => q#Venezuela gaƒoƒo me#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Vladivostok dzomeŋɔli gaƒoƒome),
-				'generic' => q(Vladivostok gaƒoƒome),
-				'standard' => q(Vladivostok gaƒoƒoɖoanyime),
+				'daylight' => q#Vladivostok dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Vladivostok gaƒoƒo me#,
+				'standard' => q#Vladivostok nutome gaƒoƒo me#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Vogograd dzomeŋɔli gaƒoƒome),
-				'generic' => q(Vogograd gaƒoƒome),
-				'standard' => q(Vogograd gaƒoƒoɖoanyime),
+				'daylight' => q#Vogograd dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Volgograd gaƒoƒo me#,
+				'standard' => q#Volgograd nutome gaƒoƒo me#,
+			},
+		},
+		'Vostok' => {
+			long => {
+				'standard' => q#Vostok gaƒoƒo me#,
+			},
+		},
+		'Wake' => {
+			long => {
+				'standard' => q#Wake Island gaƒoƒo me#,
+			},
+		},
+		'Wallis' => {
+			long => {
+				'standard' => q#Wallis & Futuna gaƒoƒo me#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Yakutsk dzomeŋɔli gaƒoƒome),
-				'generic' => q(Yakutsk gaƒoƒome),
-				'standard' => q(Yakutsk gaƒoƒoɖoanyime),
+				'daylight' => q#Yakutsk dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Yakutsk gaƒoƒo me#,
+				'standard' => q#Yakutsk nutome gaƒoƒo me#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Yekaterinburg dzomeŋɔli gaƒoƒome),
-				'generic' => q(Yekateringburg gaƒoƒome),
-				'standard' => q(Yekateringburg gaƒoƒoɖoanyime),
+				'daylight' => q#Yekaterinburg dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Yekaterinburg gaƒoƒo me#,
+				'standard' => q#Yekaterinburg nutome gaƒoƒo me#,
 			},
 		},
 	 } }

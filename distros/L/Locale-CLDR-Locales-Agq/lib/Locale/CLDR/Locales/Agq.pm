@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Agq - Package for language Aghem
 
 package Locale::CLDR::Locales::Agq;
 # This file auto generated from Data\common\main\agq.xml
-#	on Fri 29 Apr  6:50:01 pm GMT
+#	on Fri 13 Apr  7:00:45 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q r x])},
+			auxiliary => qr{[q r x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'Ɨ', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'S', 'T', 'U', 'Ʉ', 'V', 'W', 'Y', 'Z', 'ʔ'],
-			main => qr{(?^u:[a à â ǎ ā b c d e è ê ě ē ɛ {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i ì î ǐ ī ɨ {ɨ̀} {ɨ̂} {ɨ̌} {ɨ̄} k l m n ŋ o ò ô ǒ ō ɔ {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} p s t u ù û ǔ ū ʉ {ʉ̀} {ʉ̂} {ʉ̌} {ʉ̄} v w y z ʔ])},
+			main => qr{[a à â ǎ ā b c d e è ê ě ē ɛ {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i ì î ǐ ī ɨ {ɨ̀} {ɨ̂} {ɨ̌} {ɨ̄} k l m n ŋ o ò ô ǒ ō ɔ {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} p s t u ù û ǔ ū ʉ {ʉ̀} {ʉ̂} {ʉ̌} {ʉ̄} v w y z ʔ]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -401,14 +403,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -938,7 +940,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{d E},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -962,7 +964,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{d E},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

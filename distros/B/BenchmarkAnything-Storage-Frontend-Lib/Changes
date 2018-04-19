@@ -1,5 +1,10 @@
 Revision history for BenchmarkAnything-Storage-Frontend-Lib
 
+0.022     2018-04-11
+        - verbosity tweaks fitting ::Backend::SQL behaviour changes
+        - adapt to changed and new operators 'not_like' and 'is_empty'
+        - enable mysql auto re-connect
+
 0.021     2017-02-08
         - pass through 'dbh_config' needed to support parallel execution
 

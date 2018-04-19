@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Rm - Package for language Romansh
 
 package Locale::CLDR::Locales::Rm;
 # This file auto generated from Data\common\main\rm.xml
-#	on Fri 29 Apr  7:22:10 pm GMT
+#	on Fri 13 Apr  7:26:09 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -705,7 +706,7 @@ has 'display_name_region' => (
  			'BM' => 'Bermudas',
  			'BN' => 'Brunei',
  			'BO' => 'Bolivia',
- 			'BR' => 'Brasila',
+ 			'BR' => 'Brasilia',
  			'BS' => 'Bahamas',
  			'BT' => 'Bhutan',
  			'BV' => 'Insla Bouvet',
@@ -770,7 +771,7 @@ has 'display_name_region' => (
  			'GW' => 'Guinea-Bissau',
  			'GY' => 'Guyana',
  			'HK' => 'Regiun d’administraziun speziala da Hongkong, China',
- 			'HM' => 'Inslas da Heard e da McDonlad',
+ 			'HM' => 'Inslas da Heard e da McDonald',
  			'HN' => 'Honduras',
  			'HR' => 'Croazia',
  			'HT' => 'Haiti',
@@ -913,8 +914,8 @@ has 'display_name_region' => (
  			'VA' => 'Citad dal Vatican',
  			'VC' => 'Saint Vincent e las Grenadinas',
  			'VE' => 'Venezuela',
- 			'VG' => 'Inslas Verginas Britannicas',
- 			'VI' => 'Inslas Verginas Americanas',
+ 			'VG' => 'Inslas Virginas Britannicas',
+ 			'VI' => 'Inslas Virginas Americanas',
  			'VN' => 'Vietnam',
  			'VU' => 'Vanuatu',
  			'WF' => 'Wallis e Futuna',
@@ -1063,9 +1064,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á ă â å ä ā æ ç ĕ ê ë ē í ĭ î ï ī ñ ó ŏ ô ö ø ō œ ú ŭ û ü ū ÿ])},
+			auxiliary => qr{[á ă â å ä ā æ ç ĕ ê ë ē í ĭ î ï ī ñ ó ŏ ô ö ø ō œ ú ŭ û ü ū ÿ]},
 			index => ['A', 'À', 'B', 'C', 'D', 'E', 'É', 'È', 'F', 'G', 'H', 'I', 'Ì', 'J', 'K', 'L', 'M', 'N', 'O', 'Ò', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ù', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a à b c d e é è f g h i ì j k l m n o ò p q r s t u ù v w x y z])},
+			main => qr{[a à b c d e é è f g h i ì j k l m n o ò p q r s t u ù v w x y z]},
+			numbers => qr{[. ’ % ‰ + − 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1423,6 +1425,13 @@ has native_numbering_system => (
 	default		=> 'latn',
 );
 
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 1,
+);
+
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -1439,6 +1448,8 @@ has 'number_symbols' => (
 			'perMille' => q(‰),
 			'percentSign' => q(%),
 			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
 		},
 	} }
 );
@@ -1451,21 +1462,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -1480,6 +1491,9 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
+					'accounting' => {
+						'positive' => '#,##0.00 ¤',
+					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -1767,9 +1781,14 @@ has 'currencies' => (
 				'currency' => q(nov rubel bieloruss \(1994–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(rubel bieloruss),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(rubel bieloruss \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -2499,12 +2518,12 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(nov sol peruan),
+				'currency' => q(sol peruan),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(sol peruan),
+				'currency' => q(sol peruan \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -3043,6 +3062,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					narrow => {
+						nonleap => [
+							'S',
+							'F',
+							'M',
+							'A',
+							'M',
+							'Z',
+							'F',
+							'A',
+							'S',
+							'O',
+							'N',
+							'D'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'schaner',
@@ -3064,6 +3102,25 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'schan.',
+							'favr.',
+							'mars',
+							'avr.',
+							'matg',
+							'zercl.',
+							'fan.',
+							'avust',
+							'sett.',
+							'oct.',
+							'nov.',
+							'dec.'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'S',
@@ -3078,6 +3135,25 @@ has 'calendar_months' => (
 							'O',
 							'N',
 							'D'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'schaner',
+							'favrer',
+							'mars',
+							'avrigl',
+							'matg',
+							'zercladur',
+							'fanadur',
+							'avust',
+							'settember',
+							'october',
+							'november',
+							'december'
 						],
 						leap => [
 							
@@ -3104,6 +3180,24 @@ has 'calendar_days' => (
 						sat => 'so',
 						sun => 'du'
 					},
+					narrow => {
+						mon => 'G',
+						tue => 'M',
+						wed => 'M',
+						thu => 'G',
+						fri => 'V',
+						sat => 'S',
+						sun => 'D'
+					},
+					short => {
+						mon => 'gli',
+						tue => 'ma',
+						wed => 'me',
+						thu => 'gie',
+						fri => 've',
+						sat => 'so',
+						sun => 'du'
+					},
 					wide => {
 						mon => 'glindesdi',
 						tue => 'mardi',
@@ -3115,6 +3209,15 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						mon => 'gli',
+						tue => 'ma',
+						wed => 'me',
+						thu => 'gie',
+						fri => 've',
+						sat => 'so',
+						sun => 'du'
+					},
 					narrow => {
 						mon => 'G',
 						tue => 'M',
@@ -3123,6 +3226,24 @@ has 'calendar_days' => (
 						fri => 'V',
 						sat => 'S',
 						sun => 'D'
+					},
+					short => {
+						mon => 'gli',
+						tue => 'ma',
+						wed => 'me',
+						thu => 'gie',
+						fri => 've',
+						sat => 'so',
+						sun => 'du'
+					},
+					wide => {
+						mon => 'glindesdi',
+						tue => 'mardi',
+						wed => 'mesemna',
+						thu => 'gievgia',
+						fri => 'venderdi',
+						sat => 'sonda',
+						sun => 'dumengia'
 					},
 				},
 			},
@@ -3136,6 +3257,33 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
+					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
+					wide => {0 => '1. quartal',
+						1 => '2. quartal',
+						2 => '3. quartal',
+						3 => '4. quartal'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
+					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
 					wide => {0 => '1. quartal',
 						1 => '2. quartal',
 						2 => '3. quartal',
@@ -3153,13 +3301,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
 				'wide' => {
-					'am' => q{am},
-					'pm' => q{sm},
+					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'abbreviated' => {
-					'am' => q{am},
-					'pm' => q{sm},
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+			},
+			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -3230,6 +3396,10 @@ has 'datetime_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 	} },
 );
@@ -3239,23 +3409,41 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
+			E => q{ccc},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{E d.},
-			H => q{H},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
 			HHmm => q{HH:mm},
 			HHmmss => q{HH:mm:ss},
-			Hm => q{H:mm},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
 			M => q{L},
 			MEd => q{E, d.M.},
 			MMM => q{LLL},
 			MMMEd => q{E d. MMM},
 			MMMMEd => q{E d. MMMM},
+			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. MMM},
 			MMd => q{d.MM.},
 			MMdd => q{dd.MM.},
 			Md => q{d.M.},
 			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
 			mmss => q{mm:ss},
 			ms => q{mm:ss},
 			y => q{y},
@@ -3263,13 +3451,16 @@ has 'datetime_formats_available_formats' => (
 			yMEd => q{E, y-M-d},
 			yMM => q{MM.y},
 			yMMM => q{MMM y},
-			yMMMEd => q{E, d. MMM y},
-			yMMMM => q{MMMM y},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y MMMM},
+			yMMMd => q{y MMM d},
 			yMMdd => q{dd.MM.y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
+			yMd => q{y-MM-dd},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{'week' w 'of' Y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d.},
 			H => q{H},
 			HHmm => q{HH:mm},
@@ -3307,6 +3498,9 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Timezone' => '{0} {1}',
+		},
 	} },
 );
 
@@ -3315,33 +3509,47 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
 			M => {
-				M => q{M.–M.},
+				M => q{MM–MM},
 			},
 			MEd => {
-				M => q{E, dd.MM. – E, dd.MM.},
-				d => q{E, dd.MM. – E, dd.MM.},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
 			},
 			MMM => {
-				M => q{MMM–MMM},
+				M => q{LLL–LLL},
 			},
 			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
-				M => q{d. MMM – d. MMM},
-				d => q{d.–d. MMM},
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
 			},
 			Md => {
-				M => q{dd.MM. – dd.MM.},
-				d => q{dd.MM. – dd.MM.},
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
 			},
 			d => {
-				d => q{d.–d.},
+				d => q{d–d},
 			},
-			fallback => '{0} - {1}',
+			fallback => '{0} – {1}',
 			h => {
 				a => q{h a – h a},
 				h => q{h–h a},
@@ -3364,39 +3572,39 @@ has 'datetime_formats_interval' => (
 				y => q{y–y},
 			},
 			yM => {
-				M => q{MM.y – MM.y},
-				y => q{MM.y – MM.y},
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
 			},
 			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y},
-				d => q{E, dd.MM.y – E, dd.MM.y},
-				y => q{E, dd.MM.y – E, dd.MM.y},
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
 			},
 			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM y – MMM y},
+				M => q{y MMM–MMM},
+				y => q{y MMM – y MMM},
 			},
 			yMMMEd => {
-				M => q{E, d. MMM – E, d. MMM y},
-				d => q{E, d. – E, d. MMM y},
-				y => q{E, d. MMM y – E, d. MMM y},
+				M => q{y MMM d, E – MMM d, E},
+				d => q{y MMM d, E – MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
 			},
 			yMMMM => {
-				M => q{MM – MM.y},
-				y => q{MM.y – MM.y},
+				M => q{y MMMM–MMMM},
+				y => q{y MMMM – y MMMM},
 			},
 			yMMMd => {
-				M => q{d. MMM – d. MMM y},
-				d => q{d.–d. MMM y},
-				y => q{d. MMM y – d. MMM y},
+				M => q{y MMM d – MMM d},
+				d => q{y MMM d–d},
+				y => q{y MMM d – y MMM d},
 			},
 			yMd => {
-				M => q{dd.MM.y – dd.MM.y},
-				d => q{dd.MM.y – dd.MM.y},
-				y => q{dd.MM.y – dd.MM.y},
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			M => {
 				M => q{M.–M.},
 			},

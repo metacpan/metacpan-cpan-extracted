@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Hsb - Package for language Upper Sorbian
 
 package Locale::CLDR::Locales::Hsb;
 # This file auto generated from Data\common\main\hsb.xml
-#	on Fri 29 Apr  7:08:05 pm GMT
+#	on Fri 13 Apr  7:13:33 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -807,10 +808,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ä ã ą ā æ ç ď đ é è ĕ ê ë ė ę ē ğ í ì ĭ î ï İ ī ı ĺ ľ ň ñ ò ŏ ô ö ő ø ō œ ŕ ś ş ß ť ú ù ŭ û ů ü ű ū ý ÿ ż ź])},
+			auxiliary => qr{[á à ă â å ä ã ą ā æ ç ď đ é è ĕ ê ë ė ę ē ğ í ì ĭ î ï İ ī ı ĺ ľ ň ñ ò ŏ ô ö ő ø ō œ ŕ ś ş ß ť ú ù ŭ û ů ü ű ū ý ÿ ż ź]},
 			index => ['A', 'B', 'C', 'Č', 'Ć', 'D', '{DŹ}', 'E', 'F', 'G', 'H', '{CH}', 'I', 'J', 'K', 'Ł', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{(?^u:[a b c č ć d {dź} e ě f g h {ch} i j k ł l m n ń o ó p q r ř s š t u v w x y z ž])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #])},
+			main => qr{[a b c č ć d {dź} e ě f g h {ch} i j k ł l m n ń o ó p q r ř s š t u v w x y z ž]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -2942,7 +2944,7 @@ has 'number_formats' => (
 					'two' => '000 bil'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3097,14 +3099,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3544,13 +3546,22 @@ has 'currencies' => (
 				'two' => q(běłoruskej rublej \(1994–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(běłoruski rubl),
 				'few' => q(běłoruske ruble),
 				'one' => q(běłoruski rubl),
 				'other' => q(běłoruskich rublow),
 				'two' => q(běłoruskej rublej),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(běłoruski rubl \(2000–2016\)),
+				'few' => q(běłoruske ruble \(2000–2016\)),
+				'one' => q(běłoruski rubl \(2000–2016\)),
+				'other' => q(běłoruskich rublow \(2000–2016\)),
+				'two' => q(běłoruskej rublej \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -4331,11 +4342,11 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(peruski nowy sol),
-				'few' => q(peruske nowe sole),
-				'one' => q(peruski nowy sol),
-				'other' => q(peruskich nowych solow),
-				'two' => q(peruskej nowej solej),
+				'currency' => q(peruski sol),
+				'few' => q(peruske sole),
+				'one' => q(peruski sol),
+				'other' => q(peruskich solow),
+				'two' => q(peruskej solej),
 			},
 		},
 		'PGK' => {
@@ -5080,8 +5091,8 @@ has 'day_periods' => (
 					'pm' => q{popołdnju},
 				},
 				'narrow' => {
-					'pm' => q{pop.},
 					'am' => q{dop.},
+					'pm' => q{pop.},
 				},
 				'abbreviated' => {
 					'am' => q{dopołdnja},
@@ -5173,6 +5184,30 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Ed => q{E, d.},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d. MMM y G},
+			GyMMMd => q{d. MMM y G},
+			M => q{L},
+			MEd => q{E, d.M.},
+			MMM => q{LLL},
+			MMMEd => q{E, d. MMM},
+			MMMd => q{d. MMM},
+			Md => q{d.M.},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M.y GGGGG},
+			yyyyMEd => q{E, d.M.y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d. MMM y G},
+			yyyyMMMd => q{d. MMM y G},
+			yyyyMd => q{d.M.y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E, H:mm 'hodź'.},
@@ -5208,30 +5243,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
-			Ed => q{E, d.},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, d. MMM y G},
-			GyMMMd => q{d. MMM y G},
-			M => q{L},
-			MEd => q{E, d.M.},
-			MMM => q{LLL},
-			MMMEd => q{E, d. MMM},
-			MMMd => q{d. MMM},
-			Md => q{d.M.},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M.y GGGGG},
-			yyyyMEd => q{E, d.M.y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d. MMM y G},
-			yyyyMMMd => q{d. MMM y G},
-			yyyyMd => q{d.M.y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 	} },
 );
 
@@ -5251,6 +5262,69 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{M. – M.},
+			},
+			MEd => {
+				M => q{E, d.M. – E, d.M.},
+				d => q{E, d.M. – E, d.M.},
+			},
+			MMM => {
+				M => q{LLL – LLL},
+			},
+			MMMEd => {
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. – E, d. MMM},
+			},
+			MMMd => {
+				M => q{d. MMM – d. MMM},
+				d => q{d. – d. MMM},
+			},
+			Md => {
+				M => q{d.M. – d.M.},
+				d => q{d.M. – d.M.},
+			},
+			d => {
+				d => q{d. – d.},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M.y – M.y G},
+				y => q{M.y – M.y G},
+			},
+			yMEd => {
+				M => q{E, d.M.y – E, d.M.y G},
+				d => q{E, d.M.y – E, d.M.y G},
+				y => q{E, d.M.y – E, d.M.y G},
+			},
+			yMMM => {
+				M => q{LLL – LLL y G},
+				y => q{LLL y – LLL y G},
+			},
+			yMMMEd => {
+				M => q{E, d. MMM – E, d. MMM y G},
+				d => q{E, d. – E, d. MMM y G},
+				y => q{E, d. MMM y – E, d. MMM y G},
+			},
+			yMMMM => {
+				M => q{LLLL – LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. MMM – d. MMM y G},
+				d => q{d. – d. MMM y G},
+				y => q{d. MMM y – d. MMM y G},
+			},
+			yMd => {
+				M => q{d.M.y – d.M.y G},
+				d => q{d.M.y – d.M.y G},
+				y => q{d.M.y – d.M.y G},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{H–H 'hodź'.},
@@ -5346,69 +5420,6 @@ has 'datetime_formats_interval' => (
 				y => q{d.M.y – d.M.y},
 			},
 		},
-		'generic' => {
-			M => {
-				M => q{M. – M.},
-			},
-			MEd => {
-				M => q{E, d.M. – E, d.M.},
-				d => q{E, d.M. – E, d.M.},
-			},
-			MMM => {
-				M => q{LLL – LLL},
-			},
-			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
-			},
-			MMMd => {
-				M => q{d. MMM – d. MMM},
-				d => q{d. – d. MMM},
-			},
-			Md => {
-				M => q{d.M. – d.M.},
-				d => q{d.M. – d.M.},
-			},
-			d => {
-				d => q{d. – d.},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{y–y G},
-			},
-			yM => {
-				M => q{M.y – M.y G},
-				y => q{M.y – M.y G},
-			},
-			yMEd => {
-				M => q{E, d.M.y – E, d.M.y G},
-				d => q{E, d.M.y – E, d.M.y G},
-				y => q{E, d.M.y – E, d.M.y G},
-			},
-			yMMM => {
-				M => q{LLL – LLL y G},
-				y => q{LLL y – LLL y G},
-			},
-			yMMMEd => {
-				M => q{E, d. MMM – E, d. MMM y G},
-				d => q{E, d. – E, d. MMM y G},
-				y => q{E, d. MMM y – E, d. MMM y G},
-			},
-			yMMMM => {
-				M => q{LLLL – LLLL y G},
-				y => q{LLLL y – LLLL y G},
-			},
-			yMMMd => {
-				M => q{d. MMM – d. MMM y G},
-				d => q{d. – d. MMM y G},
-				y => q{d. MMM y – d. MMM y G},
-			},
-			yMd => {
-				M => q{d.M.y – d.M.y G},
-				d => q{d.M.y – d.M.y G},
-				y => q{d.M.y – d.M.y G},
-			},
-		},
 	} },
 );
 
@@ -5426,7 +5437,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(afghanski čas),
+				'standard' => q#afghanski čas#,
 			},
 		},
 		'Africa/Accra' => {
@@ -5476,38 +5487,38 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(centralnoafriski čas),
+				'standard' => q#centralnoafriski čas#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(wuchodoafriski čas),
+				'standard' => q#wuchodoafriski čas#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(južnoafriski čas),
+				'standard' => q#južnoafriski čas#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(zapadoafriski lětni čas),
-				'generic' => q(zapadoafriski čas),
-				'standard' => q(zapadoafriski standardny čas),
+				'daylight' => q#zapadoafriski lětni čas#,
+				'generic' => q#zapadoafriski čas#,
+				'standard' => q#zapadoafriski standardny čas#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(alaskaski lětni čas),
-				'generic' => q(alaskaski čas),
-				'standard' => q(alaskaski standardny čas),
+				'daylight' => q#alaskaski lětni čas#,
+				'generic' => q#alaskaski čas#,
+				'standard' => q#alaskaski standardny čas#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amaconaski lětni čas),
-				'generic' => q(Amaconaski čas),
-				'standard' => q(Amaconaski standardny čas),
+				'daylight' => q#Amaconaski lětni čas#,
+				'generic' => q#Amaconaski čas#,
+				'standard' => q#Amaconaski standardny čas#,
 			},
 		},
 		'America/Asuncion' => {
@@ -5605,30 +5616,30 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(sewjeroameriski centralny lětni čas),
-				'generic' => q(sewjeroameriski centralny čas),
-				'standard' => q(sewjeroameriski centralny standardny čas),
+				'daylight' => q#sewjeroameriski centralny lětni čas#,
+				'generic' => q#sewjeroameriski centralny čas#,
+				'standard' => q#sewjeroameriski centralny standardny čas#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(sewjeroameriski wuchodny lětni čas),
-				'generic' => q(sewjeroameriski wuchodny čas),
-				'standard' => q(sewjeroameriski wuchodny standardny čas),
+				'daylight' => q#sewjeroameriski wuchodny lětni čas#,
+				'generic' => q#sewjeroameriski wuchodny čas#,
+				'standard' => q#sewjeroameriski wuchodny standardny čas#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(sewjeroameriski hórski lětni čas),
-				'generic' => q(sewjeroameriski hórski čas),
-				'standard' => q(sewjeroameriski hórski standardny čas),
+				'daylight' => q#sewjeroameriski hórski lětni čas#,
+				'generic' => q#sewjeroameriski hórski čas#,
+				'standard' => q#sewjeroameriski hórski standardny čas#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(sewjeroameriski pacifiski lětni čas),
-				'generic' => q(sewjeroameriski pacifiski čas),
-				'standard' => q(sewjeroameriski pacifiski standardny čas),
+				'daylight' => q#sewjeroameriski pacifiski lětni čas#,
+				'generic' => q#sewjeroameriski pacifiski čas#,
+				'standard' => q#sewjeroameriski pacifiski standardny čas#,
 			},
 		},
 		'Antarctica/DumontDUrville' => {
@@ -5639,37 +5650,37 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Apiaski lětni čas),
-				'generic' => q(Apiaski čas),
-				'standard' => q(Apiaski standardny čas),
+				'daylight' => q#Apiaski lětni čas#,
+				'generic' => q#Apiaski čas#,
+				'standard' => q#Apiaski standardny čas#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(arabski lětni čas),
-				'generic' => q(arabski čas),
-				'standard' => q(arabski standardny čas),
+				'daylight' => q#arabski lětni čas#,
+				'generic' => q#arabski čas#,
+				'standard' => q#arabski standardny čas#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(argentinski lětni čas),
-				'generic' => q(argentinski čas),
-				'standard' => q(argentinski standardny čas),
+				'daylight' => q#argentinski lětni čas#,
+				'generic' => q#argentinski čas#,
+				'standard' => q#argentinski standardny čas#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(zapadoargentinski lětni čas),
-				'generic' => q(zapadoargentinski čas),
-				'standard' => q(zapadoargentinski standardny čas),
+				'daylight' => q#zapadoargentinski lětni čas#,
+				'generic' => q#zapadoargentinski čas#,
+				'standard' => q#zapadoargentinski standardny čas#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(armenski lětni čas),
-				'generic' => q(armenski čas),
-				'standard' => q(armenski standardny čas),
+				'daylight' => q#armenski lětni čas#,
+				'generic' => q#armenski čas#,
+				'standard' => q#armenski standardny čas#,
 			},
 		},
 		'Asia/Aqtobe' => {
@@ -5767,9 +5778,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(atlantiski lětni čas),
-				'generic' => q(atlantiski čas),
-				'standard' => q(atlantiski standardny čas),
+				'daylight' => q#atlantiski lětni čas#,
+				'generic' => q#atlantiski čas#,
+				'standard' => q#atlantiski standardny čas#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -5798,171 +5809,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(srjedźoawstralski lětni čas),
-				'generic' => q(srjedźoawstralski čas),
-				'standard' => q(srjedźoawstralski standardny čas),
+				'daylight' => q#srjedźoawstralski lětni čas#,
+				'generic' => q#srjedźoawstralski čas#,
+				'standard' => q#srjedźoawstralski standardny čas#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(sjedźozapadny awstralski lětni čas),
-				'generic' => q(srjedźozapadny awstralski čas),
-				'standard' => q(srjedźozapadny awstralski standardny čas),
+				'daylight' => q#sjedźozapadny awstralski lětni čas#,
+				'generic' => q#srjedźozapadny awstralski čas#,
+				'standard' => q#srjedźozapadny awstralski standardny čas#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(wuchodoawstralski lětni čas),
-				'generic' => q(wuchodoawstralski čas),
-				'standard' => q(wuchodoawstralski standardny čas),
+				'daylight' => q#wuchodoawstralski lětni čas#,
+				'generic' => q#wuchodoawstralski čas#,
+				'standard' => q#wuchodoawstralski standardny čas#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(zapadoawstralski lětni čas),
-				'generic' => q(zapadoawstralski čas),
-				'standard' => q(zapadoawstralski standardny čas),
+				'daylight' => q#zapadoawstralski lětni čas#,
+				'generic' => q#zapadoawstralski čas#,
+				'standard' => q#zapadoawstralski standardny čas#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(azerbajdźanski lětni čas),
-				'generic' => q(azerbajdźanski čas),
-				'standard' => q(azerbajdźanski standardny čas),
+				'daylight' => q#azerbajdźanski lětni čas#,
+				'generic' => q#azerbajdźanski čas#,
+				'standard' => q#azerbajdźanski standardny čas#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(acorski lětni čas),
-				'generic' => q(acorski čas),
-				'standard' => q(acorski standardny čas),
+				'daylight' => q#acorski lětni čas#,
+				'generic' => q#acorski čas#,
+				'standard' => q#acorski standardny čas#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(bangladešski lětni čas),
-				'generic' => q(bangladešski čas),
-				'standard' => q(bangladešski standardny čas),
+				'daylight' => q#bangladešski lětni čas#,
+				'generic' => q#bangladešski čas#,
+				'standard' => q#bangladešski standardny čas#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(bhutanski čas),
+				'standard' => q#bhutanski čas#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(boliwiski čas),
+				'standard' => q#boliwiski čas#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brasiliski lětni čas),
-				'generic' => q(Brasiliski čas),
-				'standard' => q(Brasiliski standardny čas),
+				'daylight' => q#Brasiliski lětni čas#,
+				'generic' => q#Brasiliski čas#,
+				'standard' => q#Brasiliski standardny čas#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(bruneiski čas),
+				'standard' => q#bruneiski čas#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(kapverdski lětni čas),
-				'generic' => q(kapverdski čas),
-				'standard' => q(kapverdski standardny čas),
+				'daylight' => q#kapverdski lětni čas#,
+				'generic' => q#kapverdski čas#,
+				'standard' => q#kapverdski standardny čas#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(chamorroski čas),
+				'standard' => q#chamorroski čas#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(chathamski lětni čas),
-				'generic' => q(chathamski čas),
-				'standard' => q(chathamski standardny čas),
+				'daylight' => q#chathamski lětni čas#,
+				'generic' => q#chathamski čas#,
+				'standard' => q#chathamski standardny čas#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(chilski lětni čas),
-				'generic' => q(chilski čas),
-				'standard' => q(chilski standardny čas),
+				'daylight' => q#chilski lětni čas#,
+				'generic' => q#chilski čas#,
+				'standard' => q#chilski standardny čas#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(chinski lětni čas),
-				'generic' => q(chinski čas),
-				'standard' => q(chinski standardny čas),
+				'daylight' => q#chinski lětni čas#,
+				'generic' => q#chinski čas#,
+				'standard' => q#chinski standardny čas#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Čojbalsanski lětni čas),
-				'generic' => q(Čojbalsanski čas),
-				'standard' => q(Čojbalsanski standardny čas),
+				'daylight' => q#Čojbalsanski lětni čas#,
+				'generic' => q#Čojbalsanski čas#,
+				'standard' => q#Čojbalsanski standardny čas#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(čas Hodowneje kupy),
+				'standard' => q#čas Hodowneje kupy#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(čas Kokosowych kupow),
+				'standard' => q#čas Kokosowych kupow#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(kolumbiski lětni čas),
-				'generic' => q(kolumbiski čas),
-				'standard' => q(kolumbiski standardny čas),
+				'daylight' => q#kolumbiski lětni čas#,
+				'generic' => q#kolumbiski čas#,
+				'standard' => q#kolumbiski standardny čas#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(lětni čas Cookowych kupow),
-				'generic' => q(čas Cookowych kupow),
-				'standard' => q(standardny čas Cookowych kupow),
+				'daylight' => q#lětni čas Cookowych kupow#,
+				'generic' => q#čas Cookowych kupow#,
+				'standard' => q#standardny čas Cookowych kupow#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(kubaski lětni čas),
-				'generic' => q(kubaski čas),
-				'standard' => q(kubaski standardny čas),
+				'daylight' => q#kubaski lětni čas#,
+				'generic' => q#kubaski čas#,
+				'standard' => q#kubaski standardny čas#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Daviski čas),
+				'standard' => q#Daviski čas#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Dumont d´ Urvilleski čas),
+				'standard' => q#Dumont d´ Urvilleski čas#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(wuchodnotimorski čas),
+				'standard' => q#wuchodnotimorski čas#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(lětni čas Jutrowneje kupy),
-				'generic' => q(čas Jutrowneje kupy),
-				'standard' => q(standardny čas Jutrowneje kupy),
+				'daylight' => q#lětni čas Jutrowneje kupy#,
+				'generic' => q#čas Jutrowneje kupy#,
+				'standard' => q#standardny čas Jutrowneje kupy#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ekwadorski čas),
+				'standard' => q#ekwadorski čas#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -5991,7 +6002,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q(Irski lětni čas),
+				'daylight' => q#Irski lětni čas#,
 			},
 		},
 		'Europe/Kiev' => {
@@ -6002,7 +6013,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/London' => {
 			long => {
-				'daylight' => q(Britiski lětni čas),
+				'daylight' => q#Britiski lětni čas#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -6046,144 +6057,144 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(srjedźoeuropski lětni čas),
-				'generic' => q(srjedźoeuropski čas),
-				'standard' => q(srjedźoeuropski standardny čas),
+				'daylight' => q#srjedźoeuropski lětni čas#,
+				'generic' => q#srjedźoeuropski čas#,
+				'standard' => q#srjedźoeuropski standardny čas#,
 			},
 			short => {
-				'daylight' => q(MESZ),
-				'generic' => q(MEZ),
-				'standard' => q(MEZ),
+				'daylight' => q#MESZ#,
+				'generic' => q#MEZ#,
+				'standard' => q#MEZ#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(wuchodoeuropski lětni čas),
-				'generic' => q(wuchodoeuropski čas),
-				'standard' => q(wuchodoeuropski standardny čas),
+				'daylight' => q#wuchodoeuropski lětni čas#,
+				'generic' => q#wuchodoeuropski čas#,
+				'standard' => q#wuchodoeuropski standardny čas#,
 			},
 			short => {
-				'daylight' => q(OESZ),
-				'generic' => q(OEZ),
-				'standard' => q(OEZ),
+				'daylight' => q#OESZ#,
+				'generic' => q#OEZ#,
+				'standard' => q#OEZ#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Kaliningradski čas),
+				'standard' => q#Kaliningradski čas#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(zapadoeuropski lětni čas),
-				'generic' => q(zapadoeuropski čas),
-				'standard' => q(zapadoeuropski standardny čas),
+				'daylight' => q#zapadoeuropski lětni čas#,
+				'generic' => q#zapadoeuropski čas#,
+				'standard' => q#zapadoeuropski standardny čas#,
 			},
 			short => {
-				'daylight' => q(WESZ),
-				'generic' => q(WEZ),
-				'standard' => q(WEZ),
+				'daylight' => q#WESZ#,
+				'generic' => q#WEZ#,
+				'standard' => q#WEZ#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(falklandski lětni čas),
-				'generic' => q(falklandski čas),
-				'standard' => q(falklandski standardny čas),
+				'daylight' => q#falklandski lětni čas#,
+				'generic' => q#falklandski čas#,
+				'standard' => q#falklandski standardny čas#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(fidźiski lětni čas),
-				'generic' => q(fidźiski čas),
-				'standard' => q(fidźiski standardny čas),
+				'daylight' => q#fidźiski lětni čas#,
+				'generic' => q#fidźiski čas#,
+				'standard' => q#fidźiski standardny čas#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(francoskoguyanski čas),
+				'standard' => q#francoskoguyanski čas#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(čas Francoskeho južneho a antarktiskeho teritorija),
+				'standard' => q#čas Francoskeho južneho a antarktiskeho teritorija#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwichski čas),
+				'standard' => q#Greenwichski čas#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(galapagoski čas),
+				'standard' => q#galapagoski čas#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(gambierski čas),
+				'standard' => q#gambierski čas#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(georgiski lětni čas),
-				'generic' => q(georgiski čas),
-				'standard' => q(georgiski standardny čas),
+				'daylight' => q#georgiski lětni čas#,
+				'generic' => q#georgiski čas#,
+				'standard' => q#georgiski standardny čas#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(čas Gilbertowych kupow),
+				'standard' => q#čas Gilbertowych kupow#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(wuchodogrönlandski lětni čas),
-				'generic' => q(wuchodogrönlandski čas),
-				'standard' => q(wuchodogrönlandski standardny čas),
+				'daylight' => q#wuchodogrönlandski lětni čas#,
+				'generic' => q#wuchodogrönlandski čas#,
+				'standard' => q#wuchodogrönlandski standardny čas#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(zapadogrönlandski lětni čas),
-				'generic' => q(zapadogrönlandski čas),
-				'standard' => q(zapadogrönlandski standardny čas),
+				'daylight' => q#zapadogrönlandski lětni čas#,
+				'generic' => q#zapadogrönlandski čas#,
+				'standard' => q#zapadogrönlandski standardny čas#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(čas Persiskeho golfa),
+				'standard' => q#čas Persiskeho golfa#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(guyanski čas),
+				'standard' => q#guyanski čas#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(hawaiisko-aleutski lětni čas),
-				'generic' => q(hawaiisko-aleutski čas),
-				'standard' => q(hawaiisko-aleutski standardny čas),
+				'daylight' => q#hawaiisko-aleutski lětni čas#,
+				'generic' => q#hawaiisko-aleutski čas#,
+				'standard' => q#hawaiisko-aleutski standardny čas#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Hongkongski lětni čas),
-				'generic' => q(Hongkongski čas),
-				'standard' => q(Hongkongski standardny čas),
+				'daylight' => q#Hongkongski lětni čas#,
+				'generic' => q#Hongkongski čas#,
+				'standard' => q#Hongkongski standardny čas#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Chowdski lětni čas),
-				'generic' => q(Chowdski čas),
-				'standard' => q(Chowdski standardny čas),
+				'daylight' => q#Chowdski lětni čas#,
+				'generic' => q#Chowdski čas#,
+				'standard' => q#Chowdski standardny čas#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(indiski čas),
+				'standard' => q#indiski čas#,
 			},
 		},
 		'Indian/Christmas' => {
@@ -6200,240 +6211,240 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(indiskooceanski čas),
+				'standard' => q#indiskooceanski čas#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(indochinski čas),
+				'standard' => q#indochinski čas#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(srjedźoindoneski čas),
+				'standard' => q#srjedźoindoneski čas#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(wuchodoindoneski),
+				'standard' => q#wuchodoindoneski#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(zapadoindoneski čas),
+				'standard' => q#zapadoindoneski čas#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(iranski lětni čas),
-				'generic' => q(iranski čas),
-				'standard' => q(iranski standardny čas),
+				'daylight' => q#iranski lětni čas#,
+				'generic' => q#iranski čas#,
+				'standard' => q#iranski standardny čas#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkutski lětni čas),
-				'generic' => q(Irkutski čas),
-				'standard' => q(Irkutski standardny čas),
+				'daylight' => q#Irkutski lětni čas#,
+				'generic' => q#Irkutski čas#,
+				'standard' => q#Irkutski standardny čas#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(israelski lětni čas),
-				'generic' => q(israelski čas),
-				'standard' => q(israelski standardny čas),
+				'daylight' => q#israelski lětni čas#,
+				'generic' => q#israelski čas#,
+				'standard' => q#israelski standardny čas#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(japanski lětni čas),
-				'generic' => q(japanski čas),
-				'standard' => q(japanski standardny čas),
+				'daylight' => q#japanski lětni čas#,
+				'generic' => q#japanski čas#,
+				'standard' => q#japanski standardny čas#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(wuchodnokazachski čas),
+				'standard' => q#wuchodnokazachski čas#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(zapadnokazachski čas),
+				'standard' => q#zapadnokazachski čas#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(korejski lětni čas),
-				'generic' => q(korejski čas),
-				'standard' => q(korejski standardny čas),
+				'daylight' => q#korejski lětni čas#,
+				'generic' => q#korejski čas#,
+				'standard' => q#korejski standardny čas#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(kosraeski čas),
+				'standard' => q#kosraeski čas#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnojarski lětni čas),
-				'generic' => q(Krasnojarski čas),
-				'standard' => q(Krasnojarski standardny čas),
+				'daylight' => q#Krasnojarski lětni čas#,
+				'generic' => q#Krasnojarski čas#,
+				'standard' => q#Krasnojarski standardny čas#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(kirgiski čas),
+				'standard' => q#kirgiski čas#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(čas Linijowych kupow),
+				'standard' => q#čas Linijowych kupow#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(lětni čas kupy Lord-Howe),
-				'generic' => q(čas kupy Lord-Howe),
-				'standard' => q(standardny čas kupy Lord-Howe),
+				'daylight' => q#lětni čas kupy Lord-Howe#,
+				'generic' => q#čas kupy Lord-Howe#,
+				'standard' => q#standardny čas kupy Lord-Howe#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(čas kupy Macquarie),
+				'standard' => q#čas kupy Macquarie#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadanski lětni čas),
-				'generic' => q(Magadanski čas),
-				'standard' => q(Magadanski standardny čas),
+				'daylight' => q#Magadanski lětni čas#,
+				'generic' => q#Magadanski čas#,
+				'standard' => q#Magadanski standardny čas#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(malajziski čas),
+				'standard' => q#malajziski čas#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(malediwski čas),
+				'standard' => q#malediwski čas#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(marquesaski čas),
+				'standard' => q#marquesaski čas#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(čas Marshallowych kupow),
+				'standard' => q#čas Marshallowych kupow#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(mauritiuski lětni čas),
-				'generic' => q(mauritiuski čas),
-				'standard' => q(mauritiuski standardny čas),
+				'daylight' => q#mauritiuski lětni čas#,
+				'generic' => q#mauritiuski čas#,
+				'standard' => q#mauritiuski standardny čas#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Mawsonski čas),
+				'standard' => q#Mawsonski čas#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(mexiski sewjerozapadny lětni čas),
-				'generic' => q(mexiski sewjerozapadny čas),
-				'standard' => q(mexiski sewjerozapadny standardny čas),
+				'daylight' => q#mexiski sewjerozapadny lětni čas#,
+				'generic' => q#mexiski sewjerozapadny čas#,
+				'standard' => q#mexiski sewjerozapadny standardny čas#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(mexiski pacifiski lětni čas),
-				'generic' => q(mexiski pacifiski čas),
-				'standard' => q(mexiski pacifiski standardny čas),
+				'daylight' => q#mexiski pacifiski lětni čas#,
+				'generic' => q#mexiski pacifiski čas#,
+				'standard' => q#mexiski pacifiski standardny čas#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulan-Batorski lětni čas),
-				'generic' => q(Ulan-Batorski čas),
-				'standard' => q(Ulan-Batorski standardny čas),
+				'daylight' => q#Ulan-Batorski lětni čas#,
+				'generic' => q#Ulan-Batorski čas#,
+				'standard' => q#Ulan-Batorski standardny čas#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskowski lětni čas),
-				'generic' => q(Moskowski čas),
-				'standard' => q(Moskowski standardny čas),
+				'daylight' => q#Moskowski lětni čas#,
+				'generic' => q#Moskowski čas#,
+				'standard' => q#Moskowski standardny čas#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(myanmarski čas),
+				'standard' => q#myanmarski čas#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(nauruski čas),
+				'standard' => q#nauruski čas#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(nepalski čas),
+				'standard' => q#nepalski čas#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(nowokaledonski lětni čas),
-				'generic' => q(nowokaledonski čas),
-				'standard' => q(nowokaledonski standardny čas),
+				'daylight' => q#nowokaledonski lětni čas#,
+				'generic' => q#nowokaledonski čas#,
+				'standard' => q#nowokaledonski standardny čas#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(nowoseelandski lětni čas),
-				'generic' => q(nowoseelandski čas),
-				'standard' => q(nowoseelandski standardny čas),
+				'daylight' => q#nowoseelandski lětni čas#,
+				'generic' => q#nowoseelandski čas#,
+				'standard' => q#nowoseelandski standardny čas#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(nowofundlandski lětni čas),
-				'generic' => q(nowofundlandski čas),
-				'standard' => q(nowofundlandski standardny čas),
+				'daylight' => q#nowofundlandski lětni čas#,
+				'generic' => q#nowofundlandski čas#,
+				'standard' => q#nowofundlandski standardny čas#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(niueski čas),
+				'standard' => q#niueski čas#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(čas kupy Norfolk),
+				'standard' => q#čas kupy Norfolk#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(lětni čas kupow Fernando de Noronha),
-				'generic' => q(čas kupow Fernando de Noronha),
-				'standard' => q(standardny čas kupow Fernando de Noronha),
+				'daylight' => q#lětni čas kupow Fernando de Noronha#,
+				'generic' => q#čas kupow Fernando de Noronha#,
+				'standard' => q#standardny čas kupow Fernando de Noronha#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Nowosibirski lětni čas),
-				'generic' => q(Nowosibirski čas),
-				'standard' => q(Nowosibirski standardny čas),
+				'daylight' => q#Nowosibirski lětni čas#,
+				'generic' => q#Nowosibirski čas#,
+				'standard' => q#Nowosibirski standardny čas#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omski lětni čas),
-				'generic' => q(Omski čas),
-				'standard' => q(Omski standardny čas),
+				'daylight' => q#Omski lětni čas#,
+				'generic' => q#Omski čas#,
+				'standard' => q#Omski standardny čas#,
 			},
 		},
 		'Pacific/Easter' => {
@@ -6450,231 +6461,231 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(pakistanski lětni čas),
-				'generic' => q(pakistanski čas),
-				'standard' => q(pakistanski standardny čas),
+				'daylight' => q#pakistanski lětni čas#,
+				'generic' => q#pakistanski čas#,
+				'standard' => q#pakistanski standardny čas#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(palauski čas),
+				'standard' => q#palauski čas#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(papua-nowoginejski čas),
+				'standard' => q#papua-nowoginejski čas#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraguayski lětni čas),
-				'generic' => q(Paraguayski čas),
-				'standard' => q(Paraguayski standardny čas),
+				'daylight' => q#Paraguayski lětni čas#,
+				'generic' => q#Paraguayski čas#,
+				'standard' => q#Paraguayski standardny čas#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(peruski lětni čas),
-				'generic' => q(peruski čas),
-				'standard' => q(peruski standardny čas),
+				'daylight' => q#peruski lětni čas#,
+				'generic' => q#peruski čas#,
+				'standard' => q#peruski standardny čas#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(filipinski lětni čas),
-				'generic' => q(filipinski čas),
-				'standard' => q(filipinski standardny čas),
+				'daylight' => q#filipinski lětni čas#,
+				'generic' => q#filipinski čas#,
+				'standard' => q#filipinski standardny čas#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(čas Phoenixowych kupow),
+				'standard' => q#čas Phoenixowych kupow#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(lětni čas kupow St. Pierre a Miquelon),
-				'generic' => q(čas kupow St. Pierre a Miquelon),
-				'standard' => q(standardny čas kupow St. Pierre a Miquelon),
+				'daylight' => q#lětni čas kupow St. Pierre a Miquelon#,
+				'generic' => q#čas kupow St. Pierre a Miquelon#,
+				'standard' => q#standardny čas kupow St. Pierre a Miquelon#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(čas Pitcairnowych kupow),
+				'standard' => q#čas Pitcairnowych kupow#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(ponapeski čas),
+				'standard' => q#ponapeski čas#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(reunionski čas),
+				'standard' => q#reunionski čas#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Rotheraski čas),
+				'standard' => q#Rotheraski čas#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(sachalinski lětni čas),
-				'generic' => q(sachalinski čas),
-				'standard' => q(sachalinski standardny čas),
+				'daylight' => q#sachalinski lětni čas#,
+				'generic' => q#sachalinski čas#,
+				'standard' => q#sachalinski standardny čas#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(samoaski lětni čas),
-				'generic' => q(samoaski čas),
-				'standard' => q(samoaski standardny čas),
+				'daylight' => q#samoaski lětni čas#,
+				'generic' => q#samoaski čas#,
+				'standard' => q#samoaski standardny čas#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(seychellski čas),
+				'standard' => q#seychellski čas#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Singapurski čas),
+				'standard' => q#Singapurski čas#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(čas Salomonskich kupow),
+				'standard' => q#čas Salomonskich kupow#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(južnogeorgiski čas),
+				'standard' => q#južnogeorgiski čas#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(surinamski čas),
+				'standard' => q#surinamski čas#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Syowaski čas),
+				'standard' => q#Syowaski čas#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(tahitiski čas),
+				'standard' => q#tahitiski čas#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taipehski lětni čas),
-				'generic' => q(Taipehski čas),
-				'standard' => q(Taipehski standardny čas),
+				'daylight' => q#Taipehski lětni čas#,
+				'generic' => q#Taipehski čas#,
+				'standard' => q#Taipehski standardny čas#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(tadźikski čas),
+				'standard' => q#tadźikski čas#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(tokelauski čas),
+				'standard' => q#tokelauski čas#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(tongaski lětni čas),
-				'generic' => q(tongaski čas),
-				'standard' => q(tongaski standardny čas),
+				'daylight' => q#tongaski lětni čas#,
+				'generic' => q#tongaski čas#,
+				'standard' => q#tongaski standardny čas#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(chuukski čas),
+				'standard' => q#chuukski čas#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(turkmenski lětni čas),
-				'generic' => q(turkmenski čas),
-				'standard' => q(turkmenski standardny čas),
+				'daylight' => q#turkmenski lětni čas#,
+				'generic' => q#turkmenski čas#,
+				'standard' => q#turkmenski standardny čas#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(tuvaluski čas),
+				'standard' => q#tuvaluski čas#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(uruguayski lětni čas),
-				'generic' => q(uruguayski čas),
-				'standard' => q(uruguayski standardny čas),
+				'daylight' => q#uruguayski lětni čas#,
+				'generic' => q#uruguayski čas#,
+				'standard' => q#uruguayski standardny čas#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(uzbekski lětni čas),
-				'generic' => q(uzbekski čas),
-				'standard' => q(uzbekski standardny čas),
+				'daylight' => q#uzbekski lětni čas#,
+				'generic' => q#uzbekski čas#,
+				'standard' => q#uzbekski standardny čas#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(vanuatuski lětni čas),
-				'generic' => q(vanuatuski čas),
-				'standard' => q(vanuatuski standardny čas),
+				'daylight' => q#vanuatuski lětni čas#,
+				'generic' => q#vanuatuski čas#,
+				'standard' => q#vanuatuski standardny čas#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(venezuelski čas),
+				'standard' => q#venezuelski čas#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Wladiwostokski lětni čas),
-				'generic' => q(Wladiwostokski čas),
-				'standard' => q(Wladiwostokski standardny čas),
+				'daylight' => q#Wladiwostokski lětni čas#,
+				'generic' => q#Wladiwostokski čas#,
+				'standard' => q#Wladiwostokski standardny čas#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Wolgogradski lětni čas),
-				'generic' => q(Wolgogradski čas),
-				'standard' => q(Wolgogradski standardny čas),
+				'daylight' => q#Wolgogradski lětni čas#,
+				'generic' => q#Wolgogradski čas#,
+				'standard' => q#Wolgogradski standardny čas#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Wostokski čas),
+				'standard' => q#Wostokski čas#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(čas kupy Wake),
+				'standard' => q#čas kupy Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(čas kupow Wallis a Futuna),
+				'standard' => q#čas kupow Wallis a Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakutski lětni čas),
-				'generic' => q(Jakutski čas),
-				'standard' => q(Jakutski standardny čas),
+				'daylight' => q#Jakutski lětni čas#,
+				'generic' => q#Jakutski čas#,
+				'standard' => q#Jakutski standardny čas#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekaterinburgski lětni čas),
-				'generic' => q(Jekaterinburgski čas),
-				'standard' => q(Jekaterinburgski standardny čas),
+				'daylight' => q#Jekaterinburgski lětni čas#,
+				'generic' => q#Jekaterinburgski čas#,
+				'standard' => q#Jekaterinburgski standardny čas#,
 			},
 		},
 	 } }

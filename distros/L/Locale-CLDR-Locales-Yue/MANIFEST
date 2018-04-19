@@ -1,7 +1,9 @@
 Build.PL
 lib/Locale/CLDR/Locales/Yue.pm
-lib/Locale/CLDR/Locales/Yue/Any.pm
-lib/Locale/CLDR/Locales/Yue/Any/Hk.pm
+lib/Locale/CLDR/Locales/Yue/Hans.pm
+lib/Locale/CLDR/Locales/Yue/Hans/Cn.pm
+lib/Locale/CLDR/Locales/Yue/Hant.pm
+lib/Locale/CLDR/Locales/Yue/Hant/Hk.pm
 MANIFEST			This list of files
 README
 t/00-load.t

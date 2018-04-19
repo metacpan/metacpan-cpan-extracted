@@ -1,6 +1,6 @@
 package Pcore::Handle::DBI;
 
-use Pcore -role, -const, -result;
+use Pcore -role, -const;
 use Pcore::Handle::DBI::STH;
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref];
 
@@ -26,111 +26,39 @@ sub add_schema_patch ( $self, $id, $query ) {
     return;
 }
 
-sub upgrade_schema ( $self, $cb ) {
-    my $on_finish = sub ( $dbh, $status ) {
+sub upgrade_schema ( $self ) {
+    my ( $dbh, $res ) = $self->begin_work;
+
+    my $on_finish = sub {
         delete $self->{_schema_patch};
 
-        if ($status) {
-            $dbh->commit(
-                sub ( $dbh, $status ) {
-                    $cb->($status);
-
-                    return;
-                }
-            );
+        if ($res) {
+            $dbh->commit;
         }
         else {
-            if ( !$dbh ) {
-                $cb->($status);
-            }
-            else {
-                $dbh->rollback(
-                    sub ( $dbh, $status1 ) {
-                        $cb->($status);
-
-                        return;
-                    }
-                );
-            }
+            $dbh->rollback;
         }
 
-        return;
+        return $res;
     };
 
-    # start transaction
-    $self->begin_work(
-        sub ( $dbh, $status ) {
-            return $on_finish->( $dbh, $status ) if !$status;
+    # create patch table
+    ( $res = $dbh->do( $self->_get_schema_patch_table_query($SCHEMA_PATCH_TABLE_NAME) ) ) || return $on_finish->();
 
-            # create patch table
-            $dbh->do(
-                $self->_get_schema_patch_table_query($SCHEMA_PATCH_TABLE_NAME),
-                sub ( $dbh, $status, $data ) {
-                    return $on_finish->( $dbh, $status ) if !$status;
+    for my $id ( sort keys $self->{_schema_patch}->%* ) {
+        ( $res = $dbh->selectrow( qq[SELECT "id" FROM "$SCHEMA_PATCH_TABLE_NAME" WHERE "id" = \$1], [$id] ) ) || return $on_finish->();
 
-                    $self->_apply_patch(
-                        $dbh,
-                        sub ($status) {
-                            return $on_finish->( $dbh, $status );
-                        }
-                    );
-                }
-            );
+        # patch is already exists
+        next if $res->{data};
 
-            return;
-        }
-    );
+        # apply patch
+        ( $res = $dbh->do( $self->{_schema_patch}->{$id}->{query} ) ) || return $on_finish->();
 
-    return;
-}
+        # register patch
+        ( $res = $dbh->do( qq[INSERT INTO "$SCHEMA_PATCH_TABLE_NAME" ("id") VALUES (\$1)], [$id] ) ) || return $on_finish->();
+    }
 
-sub _apply_patch ( $self, $dbh, $cb ) {
-    return $cb->( result 200 ) if !$self->{_schema_patch}->%*;
-
-    my $id = ( sort keys $self->{_schema_patch}->%* )[0];
-
-    my $patch = delete $self->{_schema_patch}->{$id};
-
-    $dbh->selectrow(
-        qq[SELECT "id" FROM "$SCHEMA_PATCH_TABLE_NAME" WHERE "id" = \$1],
-        [ $patch->{id} ],
-        sub ( $dbh, $status, $data ) {
-            return $cb->($status) if !$status;
-
-            # patch is already exists
-            if ($data) {
-                @_ = ( $self, $dbh, $cb );
-
-                goto $self->can('_apply_patch');
-            }
-
-            # apply patch
-            $dbh->do(
-                $patch->{query},
-                sub ( $dbh, $status, $data ) {
-                    return $cb->( result [ 500, qq[Failed to apply schema patch "$id": $status->{reason}] ] ) if !$status;
-
-                    # register patch
-                    $dbh->do(
-                        qq[INSERT INTO "$SCHEMA_PATCH_TABLE_NAME" ("id") VALUES (\$1)],
-                        [ $patch->{id} ],
-                        sub ( $dbh, $status, $data ) {
-                            return $cb->( result [ 500, qq[Failed to register patch "$id": $status->{reason}] ] ) if !$status;
-
-                            # patch registered successfully
-                            @_ = ( $self, $dbh, $cb );
-
-                            goto $self->can('_apply_patch');
-                        }
-                    );
-                }
-            );
-
-            return;
-        }
-    );
-
-    return;
+    return $on_finish->();
 }
 
 # QUOTE

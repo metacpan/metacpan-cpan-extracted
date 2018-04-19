@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "locale",
       "CLDR",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Locale-CLDR-Locales-Az",
    "prereqs" : {
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.29.0",
+            "Locale::CLDR" : "v0.32.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,23 +46,23 @@
    "provides" : {
       "Locale::CLDR::Locales::Az" : {
          "file" : "lib/Locale/CLDR/Locales/Az.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Az::Cyrl" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Cyrl.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Az::Cyrl::Az" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Cyrl/Az.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Az::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Latn.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Az::Latn::Az" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Latn/Az.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       }
    },
    "release_status" : "stable",
@@ -75,5 +75,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.29.0"
+   "version" : "v0.32.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

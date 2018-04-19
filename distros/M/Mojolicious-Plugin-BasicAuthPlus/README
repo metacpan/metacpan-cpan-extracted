@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 VERSION
-    Version 0.11.0
+    Version 0.11.1
 
 SYNOPSIS
       # Mojolicious::Lite
@@ -386,13 +386,13 @@ AUTHOR
     Brad Robertson <blr@cpan.org>
 
 CONTRIBUTORS
-    In alphabetical order:
-
-      G.Y. Park
+      Nicolas Georges
 
       Jay Mortensen
 
-      Nicolas Georges
+      Mark Muldoon
+
+      G.Y. Park
 
 SEE ALSO
     Mojolicious, Mojolicious::Guides, <http://mojolicio.us>,

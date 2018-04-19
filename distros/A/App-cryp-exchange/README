@@ -2,8 +2,8 @@ NAME
     App::cryp::exchange - Interact with cryptoexchanges
 
 VERSION
-    This document describes version 0.001 of App::cryp::exchange (from Perl
-    distribution App-cryp-exchange), released on 2018-04-04.
+    This document describes version 0.002 of App::cryp::exchange (from Perl
+    distribution App-cryp-exchange), released on 2018-04-12.
 
 SYNOPSIS
     Please see included script cryp-exchange.

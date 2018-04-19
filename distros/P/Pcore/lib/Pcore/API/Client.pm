@@ -1,6 +1,6 @@
 package Pcore::API::Client;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::WebSocket;
 use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref is_plain_coderef weaken];
 use Pcore::Util::Data qw[to_cbor from_cbor];
@@ -70,7 +70,6 @@ sub disconnect ($self) {
     return;
 }
 
-# TODO make blocking call
 sub api_call ( $self, $method, @args ) {
 
     # add version to relative method id
@@ -83,34 +82,41 @@ sub api_call ( $self, $method, @args ) {
         }
     }
 
-    if ( $self->{_is_http} ) {
-        $self->_send_http( $method, @args );
+    # parse callback
+    my $cb = is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? pop : undef;
+
+    if ( defined wantarray ) {
+        my $rouse_cb = Coro::roouse_cb;
+
+        if ( $self->{_is_http} ) {
+            $self->_send_http( $method, \@args, $rouse_cb );
+        }
+        else {
+            $self->_send_ws( $method, \@args, $rouse_cb );
+        }
+
+        my $res = Coro::rouse_wait $rouse_cb;
+
+        return $cb ? $cb->($res) : $res;
     }
     else {
-        $self->_send_ws( $method, @args );
-    }
+        if ( $self->{_is_http} ) {
+            $self->_send_http( $method, \@args, undef );
+        }
+        else {
+            $self->_send_ws( $method, \@args, undef );
+        }
 
-    return;
+        return;
+    }
 }
 
-sub _send_http ( $self, $method, @ ) {
-    my ( $cb, $data );
-
-    # detect callback
-    if ( is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
-        $cb = $_[-1];
-
-        $data = [ @_[ 2 .. $#_ - 1 ] ] if @_ > 3;
-    }
-    else {
-        $data = [ @_[ 2 .. $#_ ] ] if @_ > 2;
-    }
-
+sub _send_http ( $self, $method, $args, $cb ) {
     my $payload = {
         type   => 'rpc',
         method => $method,
-        ( $cb   ? ( tid  => uuid_v1mc_str ) : () ),
-        ( $data ? ( data => $data )         : () ),
+        data   => $args,
+        ( $cb ? ( tid => uuid_v1mc_str ) : () ),
     };
 
     P->http->post(
@@ -127,13 +133,13 @@ sub _send_http ( $self, $method, @ ) {
         body => to_cbor($payload),
         sub ($res) {
             if ( !$res ) {
-                $cb->( result [ $res->status, $res->reason ] ) if $cb;
+                $cb->( res [ $res->{status}, $res->{reason} ] ) if $cb;
             }
             else {
-                my $msg = eval { from_cbor $res->body };
+                my $msg = eval { from_cbor $res->{body} };
 
                 if ($@) {
-                    $cb->( result [ 500, 'Error decoding response' ] ) if $cb;
+                    $cb->( res [ 500, 'Error decoding response' ] ) if $cb;
                 }
                 elsif ($cb) {
                     my $tx = is_plain_arrayref $msg ? $msg->[0] : $msg;
@@ -154,16 +160,14 @@ sub _send_http ( $self, $method, @ ) {
     return;
 }
 
-sub _send_ws ( $self, @args ) {
-    my $cb = is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? $_[-1] : undef;
-
+sub _send_ws ( $self, $method, $args, $cb ) {
     $self->_get_ws(
         sub ( $ws, $error ) {
             if ( defined $error ) {
                 $cb->($error) if $cb;
             }
             else {
-                $ws->rpc_call(@args);
+                $ws->rpc_call( $method, $args, $cb );
             }
 
             return;

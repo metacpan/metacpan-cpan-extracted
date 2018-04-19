@@ -25,3 +25,4 @@ t/Plack/Auth/SSO/ResponseParser.t
 t/Plack/Auth/SSO/ResponseParser/CAS.t
 t/Plack/Auth/SSO/ResponseParser/ORCID.t
 t/author-pod-syntax.t
+t/lib/Plack/Auth/SSO/Mock.pm

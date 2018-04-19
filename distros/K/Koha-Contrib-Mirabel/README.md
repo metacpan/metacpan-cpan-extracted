@@ -325,7 +325,7 @@ EXPORT PERL5LIB=<koha_mirabel_root>/lib:$PERL5LIB
 
 ## Copyright et license
 
-Copyright 2014 by Tamil, s.a.r.l.
+Copyright 2015 by Tamil, s.a.r.l.
 
 <http://www.tamil.fr>
 

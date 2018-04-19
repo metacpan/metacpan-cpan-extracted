@@ -16,7 +16,8 @@ to support an earlier Perl release.
 EOL
 }
 
-use vars qw ($no_xs $force_xs);
+my ($no_xs, $force_xs);
+
 unlink 'pm_to_blib'; # belts and braces
 
 if ($ENV{PERL_ONLY}) {
@@ -51,7 +52,7 @@ sub write_makefile
         'parent'                => 0.221,
     );
 
-    WriteMakefile( VERSION         => '0.9920',
+    WriteMakefile( VERSION         => '0.9923',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,

@@ -35,6 +35,7 @@ use File::Temp;
 use Gzip::Faster;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use Error::Simple;
+use Carp;
 
 our @databases;
 our $directory;
@@ -81,6 +82,8 @@ sub set_logger {
 
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
+	} elsif(!ref($_[0])) {
+		Carp::croak('Usage: set_logger(logger => $logger)');
 	} elsif(scalar(@_) % 2 == 0) {
 		%args = @_;
 	} else {
@@ -140,8 +143,8 @@ sub _open {
 						csv_tables => {
 							$table => {
 								col_names => $args{'column_names'},
-							}
-						}
+							},
+						},
 					}
 				);
 			} else {
@@ -153,7 +156,7 @@ sub _open {
 				$self->{'logger'}->debug("read in $table from CSV $slurp_file");
 			}
 
-			my %options = (
+			$dbh->{csv_tables}->{$table} = {
 				allow_loose_quotes => 1,
 				blank_is_undef => 1,
 				empty_is_undef => 1,
@@ -161,9 +164,23 @@ sub _open {
 				f_file => $slurp_file,
 				escape_char => '\\',
 				sep_char => $sep_char,
-			);
+				auto_diag => 1,
+				# Don't do this, it causes "Attempt to free unreferenced scalar"
+				# callbacks => {
+					# after_parse => sub {
+						# my ($csv, @rows) = @_;
+						# my @rc;
+						# foreach my $row(@rows) {
+							# if($row->[0] !~ /^#/) {
+								# push @rc, $row;
+							# }
+						# }
+						# return @rc;
+					# }
+				# }
+			};
 
-			$dbh->{csv_tables}->{$table} = \%options;
+			# $dbh->{csv_tables}->{$table} = \%options;
 			# delete $options{f_file};
 
 			# require Text::CSV::Slurp;
@@ -323,7 +340,7 @@ sub fetchrow_hashref {
 			return $rc;
 		}
 	}
-	my $sth = $self->{$table}->prepare($query);
+	my $sth = $self->{$table}->prepare($query) or die $self->{$table}->errstr();
 	$sth->execute(@args) || throw Error::Simple("$query: @args");
 	if($c) {
 		my $rc = $sth->fetchrow_hashref();
@@ -341,6 +358,8 @@ sub execute {
 
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: execute(query => $query)');
 	} elsif(scalar(@_) % 2 == 0) {
 		%args = @_;
 	} else {
@@ -354,7 +373,7 @@ sub execute {
 
 	my $query = $args{'query'};
 	if($self->{'logger'}) {
-		$self->{'logger'}->debug("fetchrow_hashref $query");
+		$self->{'logger'}->debug("execute $query");
 	}
 	my $sth = $self->{$table}->prepare($query);
 	$sth->execute() || throw Error::Simple($query);
@@ -444,7 +463,7 @@ sub DESTROY {
 	my $self = shift;
 
 	if($self->{'temp'}) {
-		unlink $self->{'temp'};
+		unlink delete $self->{'temp'};
 	}
 }
 

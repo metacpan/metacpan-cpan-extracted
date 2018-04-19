@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Bem - Package for language Bemba
 
 package Locale::CLDR::Locales::Bem;
 # This file auto generated from Data\common\main\bem.xml
-#	on Fri 29 Apr  6:52:27 pm GMT
+#	on Fri 13 Apr  7:02:28 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -104,9 +105,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[d h q r v x z])},
+			auxiliary => qr{[d h q r v x z]},
 			index => ['A', 'B', 'C', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S', '{SH}', 'T', 'U', 'W', 'Y'],
-			main => qr{(?^u:[a b c e f g i j k l m n o p s {sh} t u w y])},
+			main => qr{[a b c e f g i j k l m n o p s {sh} t u w y]},
 		};
 	},
 EOT
@@ -290,11 +291,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{akasuba},
-					'am' => q{uluchelo},
-				},
 				'abbreviated' => {
+					'am' => q{uluchelo},
+					'pm' => q{akasuba},
+				},
+				'wide' => {
 					'am' => q{uluchelo},
 					'pm' => q{akasuba},
 				},
@@ -376,7 +377,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -401,7 +402,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

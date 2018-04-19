@@ -60,10 +60,12 @@ while ( my $line = <STDIN> ) {
 	$station =~ s{ ^ EBIL     $ }{EBILP}x;
 	$station =~ s{ ^ EBLA     $ }{EBP}x;
 	$station =~ s{ ^ EBTHP    $ }{EBTH}x;
+	$station =~ s{ ^ EDULH    $ }{EDUL}x;
 	$station =~ s{ ^ EDO \s N $ }{EDO}x;
 	$station =~ s{ ^ FBUSS    $ }{FBUS}x;
 	$station =~ s{ ^ FH \s\s N$ }{FH}x;
 	$station =~ s{ ^ FMTN     $ }{FMT}x;
+	$station =~ s{ ^ HWOL     $ }{HWOH}x;
 	$station =~ s{ ^ KAREP    $ }{KARE}x;
 	$station =~ s{ ^ KBR \s P $ }{KBR}x;
 	$station =~ s{ ^ KDDH     $ }{KDD}x;
@@ -71,7 +73,6 @@ while ( my $line = <STDIN> ) {
 	$station =~ s{ ^ KDN \s P $ }{KDN}x;
 	$station =~ s{ ^ KGKK     $ }{KGEK}x;
 	$station =~ s{ ^ KRY \s P $ }{KRY}x;
-	$station =~ s{ ^ TS \s\s T$ }{TST}x;
 	$station =~ s{ ^ TSZ \s F $ }{TSFE}x;
 
 	printf(
@@ -2057,7 +2058,7 @@ Travel::Status::DE::IRIS(3pm).
 
 Station data: Copyright (C) 2016 by DB Station&Service AG, Europaplatz 1, 10557 Berlin, Germany
 
-Lookup code: Copyright (C) 2014-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Lookup code: Copyright (C) 2014-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

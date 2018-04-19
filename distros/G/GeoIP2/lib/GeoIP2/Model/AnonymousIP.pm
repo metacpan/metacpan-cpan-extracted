@@ -3,7 +3,7 @@ package GeoIP2::Model::AnonymousIP;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -41,7 +41,7 @@ GeoIP2::Model::AnonymousIP - Model class for the GeoIP2 Anonymous IP database
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 

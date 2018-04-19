@@ -31,42 +31,46 @@ GOOGLE: {
 		} else {
 			diag("Using Geo::Coder::Google::V3 $Geo::Coder::Google::V3::VERSION");
 		}
-		my %gp_args;
+		if(my $key = $ENV{GMAP_KEY}) {
+			my %gp_args = (
+				key => $key,
+				api_key => $key
+			);
 
-		if(my $geolocation_key = $ENV{'GMAP_KEY'}) {
-			$gp_args{'key'} = $geolocation_key;
-			$gp_args{'api_key'} = $geolocation_key;
+			my $geocoderlist = new_ok('Geo::Coder::List')
+				->push(new_ok('Geo::Coder::Google::V3' => [ %gp_args ]));
+
+			my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
+			ok(defined($location));
+			ok(ref($location) eq 'HASH');
+			delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
+			delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
+			is(ref($location->{'geocoder'}), 'Geo::Coder::Google::V3', 'Verify Google encoder is used');
+
+			$location = $geocoderlist->geocode('Silver Spring, MD, USA');
+			ok(defined($location));
+			ok(ref($location) eq 'HASH');
+			delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
+			delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
+			is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
+
+			$location = $geocoderlist->geocode('Plugh Hospice, Rochester, Earth');
+			ok(!defined($location));
+
+			$location = $geocoderlist->geocode({ location => 'Rochester, Kent, England' });
+			ok(defined($location));
+			ok(ref($location) eq 'HASH');
+			delta_within($location->{geometry}{location}{lat}, 51.38, 1e-1);
+			delta_within($location->{geometry}{location}{lng}, 0.5067, 1e-1);
+
+			$location = $geocoderlist->geocode('Xyzzy Lane, Minster, Thanet, Kent, England');
+			ok(!defined($location));
+
+			ok(!defined($geocoderlist->geocode()));
+			ok(!defined($geocoderlist->geocode('')));
+		} else {
+			diag('Set GMAP_KEY to enable more tests');
+			skip 'GMAP_KEY not set', 20;
 		}
-		my $geocoderlist = new_ok('Geo::Coder::List')
-			->push(new_ok('Geo::Coder::Google::V3' => [ %gp_args ]));
-
-		my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
-		ok(defined($location));
-		ok(ref($location) eq 'HASH');
-		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
-		delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
-		is(ref($location->{'geocoder'}), 'Geo::Coder::Google::V3', 'Verify Google encoder is used');
-
-		$location = $geocoderlist->geocode('Silver Spring, MD, USA');
-		ok(defined($location));
-		ok(ref($location) eq 'HASH');
-		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
-		delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
-		is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
-
-		$location = $geocoderlist->geocode('Plugh Hospice, Rochester, Earth');
-		ok(!defined($location));
-
-		$location = $geocoderlist->geocode({ location => 'Rochester, Kent, England' });
-		ok(defined($location));
-		ok(ref($location) eq 'HASH');
-		delta_within($location->{geometry}{location}{lat}, 51.38, 1e-1);
-		delta_within($location->{geometry}{location}{lng}, 0.5067, 1e-1);
-
-		$location = $geocoderlist->geocode('Xyzzy Lane, Minster, Thanet, Kent, England');
-		ok(!defined($location));
-
-		ok(!defined($geocoderlist->geocode()));
-		ok(!defined($geocoderlist->geocode('')));
 	}
 }

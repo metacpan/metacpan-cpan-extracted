@@ -37,8 +37,8 @@ sub load ( $self, $cb ) {
             $url,
             timeout => $self->http_timeout,
             sub ($res) {
-                if ( $res->status == 200 && $res->{body} ) {
-                    decode_eol $res->body->$*;
+                if ( $res->{status} == 200 && $res->{body} ) {
+                    decode_eol $res->{body}->$*;
 
                     for my $addr ( split /\n/sm, $res->{body}->$* ) {
                         push $proxies, $addr;

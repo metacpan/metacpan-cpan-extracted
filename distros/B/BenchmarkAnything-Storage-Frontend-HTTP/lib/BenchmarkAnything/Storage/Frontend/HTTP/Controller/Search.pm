@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Frontend::HTTP::Controller::Search;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: BenchmarkAnything - REST API - data query
-$BenchmarkAnything::Storage::Frontend::HTTP::Controller::Search::VERSION = '0.011';
+$BenchmarkAnything::Storage::Frontend::HTTP::Controller::Search::VERSION = '0.012';
 use Mojo::Base 'Mojolicious::Controller';
 
 
@@ -146,7 +146,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2018 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

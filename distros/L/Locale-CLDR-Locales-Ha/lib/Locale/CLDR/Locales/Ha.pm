@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ha - Package for language Hausa
 
 package Locale::CLDR::Locales::Ha;
 # This file auto generated from Data\common\main\ha.xml
-#	on Fri 29 Apr  7:06:39 pm GMT
+#	on Fri 13 Apr  7:12:35 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -392,9 +393,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à â é è ê í ì î ó ò ô p q {r̃} ú ù û v x ƴ])},
+			auxiliary => qr{[á à â é è ê í ì î ó ò ô p q {r̃} ú ù û v x ƴ]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'Ƙ', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', '{ʼY}', 'Z'],
-			main => qr{(?^u:[a b ɓ c d ɗ e f g h i j k ƙ l m n o r s {sh} t {ts} u w y {ʼy} z ʼ])},
+			main => qr{[a b ɓ c d ɗ e f g h i j k ƙ l m n o r s {sh} t {ts} u w y {ʼy} z ʼ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -465,22 +467,170 @@ has 'number_formats' => (
 	default		=> sub { {
 		decimalFormat => {
 			'default' => {
+				'1000' => {
+					'one' => '0D',
+					'other' => '0D',
+				},
+				'10000' => {
+					'one' => '00D',
+					'other' => '00D',
+				},
+				'100000' => {
+					'one' => '000D',
+					'other' => '000D',
+				},
+				'1000000' => {
+					'one' => '0M',
+					'other' => '0M',
+				},
+				'10000000' => {
+					'one' => '00M',
+					'other' => '00M',
+				},
+				'100000000' => {
+					'one' => '000M',
+					'other' => '000M',
+				},
+				'1000000000' => {
+					'one' => '0B',
+					'other' => '0B',
+				},
+				'10000000000' => {
+					'one' => '00B',
+					'other' => '00B',
+				},
+				'100000000000' => {
+					'one' => '000B',
+					'other' => '000B',
+				},
+				'1000000000000' => {
+					'one' => '0T',
+					'other' => '0T',
+				},
+				'10000000000000' => {
+					'one' => '00T',
+					'other' => '00T',
+				},
+				'100000000000000' => {
+					'one' => '000T',
+					'other' => '000T',
+				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
+				},
+			},
+			'long' => {
+				'1000' => {
+					'one' => 'Dubu 0',
+					'other' => 'Dubu 0',
+				},
+				'10000' => {
+					'one' => 'Dubu 00',
+					'other' => 'Dubu 00',
+				},
+				'100000' => {
+					'one' => 'Dubu 000',
+					'other' => 'Dubu 000',
+				},
+				'1000000' => {
+					'one' => 'Miliyan 0',
+					'other' => 'Miliyan 0',
+				},
+				'10000000' => {
+					'one' => 'Miliyan 00',
+					'other' => 'Miliyan 00',
+				},
+				'100000000' => {
+					'one' => 'Miliyan 000',
+					'other' => 'Miliyan 000',
+				},
+				'1000000000' => {
+					'one' => 'Biliyan 0',
+					'other' => 'Biliyan 0',
+				},
+				'10000000000' => {
+					'one' => 'Biliyan 00',
+					'other' => 'Biliyan 00',
+				},
+				'100000000000' => {
+					'one' => 'Biliyan 000',
+					'other' => 'Biliyan 000',
+				},
+				'1000000000000' => {
+					'one' => 'Triliyan 0',
+					'other' => 'Triliyan 0',
+				},
+				'10000000000000' => {
+					'one' => 'Triliyan 00',
+					'other' => 'Triliyan 00',
+				},
+				'100000000000000' => {
+					'one' => 'Triliyan 000',
+					'other' => 'Triliyan 000',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'one' => '0D',
+					'other' => '0D',
+				},
+				'10000' => {
+					'one' => '00D',
+					'other' => '00D',
+				},
+				'100000' => {
+					'one' => '000D',
+					'other' => '000D',
+				},
+				'1000000' => {
+					'one' => '0M',
+					'other' => '0M',
+				},
+				'10000000' => {
+					'one' => '00M',
+					'other' => '00M',
+				},
+				'100000000' => {
+					'one' => '000M',
+					'other' => '000M',
+				},
+				'1000000000' => {
+					'one' => '0B',
+					'other' => '0B',
+				},
+				'10000000000' => {
+					'one' => '00B',
+					'other' => '00B',
+				},
+				'100000000000' => {
+					'one' => '000B',
+					'other' => '000B',
+				},
+				'1000000000000' => {
+					'one' => '0T',
+					'other' => '0T',
+				},
+				'10000000000000' => {
+					'one' => '00T',
+					'other' => '00T',
+				},
+				'100000000000000' => {
+					'one' => '000T',
+					'other' => '000T',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -815,6 +965,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					narrow => {
+						nonleap => [
+							'J',
+							'F',
+							'M',
+							'A',
+							'M',
+							'Y',
+							'Y',
+							'A',
+							'S',
+							'O',
+							'N',
+							'D'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'Janairu',
@@ -836,6 +1005,25 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'Jan',
+							'Fab',
+							'Mar',
+							'Afi',
+							'May',
+							'Yun',
+							'Yul',
+							'Agu',
+							'Sat',
+							'Okt',
+							'Nuw',
+							'Dis'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'J',
@@ -855,6 +1043,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'Janairu',
+							'Faburairu',
+							'Maris',
+							'Afirilu',
+							'Mayu',
+							'Yuni',
+							'Yuli',
+							'Agusta',
+							'Satumba',
+							'Oktoba',
+							'Nuwamba',
+							'Disamba'
+						],
+						leap => [
+							
+						],
+					},
 				},
 			},
 	} },
@@ -868,6 +1075,24 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
+						mon => 'Lit',
+						tue => 'Tal',
+						wed => 'Lar',
+						thu => 'Alh',
+						fri => 'Jum',
+						sat => 'Asa',
+						sun => 'Lah'
+					},
+					narrow => {
+						mon => 'L',
+						tue => 'T',
+						wed => 'L',
+						thu => 'A',
+						fri => 'J',
+						sat => 'A',
+						sun => 'L'
+					},
+					short => {
 						mon => 'Li',
 						tue => 'Ta',
 						wed => 'Lr',
@@ -887,6 +1112,15 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						mon => 'Lit',
+						tue => 'Tal',
+						wed => 'Lar',
+						thu => 'Alh',
+						fri => 'Jum',
+						sat => 'Asa',
+						sun => 'Lah'
+					},
 					narrow => {
 						mon => 'L',
 						tue => 'T',
@@ -895,6 +1129,24 @@ has 'calendar_days' => (
 						fri => 'J',
 						sat => 'A',
 						sun => 'L'
+					},
+					short => {
+						mon => 'Li',
+						tue => 'Ta',
+						wed => 'Lr',
+						thu => 'Al',
+						fri => 'Ju',
+						sat => 'As',
+						sun => 'Lh'
+					},
+					wide => {
+						mon => 'Litinin',
+						tue => 'Talata',
+						wed => 'Laraba',
+						thu => 'Alhamis',
+						fri => 'Jummaʼa',
+						sat => 'Asabar',
+						sun => 'Lahadi'
 					},
 				},
 			},
@@ -913,6 +1165,28 @@ has 'calendar_quarters' => (
 						2 => 'K3',
 						3 => 'K4'
 					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
+					wide => {0 => 'Kwata na ɗaya',
+						1 => 'Kwata na biyu',
+						2 => 'Kwata na uku',
+						3 => 'Kwata na huɗu'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => 'K1',
+						1 => 'K2',
+						2 => 'K3',
+						3 => 'K4'
+					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
 					wide => {0 => 'Kwata na ɗaya',
 						1 => 'Kwata na biyu',
 						2 => 'Kwata na uku',
@@ -920,6 +1194,40 @@ has 'calendar_quarters' => (
 					},
 				},
 			},
+	} },
+);
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+			},
+			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+			},
+		},
 	} },
 );
 
@@ -971,10 +1279,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 	} },
 );
@@ -997,6 +1305,7 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			Ed => q{E, d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -1009,13 +1318,16 @@ has 'datetime_formats_available_formats' => (
 			Md => q{M/d},
 			d => q{d},
 			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{mm:ss},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},
-			yMMMEd => q{E, MMM d, y},
+			yMMMEd => q{y MMM d, E},
 			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM, y},
+			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
@@ -1058,6 +1370,48 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			MEd => {
+				d => q{E, dd/M – E, dd/M},
+			},
+			h => {
+				a => q{h a – h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+			},
+			yM => {
+				M => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
+			},
+			yMEd => {
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				y => q{y MMM – y MMM},
+			},
+			yMMMEd => {
+				y => q{y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				y => q{y MMMM – y MMMM},
+			},
+			yMMMd => {
+				y => q{y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{dd/MM/y – dd/MM/y},
+				d => q{dd/MM/y – dd/MM/y},
+			},
+		},
 	} },
 );
 

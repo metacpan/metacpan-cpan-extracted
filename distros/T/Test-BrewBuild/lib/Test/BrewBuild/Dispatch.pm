@@ -12,13 +12,13 @@ use Parallel::ForkManager;
 use POSIX;
 use Storable;
 use Test::BrewBuild;
+use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Git;
+use Test::BrewBuild::Regex;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 $| = 1;
-
-use constant REPO_PREFIX => 'https://github.com/';
 
 my ($log, $last_run_status, $results_returned);
 $ENV{BB_RUN_STATUS} = 'PASS';
@@ -39,11 +39,7 @@ sub new {
 
     $log->child('new')->_5("instantiating new object");
 
-    if (defined $args{auto}){
-        $self->{auto} = $args{auto};
-        $self->{auto} = 0 if $self->{auto} == 1;
-    }
-
+    $self->{auto} = $args{auto};
     $self->{autotest} = $args{autotest} if defined $args{autotest};
     $self->{forks} = defined $args{forks} ? $args{forks} : 4;
     $self->{rpi} = defined $args{rpi} ? $args{rpi} : undef;
@@ -57,7 +53,7 @@ sub auto {
 
     my $log = $log->child('auto');
 
-    $log->_5("\nCommencing auto run dispatch sequence");
+    $log->_5("Commencing auto run dispatch sequence");
 
     $last_run_status = $ENV{BB_RUN_STATUS};
 
@@ -91,8 +87,8 @@ sub auto {
         }
 
         my $results = $self->dispatch(%params);
-
-        my @short_results = $results =~ /(5\.\d{1,2}\.\d{1,2} :: \w{4})/g;
+        my @short_results
+            = $results =~ /${ re_dispatch('extract_short_results')}/g;
 
         print "$_\n" for @short_results;
 
@@ -112,46 +108,74 @@ sub auto {
         }
 
         if ($self->{rpi}){
-            $log->_7("RPi specific testing enabled");
+            $log->_7("RPi LCD test result output enabled");
 
             if ($ENV{BB_RPI_LCD}){
                 if ($results_returned){
+
+                    my @lcd_info = split /,/, $ENV{BB_RPI_LCD};
+                    my @pins;
+
+                    if (@lcd_info == 8){
+                        $self->{rpi_lcd_rows} = $lcd_info[6];
+                        $self->{rpi_lcd_cols} = $lcd_info[7];
+                        @pins = @lcd_info[0..5];
+                    }
+                    if (! $lcd && @pins == 6){
+                        $lcd = _lcd(\@pins, $self->{rpi_lcd_rows}, $self->{rpi_lcd_cols});
+                    }
+                    elsif (! $lcd && @pins != 6) {
+                        $log->_1(
+                            "in --rpi mode, but BB_RPI_LCD env var not set " .
+                            "correctly"
+                        );
+                        warn "bbdispatch is in --rpi mode, but the BB_RPI_LCD ".
+                             " env var isn't set correctly. See the documentation" .
+                             "...\n";
+                    }
+
                     my $commit = $git->revision(
                         remote => 1, repo => $params{repo}
                     );
+
                     $commit = substr $commit, 0, 7;
 
-                    my $time = strftime(
-                        "%Y-%m-%d %H:%M:%S", localtime(time)
-                    );
+                    my $time;
 
-                    my @pins = split /,/, $ENV{BB_RPI_LCD};
-
-                    if (! $lcd && @pins == 6){
-                        $lcd = _lcd(@pins);
+                    if ($self->{rpi_lcd_cols} == 20){
+                        $time = strftime(
+                            "%Y/%m/%d %H:%M", localtime(time)
+                        );
+                    }
+                    else {
+                        $time = strftime(
+                            "%m/%d %H:%M", localtime(time)
+                        );
                     }
 
+                    my ($repo) = $params{repo} =~ m|.*/(.*)|;
+
                     $lcd->clear;
-
-                    $lcd->position(0, 0);
-                    $lcd->print($time);
-
-                    $lcd->position(0, 1);
-                    $lcd->print($ENV{BB_RUN_STATUS});
-
-                    $lcd->position(5, 1);
-                    $lcd->print($commit);
-
-                    $lcd->position(13, 1);
-                    $lcd->print($run_count);
-                }
-                else {
-                    $log->_1(
-                        "in --rpi mode, but BB_RPI_LCD env var not set " .
-                        "correctly"
+                    $self->_lcd_display(
+                        $lcd,
+                        commit => $commit,
+                        time => $time,
+                        run_count => $run_count,
+                        repo => $repo,
                     );
-                    warn "bbdispatch is in --rpi mode, but the BB_RPI_LCD ".
-                         " env var isn't set. See the documentation...\n";
+
+#                    $lcd->position(0, 0);
+#                    $lcd->print($time);
+                    
+#                    $lcd->position(12, 0);
+#                    $lcd->print($ENV{BB_RUN_STATUS});
+
+#                    $lcd->position(9, 1);
+#                    $lcd->print($commit);
+
+#                    $lcd->position(0, 1);
+#                    $lcd->print($run_count);
+
                 }
             }
             else {
@@ -162,14 +186,19 @@ sub auto {
             $log->_7("not in --rpi mode");
         }
 
-        my $sleep_msg =
-            "auto run complete. Sleeping for $sleep seconds, then restarting" .
-            " if more runs required\n";
-
-        $log->_6($sleep_msg);
-
-        exit() if $run_count >= $runs && $runs != 0;
-        $run_count++;
+        if ($run_count >= $runs && $runs != 0){
+            $log->_6(
+                "auto run complete. No more runs to perform, exiting...\n"
+            );
+            exit;
+        }
+        else {
+            $log->_6(
+                "auto run complete. Sleeping for $sleep seconds, then " .
+                "commencing the next run\n"
+            );
+            $run_count++;
+        }
 
         sleep $sleep;
     }
@@ -177,22 +206,22 @@ sub auto {
 sub _lcd {
     # used only for dispatching to an RPi in auto mode
 
-    my @pins = @_;
+    my ($pins, $rows, $cols) = @_;
 
     require RPi::LCD;
 
     my $lcd = RPi::LCD->new;
 
     $lcd->init(
-        rows    => 2,
-        cols    => 16,
+        rows    => $rows,
+        cols    => $cols,
         bits    => 4,
-        rs      => $pins[0],
-        strb    => $pins[1],
-        d0      => $pins[2],
-        d1      => $pins[3],
-        d2      => $pins[4],
-        d3      => $pins[5],
+        rs      => $pins->[0],
+        strb    => $pins->[1],
+        d0      => $pins->[2],
+        d1      => $pins->[3],
+        d2      => $pins->[4],
+        d3      => $pins->[5],
         d4      => 0,
         d5      => 0,
         d6      => 0,
@@ -200,6 +229,39 @@ sub _lcd {
     );
 
     return $lcd;
+}
+sub _lcd_display {
+    my ($self, $lcd, %args) = @_;
+
+    if ($self->{rpi_lcd_rows} == 4 && $self->{rpi_lcd_cols} == 20){
+        $lcd->position(0, 0);
+        $lcd->print($args{repo}); 
+
+        $lcd->position(0, 1);
+        $lcd->print($args{time});
+
+        $lcd->position(0, 2);
+        $lcd->print($ENV{BB_RUN_STATUS});
+
+        $lcd->position(5, 2);
+        $lcd->print("commit: $args{commit}");
+
+        $lcd->position(0, 3);
+        $lcd->print("runs: $args{run_count}");
+    }
+    else {
+        $lcd->position(0, 0);
+        $lcd->print($args{time});
+
+        $lcd->position(12, 0);
+        $lcd->print($ENV{BB_RUN_STATUS});
+
+        $lcd->position(9, 1);
+        $lcd->print($args{commit});
+
+        $lcd->position(0, 1);
+        $lcd->print($args{run_count});
+    }
 }
 sub dispatch {
     my ($self, %params) = @_;
@@ -310,6 +372,10 @@ sub _config {
         $self->{cmd} = $conf->{cmd} if $conf->{cmd};
         $self->{auto_sleep} = $conf->{auto_sleep} 
           if defined $conf->{auto_sleep};
+        $self->{rpi} = $conf->{rpi} || 0;
+        $self->{rpi_lcd_rows} = $conf->{rpi_lcd_rows} || 4;
+        $self->{rpi_lcd_cols} = $conf->{rpi_lcd_cols} || 20;
+        print "r: $self->{rpi_lcd_rows}, c: $self->{rpi_lcd_cols}\n";
     }
 }
 sub _fork {

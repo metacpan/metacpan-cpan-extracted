@@ -4,7 +4,7 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -14,28 +14,35 @@
    },
    "name" : "JavaScript-Beautifier",
    "prereqs" : {
-      "build" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
          "requires" : {
             "Getopt::Long" : "0",
             "IO::File" : "0",
             "Pod::Usage" : "0",
-            "Test::More" : "0.88"
+            "perl" : "v5.10.0"
          }
       },
-      "configure" : {
+      "test" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "IO::File" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Code::TidyAll::Plugin::JSBeautifier" : {
          "file" : "lib/Code/TidyAll/Plugin/JSBeautifier.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       },
       "JavaScript::Beautifier" : {
          "file" : "lib/JavaScript/Beautifier.pm",
-         "version" : "0.21"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -47,6 +54,6 @@
          "url" : "http://github.com/fayland/perl-javascript-beautifier/tree/master"
       }
    },
-   "version" : "0.21",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '5.5'; # VERSION
+our $VERSION = '5.6'; # VERSION
 
 use Hash::Merge::Simple qw(clone_merge);
 use Moo::Role;
@@ -90,7 +90,7 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 ATTRIBUTES
 

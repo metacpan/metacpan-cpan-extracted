@@ -2,9 +2,8 @@
 
 BEGIN {
     unless ($ENV{AUTHOR_TESTING}) {
-        require Test::More;
-        Test::More::plan(skip_all =>
-                         'these tests are for testing by the author');
+        print "1..0 # SKIP these tests are for testing by the author";
+        exit;
     }
 }
 
@@ -69,7 +68,7 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
     eval $test;
     is($@, "", "'$test' gives emtpy \$\@");
 
-    subtest "_to_hex() in list context: $test", sub {
+    subtest "_to_bytes() in list context: $test", sub {
         plan tests => 3,
 
         cmp_ok(scalar @got, '==', 1,
@@ -99,7 +98,7 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
     eval $test;
     is($@, "", "'$test' gives emtpy \$\@");
 
-    subtest "_to_hex() in scalar context: $test", sub {
+    subtest "_to_bytes() in scalar context: $test", sub {
         plan tests => 2,
 
         is(ref($got), "",

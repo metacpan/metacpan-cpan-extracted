@@ -1,12 +1,12 @@
 package Pcore::Handle::pgsql;
 
-use Pcore -class, -const, -result,
+use Pcore -class, -const, -res,
   -export => {
     STATE     => [qw[$STATE_CONNECT $STATE_READY $STATE_BUSY $STATE_DISCONNECTED]],
     TX_STATUS => [qw[$TX_STATUS_IDLE $TX_STATUS_TRANS $TX_STATUS_ERROR]],
   };
 use Pcore::Handle::DBI::Const qw[:CONST];
-use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref];
+use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref is_plain_coderef];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Data qw[to_json];
 
@@ -58,13 +58,13 @@ sub _create_dbh ($self) {
 
     Pcore::PgSQL::DBH->connect(
         handle     => $self,
-        on_connect => sub ( $dbh, $status ) {
-            if ( !$status ) {
+        on_connect => sub ( $dbh, $res ) {
+            if ( !$res ) {
                 $self->{active_dbh}--;
 
                 # throw connection error for all pending requests
                 while ( my $cb = shift $self->{_get_dbh_queue}->@* ) {
-                    $cb->( $status, undef );
+                    $cb->( $res, undef );
                 }
             }
             else {
@@ -83,7 +83,7 @@ sub _create_dbh ($self) {
 sub _get_dbh ( $self, $cb ) {
     while ( my $dbh = shift $self->{_dbh_pool}->@* ) {
         if ( $dbh->{state} == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
-            $cb->( $dbh, result 200 );
+            $cb->( res(200), $dbh );
 
             return;
         }
@@ -95,7 +95,7 @@ sub _get_dbh ( $self, $cb ) {
     if ( $self->{backlog} && $self->{_get_dbh_queue}->@* > $self->{backlog} ) {
         warn 'DBI: backlog queue is full';
 
-        $cb->( undef, result [ 500, 'backlog queue is full' ] );
+        $cb->( res( [ 500, 'backlog queue is full' ] ), undef );
 
         return;
     }
@@ -112,7 +112,7 @@ sub push_dbh ( $self, $dbh ) {
     # dbh is ready for query
     if ( $dbh->{state} == $STATE_READY && $dbh->{tx_status} eq $TX_STATUS_IDLE ) {
         if ( my $cb = shift $self->{_get_dbh_queue}->@* ) {
-            $cb->( $dbh, result 200 );
+            $cb->( res(200), $dbh );
         }
         else {
             push $self->{_dbh_pool}->@*, $dbh;
@@ -263,48 +263,82 @@ sub encode_array ( $self, $var ) {
     return \( '{' . join( q[,], @buf ) . '}' );
 }
 
+sub dbh ($self) {
+    $self->_get_dbh(Coro::rouse_cb);
+
+    return Coro::rouse_wait;
+}
+
 # DBI METHODS
 for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref selectcol]) {
-    eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
-        *$method = sub ( \$self, \@args ) {
-            \$self->_get_dbh(
-                sub ( \$dbh, \$status ) {
-                    if (!\$status) {
-                        \$args[-1]->( undef, \$status, undef );
-                    }
-                    else {
-                        \$dbh->$method(\@args);
-                    }
+    no strict qw[refs];
 
-                    return;
+    *$method = eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+        use Pcore::Util::Scalar qw[is_plain_coderef];
+
+        sub ( \$self, \@args ) {
+            my \$cb = is_plain_coderef \$args[-1] ? \$args[-1] : undef;
+
+            if ( defined wantarray ) {
+                my ( \$res, \$dbh ) = \$self->dbh;
+
+                if ( !\$res ) {
+                    return \$cb ? \$cb->(\$res) : \$res;
                 }
-            );
+                else {
+                    return \$dbh->$method(\@args);
+                }
+            }
+            else {
+                \$self->_get_dbh(
+                    sub ( \$res, \$dbh ) {
+                        if ( !\$res ) {
+                            \$cb->( \$res ) if \$cb;
+                        }
+                        else {
+                            \$dbh->$method(\@args);
+                        }
 
-            return;
+                        return;
+                    }
+                );
+
+                return;
+            }
         }
 PERL
 }
 
 # TRANSACTIONS
-for my $method (qw[begin_work commit rollback]) {
-    eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
-        *$method = sub ( \$self, \@args ) {
-            \$self->_get_dbh(
-                sub ( \$dbh, \$status ) {
-                    if (!\$status) {
-                        \$args[-1]->( undef, \$status );
-                    }
-                    else {
-                        \$dbh->$method(\@args);
-                    }
+sub begin_work ( $self, @args ) {
+    my $cb = is_plain_coderef $args[-1] ? $args[-1] : undef;
 
-                    return;
-                }
-            );
+    if ( defined wantarray ) {
+        my ( $res, $dbh ) = $self->dbh;
 
-            return;
+        if ( !$res ) {
+            return $cb ? $cb->($res) : $res;
         }
-PERL
+        else {
+            return $dbh->begin_work(@args);
+        }
+    }
+    else {
+        $self->_get_dbh(
+            sub ( $res, $dbh ) {
+                if ( !$res ) {
+                    $cb->( undef, $res ) if $cb;
+                }
+                else {
+                    $dbh->begin_work(@args);
+                }
+
+                return;
+            }
+        );
+
+        return;
+    }
 }
 
 1;
@@ -314,11 +348,8 @@ PERL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 83                   | * Private subroutine/method '_get_dbh' declared but not used                                                   |
-## |      | 154                  | * Private subroutine/method '_get_schema_patch_table_query' declared but not used                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 268, 290             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 154                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |      |                      | declared but not used                                                                                          |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

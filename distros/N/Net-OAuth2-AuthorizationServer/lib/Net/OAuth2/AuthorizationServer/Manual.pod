@@ -530,10 +530,9 @@ client_id, client_secret, username, password, an optional reference to a list of
 the scopes.
 
 The callback should verify client details and username + password and return a
-a list with 4 elements. The first element should be the client id if the client
-details + username is valid. The second element should be the error message in
-the case of bad credentials. The third element should be an array reference of
-the required scopes. The fourth should be the username.
+a hash list with 2 elements. The first element should a hash containing the
+client id if the client details + username is valid + scopes + username. The
+second element should be the error message in the case of bad credentials.
 
   my $verify_user_password_sub = sub {
     my ( $self, %args ) = @_;
@@ -558,7 +557,11 @@ the required scopes. The fourth should be the username.
       return ( 0, 'invalid_grant' );
     }
     else {
-      return ( $client_id, undef, $scopes, $username );
+      return ({
+          client_id => $client_id,
+          scopes    => $scopes,
+          username  => $username,
+      });
     }
 
   };

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Rn - Package for language Rundi
 
 package Locale::CLDR::Locales::Rn;
 # This file auto generated from Data\common\main\rn.xml
-#	on Fri 29 Apr  7:22:22 pm GMT
+#	on Fri 13 Apr  7:26:16 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -328,7 +329,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p q r s t u v w x y z])},
+			main => qr{[a b c d e f g h i j k l m n o p q r s t u v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -400,14 +402,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
@@ -815,13 +817,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{Z.MU.},
-					'pm' => q{Z.MW.},
-				},
 				'abbreviated' => {
 					'am' => q{Z.MU.},
 					'pm' => q{Z.MW.},
+				},
+				'wide' => {
+					'pm' => q{Z.MW.},
+					'am' => q{Z.MU.},
 				},
 			},
 		},
@@ -901,7 +903,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -925,7 +927,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

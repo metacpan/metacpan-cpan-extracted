@@ -74,7 +74,7 @@ Net::SNMP::Mixin::Dot1abLldp - mixin class for the Link Layer Discovery Protocol
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -151,7 +151,7 @@ sub get_lldp_local_system_data {
   # if the chassisIdSubtype has the enumeration 'macAddress(4)'
   # we normalize the MacAddress
   $result->{lldpLocChassisId} = normalize_mac( $result->{lldpLocChassisId} )
-    if $result->{lldpLocChassisIdSubtype} == 4;
+    if defined $result->{lldpLocChassisIdSubtype} && $result->{lldpLocChassisIdSubtype} == 4;
 
   return $result;
 }

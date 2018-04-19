@@ -126,18 +126,18 @@ sub _build_web2_canon ($self) {
 sub web2_check_available ( $self, $http_res ) {
     return undef if !$self->is_web2;    ## no critic qw[Subroutines::ProhibitExplicitReturnUndef]
 
-    return undef if !$http_res->body;   ## no critic qw[Subroutines::ProhibitExplicitReturnUndef]
+    return undef if !$http_res->{body}; ## no critic qw[Subroutines::ProhibitExplicitReturnUndef]
 
     my $web2_id = $self->web2_id;
 
     my $cfg = $WEB2_CFG->{$web2_id};
 
-    if ( $cfg->{status} && $http_res->status == $cfg->{status} ) { return 1 }
+    if ( $cfg->{status} && $http_res->{status} == $cfg->{status} ) { return 1 }
 
     if ( $WEB2_RE->{$web2_id} ) {
-        eval { decode_utf8 $http_res->body->$* };
+        eval { decode_utf8 $http_res->{body}->$* };
 
-        return 1 if $http_res->body->$* =~ $WEB2_RE->{$web2_id};
+        return 1 if $http_res->{body}->$* =~ $WEB2_RE->{$web2_id};
     }
 
     return 0;

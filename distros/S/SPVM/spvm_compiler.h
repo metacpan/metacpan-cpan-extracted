@@ -29,7 +29,7 @@ struct SPVM_compiler {
   // Current file name
   const char* cur_file;
   
-  const char* cur_package_name_with_template_args;
+  const char* cur_package_name;
   
   // Source base_object
   char* cur_src;
@@ -99,9 +99,6 @@ struct SPVM_compiler {
   // Syntax error count
   int32_t error_count;
   
-  // Current package count
-  int32_t current_package_count;
-  
   // Package Variable id
   int32_t package_var_length;
   
@@ -120,6 +117,8 @@ struct SPVM_compiler {
   _Bool expect_name;
   
   SPVM_OP* cur_op_use;
+  
+  int32_t anon_package_length;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();

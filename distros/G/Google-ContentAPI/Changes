@@ -1,6 +1,11 @@
 Revision history for Google::ContentAPI.
 
+1.02  2018-04-11 Added accountstatuses and productstatuses methods. Also added 
+                 a "custom" resource to perform methods that are not implemented 
+                 by this module.
+
 1.01  2018-03-27 Added config_json, merchant_id options.
                  Switched to Crypt::JWT on recommendation of Andrew Maltsev, as
                  it is a more stable module and is likely to be installed already.
+
 1.00  2018-03-23 initial implementation

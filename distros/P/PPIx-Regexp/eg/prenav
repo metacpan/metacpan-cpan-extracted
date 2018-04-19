@@ -5,6 +5,10 @@ use warnings;
 
 use Pod::Usage;
 use PPIx::Regexp;
+use PPIx::Regexp::Constant qw{
+    ARRAY_REF
+    SCALAR_REF
+};
 use PPIx::Regexp::Dumper;
 use PPIx::Regexp::Util qw{ __instance };
 use Term::ReadLine;
@@ -66,7 +70,7 @@ my %internal = (
 sub _safe {
     my ( @args ) = @_;
     my $rslt = join ', ', map {
-	'ARRAY' eq ref $_ ? '[ ' . _safe( @{ $_ } ) . ' ]' : "'$_'"
+	ARRAY_REF eq ref $_ ? '[ ' . _safe( @{ $_ } ) . ' ]' : "'$_'"
     } @args;
     $rslt =~ s/ \[ \s+ \] /[]/smxg;
     $rslt =~ s/ ' ( \d+ ) ' /$1/smxg;
@@ -122,9 +126,9 @@ sub _format {
     foreach my $thing ( @args ) {
 	if ( __instance( $thing, 'PPIx::Regexp::Element' ) ) {
 	    $rslt .= $thing->class() . "\t" . $thing->content() . "\n";
-	} elsif ( 'ARRAY' eq ref $thing ) {
+	} elsif ( ARRAY_REF eq ref $thing ) {
 	    $rslt .= _format( @{ $thing } );
-	} elsif ( 'SCALAR' eq ref $thing ) {
+	} elsif ( SCALAR_REF eq ref $thing ) {
 	    $rslt .= ${ $thing };
 	} else {
 	    $rslt .= $thing =~ m/ \n /smx ? $thing :

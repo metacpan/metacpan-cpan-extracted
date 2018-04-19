@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Time::HiRes;
 use Test::More;
 use Test::Output;
 use JavaScript::Duktape::XS;
@@ -21,7 +20,7 @@ sub test_console {
         $expected = quotemeta($expected);
 
         foreach my $func (qw/ log debug trace info /) {
-            stdout_like sub { $duk->eval("console.$func($text)"); },
+            stderr_like sub { $duk->eval("console.$func($text)"); },
                         qr/$expected/,
                         "got correct stdout from $func for <$text>";
         }

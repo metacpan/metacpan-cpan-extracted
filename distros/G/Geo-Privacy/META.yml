@@ -1,0 +1,27 @@
+---
+abstract: 'Information about privacy/GDPR regulations by state'
+author:
+  - 'Dan Wright <Dan@DWright.Org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Privacy
+provides:
+  Geo::Privacy:
+    file: lib/Geo/Privacy.pm
+    version: '0.01'
+requires:
+  Exporter::Lite: '0.06'
+  Readonly: '1'
+resources:
+  bugtracker: https://github.com/dwright/Geo-Privacy/issues
+  repository: https://github.com/dwright/Geo-Privacy.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

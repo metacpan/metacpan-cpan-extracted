@@ -215,7 +215,7 @@ es-status.pl - Simple ElaticSearch Status Checks
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 SYNOPSIS
 

@@ -6,6 +6,31 @@ SYNOPSIS
 
 DESCRIPTION
 
+    Version 0.81 (Algorithm::Bertsekas-0.81 Released on 19th Abr 2018)
+		1. Little changes and improvements.
+		
+    Version 0.80 (Algorithm::Bertsekas-0.80 Released on 16th Abr 2018)
+		1. Little changes and improvements.
+		
+    Version 0.70 (Algorithm::Bertsekas-0.70 Released on 15th Abr 2018)
+		1. If $verbose >= 8, print the output to 'auction_output.txt' file.
+		1. Some changes and improvements.
+
+    Version 0.60 (Algorithm::Bertsekas-0.60 Released on 13th Abr 2018)
+		1. Substantial improvements.
+		2. Lock or unlock the old list after reviewing the quality of the list objects.
+		3. Delete objects of little benefit from the old list.
+		4. In the complementary subset (new list), search only one object, 
+		   if ( $epsilon_scaling >= 7 ).
+		
+    Version 0.50 (Algorithm::Bertsekas-0.50 Released on 11th Abr 2018)
+		1. The @objects_with_greater_benefits list are updated dynamically by 
+		   $objects_desired_by_this{$person} by considering the current price 
+		   (or current value) of objects.		
+		2. For each person, the Current Value $current_value{$object} of the 
+		   most desired objects contained in the @objects_with_greater_benefits 
+		   list tends to converge to a specific value.
+		
     Version 0.46 (Algorithm::Bertsekas-0.46 Released on 06th Abr 2018)
 		1. Little changes and improvements.
 		

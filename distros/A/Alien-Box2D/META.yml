@@ -3,46 +3,47 @@ abstract: 'Build and make available Box2D library - L<http://box2d.org/>'
 author:
   - 'FROGGS <froggs@cpan.org>'
 build_requires:
-  Archive::Extract: 0
-  Archive::Zip: 0
-  Digest::SHA: 0
-  ExtUtils::CppGuess: 0
-  ExtUtils::Liblist: 0
-  File::Copy: 0
-  File::Fetch: 0
-  File::Find: 0
-  File::Path: 0
-  File::ShareDir: 0
-  File::Spec: 0
-  Module::Build: 0.36
-  Text::Patch: 0
+  Archive::Extract: '0'
+  Archive::Zip: '0'
+  Digest::SHA: '0'
+  ExtUtils::CppGuess: '0'
+  ExtUtils::Liblist: '0'
+  File::Copy: '0'
+  File::Fetch: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Module::Build: '0.36'
+  Text::Patch: '0'
 configure_requires:
-  Archive::Extract: 0
-  Digest::SHA: 0
-  File::Copy: 0
-  File::Fetch: 0
-  File::Find: 0
-  File::Path: 0
-  File::ShareDir: 0
-  File::Spec: 0
-  Module::Build: 0.36
-  Text::Patch: 0
+  Archive::Extract: '0'
+  Digest::SHA: '0'
+  File::Copy: '0'
+  File::Fetch: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Module::Build: '0.36'
+  Text::Patch: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Alien-Box2D
 provides:
   Alien::Box2D:
     file: lib/Alien/Box2D.pm
-    version: 0.105
+    version: '0.106'
 requires:
-  File::ShareDir: 1.00
-  File::Spec: 0
+  File::ShareDir: '1.00'
+  File::Spec: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-Box2D
   license: http://dev.perl.org/licenses/
   repository: http://github.com/PerlGameDev/Alien-Box2D
-version: 0.105
+version: '0.106'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

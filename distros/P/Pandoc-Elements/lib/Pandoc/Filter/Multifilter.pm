@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.25';
+our $VERSION = '0.34';
 
 use parent 'Pandoc::Filter';
 our @EXPORT_OK = (qw(find_filter apply_filter));
@@ -25,9 +25,9 @@ sub apply {
 
     my @filters = map {
         if ($_->name eq 'MetaMap' and $_->{filter}) {
-            $_->metavalue
+            $_->value
         } elsif ($_->name eq 'MetaString' or $_->name eq 'MetaInlines') {
-            { filter => $_->metavalue }
+            { filter => $_->value }
         }
     } @{$multi->content};
 

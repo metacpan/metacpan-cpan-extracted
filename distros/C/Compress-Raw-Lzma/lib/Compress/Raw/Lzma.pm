@@ -12,7 +12,7 @@ use Carp ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.081';
+$VERSION = '2.082';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -1099,7 +1099,7 @@ Controls whether the compressed data is appended to the output buffer in
 the C<code> and C<flush> methods.
 
 Defaults to 0.
-(Note in versions of this module prior to 2.072 the defaut value was
+(Note in versions of this module prior to 2.072 the default value was
 incorrectly documented as 1).
 
 =item B<< BufSize => $number >>
@@ -1143,7 +1143,7 @@ Controls whether the compressed data is appended to the output buffer in
 the C<code> and C<flush> methods.
 
 Defaults to 0.
-(Note in versions of this module prior to 2.072 the defaut value was
+(Note in versions of this module prior to 2.072 the default value was
 incorrectly documented as 1).
 
 =item B<< BufSize => $number >>
@@ -1200,7 +1200,7 @@ Controls whether the compressed data is appended to the output buffer in
 the C<code> and C<flush> methods.
 
 Defaults to 0.
-(Note in versions of this module prior to 2.072 the defaut value was
+(Note in versions of this module prior to 2.072 the default value was
 incorrectly documented as 1).
 
 =item B<< BufSize => $number >>
@@ -1249,7 +1249,7 @@ Controls whether the compressed data is appended to the output buffer in
 the C<code> and C<flush> methods.
 
 Defaults to 0.
-(Note in versions of this module prior to 2.072 the defaut value was
+(Note in versions of this module prior to 2.072 the default value was
 incorrectly documented as 1).
 
 =item B<< BufSize => $number >>

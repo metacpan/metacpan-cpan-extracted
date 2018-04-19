@@ -1,5 +1,8 @@
 Revision history for Alien-libuv
 
+1.001     2018-04-15
+  - Fix compiler flag typos for windows
+
 1.000     2018-04-05
   - Update to the libuv v1.20.0 release
   - Bump to major version 1 to reflect same major version as libuv.

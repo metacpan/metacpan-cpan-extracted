@@ -262,6 +262,10 @@ $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', fu
   });
 });
 
+// **************************************************
+// ************ react to sidebar in/out *************
+// **************************************************
+
 // custom resize function as there is no event to fire and we need
 // to react to the sidebar.
 function resizeGraphContainer() {

@@ -102,7 +102,8 @@ static void parse_net_constants(VFileLine* fl, VParseHashElem nets[][3]) {
 	const char* netnamep = it->m_name.c_str();
 
 	size_t delim = it->m_name.find_first_of("'");
-	if (it->m_name[0] != '\\' && it->m_msb.empty() && it->m_name[delim] == '\'') {
+	if (it->m_name[0] != '\\' && it->m_msb.empty()
+	    && delim != string::npos && it->m_name[delim] == '\'') {
 	    // Handle sized integer constants (e.g., 7'b0) specifically but ignore replications (e.g., {4{w}})
 	    if (delim != 0 && netnamep[0] != '{') {
 		// Handle the first part that indicates the width for sized constants (guaranteed to be a decimal)
@@ -1022,6 +1023,8 @@ portE:				// ==IEEE: [ port ]
 	//			// No VARDECL("port") for implicit, as we don't want to declare variables for them
 	|	portDirNetE var_data_type       '.' portSig '(' portAssignExprE ')' sigAttrListE
 			{ VARDTYPE($2); VARDONE($<fl>4, $4, "", ""); PINNUMINC(); }
+	|	portDirNetE signing '.' portSig '(' portAssignExprE ')' sigAttrListE
+			{ VARDTYPE($2); VARDONE($<fl>4, $4, "", ""); PINNUMINC(); }
 	|	portDirNetE signingE variable_dimensionList  '.' portSig '(' portAssignExprE ')' sigAttrListE
 			{ VARDTYPE(SPACED($2,$3)); VARDONE($<fl>5, $5, "", ""); PINNUMINC(); }
 	|	portDirNetE yINTERCONNECT signingE variable_dimensionListE '.' portSig '(' portAssignExprE ')' sigAttrListE
@@ -1031,6 +1034,8 @@ portE:				// ==IEEE: [ port ]
 	//
 	|	portDirNetE var_data_type       portSig variable_dimensionListE sigAttrListE
 			{ VARDTYPE($2); VARDONE($<fl>3, $3, $4, ""); PINNUMINC(); }
+	|	portDirNetE signing  portSig variable_dimensionListE sigAttrListE
+			{ VARDTYPE($2); VARDONE($<fl>3, $3, $4, ""); PINNUMINC(); }
 	|	portDirNetE signingE variable_dimensionList  portSig variable_dimensionListE sigAttrListE
 			{ VARDTYPE(SPACED($2,$3)); VARDONE($<fl>4, $4, $5, ""); PINNUMINC(); }
 	|	portDirNetE yINTERCONNECT signingE variable_dimensionList  portSig variable_dimensionListE sigAttrListE
@@ -1039,6 +1044,8 @@ portE:				// ==IEEE: [ port ]
 			{ /*VARDTYPE-same*/ VARDONE($<fl>2, $2, $3, ""); PINNUMINC(); }
 	//
 	|	portDirNetE var_data_type       portSig variable_dimensionListE sigAttrListE '=' constExpr
+			{ VARDTYPE($2); VARDONE($<fl>3, $3, $4, $7); PINNUMINC(); }
+	|	portDirNetE signing  portSig variable_dimensionListE sigAttrListE '=' constExpr
 			{ VARDTYPE($2); VARDONE($<fl>3, $3, $4, $7); PINNUMINC(); }
 	|	portDirNetE signingE variable_dimensionList  portSig variable_dimensionListE sigAttrListE '=' constExpr
 			{ VARDTYPE(SPACED($2,$3)); VARDONE($<fl>4, $4, $5, $8); PINNUMINC(); }
@@ -1108,6 +1115,8 @@ interface_item:			// IEEE: interface_item + non_port_interface_item
 	|	generate_region				{ }
 	|	interface_or_generate_item		{ }
 	|	program_declaration			{ }
+	//			// IEEE 1800-2017: modport_item
+	//			// See instead old 2012 position in interface_or_generate_item
 	|	interface_declaration			{ }
 	|	timeunits_declaration			{ }
 	//			// See note in interface_or_generate item
@@ -1117,6 +1126,8 @@ interface_item:			// IEEE: interface_item + non_port_interface_item
 interface_or_generate_item:	// ==IEEE: interface_or_generate_item
 	//			// module_common_item in interface_item, as otherwise duplicated
 	//			// with module_or_generate_item:module_common_item
+	//			// IEEE 1800-2017 removes modport_declaration here
+	//			// but for 2012 compatibility we retain it
 		modport_declaration			{ }
 	|	extern_tf_declaration			{ }
 	;
@@ -2409,6 +2420,8 @@ statement_item:			// IEEE: statement_item
 	//			// for's first ';' is in for_initalization
 	|	yFOR '(' for_initialization expr ';' for_stepE ')' stmtBlock
 				{ }
+	|	yFOR '(' for_initialization ';' for_stepE ')' stmtBlock
+				{ }
 	|	yDO stmtBlock yWHILE '(' expr ')' ';'	{ }
 	//			// IEEE says array_identifier here, but dotted accepted in VMM and 1800-2009
 	|	yFOREACH '(' idClassForeach/*array_id[loop_variables]*/ ')' stmt	{ }
@@ -2651,6 +2664,8 @@ assignment_pattern<str>:		// ==IEEE: assignment_pattern
 for_initialization:		// ==IEEE: for_initialization + for_variable_declaration + extra terminating ";"
 	//			// IEEE: for_variable_declaration
 		for_initializationItemList ';'		{ }
+	//			// IEEE: 1800-2017 empty initialization
+	|	';'					{ }
 	;
 
 for_initializationItemList:	// IEEE: [for_variable_declaration...]
@@ -3019,6 +3034,7 @@ dpi_tf_import_propertyE:	// IEEE: [ dpi_function_import_property + dpi_task_impo
 	;
 
 overload_declaration:		// ==IEEE: overload_declaration
+	//			// OLD: Overloads deprecated in IEEE 1800-2017
 		yBIND overload_operator function data_type idAny/*new-function_identifier*/
 			'(' overload_proto_formals ')' ';'	{ }
 	;
@@ -3153,7 +3169,7 @@ expr<str>:			// IEEE: part of expression/constant_expression/primary
 	//
 	//			// IEEE: "... hierarchical_identifier select"  see below
 	//
-	//			// IEEE: empty_queue
+	//			// IEEE: empty_queue (IEEE 1800-2017 empty_unpacked_array_concatenation)
 	|	'{' '}'
 	//
 	//			// IEEE: concatenation/constant_concatenation
@@ -3931,8 +3947,8 @@ property_port_itemDirE:
 
 property_declarationBody:	// IEEE: part of property_declaration
 		assertion_variable_declarationList property_statement_spec	{ }
-	//UNSUP			// IEEE-2012: Has yCOVER ySEQUENCE then property_spec here.
-	//			// Must really be optional.  Get clarification.
+	//			// IEEE-2012: Incorectly hasyCOVER ySEQUENCE then property_spec here.
+	//			// Fixed in IEEE 1800-2017
 	|	property_statement_spec			{ }
 	;
 
@@ -4025,7 +4041,8 @@ property_case_itemList:		// IEEE: {property_case_item}
 
 property_case_item:		// ==IEEE: property_case_item
 	//			// IEEE: expression_or_dist { ',' expression_or_dist } ':' property_statement
-	//			// 1800-2012 changed from property_statement to property_expr
+	//			// IEEE 1800-2012 changed from property_statement to property_expr
+	//			// IEEE 1800-2017 changed to require the semicolon
 		caseCondList ':' pexpr			{ }
 	|	caseCondList ':' pexpr ';'		{ }
 	|	yDEFAULT pexpr				{ }

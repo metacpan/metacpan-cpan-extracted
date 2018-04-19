@@ -5,7 +5,7 @@ package Dancer2::Session::PSGI;
 use Moo;
 with 'Dancer2::Core::Role::SessionFactory';
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 #-----------------------------------------#
 # Alter SessionFactory attribute defaults
@@ -43,6 +43,10 @@ sub _sessions { return [] }
 #-----------------------------------------#
 # Overridden methods from SessionFactory
 #-----------------------------------------#
+
+# Plack::Middleware::Session is responsible for fetch and id generation
+# any ID passed to this engine is considered valid
+sub validate_id { 1 }
 
 sub change_id {
     my ( $self, %params ) = @_;
@@ -85,7 +89,7 @@ Dancer2::Session::PSGI - Dancer2 session storage via Plack::Middleware::Session
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -107,6 +111,7 @@ L<Plack::Middleware::Session> for session management.
 =for Pod::Coverage method_names_here
 set_cookie_header
 change_id
+validate_id
 
 =head1 CONFIGURATION
 

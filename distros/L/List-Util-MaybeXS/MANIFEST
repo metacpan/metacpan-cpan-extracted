@@ -13,6 +13,7 @@ t/max.t
 t/maxstr.t
 t/min.t
 t/minstr.t
+t/overload-count.t
 t/pair.t
 t/product.t
 t/reduce.t

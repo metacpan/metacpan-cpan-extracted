@@ -61,9 +61,27 @@ for C<d-imsx>, and that it the way this class handles it.
 
 For example, given C<PPIx::Regexp::Token::Modifier> C<$elem>
 representing regular expression fragment C<(?^i)>,
-C<< $elem->asserted( 'd' ) >> would return true, since in the absence of
+C<< $elem->asserts( 'd' ) >> would return true, since in the absence of
 an explicit C<l> or C<u> this class considers the C<^> to explicitly
 assert C<d>.
+
+The caret handling is complicated by the fact that the C<'n'> modifier
+was introduced in 5.21.8, at which point the caret became equivalent to
+C<d-imnsx>. I did not feel I could unconditionally add the C<-n> to the
+expansion of the caret, because that would produce confusing output from
+methods like L<explain()|PPIx::Regexp::Element/explain>. Nor could I
+make it conditional on the minimum perl version, because that
+information is not available early enough in the parse. What I did was
+to expand the caret into C<d-imnsx> if and only if C<'n'> was in effect
+at some point in the scope in which the modifier was parsed.
+
+Continuing the above example, C<< $elem->asserts( 'n' ) >> and
+C<< $elem->modifier_asserted( 'n' ) >> would both return false, but
+C<< $elem->negates( 'n' ) >> would return true if and only if the C</m>
+modifier has been asserted somewhere before and in-scope from this
+token. The
+L<modifier_asserted( 'n' )|PPIx::Regexp::Element/modifier_asserted>
+method is inherited from L<PPIx::Regexp::Element|PPIx::Regexp::Element>.
 
 =head1 METHODS
 
@@ -86,7 +104,7 @@ use PPIx::Regexp::Constant qw{
     MODIFIER_GROUP_MATCH_SEMANTICS
 };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 # Define modifiers that are to be aggregated internally for ease of
 # computation.
@@ -102,6 +120,10 @@ foreach my $value ( values %aggregate ) {
     $de_aggregate{$value}++;
 }
 
+# Note that we do NOT want the /o modifier on regexen that make use of
+# this, because it is already compiled.
+my $capture_group_leader = qr{ [?/(] }smx;	# );
+
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 
 sub __new {
@@ -109,6 +131,10 @@ sub __new {
 
     my $self = $class->SUPER::__new( $content, %arg )
 	or return;
+
+    $content =~ m{ \A $capture_group_leader* \^ }smx	# no /o!
+	and defined $arg{tokenizer}->modifier_seen( 'n' )
+	and $self->{__caret_undoes_n} = 1;
 
     $arg{tokenizer}->modifier_modify( $self->modifiers() );
 
@@ -128,8 +154,7 @@ Starting with version 0.036_01, if the argument is a
 single-character modifier followed by an asterisk (intended as a wild
 card character), the return is the number of times that modifier
 appears. In this case an exception will be thrown if you specify a
-multi-character modifier (e.g.  C<'ee*'>), or if you specify one of the
-match semantics modifiers (e.g.  C<'a*'>).
+multi-character modifier (e.g.  C<'ee*'>).
 
 If called without an argument, or with an undef argument, all modifiers
 explicitly asserted by this token are returned.
@@ -156,14 +181,21 @@ sub asserts {
 
 sub __asserts {
     my ( $present, $modifier ) = @_;
+    my $wild = $modifier =~ s/ [*] \z //smx;
+    not $wild
+	or 1 == length $modifier
+	or croak "Can not use wild card on multi-character modifier '$modifier*'";
     if ( my $bin = $aggregate{$modifier} ) {
-	return defined $present->{$bin} && $modifier eq $present->{$bin};
+	my $aggr = $present->{$bin};
+	$wild
+	    or return ( defined $aggr && $modifier eq $aggr );
+	defined $aggr
+	    or return 0;
+	$aggr =~ m/ \A ( (?: \Q$modifier\E )* ) \z /smx
+	    or return 0;
+	return length $1;
     }
-    if ( $modifier =~ s/ [*] \z //smx ) {
-	$aggregate{$modifier}
-	    and croak "Can not use wild card on modifier '$modifier*'";
-	1 == length $modifier
-	    or croak "Can not use wild card on multi-character modifier '$modifier*'";
+    if ( $wild ) {
 	return $present->{$modifier} || 0;
     }
     my $len = length $modifier;
@@ -360,7 +392,7 @@ sub __aggregate_modifiers {
     my ( @mods ) = @_;
     my %present;
     foreach my $content ( @mods ) {
-	$content =~ s{ [?/]+ }{}smxg;
+	$content =~ s{ \A $capture_group_leader+ }{}smxg;	# no /o!
 	if ( $content =~ m/ \A \^ /smx ) {
 	    @present{ MODIFIER_GROUP_MATCH_SEMANTICS(), qw{ i s m x } }
 		= qw{ d 0 0 0 0 };
@@ -377,6 +409,7 @@ sub __aggregate_modifiers {
 	# specifically by the change that handled multi-character
 	# modifiers.
 	# $content = join '', sort split qr{}smx, $content;
+
 	# The following is better because it re-orders the modifiers
 	# separately. It does not recognize multiple dashes as
 	# representing an error (though it could!), and modifiers that
@@ -445,7 +478,10 @@ sub __PPIX_TOKEN__recognize {
     # Decode modifiers from the content of the token.
     sub _decode {
 	my ( $self ) = @_;
-	return __aggregate_modifiers( $self->content() );
+	my $mod = __aggregate_modifiers( $self->content() );
+	$self->{__caret_undoes_n}
+	    and $mod->{n} = 0;
+	return $mod;
     }
 }
 

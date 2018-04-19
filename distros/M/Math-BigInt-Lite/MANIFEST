@@ -15,8 +15,15 @@ t/from_hex-mbl.t
 t/from_oct-mbl.t
 t/lite.t
 t/mbi_ali.t
-t/pod.t
-t/pod_cov.t
+t/release-cpan-changes.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod.t
+t/release-portability.t
+t/release-synopsis.t
+t/release-test-version.t
+t/release-unused-vars.t
+t/release-whitespaces.t
 t/with.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)

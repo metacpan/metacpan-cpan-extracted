@@ -15,7 +15,7 @@ my $locale = Locale::CLDR->new('en_US');
 
 is($locale->format_number(12345678, '¤###,###'), 'US$12,345,678.00', 'Format number for currency with default currency');
 is($locale->currency_format('standard'), '¤#,##0.00', 'Standard currency format');
-is($locale->currency_format('account'), '¤#,##0.00;(¤#,##0.00)', 'Accountcy currency format');
+is($locale->currency_format('accounting'), '¤#,##0.00;(¤#,##0.00)', 'Accountcy currency format');
 
 $locale = Locale::CLDR->new('en_US_u_cf_standard');
 is($locale->currency_format(), '¤#,##0.00', 'Currency format with standard default');

@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 has '+_need_types' => (
     is      => 'rwp',
@@ -75,7 +75,7 @@ Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 SYNOPSIS
 

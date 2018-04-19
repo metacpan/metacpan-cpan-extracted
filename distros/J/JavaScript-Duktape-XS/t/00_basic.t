@@ -3,6 +3,7 @@ use warnings;
 
 use Data::Dumper;
 use Test::More;
+use Test::Output;
 use JavaScript::Duktape::XS;
 
 sub test_set_get {
@@ -72,24 +73,13 @@ sub test_eval {
     foreach my $cmd (@commands) {
         my ($js, $expected_return, $expected_output) = @$cmd;
         $expected_output //= '';
+        $expected_output = quotemeta($expected_output);
+
         my $output = '';
-
-        # Move STDOUT to store results in $output
-        my $real_stdout;
-        open $real_stdout, ">&STDOUT" || warn "Can't preserve STDOUT\n$!\n";
-        close STDOUT;
-        open STDOUT, '>', \$output or die "Can't open STDOUT: $!";
-        select STDOUT; $| = 1;
-
-        my $got = $duk->eval($js);
-
-        # Now recover original STDOUT
-        close STDOUT;
-        open STDOUT, ">&", $real_stdout;
-        select STDOUT; $| = 1;
-
-        chomp($output);
-        is($output, $expected_output, "eval output [$js]");
+        my $got;
+        stdout_like sub { $got = $duk->eval($js); },
+                    qr/$expected_output/,
+                    "got correct stdout from [$js]";
         is_deeply($got, $expected_return, "eval return [$js]");
     }
 }

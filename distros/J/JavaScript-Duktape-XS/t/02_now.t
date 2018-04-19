@@ -15,9 +15,6 @@ sub test_now {
     my $margin = 0.9;
     my $delta = abs($got - $expected);
     ok($delta < $margin, "got correct JS timestamp within $margin ms");
-
-    my $js = q<print('this is a string', JSON.stringify({this: 'object'}))>;
-    $duk->eval($js);
 }
 
 sub main {

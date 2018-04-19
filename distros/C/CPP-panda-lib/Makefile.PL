@@ -1,4 +1,4 @@
-use 5.018;
+use 5.012;
 use Config;
 use Panda::Install;
 
@@ -13,9 +13,10 @@ my %params = (
         CPLUS    => 11,
         INCLUDE  => {'src' => '/'},
     },
-    BIN_DEPS => ['CPP::catch::test'],
-    CCFLAGS  => '-Wall -Wextra',
-    OPTIMIZE  => '-g0 -O2',
+    BIN_DEPS         => ['CPP::catch::test'],
+    CCFLAGS          => '-Wall -Wextra',
+    OPTIMIZE         => '-g0 -O2',
+    MIN_PERL_VERSION => '5.12.0',
     #OPTIMIZE  => '-g0',
     XS => {},
     #CC => 'clang++',

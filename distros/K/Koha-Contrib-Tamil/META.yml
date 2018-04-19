@@ -6,10 +6,10 @@ build_requires:
   File::Find: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
-  File::ShareDir::Install: '0.03'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -73,4 +73,4 @@ requires:
   warnings: '0'
 resources:
   repository: http://git.tamil.fr/git/Koha-Contrib-Tamil
-version: '0.054'
+version: '0.055'

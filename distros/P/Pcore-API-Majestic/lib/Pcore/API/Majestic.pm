@@ -1,6 +1,6 @@
-package Pcore::API::Majestic v0.12.2;
+package Pcore::API::Majestic v0.12.3;
 
-use Pcore -dist, -class, -const, -result, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
+use Pcore -dist, -class, -const, -res, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
 use IO::Uncompress::Unzip qw[];
 
 const our $MAJESTIC_INDEX_FRESH    => 1;
@@ -144,19 +144,19 @@ sub _request ( $self, $url_params, $cb ) {
         bind_ip    => $self->bind_ip,
         on_finish  => sub ($res) {
             if ( !$res ) {
-                $cb->( result [ $res->status, $res->reason ] );
+                $cb->( res [ $res->{status}, $res->{reason} ] );
             }
             else {
-                my $json = eval { P->data->from_json( $res->body->$* ); };
+                my $json = eval { P->data->from_json( $res->{body}->$* ); };
 
                 if ($@) {
-                    $cb->( result [ 500, 'Error decoding response' ] );
+                    $cb->( res [ 500, 'Error decoding response' ] );
                 }
                 elsif ( $json->{Code} ne 'OK' ) {
-                    $cb->( result [ 400, $json->{ErrorMessage} ] );
+                    $cb->( res [ 400, $json->{ErrorMessage} ] );
                 }
                 else {
-                    $cb->( result 200, $json );
+                    $cb->( res 200, $json );
                 }
             }
 
@@ -196,7 +196,7 @@ sub bulk_check ( $self, $domains, $cb ) {
             body      => $body,
             on_finish => sub ($res) {
                 if ( !$res ) {
-                    $cb->( result [ 500, 'Send domains error' ] );
+                    $cb->( res [ 500, 'Send domains error' ] );
                 }
                 elsif ( $res->decoded_body->$* =~ /fileupload_uid=([[:xdigit:]-]+)/sm ) {
                     my $uid = $1;
@@ -217,14 +217,14 @@ sub bulk_check ( $self, $domains, $cb ) {
                         },
                         on_finish => sub ($res) {
                             if ( !$res ) {
-                                $cb->( result [ $res->status, $res->reason ] );
+                                $cb->( res [ $res->{status}, $res->{reason} ] );
                             }
                             else {
                                 if ( $res->decoded_body->$* =~ /$uid/sm ) {
-                                    $cb->( result 200, $job_id );
+                                    $cb->( res 200, $job_id );
                                 }
                                 else {
-                                    $cb->( result [ 500, 'Unknown confirmation error' ] );
+                                    $cb->( res [ 500, 'Unknown confirmation error' ] );
                                 }
                             }
 
@@ -233,7 +233,7 @@ sub bulk_check ( $self, $domains, $cb ) {
                     );
                 }
                 else {
-                    $cb->( result [ 500, 'Send domains error - no job UID returned' ] );
+                    $cb->( res [ 500, 'Send domains error - no job UID returned' ] );
                 }
 
                 return;
@@ -264,7 +264,7 @@ sub bulk_check_result ( $self, $id, $mapping, $cb ) {
             cookies   => $cookies,
             on_finish => sub ($res) {
                 if ( !$res ) {
-                    $cb->( result [ 500, 'Get jobs list error' ] );
+                    $cb->( res [ 500, 'Get jobs list error' ] );
 
                     return;
                 }
@@ -279,10 +279,10 @@ sub bulk_check_result ( $self, $id, $mapping, $cb ) {
                                 cookies   => $cookies,
                                 on_finish => sub ($res) {
                                     if ( !$res ) {
-                                        $cb->( result [ 500, 'Job download error' ] );
+                                        $cb->( res [ 500, 'Job download error' ] );
                                     }
                                     else {
-                                        IO::Uncompress::Unzip::unzip( $res->body, \my $data );
+                                        IO::Uncompress::Unzip::unzip( $res->{body}, \my $data );
 
                                         my @lines = split "\n", $data;
 
@@ -298,7 +298,7 @@ sub bulk_check_result ( $self, $id, $mapping, $cb ) {
                                             push $items->@*, $item;
                                         }
 
-                                        $cb->( result 200, $items );
+                                        $cb->( res 200, $items );
                                     }
 
                                     return;
@@ -306,11 +306,11 @@ sub bulk_check_result ( $self, $id, $mapping, $cb ) {
                             );
                         }
                         else {
-                            $cb->( result [ 400, 'Job not ready' ] );
+                            $cb->( res [ 400, 'Job not ready' ] );
                         }
                     }
                     else {
-                        $cb->( result [ 404, 'Job not found' ] );
+                        $cb->( res [ 404, 'Job not found' ] );
                     }
                 }
 
@@ -326,7 +326,7 @@ sub _login ( $self, $cb ) {
 
     # login is valid for 1 day
     if ( $self->{_cookies} && $self->{_cookies_time} + 60 * 60 * 24 > time ) {
-        $cb->( result 200, $self->{_cookies} );
+        $cb->( res 200, $self->{_cookies} );
     }
     else {
         push $self->{_login_requests}->@*, $cb;
@@ -353,19 +353,19 @@ sub _login ( $self, $cb ) {
                 if ( !$res ) {
                     undef $self->{_cookies};
 
-                    $on_finish->( $self, result [ 500, 'Login error' ] );
+                    $on_finish->( $self, res [ 500, 'Login error' ] );
                 }
                 elsif ( $res->decoded_body->$* =~ /in a lot today/sm ) {
                     undef $self->{_cookies};
 
-                    $on_finish->( $self, result [ 500, 'Login error - captcha' ] );
+                    $on_finish->( $self, res [ 500, 'Login error - captcha' ] );
                 }
                 else {
                     $self->{_cookies} = $cookies;
 
                     $self->{_cookies_time} = time;
 
-                    $on_finish->( $self, result 200, $cookies );
+                    $on_finish->( $self, res 200, $cookies );
                 }
 
                 return;

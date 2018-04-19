@@ -2,7 +2,8 @@ package App::SimulateReads::Role::Digest;
 # ABSTRACT: Wrapper on Simulator class for genome/transcriptome sequencing
 
 use App::SimulateReads::Base 'role';
-use App::SimulateReads::Quality::Handle;
+use App::SimulateReads::DB::Handle::Quality;
+use App::SimulateReads::DB::Handle::Expression;
 use App::SimulateReads::Fastq::SingleEnd;
 use App::SimulateReads::Fastq::PairedEnd;
 use App::SimulateReads::Simulator;
@@ -11,12 +12,12 @@ use File::Path 'make_path';
 
 requires qw/default_opt opt_spec rm_opt/;
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 use constant {
 	COUNT_LOOPS_BY_OPT    => ['coverage', 'number-of-reads'],
 	STRAND_BIAS_OPT       => ['random', 'plus', 'minus'],
-	SEQID_WEIGHT_OPT      => ['length', 'same', 'file'],
+	SEQID_WEIGHT_OPT      => ['length', 'same', 'count'],
 	SEQUENCING_TYPE_OPT   => ['single-end', 'paired-end']
 };
 
@@ -25,25 +26,25 @@ override 'opt_spec' => sub {
 	my @rm_opt = $self->rm_opt;
 
 	my %all_opt = (
-		'seed'             => 'seed|s=i',
-		'prefix'           => 'prefix|p=s',
-		'id'               => 'id|I=s',
-		'append-id'        => 'append-id|i=s',
-		'verbose'          => 'verbose|v',
-		'output-dir'       => 'output-dir|o=s',
-		'jobs'             => 'jobs|j=i',
-		'gzip'             => 'gzip|z!',
-		'coverage'         => 'coverage|c=f',
-		'read-size'        => 'read-size|r=i',
-		'fragment-mean'    => 'fragment-mean|m=i',
-		'fragment-stdd'    => 'fragment-stdd|d=i',
-		'sequencing-error' => 'sequencing-error|e=f',
-		'sequencing-type'  => 'sequencing-type|t=s',
-		'quality-profile'  => 'quality-profile|q=s',
-		'strand-bias'      => 'strand-bias|b=s',
-		'seqid-weight'     => 'seqid-weight|w=s',
-		'number-of-reads'  => 'number-of-reads|n=i',
-		'weight-file'      => 'weight-file|f=s'
+		'seed'              => 'seed|s=i',
+		'prefix'            => 'prefix|p=s',
+		'id'                => 'id|I=s',
+		'append-id'         => 'append-id|i=s',
+		'verbose'           => 'verbose|v',
+		'output-dir'        => 'output-dir|o=s',
+		'jobs'              => 'jobs|j=i',
+		'gzip'              => 'gzip|z!',
+		'coverage'          => 'coverage|c=f',
+		'read-size'         => 'read-size|r=i',
+		'fragment-mean'     => 'fragment-mean|m=i',
+		'fragment-stdd'     => 'fragment-stdd|d=i',
+		'sequencing-error'  => 'sequencing-error|e=f',
+		'sequencing-type'   => 'sequencing-type|t=s',
+		'quality-profile'   => 'quality-profile|q=s',
+		'strand-bias'       => 'strand-bias|b=s',
+		'seqid-weight'      => 'seqid-weight|w=s',
+		'number-of-reads'   => 'number-of-reads|n=i',
+		'expression-matrix' => 'expression-matrix|f=s'
 	);
 
 	for my $opt (@rm_opt) {
@@ -64,8 +65,13 @@ sub _log_msg_opt {
 }
 
 sub _quality_profile_report {
-	my $quality = App::SimulateReads::Quality::Handle->new;
-	return $quality->make_report;
+	state $report = App::SimulateReads::DB::Handle::Quality->new->make_report;
+	return $report;
+}
+
+sub _expression_matrix_report {
+	state $report = App::SimulateReads::DB::Handle::Expression->new->make_report;
+	return $report;
 }
 
 sub validate_args {
@@ -92,6 +98,7 @@ sub validate_args {
 
 sub validate_opts {
 	my ($self, $opts) = @_;
+	my $progname = $self->progname;
 	my %default_opt = $self->default_opt;
 	$self->fill_opts($opts, \%default_opt);
 
@@ -101,6 +108,7 @@ sub validate_opts {
 	my %SEQUENCING_TYPE   = map { $_ => 1 } @{ &SEQUENCING_TYPE_OPT };
 	my %COUNT_LOOPS_BY    = map { $_ => 1 } @{ &COUNT_LOOPS_BY_OPT  };
 	my %QUALITY_PROFILE   = %{ $self->_quality_profile_report };
+	my %EXPRESSION_MATRIX = %{ $self->_expression_matrix_report };
 
 	#  prefix
 	if ($opts->{prefix} =~ /([\/\\])/) {
@@ -118,22 +126,24 @@ sub validate_opts {
 	}
 
 	# quality_profile
-	if ((not exists $QUALITY_PROFILE{$opts->{'quality-profile'}}) && ($opts->{'quality-profile'} ne 'poisson')) {
-		my $opt = join ', ' => keys %QUALITY_PROFILE;
-		die "Option 'quality-profile' requires one of these arguments: $opt and poisson. Not $opts->{'quality-profile'}\n";
-	}
-
-	# 0 < read-size <= 101
-	if (0 > $opts->{'read-size'}) {
-		die "Option 'read-size' requires an integer greater than zero, not $opts->{'read-size'}\n";
-	}
-
-	# read-size if quality-profile is not poisson, test for available sizes
-	my $quality_entry = $QUALITY_PROFILE{$opts->{'quality-profile'}};
-	my %sizes = map { $_->{size} => 1 } @$quality_entry;
-	if ((not $sizes{$opts->{'read-size'}}) && ($opts->{'quality-profile'} ne 'poisson')) {
-		my $opt = join ', ' => keys %sizes;
-		die "Option 'read-size' requires one of these arguments for $opts->{'quality-profile'}: $opt. Not $opts->{'read-size'}\n";
+	# If the quality_profile is 'poisson', then check the read-size.
+	# Else look for the quality-profile into the database 
+	if ($opts->{'quality-profile'} eq 'poisson') {
+		# 0 < read-size <= 101
+		if (0 > $opts->{'read-size'}) {
+			die "Option 'read-size' requires an integer greater than zero, not $opts->{'read-size'}\n";
+		}
+	} else {
+		if (exists $QUALITY_PROFILE{$opts->{'quality-profile'}}) {
+			my $entry = $QUALITY_PROFILE{$opts->{'quality-profile'}};
+			# It is necessary for the next validations, so
+			# I set the opts read-size for the value that will be used
+			# afterwards
+			$opts->{'read-size'} = $entry->{'size'};
+		} else {
+			die "Option quality-profile='$opts->{'quality-profile'}' does not exist into the database.\n",
+				"Please check '$progname quality' to see the available profiles or use '--quality-profile=poisson'\n";
+		}
 	}
 
 	# strand_bias (STRAND_BIAS_OPT)
@@ -209,15 +219,16 @@ sub validate_opts {
 		die "Option 'seqid-weight' requires one of these arguments: $opt not $opts->{'seqid_weight'}\n";
 	}
 
-	# seqid-weight eq 'file' requires a weight-file
-	if ($opts->{'seqid-weight'} eq 'file') {
-		if (not defined $opts->{'weight-file'}) {
-			die "Option 'weight-file' requires an expression matrix file\n";
+	# seqid-weight eq 'count' requires an expression-matrix
+	if ($opts->{'seqid-weight'} eq 'count') {
+		if (not defined $opts->{'expression-matrix'}) {
+			die "Option 'expression-matrix' requires a database entry\n";
 		}
 
-		# It is defined, but the file exists?
-		if (not -f $opts->{'weight-file'}) {
-			die "Option 'weight-file' requires a valid file, not $opts->{'weight-file'}\n";
+		# It is defined, but the entry exists?
+		if (not exists $EXPRESSION_MATRIX{$opts->{'expression-matrix'}}) {
+			die "Option expression-matrix='$opts->{'expression-matrix'}' does not exist into the database.\n",
+				"Please check '$progname expression' to see the available matrices\n";
 		}
 	}
 }
@@ -242,6 +253,14 @@ sub execute {
 		die "'count-lopps-by' must be defined"
 	}
 
+	# Override read-size if quality-profile comes from database
+	if ($opts->{'quality-profile'} ne 'poisson') {
+		my $report = $self->_quality_profile_report;
+		my $entry = $report->{$opts->{'quality-profile'}};
+		# Override default or user-defined value
+		$opts->{'read-size'} = $entry->{'size'};
+	}
+
 	# Sequence identifier
 	$opts->{'id'} ||= $opts->{'sequencing-type'} eq 'paired-end' ?
 		$opts->{'paired-end-id'} :
@@ -257,7 +276,7 @@ sub execute {
 			my ($dir, $message) = %$_;
 			$err_dir .= "Problem creating '$dir': $message\n";
 		}
-		die "$err_dir";
+		die "$err_dir\n";
 	}
 
 	# Concatenate output-dir to prefix
@@ -268,12 +287,12 @@ sub execute {
 	#  Log presentation header
 	#-------------------------------------------------------------------------------
 	my $time_stamp = localtime;
-	my $progname   = $self->progname;
+	my $progname = $self->progname;
 	my $argv = $self->argv;
 	log_msg <<"HEADER";
 --------------------------------------------------------
-Date $time_stamp
 $progname
+Date $time_stamp
 --------------------------------------------------------
 :: Arguments passed by the user:
   => '@$argv'
@@ -321,7 +340,7 @@ HEADER
 		jobs              => $opts->{'jobs'},
 		strand_bias       => $opts->{'strand-bias'},
 		seqid_weight      => $opts->{'seqid-weight'},
-		weight_file       => $opts->{'weight-file'}
+		expression_matrix => $opts->{'expression-matrix'}
 	);
 
 	my $simulator;
@@ -350,7 +369,7 @@ App::SimulateReads::Role::Digest - Wrapper on Simulator class for genome/transcr
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 

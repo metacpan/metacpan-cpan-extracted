@@ -6,6 +6,7 @@ build_requires:
   Config::Model::Tester: '2.062'
   Config::Model::Tester::Setup: '0'
   File::Copy: '0'
+  IO::File: '0'
   Module::Build: '0.34'
   Test::Differences: '0'
   Test::Exception: '0'
@@ -41,7 +42,6 @@ requires:
   File::HomeDir: '0'
   File::Path: '0'
   Hash::Merge: '0.12'
-  IO::File: '0'
   JSON: '0'
   List::MoreUtils: '0'
   List::Util: '0'
@@ -69,5 +69,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.120'
+version: '2.122'
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query::mysql;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - MySQL backend
-$BenchmarkAnything::Storage::Backend::SQL::Query::mysql::VERSION = '0.023';
+$BenchmarkAnything::Storage::Backend::SQL::Query::mysql::VERSION = '0.024';
 use strict;
 use warnings;
 use base 'BenchmarkAnything::Storage::Backend::SQL::Query::common';
@@ -81,7 +81,7 @@ sub select_benchmark_values {
             if ( any { $ar_where->[1] eq $_  } keys %h_default_columns ) {
                 my $s_column = splice( @{$ar_where}, 1, 1 );
                 push @a_where, $or_self->create_where_clause( $h_default_columns{$s_column}, $ar_where );
-                push @a_where_vals , @{$ar_where}[1..$#{$ar_where}];
+                push @a_where_vals , @{$ar_where}[1..$#{$ar_where}] unless $ar_where->[0] eq 'is_empty';
             }
             else {
                 my $s_additional_type = splice( @{$ar_where}, 1, 1 );
@@ -107,7 +107,7 @@ sub select_benchmark_values {
                 ";
                 push @a_from_vals, $hr_additional_type->{bench_additional_type_id};
                 push @a_where, $or_self->create_where_clause( "bav$i_counter.bench_additional_value", $ar_where );
-                push @a_where_vals , @{$ar_where}[1..$#{$ar_where}];
+                push @a_where_vals , @{$ar_where}[1..$#{$ar_where}] unless $ar_where->[0] eq 'is_empty';
                 $i_counter++;
             }
         }
@@ -449,7 +449,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

@@ -1,4 +1,4 @@
-version 0.9920
+version 0.9923
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -6,10 +6,9 @@ the core version code for all Perl releases from 5.10.0 onwards.
 
 Although this code has been fully integrated into the latest Perl release
 itself (e.g. bleadperl), the CPAN release is considered upstream.  The source
-code itself is available from two mirrors:
+code itself is available from:
 
-    https://bitbucket.org/jpeacock/version (primary)
-    https://github.com/JohnPeacock/version.git (secondary)
+    https://github.com/JohnPeacock/version.pm.git
 
 and a bug queue here:
 
@@ -55,5 +54,5 @@ COPYRIGHT AND LICENCE
 
 This module can be distributed under the same terms as Perl.
 
-Copyright (C) 2004-2017 John Peacock
+Copyright (C) 2004-2018 John Peacock
 

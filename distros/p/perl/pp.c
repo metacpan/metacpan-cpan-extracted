@@ -39,14 +39,6 @@
 extern Pid_t getpid (void);
 #endif
 
-/*
- * Some BSDs and Cygwin default to POSIX math instead of IEEE.
- * This switches them over to IEEE.
- */
-#if defined(LIBM_LIB_VERSION)
-    _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
-#endif
-
 static const STRLEN small_mu_len = sizeof(GREEK_SMALL_LETTER_MU_UTF8) - 1;
 static const STRLEN capital_iota_len = sizeof(GREEK_CAPITAL_LETTER_IOTA_UTF8) - 1;
 
@@ -5186,9 +5178,11 @@ PP(pp_list)
 {
     I32 markidx = POPMARK;
     if (GIMME_V != G_ARRAY) {
-	SV **mark = PL_stack_base + markidx;
+        /* don't initialize mark here, EXTEND() may move the stack */
+        SV **mark;
 	dSP;
         EXTEND(SP, 1);          /* in case no arguments, as in @empty */
+        mark = PL_stack_base + markidx;
 	if (++MARK <= SP)
 	    *MARK = *SP;		/* unwanted list, return last item */
 	else

@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Yo::Yo_bj;
 # This file auto generated from Data\common\transforms\yo-yo_BJ.xml
-#	on Fri 29 Apr  6:48:50 pm GMT
+#	on Fri 13 Apr  6:59:58 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -25,7 +26,7 @@ has 'transforms' => (
 	isa => ArrayRef,
 	init_arg => undef,
 	default => sub { [
-		qr/(?^umi:\G(?^u:[ẸỌṢẹọṣ]))/,
+		qr/(?^umi:\G[ẸỌṢẹọṣ])/,
 		{
 			type => 'transform',
 			data => [
@@ -41,42 +42,42 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:Ẹ)),
+					replace => q(Ẹ),
 					result  => q(Ɛ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ẹ)),
+					replace => q(ẹ),
 					result  => q(ɛ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:Ọ)),
+					replace => q(Ọ),
 					result  => q(Ɔ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ọ)),
+					replace => q(ọ),
 					result  => q(ɔ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:Ṣ)),
+					replace => q(Ṣ),
 					result  => q(Sh),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ṣ)),
+					replace => q(ṣ),
 					result  => q(sh),
 					revisit => 0,
 				},

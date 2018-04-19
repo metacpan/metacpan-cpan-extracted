@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.2.2;
+package Pcore::Chrome v0.2.3;
 
 use Pcore -dist, -const, -class;
 use Pcore::Chrome::Tab;
@@ -25,7 +25,7 @@ sub DEMOLISH ( $self, $global ) {
 }
 
 sub run ( $self, @args ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
 
@@ -105,9 +105,7 @@ sub run ( $self, @args ) {
             $proc->{timer} = AE::timer $args{timeout} // 3, 0, sub {
                 delete $proc->{timer};
 
-                $cb->($self) if $cb;
-
-                $blocking_cv->($self) if $blocking_cv;
+                $rouse_cb ? $cb ? $rouse_cb->( $cb->($self) ) : $rouse_cb->($self) : $cb ? $cb->($self) : ();
 
                 return;
             };
@@ -116,14 +114,14 @@ sub run ( $self, @args ) {
         },
     );
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub get_tabs ( $self, $cb ) {
     P->http->get(
         "http://$self->{host}:$self->{port}/json",
         on_finish => sub ($res) {
-            my $tabs = from_json $res->body;
+            my $tabs = from_json $res->{body};
 
             for my $tab ( $tabs->@* ) {
                 $tab = bless { chrome => $self, id => $tab->{id} }, 'Pcore::Chrome::Tab';
@@ -146,7 +144,7 @@ sub new_tab ( $self, @args ) {
     P->http->get(
         "http://$self->{host}:$self->{port}/json/new$url",
         on_finish => sub ($res) {
-            my $data = from_json $res->body;
+            my $data = from_json $res->{body};
 
             my $tab = bless { chrome => $self, id => $data->{id} }, 'Pcore::Chrome::Tab';
 

@@ -1,5 +1,9 @@
 Revision history for Config-AutoConf
 
+0.316	2018-04-12
+	- deal with pkg-config errors
+	- allow more search_lib others
+
 0.315	2017-08-02
 	- add check_builtin
 	- perltidy code and add perltidy test (taken from MooX::Options)

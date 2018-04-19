@@ -9,10 +9,12 @@ debug/server.pl
 lib/Test/BrewBuild.pm
 lib/Test/BrewBuild/brewbuild.conf.pod
 lib/Test/BrewBuild/BrewCommands.pm
+lib/Test/BrewBuild/Constant.pm
 lib/Test/BrewBuild/Dispatch.pm
 lib/Test/BrewBuild/Git.pm
 lib/Test/BrewBuild/Plugin/DefaultExec.pm
 lib/Test/BrewBuild/Plugin/UnitTestPluginInst.pm
+lib/Test/BrewBuild/Regex.pm
 lib/Test/BrewBuild/Tester.pm
 lib/Test/BrewBuild/Tutorial.pod
 Makefile.PL
@@ -40,6 +42,7 @@ t/test_api/00-api-BB_plugins.t
 t/test_api/05-api-BB_brew_info.t
 t/test_api/10-api-BB_perls_avaliable.t
 t/test_api/100-api-BB_install_all.t
+t/test_api/105-re.t
 t/test_api/15-api-BB_is_win.t
 t/test_api/20-api-BB_perls_installed.t
 t/test_api/25-api-BB_log.t

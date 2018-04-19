@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Email;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use WebService::MinFraud::Types qw( Bool BoolCoercion Str );
 
@@ -40,7 +40,7 @@ WebService::MinFraud::Record::Email - Contains data for the email associated wit
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
   my $request  = { device => { ip_address => '24.24.24.24' } };
@@ -68,7 +68,7 @@ This class provides the following methods:
 =head2 first_seen
 
 A date string (e.g. 2017-04-24) to identify the date an email address was first
-seen by MaxMind. This is expressed using the ISO 8601 date format.
+seen by MaxMind. This is expressed using the ISO 8601 date format YYYY-MM-DD.
 
 =head2 is_free
 

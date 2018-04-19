@@ -16,7 +16,7 @@ END
 }
 
 ## OK, we really hope people have sdtio.h around
-ok(Config::AutoConf->check_header("stdio.h")) or plan skip_all => "No working compile environment";
+Config::AutoConf->check_header("stdio.h") or plan skip_all => "No working compile environment";
 ok(!Config::AutoConf->check_header("astupidheaderfile.h"));
 is(Config::AutoConf->check_headers("astupidheaderfile.h", "stdio.h"), "stdio.h");
 

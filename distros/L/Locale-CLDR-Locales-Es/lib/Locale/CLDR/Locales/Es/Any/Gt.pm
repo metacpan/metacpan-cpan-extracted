@@ -6,21 +6,69 @@ Locale::CLDR::Locales::Es::Any::Gt - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Gt;
 # This file auto generated from Data\common\main\es_GT.xml
-#	on Fri 29 Apr  7:00:43 pm GMT
+#	on Fri 13 Apr  7:08:36 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Es::Any::419');
+has 'display_name_language' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub { 
+		 sub {
+			 my %languages = (
+				'ace' => 'acehnés',
+ 				'arp' => 'arapaho',
+ 				'bho' => 'bhojpuri',
+ 				'eu' => 'euskera',
+ 				'grc' => 'griego antiguo',
+ 				'lo' => 'lao',
+ 				'nso' => 'sotho septentrional',
+ 				'pa' => 'punyabí',
+ 				'ss' => 'siswati',
+ 				'sw' => 'suajili',
+ 				'sw_CD' => 'suajili del Congo',
+ 				'tn' => 'setswana',
+ 				'wo' => 'wolof',
+ 				'zgh' => 'tamazight marroquí estándar',
+
+			);
+			if (@_) {
+				return $languages{$_[0]};
+			}
+			return \%languages;
+		}
+	},
+);
+
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { 
+		{
+			'BA' => 'Bosnia y Herzegovina',
+ 			'GB@alt=short' => 'RU',
+ 			'TA' => 'Tristán de Acuña',
+ 			'TL' => 'Timor-Leste',
+ 			'UM' => 'Islas menores alejadas de EE. UU.',
+
+		}
+	},
+);
+
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -51,9 +99,6 @@ has 'units' => (
 						'name' => q(kilojulios),
 						'one' => q({0} kilojulio),
 						'other' => q({0} kilojulios),
-					},
-					'mile-scandinavian' => {
-						'name' => q(milla escandinava),
 					},
 					'milliampere' => {
 						'name' => q(miliamperios),
@@ -129,48 +174,48 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
@@ -184,6 +229,40 @@ around day_period_data => sub {
 	my ($orig, $self) = @_;
 	return $self->$orig;
 };
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
+				'wide' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+			},
+			'stand-alone' => {
+				'narrow' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
+				'wide' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
+				'abbreviated' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+			},
+		},
+	} },
+);
 
 has 'eras' => (
 	is			=> 'ro',

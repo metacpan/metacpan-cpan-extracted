@@ -1,9 +1,54 @@
-2017-06-16 v0.2613 pjacklam
+0.2614 2018-04-17
+
+ * Fix bug in bpow() (CPAN RT #124002). Add tests to verify fix.
+
+ * Fix bug in is_one(). The code $x->is_one("-") returned false when $x was -1
+   and true when $x was 1. Add tests to verify fix.
+
+ * Improve bsqrt() so it returns the exact result when possible.
+
+ * Fix documentation errors.
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * Add test files t/release-portability.t, t/release-test-version.t, and
+   t/release-cpan-changes.t.
+
+ * Update TODO file.
+
+ * Prefer as_int() to as_number(), since what is does is return an integer.
+
+ * Expand tabs to spaces and clean up whitepace.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+ * Reformat CHANGES to match the specification in CPAN::Changes::Spec and
+   CPAN::Meta::Spec.
+
+ * Better testing of NaN and Inf trapping.
+
+ * Use $class->config("xyz") rather than $class->config()->{xyz}.
+
+ * Add more tests of is_inf() to catch bugs like the one that was in is_one().
+   Specifically, make sure we test is_inf() with and without a sign argument.
+
+ * Use $LIB for the math backend library class.
+
+ * Reformat test data in t/bigratpm.inc.
+
+ * Import carp() and croak() from Carp.
+
+ * Make tests pass when '.' is not in @INC.
+
+ * Remove t/bigroot.t and t/biglog.t which didn't test Math::BigRat at all.
+
+0.2613 2017-06-16 pjacklam
 
  * Fix problem with second operand being changed in multiplication (CPAN RT
    #121139).
 
-2017-03-01 v0.2612 pjacklam
+0.2612 2017-03-01 pjacklam
 
  * Improve the logic in blog() to determine how to call objectify(). The old,
    simpler logic didn't handle an undefined base correctly.
@@ -12,16 +57,16 @@
 
  * Don't quote the version number of a use'd module.
 
-2016-12-13 v0.2611 pjacklam
+0.2611 2016-12-13 pjacklam
 
  * Add more logic to Makefile.PL regarding INSTALLDIRS (CPAN RT #119199
    and #119225).
 
-2016-12-11 v0.2610 pjacklam
+0.2610 2016-12-11 pjacklam
 
  * Fix Makefile.PL so that this module installs over the core version.
 
-2016-12-03 v0.2609 pjacklam
+0.2609 2016-12-03 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
@@ -39,7 +84,7 @@
 
  * Minor POD reformatting in lib/Math/BigRat.pm.
 
-2016-11-15 v0.260805 pjacklam
+0.260805 2016-11-15 pjacklam
 
  * Standardize on using $LIB for the variable holding the class of the backend
    library.
@@ -47,7 +92,7 @@
  * Improve bmul() by doing _gcd() twice on smaller numbers rather than once on
    larger numbers.
 
-2016-04-25 v0.260804 pjacklam
+0.260804 2016-04-25 pjacklam
 
  * Revert the change to the blsft() and brsft() methods, which truncated the
    input (and output) to integers. However, now convert the base to an object
@@ -63,7 +108,7 @@
    "test_requires 'Test::More' => 0.47". Test::More is only needed for testing,
    not for building.
 
-2016-04-22 v0.260803 pjacklam
+0.260803 2016-04-22 pjacklam
 
  * Add methods bnan(), binf(), bzero(), and bone(). The old code was based on
    an undocumented behaviour where the superclass made assumptions about the
@@ -102,7 +147,7 @@
 
  * Add methods band(), bior(), bxor(), and bnot().
 
-2015-12-28 v0.260802 pjacklam
+0.260802 2015-12-28 pjacklam
 
  * Fix blog(). The handling of inf and NaN was broken. It also returned
    incorrect result in several cases, especially when both the operand and the
@@ -144,7 +189,7 @@
 
  * Include "use strict" and "use warnings" in all files.
 
-2015-09-14 v0.260801 pjacklam
+0.260801 2015-09-14 pjacklam
 
  * Added support for bdiv() in list context. Added corresponding tests.
 
@@ -157,262 +202,427 @@
 
  * Display more information about loaded modules.
 
-2015-08-28 v0.2608 pjacklam
- lib/Math/BigRat.pm
+0.2608 2015-08-28 pjacklam
+
   * Wrap long lines.
+
   * Increment version number. (Sync with blead.)
 
-2015-08-28 v0.2607 pjacklam
- CHANGES
+0.2607 2015-08-28 pjacklam
+
   * Add changes from v0.2602 to v0.2606.
- lib/Math/BigRat.pm
+
   * Increment version number. (Sync with blead.)
- inc/Module/Install.pm
+
   * Update bundled version of Module::Install from v1.08 to v1.16.
 
-2014-04-03 v0.2606 pjacklam
- BUGS
+0.2606 2014-04-03 pjacklam
+
   * Add ref to https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigRat
- MANIFEST.SKIP
+
   * Misc. updates.
- inc/Module/Install.pm
+
   * Update bundled version of Module::Install from v1.00 to v1.08.
- lib/Math/BigRat.pm
+
   * Fix spelling errors.
+
   * Avoid negative zero.
+
   * Various POD corrections.
+
   * Add refereces to CPAN testers, CPAN RT etc.
- t/bigrat.t
+
   * Test to avoid negative zero.
 
-2011-02-13 v0.2602 pjacklam (1000 tests)
+0.2602 2011-02-13 pjacklam (1000 tests)
+
  * Fix spelling errors (Peter John Acklam).
+
  * Include latest versions test scripts shared with the Math::BigInt
    distribution (Peter John Acklam).
+
  * Add 00sig.t for testing the SIGNATURE file, 01load.t for explicitly
    testing module loading and showing version information useful for
    debugging (Peter John Acklam).
+
  * Replace pod.t and pod_cov.t by 02pod.t as a generic script for testing
    POD syntax, and 03podcov.t as a more generic script for testing POD
    coverage (Peter John Acklam).
 
-2010-09-15 v0.26 rafl 975 tests
+0.26 2010-09-15 rafl 975 tests
+
  * Remove obsolete test boilerplate that was once needed to test within the
    perl core (Nicholas Clark).
+
  * Convert tests from Test to Test::More (Nicholas Clark).
 
-2010-09-13 v0.25 rafl 975 tests
+0.25 2010-09-13 rafl 975 tests
+
  * Re-upload 0.24 with a fixed SIGNATURE
 
-2009-09-09 v0.24 Leto 975 tests
+0.24 2009-09-09 Leto 975 tests
+
  * Fix [perl RT #49565: SIGNATURES]
+
  * Fix [perl RT #44827: Documentation incorrect]
 
-2009-09-08 v0.23 Leto 975 tests
+0.23 2009-09-08 Leto 975 tests
+
  * Fix [perl RT #67244] hex "e" misunderstood by Math::BigRat
 
-2008-04-06 v0.22 Tels 973 tests
+0.22 2008-04-06 Tels 973 tests
+
  * fix bug ##34584: hang when calling exp (Thanx Steve Wills!)
    + broot() normalizes result
    + bexp() works for values like '1/2' (sqrt), '1/4' (broot), etc.
    + broot() works for values like '2/3'
+
  * added as_float() - return the BigRat as rounded Math::BigFloat
 
-2007-09-16 v0.21 Tels 956 tests
+0.21 2007-09-16 Tels 956 tests
+
  * require Math::BigInt v1.88
+
  * fix as_number() with Nan/inf (thanx zefram!)
+
  * add POD stub for objectify() to make pod_cov.t happy
 
-2007-06-30 v0.20 Tels 956 tests
+0.20 2007-06-30 Tels 956 tests
+
  * require Math::BigInt v1.87
+
  * add bnok() and bexp()
 
-2007-04-17 v0.19 Tels 934 tests
+0.19 2007-04-17 Tels 934 tests
+
  * fix the check in bnorm() as it breaks under Pari
+
  * require Math::BigInt v1.83
+
  * exponent() makes a copy, so we can skip copy()
+
  * fix the licence back to be "perl"
 
-2007-04-09 v0.18 Tels 934 tests
+0.18 2007-04-09 Tels 934 tests
+
  * install_as_core() to work around Module::Install bug
+
  * remove PREREQ_FATAL since the toolchain is broken
+
  * require Math::BigInt v1.82
 
-2007-02-03 v0.17 Tels 934 tests
+0.17 2007-02-03 Tels 934 tests
+
  * include the spelling fixes for bleadperl
+
  * more typo and POD fixes
+
  * include from_bin(), from_hex() and from_oct()
+
  * add tests for octal and from_hex()/from_bin()
+
  * bundle and use Module::Install
 
 Older revision history:
 
-2001-11-21 v0.01 Tels
- * first release
-2002-02-24 v0.02 Tels (late night)
- * ripped out doc and replaced by something closer to the truth
- * subclass of BigFloat w/ overload section
- * uses d/n instead of x/y for denominator and nominator
- * tests from Math::BigFloat with a test subclass warping the input/output
- * added preliminary bmul(), badd(), bdiv() methods
- * added binf(), bone(), bzero() and bnan()
- * added _bzero(), _bone(), _bnan() and _binf() (bnan() etc inherited)
- * dummy blog(), bceil(), floor(), bfac() and bpow() functions
- * parse input as '0.1', '0.1/0.1', '1/10', '10' or '10/0.1'
- * input as Math::BigInts or Math::BigFloats is okay
-2002-02-25 v0.03 Tels (early morning hours)
- * fixed bstr()/bsstr() for negative output and inf/NaN
- * _d/_n were accidentily swapped
- * added numerator()/denominator()/parts() and doc and tests
- * fixed is_one()
- * '1/ ' is as invalid as '1/'
- * badd/bsub/bmul: inf/NaN handling was wrong due to copy&paste (ha!) from bdiv
- * more extensive testsuite (about 400 tests)
- * bnorm() normalizes 0/x to 0/1
- * badd()/bsub()/bmul()/bdiv() handle +/-/NaN/inf/-inf sign properly
- * t/Math/BigRat/Test.pm: fixed bstr() and bsstr() to handle inf/NaN and signs
-2002-03-19 v0.04 Tels
- * bcmp/bacmp/as_number/bfloor/bceil work now
- * bsqrt() is better now
- * t/Math/BigInt/Test.pm is fixed now and makes a much better figure
-   (formerly almost all of the 1500 tests in bigfltrt.inc would fail. Now we
-   fail "only" 868 of 2014 tests, and most of them since the test dies early.
- * added stubs for round, bfround, bround and certain others
-2002-03-19 v0.04 Tels
- * 5/7+3/7 hung under "Math::BigInt upgrade =>" (forgot local upgrade = undef)
- * better testsuite
- * added & fixed isa()
- * new() can handle Lite
-2002-03-26 v0.05 Tels
- * various bugfixes
-   (local undef upgrade, Bigint handling, handling of string arguments)
- * fixed up isa()
- * removed some old and wrong comments
-2002-05-23 v0.06 Tels
- * added import() routine
- * support for 'use Math::BigRat with => Foo::Bar;'
- * support for 'use Math::BigRat lib => Foo::Bar;'
- * bnorm() makes sure that both parts (n and d) are of class $MBI
- * more documentation
- * bugfix in new() with two arguments
- * INSTALLDIRS => perl
-2002-06-04 v0.07 Tels
- * bfac() now works for integers (x/1), and returns $x->bnan() instead of
-   Math::BigRat->bnan() (modify in-place)
- * bpow() faster for x/1 ** y/1 and x/z ** y/1 cases (some of the speedups are
-   two-digit factors :) - also some bugfixes
- * bpow() no longer litters stdout
- * removed some (all of them commented out) debug prints to reduce footprint
- * shortened testfile bigrat.t
- * some hardcoded 'Math::BigInt' replaced with '$MBI'
- * bceil() would leave -0 in some cases
- * (more) tests (all in all 628) for:
-   bceil/bfloor/bpow/bfac/parts/denominator/nominator/binc/bdec
- * parts('-3/1') would return (3,1) instead of (-3,1)
- * parts() did not work for NaN, +inf, -inf
- * numerator()/denominator() did not work for inf,-inf,NaN
- * new('1.2.2') was valid (resulted in 12/10 due to bug in BigFloat)
- * new() for some cases left internal state not as 0/0 for NaN, inf, -inf etc
- * binc()/bdec() were missing entirely
-2002-08-13 v0.08 Tels
- * bsstr() returned positive result for negative numbers - Oups!
- * added a numify() so that $array[Math::BigRat->new('17/8')] works
-2002-08-14 v0.09 Tels
- * documentation was lacking a proper description, METHODS missing etc
- * setting accuracy/precision in BigFloat/BigInt interfered with BigRat
- * new testcases for the A/P fix in t/big_ap.t
- * speedup: apply the same trick to avoid calls to objectify() like in BigInt
- * speedup: badd()/bsub() did needless gcd(), copy() and bdiv()
- * speedup: workaround for 'x.y.z'-valid bug in BigFloat no longer neccessary
-2002-12-15 v0.10a Tels 700 tests (not released)
- * as_number() forgot to disable $upgrade, resulting in BigRat again when
-   run under -Mbigrat -- thanx to Ian Phillips.
- * fixed a bug in new() that failed with
-    Math::BigRat->new(Math::BigInt::Lite->new(123));
- * fixed new() to work better under
-    use Math::BigRat with => 'Math::BigInt::Lite';
- * add a test for "require Math::BigRat; $x = Math::BigRat->new(123); $x++;"
-   (it already works since we "use Math::BigFloat;"
- * require Carp; Carp::croak () instead of simple die()
- * implemented bmod() - Thanx Ian Phillips.
- * bsqrt() now returns a big rationale - Ian again
- * tests for bmod(), as_number(), bsqrt() and some NaN cases
- * bfloor()/bceil() broke under use bigrat; due to missing upgrade-disabling
-2002-12-18 v0.10b Tels 729 tests (not released)
- * support for :trap_nan/:trap_inf
- * doc for config()
- * implement trapping of creation of NaN/inf/-inf
-2003-07-06 v0.10 Tels 751 tests (released on 2003-08-13)
- * one more die => croak conversion
- * fix inf/NAN handling in new()
- * fix bsqrt(3/4) and similiar cases failing with some obscure error, this was
-   a simple typo ({_n} vs. {_m}). Added tests for that.
- * numify() is now much faster (38400 vs 720 tries/s on 2Ghz AMD XP2400+)
-2004-01-07 v0.11 Tels 859 tests
- * require Exporter vs. use it
- * more tests for bacmp(), bnorm()
- * fixed bug in bacmp() with ($x,[+-]inf) (Thanx to William T. Morgan!)
- * fixed bug in new("+-inf/X") (e.g. "-inf/5" resulted in "inf", not "-inf")
- * delete _a and _p on _d and _n, reduces size of a BigRat object from
-   887 bytes to 767 bytes on a x86 32 bit system. This also makes some
-   operations slightly (single-digit percentages) faster.
- * bacmp() is about 20% faster
- * bcmp() is:
-   * about 4 times faster if sign($x) != sign($y)
-   * about 20% faster if sign($x) == sign($y)
- * added broot(), bmodinv(), bmodpow(), blog() so that their equivalent of:
-    # perl -MMath::BigRat=:constant -le '$a = 2.0 ** 32; print $a->broot(4)'
-     Can't call method "copy" on an undefined value at BigFloat.pm line 1442.
-   works now for integer arguments and inf/NaN, at least.
- * doc: rationales => rational numbers
-2004-02-15 v0.12 Tels 863 tests
- * fixed bug in is_one() (segfault under v.5.6.x)
- * implemented length() and digit() for integers
- * beefed up testing class Test.pm to make more float tests work (185 of them
-   still fail)
- * added AUTOLOAD to load fxxx() stubs (for BigFloat compatibility tests)
- * $IMPORT for require and AUTOLOAD
- * added as_bin(), as_hex() which work for integers, NaN, and +-inf
- * implement broot() and blog() for non-integer numbers
- * fixed blsft()/brsft() to work with undefined or scalar base
- * added a copy() method to be independend from BigInt's copy()
- * adopted to new internal format of Math::BigFloat v1.44 (from BigInt v1.70)
-2004-10-22 v0.13 Tels 892 tests
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+0.16 2007-01-28 Tels 926 tests
+
+ * require Math::BigInt 1.78
+
+ * add support for 'try' and 'only'
+
+ * add pod tests
+
+0.15 2005-04-02 Tels 924 tests
+
+ * no need to require Exporter
+
+ * rem no longer used 'with' from import
+
+ * add a few comments here and there
+
+ * fix import()'s handling of the lib argument (it didn't work)
+
+ * fix segfault under trap_nan in _bnan()
+
+ * remove unused IMPORT logic (require BigRat seems to work without it)
+
+0.14 2005-01-01 Tels 924 tests
+
+ * require Math::BigInt v1.74
+
+ * streamline copy()
+
+ * inline is_zero() into bneg(), making it about 50% faster
+
+ * more tests for bneg()
+
+ * register callback to get notified of lib changes from Math::BigInt
+
+ * much simpler import() logic
+
+ * new() accepts input like new(Math::BigInt->new(123),Math::BigInt->new(7));
+
+ * doc: as_hex(), as_bin(), add note about as_pos(), as_neg() and as_int()
+
+ * numify() now deals with large N and D by using BigFloat (Thanx Hugo!)
+
+ * numify() lost the sign on negative integer values (Thanx Zefram!)
+
+0.13 2004-10-22 Tels 892 tests
+
  * fixed digit(): it never worked due to dropping the second parameter
+
  * fixed a bug in brsft() when passing arguments (2 vs. 3 in objectify)
+
  * use Math::BigInt->config('lib') for parts instead of Math::BigInt
    + This makes everything go about 2..4 times faster :)
    + And it saves memory (408 vs. 807 bytes for a simple number)
+
  * _as_float() is about 6 times as fast for integers (e.g. 123/1 vs. 2/3)
+
  * denominator() returns 1 for +inf and -inf (+inf/1, -inf/1) instead of +-inf
+
  * when using "lib => GMP;", certain things never worked:
    + sqrt() was not possible
    + new("2.3") did not work
    + new("12.3e-2") did not work
-2005-01-01 v0.14 Tels 924 tests
- * require Math::BigInt v1.74
- * streamline copy()
- * inline is_zero() into bneg(), making it about 50% faster
- * more tests for bneg()
- * register callback to get notified of lib changes from Math::BigInt
- * much simpler import() logic
- * new() accepts input like new(Math::BigInt->new(123),Math::BigInt->new(7));
- * doc: as_hex(), as_bin(), add note about as_pos(), as_neg() and as_int()
- * numify() now deals with large N and D by using BigFloat (Thanx Hugo!)
- * numify() lost the sign on negative integer values (Thanx Zefram!)
-2005-04-02 v0.15 Tels 924 tests
- * no need to require Exporter
- * rem no longer used 'with' from import
- * add a few comments here and there
- * fix import()'s handling of the lib argument (it didn't work)
- * fix segfault under trap_nan in _bnan()
- * remove unused IMPORT logic (require BigRat seems to work without it)
-2007-01-28 v0.16 Tels 926 tests
- * require Math::BigInt 1.78
- * add support for 'try' and 'only'
- * add pod tests
 
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
+0.12 2004-02-15 Tels 863 tests
 
-Tels <http://bloodgate.com/>
+ * fixed bug in is_one() (segfault under v.5.6.x)
+
+ * implemented length() and digit() for integers
+
+ * beefed up testing class Test.pm to make more float tests work (185 of them
+   still fail)
+
+ * added AUTOLOAD to load fxxx() stubs (for BigFloat compatibility tests)
+
+ * $IMPORT for require and AUTOLOAD
+
+ * added as_bin(), as_hex() which work for integers, NaN, and +-inf
+
+ * implement broot() and blog() for non-integer numbers
+
+ * fixed blsft()/brsft() to work with undefined or scalar base
+
+ * added a copy() method to be independend from BigInt's copy()
+
+ * adopted to new internal format of Math::BigFloat v1.44 (from BigInt v1.70)
+
+0.11 2004-01-07 Tels 859 tests
+
+ * require Exporter vs. use it
+
+ * more tests for bacmp(), bnorm()
+
+ * fixed bug in bacmp() with ($x,[+-]inf) (Thanx to William T. Morgan!)
+
+ * fixed bug in new("+-inf/X") (e.g. "-inf/5" resulted in "inf", not "-inf")
+
+ * delete _a and _p on _d and _n, reduces size of a BigRat object from
+   887 bytes to 767 bytes on a x86 32 bit system. This also makes some
+   operations slightly (single-digit percentages) faster.
+
+ * bacmp() is about 20% faster
+
+ * bcmp() is:
+   * about 4 times faster if sign($x) != sign($y)
+   * about 20% faster if sign($x) == sign($y)
+
+ * added broot(), bmodinv(), bmodpow(), blog() so that their equivalent of:
+    # perl -MMath::BigRat=:constant -le '$a = 2.0 ** 32; print $a->broot(4)'
+     Can't call method "copy" on an undefined value at BigFloat.pm line 1442.
+   works now for integer arguments and inf/NaN, at least.
+
+ * doc: rationales => rational numbers
+
+0.10 2003-07-06 Tels 751 tests (released on 2003-08-13)
+
+ * one more die => croak conversion
+
+ * fix inf/NAN handling in new()
+
+ * fix bsqrt(3/4) and similiar cases failing with some obscure error, this was
+   a simple typo ({_n} vs. {_m}). Added tests for that.
+
+ * numify() is now much faster (38400 vs 720 tries/s on 2Ghz AMD XP2400+)
+
+ * support for :trap_nan/:trap_inf
+
+ * doc for config()
+
+ * implement trapping of creation of NaN/inf/-inf
+
+ * as_number() forgot to disable $upgrade, resulting in BigRat again when
+   run under -Mbigrat -- thanx to Ian Phillips.
+
+ * fixed a bug in new() that failed with
+    Math::BigRat->new(Math::BigInt::Lite->new(123));
+
+ * fixed new() to work better under
+    use Math::BigRat with => 'Math::BigInt::Lite';
+
+ * add a test for "require Math::BigRat; $x = Math::BigRat->new(123); $x++;"
+   (it already works since we "use Math::BigFloat;"
+
+ * require Carp; Carp::croak () instead of simple die()
+
+ * implemented bmod() - Thanx Ian Phillips.
+
+ * bsqrt() now returns a big rationale - Ian again
+
+ * tests for bmod(), as_number(), bsqrt() and some NaN cases
+
+ * bfloor()/bceil() broke under use bigrat; due to missing upgrade-disabling
+
+0.09 2002-08-14 Tels
+
+ * documentation was lacking a proper description, METHODS missing etc
+
+ * setting accuracy/precision in BigFloat/BigInt interfered with BigRat
+
+ * new testcases for the A/P fix in t/big_ap.t
+
+ * speedup: apply the same trick to avoid calls to objectify() like in BigInt
+
+ * speedup: badd()/bsub() did needless gcd(), copy() and bdiv()
+
+ * speedup: workaround for 'x.y.z'-valid bug in BigFloat no longer neccessary
+
+0.08 2002-08-13 Tels
+
+ * bsstr() returned positive result for negative numbers - Oups!
+
+ * added a numify() so that $array[Math::BigRat->new('17/8')] works
+
+0.07 2002-06-04 Tels
+
+ * bfac() now works for integers (x/1), and returns $x->bnan() instead of
+   Math::BigRat->bnan() (modify in-place)
+
+ * bpow() faster for x/1 ** y/1 and x/z ** y/1 cases (some of the speedups are
+   two-digit factors :) - also some bugfixes
+
+ * bpow() no longer litters stdout
+
+ * removed some (all of them commented out) debug prints to reduce footprint
+
+ * shortened testfile bigrat.t
+
+ * some hardcoded 'Math::BigInt' replaced with '$MBI'
+
+ * bceil() would leave -0 in some cases
+
+ * (more) tests (all in all 628) for:
+   bceil/bfloor/bpow/bfac/parts/denominator/nominator/binc/bdec
+
+ * parts('-3/1') would return (3,1) instead of (-3,1)
+
+ * parts() did not work for NaN, +inf, -inf
+
+ * numerator()/denominator() did not work for inf,-inf,NaN
+
+ * new('1.2.2') was valid (resulted in 12/10 due to bug in BigFloat)
+
+ * new() for some cases left internal state not as 0/0 for NaN, inf, -inf etc
+
+ * binc()/bdec() were missing entirely
+
+0.06 2002-05-23 Tels
+
+ * added import() routine
+
+ * support for 'use Math::BigRat with => Foo::Bar;'
+
+ * support for 'use Math::BigRat lib => Foo::Bar;'
+
+ * bnorm() makes sure that both parts (n and d) are of class $MBI
+
+ * more documentation
+
+ * bugfix in new() with two arguments
+
+ * INSTALLDIRS => perl
+
+0.05 2002-03-26 Tels
+
+ * various bugfixes
+   (local undef upgrade, Bigint handling, handling of string arguments)
+
+ * fixed up isa()
+
+ * removed some old and wrong comments
+
+0.04 2002-03-19 Tels
+
+ * 5/7+3/7 hung under "Math::BigInt upgrade =>" (forgot local upgrade = undef)
+
+ * better testsuite
+
+ * added & fixed isa()
+
+ * new() can handle Lite
+
+0.04 2002-03-19 Tels
+
+ * bcmp/bacmp/as_number/bfloor/bceil work now
+
+ * bsqrt() is better now
+
+ * t/Math/BigInt/Test.pm is fixed now and makes a much better figure
+   (formerly almost all of the 1500 tests in bigfltrt.inc would fail. Now we
+   fail "only" 868 of 2014 tests, and most of them since the test dies early.
+
+ * added stubs for round, bfround, bround and certain others
+
+0.03 2002-02-25 Tels (early morning hours)
+
+ * fixed bstr()/bsstr() for negative output and inf/NaN
+
+ * _d/_n were accidentily swapped
+
+ * added numerator()/denominator()/parts() and doc and tests
+
+ * fixed is_one()
+
+ * '1/ ' is as invalid as '1/'
+
+ * badd/bsub/bmul: inf/NaN handling was wrong due to copy&paste (ha!) from bdiv
+
+ * more extensive testsuite (about 400 tests)
+
+ * bnorm() normalizes 0/x to 0/1
+
+ * badd()/bsub()/bmul()/bdiv() handle +/-/NaN/inf/-inf sign properly
+
+ * t/Math/BigRat/Test.pm: fixed bstr() and bsstr() to handle inf/NaN and signs
+
+0.02 2002-02-24 Tels (late night)
+
+ * ripped out doc and replaced by something closer to the truth
+
+ * subclass of BigFloat w/ overload section
+
+ * uses d/n instead of x/y for denominator and nominator
+
+ * tests from Math::BigFloat with a test subclass warping the input/output
+
+ * added preliminary bmul(), badd(), bdiv() methods
+
+ * added binf(), bone(), bzero() and bnan()
+
+ * added _bzero(), _bone(), _bnan() and _binf() (bnan() etc inherited)
+
+ * dummy blog(), bceil(), floor(), bfac() and bpow() functions
+
+ * parse input as '0.1', '0.1/0.1', '1/10', '10' or '10/0.1'
+
+ * input as Math::BigInts or Math::BigFloats is okay
+
+0.01 2001-11-21 Tels
+
+ * first release

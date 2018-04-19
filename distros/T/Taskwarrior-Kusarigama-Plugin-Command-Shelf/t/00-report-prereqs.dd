@@ -1,0 +1,31 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Clone' => '0',
+                                      'JSON' => '0',
+                                      'Moo' => '0',
+                                      'MooseX::MungeHas' => '0',
+                                      'Taskwarrior::Kusarigama::Hook::OnCommand' => '0',
+                                      'Taskwarrior::Kusarigama::Plugin' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

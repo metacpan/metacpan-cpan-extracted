@@ -3,4 +3,6 @@
 1.002  12/18/14  fixed minor Windows bugs (bypassed `ps`, ls() `ls -l` => `dir`)
 1.003  12/19/14  fixed bug in Windows .t, updated POD, added Changes file
 1.004  12/22/14  POD
+1.005  12/23/14  minor change
+1.006  04/17/18  EXPORT_TAGS :all, d '.', sub LS, sub cp, sub Die, fixed unescaped left brace in regex as suggested by dominique.quatravaux
 

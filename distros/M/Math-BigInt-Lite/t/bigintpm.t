@@ -3,15 +3,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3913;
+use Test::More tests => 4026;
 
 use Math::BigInt::Lite;
 
-our ($CLASS, $CALC);
+our ($CLASS, $LIB);
 $CLASS = "Math::BigInt::Lite";
-$CALC  = "Math::BigInt::Calc";
+$LIB   = "Math::BigInt::Calc";  # for Math::BigInt, not Math::BigInt::Lite!
 
 #############################################################################
 # all the other tests
 
-require 't/bigintpm.inc';               # all tests here for sharing
+require './t/bigintpm.inc';             # all tests here for sharing

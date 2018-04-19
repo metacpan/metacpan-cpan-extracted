@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 requires 'encode';
 
@@ -32,7 +32,7 @@ Data::Record::Serialize::Role::Encode - Encode Role
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 DESCRIPTION
 

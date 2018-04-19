@@ -285,6 +285,12 @@ need to set up an environment variable set to the pins the LCD is connected to
 
     BB_RPI_LCD=5,6,4,17,27,22
 
+The above is for 2 row, 16 column LCD units. To use the larger 4 row by 20
+column LCD, append the number of rows and columns to the end of the environment
+variable:
+
+    BB_RPI_LCD=5,6,4,17,27,22,4,20
+
 Then use the special C<--rpi> flag in the dispatch command:
 
     bbtester start -a

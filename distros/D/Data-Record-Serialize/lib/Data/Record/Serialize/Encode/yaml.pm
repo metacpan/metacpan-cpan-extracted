@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::yaml;
 
 use Moo::Role;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use YAML::Any qw[ Dump ];
 
@@ -45,7 +45,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 SYNOPSIS
 

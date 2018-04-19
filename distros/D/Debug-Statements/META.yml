@@ -10,11 +10,12 @@ build_requires:
   Test::Output: '0'
   lib: '0'
   perl: '5.006'
+  regression: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,4 +34,5 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '1.005'
+version: '1.006'
+x_serialization_backend: 'YAML::Tiny version 1.73'

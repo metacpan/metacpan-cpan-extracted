@@ -1,5 +1,10 @@
 Revision history for List-Util-MaybeXS
 
+1.500002 - 2018-04-19
+  - trigger codification overloads only once if used for callback
+  - fix error report location if given a non-coderef
+  - improve doc note about behavior of @_ in List::Util
+
 1.500001 - 2018-04-02
   - only test against PP module, as testing MaybeXS is redundant
   - added test to ensure List::Util::MaybeXS and List::Util::PP have matching

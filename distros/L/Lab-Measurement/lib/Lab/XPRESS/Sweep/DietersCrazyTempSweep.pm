@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::DietersCrazyTempSweep;
 #ABSTRACT: Dieter's crazy temperature sweep
-$Lab::XPRESS::Sweep::DietersCrazyTempSweep::VERSION = '3.630';
+$Lab::XPRESS::Sweep::DietersCrazyTempSweep::VERSION = '3.631';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -117,7 +117,7 @@ Lab::XPRESS::Sweep::DietersCrazyTempSweep - Dieter's crazy temperature sweep
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '1.1';
+$JSONAPI::Document::VERSION = '1.2';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
@@ -251,7 +251,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -279,8 +279,7 @@ version 1.1
 
 =head1 DESCRIPTION
 
-This is a plug-and-play Moo class that builds data structures according
-to the L<JSON API|http://jsonapi.org/format/> specification.
+Moo class that builds data structures according to the L<JSON API|http://jsonapi.org/format/> specification.
 
 =head1 NOTES
 
@@ -416,5 +415,9 @@ Returns a I<HashRef> with the following structure:
     }
 
 See C<resource_document> for a list of options.
+
+=head1 LICENSE
+
+This code is released under the Perl 5 License.
 
 =cut

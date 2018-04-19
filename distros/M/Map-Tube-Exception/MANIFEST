@@ -20,9 +20,11 @@ lib/Map/Tube/Exception/InvalidColorHexCode.pm
 lib/Map/Tube/Exception/InvalidLineColor.pm
 lib/Map/Tube/Exception/InvalidLineId.pm
 lib/Map/Tube/Exception/InvalidLineName.pm
+lib/Map/Tube/Exception/InvalidLineStructure.pm
 lib/Map/Tube/Exception/InvalidNodeObject.pm
 lib/Map/Tube/Exception/InvalidStationId.pm
 lib/Map/Tube/Exception/InvalidStationName.pm
+lib/Map/Tube/Exception/InvalidStationStructure.pm
 lib/Map/Tube/Exception/InvalidSupportedObject.pm
 lib/Map/Tube/Exception/MalformedMapData.pm
 lib/Map/Tube/Exception/MissingLineId.pm

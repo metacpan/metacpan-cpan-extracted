@@ -1,5 +1,14 @@
 Revision history for Config::AWS
 
+0.02      2018-04-16 22:07:31+01:00 Europe/London
+
+  Changes:
+    * Requires Path::Tiny 0.076 or greater, to fix incorrect
+      stringification of paths starting with "~" on Windows.
+  Fixes:
+    * Convert variations of CR / LF to newlines before chomping
+      for greater cross-platform compatibility.
+
 0.01      2018-02-16 22:40:45+00:00 Europe/London
 
   * Initial release

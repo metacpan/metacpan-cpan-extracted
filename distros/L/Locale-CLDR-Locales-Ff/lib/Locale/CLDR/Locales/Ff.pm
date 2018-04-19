@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ff - Package for language Fulah
 
 package Locale::CLDR::Locales::Ff;
 # This file auto generated from Data\common\main\ff.xml
-#	on Fri 29 Apr  7:02:08 pm GMT
+#	on Fri 13 Apr  7:09:32 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q v x z])},
+			auxiliary => qr{[q v x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Ƴ'],
-			main => qr{(?^u:[a b ɓ c d ɗ e f g h i j k l m n ñ ŋ o p r s t u w y ƴ])},
+			main => qr{[a b ɓ c d ɗ e f g h i j k l m n ñ ŋ o p r s t u w y ƴ]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -835,13 +837,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{subaka},
-					'pm' => q{kikiiɗe},
-				},
 				'abbreviated' => {
-					'am' => q{subaka},
 					'pm' => q{kikiiɗe},
+					'am' => q{subaka},
+				},
+				'wide' => {
+					'pm' => q{kikiiɗe},
+					'am' => q{subaka},
 				},
 			},
 		},
@@ -973,6 +975,19 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 	} },
 );
 

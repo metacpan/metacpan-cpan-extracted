@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "IO::File" => 0,
     "JSON::MaybeXS" => 0,
     "List::Util" => "1.29",
-    "Moo::Role" => "2.003",
+    "Moo::Role" => "2.003004",
     "POSIX" => 0,
     "Package::Variant" => 0,
     "Ref::Util" => 0,
@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "YAML::Any" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/encoders/*.t"
   }
@@ -79,7 +79,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "List::Util" => "1.29",
-  "Moo::Role" => "2.003",
+  "Moo::Role" => "2.003004",
   "POSIX" => 0,
   "Package::Variant" => 0,
   "Ref::Util" => 0,

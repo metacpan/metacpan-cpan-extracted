@@ -73,11 +73,11 @@ sub run_tests {
 		[ { username => 'i_do_not_exist' },'invalid_grant','bad username' ],
 		[ { password => 'bad_password' },'invalid_grant','bad password' ],
 	) {
-		my ( $client,$vac_error,$scopes ) = $Grant->verify_user_password(
+		my ( $rt_client,$vac_error,$scopes ) = $Grant->verify_user_password(
 			%valid_user_password,%{ $t->[0] },
 		);
 
-		ok( ! $client,'->verify_user_password, ' . $t->[2] );
+		ok( ! $rt_client,'->verify_user_password, ' . $t->[2] );
 		is( $vac_error,$t->[1],'has error' );
 		ok( ! $scopes,'has no scopes' );
 	}
@@ -87,7 +87,7 @@ sub run_tests {
 	note( "store_access_token" );
 
 	ok( my $access_token = $Grant->token(
-		client_id    => $client,
+		client_id    => 'test_client',
 		scopes       => $scopes_ref,
 		type         => 'access',
 		user_id      => $user_id,
@@ -97,7 +97,7 @@ sub run_tests {
 		if $args->{token_format_tests};
 
 	ok( my $refresh_token = $Grant->token(
-		client_id    => $client,
+		client_id    => 'test_client',
 		scopes       => $scopes_ref,
 		type         => 'refresh',
 		user_id      => $user_id,
@@ -107,7 +107,7 @@ sub run_tests {
 		if $args->{token_format_tests};
 
 	ok( $Grant->store_access_token(
-		client_id     => $client,
+		client_id     => 'test_client',
 		access_token  => $access_token,
 		refresh_token => $refresh_token,
 		scopes       => $scopes_ref,

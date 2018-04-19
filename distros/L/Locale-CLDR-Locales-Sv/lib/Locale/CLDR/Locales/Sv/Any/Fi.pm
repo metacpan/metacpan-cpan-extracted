@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Sv::Any::Fi - Package for language Swedish
 
 package Locale::CLDR::Locales::Sv::Any::Fi;
 # This file auto generated from Data\common\main\sv_FI.xml
-#	on Fri 29 Apr  7:27:18 pm GMT
+#	on Fri 13 Apr  7:29:57 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -80,7 +81,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{kinesiska i gb2312-sorteringsordning},
  				'pinyin' => q{kinesiska i pinyin-sorteringsordning},
  				'stroke' => q{kinesiska i strecksorteringsordning},
- 				'traditional' => q{traditionell sorteringsordning},
  			},
 
 		}
@@ -96,7 +96,7 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			main => qr{(?^u:[a à b c d e é f g h i j k l m n o p q r s t u v x y z å ä ö])},
+			main => qr{[a à b c d e é f g h i j k l m n o p q r s t u v x y z å ä ö]},
 		};
 	},
 EOT
@@ -125,6 +125,30 @@ has 'units' => (
 			} }
 );
 
+has 'calendar_quarters' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
+					},
+				},
+			},
+	} },
+);
+
 has 'day_period_data' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -137,29 +161,29 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning1' if $time >= 500
-						&& $time < 1000;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 					return 'morning2' if $time >= 1000
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'morning1' if $time >= 500
-						&& $time < 1000;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning2' if $time >= 1000
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning2' if $time >= 1000
+						&& $time < 1200;
+					return 'morning1' if $time >= 500
+						&& $time < 1000;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				last SWITCH;
 				}

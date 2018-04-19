@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ka - Package for language Georgian
 
 package Locale::CLDR::Locales::Ka;
 # This file auto generated from Data\common\main\ka.xml
-#	on Fri 29 Apr  7:11:06 pm GMT
+#	on Fri 13 Apr  7:15:35 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -314,11 +315,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -411,6 +412,9 @@ has 'display_name_language' => (
  				'bg' => 'ბულგარული',
  				'bgn' => 'დასავლეთ ბელუჯი',
  				'bho' => 'ბოჯპური',
+ 				'bi' => 'ბისლამა',
+ 				'bin' => 'ბინი',
+ 				'bla' => 'სიკსიკა',
  				'bm' => 'ბამბარა',
  				'bn' => 'ბენგალური',
  				'bo' => 'ტიბეტური',
@@ -419,36 +423,41 @@ has 'display_name_language' => (
  				'brx' => 'ბოდო',
  				'bs' => 'ბოსნიური',
  				'bua' => 'ბურიატული',
+ 				'bug' => 'ბუგინური',
  				'byn' => 'ბილინი',
  				'ca' => 'კატალანური',
  				'cay' => 'კაიუგა',
  				'ce' => 'ჩეჩნური',
+ 				'ceb' => 'სებუანო',
  				'cgg' => 'ჩიგა',
+ 				'ch' => 'ჩამორო',
  				'chb' => 'ჩიბჩა',
+ 				'chk' => 'ჩუკოტკური',
  				'chm' => 'მარიული',
- 				'chn' => 'ჩინუკი ვავა',
+ 				'chn' => 'ჩინუკის ჟარგონი',
  				'cho' => 'ჩოკტო',
- 				'chp' => 'დენე სულინე',
+ 				'chp' => 'ჩიპევიანი',
  				'chr' => 'ჩეროკი',
  				'chy' => 'ჩეიენი',
- 				'ckb' => 'სორანი ქურთული',
+ 				'ckb' => 'ცენტრალური ქურთული',
  				'co' => 'კორსიკული',
  				'cop' => 'კოპტური',
  				'cr' => 'კრი',
  				'crh' => 'ყირიმულ-თურქული',
+ 				'crs' => 'სესელვა-კრეოლური ფრანგული',
  				'cs' => 'ჩეხური',
  				'csb' => 'კაშუბური',
  				'cu' => 'საეკლესიო სლავური',
  				'cv' => 'ჩუვაშური',
  				'cy' => 'უელსური',
  				'da' => 'დანიური',
- 				'dak' => 'დაკოტა',
+ 				'dak' => 'დაკოტური',
  				'dar' => 'დარგუული',
  				'dav' => 'ტაიტა',
  				'de' => 'გერმანული',
  				'de_AT' => 'ავსტრიული გერმანული',
  				'de_CH' => 'შვეიცარიული ზემოგერმანული',
- 				'del' => 'დელავარული',
+ 				'del' => 'დელავერული',
  				'den' => 'სლეივი',
  				'dgr' => 'დოგრიბი',
  				'din' => 'დინკა',
@@ -461,10 +470,12 @@ has 'display_name_language' => (
  				'dyo' => 'დიოლა',
  				'dyu' => 'დიულა',
  				'dz' => 'ძონგკხა',
+ 				'dzg' => 'დაზაგა',
  				'ebu' => 'ემბუ',
  				'ee' => 'ევე',
  				'efi' => 'ეფიკი',
  				'egy' => 'ძველეგვიპტური',
+ 				'eka' => 'ეკაჯუკი',
  				'el' => 'ბერძნული',
  				'en' => 'ინგლისური',
  				'en_AU' => 'ავსტრალიური ინგლისური',
@@ -483,6 +494,7 @@ has 'display_name_language' => (
  				'eu' => 'ბასკური',
  				'ewo' => 'ევონდო',
  				'fa' => 'სპარსული',
+ 				'ff' => 'ფულა',
  				'fi' => 'ფინური',
  				'fil' => 'ფილიპინური',
  				'fj' => 'ფიჯი',
@@ -498,31 +510,39 @@ has 'display_name_language' => (
  				'fur' => 'ფრიულური',
  				'fy' => 'დასავლეთფრიზიული',
  				'ga' => 'ირლანდიური',
+ 				'gaa' => 'გა',
  				'gag' => 'გაგაუზური',
  				'gba' => 'გბაია',
  				'gd' => 'შოტლანდიური გელური',
  				'gez' => 'გეეზი',
+ 				'gil' => 'გილბერტული',
  				'gl' => 'გალისიური',
  				'gmh' => 'საშუალო ზემოგერმანული',
  				'gn' => 'გუარანი',
  				'goh' => 'ძველი ზემოგერმანული',
  				'gon' => 'გონდი',
+ 				'gor' => 'გორონტალო',
  				'got' => 'გოთური',
  				'grc' => 'ძველი ბერძნული',
  				'gsw' => 'შვეიცარიული გერმანული',
  				'gu' => 'გუჯარათი',
  				'guz' => 'გუსიი',
  				'gv' => 'მენური',
+ 				'gwi' => 'გვიჩინი',
  				'ha' => 'ჰაუსა',
  				'haw' => 'ჰავაიური',
  				'he' => 'ებრაული',
  				'hi' => 'ჰინდი',
- 				'hit' => 'ხეთური ენა',
+ 				'hil' => 'ჰილიგაინონი',
+ 				'hit' => 'ხეთური',
+ 				'hmn' => 'ჰმონგი',
  				'hr' => 'ხორვატული',
  				'hsb' => 'ზემოსორბული',
- 				'ht' => 'ჰაიტიური',
+ 				'ht' => 'ჰაიტიური კრეოლი',
  				'hu' => 'უნგრული',
+ 				'hup' => 'ჰუპა',
  				'hy' => 'სომხური',
+ 				'hz' => 'ჰერერო',
  				'ia' => 'ინტერლინგუალური',
  				'iba' => 'იბანი',
  				'ibb' => 'იბიბიო',
@@ -530,6 +550,7 @@ has 'display_name_language' => (
  				'ie' => 'ინტერლინგი',
  				'ig' => 'იგბო',
  				'ii' => 'სიჩუანის ი',
+ 				'ilo' => 'ილოკო',
  				'inh' => 'ინგუშური',
  				'io' => 'იდო',
  				'is' => 'ისლანდიური',
@@ -546,14 +567,20 @@ has 'display_name_language' => (
  				'kaa' => 'ყარაყალფახური',
  				'kab' => 'კაბილური',
  				'kac' => 'კაჩინი',
+ 				'kaj' => 'კაჯი',
  				'kam' => 'კამბა',
  				'kbd' => 'ყაბარდოული',
+ 				'kcg' => 'ტიაპი',
  				'kde' => 'მაკონდე',
  				'kea' => 'კაბუვერდიანუ',
+ 				'kfo' => 'კორო',
  				'kg' => 'კონგო',
+ 				'kha' => 'ხასი',
  				'khq' => 'კოირა-ჩიინი',
  				'ki' => 'კიკუიუ',
+ 				'kj' => 'კუნამა',
  				'kk' => 'ყაზახური',
+ 				'kkj' => 'კაკო',
  				'kl' => 'დასავლეთ გრენლანდიური',
  				'kln' => 'კალენჯინი',
  				'km' => 'ქმერული',
@@ -571,6 +598,7 @@ has 'display_name_language' => (
  				'ks' => 'ქაშმირული',
  				'ksb' => 'შამბალა',
  				'ksf' => 'ბაფია',
+ 				'ksh' => 'კიოლში',
  				'ku' => 'ქურთული',
  				'kum' => 'ყუმუხური',
  				'kut' => 'კუტენაი',
@@ -594,16 +622,18 @@ has 'display_name_language' => (
  				'lrc' => 'ჩრდილოეთ ლური',
  				'lt' => 'ლიტვური',
  				'lu' => 'ლუბა-კატანგა',
- 				'lua' => 'ლუბა-კასაი',
+ 				'lua' => 'ლუბა-ლულუა',
  				'lui' => 'ლუისენიო',
  				'lun' => 'ლუნდა',
  				'luo' => 'ლუო',
  				'lus' => 'მიზო',
  				'luy' => 'ლუჰია',
  				'lv' => 'ლატვიური',
+ 				'mad' => 'მადურული',
  				'maf' => 'მაფა',
  				'mag' => 'მაგაჰი',
  				'mai' => 'მაითილი',
+ 				'mak' => 'მაკასარი',
  				'mas' => 'მასაი',
  				'mde' => 'მაბა',
  				'mdf' => 'მოქშა',
@@ -613,7 +643,8 @@ has 'display_name_language' => (
  				'mg' => 'მალაგასიური',
  				'mga' => 'საშუალო ირლანდიური',
  				'mgh' => 'მაქუვა-მეეტო',
- 				'mgo' => 'მეტა’ ენა',
+ 				'mgo' => 'მეტა-ენა',
+ 				'mh' => 'მარშალური',
  				'mi' => 'მაორი',
  				'mic' => 'მიკმაკი',
  				'min' => 'მინანგკაბაუ',
@@ -623,11 +654,12 @@ has 'display_name_language' => (
  				'mnc' => 'მანჯურიული',
  				'mni' => 'მანიპური',
  				'moh' => 'მოჰაუკური',
- 				'mos' => 'მოორე',
+ 				'mos' => 'მოსი',
  				'mr' => 'მარათჰი',
  				'ms' => 'მალაიური',
  				'mt' => 'მალტური',
  				'mua' => 'მუნდანგი',
+ 				'mul' => 'სხვადასხვა ენა',
  				'mus' => 'კრიკი',
  				'mwl' => 'მირანდული',
  				'mwr' => 'მარვარი',
@@ -644,14 +676,20 @@ has 'display_name_language' => (
  				'nds_NL' => 'ქვემოსაქსონური',
  				'ne' => 'ნეპალური',
  				'new' => 'ნევარი',
+ 				'ng' => 'ნდონგა',
+ 				'nia' => 'ნიასი',
+ 				'niu' => 'ნიუე',
  				'nl' => 'ნიდერლანდური',
  				'nl_BE' => 'ფლამანდიური',
  				'nmg' => 'კვასიო',
  				'nn' => 'ნორვეგიული ნიუნორსკი',
+ 				'nnh' => 'ნგიმბუნი',
  				'no' => 'ნორვეგიული',
  				'nog' => 'ნოღაური',
  				'non' => 'ძველსკანდინავიური',
  				'nqo' => 'ნკო',
+ 				'nr' => 'სამხრეთ ნდებელური',
+ 				'nso' => 'ჩრდილოეთ სოთო',
  				'nus' => 'ნუერი',
  				'nv' => 'ნავახო',
  				'nwc' => 'კლასიკური ნევარული',
@@ -666,11 +704,17 @@ has 'display_name_language' => (
  				'or' => 'ორია',
  				'os' => 'ოსური',
  				'pa' => 'პენჯაბური',
+ 				'pag' => 'პანგასინანი',
  				'pal' => 'ფალაური',
+ 				'pam' => 'პამპანგა',
+ 				'pap' => 'პაპიამენტო',
+ 				'pau' => 'ფალაუანი',
+ 				'pcm' => 'ნიგერიული კრეოლური',
  				'peo' => 'ძველი სპარსული',
  				'phn' => 'ფინიკიური',
  				'pi' => 'პალი',
  				'pl' => 'პოლონური',
+ 				'prg' => 'პრუსიული',
  				'pro' => 'ძველი პროვანსული',
  				'ps' => 'პუშტუ',
  				'pt' => 'პორტუგალიური',
@@ -687,18 +731,24 @@ has 'display_name_language' => (
  				'ro_MD' => 'მოლდავური',
  				'rof' => 'რომბო',
  				'rom' => 'ბოშური',
+ 				'root' => 'ძირეული ენა',
  				'ru' => 'რუსული',
+ 				'rup' => 'არომანული',
  				'rw' => 'კინიარუანდა',
  				'rwk' => 'რუა',
  				'sa' => 'სანსკრიტი',
+ 				'sad' => 'სანდავე',
  				'sah' => 'იაკუტური',
  				'sam' => 'სამარიულ-არამეული',
  				'saq' => 'სამბურუ',
+ 				'sat' => 'სანტალი',
+ 				'sba' => 'ნგამბაი',
  				'sbp' => 'სანგუ',
  				'sc' => 'სარდინიული',
  				'scn' => 'სიცილიური',
+ 				'sco' => 'შოტლანდიური',
  				'sd' => 'სინდჰური',
- 				'sdh' => 'სამხრეთ ქურთული',
+ 				'sdh' => 'სამხრეთქურთული',
  				'se' => 'ჩრდილოეთ საამური',
  				'see' => 'სენეკა',
  				'seh' => 'სენა',
@@ -714,16 +764,21 @@ has 'display_name_language' => (
  				'sk' => 'სლოვაკური',
  				'sl' => 'სლოვენური',
  				'sm' => 'სამოა',
- 				'sma' => 'სამხრეთ საამური',
+ 				'sma' => 'სამხრეთსამური',
  				'smj' => 'ლულე-საამური',
  				'smn' => 'ინარი-საამური',
  				'sms' => 'სკოლტ-საამური',
  				'sn' => 'შონა',
+ 				'snk' => 'სონინკე',
  				'so' => 'სომალიური',
  				'sq' => 'ალბანური',
  				'sr' => 'სერბული',
+ 				'srn' => 'სრანან ტონგო',
+ 				'ss' => 'სუატი',
+ 				'ssy' => 'საჰო',
  				'st' => 'სამხრეთ სოთოს ენა',
  				'su' => 'სუნდური',
+ 				'suk' => 'სუკუმა',
  				'sux' => 'შუმერული',
  				'sv' => 'შვედური',
  				'sw' => 'სუაჰილი',
@@ -733,37 +788,53 @@ has 'display_name_language' => (
  				'syr' => 'სირიული',
  				'ta' => 'ტამილური',
  				'te' => 'ტელუგუ',
+ 				'tem' => 'ტინმე',
  				'teo' => 'ტესო',
+ 				'tet' => 'ტეტუმი',
  				'tg' => 'ტაჯიკური',
  				'th' => 'ტაი',
- 				'ti' => 'თიგრინია',
+ 				'ti' => 'ტიგრინია',
  				'tig' => 'თიგრე',
  				'tk' => 'თურქმენული',
  				'tlh' => 'კლინგონი',
  				'tn' => 'ტსვანა',
  				'to' => 'ტონგანური',
+ 				'tpi' => 'ტოკ-პისინი',
  				'tr' => 'თურქული',
+ 				'trv' => 'ტაროკო',
+ 				'ts' => 'ტსონგა',
  				'tt' => 'თათრული',
+ 				'tum' => 'ტუმბუკა',
+ 				'tvl' => 'ტუვალუ',
  				'tw' => 'თუი',
  				'twq' => 'ტასავაქი',
+ 				'ty' => 'ტაიტური',
  				'tyv' => 'ტუვა',
  				'tzm' => 'ცენტრალური მოროკოს ტამაზიგხტი',
  				'udm' => 'უდმურტული',
  				'ug' => 'უიღურული',
  				'uga' => 'უგარითული',
  				'uk' => 'უკრაინული',
+ 				'umb' => 'უმბუნდუ',
  				'und' => 'უცნობი ენა',
  				'ur' => 'ურდუ',
  				'uz' => 'უზბეკური',
  				'vai' => 'ვაი',
+ 				've' => 'ვენდა',
  				'vi' => 'ვიეტნამური',
+ 				'vo' => 'ვოლაპუკი',
  				'vun' => 'ვუნჯო',
+ 				'wa' => 'ვალონური',
+ 				'wae' => 'ვალსერი',
  				'wal' => 'ველაითა',
+ 				'war' => 'ვარაი',
  				'wbp' => 'ვალპირი',
  				'wo' => 'ვოლოფური',
  				'xal' => 'ყალმუხური',
  				'xh' => 'ქჰოსა',
  				'xog' => 'სოგა',
+ 				'yav' => 'იანგბენი',
+ 				'ybb' => 'იემბა',
  				'yi' => 'იდიში',
  				'yo' => 'იორუბა',
  				'yue' => 'კანტონური',
@@ -774,6 +845,7 @@ has 'display_name_language' => (
  				'zh_Hans' => 'გამარტივებული ჩინური',
  				'zh_Hant' => 'ტრადიციული ჩინური',
  				'zu' => 'ზულუ',
+ 				'zun' => 'ზუნი',
  				'zxx' => 'ლინგვისტური შიგთავსი არ არის',
  				'zza' => 'ზაზაკი',
 
@@ -834,6 +906,7 @@ has 'display_name_script' => (
  			'Grek' => 'ბერძნული',
  			'Gujr' => 'გუჯარათული',
  			'Guru' => 'გურმუხი',
+ 			'Hanb' => 'ჰანბი',
  			'Hang' => 'ჰანგული',
  			'Hani' => 'ჰანი',
  			'Hano' => 'ჰანუნოო',
@@ -849,6 +922,7 @@ has 'display_name_script' => (
  			'Hung' => 'ძველი უნგრული',
  			'Inds' => 'ჰარაფული',
  			'Ital' => 'იტალიკური',
+ 			'Jamo' => 'ჯამო',
  			'Java' => 'იავური',
  			'Jpan' => 'იაპონური',
  			'Jurc' => 'ჯურჯენული',
@@ -949,6 +1023,7 @@ has 'display_name_script' => (
  			'Yiii' => 'ი',
  			'Zinh' => 'გადაღებული',
  			'Zmth' => 'მათემატიკური ნოტაცია',
+ 			'Zsye' => 'Emoji',
  			'Zsym' => 'სიმბოლოები',
  			'Zxxx' => 'უმწერლობო',
  			'Zyyy' => 'ზოგადი',
@@ -971,40 +1046,40 @@ has 'display_name_region' => (
 		{
 			'001' => 'მსოფლიო',
  			'002' => 'აფრიკა',
- 			'003' => 'ჩრდილოეთი ამერიკა',
- 			'005' => 'სამხრეთი ამერიკა',
+ 			'003' => 'ჩრდილოეთ ამერიკა',
+ 			'005' => 'სამხრეთ ამერიკა',
  			'009' => 'ოკეანეთი',
- 			'011' => 'დასავლეთი აფრიკა',
+ 			'011' => 'დასავლეთ აფრიკა',
  			'013' => 'ცენტრალური ამერიკა',
- 			'014' => 'აღმოსავლეთი აფრიკა',
- 			'015' => 'ჩრდილოეთი აფრიკა',
+ 			'014' => 'აღმოსავლეთ აფრიკა',
+ 			'015' => 'ჩრდილოეთ აფრიკა',
  			'017' => 'შუა აფრიკა',
- 			'018' => 'სამხრეთი აფრიკა',
+ 			'018' => 'სამხრეთ აფრიკა',
  			'019' => 'ამერიკები',
  			'021' => 'ამერიკის ჩრდილოეთი',
  			'029' => 'კარიბის ზღვა',
- 			'030' => 'აღმოსავლეთი აზია',
- 			'034' => 'სამხრეთი აზია',
- 			'035' => 'სამხრეთ-აღმოსავლეთი აზია',
- 			'039' => 'სამხრეთი ევროპა',
+ 			'030' => 'აღმოსავლეთ აზია',
+ 			'034' => 'სამხრეთ აზია',
+ 			'035' => 'სამხრეთ-აღმოსავლეთ აზია',
+ 			'039' => 'სამხრეთ ევროპა',
  			'053' => 'ავსტრალაზია',
  			'054' => 'მელანეზია',
  			'057' => 'მიკრონეზიის რეგიონი',
  			'061' => 'პოლინეზია',
  			'142' => 'აზია',
  			'143' => 'ცენტრალური აზია',
- 			'145' => 'დასავლეთი აზია',
+ 			'145' => 'დასავლეთ აზია',
  			'150' => 'ევროპა',
- 			'151' => 'აღმოსავლეთი ევროპა',
- 			'154' => 'ჩრდილოეთი ევროპა',
- 			'155' => 'დასავლეთი ევროპა',
+ 			'151' => 'აღმოსავლეთ ევროპა',
+ 			'154' => 'ჩრდილოეთ ევროპა',
+ 			'155' => 'დასავლეთ ევროპა',
  			'419' => 'ლათინური ამერიკა',
  			'AC' => 'ამაღლების კუნძული',
  			'AD' => 'ანდორა',
  			'AE' => 'არაბთა გაერთიანებული საამიროები',
  			'AF' => 'ავღანეთი',
  			'AG' => 'ანტიგუა და ბარბუდა',
- 			'AI' => 'ანგილია',
+ 			'AI' => 'ანგვილა',
  			'AL' => 'ალბანეთი',
  			'AM' => 'სომხეთი',
  			'AO' => 'ანგოლა',
@@ -1026,19 +1101,19 @@ has 'display_name_region' => (
  			'BI' => 'ბურუნდი',
  			'BJ' => 'ბენინი',
  			'BL' => 'სენ-ბართელმი',
- 			'BM' => 'ბერმუდი',
+ 			'BM' => 'ბერმუდა',
  			'BN' => 'ბრუნეი',
  			'BO' => 'ბოლივია',
  			'BQ' => 'კარიბის ნიდერლანდები',
  			'BR' => 'ბრაზილია',
  			'BS' => 'ბაჰამის კუნძულები',
- 			'BT' => 'ბჰუტანი',
+ 			'BT' => 'ბუტანი',
  			'BV' => 'ბუვე',
  			'BW' => 'ბოტსვანა',
  			'BY' => 'ბელარუსი',
  			'BZ' => 'ბელიზი',
  			'CA' => 'კანადა',
- 			'CC' => 'ქოქოსის კუნძულები',
+ 			'CC' => 'ქოქოსის (კილინგის) კუნძულები',
  			'CD' => 'კონგო - კინშასა',
  			'CD@alt=variant' => 'კონგო (კონგოს დემოკრატიული რესპუბლიკა)',
  			'CF' => 'ცენტრალური აფრიკის რესპუბლიკა',
@@ -1059,7 +1134,8 @@ has 'display_name_region' => (
  			'CW' => 'კიურასაო',
  			'CX' => 'შობის კუნძული',
  			'CY' => 'კვიპროსი',
- 			'CZ' => 'ჩეხეთის რესპუბლიკა',
+ 			'CZ' => 'ჩეხეთი',
+ 			'CZ@alt=variant' => 'ჩეხეთის რესპუბლიკა',
  			'DE' => 'გერმანია',
  			'DG' => 'დიეგო-გარსია',
  			'DJ' => 'ჯიბუტი',
@@ -1071,11 +1147,12 @@ has 'display_name_region' => (
  			'EC' => 'ეკვადორი',
  			'EE' => 'ესტონეთი',
  			'EG' => 'ეგვიპტე',
- 			'EH' => 'დასავლეთი საჰარა',
+ 			'EH' => 'დასავლეთ საჰარა',
  			'ER' => 'ერიტრეა',
  			'ES' => 'ესპანეთი',
  			'ET' => 'ეთიოპია',
  			'EU' => 'ევროკავშირი',
+ 			'EZ' => 'ევროზონა',
  			'FI' => 'ფინეთი',
  			'FJ' => 'ფიჯი',
  			'FK' => 'ფოლკლენდის კუნძულები',
@@ -1084,7 +1161,7 @@ has 'display_name_region' => (
  			'FO' => 'ფარერის კუნძულები',
  			'FR' => 'საფრანგეთი',
  			'GA' => 'გაბონი',
- 			'GB' => 'დიდი ბრიტანეთი',
+ 			'GB' => 'გაერთიანებული სამეფო',
  			'GB@alt=short' => 'გაერთ.სამ.',
  			'GD' => 'გრენადა',
  			'GE' => 'საქართველო',
@@ -1098,7 +1175,7 @@ has 'display_name_region' => (
  			'GP' => 'გვადელუპა',
  			'GQ' => 'ეკვატორული გვინეა',
  			'GR' => 'საბერძნეთი',
- 			'GS' => 'სამხრეთი გეორგია და სამხრეთ სენდვიჩის კუნძულები',
+ 			'GS' => 'სამხრეთ ჯორჯია და სამხრეთ სენდვიჩის კუნძულები',
  			'GT' => 'გვატემალა',
  			'GU' => 'გუამი',
  			'GW' => 'გვინეა-ბისაუ',
@@ -1116,7 +1193,7 @@ has 'display_name_region' => (
  			'IL' => 'ისრაელი',
  			'IM' => 'მენის კუნძული',
  			'IN' => 'ინდოეთი',
- 			'IO' => 'ბრიტ. ტერიტ. ინდ. ოკეანეში',
+ 			'IO' => 'ბრიტანეთის ტერიტორია ინდოეთის ოკეანეში',
  			'IQ' => 'ერაყი',
  			'IR' => 'ირანი',
  			'IS' => 'ისლანდია',
@@ -1131,8 +1208,8 @@ has 'display_name_region' => (
  			'KI' => 'კირიბატი',
  			'KM' => 'კომორის კუნძულები',
  			'KN' => 'სენტ-კიტსი და ნევისი',
- 			'KP' => 'ჩრდილოეთი კორეა',
- 			'KR' => 'სამხრეთი კორეა',
+ 			'KP' => 'ჩრდილოეთ კორეა',
+ 			'KR' => 'სამხრეთ კორეა',
  			'KW' => 'ქუვეითი',
  			'KY' => 'კაიმანის კუნძულები',
  			'KZ' => 'ყაზახეთი',
@@ -1167,7 +1244,7 @@ has 'display_name_region' => (
  			'MS' => 'მონსერატი',
  			'MT' => 'მალტა',
  			'MU' => 'მავრიკი',
- 			'MV' => 'მალდივის რესპუბლიკა',
+ 			'MV' => 'მალდივები',
  			'MW' => 'მალავი',
  			'MX' => 'მექსიკა',
  			'MY' => 'მალაიზია',
@@ -1222,21 +1299,22 @@ has 'display_name_region' => (
  			'SN' => 'სენეგალი',
  			'SO' => 'სომალი',
  			'SR' => 'სურინამი',
- 			'SS' => 'სამხრეთი სუდანი',
+ 			'SS' => 'სამხრეთ სუდანი',
  			'ST' => 'სან-ტომე და პრინსიპი',
  			'SV' => 'სალვადორი',
  			'SX' => 'სინტ-მარტენი',
  			'SY' => 'სირია',
  			'SZ' => 'სვაზილენდი',
  			'TA' => 'ტრისტან-და-კუნია',
- 			'TC' => 'ტერქსისა და კაიკოსის კუნძულები',
+ 			'TC' => 'თერქს-ქაიქოსის კუნძულები',
  			'TD' => 'ჩადი',
  			'TF' => 'ფრანგული სამხრეთის ტერიტორიები',
  			'TG' => 'ტოგო',
  			'TH' => 'ტაილანდი',
  			'TJ' => 'ტაჯიკეთი',
  			'TK' => 'ტოკელაუ',
- 			'TL' => 'აღმოსავლეთი ტიმორი',
+ 			'TL' => 'ტიმორ-ლესტე',
+ 			'TL@alt=variant' => 'აღმოსავლეთ ტიმორი',
  			'TM' => 'თურქმენეთი',
  			'TN' => 'ტუნისი',
  			'TO' => 'ტონგა',
@@ -1248,6 +1326,8 @@ has 'display_name_region' => (
  			'UA' => 'უკრაინა',
  			'UG' => 'უგანდა',
  			'UM' => 'აშშ-ის შორეული კუნძულები',
+ 			'UN' => 'გაერო',
+ 			'UN@alt=short' => 'გაერო',
  			'US' => 'ამერიკის შეერთებული შტატები',
  			'US@alt=short' => 'აშშ',
  			'UY' => 'ურუგვაი',
@@ -1352,6 +1432,7 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'კალენდარი',
+ 			'cf' => 'ვალუტის ფორმატი',
  			'collation' => 'დახარისხების თანმიმდევრობა',
  			'currency' => 'ვალუტა',
  			'hc' => 'დროის სისტემა (12 ან 24)',
@@ -1385,6 +1466,10 @@ has 'display_name_type' => (
  				'japanese' => q{იაპონური კალენდარი},
  				'persian' => q{სპარსული კალენდარი},
  				'roc' => q{ჩინეთის რესპუბლიკის კალენდარი},
+ 			},
+ 			'cf' => {
+ 				'account' => q{ვალუტის ბუღალტრული ფორმატი},
+ 				'standard' => q{ვალუტის სტანდარტული ფორმატი},
  			},
  			'collation' => {
  				'big5han' => q{ტრადიციული ჩინური},
@@ -1514,10 +1599,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[ⴀ ⴁ ⴂ ⴃ ⴄ ⴅ ⴆ ჱ ⴡ ⴇ ⴈ ⴉ ⴊ ⴋ ⴌ ჲ ⴢ ⴍ ⴎ ⴏ ⴐ ⴑ ⴒ ჳ ⴣ ⴓ ⴔ ⴕ ⴖ ⴗ ⴘ ⴙ ⴚ ⴛ ⴜ ⴝ ⴞ ჴ ⴤ ⴟ ⴠ ჵ ⴥ ჶ ჷ ჸ ჹ ჺ])},
+			auxiliary => qr{[ⴀ ⴁ ⴂ ⴃ ⴄ ⴅ ⴆ ჱ ⴡ ⴇ ⴈ ⴉ ⴊ ⴋ ⴌ ჲ ⴢ ⴍ ⴎ ⴏ ⴐ ⴑ ⴒ ჳ ⴣ ⴓ ⴔ ⴕ ⴖ ⴗ ⴘ ⴙ ⴚ ⴛ ⴜ ⴝ ⴞ ჴ ⴤ ⴟ ⴠ ჵ ⴥ ჶ ჷ ჸ ჹ ჺ]},
 			index => ['ა', 'ბ', 'გ', 'დ', 'ე', 'ვ', 'ზ', 'თ', 'ი', 'კ', 'ლ', 'მ', 'ნ', 'ო', 'პ', 'ჟ', 'რ', 'ს', 'ტ', 'უ', 'ფ', 'ქ', 'ღ', 'ყ', 'შ', 'ჩ', 'ც', 'ძ', 'წ', 'ჭ', 'ხ', 'ჯ', 'ჰ'],
-			main => qr{(?^u:[ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ჻ ' ‘ ‚ “ „ « » ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″ №])},
+			main => qr{[ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ჻ ' ‘ ‚ “ „ « » ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″ №]},
 		};
 	},
 EOT
@@ -1772,6 +1858,12 @@ has 'units' => (
 						'other' => q({0} გალონი),
 						'per' => q({0} გალონში),
 					},
+					'gallon-imperial' => {
+						'name' => q(იმპ. გალონი),
+						'one' => q({0} იმპ. გალონი),
+						'other' => q({0} იმპ. გალონი),
+						'per' => q({0}/იმპ. გალ.),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -2014,6 +2106,11 @@ has 'units' => (
 						'one' => q({0} მილი გალონზე),
 						'other' => q({0} მილი გალონზე),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(იმპ. გალონი მილზე),
+						'one' => q({0} იმპ. გალონი მილზე),
+						'other' => q({0} იმპ. გალონი მილზე),
+					},
 					'mile-per-hour' => {
 						'name' => q(მილი საათში),
 						'one' => q({0} მილი საათში),
@@ -2039,6 +2136,11 @@ has 'units' => (
 						'one' => q({0} მილიგრამი),
 						'other' => q({0} მილიგრამი),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(მილიგრამი დეცილიტრზე),
+						'one' => q({0} მილიგრამი დეცილიტრზე),
+						'other' => q({0} მილიგრამი დეცილიტრზე),
+					},
 					'milliliter' => {
 						'name' => q(მილილიტრი),
 						'one' => q({0} მილილიტრი),
@@ -2053,6 +2155,11 @@ has 'units' => (
 						'name' => q(მილიმეტრი ვერცხლისწყლის სვეტისა),
 						'one' => q({0} მილიმეტრი ვერცხლისწყლის სვეტისა),
 						'other' => q({0} მილიმეტრი ვერცხლისწყლის სვეტისა),
+					},
+					'millimole-per-liter' => {
+						'name' => q(მილიმოლი ლიტრზე),
+						'one' => q({0} მილიმოლი ლიტრზე),
+						'other' => q({0} მილიმოლი ლიტრზე),
 					},
 					'millisecond' => {
 						'name' => q(მილიწამი),
@@ -2112,6 +2219,11 @@ has 'units' => (
 						'one' => q({0} პარსეკი),
 						'other' => q({0} პარსეკი),
 					},
+					'part-per-million' => {
+						'name' => q(ნაწილი მილიონზე),
+						'one' => q({0} ნაწილი მილიონზე),
+						'other' => q({0} ნაწილი მილიონზე),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2129,6 +2241,11 @@ has 'units' => (
 						'name' => q(მეტრული პინტა),
 						'one' => q({0} მეტრული პინტა),
 						'other' => q({0} მეტრული პინტა),
+					},
+					'point' => {
+						'name' => q(პუნქტი),
+						'one' => q({0} პუნქტი),
+						'other' => q({0} პუნქტი),
 					},
 					'pound' => {
 						'name' => q(ფუნტი),
@@ -2183,6 +2300,7 @@ has 'units' => (
 						'name' => q(კვადრატული კილომეტრი),
 						'one' => q({0} კვადრატული კილომეტრი),
 						'other' => q({0} კვადრატული კილომეტრი),
+						'per' => q({0} კვადრატულ კილომეტრში),
 					},
 					'square-meter' => {
 						'name' => q(კვადრატული მეტრი),
@@ -2194,6 +2312,7 @@ has 'units' => (
 						'name' => q(კვადრატული მილი),
 						'one' => q({0} კვადრატული მილი),
 						'other' => q({0} კვადრატული მილი),
+						'per' => q({0} კვადრატულ მილში),
 					},
 					'square-yard' => {
 						'name' => q(კვადრატული იარდი),
@@ -2648,6 +2767,12 @@ has 'units' => (
 						'other' => q({0} გალონი),
 						'per' => q({0}/გალონი),
 					},
+					'gallon-imperial' => {
+						'name' => q(იმპ. გალ.),
+						'one' => q({0} იმპ. გალ.),
+						'other' => q({0} იმპ. გალ.),
+						'per' => q({0}/იმპ. გალ.),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -2890,6 +3015,11 @@ has 'units' => (
 						'one' => q({0} მილი/გალ.),
 						'other' => q({0} მილი/გალ.),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(მილი/იმპ. გალონზე),
+						'one' => q({0} მილი/იმპ. გალონზე),
+						'other' => q({0} მილი/იმპ. გალონზე),
+					},
 					'mile-per-hour' => {
 						'name' => q(მილი/სთ),
 						'one' => q({0} მილი/სთ),
@@ -2915,6 +3045,11 @@ has 'units' => (
 						'one' => q({0} მგ),
 						'other' => q({0} მგ),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(მგ/დლ),
+						'one' => q({0} მგ/დლ),
+						'other' => q({0} მგ/დლ),
+					},
 					'milliliter' => {
 						'name' => q(მილილ.),
 						'one' => q({0} მილილ.),
@@ -2929,6 +3064,11 @@ has 'units' => (
 						'name' => q(მმ ვწყ. სვ.),
 						'one' => q({0} მმ ვწყ. სვ.),
 						'other' => q({0} მმ ვწყ. სვ.),
+					},
+					'millimole-per-liter' => {
+						'name' => q(მმოლ/ლ),
+						'one' => q({0} მმოლ/ლ),
+						'other' => q({0} მმოლ/ლ),
 					},
 					'millisecond' => {
 						'name' => q(მწმ),
@@ -2988,6 +3128,11 @@ has 'units' => (
 						'one' => q({0} პს),
 						'other' => q({0} პს),
 					},
+					'part-per-million' => {
+						'name' => q(ნაწილი/მილიონზე),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -3005,6 +3150,11 @@ has 'units' => (
 						'name' => q(მეტრ. პინტა),
 						'one' => q({0} მეტრ. პინტა),
 						'other' => q({0} მეტრ. პინტა),
+					},
+					'point' => {
+						'name' => q(პნქტ.),
+						'one' => q({0} პნქტ.),
+						'other' => q({0} პქნტ.),
 					},
 					'pound' => {
 						'name' => q(ფუნტი),
@@ -3059,6 +3209,7 @@ has 'units' => (
 						'name' => q(კმ²),
 						'one' => q({0} კმ²),
 						'other' => q({0} კმ²),
+						'per' => q({0}/კმ²),
 					},
 					'square-meter' => {
 						'name' => q(მ²),
@@ -3070,6 +3221,7 @@ has 'units' => (
 						'name' => q(მილი²),
 						'one' => q({0} მილი²),
 						'other' => q({0} მილი²),
+						'per' => q({0}/მილი²),
 					},
 					'square-yard' => {
 						'name' => q(იარდი²),
@@ -3264,7 +3416,7 @@ has 'number_formats' => (
 					'other' => '000 ტრლ'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3371,14 +3523,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3699,12 +3851,20 @@ has 'currencies' => (
 				'currency' => q(ახალი ბელარუსიული რუბლი \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(ბელორუსული რუბლი),
 				'one' => q(ბელორუსული რუბლი),
 				'other' => q(ბელორუსული რუბლი),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(ბელორუსული რუბლი \(2000–2016\)),
+				'one' => q(ბელორუსული რუბლი \(2000–2016\)),
+				'other' => q(ბელორუსული რუბლი \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3745,6 +3905,14 @@ has 'currencies' => (
 				'currency' => q(ჩილეს პესო),
 				'one' => q(ჩილეს პესო),
 				'other' => q(ჩილეს პესო),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(ჩინური იუანი \(ოფშორი\)),
+				'one' => q(ჩინური იუანი \(ოფშორი\)),
+				'other' => q(ჩინური იუანი \(ოფშორი\)),
 			},
 		},
 		'CNY' => {
@@ -4523,14 +4691,14 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(პერუს ახალი სოლი),
-				'one' => q(პერუს ახალი სოლი),
-				'other' => q(პერუს ახალი სოლი),
+				'currency' => q(პერუს სოლი),
+				'one' => q(პერუს სოლი),
+				'other' => q(პერუს სოლი),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(პერუს სოლი),
+				'currency' => q(პერუს სოლი \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -5712,14 +5880,14 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'hebrew') {
 				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 				}
@@ -5728,10 +5896,10 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 				}
@@ -5741,10 +5909,10 @@ has 'day_period_data' => (
 				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 				}
@@ -5753,23 +5921,23 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'hebrew') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 				}
@@ -5778,35 +5946,10 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 500;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 				}
@@ -5816,10 +5959,10 @@ has 'day_period_data' => (
 				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 				}
@@ -5828,10 +5971,35 @@ has 'day_period_data' => (
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 				}
@@ -5853,67 +6021,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'midnight' => q{შუაღამეს},
-					'noon' => q{შუადღ.},
-					'night1' => q{ღამით},
-					'morning1' => q{დილას},
-					'evening1' => q{საღამოს},
-					'afternoon1' => q{ნაშუადღევს},
-					'pm' => q{p},
-					'am' => q{a},
-				},
-				'wide' => {
-					'noon' => q{შუადღეს},
-					'night1' => q{ღამით},
-					'morning1' => q{დილით},
-					'midnight' => q{შუაღამეს},
-					'pm' => q{PM},
-					'am' => q{AM},
-					'afternoon1' => q{ნაშუადღევს},
-					'evening1' => q{საღამოს},
-				},
 				'abbreviated' => {
-					'evening1' => q{საღ.},
-					'afternoon1' => q{ნაშუადღ.},
-					'am' => q{AM},
 					'pm' => q{PM},
 					'midnight' => q{შუაღამეს},
+					'morning1' => q{დილ.},
+					'afternoon1' => q{ნაშუადღ.},
 					'noon' => q{შუადღ.},
 					'night1' => q{ღამ.},
+					'evening1' => q{საღ.},
+					'am' => q{AM},
+				},
+				'narrow' => {
+					'evening1' => q{საღ.},
+					'am' => q{a},
 					'morning1' => q{დილ.},
+					'afternoon1' => q{ნაშუადღ.},
+					'noon' => q{შუადღ.},
+					'night1' => q{ღამ.},
+					'midnight' => q{შუაღამეს},
+					'pm' => q{p},
+				},
+				'wide' => {
+					'afternoon1' => q{ნაშუადღევს},
+					'morning1' => q{დილით},
+					'night1' => q{ღამით},
+					'noon' => q{შუადღეს},
+					'pm' => q{PM},
+					'midnight' => q{შუაღამეს},
+					'evening1' => q{საღამოს},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'night1' => q{ღამე},
-					'noon' => q{შუადღე},
-					'morning1' => q{დილა},
-					'midnight' => q{შუაღამე},
-					'pm' => q{შუადღ. შემდეგ},
-					'am' => q{შუადღემდე},
-					'afternoon1' => q{ნაშუადღევი},
-					'evening1' => q{საღამო},
-				},
 				'narrow' => {
+					'midnight' => q{შუაღამე},
+					'pm' => q{PM},
+					'morning1' => q{დილა},
+					'afternoon1' => q{ნაშუადღევი},
 					'night1' => q{ღამე},
 					'noon' => q{შუადღე},
-					'morning1' => q{დილა},
-					'midnight' => q{შუაღამე},
-					'afternoon1' => q{ნაშუადღევი},
 					'evening1' => q{საღამო},
-					'am' => q{a},
-					'pm' => q{p},
+					'am' => q{AM},
+				},
+				'wide' => {
+					'evening1' => q{საღამო},
+					'am' => q{AM},
+					'afternoon1' => q{ნაშუადღევი},
+					'morning1' => q{დილა},
+					'night1' => q{ღამე},
+					'noon' => q{შუადღე},
+					'pm' => q{შუადღ. შემდეგ},
+					'midnight' => q{შუაღამე},
 				},
 				'abbreviated' => {
-					'evening1' => q{საღამო},
 					'afternoon1' => q{ნაშუადღევი},
-					'pm' => q{PM},
-					'am' => q{AM},
-					'midnight' => q{შუაღამე},
-					'night1' => q{ღამე},
 					'morning1' => q{დილა},
 					'noon' => q{შუადღე},
+					'night1' => q{ღამე},
+					'pm' => q{PM},
+					'midnight' => q{შუაღამე},
+					'am' => q{AM},
+					'evening1' => q{საღამო},
 				},
 			},
 		},
@@ -6011,8 +6179,8 @@ has 'datetime_formats' => (
 		'generic' => {
 			'full' => q{{1} {0}},
 			'long' => q{{1}, {0}},
-			'medium' => q{{1} {0}},
-			'short' => q{{1} {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
 			'full' => q{{1}, {0}},
@@ -6034,50 +6202,18 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E, HH:mm},
-			EHms => q{E, HH:mm:ss},
-			Ed => q{d E},
-			Ehm => q{E, h:mm a},
-			Ehms => q{E, h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM. y G},
-			GyMMMEd => q{E, d MMM. y G},
-			GyMMMd => q{d MMM. y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{E, d.M},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d.M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M.y},
-			yMEd => q{E, d.M.y},
-			yMMM => q{MMM. y},
-			yMMMEd => q{E, d MMM. y},
-			yMMMM => q{MMMM, y},
-			yMMMd => q{d MMM. y},
-			yMd => q{d.M.y},
-			yQQQ => q{QQQ, y},
-			yQQQQ => q{QQQQ, y},
-		},
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, d MMM, y G},
@@ -6109,6 +6245,54 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ, y G},
 			yyyyQQQQ => q{QQQQ, y G},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E, HH:mm},
+			EHms => q{E, HH:mm:ss},
+			Ed => q{d E},
+			Ehm => q{E, h:mm a},
+			Ehms => q{E, h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM. y G},
+			GyMMMEd => q{E, d MMM. y G},
+			GyMMMd => q{d MMM. y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{E, d.M},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMW => q{MMM-ის კვირა W},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d.M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M.y},
+			yMEd => q{E, d.M.y},
+			yMMM => q{MMM. y},
+			yMMMEd => q{E, d MMM. y},
+			yMMMM => q{MMMM, y},
+			yMMMd => q{d MMM. y},
+			yMd => q{d.M.y},
+			yQQQ => q{QQQ, y},
+			yQQQQ => q{QQQQ, y},
+			yw => q{კვირა w, Y},
+		},
 	} },
 );
 
@@ -6128,101 +6312,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E, dd.MM. – E, dd.MM.},
-				d => q{E, dd.MM. – E, dd.MM.},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E, d MMM – E, d MMM},
-				d => q{E, d – E, d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d–d MMM},
-			},
-			Md => {
-				M => q{dd.MM. – dd.MM.},
-				d => q{dd.MM. – dd.MM.},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{MM.y – MM.y},
-				y => q{MM.y – MM.y},
-			},
-			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y},
-				d => q{E, dd.MM.y – E, dd.MM.y},
-				y => q{E, dd.MM.y – E, dd.MM.y},
-			},
-			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM y – MMM y},
-			},
-			yMMMEd => {
-				M => q{E, d MMM. – E, d MMM. y},
-				d => q{E, d MMM. – E, d MMM. y},
-				y => q{E, d MMM. y – E, d MMM. y},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM, y},
-				y => q{MMMM y – MMMM y},
-			},
-			yMMMd => {
-				M => q{dd MMM. – dd MMM. y},
-				d => q{d–d MMM, y},
-				y => q{dd MMM. y – d MMM. y},
-			},
-			yMd => {
-				M => q{dd.MM.y – dd.MM.y},
-				d => q{dd.MM.y – dd.MM.y},
-				y => q{dd.MM.y – dd.MM.y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -6318,6 +6407,101 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y G},
 			},
 		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E, dd.MM. – E, dd.MM.},
+				d => q{E, dd.MM. – E, dd.MM.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d–d MMM},
+			},
+			Md => {
+				M => q{dd.MM. – dd.MM.},
+				d => q{dd.MM. – dd.MM.},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{MM.y – MM.y},
+				y => q{MM.y – MM.y},
+			},
+			yMEd => {
+				M => q{E, dd.MM.y – E, dd.MM.y},
+				d => q{E, dd.MM.y – E, dd.MM.y},
+				y => q{E, dd.MM.y – E, dd.MM.y},
+			},
+			yMMM => {
+				M => q{MMM–MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E, d MMM. – E, d MMM. y},
+				d => q{E, d MMM. – E, d MMM. y},
+				y => q{E, d MMM. y – E, d MMM. y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM, y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{dd MMM. – dd MMM. y},
+				d => q{d–d MMM, y},
+				y => q{dd MMM. y – d MMM. y},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y},
+				d => q{dd.MM.y – dd.MM.y},
+				y => q{dd.MM.y – dd.MM.y},
+			},
+		},
 	} },
 );
 
@@ -6335,7 +6519,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(ავღანეთის დრო),
+				'standard' => q#ავღანეთის დრო#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -6496,38 +6680,38 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(ცენტრალური აფრიკის დრო),
+				'standard' => q#ცენტრალური აფრიკის დრო#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(აღმოსავლეთ აფრიკის დრო),
+				'standard' => q#აღმოსავლეთ აფრიკის დრო#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(სამხრეთ აფრიკის დრო),
+				'standard' => q#სამხრეთ აფრიკის დრო#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(დასავლეთ აფრიკის ზაფხულის დრო),
-				'generic' => q(დასავლეთ აფრიკის დრო),
-				'standard' => q(დასავლეთ აფრიკის სტანდარტული დრო),
+				'daylight' => q#დასავლეთ აფრიკის ზაფხულის დრო#,
+				'generic' => q#დასავლეთ აფრიკის დრო#,
+				'standard' => q#დასავლეთ აფრიკის სტანდარტული დრო#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(ალასკას ზაფხულის დრო),
-				'generic' => q(ალასკის დრო),
-				'standard' => q(ალასკას სტანდარტული დრო),
+				'daylight' => q#ალასკის ზაფხულის დრო#,
+				'generic' => q#ალასკის დრო#,
+				'standard' => q#ალასკის სტანდარტული დრო#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(ამაზონიის ზაფხულის დრო),
-				'generic' => q(ამაზონიის დრო),
-				'standard' => q(ამაზონიის სტანდარტული დრო),
+				'daylight' => q#ამაზონიის ზაფხულის დრო#,
+				'generic' => q#ამაზონიის დრო#,
+				'standard' => q#ამაზონიის სტანდარტული დრო#,
 			},
 		},
 		'America/Adak' => {
@@ -6674,6 +6858,9 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#სალვადორი#,
 		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#ფორტ-ნელსონი#,
+		},
 		'America/Fortaleza' => {
 			exemplarCity => q#ფორტალეზა#,
 		},
@@ -6693,7 +6880,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#გრენადა#,
 		},
 		'America/Guadeloupe' => {
-			exemplarCity => q#გვადელუპე#,
+			exemplarCity => q#გვადელუპა#,
 		},
 		'America/Guatemala' => {
 			exemplarCity => q#გვატემალა#,
@@ -6846,7 +7033,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ცენტრი, ჩრდილოეთი დაკოტა#,
 		},
 		'America/North_Dakota/New_Salem' => {
-			exemplarCity => q#ნიუ სალემი, ჩრდილოეთი დაკოტა#,
+			exemplarCity => q#ნიუ-სალემი, ჩრდილოეთი დაკოტა#,
 		},
 		'America/Ojinaga' => {
 			exemplarCity => q#ოხინაგა#,
@@ -6874,6 +7061,9 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#პუერტო-რიკო#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#პუნტა-არენასი#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#რეინი რივერი#,
@@ -6918,7 +7108,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#სენ-ბართელემი#,
 		},
 		'America/St_Johns' => {
-			exemplarCity => q#სენტ ჯონსი#,
+			exemplarCity => q#სენტ-ჯონსი#,
 		},
 		'America/St_Kitts' => {
 			exemplarCity => q#სენტ-კიტსი#,
@@ -6970,30 +7160,30 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(ჩრდილოეთ ამერიკის ცენტრალური ზაფხულის დრო),
-				'generic' => q(ჩრდილოეთ ამერიკის ცენტრალური დრო),
-				'standard' => q(ჩრდილოეთ ამერიკის ცენტრალური სტანდარტული დრო),
+				'daylight' => q#ჩრდილოეთ ამერიკის ცენტრალური ზაფხულის დრო#,
+				'generic' => q#ჩრდილოეთ ამერიკის ცენტრალური დრო#,
+				'standard' => q#ჩრდილოეთ ამერიკის ცენტრალური სტანდარტული დრო#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(ჩრდილოეთ ამერიკის აღმოსავლეთის ზაფხულის დრო),
-				'generic' => q(ჩრდილოეთ ამერიკის აღმოსავლეთის დრო),
-				'standard' => q(ჩრდილოეთ ამერიკის აღმოსავლეთის სტანდარტული დრო),
+				'daylight' => q#ჩრდილოეთ ამერიკის აღმოსავლეთის ზაფხულის დრო#,
+				'generic' => q#ჩრდილოეთ ამერიკის აღმოსავლეთის დრო#,
+				'standard' => q#ჩრდილოეთ ამერიკის აღმოსავლეთის სტანდარტული დრო#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(ჩრდილოეთ ამერიკის მაუნთინის ზაფხულის დრო),
-				'generic' => q(ჩრდილოეთ ამერიკის მაუნთინის დრო),
-				'standard' => q(ჩრდილოეთ ამერიკის მაუნთინის სტანდარტული დრო),
+				'daylight' => q#ჩრდილოეთ ამერიკის მაუნთინის ზაფხულის დრო#,
+				'generic' => q#ჩრდილოეთ ამერიკის მაუნთინის დრო#,
+				'standard' => q#ჩრდილოეთ ამერიკის მაუნთინის სტანდარტული დრო#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(ჩრდილოეთ ამერიკის წყნარი ოკეანის ზაფხულის დრო),
-				'generic' => q(ჩრდილოეთ ამერიკის წყნარი ოკეანის დრო),
-				'standard' => q(ჩრდილოეთ ამერიკის წყნარი ოკეანის სტანდარტული დრო),
+				'daylight' => q#ჩრდილოეთ ამერიკის წყნარი ოკეანის ზაფხულის დრო#,
+				'generic' => q#ჩრდილოეთ ამერიკის წყნარი ოკეანის დრო#,
+				'standard' => q#ჩრდილოეთ ამერიკის წყნარი ოკეანის სტანდარტული დრო#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -7031,16 +7221,16 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(აპიას ზაფხულის დრო),
-				'generic' => q(აპიას დრო),
-				'standard' => q(აპიას სტანდარტული დრო),
+				'daylight' => q#აპიას ზაფხულის დრო#,
+				'generic' => q#აპიას დრო#,
+				'standard' => q#აპიას სტანდარტული დრო#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(არაბეთის ზაფხულის დრო),
-				'generic' => q(არაბეთის დრო),
-				'standard' => q(არაბეთის სტანდარტული დრო),
+				'daylight' => q#არაბეთის ზაფხულის დრო#,
+				'generic' => q#არაბეთის დრო#,
+				'standard' => q#არაბეთის სტანდარტული დრო#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -7048,23 +7238,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(არგენტინის ზაფხულის დრო),
-				'generic' => q(არგენტინის დრო),
-				'standard' => q(არგენტინის სტანდარტული დრო),
+				'daylight' => q#არგენტინის ზაფხულის დრო#,
+				'generic' => q#არგენტინის დრო#,
+				'standard' => q#არგენტინის სტანდარტული დრო#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(დასავლეთ არგენტინის ზაფხულის დრო),
-				'generic' => q(დასავლეთ არგენტინის დრო),
-				'standard' => q(დასავლეთ არგენტინის სტანდარტული დრო),
+				'daylight' => q#დასავლეთ არგენტინის ზაფხულის დრო#,
+				'generic' => q#დასავლეთ არგენტინის დრო#,
+				'standard' => q#დასავლეთ არგენტინის სტანდარტული დრო#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(სომხეთის ზაფხულის დრო),
-				'generic' => q(სომხეთის დრო),
-				'standard' => q(სომხეთის სტანდარტული დრო),
+				'daylight' => q#სომხეთის ზაფხულის დრო#,
+				'generic' => q#სომხეთის დრო#,
+				'standard' => q#სომხეთის სტანდარტული დრო#,
 			},
 		},
 		'Asia/Aden' => {
@@ -7088,6 +7278,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#აშხაბადი#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#ატირაუ#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#ბაღდადი#,
 		},
@@ -7099,6 +7292,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#ბანგკოკი#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#ბარნაული#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#ბეირუთი#,
@@ -7135,6 +7331,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#დუშანბე#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#ფამაგუსტა#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#გაზა#,
@@ -7277,6 +7476,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#ტოკიო#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#ტომსკი#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#ულანბატარი#,
 		},
@@ -7303,9 +7505,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(ატლანტიკის ოკეანის ზაფხულის დრო),
-				'generic' => q(ატლანტიკის ოკეანის დრო),
-				'standard' => q(ატლანტიკის ოკეანის სტანდარტული დრო),
+				'daylight' => q#ატლანტიკის ოკეანის ზაფხულის დრო#,
+				'generic' => q#ატლანტიკის ოკეანის დრო#,
+				'standard' => q#ატლანტიკის ოკეანის სტანდარტული დრო#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -7376,171 +7578,176 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(ავსტრალიის ცენტრალური ზაფხულის დრო),
-				'generic' => q(ცენტრალური ავსტრალიის დრო),
-				'standard' => q(ავსტრალიის ცენტრალური სტანდარტული დრო),
+				'daylight' => q#ავსტრალიის ცენტრალური ზაფხულის დრო#,
+				'generic' => q#ცენტრალური ავსტრალიის დრო#,
+				'standard' => q#ავსტრალიის ცენტრალური სტანდარტული დრო#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(ცენტრალური და დასავლეთ ავსტრალიის ზაფხულის დრო),
-				'generic' => q(ცენტრალური და დასავლეთ ავსტრალიის დრო),
-				'standard' => q(ცენტრალური და დასავლეთ ავსტრალიის სტანდარტული დრო),
+				'daylight' => q#ცენტრალური და დასავლეთ ავსტრალიის ზაფხულის დრო#,
+				'generic' => q#ცენტრალური და დასავლეთ ავსტრალიის დრო#,
+				'standard' => q#ცენტრალური და დასავლეთ ავსტრალიის სტანდარტული დრო#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(აღმოსავლეთ ავსტრალიის ზაფხულის დრო),
-				'generic' => q(აღმოსავლეთ ავსტრალიის დრო),
-				'standard' => q(აღმოსავლეთ ავსტრალიის სტანდარტული დრო),
+				'daylight' => q#აღმოსავლეთ ავსტრალიის ზაფხულის დრო#,
+				'generic' => q#აღმოსავლეთ ავსტრალიის დრო#,
+				'standard' => q#აღმოსავლეთ ავსტრალიის სტანდარტული დრო#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(დასავლეთ ავსტრალიის ზაფხულის დრო),
-				'generic' => q(დასავლეთ ავსტრალიის დრო),
-				'standard' => q(დასავლეთ ავსტრალიის სტანდარტული დრო),
+				'daylight' => q#დასავლეთ ავსტრალიის ზაფხულის დრო#,
+				'generic' => q#დასავლეთ ავსტრალიის დრო#,
+				'standard' => q#დასავლეთ ავსტრალიის სტანდარტული დრო#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(აზერბაიჯანის ზაფხულის დრო),
-				'generic' => q(აზერბაიჯანის დრო),
-				'standard' => q(აზერბაიჯანის სტანდარტული დრო),
+				'daylight' => q#აზერბაიჯანის ზაფხულის დრო#,
+				'generic' => q#აზერბაიჯანის დრო#,
+				'standard' => q#აზერბაიჯანის სტანდარტული დრო#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(აზორის კუნძულების ზაფხულის დრო),
-				'generic' => q(აზორის კუნძულების დრო),
-				'standard' => q(აზორის კუნძულების სტანდარტული დრო),
+				'daylight' => q#აზორის კუნძულების ზაფხულის დრო#,
+				'generic' => q#აზორის კუნძულების დრო#,
+				'standard' => q#აზორის კუნძულების სტანდარტული დრო#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(ბანგლადეშის ზაფხულის დრო),
-				'generic' => q(ბანგლადეშის დრო),
-				'standard' => q(ბანგლადეშის სტანდარტული დრო),
+				'daylight' => q#ბანგლადეშის ზაფხულის დრო#,
+				'generic' => q#ბანგლადეშის დრო#,
+				'standard' => q#ბანგლადეშის სტანდარტული დრო#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(ბუტანის დრო),
+				'standard' => q#ბუტანის დრო#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(ბოლივიის დრო),
+				'standard' => q#ბოლივიის დრო#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(ბრაზილიის ზაფხულის დრო),
-				'generic' => q(ბრაზილიის დრო),
-				'standard' => q(ბრაზილიის სტანდარტული დრო),
+				'daylight' => q#ბრაზილიის ზაფხულის დრო#,
+				'generic' => q#ბრაზილიის დრო#,
+				'standard' => q#ბრაზილიის სტანდარტული დრო#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(ბრუნეი-დარუსალამის დრო),
+				'standard' => q#ბრუნეი-დარუსალამის დრო#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(კაბო-ვერდეს ზაფხულის დრო),
-				'generic' => q(კაბო-ვერდეს დრო),
-				'standard' => q(კაბო-ვერდეს სტანდარტული დრო),
+				'daylight' => q#კაბო-ვერდეს ზაფხულის დრო#,
+				'generic' => q#კაბო-ვერდეს დრო#,
+				'standard' => q#კაბო-ვერდეს სტანდარტული დრო#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(ჩამოროს დრო),
+				'standard' => q#ჩამოროს დრო#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(ჩატემის ზაფხულის დრო),
-				'generic' => q(ჩატემის დრო),
-				'standard' => q(ჩატემის სტანდარტული დრო),
+				'daylight' => q#ჩატემის ზაფხულის დრო#,
+				'generic' => q#ჩატემის დრო#,
+				'standard' => q#ჩატემის სტანდარტული დრო#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(ჩილეს ზაფხულის დრო),
-				'generic' => q(ჩილეს დრო),
-				'standard' => q(ჩილეს სტანდარტული დრო),
+				'daylight' => q#ჩილეს ზაფხულის დრო#,
+				'generic' => q#ჩილეს დრო#,
+				'standard' => q#ჩილეს სტანდარტული დრო#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(ჩინეთის დროის სარტყელი),
-				'generic' => q(ჩინეთის დრო),
-				'standard' => q(ჩინეთის სტანდარტული დრო),
+				'daylight' => q#ჩინეთის დროის სარტყელი#,
+				'generic' => q#ჩინეთის დრო#,
+				'standard' => q#ჩინეთის სტანდარტული დრო#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(ჩოიბალსანის ზაფხულის დრო),
-				'generic' => q(ჩოიბალსანის დრო),
-				'standard' => q(ჩოიბალსანის სტანდარტული დრო),
+				'daylight' => q#ჩოიბალსანის ზაფხულის დრო#,
+				'generic' => q#ჩოიბალსანის დრო#,
+				'standard' => q#ჩოიბალსანის სტანდარტული დრო#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(შობის კუნძულის დრო),
+				'standard' => q#შობის კუნძულის დრო#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(ქოქოსის კუნძულების დრო),
+				'standard' => q#ქოქოსის კუნძულების დრო#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(კოლუმბიის ზაფხულის დრო),
-				'generic' => q(კოლუმბიის დრო),
-				'standard' => q(კოლუმბიის სტანდარტული დრო),
+				'daylight' => q#კოლუმბიის ზაფხულის დრო#,
+				'generic' => q#კოლუმბიის დრო#,
+				'standard' => q#კოლუმბიის სტანდარტული დრო#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(კუკის კუნძულების ნახევრად ზაფხულის დრო),
-				'generic' => q(კუკის კუნძულების დრო),
-				'standard' => q(კუკის კუნძულების სტანდარტული დრო),
+				'daylight' => q#კუკის კუნძულების ნახევრად ზაფხულის დრო#,
+				'generic' => q#კუკის კუნძულების დრო#,
+				'standard' => q#კუკის კუნძულების სტანდარტული დრო#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(კუბის ზაფხულის დრო),
-				'generic' => q(კუბის დრო),
-				'standard' => q(კუბის სტანდარტული დრო),
+				'daylight' => q#კუბის ზაფხულის დრო#,
+				'generic' => q#კუბის დრო#,
+				'standard' => q#კუბის სტანდარტული დრო#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(დევისის დრო),
+				'standard' => q#დევისის დრო#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(დუმონ-დურვილის დრო),
+				'standard' => q#დუმონ-დურვილის დრო#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(აღმოსავლეთ ტიმორის დრო),
+				'standard' => q#აღმოსავლეთ ტიმორის დრო#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(აღდგომის კუნძულის ზაფხულის დრო),
-				'generic' => q(აღდგომის კუნძულის დრო),
-				'standard' => q(აღდგომის კუნძულის სტანდარტული დრო),
+				'daylight' => q#აღდგომის კუნძულის ზაფხულის დრო#,
+				'generic' => q#აღდგომის კუნძულის დრო#,
+				'standard' => q#აღდგომის კუნძულის სტანდარტული დრო#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ეკვადორის დრო),
+				'standard' => q#ეკვადორის დრო#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#მსოფლიო კოორდინირებული დრო#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -7551,6 +7758,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#ანდორა#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#ასტრახანი#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#ათენი#,
@@ -7585,7 +7795,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#დუბლინი#,
 			long => {
-				'daylight' => q(ირლანდიის სტანდარტული დრო),
+				'daylight' => q#ირლანდიის სტანდარტული დრო#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -7612,6 +7822,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#კიევი#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#კიროვი#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#ლისაბონი#,
 		},
@@ -7621,7 +7834,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#ლონდონი#,
 			long => {
-				'daylight' => q(ბრიტანეთის ზაფხულის დრო),
+				'daylight' => q#ბრიტანეთის ზაფხულის დრო#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -7672,6 +7885,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#სარაევო#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#სარატოვი#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#სიმფეროპოლი#,
 		},
@@ -7689,6 +7905,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#ტირანა#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#ულიანოვსკი#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#უჟგოროდი#,
@@ -7722,129 +7941,129 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(ცენტრალური ევროპის ზაფხულის დრო),
-				'generic' => q(ცენტრალური ევროპის დრო),
-				'standard' => q(ცენტრალური ევროპის სტანდარტული დრო),
+				'daylight' => q#ცენტრალური ევროპის ზაფხულის დრო#,
+				'generic' => q#ცენტრალური ევროპის დრო#,
+				'standard' => q#ცენტრალური ევროპის სტანდარტული დრო#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(აღმოსავლეთ ევროპის ზაფხულის დრო),
-				'generic' => q(აღმოსავლეთ ევროპის დრო),
-				'standard' => q(აღმოსავლეთ ევროპის სტანდარტული დრო),
+				'daylight' => q#აღმოსავლეთ ევროპის ზაფხულის დრო#,
+				'generic' => q#აღმოსავლეთ ევროპის დრო#,
+				'standard' => q#აღმოსავლეთ ევროპის სტანდარტული დრო#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(შორეული აღმოსავლეთ ევროპის დრო),
+				'standard' => q#შორეული აღმოსავლეთ ევროპის დრო#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(დასავლეთ ევროპის ზაფხულის დრო),
-				'generic' => q(დასავლეთ ევროპის დრო),
-				'standard' => q(დასავლეთ ევროპის სტანდარტული დრო),
+				'daylight' => q#დასავლეთ ევროპის ზაფხულის დრო#,
+				'generic' => q#დასავლეთ ევროპის დრო#,
+				'standard' => q#დასავლეთ ევროპის სტანდარტული დრო#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(ფოლკლენდის კუნძულების ზაფხულის დრო),
-				'generic' => q(ფოლკლენდის კუნძულების დრო),
-				'standard' => q(ფოლკლენდის კუნძულების სტანდარტული დრო),
+				'daylight' => q#ფოლკლენდის კუნძულების ზაფხულის დრო#,
+				'generic' => q#ფოლკლენდის კუნძულების დრო#,
+				'standard' => q#ფოლკლენდის კუნძულების სტანდარტული დრო#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(ფიჯის ზაფხულის დრო),
-				'generic' => q(ფიჯის დრო),
-				'standard' => q(ფიჯის სტანდარტული დრო),
+				'daylight' => q#ფიჯის ზაფხულის დრო#,
+				'generic' => q#ფიჯის დრო#,
+				'standard' => q#ფიჯის სტანდარტული დრო#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(საფრანგეთის გვიანის დრო),
+				'standard' => q#საფრანგეთის გვიანის დრო#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(ფრანგული სამხრეთის და ანტარქტიკის დრო),
+				'standard' => q#ფრანგული სამხრეთის და ანტარქტიკის დრო#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(გრინვიჩის საშუალო დრო),
+				'standard' => q#გრინვიჩის საშუალო დრო#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(გალაპაგოსის დრო),
+				'standard' => q#გალაპაგოსის დრო#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(გამბიერის დრო),
+				'standard' => q#გამბიერის დრო#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(საქართველოს ზაფხულის დრო),
-				'generic' => q(საქართველოს დრო),
-				'standard' => q(საქართველოს სტანდარტული დრო),
+				'daylight' => q#საქართველოს ზაფხულის დრო#,
+				'generic' => q#საქართველოს დრო#,
+				'standard' => q#საქართველოს სტანდარტული დრო#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(გილბერტის კუნძულების დრო),
+				'standard' => q#გილბერტის კუნძულების დრო#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(აღმოსავლეთ გრენლანდიის ზაფხულის დრო),
-				'generic' => q(აღმოსავლეთ გრენლანდიის დრო),
-				'standard' => q(აღმოსავლეთ გრენლანდიის სტანდარტული დრო),
+				'daylight' => q#აღმოსავლეთ გრენლანდიის ზაფხულის დრო#,
+				'generic' => q#აღმოსავლეთ გრენლანდიის დრო#,
+				'standard' => q#აღმოსავლეთ გრენლანდიის სტანდარტული დრო#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(დასავლეთ გრენლანდიის ზაფხულის დრო),
-				'generic' => q(დასავლეთ გრენლანდიის დრო),
-				'standard' => q(დასავლეთ გრენლანდიის სტანდარტული დრო),
+				'daylight' => q#დასავლეთ გრენლანდიის ზაფხულის დრო#,
+				'generic' => q#დასავლეთ გრენლანდიის დრო#,
+				'standard' => q#დასავლეთ გრენლანდიის სტანდარტული დრო#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(სპარსეთის ყურის სტანდარტული დრო),
+				'standard' => q#სპარსეთის ყურის სტანდარტული დრო#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(გაიანის დრო),
+				'standard' => q#გაიანის დრო#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(ჰავაის და ალეუტის ზაფხულის დრო),
-				'generic' => q(ჰავაის და ალეუტის დრო),
-				'standard' => q(ჰავაის და ალეუტის სტანდარტული დრო),
+				'daylight' => q#ჰავაისა და ალეუტის ზაფხულის დრო#,
+				'generic' => q#ჰავაისა და ალეუტის დრო#,
+				'standard' => q#ჰავაისა და ალეუტის სტანდარტული დრო#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(ჰონკონგის ზაფხულის დრო),
-				'generic' => q(ჰონკონგის დრო),
-				'standard' => q(ჰონკონგის სტანდარტული დრო),
+				'daylight' => q#ჰონკონგის ზაფხულის დრო#,
+				'generic' => q#ჰონკონგის დრო#,
+				'standard' => q#ჰონკონგის სტანდარტული დრო#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(ჰოვდის ზაფხულის დრო),
-				'generic' => q(ჰოვდის დრო),
-				'standard' => q(ჰოვდის სტანდარტული დრო),
+				'daylight' => q#ჰოვდის ზაფხულის დრო#,
+				'generic' => q#ჰოვდის დრო#,
+				'standard' => q#ჰოვდის სტანდარტული დრო#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(ინდოეთის დრო),
+				'standard' => q#ინდოეთის დრო#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -7882,240 +8101,240 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(ინდოეთის ოკეანის კუნძულების დრო),
+				'standard' => q#ინდოეთის ოკეანის კუნძულების დრო#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(ინდოჩინეთის დრო),
+				'standard' => q#ინდოჩინეთის დრო#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(ცენტრალური ინდონეზიის დრო),
+				'standard' => q#ცენტრალური ინდონეზიის დრო#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(აღმოსავლეთ ინდონეზიის დრო),
+				'standard' => q#აღმოსავლეთ ინდონეზიის დრო#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(დასავლეთ ინდონეზიის დრო),
+				'standard' => q#დასავლეთ ინდონეზიის დრო#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(ირანის დროის სარტყელი),
-				'generic' => q(ირანის დრო),
-				'standard' => q(ირანის სტანდარტული დრო),
+				'daylight' => q#ირანის დროის სარტყელი#,
+				'generic' => q#ირანის დრო#,
+				'standard' => q#ირანის სტანდარტული დრო#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(ირკუტსკის ზაფხულის დრო),
-				'generic' => q(ირკუტსკის დრო),
-				'standard' => q(ირკუტსკის სტანდარტული დრო),
+				'daylight' => q#ირკუტსკის ზაფხულის დრო#,
+				'generic' => q#ირკუტსკის დრო#,
+				'standard' => q#ირკუტსკის სტანდარტული დრო#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(ისრაელის ზაფხულის დრო),
-				'generic' => q(ისრაელის დრო),
-				'standard' => q(ისრაელის სტანდარტული დრო),
+				'daylight' => q#ისრაელის ზაფხულის დრო#,
+				'generic' => q#ისრაელის დრო#,
+				'standard' => q#ისრაელის სტანდარტული დრო#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(იაპონიის ზაფხულის დრო),
-				'generic' => q(იაპონიის დრო),
-				'standard' => q(იაპონიის სტანდარტული დრო),
+				'daylight' => q#იაპონიის ზაფხულის დრო#,
+				'generic' => q#იაპონიის დრო#,
+				'standard' => q#იაპონიის სტანდარტული დრო#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(აღმოსავლეთ ყაზახეთის დრო),
+				'standard' => q#აღმოსავლეთ ყაზახეთის დრო#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(დასავლეთ ყაზახეთის დრო),
+				'standard' => q#დასავლეთ ყაზახეთის დრო#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(კორეის ზაფხულის დრო),
-				'generic' => q(კორეის დრო),
-				'standard' => q(კორეის სტანდარტული დრო),
+				'daylight' => q#კორეის ზაფხულის დრო#,
+				'generic' => q#კორეის დრო#,
+				'standard' => q#კორეის სტანდარტული დრო#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(კოსრეს დრო),
+				'standard' => q#კოსრეს დრო#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(კრასნოიარსკის ზაფხულის დრო),
-				'generic' => q(კრასნოიარსკის დრო),
-				'standard' => q(კრასნოიარსკის სტანდარტული დრო),
+				'daylight' => q#კრასნოიარსკის ზაფხულის დრო#,
+				'generic' => q#კრასნოიარსკის დრო#,
+				'standard' => q#კრასნოიარსკის სტანდარტული დრო#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(ყირგიზეთის დრო),
+				'standard' => q#ყირგიზეთის დრო#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(ლაინის კუნძულების დრო),
+				'standard' => q#ლაინის კუნძულების დრო#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(ლორდ-ჰაუს ზაფხულის დრო),
-				'generic' => q(ლორდ-ჰაუს დრო),
-				'standard' => q(ლორდ-ჰაუს სტანდარტული დრო),
+				'daylight' => q#ლორდ-ჰაუს ზაფხულის დრო#,
+				'generic' => q#ლორდ-ჰაუს დრო#,
+				'standard' => q#ლორდ-ჰაუს სტანდარტული დრო#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(მაქკუორის კუნძულის დრო),
+				'standard' => q#მაქკუორის კუნძულის დრო#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(მაგადანის ზაფხულის დრო),
-				'generic' => q(მაგადანის დრო),
-				'standard' => q(მაგადანის სტანდარტული დრო),
+				'daylight' => q#მაგადანის ზაფხულის დრო#,
+				'generic' => q#მაგადანის დრო#,
+				'standard' => q#მაგადანის სტანდარტული დრო#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(მალაიზიის დრო),
+				'standard' => q#მალაიზიის დრო#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(მალდივების დრო),
+				'standard' => q#მალდივების დრო#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(მარკიზის კუნძულების დრო),
+				'standard' => q#მარკიზის კუნძულების დრო#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(მარშალის კუნძულების დრო),
+				'standard' => q#მარშალის კუნძულების დრო#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(მავრიკის ზაფხულის დრო),
-				'generic' => q(მავრიკის დრო),
-				'standard' => q(მავრიკის სტანდარტული დრო),
+				'daylight' => q#მავრიკის ზაფხულის დრო#,
+				'generic' => q#მავრიკის დრო#,
+				'standard' => q#მავრიკის სტანდარტული დრო#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(მოუსონის დრო),
+				'standard' => q#მოუსონის დრო#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(ჩრდილო-დასავლეთ მექსიკის ზაფხულის დრო),
-				'generic' => q(ჩრდილო-აღმოსავლეთ მექსიკის დრო),
-				'standard' => q(ჩრდილო-დასავლეთ მექსიკის დრო),
+				'daylight' => q#ჩრდილო-დასავლეთ მექსიკის ზაფხულის დრო#,
+				'generic' => q#ჩრდილო-აღმოსავლეთ მექსიკის დრო#,
+				'standard' => q#ჩრდილო-დასავლეთ მექსიკის დრო#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(მექსიკის წყნარი ოკეანის ზაფხულის დრო),
-				'generic' => q(მექსიკის წყნარი ოკეანის დრო),
-				'standard' => q(მექსიკის წყნარი ოკეანის სტანდარტული დრო),
+				'daylight' => q#მექსიკის წყნარი ოკეანის ზაფხულის დრო#,
+				'generic' => q#მექსიკის წყნარი ოკეანის დრო#,
+				'standard' => q#მექსიკის წყნარი ოკეანის სტანდარტული დრო#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(ულან-ბატორის ზაფხულის დრო),
-				'generic' => q(ულან-ბატორის დრო),
-				'standard' => q(ულან-ბატორის სტანდარტული დრო),
+				'daylight' => q#ულან-ბატორის ზაფხულის დრო#,
+				'generic' => q#ულან-ბატორის დრო#,
+				'standard' => q#ულან-ბატორის სტანდარტული დრო#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(მოსკოვის ზაფხულის დრო),
-				'generic' => q(მოსკოვის დრო),
-				'standard' => q(მოსკოვის სტანდარტული დრო),
+				'daylight' => q#მოსკოვის ზაფხულის დრო#,
+				'generic' => q#მოსკოვის დრო#,
+				'standard' => q#მოსკოვის სტანდარტული დრო#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(მიანმარის დრო),
+				'standard' => q#მიანმარის დრო#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(ნაურუს დრო),
+				'standard' => q#ნაურუს დრო#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(ნეპალის დრო),
+				'standard' => q#ნეპალის დრო#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(ახალი კალედონიის ზაფხულის დრო),
-				'generic' => q(ახალი კალედონიის დრო),
-				'standard' => q(ახალი კალედონიის სტანდარტული დრო),
+				'daylight' => q#ახალი კალედონიის ზაფხულის დრო#,
+				'generic' => q#ახალი კალედონიის დრო#,
+				'standard' => q#ახალი კალედონიის სტანდარტული დრო#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(ახალი ზელანდიის ზაფხულის დრო),
-				'generic' => q(ახალი ზელანდიის დრო),
-				'standard' => q(ახალი ზელანდიის სტანდარტული დრო),
+				'daylight' => q#ახალი ზელანდიის ზაფხულის დრო#,
+				'generic' => q#ახალი ზელანდიის დრო#,
+				'standard' => q#ახალი ზელანდიის სტანდარტული დრო#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(ნიუფაუნდლენდის ზაფხულის დრო),
-				'generic' => q(ნიუფაუნდლენდის დრო),
-				'standard' => q(ნიუფაუნდლენდის სტანდარტული დრო),
+				'daylight' => q#ნიუფაუნდლენდის ზაფხულის დრო#,
+				'generic' => q#ნიუფაუნდლენდის დრო#,
+				'standard' => q#ნიუფაუნდლენდის სტანდარტული დრო#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(ნიუეს დრო),
+				'standard' => q#ნიუეს დრო#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(ნორფოლკის კუნძულის დრო),
+				'standard' => q#ნორფოლკის კუნძულის დრო#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(ფერნანდო-დე-ნორონიას ზაფხულის დრო),
-				'generic' => q(ფერნანდო-დე-ნორონიას დრო),
-				'standard' => q(ფერნანდო-დე-ნორონიას სტანდარტული დრო),
+				'daylight' => q#ფერნანდო-დე-ნორონიას ზაფხულის დრო#,
+				'generic' => q#ფერნანდო-დე-ნორონიას დრო#,
+				'standard' => q#ფერნანდო-დე-ნორონიას სტანდარტული დრო#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(ნოვოსიბირსკის ზაფხულის დრო),
-				'generic' => q(ნოვოსიბირსკის დრო),
-				'standard' => q(ნოვოსიბირსკის სტანდარტული დრო),
+				'daylight' => q#ნოვოსიბირსკის ზაფხულის დრო#,
+				'generic' => q#ნოვოსიბირსკის დრო#,
+				'standard' => q#ნოვოსიბირსკის სტანდარტული დრო#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(ომსკის ზაფხულის დრო),
-				'generic' => q(ომსკის დრო),
-				'standard' => q(ომსკის სტანდარტული დრო),
+				'daylight' => q#ომსკის ზაფხულის დრო#,
+				'generic' => q#ომსკის დრო#,
+				'standard' => q#ომსკის სტანდარტული დრო#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -8237,231 +8456,236 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(პაკისტანის ზაფხულის დრო),
-				'generic' => q(პაკისტანის დრო),
-				'standard' => q(პაკისტანის სტანდარტული დრო),
+				'daylight' => q#პაკისტანის ზაფხულის დრო#,
+				'generic' => q#პაკისტანის დრო#,
+				'standard' => q#პაკისტანის სტანდარტული დრო#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(პალაუს დრო),
+				'standard' => q#პალაუს დრო#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(პაპუა-ახალი გვინეის დრო),
+				'standard' => q#პაპუა-ახალი გვინეის დრო#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(პარაგვაის ზაფხულის დრო),
-				'generic' => q(პარაგვაის დრო),
-				'standard' => q(პარაგვაის სტანდარტული დრო),
+				'daylight' => q#პარაგვაის ზაფხულის დრო#,
+				'generic' => q#პარაგვაის დრო#,
+				'standard' => q#პარაგვაის სტანდარტული დრო#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(პერუს ზაფხულის დრო),
-				'generic' => q(პერუს დრო),
-				'standard' => q(პერუს სტანდარტული დრო),
+				'daylight' => q#პერუს ზაფხულის დრო#,
+				'generic' => q#პერუს დრო#,
+				'standard' => q#პერუს სტანდარტული დრო#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(ფილიპინების ზაფხულის დრო),
-				'generic' => q(ფილიპინების დრო),
-				'standard' => q(ფილიპინების სტანდარტული დრო),
+				'daylight' => q#ფილიპინების ზაფხულის დრო#,
+				'generic' => q#ფილიპინების დრო#,
+				'standard' => q#ფილიპინების სტანდარტული დრო#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(ფენიქსის კუნძულების დრო),
+				'standard' => q#ფენიქსის კუნძულების დრო#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(სენ-პიერის და მიკელონის ზაფხულის დრო),
-				'generic' => q(სენ-პიერის და მიკელონის დრო),
-				'standard' => q(სენ-პიერის და მიკელონის სტანდარტული დრო),
+				'daylight' => q#სენ-პიერის და მიკელონის ზაფხულის დრო#,
+				'generic' => q#სენ-პიერის და მიკელონის დრო#,
+				'standard' => q#სენ-პიერის და მიკელონის სტანდარტული დრო#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(პიტკერნის დრო),
+				'standard' => q#პიტკერნის დრო#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(პონაპეს დრო),
+				'standard' => q#პონაპეს დრო#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#ფხენიანის დრო#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(რეიუნიონის დრო),
+				'standard' => q#რეიუნიონის დრო#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(როთერის დრო),
+				'standard' => q#როთერის დრო#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(სახალინის ზაფხულის დრო),
-				'generic' => q(სახალინის დრო),
-				'standard' => q(სახალინის სტანდარტული დრო),
+				'daylight' => q#სახალინის ზაფხულის დრო#,
+				'generic' => q#სახალინის დრო#,
+				'standard' => q#სახალინის სტანდარტული დრო#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(სამოას ზაფხულის დრო),
-				'generic' => q(სამოას დრო),
-				'standard' => q(სამოას სტანდარტული დრო),
+				'daylight' => q#სამოას ზაფხულის დრო#,
+				'generic' => q#სამოას დრო#,
+				'standard' => q#სამოას სტანდარტული დრო#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(სეიშელის კუნძულების დრო),
+				'standard' => q#სეიშელის კუნძულების დრო#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(სინგაპურის დრო),
+				'standard' => q#სინგაპურის დრო#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(სოლომონის კუნძულების დრო),
+				'standard' => q#სოლომონის კუნძულების დრო#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(სამხრეთ გეორგიის დრო),
+				'standard' => q#სამხრეთ გეორგიის დრო#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(სურინამის დრო),
+				'standard' => q#სურინამის დრო#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(სიოვას დრო),
+				'standard' => q#სიოვას დრო#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(ტაიტის დრო),
+				'standard' => q#ტაიტის დრო#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(ტაიბეის ზაფხულის დრო),
-				'generic' => q(ტაიბეის დრო),
-				'standard' => q(ტაიბეის სტანდარტული დრო),
+				'daylight' => q#ტაიბეის ზაფხულის დრო#,
+				'generic' => q#ტაიბეის დრო#,
+				'standard' => q#ტაიბეის სტანდარტული დრო#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(ტაჯიკეთის დრო),
+				'standard' => q#ტაჯიკეთის დრო#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(ტოკელაუს დრო),
+				'standard' => q#ტოკელაუს დრო#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(ტონგის ზაფხულის დრო),
-				'generic' => q(ტონგის დრო),
-				'standard' => q(ტონგის სტანდარტული დრო),
+				'daylight' => q#ტონგის ზაფხულის დრო#,
+				'generic' => q#ტონგის დრო#,
+				'standard' => q#ტონგის სტანდარტული დრო#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(ჩუუკის დრო),
+				'standard' => q#ჩუუკის დრო#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(თურქმენეთის ზაფხულის დრო),
-				'generic' => q(თურქმენეთის დრო),
-				'standard' => q(თურქმენეთის სტანდარტული დრო),
+				'daylight' => q#თურქმენეთის ზაფხულის დრო#,
+				'generic' => q#თურქმენეთის დრო#,
+				'standard' => q#თურქმენეთის სტანდარტული დრო#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(ტუვალუს დრო),
+				'standard' => q#ტუვალუს დრო#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(ურუგვაის ზაფხულის დრო),
-				'generic' => q(ურუგვაის დრო),
-				'standard' => q(ურუგვაის სტანდარტული დრო),
+				'daylight' => q#ურუგვაის ზაფხულის დრო#,
+				'generic' => q#ურუგვაის დრო#,
+				'standard' => q#ურუგვაის სტანდარტული დრო#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(უზბეკეთის ზაფხულის დრო),
-				'generic' => q(უზბეკეთის დრო),
-				'standard' => q(უზბეკეთის სტანდარტული დრო),
+				'daylight' => q#უზბეკეთის ზაფხულის დრო#,
+				'generic' => q#უზბეკეთის დრო#,
+				'standard' => q#უზბეკეთის სტანდარტული დრო#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(ვანუატუს ზაფხულის დრო),
-				'generic' => q(ვანუატუს დრო),
-				'standard' => q(ვანუატუს სტანდარტული დრო),
+				'daylight' => q#ვანუატუს ზაფხულის დრო#,
+				'generic' => q#ვანუატუს დრო#,
+				'standard' => q#ვანუატუს სტანდარტული დრო#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(ვენესუელის დრო),
+				'standard' => q#ვენესუელის დრო#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(ვლადივოსტოკის ზაფხულის დრო),
-				'generic' => q(ვლადივოსტოკის დრო),
-				'standard' => q(ვლადივოსტოკის სტანდარტული დრო),
+				'daylight' => q#ვლადივოსტოკის ზაფხულის დრო#,
+				'generic' => q#ვლადივოსტოკის დრო#,
+				'standard' => q#ვლადივოსტოკის სტანდარტული დრო#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(ვოლგოგრადის ზაფხულის დრო),
-				'generic' => q(ვოლგოგრადის დრო),
-				'standard' => q(ვოლგოგრადის სტანდარტული დრო),
+				'daylight' => q#ვოლგოგრადის ზაფხულის დრო#,
+				'generic' => q#ვოლგოგრადის დრო#,
+				'standard' => q#ვოლგოგრადის სტანდარტული დრო#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(ვოსტოკის დრო),
+				'standard' => q#ვოსტოკის დრო#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(ვეიკის კუნძულის დრო),
+				'standard' => q#ვეიკის კუნძულის დრო#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(ვოლისი და ფუტუნას დრო),
+				'standard' => q#ვოლისი და ფუტუნას დრო#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(იაკუტსკის ზაფხულის დრო),
-				'generic' => q(იაკუტსკის დრო),
-				'standard' => q(იაკუტსკის სტანდარტული დრო),
+				'daylight' => q#იაკუტსკის ზაფხულის დრო#,
+				'generic' => q#იაკუტსკის დრო#,
+				'standard' => q#იაკუტსკის სტანდარტული დრო#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(ეკატერინბურგის ზაფხულის დრო),
-				'generic' => q(ეკატერინბურგის დრო),
-				'standard' => q(ეკატერინბურგის სტანდარტული დრო),
+				'daylight' => q#ეკატერინბურგის ზაფხულის დრო#,
+				'generic' => q#ეკატერინბურგის დრო#,
+				'standard' => q#ეკატერინბურგის სტანდარტული დრო#,
 			},
 		},
 	 } }

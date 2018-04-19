@@ -23,30 +23,6 @@ sub run ($self) {
 
     return if !$new_ver;
 
-    # check for resolved issues without milestone
-    # if ( $self->dist->build->issues ) {
-    #     my $resolved_issues = $self->dist->build->issues->get( resolved => 1 );
-    #
-    #     if ( !$resolved_issues ) {
-    #         say 'Error retrieving issues from tracker';
-    #
-    #         return;
-    #     }
-    #
-    #     if ( $resolved_issues->{data} ) {
-    #         say qq[Following issues are resolved and not closed:$LF];
-    #
-    #         $self->dist->build->issues->print_issues( $resolved_issues->{data} );
-    #
-    #         say qq[${LF}Close or re-open this issues. Release is impossible.$LF];
-    #
-    #         return;
-    #     }
-    # }
-
-    # get closed issues sinse latest release
-    # my $closed_issues = $self->dist->build->issues && $self->dist->build->issues->get( closed => 1 );
-
     say qq[${LF}Current version is: $cur_ver];
 
     say qq[New version will be: $new_ver$LF];
@@ -61,83 +37,6 @@ sub run ($self) {
     say q[];
 
     # NOTE !!!WARNING!!! start release, next changes will be hard to revert
-
-    # working with the issue tracker
-    # if ( $self->dist->build->issues ) {
-    #     my $cv = AE::cv;
-    #
-    #     # create new version on issues tracker
-    #     print q[Creating new version and milestone on issues tracker ... ];
-    #
-    #     $cv->begin;
-    #
-    #     $self->dist->build->issues->create_version(
-    #         $new_ver,
-    #         sub ($res) {
-    #             if ( !$res ) {
-    #                 say qq[Error creating new version on issues tracker: $res];
-    #
-    #                 exit;
-    #             }
-    #
-    #             $cv->end;
-    #
-    #             return;
-    #         }
-    #     );
-    #
-    #     # create new milestone on issues tracker
-    #     $cv->begin;
-    #
-    #     $self->dist->build->issues->create_milestone(
-    #         $new_ver,
-    #         sub ($res) {
-    #             if ( !$res ) {
-    #                 say qq[Error creating new milestone on issues tracker: $res];
-    #
-    #                 exit;
-    #             }
-    #
-    #             $cv->end;
-    #
-    #             return;
-    #         }
-    #     );
-    #
-    #     $cv->recv;
-    #
-    #     say 'done';
-    #
-    #     # get closed issues, set milestone for closed issues
-    #     if ( $closed_issues->{data} ) {
-    #         $cv = AE::cv;
-    #
-    #         print q[Updating milestone for closed issues ... ];
-    #
-    #         for my $issue ( $closed_issues->{data}->@* ) {
-    #             $cv->begin;
-    #
-    #             $issue->set_milestone(
-    #                 $new_ver,
-    #                 sub ($res) {
-    #                     if ( !$res ) {
-    #                         say qq[Error updating milestone for issue: $res];
-    #
-    #                         exit;
-    #                     }
-    #
-    #                     $cv->end;
-    #
-    #                     return;
-    #                 }
-    #             );
-    #         }
-    #
-    #         $cv->recv;
-    #
-    #         say 'done';
-    #     }
-    # }
 
     # update release version in the main module
     unless ( $self->dist->module->content->$* =~ s[^(\s*package\s+\w[\w\:\']*\s+)v?[\d._]+(\s*;)][$1$new_ver$2]sm ) {
@@ -202,7 +101,7 @@ sub run ($self) {
 
         my $res = $self->dist->scm->scm_push;
 
-        say $res->reason;
+        say $res->{reason};
 
         if ( !$res ) {
             goto PUSH_UPSTREAM if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
@@ -445,10 +344,10 @@ TXT
 ## |======+======================+================================================================================================================|
 ## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (26)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 143, 163, 218, 223,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
-## |      | 228, 233             |                                                                                                                |
+## |    2 | 42, 62, 117, 122,    | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |      | 127, 132             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 379                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 278                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

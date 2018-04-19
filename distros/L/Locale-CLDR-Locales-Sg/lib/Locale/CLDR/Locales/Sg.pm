@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Sg - Package for language Sango
 
 package Locale::CLDR::Locales::Sg;
 # This file auto generated from Data\common\main\sg.xml
-#	on Fri 29 Apr  7:24:02 pm GMT
+#	on Fri 13 Apr  7:27:42 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -328,9 +329,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[c q x])},
+			auxiliary => qr{[c q x]},
 			index => ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a â ä b d e ê ë f g h i î ï j k l m n o ô ö p r s t u ù û ü v w y z])},
+			main => qr{[a â ä b d e ê ë f g h i î ï j k l m n o ô ö p r s t u ù û ü v w y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -837,13 +839,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{LK},
 					'am' => q{ND},
 				},
-				'abbreviated' => {
-					'am' => q{ND},
+				'wide' => {
 					'pm' => q{LK},
+					'am' => q{ND},
 				},
 			},
 		},
@@ -971,6 +973,19 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 	} },
 );
 

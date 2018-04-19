@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2018-04-04'; # DATE
-our $VERSION = '0.001'; # VERSION
+# FRAGMENT id=shcompgen-hint command=cryp-exchange
+
+our $DATE = '2018-04-12'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +45,7 @@ cryp-exchange - Interact with cryptoexchanges
 
 =head1 VERSION
 
-This document describes version 0.001 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-04-04.
+This document describes version 0.002 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-04-12.
 
 =head1 SYNOPSIS
 
@@ -88,7 +90,12 @@ To get order book:
 
 =head1 DESCRIPTION
 
-Early release. More functionality will be added in the future.
+B<Early release. More functionality will be added in the future.>
+
+This utility (and the corresponding backend modules) provide a common interface
+to interact with various cryptocurrency exchanges: common set of subcommands
+(methods) with common arguments and result format, standardized currency codes
+(following L<CryptoCurrency::Catalog>) and pair formats (e.g. C<BTC/USD>).
 
 =head1 SUBCOMMANDS
 

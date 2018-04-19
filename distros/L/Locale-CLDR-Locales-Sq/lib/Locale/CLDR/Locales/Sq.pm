@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Sq - Package for language Albanian
 
 package Locale::CLDR::Locales::Sq;
 # This file auto generated from Data\common\main\sq.xml
-#	on Fri 29 Apr  7:25:24 pm GMT
+#	on Fri 13 Apr  7:28:41 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,11 +328,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -361,51 +362,88 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'ab' => 'abkazisht',
+				'aa' => 'afarisht',
+ 				'ab' => 'abkazisht',
+ 				'ace' => 'akinezisht',
+ 				'ada' => 'andangmeisht',
+ 				'ady' => 'adigisht',
  				'af' => 'afrikanisht',
  				'agq' => 'agemisht',
+ 				'ain' => 'ajnuisht',
  				'ak' => 'akanisht',
- 				'am' => 'amarikisht',
+ 				'ale' => 'aleutisht',
+ 				'alt' => 'altaishte jugore',
+ 				'am' => 'amarisht',
+ 				'an' => 'aragonezisht',
+ 				'anp' => 'angikisht',
  				'ar' => 'arabisht',
  				'ar_001' => 'arabishte standarde moderne',
  				'arn' => 'mapuçisht',
+ 				'arp' => 'arapahoisht',
  				'as' => 'asamezisht',
  				'asa' => 'asuisht',
+ 				'ast' => 'asturisht',
+ 				'av' => 'avarikisht',
+ 				'awa' => 'auadhisht',
+ 				'ay' => 'ajmarisht',
  				'az' => 'azerbajxhanisht',
  				'az@alt=short' => 'azerisht',
  				'ba' => 'bashkirisht',
+ 				'ban' => 'balinezisht',
+ 				'bas' => 'basaisht',
  				'be' => 'bjellorusisht',
  				'bem' => 'bembaisht',
  				'bez' => 'benaisht',
  				'bg' => 'bullgarisht',
  				'bgn' => 'balokishte perëndimore',
+ 				'bho' => 'boxhpurisht',
+ 				'bi' => 'bislamisht',
+ 				'bin' => 'binisht',
+ 				'bla' => 'siksikaisht',
  				'bm' => 'bambarisht',
  				'bn' => 'bengalisht',
  				'bo' => 'tibetisht',
  				'br' => 'bretonisht',
  				'brx' => 'bodoisht',
  				'bs' => 'boshnjakisht',
+ 				'bug' => 'buginezisht',
+ 				'byn' => 'blinisht',
  				'ca' => 'katalonisht',
  				'ce' => 'çeçenisht',
+ 				'ceb' => 'sebuanisht',
  				'cgg' => 'çigisht',
+ 				'ch' => 'kamoroisht',
+ 				'chk' => 'çukezisht',
+ 				'chm' => 'marisht',
+ 				'cho' => 'çoktauisht',
  				'chr' => 'çerokisht',
- 				'ckb' => 'kurdishte sorani',
- 				'co' => 'korsikanisht',
+ 				'chy' => 'çejenisht',
+ 				'ckb' => 'kurdishte qendrore',
+ 				'co' => 'korsikisht',
+ 				'crs' => 'frëngjishte kreole seselve',
  				'cs' => 'çekisht',
+ 				'cu' => 'sllavishte kishtare',
  				'cv' => 'çuvashisht',
  				'cy' => 'uellsisht',
  				'da' => 'danisht',
- 				'dav' => 'taitisht',
+ 				'dak' => 'dakotisht',
+ 				'dar' => 'darguaisht',
+ 				'dav' => 'tajtaisht',
  				'de' => 'gjermanisht',
  				'de_AT' => 'gjermanishte austriake',
  				'de_CH' => 'gjermanishte zvicerane (dialekti i Alpeve)',
- 				'dje' => 'zarmisht',
+ 				'dgr' => 'dogribisht',
+ 				'dje' => 'zarmaisht',
  				'dsb' => 'sorbishte e poshtme',
  				'dua' => 'dualaisht',
+ 				'dv' => 'divehisht',
  				'dyo' => 'xhulafonjisht',
  				'dz' => 'xhongaisht',
+ 				'dzg' => 'dazagauisht',
  				'ebu' => 'embuisht',
- 				'ee' => 'juisht',
+ 				'ee' => 'eveisht',
+ 				'efi' => 'efikisht',
+ 				'eka' => 'ekajukisht',
  				'el' => 'greqisht',
  				'en' => 'anglisht',
  				'en_AU' => 'anglishte australiane',
@@ -421,190 +459,310 @@ has 'display_name_language' => (
  				'es_MX' => 'spanjishte meksikane',
  				'et' => 'estonisht',
  				'eu' => 'baskisht',
+ 				'ewo' => 'euondoisht',
  				'fa' => 'persisht',
+ 				'ff' => 'fulaisht',
  				'fi' => 'finlandisht',
- 				'fil' => 'filipinase',
+ 				'fil' => 'filipinisht',
  				'fj' => 'fixhianisht',
  				'fo' => 'faroisht',
+ 				'fon' => 'fonisht',
  				'fr' => 'frëngjisht',
  				'fr_CA' => 'frëngjishte kanadeze',
  				'fr_CH' => 'frëngjishte zvicerane',
- 				'fy' => 'frizianisht',
+ 				'fur' => 'friulianisht',
+ 				'fy' => 'frizianishte perëndimore',
  				'ga' => 'irlandisht',
+ 				'gaa' => 'gaisht',
  				'gag' => 'gagauzisht',
- 				'gd' => 'Galisht',
- 				'gl' => 'galike',
+ 				'gd' => 'galishte skoceze',
+ 				'gez' => 'gizisht',
+ 				'gil' => 'gilbertazisht',
+ 				'gl' => 'galicisht',
  				'gn' => 'guaranisht',
+ 				'gor' => 'gorontaloisht',
  				'gsw' => 'gjermanishte zvicerane',
  				'gu' => 'guxharatisht',
  				'guz' => 'gusisht',
  				'gv' => 'manksisht',
+ 				'gwi' => 'guiçinisht',
  				'ha' => 'hausisht',
- 				'haw' => 'huajanisht',
+ 				'haw' => 'havaisht',
  				'he' => 'hebraisht',
  				'hi' => 'indisht',
+ 				'hil' => 'hiligajnonisht',
+ 				'hmn' => 'hmongisht',
  				'hr' => 'kroatisht',
- 				'hsb' => 'sorbiane e sipërme',
- 				'ht' => 'haitianisht',
+ 				'hsb' => 'sorbishte e sipërme',
+ 				'ht' => 'haitisht',
  				'hu' => 'hungarisht',
+ 				'hup' => 'hupaisht',
  				'hy' => 'armenisht',
- 				'ia' => 'Interlingua',
+ 				'hz' => 'hereroisht',
+ 				'ia' => 'interlingua',
+ 				'iba' => 'ibanisht',
+ 				'ibb' => 'ibibioisht',
  				'id' => 'indonezisht',
- 				'ie' => 'Gjuha nderkombtare',
+ 				'ie' => 'gjuha oksidentale',
  				'ig' => 'igboisht',
  				'ii' => 'sishuanisht',
+ 				'ilo' => 'ilokoisht',
+ 				'inh' => 'ingushisht',
+ 				'io' => 'idoisht',
  				'is' => 'islandisht',
  				'it' => 'italisht',
  				'iu' => 'inuktitutisht',
  				'ja' => 'japonisht',
+ 				'jbo' => 'lojbanisht',
  				'jgo' => 'ngombisht',
  				'jmc' => 'maçamisht',
  				'jv' => 'javanisht',
  				'ka' => 'gjeorgjisht',
  				'kab' => 'kabilisht',
+ 				'kac' => 'kaçinisht',
+ 				'kaj' => 'kajeisht',
  				'kam' => 'kambaisht',
+ 				'kbd' => 'kabardianisht',
+ 				'kcg' => 'tjapisht',
  				'kde' => 'makondisht',
- 				'kea' => 'kabuverdianisht',
+ 				'kea' => 'kreolishte e Kepit të Gjelbër',
+ 				'kfo' => 'koroisht',
+ 				'kha' => 'kasisht',
  				'khq' => 'kojraçinisht',
  				'ki' => 'kikujuisht',
+ 				'kj' => 'kuanjamaisht',
  				'kk' => 'kazakisht',
+ 				'kkj' => 'kakoisht',
  				'kl' => 'kalalisutisht',
- 				'kln' => 'kalenjinisht',
- 				'km' => 'kmere',
- 				'kn' => 'kanade',
+ 				'kln' => 'kalenxhinisht',
+ 				'km' => 'kmerisht',
+ 				'kmb' => 'kimbunduisht',
+ 				'kn' => 'kanadisht',
  				'ko' => 'koreanisht',
- 				'koi' => 'komishte permiake',
+ 				'koi' => 'komi-parmjakisht',
  				'kok' => 'konkanisht',
- 				'ks' => 'kashmire',
+ 				'kpe' => 'kpeleisht',
+ 				'kr' => 'kanurisht',
+ 				'krc' => 'karaçaj-balkarisht',
+ 				'krl' => 'karelianisht',
+ 				'kru' => 'kurukisht',
+ 				'ks' => 'kashmirisht',
  				'ksb' => 'shambalisht',
  				'ksf' => 'bafianisht',
- 				'ku' => 'kurde',
- 				'kw' => 'kornishisht',
+ 				'ksh' => 'këlnisht',
+ 				'ku' => 'kurdisht',
+ 				'kum' => 'kumikisht',
+ 				'kv' => 'komisht',
+ 				'kw' => 'kornisht',
  				'ky' => 'kirgizisht',
  				'la' => 'latinisht',
+ 				'lad' => 'ladinoisht',
  				'lag' => 'langisht',
- 				'lb' => 'luksemburgase',
- 				'lg' => 'gandisht',
+ 				'lb' => 'luksemburgisht',
+ 				'lez' => 'lezgianisht',
+ 				'lg' => 'gandaisht',
+ 				'li' => 'limburgisht',
  				'lkt' => 'lakotisht',
  				'ln' => 'lingalisht',
  				'lo' => 'laosisht',
+ 				'loz' => 'lozisht',
  				'lrc' => 'lurishte veriore',
  				'lt' => 'lituanisht',
- 				'lu' => 'lubakatangisht',
+ 				'lu' => 'luba-katangaisht',
+ 				'lua' => 'luba-luluaisht',
+ 				'lun' => 'lundaisht',
  				'luo' => 'luoisht',
+ 				'lus' => 'mizoisht',
  				'luy' => 'lujaisht',
  				'lv' => 'letonisht',
+ 				'mad' => 'madurezisht',
+ 				'mag' => 'magaisht',
+ 				'mai' => 'maitilisht',
+ 				'mak' => 'makasarisht',
  				'mas' => 'masaisht',
+ 				'mdf' => 'mokshaisht',
+ 				'men' => 'mendisht',
  				'mer' => 'meruisht',
- 				'mfe' => 'norisjene',
- 				'mg' => 'malagezisht',
- 				'mgh' => 'makuamitoisht',
+ 				'mfe' => 'morisjenisht',
+ 				'mg' => 'madagaskarisht',
+ 				'mgh' => 'makua-mitoisht',
  				'mgo' => 'metaisht',
+ 				'mh' => 'marshallisht',
  				'mi' => 'maorisht',
+ 				'mic' => 'mikmakisht',
+ 				'min' => 'minangkabauisht',
  				'mk' => 'maqedonisht',
  				'ml' => 'malajalamisht',
  				'mn' => 'mongolisht',
- 				'moh' => 'mohaukisht',
+ 				'mni' => 'manipurisht',
+ 				'moh' => 'mohokisht',
+ 				'mos' => 'mosisht',
  				'mr' => 'maratisht',
  				'ms' => 'malajisht',
  				'mt' => 'maltisht',
- 				'mua' => 'mundagishte',
+ 				'mua' => 'mundangisht',
+ 				'mul' => 'gjuhë të shumëfishta',
+ 				'mus' => 'krikisht',
+ 				'mwl' => 'mirandisht',
  				'my' => 'birmanisht',
+ 				'myv' => 'erzjaisht',
  				'mzn' => 'mazanderanisht',
- 				'naq' => 'namaishte',
- 				'nb' => 'bokmalishte norvegjeze',
+ 				'na' => 'nauruisht',
+ 				'nap' => 'napoletanisht',
+ 				'naq' => 'namaisht',
+ 				'nb' => 'norvegjishte letrare',
  				'nd' => 'ndebelishte veriore',
  				'nds' => 'gjermanishte e vendeve të ulëta',
  				'nds_NL' => 'gjermanishte saksone e vendeve të ulëta',
  				'ne' => 'nepalisht',
+ 				'new' => 'neuarisht',
+ 				'ng' => 'ndongaisht',
+ 				'nia' => 'niasisht',
+ 				'niu' => 'niueanisht',
  				'nl' => 'holandisht',
  				'nl_BE' => 'flamandisht',
  				'nmg' => 'kuasisht',
- 				'nn' => 'ninorske norvegjeze',
- 				'no' => 'Norvegjisht',
+ 				'nn' => 'norvegjishte nynorsk',
+ 				'nnh' => 'ngiembunisht',
+ 				'no' => 'norvegjisht',
+ 				'nog' => 'nogajisht',
  				'nqo' => 'nkoisht',
+ 				'nr' => 'ndebelishte jugore',
+ 				'nso' => 'sotoishte veriore',
  				'nus' => 'nuerisht',
+ 				'nv' => 'navahoisht',
+ 				'ny' => 'nianjisht',
  				'nyn' => 'niankolisht',
- 				'oc' => 'Oksitanisht',
+ 				'oc' => 'oksitanisht',
  				'om' => 'oromoisht',
- 				'or' => 'orijaisht',
- 				'pa' => 'panxhabisht',
+ 				'or' => 'odisht',
+ 				'os' => 'osetisht',
+ 				'pa' => 'punxhabisht',
+ 				'pag' => 'pangasinanisht',
+ 				'pam' => 'pampangaisht',
+ 				'pap' => 'papiamentisht',
+ 				'pau' => 'paluanisht',
+ 				'pcm' => 'pixhinishte nigeriane',
  				'pl' => 'polonisht',
+ 				'prg' => 'prusisht',
  				'ps' => 'pashtoisht',
  				'pt' => 'portugalisht',
  				'pt_BR' => 'portugalishte braziliane',
  				'pt_PT' => 'portugalishte evropiane',
  				'qu' => 'keçuaisht',
  				'quc' => 'kiçeisht',
- 				'rm' => 'rome',
+ 				'rap' => 'rapanuisht',
+ 				'rar' => 'rarontonganisht',
+ 				'rm' => 'retoromanisht',
  				'rn' => 'rundisht',
  				'ro' => 'rumanisht',
- 				'ro_MD' => 'moldavishte',
- 				'rof' => 'romboishte',
+ 				'ro_MD' => 'moldavisht',
+ 				'rof' => 'romboisht',
+ 				'root' => 'rutisht',
  				'ru' => 'rusisht',
+ 				'rup' => 'vllahisht',
  				'rw' => 'kiniaruandisht',
  				'rwk' => 'ruaisht',
  				'sa' => 'sanskritisht',
+ 				'sad' => 'sandauisht',
+ 				'sah' => 'sakaisht',
  				'saq' => 'samburisht',
+ 				'sat' => 'santalisht',
+ 				'sba' => 'ngambajisht',
  				'sbp' => 'sanguisht',
+ 				'sc' => 'sardenjisht',
+ 				'scn' => 'siçilianisht',
+ 				'sco' => 'skotisht',
  				'sd' => 'sindisht',
  				'sdh' => 'kurdishte jugore',
  				'se' => 'samishte veriore',
- 				'seh' => 'senaishte',
+ 				'seh' => 'senaisht',
  				'ses' => 'senishte kojrabore',
  				'sg' => 'sangoisht',
- 				'sh' => 'Serbo-Kroatisht',
+ 				'sh' => 'serbo-kroatisht',
  				'shi' => 'taçelitisht',
+ 				'shn' => 'shanisht',
  				'si' => 'sinhalisht',
  				'sk' => 'sllovakisht',
  				'sl' => 'sllovenisht',
+ 				'sm' => 'samoanisht',
  				'sma' => 'samishte jugore',
- 				'smj' => 'samishte luleje',
- 				'smn' => 'samishte inarie',
- 				'sms' => 'samishte skolte',
+ 				'smj' => 'samishte lule',
+ 				'smn' => 'samishte inari',
+ 				'sms' => 'samishte skolti',
  				'sn' => 'shonisht',
+ 				'snk' => 'soninkisht',
  				'so' => 'somalisht',
  				'sq' => 'shqip',
  				'sr' => 'serbisht',
- 				'st' => 'Sesotho',
+ 				'srn' => 'srananisht (sranantongoisht)',
+ 				'ss' => 'suatisht',
+ 				'ssy' => 'sahoisht',
+ 				'st' => 'sotoishte jugore',
  				'su' => 'sundanisht',
+ 				'suk' => 'sukumaisht',
  				'sv' => 'suedisht',
  				'sw' => 'suahilisht',
- 				'sw_CD' => 'suahilishte kongoje',
- 				'ta' => 'tamile',
- 				'te' => 'teluge',
- 				'teo' => 'tezoisht',
+ 				'sw_CD' => 'suahilishte kongoleze',
+ 				'swb' => 'kamorianisht',
+ 				'syr' => 'siriakisht',
+ 				'ta' => 'tamilisht',
+ 				'te' => 'teluguisht',
+ 				'tem' => 'timneisht',
+ 				'teo' => 'tesoisht',
+ 				'tet' => 'tetumisht',
  				'tg' => 'taxhikisht',
  				'th' => 'tajlandisht',
- 				'ti' => 'tigrinje',
+ 				'ti' => 'tigrinjaisht',
+ 				'tig' => 'tigreisht',
  				'tk' => 'turkmenisht',
- 				'tlh' => 'Klingon',
+ 				'tlh' => 'klingonisht',
+ 				'tn' => 'cuanaisht',
  				'to' => 'tonganisht',
+ 				'tpi' => 'pisinishte toku',
  				'tr' => 'turqisht',
+ 				'trv' => 'torokoisht',
+ 				'ts' => 'congaisht',
  				'tt' => 'tatarisht',
- 				'tw' => 'Twi',
- 				'twq' => 'tasaukisht',
- 				'tzm' => 'tamaziatishte atlase qendrore',
- 				'ug' => 'ujgure',
+ 				'tum' => 'tumbukaisht',
+ 				'tvl' => 'tuvaluisht',
+ 				'tw' => 'tuisht',
+ 				'twq' => 'tasavakisht',
+ 				'ty' => 'tahitisht',
+ 				'tyv' => 'tuvinianisht',
+ 				'tzm' => 'tamazajtisht e Atlasit Qendror',
+ 				'udm' => 'udmurtisht',
+ 				'ug' => 'ujgurisht',
  				'uk' => 'ukrainisht',
- 				'und' => 'e panjohur',
- 				'ur' => 'urdu',
- 				'uz' => 'uzbeke',
+ 				'umb' => 'umbunduisht',
+ 				'und' => 'E panjohur',
+ 				'ur' => 'urduisht',
+ 				'uz' => 'uzbekisht',
  				'vai' => 'vaisht',
+ 				've' => 'vendaisht',
  				'vi' => 'vietnamisht',
- 				'vun' => 'vunjisht',
- 				'wbp' => 'uarlipirisht',
- 				'wo' => 'ulufisht',
- 				'xh' => 'xhozaisht',
+ 				'vo' => 'volapykisht',
+ 				'vun' => 'vunxhoisht',
+ 				'wa' => 'ualunisht',
+ 				'wae' => 'ualserisht',
+ 				'wal' => 'ulajtaisht',
+ 				'war' => 'uarajisht',
+ 				'wbp' => 'uarlpirisht',
+ 				'wo' => 'uolofisht',
+ 				'xal' => 'kalmikisht',
+ 				'xh' => 'xhosaisht',
  				'xog' => 'sogisht',
- 				'yi' => 'Jiden',
- 				'yo' => 'jorubisht',
- 				'zgh' => 'tamazishte standarde marokene',
+ 				'yav' => 'jangbenisht',
+ 				'ybb' => 'jembaisht',
+ 				'yi' => 'jidisht',
+ 				'yo' => 'jorubaisht',
+ 				'yue' => 'kantonezisht',
+ 				'zgh' => 'tamaziatishte standarde marokene',
  				'zh' => 'kinezisht',
- 				'zh_Hans' => 'kinezishte e thjeshtuar',
- 				'zh_Hant' => 'kinezishte tradicionale',
  				'zu' => 'zuluisht',
+ 				'zun' => 'zunisht',
  				'zxx' => 'nuk ka përmbajtje gjuhësore',
+ 				'zza' => 'zazaisht',
 
 			);
 			if (@_) {
@@ -634,6 +792,7 @@ has 'display_name_script' => (
  			'Grek' => 'grek',
  			'Gujr' => 'guxharat',
  			'Guru' => 'gurmuk',
+ 			'Hanb' => 'hanbik',
  			'Hang' => 'hangul',
  			'Hani' => 'han',
  			'Hans' => 'i thjeshtuar',
@@ -642,6 +801,8 @@ has 'display_name_script' => (
  			'Hant@alt=stand-alone' => 'han tradicional',
  			'Hebr' => 'hebraik',
  			'Hira' => 'hiragan',
+ 			'Hrkt' => 'alfabet rrokjesor japonez',
+ 			'Jamo' => 'jamosisht',
  			'Jpan' => 'japonez',
  			'Kana' => 'katakan',
  			'Khmr' => 'kmer',
@@ -659,6 +820,8 @@ has 'display_name_script' => (
  			'Thaa' => 'tanisht',
  			'Thai' => 'tajlandez',
  			'Tibt' => 'tibetisht',
+ 			'Zmth' => 'simbole matematikore',
+ 			'Zsye' => 'emoji',
  			'Zsym' => 'me simbole',
  			'Zxxx' => 'i pashkruar',
  			'Zyyy' => 'i zakonshëm',
@@ -732,31 +895,32 @@ has 'display_name_region' => (
  			'BE' => 'Belgjikë',
  			'BF' => 'Burkina-Faso',
  			'BG' => 'Bullgari',
- 			'BH' => 'Bahrein',
- 			'BI' => 'Burund',
+ 			'BH' => 'Bahrejn',
+ 			'BI' => 'Burundi',
  			'BJ' => 'Benin',
- 			'BL' => 'Shën-Bartolemeo',
+ 			'BL' => 'Shën Bartolomeu',
  			'BM' => 'Bermudë',
- 			'BN' => 'Brunej',
+ 			'BN' => 'Brunei',
  			'BO' => 'Bolivi',
  			'BQ' => 'Karaibet holandeze',
  			'BR' => 'Brazil',
  			'BS' => 'Bahamas',
  			'BT' => 'Butan',
- 			'BV' => 'Ishujt Bove’',
- 			'BW' => 'Botsuanë',
+ 			'BV' => 'Ishulli Bove',
+ 			'BW' => 'Botsvanë',
  			'BY' => 'Bjellorusi',
  			'BZ' => 'Belizë',
  			'CA' => 'Kanada',
- 			'CC' => 'Ishujt Kokosë',
+ 			'CC' => 'Ishujt Kokos',
  			'CD' => 'Kongo-Kinshasa',
  			'CD@alt=variant' => 'Kongo (RDK)',
- 			'CF' => 'Republika Afrikano-Qendrore',
+ 			'CF' => 'Republika e Afrikës Qendrore',
  			'CG' => 'Kongo-Brazavilë',
  			'CG@alt=variant' => 'Kongo (Republika)',
  			'CH' => 'Zvicër',
- 			'CI' => 'Bregu i Fildishtë',
- 			'CK' => 'Ishujt Kukë',
+ 			'CI' => 'Côte d’Ivoire',
+ 			'CI@alt=variant' => 'Bregu i Fildishtë',
+ 			'CK' => 'Ishujt Kuk',
  			'CL' => 'Kili',
  			'CM' => 'Kamerun',
  			'CN' => 'Kinë',
@@ -768,10 +932,11 @@ has 'display_name_region' => (
  			'CW' => 'Kuraçao',
  			'CX' => 'Ishulli i Krishtlindjes',
  			'CY' => 'Qipro',
- 			'CZ' => 'Republika Çeke',
+ 			'CZ' => 'Çeki',
+ 			'CZ@alt=variant' => 'Republika Çeke',
  			'DE' => 'Gjermani',
  			'DG' => 'Diego-Garsia',
- 			'DJ' => 'Xhibut',
+ 			'DJ' => 'Xhibuti',
  			'DK' => 'Danimarkë',
  			'DM' => 'Dominikë',
  			'DO' => 'Republika Dominikane',
@@ -785,10 +950,11 @@ has 'display_name_region' => (
  			'ES' => 'Spanjë',
  			'ET' => 'Etiopi',
  			'EU' => 'Bashkimi Europian',
+ 			'EZ' => 'Eurozonë',
  			'FI' => 'Finlandë',
  			'FJ' => 'Fixhi',
- 			'FK' => 'Ishujt Folklandë',
- 			'FK@alt=variant' => 'Ishujt Folklandë (Ishujt Malvine)',
+ 			'FK' => 'Ishujt Falkland',
+ 			'FK@alt=variant' => 'Ishujt Falkland (Malvine)',
  			'FM' => 'Mikronezi',
  			'FO' => 'Ishujt Faroe',
  			'FR' => 'Francë',
@@ -798,11 +964,11 @@ has 'display_name_region' => (
  			'GD' => 'Grenadë',
  			'GE' => 'Gjeorgji',
  			'GF' => 'Guajana Franceze',
- 			'GG' => 'Guernsej',
+ 			'GG' => 'Gernsej',
  			'GH' => 'Ganë',
  			'GI' => 'Gjibraltar',
  			'GL' => 'Grenlandë',
- 			'GM' => 'Gambi',
+ 			'GM' => 'Gambia',
  			'GN' => 'Guine',
  			'GP' => 'Guadalupe',
  			'GQ' => 'Guineja Ekuatoriale',
@@ -812,9 +978,9 @@ has 'display_name_region' => (
  			'GU' => 'Guam',
  			'GW' => 'Guine-Bisau',
  			'GY' => 'Guajanë',
- 			'HK' => 'RVAK i Hong Kongut',
- 			'HK@alt=short' => 'Hong Kong',
- 			'HM' => 'Ishulli Hërd dhe Ishujt Mekdonaldë',
+ 			'HK' => 'RPA i Hong-Kongut',
+ 			'HK@alt=short' => 'Hong-Kong',
+ 			'HM' => 'Ishulli Hërd dhe Ishujt Mekdonald',
  			'HN' => 'Honduras',
  			'HR' => 'Kroaci',
  			'HT' => 'Haiti',
@@ -837,18 +1003,18 @@ has 'display_name_region' => (
  			'KE' => 'Kenia',
  			'KG' => 'Kirgistan',
  			'KH' => 'Kamboxhia',
- 			'KI' => 'Qiribati',
+ 			'KI' => 'Kiribati',
  			'KM' => 'Komore',
  			'KN' => 'Shën-Kits dhe Nevis',
  			'KP' => 'Koreja e Veriut',
  			'KR' => 'Koreja e Jugut',
  			'KW' => 'Kuvajt',
- 			'KY' => 'Ishujt Kajmanë',
+ 			'KY' => 'Ishujt Kajman',
  			'KZ' => 'Kazakistan',
  			'LA' => 'Laos',
  			'LB' => 'Liban',
  			'LC' => 'Shën-Luçia',
- 			'LI' => 'Lihtënshtajn',
+ 			'LI' => 'Lihtenshtajn',
  			'LK' => 'Sri-Lankë',
  			'LR' => 'Liberi',
  			'LS' => 'Lesoto',
@@ -859,19 +1025,19 @@ has 'display_name_region' => (
  			'MA' => 'Marok',
  			'MC' => 'Monako',
  			'MD' => 'Moldavi',
- 			'ME' => 'Mali i Zi',
+ 			'ME' => 'Mal i Zi',
  			'MF' => 'Shën-Martin',
  			'MG' => 'Madagaskar',
- 			'MH' => 'Ishujt Marshallë',
+ 			'MH' => 'Ishujt Marshall',
  			'MK' => 'Maqedoni',
  			'MK@alt=variant' => 'Maqedoni (IRJM)',
  			'ML' => 'Mali',
  			'MM' => 'Mianmar (Burma)',
  			'MN' => 'Mongoli',
- 			'MO' => 'RVAK i Makaos',
+ 			'MO' => 'RPA i Makaos',
  			'MO@alt=short' => 'Makao',
  			'MP' => 'Ishujt e Marianës Veriore',
- 			'MQ' => 'Martinik',
+ 			'MQ' => 'Martinikë',
  			'MR' => 'Mauritani',
  			'MS' => 'Montserat',
  			'MT' => 'Maltë',
@@ -892,17 +1058,17 @@ has 'display_name_region' => (
  			'NP' => 'Nepal',
  			'NR' => 'Nauru',
  			'NU' => 'Niue',
- 			'NZ' => 'Zelanda e Re',
+ 			'NZ' => 'Zelandë e Re',
  			'OM' => 'Oman',
  			'PA' => 'Panama',
  			'PE' => 'Peru',
  			'PF' => 'Polinezia Franceze',
- 			'PG' => 'Papua Guineja e Re',
+ 			'PG' => 'Guineja e Re-Papua',
  			'PH' => 'Filipine',
  			'PK' => 'Pakistan',
  			'PL' => 'Poloni',
- 			'PM' => 'Shën-Peir dhe Mikuelon',
- 			'PN' => 'Ishujt Pitkernë',
+ 			'PM' => 'Shën Pier dhe Mikelon',
+ 			'PN' => 'Ishujt Pitkern',
  			'PR' => 'Porto-Riko',
  			'PS' => 'Territoret Palestineze',
  			'PS@alt=short' => 'Palestinë',
@@ -917,35 +1083,36 @@ has 'display_name_region' => (
  			'RU' => 'Rusi',
  			'RW' => 'Ruandë',
  			'SA' => 'Arabia Saudite',
- 			'SB' => 'Ishujt Solomonë',
- 			'SC' => 'Sishel',
+ 			'SB' => 'Ishujt Solomon',
+ 			'SC' => 'Sejshelle',
  			'SD' => 'Sudan',
  			'SE' => 'Suedi',
  			'SG' => 'Singapor',
- 			'SH' => 'Shën-Helena',
+ 			'SH' => 'Shën-Helenë',
  			'SI' => 'Slloveni',
- 			'SJ' => 'Svalbard e Zhan-Majen',
+ 			'SJ' => 'Svalbard dhe Jan-Majen',
  			'SK' => 'Sllovaki',
  			'SL' => 'Siera-Leone',
  			'SM' => 'San-Marino',
- 			'SN' => 'Senegali',
+ 			'SN' => 'Senegal',
  			'SO' => 'Somali',
  			'SR' => 'Surinami',
  			'SS' => 'Sudani i Jugut',
- 			'ST' => 'Sao-Tome e Prinsipe',
- 			'SV' => 'El Salvador',
- 			'SX' => 'Shën-Martin (Sint Maarten - pjesa e Mbretërisë së Holandës)',
+ 			'ST' => 'Sao Tome dhe Principe',
+ 			'SV' => 'Salvador',
+ 			'SX' => 'Sint-Marten',
  			'SY' => 'Siri',
- 			'SZ' => 'Suazilandë',
+ 			'SZ' => 'Svazilandë',
  			'TA' => 'Tristan-da-Kuna',
- 			'TC' => 'Ishujt Turke dhe Kaike',
+ 			'TC' => 'Ishujt Turks dhe Kaikos',
  			'TD' => 'Çad',
- 			'TF' => 'Territoret Australiane Franceze',
+ 			'TF' => 'Territoret Jugore Franceze',
  			'TG' => 'Togo',
  			'TH' => 'Tajlandë',
  			'TJ' => 'Taxhikistan',
  			'TK' => 'Tokelau',
- 			'TL' => 'Timori Lindor',
+ 			'TL' => 'Timor-Leste',
+ 			'TL@alt=variant' => 'Timori Lindor',
  			'TM' => 'Turkmenistan',
  			'TN' => 'Tunizi',
  			'TO' => 'Tonga',
@@ -956,25 +1123,27 @@ has 'display_name_region' => (
  			'TZ' => 'Tanzani',
  			'UA' => 'Ukrainë',
  			'UG' => 'Ugandë',
- 			'UM' => 'Ishujt periferikë të SHBA-së',
+ 			'UM' => 'Ishujt Periferikë të SHBA-së',
+ 			'UN' => 'Kombet e Bashkuara',
+ 			'UN@alt=short' => 'Kombet e Bashkuara',
  			'US' => 'Shtetet e Bashkuara të Amerikës',
  			'US@alt=short' => 'SHBA',
  			'UY' => 'Uruguai',
  			'UZ' => 'Uzbekistan',
  			'VA' => 'Vatikan',
- 			'VC' => 'Shën-Vinsent dhe Grenadinet',
+ 			'VC' => 'Shën-Vincent dhe Grenadine',
  			'VE' => 'Venezuelë',
  			'VG' => 'Ishujt e Virgjër Britanikë',
- 			'VI' => 'Ishujt e Virgjër Amerikanë',
+ 			'VI' => 'Ishujt e Virgjër të SHBA-së',
  			'VN' => 'Vietnam',
  			'VU' => 'Vanuatu',
- 			'WF' => 'Uollis e Futina',
+ 			'WF' => 'Uollis e Futuna',
  			'WS' => 'Samoa',
  			'XK' => 'Kosovë',
  			'YE' => 'Jemen',
  			'YT' => 'Majotë',
  			'ZA' => 'Afrika e Jugut',
- 			'ZM' => 'Zambi',
+ 			'ZM' => 'Zambia',
  			'ZW' => 'Zimbabve',
  			'ZZ' => 'I panjohur',
 
@@ -989,12 +1158,13 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Kalendari',
+ 			'cf' => 'Formati valutor',
  			'collation' => 'Radhitja',
  			'currency' => 'Valuta',
  			'hc' => 'Cikli orar (12 - 24)',
  			'lb' => 'Stili i gjerësisë së rreshtave',
  			'ms' => 'Sistemi i njësive matëse',
- 			'numbers' => 'Numrat',
+ 			'numbers' => 'Numrat/shifrat',
 
 		}
 	},
@@ -1011,7 +1181,7 @@ has 'display_name_type' => (
  				'chinese' => q{kalendar kinez},
  				'coptic' => q{Kalendari Koptik},
  				'dangi' => q{kalendar dangi},
- 				'ethiopic' => q{kalendar etiop},
+ 				'ethiopic' => q{kalendar etiopik},
  				'ethiopic-amete-alem' => q{Kalendari Etiopas Amete Alem},
  				'gregorian' => q{kalendar gregorian},
  				'hebrew' => q{kalendar hebraik},
@@ -1023,7 +1193,11 @@ has 'display_name_type' => (
  				'iso8601' => q{kalendar ISO-8601},
  				'japanese' => q{kalendar japonez},
  				'persian' => q{kalendar persian},
- 				'roc' => q{kalendar minguo (kinez)},
+ 				'roc' => q{kalendar minguoje (kinez)},
+ 			},
+ 			'cf' => {
+ 				'account' => q{format valutor llogaritës},
+ 				'standard' => q{format valutor standard},
  			},
  			'collation' => {
  				'big5han' => q{Radhitje e kinezishtes tradicionale - Big5},
@@ -1037,20 +1211,20 @@ has 'display_name_type' => (
  				'standard' => q{radhitje standarde},
  			},
  			'hc' => {
- 				'h11' => q{Sistemi 12-orësh (0 - 11)},
- 				'h12' => q{Sistemi 12-orësh (1 - 12)},
- 				'h23' => q{Sistemi 24-orësh (0 - 23)},
- 				'h24' => q{Sistemi 24-orësh (1 - 24)},
+ 				'h11' => q{sistem 12-orësh (0 - 11)},
+ 				'h12' => q{sistem 12-orësh (1 - 12)},
+ 				'h23' => q{sistem 24-orësh (0 - 23)},
+ 				'h24' => q{sistem 24-orësh (1 - 24)},
  			},
  			'lb' => {
- 				'loose' => q{Stili i gjerësisë së rreshtave - i larguar},
- 				'normal' => q{Stili i gjerësisë së rreshtave - normal},
- 				'strict' => q{Stili i gjerësisë së rreshtave - i ngushtuar},
+ 				'loose' => q{stil i gjerësisë së rreshtave - i larguar},
+ 				'normal' => q{stil i gjerësisë së rreshtave - normal},
+ 				'strict' => q{stil i gjerësisë së rreshtave - i ngushtuar},
  			},
  			'ms' => {
- 				'metric' => q{Sistemi metrik},
- 				'uksystem' => q{Sistemi imperial (britanik) i njësive matëse},
- 				'ussystem' => q{Sistemi amerikan i njësive matëse},
+ 				'metric' => q{sistem metrik},
+ 				'uksystem' => q{sistem imperial (britanik) i njësive matëse},
+ 				'ussystem' => q{sistem amerikan i njësive matëse},
  			},
  			'numbers' => {
  				'arab' => q{shifra indo-arabe},
@@ -1115,7 +1289,7 @@ has 'display_name_code_patterns' => (
 	default		=> sub { 
 		{
 			'language' => 'Gjuha: {0}',
- 			'script' => 'Shkrimi: {0}',
+ 			'script' => 'Skripti: {0}',
  			'region' => 'Rajoni: {0}',
 
 		}
@@ -1131,10 +1305,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[w])},
+			auxiliary => qr{[w]},
 			index => ['A', 'B', 'C', 'Ç', 'D', '{DH}', 'E', 'Ë', 'F', 'G', '{GJ}', 'H', 'I', 'J', 'K', 'L', '{LL}', 'M', 'N', '{NJ}', 'O', 'P', 'Q', 'R', '{RR}', 'S', '{SH}', 'T', '{TH}', 'U', 'V', 'X', '{XH}', 'Y', 'Z', '{ZH}'],
-			main => qr{(?^u:[a b c ç d {dh} e ë f g {gj} h i j k l {ll} m n {nj} o p q r {rr} s {sh} t {th} u v x {xh} y z {zh}])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” « » ( ) \[ \] § @ * / \& # ′ ″ ~])},
+			main => qr{[a b c ç d {dh} e ë f g {gj} h i j k l {ll} m n {nj} o p q r {rr} s {sh} t {th} u v x {xh} y z {zh}]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” « » ( ) \[ \] § @ * / \& # ′ ″ ~]},
 		};
 	},
 EOT
@@ -1151,7 +1326,11 @@ has 'ellipsis' => (
 	default		=> sub {
 		return {
 			'final' => '{0}…',
+			'initial' => '…{0}',
+			'medial' => '{0}…{1}',
 			'word-final' => '{0} …',
+			'word-initial' => '… {0}',
+			'word-medial' => '{0} … {1}',
 		};
 	},
 );
@@ -1214,9 +1393,9 @@ has 'units' => (
 						'other' => q({0} akra),
 					},
 					'acre-foot' => {
-						'name' => q(akra-këmbë),
-						'one' => q({0} akër-këmbë),
-						'other' => q({0} akra-këmbë),
+						'name' => q(këmbë-akër),
+						'one' => q({0} këmbë-akër),
+						'other' => q({0} këmbë-akër),
 					},
 					'ampere' => {
 						'name' => q(amper),
@@ -1280,10 +1459,10 @@ has 'units' => (
 						'other' => q({0} shekuj),
 					},
 					'coordinate' => {
-						'east' => q({0}Lindje),
-						'north' => q({0}Veri),
-						'south' => q({0}Jug),
-						'west' => q({0}Perëndim),
+						'east' => q({0} Lindje),
+						'north' => q({0} Veri),
+						'south' => q({0} Jug),
+						'west' => q({0} Perëndim),
 					},
 					'cubic-centimeter' => {
 						'name' => q(centimetra kub),
@@ -1359,9 +1538,9 @@ has 'units' => (
 						'other' => q({0} gradë Farenhait),
 					},
 					'fluid-ounce' => {
-						'name' => q(onsë fluidë),
-						'one' => q({0} ons fluidë),
-						'other' => q({0} onsë fluidë),
+						'name' => q(onsë të lëngshëm),
+						'one' => q({0} ons i lëngshëm),
+						'other' => q({0} onsë të lëngshëm),
 					},
 					'foodcalorie' => {
 						'name' => q(kalori ushqimore),
@@ -1384,6 +1563,12 @@ has 'units' => (
 						'one' => q({0} gallon),
 						'other' => q({0} gallonë),
 						'per' => q({0}/gallon),
+					},
+					'gallon-imperial' => {
+						'name' => q(gallonë imperial),
+						'one' => q({0} gallon imperial),
+						'other' => q({0} gallonë imperial),
+						'per' => q({0} për gallon imperial),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -1489,7 +1674,7 @@ has 'units' => (
 						'other' => q({0} kilokalori),
 					},
 					'kilogram' => {
-						'name' => q(kilogram),
+						'name' => q(kilogramë),
 						'one' => q({0} kilogram),
 						'other' => q({0} kilogramë),
 						'per' => q({0}/kilogram),
@@ -1627,6 +1812,11 @@ has 'units' => (
 						'one' => q({0} milje për gallon),
 						'other' => q({0} milje për gallon),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(milje për gallon imperial),
+						'one' => q({0} milje për gallon imperial),
+						'other' => q({0} milje për gallon imperial),
+					},
 					'mile-per-hour' => {
 						'name' => q(milje në orë),
 						'one' => q({0} milje në orë),
@@ -1652,6 +1842,11 @@ has 'units' => (
 						'one' => q({0} miligram),
 						'other' => q({0} miligramë),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(miligramë për decilitër),
+						'one' => q({0} miligram për decilitër),
+						'other' => q({0} miligramë për decilitër),
+					},
 					'milliliter' => {
 						'name' => q(mililitra),
 						'one' => q({0} mililitër),
@@ -1666,6 +1861,11 @@ has 'units' => (
 						'name' => q(milimetra mërkuri),
 						'one' => q({0} milimetër mërkuri),
 						'other' => q({0} milimetra mërkuri),
+					},
+					'millimole-per-liter' => {
+						'name' => q(milimolë për litër),
+						'one' => q({0} milimol për litër),
+						'other' => q({0} milimolë për litër),
 					},
 					'millisecond' => {
 						'name' => q(milisekonda),
@@ -1725,6 +1925,11 @@ has 'units' => (
 						'one' => q({0} parsek),
 						'other' => q({0} parsekë),
 					},
+					'part-per-million' => {
+						'name' => q(pjesë për milion),
+						'one' => q({0} pjesë për milion),
+						'other' => q({0} pjesë për milion),
+					},
 					'per' => {
 						'1' => q({0} në {1}),
 					},
@@ -1743,6 +1948,11 @@ has 'units' => (
 						'one' => q({0} pintë metrike),
 						'other' => q({0} pinta metrike),
 					},
+					'point' => {
+						'name' => q(shkallë),
+						'one' => q({0} shkallë),
+						'other' => q({0} shkallë),
+					},
 					'pound' => {
 						'name' => q(paund),
 						'one' => q({0} paund),
@@ -1755,9 +1965,9 @@ has 'units' => (
 						'other' => q({0} paund për inç në katror),
 					},
 					'quart' => {
-						'name' => q(çerekje),
+						'name' => q(çerekë),
 						'one' => q({0} çerek),
-						'other' => q({0} çerekje),
+						'other' => q({0} çerekë),
 					},
 					'radian' => {
 						'name' => q(radianë),
@@ -1765,9 +1975,9 @@ has 'units' => (
 						'other' => q({0} radianë),
 					},
 					'revolution' => {
-						'name' => q(revolucion),
-						'one' => q({0} revolucion),
-						'other' => q({0} revolucione),
+						'name' => q(rrotullim),
+						'one' => q({0} rrotullim),
+						'other' => q({0} rrotullime),
 					},
 					'second' => {
 						'name' => q(sekonda),
@@ -1796,6 +2006,7 @@ has 'units' => (
 						'name' => q(kilometra katrore),
 						'one' => q({0} kilometër katror),
 						'other' => q({0} kilometra katrore),
+						'per' => q({0} për kilometër katror),
 					},
 					'square-meter' => {
 						'name' => q(metra katrore),
@@ -1807,6 +2018,7 @@ has 'units' => (
 						'name' => q(milje katrore),
 						'one' => q({0} milje katror),
 						'other' => q({0} milje katrore),
+						'per' => q({0} për milje katrore),
 					},
 					'square-yard' => {
 						'name' => q(jardë katrore),
@@ -1819,9 +2031,9 @@ has 'units' => (
 						'other' => q({0} lugë gjelle),
 					},
 					'teaspoon' => {
-						'name' => q(lugë çaji),
-						'one' => q({0} lugë çaji),
-						'other' => q({0} lugë çaji),
+						'name' => q(lugë kafeje),
+						'one' => q({0} lugë kafeje),
+						'other' => q({0} lugë kafeje),
 					},
 					'terabit' => {
 						'name' => q(terabit),
@@ -1890,10 +2102,10 @@ has 'units' => (
 						'other' => q({0} cm),
 					},
 					'coordinate' => {
-						'east' => q({0}L),
-						'north' => q({0}V),
-						'south' => q({0}J),
-						'west' => q({0}P),
+						'east' => q({0} L),
+						'north' => q({0} V),
+						'south' => q({0} J),
+						'west' => q({0} P),
 					},
 					'cubic-kilometer' => {
 						'one' => q({0} km³),
@@ -2184,10 +2396,10 @@ has 'units' => (
 						'other' => q({0} shek.),
 					},
 					'coordinate' => {
-						'east' => q({0}L),
-						'north' => q({0}V),
-						'south' => q({0}J),
-						'west' => q({0}P),
+						'east' => q({0} L),
+						'north' => q({0} V),
+						'south' => q({0} J),
+						'west' => q({0} P),
 					},
 					'cubic-centimeter' => {
 						'name' => q(cm³),
@@ -2288,6 +2500,12 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'name' => q(gal Imp.),
+						'one' => q({0} gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2527,9 +2745,14 @@ has 'units' => (
 						'other' => q({0} mi),
 					},
 					'mile-per-gallon' => {
-						'name' => q(mi/gallon),
-						'one' => q({0} mi/gallon),
-						'other' => q({0} mi/gallon),
+						'name' => q(mi/gal),
+						'one' => q({0} mi/gal),
+						'other' => q({0} mi/gal),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mi/gal Imp.),
+						'one' => q({0} mi/gal Imp.),
+						'other' => q({0} mi/gal Imp.),
 					},
 					'mile-per-hour' => {
 						'name' => q(mi/h),
@@ -2556,6 +2779,11 @@ has 'units' => (
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mg/dL),
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+					},
 					'milliliter' => {
 						'name' => q(mL),
 						'one' => q({0} mL),
@@ -2570,6 +2798,11 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'name' => q(mmol/L),
+						'one' => q({0} mmol/L),
+						'other' => q({0} mmol/L),
 					},
 					'millisecond' => {
 						'name' => q(milisek.),
@@ -2629,6 +2862,11 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2646,6 +2884,11 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'name' => q(shkallë),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'name' => q(lb),
@@ -2669,9 +2912,9 @@ has 'units' => (
 						'other' => q({0} rad),
 					},
 					'revolution' => {
-						'name' => q(rev),
-						'one' => q({0} rev),
-						'other' => q({0} rev),
+						'name' => q(rrot.),
+						'one' => q({0} rrot.),
+						'other' => q({0} rrot.),
 					},
 					'second' => {
 						'name' => q(sek.),
@@ -2700,6 +2943,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(m²),
@@ -2711,6 +2955,7 @@ has 'units' => (
 						'name' => q(mi²),
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yd²),
@@ -2861,43 +3106,43 @@ has 'number_formats' => (
 					'other' => '000 mijë',
 				},
 				'1000000' => {
-					'one' => '0 Mln',
-					'other' => '0 Mln',
+					'one' => '0 mln',
+					'other' => '0 mln',
 				},
 				'10000000' => {
-					'one' => '00 Mln',
-					'other' => '00 Mln',
+					'one' => '00 mln',
+					'other' => '00 mln',
 				},
 				'100000000' => {
-					'one' => '000 Mln',
-					'other' => '000 Mln',
+					'one' => '000 mln',
+					'other' => '000 mln',
 				},
 				'1000000000' => {
-					'one' => '0 Mld',
-					'other' => '0 Mld',
+					'one' => '0 mld',
+					'other' => '0 mld',
 				},
 				'10000000000' => {
-					'one' => '00 Mld',
-					'other' => '00 Mld',
+					'one' => '00 mld',
+					'other' => '00 mld',
 				},
 				'100000000000' => {
-					'one' => '000 Mld',
-					'other' => '000 Mld',
+					'one' => '000 mld',
+					'other' => '000 mld',
 				},
 				'1000000000000' => {
-					'one' => '0 Bln',
-					'other' => '0 Bln',
+					'one' => '0 bln',
+					'other' => '0 bln',
 				},
 				'10000000000000' => {
-					'one' => '00 Bln',
-					'other' => '00 Bln',
+					'one' => '00 bln',
+					'other' => '00 bln',
 				},
 				'100000000000000' => {
-					'one' => '000 Bln',
-					'other' => '000 Bln',
+					'one' => '000 bln',
+					'other' => '000 bln',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -2964,54 +3209,54 @@ has 'number_formats' => (
 					'other' => '000 mijë',
 				},
 				'1000000' => {
-					'one' => '0 Mln',
-					'other' => '0 Mln',
+					'one' => '0 mln',
+					'other' => '0 mln',
 				},
 				'10000000' => {
-					'one' => '00 Mln',
-					'other' => '00 Mln',
+					'one' => '00 mln',
+					'other' => '00 mln',
 				},
 				'100000000' => {
-					'one' => '000 Mln',
-					'other' => '000 Mln',
+					'one' => '000 mln',
+					'other' => '000 mln',
 				},
 				'1000000000' => {
-					'one' => '0 Mld',
-					'other' => '0 Mld',
+					'one' => '0 mld',
+					'other' => '0 mld',
 				},
 				'10000000000' => {
-					'one' => '00 Mld',
-					'other' => '00 Mld',
+					'one' => '00 mld',
+					'other' => '00 mld',
 				},
 				'100000000000' => {
-					'one' => '000 Mld',
-					'other' => '000 Mld',
+					'one' => '000 mld',
+					'other' => '000 mld',
 				},
 				'1000000000000' => {
-					'one' => '0 Bln',
-					'other' => '0 Bln',
+					'one' => '0 bln',
+					'other' => '0 bln',
 				},
 				'10000000000000' => {
-					'one' => '00 Bln',
-					'other' => '00 Bln',
+					'one' => '00 bln',
+					'other' => '00 bln',
 				},
 				'100000000000000' => {
-					'one' => '000 Bln',
-					'other' => '000 Bln',
+					'one' => '000 bln',
+					'other' => '000 bln',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3089,9 +3334,9 @@ has 'currencies' => (
 		},
 		'ARS' => {
 			display_name => {
-				'currency' => q(Pezoja argjentinase),
-				'one' => q(pezo argjentinase),
-				'other' => q(pezo argjentinase),
+				'currency' => q(Pesoja argjentinase),
+				'one' => q(peso argjentinase),
+				'other' => q(peso argjentinase),
 			},
 		},
 		'AUD' => {
@@ -3208,11 +3453,18 @@ has 'currencies' => (
 				'other' => q(pula botsuane),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(Rubla bjelloruse),
 				'one' => q(rubël bjelloruse),
 				'other' => q(rubla bjelloruse),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(Rubla bjelloruse \(2000–2016\)),
+				'one' => q(rubël bjelloruse \(2000–2016\)),
+				'other' => q(rubla bjelloruse \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3246,9 +3498,16 @@ has 'currencies' => (
 		},
 		'CLP' => {
 			display_name => {
-				'currency' => q(Pezoja kiliane),
-				'one' => q(pezo kiliane),
-				'other' => q(pezo kiliane),
+				'currency' => q(Pesoja kiliane),
+				'one' => q(peso kiliane),
+				'other' => q(peso kiliane),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(Juani kinez \(tregu i jashtëm\)),
+				'one' => q(juan kinez \(tregu i jashtëm\)),
+				'other' => q(juanë kinez \(tregu i jashtëm\)),
 			},
 		},
 		'CNY' => {
@@ -3261,9 +3520,9 @@ has 'currencies' => (
 		},
 		'COP' => {
 			display_name => {
-				'currency' => q(Pezoja kolumbiane),
-				'one' => q(pezo kolumbiane),
-				'other' => q(pezo kolumbiane),
+				'currency' => q(Pesoja kolumbiane),
+				'one' => q(peso kolumbiane),
+				'other' => q(peso kolumbiane),
 			},
 		},
 		'CRC' => {
@@ -3275,16 +3534,16 @@ has 'currencies' => (
 		},
 		'CUC' => {
 			display_name => {
-				'currency' => q(Pezoja kubaneze e shkëmbyeshme),
-				'one' => q(pezo kubaneze e shkëmbyeshme),
-				'other' => q(pezo kubaneze të shkëmbyeshme),
+				'currency' => q(Pesoja kubaneze e shkëmbyeshme),
+				'one' => q(peso kubaneze e shkëmbyeshme),
+				'other' => q(peso kubaneze e shkëmbyeshme),
 			},
 		},
 		'CUP' => {
 			display_name => {
-				'currency' => q(Pezoja kubaneze),
-				'one' => q(pezo kubaneze),
-				'other' => q(pezo kubaneze),
+				'currency' => q(Pesoja kubaneze),
+				'one' => q(peso kubaneze),
+				'other' => q(peso kubaneze),
 			},
 		},
 		'CVE' => {
@@ -3317,9 +3576,9 @@ has 'currencies' => (
 		},
 		'DOP' => {
 			display_name => {
-				'currency' => q(Pezoja dominikane),
-				'one' => q(pezo dominikane),
-				'other' => q(pezo dominikane),
+				'currency' => q(Pesoja dominikane),
+				'one' => q(peso dominikane),
+				'other' => q(peso dominikane),
 			},
 		},
 		'DZD' => {
@@ -3367,9 +3626,9 @@ has 'currencies' => (
 		},
 		'FKP' => {
 			display_name => {
-				'currency' => q(Stërlina e Ishujve Folkland),
-				'one' => q(stërlinë e Ishujve Folkland),
-				'other' => q(stërlina të Ishujve Folkland),
+				'currency' => q(Stërlina e Ishujve Falkland),
+				'one' => q(stërlinë e Ishujve Falkland),
+				'other' => q(stërlina të Ishujve Falkland),
 			},
 		},
 		'GBP' => {
@@ -3432,9 +3691,9 @@ has 'currencies' => (
 		'HKD' => {
 			symbol => 'HK$',
 			display_name => {
-				'currency' => q(Dollari i Hong Kongut),
-				'one' => q(dollar Hong Kongu),
-				'other' => q(dollarë Hong Kongu),
+				'currency' => q(Dollari i Hong-Kongut),
+				'one' => q(dollar hong-kongu),
+				'other' => q(dollarë hong-kongu),
 			},
 		},
 		'HNL' => {
@@ -3653,9 +3912,9 @@ has 'currencies' => (
 		},
 		'MDL' => {
 			display_name => {
-				'currency' => q(Leu moldav),
-				'one' => q(leu moldav),
-				'other' => q(leu moldav),
+				'currency' => q(Leuja moldave),
+				'one' => q(leu moldave),
+				'other' => q(leu moldave),
 			},
 		},
 		'MGA' => {
@@ -3724,9 +3983,9 @@ has 'currencies' => (
 		'MXN' => {
 			symbol => 'MX$',
 			display_name => {
-				'currency' => q(Pezoja meksikane),
-				'one' => q(pezo meksikane),
-				'other' => q(pezo meksikane),
+				'currency' => q(Pesoja meksikane),
+				'one' => q(peso meksikane),
+				'other' => q(peso meksikane),
 			},
 		},
 		'MYR' => {
@@ -3802,23 +4061,23 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(Sola nuevo-peruane),
-				'one' => q(solë nuevo-peruane),
-				'other' => q(sola nuevo-peruane),
+				'currency' => q(Sola peruane),
+				'one' => q(solë peruane),
+				'other' => q(sola peruane),
 			},
 		},
 		'PGK' => {
 			display_name => {
-				'currency' => q(Kina e Papua-Guineas së Re),
-				'one' => q(kinë e Papua-Guineas së Re),
-				'other' => q(kina të Papua-Guineas së Re),
+				'currency' => q(Kina e Guinesë së Re-Papua),
+				'one' => q(kinë e Guinesë së Re-Papua),
+				'other' => q(kina të Guinesë së Re-Papua),
 			},
 		},
 		'PHP' => {
 			display_name => {
-				'currency' => q(Pezoja filipinase),
-				'one' => q(pezo filipinase),
-				'other' => q(pezo filipinase),
+				'currency' => q(Pesoja filipinase),
+				'one' => q(peso filipinase),
+				'other' => q(peso filipinase),
 			},
 		},
 		'PKR' => {
@@ -3851,9 +4110,9 @@ has 'currencies' => (
 		},
 		'RON' => {
 			display_name => {
-				'currency' => q(Leu rumun),
-				'one' => q(leu rumun),
-				'other' => q(leu rumun),
+				'currency' => q(Leuja rumune),
+				'one' => q(leu rumune),
+				'other' => q(leu rumune),
 			},
 		},
 		'RSD' => {
@@ -4063,10 +4322,11 @@ has 'currencies' => (
 			},
 		},
 		'UYU' => {
+			symbol => '$',
 			display_name => {
-				'currency' => q(Pezoja uruguaiane),
-				'one' => q(pezo uruguaiane),
-				'other' => q(pezo uruguaiane),
+				'currency' => q(Pesoja uruguaiane),
+				'one' => q(peso uruguaiane),
+				'other' => q(peso uruguaiane),
 			},
 		},
 		'UZS' => {
@@ -4077,6 +4337,7 @@ has 'currencies' => (
 			},
 		},
 		'VEF' => {
+			symbol => 'VEF',
 			display_name => {
 				'currency' => q(Bolivari venezuelian),
 				'one' => q(bolivar venezuelian),
@@ -4153,9 +4414,9 @@ has 'currencies' => (
 		},
 		'ZAR' => {
 			display_name => {
-				'currency' => q(Randa afrikano-jugore),
-				'one' => q(randë afrikano-jugore),
-				'other' => q(randa afrikano-jugore),
+				'currency' => q(Randi afrikano-jugor),
+				'one' => q(rand afrikano-jugor),
+				'other' => q(randë afrikano-jugor),
 			},
 		},
 		'ZMW' => {
@@ -4178,18 +4439,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'Jan',
-							'Shk',
-							'Mar',
-							'Pri',
-							'Maj',
-							'Qer',
-							'Kor',
-							'Gsh',
-							'Sht',
-							'Tet',
-							'Nën',
-							'Dhj'
+							'jan',
+							'shk',
+							'mar',
+							'pri',
+							'maj',
+							'qer',
+							'korr',
+							'gush',
+							'sht',
+							'tet',
+							'nën',
+							'dhj'
 						],
 						leap => [
 							
@@ -4197,18 +4458,18 @@ has 'calendar_months' => (
 					},
 					narrow => {
 						nonleap => [
-							'J',
-							'S',
-							'M',
-							'P',
-							'M',
-							'Q',
-							'K',
-							'G',
-							'S',
-							'T',
-							'N',
-							'D'
+							'j',
+							'sh',
+							'm',
+							'p',
+							'm',
+							'q',
+							'k',
+							'g',
+							'sh',
+							't',
+							'n',
+							'dh'
 						],
 						leap => [
 							
@@ -4243,8 +4504,8 @@ has 'calendar_months' => (
 							'Pri',
 							'Maj',
 							'Qer',
-							'Kor',
-							'Gsh',
+							'Korr',
+							'Gush',
 							'Sht',
 							'Tet',
 							'Nën',
@@ -4257,17 +4518,17 @@ has 'calendar_months' => (
 					narrow => {
 						nonleap => [
 							'J',
-							'S',
+							'Sh',
 							'M',
 							'P',
 							'M',
 							'Q',
 							'K',
 							'G',
-							'S',
+							'Sh',
 							'T',
 							'N',
-							'D'
+							'Dh'
 						],
 						leap => [
 							
@@ -4319,7 +4580,7 @@ has 'calendar_days' => (
 						wed => 'M',
 						thu => 'E',
 						fri => 'P',
-						sat => 'S',
+						sat => 'Sh',
 						sun => 'D'
 					},
 					short => {
@@ -4357,7 +4618,7 @@ has 'calendar_days' => (
 						wed => 'M',
 						thu => 'E',
 						fri => 'P',
-						sat => 'S',
+						sat => 'Sh',
 						sun => 'D'
 					},
 					short => {
@@ -4438,60 +4699,60 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 900;
 					return 'night1' if $time >= 0
 						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 400
 						&& $time < 900;
 					return 'night1' if $time >= 0
 						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -4511,73 +4772,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'afternoon1' => q{e pasdites},
-					'evening1' => q{mbrëmje},
-					'am' => q{e paradites},
-					'pm' => q{e pasdites},
+				'abbreviated' => {
 					'morning2' => q{e paradites},
-					'noon' => q{mesditë},
-					'night1' => q{natë},
-					'morning1' => q{mëngjes},
-					'midnight' => q{mesnatë},
+					'am' => q{e paradites},
+					'evening1' => q{e mbrëmjes},
+					'pm' => q{e pasdites},
+					'midnight' => q{e mesnatës},
+					'afternoon1' => q{e pasdites},
+					'morning1' => q{e mëngjesit},
+					'noon' => q{e mesditës},
+					'night1' => q{e natës},
 				},
 				'wide' => {
+					'evening1' => q{e mbrëmjes},
+					'am' => q{e paradites},
 					'morning2' => q{e paradites},
-					'noon' => q{mesditë},
-					'night1' => q{natë},
-					'morning1' => q{mëngjes},
-					'midnight' => q{mesnatë},
-					'afternoon1' => q{e pasdites},
-					'evening1' => q{mbrëmje},
-					'am' => q{e paradites},
 					'pm' => q{e pasdites},
+					'midnight' => q{e mesnatës},
+					'morning1' => q{e mëngjesit},
+					'afternoon1' => q{e pasdites},
+					'night1' => q{e natës},
+					'noon' => q{e mesditës},
 				},
-				'abbreviated' => {
-					'pm' => q{e pasdites},
-					'am' => q{e paradites},
+				'narrow' => {
 					'afternoon1' => q{e pasdites},
-					'evening1' => q{mbrëmje},
-					'night1' => q{natë},
-					'morning1' => q{mëngjes},
-					'noon' => q{mesditë},
-					'midnight' => q{mesnatë},
+					'morning1' => q{e mëngjesit},
+					'noon' => q{e mesditës},
+					'night1' => q{e natës},
+					'midnight' => q{e mesnatës},
+					'pm' => q{e pasdites},
+					'evening1' => q{e mbrëmjes},
+					'am' => q{e paradites},
 					'morning2' => q{e paradites},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{pasdite},
-					'am' => q{paradite},
-					'evening1' => q{mbrëmje},
+				'abbreviated' => {
+					'morning1' => q{mëngjes},
 					'afternoon1' => q{pasdite},
-					'midnight' => q{mesnatë},
 					'noon' => q{mesditë},
 					'night1' => q{natë},
-					'morning1' => q{mëngjes},
+					'pm' => q{pasdite},
+					'midnight' => q{mesnatë},
+					'am' => q{paradite},
 					'morning2' => q{paradite},
+					'evening1' => q{mbrëmje},
 				},
 				'narrow' => {
-					'night1' => q{natë},
+					'evening1' => q{mbrëmje},
+					'am' => q{paradite},
+					'morning2' => q{paradite},
 					'morning1' => q{mëngjes},
+					'afternoon1' => q{pasdite},
+					'night1' => q{natë},
 					'noon' => q{mesditë},
 					'midnight' => q{mesnatë},
-					'morning2' => q{paradite},
-					'afternoon1' => q{pasdite},
-					'evening1' => q{mbrëmje},
 					'pm' => q{pasdite},
-					'am' => q{paradite},
 				},
-				'abbreviated' => {
-					'am' => q{paradite},
-					'pm' => q{pasdite},
-					'evening1' => q{mbrëmje},
-					'afternoon1' => q{pasdite},
-					'morning2' => q{paradite},
+				'wide' => {
 					'midnight' => q{mesnatë},
+					'pm' => q{pasdite},
+					'afternoon1' => q{pasdite},
 					'morning1' => q{mëngjes},
-					'night1' => q{natë},
 					'noon' => q{mesditë},
+					'night1' => q{natë},
+					'am' => q{paradite},
+					'morning2' => q{paradite},
+					'evening1' => q{mbrëmje},
 				},
 			},
 		},
@@ -4593,16 +4854,16 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'p.e.r.',
-				'1' => 'e.r.'
+				'0' => 'p.K.',
+				'1' => 'mb.K.'
 			},
 			narrow => {
-				'0' => 'p.e.r.',
-				'1' => 'e.r.'
+				'0' => 'p.K.',
+				'1' => 'mb.K.'
 			},
 			wide => {
-				'0' => 'para erës së re',
-				'1' => 'erës së re'
+				'0' => 'para Krishtit',
+				'1' => 'mbas Krishtit'
 			},
 		},
 	} },
@@ -4670,15 +4931,24 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E, h:mm B},
+			EBhms => q{E, h:mm:ss B},
+			EHm => q{E, HH:mm},
+			EHms => q{E, HH:mm:ss},
 			Ed => q{E, d},
+			Ehm => q{E, h:mm a},
+			Ehms => q{E, h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM y G},
 			GyMMMd => q{d MMM y G},
-			H => q{H},
-			Hm => q{H.mm},
-			Hms => q{H.mm.ss},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
 			M => q{L},
 			MEd => q{E, d.M},
 			MMM => q{LLL},
@@ -4689,10 +4959,10 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{MM-dd},
 			Md => q{d.M},
 			d => q{d},
-			h => q{h.a},
-			hm => q{h.mm.a},
-			hms => q{h.mm.ss.a},
-			ms => q{mm.ss},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M.y GGGGG},
@@ -4706,7 +4976,12 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ, y G},
 		},
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
 			Ed => q{E, d},
@@ -4726,6 +5001,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMEd => q{E, d MMMM},
+			MMMMW => q{'java' W 'e' MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{d.M},
@@ -4747,6 +5023,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d.M.y},
 			yQQQ => q{QQQ, y},
 			yQQQQ => q{QQQQ, y},
+			yw => q{'java' w 'e' Y},
 		},
 	} },
 );
@@ -4757,7 +5034,7 @@ has 'datetime_formats_append_item' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			'Timezone' => '{0} {1}',
+			'Timezone' => '{0}, {1}',
 		},
 	} },
 );
@@ -4952,22 +5229,22 @@ has 'time_zone_names' => (
 	init_arg	=> undef,
 	default	=> sub { {
 		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(Ora e Grenuiçit: {0}),
-		gmtZeroFormat => q(Ora e Grenuiçit),
+		gmtFormat => q(GMT{0}),
+		gmtZeroFormat => q(GMT),
 		regionFormat => q(Ora: {0}),
 		regionFormat => q(Ora verore: {0}),
 		regionFormat => q(Ora standarde: {0}),
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Ora verore e Ejkrit [Ako]),
-				'generic' => q(Ora e Ejkrit [Ako]),
-				'standard' => q(Ora standarde e Ejkrit [Ako]),
+				'daylight' => q#Ora verore e Ejkrit [Ako]#,
+				'generic' => q#Ora e Ejkrit [Ako]#,
+				'standard' => q#Ora standarde e Ejkrit [Ako]#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Ora e Afganistanit),
+				'standard' => q#Ora e Afganistanit#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -5100,7 +5377,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Nairobi#,
 		},
 		'Africa/Ndjamena' => {
-			exemplarCity => q#Nxhamenë#,
+			exemplarCity => q#Ndjamena#,
 		},
 		'Africa/Niamey' => {
 			exemplarCity => q#Niamej#,
@@ -5128,45 +5405,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Ora e Afrikës Qendrore),
+				'standard' => q#Ora e Afrikës Qendrore#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Ora e Afrikës Lindore),
+				'standard' => q#Ora e Afrikës Lindore#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Ora standarde e Afrikës Jugore),
+				'standard' => q#Ora standarde e Afrikës Jugore#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Ora verore e Afrikës Perëndimore),
-				'generic' => q(Ora e Afrikës Perëndimore),
-				'standard' => q(Ora standarde e Afrikës Perëndimore),
+				'daylight' => q#Ora verore e Afrikës Perëndimore#,
+				'generic' => q#Ora e Afrikës Perëndimore#,
+				'standard' => q#Ora standarde e Afrikës Perëndimore#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Ora verore e Alsaskës),
-				'generic' => q(Ora e Alaskës),
-				'standard' => q(Ora standarde e Alaskës),
+				'daylight' => q#Ora verore e Alsaskës#,
+				'generic' => q#Ora e Alaskës#,
+				'standard' => q#Ora standarde e Alaskës#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Ora verore e Almatit),
-				'generic' => q(Ora e Almatit),
-				'standard' => q(Ora standarde e Almatit),
+				'daylight' => q#Ora verore e Almatit#,
+				'generic' => q#Ora e Almatit#,
+				'standard' => q#Ora standarde e Almatit#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Ora verore e Amazonës),
-				'generic' => q(Ora e Amazonës),
-				'standard' => q(Ora standarde e Amazonës),
+				'daylight' => q#Ora verore e Amazonës#,
+				'generic' => q#Ora e Amazonës#,
+				'standard' => q#Ora standarde e Amazonës#,
 			},
 		},
 		'America/Adak' => {
@@ -5206,7 +5483,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ushuaja#,
 		},
 		'America/Aruba' => {
-			exemplarCity => q#Aruba#,
+			exemplarCity => q#Arubë#,
 		},
 		'America/Asuncion' => {
 			exemplarCity => q#Asunsion#,
@@ -5311,7 +5588,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ejrunep#,
 		},
 		'America/El_Salvador' => {
-			exemplarCity => q#El Salvador#,
+			exemplarCity => q#Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort-Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -5332,7 +5612,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Grenadë#,
 		},
 		'America/Guadeloupe' => {
-			exemplarCity => q#Guadelupe#,
+			exemplarCity => q#Guadalupe#,
 		},
 		'America/Guatemala' => {
 			exemplarCity => q#Guatemalë#,
@@ -5353,7 +5633,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Hermosijo#,
 		},
 		'America/Indiana/Knox' => {
-			exemplarCity => q#Noks, Indiana#,
+			exemplarCity => q#Knoks, Indiana#,
 		},
 		'America/Indiana/Marengo' => {
 			exemplarCity => q#Marengo, Indiana#,
@@ -5449,7 +5729,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Qyteti i Meksikës#,
 		},
 		'America/Miquelon' => {
-			exemplarCity => q#Mikuelon#,
+			exemplarCity => q#Mikelon#,
 		},
 		'America/Moncton' => {
 			exemplarCity => q#Monkton#,
@@ -5461,7 +5741,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Montevideo#,
 		},
 		'America/Montserrat' => {
-			exemplarCity => q#Monteserat#,
+			exemplarCity => q#Montserat#,
 		},
 		'America/Nassau' => {
 			exemplarCity => q#Nasao#,
@@ -5506,13 +5786,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#Port-o-Prins#,
 		},
 		'America/Port_of_Spain' => {
-			exemplarCity => q#Porti i Spanjës#,
+			exemplarCity => q#Port of Spain#,
 		},
 		'America/Porto_Velho' => {
 			exemplarCity => q#Porto-Velho#,
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Porto-Riko#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta-Arenas#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Lumi i Shirave#,
@@ -5527,7 +5810,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Rexhina#,
 		},
 		'America/Resolute' => {
-			exemplarCity => q#Rezolutë#,
+			exemplarCity => q#Resolute#,
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Rio-Branko#,
@@ -5609,37 +5892,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Ora verore e SHBA-së Qendrore),
-				'generic' => q(Ora e SHBA-së Qendrore),
-				'standard' => q(Ora standarde e SHBA-së Qendrore),
+				'daylight' => q#Ora verore e SHBA-së Qendrore#,
+				'generic' => q#Ora e SHBA-së Qendrore#,
+				'standard' => q#Ora standarde e SHBA-së Qendrore#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Ora verore e SHBA-së Lindore),
-				'generic' => q(Ora e SHBA-së Lindore),
-				'standard' => q(Ora standarde e SHBA-së Lindore),
+				'daylight' => q#Ora verore e SHBA-së Lindore#,
+				'generic' => q#Ora e SHBA-së Lindore#,
+				'standard' => q#Ora standarde e SHBA-së Lindore#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Ora verore amerikane e Brezit Malor),
-				'generic' => q(Ora amerikane e Brezit Malor),
-				'standard' => q(Ora standarde amerikane e Brezit Malor),
+				'daylight' => q#Ora verore e Territoreve Amerikane të Brezit Malor#,
+				'generic' => q#Ora e Territoreve Amerikane të Brezit Malor#,
+				'standard' => q#Ora standarde e Territoreve Amerikane të Brezit Malor#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Ora verore amerikane e Bregut të Paqësorit),
-				'generic' => q(Ora amerikane e Bregut të Paqësorit),
-				'standard' => q(Ora standarde amerikane e Bregut të Paqësorit),
+				'daylight' => q#Ora verore e Territoreve Amerikane të Bregut të Paqësorit#,
+				'generic' => q#Ora e Territoreve Amerikane të Bregut të Paqësorit#,
+				'standard' => q#Ora standarde e Territoreve Amerikane të Bregut të Paqësorit#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Ora verore e Anadirit),
-				'generic' => q(Ora e Anadirit),
-				'standard' => q(Ora standarde e Anadirit),
+				'daylight' => q#Ora verore e Anadirit#,
+				'generic' => q#Ora e Anadirit#,
+				'standard' => q#Ora standarde e Anadirit#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -5677,30 +5960,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Ora verore e Apias),
-				'generic' => q(Ora e Apias),
-				'standard' => q(Ora standarde e Apias),
+				'daylight' => q#Ora verore e Apias#,
+				'generic' => q#Ora e Apias#,
+				'standard' => q#Ora standarde e Apias#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Ora verore e Aktaut),
-				'generic' => q(Ora e Aktaut),
-				'standard' => q(Ora standarde e Aktaut),
+				'daylight' => q#Ora verore e Aktaut#,
+				'generic' => q#Ora e Aktaut#,
+				'standard' => q#Ora standarde e Aktaut#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Ora verore e Aktobit),
-				'generic' => q(Ora e Aktobit),
-				'standard' => q(Ora standarde e Aktobit),
+				'daylight' => q#Ora verore e Aktobit#,
+				'generic' => q#Ora e Aktobit#,
+				'standard' => q#Ora standarde e Aktobit#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Ora verore arabe),
-				'generic' => q(Ora arabe),
-				'standard' => q(Ora standarde arabe),
+				'daylight' => q#Ora verore arabe#,
+				'generic' => q#Ora arabe#,
+				'standard' => q#Ora standarde arabe#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -5708,23 +5991,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Ora verore e Argjentinës),
-				'generic' => q(Ora e Argjentinës),
-				'standard' => q(Ora standarde e Argjentinës),
+				'daylight' => q#Ora verore e Argjentinës#,
+				'generic' => q#Ora e Argjentinës#,
+				'standard' => q#Ora standarde e Argjentinës#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Ora verore e Argjentinës Perëndimore),
-				'generic' => q(Ora e Argjentinës Perëndimore),
-				'standard' => q(Ora standarde e Argjentinës Perëndimore),
+				'daylight' => q#Ora verore e Argjentinës Perëndimore#,
+				'generic' => q#Ora e Argjentinës Perëndimore#,
+				'standard' => q#Ora standarde e Argjentinës Perëndimore#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Ora verore e Armenisë),
-				'generic' => q(Ora e Armenisë),
-				'standard' => q(Ora standarde e Armenisë),
+				'daylight' => q#Ora verore e Armenisë#,
+				'generic' => q#Ora e Armenisë#,
+				'standard' => q#Ora standarde e Armenisë#,
 			},
 		},
 		'Asia/Aden' => {
@@ -5748,6 +6031,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ashgabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atirau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Bagdad#,
 		},
@@ -5759,6 +6045,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Bejrut#,
@@ -5796,6 +6085,9 @@ has 'time_zone_names' => (
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dushanbe#,
 		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagustë#,
+		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gaza#,
 		},
@@ -5818,7 +6110,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Xhajapurë#,
 		},
 		'Asia/Jerusalem' => {
-			exemplarCity => q#Jeruzalem#,
+			exemplarCity => q#Jerusalem#,
 		},
 		'Asia/Kabul' => {
 			exemplarCity => q#Kabul#,
@@ -5857,13 +6149,13 @@ has 'time_zone_names' => (
 			exemplarCity => q#Makasar#,
 		},
 		'Asia/Manila' => {
-			exemplarCity => q#Manila#,
+			exemplarCity => q#Manilë#,
 		},
 		'Asia/Muscat' => {
 			exemplarCity => q#Muskat#,
 		},
 		'Asia/Nicosia' => {
-			exemplarCity => q#Nikozi#,
+			exemplarCity => q#Nikozia#,
 		},
 		'Asia/Novokuznetsk' => {
 			exemplarCity => q#Novokuznetsk#,
@@ -5937,6 +6229,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokio#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulanbatar#,
 		},
@@ -5963,9 +6258,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Ora verore e Atlantikut),
-				'generic' => q(Ora e Atlantikut),
-				'standard' => q(Ora standarde e Atlantikut),
+				'daylight' => q#Ora verore e Atlantikut#,
+				'generic' => q#Ora e Atlantikut#,
+				'standard' => q#Ora standarde e Atlantikut#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -5978,7 +6273,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Kanari#,
 		},
 		'Atlantic/Cape_Verde' => {
-			exemplarCity => q#Kepi Verde#,
+			exemplarCity => q#Kepi i Gjelbër#,
 		},
 		'Atlantic/Faeroe' => {
 			exemplarCity => q#Faroe#,
@@ -5987,10 +6282,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Madeira#,
 		},
 		'Atlantic/Reykjavik' => {
-			exemplarCity => q#Rejkjavik#,
+			exemplarCity => q#Reikjavik#,
 		},
 		'Atlantic/South_Georgia' => {
-			exemplarCity => q#Gjeorgjia e Jugut#,
+			exemplarCity => q#Xhorxha e Jugut#,
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Shën-Helenë#,
@@ -6023,7 +6318,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Lindëmen#,
 		},
 		'Australia/Lord_Howe' => {
-			exemplarCity => q#Lord Houi#,
+			exemplarCity => q#Lord-Houi#,
 		},
 		'Australia/Melbourne' => {
 			exemplarCity => q#Melburn#,
@@ -6036,176 +6331,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Ora verore e Australisë Qendrore),
-				'generic' => q(Ora e Australisë Qendrore),
-				'standard' => q(Ora standarde e Australisë Qendrore),
+				'daylight' => q#Ora verore e Australisë Qendrore#,
+				'generic' => q#Ora e Australisë Qendrore#,
+				'standard' => q#Ora standarde e Australisë Qendrore#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Ora verore e Australisë Qendroro-Perëndimore),
-				'generic' => q(Ora e Australisë Qendroro-Perëndimore),
-				'standard' => q(Ora standarde e Australisë Qendroro-Perëndimore),
+				'daylight' => q#Ora verore e Australisë Qendroro-Perëndimore#,
+				'generic' => q#Ora e Australisë Qendroro-Perëndimore#,
+				'standard' => q#Ora standarde e Australisë Qendroro-Perëndimore#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Ora verore e Australisë Lindore),
-				'generic' => q(Ora e Australisë Lindore),
-				'standard' => q(Ora standarde e Australisë Lindore),
+				'daylight' => q#Ora verore e Australisë Lindore#,
+				'generic' => q#Ora e Australisë Lindore#,
+				'standard' => q#Ora standarde e Australisë Lindore#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Ora verore e Australisë Perëndimore),
-				'generic' => q(Ora e Australisë Perëndimore),
-				'standard' => q(Ora standarde e Australisë Perëndimore),
+				'daylight' => q#Ora verore e Australisë Perëndimore#,
+				'generic' => q#Ora e Australisë Perëndimore#,
+				'standard' => q#Ora standarde e Australisë Perëndimore#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Ora verore e Azerbajxhanit),
-				'generic' => q(Ora e Azerbajxhanit),
-				'standard' => q(Ora standarde e Azerbajxhanit),
+				'daylight' => q#Ora verore e Azerbajxhanit#,
+				'generic' => q#Ora e Azerbajxhanit#,
+				'standard' => q#Ora standarde e Azerbajxhanit#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Ora verore e Azoreve),
-				'generic' => q(Ora e Azoreve),
-				'standard' => q(Ora standarde e Azoreve),
+				'daylight' => q#Ora verore e Azoreve#,
+				'generic' => q#Ora e Azoreve#,
+				'standard' => q#Ora standarde e Azoreve#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Ora verore e Bangladeshit),
-				'generic' => q(Ora e Bangladeshit),
-				'standard' => q(Ora standarde e Bangladeshit),
+				'daylight' => q#Ora verore e Bangladeshit#,
+				'generic' => q#Ora e Bangladeshit#,
+				'standard' => q#Ora standarde e Bangladeshit#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Ora e Butanit),
+				'standard' => q#Ora e Butanit#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Ora e Bolivisë),
+				'standard' => q#Ora e Bolivisë#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Ora verore e Brasilës),
-				'generic' => q(Ora e Brasilës),
-				'standard' => q(Ora standarde e Brasilës),
+				'daylight' => q#Ora verore e Brasilës#,
+				'generic' => q#Ora e Brasilës#,
+				'standard' => q#Ora standarde e Brasilës#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Ora e Brunei-Durasalamit),
+				'standard' => q#Ora e Brunei-Durasalamit#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Ora verore e Kepit të Gjelbër),
-				'generic' => q(Ora e Kepit të Gjelbër),
-				'standard' => q(Ora standarde e Kepit të Gjelbër),
+				'daylight' => q#Ora verore e Kepit të Gjelbër#,
+				'generic' => q#Ora e Kepit të Gjelbër#,
+				'standard' => q#Ora standarde e Kepit të Gjelbër#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(Ora e Kejsit),
+				'standard' => q#Ora e Kejsit#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Ora e Kamorros),
+				'standard' => q#Ora e Kamorros#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Ora verore e Katamit),
-				'generic' => q(Ora e Katamit),
-				'standard' => q(Ora standarde e Katamit),
+				'daylight' => q#Ora verore e Katamit#,
+				'generic' => q#Ora e Katamit#,
+				'standard' => q#Ora standarde e Katamit#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Ora verore e Kilit),
-				'generic' => q(Ora e Kilit),
-				'standard' => q(Ora standarde e Kilit),
+				'daylight' => q#Ora verore e Kilit#,
+				'generic' => q#Ora e Kilit#,
+				'standard' => q#Ora standarde e Kilit#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Ora verore e Kinës),
-				'generic' => q(Ora e Kinës),
-				'standard' => q(Ora standarde e Kinës),
+				'daylight' => q#Ora verore e Kinës#,
+				'generic' => q#Ora e Kinës#,
+				'standard' => q#Ora standarde e Kinës#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Ora verore e Çoibalsanit),
-				'generic' => q(Ora e Çoibalsanit),
-				'standard' => q(Ora standarde e Çoibalsanit),
+				'daylight' => q#Ora verore e Çoibalsanit#,
+				'generic' => q#Ora e Çoibalsanit#,
+				'standard' => q#Ora standarde e Çoibalsanit#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Ora e Ishullit të Krishtlindjeve),
+				'standard' => q#Ora e Ishullit të Krishtlindjeve#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Ora e Ishujve Kokos),
+				'standard' => q#Ora e Ishujve Kokos#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Ora verore e Kolumbisë),
-				'generic' => q(Ora e Kolumbisë),
-				'standard' => q(Ora standarde e Kolumbisë),
+				'daylight' => q#Ora verore e Kolumbisë#,
+				'generic' => q#Ora e Kolumbisë#,
+				'standard' => q#Ora standarde e Kolumbisë#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Ora verore e Ishujve Kuk),
-				'generic' => q(Ora e Ishujve Kuk),
-				'standard' => q(Ora standarde e Ishujve Kuk),
+				'daylight' => q#Ora verore e Ishujve Kuk#,
+				'generic' => q#Ora e Ishujve Kuk#,
+				'standard' => q#Ora standarde e Ishujve Kuk#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Ora verore e Kubës),
-				'generic' => q(Ora e Kubës),
-				'standard' => q(Ora standarde e Kubës),
+				'daylight' => q#Ora verore e Kubës#,
+				'generic' => q#Ora e Kubës#,
+				'standard' => q#Ora standarde e Kubës#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Ora e Dejvisit),
+				'standard' => q#Ora e Dejvisit#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Ora e Dumont-d’Urvilës),
+				'standard' => q#Ora e Dumont-d’Urvilës#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Ora e Timorit Lindor),
+				'standard' => q#Ora e Timorit Lindor#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Ora verore e Ishullit të Pashkës),
-				'generic' => q(Ora e Ishullit të Pashkës),
-				'standard' => q(Ora standarde e Ishullit të Pashkës),
+				'daylight' => q#Ora verore e Ishullit të Pashkës#,
+				'generic' => q#Ora e Ishullit të Pashkës#,
+				'standard' => q#Ora standarde e Ishullit të Pashkës#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ora e Ekuadorit),
+				'standard' => q#Ora e Ekuadorit#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Ora universale e koordinuar#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -6217,6 +6517,9 @@ has 'time_zone_names' => (
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorrë#,
 		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrakan#,
+		},
 		'Europe/Athens' => {
 			exemplarCity => q#Athinë#,
 		},
@@ -6227,7 +6530,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Berlin#,
 		},
 		'Europe/Bratislava' => {
-			exemplarCity => q#Bratisllavë#,
+			exemplarCity => q#Bratislavë#,
 		},
 		'Europe/Brussels' => {
 			exemplarCity => q#Bruksel#,
@@ -6250,7 +6553,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(Ora verore e Irlandës),
+				'daylight' => q#Ora strandarde e Irlandës#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -6277,6 +6580,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisbonë#,
 		},
@@ -6286,7 +6592,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Londër#,
 			long => {
-				'daylight' => q(Ora verore britanike),
+				'daylight' => q#Ora verore britanike#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -6337,6 +6643,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevë#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -6354,6 +6663,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tiranë#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Uljanovsk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Uzhgorod#,
@@ -6383,138 +6695,138 @@ has 'time_zone_names' => (
 			exemplarCity => q#Zaporozhje#,
 		},
 		'Europe/Zurich' => {
-			exemplarCity => q#Cyrih#,
+			exemplarCity => q#Zyrih#,
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Ora verore e Europës Qendrore),
-				'generic' => q(Ora e Europës Qendrore),
-				'standard' => q(Ora standarde e Europës Qendrore),
+				'daylight' => q#Ora verore e Evropës Qendrore#,
+				'generic' => q#Ora e Evropës Qendrore#,
+				'standard' => q#Ora standarde e Evropës Qendrore#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Ora verore e Europës Lindore),
-				'generic' => q(Ora e Europës Lindore),
-				'standard' => q(Ora standarde e Europës Lindore),
+				'daylight' => q#Ora verore e Evropës Lindore#,
+				'generic' => q#Ora e Evropës Lindore#,
+				'standard' => q#Ora standarde e Evropës Lindore#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Ora e Lindjes së Largët Europiane),
+				'standard' => q#Ora e Evropës së Largët Lindore#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Ora verore e Europës Perëndimore),
-				'generic' => q(Ora e Europës Perëndimore),
-				'standard' => q(Ora standarde e Europës Perëndimore),
+				'daylight' => q#Ora verore e Evropës Perëndimore#,
+				'generic' => q#Ora e Evropës Perëndimore#,
+				'standard' => q#Ora standarde e Evropës Perëndimore#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Ora verore e Ishujve Folkland),
-				'generic' => q(Ora e Ishujve Folkland),
-				'standard' => q(Ora standarde e Ishujve Folkland),
+				'daylight' => q#Ora verore e Ishujve Falkland#,
+				'generic' => q#Ora e Ishujve Falkland#,
+				'standard' => q#Ora standarde e Ishujve Falkland#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Ora verore e Fixhit),
-				'generic' => q(Ora e Fixhit),
-				'standard' => q(Ora standarde e Fixhit),
+				'daylight' => q#Ora verore e Fixhit#,
+				'generic' => q#Ora e Fixhit#,
+				'standard' => q#Ora standarde e Fixhit#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Ora e Guajanës Franceze),
+				'standard' => q#Ora e Guajanës Franceze#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Ora e Rajoneve Australiane dhe Antraktike Franceze),
+				'standard' => q#Ora e Territoreve Jugore dhe Antarktike Franceze#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Ora e Meridianit të Grinuiçit),
+				'standard' => q#Ora e Grinuiçit#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Ora e Galapagosit),
+				'standard' => q#Ora e Galapagosit#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Ora e Gambierit),
+				'standard' => q#Ora e Gambierit#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Ora verore e Gjeorgjisë),
-				'generic' => q(Ora e Gjeorgjisë),
-				'standard' => q(Ora standarde e Gjeorgjisë),
+				'daylight' => q#Ora verore e Gjeorgjisë#,
+				'generic' => q#Ora e Gjeorgjisë#,
+				'standard' => q#Ora standarde e Gjeorgjisë#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Ora e Ishujve Gilbert),
+				'standard' => q#Ora e Ishujve Gilbert#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Ora verore e Grenlandës Lindore),
-				'generic' => q(Ora e Grenlandës Lindore),
-				'standard' => q(Ora standarde e Grenlandës Lindore),
+				'daylight' => q#Ora verore e Grenlandës Lindore#,
+				'generic' => q#Ora e Grenlandës Lindore#,
+				'standard' => q#Ora standarde e Grenlandës Lindore#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Ora verore e Grenlandës Perëndimore),
-				'generic' => q(Ora e Grenlandës Perëndimore),
-				'standard' => q(Ora standarde e Grenlandës Perëndimore),
+				'daylight' => q#Ora verore e Grenlandës Perëndimore#,
+				'generic' => q#Ora e Grenlandës Perëndimore#,
+				'standard' => q#Ora standarde e Grenlandës Perëndimore#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Ora e Guamit),
+				'standard' => q#Ora e Guamit#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Ora e Gjirit),
+				'standard' => q#Ora e Gjirit#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Ora e Guajanës),
+				'standard' => q#Ora e Guajanës#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Ora verore e Ishujve Hauai-Aleutian),
-				'generic' => q(Ora e Ishujve Hauai-Aleutian),
-				'standard' => q(Ora standarde e Ishujve Hauai-Aleutian),
+				'daylight' => q#Ora verore e Ishujve Hauai-Aleutian#,
+				'generic' => q#Ora e Ishujve Hauai-Aleutian#,
+				'standard' => q#Ora standarde e Ishujve Hauai-Aleutian#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Ora verore e Hong-Kongut),
-				'generic' => q(Ora e Hong-Kongut),
-				'standard' => q(Ora standarde e Hong-Kongut),
+				'daylight' => q#Ora verore e Hong-Kongut#,
+				'generic' => q#Ora e Hong-Kongut#,
+				'standard' => q#Ora standarde e Hong-Kongut#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Ora verore e Hovdit),
-				'generic' => q(Ora e Hovdit),
-				'standard' => q(Ora standarde e Hovdit),
+				'daylight' => q#Ora verore e Hovdit#,
+				'generic' => q#Ora e Hovdit#,
+				'standard' => q#Ora standarde e Hovdit#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Ora standarde e Indisë),
+				'standard' => q#Ora standarde e Indisë#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -6552,264 +6864,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Ora e Oqeanit Indian),
+				'standard' => q#Ora e Oqeanit Indian#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Ora e Indokinës),
+				'standard' => q#Ora e Indokinës#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Ora e Indonezisë Qendrore),
+				'standard' => q#Ora e Indonezisë Qendrore#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Ora e Indonezisë Lindore),
+				'standard' => q#Ora e Indonezisë Lindore#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Ora e Indonezisë Perëndimore),
+				'standard' => q#Ora e Indonezisë Perëndimore#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Ora verore e Iranit),
-				'generic' => q(Ora e Iranit),
-				'standard' => q(Ora standarde e Iranit),
+				'daylight' => q#Ora verore e Iranit#,
+				'generic' => q#Ora e Iranit#,
+				'standard' => q#Ora standarde e Iranit#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Ora verore e Irkutskut),
-				'generic' => q(Ora e Irkutskut),
-				'standard' => q(Ora standarde e Irkutskut),
+				'daylight' => q#Ora verore e Irkutskut#,
+				'generic' => q#Ora e Irkutskut#,
+				'standard' => q#Ora standarde e Irkutskut#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Ora verore e Izraelit),
-				'generic' => q(Ora e Izraelit),
-				'standard' => q(Ora standarde e Izraelit),
+				'daylight' => q#Ora verore e Izraelit#,
+				'generic' => q#Ora e Izraelit#,
+				'standard' => q#Ora standarde e Izraelit#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Ora verore e Japonisë),
-				'generic' => q(Ora e Japonisë),
-				'standard' => q(Ora standarde e Japonisë),
+				'daylight' => q#Ora verore e Japonisë#,
+				'generic' => q#Ora e Japonisë#,
+				'standard' => q#Ora standarde e Japonisë#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Ora verore e Petropavllovsk-Kamçatkës),
-				'generic' => q(Ora e Petropavllovsk-Kamçatkës),
-				'standard' => q(Ora standarde e Petropavllovsk-Kamçatkës),
+				'daylight' => q#Ora verore e Petropavllovsk-Kamçatkës#,
+				'generic' => q#Ora e Petropavllovsk-Kamçatkës#,
+				'standard' => q#Ora standarde e Petropavllovsk-Kamçatkës#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Ora e Kazakistanit Lindor),
+				'standard' => q#Ora e Kazakistanit Lindor#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Ora e Kazakistanit Perëndimor),
+				'standard' => q#Ora e Kazakistanit Perëndimor#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Ora verore koreane),
-				'generic' => q(Ora koreane),
-				'standard' => q(Ora standarde koreane),
+				'daylight' => q#Ora verore koreane#,
+				'generic' => q#Ora koreane#,
+				'standard' => q#Ora standarde koreane#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Ora e Kosrës),
+				'standard' => q#Ora e Kosrës#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Ora verore e Krasnojarskut),
-				'generic' => q(Ora e Krasnojarskut),
-				'standard' => q(Ora standarde e Krasnojarskut),
+				'daylight' => q#Ora verore e Krasnojarskut#,
+				'generic' => q#Ora e Krasnojarskut#,
+				'standard' => q#Ora standarde e Krasnojarskut#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Ora e Kirgistanit),
+				'standard' => q#Ora e Kirgistanit#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Ora e Lankasë),
+				'standard' => q#Ora e Lankasë#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Ora e Ishujve Sporadikë Ekuatorialë),
+				'standard' => q#Ora e Ishujve Sporadikë Ekuatorialë#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Ora verore e Lord-Houit),
-				'generic' => q(Ora e Lord-Houit),
-				'standard' => q(Ora standarde e Lord-Houit),
+				'daylight' => q#Ora verore e Lord-Houit#,
+				'generic' => q#Ora e Lord-Houit#,
+				'standard' => q#Ora standarde e Lord-Houit#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Ora verore e Makaos),
-				'generic' => q(Ora e Makaos),
-				'standard' => q(Ora standarde e Makaos),
+				'daylight' => q#Ora verore e Makaos#,
+				'generic' => q#Ora e Makaos#,
+				'standard' => q#Ora standarde e Makaos#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Ora e Ishullit Makuari),
+				'standard' => q#Ora e Ishullit Makuari#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Ora verore e Magadanit),
-				'generic' => q(Ora e Magadanit),
-				'standard' => q(Ora standarde e Magadanit),
+				'daylight' => q#Ora verore e Magadanit#,
+				'generic' => q#Ora e Magadanit#,
+				'standard' => q#Ora standarde e Magadanit#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Ora e Malajzisë),
+				'standard' => q#Ora e Malajzisë#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Ora e Maldivit),
+				'standard' => q#Ora e Maldiveve#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Ora e Ishujve Markezë),
+				'standard' => q#Ora e Ishujve Markezë#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Ora e Ishujve Marshallë),
+				'standard' => q#Ora e Ishujve Marshallë#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Ora verore e Mauritiusit),
-				'generic' => q(Ora e Mauritiusit),
-				'standard' => q(Ora standarde e Mauritiusit),
+				'daylight' => q#Ora verore e Mauritiusit#,
+				'generic' => q#Ora e Mauritiusit#,
+				'standard' => q#Ora standarde e Mauritiusit#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Ora e Mausonit),
+				'standard' => q#Ora e Mausonit#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Ora verore e Meksikës Veriperëndimore),
-				'generic' => q(Ora e Meksikës Veriperëndimore),
-				'standard' => q(Ora standarde e Meksikës Veriperëndimore),
+				'daylight' => q#Ora verore e Meksikës Veriperëndimore#,
+				'generic' => q#Ora e Meksikës Veriperëndimore#,
+				'standard' => q#Ora standarde e Meksikës Veriperëndimore#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Ora verore meksikane e Bregut të Paqësorit),
-				'generic' => q(Ora meksikane e Bregut të Paqësorit),
-				'standard' => q(Ora standarde meksikane e Bregut të Paqësorit),
+				'daylight' => q#Ora verore e Territoreve Meksikane të Bregut të Paqësorit#,
+				'generic' => q#Ora e Territoreve Meksikane të Bregut të Paqësorit#,
+				'standard' => q#Ora standarde e Territoreve Meksikane të Bregut të Paqësorit#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ora verore e Ulan-Batorit),
-				'generic' => q(Ora e Ulan-Batorit),
-				'standard' => q(Ora standarde e Ulan-Batorit),
+				'daylight' => q#Ora verore e Ulan-Batorit#,
+				'generic' => q#Ora e Ulan-Batorit#,
+				'standard' => q#Ora standarde e Ulan-Batorit#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Ora verore e Moskës),
-				'generic' => q(Ora e Moskës),
-				'standard' => q(Ora standarde e Moskës),
+				'daylight' => q#Ora verore e Moskës#,
+				'generic' => q#Ora e Moskës#,
+				'standard' => q#Ora standarde e Moskës#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Ora e Mianmarit),
+				'standard' => q#Ora e Mianmarit#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Ora e Naurusë),
+				'standard' => q#Ora e Naurusë#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Ora e Nepalit),
+				'standard' => q#Ora e Nepalit#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Ora verore e Kaledonisë së Re),
-				'generic' => q(Ora e Kaledonisë së Re),
-				'standard' => q(Ora standarde e Kaledonisë së Re),
+				'daylight' => q#Ora verore e Kaledonisë së Re#,
+				'generic' => q#Ora e Kaledonisë së Re#,
+				'standard' => q#Ora standarde e Kaledonisë së Re#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Ora verore e Zelandës së Re),
-				'generic' => q(Ora e Zelandës së Re),
-				'standard' => q(Ora standarde e Zelandës së Re),
+				'daylight' => q#Ora verore e Zelandës së Re#,
+				'generic' => q#Ora e Zelandës së Re#,
+				'standard' => q#Ora standarde e Zelandës së Re#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Ora verore e Njufaundlendit [Tokës së Re]),
-				'generic' => q(Ora e Njufaundlendit [Tokës së Re]),
-				'standard' => q(Ora standarde e Njufaundlendit [Tokës së Re]),
+				'daylight' => q#Ora verore e Njufaundlendit [Tokës së Re]#,
+				'generic' => q#Ora e Njufaundlendit [Tokës së Re]#,
+				'standard' => q#Ora standarde e Njufaundlendit [Tokës së Re]#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Ora e Niuesë),
+				'standard' => q#Ora e Niuesë#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Ora e Ishullit Norfolk),
+				'standard' => q#Ora e Ishullit Norfolk#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Ora verore e Fernando-de-Noronjës),
-				'generic' => q(Ora e Fernando-de-Noronjës),
-				'standard' => q(Ora standarde e Fernando-de-Noronjës),
+				'daylight' => q#Ora verore e Fernando-de-Noronjës#,
+				'generic' => q#Ora e Fernando-de-Noronjës#,
+				'standard' => q#Ora standarde e Fernando-de-Noronjës#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Ora e Ishujve të Marianës së Veriut),
+				'standard' => q#Ora e Ishujve të Marianës së Veriut#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Ora verore e Novosibirskut),
-				'generic' => q(Ora e Novosibirskut),
-				'standard' => q(Ora standarde e Novosibirskut),
+				'daylight' => q#Ora verore e Novosibirskut#,
+				'generic' => q#Ora e Novosibirskut#,
+				'standard' => q#Ora standarde e Novosibirskut#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Ora verore e Omskut),
-				'generic' => q(Ora e Omskut),
-				'standard' => q(Ora standarde e Omskut),
+				'daylight' => q#Ora verore e Omskut#,
+				'generic' => q#Ora e Omskut#,
+				'standard' => q#Ora standarde e Omskut#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -6858,7 +7170,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Honolulu#,
 		},
 		'Pacific/Johnston' => {
-			exemplarCity => q#Xhonson#,
+			exemplarCity => q#Xhonston#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kiritimat#,
@@ -6931,245 +7243,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Ora verore e Pakistanit),
-				'generic' => q(Ora e Pakistanit),
-				'standard' => q(Ora standarde e Pakistanit),
+				'daylight' => q#Ora verore e Pakistanit#,
+				'generic' => q#Ora e Pakistanit#,
+				'standard' => q#Ora standarde e Pakistanit#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Ora e Palaut),
+				'standard' => q#Ora e Palaut#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Ora e Papua-Guinesë së Re),
+				'standard' => q#Ora e Papua-Guinesë së Re#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Ora Verore e Paraguait),
-				'generic' => q(Ora e Paraguait),
-				'standard' => q(Ora standarde e Paraguait),
+				'daylight' => q#Ora Verore e Paraguait#,
+				'generic' => q#Ora e Paraguait#,
+				'standard' => q#Ora standarde e Paraguait#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Ora verore e Perusë),
-				'generic' => q(Ora e Perusë),
-				'standard' => q(Ora standarde e Perusë),
+				'daylight' => q#Ora verore e Perusë#,
+				'generic' => q#Ora e Perusë#,
+				'standard' => q#Ora standarde e Perusë#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Ora verore e Filipineve),
-				'generic' => q(Ora e Filipineve),
-				'standard' => q(Ora standarde e Filipineve),
+				'daylight' => q#Ora verore e Filipineve#,
+				'generic' => q#Ora e Filipineve#,
+				'standard' => q#Ora standarde e Filipineve#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Ora e Ishujve Feniks),
+				'standard' => q#Ora e Ishujve Feniks#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Ora verore e Shën-Pier dhe Mikuelon),
-				'generic' => q(Ora e Shën-Pier dhe Mikuelon),
-				'standard' => q(Ora standarde e Shën-Pier dhe Mikuelon),
+				'daylight' => q#Ora verore e Shën-Pier dhe Mikelon#,
+				'generic' => q#Ora e Shën-Pier dhe Mikelon#,
+				'standard' => q#Ora standarde e Shën-Pier dhe Mikelon#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Ora e Pitkernit),
+				'standard' => q#Ora e Pitkernit#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Ora e Ponapeit),
+				'standard' => q#Ora e Ponapeit#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Ora e Penianit#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Ora verore e Kizilordit),
-				'generic' => q(Ora e Kizilordit),
-				'standard' => q(Ora standarde e Kizilordit),
+				'daylight' => q#Ora verore e Kizilordit#,
+				'generic' => q#Ora e Kizilordit#,
+				'standard' => q#Ora standarde e Kizilordit#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Ora e Reunionit),
+				'standard' => q#Ora e Reunionit#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Ora e Rodherës),
+				'standard' => q#Ora e Rodherës#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Ora verore e Sakalinit),
-				'generic' => q(Ora e Sakalinit),
-				'standard' => q(Ora standarde e Sakalinit),
+				'daylight' => q#Ora verore e Sakalinit#,
+				'generic' => q#Ora e Sakalinit#,
+				'standard' => q#Ora standarde e Sakalinit#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Ora verore e Samarës),
-				'generic' => q(Ora e Samarës),
-				'standard' => q(Ora standarde e Samarës),
+				'daylight' => q#Ora verore e Samarës#,
+				'generic' => q#Ora e Samarës#,
+				'standard' => q#Ora standarde e Samarës#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Ora verore e Samoas),
-				'generic' => q(Ora e Samoas),
-				'standard' => q(Ora standarde e Samoas),
+				'daylight' => q#Ora verore e Samoas#,
+				'generic' => q#Ora e Samoas#,
+				'standard' => q#Ora standarde e Samoas#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Ora e Sishelës),
+				'standard' => q#Ora e Sejshelleve#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Ora e Singaporit),
+				'standard' => q#Ora e Singaporit#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Ora e Ishujve Solomonë),
+				'standard' => q#Ora e Ishujve Solomon#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Ora e Gjeorgjisë së Jugut),
+				'standard' => q#Ora e Xhorxhas të Jugut#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Ora e Surinamit),
+				'standard' => q#Ora e Surinamit#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Ora e Sjouit),
+				'standard' => q#Ora e Sjouit#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Ora e Tahitit),
+				'standard' => q#Ora e Tahitit#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Ora verore e Tajpeit),
-				'generic' => q(Ora e Tajpeit),
-				'standard' => q(Ora standarde e Tajpeit),
+				'daylight' => q#Ora verore e Tajpeit#,
+				'generic' => q#Ora e Tajpeit#,
+				'standard' => q#Ora standarde e Tajpeit#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Ora e Taxhikistanit),
+				'standard' => q#Ora e Taxhikistanit#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Ora e Tokelaut),
+				'standard' => q#Ora e Tokelaut#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Ora verore e Tongës),
-				'generic' => q(Ora e Tongës),
-				'standard' => q(Ora standarde e Tongës),
+				'daylight' => q#Ora verore e Tongës#,
+				'generic' => q#Ora e Tongës#,
+				'standard' => q#Ora standarde e Tongës#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Ora e Çukut),
+				'standard' => q#Ora e Çukut#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Ora verore e Turkmenistanit),
-				'generic' => q(Ora e Turkmenistanit),
-				'standard' => q(Ora standarde e Turkmenistanit),
+				'daylight' => q#Ora verore e Turkmenistanit#,
+				'generic' => q#Ora e Turkmenistanit#,
+				'standard' => q#Ora standarde e Turkmenistanit#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Ora e Tuvalusë),
+				'standard' => q#Ora e Tuvalusë#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Ora verore e Uruguait),
-				'generic' => q(Ora e Uruguait),
-				'standard' => q(Ora standarde e Uruguait),
+				'daylight' => q#Ora verore e Uruguait#,
+				'generic' => q#Ora e Uruguait#,
+				'standard' => q#Ora standarde e Uruguait#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Ora verore e Uzbekistanit),
-				'generic' => q(Ora e Uzbekistanit),
-				'standard' => q(Ora standarde e Uzbekistanit),
+				'daylight' => q#Ora verore e Uzbekistanit#,
+				'generic' => q#Ora e Uzbekistanit#,
+				'standard' => q#Ora standarde e Uzbekistanit#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Ora verore e Vanuatusë),
-				'generic' => q(Ora e Vanuatusë),
-				'standard' => q(Ora standarde e Vanuatusë),
+				'daylight' => q#Ora verore e Vanuatusë#,
+				'generic' => q#Ora e Vanuatusë#,
+				'standard' => q#Ora standarde e Vanuatusë#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Ora e Venezuelës),
+				'standard' => q#Ora e Venezuelës#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Ora verore e Vladivostokut),
-				'generic' => q(Ora e Vladivostokut),
-				'standard' => q(Ora standarde e Vladivostokut),
+				'daylight' => q#Ora verore e Vladivostokut#,
+				'generic' => q#Ora e Vladivostokut#,
+				'standard' => q#Ora standarde e Vladivostokut#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Ora verore e Volgogradit),
-				'generic' => q(Ora e Volgogradit),
-				'standard' => q(Ora standarde e Volgogradit),
+				'daylight' => q#Ora verore e Volgogradit#,
+				'generic' => q#Ora e Volgogradit#,
+				'standard' => q#Ora standarde e Volgogradit#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Ora e Vostokut),
+				'standard' => q#Ora e Vostokut#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Ora e Ishullit Uejk),
+				'standard' => q#Ora e Ishullit Uejk#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Ora e Uollisit dhe Futunës),
+				'standard' => q#Ora e Uollisit dhe Futunës#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Ora verore e Jakutskut),
-				'generic' => q(Ora e Jakutskut),
-				'standard' => q(Ora standarde e Jakutskut),
+				'daylight' => q#Ora verore e Jakutskut#,
+				'generic' => q#Ora e Jakutskut#,
+				'standard' => q#Ora standarde e Jakutskut#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Ora verore e Ekaterinburgut),
-				'generic' => q(Ora e Ekaterinburgut),
-				'standard' => q(Ora standarde e Ekaterinburgut),
+				'daylight' => q#Ora verore e Ekaterinburgut#,
+				'generic' => q#Ora e Ekaterinburgut#,
+				'standard' => q#Ora standarde e Ekaterinburgut#,
 			},
 		},
 	 } }

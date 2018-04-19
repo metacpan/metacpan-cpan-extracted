@@ -4,7 +4,7 @@ Database::Migrator - A system for implementing database migrations
 
 # VERSION
 
-version 0.13
+version 0.14
 
 # DESCRIPTION
 
@@ -32,13 +32,20 @@ the migration. Migrations are applied in sorted order. If the migrations start
 with numbers, they are sorted by these numbers, otherwise they are sorted
 alphabetically.
 
-The migration directory can either contain files with SQL or Perl. If a file
-ends in ".sql", the migration runner code will feed it to the appropriate
-command line utility for your database.
+The migration directory can contain files with SQL, Perl, or executable
+programs.
 
-Otherwise the file is assumed to contain Perl code. This code is expected to
-return a single anonymous subroutine when `eval`ed. This subroutine will then
-be called with the `Database::Migrator` object as its only argument.
+If a file ends in ".sql", the migration runner code will feed it to the
+appropriate command line utility for your database.
+
+Otherwise, if the file is executable, then it is assumed to be a program that
+will apply a migration when run. The migration runner runs it. It is not
+provided a database handle.
+
+If neither of the above conditions are met, the file is assumed to contain Perl
+code. This code is expected to return a single anonymous subroutine when
+`eval`ed. This subroutine will then be called with the `Database::Migrator`
+object as its only argument.
 
 Each file in a single migration's directory is run in sorted order. You can
 use numeric prefixes on these files if necessary.
@@ -194,6 +201,7 @@ Dave Rolsky <autarch@urth.org>
 - Gregory Oschwald <goschwald@maxmind.com>
 - Kevin Phair <phair.kevin@gmail.com>
 - Olaf Alders <olaf@wundersolutions.com>
+- William Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 

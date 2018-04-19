@@ -4,7 +4,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 # VERSION
 
-version 0.004
+version 0.005
 
 # SYNOPSIS
 
@@ -114,6 +114,7 @@ This is free software, licensed under:
 # CONTRIBUTORS
 
 - Brad Lhotsky <brad.lhotsky@gmail.com>
+- José Joaquín Atria <jjatria@gmail.com>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # SUPPORT

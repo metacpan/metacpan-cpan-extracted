@@ -85,4 +85,3 @@ describe 'Config::AWS in Config::INI compatibility mode' => sub {
 };
 
 done_testing;
-

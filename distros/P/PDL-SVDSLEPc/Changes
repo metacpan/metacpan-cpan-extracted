@@ -1,5 +1,8 @@
 Changes for perl/PDL module PDL::SVDSLEPc
 
+v0.005 Mon, 16 Apr 2018 16:28:29 +0200
+       + updated for PETSc v3.7.5 / SLEPc v3.7.3 (debian stretch)
+
 v0.004 Tue, 06 Jun 2017 11:22:41 +0200
 	+ Makefile.PL: explicit "./pdlmaker.plm" (RT bug #121661)
 	+ fixed new errors `svd requires input piddles to have m >= n (you have m=6 and n=7). Try inputting the transpose.' with PDL-2.018	

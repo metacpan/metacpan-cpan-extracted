@@ -109,6 +109,15 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Pod::Text 2.08
+  Dancer-Middleware-Rebase-0.8.0
+    pathname: P/PO/POLETTIX/Dancer-Middleware-Rebase-0.8.0.tar.gz
+    provides:
+      Dancer::Middleware::Rebase 0.008000
+    requirements:
+      ExtUtils::MakeMaker 6.31
+      Plack::Middleware 0
+      URI 0
+      parent 0
   Data-OptList-0.110
     pathname: R/RJ/RJBS/Data-OptList-0.110.tar.gz
     provides:
@@ -152,6 +161,65 @@ DISTRIBUTIONS
       Test::More 0.98
       parent 0
       perl 5.008001
+  Devel-Cover-1.29
+    pathname: P/PJ/PJCJ/Devel-Cover-1.29.tar.gz
+    provides:
+      Devel::Cover 1.29
+      Devel::Cover::Annotation::Git 1.29
+      Devel::Cover::Annotation::Random 1.29
+      Devel::Cover::Annotation::Svk 1.29
+      Devel::Cover::Branch 1.29
+      Devel::Cover::Collection 1.29
+      Devel::Cover::Collection::Template::Provider 1.29
+      Devel::Cover::Condition 1.29
+      Devel::Cover::Condition_and_2 1.29
+      Devel::Cover::Condition_and_3 1.29
+      Devel::Cover::Condition_or_2 1.29
+      Devel::Cover::Condition_or_3 1.29
+      Devel::Cover::Condition_xor_4 1.29
+      Devel::Cover::Criterion 1.29
+      Devel::Cover::DB 1.29
+      Devel::Cover::DB::Criterion 1.29
+      Devel::Cover::DB::Digests 1.29
+      Devel::Cover::DB::File 1.29
+      Devel::Cover::DB::IO 1.29
+      Devel::Cover::DB::IO::Base 1.29
+      Devel::Cover::DB::IO::JSON 1.29
+      Devel::Cover::DB::IO::Sereal 1.29
+      Devel::Cover::DB::IO::Storable 1.29
+      Devel::Cover::DB::Run 1.29
+      Devel::Cover::DB::Structure 1.29
+      Devel::Cover::Html_Common 1.29
+      Devel::Cover::Op 1.29
+      Devel::Cover::Pod 1.29
+      Devel::Cover::Report::Compilation 1.29
+      Devel::Cover::Report::Html 1.29
+      Devel::Cover::Report::Html_basic 1.29
+      Devel::Cover::Report::Html_basic::Template::Provider 1.29
+      Devel::Cover::Report::Html_minimal 1.29
+      Devel::Cover::Report::Html_subtle 1.29
+      Devel::Cover::Report::Html_subtle::Template::Provider 1.29
+      Devel::Cover::Report::Json 1.29
+      Devel::Cover::Report::Sort 1.29
+      Devel::Cover::Report::Text 1.29
+      Devel::Cover::Report::Text2 1.29
+      Devel::Cover::Report::Vim 1.29
+      Devel::Cover::Report::Vim::Template::Provider 1.29
+      Devel::Cover::Statement 1.29
+      Devel::Cover::Subroutine 1.29
+      Devel::Cover::Test 1.29
+      Devel::Cover::Time 1.29
+      Devel::Cover::Truth_Table 1.29
+      Devel::Cover::Truth_Table::Row 1.29
+      Devel::Cover::Util 1.29
+      Devel::Cover::Web 1.29
+    requirements:
+      B::Debug 0
+      Digest::MD5 0
+      ExtUtils::MakeMaker 0
+      HTML::Entities 3.69
+      Storable 0
+      Test::More 0
   Devel-GlobalDestruction-0.14
     pathname: H/HA/HAARG/Devel-GlobalDestruction-0.14.tar.gz
     provides:

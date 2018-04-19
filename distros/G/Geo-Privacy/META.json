@@ -1,0 +1,53 @@
+{
+   "abstract" : "Information about privacy/GDPR regulations by state",
+   "author" : [
+      "Dan Wright <Dan@DWright.Org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-Privacy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Lite" : "0.06",
+            "Readonly" : "1"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::Privacy" : {
+         "file" : "lib/Geo/Privacy.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dwright/Geo-Privacy/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwright/Geo-Privacy.git",
+         "web" : "https://github.com/dwright/Geo-Privacy"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

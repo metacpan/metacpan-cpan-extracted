@@ -1,6 +1,6 @@
-package Pcore::SMTP v0.5.6;
+package Pcore::SMTP v0.5.7;
 
-use Pcore -dist, -const, -class, -result;
+use Pcore -dist, -const, -class, -res;
 use Pcore::AE::Handle qw[:TLS_CTX];
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref];
 use Pcore::Util::Data qw[from_b64 to_b64];
@@ -77,12 +77,12 @@ sub sendmail ( $self, @ ) {
         persistent       => 0,
         tls_ctx          => $self->{tls_ctx},
         on_connect_error => sub ( $h, $reason ) {
-            $cb->( result [ 500, $reason ] );
+            $cb->( res [ 500, $reason ] );
 
             return;
         },
         on_error => sub ( $h, $fatal, $reason ) {
-            $cb->( result [ 500, $reason ] );
+            $cb->( res [ 500, $reason ] );
 
             return;
         },
@@ -255,7 +255,7 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
     # NOTE partially stolen from Net::SMTP
 
     if ( !$mechanisms ) {
-        $cb->( result [ 500, $STATUS_REASON ] );
+        $cb->( res [ 500, $STATUS_REASON ] );
 
         return;
     }
@@ -279,7 +279,7 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
             my $failed_mechanism = $client->mechanism;
 
             if ( !defined $failed_mechanism ) {
-                $cb->( result [ 500, $STATUS_REASON ] );
+                $cb->( res [ 500, $STATUS_REASON ] );
 
                 return;
             }
@@ -288,7 +288,7 @@ sub _AUTH ( $self, $h, $mechanisms, $cb ) {
 
             # no auth mechanisms left
             if ( $mechanisms !~ /\S/sm ) {
-                $cb->( result [ 500, $STATUS_REASON ] );
+                $cb->( res [ 500, $STATUS_REASON ] );
 
                 return;
             }
@@ -533,7 +533,7 @@ sub _QUIT ( $self, $h, $cb ) {
     # do not wait for QUIT response
     $h->destroy;
 
-    $cb->( result [ 221, $STATUS_REASON ] );
+    $cb->( res [ 221, $STATUS_REASON ] );
 
     return;
 }
@@ -559,7 +559,7 @@ sub _read_response ( $self, $h, $cb ) {
                     # remove wathcher
                     $h->on_read;
 
-                    $cb->( result [ $status, $STATUS_REASON ], $data );
+                    $cb->( res [ $status, $STATUS_REASON ], $data );
                 }
 
                 return;

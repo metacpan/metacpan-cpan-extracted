@@ -4,10 +4,9 @@ lib/Math/BigInt/BitVect.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/01load.t
-t/02pod.t
-t/03podcov.t
 t/author-lib-arithmetic-binary-_add.dat
 t/author-lib-arithmetic-binary-_add.t
 t/author-lib-arithmetic-binary-_div.dat
@@ -42,8 +41,12 @@ t/author-lib-arithmetic-unary-_dfac.dat
 t/author-lib-arithmetic-unary-_dfac.t
 t/author-lib-arithmetic-unary-_fac.dat
 t/author-lib-arithmetic-unary-_fac.t
+t/author-lib-arithmetic-unary-_fib.dat
+t/author-lib-arithmetic-unary-_fib.t
 t/author-lib-arithmetic-unary-_inc.dat
 t/author-lib-arithmetic-unary-_inc.t
+t/author-lib-arithmetic-unary-_lucas.dat
+t/author-lib-arithmetic-unary-_lucas.t
 t/author-lib-arithmetic-unary-_sqrt.dat
 t/author-lib-arithmetic-unary-_sqrt.t
 t/author-lib-bitwise-_and.dat
@@ -110,6 +113,11 @@ t/Math/BigInt/Lib/TestUtil.pm
 t/mbi_rand.t
 t/mbimbf.inc
 t/mbimbf.t
+t/release-cpan-changes.t
+t/release-pod-coverage.t
+t/release-pod.t
+t/release-portability.t
+t/release-test-version.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

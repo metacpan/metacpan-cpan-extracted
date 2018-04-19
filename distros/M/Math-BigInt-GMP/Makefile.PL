@@ -26,8 +26,8 @@ WriteMakefile
    'PREREQ_PM'          => {
                             #'ExtUtils::MakeMaker' => 6.58,
                             'XSLoader'            => 0.02,
-                            'Test::More'          => 0.82,
-                            'Math::BigInt'        => 1.999808,
+                            'Test::More'          => 0.88,
+                            'Math::BigInt'        => 1.999812,
                            },
    'LICENSE'            => 'perl_5',
    'LIBS'               => ['-lgmp'],   # e.g., '-lm'

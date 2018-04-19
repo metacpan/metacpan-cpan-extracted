@@ -1,10 +1,10 @@
 NAME
-    Random::Any - Try to use Math::Random::Secure::rand(), fallback on
+    Random::Any - Try to use Data::Entropy::Algorithms::rand(), fallback on
     builtin rand()
 
 VERSION
-    This document describes version 0.003 of Random::Any (from Perl
-    distribution Random-Any), released on 2018-01-02.
+    This document describes version 0.004 of Random::Any (from Perl
+    distribution Random-Any), released on 2018-04-18.
 
 SYNOPSIS
      use Random::Any qw(rand);
@@ -13,22 +13,27 @@ SYNOPSIS
 
 DESCRIPTION
     This module provides a single export "rand()" that tries to use
-    Math::Random::Secure's "rand()" first and, if that module is not
+    Data::Entropy::Algorithms's "rand()" first and, if that module is not
     available, falls back on the builtin rand().
 
 EXPORTS
   -warn => bool
-    Can be set to true to emit a warning if Math::Random::Secure is not
+    Can be set to true to emit a warning if Data::Entropy::Algorithms is not
     available.
 
 FUNCTIONS
   rand
+ENVIRONMENT
+  PERL_RANDOM_ANY_WARN
+    Bool. Can be set to provide default value for "-warn".
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Random-Any>.
 
 SOURCE
-    Source repository is at <https://github.com/perlancar/perl-Random-Any>.
+    Source repository is at
+    <https://github.com///git@github.com/perlancar/perl-Random-Any>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -38,7 +43,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Math::Random::Secure
+    Data::Entropy::Algorithms
 
 AUTHOR
     perlancar <perlancar@cpan.org>

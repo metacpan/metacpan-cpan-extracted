@@ -18,7 +18,7 @@ use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use MooseX::StrictConstructor;
 
-use version; our $VERSION = version->declare("v1.20180410");
+use version; our $VERSION = version->declare("v1.20180417");
 
 =encoding utf8
 =head1 NAME
@@ -27,7 +27,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180410
+Version 1.20180417
 
 =cut
 
@@ -419,7 +419,7 @@ L<http://search.cpan.org/dist/Date-Lectionary-Daily/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet  son, Oliver.  But, above all, SOLI DEO GLORIA!
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
 
 =head1 LICENSE BSD-2-Clause 
 

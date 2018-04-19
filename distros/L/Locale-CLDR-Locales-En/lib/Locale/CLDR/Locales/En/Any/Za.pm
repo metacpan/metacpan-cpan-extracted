@@ -6,17 +6,18 @@ Locale::CLDR::Locales::En::Any::Za - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Za;
 # This file auto generated from Data\common\main\en_ZA.xml
-#	on Fri 29 Apr  7:00:03 pm GMT
+#	on Fri 13 Apr  7:08:08 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -30,7 +31,8 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ä ā æ ç ḓ é è ĕ ê ë ē í ì ĭ î ï ī ḽ ñ ṅ ṋ ó ò ŏ ô ö ø ō œ š ṱ ú ù ŭ û ü ū ÿ])},
+			auxiliary => qr{[á à ă â å ä ā æ ç ḓ é è ĕ ê ë ē í ì ĭ î ï ī ḽ ñ ṅ ṋ ó ò ŏ ô ö ø ō œ š ṱ ú ù ŭ û ü ū ÿ]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -74,53 +76,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -173,6 +175,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 	} },
 );
@@ -194,16 +200,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			MEd => q{E, MM/dd},
-			MMMEd => q{E, dd MMM},
-			MMMd => q{dd MMM},
-			Md => q{MM/dd},
-			yyyyMEd => q{E, G y/MM/dd},
-			yyyyMMMEd => q{E, dd MMM y G},
-			yyyyMMMd => q{dd MMM y G},
-			yyyyMd => q{G y/MM/dd},
-		},
 		'gregorian' => {
 			MEd => q{E, MM/dd},
 			MMMEd => q{E, dd MMM},
@@ -213,6 +209,16 @@ has 'datetime_formats_available_formats' => (
 			yMMMEd => q{E, dd MMM y},
 			yMMMd => q{dd MMM y},
 			yMd => q{y/MM/dd},
+		},
+		'generic' => {
+			MEd => q{E, MM/dd},
+			MMMEd => q{E, dd MMM},
+			MMMd => q{dd MMM},
+			Md => q{MM/dd},
+			yyyyMEd => q{E, G y/MM/dd},
+			yyyyMMMEd => q{E, dd MMM y G},
+			yyyyMMMd => q{dd MMM y G},
+			yyyyMd => q{G y/MM/dd},
 		},
 	} },
 );
@@ -230,6 +236,48 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			MEd => {
+				M => q{E MM/dd – E MM/dd},
+				d => q{E MM/dd – E MM/dd},
+			},
+			MMMEd => {
+				M => q{E dd MMM – E dd MMM},
+				d => q{E dd – E dd MMM},
+			},
+			MMMd => {
+				M => q{dd MMM – dd MMM},
+				d => q{dd – dd MMM},
+			},
+			Md => {
+				M => q{MM/dd – MM/dd},
+				d => q{MM/dd – MM/dd},
+			},
+			yM => {
+				M => q{y/MM – y/MM},
+				y => q{y/MM – y/MM},
+			},
+			yMEd => {
+				M => q{E y/MM/dd – E y/MM/dd},
+				d => q{E y/MM/dd – E y/MM/dd},
+				y => q{E y/MM/dd – E y/MM/dd},
+			},
+			yMMMEd => {
+				M => q{E, dd MMM – E, dd MMM y},
+				d => q{E, dd – E, dd MMM y},
+				y => q{E, dd MMM y – E, dd MMM y},
+			},
+			yMMMd => {
+				M => q{dd MMM – dd MMM y},
+				d => q{dd – dd MMM y},
+				y => q{dd MMM y – dd MMM y},
+			},
+			yMd => {
+				M => q{y/MM/dd – y/MM/dd},
+				d => q{y/MM/dd – y/MM/dd},
+				y => q{y/MM/dd – y/MM/dd},
+			},
+		},
 		'generic' => {
 			MEd => {
 				M => q{E MM/dd – E MM/dd},
@@ -275,48 +323,6 @@ has 'datetime_formats_interval' => (
 				y => q{G y/MM/dd – y/MM/dd},
 			},
 		},
-		'gregorian' => {
-			MEd => {
-				M => q{E MM/dd – E MM/dd},
-				d => q{E MM/dd – E MM/dd},
-			},
-			MMMEd => {
-				M => q{E dd MMM – E dd MMM},
-				d => q{E dd – E dd MMM},
-			},
-			MMMd => {
-				M => q{dd MMM – dd MMM},
-				d => q{dd – dd MMM},
-			},
-			Md => {
-				M => q{MM/dd – MM/dd},
-				d => q{MM/dd – MM/dd},
-			},
-			yM => {
-				M => q{y/MM – y/MM},
-				y => q{y/MM – y/MM},
-			},
-			yMEd => {
-				M => q{E y/MM/dd – E y/MM/dd},
-				d => q{E y/MM/dd – E y/MM/dd},
-				y => q{E y/MM/dd – E y/MM/dd},
-			},
-			yMMMEd => {
-				M => q{E, dd MMM – E, dd MMM y},
-				d => q{E, dd – E, dd MMM y},
-				y => q{E, dd MMM y – E, dd MMM y},
-			},
-			yMMMd => {
-				M => q{dd MMM – dd MMM y},
-				d => q{dd – dd MMM y},
-				y => q{dd MMM y – dd MMM y},
-			},
-			yMd => {
-				M => q{y/MM/dd – y/MM/dd},
-				d => q{y/MM/dd – y/MM/dd},
-				y => q{y/MM/dd – y/MM/dd},
-			},
-		},
 	} },
 );
 
@@ -327,24 +333,24 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Africa_Central' => {
 			short => {
-				'standard' => q(CAT),
+				'standard' => q#CAT#,
 			},
 		},
 		'Africa_Eastern' => {
 			short => {
-				'standard' => q(EAT),
+				'standard' => q#EAT#,
 			},
 		},
 		'Africa_Southern' => {
 			short => {
-				'standard' => q(SAST),
+				'standard' => q#SAST#,
 			},
 		},
 		'Africa_Western' => {
 			short => {
-				'daylight' => q(WAST),
-				'generic' => q(WAT),
-				'standard' => q(WAT),
+				'daylight' => q#WAST#,
+				'generic' => q#WAT#,
+				'standard' => q#WAT#,
 			},
 		},
 	 } }

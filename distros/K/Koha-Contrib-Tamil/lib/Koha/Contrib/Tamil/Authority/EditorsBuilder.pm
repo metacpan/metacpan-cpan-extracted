@@ -1,5 +1,6 @@
 package Koha::Contrib::Tamil::Authority::EditorsBuilder;
-$Koha::Contrib::Tamil::Authority::EditorsBuilder::VERSION = '0.054';
+#ABSTRACT: Build Unimarc editor field bases on ISBN
+$Koha::Contrib::Tamil::Authority::EditorsBuilder::VERSION = '0.055';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -149,11 +150,11 @@ __END__
 
 =head1 NAME
 
-Koha::Contrib::Tamil::Authority::EditorsBuilder
+Koha::Contrib::Tamil::Authority::EditorsBuilder - Build Unimarc editor field bases on ISBN
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package Pcore::API::AntiCaptcha;
 
-use Pcore -class, -const, -result;
+use Pcore -class, -const, -res;
 use Pcore::Captcha;
 use Pcore::Util::Data qw[to_b64 to_json from_json];
 
@@ -150,19 +150,19 @@ sub get_balance ( $self, $cb ) {
 
             # HTTP ERROR
             if ( !$res ) {
-                $result = result [ $res->status, $res->reason ];
+                $result = res [ $res->{status}, $res->{reason} ];
             }
             else {
-                my $data = from_json $res->body->$*;
+                my $data = from_json $res->{body}->$*;
 
                 # OK
                 if ( !$data->{errorId} ) {
-                    $result = result 200, $data->{balance};
+                    $result = res 200, $data->{balance};
                 }
 
                 # ERROR
                 else {
-                    $result = result [ $data->{errorId}, $STATUS_REASON->{ $data->{errorId} }->[1] ];
+                    $result = res [ $data->{errorId}, $STATUS_REASON->{ $data->{errorId} }->[1] ];
                 }
             }
 
@@ -187,19 +187,19 @@ sub get_queue_stats ( $self, $queue_id, $cb ) {
 
             # HTTP ERROR
             if ( !$res ) {
-                $result = result [ $res->status, $res->reason ];
+                $result = res [ $res->{status}, $res->{reason} ];
             }
             else {
-                my $data = from_json $res->body->$*;
+                my $data = from_json $res->{body}->$*;
 
                 # OK
                 if ( !$data->{errorId} ) {
-                    $result = result 200, $data;
+                    $result = res 200, $data;
                 }
 
                 # ERROR
                 else {
-                    $result = result [ $data->{errorId}, $STATUS_REASON->{ $data->{errorId} }->[1] ];
+                    $result = res [ $data->{errorId}, $STATUS_REASON->{ $data->{errorId} }->[1] ];
                 }
             }
 
@@ -220,12 +220,12 @@ sub _resolve ( $self, $captcha, $body, $cb ) {
 
             # HTTP ERROR
             if ( !$res ) {
-                $captcha->set_status( $res->status, $res->reason );
+                $captcha->set_status( $res->{status}, $res->{reason} );
 
                 $cb->($captcha);
             }
             else {
-                my $data = from_json $res->body->$*;
+                my $data = from_json $res->{body}->$*;
 
                 # ACCEPTED
                 if ( !$data->{errorId} ) {
@@ -285,7 +285,7 @@ sub _run_resolver ($self) {
                 } ),
                 on_finish => sub ($res) {
                     if ($res) {
-                        my $data = from_json $res->body->$*;
+                        my $data = from_json $res->{body}->$*;
 
                         # ERROR
                         if ( $data->{errorId} ) {

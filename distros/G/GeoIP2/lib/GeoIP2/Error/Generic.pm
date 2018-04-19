@@ -3,7 +3,7 @@ package GeoIP2::Error::Generic;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -27,7 +27,7 @@ GeoIP2::Error::Generic - A generic exception
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ version 2.005000
   use Try::Tiny;
 
   my $client = GeoIP2::WebService::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
 

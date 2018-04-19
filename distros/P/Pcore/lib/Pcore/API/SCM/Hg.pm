@@ -1,6 +1,6 @@
 package Pcore::API::SCM::Hg;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
 use Pcore::Util::Text qw[decode_utf8];
 use Pcore::Util::Scalar qw[weaken is_plain_arrayref];
@@ -98,7 +98,7 @@ sub _read ( $self, $cb ) {
 
 # NOTE status + pattern (status *.txt) not works under linux - http://bz.selenic.com/show_bug.cgi?id=4526
 sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $buf = join "\x00", $cmd->@*;
 
@@ -127,15 +127,13 @@ sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
                 my $result;
 
                 if ( exists $res->{e} ) {
-                    $result = result [ 500, join q[ ], $res->{e}->@* ];
+                    $result = res [ 500, join q[ ], $res->{e}->@* ];
                 }
                 else {
-                    $result = result 200, $res->{o};
+                    $result = res 200, $res->{o};
                 }
 
-                $cb->($result) if $cb;
-
-                $blocking_cv->($result) if $blocking_cv;
+                $rouse_cb ? $cb ? $rouse_cb->( $cb->($result) ) : $rouse_cb->($result) : $cb ? $cb->($result) : ();
             }
 
             return;
@@ -146,7 +144,7 @@ sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
         return;
     } );
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub scm_cmd ( $self, $cmd, $cb = undef ) {
@@ -191,9 +189,7 @@ sub scm_id ( $self, $cb = undef ) {
                 $res->{data} = \%res;
             }
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         },
     );
 }
@@ -206,9 +202,7 @@ sub scm_releases ( $self, $cb = undef ) {
                 $res->{data} = [ sort grep {/\Av\d+[.]\d+[.]\d+\z/sm} $res->{data}->@* ];
             }
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         },
     );
 }
@@ -221,9 +215,7 @@ sub scm_is_commited ( $self, $cb = undef ) {
                 $res->{data} = defined $res->{data} ? 0 : 1;
             }
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         },
     );
 }
@@ -276,9 +268,7 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
                 $res->{data} = $data;
             }
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         },
     );
 }
@@ -292,7 +282,7 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## |======+======================+================================================================================================================|
 ## |    2 | 103, 105, 110        | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 166                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 164                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Data::Cuid;
-use Math::Base36 'decode_base36';
 
 sub _count_ok {
     local $_ = shift;
@@ -23,7 +22,7 @@ subtest 'basics' => sub {
     note $id;
 
     is $id =~ /^c/, 1, 'cuid starts with "c"';
-    _count_ok $id, 24, 'cuid is at least 24 characters';
+    _count_ok $id, 25, 'cuid is at least 25 characters';
 
     my $slug = Data::Cuid::slug;
     ok $slug, 'slug returns a value';
@@ -42,43 +41,46 @@ subtest 'package variables' => sub {
 };
 
 subtest 'private functions' => sub {
-    plan tests => 5;
+    plan tests => 7;
 
-    my $fp = Data::Cuid::_fingerprint;
-    ok decode_base36 $fp, 'fingerprint is base36-encoded';
+    subtest 'local encode_base36' => sub {
+        plan tests => 3;
 
-    my $rb = Data::Cuid::_random_block;
-    ok decode_base36 $rb, 'random block is base36-encoded';
+        my $n = 1234;
 
-    my $ts = Data::Cuid::_timestamp;
-    ok decode_base36 $ts, 'timestamp is base36-encoded';
+        note explain '$n = ', $n;
+        is Data::Cuid::_encode_base36(1234), 'A',
+            '_encode_base36 of $n is truncated';
+        is Data::Cuid::_encode_base36( 1234, 2 ), 'YA',
+            '_encode_base36 of $n with given size';
+        is Data::Cuid::_encode_base36( 1234, 4 ), '00YA',
+            '_encode_base36 of $n with extra padding';
+    };
+
+    ok Data::Cuid::_fingerprint, 'got fingerprint';
+    subtest 'fingerprint size' => sub {
+        plan tests => 2;
+
+        my $fp = Data::Cuid::_fingerprint;
+        note explain $fp;
+        is length $fp, 4, 'fingerprint is at max size';
+
+        local $$ = 36**2 - 1;
+        my $fp_mockpid = Data::Cuid::_fingerprint;
+        note explain $fp_mockpid;
+        is length $fp_mockpid, 4,
+            'fingerprint overflow but still at max size';
+    };
+
+    ok Data::Cuid::_random_block, 'got random block';
+    note explain Data::Cuid::_random_block;
+
+    ok Data::Cuid::_timestamp, 'got timestamp';
+    note explain Data::Cuid::_timestamp;
 
     my $c = Data::Cuid::_safe_counter;
     ok $c, "counter starts at $c";
 
     Data::Cuid::_safe_counter while ++$c < $Data::Cuid::cmax;
     is Data::Cuid::_safe_counter, 0, 'safe counter rolls back to 0';
-};
-
-subtest 'collisions' => sub {
-    plan skip_all => 'Testing collisions only upon release'
-        unless $ENV{RELEASE_TESTING};
-
-    my $max = 10_000;
-    plan tests => $max * 2;
-
-    my $test = sub {
-        my $fn = shift;
-        my %ids;
-
-        for ( my $i = 0; $i < $max; $i++ ) {
-            my $id = $fn->();
-
-            ok !$ids{$id}, "$id is unique in $i iterations";
-            ++$ids{$id};
-        }
-    };
-
-    $test->( \&Data::Cuid::cuid );
-    $test->( \&Data::Cuid::slug );
 };

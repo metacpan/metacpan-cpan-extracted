@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Lt - Package for language Lithuanian
 
 package Locale::CLDR::Locales::Lt;
 # This file auto generated from Data\common\main\lt.xml
-#	on Fri 29 Apr  7:15:11 pm GMT
+#	on Fri 13 Apr  7:18:34 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -396,11 +397,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -628,7 +629,7 @@ has 'display_name_language' => (
  				'az@alt=short' => 'azeri',
  				'ba' => 'baškirų',
  				'bal' => 'baluči',
- 				'ban' => 'balinezų',
+ 				'ban' => 'baliečių',
  				'bar' => 'bavarų',
  				'bas' => 'basų',
  				'bax' => 'bamunų',
@@ -649,11 +650,11 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bjn' => 'bandžarų',
  				'bkm' => 'komų',
- 				'bla' => 'siksika',
+ 				'bla' => 'siksikų',
  				'bm' => 'bambarų',
  				'bn' => 'bengalų',
  				'bo' => 'tibetiečių',
- 				'bpy' => 'Bišnuprijos',
+ 				'bpy' => 'bišnuprijos',
  				'bqi' => 'bakhtiari',
  				'br' => 'bretonų',
  				'bra' => 'brajų',
@@ -672,13 +673,13 @@ has 'display_name_language' => (
  				'cay' => 'kaijūgų',
  				'cch' => 'atsamų',
  				'ce' => 'čečėnų',
- 				'ceb' => 'cebuanų',
+ 				'ceb' => 'sebuanų',
  				'cgg' => 'čigų',
  				'ch' => 'čamorų',
- 				'chb' => 'čibča',
+ 				'chb' => 'čibčų',
  				'chg' => 'čagatų',
  				'chk' => 'čukesų',
- 				'chm' => 'mari',
+ 				'chm' => 'marių',
  				'chn' => 'činuk žargonas',
  				'cho' => 'čoktau',
  				'chp' => 'čipvėjų',
@@ -690,6 +691,7 @@ has 'display_name_language' => (
  				'cps' => 'capiznon',
  				'cr' => 'kry',
  				'crh' => 'Krymo turkų',
+ 				'crs' => 'Seišelių kreolų ir prancūzų',
  				'cs' => 'čekų',
  				'csb' => 'kašubų',
  				'cu' => 'bažnytinė slavų',
@@ -712,7 +714,7 @@ has 'display_name_language' => (
  				'dtp' => 'centrinio Dusuno',
  				'dua' => 'dualų',
  				'dum' => 'Vidurio Vokietijos',
- 				'dv' => 'divehi',
+ 				'dv' => 'divehų',
  				'dyo' => 'džiola-foni',
  				'dyu' => 'dyulų',
  				'dz' => 'botijų',
@@ -744,7 +746,7 @@ has 'display_name_language' => (
  				'ewo' => 'evondo',
  				'ext' => 'ispanų kalbos Ekstremadūros tarmė',
  				'fa' => 'persų',
- 				'fan' => 'fang',
+ 				'fan' => 'fangų',
  				'fat' => 'fanti',
  				'ff' => 'fulahų',
  				'fi' => 'suomių',
@@ -759,10 +761,10 @@ has 'display_name_language' => (
  				'frc' => 'kadžunų prancūzų',
  				'frm' => 'Vidurio Prancūzijos',
  				'fro' => 'senoji prancūzų',
- 				'frp' => 'Arpitano',
+ 				'frp' => 'arpitano',
  				'frr' => 'šiaurinių fryzų',
  				'frs' => 'rytų fryzų',
- 				'fur' => 'frulan',
+ 				'fur' => 'friulių',
  				'fy' => 'vakarų fryzų',
  				'ga' => 'airių',
  				'gaa' => 'ga',
@@ -778,7 +780,7 @@ has 'display_name_language' => (
  				'glk' => 'gilaki',
  				'gmh' => 'Vidurio Aukštosios Vokietijos',
  				'gn' => 'gvaranių',
- 				'goh' => 'Senoji Aukštosios Vokietijos',
+ 				'goh' => 'senoji Aukštosios Vokietijos',
  				'gom' => 'Goa konkanių',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
@@ -799,7 +801,7 @@ has 'display_name_language' => (
  				'he' => 'hebrajų',
  				'hi' => 'hindi',
  				'hif' => 'Fidžio hindi',
- 				'hil' => 'hiligainon',
+ 				'hil' => 'hiligainonų',
  				'hit' => 'hititų',
  				'hmn' => 'hmong',
  				'ho' => 'hiri motu',
@@ -810,16 +812,16 @@ has 'display_name_language' => (
  				'hu' => 'vengrų',
  				'hup' => 'hupa',
  				'hy' => 'armėnų',
- 				'hz' => 'herero',
- 				'ia' => 'interlingva',
+ 				'hz' => 'hererų',
+ 				'ia' => 'tarpinė',
  				'iba' => 'iban',
- 				'ibb' => 'ibibio',
+ 				'ibb' => 'ibibijų',
  				'id' => 'indoneziečių',
  				'ie' => 'interkalba',
  				'ig' => 'igbų',
  				'ii' => 'sičuan ji',
- 				'ik' => 'inupiak',
- 				'ilo' => 'iloko',
+ 				'ik' => 'inupiakų',
+ 				'ilo' => 'ilokų',
  				'inh' => 'ingušų',
  				'io' => 'ido',
  				'is' => 'islandų',
@@ -838,10 +840,10 @@ has 'display_name_language' => (
  				'ka' => 'gruzinų',
  				'kaa' => 'karakalpakų',
  				'kab' => 'kebailų',
- 				'kac' => 'kačin',
+ 				'kac' => 'kačinų',
  				'kaj' => 'ju',
  				'kam' => 'kembų',
- 				'kaw' => 'kavi',
+ 				'kaw' => 'kavių',
  				'kbd' => 'kabardinų',
  				'kbl' => 'kanembų',
  				'kcg' => 'tyap',
@@ -869,8 +871,8 @@ has 'display_name_language' => (
  				'koi' => 'komių-permių',
  				'kok' => 'konkanių',
  				'kos' => 'kosreanų',
- 				'kpe' => 'kpele',
- 				'kr' => 'kanuri',
+ 				'kpe' => 'kpelių',
+ 				'kr' => 'kanurių',
  				'krc' => 'karačiajų balkarijos',
  				'kri' => 'krio',
  				'krj' => 'kinaray-a',
@@ -895,22 +897,23 @@ has 'display_name_language' => (
  				'lez' => 'lezginų',
  				'lfn' => 'naujoji frankų kalba',
  				'lg' => 'ganda',
- 				'li' => 'limburgiš',
+ 				'li' => 'limburgiečių',
  				'lij' => 'ligūrų',
  				'liv' => 'lyvių',
  				'lkt' => 'lakotų',
  				'lmo' => 'lombardų',
  				'ln' => 'ngalų',
  				'lo' => 'laosiečių',
- 				'lol' => 'mongo',
- 				'loz' => 'lozi',
+ 				'lol' => 'mongų',
+ 				'lou' => 'Luizianos kreolų',
+ 				'loz' => 'lozių',
  				'lrc' => 'šiaurės luri',
  				'lt' => 'lietuvių',
  				'ltg' => 'latgalių',
  				'lu' => 'luba katanga',
  				'lua' => 'luba lulua',
  				'lui' => 'luiseno',
- 				'lun' => 'lunda',
+ 				'lun' => 'Lundos',
  				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luja',
@@ -921,12 +924,12 @@ has 'display_name_language' => (
  				'maf' => 'mafų',
  				'mag' => 'magahi',
  				'mai' => 'maithili',
- 				'mak' => 'makasaro',
- 				'man' => 'mandingo',
+ 				'mak' => 'Makasaro',
+ 				'man' => 'mandingų',
  				'mas' => 'masajų',
  				'mde' => 'mabų',
  				'mdf' => 'mokša',
- 				'mdr' => 'mandar',
+ 				'mdr' => 'mandarų',
  				'men' => 'mende',
  				'mer' => 'merų',
  				'mfe' => 'morisijų',
@@ -936,13 +939,13 @@ has 'display_name_language' => (
  				'mgo' => 'meta',
  				'mh' => 'Maršalo Salų',
  				'mi' => 'maorių',
- 				'mic' => 'mikmak',
- 				'min' => 'minankabu',
+ 				'mic' => 'mikmakų',
+ 				'min' => 'minangkabau',
  				'mk' => 'makedonų',
  				'ml' => 'malajalių',
  				'mn' => 'mongolų',
  				'mnc' => 'manču',
- 				'mni' => 'manipuri',
+ 				'mni' => 'manipurių',
  				'moh' => 'mohok',
  				'mos' => 'mosi',
  				'mr' => 'maratų',
@@ -963,7 +966,7 @@ has 'display_name_language' => (
  				'nan' => 'kinų kalbos pietų minų tarmė',
  				'nap' => 'neapoliečių',
  				'naq' => 'nama',
- 				'nb' => 'Norvegijos rašytinė – būkmolų',
+ 				'nb' => 'norvegų bukmolas',
  				'nd' => 'šiaurės ndebelų',
  				'nds' => 'Žemutinės Vokietijos',
  				'nds_NL' => 'Žemutinės Saksonijos (Nyderlandai)',
@@ -971,7 +974,7 @@ has 'display_name_language' => (
  				'new' => 'nevari',
  				'ng' => 'ndongų',
  				'nia' => 'nias',
- 				'niu' => 'niuenų',
+ 				'niu' => 'niujiečių',
  				'njo' => 'ao naga',
  				'nl' => 'olandų',
  				'nl_BE' => 'flamandų',
@@ -980,33 +983,34 @@ has 'display_name_language' => (
  				'nnh' => 'ngiembūnų',
  				'no' => 'norvegų',
  				'nog' => 'nogų',
- 				'non' => 'norsu',
+ 				'non' => 'senoji norsų',
  				'nov' => 'novial',
  				'nqo' => 'enko',
  				'nr' => 'pietų ndebele',
- 				'nso' => 'šiaurės sothų',
+ 				'nso' => 'šiaurės Soto',
  				'nus' => 'nuerų',
  				'nv' => 'navajų',
  				'nwc' => 'klasikinė nevari',
- 				'ny' => 'nianja',
+ 				'ny' => 'nianjų',
  				'nym' => 'niamvezi',
  				'nyn' => 'niankolų',
- 				'nyo' => 'nioro',
+ 				'nyo' => 'niorų',
  				'nzi' => 'nzima',
  				'oc' => 'očitarų',
  				'oj' => 'ojibva',
  				'om' => 'oromų',
- 				'or' => 'orijų',
+ 				'or' => 'odijų',
  				'os' => 'osetinų',
  				'osa' => 'osage',
  				'ota' => 'osmanų turkų',
  				'pa' => 'pendžabų',
- 				'pag' => 'pangasinan',
- 				'pal' => 'pahlavi',
- 				'pam' => 'pampanga',
- 				'pap' => 'papiemento',
- 				'pau' => 'palau',
+ 				'pag' => 'pangasinanų',
+ 				'pal' => 'vidurinė persų kalba',
+ 				'pam' => 'pampangų',
+ 				'pap' => 'papiamento',
+ 				'pau' => 'palauliečių',
  				'pcd' => 'pikardų',
+ 				'pcm' => 'Nigerijos pidžinų',
  				'pdc' => 'Pensilvanijos vokiečių',
  				'pdt' => 'vokiečių kalbos žemaičių tarmė',
  				'peo' => 'senoji persų',
@@ -1026,9 +1030,9 @@ has 'display_name_language' => (
  				'qu' => 'kečujų',
  				'quc' => 'kičių',
  				'qug' => 'Čimboraso aukštumų kečujų',
- 				'raj' => 'radžastano',
+ 				'raj' => 'Radžastano',
  				'rap' => 'rapanui',
- 				'rar' => 'rarotongan',
+ 				'rar' => 'rarotonganų',
  				'rgn' => 'italų kalbos Romanijos tarmė',
  				'rif' => 'rifų',
  				'rm' => 'retoromanų',
@@ -1046,12 +1050,12 @@ has 'display_name_language' => (
  				'rw' => 'kinjaruandų',
  				'rwk' => 'rua',
  				'sa' => 'sanskritas',
- 				'sad' => 'sandavi',
+ 				'sad' => 'sandavių',
  				'sah' => 'jakutų',
  				'sam' => 'samarėjų aramių',
  				'saq' => 'sambūrų',
  				'sas' => 'sasak',
- 				'sat' => 'santali',
+ 				'sat' => 'santalių',
  				'saz' => 'sauraštrų',
  				'sba' => 'ngambajų',
  				'sbp' => 'sangų',
@@ -1075,14 +1079,14 @@ has 'display_name_language' => (
  				'shn' => 'šan',
  				'shu' => 'chadian arabų',
  				'si' => 'sinhalų',
- 				'sid' => 'sidamo',
+ 				'sid' => 'sidamų',
  				'sk' => 'slovakų',
  				'sl' => 'slovėnų',
  				'sli' => 'sileziečių žemaičių',
  				'sly' => 'selajarų',
- 				'sm' => 'samoa',
+ 				'sm' => 'Samoa',
  				'sma' => 'pietų samių',
- 				'smj' => 'Lulėjo samių',
+ 				'smj' => 'Liuleo samių',
  				'smn' => 'Inario samių',
  				'sms' => 'Skolto samių',
  				'sn' => 'šonų',
@@ -1093,9 +1097,9 @@ has 'display_name_language' => (
  				'sr' => 'serbų',
  				'srn' => 'sranan tongo',
  				'srr' => 'sererų',
- 				'ss' => 'svati',
+ 				'ss' => 'svatų',
  				'ssy' => 'saho',
- 				'st' => 'pietų sesuto',
+ 				'st' => 'pietų Soto',
  				'stq' => 'Saterlendo fryzų',
  				'su' => 'sundų',
  				'suk' => 'sukuma',
@@ -1105,7 +1109,7 @@ has 'display_name_language' => (
  				'sw' => 'suahilių',
  				'sw_CD' => 'Kongo suahilių',
  				'swb' => 'Komorų',
- 				'syc' => 'klasikinė siriečių',
+ 				'syc' => 'klasikinė sirų',
  				'syr' => 'sirų',
  				'szl' => 'sileziečių',
  				'ta' => 'tamilų',
@@ -1113,7 +1117,7 @@ has 'display_name_language' => (
  				'te' => 'telugų',
  				'tem' => 'timne',
  				'teo' => 'teso',
- 				'ter' => 'tereno',
+ 				'ter' => 'Tereno',
  				'tet' => 'tetum',
  				'tg' => 'tadžikų',
  				'th' => 'tajų',
@@ -1121,27 +1125,27 @@ has 'display_name_language' => (
  				'tig' => 'tigre',
  				'tiv' => 'tiv',
  				'tk' => 'turkmėnų',
- 				'tkl' => 'tokelau',
+ 				'tkl' => 'Tokelau',
  				'tkr' => 'tsakurų',
  				'tl' => 'tagalogų',
  				'tlh' => 'klingonų',
- 				'tli' => 'tlingit',
+ 				'tli' => 'tlingitų',
  				'tly' => 'talyšų',
  				'tmh' => 'tamašek',
- 				'tn' => 'tsvana',
+ 				'tn' => 'tsvanų',
  				'to' => 'tonganų',
- 				'tog' => 'niasa tongos',
- 				'tpi' => 'tok pisin',
+ 				'tog' => 'niasa tongų',
+ 				'tpi' => 'Papua pidžinų',
  				'tr' => 'turkų',
  				'tru' => 'turoyo',
- 				'trv' => 'taroko',
- 				'ts' => 'tsonga',
+ 				'trv' => 'Taroko',
+ 				'ts' => 'tsongų',
  				'tsd' => 'tsakonų',
  				'tsi' => 'tsimšian',
  				'tt' => 'totorių',
  				'ttt' => 'musulmonų tatų',
  				'tum' => 'tumbukų',
- 				'tvl' => 'tuvalu',
+ 				'tvl' => 'Tuvalu',
  				'tw' => 'tvi',
  				'twq' => 'tasavakų',
  				'ty' => 'taitiečių',
@@ -1149,28 +1153,28 @@ has 'display_name_language' => (
  				'tzm' => 'Centrinio Maroko tamazitų',
  				'udm' => 'udmurtų',
  				'ug' => 'uigūrų',
- 				'uga' => 'ugaritic',
+ 				'uga' => 'ugaritų',
  				'uk' => 'ukrainiečių',
  				'umb' => 'umbundu',
  				'und' => 'nežinoma kalba',
  				'ur' => 'urdų',
  				'uz' => 'uzbekų',
  				'vai' => 'vai',
- 				've' => 'venda',
+ 				've' => 'vendų',
  				'vec' => 'venetų',
  				'vep' => 'vepsų',
  				'vi' => 'vietnamiečių',
  				'vls' => 'vakarų flamandų',
  				'vmf' => 'pagrindinė frankonų',
- 				'vo' => 'volapiuk',
- 				'vot' => 'votik',
- 				'vro' => 'võro',
+ 				'vo' => 'volapiuko',
+ 				'vot' => 'Votik',
+ 				'vro' => 'veru',
  				'vun' => 'vunjo',
  				'wa' => 'valonų',
  				'wae' => 'valserų',
  				'wal' => 'valamo',
  				'war' => 'varai',
- 				'was' => 'vašo',
+ 				'was' => 'Vašo',
  				'wbp' => 'valrpiri',
  				'wo' => 'volofų',
  				'wuu' => 'kinų kalbos vu tarmė',
@@ -1188,7 +1192,7 @@ has 'display_name_language' => (
  				'yue' => 'kinų kalbos Kantono tarmė',
  				'za' => 'chuang',
  				'zap' => 'zapotekų',
- 				'zbl' => '„Bliss“ simbolių',
+ 				'zbl' => 'BLISS simbolių',
  				'zea' => 'zelandų',
  				'zen' => 'zenaga',
  				'zgh' => 'standartinė Maroko tamazigtų',
@@ -1196,7 +1200,7 @@ has 'display_name_language' => (
  				'zh_Hans' => 'supaprastintoji kinų',
  				'zh_Hant' => 'tradicinė kinų',
  				'zu' => 'zulų',
- 				'zun' => 'zuni',
+ 				'zun' => 'Zuni',
  				'zxx' => 'nėra kalbinio turinio',
  				'zza' => 'zaza',
 
@@ -1260,6 +1264,7 @@ has 'display_name_script' => (
  			'Grek' => 'graikų',
  			'Gujr' => 'gudžaratų',
  			'Guru' => 'gurmuki',
+ 			'Hanb' => 'hanbų',
  			'Hang' => 'hangul',
  			'Hani' => 'han',
  			'Hano' => 'hanuno',
@@ -1275,6 +1280,7 @@ has 'display_name_script' => (
  			'Hung' => 'senasis vengrų',
  			'Inds' => 'indus',
  			'Ital' => 'senasis italų',
+ 			'Jamo' => 'Jamo simboliai',
  			'Java' => 'javiečių',
  			'Jpan' => 'japonų',
  			'Jurc' => 'Jurchen',
@@ -1379,6 +1385,7 @@ has 'display_name_script' => (
  			'Yiii' => 'ji',
  			'Zinh' => 'paveldėtas',
  			'Zmth' => 'matematiniai simboliai',
+ 			'Zsye' => 'jaustukai',
  			'Zsym' => 'simbolių',
  			'Zxxx' => 'neparašyta',
  			'Zyyy' => 'bendri',
@@ -1490,6 +1497,7 @@ has 'display_name_region' => (
  			'CX' => 'Kalėdų Sala',
  			'CY' => 'Kipras',
  			'CZ' => 'Čekija',
+ 			'CZ@alt=variant' => 'Čekijos Respublika',
  			'DE' => 'Vokietija',
  			'DG' => 'Diego Garsija',
  			'DJ' => 'Džibutis',
@@ -1506,6 +1514,7 @@ has 'display_name_region' => (
  			'ES' => 'Ispanija',
  			'ET' => 'Etiopija',
  			'EU' => 'Europos Sąjunga',
+ 			'EZ' => 'euro zona',
  			'FI' => 'Suomija',
  			'FJ' => 'Fidžis',
  			'FK' => 'Folklando Salos',
@@ -1514,8 +1523,8 @@ has 'display_name_region' => (
  			'FO' => 'Farerų Salos',
  			'FR' => 'Prancūzija',
  			'GA' => 'Gabonas',
- 			'GB' => 'Didžioji Britanija',
- 			'GB@alt=short' => 'Didžioji Britanija',
+ 			'GB' => 'Jungtinė Karalystė',
+ 			'GB@alt=short' => 'JK',
  			'GD' => 'Grenada',
  			'GE' => 'Gruzija',
  			'GF' => 'Prancūzijos Gviana',
@@ -1568,7 +1577,7 @@ has 'display_name_region' => (
  			'KZ' => 'Kazachstanas',
  			'LA' => 'Laosas',
  			'LB' => 'Libanas',
- 			'LC' => 'Šventoji Liucija',
+ 			'LC' => 'Sent Lusija',
  			'LI' => 'Lichtenšteinas',
  			'LK' => 'Šri Lanka',
  			'LR' => 'Liberija',
@@ -1617,13 +1626,13 @@ has 'display_name_region' => (
  			'OM' => 'Omanas',
  			'PA' => 'Panama',
  			'PE' => 'Peru',
- 			'PF' => 'Prancūzų Polinezija',
+ 			'PF' => 'Prancūzijos Polinezija',
  			'PG' => 'Papua Naujoji Gvinėja',
  			'PH' => 'Filipinai',
  			'PK' => 'Pakistanas',
  			'PL' => 'Lenkija',
  			'PM' => 'Sen Pjeras ir Mikelonas',
- 			'PN' => 'Pitkernas',
+ 			'PN' => 'Pitkerno salos',
  			'PR' => 'Puerto Rikas',
  			'PS' => 'Palestinos teritorija',
  			'PS@alt=short' => 'Palestina',
@@ -1678,6 +1687,8 @@ has 'display_name_region' => (
  			'UA' => 'Ukraina',
  			'UG' => 'Uganda',
  			'UM' => 'Jungtinių Valstijų Mažosios Tolimosios Salos',
+ 			'UN' => 'Jungtinės Tautos',
+ 			'UN@alt=short' => 'JT',
  			'US' => 'Jungtinės Valstijos',
  			'US@alt=short' => 'JAV',
  			'UY' => 'Urugvajus',
@@ -1689,7 +1700,7 @@ has 'display_name_region' => (
  			'VI' => 'Jungtinių Valstijų Mergelių Salos',
  			'VN' => 'Vietnamas',
  			'VU' => 'Vanuatu',
- 			'WF' => 'Volisas ir Futuna',
+ 			'WF' => 'Volisas ir Futūna',
  			'WS' => 'Samoa',
  			'XK' => 'Kosovas',
  			'YE' => 'Jemenas',
@@ -1754,11 +1765,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'kalendorius',
+ 			'cf' => 'valiutos formatas',
  			'colalternate' => 'Rikiavimas nepaisant simbolių',
  			'colbackwards' => 'Atvirkštinis rikiavimas',
  			'colcasefirst' => 'Didžiųjų / mažųjų raidžių tvarka',
  			'colcaselevel' => 'Rikiavimas skiriant didžiąsias ir mažąsias raides',
- 			'colhiraganaquaternary' => 'Rikiavimas pagal kanos ženklus',
  			'collation' => 'rikiavimas',
  			'colnormalization' => 'Normalizuotas rikiavimas',
  			'colnumeric' => 'Skaitinis rikiavimas',
@@ -1770,7 +1781,6 @@ has 'display_name_key' => (
  			'numbers' => 'skaičiai',
  			'timezone' => 'Laiko juosta',
  			'va' => 'Lokalės variantas',
- 			'variabletop' => 'Rikiavimas simbolių principu',
  			'x' => 'Naudoti privačiai',
 
 		}
@@ -1803,6 +1813,10 @@ has 'display_name_type' => (
  				'persian' => q{persų kalendorius},
  				'roc' => q{Kinijos Respublikos kalendorius},
  			},
+ 			'cf' => {
+ 				'account' => q{apskaitos valiutos formatas},
+ 				'standard' => q{standartinis valiutos formatas},
+ 			},
  			'colalternate' => {
  				'non-ignorable' => q{Rikiuoti simbolius},
  				'shifted' => q{Rikiuoti nepaisant simbolių},
@@ -1820,12 +1834,9 @@ has 'display_name_type' => (
  				'no' => q{Rikiuoti neskiriant didžiųjų ir mažųjų raidžių},
  				'yes' => q{Rikiuoti skiriant didžiąsias ir mažąsias raides},
  			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{Rikiuoti kanos ženklus atskirai},
- 				'yes' => q{Rikiuoti kanos ženklus kitaip},
- 			},
  			'collation' => {
  				'big5han' => q{įprasta kiniška rūšiavimo tvarka - Big5},
+ 				'compat' => q{ankstesnė rūšiavimo tvarka, skirta suderinamumui},
  				'dictionary' => q{žodyno rūšiavimo tvarka},
  				'ducet' => q{numatytasis unikodo rikiavimas},
  				'eor' => q{rūšiavimo tvarka daugiakalbės Europos dokumentų},
@@ -1857,6 +1868,11 @@ has 'display_name_type' => (
  				'secondary' => q{Rikiuoti diakritinius ženklus},
  				'tertiary' => q{Rikiuoti pagal diakritinius ženklus / didžiąsias ir mažąsias raides / plotį},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{viso pločio},
+ 				'hwidth' => q{vidutinio pločio},
+ 				'npinyin' => q{Skaitinis},
+ 			},
  			'hc' => {
  				'h11' => q{12 valandų sistema (0–11)},
  				'h12' => q{12 valandų sistema (1–12)},
@@ -1867,6 +1883,10 @@ has 'display_name_type' => (
  				'loose' => q{laisvas teksto laužymo stilius},
  				'normal' => q{įprastas teksto laužymo stilius},
  				'strict' => q{griežtas teksto laužymo stilius},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{BGN simboliai},
+ 				'ungegn' => q{UNGEGN simboliai},
  			},
  			'ms' => {
  				'metric' => q{metrinė sistema},
@@ -1955,27 +1975,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN simboliai',
- 			'numeric' => 'Skaitinis',
- 			'tone' => 'Tonas',
- 			'ungegn' => 'UNGEGN simboliai',
- 			'x-accents' => 'Kirčiai',
- 			'x-fullwidth' => 'Viso pločio',
- 			'x-halfwidth' => 'Vidutinio pločio',
- 			'x-jamo' => 'Jamo simboliai',
- 			'x-pinyin' => 'Pinjino simboliai',
- 			'x-publishing' => 'Skelbimas',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1999,10 +1998,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ã {ą́} {ą̃} {ch} {dz} {dž} é è ẽ {ę́} {ę̃} {ė́} {ė̃} {i̇́}í {i̇̀}ì {i̇̃}ĩ {į́}{į̇́} {į̃}{į̇̃} {j̃}{j̇̃} {l̃} {m̃} ñ ó ò õ q {r̃} ú ù ũ {ų́} {ų̃} {ū́} {ū̃} w x])},
+			auxiliary => qr{[á à ã {ą́} {ą̃} {ch} {dz} {dž} é è ẽ {ę́} {ę̃} {ė́} {ė̃} {i̇́}í {i̇̀}ì {i̇̃}ĩ {į́}{į̇́} {į̃}{į̇̃} {j̃}{j̇̃} {l̃} {m̃} ñ ó ò õ q {r̃} ú ù ũ {ų́} {ų̃} {ū́} {ū̃} w x]},
 			index => ['A', 'Ą', 'B', 'C', 'Č', 'D', 'E', 'Ę', 'Ė', 'F', 'G', 'H', 'I', 'Į', 'Y', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'Š', 'T', 'U', 'Ų', 'Ū', 'V', 'Z', 'Ž'],
-			main => qr{(?^u:[a ą b c č d e ę ė f g h i į y j k l m n o p r s š t u ų ū v z ž])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … “ „ ( ) \[ \] \{ \}])},
+			main => qr{[a ą b c č d e ę ė f g h i į y j k l m n o p r s š t u ų ū v z ž]},
+			numbers => qr{[  , % ‰ + − 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … “ „ ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -2187,10 +2187,10 @@ has 'units' => (
 						'other' => q({0} amžių),
 					},
 					'coordinate' => {
-						'east' => q({0} E),
-						'north' => q({0} N),
-						'south' => q({0} S),
-						'west' => q({0} W),
+						'east' => q({0} rytų),
+						'north' => q({0} šiaurės),
+						'south' => q({0} pietų),
+						'west' => q({0} vakarų),
 					},
 					'cubic-centimeter' => {
 						'few' => q({0} kubiniai centimetrai),
@@ -2343,6 +2343,14 @@ has 'units' => (
 						'one' => q({0} galonas),
 						'other' => q({0} galonų),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'few' => q({0} imperiniai galonai),
+						'many' => q({0} imperinio galono),
+						'name' => q(imperinis galonas),
+						'one' => q({0} imperinis galonas),
+						'other' => q({0} imperinių galonų),
+						'per' => q({0} imperiniame galone),
 					},
 					'generic' => {
 						'few' => q({0}°),
@@ -2632,7 +2640,7 @@ has 'units' => (
 						'other' => q({0} metrų per sekundę),
 					},
 					'meter-per-second-squared' => {
-						'few' => q({0} metrai per kvadratinęsekundę),
+						'few' => q({0} metrai per kvadratinę sekundę),
 						'many' => q({0} metro per kvadratinę sekundę),
 						'name' => q(metrai per kvadratinę sekundę),
 						'one' => q({0} metras per kvadratinę sekundę),
@@ -2680,6 +2688,13 @@ has 'units' => (
 						'one' => q({0} mylia už galoną),
 						'other' => q({0} mylių už galoną),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mylios už imperinį galoną),
+						'many' => q({0} mylios už imperinį galoną),
+						'name' => q(mylios už imperinį galoną),
+						'one' => q({0} mylia už imperinį galoną),
+						'other' => q({0} mylių už imperinį galoną),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} mylios per valandą),
 						'many' => q({0} mylios per valandą),
@@ -2715,6 +2730,13 @@ has 'units' => (
 						'one' => q({0} miligramas),
 						'other' => q({0} miligramų),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} miligramai decilitre),
+						'many' => q({0} miligramo decilitre),
+						'name' => q(miligramai decilitre),
+						'one' => q({0} miligramas decilitre),
+						'other' => q({0} miligramų decilitre),
+					},
 					'milliliter' => {
 						'few' => q({0} mililitrai),
 						'many' => q({0} mililitro),
@@ -2735,6 +2757,13 @@ has 'units' => (
 						'name' => q(gysidabrio stulpelio milimetrai),
 						'one' => q({0} gysidabrio stulpelio milimetras),
 						'other' => q({0} gysidabrio stulpelio milimetrų),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} milimoliai litre),
+						'many' => q({0} milimoliai litre),
+						'name' => q(milimoliai litre),
+						'one' => q({0} milimolis litre),
+						'other' => q({0} milimolių litre),
 					},
 					'millisecond' => {
 						'few' => q({0} milisekundės),
@@ -2816,6 +2845,13 @@ has 'units' => (
 						'one' => q({0} parsekas),
 						'other' => q({0} parsekų),
 					},
+					'part-per-million' => {
+						'few' => q({0} milijoninės dalys),
+						'many' => q({0} milijoninės dalies),
+						'name' => q(milijoninės dalys),
+						'one' => q({0} milijoninė dalis),
+						'other' => q({0} milijoninių dalių),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2839,6 +2875,13 @@ has 'units' => (
 						'name' => q(metrinės pintos),
 						'one' => q({0} metrinė pinta),
 						'other' => q({0} metrinių pintų),
+					},
+					'point' => {
+						'few' => q({0} punktai),
+						'many' => q({0} punktų),
+						'name' => q(punktai),
+						'one' => q({0} punktas),
+						'other' => q({0} punkto),
 					},
 					'pound' => {
 						'few' => q({0} svarai),
@@ -2913,6 +2956,7 @@ has 'units' => (
 						'name' => q(kvadratiniai kilometrai),
 						'one' => q({0} kvadratinis kilometras),
 						'other' => q({0} kvadratinių kilometrų),
+						'per' => q({0} kv. km),
 					},
 					'square-meter' => {
 						'few' => q({0} kvadratiniai metrai),
@@ -2928,6 +2972,7 @@ has 'units' => (
 						'name' => q(kvadratinės mylios),
 						'one' => q({0} kvadratinė mylia),
 						'other' => q({0} kvadratinių mylių),
+						'per' => q({0} kv. my),
 					},
 					'square-yard' => {
 						'few' => q({0} kvadratiniai jardai),
@@ -3062,12 +3107,20 @@ has 'units' => (
 						'name' => q(cm),
 						'one' => q({0} cm),
 						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					'century' => {
+						'few' => q({0} a.),
+						'many' => q({0} a.),
+						'name' => q(a.),
+						'one' => q({0} a.),
+						'other' => q({0} a.),
 					},
 					'coordinate' => {
-						'east' => q({0} E),
-						'north' => q({0} N),
-						'south' => q({0} S),
-						'west' => q({0} W),
+						'east' => q({0} R),
+						'north' => q({0} Š),
+						'south' => q({0} P),
+						'west' => q({0} V),
 					},
 					'cubic-kilometer' => {
 						'few' => q({0} km³),
@@ -3087,6 +3140,14 @@ has 'units' => (
 						'name' => q(diena),
 						'one' => q({0} d.),
 						'other' => q({0} d.),
+						'per' => q({0}/d.),
+					},
+					'decimeter' => {
+						'few' => q({0} dm),
+						'many' => q({0} dm),
+						'name' => q(dm),
+						'one' => q({0} dm),
+						'other' => q({0} dm),
 					},
 					'degree' => {
 						'few' => q({0}°),
@@ -3097,6 +3158,7 @@ has 'units' => (
 					'fahrenheit' => {
 						'few' => q({0}°F),
 						'many' => q({0}°F),
+						'name' => q(°F),
 						'one' => q({0}°F),
 						'other' => q({0}°F),
 					},
@@ -3116,8 +3178,10 @@ has 'units' => (
 					'foot' => {
 						'few' => q({0} ft),
 						'many' => q({0} ft),
+						'name' => q(pėda),
 						'one' => q({0} ft),
 						'other' => q({0} ft),
+						'per' => q({0}/ft),
 					},
 					'furlong' => {
 						'few' => q({0} fur),
@@ -3129,8 +3193,16 @@ has 'units' => (
 					'g-force' => {
 						'few' => q({0} G),
 						'many' => q({0} G),
+						'name' => q(G),
 						'one' => q({0} G),
 						'other' => q({0} G),
+					},
+					'generic' => {
+						'few' => q({0}°),
+						'many' => q({0}°),
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
 					},
 					'gram' => {
 						'few' => q({0} g),
@@ -3138,6 +3210,7 @@ has 'units' => (
 						'name' => q(g),
 						'one' => q({0} g),
 						'other' => q({0} g),
+						'per' => q({0}/g),
 					},
 					'hectare' => {
 						'few' => q({0}ha),
@@ -3148,6 +3221,7 @@ has 'units' => (
 					'hectopascal' => {
 						'few' => q({0} hPa),
 						'many' => q({0} hPa),
+						'name' => q(hPa),
 						'one' => q({0} hPa),
 						'other' => q({0} hPa),
 					},
@@ -3163,16 +3237,20 @@ has 'units' => (
 						'name' => q(valanda),
 						'one' => q({0} h),
 						'other' => q({0} h),
+						'per' => q({0}/h),
 					},
 					'inch' => {
 						'few' => q({0} in),
 						'many' => q({0} in),
+						'name' => q(coliai),
 						'one' => q({0} in),
 						'other' => q({0} in),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
 						'few' => q({0} inHg),
 						'many' => q({0} inHg),
+						'name' => q(inHg),
 						'one' => q({0} inHg),
 						'other' => q({0} inHg),
 					},
@@ -3189,6 +3267,7 @@ has 'units' => (
 						'name' => q(kg),
 						'one' => q({0} kg),
 						'other' => q({0} kg),
+						'per' => q({0}/kg),
 					},
 					'kilometer' => {
 						'few' => q({0} km),
@@ -3196,6 +3275,7 @@ has 'units' => (
 						'name' => q(km),
 						'one' => q({0} km),
 						'other' => q({0} km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'few' => q({0} km/h),
@@ -3209,6 +3289,13 @@ has 'units' => (
 						'many' => q({0} kW),
 						'one' => q({0} kW),
 						'other' => q({0} kW),
+					},
+					'knot' => {
+						'few' => q({0} KN),
+						'many' => q({0} KN),
+						'name' => q(mazgas),
+						'one' => q({0} KN),
+						'other' => q({0} KN),
 					},
 					'light-year' => {
 						'few' => q({0} šm.),
@@ -3236,18 +3323,35 @@ has 'units' => (
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
 						'few' => q({0} m/s),
 						'many' => q({0} m/s),
+						'name' => q(m/s),
 						'one' => q({0} m/s),
 						'other' => q({0} m/s),
 					},
+					'meter-per-second-squared' => {
+						'few' => q({0} m/s²),
+						'many' => q({0} m/s²),
+						'name' => q(m/s²),
+						'one' => q({0} m/s²),
+						'other' => q({0} m/s²),
+					},
+					'microsecond' => {
+						'few' => q({0} μs),
+						'many' => q({0} μs),
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
 					'mile' => {
-						'few' => q({0} my),
-						'many' => q({0} my),
-						'one' => q({0} my),
-						'other' => q({0} my),
+						'few' => q({0} mi),
+						'many' => q({0} mi),
+						'name' => q(mi),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
 					},
 					'mile-per-gallon' => {
 						'few' => q({0} mi/gal),
@@ -3256,14 +3360,23 @@ has 'units' => (
 						'other' => q({0} mi/gal),
 					},
 					'mile-per-hour' => {
-						'few' => q({0} my/h),
-						'many' => q({0} my/h),
-						'one' => q({0} my/h),
-						'other' => q({0} my/h),
+						'few' => q({0} mi/h),
+						'many' => q({0} mi/h),
+						'name' => q(mi/h),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					'mile-scandinavian' => {
+						'few' => q({0} IM),
+						'many' => q({0} IM),
+						'name' => q(IM),
+						'one' => q({0} IM),
+						'other' => q({0} IM),
 					},
 					'millibar' => {
 						'few' => q({0} mbar),
 						'many' => q({0} mbar),
+						'name' => q(mbar),
 						'one' => q({0} mbar),
 						'other' => q({0} mbar),
 					},
@@ -3277,6 +3390,7 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'few' => q({0} mm Hg),
 						'many' => q({0} mm Hg),
+						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
 					},
@@ -3293,6 +3407,7 @@ has 'units' => (
 						'name' => q(min.),
 						'one' => q({0} min.),
 						'other' => q({0} min.),
+						'per' => q({0}/min.),
 					},
 					'month' => {
 						'few' => q({0} mėn.),
@@ -3300,12 +3415,22 @@ has 'units' => (
 						'name' => q(mėnuo),
 						'one' => q({0} mėn.),
 						'other' => q({0} mėn.),
+						'per' => q({0}/mėn.),
+					},
+					'nanosecond' => {
+						'few' => q({0} ns),
+						'many' => q({0} ns),
+						'name' => q(nanosek.),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
 					},
 					'ounce' => {
 						'few' => q({0} oz),
 						'many' => q({0} oz),
+						'name' => q(oz),
 						'one' => q({0} oz),
 						'other' => q({0} oz),
+						'per' => q({0}/oz),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -3319,8 +3444,17 @@ has 'units' => (
 					'pound' => {
 						'few' => q({0} lb),
 						'many' => q({0} lb),
+						'name' => q(lb),
 						'one' => q({0} lb),
 						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					'pound-per-square-inch' => {
+						'few' => q({0} lb in²),
+						'many' => q({0} lb in²),
+						'name' => q(lb in²),
+						'one' => q({0} lb in²),
+						'other' => q({0} lb in²),
 					},
 					'quart' => {
 						'few' => q({0} kvortos),
@@ -3334,6 +3468,7 @@ has 'units' => (
 						'name' => q(sek.),
 						'one' => q({0} s),
 						'other' => q({0} s),
+						'per' => q({0}/s),
 					},
 					'square-foot' => {
 						'few' => q({0} ft²),
@@ -3378,10 +3513,12 @@ has 'units' => (
 						'name' => q(sav.),
 						'one' => q({0} sav.),
 						'other' => q({0} sav.),
+						'per' => q({0}/sav.),
 					},
 					'yard' => {
 						'few' => q({0} yd),
 						'many' => q({0} yd),
+						'name' => q(yd),
 						'one' => q({0} yd),
 						'other' => q({0} yd),
 					},
@@ -3391,6 +3528,7 @@ has 'units' => (
 						'name' => q(metai),
 						'one' => q({0} m.),
 						'other' => q({0} m.),
+						'per' => q({0}/m.),
 					},
 				},
 				'short' => {
@@ -3501,10 +3639,10 @@ has 'units' => (
 						'other' => q({0} a.),
 					},
 					'coordinate' => {
-						'east' => q({0} E),
-						'north' => q({0} N),
-						'south' => q({0} S),
-						'west' => q({0} W),
+						'east' => q({0} R),
+						'north' => q({0} Š),
+						'south' => q({0} P),
+						'west' => q({0} V),
 					},
 					'cubic-centimeter' => {
 						'few' => q({0} cm³),
@@ -3657,6 +3795,14 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'few' => q({0} imp. galonai),
+						'many' => q({0} imp. galono),
+						'name' => q(imp. galonas),
+						'one' => q({0} imp. galonas),
+						'other' => q({0} imp. galonų),
+						'per' => q({0}/imp. galone),
 					},
 					'generic' => {
 						'few' => q({0}°),
@@ -3988,11 +4134,18 @@ has 'units' => (
 						'other' => q({0} mi),
 					},
 					'mile-per-gallon' => {
-						'few' => q({0} mi/gal),
-						'many' => q({0} mi/gal),
-						'name' => q(mi/gal),
-						'one' => q({0} mi/gal),
-						'other' => q({0} mi/gal),
+						'few' => q({0} my/gal),
+						'many' => q({0} my/gal),
+						'name' => q(my/gal),
+						'one' => q({0} my/gal),
+						'other' => q({0} my/gal),
+					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} my/imp. g),
+						'many' => q({0} my/imp. g),
+						'name' => q(my/imp. g),
+						'one' => q({0} my/imp. g),
+						'other' => q({0} my/imp. g),
 					},
 					'mile-per-hour' => {
 						'few' => q({0} mi/h),
@@ -4029,6 +4182,13 @@ has 'units' => (
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mg/dl),
+						'many' => q({0} mg/dl),
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
 					'milliliter' => {
 						'few' => q({0} ml),
 						'many' => q({0} ml),
@@ -4049,6 +4209,13 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} mmol/l),
+						'many' => q({0} mmol/l),
+						'name' => q(mmol/l),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
 					},
 					'millisecond' => {
 						'few' => q({0} ms),
@@ -4130,6 +4297,13 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'few' => q({0} ppm),
+						'many' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -4153,6 +4327,13 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'few' => q({0} pt),
+						'many' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'few' => q({0} lb),
@@ -4227,6 +4408,7 @@ has 'units' => (
 						'name' => q(kv. km),
 						'one' => q({0} kv. km),
 						'other' => q({0} kv. km),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'few' => q({0} kv. m),
@@ -4242,6 +4424,7 @@ has 'units' => (
 						'name' => q(kv. mylios),
 						'one' => q({0} kv. my),
 						'other' => q({0} kv. my),
+						'per' => q({0}/my²),
 					},
 					'square-yard' => {
 						'few' => q({0} yd²),
@@ -4482,7 +4665,7 @@ has 'number_formats' => (
 					'other' => '000 trln'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -4637,14 +4820,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -5185,14 +5368,24 @@ has 'currencies' => (
 				'other' => q(Baltarusijos naujųjų rublių),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(Baltarusijos rublis),
 				'few' => q(Baltarusijos rubliai),
 				'many' => q(Baltarusijos rublio),
 				'one' => q(Baltarusijos rublis),
 				'other' => q(Baltarusijos rublių),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(Baltarusijos rublis \(2000–2016\)),
+				'few' => q(Baltarusijos rubliai \(2000–2016\)),
+				'many' => q(Baltarusijos rublio \(2000–2016\)),
+				'one' => q(Baltarusijos rublis \(2000–2016\)),
+				'other' => q(Baltarusijos rublių \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -5279,6 +5472,16 @@ has 'currencies' => (
 				'many' => q(Čilės peso),
 				'one' => q(Čilės pesas),
 				'other' => q(Čilės pesų),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(Kinijos Užsienio juanis),
+				'few' => q(Kinijos Užsienio juaniai),
+				'many' => q(Kinijos Užsienio juanio),
+				'one' => q(Kinijos Užsienio juanis),
+				'other' => q(Kinijos Užsienio juanių),
 			},
 		},
 		'CNX' => {
@@ -6522,11 +6725,11 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(Peru naujasis solis),
-				'few' => q(Peru naujieji soliai),
-				'many' => q(Peru naujojo solio),
-				'one' => q(Peru naujasis solis),
-				'other' => q(Peru naujųjų solių),
+				'currency' => q(Peru solis),
+				'few' => q(Peru soliai),
+				'many' => q(Peru solio),
+				'one' => q(Peru solis),
+				'other' => q(Peru solių),
 			},
 		},
 		'PES' => {
@@ -8305,6 +8508,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					narrow => {
+						nonleap => [
+							'1',
+							'2',
+							'3',
+							'4',
+							'5',
+							'6',
+							'7',
+							'8',
+							'9',
+							'10',
+							'11',
+							'12'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'Chaitra',
@@ -8768,353 +8990,353 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'buddhist') {
+			if ($_ eq 'roc') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'chinese') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'persian') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'dangi') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'islamic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'dangi') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'ethiopic-amete-alem') {
+			if ($_ eq 'ethiopic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'japanese') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic-amete-alem') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 0
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
@@ -9134,67 +9356,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'night1' => q{naktis},
-					'morning1' => q{rytas},
-					'noon' => q{perpiet},
-					'midnight' => q{vidurnaktis},
-					'afternoon1' => q{popietė},
-					'evening1' => q{vakaras},
-					'am' => q{priešpiet},
-					'pm' => q{popiet},
-				},
 				'wide' => {
-					'am' => q{priešpiet},
-					'pm' => q{popiet},
 					'evening1' => q{vakaras},
-					'afternoon1' => q{popietė},
-					'midnight' => q{vidurnaktis},
-					'night1' => q{naktis},
+					'am' => q{priešpiet},
 					'morning1' => q{rytas},
+					'afternoon1' => q{popietė},
+					'night1' => q{naktis},
 					'noon' => q{perpiet},
+					'pm' => q{popiet},
+					'midnight' => q{vidurnaktis},
 				},
 				'narrow' => {
-					'night1' => q{naktis},
-					'morning1' => q{rytas},
-					'noon' => q{perpiet},
-					'midnight' => q{vidurnaktis},
-					'afternoon1' => q{popietė},
 					'evening1' => q{vakaras},
 					'am' => q{pr. p.},
 					'pm' => q{pop.},
+					'midnight' => q{vidurnaktis},
+					'noon' => q{perpiet},
+					'night1' => q{naktis},
+					'afternoon1' => q{popietė},
+					'morning1' => q{rytas},
+				},
+				'abbreviated' => {
+					'pm' => q{popiet},
+					'midnight' => q{vidurnaktis},
+					'morning1' => q{rytas},
+					'afternoon1' => q{popietė},
+					'noon' => q{perpiet},
+					'night1' => q{naktis},
+					'am' => q{priešpiet},
+					'evening1' => q{vakaras},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'morning1' => q{rytas},
-					'night1' => q{naktis},
-					'noon' => q{vidurdienis},
-					'midnight' => q{vidurnaktis},
-					'afternoon1' => q{diena},
-					'evening1' => q{vakaras},
-					'am' => q{priešpiet},
-					'pm' => q{popiet},
-				},
 				'wide' => {
 					'am' => q{priešpiet},
+					'evening1' => q{vakaras},
+					'midnight' => q{vidurnaktis},
 					'pm' => q{popiet},
 					'afternoon1' => q{diena},
-					'evening1' => q{vakaras},
 					'morning1' => q{rytas},
-					'night1' => q{naktis},
 					'noon' => q{vidurdienis},
-					'midnight' => q{vidurnaktis},
+					'night1' => q{naktis},
 				},
 				'narrow' => {
-					'midnight' => q{vidurnaktis},
-					'noon' => q{vidurdienis},
-					'night1' => q{naktis},
-					'morning1' => q{rytas},
-					'pm' => q{pop.},
-					'am' => q{pr. p.},
 					'evening1' => q{vakaras},
+					'am' => q{pr. p.},
+					'pm' => q{pop.},
+					'midnight' => q{vidurnaktis},
+					'night1' => q{naktis},
+					'noon' => q{vidurdienis},
 					'afternoon1' => q{diena},
+					'morning1' => q{rytas},
+				},
+				'abbreviated' => {
+					'evening1' => q{vakaras},
+					'am' => q{priešpiet},
+					'midnight' => q{vidurnaktis},
+					'pm' => q{popiet},
+					'morning1' => q{rytas},
+					'afternoon1' => q{diena},
+					'night1' => q{naktis},
+					'noon' => q{vidurdienis},
 				},
 			},
 		},
@@ -9210,11 +9432,21 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'BE'
 			},
+			narrow => {
+				'0' => 'BE'
+			},
+			wide => {
+				'0' => 'BE'
+			},
 		},
 		'chinese' => {
 		},
 		'coptic' => {
 			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
 				'0' => 'ERA0',
 				'1' => 'ERA1'
 			},
@@ -9227,6 +9459,10 @@ has 'eras' => (
 		},
 		'ethiopic' => {
 			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
 				'0' => 'ERA0',
 				'1' => 'ERA1'
 			},
@@ -9263,14 +9499,32 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'AM'
 			},
+			narrow => {
+				'0' => 'AM'
+			},
+			wide => {
+				'0' => 'AM'
+			},
 		},
 		'indian' => {
 			abbreviated => {
 				'0' => 'Saka'
 			},
+			narrow => {
+				'0' => 'Saka'
+			},
+			wide => {
+				'0' => 'Saka'
+			},
 		},
 		'islamic' => {
 			abbreviated => {
+				'0' => 'AH'
+			},
+			narrow => {
+				'0' => 'AH'
+			},
+			wide => {
 				'0' => 'AH'
 			},
 		},
@@ -9518,9 +9772,23 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'AP'
 			},
+			narrow => {
+				'0' => 'AP'
+			},
+			wide => {
+				'0' => 'AP'
+			},
 		},
 		'roc' => {
 			abbreviated => {
+				'0' => 'Prieš R.O.C.',
+				'1' => 'R.O.C.'
+			},
+			narrow => {
+				'0' => 'Prieš R.O.C.',
+				'1' => 'R.O.C.'
+			},
+			wide => {
 				'0' => 'Prieš R.O.C.',
 				'1' => 'R.O.C.'
 			},
@@ -9681,115 +9949,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'dangi' => {
-			Ed => q{d, E},
-			Gy => q{U},
-			GyMMM => q{U MMM},
-			GyMMMEd => q{U MMM d, E},
-			GyMMMd => q{U MMM d},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMd => q{MMM d},
-			Md => q{MM-dd},
-			d => q{d},
-			y => q{U},
-			yMd => q{y-MM-dd},
-			yyyy => q{U},
-			yyyyM => q{y-MM},
-			yyyyMEd => q{y-MM-dd, E},
-			yyyyMMM => q{U MMM},
-			yyyyMMMEd => q{U MMM d, E},
-			yyyyMMMd => q{U MMM d},
-			yyyyMd => q{y-MM-dd},
-			yyyyQQQ => q{U QQQ},
-			yyyyQQQQ => q{U QQQQ},
-		},
-		'generic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{y G},
-			GyMMM => q{y MMM G},
-			GyMMMEd => q{y MMM d G, E},
-			GyMMMd => q{y MMM d G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{LL},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM-d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM-d},
-			MMdd => q{MM.dd},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{hh a},
-			hm => q{hh:mm a},
-			hms => q{hh:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{y MM G},
-			yyyyMEd => q{y-MM-dd G, E},
-			yyyyMMM => q{y MMM G},
-			yyyyMMMEd => q{y MMM d G, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{y MMM d G},
-			yyyyMd => q{y-MM-dd G},
-			yyyyQQQ => q{y G QQQ},
-			yyyyQQQQ => q{y G QQQQ},
-		},
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{HH:mm, E},
-			EHms => q{HH:mm:ss, E},
-			Ed => q{d, E},
-			Ehm => q{hh:mm a, E},
-			Ehms => q{hh:mm:ss a, E},
-			Gy => q{y 'm'. G},
-			GyMMM => q{y-MM G},
-			GyMMMEd => q{y-MM-dd G, E},
-			GyMMMM => q{y 'm'. G, LLLL},
-			GyMMMMEd => q{y 'm'. G MMMM d 'd'., E},
-			GyMMMMd => q{y 'm'. G MMMM d 'd'.},
-			GyMMMd => q{y-MM-dd G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss; v},
-			Hmv => q{HH:mm; v},
-			M => q{MM},
-			MEd => q{MM-dd, E},
-			MMM => q{MM},
-			MMMEd => q{MM-dd, E},
-			MMMM => q{LLLL},
-			MMMMEd => q{MMMM d 'd'., E},
-			MMMMd => q{MMMM d 'd'.},
-			MMMd => q{MM-dd},
-			MMdd => q{MM-dd},
-			Md => q{MM-d},
-			d => q{dd},
-			h => q{hh a},
-			hm => q{hh:mm a},
-			hms => q{hh:mm:ss a},
-			hmsv => q{hh:mm:ss a; v},
-			hmv => q{hh:mm a; v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{y-MM},
-			yMEd => q{y-MM-dd, E},
-			yMMM => q{y-MM},
-			yMMMEd => q{y-MM-dd, E},
-			yMMMM => q{y 'm'. LLLL},
-			yMMMMEd => q{y 'm'. MMMM d 'd'., E},
-			yMMMMd => q{y 'm'. MMMM d 'd'.},
-			yMMMd => q{y-MM-dd},
-			yMd => q{y-MM-dd},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
-		},
 		'chinese' => {
 			Ed => q{d, E},
 			Gy => q{U},
@@ -9815,6 +9974,131 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{U QQQ},
 			yyyyQQQQ => q{U QQQQ},
 		},
+		'dangi' => {
+			Ed => q{d, E},
+			Gy => q{U},
+			GyMMM => q{U MMM},
+			GyMMMEd => q{U MMM d, E},
+			GyMMMd => q{U MMM d},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			y => q{U},
+			yMd => q{y-MM-dd},
+			yyyy => q{U},
+			yyyyM => q{y-MM},
+			yyyyMEd => q{y-MM-dd, E},
+			yyyyMMM => q{U MMM},
+			yyyyMMMEd => q{U MMM d, E},
+			yyyyMMMd => q{U MMM d},
+			yyyyMd => q{y-MM-dd},
+			yyyyQQQ => q{U QQQ},
+			yyyyQQQQ => q{U QQQQ},
+		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{h:mm B, E},
+			EBhms => q{h:mm:ss B, E},
+			EHm => q{HH:mm, E},
+			EHms => q{HH:mm:ss, E},
+			Ed => q{d, E},
+			Ehm => q{hh:mm a, E},
+			Ehms => q{hh:mm:ss a, E},
+			Gy => q{y 'm'. G},
+			GyMMM => q{y-MM G},
+			GyMMMEd => q{y-MM-dd G, E},
+			GyMMMM => q{y 'm'. G, LLLL},
+			GyMMMMEd => q{y 'm'. G MMMM d 'd'., E},
+			GyMMMMd => q{y 'm'. G MMMM d 'd'.},
+			GyMMMd => q{y-MM-dd G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss; v},
+			Hmv => q{HH:mm; v},
+			M => q{MM},
+			MEd => q{MM-dd, E},
+			MMM => q{MM},
+			MMMEd => q{MM-dd, E},
+			MMMM => q{LLLL},
+			MMMMEd => q{MMMM d 'd'., E},
+			MMMMW => q{MMM W 'sav'.},
+			MMMMd => q{MMMM d 'd'.},
+			MMMd => q{MM-dd},
+			MMdd => q{MM-dd},
+			Md => q{MM-d},
+			d => q{dd},
+			h => q{hh a},
+			hm => q{hh:mm a},
+			hms => q{hh:mm:ss a},
+			hmsv => q{hh:mm:ss a; v},
+			hmv => q{hh:mm a; v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{y-MM},
+			yMEd => q{y-MM-dd, E},
+			yMMM => q{y-MM},
+			yMMMEd => q{y-MM-dd, E},
+			yMMMM => q{y 'm'. LLLL},
+			yMMMMEd => q{y 'm'. MMMM d 'd'., E},
+			yMMMMd => q{y 'm'. MMMM d 'd'.},
+			yMMMd => q{y-MM-dd},
+			yMd => q{y-MM-dd},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{Y w 'sav'.},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{h:mm B, E},
+			EBhms => q{h:mm:ss B, E},
+			EHm => q{HH:mm, E},
+			EHms => q{HH:mm:ss, E},
+			Ed => q{d, E},
+			Ehm => q{h:mm a, E},
+			Ehms => q{h:mm:ss a, E},
+			Gy => q{y G},
+			GyMMM => q{y MMM G},
+			GyMMMEd => q{y MMM d G, E},
+			GyMMMd => q{y MMM d G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{LL},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM-d, E},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM-d},
+			MMdd => q{MM.dd},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{y MM G},
+			yyyyMEd => q{y-MM-dd G, E},
+			yyyyMMM => q{y MMM G},
+			yyyyMMMEd => q{y MMM d G, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{y MMM d G},
+			yyyyMd => q{y-MM-dd G},
+			yyyyQQQ => q{y G QQQ},
+			yyyyQQQQ => q{y G QQQQ},
+		},
 	} },
 );
 
@@ -9834,7 +10118,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'dangi' => {
+		'chinese' => {
 			M => {
 				M => q{MM–MM},
 			},
@@ -9896,34 +10180,20 @@ has 'datetime_formats_interval' => (
 				y => q{y-MM-dd–y-MM-dd},
 			},
 		},
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
+		'dangi' => {
 			M => {
-				M => q{M–M},
+				M => q{MM–MM},
 			},
 			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
+				M => q{MM-dd, E–MM-dd, E},
+				d => q{MM-dd, E–MM-dd, E},
 			},
 			MMM => {
-				M => q{MMM–MMM},
+				M => q{LLL–LLL},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
+				M => q{MMM d, E–MMM d, E},
+				d => q{MMM d, E–MMM d, E},
 			},
 			MMMd => {
 				M => q{MMM d–MMM d},
@@ -9936,59 +10206,40 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d–d},
 			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a–h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{hh:mm a–hh:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{hh:mm a–hh:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a–h a v},
-				h => q{h–h a v},
-			},
 			y => {
-				y => q{y–y G},
+				y => q{U–U},
 			},
 			yM => {
-				M => q{y-MM – y-MM G},
-				y => q{y-MM – y-MM G},
+				M => q{y-MM–y-MM},
+				y => q{y-MM–y-MM},
 			},
 			yMEd => {
-				M => q{y-MM-dd G, E – y-MM-dd G, E},
-				d => q{y-MM-dd G, E – y-MM-dd G, E},
-				y => q{y-MM-dd G, E – y-MM-dd G, E},
+				M => q{y-MM-dd, E–y-MM-dd, E},
+				d => q{y-MM-dd, E–y-MM-dd, E},
+				y => q{y-MM-dd, E–y-MM-dd, E},
 			},
 			yMMM => {
-				M => q{y MMM–MMM G},
-				y => q{y-MM – y-MM G},
+				M => q{U MMM–MMM},
+				y => q{U MMM–U MMM},
 			},
 			yMMMEd => {
-				M => q{y-MM-dd G, E – y-MM-dd G, E},
-				d => q{y-MM-dd G, E – y-MM-dd G, E},
-				y => q{y-MM-dd G, E – y-MM-dd G, E},
+				M => q{U MMM d, E–MMM d, E},
+				d => q{U MMM d, E–MMM d, E},
+				y => q{U MMM d, E–U MMM d, E},
 			},
 			yMMMM => {
-				M => q{y LLLL – y LLLL G},
-				y => q{y LLLL – y LLLL G},
+				M => q{U MMMM–MMMM},
+				y => q{U MMMM–U MMMM},
 			},
 			yMMMd => {
-				M => q{y-MM-dd – MM-d G},
-				d => q{y 'm'. MMM d 'd'.–d 'd'. G},
-				y => q{y-MM-dd – y-MM-dd G},
+				M => q{U MMM d–MMM d},
+				d => q{U MMM d–d},
+				y => q{U MMM d–U MMM d},
 			},
 			yMd => {
-				M => q{y-MM-dd– y-MM-dd G},
-				d => q{y-MM-dd–y-MM-dd G},
-				y => q{y-MM-dd – y-MM-dd G},
+				M => q{y-MM-dd–y-MM-dd},
+				d => q{y-MM-dd–y-MM-dd},
+				y => q{y-MM-dd–y-MM-dd},
 			},
 		},
 		'gregorian' => {
@@ -10107,20 +10358,34 @@ has 'datetime_formats_interval' => (
 				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
-		'chinese' => {
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
 			M => {
-				M => q{MM–MM},
+				M => q{M–M},
 			},
 			MEd => {
-				M => q{MM-dd, E–MM-dd, E},
-				d => q{MM-dd, E–MM-dd, E},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
 			},
 			MMM => {
-				M => q{LLL–LLL},
+				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{MMM d, E–MMM d, E},
-				d => q{MMM d, E–MMM d, E},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
 				M => q{MMM d–MMM d},
@@ -10133,40 +10398,59 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d–d},
 			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a–h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{hh:mm a–hh:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{hh:mm a–hh:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a–h a v},
+				h => q{h–h a v},
+			},
 			y => {
-				y => q{U–U},
+				y => q{y–y G},
 			},
 			yM => {
-				M => q{y-MM–y-MM},
-				y => q{y-MM–y-MM},
+				M => q{y-MM – y-MM G},
+				y => q{y-MM – y-MM G},
 			},
 			yMEd => {
-				M => q{y-MM-dd, E–y-MM-dd, E},
-				d => q{y-MM-dd, E–y-MM-dd, E},
-				y => q{y-MM-dd, E–y-MM-dd, E},
+				M => q{y-MM-dd G, E – y-MM-dd G, E},
+				d => q{y-MM-dd G, E – y-MM-dd G, E},
+				y => q{y-MM-dd G, E – y-MM-dd G, E},
 			},
 			yMMM => {
-				M => q{U MMM–MMM},
-				y => q{U MMM–U MMM},
+				M => q{y MMM–MMM G},
+				y => q{y-MM – y-MM G},
 			},
 			yMMMEd => {
-				M => q{U MMM d, E–MMM d, E},
-				d => q{U MMM d, E–MMM d, E},
-				y => q{U MMM d, E–U MMM d, E},
+				M => q{y-MM-dd G, E – y-MM-dd G, E},
+				d => q{y-MM-dd G, E – y-MM-dd G, E},
+				y => q{y-MM-dd G, E – y-MM-dd G, E},
 			},
 			yMMMM => {
-				M => q{U MMMM–MMMM},
-				y => q{U MMMM–U MMMM},
+				M => q{y LLLL – y LLLL G},
+				y => q{y LLLL – y LLLL G},
 			},
 			yMMMd => {
-				M => q{U MMM d–MMM d},
-				d => q{U MMM d–d},
-				y => q{U MMM d–U MMM d},
+				M => q{y-MM-dd – MM-d G},
+				d => q{y 'm'. MMM d 'd'.–d 'd'. G},
+				y => q{y-MM-dd – y-MM-dd G},
 			},
 			yMd => {
-				M => q{y-MM-dd–y-MM-dd},
-				d => q{y-MM-dd–y-MM-dd},
-				y => q{y-MM-dd–y-MM-dd},
+				M => q{y-MM-dd– y-MM-dd G},
+				d => q{y-MM-dd–y-MM-dd G},
+				y => q{y-MM-dd – y-MM-dd G},
 			},
 		},
 	} },
@@ -10504,14 +10788,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Ako vasaros laikas),
-				'generic' => q(Ako laikas),
-				'standard' => q(Ako standartinis laikas),
+				'daylight' => q#Ako vasaros laikas#,
+				'generic' => q#Ako laikas#,
+				'standard' => q#Ako standartinis laikas#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Afganistano laikas),
+				'standard' => q#Afganistano laikas#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -10672,45 +10956,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Centrinės Afrikos laikas),
+				'standard' => q#Centrinės Afrikos laikas#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Rytų Afrikos laikas),
+				'standard' => q#Rytų Afrikos laikas#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Pietų Afrikos laikas),
+				'standard' => q#Pietų Afrikos laikas#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Vakarų Afrikos vasaros laikas),
-				'generic' => q(Vakarų Afrikos laikas),
-				'standard' => q(Vakarų Afrikos žiemos laikas),
+				'daylight' => q#Vakarų Afrikos vasaros laikas#,
+				'generic' => q#Vakarų Afrikos laikas#,
+				'standard' => q#Vakarų Afrikos žiemos laikas#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Aliaskos vasaros laikas),
-				'generic' => q(Aliaskos laikas),
-				'standard' => q(Aliaskos žiemos laikas),
+				'daylight' => q#Aliaskos vasaros laikas#,
+				'generic' => q#Aliaskos laikas#,
+				'standard' => q#Aliaskos žiemos laikas#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Almatos vasaros laikas),
-				'generic' => q(Almatos laikas),
-				'standard' => q(Almatos žiemos laikas),
+				'daylight' => q#Almatos vasaros laikas#,
+				'generic' => q#Almatos laikas#,
+				'standard' => q#Almatos žiemos laikas#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazonės vasaros laikas),
-				'generic' => q(Amazonės laikas),
-				'standard' => q(Amazonės žiemos laikas),
+				'daylight' => q#Amazonės vasaros laikas#,
+				'generic' => q#Amazonės laikas#,
+				'standard' => q#Amazonės žiemos laikas#,
 			},
 		},
 		'America/Adak' => {
@@ -10856,6 +11140,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvadoras#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelsonas#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -11058,6 +11345,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Rikas#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenasas#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Reini Riveris#,
 		},
@@ -11153,37 +11443,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Šiaurės Amerikos centro vasaros laikas),
-				'generic' => q(Šiaurės Amerikos centro laikas),
-				'standard' => q(Šiaurės Amerikos centro žiemos laikas),
+				'daylight' => q#Šiaurės Amerikos centro vasaros laikas#,
+				'generic' => q#Šiaurės Amerikos centro laikas#,
+				'standard' => q#Šiaurės Amerikos centro žiemos laikas#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Šiaurės Amerikos rytų vasaros laikas),
-				'generic' => q(Šiaurės Amerikos rytų laikas),
-				'standard' => q(Šiaurės Amerikos rytų žiemos laikas),
+				'daylight' => q#Šiaurės Amerikos rytų vasaros laikas#,
+				'generic' => q#Šiaurės Amerikos rytų laikas#,
+				'standard' => q#Šiaurės Amerikos rytų žiemos laikas#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Šiaurės Amerikos kalnų vasaros laikas),
-				'generic' => q(Šiaurės Amerikos kalnų laikas),
-				'standard' => q(Šiaurės Amerikos kalnų žiemos laikas),
+				'daylight' => q#Šiaurės Amerikos kalnų vasaros laikas#,
+				'generic' => q#Šiaurės Amerikos kalnų laikas#,
+				'standard' => q#Šiaurės Amerikos kalnų žiemos laikas#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Šiaurės Amerikos Ramiojo vandenyno vasaros laikas),
-				'generic' => q(Šiaurės Amerikos Ramiojo vandenyno laikas),
-				'standard' => q(Šiaurės Amerikos Ramiojo vandenyno žiemos laikas),
+				'daylight' => q#Šiaurės Amerikos Ramiojo vandenyno vasaros laikas#,
+				'generic' => q#Šiaurės Amerikos Ramiojo vandenyno laikas#,
+				'standard' => q#Šiaurės Amerikos Ramiojo vandenyno žiemos laikas#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadyrės vasaros laikas),
-				'generic' => q(Anadyrės laikas),
-				'standard' => q(Anadyrės žiemos laikas),
+				'daylight' => q#Anadyrės vasaros laikas#,
+				'generic' => q#Anadyrės laikas#,
+				'standard' => q#Anadyrės žiemos laikas#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -11221,30 +11511,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Apijos vasaros laikas),
-				'generic' => q(Apijos laikas),
-				'standard' => q(Apijos žiemos laikas),
+				'daylight' => q#Apijos vasaros laikas#,
+				'generic' => q#Apijos laikas#,
+				'standard' => q#Apijos žiemos laikas#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Aktau vasaros laikas),
-				'generic' => q(Aktau laikas),
-				'standard' => q(Aktau žiemos laikas),
+				'daylight' => q#Aktau vasaros laikas#,
+				'generic' => q#Aktau laikas#,
+				'standard' => q#Aktau žiemos laikas#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Aktobės vasaros laikas),
-				'generic' => q(Aktobės laikas),
-				'standard' => q(Aktobės žiemos laikas),
+				'daylight' => q#Aktobės vasaros laikas#,
+				'generic' => q#Aktobės laikas#,
+				'standard' => q#Aktobės žiemos laikas#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabijos vasaros laikas),
-				'generic' => q(Arabijos laikas),
-				'standard' => q(Arabijos žiemos laikas),
+				'daylight' => q#Arabijos vasaros laikas#,
+				'generic' => q#Arabijos laikas#,
+				'standard' => q#Arabijos žiemos laikas#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -11252,23 +11542,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentinos vasaros laikas),
-				'generic' => q(Argentinos laikas),
-				'standard' => q(Argentinos žiemos laikas),
+				'daylight' => q#Argentinos vasaros laikas#,
+				'generic' => q#Argentinos laikas#,
+				'standard' => q#Argentinos žiemos laikas#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Vakarų Argentinos vasaros laikas),
-				'generic' => q(Vakarų Argentinos laikas),
-				'standard' => q(Vakarų Argentinos žiemos laikas),
+				'daylight' => q#Vakarų Argentinos vasaros laikas#,
+				'generic' => q#Vakarų Argentinos laikas#,
+				'standard' => q#Vakarų Argentinos žiemos laikas#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Armėnijos vasaros laikas),
-				'generic' => q(Armėnijos laikas),
-				'standard' => q(Armėnijos žiemos laikas),
+				'daylight' => q#Armėnijos vasaros laikas#,
+				'generic' => q#Armėnijos laikas#,
+				'standard' => q#Armėnijos žiemos laikas#,
 			},
 		},
 		'Asia/Aden' => {
@@ -11292,6 +11582,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ašchabadas#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Bagdadas#,
 		},
@@ -11303,6 +11596,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bankokas#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaulas#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Beirutas#,
@@ -11339,6 +11635,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dušanbė#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gazos ruožas#,
@@ -11481,6 +11780,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokijas#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomskas#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulan Batoras#,
 		},
@@ -11507,9 +11809,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlanto vasaros laikas),
-				'generic' => q(Atlanto laikas),
-				'standard' => q(Atlanto žiemos laikas),
+				'daylight' => q#Atlanto vasaros laikas#,
+				'generic' => q#Atlanto laikas#,
+				'standard' => q#Atlanto žiemos laikas#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -11580,176 +11882,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Centrinės Australijos vasaros laikas),
-				'generic' => q(Centrinės Australijos laikas),
-				'standard' => q(Centrinės Australijos žiemos laikas),
+				'daylight' => q#Centrinės Australijos vasaros laikas#,
+				'generic' => q#Centrinės Australijos laikas#,
+				'standard' => q#Centrinės Australijos žiemos laikas#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Centrinės vakarų Australijos vasaros laikas),
-				'generic' => q(Centrinės vakarų Australijos laikas),
-				'standard' => q(Centrinės vakarų Australijos žiemos laikas),
+				'daylight' => q#Centrinės vakarų Australijos vasaros laikas#,
+				'generic' => q#Centrinės vakarų Australijos laikas#,
+				'standard' => q#Centrinės vakarų Australijos žiemos laikas#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Rytų Australijos vasaros laikas),
-				'generic' => q(Rytų Australijos laikas),
-				'standard' => q(Rytų Australijos žiemos laikas),
+				'daylight' => q#Rytų Australijos vasaros laikas#,
+				'generic' => q#Rytų Australijos laikas#,
+				'standard' => q#Rytų Australijos žiemos laikas#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Vakarų Australijos vasaros laikas),
-				'generic' => q(Vakarų Australijos laikas),
-				'standard' => q(Vakarų Australijos žiemos laikas),
+				'daylight' => q#Vakarų Australijos vasaros laikas#,
+				'generic' => q#Vakarų Australijos laikas#,
+				'standard' => q#Vakarų Australijos žiemos laikas#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Azerbaidžano vasaros laikas),
-				'generic' => q(Azerbaidžano laikas),
-				'standard' => q(Azerbaidžano žiemos laikas),
+				'daylight' => q#Azerbaidžano vasaros laikas#,
+				'generic' => q#Azerbaidžano laikas#,
+				'standard' => q#Azerbaidžano žiemos laikas#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Azorų Salų vasaros laikas),
-				'generic' => q(Azorų Salų laikas),
-				'standard' => q(Azorų Salų žiemos laikas),
+				'daylight' => q#Azorų Salų vasaros laikas#,
+				'generic' => q#Azorų Salų laikas#,
+				'standard' => q#Azorų Salų žiemos laikas#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Bangladešo vasaros laikas),
-				'generic' => q(Bangladešo laikas),
-				'standard' => q(Bangladešo žiemos laikas),
+				'daylight' => q#Bangladešo vasaros laikas#,
+				'generic' => q#Bangladešo laikas#,
+				'standard' => q#Bangladešo žiemos laikas#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Butano laikas),
+				'standard' => q#Butano laikas#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Bolivijos laikas),
+				'standard' => q#Bolivijos laikas#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brazilijos vasaros laikas),
-				'generic' => q(Brazilijos laikas),
-				'standard' => q(Brazilijos žiemos laikas),
+				'daylight' => q#Brazilijos vasaros laikas#,
+				'generic' => q#Brazilijos laikas#,
+				'standard' => q#Brazilijos žiemos laikas#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Brunėjaus Darusalamo laikas),
+				'standard' => q#Brunėjaus Darusalamo laikas#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Žaliojo Kyšulio vasaros laikas),
-				'generic' => q(Žaliojo Kyšulio laikas),
-				'standard' => q(Žaliojo Kyšulio žiemos laikas),
+				'daylight' => q#Žaliojo Kyšulio vasaros laikas#,
+				'generic' => q#Žaliojo Kyšulio laikas#,
+				'standard' => q#Žaliojo Kyšulio žiemos laikas#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(Keisio laikas),
+				'standard' => q#Keisio laikas#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Čamoro laikas),
+				'standard' => q#Čamoro laikas#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Čatamo vasaros laikas),
-				'generic' => q(Čatamo laikas),
-				'standard' => q(Čatamo žiemos laikas),
+				'daylight' => q#Čatamo vasaros laikas#,
+				'generic' => q#Čatamo laikas#,
+				'standard' => q#Čatamo žiemos laikas#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Čilės vasaros laikas),
-				'generic' => q(Čilės laikas),
-				'standard' => q(Čilės žiemos laikas),
+				'daylight' => q#Čilės vasaros laikas#,
+				'generic' => q#Čilės laikas#,
+				'standard' => q#Čilės žiemos laikas#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Kinijos vasaros laikas),
-				'generic' => q(Kinijos laikas),
-				'standard' => q(Kinijos žiemos laikas),
+				'daylight' => q#Kinijos vasaros laikas#,
+				'generic' => q#Kinijos laikas#,
+				'standard' => q#Kinijos žiemos laikas#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Čoibalsano vasaros laikas),
-				'generic' => q(Čoibalsano laikas),
-				'standard' => q(Čoibalsano žiemos laikas),
+				'daylight' => q#Čoibalsano vasaros laikas#,
+				'generic' => q#Čoibalsano laikas#,
+				'standard' => q#Čoibalsano žiemos laikas#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Kalėdų Salos laikas),
+				'standard' => q#Kalėdų Salos laikas#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Kokosų Salų laikas),
+				'standard' => q#Kokosų Salų laikas#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolumbijos vasaros laikas),
-				'generic' => q(Kolumbijos laikas),
-				'standard' => q(Kolumbijos žiemos laikas),
+				'daylight' => q#Kolumbijos vasaros laikas#,
+				'generic' => q#Kolumbijos laikas#,
+				'standard' => q#Kolumbijos žiemos laikas#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Kuko Salų pusės vasaros laikas),
-				'generic' => q(Kuko Salų laikas),
-				'standard' => q(Kuko Salų žiemos laikas),
+				'daylight' => q#Kuko Salų pusės vasaros laikas#,
+				'generic' => q#Kuko Salų laikas#,
+				'standard' => q#Kuko Salų žiemos laikas#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kubos vasaros laikas),
-				'generic' => q(Kubos laikas),
-				'standard' => q(Kubos žiemos laikas),
+				'daylight' => q#Kubos vasaros laikas#,
+				'generic' => q#Kubos laikas#,
+				'standard' => q#Kubos žiemos laikas#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Deiviso laikas),
+				'standard' => q#Deiviso laikas#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Diumono d’Urvilio laikas),
+				'standard' => q#Diumono d’Urvilio laikas#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Rytų Timoro laikas),
+				'standard' => q#Rytų Timoro laikas#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Velykų Salos vasaros laikas),
-				'generic' => q(Velykų Salos laikas),
-				'standard' => q(Velykų salos žiemos laikas),
+				'daylight' => q#Velykų Salos vasaros laikas#,
+				'generic' => q#Velykų Salos laikas#,
+				'standard' => q#Velykų salos žiemos laikas#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ekvadoro laikas),
+				'standard' => q#Ekvadoro laikas#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#pasaulio suderintasis laikas#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -11760,6 +12067,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andora#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrachanė#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#Atėnai#,
@@ -11794,7 +12104,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublinas#,
 			long => {
-				'daylight' => q(Airijos vasaros laikas),
+				'daylight' => q#Airijos vasaros laikas#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -11821,6 +12131,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kijevas#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirovas#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisabona#,
 		},
@@ -11830,7 +12143,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Londonas#,
 			long => {
-				'daylight' => q(Britanijos vasaros laikas),
+				'daylight' => q#Britanijos vasaros laikas#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -11881,6 +12194,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevas#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratovas#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopolis#,
 		},
@@ -11898,6 +12214,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Uljanovskas#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Užhorodas#,
@@ -11931,134 +12250,134 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Vidurio Europos vasaros laikas),
-				'generic' => q(Vidurio Europos laikas),
-				'standard' => q(Vidurio Europos žiemos laikas),
+				'daylight' => q#Vidurio Europos vasaros laikas#,
+				'generic' => q#Vidurio Europos laikas#,
+				'standard' => q#Vidurio Europos žiemos laikas#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Rytų Europos vasaros laikas),
-				'generic' => q(Rytų Europos laikas),
-				'standard' => q(Rytų Europos žiemos laikas),
+				'daylight' => q#Rytų Europos vasaros laikas#,
+				'generic' => q#Rytų Europos laikas#,
+				'standard' => q#Rytų Europos žiemos laikas#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Tolimųjų rytų Europos laikas),
+				'standard' => q#Tolimųjų rytų Europos laikas#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Vakarų Europos vasaros laikas),
-				'generic' => q(Vakarų Europos laikas),
-				'standard' => q(Vakarų Europos žiemos laikas),
+				'daylight' => q#Vakarų Europos vasaros laikas#,
+				'generic' => q#Vakarų Europos laikas#,
+				'standard' => q#Vakarų Europos žiemos laikas#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Folklando Salų vasaros laikas),
-				'generic' => q(Folklando Salų laikas),
-				'standard' => q(Folklandų Salų žiemos laikas),
+				'daylight' => q#Folklando Salų vasaros laikas#,
+				'generic' => q#Folklando Salų laikas#,
+				'standard' => q#Folklandų Salų žiemos laikas#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Fidžio vasaros laikas),
-				'generic' => q(Fidžio laikas),
-				'standard' => q(Fidžio žiemos laikas),
+				'daylight' => q#Fidžio vasaros laikas#,
+				'generic' => q#Fidžio laikas#,
+				'standard' => q#Fidžio žiemos laikas#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Prancūzijos Gvianos laikas),
+				'standard' => q#Prancūzijos Gvianos laikas#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Pietų Prancūzijos ir antarktinis laikas),
+				'standard' => q#Pietų Prancūzijos ir antarktinis laikas#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Grinvičo laikas),
+				'standard' => q#Grinvičo laikas#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Galapagų laikas),
+				'standard' => q#Galapagų laikas#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Gambyro laikas),
+				'standard' => q#Gambyro laikas#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Gruzijos vasaros laikas),
-				'generic' => q(Gruzijos laikas),
-				'standard' => q(Gruzijos žiemos laikas),
+				'daylight' => q#Gruzijos vasaros laikas#,
+				'generic' => q#Gruzijos laikas#,
+				'standard' => q#Gruzijos žiemos laikas#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Gilberto Salų laikas),
+				'standard' => q#Gilberto Salų laikas#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Grenlandijos rytų vasaros laikas),
-				'generic' => q(Grenlandijos rytų laikas),
-				'standard' => q(Grenlandijos rytų žiemos laikas),
+				'daylight' => q#Grenlandijos rytų vasaros laikas#,
+				'generic' => q#Grenlandijos rytų laikas#,
+				'standard' => q#Grenlandijos rytų žiemos laikas#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Grenlandijos vakarų vasaros laikas),
-				'generic' => q(Grenlandijos vakarų laikas),
-				'standard' => q(Grenlandijos vakarų žiemos laikas),
+				'daylight' => q#Grenlandijos vakarų vasaros laikas#,
+				'generic' => q#Grenlandijos vakarų laikas#,
+				'standard' => q#Grenlandijos vakarų žiemos laikas#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Guamo laikas),
+				'standard' => q#Guamo laikas#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Persijos įlankos laikas),
+				'standard' => q#Persijos įlankos laikas#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Gajanos laikas),
+				'standard' => q#Gajanos laikas#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Havajų–Aleutų vasaros laikas),
-				'generic' => q(Havajų-Aleutų laikas),
-				'standard' => q(Havajų–Aleutų žiemos laikas),
+				'daylight' => q#Havajų–Aleutų vasaros laikas#,
+				'generic' => q#Havajų-Aleutų laikas#,
+				'standard' => q#Havajų–Aleutų žiemos laikas#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Honkongo vasaros laikas),
-				'generic' => q(Honkongo laikas),
-				'standard' => q(Honkongo žiemos laikas),
+				'daylight' => q#Honkongo vasaros laikas#,
+				'generic' => q#Honkongo laikas#,
+				'standard' => q#Honkongo žiemos laikas#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Hovdo vasaros laikas),
-				'generic' => q(Hovdo laikas),
-				'standard' => q(Hovdo žiemos laikas),
+				'daylight' => q#Hovdo vasaros laikas#,
+				'generic' => q#Hovdo laikas#,
+				'standard' => q#Hovdo žiemos laikas#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Indijos laikas),
+				'standard' => q#Indijos laikas#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -12096,264 +12415,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Indijos vandenyno laikas),
+				'standard' => q#Indijos vandenyno laikas#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Indokinijos laikas),
+				'standard' => q#Indokinijos laikas#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Centrinės Indonezijos laikas),
+				'standard' => q#Centrinės Indonezijos laikas#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Rytų Indonezijos laikas),
+				'standard' => q#Rytų Indonezijos laikas#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Vakarų Indonezijos laikas),
+				'standard' => q#Vakarų Indonezijos laikas#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Irano vasaros laikas),
-				'generic' => q(Irano laikas),
-				'standard' => q(Irano žiemos laikas),
+				'daylight' => q#Irano vasaros laikas#,
+				'generic' => q#Irano laikas#,
+				'standard' => q#Irano žiemos laikas#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkutsko vasaros laikas),
-				'generic' => q(Irkutsko laikas),
-				'standard' => q(Irkutsko žiemos laikas),
+				'daylight' => q#Irkutsko vasaros laikas#,
+				'generic' => q#Irkutsko laikas#,
+				'standard' => q#Irkutsko žiemos laikas#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Izraelio vasaros laikas),
-				'generic' => q(Izraelio laikas),
-				'standard' => q(Izraelio žiemos laikas),
+				'daylight' => q#Izraelio vasaros laikas#,
+				'generic' => q#Izraelio laikas#,
+				'standard' => q#Izraelio žiemos laikas#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japonijos vasaros laikas),
-				'generic' => q(Japonijos laikas),
-				'standard' => q(Japonijos žiemos laikas),
+				'daylight' => q#Japonijos vasaros laikas#,
+				'generic' => q#Japonijos laikas#,
+				'standard' => q#Japonijos žiemos laikas#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Kamčiatkos Petropavlovsko vasaros laikas),
-				'generic' => q(Kamčiatkos Petropavlovsko laikas),
-				'standard' => q(Kamčiatkos Petropavlovsko žiemos laikas),
+				'daylight' => q#Kamčiatkos Petropavlovsko vasaros laikas#,
+				'generic' => q#Kamčiatkos Petropavlovsko laikas#,
+				'standard' => q#Kamčiatkos Petropavlovsko žiemos laikas#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Rytų Kazachstano laikas),
+				'standard' => q#Rytų Kazachstano laikas#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Vakarų Kazachstano laikas),
+				'standard' => q#Vakarų Kazachstano laikas#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Korėjos vasaros laikas),
-				'generic' => q(Korėjos laikas),
-				'standard' => q(Korėjos žiemos laikas),
+				'daylight' => q#Korėjos vasaros laikas#,
+				'generic' => q#Korėjos laikas#,
+				'standard' => q#Korėjos žiemos laikas#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Kosrajė laikas),
+				'standard' => q#Kosrajė laikas#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnojarsko vasaros laikas),
-				'generic' => q(Krasnojarsko laikas),
-				'standard' => q(Krasnojarsko žiemos laikas),
+				'daylight' => q#Krasnojarsko vasaros laikas#,
+				'generic' => q#Krasnojarsko laikas#,
+				'standard' => q#Krasnojarsko žiemos laikas#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Kirgistano laikas),
+				'standard' => q#Kirgistano laikas#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Lankos laikas),
+				'standard' => q#Lankos laikas#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Laino Salų laikas),
+				'standard' => q#Laino Salų laikas#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Lordo Hau vasaros laikas),
-				'generic' => q(Lordo Hau laikas),
-				'standard' => q(Lordo Hau žiemos laikas),
+				'daylight' => q#Lordo Hau vasaros laikas#,
+				'generic' => q#Lordo Hau laikas#,
+				'standard' => q#Lordo Hau žiemos laikas#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Makau vasaros laikas),
-				'generic' => q(Makau laikas),
-				'standard' => q(Makau žiemos laikas),
+				'daylight' => q#Makau vasaros laikas#,
+				'generic' => q#Makau laikas#,
+				'standard' => q#Makau žiemos laikas#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Makvorio Salos laikas),
+				'standard' => q#Makvorio Salos laikas#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadano vasaros laikas),
-				'generic' => q(Magadano laikas),
-				'standard' => q(Magadano žiemos laikas),
+				'daylight' => q#Magadano vasaros laikas#,
+				'generic' => q#Magadano laikas#,
+				'standard' => q#Magadano žiemos laikas#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Malaizijos laikas),
+				'standard' => q#Malaizijos laikas#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Maldyvų laikas),
+				'standard' => q#Maldyvų laikas#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Markizo Salų laikas),
+				'standard' => q#Markizo Salų laikas#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Maršalo Salų laikas),
+				'standard' => q#Maršalo Salų laikas#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mauricijaus vasaros laikas),
-				'generic' => q(Mauricijaus laikas),
-				'standard' => q(Mauricijaus žiemos laikas),
+				'daylight' => q#Mauricijaus vasaros laikas#,
+				'generic' => q#Mauricijaus laikas#,
+				'standard' => q#Mauricijaus žiemos laikas#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Mosono laikas),
+				'standard' => q#Mosono laikas#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Šiaurės Vakarų Meksikos vasaros laikas),
-				'generic' => q(Šiaurės Vakarų Meksikos laikas),
-				'standard' => q(Šiaurės Vakarų Meksikos žiemos laikas),
+				'daylight' => q#Šiaurės Vakarų Meksikos vasaros laikas#,
+				'generic' => q#Šiaurės Vakarų Meksikos laikas#,
+				'standard' => q#Šiaurės Vakarų Meksikos žiemos laikas#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Meksikos Ramiojo vandenyno vasaros laikas),
-				'generic' => q(Meksikos Ramiojo vandenyno laikas),
-				'standard' => q(Meksikos Ramiojo vandenyno žiemos laikas),
+				'daylight' => q#Meksikos Ramiojo vandenyno vasaros laikas#,
+				'generic' => q#Meksikos Ramiojo vandenyno laikas#,
+				'standard' => q#Meksikos Ramiojo vandenyno žiemos laikas#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulan Batoro vasaros laikas),
-				'generic' => q(Ulan Batoro laikas),
-				'standard' => q(Ulan Batoro žiemos laikas),
+				'daylight' => q#Ulan Batoro vasaros laikas#,
+				'generic' => q#Ulan Batoro laikas#,
+				'standard' => q#Ulan Batoro žiemos laikas#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Maskvos vasaros laikas),
-				'generic' => q(Maskvos laikas),
-				'standard' => q(Maskvos žiemos laikas),
+				'daylight' => q#Maskvos vasaros laikas#,
+				'generic' => q#Maskvos laikas#,
+				'standard' => q#Maskvos žiemos laikas#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Mianmaro laikas),
+				'standard' => q#Mianmaro laikas#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Nauru laikas),
+				'standard' => q#Nauru laikas#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Nepalo laikas),
+				'standard' => q#Nepalo laikas#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Naujosios Kaledonijos vasaros laikas),
-				'generic' => q(Naujosios Kaledonijos laikas),
-				'standard' => q(Naujosios Kaledonijos žiemos laikas),
+				'daylight' => q#Naujosios Kaledonijos vasaros laikas#,
+				'generic' => q#Naujosios Kaledonijos laikas#,
+				'standard' => q#Naujosios Kaledonijos žiemos laikas#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Naujosios Zelandijos vasaros laikas),
-				'generic' => q(Naujosios Zelandijos laikas),
-				'standard' => q(Naujosios Zelandijos žiemos laikas),
+				'daylight' => q#Naujosios Zelandijos vasaros laikas#,
+				'generic' => q#Naujosios Zelandijos laikas#,
+				'standard' => q#Naujosios Zelandijos žiemos laikas#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Niufaundlendo vasaros laikas),
-				'generic' => q(Niufaundlendo laikas),
-				'standard' => q(Niufaundlendo žiemos laikas),
+				'daylight' => q#Niufaundlendo vasaros laikas#,
+				'generic' => q#Niufaundlendo laikas#,
+				'standard' => q#Niufaundlendo žiemos laikas#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Niujė laikas),
+				'standard' => q#Niujė laikas#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Norfolko Salų laikas),
+				'standard' => q#Norfolko Salų laikas#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Fernando de Noronjos vasaros laikas),
-				'generic' => q(Fernando de Noronjos laikas),
-				'standard' => q(Fernando de Noronjos žiemos laikas),
+				'daylight' => q#Fernando de Noronjos vasaros laikas#,
+				'generic' => q#Fernando de Noronjos laikas#,
+				'standard' => q#Fernando de Noronjos žiemos laikas#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Šiaurės Marianos Salų laikas),
+				'standard' => q#Šiaurės Marianos Salų laikas#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Novosibirsko vasaros laikas),
-				'generic' => q(Novosibirsko laikas),
-				'standard' => q(Novosibirsko žiemos laikas),
+				'daylight' => q#Novosibirsko vasaros laikas#,
+				'generic' => q#Novosibirsko laikas#,
+				'standard' => q#Novosibirsko žiemos laikas#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omsko vasaros laikas),
-				'generic' => q(Omsko laikas),
-				'standard' => q(Omsko žiemos laikas),
+				'daylight' => q#Omsko vasaros laikas#,
+				'generic' => q#Omsko laikas#,
+				'standard' => q#Omsko žiemos laikas#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -12475,245 +12794,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Pakistano vasaros laikas),
-				'generic' => q(Pakistano laikas),
-				'standard' => q(Pakistano žiemos laikas),
+				'daylight' => q#Pakistano vasaros laikas#,
+				'generic' => q#Pakistano laikas#,
+				'standard' => q#Pakistano žiemos laikas#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Palau laikas),
+				'standard' => q#Palau laikas#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Papua Naujosios Gvinėjos laikas),
+				'standard' => q#Papua Naujosios Gvinėjos laikas#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paragvajaus vasaros laikas),
-				'generic' => q(Paragvajaus laikas),
-				'standard' => q(Paragvajaus žiemos laikas),
+				'daylight' => q#Paragvajaus vasaros laikas#,
+				'generic' => q#Paragvajaus laikas#,
+				'standard' => q#Paragvajaus žiemos laikas#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peru vasaros laikas),
-				'generic' => q(Peru laikas),
-				'standard' => q(Peru žiemos laikas),
+				'daylight' => q#Peru vasaros laikas#,
+				'generic' => q#Peru laikas#,
+				'standard' => q#Peru žiemos laikas#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Filipinų vasaros laikas),
-				'generic' => q(Filipinų laikas),
-				'standard' => q(Filipinų žiemos laikas),
+				'daylight' => q#Filipinų vasaros laikas#,
+				'generic' => q#Filipinų laikas#,
+				'standard' => q#Filipinų žiemos laikas#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Fenikso Salų laikas),
+				'standard' => q#Fenikso Salų laikas#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Sen Pjero ir Mikelono vasaros laikas),
-				'generic' => q(Sen Pjero ir Mikelono laikas),
-				'standard' => q(Sen Pjero ir Mikelono žiemos laikas),
+				'daylight' => q#Sen Pjero ir Mikelono vasaros laikas#,
+				'generic' => q#Sen Pjero ir Mikelono laikas#,
+				'standard' => q#Sen Pjero ir Mikelono žiemos laikas#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Pitkerno laikas),
+				'standard' => q#Pitkerno laikas#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Ponapės laikas),
+				'standard' => q#Ponapės laikas#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Pchenjano laikas#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Kyzylordos vasaros laikas),
-				'generic' => q(Kyzylordos laikas),
-				'standard' => q(Kyzylordos žiemos laikas),
+				'daylight' => q#Kyzylordos vasaros laikas#,
+				'generic' => q#Kyzylordos laikas#,
+				'standard' => q#Kyzylordos žiemos laikas#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Reunjono laikas),
+				'standard' => q#Reunjono laikas#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Roteros laikas),
+				'standard' => q#Roteros laikas#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Sachalino vasaros laikas),
-				'generic' => q(Sachalino laikas),
-				'standard' => q(Sachalino žiemos laikas),
+				'daylight' => q#Sachalino vasaros laikas#,
+				'generic' => q#Sachalino laikas#,
+				'standard' => q#Sachalino žiemos laikas#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samaros vasaros laikas),
-				'generic' => q(Samaros laikas),
-				'standard' => q(Samaros žiemos laikas),
+				'daylight' => q#Samaros vasaros laikas#,
+				'generic' => q#Samaros laikas#,
+				'standard' => q#Samaros žiemos laikas#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samoa vasaros laikas),
-				'generic' => q(Samoa laikas),
-				'standard' => q(Samoa žiemos laikas),
+				'daylight' => q#Samoa vasaros laikas#,
+				'generic' => q#Samoa laikas#,
+				'standard' => q#Samoa žiemos laikas#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Seišelių laikas),
+				'standard' => q#Seišelių laikas#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Singapūro laikas),
+				'standard' => q#Singapūro laikas#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Saliamono Salų laikas),
+				'standard' => q#Saliamono Salų laikas#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Pietų Džordžijos laikas),
+				'standard' => q#Pietų Džordžijos laikas#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Surinamo laikas),
+				'standard' => q#Surinamo laikas#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Siovos laikas),
+				'standard' => q#Siovos laikas#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Tahičio laikas),
+				'standard' => q#Tahičio laikas#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taipėjaus vasaros laikas),
-				'generic' => q(Taipėjaus laikas),
-				'standard' => q(Taipėjaus žiemos laikas),
+				'daylight' => q#Taipėjaus vasaros laikas#,
+				'generic' => q#Taipėjaus laikas#,
+				'standard' => q#Taipėjaus žiemos laikas#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tadžikistano laikas),
+				'standard' => q#Tadžikistano laikas#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Tokelau laikas),
+				'standard' => q#Tokelau laikas#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tongos vasaros laikas),
-				'generic' => q(Tongos laikas),
-				'standard' => q(Tongos žiemos laikas),
+				'daylight' => q#Tongos vasaros laikas#,
+				'generic' => q#Tongos laikas#,
+				'standard' => q#Tongos žiemos laikas#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Čuko laikas),
+				'standard' => q#Čuko laikas#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Turkmėnistano vasaros laikas),
-				'generic' => q(Turkmėnistano laikas),
-				'standard' => q(Turkmėnistano žiemos laikas),
+				'daylight' => q#Turkmėnistano vasaros laikas#,
+				'generic' => q#Turkmėnistano laikas#,
+				'standard' => q#Turkmėnistano žiemos laikas#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Tuvalu laikas),
+				'standard' => q#Tuvalu laikas#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Urugvajaus vasaros laikas),
-				'generic' => q(Urugvajaus laikas),
-				'standard' => q(Urugvajaus žiemos laikas),
+				'daylight' => q#Urugvajaus vasaros laikas#,
+				'generic' => q#Urugvajaus laikas#,
+				'standard' => q#Urugvajaus žiemos laikas#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Uzbekistano vasaros laikas),
-				'generic' => q(Uzbekistano laikas),
-				'standard' => q(Uzbekistano žiemos laikas),
+				'daylight' => q#Uzbekistano vasaros laikas#,
+				'generic' => q#Uzbekistano laikas#,
+				'standard' => q#Uzbekistano žiemos laikas#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Vanuatu vasaros laikas),
-				'generic' => q(Vanuatu laikas),
-				'standard' => q(Vanuatu žiemos laikas),
+				'daylight' => q#Vanuatu vasaros laikas#,
+				'generic' => q#Vanuatu laikas#,
+				'standard' => q#Vanuatu žiemos laikas#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Venesuelos laikas),
+				'standard' => q#Venesuelos laikas#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Vladivostoko vasaros laikas),
-				'generic' => q(Vladivostoko laikas),
-				'standard' => q(Vladivostoko žiemos laikas),
+				'daylight' => q#Vladivostoko vasaros laikas#,
+				'generic' => q#Vladivostoko laikas#,
+				'standard' => q#Vladivostoko žiemos laikas#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Volgogrado vasaros laikas),
-				'generic' => q(Volgogrado laikas),
-				'standard' => q(Volgogrado žiemos laikas),
+				'daylight' => q#Volgogrado vasaros laikas#,
+				'generic' => q#Volgogrado laikas#,
+				'standard' => q#Volgogrado žiemos laikas#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Vostoko laikas),
+				'standard' => q#Vostoko laikas#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Veiko Salos laikas),
+				'standard' => q#Veiko Salos laikas#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Voliso ir Futūnos laikas),
+				'standard' => q#Voliso ir Futūnos laikas#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakutsko vasaros laikas),
-				'generic' => q(Jakutsko laikas),
-				'standard' => q(Jakutsko žiemos laikas),
+				'daylight' => q#Jakutsko vasaros laikas#,
+				'generic' => q#Jakutsko laikas#,
+				'standard' => q#Jakutsko žiemos laikas#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekaterinburgo vasaros laikas),
-				'generic' => q(Jekaterinburgo laikas),
-				'standard' => q(Jekaterinburgo žiemos laikas),
+				'daylight' => q#Jekaterinburgo vasaros laikas#,
+				'generic' => q#Jekaterinburgo laikas#,
+				'standard' => q#Jekaterinburgo žiemos laikas#,
 			},
 		},
 	 } }

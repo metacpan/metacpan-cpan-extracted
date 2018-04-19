@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '3.003';
+our $VERSION = '4.000';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -71,17 +71,20 @@ sub list_jobs {
     push @where, @$ids ? "id in ($ids_in)" : 'id is null';
     push @where_params, @$ids;
   }
-  if (defined(my $queue = $options->{queue})) {
-    push @where, 'queue = ?';
-    push @where_params, $queue;
+  if (defined(my $queues = $options->{queues})) {
+    my $queues_in = join ',', ('?')x@$queues;
+    push @where, @$queues ? "queue in ($queues_in)" : 'queue is null';
+    push @where_params, @$queues;
   }
-  if (defined(my $state = $options->{state})) {
-    push @where, 'state = ?';
-    push @where_params, $state;
+  if (defined(my $states = $options->{states})) {
+    my $states_in = join ',', ('?')x@$states;
+    push @where, @$states ? "state in ($states_in)" : 'state is null';
+    push @where_params, @$states;
   }
-  if (defined(my $task = $options->{task})) {
-    push @where, 'task = ?';
-    push @where_params, $task;
+  if (defined(my $tasks = $options->{tasks})) {
+    my $tasks_in = join ',', ('?')x@$tasks;
+    push @where, @$tasks ? "task in ($tasks_in)" : 'task is null';
+    push @where_params, @$tasks;
   }
 
   my $where_str = @where ? 'where ' . join(' and ', @where) : '';
@@ -112,9 +115,10 @@ sub list_locks {
   
   my (@where, @where_params);
   push @where, q{expires > datetime('now')};
-  if (defined(my $name = $options->{name})) {
-    push @where, 'name = ?';
-    push @where_params, $name;
+  if (defined(my $names = $options->{names})) {
+    my $names_in = join ',', ('?')x@$names;
+    push @where, @$names ? "name in ($names_in)" : 'name is null';
+    push @where_params, @$names;
   }
   
   my $where_str = 'where ' . join(' and ', @where);
@@ -176,12 +180,18 @@ sub lock {
 }
 
 sub note {
-  my ($self, $id, $key, $value) = @_;
-  croak qq{Invalid note key '$key'; must not contain '.', '[', or ']'}
-    if $key =~ m/[\[\].]/;
+  my ($self, $id, $merge) = @_;
+  my (@set, @set_params);
+  foreach my $key (keys %$merge) {
+    croak qq{Invalid note key '$key'; must not contain '.', '[', or ']'}
+      if $key =~ m/[\[\].]/;
+    push @set, q{'$.' || ?}, 'json(?)';
+    push @set_params, $key, {json => $merge->{$key}};
+  }
+  my $json_set = join ', ', @set;
   return !!$self->sqlite->db->query(
-    q{update minion_jobs set notes = json_set(notes, '$.' || ?, json(?))
-      where id = ?}, $key, {json => $value}, $id
+    qq{update minion_jobs set notes = json_set(notes, $json_set)
+       where id = ?}, @set_params, $id
   )->rows;
 }
 
@@ -259,14 +269,17 @@ sub reset {
 sub retry_job {
   my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
 
+  my $parents = defined $options->{parents}
+    ? {json => $options->{parents}} : undef;
   return !!$self->sqlite->db->query(
     q{update minion_jobs
       set attempts = coalesce(?, attempts),
         delayed = (datetime('now', ? || ' seconds')),
-        priority = coalesce(?, priority), queue = coalesce(?, queue),
-        retried = datetime('now'), retries = retries + 1, state = 'inactive'
+        parents = coalesce(?, parents), priority = coalesce(?, priority),
+        queue = coalesce(?, queue), retried = datetime('now'),
+        retries = retries + 1, state = 'inactive'
       where id = ? and retries = ?},
-    $options->{attempts}, $options->{delay} // 0,
+    $options->{attempts}, $options->{delay} // 0, $parents,
     @$options{qw(priority queue)}, $id, $retries
   )->rows;
 }
@@ -281,6 +294,8 @@ sub stats {
       count(case state when 'finished' then 1 end) as finished_jobs,
       count(case when state = 'inactive' and delayed > datetime('now')
         then 1 end) as delayed_jobs,
+      (select count(*) from minion_locks where expires > datetime('now'))
+        as active_locks,
       count(distinct case when state = 'active' then worker end)
         as active_workers,
       ifnull((select seq from sqlite_sequence where name = 'minion_jobs'), 0)
@@ -570,7 +585,7 @@ Transition from C<active> to C<finished> state.
 =head2 list_jobs
 
   my $results = $backend->list_jobs($offset, $limit);
-  my $results = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+  my $results = $backend->list_jobs($offset, $limit, {states => ['inactive']});
 
 Returns the information about jobs in batches.
 
@@ -592,23 +607,23 @@ These options are currently available:
 
 List only jobs with these ids.
 
-=item queue
+=item queues
 
-  queue => 'important'
+  queue => ['important', 'unimportant']
 
-List only jobs in this queue.
+List only jobs in these queues.
 
-=item state
+=item states
 
-  state => 'inactive'
+  states => ['inactive', 'active']
 
-List only jobs in this state.
+List only jobs in these states.
 
-=item task
+=item tasks
 
-  task => 'test'
+  tasks => ['foo', 'bar']
 
-List only jobs for this task.
+List only jobs for these tasks.
 
 =back
 
@@ -723,23 +738,23 @@ Id of worker that is processing the job.
 =head2 list_locks
 
   my $results = $backend->list_locks($offset, $limit);
-  my $results = $backend->list_locks($offset, $limit, {name => 'foo'});
+  my $results = $backend->list_locks($offset, $limit, {names => ['foo']});
 
 Returns information about locks in batches.
 
   # Check expiration time
-  my $results = $backend->list_locks(0, 1, {name => 'foo'});
+  my $results = $backend->list_locks(0, 1, {names => ['foo']});
   my $expires = $results->{locks}[0]{expires};
 
 These options are currently available:
 
 =over 2
 
-=item name
+=item names
 
-  name => 'foo'
+  names => ['foo', 'bar']
 
-List only locks with this name.
+List only locks with these names.
 
 =back
 
@@ -850,10 +865,11 @@ defaults to C<1>.
 
 =head2 note
 
-  my $bool = $backend->note($job_id, foo => 'bar');
+  my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-Change a metadata field for a job. It is currently an error to attempt to set a
-metadata field with a name containing the characters C<.>, C<[>, or C<]>.
+Change one or more metadata fields for a job. It is currently an error to
+attempt to set a metadata field with a name containing the characters C<.>,
+C<[>, or C<]>.
 
 =head2 receive
 
@@ -924,6 +940,12 @@ Number of times performing this job will be attempted.
 
 Delay job for this many seconds (from now).
 
+=item parents
+
+  parents => [$id1, $id2, $id3]
+
+Jobs this job depends on.
+
 =item priority
 
   priority => 5
@@ -953,6 +975,12 @@ These fields are currently available:
   active_jobs => 100
 
 Number of jobs in C<active> state.
+
+=item active_locks
+
+  active_locks => 100
+
+Number of active named locks.
 
 =item active_workers
 

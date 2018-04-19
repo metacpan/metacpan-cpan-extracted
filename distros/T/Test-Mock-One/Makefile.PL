@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Exporter" => 0,
     "List::Util" => "1.33",
-    "Scalar::Util" => 0,
     "Test::Builder" => 0,
     "overload" => 0,
     "strict" => 0,
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +50,6 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.33",
-  "Scalar::Util" => 0,
   "Test::Builder" => 0,
   "Test::Deep" => 0,
   "Test::Exception" => 0,

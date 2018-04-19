@@ -137,11 +137,11 @@ foreach my $index (sort @indices) {
                 { index => $index, method => 'PUT' },
                 { index => { number_of_replicas => $replicas} },
             );
-            if(!defined $result) {
-                output({color=>'red',indent=>1}, "Error encountered.");
+            if($result) {
+                output({color=>"green"}, "$index: Successfully set replicas to $replicas");
             }
             else {
-                output({color=>"green"}, "$index: Successfully set replicas to $replicas");
+                output({color=>'red'}, "$index: Unable to set replicas");
             }
         }
     }
@@ -224,7 +224,7 @@ es-daily-index-maintenance.pl - Run to prune old indexes and optimize existing
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 SYNOPSIS
 

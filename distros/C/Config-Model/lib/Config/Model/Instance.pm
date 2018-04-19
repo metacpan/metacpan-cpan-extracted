@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.120';
+$Config::Model::Instance::VERSION = '2.122';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -237,7 +237,7 @@ has [qw/name application backend backend_arg backup/] => (
 );
 
 subtype 'RootPath' => as 'Maybe[Path::Tiny]' ;
-coerce 'RootPath' => from 'Str' => via sub { defined ?  Path::Tiny::path($_) : undef ; } ;
+coerce 'RootPath' => from 'Str' => via sub { defined $_ ?  Path::Tiny::path($_) : undef ; } ;
 
 has 'root_dir' => (
     is => 'ro',
@@ -658,7 +658,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

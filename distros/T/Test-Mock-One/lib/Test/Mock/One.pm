@@ -4,14 +4,13 @@ use strict;
 
 # ABSTRACT: Mock the world with one object
 
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 our $AUTOLOAD;
 
 use overload '""' => '__x_mock_str';
 
 use List::Util 1.33 qw(any);
-use Scalar::Util qw(blessed);
 
 sub new {
     my $class = shift;
@@ -32,8 +31,8 @@ sub AUTOLOAD {
     my ($call) = $AUTOLOAD =~ /([^:]+)$/;
 
     if ($self->{'X-Mock-Called'}) {
-        my @caller = caller(1); # who called the caller of self->$call
-        push(@{ $self->{'X-Mock-Called-By'}{$caller[3]}{$call}}, [ @_ ]);
+        my @caller = caller(1);
+        push(@{ $self->{'X-Mock-Called-By'}{$call}{$caller[3]}}, [ @_ ]);
     }
 
     if (exists $self->{$call}) {
@@ -135,7 +134,7 @@ Test::Mock::One - Mock the world with one object
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

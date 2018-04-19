@@ -26,6 +26,8 @@ sub init ($self) {
 
     $self->{map} = $map;
 
+    $self->{_unblocked_app} = Coro::unblock_sub sub ( $ctrl, $req ) { $ctrl->run($req); return };
+
     return;
 }
 
@@ -175,7 +177,7 @@ sub run ( $self, $req ) {
     $req->{path}      = $path;
     $req->{path_tail} = P->path($path_tail);
 
-    $self->{_path_class_cache}->{$host}->{$path}->run($req);
+    $self->{_unblocked_app}->( $self->{_path_class_cache}->{$host}->{$path}, $req );
 
     return;
 }

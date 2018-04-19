@@ -1,4 +1,4 @@
-Mojo-Weixin v1.3.9 [![Build Status](https://travis-ci.org/sjdy521/Mojo-Weixin.svg?branch=master)](https://travis-ci.org/sjdy521/Mojo-Weixin) [![Join the chat at https://gitter.im/sjdy521/Mojo-Weixin](https://badges.gitter.im/sjdy521/Mojo-Weixin.svg)](https://gitter.im/sjdy521/Mojo-Weixin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![API列表](https://img.shields.io/badge/doc-API%E5%88%97%E8%A1%A8-brightgreen.svg)](API.md) [![QQ群-498880156](https://img.shields.io/badge/QQ%E7%BE%A4-498880156-blue.svg)](http://jq.qq.com/?_wv=1027&k=kjVJzo) [![IRC](https://img.shields.io/badge/IRC-%E5%AE%98%E6%96%B9%E9%A2%91%E9%81%93-yellow.svg)](http://irc.perfi.wang/?channel=#Mojo-Webqq)
+Mojo-Weixin v1.4.0 [![Build Status](https://travis-ci.org/sjdy521/Mojo-Weixin.svg?branch=master)](https://travis-ci.org/sjdy521/Mojo-Weixin) [![Join the chat at https://gitter.im/sjdy521/Mojo-Weixin](https://badges.gitter.im/sjdy521/Mojo-Weixin.svg)](https://gitter.im/sjdy521/Mojo-Weixin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![API列表](https://img.shields.io/badge/doc-API%E5%88%97%E8%A1%A8-brightgreen.svg)](API.md) [![QQ群-498880156](https://img.shields.io/badge/QQ%E7%BE%A4-498880156-blue.svg)](http://jq.qq.com/?_wv=1027&k=kjVJzo) [![IRC](https://img.shields.io/badge/IRC-%E5%AE%98%E6%96%B9%E9%A2%91%E9%81%93-yellow.svg)](http://irc.perfi.wang/?channel=#Mojo-Webqq)
 ========================
 
 使用Perl语言编写的微信客户端框架，基于Mojolicious，要求Perl版本5.10+，可通过插件提供基于HTTP协议的api接口供其他语言或系统调用
@@ -159,6 +159,8 @@ Mojo-Weixin v1.3.9 [![Build Status](https://travis-ci.org/sjdy521/Mojo-Weixin.sv
         $ sudo apt-get install libssl-dev
     
     搞定了编译和运行环境之后，再重新回到 步骤2 安装Mojo::Weixin即可
+    
+    请尽量在root下安装使用，非root下安装使用参考[FAQ](https://github.com/sjdy521/Mojo-Weixin/blob/master/FAQ.md#5-%E9%9D%9Eroot%E8%B4%A6%E5%8F%B7%E5%AE%89%E8%A3%85%E5%90%8E%E6%97%A0%E6%B3%95%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98)
     
     如果仍然有问题，Linux上可以尝试执行如下脚本进行依赖模块检查
     

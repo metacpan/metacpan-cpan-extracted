@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'WiringPi::API';
 
-our $VERSION = '2.3604';
+our $VERSION = '2.3606';
 
 sub new {
     my ($class, $pin) = @_;
@@ -79,10 +79,6 @@ sub pwm {
         die "\npin $num isn't set to mode 2 (PWM). pwm() can't be set\n";
     }
 
-    if ($value > 1023 || $value < 0){
-        die "\npwm() value must be 0-1023\n";
-    }
-
     $self->pwm_write($self->num, $value);
 }
 sub num {
@@ -107,7 +103,7 @@ RPi::Pin - Access and manipulate Raspberry Pi GPIO pins
 =head1 SYNOPSIS
 
     use RPi::Pin;
-    use RPi::Constant qw(:all);
+    use RPi::Const qw(:all);
 
     my $pin = RPi::Pin->new(5);
 

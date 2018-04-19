@@ -5,9 +5,10 @@
 package Math::BigInt::Lite;
 
 require 5.006002;
-use strict;
 
-require Exporter;
+use strict;
+use warnings;
+
 use Math::BigInt 1.999801;
 
 our ($_trap_inf, $_trap_nan);
@@ -16,7 +17,7 @@ our @ISA = qw(Math::BigInt);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -255,8 +256,33 @@ BEGIN {
 }
 
 sub config {
+    my $class = shift;
+
+    # config({a => b, ...}) -> config(a => b, ...)
+    @_ = %{ $_[0] } if @_ == 1 && ref($_[0]) eq 'HASH';
+
+    # Getter/accessor.
+
+    if (@_ == 1) {
+        my $param = shift;
+
+        # We don't use a math backend library.
+        return undef if ($param eq 'lib' ||
+                         $param eq 'lib_version');
+
+        return $class -> SUPER::config($param);
+    }
+
+    # Setter.
+
+    $class -> SUPER::config(@_) if @_;
+
+    # For backwards compatibility.
+
     my $cfg = Math::BigInt -> config();
-    $cfg->{version_lite} = $VERSION;
+    $cfg->{version}     = $VERSION;
+    $cfg->{lib}         = undef;
+    $cfg->{lib_version} = undef;
     $cfg;
 }
 
@@ -457,14 +483,12 @@ sub round {
 
 sub bnan {
     # return a bnan or set object to NaN
-    my $x = shift;
-
     $upgrade->bnan();
 }
 
 sub binf {
     # return a binf
-    my $x = shift;
+    shift;
 
     #  return $upgrade->new($$x)->binf(@_) if ref $x;
     $upgrade->binf(@_);         # binf(1, '-') form
@@ -1214,6 +1238,21 @@ sub bsqrt {
     $x;
 }
 
+sub to_bin {
+    my $self  = shift;
+    $upgrade -> new($$self) -> to_bin();
+}
+
+sub to_oct {
+    my $self  = shift;
+    $upgrade -> new($$self) -> to_oct();
+}
+
+sub to_hex {
+    my $self  = shift;
+    $upgrade -> new($$self) -> to_hex();
+}
+
 ##############################################################################
 
 sub import {
@@ -1244,7 +1283,7 @@ sub import {
             $j -= $s;
         }
     }
-    # any non :constant stuff is handled by our parent, Math::BigInt or Exporter
+    # any non :constant stuff is handled by our parent,
     # even if @_ is empty, to give it a chance
     $self->SUPER::import(@a);           # need it for subclasses
     $self->export_to_level(1, $self, @a); # need it for MBF
@@ -1264,7 +1303,7 @@ Math::BigInt::Lite - What Math::BigInts are before they become big
 
     use Math::BigInt::Lite;
 
-    $x = Math::BigInt::Lite->new(1);
+    my $x = Math::BigInt::Lite->new(1);
 
     print $x->bstr(), "\n";                     # 1
     $x = Math::BigInt::Lite->new('1e1234');

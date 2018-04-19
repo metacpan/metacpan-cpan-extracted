@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ks - Package for language Kashmiri
 
 package Locale::CLDR::Locales::Ks;
 # This file auto generated from Data\common\main\ks.xml
-#	on Fri 29 Apr  7:13:24 pm GMT
+#	on Fri 13 Apr  7:17:23 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1034,8 +1035,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[‎‏])},
-			main => qr{(?^u:[۪ۭ َ ُ ِ ٔ ٕ ٖ ٗ ٚ ٛ ء آ أ ٲ ؤ ا ٮ ب پ ت ث ٹ ج چ ح خ د ذ ڈ ر ز ڑ ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں ھ ہ و ۄ ی ۍ ے])},
+			auxiliary => qr{[‎‏]},
+			main => qr{[۪ۭ َ ُ ِ ٔ ٕ ٖ ٗ ٚ ٛ ء آ أ ٲ ؤ ا ٮ ب پ ت ث ٹ ج چ ح خ د ذ ڈ ر ز ڑ ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں ھ ہ و ۄ ی ۍ ے]},
+			numbers => qr{[‎ \- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1150,7 +1152,7 @@ has 'number_symbols' => (
 			'decimal' => q(.),
 			'exponential' => q(E),
 			'group' => q(,),
-			'infinity' => q(?),
+			'infinity' => q(∞),
 			'list' => q(;),
 			'minusSign' => q(‎-),
 			'nan' => q(NaN),
@@ -1169,21 +1171,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##,##0.###',
+					'default' => '#,##,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##,##0%',
+					'default' => '#,##,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -1402,9 +1404,14 @@ has 'currencies' => (
 				'currency' => q(بِلیروشِیَن نِو رِبٕل),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(بِلیروشِیَن رِبٕل),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(بِلیروشِیَن رِبٕل \(۲۰۰۰–۲۰۱۶\)),
 			},
 		},
 		'BZD' => {
@@ -2009,12 +2016,12 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(پٔریوٗوِیَن نیوٗاوز سولٕز),
+				'currency' => q(پٔریوٗوِیَن سولٕز),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(پٔریوٗوِیَن سول),
+				'currency' => q(پٔریوٗوِیَن سول \(۱۸۶۳–۱۹۶۵\)),
 			},
 		},
 		'PGK' => {
@@ -2698,6 +2705,33 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			Gy => q{Gy},
+			GyMMM => q{MMM Gy},
+			GyMMMEd => q{EEE, MMM d, Gy},
+			GyMMMd => q{MMM d, Gy},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{d-MMM},
+			Md => q{M/d},
+			d => q{d},
+			hm => q{h:mm a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{EEE, M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{EEE, MMM d, y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+		},
 		'generic' => {
 			Gy => q{Gy},
 			GyMMM => q{MMM Gy},
@@ -2727,33 +2761,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ Gy},
 			yyyyQQQQ => q{QQQQ Gy},
 		},
-		'gregorian' => {
-			Gy => q{Gy},
-			GyMMM => q{MMM Gy},
-			GyMMMEd => q{EEE, MMM d, Gy},
-			GyMMMd => q{MMM d, Gy},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{d-MMM},
-			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{EEE, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{EEE, MMM d, y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-		},
 	} },
 );
 
@@ -2782,14 +2789,14 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		'Acre' => {
 			long => {
-				'daylight' => q(اٮ۪کرے سَمَر ٹایِم),
-				'generic' => q(اٮ۪کرے ٹایِم),
-				'standard' => q(اٮ۪کرے سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪کرے سَمَر ٹایِم#,
+				'generic' => q#اٮ۪کرے ٹایِم#,
+				'standard' => q#اٮ۪کرے سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(افغانِستان ٹایِم),
+				'standard' => q#افغانِستان ٹایِم#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -2941,45 +2948,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(مرکزی افریٖقا ٹایِم),
+				'standard' => q#مرکزی افریٖقا ٹایِم#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(مشرقی افریٖقا ٹایِم),
+				'standard' => q#مشرقی افریٖقا ٹایِم#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(جنوٗبی افریقا ٹایِم),
+				'standard' => q#جنوٗبی افریقا ٹایِم#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(مغربی افریٖقا سَمَر ٹایِم),
-				'generic' => q(مغربی افریٖقا ٹایِم),
-				'standard' => q(مغربی افریٖقا سٹینڑاڑ ٹایِم),
+				'daylight' => q#مغربی افریٖقا سَمَر ٹایِم#,
+				'generic' => q#مغربی افریٖقا ٹایِم#,
+				'standard' => q#مغربی افریٖقا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(اٮ۪لاسکا ڈےلایِٔٹ ٹایِم),
-				'generic' => q(اٮ۪لاسکا ٹایِم),
-				'standard' => q(اٮ۪لاسکا سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪لاسکا ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#اٮ۪لاسکا ٹایِم#,
+				'standard' => q#اٮ۪لاسکا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(اٮ۪لمٮ۪ٹی سَمَر ٹایِم),
-				'generic' => q(اٮ۪لمٮ۪ٹی ٹایِم),
-				'standard' => q(اٮ۪لمٮ۪ٹی سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪لمٮ۪ٹی سَمَر ٹایِم#,
+				'generic' => q#اٮ۪لمٮ۪ٹی ٹایِم#,
+				'standard' => q#اٮ۪لمٮ۪ٹی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(اٮ۪مَزَن سَمَر ٹایِم),
-				'generic' => q(اٮ۪مَزَن ٹایِم),
-				'standard' => q(اٮ۪مَزَن سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪مَزَن سَمَر ٹایِم#,
+				'generic' => q#اٮ۪مَزَن ٹایِم#,
+				'standard' => q#اٮ۪مَزَن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'America/Adak' => {
@@ -3377,37 +3384,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(مرکزی ڈےلایِٔٹ ٹایِم),
-				'generic' => q(مرکزی ٹایِم),
-				'standard' => q(مرکزی سٹینڑاڑ ٹایِم),
+				'daylight' => q#مرکزی ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#مرکزی ٹایِم#,
+				'standard' => q#مرکزی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(مشرقی ڈےلایِٔٹ ٹایِم),
-				'generic' => q(مشرقی ٹایِم),
-				'standard' => q(مشرقی سٹینڑاڑ ٹایِم),
+				'daylight' => q#مشرقی ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#مشرقی ٹایِم#,
+				'standard' => q#مشرقی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(ماونٹین ڈےلایِٔٹ ٹایِم),
-				'generic' => q(ماونٹین ٹایِم),
-				'standard' => q(ماونٹین سٹینڑاڑ ٹایِم),
+				'daylight' => q#ماونٹین ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#ماونٹین ٹایِم#,
+				'standard' => q#ماونٹین سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(پیسِفِک ڈےلایِٔٹ ٹایِم),
-				'generic' => q(پیسِفِک ٹایِم),
-				'standard' => q(پیسِفِک سٹینڑاڑ ٹایِم),
+				'daylight' => q#پیسِفِک ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#پیسِفِک ٹایِم#,
+				'standard' => q#پیسِفِک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(اٮ۪نڑیٖر سَمَر ٹایِم),
-				'generic' => q(اٮ۪نَڑیٖر ٹایِم),
-				'standard' => q(اٮ۪نَڑیٖر سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪نڑیٖر سَمَر ٹایِم#,
+				'generic' => q#اٮ۪نَڑیٖر ٹایِم#,
+				'standard' => q#اٮ۪نَڑیٖر سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -3439,44 +3446,44 @@ has 'time_zone_names' => (
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(اٮ۪کٹاؤ سَمَر ٹایِم),
-				'generic' => q(اٮ۪کٹاؤ ٹایِم),
-				'standard' => q(اٮ۪کٹاؤ سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪کٹاؤ سَمَر ٹایِم#,
+				'generic' => q#اٮ۪کٹاؤ ٹایِم#,
+				'standard' => q#اٮ۪کٹاؤ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(اٮ۪کٹوب سَمَر ٹایِم),
-				'generic' => q(اٮ۪کٹوب ٹایِم),
-				'standard' => q(اٮ۪کٹوب سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪کٹوب سَمَر ٹایِم#,
+				'generic' => q#اٮ۪کٹوب ٹایِم#,
+				'standard' => q#اٮ۪کٹوب سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(ارٮ۪بِیَن ڈےلایِٔٹ ٹایِم),
-				'generic' => q(ارٮ۪بِیَن ٹایِم),
-				'standard' => q(ارٮ۪بِیَن سٹینڑاڑ ٹایِم),
+				'daylight' => q#ارٮ۪بِیَن ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#ارٮ۪بِیَن ٹایِم#,
+				'standard' => q#ارٮ۪بِیَن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(ارجٮ۪نٹیٖنا سَمَر ٹایِم),
-				'generic' => q(ارجٮ۪نٹیٖنا ٹایِم),
-				'standard' => q(ارجٮ۪نٹیٖنا سٹینڑاڑ ٹایِم),
+				'daylight' => q#ارجٮ۪نٹیٖنا سَمَر ٹایِم#,
+				'generic' => q#ارجٮ۪نٹیٖنا ٹایِم#,
+				'standard' => q#ارجٮ۪نٹیٖنا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(مغربی ارجٮ۪نٹیٖنا سَمَر ٹایِم),
-				'generic' => q(مغربی ارجٮ۪نٹیٖنا ٹایِم),
-				'standard' => q(مغربی ارجٮ۪نٹیٖنا سٹینڑاڑ ٹایِم),
+				'daylight' => q#مغربی ارجٮ۪نٹیٖنا سَمَر ٹایِم#,
+				'generic' => q#مغربی ارجٮ۪نٹیٖنا ٹایِم#,
+				'standard' => q#مغربی ارجٮ۪نٹیٖنا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(ارمیٖنِیا سَمَر ٹایِم),
-				'generic' => q(ارمیٖنِیا ٹایِم),
-				'standard' => q(ارمیٖنِیا سٹینڑاڑ ٹایِم),
+				'daylight' => q#ارمیٖنِیا سَمَر ٹایِم#,
+				'generic' => q#ارمیٖنِیا ٹایِم#,
+				'standard' => q#ارمیٖنِیا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Asia/Aden' => {
@@ -3691,9 +3698,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(اٮ۪ٹلانٹِک ڈےلایِٔٹ ٹایِم),
-				'generic' => q(اٮ۪ٹلانٹِک ٹایِم),
-				'standard' => q(اٮ۪ٹلانٹِک سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪ٹلانٹِک ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#اٮ۪ٹلانٹِک ٹایِم#,
+				'standard' => q#اٮ۪ٹلانٹِک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -3764,171 +3771,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(آسٹریلِیَن مرکزی ڈےلایِٔٹ ٹایِم),
-				'generic' => q(مرکزی آسٹریلِیَن ٹایِم),
-				'standard' => q(آسٹریلِیَن مرکزی سٹینڑاڑ ٹایِم),
+				'daylight' => q#آسٹریلِیَن مرکزی ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#مرکزی آسٹریلِیَن ٹایِم#,
+				'standard' => q#آسٹریلِیَن مرکزی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(آسٹریلِیَن مرکزی مغربی ڈےلایِٔٹ ٹایِم),
-				'generic' => q(آسٹریلِیَن مرکزی مغربی ٹایِم),
-				'standard' => q(آسٹریلِیَن مرکزی مغربی سٹینڑاڑ ٹایِم),
+				'daylight' => q#آسٹریلِیَن مرکزی مغربی ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#آسٹریلِیَن مرکزی مغربی ٹایِم#,
+				'standard' => q#آسٹریلِیَن مرکزی مغربی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(آسٹریلِیَن مشرقی ڈےلایِٔٹ ٹایِم),
-				'generic' => q(مشرِقی آسٹریلِیا ٹایِم),
-				'standard' => q(آسٹریلِیَن مشرقی سٹینڑاڑ ٹایِم),
+				'daylight' => q#آسٹریلِیَن مشرقی ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#مشرِقی آسٹریلِیا ٹایِم#,
+				'standard' => q#آسٹریلِیَن مشرقی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(آسٹریلِیَن مغرِبیٖ ڈےلایٔٹ ٹایِم),
-				'generic' => q(مغرِبی آسٹریلِیا ٹایِم),
-				'standard' => q(آسٹریلِیَن مغرِبی سٹینڑاڑ ٹایِم),
+				'daylight' => q#آسٹریلِیَن مغرِبیٖ ڈےلایٔٹ ٹایِم#,
+				'generic' => q#مغرِبی آسٹریلِیا ٹایِم#,
+				'standard' => q#آسٹریلِیَن مغرِبی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(اَزَربیجان سَمَر ٹایِم),
-				'generic' => q(اَزَربیجان ٹایِم),
-				'standard' => q(اَزَربیجان سٹینڑاڑ ٹایِم),
+				'daylight' => q#اَزَربیجان سَمَر ٹایِم#,
+				'generic' => q#اَزَربیجان ٹایِم#,
+				'standard' => q#اَزَربیجان سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(اٮ۪زورٕس سَمَر ٹ),
-				'generic' => q(اٮ۪زورٕس ٹایِم),
-				'standard' => q(اٮ۪زورٕس سٹینڑاڑ ٹایِم),
+				'daylight' => q#اٮ۪زورٕس سَمَر ٹ#,
+				'generic' => q#اٮ۪زورٕس ٹایِم#,
+				'standard' => q#اٮ۪زورٕس سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(بَنٛگلادیش سَمَر ٹایِم),
-				'generic' => q(بَنٛگلادیش ٹایِم),
-				'standard' => q(بَنٛگلادیش سٹینڑاڑ ٹایِم),
+				'daylight' => q#بَنٛگلادیش سَمَر ٹایِم#,
+				'generic' => q#بَنٛگلادیش ٹایِم#,
+				'standard' => q#بَنٛگلادیش سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(بوٗٹان ٹایِم),
+				'standard' => q#بوٗٹان ٹایِم#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(بولِوِیا ٹایِم),
+				'standard' => q#بولِوِیا ٹایِم#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(برٮ۪سِلِیا سَمَر ٹایِم),
-				'generic' => q(برٮ۪سِلِیا ٹایِم),
-				'standard' => q(برٮ۪سِلِیا سٹینڑاڑ ٹایِم),
+				'daylight' => q#برٮ۪سِلِیا سَمَر ٹایِم#,
+				'generic' => q#برٮ۪سِلِیا ٹایِم#,
+				'standard' => q#برٮ۪سِلِیا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(برٛوٗنَے دَروٗسَلَم ٹایِم),
+				'standard' => q#برٛوٗنَے دَروٗسَلَم ٹایِم#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(کیپ سَمَر ٹایِم),
-				'generic' => q(کیپ ؤرڑو ٹایِم),
-				'standard' => q(کیپ ؤرڑو سٹینڑاڑ ٹایِم),
+				'daylight' => q#کیپ سَمَر ٹایِم#,
+				'generic' => q#کیپ ؤرڑو ٹایِم#,
+				'standard' => q#کیپ ؤرڑو سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(کٮ۪مورو سٹینڑاڑ ٹایِم),
+				'standard' => q#کٮ۪مورو سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(چٮ۪تھَم سَمَر ٹایِم),
-				'generic' => q(کٮ۪تھَم ٹایِم),
-				'standard' => q(کٮ۪تھَم سٹینڑاڑ ٹایِم),
+				'daylight' => q#چٮ۪تھَم سَمَر ٹایِم#,
+				'generic' => q#کٮ۪تھَم ٹایِم#,
+				'standard' => q#کٮ۪تھَم سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(چِلی سَمَر ٹایِم),
-				'generic' => q(چِلی ٹایِم),
-				'standard' => q(چِلی سٹینڑاڑ ٹایِم),
+				'daylight' => q#چِلی سَمَر ٹایِم#,
+				'generic' => q#چِلی ٹایِم#,
+				'standard' => q#چِلی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(چَینا ڈےلایِٔٹ ٹایِم),
-				'generic' => q(چَینا ٹایِم),
-				'standard' => q(چَینا سٹینڑاڑ ٹایِم),
+				'daylight' => q#چَینا ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#چَینا ٹایِم#,
+				'standard' => q#چَینا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(کوےبٮ۪لسَن سَمَر ٹایِم),
-				'generic' => q(کوےبٮ۪لسَن ٹایِم),
-				'standard' => q(کوےبٮ۪لسَن سٹینڑاڑ ٹایِم),
+				'daylight' => q#کوےبٮ۪لسَن سَمَر ٹایِم#,
+				'generic' => q#کوےبٮ۪لسَن ٹایِم#,
+				'standard' => q#کوےبٮ۪لسَن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(کرٛسمَس ٹایِم),
+				'standard' => q#کرٛسمَس ٹایِم#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(کوکوز اَیلینڑز ٹایِم),
+				'standard' => q#کوکوز اَیلینڑز ٹایِم#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(کولومبِیا سَمَر ٹایِم),
-				'generic' => q(کولومبِیا ٹایِم),
-				'standard' => q(کولومبِیا سٹینڑاڑ ٹایِم),
+				'daylight' => q#کولومبِیا سَمَر ٹایِم#,
+				'generic' => q#کولومبِیا ٹایِم#,
+				'standard' => q#کولومبِیا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(کُک اَیلینڑز حاف سَمَر ٹایِم),
-				'generic' => q(کُک اَیلینڑز ٹایِم),
-				'standard' => q(کُک اَیلینڑز سٹینڑاڑ ٹایِم),
+				'daylight' => q#کُک اَیلینڑز حاف سَمَر ٹایِم#,
+				'generic' => q#کُک اَیلینڑز ٹایِم#,
+				'standard' => q#کُک اَیلینڑز سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(کیوٗبا ڈےلایِٔٹ ٹایِم),
-				'generic' => q(کیوٗبا ٹایِم),
-				'standard' => q(کیوٗبا سٹینڑاڑ ٹایِم),
+				'daylight' => q#کیوٗبا ڈےلایِٔٹ ٹایِم#,
+				'generic' => q#کیوٗبا ٹایِم#,
+				'standard' => q#کیوٗبا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(ڑیوِس ٹایِم),
+				'standard' => q#ڑیوِس ٹایِم#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(ڑمانٹ ڈی اُرویٖل ٹایِم),
+				'standard' => q#ڑمانٹ ڈی اُرویٖل ٹایِم#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(ایٖسٹ ٹیٖمَر ٹایِم),
+				'standard' => q#ایٖسٹ ٹیٖمَر ٹایِم#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(ایٖسٹَر سَمَر ٹایِم),
-				'generic' => q(ایٖسٹَر ٹایِم),
-				'standard' => q(ایٖسٹَر سٹینڑاڑ ٹایِم),
+				'daylight' => q#ایٖسٹَر سَمَر ٹایِم#,
+				'generic' => q#ایٖسٹَر ٹایِم#,
+				'standard' => q#ایٖسٹَر سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(اِکویڑَر ٹایِم),
+				'standard' => q#اِکویڑَر ٹایِم#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -3964,7 +3971,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#ڈَبلِن#,
 			long => {
-				'daylight' => q(اَیرِش سَمَر ٹایِم),
+				'daylight' => q#اَیرِش سَمَر ٹایِم#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -3988,7 +3995,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#لَنٛدَن#,
 			long => {
-				'daylight' => q(برطٲنوی سَمَر ٹایِم),
+				'daylight' => q#برطٲنوی سَمَر ٹایِم#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -4065,129 +4072,129 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(مرکزی یوٗرپی سَمَر ٹایِم),
-				'generic' => q(مرکزی یوٗرپی ٹایِم),
-				'standard' => q(مرکزی یوٗرپی سٹینڑاڑ ٹایِم),
+				'daylight' => q#مرکزی یوٗرپی سَمَر ٹایِم#,
+				'generic' => q#مرکزی یوٗرپی ٹایِم#,
+				'standard' => q#مرکزی یوٗرپی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(مشرقی یوٗرپی سَمَر ٹایِم),
-				'generic' => q(مشرقی یوٗرپی ٹایِم),
-				'standard' => q(مشرقی یوٗرپی سٹینڑاڑ ٹایِم),
+				'daylight' => q#مشرقی یوٗرپی سَمَر ٹایِم#,
+				'generic' => q#مشرقی یوٗرپی ٹایِم#,
+				'standard' => q#مشرقی یوٗرپی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(مغرِبی یوٗرِپی سَمَر ٹایِم),
-				'generic' => q(مغرِبی یوٗرپی ٹایِم),
-				'standard' => q(مغرِبی یوٗرپی سٹینڑاڑ ٹایِم),
+				'daylight' => q#مغرِبی یوٗرِپی سَمَر ٹایِم#,
+				'generic' => q#مغرِبی یوٗرپی ٹایِم#,
+				'standard' => q#مغرِبی یوٗرپی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(فاکلینڑ سَمَر ٹایِم),
-				'generic' => q(فاکلینڑ ٹایِم),
-				'standard' => q(فاکلینڑ سٹینڑاڑ ٹایِم),
+				'daylight' => q#فاکلینڑ سَمَر ٹایِم#,
+				'generic' => q#فاکلینڑ ٹایِم#,
+				'standard' => q#فاکلینڑ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(فیٖجی سَمَر ٹایِم),
-				'generic' => q(فیٖجی ٹایِم),
-				'standard' => q(فیٖجی سٹینڑاڑ ٹایِم),
+				'daylight' => q#فیٖجی سَمَر ٹایِم#,
+				'generic' => q#فیٖجی ٹایِم#,
+				'standard' => q#فیٖجی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(فرٛٮ۪نٛچ گیوٗٮ۪نا ٹایِم),
+				'standard' => q#فرٛٮ۪نٛچ گیوٗٮ۪نا ٹایِم#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(جنوٗبی فرٮ۪نٛچ ٹایِم),
+				'standard' => q#جنوٗبی فرٮ۪نٛچ ٹایِم#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(گرٛیٖن وِچ میٖن ٹایِم),
+				'standard' => q#گرٛیٖن وِچ میٖن ٹایِم#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(گٮ۪لٮ۪پیٚگوز ٹایِم),
+				'standard' => q#گٮ۪لٮ۪پیٚگوز ٹایِم#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(گٮ۪مبِیَر ٹایِم),
+				'standard' => q#گٮ۪مبِیَر ٹایِم#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(جورجِیاہُک سَمَر ٹایِم),
-				'generic' => q(جورجِیاہُک ٹایِم),
-				'standard' => q(جورجِیاہُک سٹینڑاڑ ٹایِم),
+				'daylight' => q#جورجِیاہُک سَمَر ٹایِم#,
+				'generic' => q#جورجِیاہُک ٹایِم#,
+				'standard' => q#جورجِیاہُک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(گِلبٲٹ ججیٖرُک ٹایِم),
+				'standard' => q#گِلبٲٹ ججیٖرُک ٹایِم#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(مشرِقی گریٖن لینڑُک سَمَر ٹایِم),
-				'generic' => q(مشرِقی گریٖن لینڑُک ٹایِم),
-				'standard' => q(مشرِقی گریٖن لینڑُک سٹینڑاڑ ٹایِم),
+				'daylight' => q#مشرِقی گریٖن لینڑُک سَمَر ٹایِم#,
+				'generic' => q#مشرِقی گریٖن لینڑُک ٹایِم#,
+				'standard' => q#مشرِقی گریٖن لینڑُک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(مغرِبی گریٖن لینڑُک سَمَر ٹایِم),
-				'generic' => q(مغرِبی گریٖن لینڑُک ٹایِم),
-				'standard' => q(مغرِبی گریٖن لینڑُک سٹینڑاڑ ٹایِم),
+				'daylight' => q#مغرِبی گریٖن لینڑُک سَمَر ٹایِم#,
+				'generic' => q#مغرِبی گریٖن لینڑُک ٹایِم#,
+				'standard' => q#مغرِبی گریٖن لینڑُک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(گُوٮ۪م ٹایِم),
+				'standard' => q#گُوٮ۪م ٹایِم#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(گَلف سٹینڑاڑ ٹایِم),
+				'standard' => q#گَلف سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(گُیَنا ٹایِم),
+				'standard' => q#گُیَنا ٹایِم#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(حَواے اٮ۪لیوٗٹِیَن سَمَر ٹایِم),
-				'generic' => q(حَواے اٮ۪لیوٗٹِیَن ٹایِم),
-				'standard' => q(حَواے اٮ۪لیوٗٹِیَن سٹینڑاڑ ٹایِم),
+				'daylight' => q#حَواے اٮ۪لیوٗٹِیَن سَمَر ٹایِم#,
+				'generic' => q#حَواے اٮ۪لیوٗٹِیَن ٹایِم#,
+				'standard' => q#حَواے اٮ۪لیوٗٹِیَن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(حانٛگ کانٛگ سَمَر ٹایِم),
-				'generic' => q(حانگ کانٛگ ٹایِم),
-				'standard' => q(حانگ کانٛگ سٹینڑاڑ ٹایِم),
+				'daylight' => q#حانٛگ کانٛگ سَمَر ٹایِم#,
+				'generic' => q#حانگ کانٛگ ٹایِم#,
+				'standard' => q#حانگ کانٛگ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(حووڑ سَمَر ٹایِم),
-				'generic' => q(حووڑ ٹایِم),
-				'standard' => q(حووڑ سٹینڑاڑ ٹایِم),
+				'daylight' => q#حووڑ سَمَر ٹایِم#,
+				'generic' => q#حووڑ ٹایِم#,
+				'standard' => q#حووڑ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(ہِنٛدوستان),
+				'standard' => q#ہِنٛدوستان#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -4225,245 +4232,245 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(ہِندوستٲنۍ اوشَن ٹایِن),
+				'standard' => q#ہِندوستٲنۍ اوشَن ٹایِن#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(اِنڑوچَینا ٹایِم),
+				'standard' => q#اِنڑوچَینا ٹایِم#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(مرکزی اِنڑونیشِیا ٹایِم),
+				'standard' => q#مرکزی اِنڑونیشِیا ٹایِم#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(مشرِقی اِنڑونیشِیا ٹایِم),
+				'standard' => q#مشرِقی اِنڑونیشِیا ٹایِم#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(مغرِبی اِنڑونیشِیا ٹایِم),
+				'standard' => q#مغرِبی اِنڑونیشِیا ٹایِم#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(اِیٖرٲنی سَمَر ٹایِم),
-				'generic' => q(اِیٖرٲنۍ ٹایِم),
-				'standard' => q(اِیٖرٲنۍ سٹینڑاڑ ٹایِم),
+				'daylight' => q#اِیٖرٲنی سَمَر ٹایِم#,
+				'generic' => q#اِیٖرٲنۍ ٹایِم#,
+				'standard' => q#اِیٖرٲنۍ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(اِرکُٹسک سَمَر ٹایِم),
-				'generic' => q(اِرکُٹسک ٹایِم),
-				'standard' => q(اِرکُٹسک سٹینڑاڑ ٹایِم),
+				'daylight' => q#اِرکُٹسک سَمَر ٹایِم#,
+				'generic' => q#اِرکُٹسک ٹایِم#,
+				'standard' => q#اِرکُٹسک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(اِسرٲیِلی ڑےلایِٔٹ ٹایِم),
-				'generic' => q(اِسرٲیِلی ٹایِم),
-				'standard' => q(اِسرٲیِلی سٹینڑاڑ ٹایِم),
+				'daylight' => q#اِسرٲیِلی ڑےلایِٔٹ ٹایِم#,
+				'generic' => q#اِسرٲیِلی ٹایِم#,
+				'standard' => q#اِسرٲیِلی سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(جاپٲنۍ ڑےلایِٔٹ ٹایِم),
-				'generic' => q(جاپٲنۍ ٹایِم),
-				'standard' => q(جاپٲنۍ سٹینڑاڑ ٹایِم),
+				'daylight' => q#جاپٲنۍ ڑےلایِٔٹ ٹایِم#,
+				'generic' => q#جاپٲنۍ ٹایِم#,
+				'standard' => q#جاپٲنۍ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(کَمچَٹکا سَمَر ٹایِم),
-				'generic' => q(کَمچَٹکا ٹایِم),
-				'standard' => q(کَمچَٹکا سٹینڑاڑ ٹایِم),
+				'daylight' => q#کَمچَٹکا سَمَر ٹایِم#,
+				'generic' => q#کَمچَٹکا ٹایِم#,
+				'standard' => q#کَمچَٹکا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(مشرِقی کَزاکھِستان ٹایِم),
+				'standard' => q#مشرِقی کَزاکھِستان ٹایِم#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(مغرِبی کَزاکھِستان ٹایِم),
+				'standard' => q#مغرِبی کَزاکھِستان ٹایِم#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(کورِیا ڑےلایِٔٹ ٹایِم),
-				'generic' => q(کورِیا ٹایِم),
-				'standard' => q(کورِیا سٹینڑاڑ ٹایِم),
+				'daylight' => q#کورِیا ڑےلایِٔٹ ٹایِم#,
+				'generic' => q#کورِیا ٹایِم#,
+				'standard' => q#کورِیا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(کورسَے ٹایِم),
+				'standard' => q#کورسَے ٹایِم#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(کرٮ۪سنوےیارسک سَمَر ٹایِم),
-				'generic' => q(کرٮ۪سنوےیارسک ٹایِم),
-				'standard' => q(کرٮ۪سنوےیارسک سٹینڑاڑ ٹایِم),
+				'daylight' => q#کرٮ۪سنوےیارسک سَمَر ٹایِم#,
+				'generic' => q#کرٮ۪سنوےیارسک ٹایِم#,
+				'standard' => q#کرٮ۪سنوےیارسک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(کِرگِستان ٹایِم),
+				'standard' => q#کِرگِستان ٹایِم#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(لَنٛکا ٹایِم),
+				'standard' => q#لَنٛکا ٹایِم#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(لایِٔن ججیٖرُک ٹایِم),
+				'standard' => q#لایِٔن ججیٖرُک ٹایِم#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(لعاڑ ڑےلایٔٹ ٹایِم),
-				'generic' => q(لعاڑ حووے ٹایِم),
-				'standard' => q(لعاڑ حووے سٹینڑاڑ ٹایِم),
+				'daylight' => q#لعاڑ ڑےلایٔٹ ٹایِم#,
+				'generic' => q#لعاڑ حووے ٹایِم#,
+				'standard' => q#لعاڑ حووے سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(مَکَعوٗ سَمَر ٹایِم),
-				'generic' => q(مَکَعوٗ ٹایِم),
-				'standard' => q(مَکَعوٗ سٹینڑاڑ ٹایِم),
+				'daylight' => q#مَکَعوٗ سَمَر ٹایِم#,
+				'generic' => q#مَکَعوٗ ٹایِم#,
+				'standard' => q#مَکَعوٗ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(مَگَدَن سَمَر ٹایِم),
-				'generic' => q(مَگَدَن ٹایِم),
-				'standard' => q(مَگَدَن سٹینڑاڑ ٹایِم),
+				'daylight' => q#مَگَدَن سَمَر ٹایِم#,
+				'generic' => q#مَگَدَن ٹایِم#,
+				'standard' => q#مَگَدَن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(مَلیشِیا ٹایِم),
+				'standard' => q#مَلیشِیا ٹایِم#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(مالدیٖوٕز ٹایِم),
+				'standard' => q#مالدیٖوٕز ٹایِم#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(مارقیوٗسَس ٹایِم),
+				'standard' => q#مارقیوٗسَس ٹایِم#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(مارشَل ججیٖرُک ٹایِم),
+				'standard' => q#مارشَل ججیٖرُک ٹایِم#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(مورِشَس سَمَر ٹایِم),
-				'generic' => q(مورِشَس ٹایِم),
-				'standard' => q(مورِشَس سٹینڑاڑ ٹایِم),
+				'daylight' => q#مورِشَس سَمَر ٹایِم#,
+				'generic' => q#مورِشَس ٹایِم#,
+				'standard' => q#مورِشَس سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(ماسَن ٹایِم),
+				'standard' => q#ماسَن ٹایِم#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(مونگولِیا سَمَر ٹایِم),
-				'generic' => q(مونگولِیا ٹایِم),
-				'standard' => q(مونگولِیا سٹینڑاڑ ٹایِم),
+				'daylight' => q#مونگولِیا سَمَر ٹایِم#,
+				'generic' => q#مونگولِیا ٹایِم#,
+				'standard' => q#مونگولِیا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(ماسکو سَمَر ٹایِم),
-				'generic' => q(ماسکَو ٹایِم),
-				'standard' => q(ماسکو سٹینڑاڑ ٹایِم),
+				'daylight' => q#ماسکو سَمَر ٹایِم#,
+				'generic' => q#ماسکَو ٹایِم#,
+				'standard' => q#ماسکو سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(مِیانمَر ٹایِم),
+				'standard' => q#مِیانمَر ٹایِم#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(نَعوٗروٗ ٹایِم),
+				'standard' => q#نَعوٗروٗ ٹایِم#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(نٮ۪پٲلۍ ٹایِم),
+				'standard' => q#نٮ۪پٲلۍ ٹایِم#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(نِو کیلٮ۪ڑونِیس سَمَر ٹایِم),
-				'generic' => q(نِو کیلٮ۪ڑونِیا ٹایِم),
-				'standard' => q(نِو کیلٮ۪ڑونِیا سٹینڑاڑ ٹایِم),
+				'daylight' => q#نِو کیلٮ۪ڑونِیس سَمَر ٹایِم#,
+				'generic' => q#نِو کیلٮ۪ڑونِیا ٹایِم#,
+				'standard' => q#نِو کیلٮ۪ڑونِیا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(نِوزِلینڑ ڑےلایٔٹ ٹایِم),
-				'generic' => q(نِوزِلینڑ ٹایِم),
-				'standard' => q(نِوزِلینڑ سٹینڑاڑ ٹایِم),
+				'daylight' => q#نِوزِلینڑ ڑےلایٔٹ ٹایِم#,
+				'generic' => q#نِوزِلینڑ ٹایِم#,
+				'standard' => q#نِوزِلینڑ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(نیوٗ فاونڑ لینڑ ڑےلایِٔٹ ٹایِم),
-				'generic' => q(نیوٗ فاونڑلینڑ ٹایِم),
-				'standard' => q(نیوٗ فاونڑلینڑ سٹینڑاڑ ٹایِم),
+				'daylight' => q#نیوٗ فاونڑ لینڑ ڑےلایِٔٹ ٹایِم#,
+				'generic' => q#نیوٗ فاونڑلینڑ ٹایِم#,
+				'standard' => q#نیوٗ فاونڑلینڑ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(نِیوٗ ٹایِم),
+				'standard' => q#نِیوٗ ٹایِم#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(نورفعاک ٹایِم),
+				'standard' => q#نورفعاک ٹایِم#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(نورونہا سَمَر ٹایِم),
-				'generic' => q(نورونہا ٹایِم),
-				'standard' => q(نورونہا سٹینڑاڑ ٹایِم),
+				'daylight' => q#نورونہا سَمَر ٹایِم#,
+				'generic' => q#نورونہا ٹایِم#,
+				'standard' => q#نورونہا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(شُمٲلی مَرِیانا ٹایِم),
+				'standard' => q#شُمٲلی مَرِیانا ٹایِم#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(نۄوۄسِبٔرسک سَمَر ٹایِم),
-				'generic' => q(نۄوۄسِبٔرسک ٹایِم),
-				'standard' => q(نۄوۄسِبٔرسک سٹینڑاڑ ٹایِم),
+				'daylight' => q#نۄوۄسِبٔرسک سَمَر ٹایِم#,
+				'generic' => q#نۄوۄسِبٔرسک ٹایِم#,
+				'standard' => q#نۄوۄسِبٔرسک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(اۄمسک سَمَر ٹایِم),
-				'generic' => q(اۄمسک ٹایِم),
-				'standard' => q(اۄمسک سٹینڑاڑ ٹایِم),
+				'daylight' => q#اۄمسک سَمَر ٹایِم#,
+				'generic' => q#اۄمسک ٹایِم#,
+				'standard' => q#اۄمسک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -4582,238 +4589,238 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(پاکِستان سَمَر ٹایِم),
-				'generic' => q(پاکِستان ٹایِم),
-				'standard' => q(پاکِستان سٹینڑاڑ ٹایِم),
+				'daylight' => q#پاکِستان سَمَر ٹایِم#,
+				'generic' => q#پاکِستان ٹایِم#,
+				'standard' => q#پاکِستان سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(پَلاو ٹایِم),
+				'standard' => q#پَلاو ٹایِم#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(پاپُعا نیوٗ گٮ۪نی ٹایِم),
+				'standard' => q#پاپُعا نیوٗ گٮ۪نی ٹایِم#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(پیرٮ۪گوے سَمَر ٹایِم),
-				'generic' => q(پیرٮ۪گوے ٹایِم),
-				'standard' => q(پیرٮ۪گوے سٹینڑاڑ ٹایِم),
+				'daylight' => q#پیرٮ۪گوے سَمَر ٹایِم#,
+				'generic' => q#پیرٮ۪گوے ٹایِم#,
+				'standard' => q#پیرٮ۪گوے سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(پٔروٗ سَمَر ٹایِم),
-				'generic' => q(پٔروٗ ٹایِم),
-				'standard' => q(پٔروٗ سٹینڑاڑ ٹایِم),
+				'daylight' => q#پٔروٗ سَمَر ٹایِم#,
+				'generic' => q#پٔروٗ ٹایِم#,
+				'standard' => q#پٔروٗ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(پھِلِپایِن سَمَر ٹایِم),
-				'generic' => q(پھِلِپایِن ٹایِم),
-				'standard' => q(پھِلِپایِن سٹینڑاڑ ٹایِم),
+				'daylight' => q#پھِلِپایِن سَمَر ٹایِم#,
+				'generic' => q#پھِلِپایِن ٹایِم#,
+				'standard' => q#پھِلِپایِن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(پھونِکس ججیٖرُک ٹایِم),
+				'standard' => q#پھونِکس ججیٖرُک ٹایِم#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(سینٛٹ پَیری مِقیوٗلَن ڑےلایِٔٹ ٹایِم),
-				'generic' => q(سینٛٹ پَیری مِقیوٗلَن ٹایِم),
-				'standard' => q(سینٛٹ پَیری مِقیوٗلَن سٹینڑاڑ ٹایِم),
+				'daylight' => q#سینٛٹ پَیری مِقیوٗلَن ڑےلایِٔٹ ٹایِم#,
+				'generic' => q#سینٛٹ پَیری مِقیوٗلَن ٹایِم#,
+				'standard' => q#سینٛٹ پَیری مِقیوٗلَن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(پِٹکیرٕن ٹایِم),
+				'standard' => q#پِٹکیرٕن ٹایِم#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(پونیپ ٹایِم),
+				'standard' => q#پونیپ ٹایِم#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(قِزلوڑا سَمَر ٹایِم),
-				'generic' => q(قِزلوڑا ٹایِم),
-				'standard' => q(قِزلوڑا سٹینڑاڑ ٹایِم),
+				'daylight' => q#قِزلوڑا سَمَر ٹایِم#,
+				'generic' => q#قِزلوڑا ٹایِم#,
+				'standard' => q#قِزلوڑا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(رِیوٗنِیَن ٹایِم),
+				'standard' => q#رِیوٗنِیَن ٹایِم#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(روتھٮ۪را ٹایِم),
+				'standard' => q#روتھٮ۪را ٹایِم#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(سَکھٮ۪لِن سَمَر ٹایِم),
-				'generic' => q(سَکھٮ۪لِن ٹایِم),
-				'standard' => q(سَکھٮ۪لِن سٹینڑاڑ ٹایِم),
+				'daylight' => q#سَکھٮ۪لِن سَمَر ٹایِم#,
+				'generic' => q#سَکھٮ۪لِن ٹایِم#,
+				'standard' => q#سَکھٮ۪لِن سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(سمٮ۪را سَمَر ٹایِم),
-				'generic' => q(سمٮ۪را ٹایِم),
-				'standard' => q(سمٮ۪را سٹینڑاڑ ٹایِم),
+				'daylight' => q#سمٮ۪را سَمَر ٹایِم#,
+				'generic' => q#سمٮ۪را ٹایِم#,
+				'standard' => q#سمٮ۪را سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(سٮ۪موآ سَمَر ٹایِم),
-				'generic' => q(سٮ۪موآ ٹایِم),
-				'standard' => q(سٮ۪موآ سٹینڑاڑ ٹایِم),
+				'daylight' => q#سٮ۪موآ سَمَر ٹایِم#,
+				'generic' => q#سٮ۪موآ ٹایِم#,
+				'standard' => q#سٮ۪موآ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(سیشٮ۪لٕز ٹایِم),
+				'standard' => q#سیشٮ۪لٕز ٹایِم#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(سِنٛگاپوٗر ٹایِم),
+				'standard' => q#سِنٛگاپوٗر ٹایِم#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(سولومَن ججیٖرَن ہُنٛد ٹایِم),
+				'standard' => q#سولومَن ججیٖرَن ہُنٛد ٹایِم#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(شُمٲلی جورجِیا ٹایِم),
+				'standard' => q#شُمٲلی جورجِیا ٹایِم#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(سُرِنام ٹایِم),
+				'standard' => q#سُرِنام ٹایِم#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(سیووا ٹایِم),
+				'standard' => q#سیووا ٹایِم#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(ٹاہِٹی ٹایِم),
+				'standard' => q#ٹاہِٹی ٹایِم#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(تازِکِستان ٹایِم),
+				'standard' => q#تازِکِستان ٹایِم#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(ٹوکٮ۪لو ٹایِم),
+				'standard' => q#ٹوکٮ۪لو ٹایِم#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(ٹعانٛگا سَمَر ٹایِم),
-				'generic' => q(ٹعانٛگا ٹایِم),
-				'standard' => q(ٹعانٛگا سٹینڑاڑ ٹایِم),
+				'daylight' => q#ٹعانٛگا سَمَر ٹایِم#,
+				'generic' => q#ٹعانٛگا ٹایِم#,
+				'standard' => q#ٹعانٛگا سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(ٹٔرک ٹایِم),
+				'standard' => q#ٹٔرک ٹایِم#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(تُرکمٮ۪نِستان سَمَر ٹایِم),
-				'generic' => q(تُرکمٮ۪نِستان ٹایِم),
-				'standard' => q(تُرکمٮ۪نِستان سٹینڑاڑ ٹایِم),
+				'daylight' => q#تُرکمٮ۪نِستان سَمَر ٹایِم#,
+				'generic' => q#تُرکمٮ۪نِستان ٹایِم#,
+				'standard' => q#تُرکمٮ۪نِستان سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(ٹوٗوَلوٗ ٹایِم),
+				'standard' => q#ٹوٗوَلوٗ ٹایِم#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(یوٗرٮ۪گوَے سَمَر ٹایِم),
-				'generic' => q(یوٗرٮ۪گوَے ٹایِم),
-				'standard' => q(یوٗرٮ۪گوَے سٹینڑاڑ ٹایِم),
+				'daylight' => q#یوٗرٮ۪گوَے سَمَر ٹایِم#,
+				'generic' => q#یوٗرٮ۪گوَے ٹایِم#,
+				'standard' => q#یوٗرٮ۪گوَے سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(اُزبیکِستانُک سَمَر ٹایِم),
-				'generic' => q(اُزبیکِستان ٹایِم),
-				'standard' => q(اُزبیکِستان سٹینڑاڑ ٹایِم),
+				'daylight' => q#اُزبیکِستانُک سَمَر ٹایِم#,
+				'generic' => q#اُزبیکِستان ٹایِم#,
+				'standard' => q#اُزبیکِستان سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(وَنوٗاَٹوٗ سَمَر ٹایِم),
-				'generic' => q(وَنوٗاَٹوٗ ٹایِم),
-				'standard' => q(وَنوٗاَٹوٗ سٹینڑاڑ ٹایِم),
+				'daylight' => q#وَنوٗاَٹوٗ سَمَر ٹایِم#,
+				'generic' => q#وَنوٗاَٹوٗ ٹایِم#,
+				'standard' => q#وَنوٗاَٹوٗ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(وٮ۪نٮ۪زیوٗلا ٹایِم),
+				'standard' => q#وٮ۪نٮ۪زیوٗلا ٹایِم#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(ولاڑِووسٹوک سَمَر ٹایِم),
-				'generic' => q(ولاڑِووسٹوک ٹایِم),
-				'standard' => q(ولاڑِووسٹوک سٹینڑاڑ ٹایِم),
+				'daylight' => q#ولاڑِووسٹوک سَمَر ٹایِم#,
+				'generic' => q#ولاڑِووسٹوک ٹایِم#,
+				'standard' => q#ولاڑِووسٹوک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(وولگوگریڑ سَمَر ٹایِم),
-				'generic' => q(وولگوگریڑ ٹایِم),
-				'standard' => q(وولگوگریڑ سٹینڑاڑ ٹایِم),
+				'daylight' => q#وولگوگریڑ سَمَر ٹایِم#,
+				'generic' => q#وولگوگریڑ ٹایِم#,
+				'standard' => q#وولگوگریڑ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(ووسٹوک ٹایِم),
+				'standard' => q#ووسٹوک ٹایِم#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(ویک ججیٖرُک ٹایِم),
+				'standard' => q#ویک ججیٖرُک ٹایِم#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(والِس تہٕ فیوٗٹیوٗنا ٹایِم),
+				'standard' => q#والِس تہٕ فیوٗٹیوٗنا ٹایِم#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(یَکُٹُسک سَمَر ٹایِم),
-				'generic' => q(یَکُٹسک ٹایِم),
-				'standard' => q(یَکُٹسک سٹینڑاڑ ٹایِم),
+				'daylight' => q#یَکُٹُسک سَمَر ٹایِم#,
+				'generic' => q#یَکُٹسک ٹایِم#,
+				'standard' => q#یَکُٹسک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(یٮ۪کَٹرِنبٔرگ سَمَر ٹایِم),
-				'generic' => q(یٮ۪کَٹٔرِنبٔرگ ٹایِم),
-				'standard' => q(یٮ۪کَٹٔرِنبٔرگ سٹینڑاڑ ٹایِم),
+				'daylight' => q#یٮ۪کَٹرِنبٔرگ سَمَر ٹایِم#,
+				'generic' => q#یٮ۪کَٹٔرِنبٔرگ ٹایِم#,
+				'standard' => q#یٮ۪کَٹٔرِنبٔرگ سٹینڑاڑ ٹایِم#,
 			},
 		},
 	 } }

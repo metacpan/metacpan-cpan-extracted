@@ -1,6 +1,6 @@
 package Pcore::AE::Handle;
 
-use Pcore -result, -const, -export => { TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]] };
+use Pcore -const, -export => { TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]] };
 use parent qw[AnyEvent::Handle];
 use AnyEvent::Socket qw[];
 use Pcore::AE::DNS::Cache;

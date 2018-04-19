@@ -21,6 +21,16 @@ WriteMakefile(
         'Mojolicious'              => 6.00,
         'CGI' => 4.00,
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+          repository => {
+            type => 'git',
+            url => 'git://github.com/mche/Mojolicious-Plugin-RenderCGI.git',
+            web => 'https://github.com/mche/Mojolicious-Plugin-RenderCGI',
+          },
+        },
+      },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojolicious-Plugin-RenderCGI-*' },
 );

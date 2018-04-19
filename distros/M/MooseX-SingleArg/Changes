@@ -1,5 +1,9 @@
 Revision history for Perl extension MooseX::SingleArg.
 
+0.06 2018-04-17
+
+ - Add a cpanfile, doh!
+
 0.05 2018-04-09
 
  - Minor doc updates.

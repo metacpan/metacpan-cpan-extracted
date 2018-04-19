@@ -4,7 +4,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 # VERSION
 
-version 1.000004
+version 1.000005
 
 # SYNOPSIS
 
@@ -35,6 +35,23 @@ build of the 64 bit binary. For example, if you're installing via `cpanm`:
 
     ARCHFLAGS="-arch x86_64" cpanm MaxMind::DB::Reader::XS
 
+# UBUNTU SUPPORT
+
+The version of libmaxminddb that is available by default with Ubuntu may be
+too old for this level of MaxMind::DB::Reader::XS.  However, we do maintain a
+Launchpad PPA for all supported levels of Ubuntu.
+
+    https://launchpad.net/~maxmind/+archive/ubuntu/ppa
+
+Please visit the PPA page for more information, or, to configure your system,
+run as root:
+
+    # apt-add-repository ppa:maxmind/ppa
+    # apt-get update
+
+The PPA is now configured, and you may install (or upgrade) the libmaxminddb
+library via the usual apt commands.
+
 # SUPPORT
 
 Please report all issues with this code using the GitHub issue tracker at
@@ -51,13 +68,15 @@ Bugs may be submitted through [https://github.com/maxmind/MaxMind-DB-Reader-XS/i
 # CONTRIBUTORS
 
 - Andy Jack <github@veracity.ca>
+- Chris Weyl <cweyl@alumni.drew.edu>
 - Florian Ragwitz <rafl@debian.org>
 - Greg Oschwald <goschwald@maxmind.com>
+- Hidenori Sugiyama <madogiwa@gmail.com>
 - Olaf Alders <oalders@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2017 by MaxMind, Inc.
+This software is Copyright (c) 2013 - 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

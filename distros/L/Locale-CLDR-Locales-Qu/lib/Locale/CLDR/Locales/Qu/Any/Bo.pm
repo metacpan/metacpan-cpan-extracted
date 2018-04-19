@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Qu::Any::Bo - Package for language Quechua
 
 package Locale::CLDR::Locales::Qu::Any::Bo;
 # This file auto generated from Data\common\main\qu_BO.xml
-#	on Fri 29 Apr  7:22:09 pm GMT
+#	on Fri 13 Apr  7:26:08 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -55,14 +56,14 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Bolivia' => {
 			short => {
-				'standard' => q(BOT),
+				'standard' => q#BOT#,
 			},
 		},
 		'Peru' => {
 			short => {
-				'daylight' => q(∅∅∅),
-				'generic' => q(∅∅∅),
-				'standard' => q(∅∅∅),
+				'daylight' => q#∅∅∅#,
+				'generic' => q#∅∅∅#,
+				'standard' => q#∅∅∅#,
 			},
 		},
 	 } }

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString;
 use strict;
 use warnings;
 
-our $VERSION = '5.5'; # VERSION
+our $VERSION = '5.6'; # VERSION
 
 use App::ElasticSearch::Utilities qw(:config);
 use App::ElasticSearch::Utilities::Query;
@@ -123,7 +123,7 @@ App::ElasticSearch::Utilities::QueryString - CLI query string fixer
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 SYNOPSIS
 

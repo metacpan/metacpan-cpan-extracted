@@ -8,12 +8,12 @@ use Code::TidyAll::CacheModel;
 use Code::TidyAll::Config::INI::Reader;
 use Code::TidyAll::Plugin;
 use Code::TidyAll::Result;
+use Code::TidyAll::Zglob qw(zglob);
 use Data::Dumper;
 use Date::Format;
 use Digest::SHA qw(sha1_hex);
 use File::Find qw(find);
 use File::pushd qw( pushd );
-use File::Zglob qw(zglob);
 use List::SomeUtils qw(uniq);
 use Module::Runtime qw( use_module );
 use Path::Tiny qw(path);
@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -114,9 +114,9 @@ has plugins => (
 );
 
 has selected_plugins => (
-    is   => 'ro',
-    isa  => t( 'ArrayRef', of => t('NonEmptyStr') ),
-    lazy => 1,
+    is      => 'ro',
+    isa     => t( 'ArrayRef', of => t('NonEmptyStr') ),
+    lazy    => 1,
     default => sub { [] },
 );
 
@@ -148,8 +148,8 @@ has verbose => (
 );
 
 has inc => (
-    is  => 'ro',
-    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+    is      => 'ro',
+    isa     => t( 'ArrayRef', of => t('NonEmptyStr') ),
     default => sub { [] },
 );
 
@@ -198,7 +198,7 @@ has _plugins_for_path => (
     isa      => t( 'HashRef', of => t('HashRef') ),
     init_arg => undef,
     lazy     => 1,
-    default => sub { {} },
+    default  => sub { {} },
 );
 
 with qw( Code::TidyAll::Role::HasIgnore Code::TidyAll::Role::Tempdir );
@@ -808,7 +808,7 @@ sub _matched_by_plugin {
 sub _zglob {
     my ( $self, $globs ) = @_;
 
-    local $File::Zglob::NOCASE = 0;
+    local $Code::TidyAll::Zglob::NOCASE = 0;
     my @files;
     foreach my $glob (@$globs) {
         try {
@@ -849,7 +849,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.69
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -1069,7 +1069,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Herzog Andy Jack Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Mark Fowler Grimes Martin Gruner Mohammad S Anwar Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
+=for stopwords Adam Herzog Andy Jack Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
 
 =over 4
 
@@ -1119,6 +1119,14 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
+Nick Tonkin <1nickt@users.noreply.github.com>
+
+=item *
+
+Nick Tonkin <ntonkin@bur-ntonkin-m1.corp.endurance.com>
+
+=item *
+
 Olaf Alders <olaf@wundersolutions.com>
 
 =item *
@@ -1145,7 +1153,7 @@ timgimyee <tim.gim.yee@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2017 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2018 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

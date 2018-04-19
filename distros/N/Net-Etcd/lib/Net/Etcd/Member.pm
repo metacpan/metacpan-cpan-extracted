@@ -20,7 +20,7 @@ Net::Etcd::Maintenance
 
 =cut
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 =head1 SYNOPSIS
 
     # list members

@@ -13,17 +13,21 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.18
+Version 0.20
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 our %locations;
 
 =head1 SYNOPSIS
 
-L<Geo::Coder::All> and L<Geo::Coder::Many> are great routines but neither quite does what I want.
-This module's primary use is to allow many backends to be used by L<HTML::GoogleMaps::V3>
+L<Geo::Coder::All>
+and
+L<Geo::Coder::Many>
+are great routines but neither quite does what I want.
+This module's primary use is to allow many backends to be used by
+L<HTML::GoogleMaps::V3>
 
 =head1 SUBROUTINES/METHODS
 
@@ -99,6 +103,8 @@ sub geocode {
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location)');
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
 	} else {
@@ -107,8 +113,8 @@ sub geocode {
 
 	my $location = $params{'location'};
 
-	return unless(defined($location));
-	return unless(length($location) > 0);
+	return if(!defined($location));
+	return if(length($location) == 0);
 
 	$location =~ s/\s\s+/ /g;
 
@@ -121,6 +127,7 @@ sub geocode {
 			my $log = {
 				location => $location,
 				timetaken => 0,
+				wantarray => wantarray,
 				result => $rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
@@ -129,15 +136,23 @@ sub geocode {
 	}
 	if(defined($locations{$location}) && (ref($locations{$location}) eq 'ARRAY') && (my @rc = @{$locations{$location}})) {
 		if(scalar(@rc)) {
+			my $allempty = 1;
 			foreach (@rc) {
-				delete $_->{'geocoder'};
+				if(ref($_) eq 'HASH') {
+					$allempty = 0;
+					delete $_->{'geocoder'};
+				}
 			}
 			my $log = {
 				location => $location,
 				timetaken => 0,
+				wantarray => wantarray,
 				result => \@rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
+			if($allempty) {
+				return;
+			}
 			return (wantarray) ? @rc : $rc[0];
 		}
 	}
@@ -146,8 +161,7 @@ sub geocode {
 
 	ENCODER: foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
-		if(ref($geocoder) eq 'HASH') {
-			my $regex = $g->{'regex'};
+		if((ref($geocoder) eq 'HASH') && (my $regex = $g->{'regex'})) {
 			if($location =~ $regex) {
 				$geocoder = $g->{'geocoder'};
 			} else {
@@ -159,7 +173,11 @@ sub geocode {
 		eval {
 			# e.g. over QUERY LIMIT with this one
 			# TODO: remove from the list of geocoders
-			@rc = $geocoder->geocode(%params);
+			if(ref($geocoder) eq 'Geo::GeoNames') {
+				@rc = $geocoder->geocode($location);
+			} else {
+				@rc = $geocoder->geocode(%params);
+			}
 		};
 		$timetaken = Time::HiRes::time() - $timetaken;
 		if($@) {
@@ -167,6 +185,7 @@ sub geocode {
 				location => $location,
 				geocoder => ref($geocoder),
 				timetaken => $timetaken,
+				wantarray => wantarray,
 				error => $@
 			};
 			CORE::push @{$self->{'log'}}, $log;
@@ -174,13 +193,19 @@ sub geocode {
 			$error = $@;
 			next;
 		}
-		foreach my $l(@rc) {
+		POSSIBLE_LOCATION: foreach my $l(@rc) {
+			if(ref($l) eq 'ARRAY') {
+				# Geo::GeoNames
+				# TODO: should consider all locations in the array
+				$l = $l->[0];
+			}
 			next if(ref($l) ne 'HASH');
 			if($l->{'error'}) {
 				my $log = {
 					location => $location,
 					timetaken => $timetaken,
 					geocoder => ref($geocoder),
+					wantarray => wantarray,
 					error => $l->{'error'}
 				};
 				CORE::push @{$self->{'log'}}, $log;
@@ -189,7 +214,7 @@ sub geocode {
 			} else {
 				# Try to create a common interface, helps with HTML::GoogleMaps::V3
 				if(!defined($l->{geometry}{location}{lat})) {
-					if($l->{lat}) {
+					if($l->{lat} && defined($l->{lon})) {
 						# OSM/RandMcNalley
 						$l->{geometry}{location}{lat} = $l->{lat};
 						$l->{geometry}{location}{lng} = $l->{lon};
@@ -207,6 +232,7 @@ sub geocode {
 						$l->{geometry}{location}{lng} = $l->{longt};
 					} elsif($l->{latitude}) {
 						# postcodes.io
+						# Geo::Coder::Free
 						$l->{geometry}{location}{lat} = $l->{latitude};
 						$l->{geometry}{location}{lng} = $l->{longitude};
 					} elsif($l->{'properties'}{'geoLatitude'}) {
@@ -221,6 +247,10 @@ sub geocode {
 						# US Census
 						$l->{geometry}{location}{lat} = $l->{result}{addressMatches}[0]->{coordinates}{y};
 						$l->{geometry}{location}{lng} = $l->{result}{addressMatches}[0]->{coordinates}{x};
+					} elsif($l->{lat}) {
+						# Geo::GeoNames
+						$l->{geometry}{location}{lat} = $l->{lat};
+						$l->{geometry}{location}{lng} = $l->{lng};
 					}
 
 					if($l->{'standard'}{'countryname'}) {
@@ -234,10 +264,11 @@ sub geocode {
 						location => $location,
 						timetaken => $timetaken,
 						geocoder => ref($geocoder),
+						wantarray => wantarray,
 						result => $l
 					};
 					CORE::push @{$self->{'log'}}, $log;
-					last;
+					last POSSIBLE_LOCATION;
 				}
 			}
 		}
@@ -257,7 +288,11 @@ sub geocode {
 	# if($error) {
 		# return { error => $error };
 	# }
-	undef;
+	if(wantarray) {
+		$locations{$location} = ();
+		return ();
+	}
+	$locations{$location} = undef;
 }
 
 =head2 ua
@@ -365,7 +400,7 @@ L<http://search.cpan.org/dist/Geo-Coder-List/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Nigel Horne.
+Copyright 2016-2018 Nigel Horne.
 
 This program is released under the following licence: GPL
 

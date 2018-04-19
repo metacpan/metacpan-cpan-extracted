@@ -13,17 +13,28 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Git-Helpers",
+  "EXE_FILES" => [
+    "script/cpan-repo",
+    "script/delete-git-branches",
+    "script/gh-open",
+    "script/travis-open"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Git::Helpers",
   "PREREQ_PM" => {
+    "Browser::Open" => 0,
     "Capture::Tiny" => 0,
     "Carp" => 0,
     "File::pushd" => 0,
+    "Getopt::Long" => 0,
     "Git::Sub" => 0,
     "MetaCPAN::Client" => 0,
     "Moo" => 0,
+    "MooX::Options" => 0,
+    "String::Trim" => 0,
     "Sub::Exporter" => 0,
+    "Term::Choose" => 0,
     "Try::Tiny" => 0,
     "Types::Standard" => 0,
     "URI" => 0,
@@ -45,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => "1.005",
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "0.000014",
+  "VERSION" => "0.000015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +64,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Browser::Open" => 0,
   "Capture::Tiny" => 0,
   "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
@@ -60,11 +72,15 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "File::Touch" => 0,
   "File::pushd" => 0,
+  "Getopt::Long" => 0,
   "Git::Sub" => 0,
   "Git::Version" => 0,
   "MetaCPAN::Client" => 0,
   "Moo" => 0,
+  "MooX::Options" => 0,
+  "String::Trim" => 0,
   "Sub::Exporter" => 0,
+  "Term::Choose" => 0,
   "Test::Fatal" => 0,
   "Test::Git" => "1.313",
   "Test::More" => 0,

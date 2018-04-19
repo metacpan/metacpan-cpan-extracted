@@ -7,17 +7,53 @@ use <: $module_name ~ "::Const qw[:CONST]" :>;
 with qw[Pcore::App::API::Role];
 
 our $API_MAP = {    #
-    method => { permissions => undef, desc => 'test method' },
+    app_init => { permissions => undef, desc => 'get ext app init settings' },
+    signin   => { permissions => undef, desc => 'signin user' },
+    signout  => { permissions => q[*],  desc => 'signout user' },
 };
 
 sub _build_api_map ($self) {
     return $API_MAP;
 }
 
-sub API_method ( $self, $req, @args ) {
-    $req->(200);
+sub API_app_init ( $self, $req, $data = undef ) {
+    return $req->( 200, { user_name => $req->{auth} ? ( $req->{auth}->{user_name} ) : undef, } );
+}
+
+sub API_signin ( $self, $req, $data ) {
+    $self->{app}->{api}->authenticate(
+        $data->{user_name},
+        $data->{password},
+        Coro::unblock_sub sub ($auth) {
+
+            # authentication error
+            return $req->(401) if !$auth;
+
+            # create user session
+            my $session = $self->{app}->{api}->create_user_session( $auth->{user_id} );
+
+            # user session creation error
+            return $req->(500) if !$session;
+
+            # user session created
+            return $req->( 200, { user_name => $data->{user_name}, token => $session->{data}->{token} } );
+        }
+    );
 
     return;
+}
+
+sub API_signout ( $self, $req, @ ) {
+
+    # request is authenticated from session token
+    if ( $req->{auth}->{private_token}->[0] && $req->{auth}->{private_token}->[0] == $TOKEN_TYPE_USER_SESSION ) {
+
+        # remove user session
+        return $req->( $self->{app}->{api}->remove_user_session( $req->{auth}->{private_token}->[1] ) );
+    }
+
+    # not a session token
+    return $req->(400);
 }
 
 1;
@@ -29,7 +65,7 @@ sub API_method ( $self, $req, @args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 37                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 41 does not match the package declaration       |
+## |    1 | 73                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 77 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,9 +1,9 @@
 
                             Compress-Raw-Lzma
 
-                         Version 2.081
+                         Version 2.082
 
-                               4 April 2018
+                               15 April 2018
 
        Copyright (c) 2009-2018 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -53,6 +53,31 @@ To install Compress-Raw-Lzma, run the command below:
 
 TROUBLESHOOTING
 ---------------
+
+Test harness fails with: Undefined symbol "lzma_properties_size"
+----------------------------------------------------------------
+
+If the module appears to have built correctly, but the t/001version.t test
+harness fails with the error 
+
+    Undefined symbol "lzma_properties_size"
+
+it means you have two libraries called liblzma installed on your system. 
+
+The version of liblzma used by this module comes from http://tukaani.org/xz/. 
+
+There is another distribution, that comes from
+http://tokyocabinet.sourceforge.net/misc/ that also builds a library called
+liblzma.  The tokyocabinet version of liblzma is not compatible with this
+module.  Note that the Perl module Compress-Lzma-Simple uses the
+tokyocabinet version of liblzma.
+
+The solution is either:
+
+    1. Set the LIB variable in config.in to point to the directory where
+       the correct liblzma library is installed.
+
+    2. Remove the offending version of liblzma.
 
 Solaris build fails with "language optional software package not installed"
 ---------------------------------------------------------------------------
@@ -161,7 +186,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Lzma then search Compress::Raw::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.081" ;
+          $VERSION = "2.082" ;
 
      c. The version of lzma you have used.
         If you have successfully installed Compress-Raw-Lzma, this one-liner

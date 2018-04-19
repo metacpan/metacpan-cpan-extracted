@@ -3,9 +3,9 @@ package WebService::MinFraud::Record::Country;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
-use GeoIP2::Record::Country 2.005000;
+use GeoIP2::Record::Country 2.005001;
 use WebService::MinFraud::Types qw( Bool BoolCoercion );
 
 extends 'GeoIP2::Record::Country';
@@ -33,7 +33,7 @@ WebService::MinFraud::Record::Country - Contains data for the country record ass
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
   my $request  = { device => { ip_address => '24.24.24.24' } };

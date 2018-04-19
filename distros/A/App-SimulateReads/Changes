@@ -1,5 +1,21 @@
 Revision history for App-SimulateReads
 
+0.16      2018-04-16 00:59:15-03:00 America/Sao_Paulo
+
+	- Update quality profile database in order to keep it simple
+	- Turn read-size option settable only when quality-profile="poisson".
+	  Otherwise, if quality-profile comes from database, it will override
+	  the default/user-provided value
+
+0.15      2018-04-15 02:15:43-03:00 America/Sao_Paulo
+
+	- Substitute expression-matrix for weight-file
+	- Add an expression-matrix database to provide vendor
+	  options for the users
+	- Change main commands to: genome, transcriptome, custom,
+	  quality and expression. The first three manage simulations
+	  and the last two manage databases
+
 0.14      2018-03-29 03:29:43-03:00 America/Sao_Paulo
 
 	- Add seed option for reproducible simulations

@@ -1,5 +1,15 @@
 Revision history for Filter-Heredoc
 
+0.05  Apr 12 18:58 2018
+       Minor corrections in text
+
+0.04  Apr 01 10:10 2018
+       Add meta to github repository
+
+0.03   pr 01 09:12 2018
+       Bugfix - Correct POD error, remove Changes.hd
+       Bugfix - Correct encoding utf-8, Cookbook.pod
+
 0.02  Dec 19 19:39 2012
        Bugfix - Don't exclude Max OS X in Build.PL.
 

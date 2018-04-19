@@ -1,0 +1,35 @@
+---
+abstract: 'Attach a console to an async module'
+author:
+  - 'Matthew King (cpan:CHOHAG) <chohag@jtan.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Async-Console
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Future: '0.33'
+  IO::Async: '0.71'
+  Import::Into: '1.002'
+  List::Util: '1.29'
+  Modern::Perl: '1.2017'
+  Module::Runtime: '0.016'
+  Moo: '2'
+  MooX::Role::Logger: '0.005'
+  Syntax::Keyword::Try: '0.09'
+  curry: '1'
+  namespace::clean: '0.27'
+  perl: '5.024'
+  strictures: '2'
+version: '0.103'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

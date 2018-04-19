@@ -62,7 +62,7 @@ sub update_all ( $self ) {
     if ( my $res = P->http->get( 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt', buf_size => 0, on_progress => 0 ) ) {
         my $domains;
 
-        for my $domain_ascii ( map {lc} grep { $_ && !/\A\s*#/sm } split /\n/sm, $res->body->$* ) {
+        for my $domain_ascii ( map {lc} grep { $_ && !/\A\s*#/sm } split /\n/sm, $res->{body}->$* ) {
             $domains->{$domain_ascii} = domain_to_utf8($domain_ascii);
         }
 
@@ -84,9 +84,9 @@ sub update_all ( $self ) {
     if ( my $res = P->http->get( 'https://publicsuffix.org/list/effective_tld_names.dat', buf_size => 0, on_progress => 0 ) ) {
         my $suffixes = {};
 
-        decode_utf8 $res->body->$*;
+        decode_utf8 $res->{body}->$*;
 
-        for my $domain_utf8 ( split /\n/sm, $res->body->$* ) {
+        for my $domain_utf8 ( split /\n/sm, $res->{body}->$* ) {
 
             # remove spaces
             $domain_utf8 =~ s/\s//smg;

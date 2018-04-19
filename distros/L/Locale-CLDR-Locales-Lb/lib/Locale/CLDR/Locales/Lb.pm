@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Lb - Package for language Luxembourgish
 
 package Locale::CLDR::Locales::Lb;
 # This file auto generated from Data\common\main\lb.xml
-#	on Fri 29 Apr  7:14:17 pm GMT
+#	on Fri 13 Apr  7:17:58 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1088,7 +1089,7 @@ has 'display_name_region' => (
  			'UA' => 'Ukrain',
  			'UG' => 'Uganda',
  			'UM' => 'Amerikanesch-Ozeanien',
- 			'US' => 'Vereenegt Staate vun Amerika',
+ 			'US' => 'Vereenegt Staaten',
  			'US@alt=short' => 'US',
  			'UY' => 'Uruguay',
  			'UZ' => 'Usbekistan',
@@ -1320,10 +1321,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ã ā æ ç è ĕ ê ē ğ í ì ĭ î ï İ ī ı ñ ó ò ŏ ô ö ø ō œ ş ß ú ù ŭ û ü ū ÿ])},
+			auxiliary => qr{[á à ă â å ã ā æ ç è ĕ ê ē ğ í ì ĭ î ï İ ī ı ñ ó ò ŏ ô ö ø ō œ ş ß ú ù ŭ û ü ū ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a ä b c d e é ë f g h i j k l m n o p q r s t u v w x y z])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #])},
+			main => qr{[a ä b c d e é ë f g h i j k l m n o p q r s t u v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -3107,7 +3109,7 @@ has 'number_formats' => (
 					'other' => '000 Bio'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3214,14 +3216,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3591,11 +3593,18 @@ has 'currencies' => (
 				'other' => q(Wäissrussesch Rubel \(1994–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(Wäissrussesche Rubel),
 				'one' => q(Wäissrussesche Rubel),
 				'other' => q(Wäissrussesch Rubel),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(Wäissrussesche Rubel \(2000–2016\)),
+				'one' => q(Wäissrussesche Rubel \(2000–2016\)),
+				'other' => q(Wäissrussesch Rubel \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -4512,15 +4521,15 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(Peruaneschen Neie Sol),
-				'one' => q(Peruaneschen Neie Sol),
-				'other' => q(Peruanesch Nei Soles),
+				'currency' => q(Peruaneschen Sol),
+				'one' => q(Peruaneschen Sol),
+				'other' => q(Peruanesch Soles),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(Peruanesche Sol \(1863–1965\)),
-				'one' => q(Peruanesche Sol \(1863–1965\)),
+				'currency' => q(Peruaneschen Sol \(1863–1965\)),
+				'one' => q(Peruaneschen Sol \(1863–1965\)),
 				'other' => q(Peruanesch Soles \(1863–1965\)),
 			},
 		},
@@ -5484,16 +5493,16 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{moies},
 					'pm' => q{nomëttes},
+					'am' => q{moies},
+				},
+				'narrow' => {
+					'pm' => q{nomë.},
+					'am' => q{mo.},
 				},
 				'wide' => {
 					'am' => q{moies},
 					'pm' => q{nomëttes},
-				},
-				'narrow' => {
-					'am' => q{mo.},
-					'pm' => q{nomë.},
 				},
 			},
 		},
@@ -5959,14 +5968,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Acre-Summerzäit),
-				'generic' => q(Acre-Zäit),
-				'standard' => q(Acre-Normalzäit),
+				'daylight' => q#Acre-Summerzäit#,
+				'generic' => q#Acre-Zäit#,
+				'standard' => q#Acre-Normalzäit#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Afghanistan-Zäit),
+				'standard' => q#Afghanistan-Zäit#,
 			},
 		},
 		'Africa/Accra' => {
@@ -6010,45 +6019,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Zentralafrikanesch Zäit),
+				'standard' => q#Zentralafrikanesch Zäit#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Ostafrikanesch Zäit),
+				'standard' => q#Ostafrikanesch Zäit#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Südafrikanesch Zäit),
+				'standard' => q#Südafrikanesch Zäit#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Westafrikanesch Summerzäit),
-				'generic' => q(Westafrikanesch Zäit),
-				'standard' => q(Westafrikanesch Normalzäit),
+				'daylight' => q#Westafrikanesch Summerzäit#,
+				'generic' => q#Westafrikanesch Zäit#,
+				'standard' => q#Westafrikanesch Normalzäit#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Alaska-Summerzäit),
-				'generic' => q(Alaska-Zäit),
-				'standard' => q(Alaska-Normalzäit),
+				'daylight' => q#Alaska-Summerzäit#,
+				'generic' => q#Alaska-Zäit#,
+				'standard' => q#Alaska-Normalzäit#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Almaty-Summerzäit),
-				'generic' => q(Almaty-Zäit),
-				'standard' => q(Almaty-Normalzäit),
+				'daylight' => q#Almaty-Summerzäit#,
+				'generic' => q#Almaty-Zäit#,
+				'standard' => q#Almaty-Normalzäit#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazonas-Summerzäit),
-				'generic' => q(Amazonas-Zäit),
-				'standard' => q(Amazonas-Normalzäit),
+				'daylight' => q#Amazonas-Summerzäit#,
+				'generic' => q#Amazonas-Zäit#,
+				'standard' => q#Amazonas-Normalzäit#,
 			},
 		},
 		'America/Asuncion' => {
@@ -6134,37 +6143,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Nordamerikanesch Inland-Summerzäit),
-				'generic' => q(Nordamerikanesch Inlandzäit),
-				'standard' => q(Nordamerikanesch Inland-Normalzäit),
+				'daylight' => q#Nordamerikanesch Inland-Summerzäit#,
+				'generic' => q#Nordamerikanesch Inlandzäit#,
+				'standard' => q#Nordamerikanesch Inland-Normalzäit#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Nordamerikanesch Ostküsten-Summerzäit),
-				'generic' => q(Nordamerikanesch Ostküstenzäit),
-				'standard' => q(Nordamerikanesch Ostküsten-Normalzäit),
+				'daylight' => q#Nordamerikanesch Ostküsten-Summerzäit#,
+				'generic' => q#Nordamerikanesch Ostküstenzäit#,
+				'standard' => q#Nordamerikanesch Ostküsten-Normalzäit#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Rocky-Mountain-Summerzäit),
-				'generic' => q(Rocky-Mountain-Zäit),
-				'standard' => q(Rocky-Mountain-Normalzäit),
+				'daylight' => q#Rocky-Mountain-Summerzäit#,
+				'generic' => q#Rocky-Mountain-Zäit#,
+				'standard' => q#Rocky-Mountain-Normalzäit#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Nordamerikanesch Westküsten-Summerzäit),
-				'generic' => q(Nordamerikanesch Westküstenzäit),
-				'standard' => q(Nordamerikanesch Westküsten-Normalzäit),
+				'daylight' => q#Nordamerikanesch Westküsten-Summerzäit#,
+				'generic' => q#Nordamerikanesch Westküstenzäit#,
+				'standard' => q#Nordamerikanesch Westküsten-Normalzäit#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadyr-Summerzäit),
-				'generic' => q(Anadyr-Zäit),
-				'standard' => q(Anadyr-Normalzäit),
+				'daylight' => q#Anadyr-Summerzäit#,
+				'generic' => q#Anadyr-Zäit#,
+				'standard' => q#Anadyr-Normalzäit#,
 			},
 		},
 		'Antarctica/DumontDUrville' => {
@@ -6175,30 +6184,30 @@ has 'time_zone_names' => (
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabesch Summerzäit),
-				'generic' => q(Arabesch Zäit),
-				'standard' => q(Arabesch Normalzäit),
+				'daylight' => q#Arabesch Summerzäit#,
+				'generic' => q#Arabesch Zäit#,
+				'standard' => q#Arabesch Normalzäit#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentinesch Summerzäit),
-				'generic' => q(Argentinesch Zäit),
-				'standard' => q(Argentinesch Normalzäit),
+				'daylight' => q#Argentinesch Summerzäit#,
+				'generic' => q#Argentinesch Zäit#,
+				'standard' => q#Argentinesch Normalzäit#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Westargentinesch Summerzäit),
-				'generic' => q(Westargentinesch Zäit),
-				'standard' => q(Westargentinesch Normalzäit),
+				'daylight' => q#Westargentinesch Summerzäit#,
+				'generic' => q#Westargentinesch Zäit#,
+				'standard' => q#Westargentinesch Normalzäit#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Armenesch Summerzäit),
-				'generic' => q(Armenesch Zäit),
-				'standard' => q(Armenesch Normalzäit),
+				'daylight' => q#Armenesch Summerzäit#,
+				'generic' => q#Armenesch Zäit#,
+				'standard' => q#Armenesch Normalzäit#,
 			},
 		},
 		'Asia/Aqtobe' => {
@@ -6293,9 +6302,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlantik-Summerzäit),
-				'generic' => q(Atlantik-Zäit),
-				'standard' => q(Atlantik-Normalzäit),
+				'daylight' => q#Atlantik-Summerzäit#,
+				'generic' => q#Atlantik-Zäit#,
+				'standard' => q#Atlantik-Normalzäit#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -6321,171 +6330,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Zentralaustralesch Summerzäit),
-				'generic' => q(Zentralaustralesch Zäit),
-				'standard' => q(Zentralaustralesch Normalzäit),
+				'daylight' => q#Zentralaustralesch Summerzäit#,
+				'generic' => q#Zentralaustralesch Zäit#,
+				'standard' => q#Zentralaustralesch Normalzäit#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Zentral-/Westaustralesch Summerzäit),
-				'generic' => q(Zentral-/Westaustralesch Zäit),
-				'standard' => q(Zentral-/Westaustralesch Normalzäit),
+				'daylight' => q#Zentral-/Westaustralesch Summerzäit#,
+				'generic' => q#Zentral-/Westaustralesch Zäit#,
+				'standard' => q#Zentral-/Westaustralesch Normalzäit#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Ostaustralesch Summerzäit),
-				'generic' => q(Ostaustralesch Zäit),
-				'standard' => q(Ostaustralesch Normalzäit),
+				'daylight' => q#Ostaustralesch Summerzäit#,
+				'generic' => q#Ostaustralesch Zäit#,
+				'standard' => q#Ostaustralesch Normalzäit#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Westaustralesch Summerzäit),
-				'generic' => q(Westaustralesch Zäit),
-				'standard' => q(Westaustralesch Normalzäit),
+				'daylight' => q#Westaustralesch Summerzäit#,
+				'generic' => q#Westaustralesch Zäit#,
+				'standard' => q#Westaustralesch Normalzäit#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Aserbaidschanesch Summerzäit),
-				'generic' => q(Aserbaidschanesch Zäit),
-				'standard' => q(Aserbeidschanesch Normalzäit),
+				'daylight' => q#Aserbaidschanesch Summerzäit#,
+				'generic' => q#Aserbaidschanesch Zäit#,
+				'standard' => q#Aserbeidschanesch Normalzäit#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Azoren-Summerzäit),
-				'generic' => q(Azoren-Zäit),
-				'standard' => q(Azoren-Normalzäit),
+				'daylight' => q#Azoren-Summerzäit#,
+				'generic' => q#Azoren-Zäit#,
+				'standard' => q#Azoren-Normalzäit#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Bangladesch-Summerzäit),
-				'generic' => q(Bangladesch-Zäit),
-				'standard' => q(Bangladesch-Normalzäit),
+				'daylight' => q#Bangladesch-Summerzäit#,
+				'generic' => q#Bangladesch-Zäit#,
+				'standard' => q#Bangladesch-Normalzäit#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Bhutan-Zäit),
+				'standard' => q#Bhutan-Zäit#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Bolivianesch Zäit),
+				'standard' => q#Bolivianesch Zäit#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brasília-Summerzäit),
-				'generic' => q(Brasília-Zäit),
-				'standard' => q(Brasília-Normalzäit),
+				'daylight' => q#Brasília-Summerzäit#,
+				'generic' => q#Brasília-Zäit#,
+				'standard' => q#Brasília-Normalzäit#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Brunei-Zäit),
+				'standard' => q#Brunei-Zäit#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Kap-Verde-Summerzäit),
-				'generic' => q(Kap-Verde-Zäit),
-				'standard' => q(Kap-Verde-Normalzäit),
+				'daylight' => q#Kap-Verde-Summerzäit#,
+				'generic' => q#Kap-Verde-Zäit#,
+				'standard' => q#Kap-Verde-Normalzäit#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Chamorro-Zäit),
+				'standard' => q#Chamorro-Zäit#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Chatham-Summerzäit),
-				'generic' => q(Chatham-Zäit),
-				'standard' => q(Chatham-Normalzäit),
+				'daylight' => q#Chatham-Summerzäit#,
+				'generic' => q#Chatham-Zäit#,
+				'standard' => q#Chatham-Normalzäit#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Chilenesch Summerzäit),
-				'generic' => q(Chilenesch Zäit),
-				'standard' => q(Chilenesch Normalzäit),
+				'daylight' => q#Chilenesch Summerzäit#,
+				'generic' => q#Chilenesch Zäit#,
+				'standard' => q#Chilenesch Normalzäit#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Chinesesch Summerzäit),
-				'generic' => q(Chinesesch Zäit),
-				'standard' => q(Chinesesch Normalzäit),
+				'daylight' => q#Chinesesch Summerzäit#,
+				'generic' => q#Chinesesch Zäit#,
+				'standard' => q#Chinesesch Normalzäit#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Choibalsan-Summerzäit),
-				'generic' => q(Choibalsan-Zäit),
-				'standard' => q(Choibalsan-Normalzäit),
+				'daylight' => q#Choibalsan-Summerzäit#,
+				'generic' => q#Choibalsan-Zäit#,
+				'standard' => q#Choibalsan-Normalzäit#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Chrëschtdagsinsel-Zäit),
+				'standard' => q#Chrëschtdagsinsel-Zäit#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Kokosinselen-Zäit),
+				'standard' => q#Kokosinselen-Zäit#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolumbianesch Summerzäit),
-				'generic' => q(Kolumbianesch Zäit),
-				'standard' => q(Kolumbianesch Normalzäit),
+				'daylight' => q#Kolumbianesch Summerzäit#,
+				'generic' => q#Kolumbianesch Zäit#,
+				'standard' => q#Kolumbianesch Normalzäit#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Cookinselen-Summerzäit),
-				'generic' => q(Cookinselen-Zäit),
-				'standard' => q(Cookinselen-Normalzäit),
+				'daylight' => q#Cookinselen-Summerzäit#,
+				'generic' => q#Cookinselen-Zäit#,
+				'standard' => q#Cookinselen-Normalzäit#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kubanesch Summerzäit),
-				'generic' => q(Kubanesch Zäit),
-				'standard' => q(Kubanesch Normalzäit),
+				'daylight' => q#Kubanesch Summerzäit#,
+				'generic' => q#Kubanesch Zäit#,
+				'standard' => q#Kubanesch Normalzäit#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Davis-Zäit),
+				'standard' => q#Davis-Zäit#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Dumont-d’Urville-Zäit),
+				'standard' => q#Dumont-d’Urville-Zäit#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Osttimor-Zäit),
+				'standard' => q#Osttimor-Zäit#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Ouschterinsel-Summerzäit),
-				'generic' => q(Ouschterinsel-Zäit),
-				'standard' => q(Ouschterinsel-Normalzäit),
+				'daylight' => q#Ouschterinsel-Summerzäit#,
+				'generic' => q#Ouschterinsel-Zäit#,
+				'standard' => q#Ouschterinsel-Normalzäit#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ecuadorianesch Zäit),
+				'standard' => q#Ecuadorianesch Zäit#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -6511,7 +6520,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q(Iresch Summerzäit),
+				'daylight' => q#Iresch Summerzäit#,
 			},
 		},
 		'Europe/Kiev' => {
@@ -6522,7 +6531,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/London' => {
 			long => {
-				'daylight' => q(Britesch Summerzäit),
+				'daylight' => q#Britesch Summerzäit#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -6566,129 +6575,129 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Mëtteleuropäesch Summerzäit),
-				'generic' => q(Mëtteleuropäesch Zäit),
-				'standard' => q(Mëtteleuropäesch Normalzäit),
+				'daylight' => q#Mëtteleuropäesch Summerzäit#,
+				'generic' => q#Mëtteleuropäesch Zäit#,
+				'standard' => q#Mëtteleuropäesch Normalzäit#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Osteuropäesch Summerzäit),
-				'generic' => q(Osteuropäesch Zäit),
-				'standard' => q(Osteuropäesch Normalzäit),
+				'daylight' => q#Osteuropäesch Summerzäit#,
+				'generic' => q#Osteuropäesch Zäit#,
+				'standard' => q#Osteuropäesch Normalzäit#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Westeuropäesch Summerzäit),
-				'generic' => q(Westeuropäesch Zäit),
-				'standard' => q(Westeuropäesch Normalzäit),
+				'daylight' => q#Westeuropäesch Summerzäit#,
+				'generic' => q#Westeuropäesch Zäit#,
+				'standard' => q#Westeuropäesch Normalzäit#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Falklandinselen-Summerzäit),
-				'generic' => q(Falklandinselen-Zäit),
-				'standard' => q(Falklandinselen-Normalzäit),
+				'daylight' => q#Falklandinselen-Summerzäit#,
+				'generic' => q#Falklandinselen-Zäit#,
+				'standard' => q#Falklandinselen-Normalzäit#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Fidschi-Summerzäit),
-				'generic' => q(Fidschi-Zäit),
-				'standard' => q(Fidschi-Normalzäit),
+				'daylight' => q#Fidschi-Summerzäit#,
+				'generic' => q#Fidschi-Zäit#,
+				'standard' => q#Fidschi-Normalzäit#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Franséisch-Guayane-Zäit),
+				'standard' => q#Franséisch-Guayane-Zäit#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Franséisch Süd- an Antarktisgebidder-Zäit),
+				'standard' => q#Franséisch Süd- an Antarktisgebidder-Zäit#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Mëttler Greenwich-Zäit),
+				'standard' => q#Mëttler Greenwich-Zäit#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Galapagos-Zäit),
+				'standard' => q#Galapagos-Zäit#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Gambier-Zäit),
+				'standard' => q#Gambier-Zäit#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Georgesch Summerzäit),
-				'generic' => q(Georgesch Zäit),
-				'standard' => q(Georgesch Normalzäit),
+				'daylight' => q#Georgesch Summerzäit#,
+				'generic' => q#Georgesch Zäit#,
+				'standard' => q#Georgesch Normalzäit#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Gilbert-Inselen-Zäit),
+				'standard' => q#Gilbert-Inselen-Zäit#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Ostgrönland-Summerzäit),
-				'generic' => q(Ostgrönland-Zäit),
-				'standard' => q(Ostgrönland-Normalzäit),
+				'daylight' => q#Ostgrönland-Summerzäit#,
+				'generic' => q#Ostgrönland-Zäit#,
+				'standard' => q#Ostgrönland-Normalzäit#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Westgrönland-Summerzäit),
-				'generic' => q(Westgrönland-Zäit),
-				'standard' => q(Westgrönland-Normalzäit),
+				'daylight' => q#Westgrönland-Summerzäit#,
+				'generic' => q#Westgrönland-Zäit#,
+				'standard' => q#Westgrönland-Normalzäit#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Guam-Zäit),
+				'standard' => q#Guam-Zäit#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Golf-Zäit),
+				'standard' => q#Golf-Zäit#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Guyana-Zäit),
+				'standard' => q#Guyana-Zäit#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Hawaii-Aleuten-Summerzäit),
-				'generic' => q(Hawaii-Aleuten-Zäit),
-				'standard' => q(Hawaii-Aleuten-Normalzäit),
+				'daylight' => q#Hawaii-Aleuten-Summerzäit#,
+				'generic' => q#Hawaii-Aleuten-Zäit#,
+				'standard' => q#Hawaii-Aleuten-Normalzäit#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Hong-Kong-Summerzäit),
-				'generic' => q(Hong-Kong-Zäit),
-				'standard' => q(Hong-Kong-Normalzäit),
+				'daylight' => q#Hong-Kong-Summerzäit#,
+				'generic' => q#Hong-Kong-Zäit#,
+				'standard' => q#Hong-Kong-Normalzäit#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Hovd-Summerzäit),
-				'generic' => q(Hovd-Zäit),
-				'standard' => q(Hovd-Normalzäit),
+				'daylight' => q#Hovd-Summerzäit#,
+				'generic' => q#Hovd-Zäit#,
+				'standard' => q#Hovd-Normalzäit#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Indesch Zäit),
+				'standard' => q#Indesch Zäit#,
 			},
 		},
 		'Indian/Christmas' => {
@@ -6705,247 +6714,247 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Indeschen Ozean-Zäit),
+				'standard' => q#Indeschen Ozean-Zäit#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Indochina-Zäit),
+				'standard' => q#Indochina-Zäit#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Zentralindonesesch Zäit),
+				'standard' => q#Zentralindonesesch Zäit#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Ostindonesesch Zäit),
+				'standard' => q#Ostindonesesch Zäit#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Westindonesesch Zäit),
+				'standard' => q#Westindonesesch Zäit#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Iranesch Summerzäit),
-				'generic' => q(Iranesch Zäit),
-				'standard' => q(Iranesch Normalzäit),
+				'daylight' => q#Iranesch Summerzäit#,
+				'generic' => q#Iranesch Zäit#,
+				'standard' => q#Iranesch Normalzäit#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkutsk-Summerzäit),
-				'generic' => q(Irkutsk-Zäit),
-				'standard' => q(Irkutsk-Normalzäit),
+				'daylight' => q#Irkutsk-Summerzäit#,
+				'generic' => q#Irkutsk-Zäit#,
+				'standard' => q#Irkutsk-Normalzäit#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Israelesch Summerzäit),
-				'generic' => q(Israelesch Zäit),
-				'standard' => q(Israelesch Normalzäit),
+				'daylight' => q#Israelesch Summerzäit#,
+				'generic' => q#Israelesch Zäit#,
+				'standard' => q#Israelesch Normalzäit#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japanesch Summerzäit),
-				'generic' => q(Japanesch Zäit),
-				'standard' => q(Japanesch Normalzäit),
+				'daylight' => q#Japanesch Summerzäit#,
+				'generic' => q#Japanesch Zäit#,
+				'standard' => q#Japanesch Normalzäit#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Kamtschatka-Summerzäit),
-				'generic' => q(Kamtschatka-Zäit),
-				'standard' => q(Kamtschatka-Normalzäit),
+				'daylight' => q#Kamtschatka-Summerzäit#,
+				'generic' => q#Kamtschatka-Zäit#,
+				'standard' => q#Kamtschatka-Normalzäit#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Ostkasachesch Zäit),
+				'standard' => q#Ostkasachesch Zäit#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Westkasachesch Zäit),
+				'standard' => q#Westkasachesch Zäit#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Koreanesch Summerzäit),
-				'generic' => q(Koreanesch Zäit),
-				'standard' => q(Koreanesch Normalzäit),
+				'daylight' => q#Koreanesch Summerzäit#,
+				'generic' => q#Koreanesch Zäit#,
+				'standard' => q#Koreanesch Normalzäit#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Kosrae-Zäit),
+				'standard' => q#Kosrae-Zäit#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnojarsk-Summerzäit),
-				'generic' => q(Krasnojarsk-Zäit),
-				'standard' => q(Krasnojarsk-Normalzäit),
+				'daylight' => q#Krasnojarsk-Summerzäit#,
+				'generic' => q#Krasnojarsk-Zäit#,
+				'standard' => q#Krasnojarsk-Normalzäit#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Kirgisistan-Zäit),
+				'standard' => q#Kirgisistan-Zäit#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Linneninselen-Zäit),
+				'standard' => q#Linneninselen-Zäit#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Lord-Howe-Summerzäit),
-				'generic' => q(Lord-Howe-Zäit),
-				'standard' => q(Lord-Howe-Normalzäit),
+				'daylight' => q#Lord-Howe-Summerzäit#,
+				'generic' => q#Lord-Howe-Zäit#,
+				'standard' => q#Lord-Howe-Normalzäit#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Macquarieinsel-Zäit),
+				'standard' => q#Macquarieinsel-Zäit#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadan-Summerzäit),
-				'generic' => q(Magadan-Zäit),
-				'standard' => q(Magadan-Normalzäit),
+				'daylight' => q#Magadan-Summerzäit#,
+				'generic' => q#Magadan-Zäit#,
+				'standard' => q#Magadan-Normalzäit#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Malaysesch Zäit),
+				'standard' => q#Malaysesch Zäit#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Maldiven-Zäit),
+				'standard' => q#Maldiven-Zäit#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Marquesas-Zäit),
+				'standard' => q#Marquesas-Zäit#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Marshallinselen-Zäit),
+				'standard' => q#Marshallinselen-Zäit#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mauritius-Summerzäit),
-				'generic' => q(Mauritius-Zäit),
-				'standard' => q(Mauritius-Normalzäit),
+				'daylight' => q#Mauritius-Summerzäit#,
+				'generic' => q#Mauritius-Zäit#,
+				'standard' => q#Mauritius-Normalzäit#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Mawson-Zäit),
+				'standard' => q#Mawson-Zäit#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Nordwest-Mexiko-Summerzäit),
-				'generic' => q(Nordwest-Mexiko-Zäit),
-				'standard' => q(Nordwest-Mexiko-Normalzäit),
+				'daylight' => q#Nordwest-Mexiko-Summerzäit#,
+				'generic' => q#Nordwest-Mexiko-Zäit#,
+				'standard' => q#Nordwest-Mexiko-Normalzäit#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Mexikanesch Pazifik-Summerzäit),
-				'generic' => q(Mexikanesch Pazifikzäit),
-				'standard' => q(Mexikanesch Pazifik-Normalzäit),
+				'daylight' => q#Mexikanesch Pazifik-Summerzäit#,
+				'generic' => q#Mexikanesch Pazifikzäit#,
+				'standard' => q#Mexikanesch Pazifik-Normalzäit#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulaanbaatar-Summerzäit),
-				'generic' => q(Ulaanbaatar-Zäit),
-				'standard' => q(Ulaanbaatar-Normalzäit),
+				'daylight' => q#Ulaanbaatar-Summerzäit#,
+				'generic' => q#Ulaanbaatar-Zäit#,
+				'standard' => q#Ulaanbaatar-Normalzäit#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskauer Summerzäit),
-				'generic' => q(Moskauer Zäit),
-				'standard' => q(Moskauer Normalzäit),
+				'daylight' => q#Moskauer Summerzäit#,
+				'generic' => q#Moskauer Zäit#,
+				'standard' => q#Moskauer Normalzäit#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Myanmar-Zäit),
+				'standard' => q#Myanmar-Zäit#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Nauru-Zäit),
+				'standard' => q#Nauru-Zäit#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Nepalesesch Zäit),
+				'standard' => q#Nepalesesch Zäit#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Neikaledonesch Summerzäit),
-				'generic' => q(Neikaledonesch Zäit),
-				'standard' => q(Neikaledonesch Normalzäit),
+				'daylight' => q#Neikaledonesch Summerzäit#,
+				'generic' => q#Neikaledonesch Zäit#,
+				'standard' => q#Neikaledonesch Normalzäit#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Neiséiland-Summerzäit),
-				'generic' => q(Neiséiland-Zäit),
-				'standard' => q(Neiséiland-Normalzäit),
+				'daylight' => q#Neiséiland-Summerzäit#,
+				'generic' => q#Neiséiland-Zäit#,
+				'standard' => q#Neiséiland-Normalzäit#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Neifundland-Summerzäit),
-				'generic' => q(Neifundland-Zäit),
-				'standard' => q(Neifundland-Normalzäit),
+				'daylight' => q#Neifundland-Summerzäit#,
+				'generic' => q#Neifundland-Zäit#,
+				'standard' => q#Neifundland-Normalzäit#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Niue-Zäit),
+				'standard' => q#Niue-Zäit#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Norfolkinselen-Zäit),
+				'standard' => q#Norfolkinselen-Zäit#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Fernando-de-Noronha-Summerzäit),
-				'generic' => q(Fernando-de-Noronha-Zäit),
-				'standard' => q(Fernando-de-Noronha-Normalzäit),
+				'daylight' => q#Fernando-de-Noronha-Summerzäit#,
+				'generic' => q#Fernando-de-Noronha-Zäit#,
+				'standard' => q#Fernando-de-Noronha-Normalzäit#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Nowosibirsk-Summerzäit),
-				'generic' => q(Nowosibirsk-Zäit),
-				'standard' => q(Nowosibirsk-Normalzäit),
+				'daylight' => q#Nowosibirsk-Summerzäit#,
+				'generic' => q#Nowosibirsk-Zäit#,
+				'standard' => q#Nowosibirsk-Normalzäit#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omsk-Summerzäit),
-				'generic' => q(Omsk-Zäit),
-				'standard' => q(Omsk-Normalzäit),
+				'daylight' => q#Omsk-Summerzäit#,
+				'generic' => q#Omsk-Zäit#,
+				'standard' => q#Omsk-Normalzäit#,
 			},
 		},
 		'Pacific/Easter' => {
@@ -6962,238 +6971,238 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Pakistanesch Summerzäit),
-				'generic' => q(Pakistanesch Zäit),
-				'standard' => q(Pakistanesch Normalzäit),
+				'daylight' => q#Pakistanesch Summerzäit#,
+				'generic' => q#Pakistanesch Zäit#,
+				'standard' => q#Pakistanesch Normalzäit#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Palau-Zäit),
+				'standard' => q#Palau-Zäit#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Papua-Neiguinea-Zäit),
+				'standard' => q#Papua-Neiguinea-Zäit#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraguayanesch Summerzäit),
-				'generic' => q(Paraguayanesch Zäit),
-				'standard' => q(Paraguayanesch Normalzäit),
+				'daylight' => q#Paraguayanesch Summerzäit#,
+				'generic' => q#Paraguayanesch Zäit#,
+				'standard' => q#Paraguayanesch Normalzäit#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peruanesch Summerzäit),
-				'generic' => q(Peruanesch Zäit),
-				'standard' => q(Peruanesch Normalzäit),
+				'daylight' => q#Peruanesch Summerzäit#,
+				'generic' => q#Peruanesch Zäit#,
+				'standard' => q#Peruanesch Normalzäit#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Philippinnesch Summerzäit),
-				'generic' => q(Philippinnesch Zäit),
-				'standard' => q(Philippinnesch Normalzäit),
+				'daylight' => q#Philippinnesch Summerzäit#,
+				'generic' => q#Philippinnesch Zäit#,
+				'standard' => q#Philippinnesch Normalzäit#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Phoenixinselen-Zäit),
+				'standard' => q#Phoenixinselen-Zäit#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Saint-Pierre-a-Miquelon-Summerzäit),
-				'generic' => q(Saint-Pierre-a-Miquelon-Zäit),
-				'standard' => q(Saint-Pierre-a-Miquelon-Normalzäit),
+				'daylight' => q#Saint-Pierre-a-Miquelon-Summerzäit#,
+				'generic' => q#Saint-Pierre-a-Miquelon-Zäit#,
+				'standard' => q#Saint-Pierre-a-Miquelon-Normalzäit#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Pitcairninselen-Zäit),
+				'standard' => q#Pitcairninselen-Zäit#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Ponape-Zäit),
+				'standard' => q#Ponape-Zäit#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Réunion-Zäit),
+				'standard' => q#Réunion-Zäit#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Rothera-Zäit),
+				'standard' => q#Rothera-Zäit#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Sakhalin-Summerzäit),
-				'generic' => q(Sakhalin-Zäit),
-				'standard' => q(Sakhalin-Normalzäit),
+				'daylight' => q#Sakhalin-Summerzäit#,
+				'generic' => q#Sakhalin-Zäit#,
+				'standard' => q#Sakhalin-Normalzäit#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samara-Summerzäit),
-				'generic' => q(Samara-Zäit),
-				'standard' => q(Samara-Normalzäit),
+				'daylight' => q#Samara-Summerzäit#,
+				'generic' => q#Samara-Zäit#,
+				'standard' => q#Samara-Normalzäit#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samoa-Summerzäit),
-				'generic' => q(Samoa-Zäit),
-				'standard' => q(Samoa-Normalzäit),
+				'daylight' => q#Samoa-Summerzäit#,
+				'generic' => q#Samoa-Zäit#,
+				'standard' => q#Samoa-Normalzäit#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Seychellen-Zäit),
+				'standard' => q#Seychellen-Zäit#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Singapur-Standardzäit),
+				'standard' => q#Singapur-Standardzäit#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Salomoninselen-Zäit),
+				'standard' => q#Salomoninselen-Zäit#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Südgeorgesch Zäit),
+				'standard' => q#Südgeorgesch Zäit#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Suriname-Zäit),
+				'standard' => q#Suriname-Zäit#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Syowa-Zäit),
+				'standard' => q#Syowa-Zäit#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Tahiti-Zäit),
+				'standard' => q#Tahiti-Zäit#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taipei-Summerzäit),
-				'generic' => q(Taipei-Zäit),
-				'standard' => q(Taipei-Normalzäit),
+				'daylight' => q#Taipei-Summerzäit#,
+				'generic' => q#Taipei-Zäit#,
+				'standard' => q#Taipei-Normalzäit#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tadschikistan-Zäit),
+				'standard' => q#Tadschikistan-Zäit#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Tokelau-Zäit),
+				'standard' => q#Tokelau-Zäit#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tonganesch Summerzäit),
-				'generic' => q(Tonganesch Zäit),
-				'standard' => q(Tonganesch Normalzäit),
+				'daylight' => q#Tonganesch Summerzäit#,
+				'generic' => q#Tonganesch Zäit#,
+				'standard' => q#Tonganesch Normalzäit#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Chuuk-Zäit),
+				'standard' => q#Chuuk-Zäit#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Turkmenistan-Summerzäit),
-				'generic' => q(Turkmenistan-Zäit),
-				'standard' => q(Turkmenistan-Normalzäit),
+				'daylight' => q#Turkmenistan-Summerzäit#,
+				'generic' => q#Turkmenistan-Zäit#,
+				'standard' => q#Turkmenistan-Normalzäit#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Tuvalu-Zäit),
+				'standard' => q#Tuvalu-Zäit#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Uruguayanesch Summerzäit),
-				'generic' => q(Uruguayanesch Zäit),
-				'standard' => q(Uruguyanesch Normalzäit),
+				'daylight' => q#Uruguayanesch Summerzäit#,
+				'generic' => q#Uruguayanesch Zäit#,
+				'standard' => q#Uruguyanesch Normalzäit#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Usbekistan-Summerzäit),
-				'generic' => q(Usbekistan-Zäit),
-				'standard' => q(Usbekistan-Normalzäit),
+				'daylight' => q#Usbekistan-Summerzäit#,
+				'generic' => q#Usbekistan-Zäit#,
+				'standard' => q#Usbekistan-Normalzäit#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Vanuatu-Summerzäit),
-				'generic' => q(Vanuatu-Zäit),
-				'standard' => q(Vanuatu-Normalzäit),
+				'daylight' => q#Vanuatu-Summerzäit#,
+				'generic' => q#Vanuatu-Zäit#,
+				'standard' => q#Vanuatu-Normalzäit#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Venezuela-Zäit),
+				'standard' => q#Venezuela-Zäit#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Wladiwostok-Summerzäit),
-				'generic' => q(Wladiwostok-Zäit),
-				'standard' => q(Wladiwostok-Normalzäit),
+				'daylight' => q#Wladiwostok-Summerzäit#,
+				'generic' => q#Wladiwostok-Zäit#,
+				'standard' => q#Wladiwostok-Normalzäit#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Wolgograd-Summerzäit),
-				'generic' => q(Wolgograd-Zäit),
-				'standard' => q(Wolgograd-Normalzäit),
+				'daylight' => q#Wolgograd-Summerzäit#,
+				'generic' => q#Wolgograd-Zäit#,
+				'standard' => q#Wolgograd-Normalzäit#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Wostok-Zäit),
+				'standard' => q#Wostok-Zäit#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Wake-Insel-Zäit),
+				'standard' => q#Wake-Insel-Zäit#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Wallis-a-Futuna-Zäit),
+				'standard' => q#Wallis-a-Futuna-Zäit#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakutsk-Summerzäit),
-				'generic' => q(Jakutsk-Zäit),
-				'standard' => q(Jakutsk-Normalzäit),
+				'daylight' => q#Jakutsk-Summerzäit#,
+				'generic' => q#Jakutsk-Zäit#,
+				'standard' => q#Jakutsk-Normalzäit#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekaterinbuerg-Summerzäit),
-				'generic' => q(Jekaterinbuerg-Zäit),
-				'standard' => q(Jekaterinbuerg-Normalzäit),
+				'daylight' => q#Jekaterinbuerg-Summerzäit#,
+				'generic' => q#Jekaterinbuerg-Zäit#,
+				'standard' => q#Jekaterinbuerg-Normalzäit#,
 			},
 		},
 	 } }

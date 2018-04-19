@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +22,6 @@ resources:
   bugtracker: https://github.com/plicease/Test2-Plugin-FauxHomeDir/issues
   homepage: https://metacpan.org/pod/Test2::Plugin::FauxHomeDir
   repository: git://github.com/plicease/Test2-Plugin-FauxHomeDir.git
-version: '0.03'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

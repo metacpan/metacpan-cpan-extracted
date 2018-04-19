@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Shi::Latn - Package for language Tachelhit
 
 package Locale::CLDR::Locales::Shi::Latn;
 # This file auto generated from Data\common\main\shi_Latn.xml
-#	on Fri 29 Apr  7:24:05 pm GMT
+#	on Fri 13 Apr  7:27:44 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[o p v])},
+			auxiliary => qr{[o p v]},
 			index => ['A', 'B', 'C', 'D', 'Ḍ', 'E', 'Ɛ', 'F', 'G', '{Gʷ}', 'Ɣ', 'H', 'Ḥ', 'I', 'J', 'K', '{Kʷ}', 'L', 'M', 'N', 'Q', 'R', 'Ṛ', 'S', 'Ṣ', 'T', 'Ṭ', 'U', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d ḍ e ɛ f g {gʷ} ɣ h ḥ i j k {kʷ} l m n q r ṛ s ṣ t ṭ u w x y z])},
+			main => qr{[a b c d ḍ e ɛ f g {gʷ} ɣ h ḥ i j k {kʷ} l m n q r ṛ s ṣ t ṭ u w x y z]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -829,13 +831,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{tifawt},
-					'pm' => q{tadggʷat},
-				},
 				'abbreviated' => {
-					'am' => q{tifawt},
 					'pm' => q{tadggʷat},
+					'am' => q{tifawt},
+				},
+				'wide' => {
+					'pm' => q{tadggʷat},
+					'am' => q{tifawt},
 				},
 			},
 		},
@@ -959,6 +961,19 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 	} },
 );
 

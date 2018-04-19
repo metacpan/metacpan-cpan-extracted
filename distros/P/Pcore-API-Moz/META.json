@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-api-moz/overview"
       }
    },
-   "version" : "v0.11.1",
+   "version" : "v0.11.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

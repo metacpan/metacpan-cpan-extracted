@@ -114,7 +114,7 @@ sub fix_newmortal {
     # if code has '$arg = <something>' not in first line - prevent fuckin ExtUtils::ParseXS from adding '$arg = sv_newmortal()'
     # triggered by $arg = NULL which must firstly be set by typemap itself. Move it on top if inheriting
     #state $ppline = '    $arg = NULL; /* suppress xsubpp\'s pollution of $arg */';
-    my $found = ($$coderef =~ s/^\s*\Q$arg\E\s*=\s*\NULL\s*;\s*$//gm); # remove previous guardians;
+    my $found = ($$coderef =~ s/^\s*\Q$arg\E\s*=\s*NULL\s*;\s*$//gm); # remove previous guardians;
     $$coderef = "    $arg = NULL;\n$$coderef" if $found;
 }
 
@@ -357,7 +357,7 @@ sub print_section {
                     $meth = $is_input ? 'eval_input_typemap_code' : 'eval_output_typemap_code';
                     my $tmcode = $tmap->code;
                     my $code = $self->$meth("qq\a$tmcode\a", $other);
-                    my $arg_init = (!$is_input && $code =~ /^\s*$arg\s*=\s*\NULL\s*;\s*$/m) ? '' : ' = newSV(0)';
+                    my $arg_init = (!$is_input && $code =~ /^\s*$arg\s*=\s*NULL\s*;\s*$/m) ? '' : ' = newSV(0)';
                     my $tmfunc_code = $self->typemap_inline_func($tmfunc_name, $class, $code, $arg_init, $is_input, \@args, $tmap->{_init_code});
                     $gen_funcs{$tmfunc_name} = $tmfunc_code;
                 }

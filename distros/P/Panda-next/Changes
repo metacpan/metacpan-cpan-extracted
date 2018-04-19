@@ -1,0 +1,6 @@
+0.1.2    16.04.2018
+           - remove useless dependencies, remove static algo from code
+0.1.1    13.04.2018
+           - remove useless tests (from perl core)
+0.1.0    12.04.2018
+           - first release

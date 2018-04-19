@@ -1,3 +1,20 @@
+0.057		2018-04-17	T. R. Wyant
+    Allow ->asserts( 'a*' ). This modification actually allows wild
+    cards in asserts() on all match semantic modifiers, but it is
+    probably only useful in the case of 'a*', because that is the only
+    one that can be doubled.
+
+    Explain grouping structure as 'Grouping', not 'Capture or grouping'.
+
+    Caret modifier was not turning off /n. This was complicated by the
+    fact that (?^) was introduced in 5.13.6, but (?n) was not introduced
+    until 5.21.8. The solution was to include -n in the expansion of the
+    caret if and only if /n had been seen in the scope of the caret.
+
+    Recognize caret in /(?^)x/.
+
+    Acknowledge Regexp::Parsertron in SEE ALSO
+
 0.056		2018-03-07	T. R. Wyant
     Support removal of unescaped literal left curlys after left parens,
     which was deprecated in 5.27.8. No actual change in output yet,

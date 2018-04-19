@@ -1,45 +1,85 @@
 {
-   "no_index" : {
-      "directory" : [
-         "inc",
-         "t"
-      ]
-   },
-   "resources" : {
-      "homepage" : "https://github.com/barefootcoder/Data-Random/tree",
-      "repository" : "git://github.com/barefootcoder/Data-Random.git",
-      "license" : "http://dev.perl.org/licenses/"
-   },
-   "meta-spec" : {
-      "version" : 1.4,
-      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
-   },
-   "generated_by" : "Module::Install version 1.06 using Module::Install::JSONMETA version 7.001",
-   "distribution_type" : "module",
-   "version" : "0.12",
-   "name" : "Data-Random",
-   "author" : [
-      "Originally written by: Adekunle Olonoh"
-   ],
-   "dynamic_config" : 1,
-   "license" : "perl",
-   "build_requires" : {
-      "Test::More" : "0.88",
-      "ExtUtils::MakeMaker" : 6.36,
-      "File::Temp" : 0
-   },
-   "requires" : {
-      "perl" : "5.00562",
-      "Time::Piece" : "1.16",
-      "Carp" : 0
-   },
-   "recommends" : {
-      "GD" : 0
-   },
    "abstract" : "Perl module to generate random data",
-   "configure_requires" : {
-      "YAML::Tiny" : 0,
-      "ExtUtils::MakeMaker" : 6.36
-   }
+   "author" : [
+      "Adekunle Olonoh <koolade@users.sourceforge.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Random",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "GD" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "FileHandle" : "0",
+            "Time::Piece" : "1.16",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::MockTime" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Random" : {
+         "file" : "lib/Data/Random.pm",
+         "version" : "0.13"
+      },
+      "Data::Random::WordList" : {
+         "file" : "lib/Data/Random/WordList.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-data-random at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://githubb.com/barefootcoder/Data-Random.git",
+         "web" : "https://github.com/barefootcoder/Data-Random"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [
+      "Buddy Burden <barefootcoder@gmail.com>",
+      "Jose Joaquin Atria <jjatria@cpan.org>",
+      "Michiel Beijen <michiel.beijen@gmail.com>",
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

@@ -27,14 +27,12 @@ sub clear {
 }
 
 sub update_all ($cb = undef) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $success_all = 1;
 
     my $cv = AE::cv sub {
-        $cb->($success_all) if $cb;
-
-        $blocking_cv->($success_all) if $blocking_cv;
+        $rouse_cb ? $cb ? $rouse_cb->( $cb->($success_all) ) : $rouse_cb->($success_all) : $cb ? $cb->($success_all) : ();
 
         return;
     };
@@ -58,26 +56,24 @@ sub update_all ($cb = undef) {
 
     $cv->end;
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub update ( $type, $cb = undef ) {
     state $init = !!require IO::Uncompress::Gunzip;
 
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    P->http->get(
+    return P->http->get(
         $RES->{$type}->[1],
         buf_size    => 1,
         on_progress => 1,
         on_finish   => sub ($res) {
             my $success = 0;
 
-            if ( $res->status == 200 ) {
+            if ( $res->{status} == 200 ) {
                 eval {
                     my $temp = P->file->tempfile;
 
-                    IO::Uncompress::Gunzip::gunzip( $res->body, $temp->path, BinModeOut => 1 );
+                    IO::Uncompress::Gunzip::gunzip( $res->{body}, $temp->path, BinModeOut => 1 );
 
                     $ENV->share->store( $RES->{$type}->[0], $temp->path, 'Pcore-GeoIP' );
 
@@ -87,15 +83,9 @@ sub update ( $type, $cb = undef ) {
                 };
             }
 
-            $cb->($success) if $cb;
-
-            $blocking_cv->($success) if $blocking_cv;
-
-            return;
+            return $cb ? $cb->($success) : $success;
         }
     );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
 }
 
 sub country {
@@ -163,7 +153,7 @@ sub _get_h ($type) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 77                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 73                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

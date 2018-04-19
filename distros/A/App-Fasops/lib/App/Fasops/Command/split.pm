@@ -7,13 +7,16 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'split blocked fasta files to separate per-alignment files';
+sub abstract {
+    return 'split blocked fasta files to per-alignment files';
+}
 
 sub opt_spec {
     return (
         [ "outdir|o=s", "Output location, [stdout] for screen" ],
-        [ "rm|r",       "If outdir exists, remove it before operating." ],
-        [ "chr",        "Split by chromosomes." ],
+        [ "rm|r",       "if outdir exists, remove it before operating." ],
+        [ "chr",        "split by chromosomes." ],
+        [ "simple",     "only keep names in headers" ],
         { show_defaults => 1, }
     );
 }
@@ -25,8 +28,13 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infiles> are paths to blocked fasta files, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to blocked fasta files, .fas.gz is supported
+* infile == stdin means reading from STDIN
+
+MARKDOWN
+
     return $desc;
 }
 
@@ -85,7 +93,12 @@ sub execute {
 
                 if ( lc( $opt->{outdir} ) eq "stdout" ) {
                     for my $key ( keys %{$info_of} ) {
-                        printf ">%s\n", App::RL::Common::encode_header( $info_of->{$key} );
+                        if ( $opt->{simple} ) {
+                            printf ">%s\n", $info_of->{$key}{name};
+                        }
+                        else {
+                            printf ">%s\n", App::RL::Common::encode_header( $info_of->{$key} );
+                        }
                         print $info_of->{$key}{seq} . "\n";
                     }
                 }
@@ -106,8 +119,13 @@ sub execute {
 
                     open my $out_fh, ">>", $filename;
                     for my $key ( keys %{$info_of} ) {
-                        printf {$out_fh} ">%s\n",
-                            App::RL::Common::encode_header( $info_of->{$key} );
+                        if ( $opt->{simple} ) {
+                            printf {$out_fh} ">%s\n", $info_of->{$key}{name};
+                        }
+                        else {
+                            printf {$out_fh} ">%s\n",
+                                App::RL::Common::encode_header( $info_of->{$key} );
+                        }
                         print {$out_fh} $info_of->{$key}{seq} . "\n";
                     }
                     print {$out_fh} "\n";

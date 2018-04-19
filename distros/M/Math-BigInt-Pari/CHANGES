@@ -1,4 +1,21 @@
-2017-01-11 v1.3003 pjacklam
+1.3004 2018-04-17
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * Sync test files with Math-BigInt.
+
+ * Add test files t/release-test-version.t, t/release-portability.t, and
+   t/release-cpan-changes.t.
+
+ * Use a MANIFEST.SKIP file based on the default file in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+1.3003 2017-01-11 pjacklam
 
  * Fix syntax for required version of Math::BigInt::Lib.
 
@@ -26,13 +43,13 @@
 
  * In test file t/01load.t, display the PARI library version number.
 
-2016-12-03 v1.3002 pjacklam
+1.3002 2016-12-03 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
  * Remove author information in LICENSE file.
 
-2016-11-23 v1.3001 pjacklam
+1.3001 2016-11-23 pjacklam
 
  * Sync test files with Math-BigInt-1.999801. Add t/mbi_rand.t, t/mbimbf.t,
    and t/mbimbf.inc since these are included in the test suite for the other
@@ -42,7 +59,7 @@
 
  * Add _lcm() by using Pari's lcm() function.
 
-2016-11-15 v1.3000 pjacklam
+1.3000 2016-11-15 pjacklam
 
  * Sync test files with Math-BigInt-1.999800.
 
@@ -53,23 +70,23 @@
 
  * Add methods _str() and _set(), and correct _num() method.
 
-2016-04-25 v1.27 pjacklam
+1.27 2016-04-25 pjacklam
 
  * Sync test files with Math-BigInt-1.999719.
 
-2016-04-22 v1.26 pjacklam
+1.26 2016-04-22 pjacklam
 
  * Sync test files with Math-BigInt-1.999718.
 
-2016-01-03 v1.25 pjacklam
+1.25 2016-01-03 pjacklam
 
  * Sync test files with Math-BigInt-1.999714.
 
-2015-12-31 v1.24 pjacklam
+1.24 2015-12-31 pjacklam
 
  * Sync test files with Math-BigInt-1.999713.
 
-2015-11-22 v1.23 pjacklam
+1.23 2015-11-22 pjacklam
 
  * Sync test files with Math-BigInt-1.999709.
 
@@ -78,7 +95,7 @@
 
  * Correct error in CHANGES file.
 
-2015-11-09 v1.22 pjacklam
+1.22 2015-11-09 pjacklam
 
  * Sync test files with Math-BigInt-1.999709.
 
@@ -97,7 +114,7 @@
  * Add 'assertlib.*\.exe' to MANIFEST.SKIP, since make generates temporary
    files like 'assertlibzxjE4WfG.exe' on Cygwin.
 
-2015-09-21 v1.21 pjacklam
+1.21 2015-09-21 pjacklam
 
  * Sync test files with Math-BigInt-1.999703.
 
@@ -105,13 +122,13 @@
 
  * Update author information.
 
-2015-09-17 v1.20 pjacklam
+1.20 2015-09-17 pjacklam
 
  * Sync test files with Math-BigInt-1.999702.
 
  * Required version of Math-BigInt is now 1.999702.
 
-2015-09-11 v1.19 pjacklam
+1.19 2015-09-11 pjacklam
  bigfltpm.inc
   * File removed. It was included in the previous release by accident.
  bigfltpm.t
@@ -160,11 +177,11 @@
     Math-BigInt distribution and the backend distributions are as few and as
     small as possible. This makes for easier release management.
 
-2014-04-03 v1.18 pjacklam
+1.18 2014-04-03 pjacklam
  * Updated test files from the Math::BigInt distribution (Peter John Acklam).
  * Updated POD (Peter John Acklam)
 
-2011-09-04 v1.17 pjacklam
+1.17 2011-09-04 pjacklam
  * Upgrade bundled modules in "inc" to latest version. (Peter John Acklam)
  * Math::BigInt::GMP now requires Math::BigInt v1.997 (Peter John Acklam).
  * Include "^MYMETA\.(yml|json)\z" in MANIFEST.SKIP. Whereas META.* are
@@ -174,11 +191,11 @@
  * Updated common test files from the Math::BigInt distribution. (Peter
    John Acklam)
 
-2011-02-26 v1.16 pjacklam (6153 tests)
+1.16 2011-02-26 pjacklam (6153 tests)
  * Change bigintpm.inc to reflect recent changes in the Math::BigInt
    distribution (Peter John Acklam).
 
-2011-02-10 v1.15 pjacklam (6151 tests)
+1.15 2011-02-10 pjacklam (6151 tests)
  * Include latest version of test scripts from Math-BigInt (closes RT #65580)
    (Peter John Acklam).
  * Add 00sig.t for testing SIGNATURE, and 01load.t for basic module loading and
@@ -187,10 +204,10 @@
    code (Peter John Acklam).
  * Clean up whitespace (Peter John Acklam).
 
-2010-09-10 v1.14 rafl 5716 tests
+1.14 2010-09-10 rafl 5716 tests
  * Fix tests with Math::BigInt >= 1.90 and depend on it.
 
-2007-07-01 v1.13 Tels 5704 tests
+1.13 2007-07-01 Tels 5704 tests
  * require Math::BigInt v1.87
  * testsuite from MBI v1.87
  * _log_int() calculates a guess, and then use this to find the real result,
@@ -234,7 +251,7 @@
   06 len 20:    3s (3.15 usr + 0.01 sys = 3.16 CPU) @ 15761/s (n=49807)
   0a len 3 big: 4s (3.20 usr + 0.04 sys = 3.24 CPU) @ 15838/s (n=51316)
 
-2007-04-17 v1.12 Tels 5258 tests
+1.12 2007-04-17 Tels 5258 tests
  * require Math::BigInt v1.83, Math::Pari v2.010709
  * use native sqrtint() for _sqrt(), making it faster
  * use native sqrtn() for _root(), making it faster
@@ -242,19 +259,19 @@
    + _from_oct(), _as_oct()
    + _10ex(), _alen()
 
-2005-01-02 v1.11 Tels 5055 tests
+1.11 2005-01-02 Tels 5055 tests
  * require Math::BigInt v1.74 and Math::Pari v2.010602
  * testsuite from MBI v1.74
  * support API from BigInt v1.70 and better
  * add _is_two, _is_ten, _two, _ten, _log_int, _zeros, _sqrt, _root() etc
 
-2004-01-07 v1.10 Tels
+1.10 2004-01-07 Tels
  * testsuite from MBI v1.68 - 4583 tests
  * _as_hex() and _as_bin() handle zero, tests for that
  * bacmp() is about 11% faster due to _acmp() using gcmp() vs. "<=>"
  * added _modinv() and tests
 
-2002-07-07 v1.09 Tels
+1.09 2002-07-07 Tels
  - testsuite from MBI v1.60 - 4061 tests
  - prerequisite fixed
  - _copy() uses $zero instead of PARI(0) - benchmark for full BigInt copy():
@@ -277,18 +294,18 @@
    inc 100:  6 secs ( 5.39 usr +  0.00 sys =  5.39 CPU) @ 24157.70/s (n=130210)
   inc 1000:  5 secs ( 4.93 usr +  0.07 sys =  5.00 CPU) @ 24108.80/s (n=120544)
 
-2002-03-23 v1.08 Tels
+1.08 2002-03-23 Tels
  - testsuite from MBI v1.55 - 3881 tests
  - prerequisite fixed
 
-2002-02-21 v1.07 Tels
+1.07 2002-02-21 Tels
  - Math::Pari has _hex_cvt(), which makes from_hex() fast, but doesn't have
    something for from_bin(). Now _from_bin() repacks the input as hex number
    and then passes it to _hex_cvt().
  - tests from Math::BigInt v1.51
  - replaced _core_lib() by config()->{lib}
 
-2002-02-10 v1.06 Tels
+1.06 2002-02-10 Tels
  - _lsft() and _rsft() do now bases != 2, too
  - tests are now from v1.50
  - added _fac() for faster factorial() (used from MBI v1.50 onwards)
@@ -316,10 +333,10 @@
          right_1_10:     2570    6433   2.5
 
 
-2001-11-11 v1.05 Tels
-  - fixed _inc() and _dec() so that they can be used by MBI v1.46
+1.05 2001-11-11 Tels
+ - fixed _inc() and _dec() so that they can be used by MBI v1.46
 
-2001-11-01 v1.04 Tels
+1.04 2001-11-01 Tels
  - tests from BigInt v1.45
  - added _mod() for faster % operator (about two times faster now)
  - added _lsft() and _rsft() for faster shifting
@@ -347,22 +364,22 @@
           right_10:      2020    5465   2.7
 
 1.03  2001.09.02 btrott
-    - Incorporated Tels's changes: no longer need to EXPORT_OK functions;
-      added empty import method.
-    - Added _as_hex and _as_bin implementations for Math::Pari integers,
-      to support as_hex and as_bin Math::BigInt methods.
+ - Incorporated Tels's changes: no longer need to EXPORT_OK functions;
+   added empty import method.
+ - Added _as_hex and _as_bin implementations for Math::Pari integers,
+   to support as_hex and as_bin Math::BigInt methods.
 
 1.02  2001.08.05 btrott
-    - Added _gcd method; uses PARI library function to return gcd.
-    - Incorporated Tels's changes: _copy() is now linear; _is_zero,
-      _is_one, is_even, and is_odd now use PARI library functions
-      rather than overloaded ops and should thus be faster. Also
-      added new tests from Math::BigInt 1.40.
+ - Added _gcd method; uses PARI library function to return gcd.
+ - Incorporated Tels's changes: _copy() is now linear; _is_zero,
+   _is_one, is_even, and is_odd now use PARI library functions
+   rather than overloaded ops and should thus be faster. Also
+   added new tests from Math::BigInt 1.40.
 
 1.01  2001.07.14 btrott
-    - Incorporated Tels's changes per calling args to plugin methods
-      (now class is *always* the first arg, so no more checking).
-      Fixed some tests per Math::BigInt changes.
+ - Incorporated Tels's changes per calling args to plugin methods
+   (now class is *always* the first arg, so no more checking).
+   Fixed some tests per Math::BigInt changes.
 
 1.00  2001.07.11 btrott
-    - Initial release.
+ - Initial release.

@@ -3,7 +3,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-    use_ok( 'Safe::Hole' );
-  }
+    use_ok('Safe::Hole');
+}
 
-diag( "Testing Safe::Hole $Safe::Hole::VERSION, Perl $], $^X" );
+diag("Testing Safe::Hole $Safe::Hole::VERSION, Perl $], $^X");

@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -90,12 +90,10 @@ sub new {
 
 	my $lookahead_steps = int( $self->{lookahead} / 60 );
 	if ( ( 60 - $self->{datetime}->minute ) < ( $self->{lookahead} % 60 ) ) {
-		say "lookahead: ${lookahead_steps}++";
 		$lookahead_steps++;
 	}
 	my $lookbehind_steps = int( $self->{lookbehind} / 60 );
 	if ( $self->{datetime}->minute < ( $self->{lookbehind} % 60 ) ) {
-		say "lookbehind: ${lookbehind_steps}++";
 		$lookbehind_steps++;
 	}
 
@@ -577,7 +575,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 DESCRIPTION
 
@@ -672,7 +670,7 @@ Returns undef otherwise.
 
 =item $status->results
 
-Returns a list of Travel::Status::DE::IRIS(3pm) objects, each one describing
+Returns a list of Travel::Status::DE::IRIS::Result(3pm) objects, each one describing
 one arrival and/or departure.
 
 =item $status->warnstr
@@ -715,7 +713,7 @@ L<https://github.com/derf/Travel-Status-DE-IRIS>
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

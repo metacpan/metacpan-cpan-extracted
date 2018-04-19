@@ -22,8 +22,8 @@ unless ( $ENV{MM_LICENSE_KEY} ) {
 }
 
 my $client = WebService::MinFraud::Client->new(
-    host    => $ENV{MM_MINFRAUD_HOST} || 'ct100-test.maxmind.com',
-    user_id => $ENV{MM_USER_ID}       || 10,
+    host       => $ENV{MM_MINFRAUD_HOST} || 'ct100-test.maxmind.com',
+    account_id => $ENV{MM_ACCOUNT_ID}    || 10,
     license_key => $ENV{MM_LICENSE_KEY},
 );
 
@@ -78,18 +78,18 @@ subtest 'factors' => sub {
 like(
     exception {
 
-        # Choose a user_id that is valid in type, but way too big to real,
-        # unless we hit the jackpot of users :)
-        my $big_user_id = 900_000_000;
-        my $test_client = WebService::MinFraud::Client->new(
-            host => $ENV{MM_MINFRAUD_HOST} || 'ct100-test.maxmind.com',
-            user_id     => $big_user_id,
+        # Choose an account_id that is valid in type, but way too big to real,
+        # unless we hit the jackpot of accounts :)
+        my $big_account_id = 900_000_000;
+        my $test_client    = WebService::MinFraud::Client->new(
+            host        => $ENV{MM_MINFRAUD_HOST} || 'ct100-test.maxmind.com',
+            account_id  => $big_account_id,
             license_key => $ENV{MM_LICENSE_KEY},
         );
         $test_client->score($request);
     },
-    qr/Invalid user_id or license_key provided/,
-    'bad user_id throws an exception'
+    qr/Invalid account_id or license_key provided/,
+    'bad account_id throws an exception'
 );
 
 sub _insights_tests {

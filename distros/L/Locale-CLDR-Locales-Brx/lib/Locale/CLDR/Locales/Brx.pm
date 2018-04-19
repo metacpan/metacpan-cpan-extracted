@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Brx - Package for language Bodo
 
 package Locale::CLDR::Locales::Brx;
 # This file auto generated from Data\common\main\brx.xml
-#	on Fri 29 Apr  6:53:46 pm GMT
+#	on Fri 13 Apr  7:03:21 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1026,9 +1027,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[‌‍])},
+			auxiliary => qr{[‌‍]},
 			index => ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऍ', 'ए', 'ऐ', 'ऑ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ञ', 'ट', 'ठ', 'ड', '{ड\u093C}', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'ळ', 'व', 'श', 'ष', 'स', 'ह'],
-			main => qr{(?^u:[़ ँ ं अ आ इ ई उ ऊ ऍ ए ऐ ऑ ओ औ क ख ग घ च छ ज झ ञ ट ठ ड {ड़} ढ ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ा ि ी ु ू ृ ॅ े ै ॉ ो ौ ्])},
+			main => qr{[़ ँ ं अ आ इ ई उ ऊ ऍ ए ऐ ऑ ओ औ क ख ग घ च छ ज झ ञ ट ठ ड {ड़} ढ ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ा ि ी ु ू ृ ॅ े ै ॉ ो ौ ्]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1190,21 +1192,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##,##0.###',
+					'default' => '#,##,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##,##0%',
+					'default' => '#,##,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -1463,9 +1465,14 @@ has 'currencies' => (
 				'currency' => q(बेलारुसी नया रूबल \(194–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(बेलारुसी रूबल),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(बेलारुसी रूबल \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -2105,12 +2112,12 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(पेरुवाई नया सोल),
+				'currency' => q(पेरुवाई सोल),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(पेरुवाई सोल),
+				'currency' => q(पेरुवाई सोल \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -2713,8 +2720,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{फुं},
 					'pm' => q{बेलासे},
+					'am' => q{फुं},
 				},
 				'abbreviated' => {
 					'pm' => q{बेलासे},
@@ -2802,7 +2809,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, MMM d, y G},
@@ -2829,7 +2836,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, MMM d, y G},
@@ -2882,14 +2889,14 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Acre' => {
 			long => {
-				'daylight' => q(आकर समर टाईम),
-				'generic' => q(आकर टाईम),
-				'standard' => q(आकर स्टैंडर्ड टाईम),
+				'daylight' => q#आकर समर टाईम#,
+				'generic' => q#आकर टाईम#,
+				'standard' => q#आकर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(अफ़गानी स्टैंडर्ड टाईम),
+				'standard' => q#अफ़गानी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -3047,45 +3054,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(मध्य अफ्रीका स्टैंडर्ड टाईम),
+				'standard' => q#मध्य अफ्रीका स्टैंडर्ड टाईम#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(पूर्वी अफ्रीका स्टैंडर्ड टाईम),
+				'standard' => q#पूर्वी अफ्रीका स्टैंडर्ड टाईम#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(दक्षिण अफ्रीका स्टैंडर्ड टाईम),
+				'standard' => q#दक्षिण अफ्रीका स्टैंडर्ड टाईम#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(पश्चीम अफ्रीका समर टाईम),
-				'generic' => q(पश्चीम अफ्रीका टाईम),
-				'standard' => q(पश्चीम अफ्रीका स्टैंडर्ड टाईम),
+				'daylight' => q#पश्चीम अफ्रीका समर टाईम#,
+				'generic' => q#पश्चीम अफ्रीका टाईम#,
+				'standard' => q#पश्चीम अफ्रीका स्टैंडर्ड टाईम#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(अलास्का डेलाईट टाईम),
-				'generic' => q(अलास्का टाईम),
-				'standard' => q(अलास्का स्टैंडर्ड टाईम),
+				'daylight' => q#अलास्का डेलाईट टाईम#,
+				'generic' => q#अलास्का टाईम#,
+				'standard' => q#अलास्का स्टैंडर्ड टाईम#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(अलमाटी समर टाईम),
-				'generic' => q(अलमाटी टाईम),
-				'standard' => q(अलमाटी स्टैंडर्ड टाईम),
+				'daylight' => q#अलमाटी समर टाईम#,
+				'generic' => q#अलमाटी टाईम#,
+				'standard' => q#अलमाटी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(अमाज़ोन समर टाईम),
-				'generic' => q(अमाज़ोन टाईम),
-				'standard' => q(अमाज़ोन स्टैंडर्ड टाईम),
+				'daylight' => q#अमाज़ोन समर टाईम#,
+				'generic' => q#अमाज़ोन टाईम#,
+				'standard' => q#अमाज़ोन स्टैंडर्ड टाईम#,
 			},
 		},
 		'America/Adak' => {
@@ -3483,37 +3490,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(सैंट्रल अमरिका डेलाईट टाईम),
-				'generic' => q(सैंट्रल अमरिका टाईम),
-				'standard' => q(सैंट्रल अमरिका स्टैंडर्ड टाईम),
+				'daylight' => q#सैंट्रल अमरिका डेलाईट टाईम#,
+				'generic' => q#सैंट्रल अमरिका टाईम#,
+				'standard' => q#सैंट्रल अमरिका स्टैंडर्ड टाईम#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(ईस्टर्न अमरिका डेलाईट टाईम),
-				'generic' => q(ईस्टर्न अमरिका टाईम),
-				'standard' => q(ईस्टर्न अमरिका स्टैंडर्ड टाईम),
+				'daylight' => q#ईस्टर्न अमरिका डेलाईट टाईम#,
+				'generic' => q#ईस्टर्न अमरिका टाईम#,
+				'standard' => q#ईस्टर्न अमरिका स्टैंडर्ड टाईम#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(अमरिका माऊन्टन डेलाईट टाईम),
-				'generic' => q(अमरिका माऊन्टन टाईम),
-				'standard' => q(अमरिका माऊन्टन स्टैंडर्ड टाईम),
+				'daylight' => q#अमरिका माऊन्टन डेलाईट टाईम#,
+				'generic' => q#अमरिका माऊन्टन टाईम#,
+				'standard' => q#अमरिका माऊन्टन स्टैंडर्ड टाईम#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(पैसीफीक डेलाईट टाईम),
-				'generic' => q(पैसीफीक टाईम),
-				'standard' => q(पैसीफीक स्टैंडर्ड टाईम),
+				'daylight' => q#पैसीफीक डेलाईट टाईम#,
+				'generic' => q#पैसीफीक टाईम#,
+				'standard' => q#पैसीफीक स्टैंडर्ड टाईम#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(अनादीर समर टाईम),
-				'generic' => q(अनादीर टाईम),
-				'standard' => q(अनादीर स्टैंडर्ड टाईम),
+				'daylight' => q#अनादीर समर टाईम#,
+				'generic' => q#अनादीर टाईम#,
+				'standard' => q#अनादीर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -3545,44 +3552,44 @@ has 'time_zone_names' => (
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(अक़्टाऊ समर टाईम),
-				'generic' => q(अक़्टाऊ टाईम),
-				'standard' => q(अक़्टाऊ स्टैंडर्ड टाईम),
+				'daylight' => q#अक़्टाऊ समर टाईम#,
+				'generic' => q#अक़्टाऊ टाईम#,
+				'standard' => q#अक़्टाऊ स्टैंडर्ड टाईम#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(अक़्टोबे समर टाईम),
-				'generic' => q(अक़्टोबे टाईम),
-				'standard' => q(अक़्टोबे स्टैंडर्ड टाईम),
+				'daylight' => q#अक़्टोबे समर टाईम#,
+				'generic' => q#अक़्टोबे टाईम#,
+				'standard' => q#अक़्टोबे स्टैंडर्ड टाईम#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(अरबी डेलाईट टाईम),
-				'generic' => q(अरबी टाईम),
-				'standard' => q(अरबी स्टैंडर्ड टाईम),
+				'daylight' => q#अरबी डेलाईट टाईम#,
+				'generic' => q#अरबी टाईम#,
+				'standard' => q#अरबी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(अर्जण्टिना समर टाईम),
-				'generic' => q(अर्जनटिना टाईम),
-				'standard' => q(अर्जनटिना स्टैंडर्ड टाईम),
+				'daylight' => q#अर्जण्टिना समर टाईम#,
+				'generic' => q#अर्जनटिना टाईम#,
+				'standard' => q#अर्जनटिना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(पश्चीम अर्जण्टिना समर टाईम),
-				'generic' => q(पश्चीम अर्जण्टिना टाईम),
-				'standard' => q(पश्चीम अर्जण्टिना स्टैंडर्ड टाईम),
+				'daylight' => q#पश्चीम अर्जण्टिना समर टाईम#,
+				'generic' => q#पश्चीम अर्जण्टिना टाईम#,
+				'standard' => q#पश्चीम अर्जण्टिना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(आरमीनी समर टाईम),
-				'generic' => q(आरमीनी टाईम),
-				'standard' => q(आरमीनी स्टैंडर्ड टाईम),
+				'daylight' => q#आरमीनी समर टाईम#,
+				'generic' => q#आरमीनी टाईम#,
+				'standard' => q#आरमीनी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Asia/Aden' => {
@@ -3797,9 +3804,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(अटलांटीक डेलाईट टाईम),
-				'generic' => q(अटलांटीक टाईम),
-				'standard' => q(अटलांटीक स्टैंडर्ड टाईम),
+				'daylight' => q#अटलांटीक डेलाईट टाईम#,
+				'generic' => q#अटलांटीक टाईम#,
+				'standard' => q#अटलांटीक स्टैंडर्ड टाईम#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -3870,171 +3877,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(मध्य ओस्ट्रेलिया डेलाईट टाईम),
-				'generic' => q(ओस्ट्रेलिया टाईम),
-				'standard' => q(मध्य ओस्ट्रेलिया स्टैंडर्ड टाईम),
+				'daylight' => q#मध्य ओस्ट्रेलिया डेलाईट टाईम#,
+				'generic' => q#ओस्ट्रेलिया टाईम#,
+				'standard' => q#मध्य ओस्ट्रेलिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(मध्य-पश्चीम ओस्ट्रेलिया डेलाईट टाईम),
-				'generic' => q(मध्य-पश्चीम ओस्ट्रेलिया टाईम),
-				'standard' => q(मध्य-पश्चीम ओस्ट्रेलिया स्टैंडर्ड टाईम),
+				'daylight' => q#मध्य-पश्चीम ओस्ट्रेलिया डेलाईट टाईम#,
+				'generic' => q#मध्य-पश्चीम ओस्ट्रेलिया टाईम#,
+				'standard' => q#मध्य-पश्चीम ओस्ट्रेलिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(पूर्वी ओस्ट्रेलिया डेलाईट टाईम),
-				'generic' => q(पूर्वी ओस्ट्रेलिया टाईम),
-				'standard' => q(पूर्वी ओस्ट्रेलिया स्टैंडर्ड टाईम),
+				'daylight' => q#पूर्वी ओस्ट्रेलिया डेलाईट टाईम#,
+				'generic' => q#पूर्वी ओस्ट्रेलिया टाईम#,
+				'standard' => q#पूर्वी ओस्ट्रेलिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(दक्षिण ओस्ट्रेलिया डेलाईट टाईम),
-				'generic' => q(दक्षिण ओस्ट्रेलिया टाईम),
-				'standard' => q(दक्षिण ओस्ट्रेलिया स्टैंडर्ड टाईम),
+				'daylight' => q#दक्षिण ओस्ट्रेलिया डेलाईट टाईम#,
+				'generic' => q#दक्षिण ओस्ट्रेलिया टाईम#,
+				'standard' => q#दक्षिण ओस्ट्रेलिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(आज़रबैजान समर टाईम),
-				'generic' => q(आज़रबैजान टाईम),
-				'standard' => q(आज़रबैजान स्टैंडर्ड टाईम),
+				'daylight' => q#आज़रबैजान समर टाईम#,
+				'generic' => q#आज़रबैजान टाईम#,
+				'standard' => q#आज़रबैजान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(आज़ोर समर टाईम),
-				'generic' => q(आज़ोर टाईम),
-				'standard' => q(आज़ोर स्टैंडर्ड टाईम),
+				'daylight' => q#आज़ोर समर टाईम#,
+				'generic' => q#आज़ोर टाईम#,
+				'standard' => q#आज़ोर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(बांगलादेश समर टाईम),
-				'generic' => q(बांगलादेश टाईम),
-				'standard' => q(बांगलादेश स्टैंडर्ड टाईम),
+				'daylight' => q#बांगलादेश समर टाईम#,
+				'generic' => q#बांगलादेश टाईम#,
+				'standard' => q#बांगलादेश स्टैंडर्ड टाईम#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(भुटान स्टैंडर्ड टाईम),
+				'standard' => q#भुटान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(बोलिविया स्टैंडर्ड टाईम),
+				'standard' => q#बोलिविया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(ब्राज़ीलिया समर टाईम),
-				'generic' => q(ब्राज़ीलिया टाईम),
-				'standard' => q(ब्राज़ीलिया स्टैंडर्ड टाईम),
+				'daylight' => q#ब्राज़ीलिया समर टाईम#,
+				'generic' => q#ब्राज़ीलिया टाईम#,
+				'standard' => q#ब्राज़ीलिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(ब्रुनेई दर उस सलाम स्टैंडर्ड टाईम),
+				'standard' => q#ब्रुनेई दर उस सलाम स्टैंडर्ड टाईम#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(काप वेर्दे समर टाईम),
-				'generic' => q(काप वेर्दे टाईम),
-				'standard' => q(काप वेर्दे स्टैंडर्ड टाईम),
+				'daylight' => q#काप वेर्दे समर टाईम#,
+				'generic' => q#काप वेर्दे टाईम#,
+				'standard' => q#काप वेर्दे स्टैंडर्ड टाईम#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(चामरो स्टैंडर्ड टाईम),
+				'standard' => q#चामरो स्टैंडर्ड टाईम#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(चैथम डेलाईट टाईम),
-				'generic' => q(चैथम टाईम),
-				'standard' => q(चैथम स्टैंडर्ड टाईम),
+				'daylight' => q#चैथम डेलाईट टाईम#,
+				'generic' => q#चैथम टाईम#,
+				'standard' => q#चैथम स्टैंडर्ड टाईम#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(चीली समर टाईम),
-				'generic' => q(चीली टाईम),
-				'standard' => q(चीली स्टैंडर्ड टाईम),
+				'daylight' => q#चीली समर टाईम#,
+				'generic' => q#चीली टाईम#,
+				'standard' => q#चीली स्टैंडर्ड टाईम#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(चाईना डेलाईट टाईम),
-				'generic' => q(चाईना टाईम),
-				'standard' => q(चाईना स्टैंडर्ड टाईम),
+				'daylight' => q#चाईना डेलाईट टाईम#,
+				'generic' => q#चाईना टाईम#,
+				'standard' => q#चाईना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(चोईबालसान समर टाईम),
-				'generic' => q(चोईबालसान टाईम),
-				'standard' => q(चोईबालसान स्टैंडर्ड टाईम),
+				'daylight' => q#चोईबालसान समर टाईम#,
+				'generic' => q#चोईबालसान टाईम#,
+				'standard' => q#चोईबालसान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(क्रीसमस स्टैंडर्ड टाईम),
+				'standard' => q#क्रीसमस स्टैंडर्ड टाईम#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(कोको द्वीप स्टैंडर्ड टाईम),
+				'standard' => q#कोको द्वीप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(कोलंबिया समर टाईम),
-				'generic' => q(कोलंबिया टाईम),
-				'standard' => q(कोलंबिया स्टैंडर्ड टाईम),
+				'daylight' => q#कोलंबिया समर टाईम#,
+				'generic' => q#कोलंबिया टाईम#,
+				'standard' => q#कोलंबिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(कुक द्वीप अर्ध समर टाईम),
-				'generic' => q(कुक द्वीप टाईम),
-				'standard' => q(कुक द्वीप स्टैंडर्ड टाईम),
+				'daylight' => q#कुक द्वीप अर्ध समर टाईम#,
+				'generic' => q#कुक द्वीप टाईम#,
+				'standard' => q#कुक द्वीप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(क्युबा डेलाईट टाईम),
-				'generic' => q(क्युबा टाईम),
-				'standard' => q(क्युबा स्टैंडर्ड टाईम),
+				'daylight' => q#क्युबा डेलाईट टाईम#,
+				'generic' => q#क्युबा टाईम#,
+				'standard' => q#क्युबा स्टैंडर्ड टाईम#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(डेवीस स्टैंडर्ड टाईम),
+				'standard' => q#डेवीस स्टैंडर्ड टाईम#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(ड्युमों ड्युरवील स्टैंडर्ड टाईम),
+				'standard' => q#ड्युमों ड्युरवील स्टैंडर्ड टाईम#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(ईस्ट टीमोर स्टैंडर्ड टाईम),
+				'standard' => q#ईस्ट टीमोर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(ईस्टर आईलंड समर टाईम),
-				'generic' => q(ईस्टर आईलंड टाईम),
-				'standard' => q(ईस्टर आईलंड स्टैंडर्ड टाईम),
+				'daylight' => q#ईस्टर आईलंड समर टाईम#,
+				'generic' => q#ईस्टर आईलंड टाईम#,
+				'standard' => q#ईस्टर आईलंड स्टैंडर्ड टाईम#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(एक्वाडौर स्टैंडर्ड टाईम),
+				'standard' => q#एक्वाडौर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -4070,7 +4077,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#डबलिन#,
 			long => {
-				'daylight' => q(आईरीश समर टाईम),
+				'daylight' => q#आईरीश समर टाईम#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -4094,7 +4101,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#लंदन#,
 			long => {
-				'daylight' => q(ब्रीटीश समर टाईम),
+				'daylight' => q#ब्रीटीश समर टाईम#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -4171,132 +4178,132 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(मध्य यूरोप समर टाईम),
-				'generic' => q(मध्य यूरोप टाईम),
-				'standard' => q(मध्य यूरोप स्टैंडर्ड टाईम),
+				'daylight' => q#मध्य यूरोप समर टाईम#,
+				'generic' => q#मध्य यूरोप टाईम#,
+				'standard' => q#मध्य यूरोप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(ईस्टर्न यूरोप समर टाईम),
-				'generic' => q(ईस्टर्न यूरोप टाईम),
-				'standard' => q(ईस्टर्न यूरोप स्टैंडर्ड टाईम),
+				'daylight' => q#ईस्टर्न यूरोप समर टाईम#,
+				'generic' => q#ईस्टर्न यूरोप टाईम#,
+				'standard' => q#ईस्टर्न यूरोप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(वेस्टर्न यूरोप समर टाईम),
-				'generic' => q(वेस्टर्न यूरोप टाईम),
-				'standard' => q(वेस्टर्न यूरोप स्टैंडर्ड टाईम),
+				'daylight' => q#वेस्टर्न यूरोप समर टाईम#,
+				'generic' => q#वेस्टर्न यूरोप टाईम#,
+				'standard' => q#वेस्टर्न यूरोप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(फ़ाल्कलैण्ड समर टाईम),
-				'generic' => q(फ़ाल्कलैण्ड टाईम),
-				'standard' => q(फ़ाल्कलैण्ड स्टैंडर्ड टाईम),
+				'daylight' => q#फ़ाल्कलैण्ड समर टाईम#,
+				'generic' => q#फ़ाल्कलैण्ड टाईम#,
+				'standard' => q#फ़ाल्कलैण्ड स्टैंडर्ड टाईम#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(फीजी समर टाईम),
-				'generic' => q(फीजी टाईम),
-				'standard' => q(फीजी स्टैंडर्ड टाईम),
+				'daylight' => q#फीजी समर टाईम#,
+				'generic' => q#फीजी टाईम#,
+				'standard' => q#फीजी स्टैंडर्ड टाईम#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(फ्रान्सीसी गुयाना स्टैंडर्ड टाईम),
+				'standard' => q#फ्रान्सीसी गुयाना स्टैंडर्ड टाईम#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(दक्षिण फ्रान्सीसी स्टैंडर्ड टाईम),
+				'standard' => q#दक्षिण फ्रान्सीसी स्टैंडर्ड टाईम#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(ग्रीनीच स्टैंडर्ड टाईम),
+				'standard' => q#ग्रीनीच स्टैंडर्ड टाईम#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(गालापागोस स्टैंडर्ड टाईम),
+				'standard' => q#गालापागोस स्टैंडर्ड टाईम#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(गांबिये स्टैंडर्ड टाईम),
+				'standard' => q#गांबिये स्टैंडर्ड टाईम#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(जोर्जिया समर टाईम),
-				'generic' => q(जोर्जिया टाईम),
-				'standard' => q(जोर्जिया स्टैंडर्ड टाईम),
+				'daylight' => q#जोर्जिया समर टाईम#,
+				'generic' => q#जोर्जिया टाईम#,
+				'standard' => q#जोर्जिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(गीलबर्ट द्वीप स्टैंडर्ड टाईम),
+				'standard' => q#गीलबर्ट द्वीप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(ग्रीनलैण्ड ईस्टर्न समर टाईम),
-				'generic' => q(ग्रीनलैण्ड ईस्टर्न टाईम),
-				'standard' => q(ग्रीनलैण्ड ईस्टर्न स्टैंडर्ड टाईम),
+				'daylight' => q#ग्रीनलैण्ड ईस्टर्न समर टाईम#,
+				'generic' => q#ग्रीनलैण्ड ईस्टर्न टाईम#,
+				'standard' => q#ग्रीनलैण्ड ईस्टर्न स्टैंडर्ड टाईम#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(ग्रीनलैण्ड वेस्टर्न समर टाईम),
-				'generic' => q(ग्रीनलैण्ड वेस्टर्न टाईम),
-				'standard' => q(ग्रीनलैण्ड वेस्टर्न स्टैंडर्ड टाईम),
+				'daylight' => q#ग्रीनलैण्ड वेस्टर्न समर टाईम#,
+				'generic' => q#ग्रीनलैण्ड वेस्टर्न टाईम#,
+				'standard' => q#ग्रीनलैण्ड वेस्टर्न स्टैंडर्ड टाईम#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(गुआम स्टैंडर्ड टाईम),
+				'standard' => q#गुआम स्टैंडर्ड टाईम#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(गल्फ़ स्टैंडर्ड टाईम),
+				'standard' => q#गल्फ़ स्टैंडर्ड टाईम#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(गुयाना स्टैंडर्ड टाईम),
+				'standard' => q#गुयाना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(हवाई आलटन डेलाईट टाईम),
-				'generic' => q(हवाई आलटन टाईम),
-				'standard' => q(हवाई आलटन स्टैंडर्ड टाईम),
+				'daylight' => q#हवाई आलटन डेलाईट टाईम#,
+				'generic' => q#हवाई आलटन टाईम#,
+				'standard' => q#हवाई आलटन स्टैंडर्ड टाईम#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(हाँगकॉंग समर टाईम),
-				'generic' => q(हाँगकॉंग टाईम),
-				'standard' => q(हाँगकॉंग स्टैंडर्ड टाईम),
+				'daylight' => q#हाँगकॉंग समर टाईम#,
+				'generic' => q#हाँगकॉंग टाईम#,
+				'standard' => q#हाँगकॉंग स्टैंडर्ड टाईम#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(होव्ड समर टाईम),
-				'generic' => q(होव्ड टाईम),
-				'standard' => q(होव्ड स्टैंडर्ड टाईम),
+				'daylight' => q#होव्ड समर टाईम#,
+				'generic' => q#होव्ड टाईम#,
+				'standard' => q#होव्ड स्टैंडर्ड टाईम#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(भारतीय स्टैंडर्ड टाईम),
+				'standard' => q#भारतीय स्टैंडर्ड टाईम#,
 			},
 			short => {
-				'standard' => q(IST),
+				'standard' => q#IST#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -4334,245 +4341,245 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(भारतीय महासगर स्टैंडर्ड टाईम),
+				'standard' => q#भारतीय महासगर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(ईंडो चइना स्टैंडर्ड टाईम),
+				'standard' => q#ईंडो चइना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(ईंडोनीशिया स्टैंडर्ड टाईम),
+				'standard' => q#ईंडोनीशिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(ईस्टर्न ईंडोनीशिया स्टैंडर्ड टाईम),
+				'standard' => q#ईस्टर्न ईंडोनीशिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(वेस्टर्न ईंडोनीशिया स्टैंडर्ड टाईम),
+				'standard' => q#वेस्टर्न ईंडोनीशिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(ईरान डेलाईट टाईम),
-				'generic' => q(ईरान टाईम),
-				'standard' => q(ईरान स्टैंडर्ड टाईम),
+				'daylight' => q#ईरान डेलाईट टाईम#,
+				'generic' => q#ईरान टाईम#,
+				'standard' => q#ईरान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(ईरकुर्त्स्क समर टाईम),
-				'generic' => q(ईरकुर्त्स्क टाईम),
-				'standard' => q(ईरकुर्त्स्क स्टैंडर्ड टाईम),
+				'daylight' => q#ईरकुर्त्स्क समर टाईम#,
+				'generic' => q#ईरकुर्त्स्क टाईम#,
+				'standard' => q#ईरकुर्त्स्क स्टैंडर्ड टाईम#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(ईस्राइल डेलाईट टाईम),
-				'generic' => q(ईस्राइल टाईम),
-				'standard' => q(ईस्राइल स्टैंडर्ड टाईम),
+				'daylight' => q#ईस्राइल डेलाईट टाईम#,
+				'generic' => q#ईस्राइल टाईम#,
+				'standard' => q#ईस्राइल स्टैंडर्ड टाईम#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(जपान डेलाईट टाईम),
-				'generic' => q(जपान टाईम),
-				'standard' => q(जपान स्टैंडर्ड टाईम),
+				'daylight' => q#जपान डेलाईट टाईम#,
+				'generic' => q#जपान टाईम#,
+				'standard' => q#जपान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(पेत्रोपावलोस्क कामचटका समर टाईम),
-				'generic' => q(पेत्रोपावलोस्क कामचटका टाईम),
-				'standard' => q(पेत्रोपावलोस्क कामचटका स्टैंडर्ड टाईम),
+				'daylight' => q#पेत्रोपावलोस्क कामचटका समर टाईम#,
+				'generic' => q#पेत्रोपावलोस्क कामचटका टाईम#,
+				'standard' => q#पेत्रोपावलोस्क कामचटका स्टैंडर्ड टाईम#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(क़ज़ाख़स्तान टाईम),
+				'standard' => q#क़ज़ाख़स्तान टाईम#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(वेस्टर्न क़ज़ाख़स्तान टाईम),
+				'standard' => q#वेस्टर्न क़ज़ाख़स्तान टाईम#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(कोरिया डेलाईट टाईम),
-				'generic' => q(कोरिया टाईम),
-				'standard' => q(कोरिया स्टैंडर्ड टाईम),
+				'daylight' => q#कोरिया डेलाईट टाईम#,
+				'generic' => q#कोरिया टाईम#,
+				'standard' => q#कोरिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(कोसरी स्टैंडर्ड टाईम),
+				'standard' => q#कोसरी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(क्रासनोयार्स्क समर टाईम),
-				'generic' => q(क्रासनोयार्स्क टाईम),
-				'standard' => q(क्रासनोयार्स्क स्टैंडर्ड टाईम),
+				'daylight' => q#क्रासनोयार्स्क समर टाईम#,
+				'generic' => q#क्रासनोयार्स्क टाईम#,
+				'standard' => q#क्रासनोयार्स्क स्टैंडर्ड टाईम#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(क़ीर्ग़स्तान स्टैंडर्ड टाईम),
+				'standard' => q#क़ीर्ग़स्तान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(लंका स्टैंडर्ड टाईम),
+				'standard' => q#लंका स्टैंडर्ड टाईम#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(लाईन द्वीप स्टैंडर्ड टाईम),
+				'standard' => q#लाईन द्वीप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(लार्ड़ होव डेलाईट टाईम),
-				'generic' => q(लार्ड़ होव टाईम),
-				'standard' => q(लार्ड़ होव स्टैंडर्ड टाईम),
+				'daylight' => q#लार्ड़ होव डेलाईट टाईम#,
+				'generic' => q#लार्ड़ होव टाईम#,
+				'standard' => q#लार्ड़ होव स्टैंडर्ड टाईम#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(माकाऊ समर टाईम),
-				'generic' => q(माकाऊ टाईम),
-				'standard' => q(माकाऊ स्टैंडर्ड टाईम),
+				'daylight' => q#माकाऊ समर टाईम#,
+				'generic' => q#माकाऊ टाईम#,
+				'standard' => q#माकाऊ स्टैंडर्ड टाईम#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(मगदन समर टाईम),
-				'generic' => q(मगदन टाईम),
-				'standard' => q(मगदन स्टैंडर्ड टाईम),
+				'daylight' => q#मगदन समर टाईम#,
+				'generic' => q#मगदन टाईम#,
+				'standard' => q#मगदन स्टैंडर्ड टाईम#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(मलेशिया स्टैंडर्ड टाईम),
+				'standard' => q#मलेशिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(मालदीव स्टैंडर्ड टाईम),
+				'standard' => q#मालदीव स्टैंडर्ड टाईम#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(मार्केज़ास स्टैंडर्ड टाईम),
+				'standard' => q#मार्केज़ास स्टैंडर्ड टाईम#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(मार्शल र्स्टैंडर्ड टाईम),
+				'standard' => q#मार्शल र्स्टैंडर्ड टाईम#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(मॉरिशीयस समर टाईम),
-				'generic' => q(मॉरिशीयस टाईम),
-				'standard' => q(मॉरिशीयस स्टैंडर्ड टाईम),
+				'daylight' => q#मॉरिशीयस समर टाईम#,
+				'generic' => q#मॉरिशीयस टाईम#,
+				'standard' => q#मॉरिशीयस स्टैंडर्ड टाईम#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(मॉसन स्टैंडर्ड टाईम),
+				'standard' => q#मॉसन स्टैंडर्ड टाईम#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(मँगोलिया समर टाईम),
-				'generic' => q(मँगोलिया टाईम),
-				'standard' => q(मँगोलिया स्टैंडर्ड टाईम),
+				'daylight' => q#मँगोलिया समर टाईम#,
+				'generic' => q#मँगोलिया टाईम#,
+				'standard' => q#मँगोलिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(मॉस्को समर टाईम),
-				'generic' => q(मॉस्को टाईम),
-				'standard' => q(मॉस्को स्टैंडर्ड टाईम),
+				'daylight' => q#मॉस्को समर टाईम#,
+				'generic' => q#मॉस्को टाईम#,
+				'standard' => q#मॉस्को स्टैंडर्ड टाईम#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(म्यानमार स्टैंडर्ड टाईम),
+				'standard' => q#म्यानमार स्टैंडर्ड टाईम#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(नाऊरु स्टैंडर्ड टाईम),
+				'standard' => q#नाऊरु स्टैंडर्ड टाईम#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(नेपाल स्टैंडर्ड टाईम),
+				'standard' => q#नेपाल स्टैंडर्ड टाईम#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(न्यु कैलेडोनिया समर टाईम),
-				'generic' => q(न्यु कैलेडोनिया टाईम),
-				'standard' => q(न्यु कैलेडोनिया स्टैंडर्ड टाईम),
+				'daylight' => q#न्यु कैलेडोनिया समर टाईम#,
+				'generic' => q#न्यु कैलेडोनिया टाईम#,
+				'standard' => q#न्यु कैलेडोनिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(न्युज़ीलैण्ड डेलाईट टाईम),
-				'generic' => q(न्युज़ीलैण्ड टाईम),
-				'standard' => q(न्युज़ीलैण्ड स्टैंडर्ड टाईम),
+				'daylight' => q#न्युज़ीलैण्ड डेलाईट टाईम#,
+				'generic' => q#न्युज़ीलैण्ड टाईम#,
+				'standard' => q#न्युज़ीलैण्ड स्टैंडर्ड टाईम#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(न्युफाऊंडलैण्ड डेलाईट टाईम),
-				'generic' => q(न्युफाऊंडलैण्ड टाईम),
-				'standard' => q(न्युफाऊंडलैण्ड स्टैंडर्ड टाईम),
+				'daylight' => q#न्युफाऊंडलैण्ड डेलाईट टाईम#,
+				'generic' => q#न्युफाऊंडलैण्ड टाईम#,
+				'standard' => q#न्युफाऊंडलैण्ड स्टैंडर्ड टाईम#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(नीऊई स्टैंडर्ड टाईम),
+				'standard' => q#नीऊई स्टैंडर्ड टाईम#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(नॉरफोक स्टैंडर्ड टाईम),
+				'standard' => q#नॉरफोक स्टैंडर्ड टाईम#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(फेरनान्दो द नोरोन्हा समर टाईम),
-				'generic' => q(फेरनान्दो द नोरोन्हा टाईम),
-				'standard' => q(फेरनान्दो द नोरोन्हा स्टैंडर्ड टाईम),
+				'daylight' => q#फेरनान्दो द नोरोन्हा समर टाईम#,
+				'generic' => q#फेरनान्दो द नोरोन्हा टाईम#,
+				'standard' => q#फेरनान्दो द नोरोन्हा स्टैंडर्ड टाईम#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(नॉर्थ मारिआना स्टैंडर्ड टाईम),
+				'standard' => q#नॉर्थ मारिआना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(नोवोसीबीर्स्क समर टाईम),
-				'generic' => q(नोवोसीबीर्स्क टाईम),
-				'standard' => q(नोवोसीबीर्स्क स्टैंडर्ड टाईम),
+				'daylight' => q#नोवोसीबीर्स्क समर टाईम#,
+				'generic' => q#नोवोसीबीर्स्क टाईम#,
+				'standard' => q#नोवोसीबीर्स्क स्टैंडर्ड टाईम#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(ओम्स्क समर टाईम),
-				'generic' => q(ओम्स्क टाईम),
-				'standard' => q(ओम्स्क स्टैंडर्ड टाईम),
+				'daylight' => q#ओम्स्क समर टाईम#,
+				'generic' => q#ओम्स्क टाईम#,
+				'standard' => q#ओम्स्क स्टैंडर्ड टाईम#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -4691,238 +4698,238 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(पाकिस्तान समर टाईम),
-				'generic' => q(पाकिस्तान टाईम),
-				'standard' => q(पाकिस्तान स्टैंडर्ड टाईम),
+				'daylight' => q#पाकिस्तान समर टाईम#,
+				'generic' => q#पाकिस्तान टाईम#,
+				'standard' => q#पाकिस्तान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(पलाऊ स्टैंडर्ड टाईम),
+				'standard' => q#पलाऊ स्टैंडर्ड टाईम#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(पापुआ न्यु गीनी स्टैंडर्ड टाईम),
+				'standard' => q#पापुआ न्यु गीनी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(पारागुए समर टाईम),
-				'generic' => q(पारागुए टाईम),
-				'standard' => q(पारागुए स्टैंडर्ड टाईम),
+				'daylight' => q#पारागुए समर टाईम#,
+				'generic' => q#पारागुए टाईम#,
+				'standard' => q#पारागुए स्टैंडर्ड टाईम#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(पेरु समर टाईम),
-				'generic' => q(पेरु टाईम),
-				'standard' => q(पेरु स्टैंडर्ड टाईम),
+				'daylight' => q#पेरु समर टाईम#,
+				'generic' => q#पेरु टाईम#,
+				'standard' => q#पेरु स्टैंडर्ड टाईम#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(फीलीपीन्स समर टाईम),
-				'generic' => q(फीलीपीन्स टाईम),
-				'standard' => q(फीलीपीन्स स्टैंडर्ड टाईम),
+				'daylight' => q#फीलीपीन्स समर टाईम#,
+				'generic' => q#फीलीपीन्स टाईम#,
+				'standard' => q#फीलीपीन्स स्टैंडर्ड टाईम#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(फीनीक्स द्वीप स्टैंडर्ड टाईम),
+				'standard' => q#फीनीक्स द्वीप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(सेँ पीयॅर एवं मीकलों डेलाईट टाईम),
-				'generic' => q(सेँ पीयॅर एवं मीकलों टाईम),
-				'standard' => q(सेँ पीयॅर एवं मीकलों स्टैंडर्ड टाईम),
+				'daylight' => q#सेँ पीयॅर एवं मीकलों डेलाईट टाईम#,
+				'generic' => q#सेँ पीयॅर एवं मीकलों टाईम#,
+				'standard' => q#सेँ पीयॅर एवं मीकलों स्टैंडर्ड टाईम#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(पीटकैर्न स्टैंडर्ड टाईम),
+				'standard' => q#पीटकैर्न स्टैंडर्ड टाईम#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(पोनापे (पोह्नपेई) स्टैंडर्ड टाईम),
+				'standard' => q#पोनापे (पोह्नपेई) स्टैंडर्ड टाईम#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(क़ीज़ीलोर्डा समर टाईम),
-				'generic' => q(क़ीज़ीलोर्डा टाईम),
-				'standard' => q(क़ीज़ीलोर्डा स्टैंडर्ड टाईम),
+				'daylight' => q#क़ीज़ीलोर्डा समर टाईम#,
+				'generic' => q#क़ीज़ीलोर्डा टाईम#,
+				'standard' => q#क़ीज़ीलोर्डा स्टैंडर्ड टाईम#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(रियूनियन स्टैंडर्ड टाईम),
+				'standard' => q#रियूनियन स्टैंडर्ड टाईम#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(रोथेरा स्टैंडर्ड टाईम),
+				'standard' => q#रोथेरा स्टैंडर्ड टाईम#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(सख़ालीन समर टाईम),
-				'generic' => q(सख़ालीन टाईम),
-				'standard' => q(सख़ालीन स्टैंडर्ड टाईम),
+				'daylight' => q#सख़ालीन समर टाईम#,
+				'generic' => q#सख़ालीन टाईम#,
+				'standard' => q#सख़ालीन स्टैंडर्ड टाईम#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(समारा समर टाईम),
-				'generic' => q(समारा टाईम),
-				'standard' => q(समारा स्टैंडर्ड टाईम),
+				'daylight' => q#समारा समर टाईम#,
+				'generic' => q#समारा टाईम#,
+				'standard' => q#समारा स्टैंडर्ड टाईम#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(समोआ समर टाईम),
-				'generic' => q(समोआ टाईम),
-				'standard' => q(समोआ स्टैंडर्ड टाईम),
+				'daylight' => q#समोआ समर टाईम#,
+				'generic' => q#समोआ टाईम#,
+				'standard' => q#समोआ स्टैंडर्ड टाईम#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(सेशेल्स स्टैंडर्ड टाईम),
+				'standard' => q#सेशेल्स स्टैंडर्ड टाईम#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(सींगापुर स्टैंडर्ड टाईम),
+				'standard' => q#सींगापुर स्टैंडर्ड टाईम#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(सॉलॉमन स्टैंडर्ड टाईम),
+				'standard' => q#सॉलॉमन स्टैंडर्ड टाईम#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(साऊथ जॉर्जिया स्टैंडर्ड टाईम),
+				'standard' => q#साऊथ जॉर्जिया स्टैंडर्ड टाईम#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(सुरीनाम स्टैंडर्ड टाईम),
+				'standard' => q#सुरीनाम स्टैंडर्ड टाईम#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(सीओवा स्टैंडर्ड टाईम),
+				'standard' => q#सीओवा स्टैंडर्ड टाईम#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(टाहिटी स्टैंडर्ड टाईम),
+				'standard' => q#टाहिटी स्टैंडर्ड टाईम#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(ताजीक़ीस्तान स्टैंडर्ड टाईम),
+				'standard' => q#ताजीक़ीस्तान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(टोकेलौ स्टैंडर्ड टाईम),
+				'standard' => q#टोकेलौ स्टैंडर्ड टाईम#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(टॉंगा समर टाईम),
-				'generic' => q(टॉंगा टाईम),
-				'standard' => q(टॉंगा स्टैंडर्ड टाईम),
+				'daylight' => q#टॉंगा समर टाईम#,
+				'generic' => q#टॉंगा टाईम#,
+				'standard' => q#टॉंगा स्टैंडर्ड टाईम#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(ट्रुक स्टैंडर्ड टाईम),
+				'standard' => q#ट्रुक स्टैंडर्ड टाईम#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(तुर्कमेनीस्तान समर टाईम),
-				'generic' => q(तुर्कमेनीस्तान टाईम),
-				'standard' => q(तुर्कमेनीस्तान स्टैंडर्ड टाईम),
+				'daylight' => q#तुर्कमेनीस्तान समर टाईम#,
+				'generic' => q#तुर्कमेनीस्तान टाईम#,
+				'standard' => q#तुर्कमेनीस्तान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(तुवालु स्टैंडर्ड टाईम),
+				'standard' => q#तुवालु स्टैंडर्ड टाईम#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(ऊरुगुए समर टाईम),
-				'generic' => q(ऊरुगुए टाईम),
-				'standard' => q(ऊरुगुए स्टैंडर्ड टाईम),
+				'daylight' => q#ऊरुगुए समर टाईम#,
+				'generic' => q#ऊरुगुए टाईम#,
+				'standard' => q#ऊरुगुए स्टैंडर्ड टाईम#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(ऊज़्बेकिस्तान समर टाईम),
-				'generic' => q(ऊज़्बेकिस्तान टाईम),
-				'standard' => q(ऊज़्बेकिस्तान स्टैंडर्ड टाईम),
+				'daylight' => q#ऊज़्बेकिस्तान समर टाईम#,
+				'generic' => q#ऊज़्बेकिस्तान टाईम#,
+				'standard' => q#ऊज़्बेकिस्तान स्टैंडर्ड टाईम#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(वनुआटु समर टाईम),
-				'generic' => q(वनुआटु टाईम),
-				'standard' => q(वनुआटु स्टैंडर्ड टाईम),
+				'daylight' => q#वनुआटु समर टाईम#,
+				'generic' => q#वनुआटु टाईम#,
+				'standard' => q#वनुआटु स्टैंडर्ड टाईम#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(वेनेज़ुएला स्टैंडर्ड टाईम),
+				'standard' => q#वेनेज़ुएला स्टैंडर्ड टाईम#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(व्लादीवॉस्तॉक डेलाईट टाईम),
-				'generic' => q(व्लादीवॉस्तॉक टाईम),
-				'standard' => q(व्लादीवॉस्तॉक स्टैंडर्ड टाईम),
+				'daylight' => q#व्लादीवॉस्तॉक डेलाईट टाईम#,
+				'generic' => q#व्लादीवॉस्तॉक टाईम#,
+				'standard' => q#व्लादीवॉस्तॉक स्टैंडर्ड टाईम#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(वॉलगोग्राद समर टाईम),
-				'generic' => q(वॉलगोग्राद टाईम),
-				'standard' => q(वॉलगोग्राद स्टैंडर्ड टाईम),
+				'daylight' => q#वॉलगोग्राद समर टाईम#,
+				'generic' => q#वॉलगोग्राद टाईम#,
+				'standard' => q#वॉलगोग्राद स्टैंडर्ड टाईम#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(वॉस्तॉक स्टैंडर्ड टाईम),
+				'standard' => q#वॉस्तॉक स्टैंडर्ड टाईम#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(वाके द्वीप स्टैंडर्ड टाईम),
+				'standard' => q#वाके द्वीप स्टैंडर्ड टाईम#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(वालीस एवं फ़ुतुना स्टैंडर्ड टाईम),
+				'standard' => q#वालीस एवं फ़ुतुना स्टैंडर्ड टाईम#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(याकुट्स्क समर टाईम),
-				'generic' => q(याकुट्स्क टाईम),
-				'standard' => q(याकुट्स्क स्टैंडर्ड टाईम),
+				'daylight' => q#याकुट्स्क समर टाईम#,
+				'generic' => q#याकुट्स्क टाईम#,
+				'standard' => q#याकुट्स्क स्टैंडर्ड टाईम#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(येकातेरीनाबुर्ग समर टाईम),
-				'generic' => q(येकातेरीनाबुर्ग टाईम),
-				'standard' => q(येकातेरीनाबुर्ग स्टैंडर्ड टाईम),
+				'daylight' => q#येकातेरीनाबुर्ग समर टाईम#,
+				'generic' => q#येकातेरीनाबुर्ग टाईम#,
+				'standard' => q#येकातेरीनाबुर्ग स्टैंडर्ड टाईम#,
 			},
 		},
 	 } }

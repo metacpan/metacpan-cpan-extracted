@@ -1,0 +1,68 @@
+{
+   "abstract" : "Linux system calls with pure Perl",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Call::Context" : "0",
+            "Module::Load" : "0",
+            "X::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Linux::Seccomp" : "0",
+            "Test::Deep" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "Test::SharedFork" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/FGasper/p5-Linux-Perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/FGasper/p5-Linux-Perl.git",
+         "web" : "https://github.com/FGasper/p5-Linux-Perl"
+      }
+   },
+   "version" : "0.03"
+}

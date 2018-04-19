@@ -2,7 +2,7 @@
 use v5.22;
 use strict;
 use warnings;
-use Test::More tests => 182;
+use Test::More tests => 183;
 use Test::Exception;
 
 use Time::Piece;
@@ -1777,4 +1777,14 @@ is(
     $sunday->day->name,
     "The First Sunday in Lent",
     'Validating that 2018-02-18 returns the correct day.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-04-22", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "The Fourth Sunday of Easter",
+    'Validating that 2018-04-22 returns the correct day.'
 );

@@ -7,6 +7,9 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Path::Tiny: '0'
   Test::More: '0'
+  Test::Output: '0'
+  Text::Trim: '0'
+  Time::HiRes: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -24,5 +27,5 @@ requires:
   XSLoader: '0'
   perl: '5.018'
 resources:
-  repository: https://github.com/gonzus/NONE
-version: '0.000038'
+  repository: https://github.com/gonzus/JavaScript-Duktape-XS
+version: '0.000046'

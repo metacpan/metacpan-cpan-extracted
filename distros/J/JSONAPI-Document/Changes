@@ -1,4 +1,8 @@
+1.2       2018-04-14 12:43:26+00:00 UTC
+
 1.1       2018-04-08 15:01:24+00:00 UTC
+- Use file based caching
+- New required argument: data_dir
 
 1.0       2018-04-08 00:55:28+00:00 UTC
 - namespace the CHI keys by this package name

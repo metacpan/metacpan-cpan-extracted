@@ -6,7 +6,7 @@ use Getopt::Long;
 use Test::BrewBuild;
 use Test::BrewBuild::Tester;
 
-our $VERSION = '2.18';
+our $VERSION = '2.20';
 
 my $auto;
 my $auto_csum_match;

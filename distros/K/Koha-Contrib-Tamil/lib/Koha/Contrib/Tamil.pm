@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil;
 # ABSTRACT: Various scripts to manage Koha instances
-$Koha::Contrib::Tamil::VERSION = '0.054';
+$Koha::Contrib::Tamil::VERSION = '0.055';
 use warnings;
 use strict;
 
@@ -18,7 +18,7 @@ Koha::Contrib::Tamil - Various scripts to manage Koha instances
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 DESCRIPTION
 

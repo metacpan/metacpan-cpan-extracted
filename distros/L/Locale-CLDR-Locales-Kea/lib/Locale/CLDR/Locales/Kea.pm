@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Kea - Package for language Kabuverdianu
 
 package Locale::CLDR::Locales::Kea;
 # This file auto generated from Data\common\main\kea.xml
-#	on Fri 29 Apr  7:11:35 pm GMT
+#	on Fri 13 Apr  7:16:09 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -44,13 +45,13 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'ab' => 'abkaziu',
+				'ab' => 'abkáziu',
  				'af' => 'afrikaner',
  				'agq' => 'aghem',
  				'ak' => 'akan',
- 				'am' => 'amariku',
- 				'ar' => 'arabi',
- 				'ar_001' => 'arabi mudernu',
+ 				'am' => 'amáriku',
+ 				'ar' => 'árabi',
+ 				'ar_001' => 'árabi mudernu',
  				'arn' => 'araukanu',
  				'as' => 'asames',
  				'asa' => 'asu',
@@ -112,12 +113,12 @@ has 'display_name_language' => (
  				'fr' => 'franses',
  				'fr_CA' => 'franses kanadianu',
  				'fr_CH' => 'franses suisu',
- 				'fy' => 'frisiu osidental',
+ 				'fy' => 'fríziu osidental',
  				'ga' => 'irlandes',
  				'gag' => 'gagauz',
  				'gl' => 'galegu',
  				'gn' => 'guarani',
- 				'gsw' => 'alimãu di Suisa',
+ 				'gsw' => 'alimãu suísu',
  				'gu' => 'gujarati',
  				'guz' => 'gusii',
  				'gv' => 'manks',
@@ -167,10 +168,10 @@ has 'display_name_language' => (
  				'lv' => 'letãu',
  				'mg' => 'malgaxi',
  				'mi' => 'maori',
- 				'mk' => 'masedoniu',
+ 				'mk' => 'masedóniu',
  				'ml' => 'malaialam',
  				'mr' => 'marati',
- 				'ms' => 'malaiu',
+ 				'ms' => 'maláiu',
  				'mt' => 'maltes',
  				'my' => 'birmanes',
  				'nb' => 'norueges bokmål',
@@ -180,7 +181,7 @@ has 'display_name_language' => (
  				'nmg' => 'kuazio',
  				'nn' => 'norueges nynorsk',
  				'om' => 'oromo',
- 				'or' => 'oriya',
+ 				'or' => 'odía',
  				'pa' => 'pandjabi',
  				'pl' => 'pulaku',
  				'ps' => 'paxto',
@@ -191,14 +192,15 @@ has 'display_name_language' => (
  				'quc' => 'kitxe',
  				'rm' => 'romanxi',
  				'ro' => 'rumenu',
+ 				'ro_MD' => 'rumenu moldáviku',
  				'ru' => 'rusu',
  				'rw' => 'kiniaruanda',
- 				'sa' => 'sanskritu',
+ 				'sa' => 'sánskritu',
  				'sd' => 'sindi',
  				'ses' => 'koiraboro seni',
  				'si' => 'singales',
  				'sk' => 'slovaku',
- 				'sl' => 'sloveniu',
+ 				'sl' => 'slovéniu',
  				'smn' => 'inari sami',
  				'so' => 'somali',
  				'sq' => 'albanes',
@@ -209,7 +211,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'suaíli kongoles',
  				'ta' => 'tamil',
  				'te' => 'telugu',
- 				'tg' => 'tajik',
+ 				'tg' => 'tadjiki',
  				'th' => 'tailandes',
  				'ti' => 'tigrinia',
  				'tk' => 'turkmenu',
@@ -219,7 +221,7 @@ has 'display_name_language' => (
  				'tzm' => 'tamazait di Atlas Sentral',
  				'ug' => 'uigur',
  				'uk' => 'ukranianu',
- 				'und' => 'lingua diskonxedu',
+ 				'und' => 'língua diskonxedu',
  				'ur' => 'urdu',
  				'uz' => 'uzbeki',
  				'vi' => 'vietnamita',
@@ -230,7 +232,7 @@ has 'display_name_language' => (
  				'zh_Hans' => 'xines simplifikadu',
  				'zh_Hant' => 'xines tradisional',
  				'zu' => 'zulu',
- 				'zxx' => 'sem konteudo linguistiku',
+ 				'zxx' => 'sen kontiudu linguístiku',
 
 			);
 			if (@_) {
@@ -260,7 +262,7 @@ has 'display_name_script' => (
  			'Grek' => 'gregu',
  			'Gujr' => 'gujarati',
  			'Guru' => 'gurmuki',
- 			'Hang' => 'angul',
+ 			'Hang' => 'hangul',
  			'Hani' => 'han',
  			'Hans' => 'simplifikadu',
  			'Hans@alt=stand-alone' => 'han simplifikadu',
@@ -285,7 +287,7 @@ has 'display_name_script' => (
  			'Thaa' => 'taana',
  			'Thai' => 'tailandes',
  			'Tibt' => 'tibetanu',
- 			'Zsym' => 'simbulus',
+ 			'Zsym' => 'símbulus',
  			'Zxxx' => 'nãu skritu',
  			'Zyyy' => 'komun',
  			'Zzzz' => 'skrita diskonxedu',
@@ -337,27 +339,27 @@ has 'display_name_region' => (
  			'419' => 'Merka Latinu',
  			'AC' => 'Ilha di Asensãu',
  			'AD' => 'Andora',
- 			'AE' => 'Emiradus Arabi Unidu',
+ 			'AE' => 'Emiradus Árabi Unidu',
  			'AF' => 'Afeganistãu',
  			'AG' => 'Antigua i Barbuda',
  			'AI' => 'Angila',
- 			'AL' => 'Albania',
- 			'AM' => 'Armenia',
+ 			'AL' => 'Albánia',
+ 			'AM' => 'Arménia',
  			'AO' => 'Angola',
- 			'AQ' => 'Antartika',
+ 			'AQ' => 'Antártika',
  			'AR' => 'Arjentina',
  			'AS' => 'Samoa Merkanu',
- 			'AT' => 'Austria',
- 			'AU' => 'Australia',
+ 			'AT' => 'Áustria',
+ 			'AU' => 'Austrália',
  			'AW' => 'Aruba',
  			'AX' => 'Ilhas Åland',
  			'AZ' => 'Azerbaijãu',
- 			'BA' => 'Bosnia-Erzegovina',
+ 			'BA' => 'Bósnia i Erzegovina',
  			'BB' => 'Barbadus',
  			'BD' => 'Bangladexi',
  			'BE' => 'Béljika',
  			'BF' => 'Burkina Fasu',
- 			'BG' => 'Bulgaria',
+ 			'BG' => 'Bulgária',
  			'BH' => 'Barain',
  			'BI' => 'Burundi',
  			'BJ' => 'Benin',
@@ -374,12 +376,12 @@ has 'display_name_region' => (
  			'BY' => 'Belarus',
  			'BZ' => 'Belizi',
  			'CA' => 'Kanadá',
- 			'CC' => 'Ilhas Kokus',
+ 			'CC' => 'Ilhas Kokus (Keeling)',
  			'CD' => 'Kongu - Kinxasa',
- 			'CD@alt=variant' => 'Republika Dimokratika di Kongu',
+ 			'CD@alt=variant' => 'Repúblika Dimokrátika di Kongu',
  			'CF' => 'Republika Sentru-Afrikanu',
  			'CG' => 'Kongu - Brazavili',
- 			'CG@alt=variant' => 'Republika di Kongu',
+ 			'CG@alt=variant' => 'Repúblika di Kongu',
  			'CH' => 'Suisa',
  			'CI' => 'Kosta di Marfin',
  			'CI@alt=variant' => 'Kosta di Marfin (Côte d’Ivoire)',
@@ -395,74 +397,75 @@ has 'display_name_region' => (
  			'CW' => 'Kurasau',
  			'CX' => 'Ilha di Natal',
  			'CY' => 'Xipri',
- 			'CZ' => 'Republika Txeka',
+ 			'CZ' => 'Txékia',
+ 			'CZ@alt=variant' => 'Repúblika Txeka',
  			'DE' => 'Alimanha',
  			'DG' => 'Diegu Garsia',
  			'DJ' => 'Djibuti',
  			'DK' => 'Dinamarka',
  			'DM' => 'Dominika',
  			'DO' => 'Repúblika Dominikana',
- 			'DZ' => 'Arjelia',
- 			'EA' => 'Seuta i Melila',
+ 			'DZ' => 'Arjélia',
+ 			'EA' => 'Seuta i Melilha',
  			'EC' => 'Ekuador',
- 			'EE' => 'Stonia',
+ 			'EE' => 'Stónia',
  			'EG' => 'Ejitu',
  			'EH' => 'Sara Osidental',
  			'ER' => 'Iritreia',
  			'ES' => 'Spanha',
- 			'ET' => 'Itiopia',
+ 			'ET' => 'Etiópia',
  			'EU' => 'Uniãu Europeia',
- 			'FI' => 'Finlandia',
+ 			'FI' => 'Finlándia',
  			'FJ' => 'Fidji',
  			'FK' => 'Ilhas Malvinas',
  			'FK@alt=variant' => 'Ilhas Falkland (Ilhas Malvinas)',
- 			'FM' => 'Mikronezia',
+ 			'FM' => 'Mikronézia',
  			'FO' => 'Ilhas Faroe',
  			'FR' => 'Fransa',
  			'GA' => 'Gabãu',
  			'GB' => 'Reinu Unidu',
  			'GB@alt=short' => 'R.U.',
  			'GD' => 'Granada',
- 			'GE' => 'Jiorjia',
+ 			'GE' => 'Jiórjia',
  			'GF' => 'Giana Franseza',
  			'GG' => 'Gernzi',
  			'GH' => 'Gana',
  			'GI' => 'Jibraltar',
  			'GL' => 'Gronelándia',
- 			'GM' => 'Gambia',
+ 			'GM' => 'Gámbia',
  			'GN' => 'Gine',
  			'GP' => 'Guadalupi',
  			'GQ' => 'Gine Ekuatorial',
- 			'GR' => 'Gresia',
- 			'GS' => 'Jeórjia di Sul i Ilhas di Sanduixi di Sul',
+ 			'GR' => 'Grésia',
+ 			'GS' => 'Ilhas Jeórjia di Sul i Sanduixi di Sul',
  			'GT' => 'Guatimala',
  			'GU' => 'Guam',
  			'GW' => 'Gine-Bisau',
  			'GY' => 'Giana',
- 			'HK' => 'Rejiãu Administrativu Special di Hong Kong',
+ 			'HK' => 'Rejiãu Administrativu Spesial di Hong Kong',
  			'HK@alt=short' => 'Hong Kong',
- 			'HM' => 'Ilha Heard i Ilhas McDonald',
+ 			'HM' => 'Ilhas Heard i McDonald',
  			'HN' => 'Onduras',
- 			'HR' => 'Kroasia',
+ 			'HR' => 'Kroásia',
  			'HT' => 'Aití',
  			'HU' => 'Ungria',
  			'IC' => 'Kanárias',
- 			'ID' => 'Indonezia',
+ 			'ID' => 'Indonézia',
  			'IE' => 'Irlanda',
  			'IL' => 'Israel',
  			'IM' => 'Ilha di Man',
- 			'IN' => 'India',
- 			'IO' => 'Ilhas Britanika di Indiku',
+ 			'IN' => 'Índia',
+ 			'IO' => 'Ilhas Británikas di Índiku',
  			'IQ' => 'Iraki',
- 			'IR' => 'Iron',
- 			'IS' => 'Islandia',
- 			'IT' => 'Italia',
+ 			'IR' => 'Irãu',
+ 			'IS' => 'Islándia',
+ 			'IT' => 'Itália',
  			'JE' => 'Jersi',
  			'JM' => 'Jamaika',
- 			'JO' => 'Jordania',
+ 			'JO' => 'Jordánia',
  			'JP' => 'Japãu',
- 			'KE' => 'Kenia',
- 			'KG' => 'Kirgiston',
+ 			'KE' => 'Kénia',
+ 			'KG' => 'Kirgistãu',
  			'KH' => 'Kambodja',
  			'KI' => 'Kiribati',
  			'KM' => 'Kamoris',
@@ -473,61 +476,61 @@ has 'display_name_region' => (
  			'KY' => 'Ilhas Kaimãu',
  			'KZ' => 'Kazakistãu',
  			'LA' => 'Laus',
- 			'LB' => 'Libanu',
+ 			'LB' => 'Líbanu',
  			'LC' => 'Santa Lúsia',
  			'LI' => 'Lixenstain',
  			'LK' => 'Sri Lanka',
- 			'LR' => 'Liberia',
+ 			'LR' => 'Libéria',
  			'LS' => 'Lezotu',
- 			'LT' => 'Lituania',
+ 			'LT' => 'Lituánia',
  			'LU' => 'Luxemburgu',
- 			'LV' => 'Letonia',
- 			'LY' => 'Libia',
+ 			'LV' => 'Letónia',
+ 			'LY' => 'Líbia',
  			'MA' => 'Marokus',
- 			'MC' => 'Monaku',
- 			'MD' => 'Moldavia',
+ 			'MC' => 'Mónaku',
+ 			'MD' => 'Moldávia',
  			'ME' => 'Montenegru',
  			'MF' => 'Sãu Martinhu di Fransa',
  			'MG' => 'Madagaskar',
  			'MH' => 'Ilhas Marxal',
- 			'MK' => 'Masidonia',
- 			'MK@alt=variant' => 'Masidonia (FYROM)',
+ 			'MK' => 'Masidónia',
+ 			'MK@alt=variant' => 'Masidónia (FYROM)',
  			'ML' => 'Mali',
- 			'MM' => 'Mianmar',
- 			'MN' => 'Mongolia',
- 			'MO' => 'Rejiãu Administrativu Special di Makau',
+ 			'MM' => 'Mianmar (Birmánia)',
+ 			'MN' => 'Mongólia',
+ 			'MO' => 'Rejiãu Administrativu Spesial di Makau',
  			'MO@alt=short' => 'Makau',
  			'MP' => 'Ilhas Marianas di Norti',
  			'MQ' => 'Martinika',
- 			'MR' => 'Mauritania',
+ 			'MR' => 'Mauritánia',
  			'MS' => 'Monserat',
  			'MT' => 'Malta',
- 			'MU' => 'Ilhas Maurisia',
+ 			'MU' => 'Maurísia',
  			'MV' => 'Maldivas',
  			'MW' => 'Malaui',
  			'MX' => 'Méxiku',
- 			'MY' => 'Malazia',
+ 			'MY' => 'Malázia',
  			'MZ' => 'Musambiki',
- 			'NA' => 'Namibia',
- 			'NC' => 'Nova Kalidonia',
+ 			'NA' => 'Namíbia',
+ 			'NC' => 'Nova Kalidónia',
  			'NE' => 'Nijer',
  			'NF' => 'Ilhas Norfolk',
- 			'NG' => 'Nijeria',
+ 			'NG' => 'Nijéria',
  			'NI' => 'Nikarágua',
  			'NL' => 'Olanda',
  			'NO' => 'Noruega',
  			'NP' => 'Nepal',
  			'NR' => 'Nauru',
  			'NU' => 'Niue',
- 			'NZ' => 'Nova Zilandia',
+ 			'NZ' => 'Nova Zilándia',
  			'OM' => 'Oman',
  			'PA' => 'Panamá',
  			'PE' => 'Peru',
- 			'PF' => 'Polinezia Franseza',
+ 			'PF' => 'Polinézia Franseza',
  			'PG' => 'Papua-Nova Gine',
  			'PH' => 'Filipinas',
  			'PK' => 'Pakistãu',
- 			'PL' => 'Pulonia',
+ 			'PL' => 'Pulónia',
  			'PM' => 'San Piere i Mikelon',
  			'PN' => 'Pirkairn',
  			'PR' => 'Portu Riku',
@@ -537,50 +540,50 @@ has 'display_name_region' => (
  			'PY' => 'Paraguai',
  			'QA' => 'Katar',
  			'QO' => 'Ilhas di Oseania',
- 			'RE' => 'Runion',
- 			'RO' => 'Romenia',
- 			'RS' => 'Servia',
+ 			'RE' => 'Runiãu',
+ 			'RO' => 'Ruménia',
+ 			'RS' => 'Sérvia',
  			'RU' => 'Rúsia',
  			'RW' => 'Ruanda',
- 			'SA' => 'Arabia Saudita',
- 			'SB' => 'Ilhas Salumon',
+ 			'SA' => 'Arábia Saudita',
+ 			'SB' => 'Ilhas Salumãu',
  			'SC' => 'Seixelis',
  			'SD' => 'Sudãu',
- 			'SE' => 'Suesia',
+ 			'SE' => 'Suésia',
  			'SG' => 'Singapura',
  			'SH' => 'Santa Ilena',
- 			'SI' => 'Slovenia',
+ 			'SI' => 'Slovénia',
  			'SJ' => 'Svalbard i Jan Maien',
- 			'SK' => 'Slovakia',
+ 			'SK' => 'Slovákia',
  			'SL' => 'Sera Lioa',
  			'SM' => 'San Marinu',
  			'SN' => 'Senegal',
- 			'SO' => 'Sumalia',
+ 			'SO' => 'Sumália',
  			'SR' => 'Surinami',
  			'SS' => 'Sudãu di Sul',
- 			'ST' => 'Sãu Tume i Prinsipi',
+ 			'ST' => 'Sãu Tume i Prínsipi',
  			'SV' => 'El Salvador',
  			'SX' => 'Sãu Martinhu di Olanda',
- 			'SY' => 'Siria',
+ 			'SY' => 'Síria',
  			'SZ' => 'Suazilándia',
  			'TA' => 'Tristan da Kunha',
  			'TC' => 'Ilhas Turkas i Kaikus',
  			'TD' => 'Txadi',
  			'TF' => 'Terras Franses di Sul',
  			'TG' => 'Togu',
- 			'TH' => 'Tailandia',
+ 			'TH' => 'Tailándia',
  			'TJ' => 'Tadjikistãu',
  			'TK' => 'Tokelau',
  			'TL' => 'Timor Lesti',
  			'TM' => 'Turkumenistãu',
- 			'TN' => 'Tunizia',
+ 			'TN' => 'Tunízia',
  			'TO' => 'Tonga',
  			'TR' => 'Turkia',
  			'TT' => 'Trinidad i Tobagu',
  			'TV' => 'Tuvalu',
  			'TW' => 'Taiuan',
- 			'TZ' => 'Tanzania',
- 			'UA' => 'Ukrania',
+ 			'TZ' => 'Tanzánia',
+ 			'UA' => 'Ukránia',
  			'UG' => 'Uganda',
  			'UM' => 'Ilhas Minoris Distantis de Stadus Unidus',
  			'US' => 'Stadus Unidos di Merka',
@@ -590,18 +593,18 @@ has 'display_name_region' => (
  			'VA' => 'Vatikanu',
  			'VC' => 'Sãu Bisenti i Granadinas',
  			'VE' => 'Vinizuela',
- 			'VG' => 'Ilhas Virjens Britanikas',
+ 			'VG' => 'Ilhas Virjens Británikas',
  			'VI' => 'Ilhas Virjens Merkanas',
  			'VN' => 'Vietnam',
  			'VU' => 'Vanuatu',
  			'WF' => 'Ualis i Futuna',
  			'WS' => 'Samoa',
  			'XK' => 'Kozovu',
- 			'YE' => 'Iemen',
+ 			'YE' => 'Iémen',
  			'YT' => 'Maiote',
- 			'ZA' => 'Afrika di Sul',
- 			'ZM' => 'Zambia',
- 			'ZW' => 'Zimbabui',
+ 			'ZA' => 'Áfrika di Sul',
+ 			'ZM' => 'Zámbia',
+ 			'ZW' => 'Zimbábui',
  			'ZZ' => 'Rejiãu Diskonxedu',
 
 		}
@@ -643,7 +646,7 @@ has 'display_name_measurement_system' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'metric' => q{Metriku},
+			'metric' => q{Métriku},
  			'UK' => q{Ingles},
  			'US' => q{Merkanu},
 
@@ -674,9 +677,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ä ã ā æ c ç é è ĕ ê ë ẽ ē í ì ĭ î ï ĩ ī {n̈} ó ò ŏ ô ö õ ø ō œ q {rr} ú ù ŭ û ü ũ ū w ÿ])},
+			auxiliary => qr{[á à ă â å ä ã ā æ c ç é è ĕ ê ë ẽ ē í ì ĭ î ï ĩ ī {n̈} ó ò ŏ ô ö õ ø ō œ q {rr} ú ù ŭ û ü ũ ū w ÿ]},
 			index => ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'X', 'Z'],
-			main => qr{(?^u:[a b d {dj} e f g h i j k l {lh} m n ñ {nh} o p r s t {tx} u v x y z])},
+			main => qr{[a b d {dj} e f g h i j k l {lh} m n ñ {nh} o p r s t {tx} u v x y z]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -762,6 +766,14 @@ has 'units' => (
 						'name' => q(ákri-pé),
 						'other' => q({0} ákri-pé),
 					},
+					'arc-minute' => {
+						'name' => q(minutu di arku),
+						'other' => q({0} minutu di arku),
+					},
+					'arc-second' => {
+						'name' => q(sigundu di arku),
+						'other' => q({0} sigundu di arku),
+					},
 					'astronomical-unit' => {
 						'name' => q(unidadi astronómiku),
 						'other' => q({0} unidadi astronómiku),
@@ -781,6 +793,11 @@ has 'units' => (
 					'centimeter' => {
 						'name' => q(sentímetru),
 						'other' => q({0} sentímetru),
+						'per' => q({0} pur sentímetru),
+					},
+					'century' => {
+						'name' => q(sékulu),
+						'other' => q({0} sékulu),
 					},
 					'cubic-centimeter' => {
 						'name' => q(sentímetru kúbiku),
@@ -817,6 +834,7 @@ has 'units' => (
 					'day' => {
 						'name' => q(dia),
 						'other' => q({0} dia),
+						'per' => q({0} pur dia),
 					},
 					'deciliter' => {
 						'name' => q(desilitru),
@@ -835,8 +853,9 @@ has 'units' => (
 						'other' => q({0} ónsa fluídu),
 					},
 					'foot' => {
-						'name' => q(pé),
-						'other' => q({0} pé),
+						'name' => q(pe),
+						'other' => q({0} pe),
+						'per' => q({0} pur pe),
 					},
 					'g-force' => {
 						'name' => q(forsa G),
@@ -870,6 +889,7 @@ has 'units' => (
 					'inch' => {
 						'name' => q(pulegada),
 						'other' => q({0} pulegada),
+						'per' => q({0} pur pulegada),
 					},
 					'karat' => {
 						'name' => q(kilati),
@@ -886,6 +906,7 @@ has 'units' => (
 					'kilometer' => {
 						'name' => q(kilómetru),
 						'other' => q({0} kilómetru),
+						'per' => q({0} pur kilómetru),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(kilómetru pur ora),
@@ -898,6 +919,10 @@ has 'units' => (
 					'liter' => {
 						'name' => q(litru),
 						'other' => q({0} litru),
+					},
+					'liter-per-100kilometers' => {
+						'name' => q(litru pur 100 kilómetru),
+						'other' => q({0} litru pur 100 kilómetru),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(litru pur kilómetru),
@@ -920,8 +945,9 @@ has 'units' => (
 						'other' => q({0} megalitru),
 					},
 					'meter' => {
-						'name' => q(métru),
-						'other' => q({0} métru),
+						'name' => q(metru),
+						'other' => q({0} metru),
+						'per' => q({0} pur metru),
 					},
 					'meter-per-second' => {
 						'name' => q(métru pur sigundu),
@@ -947,9 +973,21 @@ has 'units' => (
 						'name' => q(milha pur galãu),
 						'other' => q({0} milha pur galãu),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(milha pur galãu imperial),
+						'other' => q({0} milha pur galãu imperial),
+					},
 					'mile-per-hour' => {
 						'name' => q(milha pur ora),
 						'other' => q({0} milha pur ora),
+					},
+					'mile-scandinavian' => {
+						'name' => q(milha skandinavu),
+						'other' => q({0} milha skandinavu),
+					},
+					'milligram-per-deciliter' => {
+						'name' => q(miligrama pur desilitru),
+						'other' => q({0} miligrama pur desilitru),
 					},
 					'milliliter' => {
 						'name' => q(mililitru),
@@ -959,6 +997,10 @@ has 'units' => (
 						'name' => q(milímetru),
 						'other' => q({0} milímetru),
 					},
+					'millimole-per-liter' => {
+						'name' => q(milimol pur litru),
+						'other' => q({0} milimol pur litru),
+					},
 					'millisecond' => {
 						'name' => q(milisigundu),
 						'other' => q({0} milisigundu),
@@ -966,10 +1008,12 @@ has 'units' => (
 					'minute' => {
 						'name' => q(minutu),
 						'other' => q({0} minutu),
+						'per' => q({0} pur minutu),
 					},
 					'month' => {
 						'name' => q(mes),
 						'other' => q({0} mes),
+						'per' => q({0} pur mes),
 					},
 					'nanometer' => {
 						'name' => q(nanómetru),
@@ -987,6 +1031,10 @@ has 'units' => (
 						'name' => q(parsek),
 						'other' => q({0} parsek),
 					},
+					'part-per-million' => {
+						'name' => q(parti pur milhãu),
+						'other' => q({0} parti pur milhãu),
+					},
 					'picometer' => {
 						'name' => q(pikómetru),
 						'other' => q({0} pikómetru),
@@ -1003,6 +1051,10 @@ has 'units' => (
 						'name' => q(radianu),
 						'other' => q({0} radianu),
 					},
+					'revolution' => {
+						'name' => q(volta),
+						'other' => q({0} volta),
+					},
 					'second' => {
 						'name' => q(sigundu),
 						'other' => q({0} sigundu),
@@ -1011,26 +1063,31 @@ has 'units' => (
 					'square-centimeter' => {
 						'name' => q(sentímetru kuadradu),
 						'other' => q({0} sentímetru kuadradu),
+						'per' => q({0} pur sentímetru kuadradu),
 					},
 					'square-foot' => {
-						'name' => q(pé kuadradu),
-						'other' => q({0} pé kuadradu),
+						'name' => q(pe kuadradu),
+						'other' => q({0} pe kuadradu),
 					},
 					'square-inch' => {
 						'name' => q(pulegada kuadradu),
 						'other' => q({0} pulegada kuadradu),
+						'per' => q({0} pur pulegada kuadradu),
 					},
 					'square-kilometer' => {
 						'name' => q(kilómetru kuadradu),
 						'other' => q({0} kilómetru kuadradu),
+						'per' => q({0} pur kilómetru kuadradu),
 					},
 					'square-meter' => {
-						'name' => q(métru kuadradu),
-						'other' => q({0} métru kuadradu),
+						'name' => q(metru kuadradu),
+						'other' => q({0} metru kuadradu),
+						'per' => q({0} pur metru kuadradu),
 					},
 					'square-mile' => {
 						'name' => q(milha kuadradu),
 						'other' => q({0} milha kuadradu),
+						'per' => q({0} pur milha kuadradu),
 					},
 					'square-yard' => {
 						'name' => q(jarda kuadradu),
@@ -1058,6 +1115,7 @@ has 'units' => (
 					'week' => {
 						'name' => q(simana),
 						'other' => q({0} simana),
+						'per' => q({0} pur simana),
 					},
 					'yard' => {
 						'name' => q(jarda),
@@ -1066,6 +1124,7 @@ has 'units' => (
 					'year' => {
 						'name' => q(anu),
 						'other' => q({0} anu),
+						'per' => q({0} pur anu),
 					},
 				},
 				'narrow' => {
@@ -1099,6 +1158,10 @@ has 'units' => (
 					'liter' => {
 						'name' => q(l),
 						'other' => q({0} l),
+					},
+					'liter-per-100kilometers' => {
+						'name' => q(l/100km),
+						'other' => q({0} l/100km),
 					},
 					'meter' => {
 						'name' => q(m),
@@ -1147,12 +1210,12 @@ has 'units' => (
 						'other' => q({0} A),
 					},
 					'arc-minute' => {
-						'name' => q(arcmin),
-						'other' => q({0}′),
+						'name' => q(arkmin),
+						'other' => q({0} arkmin),
 					},
 					'arc-second' => {
-						'name' => q(arcsec),
-						'other' => q({0}″),
+						'name' => q(arksig),
+						'other' => q({0} arksig),
 					},
 					'astronomical-unit' => {
 						'name' => q(ua),
@@ -1180,6 +1243,11 @@ has 'units' => (
 					'centimeter' => {
 						'name' => q(cm),
 						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					'century' => {
+						'name' => q(sék.),
+						'other' => q({0} sék.),
 					},
 					'cubic-centimeter' => {
 						'name' => q(cm³),
@@ -1216,6 +1284,7 @@ has 'units' => (
 					'day' => {
 						'name' => q(dia),
 						'other' => q({0} dia),
+						'per' => q({0}/dia),
 					},
 					'deciliter' => {
 						'name' => q(dl),
@@ -1238,8 +1307,9 @@ has 'units' => (
 						'other' => q({0} Cal),
 					},
 					'foot' => {
-						'name' => q(pé),
-						'other' => q({0} pé),
+						'name' => q(pe),
+						'other' => q({0} pe),
+						'per' => q({0}/pe),
 					},
 					'g-force' => {
 						'name' => q(G),
@@ -1292,6 +1362,7 @@ has 'units' => (
 					'inch' => {
 						'name' => q(in),
 						'other' => q({0} in),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
 						'name' => q(inHg),
@@ -1328,6 +1399,7 @@ has 'units' => (
 					'kilometer' => {
 						'name' => q(km),
 						'other' => q({0} km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(km/h),
@@ -1348,6 +1420,10 @@ has 'units' => (
 					'liter' => {
 						'name' => q(l),
 						'other' => q({0} l),
+					},
+					'liter-per-100kilometers' => {
+						'name' => q(litru/100km),
+						'other' => q({0} l/100 km),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(l/km),
@@ -1380,6 +1456,7 @@ has 'units' => (
 					'meter' => {
 						'name' => q(m),
 						'other' => q({0} m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
 						'name' => q(m/s),
@@ -1413,9 +1490,17 @@ has 'units' => (
 						'name' => q(mpg),
 						'other' => q({0} mpg),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(milha/gal imp.),
+						'other' => q({0} mpg imp.),
+					},
 					'mile-per-hour' => {
 						'name' => q(mi/h),
 						'other' => q({0} mi/h),
+					},
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0} smi),
 					},
 					'milliampere' => {
 						'name' => q(mA),
@@ -1429,6 +1514,10 @@ has 'units' => (
 						'name' => q(mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mg/dl),
+						'other' => q({0} mg/dl),
+					},
 					'milliliter' => {
 						'name' => q(ml),
 						'other' => q({0} ml),
@@ -1441,6 +1530,10 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'other' => q({0} mm Hg),
 					},
+					'millimole-per-liter' => {
+						'name' => q(milimol/litru),
+						'other' => q({0} mmol/l),
+					},
 					'millisecond' => {
 						'name' => q(ms),
 						'other' => q({0} ms),
@@ -1452,10 +1545,12 @@ has 'units' => (
 					'minute' => {
 						'name' => q(min.),
 						'other' => q({0} min.),
+						'per' => q({0}/min.),
 					},
 					'month' => {
 						'name' => q(mes),
 						'other' => q({0} mes),
+						'per' => q({0}/mes),
 					},
 					'nanometer' => {
 						'name' => q(nm),
@@ -1485,6 +1580,10 @@ has 'units' => (
 						'name' => q(pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'name' => q(parti/milhãu),
+						'other' => q({0} ppm),
+					},
 					'picometer' => {
 						'name' => q(pm),
 						'other' => q({0} pm),
@@ -1509,6 +1608,10 @@ has 'units' => (
 						'name' => q(rad),
 						'other' => q({0} rad),
 					},
+					'revolution' => {
+						'name' => q(vol),
+						'other' => q({0} vol),
+					},
 					'second' => {
 						'name' => q(sig.),
 						'other' => q({0} sig.),
@@ -1517,6 +1620,7 @@ has 'units' => (
 					'square-centimeter' => {
 						'name' => q(cm²),
 						'other' => q({0} cm²),
+						'per' => q({0}/cm²),
 					},
 					'square-foot' => {
 						'name' => q(ft²),
@@ -1525,18 +1629,22 @@ has 'units' => (
 					'square-inch' => {
 						'name' => q(in²),
 						'other' => q({0} in²),
+						'per' => q({0}/in²),
 					},
 					'square-kilometer' => {
 						'name' => q(km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(m²),
 						'other' => q({0} m²),
+						'per' => q({0}/m²),
 					},
 					'square-mile' => {
 						'name' => q(mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yd²),
@@ -1573,6 +1681,7 @@ has 'units' => (
 					'week' => {
 						'name' => q(sim.),
 						'other' => q({0} sim.),
+						'per' => q({0}/sim.),
 					},
 					'yard' => {
 						'name' => q(yd),
@@ -1581,6 +1690,7 @@ has 'units' => (
 					'year' => {
 						'name' => q(anu),
 						'other' => q({0} anu),
+						'per' => q({0}/anu),
 					},
 				},
 			} }
@@ -1699,7 +1809,7 @@ has 'number_formats' => (
 					'other' => '000 Bi',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -1782,14 +1892,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -2360,7 +2470,7 @@ has 'currencies' => (
 		'STD' => {
 			symbol => 'STD',
 			display_name => {
-				'currency' => q(Dobra di Sãu Tume i Prinsipi),
+				'currency' => q(Dobra di Sãu Tume i Prínsipi),
 				'other' => q(Dobra di Sãu Tume i Prinsipi),
 			},
 		},
@@ -2450,8 +2560,8 @@ has 'currencies' => (
 		'XAF' => {
 			symbol => 'FCFA',
 			display_name => {
-				'currency' => q(Franku CFA BEAC),
-				'other' => q(Franku CFA BEAC),
+				'currency' => q(Franku CFA \(BEAC\)),
+				'other' => q(Franku CFA \(BEAC\)),
 			},
 		},
 		'XCD' => {
@@ -2460,8 +2570,8 @@ has 'currencies' => (
 		'XOF' => {
 			symbol => 'CFA',
 			display_name => {
-				'currency' => q(Franku CFA BCEAO),
-				'other' => q(Franku CFA BCEAO),
+				'currency' => q(Franku CFA \(BCEAO\)),
+				'other' => q(Franku CFA \(BCEAO\)),
 			},
 		},
 		'XPF' => {
@@ -2687,13 +2797,13 @@ has 'calendar_days' => (
 						sun => 'dum'
 					},
 					narrow => {
-						mon => 's',
-						tue => 't',
-						wed => 'k',
-						thu => 'k',
-						fri => 's',
-						sat => 's',
-						sun => 'd'
+						mon => 'S',
+						tue => 'T',
+						wed => 'K',
+						thu => 'K',
+						fri => 'S',
+						sat => 'S',
+						sun => 'D'
 					},
 					short => {
 						mon => 'si',
@@ -2710,7 +2820,7 @@ has 'calendar_days' => (
 						wed => 'kuarta-fera',
 						thu => 'kinta-fera',
 						fri => 'sesta-fera',
-						sat => 'sabadu',
+						sat => 'sábadu',
 						sun => 'dumingu'
 					},
 				},
@@ -2769,15 +2879,15 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{am},
+				'wide' => {
 					'pm' => q{pm},
+					'am' => q{am},
 				},
 				'narrow' => {
-					'pm' => q{p},
 					'am' => q{a},
+					'pm' => q{p},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{am},
 					'pm' => q{pm},
 				},
@@ -2867,48 +2977,8 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E, HH:mm},
-			EHms => q{E, HH:mm:ss},
-			Ed => q{E, d},
-			Ehm => q{E, h:mm a},
-			Ehms => q{E, h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM 'di' y G},
-			GyMMMEd => q{E, d 'di' MMM 'di' y G},
-			GyMMMd => q{d 'di' MMM 'di' y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, dd/MM},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMEd => q{E, d 'di' MMMM},
-			MMMMd => q{d 'di' MMMM},
-			MMMd => q{d MMM},
-			MMdd => q{dd/MM},
-			Md => q{dd/MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			mmss => q{mm:ss},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{MM/y},
-			yMEd => q{E, dd/MM/y},
-			yMM => q{MM/y},
-			yMMM => q{MMM 'di' y},
-			yMMMEd => q{E, d MMM y},
-			yMMMM => q{MMMM 'di' y},
-			yMMMd => q{d MMM y},
-			yMd => q{dd/MM/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ 'di' y},
-		},
 		'generic' => {
+			E => q{ccc},
 			Ed => q{E, d},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
@@ -2948,10 +3018,56 @@ has 'datetime_formats_available_formats' => (
 			yyyyMEd => q{E, dd/MM/y GGGGG},
 			yyyyMMM => q{MMM y G},
 			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
 			yyyyMMMd => q{d MMM y G},
 			yyyyMd => q{dd/MM/y GGGGG},
 			yyyyQQQ => q{QQQ y G},
 			yyyyQQQQ => q{QQQQ 'di' y G},
+		},
+		'gregorian' => {
+			E => q{ccc},
+			EHm => q{E, HH:mm},
+			EHms => q{E, HH:mm:ss},
+			Ed => q{E, d},
+			Ehm => q{E, h:mm a},
+			Ehms => q{E, h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss (v)},
+			Hmv => q{HH:mm (v)},
+			M => q{L},
+			MEd => q{E, dd/MM},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMEd => q{E, d 'di' MMMM},
+			MMMMd => q{d 'di' MMMM},
+			MMMd => q{d MMM},
+			MMdd => q{dd/MM},
+			Md => q{dd/MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a (v)},
+			hmv => q{h:mm a (v)},
+			mmss => q{mm:ss},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{MM/y},
+			yMEd => q{E, dd/MM/y},
+			yMM => q{MM/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, d MMM y},
+			yMMMM => q{MMMM 'di' y},
+			yMMMd => q{d MMM y},
+			yMd => q{dd/MM/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ 'di' y},
 		},
 	} },
 );
@@ -2972,101 +3088,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH – HH},
-			},
-			Hm => {
-				H => q{HH:mm – HH:mm},
-				m => q{HH:mm – HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm – HH:mm v},
-				m => q{HH:mm – HH:mm v},
-			},
-			Hv => {
-				H => q{HH – HH v},
-			},
-			M => {
-				M => q{M – M},
-			},
-			MEd => {
-				M => q{E, dd/MM – E, dd/MM},
-				d => q{E, dd/MM – E, dd/MM},
-			},
-			MMM => {
-				M => q{LLL – LLL},
-			},
-			MMMEd => {
-				M => q{E, dd/MM – E, dd/MM},
-				d => q{E, dd/MM – E, dd/MM},
-			},
-			MMMd => {
-				M => q{dd/MM – dd/MM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h – h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm – h:mm a},
-				m => q{h:mm – h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm – h:mm a v},
-				m => q{h:mm – h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h – h a v},
-			},
-			y => {
-				y => q{y – y},
-			},
-			yM => {
-				M => q{MM/y – MM/y},
-				y => q{MM/y – MM/y},
-			},
-			yMEd => {
-				M => q{E, dd/MM/y – E, dd/MM/y},
-				d => q{E, dd/MM/y – E, dd/MM/y},
-				y => q{E, dd/MM/y – E, dd/MM/y},
-			},
-			yMMM => {
-				M => q{MMM – MMM y},
-				y => q{MMM y – MMM y},
-			},
-			yMMMEd => {
-				M => q{E, d MMM – E, d MMM y},
-				d => q{E, d MMM – E, d MMM y},
-				y => q{E, d MMM y – E, d MMM y},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM 'di' y},
-				y => q{MMMM y – MMMM y},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM y},
-				d => q{d – d MMM y},
-				y => q{d MMM y – d MMM y},
-			},
-			yMd => {
-				M => q{dd/MM/y – dd/MM/y},
-				d => q{dd/MM/y – dd/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -3162,6 +3183,101 @@ has 'datetime_formats_interval' => (
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
+		'gregorian' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, dd/MM – E, dd/MM},
+				d => q{E, dd/MM – E, dd/MM},
+			},
+			MMM => {
+				M => q{LLL – LLL},
+			},
+			MMMEd => {
+				M => q{E, dd/MM – E, dd/MM},
+				d => q{E, dd/MM – E, dd/MM},
+			},
+			MMMd => {
+				M => q{dd/MM – dd/MM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm – h:mm a},
+				m => q{h:mm – h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm – h:mm a v},
+				m => q{h:mm – h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y – y},
+			},
+			yM => {
+				M => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
+			},
+			yMEd => {
+				M => q{E, dd/MM/y – E, dd/MM/y},
+				d => q{E, dd/MM/y – E, dd/MM/y},
+				y => q{E, dd/MM/y – E, dd/MM/y},
+			},
+			yMMM => {
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E, d MMM – E, d MMM y},
+				d => q{E, d MMM – E, d MMM y},
+				y => q{E, d MMM y – E, d MMM y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM 'di' y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y},
+				d => q{d – d MMM y},
+				y => q{d MMM y – d MMM y},
+			},
+			yMd => {
+				M => q{dd/MM/y – dd/MM/y},
+				d => q{dd/MM/y – dd/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
+			},
+		},
 	} },
 );
 
@@ -3179,24 +3295,24 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Ora di Afrika Sentral),
+				'standard' => q#Ora di Afrika Sentral#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Ora di Afrika Oriental),
+				'standard' => q#Ora di Afrika Oriental#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Ora di Sul di Afrika),
+				'standard' => q#Ora di Sul di Afrika#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Ora di Verão di Afrika Osidental),
-				'generic' => q(Ora di Afrika Osidental),
-				'standard' => q(Ora Padrãu di Afrika Osidental),
+				'daylight' => q#Ora di Verão di Afrika Osidental#,
+				'generic' => q#Ora di Afrika Osidental#,
+				'standard' => q#Ora Padrãu di Afrika Osidental#,
 			},
 		},
 		'America/Blanc-Sablon' => {
@@ -3204,65 +3320,65 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Ora Sentral di Verãu),
-				'generic' => q(Ora Sentral),
-				'standard' => q(Ora Sentral Padrãu),
+				'daylight' => q#Ora Sentral di Verãu#,
+				'generic' => q#Ora Sentral#,
+				'standard' => q#Ora Sentral Padrãu#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Ora Oriental di Verãu),
-				'generic' => q(Ora Oriental),
-				'standard' => q(Ora Oriental Padrãu),
+				'daylight' => q#Ora Oriental di Verãu#,
+				'generic' => q#Ora Oriental#,
+				'standard' => q#Ora Oriental Padrãu#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Montanha),
-				'generic' => q(Ora di Montanha),
-				'standard' => q(Ora di Montanha Padrãu),
+				'daylight' => q#Ora di Verãu di Montanha#,
+				'generic' => q#Ora di Montanha#,
+				'standard' => q#Ora di Montanha Padrãu#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Ora di Pasifiku di Verãu),
-				'generic' => q(Ora di Pasifiku),
-				'standard' => q(Ora di Pasifiku Padrãu),
+				'daylight' => q#Ora di Pasifiku di Verãu#,
+				'generic' => q#Ora di Pasifiku#,
+				'standard' => q#Ora di Pasifiku Padrãu#,
 			},
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Atlantiku),
-				'generic' => q(Ora di Atlantiku),
-				'standard' => q(Ora Padrãu di Atlantiku),
+				'daylight' => q#Ora di Verãu di Atlantiku#,
+				'generic' => q#Ora di Atlantiku#,
+				'standard' => q#Ora Padrãu di Atlantiku#,
 			},
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Australia Sentral),
-				'generic' => q(Ora di Australia Sentral),
-				'standard' => q(Ora Padrãu di Australia Sentral),
+				'daylight' => q#Ora di Verãu di Australia Sentral#,
+				'generic' => q#Ora di Australia Sentral#,
+				'standard' => q#Ora Padrãu di Australia Sentral#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Australia Sentru-Osidental),
-				'generic' => q(Ora di Autralia Sentru-Osidental),
-				'standard' => q(Ora Padrãu di Australia Sentru-Osidental),
+				'daylight' => q#Ora di Verãu di Australia Sentru-Osidental#,
+				'generic' => q#Ora di Autralia Sentru-Osidental#,
+				'standard' => q#Ora Padrãu di Australia Sentru-Osidental#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Australia Oriental),
-				'generic' => q(Ora di Australia Oriental),
-				'standard' => q(Ora Padrãu di Australia Oriental),
+				'daylight' => q#Ora di Verãu di Australia Oriental#,
+				'generic' => q#Ora di Australia Oriental#,
+				'standard' => q#Ora Padrãu di Australia Oriental#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Australia Osidental),
-				'generic' => q(Ora di Australia Osidental),
-				'standard' => q(Ora Padrãu di Australia Osidental),
+				'daylight' => q#Ora di Verãu di Australia Osidental#,
+				'generic' => q#Ora di Australia Osidental#,
+				'standard' => q#Ora Padrãu di Australia Osidental#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -3270,23 +3386,23 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Europa Sentral),
-				'generic' => q(Ora di Europa Sentral),
-				'standard' => q(Ora Padrãu di Europa Sentral),
+				'daylight' => q#Ora di Verãu di Europa Sentral#,
+				'generic' => q#Ora di Europa Sentral#,
+				'standard' => q#Ora Padrãu di Europa Sentral#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Europa Oriental),
-				'generic' => q(Ora di Europa Oriental),
-				'standard' => q(Ora Padrãu di Europa Oriental),
+				'daylight' => q#Ora di Verãu di Europa Oriental#,
+				'generic' => q#Ora di Europa Oriental#,
+				'standard' => q#Ora Padrãu di Europa Oriental#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Ora di Verãu di Europa Osidental),
-				'generic' => q(Ora di Europa Osidental),
-				'standard' => q(Ora Padrãu di Europa Osidental),
+				'daylight' => q#Ora di Verãu di Europa Osidental#,
+				'generic' => q#Ora di Europa Osidental#,
+				'standard' => q#Ora Padrãu di Europa Osidental#,
 			},
 		},
 	 } }

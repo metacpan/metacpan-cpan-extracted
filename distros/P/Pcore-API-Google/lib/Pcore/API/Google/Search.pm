@@ -76,8 +76,8 @@ sub _request ( $self, $url, $cb ) {
         timeout   => $HTTP_TIMEOUT,
         useragent => $HTTP_USERAGENT,
         cookies   => $self->{cookies},
-        on_finish => sub ($res) {
-            if ( $res->status == 503 ) {    # captcha
+        sub ($res) {
+            if ( $res->{status} == 503 ) {    # captcha
                 if ( !$self->_anticaptcha ) {
                     $on_finish->($res);
                 }
@@ -107,7 +107,7 @@ sub _request ( $self, $url, $cb ) {
                     }
                 }
             }
-            elsif ( $res->status == 403 ) {    # IP banned
+            elsif ( $res->{status} == 403 ) {    # IP banned
                 P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'IP addr. banned' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
                 $on_finish->($res);
@@ -128,9 +128,9 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
 
     my $base_url = $res->url;
 
-    my ($id) = $res->body->$* =~ m[name="id" value="(\d+)"]sm;
+    my ($id) = $res->{body}->$* =~ m[name="id" value="(\d+)"]sm;
 
-    my ($image_url) = $res->body->$* =~ m[<img src="(/sorry/image.+?)"]sm;
+    my ($image_url) = $res->{body}->$* =~ m[<img src="(/sorry/image.+?)"]sm;
 
     $image_url =~ s/&amp;/&/smg;
 
@@ -149,7 +149,7 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
             # resolve captcha
           RESOLVE_CAPTCHA:
             $self->_anticaptcha->resolve(
-                image => $img_res->body,
+                image => $img_res->{body},
                 sub ($captcha) {
                     if ( !$captcha ) {
                         $self->_resolve_captcha( $url, $res, $cb );
@@ -174,7 +174,7 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
                         on_finish => sub ($res) {
 
                             # captcha recognized incorrectly
-                            if ( $res->status == 503 ) {
+                            if ( $res->{status} == 503 ) {
                                 P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'captcha resolving error' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
                                 # TODO report failure to AntiCaptcha

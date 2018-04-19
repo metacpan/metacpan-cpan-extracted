@@ -3,7 +3,7 @@ package Database::Migrator::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use MooseX::Types::Moose;
 use MooseX::Types::Path::Class;
@@ -32,7 +32,7 @@ Database::Migrator::Types - Type library for use by Database::Migrator
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =for Pod::Coverage .*
 

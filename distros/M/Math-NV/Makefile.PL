@@ -25,6 +25,10 @@ my %options = %{
 {
   'NAME' => 'Math::NV',
   'VERSION_FROM' => 'NV.pm',
+  'PREREQ_PM' => {
+                'Math::MPFR'          => '4.03',
+
+               },
   'LIBS' => [
     '-lm'
   ],

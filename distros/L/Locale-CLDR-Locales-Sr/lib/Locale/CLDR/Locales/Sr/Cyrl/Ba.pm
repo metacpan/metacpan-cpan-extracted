@@ -6,21 +6,181 @@ Locale::CLDR::Locales::Sr::Cyrl::Ba - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Ba;
 # This file auto generated from Data\common\main\sr_Cyrl_BA.xml
-#	on Fri 29 Apr  7:26:14 pm GMT
+#	on Fri 13 Apr  7:29:14 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Sr::Cyrl');
+has 'display_name_language' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub { 
+		 sub {
+			 my %languages = (
+				'arn' => 'мапудунгун',
+ 				'be' => 'бјелоруски',
+ 				'bm' => 'бамананкан',
+ 				'bn' => 'бангла',
+ 				'gsw' => 'швајцарски немачки',
+ 				'ht' => 'хаићански креолски',
+ 				'lo' => 'лаошки',
+ 				'moh' => 'мохок',
+ 				'nqo' => 'н’ко',
+ 				'shi' => 'јужни шилха',
+ 				'si' => 'синхалски',
+ 				'tzm' => 'централноатласки тамашек',
+ 				'xh' => 'исикоса',
+ 				'zgh' => 'стандардни марокански тамашек',
+ 				'zu' => 'исизулу',
+
+			);
+			if (@_) {
+				return $languages{$_[0]};
+			}
+			return \%languages;
+		}
+	},
+);
+
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { 
+		{
+			'BY' => 'Бјелорусија',
+ 			'CG' => 'Конго',
+ 			'CV' => 'Кабо Верде',
+ 			'CZ' => 'Чешка Република',
+ 			'DE' => 'Њемачка',
+ 			'KN' => 'Свети Китс и Невис',
+ 			'MK@alt=variant' => 'БЈР Македонија',
+ 			'MO' => 'САР Макао',
+ 			'PM' => 'Свети Пјер и Микелон',
+ 			'RE' => 'Реунион',
+ 			'UM' => 'Мања удаљена острва САД',
+ 			'VC' => 'Свети Винсент и Гренадини',
+ 			'VG' => 'Британска Дјевичанска Острва',
+ 			'VI' => 'Америчка Дјевичанска Острва',
+
+		}
+	},
+);
+
+has 'calendar_months' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'јан.',
+							'феб.',
+							'март',
+							'апр.',
+							'мај',
+							'јун',
+							'јул',
+							'авг.',
+							'септ.',
+							'окт.',
+							'нов.',
+							'дец.'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'јан.',
+							'феб.',
+							'март',
+							'апр.',
+							'мај',
+							'јун',
+							'јул',
+							'авг.',
+							'септ.',
+							'окт.',
+							'нов.',
+							'дец.'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+	} },
+);
+
+has 'calendar_days' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					abbreviated => {
+						mon => 'пон.',
+						tue => 'ут.',
+						wed => 'ср.',
+						thu => 'чет.',
+						fri => 'пет.',
+						sat => 'суб.',
+						sun => 'нед.'
+					},
+					wide => {
+						mon => 'понедељак',
+						tue => 'уторак',
+						wed => 'сриједа',
+						thu => 'четвртак',
+						fri => 'петак',
+						sat => 'субота',
+						sun => 'недјеља'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						mon => 'пон.',
+						tue => 'ут.',
+						wed => 'ср.',
+						thu => 'чет.',
+						fri => 'пет.',
+						sat => 'суб.',
+						sun => 'нед.'
+					},
+					wide => {
+						mon => 'понедељак',
+						tue => 'уторак',
+						wed => 'сриједа',
+						thu => 'четвртак',
+						fri => 'петак',
+						sat => 'субота',
+						sun => 'недјеља'
+					},
+				},
+			},
+	} },
+);
+
 has 'day_period_data' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -33,51 +193,51 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -90,6 +250,54 @@ around day_period_data => sub {
 	return $self->$orig;
 };
 
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'night1' => q{ноћу},
+					'noon' => q{подне},
+					'morning1' => q{јутро},
+					'afternoon1' => q{по под.},
+					'pm' => q{по подне},
+					'midnight' => q{поноћ},
+					'evening1' => q{вече},
+					'am' => q{прије подне},
+				},
+				'narrow' => {
+					'night1' => q{ноћ},
+					'noon' => q{подне},
+					'afternoon1' => q{по под.},
+					'morning1' => q{јутро},
+					'evening1' => q{вече},
+					'midnight' => q{поноћ},
+				},
+				'wide' => {
+					'am' => q{прије подне},
+					'pm' => q{по подне},
+				},
+			},
+			'stand-alone' => {
+				'wide' => {
+					'am' => q{прије подне},
+					'pm' => q{по подне},
+				},
+				'narrow' => {
+					'am' => q{а},
+					'pm' => q{p},
+				},
+				'abbreviated' => {
+					'am' => q{прије подне},
+					'pm' => q{по подне},
+				},
+			},
+		},
+	} },
+);
+
 has 'eras' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -98,6 +306,9 @@ has 'eras' => (
 		'generic' => {
 		},
 		'gregorian' => {
+			wide => {
+				'0' => 'прије нове ере'
+			},
 		},
 	} },
 );
@@ -122,10 +333,6 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{HH:mm:ss zzzz},
-			'long' => q{HH:mm:ss z},
-			'medium' => q{HH:mm:ss},
-			'short' => q{HH:mm},
 		},
 	} },
 );
@@ -147,6 +354,10 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			MMMMW => q{W. 'сједмица' 'у' MMM},
+			yw => q{w. 'сједмица' 'у' y.},
+		},
 	} },
 );
 
@@ -188,27 +399,12 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'generic' => {
-			MEd => {
-				M => q{E, MM-dd – E, MM-dd},
-				d => q{E, MM-dd – E, MM-dd},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{E, y-MM-dd – E, y-MM-dd},
-				d => q{E, y-MM-dd – E, y-MM-dd},
-				y => q{E, y-MM-dd – E, y-MM-dd},
+			MMMEd => {
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. MMM – E, d. MMM},
 			},
 			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
+				M => q{d.M.y. – d.M.y. GGGGG},
 			},
 		},
 	} },

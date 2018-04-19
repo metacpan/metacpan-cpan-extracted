@@ -1,7 +1,7 @@
-use Test::More;
+use Test::More 0.96;
 use Test::Exception;
 
-use if $^V == 5.010, FileHandle; # Make sure we can run on perl 5.10
+use if $^V < 5.012, IO::File;   # Make sure we can run on perl 5.8/5.10
 use IO::All;
 use Text::Continuation::Parser qw(parse_line);
 use File::Spec::Functions qw(catfile);

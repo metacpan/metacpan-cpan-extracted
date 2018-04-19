@@ -1,6 +1,6 @@
 package Pcore::App::API::Auth::Request;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_blessed_ref];
 
 use overload    #
@@ -37,9 +37,7 @@ sub api_can_call ( $self, $method_id, $cb ) {
 }
 
 sub api_call ( $self, $method_id, @args ) {
-    $self->{auth}->api_call( $method_id, @args );
-
-    return;
+    return $self->{auth}->api_call( $method_id, @args );
 }
 
 sub _respond ( $self, @ ) {
@@ -51,7 +49,7 @@ sub _respond ( $self, @ ) {
     if ( my $cb = delete $self->{_cb} ) {
 
         # return response, if callback is defined
-        $cb->( is_blessed_ref $_[1] ? $_[1] : result splice @_, 1 );
+        $cb->( is_blessed_ref $_[1] ? $_[1] : res splice @_, 1 );
     }
 
     return;

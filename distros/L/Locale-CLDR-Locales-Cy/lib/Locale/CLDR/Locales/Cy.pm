@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Cy - Package for language Welsh
 
 package Locale::CLDR::Locales::Cy;
 # This file auto generated from Data\common\main\cy.xml
-#	on Fri 29 Apr  6:56:27 pm GMT
+#	on Fri 13 Apr  7:05:40 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -526,11 +527,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -615,7 +616,9 @@ has 'display_name_language' => (
  				'bfq' => 'Badaga',
  				'bg' => 'Bwlgareg',
  				'bgn' => 'Balochi Gorllewinol',
+ 				'bho' => 'Bhojpuri',
  				'bi' => 'Bislama',
+ 				'bin' => 'Bini',
  				'bkm' => 'Comeg',
  				'bla' => 'Siksika',
  				'bm' => 'Bambareg',
@@ -627,14 +630,18 @@ has 'display_name_language' => (
  				'bs' => 'Bosnieg',
  				'bss' => 'Acwseg',
  				'bua' => 'Bwriateg',
+ 				'bug' => 'Bwginaeg',
  				'bum' => 'Bwlw',
+ 				'byn' => 'Blin',
  				'ca' => 'Catalaneg',
  				'cad' => 'Cado',
  				'car' => 'Caribeg',
  				'cch' => 'Atsameg',
  				'ce' => 'Tsietsieneg',
+ 				'ceb' => 'Cebuano',
  				'cgg' => 'Tsiga',
  				'ch' => 'Tsiamorro',
+ 				'chk' => 'Chuukaeg',
  				'chm' => 'Marieg',
  				'cho' => 'Siocto',
  				'chr' => 'Tsierocî',
@@ -644,6 +651,7 @@ has 'display_name_language' => (
  				'cop' => 'Copteg',
  				'cr' => 'Cri',
  				'crh' => 'Tyrceg y Crimea',
+ 				'crs' => 'Ffrangeg Seselwa Creole',
  				'cs' => 'Tsieceg',
  				'cu' => 'Hen Slafoneg',
  				'cv' => 'Tshwfasheg',
@@ -655,8 +663,9 @@ has 'display_name_language' => (
  				'de' => 'Almaeneg',
  				'de_AT' => 'Almaeneg Awstria',
  				'de_CH' => 'Almaeneg Safonol y Swistir',
+ 				'dgr' => 'Dogrib',
  				'din' => 'Dinca',
- 				'dje' => 'Zarmaeg',
+ 				'dje' => 'Sarmaeg',
  				'doi' => 'Dogri',
  				'dsb' => 'Sorbeg Isaf',
  				'dua' => 'Diwaleg',
@@ -664,9 +673,12 @@ has 'display_name_language' => (
  				'dv' => 'Difehi',
  				'dyo' => 'Jola-Fonyi',
  				'dz' => 'Dzongkha',
+ 				'dzg' => 'Dazaga',
  				'ebu' => 'Embw',
  				'ee' => 'Ewe',
+ 				'efi' => 'Efik',
  				'egy' => 'Hen Eiffteg',
+ 				'eka' => 'Ekajuk',
  				'el' => 'Groeg',
  				'elx' => 'Elameg',
  				'en' => 'Saesneg',
@@ -694,6 +706,7 @@ has 'display_name_language' => (
  				'fit' => 'Ffinneg Tornedal',
  				'fj' => 'Ffijïeg',
  				'fo' => 'Ffaröeg',
+ 				'fon' => 'Fon',
  				'fr' => 'Ffrangeg',
  				'fr_CA' => 'Ffrangeg Canada',
  				'fr_CH' => 'Ffrangeg y Swistir',
@@ -701,38 +714,44 @@ has 'display_name_language' => (
  				'frm' => 'Ffrangeg Canol',
  				'fro' => 'Hen Ffrangeg',
  				'frp' => 'Arpitaneg',
- 				'frr' => 'Ffriseg y Gogledd',
+ 				'frr' => 'Ffriseg Gogleddol',
  				'frs' => 'Ffriseg y Dwyrain',
  				'fur' => 'Ffriwleg',
  				'fy' => 'Ffriseg y Gorllewin',
  				'ga' => 'Gwyddeleg',
+ 				'gaa' => 'Ga',
  				'gag' => 'Gagauz',
  				'gay' => 'Gaio',
  				'gba' => 'Gbaia',
  				'gbz' => 'Dareg y Zoroastriaid',
  				'gd' => 'Gaeleg yr Alban',
+ 				'gez' => 'Geez',
  				'gil' => 'Gilberteg',
  				'gl' => 'Galisieg',
- 				'gmh' => 'Uchel Almaeneg Canol',
+ 				'gmh' => 'Almaeneg Uchel Canol',
  				'gn' => 'Guaraní',
- 				'goh' => 'Hen Uchel Almaeneg',
+ 				'goh' => 'Hen Almaeneg Uchel',
+ 				'gor' => 'Gorontalo',
  				'got' => 'Gotheg',
  				'grc' => 'Hen Roeg',
  				'gsw' => 'Almaeneg y Swistir',
  				'gu' => 'Gwjarati',
  				'guz' => 'Gusii',
  				'gv' => 'Manaweg',
+ 				'gwi' => 'Gwichʼin',
  				'ha' => 'Hawsa',
  				'hai' => 'Haida',
  				'haw' => 'Hawäieg',
  				'he' => 'Hebraeg',
  				'hi' => 'Hindi',
+ 				'hil' => 'Hiligaynon',
  				'hit' => 'Hetheg',
  				'hmn' => 'Hmongeg',
  				'hr' => 'Croateg',
  				'hsb' => 'Sorbeg Uchaf',
  				'ht' => 'Creol Haiti',
  				'hu' => 'Hwngareg',
+ 				'hup' => 'Hupa',
  				'hy' => 'Armeneg',
  				'hz' => 'Herero',
  				'ia' => 'Interlingua',
@@ -745,10 +764,12 @@ has 'display_name_language' => (
  				'ik' => 'Inwpiaceg',
  				'ilo' => 'Ilocaneg',
  				'inh' => 'Ingwsieg',
+ 				'io' => 'Ido',
  				'is' => 'Islandeg',
  				'it' => 'Eidaleg',
  				'iu' => 'Inwctitwt',
  				'ja' => 'Japaneeg',
+ 				'jbo' => 'Lojban',
  				'jgo' => 'Ngomba',
  				'jmc' => 'Matsiame',
  				'jpr' => 'Iddew-Bersieg',
@@ -757,26 +778,35 @@ has 'display_name_language' => (
  				'ka' => 'Georgeg',
  				'kaa' => 'Cara-Calpaceg',
  				'kab' => 'Cabileg',
+ 				'kac' => 'Kachin',
+ 				'kaj' => 'Jju',
  				'kam' => 'Camba',
- 				'kbd' => 'Circaseg Dwyreiniol',
+ 				'kbd' => 'Cabardieg',
  				'kcg' => 'Tyapeg',
  				'kde' => 'Macondeg',
  				'kea' => 'Caboferdianeg',
+ 				'kfo' => 'Koro',
  				'kg' => 'Congo',
  				'kha' => 'Càseg',
  				'khq' => 'Koyra Chiini',
  				'khw' => 'Chowareg',
  				'ki' => 'Kikuyu',
+ 				'kj' => 'Kuanyama',
  				'kk' => 'Casacheg',
+ 				'kkj' => 'Kako',
  				'kl' => 'Kalaallisut',
  				'kln' => 'Kalenjin',
  				'km' => 'Chmereg',
+ 				'kmb' => 'Kimbundu',
  				'kn' => 'Kannada',
  				'ko' => 'Coreeg',
  				'koi' => 'Komi-Permyak',
  				'kok' => 'Concani',
+ 				'kpe' => 'Kpelle',
  				'kr' => 'Canwri',
+ 				'krc' => 'Karachay-Balkar',
  				'krl' => 'Careleg',
+ 				'kru' => 'Kurukh',
  				'ks' => 'Cashmireg',
  				'ksb' => 'Shambala',
  				'ksf' => 'Baffia',
@@ -805,6 +835,7 @@ has 'display_name_language' => (
  				'lt' => 'Lithwaneg',
  				'ltg' => 'Latgaleg',
  				'lu' => 'Luba-Katanga',
+ 				'lua' => 'Luba-Lulua',
  				'lun' => 'Lwnda',
  				'luo' => 'Lŵo',
  				'lus' => 'Lwshaieg',
@@ -828,6 +859,7 @@ has 'display_name_language' => (
  				'mh' => 'Marsialeg',
  				'mi' => 'Maori',
  				'mic' => 'Micmaceg',
+ 				'min' => 'Minangkabau',
  				'mk' => 'Macedoneg',
  				'ml' => 'Malayalam',
  				'mn' => 'Mongoleg',
@@ -840,27 +872,33 @@ has 'display_name_language' => (
  				'ms' => 'Maleieg',
  				'mt' => 'Malteg',
  				'mua' => 'Mundang',
- 				'mul' => 'mwy nag un iaith',
+ 				'mul' => 'Mwy nag un iaith',
+ 				'mus' => 'Creek',
  				'mwl' => 'Mirandeg',
  				'mwr' => 'Marwari',
  				'my' => 'Byrmaneg',
+ 				'myv' => 'Erzya',
  				'mzn' => 'Masanderani',
  				'na' => 'Nawrŵeg',
  				'nap' => 'Naplieg',
  				'naq' => 'Nama',
  				'nb' => 'Norwyeg Bokmål',
  				'nd' => 'Ndebele Gogleddol',
- 				'nds' => 'Isel Almaeneg',
+ 				'nds' => 'Almaeneg Isel',
  				'nds_NL' => 'Sacsoneg Isel',
  				'ne' => 'Nepaleg',
  				'new' => 'Newaeg',
  				'ng' => 'Ndonga',
+ 				'nia' => 'Nias',
+ 				'niu' => 'Niuean',
  				'njo' => 'Ao Naga',
  				'nl' => 'Iseldireg',
  				'nl_BE' => 'Fflemeg',
  				'nmg' => 'Kwasio',
  				'nn' => 'Norwyeg Nynorsk',
+ 				'nnh' => 'Ngiemboon',
  				'no' => 'Norwyeg',
+ 				'nog' => 'Nogai',
  				'non' => 'Hen Norseg',
  				'nqo' => 'N’Ko',
  				'nr' => 'Ndebele Deheuol',
@@ -876,7 +914,7 @@ has 'display_name_language' => (
  				'oc' => 'Ocsitaneg',
  				'oj' => 'Ojibwa',
  				'om' => 'Oromo',
- 				'or' => 'Oriya',
+ 				'or' => 'Odia',
  				'os' => 'Oseteg',
  				'osa' => 'Osageg',
  				'ota' => 'Tyrceg Otoman',
@@ -884,7 +922,10 @@ has 'display_name_language' => (
  				'pag' => 'Pangasineg',
  				'pal' => 'Pahlafi',
  				'pam' => 'Pampanga',
+ 				'pap' => 'Papiamento',
+ 				'pau' => 'Palawan',
  				'pcd' => 'Picardeg',
+ 				'pcm' => 'Pidgin Nigeria',
  				'pdc' => 'Almaeneg Pensylfania',
  				'peo' => 'Hen Bersieg',
  				'pfl' => 'Almaeneg Palatin',
@@ -911,7 +952,7 @@ has 'display_name_language' => (
  				'ro_MD' => 'Moldofeg',
  				'rof' => 'Rombo',
  				'rom' => 'Romani',
- 				'root' => 'y Gwraidd',
+ 				'root' => 'Y Gwraidd',
  				'rtm' => 'Rotumaneg',
  				'ru' => 'Rwseg',
  				'rup' => 'Aromaneg',
@@ -919,7 +960,7 @@ has 'display_name_language' => (
  				'rwk' => 'Rwa',
  				'sa' => 'Sansgrit',
  				'sad' => 'Sandäweg',
- 				'sah' => 'Iacwteg',
+ 				'sah' => 'Sakha',
  				'sam' => 'Aramaeg Samaria',
  				'saq' => 'Sambŵrw',
  				'sas' => 'Sasaceg',
@@ -943,6 +984,7 @@ has 'display_name_language' => (
  				'sgs' => 'Samogiteg',
  				'sh' => 'Serbo-Croateg',
  				'shi' => 'Tachelhit',
+ 				'shn' => 'Shan',
  				'shu' => 'Arabeg Chad',
  				'si' => 'Sinhaleg',
  				'sid' => 'Sidamo',
@@ -960,9 +1002,11 @@ has 'display_name_language' => (
  				'sog' => 'Sogdeg',
  				'sq' => 'Albaneg',
  				'sr' => 'Serbeg',
+ 				'srn' => 'Sranan Tongo',
  				'srr' => 'Serereg',
  				'ss' => 'Swati',
- 				'st' => 'Sesotheg',
+ 				'ssy' => 'Saho',
+ 				'st' => 'Sesotheg Deheuol',
  				'stq' => 'Ffriseg Saterland',
  				'su' => 'Swndaneg',
  				'suk' => 'Swcwma',
@@ -1008,13 +1052,14 @@ has 'display_name_language' => (
  				'tw' => 'Twi',
  				'twq' => 'Tasawaq',
  				'ty' => 'Tahitïeg',
+ 				'tyv' => 'Twfwnieg',
  				'tzm' => 'Tamaseit Canolbarth Moroco',
  				'udm' => 'Fotiaceg',
  				'ug' => 'Uighur',
  				'uga' => 'Wgariteg',
  				'uk' => 'Wcreineg',
  				'umb' => 'Umbundu',
- 				'und' => 'Iaith Anhysbys',
+ 				'und' => 'Iaith anhysbys',
  				'ur' => 'Wrdw',
  				'uz' => 'Wsbeceg',
  				'vai' => 'Faieg',
@@ -1023,6 +1068,7 @@ has 'display_name_language' => (
  				'vep' => 'Feps',
  				'vi' => 'Fietnameg',
  				'vls' => 'Fflemeg Gorllewinol',
+ 				'vo' => 'Folapük',
  				'vot' => 'Foteg',
  				'vun' => 'Funjo',
  				'wa' => 'Walwneg',
@@ -1035,6 +1081,7 @@ has 'display_name_language' => (
  				'xal' => 'Calmyceg',
  				'xh' => 'Xhosa',
  				'xog' => 'Soga',
+ 				'yav' => 'Iangben',
  				'ybb' => 'Iembaeg',
  				'yi' => 'Iddew-Almaeneg',
  				'yo' => 'Iorwba',
@@ -1047,9 +1094,9 @@ has 'display_name_language' => (
  				'zh_Hans' => 'Tsieineeg Symledig',
  				'zh_Hant' => 'Tsieineeg Traddodiadol',
  				'zu' => 'Swlw',
- 				'zun' => 'Zuni',
+ 				'zun' => 'Swni',
  				'zxx' => 'Dim cynnwys ieithyddol',
- 				'zza' => 'Zazäeg',
+ 				'zza' => 'Sasäeg',
 
 			);
 			if (@_) {
@@ -1069,7 +1116,7 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Arab' => 'Arabaidd',
  			'Armn' => 'Armenaidd',
- 			'Beng' => 'Bengalaidd',
+ 			'Beng' => 'Bangla',
  			'Bopo' => 'Bopomofo',
  			'Brai' => 'Braille',
  			'Cyrl' => 'Cyrilig',
@@ -1079,6 +1126,7 @@ has 'display_name_script' => (
  			'Grek' => 'Groegaidd',
  			'Gujr' => 'Gwjarataidd',
  			'Guru' => 'Gwrmwci',
+ 			'Hanb' => 'Han gyda Bopomofo',
  			'Hang' => 'Hangul',
  			'Hani' => 'Han',
  			'Hans' => 'Symledig',
@@ -1087,6 +1135,8 @@ has 'display_name_script' => (
  			'Hant@alt=stand-alone' => 'Han traddodiadol',
  			'Hebr' => 'Hebreig',
  			'Hira' => 'Hiragana',
+ 			'Hrkt' => 'Syllwyddor Japaneaidd',
+ 			'Jamo' => 'Jamo',
  			'Jpan' => 'Japaneaidd',
  			'Kana' => 'Catacana',
  			'Khmr' => 'Chmeraidd',
@@ -1105,6 +1155,8 @@ has 'display_name_script' => (
  			'Thaa' => 'Thaana',
  			'Thai' => 'Tai',
  			'Tibt' => 'Tibetaidd',
+ 			'Zmth' => 'Nodiant Mathemategol',
+ 			'Zsye' => 'Emoji',
  			'Zsym' => 'Symbolau',
  			'Zxxx' => 'Anysgrifenedig',
  			'Zyyy' => 'Cyffredin',
@@ -1172,7 +1224,7 @@ has 'display_name_region' => (
  			'AW' => 'Aruba',
  			'AX' => 'Ynysoedd Åland',
  			'AZ' => 'Azerbaijan',
- 			'BA' => 'Bosnia a Hercegovina',
+ 			'BA' => 'Bosnia a Herzegovina',
  			'BB' => 'Barbados',
  			'BD' => 'Bangladesh',
  			'BE' => 'Gwlad Belg',
@@ -1196,7 +1248,7 @@ has 'display_name_region' => (
  			'CA' => 'Canada',
  			'CC' => 'Ynysoedd Cocos (Keeling)',
  			'CD' => 'Y Congo - Kinshasa',
- 			'CD@alt=variant' => 'y Congo (G.Dd.C.)',
+ 			'CD@alt=variant' => 'Y Congo (G.Dd.C.)',
  			'CF' => 'Gweriniaeth Canolbarth Affrica',
  			'CG' => 'Y Congo - Brazzaville',
  			'CG@alt=variant' => 'Y Congo (Gweriniaeth)',
@@ -1215,7 +1267,8 @@ has 'display_name_region' => (
  			'CW' => 'Curaçao',
  			'CX' => 'Ynys y Nadolig',
  			'CY' => 'Cyprus',
- 			'CZ' => 'Gweriniaeth Tsiec',
+ 			'CZ' => 'Tsiecia',
+ 			'CZ@alt=variant' => 'Gweriniaeth Tsiec',
  			'DE' => 'Yr Almaen',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Djibouti',
@@ -1232,6 +1285,7 @@ has 'display_name_region' => (
  			'ES' => 'Sbaen',
  			'ET' => 'Ethiopia',
  			'EU' => 'Yr Undeb Ewropeaidd',
+ 			'EZ' => 'Ardal yr Ewro',
  			'FI' => 'Y Ffindir',
  			'FJ' => 'Fiji',
  			'FK' => 'Ynysoedd y Falkland/Malvinas',
@@ -1405,6 +1459,8 @@ has 'display_name_region' => (
  			'UA' => 'Wcráin',
  			'UG' => 'Uganda',
  			'UM' => 'Ynysoedd Pellennig UDA',
+ 			'UN' => 'y Cenhedloedd Unedig',
+ 			'UN@alt=short' => 'UN',
  			'US' => 'Yr Unol Daleithiau',
  			'US@alt=short' => 'UDA',
  			'UY' => 'Uruguay',
@@ -1485,10 +1541,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Calendr',
+ 			'cf' => 'Fformat Arian',
  			'collation' => 'Trefn',
  			'currency' => 'Arian Breiniol',
  			'hc' => 'Cylched Awr (12 vs 24)',
- 			'lb' => 'Arddull Torriad Llinell',
+ 			'lb' => 'Arddull Toriad Llinell',
  			'ms' => 'System Fesur',
  			'numbers' => 'Rhifau',
 
@@ -1519,6 +1576,10 @@ has 'display_name_type' => (
  				'persian' => q{Calendr Persia},
  				'roc' => q{Calendr Gweriniaeth Tseina},
  			},
+ 			'cf' => {
+ 				'account' => q{Fformat Arian Cyfrifeg},
+ 				'standard' => q{Fformat Arian Safonol},
+ 			},
  			'collation' => {
  				'big5han' => q{Trefn Traddodiadol Tsieina - Big5},
  				'dictionary' => q{Trefn Geiriadur},
@@ -1540,8 +1601,8 @@ has 'display_name_type' => (
  				'h24' => q{System 24 Awr (1–24)},
  			},
  			'lb' => {
- 				'loose' => q{Arddull Torriad Llinell Rhydd},
- 				'normal' => q{Arddull Torriad Llinell Arferol},
+ 				'loose' => q{Arddull Toriad Llinell Rhydd},
+ 				'normal' => q{Arddull Toriad Llinell Arferol},
  				'strict' => q{Arddull Torriad Llinell Caeth},
  			},
  			'ms' => {
@@ -1630,10 +1691,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[ă å ã ā æ ç ĕ ē ĭ ī k ñ ŏ ø ō œ q ŭ ū v x z])},
+			auxiliary => qr{[ă å ã ā æ ç ĕ ē ĭ ī k ñ ŏ ø ō œ q ŭ ū v x z]},
 			index => ['A', 'B', 'C', '{CH}', 'D', '{DD}', 'E', 'F', '{FF}', 'G', '{NG}', 'H', 'I', 'J', 'K', 'L', '{LL}', 'M', 'N', 'O', 'P', '{PH}', 'Q', 'R', '{RH}', 'S', 'T', '{TH}', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a á à â ä b c {ch} d {dd} e é è ê ë f {ff} g {ng} h i í ì î ï j l {ll} m n o ó ò ô ö p {ph} r {rh} s t {th} u ú ù û ü w ẃ ẁ ŵ ẅ y ý ỳ ŷ ÿ])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″])},
+			main => qr{[a á à â ä b c {ch} d {dd} e é è ê ë f {ff} g {ng} h i í ì î ï j l {ll} m n o ó ò ô ö p {ph} r {rh} s t {th} u ú ù û ü w ẃ ẁ ŵ ẅ y ý ỳ ŷ ÿ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1670,28 +1732,28 @@ has 'quote_start' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> qq{‘},
+	default		=> qq{“},
 );
 
 has 'quote_end' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> qq{’},
+	default		=> qq{”},
 );
 
 has 'alternate_quote_start' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> qq{“},
+	default		=> qq{‘},
 );
 
 has 'alternate_quote_end' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> qq{”},
+	default		=> qq{’},
 );
 
 has 'duration_units' => (
@@ -1739,22 +1801,22 @@ has 'units' => (
 						'zero' => q({0} amper),
 					},
 					'arc-minute' => {
-						'few' => q({0} arcfunud),
-						'many' => q({0} arcfunud),
-						'name' => q(arcfunudau),
-						'one' => q({0} arcfunud),
-						'other' => q({0} arcfunud),
-						'two' => q({0} arcfunud),
-						'zero' => q({0} arcfunud),
+						'few' => q({0} archfunud),
+						'many' => q({0} archfunud),
+						'name' => q(archfunudau),
+						'one' => q({0} archfunud),
+						'other' => q({0} archfunud),
+						'two' => q({0} archfunud),
+						'zero' => q({0} archfunud),
 					},
 					'arc-second' => {
-						'few' => q({0} arceiliad),
-						'many' => q({0} arceiliad),
-						'name' => q(arceiliadau),
-						'one' => q({0} arceiliad),
-						'other' => q({0} arceiliad),
-						'two' => q({0} arceiliad),
-						'zero' => q({0} arceiliad),
+						'few' => q({0} archeiliad),
+						'many' => q({0} archeiliad),
+						'name' => q(archeiliadau),
+						'one' => q({0} archeiliad),
+						'other' => q({0} archeiliad),
+						'two' => q({0} archeiliad),
+						'zero' => q({0} archeiliad),
 					},
 					'astronomical-unit' => {
 						'few' => q({0} uned seryddol),
@@ -2047,6 +2109,16 @@ has 'units' => (
 						'two' => q({0} alwyn),
 						'zero' => q({0} galwyn),
 					},
+					'gallon-imperial' => {
+						'few' => q({0} galwyn Imp.),
+						'many' => q({0} galwyn Imp.),
+						'name' => q(Galwyni Imp.),
+						'one' => q({0} galwyn Imp.),
+						'other' => q({0} galwyn Imp.),
+						'per' => q({0} y galwyn Imp.),
+						'two' => q({0} galwyn Imp.),
+						'zero' => q({0} galwyn Imp.),
+					},
 					'generic' => {
 						'few' => q({0}°),
 						'many' => q({0}°),
@@ -2280,7 +2352,7 @@ has 'units' => (
 					'kilowatt' => {
 						'few' => q({0} chilowat),
 						'many' => q({0} chilowat),
-						'name' => q(cilawatiau),
+						'name' => q(cilowatiau),
 						'one' => q({0} cilowat),
 						'other' => q({0} cilowat),
 						'two' => q({0} gilowat),
@@ -2324,12 +2396,12 @@ has 'units' => (
 						'zero' => q({0} litr),
 					},
 					'liter-per-100kilometers' => {
-						'few' => q({0} litr wrth y 100 cilometr),
-						'many' => q({0} litr wrth y 100 cilometr),
-						'name' => q(litrau wrth y 100 cilometr),
-						'one' => q({0} litr wrth y 100 cilometr),
-						'other' => q({0} litr wrth y 100 cilometr),
-						'two' => q({0} litr wrth y 100 cilometr),
+						'few' => q({0} litr y 100 cilometr),
+						'many' => q({0} litr y 100 cilometr),
+						'name' => q(litrau y 100 cilometr),
+						'one' => q({0} litr y 100 cilometr),
+						'other' => q({0} litr y 100 cilometr),
+						'two' => q({0} litr y 100 cilometr),
 						'zero' => q({0} litr wrth y 100 cilometr),
 					},
 					'liter-per-kilometer' => {
@@ -2477,6 +2549,15 @@ has 'units' => (
 						'two' => q({0} filltir y galwyn),
 						'zero' => q({0} milltir y galwyn),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} milltir y galwyn Imp.),
+						'many' => q({0} milltir y galwyn Imp.),
+						'name' => q(milltiroedd y galwyn Imp.),
+						'one' => q({0} milltir y galwyn Imp.),
+						'other' => q({0} milltir y galwyn Imp.),
+						'two' => q({0} filltir y galwyn Imp.),
+						'zero' => q({0} milltir y galwyn Imp.),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} milltir yr awr),
 						'many' => q({0} milltir yr awr),
@@ -2489,7 +2570,7 @@ has 'units' => (
 					'mile-scandinavian' => {
 						'few' => q({0} milltir Sgandinafia),
 						'many' => q({0} milltir Sgandinafia),
-						'name' => q(milltir Sgandinafia),
+						'name' => q(milltiroedd Sgandinafia),
 						'one' => q({0} filltir Sgandinafia),
 						'other' => q({0} milltir Sgandinafia),
 						'two' => q({0} filltir Sgandinafia),
@@ -2507,7 +2588,7 @@ has 'units' => (
 					'millibar' => {
 						'few' => q({0} milibar),
 						'many' => q({0} milibar),
-						'name' => q(milibarrau),
+						'name' => q(milibarau),
 						'one' => q({0} milibar),
 						'other' => q({0} milibar),
 						'two' => q({0} filibar),
@@ -2521,6 +2602,15 @@ has 'units' => (
 						'other' => q({0} miligram),
 						'two' => q({0} filigram),
 						'zero' => q({0} miligram),
+					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} miligram y decilitr),
+						'many' => q({0} miligram y decilitr),
+						'name' => q(miligramau y declilitr),
+						'one' => q({0} miligram y decilitr),
+						'other' => q({0} miligram y decilitr),
+						'two' => q({0} miligram y decilitr),
+						'zero' => q({0} miligram y decilitr),
 					},
 					'milliliter' => {
 						'few' => q({0} mililitr),
@@ -2548,6 +2638,15 @@ has 'units' => (
 						'other' => q({0} milimetr o fercwri),
 						'two' => q({0} filimetr o fercwri),
 						'zero' => q({0} milimetr o fercwri),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} milimôl y litr),
+						'many' => q({0} milimôl y litr),
+						'name' => q(milimolau y litr),
+						'one' => q({0} milimôl y litr),
+						'other' => q({0} milimôl y litr),
+						'two' => q({0} milimôl y litr),
+						'zero' => q({0} milimôl y litr),
 					},
 					'millisecond' => {
 						'few' => q({0} milieiliad),
@@ -2651,6 +2750,15 @@ has 'units' => (
 						'two' => q({0} barsec),
 						'zero' => q({0} parsec),
 					},
+					'part-per-million' => {
+						'few' => q({0} rhan pob miliwn),
+						'many' => q({0} rhan pob miliwn),
+						'name' => q(rhannau pob miliwn),
+						'one' => q({0} rhan pob miliwn),
+						'other' => q({0} rhan pob miliwn),
+						'two' => q({0} rhan pob miliwn),
+						'zero' => q({0} rhan pob miliwn),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2680,6 +2788,15 @@ has 'units' => (
 						'other' => q({0} peint metrig),
 						'two' => q({0} peint metrig),
 						'zero' => q({0} peint metrig),
+					},
+					'point' => {
+						'few' => q({0} phwynt),
+						'many' => q({0} phwynt),
+						'name' => q(pwyntiau),
+						'one' => q({0} pwynt),
+						'other' => q({0} pwynt),
+						'two' => q({0} bwynt),
+						'zero' => q({0} pwynt),
 					},
 					'pound' => {
 						'few' => q({0} phwys),
@@ -2772,6 +2889,7 @@ has 'units' => (
 						'name' => q(cilometrau sgwâr),
 						'one' => q({0} cilometr sgwâr),
 						'other' => q({0} cilometr sgwâr),
+						'per' => q({0} y cilometr sgwâr),
 						'two' => q({0} gilometr sgwâr),
 						'zero' => q({0} cilometr sgwâr),
 					},
@@ -2791,6 +2909,7 @@ has 'units' => (
 						'name' => q(milltiroedd sgwâr),
 						'one' => q({0} filltir sgwâr),
 						'other' => q({0} milltir sgwâr),
+						'per' => q({0}/mi²),
 						'two' => q({0} filltir sgwâr),
 						'zero' => q({0} milltir sgwâr),
 					},
@@ -3472,7 +3591,7 @@ has 'units' => (
 					'meter' => {
 						'few' => q({0}m),
 						'many' => q({0}m),
-						'name' => q(metr),
+						'name' => q(m),
 						'one' => q({0}m),
 						'other' => q({0}m),
 						'per' => q({0}/m),
@@ -3579,13 +3698,13 @@ has 'units' => (
 						'zero' => q({0}mm),
 					},
 					'millimeter-of-mercury' => {
-						'few' => q({0}mm Hg),
-						'many' => q({0}mm Hg),
-						'name' => q(mm Hg),
-						'one' => q({0}mm Hg),
-						'other' => q({0}mm Hg),
-						'two' => q({0}mm Hg),
-						'zero' => q({0}mm Hg),
+						'few' => q({0}mmHg),
+						'many' => q({0}mmHg),
+						'name' => q(mmHg),
+						'one' => q({0}mmHg),
+						'other' => q({0}mmHg),
+						'two' => q({0}mmHg),
+						'zero' => q({0}mmHg),
 					},
 					'millisecond' => {
 						'few' => q({0}ms),
@@ -3865,22 +3984,22 @@ has 'units' => (
 						'zero' => q({0} A),
 					},
 					'arc-minute' => {
-						'few' => q({0}′),
-						'many' => q({0}′),
-						'name' => q(arcfunudau),
-						'one' => q({0}′),
-						'other' => q({0}′),
-						'two' => q({0}′),
-						'zero' => q({0}′),
+						'few' => q({0} archfun),
+						'many' => q({0} archfun),
+						'name' => q(archfunudau),
+						'one' => q({0} archfun),
+						'other' => q({0} archfun),
+						'two' => q({0} archfun),
+						'zero' => q({0} archfun),
 					},
 					'arc-second' => {
-						'few' => q({0}″),
-						'many' => q({0}″),
-						'name' => q(arceiliadau),
-						'one' => q({0}″),
-						'other' => q({0}″),
-						'two' => q({0}″),
-						'zero' => q({0}″),
+						'few' => q({0} archeiliad),
+						'many' => q({0} archeiliad),
+						'name' => q(archeiliadau),
+						'one' => q({0} archeiliad),
+						'other' => q({0} archeiliad),
+						'two' => q({0} archeiliad),
+						'zero' => q({0} archeiliad),
 					},
 					'astronomical-unit' => {
 						'few' => q({0} u.s.),
@@ -3897,7 +4016,7 @@ has 'units' => (
 						'name' => q(did),
 						'one' => q({0} did),
 						'other' => q({0} did),
-						'two' => q({0} ddid),
+						'two' => q({0} did),
 						'zero' => q({0} did),
 					},
 					'bushel' => {
@@ -3974,10 +4093,10 @@ has 'units' => (
 						'zero' => q({0} c),
 					},
 					'coordinate' => {
-						'east' => q({0}dn),
-						'north' => q({0}g),
-						'south' => q({0}d),
-						'west' => q({0}gn),
+						'east' => q({0} dn),
+						'north' => q({0} g),
+						'south' => q({0} d),
+						'west' => q({0} gn),
 					},
 					'cubic-centimeter' => {
 						'few' => q({0} cm³),
@@ -3990,13 +4109,13 @@ has 'units' => (
 						'zero' => q({0} cm³),
 					},
 					'cubic-foot' => {
-						'few' => q({0} troedfedd³),
-						'many' => q({0} troedfedd³),
+						'few' => q({0} tr³),
+						'many' => q({0} tr³),
 						'name' => q(troedfedd³),
-						'one' => q({0} troedfedd³),
-						'other' => q({0} troedfedd³),
-						'two' => q({0} droedfedd³),
-						'zero' => q({0} troedfedd³),
+						'one' => q({0} tr³),
+						'other' => q({0} tr³),
+						'two' => q({0} tr³),
+						'zero' => q({0} tr³),
 					},
 					'cubic-inch' => {
 						'few' => q({0} modfedd³),
@@ -4167,6 +4286,16 @@ has 'units' => (
 						'two' => q({0} gal),
 						'zero' => q({0} gal),
 					},
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'many' => q({0} gal Imp.),
+						'name' => q(Gal Imp.),
+						'one' => q({0} gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
+						'two' => q({0} gal Imp.),
+						'zero' => q({0} gal Imp.),
+					},
 					'generic' => {
 						'few' => q({0}°),
 						'many' => q({0}°),
@@ -4273,7 +4402,7 @@ has 'units' => (
 						'name' => q(oriau),
 						'one' => q({0} awr),
 						'other' => q({0} awr),
-						'per' => q({0} ya),
+						'per' => q({0}/a),
 						'two' => q({0} awr),
 						'zero' => q({0} awr),
 					},
@@ -4425,13 +4554,13 @@ has 'units' => (
 						'zero' => q({0} not),
 					},
 					'light-year' => {
-						'few' => q({0} blwyddyn golau),
-						'many' => q({0} blwyddyn golau),
+						'few' => q({0} bg),
+						'many' => q({0} bg),
 						'name' => q(bl golau),
-						'one' => q({0} flwyddyn golau),
-						'other' => q({0} blwyddyn golau),
-						'two' => q({0} flwyddyn golau),
-						'zero' => q({0} blwyddyn golau),
+						'one' => q({0} bg),
+						'other' => q({0} bg),
+						'two' => q({0} bg),
+						'zero' => q({0} bg),
 					},
 					'liter' => {
 						'few' => q({0} L),
@@ -4518,10 +4647,10 @@ has 'units' => (
 					'meter' => {
 						'few' => q({0} m),
 						'many' => q({0} m),
-						'name' => q(metrau),
+						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
-						'per' => q({0} y metr),
+						'per' => q({0}/m),
 						'two' => q({0} m),
 						'zero' => q({0} m),
 					},
@@ -4597,6 +4726,15 @@ has 'units' => (
 						'two' => q({0} mpg),
 						'zero' => q({0} mpg),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mpg Imp.),
+						'many' => q({0} mpg Imp.),
+						'name' => q(milltir/gal Imp.),
+						'one' => q({0} mpg Imp.),
+						'other' => q({0} mpg Imp.),
+						'two' => q({0} mpg Imp.),
+						'zero' => q({0} mpg Imp.),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} m.y.a.),
 						'many' => q({0} m.y.a.),
@@ -4642,6 +4780,15 @@ has 'units' => (
 						'two' => q({0} mg),
 						'zero' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mg/dL),
+						'many' => q({0} mg/dL),
+						'name' => q(mg/dL),
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+						'two' => q({0} mg/dL),
+						'zero' => q({0} mg/dL),
+					},
 					'milliliter' => {
 						'few' => q({0} mL),
 						'many' => q({0} mL),
@@ -4661,13 +4808,22 @@ has 'units' => (
 						'zero' => q({0} mm),
 					},
 					'millimeter-of-mercury' => {
-						'few' => q({0} mm Hg),
-						'many' => q({0} mm Hg),
-						'name' => q(mm Hg),
-						'one' => q({0} mm Hg),
-						'other' => q({0} mm Hg),
-						'two' => q({0} mm Hg),
-						'zero' => q({0} mm Hg),
+						'few' => q({0} mmHg),
+						'many' => q({0} mmHg),
+						'name' => q(mmHg),
+						'one' => q({0} mmHg),
+						'other' => q({0} mmHg),
+						'two' => q({0} mmHg),
+						'zero' => q({0} mmHg),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} mmol/L),
+						'many' => q({0} mmol/L),
+						'name' => q(milimôl/litr),
+						'one' => q({0} mmol/L),
+						'other' => q({0} mmol/L),
+						'two' => q({0} mmol/L),
+						'zero' => q({0} mmol/L),
 					},
 					'millisecond' => {
 						'few' => q({0} ms),
@@ -4771,6 +4927,15 @@ has 'units' => (
 						'two' => q({0} pc),
 						'zero' => q({0} pc),
 					},
+					'part-per-million' => {
+						'few' => q({0} ppm),
+						'many' => q({0} ppm),
+						'name' => q(rhan/miliwn),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+						'two' => q({0} ppm),
+						'zero' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -4800,6 +4965,15 @@ has 'units' => (
 						'other' => q({0} mpt),
 						'two' => q({0} mpt),
 						'zero' => q({0} mpt),
+					},
+					'point' => {
+						'few' => q({0} pt),
+						'many' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+						'two' => q({0} pt),
+						'zero' => q({0} pt),
 					},
 					'pound' => {
 						'few' => q({0} phwys),
@@ -4892,6 +5066,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 						'two' => q({0} km²),
 						'zero' => q({0} km²),
 					},
@@ -4911,6 +5086,7 @@ has 'units' => (
 						'name' => q(mi²),
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 						'two' => q({0} mi²),
 						'zero' => q({0} mi²),
 					},
@@ -5081,7 +5257,21 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'arab' => {
+			'infinity' => q(∞),
+			'minusSign' => q(؜-),
+			'nan' => q(NaN),
+			'perMille' => q(؉),
+			'percentSign' => q(٪؜),
+			'plusSign' => q(؜+),
 			'timeSeparator' => q(:),
+		},
+		'arabext' => {
+			'infinity' => q(∞),
+			'minusSign' => q(‎-‎),
+			'nan' => q(NaN),
+			'perMille' => q(؉),
+			'percentSign' => q(٪),
+			'plusSign' => q(‎+‎),
 		},
 		'latn' => {
 			'decimal' => q(.),
@@ -5094,7 +5284,7 @@ has 'number_symbols' => (
 			'perMille' => q(‰),
 			'percentSign' => q(%),
 			'plusSign' => q(+),
-			'superscriptingExponent' => q(x),
+			'superscriptingExponent' => q(×),
 			'timeSeparator' => q(:),
 		},
 	} }
@@ -5204,105 +5394,105 @@ has 'number_formats' => (
 					'zero' => '000T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
 				'1000' => {
-					'few' => '0 mil',
-					'many' => '0 mil',
+					'few' => '0K',
+					'many' => '0K',
 					'one' => '0 mil',
 					'other' => '0 mil',
-					'two' => '0 fil',
+					'two' => '0K',
 					'zero' => '0 mil',
 				},
 				'10000' => {
-					'few' => '00 mil',
-					'many' => '00 mil',
+					'few' => '00K',
+					'many' => '00K',
 					'one' => '00 mil',
 					'other' => '00 mil',
-					'two' => '00 mil',
-					'zero' => '00 mil',
+					'two' => '00K',
+					'zero' => '00K',
 				},
 				'100000' => {
-					'few' => '000 mil',
-					'many' => '000 mil',
+					'few' => '000K',
+					'many' => '000K',
 					'one' => '000 mil',
 					'other' => '000 mil',
-					'two' => '000 mil',
-					'zero' => '000 mil',
+					'two' => '000K',
+					'zero' => '000K',
 				},
 				'1000000' => {
-					'few' => '0 miliwn',
-					'many' => '0 miliwn',
+					'few' => '0M',
+					'many' => '0M',
 					'one' => '0 miliwn',
 					'other' => '0 miliwn',
-					'two' => '0 filiwn',
-					'zero' => '0 miliwn',
+					'two' => '0M',
+					'zero' => '0M',
 				},
 				'10000000' => {
-					'few' => '00 miliwn',
-					'many' => '00 miliwn',
+					'few' => '00M',
+					'many' => '00M',
 					'one' => '00 miliwn',
 					'other' => '00 miliwn',
-					'two' => '00 miliwn',
-					'zero' => '00 miliwn',
+					'two' => '00M',
+					'zero' => '00M',
 				},
 				'100000000' => {
-					'few' => '000 miliwn',
-					'many' => '000 miliwn',
+					'few' => '000M',
+					'many' => '000M',
 					'one' => '000 miliwn',
 					'other' => '000 miliwn',
-					'two' => '000 miliwn',
-					'zero' => '000 miliwn',
+					'two' => '000M',
+					'zero' => '000M',
 				},
 				'1000000000' => {
-					'few' => '0 biliwn',
-					'many' => '0 biliwn',
+					'few' => '0B',
+					'many' => '0B',
 					'one' => '0 biliwn',
 					'other' => '0 biliwn',
-					'two' => '0 biliwn',
-					'zero' => '0 biliwn',
+					'two' => '0B',
+					'zero' => '0B',
 				},
 				'10000000000' => {
-					'few' => '00 biliwn',
-					'many' => '00 biliwn',
+					'few' => '00B',
+					'many' => '00B',
 					'one' => '00 biliwn',
 					'other' => '00 biliwn',
-					'two' => '00 biliwn',
-					'zero' => '00 biliwn',
+					'two' => '00B',
+					'zero' => '00B',
 				},
 				'100000000000' => {
-					'few' => '000 biliwn',
-					'many' => '000 biliwn',
+					'few' => '000B',
+					'many' => '000B',
 					'one' => '000 biliwn',
 					'other' => '000 biliwn',
-					'two' => '000 biliwn',
-					'zero' => '000 biliwn',
+					'two' => '000B',
+					'zero' => '000B',
 				},
 				'1000000000000' => {
-					'few' => '0 thriliwn',
-					'many' => '0 thriliwn',
+					'few' => '0T',
+					'many' => '0T',
 					'one' => '0 triliwn',
 					'other' => '0 triliwn',
-					'two' => '0 driliwn',
-					'zero' => '0 triliwn',
+					'two' => '0T',
+					'zero' => '0T',
 				},
 				'10000000000000' => {
-					'few' => '00 triliwn',
-					'many' => '00 triliwn',
+					'few' => '00T',
+					'many' => '00T',
 					'one' => '00 triliwn',
 					'other' => '00 triliwn',
-					'two' => '00 triliwn',
-					'zero' => '00 triliwn',
+					'two' => '00T',
+					'zero' => '00T',
 				},
 				'100000000000000' => {
-					'few' => '000 triliwn',
-					'many' => '000 triliwn',
-					'one' => '000 triliwn',
+					'few' => '000T',
+					'many' => '000T',
+					'one' => '000T',
 					'other' => '000 triliwn',
-					'two' => '000 triliwn',
-					'zero' => '000 triliwn',
+					'two' => '000T',
+					'zero' => '000T',
 				},
 			},
 			'short' => {
@@ -5407,14 +5597,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -5475,12 +5665,12 @@ has 'currencies' => (
 			symbol => 'AFN',
 			display_name => {
 				'currency' => q(Afghani Afghanistan),
-				'few' => q(Afghani Afghanistan),
-				'many' => q(Afghani Afghanistan),
-				'one' => q(Afghani Afghanistan),
-				'other' => q(Afghani Afghanistan),
-				'two' => q(Afghani Afghanistan),
-				'zero' => q(Afghani Afghanistan),
+				'few' => q(afghani Afghanistan),
+				'many' => q(afghani Afghanistan),
+				'one' => q(afghani Afghanistan),
+				'other' => q(afghani Afghanistan),
+				'two' => q(afghani Afghanistan),
+				'zero' => q(afghani Afghanistan),
 			},
 		},
 		'ALL' => {
@@ -5535,36 +5725,36 @@ has 'currencies' => (
 			symbol => 'AOK',
 			display_name => {
 				'currency' => q(Kwanza Angola \(1977–1991\)),
-				'few' => q(Kwanza Angola \(1977–1991\)),
-				'many' => q(Kwanza Angola \(1977–1991\)),
-				'one' => q(Kwanza Angola \(1977–1991\)),
-				'other' => q(Kwanza Angola \(1977–1991\)),
-				'two' => q(Kwanza Angola \(1977–1991\)),
-				'zero' => q(Kwanza Angola \(1977–1991\)),
+				'few' => q(kwanza Angola \(1977 – 1991\)),
+				'many' => q(kwanza Angola \(1977 – 1991\)),
+				'one' => q(kwanza Angola \(1977 – 1991\)),
+				'other' => q(kwanza Angola \(1977 – 1991\)),
+				'two' => q(kwanza Angola \(1977 – 1991\)),
+				'zero' => q(kwanza Angola \(1977 – 1991\)),
 			},
 		},
 		'AON' => {
 			symbol => 'AON',
 			display_name => {
 				'currency' => q(Kwanza Newydd Angola \(1990–2000\)),
-				'few' => q(Kwanza Newydd Angola \(1990–2000\)),
-				'many' => q(Kwanza Newydd Angola \(1990–2000\)),
-				'one' => q(Kwanza Newydd Angola \(1990–2000\)),
-				'other' => q(Kwanza Newydd Angola \(1990–2000\)),
-				'two' => q(Kwanza Newydd Angola \(1990–2000\)),
-				'zero' => q(Kwanza Newydd Angola \(1990–2000\)),
+				'few' => q(kwanza newydd Angola \(1999 – 2000\)),
+				'many' => q(kwanza newydd Angola \(1999 – 2000\)),
+				'one' => q(kwanza newydd Angola \(1999 – 2000\)),
+				'other' => q(kwanza newydd Angola \(1999 – 2000\)),
+				'two' => q(kwanza newydd Angola \(1999 – 2000\)),
+				'zero' => q(kwanza newydd Angola \(1999 – 2000\)),
 			},
 		},
 		'AOR' => {
 			symbol => 'AOR',
 			display_name => {
 				'currency' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
-				'few' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
-				'many' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
-				'one' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
-				'other' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
-				'two' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
-				'zero' => q(Kwanza Ailgymhwysedig Angola \(1995–1999\)),
+				'few' => q(kwanza ailgymhwysedig Angola \(1995 – 1999\)),
+				'many' => q(kwanza ailgymhwysedig Angola \(1995 – 1999\)),
+				'one' => q(kwanza ailgymhwysedig Angola \(1995 – 1999\)),
+				'other' => q(kwanza ailgymhwysedig Angola \(1995 – 1999\)),
+				'two' => q(kwanza ailgymhwysedig Angola \(1995 – 1999\)),
+				'zero' => q(kwanza ailgymhwysedig Angola \(1995 – 1999\)),
 			},
 		},
 		'ARA' => {
@@ -5643,12 +5833,12 @@ has 'currencies' => (
 			symbol => 'A$',
 			display_name => {
 				'currency' => q(Doler Awstralia),
-				'few' => q(Doler Awstralia),
-				'many' => q(Doler Awstralia),
-				'one' => q(Doler Awstralia),
-				'other' => q(Doler Awstralia),
-				'two' => q(Doler Awstralia),
-				'zero' => q(Doler Awstralia),
+				'few' => q(doler Awstralia),
+				'many' => q(doler Awstralia),
+				'one' => q(ddoler Awstralia),
+				'other' => q(doler Awstralia),
+				'two' => q(ddoler Awstralia),
+				'zero' => q(doler Awstralia),
 			},
 		},
 		'AWG' => {
@@ -5682,7 +5872,7 @@ has 'currencies' => (
 				'few' => q(manat Azerbaijan),
 				'many' => q(manat Azerbaijan),
 				'one' => q(manat Azerbaijan),
-				'other' => q(Manat Azerbaijan),
+				'other' => q(manat Azerbaijan),
 				'two' => q(manat Azerbaijan),
 				'zero' => q(manat Azerbaijan),
 			},
@@ -5695,7 +5885,7 @@ has 'currencies' => (
 				'many' => q(marc trosadwy Bosnia a Hercegovina),
 				'one' => q(marc trosadwy Bosnia a Hercegovina),
 				'other' => q(marc trosadwy Bosnia a Hercegovina),
-				'two' => q(marc trosadwy Bosnia a Hercegovina),
+				'two' => q(farc trosiadwy Bosnia a Hercegovina),
 				'zero' => q(marc trosadwy Bosnia a Hercegovina),
 			},
 		},
@@ -5715,22 +5905,49 @@ has 'currencies' => (
 			symbol => 'BDT',
 			display_name => {
 				'currency' => q(Taka Bangladesh),
-				'few' => q(Taka Bangladesh),
-				'many' => q(Taka Bangladesh),
-				'one' => q(Taka Bangladesh),
-				'other' => q(Taka Bangladesh),
-				'two' => q(Taka Bangladesh),
-				'zero' => q(Taka Bangladesh),
+				'few' => q(taka Bangladesh),
+				'many' => q(taka Bangladesh),
+				'one' => q(taka Bangladesh),
+				'other' => q(taka Bangladesh),
+				'two' => q(taka Bangladesh),
+				'zero' => q(taka Bangladesh),
 			},
 		},
 		'BEC' => {
 			symbol => 'BEC',
+			display_name => {
+				'currency' => q(Ffranc Gwlad Belg \(arnewidiol\)),
+				'few' => q(ffranc Gwlad Belg \(arnewidiol\)),
+				'many' => q(ffranc Gwlad Belg \(arnewidiol\)),
+				'one' => q(ffranc Gwlad Belg \(arnewidiol\)),
+				'other' => q(ffranc Gwlad Belg \(arnewidiol\)),
+				'two' => q(ffranc Gwlad Belg \(arnewidiol\)),
+				'zero' => q(ffranc Gwlad Belg \(arnewidiol\)),
+			},
 		},
 		'BEF' => {
 			symbol => 'BEF',
+			display_name => {
+				'currency' => q(Ffranc Gwlad Belg),
+				'few' => q(ffranc Gwlad Belg),
+				'many' => q(ffranc Gwlad Belg),
+				'one' => q(ffranc Gwlad Belg),
+				'other' => q(ffranc Gwlad Belg),
+				'two' => q(ffranc Gwlad Belg),
+				'zero' => q(ffranc Gwlad Belg),
+			},
 		},
 		'BEL' => {
 			symbol => 'BEL',
+			display_name => {
+				'currency' => q(Ffranc Gwlad Belg \(ariannol\)),
+				'few' => q(ffranc Gwlad Belg \(ariannol\)),
+				'many' => q(ffranc Gwlad Belg \(ariannol\)),
+				'one' => q(ffranc Gwlad Belg \(ariannol\)),
+				'other' => q(ffranc Gwlad Belg \(ariannol\)),
+				'two' => q(ffranc Gwlad Belg \(ariannol\)),
+				'zero' => q(ffranc Gwlad Belg \(ariannol\)),
+			},
 		},
 		'BGM' => {
 			symbol => 'BGM',
@@ -5760,12 +5977,12 @@ has 'currencies' => (
 			symbol => 'BGO',
 			display_name => {
 				'currency' => q(Lev Bwlgaria \(1879–1952\)),
-				'few' => q(Lev Bwlgaria \(1879–1952\)),
-				'many' => q(Lev Bwlgaria \(1879–1952\)),
-				'one' => q(Lev Bwlgaria \(1879–1952\)),
-				'other' => q(Lev Bwlgaria \(1879–1952\)),
-				'two' => q(Lev Bwlgaria \(1879–1952\)),
-				'zero' => q(Lev Bwlgaria \(1879–1952\)),
+				'few' => q(lev Bwlgaria \(1879 – 1952\)),
+				'many' => q(lev Bwlgaria \(1879 – 1952\)),
+				'one' => q(lev Bwlgaria \(1879 – 1952\)),
+				'other' => q(lev Bwlgaria \(1879 – 1952\)),
+				'two' => q(lev Bwlgaria \(1879 – 1952\)),
+				'zero' => q(lev Bwlgaria \(1879 – 1952\)),
 			},
 		},
 		'BHD' => {
@@ -5808,12 +6025,12 @@ has 'currencies' => (
 			symbol => 'BND',
 			display_name => {
 				'currency' => q(Doler Brunei),
-				'few' => q(Doler Brunei),
-				'many' => q(Doler Brunei),
-				'one' => q(Doler Brunei),
-				'other' => q(Doler Brunei),
-				'two' => q(Doler Brunei),
-				'zero' => q(Doler Brunei),
+				'few' => q(doler Brunei),
+				'many' => q(doler Brunei),
+				'one' => q(ddoler Brunei),
+				'other' => q(doler Brunei),
+				'two' => q(ddoler Brunei),
+				'zero' => q(doler Brunei),
 			},
 		},
 		'BOB' => {
@@ -5956,7 +6173,7 @@ has 'currencies' => (
 				'many' => q(doler y Bahamas),
 				'one' => q(doler y Bahamas),
 				'other' => q(doler y Bahamas),
-				'two' => q(doler y Bahamas),
+				'two' => q(ddoler y Bahamas),
 				'zero' => q(doler y Bahamas),
 			},
 		},
@@ -5964,12 +6181,12 @@ has 'currencies' => (
 			symbol => 'BTN',
 			display_name => {
 				'currency' => q(Ngultrum Bhutan),
-				'few' => q(Ngultrum Bhutan),
-				'many' => q(Ngultrum Bhutan),
-				'one' => q(Ngultrum Bhutan),
-				'other' => q(Ngultrum Bhutan),
-				'two' => q(Ngultrum Bhutan),
-				'zero' => q(Ngultrum Bhutan),
+				'few' => q(ngultrum Bhutan),
+				'many' => q(ngultrum Bhutan),
+				'one' => q(ngultrum Bhutan),
+				'other' => q(ngultrum Bhutan),
+				'two' => q(ngultrum Bhutan),
+				'zero' => q(ngultrum Bhutan),
 			},
 		},
 		'BUK' => {
@@ -5996,8 +6213,8 @@ has 'currencies' => (
 				'zero' => q(pula Botswana),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(Rwbl Belarws),
 				'few' => q(rwbl Belarws),
@@ -6006,6 +6223,18 @@ has 'currencies' => (
 				'other' => q(rwbl Belarws),
 				'two' => q(rwbl Belarws),
 				'zero' => q(rwbl Belarws),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(Rwbl Belarws \(2000–2016\)),
+				'few' => q(rwbl Belarws \(2000–2016\)),
+				'many' => q(rwbl Belarws \(2000–2016\)),
+				'one' => q(rwbl Belarws \(2000–2016\)),
+				'other' => q(rwbl Belarws \(2000–2016\)),
+				'two' => q(rwbl Belarws \(2000–2016\)),
+				'zero' => q(rwbl Belarws \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -6046,6 +6275,15 @@ has 'currencies' => (
 		},
 		'CHE' => {
 			symbol => 'CHE',
+			display_name => {
+				'currency' => q(Ewro WIR),
+				'few' => q(ewro WIR),
+				'many' => q(ewro WIR),
+				'one' => q(ewro WIR),
+				'other' => q(ewro WIR),
+				'two' => q(ewro WIR),
+				'zero' => q(ewro WIR),
+			},
 		},
 		'CHF' => {
 			symbol => 'CHF',
@@ -6061,6 +6299,15 @@ has 'currencies' => (
 		},
 		'CHW' => {
 			symbol => 'CHW',
+			display_name => {
+				'currency' => q(Ffranc WIR),
+				'few' => q(ffranc WIR),
+				'many' => q(ffranc WIR),
+				'one' => q(ffranc WIR),
+				'other' => q(ffranc WIR),
+				'two' => q(ffranc WIR),
+				'zero' => q(ffranc WIR),
+			},
 		},
 		'CLE' => {
 			symbol => 'CLE',
@@ -6096,6 +6343,18 @@ has 'currencies' => (
 				'other' => q(peso Chile),
 				'two' => q(peso Chile),
 				'zero' => q(peso Chile),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(Yuan Tsieina \(ar y môr\)),
+				'few' => q(yuan Tsieina \(ar y môr\)),
+				'many' => q(yuan Tsieina \(ar y môr\)),
+				'one' => q(yuan Tsieina \(ar y môr\)),
+				'other' => q(yuan Tsieina \(ar y môr\)),
+				'two' => q(yuan Tsieina \(ar y môr\)),
+				'zero' => q(yuan Tsieina \(ar y môr\)),
 			},
 		},
 		'CNX' => {
@@ -6135,6 +6394,15 @@ has 'currencies' => (
 		},
 		'COU' => {
 			symbol => 'COU',
+			display_name => {
+				'currency' => q(Uned Gwir Werth Colombia),
+				'few' => q(uned gwir werth Colombia),
+				'many' => q(uned gwir werth Colombia),
+				'one' => q(uned gwir werth Colombia),
+				'other' => q(uned gwir werth Colombia),
+				'two' => q(uned gwir werth Colombia),
+				'zero' => q(uned gwir werth Colombia),
+			},
 		},
 		'CRC' => {
 			symbol => 'CRC',
@@ -6202,7 +6470,7 @@ has 'currencies' => (
 		'CZK' => {
 			symbol => 'CZK',
 			display_name => {
-				'currency' => q(Koruna Tsiec),
+				'currency' => q(Koruna’r Weriniaeth Tsiec),
 				'few' => q(koruna’r Weriniaeth Tsiec),
 				'many' => q(koruna’r Weriniaeth Tsiec),
 				'one' => q(koruna’r Weriniaeth Tsiec),
@@ -6213,9 +6481,27 @@ has 'currencies' => (
 		},
 		'DDM' => {
 			symbol => 'DDM',
+			display_name => {
+				'currency' => q(Marc Dwyrain yr Almaen),
+				'few' => q(marc Dwyrain yr Almaen),
+				'many' => q(marc Dwyrain yr Almaen),
+				'one' => q(marc Dwyrain yr Almaen),
+				'other' => q(marc Dwyrain yr Almaen),
+				'two' => q(marc Dwyrain yr Almaen),
+				'zero' => q(marc Dwyrain yr Almaen),
+			},
 		},
 		'DEM' => {
 			symbol => 'DEM',
+			display_name => {
+				'currency' => q(Marc yr Almaen),
+				'few' => q(marc yr Almaen),
+				'many' => q(marc yr Almaen),
+				'one' => q(marc yr Almaen),
+				'other' => q(marc yr Almaen),
+				'two' => q(marc yr Almaen),
+				'zero' => q(marc yr Almaen),
+			},
 		},
 		'DJF' => {
 			symbol => 'DJF',
@@ -6277,6 +6563,28 @@ has 'currencies' => (
 				'zero' => q(sucre Ecuador),
 			},
 		},
+		'ECV' => {
+			display_name => {
+				'currency' => q(Uned Gwerth Gyson Ecuador),
+				'few' => q(uned gwerth gyson Ecuador),
+				'many' => q(uned gwerth gyson Ecuador),
+				'one' => q(uned gwerth gyson Ecuador),
+				'other' => q(uned gwerth gyson Ecuador),
+				'two' => q(uned gwerth gyson Ecuador),
+				'zero' => q(uned gwerth gyson Ecuador),
+			},
+		},
+		'EEK' => {
+			display_name => {
+				'currency' => q(Kroon Estonia),
+				'few' => q(kroon Estonia),
+				'many' => q(kroon Estonia),
+				'one' => q(kroon Estonia),
+				'other' => q(kroon Estonia),
+				'two' => q(kroon Estonia),
+				'zero' => q(kroon Estonia),
+			},
+		},
 		'EGP' => {
 			symbol => 'EGP',
 			display_name => {
@@ -6320,27 +6628,36 @@ has 'currencies' => (
 			symbol => '€',
 			display_name => {
 				'currency' => q(Ewro),
-				'few' => q(Ewro),
-				'many' => q(Ewro),
-				'one' => q(Ewro),
-				'other' => q(Ewro),
-				'two' => q(Ewro),
-				'zero' => q(Ewro),
+				'few' => q(ewro),
+				'many' => q(ewro),
+				'one' => q(ewro),
+				'other' => q(ewro),
+				'two' => q(ewro),
+				'zero' => q(ewro),
 			},
 		},
 		'FIM' => {
 			symbol => 'FIM',
+			display_name => {
+				'currency' => q(Markka’r Ffindir),
+				'few' => q(markka’r Ffindir),
+				'many' => q(markka’r Ffindir),
+				'one' => q(markka’r Ffindir),
+				'other' => q(markka’r Ffindir),
+				'two' => q(markka’r Ffindir),
+				'zero' => q(markka’r Ffindir),
+			},
 		},
 		'FJD' => {
 			symbol => 'FJD',
 			display_name => {
 				'currency' => q(Doler Ffiji),
-				'few' => q(Doler Ffiji),
-				'many' => q(Doler Ffiji),
-				'one' => q(Doler Ffiji),
-				'other' => q(Doler Ffiji),
-				'two' => q(Doler Ffiji),
-				'zero' => q(Doler Ffiji),
+				'few' => q(doler Ffiji),
+				'many' => q(doler Ffiji),
+				'one' => q(ddoler Ffiji),
+				'other' => q(doler Ffiji),
+				'two' => q(ddoler Ffiji),
+				'zero' => q(doler Ffiji),
 			},
 		},
 		'FKP' => {
@@ -6349,7 +6666,7 @@ has 'currencies' => (
 				'currency' => q(Punt Ynysoedd Falkland/Malvinas),
 				'few' => q(punt Ynysoedd Falkland/Malvinas),
 				'many' => q(phunt Ynysoedd Falkland/Malvinas),
-				'one' => q(bunt Ynysoedd Falkland/Malvinas),
+				'one' => q(punt Ynysoedd Falkland/Malvinas),
 				'other' => q(punt Ynysoedd Falkland/Malvinas),
 				'two' => q(bunt Ynysoedd Falkland/Malvinas),
 				'zero' => q(punt Ynysoedd Falkland/Malvinas),
@@ -6357,6 +6674,15 @@ has 'currencies' => (
 		},
 		'FRF' => {
 			symbol => 'FRF',
+			display_name => {
+				'currency' => q(Ffranc Ffrainc),
+				'few' => q(ffranc Ffrainc),
+				'many' => q(ffranc Ffrainc),
+				'one' => q(ffranc Ffrainc),
+				'other' => q(ffranc Ffrainc),
+				'two' => q(ffranc Ffrainc),
+				'zero' => q(ffranc Ffrainc),
+			},
 		},
 		'GBP' => {
 			symbol => '£',
@@ -6424,7 +6750,7 @@ has 'currencies' => (
 				'currency' => q(Punt Gibraltar),
 				'few' => q(punt Gibraltar),
 				'many' => q(phunt Gibraltar),
-				'one' => q(bunt Gibraltar),
+				'one' => q(punt Gibraltar),
 				'other' => q(punt Gibraltar),
 				'two' => q(bunt Gibraltar),
 				'zero' => q(punt Gibraltar),
@@ -6470,12 +6796,12 @@ has 'currencies' => (
 			symbol => 'GQE',
 			display_name => {
 				'currency' => q(Ekwele Guinea Gyhydeddol),
-				'few' => q(Ekwele Guinea Gyhydeddol),
-				'many' => q(Ekwele Guinea Gyhydeddol),
-				'one' => q(Ekwele Guinea Gyhydeddol),
-				'other' => q(Ekwele Guinea Gyhydeddol),
-				'two' => q(Ekwele Guinea Gyhydeddol),
-				'zero' => q(Ekwele Guinea Gyhydeddol),
+				'few' => q(ekwele Guinea Gyhydeddol),
+				'many' => q(ekwele Guinea Gyhydeddol),
+				'one' => q(ekwele Guinea Gyhydeddol),
+				'other' => q(ekwele Guinea Gyhydeddol),
+				'two' => q(ekwele Guinea Gyhydeddol),
+				'zero' => q(ekwele Guinea Gyhydeddol),
 			},
 		},
 		'GRD' => {
@@ -6587,12 +6913,12 @@ has 'currencies' => (
 			symbol => 'IDR',
 			display_name => {
 				'currency' => q(Rupiah Indonesia),
-				'few' => q(Rupiah Indonesia),
-				'many' => q(Rupiah Indonesia),
-				'one' => q(Rupiah Indonesia),
-				'other' => q(Rupiah Indonesia),
-				'two' => q(Rupiah Indonesia),
-				'zero' => q(Rupiah Indonesia),
+				'few' => q(rupiah Indonesia),
+				'many' => q(rupiah Indonesia),
+				'one' => q(rupiah Indonesia),
+				'other' => q(rupiah Indonesia),
+				'two' => q(rupiah Indonesia),
+				'zero' => q(rupiah Indonesia),
 			},
 		},
 		'IEP' => {
@@ -6646,12 +6972,12 @@ has 'currencies' => (
 			symbol => '₹',
 			display_name => {
 				'currency' => q(Rwpî India),
-				'few' => q(Rwpî India),
-				'many' => q(Rwpî India),
-				'one' => q(Rwpî India),
-				'other' => q(Rwpî India),
-				'two' => q(Rwpî India),
-				'zero' => q(Rwpî India),
+				'few' => q(rwpî India),
+				'many' => q(rwpî India),
+				'one' => q(rwpî India),
+				'other' => q(rwpî India),
+				'two' => q(rwpî India),
+				'zero' => q(rwpî India),
 			},
 		},
 		'IQD' => {
@@ -6670,12 +6996,23 @@ has 'currencies' => (
 			symbol => 'IRR',
 			display_name => {
 				'currency' => q(Rial Iran),
-				'few' => q(Rial Iran),
-				'many' => q(Rial Iran),
-				'one' => q(Rial Iran),
-				'other' => q(Rial Iran),
-				'two' => q(Rial Iran),
-				'zero' => q(Rial Iran),
+				'few' => q(rial Iran),
+				'many' => q(rial Iran),
+				'one' => q(rial Iran),
+				'other' => q(rial Iran),
+				'two' => q(rial Iran),
+				'zero' => q(rial Iran),
+			},
+		},
+		'ISJ' => {
+			display_name => {
+				'currency' => q(Króna Gwlad yr Iâ \(1918 – 1981\)),
+				'few' => q(króna Gwlad yr Iâ \(1918 – 1981\)),
+				'many' => q(króna Gwlad yr Iâ \(1918 – 1981\)),
+				'one' => q(króna Gwlad yr Iâ \(1918 – 1981\)),
+				'other' => q(króna Gwlad yr Iâ \(1918 – 1981\)),
+				'two' => q(króna Gwlad yr Iâ \(1918 – 1981\)),
+				'zero' => q(króna Gwlad yr Iâ \(1918 – 1981\)),
 			},
 		},
 		'ISK' => {
@@ -6745,24 +7082,24 @@ has 'currencies' => (
 			symbol => 'KGS',
 			display_name => {
 				'currency' => q(Som Kyrgyzstan),
-				'few' => q(Som Kyrgyzstan),
-				'many' => q(Som Kyrgyzstan),
-				'one' => q(Som Kyrgyzstan),
-				'other' => q(Som Kyrgyzstan),
-				'two' => q(Som Kyrgyzstan),
-				'zero' => q(Som Kyrgyzstan),
+				'few' => q(som Kyrgyzstan),
+				'many' => q(som Kyrgyzstan),
+				'one' => q(som Kyrgyzstan),
+				'other' => q(som Kyrgyzstan),
+				'two' => q(som Kyrgyzstan),
+				'zero' => q(som Kyrgyzstan),
 			},
 		},
 		'KHR' => {
 			symbol => 'KHR',
 			display_name => {
 				'currency' => q(Riel Cambodia),
-				'few' => q(Riel Cambodia),
-				'many' => q(Riel Cambodia),
-				'one' => q(Riel Cambodia),
-				'other' => q(Riel Cambodia),
-				'two' => q(Riel Cambodia),
-				'zero' => q(Riel Cambodia),
+				'few' => q(riel Cambodia),
+				'many' => q(riel Cambodia),
+				'one' => q(riel Cambodia),
+				'other' => q(riel Cambodia),
+				'two' => q(riel Cambodia),
+				'zero' => q(riel Cambodia),
 			},
 		},
 		'KMF' => {
@@ -6853,24 +7190,24 @@ has 'currencies' => (
 			symbol => 'KZT',
 			display_name => {
 				'currency' => q(Tenge Kazakstan),
-				'few' => q(Tenge Kazakstan),
-				'many' => q(Tenge Kazakstan),
-				'one' => q(Tenge Kazakstan),
-				'other' => q(Tenge Kazakstan),
-				'two' => q(Tenge Kazakstan),
-				'zero' => q(Tenge Kazakstan),
+				'few' => q(tenge Kazakstan),
+				'many' => q(tenge Kazakstan),
+				'one' => q(tenge Kazakstan),
+				'other' => q(tenge Kazakstan),
+				'two' => q(tenge Kazakstan),
+				'zero' => q(tenge Kazakstan),
 			},
 		},
 		'LAK' => {
 			symbol => 'LAK',
 			display_name => {
 				'currency' => q(Kip Laos),
-				'few' => q(Kip Laos),
-				'many' => q(Kip Laos),
-				'one' => q(Kip Laos),
-				'other' => q(Kip Laos),
-				'two' => q(Kip Laos),
-				'zero' => q(Kip Laos),
+				'few' => q(kip Laos),
+				'many' => q(kip Laos),
+				'one' => q(kip Laos),
+				'other' => q(kip Laos),
+				'two' => q(kip Laos),
+				'zero' => q(kip Laos),
 			},
 		},
 		'LBP' => {
@@ -6879,7 +7216,7 @@ has 'currencies' => (
 				'currency' => q(Punt Libanus),
 				'few' => q(punt Libanus),
 				'many' => q(phunt Libanus),
-				'one' => q(bunt Libanus),
+				'one' => q(punt Libanus),
 				'other' => q(punt Libanus),
 				'two' => q(bunt Libanus),
 				'zero' => q(punt Libanus),
@@ -6889,12 +7226,12 @@ has 'currencies' => (
 			symbol => 'LKR',
 			display_name => {
 				'currency' => q(Rwpî Sri Lanka),
-				'few' => q(Rwpî Sri Lanka),
-				'many' => q(Rwpî Sri Lanka),
-				'one' => q(Rwpî Sri Lanka),
-				'other' => q(Rwpî Sri Lanka),
-				'two' => q(Rwpî Sri Lanka),
-				'zero' => q(Rwpî Sri Lanka),
+				'few' => q(rwpî Sri Lanka),
+				'many' => q(rwpî Sri Lanka),
+				'one' => q(rwpî Sri Lanka),
+				'other' => q(rwpî Sri Lanka),
+				'two' => q(rwpî Sri Lanka),
+				'zero' => q(rwpî Sri Lanka),
 			},
 		},
 		'LRD' => {
@@ -6925,12 +7262,12 @@ has 'currencies' => (
 			symbol => 'LTL',
 			display_name => {
 				'currency' => q(Litas Lithwania),
-				'few' => q(Litas Lithwania),
-				'many' => q(Litas Lithwania),
-				'one' => q(Litas Lithwania),
-				'other' => q(Litas Lithwania),
-				'two' => q(Litas Lithwania),
-				'zero' => q(Litas Lithwania),
+				'few' => q(litas Lithwania),
+				'many' => q(litas Lithwania),
+				'one' => q(litas Lithwania),
+				'other' => q(litas Lithwania),
+				'two' => q(litas Lithwania),
+				'zero' => q(litas Lithwania),
 			},
 		},
 		'LTT' => {
@@ -6950,6 +7287,15 @@ has 'currencies' => (
 		},
 		'LUF' => {
 			symbol => 'LUF',
+			display_name => {
+				'currency' => q(Ffranc Lwcsembwrg),
+				'few' => q(ffranc Lwcsembwrg),
+				'many' => q(ffranc Lwcsembwrg),
+				'one' => q(ffranc Lwcsembwrg),
+				'other' => q(ffranc Lwcsembwrg),
+				'two' => q(ffranc Lwcsembwrg),
+				'zero' => q(ffranc Lwcsembwrg),
+			},
 		},
 		'LUL' => {
 			symbol => 'LUL',
@@ -6958,16 +7304,25 @@ has 'currencies' => (
 			symbol => 'LVL',
 			display_name => {
 				'currency' => q(Lats Latfia),
-				'few' => q(Lats Latfia),
-				'many' => q(Lats Latfia),
-				'one' => q(Lats Latfia),
-				'other' => q(Lats Latfia),
-				'two' => q(Lats Latfia),
-				'zero' => q(Lats Latfia),
+				'few' => q(lats Latfia),
+				'many' => q(lats Latfia),
+				'one' => q(lats Latfia),
+				'other' => q(lats Latfia),
+				'two' => q(lats Latfia),
+				'zero' => q(lats Latfia),
 			},
 		},
 		'LVR' => {
 			symbol => 'LVR',
+			display_name => {
+				'currency' => q(Rwbl Latfia),
+				'few' => q(rwbl Latfia),
+				'many' => q(rwbl Latfia),
+				'one' => q(rwbl Latfia),
+				'other' => q(rwbl Latfia),
+				'two' => q(rwbl Latfia),
+				'zero' => q(rwbl Latfia),
+			},
 		},
 		'LYD' => {
 			symbol => 'LYD',
@@ -7084,12 +7439,12 @@ has 'currencies' => (
 			symbol => 'MMK',
 			display_name => {
 				'currency' => q(Kyat Myanmar),
-				'few' => q(Kyat Myanmar),
-				'many' => q(Kyat Myanmar),
-				'one' => q(Kyat Myanmar),
-				'other' => q(Kyat Myanmar),
-				'two' => q(Kyat Myanmar),
-				'zero' => q(Kyat Myanmar),
+				'few' => q(kyat Myanmar),
+				'many' => q(kyat Myanmar),
+				'one' => q(kyat Myanmar),
+				'other' => q(kyat Myanmar),
+				'two' => q(kyat Myanmar),
+				'zero' => q(kyat Myanmar),
 			},
 		},
 		'MNT' => {
@@ -7161,12 +7516,12 @@ has 'currencies' => (
 			symbol => 'MVR',
 			display_name => {
 				'currency' => q(Rufiyaa’r Maldives),
-				'few' => q(Rufiyaa’r Maldives),
-				'many' => q(Rufiyaa’r Maldives),
-				'one' => q(Rufiyaa’r Maldives),
-				'other' => q(Rufiyaa’r Maldives),
-				'two' => q(Rufiyaa’r Maldives),
-				'zero' => q(Rufiyaa’r Maldives),
+				'few' => q(rufiyaa’r Maldives),
+				'many' => q(rufiyaa’r Maldives),
+				'one' => q(rufiyaa’r Maldives),
+				'other' => q(rufiyaa’r Maldives),
+				'two' => q(rufiyaa’r Maldives),
+				'zero' => q(rufiyaa’r Maldives),
 			},
 		},
 		'MWK' => {
@@ -7221,12 +7576,12 @@ has 'currencies' => (
 			symbol => 'MYR',
 			display_name => {
 				'currency' => q(Ringgit Malaysia),
-				'few' => q(Ringgit Malaysia),
-				'many' => q(Ringgit Malaysia),
-				'one' => q(Ringgit Malaysia),
-				'other' => q(Ringgit Malaysia),
-				'two' => q(Ringgit Malaysia),
-				'zero' => q(Ringgit Malaysia),
+				'few' => q(ringgit Malaysia),
+				'many' => q(ringgit Malaysia),
+				'one' => q(ringgit Malaysia),
+				'other' => q(ringgit Malaysia),
+				'two' => q(ringgit Malaysia),
+				'zero' => q(ringgit Malaysia),
 			},
 		},
 		'MZE' => {
@@ -7305,12 +7660,12 @@ has 'currencies' => (
 			symbol => 'NIO',
 			display_name => {
 				'currency' => q(Cordoba Nicaragwa),
-				'few' => q(Cordoba Nicaragwa),
-				'many' => q(Cordoba Nicaragwa),
-				'one' => q(Cordoba Nicaragwa),
-				'other' => q(Cordoba Nicaragwa),
-				'two' => q(Cordoba Nicaragwa),
-				'zero' => q(Cordoba Nicaragwa),
+				'few' => q(cordoba Nicaragwa),
+				'many' => q(cordoba Nicaragwa),
+				'one' => q(cordoba Nicaragwa),
+				'other' => q(cordoba Nicaragwa),
+				'two' => q(cordoba Nicaragwa),
+				'zero' => q(cordoba Nicaragwa),
 			},
 		},
 		'NLG' => {
@@ -7341,24 +7696,24 @@ has 'currencies' => (
 			symbol => 'NPR',
 			display_name => {
 				'currency' => q(Rwpî Nepal),
-				'few' => q(Rwpî Nepal),
-				'many' => q(Rwpî Nepal),
-				'one' => q(Rwpî Nepal),
-				'other' => q(Rwpî Nepal),
-				'two' => q(Rwpî Nepal),
-				'zero' => q(Rwpî Nepal),
+				'few' => q(rwpî Nepal),
+				'many' => q(rwpî Nepal),
+				'one' => q(rwpî Nepal),
+				'other' => q(rwpî Nepal),
+				'two' => q(rwpî Nepal),
+				'zero' => q(rwpî Nepal),
 			},
 		},
 		'NZD' => {
 			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(Doler Seland Newydd),
-				'few' => q(Doler Seland Newydd),
-				'many' => q(Doler Seland Newydd),
-				'one' => q(Doler Seland Newydd),
-				'other' => q(Doler Seland Newydd),
-				'two' => q(Doler Seland Newydd),
-				'zero' => q(Doler Seland Newydd),
+				'few' => q(doler Seland Newydd),
+				'many' => q(doler Seland Newydd),
+				'one' => q(ddoler Seland Newydd),
+				'other' => q(doler Seland Newydd),
+				'two' => q(ddoler Seland Newydd),
+				'zero' => q(doler Seland Newydd),
 			},
 		},
 		'OMR' => {
@@ -7400,13 +7755,13 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(Nuevo Sol Periw),
-				'few' => q(nuevo sol Periw),
-				'many' => q(nuevo sol Periw),
-				'one' => q(nuevo sol Periw),
-				'other' => q(nuevo sol Periw),
-				'two' => q(nuevo sol Periw),
-				'zero' => q(nuevo sol Periw),
+				'currency' => q(Sol Periw),
+				'few' => q(sol Periw),
+				'many' => q(sol Periw),
+				'one' => q(sol Periw),
+				'other' => q(sol Periw),
+				'two' => q(sol Periw),
+				'zero' => q(sol Periw),
 			},
 		},
 		'PES' => {
@@ -7425,36 +7780,36 @@ has 'currencies' => (
 			symbol => 'PGK',
 			display_name => {
 				'currency' => q(Kina Papua Guinea Newydd),
-				'few' => q(Kina Papua Guinea Newydd),
-				'many' => q(Kina Papua Guinea Newydd),
-				'one' => q(Kina Papua Guinea Newydd),
-				'other' => q(Kina Papua Guinea Newydd),
-				'two' => q(Kina Papua Guinea Newydd),
-				'zero' => q(Kina Papua Guinea Newydd),
+				'few' => q(kina Papua Guinea Newydd),
+				'many' => q(kina Papua Guinea Newydd),
+				'one' => q(kina Papua Guinea Newydd),
+				'other' => q(kina Papua Guinea Newydd),
+				'two' => q(kina Papua Guinea Newydd),
+				'zero' => q(kina Papua Guinea Newydd),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(Peso’r Philipinau),
-				'few' => q(Peso Pilipinas),
-				'many' => q(Peso Pilipinas),
-				'one' => q(Peso Pilipinas),
-				'other' => q(Peso Pilipinas),
-				'two' => q(Peso Pilipinas),
-				'zero' => q(Peso Pilipinas),
+				'few' => q(peso Philipinas),
+				'many' => q(peso Philipinas),
+				'one' => q(peso Philipinas),
+				'other' => q(peso Philipinas),
+				'two' => q(peso Philipinas),
+				'zero' => q(peso Philipinas),
 			},
 		},
 		'PKR' => {
 			symbol => 'PKR',
 			display_name => {
 				'currency' => q(Rwpî Pacistan),
-				'few' => q(Rwpî Pacistan),
-				'many' => q(Rwpî Pacistan),
-				'one' => q(Rwpî Pacistan),
-				'other' => q(Rwpî Pacistan),
-				'two' => q(Rwpî Pacistan),
-				'zero' => q(Rwpî Pacistan),
+				'few' => q(rwpî Pacistan),
+				'many' => q(rwpî Pacistan),
+				'one' => q(rwpî Pacistan),
+				'other' => q(rwpî Pacistan),
+				'two' => q(rwpî Pacistan),
+				'zero' => q(rwpî Pacistan),
 			},
 		},
 		'PLN' => {
@@ -7562,7 +7917,7 @@ has 'currencies' => (
 				'currency' => q(Riyal Saudi Arabia),
 				'few' => q(riyal Saudi Arabia),
 				'many' => q(riyal Saudi Arabia),
-				'one' => q(Riyal Saudi Arabia),
+				'one' => q(riyal Saudi Arabia),
 				'other' => q(riyal Saudi Arabia),
 				'two' => q(riyal Saudi Arabia),
 				'zero' => q(riyal Saudi Arabia),
@@ -7572,12 +7927,12 @@ has 'currencies' => (
 			symbol => 'SBD',
 			display_name => {
 				'currency' => q(Doler Ynysoedd Solomon),
-				'few' => q(Doler Ynysoedd Solomon),
-				'many' => q(Doler Ynysoedd Solomon),
-				'one' => q(Doler Ynysoedd Solomon),
-				'other' => q(Doler Ynysoedd Solomon),
-				'two' => q(Doler Ynysoedd Solomon),
-				'zero' => q(Doler Ynysoedd Solomon),
+				'few' => q(doler Ynysoedd Solomon),
+				'many' => q(doler Ynysoedd Solomon),
+				'one' => q(ddoler Ynysoedd Solomon),
+				'other' => q(doler Ynysoedd Solomon),
+				'two' => q(ddoler Ynysoedd Solomon),
+				'zero' => q(doler Ynysoedd Solomon),
 			},
 		},
 		'SCR' => {
@@ -7644,18 +7999,18 @@ has 'currencies' => (
 			symbol => 'SGD',
 			display_name => {
 				'currency' => q(Doler Singapore),
-				'few' => q(Doler Singapore),
-				'many' => q(Doler Singapore),
-				'one' => q(Doler Singapore),
-				'other' => q(Doler Singapore),
-				'two' => q(Doler Singapore),
-				'zero' => q(Doler Singapore),
+				'few' => q(doler Singapore),
+				'many' => q(doler Singapore),
+				'one' => q(ddoler Singapore),
+				'other' => q(doler Singapore),
+				'two' => q(ddoler Singapore),
+				'zero' => q(doler Singapore),
 			},
 		},
 		'SHP' => {
 			symbol => 'SHP',
 			display_name => {
-				'currency' => q(Punt Saint Helena),
+				'currency' => q(Punt St Helena),
 				'few' => q(punt St. Helena),
 				'many' => q(phunt St. Helena),
 				'one' => q(bunt St. Helena),
@@ -7721,7 +8076,7 @@ has 'currencies' => (
 				'currency' => q(Punt De Sudan),
 				'few' => q(punt De Sudan),
 				'many' => q(phunt De Sudan),
-				'one' => q(bunt De Sudan),
+				'one' => q(punt De Sudan),
 				'other' => q(punt De Sudan),
 				'two' => q(bunt De Sudan),
 				'zero' => q(punt De Sudan),
@@ -7731,12 +8086,12 @@ has 'currencies' => (
 			symbol => 'STD',
 			display_name => {
 				'currency' => q(Dobra São Tomé a Príncipe),
-				'few' => q(Dobra São Tomé a Príncipe),
-				'many' => q(Dobra São Tomé a Príncipe),
-				'one' => q(Dobra São Tomé a Príncipe),
-				'other' => q(Dobra São Tomé a Príncipe),
-				'two' => q(Dobra São Tomé a Príncipe),
-				'zero' => q(Dobra São Tomé a Príncipe),
+				'few' => q(dobra São Tomé a Príncipe),
+				'many' => q(dobra São Tomé a Príncipe),
+				'one' => q(dobra São Tomé a Príncipe),
+				'other' => q(dobra São Tomé a Príncipe),
+				'two' => q(dobra São Tomé a Príncipe),
+				'zero' => q(dobra São Tomé a Príncipe),
 			},
 		},
 		'SVC' => {
@@ -7755,12 +8110,12 @@ has 'currencies' => (
 			symbol => 'SYP',
 			display_name => {
 				'currency' => q(Punt Syria),
-				'few' => q(Punt Syria),
-				'many' => q(Punt Syria),
-				'one' => q(Punt Syria),
-				'other' => q(Punt Syria),
-				'two' => q(Punt Syria),
-				'zero' => q(Punt Syria),
+				'few' => q(punt Syria),
+				'many' => q(punt Syria),
+				'one' => q(punt Syria),
+				'other' => q(punt Syria),
+				'two' => q(bunt Syria),
+				'zero' => q(punt Syria),
 			},
 		},
 		'SZL' => {
@@ -7779,12 +8134,12 @@ has 'currencies' => (
 			symbol => '฿',
 			display_name => {
 				'currency' => q(Baht Gwlad Thai),
-				'few' => q(Baht Gwlad Thai),
-				'many' => q(Baht Gwlad Thai),
-				'one' => q(Baht Gwlad Thai),
-				'other' => q(Baht Gwlad Thai),
-				'two' => q(Baht Gwlad Thai),
-				'zero' => q(Baht Gwlad Thai),
+				'few' => q(baht Gwlad Thai),
+				'many' => q(baht Gwlad Thai),
+				'one' => q(baht Gwlad Thai),
+				'other' => q(baht Gwlad Thai),
+				'two' => q(baht Gwlad Thai),
+				'zero' => q(baht Gwlad Thai),
 			},
 		},
 		'TJR' => {
@@ -7803,12 +8158,12 @@ has 'currencies' => (
 			symbol => 'TJS',
 			display_name => {
 				'currency' => q(Somoni Tajikistan),
-				'few' => q(Somoni Tajikistan),
-				'many' => q(Somoni Tajikistan),
-				'one' => q(Somoni Tajikistan),
-				'other' => q(Somoni Tajikistan),
-				'two' => q(Somoni Tajikistan),
-				'zero' => q(Somoni Tajikistan),
+				'few' => q(somoni Tajikstan),
+				'many' => q(somoni Tajikstan),
+				'one' => q(somoni Tajikstan),
+				'other' => q(somoni Tajikstan),
+				'two' => q(somoni Tajikstan),
+				'zero' => q(somoni Tajikstan),
 			},
 		},
 		'TMM' => {
@@ -7827,12 +8182,12 @@ has 'currencies' => (
 			symbol => 'TMT',
 			display_name => {
 				'currency' => q(Manat Turkmenistan),
-				'few' => q(Manat Turkmenistan),
-				'many' => q(Manat Turkmenistan),
-				'one' => q(Manat Turkmenistan),
-				'other' => q(Manat Turkmenistan),
-				'two' => q(Manat Turkmenistan),
-				'zero' => q(Manat Turkmenistan),
+				'few' => q(manat Turkmenistan),
+				'many' => q(manat Turkmenistan),
+				'one' => q(manat Turkmenistan),
+				'other' => q(manat Turkmenistan),
+				'two' => q(manat Turkmenistan),
+				'zero' => q(manat Turkmenistan),
 			},
 		},
 		'TND' => {
@@ -7851,12 +8206,12 @@ has 'currencies' => (
 			symbol => 'TOP',
 			display_name => {
 				'currency' => q(Paʻanga Tonga),
-				'few' => q(Paʻanga Tonga),
-				'many' => q(Paʻanga Tonga),
-				'one' => q(Paʻanga Tonga),
-				'other' => q(Paʻanga Tonga),
-				'two' => q(Paʻanga Tonga),
-				'zero' => q(Paʻanga Tonga),
+				'few' => q(paʻanga Tonga),
+				'many' => q(paʻanga Tonga),
+				'one' => q(paʻanga Tonga),
+				'other' => q(paʻanga Tonga),
+				'two' => q(paʻanga Tonga),
+				'zero' => q(paʻanga Tonga),
 			},
 		},
 		'TPE' => {
@@ -7887,12 +8242,12 @@ has 'currencies' => (
 			symbol => 'TRY',
 			display_name => {
 				'currency' => q(Lira Twrci),
-				'few' => q(Lira Twrci),
-				'many' => q(Lira Twrci),
-				'one' => q(Lira Twrci),
-				'other' => q(Lira Twrci),
-				'two' => q(Lira Twrci),
-				'zero' => q(Lira Twrci),
+				'few' => q(lira Twrci),
+				'many' => q(lira Twrci),
+				'one' => q(lira Twrci),
+				'other' => q(lira Twrci),
+				'two' => q(lira Twrci),
+				'zero' => q(lira Twrci),
 			},
 		},
 		'TTD' => {
@@ -7985,9 +8340,9 @@ has 'currencies' => (
 				'currency' => q(Doler UDA \(y diwrnod nesaf\)),
 				'few' => q(doler UDA \(y diwrnod nesaf\)),
 				'many' => q(doler UDA \(y diwrnod nesaf\)),
-				'one' => q(doler UDA \(y diwrnod nesaf\)),
+				'one' => q(ddoler UDA \(y diwrnod nesaf\)),
 				'other' => q(doler UDA \(y diwrnod nesaf\)),
-				'two' => q(doler UDA \(y diwrnod nesaf\)),
+				'two' => q(ddoler UDA \(y diwrnod nesaf\)),
 				'zero' => q(doler UDA \(y diwrnod nesaf\)),
 			},
 		},
@@ -7997,9 +8352,9 @@ has 'currencies' => (
 				'currency' => q(Doler UDA \(yr un diwrnod\)),
 				'few' => q(doler UDA \(yr un diwrnod\)),
 				'many' => q(doler UDA \(yr un diwrnod\)),
-				'one' => q(doler UDA \(yr un diwrnod\)),
+				'one' => q(ddoler UDA \(yr un diwrnod\)),
 				'other' => q(doler UDA \(yr un diwrnod\)),
-				'two' => q(doler UDA \(yr un diwrnod\)),
+				'two' => q(ddoler UDA \(yr un diwrnod\)),
 				'zero' => q(doler UDA \(yr un diwrnod\)),
 			},
 		},
@@ -8034,12 +8389,12 @@ has 'currencies' => (
 			symbol => 'UZS',
 			display_name => {
 				'currency' => q(Som Uzbekistan),
-				'few' => q(Som Uzbekistan),
-				'many' => q(Som Uzbekistan),
-				'one' => q(Som Uzbekistan),
-				'other' => q(Som Uzbekistan),
-				'two' => q(Som Uzbekistan),
-				'zero' => q(Som Uzbekistan),
+				'few' => q(som Uzbekistan),
+				'many' => q(som Uzbekistan),
+				'one' => q(som Uzbekistan),
+				'other' => q(som Uzbekistan),
+				'two' => q(som Uzbekistan),
+				'zero' => q(som Uzbekistan),
 			},
 		},
 		'VEB' => {
@@ -8058,24 +8413,24 @@ has 'currencies' => (
 			symbol => 'VEF',
 			display_name => {
 				'currency' => q(Bolívar Venezuela),
-				'few' => q(Bolívar Venezuela),
-				'many' => q(bolivar Venezuela),
-				'one' => q(Bolívar Venezuela),
-				'other' => q(bolivar Venezuela),
-				'two' => q(Bolívar Venezuela),
-				'zero' => q(Bolívar Venezuela),
+				'few' => q(bolívar Venezuela),
+				'many' => q(bolívar Venezuela),
+				'one' => q(bolívar Venezuela),
+				'other' => q(bolívar Venezuela),
+				'two' => q(bolívar Venezuela),
+				'zero' => q(bolívar Venezuela),
 			},
 		},
 		'VND' => {
 			symbol => '₫',
 			display_name => {
 				'currency' => q(Dong Fietnam),
-				'few' => q(Dong Fietnam),
-				'many' => q(Dong Fietnam),
-				'one' => q(Dong Fietnam),
-				'other' => q(Dong Fietnam),
-				'two' => q(Dong Fietnam),
-				'zero' => q(Dong Fietnam),
+				'few' => q(dong Fietnam),
+				'many' => q(dong Fietnam),
+				'one' => q(dong Fietnam),
+				'other' => q(dong Fietnam),
+				'two' => q(dong Fietnam),
+				'zero' => q(dong Fietnam),
 			},
 		},
 		'VNN' => {
@@ -8094,24 +8449,24 @@ has 'currencies' => (
 			symbol => 'VUV',
 			display_name => {
 				'currency' => q(Vatu Vanuatu),
-				'few' => q(Vatu Vanuatu),
-				'many' => q(Vatu Vanuatu),
-				'one' => q(Vatu Vanuatu),
-				'other' => q(Vatu Vanuatu),
-				'two' => q(Vatu Vanuatu),
-				'zero' => q(Vatu Vanuatu),
+				'few' => q(vatu Vanuatu),
+				'many' => q(vatu Vanuatu),
+				'one' => q(vatu Vanuatu),
+				'other' => q(vatu Vanuatu),
+				'two' => q(vatu Vanuatu),
+				'zero' => q(vatu Vanuatu),
 			},
 		},
 		'WST' => {
 			symbol => 'WST',
 			display_name => {
 				'currency' => q(Tala Samoa),
-				'few' => q(Tala Samoa),
-				'many' => q(Tala Samoa),
-				'one' => q(Tala Samoa),
-				'other' => q(Tala Samoa),
-				'two' => q(Tala Samoa),
-				'zero' => q(Tala Samoa),
+				'few' => q(tala Samoa),
+				'many' => q(tala Samoa),
+				'one' => q(tala Samoa),
+				'other' => q(tala Samoa),
+				'two' => q(tala Samoa),
+				'zero' => q(tala Samoa),
 			},
 		},
 		'XAF' => {
@@ -8124,6 +8479,38 @@ has 'currencies' => (
 				'other' => q(ffranc CFA Canol Affrica),
 				'two' => q(ffranc CFA Canol Affrica),
 				'zero' => q(ffranc CFA Canol Affrica),
+			},
+		},
+		'XAG' => {
+			display_name => {
+				'currency' => q(Arian),
+			},
+		},
+		'XAU' => {
+			display_name => {
+				'currency' => q(Aur),
+			},
+		},
+		'XBA' => {
+			display_name => {
+				'currency' => q(Uned Cyfansawdd Ewropeaidd),
+				'few' => q(uned cyfansawdd Ewropeaidd),
+				'many' => q(uned cyfansawdd Ewropeaidd),
+				'one' => q(uned cyfansawdd Ewropeaidd),
+				'other' => q(uned cyfansawdd Ewropeaidd),
+				'two' => q(uned cyfansawdd Ewropeaidd),
+				'zero' => q(uned cyfansawdd Ewropeaidd),
+			},
+		},
+		'XBB' => {
+			display_name => {
+				'currency' => q(Uned Ariannol Ewropeaidd),
+				'few' => q(uned ariannol Ewropeaidd),
+				'many' => q(uned ariannol Ewropeaidd),
+				'one' => q(uned ariannol Ewropeaidd),
+				'other' => q(uned ariannol Ewropeaidd),
+				'two' => q(uned ariannol Ewropeaidd),
+				'zero' => q(uned ariannol Ewropeaidd),
 			},
 		},
 		'XCD' => {
@@ -8140,6 +8527,15 @@ has 'currencies' => (
 		},
 		'XEU' => {
 			symbol => 'XEU',
+			display_name => {
+				'currency' => q(Uned Arian Cyfred Ewropeaidd),
+				'few' => q(uned arian cyfred Ewropeaidd),
+				'many' => q(uned arian cyfred Ewropeaidd),
+				'one' => q(uned arian cyfred Ewropeaidd),
+				'other' => q(uned arian cyfred Ewropeaidd),
+				'two' => q(uned arian cyfred Ewropeaidd),
+				'zero' => q(uned arian cyfred Ewropeaidd),
+			},
 		},
 		'XOF' => {
 			symbol => 'CFA',
@@ -8153,16 +8549,37 @@ has 'currencies' => (
 				'zero' => q(ffranc CFA Gorllewin Affrica),
 			},
 		},
+		'XPD' => {
+			display_name => {
+				'currency' => q(Paladiwm),
+			},
+		},
 		'XPF' => {
 			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(Ffranc CFP),
-				'few' => q(Ffranc CPF),
-				'many' => q(Ffranc CPF),
-				'one' => q(Ffranc CPF),
-				'other' => q(Ffranc CPF),
-				'two' => q(Ffranc CPF),
-				'zero' => q(Ffranc CPF),
+				'few' => q(ffranc CPF),
+				'many' => q(ffranc CPF),
+				'one' => q(ffranc CPF),
+				'other' => q(ffranc CPF),
+				'two' => q(ffranc CPF),
+				'zero' => q(ffranc CPF),
+			},
+		},
+		'XPT' => {
+			display_name => {
+				'currency' => q(Platinwm),
+			},
+		},
+		'XSU' => {
+			display_name => {
+				'currency' => q(Sucre),
+				'few' => q(sucre),
+				'many' => q(sucre),
+				'one' => q(sucre),
+				'other' => q(sucre),
+				'two' => q(sucre),
+				'zero' => q(sucre),
 			},
 		},
 		'XXX' => {
@@ -8193,12 +8610,12 @@ has 'currencies' => (
 			symbol => 'YER',
 			display_name => {
 				'currency' => q(Rial Yemen),
-				'few' => q(Rial Yemen),
-				'many' => q(Rial Yemen),
-				'one' => q(Rial Yemen),
-				'other' => q(Rial Yemen),
-				'two' => q(Rial Yemen),
-				'zero' => q(Rial Yemen),
+				'few' => q(rial Yemen),
+				'many' => q(rial Yemen),
+				'one' => q(rial Yemen),
+				'other' => q(rial Yemen),
+				'two' => q(rial Yemen),
+				'zero' => q(rial Yemen),
 			},
 		},
 		'YUD' => {
@@ -8265,24 +8682,24 @@ has 'currencies' => (
 			symbol => 'ZRN',
 			display_name => {
 				'currency' => q(Zaire Newydd Zaire \(1993–1998\)),
-				'few' => q(Zaire Newydd Zaire \(1993–1998\)),
-				'many' => q(Zaire Newydd Zaire \(1993–1998\)),
-				'one' => q(Zaire Newydd Zaire \(1993–1998\)),
-				'other' => q(Zaire Newydd Zaire \(1993–1998\)),
-				'two' => q(Zaire Newydd Zaire \(1993–1998\)),
-				'zero' => q(Zaire Newydd Zaire \(1993–1998\)),
+				'few' => q(zaire newydd Zaire \(1993 – 1998\)),
+				'many' => q(zaire newydd Zaire \(1993 – 1998\)),
+				'one' => q(zaire newydd Zaire \(1993 – 1998\)),
+				'other' => q(zaire newydd Zaire \(1993 – 1998\)),
+				'two' => q(zaire newydd Zaire \(1993 – 1998\)),
+				'zero' => q(zaire newydd Zaire \(1993 – 1998\)),
 			},
 		},
 		'ZRZ' => {
 			symbol => 'ZRZ',
 			display_name => {
 				'currency' => q(Zaire Zaire \(1971–1993\)),
-				'few' => q(Zaire Zaire \(1971–1993\)),
-				'many' => q(Zaire Zaire \(1971–1993\)),
-				'one' => q(Zaire Zaire \(1971–1993\)),
-				'other' => q(Zaire Zaire \(1971–1993\)),
-				'two' => q(Zaire Zaire \(1971–1993\)),
-				'zero' => q(Zaire Zaire \(1971–1993\)),
+				'few' => q(zaire Zaire \(1971 – 1993\)),
+				'many' => q(zaire Zaire \(1971 – 1993\)),
+				'one' => q(zaire Zaire \(1971 – 1993\)),
+				'other' => q(zaire Zaire \(1971 – 1993\)),
+				'two' => q(zaire Zaire \(1971 – 1993\)),
+				'zero' => q(zaire Zaire \(1971 – 1993\)),
 			},
 		},
 		'ZWD' => {
@@ -8583,6 +9000,67 @@ has 'calendar_quarters' => (
 	} },
 );
 
+has 'day_period_data' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub { sub {
+		# Time in hhmm format
+		my ($self, $type, $time, $day_period_type) = @_;
+		$day_period_type //= 'default';
+		SWITCH:
+		for ($type) {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+		}
+	} },
+);
+
+around day_period_data => sub {
+	my ($orig, $self) = @_;
+	return $self->$orig;
+};
+
 has 'day_periods' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -8590,17 +9068,41 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{yh},
+					'am' => q{yb},
+				},
 				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
+					'pm' => q{h},
+					'am' => q{b},
 				},
 				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
+					'morning1' => q{y bore},
+					'afternoon1' => q{y prynhawn},
+					'noon' => q{canol dydd},
+					'am' => q{yb},
+					'evening1' => q{yr hwyr},
+					'pm' => q{yh},
+					'midnight' => q{canol nos},
+				},
+			},
+			'stand-alone' => {
+				'wide' => {
+					'morning1' => q{y bore},
+					'afternoon1' => q{y prynhawn},
+					'noon' => q{canol dydd},
+					'am' => q{yb},
+					'evening1' => q{yr hwyr},
+					'pm' => q{yh},
+					'midnight' => q{canol nos},
+				},
+				'narrow' => {
+					'pm' => q{yh},
+					'am' => q{yb},
 				},
 				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
+					'pm' => q{yh},
+					'am' => q{yb},
 				},
 			},
 		},
@@ -8673,8 +9175,8 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} am {0}},
-			'long' => q{{1} am {0}},
+			'full' => q{{1} 'am' {0}},
+			'long' => q{{1} 'am' {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -8693,8 +9195,17 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{E, d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM y G},
@@ -8714,23 +9225,28 @@ has 'datetime_formats_available_formats' => (
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			ms => q{mm:ss},
-			y => q{y},
+			y => q{y G},
 			yyyy => q{y G},
-			yyyyM => q{M/y G},
-			yyyyMEd => q{E, d/M/y G},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
 			yyyyMMM => q{MMM y G},
 			yyyyMMMEd => q{E, d MMM y G},
 			yyyyMMMM => q{G y MMMM},
 			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d/M/y G},
+			yyyyMd => q{GGGGG y-MM-dd},
 			yyyyQQQ => q{QQQ y G},
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
-			Ed => q{E, d},
+			Ed => q{d, E},
 			Ehm => q{E, h:mm a},
 			Ehms => q{E, h:mm:ss a},
 			Gy => q{y G},
@@ -8746,6 +9262,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, d/M},
 			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
+			MMMMW => q{'wythnos' W 'o' MMMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -8767,6 +9284,7 @@ has 'datetime_formats_available_formats' => (
 			yQ => q{Q y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{'wythnos' w 'o' Y},
 		},
 	} },
 );
@@ -8810,7 +9328,7 @@ has 'datetime_formats_interval' => (
 				d => q{E, d/M – E, d/M},
 			},
 			MMM => {
-				M => q{MMM–MMM},
+				M => q{MMM – MMM},
 			},
 			MMMEd => {
 				M => q{E, d MMM – E, d MMM},
@@ -8887,18 +9405,18 @@ has 'datetime_formats_interval' => (
 		},
 		'gregorian' => {
 			H => {
-				H => q{HH–HH},
+				H => q{HH – HH},
 			},
 			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
 			},
 			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
 			},
 			Hv => {
-				H => q{HH–HH v},
+				H => q{HH – HH v},
 			},
 			M => {
 				M => q{M–M},
@@ -8919,7 +9437,7 @@ has 'datetime_formats_interval' => (
 			},
 			MMMd => {
 				M => q{d MMM – d MMM},
-				d => q{d–d MMM},
+				d => q{d – d MMM},
 			},
 			Md => {
 				M => q{d/M – d/M},
@@ -8931,7 +9449,7 @@ has 'datetime_formats_interval' => (
 			fallback => '{0} – {1}',
 			h => {
 				a => q{h a – h a},
-				h => q{h–h a},
+				h => q{h – h a},
 			},
 			hm => {
 				a => q{h:mm a – h:mm a},
@@ -8941,11 +9459,11 @@ has 'datetime_formats_interval' => (
 			hmv => {
 				a => q{h:mm a – h:mm a v},
 				h => q{h:mm – h:mm a v},
-				m => q{h:mm–h:mm a v},
+				m => q{h:mm – h:mm a v},
 			},
 			hv => {
 				a => q{h a – h a v},
-				h => q{h–h a v},
+				h => q{h – h a v},
 			},
 			y => {
 				y => q{y–y},
@@ -8969,7 +9487,7 @@ has 'datetime_formats_interval' => (
 				y => q{E, d MMM y – E, d MMM y},
 			},
 			yMMMM => {
-				M => q{MMMM–MMMM y},
+				M => q{MMMM – MMMM y},
 				y => q{MMMM y – MMMM y},
 			},
 			yMMMd => {
@@ -9000,7 +9518,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Amser Afghanistan),
+				'standard' => q#Amser Afghanistan#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -9064,7 +9582,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Douala#,
 		},
 		'Africa/El_Aaiun' => {
-			exemplarCity => q#El Aaiún#,
+			exemplarCity => q#El Aaiun#,
 		},
 		'Africa/Freetown' => {
 			exemplarCity => q#Freetown#,
@@ -9100,7 +9618,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Libreville#,
 		},
 		'Africa/Lome' => {
-			exemplarCity => q#Lomé#,
+			exemplarCity => q#Lome#,
 		},
 		'Africa/Luanda' => {
 			exemplarCity => q#Luanda#,
@@ -9133,7 +9651,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Nairobi#,
 		},
 		'Africa/Ndjamena' => {
-			exemplarCity => q#N’Djamena#,
+			exemplarCity => q#Ndjamena#,
 		},
 		'Africa/Niamey' => {
 			exemplarCity => q#Niamey#,
@@ -9161,38 +9679,38 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Amser Canolbarth Affrica),
+				'standard' => q#Amser Canolbarth Affrica#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Amser Dwyrain Affrica),
+				'standard' => q#Amser Dwyrain Affrica#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Amser Safonol De Affrica),
+				'standard' => q#Amser Safonol De Affrica#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Amser Haf Gorllewin Affrica),
-				'generic' => q(Amser Gorllewin Affrica),
-				'standard' => q(Amser Safonol Gorllewin Affrica),
+				'daylight' => q#Amser Haf Gorllewin Affrica#,
+				'generic' => q#Amser Gorllewin Affrica#,
+				'standard' => q#Amser Safonol Gorllewin Affrica#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Amser Haf Alaska),
-				'generic' => q(Amser Alaska),
-				'standard' => q(Amser Safonol Alaska),
+				'daylight' => q#Amser Haf Alaska#,
+				'generic' => q#Amser Alaska#,
+				'standard' => q#Amser Safonol Alaska#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amser Haf Amazonas),
-				'generic' => q(Amser Amazonas),
-				'standard' => q(Amser Safonol Amazonas),
+				'daylight' => q#Amser Haf Amazonas#,
+				'generic' => q#Amser Amazonas#,
+				'standard' => q#Amser Safonol Amazonas#,
 			},
 		},
 		'America/Adak' => {
@@ -9268,7 +9786,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Buenos Aires#,
 		},
 		'America/Cambridge_Bay' => {
-			exemplarCity => q#Cambridge Bay#,
+			exemplarCity => q#Bae Cambridge#,
 		},
 		'America/Campo_Grande' => {
 			exemplarCity => q#Campo Grande#,
@@ -9338,6 +9856,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#El Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -9439,7 +9960,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Lower Prince’s Quarter#,
 		},
 		'America/Maceio' => {
-			exemplarCity => q#Maceió#,
+			exemplarCity => q#Maceio#,
 		},
 		'America/Managua' => {
 			exemplarCity => q#Managua#,
@@ -9457,7 +9978,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Matamoros#,
 		},
 		'America/Mazatlan' => {
-			exemplarCity => q#Mazatlán#,
+			exemplarCity => q#Mazatlan#,
 		},
 		'America/Mendoza' => {
 			exemplarCity => q#Mendoza#,
@@ -9517,7 +10038,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ojinaga#,
 		},
 		'America/Panama' => {
-			exemplarCity => q#Panamá#,
+			exemplarCity => q#Panama#,
 		},
 		'America/Pangnirtung' => {
 			exemplarCity => q#Pangnirtung#,
@@ -9539,6 +10060,9 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Rico#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
@@ -9571,7 +10095,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Santo Domingo#,
 		},
 		'America/Sao_Paulo' => {
-			exemplarCity => q#São Paulo#,
+			exemplarCity => q#Sao Paulo#,
 		},
 		'America/Scoresbysund' => {
 			exemplarCity => q#Ittoqqortoormiit#,
@@ -9586,16 +10110,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#St. John’s#,
 		},
 		'America/St_Kitts' => {
-			exemplarCity => q#Saint Kitts#,
+			exemplarCity => q#St. Kitts#,
 		},
 		'America/St_Lucia' => {
-			exemplarCity => q#Saint Lucia#,
+			exemplarCity => q#St. Lucia#,
 		},
 		'America/St_Thomas' => {
-			exemplarCity => q#Saint Thomas#,
+			exemplarCity => q#St. Thomas#,
 		},
 		'America/St_Vincent' => {
-			exemplarCity => q#Saint Vincent#,
+			exemplarCity => q#St. Vincent#,
 		},
 		'America/Swift_Current' => {
 			exemplarCity => q#Swift Current#,
@@ -9635,30 +10159,30 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Amser Haf Canolbarth Gogledd America),
-				'generic' => q(Amser Canolbarth Gogledd America),
-				'standard' => q(Amser Safonol Canolbarth Gogledd America),
+				'daylight' => q#Amser Haf Canolbarth Gogledd America#,
+				'generic' => q#Amser Canolbarth Gogledd America#,
+				'standard' => q#Amser Safonol Canolbarth Gogledd America#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Amser Haf Dwyrain Gogledd America),
-				'generic' => q(Amser Dwyrain Gogledd America),
-				'standard' => q(Amser Safonol Dwyrain Gogledd America),
+				'daylight' => q#Amser Haf Dwyrain Gogledd America#,
+				'generic' => q#Amser Dwyrain Gogledd America#,
+				'standard' => q#Amser Safonol Dwyrain Gogledd America#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Amser Haf Mynyddoedd Gogledd America),
-				'generic' => q(Amser Mynyddoedd Gogledd America),
-				'standard' => q(Amser Safonol Mynyddoedd Gogledd America),
+				'daylight' => q#Amser Haf Mynyddoedd Gogledd America#,
+				'generic' => q#Amser Mynyddoedd Gogledd America#,
+				'standard' => q#Amser Safonol Mynyddoedd Gogledd America#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Amser Haf Cefnfor Tawel Gogledd America),
-				'generic' => q(Amser Cefnfor Tawel Gogledd America),
-				'standard' => q(Amser Safonol Cefnfor Tawel Gogledd America),
+				'daylight' => q#Amser Haf Cefnfor Tawel Gogledd America#,
+				'generic' => q#Amser Cefnfor Tawel Gogledd America#,
+				'standard' => q#Amser Safonol Cefnfor Tawel Gogledd America#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -9696,16 +10220,16 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Amser Haf Apia),
-				'generic' => q(Amser Apia),
-				'standard' => q(Amser Safonol Apia),
+				'daylight' => q#Amser Haf Apia#,
+				'generic' => q#Amser Apia#,
+				'standard' => q#Amser Safonol Apia#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Amser Haf Arabaidd),
-				'generic' => q(Amser Arabaidd),
-				'standard' => q(Amser Safonol Arabaidd),
+				'daylight' => q#Amser Haf Arabaidd#,
+				'generic' => q#Amser Arabaidd#,
+				'standard' => q#Amser Safonol Arabaidd#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -9713,23 +10237,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Amser Haf Ariannin),
-				'generic' => q(Amser yr Ariannin),
-				'standard' => q(Amser Safonol Ariannin),
+				'daylight' => q#Amser Haf Ariannin#,
+				'generic' => q#Amser yr Ariannin#,
+				'standard' => q#Amser Safonol Ariannin#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Amser Haf Gorllewin Ariannin),
-				'generic' => q(Amser Gorllewin Ariannin),
-				'standard' => q(Amser Safonol Gorllewin Ariannin),
+				'daylight' => q#Amser Haf Gorllewin Ariannin#,
+				'generic' => q#Amser Gorllewin Ariannin#,
+				'standard' => q#Amser Safonol Gorllewin Ariannin#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Amser Haf Armenia),
-				'generic' => q(Amser Armenia),
-				'standard' => q(Amser Safonol Armenia),
+				'daylight' => q#Amser Haf Armenia#,
+				'generic' => q#Amser Armenia#,
+				'standard' => q#Amser Safonol Armenia#,
 			},
 		},
 		'Asia/Aden' => {
@@ -9753,6 +10277,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ashgabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Baghdad#,
 		},
@@ -9764,6 +10291,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Beirut#,
@@ -9800,6 +10330,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dushanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gasa#,
@@ -9942,6 +10475,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokyo#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulan Bator#,
 		},
@@ -9968,9 +10504,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Amser Haf Cefnfor yr Iwerydd),
-				'generic' => q(Amser Cefnfor yr Iwerydd),
-				'standard' => q(Amser Safonol Cefnfor yr Iwerydd),
+				'daylight' => q#Amser Haf Cefnfor yr Iwerydd#,
+				'generic' => q#Amser Cefnfor yr Iwerydd#,
+				'standard' => q#Amser Safonol Cefnfor yr Iwerydd#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -9980,7 +10516,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Bermuda#,
 		},
 		'Atlantic/Canary' => {
-			exemplarCity => q#yr Ynysoedd Dedwydd#,
+			exemplarCity => q#Yr Ynysoedd Dedwydd#,
 		},
 		'Atlantic/Cape_Verde' => {
 			exemplarCity => q#Cabo Verde#,
@@ -9998,7 +10534,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#De Georgia#,
 		},
 		'Atlantic/St_Helena' => {
-			exemplarCity => q#Saint Helena#,
+			exemplarCity => q#St. Helena#,
 		},
 		'Atlantic/Stanley' => {
 			exemplarCity => q#Stanley#,
@@ -10041,171 +10577,176 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Amser Haf Canolbarth Awstralia),
-				'generic' => q(Amser Canolbarth Awstralia),
-				'standard' => q(Amser Safonol Canolbarth Awstralia),
+				'daylight' => q#Amser Haf Canolbarth Awstralia#,
+				'generic' => q#Amser Canolbarth Awstralia#,
+				'standard' => q#Amser Safonol Canolbarth Awstralia#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Amser Haf Canolbarth Gorllewin Awstralia),
-				'generic' => q(Amser Canolbarth Gorllewin Awstralia),
-				'standard' => q(Amser Safonol Canolbarth Gorllewin Awstralia),
+				'daylight' => q#Amser Haf Canolbarth Gorllewin Awstralia#,
+				'generic' => q#Amser Canolbarth Gorllewin Awstralia#,
+				'standard' => q#Amser Safonol Canolbarth Gorllewin Awstralia#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Amser Haf Dwyrain Awstralia),
-				'generic' => q(Amser Dwyrain Awstralia),
-				'standard' => q(Amser Safonol Dwyrain Awstralia),
+				'daylight' => q#Amser Haf Dwyrain Awstralia#,
+				'generic' => q#Amser Dwyrain Awstralia#,
+				'standard' => q#Amser Safonol Dwyrain Awstralia#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Amser Haf Gorllewin Awstralia),
-				'generic' => q(Amser Gorllewin Awstralia),
-				'standard' => q(Amser Safonol Gorllewin Awstralia),
+				'daylight' => q#Amser Haf Gorllewin Awstralia#,
+				'generic' => q#Amser Gorllewin Awstralia#,
+				'standard' => q#Amser Safonol Gorllewin Awstralia#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Amser Haf Aserbaijan),
-				'generic' => q(Amser Aserbaijan),
-				'standard' => q(Amser Safonol Aserbaijan),
+				'daylight' => q#Amser Haf Aserbaijan#,
+				'generic' => q#Amser Aserbaijan#,
+				'standard' => q#Amser Safonol Aserbaijan#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Amser Haf yr Azores),
-				'generic' => q(Amser yr Azores),
-				'standard' => q(Amser Safonol yr Azores),
+				'daylight' => q#Amser Haf yr Azores#,
+				'generic' => q#Amser yr Azores#,
+				'standard' => q#Amser Safonol yr Azores#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Amser Haf Bangladesh),
-				'generic' => q(Amser Bangladesh),
-				'standard' => q(Amser Safonol Bangladesh),
+				'daylight' => q#Amser Haf Bangladesh#,
+				'generic' => q#Amser Bangladesh#,
+				'standard' => q#Amser Safonol Bangladesh#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Amser Bhutan),
+				'standard' => q#Amser Bhutan#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Amser Bolivia),
+				'standard' => q#Amser Bolivia#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Amser Haf Brasília),
-				'generic' => q(Amser Brasília),
-				'standard' => q(Amser Safonol Brasília),
+				'daylight' => q#Amser Haf Brasília#,
+				'generic' => q#Amser Brasília#,
+				'standard' => q#Amser Safonol Brasília#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Amser Brunei Darussalam),
+				'standard' => q#Amser Brunei Darussalam#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Amser Haf Cabo Verde),
-				'generic' => q(Amser Cabo Verde),
-				'standard' => q(Amser Safonol Cabo Verde),
+				'daylight' => q#Amser Haf Cabo Verde#,
+				'generic' => q#Amser Cabo Verde#,
+				'standard' => q#Amser Safonol Cabo Verde#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Amser Chamorro),
+				'standard' => q#Amser Chamorro#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Amser Haf Chatham),
-				'generic' => q(Amser Chatham),
-				'standard' => q(Amser Safonol Chatham),
+				'daylight' => q#Amser Haf Chatham#,
+				'generic' => q#Amser Chatham#,
+				'standard' => q#Amser Safonol Chatham#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Amser Haf Chile),
-				'generic' => q(Amser Chile),
-				'standard' => q(Amser Safonol Chile),
+				'daylight' => q#Amser Haf Chile#,
+				'generic' => q#Amser Chile#,
+				'standard' => q#Amser Safonol Chile#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Amser Haf Tsieina),
-				'generic' => q(Amser Tsieina),
-				'standard' => q(Amser Safonol Tsieina),
+				'daylight' => q#Amser Haf Tsieina#,
+				'generic' => q#Amser Tsieina#,
+				'standard' => q#Amser Safonol Tsieina#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Amser Haf Choibalsan),
-				'generic' => q(Amser Choibalsan),
-				'standard' => q(Amser Safonol Choibalsan),
+				'daylight' => q#Amser Haf Choibalsan#,
+				'generic' => q#Amser Choibalsan#,
+				'standard' => q#Amser Safonol Choibalsan#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Amser Ynys Y Nadolig),
+				'standard' => q#Amser Ynys Y Nadolig#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Amser Ynysoedd Cocos),
+				'standard' => q#Amser Ynysoedd Cocos#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Amser Haf Colombia),
-				'generic' => q(Amser Colombia),
-				'standard' => q(Amser Safonol Colombia),
+				'daylight' => q#Amser Haf Colombia#,
+				'generic' => q#Amser Colombia#,
+				'standard' => q#Amser Safonol Colombia#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Amser Hanner Haf Ynysoedd Cook),
-				'generic' => q(Amser Ynysoedd Cook),
-				'standard' => q(Amser Safonol Ynysoedd Cook),
+				'daylight' => q#Amser Hanner Haf Ynysoedd Cook#,
+				'generic' => q#Amser Ynysoedd Cook#,
+				'standard' => q#Amser Safonol Ynysoedd Cook#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Amser Haf Cuba),
-				'generic' => q(Amser Cuba),
-				'standard' => q(Amser Safonol Cuba),
+				'daylight' => q#Amser Haf Cuba#,
+				'generic' => q#Amser Cuba#,
+				'standard' => q#Amser Safonol Cuba#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Amser Davis),
+				'standard' => q#Amser Davis#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Amser Dumont-d’Urville),
+				'standard' => q#Amser Dumont-d’Urville#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Amser Dwyrain Timor),
+				'standard' => q#Amser Dwyrain Timor#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Amser Haf Ynys y Pasg),
-				'generic' => q(Amser Ynys y Pasg),
-				'standard' => q(Amser Safonol Ynys y Pasg),
+				'daylight' => q#Amser Haf Ynys y Pasg#,
+				'generic' => q#Amser Ynys y Pasg#,
+				'standard' => q#Amser Safonol Ynys y Pasg#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Amser Ecuador),
+				'standard' => q#Amser Ecuador#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Amser Cyffredniol Cydlynol#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -10217,11 +10758,14 @@ has 'time_zone_names' => (
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
 		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrakhan#,
+		},
 		'Europe/Athens' => {
-			exemplarCity => q#Athen#,
+			exemplarCity => q#Athens#,
 		},
 		'Europe/Belgrade' => {
-			exemplarCity => q#Beograd#,
+			exemplarCity => q#Belgrade#,
 		},
 		'Europe/Berlin' => {
 			exemplarCity => q#Berlin#,
@@ -10250,7 +10794,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dulyn#,
 			long => {
-				'daylight' => q(Amser Haf Iwerddon),
+				'daylight' => q#Amser Safonol Iwerddon#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -10277,6 +10821,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisbon#,
 		},
@@ -10286,7 +10833,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Llundain#,
 			long => {
-				'daylight' => q(Amser Haf Prydain),
+				'daylight' => q#Amser Haf Prydain#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -10337,6 +10884,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -10355,6 +10905,9 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirane#,
 		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ulyanovsk#,
+		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Uzhhorod#,
 		},
@@ -10362,7 +10915,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Vaduz#,
 		},
 		'Europe/Vatican' => {
-			exemplarCity => q#y Fatican#,
+			exemplarCity => q#Y Fatican#,
 		},
 		'Europe/Vienna' => {
 			exemplarCity => q#Fienna#,
@@ -10387,147 +10940,147 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Amser Haf Canolbarth Ewrop),
-				'generic' => q(Amser Canolbarth Ewrop),
-				'standard' => q(Amser Safonol Canolbarth Ewrop),
+				'daylight' => q#Amser Haf Canolbarth Ewrop#,
+				'generic' => q#Amser Canolbarth Ewrop#,
+				'standard' => q#Amser Safonol Canolbarth Ewrop#,
 			},
 			short => {
-				'daylight' => q(CEST),
-				'generic' => q(CET),
-				'standard' => q(CET),
+				'daylight' => q#CEST#,
+				'generic' => q#CET#,
+				'standard' => q#CET#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Amser Haf Dwyrain Ewrop),
-				'generic' => q(Amser Dwyrain Ewrop),
-				'standard' => q(Amser Safonol Dwyrain Ewrop),
+				'daylight' => q#Amser Haf Dwyrain Ewrop#,
+				'generic' => q#Amser Dwyrain Ewrop#,
+				'standard' => q#Amser Safonol Dwyrain Ewrop#,
 			},
 			short => {
-				'daylight' => q(EEST),
-				'generic' => q(EET),
-				'standard' => q(EET),
+				'daylight' => q#EEST#,
+				'generic' => q#EET#,
+				'standard' => q#EET#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Amser Dwyrain Pell Ewrop),
+				'standard' => q#Amser Dwyrain Pell Ewrop#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Amser Haf Gorllewin Ewrop),
-				'generic' => q(Amser Gorllewin Ewrop),
-				'standard' => q(Amser Safonol Gorllewin Ewrop),
+				'daylight' => q#Amser Haf Gorllewin Ewrop#,
+				'generic' => q#Amser Gorllewin Ewrop#,
+				'standard' => q#Amser Safonol Gorllewin Ewrop#,
 			},
 			short => {
-				'daylight' => q(WEST),
-				'generic' => q(WET),
-				'standard' => q(WET),
+				'daylight' => q#WEST#,
+				'generic' => q#WET#,
+				'standard' => q#WET#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Amser Haf Ynysoedd Falklands/Malvinas),
-				'generic' => q(Amser Ynysoedd Falklands/Malvinas),
-				'standard' => q(Amser Safonol Ynysoedd Falklands/Malvinas),
+				'daylight' => q#Amser Haf Ynysoedd Falklands/Malvinas#,
+				'generic' => q#Amser Ynysoedd Falklands/Malvinas#,
+				'standard' => q#Amser Safonol Ynysoedd Falklands/Malvinas#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Amser Haf Fiji),
-				'generic' => q(Amser Fiji),
-				'standard' => q(Amser Safonol Fiji),
+				'daylight' => q#Amser Haf Fiji#,
+				'generic' => q#Amser Fiji#,
+				'standard' => q#Amser Safonol Fiji#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Amser Guyane Ffrengig),
+				'standard' => q#Amser Guyane Ffrengig#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Amser Deheuol ac Antarctig Frengig),
+				'standard' => q#Amser Tiroedd Ffrainc yn y De a’r Antarctig#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Amser Safonol Greenwich),
+				'standard' => q#Amser Safonol Greenwich#,
 			},
 			short => {
-				'standard' => q(GMT),
+				'standard' => q#GMT#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Amser Galapagos),
+				'standard' => q#Amser Galapagos#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Amser Gambier),
+				'standard' => q#Amser Gambier#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Amser Haf Georgia),
-				'generic' => q(Amser Georgia),
-				'standard' => q(Amser Safonol Georgia),
+				'daylight' => q#Amser Haf Georgia#,
+				'generic' => q#Amser Georgia#,
+				'standard' => q#Amser Safonol Georgia#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Amser Ynysoedd Gilbert),
+				'standard' => q#Amser Ynysoedd Gilbert#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Amser Haf Dwyrain yr Ynys Las),
-				'generic' => q(Amser Dwyrain yr Ynys Las),
-				'standard' => q(Amser Safonol Dwyrain yr Ynys Las),
+				'daylight' => q#Amser Haf Dwyrain yr Ynys Las#,
+				'generic' => q#Amser Dwyrain yr Ynys Las#,
+				'standard' => q#Amser Safonol Dwyrain yr Ynys Las#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Amser Haf Gorllewin yr Ynys Las),
-				'generic' => q(Amser Gorllewin yr Ynys Las),
-				'standard' => q(Amser Safonol Gorllewin yr Ynys Las),
+				'daylight' => q#Amser Haf Gorllewin yr Ynys Las#,
+				'generic' => q#Amser Gorllewin yr Ynys Las#,
+				'standard' => q#Amser Safonol Gorllewin yr Ynys Las#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Amser Safonol y Gwlff),
+				'standard' => q#Amser Safonol y Gwlff#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Amser Guyana),
+				'standard' => q#Amser Guyana#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Amser Haf Hawaii-Aleutian),
-				'generic' => q(Amser Hawaii-Aleutian),
-				'standard' => q(Amser Safonol Hawaii-Aleutian),
+				'daylight' => q#Amser Haf Hawaii-Aleutian#,
+				'generic' => q#Amser Hawaii-Aleutian#,
+				'standard' => q#Amser Safonol Hawaii-Aleutian#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Amser Haf Hong Kong),
-				'generic' => q(Amser Hong Kong),
-				'standard' => q(Amser Safonol Hong Kong),
+				'daylight' => q#Amser Haf Hong Kong#,
+				'generic' => q#Amser Hong Kong#,
+				'standard' => q#Amser Safonol Hong Kong#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Amser Haf Hovd),
-				'generic' => q(Amser Hovd),
-				'standard' => q(Amser Safonol Hovd),
+				'daylight' => q#Amser Haf Hovd#,
+				'generic' => q#Amser Hovd#,
+				'standard' => q#Amser Safonol Hovd#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Amser India),
+				'standard' => q#Amser India#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -10549,7 +11102,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Kerguelen#,
 		},
 		'Indian/Mahe' => {
-			exemplarCity => q#Mahé#,
+			exemplarCity => q#Mahe#,
 		},
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldives#,
@@ -10565,240 +11118,240 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Amser Cefnfor India),
+				'standard' => q#Amser Cefnfor India#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Amser Indo-Tsieina),
+				'standard' => q#Amser Indo-Tsieina#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Amser Canolbarth Indonesia),
+				'standard' => q#Amser Canolbarth Indonesia#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Amser Dwyrain Indonesia),
+				'standard' => q#Amser Dwyrain Indonesia#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Amser Gorllewin Indonesia),
+				'standard' => q#Amser Gorllewin Indonesia#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Amser Haf Iran),
-				'generic' => q(Amser Iran),
-				'standard' => q(Amser Safonol Iran),
+				'daylight' => q#Amser Haf Iran#,
+				'generic' => q#Amser Iran#,
+				'standard' => q#Amser Safonol Iran#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Amser Haf Irkutsk),
-				'generic' => q(Amser Irkutsk),
-				'standard' => q(Amser Safonol Irkutsk),
+				'daylight' => q#Amser Haf Irkutsk#,
+				'generic' => q#Amser Irkutsk#,
+				'standard' => q#Amser Safonol Irkutsk#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Amser Haf Israel),
-				'generic' => q(Amser Israel),
-				'standard' => q(Amser Safonol Israel),
+				'daylight' => q#Amser Haf Israel#,
+				'generic' => q#Amser Israel#,
+				'standard' => q#Amser Safonol Israel#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Amser Haf Siapan),
-				'generic' => q(Amser Siapan),
-				'standard' => q(Amser Safonol Siapan),
+				'daylight' => q#Amser Haf Siapan#,
+				'generic' => q#Amser Siapan#,
+				'standard' => q#Amser Safonol Siapan#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Amser Dwyrain Casachstan),
+				'standard' => q#Amser Dwyrain Kazakhstan#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Amser Gorllewin Casachstan),
+				'standard' => q#Amser Gorllewin Casachstan#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Amser Haf Corea),
-				'generic' => q(Amser Corea),
-				'standard' => q(Amser Safonol Corea),
+				'daylight' => q#Amser Haf Corea#,
+				'generic' => q#Amser Corea#,
+				'standard' => q#Amser Safonol Corea#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Amser Kosrae),
+				'standard' => q#Amser Kosrae#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Amser Haf Krasnoyarsk),
-				'generic' => q(Amser Krasnoyarsk),
-				'standard' => q(Amser Safonol Krasnoyarsk),
+				'daylight' => q#Amser Haf Krasnoyarsk#,
+				'generic' => q#Amser Krasnoyarsk#,
+				'standard' => q#Amser Safonol Krasnoyarsk#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Amser Casachstan),
+				'standard' => q#Amser Kyrgyzstan#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Amser Ynysoedd Line),
+				'standard' => q#Amser Ynysoedd Line#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Amser Haf yr Arglwydd Howe),
-				'generic' => q(Amser yr Arglwydd Howe),
-				'standard' => q(Amser Safonol yr Arglwydd Howe),
+				'daylight' => q#Amser Haf yr Arglwydd Howe#,
+				'generic' => q#Amser yr Arglwydd Howe#,
+				'standard' => q#Amser Safonol yr Arglwydd Howe#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Amser Ynys Macquarie),
+				'standard' => q#Amser Ynys Macquarie#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Amser Haf Magadan),
-				'generic' => q(Amser Magadan),
-				'standard' => q(Amser Safonol Magadan),
+				'daylight' => q#Amser Haf Magadan#,
+				'generic' => q#Amser Magadan#,
+				'standard' => q#Amser Safonol Magadan#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Amser Malaysia),
+				'standard' => q#Amser Malaysia#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Amser Y Maldives),
+				'standard' => q#Amser Y Maldives#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Amser Marquises),
+				'standard' => q#Amser Marquises#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Amser Ynysoedd Marshall),
+				'standard' => q#Amser Ynysoedd Marshall#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Amser Haf Mauritius),
-				'generic' => q(Amser Mauritius),
-				'standard' => q(Amser Safonol Mauritius),
+				'daylight' => q#Amser Haf Mauritius#,
+				'generic' => q#Amser Mauritius#,
+				'standard' => q#Amser Safonol Mauritius#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Amser Mawson),
+				'standard' => q#Amser Mawson#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Amser Haf Gogledd Orllewin Mecsico),
-				'generic' => q(Amser Gogledd Orllewin Mecsico),
-				'standard' => q(Amser Safonol Gogledd Orllewin Mecsico),
+				'daylight' => q#Amser Haf Gogledd Orllewin Mecsico#,
+				'generic' => q#Amser Gogledd Orllewin Mecsico#,
+				'standard' => q#Amser Safonol Gogledd Orllewin Mecsico#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Amser Haf Pasiffig Mecsico),
-				'generic' => q(Amser Pasiffig Mecsico),
-				'standard' => q(Amser Safonol Pasiffig Mecsico),
+				'daylight' => q#Amser Haf Pasiffig Mecsico#,
+				'generic' => q#Amser Pasiffig Mecsico#,
+				'standard' => q#Amser Safonol Pasiffig Mecsico#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Amser Haf Ulan Bator),
-				'generic' => q(Amser Ulan Bator),
-				'standard' => q(Amser Safonol Ulan Bator),
+				'daylight' => q#Amser Haf Ulan Bator#,
+				'generic' => q#Amser Ulan Bator#,
+				'standard' => q#Amser Safonol Ulan Bator#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Amser Haf Moscfa),
-				'generic' => q(Amser Moscfa),
-				'standard' => q(Amser Safonol Moscfa),
+				'daylight' => q#Amser Haf Moscfa#,
+				'generic' => q#Amser Moscfa#,
+				'standard' => q#Amser Safonol Moscfa#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Amser Myanmar),
+				'standard' => q#Amser Myanmar#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Amser Nauru),
+				'standard' => q#Amser Nauru#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Amser Nepal),
+				'standard' => q#Amser Nepal#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Amser Haf Caledonia Newydd),
-				'generic' => q(Amser Caledonia Newydd),
-				'standard' => q(Amser Safonol Caledonia Newydd),
+				'daylight' => q#Amser Haf Caledonia Newydd#,
+				'generic' => q#Amser Caledonia Newydd#,
+				'standard' => q#Amser Safonol Caledonia Newydd#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Amser Haf Seland Newydd),
-				'generic' => q(Amser Seland Newydd),
-				'standard' => q(Amser Safonol Seland Newydd),
+				'daylight' => q#Amser Haf Seland Newydd#,
+				'generic' => q#Amser Seland Newydd#,
+				'standard' => q#Amser Safonol Seland Newydd#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Amser Haf Newfoundland),
-				'generic' => q(Amser Newfoundland),
-				'standard' => q(Amser Safonol Newfoundland),
+				'daylight' => q#Amser Haf Newfoundland#,
+				'generic' => q#Amser Newfoundland#,
+				'standard' => q#Amser Safonol Newfoundland#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Amser Niue),
+				'standard' => q#Amser Niue#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Amser Ynys Norfolk),
+				'standard' => q#Amser Ynys Norfolk#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Amser Haf Fernando de Noronha),
-				'generic' => q(Amser Fernando de Noronha),
-				'standard' => q(Amser Safonol Fernando de Noronha),
+				'daylight' => q#Amser Haf Fernando de Noronha#,
+				'generic' => q#Amser Fernando de Noronha#,
+				'standard' => q#Amser Safonol Fernando de Noronha#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Amser Haf Novosibirsk),
-				'generic' => q(Amser Novosibirsk),
-				'standard' => q(Amser Safonol Novosibirsk),
+				'daylight' => q#Amser Haf Novosibirsk#,
+				'generic' => q#Amser Novosibirsk#,
+				'standard' => q#Amser Safonol Novosibirsk#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Amser Haf Omsk),
-				'generic' => q(Amser Omsk),
-				'standard' => q(Amser Safonol Omsk),
+				'daylight' => q#Amser Haf Omsk#,
+				'generic' => q#Amser Omsk#,
+				'standard' => q#Amser Safonol Omsk#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -10920,231 +11473,243 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Amser Haf Pakistan),
-				'generic' => q(Amser Pakistan),
-				'standard' => q(Amser Safonol Pakistan),
+				'daylight' => q#Amser Haf Pakistan#,
+				'generic' => q#Amser Pakistan#,
+				'standard' => q#Amser Safonol Pakistan#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Amser Palau),
+				'standard' => q#Amser Palau#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Amser Papua Guinea Newydd),
+				'standard' => q#Amser Papua Guinea Newydd#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Amser Haf Paraguay),
-				'generic' => q(Amser Paraguay),
-				'standard' => q(Amser Safonol Paraguay),
+				'daylight' => q#Amser Haf Paraguay#,
+				'generic' => q#Amser Paraguay#,
+				'standard' => q#Amser Safonol Paraguay#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Amser Haf Periw),
-				'generic' => q(Amser Periw),
-				'standard' => q(Amser Safonol Periw),
+				'daylight' => q#Amser Haf Periw#,
+				'generic' => q#Amser Periw#,
+				'standard' => q#Amser Safonol Periw#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Amser Haf Pilipinas),
-				'generic' => q(Amser Pilipinas),
-				'standard' => q(Amser Safonol Pilipinas),
+				'daylight' => q#Amser Haf Pilipinas#,
+				'generic' => q#Amser Pilipinas#,
+				'standard' => q#Amser Safonol Pilipinas#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Amser Ynysoedd Phoenix),
+				'standard' => q#Amser Ynysoedd Phoenix#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Amser Haf Saint-Pierre-et-Miquelon),
-				'generic' => q(Amser Saint-Pierre-et-Miquelon),
-				'standard' => q(Amser Safonol Saint-Pierre-et-Miquelon),
+				'daylight' => q#Amser Haf Saint-Pierre-et-Miquelon#,
+				'generic' => q#Amser Saint-Pierre-et-Miquelon#,
+				'standard' => q#Amser Safonol Saint-Pierre-et-Miquelon#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Amser Pitcairn),
+				'standard' => q#Amser Pitcairn#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Amser Pohnpei),
+				'standard' => q#Amser Pohnpei#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Amser Pyongyang#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Amser Réunion),
+				'standard' => q#Amser Réunion#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Amser Rothera),
+				'standard' => q#Amser Rothera#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Amser Haf Sakhalin),
-				'generic' => q(Amser Sakhalin),
-				'standard' => q(Amser Safonol Sakhalin),
+				'daylight' => q#Amser Haf Sakhalin#,
+				'generic' => q#Amser Sakhalin#,
+				'standard' => q#Amser Safonol Sakhalin#,
+			},
+		},
+		'Samara' => {
+			long => {
+				'daylight' => q#Amser Haf Samara#,
+				'generic' => q#Amser Samara#,
+				'standard' => q#Amser Safonol Samara#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Amser Haf Samoa),
-				'generic' => q(Amser Samoa),
-				'standard' => q(Amser Safonol Samoa),
+				'daylight' => q#Amser Haf Samoa#,
+				'generic' => q#Amser Samoa#,
+				'standard' => q#Amser Safonol Samoa#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Amser Seychelles),
+				'standard' => q#Amser Seychelles#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Amser Singapore),
+				'standard' => q#Amser Singapore#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Amser Ynysoedd Solomon),
+				'standard' => q#Amser Ynysoedd Solomon#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Amser De Georgia),
+				'standard' => q#Amser De Georgia#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Amser Suriname),
+				'standard' => q#Amser Suriname#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Amser Syowa),
+				'standard' => q#Amser Syowa#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Amser Tahiti),
+				'standard' => q#Amser Tahiti#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Amser Haf Taipei),
-				'generic' => q(Amser Taipei),
-				'standard' => q(Amser Safonol Taipei),
+				'daylight' => q#Amser Haf Taipei#,
+				'generic' => q#Amser Taipei#,
+				'standard' => q#Amser Safonol Taipei#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Amser Tajicistan),
+				'standard' => q#Amser Tajicistan#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Amser Tokelau),
+				'standard' => q#Amser Tokelau#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Amser Haf Tonga),
-				'generic' => q(Amser Tonga),
-				'standard' => q(Amser Safonol Tonga),
+				'daylight' => q#Amser Haf Tonga#,
+				'generic' => q#Amser Tonga#,
+				'standard' => q#Amser Safonol Tonga#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Amser Chuuk),
+				'standard' => q#Amser Chuuk#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Amser Haf Tyrcmenistan),
-				'generic' => q(Amser Tyrcmenistan),
-				'standard' => q(Amser Safonol Tyrcmenistan),
+				'daylight' => q#Amser Haf Tyrcmenistan#,
+				'generic' => q#Amser Tyrcmenistan#,
+				'standard' => q#Amser Safonol Tyrcmenistan#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Amser Tuvalu),
+				'standard' => q#Amser Tuvalu#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Amser Haf Uruguay),
-				'generic' => q(Amser Uruguay),
-				'standard' => q(Amser Safonol Uruguay),
+				'daylight' => q#Amser Haf Uruguay#,
+				'generic' => q#Amser Uruguay#,
+				'standard' => q#Amser Safonol Uruguay#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Amser Haf Wsbecistan),
-				'generic' => q(Amser Wsbecistan),
-				'standard' => q(Amser Safonol Wsbecistan),
+				'daylight' => q#Amser Haf Wsbecistan#,
+				'generic' => q#Amser Wsbecistan#,
+				'standard' => q#Amser Safonol Wsbecistan#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Amser Haf Vanuatu),
-				'generic' => q(Amser Vanuatu),
-				'standard' => q(Amser Safonol Vanuatu),
+				'daylight' => q#Amser Haf Vanuatu#,
+				'generic' => q#Amser Vanuatu#,
+				'standard' => q#Amser Safonol Vanuatu#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Amser Venezuela),
+				'standard' => q#Amser Venezuela#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Amser Haf Vladivostok),
-				'generic' => q(Amser Vladivostok),
-				'standard' => q(Amser Safonol Vladivostok),
+				'daylight' => q#Amser Haf Vladivostok#,
+				'generic' => q#Amser Vladivostok#,
+				'standard' => q#Amser Safonol Vladivostok#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Amser Haf Volgograd),
-				'generic' => q(Amser Volgograd),
-				'standard' => q(Amser Safonol Volgograd),
+				'daylight' => q#Amser Haf Volgograd#,
+				'generic' => q#Amser Volgograd#,
+				'standard' => q#Amser Safonol Volgograd#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Amser Vostok),
+				'standard' => q#Amser Vostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Amser Ynys Wake),
+				'standard' => q#Amser Ynys Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Amser Wallis a Futuna),
+				'standard' => q#Amser Wallis a Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Amser Haf Yakutsk),
-				'generic' => q(Amser Yakutsk),
-				'standard' => q(Amser Safonol Yakutsk),
+				'daylight' => q#Amser Haf Yakutsk#,
+				'generic' => q#Amser Yakutsk#,
+				'standard' => q#Amser Safonol Yakutsk#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Amser Haf Yekaterinburg),
-				'generic' => q(Amser Yekaterinburg),
-				'standard' => q(Amser Safonol Yekaterinburg),
+				'daylight' => q#Amser Haf Yekaterinburg#,
+				'generic' => q#Amser Yekaterinburg#,
+				'standard' => q#Amser Safonol Yekaterinburg#,
 			},
 		},
 	 } }

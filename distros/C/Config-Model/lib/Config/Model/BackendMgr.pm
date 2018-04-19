@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.120';
+$Config::Model::BackendMgr::VERSION = '2.122';
 use Mouse;
 use strict;
 use warnings;
@@ -108,7 +108,8 @@ sub get_cfg_file_path {
     my $cfo = $args{config_file};
 
     if ( defined $cfo ) {
-        my $override =  $args{root}->child($cfo);
+        my $root_path = $args{root} // path('.');
+        my $override =  $root_path->child($cfo);
         my $mode = $w ? 'write' : 'read';
         $logger->trace("$args{backend} override target file is $override ($mode mode)");
         return ( 1, $override );
@@ -542,7 +543,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

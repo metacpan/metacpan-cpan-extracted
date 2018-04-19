@@ -1,4 +1,4 @@
-package Pcore::API::Google v0.8.1;
+package Pcore::API::Google v0.8.2;
 
 use Pcore -dist;
 

@@ -1,5 +1,5 @@
 package QBit::QueryData::Function;
-$QBit::QueryData::Function::VERSION = '0.010';
+$QBit::QueryData::Function::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Class);

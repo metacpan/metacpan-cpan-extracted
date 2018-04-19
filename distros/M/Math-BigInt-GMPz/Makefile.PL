@@ -12,8 +12,8 @@ WriteMakefile
    'MIN_PERL_VERSION'   => 5.006002,
    'PREREQ_PM'          => {
                             #'ExtUtils::MakeMaker' => 6.58,
-                            'Test::More'          => 0.82,
-                            'Math::BigInt'        => 1.999808,
+                            'Test::More'          => 0.88,
+                            'Math::BigInt'        => 1.999812,
                             'Math::GMPz'          => 0,
                            },
    'LICENSE'            => 'perl_5',

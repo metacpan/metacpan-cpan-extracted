@@ -41,10 +41,13 @@ use Carp;
 use Scalar::Util qw{ blessed looks_like_number };
 
 use PPIx::Regexp;
+use PPIx::Regexp::Constant qw{
+    ARRAY_REF
+};
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 =head2 new
 
@@ -217,7 +220,7 @@ ignored.
 	    $self->{tokens} = 1;
 	} elsif ( __instance( $re, 'PPIx::Regexp::Element' ) ) {
 	    $self->{object} = $re;
-	} elsif ( ref $re eq 'ARRAY' ) {
+	} elsif ( ARRAY_REF eq ref $re ) {
 	    $self->{object} = $re;
 	} elsif ( ref $re && ! __instance( $re, 'PPI::Element' ) ) {
 	    croak "Do not know how to dump ", ref $re;
@@ -254,7 +257,7 @@ sub list {
     my ( $self ) = @_;
     my $lister = $self->{test} ? '__PPIX_DUMPER__test' : '__PPIX_DUMPER__dump';
 
-    ref $self->{object} eq 'ARRAY'
+    ARRAY_REF eq ref $self->{object}
 	and return ( map { $_->$lister( $self ) } @{ $self->{object} } );
 
     return $self->{object}->$lister( $self );
@@ -300,7 +303,7 @@ sub _safe {
 	}
 	if ( ! defined $item ) {
 	    push @rslt, 'undef';
-	} elsif ( ref $item eq 'ARRAY' ) {
+	} elsif ( ARRAY_REF eq ref $item ) {
 	    push @rslt, join( ' ', '[', $self->_safe( @{ $item } ), ']' );
 	} elsif ( looks_like_number( $item ) ) {
 	    push @rslt, $item;
@@ -338,7 +341,7 @@ sub _content {
     defined $dflt or $dflt = '';
 
     defined $elem or return $dflt;
-    if ( ref $elem eq 'ARRAY' ) {
+    if ( ARRAY_REF eq ref $elem ) {
 	my $rslt = join '',
 	    map { $self->_content( $_ ) }
 	    grep { ! $self->{significant} || $_->significant() }
@@ -368,7 +371,7 @@ sub _format_default_modifiers {
     foreach my $attr ( qw{ default_modifiers parse postderef strict } ) {
 	defined ( my $val = $self->{$attr} )
 	    or next;
-	'ARRAY' eq ref $val
+	ARRAY_REF eq ref $val
 	    and not @{ $val }
 	    and next;
 	push @arg, "$attr => @{[ $self->_safe( $val ) ]}";

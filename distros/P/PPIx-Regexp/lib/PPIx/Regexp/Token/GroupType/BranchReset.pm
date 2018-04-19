@@ -34,7 +34,7 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 =begin comment
 

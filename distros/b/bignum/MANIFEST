@@ -12,8 +12,6 @@ MANIFEST.SKIP
 README
 t/00sig.t
 t/01load.t
-t/02pod.t
-t/03podcov.t
 t/author-bigint-hex.t
 t/author-bigint-oct.t
 t/big_e_pi.t
@@ -35,6 +33,11 @@ t/option_l.t
 t/option_p.t
 t/overrides.t
 t/ratopt_a.t
+t/release-cpan-changes.t
+t/release-pod-coverage.t
+t/release-pod.t
+t/release-portability.t
+t/release-test-version.t
 t/scope_f.t
 t/scope_i.t
 t/scope_r.t

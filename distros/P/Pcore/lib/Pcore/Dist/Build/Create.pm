@@ -1,6 +1,6 @@
 package Pcore::Dist::Build::Create;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::Dist;
 use Pcore::Util::File::Tree;
 use Pcore::API::SCM::Const qw[:ALL];
@@ -50,7 +50,7 @@ sub _build_tmpl_params ($self) {
 
 sub run ($self) {
     if ( -e $self->target_path ) {
-        my $res = result [ 500, 'Target path already exists' ];
+        my $res = res [ 500, 'Target path already exists' ];
 
         say $res;
 
@@ -111,7 +111,7 @@ sub run ($self) {
     # update dist after create
     $dist->build->update;
 
-    return result 200;
+    return res 200;
 }
 
 sub _create_upstream_repo ($self) {
@@ -122,10 +122,10 @@ sub _create_upstream_repo ($self) {
     my $confirm = P->term->prompt( qq[Create upstream $self->{upstream_scm_type} repository "$upstream_repo_id" on $self->{upstream_hosting}?], [qw[yes no exit]], enter => 1 );
 
     if ( $confirm eq 'no' ) {
-        return result 200;
+        return res 200;
     }
     elsif ( $confirm eq 'exit' ) {
-        return result [ 500, 'Creating upstream repository cancelled' ];
+        return res [ 500, 'Creating upstream repository cancelled' ];
     }
 
     print 'Creating upstream repository ... ';

@@ -8,20 +8,21 @@ my $builder = Module::Build->new(
   include_dirs => 'include',
   'build_requires' => {
     'Module::Build' => '0.28',
-    'Test::More' => '0.89',
-    'perl' => '5.006'
+    'Test::More' => '0.89'
   },
   'configure_requires' => {
-    'Module::Build' => '0.28',
-    'perl' => '5.006'
+    'Module::Build' => '0.28'
   },
   'requires' => {
     'Exporter' => '5.57',
     'XSLoader' => '0',
-    'perl' => '5.006',
     'strict' => '0',
     'warnings' => '0'
   },
 );
+
+if ($^O ne 'MSWin32') {
+	$builder->extra_linker_flags('-lpthread');
+}
 
 $builder->create_build_script();

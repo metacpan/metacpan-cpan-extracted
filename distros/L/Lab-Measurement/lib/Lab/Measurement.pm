@@ -1,6 +1,6 @@
 package Lab::Measurement;
 #ABSTRACT: Log, describe and plot data on the fly
-$Lab::Measurement::VERSION = '3.630';
+$Lab::Measurement::VERSION = '3.631';
 use strict;
 use warnings;
 use Lab::Generic;
@@ -23,7 +23,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 SYNOPSIS
 

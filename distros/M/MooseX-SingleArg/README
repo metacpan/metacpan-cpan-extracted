@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution MooseX-SingleArg,
-version 0.05:
+version 0.06:
 
   No-fuss instantiation of Moose objects using a single argument.
 

@@ -41,3 +41,4 @@ subquery
 substatement
 MERCHANTIBILITY
 incr
+SQ

@@ -11,14 +11,15 @@ use Data::RecordStore;
 use Scalar::Util qw(weaken);
 use vars qw($VERSION);
 
-$VERSION = '1.104';
+$VERSION = '1.106';
 
 use constant {
     RECORD_STORE => 0,
     DIRTY        => 1,
     WEAK         => 2,
     PATH         => 3,
-    STOREINFO    => 4,
+    OPTIONS      => 4,
+    STOREINFO    => 5,
 
     ID           => 0,
     DATA         => 1,
@@ -123,6 +124,7 @@ Starts up a persistance engine that stores data in the given directory and retur
 =cut
 
 sub open_store {
+    my $opts = ref $_[$#_] ? pop : {};
     my $base_path = pop;
     my $cls = pop || 'Data::ObjectStore';
 
@@ -135,10 +137,11 @@ sub open_store {
     }
 
     my $store = bless [
-        Data::RecordStore->open_store( "$base_path/RECORDSTORE" ),
+        Data::RecordStore->open_store( "$base_path/RECORDSTORE", $opts ),
         {}, #DIRTY CACHE
         {}, #WEAK CACHE
-        $base_path
+        $base_path,
+        $opts,
         ], $cls;
 
     $store->[STOREINFO] = $store->_fetch_store_info_node;
@@ -280,7 +283,7 @@ sub run_recycler {
     my $self = shift;
     $self->save;
     my $base_path = $self->[PATH];
-    my $recycle_tally = Data::RecordStore->open_store( "$base_path/RECYCLE" );
+    my $recycle_tally = Data::RecordStore->open_store( "$base_path/RECYCLE", $self->[OPTIONS] );
 
     # empty because this may have run recently
     $self->[RECORD_STORE]->empty_recycler;
@@ -1619,9 +1622,6 @@ sub _load {}
 #
 # -----------------------
 
-sub _id {
-    shift->[ID];
-}
 
 sub _freezedry {
     my $self = shift;
@@ -1661,7 +1661,7 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 1.104  (Mar, 2018))
+       Version 1.106  (April, 2018))
 
 =cut
 

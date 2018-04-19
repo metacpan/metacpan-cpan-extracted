@@ -4,11 +4,11 @@ author:
   - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
-  Test::More: '0.47'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,8 +19,8 @@ no_index:
     - t
     - inc
 requires:
-  Math::BigInt: '1.999718'
+  Math::BigInt: '1.999812'
   Math::BigRat: '0.12'
   perl: '5.01'
-version: '0.49'
+version: '0.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

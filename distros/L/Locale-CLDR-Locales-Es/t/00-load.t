@@ -4,12 +4,13 @@ use Test::Exception;
 use ok( 'Locale::CLDR' );
 my $locale;
 
-diag( "Testing Locale::CLDR v0.29.0, Perl 5.018002, D:\strawberry\perl\bin\perl.exe" );
+diag( "Testing Locale::CLDR v0.32.0, Perl $], $^X" );
 use ok Locale::CLDR::Locales::Es, 'Can use locale file Locale::CLDR::Locales::Es';
 use ok Locale::CLDR::Locales::Es::Any::419, 'Can use locale file Locale::CLDR::Locales::Es::Any::419';
 use ok Locale::CLDR::Locales::Es::Any::Ar, 'Can use locale file Locale::CLDR::Locales::Es::Any::Ar';
 use ok Locale::CLDR::Locales::Es::Any::Bo, 'Can use locale file Locale::CLDR::Locales::Es::Any::Bo';
 use ok Locale::CLDR::Locales::Es::Any::Br, 'Can use locale file Locale::CLDR::Locales::Es::Any::Br';
+use ok Locale::CLDR::Locales::Es::Any::Bz, 'Can use locale file Locale::CLDR::Locales::Es::Any::Bz';
 use ok Locale::CLDR::Locales::Es::Any::Cl, 'Can use locale file Locale::CLDR::Locales::Es::Any::Cl';
 use ok Locale::CLDR::Locales::Es::Any::Co, 'Can use locale file Locale::CLDR::Locales::Es::Any::Co';
 use ok Locale::CLDR::Locales::Es::Any::Cr, 'Can use locale file Locale::CLDR::Locales::Es::Any::Cr';

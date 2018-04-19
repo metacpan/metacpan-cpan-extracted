@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/reyjrar/WWW-Subsonic/issues
   homepage: https://github.com/reyjrar/WWW-Subsonic
   repository: https://github.com/reyjrar/WWW-Subsonic.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -288,7 +288,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.0
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -310,7 +310,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.0
           repo_root: .
       name: Git::Check
       version: '2.042'
@@ -343,7 +343,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -356,11 +356,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -383,7 +383,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -397,7 +397,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.0
           repo_root: .
       name: Git::Push
       version: '2.042'
@@ -448,5 +448,6 @@ x_Dist_Zilla:
     version: '6.010'
 x_contributors:
   - 'Brad Lhotsky <brad.lhotsky@gmail.com>'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

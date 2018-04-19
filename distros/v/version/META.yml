@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=version
   repository: https://bitbucket.org/jpeacock/version
-version: '0.9920'
+version: '0.9923'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

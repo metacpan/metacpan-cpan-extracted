@@ -3646,6 +3646,7 @@ dist/Term-ReadLine/lib/Term/ReadLine.pm		Stub readline library
 dist/Term-ReadLine/t/AE.t			See if Term::ReadLine works
 dist/Term-ReadLine/t/AETk.t			See if Term::ReadLine works
 dist/Term-ReadLine/t/ReadLine.t			See if Term::ReadLine works
+dist/Term-ReadLine/t/ReadLine-STDERR.t		See if Term::ReadLine works
 dist/Term-ReadLine/t/Tk.t			See if Term::ReadLine works
 dist/Test/lib/Test.pm		A simple framework for writing test scripts
 dist/Test/t/05_about_verbose.t	See if Test works
@@ -4048,6 +4049,7 @@ ext/PerlIO-scalar/scalar.xs	PerlIO layer for scalars
 ext/PerlIO-scalar/t/scalar.t	See if PerlIO::scalar works
 ext/PerlIO-scalar/t/scalar_ungetc.t	Tests for PerlIO layer for scalars
 ext/PerlIO-via/hints/aix.pl	Hint for PerlIO::via for named architecture
+ext/PerlIO-via/t/thread.t		See if PerlIO::via works with threads
 ext/PerlIO-via/t/via.t		See if PerlIO::via works
 ext/PerlIO-via/via.pm		PerlIO layer for layers in perl
 ext/PerlIO-via/via.xs		PerlIO layer for layers in perl
@@ -4936,7 +4938,9 @@ pod/perl5224delta.pod		Perl changes in version 5.22.4
 pod/perl5240delta.pod		Perl changes in version 5.24.0
 pod/perl5241delta.pod		Perl changes in version 5.24.1
 pod/perl5242delta.pod		Perl changes in version 5.24.2
+pod/perl5243delta.pod		Perl changes in version 5.24.3
 pod/perl5260delta.pod		Perl changes in version 5.26.0
+pod/perl5261delta.pod		Perl changes in version 5.26.1
 pod/perl561delta.pod		Perl changes in version 5.6.1
 pod/perl56delta.pod		Perl changes in version 5.6
 pod/perl581delta.pod		Perl changes in version 5.8.1

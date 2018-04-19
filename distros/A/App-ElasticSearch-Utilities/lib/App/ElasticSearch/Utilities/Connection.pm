@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '5.5'; # VERSION
+our $VERSION = '5.6'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -124,6 +124,7 @@ sub request {
     my ($self,$url,$options,$body) = @_;
 
     # Build the Path
+    $options->{command} ||= $url;
     my @path = grep { defined && length } @{ $options }{qw(index command)};
     my $path = join('/', @path);
 
@@ -219,7 +220,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 SYNOPSIS
 

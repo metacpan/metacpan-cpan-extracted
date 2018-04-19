@@ -38,9 +38,19 @@ Revision history for Perl extension Safe::Hole.
     - don't local(*INC} unless $self->{INC}
     - this version by Brian McCauley <nobull@cpan.org>
 
-0.11 Tue Mar 16 2010
+0.11 May 4 2010
     - re-structure module to more modern layout. Convert to M::B
     - re-factor tests to test::more
     - pod fixes now we're testing them
     - clean up authors and generate proper META.yml
     - Fix 5.10 deprecation of defined %hash. Just use %hash to the same effect.
+
+0.12 May 4 2010
+    - Hide Safe::Hole::User from CPAN by moving the package name onto a different line
+
+0.13 May 5 2010
+    - Remove Makefile.PL. M::B compatibility just doesn't work as expected and breaks on smokers
+0.14 April 13 2018
+    - Update issue tracker to github
+    - Tidy all the things
+    - README.md for github

@@ -2,24 +2,18 @@
 abstract: 'Quickly installs one or more MySQL servers (or forks) in the same host, either standalone or in groups'
 author:
   - 'Giuseppe Maxia <gmax@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
+build_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: MySQL-Sandbox
 no_index:
   directory:
     - t
     - inc
-requires:
-  File::Find: '1'
-  Socket: '1.7'
 resources:
   repository: git://github.com/datacharmer/mysql-sandbox.git
-version: v3.2.16
+version: v3.2.17

@@ -1,0 +1,37 @@
+---
+abstract: 'Recursive copying of files and directories within Perl 5 toolchain'
+author:
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Path::Tiny: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Copy-Recursive-Reduced
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  perl: '5.008000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Copy-Recursive-Reduced
+  homepage: http://thenceforward.net/perl/modules/File-Copy-Recursive-Reduced/
+  repository: https://github.com/jkeenan/file-copy-recursive-reduced.git
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

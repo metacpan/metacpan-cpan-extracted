@@ -1,16 +1,17 @@
 package Locale::CLDR::WeekData;
 # This file auto generated from Data.xml
-#	on Fri 29 Apr  6:48:39 pm GMT
+#	on Fri 13 Apr  6:59:50 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -62,6 +63,7 @@ has '_week_data_min_days' => (
 		'PL' => 4,
 		'PT' => 4,
 		'RE' => 4,
+		'RU' => 4,
 		'SE' => 4,
 		'SJ' => 4,
 		'SK' => 4,
@@ -131,6 +133,7 @@ has '_week_data_first_day' => (
 		'MY' => 'mon',
 		'NL' => 'mon',
 		'NO' => 'mon',
+		'NZ' => 'mon',
 		'PL' => 'mon',
 		'PT' => 'mon',
 		'RE' => 'mon',
@@ -205,7 +208,6 @@ has '_week_data_first_day' => (
 		'MZ' => 'sun',
 		'NI' => 'sun',
 		'NP' => 'sun',
-		'NZ' => 'sun',
 		'PA' => 'sun',
 		'PE' => 'sun',
 		'PH' => 'sun',

@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.005     2018-04-12 00:59:47+02:00 Europe/Amsterdam
+          - Add libpthread for non-threaded perls
+
 0.004     2018-04-09 20:26:23+02:00 Europe/Amsterdam
           - Export Argon2_id functions
 

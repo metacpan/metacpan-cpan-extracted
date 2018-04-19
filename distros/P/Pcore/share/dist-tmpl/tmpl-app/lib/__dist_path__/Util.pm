@@ -1,6 +1,6 @@
 package <: $module_name ~ "::Util" :>;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::SMTP;
 use Pcore::API::ReCaptcha;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
@@ -33,6 +33,10 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
+sub TO_DATA ($self) {
+    return { settings => $self->{settings} };
+}
+
 # DBH
 sub build_dbh ( $self, $db ) {
     $self->{dbh} = P->handle($db) if !defined $self->{dbh};
@@ -41,7 +45,7 @@ sub build_dbh ( $self, $db ) {
 }
 
 # TODO
-sub update_schema ( $self, $db, $cb ) {
+sub update_schema ( $self, $db ) {
     my $dbh = $self->build_dbh($db);
 
     $dbh->add_schema_patch(
@@ -94,55 +98,30 @@ sub update_schema ( $self, $db, $cb ) {
 SQL
     );
 
-    $dbh->upgrade_schema($cb);
-
-    return;
+    return $dbh->upgrade_schema;
 }
 
 # SETTINGS
-sub load_settings ( $self, $cb ) {
-    $self->{dbh}->selectrow(
-        q[SELECT * FROM "settings" WHERE "id" = 1],
-        sub ( $dbh, $res, $data ) {
-            P->fire_event( 'APP.SETTINGS_UPDATED', $data ) if $res;
+sub load_settings ( $self ) {
+    my $settings = $self->{dbh}->selectrow(q[SELECT * FROM "settings" WHERE "id" = 1]);
 
-            $cb->($res);
+    P->fire_event( 'APP.SETTINGS_UPDATED', $settings->{data} ) if $settings;
 
-            return;
-        }
-    );
-
-    return;
+    return $settings;
 }
 
 sub update_settings ( $self, $settings, $cb ) {
 
     # check SMTP port
     if ( exists $settings->{smtp_port} && $settings->{smtp_port} !~ /\A\d+\z/sm ) {
-        $cb->( result 400, error => { smtp_port => 'Port is invalid' } );
-
-        return;
+        return res 400, error => { smtp_port => 'Port is invalid' };
     }
 
-    $self->{dbh}->do(
-        [ q[UPDATE "settings"], SET($settings), 'WHERE "id" = 1' ],
-        sub ( $dbh, $status, $data ) {
-            if ( !$status ) {
-                $cb->( result 500 );
-            }
-            else {
-                $self->load_settings( sub ($res) {
-                    $cb->($res);
+    my $res = $self->{dbh}->do( [ q[UPDATE "settings"], SET($settings), 'WHERE "id" = 1' ] );
 
-                    return;
-                } );
-            }
+    return $res if !$res;
 
-            return;
-        }
-    );
-
-    return;
+    return $self->load_settings;
 }
 
 # SMTP
@@ -164,7 +143,7 @@ sub sendmail ( $self, $to, $bcc, $subject, $body, $cb = undef ) {
     my $smtp = $self->_smtp;
 
     if ( !$smtp ) {
-        my $res = result [ 500, 'SMTP is not configured' ];
+        my $res = res [ 500, 'SMTP is not configured' ];
 
         P->sendlog( '<: $dist_name :>.FATAL', 'SMTP error', "$res" );
 
@@ -214,11 +193,11 @@ sub _build_recaptcha ($self) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 6                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 163                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 142                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 169, 182             | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 148, 161             | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 226                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 230 does not match the package declaration      |
+## |    1 | 205                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 209 does not match the package declaration      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

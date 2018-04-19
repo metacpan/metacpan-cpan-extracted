@@ -5,13 +5,13 @@ use strict;
 use Getopt::Long;
 use Test::BrewBuild::Dispatch;
 
-our $VERSION = '2.18';
+our $VERSION = '2.20';
 
-my %args;
+my %args = (auto => -1);
 my $help;
 
 GetOptions(
-    "auto"       => \$args{auto},
+    "auto:i"     => \$args{auto},
     "cmd=s"      => \$args{cmd},
     "testers=s@" => \$args{testers},
     "r|repo=s"   => \$args{repo},
@@ -32,13 +32,13 @@ exit;
 }
 
 my $dispatcher = Test::BrewBuild::Dispatch->new(
+    auto => $args{auto},
     debug => $args{debug},
     forks => $args{forks},
-    auto => $args{auto},
     rpi => $args{rpi}
 );
 
-if (defined $args{auto}){
+if ($args{auto} >= 0){
     $dispatcher->auto(%args);
     exit();
 }
@@ -170,7 +170,7 @@ argument to change the default number of concurrent testers.
 =head2 -a, --auto
 
 This command tells the dispatcher to throw tests at the Testers continuously.
-With no argument or an argument of C<1>, we'll run forever. Any other integer
+With no argument (or an argument of C<0>), we'll run forever. Any other integer
 will run in auto mode for that many cycles.
 
 The C<--repo|-r> parameter is *mandatory* when in auto mode.
@@ -182,6 +182,11 @@ on an RPi, with an LCD connected, and C<bbdispatch> is running in C<--auto>
 mode. It requires the C<$ENV{BB_RPI_LCD}> environment variable set, with a
 comma-separated list of pin numbers in the format C<'1,2,3,4,5,6'>, where the
 GPIO pin numbers are in the order of C<RS, E, D0, D1, D2, D3>.
+
+To use the larger 4 row by 20 column LCD, append the number of rows and columns
+to the end of the environment variable:
+
+    BB_RPI_LCD=5,6,4,17,27,22,4,20
 
 =head1 AUTHOR
 

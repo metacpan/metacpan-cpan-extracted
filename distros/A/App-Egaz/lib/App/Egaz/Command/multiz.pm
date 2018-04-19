@@ -285,9 +285,9 @@ sub execute {
         #
         # multiz t/Q_rubravsQ_aliena/mafSynNet/NC_020152.synNet.maf.gz \
         #       t/Q_rubravsQ_aquifolioides/mafSynNet/NC_020152.synNet.maf.gz \
-        #       1 out1 out2 > step1.chr1.maf
+        #       1 out1 out2 > step1.NC_020152.maf
         # multiz step1.chr1.maf t/Q_rubravsQ_baronii/mafSynNet/NC_020152.synNet.maf.gz \
-        #       1 out1 out2 > step2.chr1.maf
+        #       1 out1 out2 > step2.NC_020152.maf
 
         my @species_copy = @species;
         my ( $species1, $species2 );

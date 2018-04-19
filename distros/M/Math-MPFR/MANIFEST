@@ -24,6 +24,7 @@ V/Makefile.PL
 t/_1aaa_v.t
 t/_1basic.t
 t/_2exp.t
+t/atonv.t
 t/base_conversion.t
 t/bessel.t
 t/buildopt.t

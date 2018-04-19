@@ -1,5 +1,13 @@
+4.03
+ - Values less than DENORM_MIN were automatically denormalized to 0 ... but should have been
+   denormalized to DENORM_MIN when greater than DENORM_MIN/2.
+ - Attend to various other issues involving handling of subnormals.
+ - Remove Math::Float128 and Math::Decimal64 from PREREQ_PM.
+ - Add atonv().
+
 4.02
- -  mfr_subnormalize() in _d_bytes(), _ld_bytes() and f128_bytes().
+ - mpfr_subnormalize() in _d_bytes(), _ld_bytes() and _f128_bytes(). (These 3 functions are
+   used by Math::NV.)
 4.01
  - Automatically build Math::MPFR with __float128 support if mpfr_buildopt_float128_p() returns
    true && 'F128=0' has not been provided as an argument to Makefile.PL.

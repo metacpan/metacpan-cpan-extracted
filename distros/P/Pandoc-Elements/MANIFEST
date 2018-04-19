@@ -26,7 +26,6 @@ lib/Pandoc/Filter.pm
 lib/Pandoc/Filter/HeaderIdentifiers.pm
 lib/Pandoc/Filter/ImagesFromCode.pm
 lib/Pandoc/Filter/Multifilter.pm
-lib/Pandoc/Filter/Usage.pm
 lib/Pandoc/Metadata.pm
 lib/Pandoc/Walker.pm
 script/multifilter
@@ -51,6 +50,7 @@ t/filter.t
 t/header-identifiers.t
 t/invalid-version-from-env.t
 t/lineblock.t
+t/lineblocks-empty-lines.t
 t/link-image-attributes.t
 t/linkage-setters.t
 t/match.t
@@ -73,9 +73,3 @@ t/synopsis.t
 t/to_pandoc.t
 t/walker.t
 xt/Makefile
-xt/README.md
-xt/get-pandoc-releases.pl
-xt/lib/Pandoc/Releases.pm
-xt/pod2pandoc.pl
-xt/prove
-xt/versions.t

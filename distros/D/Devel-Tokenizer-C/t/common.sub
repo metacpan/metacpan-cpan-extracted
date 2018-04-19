@@ -1,14 +1,6 @@
 ################################################################################
-#
-# $Project: /Devel-Tokenizer-C $
-# $Author: mhx $
-# $Date: 2008/12/13 15:00:41 +0000 $
-# $Revision: 7 $
-# $Source: /t/common.sub $
-#
-################################################################################
 # 
-# Copyright (c) 2002-2008 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2018 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 # 
@@ -59,7 +51,7 @@ int main( int argc, char **argv )
   Keyword key;
 
   in = fopen( argv[1], "r" );
-  
+
   while( fgets(buffer, 256, in) ) {
     for( c=buffer; *c; c++ ) {
       if( *c == '\\n' || *c == '\\r' ) {
@@ -140,7 +132,7 @@ ENDC
 
   $r->{didnotrun} == 0 &&
   $r->{status}    == 0    or return 0;
-  
+
   $r = runprog( $exe );
 
   unlink $file, $exe;

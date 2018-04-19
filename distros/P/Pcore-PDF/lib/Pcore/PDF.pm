@@ -1,6 +1,6 @@
-package Pcore::PDF v0.4.6;
+package Pcore::PDF v0.4.7;
 
-use Pcore -dist, -class, -const, -result;
+use Pcore -dist, -class, -const, -res;
 use Config;
 use Pcore::Util::Data qw[to_json from_json];
 use Pcore::Util::Scalar qw[is_plain_scalarref];
@@ -152,7 +152,7 @@ sub _generate_mswin ( $self ) {
             return;
         },
         on_finish => sub ($proc) {
-            $cb->( result 200, { pdf => \$proc->{stdout} } );
+            $cb->( res 200, { pdf => \$proc->{stdout} } );
 
             $self->{_threads}--;
 
@@ -279,7 +279,7 @@ sub _run_task ( $self, $proc, $task ) {
     my $on_finish = sub ( $status, $reason, $pdf_ref = undef, $log_ref = undef ) {
         $proc->stdout->on_read(undef);
 
-        my $res = result [ $status, $reason ], { pdf => $pdf_ref, log => $log_ref };
+        my $res = res [ $status, $reason ], { pdf => $pdf_ref, log => $log_ref };
 
         $cb->($res);
 

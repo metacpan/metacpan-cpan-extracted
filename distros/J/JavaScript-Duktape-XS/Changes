@@ -1,3 +1,34 @@
+0.000046    2018-04-19
+            * Clean up implementation of console handlers.
+
+0.000045    2018-04-18
+            * Change console implementation to allow registering a handler to
+              log the messages.
+            * Add option to grab console messages and stash them.
+
+0.000044    2018-04-17
+            * Add an optional parameter to eval, to specify a JS file name for
+              stack traces
+            * Print a JS stack trace to the console when running JS throws
+              errors.
+
+0.000043    2018-04-16
+            * Bubble-up to the console any errors that happen in setTimeout.
+            * Fix pointers to github repo.
+
+0.000042    2018-04-13
+            * Add test-time dependencies.
+
+0.000041    2018-04-12
+            * Gather stats in all calls, not just eval.
+
+0.000040    2018-04-12
+            * Send all console output to stderr by default.
+
+0.000039    2018-04-12
+            * Add support for gathering and returning stats for JS compilation
+              and running (both time and memory usage).
+
 0.000038    2018-04-10
             * Add support for JS console.
 

@@ -1,0 +1,53 @@
+NAME
+    Shorthand::Entropy::UseLocal - Use local entropy source
+
+VERSION
+    This document describes version 0.001 of Shorthand::Entropy::UseLocal
+    (from Perl distribution Shorthand-Entropy-UseLocal), released on
+    2018-04-18.
+
+SYNOPSIS
+     use Shorthand::Entropy::UseLocal;
+
+DESCRIPTION
+     use Shorthand::Entropy::UseLocal;
+
+    is a shorthand for:
+
+     use Data::Entropy;
+     use Data::Entropy::Source;
+     use Data::Entropy::RawSource::Local;
+
+     $Data::Entropy::entropy_source = Data::Entropy::Source->new(
+         Data::Entropy::RawSource::Local->new, "sysread");
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Shorthand-Entropy-UseLocal>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Shorthand-Entropy-UseLocal>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Shorthand-Entropy-Use
+    Local>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Entropy
+
+    Data::Entropy::RawSource::Local
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

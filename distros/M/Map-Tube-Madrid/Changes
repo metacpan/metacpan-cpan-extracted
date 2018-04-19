@@ -1,4 +1,7 @@
 Revision history for Map::Tube::Madrid
 
+0.02  2018-04-14
+      - Updated dependency on Map::Tube v3.49.
+
 0.01  2018-04-05
       - First version, released from German Perl Workshop 2018.

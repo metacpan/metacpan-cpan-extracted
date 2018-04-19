@@ -318,6 +318,7 @@ sub getTranslations {
         $locale =~ s/\.po$//;
         my $lang = $locale;
         $lang =~ s/_.+//;
+        local $_; # since load_file_ashash modifies $_ and does not localize it
         my $href = Locale::PO->load_file_ashash($file, 'utf8');
         for my $key (keys %$href) {
             my $o = $href->{$key};

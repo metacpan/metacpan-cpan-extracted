@@ -1,6 +1,6 @@
 package Pcore::Handle::sqlite;
 
-use Pcore -class, -const, -result;
+use Pcore -class, -const, -res;
 use DBI qw[];
 use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
@@ -339,10 +339,6 @@ sub _warn ($self) {
     return;
 }
 
-sub _die ($self) {
-    die qq[DBI: "$DBI::errstr"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : q[] );
-}
-
 sub _execute ( $self, $sth, $bind, $bind_pos ) {
 
     # make a copy
@@ -375,6 +371,8 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
     return $sth->execute(@bind);
 }
 
+sub dbh ($self) { return $self }
+
 # PUBLIC DBI METHODS
 sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
 
@@ -383,7 +381,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     my $cb   = is_plain_coderef $args[-1] ? pop @args   : undef;
     my %args = @args;
 
-    my ( $dbh, $rows ) = $self->{h};
+    my ( $dbh, $rows, $res ) = $self->{h};
 
     # query is sth
     if ( is_blessed_ref $query) {
@@ -395,12 +393,14 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             if ( !defined $sth ) {
                 $self->{query} = \$query->{query};
 
+                # prepare sth
                 $sth = $dbh->prepare( $query->{query} );
 
                 # check error
                 if ( defined $DBI::err ) {
-                    if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-                    else               { $self->_die }
+                    $self->_warn;
+
+                    $res = res [ 500, $DBI::errstr ];
                 }
 
                 $self->{prepared_sth}->{ $query->{id} } = $sth;
@@ -414,29 +414,36 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $sth = $query;
         }
         else {
-            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, 'Invalid STH class' ], rows => $rows ), undef ); return $rows }
-            else               { die 'Invalid STH class' }
+            warn 'Invalid STH class';
+
+            $res = res [ 400, 'Invalid STH class' ];
         }
 
         # bind and exec
-        if ( defined $bind ) {
-            $rows = $self->_execute( $sth, $bind, 0 );
+        if ( !defined $res ) {
+            if ( defined $bind ) {
+                $rows = $self->_execute( $sth, $bind, 0 );
+            }
+            else {
+                $rows = $sth->execute;
+            }
+
+            # check error
+            if ( defined $DBI::err ) {
+                $self->_warn;
+
+                $res = res [ 500, $DBI::errstr ];
+            }
         }
-        else {
-            $rows = $sth->execute;
+
+        # success
+        if ( !defined $res ) {
+            $rows = 0 if $rows == 0;    # convert "0E0" to "0"
+
+            $res = res 200, rows => $rows;
         }
 
-        # check error
-        if ( defined $DBI::err ) {
-            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-            else               { $self->_die }
-        }
-
-        $rows = 0 if $rows == 0;    # convert "0E0" to "0"
-
-        $cb->( $self, result( 200, rows => $rows ), undef ) if defined $cb;
-
-        return $rows;
+        return $cb ? $cb->($res) : $res;
     }
 
     # query is ArrayRef
@@ -454,15 +461,17 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-            else               { $self->_die }
+            $self->_warn;
+
+            $res = res [ 500, $DBI::errstr ];
+        }
+        else {
+            $rows = 0 if $rows == 0;    # convert "0E0" to "0"
+
+            $res = res 200, rows => $rows;
         }
 
-        $rows = 0 if $rows == 0;    # convert "0E0" to "0"
-
-        $cb->( $self, result( 200, rows => $rows ), undef ) if defined $cb;
-
-        return $rows;
+        return $cb ? $cb->($res) : $res;
     }
 
     # extended query mode
@@ -478,8 +487,11 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
             # prepare sth error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-                else               { $self->_die }
+                $self->_warn;
+
+                $res = res [ 500, $DBI::errstr ];
+
+                last;
             }
 
             # bind and exec
@@ -487,8 +499,11 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
             # execute error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-                else               { $self->_die }
+                $self->_warn;
+
+                $res = res [ 500, $DBI::errstr ];
+
+                last;
             }
 
             $rows += $sth->rows;
@@ -496,9 +511,9 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $query = $sth->{sqlite_unprepared_statements};
         }
 
-        $cb->( $self, result( 200, rows => $rows ), undef ) if defined $cb;
+        $res = res 200, rows => $rows if !defined $res;
 
-        return $rows;
+        return $cb ? $cb->($res) : $res;
     }
 }
 
@@ -506,179 +521,211 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 sub selectall ( $self, @ ) {
     my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { $self->_die }
-    }
+        $self->_warn;
 
-    my $data;
-
-    if ( defined $args->{key_field} ) {
-
-        # make fields indexes 0-based
-        my @key_fields = map { looks_like_number $_ ? $_ + 1 : $_ } is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field};
-
-        $data = $sth->fetchall_hashref( \@key_fields );
-
-        # check error
-        if ( defined $DBI::err ) {
-            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-            else               { $self->_die }
-        }
-
-        undef $data if !$data->%*;
+        $res = res [ 500, $DBI::errstr ];
     }
     else {
-        $data = $sth->fetchall_arrayref( {}, undef );
+        my $data;
 
-        undef $data if !$data->@*;
+        if ( defined $args->{key_field} ) {
+
+            # make fields indexes 0-based
+            my @key_fields = map { looks_like_number $_ ? $_ + 1 : $_ } is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field};
+
+            $data = $sth->fetchall_hashref( \@key_fields );
+
+            # check error
+            if ( defined $DBI::err ) {
+                $self->_warn;
+
+                $res = res [ 500, $DBI::errstr ];
+            }
+            else {
+                $res = res 200, $data, rows => $rows;
+            }
+        }
+        else {
+            $res = res 200, $sth->fetchall_arrayref( {}, undef ), rows => $rows;
+        }
     }
 
-    $cb->( $self, result( 200, rows => $rows ), $data ) if defined $cb;
-
-    return $data;
+    return $cb ? $cb->($res) : $res;
 }
 
 sub selectall_arrayref ( $self, @ ) {
     my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        $res = res 200, $sth->fetchall_arrayref( undef, undef ), rows => $rows;
     }
 
-    my $data = $sth->fetchall_arrayref( undef, undef );
-
-    undef $data if !$data->@*;
-
-    $cb->( result( $self, 200, rows => $rows ), $data ) if defined $cb;
-
-    return $data;
+    return $cb ? $cb->($res) : $res;
 }
 
 sub selectrow ( $self, @ ) {
     my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        $res = res 200, $sth->fetchrow_hashref, rows => $rows;
+
+        $sth->finish;
     }
 
-    my $data = $sth->fetchrow_hashref;
-
-    $sth->finish;
-
-    $cb->( $self, result( 200, rows => $rows ), $data ) if defined $cb;
-
-    return $data;
+    return $cb ? $cb->($res) : $res;
 }
 
 sub selectrow_arrayref ( $self, @ ) {
     my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        $res = res 200, $sth->fetchrow_arrayref, rows => $rows;
+
+        $sth->finish;
     }
 
-    my $data = $sth->fetchrow_arrayref;
-
-    $sth->finish;
-
-    $cb->( $self, result( 200, rows => $rows ), $data ) if defined $cb;
-
-    return $data;
+    return $cb ? $cb->($res) : $res;
 }
 
 # col => [0, 'id'], col => 'id', default col => 0
 sub selectcol ( $self, @ ) {
     my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        my ( $name2idx, $idx, @vals );
+
+        my $num_of_fields = $sth->{NUM_OF_FIELDS} - 1;
+
+        $args->{col} //= 0;
+
+        for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
+            if ( looks_like_number $col) {
+                if ( $col > $num_of_fields ) {
+                    warn qq[Invalid column index: "$col"];
+
+                    $res = res [ 400, qq[Invalid column index: "$col"] ];
+
+                    last;
+                }
+
+                $sth->bind_col( $col + 1, \$vals[ $idx++ ] );
+            }
+            else {
+                $name2idx //= $sth->{NAME_hash};
+
+                if ( !exists $name2idx->{$col} ) {
+                    warn qq[Invalid column name: "$col"];
+
+                    $res = res [ 400, qq[Invalid column name: "$col"] ];
+
+                    last;
+                }
+
+                $sth->bind_col( $name2idx->{$col} + 1, \$vals[ $idx++ ] );
+            }
+        }
+
+        if ( !defined $res ) {
+            my $data;
+
+            push $data->@*, @vals while $sth->fetch;
+
+            $res = res 200, $data, rows => $rows;
+        }
     }
 
-    my ( $data, $name2idx, $idx, @vals );
-
-    my $num_of_fields = $sth->{NUM_OF_FIELDS} - 1;
-
-    $args->{col} //= 0;
-
-    for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
-        if ( looks_like_number $col) {
-            if ( $col > $num_of_fields ) {
-                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, qq[Invalid column index: "$col"] ], rows => $rows ), undef ); return }
-                else               { die qq[Invalid column index: "$col"] }
-            }
-
-            $sth->bind_col( $col + 1, \$vals[ $idx++ ] );
-        }
-        else {
-            $name2idx //= $sth->{NAME_hash};
-
-            if ( !exists $name2idx->{$col} ) {
-                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, qq[Invalid column name: "$col"] ], rows => $rows ), undef ); return }
-                else               { die qq[Invalid column name: "$col"] }
-            }
-
-            $sth->bind_col( $name2idx->{$col} + 1, \$vals[ $idx++ ] );
-        }
-    }
-
-    push $data->@*, @vals while $sth->fetch;
-
-    $cb->( $self, result( 200, rows => $rows ), $data ) if defined $cb;
-
-    return $data;
+    return $cb ? $cb->($res) : $res;
 }
 
 # TRANSACTIONS
 sub begin_work ( $self, $cb = undef ) {
     $self->{h}->begin_work;
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        $res = res 200;
     }
 
-    $cb->( $self, result 200 ) if defined $cb;
-
-    return;
+    return $cb ? $cb->( $self, $res ) : ( $self, $res );
 }
 
 sub commit ( $self, $cb = undef ) {
     $self->{h}->commit;
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        $res = res 200;
     }
 
-    $cb->( $self, result 200 ) if defined $cb;
-
-    return;
+    return $cb ? $cb->($res) : $res;
 }
 
 sub rollback ( $self, $cb = undef ) {
     $self->{h}->rollback;
 
+    my $res;
+
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $self->_warn; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
-        else               { $self->_die }
+        $self->_warn;
+
+        $res = res [ 500, $DBI::errstr ];
+    }
+    else {
+        $res = res 200;
     }
 
-    $cb->( $self, result 200 ) if defined $cb;
-
-    return;
+    return $cb ? $cb->($res) : $res;
 }
 
 # LAST INSERT ID
@@ -712,15 +759,15 @@ sub attach ( $self, $name, $path = undef ) {
 ## |    3 | 159                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 379                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (36)                        |
+## |    3 | 377                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 453                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 460                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 235                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 354                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 350                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 634                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 667                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

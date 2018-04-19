@@ -4,7 +4,6 @@ use warnings;
 use lib '.';
 
 use RPi::Pin;
-use RPi::WiringPi::Constant qw(:all);
 use Test::More;
 
 my $mod = 'RPi::Pin';

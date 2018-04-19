@@ -10,12 +10,17 @@ use if $^O eq 'cygwin', 'File::Spec::Win32';
 use Test2::API qw( test2_add_callback_post_load test2_stack test2_add_callback_exit );
 
 # ABSTRACT: Setup a faux home directory for tests
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 my $real;
 my $faux;
 my $user;
+
+sub real_home_dir
+{
+  $real;
+}
 
 sub import
 {
@@ -110,7 +115,7 @@ Test2::Plugin::FauxHomeDir - Setup a faux home directory for tests
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -156,6 +161,13 @@ This systems are actively developed and tested:
 I expect that it should work on most other modern UNIX platforms.  It 
 probably will not work on more esoteric systems like VMS or msys2.  
 Patches to address this will be eagerly accepted.
+
+=head1 METHODS
+
+=head2 real_home_dir
+
+Returns the real home directory as detected during startup.  If
+initialization hasn't happened then this will return C<undef>.
 
 =head1 CAVEATS
 

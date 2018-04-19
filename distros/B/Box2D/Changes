@@ -1,5 +1,9 @@
 Revision history for Box2D
 
+0.08    15/04/2018
+        Adjust path to helper header file [FROGGS]
+        Require newer Alien::Box2D [FROGGS]
+
 0.07    06/04/2012
         Weaken tests due to precision (t/25-b2transform.t) [jtpalmer]
 

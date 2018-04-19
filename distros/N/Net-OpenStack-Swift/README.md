@@ -200,6 +200,8 @@ Create or replace object.
     Optional.
     default none
 
+- headers: HashRef
+
 ## post\_object
 
 Create or update object metadata.

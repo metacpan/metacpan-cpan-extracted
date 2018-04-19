@@ -1,13 +1,14 @@
 package BenchmarkAnything::Storage::Backend::SQL;
-# git description: v0.022-6-gbc1773c
+# git description: v0.023-12-g9b05097
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Autonomous SQL backend to store benchmarks
-$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.023';
+$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.024';
 use 5.008;
 use utf8;
 use strict;
 use warnings;
+use Try::Tiny;
 
 my $hr_default_config = {
     select_cache        => 0,
@@ -405,44 +406,65 @@ sub process_queued_multi_benchmark {
     my $i_id;
     my $s_serialized;
     my $ar_data_points;
-    my $ar_results;
-    my $or_result;
+    my $ar_results_lock;
+    my $or_result_lock;
+    my $ar_results_process;
+
     my $driver = $or_self->{query}{dbh}{Driver}{Name};
+
+    $or_self->{query}{dbh}->do("set transaction isolation level read committed") if $driver eq "mysql"; # avoid deadlocks due to gap locking
+    $or_self->{query}->start_transaction;
 
     # ===== exclusively pick single raw entry =====
     # Lock single row via processing=1 so that only one worker handles it!
-    $or_self->{query}{dbh}->do("set transaction isolation level read committed") if $driver eq "mysql"; # avoid deadlocks due to gap locking
-    $or_self->{query}->start_transaction;
     eval {
-            $ar_results = $or_self->{query}->select_raw_bench_bundle_for_lock;
-            $or_result  = $ar_results->fetchrow_hashref;
-            $i_id       = $or_result->{raw_bench_bundle_id};
-            if (!$i_id) {
-                    $or_self->{query}->finish_transaction( $@ );
-                    $or_self->{query}{dbh}->do("set transaction isolation level repeatable read") if $driver eq "mysql"; # reset to normal gap locking
-                    goto RETURN ;
+        try {
+            $ar_results_lock = $or_self->{query}->select_raw_bench_bundle_for_lock;
+            $or_result_lock  = $ar_results_lock->fetchrow_hashref;
+        }
+        catch {
+            if (/Deadlock found when trying to get lock/) {
+                # very normal, handled by eval{} and finish_transaction() in this sub.
+                # warn("IGNORED - DEADLOCK\n");
+                die $_;
+            } elsif (/DBD::mysql::st fetchrow_hashref failed: fetch.. without execute/) {
+                # very normal with multiple workers, usually related
+                # to above deadlock. It is handled by eval{} and
+                # finish_transaction() in this sub.
+                warn("IGNORED - FETCH-WITHOUT-EXECUTE\n");
+                die $_;
+            } else {
+                # An unexpected exception can happen anytime. It is
+                # handled by eval{} and finish_transaction() in this
+                # sub. Still, we print it to know what's happening.
+                require Carp;
+                Carp::cluck("SQL DATABASE EXCEPTION: {{{\n$_\n}}}\n");
+                die $_;
             }
+        };
+        $i_id       = $or_result_lock->{raw_bench_bundle_id};
+        if ($i_id) {
             $or_self->{query}->start_processing_raw_bench_bundle($i_id);
-    };
-    $or_self->{query}->finish_transaction( $@ );
-    $or_self->{query}{dbh}->do("set transaction isolation level repeatable read") if $driver eq "mysql"; # reset to normal gap locking
 
-    # ===== process that single raw entry =====
-    $or_self->{query}->start_transaction;
-    eval {
+            # ===== process that single raw entry =====
             require Sereal::Decoder;
 
-            $ar_results     = $or_self->{query}->select_raw_bench_bundle_for_processing($i_id);
-            $s_serialized   = $ar_results->fetchrow_hashref->{raw_bench_bundle_serialized};
-            $ar_data_points = Sereal::Decoder::decode_sereal($s_serialized);
+            $ar_results_process = $or_self->{query}->select_raw_bench_bundle_for_processing($i_id);
+            $s_serialized       = $ar_results_process->fetchrow_hashref->{raw_bench_bundle_serialized};
+            $ar_data_points     = Sereal::Decoder::decode_sereal($s_serialized);
 
             # preserve order, otherwise add_multi_benchmark() would reorder to optimize insert
             $or_self->add_multi_benchmark([$_], $hr_options) foreach @$ar_data_points;
             $or_self->{query}->update_raw_bench_bundle_set_processed($i_id);
+        }
     };
-    $or_self->{query}->finish_transaction( $@ );
+    $or_self->{query}->finish_transaction($@, { silent => 1 });
 
- RETURN:
+    # $or_self->{query}->start_transaction;
+    # eval { $or_self->{query}->unlock_raw_bench_bundle($i_id) };
+    # $or_self->{query}->finish_transaction($@, { silent => 1 });
+
+    $or_self->{query}{dbh}->do("set transaction isolation level repeatable read") if $driver eq "mysql"; # reset to normal gap locking
     return $@ ? undef : $i_id;
 
 }
@@ -579,11 +601,9 @@ sub get_stats {
 
     my ( $or_self ) = @_;
 
-    my $i_count_datapointkeys = $or_self->{query}->select_count_datapointkeys->fetch->[0];
-    my $i_count_datapoints    = $or_self->{query}->select_count_datapoints->fetch->[0];
-    my $i_count_metrics       = $or_self->{query}->select_count_metrics->fetch->[0];
-    my $i_count_keys          = $or_self->{query}->select_count_keys->fetch->[0];
     my %h_searchengine_stats  = ();
+    my %h_flat_searchengine_stats = ();
+    my %stats = ();
 
     # Not strictly *stats* but useful information.
     if ( $or_self->{searchengine}{elasticsearch}{index} )
@@ -593,30 +613,34 @@ sub get_stats {
          (
           {searchengine => $or_self->{searchengine}}
          );
+
+        $stats{count_datapoints} = (map {chomp; $_} split(qr/ +/, $or_es->cat->count))[2];
         %h_searchengine_stats =
             (
-             elasticsearch =>
-             {
-                 index          => $or_self->{searchengine}{elasticsearch}{index} || 'UNKNOWN',
-                 type           => $or_self->{searchengine}{elasticsearch}{type}  || 'UNKNOWN',
-                 enable_query   => $or_self->{searchengine}{elasticsearch}{enable_query} || 0,
-                 cluster_health => $or_es->cluster->health,
-                 index_single_added_values_immediately => $or_self->{searchengine}{elasticsearch}{index_single_added_values_immediately} || 0,
-             },
+             index          => $or_self->{searchengine}{elasticsearch}{index} || 'UNKNOWN',
+             type           => $or_self->{searchengine}{elasticsearch}{type}  || 'UNKNOWN',
+             enable_query   => $or_self->{searchengine}{elasticsearch}{enable_query} || 0,
+             cluster_health => $or_es->cluster->health,
+             index_single_added_values_immediately => $or_self->{searchengine}{elasticsearch}{index_single_added_values_immediately} || 0,
             );
         # boolean -> 0/1
         for (values %{$h_searchengine_stats{elasticsearch}{cluster_health}}) {
             $_ = $_ ? 1 : 0 if ref eq 'JSON::XS::Boolean';
         }
+        $h_flat_searchengine_stats{"elasticsearch_$_"} = $h_searchengine_stats{$_}
+          for qw(index type enable_query index_single_added_values_immediately);
+        $h_flat_searchengine_stats{"elasticsearch_cluster_health_$_"} = $h_searchengine_stats{cluster_health}{$_}
+          for qw(cluster_name active_shards_percent_as_number active_primary_shards number_of_nodes status);
     }
 
-    return {
-        count_datapointkeys => 0+$i_count_datapointkeys,
-        count_datapoints    => 0+$i_count_datapoints,
-        count_metrics       => 0+$i_count_metrics,
-        count_keys          => 0+$i_count_keys,
-        %h_searchengine_stats,
-    };
+    $stats{count_datapoints}    ||= 0+$or_self->{query}->select_count_datapoints->fetch->[0];
+    $stats{count_datapointkeys}   = 0+$or_self->{query}->select_count_datapointkeys->fetch->[0] if $or_self->{verbose};
+    $stats{count_metrics}         = 0+$or_self->{query}->select_count_metrics->fetch->[0]       if $or_self->{verbose};
+    $stats{count_keys}            = 0+$or_self->{query}->select_count_keys->fetch->[0]          if $or_self->{verbose};
+
+    %stats = (%stats, %h_flat_searchengine_stats);
+
+    return \%stats;
 }
 
 sub get_single_benchmark_point {
@@ -806,6 +830,8 @@ sub search_array {
                 my @ar_es_result = map { $_->{_source} } @{$hr_es_answer->{hits}{hits} || []};
                 return \@ar_es_result;
             }
+        } else {
+            print STDERR "Did not get Elasticsearch query, fall back to SQL.\n" if $debug;
         }
 
         # Else no-op, continue with relational backend query.
@@ -1360,7 +1386,8 @@ An Array of Array References containing restrictions for benchmark data points.
     <=          - lower equal
     >=          - greater equal
     like        - SQL LIKE
-    not like    - SQL NOT LIKE
+    not_like    - SQL NOT LIKE
+    is_empty    - empty string or undef or null
 
 2. Parameter in Sub-Array = restricted column
 
@@ -1447,8 +1474,12 @@ Every "key" create a new nested hash.
             'machine',
         ],
         where       => [
-            ['!=', 'machine', 'mx1.small'     ],
-            ['=' , 'NAME'   , 'testbenchmark' ],
+            ['!=',       'machine',      'mx1.small'     ],
+            ['=',        'NAME'   ,      'testbenchmark' ],
+            ['like',     'some_key',     'some%value'    ],
+            ['not_like', 'another_key',  'another%value' ],
+            ['is_empty', 'parameter1',   1 ], # check parameter1 is empty     - Elasticsearch backend only
+            ['is_empty', 'parameter2',   0 ], # check parameter2 is not empty - Elasticsearch backend only
         ],
         limit       => 2,
         offset      => 1,
@@ -1756,7 +1787,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

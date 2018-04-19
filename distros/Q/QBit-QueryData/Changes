@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2017-04-05 00:00:00 +0000 to present.
+Changes from 2017-04-14 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2018-04-05 21:17:48 +0000
+version 0.011 at 2018-04-14 16:58:22 +0000
 ------------------------------------------
+
+  Change: 0cbb94dfde4cc009d42fbc35462314346ddab4c8
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-04-14 19:57:36 +0000
+
+    Merge pull request #9 from QBitFramework/support_fields_with_dot
+
+    Support fields with dot 
+
+  Change: 50c439847d15f40e81cb5cedbb0e75ebdbc77606
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-04-14 18:37:38 +0000
+
+    speed up filters 
+
+  Change: df924e1f1c75bb2b38ba64865b6056e50c87092f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-04-14 18:01:35 +0000
+
+    function - ok 
+
+------------------------------------------
+version 0.010 at 2018-04-05 21:18:00 +0000
+------------------------------------------
+
+  Change: 3350e79466186a1c6e12ccaedddf69feb069678b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-04-06 00:18:00 +0000
+
+    Version 0.010 
 
   Change: 8d8bbee9e34559ca58a177866fbf340edd013e89
   Author: Igor <igor-sverdlov@mail.ru>
@@ -255,5 +285,5 @@ version 0.003 at 2017-08-22 06:46:38 +0000
     fix doc 
 
 ================================================
-Plus 2 releases after 2017-04-05 00:00:00 +0000.
+Plus 2 releases after 2017-04-14 00:00:00 +0000.
 ================================================

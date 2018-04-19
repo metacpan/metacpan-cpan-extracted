@@ -1,5 +1,9 @@
 Version history for Perl module Alien::Box2D
 
+0.106	14/04/2018
+	- Fixed libBox2D download url [FROGGS]
+	- Fixed detection of cl in tests [FROGGS]
+
 0.105	20/01/2012
 	- another fix for -fpic (can be "-DPIC -fPIC") [FROGGS]
 

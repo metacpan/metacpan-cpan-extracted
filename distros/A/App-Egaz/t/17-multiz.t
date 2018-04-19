@@ -21,7 +21,7 @@ $result = test_app( 'App::Egaz' => [qw(multiz t/Q_rubravsQ_aliena --tree t/not_e
 like( $result->error, qr{doesn't exist}, 'inputs not exists' );
 
 SKIP: {
-    skip "multiz not installed", 2 unless IPC::Cmd::can_run('multiz');
+    skip "multiz not installed", 3 unless IPC::Cmd::can_run('multiz');
 
     my $t_path = Path::Tiny::path("t/")->absolute->stringify;
     my $cwd    = Path::Tiny->cwd;
@@ -30,15 +30,15 @@ SKIP: {
     chdir $tempdir;
 
     $result = test_app( 'App::Egaz' => [ "multiz", "$t_path/Q_rubravsQ_aliena", "-o", "." ] );
-    like( $result->stderr, qr{.maf.gz files: \[1\]}, 'STDERR: file count' );
+    like( $result->stderr, qr{.maf.gz files: \[1\]}, 'STDERR: .maf file count' );
     like( $result->stderr, qr{too few species},      'STDERR: too few species' );
-    ok( $tempdir->child("NC_020152.synNet.maf.gz")->is_file, 'maf file exists' );
+    ok( $tempdir->child("NC_020152.synNet.maf.gz")->is_file, '.maf file exists' );
 
     chdir $cwd;    # Won't keep tempdir
 }
 
 SKIP: {
-    skip "multiz not installed", 4 unless IPC::Cmd::can_run('multiz');
+    skip "multiz not installed", 9 unless IPC::Cmd::can_run('multiz');
 
     my $t_path = Path::Tiny::path("t/")->absolute->stringify;
     my $cwd    = Path::Tiny->cwd;

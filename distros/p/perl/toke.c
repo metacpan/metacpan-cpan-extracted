@@ -2388,6 +2388,8 @@ S_sublex_start(pTHX)
     PL_parser->lex_super_state = PL_lex_state;
     PL_parser->lex_sub_inwhat = (U16)op_type;
     PL_parser->lex_sub_op = PL_lex_op;
+    PL_parser->sub_no_recover = FALSE;
+    PL_parser->sub_error_count = PL_error_count;
     PL_lex_state = LEX_INTERPPUSH;
 
     PL_expect = XTERM;
@@ -2567,6 +2569,20 @@ S_sublex_done(pTHX)
     else {
 	const line_t l = CopLINE(PL_curcop);
 	LEAVE;
+        if (PL_parser->sub_error_count != PL_error_count) {
+            const char * const name = OutCopFILE(PL_curcop);
+            if (PL_parser->sub_no_recover) {
+                const char * msg = "";
+                if (PL_in_eval) {
+                    SV *errsv = ERRSV;
+                    if (SvCUR(ERRSV)) {
+                        msg = Perl_form(aTHX_ "%" SVf, SVfARG(errsv));
+                    }
+                }
+                abort_execution(msg, name);
+                NOT_REACHED;
+            }
+        }
 	if (PL_multi_close == '<')
 	    PL_parser->herelines += l - PL_multi_end;
 	PL_bufend = SvPVX(PL_linestr);
@@ -4141,6 +4157,7 @@ S_intuit_more(pTHX_ char *s)
 	return TRUE;
     if (*s != '{' && *s != '[')
 	return FALSE;
+    PL_parser->sub_no_recover = TRUE;
     if (!PL_lex_inpat)
 	return TRUE;
 
@@ -5164,12 +5181,23 @@ Perl_yylex(pTHX)
         else {
             c = Perl_form(aTHX_ "\\x%02X", (unsigned char)*s);
         }
-        len = UTF ? Perl_utf8_length(aTHX_ (U8 *) PL_linestart, (U8 *) s) : (STRLEN) (s - PL_linestart);
-        if (len > UNRECOGNIZED_PRECEDE_COUNT) {
-            d = UTF ? (char *) utf8_hop_back((U8 *) s, -UNRECOGNIZED_PRECEDE_COUNT, (U8 *)PL_linestart) : s - UNRECOGNIZED_PRECEDE_COUNT;
-        } else {
+
+        if (s >= PL_linestart) {
             d = PL_linestart;
         }
+        else {
+            /* somehow (probably due to a parse failure), PL_linestart has advanced
+             * pass PL_bufptr, get a reasonable beginning of line
+             */
+            d = s;
+            while (d > SvPVX(PL_linestr) && d[-1] && d[-1] != '\n')
+                --d;
+        }
+        len = UTF ? Perl_utf8_length(aTHX_ (U8 *) d, (U8 *) s) : (STRLEN) (s - d);
+        if (len > UNRECOGNIZED_PRECEDE_COUNT) {
+            d = UTF ? (char *) utf8_hop_back((U8 *) s, -UNRECOGNIZED_PRECEDE_COUNT, (U8 *)d) : s - UNRECOGNIZED_PRECEDE_COUNT;
+        }
+
         Perl_croak(aTHX_  "Unrecognized character %s; marked by <-- HERE after %" UTF8f "<-- HERE near column %d", c,
                           UTF8fARG(UTF, (s - d), d),
                          (int) len + 1);
@@ -6221,8 +6249,10 @@ Perl_yylex(pTHX)
 			break;
 		    }
 		    if (strEQs(s, "sub")) {
+                        PL_bufptr = s;
 			d = s + 3;
 			d = skipspace(d);
+                        s = PL_bufptr;
 			if (*d == ':') {
 			    PL_expect = XTERM;
 			    break;
@@ -9433,10 +9463,13 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
 
         if ( !tmp_copline )
             tmp_copline = CopLINE(PL_curcop);
-        if ((skip = s < PL_bufend && isSPACE(*s)))
+        if ((skip = s < PL_bufend && isSPACE(*s))) {
             /* Avoid incrementing line numbers or resetting PL_linestart,
                in case we have to back up.  */
+            STRLEN s_off = s - SvPVX(PL_linestr);
             s2 = peekspace(s);
+            s = SvPVX(PL_linestr) + s_off;
+        }
         else
             s2 = s;
 
@@ -9478,6 +9511,7 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
             CopLINE_set(PL_curcop, orig_copline);
             PL_parser->herelines = herelines;
 	    *dest = '\0';
+            PL_parser->sub_no_recover = TRUE;
 	}
     }
     else if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets && !intuit_more(s))

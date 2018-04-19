@@ -1,4 +1,4 @@
-package Pcore v0.60.0;
+package Pcore v0.61.4;
 
 use v5.26.1;
 use common::header;
@@ -17,7 +17,7 @@ our $EXPORT_PRAGMA = {
     export   => 1,    # install standart import method
     inline   => 0,    # package use Inline
     l10n     => 1,    # register package L10N domain
-    result   => 0,    # export Pcore::Util::Result qw[result]
+    res      => 0,    # export Pcore::Util::Result qw[res]
     role     => 0,    # package is a Moo role
     rpc      => 0,    # run class as RPC server
     sql      => 0,    # export Pcore::Handle::DBI::Const qw[:TYPES]
@@ -25,6 +25,7 @@ our $EXPORT_PRAGMA = {
 };
 
 our $EMBEDDED    = 0;       # Pcore::Core used in embedded mode
+our $FORK        = 0;       # fork template proc
 our $SCRIPT_PATH = $0;
 our $WIN_ENC     = undef;
 our $CON_ENC     = undef;
@@ -110,12 +111,8 @@ sub import {
                     exit;
                 } );
             }
-            elsif ( !$MSWIN ) {
-                B::Hooks::AtRuntime::at_runtime( sub {
-                    require Pcore::RPC::Tmpl;
-
-                    return;
-                } );
+            else {
+                $FORK = 1;
             }
         }
 
@@ -176,11 +173,11 @@ sub import {
         # import exceptions
         Pcore::Core::Exception->import( -caller => $caller );
 
-        # process -result pragma
-        if ( $import->{pragma}->{result} ) {
+        # process -res pragma
+        if ( $import->{pragma}->{res} ) {
             state $RESULT_INIT = !!require Pcore::Util::Result;
 
-            Pcore::Util::Result->import( -caller => $caller, qw[result] );
+            Pcore::Util::Result->import( -caller => $caller, qw[res] );
         }
 
         # process -sql pragma
@@ -402,34 +399,31 @@ sub _CORE_INIT {
     }
 
     # STDOUT
-    open our $STDOUT_UTF8, '>&STDOUT' or $STDOUT_UTF8 = *STDOUT;    ## no critic qw[InputOutput::ProhibitBarewordFileHandles]
-
-    _config_stdout($STDOUT_UTF8);
-
-    # STDERR
-    open our $STDERR_UTF8, '>&STDERR' or $STDERR_UTF8 = *STDERR;    ## no critic qw[InputOutput::ProhibitBarewordFileHandles]
-
-    _config_stdout($STDERR_UTF8);
-
-    select $STDOUT_UTF8;                                            ## no critic qw[InputOutput::ProhibitOneArgSelect]
+    config_stdout(*STDOUT);
+    config_stdout(*STDERR);
 
     STDOUT->autoflush(1);
     STDERR->autoflush(1);
 
-    $STDOUT_UTF8->autoflush(1);
-    $STDERR_UTF8->autoflush(1);
+    require Pcore::Core::Exception;    # set $SIG{__DIE__}, $SIG{__WARN__}, $SIG->{INT}, $SIG->{TERM} handlers
 
-    require Pcore::Core::Exception;                                 # set $SIG{__DIE__}, $SIG{__WARN__}, $SIG->{INT}, $SIG->{TERM} handlers
+    require Pcore::RPC::Tmpl if $FORK && !$MSWIN;
 
+    _CORE_INIT_AFTER_FORK();
+
+    return;
+}
+
+sub _CORE_INIT_AFTER_FORK {
     require Pcore::AE::Patch;
 
     return;
 }
 
 # TODO add PerlIO::removeEsc layer
-sub _config_stdout ($h) {
+sub config_stdout ($h) {
     if ($MSWIN) {
-        if ( -t $h ) {                                              ## no critic qw[InputOutput::ProhibitInteractiveTest]
+        if ( -t $h ) {    ## no critic qw[InputOutput::ProhibitInteractiveTest]
             state $init = !!require Pcore::Core::PerlIOviaWinUniCon;
 
             binmode $h, ':raw:via(Pcore::Core::PerlIOviaWinUniCon)' or die;    # terminal
@@ -649,25 +643,25 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 64                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (23)                    |
+## |    3 | 65                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (23)                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 86                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 87                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 258                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 255                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 333                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 453                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |      | 330                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
+## |      | 447                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 365, 394, 397, 401,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 435, 438, 443, 446,  |                                                                                                                |
-## |      | 471, 497, 633        |                                                                                                                |
+## |    3 | 362, 391, 394, 398,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 429, 432, 437, 440,  |                                                                                                                |
+## |      | 465, 491, 627        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 559                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 553                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 268                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 265                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 369                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 366                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

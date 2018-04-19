@@ -5,25 +5,28 @@ author:
   - 'Brian McCauley <nobull@cpan.org> (Maintenance)'
   - 'Todd Rinaldo <toddr@cpan.org> (Maintenance)'
 build_requires:
-  ExtUtils::CBuilder: 0
-  Module::Build: 0.35
-  Test::More: 0.40
+  ExtUtils::CBuilder: '0'
+  Module::Build: '0.35'
+  Test::More: '0.40'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3603'
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Safe-Hole
 provides:
   Safe::Hole:
     file: lib/Safe/Hole.pm
-    version: 0.13
+    version: '0.14'
+  Safe::Hole::User:
+    file: lib/Safe/Hole.pm
 resources:
-  MailingList: mailto:toddr@cpan.org
-  bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=Safe-Hole
+  bugtracker: https://github.com/toddr/Safe-Hole/issues
   homepage: http://github.com/toddr/Safe-Hole
   license: http://dev.perl.org/licenses/
   repository: git://github.com/toddr/Safe-Hole.git
-version: 0.13
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

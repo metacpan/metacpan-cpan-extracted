@@ -3,7 +3,7 @@ package GeoIP2::Model::ASN;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -41,7 +41,7 @@ GeoIP2::Model::ASN - Model class for the GeoLite2 ASN database
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ Provides a geocoding functionality using free databases
 
 # VERSION
 
-Version 0.07
+Version 0.09
 
 # SYNOPSIS
 

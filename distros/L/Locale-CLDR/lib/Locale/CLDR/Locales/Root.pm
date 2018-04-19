@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Root - Package for language Root
 
 package Locale::CLDR::Locales::Root;
 # This file auto generated from Data\common\main\root.xml
-#	on Fri 29 Apr  7:22:51 pm GMT
+#	on Fri 13 Apr  7:26:36 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -29,13 +30,20 @@ has 'GraphemeClusterBreak_variables' => (
 		'$LF' => '\p{Grapheme_Cluster_Break=LF}',
 		'$Control' => '\p{Grapheme_Cluster_Break=Control}',
 		'$Extend' => '\p{Grapheme_Cluster_Break=Extend}',
+		'$ZWJ' => '\p{Grapheme_Cluster_Break=ZWJ}',
+		'$RI' => '\p{Grapheme_Cluster_Break=Regional_Indicator}',
+		'$Prepend' => '\p{Grapheme_Cluster_Break=Prepend}',
 		'$SpacingMark' => '\p{Grapheme_Cluster_Break=SpacingMark}',
 		'$L' => '\p{Grapheme_Cluster_Break=L}',
 		'$V' => '\p{Grapheme_Cluster_Break=V}',
 		'$T' => '\p{Grapheme_Cluster_Break=T}',
 		'$LV' => '\p{Grapheme_Cluster_Break=LV}',
 		'$LVT' => '\p{Grapheme_Cluster_Break=LVT}',
-		'$Regional_Indicator' => '\p{Grapheme_Cluster_Break=Regional_Indicator}',
+		'$E_Base' => '\p{Grapheme_Cluster_Break=E_Base}',
+		'$E_Modifier' => '\p{Grapheme_Cluster_Break=E_Modifier}',
+		'$EBG' => '\p{Grapheme_Cluster_Break=E_Base_GAZ}',
+		'$Extended_Pict' => '[⎈★☇-☍☏-☐☒☖-☗☙-☜☞-☟☡☤-☥☧-☩☫-☭☰-☷☻-♇♔-♟♡-♢♤♧♩-♺♼-♾⚀-⚑⚕⚘⚚⚝-⚟⚢-⚩⚬-⚯⚲-⚼⚿-⛃⛆-⛇⛉-⛍⛐⛒⛕-⛨⛫-⛯⛶⛻-⛼⛾-✁✃-✄✎✐-✑❥-❧🀀-🀃🀅-🃿🄍-🄏🄯🅬-🅯🆭-🇥🈃-🈏🈼-🈿🉉-🉏🉒-🋿🌢-🌣🎔-🎕🎘🎜-🎝🏱-🏲🏶📾🔾-🕈🕏🕨-🕮🕱-🕲🕻-🖆🖈-🖉🖎-🖏🖑-🖔🖗-🖣🖦-🖧🖩-🖰🖳-🖻🖽-🗁🗅-🗐🗔-🗛🗟-🗠🗢🗤-🗧🗩-🗮🗰-🗲🗴-🗹🛆-🛊🛓-🛟🛦-🛨🛪🛭-🛯🛱-🛲🛷-🛿🝴-🝿🟕-🟿🠌-🠏🡈-🡏🡚-🡟🢈-🢏🢮-🤏🤟🤨-🤯🤱-🤲🤿🥌-🥏🥟-🥿🦒-🦿🧁-🿽]',
+		'$EmojiNRK' => '[[\p{Emoji}] - [\p{Grapheme_Cluster_Break=Regional_Indicator}*#0-9©®™〰〽]]',
 	]}
 );
 
@@ -50,9 +58,13 @@ has 'GraphemeClusterBreak_rules' => (
 		'6' => ' $L × ( $L | $V | $LV | $LVT ) ',
 		'7' => ' ( $LV | $V ) × ( $V | $T ) ',
 		'8' => ' ( $LVT | $T) × $T ',
-		'8.1' => ' $Regional_Indicator × $Regional_Indicator ',
-		'9' => ' × $Extend ',
+		'9' => ' × ($Extend | $ZWJ) ',
 		'9.1' => ' × $SpacingMark ',
+		'9.2' => ' $Prepend × ',
+		'10' => ' ($E_Base | $EBG) $Extend* × $E_Modifier ',
+		'11' => ' ($Extended_Pict | $EmojiNRK) $Extend* $ZWJ × ($Extended_Pict | $EmojiNRK) ',
+		'12' => ' ^ ($RI $RI)* $RI × $RI ',
+		'13' => ' [^$RI] ($RI $RI)* $RI × $RI ',
 	}}
 );
 has 'WordBreak_variables' => (
@@ -72,8 +84,19 @@ has 'WordBreak_variables' => (
 		'$MidNumLet' => '\p{Word_Break=MidNumLet}',
 		'$Numeric' => '\p{Word_Break=Numeric}',
 		'$ExtendNumLet' => '\p{Word_Break=ExtendNumLet}',
-		'$Regional_Indicator' => '\p{Word_Break=Regional_Indicator}',
-		'$FE' => '[$Format $Extend]',
+		'$RI' => '\p{Word_Break=Regional_Indicator}',
+		'$Hebrew_Letter' => '\p{Word_Break=Hebrew_Letter}',
+		'$Double_Quote' => '\p{Word_Break=Double_Quote}',
+		'$Single_Quote' => '\p{Word_Break=Single_Quote}',
+		'$E_Base' => '\p{Word_Break=E_Base}',
+		'$E_Modifier' => '\p{Word_Break=E_Modifier}',
+		'$ZWJ' => '\p{Word_Break=ZWJ}',
+		'$EBG' => '\p{Word_Break=E_Base_GAZ}',
+		'$Extended_Pict' => '[⎈★☇-☍☏-☐☒☖-☗☙-☜☞-☟☡☤-☥☧-☩☫-☭☰-☷☻-♇♔-♟♡-♢♤♧♩-♺♼-♾⚀-⚑⚕⚘⚚⚝-⚟⚢-⚩⚬-⚯⚲-⚼⚿-⛃⛆-⛇⛉-⛍⛐⛒⛕-⛨⛫-⛯⛶⛻-⛼⛾-✁✃-✄✎✐-✑❥-❧🀀-🀃🀅-🃿🄍-🄏🄯🅬-🅯🆭-🇥🈃-🈏🈼-🈿🉉-🉏🉒-🋿🌢-🌣🎔-🎕🎘🎜-🎝🏱-🏲🏶📾🔾-🕈🕏🕨-🕮🕱-🕲🕻-🖆🖈-🖉🖎-🖏🖑-🖔🖗-🖣🖦-🖧🖩-🖰🖳-🖻🖽-🗁🗅-🗐🗔-🗛🗟-🗠🗢🗤-🗧🗩-🗮🗰-🗲🗴-🗹🛆-🛊🛓-🛟🛦-🛨🛪🛭-🛯🛱-🛲🛷-🛿🝴-🝿🟕-🟿🠌-🠏🡈-🡏🡚-🡟🢈-🢏🢮-🤏🤟🤨-🤯🤱-🤲🤿🥌-🥏🥟-🥿🦒-🦿🧁-🿽]',
+		'$EmojiNRK' => '[[\p{Emoji}] - [\p{Word_Break=Regional_Indicator}*#0-9©®™〰〽]]',
+		'$AHLetter' => '($ALetter | $Hebrew_Letter)',
+		'$MidNumLetQ' => '($MidNumLet | $Single_Quote)',
+		'$FE' => '[$Format $Extend $ZWJ]',
 		'$NotBreak_' => '[^ $Newline $CR $LF ]',
 		'$Katakana' => '($Katakana $FE*)',
 		'$ALetter' => '($ALetter $FE*)',
@@ -82,7 +105,12 @@ has 'WordBreak_variables' => (
 		'$MidNumLet' => '($MidNumLet $FE*)',
 		'$Numeric' => '($Numeric $FE*)',
 		'$ExtendNumLet' => '($ExtendNumLet $FE*)',
-		'$Regional_Indicator' => '($Regional_Indicator $FE*)',
+		'$RI' => '($RI $FE*)',
+		'$Hebrew_Letter' => '($Hebrew_Letter $FE*)',
+		'$Double_Quote' => '($Double_Quote $FE*)',
+		'$Single_Quote' => '($Single_Quote $FE*)',
+		'$AHLetter' => '($AHLetter $FE*)',
+		'$MidNumLetQ' => '($MidNumLetQ $FE*)',
 	]}
 );
 
@@ -94,19 +122,25 @@ has 'WordBreak_rules' => (
 		'3' => ' $CR × $LF ',
 		'3.1' => ' ($Newline | $CR | $LF) ÷ ',
 		'3.2' => ' ÷ ($Newline | $CR | $LF) ',
-		'4' => ' $NotBreak_ × [$Format $Extend] ',
-		'5' => ' $ALetter × $ALetter ',
-		'6' => ' $ALetter × ($MidLetter | $MidNumLet) $ALetter ',
-		'7' => ' $ALetter ($MidLetter | $MidNumLet) × $ALetter ',
+		'3.3' => ' $ZWJ × ($Extended_Pict | $EmojiNRK) ',
+		'4' => ' $NotBreak_ × [$Format $Extend $ZWJ] ',
+		'5' => ' $AHLetter × $AHLetter ',
+		'6' => ' $AHLetter × ($MidLetter | $MidNumLetQ) $AHLetter ',
+		'7' => ' $AHLetter ($MidLetter | $MidNumLetQ) × $AHLetter ',
+		'7.1' => ' $Hebrew_Letter × $Single_Quote ',
+		'7.2' => ' $Hebrew_Letter × $Double_Quote $Hebrew_Letter ',
+		'7.3' => ' $Hebrew_Letter $Double_Quote × $Hebrew_Letter ',
 		'8' => ' $Numeric × $Numeric ',
-		'9' => ' $ALetter × $Numeric ',
-		'10' => ' $Numeric × $ALetter ',
-		'11' => ' $Numeric ($MidNum | $MidNumLet) × $Numeric ',
-		'12' => ' $Numeric × ($MidNum | $MidNumLet) $Numeric ',
+		'9' => ' $AHLetter × $Numeric ',
+		'10' => ' $Numeric × $AHLetter ',
+		'11' => ' $Numeric ($MidNum | $MidNumLetQ) × $Numeric ',
+		'12' => ' $Numeric × ($MidNum | $MidNumLetQ) $Numeric ',
 		'13' => ' $Katakana × $Katakana ',
-		'13.1' => ' ($ALetter | $Numeric | $Katakana | $ExtendNumLet) × $ExtendNumLet ',
-		'13.2' => ' $ExtendNumLet × ($ALetter | $Numeric | $Katakana) ',
-		'13.3' => ' $Regional_Indicator × $Regional_Indicator ',
+		'13.1' => ' ($AHLetter | $Numeric | $Katakana | $ExtendNumLet) × $ExtendNumLet ',
+		'13.2' => ' $ExtendNumLet × ($AHLetter | $Numeric | $Katakana) ',
+		'14' => ' ($E_Base | $EBG) ($Format | $Extend | $ZWJ)* × $E_Modifier ',
+		'15' => ' ^ ($RI $RI)* $RI × $RI ',
+		'16' => ' [^$RI] ($RI $RI)* $RI × $RI ',
 	}}
 );
 has 'SentenceBreak_variables' => (
@@ -140,6 +174,8 @@ has 'SentenceBreak_variables' => (
 		'$STerm' => '($STerm $FE*)',
 		'$Close' => '($Close $FE*)',
 		'$SContinue' => '($SContinue $FE*)',
+		'$ParaSep' => '($Sep | $CR | $LF)',
+		'$SATerm' => '($STerm | $ATerm)',
 	]}
 );
 
@@ -149,16 +185,16 @@ has 'SentenceBreak_rules' => (
 	init_arg => undef,
 	default => sub { {
 		'3' => ' $CR × $LF ',
-		'4' => ' ($Sep | $CR | $LF) ÷ ',
+		'4' => ' $ParaSep ÷ ',
 		'5' => ' × [$Format $Extend] ',
 		'6' => ' $ATerm × $Numeric ',
 		'7' => ' ($Upper | $Lower) $ATerm × $Upper ',
 		'8' => ' $ATerm $Close* $Sp* × $NotPreLower_* $Lower ',
-		'8.1' => ' ($STerm | $ATerm) $Close* $Sp* × ($SContinue | $STerm | $ATerm) ',
-		'9' => ' ( $STerm | $ATerm ) $Close* × ( $Close | $Sp | $Sep | $CR | $LF ) ',
-		'10' => ' ( $STerm | $ATerm ) $Close* $Sp* × ( $Sp | $Sep | $CR | $LF ) ',
-		'11' => ' ( $STerm | $ATerm ) $Close* $Sp* ($Sep | $CR | $LF)? ÷ ',
-		'12' => ' × $Any ',
+		'8.1' => ' $SATerm $Close* $Sp* × ($SContinue | $SATerm) ',
+		'9' => ' $SATerm $Close* × ( $Close | $Sp | $ParaSep ) ',
+		'10' => ' $SATerm $Close* $Sp* × ( $Sp | $ParaSep ) ',
+		'11' => ' $SATerm $Close* $Sp* $ParaSep? ÷ ',
+		'998' => ' × $Any ',
 	}}
 );
 has 'LineBreak_variables' => (
@@ -175,7 +211,7 @@ has 'LineBreak_variables' => (
 		'$CB' => '\p{Line_Break=Contingent_Break}',
 		'$CL' => '\p{Line_Break=Close_Punctuation}',
 		'$CP' => '\p{Line_Break=CP}',
-		'$CM' => '\p{Line_Break=Combining_Mark}',
+		'$CM1' => '\p{Line_Break=Combining_Mark}',
 		'$CR' => '\p{Line_Break=Carriage_Return}',
 		'$EX' => '\p{Line_Break=Exclamation}',
 		'$GL' => '\p{Line_Break=Glue}',
@@ -206,7 +242,15 @@ has 'LineBreak_variables' => (
 		'$ZW' => '\p{Line_Break=ZWSpace}',
 		'$CJ' => '\p{Line_Break=Conditional_Japanese_Starter}',
 		'$RI' => '\p{Line_Break=Regional_Indicator}',
-		'$AL' => '[$AI $AL $XX $SA $SG]',
+		'$EB' => '\p{Line_Break=E_Base}',
+		'$EM' => '\p{Line_Break=E_Modifier}',
+		'$ZWJ_O' => '\p{Line_Break=ZWJ}',
+		'$ZWJ' => '\p{Line_Break=ZWJ}',
+		'$EmojiNRK' => '[[\p{Emoji}] - [$RI *#0-9©®™〰〽]]',
+		'$Extended_Pict' => '[⎈★☇-☍☏-☐☒☖-☗☙-☜☞-☟☡☤-☥☧-☩☫-☭☰-☷☻-♇♔-♟♡-♢♤♧♩-♺♼-♾⚀-⚑⚕⚘⚚⚝-⚟⚢-⚩⚬-⚯⚲-⚼⚿-⛃⛆-⛇⛉-⛍⛐⛒⛕-⛨⛫-⛯⛶⛻-⛼⛾-✁✃-✄✎✐-✑❥-❧🀀-🀃🀅-🃿🄍-🄏🄯🅬-🅯🆭-🇥🈃-🈏🈼-🈿🉉-🉏🉒-🋿🌢-🌣🎔-🎕🎘🎜-🎝🏱-🏲🏶📾🔾-🕈🕏🕨-🕮🕱-🕲🕻-🖆🖈-🖉🖎-🖏🖑-🖔🖗-🖣🖦-🖧🖩-🖰🖳-🖻🖽-🗁🗅-🗐🗔-🗛🗟-🗠🗢🗤-🗧🗩-🗮🗰-🗲🗴-🗹🛆-🛊🛓-🛟🛦-🛨🛪🛭-🛯🛱-🛲🛷-🛿🝴-🝿🟕-🟿🠌-🠏🡈-🡏🡚-🡟🢈-🢏🢮-🤏🤟🤨-🤯🤱-🤲🤿🥌-🥏🥟-🥿🦒-🦿🧁-🿽]',
+		'$CM' => '[$CM1 $ZWJ]',
+		'$AL' => '[$AI $AL $SG $XX [$SA-[[:Mn:][:Mc:]]]]',
+		'$CM' => '[$CM $ZWJ [$SA & [[:Mn:][:Mc:]]]]',
 		'$NS' => '[$NS $CJ]',
 		'$X' => '$CM*',
 		'$Spec1_' => '[$SP $BK $CR $LF $NL $ZW]',
@@ -223,7 +267,7 @@ has 'LineBreak_variables' => (
 		'$CL' => '($CL $X)',
 		'$CP' => '($CP $X)',
 		'$CM' => '($CM $X)',
-		'$CM' => '($CM $X)',
+		'$EX' => '($EX $X)',
 		'$GL' => '($GL $X)',
 		'$H2' => '($H2 $X)',
 		'$H3' => '($H3 $X)',
@@ -247,6 +291,11 @@ has 'LineBreak_variables' => (
 		'$WJ' => '($WJ $X)',
 		'$XX' => '($XX $X)',
 		'$RI' => '($RI $X)',
+		'$EB' => '($EB $X)',
+		'$EM' => '($EM $X)',
+		'$ZWJ' => '($ZWJ $X)',
+		'$EmojiNRK' => '($EmojiNRK $X)',
+		'$Extended_Pict' => '($Extended_Pict $X)',
 		'$AL' => '($AL | ^ $CM | (?<=$Spec1_) $CM)',
 	]}
 );
@@ -265,6 +314,7 @@ has 'LineBreak_rules' => (
 		'7.01' => ' × $SP ',
 		'7.02' => ' × $ZW ',
 		'8' => ' $ZW $SP* ÷ ',
+		'8.1' => ' $ZWJ_0 × ($ID | $Extended_Pict | $EmojiNRK) ',
 		'9' => ' $Spec2_ × $CM ',
 		'11.01' => ' × $WJ ',
 		'11.02' => ' $WJ × ',
@@ -292,16 +342,16 @@ has 'LineBreak_rules' => (
 		'21.1' => ' $HL ($HY | $BA) × ',
 		'21.2' => ' $SY × $HL ',
 		'22.01' => ' ($AL | $HL) × $IN ',
-		'22.02' => ' $ID × $IN ',
-		'22.03' => ' $IN × $IN ',
-		'22.04' => ' $NU × $IN ',
-		'22.05' => ' $EX × $IN ',
-		'23.01' => ' $ID × $PO ',
+		'22.02' => ' $EX × $IN ',
+		'22.03' => ' ($ID | $EB | $EM) × $IN ',
+		'22.04' => ' $IN × $IN ',
+		'22.05' => ' $NU × $IN ',
 		'23.02' => ' ($AL | $HL) × $NU ',
 		'23.03' => ' $NU × ($AL | $HL) ',
-		'24.01' => ' $PR × $ID ',
-		'24.02' => ' $PR × ($AL | $HL) ',
-		'24.03' => ' $PO × ($AL | $HL) ',
+		'23.12' => ' $PR × ($ID | $EB | $EM) ',
+		'23.13' => ' ($ID | $EB | $EM) × $PO ',
+		'24.02' => ' ($PR | $PO) × ($AL | $HL) ',
+		'24.03' => ' ($AL | $HL) × ($PR | $PO) ',
 		'25.01' => ' ($PR | $PO) × ( $OP | $HY )? $NU ',
 		'25.02' => ' ( $OP | $HY ) × $NU ',
 		'25.03' => ' $NU × ($NU | $SY | $IS) ',
@@ -317,7 +367,10 @@ has 'LineBreak_rules' => (
 		'29' => ' $IS × ($AL | $HL) ',
 		'30.01' => ' ($AL | $HL | $NU) × $OP ',
 		'30.02' => ' $CP × ($AL | $HL | $NU) ',
-		'30.11' => ' $RI × $RI ',
+		'30.11' => ' ^ ($RI $RI)* $RI × $RI ',
+		'30.12' => ' [^$RI] ($RI $RI)* $RI × $RI ',
+		'30.13' => ' $RI ÷ $RI ',
+		'30.2' => ' $EB × $EM ',
 	}}
 );
 has 'valid_algorithmic_formats' => (
@@ -1542,12 +1595,12 @@ has 'algorithmic_number_format_data' => (
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 				'max' => {
 					base_value => q(1000000000000000000),
 					divisor => q(1000000000000000000),
-					rule => q(=#,###0=),
+					rule => q(=#,##0=),
 				},
 			},
 		},
@@ -3475,12 +3528,15 @@ has 'algorithmic_number_format_data' => (
 				'0' => {
 					base_value => q(0),
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0=),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
 				},
 				'max' => {
-					base_value => q(0),
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -3694,7 +3750,8 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			punctuation => qr{(?^u:[\- , ; \: ! ? . ( ) \[ \] \{ \}])},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- , ; \: ! ? . ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -4254,6 +4311,10 @@ has 'units' => (
 						'name' => q(mpt),
 						'other' => q({0} mpt),
 					},
+					'point' => {
+						'name' => q(pt),
+						'other' => q({0} pt),
+					},
 					'pound' => {
 						'name' => q(lb),
 						'other' => q({0} lb),
@@ -4297,6 +4358,7 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(m²),
@@ -4306,6 +4368,7 @@ has 'units' => (
 					'square-mile' => {
 						'name' => q(mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yd²),
@@ -4382,8 +4445,8 @@ has 'listPatterns' => (
 	default		=> sub { {
 				start => q({0}, {1}),
 				middle => q({0}, {1}),
-				end => q({0}, {1}),
-				2 => q({0}, {1}),
+				end => q({0}, or {1}),
+				2 => q({0} or {1}),
 		} }
 );
 
@@ -4419,11 +4482,11 @@ has 'number_symbols' => (
 			'group' => q(٬),
 			'infinity' => q(∞),
 			'list' => q(؛),
-			'minusSign' => q(‏-),
+			'minusSign' => q(؜-),
 			'nan' => q(NaN),
 			'perMille' => q(؉),
-			'percentSign' => q(٪),
-			'plusSign' => q(‏+),
+			'percentSign' => q(٪؜),
+			'plusSign' => q(؜+),
 			'superscriptingExponent' => q(×),
 			'timeSeparator' => q(:),
 		},
@@ -4448,6 +4511,7 @@ has 'number_symbols' => (
 		'cham' => { 'alias' => 'latn' },
 		'deva' => { 'alias' => 'latn' },
 		'fullwide' => { 'alias' => 'latn' },
+		'gonm' => { 'alias' => 'latn' },
 		'gujr' => { 'alias' => 'latn' },
 		'guru' => { 'alias' => 'latn' },
 		'hanidec' => { 'alias' => 'latn' },
@@ -4562,7 +4626,7 @@ has 'number_formats' => (
 					'other' => '000T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'short' => {
@@ -4611,6 +4675,9 @@ has 'number_formats' => (
 			'alias' => 'latn',
 		},
 		fullwide => {
+			'alias' => 'latn',
+		},
+		gonm => {
 			'alias' => 'latn',
 		},
 		gujr => {
@@ -4679,7 +4746,7 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -4689,7 +4756,7 @@ has 'number_formats' => (
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -4732,7 +4799,16 @@ has 'number_currency_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'arab' => {
-			'alias' => 'latn',
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'alias' => 'standard',
+					},
+					'standard' => {
+						'positive' => '#,##0.00 ¤',
+					},
+				},
+			},
 		},
 		'arabext' => {
 			'alias' => 'latn',
@@ -4756,6 +4832,9 @@ has 'number_currency_formats' => (
 			'alias' => 'latn',
 		},
 		'fullwide' => {
+			'alias' => 'latn',
+		},
+		'gonm' => {
 			'alias' => 'latn',
 		},
 		'gujr' => {
@@ -4922,7 +5001,7 @@ has 'currencies' => (
 		'BWP' => {
 			symbol => 'P',
 		},
-		'BYR' => {
+		'BYN' => {
 			symbol => 'р.',
 		},
 		'BZD' => {
@@ -5104,6 +5183,9 @@ has 'currencies' => (
 		},
 		'PYG' => {
 			symbol => '₲',
+		},
+		'RON' => {
+			symbol => 'lei',
 		},
 		'RUB' => {
 			symbol => '₽',
@@ -6096,224 +6178,14 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic-amete-alem') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'chinese') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic-umalqura') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic-rgsa') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic-tbla') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic-civil') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'am' if $time >= 0
-						&& $time < 1200;
-					return 'pm' if $time >= 1200
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'japanese') {
-				if($day_period_type eq 'default') {
+				if($day_period_type eq 'selection') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
 						&& $time < 2400;
 				}
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
@@ -6322,13 +6194,103 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
 				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
 						&& $time < 2400;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
 				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic-amete-alem') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic-tbla') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
@@ -6337,13 +6299,133 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
 				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
 						&& $time < 2400;
 				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic-civil') {
 				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic-rgsa') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic-umalqura') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
@@ -6352,13 +6434,13 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'dangi') {
-				if($day_period_type eq 'default') {
+				if($day_period_type eq 'selection') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
 						&& $time < 2400;
 				}
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
 						&& $time < 1200;
 					return 'pm' if $time >= 1200
@@ -6403,13 +6485,13 @@ has 'day_periods' => (
 		},
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
+				'wide' => {
 					'alias' => {
 						'context' => 'format',
 						'width' => 'abbreviated',
 					},
 				},
-				'wide' => {
+				'narrow' => {
 					'alias' => {
 						'context' => 'format',
 						'width' => 'abbreviated',
@@ -6421,13 +6503,13 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'wide' => {
 					'alias' => {
 						'context' => 'stand-alone',
 						'width' => 'abbreviated',
 					},
 				},
-				'wide' => {
+				'narrow' => {
 					'alias' => {
 						'context' => 'stand-alone',
 						'width' => 'abbreviated',
@@ -6611,13 +6693,13 @@ has 'eras' => (
 				'8' => 'Yōrō (717–724)',
 				'9' => 'Jinki (724–729)',
 				'10' => 'Tenpyō (729–749)',
-				'11' => 'Tenpyō-kampō (749-749)',
-				'12' => 'Tenpyō-shōhō (749-757)',
-				'13' => 'Tenpyō-hōji (757-765)',
-				'14' => 'Tenpyō-jingo (765-767)',
-				'15' => 'Jingo-keiun (767-770)',
+				'11' => 'Tenpyō-kampō (749–749)',
+				'12' => 'Tenpyō-shōhō (749–757)',
+				'13' => 'Tenpyō-hōji (757–765)',
+				'14' => 'Tenpyō-jingo (765–767)',
+				'15' => 'Jingo-keiun (767–770)',
 				'16' => 'Hōki (770–780)',
-				'17' => 'Ten-ō (781-782)',
+				'17' => 'Ten-ō (781–782)',
 				'18' => 'Enryaku (782–806)',
 				'19' => 'Daidō (806–810)',
 				'20' => 'Kōnin (810–824)',
@@ -6626,7 +6708,7 @@ has 'eras' => (
 				'23' => 'Kajō (848–851)',
 				'24' => 'Ninju (851–854)',
 				'25' => 'Saikō (854–857)',
-				'26' => 'Ten-an (857-859)',
+				'26' => 'Ten-an (857–859)',
 				'27' => 'Jōgan (859–877)',
 				'28' => 'Gangyō (877–885)',
 				'29' => 'Ninna (885–889)',
@@ -6678,7 +6760,7 @@ has 'eras' => (
 				'75' => 'Chōji (1104–1106)',
 				'76' => 'Kashō (1106–1108)',
 				'77' => 'Tennin (1108–1110)',
-				'78' => 'Ten-ei (1110-1113)',
+				'78' => 'Ten-ei (1110–1113)',
 				'79' => 'Eikyū (1113–1118)',
 				'80' => 'Gen’ei (1118–1120)',
 				'81' => 'Hōan (1120–1124)',
@@ -6849,13 +6931,13 @@ has 'eras' => (
 				'8' => 'Yōrō (717–724)',
 				'9' => 'Jinki (724–729)',
 				'10' => 'Tenpyō (729–749)',
-				'11' => 'Tenpyō-kampō (749-749)',
-				'12' => 'Tenpyō-shōhō (749-757)',
-				'13' => 'Tenpyō-hōji (757-765)',
-				'14' => 'Tenpyō-jingo (765-767)',
-				'15' => 'Jingo-keiun (767-770)',
+				'11' => 'Tenpyō-kampō (749–749)',
+				'12' => 'Tenpyō-shōhō (749–757)',
+				'13' => 'Tenpyō-hōji (757–765)',
+				'14' => 'Tenpyō-jingo (765–767)',
+				'15' => 'Jingo-keiun (767–770)',
 				'16' => 'Hōki (770–780)',
-				'17' => 'Ten-ō (781-782)',
+				'17' => 'Ten-ō (781–782)',
 				'18' => 'Enryaku (782–806)',
 				'19' => 'Daidō (806–810)',
 				'20' => 'Kōnin (810–824)',
@@ -6864,7 +6946,7 @@ has 'eras' => (
 				'23' => 'Kajō (848–851)',
 				'24' => 'Ninju (851–854)',
 				'25' => 'Saikō (854–857)',
-				'26' => 'Ten-an (857-859)',
+				'26' => 'Ten-an (857–859)',
 				'27' => 'Jōgan (859–877)',
 				'28' => 'Gangyō (877–885)',
 				'29' => 'Ninna (885–889)',
@@ -6916,7 +6998,7 @@ has 'eras' => (
 				'75' => 'Chōji (1104–1106)',
 				'76' => 'Kashō (1106–1108)',
 				'77' => 'Tennin (1108–1110)',
-				'78' => 'Ten-ei (1110-1113)',
+				'78' => 'Ten-ei (1110–1113)',
 				'79' => 'Eikyū (1113–1118)',
 				'80' => 'Gen’ei (1118–1120)',
 				'81' => 'Hōan (1120–1124)',
@@ -7317,8 +7399,67 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'islamic-civil' => {
+			'alias' => q{islamic},
+		},
+		'hebrew' => {
+			'alias' => q{generic},
+		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMW => q{'week' W 'of' MMMM},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{y-MM},
+			yMEd => q{y-MM-dd, E},
+			yMMM => q{y MMM},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y MMMM},
+			yMMMd => q{y MMM d},
+			yMd => q{y-MM-dd},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{'week' w 'of' Y},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d, E},
@@ -7355,26 +7496,17 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
-		'buddhist' => {
-			'alias' => q{generic},
-		},
-		'dangi' => {
-			'alias' => q{chinese},
-		},
-		'islamic' => {
+		'persian' => {
 			'alias' => q{generic},
 		},
 		'roc' => {
 			'alias' => q{generic},
 		},
-		'hebrew' => {
-			'alias' => q{generic},
-		},
-		'islamic-civil' => {
+		'islamic-rgsa' => {
 			'alias' => q{islamic},
 		},
-		'japanese' => {
-			'alias' => q{generic},
+		'dangi' => {
+			'alias' => q{chinese},
 		},
 		'ethiopic' => {
 			'alias' => q{generic},
@@ -7382,11 +7514,28 @@ has 'datetime_formats_available_formats' => (
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
 		},
-		'persian' => {
+		'islamic' => {
 			'alias' => q{generic},
 		},
+		'japanese' => {
+			'alias' => q{generic},
+		},
+		'buddhist' => {
+			'alias' => q{generic},
+		},
+		'indian' => {
+			'alias' => q{generic},
+		},
+		'ethiopic-amete-alem' => {
+			'alias' => q{ethiopic},
+		},
 		'chinese' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			Ed => q{d, E},
 			Gy => q{r U},
 			GyMMM => q{r(U) MMM},
@@ -7424,61 +7573,11 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{r(U) QQQ},
 			yyyyQQQQ => q{r(U) QQQQ},
 		},
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{y-MM},
-			yMEd => q{y-MM-dd, E},
-			yMMM => q{y MMM},
-			yMMMEd => q{y MMM d, E},
-			yMMMM => q{y MMMM},
-			yMMMd => q{y MMM d},
-			yMd => q{y-MM-dd},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
-		},
-		'islamic-rgsa' => {
-			'alias' => q{islamic},
+		'coptic' => {
+			'alias' => q{generic},
 		},
 		'islamic-tbla' => {
 			'alias' => q{islamic},
-		},
-		'indian' => {
-			'alias' => q{generic},
-		},
-		'ethiopic-amete-alem' => {
-			'alias' => q{ethiopic},
-		},
-		'coptic' => {
-			'alias' => q{generic},
 		},
 	} },
 );
@@ -7488,61 +7587,11 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
-		'buddhist' => {
-			'alias' => q{generic},
-		},
-		'dangi' => {
-			'alias' => q{chinese},
-		},
-		'islamic' => {
-			'alias' => q{generic},
-		},
-		'roc' => {
-			'alias' => q{generic},
-		},
-		'hebrew' => {
-			'alias' => q{generic},
-		},
 		'islamic-civil' => {
 			'alias' => q{islamic},
 		},
-		'japanese' => {
+		'hebrew' => {
 			'alias' => q{generic},
-		},
-		'ethiopic' => {
-			'alias' => q{generic},
-		},
-		'islamic-umalqura' => {
-			'alias' => q{islamic},
-		},
-		'persian' => {
-			'alias' => q{generic},
-		},
-		'chinese' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
 		},
 		'gregorian' => {
 			'Day' => '{0} ({2}: {1})',
@@ -7557,11 +7606,45 @@ has 'datetime_formats_append_item' => (
 			'Week' => '{0} ({2}: {1})',
 			'Year' => '{1} {0}',
 		},
+		'generic' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
+		'persian' => {
+			'alias' => q{generic},
+		},
+		'roc' => {
+			'alias' => q{generic},
+		},
 		'islamic-rgsa' => {
 			'alias' => q{islamic},
 		},
-		'islamic-tbla' => {
+		'dangi' => {
+			'alias' => q{chinese},
+		},
+		'ethiopic' => {
+			'alias' => q{generic},
+		},
+		'islamic-umalqura' => {
 			'alias' => q{islamic},
+		},
+		'islamic' => {
+			'alias' => q{generic},
+		},
+		'japanese' => {
+			'alias' => q{generic},
+		},
+		'buddhist' => {
+			'alias' => q{generic},
 		},
 		'indian' => {
 			'alias' => q{generic},
@@ -7569,8 +7652,24 @@ has 'datetime_formats_append_item' => (
 		'ethiopic-amete-alem' => {
 			'alias' => q{ethiopic},
 		},
+		'chinese' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 		'coptic' => {
 			'alias' => q{generic},
+		},
+		'islamic-tbla' => {
+			'alias' => q{islamic},
 		},
 	} },
 );
@@ -7580,225 +7679,11 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
-			},
-		},
-		'buddhist' => {
-			'alias' => q{generic},
-		},
-		'dangi' => {
-			'alias' => q{chinese},
-		},
-		'islamic' => {
-			'alias' => q{generic},
-		},
-		'roc' => {
-			'alias' => q{generic},
-		},
-		'hebrew' => {
-			'alias' => q{generic},
-		},
 		'islamic-civil' => {
 			'alias' => q{islamic},
 		},
-		'japanese' => {
+		'hebrew' => {
 			'alias' => q{generic},
-		},
-		'ethiopic' => {
-			'alias' => q{generic},
-		},
-		'islamic-umalqura' => {
-			'alias' => q{islamic},
-		},
-		'persian' => {
-			'alias' => q{generic},
-		},
-		'chinese' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{U–U},
-			},
-			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{y-MM-dd, E – y-MM-dd, E},
-				d => q{y-MM-dd, E – y-MM-dd, E},
-				y => q{y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{U MMM–MMM},
-				y => q{U MMM – U MMM},
-			},
-			yMMMEd => {
-				M => q{U MMM d, E – MMM d, E},
-				d => q{U MMM d, E – MMM d, E},
-				y => q{U MMM d, E – U MMM d, E},
-			},
-			yMMMM => {
-				M => q{U MMMM–MMMM},
-				y => q{U MMMM – U MMMM},
-			},
-			yMMMd => {
-				M => q{U MMM d – MMM d},
-				d => q{U MMM d–d},
-				y => q{U MMM d – U MMM d},
-			},
-			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
-			},
 		},
 		'gregorian' => {
 			H => {
@@ -7895,11 +7780,127 @@ has 'datetime_formats_interval' => (
 				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
+		},
+		'persian' => {
+			'alias' => q{generic},
+		},
+		'roc' => {
+			'alias' => q{generic},
+		},
 		'islamic-rgsa' => {
 			'alias' => q{islamic},
 		},
-		'islamic-tbla' => {
+		'dangi' => {
+			'alias' => q{chinese},
+		},
+		'ethiopic' => {
+			'alias' => q{generic},
+		},
+		'islamic-umalqura' => {
 			'alias' => q{islamic},
+		},
+		'islamic' => {
+			'alias' => q{generic},
+		},
+		'japanese' => {
+			'alias' => q{generic},
+		},
+		'buddhist' => {
+			'alias' => q{generic},
 		},
 		'indian' => {
 			'alias' => q{generic},
@@ -7907,8 +7908,106 @@ has 'datetime_formats_interval' => (
 		'ethiopic-amete-alem' => {
 			'alias' => q{ethiopic},
 		},
+		'chinese' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{U–U},
+			},
+			yM => {
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{U MMM–MMM},
+				y => q{U MMM – U MMM},
+			},
+			yMMMEd => {
+				M => q{U MMM d, E – MMM d, E},
+				d => q{U MMM d, E – MMM d, E},
+				y => q{U MMM d, E – U MMM d, E},
+			},
+			yMMMM => {
+				M => q{U MMMM–MMMM},
+				y => q{U MMMM – U MMMM},
+			},
+			yMMMd => {
+				M => q{U MMM d – MMM d},
+				d => q{U MMM d–d},
+				y => q{U MMM d – U MMM d},
+			},
+			yMd => {
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
+			},
+		},
 		'coptic' => {
 			'alias' => q{generic},
+		},
+		'islamic-tbla' => {
+			'alias' => q{islamic},
 		},
 	} },
 );
@@ -8256,6 +8355,9 @@ has 'time_zone_names' => (
 		'Asia/Katmandu' => {
 			exemplarCity => q#Kathmandu#,
 		},
+		'Asia/Rangoon' => {
+			exemplarCity => q#Yangon#,
+		},
 		'Asia/Saigon' => {
 			exemplarCity => q#Ho Chi Minh#,
 		},
@@ -8264,6 +8366,11 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#St. Helena#,
+		},
+		'Etc/UTC' => {
+			short => {
+				'standard' => q#UTC#,
+			},
 		},
 		'Etc/Unknown' => {
 			exemplarCity => q#Unknown#,

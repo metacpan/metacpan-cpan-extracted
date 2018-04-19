@@ -1,5 +1,15 @@
 Revision history for RPi-Pin
 
+2.3606  2018-04-16
+        - removed RPi::Const from t/40, it wasn't required, and eliminated a
+          prereq we didn't need
+
+2.3605  2018-04-16
+        - removed 0-1023 restriction in pwm()
+        - removed 'use' statement for RPi::WiringPi::Constant from t/40 as we
+          deprecated that for RPi::Const, and this was breaking the test	
+        - changed use statement in SYNOPSIS (closes #2)
+
 2.3604  2017-07-06
         - remove erroneous call to pin_to_gpio() in pwm() (Reported by Francesca
            Andriolo)

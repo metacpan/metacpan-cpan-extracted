@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Mgh - Package for language Makhuwa-Meetto
 
 package Locale::CLDR::Locales::Mgh;
 # This file auto generated from Data\common\main\mgh.xml
-#	on Fri 29 Apr  7:16:15 pm GMT
+#	on Fri 13 Apr  7:19:17 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -239,9 +240,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x])},
+			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p r s t u v w y z])},
+			main => qr{[a b c d e f g h i j k l m n o p r s t u v w y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -408,13 +410,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{mchochil’l},
-					'am' => q{wichishu},
-				},
 				'wide' => {
-					'pm' => q{mchochil’l},
 					'am' => q{wichishu},
+					'pm' => q{mchochil’l},
+				},
+				'abbreviated' => {
+					'am' => q{wichishu},
+					'pm' => q{mchochil’l},
 				},
 			},
 		},

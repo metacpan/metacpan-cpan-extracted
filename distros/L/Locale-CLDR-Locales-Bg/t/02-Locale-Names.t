@@ -24,7 +24,7 @@ is ($locale->region_name('GB'), 'Обединеното кралство', 'Regi
 is ($locale->region_name('wibble'), 'непознат регион', 'Invalid Region name');
 is ($locale->variant_name('AREVMDA'), 'Западно арменски', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
-is ($locale->language_name('i_klingon'), 'клингон', 'Language alias');
+is ($locale->language_name('i_klingon'), 'клингонски', 'Language alias');
 is ($locale->region_name('BQ'), 'Карибска Нидерландия', 'Region alias');
 is ($locale->region_name('830'), 'непознат регион', 'Region alias');
 is ($locale->variant_name('BOKMAL'), '', 'Variant alias');

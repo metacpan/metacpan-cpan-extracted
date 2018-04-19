@@ -14,7 +14,7 @@ use Redis;
 use Storable qw/nfreeze thaw/;
 use Try::Tiny;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 __PACKAGE__->mk_classdata(qw/_session_redis_storage/);
 
@@ -118,7 +118,7 @@ Catalyst::Plugin::Session::Store::Redis - Redis Session store for Catalyst
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,19 @@ session. I might look into this in the future. But patches are welcome!
 
 Cory G Watson, C<< <gphat at cpan.org> >>
 
+=head2 Current Maintainer
+
 Thomas Klausner C<< domm@cpan.org >>
+
+=head2 Contributors
+
+=over
+
+=item * Andreas Granig L<https://github.com/agranig>
+
+=item * Mohammad S Anwar L<https://github.com/manwar>
+
+=back
 
 =head1 AUTHOR
 

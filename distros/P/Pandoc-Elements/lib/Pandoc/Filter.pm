@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.27';
+our $VERSION = '0.34';
 
 use JSON;
 use Carp;
@@ -35,15 +35,21 @@ sub pandoc_walk(@) {    ## no critic
 
 sub _pod2usage_if_help {
     require Getopt::Long;
-    require Pandoc::Filter::Usage;
     my %opt;
     Getopt::Long::GetOptions(\%opt, 'help|?');
-    Pandoc::Filter::Usage::pod2usage() if $opt{help};
+    return unless $opt{help};
+
+    ## no critic
+    my $module = -t STDOUT ? 'Pod::Text::Termcap' : 'Pod::Text';
+    eval "require $module" or die "Can't locate $module in \@INC\n";
+    $module->new( indent => 2, nourls => 1 )->parse_file($0);
+
+    exit;
 }
 
 sub pandoc_filter(@) {    ## no critic
     _pod2usage_if_help();
-    
+
     my $ast = pandoc_walk(@_);    # implies binmode STDOUT UTF-8
     my $json = JSON->new->allow_blessed->convert_blessed->encode($ast);
 
@@ -95,7 +101,7 @@ __END__
 
 =head1 NAME
 
-Pandoc::Filter - process Pandoc abstract syntax tree 
+Pandoc::Filter - process Pandoc abstract syntax tree
 
 =head1 SYNOPSIS
 
@@ -115,7 +121,7 @@ Apply this filter on a Markdown file like this:
 
     pandoc --filter flatten.pl -t markdown < input.md
 
-See L<https://metacpan.org/pod/distribution/Pandoc-Elements/examples/> for more 
+See L<https://metacpan.org/pod/distribution/Pandoc-Elements/examples/> for more
 examples of filters.
 
 =head1 DESCRIPTION
@@ -125,7 +131,7 @@ L<Pandoc|http://pandoc.org/> documents. See L<Pandoc::Elements> for AST
 elements that can be modified by filters.
 
 The function interface (see L</FUNCTIONS>) directly reads AST and format from
-STDIN and ARGV and prints the transformed AST to STDOUT. 
+STDIN and ARGV and prints the transformed AST to STDOUT.
 
 The object oriented interface (see L</METHODS>) requires to:
 
@@ -147,7 +153,7 @@ by default).  The current element is also given in the special variable C<$_>
 for convenience.
 
 The action is expected to return an element, an empty array reference, or
-C<undef> to modify, remove, or keep a traversed element in the AST. 
+C<undef> to modify, remove, or keep a traversed element in the AST.
 
 =head1 METHODS
 
@@ -155,10 +161,10 @@ C<undef> to modify, remove, or keep a traversed element in the AST.
 
 Create a new filter object with one or more actions (see L</ACTIONS>). If
 actions are given as hash, key values are used to check which elements to apply
-for, e.g. 
+for, e.g.
 
-    Pandoc::Filter->new( 
-        Header                 => sub { ... }, 
+    Pandoc::Filter->new(
+        Header                 => sub { ... },
         'Suscript|Superscript' => sub { ... }
     )
 
@@ -180,9 +186,9 @@ The following functions are exported by default.
 =head2 pandoc_filter( @actions | %actions )
 
 Read a single line of JSON from STDIN, apply actions on the document content
-and print the resulting AST as single line of JSON. L<Pandoc::Filter::Usage>
-is used to print filter documentation if called with command line argument
-C<--help>, C<-h>, or C<-?>.
+and print the resulting AST as single line of JSON. Filter documentation is
+printed if filter called with command line argument C<--help>, C<-h>, or C<-?>.
+See L<Pod::Pandoc> for extended ways to process filter documentation.
 
 =head1 FILTER MODULES
 
@@ -199,7 +205,7 @@ C<--help>, C<-h>, or C<-?>.
 =head1 SEE ALSO
 
 This module is a port of L<pandocfilters|https://github.com/jgm/pandocfilters>
-from Python to modern Perl.  
+from Python to modern Perl.
 
 =head1 COPYRIGHT AND LICENSE
 

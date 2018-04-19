@@ -1,6 +1,6 @@
 package Pcore::API::BitBucket;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_plain_coderef];
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
 
@@ -21,10 +21,8 @@ sub _build__auth ($self) {
     return 'Basic ' . P->data->to_b64( "$self->{username}:$self->{password}", q[] );
 }
 
-sub _req1 ( $self, $method, $endpoint, $data, $cb ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    P->http->$method(
+sub _req1 ( $self, $method, $endpoint, $data, $cb = undef ) {
+    return P->http->$method(
         'https://bitbucket.org/api/1.0' . $endpoint,
         headers => {
             AUTHORIZATION => $self->_auth,
@@ -35,29 +33,21 @@ sub _req1 ( $self, $method, $endpoint, $data, $cb ) {
             my $api_res;
 
             if ( !$res ) {
-                $api_res = result [ $res->status, $res->reason ], $res->body;
+                $api_res = res [ $res->{status}, $res->{reason} ], $res->{body};
             }
             else {
-                my $data = $res->body && $res->body->$* ? P->data->from_json( $res->body ) : undef;
+                my $data = $res->{body} && $res->{body}->$* ? P->data->from_json( $res->{body} ) : undef;
 
-                $api_res = result $res->status, $data;
+                $api_res = res $res->{status}, $data;
             }
 
-            $cb->($api_res) if $cb;
-
-            $blocking_cv->send($api_res) if $blocking_cv;
-
-            return;
+            return $cb ? $cb->{$api_res} : $api_res;
         }
     );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
 }
 
-sub _req2 ( $self, $method, $endpoint, $data, $cb ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    P->http->$method(
+sub _req2 ( $self, $method, $endpoint, $data, $cb = undef ) {
+    return P->http->$method(
         'https://api.bitbucket.org/2.0' . $endpoint,
         headers => {
             AUTHORIZATION => $self->_auth,
@@ -65,32 +55,24 @@ sub _req2 ( $self, $method, $endpoint, $data, $cb ) {
         },
         body => $data ? P->data->to_json($data) : undef,
         sub ($res) {
-            my $data = $res->body && $res->body->$* ? P->data->from_json( $res->body ) : undef;
+            my $data = $res->{body} && $res->{body}->$* ? P->data->from_json( $res->{body} ) : undef;
 
             my $api_res;
 
             if ( !$res ) {
-                $api_res = result [ $res->status, $data->{error}->{message} // $res->reason ];
+                $api_res = res [ $res->{status}, $data->{error}->{message} // $res->{reason} ];
             }
             else {
-                $api_res = result $res->status, $data;
+                $api_res = res $res->{status}, $data;
             }
 
-            $cb->($api_res) if $cb;
-
-            $blocking_cv->send($api_res) if $blocking_cv;
-
-            return;
+            return $cb ? $cb->($api_res) : $api_res;
         }
     );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
 }
 
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D#post
 sub create_repo ( $self, $repo_id, @args ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
     my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
 
     my %args = (
@@ -119,7 +101,7 @@ sub delete_repo ( $self, $repo_id, $cb = undef ) {
 # VERSIONS
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D/versions
 sub get_versions ( $self, $repo_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $versions;
 
@@ -140,17 +122,13 @@ sub get_versions ( $self, $repo_id, $cb = undef ) {
                         $sub->( ++$page );
                     }
                     else {
-                        my $api_res = result 200, $versions;
+                        my $api_res = res 200, $versions;
 
-                        $cb->($api_res) if $cb;
-
-                        $blocking_cv->($api_res) if $blocking_cv;
+                        $rouse_cb ? $cb ? $rouse_cb->( $cb->($api_res) ) : $rouse_cb->($api_res) : $cb ? $cb->($api_res) : ();
                     }
                 }
                 else {
-                    $cb->($res) if $cb;
-
-                    $blocking_cv->($res) if $blocking_cv;
+                    $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
                 }
 
                 return;
@@ -162,7 +140,7 @@ sub get_versions ( $self, $repo_id, $cb = undef ) {
 
     $get->(1);
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-POSTanewversion
@@ -176,9 +154,7 @@ sub create_version ( $self, $repo_id, $ver, $cb = undef ) {
                 $res->set_status(200);
             }
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         }
     );
 }
@@ -186,7 +162,7 @@ sub create_version ( $self, $repo_id, $ver, $cb = undef ) {
 # MILESTONES
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D/milestones
 sub get_milestones ( $self, $repo_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $versions;
 
@@ -207,17 +183,13 @@ sub get_milestones ( $self, $repo_id, $cb = undef ) {
                         $sub->( ++$page );
                     }
                     else {
-                        my $api_res = result 200, $versions;
+                        my $api_res = res 200, $versions;
 
-                        $cb->($api_res) if $cb;
-
-                        $blocking_cv->($api_res) if $blocking_cv;
+                        $rouse_cb ? $cb ? $rouse_cb->( $cb->($api_res) ) : $rouse_cb->($api_res) : $cb ? $cb->($api_res) : ();
                     }
                 }
                 else {
-                    $cb->($res) if $cb;
-
-                    $blocking_cv->($res) if $blocking_cv;
+                    $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
                 }
 
                 return;
@@ -229,7 +201,7 @@ sub get_milestones ( $self, $repo_id, $cb = undef ) {
 
     $get->(1);
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-POSTanewmilestone
@@ -243,18 +215,16 @@ sub create_milestone ( $self, $repo_id, $ver, $cb = undef ) {
                 $res->set_status(200);
             }
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         }
     );
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-GETalistofissuesinarepository%27stracker
 sub get_issues ( $self, $repo_id, @args ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
+    my $cb = is_plain_coderef $args[-1] ? pop @args : ();
 
     my %args = (
         sort   => 'priority',    # priority, kind, version, component, milestone
@@ -282,16 +252,12 @@ sub get_issues ( $self, $repo_id, @args ) {
                         $issues->{ $issue->{local_id} } = $issue;
                     }
 
-                    my $api_res = result 200, data => $issues, total => $res->{data}->{count};
+                    my $api_res = res 200, data => $issues, total => $res->{data}->{count};
 
-                    $cb->($api_res) if $cb;
-
-                    $blocking_cv->($api_res) if $blocking_cv;
+                    $rouse_cb ? $cb ? $rouse_cb->( $cb->($api_res) ) : $rouse_cb->($api_res) : $cb ? $cb->($api_res) : ();
                 }
                 else {
-                    $cb->($res) if $cb;
-
-                    $blocking_cv->($res) if $blocking_cv;
+                    $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
                 }
 
                 return;
@@ -303,7 +269,7 @@ sub get_issues ( $self, $repo_id, @args ) {
 
     $get->(1);
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-GETanindividualissue
@@ -323,7 +289,7 @@ sub update_issue ( $self, $repo_id, $issue_id, $data, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 310, 315             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 276, 281             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

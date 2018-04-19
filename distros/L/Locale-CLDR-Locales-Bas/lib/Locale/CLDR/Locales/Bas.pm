@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Bas - Package for language Basaa
 
 package Locale::CLDR::Locales::Bas;
 # This file auto generated from Data\common\main\bas.xml
-#	on Fri 29 Apr  6:52:01 pm GMT
+#	on Fri 13 Apr  7:02:11 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -324,9 +325,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x])},
+			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a á à â ǎ ā {a᷆}{a᷇} b ɓ c d e é è ê ě ē {e᷆}{e᷇} ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} {ɛ᷆}{ɛ᷇} f g h i í ì î ǐ ī {i᷆}{i᷇} j k l m n ń ǹ ŋ o ó ò ô ǒ ō {o᷆}{o᷇} ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} {ɔ᷆}{ɔ᷇} p r s t u ú ù û ǔ ū {u᷆}{u᷇} v w y z])},
+			main => qr{[a á à â ǎ ā {a᷆}{a᷇} b ɓ c d e é è ê ě ē {e᷆}{e᷇} ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} {ɛ᷆}{ɛ᷇} f g h i í ì î ǐ ī {i᷆}{i᷇} j k l m n ń ǹ ŋ o ó ò ô ǒ ō {o᷆}{o᷇} ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} {ɔ᷆}{ɔ᷇} p r s t u ú ù û ǔ ū {u᷆}{u᷇} v w y z]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -398,14 +400,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
@@ -859,13 +861,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{I ɓugajɔp},
-					'am' => q{I bikɛ̂glà},
-				},
 				'abbreviated' => {
 					'am' => q{I bikɛ̂glà},
 					'pm' => q{I ɓugajɔp},
+				},
+				'wide' => {
+					'pm' => q{I ɓugajɔp},
+					'am' => q{I bikɛ̂glà},
 				},
 			},
 		},

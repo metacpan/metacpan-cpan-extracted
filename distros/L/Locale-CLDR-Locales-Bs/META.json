@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "locale",
       "CLDR",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Locale-CLDR-Locales-Bs",
    "prereqs" : {
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.29.0",
+            "Locale::CLDR" : "v0.32.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,23 +46,23 @@
    "provides" : {
       "Locale::CLDR::Locales::Bs" : {
          "file" : "lib/Locale/CLDR/Locales/Bs.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Bs::Cyrl" : {
          "file" : "lib/Locale/CLDR/Locales/Bs/Cyrl.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Bs::Cyrl::Ba" : {
          "file" : "lib/Locale/CLDR/Locales/Bs/Cyrl/Ba.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Bs::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Bs/Latn.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       },
       "Locale::CLDR::Locales::Bs::Latn::Ba" : {
          "file" : "lib/Locale/CLDR/Locales/Bs/Latn/Ba.pm",
-         "version" : "v0.29.0"
+         "version" : "v0.32.0"
       }
    },
    "release_status" : "stable",
@@ -75,5 +75,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.29.0"
+   "version" : "v0.32.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,3 +1,9 @@
+1.000005 2018-04-12
+
+- Fixed tests to work with recent `libmaxminddb` releases. PR by
+  Hidenori Sugiyama. GitHub #22.
+
+
 1.000004 2017-01-25
 
 - Command line arguments to Build.PL are now passed through, allowing building

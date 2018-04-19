@@ -1,3 +1,11 @@
+0.004   2018-04-18 (PERLANCAR)
+
+	- Observe PERL_RANDOM_ANY_WARN environment variable.
+
+	- Replace Math::Random::Secure with Data::Entropy::Algorithms
+	  because MRS is only backed by a 32-bit random number generator.
+
+
 0.003   2018-01-02 (PERLANCAR)
 
 	- Add import option: -warn => 1.

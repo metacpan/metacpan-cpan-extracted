@@ -127,21 +127,25 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                 }
                 processing = true;
                 var lastData = this.getSelection();
+                if (!qx.lang.Type.isObject(lastData)){
+                    return;
+                }
                 new qx.util.DeferredCall(function(){
-                    if (currentRow !== null && qx.lang.Type.isObject(lastData) ){
+                    if (currentRow !== null){
                         for (var offset=-1;offset<=1;offset++){
                             if (currentRow + offset < 0){
                                 continue;
                             }
                             var currentData = model.getRowData(currentRow+offset);
+                            if (!qx.lang.Type.isObject(currentData)){
+                                continue;
+                            }
                             var gotPrimary = false;
                             var equal = true;
                             cfg.table.forEach(function(col,i){
                                 if (col.primary){
                                     gotPrimary = true;
-                                    if (!qx.lang.Type.isObject(currentData)
-                                        || !qx.lang.Type.isObject(lastData)
-                                        || currentData[col.key] != lastData[col.key]){
+                                    if (currentData[col.key] != lastData[col.key]){
                                         equal = false;
                                     }
                                 }

@@ -4,7 +4,7 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -32,9 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Carp::Assert::More" : "0",
+            "HTML::Form" : "0",
             "HTML::TokeParser" : "0",
-            "HTML::TreeBuilder" : "0",
             "HTTP::Server::Simple" : "0.42",
             "HTTP::Server::Simple::CGI" : "0",
             "LWP" : "6.02",
@@ -61,6 +62,6 @@
          "url" : "https://github.com/petdance/test-www-mechanize"
       }
    },
-   "version" : "1.48",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.50",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

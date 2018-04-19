@@ -3,7 +3,7 @@ package GeoIP2::Model::Enterprise;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -33,7 +33,7 @@ GeoIP2::Model::Enterprise - Model class for GeoIP2 Enterprise
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 

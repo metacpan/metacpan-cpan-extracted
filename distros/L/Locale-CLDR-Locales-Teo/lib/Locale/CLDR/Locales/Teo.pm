@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Teo - Package for language Teso
 
 package Locale::CLDR::Locales::Teo;
 # This file auto generated from Data\common\main\teo.xml
-#	on Fri 29 Apr  7:28:24 pm GMT
+#	on Fri 13 Apr  7:30:43 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[f q z])},
+			auxiliary => qr{[f q z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'],
-			main => qr{(?^u:[a b c d e g h i j k l m n o p r s t u v w x y])},
+			main => qr{[a b c d e g h i j k l m n o p r s t u v w x y]},
 		};
 	},
 EOT
@@ -829,8 +830,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{Taparachu},
 					'pm' => q{Ebongi},
+					'am' => q{Taparachu},
 				},
 				'wide' => {
 					'am' => q{Taparachu},

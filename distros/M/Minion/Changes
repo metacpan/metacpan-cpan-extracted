@@ -1,4 +1,34 @@
 
+9.02  2018-04-18
+  - Changed 24 hour history graph on Mojolicious::Plugin::Minion::Admin
+    dashboard to refresh in 10 minute intervals.
+  - Changed daily history data to include an epoch value instead of a day.
+  - Fixed a few ordering bugs in history methods.
+
+9.01  2018-04-17
+  - Improved 24 hour history graph to refresh automatically every 5 minutes in
+    Mojolicious::Plugin::Minion::Admin. (s1037989)
+
+9.0  2018-04-15
+  - Replaced queue, state and task options of list_jobs method in
+    Minion::Backend::Pg with queues, states and tasks options.
+  - Replaced name option of list_locks method in Minion::Backend::Pg with names
+    option.
+  - Replaced key/value argument of note method in Minion::Backend::Pg with a
+    hash reference.
+  - Added EXPERIMENTAL support for displaying a 24 hour history graph on the
+    Mojolicious::Plugin::Minion::Admin dashboard.
+  - Added EXPERIMENTAL finish event to Minion::Job.
+  - Added EXPERIMENTAL history methods to Minion and Minion::Backend::Pg.
+  - Added execute method to Minion::Job.
+  - Added -H option to job command.
+  - Improved note method in Minion::Job to allow for multiple metadata fields to
+    be changed at once.
+  - Fixed a bug where the job command could remove all parents from retried
+    jobs.
+  - Fixed filtering of jobs by queue and state in
+    Mojolicious::Plugin::Minion::Admin.
+
 8.12  2018-03-07
   - Added parents option to retry and retry_job methods in Minion::Job and
     Minion::Backend::Pg. (CandyAngel)

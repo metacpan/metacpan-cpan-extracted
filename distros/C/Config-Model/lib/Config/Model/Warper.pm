@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Warper;
-$Config::Model::Warper::VERSION = '2.120';
+$Config::Model::Warper::VERSION = '2.122';
 use Mouse;
 
 use Log::Log4perl qw(get_logger :levels);
@@ -48,10 +48,12 @@ sub _get_value_gist {
     return ref($item) eq 'HASH' ? join(',', each %$item) : $item;
 }
 
-has _computed_masters => ( is => 'rw', isa => 'HashRef', init_arg => undef );
-
-has [qw/_warped_nodes _registered_values/] =>
-    ( is => 'rw', isa => 'HashRef', init_arg => undef, default => sub { {} }, );
+has [qw/ _computed_masters _warped_nodes _registered_values/] => (
+    is => 'rw',
+    isa => 'HashRef',
+    init_arg => undef, # can't use this param in constructor
+    default => sub { {} },
+);
 
 has allowed => ( is => 'rw', isa => 'ArrayRef' );
 has morph   => ( is => 'ro', isa => 'Bool' );
@@ -620,7 +622,7 @@ Config::Model::Warper - Warp tree properties
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

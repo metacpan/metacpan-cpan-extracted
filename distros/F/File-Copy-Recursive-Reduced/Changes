@@ -1,0 +1,17 @@
+Revision history for Perl module File::Copy::Recursive::Reduced
+
+0.003 Tue Apr 17 09:14:19 EDT 2018
+    - No changes in functionality; changes only to documentation.
+
+0.002 Mon Apr 16 17:51:13 EDT 2018
+    - Object-oriented interface replaced; module now exports
+      fcopy() and dircopy() on demand.
+
+    - Should be usable as replacement for File::Copy::Recursive
+      in the test suite for CPAN-Reporter.
+
+0.001 Tue Apr 10 22:03:22 2018
+    - Original version; created by ExtUtils::ModuleMaker 0.56;
+    - Not yet ready for use.
+
+

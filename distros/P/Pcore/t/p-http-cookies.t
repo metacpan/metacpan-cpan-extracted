@@ -63,7 +63,7 @@ sub set_cover_domain {
         $c->parse_cookies( 'http://' . $args->[0], ["1=2;domain=$args->[1]"] );
 
         unless ( ( exists $c->{cookies}->{".$args->[1]"} ? 1 : 0 ) == $args->[2] ) {
-            say {$STDERR_UTF8} dump $c->{cookies};
+            say {*STDERR} dump $c->{cookies};
         }
 
         ok( ( exists $c->{cookies}->{".$args->[1]"} ? 1 : 0 ) == $args->[2], 'set_cover_domain_' . $i++ . '_' . $args->[1] );
@@ -96,7 +96,7 @@ sub get_cookies {
         }
         else {
             if ( !keys $cookies->%* ) {
-                say {$STDERR_UTF8} dump { expect => [ sort keys $index->%* ], got => [ sort keys $cookies->%* ], cookies => $c->{cookies} };
+                say {*STDERR} dump { expect => [ sort keys $index->%* ], got => [ sort keys $cookies->%* ], cookies => $c->{cookies} };
 
                 ok( 0, 'get_cookies_' . $i++ );
             }
@@ -113,7 +113,7 @@ sub get_cookies {
                 }
 
                 if ( !$match ) {
-                    say {$STDERR_UTF8} dump { expect => [ sort keys $index->%* ], got => [ sort keys $cookies->%* ], cookies => $c->{cookies} };
+                    say {*STDERR} dump { expect => [ sort keys $index->%* ], got => [ sort keys $cookies->%* ], cookies => $c->{cookies} };
 
                     ok( 0, 'get_cookies_' . $i++ );
                 }

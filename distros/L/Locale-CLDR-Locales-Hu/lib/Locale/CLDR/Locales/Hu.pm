@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Hu - Package for language Hungarian
 
 package Locale::CLDR::Locales::Hu;
 # This file auto generated from Data\common\main\hu.xml
-#	on Fri 29 Apr  7:08:18 pm GMT
+#	on Fri 13 Apr  7:13:41 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -310,7 +311,7 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'1100' => {
 					base_value => q(1100),
@@ -705,7 +706,7 @@ has 'display_name_language' => (
  				'ar' => 'arab',
  				'ar_001' => 'modern szabányos arab',
  				'arc' => 'arámi',
- 				'arn' => 'araucani',
+ 				'arn' => 'mapucse',
  				'arp' => 'arapaho',
  				'arw' => 'aravak',
  				'as' => 'asszámi',
@@ -722,7 +723,7 @@ has 'display_name_language' => (
  				'bas' => 'basza',
  				'bax' => 'bamun',
  				'bbj' => 'gomala',
- 				'be' => 'belorusz',
+ 				'be' => 'belarusz',
  				'bej' => 'bedzsa',
  				'bem' => 'bemba',
  				'bez' => 'bena',
@@ -736,7 +737,7 @@ has 'display_name_language' => (
  				'bkm' => 'kom',
  				'bla' => 'siksika',
  				'bm' => 'bambara',
- 				'bn' => 'bengáli',
+ 				'bn' => 'bangla',
  				'bo' => 'tibeti',
  				'br' => 'breton',
  				'bra' => 'braj',
@@ -754,7 +755,7 @@ has 'display_name_language' => (
  				'cay' => 'kajuga',
  				'cch' => 'atszam',
  				'ce' => 'csecsen',
- 				'ceb' => 'cebui',
+ 				'ceb' => 'szebuano',
  				'cgg' => 'kiga',
  				'ch' => 'csamoró',
  				'chb' => 'csibcsa',
@@ -766,11 +767,12 @@ has 'display_name_language' => (
  				'chp' => 'csipevé',
  				'chr' => 'cseroki',
  				'chy' => 'csejen',
- 				'ckb' => 'szoráni kurd',
+ 				'ckb' => 'közép-ázsiai kurd',
  				'co' => 'korzikai',
  				'cop' => 'kopt',
  				'cr' => 'krí',
  				'crh' => 'krími tatár',
+ 				'crs' => 'szeszelva kreol francia',
  				'cs' => 'cseh',
  				'csb' => 'kasub',
  				'cu' => 'egyházi szláv',
@@ -789,13 +791,13 @@ has 'display_name_language' => (
  				'din' => 'dinka',
  				'dje' => 'zarma',
  				'doi' => 'dogri',
- 				'dsb' => 'alsó szorb',
+ 				'dsb' => 'alsó-szorb',
  				'dua' => 'duala',
  				'dum' => 'közép holland',
  				'dv' => 'divehi',
  				'dyo' => 'jola-fonyi',
  				'dyu' => 'diula',
- 				'dz' => 'butáni',
+ 				'dz' => 'dzsonga',
  				'dzg' => 'dazaga',
  				'ebu' => 'embu',
  				'ee' => 'eve',
@@ -832,21 +834,23 @@ has 'display_name_language' => (
  				'fr' => 'francia',
  				'fr_CA' => 'kanadai francia',
  				'fr_CH' => 'svájci francia',
+ 				'frc' => 'cajun francia',
  				'frm' => 'közép francia',
  				'fro' => 'ófrancia',
  				'frr' => 'északi fríz',
  				'frs' => 'keleti fríz',
  				'fur' => 'friuli',
- 				'fy' => 'fríz',
+ 				'fy' => 'nyugati fríz',
  				'ga' => 'ír',
  				'gaa' => 'ga',
  				'gag' => 'gagauz',
+ 				'gan' => 'gan kínai',
  				'gay' => 'gajo',
  				'gba' => 'gbaja',
- 				'gd' => 'skót gael',
+ 				'gd' => 'skóciai kelta',
  				'gez' => 'geez',
  				'gil' => 'ikiribati',
- 				'gl' => 'galíciai',
+ 				'gl' => 'gallego',
  				'gmh' => 'közép felső német',
  				'gn' => 'guarani',
  				'goh' => 'ófelső német',
@@ -856,29 +860,31 @@ has 'display_name_language' => (
  				'grb' => 'grebó',
  				'grc' => 'ógörög',
  				'gsw' => 'svájci német',
- 				'gu' => 'gudzsarati',
+ 				'gu' => 'gudzsaráti',
  				'guz' => 'guszii',
  				'gv' => 'man-szigeti',
  				'gwi' => 'gvicsin',
  				'ha' => 'hausza',
  				'hai' => 'haida',
+ 				'hak' => 'hakka kínai',
  				'haw' => 'hawaii',
  				'he' => 'héber',
  				'hi' => 'hindi',
- 				'hil' => 'hiligajnon',
+ 				'hil' => 'ilokano',
  				'hit' => 'hittite',
  				'hmn' => 'hmong',
  				'ho' => 'hiri motu',
  				'hr' => 'horvát',
- 				'hsb' => 'felső szorb',
- 				'ht' => 'haiti',
+ 				'hsb' => 'felső-szorb',
+ 				'hsn' => 'xiang kínai',
+ 				'ht' => 'haiti kreol',
  				'hu' => 'magyar',
  				'hup' => 'hupa',
  				'hy' => 'örmény',
  				'hz' => 'herero',
  				'ia' => 'interlingva',
  				'iba' => 'iban',
- 				'ibb' => 'ibibió',
+ 				'ibb' => 'ibibio',
  				'id' => 'indonéz',
  				'ie' => 'interlingue',
  				'ig' => 'igbó',
@@ -920,7 +926,7 @@ has 'display_name_language' => (
  				'kkj' => 'kakó',
  				'kl' => 'grönlandi',
  				'kln' => 'kalendzsin',
- 				'km' => 'kambodzsai',
+ 				'km' => 'khmer',
  				'kmb' => 'kimbundu',
  				'kn' => 'kannada',
  				'ko' => 'koreai',
@@ -932,7 +938,7 @@ has 'display_name_language' => (
  				'krc' => 'karacsáj-balkár',
  				'krl' => 'karelai',
  				'kru' => 'kuruh',
- 				'ks' => 'kásmíri',
+ 				'ks' => 'kasmíri',
  				'ksb' => 'sambala',
  				'ksf' => 'bafia',
  				'ksh' => 'kölsch',
@@ -953,8 +959,9 @@ has 'display_name_language' => (
  				'li' => 'limburgi',
  				'lkt' => 'lakota',
  				'ln' => 'lingala',
- 				'lo' => 'laoszi',
+ 				'lo' => 'lao',
  				'lol' => 'mongó',
+ 				'lou' => 'louisianai kreol',
  				'loz' => 'lozi',
  				'lrc' => 'északi luri',
  				'lt' => 'litván',
@@ -979,7 +986,7 @@ has 'display_name_language' => (
  				'men' => 'mende',
  				'mer' => 'meru',
  				'mfe' => 'mauritiusi kreol',
- 				'mg' => 'málgas',
+ 				'mg' => 'malgas',
  				'mga' => 'közép ír',
  				'mgh' => 'makua-metó',
  				'mgo' => 'meta’',
@@ -994,22 +1001,23 @@ has 'display_name_language' => (
  				'mni' => 'manipuri',
  				'moh' => 'mohawk',
  				'mos' => 'moszi',
- 				'mr' => 'marathi',
+ 				'mr' => 'maráthi',
  				'ms' => 'maláj',
  				'mt' => 'máltai',
  				'mua' => 'mundang',
  				'mul' => 'többszörös nyelvek',
  				'mus' => 'krík',
  				'mwl' => 'mirandéz',
- 				'mwr' => 'marvari',
+ 				'mwr' => 'márvári',
  				'my' => 'burmai',
  				'mye' => 'myene',
  				'myv' => 'erzjány',
  				'mzn' => 'mázanderáni',
  				'na' => 'naurui',
+ 				'nan' => 'min nan kínai',
  				'nap' => 'nápolyi',
  				'naq' => 'nama',
- 				'nb' => 'norvég bokmal',
+ 				'nb' => 'norvég (bokmål)',
  				'nd' => 'északi ndebele',
  				'nds' => 'alsónémet',
  				'nds_NL' => 'alsószász',
@@ -1017,30 +1025,30 @@ has 'display_name_language' => (
  				'new' => 'nevari',
  				'ng' => 'ndonga',
  				'nia' => 'nias',
- 				'niu' => 'niui',
+ 				'niu' => 'niuei',
  				'nl' => 'holland',
  				'nl_BE' => 'flamand',
  				'nmg' => 'ngumba',
- 				'nn' => 'norvég nynorsk',
+ 				'nn' => 'norvég (nynorsk)',
  				'nnh' => 'ngiemboon',
  				'no' => 'norvég',
  				'nog' => 'nogaj',
  				'non' => 'óskandináv',
  				'nqo' => 'n’kó',
  				'nr' => 'déli ndebele',
- 				'nso' => 'északi szotó',
+ 				'nso' => 'északi szeszotó',
  				'nus' => 'nuer',
  				'nv' => 'navahó',
  				'nwc' => 'klasszikus newari',
- 				'ny' => 'nyanja',
+ 				'ny' => 'nyandzsa',
  				'nym' => 'nyamvézi',
  				'nyn' => 'nyankole',
  				'nyo' => 'nyoró',
  				'nzi' => 'nzima',
  				'oc' => 'okszitán',
  				'oj' => 'ojibva',
- 				'om' => 'oromói',
- 				'or' => 'orija',
+ 				'om' => 'oromo',
+ 				'or' => 'odia',
  				'os' => 'oszét',
  				'osa' => 'osage',
  				'ota' => 'ottomán török',
@@ -1048,13 +1056,15 @@ has 'display_name_language' => (
  				'pag' => 'pangaszinan',
  				'pal' => 'pahlavi',
  				'pam' => 'pampangan',
- 				'pap' => 'papiamentó',
+ 				'pap' => 'papiamento',
  				'pau' => 'palaui',
+ 				'pcm' => 'nigériai pidgin',
  				'peo' => 'óperzsa',
  				'phn' => 'főniciai',
  				'pi' => 'pali',
  				'pl' => 'lengyel',
  				'pon' => 'pohnpei',
+ 				'prg' => 'porosz',
  				'pro' => 'óprovánszi',
  				'ps' => 'pastu',
  				'pt' => 'portugál',
@@ -1065,7 +1075,7 @@ has 'display_name_language' => (
  				'raj' => 'radzsasztáni',
  				'rap' => 'rapanui',
  				'rar' => 'rarotongai',
- 				'rm' => 'réto-román',
+ 				'rm' => 'rétoromán',
  				'rn' => 'kirundi',
  				'ro' => 'román',
  				'ro_MD' => 'moldvai',
@@ -1074,11 +1084,11 @@ has 'display_name_language' => (
  				'root' => 'ősi',
  				'ru' => 'orosz',
  				'rup' => 'aromán',
- 				'rw' => 'kiruanda',
+ 				'rw' => 'kinyarvanda',
  				'rwk' => 'rwo',
  				'sa' => 'szanszkrit',
  				'sad' => 'szandave',
- 				'sah' => 'jakut',
+ 				'sah' => 'szaha',
  				'sam' => 'szamaritánus arámi',
  				'saq' => 'szamburu',
  				'sas' => 'sasak',
@@ -1107,12 +1117,12 @@ has 'display_name_language' => (
  				'sl' => 'szlovén',
  				'sm' => 'szamoai',
  				'sma' => 'déli számi',
- 				'smj' => 'lule számi',
- 				'smn' => 'inar sami',
- 				'sms' => 'koltta lapp',
+ 				'smj' => 'lulei számi',
+ 				'smn' => 'inari számi',
+ 				'sms' => 'kolta számi',
  				'sn' => 'sona',
  				'snk' => 'szoninke',
- 				'so' => 'szomáliai',
+ 				'so' => 'szomáli',
  				'sog' => 'sogdien',
  				'sq' => 'albán',
  				'sr' => 'szerb',
@@ -1120,7 +1130,7 @@ has 'display_name_language' => (
  				'srr' => 'szerer',
  				'ss' => 'sziszuati',
  				'ssy' => 'szahó',
- 				'st' => 'szeszotó',
+ 				'st' => 'déli szeszotó',
  				'su' => 'szundanéz',
  				'suk' => 'szukuma',
  				'sus' => 'szuszu',
@@ -1130,7 +1140,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'kongói szuahéli',
  				'swb' => 'comorei',
  				'syc' => 'klasszikus szír',
- 				'syr' => 'szíriai',
+ 				'syr' => 'szír',
  				'ta' => 'tamil',
  				'te' => 'telugu',
  				'tem' => 'temne',
@@ -1139,7 +1149,7 @@ has 'display_name_language' => (
  				'tet' => 'tetum',
  				'tg' => 'tadzsik',
  				'th' => 'thai',
- 				'ti' => 'tigrinja',
+ 				'ti' => 'tigrinya',
  				'tig' => 'tigré',
  				'tiv' => 'tiv',
  				'tk' => 'türkmén',
@@ -1149,8 +1159,8 @@ has 'display_name_language' => (
  				'tli' => 'tlingit',
  				'tmh' => 'tamasek',
  				'tn' => 'szecsuáni',
- 				'to' => 'tonga',
- 				'tog' => 'nyasa tonga',
+ 				'to' => 'tongai',
+ 				'tog' => 'nyugati nyasza',
  				'tpi' => 'tok pisin',
  				'tr' => 'török',
  				'trv' => 'tarokó',
@@ -1163,7 +1173,7 @@ has 'display_name_language' => (
  				'twq' => 'szavák',
  				'ty' => 'tahiti',
  				'tyv' => 'tuvai',
- 				'tzm' => 'közép-marokkói tamazigt',
+ 				'tzm' => 'közép-atlaszi tamazigt',
  				'udm' => 'udmurt',
  				'ug' => 'ujgur',
  				'uga' => 'ugariti',
@@ -1185,8 +1195,9 @@ has 'display_name_language' => (
  				'was' => 'vasó',
  				'wbp' => 'warlpiri',
  				'wo' => 'volof',
+ 				'wuu' => 'wu kínai',
  				'xal' => 'kalmük',
- 				'xh' => 'hosza',
+ 				'xh' => 'xhosza',
  				'xog' => 'szoga',
  				'yao' => 'jaó',
  				'yap' => 'japi',
@@ -1260,6 +1271,7 @@ has 'display_name_script' => (
  			'Grek' => 'Görög',
  			'Gujr' => 'Gudzsaráti',
  			'Guru' => 'Gurmuki',
+ 			'Hanb' => 'Hanb',
  			'Hang' => 'Hangul',
  			'Hani' => 'Han',
  			'Hano' => 'Hanunoo',
@@ -1274,6 +1286,7 @@ has 'display_name_script' => (
  			'Hung' => 'Ómagyar',
  			'Inds' => 'Indus',
  			'Ital' => 'Régi olasz',
+ 			'Jamo' => 'Jamo',
  			'Java' => 'Jávai',
  			'Jpan' => 'Japán',
  			'Kali' => 'Kajah li',
@@ -1352,6 +1365,7 @@ has 'display_name_script' => (
  			'Yiii' => 'Ji',
  			'Zinh' => 'Származtatott',
  			'Zmth' => 'Matematikai jelrendszer',
+ 			'Zsye' => 'Emoji',
  			'Zsym' => 'Szimbólum',
  			'Zxxx' => 'Íratlan nyelvek kódja',
  			'Zyyy' => 'Meghatározatlan',
@@ -1438,10 +1452,10 @@ has 'display_name_region' => (
  			'BT' => 'Bhután',
  			'BV' => 'Bouvet-sziget',
  			'BW' => 'Botswana',
- 			'BY' => 'Fehéroroszország',
+ 			'BY' => 'Belarusz',
  			'BZ' => 'Belize',
  			'CA' => 'Kanada',
- 			'CC' => 'Kókusz-szigetek',
+ 			'CC' => 'Kókusz (Keeling)-szigetek',
  			'CD' => 'Kongó - Kinshasa',
  			'CD@alt=variant' => 'Kongó (KDK)',
  			'CF' => 'Közép-afrikai Köztársaság',
@@ -1449,6 +1463,7 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'Kongó (Köztársaság)',
  			'CH' => 'Svájc',
  			'CI' => 'Elefántcsontpart',
+ 			'CI@alt=variant' => 'CI',
  			'CK' => 'Cook-szigetek',
  			'CL' => 'Chile',
  			'CM' => 'Kamerun',
@@ -1462,6 +1477,7 @@ has 'display_name_region' => (
  			'CX' => 'Karácsony-sziget',
  			'CY' => 'Ciprus',
  			'CZ' => 'Csehország',
+ 			'CZ@alt=variant' => 'Cseh Köztársaság',
  			'DE' => 'Németország',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Dzsibuti',
@@ -1478,6 +1494,7 @@ has 'display_name_region' => (
  			'ES' => 'Spanyolország',
  			'ET' => 'Etiópia',
  			'EU' => 'Európai Unió',
+ 			'EZ' => 'Eurózóna',
  			'FI' => 'Finnország',
  			'FJ' => 'Fidzsi',
  			'FK' => 'Falkland-szigetek',
@@ -1505,7 +1522,7 @@ has 'display_name_region' => (
  			'GU' => 'Guam',
  			'GW' => 'Bissau-Guinea',
  			'GY' => 'Guyana',
- 			'HK' => 'Hongkong SAR Kína',
+ 			'HK' => 'Hongkong KKT',
  			'HK@alt=short' => 'Hongkong',
  			'HM' => 'Heard-sziget és McDonald-szigetek',
  			'HN' => 'Honduras',
@@ -1540,7 +1557,7 @@ has 'display_name_region' => (
  			'KZ' => 'Kazahsztán',
  			'LA' => 'Laosz',
  			'LB' => 'Libanon',
- 			'LC' => 'Santa Lucia',
+ 			'LC' => 'Saint Lucia',
  			'LI' => 'Liechtenstein',
  			'LK' => 'Srí Lanka',
  			'LR' => 'Libéria',
@@ -1561,7 +1578,7 @@ has 'display_name_region' => (
  			'ML' => 'Mali',
  			'MM' => 'Mianmar (Burma)',
  			'MN' => 'Mongólia',
- 			'MO' => 'Makaó SAR Kína',
+ 			'MO' => 'Makaó KKT',
  			'MO@alt=short' => 'Makaó',
  			'MP' => 'Északi Mariana-szigetek',
  			'MQ' => 'Martinique',
@@ -1594,7 +1611,7 @@ has 'display_name_region' => (
  			'PH' => 'Fülöp-szigetek',
  			'PK' => 'Pakisztán',
  			'PL' => 'Lengyelország',
- 			'PM' => 'Saint Pierre és Miquelon',
+ 			'PM' => 'Saint-Pierre és Miquelon',
  			'PN' => 'Pitcairn-szigetek',
  			'PR' => 'Puerto Rico',
  			'PS' => 'Palesztin Terület',
@@ -1604,7 +1621,7 @@ has 'display_name_region' => (
  			'PY' => 'Paraguay',
  			'QA' => 'Katar',
  			'QO' => 'Külső-Óceánia',
- 			'RE' => 'Reunion',
+ 			'RE' => 'Réunion',
  			'RO' => 'Románia',
  			'RS' => 'Szerbia',
  			'RU' => 'Oroszország',
@@ -1617,7 +1634,7 @@ has 'display_name_region' => (
  			'SG' => 'Szingapúr',
  			'SH' => 'Szent Ilona',
  			'SI' => 'Szlovénia',
- 			'SJ' => 'Spitzbergák és Jan Mayen-szigetek',
+ 			'SJ' => 'Svalbard és Jan Mayen',
  			'SK' => 'Szlovákia',
  			'SL' => 'Sierra Leone',
  			'SM' => 'San Marino',
@@ -1625,7 +1642,7 @@ has 'display_name_region' => (
  			'SO' => 'Szomália',
  			'SR' => 'Suriname',
  			'SS' => 'Dél-Szudán',
- 			'ST' => 'Sao Tomé és Príncipe',
+ 			'ST' => 'São Tomé és Príncipe',
  			'SV' => 'Salvador',
  			'SX' => 'Sint Maarten',
  			'SY' => 'Szíria',
@@ -1639,6 +1656,7 @@ has 'display_name_region' => (
  			'TJ' => 'Tádzsikisztán',
  			'TK' => 'Tokelau',
  			'TL' => 'Kelet-Timor',
+ 			'TL@alt=variant' => 'Timor-Leste',
  			'TM' => 'Türkmenisztán',
  			'TN' => 'Tunézia',
  			'TO' => 'Tonga',
@@ -1649,7 +1667,9 @@ has 'display_name_region' => (
  			'TZ' => 'Tanzánia',
  			'UA' => 'Ukrajna',
  			'UG' => 'Uganda',
- 			'UM' => 'Amerikai Csendes-óceáni Szigetek',
+ 			'UM' => 'Az USA lakatlan külbirtokai',
+ 			'UN' => 'Egyesült Nemzetek Szervezete',
+ 			'UN@alt=short' => 'ENSZ',
  			'US' => 'Egyesült Államok',
  			'US@alt=short' => 'USA',
  			'UY' => 'Uruguay',
@@ -1661,7 +1681,7 @@ has 'display_name_region' => (
  			'VI' => 'Amerikai Virgin-szigetek',
  			'VN' => 'Vietnam',
  			'VU' => 'Vanuatu',
- 			'WF' => 'Wallis- és Futuna-szigetek',
+ 			'WF' => 'Wallis és Futuna',
  			'WS' => 'Szamoa',
  			'XK' => 'Koszovó',
  			'YE' => 'Jemen',
@@ -1749,11 +1769,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Naptár',
+ 			'cf' => 'Pénznemformátum',
  			'colalternate' => 'Szimbólumokat figyelmen kívül hagyó rendezés',
  			'colbackwards' => 'Ékezetek fordított rendezése',
  			'colcasefirst' => 'Rendezés nagy- vagy kisbetűk szerint',
  			'colcaselevel' => 'Kisbetű-nagybetű érzékeny rendezés',
- 			'colhiraganaquaternary' => 'Kanák szerinti rendezés',
  			'collation' => 'Rendezési sorrend',
  			'colnormalization' => 'Normalizált rendezés',
  			'colnumeric' => 'Numerikus rendezés',
@@ -1765,7 +1785,6 @@ has 'display_name_key' => (
  			'numbers' => 'Számok',
  			'timezone' => 'Időzóna',
  			'va' => 'Földrajzi helyvariáns',
- 			'variabletop' => 'Rendezés szimbólumok szerint',
  			'x' => 'Privát használatra',
 
 		}
@@ -1790,10 +1809,15 @@ has 'display_name_type' => (
  				'indian' => q{Indiai nemzeti naptár},
  				'islamic' => q{Iszlám naptár},
  				'islamic-civil' => q{Iszlám civil naptár},
+ 				'islamic-umalqura' => q{Iszlám Umm al-Qura naptár},
  				'iso8601' => q{ISO-8601 naptár},
  				'japanese' => q{Japán naptár},
  				'persian' => q{Perzsa naptár},
  				'roc' => q{Kínai köztársasági naptár},
+ 			},
+ 			'cf' => {
+ 				'account' => q{Könyvelési pénznemformátum},
+ 				'standard' => q{Normál pénznemformátum},
  			},
  			'colalternate' => {
  				'non-ignorable' => q{Szimbólumok rendezése},
@@ -1812,14 +1836,12 @@ has 'display_name_type' => (
  				'no' => q{Kis- és nagybetűket meg nem különböztető rendezés},
  				'yes' => q{Rendezés kisbetű-nagybetű szerint},
  			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{Kanák rendezése külön},
- 				'yes' => q{Kanák megkülönböztető rendezése},
- 			},
  			'collation' => {
  				'big5han' => q{Hagyományos kínai sorrend - Big5},
+ 				'compat' => q{Előző rendezési sorrend a kompatibilitás érdekében},
  				'dictionary' => q{Szótári rendezési sorrend},
  				'ducet' => q{Alapértelmezett Unicode rendezési sorrend},
+ 				'eor' => q{Európai rendezési szabályok},
  				'gb2312han' => q{Egyszerűsített kínai sorrend - GB2312},
  				'phonebook' => q{Telefonkönyv sorrend},
  				'phonetic' => q{Fonetikus rendezési sorrend},
@@ -1847,6 +1869,11 @@ has 'display_name_type' => (
  				'secondary' => q{Ékezetek rendezése},
  				'tertiary' => q{Ékezetek/kisbetű-nagybetű/szélesség rendezése},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{Teljes szélesség},
+ 				'hwidth' => q{Fél szélesség},
+ 				'npinyin' => q{Szám},
+ 			},
  			'hc' => {
  				'h11' => q{12 órás rendszer (0–11)},
  				'h12' => q{12 órás rendszer (0–12)},
@@ -1857,6 +1884,10 @@ has 'display_name_type' => (
  				'loose' => q{Tág stílusú sortörés},
  				'normal' => q{Normál stílusú sortörés},
  				'strict' => q{Szűk stílusú sortörés},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{BGN},
+ 				'ungegn' => q{UNGEGN},
  			},
  			'ms' => {
  				'metric' => q{Méterrendszer},
@@ -1924,27 +1955,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN',
- 			'numeric' => 'Szám',
- 			'tone' => 'Hangsúly',
- 			'ungegn' => 'UNGEGN',
- 			'x-accents' => 'Ékezetek',
- 			'x-fullwidth' => 'Teljes szélesség',
- 			'x-halfwidth' => 'Fél szélesség',
- 			'x-jamo' => 'Jamo',
- 			'x-pinyin' => 'Pinjin',
- 			'x-publishing' => 'Kiadásra',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1968,10 +1978,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[à ă â å ä ã ā æ ç è ĕ ê ë ē ì ĭ î ï ī ñ ò ŏ ô ø ō œ q ù ŭ û ū w x y ÿ])},
+			auxiliary => qr{[à ă â å ä ã ā æ ç è ĕ ê ë ē ì ĭ î ï ī ñ ò ŏ ô ø ō œ q ù ŭ û ū w x y ÿ]},
 			index => ['A', 'Á', 'B', 'C', '{CS}', 'D', '{DZ}', '{DZS}', 'E', 'É', 'F', 'G', '{GY}', 'H', 'I', 'Í', 'J', 'K', 'L', '{LY}', 'M', 'N', '{NY}', 'O', 'Ó', 'Ö', 'Ő', 'P', 'Q', 'R', 'S', '{SZ}', 'T', '{TY}', 'U', 'Ú', 'Ü', 'Ű', 'V', 'W', 'X', 'Y', 'Z', '{ZS}'],
-			main => qr{(?^u:[a á b c {cs} {ccs} d {dz} {ddz} {dzs} {ddzs} e é f g {gy} {ggy} h i í j k l {ly} {lly} m n {ny} {nny} o ó ö ő p r s {sz} {ssz} t {ty} {tty} u ú ü ű v z {zs} {zzs}])},
-			punctuation => qr{(?^u:[\- – , ; \: ! ? . … ' ’ " ” „ « » ( ) \[ \] \{ \} ⟨ ⟩ § @ * / \& # ~ ⁒])},
+			main => qr{[a á b c {cs} {ccs} d {dz} {ddz} {dzs} {ddzs} e é f g {gy} {ggy} h i í j k l {ly} {lly} m n {ny} {nny} o ó ö ő p r s {sz} {ssz} t {ty} {tty} u ú ü ű v z {zs} {zzs}]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- – , ; \: ! ? . … ' ’ " ” „ « » ( ) \[ \] \{ \} ⟨ ⟩ § @ * / \& # ~ ⁒]},
 		};
 	},
 EOT
@@ -2226,6 +2237,12 @@ has 'units' => (
 						'other' => q({0} gallon),
 						'per' => q({0}/gallon),
 					},
+					'gallon-imperial' => {
+						'name' => q(birodalmi gallon),
+						'one' => q({0} birodalmi gallon),
+						'other' => q({0} birodalmi gallon),
+						'per' => q({0}/birodalmi gallon),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -2468,6 +2485,11 @@ has 'units' => (
 						'one' => q({0} mérföld per gallon),
 						'other' => q({0} mérföld per gallon),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mérföld/birodalmi gallon),
+						'one' => q({0} mérföld/birodalmi gallon),
+						'other' => q({0} mérföld/birodalmi gallon),
+					},
 					'mile-per-hour' => {
 						'name' => q(mérföld per óra),
 						'one' => q({0} mérföld per óra),
@@ -2493,6 +2515,11 @@ has 'units' => (
 						'one' => q({0} milligramm),
 						'other' => q({0} milligramm),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(milligramm/deciliter),
+						'one' => q({0} milligramm/deciliter),
+						'other' => q({0} milligramm/deciliter),
+					},
 					'milliliter' => {
 						'name' => q(milliliter),
 						'one' => q({0} milliliter),
@@ -2507,6 +2534,11 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} higanymilliméter),
 						'other' => q({0} higanymilliméter),
+					},
+					'millimole-per-liter' => {
+						'name' => q(millimól/liter),
+						'one' => q({0} millimól/liter),
+						'other' => q({0} millimól/liter),
 					},
 					'millisecond' => {
 						'name' => q(ezredmásodperc),
@@ -2566,6 +2598,11 @@ has 'units' => (
 						'one' => q({0} parszek),
 						'other' => q({0} parszek),
 					},
+					'part-per-million' => {
+						'name' => q(részecske/millió),
+						'one' => q({0} részecske/millió),
+						'other' => q({0} részecske/millió),
+					},
 					'per' => {
 						'1' => q({0} per {1}),
 					},
@@ -2583,6 +2620,11 @@ has 'units' => (
 						'name' => q(metrikus pint),
 						'one' => q({0} metrikus pint),
 						'other' => q({0} metrikus pint),
+					},
+					'point' => {
+						'name' => q(pont),
+						'one' => q({0} pont),
+						'other' => q({0} pont),
 					},
 					'pound' => {
 						'name' => q(font),
@@ -2637,6 +2679,7 @@ has 'units' => (
 						'name' => q(négyzetkilométer),
 						'one' => q({0} négyzetkilométer),
 						'other' => q({0} négyzetkilométer),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(négyzetméter),
@@ -2648,6 +2691,7 @@ has 'units' => (
 						'name' => q(négyzetmérföld),
 						'one' => q({0} négyzetmérföld),
 						'other' => q({0} négyzetmérföld),
+						'per' => q({0}/négyzetmérföld),
 					},
 					'square-yard' => {
 						'name' => q(négyzetyard),
@@ -2729,6 +2773,12 @@ has 'units' => (
 						'name' => q(cm),
 						'one' => q({0} cm),
 						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					'century' => {
+						'name' => q(sz.),
+						'one' => q({0} sz.),
+						'other' => q({0} sz.),
 					},
 					'coordinate' => {
 						'east' => q({0} K),
@@ -2748,33 +2798,49 @@ has 'units' => (
 						'name' => q(nap),
 						'one' => q({0} nap),
 						'other' => q({0} nap),
+						'per' => q({0}/nap),
+					},
+					'decimeter' => {
+						'name' => q(dm),
+						'one' => q({0} dm),
+						'other' => q({0} dm),
 					},
 					'degree' => {
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
 					'fahrenheit' => {
+						'name' => q(°F),
 						'one' => q({0} °F),
 						'other' => q({0} °F),
 					},
 					'foot' => {
+						'name' => q(láb),
 						'one' => q({0} láb),
 						'other' => q({0} láb),
+						'per' => q({0}/láb),
 					},
 					'g-force' => {
 						'one' => q({0} G),
 						'other' => q({0} G),
 					},
+					'generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
 					'gram' => {
 						'name' => q(g),
 						'one' => q({0} g),
 						'other' => q({0} g),
+						'per' => q({0}/g),
 					},
 					'hectare' => {
 						'one' => q({0} ha),
 						'other' => q({0} ha),
 					},
 					'hectopascal' => {
+						'name' => q(hPa),
 						'one' => q({0} hPa),
 						'other' => q({0} hPa),
 					},
@@ -2786,24 +2852,35 @@ has 'units' => (
 						'name' => q(h),
 						'one' => q({0} h),
 						'other' => q({0} h),
+						'per' => q({0}/h),
 					},
 					'inch' => {
+						'name' => q(hüvelyk),
 						'one' => q({0} hüvelyk),
 						'other' => q({0} hüvelyk),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
+						'name' => q(inHg),
 						'one' => q({0} inHg),
 						'other' => q({0} inHg),
+					},
+					'kelvin' => {
+						'name' => q(K),
+						'one' => q({0} K),
+						'other' => q({0} K),
 					},
 					'kilogram' => {
 						'name' => q(kg),
 						'one' => q({0} kg),
 						'other' => q({0} kg),
+						'per' => q({0}/kg),
 					},
 					'kilometer' => {
 						'name' => q(km),
 						'one' => q({0} km),
 						'other' => q({0} km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(km/h),
@@ -2832,20 +2909,30 @@ has 'units' => (
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
+						'name' => q(m/s),
 						'one' => q({0} m/s),
 						'other' => q({0} m/s),
 					},
 					'mile' => {
+						'name' => q(mf),
 						'one' => q({0} mf),
 						'other' => q({0} mf),
 					},
 					'mile-per-hour' => {
+						'name' => q(mph),
 						'one' => q({0} mph),
 						'other' => q({0} mph),
 					},
+					'mile-scandinavian' => {
+						'name' => q(mil),
+						'one' => q({0} mil),
+						'other' => q({0} mil),
+					},
 					'millibar' => {
+						'name' => q(mbar),
 						'one' => q({0} mb),
 						'other' => q({0} mb),
 					},
@@ -2853,6 +2940,11 @@ has 'units' => (
 						'name' => q(mm),
 						'one' => q({0} mm),
 						'other' => q({0} mm),
+					},
+					'millimeter-of-mercury' => {
+						'name' => q(Hgmm),
+						'one' => q({0} Hgmm),
+						'other' => q({0} Hgmm),
 					},
 					'millisecond' => {
 						'name' => q(ms),
@@ -2863,6 +2955,7 @@ has 'units' => (
 						'name' => q(min),
 						'one' => q({0} min),
 						'other' => q({0} min),
+						'per' => q({0}/min),
 					},
 					'month' => {
 						'name' => q(hónap),
@@ -2870,8 +2963,10 @@ has 'units' => (
 						'other' => q({0} h.),
 					},
 					'ounce' => {
+						'name' => q(oz),
 						'one' => q({0} uncia),
 						'other' => q({0} uncia),
+						'per' => q({0}/oz),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -2881,13 +2976,21 @@ has 'units' => (
 						'other' => q({0} pm),
 					},
 					'pound' => {
+						'name' => q(lb),
 						'one' => q({0} font),
 						'other' => q({0} font),
+						'per' => q({0}/lb),
+					},
+					'pound-per-square-inch' => {
+						'name' => q(psi),
+						'one' => q({0} psi),
+						'other' => q({0} psi),
 					},
 					'second' => {
 						'name' => q(s),
 						'one' => q({0} s),
 						'other' => q({0} s),
+						'per' => q({0}/s),
 					},
 					'square-foot' => {
 						'one' => q({0} ft²),
@@ -2905,6 +3008,11 @@ has 'units' => (
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
 					},
+					'stone' => {
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
+					},
 					'watt' => {
 						'one' => q({0} W),
 						'other' => q({0} W),
@@ -2915,6 +3023,7 @@ has 'units' => (
 						'other' => q({0} hét),
 					},
 					'yard' => {
+						'name' => q(yd),
 						'one' => q({0} yd),
 						'other' => q({0} yd),
 					},
@@ -3101,6 +3210,12 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'name' => q(bir. gal),
+						'one' => q({0} bir. gal),
+						'other' => q({0} bir. gal),
+						'per' => q({0}/bir. gal),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -3344,6 +3459,11 @@ has 'units' => (
 						'one' => q({0} mpg),
 						'other' => q({0} mpg),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mérföld/bir. gallon),
+						'one' => q({0} mpg bir.),
+						'other' => q({0} mpg bir.),
+					},
 					'mile-per-hour' => {
 						'name' => q(mph),
 						'one' => q({0} mph),
@@ -3369,6 +3489,11 @@ has 'units' => (
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
 					'milliliter' => {
 						'name' => q(ml),
 						'one' => q({0} ml),
@@ -3383,6 +3508,11 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'name' => q(millimól/liter),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
 					},
 					'millisecond' => {
 						'name' => q(ms),
@@ -3442,6 +3572,11 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'name' => q(részecske/millió),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -3459,6 +3594,11 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'name' => q(pont),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'name' => q(lb),
@@ -3513,6 +3653,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(m²),
@@ -3521,9 +3662,10 @@ has 'units' => (
 						'per' => q({0}/m²),
 					},
 					'square-mile' => {
-						'name' => q(mf²),
-						'one' => q({0} mf²),
-						'other' => q({0} mf²),
+						'name' => q(mi²),
+						'one' => q({0} mi²),
+						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yd²),
@@ -3630,7 +3772,7 @@ has 'minimum_grouping_digits' => (
 	is			=>'ro',
 	isa			=> Int,
 	init_arg	=> undef,
-	default		=> 1,
+	default		=> 4,
 );
 
 has 'number_symbols' => (
@@ -3711,7 +3853,7 @@ has 'number_formats' => (
 					'other' => '000 B',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3818,14 +3960,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -4198,12 +4340,20 @@ has 'currencies' => (
 				'currency' => q(Fehérorosz új rubel \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(fehérorosz rubel),
 				'one' => q(fehérorosz rubel),
 				'other' => q(fehérorosz rubel),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(fehérorosz rubel \(2000–2016\)),
+				'one' => q(fehérorosz rubel \(2000–2016\)),
+				'other' => q(fehérorosz rubel \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -4259,6 +4409,14 @@ has 'currencies' => (
 				'currency' => q(chilei peso),
 				'one' => q(chilei peso),
 				'other' => q(chilei peso),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(kínai jüan \(offshore\)),
+				'one' => q(kínai jüan \(offshore\)),
+				'other' => q(kínai jüan \(offshore\)),
 			},
 		},
 		'CNY' => {
@@ -5091,20 +5249,20 @@ has 'currencies' => (
 		},
 		'PEI' => {
 			display_name => {
-				'currency' => q(Perui inti),
+				'currency' => q(perui inti),
 			},
 		},
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(perui sol nuevo),
-				'one' => q(perui sol nuevo),
-				'other' => q(perui sol nuevo),
+				'currency' => q(perui sol),
+				'one' => q(perui sol),
+				'other' => q(perui sol),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(Perui sol),
+				'currency' => q(perui sol \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -5882,19 +6040,19 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'Tout',
-							'Baba',
-							'Hator',
-							'Kiahk',
-							'Toba',
-							'Amshir',
-							'Baramhat',
-							'Baramouda',
-							'Bashans',
-							'Paona',
-							'Epep',
-							'Mesra',
-							'Nasie'
+							'Thot',
+							'Paophi',
+							'Athür',
+							'Koiak',
+							'Tübi',
+							'Mehir',
+							'Phamenóth',
+							'Pharmuthi',
+							'Pakhónsz',
+							'Pauni',
+							'Epip',
+							'Meszoré',
+							'Pi Kogi Enavot'
 						],
 						leap => [
 							
@@ -5920,23 +6078,43 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'Thot',
+							'Paophi',
+							'Athür',
+							'Koiak',
+							'Tübi',
+							'Mehir',
+							'Phamenóth',
+							'Pharmuthi',
+							'Pakhónsz',
+							'Pauni',
+							'Epip',
+							'Meszoré',
+							'Pi Kogi Enavot'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'Tout',
-							'Baba',
-							'Hator',
-							'Kiahk',
-							'Toba',
-							'Amshir',
-							'Baramhat',
-							'Baramouda',
-							'Bashans',
-							'Paona',
-							'Epep',
-							'Mesra',
-							'Nasie'
+							'Thot',
+							'Paophi',
+							'Athür',
+							'Koiak',
+							'Tübi',
+							'Mehir',
+							'Phamenóth',
+							'Pharmuthi',
+							'Pakhónsz',
+							'Pauni',
+							'Epip',
+							'Meszoré',
+							'Pi Kogi Enavot'
 						],
 						leap => [
 							
@@ -5944,19 +6122,19 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Tout',
-							'Baba',
-							'Hator',
-							'Kiahk',
-							'Toba',
-							'Amshir',
-							'Baramhat',
-							'Baramouda',
-							'Bashans',
-							'Paona',
-							'Epep',
-							'Mesra',
-							'Nasie'
+							'Thot',
+							'Paophi',
+							'Athür',
+							'Koiak',
+							'Tübi',
+							'Mehir',
+							'Phamenóth',
+							'Pharmuthi',
+							'Pakhónsz',
+							'Pauni',
+							'Epip',
+							'Meszoré',
+							'Pi Kogi Enavot'
 						],
 						leap => [
 							
@@ -6446,25 +6624,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Farvardin',
-							'Ordibehesht',
-							'Khordad',
-							'Tir',
-							'Mordad',
-							'Shahrivar',
-							'Mehr',
-							'Aban',
-							'Azar',
-							'Dey',
-							'Bahman',
-							'Esfand'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -6484,22 +6643,41 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'farvardin',
+							'ordibehesht',
+							'khordad',
+							'tir',
+							'mordad',
+							'shahrivar',
+							'mehr',
+							'aban',
+							'azar',
+							'dey',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'Farvardin',
-							'Ordibehesht',
-							'Khordad',
-							'Tir',
-							'Mordad',
-							'Shahrivar',
-							'Mehr',
-							'Aban',
-							'Azar',
-							'Dey',
-							'Bahman',
-							'Esfand'
+							'farvardin',
+							'ordibehesht',
+							'khordad',
+							'tir',
+							'mordad',
+							'shahrivar',
+							'mehr',
+							'aban',
+							'azar',
+							'dey',
+							'bahman',
+							'esfand'
 						],
 						leap => [
 							
@@ -6507,18 +6685,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Farvardin',
-							'Ordibehesht',
-							'Khordad',
-							'Tir',
-							'Mordad',
-							'Shahrivar',
-							'Mehr',
-							'Aban',
-							'Azar',
-							'Dey',
-							'Bahman',
-							'Esfand'
+							'farvardin',
+							'ordibehesht',
+							'khordad',
+							'tir',
+							'mordad',
+							'shahrivar',
+							'mehr',
+							'aban',
+							'azar',
+							'dey',
+							'bahman',
+							'esfand'
 						],
 						leap => [
 							
@@ -6622,15 +6800,15 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'N1',
-						1 => 'N2',
-						2 => 'N3',
-						3 => 'N4'
+					abbreviated => {0 => 'I. n.év',
+						1 => 'II. n.év',
+						2 => 'III. n.év',
+						3 => 'IV. n.év'
 					},
-					narrow => {0 => '1.',
-						1 => '2.',
-						2 => '3.',
-						3 => '4.'
+					narrow => {0 => 'I.',
+						1 => 'II.',
+						2 => 'III.',
+						3 => 'IV.'
 					},
 					wide => {0 => 'I. negyedév',
 						1 => 'II. negyedév',
@@ -6639,10 +6817,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'N1',
-						1 => 'N2',
-						2 => 'N3',
-						3 => 'N4'
+					abbreviated => {0 => '1. n.év',
+						1 => '2. n.év',
+						2 => '3. n.év',
+						3 => '4. n.év'
 					},
 					narrow => {0 => '1.',
 						1 => '2.',
@@ -6669,333 +6847,36 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'chinese') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'hebrew') {
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
 				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
 					return 'night2' if $time >= 400
 						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 900;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -7003,32 +6884,164 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
 				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -7036,32 +7049,197 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
 				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
+					return 'night2' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 900;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -7081,79 +7259,79 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'morning2' => q{reggel},
-					'night2' => q{éjszaka},
-					'midnight' => q{éjfél},
-					'night1' => q{éjszaka},
-					'morning1' => q{reggel},
-					'noon' => q{dél},
-					'evening1' => q{este},
-					'afternoon1' => q{délután},
-					'am' => q{de.},
-					'pm' => q{du.},
-				},
 				'narrow' => {
-					'morning2' => q{reggel},
-					'night2' => q{éjszaka},
-					'midnight' => q{éjfél},
 					'morning1' => q{reggel},
-					'night1' => q{éjszaka},
+					'afternoon1' => q{du.},
 					'noon' => q{dél},
-					'evening1' => q{délután},
-					'afternoon1' => q{délután},
-					'am' => q{de.},
+					'night1' => q{éjjel},
 					'pm' => q{du.},
+					'midnight' => q{éjfél},
+					'night2' => q{hajnal},
+					'am' => q{de.},
+					'morning2' => q{de.},
+					'evening1' => q{este},
+				},
+				'wide' => {
+					'am' => q{de.},
+					'evening1' => q{este},
+					'morning2' => q{délelőtt},
+					'night2' => q{hajnal},
+					'pm' => q{du.},
+					'midnight' => q{éjfél},
+					'afternoon1' => q{délután},
+					'morning1' => q{reggel},
+					'night1' => q{éjjel},
+					'noon' => q{dél},
 				},
 				'abbreviated' => {
-					'evening1' => q{este},
-					'afternoon1' => q{délután},
-					'am' => q{de.},
 					'pm' => q{du.},
-					'morning2' => q{reggel},
-					'night2' => q{éjszaka},
 					'midnight' => q{éjfél},
-					'night1' => q{éjszaka},
 					'noon' => q{dél},
+					'night1' => q{éjjel},
+					'afternoon1' => q{du.},
 					'morning1' => q{reggel},
+					'evening1' => q{este},
+					'am' => q{de.},
+					'morning2' => q{de.},
+					'night2' => q{hajnal},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'morning2' => q{délelőtt},
-					'morning1' => q{reggel},
+				'abbreviated' => {
+					'am' => q{de.},
+					'evening1' => q{este},
+					'morning2' => q{de.},
+					'night2' => q{hajnal},
+					'pm' => q{du.},
+					'midnight' => q{éjfél},
 					'night1' => q{éjjel},
 					'noon' => q{dél},
-					'midnight' => q{éjfél},
+					'afternoon1' => q{du.},
+					'morning1' => q{reggel},
+				},
+				'narrow' => {
 					'night2' => q{hajnal},
 					'am' => q{de.},
-					'pm' => q{du.},
-					'afternoon1' => q{délután},
+					'morning2' => q{de.},
 					'evening1' => q{este},
+					'morning1' => q{reggel},
+					'afternoon1' => q{du.},
+					'noon' => q{dél},
+					'night1' => q{éjjel},
+					'pm' => q{du.},
+					'midnight' => q{éjfél},
 				},
 				'wide' => {
-					'morning1' => q{reggel},
+					'pm' => q{du.},
+					'midnight' => q{éjfél},
 					'night1' => q{éjjel},
 					'noon' => q{dél},
-					'midnight' => q{éjfél},
-					'night2' => q{hajnal},
-					'morning2' => q{délelőtt},
-					'afternoon1' => q{délután},
-					'evening1' => q{este},
-					'pm' => q{du.},
-					'am' => q{de.},
-				},
-				'abbreviated' => {
-					'pm' => q{du.},
-					'am' => q{de.},
-					'afternoon1' => q{délután},
-					'evening1' => q{este},
-					'night1' => q{éjjel},
 					'morning1' => q{reggel},
-					'noon' => q{dél},
-					'night2' => q{hajnal},
-					'midnight' => q{éjfél},
+					'afternoon1' => q{délután},
+					'am' => q{de.},
+					'evening1' => q{este},
 					'morning2' => q{délelőtt},
+					'night2' => q{hajnal},
 				},
 			},
 		},
@@ -7169,12 +7347,42 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'BK'
 			},
+			narrow => {
+				'0' => 'BK'
+			},
+			wide => {
+				'0' => 'BK'
+			},
 		},
 		'chinese' => {
 		},
 		'coptic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
 		},
 		'ethiopic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
 		},
 		'generic' => {
 		},
@@ -7188,12 +7396,18 @@ has 'eras' => (
 				'1' => 'isz.'
 			},
 			wide => {
-				'0' => 'időszámításunk előtt',
+				'0' => 'Krisztus előtt',
 				'1' => 'időszámításunk szerint'
 			},
 		},
 		'hebrew' => {
 			abbreviated => {
+				'0' => 'TÉ'
+			},
+			narrow => {
+				'0' => 'TÉ'
+			},
+			wide => {
 				'0' => 'TÉ'
 			},
 		},
@@ -7203,6 +7417,12 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'MF'
 			},
+			narrow => {
+				'0' => 'MF'
+			},
+			wide => {
+				'0' => 'MF'
+			},
 		},
 		'japanese' => {
 		},
@@ -7210,7 +7430,16 @@ has 'eras' => (
 		},
 		'roc' => {
 			abbreviated => {
-				'0' => 'R.O.C. előtt'
+				'0' => 'R.O.C. előtt',
+				'1' => 'R.O.C.'
+			},
+			narrow => {
+				'0' => 'R.O.C. előtt',
+				'1' => 'R.O.C.'
+			},
+			wide => {
+				'0' => 'R.O.C. előtt',
+				'1' => 'R.O.C.'
 			},
 		},
 	} },
@@ -7342,7 +7571,12 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
 			E => q{ccc},
+			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d., E},
@@ -7361,6 +7595,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{M. d., E},
 			MMM => q{LLL},
 			MMMEd => q{MMM d., E},
+			MMMMW => q{MMM W. 'hete'},
 			MMMMd => q{MMMM d.},
 			MMMd => q{MMM d.},
 			Md => q{M. d.},
@@ -7368,8 +7603,8 @@ has 'datetime_formats_available_formats' => (
 			h => q{a h},
 			hm => q{a h:mm},
 			hms => q{a h:mm:ss},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
+			hmsv => q{a h:mm:ss v},
+			hmv => q{a h:mm v},
 			mmss => q{mm:ss},
 			ms => q{mm:ss},
 			y => q{y.},
@@ -7382,10 +7617,20 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y. MM. dd.},
 			yQQQ => q{y. QQQ},
 			yQQQQ => q{y. QQQQ},
+			yw => q{Y w. 'hete'},
 		},
 		'generic' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
 			E => q{ccc},
+			EBhm => q{E h:mm},
+			EBhms => q{E h:mm:ss},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{d., E},
+			Ehm => q{E h:mm},
+			Ehms => q{E h:mm:ss},
 			Gy => q{G y.},
 			GyMMM => q{G y. MMM},
 			GyMMMEd => q{G y. MMM d., E},
@@ -7643,14 +7888,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Acre nyári idő),
-				'generic' => q(Acre idő),
-				'standard' => q(Acre zónaidő),
+				'daylight' => q#Acre nyári idő#,
+				'generic' => q#Acre idő#,
+				'standard' => q#Acre zónaidő#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(afganisztáni idő),
+				'standard' => q#afganisztáni idő#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -7811,45 +8056,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(közép-afrikai téli idő),
+				'standard' => q#közép-afrikai téli idő#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(kelet-afrikai téli idő),
+				'standard' => q#kelet-afrikai téli idő#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(dél-afrikai téli idő),
+				'standard' => q#dél-afrikai téli idő#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(nyugat-afrikai nyári idő),
-				'generic' => q(nyugat-afrikai időzóna),
-				'standard' => q(nyugat-afrikai téli idő),
+				'daylight' => q#nyugat-afrikai nyári idő#,
+				'generic' => q#nyugat-afrikai időzóna#,
+				'standard' => q#nyugat-afrikai téli idő#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(alaszkai nyári idő),
-				'generic' => q(alaszkai idő),
-				'standard' => q(alaszkai zónaidő),
+				'daylight' => q#alaszkai nyári idő#,
+				'generic' => q#alaszkai idő#,
+				'standard' => q#alaszkai zónaidő#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Almati nyári idő),
-				'generic' => q(Almati idő),
-				'standard' => q(Almati zónaidő),
+				'daylight' => q#Almati nyári idő#,
+				'generic' => q#Almati idő#,
+				'standard' => q#Almati zónaidő#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(amazóniai nyári idő),
-				'generic' => q(amazóniai idő),
-				'standard' => q(amazóniai téli idő),
+				'daylight' => q#amazóniai nyári idő#,
+				'generic' => q#amazóniai idő#,
+				'standard' => q#amazóniai téli idő#,
 			},
 		},
 		'America/Adak' => {
@@ -7967,7 +8212,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Cuiabá#,
 		},
 		'America/Curacao' => {
-			exemplarCity => q#Curacao#,
+			exemplarCity => q#Curaçao#,
 		},
 		'America/Danmarkshavn' => {
 			exemplarCity => q#Danmarkshavn#,
@@ -7995,6 +8240,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -8165,7 +8413,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Beulah, Észak-Dakota#,
 		},
 		'America/North_Dakota/Center' => {
-			exemplarCity => q#Középső, Észak-Dakota#,
+			exemplarCity => q#Center, Észak-Dakota#,
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Észak-Dakota#,
@@ -8196,6 +8444,9 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Rico#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
@@ -8292,37 +8543,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(középső államokbeli nyári idő),
-				'generic' => q(középső államokbeli idő),
-				'standard' => q(középső államokbeli zónaidő),
+				'daylight' => q#középső államokbeli nyári idő#,
+				'generic' => q#középső államokbeli idő#,
+				'standard' => q#középső államokbeli zónaidő#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(keleti államokbeli nyári idő),
-				'generic' => q(keleti államokbeli idő),
-				'standard' => q(keleti államokbeli zónaidő),
+				'daylight' => q#keleti államokbeli nyári idő#,
+				'generic' => q#keleti államokbeli idő#,
+				'standard' => q#keleti államokbeli zónaidő#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(hegyvidéki nyári idő),
-				'generic' => q(hegyvidéki idő),
-				'standard' => q(hegyvidéki zónaidő),
+				'daylight' => q#hegyvidéki nyári idő#,
+				'generic' => q#hegyvidéki idő#,
+				'standard' => q#hegyvidéki zónaidő#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(csendes-óceáni nyári idő),
-				'generic' => q(csendes-óceáni idő),
-				'standard' => q(csendes-óceáni zónaidő),
+				'daylight' => q#csendes-óceáni nyári idő#,
+				'generic' => q#csendes-óceáni idő#,
+				'standard' => q#csendes-óceáni zónaidő#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadíri nyári idő),
-				'generic' => q(Anadiri idő),
-				'standard' => q(Anadíri zónaidő),
+				'daylight' => q#Anadíri nyári idő#,
+				'generic' => q#Anadiri idő#,
+				'standard' => q#Anadíri zónaidő#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -8360,30 +8611,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(apiai nyári idő),
-				'generic' => q(apiai idő),
-				'standard' => q(apiai téli idő),
+				'daylight' => q#apiai nyári idő#,
+				'generic' => q#apiai idő#,
+				'standard' => q#apiai téli idő#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Aqtaui nyári idő),
-				'generic' => q(Aqtaui idő),
-				'standard' => q(Aqtaui zónaidő),
+				'daylight' => q#Aqtaui nyári idő#,
+				'generic' => q#Aqtaui idő#,
+				'standard' => q#Aqtaui zónaidő#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Aqtobei nyári idő),
-				'generic' => q(Aqtobei idő),
-				'standard' => q(Aqtobei zónaidő),
+				'daylight' => q#Aqtobei nyári idő#,
+				'generic' => q#Aqtobei idő#,
+				'standard' => q#Aqtobei zónaidő#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(arab nyári idő),
-				'generic' => q(arab idő),
-				'standard' => q(arab téli idő),
+				'daylight' => q#arab nyári idő#,
+				'generic' => q#arab idő#,
+				'standard' => q#arab téli idő#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -8391,23 +8642,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentínai nyári idő),
-				'generic' => q(argentínai idő),
-				'standard' => q(argentínai téli idő),
+				'daylight' => q#argentínai nyári idő#,
+				'generic' => q#argentínai idő#,
+				'standard' => q#argentínai téli idő#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(nyugat-argentínai nyári idő),
-				'generic' => q(nyugat-argentínai időzóna),
-				'standard' => q(nyugat-argentínai téli idő),
+				'daylight' => q#nyugat-argentínai nyári idő#,
+				'generic' => q#nyugat-argentínai időzóna#,
+				'standard' => q#nyugat-argentínai téli idő#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(örményországi nyári idő),
-				'generic' => q(örményországi idő),
-				'standard' => q(örményországi téli idő),
+				'daylight' => q#örményországi nyári idő#,
+				'generic' => q#örményországi idő#,
+				'standard' => q#örményországi téli idő#,
 			},
 		},
 		'Asia/Aden' => {
@@ -8431,6 +8682,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Asgabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Bagdad#,
 		},
@@ -8442,6 +8696,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Bejrút#,
@@ -8468,7 +8725,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Damaszkusz#,
 		},
 		'Asia/Dhaka' => {
-			exemplarCity => q#Dháka#,
+			exemplarCity => q#Dakka#,
 		},
 		'Asia/Dili' => {
 			exemplarCity => q#Dili#,
@@ -8478,6 +8735,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dushanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gáza#,
@@ -8576,7 +8836,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Kizilorda#,
 		},
 		'Asia/Rangoon' => {
-			exemplarCity => q#Rangoon#,
+			exemplarCity => q#Yangon#,
 		},
 		'Asia/Riyadh' => {
 			exemplarCity => q#Rijád#,
@@ -8620,6 +8880,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokió#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomszk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulánbátor#,
 		},
@@ -8646,9 +8909,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(atlanti-óceáni nyári idő),
-				'generic' => q(atlanti-óceáni idő),
-				'standard' => q(atlanti-óceáni zónaidő),
+				'daylight' => q#atlanti-óceáni nyári idő#,
+				'generic' => q#atlanti-óceáni idő#,
+				'standard' => q#atlanti-óceáni zónaidő#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -8661,10 +8924,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Kanári-szigetek#,
 		},
 		'Atlantic/Cape_Verde' => {
-			exemplarCity => q#Zöld-Foki Szigetek#,
+			exemplarCity => q#Zöld-foki szigetek#,
 		},
 		'Atlantic/Faeroe' => {
-			exemplarCity => q#Faroe#,
+			exemplarCity => q#Feröer#,
 		},
 		'Atlantic/Madeira' => {
 			exemplarCity => q#Madeira#,
@@ -8719,171 +8982,176 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(közép-ausztráliai nyári idő),
-				'generic' => q(közép-ausztráliai idő),
-				'standard' => q(közép-ausztráliai téli idő),
+				'daylight' => q#közép-ausztráliai nyári idő#,
+				'generic' => q#közép-ausztráliai idő#,
+				'standard' => q#közép-ausztráliai téli idő#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(közép-nyugat-ausztráliai nyári idő),
-				'generic' => q(közép-nyugat-ausztráliai idő),
-				'standard' => q(közép-nyugat-ausztráliai téli idő),
+				'daylight' => q#közép-nyugat-ausztráliai nyári idő#,
+				'generic' => q#közép-nyugat-ausztráliai idő#,
+				'standard' => q#közép-nyugat-ausztráliai téli idő#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(kelet-ausztráliai nyári idő),
-				'generic' => q(kelet-ausztráliai idő),
-				'standard' => q(kelet-ausztráliai téli idő),
+				'daylight' => q#kelet-ausztráliai nyári idő#,
+				'generic' => q#kelet-ausztráliai idő#,
+				'standard' => q#kelet-ausztráliai téli idő#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(nyugat-ausztráliai nyári idő),
-				'generic' => q(nyugat-ausztráliai idő),
-				'standard' => q(nyugat-ausztráliai téli idő),
+				'daylight' => q#nyugat-ausztráliai nyári idő#,
+				'generic' => q#nyugat-ausztráliai idő#,
+				'standard' => q#nyugat-ausztráliai téli idő#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(azerbajdzsáni nyári idő),
-				'generic' => q(Azerbajdzsáni idő),
-				'standard' => q(azerbajdzsáni téli idő),
+				'daylight' => q#azerbajdzsáni nyári idő#,
+				'generic' => q#azerbajdzsáni idő#,
+				'standard' => q#azerbajdzsáni téli idő#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(azori nyári idő),
-				'generic' => q(azori időzóna),
-				'standard' => q(azori téli idő),
+				'daylight' => q#azori nyári idő#,
+				'generic' => q#azori időzóna#,
+				'standard' => q#azori téli idő#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(bangladesi nyári idő),
-				'generic' => q(bangladesi idő),
-				'standard' => q(bangladesi téli idő),
+				'daylight' => q#bangladesi nyári idő#,
+				'generic' => q#bangladesi idő#,
+				'standard' => q#bangladesi téli idő#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(butáni idő),
+				'standard' => q#butáni idő#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(bolíviai téli idő),
+				'standard' => q#bolíviai téli idő#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(brazíliai nyári idő),
-				'generic' => q(brazíliai idő),
-				'standard' => q(brazíliai téli idő),
+				'daylight' => q#brazíliai nyári idő#,
+				'generic' => q#brazíliai idő#,
+				'standard' => q#brazíliai téli idő#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Brunei Darussalam-i idő),
+				'standard' => q#Brunei Darussalam-i idő#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(zöld-foki-szigeteki nyári idő),
-				'generic' => q(zöld-foki-szigeteki időzóna),
-				'standard' => q(zöld-foki-szigeteki téli idő),
+				'daylight' => q#zöld-foki-szigeteki nyári idő#,
+				'generic' => q#zöld-foki-szigeteki időzóna#,
+				'standard' => q#zöld-foki-szigeteki téli idő#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(chamorrói téli idő),
+				'standard' => q#chamorrói téli idő#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(chathami nyári idő),
-				'generic' => q(chathami idő),
-				'standard' => q(chathami téli idő),
+				'daylight' => q#chathami nyári idő#,
+				'generic' => q#chathami idő#,
+				'standard' => q#chathami téli idő#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(chilei nyári idő),
-				'generic' => q(chilei időzóna),
-				'standard' => q(chilei téli idő),
+				'daylight' => q#chilei nyári idő#,
+				'generic' => q#chilei időzóna#,
+				'standard' => q#chilei téli idő#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(kínai nyári idő),
-				'generic' => q(kínai idő),
-				'standard' => q(kínai téli idő),
+				'daylight' => q#kínai nyári idő#,
+				'generic' => q#kínai idő#,
+				'standard' => q#kínai téli idő#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(csojbalszani nyári idő),
-				'generic' => q(csojbalszani idő),
-				'standard' => q(csojbalszani téli idő),
+				'daylight' => q#csojbalszani nyári idő#,
+				'generic' => q#csojbalszani idő#,
+				'standard' => q#csojbalszani téli idő#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(karácsony-szigeti téli idő),
+				'standard' => q#karácsony-szigeti téli idő#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(kókusz-szigeteki téli idő),
+				'standard' => q#kókusz-szigeteki téli idő#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(kolumbiai nyári idő),
-				'generic' => q(kolumbiai idő),
-				'standard' => q(kolumbiai téli idő),
+				'daylight' => q#kolumbiai nyári idő#,
+				'generic' => q#kolumbiai idő#,
+				'standard' => q#kolumbiai téli idő#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(cook-szigeteki fél nyári idő),
-				'generic' => q(cook-szigeteki idő),
-				'standard' => q(cook-szigeteki téli idő),
+				'daylight' => q#cook-szigeteki fél nyári idő#,
+				'generic' => q#cook-szigeteki idő#,
+				'standard' => q#cook-szigeteki téli idő#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(kubai nyári idő),
-				'generic' => q(kubai időzóna),
-				'standard' => q(kubai téli idő),
+				'daylight' => q#kubai nyári idő#,
+				'generic' => q#kubai időzóna#,
+				'standard' => q#kubai téli idő#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(davisi idő),
+				'standard' => q#davisi idő#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(dumont-d’Urville-i idő),
+				'standard' => q#dumont-d’Urville-i idő#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(kelet-timori téli idő),
+				'standard' => q#kelet-timori téli idő#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(húsvét-szigeti nyári idő),
-				'generic' => q(húsvét-szigeti időzóna),
-				'standard' => q(húsvét-szigeti téli idő),
+				'daylight' => q#húsvét-szigeti nyári idő#,
+				'generic' => q#húsvét-szigeti időzóna#,
+				'standard' => q#húsvét-szigeti téli idő#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ecuadori téli idő),
+				'standard' => q#ecuadori téli idő#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#egyezményes koordinált világidő#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -8894,6 +9162,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Asztrahán#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#Athén#,
@@ -8928,7 +9199,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(ír nyári idő),
+				'daylight' => q#ír nyári idő#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -8955,6 +9226,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kijev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisszabon#,
 		},
@@ -8964,7 +9238,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#London#,
 			long => {
-				'daylight' => q(brit nyári idő),
+				'daylight' => q#brit nyári idő#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -9015,6 +9289,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Szarajevó#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Szaratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Szimferopol#,
 		},
@@ -9032,6 +9309,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Uljanovszk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Ungvár#,
@@ -9065,152 +9345,152 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(közép-európai nyári idő),
-				'generic' => q(közép-európai időzóna),
-				'standard' => q(közép-európai téli idő),
+				'daylight' => q#közép-európai nyári idő#,
+				'generic' => q#közép-európai időzóna#,
+				'standard' => q#közép-európai téli idő#,
 			},
 			short => {
-				'daylight' => q(CEST),
-				'generic' => q(CET),
-				'standard' => q(CET),
+				'daylight' => q#CEST#,
+				'generic' => q#CET#,
+				'standard' => q#CET#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(kelet-európai nyári idő),
-				'generic' => q(kelet-európai időzóna),
-				'standard' => q(kelet-európai téli idő),
+				'daylight' => q#kelet-európai nyári idő#,
+				'generic' => q#kelet-európai időzóna#,
+				'standard' => q#kelet-európai téli idő#,
 			},
 			short => {
-				'daylight' => q(EEST),
-				'generic' => q(EET),
-				'standard' => q(EET),
+				'daylight' => q#EEST#,
+				'generic' => q#EET#,
+				'standard' => q#EET#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(minszki idő),
+				'standard' => q#minszki idő#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(nyugat-európai nyári idő),
-				'generic' => q(nyugat-európai időzóna),
-				'standard' => q(nyugat-európai téli idő),
+				'daylight' => q#nyugat-európai nyári idő#,
+				'generic' => q#nyugat-európai időzóna#,
+				'standard' => q#nyugat-európai téli idő#,
 			},
 			short => {
-				'daylight' => q(WEST),
-				'generic' => q(WET),
-				'standard' => q(WET),
+				'daylight' => q#WEST#,
+				'generic' => q#WET#,
+				'standard' => q#WET#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(falkland-szigeteki nyári idő),
-				'generic' => q(falkland-szigeteki idő),
-				'standard' => q(falkland-szigeteki téli idő),
+				'daylight' => q#falkland-szigeteki nyári idő#,
+				'generic' => q#falkland-szigeteki idő#,
+				'standard' => q#falkland-szigeteki téli idő#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(fidzsi nyári idő),
-				'generic' => q(fidzsi idő),
-				'standard' => q(fidzsi téli idő),
+				'daylight' => q#fidzsi nyári idő#,
+				'generic' => q#fidzsi idő#,
+				'standard' => q#fidzsi téli idő#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(francia-guianai idő),
+				'standard' => q#francia-guyanai idő#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(francia déli és antarktiszi idő),
+				'standard' => q#francia déli és antarktiszi idő#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(greenwichi középidő, téli idő),
+				'standard' => q#greenwichi középidő, téli idő#,
 			},
 			short => {
-				'standard' => q(GMT),
+				'standard' => q#GMT#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(galápagosi téli idő),
+				'standard' => q#galápagosi téli idő#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(gambieri idő),
+				'standard' => q#gambieri idő#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(grúziai nyári idő),
-				'generic' => q(grúziai idő),
-				'standard' => q(grúziai téli idő),
+				'daylight' => q#grúziai nyári idő#,
+				'generic' => q#grúziai idő#,
+				'standard' => q#grúziai téli idő#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(gilbert-szigeteki idő),
+				'standard' => q#gilbert-szigeteki idő#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(kelet-grönlandi nyári idő),
-				'generic' => q(kelet-grönlandi időzóna),
-				'standard' => q(kelet-grönlandi téli idő),
+				'daylight' => q#kelet-grönlandi nyári idő#,
+				'generic' => q#kelet-grönlandi időzóna#,
+				'standard' => q#kelet-grönlandi téli idő#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(nyugat-grönlandi nyári idő),
-				'generic' => q(nyugat-grönlandi időzóna),
-				'standard' => q(nyugat-grönlandi téli idő),
+				'daylight' => q#nyugat-grönlandi nyári idő#,
+				'generic' => q#nyugat-grönlandi időzóna#,
+				'standard' => q#nyugat-grönlandi téli idő#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Guami zónaidő),
+				'standard' => q#Guami zónaidő#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(öbölbeli téli idő),
+				'standard' => q#öbölbeli téli idő#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(guyanai téli idő),
+				'standard' => q#guyanai téli idő#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(hawaii-aleuti nyári idő),
-				'generic' => q(hawaii-aleut időzóna),
-				'standard' => q(hawaii-aleuti téli idő),
+				'daylight' => q#hawaii-aleuti nyári idő#,
+				'generic' => q#hawaii-aleuti időzóna#,
+				'standard' => q#hawaii-aleuti téli idő#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(hongkongi nyári idő),
-				'generic' => q(hongkongi időzóna),
-				'standard' => q(hongkongi téli idő),
+				'daylight' => q#hongkongi nyári idő#,
+				'generic' => q#hongkongi időzóna#,
+				'standard' => q#hongkongi téli idő#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(hovdi nyári idő),
-				'generic' => q(hovdi idő),
-				'standard' => q(hovdi téli idő),
+				'daylight' => q#hovdi nyári idő#,
+				'generic' => q#hovdi idő#,
+				'standard' => q#hovdi téli idő#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(indiai téli idő),
+				'standard' => q#indiai téli idő#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -9248,264 +9528,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(indiai-óceáni idő),
+				'standard' => q#indiai-óceáni idő#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(indokínai idő),
+				'standard' => q#indokínai idő#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(közép-indonéziai idő),
+				'standard' => q#közép-indonéziai idő#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(kelet-indonéziai idő),
+				'standard' => q#kelet-indonéziai idő#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(nyugat-indonéziai téli idő),
+				'standard' => q#nyugat-indonéziai téli idő#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(iráni nyári idő),
-				'generic' => q(iráni idő),
-				'standard' => q(iráni téli idő),
+				'daylight' => q#iráni nyári idő#,
+				'generic' => q#iráni idő#,
+				'standard' => q#iráni téli idő#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(irkutszki nyári idő),
-				'generic' => q(irkutszki idő),
-				'standard' => q(irkutszki téli idő),
+				'daylight' => q#irkutszki nyári idő#,
+				'generic' => q#irkutszki idő#,
+				'standard' => q#irkutszki téli idő#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(izraeli nyári idő),
-				'generic' => q(izraeli idő),
-				'standard' => q(izraeli téli idő),
+				'daylight' => q#izraeli nyári idő#,
+				'generic' => q#izraeli idő#,
+				'standard' => q#izraeli téli idő#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(japán nyári idő),
-				'generic' => q(japán idő),
-				'standard' => q(japán téli idő),
+				'daylight' => q#japán nyári idő#,
+				'generic' => q#japán idő#,
+				'standard' => q#japán téli idő#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Petropavlovszk-kamcsatkai nyári idő),
-				'generic' => q(Petropavlovszk-kamcsatkai idő),
-				'standard' => q(Petropavlovszk-kamcsatkai zónaidő),
+				'daylight' => q#Petropavlovszk-kamcsatkai nyári idő#,
+				'generic' => q#Petropavlovszk-kamcsatkai idő#,
+				'standard' => q#Petropavlovszk-kamcsatkai zónaidő#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(kelet-kazahsztáni idő),
+				'standard' => q#kelet-kazahsztáni idő#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(nyugat-kazahsztáni idő),
+				'standard' => q#nyugat-kazahsztáni idő#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(koreai nyári idő),
-				'generic' => q(koreai idő),
-				'standard' => q(koreai téli idő),
+				'daylight' => q#koreai nyári idő#,
+				'generic' => q#koreai idő#,
+				'standard' => q#koreai téli idő#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(kosraei idő),
+				'standard' => q#kosraei idő#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(krasznojarszki nyári idő),
-				'generic' => q(krasznojarszki idő),
-				'standard' => q(krasznojarszki téli idő),
+				'daylight' => q#krasznojarszki nyári idő#,
+				'generic' => q#krasznojarszki idő#,
+				'standard' => q#krasznojarszki téli idő#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(kirgizisztáni idő),
+				'standard' => q#kirgizisztáni idő#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Lankai idő),
+				'standard' => q#Lankai idő#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(sor-szigeteki idő),
+				'standard' => q#sor-szigeteki idő#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Lord Howe-szigeti nyári idő),
-				'generic' => q(Lord Howe-szigeti idő),
-				'standard' => q(Lord Howe-szigeti téli idő),
+				'daylight' => q#Lord Howe-szigeti nyári idő#,
+				'generic' => q#Lord Howe-szigeti idő#,
+				'standard' => q#Lord Howe-szigeti téli idő#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Macaui nyári idő),
-				'generic' => q(Macaui idő),
-				'standard' => q(Macaui zónaidő),
+				'daylight' => q#Macaui nyári idő#,
+				'generic' => q#Macaui idő#,
+				'standard' => q#Macaui zónaidő#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(macquarie-szigeti téli idő),
+				'standard' => q#macquarie-szigeti téli idő#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(magadáni nyári idő),
-				'generic' => q(magadáni idő),
-				'standard' => q(magadani téli idő),
+				'daylight' => q#magadáni nyári idő#,
+				'generic' => q#magadáni idő#,
+				'standard' => q#magadani téli idő#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(malajziai idő),
+				'standard' => q#malajziai idő#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(maldív-szigeteki idő),
+				'standard' => q#maldív-szigeteki idő#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(marquises-szigeteki idő),
+				'standard' => q#marquises-szigeteki idő#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(marshall-szigeteki idő),
+				'standard' => q#marshall-szigeteki idő#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(mauritiusi nyári idő),
-				'generic' => q(mauritiusi időzóna),
-				'standard' => q(mauritiusi téli idő),
+				'daylight' => q#mauritiusi nyári idő#,
+				'generic' => q#mauritiusi időzóna#,
+				'standard' => q#mauritiusi téli idő#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(mawsoni idő),
+				'standard' => q#mawsoni idő#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(északnyugat-mexikói nyári idő),
-				'generic' => q(északnyugat-mexikói idő),
-				'standard' => q(északnyugat-mexikói zónaidő),
+				'daylight' => q#északnyugat-mexikói nyári idő#,
+				'generic' => q#északnyugat-mexikói idő#,
+				'standard' => q#északnyugat-mexikói zónaidő#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(mexikói csendes-óceáni nyári idő),
-				'generic' => q(mexikói csendes-óceáni idő),
-				'standard' => q(mexikói csendes-óceáni zónaidő),
+				'daylight' => q#mexikói csendes-óceáni nyári idő#,
+				'generic' => q#mexikói csendes-óceáni idő#,
+				'standard' => q#mexikói csendes-óceáni zónaidő#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(ulánbátori nyári idő),
-				'generic' => q(ulánbátori idő),
-				'standard' => q(ulánbátori téli idő),
+				'daylight' => q#ulánbátori nyári idő#,
+				'generic' => q#ulánbátori idő#,
+				'standard' => q#ulánbátori téli idő#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(moszkvai nyári idő),
-				'generic' => q(moszkvai idő),
-				'standard' => q(moszkvai téli idő),
+				'daylight' => q#moszkvai nyári idő#,
+				'generic' => q#moszkvai idő#,
+				'standard' => q#moszkvai téli idő#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(mianmari idő),
+				'standard' => q#mianmari idő#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(naurui idő),
+				'standard' => q#naurui idő#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(nepáli idő),
+				'standard' => q#nepáli idő#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(új-kaledóniai nyári idő),
-				'generic' => q(új-kaledóniai idő),
-				'standard' => q(új-kaledóniai téli idő),
+				'daylight' => q#új-kaledóniai nyári idő#,
+				'generic' => q#új-kaledóniai idő#,
+				'standard' => q#új-kaledóniai téli idő#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(új-zélandi nyári idő),
-				'generic' => q(új-zélandi idő),
-				'standard' => q(új-zélandi téli idő),
+				'daylight' => q#új-zélandi nyári idő#,
+				'generic' => q#új-zélandi idő#,
+				'standard' => q#új-zélandi téli idő#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(új-fundlandi nyári idő),
-				'generic' => q(új-fundlandi idő),
-				'standard' => q(új-fundlandi zónaidő),
+				'daylight' => q#új-fundlandi nyári idő#,
+				'generic' => q#új-fundlandi idő#,
+				'standard' => q#új-fundlandi zónaidő#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(niuei idő),
+				'standard' => q#niuei idő#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(norfolk-szigeteki idő),
+				'standard' => q#norfolk-szigeteki idő#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Fernando de Noronha-i nyári idő),
-				'generic' => q(Fernando de Noronha-i idő),
-				'standard' => q(Fernando de Noronha-i téli idő),
+				'daylight' => q#Fernando de Noronha-i nyári idő#,
+				'generic' => q#Fernando de Noronha-i idő#,
+				'standard' => q#Fernando de Noronha-i téli idő#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Észak-mariana-szigeteki idő),
+				'standard' => q#Észak-mariana-szigeteki idő#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(novoszibirszki nyári idő),
-				'generic' => q(novoszibirszki idő),
-				'standard' => q(novoszibirszki téli idő),
+				'daylight' => q#novoszibirszki nyári idő#,
+				'generic' => q#novoszibirszki idő#,
+				'standard' => q#novoszibirszki téli idő#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(omszki nyári idő),
-				'generic' => q(omszki idő),
-				'standard' => q(omszki téli idő),
+				'daylight' => q#omszki nyári idő#,
+				'generic' => q#omszki idő#,
+				'standard' => q#omszki téli idő#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -9617,7 +9897,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Tongatapu#,
 		},
 		'Pacific/Truk' => {
-			exemplarCity => q#Chuuk#,
+			exemplarCity => q#Truk#,
 		},
 		'Pacific/Wake' => {
 			exemplarCity => q#Wake-sziget#,
@@ -9627,245 +9907,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(pakisztáni nyári idő),
-				'generic' => q(pakisztáni idő),
-				'standard' => q(pakisztáni téli idő),
+				'daylight' => q#pakisztáni nyári idő#,
+				'generic' => q#pakisztáni idő#,
+				'standard' => q#pakisztáni téli idő#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(palaui idő),
+				'standard' => q#palaui idő#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(pápua új-guineai idő),
+				'standard' => q#pápua új-guineai idő#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(paraguayi nyári idő),
-				'generic' => q(paraguayi idő),
-				'standard' => q(paraguayi téli idő),
+				'daylight' => q#paraguayi nyári idő#,
+				'generic' => q#paraguayi idő#,
+				'standard' => q#paraguayi téli idő#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(perui nyári idő),
-				'generic' => q(perui idő),
-				'standard' => q(perui téli idő),
+				'daylight' => q#perui nyári idő#,
+				'generic' => q#perui idő#,
+				'standard' => q#perui téli idő#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(fülöp-szigeteki nyári idő),
-				'generic' => q(fülöp-szigeteki idő),
-				'standard' => q(fülöp-szigeteki téli idő),
+				'daylight' => q#fülöp-szigeteki nyári idő#,
+				'generic' => q#fülöp-szigeteki idő#,
+				'standard' => q#fülöp-szigeteki téli idő#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(phoenix-szigeteki téli idő),
+				'standard' => q#phoenix-szigeteki téli idő#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Saint Pierre és Miquelon-i nyári idő),
-				'generic' => q(Saint Pierre és Miquelon-i idő),
-				'standard' => q(Saint Pierre és Miquelon-i zónaidő),
+				'daylight' => q#Saint-Pierre és Miquelon-i nyári idő#,
+				'generic' => q#Saint-Pierre és Miquelon-i idő#,
+				'standard' => q#Saint-Pierre és Miquelon-i zónaidő#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(pitcairn-szigeteki idő),
+				'standard' => q#pitcairn-szigeteki idő#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(ponape-szigeti idő),
+				'standard' => q#ponape-szigeti idő#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#phenjani idő#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Qyzylordai nyári idő),
-				'generic' => q(Qyzylordai idő),
-				'standard' => q(Qyzylordai zónaidő),
+				'daylight' => q#Qyzylordai nyári idő#,
+				'generic' => q#Qyzylordai idő#,
+				'standard' => q#Qyzylordai zónaidő#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(réunioni idő),
+				'standard' => q#réunioni idő#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(rotherai idő),
+				'standard' => q#rotherai idő#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(szahalini nyári idő),
-				'generic' => q(szahalini idő),
-				'standard' => q(szahalini téli idő),
+				'daylight' => q#szahalini nyári idő#,
+				'generic' => q#szahalini idő#,
+				'standard' => q#szahalini téli idő#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Szamarai nyári idő),
-				'generic' => q(Szamarai idő),
-				'standard' => q(Szamarai zónaidő),
+				'daylight' => q#Szamarai nyári idő#,
+				'generic' => q#Szamarai idő#,
+				'standard' => q#Szamarai zónaidő#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(szamoai nyári idő),
-				'generic' => q(szamoai idő),
-				'standard' => q(szamoai téli idő),
+				'daylight' => q#szamoai nyári idő#,
+				'generic' => q#szamoai idő#,
+				'standard' => q#szamoai téli idő#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(seychelle-szigeteki idő),
+				'standard' => q#seychelle-szigeteki idő#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(szingapúri téli idő),
+				'standard' => q#szingapúri téli idő#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(salamon-szigeteki idő),
+				'standard' => q#salamon-szigeteki idő#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(déli-georgiai idő),
+				'standard' => q#déli-georgiai idő#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(szurinámi idő),
+				'standard' => q#szurinámi idő#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(syowai idő),
+				'standard' => q#syowai idő#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(tahiti idő),
+				'standard' => q#tahiti idő#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(taipei nyári idő),
-				'generic' => q(taipei idő),
-				'standard' => q(taipei téli idő),
+				'daylight' => q#taipei nyári idő#,
+				'generic' => q#taipei idő#,
+				'standard' => q#taipei téli idő#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(tádzsikisztáni idő),
+				'standard' => q#tádzsikisztáni idő#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(tokelaui idő),
+				'standard' => q#tokelaui idő#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(tongai nyári idő),
-				'generic' => q(tongai idő),
-				'standard' => q(tongai téli idő),
+				'daylight' => q#tongai nyári idő#,
+				'generic' => q#tongai idő#,
+				'standard' => q#tongai téli idő#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(truki idő),
+				'standard' => q#truki idő#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(türkmenisztáni nyári idő),
-				'generic' => q(türkmenisztáni idő),
-				'standard' => q(türkmenisztáni téli idő),
+				'daylight' => q#türkmenisztáni nyári idő#,
+				'generic' => q#türkmenisztáni idő#,
+				'standard' => q#türkmenisztáni téli idő#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(tuvalui idő),
+				'standard' => q#tuvalui idő#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(uruguayi nyári idő),
-				'generic' => q(uruguayi idő),
-				'standard' => q(uruguayi téli idő),
+				'daylight' => q#uruguayi nyári idő#,
+				'generic' => q#uruguayi idő#,
+				'standard' => q#uruguayi téli idő#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(üzbegisztáni nyári idő),
-				'generic' => q(üzbegisztáni idő),
-				'standard' => q(üzbegisztáni téli idő),
+				'daylight' => q#üzbegisztáni nyári idő#,
+				'generic' => q#üzbegisztáni idő#,
+				'standard' => q#üzbegisztáni téli idő#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(vanuatui nyári idő),
-				'generic' => q(vanuatui idő),
-				'standard' => q(vanuatui téli idő),
+				'daylight' => q#vanuatui nyári idő#,
+				'generic' => q#vanuatui idő#,
+				'standard' => q#vanuatui téli idő#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(venezuelai idő),
+				'standard' => q#venezuelai idő#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(vlagyivosztoki nyári idő),
-				'generic' => q(vlagyivosztoki idő),
-				'standard' => q(vlagyivosztoki téli idő),
+				'daylight' => q#vlagyivosztoki nyári idő#,
+				'generic' => q#vlagyivosztoki idő#,
+				'standard' => q#vlagyivosztoki téli idő#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(volgográdi nyári idő),
-				'generic' => q(volgográdi idő),
-				'standard' => q(volgográdi téli idő),
+				'daylight' => q#volgográdi nyári idő#,
+				'generic' => q#volgográdi idő#,
+				'standard' => q#volgográdi téli idő#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(vosztoki idő),
+				'standard' => q#vosztoki idő#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(wake-szigeti idő),
+				'standard' => q#wake-szigeti idő#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Wallis és Futuna-i idő),
+				'standard' => q#Wallis és Futuna-i idő#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakutszki nyári idő),
-				'generic' => q(jakutszki idő),
-				'standard' => q(jakutszki téli idő),
+				'daylight' => q#jakutszki nyári idő#,
+				'generic' => q#jakutszki idő#,
+				'standard' => q#jakutszki téli idő#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekatyerinburgi nyári idő),
-				'generic' => q(Jekatyerinburgi idő),
-				'standard' => q(jekatyerinburgi téli idő),
+				'daylight' => q#jekatyerinburgi nyári idő#,
+				'generic' => q#jekatyerinburgi idő#,
+				'standard' => q#jekatyerinburgi téli idő#,
 			},
 		},
 	 } }

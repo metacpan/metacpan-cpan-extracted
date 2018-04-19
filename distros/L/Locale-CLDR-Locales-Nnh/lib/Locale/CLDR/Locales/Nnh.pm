@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Nnh - Package for language Ngiemboon
 
 package Locale::CLDR::Locales::Nnh;
 # This file auto generated from Data\common\main\nnh.xml
-#	on Fri 29 Apr  7:20:24 pm GMT
+#	on Fri 13 Apr  7:24:24 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -101,10 +102,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q r x])},
+			auxiliary => qr{[q r x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', '{Pf}', 'R', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', 'V', 'W', 'Ẅ', 'Y', 'Ÿ', 'Z', 'ʼ'],
-			main => qr{(?^u:[a á à â ǎ b c d e é è ê ě ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} f g h i í ì j k l m ḿ n ń ŋ o ó ò ô ǒ ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú ù û ǔ ʉ {ʉ́} {ʉ̀} {ʉ̂} {ʉ̌} v w ẅ y ÿ z ʼ])},
-			punctuation => qr{(?^u:[, ; \: ! ? . ' ‘ ’ « »])},
+			main => qr{[a á à â ǎ b c d e é è ê ě ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} f g h i í ì j k l m ḿ n ń ŋ o ó ò ô ǒ ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú ù û ǔ ʉ {ʉ́} {ʉ̀} {ʉ̂} {ʉ̌} v w ẅ y ÿ z ʼ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[, ; \: ! ? . ' ‘ ’ « »]},
 		};
 	},
 EOT
@@ -164,7 +166,7 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
@@ -368,13 +370,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{mbaʼámbaʼ},
-					'pm' => q{ncwònzém},
-				},
 				'abbreviated' => {
 					'pm' => q{ncwònzém},
 					'am' => q{mbaʼámbaʼ},
+				},
+				'wide' => {
+					'am' => q{mbaʼámbaʼ},
+					'pm' => q{ncwònzém},
 				},
 			},
 		},
@@ -454,14 +456,14 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			yMEd => q{E , 'lyɛ'̌ʼ d 'na' M, y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E , 'lyɛ'̌ʼ d 'na' MMM, y},
 			yMMMd => q{'lyɛ'̌ʼ d 'na' MMMM, y},
 			yMd => q{d/M/y},
 		},
-		'generic' => {
+		'gregorian' => {
 			yMEd => q{E , 'lyɛ'̌ʼ d 'na' M, y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E , 'lyɛ'̌ʼ d 'na' MMM, y},

@@ -18,7 +18,7 @@ has _init => ( is => 'ro', isa => Bool, init_arg => undef );
 const our $INDENT => q[ ] x 4;
 
 sub sendlog ( $self, $ev ) {
-    return if $ENV->{PCORE_LOG_STDERR_DISABLED} || !defined $STDERR_UTF8;
+    return if $ENV->{PCORE_LOG_STDERR_DISABLED} || !defined *STDERR;
 
     # init
     if ( !$self->{_init} ) {
@@ -30,7 +30,7 @@ sub sendlog ( $self, $ev ) {
         $self->{_tmpl}->cache_string_tmpl( message => \"$self->{tmpl}$LF" );
 
         # check ansi support
-        $self->{_is_ansi} //= -t $STDERR_UTF8 ? 1 : 0;    ## no critic qw[InputOutput::ProhibitInteractiveTest]
+        $self->{_is_ansi} //= -t *STDERR ? 1 : 0;    ## no critic qw[InputOutput::ProhibitInteractiveTest]
     }
 
     # sendlog
@@ -48,18 +48,16 @@ sub sendlog ( $self, $ev ) {
 
             # indent
             $ev->{text} =~ s/^/$INDENT/smg;
-
-            # remove all trailing "\n"
-            local $/ = q[];
-
-            chomp $ev->{text};
         }
 
         my $message = $self->{_tmpl}->render( 'message', $ev );
 
         remove_ansi $message->$* if !$self->{_is_ansi};
 
-        print {$STDERR_UTF8} $message->$*;
+        # remove all trailing "\n"
+        $message->$* =~ s/\s+\z/\n/sm;
+
+        print {*STDERR} $message->$*;
     }
 
     return;

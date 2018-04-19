@@ -1,8 +1,10 @@
 bin/createdatabase
+bin/geodecode
 bin/testcgibin
 cgi-bin/page.fcgi
 Changes
 conf/ncbimac2024
+conf/njh
 conf/page.l4pconf
 createdatabase.PL
 css/style.css
@@ -20,9 +22,6 @@ lib/Geo/Coder/Free/Display.pm
 lib/Geo/Coder/Free/Display/index.pm
 lib/Geo/Coder/Free/Display/query.pm
 lib/Geo/Coder/Free/MaxMind.pm
-lib/Geo/Coder/Free/MaxMind/databases/admin1.db
-lib/Geo/Coder/Free/MaxMind/databases/admin2.db
-lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz
 lib/Geo/Coder/Free/MaxMind/databases/MAXMIND.LICENCE
 lib/Geo/Coder/Free/OpenAddresses.pm
 lib/Geo/Coder/Free/OpenAddresses/databases/codes.txt
@@ -38,11 +37,15 @@ t/10-new.t
 t/admin1.t
 t/admin2.t
 t/cities.t
+t/coverage.t
 t/lib/MyLogger.pm
+t/manifest.t
 t/maxmind.t
 t/openaddr.t
 t/pod-cm.t
 t/pod.t
+t/port.t
+t/snippets.t
 t/spelling.t
 t/strict.t
 t/unused.t
@@ -50,6 +53,5 @@ t/used.t
 t/vars.t
 templates/Geo/Coder/Free/Display/index.tmpl
 templates/Geo/Coder/Free/Display/query.txt
-typhoon/openaddresses.ddl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

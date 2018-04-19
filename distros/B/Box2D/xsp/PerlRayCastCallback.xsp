@@ -2,7 +2,7 @@
 
 #include <PerlRayCastCallback.h>
 #include <Box2D/Box2D.h>
-#include <helper.h>
+#include "../src/helper.h"
 
 %}
 

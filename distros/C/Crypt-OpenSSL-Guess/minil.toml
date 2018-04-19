@@ -1,0 +1,6 @@
+name = "Crypt-OpenSSL-Guess"
+badges = ["travis"]
+authority="cpan:AKIYM"
+
+module_maker="ExtUtilsMakeMaker"
+

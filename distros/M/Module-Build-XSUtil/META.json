@@ -4,7 +4,7 @@
       ":"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.0.17",
    "license" : [
       "perl_5"
    ],
@@ -50,14 +50,14 @@
             "File::Path" : "0",
             "XSLoader" : "0",
             "parent" : "0",
-            "perl" : "5.008005"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
             "Cwd::Guard" : "0",
-            "File::Copy::Recursive" : "0",
+            "File::Copy::Recursive::Reduced" : "0.002",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "Test::More" : "0.98"
@@ -67,7 +67,7 @@
    "provides" : {
       "Module::Build::XSUtil" : {
          "file" : "lib/Module/Build/XSUtil.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -81,12 +81,13 @@
          "web" : "https://github.com/hideo55/Module-Build-XSUtil"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
+      "Hideaki Ohno <hide.o.j55@gmail.com>",
+      "James E Keenan <jkeenan@cpan.org>",
       "Shoichi Kaji <skaji@cpan.org>",
       "Syohei YOSHIDA <syohex@gmail.com>",
       "Vincent Pit <perl@profvince.com>",
-      "hideo55 <hide.o.j55@gmail.com>",
       "tokuhirom <tokuhirom@gmail.com>"
    ]
 }

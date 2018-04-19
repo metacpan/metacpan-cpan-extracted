@@ -21,7 +21,7 @@ use strict;
 use Carp;
 use vars '$VERSION';
 
-$VERSION = '0.09';
+$VERSION = '0.11';
 
 my %DEF = (
   CaseSensitive => 1,

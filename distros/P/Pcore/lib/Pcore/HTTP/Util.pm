@@ -74,7 +74,7 @@ sub http_request ($args) {
                     $args->{max_redirects}--;
 
                     # redirect type may require to switch request method during redirect
-                    if ( $REDIRECT->{ $res->status } ) {
+                    if ( $REDIRECT->{ $res->{status} } ) {
 
                         # change method to GET if original method was not "GET" or "HEAD"
                         $args->{method} = 'GET' if $args->{method} ne 'HEAD';
@@ -600,7 +600,7 @@ sub _read_body ( $args, $runtime, $cb ) {
                             $runtime->{res}->{body} = P->file->tempfile;
 
                             if ( length $body ) {
-                                syswrite $runtime->{res}->body, $body or die;
+                                syswrite $runtime->{res}->{body}, $body or die;
                             }
 
                             undef $body;
@@ -609,10 +609,10 @@ sub _read_body ( $args, $runtime, $cb ) {
 
                     if ( length $out_buf_ref->$* ) {
                         if ($body_is_fh) {
-                            syswrite $runtime->{res}->body, $out_buf_ref->$* or die;
+                            syswrite $runtime->{res}->{body}, $out_buf_ref->$* or die;
                         }
                         else {
-                            $runtime->{res}->body->$* .= $out_buf_ref->$*;
+                            $runtime->{res}->{body}->$* .= $out_buf_ref->$*;
                         }
                     }
 

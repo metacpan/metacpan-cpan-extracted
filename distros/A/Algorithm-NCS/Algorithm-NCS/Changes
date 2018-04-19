@@ -1,0 +1,9 @@
+Revision history for Perl extension Algorithm::NCS.
+
+0.01  Wed Nov 30 16:34:03 2016
+	- original version; created by h2xs 1.23 with options
+		-A -n Algorithm::NCS --skip-ppport
+0.02 Sun Dec 11 16:39:06 2016
+    - added description
+0.02 Thu Apr 11 11:39:36 2018
+    - rewrited code

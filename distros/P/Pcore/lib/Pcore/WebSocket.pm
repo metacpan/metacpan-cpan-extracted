@@ -1,6 +1,6 @@
 package Pcore::WebSocket;
 
-use Pcore -result;
+use Pcore -res;
 use Pcore::Util::Scalar qw[refaddr];
 use Pcore::Util::Data qw[to_b64];
 use Pcore::Util::List qw[pairs];
@@ -131,7 +131,7 @@ sub connect_ws ( $self, $uri, @ ) {
 
     # load protocol implementation
     my $class = eval { P->class->load( $args{protocol} || 'raw', ns => 'Pcore::WebSocket::Protocol' ) } or do {
-        $on_connect_error->( result [ 400, 'WebSocket protocol is not supported' ] );
+        $on_connect_error->( res [ 400, 'WebSocket protocol is not supported' ] );
 
         return;
     };
@@ -160,7 +160,7 @@ sub connect_ws ( $self, $uri, @ ) {
         tls_ctx         => $args{tls_ctx},
         bind_ip         => $args{bind_ip},
         on_error        => sub ( $h, $fatal, $reason ) {
-            $on_connect_error->( result [ 596, $reason ] );
+            $on_connect_error->( res [ 596, $reason ] );
 
             return;
         },
@@ -206,7 +206,7 @@ sub connect_ws ( $self, $uri, @ ) {
 
                     # headers parsing error
                     if ($error_reason) {
-                        $on_connect_error->( result [ 596, $error_reason ] );
+                        $on_connect_error->( res [ 596, $error_reason ] );
 
                         return;
                     }
@@ -215,21 +215,21 @@ sub connect_ws ( $self, $uri, @ ) {
 
                     # check response status
                     if ( $headers->{status} != 101 ) {
-                        $on_connect_error->( result [ $headers->{status}, $headers->{reason} ] );
+                        $on_connect_error->( res [ $headers->{status}, $headers->{reason} ] );
 
                         return;
                     }
 
                     # check response connection headers
                     if ( !$res_headers->{CONNECTION} || !$res_headers->{UPGRADE} || $res_headers->{CONNECTION} !~ /\bupgrade\b/smi || $res_headers->{UPGRADE} !~ /\bwebsocket\b/smi ) {
-                        $on_connect_error->( result [ 596, q[WebSocket handshake error] ] );
+                        $on_connect_error->( res [ 596, q[WebSocket handshake error] ] );
 
                         return;
                     }
 
                     # validate SEC_WEBSOCKET_ACCEPT
                     if ( !$res_headers->{SEC_WEBSOCKET_ACCEPT} || $res_headers->{SEC_WEBSOCKET_ACCEPT} ne Pcore::WebSocket::Handle->get_challenge($sec_websocket_key) ) {
-                        $on_connect_error->( result [ 596, q[Invalid SEC_WEBSOCKET_ACCEPT header] ] );
+                        $on_connect_error->( res [ 596, q[Invalid SEC_WEBSOCKET_ACCEPT header] ] );
 
                         return;
                     }
@@ -237,13 +237,13 @@ sub connect_ws ( $self, $uri, @ ) {
                     # check protocol
                     if ( $res_headers->{SEC_WEBSOCKET_PROTOCOL} ) {
                         if ( !$args{protocol} || $res_headers->{SEC_WEBSOCKET_PROTOCOL} !~ /\b$args{protocol}\b/smi ) {
-                            $on_connect_error->( result [ 596, qq[WebSocket server returned unsupported protocol "$res_headers->{SEC_WEBSOCKET_PROTOCOL}"] ] );
+                            $on_connect_error->( res [ 596, qq[WebSocket server returned unsupported protocol "$res_headers->{SEC_WEBSOCKET_PROTOCOL}"] ] );
 
                             return;
                         }
                     }
                     elsif ( $args{protocol} ) {
-                        $on_connect_error->( result [ 596, q[WebSocket server returned no protocol] ] );
+                        $on_connect_error->( res [ 596, q[WebSocket server returned no protocol] ] );
 
                         return;
                     }

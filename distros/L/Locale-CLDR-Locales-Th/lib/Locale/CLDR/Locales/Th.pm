@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Th - Package for language Thai
 
 package Locale::CLDR::Locales::Th;
 # This file auto generated from Data\common\main\th.xml
-#	on Fri 29 Apr  7:28:26 pm GMT
+#	on Fri 13 Apr  7:30:45 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -207,11 +208,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -259,7 +260,7 @@ has 'display_name_language' => (
 		 sub {
 			 my %languages = (
 				'aa' => 'อะฟาร์',
- 				'ab' => 'อับคาซ',
+ 				'ab' => 'อับฮาเซีย',
  				'ace' => 'อาเจะห์',
  				'ach' => 'อาโคลิ',
  				'ada' => 'อาแดงมี',
@@ -270,7 +271,7 @@ has 'display_name_language' => (
  				'afh' => 'แอฟริฮีลี',
  				'agq' => 'อักเฮม',
  				'ain' => 'ไอนุ',
- 				'ak' => 'อาคัน',
+ 				'ak' => 'อาคาน',
  				'akk' => 'อักกาด',
  				'akz' => 'แอละแบมา',
  				'ale' => 'อาลิวต์',
@@ -283,7 +284,7 @@ has 'display_name_language' => (
  				'ar' => 'อาหรับ',
  				'ar_001' => 'อาหรับมาตรฐานสมัยใหม่',
  				'arc' => 'อราเมอิก',
- 				'arn' => 'อาเราคาเนียน',
+ 				'arn' => 'มาปูเช',
  				'aro' => 'อาเรานา',
  				'arp' => 'อาราปาโฮ',
  				'arq' => 'อาหรับแอลจีเรีย',
@@ -316,7 +317,7 @@ has 'display_name_language' => (
  				'bfd' => 'บาฟัต',
  				'bfq' => 'พทคะ',
  				'bg' => 'บัลแกเรีย',
- 				'bgn' => 'บาลูจิตะวันออก',
+ 				'bgn' => 'บาลูจิตะวันตก',
  				'bho' => 'โภชปุรี',
  				'bi' => 'บิสลามา',
  				'bik' => 'บิกอล',
@@ -364,6 +365,7 @@ has 'display_name_language' => (
  				'cps' => 'กาปิซนอน',
  				'cr' => 'ครี',
  				'crh' => 'ตุรกีไครเมีย',
+ 				'crs' => 'ครีโอลเซเซลส์ฝรั่งเศส',
  				'cs' => 'เช็ก',
  				'csb' => 'คาซูเบียน',
  				'cu' => 'เชอร์ชสลาวิก',
@@ -407,20 +409,20 @@ has 'display_name_language' => (
  				'en_US' => 'อังกฤษ - อเมริกัน',
  				'en_US@alt=short' => 'อังกฤษ - อเมริกัน',
  				'enm' => 'อังกฤษกลาง',
- 				'eo' => 'เอสเปอรันโต',
+ 				'eo' => 'เอสเปรันโต',
  				'es' => 'สเปน',
  				'es_419' => 'สเปน - ละตินอเมริกา',
  				'es_ES' => 'สเปน - ยุโรป',
  				'es_MX' => 'สเปน - เม็กซิโก',
  				'esu' => 'ยูพิกกลาง',
  				'et' => 'เอสโตเนีย',
- 				'eu' => 'บัสเก',
+ 				'eu' => 'บาสก์',
  				'ewo' => 'อีวันโด',
  				'ext' => 'เอกซ์เตรมาดูรา',
  				'fa' => 'เปอร์เซีย',
  				'fan' => 'ฟอง',
  				'fat' => 'ฟันติ',
- 				'ff' => 'ฟูลาฮ์',
+ 				'ff' => 'ฟูลาห์',
  				'fi' => 'ฟินแลนด์',
  				'fil' => 'ฟิลิปปินส์',
  				'fit' => 'ฟินแลนด์ทอร์เนดาเล็น',
@@ -441,17 +443,17 @@ has 'display_name_language' => (
  				'ga' => 'ไอริช',
  				'gaa' => 'กา',
  				'gag' => 'กากาอุซ',
- 				'gan' => 'จีนกาน',
+ 				'gan' => 'จีนกั้น',
  				'gay' => 'กาโย',
  				'gba' => 'กบายา',
  				'gbz' => 'ดารีโซโรอัสเตอร์',
- 				'gd' => 'สกอตส์กาลิก',
+ 				'gd' => 'เกลิกสกอต',
  				'gez' => 'กีซ',
  				'gil' => 'กิลเบอร์ต',
  				'gl' => 'กาลิเซีย',
  				'glk' => 'กิลากี',
  				'gmh' => 'เยอรมันสูงกลาง',
- 				'gn' => 'กวารานี',
+ 				'gn' => 'กัวรานี',
  				'goh' => 'เยอรมันสูงโบราณ',
  				'gom' => 'กอนกานีของกัว',
  				'gon' => 'กอนดิ',
@@ -466,7 +468,7 @@ has 'display_name_language' => (
  				'guz' => 'กุซซี',
  				'gv' => 'มานซ์',
  				'gwi' => 'กวิชอิน',
- 				'ha' => 'เฮาชา',
+ 				'ha' => 'เฮาซา',
  				'hai' => 'ไฮดา',
  				'hak' => 'จีนแคะ',
  				'haw' => 'ฮาวาย',
@@ -478,9 +480,9 @@ has 'display_name_language' => (
  				'hmn' => 'ม้ง',
  				'ho' => 'ฮีรีโมตู',
  				'hr' => 'โครเอเชีย',
- 				'hsb' => 'ซอร์บส์ตอนบน',
+ 				'hsb' => 'ซอร์เบียตอนบน',
  				'hsn' => 'จีนเซียง',
- 				'ht' => 'เฮติ',
+ 				'ht' => 'เฮติครีโอล',
  				'hu' => 'ฮังการี',
  				'hup' => 'ฮูปา',
  				'hy' => 'อาร์เมเนีย',
@@ -488,7 +490,7 @@ has 'display_name_language' => (
  				'ia' => 'อินเตอร์ลิงกัว',
  				'iba' => 'อิบาน',
  				'ibb' => 'อิบิบิโอ',
- 				'id' => 'อินโดนีเชีย',
+ 				'id' => 'อินโดนีเซีย',
  				'ie' => 'อินเตอร์ลิงกิว',
  				'ig' => 'อิกโบ',
  				'ii' => 'เสฉวนยิ',
@@ -577,6 +579,7 @@ has 'display_name_language' => (
  				'ln' => 'ลิงกาลา',
  				'lo' => 'ลาว',
  				'lol' => 'มองโก',
+ 				'lou' => 'ภาษาครีโอลุยเซียนา',
  				'loz' => 'โลซิ',
  				'lrc' => 'ลูรีเหนือ',
  				'lt' => 'ลิทัวเนีย',
@@ -681,6 +684,7 @@ has 'display_name_language' => (
  				'pap' => 'ปาเปียเมนโต',
  				'pau' => 'ปาเลา',
  				'pcd' => 'ปิการ์',
+ 				'pcm' => 'พิดจิน',
  				'pdc' => 'เยอรมันเพนซิลเวเนีย',
  				'pdt' => 'เพลาท์ดิช',
  				'peo' => 'เปอร์เซียโบราณ',
@@ -693,12 +697,12 @@ has 'display_name_language' => (
  				'pon' => 'พอห์นเพ',
  				'prg' => 'ปรัสเซีย',
  				'pro' => 'โปรวองซาลโบราณ',
- 				'ps' => 'พาชตู',
+ 				'ps' => 'พัชโต',
  				'ps@alt=variant' => 'พุชโต',
  				'pt' => 'โปรตุเกส',
  				'pt_BR' => 'โปรตุเกส - บราซิล',
  				'pt_PT' => 'โปรตุเกส - ยุโรป',
- 				'qu' => 'ควิชัว',
+ 				'qu' => 'เคชวา',
  				'quc' => 'กีเช',
  				'qug' => 'ควิชัวไฮแลนด์ชิมโบราโซ',
  				'raj' => 'ราชสถาน',
@@ -722,7 +726,7 @@ has 'display_name_language' => (
  				'rwk' => 'รวา',
  				'sa' => 'สันสกฤต',
  				'sad' => 'ซันดาเว',
- 				'sah' => 'ซาฮา',
+ 				'sah' => 'ซาคา',
  				'sam' => 'อราเมอิกซามาเรีย',
  				'saq' => 'แซมบูรู',
  				'sas' => 'ซาซัก',
@@ -733,7 +737,7 @@ has 'display_name_language' => (
  				'sc' => 'ซาร์เดญา',
  				'scn' => 'ซิซิลี',
  				'sco' => 'สกอตส์',
- 				'sd' => 'สินธุ',
+ 				'sd' => 'สินธิ',
  				'sdc' => 'ซาร์ดิเนียซาสซารี',
  				'sdh' => 'เคอร์ดิชใต้',
  				'se' => 'ซามิเหนือ',
@@ -742,7 +746,7 @@ has 'display_name_language' => (
  				'sei' => 'เซรี',
  				'sel' => 'เซลคุป',
  				'ses' => 'โคย์ราโบโรเซนนี',
- 				'sg' => 'แซงโก',
+ 				'sg' => 'ซันโก',
  				'sga' => 'ไอริชโบราณ',
  				'sgs' => 'ซาโมจิเตียน',
  				'sh' => 'เซอร์โบ-โครเอเชีย',
@@ -778,7 +782,7 @@ has 'display_name_language' => (
  				'sux' => 'ซูเมอ',
  				'sv' => 'สวีเดน',
  				'sw' => 'สวาฮีลี',
- 				'sw_CD' => 'สวาฮีลี-คองโก',
+ 				'sw_CD' => 'สวาฮีลี - คองโก',
  				'swb' => 'โคเมอเรียน',
  				'syc' => 'ซีเรียแบบดั้งเดิม',
  				'syr' => 'ซีเรีย',
@@ -795,7 +799,7 @@ has 'display_name_language' => (
  				'ti' => 'ติกริญญา',
  				'tig' => 'ตีเกร',
  				'tiv' => 'ทิฟ',
- 				'tk' => 'เติร์กเมนิสถาน',
+ 				'tk' => 'เติร์กเมน',
  				'tkl' => 'โตเกเลา',
  				'tkr' => 'แซคเซอร์',
  				'tl' => 'ตากาล็อก',
@@ -810,7 +814,7 @@ has 'display_name_language' => (
  				'tr' => 'ตุรกี',
  				'tru' => 'ตูโรโย',
  				'trv' => 'ทาโรโก',
- 				'ts' => 'ซิิตซองกา',
+ 				'ts' => 'ซิตซองกา',
  				'tsd' => 'ซาโคเนีย',
  				'tsi' => 'ซิมชีแอน',
  				'tt' => 'ตาตาร์',
@@ -823,8 +827,7 @@ has 'display_name_language' => (
  				'tyv' => 'ตูวา',
  				'tzm' => 'ทามาไซต์แอตลาสกลาง',
  				'udm' => 'อุดมูร์ต',
- 				'ug' => 'อุยกัว',
- 				'ug@alt=variant' => 'อุยกูร์',
+ 				'ug' => 'อุยกูร์',
  				'uga' => 'ยูการิต',
  				'uk' => 'ยูเครน',
  				'umb' => 'อุมบุนดู',
@@ -858,7 +861,7 @@ has 'display_name_language' => (
  				'yap' => 'ยัป',
  				'yav' => 'แยงเบน',
  				'ybb' => 'เยมบา',
- 				'yi' => 'ยิว',
+ 				'yi' => 'ยิดดิช',
  				'yo' => 'โยรูบา',
  				'yrl' => 'เหงงกาตุ',
  				'yue' => 'กวางตุ้ง',
@@ -927,7 +930,7 @@ has 'display_name_script' => (
  			'Egyh' => 'เฮียราติกอียิปต์',
  			'Egyp' => 'เฮียโรกลิฟส์อียิปต์',
  			'Elba' => 'เอลบ์ซาน',
- 			'Ethi' => 'เอทิโอปิก',
+ 			'Ethi' => 'เอธิโอปิก',
  			'Geok' => 'คัตซูรีจอร์เจีย',
  			'Geor' => 'จอร์เจีย',
  			'Glag' => 'กลาโกลิติก',
@@ -936,7 +939,8 @@ has 'display_name_script' => (
  			'Grek' => 'กรีก',
  			'Gujr' => 'คุชราต',
  			'Guru' => 'กูร์มูคี',
- 			'Hang' => 'ฮันกูล',
+ 			'Hanb' => 'จีนกลาง',
+ 			'Hang' => 'ฮันกึล',
  			'Hani' => 'ฮั่น',
  			'Hano' => 'ฮานูโนโอ',
  			'Hans' => 'ตัวย่อ',
@@ -951,6 +955,7 @@ has 'display_name_script' => (
  			'Hung' => 'ฮังการีโบราณ',
  			'Inds' => 'อินดัส',
  			'Ital' => 'อิตาลีโบราณ',
+ 			'Jamo' => 'จาโม',
  			'Java' => 'ชวา',
  			'Jpan' => 'ญี่ปุ่น',
  			'Jurc' => 'จูร์เชน',
@@ -1037,7 +1042,7 @@ has 'display_name_script' => (
  			'Taml' => 'ทมิฬ',
  			'Tang' => 'ตันกัท',
  			'Tavt' => 'ไทเวียต',
- 			'Telu' => 'เทลูกู',
+ 			'Telu' => 'เตลูกู',
  			'Teng' => 'เทงกวาร์',
  			'Tfng' => 'ทิฟินาก',
  			'Tglg' => 'ตากาล็อก',
@@ -1055,7 +1060,8 @@ has 'display_name_script' => (
  			'Yiii' => 'ยิ',
  			'Zinh' => 'อินเฮอริต',
  			'Zmth' => 'เครื่องหมายทางคณิตศาสตร์',
- 			'Zsym' => 'ซิมโบลส์',
+ 			'Zsye' => 'อีโมจิ',
+ 			'Zsym' => 'สัญลักษณ์',
  			'Zxxx' => 'ไม่มีภาษาเขียน',
  			'Zyyy' => 'สามัญ',
  			'Zzzz' => 'สคริปต์ที่ไม่รู้จัก',
@@ -1145,13 +1151,14 @@ has 'display_name_region' => (
  			'BZ' => 'เบลีซ',
  			'CA' => 'แคนาดา',
  			'CC' => 'หมู่เกาะโคโคส (คีลิง)',
- 			'CD' => 'คองโก-กินชาซา',
+ 			'CD' => 'คองโก - กินชาซา',
  			'CD@alt=variant' => 'คองโก (สาธารณรัฐประชาธิปไตย)',
  			'CF' => 'สาธารณรัฐแอฟริกากลาง',
- 			'CG' => 'คองโก-บราซซาวิล',
+ 			'CG' => 'คองโก - บราซซาวิล',
  			'CG@alt=variant' => 'คองโก (สาธารณรัฐ)',
  			'CH' => 'สวิตเซอร์แลนด์',
- 			'CI' => 'ไอวอรี่โคสต์',
+ 			'CI' => 'โกตดิวัวร์',
+ 			'CI@alt=variant' => 'ไอวอรี่โคสต์',
  			'CK' => 'หมู่เกาะคุก',
  			'CL' => 'ชิลี',
  			'CM' => 'แคเมอรูน',
@@ -1164,7 +1171,8 @@ has 'display_name_region' => (
  			'CW' => 'คูราเซา',
  			'CX' => 'เกาะคริสต์มาส',
  			'CY' => 'ไซปรัส',
- 			'CZ' => 'สาธารณรัฐเช็ก',
+ 			'CZ' => 'เช็ก',
+ 			'CZ@alt=variant' => 'สาธารณรัฐเช็ก',
  			'DE' => 'เยอรมนี',
  			'DG' => 'ดิเอโกการ์เซีย',
  			'DJ' => 'จิบูตี',
@@ -1172,7 +1180,7 @@ has 'display_name_region' => (
  			'DM' => 'โดมินิกา',
  			'DO' => 'สาธารณรัฐโดมินิกัน',
  			'DZ' => 'แอลจีเรีย',
- 			'EA' => 'ซีโอตาและเมลิลลา',
+ 			'EA' => 'เซวตาและเมลียา',
  			'EC' => 'เอกวาดอร์',
  			'EE' => 'เอสโตเนีย',
  			'EG' => 'อียิปต์',
@@ -1181,6 +1189,7 @@ has 'display_name_region' => (
  			'ES' => 'สเปน',
  			'ET' => 'เอธิโอเปีย',
  			'EU' => 'สหภาพยุโรป',
+ 			'EZ' => 'ยูโรโซน',
  			'FI' => 'ฟินแลนด์',
  			'FJ' => 'ฟิจิ',
  			'FK' => 'หมู่เกาะฟอล์กแลนด์',
@@ -1256,13 +1265,13 @@ has 'display_name_region' => (
  			'MC' => 'โมนาโก',
  			'MD' => 'มอลโดวา',
  			'ME' => 'มอนเตเนโกร',
- 			'MF' => 'เซนต์มาติน',
+ 			'MF' => 'เซนต์มาร์ติน',
  			'MG' => 'มาดากัสการ์',
  			'MH' => 'หมู่เกาะมาร์แชลล์',
  			'MK' => 'มาซิโดเนีย',
  			'MK@alt=variant' => 'มาซิโดเนีย (FYROM)',
  			'ML' => 'มาลี',
- 			'MM' => 'เมียนม่าร์ (พม่า)',
+ 			'MM' => 'เมียนมาร์ (พม่า)',
  			'MN' => 'มองโกเลีย',
  			'MO' => 'เขตปกครองพิเศษมาเก๊าแห่งสาธารณรัฐประชาชนจีน',
  			'MO@alt=short' => 'มาเก๊า',
@@ -1323,17 +1332,17 @@ has 'display_name_region' => (
  			'SJ' => 'สฟาลบาร์และยานไมเอน',
  			'SK' => 'สโลวะเกีย',
  			'SL' => 'เซียร์ราลีโอน',
- 			'SM' => 'ซานมารีโน',
+ 			'SM' => 'ซานมาริโน',
  			'SN' => 'เซเนกัล',
  			'SO' => 'โซมาเลีย',
  			'SR' => 'ซูรินาเม',
  			'SS' => 'ซูดานใต้',
  			'ST' => 'เซาตูเมและปรินซิปี',
  			'SV' => 'เอลซัลวาดอร์',
- 			'SX' => 'เซนต์มาร์ติน',
+ 			'SX' => 'ซินต์มาร์เทน',
  			'SY' => 'ซีเรีย',
  			'SZ' => 'สวาซิแลนด์',
- 			'TA' => 'ทริสตัน เดอ คูนา',
+ 			'TA' => 'ทริสตันดาคูนา',
  			'TC' => 'หมู่เกาะเติกส์และหมู่เกาะเคคอส',
  			'TD' => 'ชาด',
  			'TF' => 'เฟรนช์เซาเทิร์นเทร์ริทอรีส์',
@@ -1354,6 +1363,8 @@ has 'display_name_region' => (
  			'UA' => 'ยูเครน',
  			'UG' => 'ยูกันดา',
  			'UM' => 'หมู่เกาะรอบนอกของสหรัฐอเมริกา',
+ 			'UN' => 'สหประชาชาติ',
+ 			'UN@alt=short' => 'สหประชาชาติ',
  			'US' => 'สหรัฐอเมริกา',
  			'US@alt=short' => 'สหรัฐฯ',
  			'UY' => 'อุรุกวัย',
@@ -1460,11 +1471,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'ปฏิทิน',
+ 			'cf' => 'รูปแบบสกุลเงิน',
  			'colalternate' => 'ละเว้นการจัดเรียงสัญลักษณ์',
  			'colbackwards' => 'การจัดเรียงเสียงหนักเบาในลำดับถอยหลัง',
  			'colcasefirst' => 'การเรียงลำดับตัวพิมพ์ใหญ่/ตัวพิมพ์เล็ก',
  			'colcaselevel' => 'การจัดเรียงตามความสำคัญของตัวพิมพ์อักษร',
- 			'colhiraganaquaternary' => 'การจัดเรียงตัวอักษรคะนะ',
  			'collation' => 'ลำดับการจัดเรียง',
  			'colnormalization' => 'การจัดเรียงแบบที่เป็นปกติ',
  			'colnumeric' => 'การจัดเรียงตัวเลข',
@@ -1476,7 +1487,6 @@ has 'display_name_key' => (
  			'numbers' => 'ตัวเลข',
  			'timezone' => 'เขตเวลา',
  			'va' => 'ตัวแปรภาษาถิ่น',
- 			'variabletop' => 'จัดเรียงเป็นสัญลักษณ์',
  			'x' => 'ใช้งานส่วนบุคคล',
 
 		}
@@ -1509,6 +1519,10 @@ has 'display_name_type' => (
  				'persian' => q{ปฏิทินเปอร์เชีย},
  				'roc' => q{ปฏิทินไต้หวัน},
  			},
+ 			'cf' => {
+ 				'account' => q{รูปแบบสกุลเงินบัญชี},
+ 				'standard' => q{รูปแบบสกุลเงินมาตรฐาน},
+ 			},
  			'colalternate' => {
  				'non-ignorable' => q{จัดเรียงสัญลักษณ์},
  				'shifted' => q{จัดเรียงสัญลักษณ์ที่ละไว้},
@@ -1525,10 +1539,6 @@ has 'display_name_type' => (
  			'colcaselevel' => {
  				'no' => q{จัดเรียงตามความสำคัญของตัวพิมพ์},
  				'yes' => q{จัดเรียงความสำคัญของตัวพิมพ์},
- 			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{จัดเรียงตัวอักษรคะนะแยกต่างหาก},
- 				'yes' => q{จัดเรียงตัวอักษรคะนะในแบบอื่น},
  			},
  			'collation' => {
  				'big5han' => q{เรียงตามอักษรจีนดั้งเดิม},
@@ -1563,6 +1573,11 @@ has 'display_name_type' => (
  				'secondary' => q{จัดเรียงเสียงหนักเบา},
  				'tertiary' => q{จัดเรียงเสียงหนักเบา/ตัวพิมพ์/ความกว้าง},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{ตัวเต็ม},
+ 				'hwidth' => q{ตัวย่อ},
+ 				'npinyin' => q{ตัวเลข},
+ 			},
  			'hc' => {
  				'h11' => q{ระบบ 12 ชั่วโมง (0–11)},
  				'h12' => q{ระบบ 12 ชั่วโมง (1–12)},
@@ -1574,14 +1589,18 @@ has 'display_name_type' => (
  				'normal' => q{รูปแบบปกติของการขึ้นบรรทัดใหม่},
  				'strict' => q{รูปแบบที่เคร่งครัดของการขึ้นบรรทัดใหม่},
  			},
+ 			'm0' => {
+ 				'bgn' => q{ชื่อมาตรฐานอังกฤษ (BGN)},
+ 				'ungegn' => q{ชื่อภูมิศาสตร์มาตรฐาน UN (UNGEGN)},
+ 			},
  			'ms' => {
  				'metric' => q{ระบบเมตริก},
  				'uksystem' => q{ระบบการวัดอิมพีเรียล},
  				'ussystem' => q{ระบบการวัดอเมริกัน},
  			},
  			'numbers' => {
- 				'arab' => q{ตัวเลขอินเดีย-อารบิก},
- 				'arabext' => q{ตัวเลขอินเดีย-อารบิกตัวเต็ม},
+ 				'arab' => q{ตัวเลขอารบิก-อินดิก},
+ 				'arabext' => q{ตัวเลขอารบิก-อินดิกแบบขยาย},
  				'armn' => q{ตัวเลขอาร์เมเนีย},
  				'armnlow' => q{ตัวเลขอาร์เมเนียพิมพ์เล็ก},
  				'bali' => q{ตัวเลขบาหลี},
@@ -1613,7 +1632,7 @@ has 'display_name_type' => (
  				'lana' => q{ตัวเลขไททัมโฮรา},
  				'lanatham' => q{ตัวเลขไททัมทัม},
  				'laoo' => q{ตัวเลขลาว},
- 				'latn' => q{ตัวเลขอารบิค},
+ 				'latn' => q{ตัวเลขอารบิก},
  				'lepc' => q{ตัวเลขเลปชา},
  				'limb' => q{ตัวเลขลิมบู},
  				'mlym' => q{ตัวเลขมาลายาลัม},
@@ -1661,27 +1680,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'ชื่อมาตรฐานอังกฤษ (BGN)',
- 			'numeric' => 'ตัวเลข',
- 			'tone' => 'ระดับเสียง',
- 			'ungegn' => 'ชื่อภูมิศาสตร์มาตรฐาน UN (UNGEGN)',
- 			'x-accents' => 'สำเนียง',
- 			'x-fullwidth' => 'ตัวเต็ม',
- 			'x-halfwidth' => 'ตัวย่อ',
- 			'x-jamo' => 'จาโม',
- 			'x-pinyin' => 'พินอิน',
- 			'x-publishing' => 'เพื่อเผยแพร่',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1705,10 +1703,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[​])},
+			auxiliary => qr{[​]},
 			index => ['ก', 'ข', 'ฃ', 'ค', 'ฅ', 'ฆ', 'ง', 'จ', 'ฉ', 'ช', 'ซ', 'ฌ', 'ญ', 'ฎ', 'ฏ', 'ฐ', 'ฑ', 'ฒ', 'ณ', 'ด', 'ต', 'ถ', 'ท', 'ธ', 'น', 'บ', 'ป', 'ผ', 'ฝ', 'พ', 'ฟ', 'ภ', 'ม', 'ย', 'ร', 'ฤ', 'ล', 'ฦ', 'ว', 'ศ', 'ษ', 'ส', 'ห', 'ฬ', 'อ', 'ฮ'],
-			main => qr{(?^u:[ฯ ๆ ๎ ์ ็ ่ ้ ๊ ๋ ก ข ฃ ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ฤ ล ฦ ว ศ ษ ส ห ฬ อ ฮ ํ ะ ั า ๅ ำ ิ ี ึ ื ุ ู เ แ โ ใ ไ ฺ])},
-			punctuation => qr{(?^u:[! " # ' ( ) * , \- . / \: @ \[ \] ‐ – — ‘ ’ “ ” … ′ ″])},
+			main => qr{[ฯ ๆ ๎ ์ ็ ่ ้ ๊ ๋ ก ข ฃ ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ฤ ล ฦ ว ศ ษ ส ห ฬ อ ฮ ํ ะ ั า ๅ ำ ิ ี ึ ื ุ ู เ แ โ ใ ไ ฺ]},
+			numbers => qr{[% , \- . ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[! " # ' ( ) * , \- . / \: @ \[ \] ‐ – — ‘ ’ “ ” … ′ ″]},
 		};
 	},
 EOT
@@ -1819,8 +1818,8 @@ has 'units' => (
 						'other' => q({0} ไบต์),
 					},
 					'calorie' => {
-						'name' => q(แคลอรี่),
-						'other' => q({0} แคลอรี่),
+						'name' => q(แคลอรี),
+						'other' => q({0} แคลอรี),
 					},
 					'carat' => {
 						'name' => q(กะรัต),
@@ -1913,8 +1912,8 @@ has 'units' => (
 						'other' => q({0} ฟลูอิดออนซ์),
 					},
 					'foodcalorie' => {
-						'name' => q(แคลอรี่),
-						'other' => q({0} แคลอรี่),
+						'name' => q(แคลอรี),
+						'other' => q({0} แคลอรี),
 					},
 					'foot' => {
 						'name' => q(ฟุต),
@@ -1929,6 +1928,11 @@ has 'units' => (
 						'name' => q(แกลลอน),
 						'other' => q({0} แกลลอน),
 						'per' => q({0} ต่อแกลลอน),
+					},
+					'gallon-imperial' => {
+						'name' => q(แกลลอนอังกฤษ),
+						'other' => q({0} แกลลอนอังกฤษ),
+						'per' => q({0} ต่อแกลลอนอังกฤษ),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2010,8 +2014,8 @@ has 'units' => (
 						'other' => q({0} กิโลไบต์),
 					},
 					'kilocalorie' => {
-						'name' => q(กิโลแคลอรี่),
-						'other' => q({0} กิโลแคลอรี่),
+						'name' => q(กิโลแคลอรี),
+						'other' => q({0} กิโลแคลอรี),
 					},
 					'kilogram' => {
 						'name' => q(กิโลกรัม),
@@ -2058,7 +2062,7 @@ has 'units' => (
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(ลิตรต่อ100 กิโลเมตร),
-						'other' => q({0} ลิตร/100 กิโลเมตร),
+						'other' => q({0} ลิตรต่อ100 กิโลเมตร),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(ลิตรต่อกิโลเมตร),
@@ -2081,8 +2085,8 @@ has 'units' => (
 						'other' => q({0} เมกะเฮิรตซ์),
 					},
 					'megaliter' => {
-						'name' => q(เมกกะลิตร),
-						'other' => q({0} เมกกะลิตร),
+						'name' => q(เมกะลิตร),
+						'other' => q({0} เมกะลิตร),
 					},
 					'megawatt' => {
 						'name' => q(เมกะวัตต์),
@@ -2125,6 +2129,10 @@ has 'units' => (
 						'name' => q(ไมล์ต่อแกลลอน),
 						'other' => q({0} ไมล์ต่อแกลลอน),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(ไมล์ต่อแกลลอนอังกฤษ),
+						'other' => q({0} ไมล์ต่อแกลลอนอังกฤษ),
+					},
 					'mile-per-hour' => {
 						'name' => q(ไมล์ต่อชั่วโมง),
 						'other' => q({0} ไมล์ต่อชั่วโมง),
@@ -2145,6 +2153,10 @@ has 'units' => (
 						'name' => q(มิลลิกรัม),
 						'other' => q({0} มิลลิกรัม),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(มิลลิกรัมต่อเดซิลิตร),
+						'other' => q({0} มิลลิกรัมต่อเดซิลิตร),
+					},
 					'milliliter' => {
 						'name' => q(มิลลิลิตร),
 						'other' => q({0} มิลลิลิตร),
@@ -2156,6 +2168,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(มิลลิเมตรปรอท),
 						'other' => q({0} มิลลิเมตรปรอท),
+					},
+					'millimole-per-liter' => {
+						'name' => q(มิลลิโมลต่อลิตร),
+						'other' => q({0} มิลลิโมลต่อลิตร),
 					},
 					'millisecond' => {
 						'name' => q(มิลลิวินาที),
@@ -2204,6 +2220,10 @@ has 'units' => (
 						'name' => q(พาร์เซก),
 						'other' => q({0} พาร์เซก),
 					},
+					'part-per-million' => {
+						'name' => q(ส่วนต่อล้าน),
+						'other' => q({0} ส่วนต่อล้าน),
+					},
 					'per' => {
 						'1' => q({0}ต่อ{1}),
 					},
@@ -2218,6 +2238,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(ไพนต์เมตริก),
 						'other' => q({0} ไพนต์เมตริก),
+					},
+					'point' => {
+						'name' => q(จุด),
+						'other' => q({0} จุด),
 					},
 					'pound' => {
 						'name' => q(ปอนด์),
@@ -2262,19 +2286,21 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(ตารางกิโลเมตร),
 						'other' => q({0} ตารางกิโลเมตร),
+						'per' => q({0} ต่อตารางกิโลเมตร),
 					},
 					'square-meter' => {
 						'name' => q(ตารางเมตร),
 						'other' => q({0} ตารางเมตร),
-						'per' => q({0} ต่อ ตร.ม.),
+						'per' => q({0} ต่อตารางเมตร),
 					},
 					'square-mile' => {
 						'name' => q(ตารางไมล์),
 						'other' => q({0} ตารางไมล์),
+						'per' => q({0} ต่อตารางไมล์),
 					},
 					'square-yard' => {
-						'name' => q(ตารางวา),
-						'other' => q({0} ตารางวา),
+						'name' => q(ตารางหลา),
+						'other' => q({0} ตารางหลา),
 					},
 					'tablespoon' => {
 						'name' => q(ช้อนโต๊ะ),
@@ -2329,6 +2355,10 @@ has 'units' => (
 					'arc-second' => {
 						'other' => q({0}วิ),
 					},
+					'calorie' => {
+						'name' => q(แคลอรี),
+						'other' => q({0} แคลอรี),
+					},
 					'celsius' => {
 						'name' => q(°C),
 						'other' => q({0}°C),
@@ -2358,6 +2388,10 @@ has 'units' => (
 					},
 					'fahrenheit' => {
 						'other' => q({0}°F),
+					},
+					'foodcalorie' => {
+						'name' => q(แคลอรี),
+						'other' => q({0} แคลอรี),
 					},
 					'foot' => {
 						'other' => q({0}′),
@@ -2389,6 +2423,10 @@ has 'units' => (
 					'inch-hg' => {
 						'other' => q({0}" Hg),
 					},
+					'kilocalorie' => {
+						'name' => q(กิโลแคลอรี),
+						'other' => q({0}กแคลอรี),
+					},
 					'kilogram' => {
 						'name' => q(กก.),
 						'other' => q({0}กก.),
@@ -2413,7 +2451,7 @@ has 'units' => (
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(ล. /100 กม.),
-						'other' => q({0}ล/100กม),
+						'other' => q({0} ล./100กม.),
 					},
 					'meter' => {
 						'name' => q(เมตร),
@@ -2524,8 +2562,8 @@ has 'units' => (
 						'other' => q({0} ไบต์),
 					},
 					'calorie' => {
-						'name' => q(แคลอรี่),
-						'other' => q({0} แคลอรี่),
+						'name' => q(แคลอรี),
+						'other' => q({0} แคลอรี),
 					},
 					'carat' => {
 						'name' => q(กะรัต),
@@ -2618,8 +2656,8 @@ has 'units' => (
 						'other' => q({0} ฟลูอิดออนซ์),
 					},
 					'foodcalorie' => {
-						'name' => q(แคลอรี่),
-						'other' => q({0} แคลอรี่),
+						'name' => q(แคลอรี),
+						'other' => q({0} แคลอรี),
 					},
 					'foot' => {
 						'name' => q(ฟุต),
@@ -2634,6 +2672,11 @@ has 'units' => (
 						'name' => q(แกลลอน),
 						'other' => q({0} แกลลอน),
 						'per' => q({0}/แกลลอน),
+					},
+					'gallon-imperial' => {
+						'name' => q(แกลลอนอังกฤษ),
+						'other' => q({0} แกลลอนอังกฤษ),
+						'per' => q({0}/แกลลอนอังกฤษ),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2658,7 +2701,7 @@ has 'units' => (
 					'gram' => {
 						'name' => q(กรัม),
 						'other' => q({0} ก.),
-						'per' => q({0}/กรัม),
+						'per' => q({0}/ก.),
 					},
 					'hectare' => {
 						'name' => q(เฮกตาร์),
@@ -2715,13 +2758,13 @@ has 'units' => (
 						'other' => q({0} kB),
 					},
 					'kilocalorie' => {
-						'name' => q(กิโลแคลอรี่),
-						'other' => q({0} กิโลแคลอรี่),
+						'name' => q(กิโลแคลอรี),
+						'other' => q({0} กิโลแคลอรี),
 					},
 					'kilogram' => {
 						'name' => q(กก.),
 						'other' => q({0} กก.),
-						'per' => q({0}/ก.ก.),
+						'per' => q({0}/กก.),
 					},
 					'kilohertz' => {
 						'name' => q(kHz),
@@ -2762,7 +2805,7 @@ has 'units' => (
 						'per' => q({0}/ล.),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(ลิตร/100 กิโลเมตร),
+						'name' => q(ล./100 กม.),
 						'other' => q({0} ล./100กม.),
 					},
 					'liter-per-kilometer' => {
@@ -2786,8 +2829,8 @@ has 'units' => (
 						'other' => q({0} MHz),
 					},
 					'megaliter' => {
-						'name' => q(เมกกะลิตร),
-						'other' => q({0} เมกกะลิตร),
+						'name' => q(เมกะลิตร),
+						'other' => q({0} เมกะลิตร),
 					},
 					'megawatt' => {
 						'name' => q(เมกะวัตต์),
@@ -2804,7 +2847,7 @@ has 'units' => (
 					},
 					'meter-per-second-squared' => {
 						'name' => q(เมตร/วินาที²),
-						'other' => q({0} ม./วินาที²),
+						'other' => q({0} ม./วิ²),
 					},
 					'metric-ton' => {
 						'name' => q(ต.),
@@ -2830,6 +2873,10 @@ has 'units' => (
 						'name' => q(ไมล์/แกลลอน),
 						'other' => q({0} ไมล์/แกลลอน),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(ไมล์/แกลลอนอังกฤษ),
+						'other' => q({0} ไมล์ต่อแกลลอนอังกฤษ),
+					},
 					'mile-per-hour' => {
 						'name' => q(ไมล์/ชั่วโมง),
 						'other' => q({0} ไมล์/ชม.),
@@ -2850,6 +2897,10 @@ has 'units' => (
 						'name' => q(มก.),
 						'other' => q({0} มก.),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(มก./ดล.),
+						'other' => q({0} มก./ดล.),
+					},
 					'milliliter' => {
 						'name' => q(มล.),
 						'other' => q({0} มล.),
@@ -2861,6 +2912,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(มม. ปรอท),
 						'other' => q({0} มม. ปรอท),
+					},
+					'millimole-per-liter' => {
+						'name' => q(มิลลิโมล/ลิตร),
+						'other' => q({0} มลม./ล.),
 					},
 					'millisecond' => {
 						'name' => q(มิลลิวินาที),
@@ -2909,6 +2964,10 @@ has 'units' => (
 						'name' => q(พาร์เซก),
 						'other' => q({0} พาร์เซก),
 					},
+					'part-per-million' => {
+						'name' => q(ส่วน/ล้าน),
+						'other' => q({0} สตล.),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2923,6 +2982,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(ไพนต์เมตริก),
 						'other' => q({0} ไพนต์เมตริก),
+					},
+					'point' => {
+						'name' => q(จุด),
+						'other' => q({0} จุด),
 					},
 					'pound' => {
 						'name' => q(ปอนด์),
@@ -2953,7 +3016,7 @@ has 'units' => (
 					'square-centimeter' => {
 						'name' => q(ตร.ซม.),
 						'other' => q({0} ตร.ซม.),
-						'per' => q({0} ต่อ ตร.ซม.),
+						'per' => q({0}/ตร.ซม.),
 					},
 					'square-foot' => {
 						'name' => q(ตร.ฟุต),
@@ -2962,24 +3025,26 @@ has 'units' => (
 					'square-inch' => {
 						'name' => q(ตร.นิ้ว),
 						'other' => q({0} ตร.นิ้ว),
-						'per' => q({0} ต่อตารางนิ้ว),
+						'per' => q({0}/ตร.นิ้ว),
 					},
 					'square-kilometer' => {
 						'name' => q(ตร.กม.),
 						'other' => q({0} ตร.กม.),
+						'per' => q({0}/ตร.กม.),
 					},
 					'square-meter' => {
 						'name' => q(ตร.ม.),
 						'other' => q({0} ตร.ม.),
-						'per' => q({0} ต่อ ตร.ม.),
+						'per' => q({0}/ตร.ม.),
 					},
 					'square-mile' => {
 						'name' => q(ตร.ไมล์),
 						'other' => q({0} ตร.ไมล์),
+						'per' => q({0}/ตร.ไมล์),
 					},
 					'square-yard' => {
-						'name' => q(ตร.ว.),
-						'other' => q({0} ตร.ว.),
+						'name' => q(ตร.หลา),
+						'other' => q({0} ตร.หลา),
 					},
 					'tablespoon' => {
 						'name' => q(ชต.),
@@ -3104,43 +3169,43 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'other' => '0 พ'.'',
+					'other' => '0K',
 				},
 				'10000' => {
-					'other' => '0 ม'.'',
+					'other' => '00K',
 				},
 				'100000' => {
-					'other' => '0 ส'.'',
+					'other' => '000K',
 				},
 				'1000000' => {
-					'other' => '0 ล'.'',
+					'other' => '0M',
 				},
 				'10000000' => {
-					'other' => '00 ล'.'',
+					'other' => '00M',
 				},
 				'100000000' => {
-					'other' => '000 ล'.'',
+					'other' => '000M',
 				},
 				'1000000000' => {
-					'other' => '0 พ'.'ล'.'',
+					'other' => '0B',
 				},
 				'10000000000' => {
-					'other' => '0 ม'.'ล'.'',
+					'other' => '00B',
 				},
 				'100000000000' => {
-					'other' => '0 ส'.'ล'.'',
+					'other' => '000B',
 				},
 				'1000000000000' => {
-					'other' => '0 ล'.'ล'.'',
+					'other' => '0T',
 				},
 				'10000000000000' => {
-					'other' => '00 ล'.'ล'.'',
+					'other' => '00T',
 				},
 				'100000000000000' => {
-					'other' => '000 ล'.'ล'.'',
+					'other' => '000T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3183,54 +3248,54 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'other' => '0 พ'.'',
+					'other' => '0K',
 				},
 				'10000' => {
-					'other' => '0 ม'.'',
+					'other' => '00K',
 				},
 				'100000' => {
-					'other' => '0 ส'.'',
+					'other' => '000K',
 				},
 				'1000000' => {
-					'other' => '0 ล'.'',
+					'other' => '0M',
 				},
 				'10000000' => {
-					'other' => '00 ล'.'',
+					'other' => '00M',
 				},
 				'100000000' => {
-					'other' => '000 ล'.'',
+					'other' => '000M',
 				},
 				'1000000000' => {
-					'other' => '0 พ'.'ล'.'',
+					'other' => '0B',
 				},
 				'10000000000' => {
-					'other' => '0 ม'.'ล'.'',
+					'other' => '00B',
 				},
 				'100000000000' => {
-					'other' => '0 ส'.'ล'.'',
+					'other' => '000B',
 				},
 				'1000000000000' => {
-					'other' => '0 ล'.'ล'.'',
+					'other' => '0T',
 				},
 				'10000000000000' => {
-					'other' => '00 ล'.'ล'.'',
+					'other' => '00T',
 				},
 				'100000000000000' => {
-					'other' => '000 ล'.'ล'.'',
+					'other' => '000T',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3604,11 +3669,18 @@ has 'currencies' => (
 				'currency' => q(นิวรูเบิลเบลารุส \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(รูเบิลเบลารุส),
 				'other' => q(รูเบิลเบลารุส),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(รูเบิลเบลารุส \(2000–2016\)),
+				'other' => q(รูเบิลเบลารุส \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3668,6 +3740,13 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(เปโซชิลี),
 				'other' => q(เปโซชิลี),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(หยวน),
+				'other' => q(หยวน),
 			},
 		},
 		'CNY' => {
@@ -4096,8 +4175,8 @@ has 'currencies' => (
 		'KES' => {
 			symbol => 'KES',
 			display_name => {
-				'currency' => q(ชิลลิ่งเคนยา),
-				'other' => q(ชิลลิ่งเคนยา),
+				'currency' => q(ชิลลิงเคนยา),
+				'other' => q(ชิลลิงเคนยา),
 			},
 		},
 		'KGS' => {
@@ -4500,14 +4579,15 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(นูโวซอลเปรู),
-				'other' => q(นูโวซอลเปรู),
+				'currency' => q(ซอลเปรู),
+				'other' => q(ซอลเปรู),
 			},
 		},
 		'PES' => {
 			symbol => 'PES',
 			display_name => {
-				'currency' => q(ซอลเปรู),
+				'currency' => q(ซอลเปรู \(1863–1965\)),
+				'other' => q(ซอลเปรู\(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -4753,7 +4833,7 @@ has 'currencies' => (
 		'THB' => {
 			symbol => 'THB',
 			display_name => {
-				'currency' => q(บาทไทย),
+				'currency' => q(บาท),
 				'other' => q(บาทไทย),
 			},
 		},
@@ -6460,432 +6540,432 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
+			if ($_ eq 'dangi') {
 				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'afternoon2' if $time >= 1300
 						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
 				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'japanese') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'chinese') {
-				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'afternoon2' if $time >= 1300
 						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
 				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'dangi') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
+			if ($_ eq 'islamic') {
 				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening2' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
 				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
 					return 'evening2' if $time >= 1800
 						&& $time < 2100;
 					return 'evening1' if $time >= 1600
 						&& $time < 1800;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'evening2' if $time >= 1800
+						&& $time < 2100;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -6906,70 +6986,78 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'evening2' => q{ค่ำ},
-					'afternoon2' => q{บ่าย},
-					'midnight' => q{เที่ยงคืน},
-					'noon' => q{เที่ยง},
-					'night1' => q{กลางคืน},
-					'morning1' => q{ในตอนเช้า},
-					'evening1' => q{ในตอนเย็น},
-					'afternoon1' => q{ในตอนบ่าย},
 					'am' => q{ก่อนเที่ยง},
+					'evening1' => q{ในตอนเย็น},
 					'pm' => q{หลังเที่ยง},
+					'midnight' => q{เที่ยงคืน},
+					'afternoon2' => q{บ่าย},
+					'evening2' => q{ค่ำ},
+					'afternoon1' => q{ในตอนบ่าย},
+					'morning1' => q{ในตอนเช้า},
+					'night1' => q{กลางคืน},
+					'noon' => q{เที่ยง},
 				},
 				'narrow' => {
-					'evening2' => q{ค่ำ},
-					'afternoon2' => q{บ่าย},
-					'night1' => q{กลางคืน},
-					'morning1' => q{เช้า},
-					'noon' => q{n},
-					'midnight' => q{เที่ยงคืน},
-					'afternoon1' => q{เที่ยง},
-					'evening1' => q{เย็น},
 					'am' => q{a},
+					'evening1' => q{เย็น},
+					'morning1' => q{เช้า},
+					'afternoon1' => q{เที่ยง},
+					'night1' => q{กลางคืน},
+					'noon' => q{n},
 					'pm' => q{p},
+					'midnight' => q{เที่ยงคืน},
+					'afternoon2' => q{บ่าย},
+					'evening2' => q{ค่ำ},
 				},
 				'wide' => {
+					'am' => q{ก่อนเที่ยง},
+					'evening1' => q{ในตอนเย็น},
 					'noon' => q{เที่ยง},
 					'night1' => q{กลางคืน},
 					'morning1' => q{ในตอนเช้า},
-					'midnight' => q{เที่ยงคืน},
-					'afternoon2' => q{บ่าย},
-					'evening2' => q{ค่ำ},
-					'pm' => q{หลังเที่ยง},
-					'am' => q{ก่อนเที่ยง},
 					'afternoon1' => q{ในตอนบ่าย},
-					'evening1' => q{ในตอนเย็น},
+					'evening2' => q{ค่ำ},
+					'afternoon2' => q{บ่าย},
+					'pm' => q{หลังเที่ยง},
+					'midnight' => q{เที่ยงคืน},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{หลังเที่ยง},
-					'am' => q{ก่อนเที่ยง},
-				},
 				'wide' => {
-					'afternoon1' => q{ช่วงเที่ยง},
-					'evening1' => q{เย็น},
-					'am' => q{ก่อนเที่ยง},
-					'pm' => q{หลังเที่ยง},
 					'evening2' => q{ค่ำ},
 					'afternoon2' => q{บ่าย},
-					'night1' => q{กลางคืน},
-					'morning1' => q{เช้า},
-					'noon' => q{เที่ยง},
+					'pm' => q{หลังเที่ยง},
 					'midnight' => q{เที่ยงคืน},
+					'noon' => q{เที่ยง},
+					'night1' => q{กลางคืน},
+					'afternoon1' => q{ในตอนบ่าย},
+					'morning1' => q{ในตอนเช้า},
+					'evening1' => q{ในตอนเย็น},
+					'am' => q{ก่อนเที่ยง},
 				},
 				'narrow' => {
+					'pm' => q{หลังเที่ยง},
 					'midnight' => q{เที่ยงคืน},
-					'night1' => q{กลางคืน},
-					'morning1' => q{เช้า},
-					'noon' => q{เที่ยง},
 					'afternoon2' => q{บ่าย},
 					'evening2' => q{ค่ำ},
-					'pm' => q{หลังเที่ยง},
-					'am' => q{ก่อนเที่ยง},
-					'evening1' => q{เย็น},
 					'afternoon1' => q{ช่วงเที่ยง},
+					'morning1' => q{เช้า},
+					'night1' => q{กลางคืน},
+					'noon' => q{เที่ยง},
+					'evening1' => q{เย็น},
+					'am' => q{ก่อนเที่ยง},
+				},
+				'abbreviated' => {
+					'evening1' => q{ในตอนเย็น},
+					'am' => q{ก่อนเที่ยง},
+					'morning1' => q{ในตอนเช้า},
+					'afternoon1' => q{ในตอนบ่าย},
+					'noon' => q{เที่ยง},
+					'night1' => q{กลางคืน},
+					'midnight' => q{เที่ยงคืน},
+					'pm' => q{หลังเที่ยง},
+					'evening2' => q{ค่ำ},
+					'afternoon2' => q{บ่าย},
 				},
 			},
 		},
@@ -7444,61 +7532,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'japanese' => {
-			Ed => q{E d},
-			Gy => q{G y},
-			GyMMM => q{MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
-			yyyyM => q{M/GGGGG y},
-			yyyyMEd => q{E d/M/GGGGG y},
-			yyyyMMM => q{MMM G y},
-			yyyyMMMEd => q{E d MMM G y},
-			yyyyMMMd => q{d MMM G y},
-			yyyyMd => q{d/M/GGGGG y},
-			yyyyQQQ => q{QQQ G y},
-			yyyyQQQQ => q{QQQQ G y},
-		},
-		'islamic' => {
-			Ed => q{E d},
-			Gy => q{G y},
-			GyMMM => q{MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			y => q{G y},
-			yyyy => q{G y},
-			yyyyM => q{M/y G},
-			yyyyMEd => q{E d/M/y GGGGG},
-			yyyyMMM => q{MMM G y},
-			yyyyMMMEd => q{E d MMM G y},
-			yyyyMMMd => q{d MMM G y},
-			yyyyMd => q{d/M/y GGGGG},
-			yyyyQQQ => q{QQQ G y},
-			yyyyQQQQ => q{QQQQ G y},
-		},
 		'roc' => {
 			Ed => q{E d},
 			Gy => q{ปีGที่ y},
@@ -7529,23 +7562,43 @@ has 'datetime_formats_available_formats' => (
 			yyyyMd => q{d/M/GGGGG y},
 			yyyyQQQ => q{QQQ G y},
 		},
-		'generic' => {
-			E => q{ccc},
+		'islamic' => {
 			Ed => q{E d},
 			Gy => q{G y},
 			GyMMM => q{MMM G y},
-			GyMMMEEEEd => q{EEEEที่ d MMM G y},
+			GyMMMEd => q{E d MMM G y},
+			GyMMMd => q{d MMM G y},
+			M => q{L},
+			MEd => q{E, d/M},
+			MMM => q{LLL},
+			MMMEd => q{E d MMM},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			d => q{d},
+			y => q{G y},
+			yyyy => q{G y},
+			yyyyM => q{M/y G},
+			yyyyMEd => q{E d/M/y GGGGG},
+			yyyyMMM => q{MMM G y},
+			yyyyMMMEd => q{E d MMM G y},
+			yyyyMMMd => q{d MMM G y},
+			yyyyMd => q{d/M/y GGGGG},
+			yyyyQQQ => q{QQQ G y},
+			yyyyQQQQ => q{QQQQ G y},
+		},
+		'japanese' => {
+			Ed => q{E d},
+			Gy => q{G y},
+			GyMMM => q{MMM G y},
 			GyMMMEd => q{E d MMM G y},
 			GyMMMd => q{d MMM G y},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
-			MEd => q{E d/M},
+			MEd => q{E, d/M},
 			MMM => q{LLL},
-			MMMEEEEd => q{EEEEที่ d MMM},
 			MMMEd => q{E d MMM},
-			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
 			d => q{d},
@@ -7555,66 +7608,14 @@ has 'datetime_formats_available_formats' => (
 			ms => q{mm:ss},
 			y => q{G y},
 			yyyy => q{G y},
-			yyyyM => q{M/y G},
-			yyyyMEd => q{E d/M/y GGGGG},
+			yyyyM => q{M/GGGGG y},
+			yyyyMEd => q{E d/M/GGGGG y},
 			yyyyMMM => q{MMM G y},
-			yyyyMMMEEEEd => q{EEEEที่ d MMM G y},
 			yyyyMMMEd => q{E d MMM G y},
-			yyyyMMMM => q{MMMM G y},
 			yyyyMMMd => q{d MMM G y},
-			yyyyMd => q{d/M/y GGGGG},
+			yyyyMd => q{d/M/GGGGG y},
 			yyyyQQQ => q{QQQ G y},
 			yyyyQQQQ => q{QQQQ G y},
-		},
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm น.},
-			EHms => q{E HH:mm:ss},
-			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{MMM G y},
-			GyMMMEEEEd => q{EEEEที่ d MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			H => q{HH},
-			Hm => q{HH:mm น.},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{E d/M},
-			MMM => q{LLL},
-			MMMEEEEd => q{EEEEที่ d MMM},
-			MMMEd => q{E d MMM},
-			MMMMEEEEd => q{EEEEที่ d MMMM},
-			MMMMEd => q{E d MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			mmss => q{mm:ss},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E d/M/y},
-			yMMM => q{MMM y},
-			yMMMEEEEd => q{EEEEที่ d MMM y},
-			yMMMEd => q{E d MMM y},
-			yMMMM => q{MMMM G y},
-			yMMMMEEEEd => q{EEEEที่ d MMMM G y},
-			yMMMMEd => q{E d MMMM G y},
-			yMMMMd => q{d MMMM G y},
-			yMMMd => q{d MMM y},
-			yMd => q{d/M/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ G y},
 		},
 		'buddhist' => {
 			E => q{ccc},
@@ -7655,6 +7656,109 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ y},
 			yyyyQQQQ => q{QQQQ y},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm น.},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{MMM G y},
+			GyMMMEEEEd => q{EEEEที่ d MMM G y},
+			GyMMMEd => q{E d MMM G y},
+			GyMMMd => q{d MMM G y},
+			H => q{HH},
+			Hm => q{HH:mm น.},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{E d/M},
+			MMM => q{LLL},
+			MMMEEEEd => q{EEEEที่ d MMM},
+			MMMEd => q{E d MMM},
+			MMMMEEEEd => q{EEEEที่ d MMMM},
+			MMMMEd => q{E d MMMM},
+			MMMMW => q{สัปดาห์ที่ W ของ MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm น. a v},
+			mmss => q{mm:ss},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E d/M/y},
+			yMMM => q{MMM y},
+			yMMMEEEEd => q{EEEEที่ d MMM y},
+			yMMMEd => q{E d MMM y},
+			yMMMM => q{MMMM G y},
+			yMMMMEEEEd => q{EEEEที่ d MMMM G y},
+			yMMMMEd => q{E d MMMM G y},
+			yMMMMd => q{d MMMM G y},
+			yMMMd => q{d MMM y},
+			yMd => q{d/M/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ G y},
+			yw => q{สัปดาห์ที่ w ของ Y},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{MMM G y},
+			GyMMMEEEEd => q{EEEEที่ d MMM G y},
+			GyMMMEd => q{E d MMM G y},
+			GyMMMd => q{d MMM G y},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E d/M},
+			MMM => q{LLL},
+			MMMEEEEd => q{EEEEที่ d MMM},
+			MMMEd => q{E d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{G y},
+			yyyy => q{G y},
+			yyyyM => q{M/y G},
+			yyyyMEd => q{E d/M/y GGGGG},
+			yyyyMMM => q{MMM G y},
+			yyyyMMMEEEEd => q{EEEEที่ d MMM G y},
+			yyyyMMMEd => q{E d MMM G y},
+			yyyyMMMM => q{MMMM G y},
+			yyyyMMMd => q{d MMM G y},
+			yyyyMd => q{d/M/y GGGGG},
+			yyyyQQQ => q{QQQ G y},
+			yyyyQQQQ => q{QQQQ G y},
+		},
 	} },
 );
 
@@ -7674,229 +7778,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{H–H},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{H:mm–H:mm v},
-				m => q{H:mm–H:mm v},
-			},
-			Hv => {
-				H => q{H–H v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E d/M – E d/M},
-				d => q{E d – E d/M},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEEEEd => {
-				M => q{EEEEที่ d MMM – EEEEที่ d MMM},
-				d => q{EEEEที่ d – EEEEที่ d MMM},
-			},
-			MMMEd => {
-				M => q{E d MMM – E d MMM},
-				d => q{E d – E d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} - {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{M/y – M/y G},
-				y => q{M/y – M/y G},
-			},
-			yMEd => {
-				M => q{E d/M/y – E d/M/y G},
-				d => q{E d – E d/M/y G},
-				y => q{E d/M/y – E d/M/y G},
-			},
-			yMMM => {
-				M => q{MMM–MMM G y},
-				y => q{MMM G y – MMM y},
-			},
-			yMMMEEEEd => {
-				M => q{EEEEที่ d MMM – EEEEที่ d MMM G y},
-				d => q{EEEEที่ d – EEEEที่ d MMM G y},
-				y => q{EEEEที่ d MMM G y – EEEEที่ d MMM y},
-			},
-			yMMMEd => {
-				M => q{E d MMM – E d MMM G y},
-				d => q{E d – E d MMM G y},
-				y => q{E d MMM G y – E d MMM y},
-			},
-			yMMMM => {
-				M => q{MMMM – MMMM G y},
-				y => q{MMMM G y – MMMM y},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM G y},
-				d => q{d–d MMM G y},
-				y => q{d MMM G y – d MMM y},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y G},
-				d => q{d–d/M/y G},
-				y => q{d/M/y – d/M/y G},
-			},
-		},
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm น. – HH:mm น.},
-				m => q{HH:mm น. – HH:mm น.},
-			},
-			Hmv => {
-				H => q{H:mm น. – H:mm น. v},
-				m => q{H:mm น. – H:mm น. v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E d/M – E d/M},
-				d => q{E d – E d/M},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEEEEd => {
-				M => q{EEEEที่ d MMM – EEEEที่ d MMM},
-				d => q{EEEEที่ d – EEEEที่ d MMM},
-			},
-			MMMEd => {
-				M => q{E d MMM – E d MMM},
-				d => q{E d – E d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{M/y – M/y},
-				y => q{M/y – M/y},
-			},
-			yMEd => {
-				M => q{E d/M/y – E d/M/y},
-				d => q{E d – E d/M/y},
-				y => q{E d/M/y – E d/M/y},
-			},
-			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM y – MMM y},
-			},
-			yMMMEEEEd => {
-				M => q{EEEEที่ d MMM – EEEEที่ d MMM y},
-				d => q{EEEEที่ d – EEEEที่ d MMM y},
-				y => q{EEEEที่ d MMM y – EEEEที่ d MMM y},
-			},
-			yMMMEd => {
-				M => q{E d MMM – E d MMM y},
-				d => q{E d – E d MMM y},
-				y => q{E d MMM y – E d MMM y},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM G y},
-				y => q{MMMM G y – MMMM y},
-			},
-			yMMMMEEEEd => {
-				M => q{EEEEที่ d MMMM – EEEEที่ d MMMM G y},
-				d => q{EEEEที่ d – EEEEที่ d MMMM G y},
-				y => q{EEEEที่ d MMMM G y – EEEEที่ d MMMM y},
-			},
-			yMMMMEd => {
-				M => q{E d MMMM – E d MMMM G y},
-				d => q{E d – E d MMMM G y},
-				y => q{E d MMMM G y – E d MMMM y},
-			},
-			yMMMMd => {
-				M => q{d MMMM – d MMMM G y},
-				d => q{d–d MMMM G y},
-				y => q{d MMMM G y – d MMMM y},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM y},
-				d => q{d–d MMM y},
-				y => q{d MMM y – d MMM y},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y},
-				d => q{d–d/M/y},
-				y => q{d/M/y – d/M/y},
-			},
-		},
 		'buddhist' => {
 			H => {
 				H => q{H–H},
@@ -7999,6 +7880,229 @@ has 'datetime_formats_interval' => (
 				M => q{d/M/y – d/M/y},
 				d => q{d–d/M/y},
 				y => q{d/M/y – d/M/y},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm น. – HH:mm น.},
+				m => q{HH:mm น. – HH:mm น.},
+			},
+			Hmv => {
+				H => q{H:mm น. – H:mm น. v},
+				m => q{H:mm น. – H:mm น. v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d/M – E d/M},
+				d => q{E d/M – E d/M/},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEEEEd => {
+				M => q{EEEEที่ d MMM – EEEEที่ d MMM},
+				d => q{EEEEที่ d – EEEEที่ d MMM},
+			},
+			MMMEd => {
+				M => q{E d MMM – E d MMM},
+				d => q{E d – E d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E d/M/y – E d/M/y},
+				d => q{E d/M/y – E d/M/y},
+				y => q{E d/M/y – E d/M/y},
+			},
+			yMMM => {
+				M => q{MMM–MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEEEEd => {
+				M => q{EEEEที่ d MMM – EEEEที่ d MMM y},
+				d => q{EEEEที่ d – EEEEที่ d MMM y},
+				y => q{EEEEที่ d MMM y – EEEEที่ d MMM y},
+			},
+			yMMMEd => {
+				M => q{E d MMM – E d MMM y},
+				d => q{E d MMM – E d MMM y},
+				y => q{E d MMM y – E d MMM y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMMEEEEd => {
+				M => q{EEEEที่ d MMMM – EEEEที่ d MMMM G y},
+				d => q{EEEEที่ d – EEEEที่ d MMMM G y},
+				y => q{EEEEที่ d MMMM G y – EEEEที่ d MMMM y},
+			},
+			yMMMMEd => {
+				M => q{E d MMMM – E d MMMM G y},
+				d => q{E d – E d MMMM G y},
+				y => q{E d MMMM G y – E d MMMM y},
+			},
+			yMMMMd => {
+				M => q{d MMMM – d MMMM G y},
+				d => q{d–d MMMM G y},
+				y => q{d MMMM G y – d MMMM y},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y},
+				d => q{d–d MMM y},
+				y => q{d MMM y – d MMM y},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y},
+				d => q{d/M/y – d/M/y},
+				y => q{d/M/y – d/M/y},
+			},
+		},
+		'generic' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d/M – E d/M},
+				d => q{E d/M – E d/M},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEEEEd => {
+				M => q{EEEEที่ d MMM – EEEEที่ d MMM},
+				d => q{EEEEที่ d – EEEEที่ d MMM},
+			},
+			MMMEd => {
+				M => q{E d MMM – E d MMM},
+				d => q{E d MMM – E d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} - {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E d/M/y – E d/M/y G},
+				d => q{E d/M/y – E d/M/y G},
+				y => q{E d/M/y – E d/M/y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM G y},
+				y => q{MMM G y – MMM y},
+			},
+			yMMMEEEEd => {
+				M => q{EEEEที่ d MMM – EEEEที่ d MMM G y},
+				d => q{EEEEที่ d – EEEEที่ d MMM G y},
+				y => q{EEEEที่ d MMM G y – EEEEที่ d MMM y},
+			},
+			yMMMEd => {
+				M => q{E d MMM – E d MMM G y},
+				d => q{E d MMM – E d MMM G y},
+				y => q{E d MMM G y – E d MMM y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM G y},
+				y => q{MMMM G y – MMMM y},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM G y},
+				d => q{d–d MMM G y},
+				y => q{d MMM G y – d MMM y},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y G},
+				d => q{d/M/y – d/M/y G},
+				y => q{d/M/y – d/M/y G},
 			},
 		},
 	} },
@@ -8241,14 +8345,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอาเกร),
-				'generic' => q(เวลาอาเกร),
-				'standard' => q(เวลามาตรฐานอาเกร),
+				'daylight' => q#เวลาฤดูร้อนอาเกร#,
+				'generic' => q#เวลาอาเกร#,
+				'standard' => q#เวลามาตรฐานอาเกร#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(เวลาอัฟกานิสถาน),
+				'standard' => q#เวลาอัฟกานิสถาน#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -8409,45 +8513,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(เวลาแอฟริกากลาง),
+				'standard' => q#เวลาแอฟริกากลาง#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(เวลาแอฟริกาตะวันออก),
+				'standard' => q#เวลาแอฟริกาตะวันออก#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(เวลาแอฟริกาใต้),
+				'standard' => q#เวลาแอฟริกาใต้#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนแอฟริกาตะวันตก),
-				'generic' => q(เวลาแอฟริกาตะวันตก),
-				'standard' => q(เวลามาตรฐานแอฟริกาตะวันตก),
+				'daylight' => q#เวลาฤดูร้อนแอฟริกาตะวันตก#,
+				'generic' => q#เวลาแอฟริกาตะวันตก#,
+				'standard' => q#เวลามาตรฐานแอฟริกาตะวันตก#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(เวลาออมแสงของอะแลสกา),
-				'generic' => q(เวลาอะแลสกา),
-				'standard' => q(เวลามาตรฐานอะแลสกา),
+				'daylight' => q#เวลาออมแสงของอะแลสกา#,
+				'generic' => q#เวลาอะแลสกา#,
+				'standard' => q#เวลามาตรฐานอะแลสกา#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอัลมาตี),
-				'generic' => q(เวลาอัลมาตี),
-				'standard' => q(เวลามาตรฐานอัลมาตี),
+				'daylight' => q#เวลาฤดูร้อนอัลมาตี#,
+				'generic' => q#เวลาอัลมาตี#,
+				'standard' => q#เวลามาตรฐานอัลมาตี#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอะเมซอน),
-				'generic' => q(เวลาอะเมซอน),
-				'standard' => q(เวลามาตรฐานอะเมซอน),
+				'daylight' => q#เวลาฤดูร้อนแอมะซอน#,
+				'generic' => q#เวลาแอมะซอน#,
+				'standard' => q#เวลามาตรฐานแอมะซอน#,
 			},
 		},
 		'America/Adak' => {
@@ -8594,11 +8698,14 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#เอลซัลวาดอร์#,
 		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#ฟอร์ตเนลสัน#,
+		},
 		'America/Fortaleza' => {
 			exemplarCity => q#ฟอร์ตาเลซา#,
 		},
 		'America/Glace_Bay' => {
-			exemplarCity => q#แกลซเบย์#,
+			exemplarCity => q#เกลซเบย์#,
 		},
 		'America/Godthab' => {
 			exemplarCity => q#กอดแธบ#,
@@ -8795,6 +8902,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#เปอโตริโก#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#ปุนตาอาเรนัส#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#เรนนี่ริเวอร์#,
 		},
@@ -8890,44 +9000,44 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(เวลาออมแสงตอนกลางในอเมริกาเหนือ),
-				'generic' => q(เวลาตอนกลางในอเมริกาเหนือ),
-				'standard' => q(เวลามาตรฐานตอนกลางในอเมริกาเหนือ),
+				'daylight' => q#เวลาออมแสงตอนกลางในอเมริกาเหนือ#,
+				'generic' => q#เวลาตอนกลางในอเมริกาเหนือ#,
+				'standard' => q#เวลามาตรฐานตอนกลางในอเมริกาเหนือ#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(เวลาออมแสงทางตะวันออกในอเมริกาเหนือ),
-				'generic' => q(เวลาทางตะวันออกในอเมริกาเหนือ),
-				'standard' => q(เวลามาตรฐานทางตะวันออกในอเมริกาเหนือ),
+				'daylight' => q#เวลาออมแสงทางตะวันออกในอเมริกาเหนือ#,
+				'generic' => q#เวลาทางตะวันออกในอเมริกาเหนือ#,
+				'standard' => q#เวลามาตรฐานทางตะวันออกในอเมริกาเหนือ#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(เวลาออมแสงแถบภูเขาในอเมริกาเหนือ),
-				'generic' => q(เวลาแถบภูเขาในอเมริกาเหนือ),
-				'standard' => q(เวลามาตรฐานแถบภูเขาในอเมริกาเหนือ),
+				'daylight' => q#เวลาออมแสงแถบภูเขาในอเมริกาเหนือ#,
+				'generic' => q#เวลาแถบภูเขาในอเมริกาเหนือ#,
+				'standard' => q#เวลามาตรฐานแถบภูเขาในอเมริกาเหนือ#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(เวลาออมแสงแปซิฟิกในอเมริกาเหนือ),
-				'generic' => q(เวลาแปซิฟิกในอเมริกาเหนือ),
-				'standard' => q(เวลามาตรฐานแปซิฟิกในอเมริกาเหนือ),
+				'daylight' => q#เวลาออมแสงแปซิฟิกในอเมริกาเหนือ#,
+				'generic' => q#เวลาแปซิฟิกในอเมริกาเหนือ#,
+				'standard' => q#เวลามาตรฐานแปซิฟิกในอเมริกาเหนือ#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอะนาดีร์),
-				'generic' => q(เวลาอะนาดีร์),
-				'standard' => q(เวลามาตรฐานอะนาดีร์),
+				'daylight' => q#เวลาฤดูร้อนอะนาดีร์#,
+				'generic' => q#เวลาอะนาดีร์#,
+				'standard' => q#เวลามาตรฐานอะนาดีร์#,
 			},
 		},
 		'Antarctica/Casey' => {
 			exemplarCity => q#เคซีย์#,
 		},
 		'Antarctica/Davis' => {
-			exemplarCity => q#ดาวีส์#,
+			exemplarCity => q#เดวิส#,
 		},
 		'Antarctica/DumontDUrville' => {
 			exemplarCity => q#ดูมองต์ดูร์วิลล์#,
@@ -8936,7 +9046,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#แมคควอรี#,
 		},
 		'Antarctica/Mawson' => {
-			exemplarCity => q#มาว์ซัน#,
+			exemplarCity => q#มอว์สัน#,
 		},
 		'Antarctica/McMurdo' => {
 			exemplarCity => q#แมคมัวโด#,
@@ -8945,43 +9055,43 @@ has 'time_zone_names' => (
 			exemplarCity => q#พาล์เมอร์#,
 		},
 		'Antarctica/Rothera' => {
-			exemplarCity => q#โรเทรา#,
+			exemplarCity => q#โรธีรา#,
 		},
 		'Antarctica/Syowa' => {
-			exemplarCity => q#เซียวา#,
+			exemplarCity => q#ไซโยวา#,
 		},
 		'Antarctica/Troll' => {
 			exemplarCity => q#โทรล#,
 		},
 		'Antarctica/Vostok' => {
-			exemplarCity => q#วอสต็อค#,
+			exemplarCity => q#วอสตอค#,
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(เวลาออมแสงอาปีอา),
-				'generic' => q(เวลาอาปีอา),
-				'standard' => q(เวลามาตรฐานอาปีอา),
+				'daylight' => q#เวลาออมแสงอาปีอา#,
+				'generic' => q#เวลาอาปีอา#,
+				'standard' => q#เวลามาตรฐานอาปีอา#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอัคตาอู),
-				'generic' => q(เวลาอัคตาอู),
-				'standard' => q(เวลามาตรฐานอัคตาอู),
+				'daylight' => q#เวลาฤดูร้อนอัคตาอู#,
+				'generic' => q#เวลาอัคตาอู#,
+				'standard' => q#เวลามาตรฐานอัคตาอู#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอัคโทเบ),
-				'generic' => q(เวลาอัคโทเบ),
-				'standard' => q(เวลามาตรฐานอัคโทเบ),
+				'daylight' => q#เวลาฤดูร้อนอัคโทเบ#,
+				'generic' => q#เวลาอัคโทเบ#,
+				'standard' => q#เวลามาตรฐานอัคโทเบ#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(เวลาออมแสงอาหรับ),
-				'generic' => q(เวลาอาหรับ),
-				'standard' => q(เวลามาตรฐานอาหรับ),
+				'daylight' => q#เวลาออมแสงอาหรับ#,
+				'generic' => q#เวลาอาหรับ#,
+				'standard' => q#เวลามาตรฐานอาหรับ#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -8989,23 +9099,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอาร์เจนตินา),
-				'generic' => q(เวลาอาร์เจนตินา),
-				'standard' => q(เวลามาตรฐานอาร์เจนตินา),
+				'daylight' => q#เวลาฤดูร้อนอาร์เจนตินา#,
+				'generic' => q#เวลาอาร์เจนตินา#,
+				'standard' => q#เวลามาตรฐานอาร์เจนตินา#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนทางตะวันตกของอาร์เจนตินา),
-				'generic' => q(เวลาตะวันตกของอาร์เจนตินา),
-				'standard' => q(เวลามาตรฐานทางตะวันตกของอาร์เจนตินา),
+				'daylight' => q#เวลาฤดูร้อนทางตะวันตกของอาร์เจนตินา#,
+				'generic' => q#เวลาตะวันตกของอาร์เจนตินา#,
+				'standard' => q#เวลามาตรฐานทางตะวันตกของอาร์เจนตินา#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอาร์เมเนีย),
-				'generic' => q(เวลาอาร์เมเนีย),
-				'standard' => q(เวลามาตรฐานอาร์เมเนีย),
+				'daylight' => q#เวลาฤดูร้อนอาร์เมเนีย#,
+				'generic' => q#เวลาอาร์เมเนีย#,
+				'standard' => q#เวลามาตรฐานอาร์เมเนีย#,
 			},
 		},
 		'Asia/Aden' => {
@@ -9029,6 +9139,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#อาชกาบัต#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#อทีราว#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#แบกแดด#,
 		},
@@ -9040,6 +9153,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#กรุงเทพ#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#บราโมล#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#เบรุต#,
@@ -9076,6 +9192,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#ดูชานเบ#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#แฟมากุสตา#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#กาซา#,
@@ -9218,6 +9337,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#โตเกียว#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#ตอมสค์#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#อูลานบาตอร์#,
 		},
@@ -9244,9 +9366,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(เวลาออมแสงของแอตแลนติก),
-				'generic' => q(เวลาแอตแลนติก),
-				'standard' => q(เวลามาตรฐานแอตแลนติก),
+				'daylight' => q#เวลาออมแสงของแอตแลนติก#,
+				'generic' => q#เวลาแอตแลนติก#,
+				'standard' => q#เวลามาตรฐานแอตแลนติก#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -9304,7 +9426,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ลินดีแมน#,
 		},
 		'Australia/Lord_Howe' => {
-			exemplarCity => q#ลอร์ดโฮวี#,
+			exemplarCity => q#ลอร์ดโฮว์#,
 		},
 		'Australia/Melbourne' => {
 			exemplarCity => q#เมลเบิร์น#,
@@ -9317,176 +9439,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(เวลาออมแสงทางตอนกลางของออสเตรเลีย),
-				'generic' => q(เวลาออสเตรเลียกลาง),
-				'standard' => q(เวลามาตรฐานทางตอนกลางของออสเตรเลีย),
+				'daylight' => q#เวลาออมแสงทางตอนกลางของออสเตรเลีย#,
+				'generic' => q#เวลาออสเตรเลียกลาง#,
+				'standard' => q#เวลามาตรฐานทางตอนกลางของออสเตรเลีย#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(เวลาออมแสงทางตะวันตกตอนกลางของออสเตรเลีย),
-				'generic' => q(เวลาทางตะวันตกตอนกลางของออสเตรเลีย),
-				'standard' => q(เวลามาตรฐานทางตะวันตกตอนกลางของออสเตรเลีย),
+				'daylight' => q#เวลาออมแสงทางตะวันตกตอนกลางของออสเตรเลีย#,
+				'generic' => q#เวลาทางตะวันตกตอนกลางของออสเตรเลีย#,
+				'standard' => q#เวลามาตรฐานทางตะวันตกตอนกลางของออสเตรเลีย#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(เวลาออมแสงทางตะวันออกของออสเตรเลีย),
-				'generic' => q(เวลาออสเตรเลียตะวันออก),
-				'standard' => q(เวลามาตรฐานทางตะวันออกของออสเตรเลีย),
+				'daylight' => q#เวลาออมแสงทางตะวันออกของออสเตรเลีย#,
+				'generic' => q#เวลาออสเตรเลียตะวันออก#,
+				'standard' => q#เวลามาตรฐานทางตะวันออกของออสเตรเลีย#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(เวลาออมแสงทางตะวันตกของออสเตรเลีย),
-				'generic' => q(เวลาออสเตรเลียตะวันตก),
-				'standard' => q(เวลามาตรฐานทางตะวันตกของออสเตรเลีย),
+				'daylight' => q#เวลาออมแสงทางตะวันตกของออสเตรเลีย#,
+				'generic' => q#เวลาออสเตรเลียตะวันตก#,
+				'standard' => q#เวลามาตรฐานทางตะวันตกของออสเตรเลีย#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอาเซอร์ไบจาน),
-				'generic' => q(เวลาอาเซอร์ไบจาน),
-				'standard' => q(เวลามาตรฐานอาเซอร์ไบจาน),
+				'daylight' => q#เวลาฤดูร้อนอาเซอร์ไบจาน#,
+				'generic' => q#เวลาอาเซอร์ไบจาน#,
+				'standard' => q#เวลามาตรฐานอาเซอร์ไบจาน#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอะโซร์ส),
-				'generic' => q(เวลาอะโซร์ส),
-				'standard' => q(เวลามาตรฐานอะโซร์ส),
+				'daylight' => q#เวลาฤดูร้อนอะโซร์ส#,
+				'generic' => q#เวลาอะโซร์ส#,
+				'standard' => q#เวลามาตรฐานอะโซร์ส#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนบังกลาเทศ),
-				'generic' => q(เวลาบังกลาเทศ),
-				'standard' => q(เวลามาตรฐานบังกลาเทศ),
+				'daylight' => q#เวลาฤดูร้อนบังกลาเทศ#,
+				'generic' => q#เวลาบังกลาเทศ#,
+				'standard' => q#เวลามาตรฐานบังกลาเทศ#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(เวลาภูฏาน),
+				'standard' => q#เวลาภูฏาน#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(เวลาโบลิเวีย),
+				'standard' => q#เวลาโบลิเวีย#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนบราซิเลีย),
-				'generic' => q(เวลาบราซิเลีย),
-				'standard' => q(เวลามาตรฐานบราซิเลีย),
+				'daylight' => q#เวลาฤดูร้อนบราซิเลีย#,
+				'generic' => q#เวลาบราซิเลีย#,
+				'standard' => q#เวลามาตรฐานบราซิเลีย#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(เวลาบรูไนดารุสซาลาม),
+				'standard' => q#เวลาบรูไนดารุสซาลาม#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนเคปเวิร์ด),
-				'generic' => q(เวลาเคปเวิร์ด),
-				'standard' => q(เวลามาตรฐานเคปเวิร์ด),
+				'daylight' => q#เวลาฤดูร้อนเคปเวิร์ด#,
+				'generic' => q#เวลาเคปเวิร์ด#,
+				'standard' => q#เวลามาตรฐานเคปเวิร์ด#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(เวลาเคซีย์),
+				'standard' => q#เวลาเคซีย์#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(เวลาชามอร์โร),
+				'standard' => q#เวลาชามอร์โร#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(เวลาออมแสงแชทัม),
-				'generic' => q(เวลาแชทัม),
-				'standard' => q(เวลามาตรฐานแชทัม),
+				'daylight' => q#เวลาออมแสงแชทัม#,
+				'generic' => q#เวลาแชทัม#,
+				'standard' => q#เวลามาตรฐานแชทัม#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนชิลี),
-				'generic' => q(เวลาชิลี),
-				'standard' => q(เวลามาตรฐานชิลี),
+				'daylight' => q#เวลาฤดูร้อนชิลี#,
+				'generic' => q#เวลาชิลี#,
+				'standard' => q#เวลามาตรฐานชิลี#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(เวลาออมแสงจีน),
-				'generic' => q(เวลาจีน),
-				'standard' => q(เวลามาตรฐานจีน),
+				'daylight' => q#เวลาออมแสงจีน#,
+				'generic' => q#เวลาจีน#,
+				'standard' => q#เวลามาตรฐานจีน#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนชอยปาลชาน),
-				'generic' => q(เวลาชอยปาลชาน),
-				'standard' => q(เวลามาตรฐานชอยปาลชาน),
+				'daylight' => q#เวลาฤดูร้อนชอยปาลชาน#,
+				'generic' => q#เวลาชอยปาลชาน#,
+				'standard' => q#เวลามาตรฐานชอยปาลชาน#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(เวลาเกาะคริสต์มาส),
+				'standard' => q#เวลาเกาะคริสต์มาส#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะโคโคส),
+				'standard' => q#เวลาหมู่เกาะโคโคส#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนโคลอมเบีย),
-				'generic' => q(เวลาโคลอมเบีย),
-				'standard' => q(เวลามาตรฐานโคลอมเบีย),
+				'daylight' => q#เวลาฤดูร้อนโคลอมเบีย#,
+				'generic' => q#เวลาโคลอมเบีย#,
+				'standard' => q#เวลามาตรฐานโคลอมเบีย#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(เวลาครึ่งฤดูร้อนหมู่เกาะคุก),
-				'generic' => q(เวลาหมู่เกาะคุก),
-				'standard' => q(เวลามาตรฐานหมู่เกาะคุก),
+				'daylight' => q#เวลาครึ่งฤดูร้อนหมู่เกาะคุก#,
+				'generic' => q#เวลาหมู่เกาะคุก#,
+				'standard' => q#เวลามาตรฐานหมู่เกาะคุก#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(เวลาออมแสงของคิวบา),
-				'generic' => q(เวลาคิวบา),
-				'standard' => q(เวลามาตรฐานคิวบา),
+				'daylight' => q#เวลาออมแสงของคิวบา#,
+				'generic' => q#เวลาคิวบา#,
+				'standard' => q#เวลามาตรฐานคิวบา#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(เวลาเดวิส),
+				'standard' => q#เวลาเดวิส#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(เวลาดูมองต์ดูร์วิลล์),
+				'standard' => q#เวลาดูมองต์ดูร์วิลล์#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(เวลาติมอร์ตะวันออก),
+				'standard' => q#เวลาติมอร์ตะวันออก#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนเกาะอีสเตอร์),
-				'generic' => q(เวลาเกาะอีสเตอร์),
-				'standard' => q(เวลามาตรฐานเกาะอีสเตอร์),
+				'daylight' => q#เวลาฤดูร้อนเกาะอีสเตอร์#,
+				'generic' => q#เวลาเกาะอีสเตอร์#,
+				'standard' => q#เวลามาตรฐานเกาะอีสเตอร์#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(เวลาเอกวาดอร์),
+				'standard' => q#เวลาเอกวาดอร์#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#เวลาสากลเชิงพิกัด#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -9497,6 +9624,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#อันดอร์รา#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#แอสตราคาน#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#เอเธนส์#,
@@ -9531,7 +9661,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#ดับบลิน#,
 			long => {
-				'daylight' => q(เวลามาตรฐานไอร์แลนด์),
+				'daylight' => q#เวลามาตรฐานไอร์แลนด์#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -9558,6 +9688,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#เคียฟ#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#คิรอฟ#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#ลิสบอน#,
 		},
@@ -9567,7 +9700,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#ลอนดอน#,
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอังกฤษ),
+				'daylight' => q#เวลาฤดูร้อนอังกฤษ#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -9618,6 +9751,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#ซาราเยโว#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#ซาราทอฟ#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#ซิมเฟอโรโปล#,
 		},
@@ -9635,6 +9771,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#ติรานา#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#อะลิยานอฟ#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#อัซโกร็อด#,
@@ -9668,134 +9807,134 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนยุโรปกลาง),
-				'generic' => q(เวลายุโรปกลาง),
-				'standard' => q(เวลามาตรฐานยุโรปกลาง),
+				'daylight' => q#เวลาฤดูร้อนยุโรปกลาง#,
+				'generic' => q#เวลายุโรปกลาง#,
+				'standard' => q#เวลามาตรฐานยุโรปกลาง#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนยุโรปตะวันออก),
-				'generic' => q(เวลายุโรปตะวันออก),
-				'standard' => q(เวลามาตรฐานยุโรปตะวันออก),
+				'daylight' => q#เวลาฤดูร้อนยุโรปตะวันออก#,
+				'generic' => q#เวลายุโรปตะวันออก#,
+				'standard' => q#เวลามาตรฐานยุโรปตะวันออก#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(เวลายุโรปตะวันออกไกล),
+				'standard' => q#เวลายุโรปตะวันออกไกล#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนยุโรปตะวันตก),
-				'generic' => q(เวลายุโรปตะวันตก),
-				'standard' => q(เวลามาตรฐานยุโรปตะวันตก),
+				'daylight' => q#เวลาฤดูร้อนยุโรปตะวันตก#,
+				'generic' => q#เวลายุโรปตะวันตก#,
+				'standard' => q#เวลามาตรฐานยุโรปตะวันตก#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนหมู่เกาะฟอล์กแลนด์),
-				'generic' => q(เวลาหมู่เกาะฟอล์กแลนด์),
-				'standard' => q(เวลามาตรฐานหมู่เกาะฟอล์กแลนด์),
+				'daylight' => q#เวลาฤดูร้อนหมู่เกาะฟอล์กแลนด์#,
+				'generic' => q#เวลาหมู่เกาะฟอล์กแลนด์#,
+				'standard' => q#เวลามาตรฐานหมู่เกาะฟอล์กแลนด์#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนฟิจิ),
-				'generic' => q(เวลาฟิจิ),
-				'standard' => q(เวลามาตรฐานฟิจิ),
+				'daylight' => q#เวลาฤดูร้อนฟิจิ#,
+				'generic' => q#เวลาฟิจิ#,
+				'standard' => q#เวลามาตรฐานฟิจิ#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(เวลาเฟรนช์เกียนา),
+				'standard' => q#เวลาเฟรนช์เกียนา#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(เวลาเฟรนช์เซาเทิร์นและแอนตาร์กติก),
+				'standard' => q#เวลาเฟรนช์เซาเทิร์นและแอนตาร์กติก#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(เวลามาตรฐานกรีนิช),
+				'standard' => q#เวลามาตรฐานกรีนิช#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(เวลากาลาปาโกส),
+				'standard' => q#เวลากาลาปาโกส#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(เวลาแกมเบียร์),
+				'standard' => q#เวลาแกมเบียร์#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนจอร์เจีย),
-				'generic' => q(เวลาจอร์เจีย),
-				'standard' => q(เวลามาตรฐานจอร์เจีย),
+				'daylight' => q#เวลาฤดูร้อนจอร์เจีย#,
+				'generic' => q#เวลาจอร์เจีย#,
+				'standard' => q#เวลามาตรฐานจอร์เจีย#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะกิลเบิร์ต),
+				'standard' => q#เวลาหมู่เกาะกิลเบิร์ต#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนกรีนแลนด์ตะวันออก),
-				'generic' => q(เวลากรีนแลนด์ตะวันออก),
-				'standard' => q(เวลามาตรฐานกรีนแลนด์ตะวันออก),
+				'daylight' => q#เวลาฤดูร้อนกรีนแลนด์ตะวันออก#,
+				'generic' => q#เวลากรีนแลนด์ตะวันออก#,
+				'standard' => q#เวลามาตรฐานกรีนแลนด์ตะวันออก#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนกรีนแลนด์ตะวันตก),
-				'generic' => q(เวลากรีนแลนด์ตะวันตก),
-				'standard' => q(เวลามาตรฐานกรีนแลนด์ตะวันตก),
+				'daylight' => q#เวลาฤดูร้อนกรีนแลนด์ตะวันตก#,
+				'generic' => q#เวลากรีนแลนด์ตะวันตก#,
+				'standard' => q#เวลามาตรฐานกรีนแลนด์ตะวันตก#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(เวลากวม),
+				'standard' => q#เวลากวม#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(เวลากัลฟ์),
+				'standard' => q#เวลากัลฟ์#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(เวลากายอานา),
+				'standard' => q#เวลากายอานา#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(เวลาออมแสงฮาวาย-อะลูเชียน),
-				'generic' => q(เวลาฮาวาย-อะลูเชียน),
-				'standard' => q(เวลามาตรฐานฮาวาย-อะลูเชียน),
+				'daylight' => q#เวลาออมแสงฮาวาย-อะลูเชียน#,
+				'generic' => q#เวลาฮาวาย-อะลูเชียน#,
+				'standard' => q#เวลามาตรฐานฮาวาย-อะลูเชียน#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนฮ่องกง),
-				'generic' => q(เวลาฮ่องกง),
-				'standard' => q(เวลามาตรฐานฮ่องกง),
+				'daylight' => q#เวลาฤดูร้อนฮ่องกง#,
+				'generic' => q#เวลาฮ่องกง#,
+				'standard' => q#เวลามาตรฐานฮ่องกง#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนฮอฟด์),
-				'generic' => q(เวลาฮอฟด์),
-				'standard' => q(เวลามาตรฐานฮอฟด์),
+				'daylight' => q#เวลาฤดูร้อนฮอฟด์#,
+				'generic' => q#เวลาฮอฟด์#,
+				'standard' => q#เวลามาตรฐานฮอฟด์#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(เวลาอินเดีย),
+				'standard' => q#เวลาอินเดีย#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -9833,264 +9972,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(เวลามหาสมุทรอินเดีย),
+				'standard' => q#เวลามหาสมุทรอินเดีย#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(เวลาอินโดจีน),
+				'standard' => q#เวลาอินโดจีน#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(เวลาอินโดนีเซียตอนกลาง),
+				'standard' => q#เวลาอินโดนีเซียตอนกลาง#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(เวลาอินโดนีเซียฝั่งตะวันออก),
+				'standard' => q#เวลาอินโดนีเซียฝั่งตะวันออก#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(เวลาอินโดนีเซียฝั่งตะวันตก),
+				'standard' => q#เวลาอินโดนีเซียฝั่งตะวันตก#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(เวลาออมแสงอิหร่าน),
-				'generic' => q(เวลาอิหร่าน),
-				'standard' => q(เวลามาตรฐานอิหร่าน),
+				'daylight' => q#เวลาออมแสงอิหร่าน#,
+				'generic' => q#เวลาอิหร่าน#,
+				'standard' => q#เวลามาตรฐานอิหร่าน#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอีร์คุตสค์),
-				'generic' => q(เวลาอีร์คุตสค์),
-				'standard' => q(เวลามาตรฐานอีร์คุตสค์),
+				'daylight' => q#เวลาฤดูร้อนอีร์คุตสค์#,
+				'generic' => q#เวลาอีร์คุตสค์#,
+				'standard' => q#เวลามาตรฐานอีร์คุตสค์#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(เวลาออมแสงอิสราเอล),
-				'generic' => q(เวลาอิสราเอล),
-				'standard' => q(เวลามาตรฐานอิสราเอล),
+				'daylight' => q#เวลาออมแสงอิสราเอล#,
+				'generic' => q#เวลาอิสราเอล#,
+				'standard' => q#เวลามาตรฐานอิสราเอล#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(เวลาออมแสงญี่ปุ่น),
-				'generic' => q(เวลาญี่ปุ่น),
-				'standard' => q(เวลามาตรฐานญี่ปุ่น),
+				'daylight' => q#เวลาออมแสงญี่ปุ่น#,
+				'generic' => q#เวลาญี่ปุ่น#,
+				'standard' => q#เวลามาตรฐานญี่ปุ่น#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนเปโตรปัฟลอฟสค์-คัมชัตสกี),
-				'generic' => q(เวลาคัมชัตคา),
-				'standard' => q(เวลาเปโตรปัฟลอฟสค์-คัมชัตสกี),
+				'daylight' => q#เวลาฤดูร้อนเปโตรปัฟลอฟสค์-คัมชัตสกี#,
+				'generic' => q#เวลาคัมชัตคา#,
+				'standard' => q#เวลาเปโตรปัฟลอฟสค์-คัมชัตสกี#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(เวลาคาซัคสถานตะวันออก),
+				'standard' => q#เวลาคาซัคสถานตะวันออก#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(เวลาคาซัคสถานตะวันตก),
+				'standard' => q#เวลาคาซัคสถานตะวันตก#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(เวลาออมแสงเกาหลี),
-				'generic' => q(เวลาเกาหลี),
-				'standard' => q(เวลามาตรฐานเกาหลี),
+				'daylight' => q#เวลาออมแสงเกาหลี#,
+				'generic' => q#เวลาเกาหลี#,
+				'standard' => q#เวลามาตรฐานเกาหลี#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(เวลาคอสไร),
+				'standard' => q#เวลาคอสไร#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนครัสโนยาสค์),
-				'generic' => q(เวลาครัสโนยาสค์),
-				'standard' => q(เวลามาตรฐานครัสโนยาสค์),
+				'daylight' => q#เวลาฤดูร้อนครัสโนยาสค์#,
+				'generic' => q#เวลาครัสโนยาสค์#,
+				'standard' => q#เวลามาตรฐานครัสโนยาสค์#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(เวลาคีร์กีซสถาน),
+				'standard' => q#เวลาคีร์กีซสถาน#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(เวลาลังกา),
+				'standard' => q#เวลาลังกา#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะไลน์),
+				'standard' => q#เวลาหมู่เกาะไลน์#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(เวลาออมแสงของลอร์ดโฮว์),
-				'generic' => q(เวลาลอร์ดโฮว),
-				'standard' => q(เวลามาตรฐานลอร์ดโฮว์),
+				'daylight' => q#เวลาออมแสงลอร์ดโฮว์#,
+				'generic' => q#เวลาลอร์ดโฮว์#,
+				'standard' => q#เวลามาตรฐานลอร์ดโฮว์#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนมาเก๊า),
-				'generic' => q(เวลามาเก๊า),
-				'standard' => q(เวลามาตรฐานมาเก๊า),
+				'daylight' => q#เวลาฤดูร้อนมาเก๊า#,
+				'generic' => q#เวลามาเก๊า#,
+				'standard' => q#เวลามาตรฐานมาเก๊า#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(เวลาเกาะแมกควอรี),
+				'standard' => q#เวลาเกาะแมกควอรี#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนมากาดาน),
-				'generic' => q(เวลามากาดาน),
-				'standard' => q(เวลามาตรฐานมากาดาน),
+				'daylight' => q#เวลาฤดูร้อนมากาดาน#,
+				'generic' => q#เวลามากาดาน#,
+				'standard' => q#เวลามาตรฐานมากาดาน#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(เวลามาเลเซีย),
+				'standard' => q#เวลามาเลเซีย#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(เวลามัลดีฟส์),
+				'standard' => q#เวลามัลดีฟส์#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(เวลามาร์เคซัส),
+				'standard' => q#เวลามาร์เคซัส#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะมาร์แชลล์),
+				'standard' => q#เวลาหมู่เกาะมาร์แชลล์#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนของมอริเชียส),
-				'generic' => q(เวลามอริเชียส),
-				'standard' => q(เวลามาตรฐานมอริเชียส),
+				'daylight' => q#เวลาฤดูร้อนของมอริเชียส#,
+				'generic' => q#เวลามอริเชียส#,
+				'standard' => q#เวลามาตรฐานมอริเชียส#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(เวลามอว์สัน),
+				'standard' => q#เวลามอว์สัน#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(เวลาออมแสงเม็กซิโกตะวันตกเฉียงเหนือ),
-				'generic' => q(เวลาเม็กซิโกตะวันตกเฉียงเหนือ),
-				'standard' => q(เวลามาตรฐานเม็กซิโกตะวันตกเฉียงเหนือ),
+				'daylight' => q#เวลาออมแสงเม็กซิโกตะวันตกเฉียงเหนือ#,
+				'generic' => q#เวลาเม็กซิโกตะวันตกเฉียงเหนือ#,
+				'standard' => q#เวลามาตรฐานเม็กซิโกตะวันตกเฉียงเหนือ#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(เวลาออมแสงแปซิฟิกเม็กซิโก),
-				'generic' => q(เวลาแปซิฟิกเม็กซิโก),
-				'standard' => q(เวลามาตรฐานแปซิฟิกเม็กซิโก),
+				'daylight' => q#เวลาออมแสงแปซิฟิกเม็กซิโก#,
+				'generic' => q#เวลาแปซิฟิกเม็กซิโก#,
+				'standard' => q#เวลามาตรฐานแปซิฟิกเม็กซิโก#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอูลานบาตอร์),
-				'generic' => q(เวลาอูลานบาตอร์),
-				'standard' => q(เวลามาตรฐานอูลานบาตอร์),
+				'daylight' => q#เวลาฤดูร้อนอูลานบาตอร์#,
+				'generic' => q#เวลาอูลานบาตอร์#,
+				'standard' => q#เวลามาตรฐานอูลานบาตอร์#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนมอสโก),
-				'generic' => q(เวลามอสโก),
-				'standard' => q(เวลามาตรฐานมอสโก),
+				'daylight' => q#เวลาฤดูร้อนมอสโก#,
+				'generic' => q#เวลามอสโก#,
+				'standard' => q#เวลามาตรฐานมอสโก#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(เวลาพม่า),
+				'standard' => q#เวลาพม่า#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(เวลานาอูรู),
+				'standard' => q#เวลานาอูรู#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(เวลาเนปาล),
+				'standard' => q#เวลาเนปาล#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนนิวแคลิโดเนีย),
-				'generic' => q(เวลานิวแคลิโดเนีย),
-				'standard' => q(เวลามาตรฐานนิวแคลิโดเนีย),
+				'daylight' => q#เวลาฤดูร้อนนิวแคลิโดเนีย#,
+				'generic' => q#เวลานิวแคลิโดเนีย#,
+				'standard' => q#เวลามาตรฐานนิวแคลิโดเนีย#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(เวลาออมแสงนิวซีแลนด์),
-				'generic' => q(เวลานิวซีแลนด์),
-				'standard' => q(เวลามาตรฐานนิวซีแลนด์),
+				'daylight' => q#เวลาออมแสงนิวซีแลนด์#,
+				'generic' => q#เวลานิวซีแลนด์#,
+				'standard' => q#เวลามาตรฐานนิวซีแลนด์#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(เวลาออมแสงนิวฟันด์แลนด์),
-				'generic' => q(เวลานิวฟันด์แลนด์),
-				'standard' => q(เวลามาตรฐานนิวฟันด์แลนด์),
+				'daylight' => q#เวลาออมแสงนิวฟันด์แลนด์#,
+				'generic' => q#เวลานิวฟันด์แลนด์#,
+				'standard' => q#เวลามาตรฐานนิวฟันด์แลนด์#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(เวลานีอูเอ),
+				'standard' => q#เวลานีอูเอ#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(เวลาเกาะนอร์ฟอล์ก),
+				'standard' => q#เวลาเกาะนอร์ฟอล์ก#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนของหมู่เกาะเฟอร์นันโด),
-				'generic' => q(เวลาหมู่เกาะเฟอร์นันโด),
-				'standard' => q(เวลามาตรฐานหมู่เกาะเฟอร์นันโด),
+				'daylight' => q#เวลาฤดูร้อนของหมู่เกาะเฟอร์นันโด#,
+				'generic' => q#เวลาหมู่เกาะเฟอร์นันโด#,
+				'standard' => q#เวลามาตรฐานหมู่เกาะเฟอร์นันโด#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะมาเรียนาเหนือ),
+				'standard' => q#เวลาหมู่เกาะมาเรียนาเหนือ#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนโนโวซีบีสค์),
-				'generic' => q(เวลาโนโวซีบีสค์),
-				'standard' => q(เวลามาตรฐานโนโวซีบีสค์),
+				'daylight' => q#เวลาฤดูร้อนโนโวซีบีสค์#,
+				'generic' => q#เวลาโนโวซีบีสค์#,
+				'standard' => q#เวลามาตรฐานโนโวซีบีสค์#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนออมสค์),
-				'generic' => q(เวลาออมสค์),
-				'standard' => q(เวลามาตรฐานออมสค์),
+				'daylight' => q#เวลาฤดูร้อนออมสค์#,
+				'generic' => q#เวลาออมสค์#,
+				'standard' => q#เวลามาตรฐานออมสค์#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -10103,7 +10242,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#บูเกนวิลล์#,
 		},
 		'Pacific/Chatham' => {
-			exemplarCity => q#แชแทม#,
+			exemplarCity => q#แชทัม#,
 		},
 		'Pacific/Easter' => {
 			exemplarCity => q#อีสเตอร์#,
@@ -10112,7 +10251,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#เอฟาเต#,
 		},
 		'Pacific/Enderbury' => {
-			exemplarCity => q#เอนเดอร์เบอร์รี#,
+			exemplarCity => q#เอนเดอร์เบอรี#,
 		},
 		'Pacific/Fakaofo' => {
 			exemplarCity => q#ฟาเคาโฟ#,
@@ -10145,7 +10284,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#คิริทิมาตี#,
 		},
 		'Pacific/Kosrae' => {
-			exemplarCity => q#คอสแร#,
+			exemplarCity => q#คอสไร#,
 		},
 		'Pacific/Kwajalein' => {
 			exemplarCity => q#ควาจาเลน#,
@@ -10154,7 +10293,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#มาจูโร#,
 		},
 		'Pacific/Marquesas' => {
-			exemplarCity => q#มาร์เควซัส#,
+			exemplarCity => q#มาร์เคซัส#,
 		},
 		'Pacific/Midway' => {
 			exemplarCity => q#มิดเวย์#,
@@ -10193,7 +10332,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ไซปัน#,
 		},
 		'Pacific/Tahiti' => {
-			exemplarCity => q#ทาฮิติ#,
+			exemplarCity => q#ตาฮีตี#,
 		},
 		'Pacific/Tarawa' => {
 			exemplarCity => q#ตาระวา#,
@@ -10212,245 +10351,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนปากีสถาน),
-				'generic' => q(เวลาปากีสถาน),
-				'standard' => q(เวลามาตรฐานปากีสถาน),
+				'daylight' => q#เวลาฤดูร้อนปากีสถาน#,
+				'generic' => q#เวลาปากีสถาน#,
+				'standard' => q#เวลามาตรฐานปากีสถาน#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(เวลาปาเลา),
+				'standard' => q#เวลาปาเลา#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(เวลาปาปัวนิวกินี),
+				'standard' => q#เวลาปาปัวนิวกินี#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนปารากวัย),
-				'generic' => q(เวลาปารากวัย),
-				'standard' => q(เวลามาตรฐานปารากวัย),
+				'daylight' => q#เวลาฤดูร้อนปารากวัย#,
+				'generic' => q#เวลาปารากวัย#,
+				'standard' => q#เวลามาตรฐานปารากวัย#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนเปรู),
-				'generic' => q(เวลาเปรู),
-				'standard' => q(เวลามาตรฐานเปรู),
+				'daylight' => q#เวลาฤดูร้อนเปรู#,
+				'generic' => q#เวลาเปรู#,
+				'standard' => q#เวลามาตรฐานเปรู#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนฟิลิปปินส์),
-				'generic' => q(เวลาฟิลิปปินส์),
-				'standard' => q(เวลามาตรฐานฟิลิปปินส์),
+				'daylight' => q#เวลาฤดูร้อนฟิลิปปินส์#,
+				'generic' => q#เวลาฟิลิปปินส์#,
+				'standard' => q#เวลามาตรฐานฟิลิปปินส์#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะฟินิกซ์),
+				'standard' => q#เวลาหมู่เกาะฟินิกซ์#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(เวลาออมแสงของแซงปีแยร์และมีเกอลง),
-				'generic' => q(เวลาแซงปีแยร์และมีเกอลง),
-				'standard' => q(เวลามาตรฐานแซงปีแยร์และมีเกอลง),
+				'daylight' => q#เวลาออมแสงของแซงปีแยร์และมีเกอลง#,
+				'generic' => q#เวลาแซงปีแยร์และมีเกอลง#,
+				'standard' => q#เวลามาตรฐานแซงปีแยร์และมีเกอลง#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(เวลาพิตแคร์น),
+				'standard' => q#เวลาพิตแคร์น#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(เวลาโปเนป),
+				'standard' => q#เวลาโปนาเป#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#เวลาเปียงยาง#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนคืยซิลออร์ดา),
-				'generic' => q(เวลาคืยซิลออร์ดา),
-				'standard' => q(เวลามาตรฐานคืยซิลออร์ดา),
+				'daylight' => q#เวลาฤดูร้อนคืยซิลออร์ดา#,
+				'generic' => q#เวลาคืยซิลออร์ดา#,
+				'standard' => q#เวลามาตรฐานคืยซิลออร์ดา#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(เวลาเรอูนียง),
+				'standard' => q#เวลาเรอูนียง#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(เวลาโรธีรา),
+				'standard' => q#เวลาโรธีรา#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนซาคาลิน),
-				'generic' => q(เวลาซาคาลิน),
-				'standard' => q(เวลามาตรฐานซาคาลิน),
+				'daylight' => q#เวลาฤดูร้อนซาคาลิน#,
+				'generic' => q#เวลาซาคาลิน#,
+				'standard' => q#เวลามาตรฐานซาคาลิน#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนซามารา),
-				'generic' => q(เวลาซามารา),
-				'standard' => q(เวลามาตรฐานซามารา),
+				'daylight' => q#เวลาฤดูร้อนซามารา#,
+				'generic' => q#เวลาซามารา#,
+				'standard' => q#เวลามาตรฐานซามารา#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนซามัว),
-				'generic' => q(เวลาซามัว),
-				'standard' => q(เวลามาตรฐานซามัว),
+				'daylight' => q#เวลาฤดูร้อนซามัว#,
+				'generic' => q#เวลาซามัว#,
+				'standard' => q#เวลามาตรฐานซามัว#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(เวลาเซเชลส์),
+				'standard' => q#เวลาเซเชลส์#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(เวลาสิงคโปร์),
+				'standard' => q#เวลาสิงคโปร์#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(เวลาหมู่เกาะโซโลมอน),
+				'standard' => q#เวลาหมู่เกาะโซโลมอน#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(เวลาเซาท์จอร์เจีย),
+				'standard' => q#เวลาเซาท์จอร์เจีย#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(เวลาซูรินาเม),
+				'standard' => q#เวลาซูรินาเม#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(เวลาโซวา),
+				'standard' => q#เวลาไซโยวา#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(เวลาตาฮีตี),
+				'standard' => q#เวลาตาฮีตี#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(เวลาออมแสงไทเป),
-				'generic' => q(เวลาไทเป),
-				'standard' => q(เวลามาตรฐานไทเป),
+				'daylight' => q#เวลาออมแสงไทเป#,
+				'generic' => q#เวลาไทเป#,
+				'standard' => q#เวลามาตรฐานไทเป#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(เวลาทาจิกิสถาน),
+				'standard' => q#เวลาทาจิกิสถาน#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(เวลาโตเกเลา),
+				'standard' => q#เวลาโตเกเลา#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนตองกา),
-				'generic' => q(เวลาตองกา),
-				'standard' => q(เวลามาตรฐานตองกา),
+				'daylight' => q#เวลาฤดูร้อนตองกา#,
+				'generic' => q#เวลาตองกา#,
+				'standard' => q#เวลามาตรฐานตองกา#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(เวลาชุก),
+				'standard' => q#เวลาชุก#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนเติร์กเมนิสถาน),
-				'generic' => q(เวลาเติร์กเมนิสถาน),
-				'standard' => q(เวลามาตรฐานเติร์กเมนิสถาน),
+				'daylight' => q#เวลาฤดูร้อนเติร์กเมนิสถาน#,
+				'generic' => q#เวลาเติร์กเมนิสถาน#,
+				'standard' => q#เวลามาตรฐานเติร์กเมนิสถาน#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(เวลาตูวาลู),
+				'standard' => q#เวลาตูวาลู#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอุรุกวัย),
-				'generic' => q(เวลาอุรุกวัย),
-				'standard' => q(เวลามาตรฐานอุรุกวัย),
+				'daylight' => q#เวลาฤดูร้อนอุรุกวัย#,
+				'generic' => q#เวลาอุรุกวัย#,
+				'standard' => q#เวลามาตรฐานอุรุกวัย#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนอุซเบกิสถาน),
-				'generic' => q(เวลาอุซเบกิสถาน),
-				'standard' => q(เวลามาตรฐานอุซเบกิสถาน),
+				'daylight' => q#เวลาฤดูร้อนอุซเบกิสถาน#,
+				'generic' => q#เวลาอุซเบกิสถาน#,
+				'standard' => q#เวลามาตรฐานอุซเบกิสถาน#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนวานูอาตู),
-				'generic' => q(เวลาวานูอาตู),
-				'standard' => q(เวลามาตรฐานวานูอาตู),
+				'daylight' => q#เวลาฤดูร้อนวานูอาตู#,
+				'generic' => q#เวลาวานูอาตู#,
+				'standard' => q#เวลามาตรฐานวานูอาตู#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(เวลาเวเนซุเอลา),
+				'standard' => q#เวลาเวเนซุเอลา#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนวลาดีวอสตอค),
-				'generic' => q(เวลาวลาดีวอสตอค),
-				'standard' => q(เวลามาตรฐานวลาดีวอสตอค),
+				'daylight' => q#เวลาฤดูร้อนวลาดีวอสตอค#,
+				'generic' => q#เวลาวลาดีวอสตอค#,
+				'standard' => q#เวลามาตรฐานวลาดีวอสตอค#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนวอลโกกราด),
-				'generic' => q(เวลาวอลโกกราด),
-				'standard' => q(เวลามาตรฐานวอลโกกราด),
+				'daylight' => q#เวลาฤดูร้อนวอลโกกราด#,
+				'generic' => q#เวลาวอลโกกราด#,
+				'standard' => q#เวลามาตรฐานวอลโกกราด#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(เวลาวอสตอค),
+				'standard' => q#เวลาวอสตอค#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(เวลาเกาะเวก),
+				'standard' => q#เวลาเกาะเวก#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(เวลาวาลลิสและฟุตูนา),
+				'standard' => q#เวลาวาลลิสและฟุตูนา#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนยาคุตสค์),
-				'generic' => q(เวลายาคุตสค์),
-				'standard' => q(เวลามาตรฐานยาคุตสค์),
+				'daylight' => q#เวลาฤดูร้อนยาคุตสค์#,
+				'generic' => q#เวลายาคุตสค์#,
+				'standard' => q#เวลามาตรฐานยาคุตสค์#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(เวลาฤดูร้อนเยคาเตรินบูร์ก),
-				'generic' => q(เวลาเยคาเตรินบูร์ก),
-				'standard' => q(เวลามาตรฐานเยคาเตรินบูร์ก),
+				'daylight' => q#เวลาฤดูร้อนเยคาเตรินบูร์ก#,
+				'generic' => q#เวลาเยคาเตรินบูร์ก#,
+				'standard' => q#เวลามาตรฐานเยคาเตรินบูร์ก#,
 			},
 		},
 	 } }

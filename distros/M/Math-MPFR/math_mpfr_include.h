@@ -124,6 +124,9 @@ _WIN32_BIZARRE_INFNAN    : Defined (on Windows only) when the perl version
                            These earlier perl versions generally stringified
                            NaNs as (-)1.#IND and Infs as (-)1.#INF.
 
+LD_SUBNORMAL_BUG         : Defined for mpfr-3.1.4 and earlier if and only if
+                           LDBL_MANT_DIG == 64
+
 *************************************************/
 
 #include <stdio.h>
@@ -159,6 +162,10 @@ typedef __float128 float128 __attribute__ ((aligned(8)));
 #else
 typedef __float128 float128;
 #endif
+#endif
+
+#if (!defined(MPFR_VERSION) || MPFR_VERSION <= 196868) && LDBL_MANT_DIG == 64
+#define LD_SUBNORMAL_BUG 1
 #endif
 
 #if LDBL_MANT_DIG == 106

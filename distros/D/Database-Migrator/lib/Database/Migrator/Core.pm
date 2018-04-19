@@ -4,11 +4,12 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Database::Migrator::Types qw( ArrayRef Bool Dir File Maybe Str );
 use DBI;
 use Eval::Closure qw( eval_closure );
+use IPC::Run3 qw( run3 );
 use Log::Dispatch;
 use Moose::Util::TypeConstraints qw( duck_type );
 use MooseX::Getopt::OptionTypeMap;
@@ -176,6 +177,19 @@ sub _run_one_migration {
             $self->logger()->debug(" - running $basename as sql");
             $self->_run_ddl($file);
         }
+        elsif ( -x $file ) {
+            $self->logger->debug(
+                " - running $basename as a separate program");
+
+            next if $self->dry_run;
+
+            my @command = ( $file->absolute->stringify );
+            my $stderr  = q{};
+            run3( \@command, \undef, \undef, \$stderr );
+            if ( $? != 0 || $stderr ne q{} ) {
+                die "$file failed: $stderr";
+            }
+        }
         else {
             $self->logger()->debug(" - running $basename as perl code");
 
@@ -286,7 +300,7 @@ Database::Migrator::Core - Core role for Database::Migrator implementation class
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

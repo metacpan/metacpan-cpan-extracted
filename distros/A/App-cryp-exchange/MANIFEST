@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/cryp/Exchange/bitcoin_indonesia.pm
+lib/App/cryp/Exchange/cryptopia.pm
 lib/App/cryp/Exchange/gdax.pm
 lib/App/cryp/Role/Exchange.pm
 lib/App/cryp/exchange.pm

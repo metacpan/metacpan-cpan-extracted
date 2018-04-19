@@ -171,6 +171,18 @@ for my $service ( 'factors', 'insights', 'score' ) {
     };
 }
 
+for my $param (qw(account_id user_id)) {
+    subtest "$param constructor param" => sub {
+        my $client = WebService::MinFraud::Client->new(
+            $param      => 42,
+            license_key => 'abcdef123456',
+        );
+        for my $method (qw(account_id user_id)) {
+            is( $client->$method, 42, "$method returns correct value" );
+        }
+    };
+}
+
 done_testing();
 
 sub _test_ws_error {
@@ -217,7 +229,7 @@ sub _run_request {
     );
 
     return WebService::MinFraud::Client->new(
-        user_id     => 42,
+        account_id  => 42,
         license_key => 'abcdef123456',
         ua          => $ua,
         %{ $args->{client_args} || {} }

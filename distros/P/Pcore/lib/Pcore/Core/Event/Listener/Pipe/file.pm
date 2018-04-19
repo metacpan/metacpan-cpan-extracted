@@ -65,14 +65,12 @@ sub sendlog ( $self, $ev ) {
 
             # indent
             $ev->{text} =~ s/^/$INDENT/smg;
-
-            # remove all trailing "\n"
-            local $/ = q[];
-
-            chomp $ev->{text};
         }
 
         my $message = $self->{_tmpl}->render( 'message', $ev );
+
+        # remove all trailing "\n"
+        $message->$* =~ s/\s+\z/\n/sm;
 
         flock $self->{_h}, LOCK_EX or die;
 

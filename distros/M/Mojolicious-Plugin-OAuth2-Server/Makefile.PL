@@ -13,7 +13,7 @@ WriteMakefile(
   LICENSE       => 'perl',
   PREREQ_PM => {
     'Mojolicious'  => '5.37',
-    'Net::OAuth2::AuthorizationServer'  => '0.16',
+    'Net::OAuth2::AuthorizationServer'  => '0.17',
     'Carp'            => 0,
   },
   BUILD_REQUIRES => {

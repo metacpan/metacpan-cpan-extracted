@@ -33,12 +33,12 @@
       "runtime" : {
          "requires" : {
             "Import::Export" : "0.04",
-            "Struct::Match" : "0.03",
+            "Struct::Match" : "0.04",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

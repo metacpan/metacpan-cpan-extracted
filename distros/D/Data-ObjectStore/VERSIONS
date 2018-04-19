@@ -1,3 +1,6 @@
+1.106 - added mode and group options for the createion
+        of object stores
+1.105 - made Data::ObjectStore::get_id and Data::ObjectStore::Container::id public methods
 1.104 - make sure to use Data::RecordStore v 3.17
 1.103 - 
 1.102 - fix dependency issue.

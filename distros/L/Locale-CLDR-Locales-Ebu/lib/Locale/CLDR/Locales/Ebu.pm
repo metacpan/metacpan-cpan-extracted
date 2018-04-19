@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ebu - Package for language Embu
 
 package Locale::CLDR::Locales::Ebu;
 # This file auto generated from Data\common\main\ebu.xml
-#	on Fri 29 Apr  6:58:18 pm GMT
+#	on Fri 13 Apr  7:06:54 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -328,7 +329,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'Ĩ', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ũ', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i ĩ j k l m n o p q r s t u ũ v w x y z])},
+			main => qr{[a b c d e f g h i ĩ j k l m n o p q r s t u ũ v w x y z]},
 		};
 	},
 EOT
@@ -827,11 +828,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{UT},
 					'am' => q{KI},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{KI},
 					'pm' => q{UT},
 				},

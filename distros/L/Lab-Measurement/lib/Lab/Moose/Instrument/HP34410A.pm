@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34410A;
-$Lab::Moose::Instrument::HP34410A::VERSION = '3.630';
+$Lab::Moose::Instrument::HP34410A::VERSION = '3.631';
 #ABSTRACT: HP 34410A digital multimeter.
 
 use 5.010;
@@ -63,7 +63,7 @@ Lab::Moose::Instrument::HP34410A - HP 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 SYNOPSIS
 
@@ -81,11 +81,11 @@ Used roles:
 
 =over
 
-=item Lab::Moose::Instrument::SCPI::Sense::Function
+=item L<Lab::Moose::Instrument::SCPI::Sense::Function>
 
-=item Lab::Moose::Instrument::SCPI::Sense::Range
+=item L<Lab::Moose::Instrument::SCPI::Sense::Range>
 
-=item Lab::Moose::Instrument::SCPI::Sense::NPLC
+=item L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
 
 =back
 

@@ -17,7 +17,7 @@ is ($locale->locale_name('fr_CA'), 'Canadian French', 'Name with known region') 
 is ($locale->locale_name('fr_BE'), 'French (Belgium)', 'Name with unknown region') ;
 is ($locale->locale_name('fr_BE'), 'French (Belgium)', 'Cached method') ;
 is ($locale->language_name, 'English', 'Language name');
-is ($locale->language_name('wibble'), 'Unknown Language', 'Unknown Language name');
+is ($locale->language_name('wibble'), 'Unknown language', 'Unknown Language name');
 is ($locale->script_name('Cher'), 'Cherokee', 'Script name');
 is ($locale->script_name('wibl'), 'Unknown Script', 'Invalid Script name');
 is ($locale->region_name('GB'), 'United Kingdom', 'Region name');

@@ -15,6 +15,7 @@ has conn => ( is => 'ro', isa => HashRef, init_arg => undef );
 
 around new => sub ( $orig, $self, $type, % ) {
     my %args = (
+        parent_id => undef,
         listen    => undef,    # RPC server listen
         token     => undef,
         buildargs => undef,    # class constructor arguments
@@ -29,7 +30,8 @@ around new => sub ( $orig, $self, $type, % ) {
     if ($Pcore::RPC::Tmpl::CPID) {
         Pcore::RPC::Tmpl::run(
             $type,
-            {   listen    => $args{listen},
+            {   parent_id => $args{parent_id},
+                listen    => $args{listen},
                 token     => $args{token},
                 buildargs => $args{buildargs},
             },
@@ -59,6 +61,7 @@ around new => sub ( $orig, $self, $type, % ) {
         script_path => $ENV->{SCRIPT_PATH},
         version     => $main::VERSION->normal,
         scandeps    => $ENV->{SCAN_DEPS} ? 1 : undef,
+        parent_id   => $args{parent_id},
         listen      => $args{listen},
         token       => $args{token},
         buildargs   => $args{buildargs},

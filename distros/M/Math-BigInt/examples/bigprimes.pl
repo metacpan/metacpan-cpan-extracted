@@ -3,8 +3,8 @@
 use Test;
 BEGIN { plan tests => 17; }
 
-use lib '../lib';				# comment out to use old module
-#use lib '../../old/Math-BigInt-0.01/lib'; 	# for old version
+use lib '../lib';                               # comment out to use old module
+#use lib '../../old/Math-BigInt-0.01/lib';      # for old version
 
 use strict;
 #use Math::BigInt;
@@ -26,14 +26,13 @@ my $two = Math::BigInt->new(2);
 # Also there is len(), since the old BigInt has not got length() and we want
 # this script to be comparable between old and new version.
 
-
 ##############################################################################
 # Todo: these do not complete in reasonable time:
 
 # $x = $two ** 6972593; $x--;    #ok (len($x),'2098960');
 # $x = $two ** 3021377; $x--;    #ok (len($x),'909526');
 # $x = $two ** 756839; $x--;     #ok (len($x),'227832');
-# $x = 1041870 ** 32768; $x++;  	#ok (len($x),'197192');
+# $x = 1041870 ** 32768; $x++;   #ok (len($x),'197192');
 
 ##############################################################################
 # but these do:
@@ -70,7 +69,6 @@ $x = Math::BigInt->new('340789152474053904109001');
 $x *= '14193959303';
 $x = (2**3833-1) / $x;
 ok (len($x),'1121');
-
 
 #(2^4751-1)/(268982617*3274778783*629530076753*81630665742097*1507074535068001)
 $x = Math::BigInt->new('268982617');

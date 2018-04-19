@@ -18,6 +18,7 @@ t/critic.t
 t/cv.t
 t/dist.t
 t/geofarm.t
+t/geonames.t
 t/google.t
 t/googleplaces.t
 t/gv.t

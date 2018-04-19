@@ -581,7 +581,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 SYNOPSIS
 
@@ -893,9 +893,9 @@ The following barewords are transformed:
 
 =head2 App::ElasticSearch::Utilities::QueryString::IP
 
-If a field is an IP address wild card, it is transformed:
+If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
-    src_ip:10.* => src_ip:[10.0.0.0 TO 10.255.255.255]
+    src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
 
 =head2 App::ElasticSearch::Utilities::Underscored
 

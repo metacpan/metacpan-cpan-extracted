@@ -2,8 +2,10 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::MockTime qw( set_fixed_time );
 use Data::Random qw( rand_time );
 
+set_fixed_time('2018-01-21T18:54:00Z');
 
 # Test default w/ no params
 test_range();
@@ -19,8 +21,6 @@ test_range('9:0:0', '10:0:0');
 
 # Test min + max options using "now"
 {
-    # Technically, the clock could roll over to a new second between these two statements.
-    # But I don't think I'm going to worry about it unless we see a failure here from CPAN Testers.
     my $time = rand_time( min => 'now', max => 'now' );
     my ( $hour, $min, $sec ) = ( localtime() )[ 2, 1, 0 ];
 

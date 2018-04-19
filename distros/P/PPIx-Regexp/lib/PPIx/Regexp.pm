@@ -169,7 +169,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 =head2 new
 
@@ -736,7 +736,9 @@ then follow that interpolation by a character class.
 The F<perlop> documentation notes that in this case what Perl does is to
 guess. That is, it employs various heuristics on the code to try to
 figure out what the programmer wanted. These heuristics are documented
-as being undocumented (!) and subject to change without notice.
+as being undocumented (!) and subject to change without notice. As an
+example of the problems even F<perl> faces in parsing Perl, see
+L<https://rt.perl.org/Public/Bug/Display.html?id=133027>.
 
 Given this situation, this module's chances of duplicating every Perl
 version's interpretation of every regular expression are pretty much nil.
@@ -783,10 +785,12 @@ Accordingly,
 L<perl_version_introduced()|PPIx::Regexp/perl_version_introduced>
 returns C<5.0>. At the moment
 L<perl_version_removed()|PPIx::Regexp/perl_version_removed> returns
-C<'5.025001'>, but if this construction warns in Perl C<5.26.1> this
-will become C<undef>. This is not quite the same as described above, but
-is consistent with the L<NOTICE|/NOTICE> near the beginning of this
-document.
+C<'5.025001'>. But if it is present with or without warning in C<5.28>,
+L<perl_version_removed()|PPIx::Regexp/perl_version_removed> will become
+C<undef>. If you need finer resolution than this, see
+L<PPIx::Regexp::Element|PPIx::Regexp::Element> methods
+l<accepts_perl()|ppix::regexp::element/accepts_perl> and
+l<requirements_for_perl()|ppix::regexp::element/requirements_for_perl>
 
 =head2 Static Parsing
 
@@ -854,9 +858,16 @@ in various ways, some of which seem to conflict with Perl 5.010.
 
 =head1 SEE ALSO
 
+L<Regexp::Parsertron|Regexp::Parsertron>, which uses
+L<Marpa::R2|Marpa::R2> to parse the regexp, and L<Tree|Tree> for
+navigation. Unlike C<PPIx::Regexp|PPIx::Regexp>,
+L<Regexp::Parsertron|Regexp::Parsertron> supports modification of the
+parse tree.
+
 L<Regexp::Parser|Regexp::Parser>, which parses a bare regular expression
 (without enclosing C<qr{}>, C<m//>, or whatever) and uses a different
-navigation model.
+navigation model. After a long hiatus, this module has been adopted, and
+is again supported.
 
 =head1 SUPPORT
 

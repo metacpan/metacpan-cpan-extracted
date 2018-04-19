@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter (); BEGIN { *import = \&Exporter::import }
 
-our $VERSION = '1.500001';
+our $VERSION = '1.500002';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -127,7 +127,8 @@ with the interface.
 
 Inside a callback block (such as C<any { }>), C<@_> will be empty when using the
 pure perl implementation.  With the XS implementation, the outer C<@_> will be
-visible.
+visible.  Under the perl debugger, the XS implementation will also not be able
+to see the outer C<@_>.
 
 =back
 

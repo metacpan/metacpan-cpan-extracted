@@ -67,8 +67,8 @@ share {
 
     meta->after_hook(gather_share => sub {
         my $build= shift;
-        my $flags = '-DWin32';
-        $flags .= ' -DWin64' if $bits == 64;
+        my $flags = '-DWIN32';
+        $flags .= ' -DWIN64' if $bits == 64;
         if (my $ver = WINVER()) {
             $flags .= " -D_WINVER=$ver -D_WIN32_WINNT=$ver"
         }

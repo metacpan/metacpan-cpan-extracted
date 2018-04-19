@@ -14,7 +14,10 @@
     <img alt="Coverage Status" src="https://coveralls.io/repos/github/epfl-devrun/epfl-sciper-list/badge.svg?branch=master"/>
   </a>
   <a href="https://raw.githubusercontent.com/epfl-devrun/epfl-sciper-list/master/LICENSE">
-    <img alt="MIT License" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg">
+    <img alt="Apache License 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg">
+  </a>
+  <a href="https://metacpan.org/release/EPFL-Sciper-List">
+    <img alt="CPAN Version" src="https://img.shields.io/cpan/v/EPFL-Sciper-List.svg">
   </a>
 </p>
 
@@ -35,11 +38,11 @@ Usage
 ### Command Line
 
 ```bash
-$ epfl-sciper-list.pl --help
+$ epfl-sciper-list --help
 Usage:
-  epfl-sciper-list.pl
-  epfl-sciper-list.pl --output=json > sciper.json
-  epfl-sciper-list.pl --output=tsv > sciper.tsv
+  epfl-sciper-list
+  epfl-sciper-list --output=json > sciper.json
+  epfl-sciper-list --output=tsv > sciper.tsv
 
 Options:
   --output=tsv|json
@@ -73,6 +76,6 @@ License
 
 Apache License 2.0
 
-(c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2017.
+(c) ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2017-2018.
 
 See the [LICENSE](LICENSE) file for more details.

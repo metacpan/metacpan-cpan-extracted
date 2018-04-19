@@ -165,7 +165,8 @@ SKIP: {
    $cmd = [ sub { print 'Hello World' } ];
    $r   = run_cmd_test( q(), $cmd, { async => 1, use_ipc_run => 1 } );
 
-   like   $r->out, qr{ background }msx, 'IPC::Run - async coderef';
+   $ENV{AUTHOR_TESTING}
+      and like $r->out, qr{ background }msx, 'IPC::Run - async coderef';
    unlike $r->rv,  qr{ \(-1\) }msx,     'IPC::Run - async coderef captures pid';
 
    $cmd = [ $perl, '-e', 'sleep 5' ];

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Haw::Any::Us - Package for language Hawaiian
 
 package Locale::CLDR::Locales::Haw::Any::Us;
 # This file auto generated from Data\common\main\haw_US.xml
-#	on Fri 29 Apr  7:06:41 pm GMT
+#	on Fri 13 Apr  7:12:37 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 

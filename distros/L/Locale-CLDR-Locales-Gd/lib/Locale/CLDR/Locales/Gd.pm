@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Gd - Package for language Scottish Gaelic
 
 package Locale::CLDR::Locales::Gd;
 # This file auto generated from Data\common\main\gd.xml
-#	on Fri 29 Apr  7:05:09 pm GMT
+#	on Fri 13 Apr  7:11:35 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -61,6 +62,7 @@ has 'display_name_language' => (
  				'akz' => 'Alabama',
  				'ale' => 'Aleutais',
  				'aln' => 'Albàinis Ghegeach',
+ 				'alt' => 'Altais Dheasach',
  				'am' => 'Amtharais',
  				'an' => 'Aragonais',
  				'ang' => 'Seann-Bheurla',
@@ -68,7 +70,7 @@ has 'display_name_language' => (
  				'ar' => 'Arabais',
  				'ar_001' => 'Nuadh-Arabais Stannardach',
  				'arc' => 'Aramais',
- 				'arn' => 'Mapuche',
+ 				'arn' => 'Mapudungun',
  				'aro' => 'Araona',
  				'arp' => 'Arapaho',
  				'arq' => 'Arabais Aildireach',
@@ -109,7 +111,7 @@ has 'display_name_language' => (
  				'bkm' => 'Kom',
  				'bla' => 'Siksika',
  				'bm' => 'Bambara',
- 				'bn' => 'Beangailis',
+ 				'bn' => 'Bangla',
  				'bo' => 'Tibeitis',
  				'bpy' => 'Bishnupriya',
  				'bqi' => 'Bakhtiari',
@@ -142,13 +144,14 @@ has 'display_name_language' => (
  				'chp' => 'Chipewyan',
  				'chr' => 'Cherokee',
  				'chy' => 'Cheyenne',
- 				'ckb' => 'Cùrdais Soranî',
+ 				'ckb' => 'Cùrdais Mheadhanach',
  				'co' => 'Corsais',
  				'cop' => 'Coptais',
  				'cps' => 'Capiznon',
  				'cr' => 'Cree',
  				'crh' => 'Turcais Chriomach',
- 				'cs' => 'Seacais',
+ 				'crs' => 'Seiseallais',
+ 				'cs' => 'Seicis',
  				'csb' => 'Caisiubais',
  				'cu' => 'Slàbhais na h-Eaglaise',
  				'cv' => 'Chuvash',
@@ -297,6 +300,7 @@ has 'display_name_language' => (
  				'kaj' => 'Jju',
  				'kam' => 'Kamba',
  				'kaw' => 'Kawi',
+ 				'kbd' => 'Cabardais',
  				'kbl' => 'Kanembu',
  				'kcg' => 'Tyap',
  				'kde' => 'Makonde',
@@ -327,10 +331,12 @@ has 'display_name_language' => (
  				'krc' => 'Karachay-Balkar',
  				'kri' => 'Krio',
  				'krj' => 'Kinaray-a',
+ 				'krl' => 'Cairealais',
  				'kru' => 'Kurukh',
  				'ks' => 'Caismiris',
  				'ksb' => 'Shambala',
  				'ksf' => 'Bafia',
+ 				'ksh' => 'Gearmailtis Chologne',
  				'ku' => 'Cùrdais',
  				'kum' => 'Kumyk',
  				'kut' => 'Kutenai',
@@ -343,6 +349,7 @@ has 'display_name_language' => (
  				'lah' => 'Lahnda',
  				'lam' => 'Lamba',
  				'lb' => 'Lugsamburgais',
+ 				'lez' => 'Leasgais',
  				'lfn' => 'Lingua Franca Nova',
  				'lg' => 'Ganda',
  				'li' => 'Cànan Limburg',
@@ -400,6 +407,7 @@ has 'display_name_language' => (
  				'mua' => 'Mundang',
  				'mul' => 'Iomadh cànan',
  				'mus' => 'Creek',
+ 				'mwl' => 'Miorandais',
  				'mwr' => 'Marwari',
  				'mwv' => 'Mentawai',
  				'my' => 'Burmais',
@@ -408,6 +416,7 @@ has 'display_name_language' => (
  				'mzn' => 'Mazanderani',
  				'na' => 'Nabhru',
  				'nan' => 'Min Nan',
+ 				'nap' => 'Eadailtis Napoli',
  				'naq' => 'Nama',
  				'nb' => 'Bokmål na Nirribhidh',
  				'nd' => 'Ndebele Thuathach',
@@ -430,11 +439,11 @@ has 'display_name_language' => (
  				'nov' => 'Novial',
  				'nqo' => 'N’Ko',
  				'nr' => 'Ndebele Dheasach',
- 				'nso' => 'Leasotais Thuathach',
+ 				'nso' => 'Sesotho sa Leboa',
  				'nus' => 'Nuer',
  				'nv' => 'Navajo',
  				'nwc' => 'Newari Chlasaigeach',
- 				'ny' => 'Chichewa',
+ 				'ny' => 'Nyanja',
  				'nym' => 'Nyamwezi',
  				'nyn' => 'Nyankole',
  				'nyo' => 'Nyoro',
@@ -450,9 +459,10 @@ has 'display_name_language' => (
  				'pag' => 'Pangasinan',
  				'pal' => 'Pahlavi',
  				'pam' => 'Pampanga',
- 				'pap' => 'Papiamento',
+ 				'pap' => 'Papiamentu',
  				'pau' => 'Palabhais',
  				'pcd' => 'Picard',
+ 				'pcm' => 'Beurla Nigèiriach',
  				'pdc' => 'Gearmailtis Phennsylvania',
  				'pdt' => 'Plautdietsch',
  				'peo' => 'Seann-Pheirsis',
@@ -467,7 +477,7 @@ has 'display_name_language' => (
  				'pt' => 'Portagailis',
  				'pt_BR' => 'Portagailis Bhraisileach',
  				'pt_PT' => 'Portagailis Eòrpach',
- 				'qu' => 'Ceatsua',
+ 				'qu' => 'Quechua',
  				'quc' => 'K’iche’',
  				'qug' => 'Quichua Àrd-tìr Chimborazo',
  				'raj' => 'Rajasthani',
@@ -484,11 +494,12 @@ has 'display_name_language' => (
  				'ru' => 'Ruisis',
  				'rue' => 'Rusyn',
  				'rug' => 'Roviana',
+ 				'rup' => 'Aromanais',
  				'rw' => 'Kinyarwanda',
  				'rwk' => 'Rwa',
  				'sa' => 'Sanskrit',
  				'sad' => 'Sandawe',
- 				'sah' => 'Sachais',
+ 				'sah' => 'Sakha',
  				'sam' => 'Aramais Shamaritanach',
  				'saq' => 'Samburu',
  				'sas' => 'Sasak',
@@ -533,7 +544,7 @@ has 'display_name_language' => (
  				'srr' => 'Serer',
  				'ss' => 'Swati',
  				'ssy' => 'Saho',
- 				'st' => 'Leasotach Dheasach',
+ 				'st' => 'Sesotho',
  				'su' => 'Cànan Sunda',
  				'suk' => 'Sukuma',
  				'sus' => 'Susu',
@@ -552,7 +563,7 @@ has 'display_name_language' => (
  				'ter' => 'Terêna',
  				'tet' => 'Tetum',
  				'tg' => 'Taidigis',
- 				'th' => 'Tàidh',
+ 				'th' => 'Cànan nan Tàidh',
  				'ti' => 'Tigrinya',
  				'tig' => 'Tigre',
  				'tiv' => 'Tiv',
@@ -565,7 +576,7 @@ has 'display_name_language' => (
  				'tly' => 'Talysh',
  				'tmh' => 'Tamashek',
  				'tn' => 'Tswana',
- 				'to' => 'Tongais',
+ 				'to' => 'Tonga',
  				'tog' => 'Nyasa Tonga',
  				'tpi' => 'Tok Pisin',
  				'tr' => 'Turcais',
@@ -581,7 +592,7 @@ has 'display_name_language' => (
  				'twq' => 'Tasawaq',
  				'ty' => 'Cànan Tahiti',
  				'tyv' => 'Cànan Tuva',
- 				'tzm' => 'Tamazight Meadhan na h-Atlas',
+ 				'tzm' => 'Tamazight an Atlais Mheadhanaich',
  				'udm' => 'Udmurt',
  				'ug' => 'Ùigiurais',
  				'uk' => 'Ucràinis',
@@ -613,7 +624,7 @@ has 'display_name_language' => (
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
  				'yi' => 'Iùdhais',
- 				'yo' => 'Ioruba',
+ 				'yo' => 'Yoruba',
  				'yrl' => 'Nheengatu',
  				'yue' => 'Cantonais',
  				'za' => 'Zhuang',
@@ -646,7 +657,8 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'Afaka',
+			'Adlm' => 'Adlam',
+ 			'Afak' => 'Afaka',
  			'Aghb' => 'Albàinis Chabhcasach',
  			'Ahom' => 'Ahom',
  			'Arab' => 'Arabais',
@@ -658,13 +670,16 @@ has 'display_name_script' => (
  			'Bass' => 'Bassa Vah',
  			'Batk' => 'Batak',
  			'Beng' => 'Beangailis',
+ 			'Bhks' => 'Bhaiksuki',
  			'Blis' => 'Comharran Bliss',
  			'Bopo' => 'Bopomofo',
  			'Brah' => 'Brahmi',
  			'Brai' => 'Braille',
+ 			'Bugi' => 'Lontara',
  			'Buhd' => 'Buhid',
  			'Cakm' => 'Chakma',
  			'Cans' => 'Sgrìobhadh Lideach Aonaichte nan Tùsanach Canadach',
+ 			'Cari' => 'Carian',
  			'Cham' => 'Cham',
  			'Cher' => 'Cherokee',
  			'Cirt' => 'Cirth',
@@ -674,14 +689,19 @@ has 'display_name_script' => (
  			'Cyrs' => 'Cirilis Seann-Slàbhais na h-Eaglaise',
  			'Deva' => 'Devanagari',
  			'Dsrt' => 'Deseret',
+ 			'Dupl' => 'Gearr-sgrìobhadh Duployé',
  			'Egyp' => 'Sealbh-sgrìobhadh Èipheiteach',
+ 			'Elba' => 'Elbasan',
  			'Ethi' => 'Ge’ez',
  			'Geor' => 'Cairtbheilis',
+ 			'Glag' => 'Glagoliticeach',
+ 			'Gonm' => 'Masaram Gondi',
  			'Goth' => 'Gotais',
  			'Gran' => 'Grantha',
  			'Grek' => 'Greugais',
  			'Gujr' => 'Gujarati',
  			'Guru' => 'Gurmukhi',
+ 			'Hanb' => 'Han le Bopomofo',
  			'Hang' => 'Hangul',
  			'Hani' => 'Han',
  			'Hano' => 'Hanunoo',
@@ -689,6 +709,7 @@ has 'display_name_script' => (
  			'Hans@alt=stand-alone' => 'Han simplichte',
  			'Hant' => 'Tradaiseanta',
  			'Hant@alt=stand-alone' => 'Han tradaiseanta',
+ 			'Hatr' => 'Hatran',
  			'Hebr' => 'Eabhra',
  			'Hira' => 'Hiragana',
  			'Hluw' => 'Dealbh-sgrìobhadh Anatolach',
@@ -696,6 +717,7 @@ has 'display_name_script' => (
  			'Hrkt' => 'Katakana no Hiragana',
  			'Hung' => 'Seann-Ungarais',
  			'Ital' => 'Seann-Eadailtis',
+ 			'Jamo' => 'Jamo',
  			'Java' => 'Deàbhanais',
  			'Jpan' => 'Seapanais',
  			'Jurc' => 'Jurchen',
@@ -717,10 +739,18 @@ has 'display_name_script' => (
  			'Limb' => 'Limbu',
  			'Lina' => 'Linear A',
  			'Linb' => 'Linear B',
+ 			'Lisu' => 'Lisu',
  			'Loma' => 'Loma',
+ 			'Lyci' => 'Lycian',
+ 			'Lydi' => 'Lydian',
  			'Mahj' => 'Mahajani',
+ 			'Mand' => 'Mandaean',
+ 			'Mani' => 'Manichaean',
+ 			'Marc' => 'Marchen',
  			'Maya' => 'Dealbh-sgrìobhadh Mayach',
  			'Mend' => 'Mende',
+ 			'Merc' => 'Meroiticeach ceangailte',
+ 			'Mero' => 'Meroiticeach',
  			'Mlym' => 'Malayalam',
  			'Modi' => 'Modi',
  			'Mong' => 'Mongolais',
@@ -729,6 +759,8 @@ has 'display_name_script' => (
  			'Mult' => 'Multani',
  			'Mymr' => 'Miànmar',
  			'Narb' => 'Seann-Arabach Thuathach',
+ 			'Nbat' => 'Nabataean',
+ 			'Newa' => 'Newa',
  			'Nkgb' => 'Naxi Geba',
  			'Nkoo' => 'N’ko',
  			'Nshu' => 'Nüshu',
@@ -736,22 +768,33 @@ has 'display_name_script' => (
  			'Olck' => 'Ol Chiki',
  			'Orkh' => 'Orkhon',
  			'Orya' => 'Oriya',
+ 			'Osge' => 'Osage',
  			'Osma' => 'Osmanya',
+ 			'Palm' => 'Palmyrene',
  			'Pauc' => 'Pau Cin Hau',
+ 			'Perm' => 'Seann-Phermic',
  			'Phag' => 'Phags-pa',
+ 			'Phli' => 'Pahlavi nan snaidh-sgrìobhaidhean',
+ 			'Phlp' => 'Pahlavi nan saltair',
+ 			'Phnx' => 'Pheniceach',
+ 			'Plrd' => 'Miao Phollard',
  			'Prti' => 'Partais snaidh-sgrìobhte',
  			'Qaac' => 'Qaac',
  			'Rjng' => 'Rejang',
  			'Roro' => 'Rongorongo',
  			'Runr' => 'Rùn-sgrìobhadh',
+ 			'Samr' => 'Samaritanais',
  			'Sara' => 'Sarati',
  			'Sarb' => 'Seann-Arabais Dheasach',
  			'Saur' => 'Saurashtra',
+ 			'Sgnw' => 'Sgrìobhadh cainnte-sanais',
+ 			'Shaw' => 'Sgrìobhadh an t-Seathaich',
  			'Shrd' => 'Sharada',
  			'Sidd' => 'Siddham',
  			'Sind' => 'Khudawadi',
  			'Sinh' => 'Sinhala',
  			'Sora' => 'Sora Sompeng',
+ 			'Soyo' => 'Soyombo',
  			'Sund' => 'Sunda',
  			'Sylo' => 'Syloti Nagri',
  			'Syrc' => 'Suraidheac',
@@ -772,12 +815,17 @@ has 'display_name_script' => (
  			'Thai' => 'Tàidh',
  			'Tibt' => 'Tibeitis',
  			'Tirh' => 'Tirhuta',
+ 			'Ugar' => 'Ugariticeach',
  			'Vaii' => 'Vai',
  			'Wara' => 'Varang Kshiti',
  			'Wole' => 'Woleai',
  			'Xpeo' => 'Seann-Pheirsis',
+ 			'Xsux' => 'Gèinn-sgrìobhadh Sumer is Akkad',
  			'Yiii' => 'Yi',
+ 			'Zanb' => 'Zanabazar ceàrnagach',
+ 			'Zinh' => 'Dìleab',
  			'Zmth' => 'Gnìomhairean matamataig',
+ 			'Zsye' => 'Emoji',
  			'Zsym' => 'Samhlaidhean',
  			'Zxxx' => 'Gun sgrìobhadh',
  			'Zyyy' => 'Coitcheann',
@@ -833,9 +881,9 @@ has 'display_name_region' => (
  			'AE' => 'Na h-Iomaratan Arabach Aonaichte',
  			'AF' => 'Afghanastàn',
  			'AG' => 'Aintìoga is Barbuda',
- 			'AI' => 'Anguilla',
+ 			'AI' => 'Anguillia',
  			'AL' => 'Albàinia',
- 			'AM' => 'Airmeinia',
+ 			'AM' => 'Airmeinea',
  			'AO' => 'Angòla',
  			'AQ' => 'An Antartaig',
  			'AR' => 'An Argantain',
@@ -845,7 +893,7 @@ has 'display_name_region' => (
  			'AW' => 'Arùba',
  			'AX' => 'Na h-Eileanan Åland',
  			'AZ' => 'Asarbaideàn',
- 			'BA' => 'Bosna agus Hearsagobhana',
+ 			'BA' => 'Bosna is Hearsagobhana',
  			'BB' => 'Barbados',
  			'BD' => 'Bangladais',
  			'BE' => 'A’ Bheilg',
@@ -867,12 +915,12 @@ has 'display_name_region' => (
  			'BY' => 'A’ Bhealaruis',
  			'BZ' => 'A’ Bheilìs',
  			'CA' => 'Canada',
- 			'CC' => 'Na h-Eileanan Cocos (Keeling)',
+ 			'CC' => 'Na h-Eileanan Chocos (Keeling)',
  			'CD' => 'Congo - Kinshasa',
  			'CD@alt=variant' => 'A’ Chongo (PDC)',
  			'CF' => 'Poblachd Meadhan Afraga',
  			'CG' => 'A’ Chongo - Brazzaville',
- 			'CG@alt=variant' => 'A’ Chongo (Poblachd)',
+ 			'CG@alt=variant' => 'A’ Chongo',
  			'CH' => 'An Eilbheis',
  			'CI' => 'Côte d’Ivoire',
  			'CI@alt=variant' => 'An Costa Ìbhri',
@@ -888,7 +936,8 @@ has 'display_name_region' => (
  			'CW' => 'Curaçao',
  			'CX' => 'Eilean na Nollaig',
  			'CY' => 'Cìopras',
- 			'CZ' => 'Poblachd na Seice',
+ 			'CZ' => 'An t-Seic',
+ 			'CZ@alt=variant' => 'Poblachd na Seice',
  			'DE' => 'A’ Ghearmailt',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Diobùtaidh',
@@ -902,14 +951,15 @@ has 'display_name_region' => (
  			'EG' => 'An Èiphit',
  			'EH' => 'Sathara an Iar',
  			'ER' => 'Eartra',
- 			'ES' => 'An Spàinn',
+ 			'ES' => 'An Spàinnt',
  			'ET' => 'An Itiop',
  			'EU' => 'An t-Aonadh Eòrpach',
+ 			'EZ' => 'Raon an Eòro',
  			'FI' => 'An Fhionnlann',
  			'FJ' => 'Fìdi',
  			'FK' => 'Na h-Eileanan Fàclannach',
  			'FK@alt=variant' => 'Na h-Eileanan Fàclannach (Islas Malvinas)',
- 			'FM' => 'Na Meanbh-Eileanan',
+ 			'FM' => 'Na Meanbh-eileanan',
  			'FO' => 'Na h-Eileanan Fàro',
  			'FR' => 'An Fhraing',
  			'GA' => 'Gabon',
@@ -927,7 +977,7 @@ has 'display_name_region' => (
  			'GP' => 'Guadalup',
  			'GQ' => 'Gini Mheadhan-Chriosach',
  			'GR' => 'A’ Ghreug',
- 			'GS' => 'Seòrsea a Deas is na h-Eileanan Sandwich a Deas',
+ 			'GS' => 'Seòirsea a Deas is na h-Eileanan Sandwich a Deas',
  			'GT' => 'Guatamala',
  			'GU' => 'Guam',
  			'GW' => 'Gini-Bioso',
@@ -940,7 +990,7 @@ has 'display_name_region' => (
  			'HT' => 'Haidhti',
  			'HU' => 'An Ungair',
  			'IC' => 'Na h-Eileanan Canàrach',
- 			'ID' => 'Na h-Innd Innse',
+ 			'ID' => 'Na h-Innd-innse',
  			'IE' => 'Èirinn',
  			'IL' => 'Iosrael',
  			'IM' => 'Eilean Mhanainn',
@@ -961,7 +1011,7 @@ has 'display_name_region' => (
  			'KM' => 'Comoros',
  			'KN' => 'Naomh Crìstean is Nibheis',
  			'KP' => 'Coirèa a Tuath',
- 			'KR' => 'Coirèa a Deas',
+ 			'KR' => 'Coirèa',
  			'KW' => 'Cuibhèit',
  			'KY' => 'Na h-Eileanan Caimean',
  			'KZ' => 'Casachstàn',
@@ -1008,7 +1058,7 @@ has 'display_name_region' => (
  			'NG' => 'Nigèiria',
  			'NI' => 'Niocaragua',
  			'NL' => 'Na Tìrean Ìsle',
- 			'NO' => 'An Nirribhidh',
+ 			'NO' => 'Nirribhidh',
  			'NP' => 'Neapàl',
  			'NR' => 'Nabhru',
  			'NU' => 'Niue',
@@ -1022,7 +1072,7 @@ has 'display_name_region' => (
  			'PK' => 'Pagastàn',
  			'PL' => 'A’ Phòlainn',
  			'PM' => 'Saint Pierre agus Miquelon',
- 			'PN' => 'Eilean Peit a’ Chàirn',
+ 			'PN' => 'Eileanan Pheit a’ Chàirn',
  			'PR' => 'Porto Rìceo',
  			'PS' => 'Na Ranntairean Palastaineach',
  			'PS@alt=short' => 'Palastain',
@@ -1078,6 +1128,7 @@ has 'display_name_region' => (
  			'UA' => 'An Ucràin',
  			'UG' => 'Uganda',
  			'UM' => 'Meanbh-Eileanan Iomallach nan SA',
+ 			'UN' => 'Na Dùthchannan Aonaichte',
  			'US' => 'Na Stàitean Aonaichte',
  			'US@alt=short' => 'SA',
  			'UY' => 'Uruguaidh',
@@ -1086,7 +1137,7 @@ has 'display_name_region' => (
  			'VC' => 'Naomh Bhionsant agus Eileanan Greanadach',
  			'VE' => 'A’ Bheiniseala',
  			'VG' => 'Eileanan Breatannach na Maighdinn',
- 			'VI' => 'Eileanan Aimeireagach na Maighdinn',
+ 			'VI' => 'Eileanan na Maighdinn aig na SA',
  			'VN' => 'Bhiet-Nam',
  			'VU' => 'Vanuatu',
  			'WF' => 'Uallas agus Futuna',
@@ -1109,7 +1160,91 @@ has 'display_name_variant' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'SCOTLAND' => 'Beurla Bhun-Tomhasach na h-Alba',
+			'1901' => 'Litreachadh tradaiseanta na Gearmailtise',
+ 			'1994' => 'Litreachadh stannardach dual-chainnt Resia',
+ 			'1996' => 'Litreachadh na Gearmailtise 1996',
+ 			'1606NICT' => 'Meadhan-Fhraingis anmoch gu 1606',
+ 			'1694ACAD' => 'Nua-Fhraingis thràth',
+ 			'1959ACAD' => 'Bealaruisis Acadamaigeach',
+ 			'ABL1943' => 'Gnàthas-litreachaidh 1943',
+ 			'ALALC97' => 'Ròmanachadh ALA-LC 1997',
+ 			'ALUKU' => 'Dual-chainnt Aluku',
+ 			'AO1990' => 'Aonta litreachadh na Portagailise 1990',
+ 			'AREVELA' => 'Airmeinis an Ear',
+ 			'AREVMDA' => 'Airmeinis an Iar',
+ 			'BAKU1926' => 'Abidil Laideann aonaichte na Turcaise',
+ 			'BALANKA' => 'Dual-chainnt Balanka de Anii',
+ 			'BARLA' => 'Dual-chainntean Barlavento de Kabuverdianu',
+ 			'BASICENG' => 'Beurla bhunasach',
+ 			'BAUDDHA' => 'Bauddha',
+ 			'BISCAYAN' => 'Dual-chainnt Bizkaia',
+ 			'BISKE' => 'Dual-chainnt San Giorgio/Bila',
+ 			'BOHORIC' => 'Aibidil Bohorič',
+ 			'BOONT' => 'Boontling',
+ 			'COLB1945' => 'Aonta litreachaidh eadar a’ Phortagail is Braisil 1945',
+ 			'CORNU' => 'Beurla na Còirne',
+ 			'DAJNKO' => 'Aibidil Dajnko',
+ 			'EKAVSK' => 'Sèirbhis le fuaimneachadh iarach',
+ 			'EMODENG' => 'Nua-Bheurla thràth',
+ 			'FONIPA' => 'Comharran fuaim-eòlais an IPA',
+ 			'FONNAPA' => 'FONNAPA',
+ 			'FONUPA' => 'Comharran fuaim-eòlais an UPA',
+ 			'FONXSAMP' => 'FONXSAMP',
+ 			'HEPBURN' => 'Ròmanachadh Hepburn',
+ 			'HOGNORSK' => 'Høgnorsk',
+ 			'HSISTEMO' => 'HSISTEMO',
+ 			'IJEKAVSK' => 'Sèirbis le fuaimneachadh Ijekavia',
+ 			'ITIHASA' => 'Itihasa',
+ 			'JAUER' => 'Jauer',
+ 			'JYUTPING' => 'Jyutping',
+ 			'KKCOR' => 'Litreachadh coitcheann',
+ 			'KOCIEWIE' => 'Kociewie',
+ 			'KSCOR' => 'Litreachadh stannardach',
+ 			'LAUKIKA' => 'Laukika',
+ 			'LIPAW' => 'Dual-chainnt Lipovaz Resia',
+ 			'LUNA1918' => 'LUNA1918',
+ 			'METELKO' => 'Aibidil Metelko',
+ 			'MONOTON' => 'Greugais mhonotonach',
+ 			'NDYUKA' => 'Dual-chainnt Ndyuka',
+ 			'NEDIS' => 'Dual-chainnt Natisone',
+ 			'NEWFOUND' => 'Beurla Talamh an Èisg',
+ 			'NJIVA' => 'Dual-chainnt Gniva/Njiva',
+ 			'NULIK' => 'Nua-Volapük',
+ 			'OSOJS' => 'Dual-chainnt Oseacco/Osojane',
+ 			'OXENDICT' => 'Litreachadh faclair Oxford na Beurla',
+ 			'PAHAWH2' => 'Pahawh Hmong na 2na ìre',
+ 			'PAHAWH3' => 'Pahawh Hmong na 3s ìre',
+ 			'PAHAWH4' => 'Pahawh Hmong na 4mh ìre',
+ 			'PAMAKA' => 'Dual-chainnt Pamaka',
+ 			'PETR1708' => 'Litreachadh Pheadair 1708',
+ 			'PINYIN' => 'Ròmanachadh Pinyin',
+ 			'POLYTON' => 'Greugais phoiliotonach',
+ 			'POSIX' => 'Coimpiutair',
+ 			'PUTER' => 'Puter',
+ 			'REVISED' => 'Litreachadh lèirmheasaichte',
+ 			'RIGIK' => 'Volapük chlasaigeach',
+ 			'ROZAJ' => 'Dual-chainnt Resia',
+ 			'RUMGR' => 'Rumantsch Grischun',
+ 			'SAAHO' => 'Saho',
+ 			'SCOTLAND' => 'Beurla Stannardach na h-Alba',
+ 			'SCOUSE' => 'Scouse',
+ 			'SIMPLE' => 'SIMPLE',
+ 			'SOLBA' => 'Dual-chainnt Stolvizza/Solbica',
+ 			'SOTAV' => 'Dual-chainntean Sotavento de Kabuverdianu',
+ 			'SPANGLIS' => 'Spanglish',
+ 			'SURMIRAN' => 'Surmiran',
+ 			'SURSILV' => 'Sursilvan',
+ 			'SUTSILV' => 'Sutsilvan',
+ 			'TARASK' => 'Litreachadh Taraškievica',
+ 			'UCCOR' => 'Litreachadh aonaichte',
+ 			'UCRCOR' => 'Litreachadh aonaichte ’s lèirmheasaichte',
+ 			'ULSTER' => 'Albais Uladh',
+ 			'UNIFON' => 'Aibidil fuaim-eòlais Unifon',
+ 			'VAIDIKA' => 'Vaidika',
+ 			'VALENCIA' => 'Valencià',
+ 			'VALLADER' => 'Vallader',
+ 			'WADEGILE' => 'Ròmanachadh Wade-Giles',
+ 			'XSISTEMO' => 'XSISTEMO',
 
 		}
 	},
@@ -1122,6 +1257,7 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Mìosachan',
+ 			'cf' => 'Fòrmat an airgeadra',
  			'collation' => 'Òrdugh an t-seòrsachaidh',
  			'currency' => 'Airgeadra',
  			'hc' => 'Cearcall an ama (12 no 24 uair)',
@@ -1159,6 +1295,10 @@ has 'display_name_type' => (
  				'persian' => q{Am Mìosachan Pearsach},
  				'roc' => q{Mìosachan Poblachd na Sìne},
  			},
+ 			'cf' => {
+ 				'account' => q{Fòrmat airgeadra na cunntasachd},
+ 				'standard' => q{Fòrmat stannardach an airgeadra},
+ 			},
  			'collation' => {
  				'big5han' => q{Òrdugh seòrsachaidh na Sìnise Tradaiseanta - Big5},
  				'compat' => q{Òrdugh seòrsachaidh roimhe a chum co-chòrdalachd},
@@ -1178,6 +1318,11 @@ has 'display_name_type' => (
  				'unihan' => q{Òrdugh an fhreumha ’s nan stràcan},
  				'zhuyin' => q{Òrdugh seòrsachaidh Zhuyin},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{Làn-Leud},
+ 				'hwidth' => q{Leth-Leud},
+ 				'npinyin' => q{Àireamhach},
+ 			},
  			'hc' => {
  				'h11' => q{Cleoc 12 uair a thìde (0–11)},
  				'h12' => q{Cleoc 12 uair a thìde (1–12)},
@@ -1188,6 +1333,10 @@ has 'display_name_type' => (
  				'loose' => q{Brisidhean-loidhe fuasgailte},
  				'normal' => q{Brisidhean-loidhe àbhaisteach},
  				'strict' => q{Brisidhean-loidhe teanna},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{Tar-litreachadh BGN nan Stàitean Aonaichte},
+ 				'ungegn' => q{Tar-litreachadh GEGN nan Dùthchannan Aonaichte},
  			},
  			'ms' => {
  				'metric' => q{Tomhas meatrach},
@@ -1237,7 +1386,7 @@ has 'display_name_type' => (
  				'mymrshan' => q{Àireamhan Shan Miànmar},
  				'nkoo' => q{Àireamhan N’Ko},
  				'olck' => q{Àireamhan Ol Chiki},
- 				'orya' => q{Àireamhan Oriya},
+ 				'orya' => q{Àireamhan Odia},
  				'osma' => q{Àireamhan Osmanya},
  				'roman' => q{Àireamhan Ròmanach},
  				'romanlow' => q{Àireamhan beaga Ròmanach},
@@ -1273,27 +1422,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN',
- 			'numeric' => 'Àireamhach',
- 			'tone' => 'Tòna',
- 			'ungegn' => 'UNGEGN',
- 			'x-accents' => 'Stràcan',
- 			'x-fullwidth' => 'Làn-Leud',
- 			'x-halfwidth' => 'Leth-Leud',
- 			'x-jamo' => 'Jamo',
- 			'x-pinyin' => 'Pinyin',
- 			'x-publishing' => 'Foillseachadh',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1317,10 +1445,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á ă â å ä ã ā æ ċ ç ḋ é ĕ ê ë ē ḟ ġ í ĭ î ï ī ı j k ł ṁ ñ ó ŏ ô ö ø ō œ ṗ q ṡ ş ș ṫ ú ŭ û ü ū v w x y ÿ z])},
+			auxiliary => qr{[á ă â å ä ã ā æ ċ ç ḋ é ĕ ê ë ē ḟ ġ í ĭ î ï ī ı j k ł ṁ ñ ó ŏ ô ö ø ō œ ṗ q ṡ ş ș ṫ ú ŭ û ü ū v w x y ÿ z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U'],
-			main => qr{(?^u:[a à b c d e è f g h i ì l m n o ò p r s t u ù])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ¡ ? . … · ' ‘ ’ " “ ” ( ) \[ \] \{ \} § ¶ @ * / \& ⁊ # % † ‡ ‧ ° © ® ™])},
+			main => qr{[a à b c d e è f g h i ì l m n o ò p r s t u ù]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ¡ ? . … · ' ‘ ’ " “ ” ( ) \[ \] \{ \} § ¶ @ * / \& ⁊ # % † ‡ ‧ ° © ® ™]},
 		};
 	},
 EOT
@@ -1662,6 +1791,14 @@ has 'units' => (
 						'per' => q({0} sa ghalan),
 						'two' => q({0} ghalan),
 					},
+					'gallon-imperial' => {
+						'few' => q({0} galanan impireil),
+						'name' => q(galan impireil),
+						'one' => q({0} ghalan impireil),
+						'other' => q({0} galan impireil),
+						'per' => q({0} sa ghalan impireil),
+						'two' => q({0} ghalan impireil),
+					},
 					'generic' => {
 						'few' => q({0}°),
 						'name' => q(°),
@@ -1998,6 +2135,13 @@ has 'units' => (
 						'other' => q({0} mìle sa ghalan),
 						'two' => q({0} mhìle sa ghalan),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mìltean sa ghalan impireil),
+						'name' => q(mìle sa ghalan impireil),
+						'one' => q({0} mhìle sa ghalan impireil),
+						'other' => q({0} mìle sa ghalan impireil),
+						'two' => q({0} mhìle sa ghalan impireil),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} mìltean san uair),
 						'name' => q(mìle san uair),
@@ -2033,6 +2177,13 @@ has 'units' => (
 						'other' => q({0} mille-ghrama),
 						'two' => q({0} mhille-ghrama),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mille-ghramaichean san deicheamh-liotair),
+						'name' => q(mille-ghrama san deicheamh-liotair),
+						'one' => q({0} mhille-ghrama san deicheamh-liotair),
+						'other' => q({0} mille-ghrama san deicheamh-liotair),
+						'two' => q({0} mhille-ghrama san deicheamh-liotair),
+					},
 					'milliliter' => {
 						'few' => q({0} mille-liotairean),
 						'name' => q(mille-liotair),
@@ -2053,6 +2204,13 @@ has 'units' => (
 						'one' => q({0} mhille-mheatair de dh’airgead-beò),
 						'other' => q({0} mille-mheatair de dh’airgead-beò),
 						'two' => q({0} mhille-mheatair de dh’airgead-beò),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} mille-mhòlaichean san liotair),
+						'name' => q(mille-mhòl san liotair),
+						'one' => q({0} mhille-mhòl san liotair),
+						'other' => q({0} mille-mhòl san liotair),
+						'two' => q({0} mhille-mhòl san liotair),
 					},
 					'millisecond' => {
 						'few' => q({0} mille-dhiogan),
@@ -2134,6 +2292,13 @@ has 'units' => (
 						'other' => q({0} parsec),
 						'two' => q({0} pharsec),
 					},
+					'part-per-million' => {
+						'few' => q({0} pàirtean sa mhillean),
+						'name' => q(pàirt sa mhillean),
+						'one' => q({0} phàirt sa mhillean),
+						'other' => q({0} pàirt sa mhillean),
+						'two' => q({0} phàirt sa mhillean),
+					},
 					'per' => {
 						'1' => q({0} / {1}),
 					},
@@ -2157,6 +2322,13 @@ has 'units' => (
 						'one' => q({0} phinnt meatrach),
 						'other' => q({0} pinnt meatrach),
 						'two' => q({0} phinnt meatrach),
+					},
+					'point' => {
+						'few' => q({0} puingean),
+						'name' => q(puing),
+						'one' => q({0} phuing),
+						'other' => q({0} puing),
+						'two' => q({0} phuing),
 					},
 					'pound' => {
 						'few' => q({0} puinnd),
@@ -2230,6 +2402,7 @@ has 'units' => (
 						'name' => q(cilemeatair ceàrnagach),
 						'one' => q({0} chilemeatair ceàrnagach),
 						'other' => q({0} cilemeatair ceàrnagach),
+						'per' => q({0} sa chilemeatair cheàrnagach),
 						'two' => q({0} chilemeatair ceàrnagach),
 					},
 					'square-meter' => {
@@ -2245,6 +2418,7 @@ has 'units' => (
 						'name' => q(mìle cheàrnagach),
 						'one' => q({0} mhìle cheàrnagach),
 						'other' => q({0} mìle cheàrnagach),
+						'per' => q({0} sa mhìle cheàrnagach),
 						'two' => q({0} mhìle cheàrnagach),
 					},
 					'square-yard' => {
@@ -2599,6 +2773,14 @@ has 'units' => (
 						'per' => q({0}/gal),
 						'two' => q({0}gal),
 					},
+					'gallon-imperial' => {
+						'few' => q({0} gal i.),
+						'name' => q(gal imp.),
+						'one' => q({0} ghal i.),
+						'other' => q({0} gal i.),
+						'per' => q({0}/gal i.),
+						'two' => q({0} ghal i.),
+					},
 					'generic' => {
 						'few' => q({0}°),
 						'name' => q(°),
@@ -2935,6 +3117,13 @@ has 'units' => (
 						'other' => q({0}mì/g),
 						'two' => q({0}mì/g),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0}m/gRA),
+						'name' => q(mìle/gal RA),
+						'one' => q({0}m/gRA),
+						'other' => q({0}m/gRA),
+						'two' => q({0}m/gRA),
+					},
 					'mile-per-hour' => {
 						'few' => q({0}mì/h),
 						'name' => q(mì/h),
@@ -2970,6 +3159,13 @@ has 'units' => (
 						'other' => q({0}mg),
 						'two' => q({0}mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0}mg/dL),
+						'name' => q(mg/dL),
+						'one' => q({0}mg/dL),
+						'other' => q({0}mg/dL),
+						'two' => q({0}mg/dL),
+					},
 					'milliliter' => {
 						'few' => q({0}mL),
 						'name' => q(mL),
@@ -2990,6 +3186,13 @@ has 'units' => (
 						'one' => q({0}mm Hg),
 						'other' => q({0}mm Hg),
 						'two' => q({0}mm Hg),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0}mmòl/L),
+						'name' => q(mmòl/L),
+						'one' => q({0}mmòl/L),
+						'other' => q({0}mmòl/L),
+						'two' => q({0}mmòl/L),
 					},
 					'millisecond' => {
 						'few' => q({0}ms),
@@ -3071,6 +3274,13 @@ has 'units' => (
 						'other' => q({0}pc),
 						'two' => q({0}pc),
 					},
+					'part-per-million' => {
+						'few' => q({0}ppm),
+						'name' => q(ppm),
+						'one' => q({0}ppm),
+						'other' => q({0}ppm),
+						'two' => q({0}ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -3094,6 +3304,13 @@ has 'units' => (
 						'one' => q({0}mpt),
 						'other' => q({0}mpt),
 						'two' => q({0}mpt),
+					},
+					'point' => {
+						'few' => q({0}pt),
+						'name' => q(pt),
+						'one' => q({0}pt),
+						'other' => q({0}pt),
+						'two' => q({0}pt),
 					},
 					'pound' => {
 						'few' => q({0}lb),
@@ -3167,6 +3384,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0}km²),
 						'other' => q({0}km²),
+						'per' => q({0}/km²),
 						'two' => q({0}km²),
 					},
 					'square-meter' => {
@@ -3182,6 +3400,7 @@ has 'units' => (
 						'name' => q(mì²),
 						'one' => q({0}mì²),
 						'other' => q({0}mì²),
+						'per' => q({0}/mì²),
 						'two' => q({0}mì²),
 					},
 					'square-yard' => {
@@ -3536,6 +3755,14 @@ has 'units' => (
 						'per' => q({0}/gal),
 						'two' => q({0} gal),
 					},
+					'gallon-imperial' => {
+						'few' => q({0} gal imp.),
+						'name' => q(gal imp.),
+						'one' => q({0} ghal imp.),
+						'other' => q({0} gal imp.),
+						'per' => q({0}/gal imp.),
+						'two' => q({0} ghal imp.),
+					},
 					'generic' => {
 						'few' => q({0}°),
 						'name' => q(°),
@@ -3872,6 +4099,13 @@ has 'units' => (
 						'other' => q({0} mì/g),
 						'two' => q({0} mì/g),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mì/gal imp.),
+						'name' => q(mìle/gal imp.),
+						'one' => q({0} mhì/gal imp.),
+						'other' => q({0} mì/gal imp.),
+						'two' => q({0} mhì/gal imp.),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} mì/h),
 						'name' => q(mìle/uair),
@@ -3907,6 +4141,13 @@ has 'units' => (
 						'other' => q({0} mg),
 						'two' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mg/dL),
+						'name' => q(mg/dL),
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+						'two' => q({0} mg/dL),
+					},
 					'milliliter' => {
 						'few' => q({0} mL),
 						'name' => q(mL),
@@ -3927,6 +4168,13 @@ has 'units' => (
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
 						'two' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} mmòl/L),
+						'name' => q(mmòl/L),
+						'one' => q({0} mmòl/L),
+						'other' => q({0} mmòl/L),
+						'two' => q({0} mmòl/L),
 					},
 					'millisecond' => {
 						'few' => q({0} ms),
@@ -4008,6 +4256,13 @@ has 'units' => (
 						'other' => q({0} pc),
 						'two' => q({0} pc),
 					},
+					'part-per-million' => {
+						'few' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+						'two' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -4031,6 +4286,13 @@ has 'units' => (
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
 						'two' => q({0} mpt),
+					},
+					'point' => {
+						'few' => q({0} pt),
+						'name' => q(puing),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+						'two' => q({0} pt),
 					},
 					'pound' => {
 						'few' => q({0} lb),
@@ -4104,6 +4366,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 						'two' => q({0} km²),
 					},
 					'square-meter' => {
@@ -4119,6 +4382,7 @@ has 'units' => (
 						'name' => q(mìle²),
 						'one' => q({0} mì²),
 						'other' => q({0} mì²),
+						'per' => q({0}/mì²),
 						'two' => q({0} mì²),
 					},
 					'square-yard' => {
@@ -4269,11 +4533,11 @@ has 'number_symbols' => (
 			'group' => q(٬),
 			'infinity' => q(∞),
 			'list' => q(؛),
-			'minusSign' => q(‏-),
+			'minusSign' => q(؜-),
 			'nan' => q(NaN),
 			'perMille' => q(؉),
 			'percentSign' => q(٪),
-			'plusSign' => q(‏+),
+			'plusSign' => q(؜+),
 			'superscriptingExponent' => q(×),
 			'timeSeparator' => q(:),
 		},
@@ -4283,12 +4547,13 @@ has 'number_symbols' => (
 			'group' => q(٬),
 			'infinity' => q(∞),
 			'list' => q(؛),
-			'minusSign' => q(‎-‎),
+			'minusSign' => q(-),
 			'nan' => q(NaN),
 			'perMille' => q(؉),
 			'percentSign' => q(٪),
 			'plusSign' => q(‎+‎),
 			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(٫),
 		},
 		'bali' => {
 			'decimal' => q(.),
@@ -4380,6 +4645,7 @@ has 'number_symbols' => (
 			'percentSign' => q(%),
 			'plusSign' => q(+),
 			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
 		},
 		'gujr' => {
 			'decimal' => q(.),
@@ -4894,7 +5160,7 @@ has 'number_formats' => (
 					'two' => '000T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -5049,14 +5315,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -5642,14 +5908,24 @@ has 'currencies' => (
 				'two' => q(rùbal ùr Bealaruiseach \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(Rùbal Bealaruiseach),
 				'few' => q(rùbalan Bealaruiseach),
 				'one' => q(rùbal Bealaruiseach),
 				'other' => q(rùbal Bealaruiseach),
 				'two' => q(rùbal Bealaruiseach),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(Rùbal Bealaruiseach \(2000–2016\)),
+				'few' => q(rùbalan Bealaruiseach \(2000–2016\)),
+				'one' => q(rùbal Bealaruiseach \(2000–2016\)),
+				'other' => q(rùbal Bealaruiseach \(2000–2016\)),
+				'two' => q(rùbal Bealaruiseach \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -7035,11 +7311,11 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(Sol ùr Pearùthach),
-				'few' => q(sol ùra Pearùthach),
-				'one' => q(sol ùr Pearùthach),
-				'other' => q(sol ùr Pearùthach),
-				'two' => q(shol ùr Pearùthach),
+				'currency' => q(Sol Pearùthach),
+				'few' => q(sol Pearùthach),
+				'one' => q(sol Pearùthach),
+				'other' => q(sol Pearùthach),
+				'two' => q(shol Pearùthach),
 			},
 		},
 		'PES' => {
@@ -8341,25 +8617,25 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{f},
+					'am' => q{m},
+				},
 				'narrow' => {
 					'am' => q{m},
 					'pm' => q{f},
 				},
 				'wide' => {
-					'am' => q{m},
-					'pm' => q{f},
-				},
-				'abbreviated' => {
 					'pm' => q{f},
 					'am' => q{m},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'wide' => {
 					'pm' => q{f},
 					'am' => q{m},
 				},
-				'wide' => {
+				'narrow' => {
 					'pm' => q{f},
 					'am' => q{m},
 				},
@@ -8489,38 +8765,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			E => q{ccc},
-			Ed => q{E, d},
-			Gy => q{G y},
-			GyMMM => q{LLL y G},
-			GyMMMEd => q{E, d MMM y G},
-			GyMMMd => q{d MMM y G},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			MMdd => q{dd/MM},
-			Md => q{d/M},
-			d => q{d},
-			y => q{y G},
-			yMEd => q{E, d/M/y},
-			yMM => q{MM/y},
-			yMMM => q{LLL y},
-			yMMMM => q{LLLL y},
-			yyyy => q{y G},
-			yyyyM => q{M/y GGGGG},
-			yyyyMEd => q{E, d/M/y GGGGG},
-			yyyyMMM => q{LLL y G},
-			yyyyMMMEd => q{E, d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d/M/y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'roc' => {
 			Ed => q{E, d},
 			d => q{d},
@@ -8545,6 +8789,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, d/M},
 			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
+			MMMMW => q{'seachdain' W MMMM},
 			MMMMd => q{d'mh' MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd/MM},
@@ -8567,6 +8812,55 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{M/d/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{'seachdain' w 'dhe' Y},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E, d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{LLL y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, d/M},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			MMdd => q{dd/MM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yMEd => q{E, d/M/y},
+			yMM => q{MM/y},
+			yMMM => q{LLL y},
+			yMMMM => q{LLLL y},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E, d/M/y GGGGG},
+			yyyyMMM => q{LLL y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d/M/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
 		},
 	} },
 );
@@ -8587,101 +8881,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH – HH},
-			},
-			Hm => {
-				H => q{HH:mm – HH:mm},
-				m => q{HH:mm – HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm – HH:mm v},
-				m => q{HH:mm – HH:mm v},
-			},
-			Hv => {
-				H => q{HH – HH v},
-			},
-			M => {
-				M => q{M – M},
-			},
-			MEd => {
-				M => q{E, d/M – E, d/M},
-				d => q{E, d/M – E, d/M},
-			},
-			MMM => {
-				M => q{LLL – LLL},
-			},
-			MMMEd => {
-				M => q{E, d MMM – E, d MMM},
-				d => q{E, d MMM – E, d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{ha – ha},
-				h => q{h – ha},
-			},
-			hm => {
-				a => q{h:mma – h:mma},
-				h => q{h:mm – h:mma},
-				m => q{h:mm – h:mma},
-			},
-			hmv => {
-				a => q{h:mma – h:mma v},
-				h => q{h:mm – h:mma v},
-				m => q{h:mm – h:mma v},
-			},
-			hv => {
-				a => q{ha – ha v},
-				h => q{h – ha v},
-			},
-			y => {
-				y => q{y – y G},
-			},
-			yM => {
-				M => q{L/y – L/y GGGGG},
-				y => q{L/y – L/y GGGGG},
-			},
-			yMEd => {
-				M => q{E, d/M/y – E, d/M/y GGGGG},
-				d => q{E, d/M/y – E, d/M/y GGGGG},
-				y => q{E, d/M/y – E, d/M/y GGGGG},
-			},
-			yMMM => {
-				M => q{LLL – LLL y G},
-				y => q{LLL y – LLL y G},
-			},
-			yMMMEd => {
-				M => q{E, d MMM – E, d MMM y G},
-				d => q{E, d MMM – E, d MMM y G},
-				y => q{E, d MMM y – E, d MMM y G},
-			},
-			yMMMM => {
-				M => q{LLLL – LLLL y G},
-				y => q{LLLL y – LLLL y G},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM y G},
-				d => q{d – d MMM y G},
-				y => q{d MMM y – d MMM y G},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y GGGGG},
-				d => q{d/M/y – d/M/y GGGGG},
-				y => q{d/M/y – d/M/y GGGGG},
-			},
-		},
 		'buddhist' => {
 			H => {
 				H => q{HH – HH},
@@ -8794,6 +8993,101 @@ has 'datetime_formats_interval' => (
 				y => q{d/M/y – d/M/y},
 			},
 		},
+		'generic' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
+			},
+			MMM => {
+				M => q{LLL – LLL},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{ha – ha},
+				h => q{h – ha},
+			},
+			hm => {
+				a => q{h:mma – h:mma},
+				h => q{h:mm – h:mma},
+				m => q{h:mm – h:mma},
+			},
+			hmv => {
+				a => q{h:mma – h:mma v},
+				h => q{h:mm – h:mma v},
+				m => q{h:mm – h:mma v},
+			},
+			hv => {
+				a => q{ha – ha v},
+				h => q{h – ha v},
+			},
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{L/y – L/y GGGGG},
+				y => q{L/y – L/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
+			},
+			yMMM => {
+				M => q{LLL – LLL y G},
+				y => q{LLL y – LLL y G},
+			},
+			yMMMEd => {
+				M => q{E, d MMM – E, d MMM y G},
+				d => q{E, d MMM – E, d MMM y G},
+				y => q{E, d MMM y – E, d MMM y G},
+			},
+			yMMMM => {
+				M => q{LLLL – LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y G},
+				d => q{d – d MMM y G},
+				y => q{d MMM y – d MMM y G},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
+			},
+		},
 	} },
 );
 
@@ -8811,14 +9105,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Acre),
-				'generic' => q(Àm Acre),
-				'standard' => q(Bun-àm Acre),
+				'daylight' => q#Tìde samhraidh Acre#,
+				'generic' => q#Àm Acre#,
+				'standard' => q#Bun-àm Acre#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Àm Afghanastàin),
+				'standard' => q#Àm Afghanastàin#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -8979,50 +9273,50 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Àm Meadhan Afraga),
+				'standard' => q#Àm Meadhan Afraga#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Àm Afraga an Ear),
+				'standard' => q#Àm Afraga an Ear#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Àm Afraga a Deas),
+				'standard' => q#Àm Afraga a Deas#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh Afraga an Iar),
-				'generic' => q(Àm Afraga an Iar),
-				'standard' => q(Bun-àm Afraga an Iar),
+				'daylight' => q#Tìde Samhraidh Afraga an Iar#,
+				'generic' => q#Àm Afraga an Iar#,
+				'standard' => q#Bun-àm Afraga an Iar#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Alaska),
-				'generic' => q(Àm Alaska),
-				'standard' => q(Bun-àm Alaska),
+				'daylight' => q#Tìde samhraidh Alaska#,
+				'generic' => q#Àm Alaska#,
+				'standard' => q#Bun-àm Alaska#,
 			},
 			short => {
-				'daylight' => q(AKDT),
-				'generic' => q(AKT),
-				'standard' => q(AKST),
+				'daylight' => q#AKDT#,
+				'generic' => q#AKT#,
+				'standard' => q#AKST#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Almaty),
-				'generic' => q(Àm Almaty),
-				'standard' => q(Bun-àm Almaty),
+				'daylight' => q#Tìde samhraidh Almaty#,
+				'generic' => q#Àm Almaty#,
+				'standard' => q#Bun-àm Almaty#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Amasoin),
-				'generic' => q(Àm Amasoin),
-				'standard' => q(Bun-àm Amasoin),
+				'daylight' => q#Tìde samhraidh Amasoin#,
+				'generic' => q#Àm Amasoin#,
+				'standard' => q#Bun-àm Amasoin#,
 			},
 		},
 		'America/Adak' => {
@@ -9168,6 +9462,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#An Salbhador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -9370,6 +9667,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Porto Rìceo#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
 		},
@@ -9465,57 +9765,57 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Meadhan Aimeireaga a Tuath),
-				'generic' => q(Àm Meadhan Aimeireaga a Tuath),
-				'standard' => q(Bun-àm Meadhan Aimeireaga a Tuath),
+				'daylight' => q#Tìde samhraidh Meadhan Aimeireaga a Tuath#,
+				'generic' => q#Àm Meadhan Aimeireaga a Tuath#,
+				'standard' => q#Bun-àm Meadhan Aimeireaga a Tuath#,
 			},
 			short => {
-				'daylight' => q(CDT),
-				'generic' => q(CT),
-				'standard' => q(CST),
+				'daylight' => q#CDT#,
+				'generic' => q#CT#,
+				'standard' => q#CST#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Aimeireaga a Tuath an Ear),
-				'generic' => q(Àm Aimeireaga a Tuath an Ear),
-				'standard' => q(Bun-àm Aimeireaga a Tuath an Ear),
+				'daylight' => q#Tìde samhraidh Aimeireaga a Tuath an Ear#,
+				'generic' => q#Àm Aimeireaga a Tuath an Ear#,
+				'standard' => q#Bun-àm Aimeireaga a Tuath an Ear#,
 			},
 			short => {
-				'daylight' => q(EDT),
-				'generic' => q(ET),
-				'standard' => q(EST),
+				'daylight' => q#EDT#,
+				'generic' => q#ET#,
+				'standard' => q#EST#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Monadh Aimeireaga a Tuath),
-				'generic' => q(Àm Monadh Aimeireaga a Tuath),
-				'standard' => q(Bun-àm Monadh Aimeireaga a Tuath),
+				'daylight' => q#Tìde samhraidh Monadh Aimeireaga a Tuath#,
+				'generic' => q#Àm Monadh Aimeireaga a Tuath#,
+				'standard' => q#Bun-àm Monadh Aimeireaga a Tuath#,
 			},
 			short => {
-				'daylight' => q(MDT),
-				'generic' => q(MT),
-				'standard' => q(MST),
+				'daylight' => q#MDT#,
+				'generic' => q#MT#,
+				'standard' => q#MST#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Tìde samhraidh a’ Chuain Sèimh),
-				'generic' => q(Àm a’ Chuain Sèimh),
-				'standard' => q(Bun-àm a’ Chuain Sèimh),
+				'daylight' => q#Tìde samhraidh a’ Chuain Sèimh#,
+				'generic' => q#Àm a’ Chuain Sèimh#,
+				'standard' => q#Bun-àm a’ Chuain Sèimh#,
 			},
 			short => {
-				'daylight' => q(PDT),
-				'generic' => q(PT),
-				'standard' => q(PST),
+				'daylight' => q#PDT#,
+				'generic' => q#PT#,
+				'standard' => q#PST#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Anadyr),
-				'generic' => q(Àm Anadyr),
-				'standard' => q(Bun-àm Anadyr),
+				'daylight' => q#Tìde samhraidh Anadyr#,
+				'generic' => q#Àm Anadyr#,
+				'standard' => q#Bun-àm Anadyr#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -9553,30 +9853,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Apia),
-				'generic' => q(Àm Apia),
-				'standard' => q(Bun-àm Apia),
+				'daylight' => q#Tìde samhraidh Apia#,
+				'generic' => q#Àm Apia#,
+				'standard' => q#Bun-àm Apia#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Aqtau),
-				'generic' => q(Àm Aqtau),
-				'standard' => q(Bun-àm Aqtau),
+				'daylight' => q#Tìde samhraidh Aqtau#,
+				'generic' => q#Àm Aqtau#,
+				'standard' => q#Bun-àm Aqtau#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Aqtobe),
-				'generic' => q(Àm Aqtobe),
-				'standard' => q(Bun-àm Aqtobe),
+				'daylight' => q#Tìde samhraidh Aqtobe#,
+				'generic' => q#Àm Aqtobe#,
+				'standard' => q#Bun-àm Aqtobe#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Arabach),
-				'generic' => q(Àm Arabach),
-				'standard' => q(Bun-àm Arabach),
+				'daylight' => q#Tìde samhraidh Arabach#,
+				'generic' => q#Àm Arabach#,
+				'standard' => q#Bun-àm Arabach#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -9584,23 +9884,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na h-Argantaine),
-				'generic' => q(Àm na h-Argantaine),
-				'standard' => q(Bun-àm na h-Argantaine),
+				'daylight' => q#Tìde samhraidh na h-Argantaine#,
+				'generic' => q#Àm na h-Argantaine#,
+				'standard' => q#Bun-àm na h-Argantaine#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na h-Argantaine Siaraich),
-				'generic' => q(Àm na h-Argantaine Siaraich),
-				'standard' => q(Bun-àm na h-Argantaine Siaraich),
+				'daylight' => q#Tìde samhraidh na h-Argantaine Siaraich#,
+				'generic' => q#Àm na h-Argantaine Siaraich#,
+				'standard' => q#Bun-àm na h-Argantaine Siaraich#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Airmeinia),
-				'generic' => q(Àm Airmeinia),
-				'standard' => q(Bun-àm Airmeinia),
+				'daylight' => q#Tìde samhraidh Airmeinia#,
+				'generic' => q#Àm Airmeinia#,
+				'standard' => q#Bun-àm Airmeinia#,
 			},
 		},
 		'Asia/Aden' => {
@@ -9624,6 +9924,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Aşgabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Baghdād#,
 		},
@@ -9635,6 +9938,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Beirut#,
@@ -9671,6 +9977,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dushanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gàsa#,
@@ -9813,6 +10122,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tōkyō#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulaanbaatar#,
 		},
@@ -9839,14 +10151,14 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Tìde samhraidh a’ Chuain Siar),
-				'generic' => q(Àm a’ Chuain Siar),
-				'standard' => q(Bun-àm a’ Chuain Siar),
+				'daylight' => q#Tìde samhraidh a’ Chuain Siar#,
+				'generic' => q#Àm a’ Chuain Siar#,
+				'standard' => q#Bun-àm a’ Chuain Siar#,
 			},
 			short => {
-				'daylight' => q(ADT),
-				'generic' => q(AT),
-				'standard' => q(AST),
+				'daylight' => q#ADT#,
+				'generic' => q#AT#,
+				'standard' => q#AST#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -9917,176 +10229,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Meadhan Astràilia),
-				'generic' => q(Àm Meadhan Astràilia),
-				'standard' => q(Bun-àm Meadhan Astràilia),
+				'daylight' => q#Tìde samhraidh Meadhan Astràilia#,
+				'generic' => q#Àm Meadhan Astràilia#,
+				'standard' => q#Bun-àm Meadhan Astràilia#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Meadhan Astràilia an Iar),
-				'generic' => q(Àm Meadhan Astràilia an Iar),
-				'standard' => q(Bun-àm Meadhan Astràilia an Iar),
+				'daylight' => q#Tìde samhraidh Meadhan Astràilia an Iar#,
+				'generic' => q#Àm Meadhan Astràilia an Iar#,
+				'standard' => q#Bun-àm Meadhan Astràilia an Iar#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Astràilia an Ear),
-				'generic' => q(Àm Astràilia an Ear),
-				'standard' => q(Bun-àm Astràilia an Ear),
+				'daylight' => q#Tìde samhraidh Astràilia an Ear#,
+				'generic' => q#Àm Astràilia an Ear#,
+				'standard' => q#Bun-àm Astràilia an Ear#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Astràilia an Iar),
-				'generic' => q(Àm Astràilia an Iar),
-				'standard' => q(Bun-àm Astràilia an Iar),
+				'daylight' => q#Tìde samhraidh Astràilia an Iar#,
+				'generic' => q#Àm Astràilia an Iar#,
+				'standard' => q#Bun-àm Astràilia an Iar#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Asarbaideàin),
-				'generic' => q(Àm Asarbaideàin),
-				'standard' => q(Bun-àm Asarbaideàin),
+				'daylight' => q#Tìde samhraidh Asarbaideàin#,
+				'generic' => q#Àm Asarbaideàin#,
+				'standard' => q#Bun-àm Asarbaideàin#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Tìde samhraidh nan Eileanan Asorach),
-				'generic' => q(Àm nan Eileanan Asorach),
-				'standard' => q(Bun-àm nan Eileanan Asorach),
+				'daylight' => q#Tìde samhraidh nan Eileanan Asorach#,
+				'generic' => q#Àm nan Eileanan Asorach#,
+				'standard' => q#Bun-àm nan Eileanan Asorach#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Bangladais),
-				'generic' => q(Àm Bangladais),
-				'standard' => q(Bun-àm Bangladais),
+				'daylight' => q#Tìde samhraidh Bangladais#,
+				'generic' => q#Àm Bangladais#,
+				'standard' => q#Bun-àm Bangladais#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Àm Butàin),
+				'standard' => q#Àm Butàin#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Àm Boilibhia),
+				'standard' => q#Àm Boilibhia#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Bhrasilia),
-				'generic' => q(Àm Bhrasilia),
-				'standard' => q(Bun-àm Bhrasilia),
+				'daylight' => q#Tìde samhraidh Bhrasilia#,
+				'generic' => q#Àm Bhrasilia#,
+				'standard' => q#Bun-àm Bhrasilia#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Àm Bhrùnaigh Dàr as-Salàm),
+				'standard' => q#Àm Bhrùnaigh Dàr as-Salàm#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Tìde samhraidh a’ Chip Uaine),
-				'generic' => q(Àm a’ Chip Uaine),
-				'standard' => q(Bun-àm a’ Chip Uaine),
+				'daylight' => q#Tìde samhraidh a’ Chip Uaine#,
+				'generic' => q#Àm a’ Chip Uaine#,
+				'standard' => q#Bun-àm a’ Chip Uaine#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(Àm Chasey),
+				'standard' => q#Àm Chasey#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Àm Chamorro),
+				'standard' => q#Àm Chamorro#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Chatham),
-				'generic' => q(Àm Chatham),
-				'standard' => q(Bun-àm Chatham),
+				'daylight' => q#Tìde samhraidh Chatham#,
+				'generic' => q#Àm Chatham#,
+				'standard' => q#Bun-àm Chatham#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Sile),
-				'generic' => q(Àm na Sile),
-				'standard' => q(Bun-àm na Sile),
+				'daylight' => q#Tìde samhraidh na Sile#,
+				'generic' => q#Àm na Sile#,
+				'standard' => q#Bun-àm na Sile#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Sìne),
-				'generic' => q(Àm na Sìne),
-				'standard' => q(Bun-àm na Sìne),
+				'daylight' => q#Tìde samhraidh na Sìne#,
+				'generic' => q#Àm na Sìne#,
+				'standard' => q#Bun-àm na Sìne#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Choibalsan),
-				'generic' => q(Àm Choibalsan),
-				'standard' => q(Bun-àm Choibalsan),
+				'daylight' => q#Tìde samhraidh Choibalsan#,
+				'generic' => q#Àm Choibalsan#,
+				'standard' => q#Bun-àm Choibalsan#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Àm Eilean na Nollaig),
+				'standard' => q#Àm Eilean na Nollaig#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Àm Eileanan Chocos),
+				'standard' => q#Àm Eileanan Chocos#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Coloimbia),
-				'generic' => q(Àm Coloimbia),
-				'standard' => q(Bun-àm Coloimbia),
+				'daylight' => q#Tìde samhraidh Coloimbia#,
+				'generic' => q#Àm Coloimbia#,
+				'standard' => q#Bun-àm Coloimbia#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Leth-thìde samhraidh Eileanan Cook),
-				'generic' => q(Àm Eileanan Cook),
-				'standard' => q(Bun-àm Eileanan Cook),
+				'daylight' => q#Leth-thìde samhraidh Eileanan Cook#,
+				'generic' => q#Àm Eileanan Cook#,
+				'standard' => q#Bun-àm Eileanan Cook#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Cùba),
-				'generic' => q(Àm Cùba),
-				'standard' => q(Bun-àm Cùba),
+				'daylight' => q#Tìde samhraidh Cùba#,
+				'generic' => q#Àm Cùba#,
+				'standard' => q#Bun-àm Cùba#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Àm Dhavis),
+				'standard' => q#Àm Dhavis#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Àm Dumont-d’Urville),
+				'standard' => q#Àm Dumont-d’Urville#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Àm Thìomor an Ear),
+				'standard' => q#Àm Thìomor an Ear#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Eilean na Càisge),
-				'generic' => q(Àm Eilean na Càisge),
-				'standard' => q(Bun-àm Eilean na Càisge),
+				'daylight' => q#Tìde samhraidh Eilean na Càisge#,
+				'generic' => q#Àm Eilean na Càisge#,
+				'standard' => q#Bun-àm Eilean na Càisge#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Àm Eacuadoir),
+				'standard' => q#Àm Eacuadoir#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Àm Uile-choitcheann Co-òrdanaichte#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -10097,6 +10414,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrakhan#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#An Àithne#,
@@ -10131,10 +10451,10 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Baile Àtha Cliath#,
 			long => {
-				'daylight' => q(Bun-àm na h-Èireann),
+				'daylight' => q#Bun-àm na h-Èireann#,
 			},
 			short => {
-				'daylight' => q(TSÈ (Èirinn)),
+				'daylight' => q#TSÈ (Èirinn)#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -10161,6 +10481,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisbon#,
 		},
@@ -10170,10 +10493,10 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Dùn Èideann/Lunnainn#,
 			long => {
-				'daylight' => q(Tìde samhraidh Bhreatainn),
+				'daylight' => q#Tìde samhraidh Bhreatainn#,
 			},
 			short => {
-				'daylight' => q(TSB),
+				'daylight' => q#TSB#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -10224,6 +10547,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -10241,6 +10567,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tiranë#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ulyanovsk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Uzhgorod#,
@@ -10274,157 +10603,157 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Meadhan na Roinn-Eòrpa),
-				'generic' => q(Àm Meadhan na Roinn-Eòrpa),
-				'standard' => q(Bun-àm Meadhan na Roinn-Eòrpa),
+				'daylight' => q#Tìde samhraidh Meadhan na Roinn-Eòrpa#,
+				'generic' => q#Àm Meadhan na Roinn-Eòrpa#,
+				'standard' => q#Bun-àm Meadhan na Roinn-Eòrpa#,
 			},
 			short => {
-				'daylight' => q(CEST),
-				'generic' => q(CET),
-				'standard' => q(CET),
+				'daylight' => q#CEST#,
+				'generic' => q#CET#,
+				'standard' => q#CET#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Roinn-Eòrpa an Ear),
-				'generic' => q(Àm na Roinn-Eòrpa an Ear),
-				'standard' => q(Bun-àm na Roinn-Eòrpa an Ear),
+				'daylight' => q#Tìde samhraidh na Roinn-Eòrpa an Ear#,
+				'generic' => q#Àm na Roinn-Eòrpa an Ear#,
+				'standard' => q#Bun-àm na Roinn-Eòrpa an Ear#,
 			},
 			short => {
-				'daylight' => q(EEST),
-				'generic' => q(EET),
-				'standard' => q(EET),
+				'daylight' => q#EEST#,
+				'generic' => q#EET#,
+				'standard' => q#EET#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Àm na Roinn-Eòrpa nas fhaide ear),
+				'standard' => q#Àm na Roinn-Eòrpa nas fhaide ear#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Roinn-Eòrpa an Iar),
-				'generic' => q(Àm na Roinn-Eòrpa an Iar),
-				'standard' => q(Bun-àm na Roinn-Eòrpa an Iar),
+				'daylight' => q#Tìde samhraidh na Roinn-Eòrpa an Iar#,
+				'generic' => q#Àm na Roinn-Eòrpa an Iar#,
+				'standard' => q#Bun-àm na Roinn-Eòrpa an Iar#,
 			},
 			short => {
-				'daylight' => q(WEST),
-				'generic' => q(WET),
-				'standard' => q(WET),
+				'daylight' => q#WEST#,
+				'generic' => q#WET#,
+				'standard' => q#WET#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Tìde samhraidh nan Eileanan Fàclannach),
-				'generic' => q(Àm nan Eileanan Fàclannach),
-				'standard' => q(Bun-àm nan Eileanan Fàclannach),
+				'daylight' => q#Tìde samhraidh nan Eileanan Fàclannach#,
+				'generic' => q#Àm nan Eileanan Fàclannach#,
+				'standard' => q#Bun-àm nan Eileanan Fàclannach#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Fìdi),
-				'generic' => q(Àm Fìdi),
-				'standard' => q(Bun-àm Fìdi),
+				'daylight' => q#Tìde samhraidh Fìdi#,
+				'generic' => q#Àm Fìdi#,
+				'standard' => q#Bun-àm Fìdi#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Àm Guidheàna na Frainge),
+				'standard' => q#Àm Guidheàna na Frainge#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Àm Deasach agus Antartaigeach na Frainge),
+				'standard' => q#Àm Deasach agus Antartaigeach na Frainge#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwich Mean Time),
+				'standard' => q#Greenwich Mean Time#,
 			},
 			short => {
-				'standard' => q(GMT),
+				'standard' => q#GMT#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Àm Ghalapagos),
+				'standard' => q#Àm Ghalapagos#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Àm Ghambier),
+				'standard' => q#Àm Ghambier#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Cairtbheile),
-				'generic' => q(Àm na Cairtbheile),
-				'standard' => q(Bun-àm na Cairtbheile),
+				'daylight' => q#Tìde samhraidh na Cairtbheile#,
+				'generic' => q#Àm na Cairtbheile#,
+				'standard' => q#Bun-àm na Cairtbheile#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Àm Eileanan Ghileabairt),
+				'standard' => q#Àm Eileanan Ghileabairt#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Graonlainn an Ear),
-				'generic' => q(Àm na Graonlainn an Ear),
-				'standard' => q(Bun-àm na Graonlainn an Ear),
+				'daylight' => q#Tìde samhraidh na Graonlainn an Ear#,
+				'generic' => q#Àm na Graonlainn an Ear#,
+				'standard' => q#Bun-àm na Graonlainn an Ear#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Graonlainn an Iar),
-				'generic' => q(Àm na Graonlainn an Iar),
-				'standard' => q(Bun-àm na Graonlainn an Iar),
+				'daylight' => q#Tìde samhraidh na Graonlainn an Iar#,
+				'generic' => q#Àm na Graonlainn an Iar#,
+				'standard' => q#Bun-àm na Graonlainn an Iar#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Àm Guam),
+				'standard' => q#Àm Guam#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Àm a’ Chamais),
+				'standard' => q#Àm a’ Chamais#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Àm Guidheàna),
+				'standard' => q#Àm Guidheàna#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh nan Eileanan Hawai’i ’s Aleutach),
-				'generic' => q(Àm nan Eileanan Hawai’i ’s Aleutach),
-				'standard' => q(Bun-àm nan Eileanan Hawai’i ’s Aleutach),
+				'daylight' => q#Tìde Samhraidh nan Eileanan Hawai’i ’s Aleutach#,
+				'generic' => q#Àm nan Eileanan Hawai’i ’s Aleutach#,
+				'standard' => q#Bun-àm nan Eileanan Hawai’i ’s Aleutach#,
 			},
 			short => {
-				'daylight' => q(HADT),
-				'generic' => q(HAT),
-				'standard' => q(HAST),
+				'daylight' => q#HADT#,
+				'generic' => q#HAT#,
+				'standard' => q#HAST#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Hong Kong),
-				'generic' => q(Àm Hong Kong),
-				'standard' => q(Bun-àm Hong Kong),
+				'daylight' => q#Tìde samhraidh Hong Kong#,
+				'generic' => q#Àm Hong Kong#,
+				'standard' => q#Bun-àm Hong Kong#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Hovd),
-				'generic' => q(Àm Hovd),
-				'standard' => q(Bun-àm Hovd),
+				'daylight' => q#Tìde samhraidh Hovd#,
+				'generic' => q#Àm Hovd#,
+				'standard' => q#Bun-àm Hovd#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Àm nan Innseachan),
+				'standard' => q#Àm nan Innseachan#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -10462,264 +10791,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Àm Cuan nan Innseachan),
+				'standard' => q#Àm Cuan nan Innseachan#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Àm Sìn-Innseanach),
+				'standard' => q#Àm Sìn-Innseanach#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Àm Meadhan nan Innd-Innse),
+				'standard' => q#Àm Meadhan nan Innd-Innse#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Àm nan Innd-Innse an Ear),
+				'standard' => q#Àm nan Innd-Innse an Ear#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Àm nan Innd-Innse an Iar),
+				'standard' => q#Àm nan Innd-Innse an Iar#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Ioràin),
-				'generic' => q(Àm Ioràin),
-				'standard' => q(Bun-àm Ioràin),
+				'daylight' => q#Tìde samhraidh Ioràin#,
+				'generic' => q#Àm Ioràin#,
+				'standard' => q#Bun-àm Ioràin#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh Irkutsk),
-				'generic' => q(Àm Irkutsk),
-				'standard' => q(Bun-àm Irkutsk),
+				'daylight' => q#Tìde Samhraidh Irkutsk#,
+				'generic' => q#Àm Irkutsk#,
+				'standard' => q#Bun-àm Irkutsk#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Iosrael),
-				'generic' => q(Àm Iosrael),
-				'standard' => q(Bun-àm Iosrael),
+				'daylight' => q#Tìde samhraidh Iosrael#,
+				'generic' => q#Àm Iosrael#,
+				'standard' => q#Bun-àm Iosrael#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Tìde samhraidh na Seapaine),
-				'generic' => q(Àm na Seapaine),
-				'standard' => q(Bun-àm na Seapaine),
+				'daylight' => q#Tìde samhraidh na Seapaine#,
+				'generic' => q#Àm na Seapaine#,
+				'standard' => q#Bun-àm na Seapaine#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Petropavlovsk-Kamchatsky),
-				'generic' => q(Àm Petropavlovsk-Kamchatsky),
-				'standard' => q(Bun-àm Petropavlovsk-Kamchatsky),
+				'daylight' => q#Tìde samhraidh Petropavlovsk-Kamchatsky#,
+				'generic' => q#Àm Petropavlovsk-Kamchatsky#,
+				'standard' => q#Bun-àm Petropavlovsk-Kamchatsky#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Àm Casachstàin an Ear),
+				'standard' => q#Àm Casachstàin an Ear#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Àm Casachstàin an Iar),
+				'standard' => q#Àm Casachstàin an Iar#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Choirèa),
-				'generic' => q(Àm Choirèa),
-				'standard' => q(Bun-àm Choirèa),
+				'daylight' => q#Tìde samhraidh Choirèa#,
+				'generic' => q#Àm Choirèa#,
+				'standard' => q#Bun-àm Choirèa#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Àm Kosrae),
+				'standard' => q#Àm Kosrae#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Krasnoyarsk),
-				'generic' => q(Àm Krasnoyarsk),
-				'standard' => q(Bun-àm Krasnoyarsk),
+				'daylight' => q#Tìde samhraidh Krasnoyarsk#,
+				'generic' => q#Àm Krasnoyarsk#,
+				'standard' => q#Bun-àm Krasnoyarsk#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Àm Cìorgastain),
+				'standard' => q#Àm Cìorgastain#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Àm Lanca),
+				'standard' => q#Àm Lanca#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Àm Eileanan Teraina),
+				'standard' => q#Àm Eileanan Teraina#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Lord Howe),
-				'generic' => q(Àm Lord Howe),
-				'standard' => q(Bun-àm Lord Howe),
+				'daylight' => q#Tìde samhraidh Lord Howe#,
+				'generic' => q#Àm Lord Howe#,
+				'standard' => q#Bun-àm Lord Howe#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Macàthu),
-				'generic' => q(Àm Macàthu),
-				'standard' => q(Bun-àm Macàthu),
+				'daylight' => q#Tìde samhraidh Macàthu#,
+				'generic' => q#Àm Macàthu#,
+				'standard' => q#Bun-àm Macàthu#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Àm Eilein MhicGuaire),
+				'standard' => q#Àm Eilein MhicGuaire#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh Magadan),
-				'generic' => q(Àm Magadan),
-				'standard' => q(Bun-àm Magadan),
+				'daylight' => q#Tìde Samhraidh Magadan#,
+				'generic' => q#Àm Magadan#,
+				'standard' => q#Bun-àm Magadan#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Àm Mhalaidhsea),
+				'standard' => q#Àm Mhalaidhsea#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Àm nan Eileanan Mhaladaibh),
+				'standard' => q#Àm nan Eileanan Mhaladaibh#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Àm Eileanan a’ Mharcais),
+				'standard' => q#Àm Eileanan a’ Mharcais#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Àm Eileanan Mharshall),
+				'standard' => q#Àm Eileanan Mharshall#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Tìde samhraidh nan Eileanan Mhoiriseas),
-				'generic' => q(Àm nan Eileanan Mhoiriseas),
-				'standard' => q(Bun-àm nan Eileanan Mhoiriseas),
+				'daylight' => q#Tìde samhraidh nan Eileanan Mhoiriseas#,
+				'generic' => q#Àm nan Eileanan Mhoiriseas#,
+				'standard' => q#Bun-àm nan Eileanan Mhoiriseas#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Àm Mhawson),
+				'standard' => q#Àm Mhawson#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Mheagsago an Iar-thuath),
-				'generic' => q(Àm Mheagsago an Iar-thuath),
-				'standard' => q(Bun-àm Mheagsago an Iar-thuath),
+				'daylight' => q#Tìde samhraidh Mheagsago an Iar-thuath#,
+				'generic' => q#Àm Mheagsago an Iar-thuath#,
+				'standard' => q#Bun-àm Mheagsago an Iar-thuath#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Tìde samhraidh a’ Chuain Sèimh Mheagsago),
-				'generic' => q(Àm a’ Chuain Sèimh Mheagsago),
-				'standard' => q(Bun-àm a’ Chuain Sèimh Mheagsago),
+				'daylight' => q#Tìde samhraidh a’ Chuain Sèimh Mheagsago#,
+				'generic' => q#Àm a’ Chuain Sèimh Mheagsago#,
+				'standard' => q#Bun-àm a’ Chuain Sèimh Mheagsago#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Ulan Bator),
-				'generic' => q(Àm Ulan Bator),
-				'standard' => q(Bun-àm Ulan Bator),
+				'daylight' => q#Tìde samhraidh Ulan Bator#,
+				'generic' => q#Àm Ulan Bator#,
+				'standard' => q#Bun-àm Ulan Bator#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Mhosgo),
-				'generic' => q(Àm Mhosgo),
-				'standard' => q(Bun-àm Mhosgo),
+				'daylight' => q#Tìde samhraidh Mhosgo#,
+				'generic' => q#Àm Mhosgo#,
+				'standard' => q#Bun-àm Mhosgo#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Àm Miànmar),
+				'standard' => q#Àm Miànmar#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Àm Nabhru),
+				'standard' => q#Àm Nabhru#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Àm Neapàl),
+				'standard' => q#Àm Neapàl#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Chailleann Nuaidh),
-				'generic' => q(Àm Chailleann Nuaidh),
-				'standard' => q(Bun-àm Chailleann Nuaidh),
+				'daylight' => q#Tìde samhraidh Chailleann Nuaidh#,
+				'generic' => q#Àm Chailleann Nuaidh#,
+				'standard' => q#Bun-àm Chailleann Nuaidh#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Shealainn Nuaidh),
-				'generic' => q(Àm Shealainn Nuaidh),
-				'standard' => q(Bun-àm Shealainn Nuaidh),
+				'daylight' => q#Tìde samhraidh Shealainn Nuaidh#,
+				'generic' => q#Àm Shealainn Nuaidh#,
+				'standard' => q#Bun-àm Shealainn Nuaidh#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Talamh an Èisg),
-				'generic' => q(Àm Talamh an Èisg),
-				'standard' => q(Bun-àm Talamh an Èisg),
+				'daylight' => q#Tìde samhraidh Talamh an Èisg#,
+				'generic' => q#Àm Talamh an Èisg#,
+				'standard' => q#Bun-àm Talamh an Èisg#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Àm Niue),
+				'standard' => q#Àm Niue#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Àm Eilein Norfolk),
+				'standard' => q#Àm Eilein Norfolk#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh Fernando de Noronha),
-				'generic' => q(Àm Fernando de Noronha),
-				'standard' => q(Bun-àm Fernando de Noronha),
+				'daylight' => q#Tìde Samhraidh Fernando de Noronha#,
+				'generic' => q#Àm Fernando de Noronha#,
+				'standard' => q#Bun-àm Fernando de Noronha#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Àm nan Eileanan Mairianach a Tuath),
+				'standard' => q#Àm nan Eileanan Mairianach a Tuath#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Novosibirsk),
-				'generic' => q(Àm Novosibirsk),
-				'standard' => q(Bun-àm Novosibirsk),
+				'daylight' => q#Tìde samhraidh Novosibirsk#,
+				'generic' => q#Àm Novosibirsk#,
+				'standard' => q#Bun-àm Novosibirsk#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Omsk),
-				'generic' => q(Àm Omsk),
-				'standard' => q(Bun-àm Omsk),
+				'daylight' => q#Tìde samhraidh Omsk#,
+				'generic' => q#Àm Omsk#,
+				'standard' => q#Bun-àm Omsk#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -10767,9 +11096,9 @@ has 'time_zone_names' => (
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
 			short => {
-				'daylight' => q(HDT),
-				'generic' => q(HST),
-				'standard' => q(HST),
+				'daylight' => q#HDT#,
+				'generic' => q#HST#,
+				'standard' => q#HST#,
 			},
 		},
 		'Pacific/Johnston' => {
@@ -10846,245 +11175,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Pagastàin),
-				'generic' => q(Àm Pagastàin),
-				'standard' => q(Bun-àm Pagastàin),
+				'daylight' => q#Tìde samhraidh Pagastàin#,
+				'generic' => q#Àm Pagastàin#,
+				'standard' => q#Bun-àm Pagastàin#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Àm Palabh),
+				'standard' => q#Àm Palabh#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Àm Gini Nuaidh Paputhaiche),
+				'standard' => q#Àm Gini Nuaidh Paputhaiche#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Paraguaidh),
-				'generic' => q(Àm Paraguaidh),
-				'standard' => q(Bun-àm Paraguaidh),
+				'daylight' => q#Tìde samhraidh Paraguaidh#,
+				'generic' => q#Àm Paraguaidh#,
+				'standard' => q#Bun-àm Paraguaidh#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Pearù),
-				'generic' => q(Àm Pearù),
-				'standard' => q(Bun-àm Pearù),
+				'daylight' => q#Tìde samhraidh Pearù#,
+				'generic' => q#Àm Pearù#,
+				'standard' => q#Bun-àm Pearù#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Tìde samhraidh nan Eilean Filipineach),
-				'generic' => q(Àm nan Eilean Filipineach),
-				'standard' => q(Bun-àm nan Eilean Filipineach),
+				'daylight' => q#Tìde samhraidh nan Eilean Filipineach#,
+				'generic' => q#Àm nan Eilean Filipineach#,
+				'standard' => q#Bun-àm nan Eilean Filipineach#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Àm Eileanan Phoenix),
+				'standard' => q#Àm Eileanan Phoenix#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh Saint Pierre agus Miquelon),
-				'generic' => q(Àm Saint Pierre agus Miquelon),
-				'standard' => q(Bun-àm Saint Pierre agus Miquelon),
+				'daylight' => q#Tìde Samhraidh Saint Pierre agus Miquelon#,
+				'generic' => q#Àm Saint Pierre agus Miquelon#,
+				'standard' => q#Bun-àm Saint Pierre agus Miquelon#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Àm Peit a’ Chàirn),
+				'standard' => q#Àm Peit a’ Chàirn#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Àm Pohnpei),
+				'standard' => q#Àm Pohnpei#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Àm Pyeongyang#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Qızılorda),
-				'generic' => q(Àm Qızılorda),
-				'standard' => q(Bun-àm Qızılorda),
+				'daylight' => q#Tìde samhraidh Qızılorda#,
+				'generic' => q#Àm Qızılorda#,
+				'standard' => q#Bun-àm Qızılorda#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Àm Reunion),
+				'standard' => q#Àm Reunion#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Àm Rothera),
+				'standard' => q#Àm Rothera#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Sakhalin),
-				'generic' => q(Àm Sakhalin),
-				'standard' => q(Bun-àm Sakhalin),
+				'daylight' => q#Tìde samhraidh Sakhalin#,
+				'generic' => q#Àm Sakhalin#,
+				'standard' => q#Bun-àm Sakhalin#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Samara),
-				'generic' => q(Àm Samara),
-				'standard' => q(Bun-àm Samara),
+				'daylight' => q#Tìde samhraidh Samara#,
+				'generic' => q#Àm Samara#,
+				'standard' => q#Bun-àm Samara#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Samotha),
-				'generic' => q(Àm Samotha),
-				'standard' => q(Bun-àm Samotha),
+				'daylight' => q#Tìde samhraidh Samotha#,
+				'generic' => q#Àm Samotha#,
+				'standard' => q#Bun-àm Samotha#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Àm nan Eileanan Sheiseall),
+				'standard' => q#Àm nan Eileanan Sheiseall#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Àm Singeapòr),
+				'standard' => q#Àm Singeapòr#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Àm Eileanan Sholaimh),
+				'standard' => q#Àm Eileanan Sholaimh#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Àm Seòrsea a Deas),
+				'standard' => q#Àm Seòrsea a Deas#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Àm Suranaim),
+				'standard' => q#Àm Suranaim#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Àm Shyowa),
+				'standard' => q#Àm Shyowa#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Àm Tahiti),
+				'standard' => q#Àm Tahiti#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Taipei),
-				'generic' => q(Àm Taipei),
-				'standard' => q(Bun-àm Taipei),
+				'daylight' => q#Tìde samhraidh Taipei#,
+				'generic' => q#Àm Taipei#,
+				'standard' => q#Bun-àm Taipei#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Àm Taidigeastàin),
+				'standard' => q#Àm Taidigeastàin#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Àm Tokelau),
+				'standard' => q#Àm Tokelau#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Tonga),
-				'generic' => q(Àm Tonga),
-				'standard' => q(Bun-àm Tonga),
+				'daylight' => q#Tìde samhraidh Tonga#,
+				'generic' => q#Àm Tonga#,
+				'standard' => q#Bun-àm Tonga#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Àm Chuuk),
+				'standard' => q#Àm Chuuk#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Turcmanastàin),
-				'generic' => q(Àm Turcmanastàin),
-				'standard' => q(Bun-àm Turcmanastàin),
+				'daylight' => q#Tìde samhraidh Turcmanastàin#,
+				'generic' => q#Àm Turcmanastàin#,
+				'standard' => q#Bun-àm Turcmanastàin#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Àm Tubhalu),
+				'standard' => q#Àm Tubhalu#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Uruguaidh),
-				'generic' => q(Àm Uruguaidh),
-				'standard' => q(Bun-àm Uruguaidh),
+				'daylight' => q#Tìde samhraidh Uruguaidh#,
+				'generic' => q#Àm Uruguaidh#,
+				'standard' => q#Bun-àm Uruguaidh#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Usbagastàn),
-				'generic' => q(Àm Usbagastàn),
-				'standard' => q(Bun-àm Usbagastàn),
+				'daylight' => q#Tìde samhraidh Usbagastàn#,
+				'generic' => q#Àm Usbagastàn#,
+				'standard' => q#Bun-àm Usbagastàn#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Vanuatu),
-				'generic' => q(Àm Vanuatu),
-				'standard' => q(Bun-àm Vanuatu),
+				'daylight' => q#Tìde samhraidh Vanuatu#,
+				'generic' => q#Àm Vanuatu#,
+				'standard' => q#Bun-àm Vanuatu#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Àm na Bheiniseala),
+				'standard' => q#Àm na Bheiniseala#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Tìde Samhraidh Vladivostok),
-				'generic' => q(Àm Vladivostok),
-				'standard' => q(Bun-àm Vladivostok),
+				'daylight' => q#Tìde Samhraidh Vladivostok#,
+				'generic' => q#Àm Vladivostok#,
+				'standard' => q#Bun-àm Vladivostok#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Volgograd),
-				'generic' => q(Àm Volgograd),
-				'standard' => q(Bun-àm Volgograd),
+				'daylight' => q#Tìde samhraidh Volgograd#,
+				'generic' => q#Àm Volgograd#,
+				'standard' => q#Bun-àm Volgograd#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Àm Vostok),
+				'standard' => q#Àm Vostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Àm Eilean Wake),
+				'standard' => q#Àm Eilean Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Àm Uallas agus Futuna),
+				'standard' => q#Àm Uallas agus Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Yakutsk),
-				'generic' => q(Àm Yakutsk),
-				'standard' => q(Bun-àm Yakutsk),
+				'daylight' => q#Tìde samhraidh Yakutsk#,
+				'generic' => q#Àm Yakutsk#,
+				'standard' => q#Bun-àm Yakutsk#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Tìde samhraidh Yekaterinburg),
-				'generic' => q(Àm Yekaterinburg),
-				'standard' => q(Bun-àm Yekaterinburg),
+				'daylight' => q#Tìde samhraidh Yekaterinburg#,
+				'generic' => q#Àm Yekaterinburg#,
+				'standard' => q#Bun-àm Yekaterinburg#,
 			},
 		},
 	 } }

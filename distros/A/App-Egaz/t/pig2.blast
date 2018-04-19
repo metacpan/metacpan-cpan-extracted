@@ -1,0 +1,7 @@
+# BLASTN 2.6.0+
+# Query: pig2
+# Database: blastn_hGQM84iF
+# Fields: query id, subject id, q. start, q. end, s. start, s. end, query length, subject length, identical
+# 1 hits found
+pig2	pig2	1	22929	1	22929	22929	22929	22929
+# BLAST processed 1 queries

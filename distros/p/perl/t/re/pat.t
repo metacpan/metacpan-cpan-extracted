@@ -23,7 +23,7 @@ BEGIN {
     skip_all('no re module') unless defined &DynaLoader::boot_DynaLoader;
     skip_all_without_unicode_tables();
 
-plan tests => 838;  # Update this when adding/deleting tests.
+plan tests => 840;  # Update this when adding/deleting tests.
 
 run_tests() unless caller;
 
@@ -1911,6 +1911,10 @@ EOP
         # [perl #129281] buffer write overflow, detected by ASAN, valgrind
         fresh_perl_is('/0(?0)|^*0(?0)|^*(^*())0|/', '', {}, "don't bump whilem_c too much");
     }
+    {
+        # RT #131893 - fails with ASAN -fsanitize=undefined
+        fresh_perl_is('qr/0(0?(0||00*))|/', '', {}, "integer overflow during compilation");
+    }
 
     {
         # RT #131575 intuit skipping back from the end to find the highest
@@ -1920,6 +1924,9 @@ EOP
         my $text = "=t=\x{5000}";
         pos($text) = 3;
         ok(scalar($text !~ m{(~*=[a-z]=)}g), "RT #131575");
+    }
+    {
+        fresh_perl_is('"AA" =~ m/AA{1,0}/','',{},"handle OPFAIL insert properly");
     }
 
 } # End of sub run_tests

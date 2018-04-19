@@ -6,6 +6,7 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.96'
   Test::Output: '0'
+  Test::Warnings: '0'
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
@@ -27,8 +28,9 @@ requires:
   Hash::MultiValue: '0.06'
   IPC::Run3: '0'
   JSON: '0'
+  JSON::PP: '0'
   List::Util: '0'
-  Pandoc: v0.6.0
+  Pandoc: v0.7.2
   Pod::Simple: '3.08'
   Pod::Usage: '0'
   Scalar::Util: '0'
@@ -37,7 +39,8 @@ resources:
   bugtracker: https://github.com/nichtich/Pandoc-Elements/issues
   homepage: https://github.com/nichtich/Pandoc-Elements
   repository: https://github.com/nichtich/Pandoc-Elements.git
-version: '0.33'
+version: '0.34'
 x_contributors:
   - 'Benct Philip Jonsson <bpjonsson@gmail.com>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
+  - 'TakeAsh <take@TakeAsh.net>'

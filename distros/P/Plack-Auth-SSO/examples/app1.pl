@@ -32,7 +32,8 @@ builder {
         %{ $config->{cas} },
         #uri_base is needed in order to construct correct urls
         uri_base => $uri_base,
-        authorization_path => "/authorize"
+        authorization_path => "/authorize",
+        error_path => "/auth/error"
 
     )->to_app;
 
@@ -43,6 +44,7 @@ builder {
         %{ $config->{orcid} },
         uri_base => $uri_base,
         authorization_path => "/authorize",
+        error_path => "/auth/error"
 
     )->to_app;
 
@@ -57,6 +59,26 @@ builder {
             [ "Location" => "${uri_base}/" ],
             []
         ];
+
+    };
+
+    mount "/auth/error" => sub {
+
+        my $env = shift;
+        my $session = Plack::Session->new($env);
+        my $auth_sso_error = $session->get( "auth_sso_error" );
+
+        unless ( is_hash_ref( $auth_sso_error ) ) {
+
+            return [
+                302,
+                [ "Location" => "${uri_base}/" ],
+                []
+            ];
+
+        }
+
+        [ 500, [ "Content-Type" => "text/html" ], [ $auth_sso_error->{content} ] ];
 
     };
 

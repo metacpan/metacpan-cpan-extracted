@@ -15,7 +15,7 @@
   #include "spvm_block.h"
 %}
 
-%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF CLASS
+%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF
 %token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF CROAK VAR_NAME INTERFACE REF ISA
 %token <opval> SWITCH CASE DEFAULT VOID EVAL BYTE SHORT INT LONG FLOAT DOUBLE STRING WEAKEN
 
@@ -23,7 +23,7 @@
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop isa
 %type <opval> opt_assignable_terms assignable_terms assignable_term args arg opt_args use declaration_in_package declarations_in_package term logical_term relative_term
 %type <opval> enumeration_values enumeration_value weaken_field our_var invocant
-%type <opval> type package_name field_name sub_name package declarations_in_grammar opt_enumeration_values type_array
+%type <opval> type package_name field_name sub_name package anon_package declarations_in_grammar opt_enumeration_values type_array
 %type <opval> for_statement while_statement expression opt_declarations_in_grammar var
 %type <opval> call_field array_elem convert_type enumeration new_object type_name array_length declaration_in_grammar
 %type <opval> switch_statement case_statement default_statement type_array_with_length
@@ -94,8 +94,7 @@ declarations_in_grammar
   | declaration_in_grammar
 
 declaration_in_grammar
-  : use
-  | package
+  : package
 
 use
   : USE package_name ';'
@@ -107,6 +106,12 @@ package
   : PACKAGE package_name opt_colon_descriptors package_block
     {
       $$ = SPVM_OP_build_package(compiler, $1, $2, $4, $3);
+    }
+
+anon_package
+  : PACKAGE opt_colon_descriptors package_block
+    {
+      $$ = SPVM_OP_build_package(compiler, $1, NULL, $3, $2);
     }
 
 opt_declarations_in_package
@@ -147,6 +152,7 @@ declaration_in_package
   | sub
   | enumeration
   | our_var ';'
+  | use;
 
 package_block
   : '{' opt_declarations_in_package '}'
@@ -491,6 +497,10 @@ new_object
     {
       $$ = SPVM_OP_build_new_object(compiler, $1, $2, $4);
     }
+  | NEW anon_package
+    {
+      $$ = SPVM_OP_build_new_object(compiler, $1, $2, NULL);
+    }
 
 convert_type
   : '(' type ')' assignable_term
@@ -652,7 +662,7 @@ array_elem
 call_sub
   : sub_name '(' opt_assignable_terms  ')'
     {
-      $$ = SPVM_OP_build_call_sub(compiler, SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, $1->file, $1->line), $1, $3);
+      $$ = SPVM_OP_build_call_sub(compiler, NULL, $1, $3);
     }
   | package_name ARROW sub_name '(' opt_assignable_terms  ')'
     {
@@ -744,10 +754,6 @@ arg
 
 invocant
   : var ':' SELF
-    {
-      $$ = SPVM_OP_build_arg(compiler, $1, $3);
-    }
-  | var ':' CLASS
     {
       $$ = SPVM_OP_build_arg(compiler, $1, $3);
     }

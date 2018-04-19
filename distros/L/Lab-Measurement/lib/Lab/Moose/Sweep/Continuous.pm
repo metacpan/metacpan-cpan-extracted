@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous;
-$Lab::Moose::Sweep::Continuous::VERSION = '3.630';
+$Lab::Moose::Sweep::Continuous::VERSION = '3.631';
 #ABSTRACT: Base class for continuous sweeps (time, temperature, magnetic field)
 
 
@@ -252,8 +252,8 @@ Rate: $rate
 EOF
     my $instrument = $self->instrument();
     $instrument->config_sweep(
-        points => $point,
-        rates  => $rate
+        point => $point,
+        rate  => $rate
     );
     $instrument->trg();
     $instrument->wait();
@@ -270,8 +270,8 @@ Setpoint: $to
 Rate: $rate
 EOF
     $instrument->config_sweep(
-        points => $to,
-        rates  => $rate,
+        point => $to,
+        rate  => $rate,
     );
     $instrument->trg();
     $self->_start_time( time() );
@@ -316,7 +316,7 @@ Lab::Moose::Sweep::Continuous - Base class for continuous sweeps (time, temperat
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 SYNOPSIS
 

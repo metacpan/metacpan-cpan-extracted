@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.27';
+our $VERSION = '0.34';
 
 use parent 'Pandoc::Filter';
 use Pandoc::Elements;

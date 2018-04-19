@@ -362,7 +362,22 @@ int _looks_like_number(pTHX_ SV * x) {
 
 }
 
+SV * _set_C (pTHX_ char * str) {
+#ifdef Perl_strtod
+ return newSVnv(Perl_strtod(str, NULL));
+#else
+ warn("'Perl_strtod' not defined");
+ return &PL_sv_undef;
+#endif
+}
 
+int _has_perl_strtod(void) {
+#ifdef Perl_strtod
+  return 1;
+#else
+  return 0;
+#endif
+}
 
 
 MODULE = Math::NV  PACKAGE = Math::NV
@@ -500,4 +515,15 @@ _looks_like_number (x)
 CODE:
   RETVAL = _looks_like_number (aTHX_ x);
 OUTPUT:  RETVAL
+
+SV *
+_set_C (str)
+	char *	str
+CODE:
+  RETVAL = _set_C (aTHX_ str);
+OUTPUT:  RETVAL
+
+int
+_has_perl_strtod ()
+
 

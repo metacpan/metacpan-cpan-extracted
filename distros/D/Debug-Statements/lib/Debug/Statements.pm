@@ -11,19 +11,26 @@ $Data::Dumper::Terse = 1;    # eliminate the $VAR1
 use Exporter;
 use base qw( Exporter );
 our @EXPORT    = qw( d d0 d2 d3 D );
-our @EXPORT_OK = qw( d d0 d1 d2 d3 ls D );
+our @EXPORT_OK = qw( d d0 d1 d2 d3 D ls LS cp CP Die );
+our %EXPORT_TAGS = ( all => [qw(&d &d0 &d1 &d2 &d3 &D &ls &LS &cp &CP &Die)]);  # use Debug::Statements qw(:all)
 
 my $VERSION = '1.005';
 
 my $printdebug = "DEBUG:  ";    # print statement begins with this
-my $id         = 0;             # for debugging this module, turn on with d('', 10)
+my $id         = 0;             # If $d is negative, turn on $id (internal debug flag), and use the absolute value of $d.  For example:   $d = -1;
 my $flag       = '$d';          # choose another variable besides '$d'
 my $disable    = 0;             # disable all functionality (for performance)
 if ( not eval "use PadWalker; 1" ) {  ## no critic
     $disable = 1;
     print "Did not find PadWalker so disabling Debug::Statements - d()\n";
     print "    Please install PadWalker from CPAN\n";
-    eval 'sub d {}; sub d0 {}; sub d1 {} ; sub d2 {} ; sub d3 {} ; sub D {} ; sub ls {}';  ## no critic
+    eval 'sub d {}; sub d0 {}; sub d1 {} ; sub d2 {} ; sub d3 {} ; sub D {} ; sub ls {} ; sub LS {} ; sub cp {} ; sub CP {}';  ## no critic
+}
+my $data_printer_installed = 0; ### Disabled because it has problems printing %opt - $dump = '21/32'
+if ( not eval "use Data::Printer; 1" ) {  ## no critic
+    $data_printer_installed = 0;
+    #print "Did not find Data::Printer so using Dumpvalue and Data::Dumper instead\n";
+    #print "    Please install Data::Printer from CPAN\n";
 }
 my $truncateLines      = 10;
 my $globalPrintCounter = 0;
@@ -125,7 +132,7 @@ sub d3 {
 }
 
 sub checkLevel {
-    # Return if debug level is not high enough
+    # Return 1 if debug level is high enough
     my ( $h, $level ) = @_;
     if ($id) { print "sub checkLevel()\n" }
     if ($id) { print "\n\ninternaldebug checkLevel:  Dumping \$h:\n"; Dumpvalue->new->dumpValue($h) }
@@ -219,6 +226,7 @@ sub dx {
             $originalCmdLine =~ s/COMMAND\n//;
             chomp($originalCmdLine);
             print "DEBUG:  The debugged script was run as $originalCmdLine\n";
+            # This may be limited to a bit over 4000 characters
         }
     }
 
@@ -228,8 +236,11 @@ sub dx {
 
     if ( 0 == 1 ) { dumperTests($h) }
 
-    if ( !defined $vars ) {
-        print "WARNING:  Debug::Statements::d() was given a bare reference to an undefined variable instead of a single-quoted string\n";
+    if ( ! defined $vars ) {
+        # D;
+        # D();
+        # print "WARNING:  Debug::Statements::d() was given a bare reference to an undefined variable instead of a single-quoted string\n";
+        printdebugsub( $caller, $opt{level}, "", "", "", '', \%opt );
         return;
     }
 
@@ -293,6 +304,9 @@ sub dx {
             return;
         }
         #printdebugsub($caller, $opt{level}, "", "", $prefix, $suffix, \%opt);   #07/12/13
+        # Enable d '.';
+        $ovars = '....................................................................................................' if $ovars eq '.';
+        $ovars =~ s/^\. (\S)/$1/; # D '. Hello World';
         printdebugsub( $caller, $opt{level}, "", "", "", $ovars, \%opt );
     }
     return;
@@ -305,7 +319,7 @@ sub dumpvar {
 
     # Convert ${var} to ${var}
     if ($id) { print "internaldebug dumpvar:  \$vvar = '$var'\n" }
-    $var =~ s/^([\$\@\%]){(\S+)}$/$1$2/;
+    $var =~ s/^([\$\@\%])\{(\S+)\}$/$1$2/;
     if ($id) { print "internaldebug dumpvar:  \$vvar = '$var'\n" }
 
     # Convert $h->{'$listvar[0]'}      to  $h->{'@listvar'}[0]
@@ -328,7 +342,12 @@ sub dumpvar {
         my $reference = evlwrapper( $h, $e, 'dumpvar $hash{$key}' );
         if ($id) { print "internaldebug dumpvar:  \$reference = $reference\n" }
         #my $dump = cleanDump( $reference, undef );
-        my $dump = Dumper($reference);
+        my $dump;
+        if ($data_printer_installed) {
+            $dump = Data::Printer::p($reference);
+        } else {
+            $dump = Dumper($reference);
+        }
         $dump =~ s/^\\//;
         chomp $dump;
         if ($id) { print "internaldebug dumpvar:  \$dump = '$dump'\n" }
@@ -407,7 +426,7 @@ sub dumpvar {
         # Special variables
         # Package variables
         elsif (( $var =~ /^(\$0|\$\$|\$\?|\$\.|\@ARGV|\$LIST_SEPARATOR|\$PROCESS_ID|\$PID|\$PROGRAM_NAME|\$REAL_GROUP_ID|\$GID|\$EFFECTIVE_GROUP_ID|\$EGID\|\$REAL_USER_ID|\$UID|\$EFFECTIVE_USER_ID|\$EID|\$SUBSCRIPT_SEPARATOR|\$SUBSEP|\%ENV|\@INC|\$INPLACE_EDIT|\$OSNAME|\%SIG|\$BASETIME|\$PERL_VERSION|\$EXECUTABLE_NAME|\$MATCH|\$PREMATCH|\$POSTMATCH|\$ARGV|\@ARGV|\$OUTPUT_FIELD_SEPARATOR|\$INPUT_LINE_NUMBER|\$NR|\$INPUT_RECORD_SEPARATOR|\$RS|\$OUTPUT_RECORD_SEPARATOR|\$ORS|\$OUTPUT_AUTOFLUSH)$/ )
-            or ( $var =~ /^[\$\@\%]{?[a-zA-Z_][\w:{}\[\]]*$/ and $var =~ /::/ ) )
+            or ( $var =~ /^[\$\@\%]\{?[a-zA-Z_][\w:{}\[\]]*$/ and $var =~ /::/ ) )
         {
             return handlelocalvar( $var, $opt );
         }
@@ -417,7 +436,7 @@ sub dumpvar {
             return;
         }
         # $scalar @list %hash
-        elsif ( $var =~ /^[\$\@\%]{?[a-zA-Z_][\w{}\[\]]*$/ ) {
+        elsif ( $var =~ /^[\$\@\%]\{?[a-zA-Z_][\w{}\[\]]*$/ ) {
             # normal variable
             $reference = $h->{$var};
         }
@@ -506,7 +525,14 @@ sub cleanDump {
     if ( $opt->{Sort} and $ref eq "ARRAY" ) {
         $dump = Dumper( [ sort { $a cmp $b } @$reference ] );    # to sort array
     } else {
-        $dump = Dumper($reference);
+        if ($data_printer_installed) {
+            if ($id) { print "internaldebug cleanDump data_printer_installed\n" }
+            $dump = Dumper($reference);
+            if ($id) { print "internaldebug cleanDump normal dumper = $dump\n" }
+            $dump = Data::Printer::p($reference);
+        } else {
+            $dump = Dumper($reference);
+        }
     }
     if ($id) { print "internaldebug cleanDump:  \$dump = '$dump'\n" }
     $dump =~ s/^\\//;
@@ -611,30 +637,46 @@ sub printdebugsub {
     return;
 }
 
+# Always print ls -l listing, regardless of $d.  Similar to D()
+# LS($filename) 
+sub LS {
+    my ($filenames, $options) = @_;
+    $options = '-l' if ! defined $options;
+    ls($filenames, $options, 0, 2);
+}
+
 # ls($filename) 
 # ls($filename, $level)
 # ls("$filename1 filename2", $level)
 sub ls {
-    my ( $filenames, $level ) = @_;
+    my ( $filenames, $options, $level, $peek_my_parameter ) = @_;
+    #my $id = 1;
+    # $options affect unix 'ls', not windows 'dir'
+    $options = '-l' if ! defined $options;
+    $options = "-$options" if ! $options =~ /^-/;
     return if $disable;
-    $level = 1 if !$level;
+    $peek_my_parameter = 1 if ! defined $peek_my_parameter;
+    $level = 1 if ! defined $level;
     if ($id) { print "internaldebug ls:  \$level = '$level'\n" }
-    my $h = PadWalker::peek_my(1);
+    my $h = PadWalker::peek_my($peek_my_parameter);
+    # print Dumper($h);
     return if not checkLevel( $h, $level );
     my $windows = ($^O =~ /Win/) ? 1 : 0;
     my $command;
     for my $file ( split /\s+/, $filenames ) {
-        if ( $windows ) {
-            $command = "dir $file";
-        } else {
-            $command = "ls -l $file";
-        }
-        if ($id) { print "internaldebug ls:  \$command = '$command'\n" }
         my $lsl;
-        if ( -d $file or -f $file ) {
-            $lsl = `$command`;
-            chomp $lsl;
-        } elsif ( -f $file ) {
+        if ( -e $file ) {
+            if ( $windows ) {
+                $command = "dir $file";
+            } else {
+                if ( -f $file ) {
+                    $command = "ls $options $file";
+                } else {
+                    # dir
+                    $command = "ls -d $options $file;ls $options $file|egrep -v '^total [0-9]'";
+                }
+            }
+            if ($id) { print "internaldebug ls:  \$command = '$command'\n" }
             $lsl = `$command`;
             chomp $lsl;
         } else {
@@ -646,9 +688,66 @@ sub ls {
         }
         if ($id) { print "internaldebug ls:  \$lsl = '$lsl'\n" }
         my $caller = ( caller(1) )[3] || "";
-        printdebugsub( $caller, $level, "ls -l", $lsl, "", "" );
+        printdebugsub( $caller, $level, "ls $options", $lsl, "", "" );
     }
     return;
+}
+
+# cp($filename) 
+# cp($filename, $level)
+# cp("$filename1 filename2", $level)
+sub cp {
+    my ( $filenames, $level, $peek_my_parameter ) = @_;
+    return if $disable;
+    $peek_my_parameter = 1 if ! defined $peek_my_parameter;
+    $level = 1 if ! defined $level;
+    if ($id) { print "internaldebug cp  \$level = '$level'\n" }
+    my $h = PadWalker::peek_my($peek_my_parameter);
+    # print Dumper($h);
+    return if not checkLevel( $h, $level );
+    my $windows = ($^O =~ /Win/) ? 1 : 0;
+    my $command;
+    for my $file ( split /\s+/, $filenames ) {
+        if ( -e $file ) {
+            if ( $windows ) {
+                $command = "copy $file /tmp";
+                ### directory probably does not work
+            } else {
+                if ( -f $file ) {
+                    $command = "cp $file /tmp";
+                } else {
+                    # dir
+                    $command = "cp -r $file /tmp";
+                }
+            }
+            if ($id) { print "internaldebug cp:  \$command = '$command'\n" }
+            `$command`;
+        } else {
+            if ( $file =~ /^\$/ ) {
+                print "DEBUG:  WARNING:  Debug::Statements::ls() did not understand file name $file.  You probably need to remove the 'single quotes' around your variable\n";
+                return;
+            }
+            $file = "$file does not exist!";
+        }
+        my $caller = ( caller(1) )[3] || "";
+        printdebugsub( $caller, $level, "ls -l", $file, "", "" );
+    }
+    return;
+}
+# Always copy, regardless of $d.  Similar to D()
+# CP($filename) 
+sub CP {
+    my $filenames = shift;
+    cp($filenames, 0, 2);
+}
+
+sub Die {
+	my $i = 1;
+	print "\nDEBUG:  Stack Trace:\n";
+	while ( (my @call_details = (caller($i++))) ){
+		print $call_details[1].":".$call_details[2]." in function ".$call_details[3]."\n";
+	}
+    exit 1;
 }
 
 sub dumperTests {
@@ -693,6 +792,8 @@ sub evlwrapper {
 1;
 
 __END__
+
+# NOTE:  If $d is negative, turn on $id (internal debug flag), and use the absolute value of $d.  For example:   $d = -1;
 
 =head1 NAME
 
@@ -1099,17 +1200,17 @@ OR comment out some of your calls to C<d()> within performance-critical loops
 OR completely disable this code is to define you own empty d() subroutines.
 
     #use Debug::Statements qw(d d2);
-    d{}; d2{};
+    sub d{}; sub d2{};
 
 =back
 
 =head1 AUTHOR
 
-Chris Koknat 2014 chris.koknat@gmail.com
+Chris Koknat 2018 chris.koknat@gmail.com
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-14 by Chris Koknat.
+This software is copyright (c) 2013-18 by Chris Koknat.
 
 This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 

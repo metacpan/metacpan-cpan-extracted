@@ -12,9 +12,12 @@
 /* #include "ppport.h" */
 
 #include <stdio.h>
-#include <stdarg.h>
+#include "util.h"
 #include "duktape.h"
 #include "duk_console.h"
+
+/* set this to non-zero to send all console ouput to stderr */
+#define CONSOLE_USE_STDERR_ALWAYS 1
 
 /* XXX: Add some form of log level filtering. */
 
@@ -29,11 +32,43 @@
 
 /* XXX: Init console object using duk_def_prop() when that call is available. */
 
+typedef struct ConsoleConfig {
+    ConsoleHandler* handler;
+    void* data;
+} ConsoleConfig;
+
+static ConsoleConfig console_config;
+
+int duk_console_log(duk_uint_t flags, const char* fmt, ...)
+{
+    int ret = 0;
+    if (console_config.handler) {
+        va_list ap;
+        va_start(ap, fmt);
+        ret = console_config.handler(flags, console_config.data, fmt, ap);
+        va_end(ap);
+    }
+    return ret;
+}
+
+void duk_console_register_handler(ConsoleHandler* handler, void* data)
+{
+    console_config.handler = handler;
+    console_config.data = data;
+}
+
 static duk_ret_t duk__console_log_helper(duk_context *ctx, int to_stderr, const char *error_name) {
 	duk_idx_t i, n;
 	duk_uint_t flags;
 
+#if defined(CONSOLE_USE_STDERR_ALWAYS) && CONSOLE_USE_STDERR_ALWAYS > 0
+    to_stderr = 1;
+#endif
+
 	flags = (duk_uint_t) duk_get_current_magic(ctx);
+    if (to_stderr) {
+        flags |= DUK_CONSOLE_TO_STDERR;
+    }
 
 	n = duk_get_top(ctx);
 
@@ -64,11 +99,7 @@ static duk_ret_t duk__console_log_helper(duk_context *ctx, int to_stderr, const 
 		duk_get_prop_string(ctx, -1, "stack");
 	}
 
-    PerlIO* fp = to_stderr ? PerlIO_stderr() : PerlIO_stdout();
-    PerlIO_printf(fp, "%s\n", duk_to_string(ctx, -1));
-	if (flags & DUK_CONSOLE_FLUSH) {
-		PerlIO_flush(fp);
-	}
+    duk_console_log(flags, "%s\n", duk_to_string(ctx, -1));
 	return 0;
 }
 

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::En::Any::Au - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Au;
 # This file auto generated from Data\common\main\en_AU.xml
-#	on Fri 29 Apr  6:59:36 pm GMT
+#	on Fri 13 Apr  7:07:47 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -28,8 +29,10 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'bax' => 'Bamum',
+				'bn' => 'Bengali',
  				'en_US' => 'United States English',
+ 				'frc' => 'frc',
+ 				'lou' => 'lou',
  				'ro_MD' => 'Moldovan',
 
 			);
@@ -39,6 +42,24 @@ has 'display_name_language' => (
 			return \%languages;
 		}
 	},
+);
+
+has 'display_name_script' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		sub {
+			my %scripts = (
+			'Beng' => 'Bengali',
+
+			);
+			if ( @_ ) {
+				return $scripts{$_[0]};
+			}
+			return \%scripts;
+		}
+	}
 );
 
 has 'display_name_type' => (
@@ -62,19 +83,6 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'centimeter' => {
-						'per' => q({0} centimetre),
-					},
-					'coordinate' => {
-						'east' => q({0} east),
-						'north' => q({0} north),
-						'south' => q({0} south),
-						'west' => q({0} west),
-					},
-					'decimeter' => {
-						'one' => q(decimetre),
-						'other' => q({0} decimetres),
-					},
 					'generic' => {
 						'name' => q(degrees),
 						'one' => q({0} degree),
@@ -126,6 +134,11 @@ has 'units' => (
 						'one' => q({0} km/h),
 						'other' => q({0} km/h),
 					},
+					'liter' => {
+						'one' => q({0}L),
+						'other' => q({0}L),
+						'per' => q({0}/L),
+					},
 					'liter-per-100kilometers' => {
 						'name' => q(L/100km),
 						'one' => q({0}L/100km),
@@ -140,9 +153,6 @@ has 'units' => (
 						'name' => q(ML),
 						'one' => q({0}ML),
 						'other' => q({0}ML),
-					},
-					'meter' => {
-						'name' => q(metre),
 					},
 					'mile-per-hour' => {
 						'name' => q(m.p.h.),
@@ -227,6 +237,18 @@ has 'units' => (
 						'one' => q({0} fm),
 						'other' => q({0} fm),
 					},
+					'gallon' => {
+						'name' => q(US gal.),
+						'one' => q({0} gal. US),
+						'other' => q({0} gal. US),
+						'per' => q({0}/gal. US),
+					},
+					'gallon-imperial' => {
+						'name' => q(gal.),
+						'one' => q({0} gal.),
+						'other' => q({0} gal.),
+						'per' => q({0}/gal.),
+					},
 					'generic' => {
 						'name' => q(deg.),
 					},
@@ -237,6 +259,11 @@ has 'units' => (
 					},
 					'hour' => {
 						'per' => q({0} phr),
+					},
+					'kilocalorie' => {
+						'name' => q(Cal),
+						'one' => q({0} Cal),
+						'other' => q({0} Cal),
 					},
 					'kilometer-per-hour' => {
 						'one' => q({0} km/h),
@@ -252,6 +279,7 @@ has 'units' => (
 					'liter' => {
 						'one' => q({0} L),
 						'other' => q({0} L),
+						'per' => q({0}/L),
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(L/100 km),
@@ -330,9 +358,6 @@ has 'units' => (
 						'other' => q({0} sec.),
 						'per' => q({0} ps.),
 					},
-					'square-meter' => {
-						'name' => q(metres²),
-					},
 				},
 			} }
 );
@@ -353,6 +378,7 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'exponential' => q(e),
+			'timeSeparator' => q(.),
 		},
 	} }
 );
@@ -364,13 +390,6 @@ has 'currencies' => (
 	default		=> sub { {
 		'AUD' => {
 			symbol => '$',
-		},
-		'AWG' => {
-			display_name => {
-				'currency' => q(Aruba Guilder),
-				'one' => q(Aruba guilder),
-				'other' => q(Aruba guilders),
-			},
 		},
 		'BAM' => {
 			display_name => {
@@ -409,6 +428,13 @@ has 'currencies' => (
 		},
 		'CAD' => {
 			symbol => 'CAD',
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(CNH),
+				'one' => q(CNH),
+				'other' => q(CNH),
+			},
 		},
 		'CNY' => {
 			symbol => 'CNY',
@@ -594,7 +620,7 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					narrow => {
+					abbreviated => {
 						nonleap => [
 							'Jan.',
 							'Feb.',
@@ -634,6 +660,15 @@ has 'calendar_days' => (
 						sat => 'Sat.',
 						sun => 'Sun.'
 					},
+					narrow => {
+						mon => 'M.',
+						tue => 'Tu.',
+						wed => 'W.',
+						thu => 'Th.',
+						fri => 'F.',
+						sat => 'Sa.',
+						sun => 'Su.'
+					},
 					short => {
 						mon => 'Mon.',
 						tue => 'Tu.',
@@ -645,6 +680,15 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						mon => 'Mon.',
+						tue => 'Tue.',
+						wed => 'Wed.',
+						thu => 'Thu.',
+						fri => 'Fri.',
+						sat => 'Sat.',
+						sun => 'Sun.'
+					},
 					narrow => {
 						mon => 'M.',
 						tue => 'Tu.',
@@ -652,6 +696,15 @@ has 'calendar_days' => (
 						thu => 'Th.',
 						fri => 'F.',
 						sat => 'Sa.',
+						sun => 'Su.'
+					},
+					short => {
+						mon => 'Mon.',
+						tue => 'Tu.',
+						wed => 'Wed.',
+						thu => 'Th.',
+						fri => 'Fri.',
+						sat => 'Sat.',
 						sun => 'Su.'
 					},
 				},
@@ -669,78 +722,78 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'islamic') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'japanese') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -761,51 +814,51 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
+					'noon' => q{midday},
+					'night1' => q{night},
+					'afternoon1' => q{afternoon},
+					'morning1' => q{morning},
+					'midnight' => q{midnight},
 					'pm' => q{pm},
 					'am' => q{am},
 					'evening1' => q{evening},
-					'afternoon1' => q{afternoon},
-					'midnight' => q{midnight},
-					'night1' => q{night},
-					'morning1' => q{morning},
-					'noon' => q{midday},
-				},
-				'wide' => {
-					'night1' => q{night},
-					'noon' => q{midday},
-					'morning1' => q{morning},
-					'midnight' => q{midnight},
-					'afternoon1' => q{afternoon},
-					'evening1' => q{evening},
-					'am' => q{am},
-					'pm' => q{pm},
 				},
 				'narrow' => {
-					'noon' => q{midday},
-					'night1' => q{night},
-					'morning1' => q{morning},
-					'midnight' => q{midnight},
-					'afternoon1' => q{afternoon},
 					'evening1' => q{evening},
-					'pm' => q{pm},
 					'am' => q{am},
+					'night1' => q{night},
+					'noon' => q{midday},
+					'afternoon1' => q{afternoon},
+					'morning1' => q{morning},
+					'pm' => q{pm},
+					'midnight' => q{midnight},
+				},
+				'wide' => {
+					'evening1' => q{in the evening},
+					'am' => q{am},
+					'pm' => q{pm},
+					'midnight' => q{midnight},
+					'night1' => q{at night},
+					'noon' => q{midday},
+					'morning1' => q{in the morning},
+					'afternoon1' => q{in the afternoon},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'am' => q{am},
+				'abbreviated' => {
 					'noon' => q{midday},
+					'am' => q{am},
 					'pm' => q{pm},
 				},
 				'narrow' => {
+					'pm' => q{pm},
 					'am' => q{am},
 					'noon' => q{midday},
-					'pm' => q{pm},
 				},
-				'abbreviated' => {
+				'wide' => {
+					'pm' => q{pm},
 					'am' => q{am},
 					'noon' => q{midday},
-					'pm' => q{pm},
 				},
 			},
 		},
@@ -821,7 +874,7 @@ has 'eras' => (
 		},
 		'gregorian' => {
 		},
-		'japanese' => {
+		'islamic' => {
 		},
 	} },
 );
@@ -836,7 +889,7 @@ has 'date_formats' => (
 		'gregorian' => {
 			'short' => q{d/M/yy},
 		},
-		'japanese' => {
+		'islamic' => {
 		},
 	} },
 );
@@ -850,7 +903,7 @@ has 'time_formats' => (
 		},
 		'gregorian' => {
 		},
-		'japanese' => {
+		'islamic' => {
 		},
 	} },
 );
@@ -864,7 +917,7 @@ has 'datetime_formats' => (
 		},
 		'gregorian' => {
 		},
-		'japanese' => {
+		'islamic' => {
 		},
 	} },
 );
@@ -874,16 +927,17 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'japanese' => {
-			yMEd => q{E, d/M/y},
-			yMd => q{d/M/y},
-		},
 		'generic' => {
 			yMEd => q{E, dd/MM/y},
 			yMd => q{dd/MM/y},
 		},
 		'gregorian' => {
-			M => q{LL},
+			MEd => q{E, d/M},
+			Md => q{d/M},
+		},
+		'islamic' => {
+			yMEd => q{E, dd/MM/y},
+			yMd => q{dd/MM/y},
 		},
 	} },
 );
@@ -924,113 +978,126 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Eastern Africa Time),
+				'standard' => q#Eastern Africa Time#,
 			},
+		},
+		'America/St_Barthelemy' => {
+			exemplarCity => q#St Barthélemy#,
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabia Daylight Time),
-				'generic' => q(Arabia Time),
-				'standard' => q(Arabia Standard Time),
+				'daylight' => q#Arabia Daylight Time#,
+				'generic' => q#Arabia Time#,
+				'standard' => q#Arabia Standard Time#,
 			},
+		},
+		'Asia/Rangoon' => {
+			exemplarCity => q#Rangoon#,
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Australian Central Daylight Time),
-				'generic' => q(Australian Central Time),
-				'standard' => q(Australian Central Standard Time),
+				'daylight' => q#Australian Central Daylight Time#,
+				'generic' => q#Australian Central Time#,
+				'standard' => q#Australian Central Standard Time#,
 			},
 			short => {
-				'daylight' => q(ACDT),
-				'generic' => q(ACT),
-				'standard' => q(ACST),
+				'daylight' => q#ACDT#,
+				'generic' => q#ACT#,
+				'standard' => q#ACST#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			short => {
-				'daylight' => q(ACWDT),
-				'generic' => q(ACWT),
-				'standard' => q(ACWST),
+				'daylight' => q#ACWDT#,
+				'generic' => q#ACWT#,
+				'standard' => q#ACWST#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Australian Eastern Daylight Time),
-				'generic' => q(Australian Eastern Time),
-				'standard' => q(Australian Eastern Standard Time),
+				'daylight' => q#Australian Eastern Daylight Time#,
+				'generic' => q#Australian Eastern Time#,
+				'standard' => q#Australian Eastern Standard Time#,
 			},
 			short => {
-				'daylight' => q(AEDT),
-				'generic' => q(AET),
-				'standard' => q(AEST),
+				'daylight' => q#AEDT#,
+				'generic' => q#AET#,
+				'standard' => q#AEST#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Australian Western Daylight Time),
-				'generic' => q(Australian Western Time),
-				'standard' => q(Australian Western Standard Time),
+				'daylight' => q#Australian Western Daylight Time#,
+				'generic' => q#Australian Western Time#,
+				'standard' => q#Australian Western Standard Time#,
 			},
 			short => {
-				'daylight' => q(AWDT),
-				'generic' => q(AWT),
-				'standard' => q(AWST),
+				'daylight' => q#AWDT#,
+				'generic' => q#AWT#,
+				'standard' => q#AWST#,
+			},
+		},
+		'China' => {
+			long => {
+				'daylight' => q#China Summer Time#,
+				'generic' => q#China Time#,
+				'standard' => q#China Standard Time#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Cook Island Summer Time),
-				'generic' => q(Cook Island Time),
-				'standard' => q(Cook Island Standard Time),
+				'daylight' => q#Cook Island Summer Time#,
+				'generic' => q#Cook Island Time#,
+				'standard' => q#Cook Island Standard Time#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japan Summer Time),
-				'generic' => q(Japan Time),
-				'standard' => q(Japan Standard Time),
+				'daylight' => q#Japan Summer Time#,
+				'generic' => q#Japan Time#,
+				'standard' => q#Japan Standard Time#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Korean Summer Time),
-				'generic' => q(Korea Time),
-				'standard' => q(Korean Standard Time),
+				'daylight' => q#Korean Summer Time#,
+				'generic' => q#Korea Time#,
+				'standard' => q#Korean Standard Time#,
 			},
 		},
 		'Lord_Howe' => {
 			short => {
-				'daylight' => q(LHDT),
-				'generic' => q(LHT),
-				'standard' => q(LHST),
+				'daylight' => q#LHDT#,
+				'generic' => q#LHT#,
+				'standard' => q#LHST#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moscow Daylight Time),
-				'generic' => q(Moscow Time),
-				'standard' => q(Moscow Standard Time),
+				'daylight' => q#Moscow Daylight Time#,
+				'generic' => q#Moscow Time#,
+				'standard' => q#Moscow Standard Time#,
 			},
 		},
 		'New_Zealand' => {
 			short => {
-				'daylight' => q(NZDT),
-				'generic' => q(NZT),
-				'standard' => q(NZST),
+				'daylight' => q#NZDT#,
+				'generic' => q#NZT#,
+				'standard' => q#NZST#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samoa Summer Time),
-				'generic' => q(Samoa Time),
-				'standard' => q(Samoa Standard Time),
+				'daylight' => q#Samoa Summer Time#,
+				'generic' => q#Samoa Time#,
+				'standard' => q#Samoa Standard Time#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taipei Summer Time),
-				'generic' => q(Taipei Time),
-				'standard' => q(Taipei Standard Time),
+				'daylight' => q#Taipei Summer Time#,
+				'generic' => q#Taipei Time#,
+				'standard' => q#Taipei Standard Time#,
 			},
 		},
 	 } }

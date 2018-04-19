@@ -17,7 +17,7 @@ is ($locale->locale_name('fr_CA'), 'Ffrangeg Canada', 'Name with known region');
 is ($locale->locale_name('fr_BE'), 'Ffrangeg (Gwlad Belg)', 'Name with unknown region');
 is ($locale->locale_name('fr_BE'), 'Ffrangeg (Gwlad Belg)', 'Cached method');
 is ($locale->language_name, 'Cymraeg', 'Language name');
-is ($locale->language_name('wibble'), 'Iaith Anhysbys', 'Unknown Language name');
+is ($locale->language_name('wibble'), 'Iaith anhysbys', 'Unknown Language name');
 is ($locale->script_name('Guru'), 'Gwrmwci', 'Script name');
 is ($locale->script_name('wibl'), 'Sgript anhysbys', 'Invalid Script name');
 is ($locale->region_name('GB'), 'Y Deyrnas Unedig', 'Region name');

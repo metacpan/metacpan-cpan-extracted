@@ -10,6 +10,8 @@ has util => ( is => 'ro', isa => InstanceOf ['<: $module_name :>::Util'], init_a
 around BUILD => sub ( $orig, $self, $args ) {
     $self->{util} = <: $module_name ~ "::Util" :>->new;
 
+    $self->{util}->@{ keys $args->{util}->%* } = values $args->{util}->%*;
+
     $self->{util}->build_dbh( $self->{cfg}->{_}->{db} );
 
     return $self->$orig($args);
@@ -26,7 +28,7 @@ around BUILD => sub ( $orig, $self, $args ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 8                    | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 34                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 38 does not match the package declaration       |
+## |    1 | 36                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 40 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

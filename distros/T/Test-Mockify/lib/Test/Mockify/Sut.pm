@@ -47,24 +47,7 @@ sub new {
     my $self = $class->SUPER::new(@_);
     return $self;
 }
-#=pod
 
-=head2 mock
-
-To mock methods or functions of your Sut is a really bad idea. Therefore this method throws a Error when used.
-
-
-=cut
-sub mock {
-    my $self = shift;
-    my ($MethodName) = @_;
-    Error('It is not possible to mock a method of your SUT. Don\'t mock the code you like to test.',
-        {
-            'Method' => $MethodName,
-            'Sut' => $self->_mockedModulePath(),
-        }
-    );
-}
 =pod
 
 =head2 mockImported

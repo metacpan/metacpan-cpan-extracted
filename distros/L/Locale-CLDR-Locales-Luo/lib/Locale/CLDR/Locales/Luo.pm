@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Luo - Package for language Luo
 
 package Locale::CLDR::Locales::Luo;
 # This file auto generated from Data\common\main\luo.xml
-#	on Fri 29 Apr  7:15:43 pm GMT
+#	on Fri 13 Apr  7:18:55 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x z])},
+			auxiliary => qr{[q x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p r s t u v w y])},
+			main => qr{[a b c d e f g h i j k l m n o p r s t u v w y]},
 		};
 	},
 EOT
@@ -824,11 +825,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{OD},
 					'pm' => q{OT},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{OT},
 					'am' => q{OD},
 				},

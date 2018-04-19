@@ -1,0 +1,205 @@
+{
+   "abstract" : "An incomplete port of the R \"grid\" library to Perl",
+   "author" : [
+      "Stephan Loyd <sloyd@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graphics-Grid",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cairo" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "Forest::Tree" : "0",
+            "Function::Parameters" : "2.0",
+            "Graphics::Color::RGB" : "0",
+            "Import::Into" : "0",
+            "List::AllUtils" : "0",
+            "Math::Trig" : "0",
+            "Module::Load" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::HasDefaults::RO" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "Path::Tiny" : "0",
+            "Ref::Util" : "0",
+            "Safe::Isa" : "0",
+            "Scalar::Util" : "0",
+            "Type::Library" : "0",
+            "Type::Params" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "boolean" : "0",
+            "feature" : "0",
+            "namespace::autoclean" : "0",
+            "overload" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::Grid" : {
+         "file" : "lib/Graphics/Grid.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Class" : {
+         "file" : "lib/Graphics/Grid/Class.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Dimensional" : {
+         "file" : "lib/Graphics/Grid/Dimensional.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Driver" : {
+         "file" : "lib/Graphics/Grid/Driver.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Driver::Cairo" : {
+         "file" : "lib/Graphics/Grid/Driver/Cairo.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Functions" : {
+         "file" : "lib/Graphics/Grid/Functions.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::GPar" : {
+         "file" : "lib/Graphics/Grid/GPar.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::GTree" : {
+         "file" : "lib/Graphics/Grid/GTree.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob" : {
+         "file" : "lib/Graphics/Grid/Grob.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Circle" : {
+         "file" : "lib/Graphics/Grid/Grob/Circle.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Lines" : {
+         "file" : "lib/Graphics/Grid/Grob/Lines.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Null" : {
+         "file" : "lib/Graphics/Grid/Grob/Null.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Points" : {
+         "file" : "lib/Graphics/Grid/Grob/Points.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Polygon" : {
+         "file" : "lib/Graphics/Grid/Grob/Polygon.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Polyline" : {
+         "file" : "lib/Graphics/Grid/Grob/Polyline.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Rect" : {
+         "file" : "lib/Graphics/Grid/Grob/Rect.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Segments" : {
+         "file" : "lib/Graphics/Grid/Grob/Segments.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Text" : {
+         "file" : "lib/Graphics/Grid/Grob/Text.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Grob::Zero" : {
+         "file" : "lib/Graphics/Grid/Grob/Zero.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::HasGPar" : {
+         "file" : "lib/Graphics/Grid/HasGPar.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Justifiable" : {
+         "file" : "lib/Graphics/Grid/Justifiable.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Positional" : {
+         "file" : "lib/Graphics/Grid/Positional.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Role" : {
+         "file" : "lib/Graphics/Grid/Role.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Setup" : {
+         "file" : "lib/Graphics/Grid/Setup.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Types" : {
+         "file" : "lib/Graphics/Grid/Types.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Unit" : {
+         "file" : "lib/Graphics/Grid/Unit.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::UnitArithmetic" : {
+         "file" : "lib/Graphics/Grid/UnitArithmetic.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::UnitLike" : {
+         "file" : "lib/Graphics/Grid/UnitLike.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Util" : {
+         "file" : "lib/Graphics/Grid/Util.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::Viewport" : {
+         "file" : "lib/Graphics/Grid/Viewport.pm",
+         "version" : "0.0001"
+      },
+      "Graphics::Grid::ViewportTree" : {
+         "file" : "lib/Graphics/Grid/ViewportTree.pm",
+         "version" : "0.0001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/stphnlyd/perl5-Graphics-Grid.git"
+      }
+   },
+   "version" : "0.0001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

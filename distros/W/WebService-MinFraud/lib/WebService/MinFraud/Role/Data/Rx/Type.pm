@@ -5,7 +5,7 @@ use warnings;
 use Role::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use Carp ();
 
@@ -39,7 +39,7 @@ WebService::MinFraud::Role::Data::Rx::Type - A role that helps build Data::Rx Ty
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SUPPORT
 

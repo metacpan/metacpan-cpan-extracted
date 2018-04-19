@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -46,6 +46,13 @@ DESCRIPTION
     I expect that it should work on most other modern UNIX platforms. It
     probably will not work on more esoteric systems like VMS or msys2.
     Patches to address this will be eagerly accepted.
+
+METHODS
+
+ real_home_dir
+
+    Returns the real home directory as detected during startup. If
+    initialization hasn't happened then this will return undef.
 
 CAVEATS
 

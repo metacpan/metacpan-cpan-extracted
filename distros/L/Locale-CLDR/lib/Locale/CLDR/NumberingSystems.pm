@@ -1,16 +1,17 @@
 package Locale::CLDR::NumberingSystems;
 # This file auto generated from Data\common\supplemental\numberingSystems.xml
-#	on Fri 29 Apr  6:48:34 pm GMT
+#	on Fri 13 Apr  6:59:46 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -19,6 +20,10 @@ has 'numbering_system' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { return {
+		'adlm'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𞥐 𞥑 𞥒 𞥓 𞥔 𞥕 𞥖 𞥗 𞥘 𞥙)],
+		},
 		'ahom'	=> {
 			type	=> 'numeric',
 			data	=> [qw(𑜰 𑜱 𑜲 𑜳 𑜴 𑜵 𑜶 𑜷 𑜸 𑜹)],
@@ -46,6 +51,10 @@ has 'numbering_system' => (
 		'beng'	=> {
 			type	=> 'numeric',
 			data	=> [qw(০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯)],
+		},
+		'bhks'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑱐 𑱑 𑱒 𑱓 𑱔 𑱕 𑱖 𑱗 𑱘 𑱙)],
 		},
 		'brah'	=> {
 			type	=> 'numeric',
@@ -78,6 +87,10 @@ has 'numbering_system' => (
 		'geor'	=> {
 			type	=> 'algorithmic',
 			data	=> 'georgian',
+		},
+		'gonm'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑵐 𑵑 𑵒 𑵓 𑵔 𑵕 𑵖 𑵗 𑵘 𑵙)],
 		},
 		'grek'	=> {
 			type	=> 'algorithmic',
@@ -226,6 +239,10 @@ has 'numbering_system' => (
 		'mymrtlng'	=> {
 			type	=> 'numeric',
 			data	=> [qw(꧰ ꧱ ꧲ ꧳ ꧴ ꧵ ꧶ ꧷ ꧸ ꧹)],
+		},
+		'newa'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑑐 𑑑 𑑒 𑑓 𑑔 𑑕 𑑖 𑑗 𑑘 𑑙)],
 		},
 		'nkoo'	=> {
 			type	=> 'numeric',

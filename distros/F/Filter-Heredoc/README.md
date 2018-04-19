@@ -31,7 +31,7 @@ system wide. To install this module, run the following commands:
     $ ./Build
     $ ./Build test
     
-    # ./Build install
+    $ sudo ./Build install
 
 ### DEPENDENCIES
 
@@ -44,30 +44,25 @@ Filter::Heredoc complies with *nix POSIX shells here document syntax.
 Non-compliant shells on e.g. MSWin32 platform is not supported.
 
 
-### SUPPORT AND DOCUMENTATION
+### SUPPORT, BUGS AND DOCUMENTATION
 
 When you install Filter::Heredoc, manual pages will automatically be
 installed. On *nix systems, type "man Filter::Heredoc" or
 "perldoc Filter::Heredoc". See also "perldoc Filter::Heredoc::Cookbook"
 
-You can look for more information at:
+You can find source and look for more information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filter-Heredoc
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Filter-Heredoc
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Filter-Heredoc
-
+    GitHub: https://github.com/bkron/Filter-Heredoc
+    
     Search CPAN
-        http://search.cpan.org/dist/Filter-Heredoc/
-
+        https://metacpan.org/pod/Filter::Heredoc    
+    
+    Report BUGS here
+        https://github.com/bkron/Filter-Heredoc/issues
 
 ### LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 Bertil Kronlund
+Copyright (C) 2011-2018 Bertil Kronlund
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

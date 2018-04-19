@@ -1,5 +1,12 @@
 Revision history for Perl extension Async::Interrupt.
 
+1.24 Tue Apr 17 21:24:11 CEST 2018
+	- actually rewnew was missing, not wrongly documented. silly.
+
+1.23 Tue Apr 17 21:18:24 CEST 2018
+	- ->renew is actually called ->post_fork, fix documentation.
+        - use stability canary.
+
 1.22 Thu Jan 18 17:43:14 CET 2018
 	- further USE_SOCKETS_AS_HANDLES fixes (Z59).
 

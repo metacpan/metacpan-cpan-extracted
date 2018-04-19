@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Prg - Package for language Prussian
 
 package Locale::CLDR::Locales::Prg;
 # This file auto generated from Data\common\main\prg.xml
-#	on Fri 29 Apr  7:21:25 pm GMT
+#	on Fri 13 Apr  7:25:19 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -290,8 +291,9 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'Ā', 'B', 'C', 'D', 'Ḑ', 'E', 'Ē', 'F', 'G', 'Ģ', 'H', 'I', 'Ī', 'J', 'K', 'Ķ', 'L', 'M', 'N', 'Ņ', 'O', 'Ō', 'P', 'Q', 'R', 'Ŗ', 'S', 'Š', 'T', 'Ț', 'U', 'Ū', 'V', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{(?^u:[a ā b c d ḑ e ē f g ģ h i ī j k ķ l m n ņ o ō p q r ŗ s š t ț u ū v w x y z ž])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … “ „ ( ) \[ \] \{ \}])},
+			main => qr{[a ā b c d ḑ e ē f g ģ h i ī j k ķ l m n ņ o ō p q r ŗ s š t ț u ū v w x y z ž]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … “ „ ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -411,21 +413,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -778,8 +780,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{pa pussideinan},
 					'am' => q{ankstāinan},
+					'pm' => q{pa pussideinan},
 				},
 				'abbreviated' => {
 					'am' => q{AM},
@@ -925,6 +927,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			fallback => '{0} – {1}',
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1020,9 +1025,6 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y–dd.MM.y},
 			},
 		},
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
 	} },
 );
 
@@ -1040,63 +1042,63 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
-				'daylight' => q(Centrālas Amērikas daggas kerdā),
-				'generic' => q(Centrālas Amērikas kerdā),
-				'standard' => q(Centrālas Amērikas zēimas kerdā),
+				'daylight' => q#Centrālas Amērikas daggas kerdā#,
+				'generic' => q#Centrālas Amērikas kerdā#,
+				'standard' => q#Centrālas Amērikas zēimas kerdā#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Dēiniskas Amērikas daggas kerdā),
-				'generic' => q(Dēiniskas Amērikas kerdā),
-				'standard' => q(Dēiniskas Amērikas zēimas kerdā),
+				'daylight' => q#Dēiniskas Amērikas daggas kerdā#,
+				'generic' => q#Dēiniskas Amērikas kerdā#,
+				'standard' => q#Dēiniskas Amērikas zēimas kerdā#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Amērikas gārban daggas kerdā),
-				'generic' => q(Amērikas gārban kerdā),
-				'standard' => q(Amērikas gārban zēimas kerdā),
+				'daylight' => q#Amērikas gārban daggas kerdā#,
+				'generic' => q#Amērikas gārban kerdā#,
+				'standard' => q#Amērikas gārban zēimas kerdā#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Pacīfiskas Amērikas daggas kerdā),
-				'generic' => q(Pacīfiskas Amērikas kerdā),
-				'standard' => q(Pacīfiskas Amērikas zēimas kerdā),
+				'daylight' => q#Pacīfiskas Amērikas daggas kerdā#,
+				'generic' => q#Pacīfiskas Amērikas kerdā#,
+				'standard' => q#Pacīfiskas Amērikas zēimas kerdā#,
 			},
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlāntiska daggas kerdā),
-				'generic' => q(Atlāntiska kerdā),
-				'standard' => q(Atlāntiska zēimas kerdā),
+				'daylight' => q#Atlāntiska daggas kerdā#,
+				'generic' => q#Atlāntiska kerdā#,
+				'standard' => q#Atlāntiska zēimas kerdā#,
 			},
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Centrālas Eurōpas daggas kerdā),
-				'generic' => q(Centrālas Eurōpas kerdā),
-				'standard' => q(Centrālas Eurōpas zēimas kerdā),
+				'daylight' => q#Centrālas Eurōpas daggas kerdā#,
+				'generic' => q#Centrālas Eurōpas kerdā#,
+				'standard' => q#Centrālas Eurōpas zēimas kerdā#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Dēiniskas Eurōpas daggas kerdā),
-				'generic' => q(Dēiniskas Eurōpas kerdā),
-				'standard' => q(Dēiniskas Eurōpas zēimas kerdā),
+				'daylight' => q#Dēiniskas Eurōpas daggas kerdā#,
+				'generic' => q#Dēiniskas Eurōpas kerdā#,
+				'standard' => q#Dēiniskas Eurōpas zēimas kerdā#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Wakkariskas Eurōpas daggas kerdā),
-				'generic' => q(Wakkariskas Eurōpas kerdā),
-				'standard' => q(Wakkariskas Eurōpas zēimas kerdā),
+				'daylight' => q#Wakkariskas Eurōpas daggas kerdā#,
+				'generic' => q#Wakkariskas Eurōpas kerdā#,
+				'standard' => q#Wakkariskas Eurōpas zēimas kerdā#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwich kerdā),
+				'standard' => q#Greenwich kerdā#,
 			},
 		},
 	 } }

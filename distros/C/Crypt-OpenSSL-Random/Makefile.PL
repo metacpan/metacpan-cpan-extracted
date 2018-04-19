@@ -1,5 +1,6 @@
 use ExtUtils::MakeMaker;
 use Config;
+use Crypt::OpenSSL::Guess 0.11 qw(openssl_inc_paths openssl_lib_paths);
 use 5.006;
 
 my ($libdir, $incdir);
@@ -15,20 +16,25 @@ my $libs = "-lssl -lcrypto";
 WriteMakefile(
   'NAME'	    => 'Crypt::OpenSSL::Random',
   'VERSION_FROM'    => 'Random.pm',
-  'LIBS'            => $libdir ? [ "-L$libdir $libs" ] : [ $libs ],
-  'INC'             => $incdir ? "-I$incdir" : "",
+  'LIBS'            => $libdir ? [ "-L$libdir $libs" ] : [ openssl_lib_paths() . " $libs" ],
+  'INC'             => $incdir ? "-I$incdir" : openssl_inc_paths(),
   'AUTHOR'          => 'Ian Robertson',
-   ($ExtUtils::MakeMaker::VERSION gt '6.46' ?
+   (eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 } ?
+    ('CONFIGURE_REQUIRES' =>
+     {
+      'Crypt::OpenSSL::Guess' => '0.11',
+     },
+    ) : ()),
+   (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 } ?
     ('LICENSE'     => 'perl',
      'META_MERGE'  =>
      {
       resources =>
       {
-       homepage    => 'http://sourceforge.net/projects/perl-openssl/',
+       #homepage    => 'http://sourceforge.net/projects/perl-openssl/',
        repository  => 'https://github.com/rurban/Crypt-OpenSSL-Random',
-       #repository  => 'http://perl-openssl.cvs.sourceforge.net/viewvc/perl-openssl/Crypt/OpenSSL/Random/',
        license     => 'http://dev.perl.org/licenses/',
-       MailingList => 'perl-openssl-users@lists.sourceforge.net',
+       #MailingList => 'perl-openssl-users@lists.sourceforge.net',
       },
      }
     ) : ()),
@@ -50,7 +56,7 @@ README : \$(VERSION_FROM)
 	pod2text \$(VERSION_FROM) > README
 
 release : dist
-	git commit -a -m\"release \$(VERSION)\"
+	-git commit -a -m\"release \$(VERSION)\"
 	git tag \$(VERSION)
 	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
 	git push

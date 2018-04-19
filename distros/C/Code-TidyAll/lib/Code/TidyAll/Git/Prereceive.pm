@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 has allow_repeated_push => (
     is      => 'ro',
@@ -30,8 +30,8 @@ has conf_name => (
 );
 
 has extra_conf_files => (
-    is  => 'ro',
-    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+    is      => 'ro',
+    isa     => t( 'ArrayRef', of => t('NonEmptyStr') ),
     default => sub { [] },
 );
 
@@ -197,7 +197,7 @@ tidyall'd
 
 =head1 VERSION
 
-version 0.69
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -238,7 +238,7 @@ See also L<Code::TidyAll::Git::Precommit>, which operates locally.
 
 This class provides the following methods:
 
-=head2 Code::TidyAll::Git::Prerecive->check(%params)
+=head2 Code::TidyAll::Git::Prereceive->check(%params)
 
 This method reads commit info from standard input, then checks that all files
 being added or modified in this push are tidied and valid according to
@@ -379,7 +379,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2017 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2018 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

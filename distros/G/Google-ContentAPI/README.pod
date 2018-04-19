@@ -44,15 +44,34 @@
       merchant_id => '123456789',
   });
 
-  my ($result, $products, $batch_id);
+  my ($result, $products, $batch_id, $product_id);
 
   # get account auth info (merchantId)
   $result = $google->get(
     resource => 'accounts',
     method   => 'authinfo'
   );
-  print "authinfo: \n". Dumper $result;
   print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "authinfo: \n". Dumper $result;
+
+  # get status of your merchant center account
+  $result = $google->get(
+      resource => 'accountstatuses',
+      method   => 'get',
+      id => $google->{merchant_id} # your merchant ID unless working with multi-client account
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "Account status: \n". Dumper $result;
+
+  # list status of multi-client accounts (MCA)
+  # This will fail with response code 403 if the account is not a multi-client account.
+  $result = $google->get(
+      resource => 'accountstatuses',
+      method   => 'list',
+      params   => ['maxResults' => 10]
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "Account status: \n". Dumper $result;
 
   # list products
 
@@ -61,8 +80,8 @@
       method   => 'list',
       params   => ['includeInvalidInsertedItems' => 'true']
   );
-  print "Products list: \n". Dumper $result;
   print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "Products list: \n". Dumper $result;
 
   # insert a product
 
@@ -107,14 +126,14 @@
 
   # get single product info
 
-  my $product_id = '333333';
+  $product_id = '333333';
   $result = $google->get(
       resource => 'products',
       method   => 'get',
       id => 'online:en:US:'. $product_id
   );
-  print "Products info: \n". Dumper $result;
   print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "Products info: \n". Dumper $result;
 
   # delete a product
 
@@ -200,8 +219,8 @@
       #params   => ['dryRun' => 'true'],
       body => { entries => $products }
   );
-  print Dumper $result;
   print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print Dumper $result;
 
   # batch delete:
 
@@ -223,6 +242,30 @@
       body => { entries => $products }
   );
   print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # list status of products
+
+  $result = $google->get(
+      resource => 'productstatuses',
+      method   => 'list',
+      params   => [
+          'includeInvalidInsertedItems' => 'true',
+          'maxResults' => 10
+      ]
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "Product status: \n". Dumper $result;
+
+  # get status of a specific product
+
+  $product_id = '333333';
+  $result = $google->get(
+      resource => 'productstatuses',
+      method   => 'get',
+      id => 'online:en:US:'. $product_id
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+  print "Product status: \n". Dumper $result;
 
 =head1 METHODS AND FUNCTIONS
 
@@ -257,6 +300,17 @@
 
   Returns information about the authenticated user.
 
+=head2 ACCOUNTSTATUSES
+
+=head3 list
+
+  Lists the the status of accounts in a Multi-Client account.
+  This will fail with response code 403 if the account is not a multi-client account.
+
+=head3 get
+
+  Retrieves the status of your Merchant Center account.
+
 =head2 PRODUCTS
 
 =head3 custombatch
@@ -281,9 +335,28 @@
 
   Deletes a product from your Merchant Center account.
 
+=head2 PRODUCTSTATUSES
+
+=head3 list
+
+  Lists the the status and issues of products in your Merchant Center Account.
+
+=head3 get
+
+  Retrieves the status and issues of a specific product.
+
 =head1 UNIMPLEMENTED FEATURES
 
-Certain API methods are not yet implemented (no current personal business need).
+  Certain API methods are not yet implemented (no current personal business need).
+
+  A "custom" resource is available to perform methods that are not implemented by
+  this module.
+
+  # get an order from the merchant account
+  $result = $google->get(
+    resource => 'custom',
+    method   => 'merchantId/orders/orderId'
+  );
 
 =head1 PREREQUISITES
 

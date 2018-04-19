@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Saq - Package for language Samburu
 
 package Locale::CLDR::Locales::Saq;
 # This file auto generated from Data\common\main\saq.xml
-#	on Fri 29 Apr  7:23:53 pm GMT
+#	on Fri 13 Apr  7:27:20 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[f q x z])},
+			auxiliary => qr{[f q x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'],
-			main => qr{(?^u:[a b c d e g h i j k l m n o p r s t u v w y])},
+			main => qr{[a b c d e g h i j k l m n o p r s t u v w y]},
 		};
 	},
 EOT
@@ -829,8 +830,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{Tesiran},
 					'pm' => q{Teipa},
+					'am' => q{Tesiran},
 				},
 				'abbreviated' => {
 					'pm' => q{Teipa},
@@ -914,7 +915,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -937,7 +938,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

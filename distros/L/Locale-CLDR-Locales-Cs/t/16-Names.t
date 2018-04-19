@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
 
-use Test::More tests => 23;
+use Test::More tests => 22;
 use Test::Exception;
 
 use ok 'Locale::CLDR';
@@ -14,7 +14,7 @@ use ok 'Locale::CLDR';
 my $locale = Locale::CLDR->new('cs_CZ');
 my $other_locale = Locale::CLDR->new('en_US');
 
-is($locale->locale_name(), 'čeština (Česká republika)', 'Locale name from current locale');
+is($locale->locale_name(), 'čeština (Česko)', 'Locale name from current locale');
 is($locale->locale_name('fr_CA'), 'francouzština (Kanada)', 'Locale name from string');
 is($locale->locale_name($other_locale), 'angličtina (USA)', 'Locale name from other locale object');
 
@@ -48,7 +48,7 @@ my $all_languages = {
 	'ar' => 'arabština',
 	'ar_001' => 'arabština (moderní standardní)',
 	'arc' => 'aramejština',
-	'arn' => 'araukánština',
+	'arn' => 'mapudungunština',
 	'aro' => 'araonština',
 	'arp' => 'arapažština',
 	'arq' => 'arabština (alžírská)',
@@ -82,7 +82,7 @@ my $all_languages = {
 	'bfq' => 'badagština',
 	'bg' => 'bulharština',
 	'bgn' => 'balúčština (západní)',
-	'bho' => 'bhojpurština',
+	'bho' => 'bhódžpurština',
 	'bi' => 'bislamština',
 	'bik' => 'bikolština',
 	'bin' => 'bini',
@@ -129,6 +129,7 @@ my $all_languages = {
 	'cps' => 'kapiznonština',
 	'cr' => 'kríjština',
 	'crh' => 'turečtina (krymská)',
+	'crs' => 'kreolština (seychelská)',
 	'cs' => 'čeština',
 	'csb' => 'kašubština',
 	'cu' => 'staroslověnština',
@@ -164,6 +165,7 @@ my $all_languages = {
 	'el' => 'řečtina',
 	'elx' => 'elamitština',
 	'en' => 'angličtina',
+	'en_GB' => 'angličtina (Velká Británie)',
 	'en_GB@alt=short' => 'angličtina (VB)',
 	'en_US' => 'angličtina (USA)',
 	'en_US@alt=short' => 'angličtina (USA)',
@@ -187,14 +189,14 @@ my $all_languages = {
 	'fo' => 'faerština',
 	'fon' => 'fonština',
 	'fr' => 'francouzština',
-	'frc' => 'francouzština (kajunská)',
+	'frc' => 'francouzština (cajunská)',
 	'frm' => 'francouzština (středověká)',
 	'fro' => 'francouzština (stará)',
 	'frp' => 'franko-provensálština',
 	'frr' => 'fríština (severní)',
 	'frs' => 'fríština (východní)',
 	'fur' => 'furlanština',
-	'fy' => 'fríština',
+	'fy' => 'fríština (západní)',
 	'ga' => 'irština',
 	'gaa' => 'gaština',
 	'gag' => 'gagauzština',
@@ -334,6 +336,7 @@ my $all_languages = {
 	'ln' => 'lingalština',
 	'lo' => 'laoština',
 	'lol' => 'mongština',
+	'lou' => 'kreolština (Louisiana)',
 	'loz' => 'lozština',
 	'lrc' => 'lúrština (severní)',
 	'lt' => 'litevština',
@@ -381,7 +384,7 @@ my $all_languages = {
 	'ms' => 'malajština',
 	'mt' => 'maltština',
 	'mua' => 'mundang',
-	'mul' => 'složené (víceřádkové) jazyky',
+	'mul' => 'více jazyků',
 	'mus' => 'kríkština',
 	'mwl' => 'mirandština',
 	'mwr' => 'márvárština',
@@ -438,6 +441,7 @@ my $all_languages = {
 	'pap' => 'papiamento',
 	'pau' => 'palauština',
 	'pcd' => 'picardština',
+	'pcm' => 'nigerijský pidžin',
 	'pdc' => 'němčina (pensylvánská)',
 	'pdt' => 'němčina (plautdietsch)',
 	'peo' => 'staroperština',
@@ -501,7 +505,7 @@ my $all_languages = {
 	'sga' => 'irština (stará)',
 	'sgs' => 'žemaitština',
 	'sh' => 'srbochorvatština',
-	'shi' => 'tachelhit',
+	'shi' => 'tašelhit',
 	'shn' => 'šanština',
 	'shu' => 'arabština (čadská)',
 	'si' => 'sinhálština',
@@ -666,7 +670,7 @@ my $all_scripts = {
 	'Cprt' => 'kyperské',
 	'Cyrl' => 'cyrilice',
 	'Cyrs' => 'cyrilce - staroslověnská',
-	'Deva' => 'dévanágárí',
+	'Deva' => 'dévanágarí',
 	'Dsrt' => 'deseret',
 	'Dupl' => 'Duployého těsnopis',
 	'Egyd' => 'egyptské démotické',
@@ -682,6 +686,7 @@ my $all_scripts = {
 	'Grek' => 'řecké',
 	'Gujr' => 'gudžarátí',
 	'Guru' => 'gurmukhi',
+	'Hanb' => 'hanb',
 	'Hang' => 'hangul',
 	'Hani' => 'han',
 	'Hano' => 'hanunóo',
@@ -697,6 +702,7 @@ my $all_scripts = {
 	'Hung' => 'staromaďarské',
 	'Inds' => 'harappské',
 	'Ital' => 'etruské',
+	'Jamo' => 'jamo',
 	'Java' => 'javánské',
 	'Jpan' => 'japonské',
 	'Jurc' => 'džürčenské',
@@ -732,7 +738,7 @@ my $all_scripts = {
 	'Mlym' => 'malajlámské',
 	'Modi' => 'modí',
 	'Mong' => 'mongolské',
-	'Moon' => 'Moonovo',
+	'Moon' => 'Moonovo písmo',
 	'Mroo' => 'mro',
 	'Mtei' => 'mejtej majek (manipurské)',
 	'Mymr' => 'myanmarské',
@@ -800,6 +806,7 @@ my $all_scripts = {
 	'Xsux' => 'sumero-akkadské klínové písmo',
 	'Yiii' => 'yi',
 	'Zmth' => 'matematický zápis',
+	'Zsye' => 'emodži',
 	'Zsym' => 'symboly',
 	'Zxxx' => 'bez zápisu',
 	'Zyyy' => 'obecné',
@@ -808,40 +815,40 @@ my $all_scripts = {
 
 is_deeply($locale->all_scripts, $all_scripts, 'All scripts');
 
-is($locale->region_name(), 'Česká republika', 'Region name from current locale');
+is($locale->region_name(), 'Česko', 'Region name from current locale');
 is($locale->region_name('fr'), 'Francie', 'Region name from string');
 is($locale->region_name($other_locale), 'Spojené státy', 'Region name from other locale object');
 
 my $all_regions = {
-	'001' => 'Svět',
+	'001' => 'svět',
 	'002' => 'Afrika',
 	'003' => 'Severní Amerika',
 	'005' => 'Jižní Amerika',
 	'009' => 'Oceánie',
-	'011' => 'Západní Afrika',
+	'011' => 'západní Afrika',
 	'013' => 'Střední Amerika',
-	'014' => 'Východní Afrika',
-	'015' => 'Severní Afrika',
-	'017' => 'Střední Afrika',
-	'018' => 'Jižní Afrika',
+	'014' => 'východní Afrika',
+	'015' => 'severní Afrika',
+	'017' => 'střední Afrika',
+	'018' => 'jižní Afrika',
 	'019' => 'Amerika',
 	'021' => 'Severní Amerika (oblast)',
 	'029' => 'Karibik',
-	'030' => 'Východní Asie',
-	'034' => 'Jižní Asie',
-	'035' => 'Jihovýchodní Asie',
-	'039' => 'Jižní Evropa',
+	'030' => 'východní Asie',
+	'034' => 'jižní Asie',
+	'035' => 'jihovýchodní Asie',
+	'039' => 'jižní Evropa',
 	'053' => 'Australasie',
 	'054' => 'Melanésie',
 	'057' => 'Mikronésie (region)',
 	'061' => 'Polynésie',
 	'142' => 'Asie',
 	'143' => 'Střední Asie',
-	'145' => 'Západní Asie',
+	'145' => 'západní Asie',
 	'150' => 'Evropa',
-	'151' => 'Východní Evropa',
-	'154' => 'Severní Evropa',
-	'155' => 'Západní Evropa',
+	'151' => 'východní Evropa',
+	'154' => 'severní Evropa',
+	'155' => 'západní Evropa',
 	'419' => 'Latinská Amerika',
 	'AC' => 'Ascension',
 	'AD' => 'Andorra',
@@ -903,7 +910,8 @@ my $all_regions = {
 	'CW' => 'Curaçao',
 	'CX' => 'Vánoční ostrov',
 	'CY' => 'Kypr',
-	'CZ' => 'Česká republika',
+	'CZ' => 'Česko',
+	'CZ@alt=variant' => 'Česká republika',
 	'DE' => 'Německo',
 	'DG' => 'Diego García',
 	'DJ' => 'Džibutsko',
@@ -920,6 +928,7 @@ my $all_regions = {
 	'ES' => 'Španělsko',
 	'ET' => 'Etiopie',
 	'EU' => 'Evropská unie',
+	'EZ' => 'eurozóna',
 	'FI' => 'Finsko',
 	'FJ' => 'Fidži',
 	'FK' => 'Falklandské ostrovy',
@@ -928,8 +937,8 @@ my $all_regions = {
 	'FO' => 'Faerské ostrovy',
 	'FR' => 'Francie',
 	'GA' => 'Gabon',
-	'GB' => 'Velká Británie',
-	'GB@alt=short' => 'VB',
+	'GB' => 'Spojené království',
+	'GB@alt=short' => 'GB',
 	'GD' => 'Grenada',
 	'GE' => 'Gruzie',
 	'GF' => 'Francouzská Guyana',
@@ -1045,7 +1054,7 @@ my $all_regions = {
 	'PW' => 'Palau',
 	'PY' => 'Paraguay',
 	'QA' => 'Katar',
-	'QO' => 'Vnější Oceánie',
+	'QO' => 'vnější Oceánie',
 	'RE' => 'Réunion',
 	'RO' => 'Rumunsko',
 	'RS' => 'Srbsko',
@@ -1091,6 +1100,8 @@ my $all_regions = {
 	'TZ' => 'Tanzanie',
 	'UA' => 'Ukrajina',
 	'UG' => 'Uganda',
+	'UN' => 'Organizace spojených národů',
+	'UN@alt=short' => 'OSN',
 	'UM' => 'Menší odlehlé ostrovy USA',
 	'US' => 'Spojené státy',
 	'US@alt=short' => 'USA',
@@ -1111,7 +1122,7 @@ my $all_regions = {
 	'ZA' => 'Jihoafrická republika',
 	'ZM' => 'Zambie',
 	'ZW' => 'Zimbabwe',
-	'ZZ' => 'Neznámá oblast',
+	'ZZ' => 'neznámá oblast',
 };
 
 is_deeply($locale->all_regions(), $all_regions, 'All Regions');
@@ -1125,5 +1136,3 @@ is($locale->type_name(colCaseFirst => 'lower'), 'Nejdříve řadit malá písmen
 is($locale->measurement_system_name('metric'), 'metrický', 'Measurement system name English Metric');
 is($locale->measurement_system_name('us'), 'USA', 'Measurement system name English US');
 is($locale->measurement_system_name('uk'), 'Velká Británie', 'Measurement system name English UK');
-
-is($locale->transform_name('Numeric'), 'Numerický', 'Transform name from string');

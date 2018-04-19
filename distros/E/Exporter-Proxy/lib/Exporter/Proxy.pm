@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package Exporter::Proxy;
+package Exporter::Proxy v1.8.1;
 
 use v5.20;
 
@@ -14,9 +14,6 @@ use Symbol      qw( qualify_to_ref  );
 ########################################################################
 # package variables
 ########################################################################
-
-our $VERSION    = '1.8';
-$VERSION = eval $VERSION;
 
 my $disp_list   = 'DISPATCH_OK';
 
@@ -257,7 +254,6 @@ Exporter::Proxy - Simplified symbol export & proxy dispatch.
     my $object      = My::Module->construct;
 
     my $exported    = $object->exports;
-
 
     package Some::Other;
 
@@ -690,6 +686,16 @@ Symlink this to whatever modules you need testing
 and "prove t/00*.t" will give a quick, standard
 first pass as to whether they compile and are 
 minimally usable.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Symbol
+
+Used to export symbols w/o turning off strict.
+
+=back
 
 =head1 AUTHOR
 

@@ -69,7 +69,7 @@
   #endif
 #else
   #include <inttypes.h>
-  #if UINTMAX_MAX > 0xffffffffU
+  #if (defined INTPTR_MAX ? INTPTR_MAX : ULONG_MAX) > 0xffffffffU
     #define ECB_PTRSIZE 8
   #else
     #define ECB_PTRSIZE 4
@@ -157,6 +157,10 @@
   #include <builtins.h>
 #endif
 
+#if 1400 <= _MSC_VER
+  #include <intrin.h> /* fence functions _ReadBarrier, also bit search functions _BitScanReverse */
+#endif
+
 #ifndef ECB_MEMORY_FENCE
   #if ECB_GCC_VERSION(2,5) || defined __INTEL_COMPILER || (__llvm__ && __GNUC__) || __SUNPRO_C >= 0x5110 || __SUNPRO_CC >= 0x5110
     #if __i386 || __i386__
@@ -169,11 +173,19 @@
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("")
     #elif __powerpc__ || __ppc__ || __powerpc64__ || __ppc64__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("sync"     : : : "memory")
+    #elif defined __ARM_ARCH_2__ \
+      || defined __ARM_ARCH_3__  || defined __ARM_ARCH_3M__  \
+      || defined __ARM_ARCH_4__  || defined __ARM_ARCH_4T__  \
+      || defined __ARM_ARCH_5__  || defined __ARM_ARCH_5E__  \
+      || defined __ARM_ARCH_5T__ || defined __ARM_ARCH_5TE__ \
+      || defined __ARM_ARCH_5TEJ__
+      /* should not need any, unless running old code on newer cpu - arm doesn't support that */
     #elif defined __ARM_ARCH_6__  || defined __ARM_ARCH_6J__  \
-       || defined __ARM_ARCH_6K__ || defined __ARM_ARCH_6ZK__
+       || defined __ARM_ARCH_6K__ || defined __ARM_ARCH_6ZK__ \
+       || defined __ARM_ARCH_6T2__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mcr p15,0,%0,c7,c10,5" : : "r" (0) : "memory")
     #elif defined __ARM_ARCH_7__  || defined __ARM_ARCH_7A__  \
-       || defined __ARM_ARCH_7M__ || defined __ARM_ARCH_7R__
+       || defined __ARM_ARCH_7R__ || defined __ARM_ARCH_7M__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb"      : : : "memory")
     #elif __aarch64__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb ish"  : : : "memory")
@@ -425,6 +437,11 @@ typedef int ecb_bool;
   ecb_function_ ecb_const int
   ecb_ctz32 (uint32_t x)
   {
+#if 1400 <= _MSC_VER && (_M_IX86 || _M_X64 || _M_IA64 || _M_ARM)
+    unsigned long r;
+    _BitScanForward (&r, x);
+    return (int)r;
+#else
     int r = 0;
 
     x &= ~x + 1; /* this isolates the lowest bit */
@@ -444,14 +461,21 @@ typedef int ecb_bool;
 #endif
 
     return r;
+#endif
   }
 
   ecb_function_ ecb_const int ecb_ctz64 (uint64_t x);
   ecb_function_ ecb_const int
   ecb_ctz64 (uint64_t x)
   {
+#if 1400 <= _MSC_VER && (_M_X64 || _M_IA64 || _M_ARM)
+    unsigned long r;
+    _BitScanForward64 (&r, x);
+    return (int)r;
+#else
     int shift = x & 0xffffffff ? 0 : 32;
     return ecb_ctz32 (x >> shift) + shift;
+#endif
   }
 
   ecb_function_ ecb_const int ecb_popcount32 (uint32_t x);
@@ -469,6 +493,11 @@ typedef int ecb_bool;
   ecb_function_ ecb_const int ecb_ld32 (uint32_t x);
   ecb_function_ ecb_const int ecb_ld32 (uint32_t x)
   {
+#if 1400 <= _MSC_VER && (_M_IX86 || _M_X64 || _M_IA64 || _M_ARM)
+    unsigned long r;
+    _BitScanReverse (&r, x);
+    return (int)r;
+#else
     int r = 0;
 
     if (x >> 16) { x >>= 16; r += 16; }
@@ -478,16 +507,23 @@ typedef int ecb_bool;
     if (x >>  1) {           r +=  1; }
 
     return r;
+#endif
   }
 
   ecb_function_ ecb_const int ecb_ld64 (uint64_t x);
   ecb_function_ ecb_const int ecb_ld64 (uint64_t x)
   {
+#if 1400 <= _MSC_VER && (_M_X64 || _M_IA64 || _M_ARM)
+    unsigned long r;
+    _BitScanReverse64 (&r, x);
+    return (int)r;
+#else
     int r = 0;
 
     if (x >> 32) { x >>= 32; r += 32; }
 
     return r + ecb_ld32 (x);
+#endif
   }
 #endif
 
@@ -600,8 +636,8 @@ ecb_inline ecb_const uint64_t ecb_rotr64 (uint64_t x, unsigned int count) { retu
 /* try to tell the compiler that some condition is definitely true */
 #define ecb_assume(cond) if (!(cond)) ecb_unreachable (); else 0
 
-ecb_inline ecb_const unsigned char ecb_byteorder_helper (void);
-ecb_inline ecb_const unsigned char
+ecb_inline ecb_const uint32_t ecb_byteorder_helper (void);
+ecb_inline ecb_const uint32_t
 ecb_byteorder_helper (void)
 {
   /* the union code still generates code under pressure in gcc, */
@@ -610,26 +646,28 @@ ecb_byteorder_helper (void)
   /* the reason why we have this horrible preprocessor mess */
   /* is to avoid it in all cases, at least on common architectures */
   /* or when using a recent enough gcc version (>= 4.6) */
-#if ((__i386 || __i386__) && !__VOS__) || _M_IX86 || ECB_GCC_AMD64 || ECB_MSVC_AMD64
-  return 0x44;
-#elif __BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-  return 0x44;
-#elif __BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-  return 0x11;
+#if (defined __BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) \
+    || ((__i386 || __i386__ || _M_IX86 || ECB_GCC_AMD64 || ECB_MSVC_AMD64) && !__VOS__)
+  #define ECB_LITTLE_ENDIAN 1
+  return 0x44332211;
+#elif (defined __BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) \
+      || ((__AARCH64EB__ || __MIPSEB__ || __ARMEB__) && !__VOS__)
+  #define ECB_BIG_ENDIAN 1
+  return 0x11223344;
 #else
   union
   {
-    uint32_t i;
-    uint8_t c;
-  } u = { 0x11223344 };
-  return u.c;
+    uint8_t c[4];
+    uint32_t u;
+  } u = { 0x11, 0x22, 0x33, 0x44 };
+  return u.u;
 #endif
 }
 
 ecb_inline ecb_const ecb_bool ecb_big_endian    (void);
-ecb_inline ecb_const ecb_bool ecb_big_endian    (void) { return ecb_byteorder_helper () == 0x11; }
+ecb_inline ecb_const ecb_bool ecb_big_endian    (void) { return ecb_byteorder_helper () == 0x11223344; }
 ecb_inline ecb_const ecb_bool ecb_little_endian (void);
-ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper () == 0x44; }
+ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper () == 0x44332211; }
 
 #if ECB_GCC_VERSION(3,0) || ECB_C99
   #define ecb_mod(m,n) ((m) % (n) + ((m) % (n) < 0 ? (n) : 0))

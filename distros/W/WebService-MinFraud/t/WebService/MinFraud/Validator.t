@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use JSON::MaybeXS;
+use JSON::MaybeXS qw( JSON );
 use Test::Fatal qw( exception );
 use Test::More 0.88;
-use WebService::MinFraud::Validator;
+use WebService::MinFraud::Validator ();
 
 my $validator = WebService::MinFraud::Validator->new;
 
@@ -220,34 +220,36 @@ subtest 'event time' => sub {
 };
 
 subtest 'event type' => sub {
-    my $good_event_type = {
-        device => { ip_address => '24.24.24.24' },
-        event => { type => 'purchase', time => '2015-10-10T12:00:00-07:00' },
-    };
-    ok(
-        $validator->validate_request($good_event_type),
-        'good event type validates'
+    my @good = (
+        {
+            device => { ip_address => '24.24.24.24' },
+            event =>
+                { type => 'purchase', time => '2015-10-10T12:00:00-07:00' },
+        },
+        {
+            device => { ip_address => '24.24.24.24' },
+            event  => { type       => 'password_reset' },
+        },
+        {
+            device => { ip_address => '24.24.24.24' },
+            event  => { type       => 'email_change' },
+        },
+        {
+            device => { ip_address => '24.24.24.24' },
+            event  => { type       => 'payout_change' },
+        },
     );
+    for my $good_event_type (@good) {
+        ok(
+            $validator->validate_request($good_event_type),
+            'good event type validates'
+        );
+    }
+
     my $bad_event_type = {
         device => { ip_address => '24.24.24.24' },
         event  => { type       => 'estudi' },
     };
-    $good_event_type = {
-        device => { ip_address => '24.24.24.24' },
-        event  => { type       => 'password_reset' },
-    };
-    ok(
-        $validator->validate_request($good_event_type),
-        'good event type validates'
-    );
-    $good_event_type = {
-        device => { ip_address => '24.24.24.24' },
-        event  => { type       => 'email_change' },
-    };
-    ok(
-        $validator->validate_request($good_event_type),
-        'good event type validates'
-    );
     like(
         exception { $validator->validate_request($bad_event_type); },
         qr/matched none of the available alternative/,

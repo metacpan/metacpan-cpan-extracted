@@ -1,3 +1,9 @@
+0.106		2018-04-16	T. R. Wyant
+    Iridium 19 decayed April 7 2018. Canned status update.
+
+    Use Browser::Open for help if webcmd is '1'. Other true values are
+    deprecated and will eventually result in errors.
+
 0.105		2018-04-05	T. R. Wyant
     Add 'identity' to canned help text.
 

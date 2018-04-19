@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Br - Package for language Breton
 
 package Locale::CLDR::Locales::Br;
 # This file auto generated from Data\common\main\br.xml
-#	on Fri 29 Apr  6:53:25 pm GMT
+#	on Fri 13 Apr  7:03:08 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1170,9 +1171,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ä ã ā æ c ç é è ĕ ë ē í ì ĭ î ï ī ó ò ŏ ô ö ø ō œ q ú ŭ û ü ū ÿ])},
+			auxiliary => qr{[á à ă â å ä ã ā æ c ç é è ĕ ë ē í ì ĭ î ï ī ó ò ŏ ô ö ø ō œ q ú ŭ û ü ū ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b {ch} {cʼh} d e ê f g h i j k l m n ñ o p r s t u ù v w x y z])},
+			main => qr{[a b {ch} {cʼh} d e ê f g h i j k l m n ñ o p r s t u ù v w x y z]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -3777,6 +3779,13 @@ has native_numbering_system => (
 	default		=> 'latn',
 );
 
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 1,
+);
+
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -3787,10 +3796,12 @@ has 'number_symbols' => (
 		},
 		'latn' => {
 			'decimal' => q(,),
+			'exponential' => q(E),
 			'group' => q( ),
 			'infinity' => q(∞),
 			'list' => q(;),
 			'minusSign' => q(-),
+			'nan' => q(NaN),
 			'perMille' => q(‰),
 			'percentSign' => q(%),
 			'plusSign' => q(+),
@@ -3808,14 +3819,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
+				},
+			},
+		},
+		scientificFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '#E0',
 				},
 			},
 		},
@@ -4353,8 +4371,8 @@ has 'currencies' => (
 				'two' => q(roubl nevez Belarus \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(roubl Belarus),
 				'few' => q(roubl Belarus),
@@ -4362,6 +4380,17 @@ has 'currencies' => (
 				'one' => q(roubl Belarus),
 				'other' => q(roubl Belarus),
 				'two' => q(roubl Belarus),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(roubl Belarus \(2000–2016\)),
+				'few' => q(roubl Belarus \(2000–2016\)),
+				'many' => q(a roubloù Belarus \(2000–2016\)),
+				'one' => q(roubl Belarus \(2000–2016\)),
+				'other' => q(roubl Belarus \(2000–2016\)),
+				'two' => q(roubl Belarus \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -5788,12 +5817,12 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(nuevo sol Perou),
-				'few' => q(nuevo sol Perou),
-				'many' => q(nuevo sol Perou),
-				'one' => q(nuevo sol Perou),
-				'other' => q(nuevo sol Perou),
-				'two' => q(nuevo sol Perou),
+				'currency' => q(sol Perou),
+				'few' => q(sol Perou),
+				'many' => q(sol Perou),
+				'one' => q(sol Perou),
+				'other' => q(sol Perou),
+				'two' => q(sol Perou),
 			},
 		},
 		'PES' => {
@@ -6975,6 +7004,15 @@ has 'calendar_days' => (
 						sat => 'Sa',
 						sun => 'Su'
 					},
+					short => {
+						mon => 'Lun',
+						tue => 'Meu.',
+						wed => 'Mer.',
+						thu => 'Yaou',
+						fri => 'Gwe.',
+						sat => 'Sad.',
+						sun => 'Sul'
+					},
 					wide => {
 						mon => 'Lun',
 						tue => 'Meurzh',
@@ -7004,6 +7042,15 @@ has 'calendar_days' => (
 						sat => 'Sa',
 						sun => 'Su'
 					},
+					short => {
+						mon => 'Lun',
+						tue => 'Meu.',
+						wed => 'Mer.',
+						thu => 'Yaou',
+						fri => 'Gwe.',
+						sat => 'Sad.',
+						sun => 'Sul'
+					},
 					wide => {
 						mon => 'Lun',
 						tue => 'Meurzh',
@@ -7030,6 +7077,11 @@ has 'calendar_quarters' => (
 						2 => '3e trim.',
 						3 => '4e trim.'
 					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
 					wide => {0 => '1añ trimiziad',
 						1 => '2l trimiziad',
 						2 => '3e trimiziad',
@@ -7041,6 +7093,11 @@ has 'calendar_quarters' => (
 						1 => '2l trim.',
 						2 => '3e trim.',
 						3 => '4e trim.'
+					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
 					},
 					wide => {0 => '1añ trimiziad',
 						1 => '2l trimiziad',
@@ -7060,22 +7117,30 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{G.M.},
 					'am' => q{A.M.},
+					'pm' => q{G.M.},
 				},
 				'narrow' => {
 					'am' => q{am},
 					'pm' => q{gm},
 				},
 				'wide' => {
-					'am' => q{A.M.},
 					'pm' => q{G.M.},
+					'am' => q{A.M.},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'pm' => q{goude merenn},
-					'am' => q{a-raok merenn},
+					'pm' => q{G.M.},
+					'am' => q{A.M.},
+				},
+				'narrow' => {
+					'pm' => q{G.M.},
+					'am' => q{A.M.},
+				},
+				'abbreviated' => {
+					'am' => q{A.M.},
+					'pm' => q{G.M.},
 				},
 			},
 		},
@@ -7087,6 +7152,8 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+		},
 		'gregorian' => {
 			abbreviated => {
 				'0' => 'a-raok J.K.',
@@ -7123,7 +7190,17 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			'full' => q{G y MMMM d, EEEE},
+			'long' => q{G y MMMM d},
+			'medium' => q{G y MMM d},
+			'short' => q{GGGGG y-MM-dd},
+		},
 		'gregorian' => {
+			'full' => q{y MMMM d, EEEE},
+			'long' => q{y MMMM d},
+			'medium' => q{y MMM d},
+			'short' => q{y-MM-dd},
 		},
 		'roc' => {
 			'full' => q{G y MMMM d, EEEE},
@@ -7137,7 +7214,13 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+		},
 		'gregorian' => {
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 		'roc' => {
 		},
@@ -7149,6 +7232,12 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
+		},
 		'gregorian' => {
 			'full' => q{{1} 'da' {0}},
 			'long' => q{{1} 'da' {0}},
@@ -7165,6 +7254,33 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			y => q{G y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -7172,10 +7288,10 @@ has 'datetime_formats_available_formats' => (
 			Ed => q{E d},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d MMM y G},
-			GyMMMd => q{d MMM y G},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -7185,6 +7301,8 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E dd/MM},
 			MMM => q{LLL},
 			MMMEd => q{E d MMM},
+			MMMMW => q{'week' W 'of' MMM},
+			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{dd/MM},
 			d => q{d},
@@ -7199,10 +7317,12 @@ has 'datetime_formats_available_formats' => (
 			yMEd => q{E dd/MM/y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E d MMM y},
+			yMMMM => q{y MMMM},
 			yMMMd => q{d MMM y},
 			yMd => q{dd/MM/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{'week' w 'of' Y},
 		},
 	} },
 );
@@ -7223,8 +7343,68 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'roc' => {
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
 			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
 		},
 		'gregorian' => {
 			H => {
@@ -7321,6 +7501,9 @@ has 'datetime_formats_interval' => (
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
+		'roc' => {
+			fallback => '{0} – {1}',
+		},
 	} },
 );
 
@@ -7331,14 +7514,14 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		hourFormat => q(+HH:mm;-HH:mm),
 		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(UTC),
+		gmtZeroFormat => q(GMT),
 		regionFormat => q(eur {0}),
 		regionFormat => q(eur hañv {0}),
 		regionFormat => q(eur cʼhoañv {0}),
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(eur Afghanistan),
+				'standard' => q#eur Afghanistan#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -7490,45 +7673,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(eur Kreizafrika),
+				'standard' => q#eur Kreizafrika#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(eur Afrika ar Reter),
+				'standard' => q#eur Afrika ar Reter#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(eur cʼhoañv Suafrika),
+				'standard' => q#eur cʼhoañv Suafrika#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(eur hañv Afrika ar Cʼhornôg),
-				'generic' => q(eur Afrika ar Cʼhornôg),
-				'standard' => q(eur cʼhoañv Afrika ar Cʼhornôg),
+				'daylight' => q#eur hañv Afrika ar Cʼhornôg#,
+				'generic' => q#eur Afrika ar Cʼhornôg#,
+				'standard' => q#eur cʼhoañv Afrika ar Cʼhornôg#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(eur hañv Alaska),
-				'generic' => q(eur Alaska),
-				'standard' => q(eur cʼhoañv Alaska),
+				'daylight' => q#eur hañv Alaska#,
+				'generic' => q#eur Alaska#,
+				'standard' => q#eur cʼhoañv Alaska#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(eur hañv Almaty),
-				'generic' => q(eur Almaty),
-				'standard' => q(eur cʼhoañv Almaty),
+				'daylight' => q#eur hañv Almaty#,
+				'generic' => q#eur Almaty#,
+				'standard' => q#eur cʼhoañv Almaty#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(eur hañv an Amazon),
-				'generic' => q(eur an Amazon),
-				'standard' => q(eur cʼhoañv an Amazon),
+				'daylight' => q#eur hañv an Amazon#,
+				'generic' => q#eur an Amazon#,
+				'standard' => q#eur cʼhoañv an Amazon#,
 			},
 		},
 		'America/Adak' => {
@@ -7707,23 +7890,23 @@ has 'time_zone_names' => (
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(eur hañv ar Reter),
-				'generic' => q(eur ar Reter),
-				'standard' => q(eur cʼhoañv ar Reter),
+				'daylight' => q#eur hañv ar Reter#,
+				'generic' => q#eur ar Reter#,
+				'standard' => q#eur cʼhoañv ar Reter#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(eur hañv ar Menezioù),
-				'generic' => q(eur ar Menezioù),
-				'standard' => q(eur cʼhoañv ar Menezioù),
+				'daylight' => q#eur hañv ar Menezioù#,
+				'generic' => q#eur ar Menezioù#,
+				'standard' => q#eur cʼhoañv ar Menezioù#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(eur hañv Anadyrʼ),
-				'generic' => q(eur Anadyrʼ),
-				'standard' => q(eur cʼhoañv Anadyrʼ),
+				'daylight' => q#eur hañv Anadyrʼ#,
+				'generic' => q#eur Anadyrʼ#,
+				'standard' => q#eur cʼhoañv Anadyrʼ#,
 			},
 		},
 		'Antarctica/Macquarie' => {
@@ -7731,16 +7914,16 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(eur hañv Apia),
-				'generic' => q(eur Apia),
-				'standard' => q(eur cʼhoañv Apia),
+				'daylight' => q#eur hañv Apia#,
+				'generic' => q#eur Apia#,
+				'standard' => q#eur cʼhoañv Apia#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(eur hañv Arabia),
-				'generic' => q(eur Arabia),
-				'standard' => q(eur cʼhoañv Arabia),
+				'daylight' => q#eur hañv Arabia#,
+				'generic' => q#eur Arabia#,
+				'standard' => q#eur cʼhoañv Arabia#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -7748,23 +7931,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(eur hañv Arcʼhantina),
-				'generic' => q(eur Arcʼhantina),
-				'standard' => q(eur cʼhoañv Arcʼhantina),
+				'daylight' => q#eur hañv Arcʼhantina#,
+				'generic' => q#eur Arcʼhantina#,
+				'standard' => q#eur cʼhoañv Arcʼhantina#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(eur hañv Arcʼhantina ar Cʼhornôg),
-				'generic' => q(eur Arcʼhantina ar Cʼhornôg),
-				'standard' => q(eur cʼhoañv Arcʼhantina ar Cʼhornôg),
+				'daylight' => q#eur hañv Arcʼhantina ar Cʼhornôg#,
+				'generic' => q#eur Arcʼhantina ar Cʼhornôg#,
+				'standard' => q#eur cʼhoañv Arcʼhantina ar Cʼhornôg#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(eur hañv Armenia),
-				'generic' => q(eur Armenia),
-				'standard' => q(eur cʼhoañv Armenia),
+				'daylight' => q#eur hañv Armenia#,
+				'generic' => q#eur Armenia#,
+				'standard' => q#eur cʼhoañv Armenia#,
 			},
 		},
 		'Asia/Aden' => {
@@ -7979,149 +8162,149 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(eur hañv Kreizaostralia),
-				'generic' => q(eur Kreizaostralia),
-				'standard' => q(eur cʼhoañv Kreizaostralia),
+				'daylight' => q#eur hañv Kreizaostralia#,
+				'generic' => q#eur Kreizaostralia#,
+				'standard' => q#eur cʼhoañv Kreizaostralia#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(eur hañv Kreizaostralia ar Cʼhornôg),
-				'generic' => q(eur Kreizaostralia ar Cʼhornôg),
-				'standard' => q(eur cʼhoañv Kreizaostralia ar Cʼhornôg),
+				'daylight' => q#eur hañv Kreizaostralia ar Cʼhornôg#,
+				'generic' => q#eur Kreizaostralia ar Cʼhornôg#,
+				'standard' => q#eur cʼhoañv Kreizaostralia ar Cʼhornôg#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(eur hañv Aostralia ar Reter),
-				'generic' => q(eur Aostralia ar Reter),
-				'standard' => q(eur cʼhoañv Aostralia ar Reter),
+				'daylight' => q#eur hañv Aostralia ar Reter#,
+				'generic' => q#eur Aostralia ar Reter#,
+				'standard' => q#eur cʼhoañv Aostralia ar Reter#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(eur hañv Aostralia ar Cʼhornôg),
-				'generic' => q(eur Aostralia ar Cʼhornôg),
-				'standard' => q(eur cʼhoañv Aostralia ar Cʼhornôg),
+				'daylight' => q#eur hañv Aostralia ar Cʼhornôg#,
+				'generic' => q#eur Aostralia ar Cʼhornôg#,
+				'standard' => q#eur cʼhoañv Aostralia ar Cʼhornôg#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(eur hañv Azerbaidjan),
-				'generic' => q(eur Azerbaidjan),
-				'standard' => q(eur cʼhoañv Azerbaidjan),
+				'daylight' => q#eur hañv Azerbaidjan#,
+				'generic' => q#eur Azerbaidjan#,
+				'standard' => q#eur cʼhoañv Azerbaidjan#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(eur hañv an Azorez),
-				'generic' => q(eur an Azorez),
-				'standard' => q(eur cʼhoañv an Azorez),
+				'daylight' => q#eur hañv an Azorez#,
+				'generic' => q#eur an Azorez#,
+				'standard' => q#eur cʼhoañv an Azorez#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(eur hañv Bangladesh),
-				'generic' => q(eur Bangladesh),
-				'standard' => q(eur cʼhoañv Bangladesh),
+				'daylight' => q#eur hañv Bangladesh#,
+				'generic' => q#eur Bangladesh#,
+				'standard' => q#eur cʼhoañv Bangladesh#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(eur Bhoutan),
+				'standard' => q#eur Bhoutan#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(eur Bolivia),
+				'standard' => q#eur Bolivia#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(eur hañv Brasília),
-				'generic' => q(eur Brasília),
-				'standard' => q(eur cʼhoañv Brasília),
+				'daylight' => q#eur hañv Brasília#,
+				'generic' => q#eur Brasília#,
+				'standard' => q#eur cʼhoañv Brasília#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(eur Brunei Darussalam),
+				'standard' => q#eur Brunei Darussalam#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(eur hañv ar Cʼhab-Glas),
-				'generic' => q(eur ar Cʼhab-Glas),
-				'standard' => q(eur cʼhoañv ar Cʼhab-Glas),
+				'daylight' => q#eur hañv ar Cʼhab-Glas#,
+				'generic' => q#eur ar Cʼhab-Glas#,
+				'standard' => q#eur cʼhoañv ar Cʼhab-Glas#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(eur hañv Chatham),
-				'generic' => q(eur Chatham),
-				'standard' => q(eur cʼhoañv Chatham),
+				'daylight' => q#eur hañv Chatham#,
+				'generic' => q#eur Chatham#,
+				'standard' => q#eur cʼhoañv Chatham#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(eur hañv Chile),
-				'generic' => q(eur Chile),
-				'standard' => q(eur cʼhoañv Chile),
+				'daylight' => q#eur hañv Chile#,
+				'generic' => q#eur Chile#,
+				'standard' => q#eur cʼhoañv Chile#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(eur hañv Sina),
-				'generic' => q(eur Sina),
-				'standard' => q(eur cʼhoañv Sina),
+				'daylight' => q#eur hañv Sina#,
+				'generic' => q#eur Sina#,
+				'standard' => q#eur cʼhoañv Sina#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(eur Enez Christmas),
+				'standard' => q#eur Enez Christmas#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(eur Inizi Kokoz),
+				'standard' => q#eur Inizi Kokoz#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(eur hañv Kolombia),
-				'generic' => q(eur Kolombia),
-				'standard' => q(eur cʼhoañv Kolombia),
+				'daylight' => q#eur hañv Kolombia#,
+				'generic' => q#eur Kolombia#,
+				'standard' => q#eur cʼhoañv Kolombia#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(eur hañv Inizi Cook),
-				'generic' => q(eur Inizi Cook),
-				'standard' => q(eur cʼhoañv Inizi Cook),
+				'daylight' => q#eur hañv Inizi Cook#,
+				'generic' => q#eur Inizi Cook#,
+				'standard' => q#eur cʼhoañv Inizi Cook#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(eur hañv Kuba),
-				'generic' => q(eur Kuba),
-				'standard' => q(eur cʼhoañv Kuba),
+				'daylight' => q#eur hañv Kuba#,
+				'generic' => q#eur Kuba#,
+				'standard' => q#eur cʼhoañv Kuba#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(eur Timor ar Reter),
+				'standard' => q#eur Timor ar Reter#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(eur hañv Enez Pask),
-				'generic' => q(eur Enez Pask),
-				'standard' => q(eur cʼhoañv Enez Pask),
+				'daylight' => q#eur hañv Enez Pask#,
+				'generic' => q#eur Enez Pask#,
+				'standard' => q#eur cʼhoañv Enez Pask#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(eur Ecuador),
+				'standard' => q#eur Ecuador#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -8163,7 +8346,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dulenn#,
 			long => {
-				'daylight' => q(eur cʼhoañv Iwerzhon),
+				'daylight' => q#eur cʼhoañv Iwerzhon#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -8199,7 +8382,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Londrez#,
 			long => {
-				'daylight' => q(eur hañv Breizh-Veur),
+				'daylight' => q#eur hañv Breizh-Veur#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -8285,110 +8468,110 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(eur hañv Kreizeuropa),
-				'generic' => q(eur Kreizeuropa),
-				'standard' => q(eur cʼhoañv Kreizeuropa),
+				'daylight' => q#eur hañv Kreizeuropa#,
+				'generic' => q#eur Kreizeuropa#,
+				'standard' => q#eur cʼhoañv Kreizeuropa#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(eur hañv Europa ar Reter),
-				'generic' => q(eur Europa ar Reter),
-				'standard' => q(eur cʼhoañv Europa ar Reter),
+				'daylight' => q#eur hañv Europa ar Reter#,
+				'generic' => q#eur Europa ar Reter#,
+				'standard' => q#eur cʼhoañv Europa ar Reter#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(eur hañv Europa ar Cʼhornôg),
-				'generic' => q(eur Europa ar Cʼhornôg),
-				'standard' => q(eur cʼhoañv Europa ar Cʼhornôg),
+				'daylight' => q#eur hañv Europa ar Cʼhornôg#,
+				'generic' => q#eur Europa ar Cʼhornôg#,
+				'standard' => q#eur cʼhoañv Europa ar Cʼhornôg#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(eur hañv Inizi Falkland),
-				'generic' => q(eur Inizi Falkland),
-				'standard' => q(eur cʼhoañv Inizi Falkland),
+				'daylight' => q#eur hañv Inizi Falkland#,
+				'generic' => q#eur Inizi Falkland#,
+				'standard' => q#eur cʼhoañv Inizi Falkland#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(eur hañv Fidji),
-				'generic' => q(eur Fidji),
-				'standard' => q(eur cʼhoañv Fidji),
+				'daylight' => q#eur hañv Fidji#,
+				'generic' => q#eur Fidji#,
+				'standard' => q#eur cʼhoañv Fidji#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(eur Gwiana cʼhall),
+				'standard' => q#eur Gwiana cʼhall#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(eur Douaroù aostral Frañs hag Antarktika),
+				'standard' => q#eur Douaroù aostral Frañs hag Antarktika#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Amzer keitat Greenwich (AKG)),
+				'standard' => q#Amzer keitat Greenwich (AKG)#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(eur Inizi Galápagos),
+				'standard' => q#eur Inizi Galápagos#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(eur Gambier),
+				'standard' => q#eur Gambier#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(eur hañv Jorjia),
-				'generic' => q(eur Jorjia),
-				'standard' => q(eur cʼhoañv Jorjia),
+				'daylight' => q#eur hañv Jorjia#,
+				'generic' => q#eur Jorjia#,
+				'standard' => q#eur cʼhoañv Jorjia#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(eur hañv Greunland ar Reter),
-				'generic' => q(eur Greunland ar Reter),
-				'standard' => q(eur cʼhoañv Greunland ar Reter),
+				'daylight' => q#eur hañv Greunland ar Reter#,
+				'generic' => q#eur Greunland ar Reter#,
+				'standard' => q#eur cʼhoañv Greunland ar Reter#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(eur hañv Greunland ar Cʼhornôg),
-				'generic' => q(eur Greunland ar Cʼhornôg),
-				'standard' => q(eur cʼhoañv Greunland ar Cʼhornôg),
+				'daylight' => q#eur hañv Greunland ar Cʼhornôg#,
+				'generic' => q#eur Greunland ar Cʼhornôg#,
+				'standard' => q#eur cʼhoañv Greunland ar Cʼhornôg#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(eur cʼhoañv Guam),
+				'standard' => q#eur cʼhoañv Guam#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(eur cʼhoañv ar Pleg-mor Arab-ha-Pers),
+				'standard' => q#eur cʼhoañv ar Pleg-mor Arab-ha-Pers#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(eur Guyana),
+				'standard' => q#eur Guyana#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(eur hañv Hong Kong),
-				'generic' => q(eur Hong Kong),
-				'standard' => q(eur cʼhoañv Hong Kong),
+				'daylight' => q#eur hañv Hong Kong#,
+				'generic' => q#eur Hong Kong#,
+				'standard' => q#eur cʼhoañv Hong Kong#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(eur cʼhoañv India),
+				'standard' => q#eur cʼhoañv India#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -8423,185 +8606,185 @@ has 'time_zone_names' => (
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(eur Indez-Sina),
+				'standard' => q#eur Indez-Sina#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(eur Indonezia ar Reter),
+				'standard' => q#eur Indonezia ar Reter#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(eur Indonezia ar Cʼhornôg),
+				'standard' => q#eur Indonezia ar Cʼhornôg#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(eur hañv Iran),
-				'generic' => q(eur Iran),
-				'standard' => q(eur cʼhoañv Iran),
+				'daylight' => q#eur hañv Iran#,
+				'generic' => q#eur Iran#,
+				'standard' => q#eur cʼhoañv Iran#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(eur hañv Irkutsk),
-				'generic' => q(eur Irkutsk),
-				'standard' => q(eur cʼhoañv Irkutsk),
+				'daylight' => q#eur hañv Irkutsk#,
+				'generic' => q#eur Irkutsk#,
+				'standard' => q#eur cʼhoañv Irkutsk#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(eur hañv Israel),
-				'generic' => q(eur Israel),
-				'standard' => q(eur cʼhoañv Israel),
+				'daylight' => q#eur hañv Israel#,
+				'generic' => q#eur Israel#,
+				'standard' => q#eur cʼhoañv Israel#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(eur hañv Japan),
-				'generic' => q(eur Japan),
-				'standard' => q(eur cʼhoañv Japan),
+				'daylight' => q#eur hañv Japan#,
+				'generic' => q#eur Japan#,
+				'standard' => q#eur cʼhoañv Japan#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(eur Kazakstan ar Reter),
+				'standard' => q#eur Kazakstan ar Reter#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(eur Kazakstan ar Cʼhornôg),
+				'standard' => q#eur Kazakstan ar Cʼhornôg#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(eur hañv Korea),
-				'generic' => q(eur Korea),
-				'standard' => q(eur cʼhoañv Korea),
+				'daylight' => q#eur hañv Korea#,
+				'generic' => q#eur Korea#,
+				'standard' => q#eur cʼhoañv Korea#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(eur Kyrgyzstan),
+				'standard' => q#eur Kyrgyzstan#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(eur Sri Lanka),
+				'standard' => q#eur Sri Lanka#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(eur hañv Macau),
-				'generic' => q(eur Macau),
-				'standard' => q(eur cʼhoañv Macau),
+				'daylight' => q#eur hañv Macau#,
+				'generic' => q#eur Macau#,
+				'standard' => q#eur cʼhoañv Macau#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(eur Enez Macquarie),
+				'standard' => q#eur Enez Macquarie#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(eur Malaysia),
+				'standard' => q#eur Malaysia#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(eur ar Maldivez),
+				'standard' => q#eur ar Maldivez#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(eur Inizi Markiz),
+				'standard' => q#eur Inizi Markiz#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(eur Inizi Marshall),
+				'standard' => q#eur Inizi Marshall#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(eur hañv Moris),
-				'generic' => q(eur Moris),
-				'standard' => q(eur cʼhoañv Moris),
+				'daylight' => q#eur hañv Moris#,
+				'generic' => q#eur Moris#,
+				'standard' => q#eur cʼhoañv Moris#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(eur hañv Gwalarn Mecʼhiko),
-				'generic' => q(eur Gwalarn Mecʼhiko),
-				'standard' => q(eur cʼhoañv Gwalarn Mecʼhiko),
+				'daylight' => q#eur hañv Gwalarn Mecʼhiko#,
+				'generic' => q#eur Gwalarn Mecʼhiko#,
+				'standard' => q#eur cʼhoañv Gwalarn Mecʼhiko#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(eur hañv Ulaanbaatar),
-				'generic' => q(eur Ulaanbaatar),
-				'standard' => q(eur cʼhoañv Ulaanbaatar),
+				'daylight' => q#eur hañv Ulaanbaatar#,
+				'generic' => q#eur Ulaanbaatar#,
+				'standard' => q#eur cʼhoañv Ulaanbaatar#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(eur hañv Moskov),
-				'generic' => q(eur Moskov),
-				'standard' => q(eur cʼhoañv Moskov),
+				'daylight' => q#eur hañv Moskov#,
+				'generic' => q#eur Moskov#,
+				'standard' => q#eur cʼhoañv Moskov#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(eur Myanmar),
+				'standard' => q#eur Myanmar#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(eur Nauru),
+				'standard' => q#eur Nauru#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(eur Nepal),
+				'standard' => q#eur Nepal#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(eur hañv Kaledonia Nevez),
-				'generic' => q(eur Kaledonia Nevez),
-				'standard' => q(eur cʼhoañv Kaledonia Nevez),
+				'daylight' => q#eur hañv Kaledonia Nevez#,
+				'generic' => q#eur Kaledonia Nevez#,
+				'standard' => q#eur cʼhoañv Kaledonia Nevez#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(eur hañv Zeland-Nevez),
-				'generic' => q(eur Zeland-Nevez),
-				'standard' => q(eur cʼhoañv Zeland-Nevez),
+				'daylight' => q#eur hañv Zeland-Nevez#,
+				'generic' => q#eur Zeland-Nevez#,
+				'standard' => q#eur cʼhoañv Zeland-Nevez#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(eur hañv Newfoundland),
-				'generic' => q(eur Newfoundland),
-				'standard' => q(eur cʼhoañv Newfoundland),
+				'daylight' => q#eur hañv Newfoundland#,
+				'generic' => q#eur Newfoundland#,
+				'standard' => q#eur cʼhoañv Newfoundland#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(eur Niue),
+				'standard' => q#eur Niue#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(eur Enez Norfolk),
+				'standard' => q#eur Enez Norfolk#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(eur hañv Novosibirsk),
-				'generic' => q(eur Novosibirsk),
-				'standard' => q(eur cʼhoañv Novosibirsk),
+				'daylight' => q#eur hañv Novosibirsk#,
+				'generic' => q#eur Novosibirsk#,
+				'standard' => q#eur cʼhoañv Novosibirsk#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -8675,191 +8858,191 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(eur hañv Pakistan),
-				'generic' => q(eur Pakistan),
-				'standard' => q(eur cʼhoañv Pakistan),
+				'daylight' => q#eur hañv Pakistan#,
+				'generic' => q#eur Pakistan#,
+				'standard' => q#eur cʼhoañv Pakistan#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(eur Palau),
+				'standard' => q#eur Palau#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(eur hañv Paraguay),
-				'generic' => q(eur Paraguay),
-				'standard' => q(eur cʼhoañv Paraguay),
+				'daylight' => q#eur hañv Paraguay#,
+				'generic' => q#eur Paraguay#,
+				'standard' => q#eur cʼhoañv Paraguay#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(eur hañv Perou),
-				'generic' => q(eur Perou),
-				'standard' => q(eur cʼhoañv Perou),
+				'daylight' => q#eur hañv Perou#,
+				'generic' => q#eur Perou#,
+				'standard' => q#eur cʼhoañv Perou#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(eur hañv ar Filipinez),
-				'generic' => q(eur ar Filipinez),
-				'standard' => q(eur cʼhoañv ar Filipinez),
+				'daylight' => q#eur hañv ar Filipinez#,
+				'generic' => q#eur ar Filipinez#,
+				'standard' => q#eur cʼhoañv ar Filipinez#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(eur hañv Sant-Pêr-ha-Mikelon),
-				'generic' => q(eur Sant-Pêr-ha-Mikelon),
-				'standard' => q(eur cʼhoañv Sant-Pêr-ha-Mikelon),
+				'daylight' => q#eur hañv Sant-Pêr-ha-Mikelon#,
+				'generic' => q#eur Sant-Pêr-ha-Mikelon#,
+				'standard' => q#eur cʼhoañv Sant-Pêr-ha-Mikelon#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(eur Pitcairn),
+				'standard' => q#eur Pitcairn#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(eur ar Reünion),
+				'standard' => q#eur ar Reünion#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(eur hañv Sakhalin),
-				'generic' => q(eur Sakhalin),
-				'standard' => q(eur cʼhoañv Sakhalin),
+				'daylight' => q#eur hañv Sakhalin#,
+				'generic' => q#eur Sakhalin#,
+				'standard' => q#eur cʼhoañv Sakhalin#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(eur hañv Samoa),
-				'generic' => q(eur Samoa),
-				'standard' => q(eur cʼhoañv Samoa),
+				'daylight' => q#eur hañv Samoa#,
+				'generic' => q#eur Samoa#,
+				'standard' => q#eur cʼhoañv Samoa#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(eur Sechelez),
+				'standard' => q#eur Sechelez#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(eur cʼhoañv Singapour),
+				'standard' => q#eur cʼhoañv Singapour#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(eur Inizi Salomon),
+				'standard' => q#eur Inizi Salomon#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(eur Georgia ar Su),
+				'standard' => q#eur Georgia ar Su#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(eur Surinam),
+				'standard' => q#eur Surinam#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(eur Tahiti),
+				'standard' => q#eur Tahiti#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(eur hañv Taipei),
-				'generic' => q(eur Taipei),
-				'standard' => q(eur cʼhoañv Taipei),
+				'daylight' => q#eur hañv Taipei#,
+				'generic' => q#eur Taipei#,
+				'standard' => q#eur cʼhoañv Taipei#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(eur Tadjikistan),
+				'standard' => q#eur Tadjikistan#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(eur Tokelau),
+				'standard' => q#eur Tokelau#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(eur hañv Tonga),
-				'generic' => q(eur Tonga),
-				'standard' => q(eur cʼhoañv Tonga),
+				'daylight' => q#eur hañv Tonga#,
+				'generic' => q#eur Tonga#,
+				'standard' => q#eur cʼhoañv Tonga#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(eur hañv Turkmenistan),
-				'generic' => q(eur Turkmenistan),
-				'standard' => q(eur cʼhoañv Turkmenistan),
+				'daylight' => q#eur hañv Turkmenistan#,
+				'generic' => q#eur Turkmenistan#,
+				'standard' => q#eur cʼhoañv Turkmenistan#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(eur Tuvalu),
+				'standard' => q#eur Tuvalu#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(eur hañv Uruguay),
-				'generic' => q(eur Uruguay),
-				'standard' => q(eur cʼhoañv Uruguay),
+				'daylight' => q#eur hañv Uruguay#,
+				'generic' => q#eur Uruguay#,
+				'standard' => q#eur cʼhoañv Uruguay#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(eur hañv Ouzbekistan),
-				'generic' => q(eur Ouzbekistan),
-				'standard' => q(eur cʼhoañv Ouzbekistan),
+				'daylight' => q#eur hañv Ouzbekistan#,
+				'generic' => q#eur Ouzbekistan#,
+				'standard' => q#eur cʼhoañv Ouzbekistan#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(eur hañv Vanuatu),
-				'generic' => q(eur Vanuatu),
-				'standard' => q(eur cʼhoañv Vanuatu),
+				'daylight' => q#eur hañv Vanuatu#,
+				'generic' => q#eur Vanuatu#,
+				'standard' => q#eur cʼhoañv Vanuatu#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(eur Venezuela),
+				'standard' => q#eur Venezuela#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(eur hañv Vladivostok),
-				'generic' => q(eur Vladivostok),
-				'standard' => q(eur cʼhoañv Vladivostok),
+				'daylight' => q#eur hañv Vladivostok#,
+				'generic' => q#eur Vladivostok#,
+				'standard' => q#eur cʼhoañv Vladivostok#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(eur hañv Volgograd),
-				'generic' => q(eur Volgograd),
-				'standard' => q(eur cʼhoañv Volgograd),
+				'daylight' => q#eur hañv Volgograd#,
+				'generic' => q#eur Volgograd#,
+				'standard' => q#eur cʼhoañv Volgograd#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(eur Wallis ha Futuna),
+				'standard' => q#eur Wallis ha Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(eur hañv Yakutsk),
-				'generic' => q(eur Yakutsk),
-				'standard' => q(eur cʼhoañv Yakutsk),
+				'daylight' => q#eur hañv Yakutsk#,
+				'generic' => q#eur Yakutsk#,
+				'standard' => q#eur cʼhoañv Yakutsk#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(eur hañv Yekaterinbourg),
-				'generic' => q(eur Yekaterinbourg),
-				'standard' => q(eur cʼhoañv Yekaterinbourg),
+				'daylight' => q#eur hañv Yekaterinbourg#,
+				'generic' => q#eur Yekaterinbourg#,
+				'standard' => q#eur cʼhoañv Yekaterinbourg#,
 			},
 		},
 	 } }

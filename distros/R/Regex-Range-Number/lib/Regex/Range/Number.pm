@@ -6,7 +6,7 @@ use warnings;
 use Array::Merge::Unique qw/unique_array/;
 use base qw/Import::Export/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our (%helper, %cache);
 BEGIN {
 	%helper = (
@@ -181,9 +181,7 @@ sub number_range {
 		$a = $tok->{a} = 0;
 	}
 
-	if ($b >= 0) {
-		$tok->{positives} = $helper{split}($a, $b, $tok, $options);
-	}
+	$tok->{positives} = $helper{split}($a, $b, $tok, $options) if ($b >= 0);
 
 	$tok->{result} = $helper{sift}($tok, $options);
 	$tok->{result} = $helper{capture}($tok->{result}) if $capture;
@@ -198,7 +196,7 @@ Regex::Range::Number - Generate number matching regexes
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

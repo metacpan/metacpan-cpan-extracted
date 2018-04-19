@@ -29,9 +29,6 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -42,6 +39,6 @@
          "web" : "https://github.com/sisyphus/math-mpfr"
       }
    },
-   "version" : "4.02",
+   "version" : "4.03",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

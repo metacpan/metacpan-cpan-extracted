@@ -25,7 +25,7 @@ ok(ref($query) eq $query_class,'error2');
 ok(!defined($query->root()), 'error3');
 
 ok(ref($query->expected()) eq 'ARRAY', 'error4');
-my @expected = @{$query->expected()};
+my @expected = sort @{$query->expected()};
 
 ok($expected[0] eq ')', 'error5');
 ok($expected[1] eq ',', 'error6');

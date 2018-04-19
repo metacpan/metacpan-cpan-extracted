@@ -1,5 +1,9 @@
 Revision history for Perl extension Module-Build-XSHelper
 
+0.19 2018-04-17T14:51:20Z
+    - Use File::Copy::Recursive::Reduced instead File::Copy::Recursive(#13)
+        (jkeenan)
+
 0.18 2017-11-01T18:22:27Z
     - Remove Module::Build::Tiny from deps
 

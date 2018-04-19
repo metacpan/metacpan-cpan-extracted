@@ -4,7 +4,7 @@ use 5.010;
 use Moo 1.004005;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use HTTP::Headers ();
 use HTTP::Request ();
@@ -12,7 +12,7 @@ use JSON::MaybeXS;
 use LWP::UserAgent;
 use Scalar::Util qw( blessed );
 use Sub::Quote qw( quote_sub );
-use Try::Tiny;
+use Try::Tiny qw( catch try );
 use Types::Standard qw( InstanceOf );
 use URI ();
 use WebService::MinFraud::Error::Generic;
@@ -26,6 +26,13 @@ use WebService::MinFraud::Types
 use WebService::MinFraud::Validator;
 
 with 'WebService::MinFraud::Role::HasLocales';
+
+has account_id => (
+    is       => 'ro',
+    isa      => MaxMindID,
+    required => 1,
+);
+*user_id = \&account_id;    # for backwards-compatibility
 
 has _base_uri => (
     is      => 'lazy',
@@ -71,18 +78,22 @@ has uri_scheme => (
     default => q{https},
 );
 
-has user_id => (
-    is       => 'ro',
-    isa      => MaxMindID,
-    required => 1,
-);
-
 has _validator => (
     is      => 'lazy',
     isa     => InstanceOf ['WebService::MinFraud::Validator'],
     builder => sub { WebService::MinFraud::Validator->new },
     handles => { _remove_trivial_hash_values => '_delete' },
 );
+
+around BUILDARGS => sub {
+    my $orig = shift;
+
+    my $args = $orig->(@_);
+
+    $args->{account_id} = delete $args->{user_id} if exists $args->{user_id};
+
+    return $args;
+};
 
 sub BUILD {
     my $self = shift;
@@ -145,7 +156,7 @@ sub _response_for {
         $self->_json->encode($content)
     );
 
-    $request->authorization_basic( $self->user_id, $self->license_key );
+    $request->authorization_basic( $self->account_id, $self->license_key );
 
     my $response = $self->ua->request($request);
 
@@ -303,7 +314,7 @@ WebService::MinFraud::Client - Perl API for MaxMind's minFraud Score and Insight
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -312,10 +323,10 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   # The Client object can be re-used across several requests.
-  # Your MaxMind user_id and license_key are available at
+  # Your MaxMind account_id and license_key are available at
   # https://www.maxmind.com/en/my_license_key
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
 
@@ -363,7 +374,7 @@ Requests to the minFraud web service are made over an HTTPS connection.
 =head1 USAGE
 
 The basic API for this class is the same for all of the web services. First you
-create a web service object with your MaxMind C<user_id> and C<license_key>,
+create a web service object with your MaxMind C<account_id> and C<license_key>,
 then you call the method corresponding to the specific web service, passing it
 the transaction you want analyzed.
 
@@ -383,7 +394,7 @@ This method creates a new client object. It accepts the following arguments:
 
 =over 4
 
-=item * user_id
+=item * account_id
 
 Your MaxMind User ID. Go to L<https://www.maxmind.com/en/my_license_key> to see
 your MaxMind User ID and license key.

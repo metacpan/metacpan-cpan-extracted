@@ -1,5 +1,38 @@
 Revision history for Test-BrewBuild
 
+2.20    2018-04-16
+        - modified layout of LCD output to be more conducive of numerous runs
+        - refactored the bbdispatch "auto" argument handling, fixing an issue
+          where setting a run count never stopped auto mode (fixes #224)
+        - cleanup of logging in auto mode upon completion of a run
+        - updated perls in Travis CI to include 5.26, 5.24
+        - removed requirement for external t/script/bbtester_kill.pl script
+          (fixes #226)
+        - fix issue in Git::clone() where we weren't croaking if a fatal error
+          when cloning was encountered
+        - fix issue in t_bugs/164_dispatch_show_help_on_bad_args.t where we
+          were reading the config file causing failure. Now we just move it out
+          of the way temporarily to confirm the bug was fixed correctly
+        - changed the logic of Dispatch when in auto mode so that LCD warnings
+          are thrown at the correct time
+        - added rpi_lcd_cols and rpi_lcd_rows directives to the config file for
+          Dispatch; sets the LCD row and column count, and modified the display
+          for 4x20 LCDs
+        - removed "--yes" from the perlbrew uninstall command. Newer versions
+          of Perlbrew don't seem to honour it
+        - slight test cleanup
+        - _dzil_unshim() now returns early if not operating on a Dist::Zilla
+          distribution (closes #230)
+        - added all config file directives to the config file POD (closes #227)
+        - to allow for 4x2 RPi LCDs, we've extended the environment variable
+          (closes #231)
+        - added Constant.pm to eliminate hard-coded magic numbers (and other
+          info) (closes #222)
+        - all complex regexes are now housed in and fetched from new ::Regex
+          module (closes #223)
+        - in BBCmd->remove(), we check if perlbrew version > 0.76, and if so, we
+          add the "--yes" flag to the uninstall command
+
 2.19    2017-08-05
         - added 'status' command to bbtester, prints to STDOUT whether a tester
           is currently running or not (closes #214)

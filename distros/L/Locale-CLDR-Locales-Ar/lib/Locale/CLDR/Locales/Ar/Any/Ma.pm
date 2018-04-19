@@ -6,21 +6,42 @@ Locale::CLDR::Locales::Ar::Any::Ma - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Ma;
 # This file auto generated from Data\common\main\ar_MA.xml
-#	on Fri 29 Apr  6:50:58 pm GMT
+#	on Fri 13 Apr  7:01:23 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Ar::Any');
+has 'characters' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> $^V ge v5.18.0
+	? eval <<'EOT'
+	sub {
+		no warnings 'experimental::regex_sets';
+		return {
+			auxiliary => qr{[‌‍‎‏ پ چ ژ ڜ ڢ ڤ ڥ ٯ ڧ ڨ ک ڭ گ ݣ ی]},
+			numbers => qr{[‎ \- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+		};
+	},
+EOT
+: sub {
+		return {};
+},
+);
+
+
 has 'default_numbering_system' => (
 	is			=> 'ro',
 	isa			=> Str,
@@ -179,37 +200,37 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 300
-						&& $time < 600;
-					return 'night1' if $time >= 0
-						&& $time < 100;
-					return 'night2' if $time >= 100
-						&& $time < 300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1800;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-				}
 				if($day_period_type eq 'default') {
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 100;
-					return 'morning1' if $time >= 300
-						&& $time < 600;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1800;
 					return 'night2' if $time >= 100
 						&& $time < 300;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'morning1' if $time >= 300
+						&& $time < 600;
+					return 'night1' if $time >= 0
+						&& $time < 100;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 300
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'night2' if $time >= 100
+						&& $time < 300;
+					return 'night1' if $time >= 0
+						&& $time < 100;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}

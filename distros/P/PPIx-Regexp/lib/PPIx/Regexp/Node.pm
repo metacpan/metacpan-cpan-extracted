@@ -38,11 +38,17 @@ use base qw{ PPIx::Regexp::Element };
 
 use Carp;
 use List::Util qw{ max };
-use PPIx::Regexp::Constant qw{ FALSE MINIMUM_PERL NODE_UNKNOWN TRUE };
+use PPIx::Regexp::Constant qw{
+    CODE_REF
+    FALSE
+    MINIMUM_PERL
+    NODE_UNKNOWN
+    TRUE
+};
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
@@ -180,7 +186,8 @@ occurred.
 
 sub _find_routine {
     my ( $want ) = @_;
-    ref $want eq 'CODE' and return $want;
+    CODE_REF eq ref $want
+	and return $want;
     ref $want and return;
     $want =~ m/ \A PPIx::Regexp:: /smx
 	or $want = 'PPIx::Regexp::' . $want;

@@ -30,6 +30,7 @@ cat t/example.axt | perl -I lib/ script/fasops axt2fas stdin -o stdout
 perl -I lib/ script/fasops axt2fas t/example.axt -t S288c -q RM11_1a -s t/RM11_1a.chr.sizes -o stdout
 
 cat t/example.maf | perl -I lib/ script/fasops maf2fas stdin -o stdout
+perl -I lib/ t/07-maf2fas.t
 
 perl -I lib/ script/fasops separate t/example.fas --nodash --rc
 perl -I lib/ script/fasops separate t/example.fas --nodash --rc -o stdout
@@ -45,6 +46,8 @@ cat t/example.fas | perl -I lib/ script/fasops refine stdin --msa mafft -o stdou
 perl -I lib/ script/fasops refine t/example.fas --msa none --chop 10 -o stdout
 
 cat t/example.fas | perl -I lib script/fasops split stdin -o stdout
+perl -I lib script/fasops split t/example.fas --simple -o stdout
+perl -I lib/ t/12-split.t
 
 cat t/slice.fas | perl -I lib script/fasops slice stdin t/slice.yml --name S288c -o stdout
 

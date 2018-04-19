@@ -43,10 +43,11 @@ sub MY::postamble {
   my $spvm_build = SPVM::Build->new;
   
   my @module_names = qw(
-    SPVM::CORE
-    SPVM::Math
-    SPVM::Arrays
-    SPVM::Number::Util
+    SPVM::Std::IO
+    SPVM::Std::Time
+    SPVM::Std::Math
+    SPVM::Std::Arrays
+    SPVM::Std::Number::Util
   );
   
   my $make_rule = '';

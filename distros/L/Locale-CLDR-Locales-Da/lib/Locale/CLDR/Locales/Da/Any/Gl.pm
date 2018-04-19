@@ -6,136 +6,22 @@ Locale::CLDR::Locales::Da::Any::Gl - Package for language Danish
 
 package Locale::CLDR::Locales::Da::Any::Gl;
 # This file auto generated from Data\common\main\da_GL.xml
-#	on Fri 29 Apr  6:57:21 pm GMT
+#	on Fri 13 Apr  7:06:16 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Da::Any');
-has 'day_period_data' => (
-	is			=> 'ro',
-	isa			=> CodeRef,
-	init_arg	=> undef,
-	default		=> sub { sub {
-		# Time in hhmm format
-		my ($self, $type, $time, $day_period_type) = @_;
-		$day_period_type //= 'default';
-		SWITCH:
-		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'morning2' if $time >= 1000
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 1000
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-		}
-	} },
-);
-
-around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
-};
-
-has 'eras' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'date_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'time_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'full' => q{h.mm.ss a zzzz},
-			'long' => q{h.mm.ss a z},
-			'medium' => q{h.mm.ss a},
-			'short' => q{h.mm a},
-		},
-	} },
-);
-
-has 'datetime_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'datetime_formats_available_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
-has 'datetime_formats_append_item' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
-has 'datetime_formats_interval' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
 no Moo;
 
 1;

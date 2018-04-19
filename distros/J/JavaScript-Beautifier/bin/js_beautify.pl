@@ -15,8 +15,8 @@ my %params;
 GetOptions(
 	\%params,
 	"help|?",
-	"o",
-	"output=s",
+	"w|overwrite",
+	"o|output=s",
 	"s|indent_size=i",
 	"c|indent_character=s",
 	"p|preserve_newlines",
@@ -42,8 +42,8 @@ my $pretty_js = js_beautify( $js_source_code, {
     preserve_newlines => $params{p} || 1
 } );
 
-if ( $params{output} or $params{o} ) {
-    my $to_file = $params{output} || $file;
+if ( $params{o} or $params{w} ) {
+    my $to_file = $params{o} || $file;
     open(my $fh, '>', $to_file) or die("could not open $to_file: $!");
     print $fh $pretty_js;
     close($fh);
@@ -69,13 +69,15 @@ js_beautify.pl - command tool to beautify your javascript files
 
 =item B<-?>, B<--help>
 
+=item B<-w>, B<--overwrite>
+
+if B<-w>, it will overwrite the C<FILE>
+
 =item B<-o>, B<--output>
 
 By default, we will print beautified javascript to STDOUT
 
-if B<-o>, it will override the C<FILE>
-
-if B<-output=newfile.js>, it will write into C<newfile.js>
+if B<--output=newfile.js>, it will write into C<newfile.js>
 
 =item B<-s>, B<--indent_size>
 

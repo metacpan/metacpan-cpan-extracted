@@ -13,7 +13,7 @@ use AWS::S3::ResponseParser;
 use AWS::S3::Owner;
 use AWS::S3::Bucket;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 has [qw/access_key_id secret_access_key/] => ( is => 'ro', isa => 'Str' );
 
@@ -275,9 +275,10 @@ Returns the L<AWS::S3::Bucket> object matching C<$name> if found.
 
 Returns nothing otherwise.
 
-=head2 add_bucket( name => $name )
+=head2 add_bucket( name => $name, location => 'us-west-1' )
 
-Attempts to create a new bucket with the name provided.
+Attempts to create a new bucket with the name provided. The location parameter is optional
+and, as per the AWS docs, will default to "us-east-1".
 
 On success, returns the new L<AWS::S3::Bucket>
 

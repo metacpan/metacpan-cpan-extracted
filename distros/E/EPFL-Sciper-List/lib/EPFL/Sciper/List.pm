@@ -14,11 +14,11 @@ EPFL::Sciper::List - Retrieve a list of all public active sciper from EPFL.
 
 =head1 VERSION
 
-Version 0.02
+Version 1.01
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ Retrieve sciper from EPFL
     print toJson(@listPersons);
     print toTsv(@listPersons);
 
-Via the command-line program epfl-sciper-list.pl
+Via the command line epfl-sciper-list
 
 =head1 DESCRIPTION
 
@@ -198,7 +198,8 @@ L<http://search.cpan.org/dist/EPFL-Sciper-List/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2017.
+Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE,
+Switzerland, VPSI, 2017-2018.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

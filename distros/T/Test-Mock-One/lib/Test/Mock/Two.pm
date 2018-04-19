@@ -1,5 +1,5 @@
 package Test::Mock::Two;
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 use warnings;
 use strict;
 
@@ -18,7 +18,7 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
-    test => [ map { $_ =~ /_ok$/ } @EXPORT_OK ],
+    test => [ grep { $_ =~ /_ok$/ } @EXPORT_OK ],
 );
 
 use Test::Builder;
@@ -39,14 +39,16 @@ sub one_called {
         croak "Failed to provide a method";
     }
 
-
-    if (!defined $func) {
-        croak "Failed to provide a caller";
-    }
-
     if (my $cs = $one->{'X-Mock-Called-By'}) {
-        return $cs->{$func}{$method} if exists $cs->{$func}{$method};
+        my $rv = $cs->{$method};
+
+        return unless $rv;
+        return $rv if !defined $func;
+
+        return $rv->{$func} if exists $rv->{$func};
     }
+
+    return if !defined $func;
 
     $func =~ s#::#/#g;
     $func .= '.pm';
@@ -94,7 +96,7 @@ Test::Mock::Two - Inspection module for Test::Mock::One
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

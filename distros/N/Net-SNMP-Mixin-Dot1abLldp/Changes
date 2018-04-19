@@ -1,4 +1,7 @@
 Revision history for Net-SNMP-Mixin-Dot1abLldp
+0.15	Tue, 17 Apr 2018 11:15:05 +0200
+	check if lldpLocChassisId is defined in get_lldp_local_system_data
+
 0.14	Fri, 27 Oct 2017 18:59:52 +0200
 	check if chassidIdSubtype is defined in get_lldp_rem_table
 

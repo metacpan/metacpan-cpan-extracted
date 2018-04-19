@@ -1,3 +1,48 @@
+v0.61.4 2018-04-14T07:51:47Z
+ - handle die in coro
+ - result get reason fixed
+ - run api_request in coroutine
+ - invalid response usage fixed
+ - RPC::Log template fixed
+ - run HTTP request in Coro::async_pool
+ - RPC tmpl term handler
+ - run RPC on_rpc request in Coro::async_pool
+ - app router run requests in Coro::async_pool
+ - HTTP server return standard reason
+ - app tmpl updated
+
+v0.61.3 2018-04-13T01:28:05Z
+ - STD*_UTF8 removed
+
+v0.61.2 2018-04-12T18:20:19Z
+ - access to http status using hash key
+
+v0.61.1 2018-04-12T16:04:24Z
+ - invalid method call
+
+v0.61.0 2018-04-12T16:01:58Z
+ - app init rewrited using coro
+ - RPC hub coro
+ - HTTP blocking with Coro::rouse_cb
+ - EV die hooks
+ - DBI::Response class
+ - API tests added
+ - api_call coro
+ - typo
+ - RPC hub listen only for self events
+ - IO::AIO fork
+ - syntax
+ - use Coro::rouse_wait instead of $cv->recv
+ - AE::cv patched to use Coro::rouse_cb
+ - updated -result pragma
+ - DBI response removed
+ - universal response object used
+ - universal response object
+ - close
+ - blocking api call
+ - blocking rpc call
+ - blocking http call
+
 v0.60.0 2018-04-09T05:05:08Z
  - bash source wget updated to return false in case of HTTP error
  - app fix www storage undef value

@@ -26,6 +26,6 @@ $t->stop;
 my @ret = split /\n/, $ret;
 
 ok (@ret > 17, "return has debug logging lines");
-like ($ret[8], qr/\d{4}-\d{2}-\d{2}/, "log lines contain a date");
+like ($ret[2], qr/\d{4}-\d{2}-\d{2}/, "log lines contain a date");
 
 done_testing();

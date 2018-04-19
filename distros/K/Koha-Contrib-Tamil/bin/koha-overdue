@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '0.054';
+$Main::VERSION = '0.055';
 # PODNAME: koha-overdue
 # ABSTRACT: Claim overdues each day, grouping same overdues
 
@@ -50,7 +50,7 @@ koha-overdue - Claim overdues each day, grouping same overdues
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 DESCRIPTION
 

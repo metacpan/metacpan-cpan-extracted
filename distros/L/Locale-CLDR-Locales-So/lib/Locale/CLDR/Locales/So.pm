@@ -6,17 +6,18 @@ Locale::CLDR::Locales::So - Package for language Somali
 
 package Locale::CLDR::Locales::So;
 # This file auto generated from Data\common\main\so.xml
-#	on Fri 29 Apr  7:25:21 pm GMT
+#	on Fri 13 Apr  7:28:39 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -311,7 +312,7 @@ has 'display_name_region' => (
  			'MH' => 'Marshall Islands',
  			'MK' => 'Makadooniya',
  			'ML' => 'Maali',
- 			'MM' => 'Myanmar',
+ 			'MM' => 'Miyanmar',
  			'MN' => 'Mongooliya',
  			'MP' => 'Northern Mariana Islands',
  			'MQ' => 'Martinique',
@@ -454,7 +455,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p q r s t u v w x y z])},
+			main => qr{[a b c d e f g h i j k l m n o p q r s t u v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -516,6 +518,30 @@ has 'number_symbols' => (
 			'group' => q(,),
 		},
 	} }
+);
+
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'one' => '0K',
+					'other' => '0K',
+				},
+				'10000' => {
+					'one' => '00K',
+					'other' => '00K',
+				},
+				'100000' => {
+					'one' => '000K',
+					'other' => '000K',
+				},
+			},
+		},
+} },
 );
 
 has 'number_currency_formats' => (
@@ -611,6 +637,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					narrow => {
+						nonleap => [
+							'K',
+							'L',
+							'S',
+							'A',
+							'S',
+							'L',
+							'T',
+							'S',
+							'S',
+							'T',
+							'K',
+							'L'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'Bisha Koobaad',
@@ -672,6 +717,24 @@ has 'calendar_days' => (
 						sat => 'Sab',
 						sun => 'Axd'
 					},
+					narrow => {
+						mon => 'I',
+						tue => 'T',
+						wed => 'A',
+						thu => 'Kh',
+						fri => 'J',
+						sat => 'S',
+						sun => 'A'
+					},
+					short => {
+						mon => 'Isn',
+						tue => 'Tal',
+						wed => 'Arb',
+						thu => 'Kha',
+						fri => 'Jim',
+						sat => 'Sab',
+						sun => 'Axd'
+					},
 					wide => {
 						mon => 'Isniin',
 						tue => 'Talaado',
@@ -687,10 +750,28 @@ has 'calendar_days' => (
 						mon => 'I',
 						tue => 'T',
 						wed => 'A',
-						thu => 'K',
+						thu => 'Kh',
 						fri => 'J',
 						sat => 'S',
 						sun => 'A'
+					},
+					short => {
+						mon => 'Isn',
+						tue => 'Tal',
+						wed => 'Arb',
+						thu => 'Kha',
+						fri => 'Jim',
+						sat => 'Sab',
+						sun => 'Axd'
+					},
+					wide => {
+						mon => 'Isniin',
+						tue => 'Talaado',
+						wed => 'Arbaco',
+						thu => 'Khamiis',
+						fri => 'Jimco',
+						sat => 'Sabti',
+						sun => 'Axad'
 					},
 				},
 			},
@@ -709,6 +790,18 @@ has 'calendar_quarters' => (
 						2 => 'R3',
 						3 => 'R4'
 					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
+					wide => {0 => 'Rubaca 1aad',
+						1 => 'Rubaca 2aad',
+						2 => 'Rubaca 3aad',
+						3 => 'Rubaca 4aad'
+					},
+				},
+				'stand-alone' => {
 					wide => {0 => 'Rubaca 1aad',
 						1 => 'Rubaca 2aad',
 						2 => 'Rubaca 3aad',
@@ -726,13 +819,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{gn.},
+					'am' => q{sn.},
+				},
+				'narrow' => {
+					'pm' => q{gn.},
+					'am' => q{sn.},
+				},
+				'wide' => {
+					'am' => q{sn.},
+					'pm' => q{gn.},
+				},
+			},
+			'stand-alone' => {
 				'wide' => {
 					'pm' => q{gn.},
 					'am' => q{sn.},
 				},
 				'abbreviated' => {
-					'am' => q{sn.},
 					'pm' => q{gn.},
+					'am' => q{sn.},
 				},
 			},
 		},
@@ -752,8 +859,8 @@ has 'eras' => (
 				'1' => 'CD'
 			},
 			wide => {
-				'0' => 'Ciise ka hor (CS)',
-				'1' => 'Ciise ka dib (CS)'
+				'0' => 'CK',
+				'1' => 'CD'
 			},
 		},
 	} },
@@ -812,7 +919,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -835,7 +942,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -843,6 +950,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
+			MMMMW => q{'usbuuc' W 'ee' MMMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
 			Md => q{M/d},
@@ -874,7 +982,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			M => {
 				M => q{M–M},
 			},
@@ -951,7 +1059,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
-		'generic' => {
+		'gregorian' => {
 			M => {
 				M => q{M–M},
 			},
@@ -1031,6 +1139,25 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		'Colombia' => {
+			long => {
+				'daylight' => q#Waqtiyada Xagaaga Kolambiya#,
+				'generic' => q#Waqtiga Kolambiya#,
+				'standard' => q#Waqtiyada Caadiga ah ee kolambiya#,
+			},
+		},
+		'Galapagos' => {
+			long => {
+				'standard' => q#Waqtiga Galabagos#,
+			},
+		},
+	 } }
+);
 no Moo;
 
 1;

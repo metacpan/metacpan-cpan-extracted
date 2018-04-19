@@ -18,7 +18,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '8.12';
+our $VERSION = '9.02';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -38,10 +38,14 @@ sub foreground {
   return undef
     unless $job->retry({attempts => 1, queue => 'minion_foreground'});
 
+  # Reset event loop
+  Mojo::IOLoop->reset;
+  local @{$SIG}{qw(CHLD INT TERM QUIT)} = ('default') x 4;
+
   my $worker = $self->worker->register;
   $job = $worker->dequeue(0 => {id => $id, queues => ['minion_foreground']});
   my $err;
-  if ($job) { $job->finish unless defined($err = $job->_run) }
+  if ($job) { defined($err = $job->execute) ? $job->fail($err) : $job->finish }
   $worker->unregister;
 
   return defined $err ? die $err : !!$job;
@@ -53,6 +57,8 @@ sub guard {
   return undef unless $self->lock($name, $duration, $options);
   return Minion::_Guard->new(minion => $self, name => $name, time => $time);
 }
+
+sub history { shift->backend->history }
 
 sub job {
   my ($self, $id) = @_;
@@ -372,7 +378,8 @@ C<1800> (30 minutes).
 
 Amount of time in seconds after which jobs that have reached the state
 C<finished> and have no unresolved dependencies will be removed automatically by
-L</"repair">, defaults to C<172800> (2 days).
+L</"repair">, defaults to C<172800> (2 days). It is not recommended to set this
+value below 2 days.
 
 =head2 tasks
 
@@ -503,6 +510,26 @@ failed.
       unless my $guard = $minion->guard('some_web_service', 60, {limit => 5});
     ...
   });
+
+=head2 history
+
+  my $history = $minion->history;
+
+Get history information for job queue. Note that this method is EXPERIMENTAL and
+might change without warning!
+
+These fields are currently available:
+
+=over 2
+
+=item daily
+
+  daily =>
+    [{epoch => 12345, hour => 20, finished_jobs => 95, failed_jobs => 2}, ...]
+
+Hourly counts for processed jobs from the past day.
+
+=back
 
 =head2 job
 
@@ -708,21 +735,38 @@ Release a named lock that has been previously acquired with L</"lock">.
 
 Build L<Minion::Worker> object.
 
-  # Start a worker
-  $minion->worker->run;
+  # Use the standard worker with all its features
+  my $worker = $minion->worker;
+  $worker->status->{jobs} = 12;
+  $worker->status->{queues} = ['important'];
+  $worker->run;
 
-  # Perform one job manually
+  # Perform one job manually in a separate process
   my $worker = $minion->repair->worker->register;
   my $job    = $worker->dequeue(5);
   $job->perform;
   $worker->unregister;
 
-  # Build a custom worker
-  my $worker = $minion->repair->worker;
-  while (int rand 2) {
-    next unless my $job = $worker->register->dequeue(5);
-    $job->perform;
-  }
+  # Perform one job manually in this process
+  my $worker = $minion->repair->worker->register;
+  my $job    = $worker->dequeue(5);
+  if (my $err = $job->execute) { $job->fail($err) }
+  else                         { $job->finish }
+  $worker->unregister;
+
+  # Build a custom worker performing multiple jobs at the same time
+  my %jobs;
+  my $worker = $minion->repair->worker->register;
+  do {
+    for my $id (keys %jobs) {
+      delete $jobs{$id} if $jobs{$id}->is_finished;
+    }
+    if (keys %jobs >= 4) { sleep 5 }
+    else {
+      my $job = $worker->dequeue(5);
+      $jobs{$job->id} = $job->start if $job;
+    }
+  } while keys %jobs;
   $worker->unregister;
 
 =head1 REFERENCE
@@ -826,6 +870,8 @@ Hubert "depesz" Lubaczewski
 Joel Berger
 
 Paul Williams
+
+Stefan Adams
 
 =back
 

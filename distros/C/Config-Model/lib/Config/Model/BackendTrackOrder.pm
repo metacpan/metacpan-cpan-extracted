@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendTrackOrder;
-$Config::Model::BackendTrackOrder::VERSION = '2.120';
+$Config::Model::BackendTrackOrder::VERSION = '2.122';
 # ABSTRACT: Track read order of elements from configuration
 
 use Mouse;
@@ -140,7 +140,7 @@ Config::Model::BackendTrackOrder - Track read order of elements from configurati
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

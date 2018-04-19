@@ -36,9 +36,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         $dist = $self->get_dist;
     }
 
-    if ($dist) {
-        $self->_show_dist_info($dist);
-    }
+    $self->_show_dist_info($dist) if $dist;
 
     return;
 }

@@ -20,4 +20,4 @@ requires:
   QBit::Class: 0
   base: 0
   qbit: 0
-version: 0.010
+version: 0.011

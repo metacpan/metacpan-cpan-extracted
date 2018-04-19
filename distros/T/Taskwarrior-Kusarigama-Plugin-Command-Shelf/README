@@ -1,0 +1,54 @@
+NAME
+
+    Taskwarrior::Kusarigama::Plugin::Command::Shelf - Move tasks to and
+    from the shelf.
+
+VERSION
+
+    version 0.003
+
+SYNOPSIS
+
+        # add the `shelf` command
+        $ task-kusarigama add Command::Shelf
+    
+        # Shelf all tasks in the Lazy-List project
+        $ task shelf put project:List-Lazy
+    
+        # Retreieve all the tasks in the Lazy-List project
+        $ task shelf get project:List-Lazy
+    
+        # Individual tasks can be shelved or retrieved
+        $ task shelf 28
+        $ task shelf get 28
+    
+        # filter shelved tasks from next report
+        $ task config report.next.filter '!shelved:true status:pending limit:papge'
+
+DESCRIPTION
+
+    Sometimes projects aren't just put on the back burner, they're entirely
+    put on hold. For these times the shelf command sets a shelved uda
+    allowing those tasks to be filtered out.
+
+    Without specifying get or put the shelf command defaults to put.
+
+    The shelf commands work with any filtering that is supported by
+    Taskwarrior <http://taskwarrior.org/>.
+
+ACKNOWLEDGEMENTS
+
+    Yanick Champoux for creating the extremely useful
+    Taskwarrior::Kusarigama
+
+AUTHOR
+
+    Shawn Sorichetti <shawn@coloredblocks.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by Shawn Sorichetti.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

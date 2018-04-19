@@ -39,7 +39,11 @@ use warnings;
 use base qw{ PPIx::Regexp::Support };
 
 use Carp qw{ confess };
-use PPIx::Regexp::Constant qw{ TOKEN_LITERAL TOKEN_UNKNOWN };
+use PPIx::Regexp::Constant qw{
+    ARRAY_REF
+    TOKEN_LITERAL
+    TOKEN_UNKNOWN
+};
 use PPIx::Regexp::Node::Range				();
 use PPIx::Regexp::Node::Unknown				();
 use PPIx::Regexp::Structure				();
@@ -64,7 +68,7 @@ use PPIx::Regexp::Token::Unmatched			();
 use PPIx::Regexp::Tokenizer				();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 =head2 new
 
@@ -492,7 +496,7 @@ sub _recover_curly {	## no critic (ProhibitUnusedPrivateSubroutines)
     # empty $self->{_rslt} on things like 'm{)}'. This one did not get
     # made into an RT ticket, but was fixed by not calling the recovery
     # code if $self->{_rslt} contained only the enclosing delimiters.
-    'ARRAY' eq ref $self->{_rslt}
+    ARRAY_REF eq ref $self->{_rslt}
 	or confess 'Programming error - $self->{_rslt} not array ref, ',
 	    "parsing '", $self->{tokenizer}->content(), "' at ",
 	    $token->content();

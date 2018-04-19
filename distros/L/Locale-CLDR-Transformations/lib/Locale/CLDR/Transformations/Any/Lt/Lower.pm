@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Lt::Lower;
 # This file auto generated from Data\common\transforms\lt-Lower.xml
-#	on Fri 29 Apr  6:48:48 pm GMT
+#	on Fri 13 Apr  6:59:57 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -40,43 +41,43 @@ has 'transforms' => (
 			data => [
 				{
 					before  => q(),
-					after   => q((?^u:[^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above})),
-					replace => q((?^u:I)),
+					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
+					replace => q(I),
 					result  => q(i\u0307),
 					revisit => 0,
 				},
 				{
 					before  => q(),
-					after   => q((?^u:[^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above})),
-					replace => q((?^u:J)),
+					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
+					replace => q(J),
 					result  => q(j\u0307),
 					revisit => 0,
 				},
 				{
 					before  => q(),
-					after   => q((?^u:[^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above})),
-					replace => q((?^u:Į)),
+					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
+					replace => q(Į),
 					result  => q(i\u0328\u0307),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:Ì)),
+					replace => q(Ì),
 					result  => q(i\u0307\u0300),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:Í)),
+					replace => q(Í),
 					result  => q(i\u0307\u0301),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:Ĩ)),
+					replace => q(Ĩ),
 					result  => q(i\u0307\u0303),
 					revisit => 0,
 				},

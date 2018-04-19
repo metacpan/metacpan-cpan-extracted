@@ -34,6 +34,7 @@ requires:
   Template: '0'
   Test::Harness: '0'
   Text::Markdown: v1.0.31
+  Text::Markmoredown: '0'
   Text::MultiMarkdown: v1.0.34
   Text::Textile: '2.12'
   URI::Escape: '0'
@@ -41,5 +42,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/kiamazi/mira.git
-version: v00.07.55
+version: v00.07.56
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,12 +10,18 @@
  *
  * http://duktape.org/index.html
  */
+#include "util.h"
 #include "duktape.h"
 #include "c_eventloop.h"
 #include "duk_console.h"
 
-#define UNUSED_ARG(x) (void) x
 #define DUK_SLOT_CALLBACK "_perl_.callback"
+
+#define DUK_OPT_NAME_GATHER_STATS "gather_stats"
+#define DUK_OPT_NAME_SAVE_MESSAGES "save_messages"
+
+#define DUK_OPT_FLAG_GATHER_STATS 0x01
+#define DUK_OPT_FLAG_SAVE_MESSAGES 0x02
 
 /*
  * This is our internal data structure.  For now it only contains a pointer to
@@ -23,8 +29,16 @@
  */
 typedef struct Duk {
     duk_context* ctx;
+    int pagesize;
+    unsigned long flags;
     HV* stats;
+    HV* msgs;
 } Duk;
+
+typedef struct Stats {
+    double t0, t1;
+    double m0, m1;
+} Stats;
 
 /*
  * We use these two functions to convert back and forth between the Perl
@@ -54,34 +68,72 @@ static duk_ret_t native_print(duk_context* ctx)
     return 0; // no return value
 }
 
-static double now_ms(void)
-{
-    struct timeval tv;
-    double now = 0.0;
-    int rc = gettimeofday(&tv, 0);
-    if (rc == 0) {
-        now = (((double) tv.tv_sec)  * 1000.0 +
-               ((double) tv.tv_usec) / 1000.0);
-    }
-    return now;
-}
-
 /*
  * Get JS compatible 'now' timestamp (millisecs since 1970).
  */
 static duk_ret_t native_now_ms(duk_context* ctx)
 {
-    duk_push_number(ctx, (duk_double_t) now_ms());
+    duk_push_number(ctx, (duk_double_t) (now_us() / 1000.0));
     return 1; //  return value at top
 }
 
-static void register_stat(pTHX_ Duk* duk, const char* kstr, double elapsed)
+static void save_stat(pTHX_ Duk* duk, const char* category, const char* name, double value)
 {
-    STRLEN klen = strlen(kstr);
-    SV* value = sv_2mortal(newSVnv(elapsed));
-    if (hv_store(duk->stats, kstr, klen, value, 0)) {
-        SvREFCNT_inc(value);
-        /* fprintf(stderr, "STAT %s => %f\n", kstr, elapsed); */
+    STRLEN clen = strlen(category);
+    STRLEN nlen = strlen(name);
+    HV* data = 0;
+    SV** found = hv_fetch(duk->stats, category, clen, 0);
+    if (found) {
+        SV* ref = SvRV(*found);
+        /* value not a valid hashref? bail out */
+        if (SvTYPE(ref) != SVt_PVHV) {
+            return;
+        }
+        data = (HV*) ref;
+    } else {
+        data = newHV();
+        SV* ref = newRV_noinc((SV*) data);
+        if (hv_store(duk->stats, category, clen, ref, 0)) {
+            SvREFCNT_inc(ref);
+        }
+    }
+
+    SV* pvalue = sv_2mortal(newSVnv(value));
+    if (hv_store(data, name, nlen, pvalue, 0)) {
+        SvREFCNT_inc(pvalue);
+    }
+}
+
+static void save_msg(pTHX_ Duk* duk, const char* target, const char* message)
+{
+    STRLEN tlen = strlen(target);
+    STRLEN mlen = strlen(message);
+    AV* data = 0;
+    int top = 0;
+    SV** found = hv_fetch(duk->msgs, target, tlen, 0);
+    if (found) {
+        SV* ref = SvRV(*found);
+        /* value not a valid arrayref? bail out */
+        if (SvTYPE(ref) != SVt_PVAV) {
+            return;
+        }
+        data = (AV*) ref;
+        top = av_top_index(data);
+    } else {
+        data = newAV();
+        SV* ref = newRV_noinc((SV*) data);
+        if (hv_store(duk->msgs, target, tlen, ref, 0)) {
+            SvREFCNT_inc(ref);
+        }
+        top = -1;
+    }
+
+    SV* pvalue = sv_2mortal(newSVpvn(message, mlen));
+    if (av_store(data, ++top, pvalue)) {
+        SvREFCNT_inc(pvalue);
+    }
+    else {
+        croak("Could not store message in target %*.*s\n", (int) tlen, (int) tlen, target);
     }
 }
 
@@ -180,7 +232,7 @@ static SV* duk_to_perl(pTHX_ duk_context* ctx, int pos)
                     SV* nested = sv_2mortal(duk_to_perl(aTHX_ ctx, -1));
                     duk_pop(ctx); // value in current pos
                     if (!nested) {
-                        croak("Could not create Perl SV for array");
+                        croak("Could not create Perl SV for array\n");
                     }
                     if (av_store(values, j, nested)) {
                         SvREFCNT_inc(nested);
@@ -196,7 +248,7 @@ static SV* duk_to_perl(pTHX_ duk_context* ctx, int pos)
                     SV* nested = sv_2mortal(duk_to_perl(aTHX_ ctx, -1));
                     duk_pop_2(ctx); // key and value
                     if (!nested) {
-                        croak("Could not create Perl SV for hash");
+                        croak("Could not create Perl SV for hash\n");
                     }
                     if (hv_store(values, kstr, klen, nested, 0)) {
                         SvREFCNT_inc(nested);
@@ -257,10 +309,10 @@ static int perl_to_duk(pTHX_ SV* value, duk_context* ctx)
                     break; // could not get element
                 }
                 if (!perl_to_duk(aTHX_ *elem, ctx)) {
-                    croak("Could not create JS element for array");
+                    croak("Could not create JS element for array\n");
                 }
                 if (!duk_put_prop_index(ctx, array_pos, count)) {
-                    croak("Could not push JS element for array");
+                    croak("Could not push JS element for array\n");
                 }
                 ++count;
             }
@@ -285,10 +337,10 @@ static int perl_to_duk(pTHX_ SV* value, duk_context* ctx)
                     continue; // invalid value
                 }
                 if (!perl_to_duk(aTHX_ value, ctx)) {
-                    croak("Could not create JS element for hash");
+                    croak("Could not create JS element for hash\n");
                 }
                 if (! duk_put_prop_lstring(ctx, hash_pos, kstr, klen)) {
-                    croak("Could not push JS element for hash");
+                    croak("Could not push JS element for hash\n");
                 }
             }
         } else if (SvTYPE(ref) == SVt_PVCV) {
@@ -297,11 +349,11 @@ static int perl_to_duk(pTHX_ SV* value, duk_context* ctx)
             duk_push_c_function(ctx, perl_caller, DUK_VARARGS);
             SV* func = newSVsv(value);
             if (!func) {
-                croak("Could not create copy of Perl callback");
+                croak("Could not create copy of Perl callback\n");
             }
             duk_push_pointer(ctx, func);
             if (! duk_put_prop_lstring(ctx, -2, DUK_SLOT_CALLBACK, sizeof(DUK_SLOT_CALLBACK) - 1)) {
-                croak("Could not associate C dispatcher and Perl callback");
+                croak("Could not associate C dispatcher and Perl callback\n");
             }
         } else {
             croak("Don't know how to deal with an undetermined Perl reference\n");
@@ -337,7 +389,7 @@ static int set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* 
         duk_push_lstring(ctx, name + last_dot + 1, len - last_dot - 1);
         if (duk_peval_lstring(ctx, name, last_dot) != 0) {
             croak("Could not eval JS object %*.*s: %s\n",
-                  last_dot, last_dot,name,  duk_safe_to_string(ctx, -1));
+                  last_dot, last_dot, name, duk_safe_to_string(ctx, -1));
         }
 #if 0
         duk_enum(ctx, -1, 0);
@@ -370,7 +422,7 @@ static void duk_fatal_error_handler(void* data, const char* msg)
     abort();
 }
 
-static int register_native_functions(duk_context* ctx)
+static int register_native_functions(Duk* duk)
 {
     static struct Data {
         const char* name;
@@ -379,6 +431,7 @@ static int register_native_functions(duk_context* ctx)
         { "print"       , native_print  },
         { "timestamp_ms", native_now_ms },
     };
+    duk_context* ctx = duk->ctx;
     int n = sizeof(data) / sizeof(data[0]);
     int j = 0;
     for (j = 0; j < n; ++j) {
@@ -389,20 +442,49 @@ static int register_native_functions(duk_context* ctx)
     }
     return n;
 }
+static int print_console_messages(duk_uint_t flags, void* data,
+                                  const char* fmt, va_list ap)
+{
+    dTHX;
 
-static Duk* create_duktape_object(pTHX)
+    UNUSED_ARG(data);
+    PerlIO* fp = (flags & DUK_CONSOLE_TO_STDERR) ? PerlIO_stderr() : PerlIO_stdout();
+    int ret = PerlIO_vprintf(fp, fmt, ap);
+    if (flags & DUK_CONSOLE_FLUSH) {
+        PerlIO_flush(fp);
+    }
+    return ret;
+}
+
+
+static int save_console_messages(duk_uint_t flags, void* data,
+                                 const char* fmt, va_list ap)
+{
+    dTHX;
+    Duk* duk = (Duk*) data;
+    char message[1024];
+    int ret = vsprintf(message, fmt, ap);
+    const char* target = (flags & DUK_CONSOLE_TO_STDERR) ? "stderr" : "stdout";
+
+    save_msg(aTHX_ duk, target, message);
+    return ret;
+}
+
+static Duk* create_duktape_object(pTHX_ HV* opt)
 {
     Duk* duk = (Duk*) malloc(sizeof(Duk));
     memset(duk, 0, sizeof(Duk));
 
+    duk->pagesize = getpagesize();
     duk->stats = newHV();
+    duk->msgs = newHV();
 
     duk->ctx = duk_create_heap(0, 0, 0, 0, duk_fatal_error_handler);
     if (!duk->ctx) {
         croak("Could not create duk heap\n");
     }
 
-    register_native_functions(duk->ctx);
+    register_native_functions(duk);
 
     // Register our event loop dispatcher, otherwise calls to
     // dispatch_function_in_event_loop will not work.
@@ -411,25 +493,85 @@ static Duk* create_duktape_object(pTHX)
     // initialize console object
     duk_console_init(duk->ctx, DUK_CONSOLE_PROXY_WRAPPER | DUK_CONSOLE_FLUSH);
 
+    if (opt) {
+        hv_iterinit(opt);
+        while (1) {
+            SV* value = 0;
+            I32 klen = 0;
+            char* kstr = 0;
+            HE* entry = hv_iternext(opt);
+            if (!entry) {
+                break; // no more hash keys
+            }
+            kstr = hv_iterkey(entry, &klen);
+            if (!kstr || klen < 0) {
+                continue; // invalid key
+            }
+            value = hv_iterval(opt, entry);
+            if (!value) {
+                continue; // invalid value
+            }
+            if (memcmp(kstr, DUK_OPT_NAME_GATHER_STATS, klen) == 0) {
+                duk->flags |= SvTRUE(value) ? DUK_OPT_FLAG_GATHER_STATS : 0;
+                continue;
+            }
+            if (memcmp(kstr, DUK_OPT_NAME_SAVE_MESSAGES, klen) == 0) {
+                duk->flags |= SvTRUE(value) ? DUK_OPT_FLAG_SAVE_MESSAGES : 0;
+                continue;
+            }
+            croak("Unknown option %*.*s\n", (int) klen, (int) klen, kstr);
+        }
+    }
+
+    if (duk->flags & DUK_OPT_FLAG_SAVE_MESSAGES) {
+        duk_console_register_handler(save_console_messages, duk);
+    }
+    else {
+        duk_console_register_handler(print_console_messages, duk);
+    }
+
     return duk;
 }
 
-static int run_function_in_event_loop(duk_context* ctx, const char* func)
+static void stats_start(pTHX_ Duk* duk, Stats* stats)
 {
+    if (!(duk->flags & DUK_OPT_FLAG_GATHER_STATS)) {
+        return;
+    }
+    stats->t0 = now_us();
+    stats->m0 = total_memory_pages() * duk->pagesize;
+}
+
+static void stats_stop(pTHX_ Duk* duk, Stats* stats, const char* name)
+{
+    if (!(duk->flags & DUK_OPT_FLAG_GATHER_STATS)) {
+        return;
+    }
+    stats->t1 = now_us();
+    stats->m1 = total_memory_pages() * duk->pagesize;
+
+    save_stat(aTHX_ duk, name, "elapsed_us", stats->t1 - stats->t0);
+    save_stat(aTHX_ duk, name, "memory_bytes", stats->m1 - stats->m0);
+}
+
+static int run_function_in_event_loop(Duk* duk, const char* func)
+{
+    duk_context* ctx = duk->ctx;
+
     // Start a zero timer which will call our function from the event loop.
-    int rc = 0;
+    duk_int_t rc = 0;
     char js[256];
     int len = sprintf(js, "setTimeout(function() { %s(); }, 0);", func);
     rc = duk_peval_lstring(ctx, js, len);
-    if (rc != 0) {
+    if (rc != DUK_EXEC_SUCCESS) {
         croak("Could not eval JS event loop dispatcher %*.*s: %d - %s\n",
               len, len, js, rc, duk_safe_to_string(ctx, -1));
     }
     duk_pop(ctx);
 
     // Launch eventloop; this call only returns after the eventloop terminates.
-    rc = duk_safe_call(ctx, eventloop_run, NULL, 0 /*nargs*/, 1 /*nrets*/);
-    if (rc != 0) {
+    rc = duk_safe_call(ctx, eventloop_run, duk, 0 /*nargs*/, 1 /*nrets*/);
+    if (rc != DUK_EXEC_SUCCESS) {
         croak("JS event loop run failed: %d - %s\n",
               rc, duk_safe_to_string(ctx, -1));
     }
@@ -449,7 +591,7 @@ Duk*
 new(char* CLASS, HV* opt = NULL)
   CODE:
     UNUSED_ARG(opt);
-    RETVAL = create_duktape_object(aTHX);
+    RETVAL = create_duktape_object(aTHX_ opt);
   OUTPUT: RETVAL
 
 HV*
@@ -458,43 +600,85 @@ get_stats(Duk* duk)
     RETVAL = duk->stats;
   OUTPUT: RETVAL
 
+HV*
+get_msgs(Duk* duk)
+  CODE:
+    RETVAL = duk->msgs;
+  OUTPUT: RETVAL
+
 SV*
 get(Duk* duk, const char* name)
+  PREINIT:
+    duk_context* ctx = 0;
+    Stats stats;
   CODE:
-    duk_context* ctx = duk->ctx;
+    ctx = duk->ctx;
     RETVAL = &PL_sv_undef; // return undef by default
+    stats_start(aTHX_ duk, &stats);
     if (duk_get_global_string(ctx, name)) {
         RETVAL = duk_to_perl(aTHX_ ctx, -1);
         duk_pop(ctx);
     }
+    stats_stop(aTHX_ duk, &stats, "get");
   OUTPUT: RETVAL
 
 int
 set(Duk* duk, const char* name, SV* value)
+  PREINIT:
+    duk_context* ctx = 0;
+    Stats stats;
   CODE:
-    duk_context* ctx = duk->ctx;
+    ctx = duk->ctx;
+    stats_start(aTHX_ duk, &stats);
     RETVAL = set_global_or_property(aTHX_ ctx, name, value);
+    stats_stop(aTHX_ duk, &stats, "set");
   OUTPUT: RETVAL
 
 SV*
-eval(Duk* duk, const char* js)
-  CODE:
-    double t0, t1;
-    duk_context* ctx = duk->ctx;
-
+eval(Duk* duk, const char* js, const char* file = 0)
+  PREINIT:
+    duk_context* ctx = 0;
+    Stats stats;
     duk_uint_t flags = 0;
+    duk_int_t rc = 0;
+  CODE:
+    ctx = duk->ctx;
+
     /* flags |= DUK_COMPILE_STRICT; */
-    t0 = now_ms();
-    if (duk_pcompile_string(ctx, flags, js)) {
+
+    stats_start(aTHX_ duk, &stats);
+    if (!file) {
+        rc = duk_pcompile_string(ctx, flags, js);
+    }
+    else {
+        duk_push_string(ctx, file);
+        rc = duk_pcompile_string_filename(ctx, flags, js);
+    }
+    stats_stop(aTHX_ duk, &stats, "compile");
+
+    if (rc != DUK_EXEC_SUCCESS) {
         croak("JS could not compile code: %s\n", duk_safe_to_string(ctx, -1));
     }
-    t1 = now_ms();
-    register_stat(aTHX_ duk, "compile", t1 - t0);
 
-    t0 = now_ms();
-    duk_call(ctx, 0);
-    t1 = now_ms();
-    register_stat(aTHX_ duk, "run", t1 - t0);
+    stats_start(aTHX_ duk, &stats);
+    rc = duk_pcall(ctx, 0);
+    stats_stop(aTHX_ duk, &stats, "run");
+
+    if (rc != DUK_EXEC_SUCCESS) {
+        if (duk_is_error(ctx, -1)) {
+            /* Accessing .stack might cause an error to be thrown, so wrap this
+             * access in a duk_safe_call() if it matters.
+             */
+            duk_get_prop_string(ctx, -1, "stack");
+            duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
+                            "error: %s\n", duk_safe_to_string(ctx, -1));
+            duk_pop(ctx);
+        } else {
+            /* Non-Error value, coerce safely to string. */
+            duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
+                            "error: %s\n", duk_safe_to_string(ctx, -1));
+        }
+    }
 
     RETVAL = duk_to_perl(aTHX_ ctx, -1);
     duk_pop(ctx);
@@ -502,7 +686,10 @@ eval(Duk* duk, const char* js)
 
 SV*
 dispatch_function_in_event_loop(Duk* duk, const char* func)
+  PREINIT:
+    Stats stats;
   CODE:
-    duk_context* ctx = duk->ctx;
-    RETVAL = newSViv(run_function_in_event_loop(ctx, func));
+    stats_start(aTHX_ duk, &stats);
+    RETVAL = newSViv(run_function_in_event_loop(duk, func));
+    stats_stop(aTHX_ duk, &stats, "dispatch");
   OUTPUT: RETVAL

@@ -1,0 +1,61 @@
+#!perl
+
+# ABSTRACT: Open a browser window with the URL of a CPAN module's repository
+# PODNAME: cpan-repo
+
+use strict;
+use warnings;
+
+use Browser::Open qw( open_browser );
+use Git::Helpers::CPAN ();
+use Try::Tiny qw( catch try );
+
+my $search = shift @ARGV;
+die "usage: cpan-gh [module or distribution name]" unless $search;
+
+my $helper = Git::Helpers::CPAN->new( name => $search );
+
+my $repo = $helper->repository;
+my $url = $repo->{web} || $repo->{url};
+
+unless ($url) {
+    print q{Couldn't find repo URL for } . $helper->release_name;
+    exit;
+}
+
+open_browser($url);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan-repo - Open a browser window with the URL of a CPAN module's repository
+
+=head1 VERSION
+
+version 0.000015
+
+=head1 SYNOPSIS
+
+    # search by module name
+    cpan-repo Git::Helpers
+
+    # search by release name
+    cpan-repo Git-Helpers
+
+=head1 AUTHOR
+
+Olaf Alders <olaf@wundercounter.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015-2018 by Olaf Alders.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

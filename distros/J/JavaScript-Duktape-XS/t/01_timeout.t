@@ -4,6 +4,7 @@ use warnings;
 use Data::Dumper;
 use Path::Tiny;
 use Test::More;
+use Test::Output;
 use JavaScript::Duktape::XS;
 
 sub load_js_file {
@@ -50,6 +51,23 @@ JS
     is($perl_ret, 'EMPTY1234567', "timeouts dispatched correctly");
 }
 
+sub test_timeout_with_error {
+    my ($duk) = @_;
+
+    my $js = <<JS;
+function main() {
+    setTimeout(function () {
+        var notdef;
+        console.log(notdef.length);
+    })
+}
+JS
+    my $got_eval = $duk->eval($js);
+    stderr_like sub { $duk->dispatch_function_in_event_loop('main'); },
+                qr/Error:/,
+                "got correct error from setTimeout";
+}
+
 sub main {
     my $duk = JavaScript::Duktape::XS->new();
     ok($duk, "created JavaScript::Duktape::XS object");
@@ -62,6 +80,7 @@ sub main {
     }
 
     test_js_timeout($duk);
+    test_timeout_with_error($duk);
 
     done_testing;
     return 0;

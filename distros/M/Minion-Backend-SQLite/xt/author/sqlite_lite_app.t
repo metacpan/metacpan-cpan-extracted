@@ -16,12 +16,10 @@ plugin Minion => {SQLite => $sql};
 app->minion->add_task(
   add => sub {
     my ($job, $first, $second) = @_;
-    Mojo::IOLoop->next_tick(
-      sub {
-        $job->finish($first + $second);
-        Mojo::IOLoop->stop;
-      }
-    );
+    Mojo::IOLoop->next_tick(sub {
+      $job->finish($first + $second);
+      Mojo::IOLoop->stop;
+    });
     Mojo::IOLoop->start;
   }
 );

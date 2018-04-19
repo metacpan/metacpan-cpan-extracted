@@ -11,9 +11,12 @@ WriteMakefile(
         'XSLoader'    => 0,
     },
     TEST_REQUIRES  => {
-        'Test::More'   => 0,
         'Data::Dumper' => 0,
         'Path::Tiny'   => 0,
+        'Test::More'   => 0,
+        'Test::Output' => 0,
+        'Time::HiRes'  => 0,
+        'Text::Trim'   => 0,
     },
     AUTHOR         => [
         'Gonzalo Diethelm (gonzus@cpan.org)',
@@ -27,8 +30,8 @@ WriteMakefile(
         resources   => {
             repository => {
                 type => 'git',
-                url  => 'git@github.com:gonzus/NONE',
-                web  => 'https://github.com/gonzus/NONE',
+                url  => 'git@github.com:gonzus/JavaScript-Duktape-XS',
+                web  => 'https://github.com/gonzus/JavaScript-Duktape-XS',
             },
         },
     },

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 1;
 
@@ -22,7 +22,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -31,10 +31,10 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   # The Client object can be re-used across several requests.
-  # Your MaxMind user_id and license_key are available at
+  # Your MaxMind account_id and license_key are available at
   # https://www.maxmind.com/en/my_license_key
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
 
@@ -75,7 +75,7 @@ dependencies.
 
 =head1 VERSIONING POLICY
 
-The minFraud Perl API uses L<Semantic Versioning|http://semver.org/>.
+The minFraud Perl API uses L<Semantic Versioning|https://semver.org/>.
 
 =head1 PERL VERSION SUPPORT
 
@@ -92,7 +92,7 @@ Please report all issues with this distribution using the GitHub issue tracker
 at L<https://github.com/maxmind/minfraud-api-perl/issues>.
 
 If you are having an issue with a MaxMind service that is not specific to the
-client API please visit L<http://www.maxmind.com/en/support> for details.
+client API please visit L<https://www.maxmind.com/en/support> for details.
 
 Bugs may be submitted through L<https://github.com/maxmind/minfraud-api-perl/issues>.
 
@@ -102,7 +102,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Dave Rolsky Florian Ragwitz Greg Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro Will Storey
+=for stopwords Andy Jack Dave Rolsky Florian Ragwitz Greg Oschwald Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro William Storey
 
 =over 4
 
@@ -120,7 +120,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Greg <goschwald@maxmind.com>
+Greg Oschwald <goschwald@maxmind.com>
 
 =item *
 
@@ -132,15 +132,15 @@ Olaf Alders <oalders@maxmind.com>
 
 =item *
 
-Patrick Cronin <PatrickCronin@users.noreply.github.com>
+Patrick Cronin <pcronin@maxmind.com>
 
 =item *
 
-Ruben Navarro <rbnx@users.noreply.github.com>
+Ruben Navarro <rnavarro@maxmind.com>
 
 =item *
 
-Will Storey <will@summercat.com>
+William Storey <wstorey@maxmind.com>
 
 =back
 

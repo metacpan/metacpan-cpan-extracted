@@ -20,6 +20,10 @@ no_index:
     - share
     - t
     - xt
+provides:
+  CPAN::Perl::Releases::MetaCPAN:
+    file: lib/CPAN/Perl/Releases/MetaCPAN.pm
+    version: '0.005'
 requires:
   HTTP::Tiny: '0.055'
   HTTP::Tinyish: '0'
@@ -29,9 +33,9 @@ resources:
   bugtracker: https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN/issues
   homepage: https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN
   repository: https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN.git
-version: '0.004'
+version: '0.005'
 x_contributors:
   - "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>"
   - 'Shoichi Kaji <skaji@outlook.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

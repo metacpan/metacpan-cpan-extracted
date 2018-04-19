@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Sw::Any::Cd - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw::Any::Cd;
 # This file auto generated from Data\common\main\sw_CD.xml
-#	on Fri 29 Apr  7:27:39 pm GMT
+#	on Fri 13 Apr  7:30:11 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -29,10 +30,41 @@ has 'display_name_language' => (
 		 sub {
 			 my %languages = (
 				'ak' => 'Kiakan',
- 				'bn' => 'Kibangla',
- 				'cs' => 'Kichecki',
- 				'en' => 'Kingereza',
- 				'sw_CD' => 'Kiswahili ya Kongo',
+ 				'ar_001' => 'Kiarabu cha Dunia Kilichosanifishwa',
+ 				'arq' => 'Kiarabu cha Aljeria',
+ 				'az' => 'Kiazabajani',
+ 				'bug' => 'Kibugini',
+ 				'gv' => 'Kimanksi',
+ 				'gwi' => 'Kigwichiin',
+ 				'hup' => 'Kihupa',
+ 				'jbo' => 'Kilojban',
+ 				'kac' => 'Kikachin',
+ 				'khq' => 'Kikoyra Chiini',
+ 				'kkj' => 'Kikako',
+ 				'koi' => 'Kikomipermyak',
+ 				'kru' => 'Kikurukh',
+ 				'kum' => 'Kikumyk',
+ 				'ky' => 'Kikirigizi',
+ 				'lam' => 'Kilamba',
+ 				'li' => 'Kilimburgi',
+ 				'mak' => 'mak',
+ 				'mdf' => 'Kimoksha',
+ 				'mic' => 'Kimikmaki',
+ 				'mk' => 'Kimasedonia',
+ 				'moh' => 'Kimohoki',
+ 				'mos' => 'Kimossi',
+ 				'nnh' => 'Kingiemboon',
+ 				'nqo' => 'Kiinko',
+ 				'pcm' => 'Pijini ya Nijeria',
+ 				'quc' => 'Kikiiche',
+ 				'root' => 'Kiroot',
+ 				'shu' => 'Kiarabu cha Chadi',
+ 				'srn' => 'Kitongo cha Sranan',
+ 				'swb' => 'Kikomoro',
+ 				'syr' => 'Kisiria',
+ 				'udm' => 'Kiudumurti',
+ 				'wae' => 'Kiwalser',
+ 				'yi' => 'Kiyidi',
 
 			);
 			if (@_) {
@@ -49,18 +81,35 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'AF' => 'Afuganistani',
+			'030' => 'Asia Mashariki',
+ 			'AF' => 'Afuganistani',
+ 			'AZ' => 'Azabajani',
  			'BJ' => 'Benini',
- 			'CG' => 'Kongo',
  			'CI' => 'Kodivaa',
- 			'CY' => 'Kuprosi',
- 			'IR' => 'Uajemi',
+ 			'CX' => 'Kisiwa cha Christmas',
+ 			'CY' => 'Saiprasi',
+ 			'DK' => 'Denmaki',
+ 			'HR' => 'Kroeshia',
+ 			'JO' => 'Yordani',
+ 			'LB' => 'Lebanoni',
  			'LI' => 'Lishenteni',
- 			'MG' => 'Bukini',
+ 			'LU' => 'Lasembagi',
+ 			'LV' => 'Lativia',
+ 			'MA' => 'Moroko',
  			'MM' => 'Myama',
- 			'NF' => 'Kisiwa cha Norfok',
+ 			'MV' => 'Maldivi',
+ 			'NE' => 'Nijeri',
  			'NG' => 'Nijeria',
+ 			'NO' => 'Norwe',
+ 			'NP' => 'Nepali',
+ 			'OM' => 'Omani',
+ 			'PR' => 'Puetoriko',
+ 			'QA' => 'Katari',
+ 			'SD' => 'Sudani',
+ 			'ST' => 'Sao Tome na Prinsipe',
+ 			'TD' => 'Chadi',
  			'TL' => 'Timori ya Mashariki',
+ 			'VN' => 'Vietnamu',
 
 		}
 	},
@@ -75,8 +124,8 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x])},
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p r s t u v w y z])},
+			auxiliary => qr{[q x]},
+			main => qr{[a b c d e f g h i j k l m n o p r s t u v w y z]},
 		};
 	},
 EOT
@@ -150,118 +199,6 @@ has 'currencies' => (
 );
 
 
-has 'calendar_months' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'mkw',
-							'mpi',
-							'mtu',
-							'min',
-							'mtn',
-							'mst',
-							'msb',
-							'mun',
-							'mts',
-							'mku',
-							'mkm',
-							'mkb'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'mwezi ya kwanja',
-							'mwezi ya pili',
-							'mwezi ya tatu',
-							'mwezi ya ine',
-							'mwezi ya tanu',
-							'mwezi ya sita',
-							'mwezi ya saba',
-							'mwezi ya munane',
-							'mwezi ya tisa',
-							'mwezi ya kumi',
-							'mwezi ya kumi na moya',
-							'mwezi ya kumi ya mbili'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					narrow => {
-						nonleap => [
-							'k',
-							'p',
-							't',
-							'i',
-							't',
-							's',
-							's',
-							'm',
-							't',
-							'k',
-							'm',
-							'm'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-	} },
-);
-
-has 'calendar_days' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					abbreviated => {
-						mon => 'kwa',
-						tue => 'pil',
-						wed => 'tat',
-						thu => 'ine',
-						fri => 'tan',
-						sat => 'sit',
-						sun => 'yen'
-					},
-					wide => {
-						mon => 'siku ya kwanza',
-						tue => 'siku ya pili',
-						wed => 'siku ya tatu',
-						thu => 'siku ya ine',
-						fri => 'siku ya tanu',
-						sat => 'siku ya sita',
-						sun => 'siku ya yenga'
-					},
-				},
-				'stand-alone' => {
-					narrow => {
-						mon => 'k',
-						tue => 'p',
-						wed => 't',
-						thu => 'i',
-						fri => 't',
-						sat => 's',
-						sun => 'y'
-					},
-				},
-			},
-	} },
-);
-
 has 'day_period_data' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -272,59 +209,30 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 700;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
 					return 'morning2' if $time >= 700
 						&& $time < 1200;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
 				}
 				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 700
 						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 700;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
 				}
@@ -339,30 +247,12 @@ around day_period_data => sub {
 	return $self->$orig;
 };
 
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'format' => {
-				'wide' => {
-					'am' => q{ya asubuyi},
-					'pm' => q{ya muchana},
-				},
-			},
-		},
-	} },
-);
-
 has 'eras' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-		},
-		'gregorian' => {
 		},
 	} },
 );
@@ -373,12 +263,6 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE d MMMM y G},
-			'short' => q{d/M/y GGGGG},
-		},
-		'gregorian' => {
-			'full' => q{EEEE d MMMM y},
-			'short' => q{d/M/y},
 		},
 	} },
 );
@@ -390,8 +274,6 @@ has 'time_formats' => (
 	default		=> sub { {
 		'generic' => {
 		},
-		'gregorian' => {
-		},
 	} },
 );
 
@@ -402,8 +284,6 @@ has 'datetime_formats' => (
 	default		=> sub { {
 		'generic' => {
 		},
-		'gregorian' => {
-		},
 	} },
 );
 
@@ -412,28 +292,9 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			MEd => q{E d/M},
-			MMMEd => q{E d MMM},
-			ms => q{m:ss},
-			yMEd => q{E d/M/y},
-			yMMMEd => q{E d MMM y},
-		},
 		'generic' => {
-			MEd => q{E d/M},
 			MMMEd => q{E d MMM},
-			Md => q{d/M},
-			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E d/M/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E d MMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{d/M/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
 		},
 	} },
 );

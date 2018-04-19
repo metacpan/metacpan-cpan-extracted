@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Fur - Package for language Friulian
 
 package Locale::CLDR::Locales::Fur;
 # This file auto generated from Data\common\main\fur.xml
-#	on Fri 29 Apr  7:04:18 pm GMT
+#	on Fri 13 Apr  7:11:01 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -729,9 +730,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[å č é ë ğ ï ñ ó š ü])},
+			auxiliary => qr{[å č é ë ğ ï ñ ó š ü]},
 			index => ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a à â b c ç d e è ê f g h i ì î j k l m n o ò ô p q r s t u ù û v w x y z])},
+			main => qr{[a à â b c ç d e è ê f g h i ì î j k l m n o ò ô p q r s t u ù û v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -889,21 +891,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -976,9 +978,14 @@ has 'currencies' => (
 				'other' => q(real brasilians),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(Rubli bielorùs),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(Rubli bielorùs \(2000–2016\)),
 			},
 		},
 		'CAD' => {
@@ -1558,13 +1565,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{a.},
-					'pm' => q{p.},
-				},
 				'wide' => {
-					'am' => q{a.},
 					'pm' => q{p.},
+					'am' => q{a.},
+				},
+				'abbreviated' => {
+					'pm' => q{p.},
+					'am' => q{a.},
 				},
 			},
 		},
@@ -1640,7 +1647,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{d E},
 			Hm => q{H:mm},
 			M => q{L},
@@ -1663,7 +1670,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{d E},
 			Hm => q{H:mm},
 			M => q{L},
@@ -1702,7 +1709,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -1797,7 +1804,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -1947,50 +1954,50 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Ore estive de Europe centrâl),
-				'generic' => q(Ore de Europe centrâl),
-				'standard' => q(Ore standard de Europe centrâl),
+				'daylight' => q#Ore estive de Europe centrâl#,
+				'generic' => q#Ore de Europe centrâl#,
+				'standard' => q#Ore standard de Europe centrâl#,
 			},
 			short => {
-				'daylight' => q(CEST),
-				'generic' => q(CET),
-				'standard' => q(CET),
+				'daylight' => q#CEST#,
+				'generic' => q#CET#,
+				'standard' => q#CET#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Ore estive de Europe orientâl),
-				'generic' => q(Ore de Europe orientâl),
-				'standard' => q(Ore standard de Europe orientâl),
+				'daylight' => q#Ore estive de Europe orientâl#,
+				'generic' => q#Ore de Europe orientâl#,
+				'standard' => q#Ore standard de Europe orientâl#,
 			},
 			short => {
-				'daylight' => q(EEST),
-				'generic' => q(EET),
-				'standard' => q(EET),
+				'daylight' => q#EEST#,
+				'generic' => q#EET#,
+				'standard' => q#EET#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Ore estive de Europe ocidentâl),
-				'generic' => q(Ore de Europe ocidentâl),
-				'standard' => q(Ore standard de Europe ocidentâl),
+				'daylight' => q#Ore estive de Europe ocidentâl#,
+				'generic' => q#Ore de Europe ocidentâl#,
+				'standard' => q#Ore standard de Europe ocidentâl#,
 			},
 			short => {
-				'daylight' => q(WEST),
-				'generic' => q(WET),
-				'standard' => q(WET),
+				'daylight' => q#WEST#,
+				'generic' => q#WET#,
+				'standard' => q#WET#,
 			},
 		},
 		'GMT' => {
 			short => {
-				'standard' => q(GMT),
+				'standard' => q#GMT#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Ore estive di Mosche),
-				'generic' => q(Ore di Mosche),
-				'standard' => q(Ore standard di Mosche),
+				'daylight' => q#Ore estive di Mosche#,
+				'generic' => q#Ore di Mosche#,
+				'standard' => q#Ore standard di Mosche#,
 			},
 		},
 	 } }

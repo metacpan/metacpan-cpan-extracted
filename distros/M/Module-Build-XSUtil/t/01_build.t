@@ -2,7 +2,7 @@ use Test::More;
 use Config;
 use File::Spec::Functions qw(catdir catfile rel2abs);
 use File::Temp qw(tempdir);
-use File::Copy::Recursive 'dircopy';
+use File::Copy::Recursive::Reduced 'dircopy';
 use Cwd::Guard qw(cwd_guard);
 use Capture::Tiny qw(capture);
 

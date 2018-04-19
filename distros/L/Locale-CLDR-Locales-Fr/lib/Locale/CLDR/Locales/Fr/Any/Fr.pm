@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Fr::Any::Fr - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Fr;
 # This file auto generated from Data\common\main\fr_FR.xml
-#	on Fri 29 Apr  7:04:12 pm GMT
+#	on Fri 13 Apr  7:10:57 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 

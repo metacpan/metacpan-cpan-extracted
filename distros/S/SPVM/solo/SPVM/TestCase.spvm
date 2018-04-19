@@ -1,20 +1,22 @@
+package TestCase {
+  use Std;
+  use TestCase::EnumA;
+  use TestCase::EnumB;
+  use TestCase::EnumC;
+  use TestCase::EnumD;
+  use TestCase::Simple;
+  use TestCase::Minimal;
+  use TestCase::Destructor;
+  use TestCase::Interface;
+  use TestCase::ImplementInterface1;
+  use TestCase::ImplementInterface2;
+  use TestCase::Comparator;
+
 =pod
 
 ABCDE
 
 =cut ppppp
-
-use TestCase::EnumA;
-use TestCase::EnumB;
-use TestCase::EnumC;
-use TestCase::EnumD;
-use TestCase::Simple;
-use TestCase::Minimal;
-use TestCase::Template_int_long;
-use TestCase::Destructor;
-use TestCase::Interface;
-use TestCase::ImplementInterface1;
-use TestCase::ImplementInterface2;
 
 =head1 NAME
 
@@ -22,7 +24,7 @@ SPVM::Test - SPVM test module
 
 =cut
 
-package TestCase {
+  
   our $PACKAGE_VAR_INT : int;
   our $PACKAGE_VAR_TEST_CASE : TestCase;
   
@@ -36,7 +38,7 @@ package TestCase {
   has x_double : double;
   has private_field : int;
   
-  sub BYTE_MAX : byte ($class : class) { return (byte)127; }
+  sub BYTE_MAX : byte () { return (byte)127; }
   sub BYTE_MIN : byte () { return (byte)-128; }
   sub SHORT_MAX : short () { return (short)32767; }
   sub SHORT_MIN : short () { return (short)-32768; }
@@ -48,6 +50,57 @@ package TestCase {
   sub DOUBLE_PRECICE : double () { return 2147483647.0; }
   
   sub main : int ($mvar : int) {
+    
+    # sort
+    {
+      my $comparator = new package {
+        sub compare : int ($self : self, $object1 : Object, $object2 : Object) {
+          my $minimal1 = (TestCase::Minimal)$object1;
+          my $minimal2 = (TestCase::Minimal)$object2;
+          
+          my $x1 = $minimal1->{x};
+          my $x2 = $minimal2->{x};
+          
+          if ($x1 > $x2) {
+            return 1;
+          }
+          elsif ($x1 < $x2) {
+            return -1;
+          }
+          else {
+            return 0;
+          }
+        }
+      };
+      
+      my $minimals = new TestCase::Minimal[3];
+      $minimals->[0] = new TestCase::Minimal;
+      $minimals->[0]{x} = 3;
+      $minimals->[1] = new TestCase::Minimal;
+      $minimals->[1]{x} = 1;
+      $minimals->[2] = new TestCase::Minimal;
+      $minimals->[2]{x} = 2;
+      
+      sort_obj($minimals, $comparator);
+      print((String)$minimals->[0]{x} . " " . (String)$minimals->[1]{x} . " " . (String)$minimals->[2]{x} . "\n");
+    }
+    
+    # Anon package
+    {
+      my $point = new package {
+        has x : int;
+        has y : int;
+        sub clear : void ($self : self) {
+          $self->{x} = 0;
+          $self->{y} = 0;
+        }
+      };
+      
+      $point->{x} = 3;
+      print((String)$point->{x} . "\n");
+      $point->clear;
+      print((String)$point->{x} . "\n");
+    }
     
     if (!(1 == 2)) {
       
@@ -95,8 +148,6 @@ package TestCase {
     print($long_string . "\n");
     print($float_string . "\n");
     print($double_string . "\n");
-
-    my $total = CORE::test1(3, 11);
     
     {
       my $object : Object = new TestCase::Minimal;
@@ -220,7 +271,7 @@ package TestCase {
     }
     
     {
-      TestCase::error_eval_call();
+      TestCase->error_eval_call();
     }
     
     {
@@ -228,41 +279,41 @@ package TestCase {
     }
     
     {
-      my $ret = TestCase::error_eval();
+      my $ret = error_eval();
       
       print((String)$ret . "\n");
     }
     
-    TestCase::error_eval();
+    error_eval();
     
-    my $dest = TestCase::Destructor::new();
+    my $dest = TestCase::Destructor->new();
     
     # enum
     {
       TestCase->BYTE_MAX();
-      TestCase::BYTE_MIN();
-      TestCase::SHORT_MAX();
-      TestCase::SHORT_MIN();
-      TestCase::INT_MAX();
-      TestCase::INT_MIN();
-      TestCase::LONG_MAX();
-      TestCase::LONG_MIN();
+      TestCase->BYTE_MIN();
+      TestCase->SHORT_MAX();
+      TestCase->SHORT_MIN();
+      TestCase->INT_MAX();
+      TestCase->INT_MIN();
+      TestCase->LONG_MAX();
+      TestCase->LONG_MIN();
     }
     # Field set and get
     {
       my $test = new TestCase;
       
       $test->{x_byte} = TestCase->BYTE_MAX();
-      $test->{x_short} = TestCase::SHORT_MAX();
-      $test->{x_int} = TestCase::INT_MAX();
-      $test->{x_long} = TestCase::LONG_MAX();
-      $test->{x_float} = TestCase::FLOAT_PRECICE();
-      $test->{x_double} = TestCase::DOUBLE_PRECICE();
+      $test->{x_short} = TestCase->SHORT_MAX();
+      $test->{x_int} = TestCase->INT_MAX();
+      $test->{x_long} = TestCase->LONG_MAX();
+      $test->{x_float} = TestCase->FLOAT_PRECICE();
+      $test->{x_double} = TestCase->DOUBLE_PRECICE();
     }
     
     # Weaken
     {
-      my $num = TestCase::weaken_reference_count1_object();
+      my $num = TestCase->weaken_reference_count1_object();
     }
     
     # Weaken
@@ -274,26 +325,20 @@ package TestCase {
       weaken $test->{next_test};
     }
     
-    TestCase::call_void();
+    TestCase->call_void();
     
     print("a" . "\n");
     
     # Default return value object
-    if (TestCase::default_return_value_object_sub() == undef) {
-      if (TestCase::default_return_value_object_sub_empty() == undef) {
+    if (TestCase->default_return_value_object_sub() == undef) {
+      if (TestCase->default_return_value_object_sub_empty() == undef) {
         1;
       }
     }
 
-    # Use template package
-    {
-      my $num = TestCase::Template_int_long::get(100, 200, 300L,);
-      print((String)$num . "\n");
-    }
-
     # Get object from freelist
     {
-       TestCase::check_freelist();
+       TestCase->check_freelist();
        
        my $result = new int[65];
        $result->[64] = 0;
@@ -372,14 +417,14 @@ package TestCase {
     # $array->[0]{x}
     {
       my $objs = new TestCase::Minimal[3];
-      $objs->[0] = TestCase::Minimal::new();
+      $objs->[0] = TestCase::Minimal->new();
       $objs->[0]{x} = 111;
       print((String)$objs->[0]{x} . "\n");
     }
     
     # $obj->{x}[0]
     {
-      my $obj = TestCase::Simple::new();
+      my $obj = TestCase::Simple->new();
       $obj->{values1} = new int[5];
       $obj->{values1}[0] = 221;
       print((String)$obj->{values1}[0] . "\n");
@@ -387,32 +432,26 @@ package TestCase {
     
     # Call new subroutine without variable
     {
-      TestCase::Minimal::new();
-      TestCase::sum0(1, 3);
-    }
-    
-    # Subroutine call from native
-    {
-      my $total = CORE::test1(3, 11);
-      print((String)$total . "\n");
+      TestCase::Minimal->new();
+      sum0(1, 3);
     }
     
     # Create temporary varialbe
     {
-      TestCase::Minimal::new();
-      TestCase::Minimal::new();
-      TestCase::Minimal::new()->{x};
+      TestCase::Minimal->new();
+      TestCase::Minimal->new();
+      TestCase::Minimal->new()->{x};
     }
     
-    my $obj1 = TestCase::Minimal::new();
+    my $obj1 = TestCase::Minimal->new();
     
     # last
     {
       while (1) {
-        my $obj1 = TestCase::Minimal::new();
-        my $obj2 = TestCase::Minimal::new();
+        my $obj1 = TestCase::Minimal->new();
+        my $obj2 = TestCase::Minimal->new();
         {
-          my $obj3 = TestCase::Minimal::new();
+          my $obj3 = TestCase::Minimal->new();
           last;
           next;
         }
@@ -551,11 +590,11 @@ package TestCase {
     #}
     
     {
-      TestCase::Minimal::new();
+      TestCase::Minimal->new();
     }
     
     {
-      my $obj1 = TestCase::Minimal::new();
+      my $obj1 = TestCase::Minimal->new();
       
       my $obj2 : TestCase::Minimal;
       
@@ -595,11 +634,11 @@ package TestCase {
     }
     
     eval {
-      TestCase::sum0(1, 2);
+      sum0(1, 2);
       
       3;
       
-      TestCase::sum0(3, 4);
+      sum0(3, 4);
       
       croak "Catch error";
       
@@ -607,19 +646,9 @@ package TestCase {
     };
     
     {
-      TestCase::sum0(5, 6);
+      sum0(5, 6);
       2;
       print("Error" . "\n");
-    }
-    
-    {
-      my $nums = new int[3];
-      $nums->[0] = 1;
-      $nums->[1] = 2;
-      $nums->[2] = 3;
-      
-      my $total = sum_int($nums);
-      print((String)$total . "\n");
     }
     
     {
@@ -645,7 +674,7 @@ package TestCase {
     
     # get and set field
     {
-      my $m = TestCase::Minimal::new();
+      my $m = TestCase::Minimal->new();
       
       $m->{x} = 99;
       $m->{y} = 100;
@@ -656,8 +685,8 @@ package TestCase {
 
     # Free when assignment
     {
-      my $m = TestCase::Minimal::new();
-      $m = TestCase::Minimal::new();
+      my $m = TestCase::Minimal->new();
+      $m = TestCase::Minimal->new();
     }
 
     # left is object, right is undef
@@ -682,8 +711,8 @@ package TestCase {
     }
     7;
     
-    print((String)TestCase::sum0(1, 1) . "\n");
-    print((String)TestCase::sum2(1, 2) . "\n");
+    print((String)sum0(1, 1) . "\n");
+    print((String)sum2(1, 2) . "\n");
 
     # Constant float
     print((String)0.3f . "\n");
@@ -812,7 +841,7 @@ package TestCase {
     }
     6;
 
-    my $simple3 : TestCase::Simple = TestCase::Simple::new();
+    my $simple3 : TestCase::Simple = TestCase::Simple->new();
     
     print((String)$simple3->{x} . "\n");
     $simple3->{x};
@@ -821,7 +850,7 @@ package TestCase {
     $simple3->{x};
     $simple3->{y};
 
-    my $simple2 : TestCase::Simple = TestCase::Simple::new();
+    my $simple2 : TestCase::Simple = TestCase::Simple->new();
     
     if (1) { }
     
@@ -925,7 +954,7 @@ package TestCase {
       my $nums_length : int = @$nums;
     }
     
-    my $simple : TestCase::Simple = TestCase::Simple::new();
+    my $simple : TestCase::Simple = TestCase::Simple->new();
     
     
     my $v1 : int;
@@ -1009,10 +1038,10 @@ package TestCase {
     my $bar : double = (double)1;
     undef;
     
-    TestCase::sum0(1, 2);
-    TestCase::sum0(1, 2);
+    sum0(1, 2);
+    sum0(1, 2);
     
-    TestCase::test1();
+    test1();
     
     while (1) {
       1;
@@ -1054,7 +1083,7 @@ package TestCase {
   sub call_void : int () {
     my $nums = new int[] {1};
     
-    TestCase::call_void_sub($nums);
+    call_void_sub($nums);
     
     if ($nums->[0] == 5) {
       return 1;
@@ -1112,7 +1141,7 @@ package TestCase {
       
     }
     
-    TestCase::array_new();
+    array_new();
     
     return 2;
   }
@@ -1127,28 +1156,28 @@ package TestCase {
   sub sum2 : int ($num1 : int, $num2 : int) {
     # croak "Error";
     
-    my $num3 = TestCase::sum0($num1, $num2);
+    my $num3 = sum0($num1, $num2);
     
     return $num3 + 3;
   }
 
   sub increfcount : int ($test : TestCase::Minimal, $num : int) {
     
-    my $aaa = TestCase::Minimal::new();
+    my $aaa = TestCase::Minimal->new();
   }
 
   sub decinctest : int ($num1 : TestCase::Minimal, $num2 : int, $num3 : TestCase::Minimal) {
     {
-      my $num4 = TestCase::Minimal::new();
-      my $num5 = TestCase::Minimal::new();
+      my $num4 = TestCase::Minimal->new();
+      my $num5 = TestCase::Minimal->new();
     }
     return 2;
   }
 
   sub return_object : TestCase::Minimal () {
-    my $obj0 = TestCase::Minimal::new();
+    my $obj0 = TestCase::Minimal->new();
     {
-      my $obj1 = TestCase::Minimal::new();
+      my $obj1 = TestCase::Minimal->new();
       
       my $obj2 : TestCase::Minimal;
       
@@ -1159,10 +1188,10 @@ package TestCase {
   }
 
   sub eval_block : void () {
-    my $obj0 = TestCase::Minimal::new();
+    my $obj0 = TestCase::Minimal->new();
     
     eval {
-      my $obj1 = TestCase::Minimal::new();
+      my $obj1 = TestCase::Minimal->new();
       
       my $obj2 : TestCase::Minimal;
       
@@ -1174,7 +1203,7 @@ package TestCase {
     };
     
     {
-      my $obj4 = TestCase::Minimal::new();
+      my $obj4 = TestCase::Minimal->new();
       
       my $obj5 : TestCase::Minimal;
       
@@ -1203,7 +1232,7 @@ package TestCase {
     
   }
   sub weaken_reference_count1_object : int (){
-    my $minimal = TestCase::Minimal::new();
+    my $minimal = TestCase::Minimal->new();
     my $test = new TestCase;
     
     $test->{minimal} = $minimal;
@@ -1222,7 +1251,7 @@ package TestCase {
   }
   
   sub error_call_stack : int () {
-    TestCase::error();
+    error();
   }
 
   sub error_eval : int () {
@@ -1240,7 +1269,7 @@ package TestCase {
 
   sub error_eval_call : int () {
     eval {
-      TestCase::error();
+      error();
     };
     
     if ($@) {
@@ -1266,6 +1295,22 @@ package TestCase {
     return 0;
   }
 
+  sub sort_obj : void ($values : Object[], $comparator : TestCase::Comparator) {
+
+    my $change_cnt = @$values - 1;
+    while( $change_cnt > 0){
+      for (my $i = 0; $i < $change_cnt; $i++) {
+        my $ret = $comparator->compare($values->[$i], $values->[$i + 1]);
+        
+        if ($comparator->compare($values->[$i], $values->[$i + 1]) == 1) {
+          my $tmp_value = $values->[$i];
+          $values->[$i] = $values->[$i + 1];
+          $values->[$i + 1] = $tmp_value;
+        }
+      }
+      $change_cnt--;
+    }
+  }
 }
 
 =head1 NAME

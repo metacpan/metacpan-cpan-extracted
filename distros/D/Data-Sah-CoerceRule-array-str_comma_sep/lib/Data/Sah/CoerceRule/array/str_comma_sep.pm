@@ -1,7 +1,7 @@
 package Data::Sah::CoerceRule::array::str_comma_sep;
 
-our $DATE = '2016-05-23'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-04-17'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Coerce array from a comma-separated items in a string
@@ -18,7 +18,7 @@ Data::Sah::CoerceRule::array::str_comma_sep - Coerce array from a comma-separate
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Sah::CoerceRule::array::str_comma_sep (from Perl distribution Data-Sah-CoerceRule-array-str_comma_sep), released on 2016-05-23.
+This document describes version 0.006 of Data::Sah::CoerceRule::array::str_comma_sep (from Perl distribution Data-Sah-CoerceRule-array-str_comma_sep), released on 2018-04-17.
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah-C
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep>.
+Source repository is at L<https://github.com///github.com/perlancar/perl-Data-Sah-CoerceRule-array-str_comma_sep>.
 
 =head1 BUGS
 
@@ -46,6 +46,10 @@ feature.
 
 =head1 SEE ALSO
 
+L<Data::Sah::CoerceRule::array::str_int_range>
+
+L<Data::Sah::CoerceRule::array::str_int_range_and_comma_sep>
+
 L<Data::Sah::Coerce>
 
 L<Data::Sah>
@@ -56,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

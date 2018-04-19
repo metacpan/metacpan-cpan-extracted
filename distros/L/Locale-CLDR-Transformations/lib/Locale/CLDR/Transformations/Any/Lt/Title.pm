@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Lt::Title;
 # This file auto generated from Data\common\transforms\lt-Title.xml
-#	on Fri 29 Apr  6:48:48 pm GMT
+#	on Fri 13 Apr  6:59:57 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -39,65 +40,65 @@ has 'transforms' => (
 			type => 'conversion',
 			data => [
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
-					after   => q((?^u:[^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above})),
-					replace => q((?^u:I)),
+					before  => q(\p{cased}\p{case-ignorable}*),
+					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
+					replace => q(I),
 					result  => q(i\u0307),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
-					after   => q((?^u:[^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above})),
-					replace => q((?^u:J)),
+					before  => q(\p{cased}\p{case-ignorable}*),
+					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
+					replace => q(J),
 					result  => q(j\u0307),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
-					after   => q((?^u:[^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above})),
-					replace => q((?^u:Į)),
+					before  => q(\p{cased}\p{case-ignorable}*),
+					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
+					replace => q(Į),
 					result  => q(i\u0328\u0307),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:Ì)),
+					replace => q(Ì),
 					result  => q(i\u0307\u0300),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:Í)),
+					replace => q(Í),
 					result  => q(i\u0307\u0301),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:Ĩ)),
+					replace => q(Ĩ),
 					result  => q(i\u0307\u0303),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{cased}\p{case-ignorable}*)),
+					before  => q(\p{cased}\p{case-ignorable}*),
 					after   => q(),
-					replace => q((?^u:(.))),
+					replace => q((.)),
 					result  => q(&Any-Lower($1)),
 					revisit => 0,
 				},
 				{
-					before  => q((?^u:\p{Soft_Dotted}[^\p{ccc=Not_Reordered}\p{ccc=Above}]*)),
+					before  => q(\p{Soft_Dotted}[^\p{ccc=Not_Reordered}\p{ccc=Above}]*),
 					after   => q(),
-					replace => q((?^u:̇)),
+					replace => q(̇),
 					result  => q(),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:(\p{Lowercase}))),
+					replace => q(([:Lowercase:])),
 					result  => q(&Any-Upper($1)),
 					revisit => 0,
 				},

@@ -1,6 +1,6 @@
 package Pcore::PgSQL::DBH;
 
-use Pcore -class, -result, -const;
+use Pcore -class, -res, -const;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
 use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
@@ -116,7 +116,7 @@ sub connect ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHo
 
     $self->{state} = $STATE_CONNECT;
 
-    $self->{on_connect} = sub ( $dbh, $status ) {
+    $self->{on_connect} = sub ( $dbh, $res ) {
         undef $self;
 
         $on_connect->(@_);
@@ -229,7 +229,7 @@ sub _on_error ( $self, $reason, $fatal ) {
         $self->{sth}->{error} = $reason;
     }
     elsif ( $state == $STATE_CONNECT ) {
-        delete( $self->{on_connect} )->( undef, result [ 500, $reason ] );
+        delete( $self->{on_connect} )->( undef, res [ 500, $reason ] );
     }
 
     return;
@@ -287,7 +287,7 @@ sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
 
     # connected
     if ( $state == $STATE_CONNECT ) {
-        delete( $self->{on_connect} )->( $self, result 200 );
+        delete( $self->{on_connect} )->( $self, res 200 );
     }
     elsif ( $state == $STATE_BUSY ) {
         my $sth = delete $self->{sth};
@@ -295,10 +295,10 @@ sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
         my $cb = delete $sth->{cb};
 
         if ( $sth->{error} ) {
-            $cb->( $sth, result [ 500, $sth->{error} ] );
+            $cb->( $sth, res [ 500, $sth->{error} ] );
         }
         else {
-            $cb->( $sth, result 200, $sth->{tag}->%* );
+            $cb->( $sth, res 200, $sth->{tag}->%* );
         }
     }
 
@@ -536,7 +536,7 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
     if ( $self->{state} != $STATE_READY ) {
         warn 'DBI: DBH is busy';
 
-        $cb->( undef, result [ 500, 'DBH is busy' ] );
+        $cb->( undef, res [ 500, 'DBH is busy' ] );
 
         return;
     }
@@ -697,6 +697,8 @@ sub prepare ( $self, $query ) {
     return $self->{handle}->prepare($query);
 }
 
+sub dbh ($self) { return $self }
+
 # TODO
 sub destroy_sth ( $self, $id ) {
     if ( exists $self->{prepared_sth}->{$id} ) {
@@ -712,37 +714,46 @@ sub destroy_sth ( $self, $id ) {
 sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $status ) {
-        my $data;
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;           # keep reference to $self until query is finished
 
-        if ( $status && defined $sth->{rows} ) {
+        if ( $res && defined $sth->{rows} ) {
             my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+
+            my $data;
 
             for my $row ( $sth->{rows}->@* ) {
                 my $data_row->@{@cols_names} = $row->@*;
 
                 push $data->@*, $data_row;
             }
+
+            $res->{data} = $data;
         }
 
-        $cb->( $self, $status, $data );
-
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( $query, $bind, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( $query, $bind, Coro::rouse_cb );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( $query, $bind, $on_finish );
+
+        return;
+    }
 }
 
 # key_field => [0, 1, 'id'], key_field => 'id'
 sub selectall ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $status ) {
-        my $data;
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
 
-        if ( $status && defined $sth->{rows} ) {
+        if ( $res && defined $sth->{rows} ) {
             my @cols_names = map { $_->[0] } $sth->{cols}->@*;
 
             if ( defined $args->{key_field} ) {
@@ -759,11 +770,11 @@ sub selectall ( $self, $query, @args ) {
                 for my $key_field ( is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field} ) {
                     if ( looks_like_number $key_field) {
                         if ( $key_field + 1 > $num_of_fields ) {
-                            warn qq[DBI: Invalid field index "$key_field"];
+                            my $res = res [ 400, qq[Invalid field index "$key_field"] ];
 
-                            $cb->( $self, result( [ 500, qq[Invalid field index "$key_field"] ] ), undef );
+                            warn $res;
 
-                            return;
+                            return $cb ? $cb->($res) : $res;
                         }
 
                         push @key_field_idx, $key_field;
@@ -772,18 +783,18 @@ sub selectall ( $self, $query, @args ) {
                         my $idx = $name2idx->{$key_field};
 
                         if ( !defined $idx ) {
-                            warn qq[DBI: Invalid field name "$key_field"];
+                            my $res = res [ 400, qq[DBI: Invalid field name "$key_field"] ];
 
-                            $cb->( $self, result( [ 500, qq[Invalid field name "$key_field"] ] ), undef );
+                            warn $res;
 
-                            return;
+                            return $cb ? $cb->($res) : $res;
                         }
 
                         push @key_field_idx, $idx;
                     }
                 }
 
-                $data = {};
+                my $data = {};
 
                 for my $row ( $sth->{rows}->@* ) {
                     my $ref = $data;
@@ -792,98 +803,126 @@ sub selectall ( $self, $query, @args ) {
 
                     $ref->@{@cols_names} = $row->@*;
                 }
+
+                $res->{data} = $data;
             }
             else {
+                my $data;
+
                 for my $row ( $sth->{rows}->@* ) {
                     my $row_hashref->@{@cols_names} = $row->@*;
 
                     push $data->@*, $row_hashref;
                 }
+
+                $res->{data} = $data;
             }
         }
 
-        $cb->( $self, $status, $data );
-
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( $query, $bind, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( $query, $bind, my $rouse_cb = Coro::rouse_cb );
 
-    return;
+        return $on_finish->( Coro::rouse_wait $rouse_cb);
+    }
+    else {
+        $self->_execute( $query, $bind, $on_finish );
+
+        return;
+    }
 }
 
 sub selectall_arrayref ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $status ) {
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
+
         my $data;
 
-        if ( $status && defined $sth->{rows} ) {
-            $data = $sth->{rows};
+        if ( $res && defined $sth->{rows} ) {
+            $res->{data} = $sth->{rows};
         }
 
-        $cb->( $self, $status, $data );
-
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( $query, $bind, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( $query, $bind, Coro::rouse_cb );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( $query, $bind, $on_finish );
+
+        return;
+    }
 }
 
 sub selectrow ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $status ) {
-        my $data;
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
 
-        if ( $status && defined $sth->{rows} ) {
+        if ( $res && defined $sth->{rows} ) {
             if ( $sth->{rows} ) {
                 my @cols_names = map { $_->[0] } $sth->{cols}->@*;
 
-                $data->@{@cols_names} = $sth->{rows}->[0]->@*;
+                $res->{data}->@{@cols_names} = $sth->{rows}->[0]->@*;
             }
         }
 
-        $cb->( $self, $status, $data );
-
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
+    if ( defined wantarray ) {
+        $self->_execute( $query, $bind, Coro::rouse_cb, max_rows => 1 );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
+
+        return;
+    }
 }
 
 sub selectrow_arrayref ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $status ) {
-        my $data;
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
 
-        if ( $status && defined $sth->{rows} ) {
-            $data = $sth->{rows}->[0];
+        if ( $res && defined $sth->{rows} ) {
+            $res->{data} = $sth->{rows}->[0];
         }
 
-        $cb->( $self, $status, $data );
-
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
+    if ( defined wantarray ) {
+        $self->_execute( $query, $bind, Coro::rouse_cb, max_rows => 1 );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
+
+        return;
+    }
 }
 
 # col => [0, 'id'], col => 'id', default col => 0
 sub selectcol ( $self, $query, @args ) {
     my ( $bind, $args, $cb ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $status ) {
-        my $data;
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
 
-        if ( $status && defined $sth->{rows} ) {
+        if ( $res && defined $sth->{rows} ) {
             my @slice;
 
             my $num_of_fields = $sth->{cols}->@* - 1;
@@ -895,11 +934,11 @@ sub selectcol ( $self, $query, @args ) {
                 for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
                     if ( looks_like_number $col) {
                         if ( $col > $num_of_fields ) {
-                            warn qq[DBI: Invalid column index: "$col"];
+                            my $res = res [ 400, qq[DBI: Invalid column index: "$col"] ];
 
-                            $cb->( $self, result( [ 500, qq[Invalid column index: "$col"] ] ), undef );
+                            warn $res;
 
-                            return;
+                            return $cb ? $cb->($res) : $res;
                         }
 
                         push @slice, $col;
@@ -918,11 +957,11 @@ sub selectcol ( $self, $query, @args ) {
                         }
 
                         if ( !exists $name2idx->{$col} ) {
-                            warn qq[DBI: Invalid column name: "$col"];
+                            my $res = res [ 400, qq[DBI: Invalid column name: "$col"] ];
 
-                            $cb->( $self, result( [ 500, qq[Invalid column name: "$col"] ] ), undef );
+                            warn $res;
 
-                            return;
+                            return $cb ? $cb->($res) : $res;
                         }
 
                         push @slice, $name2idx->{$col};
@@ -930,56 +969,84 @@ sub selectcol ( $self, $query, @args ) {
                 }
             }
 
+            my $data;
+
             for my $row ( $sth->{rows}->@* ) {
                 push $data->@*, $row->@[@slice];
             }
+
+            $res->{data} = $data;
         }
 
-        $cb->( $self, $status, $data );
-
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( $query, $bind, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( $query, $bind, Coro::rouse_cb );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( $query, $bind, $on_finish );
+
+        return;
+    }
 }
 
 # TRANSACTIONS
-sub begin_work ( $self, $cb ) {
-    my $on_finish = sub ( $sth, $status ) {
-        $cb->( $self, $status );
-
-        return;
+sub begin_work ( $self, $cb = undef ) {
+    my $on_finish = sub ( $sth, $res ) {
+        return $cb ? $cb->( $self, $res ) : ( $self, $res );
     };
 
-    $self->_execute( 'BEGIN', undef, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( 'BEGIN', undef, Coro::rouse_cb );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( 'BEGIN', undef, $on_finish );
+
+        return;
+    }
 }
 
-sub commit ( $self, $cb ) {
-    my $on_finish = sub ( $sth, $status ) {
-        $cb->( $self, $status );
+sub commit ( $self, $cb = undef ) {
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
 
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( 'COMMIT', undef, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( 'COMMIT', undef, Coro::rouse_cb );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( 'COMMIT', undef, $on_finish );
+
+        return;
+    }
 }
 
-sub rollback ( $self, $cb ) {
-    my $on_finish = sub ( $sth, $status ) {
-        $cb->( $self, $status );
+sub rollback ( $self, $cb = undef ) {
+    my $on_finish = sub ( $sth, $res ) {
+        my $guard = $self;    # keep reference to $self until query is finished
 
-        return;
+        return $cb ? $cb->($res) : $res;
     };
 
-    $self->_execute( 'ROLLBACK', undef, $on_finish );
+    if ( defined wantarray ) {
+        $self->_execute( 'ROLLBACK', undef, Coro::rouse_cb );
 
-    return;
+        return $on_finish->(Coro::rouse_wait);
+    }
+    else {
+        $self->_execute( 'ROLLBACK', undef, $on_finish );
+
+        return;
+    }
 }
 
 # QUOTE
@@ -1010,16 +1077,16 @@ sub encode_json ( $self, $var ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 535                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 625, 915             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 625, 954             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 28, 151, 359, 526,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |      | 592, 602, 618, 623,  |                                                                                                                |
 ## |      | 637, 642, 651, 658,  |                                                                                                                |
 ## |      | 662, 666, 670, 673   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 752, 915             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 763, 954             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 791                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 802                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

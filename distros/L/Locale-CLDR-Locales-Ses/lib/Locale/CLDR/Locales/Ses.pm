@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ses - Package for language Koyraboro Senni
 
 package Locale::CLDR::Locales::Ses;
 # This file auto generated from Data\common\main\ses.xml
-#	on Fri 29 Apr  7:24:00 pm GMT
+#	on Fri 13 Apr  7:27:41 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[v])},
+			auxiliary => qr{[v]},
 			index => ['A', 'Ã', 'B', 'C', 'D', 'E', 'Ẽ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'O', 'Õ', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{(?^u:[a ã b c d e ẽ f g h i j k l m n ɲ ŋ o õ p q r s š t u w x y z ž])},
+			main => qr{[a ã b c d e ẽ f g h i j k l m n ɲ ŋ o õ p q r s š t u w x y z ž]},
+			numbers => qr{[  \- . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -839,13 +841,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{Aluula},
-					'am' => q{Adduha},
-				},
 				'abbreviated' => {
-					'pm' => q{Aluula},
 					'am' => q{Adduha},
+					'pm' => q{Aluula},
+				},
+				'wide' => {
+					'am' => q{Adduha},
+					'pm' => q{Aluula},
 				},
 			},
 		},
@@ -977,6 +979,19 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 	} },
 );
 

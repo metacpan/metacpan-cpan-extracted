@@ -567,6 +567,35 @@ choose();
 class(   'PPIx::Regexp' );
 xplain(  undef );
 
+note	'Caret';
+
+parse(   '/(?^)(x)/' );
+value(   failures => [], 0 );
+choose(  child => 1, child => 0 );
+class(   'PPIx::Regexp::Token::Modifier' );
+xplain(  'd: match using default semantics; -i: do case-sensitive matching; -m: ^ and $ match only at ends of string; -s: . can not match newline; -x: regard whitespace as literal' );
+
+parse(   '/(?^)(x)/n' );
+value(   failures => [], 0 );
+choose(  child => 1, child => 0 );
+class(   'PPIx::Regexp::Token::Modifier' );
+xplain(  'd: match using default semantics; -i: do case-sensitive matching; -m: ^ and $ match only at ends of string; -n: parentheses capture; -s: . can not match newline; -x: regard whitespace as literal' );
+
+note	'Capture vs grouping';
+
+parse(	'/(x)/' );
+value(   failures => [], 0 );
+choose(  child => 1, child => 0 );
+class(   'PPIx::Regexp::Structure::Capture' );
+xplain(  'Capture group number 1' );
+
+parse(	'/(x)/n' );
+value(   failures => [], 0 );
+choose(  child => 1, child => 0 );
+class(   'PPIx::Regexp::Structure' );
+xplain(  'Grouping' );
+
+
 done_testing;
 
 sub xplain {

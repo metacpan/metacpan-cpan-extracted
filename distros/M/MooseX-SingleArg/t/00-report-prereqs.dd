@@ -9,6 +9,11 @@ do { my $x = {
                                       'Test::Pod' => '1.41'
                                     }
                     },
+       'runtime' => {
+                      'requires' => {
+                                      'Moose' => '1.23'
+                                    }
+                    },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900'
@@ -16,6 +21,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Test2::V0' => '0.000094',
                                    'Test::More' => '0'
                                  }
                  }

@@ -1,5 +1,15 @@
 Revision history for Geo-Coder-List
 
+0.20	Tue Apr 17 20:03:03 EDT 2018
+	Don't bother to test using Google if you don't have a key
+	Improved support for Geo::GeoNames
+
+0.19	Sun Apr 15 20:42:05 EDT 2018
+	Support Geo::GeoNames
+	Explicit about which loop to finish
+	Fix ununinitialized variable
+	Fix https://github.com/Humanstate/html-googlemaps-v3/issues/17
+
 0.18	Tue Dec 26 08:18:54 EST 2017
 	Improved return value checking
 	Squash spaces

@@ -30,13 +30,18 @@ no_index:
     - t
     - xt
 requires:
+  Browser::Open: '0'
   Capture::Tiny: '0'
   Carp: '0'
   File::pushd: '0'
+  Getopt::Long: '0'
   Git::Sub: '0'
   MetaCPAN::Client: '0'
   Moo: '0'
+  MooX::Options: '0'
+  String::Trim: '0'
   Sub::Exporter: '0'
+  Term::Choose: '0'
   Try::Tiny: '0'
   Types::Standard: '0'
   URI: '0'
@@ -50,7 +55,7 @@ resources:
   bugtracker: https://github.com/oalders/git-helpers/issues
   homepage: https://github.com/oalders/git-helpers
   repository: https://github.com/oalders/git-helpers.git
-version: '0.000014'
+version: '0.000015'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -338,7 +343,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.16.3
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.043'
@@ -346,7 +351,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.16.2
+          git_version: 2.16.3
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -394,23 +399,13 @@ x_Dist_Zilla:
             - ':InstallModules'
           global: 0
           skip_version_provider: 0
-        Dist::Zilla::Plugin::RewriteVersion::Transitional:
-          _fallback_version_provider_args: {}
-          fallback_version_provider: Git::NextVersion
-        Git::NextVersion:
-          Dist::Zilla::Plugin::Git::NextVersion:
-            first_version: '0.001'
-            version_by_branch: 0
-            version_regexp: (?^:^v(.+)$)
-          Dist::Zilla::Role::Git::Repo:
-            git_version: 2.16.2
-            repo_root: .
+        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
       name: '@Author::OALDERS/@Git::VersionManager/RewriteVersion::Transitional'
       version: '0.009'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::OALDERS/@Git::VersionManager/MetaProvides::Update'
-      version: '0.005'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -439,7 +434,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.16.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -452,11 +447,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000014
+          tag: v0.000015
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.16.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -493,7 +488,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.16.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -507,7 +502,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.16.3
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.043'

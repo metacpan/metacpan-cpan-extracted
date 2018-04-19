@@ -1,4 +1,15 @@
 Revision history for Net::Etcd
+0.020
+[ ENHANCEMENTS ]
+* Add support for full chain TLS. Fixes GH #42
+* Updated travis tests to use etcd v3.3.3
+
+[ BREAKING ]
+* Default value for api_version is now /v3beta.
+
+[ ANNOUNCEMENT ]
+* Default value for api_version will change to /v3 on the release of etcd v3.4
+
 0.019
 [ BUG FIX ]
 * Resolved issue where chunked data was not properly handled in non streaming calls and would truncate data when buffer was full. Fixed By GH #40 - Thanks Ananth Kavuri (foobargeez)

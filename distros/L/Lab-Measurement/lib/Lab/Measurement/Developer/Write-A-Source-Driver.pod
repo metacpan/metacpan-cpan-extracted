@@ -14,7 +14,7 @@ Lab::Measurement::Developer::Write-A-Source-Driver - Implementing a current/volt
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 Implementing a current/voltage source driver
 

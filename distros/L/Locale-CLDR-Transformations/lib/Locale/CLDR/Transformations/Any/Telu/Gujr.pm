@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Telu::Gujr;
 # This file auto generated from Data\common\transforms\Telugu-Gujarati.xml
-#	on Fri 29 Apr  6:48:46 pm GMT
+#	on Fri 13 Apr  6:59:55 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -25,7 +26,7 @@ has 'transforms' => (
 	isa => ArrayRef,
 	init_arg => undef,
 	default => sub { [
-		qr/(?^umi:\G(?^u:[ఁ-ఃఅ-ఌఎ-ఐఒ-నప-ళవ-హా-ౄె-ైొ-్ౕ-ౖౠ-ౡ౦-౯]))/,
+		qr/(?^umi:\G[ఁ-ఃఅ-ఌఎ-ఐఒ-నప-ళవ-హా-ౄె-ైొ-్ౕ-ౖౠ-ౡ౦-౯])/,
 		{
 			type => 'transform',
 			data => [

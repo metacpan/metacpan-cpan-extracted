@@ -1,5 +1,11 @@
 Revision history for JavaScript-Beautifier
 
+0.23    2018-04-19
+        - fix wrong ship
+
+0.22    2018-04-19
+        - add packer by eleonora45 (RT 125117)
+
 0.21    2018-03-21
         - Double backslashes fixes by eleonora45 (RT 124828)
 

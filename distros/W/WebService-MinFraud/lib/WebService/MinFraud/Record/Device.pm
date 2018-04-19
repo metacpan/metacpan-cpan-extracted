@@ -3,10 +3,10 @@ package WebService::MinFraud::Record::Device;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use Types::UUID;
-use WebService::MinFraud::Types qw( NonNegativeNum Num Str );
+use WebService::MinFraud::Types qw( Num Str );
 
 has confidence => (
     is        => 'ro',
@@ -21,6 +21,12 @@ has id => (
 );
 
 has last_seen => (
+    is        => 'ro',
+    isa       => Str,
+    predicate => 1,
+);
+
+has local_time => (
     is        => 'ro',
     isa       => Str,
     predicate => 1,
@@ -42,7 +48,7 @@ WebService::MinFraud::Record::Device - Contains data for the device associated w
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -51,7 +57,7 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
   my $request  = { device => { ip_address => '24.24.24.24' } };
@@ -83,20 +89,12 @@ UUID for that device.
 =head2 last_seen
 
 This is the date and time of the last sighting of the device on the specified
-IP address for your user account. The string is formatted in the ISO 8601
-combined date and time in UTC.
+IP address for your user account. The string is in the RFC 3339 format.
 
-=head2 session_age
+=head2 local_time
 
-A floating point number. The number of seconds between the creation of the
-user's session and the time of the transaction. Note that C<session_age> is not
-the duration of the current visit, but the time since the start of the first
-visit.
-
-=head2 session_id
-
-A string up to 255 characters in length. This is an ID which uniquely
-identifies a visitor's session on the site.
+This is the date and time of the transaction at the UTC offset associated with
+the device. The string is in the RFC 3339 format.
 
 =head1 PREDICATE METHODS
 
@@ -109,9 +107,7 @@ data was present in the response body, false if otherwise:
 
 =head2 has_last_seen
 
-=head2 has_session_age
-
-=head2 has_session_id
+=head2 has_local_time
 
 =head1 SUPPORT
 

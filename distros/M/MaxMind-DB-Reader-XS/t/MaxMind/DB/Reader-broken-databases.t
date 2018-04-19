@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use autodie;
+use version;
 
 use Test::Fatal;
 use Test::More;
@@ -60,18 +61,20 @@ use Path::Class 0.27 qw( tempdir );
     ## no critic (Subroutines::ProhibitCallsToUnexportedSubs, Modules::RequireExplicitInclusion)
     if ( Module::Implementation::implementation_for('MaxMind::DB::Reader') eq
         'XS' ) {
-        my ( undef, $minor, $patch ) = (
-            split /\./,
-            MaxMind::DB::Reader::XS::libmaxminddb_version()
-        );
+        my $libmaxminddb_version
+            = MaxMind::DB::Reader::XS::libmaxminddb_version();
 
         # Newer versions of libmaxminddb do better error checking and so end
         # up throwing a different error on this garbage file.
-        if ( $minor >= 1 && $patch >= 3 ) {
+        if (
+            version->parse($libmaxminddb_version) >= version->parse('1.1.3') )
+        {
             $expect
                 = qr/Error opening database file "\Q$file\E": The MaxMind DB file contains invalid metadata .+/;
         }
-        elsif ( $minor >= 1 && $patch >= 2 ) {
+        elsif (
+            version->parse($libmaxminddb_version) >= version->parse('1.1.2') )
+        {
             $expect
                 = qr/Error opening database file "\Q$file\E": The lookup path does not match the data .+/;
         }

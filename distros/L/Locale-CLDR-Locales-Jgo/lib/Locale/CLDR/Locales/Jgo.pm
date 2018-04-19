@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Jgo - Package for language Ngomba
 
 package Locale::CLDR::Locales::Jgo;
 # This file auto generated from Data\common\main\jgo.xml
-#	on Fri 29 Apr  7:11:03 pm GMT
+#	on Fri 13 Apr  7:15:33 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -198,10 +199,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[e o q r x])},
+			auxiliary => qr{[e o q r x]},
 			index => ['A', 'B', 'C', 'D', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'Ɔ', 'P', '{Pf}', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', '{Ʉ\u0308}', 'V', 'W', 'Ẅ', 'Y', 'Z', 'Ꞌ'],
-			main => qr{(?^u:[a á â ǎ b c d ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ j k l m ḿ {m̀} {m̄} n ń ǹ {n̄} ŋ {ŋ́} {ŋ̀} {ŋ̄} ɔ {ɔ́} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú û ǔ ʉ {ʉ́} {ʉ̂} {ʉ̌} {ʉ̈} v w ẅ y z ꞌ])},
-			punctuation => qr{(?^u:[\- , ; \: ! ? . ‹ › « »])},
+			main => qr{[a á â ǎ b c d ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ j k l m ḿ {m̀} {m̄} n ń ǹ {n̄} ŋ {ŋ́} {ŋ̀} {ŋ̄} ɔ {ɔ́} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú û ǔ ʉ {ʉ́} {ʉ̂} {ʉ̌} {ʉ̈} v w ẅ y z ꞌ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- , ; \: ! ? . ‹ › « »]},
 		};
 	},
 EOT
@@ -366,21 +368,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -643,12 +645,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{ŋka mbɔ́t nji},
 					'am' => q{mbaꞌmbaꞌ},
+					'pm' => q{ŋka mbɔ́t nji},
 				},
 				'wide' => {
-					'am' => q{mbaꞌmbaꞌ},
 					'pm' => q{ŋka mbɔ́t nji},
+					'am' => q{mbaꞌmbaꞌ},
 				},
 			},
 		},

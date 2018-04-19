@@ -1,14 +1,6 @@
 ################################################################################
-#
-# $Project: /Devel-Tokenizer-C $
-# $Author: mhx $
-# $Date: 2008/12/13 15:00:43 +0000 $
-# $Revision: 9 $
-# $Source: /t/301_build.t $
-#
-################################################################################
 # 
-# Copyright (c) 2002-2008 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2018 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 # 
@@ -72,17 +64,19 @@ sub run_tests
 
   my @args = ( TokenFunc     => sub { "return KEY_".get_key($_[0]).";\n" }
              , CaseSensitive => $options->{case}
-             , TokenEnd      => 'TOKEN_END'
              );
 
   if ($options->{strlen}) {
-    push @args, StringLength => 'mystrlen';
+    push @args, StringLength => 'mystrlen'
+              , TokenEnd => undef;
     $prefix = <<CODE
 int mystrlen = 0;
 
 while (tokstr[mystrlen] != TOKEN_END)
   mystrlen++;
 CODE
+  } else {
+    push @args, TokenEnd => 'TOKEN_END';
   }
 
   if (exists $options->{strategy}) {
@@ -107,7 +101,7 @@ unknown:
 CODE
   }
 
-  print "# ", join(', ', @args), "\n";
+  print "# ", join(', ', map { defined() ? $_ : '<undef>' } @args), "\n";
 
   my $t = new Devel::Tokenizer::C @args;
 
@@ -121,7 +115,7 @@ CODE
     else {
       $t->add_tokens( [$_] );
     }
-  
+
     $c--;
   }
 
@@ -170,7 +164,7 @@ CODE
       push @ref, map [$_ => $unknown], @p;
     }
   }
-  
+
   my($out) = runtest( $skip, $src, \@in, ccflags => \@ppflags );
 
   my $count = -1;
@@ -713,3 +707,10 @@ xenomorphosis
 xiphiid
 zac
 t\tab
+age=v20
+age=v21
+age=v30
+age=v31
+numericvalue=1/40
+numericvalue=1/41
+numericvalue=1/42

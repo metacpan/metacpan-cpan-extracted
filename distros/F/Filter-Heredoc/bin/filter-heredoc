@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ filter-heredoc - Search and filter embedded here documents
 
 use Filter::Heredoc::App qw( run_filter_heredoc );
 run_filter_heredoc();
-exit (0);
+exit ;
 
 =head1 SYNOPSIS
 
@@ -190,6 +190,6 @@ WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 =head1 VERSION
 
 The version of B<filter-heredoc> described by this manual page is 
-Version 0.02.
+Version 0.05.
 
 =cut

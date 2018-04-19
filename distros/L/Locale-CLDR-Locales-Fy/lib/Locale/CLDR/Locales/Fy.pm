@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Fy - Package for language Western Frisian
 
 package Locale::CLDR::Locales::Fy;
 # This file auto generated from Data\common\main\fy.xml
-#	on Fri 29 Apr  7:04:21 pm GMT
+#	on Fri 13 Apr  7:11:03 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -195,7 +196,7 @@ has 'display_name_language' => (
  				'frr' => 'Noard-Frysk',
  				'frs' => 'East-Frysk',
  				'fur' => 'Friulysk',
- 				'fy' => 'West-Frysk',
+ 				'fy' => 'Frysk',
  				'ga' => 'Iersk',
  				'gaa' => 'Ga',
  				'gay' => 'Gayo',
@@ -632,6 +633,7 @@ has 'display_name_script' => (
  			'Hung' => 'Aldhongaars',
  			'Inds' => 'Indus',
  			'Ital' => 'Ald-italysk',
+ 			'Jamo' => 'Jamo',
  			'Java' => 'Javaansk',
  			'Jpan' => 'Japans',
  			'Jurc' => 'Jurchen',
@@ -1138,7 +1140,6 @@ has 'display_name_key' => (
  			'colbackwards' => 'Omgekeerd sortearje op accenten',
  			'colcasefirst' => 'Yndiele op haad/lytse letters',
  			'colcaselevel' => 'Haadlettergefoelich sortearje',
- 			'colhiraganaquaternary' => 'Kana sortearje',
  			'collation' => 'Sortearfolgorde',
  			'colnormalization' => 'Genormaliseerd sortearje',
  			'colnumeric' => 'Numeriek sortearje',
@@ -1147,7 +1148,6 @@ has 'display_name_key' => (
  			'numbers' => 'Sifers',
  			'timezone' => 'Tijdzone',
  			'va' => 'Landvariant',
- 			'variabletop' => 'sortearje als symbolen',
  			'x' => 'Privégebruik',
 
 		}
@@ -1192,10 +1192,6 @@ has 'display_name_type' => (
  				'no' => q{Net haadlettergefoelich sortearje},
  				'yes' => q{Hoofdlettergevoelig sortearje},
  			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{Kana apart sortearje},
- 				'yes' => q{Kana oars sortearje},
- 			},
  			'collation' => {
  				'big5han' => q{Tradisjonele-Sineeske soartear oarder - Big5},
  				'dictionary' => q{Wurdboeksortearfolgorde},
@@ -1226,6 +1222,15 @@ has 'display_name_type' => (
  				'quaternary' => q{sortearje neffens aksinten/haadletterbrûkme/breedte/Kana},
  				'secondary' => q{Sortearje op accenten},
  				'tertiary' => q{sortearje neffens aksinten/haadletterbrûkme/breedte},
+ 			},
+ 			'd0' => {
+ 				'fwidth' => q{Volledige breedte},
+ 				'hwidth' => q{Halve breedte},
+ 				'npinyin' => q{Numeriek},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{BGN},
+ 				'ungegn' => q{UNGEGN},
  			},
  			'numbers' => {
  				'arab' => q{Arabysk-Indyske sifers},
@@ -1290,27 +1295,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN',
- 			'numeric' => 'Numeriek',
- 			'tone' => 'Toon',
- 			'ungegn' => 'UNGEGN',
- 			'x-accents' => 'Accenten',
- 			'x-fullwidth' => 'Volledige breedte',
- 			'x-halfwidth' => 'Halve breedte',
- 			'x-jamo' => 'Jamo',
- 			'x-pinyin' => 'Pinyin',
- 			'x-publishing' => 'Publicatie',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1334,15 +1318,16 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[à â æ è ê ô ù û])},
-			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a á ä b c d e é ë f g h i ì ï {ij} {íj́} j k l m n o ò ö p r s t u ú ü v w y ỳ z])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″])},
+			auxiliary => qr{[æ ò ù]},
+			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Z'],
+			main => qr{[a á à â ä b c d e é è ê ë f g h i í ï {ij} {íj́} j k l m n o ó ô ö p r s t u ú û ü v w y ý z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'], };
+		return { index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Z'], };
 },
 );
 
@@ -2201,7 +2186,7 @@ has 'number_formats' => (
 					'other' => '000 bln'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -2308,14 +2293,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -2722,11 +2707,18 @@ has 'currencies' => (
 				'other' => q(Wit-Russyske nieuwe roebel \(1994–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(Wit-Russyske roebel),
 				'one' => q(Wit-Russyske roebel),
 				'other' => q(Wit-Russyske roebel),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(Wit-Russyske roebel \(2000–2016\)),
+				'one' => q(Wit-Russyske roebel \(2000–2016\)),
+				'other' => q(Wit-Russyske roebel \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3682,16 +3674,16 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(Peruaanske nieuwe sol),
-				'one' => q(Peruaanske nieuwe sol),
-				'other' => q(Peruaanske nieuwe sol),
+				'currency' => q(Peruaanske sol),
+				'one' => q(Peruaanske sol),
+				'other' => q(Peruaanske sol),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(Peruaanske sol),
-				'one' => q(Peruaanske sol),
-				'other' => q(Peruaanske sol),
+				'currency' => q(Peruaanske sol \(1863–1985\)),
+				'one' => q(Peruaanske sol \(1863–1985\)),
+				'other' => q(Peruaanske sol \(1863–1985\)),
 			},
 		},
 		'PGK' => {
@@ -4824,18 +4816,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'jan.',
-							'feb.',
-							'mrt.',
-							'apr.',
-							'mai.',
-							'jun.',
-							'jul.',
-							'aug.',
-							'sep.',
-							'okt.',
-							'nov.',
-							'des.'
+							'Jan',
+							'Feb',
+							'Mrt',
+							'Apr',
+							'Mai',
+							'Jun',
+							'Jul',
+							'Aug',
+							'Sep',
+							'Okt',
+							'Nov',
+							'Des'
 						],
 						leap => [
 							
@@ -4862,18 +4854,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'jannewaris',
-							'febrewaris',
-							'maart',
-							'april',
-							'maaie',
-							'juny',
-							'july',
-							'augustus',
-							'septimber',
-							'oktober',
-							'novimber',
-							'desimber'
+							'Jannewaris',
+							'Febrewaris',
+							'Maart',
+							'April',
+							'Maaie',
+							'Juny',
+							'July',
+							'Augustus',
+							'Septimber',
+							'Oktober',
+							'Novimber',
+							'Desimber'
 						],
 						leap => [
 							
@@ -4883,18 +4875,18 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'jan',
-							'feb',
-							'mrt',
-							'apr',
-							'mai',
-							'jun',
-							'jul',
-							'aug',
-							'sep',
-							'okt',
-							'nov',
-							'des'
+							'Jan',
+							'Feb',
+							'Mrt',
+							'Apr',
+							'Mai',
+							'Jun',
+							'Jul',
+							'Aug',
+							'Sep',
+							'Okt',
+							'Nov',
+							'Des'
 						],
 						leap => [
 							
@@ -4921,18 +4913,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'jannewaris',
-							'febrewaris',
-							'maart',
-							'april',
-							'maaie',
-							'juny',
-							'july',
-							'augustus',
-							'septimber',
-							'oktober',
-							'novimber',
-							'desimber'
+							'Jannewaris',
+							'Febrewaris',
+							'Maart',
+							'April',
+							'Maaie',
+							'Juny',
+							'July',
+							'Augustus',
+							'Septimber',
+							'Oktober',
+							'Novimber',
+							'Desimber'
 						],
 						leap => [
 							
@@ -5431,12 +5423,12 @@ has 'calendar_days' => (
 					},
 					narrow => {
 						mon => 'M',
-						tue => 'D',
+						tue => 'T',
 						wed => 'W',
-						thu => 'D',
-						fri => 'V',
-						sat => 'Z',
-						sun => 'Z'
+						thu => 'T',
+						fri => 'F',
+						sat => 'S',
+						sun => 'S'
 					},
 					short => {
 						mon => 'mo',
@@ -5469,12 +5461,12 @@ has 'calendar_days' => (
 					},
 					narrow => {
 						mon => 'M',
-						tue => 'D',
+						tue => 'T',
 						wed => 'W',
-						thu => 'D',
-						fri => 'V',
-						sat => 'Z',
-						sun => 'Z'
+						thu => 'T',
+						fri => 'F',
+						sat => 'S',
+						sun => 'S'
 					},
 					short => {
 						mon => 'mo',
@@ -5516,10 +5508,10 @@ has 'calendar_quarters' => (
 						2 => '3',
 						3 => '4'
 					},
-					wide => {0 => '1e kwartaal',
-						1 => '2e kwartaal',
-						2 => '3e kwartaal',
-						3 => '4e kwartaal'
+					wide => {0 => '1e fearnsjier',
+						1 => '2e fearnsjier',
+						2 => '3e fearnsjier',
+						3 => '4e fearnsjier'
 					},
 				},
 				'stand-alone' => {
@@ -5533,10 +5525,10 @@ has 'calendar_quarters' => (
 						2 => '3',
 						3 => '4'
 					},
-					wide => {0 => '1e kwartaal',
-						1 => '2e kwartaal',
-						2 => '3e kwartaal',
-						3 => '4e kwartaal'
+					wide => {0 => '1e fearnsjier',
+						1 => '2e fearnsjier',
+						2 => '3e fearnsjier',
+						3 => '4e fearnsjier'
 					},
 				},
 			},
@@ -5550,27 +5542,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'wide' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{p.m.},
-					'am' => q{a.m.},
+					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'wide' => {
-					'pm' => q{p.m.},
-					'am' => q{foarmiddei},
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'narrow' => {
+					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 		},
@@ -5776,8 +5772,8 @@ has 'datetime_formats' => (
 			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} {0}},
-			'long' => q{{1} {0}},
+			'full' => q{{1} 'om' {0}},
+			'long' => q{{1} 'om' {0}},
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
@@ -5805,73 +5801,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-			Ed => q{E d},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d MMM y G},
-			GyMMMd => q{d MMM y G},
-			M => q{L},
-			MEd => q{E d-M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d-M},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M-y GGGGG},
-			yyyyMEd => q{E d-M-y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d-M-y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
-		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d MMM y G},
-			GyMMMd => q{d MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{E d-M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d-M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M-y},
-			yMEd => q{E d-M-y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E d MMM y},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{d-M-y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-		},
 		'chinese' => {
 			Ed => q{E d},
 			Gy => q{U},
@@ -5905,39 +5834,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ U},
 			yyyyQQQQ => q{QQQQ U},
 		},
-		'generic' => {
-			Ed => q{E d},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d MMM y G},
-			GyMMMd => q{d MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E d-M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d-M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M-y GGGGG},
-			yyyyMEd => q{E d-M-y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d-M-y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'roc' => {
 			Ed => q{E d},
 			Gy => q{y G},
@@ -6004,6 +5900,108 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{d MMM},
 			Md => q{d-M},
 			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M-y GGGGG},
+			yyyyMEd => q{E d-M-y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d-M-y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'gregorian' => {
+			E => q{ccc},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d MMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{E d-M},
+			MMM => q{LLL},
+			MMMEd => q{E d MMM},
+			MMMMW => q{'wike' W 'fan' MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d-M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M-y},
+			yMEd => q{E d-M-y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E d MMM y},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{d-M-y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+			yw => q{'wike' w 'fan' Y},
+		},
+		'buddhist' => {
+			Ed => q{E d},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d MMM y G},
+			GyMMMd => q{d MMM y G},
+			M => q{L},
+			MEd => q{E d-M},
+			MMM => q{LLL},
+			MMMEd => q{E d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d-M},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M-y GGGGG},
+			yyyyMEd => q{E d-M-y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d-M-y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'generic' => {
+			Ed => q{E d},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d MMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E d-M},
+			MMM => q{LLL},
+			MMMEd => q{E d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d-M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M-y GGGGG},
@@ -6489,14 +6487,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Acre-simmertiid),
-				'generic' => q(Acre-tiid),
-				'standard' => q(Acre-standerttiid),
+				'daylight' => q#Acre-simmertiid#,
+				'generic' => q#Acre-tiid#,
+				'standard' => q#Acre-standerttiid#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Afghaanske tiid),
+				'standard' => q#Afghaanske tiid#,
 			},
 		},
 		'Africa/Addis_Ababa' => {
@@ -6519,45 +6517,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Sintraal-Afrikaanske tiid),
+				'standard' => q#Sintraal-Afrikaanske tiid#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(East-Afrikaanske tiid),
+				'standard' => q#East-Afrikaanske tiid#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Sûd-Afrikaanske tiid),
+				'standard' => q#Sûd-Afrikaanske tiid#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(West-Afrikaanske simmertiid),
-				'generic' => q(West-Afrikaanske tiid),
-				'standard' => q(West-Afrikaanske standerttiid),
+				'daylight' => q#West-Afrikaanske simmertiid#,
+				'generic' => q#West-Afrikaanske tiid#,
+				'standard' => q#West-Afrikaanske standerttiid#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Alaska-simmertiid),
-				'generic' => q(Alaska-tiid),
-				'standard' => q(Alaska-standerttiid),
+				'daylight' => q#Alaska-simmertiid#,
+				'generic' => q#Alaska-tiid#,
+				'standard' => q#Alaska-standerttiid#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Alma-Ata-simmertiid),
-				'generic' => q(Alma-Ata-tiid),
-				'standard' => q(Alma-Ata-standerttiid),
+				'daylight' => q#Alma-Ata-simmertiid#,
+				'generic' => q#Alma-Ata-tiid#,
+				'standard' => q#Alma-Ata-standerttiid#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazone-simmertiid),
-				'generic' => q(Amazone-tiid),
-				'standard' => q(Amazone-standerttiid),
+				'daylight' => q#Amazone-simmertiid#,
+				'generic' => q#Amazone-tiid#,
+				'standard' => q#Amazone-standerttiid#,
 			},
 		},
 		'America/Argentina/Rio_Gallegos' => {
@@ -6673,37 +6671,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Central-simmertiid),
-				'generic' => q(Central-tiid),
-				'standard' => q(Central-standerttiid),
+				'daylight' => q#Central-simmertiid#,
+				'generic' => q#Central-tiid#,
+				'standard' => q#Central-standerttiid#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Eastern-simmertiid),
-				'generic' => q(Eastern-tiid),
-				'standard' => q(Eastern-standerttiid),
+				'daylight' => q#Eastern-simmertiid#,
+				'generic' => q#Eastern-tiid#,
+				'standard' => q#Eastern-standerttiid#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Mountain-simmertiid),
-				'generic' => q(Mountain-tiid),
-				'standard' => q(Mountain-standerttiid),
+				'daylight' => q#Mountain-simmertiid#,
+				'generic' => q#Mountain-tiid#,
+				'standard' => q#Mountain-standerttiid#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Pasifik-simmertiid),
-				'generic' => q(Pasifik-tiid),
-				'standard' => q(Pasifik-standerttiid),
+				'daylight' => q#Pasifik-simmertiid#,
+				'generic' => q#Pasifik-tiid#,
+				'standard' => q#Pasifik-standerttiid#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadyr-simmertiid),
-				'generic' => q(Anadyr-tiid),
-				'standard' => q(Anadyr-standerttiid),
+				'daylight' => q#Anadyr-simmertiid#,
+				'generic' => q#Anadyr-tiid#,
+				'standard' => q#Anadyr-standerttiid#,
 			},
 		},
 		'Antarctica/DumontDUrville' => {
@@ -6711,44 +6709,44 @@ has 'time_zone_names' => (
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Aqtau-simmertiid),
-				'generic' => q(Aqtau-tiid),
-				'standard' => q(Aqtau-standerttiid),
+				'daylight' => q#Aqtau-simmertiid#,
+				'generic' => q#Aqtau-tiid#,
+				'standard' => q#Aqtau-standerttiid#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Aqtöbe-simmertiid),
-				'generic' => q(Aqtöbe-tiid),
-				'standard' => q(Aqtöbe-standerttiid),
+				'daylight' => q#Aqtöbe-simmertiid#,
+				'generic' => q#Aqtöbe-tiid#,
+				'standard' => q#Aqtöbe-standerttiid#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabyske simmertiid),
-				'generic' => q(Arabyske tiid),
-				'standard' => q(Arabyske standerttiid),
+				'daylight' => q#Arabyske simmertiid#,
+				'generic' => q#Arabyske tiid#,
+				'standard' => q#Arabyske standerttiid#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentynske simmertiid),
-				'generic' => q(Argentynske tiid),
-				'standard' => q(Argentynske standerttiid),
+				'daylight' => q#Argentynske simmertiid#,
+				'generic' => q#Argentynske tiid#,
+				'standard' => q#Argentynske standerttiid#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(West-Argentynske simmertiid),
-				'generic' => q(West-Argentynske tiid),
-				'standard' => q(West-Argentynske standerttiid),
+				'daylight' => q#West-Argentynske simmertiid#,
+				'generic' => q#West-Argentynske tiid#,
+				'standard' => q#West-Argentynske standerttiid#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Armeense simmertiid),
-				'generic' => q(Armeense tiid),
-				'standard' => q(Armeense standerttiid),
+				'daylight' => q#Armeense simmertiid#,
+				'generic' => q#Armeense tiid#,
+				'standard' => q#Armeense standerttiid#,
 			},
 		},
 		'Asia/Almaty' => {
@@ -6840,9 +6838,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlantic-simmertiid),
-				'generic' => q(Atlantic-tiid),
-				'standard' => q(Atlantic-standerttiid),
+				'daylight' => q#Atlantic-simmertiid#,
+				'generic' => q#Atlantic-tiid#,
+				'standard' => q#Atlantic-standerttiid#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -6865,171 +6863,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Midden-Australyske simmertiid),
-				'generic' => q(Midden-Australyske tiid),
-				'standard' => q(Midden-Australyske standerttiid),
+				'daylight' => q#Midden-Australyske simmertiid#,
+				'generic' => q#Midden-Australyske tiid#,
+				'standard' => q#Midden-Australyske standerttiid#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Midden-Australyske westelijke simmertiid),
-				'generic' => q(Midden-Australyske westelijke tiid),
-				'standard' => q(Midden-Australyske westelijke standerttiid),
+				'daylight' => q#Midden-Australyske westelijke simmertiid#,
+				'generic' => q#Midden-Australyske westelijke tiid#,
+				'standard' => q#Midden-Australyske westelijke standerttiid#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(East-Australyske simmertiid),
-				'generic' => q(East-Australyske tiid),
-				'standard' => q(East-Australyske standerttiid),
+				'daylight' => q#East-Australyske simmertiid#,
+				'generic' => q#East-Australyske tiid#,
+				'standard' => q#East-Australyske standerttiid#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(West-Australyske simmertiid),
-				'generic' => q(West-Australyske tiid),
-				'standard' => q(West-Australyske standerttiid),
+				'daylight' => q#West-Australyske simmertiid#,
+				'generic' => q#West-Australyske tiid#,
+				'standard' => q#West-Australyske standerttiid#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Azerbeidzjaanske simmertiid),
-				'generic' => q(Azerbeidzjaanske tiid),
-				'standard' => q(Azerbeidzjaanske standerttiid),
+				'daylight' => q#Azerbeidzjaanske simmertiid#,
+				'generic' => q#Azerbeidzjaanske tiid#,
+				'standard' => q#Azerbeidzjaanske standerttiid#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Azoren-simmertiid),
-				'generic' => q(Azoren-tiid),
-				'standard' => q(Azoren-standerttiid),
+				'daylight' => q#Azoren-simmertiid#,
+				'generic' => q#Azoren-tiid#,
+				'standard' => q#Azoren-standerttiid#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Bengalese simmertiid),
-				'generic' => q(Bengalese tiid),
-				'standard' => q(Bengalese standerttiid),
+				'daylight' => q#Bengalese simmertiid#,
+				'generic' => q#Bengalese tiid#,
+				'standard' => q#Bengalese standerttiid#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Bhutaanske tiid),
+				'standard' => q#Bhutaanske tiid#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Boliviaanske tiid),
+				'standard' => q#Boliviaanske tiid#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brazyljaanske simmertiid),
-				'generic' => q(Brazyljaanske tiid),
-				'standard' => q(Brazyljaanske standerttiid),
+				'daylight' => q#Brazyljaanske simmertiid#,
+				'generic' => q#Brazyljaanske tiid#,
+				'standard' => q#Brazyljaanske standerttiid#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Bruneise tiid),
+				'standard' => q#Bruneise tiid#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Kaapverdyske simmertiid),
-				'generic' => q(Kaapverdyske tiid),
-				'standard' => q(Kaapverdyske standerttiid),
+				'daylight' => q#Kaapverdyske simmertiid#,
+				'generic' => q#Kaapverdyske tiid#,
+				'standard' => q#Kaapverdyske standerttiid#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Chamorro-tiid),
+				'standard' => q#Chamorro-tiid#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Chatham simmertiid),
-				'generic' => q(Chatham tiid),
-				'standard' => q(Chatham standerttiid),
+				'daylight' => q#Chatham simmertiid#,
+				'generic' => q#Chatham tiid#,
+				'standard' => q#Chatham standerttiid#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Sileenske simmertiid),
-				'generic' => q(Sileenske tiid),
-				'standard' => q(Sileenske standerttiid),
+				'daylight' => q#Sileenske simmertiid#,
+				'generic' => q#Sileenske tiid#,
+				'standard' => q#Sileenske standerttiid#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Sineeske simmertiid),
-				'generic' => q(Sineeske tiid),
-				'standard' => q(Sineeske standerttiid),
+				'daylight' => q#Sineeske simmertiid#,
+				'generic' => q#Sineeske tiid#,
+				'standard' => q#Sineeske standerttiid#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Tsjojbalsan simmertiid),
-				'generic' => q(Tsjojbalsan tiid),
-				'standard' => q(Tsjojbalsan standerttiid),
+				'daylight' => q#Tsjojbalsan simmertiid#,
+				'generic' => q#Tsjojbalsan tiid#,
+				'standard' => q#Tsjojbalsan standerttiid#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Krysteilânske tiid),
+				'standard' => q#Krysteilânske tiid#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Kokoseilânske tiid),
+				'standard' => q#Kokoseilânske tiid#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolombiaanske simmertiid),
-				'generic' => q(Kolombiaanske tiid),
-				'standard' => q(Kolombiaanske standerttiid),
+				'daylight' => q#Kolombiaanske simmertiid#,
+				'generic' => q#Kolombiaanske tiid#,
+				'standard' => q#Kolombiaanske standerttiid#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Cookeilânse halve simmertiid),
-				'generic' => q(Cookeilânse tiid),
-				'standard' => q(Cookeilânse standerttiid),
+				'daylight' => q#Cookeilânse halve simmertiid#,
+				'generic' => q#Cookeilânse tiid#,
+				'standard' => q#Cookeilânse standerttiid#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kubaanske simmertiid),
-				'generic' => q(Kubaanske tiid),
-				'standard' => q(Kubaanske standerttiid),
+				'daylight' => q#Kubaanske simmertiid#,
+				'generic' => q#Kubaanske tiid#,
+				'standard' => q#Kubaanske standerttiid#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Davis tiid),
+				'standard' => q#Davis tiid#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Dumont-d’Urville tiid),
+				'standard' => q#Dumont-d’Urville tiid#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(East-Timorese tiid),
+				'standard' => q#East-Timorese tiid#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Peaskeeilânske simmertiid),
-				'generic' => q(Peaskeeilânske tiid),
-				'standard' => q(Peaskeeilânske standerttiid),
+				'daylight' => q#Peaskeeilânske simmertiid#,
+				'generic' => q#Peaskeeilânske tiid#,
+				'standard' => q#Peaskeeilânske standerttiid#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ecuadoraanske tiid),
+				'standard' => q#Ecuadoraanske tiid#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -7061,7 +7059,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q(Ierse simmertiid),
+				'daylight' => q#Ierse simmertiid#,
 			},
 		},
 		'Europe/Helsinki' => {
@@ -7076,7 +7074,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Londen#,
 			long => {
-				'daylight' => q(Britse simmertiid),
+				'daylight' => q#Britse simmertiid#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -7120,144 +7118,144 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Midden-Europeeske simmertiid),
-				'generic' => q(Midden-Europeeske tiid),
-				'standard' => q(Midden-Europeeske standerttiid),
+				'daylight' => q#Midden-Europeeske simmertiid#,
+				'generic' => q#Midden-Europeeske tiid#,
+				'standard' => q#Midden-Europeeske standerttiid#,
 			},
 			short => {
-				'daylight' => q(CEST),
-				'generic' => q(CET),
-				'standard' => q(CET),
+				'daylight' => q#CEST#,
+				'generic' => q#CET#,
+				'standard' => q#CET#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(East-Europeeske simmertiid),
-				'generic' => q(East-Europeeske tiid),
-				'standard' => q(East-Europeeske standerttiid),
+				'daylight' => q#East-Europeeske simmertiid#,
+				'generic' => q#East-Europeeske tiid#,
+				'standard' => q#East-Europeeske standerttiid#,
 			},
 			short => {
-				'daylight' => q(EEST),
-				'generic' => q(EET),
-				'standard' => q(EET),
+				'daylight' => q#EEST#,
+				'generic' => q#EET#,
+				'standard' => q#EET#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(West-Europeeske simmertiid),
-				'generic' => q(West-Europeeske tiid),
-				'standard' => q(West-Europeeske standerttiid),
+				'daylight' => q#West-Europeeske simmertiid#,
+				'generic' => q#West-Europeeske tiid#,
+				'standard' => q#West-Europeeske standerttiid#,
 			},
 			short => {
-				'daylight' => q(WEST),
-				'generic' => q(WET),
-				'standard' => q(WET),
+				'daylight' => q#WEST#,
+				'generic' => q#WET#,
+				'standard' => q#WET#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Falklâneilânske simmertiid),
-				'generic' => q(Falklâneilânske tiid),
-				'standard' => q(Falklâneilânske standerttiid),
+				'daylight' => q#Falklâneilânske simmertiid#,
+				'generic' => q#Falklâneilânske tiid#,
+				'standard' => q#Falklâneilânske standerttiid#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Fijyske simmertiid),
-				'generic' => q(Fijyske tiid),
-				'standard' => q(Fijyske standerttiid),
+				'daylight' => q#Fijyske simmertiid#,
+				'generic' => q#Fijyske tiid#,
+				'standard' => q#Fijyske standerttiid#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Frâns-Guyaanske tiid),
+				'standard' => q#Frâns-Guyaanske tiid#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Frânske Súdlike en Antarctyske tiid),
+				'standard' => q#Frânske Súdlike en Antarctyske tiid#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwich Mean Time),
+				'standard' => q#Greenwich Mean Time#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Galapagoseilânske tiid),
+				'standard' => q#Galapagoseilânske tiid#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Gambiereilânske tiid),
+				'standard' => q#Gambiereilânske tiid#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Georgyske simmertiid),
-				'generic' => q(Georgyske tiid),
-				'standard' => q(Georgyske standerttiid),
+				'daylight' => q#Georgyske simmertiid#,
+				'generic' => q#Georgyske tiid#,
+				'standard' => q#Georgyske standerttiid#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Gilberteilânske tiid),
+				'standard' => q#Gilberteilânske tiid#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(East-Groenlânske simmertiid),
-				'generic' => q(East-Groenlânske tiid),
-				'standard' => q(East-Groenlânske standerttiid),
+				'daylight' => q#East-Groenlânske simmertiid#,
+				'generic' => q#East-Groenlânske tiid#,
+				'standard' => q#East-Groenlânske standerttiid#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(West-Groenlânske simmertiid),
-				'generic' => q(West-Groenlânske tiid),
-				'standard' => q(West-Groenlânske standerttiid),
+				'daylight' => q#West-Groenlânske simmertiid#,
+				'generic' => q#West-Groenlânske tiid#,
+				'standard' => q#West-Groenlânske standerttiid#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Guamese standerttiid),
+				'standard' => q#Guamese standerttiid#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Golf standerttiid),
+				'standard' => q#Golf standerttiid#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Guyaanske tiid),
+				'standard' => q#Guyaanske tiid#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Hawaii-Aleoetyske simmertiid),
-				'generic' => q(Hawaii-Aleoetyske tiid),
-				'standard' => q(Hawaii-Aleoetyske standerttiid),
+				'daylight' => q#Hawaii-Aleoetyske simmertiid#,
+				'generic' => q#Hawaii-Aleoetyske tiid#,
+				'standard' => q#Hawaii-Aleoetyske standerttiid#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Hongkongse simmertiid),
-				'generic' => q(Hongkongse tiid),
-				'standard' => q(Hongkongse standerttiid),
+				'daylight' => q#Hongkongse simmertiid#,
+				'generic' => q#Hongkongse tiid#,
+				'standard' => q#Hongkongse standerttiid#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Hovd simmertiid),
-				'generic' => q(Hovd tiid),
-				'standard' => q(Hovd standerttiid),
+				'daylight' => q#Hovd simmertiid#,
+				'generic' => q#Hovd tiid#,
+				'standard' => q#Hovd standerttiid#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Yndiaaske tiid),
+				'standard' => q#Yndiaaske tiid#,
 			},
 		},
 		'Indian/Chagos' => {
@@ -7280,250 +7278,250 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Yndyske Oceaan-tiid),
+				'standard' => q#Yndyske Oceaan-tiid#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Yndochinese tiid),
+				'standard' => q#Yndochinese tiid#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Sintraal-Yndonezyske tiid),
+				'standard' => q#Sintraal-Yndonezyske tiid#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(East-Yndonezyske tiid),
+				'standard' => q#East-Yndonezyske tiid#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(West-Yndonezyske tiid),
+				'standard' => q#West-Yndonezyske tiid#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Iraanske simmertiid),
-				'generic' => q(Iraanske tiid),
-				'standard' => q(Iraanske standerttiid),
+				'daylight' => q#Iraanske simmertiid#,
+				'generic' => q#Iraanske tiid#,
+				'standard' => q#Iraanske standerttiid#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkoetsk-simmertiid),
-				'generic' => q(Irkoetsk-tiid),
-				'standard' => q(Irkoetsk-standerttiid),
+				'daylight' => q#Irkoetsk-simmertiid#,
+				'generic' => q#Irkoetsk-tiid#,
+				'standard' => q#Irkoetsk-standerttiid#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Israëlyske simmertiid),
-				'generic' => q(Israëlyske tiid),
-				'standard' => q(Israëlyske standerttiid),
+				'daylight' => q#Israëlyske simmertiid#,
+				'generic' => q#Israëlyske tiid#,
+				'standard' => q#Israëlyske standerttiid#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japanske simmertiid),
-				'generic' => q(Japanske tiid),
-				'standard' => q(Japanske standerttiid),
+				'daylight' => q#Japanske simmertiid#,
+				'generic' => q#Japanske tiid#,
+				'standard' => q#Japanske standerttiid#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Petropavlovsk-Kamtsjatski-simmertiid),
-				'generic' => q(Petropavlovsk-Kamtsjatski-tiid),
-				'standard' => q(Petropavlovsk-Kamtsjatski-standerttiid),
+				'daylight' => q#Petropavlovsk-Kamtsjatski-simmertiid#,
+				'generic' => q#Petropavlovsk-Kamtsjatski-tiid#,
+				'standard' => q#Petropavlovsk-Kamtsjatski-standerttiid#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(East-Kazachse tiid),
+				'standard' => q#East-Kazachse tiid#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(West-Kazachse tiid),
+				'standard' => q#West-Kazachse tiid#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Koreaanske simmertiid),
-				'generic' => q(Koreaanske tiid),
-				'standard' => q(Koreaanske standerttiid),
+				'daylight' => q#Koreaanske simmertiid#,
+				'generic' => q#Koreaanske tiid#,
+				'standard' => q#Koreaanske standerttiid#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Kosraese tiid),
+				'standard' => q#Kosraese tiid#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnojarsk-simmertiid),
-				'generic' => q(Krasnojarsk-tiid),
-				'standard' => q(Krasnojarsk-standerttiid),
+				'daylight' => q#Krasnojarsk-simmertiid#,
+				'generic' => q#Krasnojarsk-tiid#,
+				'standard' => q#Krasnojarsk-standerttiid#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Kirgizyske tiid),
+				'standard' => q#Kirgizyske tiid#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Lanka-tiid),
+				'standard' => q#Lanka-tiid#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Line-eilânske tiid),
+				'standard' => q#Line-eilânske tiid#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Lord Howe-eilânske simmertiid),
-				'generic' => q(Lord Howe-eilânske tiid),
-				'standard' => q(Lord Howe-eilânske standerttiid),
+				'daylight' => q#Lord Howe-eilânske simmertiid#,
+				'generic' => q#Lord Howe-eilânske tiid#,
+				'standard' => q#Lord Howe-eilânske standerttiid#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Macause simmertiid),
-				'generic' => q(Macause tiid),
-				'standard' => q(Macause standerttiid),
+				'daylight' => q#Macause simmertiid#,
+				'generic' => q#Macause tiid#,
+				'standard' => q#Macause standerttiid#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Macquarie-eilânske tiid),
+				'standard' => q#Macquarie-eilânske tiid#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadan-simmertiid),
-				'generic' => q(Magadan-tiid),
-				'standard' => q(Magadan-standerttiid),
+				'daylight' => q#Magadan-simmertiid#,
+				'generic' => q#Magadan-tiid#,
+				'standard' => q#Magadan-standerttiid#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Maleisyske tiid),
+				'standard' => q#Maleisyske tiid#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Maldivyske tiid),
+				'standard' => q#Maldivyske tiid#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Marquesaseilânske tiid),
+				'standard' => q#Marquesaseilânske tiid#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Marshalleilânske tiid),
+				'standard' => q#Marshalleilânske tiid#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mauritiaanske simmertiid),
-				'generic' => q(Mauritiaanske tiid),
-				'standard' => q(Mauritiaanske standerttiid),
+				'daylight' => q#Mauritiaanske simmertiid#,
+				'generic' => q#Mauritiaanske tiid#,
+				'standard' => q#Mauritiaanske standerttiid#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Mawson tiid),
+				'standard' => q#Mawson tiid#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulaanbaatar simmertiid),
-				'generic' => q(Ulaanbaatar tiid),
-				'standard' => q(Ulaanbaatar standerttiid),
+				'daylight' => q#Ulaanbaatar simmertiid#,
+				'generic' => q#Ulaanbaatar tiid#,
+				'standard' => q#Ulaanbaatar standerttiid#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskou-simmertiid),
-				'generic' => q(Moskou-tiid),
-				'standard' => q(Moskou-standerttiid),
+				'daylight' => q#Moskou-simmertiid#,
+				'generic' => q#Moskou-tiid#,
+				'standard' => q#Moskou-standerttiid#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Myanmarese tiid),
+				'standard' => q#Myanmarese tiid#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Nauruaanske tiid),
+				'standard' => q#Nauruaanske tiid#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Nepalese tiid),
+				'standard' => q#Nepalese tiid#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Nij-Kaledonyske simmertiid),
-				'generic' => q(Nij-Kaledonyske tiid),
-				'standard' => q(Nij-Kaledonyske standerttiid),
+				'daylight' => q#Nij-Kaledonyske simmertiid#,
+				'generic' => q#Nij-Kaledonyske tiid#,
+				'standard' => q#Nij-Kaledonyske standerttiid#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Nij-Seelânske simmertiid),
-				'generic' => q(Nij-Seelânske tiid),
-				'standard' => q(Nij-Seelânske standerttiid),
+				'daylight' => q#Nij-Seelânske simmertiid#,
+				'generic' => q#Nij-Seelânske tiid#,
+				'standard' => q#Nij-Seelânske standerttiid#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Newfoundlânske-simmertiid),
-				'generic' => q(Newfoundlânske-tiid),
-				'standard' => q(Newfoundlânske-standerttiid),
+				'daylight' => q#Newfoundlânske-simmertiid#,
+				'generic' => q#Newfoundlânske-tiid#,
+				'standard' => q#Newfoundlânske-standerttiid#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Niuese tiid),
+				'standard' => q#Niuese tiid#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Norfolkeilânske tiid),
+				'standard' => q#Norfolkeilânske tiid#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Fernando de Noronha-simmertiid),
-				'generic' => q(Fernando de Noronha-tiid),
-				'standard' => q(Fernando de Noronha-standerttiid),
+				'daylight' => q#Fernando de Noronha-simmertiid#,
+				'generic' => q#Fernando de Noronha-tiid#,
+				'standard' => q#Fernando de Noronha-standerttiid#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Noardlike Mariaanske tiid),
+				'standard' => q#Noardlike Mariaanske tiid#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Novosibirsk-simmertiid),
-				'generic' => q(Novosibirsk-tiid),
-				'standard' => q(Novosibirsk-standerttiid),
+				'daylight' => q#Novosibirsk-simmertiid#,
+				'generic' => q#Novosibirsk-tiid#,
+				'standard' => q#Novosibirsk-standerttiid#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omsk-simmertiid),
-				'generic' => q(Omsk-tiid),
-				'standard' => q(Omsk-standerttiid),
+				'daylight' => q#Omsk-simmertiid#,
+				'generic' => q#Omsk-tiid#,
+				'standard' => q#Omsk-standerttiid#,
 			},
 		},
 		'Pacific/Easter' => {
@@ -7552,245 +7550,245 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Pakistaanske simmertiid),
-				'generic' => q(Pakistaanske tiid),
-				'standard' => q(Pakistaanske standerttiid),
+				'daylight' => q#Pakistaanske simmertiid#,
+				'generic' => q#Pakistaanske tiid#,
+				'standard' => q#Pakistaanske standerttiid#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Belause tiid),
+				'standard' => q#Belause tiid#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Papoea-Nij-Guineeske tiid),
+				'standard' => q#Papoea-Nij-Guineeske tiid#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraguayaanske simmertiid),
-				'generic' => q(Paraguayaanske tiid),
-				'standard' => q(Paraguayaanske standerttiid),
+				'daylight' => q#Paraguayaanske simmertiid#,
+				'generic' => q#Paraguayaanske tiid#,
+				'standard' => q#Paraguayaanske standerttiid#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peruaanske simmertiid),
-				'generic' => q(Peruaanske tiid),
-				'standard' => q(Peruaanske standerttiid),
+				'daylight' => q#Peruaanske simmertiid#,
+				'generic' => q#Peruaanske tiid#,
+				'standard' => q#Peruaanske standerttiid#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Filipijnse simmertiid),
-				'generic' => q(Filipijnse tiid),
-				'standard' => q(Filipijnse standerttiid),
+				'daylight' => q#Filipijnse simmertiid#,
+				'generic' => q#Filipijnse tiid#,
+				'standard' => q#Filipijnse standerttiid#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Phoenixeilânske tiid),
+				'standard' => q#Phoenixeilânske tiid#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Saint Pierre en Miquelon-simmertiid),
-				'generic' => q(Saint Pierre en Miquelon-tiid),
-				'standard' => q(Saint Pierre en Miquelon-standerttiid),
+				'daylight' => q#Saint Pierre en Miquelon-simmertiid#,
+				'generic' => q#Saint Pierre en Miquelon-tiid#,
+				'standard' => q#Saint Pierre en Miquelon-standerttiid#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Pitcairneillânske tiid),
+				'standard' => q#Pitcairneillânske tiid#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Pohnpei tiid),
+				'standard' => q#Pohnpei tiid#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Qyzylorda-simmertiid),
-				'generic' => q(Qyzylorda-tiid),
-				'standard' => q(Qyzylorda-standerttiid),
+				'daylight' => q#Qyzylorda-simmertiid#,
+				'generic' => q#Qyzylorda-tiid#,
+				'standard' => q#Qyzylorda-standerttiid#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Réunionse tiid),
+				'standard' => q#Réunionse tiid#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Rothera tiid),
+				'standard' => q#Rothera tiid#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Sachalin-simmertiid),
-				'generic' => q(Sachalin-tiid),
-				'standard' => q(Sachalin-standerttiid),
+				'daylight' => q#Sachalin-simmertiid#,
+				'generic' => q#Sachalin-tiid#,
+				'standard' => q#Sachalin-standerttiid#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samara-simmertiid),
-				'generic' => q(Samara-tiid),
-				'standard' => q(Samara-standerttiid),
+				'daylight' => q#Samara-simmertiid#,
+				'generic' => q#Samara-tiid#,
+				'standard' => q#Samara-standerttiid#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samoaanske simmertiid),
-				'generic' => q(Samoaanske tiid),
-				'standard' => q(Samoaanske standerttiid),
+				'daylight' => q#Samoaanske simmertiid#,
+				'generic' => q#Samoaanske tiid#,
+				'standard' => q#Samoaanske standerttiid#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Seychelse tiid),
+				'standard' => q#Seychelse tiid#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Singaporese standerttiid),
+				'standard' => q#Singaporese standerttiid#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Salomonseilânske tiid),
+				'standard' => q#Salomonseilânske tiid#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Sûd-Georgyske tiid),
+				'standard' => q#Sûd-Georgyske tiid#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Surinaamske tiid),
+				'standard' => q#Surinaamske tiid#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Syowa tiid),
+				'standard' => q#Syowa tiid#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Tahitiaanske tiid),
+				'standard' => q#Tahitiaanske tiid#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taipei simmertiid),
-				'generic' => q(Taipei tiid),
-				'standard' => q(Taipei standerttiid),
+				'daylight' => q#Taipei simmertiid#,
+				'generic' => q#Taipei tiid#,
+				'standard' => q#Taipei standerttiid#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tadzjiekse tiid),
+				'standard' => q#Tadzjiekse tiid#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Tokelau-eilânske tiid),
+				'standard' => q#Tokelau-eilânske tiid#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tongaanske simmertiid),
-				'generic' => q(Tongaanske tiid),
-				'standard' => q(Tongaanske standerttiid),
+				'daylight' => q#Tongaanske simmertiid#,
+				'generic' => q#Tongaanske tiid#,
+				'standard' => q#Tongaanske standerttiid#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Chuukse tiid),
+				'standard' => q#Chuukse tiid#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Turkmeense simmertiid),
-				'generic' => q(Turkmeense tiid),
-				'standard' => q(Turkmeense standerttiid),
+				'daylight' => q#Turkmeense simmertiid#,
+				'generic' => q#Turkmeense tiid#,
+				'standard' => q#Turkmeense standerttiid#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Tuvaluaanske tiid),
+				'standard' => q#Tuvaluaanske tiid#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Uruguayaanske simmertiid),
-				'generic' => q(Uruguayaanske tiid),
-				'standard' => q(Uruguayaanske standerttiid),
+				'daylight' => q#Uruguayaanske simmertiid#,
+				'generic' => q#Uruguayaanske tiid#,
+				'standard' => q#Uruguayaanske standerttiid#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Oezbeekse simmertiid),
-				'generic' => q(Oezbeekse tiid),
-				'standard' => q(Oezbeekse standerttiid),
+				'daylight' => q#Oezbeekse simmertiid#,
+				'generic' => q#Oezbeekse tiid#,
+				'standard' => q#Oezbeekse standerttiid#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Vanuatuaanske simmertiid),
-				'generic' => q(Vanuatuaanske tiid),
-				'standard' => q(Vanuatuaanske standerttiid),
+				'daylight' => q#Vanuatuaanske simmertiid#,
+				'generic' => q#Vanuatuaanske tiid#,
+				'standard' => q#Vanuatuaanske standerttiid#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Fenezolaanske tiid),
+				'standard' => q#Fenezolaanske tiid#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Vladivostok-simmertiid),
-				'generic' => q(Vladivostok-tiid),
-				'standard' => q(Vladivostok-standerttiid),
+				'daylight' => q#Vladivostok-simmertiid#,
+				'generic' => q#Vladivostok-tiid#,
+				'standard' => q#Vladivostok-standerttiid#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Wolgograd-simmertiid),
-				'generic' => q(Wolgograd-tiid),
-				'standard' => q(Wolgograd-standerttiid),
+				'daylight' => q#Wolgograd-simmertiid#,
+				'generic' => q#Wolgograd-tiid#,
+				'standard' => q#Wolgograd-standerttiid#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Vostok tiid),
+				'standard' => q#Vostok tiid#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Wake-eilânske tiid),
+				'standard' => q#Wake-eilânske tiid#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Wallis en Futunase tiid),
+				'standard' => q#Wallis en Futunase tiid#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakoetsk-simmertiid),
-				'generic' => q(Jakoetsk-tiid),
-				'standard' => q(Jakoetsk-standerttiid),
+				'daylight' => q#Jakoetsk-simmertiid#,
+				'generic' => q#Jakoetsk-tiid#,
+				'standard' => q#Jakoetsk-standerttiid#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekaterinenburg-simmertiid),
-				'generic' => q(Jekaterinenburg-tiid),
-				'standard' => q(Jekaterinenburg-standerttiid),
+				'daylight' => q#Jekaterinenburg-simmertiid#,
+				'generic' => q#Jekaterinenburg-tiid#,
+				'standard' => q#Jekaterinenburg-standerttiid#,
 			},
 		},
 	 } }

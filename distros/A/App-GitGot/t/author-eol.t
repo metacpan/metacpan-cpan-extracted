@@ -15,6 +15,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/git-got',
     'bin/got',
     'bin/got-complete',
     'lib/App/GitGot.pm',

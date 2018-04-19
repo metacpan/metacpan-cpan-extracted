@@ -19,9 +19,9 @@ provided helpfull feedback.
 
 Secondary goals:
 * Make mixing of classes work, like in:
-	$x = Math::BigFloat->new(10);
-	$y = Math::BigInt->new(2);
-	$z = $x / $y;			# $z = Math::BigFloat = 5
+        $x = Math::BigFloat->new(10);
+        $y = Math::BigInt->new(2);
+        $z = $x / $y;                   # $z = Math::BigFloat = 5
 * Make auto-upgrading/downgrading work
 
   See also BUGS.

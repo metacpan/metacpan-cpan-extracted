@@ -8,6 +8,8 @@ t/00-load.t
 t/01-simple.t
 t/02-regex.t
 t/03-code.t
+t/04-array.t
+t/05-hash.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

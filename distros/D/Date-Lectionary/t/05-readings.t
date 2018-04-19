@@ -2,7 +2,7 @@
 use v5.22;
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Exception;
 
 use Time::Piece;
@@ -86,6 +86,16 @@ is(
     ${ $testReading->readings }[3],
     'Luke 21:5-19',
 'The fourth reading for the Sunday closest to November 16 in the RCL lectionary for year C should be Luke 21:5-19.'
+);
+
+$testReading = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2018-04-22", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    ${ $testReading->readings }[0],
+    'Acts (4:23-31); 4:32-37 or Ezekiel 34:1-10',
+'The first reading for the Fourth Sunday of Easter in the ACNA lectionary for year B should be Acts (4:23-31); 4:32-37 or Ezekiel 34:1-10'
 );
 
 #Testing readings on a day with multiple services; i.e. Christmas Day

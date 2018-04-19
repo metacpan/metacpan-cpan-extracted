@@ -5,6 +5,7 @@ use 5.010001;
 
 use Pandoc::Elements;
 use Scalar::Util qw(blessed reftype);
+use JSON::PP;
 
 # packages and methods
 
@@ -17,13 +18,8 @@ use Scalar::Util qw(blessed reftype);
     }
 
     sub value {
-        my $meta = shift;
-        if (@_) {
-            return $meta->{ $_[0] } ? $meta->{ $_[0] }->metavalue : undef;
-        }
-        else {
-            return { map { $_ => $meta->{$_}->metavalue } keys %$meta };
-        }
+        my $map = { c => shift };
+        Pandoc::Document::MetaMap::value( $map, @_ )
     }
 }
 
@@ -32,13 +28,23 @@ use Scalar::Util qw(blessed reftype);
     package Pandoc::Document::Meta;
     our @ISA = ('Pandoc::Document::Element');
     sub is_meta { 1 }
-    sub value   { shift->metavalue(@_) }
+    sub value { shift->value(@_) }
 }
 
-# functions
+# methods
 
-sub Pandoc::Document::MetaString::metavalue {
-    $_[0]->{c};
+sub _value_args {
+    my $content = shift->{c};
+    my ($pointer, %opts) = @_ % 2 ? @_ : (undef, @_);
+
+    $opts{pointer} = $pointer // $opts{pointer} // '';
+
+    return ($content, %opts);
+}
+
+sub Pandoc::Document::MetaString::value {
+    my ($content, %opts) = _value_args(@_);
+    $opts{pointer} eq '' ? $content : undef;
 }
 
 sub Pandoc::Document::MetaBool::set_content {
@@ -52,25 +58,67 @@ sub Pandoc::Document::MetaBool::TO_JSON {
     };
 }
 
-sub Pandoc::Document::MetaBool::metavalue {
-    $_[0]->{c} ? 1 : 0;
+sub Pandoc::Document::MetaBool::value {
+    my ($content, %opts) = _value_args(@_);
+    return if $opts{pointer} ne '';
+
+    if (($opts{boolean} // '') eq 'JSON::PP') {
+        $content ? JSON::true() : JSON::false();
+    } else {
+        $content ? 1 : 0;
+    }
 }
 
-sub Pandoc::Document::MetaList::metavalue {
-    [ map { $_->metavalue } @{ $_[0]->{c} } ];
+sub Pandoc::Document::MetaMap::value {
+    my ($map, %opts) = _value_args(@_);
+
+    if ($opts{pointer} eq '') {
+        return { map { $_ => $map->{$_}->value(%opts) } keys %$map };
+    } else {
+        my ($key, @fields) = split '/', $opts{pointer};
+        $key =~ s!~1!/!g;
+        $key =~ s/~0/~/g;
+        $opts{pointer} = join '/', @fields;
+        return $map->{$key} ? $map->{$key}->value(%opts) : undef;
+    }
 }
 
-sub Pandoc::Document::MetaMap::metavalue {
-    my $map = $_[0]->{c};
-    return { map { $_ => $map->{$_}->metavalue } keys %$map };
+sub Pandoc::Document::MetaList::value {
+    my ($content, %opts) = _value_args(@_);
+    if ($opts{pointer} =~ /^[1-9]*[0-9]$/) {
+        my $value = $content->[$opts{pointer}];
+        defined $value ? $value->value(%opts, pointer => '') : undef;
+    } elsif ($opts{pointer} eq '') {
+        [ map { $_->value(%opts) } @$content ]
+    } else {
+        undef
+    }
 }
 
-sub Pandoc::Document::MetaInlines::metavalue {
-    join '', map { $_->string } @{ $_[0]->{c} };
+sub Pandoc::Document::MetaInlines::value {
+    my ($content, %opts) = _value_args(@_);
+    return if $opts{pointer} ne '';
+
+    if ($opts{element} // '' eq 'keep') {
+        $content;
+    } else {
+        join '', map { $_->string } @$content;
+    }
 }
 
-sub Pandoc::Document::MetaBlocks::metavalue {
-    [ map { $_->string } @{ $_[0]->{c} } ];
+sub Pandoc::Document::MetaBlocks::string {
+    join "\n\n", map { $_->string } @{$_[0]->content};
+}
+
+sub Pandoc::Document::MetaBlocks::value {
+    my ($content, %opts) = _value_args(@_);
+    return if $opts{pointer} ne '';
+
+    if ($opts{element} // '' eq 'keep') {
+        $content;
+    } else {
+        $_[0]->string;
+    }
 }
 
 1;
@@ -110,21 +158,36 @@ Perl module L<Pandoc::Elements> exports functions to construct metadata
 elements in the internal document model and the general helper function
 C<metadata>.
 
-=head1 METADATA ELEMENTS
+=head1 COMMON METHODS
 
-All C<Meta...> elements support common element methods (C<to_json>, C<name>,
-...) and return true for method C<is_meta>. Method C<content> returns the
-blessed data structure and C<value> returns an unblessed copy:
+All Metadata Elements support L<common element methods|Pandoc::Elements/COMMON
+METHODS> (C<name>, C<to_json>, C<string>, ...) and return true for method
+C<is_meta>.
 
-  $doc->meta->{author}->content->[0];   # MetaInlines
-  $doc->meta->value('author')->[0];     # plain string
-
-=head2 value( [ $field ] )
+=head2 value( [ $pointer ] [ %options ] )
 
 Called without an argument this method returns an unblessed deep copy of the
-metadata elements or C<undef> if the given (sub)field does not exist.
+metadata element. JSON Pointer (L<RFC 6901|http://tools.ietf.org/html/rfc6901>)
+expressions can be used to select subfields.  Note that JSON Pointer escapes
+slash as C<~1> and character C<~> as C<~0>. Neither URI Fragment syntax nor
+empty strings as field names are supported.
 
-Can also be called with the alias C<metavalue>.
+  $doc->value;                  # full metadata
+  $doc->value('author');        # author field
+  $doc->value('author/name');   # name subfield of author field
+  $doc->value('author/0');      # first author field
+  $doc->value('author/0/name'); # name subfield of first author field
+  $doc->value('~1~0');          # metadata field '/~'
+
+Returns C<undef> if the selected field does not exist.
+
+Instances of MetaInlines and MetaBlocks are stringified by unless option
+C<element> is set to C<keep>.
+
+Setting option C<boolean> to C<JSON::PP> will return C<JSON::PP:true>
+or C<JSON::PP::false> for L<MetaBool|/MetaBool> instances.
+
+=head1 METADATA ELEMENTS
 
 =head2 MetaString
 
@@ -169,5 +232,8 @@ metadata.
 Container for a list of L<blocks|Pandoc::Elements/BLOCK ELEMENTS> in metadata.
 
     MetaBlocks [ @blocks ]
+
+The C<string> method concatenates all stringified content blocks separated by
+empty lines.
 
 =cut

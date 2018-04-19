@@ -1,5 +1,5 @@
 package QBit::QueryData::Function::FIELD;
-$QBit::QueryData::Function::FIELD::VERSION = '0.010';
+$QBit::QueryData::Function::FIELD::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::QueryData::Function);
@@ -8,6 +8,8 @@ sub init {
     my ($self) = @_;
 
     $self->SUPER::init();
+
+    return FALSE if $self->has_errors();
 
     if ($self->args->[0] eq '') {
         $self->{'PATH'}           = $self->path;
@@ -19,9 +21,13 @@ sub init {
 }
 
 sub process {
-    my ($self, $row) = @_;
+    my ($self) = @_;
 
-    return $self->qd->get_field_value_by_path($row, $row, undef, @{$self->{'PATH'}});
+    return
+        '        $new_row->{'
+      . $self->qd->quote($self->field) . '} = '
+      . $self->qd->_get_field_code_by_path('$row', $self->{'PATH'}) . ';
+';
 }
 
 sub check {TRUE}

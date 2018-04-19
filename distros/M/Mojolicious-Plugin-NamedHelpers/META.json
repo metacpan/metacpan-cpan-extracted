@@ -1,0 +1,72 @@
+{
+   "abstract" : "Mojolicious Plugin",
+   "author" : [
+      "Vidar Tyldum <vidar@tyldum.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-NamedHelpers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "Sub::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::NamedHelpers" : {
+         "file" : "lib/Mojolicious/Plugin/NamedHelpers.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tyldum/Mojolicious-Plugin-NamedHelpers/issues"
+      },
+      "homepage" : "https://github.com/tyldum/Mojolicious-Plugin-NamedHelpers",
+      "repository" : {
+         "url" : "git://github.com/tyldum/Mojolicious-Plugin-NamedHelpers.git",
+         "web" : "https://github.com/tyldum/Mojolicious-Plugin-NamedHelpers"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:TYLDUM",
+   "x_contributors" : [
+      "Dan Book <grinnz@grinnz.com>"
+   ]
+}

@@ -31,4 +31,4 @@ resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.12.5
+version: v0.12.7

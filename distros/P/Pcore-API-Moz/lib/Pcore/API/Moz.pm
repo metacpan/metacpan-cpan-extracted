@@ -1,6 +1,6 @@
-package Pcore::API::Moz v0.11.1;
+package Pcore::API::Moz v0.11.2;
 
-use Pcore -dist, -class, -result;
+use Pcore -dist, -class, -res;
 use Pcore::API::Moz::Account;
 
 has proxy_pool => ( is => 'ro', isa => Maybe [ InstanceOf ['Pcore::API::ProxyPool'] ] );
@@ -49,19 +49,19 @@ sub is_ready ($self) {
 
 sub get_url_metrics ( $self, $domains, $metric, $cb ) {
     if ( $domains->@* > 10 ) {
-        $cb->( result [ 400, q[Max. 10 domains are allowed per search request] ] );
+        $cb->( res [ 400, q[Max. 10 domains are allowed per search request] ] );
 
         return;
     }
 
     if ( !$self->{has_valid_accounts} ) {
-        $cb->( result [ 600, q[No moz accounts] ] );
+        $cb->( res [ 600, q[No moz accounts] ] );
 
         return;
     }
 
     if ( !$self->{valid_accounts}->@* || !$self->{valid_accounts}->[0]->is_ready ) {
-        $cb->( result [ 601, q[API is busy] ] );
+        $cb->( res [ 601, q[API is busy] ] );
 
         return;
     }
@@ -77,7 +77,7 @@ sub get_url_metrics ( $self, $domains, $metric, $cb ) {
                 # 401 - invalid credentials
                 # 403 - account banned
                 # 429 - too many requests
-                if ( $res->status == 401 || $res->status == 403 || $res->status == 429 ) {
+                if ( $res->{status} == 401 || $res->{status} == 403 || $res->{status} == 429 ) {
                     $self->{has_valid_accounts}--;
 
                     push $self->{invalid_accounts}->@*, $acc;

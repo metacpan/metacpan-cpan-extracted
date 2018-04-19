@@ -29,6 +29,7 @@ on 'test' => sub {
   requires "autodie" => "0";
   requires "lib" => "0";
   requires "utf8" => "0";
+  requires "version" => "0";
 };
 
 on 'test' => sub {
@@ -64,5 +65,4 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
 };

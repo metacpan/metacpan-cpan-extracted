@@ -9,3 +9,7 @@ Revision history for Date::Lectionary::Daily
 
  - Added author tests to ensure better distribution quality
  - Tidied up the code a little bit
+
+1.20180410 2018-04-17
+
+ - Corrected the pax headers issue in the distribution package

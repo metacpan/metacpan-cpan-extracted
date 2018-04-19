@@ -89,9 +89,21 @@ Username for authentication, defaults to $ENV{ETCD\_CLIENT\_USERNAME}
 
 Authentication credentials, defaults to $ENV{ETCD\_CLIENT\_PASSWORD}
 
+## ca\_file
+
+Path to ca\_file, defaults to $ENV{ETCD\_CLIENT\_CA\_FILE}
+
+## key\_file
+
+Path to key\_file, defaults to $ENV{ETCD\_CLIENT\_KEY\_FILE}
+
+## cert\_file
+
+Path to cert\_file, defaults to $ENV{ETCD\_CLIENT\_CERT\_FILE}
+
 ## cacert
 
-Path to cacert, defaults to $ENV{ETCD\_CERT\_FILE}
+Path to cacert, defaults to $ENV{ETCD\_CLIENT\_CACERT\_FILE}.
 
 ## ssl
 
@@ -99,7 +111,7 @@ To enable set to 1
 
 ## api\_version
 
-defaults to /v3alpha
+defaults to /v3beta
 
 ## api\_path
 
@@ -238,7 +250,7 @@ Authentication provided by this module will only work with etcd v3.3.0+
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Sam Batschelet (hexfusion).
+Copyright 2018 Sam Batschelet (hexfusion).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,0 +1,12 @@
+Revision history for Perl module Linux::Perl
+
+0.03 Web Apr 18 2018
+- Fix missing Linux::Seccomp test dependency
+- Try to fix failing tests when OS/arch are unsupported
+
+0.02 Web Apr 18 2018
+- Fix tests to report unknown architecture system calls
+  in CPAN testers.
+
+0.01 Wed Apr 18 2018
+- Initial release

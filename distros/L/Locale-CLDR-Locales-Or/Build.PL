@@ -14,7 +14,7 @@ my $builder = Module::Build->new(
         'MooX::ClassAttribute'      => '0.011',
 		'Type::Tiny'                => 0,
         'perl'                      => '5.10.1',
-        'Locale::CLDR'              => '0.29.0',
+        'Locale::CLDR'              => '0.32.0',
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
     dist_version_from   => 'lib/Locale/CLDR/Locales/Or.pm',
@@ -26,7 +26,7 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Locale-CLDR-Locales-Or-*' ],
 	configure_requires => { 'Module::Build' => '0.40' },
 	release_status => 'stable',
-	dist_abstract => 'Locale::CLDR - Data Package ( Perl localization data for Oriya )',
+	dist_abstract => 'Locale::CLDR - Data Package ( Perl localization data for Odia )',
 	meta_add => {
 		keywords => [ qw( locale CLDR locale-data-pack ) ],
 		resources => {

@@ -17,7 +17,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 my @stations = (
 
@@ -1462,7 +1462,7 @@ my @stations = (
 	[ 'KDUK',  'Duckterath',                    8001566, 7.103496,  50.984815 ],
 	[ 'SDUW',  'Dudweiler',                     8001570, 7.027351,  49.277299 ],
 	[ 'KDUL',  'Dülken',                       8001571, 6.33793,   51.257149 ],
-	[ 'EDULH', 'Dülmen',                       8000083, 7.295765,  51.827676 ],
+	[ 'EDUL',  'Dülmen',                       8000083, 7.295765,  51.827676 ],
 	[ 'KDN',   'Düren',                        8000084, 6.482451,  50.809517 ],
 	[ 'KDNS',  'Düren Annakirmesplatz',        8007818, 6.474259,  50.796237 ],
 	[ 'KDNG',  'Düren Im Großen Tal',         8007836, 6.47431,   50.83302 ],
@@ -5848,7 +5848,7 @@ my @stations = (
 	[ 'TSFS',  'Stuttgart Feuersee',            8006699, 9.166273,  48.772768 ],
 	[ 'TFL',   'Stuttgart Flughafen/Messe',     8005768, 9.19263,   48.690648 ],
 	[ 'TS',    'Stuttgart Hbf',                 8000096, 9.181635,  48.784084 ],
-	[ 'TST',   'Stuttgart Hbf (tief)',          8098096, 9.179808,  48.782999 ],
+	[ 'TS  T', 'Stuttgart Hbf (tief)',          8098096, 9.179808,  48.782999 ],
 	[ 'TSNS',  'Stuttgart Neckarpark',          8006743, 9.241595,  48.792173 ],
 	[ 'TSN',   'Stuttgart Nord',                8005767, 9.188026,  48.803769 ],
 	[ 'TSNU',  'Stuttgart Nürnberger Str.',    8004357, 9.234858,  48.806423 ],
@@ -6531,7 +6531,7 @@ my @stations = (
 	[ 'RWO',  'Wolfach',                      8006544, 8.221849,  48.293665 ],
 	[ 'TWO',  'Wolfegg',                      8006545, 9.808665,  47.824264 ],
 	[ 'LWO',  'Wolfen(Bitterfeld)',           8013335, 12.279563, 51.661159 ],
-	[ 'HWOL', 'Wolfenbüttel',                8000255, 10.532306, 52.159126 ],
+	[ 'HWOH', 'Wolfenbüttel',                8000255, 10.532306, 52.159126 ],
 	[ 'LWOR', 'Wolferode',                    8013336, 11.508752, 51.512244 ],
 	[ 'UWLH', 'Wölfershausen',               8013329, 10.436588, 50.491507 ],
 	[ 'FWOE', 'Wölfersheim-Södel',          8006529, 8.81622,   50.397335 ],
@@ -8580,7 +8580,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 DESCRIPTION
 
@@ -8684,7 +8684,7 @@ Travel::Status::DE::IRIS(3pm).
 
 Station data: Copyright (C) 2016 by DB Station&Service AG, Europaplatz 1, 10557 Berlin, Germany
 
-Lookup code: Copyright (C) 2014-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Lookup code: Copyright (C) 2014-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

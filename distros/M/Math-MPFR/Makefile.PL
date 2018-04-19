@@ -249,11 +249,11 @@ my %options = (
   },
 );
 
-my %prereq = ();
-$prereq{'Math::Decimal64'} = '0.01' if $have_decimal64;
-$prereq{'Math::Float128'}  = '0.01' if ($have_float128 && $Config{nvtype} ne '__float128');
-
-$options{PREREQ_PM} = \%prereq;
+#my %prereq = ();
+#$prereq{'Math::Decimal64'} = '0.01' if $have_decimal64;
+#$prereq{'Math::Float128'}  = '0.01' if ($have_float128 && $Config{nvtype} ne '__float128');
+#
+#$options{PREREQ_PM} = \%prereq;
 
 WriteMakefile(%options);
 

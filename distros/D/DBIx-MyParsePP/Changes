@@ -1,5 +1,11 @@
 Revision history for Perl extension DBIx::MyParsePP.
 
+0.51
+    Removed nondeterminism from t/error.t.
+    Fixed a bug in quoted hostname parsing.
+    Removed embedded patched Parse::Yapp::Driver, adding it as a prerequisite.
+    isEqual() method added for Token and Rule.
+
 0.50	
 	myconvpp.pl script removed because compiling the parser requires a patched Parse::Yapp
 	getFields() and getTables() methods added

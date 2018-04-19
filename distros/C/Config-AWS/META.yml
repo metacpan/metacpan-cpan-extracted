@@ -6,7 +6,7 @@ build_requires:
   File::Share: '0'
   File::ShareDir: '0'
   Log::Any::Adapter: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.076'
   Test2::Tools::Spec: '0'
   Test2::V0: '0'
   perl: '5.010'
@@ -15,7 +15,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,13 +24,13 @@ name: Config-AWS
 provides:
   Config::AWS:
     file: lib/Config/AWS.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Carp: '0'
   Exporter::Shiny: '0'
   Exporter::Tiny: '1'
   File::Glob: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.076'
   Ref::Util: '0'
   Scalar::Util: '0'
   perl: '5.010'
@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/Config-AWS/issues
   repository: git://gitlab.com/jjatria/Config-AWS.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = "1.500001";
+our $VERSION = '1.500002';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK = qw(
@@ -27,7 +27,7 @@ sub import {
 
 sub reduce (&@) {
   my $f = shift;
-  unless ( ref $f && eval { \&$f } ) {
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
     require Carp;
     Carp::croak("Not a subroutine reference");
   }
@@ -51,7 +51,7 @@ sub reduce (&@) {
 
 sub first (&@) {
   my $f = shift;
-  unless ( ref $f && eval { \&$f } ) {
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
     require Carp;
     Carp::croak("Not a subroutine reference");
   }
@@ -113,6 +113,11 @@ sub shuffle (@) {
 
 sub all (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   $f->() or return 0
     foreach @_;
   return 1;
@@ -120,6 +125,11 @@ sub all (&@) {
 
 sub any (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   $f->() and return 1
     foreach @_;
   return 0;
@@ -127,6 +137,11 @@ sub any (&@) {
 
 sub none (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   $f->() and return 0
     foreach @_;
   return 1;
@@ -134,6 +149,11 @@ sub none (&@) {
 
 sub notall (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   $f->() or return 1
     foreach @_;
   return 0;
@@ -189,6 +209,11 @@ sub pairvalues (@) {
 
 sub pairmap (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   if (@_ % 2) {
     warnings::warnif('misc', 'Odd number of elements in pairmap');
   }
@@ -209,6 +234,11 @@ sub pairmap (&@) {
 
 sub pairgrep (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   if (@_ % 2) {
     warnings::warnif('misc', 'Odd number of elements in pairgrep');
   }
@@ -229,6 +259,11 @@ sub pairgrep (&@) {
 
 sub pairfirst (&@) {
   my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
   if (@_ % 2) {
     warnings::warnif('misc', 'Odd number of elements in pairfirst');
   }

@@ -2,14 +2,17 @@ package Plack::Auth::SSO::CAS;
 
 use strict;
 use utf8;
+use feature qw(:5.10);
 use Data::Util qw(:check);
 use Authen::CAS::Client;
 use Moo;
 use Plack::Request;
 use Plack::Session;
 use Plack::Auth::SSO::ResponseParser::CAS;
+use XML::LibXML::XPathContext;
+use XML::LibXML;
 
-our $VERSION = "0.0132";
+our $VERSION = "0.0133";
 
 with "Plack::Auth::SSO";
 
@@ -18,30 +21,53 @@ has cas_url => (
     isa => sub { is_string($_[0]) or die("cas_url should be string"); },
     required => 1
 );
-has cas => (
-    is => "ro",
-    lazy => 1,
-    builder => "_build_cas",
-    init_arg => undef
-);
-has response_parser => (
-    is => "ro",
-    lazy => 1,
-    builder => "_build_response_parser",
-    init_arg => undef
-);
 
-sub _build_cas {
-    my $self = $_[0];
-    Authen::CAS::Client->new($self->cas_url());
-}
-sub _build_response_parser {
-    Plack::Auth::SSO::ResponseParser::CAS->new();
+sub parse_failure {
+
+    my ( $self, $obj ) = @_;
+
+    my $xpath;
+
+    if ( is_instance( $obj, "XML::LibXML" ) ) {
+
+        $xpath = XML::LibXML::XPathContext->new( $obj );
+
+    }
+    else {
+
+        $xpath = XML::LibXML::XPathContext->new(
+            XML::LibXML->load_xml( string => $obj )
+        );
+
+    }
+
+    $xpath->registerNs( "cas", "http://www.yale.edu/tp/cas" );
+
+    my @nodes = $xpath->find( "/cas:serviceResponse/cas:authenticationFailure" )->get_nodelist();
+
+    if ( @nodes ) {
+
+        return +{
+            type => $nodes[0]->findvalue( '@code' ),
+            content => $nodes[0]->textContent(),
+            package => __PACKAGE__,
+            package_id => $self->id()
+        };
+
+    }
+    else {
+
+        return undef;
+
+    }
 }
 
 sub to_app {
     my $self = $_[0];
     sub {
+
+        state $response_parser = Plack::Auth::SSO::ResponseParser::CAS->new();
+        state $cas = Authen::CAS::Client->new($self->cas_url());
 
         my $env = $_[0];
 
@@ -54,10 +80,7 @@ sub to_app {
         #already got here before
         if (is_hash_ref($auth_sso)) {
 
-            return [
-                302, [Location => $self->uri_for($self->authorization_path)],
-                []
-            ];
+            return $self->redirect_to_authorization();
 
         }
 
@@ -74,8 +97,6 @@ sub to_app {
 
         if (is_string($ticket)) {
 
-            my $cas = $self->cas();
-
             my $r = $cas->service_validate($service, $ticket);
 
             if ($r->is_success) {
@@ -86,7 +107,7 @@ sub to_app {
                     $session,
                     {
                         %{
-                            $self->response_parser()->parse( $doc )
+                            $response_parser->parse( $doc )
                         },
                         package    => __PACKAGE__,
                         package_id => $self->id,
@@ -97,29 +118,40 @@ sub to_app {
                     }
                 );
 
-                return [
-                    302,
-                    [Location => $self->uri_for($self->authorization_path)],
-                    []
-                ];
+                return $self->redirect_to_authorization();
 
             }
             #e.g. "Can't connect to localhost:8443 (certificate verify failed)"
             elsif( $r->is_error() ) {
 
-                return [
-                    500,
-                    [ "Content-Type" => "text/html" ],
-                    [ $r->doc() ]
-                ];
+                $self->set_auth_sso_error( $session, {
+                    package    => __PACKAGE__,
+                    package_id => $self->id,
+                    type => "unknown",
+                    content => $r->doc
+                });
+                return $self->redirect_to_error();
 
             }
             #$r->is_failure() -> authenticationFailure: return to authentication url
+            else {
+
+                my $failure = $self->parse_failure( $r->doc );
+
+                if ( $failure->{type} ne "INVALID_TICKET" ) {
+
+
+                    $self->set_auth_sso_error( $session, $failure );
+                    return $self->redirect_to_error();
+
+                }
+
+            }
 
         }
 
         #no ticket or ticket validation failed
-        my $login_url = $self->cas()->login_url($service)->as_string;
+        my $login_url = $cas->login_url($service)->as_string;
 
         [302, [Location => $login_url], []];
 
@@ -144,7 +176,8 @@ Plack::Auth::SSO::CAS - implementation of Plack::Auth::SSO for CAS
 
             session_key => "auth_sso",
             uri_base => "http://localhost:5000",
-            authorization_path => "/auth/cas/callback"
+            authorization_path => "/auth/cas/callback",
+            error_path => "/auth/error"
 
         )->to_app;
 
@@ -167,6 +200,26 @@ Plack::Auth::SSO::CAS - implementation of Plack::Auth::SSO for CAS
 
         };
 
+        mount "/auth/error" => sub {
+
+            my $env = shift;
+            my $session = Plack::Session->new($env);
+            my $auth_sso_error = $session->get("auth_sso_error");
+
+            unless ( $auth_sso_error ) {
+
+                return [ 302, [ Location => $self->uri_for( "/" ) ], [] ];
+
+            }
+
+            [ 200, [ "Content-Type" => "text/plain" ], [
+                "Something went wrong. User could not be authenticated against CAS\n",
+                "Please report this error:\n",
+                $auth_sso_error->{content}
+            ]];
+
+        };
+
     };
 
 
@@ -185,6 +238,33 @@ It inherits all configuration options from its parent.
 base url of the CAS service
 
 =back
+
+=head1 ERRORS
+
+Cf. L<https://apereo.github.io/cas/4.2.x/protocol/CAS-Protocol-Specification.html#253-error-codes>
+
+When a ticket arrives, it is checked against the CAS Server. This can lead to the following situations:
+
+* an error occurs. This means that the CAS server is down, or returned an unexpected response. The error type is "unknown":
+
+    {
+        package => "Plack::Auth::SSO::CAS",
+        package_id => "Plack::Auth::SSO::CAS",
+        type => "unknown",
+        content => "server could not complete request"
+    }
+
+
+* the ticket is rejected by the CAS server. When the authentication code is "TICKET_INVALID" the user is redirected back
+to the CAS server. In other cases the type equals the authentication code, and content equals the error description.
+
+    {
+        package => "Plack::Auth::SSO::CAS",
+        package_id => "Plack::Auth::SSO::CAS",
+        type => "INVALID_SERVICE",
+        content => "invalid service"
+    }
+
 
 =head1 TODO
 

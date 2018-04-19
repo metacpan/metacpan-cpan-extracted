@@ -21,7 +21,8 @@ CREATE TABLE `bench_subsume_types` (
   `datetime_strftime_pattern` VARCHAR(32) NULL COMMENT 'format pattern for per DateTime->strftime for grouping',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation date',
   PRIMARY KEY (`bench_subsume_type_id`),
-  UNIQUE INDEX `ux_bench_subsume_types_01` (`bench_subsume_type` ASC)
+  UNIQUE INDEX `ux_bench_subsume_types_01` (`bench_subsume_type` ASC),
+  INDEX `idx_bench_subsume_types_01` (`bench_subsume_type_rank` ASC)
 ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC COMMENT 'types of subsume values';
 
 CREATE TABLE `bench_units` (
@@ -186,7 +187,10 @@ CREATE TABLE `raw_bench_bundles` (
  `raw_bench_bundle_serialized` LONGBLOB NOT NULL,
  `processing` tinyint(3) NOT NULL DEFAULT 0 , -- COMMENT 'is entry processed (0=no,1=yes)',
  `processed` tinyint(3) NOT NULL DEFAULT 0 COMMENT 'is entry processed (0=no,1=yes)',
- `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation date'
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation date',
+ INDEX `idx_raw_bench_bundles_01` (`processing`),
+ INDEX `idx_raw_bench_bundles_02` (`processing`),
+ INDEX `idx_raw_bench_bundles_03` (`processed`, `processing`)
 ) ROW_FORMAT=COMPRESSED COMMENT='queue raw incoming data for later processing';
 -- Usage:
 -- * create elements:

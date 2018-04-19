@@ -2,7 +2,21 @@ Major changes for Perl module version
 
 This is not a complete list of changes.  See repository for full details:
 
-    https://bitbucket.org/jpeacock/version (primary)
+    https://github.com/JohnPeacock/version.pm.git
+
+0.9923 - 2018-04-15
+  * Add back spaces for picky C++ compilers 
+	Patch from Karl Williamson <khw@cpan.org>
+
+0.9922 - 2018-04-12
+  * Switch master repo to github
+
+0.9921 - 2018-04-11
+  * Silence overly compulsive GCC 7 warning
+	https://rt.cpan.org/Ticket/Display.html?id=123477
+
+  * Improve docs regarding trailing zeros
+	https://rt.cpan.org/Ticket/Display.html?id=122858
 
 0.9920 - 2018-04-08
 

@@ -12,122 +12,132 @@ require Exporter;
 require DynaLoader;
 
 @ISA = qw(Exporter DynaLoader);
+
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw(
 );
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 bootstrap Safe::Hole $VERSION;
 
 sub new {
-	my($class, $args) = @_;
-	my $self = bless {}, $class;
-	$args = { ROOT => $args || 'main' } unless ref $args eq 'HASH';
-	if ( $args->{ROOT} ) {
-	    $self->{PACKAGE} = $args->{ROOT};
-	    no strict 'refs';
-	    $self->{STASH} = \%{"$args->{ROOT}::"};
-        } else {
-	    $self->{INC} = [ \%INC, \@INC ];
-	    $self->{OPMASK} =  _get_current_opmask();
-	    $self->{PACKAGE} = 'main';
-	    $self->{STASH} = \%main::;
-	}
-	$self;
+    my ( $class, $args ) = @_;
+    my $self = bless {}, $class;
+    $args = { ROOT => $args || 'main' } unless ref $args eq 'HASH';
+    if ( $args->{ROOT} ) {
+        $self->{PACKAGE} = $args->{ROOT};
+        no strict 'refs';
+        $self->{STASH} = \%{"$args->{ROOT}::"};
+    }
+    else {
+        $self->{INC}     = [ \%INC, \@INC ];
+        $self->{OPMASK}  = _get_current_opmask();
+        $self->{PACKAGE} = 'main';
+        $self->{STASH}   = \%main::;
+    }
+    $self;
 }
 
 sub call {
-	my $self = shift;
-	my $coderef = shift;
-	my @args = @_;
-	
-	# _hole_call_sv() does not seem to like being ripped off the stack
-	# so we need some fancy footwork to catch and re-throw the error
+    my $self    = shift;
+    my $coderef = shift;
+    my @args    = @_;
 
-	my (@r,$did_not_die);
-	my $wantarray = wantarray;
+    # _hole_call_sv() does not seem to like being ripped off the stack
+    # so we need some fancy footwork to catch and re-throw the error
 
-	local(*INC), do {
-	    *INC = $_ for @{$self->{INC}};
-        } if $self->{INC};
+    my ( @r, $did_not_die );
+    my $wantarray = wantarray;
 
-        # Safe::Hole::User contains nothing but is a placeholder so that
-	# things that are called via Safe::Hole can Carp::croak properly.
+    local (*INC), do {
+        *INC = $_ for @{ $self->{INC} };
+    } if $self->{INC};
 
-	package
-	  Safe::Hole::User; # Package name on a different line to keep it from being indexed
+    # Safe::Hole::User contains nothing but is a placeholder so that
+    # things that are called via Safe::Hole can Carp::croak properly.
 
-	my $inner_call = sub {
-	    eval {
-		@_ = @args;
-		if ( $wantarray ) {
-		    @r = &$coderef;
-		} else {
-		    @r = scalar &$coderef;
-		}
-		$did_not_die=1;
-	    };
-	};
+    package Safe::Hole::User;    # Package name on a different line to keep it from being indexed
 
-	Safe::Hole::_hole_call_sv($self->{STASH}, $ {$self->{OPMASK}||\undef}, $inner_call);
+    my $inner_call = sub {
+        eval {
+            @_ = @args;
+            if ($wantarray) {
+                @r = &$coderef;
+            }
+            else {
+                @r = scalar &$coderef;
+            }
+            $did_not_die = 1;
+        };
+    };
 
-	die $@ unless $did_not_die;
-	return wantarray ? @r : $r[0];
+    Safe::Hole::_hole_call_sv( $self->{STASH}, ${ $self->{OPMASK} || \undef }, $inner_call );
+
+    die $@ unless $did_not_die;
+    return wantarray ? @r : $r[0];
 }
 
 sub root {
-	my $self = shift;
-	$self->{PACKAGE};
+    my $self = shift;
+    $self->{PACKAGE};
 }
 
 sub wrap {
-	my($self, $ref, $cpt, $name) = @_;
-	my($result, $typechar, $word);
-	no strict 'refs';
-	if( $cpt && $name ) {
-		croak "Safe object required" unless ref($cpt) eq 'Safe';
-		if( $name =~ /^(\W)(\w+(::\w+)*)$/ ) {
-			($typechar, $word) = ($1, $2);
-		} else {
-			croak "'$name' not a valid name";
-		}
-	}
-	my $type = ref $ref;
-	if( $type eq '' ) {
-		croak "reference required";
-	} elsif( $type eq 'CODE' ) {
-		$result = sub { $self->call($ref, @_); };
-		if( $typechar eq '&' ) {
-			*{$cpt->root()."::$word"} = $result;
-		} elsif( $typechar ) {
-			croak "'$name' type mismatch with $type";
-		}
-	} elsif( %{$type.'::'} ) {
-		my $wrapclass = ref($self).'::'.$self->root().'::'.$type;
-		*{$wrapclass.'::AUTOLOAD'} = 
-			sub {
-				$self->call(
-					sub {
-						no strict;
-						my $self = shift;
-						return if $AUTOLOAD =~ /::DESTROY$/;
-						my $name = $AUTOLOAD;
-						$name =~ s/.*://;
-						$self->{OBJ}->$name(@_);
-					}, @_);
-			} unless defined &{$wrapclass.'::AUTOLOAD'};
-		$result = bless { OBJ => $ref }, $wrapclass;
-		if( $typechar eq '$' ) {
-			${$cpt->varglob($word)} = $result;
-		} elsif( $typechar ) {
-			croak "'$name' type mismatch with object (must be scalar)";
-		}
-	} else {
-		croak "type '$type' is not supported";
-	}
-	$result;
+    my ( $self, $ref, $cpt, $name ) = @_;
+    my ( $result, $typechar, $word );
+    no strict 'refs';
+    if ( $cpt && $name ) {
+        croak "Safe object required" unless ref($cpt) eq 'Safe';
+        if ( $name =~ /^(\W)(\w+(::\w+)*)$/ ) {
+            ( $typechar, $word ) = ( $1, $2 );
+        }
+        else {
+            croak "'$name' not a valid name";
+        }
+    }
+    my $type = ref $ref;
+    if ( $type eq '' ) {
+        croak "reference required";
+    }
+    elsif ( $type eq 'CODE' ) {
+        $result = sub { $self->call( $ref, @_ ); };
+        if ( $typechar eq '&' ) {
+            *{ $cpt->root() . "::$word" } = $result;
+        }
+        elsif ($typechar) {
+            croak "'$name' type mismatch with $type";
+        }
+    }
+    elsif ( %{ $type . '::' } ) {
+        my $wrapclass = ref($self) . '::' . $self->root() . '::' . $type;
+        *{ $wrapclass . '::AUTOLOAD' } = sub {
+            $self->call(
+                sub {
+                    no strict;
+                    my $self = shift;
+                    return if $AUTOLOAD =~ /::DESTROY$/;
+                    my $name = $AUTOLOAD;
+                    $name =~ s/.*://;
+                    $self->{OBJ}->$name(@_);
+                },
+                @_
+            );
+          }
+          unless defined &{ $wrapclass . '::AUTOLOAD' };
+        $result = bless { OBJ => $ref }, $wrapclass;
+        if ( $typechar eq '$' ) {
+            ${ $cpt->varglob($word) } = $result;
+        }
+        elsif ($typechar) {
+            croak "'$name' type mismatch with object (must be scalar)";
+        }
+    }
+    else {
+        croak "type '$type' is not supported";
+    }
+    $result;
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

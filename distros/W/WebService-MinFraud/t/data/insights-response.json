@@ -130,12 +130,14 @@
     "country": "US",
     "is_issued_in_billing_address_country": true,
     "is_prepaid": true,
+    "is_virtual": true,
     "type": "credit"
   },
   "device": {
     "confidence": 99,
     "id": "ECE205B0-BE16-11E5-B83F-FE035C37265F",
-    "last_seen": "2016-06-08T14:16:38Z"
+    "last_seen": "2016-06-08T14:16:38Z",
+    "local_time": "2018-04-03T17:01:40-07:00"
   },
   "email": {
     "first_seen": "2017-01-02",

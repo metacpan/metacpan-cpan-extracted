@@ -1,4 +1,21 @@
-2017-01-11 v0.5006 pjacklam
+0.5007 2018-04-17
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * Sync test files with Math-BigInt.
+
+ * Add test files t/release-test-version.t, t/release-portability.t, and
+   t/release-cpan-changes.t.
+
+ * Use a MANIFEST.SKIP file based on the default file in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+0.5006 2017-01-11 pjacklam
 
  * Fix syntax for required version of Math::BigInt::Lib.
 
@@ -6,18 +23,18 @@
 
  * Sync test files with Math-BigInt-1.999808.
 
-2016-12-13 v0.5005 pjacklam
+0.5005 2016-12-13 pjacklam
 
  * Add more logic to Makefile.PL regarding INSTALLDIRS (CPAN RT #119199
    and #119225).
 
-2016-12-11 v0.5004 pjacklam
+0.5004 2016-12-11 pjacklam
 
  * Fix Makefile.PL so that this module installs over the core version.
 
  * Sync test files with Math-BigInt-1.999805.
 
-2016-12-03 v0.5003 pjacklam
+0.5003 2016-12-03 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
@@ -28,13 +45,13 @@
 
  * Inform that the TODO file is not up to date.
 
-2016-11-23 v0.5002 pjacklam
+0.5002 2016-11-23 pjacklam
 
  * Sync test files with Math-BigInt-1.999801. Add t/biglog.t and t/bigroot.t
    since these are included in the test suite for the other backend libraries
    (GMP and Pari).
 
-2016-11-17 v0.5001 pjacklam
+0.5001 2016-11-17 pjacklam
 
  * Avoid 'use parent' to retain compatibility with old Perls.
 
@@ -42,7 +59,7 @@
 
  * Trim whitespace.
 
-2016-11-15 v0.5000 pjacklam
+0.5000 2016-11-15 pjacklam
 
  * Sync test files with Math-BigInt-1.999800.
 
@@ -53,39 +70,39 @@
 
  * Fix documentation error in Math::BigInt::FastCalc
 
-2016-04-25 v0.42 pjacklam
+0.42 2016-04-25 pjacklam
 
  * Sync test files with Math-BigInt-1.999719.
 
-2016-04-22 v0.41 pjacklam
+0.41 2016-04-22 pjacklam
 
  * Sync test files with Math-BigInt-1.999718.
 
-2016-01-03 v0.40 pjacklam
+0.40 2016-01-03 pjacklam
 
  * Sync test files with Math-BigInt-1.999714.
 
-2015-12-31 v0.39 pjacklam
+0.39 2015-12-31 pjacklam
 
  * Sync test files with Math-BigInt-1.999713.
 
-2015-12-02 v0.38 pjacklam
+0.38 2015-12-02 pjacklam
 
  * Use 'static double', not just 'double' in FastCalc.xs.
 
  * Move 'Test::More' from 'build_requires' to 'test_requires' in Makefile.PL.
 
-2015-11-09 v0.37 pjacklam
+0.37 2015-11-09 pjacklam
 
  * Sync test files with Math-BigInt-1.999709.
 
-2015-11-04 v0.36 pjacklam
+0.36 2015-11-04 pjacklam
 
  * Sync test files with Math-BigInt-1.999708.
 
  * Required version of Test::More is only 0.47, not 0.62.
 
-2015-10-28 v0.35 pjacklam
+0.35 2015-10-28 pjacklam
 
  * Sync test files with Math-BigInt-1.999707.
 
@@ -98,7 +115,7 @@
 
  * Move 'Test::More' from 'build_requires' to 'test_requires' in Makefile.PL.
 
-2015-09-21 v0.34 pjacklam
+0.34 2015-09-21 pjacklam
 
  * Sync test files with Math-BigInt-1.999703.
 
@@ -106,70 +123,119 @@
 
  * Update author information.
 
-2015-09-17 v0.33 pjacklam
+0.33 2015-09-17 pjacklam
 
  * Sync test files with Math-BigInt-1.999702.
 
  * Required version of Math-BigInt is now 1.999702.
 
-2015-09-11 0.32 pjacklam
- CHANGES
-  * Add changes from version 0.30 to 0.31.
-  * Re-order change entries to decreasing order after version number.
- inc/Module/Install.pm
-  * Update bundled version from 1.08 to 1.16.
- lib/Math/BigInt/FastCalc.pm
-  * Increase version number to 0.32
-  * Update author information.
- Makefile.PL
-  * Required version of Math::BigInt and Math::BigInt::Calc is 1.999701.
- t/01load.t
-  * Display more information about loaded modules.
- t/bigfltpm.inc
-  * Sync tests with Math-BigInt distribution.
- t/bigfltpm.t
-  * Adjust number of tests.
-  * Make sure we test Math::BigInt::FastCalc, not Math::BigInt::Calc.
- t/bigintpm.inc
-  * Fix spelling errors.
- t/bigintpm.t
-  * Make sure we test Math::BigInt::FastCalc, not Math::BigInt::Calc.
-  * Adjust number of tests.
- t/mbimbf.t
-  * Make sure we test Math::BigInt::FastCalc, not Math::BigInt::Calc.
- t/*.t
-  * Add "use warnings" to test scripts, since Perl 5.6.2 is required anyway,
-    and "use warnings" was introduced in Perl 5.6.1.
-  * Modified test scripts so the difference between the test files in the
-    Math-BigInt distribution and the backend distributions are as few and as
-    small as possible. This makes for easier release management.
+0.32 2015-09-11 pjacklam
 
-2014-03-04 0.31 pjacklam
- FastCalc.xs
-  * Make the array interface 64-bit safe by using SSize_t instead of I32.
- Makefile.PL
-  * Required version of Math::BigInt and Math::BigInt::Calc is 1.9993.
- inc/Module/Install.pm
-  * Update bundled version from 1.01 to 1.08.
- lib/Math/BigInt/FastCalc.pm
-  * Increase version number to 0.31
- lib/Math/BigInt/FastCalc.pm
-  * Add documentation about CPAN RT, CPAN testers etc.
- t/bigfltpm.inc
-  * Add tests for fint()/bint().
- t/bigfltpm.t
-  * Increase number of tests.
- t/bigintpm.inc
-  * Add tests for bint().
- t/bigintpm.t
-  * Increase number of tests.
- t/leak.t
-  * Change "use base" to "use parent".
- t/mbi_rand.t
-  * Include older version of this file, one that tests Math::BigInt::FastCalc,
-    not Math::BigInt::Calc.
+ * CHANGES:
 
-2011-09-04 0.30 pjacklam
+   * Add changes from version 0.30 to 0.31.
+
+   * Re-order change entries to decreasing order after version number.
+
+ * inc/Module/Install.pm:
+
+   * Update bundled version from 1.08 to 1.16.
+
+ * lib/Math/BigInt/FastCalc.pm:
+
+   * Increase version number to 0.32
+
+   * Update author information.
+
+ * Makefile.PL:
+
+   * Required version of Math::BigInt and Math::BigInt::Calc is 1.999701.
+
+ * t/01load.t:
+
+   * Display more information about loaded modules.
+
+ * t/bigfltpm.inc:
+
+   * Sync tests with Math-BigInt distribution.
+
+ * t/bigfltpm.t:
+
+   * Adjust number of tests.
+
+   * Make sure we test Math::BigInt::FastCalc, not Math::BigInt::Calc.
+
+ * t/bigintpm.inc:
+
+   * Fix spelling errors.
+
+ * t/bigintpm.t:
+
+   * Make sure we test Math::BigInt::FastCalc, not Math::BigInt::Calc.
+
+   * Adjust number of tests.
+
+ * t/mbimbf.t:
+
+   * Make sure we test Math::BigInt::FastCalc, not Math::BigInt::Calc.
+
+ * t/*.t:
+
+   * Add "use warnings" to test scripts, since Perl 5.6.2 is required anyway,
+     and "use warnings" was introduced in Perl 5.6.1.
+
+   * Modified test scripts so the difference between the test files in the
+     Math-BigInt distribution and the backend distributions are as few and as
+     small as possible. This makes for easier release management.
+
+0.31 2014-03-04 pjacklam
+
+ * FastCalc.xs:
+
+   * Make the array interface 64-bit safe by using SSize_t instead of I32.
+
+ * Makefile.PL:
+
+   * Required version of Math::BigInt and Math::BigInt::Calc is 1.9993.
+
+ * inc/Module/Install.pm:
+
+   * Update bundled version from 1.01 to 1.08.
+
+ * lib/Math/BigInt/FastCalc.pm:
+
+   * Increase version number to 0.31
+
+ * lib/Math/BigInt/FastCalc.pm:
+
+   * Add documentation about CPAN RT, CPAN testers etc.
+
+ * t/bigfltpm.inc:
+
+   * Add tests for fint()/bint().
+
+ * t/bigfltpm.t:
+
+   * Increase number of tests.
+
+ * t/bigintpm.inc:
+
+   * Add tests for bint().
+
+ * t/bigintpm.t:
+
+   * Increase number of tests.
+
+ * t/leak.t:
+
+   * Change "use base" to "use parent".
+
+ * t/mbi_rand.t:
+
+   * Include older version of this file, one that tests Math::BigInt::FastCalc,
+     not Math::BigInt::Calc.
+
+0.30 2011-09-04 pjacklam
 
  * Math::BigInt::FastCalc now requires Math::BigInt v1.997 (Peter John Acklam).
 
@@ -181,12 +247,12 @@
  * Updated common test files from the Math::BigInt distribution. (Peter
    John Acklam)
 
-2011-07-09 0.29 rafl (7560 tests)
+0.29 2011-07-09 rafl (7560 tests)
 
  * Synchronise with blead perl.
    + Reduce object code size significantly through PERL_NO_GET_CONTEXT.
 
-2011-02-26 0.28 pjacklam (7560 tests)
+0.28 2011-02-26 pjacklam (7560 tests)
 
  * Sync codebases (CPAN vs. blead): include t/mbi_rand.t from blead,
    fix typos in FastCalc.xs and t/bigintfc.t (Peter John Acklam).
@@ -194,7 +260,7 @@
  * Remove redundant Math::BigInt::FastCalc version info from diagnostic
    output of 01load.t (Peter John Acklam).
 
-2011-02-26 0.27 pjacklam (7560 tests)
+0.27 2011-02-26 pjacklam (7560 tests)
 
  * Add Math::BigInt::Calc version information to diagnostics output of
    01load.t. This is useful for debugging, since Math::BigInt::FastCalc
@@ -203,7 +269,7 @@
  * Change bigintpm.inc to reflect recent changes in the Math::BigInt
    distribution (Peter John Acklam).
 
-2011-02-08 0.26 pjacklam (7560 tests)
+0.26 2011-02-08 pjacklam (7560 tests)
 
  * Add Perl v5.6 compatibility code to FastCalc.xs (RT #63859)
    (Peter John Acklam).
@@ -214,11 +280,11 @@
  * Rename pod.t to 02pod.t and pod_cov.t to 03podcov.t and use more generic
    code (Peter John Acklam).
 
-2011-02-06 0.251 pjacklam (7558 tests)
+0.251 2011-02-06 pjacklam (7558 tests)
 
  * Add requirement Math::BigInt version 1.991 (Peter John Acklam).
 
-2011-02-05 0.25 pjacklam (7558 tests)
+0.25 2011-02-05 pjacklam (7558 tests)
 
  * Remove _new() from XS code and use _new() in Math::BigInt::Calc
    instead. The XS _new() doesn't handle integers that are too large to
@@ -231,7 +297,7 @@
    bigfltpm.t, bigintpm.inc, bigintpm.t, mbi_rand.t, mbimbf.inc,
    mbimbf.t (Peter John Acklam).
 
-2010-11-07 0.24 rafl (6938 tests)
+0.24 2010-11-07 rafl (6938 tests)
 
  * Reduce repetition (and object size) in FastCalc.xs by using ALIASes
    (Nicholas Clark).
@@ -252,33 +318,33 @@
  * Remove the $BASE or $BASE_LEN globals. They were never documented or
    exported, and are now unnecessary (Nicholas Clark).
 
-2010-09-14 0.22 rafl (6938 tests)
+0.22 2010-09-14 rafl (6938 tests)
 
  * Modernize the test suite to use Test::More instead of Test.
 
-2010-09-03 0.21 rafl (6892 tests)
+0.21 2010-09-03 rafl (6892 tests)
 
  * Remove some unneeded test code which only broke things when being ran in the
    perl core.
 
-2010-09-03 0.20 rafl (6892 tests)
+0.20 2010-09-03 rafl (6892 tests)
 
  * Avoid certain kinds of segfaults as well as wrong bnok() behaviour by
    depending on Math::BigInt 0.90.
 
-2008-04-15 0.19 Tels (6892 tests)
+0.19 2008-04-15 Tels (6892 tests)
 
  * forcefully regenerate META.yml (sigh@Module::Install)
 
-2008-04-15 0.18 Tels (6892 tests)
+0.18 2008-04-15 Tels (6892 tests)
 
  * fix compilation under v5.6.2 (sigh)
 
-2008-04-13 0.17 Tels (6892 tests)
+0.17 2008-04-13 Tels (6892 tests)
 
  * forgot SvIOK() to SvUOK() (bug #29720, Thanx Alexey Tourbin!)
 
-2007-09-16 0.16 Tels (6892 tests)
+0.16 2007-09-16 Tels (6892 tests)
 
  * require Math::BigInt 1.88
 
@@ -288,7 +354,7 @@
 
  * it works back to v5.006 (thanx zefram!)
 
-2007-06-30 0.15 Tels (6892 tests)
+0.15 2007-06-30 Tels (6892 tests)
 
  * require Math::BigInt 1.87
 
@@ -298,7 +364,7 @@
 
  * put _new() into the XS
 
-2007-04-17 0.14 Tels (6438 tests)
+0.14 2007-04-17 Tels (6438 tests)
 
  * require Math::BigInt 1.83
 
@@ -306,7 +372,7 @@
 
  * add a few tests
 
-2007-04-09 0.13 Tels (6280 tests)
+0.13 2007-04-09 Tels (6280 tests)
 
  * require Math::BigInt 1.82
 
@@ -315,13 +381,13 @@
 
  * plug all the leaks in _acmp(), _is_ten() etc. (Thanx Hugo!)
 
-2007-03-03 0.12 Tels (6280 tests)
+0.12 2007-03-03 Tels (6280 tests)
 
  * fix bug #25033 It leaks (Thanx M. Schwern!)
 
  * require Perl 5.6.2, anything older is unsupported and untested
 
-2007-02-02 0.11 Tels (5953 tests)
+0.11 2007-02-02 Tels (5953 tests)
 
  * require Math::BigInt 1.79
 
@@ -329,20 +395,20 @@
 
  * add _length() to the method list
 
-2005-03-30 0.10 Tels (5953 tests)
+0.10 2005-03-30 Tels (5953 tests)
 
  * load Calc.pm and use its code to provide the routines that FastCalc
    does not yet have in XS (cut down Copy&Paste code considerably
 
  * require Math::BigInt v1.76 to properly load Calc.pm
 
-2005-03-20 0.09 Tels (5953 tests)
+0.09 2005-03-20 Tels (5953 tests)
 
  * take over changes from Calc 0.45 (fix bug with div shortcut)
 
  * require Math::BigInt v1.75 and use its tests
 
-2005-01-01 0.08 Tels (5953 tests)
+0.08 2005-01-01 Tels (5953 tests)
 
  * take tests from BigInt v1.74 and require it
 
@@ -352,14 +418,15 @@
 
  * take over changes from Calc 0.44
 
-2004-08-13 0.07 Tels (5953 tests)
+0.07 2004-08-13 Tels (5953 tests)
 
  * require BigInt v1.71, adapted to new API style by taking over Calc v0.41
-   + added _is_two(), _is_ten(), and _ten()
+
+ * added _is_two(), _is_ten(), and _ten()
 
  * cleaned XS code, got rid of "unused var" warnings (thanx perl-xs people!)
 
-2002-08-25 0.06 Tels (5355 tests)
+0.06 2002-08-25 Tels (5355 tests)
 
  * working _modinv() and fix for _rsft() taken over from Calc v0.32
 
@@ -368,57 +435,67 @@
  * require Math::BigInt v1.62
 
  * _num(), _dec() and _inc() are now in XS
-   $MBI->numify() is about 50% faster
-   $MBI->binc()/$MBI->bdec() are about 5-8% faster for numbers that don't
+
+ * $MBI->numify() is about 50% faster
+
+ * $MBI->binc()/$MBI->bdec() are about 5-8% faster for numbers that don't
    overflow (much), and about 14% for ('9' x 100)->binc()
 
  * __strip_zeros() is no in XS, making it roughly 3 times as fast
 
  * added _copy(): more than twice as fast for large (> 1000 digits) numbers:
 
- Math::BigInt::Calc v0.32
-          1:  3s ( 3.23 usr +  0.00 sys =  3.23 CPU) @ 38128/s (n=123154)
-        100:  3s ( 3.19 usr +  0.00 sys =  3.19 CPU) @ 27397/s (n=87397)
-       1000:  4s ( 3.29 usr +  0.00 sys =  3.29 CPU) @  8042/s (n=26460)
-      10000:  4s ( 3.19 usr +  0.01 sys =  3.20 CPU) @   984/s (n=3149)
+   Math::BigInt::Calc v0.32
+            1:  3s ( 3.23 usr +  0.00 sys =  3.23 CPU) @ 38128/s (n=123154)
+          100:  3s ( 3.19 usr +  0.00 sys =  3.19 CPU) @ 27397/s (n=87397)
+         1000:  4s ( 3.29 usr +  0.00 sys =  3.29 CPU) @  8042/s (n=26460)
+        10000:  4s ( 3.19 usr +  0.01 sys =  3.20 CPU) @   984/s (n=3149)
 
- Math::BigInt::FastCalc v0.06
-          1:  3s ( 3.12 usr +  0.01 sys =  3.13 CPU) @ 39346/s (n=123155)
-        100:  3s ( 3.10 usr +  0.00 sys =  3.10 CPU) @ 34138/s (n=105830)
-       1000:  3s ( 3.09 usr +  0.00 sys =  3.09 CPU) @ 15807/s (n=48844)
-      10000:  3s ( 3.20 usr +  0.00 sys =  3.20 CPU) @  2362/s (n=7559)
+   Math::BigInt::FastCalc v0.06
+            1:  3s ( 3.12 usr +  0.01 sys =  3.13 CPU) @ 39346/s (n=123155)
+          100:  3s ( 3.10 usr +  0.00 sys =  3.10 CPU) @ 34138/s (n=105830)
+         1000:  3s ( 3.09 usr +  0.00 sys =  3.09 CPU) @ 15807/s (n=48844)
+        10000:  3s ( 3.20 usr +  0.00 sys =  3.20 CPU) @  2362/s (n=7559)
 
-2002-08-13 0.05 Tels (5224 tests)
+0.05 2002-08-13 Tels (5224 tests)
 
  * the note that "_len() and _acmp() are in XS" was missing
 
  * cleaned distribution of unwanted files
 
-2002-08-13 0.04 Tels first release
- - added is_zero(), is_one(), _zero(), _one(), _two() and _acmp()
- - more tests in bigintfc.t
+0.04 2002-08-13 Tels first release
 
- Some general observations:
+ * added is_zero(), is_one(), _zero(), _one(), _two() and _acmp()
 
- * is_*() methods are quite a bit faster than in Calc, but due to the
-   overhead in Math::BigInt real programs will get only a bit faster
-   (around 2-5%).
+ * more tests in bigintfc.t
 
- * Comparisation is *much* faster, and even via Math::BigInt improves the
-   performance by about factor 9 for large numbers. For smaller numbers (less
-   than 8000 digits) it is still about factor 2.5 to 8. This is only valid if
-   the numbers have both the same length. If the length is different, then
-   FastCalc is still about a factor of 1.2 to 1.7 faster than Calc.
+ * Some general observations:
 
-2002-08-12 0.03 Tels
- - Took Calc.pm and converted it to FastCalc.pm
- - first two functions, _is_odd() and _is_even() in XS
- - testsuite from MBI v1.61
- - extended bigintc.t (also renamed to bigintfc.t)
+   * is_*() methods are quite a bit faster than in Calc, but due to the
+     overhead in Math::BigInt real programs will get only a bit faster
+     (around 2-5%).
 
-2002-08-09 0.02 Tels
- - first working version of XS code of _is_even(), _is_odd()
+   * Comparisation is *much* faster, and even via Math::BigInt improves the
+     performance by about factor 9 for large numbers. For smaller numbers (less
+     than 8000 digits) it is still about factor 2.5 to 8. This is only valid if
+     the numbers have both the same length. If the length is different, then
+     FastCalc is still about a factor of 1.2 to 1.7 faster than Calc.
 
-2002-06-05 0.01
-       - original version; created by h2xs 1.21 with options
-               -n Math::BigInt::FastCalc -A
+0.03 2002-08-12 Tels
+
+ * Took Calc.pm and converted it to FastCalc.pm
+
+ * first two functions, _is_odd() and _is_even() in XS
+
+ * testsuite from MBI v1.61
+
+ * extended bigintc.t (also renamed to bigintfc.t)
+
+0.02 2002-08-09 Tels
+
+ * first working version of XS code of _is_even(), _is_odd()
+
+0.01 2002-06-05
+
+ * original version; created by h2xs 1.21 with options
+         -n Math::BigInt::FastCalc -A

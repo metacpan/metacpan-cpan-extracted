@@ -17,7 +17,7 @@ configure_requires:
   File::chdir: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ name: Alien-premake5
 provides:
   Alien::premake5:
     file: lib/Alien/premake5.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Alien::Base: '0'
   base: '0'
@@ -36,16 +36,17 @@ requires:
 resources:
   bugtracker: https://github.com/jjatria/Alien-premake5/issues
   repository: git://github.com/jjatria/Alien-premake5.git
-version: '0.001'
+version: '0.002'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
   requires:
     share:
-      Archive::Zip: '0'
+      Archive::Tar: '0'
       Capture::Tiny: '0'
       HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
       Net::SSLeay: '1.49'
       Path::Tiny: '0'
       Sort::Versions: '0'
@@ -53,4 +54,4 @@ x_alienfile:
       URI::Escape: '0'
     system:
       Capture::Tiny: '0'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

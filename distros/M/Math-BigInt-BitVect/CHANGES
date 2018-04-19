@@ -1,4 +1,21 @@
-2017-01-11 v1.13 pjacklam
+1.14 2018-04-17
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * Sync test files with Math-BigInt.
+
+ * Add test files t/release-test-version.t, t/release-portability.t, and
+   t/release-cpan-changes.t.
+
+ * Use a MANIFEST.SKIP file based on the default file in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+1.13 2017-01-11 pjacklam
 
  * Reorder entries in CHANGES so newest entries are at the top.
 
@@ -6,7 +23,7 @@
 
  * Numerous bug fixes and speed improvements.
 
-2004-01-05 v1.12 Tels
+1.12 2004-01-05 Tels
 
  * tests from BigInt v1.68 - 4572 tests
 
@@ -26,7 +43,7 @@
 
  * _check() method checks for non-chunked sizes
 
-2002-09-30 v1.11_01 Tels (never released)
+1.11_01 2002-09-30 Tels (never released)
 
  * require Bit::Vector 6.3
 
@@ -34,21 +51,21 @@
 
  * removed unnecc. tests for $x or $y == 0 since Bit::Vector 6.3 handles these
 
-2002-03-24 v1.11 Tels
+1.11 2002-03-24 Tels
 
  * tests from BigInt v1.60 - 4057 tests
 
-2002-03-24 v1.10 Tels
+1.10 2002-03-24 Tels
 
  * tests from BigInt v1.55 - 3877 tests
 
-2002-02-21 v1.09 Tels
+1.09 2002-02-21 Tels
 
  * tests from BigInt v1.51
 
  * replaced _core_lib() by config()->{lib}
 
-2002-02-19 v1.08 Tels
+1.08 2002-02-19 Tels
 
  * added _fac() for factorial speed improvements
 
@@ -93,23 +110,23 @@
          bmul:              |      103
          ...................|..........
 
-2002-02-10 v1.07 Tels
+1.07 2002-02-10 Tels
 
  * added _lsft() and _rsft() for more speed on shifting
 
  * tests from MBI v1.50 (3685 vs. 2932 tests)
 
-2001-11-11 v1.06 Tels
+1.06 2001-11-11 Tels
 
  * made _inc/_dec faster and added tests for them
 
  * fixed bug in __reduce() that made it never  work (oups, forgot debug again)
 
-2001-11-01 v1.05 Tels
+1.05 2001-11-01 Tels
 
  * testsuite from BigInt v1.45
 
-2001-09-03 v1.04 Tels
+1.04 2001-09-03 Tels
 
  * _as_hex(), _as_bin()
 
@@ -117,11 +134,11 @@
 
  * removed default exporting, added empty import()
 
-2001-08-03 v1.03 Tels
+1.03 2001-08-03 Tels
 
  * added tests from MBI v1.40
 
-2001-07-22 v1.02 Tels (never released)
+1.02 2001-07-22 Tels (never released)
 
  * removed $class/__PACKAGE__ checks entirely
 
@@ -129,12 +146,12 @@
 
  * made Bit::Vector a requirement
 
-2001-07-13 v1.01 Tels
+1.01 2001-07-13 Tels
 
  * new testsuite from BigInt v1.37, tweaks to it to silence Exporter
 
  * $class => __PACKAGE__
 
-2001-07-09 v1.00 Tels
+1.00 2001-07-09 Tels
 
  * First release.

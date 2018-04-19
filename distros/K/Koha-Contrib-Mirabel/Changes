@@ -1,5 +1,9 @@
 Revision history for Perl module koha-mirabel
 
+0.0.6 2018-04-18
+
+  - Update for compatibility with Koha 17.05 and above
+
 0.0.5 2015-06-03
 
   - Fix bug when a Koha deleted record hasn't been deleted from Mir@bel 

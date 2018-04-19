@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Id - Package for language Indonesian
 
 package Locale::CLDR::Locales::Id;
 # This file auto generated from Data\common\main\id.xml
-#	on Fri 29 Apr  7:09:07 pm GMT
+#	on Fri 13 Apr  7:14:13 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -39,17 +40,17 @@ has 'algorithmic_number_format_data' => (
 			'public' => {
 				'-x' => {
 					divisor => q(1),
-					rule => q(ke−→#,##0→),
+					rule => q(−ke-→#,##0→),
 				},
 				'0' => {
 					base_value => q(0),
 					divisor => q(1),
-					rule => q(ke=#,##0=),
+					rule => q(ke-=#,##0=),
 				},
 				'max' => {
 					base_value => q(0),
 					divisor => q(1),
-					rule => q(ke=#,##0=),
+					rule => q(ke-=#,##0=),
 				},
 			},
 		},
@@ -208,11 +209,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -287,20 +288,20 @@ has 'display_name_language' => (
  				'ar' => 'Arab',
  				'ar_001' => 'Arab Standar Modern',
  				'arc' => 'Aram',
- 				'arn' => 'Araukan',
+ 				'arn' => 'Mapuche',
  				'arp' => 'Arapaho',
- 				'arq' => 'Arab Algeria',
+ 				'arq' => 'Arab Aljazair',
  				'arw' => 'Arawak',
  				'ary' => 'Arab Maroko',
  				'arz' => 'Arab Mesir',
  				'as' => 'Assam',
  				'asa' => 'Asu',
  				'ase' => 'Bahasa Isyarat Amerika',
- 				'ast' => 'Astur',
+ 				'ast' => 'Asturia',
  				'av' => 'Avar',
  				'awa' => 'Awadhi',
  				'ay' => 'Aymara',
- 				'az' => 'Azerbaijan',
+ 				'az' => 'Azerbaijani',
  				'az@alt=short' => 'Azeri',
  				'ba' => 'Bashkir',
  				'bal' => 'Baluchi',
@@ -344,7 +345,7 @@ has 'display_name_language' => (
  				'cay' => 'Cayuga',
  				'cch' => 'Atsam',
  				'ce' => 'Chechen',
- 				'ceb' => 'Sebuano',
+ 				'ceb' => 'Cebuano',
  				'cgg' => 'Kiga',
  				'ch' => 'Chamorro',
  				'chb' => 'Chibcha',
@@ -361,6 +362,7 @@ has 'display_name_language' => (
  				'cop' => 'Koptik',
  				'cr' => 'Kree',
  				'crh' => 'Tatar Krimea',
+ 				'crs' => 'Seselwa Kreol Prancis',
  				'cs' => 'Cheska',
  				'csb' => 'Kashubia',
  				'cu' => 'Bahasa Gereja Slavonia',
@@ -378,9 +380,9 @@ has 'display_name_language' => (
  				'din' => 'Dinka',
  				'dje' => 'Zarma',
  				'doi' => 'Dogri',
- 				'dsb' => 'Sorbia Rendah',
+ 				'dsb' => 'Sorbia Hilir',
  				'dua' => 'Duala',
- 				'dum' => 'Belanda Tengah',
+ 				'dum' => 'Belanda Abad Pertengahan',
  				'dv' => 'Divehi',
  				'dyo' => 'Jola-Fonyi',
  				'dyu' => 'Dyula',
@@ -394,16 +396,15 @@ has 'display_name_language' => (
  				'el' => 'Yunani',
  				'elx' => 'Elam',
  				'en' => 'Inggris',
+ 				'en_GB' => 'Inggris (Inggris)',
  				'en_GB@alt=short' => 'Inggris (U.K.)',
  				'en_US@alt=short' => 'Inggris (A.S.)',
  				'enm' => 'Inggris Abad Pertengahan',
  				'eo' => 'Esperanto',
  				'es' => 'Spanyol',
- 				'es_419' => 'Spanyol Amerika Latin',
  				'es_ES' => 'Spanyol (Eropa)',
- 				'es_MX' => 'Spanyol Meksiko',
  				'et' => 'Esti',
- 				'eu' => 'Bask',
+ 				'eu' => 'Basque',
  				'ewo' => 'Ewondo',
  				'fa' => 'Persia',
  				'fan' => 'Fang',
@@ -412,9 +413,10 @@ has 'display_name_language' => (
  				'fi' => 'Suomi',
  				'fil' => 'Filipino',
  				'fj' => 'Fiji',
- 				'fo' => 'Faro',
+ 				'fo' => 'Faroe',
  				'fon' => 'Fon',
  				'fr' => 'Prancis',
+ 				'frc' => 'Prancis Cajun',
  				'frm' => 'Prancis Abad Pertengahan',
  				'fro' => 'Prancis Kuno',
  				'frp' => 'Arpitan',
@@ -437,11 +439,11 @@ has 'display_name_language' => (
  				'goh' => 'Jerman Kuno',
  				'gon' => 'Gondi',
  				'gor' => 'Gorontalo',
- 				'got' => 'Gothik',
+ 				'got' => 'Gotik',
  				'grb' => 'Grebo',
  				'grc' => 'Yunani Kuno',
  				'gsw' => 'Jerman (Swiss)',
- 				'gu' => 'Gujarati',
+ 				'gu' => 'Gujarat',
  				'guz' => 'Gusii',
  				'gv' => 'Manx',
  				'gwi' => 'Gwich’in',
@@ -456,8 +458,8 @@ has 'display_name_language' => (
  				'hmn' => 'Hmong',
  				'ho' => 'Hiri Motu',
  				'hr' => 'Kroasia',
- 				'hsb' => 'Sorbia Atas',
- 				'ht' => 'Haiti',
+ 				'hsb' => 'Sorbia Hulu',
+ 				'ht' => 'Kreol Haiti',
  				'hu' => 'Hungaria',
  				'hup' => 'Hupa',
  				'hy' => 'Armenia',
@@ -544,6 +546,7 @@ has 'display_name_language' => (
  				'ln' => 'Lingala',
  				'lo' => 'Lao',
  				'lol' => 'Mongo',
+ 				'lou' => 'Kreol Louisiana',
  				'loz' => 'Lozi',
  				'lrc' => 'Luri Utara',
  				'lt' => 'Lituavi',
@@ -572,7 +575,7 @@ has 'display_name_language' => (
  				'mg' => 'Malagasi',
  				'mga' => 'Irlandia Abad Pertengahan',
  				'mgh' => 'Makhuwa-Meetto',
- 				'mgo' => 'meta’',
+ 				'mgo' => 'Meta’',
  				'mh' => 'Marshall',
  				'mi' => 'Maori',
  				'mic' => 'Mikmak',
@@ -593,7 +596,7 @@ has 'display_name_language' => (
  				'mwl' => 'Miranda',
  				'mwr' => 'Marwari',
  				'mwv' => 'Mentawai',
- 				'my' => 'Myanmar',
+ 				'my' => 'Burma',
  				'mye' => 'Myene',
  				'myv' => 'Eryza',
  				'mzn' => 'Mazanderani',
@@ -639,12 +642,14 @@ has 'display_name_language' => (
  				'pam' => 'Pampanga',
  				'pap' => 'Papiamento',
  				'pau' => 'Palau',
+ 				'pcm' => 'Pidgin Nigeria',
  				'pdc' => 'Jerman Pennsylvania',
  				'peo' => 'Persia Kuno',
  				'phn' => 'Funisia',
  				'pi' => 'Pali',
  				'pl' => 'Polski',
  				'pon' => 'Pohnpeia',
+ 				'prg' => 'Prusia',
  				'pro' => 'Provencal Lama',
  				'ps' => 'Pashto',
  				'ps@alt=variant' => 'Pushto',
@@ -664,7 +669,7 @@ has 'display_name_language' => (
  				'root' => 'Root',
  				'rtm' => 'Rotuma',
  				'ru' => 'Rusia',
- 				'rup' => 'Makedo-Rumania',
+ 				'rup' => 'Aromania',
  				'rw' => 'Kinyarwanda',
  				'rwk' => 'Rwa',
  				'sa' => 'Sanskerta',
@@ -697,7 +702,7 @@ has 'display_name_language' => (
  				'sid' => 'Sidamo',
  				'sk' => 'Slovak',
  				'sl' => 'Sloven',
- 				'sli' => 'Silesia Bawah',
+ 				'sli' => 'Silesia Rendah',
  				'sly' => 'Selayar',
  				'sm' => 'Samoa',
  				'sma' => 'Sami Selatan',
@@ -706,10 +711,10 @@ has 'display_name_language' => (
  				'sms' => 'Skolt Sami',
  				'sn' => 'Shona',
  				'snk' => 'Soninke',
- 				'so' => 'Somali',
+ 				'so' => 'Somalia',
  				'sog' => 'Sogdien',
  				'sq' => 'Albania',
- 				'sr' => 'Serb',
+ 				'sr' => 'Serbia',
  				'srn' => 'Sranan Tongo',
  				'srr' => 'Serer',
  				'ss' => 'Swati',
@@ -721,7 +726,7 @@ has 'display_name_language' => (
  				'sux' => 'Sumeria',
  				'sv' => 'Swedia',
  				'sw' => 'Swahili',
- 				'sw_CD' => 'Kongo Swahili',
+ 				'sw_CD' => 'Swahili (Kongo)',
  				'swb' => 'Komoria',
  				'syc' => 'Suriah Klasik',
  				'syr' => 'Suriah',
@@ -865,8 +870,9 @@ has 'display_name_script' => (
  			'Goth' => 'Gothic',
  			'Gran' => 'Grantha',
  			'Grek' => 'Yunani',
- 			'Gujr' => 'Gujarati',
+ 			'Gujr' => 'Gujarat',
  			'Guru' => 'Gurmukhi',
+ 			'Hanb' => 'Hanb',
  			'Hang' => 'Hangul',
  			'Hani' => 'Han',
  			'Hano' => 'Hanunoo',
@@ -882,6 +888,7 @@ has 'display_name_script' => (
  			'Hung' => 'Hungaria Kuno',
  			'Inds' => 'Indus',
  			'Ital' => 'Italia Lama',
+ 			'Jamo' => 'Jamo',
  			'Java' => 'Jawa',
  			'Jpan' => 'Jepang',
  			'Jurc' => 'Jurchen',
@@ -984,6 +991,7 @@ has 'display_name_script' => (
  			'Yiii' => 'Yi',
  			'Zinh' => 'Warisan',
  			'Zmth' => 'Notasi Matematika',
+ 			'Zsye' => 'Emoji',
  			'Zsym' => 'Simbol',
  			'Zxxx' => 'Tidak Tertulis',
  			'Zyyy' => 'Umum',
@@ -1043,7 +1051,7 @@ has 'display_name_region' => (
  			'AL' => 'Albania',
  			'AM' => 'Armenia',
  			'AO' => 'Angola',
- 			'AQ' => 'Antarktika',
+ 			'AQ' => 'Antartika',
  			'AR' => 'Argentina',
  			'AS' => 'Samoa Amerika',
  			'AT' => 'Austria',
@@ -1060,11 +1068,11 @@ has 'display_name_region' => (
  			'BH' => 'Bahrain',
  			'BI' => 'Burundi',
  			'BJ' => 'Benin',
- 			'BL' => 'Saint Barthelemy',
+ 			'BL' => 'Saint Barthélemy',
  			'BM' => 'Bermuda',
  			'BN' => 'Brunei',
  			'BO' => 'Bolivia',
- 			'BQ' => 'Karibia Belanda',
+ 			'BQ' => 'Belanda Karibia',
  			'BR' => 'Brasil',
  			'BS' => 'Bahama',
  			'BT' => 'Bhutan',
@@ -1073,15 +1081,14 @@ has 'display_name_region' => (
  			'BY' => 'Belarus',
  			'BZ' => 'Belize',
  			'CA' => 'Kanada',
- 			'CC' => 'Kepulauan Cocos',
+ 			'CC' => 'Kepulauan Cocos (Keeling)',
  			'CD' => 'Kongo - Kinshasa',
  			'CD@alt=variant' => 'Kongo (RDK)',
  			'CF' => 'Republik Afrika Tengah',
  			'CG' => 'Kongo - Brazzaville',
  			'CG@alt=variant' => 'Kongo (Republik)',
  			'CH' => 'Swiss',
- 			'CI' => 'Cote d’Ivoire',
- 			'CI@alt=variant' => 'Ivory Coast',
+ 			'CI' => 'Pantai Gading',
  			'CK' => 'Kepulauan Cook',
  			'CL' => 'Cile',
  			'CM' => 'Kamerun',
@@ -1094,7 +1101,8 @@ has 'display_name_region' => (
  			'CW' => 'Curaçao',
  			'CX' => 'Pulau Christmas',
  			'CY' => 'Siprus',
- 			'CZ' => 'Republik Cheska',
+ 			'CZ' => 'Ceko',
+ 			'CZ@alt=variant' => 'Republik Ceko',
  			'DE' => 'Jerman',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Jibuti',
@@ -1111,6 +1119,7 @@ has 'display_name_region' => (
  			'ES' => 'Spanyol',
  			'ET' => 'Etiopia',
  			'EU' => 'Uni Eropa',
+ 			'EZ' => 'Zona Euro',
  			'FI' => 'Finlandia',
  			'FJ' => 'Fiji',
  			'FK' => 'Kepulauan Malvinas',
@@ -1119,8 +1128,8 @@ has 'display_name_region' => (
  			'FO' => 'Kepulauan Faroe',
  			'FR' => 'Prancis',
  			'GA' => 'Gabon',
- 			'GB' => 'Inggris',
- 			'GB@alt=short' => 'GB',
+ 			'GB' => 'Inggris Raya',
+ 			'GB@alt=short' => 'UK',
  			'GD' => 'Grenada',
  			'GE' => 'Georgia',
  			'GF' => 'Guyana Prancis',
@@ -1272,7 +1281,6 @@ has 'display_name_region' => (
  			'TJ' => 'Tajikistan',
  			'TK' => 'Tokelau',
  			'TL' => 'Timor Leste',
- 			'TL@alt=variant' => 'Timor Timur',
  			'TM' => 'Turkimenistan',
  			'TN' => 'Tunisia',
  			'TO' => 'Tonga',
@@ -1284,6 +1292,8 @@ has 'display_name_region' => (
  			'UA' => 'Ukraina',
  			'UG' => 'Uganda',
  			'UM' => 'Kepulauan Terluar A.S.',
+ 			'UN' => 'Perserikatan Bangsa-Bangsa',
+ 			'UN@alt=short' => 'PBB',
  			'US' => 'Amerika Serikat',
  			'US@alt=short' => 'A.S.',
  			'UY' => 'Uruguay',
@@ -1383,11 +1393,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Kalender',
+ 			'cf' => 'Format Mata Uang',
  			'colalternate' => 'Penyortiran Abaikan Simbol',
  			'colbackwards' => 'Penyortiran Aksen Terbalik',
  			'colcasefirst' => 'Pengurutan Huruf Besar/Huruf Kecil',
  			'colcaselevel' => 'Penyortiran Peka Huruf Besar',
- 			'colhiraganaquaternary' => 'Penyortiran Kana',
  			'collation' => 'Aturan Pengurutan',
  			'colnormalization' => 'Penyortiran Dinormalisasi',
  			'colnumeric' => 'Penyortiran Numerik',
@@ -1399,7 +1409,6 @@ has 'display_name_key' => (
  			'numbers' => 'Angka',
  			'timezone' => 'Zona Waktu',
  			'va' => 'Varian Lokal',
- 			'variabletop' => 'Sortir Sebagai Simbol',
  			'x' => 'Penggunaan Pribadi',
 
 		}
@@ -1425,10 +1434,15 @@ has 'display_name_type' => (
  				'islamic' => q{Kalender Islam},
  				'islamic-civil' => q{Kalender Sipil Islam},
  				'islamic-rgsa' => q{Kalender Islam (Arab Saudi, penglihatan)},
+ 				'islamic-umalqura' => q{Kalender Islam (Umm al-Qura)},
  				'iso8601' => q{Kalender ISO-8601},
  				'japanese' => q{Kalender Jepang},
  				'persian' => q{Kalender Persia},
  				'roc' => q{Kalendar Minguo},
+ 			},
+ 			'cf' => {
+ 				'account' => q{Format Mata Uang Akuntansi},
+ 				'standard' => q{Format Mata Uang Standar},
  			},
  			'colalternate' => {
  				'non-ignorable' => q{Sortir Simbol},
@@ -1447,12 +1461,9 @@ has 'display_name_type' => (
  				'no' => q{Sortir Tidak Peka Huruf Besar},
  				'yes' => q{Sortir Peka Huruf Besar},
  			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{Sortir Kana Secara Terpisah},
- 				'yes' => q{Sortir Kana Secara Berbeda},
- 			},
  			'collation' => {
  				'big5han' => q{Urutan Sortir Tionghoa Tradisional - Big5},
+ 				'compat' => q{Aturan Pengurutan Sebelumnya, untuk kompatibilitas},
  				'dictionary' => q{Urutan Sortir Kamus},
  				'ducet' => q{Aturan Pengurutan Unicode Default},
  				'eor' => q{Aturan Pengurutan Eropa},
@@ -1483,6 +1494,11 @@ has 'display_name_type' => (
  				'secondary' => q{Sortir Aksen},
  				'tertiary' => q{Sortir Aksen/Ukuran Huruf/Lebar},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{Lebar penuh},
+ 				'hwidth' => q{Lebar separuh},
+ 				'npinyin' => q{Angka},
+ 			},
  			'hc' => {
  				'h11' => q{Sistem 12 Jam (0–11)},
  				'h12' => q{Sistem 12 Jam (1–12)},
@@ -1493,6 +1509,10 @@ has 'display_name_type' => (
  				'loose' => q{Gaya Pemisah Baris Renggang},
  				'normal' => q{Gaya Pemisah Baris Normal},
  				'strict' => q{Gaya Pemisah Baris Rapat},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{BGN},
+ 				'ungegn' => q{UNGEGN},
  			},
  			'ms' => {
  				'metric' => q{Sistem Metrik},
@@ -1514,7 +1534,7 @@ has 'display_name_type' => (
  				'geor' => q{Angka Georgia},
  				'grek' => q{Angka Yunani},
  				'greklow' => q{Angka Yunani Huruf Kecil},
- 				'gujr' => q{Angka Gujarati},
+ 				'gujr' => q{Angka Gujarat},
  				'guru' => q{Angka Gurmukhi},
  				'hanidec' => q{Angka Desimal Tionghoa},
  				'hans' => q{Angka Tionghoa Sederhana},
@@ -1575,27 +1595,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN',
- 			'numeric' => 'Angka',
- 			'tone' => 'Nada',
- 			'ungegn' => 'UNGEGN',
- 			'x-accents' => 'Aksen',
- 			'x-fullwidth' => 'Lebar penuh',
- 			'x-halfwidth' => 'Lebar separuh',
- 			'x-jamo' => 'Jamo',
- 			'x-pinyin' => 'Pinyin',
- 			'x-publishing' => 'Penerbitan',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1619,10 +1618,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[å])},
+			auxiliary => qr{[å]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p q r s t u v w x y z])},
-			punctuation => qr{(?^u:[‐ – — , ; \: ! ? . … ' ‘ ’ “ ” ( ) \[ \] /])},
+			main => qr{[a b c d e f g h i j k l m n o p q r s t u v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ “ ” ( ) \[ \] /]},
 		};
 	},
 EOT
@@ -1822,6 +1822,10 @@ has 'units' => (
 						'name' => q(derajat Fahrenheit),
 						'other' => q({0} derajat Fahrenheit),
 					},
+					'fathom' => {
+						'name' => q(depa),
+						'other' => q({0} depa),
+					},
 					'fluid-ounce' => {
 						'name' => q(fluid ounce),
 						'other' => q({0} fluid ounce),
@@ -1835,6 +1839,10 @@ has 'units' => (
 						'other' => q({0} kaki),
 						'per' => q({0} per kaki),
 					},
+					'furlong' => {
+						'name' => q(furlong),
+						'other' => q({0} furlong),
+					},
 					'g-force' => {
 						'name' => q(g-force),
 						'other' => q({0} g-force),
@@ -1843,6 +1851,11 @@ has 'units' => (
 						'name' => q(galon),
 						'other' => q({0} galon),
 						'per' => q({0} per galon),
+					},
+					'gallon-imperial' => {
+						'name' => q(galon Imp.),
+						'other' => q({0} galon Imp.),
+						'per' => q({0} per galon Imp.),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2039,6 +2052,10 @@ has 'units' => (
 						'name' => q(mil per galon),
 						'other' => q({0} mil per galon),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mil per galon Imp.),
+						'other' => q({0} mil per galon Imp.),
+					},
 					'mile-per-hour' => {
 						'name' => q(mil per jam),
 						'other' => q({0} mil per jam),
@@ -2059,6 +2076,10 @@ has 'units' => (
 						'name' => q(miligram),
 						'other' => q({0} miligram),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(milligram per desiliter),
+						'other' => q({0} milligram per desiliter),
+					},
 					'milliliter' => {
 						'name' => q(mililiter),
 						'other' => q({0} mililiter),
@@ -2070,6 +2091,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(milimeter merkuri),
 						'other' => q({0} milimeter merkuri),
+					},
+					'millimole-per-liter' => {
+						'name' => q(millimole per liter),
+						'other' => q({0} millimole per liter),
 					},
 					'millisecond' => {
 						'name' => q(milidetik),
@@ -2118,6 +2143,10 @@ has 'units' => (
 						'name' => q(parsec),
 						'other' => q({0} parsec),
 					},
+					'part-per-million' => {
+						'name' => q(bagian per juta),
+						'other' => q({0} bagian per juta),
+					},
 					'per' => {
 						'1' => q({0} per {1}),
 					},
@@ -2132,6 +2161,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(metric pint),
 						'other' => q({0} metric pint),
+					},
+					'point' => {
+						'name' => q(poin),
+						'other' => q({0} poin),
 					},
 					'pound' => {
 						'name' => q(pon),
@@ -2176,6 +2209,7 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(kilometer persegi),
 						'other' => q({0} kilometer persegi),
+						'per' => q({0} per kilometer persegi),
 					},
 					'square-meter' => {
 						'name' => q(meter persegi),
@@ -2185,10 +2219,15 @@ has 'units' => (
 					'square-mile' => {
 						'name' => q(mil persegi),
 						'other' => q({0} mil persegi),
+						'per' => q({0} per mil persegi),
 					},
 					'square-yard' => {
 						'name' => q(yard persegi),
 						'other' => q({0} yard persegi),
+					},
+					'stone' => {
+						'name' => q(st),
+						'other' => q({0} st),
 					},
 					'tablespoon' => {
 						'name' => q(sendok makan),
@@ -2243,13 +2282,26 @@ has 'units' => (
 					'arc-second' => {
 						'other' => q({0}″),
 					},
+					'astronomical-unit' => {
+						'name' => q(sa),
+						'other' => q({0}sa),
+					},
+					'carat' => {
+						'name' => q(karat),
+						'other' => q({0} CD),
+					},
 					'celsius' => {
 						'name' => q(°C),
 						'other' => q({0}°C),
 					},
 					'centimeter' => {
 						'name' => q(cm),
-						'other' => q({0} cm),
+						'other' => q({0}cm),
+						'per' => q({0}/cm),
+					},
+					'century' => {
+						'name' => q(abad),
+						'other' => q({0} abad),
 					},
 					'coordinate' => {
 						'east' => q({0}T),
@@ -2265,28 +2317,51 @@ has 'units' => (
 					},
 					'day' => {
 						'name' => q(hari),
-						'other' => q({0} hr),
+						'other' => q({0}hr),
+						'per' => q({0}/hr),
+					},
+					'decimeter' => {
+						'name' => q(dm),
+						'other' => q({0}dm),
 					},
 					'degree' => {
 						'other' => q({0}°),
 					},
 					'fahrenheit' => {
+						'name' => q(°F),
 						'other' => q({0}°F),
 					},
+					'fathom' => {
+						'name' => q(depa),
+						'other' => q({0}dp),
+					},
 					'foot' => {
+						'name' => q(kaki),
 						'other' => q({0} ft),
+						'per' => q({0}/kaki),
+					},
+					'furlong' => {
+						'name' => q(furlong),
+						'other' => q({0}fur),
 					},
 					'g-force' => {
+						'name' => q(g-force),
 						'other' => q({0} g),
+					},
+					'generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
 					},
 					'gram' => {
 						'name' => q(gram),
-						'other' => q({0} g),
+						'other' => q({0}g),
+						'per' => q({0}/g),
 					},
 					'hectare' => {
 						'other' => q({0} ha),
 					},
 					'hectopascal' => {
+						'name' => q(hPa),
 						'other' => q({0} hPa),
 					},
 					'horsepower' => {
@@ -2294,35 +2369,50 @@ has 'units' => (
 					},
 					'hour' => {
 						'name' => q(jam),
-						'other' => q({0} j),
+						'other' => q({0}j),
+						'per' => q({0}/j),
 					},
 					'inch' => {
+						'name' => q(inci),
 						'other' => q({0}″),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
+						'name' => q(″ Hg),
 						'other' => q({0} inHg),
+					},
+					'kelvin' => {
+						'name' => q(K),
+						'other' => q({0} K),
 					},
 					'kilogram' => {
 						'name' => q(kg),
-						'other' => q({0} kg),
+						'other' => q({0}kg),
+						'per' => q({0}/kg),
 					},
 					'kilometer' => {
 						'name' => q(km),
-						'other' => q({0} km),
+						'other' => q({0}km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(km/jam),
-						'other' => q({0} kph),
+						'other' => q({0}kph),
 					},
 					'kilowatt' => {
 						'other' => q({0} kW),
 					},
+					'knot' => {
+						'name' => q(kn),
+						'other' => q({0} kn),
+					},
 					'light-year' => {
+						'name' => q(thn cahaya),
 						'other' => q({0} ly),
 					},
 					'liter' => {
 						'name' => q(liter),
-						'other' => q({0} l),
+						'other' => q({0}L),
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(L/100km),
@@ -2330,51 +2420,124 @@ has 'units' => (
 					},
 					'meter' => {
 						'name' => q(meter),
-						'other' => q({0} m),
+						'other' => q({0}m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
+						'name' => q(m/d),
 						'other' => q({0} m/s),
 					},
+					'meter-per-second-squared' => {
+						'name' => q(m/d²),
+						'other' => q({0}m/d²),
+					},
+					'metric-ton' => {
+						'name' => q(t),
+						'other' => q({0} t),
+					},
+					'microgram' => {
+						'name' => q(µg),
+						'other' => q({0} µg),
+					},
+					'micrometer' => {
+						'name' => q(µmeter),
+						'other' => q({0}µm),
+					},
+					'microsecond' => {
+						'name' => q(μdtk),
+						'other' => q({0} μd),
+					},
 					'mile' => {
+						'name' => q(mil),
 						'other' => q({0} mi),
 					},
 					'mile-per-hour' => {
+						'name' => q(mi/j),
 						'other' => q({0} mph),
 					},
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0}smi),
+					},
 					'millibar' => {
+						'name' => q(mbar),
 						'other' => q({0} mbar),
+					},
+					'milligram' => {
+						'name' => q(mg),
+						'other' => q({0} mg),
 					},
 					'millimeter' => {
 						'name' => q(mm),
-						'other' => q({0} mm),
+						'other' => q({0}mm),
+					},
+					'millimeter-of-mercury' => {
+						'name' => q(mmHg),
+						'other' => q({0} mmHg),
 					},
 					'millisecond' => {
-						'name' => q(milidetik),
-						'other' => q({0} md),
+						'name' => q(milidtk),
+						'other' => q({0}md),
 					},
 					'minute' => {
 						'name' => q(mnt),
-						'other' => q({0} mnt),
+						'other' => q({0}mnt),
+						'per' => q({0}/mnt),
 					},
 					'month' => {
 						'name' => q(bulan),
-						'other' => q({0} bln),
+						'other' => q({0}bln),
+						'per' => q({0}/bln),
+					},
+					'nanometer' => {
+						'name' => q(nm),
+						'other' => q({0}nm),
+					},
+					'nanosecond' => {
+						'name' => q(nanodtk),
+						'other' => q({0} ndtk),
+					},
+					'nautical-mile' => {
+						'name' => q(nmi),
+						'other' => q({0}nmi),
 					},
 					'ounce' => {
+						'name' => q(ons),
 						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					'ounce-troy' => {
+						'name' => q(oz t),
+						'other' => q({0} oz t),
+					},
+					'parsec' => {
+						'name' => q(parsec),
+						'other' => q({0}pc),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
 					'picometer' => {
+						'name' => q(pm),
 						'other' => q({0} pm),
 					},
+					'point' => {
+						'name' => q(p),
+						'other' => q({0}p),
+					},
 					'pound' => {
+						'name' => q(pon),
 						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					'pound-per-square-inch' => {
+						'name' => q(psi),
+						'other' => q({0} psi),
 					},
 					'second' => {
 						'name' => q(dtk),
-						'other' => q({0} dtk),
+						'other' => q({0}dtk),
+						'per' => q({0}/dtk),
 					},
 					'square-foot' => {
 						'other' => q({0} ft²),
@@ -2388,19 +2551,30 @@ has 'units' => (
 					'square-mile' => {
 						'other' => q({0} mi²),
 					},
+					'stone' => {
+						'name' => q(stone),
+						'other' => q({0} st),
+					},
+					'ton' => {
+						'name' => q(ton),
+						'other' => q({0} tn),
+					},
 					'watt' => {
 						'other' => q({0} W),
 					},
 					'week' => {
 						'name' => q(mgg),
-						'other' => q({0} mgg),
+						'other' => q({0}mgg),
+						'per' => q({0}/mgg),
 					},
 					'yard' => {
+						'name' => q(yd),
 						'other' => q({0} yd),
 					},
 					'year' => {
 						'name' => q(thn),
-						'other' => q({0} thn),
+						'other' => q({0}thn),
+						'per' => q({0}/thn),
 					},
 				},
 				'short' => {
@@ -2526,6 +2700,10 @@ has 'units' => (
 						'name' => q(°F),
 						'other' => q({0}°F),
 					},
+					'fathom' => {
+						'name' => q(dp),
+						'other' => q({0} dp),
+					},
 					'fluid-ounce' => {
 						'name' => q(fl oz),
 						'other' => q({0} fl oz),
@@ -2539,6 +2717,10 @@ has 'units' => (
 						'other' => q({0} ft),
 						'per' => q({0}/ft),
 					},
+					'furlong' => {
+						'name' => q(furlong),
+						'other' => q({0} fur),
+					},
 					'g-force' => {
 						'name' => q(g-force),
 						'other' => q({0} G),
@@ -2547,6 +2729,11 @@ has 'units' => (
 						'name' => q(gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'name' => q(gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2557,7 +2744,7 @@ has 'units' => (
 						'other' => q({0} Gb),
 					},
 					'gigabyte' => {
-						'name' => q(Gbyte),
+						'name' => q(GByte),
 						'other' => q({0} GB),
 					},
 					'gigahertz' => {
@@ -2604,7 +2791,7 @@ has 'units' => (
 						'per' => q({0}/in),
 					},
 					'inch-hg' => {
-						'name' => q(inci merkuri),
+						'name' => q(in Hg),
 						'other' => q({0} inHg),
 					},
 					'joule' => {
@@ -2679,7 +2866,7 @@ has 'units' => (
 						'other' => q({0} L/100km),
 					},
 					'liter-per-kilometer' => {
-						'name' => q(L/km),
+						'name' => q(liter/km),
 						'other' => q({0} L/km),
 					},
 					'lux' => {
@@ -2712,12 +2899,12 @@ has 'units' => (
 						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
-						'name' => q(m/s),
-						'other' => q({0} m/s),
+						'name' => q(meter/dtk),
+						'other' => q({0} m/dtk),
 					},
 					'meter-per-second-squared' => {
-						'name' => q(m/s²),
-						'other' => q({0} m/s²),
+						'name' => q(meter/dtk²),
+						'other' => q({0} m/dtk²),
 					},
 					'metric-ton' => {
 						'name' => q(t),
@@ -2740,8 +2927,12 @@ has 'units' => (
 						'other' => q({0} mi),
 					},
 					'mile-per-gallon' => {
-						'name' => q(mpg),
+						'name' => q(mil/gal),
 						'other' => q({0} mpg),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mil/gal Imp.),
+						'other' => q({0} mpg Imp.),
 					},
 					'mile-per-hour' => {
 						'name' => q(mi/h),
@@ -2763,6 +2954,10 @@ has 'units' => (
 						'name' => q(mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mg/dL),
+						'other' => q({0} mg/dL),
+					},
 					'milliliter' => {
 						'name' => q(mL),
 						'other' => q({0} mL),
@@ -2774,6 +2969,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'name' => q(millimol/liter),
+						'other' => q({0} mmol/L),
 					},
 					'millisecond' => {
 						'name' => q(milidtk),
@@ -2815,12 +3014,16 @@ has 'units' => (
 						'per' => q({0}/oz),
 					},
 					'ounce-troy' => {
-						'name' => q(oz t),
+						'name' => q(oz troy),
 						'other' => q({0} oz t),
 					},
 					'parsec' => {
 						'name' => q(parsec),
 						'other' => q({0} pc),
+					},
+					'part-per-million' => {
+						'name' => q(bagian/juta),
+						'other' => q({0} ppm),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -2836,6 +3039,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'name' => q(poin),
+						'other' => q({0} p),
 					},
 					'pound' => {
 						'name' => q(pon),
@@ -2880,19 +3087,25 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(meter²),
 						'other' => q({0} m²),
-						'per' => q({0} per m²),
+						'per' => q({0}/m²),
 					},
 					'square-mile' => {
 						'name' => q(mil persegi),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yard²),
 						'other' => q({0} yd²),
+					},
+					'stone' => {
+						'name' => q(stone),
+						'other' => q({0} st),
 					},
 					'tablespoon' => {
 						'name' => q(sdm),
@@ -3017,7 +3230,7 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'other' => '0',
+					'other' => '0 rb',
 				},
 				'10000' => {
 					'other' => '00 rb',
@@ -3053,7 +3266,7 @@ has 'number_formats' => (
 					'other' => '000 T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3096,7 +3309,7 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'other' => '0',
+					'other' => '0 rb',
 				},
 				'10000' => {
 					'other' => '00 rb',
@@ -3136,14 +3349,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3535,11 +3748,18 @@ has 'currencies' => (
 				'other' => q(Rubel Baru Belarus \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(Rubel Belarusia),
 				'other' => q(Rubel Belarusia),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(Rubel Belarusia \(2000–2016\)),
+				'other' => q(Rubel Belarusia \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3599,6 +3819,13 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Peso Cile),
 				'other' => q(Peso Cile),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(Yuan Tiongkok \(luar negeri\)),
+				'other' => q(Yuan Tiongkok \(luar negeri\)),
 			},
 		},
 		'CNY' => {
@@ -4457,8 +4684,8 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(Nuevo Sol Peru),
-				'other' => q(Nuevo Sol Peru),
+				'currency' => q(Sol Peru),
+				'other' => q(Sol Peru),
 			},
 		},
 		'PES' => {
@@ -5032,7 +5259,7 @@ has 'currencies' => (
 			symbol => 'XXX',
 			display_name => {
 				'currency' => q(Mata Uang Tidak Dikenal),
-				'other' => q(Mata Uang Tidak Dikenal),
+				'other' => q(\(mata uang tidak dikenal\)),
 			},
 		},
 		'YDD' => {
@@ -6302,328 +6529,353 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'japanese') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'roc') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
 					return 'evening1' if $time >= 1500
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'dangi') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'chinese') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
-				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 0
-						&& $time < 1000;
 					return 'evening1' if $time >= 1500
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'persian') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'dangi') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1500;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1000;
-					return 'evening1' if $time >= 1500
-						&& $time < 1800;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic-amete-alem') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 0
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1500;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'evening1' if $time >= 1500
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -6643,67 +6895,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'evening1' => q{sore},
-					'afternoon1' => q{siang},
-					'pm' => q{PM},
-					'am' => q{AM},
-					'midnight' => q{tengah malam},
-					'night1' => q{malam},
-					'morning1' => q{pagi},
-					'noon' => q{tengah hari},
-				},
 				'narrow' => {
+					'am' => q{AM},
+					'evening1' => q{sore},
+					'pm' => q{PM},
+					'midnight' => q{tengah malam},
+					'noon' => q{tengah hari},
+					'night1' => q{malam},
+					'afternoon1' => q{siang},
 					'morning1' => q{pagi},
+				},
+				'wide' => {
+					'pm' => q{PM},
+					'midnight' => q{tengah malam},
 					'night1' => q{malam},
 					'noon' => q{tengah hari},
-					'midnight' => q{tengah malam},
+					'morning1' => q{pagi},
 					'afternoon1' => q{siang},
-					'evening1' => q{sore},
 					'am' => q{AM},
-					'pm' => q{PM},
+					'evening1' => q{sore},
 				},
 				'abbreviated' => {
+					'evening1' => q{sore},
+					'am' => q{AM},
 					'morning1' => q{pagi},
+					'afternoon1' => q{siang},
 					'night1' => q{malam},
 					'noon' => q{tengah hari},
 					'midnight' => q{tengah malam},
-					'afternoon1' => q{siang},
-					'evening1' => q{sore},
 					'pm' => q{PM},
-					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
 					'am' => q{AM},
-					'pm' => q{PM},
-					'afternoon1' => q{siang},
 					'evening1' => q{sore},
+					'pm' => q{PM},
+					'midnight' => q{tengah malam},
+					'noon' => q{tengah hari},
 					'night1' => q{malam},
 					'morning1' => q{pagi},
-					'noon' => q{tengah hari},
-					'midnight' => q{tengah malam},
-				},
-				'wide' => {
-					'midnight' => q{tengah malam},
-					'night1' => q{malam},
-					'noon' => q{tengah hari},
-					'morning1' => q{pagi},
-					'evening1' => q{sore},
 					'afternoon1' => q{siang},
-					'pm' => q{PM},
-					'am' => q{AM},
 				},
 				'narrow' => {
-					'night1' => q{malam},
-					'morning1' => q{pagi},
 					'noon' => q{tengah hari},
-					'midnight' => q{tengah malam},
+					'night1' => q{malam},
 					'afternoon1' => q{siang},
+					'morning1' => q{pagi},
+					'pm' => q{PM},
+					'midnight' => q{tengah malam},
 					'evening1' => q{sore},
 					'am' => q{AM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'evening1' => q{sore},
+					'noon' => q{tengah hari},
+					'night1' => q{malam},
+					'afternoon1' => q{siang},
+					'morning1' => q{pagi},
 					'pm' => q{PM},
+					'midnight' => q{tengah malam},
 				},
 			},
 		},
@@ -6719,14 +6971,55 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'BE'
 			},
+			narrow => {
+				'0' => 'BE'
+			},
+			wide => {
+				'0' => 'BE'
+			},
 		},
 		'chinese' => {
 		},
 		'coptic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
 		},
 		'dangi' => {
 		},
 		'ethiopic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+		},
+		'ethiopic-amete-alem' => {
+			abbreviated => {
+				'0' => 'ERA0'
+			},
+			narrow => {
+				'0' => 'ERA0'
+			},
+			wide => {
+				'0' => 'ERA0'
+			},
 		},
 		'generic' => {
 		},
@@ -6741,11 +7034,17 @@ has 'eras' => (
 			},
 			wide => {
 				'0' => 'Sebelum Masehi',
-				'1' => 'M'
+				'1' => 'Masehi'
 			},
 		},
 		'hebrew' => {
 			abbreviated => {
+				'0' => 'AM'
+			},
+			narrow => {
+				'0' => 'AM'
+			},
+			wide => {
 				'0' => 'AM'
 			},
 		},
@@ -6753,10 +7052,22 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'SAKA'
 			},
+			narrow => {
+				'0' => 'SAKA'
+			},
+			wide => {
+				'0' => 'SAKA'
+			},
 		},
 		'islamic' => {
 			abbreviated => {
-				'0' => 'AH'
+				'0' => 'H'
+			},
+			narrow => {
+				'0' => 'H'
+			},
+			wide => {
+				'0' => 'H'
 			},
 		},
 		'japanese' => {
@@ -7000,9 +7311,23 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'AP'
 			},
+			narrow => {
+				'0' => 'AP'
+			},
+			wide => {
+				'0' => 'AP'
+			},
 		},
 		'roc' => {
 			abbreviated => {
+				'0' => 'Sebelum R.O.C.',
+				'1' => 'R.O.C.'
+			},
+			narrow => {
+				'0' => 'Sebelum R.O.C.',
+				'1' => 'R.O.C.'
+			},
+			wide => {
 				'0' => 'Sebelum R.O.C.',
 				'1' => 'R.O.C.'
 			},
@@ -7032,6 +7357,8 @@ has 'date_formats' => (
 		'dangi' => {
 		},
 		'ethiopic' => {
+		},
+		'ethiopic-amete-alem' => {
 		},
 		'generic' => {
 			'full' => q{EEEE, dd MMMM y G},
@@ -7087,6 +7414,8 @@ has 'time_formats' => (
 		},
 		'ethiopic' => {
 		},
+		'ethiopic-amete-alem' => {
+		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -7116,6 +7445,10 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
+			'full' => q{{1} 'pukul' {0}},
+			'long' => q{{1} 'pukul' {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'chinese' => {
 		},
@@ -7125,11 +7458,13 @@ has 'datetime_formats' => (
 		},
 		'ethiopic' => {
 		},
+		'ethiopic-amete-alem' => {
+		},
 		'generic' => {
-			'full' => q{{1} {0}},
-			'long' => q{{1} {0}},
-			'medium' => q{{1} {0}},
-			'short' => q{{1} {0}},
+			'full' => q{{1} 'pukul' {0}},
+			'long' => q{{1} 'pukul' {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
 			'full' => q{{1} {0}},
@@ -7142,6 +7477,10 @@ has 'datetime_formats' => (
 		'indian' => {
 		},
 		'islamic' => {
+			'full' => q{{1} 'pukul' {0}},
+			'long' => q{{1} 'pukul' {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'japanese' => {
 			'full' => q{{1} {0}},
@@ -7161,7 +7500,13 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'japanese' => {
+		'islamic' => {
+			E => q{ccc},
+			Ed => q{E, d},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
 			M => q{L},
 			MEd => q{E, d/M},
 			MMM => q{LLL},
@@ -7171,7 +7516,17 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{d MMM},
 			Md => q{d/M},
 			d => q{d},
-			y => q{G y},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y G},
+			yyyyMEd => q{E, d/M/y G},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d/M/y G},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
 		},
 		'roc' => {
 			M => q{L},
@@ -7185,7 +7540,7 @@ has 'datetime_formats_available_formats' => (
 			d => q{d},
 			y => q{G y},
 		},
-		'islamic' => {
+		'japanese' => {
 			M => q{L},
 			MEd => q{E, d/M},
 			MMM => q{LLL},
@@ -7195,10 +7550,15 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{d MMM},
 			Md => q{d/M},
 			d => q{d},
-			y => q{y G},
+			y => q{G y},
 		},
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h.mm B},
+			Bhms => q{h.mm.ss B},
 			E => q{ccc},
+			EBhm => q{E h.mm B},
+			EBhms => q{E h.mm.ss B},
 			EHm => q{E HH.mm},
 			EHms => q{E HH.mm.ss},
 			Ed => q{E, d},
@@ -7218,6 +7578,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMEd => q{E, d MMMM},
+			MMMMW => q{'minggu' 'ke'-W MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -7238,8 +7599,15 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{'minggu' 'ke'-w Y},
 		},
 		'buddhist' => {
+			E => q{ccc},
+			Ed => q{E, d},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
 			M => q{L},
 			MEd => q{E, d/M},
 			MMM => q{LLL},
@@ -7250,10 +7618,29 @@ has 'datetime_formats_available_formats' => (
 			Md => q{d/M},
 			d => q{d},
 			y => q{G y},
+			yyyy => q{y G},
+			yyyyM => q{M/y G},
+			yyyyMEd => q{E, d/M/y G},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d/M/y G},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
 		},
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h.mm B},
+			Bhms => q{h.mm.ss B},
 			E => q{ccc},
+			EBhm => q{E h.mm B},
+			EBhms => q{E h.mm.ss B},
+			EHm => q{E HH.mm},
+			EHms => q{E HH.mm.ss},
 			Ed => q{E, d},
+			Ehm => q{E h.mm a},
+			Ehms => q{E h.mm.ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM y G},
@@ -7305,6 +7692,101 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'islamic' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH.mm – HH.mm},
+				m => q{HH.mm – HH.mm},
+			},
+			Hmv => {
+				H => q{HH.mm – HH.mm v},
+				m => q{HH.mm – HH.mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h.mm a – h.mm a},
+				h => q{h.mm – h.mm a},
+				m => q{h.mm – h.mm a},
+			},
+			hmv => {
+				a => q{h.mm a – h.mm a v},
+				h => q{h.mm – h.mm a v},
+				m => q{h.mm – h.mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, d MMM – E, d MMM y G},
+				d => q{E, d MMM – E, d MMM y G},
+				y => q{E, d MMM y – E, d MMM y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y G},
+				d => q{d – d MMM y G},
+				y => q{d MMM y – d MMM y G},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -7398,6 +7880,101 @@ has 'datetime_formats_interval' => (
 				M => q{d/M/y – d/M/y},
 				d => q{d/M/y – d/M/y},
 				y => q{d/M/y – d/M/y},
+			},
+		},
+		'buddhist' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH.mm – HH.mm},
+				m => q{HH.mm – HH.mm},
+			},
+			Hmv => {
+				H => q{HH.mm – HH.mm v},
+				m => q{HH.mm – HH.mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d – d MMM},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h.mm a – h.mm a},
+				h => q{h.mm – h.mm a},
+				m => q{h.mm – h.mm a},
+			},
+			hmv => {
+				a => q{h.mm a – h.mm a v},
+				h => q{h.mm – h.mm a v},
+				m => q{h.mm – h.mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, d MMM – E, d MMM y G},
+				d => q{E, d MMM – E, d MMM y G},
+				y => q{E, d MMM y – E, d MMM y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM y G},
+				d => q{d – d MMM y G},
+				y => q{d MMM y – d MMM y G},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
 			},
 		},
 		'generic' => {
@@ -7675,26 +8252,26 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
 		regionFormat => q(Waktu {0}),
-		regionFormat => q(Waktu Terang {0}),
+		regionFormat => q(Waktu Musim Panas {0}),
 		regionFormat => q(Waktu Standar {0}),
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Acre),
-				'generic' => q(Waktu Acre),
-				'standard' => q(Waktu Standar Acre),
+				'daylight' => q#Waktu Musim Panas Acre#,
+				'generic' => q#Waktu Acre#,
+				'standard' => q#Waktu Standar Acre#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Waktu Afganistan),
+				'standard' => q#Waktu Afganistan#,
 			},
 		},
 		'Africa/Abidjan' => {
 			exemplarCity => q#Abidjan#,
 		},
 		'Africa/Accra' => {
-			exemplarCity => q#Akra#,
+			exemplarCity => q#Accra#,
 		},
 		'Africa/Addis_Ababa' => {
 			exemplarCity => q#Addis Ababa#,
@@ -7736,7 +8313,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ceuta#,
 		},
 		'Africa/Conakry' => {
-			exemplarCity => q#Konakri#,
+			exemplarCity => q#Conakry#,
 		},
 		'Africa/Dakar' => {
 			exemplarCity => q#Dakar#,
@@ -7745,7 +8322,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Dar es Salaam#,
 		},
 		'Africa/Djibouti' => {
-			exemplarCity => q#Jibouti#,
+			exemplarCity => q#Djibouti#,
 		},
 		'Africa/Douala' => {
 			exemplarCity => q#Douala#,
@@ -7772,7 +8349,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Kampala#,
 		},
 		'Africa/Khartoum' => {
-			exemplarCity => q#Khartum#,
+			exemplarCity => q#Khartoum#,
 		},
 		'Africa/Kigali' => {
 			exemplarCity => q#Kigali#,
@@ -7848,45 +8425,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Waktu Afrika Tengah),
+				'standard' => q#Waktu Afrika Tengah#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Waktu Afrika Timur),
+				'standard' => q#Waktu Afrika Timur#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Waktu Standar Afrika Selatan),
+				'standard' => q#Waktu Standar Afrika Selatan#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Afrika Barat),
-				'generic' => q(Waktu Afrika Barat),
-				'standard' => q(Waktu Standar Afrika Barat),
+				'daylight' => q#Waktu Musim Panas Afrika Barat#,
+				'generic' => q#Waktu Afrika Barat#,
+				'standard' => q#Waktu Standar Afrika Barat#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Alaska),
-				'generic' => q(Waktu Alaska),
-				'standard' => q(Waktu Standar Alaska),
+				'daylight' => q#Waktu Musim Panas Alaska#,
+				'generic' => q#Waktu Alaska#,
+				'standard' => q#Waktu Standar Alaska#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Almaty),
-				'generic' => q(Waktu Almaty),
-				'standard' => q(Waktu Standar Almaty),
+				'daylight' => q#Waktu Musim Panas Almaty#,
+				'generic' => q#Waktu Almaty#,
+				'standard' => q#Waktu Standar Almaty#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Amazon),
-				'generic' => q(Waktu Amazon),
-				'standard' => q(Waktu Standar Amazon),
+				'daylight' => q#Waktu Musim Panas Amazon#,
+				'generic' => q#Waktu Amazon#,
+				'standard' => q#Waktu Standar Amazon#,
 			},
 		},
 		'America/Adak' => {
@@ -7971,7 +8548,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Cancun#,
 		},
 		'America/Caracas' => {
-			exemplarCity => q#Karakas#,
+			exemplarCity => q#Caracas#,
 		},
 		'America/Catamarca' => {
 			exemplarCity => q#Catamarca#,
@@ -7992,7 +8569,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Atikokan#,
 		},
 		'America/Cordoba' => {
-			exemplarCity => q#Kordoba#,
+			exemplarCity => q#Cordoba#,
 		},
 		'America/Costa_Rica' => {
 			exemplarCity => q#Kosta Rika#,
@@ -8032,6 +8609,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#El Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -8103,7 +8683,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Iqaluit#,
 		},
 		'America/Jamaica' => {
-			exemplarCity => q#Jamaika#,
+			exemplarCity => q#Jamaica#,
 		},
 		'America/Jujuy' => {
 			exemplarCity => q#Jujuy#,
@@ -8232,7 +8812,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Porto Velho#,
 		},
 		'America/Puerto_Rico' => {
-			exemplarCity => q#Puerto Riko#,
+			exemplarCity => q#Puerto Rico#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
@@ -8329,37 +8912,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Tengah),
-				'generic' => q(Waktu Tengah),
-				'standard' => q(Waktu Standar Tengah),
+				'daylight' => q#Waktu Musim Panas Tengah#,
+				'generic' => q#Waktu Tengah#,
+				'standard' => q#Waktu Standar Tengah#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Timur),
-				'generic' => q(Waktu Timur),
-				'standard' => q(Waktu Standar Timur),
+				'daylight' => q#Waktu Musim Panas Timur#,
+				'generic' => q#Waktu Timur#,
+				'standard' => q#Waktu Standar Timur#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Pegunungan),
-				'generic' => q(Waktu Pegunungan),
-				'standard' => q(Waktu Standar Pegunungan),
+				'daylight' => q#Waktu Musim Panas Pegunungan#,
+				'generic' => q#Waktu Pegunungan#,
+				'standard' => q#Waktu Standar Pegunungan#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Pasifik),
-				'generic' => q(Waktu Pasifik),
-				'standard' => q(Waktu Standar Pasifik),
+				'daylight' => q#Waktu Musim Panas Pasifik#,
+				'generic' => q#Waktu Pasifik#,
+				'standard' => q#Waktu Standar Pasifik#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Anadyr),
-				'generic' => q(Waktu Anadyr),
-				'standard' => q(Waktu Standar Anadyr),
+				'daylight' => q#Waktu Musim Panas Anadyr#,
+				'generic' => q#Waktu Anadyr#,
+				'standard' => q#Waktu Standar Anadyr#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -8397,30 +8980,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Apia),
-				'generic' => q(Waktu Apia),
-				'standard' => q(Waktu Standar Apia),
+				'daylight' => q#Waktu Musim Panas Apia#,
+				'generic' => q#Waktu Apia#,
+				'standard' => q#Waktu Standar Apia#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Aqtau),
-				'generic' => q(Waktu Aqtau),
-				'standard' => q(Waktu Standar Aqtau),
+				'daylight' => q#Waktu Musim Panas Aqtau#,
+				'generic' => q#Waktu Aqtau#,
+				'standard' => q#Waktu Standar Aqtau#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Aqtobe),
-				'generic' => q(Waktu Aqtobe),
-				'standard' => q(Waktu Standar Aqtobe),
+				'daylight' => q#Waktu Musim Panas Aqtobe#,
+				'generic' => q#Waktu Aqtobe#,
+				'standard' => q#Waktu Standar Aqtobe#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Arab),
-				'generic' => q(Waktu Arab),
-				'standard' => q(Waktu Standar Arab),
+				'daylight' => q#Waktu Musim Panas Arab#,
+				'generic' => q#Waktu Arab#,
+				'standard' => q#Waktu Standar Arab#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -8428,23 +9011,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Argentina),
-				'generic' => q(Waktu Argentina),
-				'standard' => q(Waktu Standar Argentina),
+				'daylight' => q#Waktu Musim Panas Argentina#,
+				'generic' => q#Waktu Argentina#,
+				'standard' => q#Waktu Standar Argentina#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Argentina Bagian Barat),
-				'generic' => q(Waktu Argentina Bagian Barat),
-				'standard' => q(Waktu Standar Argentina Bagian Barat),
+				'daylight' => q#Waktu Musim Panas Argentina Bagian Barat#,
+				'generic' => q#Waktu Argentina Bagian Barat#,
+				'standard' => q#Waktu Standar Argentina Bagian Barat#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Armenia),
-				'generic' => q(Waktu Armenia),
-				'standard' => q(Waktu Standar Armenia),
+				'daylight' => q#Waktu Musim Panas Armenia#,
+				'generic' => q#Waktu Armenia#,
+				'standard' => q#Waktu Standar Armenia#,
 			},
 		},
 		'Asia/Aden' => {
@@ -8468,8 +9051,11 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ashgabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
-			exemplarCity => q#Bagdad#,
+			exemplarCity => q#Baghdad#,
 		},
 		'Asia/Bahrain' => {
 			exemplarCity => q#Bahrain#,
@@ -8479,6 +9065,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Beirut#,
@@ -8515,6 +9104,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dushanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gaza#,
@@ -8616,10 +9208,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Rangoon#,
 		},
 		'Asia/Riyadh' => {
-			exemplarCity => q#Riyad#,
+			exemplarCity => q#Riyadh#,
 		},
 		'Asia/Saigon' => {
-			exemplarCity => q#Kota Ho Chi Minh#,
+			exemplarCity => q#Ho Chi Minh#,
 		},
 		'Asia/Sakhalin' => {
 			exemplarCity => q#Sakhalin#,
@@ -8657,6 +9249,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokyo#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulaanbaatar#,
 		},
@@ -8683,9 +9278,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Atlantik),
-				'generic' => q(Waktu Atlantik),
-				'standard' => q(Waktu Standar Atlantik),
+				'daylight' => q#Waktu Musim Panas Atlantik#,
+				'generic' => q#Waktu Atlantik#,
+				'standard' => q#Waktu Standar Atlantik#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -8756,176 +9351,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Tengah Australia),
-				'generic' => q(Waktu Tengah Australia),
-				'standard' => q(Waktu Standar Tengah Australia),
+				'daylight' => q#Waktu Musim Panas Tengah Australia#,
+				'generic' => q#Waktu Tengah Australia#,
+				'standard' => q#Waktu Standar Tengah Australia#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Barat Tengah Australia),
-				'generic' => q(Waktu Barat Tengah Australia),
-				'standard' => q(Waktu Standar Barat Tengah Australia),
+				'daylight' => q#Waktu Musim Panas Barat Tengah Australia#,
+				'generic' => q#Waktu Barat Tengah Australia#,
+				'standard' => q#Waktu Standar Barat Tengah Australia#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Timur Australia),
-				'generic' => q(Waktu Timur Australia),
-				'standard' => q(Waktu Standar Timur Australia),
+				'daylight' => q#Waktu Musim Panas Timur Australia#,
+				'generic' => q#Waktu Timur Australia#,
+				'standard' => q#Waktu Standar Timur Australia#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Barat Australia),
-				'generic' => q(Waktu Barat Australia),
-				'standard' => q(Waktu Standar Barat Australia),
+				'daylight' => q#Waktu Musim Panas Barat Australia#,
+				'generic' => q#Waktu Barat Australia#,
+				'standard' => q#Waktu Standar Barat Australia#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Azerbaijan),
-				'generic' => q(Waktu Azerbaijan),
-				'standard' => q(Waktu Standar Azerbaijan),
+				'daylight' => q#Waktu Musim Panas Azerbaijan#,
+				'generic' => q#Waktu Azerbaijan#,
+				'standard' => q#Waktu Standar Azerbaijan#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Azores),
-				'generic' => q(Waktu Azores),
-				'standard' => q(Waktu Standar Azores),
+				'daylight' => q#Waktu Musim Panas Azores#,
+				'generic' => q#Waktu Azores#,
+				'standard' => q#Waktu Standar Azores#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Bangladesh),
-				'generic' => q(Waktu Bangladesh),
-				'standard' => q(Waktu Standar Bangladesh),
+				'daylight' => q#Waktu Musim Panas Bangladesh#,
+				'generic' => q#Waktu Bangladesh#,
+				'standard' => q#Waktu Standar Bangladesh#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Waktu Bhutan),
+				'standard' => q#Waktu Bhutan#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Waktu Bolivia),
+				'standard' => q#Waktu Bolivia#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Brasil),
-				'generic' => q(Waktu Brasil),
-				'standard' => q(Waktu Standar Brasil),
+				'daylight' => q#Waktu Musim Panas Brasil#,
+				'generic' => q#Waktu Brasil#,
+				'standard' => q#Waktu Standar Brasil#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Waktu Brunei Darussalam),
+				'standard' => q#Waktu Brunei Darussalam#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Tanjung Verde),
-				'generic' => q(Waktu Tanjung Verde),
-				'standard' => q(Waktu Standar Tanjung Verde),
+				'daylight' => q#Waktu Musim Panas Tanjung Verde#,
+				'generic' => q#Waktu Tanjung Verde#,
+				'standard' => q#Waktu Standar Tanjung Verde#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(Waktu Casey),
+				'standard' => q#Waktu Casey#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Waktu Chamorro),
+				'standard' => q#Waktu Standar Chamorro#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Chatham),
-				'generic' => q(Waktu Chatham),
-				'standard' => q(Waktu Standar Chatham),
+				'daylight' => q#Waktu Musim Panas Chatham#,
+				'generic' => q#Waktu Chatham#,
+				'standard' => q#Waktu Standar Chatham#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Cile),
-				'generic' => q(Waktu Cile),
-				'standard' => q(Waktu Standar Cile),
+				'daylight' => q#Waktu Musim Panas Cile#,
+				'generic' => q#Waktu Cile#,
+				'standard' => q#Waktu Standar Cile#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Waktu Terang Tiongkok),
-				'generic' => q(Waktu Tiongkok),
-				'standard' => q(Waktu Standar Tiongkok),
+				'daylight' => q#Waktu Musim Panas Tiongkok#,
+				'generic' => q#Waktu Tiongkok#,
+				'standard' => q#Waktu Standar Tiongkok#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Choibalsan),
-				'generic' => q(Waktu Choibalsan),
-				'standard' => q(Waktu Standar Choibalsan),
+				'daylight' => q#Waktu Musim Panas Choibalsan#,
+				'generic' => q#Waktu Choibalsan#,
+				'standard' => q#Waktu Standar Choibalsan#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Waktu Pulau Natal),
+				'standard' => q#Waktu Pulau Natal#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Waktu Kepulauan Cocos),
+				'standard' => q#Waktu Kepulauan Cocos#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Kolombia),
-				'generic' => q(Waktu Kolombia),
-				'standard' => q(Waktu Standar Kolombia),
+				'daylight' => q#Waktu Musim Panas Kolombia#,
+				'generic' => q#Waktu Kolombia#,
+				'standard' => q#Waktu Standar Kolombia#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Waktu Tengah Musim Panas Kep. Cook),
-				'generic' => q(Waktu Kep. Cook),
-				'standard' => q(Waktu Standar Kep. Cook),
+				'daylight' => q#Waktu Tengah Musim Panas Kep. Cook#,
+				'generic' => q#Waktu Kep. Cook#,
+				'standard' => q#Waktu Standar Kep. Cook#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Kuba),
-				'generic' => q(Waktu Kuba),
-				'standard' => q(Waktu Standar Kuba),
+				'daylight' => q#Waktu Musim Panas Kuba#,
+				'generic' => q#Waktu Kuba#,
+				'standard' => q#Waktu Standar Kuba#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Waktu Davis),
+				'standard' => q#Waktu Davis#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Waktu Dumont-d’Urville),
+				'standard' => q#Waktu Dumont-d’Urville#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Waktu Timor Leste),
+				'standard' => q#Waktu Timor Leste#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Pulau Paskah),
-				'generic' => q(Waktu Pulau Paskah),
-				'standard' => q(Waktu Standar Pulau Paskah),
+				'daylight' => q#Waktu Musim Panas Pulau Paskah#,
+				'generic' => q#Waktu Pulau Paskah#,
+				'standard' => q#Waktu Standar Pulau Paskah#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Waktu Ekuador),
+				'standard' => q#Waktu Ekuador#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Waktu Universal Terkoordinasi#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -8936,6 +9536,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrakhan#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#Athena#,
@@ -8950,10 +9553,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Bratislava#,
 		},
 		'Europe/Brussels' => {
-			exemplarCity => q#Brussel#,
+			exemplarCity => q#Brussels#,
 		},
 		'Europe/Bucharest' => {
-			exemplarCity => q#Bukares#,
+			exemplarCity => q#Bucharest#,
 		},
 		'Europe/Budapest' => {
 			exemplarCity => q#Budapest#,
@@ -8970,7 +9573,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(Waktu Standar Irlandia),
+				'daylight' => q#Waktu Standar Irlandia#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -8997,8 +9600,11 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
-			exemplarCity => q#Lisboa#,
+			exemplarCity => q#Lisbon#,
 		},
 		'Europe/Ljubljana' => {
 			exemplarCity => q#Ljubljana#,
@@ -9006,7 +9612,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#London#,
 			long => {
-				'daylight' => q(Waktu Musim Panas Inggris),
+				'daylight' => q#Waktu Musim Panas Inggris#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -9057,6 +9663,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -9074,6 +9683,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirane#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ulyanovsk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Uzhhorod#,
@@ -9107,134 +9719,134 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Eropa Tengah),
-				'generic' => q(Waktu Eropa Tengah),
-				'standard' => q(Waktu Standar Eropa Tengah),
+				'daylight' => q#Waktu Musim Panas Eropa Tengah#,
+				'generic' => q#Waktu Eropa Tengah#,
+				'standard' => q#Waktu Standar Eropa Tengah#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Eropa Timur),
-				'generic' => q(Waktu Eropa Timur),
-				'standard' => q(Waktu Standar Eropa Timur),
+				'daylight' => q#Waktu Musim Panas Eropa Timur#,
+				'generic' => q#Waktu Eropa Timur#,
+				'standard' => q#Waktu Standar Eropa Timur#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Waktu Eropa Timur Jauh),
+				'standard' => q#Waktu Eropa Timur Jauh#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Eropa Barat),
-				'generic' => q(Waktu Eropa Barat),
-				'standard' => q(Waktu Standar Eropa Barat),
+				'daylight' => q#Waktu Musim Panas Eropa Barat#,
+				'generic' => q#Waktu Eropa Barat#,
+				'standard' => q#Waktu Standar Eropa Barat#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Kepulauan Falkland),
-				'generic' => q(Waktu Kepulauan Falkland),
-				'standard' => q(Waktu Standar Kepulauan Falkland),
+				'daylight' => q#Waktu Musim Panas Kepulauan Falkland#,
+				'generic' => q#Waktu Kepulauan Falkland#,
+				'standard' => q#Waktu Standar Kepulauan Falkland#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Fiji),
-				'generic' => q(Waktu Fiji),
-				'standard' => q(Waktu Standar Fiji),
+				'daylight' => q#Waktu Musim Panas Fiji#,
+				'generic' => q#Waktu Fiji#,
+				'standard' => q#Waktu Standar Fiji#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Waktu Guyana Prancis),
+				'standard' => q#Waktu Guyana Prancis#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Waktu Wilayah Selatan dan Antarktika Prancis),
+				'standard' => q#Waktu Wilayah Selatan dan Antarktika Prancis#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Waktu Rata-rata Greenwich),
+				'standard' => q#Greenwich Mean Time#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Waktu Galapagos),
+				'standard' => q#Waktu Galapagos#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Waktu Gambier),
+				'standard' => q#Waktu Gambier#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Georgia),
-				'generic' => q(Waktu Georgia),
-				'standard' => q(Waktu Standar Georgia),
+				'daylight' => q#Waktu Musim Panas Georgia#,
+				'generic' => q#Waktu Georgia#,
+				'standard' => q#Waktu Standar Georgia#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Waktu Kep. Gilbert),
+				'standard' => q#Waktu Kep. Gilbert#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Greenland Timur),
-				'generic' => q(Waktu Greenland Timur),
-				'standard' => q(Waktu Standar Greenland Timur),
+				'daylight' => q#Waktu Musim Panas Greenland Timur#,
+				'generic' => q#Waktu Greenland Timur#,
+				'standard' => q#Waktu Standar Greenland Timur#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Greenland Barat),
-				'generic' => q(Waktu Greenland Barat),
-				'standard' => q(Waktu Standar Greenland Barat),
+				'daylight' => q#Waktu Musim Panas Greenland Barat#,
+				'generic' => q#Waktu Greenland Barat#,
+				'standard' => q#Waktu Standar Greenland Barat#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Waktu Guam),
+				'standard' => q#Waktu Guam#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Waktu Gulf),
+				'standard' => q#Waktu Standar Teluk#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Waktu Guyana),
+				'standard' => q#Waktu Guyana#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Hawaii-Aleutian),
-				'generic' => q(Waktu Hawaii-Aleutian),
-				'standard' => q(Waktu Standar Hawaii-Aleutian),
+				'daylight' => q#Waktu Musim Panas Hawaii-Aleutian#,
+				'generic' => q#Waktu Hawaii-Aleutian#,
+				'standard' => q#Waktu Standar Hawaii-Aleutian#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Hong Kong),
-				'generic' => q(Waktu Hong Kong),
-				'standard' => q(Waktu Standar Hong Kong),
+				'daylight' => q#Waktu Musim Panas Hong Kong#,
+				'generic' => q#Waktu Hong Kong#,
+				'standard' => q#Waktu Standar Hong Kong#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Hovd),
-				'generic' => q(Waktu Hovd),
-				'standard' => q(Waktu Standar Hovd),
+				'daylight' => q#Waktu Musim Panas Hovd#,
+				'generic' => q#Waktu Hovd#,
+				'standard' => q#Waktu Standar Hovd#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Waktu India),
+				'standard' => q#Waktu India#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -9272,273 +9884,273 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Waktu Samudera Hindia),
+				'standard' => q#Waktu Samudera Hindia#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Waktu Indochina),
+				'standard' => q#Waktu Indochina#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Waktu Indonesia Tengah),
+				'standard' => q#Waktu Indonesia Tengah#,
 			},
 			short => {
-				'standard' => q(WITA),
+				'standard' => q#WITA#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Waktu Indonesia Timur),
+				'standard' => q#Waktu Indonesia Timur#,
 			},
 			short => {
-				'standard' => q(WIT),
+				'standard' => q#WIT#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Waktu Indonesia Barat),
+				'standard' => q#Waktu Indonesia Barat#,
 			},
 			short => {
-				'standard' => q(WIB),
+				'standard' => q#WIB#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Iran),
-				'generic' => q(Waktu Iran),
-				'standard' => q(Waktu Standar Iran),
+				'daylight' => q#Waktu Musim Panas Iran#,
+				'generic' => q#Waktu Iran#,
+				'standard' => q#Waktu Standar Iran#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Irkutsk),
-				'generic' => q(Waktu Irkutsk),
-				'standard' => q(Waktu Standar Irkutsk),
+				'daylight' => q#Waktu Musim Panas Irkutsk#,
+				'generic' => q#Waktu Irkutsk#,
+				'standard' => q#Waktu Standar Irkutsk#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Israel),
-				'generic' => q(Waktu Israel),
-				'standard' => q(Waktu Standar Israel),
+				'daylight' => q#Waktu Musim Panas Israel#,
+				'generic' => q#Waktu Israel#,
+				'standard' => q#Waktu Standar Israel#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Jepang),
-				'generic' => q(Waktu Jepang),
-				'standard' => q(Waktu Standar Jepang),
+				'daylight' => q#Waktu Musim Panas Jepang#,
+				'generic' => q#Waktu Jepang#,
+				'standard' => q#Waktu Standar Jepang#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Petropavlovsk-Kamchatski),
-				'generic' => q(Waktu Petropavlovsk-Kamchatsky),
-				'standard' => q(Waktu Standar Petropavlovsk-Kamchatsky),
+				'daylight' => q#Waktu Musim Panas Petropavlovsk-Kamchatski#,
+				'generic' => q#Waktu Petropavlovsk-Kamchatsky#,
+				'standard' => q#Waktu Standar Petropavlovsk-Kamchatsky#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Waktu Kazakhstan Timur),
+				'standard' => q#Waktu Kazakhstan Timur#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Waktu Kazakhstan Barat),
+				'standard' => q#Waktu Kazakhstan Barat#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Korea),
-				'generic' => q(Waktu Korea),
-				'standard' => q(Waktu Standar Korea),
+				'daylight' => q#Waktu Musim Panas Korea#,
+				'generic' => q#Waktu Korea#,
+				'standard' => q#Waktu Standar Korea#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Waktu Kosrae),
+				'standard' => q#Waktu Kosrae#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Krasnoyarsk),
-				'generic' => q(Waktu Krasnoyarsk),
-				'standard' => q(Waktu Standar Krasnoyarsk),
+				'daylight' => q#Waktu Musim Panas Krasnoyarsk#,
+				'generic' => q#Waktu Krasnoyarsk#,
+				'standard' => q#Waktu Standar Krasnoyarsk#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Waktu Kirghizia),
+				'standard' => q#Waktu Kirghizia#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Waktu Lanka),
+				'standard' => q#Waktu Lanka#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Waktu Kep. Line),
+				'standard' => q#Waktu Kep. Line#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Lord Howe),
-				'generic' => q(Waktu Lord Howe),
-				'standard' => q(Waktu Standar Lord Howe),
+				'daylight' => q#Waktu Musim Panas Lord Howe#,
+				'generic' => q#Waktu Lord Howe#,
+				'standard' => q#Waktu Standar Lord Howe#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Makau),
-				'generic' => q(Waktu Makau),
-				'standard' => q(Waktu Standar Makau),
+				'daylight' => q#Waktu Musim Panas Makau#,
+				'generic' => q#Waktu Makau#,
+				'standard' => q#Waktu Standar Makau#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Waktu Kepulauan Macquarie),
+				'standard' => q#Waktu Kepulauan Macquarie#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Magadan),
-				'generic' => q(Waktu Magadan),
-				'standard' => q(Waktu Standar Magadan),
+				'daylight' => q#Waktu Musim Panas Magadan#,
+				'generic' => q#Waktu Magadan#,
+				'standard' => q#Waktu Standar Magadan#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Waktu Malaysia),
+				'standard' => q#Waktu Malaysia#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Waktu Maladewa),
+				'standard' => q#Waktu Maladewa#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Waktu Marquesas),
+				'standard' => q#Waktu Marquesas#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Waktu Kep. Marshall),
+				'standard' => q#Waktu Kep. Marshall#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Mauritius),
-				'generic' => q(Waktu Mauritius),
-				'standard' => q(Waktu Standar Mauritius),
+				'daylight' => q#Waktu Musim Panas Mauritius#,
+				'generic' => q#Waktu Mauritius#,
+				'standard' => q#Waktu Standar Mauritius#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Waktu Mawson),
+				'standard' => q#Waktu Mawson#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Meksiko Barat Laut),
-				'generic' => q(Waktu Meksiko Barat Laut),
-				'standard' => q(Waktu Standar Meksiko Barat Laut),
+				'daylight' => q#Waktu Musim Panas Meksiko Barat Laut#,
+				'generic' => q#Waktu Meksiko Barat Laut#,
+				'standard' => q#Waktu Standar Meksiko Barat Laut#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Pasifik Meksiko),
-				'generic' => q(Waktu Pasifik Meksiko),
-				'standard' => q(Waktu Standar Pasifik Meksiko),
+				'daylight' => q#Waktu Musim Panas Pasifik Meksiko#,
+				'generic' => q#Waktu Pasifik Meksiko#,
+				'standard' => q#Waktu Standar Pasifik Meksiko#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Ulan Bator),
-				'generic' => q(Waktu Ulan Bator),
-				'standard' => q(Waktu Standar Ulan Bator),
+				'daylight' => q#Waktu Musim Panas Ulan Bator#,
+				'generic' => q#Waktu Ulan Bator#,
+				'standard' => q#Waktu Standar Ulan Bator#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Moskwa),
-				'generic' => q(Waktu Moskwa),
-				'standard' => q(Waktu Standar Moskwa),
+				'daylight' => q#Waktu Musim Panas Moskwa#,
+				'generic' => q#Waktu Moskwa#,
+				'standard' => q#Waktu Standar Moskwa#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Waktu Myanmar),
+				'standard' => q#Waktu Myanmar#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Waktu Nauru),
+				'standard' => q#Waktu Nauru#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Waktu Nepal),
+				'standard' => q#Waktu Nepal#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Kaledonia Baru),
-				'generic' => q(Waktu Kaledonia Baru),
-				'standard' => q(Waktu Standar Kaledonia Baru),
+				'daylight' => q#Waktu Musim Panas Kaledonia Baru#,
+				'generic' => q#Waktu Kaledonia Baru#,
+				'standard' => q#Waktu Standar Kaledonia Baru#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Selandia Baru),
-				'generic' => q(Waktu Selandia Baru),
-				'standard' => q(Waktu Standar Selandia Baru),
+				'daylight' => q#Waktu Musim Panas Selandia Baru#,
+				'generic' => q#Waktu Selandia Baru#,
+				'standard' => q#Waktu Standar Selandia Baru#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Newfoundland),
-				'generic' => q(Waktu Newfoundland),
-				'standard' => q(Waktu Standar Newfoundland),
+				'daylight' => q#Waktu Musim Panas Newfoundland#,
+				'generic' => q#Waktu Newfoundland#,
+				'standard' => q#Waktu Standar Newfoundland#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Waktu Niue),
+				'standard' => q#Waktu Niue#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Waktu Kepulauan Norfolk),
+				'standard' => q#Waktu Kepulauan Norfolk#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Fernando de Noronha),
-				'generic' => q(Waktu Fernando de Noronha),
-				'standard' => q(Waktu Standar Fernando de Noronha),
+				'daylight' => q#Waktu Musim Panas Fernando de Noronha#,
+				'generic' => q#Waktu Fernando de Noronha#,
+				'standard' => q#Waktu Standar Fernando de Noronha#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Waktu Kep. Mariana Utara),
+				'standard' => q#Waktu Kep. Mariana Utara#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Novosibirsk),
-				'generic' => q(Waktu Novosibirsk),
-				'standard' => q(Waktu Standar Novosibirsk),
+				'daylight' => q#Waktu Musim Panas Novosibirsk#,
+				'generic' => q#Waktu Novosibirsk#,
+				'standard' => q#Waktu Standar Novosibirsk#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Omsk),
-				'generic' => q(Waktu Omsk),
-				'standard' => q(Waktu Standar Omsk),
+				'daylight' => q#Waktu Musim Panas Omsk#,
+				'generic' => q#Waktu Omsk#,
+				'standard' => q#Waktu Standar Omsk#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -9660,245 +10272,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Pakistan),
-				'generic' => q(Waktu Pakistan),
-				'standard' => q(Waktu Standar Pakistan),
+				'daylight' => q#Waktu Musim Panas Pakistan#,
+				'generic' => q#Waktu Pakistan#,
+				'standard' => q#Waktu Standar Pakistan#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Waktu Palau),
+				'standard' => q#Waktu Palau#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Waktu Papua Nugini),
+				'standard' => q#Waktu Papua Nugini#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Paraguay),
-				'generic' => q(Waktu Paraguay),
-				'standard' => q(Waktu Standar Paraguay),
+				'daylight' => q#Waktu Musim Panas Paraguay#,
+				'generic' => q#Waktu Paraguay#,
+				'standard' => q#Waktu Standar Paraguay#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Peru),
-				'generic' => q(Waktu Peru),
-				'standard' => q(Waktu Standar Peru),
+				'daylight' => q#Waktu Musim Panas Peru#,
+				'generic' => q#Waktu Peru#,
+				'standard' => q#Waktu Standar Peru#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Filipina),
-				'generic' => q(Waktu Filipina),
-				'standard' => q(Waktu Standar Filipina),
+				'daylight' => q#Waktu Musim Panas Filipina#,
+				'generic' => q#Waktu Filipina#,
+				'standard' => q#Waktu Standar Filipina#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Waktu Kepulauan Phoenix),
+				'standard' => q#Waktu Kepulauan Phoenix#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Saint Pierre dan Miquelon),
-				'generic' => q(Waktu Saint Pierre dan Miquelon),
-				'standard' => q(Waktu Standar Saint Pierre dan Miquelon),
+				'daylight' => q#Waktu Musim Panas Saint Pierre dan Miquelon#,
+				'generic' => q#Waktu Saint Pierre dan Miquelon#,
+				'standard' => q#Waktu Standar Saint Pierre dan Miquelon#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Waktu Pitcairn),
+				'standard' => q#Waktu Pitcairn#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Waktu Ponape),
+				'standard' => q#Waktu Ponape#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Waktu Pyongyang#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Qyzylorda),
-				'generic' => q(Waktu Qyzylorda),
-				'standard' => q(Waktu Standar Qyzylorda),
+				'daylight' => q#Waktu Musim Panas Qyzylorda#,
+				'generic' => q#Waktu Qyzylorda#,
+				'standard' => q#Waktu Standar Qyzylorda#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Waktu Reunion),
+				'standard' => q#Waktu Reunion#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Waktu Rothera),
+				'standard' => q#Waktu Rothera#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Sakhalin),
-				'generic' => q(Waktu Sakhalin),
-				'standard' => q(Waktu Standar Sakhalin),
+				'daylight' => q#Waktu Musim Panas Sakhalin#,
+				'generic' => q#Waktu Sakhalin#,
+				'standard' => q#Waktu Standar Sakhalin#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Samara),
-				'generic' => q(Waktu Samara),
-				'standard' => q(Waktu Standar Samara),
+				'daylight' => q#Waktu Musim Panas Samara#,
+				'generic' => q#Waktu Samara#,
+				'standard' => q#Waktu Standar Samara#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Samoa),
-				'generic' => q(Waktu Samoa),
-				'standard' => q(Waktu Standar Samoa),
+				'daylight' => q#Waktu Musim Panas Samoa#,
+				'generic' => q#Waktu Samoa#,
+				'standard' => q#Waktu Standar Samoa#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Waktu Seychelles),
+				'standard' => q#Waktu Seychelles#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Waktu Standar Singapura),
+				'standard' => q#Waktu Standar Singapura#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Waktu Kepulauan Solomon),
+				'standard' => q#Waktu Kepulauan Solomon#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Waktu Georgia Selatan),
+				'standard' => q#Waktu Georgia Selatan#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Waktu Suriname),
+				'standard' => q#Waktu Suriname#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Waktu Syowa),
+				'standard' => q#Waktu Syowa#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Waktu Tahiti),
+				'standard' => q#Waktu Tahiti#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Taipei),
-				'generic' => q(Waktu Taipei),
-				'standard' => q(Waktu Standar Taipei),
+				'daylight' => q#Waktu Musim Panas Taipei#,
+				'generic' => q#Waktu Taipei#,
+				'standard' => q#Waktu Standar Taipei#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Waktu Tajikistan),
+				'standard' => q#Waktu Tajikistan#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Waktu Tokelau),
+				'standard' => q#Waktu Tokelau#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Tonga),
-				'generic' => q(Waktu Tonga),
-				'standard' => q(Waktu Standar Tonga),
+				'daylight' => q#Waktu Musim Panas Tonga#,
+				'generic' => q#Waktu Tonga#,
+				'standard' => q#Waktu Standar Tonga#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Waktu Chuuk),
+				'standard' => q#Waktu Chuuk#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Turkmenistan),
-				'generic' => q(Waktu Turkmenistan),
-				'standard' => q(Waktu Standar Turkmenistan),
+				'daylight' => q#Waktu Musim Panas Turkmenistan#,
+				'generic' => q#Waktu Turkmenistan#,
+				'standard' => q#Waktu Standar Turkmenistan#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Waktu Tuvalu),
+				'standard' => q#Waktu Tuvalu#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Uruguay),
-				'generic' => q(Waktu Uruguay),
-				'standard' => q(Waktu Standar Uruguay),
+				'daylight' => q#Waktu Musim Panas Uruguay#,
+				'generic' => q#Waktu Uruguay#,
+				'standard' => q#Waktu Standar Uruguay#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Uzbekistan),
-				'generic' => q(Waktu Uzbekistan),
-				'standard' => q(Waktu Standar Uzbekistan),
+				'daylight' => q#Waktu Musim Panas Uzbekistan#,
+				'generic' => q#Waktu Uzbekistan#,
+				'standard' => q#Waktu Standar Uzbekistan#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Vanuatu),
-				'generic' => q(Waktu Vanuatu),
-				'standard' => q(Waktu Standar Vanuatu),
+				'daylight' => q#Waktu Musim Panas Vanuatu#,
+				'generic' => q#Waktu Vanuatu#,
+				'standard' => q#Waktu Standar Vanuatu#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Waktu Venezuela),
+				'standard' => q#Waktu Venezuela#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Vladivostok),
-				'generic' => q(Waktu Vladivostok),
-				'standard' => q(Waktu Standar Vladivostok),
+				'daylight' => q#Waktu Musim Panas Vladivostok#,
+				'generic' => q#Waktu Vladivostok#,
+				'standard' => q#Waktu Standar Vladivostok#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Volgograd),
-				'generic' => q(Waktu Volgograd),
-				'standard' => q(Waktu Standar Volgograd),
+				'daylight' => q#Waktu Musim Panas Volgograd#,
+				'generic' => q#Waktu Volgograd#,
+				'standard' => q#Waktu Standar Volgograd#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Waktu Vostok),
+				'standard' => q#Waktu Vostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Waktu Kepulauan Wake),
+				'standard' => q#Waktu Kepulauan Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Waktu Wallis dan Futuna),
+				'standard' => q#Waktu Wallis dan Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Yakutsk),
-				'generic' => q(Waktu Yakutsk),
-				'standard' => q(Waktu Standar Yakutsk),
+				'daylight' => q#Waktu Musim Panas Yakutsk#,
+				'generic' => q#Waktu Yakutsk#,
+				'standard' => q#Waktu Standar Yakutsk#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Waktu Musim Panas Yekaterinburg),
-				'generic' => q(Waktu Yekaterinburg),
-				'standard' => q(Waktu Standar Yekaterinburg),
+				'daylight' => q#Waktu Musim Panas Yekaterinburg#,
+				'generic' => q#Waktu Yekaterinburg#,
+				'standard' => q#Waktu Standar Yekaterinburg#,
 			},
 		},
 	 } }

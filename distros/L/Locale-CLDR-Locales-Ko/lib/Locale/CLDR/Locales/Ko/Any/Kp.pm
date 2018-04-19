@@ -6,21 +6,34 @@ Locale::CLDR::Locales::Ko::Any::Kp - Package for language Korean
 
 package Locale::CLDR::Locales::Ko::Any::Kp;
 # This file auto generated from Data\common\main\ko_KP.xml
-#	on Fri 29 Apr  7:13:22 pm GMT
+#	on Fri 13 Apr  7:17:22 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Ko::Any');
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { 
+		{
+			'KP' => '조선민주주의인민공화국',
+
+		}
+	},
+);
+
 has 'time_zone_names' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -28,9 +41,9 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		'Korea' => {
 			long => {
-				'daylight' => q(조선 하계 표준시),
-				'generic' => q(조선 시간),
-				'standard' => q(조선 표준시),
+				'daylight' => q#조선 하계 표준시#,
+				'generic' => q#조선 시간#,
+				'standard' => q#조선 표준시#,
 			},
 		},
 	 } }

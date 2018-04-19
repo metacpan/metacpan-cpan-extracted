@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
 
@@ -43,8 +43,7 @@ use namespace::clean;
 
 has types => (
     is  => 'rwp',
-    isa => HashRef [ Enum [qw( N I S )] ]
-      | CycleTuple [ Str, Enum [qw( N I S )] ],
+    isa => ( HashRef [ Enum [qw( N I S )] ] | CycleTuple [ Str, Enum [qw( N I S )] ] ),   # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub {
         $_[0]->clear_type_index;
@@ -99,7 +98,7 @@ has default_type => (
 
 has fields => (
     is      => 'rwp',
-    isa     => ArrayRef [Str] | Enum ['all'],
+    isa     => ( ArrayRef [Str] | Enum ['all'] ),  # need parens for perl <= 5.12.5
     predicate => 1,
     clearer => 1,
     trigger => sub {
@@ -229,7 +228,7 @@ has _numify => (
 
 has nullify => (
     is        => 'rw',
-    isa       => ArrayRef [Str] | CodeRef | Bool,
+    isa       => ( ArrayRef [Str] | CodeRef | Bool ),  # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub { $_[0]->_clear_nullify },
 );
@@ -662,7 +661,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 DESCRIPTION
 

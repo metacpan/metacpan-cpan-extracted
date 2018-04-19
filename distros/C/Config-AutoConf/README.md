@@ -226,12 +226,6 @@ Pops the currently used language from the stack and restores previously used
 language. If _lang_ specified, it's asserted that the current used language
 equals to specified language (helps finding control flow bugs).
 
-## lang\_call( \[prologue\], function )
-
-Builds program which simply calls given function.
-When given, prologue is prepended otherwise, the default
-includes are used.
-
 ## lang\_build\_program( prologue, body )
 
 Builds program for current chosen language. If no prologue is given
@@ -264,6 +258,17 @@ will create
     #ifdef __cplusplus
     }
     #endif
+
+## lang\_call( \[prologue\], function )
+
+Builds program which simply calls given function.
+When given, prologue is prepended otherwise, the default
+includes are used.
+
+## lang\_builtin( \[prologue\], builtin )
+
+Builds program which simply proves whether a builtin is known to
+language compiler.
 
 ## lang\_build\_bool\_test (prologue, test, \[@decls\])
 
@@ -397,6 +402,21 @@ _action\_on\_false_ to `check_cached`, respectively.  Given callbacks
 for _action\_on\_function\_true_ or _action\_on\_function\_false_ are called for
 each symbol checked using ["check\_func"](#check_func) receiving the symbol as first
 argument.
+
+## check\_builtin( $builtin, \\%options? )
+
+This method actually tests whether _$builtin_ is a supported built-in
+known by the compiler. Either, by giving us the type of the built-in or
+by taking the value from `__has_builtin`.  This method caches its result
+in the ac\_cv\_builtin\_FUNCTION variable.
+
+If the very last parameter contains a hash reference, `CODE` references
+to _action\_on\_true_ or _action\_on\_false_ are executed, respectively.
+If any of _action\_on\_cache\_true_, _action\_on\_cache\_false_ is defined,
+both callbacks are passed to ["check\_cached"](#check_cached) as _action\_on\_true_ or
+_action\_on\_false_ to `check_cached`, respectively.
+
+Returns: True if the function was found, false otherwise
 
 ## check\_type( $symbol, \\%options? )
 
@@ -674,8 +694,10 @@ type `struct dirent`, not `struct direct`, and would access the length
 of a directory entry name by passing a pointer to a `struct dirent` to
 the `NAMLEN` macro.
 
+For the found header, the macro HAVE\_DIRENT\_IN\_${header} is defined.
+
 This method might be obsolescent, as all current systems with directory
-libraries have `<<dirent.h>`>. Programs supporting only newer OS
+libraries have `<dirent.h>`. Programs supporting only newer OS
 might not need to use this method.
 
 If the very last parameter contains a hash reference, `CODE` references
@@ -791,9 +813,10 @@ Prepend -llibrary to LIBS for the first library found to contain function.
 
 If linking with library results in unresolved symbols that would be
 resolved by linking with additional libraries, give those libraries as
-the _other-libraries_ argument: e.g., `[qw(Xt X11)]`. Otherwise, this
-method fails to detect that function is present, because linking the
-test program always fails with unresolved symbols.
+the _other-libraries_ argument: e.g., `[qw(Xt X11)]` or `[qw(intl),
+qw(intl iconv)]`. Otherwise, this method fails to detect that function
+is present, because linking the test program always fails with unresolved
+symbols.
 
 The result of this test is cached in the ac\_cv\_search\_function variable
 as "none required" if function is already available, as `0` if no
@@ -838,6 +861,8 @@ at the same time, respectively.
 Search for pkg-config flags for package as specified. The flags which are
 extracted are `--cflags` and `--libs`. The extracted flags are appended
 to the global `extra_compile_flags` and `extra_link_flags`, respectively.
+In case, no _package configuration_ matching given criteria could be found,
+return a `false` value (`0`).
 
 Call it with the package you're looking for and optional callback whether
 found or not.
@@ -871,7 +896,7 @@ simply 0 is returned.
 
 ## check\_pureperl\_required
 
-This check method proves whether a pureperl build is wanted or not by
+This check method proves whether a pure perl build is wanted or not by
 cached-checking `$self->_check_pureperl_required`.
 
 ## check\_produce\_xs\_build
@@ -879,7 +904,7 @@ cached-checking `$self->_check_pureperl_required`.
 This routine checks whether XS can be produced. Therefore it does
 following checks in given order:
 
-- check pureperl environment variables (["check\_pureperl\_required"](#check_pureperl_required)) or
+- check pure perl environment variables (["check\_pureperl\_required"](#check_pureperl_required)) or
 command line arguments and return false when pure perl is requested
 - check whether a compiler is available (["check\_valid\_compilers"](#check_valid_compilers)) and
 return false if none found
@@ -1034,7 +1059,7 @@ Peter Rabbitson for help on refactoring and making the API more Perl'ish
 
 # COPYRIGHT & LICENSE
 
-Copyright 2004-2016 by the Authors
+Copyright 2004-2017 by the Authors
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

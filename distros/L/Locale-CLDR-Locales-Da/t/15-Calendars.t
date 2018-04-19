@@ -21,7 +21,7 @@ is_deeply ($months, [qw( J F M A M J J A S O N D )], 'Month format narrow');
 $months = $locale->month_stand_alone_wide();
 is_deeply ($months, [qw( januar februar marts april maj juni juli august september oktober november december )], 'Month stand alone wide');
 $months = $locale->month_stand_alone_abbreviated();
-is_deeply ($months, [qw( jan feb mar apr maj jun jul aug sep okt nov dec )], 'Month stand alone abbreviated');
+is_deeply ($months, [qw( jan. feb. mar. apr. maj jun. jul. aug. sep. okt. nov. dec. )], 'Month stand alone abbreviated');
 $months = $locale->month_stand_alone_narrow();
 is_deeply ($months, [qw( J F M A M J J A S O N D )], 'Month stand alone narrow');
 

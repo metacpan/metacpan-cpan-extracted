@@ -31,9 +31,10 @@ SYNOPSIS
 
  use Algorithm::Bertsekas qw(auction);
  
- Example 1: Minimize the total benefit.
- my @array1 = ( 22, 15, 98,  1 );
- my @array2 = ( 72, 99, 29, 88, 12, 26, 41 );
+ Example 1: Find the nearest neighbor, Minimize the total benefit.
+
+ my @array1 = ( 893, 401, 902, 576, 767, 917, 76, 464, 124, 207, 125, 530 );
+ my @array2 = ( 161, 559, 247, 478, 456 );
 
  my @input_matrix;
  for my $i ( 0 .. $#array1 ){
@@ -45,53 +46,74 @@ SYNOPSIS
    }
    push @input_matrix, \@weight_function;
  }
-
-      72 99 29 88 12 26 41
-
- 22 [ 50 77  7 66 10  4 19 ]
- 15 [ 57 84 14 73  3 11 26 ]
- 98 [ 26  1 69 10 86 72 57 ]
-  1 [ 71 98 28 87 11 25 40 ]
   
+       161 559 247 478 456
+
+ 893 [ 732 334 646 415 437 ]
+ 401 [ 240 158 154  77  55 ]
+ 902 [ 741 343 655 424 446 ]
+ 576 [ 415  17 329  98 120 ]
+ 767 [ 606 208 520 289 311 ]
+ 917 [ 756 358 670 439 461 ]
+  76 [  85 483 171 402 380 ]
+ 464 [ 303  95 217  14   8 ]
+ 124 [  37 435 123 354 332 ]
+ 207 [  46 352  40 271 249 ]
+ 125 [  36 434 122 353 331 ]
+ 530 [ 369  29 283  52  74 ]
+ 
  my ( $optimal, $assignment_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 5 );
   
  Objective: to Minimize the total benefit
- Number of left nodes: 4
- Number of right nodes: 7
- Number of edges: 28
+ Number of left nodes: 12
+ Number of right nodes: 5
+ Number of edges: 60
 
  Solution:
- Optimal assignment: sum of values = 30
- Feasible assignment condition: stepsize = 0.2 < 1/4 = 0.25
- Number of iterations: 15
+ Optimal assignment: sum of values = 153
+ Feasible assignment condition: stepsize = 0.1667 < 1/5 = 0.2
+ Number of iterations: 50
 
- row index    = [ 0  1  2  3  4  5  6 ]
- column index = [ 2  5  1  4  0  6  3 ]
- matrix value = [ 7 11  1 11          ]
+ row index    = [  0   1   2   3   4   5   6   7   8   9  10  11 ]
+ column index = [  9   8  10   1   5  11   7   4   6   2   0   3 ]
+ matrix value = [             17               8      40  36  52 ]
 
- modified matrix 4 x 7:
- [ 48   21   91** 32   88   94   79  ]
- [ 41   14   84   25   95   87** 72  ]
- [ 72   97** 29   88   12   26   41  ]
- [ 27    0   70   11   87** 73   58  ]
+ modified matrix 5 x 9:
+ [ 516   341   150   671   453   719   710   720** 387  ]
+ [ 598   739** 548   273   661   321   404   322   727  ]
+ [ 602   427   236   585   539   633   716** 634   473  ]
+ [ 679   658   467   354   742   402   485   403   704**]
+ [ 701   636   445   376   748** 424   507   425   682  ]
 
- original matrix 4 x 7 with solution:
- [ 50   77    7** 66   10    4   19  ]
- [ 57   84   14   73    3   11** 26  ]
- [ 26    1** 69   10   86   72   57  ]
- [ 71   98   28   87   11** 25   40  ]
+ original matrix 12 x 5 with solution:
+ [ 732   334   646   415   437  ]
+ [ 240   158   154    77    55  ]
+ [ 741   343   655   424   446  ]
+ [ 415    17** 329    98   120  ]
+ [ 606   208   520   289   311  ]
+ [ 756   358   670   439   461  ]
+ [  85   483   171   402   380  ]
+ [ 303    95   217    14     8**]
+ [  37   435   123   354   332  ]
+ [  46   352    40** 271   249  ]
+ [  36** 434   122   353   331  ]
+ [ 369    29   283    52**  74  ]
 
  Pairs (in ascending order of matrix values):
-   indices ( 2, 1 ), matrix value =  1 ; sum of values =  1
-   indices ( 0, 2 ), matrix value =  7 ; sum of values =  8
-   indices ( 1, 5 ), matrix value = 11 ; sum of values = 19
-   indices ( 3, 4 ), matrix value = 11 ; sum of values = 30
-   indices ( 4, 0 ), matrix value =    ; sum of values = 30
-   indices ( 5, 6 ), matrix value =    ; sum of values = 30
-   indices ( 6, 3 ), matrix value =    ; sum of values = 30  
+   indices (  7,  4 ), matrix value =   8 ; sum of values =     8
+   indices (  3,  1 ), matrix value =  17 ; sum of values =    25
+   indices ( 10,  0 ), matrix value =  36 ; sum of values =    61
+   indices (  9,  2 ), matrix value =  40 ; sum of values =   101
+   indices ( 11,  3 ), matrix value =  52 ; sum of values =   153
+   indices (  0,  9 ), matrix value =     ; sum of values =   153
+   indices (  1,  8 ), matrix value =     ; sum of values =   153
+   indices (  2, 10 ), matrix value =     ; sum of values =   153
+   indices (  4,  5 ), matrix value =     ; sum of values =   153
+   indices (  5, 11 ), matrix value =     ; sum of values =   153
+   indices (  6,  7 ), matrix value =     ; sum of values =   153
+   indices (  8,  6 ), matrix value =     ; sum of values =   153
   
  Example 2: Maximize the total benefit.
- Alternatively, we can define the matrix with its elements:
  
  my $N = 10;
  my $M = 10;
@@ -106,6 +128,8 @@ SYNOPSIS
    }
    push @input_matrix, \@weight_function;
  }
+ 
+ Alternatively, we can define the matrix with its elements:
 
  my @input_matrix = ( 
  [  84,  94,  75,  56,  66,  95,  39,  53,  73,   4 ],
@@ -222,7 +246,7 @@ SEE ALSO
 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	April 6, 2018
+	April 19, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

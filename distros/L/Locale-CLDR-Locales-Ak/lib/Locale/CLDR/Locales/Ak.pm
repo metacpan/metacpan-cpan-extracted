@@ -6,21 +6,313 @@ Locale::CLDR::Locales::Ak - Package for language Akan
 
 package Locale::CLDR::Locales::Ak;
 # This file auto generated from Data\common\main\ak.xml
-#	on Fri 29 Apr  6:50:02 pm GMT
+#	on Fri 13 Apr  7:00:46 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
+has 'valid_algorithmic_formats' => (
+	is => 'ro',
+	isa => ArrayRef,
+	init_arg => undef,
+	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal' ]},
+);
+
+has 'algorithmic_number_format_data' => (
+	is => 'ro',
+	isa => HashRef,
+	init_arg => undef,
+	default => sub { 
+		use bignum;
+		return {
+		'spellout-cardinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(kaw →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(hwee),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← pɔw →→),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(koro),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(abien),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(abiasa),
+				},
+				'4' => {
+					base_value => q(4),
+					divisor => q(1),
+					rule => q(anan),
+				},
+				'5' => {
+					base_value => q(5),
+					divisor => q(1),
+					rule => q(anum),
+				},
+				'6' => {
+					base_value => q(6),
+					divisor => q(1),
+					rule => q(asia),
+				},
+				'7' => {
+					base_value => q(7),
+					divisor => q(1),
+					rule => q(asuon),
+				},
+				'8' => {
+					base_value => q(8),
+					divisor => q(1),
+					rule => q(awɔtwe),
+				},
+				'9' => {
+					base_value => q(9),
+					divisor => q(1),
+					rule => q(akron),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(du[-→%%spellout-cardinal-tens→]),
+				},
+				'20' => {
+					base_value => q(20),
+					divisor => q(10),
+					rule => q(aduonu[-→%%spellout-cardinal-tens→]),
+				},
+				'30' => {
+					base_value => q(30),
+					divisor => q(10),
+					rule => q(aduasa[-→%%spellout-cardinal-tens→]),
+				},
+				'40' => {
+					base_value => q(40),
+					divisor => q(10),
+					rule => q(adu←←[-→%%spellout-cardinal-tens→]),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(­ɔha[-na-­→→]),
+				},
+				'200' => {
+					base_value => q(200),
+					divisor => q(100),
+					rule => q(aha-←←[-na-→→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(apem[-na-→→]),
+				},
+				'2000' => {
+					base_value => q(2000),
+					divisor => q(1000),
+					rule => q(mpem-←←[-na-→→]),
+				},
+				'100000' => {
+					base_value => q(100000),
+					divisor => q(100000),
+					rule => q(mpem-ɔha[-na-→→]),
+				},
+				'200000' => {
+					base_value => q(200000),
+					divisor => q(100000),
+					rule => q(mpem-aha-←←[-na-→→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(ɔpepepem-←←[-na-→→]),
+				},
+				'2000000' => {
+					base_value => q(2000000),
+					divisor => q(1000000),
+					rule => q(mpepepem-←←[-na-→→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(ɔpepepepem-←←[-na-→→]),
+				},
+				'2000000000' => {
+					base_value => q(2000000000),
+					divisor => q(1000000000),
+					rule => q(mpepepepem-←←[-na-→→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(ɔpepepepepem-←←[-na-→→]),
+				},
+				'2000000000000' => {
+					base_value => q(2000000000000),
+					divisor => q(1000000000000),
+					rule => q(mpepepepepem-←←[-na-→→]),
+				},
+				'1000000000000000' => {
+					base_value => q(1000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(ɔpepepepepepem-←←[-na-→→]),
+				},
+				'2000000000000000' => {
+					base_value => q(2000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(mpepepepepepem-←←[-na-→→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+				'max' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+			},
+		},
+		'spellout-cardinal-tens' => {
+			'private' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(biako),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+			},
+		},
+		'spellout-numbering' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+			},
+		},
+		'spellout-numbering-year' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(kaw →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-numbering=),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(←← →→→),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(←← →→→),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(←← →→→),
+				},
+				'10000' => {
+					base_value => q(10000),
+					divisor => q(10000),
+					rule => q(=%spellout-numbering=),
+				},
+				'max' => {
+					base_value => q(10000),
+					divisor => q(10000),
+					rule => q(=%spellout-numbering=),
+				},
+			},
+		},
+		'spellout-ordinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(kaw →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(a-ɛ-tɔ-so-hwee),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(a-ɛ-di-kane),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(a-ɛ-tɔ-so-=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(a-ɛ-tɔ-so-=%spellout-cardinal=),
+				},
+			},
+		},
+	} },
+);
+
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -326,9 +618,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[c j q v z])},
+			auxiliary => qr{[c j q v z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b d e ɛ f g h i k l m n o ɔ p r s t u w y])},
+			main => qr{[a b d e ɛ f g h i k l m n o ɔ p r s t u w y]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -797,8 +1090,8 @@ has 'day_periods' => (
 					'pm' => q{EW},
 				},
 				'wide' => {
-					'pm' => q{EW},
 					'am' => q{AN},
+					'pm' => q{EW},
 				},
 			},
 		},

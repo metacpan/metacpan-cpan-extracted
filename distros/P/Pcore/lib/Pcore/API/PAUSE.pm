@@ -1,6 +1,6 @@
 package Pcore::API::PAUSE;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::Util::Text qw[encode_utf8];
 use Pcore::Util::Scalar qw[is_coderef];
 
@@ -14,14 +14,6 @@ sub _build__auth_header ($self) {
 }
 
 sub upload ( $self, $path, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    my $on_finish = sub ($res) {
-        $cb->($res) if $cb;
-
-        $blocking_cv->($res) if $blocking_cv;
-    };
-
     my $body;
 
     $path = P->path($path);
@@ -44,25 +36,19 @@ sub upload ( $self, $path, $cb = undef ) {
 
     $body .= q[--] . $boundary . q[--] . $CRLF . $CRLF;
 
-    P->http->post(
+    return P->http->post(
         'https://pause.perl.org/pause/authenquery',
         headers => {
             AUTHORIZATION => $self->_auth_header,
             CONTENT_TYPE  => qq[multipart/form-data; boundary=$boundary],
         },
         body => \$body,
-        sub ($res) {
-            $on_finish->( result [ $res->status, $res->reason ] );
-
-            return;
-        }
+        $cb // ()
     );
-
-    return defined $blocking_cv ? $blocking_cv->recv : ();
 }
 
 sub clean ( $self, @args ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $cb = is_coderef $args[-1] ? pop @args : undef;
 
@@ -71,16 +57,14 @@ sub clean ( $self, @args ) {
         @args,
     );
 
-    my $on_finish = sub ($status) {
-        $cb->($status) if $cb;
-
-        $blocking_cv->($status) if $blocking_cv;
+    my $on_finish = sub ($res) {
+        $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
 
         return;
     };
 
     if ( !$args{keep} ) {
-        $on_finish->( result [ 400, q[Bad "keep" arument.] ] );
+        $on_finish->( res [ 400, q[Bad "keep" arument.] ] );
     }
 
     P->http->get(
@@ -88,12 +72,12 @@ sub clean ( $self, @args ) {
         headers => { AUTHORIZATION => $self->_auth_header, },
         sub ($res) {
             if ( !$res ) {
-                $on_finish->( result [ $res->status, $res->reason ] );
+                $on_finish->( res [ $res->{status}, $res->{reason} ] );
             }
             else {
                 my $releases;
 
-                while ( $res->body->$* =~ /input type="checkbox" name="pause99_delete_files_FILE" value="([[:alnum:]-]+)?-v([[:alnum:].]+)?[.]tar[.]gz"(.+?)<\/span>/smg ) {
+                while ( $res->{body}->$* =~ /input type="checkbox" name="pause99_delete_files_FILE" value="([[:alnum:]-]+)?-v([[:alnum:].]+)?[.]tar[.]gz"(.+?)<\/span>/smg ) {
                     $releases->{$1}->{$2} = undef if $3 !~ m[Scheduled for deletion]smi;
                 }
 
@@ -122,7 +106,7 @@ sub clean ( $self, @args ) {
                 }
 
                 if ( !$releases_to_remove ) {
-                    $on_finish->( result [ 200, 'Nothing to do' ] );
+                    $on_finish->( res [ 200, 'Nothing to do' ] );
                 }
                 else {
                     P->http->post(
@@ -133,7 +117,7 @@ sub clean ( $self, @args ) {
                         },
                         body => P->data->to_uri($params),
                         sub ($res) {
-                            $on_finish->( result [ $res->status, $res->reason ], [ sort keys $releases_to_remove->%* ] );
+                            $on_finish->( res [ $res->{status}, $res->{reason} ], [ sort keys $releases_to_remove->%* ] );
 
                             return;
                         }
@@ -145,7 +129,7 @@ sub clean ( $self, @args ) {
         }
     );
 
-    return defined $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = undef ) {
@@ -171,9 +155,9 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 96                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 80                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 151                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 135                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

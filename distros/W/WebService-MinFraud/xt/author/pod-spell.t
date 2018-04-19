@@ -35,6 +35,8 @@ Country
 CreditCard
 Cronin
 CustomInputs
+DD
+
 Data
 DateTime
 Dave
@@ -115,7 +117,6 @@ Oschwald's
 Oxfordshire
 
 Patrick
-PatrickCronin
 PayPal
 RFC3339
 Ragwitz
@@ -146,8 +147,10 @@ Validator
 Warning
 WebService
 WebURI
-Will
+William
 YYY
+
+YYYY
 
 YYYZZZ
 
@@ -165,7 +168,11 @@ dialup
 downloadable
 
 drolsky
+en
+
 ergument
+
+fr
 
 geoname_id
 
@@ -194,8 +201,11 @@ omni
 
 params
 
+pcronin
+pt
+
 rafl
-rbnx
+rnavarro
 routable
 
 ru
@@ -210,6 +220,6 @@ unpopulated
 
 versioning
 
-will
+wstorey
 zh
 

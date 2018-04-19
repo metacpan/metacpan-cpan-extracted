@@ -5,11 +5,15 @@ use Carp 'croak';
 
 has 'minion';
 
-sub broadcast    { croak 'Method "broadcast" not implemented by subclass' }
-sub dequeue      { croak 'Method "dequeue" not implemented by subclass' }
-sub enqueue      { croak 'Method "enqueue" not implemented by subclass' }
-sub fail_job     { croak 'Method "fail_job" not implemented by subclass' }
-sub finish_job   { croak 'Method "finish_job" not implemented by subclass' }
+sub broadcast  { croak 'Method "broadcast" not implemented by subclass' }
+sub dequeue    { croak 'Method "dequeue" not implemented by subclass' }
+sub enqueue    { croak 'Method "enqueue" not implemented by subclass' }
+sub fail_job   { croak 'Method "fail_job" not implemented by subclass' }
+sub finish_job { croak 'Method "finish_job" not implemented by subclass' }
+
+# TODO: This method will croak after the experimentation period
+sub history { {daily => []} }
+
 sub list_jobs    { croak 'Method "list_jobs" not implemented by subclass' }
 sub list_locks   { croak 'Method "list_locks" not implemented by subclass' }
 sub list_workers { croak 'Method "list_workers" not implemented by subclass' }
@@ -50,6 +54,7 @@ Minion::Backend - Backend base class
   sub enqueue           {...}
   sub fail_job          {...}
   sub finish_job        {...}
+  sub history           {...}
   sub list_jobs         {...}
   sub list_locks        {...}
   sub list_workers      {...}
@@ -225,10 +230,30 @@ L<Minion/"backoff">. Meant to be overloaded in a subclass.
 Transition from C<active> to C<finished> state. Meant to be overloaded in a
 subclass.
 
+=head2 history
+
+  my $history = $backend->history;
+
+Get history information for job queue. Meant to be overloaded in a subclass.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+These fields are currently available:
+
+=over 2
+
+=item daily
+
+  daily =>
+    [{epoch => 12345, hour => 20, finished_jobs => 95, failed_jobs => 2}, ...]
+
+Hourly counts for processed jobs from the past day.
+
+=back
+
 =head2 list_jobs
 
   my $results = $backend->list_jobs($offset, $limit);
-  my $results = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+  my $results = $backend->list_jobs($offset, $limit, {states => ['inactive']});
 
 Returns the information about jobs in batches. Meant to be overloaded in a
 subclass.
@@ -251,23 +276,23 @@ These options are currently available:
 
 List only jobs with these ids.
 
-=item queue
+=item queues
 
-  queue => 'important'
+  queues => ['important', 'unimportant']
 
-List only jobs in this queue.
+List only jobs in these queues.
 
-=item state
+=item states
 
-  state => 'inactive'
+  states => ['inactive', 'active']
 
-List only jobs in this state.
+List only jobs in these states.
 
-=item task
+=item tasks
 
-  task => 'test'
+  tasks => ['foo', 'bar']
 
-List only jobs for this task.
+List only jobs for these tasks.
 
 =back
 
@@ -382,24 +407,24 @@ Id of worker that is processing the job.
 =head2 list_locks
 
   my $results = $backend->list_locks($offset, $limit);
-  my $results = $backend->list_locks($offset, $limit, {name => 'foo'});
+  my $results = $backend->list_locks($offset, $limit, {names => ['foo']});
 
 Returns information about locks in batches. Meant to be overloaded in a
 subclass.
 
   # Check expiration time
-  my $results = $backend->list_locks(0, 1, {name => 'foo'});
+  my $results = $backend->list_locks(0, 1, {names => ['foo']});
   my $expires = $results->{locks}[0]{expires};
 
 These options are currently available:
 
 =over 2
 
-=item name
+=item names
 
-  name => 'foo'
+  names => ['foo', 'bar']
 
-List only locks with this name.
+List only locks with these names.
 
 =back
 
@@ -512,9 +537,10 @@ defaults to C<1>.
 
 =head2 note
 
-  $backend->note($job_id, foo => 'bar');
+  my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-Change a metadata field for a job. Meant to be overloaded in a subclass.
+Change one or more metadata fields for a job. Meant to be overloaded in a
+subclass.
 
 =head2 receive
 

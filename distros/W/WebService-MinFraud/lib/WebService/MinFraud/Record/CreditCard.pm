@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::CreditCard;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use WebService::MinFraud::Record::Issuer;
 use WebService::MinFraud::Types
@@ -29,6 +29,13 @@ has is_issued_in_billing_address_country => (
 );
 
 has is_prepaid => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+    coerce  => BoolCoercion,
+);
+
+has is_virtual => (
     is      => 'ro',
     isa     => Bool,
     default => 0,
@@ -64,7 +71,7 @@ WebService::MinFraud::Record::CreditCard - Contains data for the credit card rec
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -73,7 +80,7 @@ version 1.006000
   use WebService::MinFraud::Client;
 
   my $client = WebService::MinFraud::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
   my $request     = { device => { ip_address => '24.24.24.24' } };
@@ -103,7 +110,7 @@ Returns the brand of the credit card, e.g. Visa, MasterCard, American Express et
 =head2 country
 
 Returns the two letter L<ISO 3166-1 alpha 2 country
-code|http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2> associated with the
+code|https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2> associated with the
 location of the majority of customers using this credit card as determined by
 their billing address. In cases where the location of customers is highly
 mixed, this defaults to the country of the bank issuing the card.
@@ -118,6 +125,10 @@ country of the bank issuing the card.
 =head2 is_prepaid
 
 Returns a boolean indicating whether the credit card is prepaid.
+
+=head2 is_virtual
+
+Returns a boolean indicating whether the credit card is virtual.
 
 =head2 type
 

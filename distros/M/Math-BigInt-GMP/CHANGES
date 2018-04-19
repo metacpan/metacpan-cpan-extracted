@@ -1,4 +1,23 @@
-2017-02-05 v1.6004 pjacklam
+1.6005 2018-04-17
+
+ * Fix memory leak in _modinv() (thanks to DANAJ). See CPAN RT #123807.
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * Sync test files with Math-BigInt.
+
+ * Add test files t/release-test-version.t, t/release-portability.t, and
+   t/release-cpan-changes.t.
+
+ * Use a MANIFEST.SKIP file based on the default file in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+1.6004 2017-02-05 pjacklam
 
  * Fix typos in POD.
 
@@ -6,7 +25,7 @@
 
  * Minor improvements to the documentation (POD).
 
-2017-01-11 v1.6003 pjacklam
+1.6003 2017-01-11 pjacklam
 
  * Fix syntax for required version of Math::BigInt::Lib.
 
@@ -14,7 +33,7 @@
 
  * Sync test files with Math-BigInt-1.999808.
 
-2016-12-03 v1.6002 pjacklam
+1.6002 2016-12-03 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
@@ -29,13 +48,13 @@
 
  * Remove INSTALL file. The information is in the README file.
 
-2016-11-23 v1.6001 pjacklam
+1.6001 2016-11-23 pjacklam
 
  * Sync test files with Math-BigInt-1.999801.
 
  * Correct version number in CHANGES file.
 
-2016-11-15 v1.6000 pjacklam
+1.6000 2016-11-15 pjacklam
 
  * Sync test files with Math-BigInt-1.999800.
 
@@ -54,30 +73,30 @@
 
  * Better use of the functionality in Test::More in t/bigintg.t.
 
-2016-04-25 v1.51 pjacklam
+1.51 2016-04-25 pjacklam
 
  * Sync test files with Math-BigInt-1.999719.
 
-2016-04-22 v1.50 pjacklam
+1.50 2016-04-22 pjacklam
 
  * Sync test files with Math-BigInt-1.999718.
 
-2016-01-03 v1.49 pjacklam
+1.49 2016-01-03 pjacklam
 
  * Sync test files with Math-BigInt-1.999714.
 
-2015-12-31 v1.48 pjacklam
+1.48 2015-12-31 pjacklam
 
  * Sync test files with Math-BigInt-1.999713.
 
-2015-12-14 v1.47 pjacklam
+1.47 2015-12-14 pjacklam
 
  * Add patch from Gregor Herrmann (GREGOA) based on code by Dana Jacobsen
    (DANAJ) to fix problems with the new() method when Perl is compiled with
    support for 64-bit integers, but on platforms when the underlying OS is
    32-bit (CPAN RT #71548).
 
-2015-12-03 v1.46 pjacklam
+1.46 2015-12-03 pjacklam
 
  * Add patch from Dana Jacobsen (DANAJ) and add new test file
    't/mbi-from-big-scalar.t' regarding CPAN RT #103517.
@@ -87,13 +106,13 @@
  * Whitespace/formatting in t/bigintg.t to make it more readble (for me, at
    least) and more in accordance with the 'perlstyle' manpage.
 
-2015-11-09 v1.45 pjacklam
+1.45 2015-11-09 pjacklam
 
  * Sync test files with Math-BigInt-1.999709.
 
  * Required version of Test::More is 0.47.
 
-2015-10-29 v1.44 pjacklam
+1.44 2015-10-29 pjacklam
 
  * Sync test files with Math-BigInt-1.999707.
 
@@ -114,7 +133,7 @@
  * Add 'assertlib.*\.exe' to MANIFEST.SKIP, since make generates temporary
    files like 'assertlibzxjE4WfG.exe' on Cygwin.
 
-2015-09-21 v1.43 pjacklam
+1.43 2015-09-21 pjacklam
 
  * Sync test files with Math-BigInt-1.999703.
 
@@ -122,13 +141,13 @@
 
  * Update author information.
 
-2015-09-17 v1.42 pjacklam
+1.42 2015-09-17 pjacklam
 
  * Sync test files with Math-BigInt-1.999702.
 
  * Required version of Math-BigInt is now 1.999702.
 
-2015-09-11 v1.41 pjacklam
+1.41 2015-09-11 pjacklam
 
  lib/Math/BigInt/GMP.pm
  * Updated version number.
@@ -148,7 +167,7 @@
  t/bigintpm.t
  * Updated number of tests.
 
-2015-08-18 v1.40 pjacklam
+1.40 2015-08-18 pjacklam
 
  CHANGES
  * Add changes for the newest release.
@@ -184,11 +203,11 @@
  lib/Math/BigInt/GMP.pm
  * Increment Math::BigInt::GMP version number to 1.40.
 
-2015-08-17 v1.39 pjacklam
+1.39 2015-08-17 pjacklam
 
  * Updated test files with those from Math-BigInt-1.9997.
 
-2014-04-03 v1.38 pjacklam
+1.38 2014-04-03 pjacklam
 
  * Updated test files from the Math::BigInt distribution (Peter John Acklam).
 
@@ -196,7 +215,7 @@
 
  * Updated bundled Devel::CheckLib from v0.93 to v1.01 (Peter John Acklam).
 
-2011-09-04 v1.37 pjacklam
+1.37 2011-09-04 pjacklam
 
  * Updated test files from the Math::BigInt distribution (Peter John Acklam).
 
@@ -215,7 +234,7 @@
  * Updated common test files from the Math::BigInt distribution. (Peter John
    Acklam)
 
-2011-02-26 v1.36 pjacklam (6362 tests)
+1.36 2011-02-26 pjacklam (6362 tests)
 
  * Change bigintpm.inc to reflect recent changes in the Math::BigInt
    distribution (Peter John Acklam).
@@ -223,7 +242,7 @@
  * Use a _nok() function more similar to the one in Math::BigInt::Calc
   (Peter John Acklam).
 
-2011-02-08 v1.35 pjacklam (6361 tests)
+1.35 2011-02-08 pjacklam (6361 tests)
 
  * Rename files for testing signature, module loading, and POD so the names
    are within the 8+3 character limit (Peter John Acklam).
@@ -242,7 +261,7 @@
  * Apply "chmod 0644" to the few test scripts that don't already have that
    mode (Peter John Acklam).
 
-2011-02-07 v1.34 pjacklam (6361 tests)
+1.34 2011-02-07 pjacklam (6361 tests)
 
  * Rename _num() to _str(). The old _num() did exactly what _str() is supposed
    to do, according to the API documentation (Peter John Acklam).
@@ -270,7 +289,7 @@
 
  * Use more generic code in 'pod.t' and 'pod_cov.t' (Peter John Acklam).
 
-2011-01-30 v1.33 pjacklam (6411 tests)
+1.33 2011-01-30 pjacklam (6411 tests)
 
  * Fix _modinv() so that it works the same way as _modinv() in other
    Math::BigInt libraries: The output arguments are an object and the
@@ -284,48 +303,48 @@
 
  * Required version of Math::BigInt is now 1.99_05 (Peter John Acklam).
 
-2010-09-23 v1.32 rafl 5559 tests
+1.32 2010-09-23 rafl 5559 tests
 
  * Re-upload 1.31 as a stable release without further changes.
 
-2010-09-21 v1.31 rafl 5559 tests  DEVELOPMENT RELEASE
+1.31 2010-09-21 rafl 5559 tests  DEVELOPMENT RELEASE
 
  * Add hooks for Storable (de-)serialisation.
 
  * Avoid failure in the destructor if someone blessed nonsense into our class.
 
-2010-09-20 v1.30 rafl 5558 tests
+1.30 2010-09-20 rafl 5558 tests
 
  * Re-upload 1.29 as a stable release without further changes.
 
-2010-09-19 v1.29 rafl 5558 tests  DEVELOPMENT RELEASE
+1.29 2010-09-19 rafl 5558 tests  DEVELOPMENT RELEASE
 
  * Attempt to fix a bug in the bundled version Devel::CheckLib.
    It used to ignore @Config{qw(ccflags ldflags)} and only tried to look for
    headers and libraries with the compiler's default include- and lib-paths as
    well as those explicitly asked for by the user.
 
-2010-09-17 v1.28 rafl 5558 tests
+1.28 2010-09-17 rafl 5558 tests
 
  * Re-upload 1.27 without further changes as a stable release.
 
-2010-09-15 v1.27 rafl 5558 tests  DEVELOPMENT RELEASE
+1.27 2010-09-15 rafl 5558 tests  DEVELOPMENT RELEASE
 
  * Try to support perls older than 5.8.8 again.
    Tested with 5.8.7 and 5.6.2.
 
-2010-09-14 v1.26 rafl 5558 tests  DEVELOPMENT RELEASE
+1.26 2010-09-14 rafl 5558 tests  DEVELOPMENT RELEASE
 
  * Error out early if libgmp or gmp.h are missing.
 
  * Clone Math::BigInt::GMP instances on thread cloning.
    This should make the module threadsafe.
 
-2010-09-10 v1.25 rafl 5536 tests
+1.25 2010-09-10 rafl 5536 tests
 
  * Fix tests with Math::BigInt >= 1.90 and depend on it.
 
-2007-07-31 v1.24 Tels 5530 tests
+1.24 2007-07-31 Tels 5530 tests
 
  * apply patch for warnings about ptr size mismatch under Cygwin (thanx
    Reini Urban!)
@@ -333,14 +352,14 @@
  * make it work under 5.6.x again by defining SvUOK() (Thanx Marcus
    Holland-Moritz and Reini Urban!)
 
-2007-07-25 v1.23 Tels 5527 tests
+1.23 2007-07-25 Tels 5527 tests
 
  * require Math::BigInt 1.87
 
  * fix for _new() (appeared under Cygwin, but possible others, thanx
    Linda W. (report) and Reini Urban (patch)!)
 
-2007-06-01 v1.22 Tels 5527 tests
+1.22 2007-06-01 Tels 5527 tests
 
  * require Math::BigInt 1.86
 
@@ -356,29 +375,29 @@
    it takes now a more or less constant time, instead of a time proportional
    to the size/value of the result:
 
-Using Math::BigInt::GMP v1.21
- baselen 2:     3s (3.22 usr +  0.00 sys =  3.22 CPU) @ 7270/s (n=23411)
- baselen 2 big: 3s (3.11 usr +  0.06 sys =  3.17 CPU) @  962/s (n=3051)
- baselen 3:     3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 1304/s (n=4173)
- baselen 7:     3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 3306/s (n=10582)
- baselen 8:     3s (3.14 usr +  0.00 sys =  3.14 CPU) @ 3769/s (n=11836)
- baselen 11:    3s (3.24 usr +  0.00 sys =  3.24 CPU) @ 4750/s (n=15392)
- baselen 14:    3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 5835/s (n=18673)
- baselen 20:    3s (3.10 usr +  0.03 sys =  3.13 CPU) @ 7621/s (n=23855)
- baselen 3 big: 4s (3.17 usr +  0.00 sys =  3.17 CPU) @  320/s (n=1016)
+   Using Math::BigInt::GMP v1.21
+    baselen 2:     3s (3.22 usr +  0.00 sys =  3.22 CPU) @ 7270/s (n=23411)
+    baselen 2 big: 3s (3.11 usr +  0.06 sys =  3.17 CPU) @  962/s (n=3051)
+    baselen 3:     3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 1304/s (n=4173)
+    baselen 7:     3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 3306/s (n=10582)
+    baselen 8:     3s (3.14 usr +  0.00 sys =  3.14 CPU) @ 3769/s (n=11836)
+    baselen 11:    3s (3.24 usr +  0.00 sys =  3.24 CPU) @ 4750/s (n=15392)
+    baselen 14:    3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 5835/s (n=18673)
+    baselen 20:    3s (3.10 usr +  0.03 sys =  3.13 CPU) @ 7621/s (n=23855)
+    baselen 3 big: 4s (3.17 usr +  0.00 sys =  3.17 CPU) @  320/s (n=1016)
 
-Using Math::BigInt::GMP v1.22
- baselen 2:     3s (3.15 usr +  0.00 sys =  3.15 CPU) @ 16290/s (n=51316)
- baselen 2 big: 4s (3.21 usr +  0.01 sys =  3.22 CPU) @ 15933/s (n=51306)
- baselen 3:     4s (3.12 usr +  0.02 sys =  3.14 CPU) @ 15555/s (n=48844)
- baselen 7:     4s (3.15 usr +  0.07 sys =  3.22 CPU) @ 15658/s (n=50420)
- baselen 8:     3s (3.18 usr +  0.01 sys =  3.19 CPU) @ 15610/s (n=49797)
- baselen 11:    3s (3.14 usr +  0.00 sys =  3.14 CPU) @ 15555/s (n=48844)
- baselen 14:    3s (3.15 usr +  0.00 sys =  3.15 CPU) @ 15506/s (n=48844)
- baselen 20:    3s (3.14 usr +  0.01 sys =  3.15 CPU) @ 15506/s (n=48844)
- baselen 3 big: 3s (3.10 usr +  0.04 sys =  3.14 CPU) @ 15555/s (n=48844)
+   Using Math::BigInt::GMP v1.22
+    baselen 2:     3s (3.15 usr +  0.00 sys =  3.15 CPU) @ 16290/s (n=51316)
+    baselen 2 big: 4s (3.21 usr +  0.01 sys =  3.22 CPU) @ 15933/s (n=51306)
+    baselen 3:     4s (3.12 usr +  0.02 sys =  3.14 CPU) @ 15555/s (n=48844)
+    baselen 7:     4s (3.15 usr +  0.07 sys =  3.22 CPU) @ 15658/s (n=50420)
+    baselen 8:     3s (3.18 usr +  0.01 sys =  3.19 CPU) @ 15610/s (n=49797)
+    baselen 11:    3s (3.14 usr +  0.00 sys =  3.14 CPU) @ 15555/s (n=48844)
+    baselen 14:    3s (3.15 usr +  0.00 sys =  3.15 CPU) @ 15506/s (n=48844)
+    baselen 20:    3s (3.14 usr +  0.01 sys =  3.15 CPU) @ 15506/s (n=48844)
+    baselen 3 big: 3s (3.10 usr +  0.04 sys =  3.14 CPU) @ 15555/s (n=48844)
 
-2007-04-17 v1.21 Tels 5488 tests
+1.21 2007-04-17 Tels 5488 tests
 
  * add _as_oct(), _from_oct(), _alen(), _1ex() and some _root() tests
 
@@ -388,7 +407,7 @@ Using Math::BigInt::GMP v1.22
 
  * _new(): take a shortcut if the passed an IV (integer value)
 
-2007-04-09 v1.20 Tels 5351 tests
+1.20 2007-04-09 Tels 5351 tests
 
  * remove PREREQ_FATAL because the toolchain is broken and cannot handle it
 
@@ -407,19 +426,19 @@ Using Math::BigInt::GMP v1.22
 
  * add MANIFEST.SKIP
 
-2007-01-27 v1.19 Tels 5339 tests
+1.19 2007-01-27 Tels 5339 tests
 
  * add support for octal
 
  * take over tests from MBI 1.78 and require it
 
-2005-04-11 v1.18 Tels 5186 tests
+1.18 2005-04-11 Tels 5186 tests
 
  * _log_int() handles now plain scalars as $base parameter
 
  * take over tests from MBI 1.76, require it
 
-2005-01-01 v1.17 Tels 5182 tests
+1.17 2005-01-01 Tels 5182 tests
 
  * use XSLoader instead of DynaLoader to save a tiny amount of memory
 
@@ -433,7 +452,7 @@ Using Math::BigInt::GMP v1.22
 
  * _zeros() is now much faster for odd numbers (O(1) vs. O(N*N))
 
-2004-12-09 v1.16 Tels 5112 tests
+1.16 2004-12-09 Tels 5112 tests
 
  * fixed a leak in _div() (Thanx Tassilo v. Parsival!)
 
@@ -441,7 +460,7 @@ Using Math::BigInt::GMP v1.22
 
  * put leak.pl and leaktest into MANIFEST for later checking
 
-2004-11-22 v1.15 Tels 5112 tests
+1.15 2004-11-22 Tels 5112 tests
 
  * some small cleanups in the Perl code
 
@@ -453,7 +472,7 @@ Using Math::BigInt::GMP v1.22
 
  * testsuite from MBI v1.73
 
-2004-02-15 v1.14 Tels 4867 tests
+1.14 2004-02-15 Tels 4867 tests
 
  * require BigInt v1.70, use tests from it and make API compatible with it
 
@@ -464,7 +483,7 @@ Using Math::BigInt::GMP v1.22
 
  * added a working _log_int() method
 
-2004-01-10 v1.13 Tels 4759 tests
+1.13 2004-01-10 Tels 4759 tests
 
  * tests from BigInt v1.68
 
@@ -481,7 +500,7 @@ Using Math::BigInt::GMP v1.22
    malloc/free and makes these ops slightly faster
    (between 10 and 33% in Math::BigInt (!), depending on input and size)
 
-2003-12-11 v1.12 Tels 4677 tests
+1.12 2003-12-11 Tels 4677 tests
 
  * testsuite from v1.67, especialy revamped bigintg.t
 
@@ -491,13 +510,9 @@ Using Math::BigInt::GMP v1.22
 
  * some routines did only return the result, but not modify $x in place
 
-2003-07-04 v1.12b Tels 4491 tests (not released)
-
  * testsuite from v1.65
 
  * fixed prereq to require BigInt v1.65
-
-2003-01-08 v1.12a Tels 4109 tests (not released)
 
  * removed unused function _mmod from XS code
 
@@ -506,7 +521,7 @@ Using Math::BigInt::GMP v1.22
  * replace some RETVAL = malloc() lines with defined to make changing them
    later much easier
 
-2003-01-01 v1.11 Tels 4109 tests
+1.11 2003-01-01 Tels 4109 tests
 
  * rewrote stringify_bin() and stringify_hex() to not allocate scratch buffers
    Faster, no longer needs malloc()/free() and strlen().
@@ -520,7 +535,7 @@ Using Math::BigInt::GMP v1.22
 
  * removed the unused "$zero = ..."/"$one = ..." in GMP.pm
 
-2002-12-24 v1.10 Tels 4109 tests
+1.10 2002-12-24 Tels 4109 tests
 
  * Merry Christmas and a Happy New Year to all!
 
@@ -548,8 +563,6 @@ Using Math::BigInt::GMP v1.22
 
  * Full (memory and other) benchmarks at http://bloodgate.com/perl/bigint/
 
-2002-12-15 v1.10a Tels Never released
-
  * no longer needs Math::GMP (and Carp), but uses own XS layer
 
  * is thus faster (saves one perl subroutine layer) and less memory hungry
@@ -563,19 +576,19 @@ Using Math::BigInt::GMP v1.22
 
  * extended tests in bigintg.t to cover more functions
 
-2002-12-12 v1.08 Tels 4069 tests (never released)
+1.08 2002-12-12 Tels 4069 tests (never released)
 
  * added implementation of bmodpow() using GMPs mpow_gmp()
 
  * release signed by key http://bloodgate.com/tels.asc id 93B84C15
 
-2002-07-07 v1.07 Tels
+1.07 2002-07-07 Tels
 
  * testsuite from BigInt v1.60 - 4054 tests
 
  * fixed PREREQUISITES to BigInt v1.60
 
-2002-03-23 v1.06 Tels
+1.06 2002-03-23 Tels
 
  * testsuite from v1.55 - 3874 tests
 
@@ -585,7 +598,7 @@ Using Math::BigInt::GMP v1.22
 
  * added _from_bin()
 
-2002-02-16 v1.05 Tels
+1.05 2002-02-16 Tels
 
  * tests from Math::BigInt v1.51
 
@@ -607,7 +620,7 @@ Using Math::BigInt::GMP v1.22
  small numbers and quickly raise as the numbers grow ;)
  The speedup for bmod() and bdiv() aren't that dramatic, but still worth it.
 
-2002-01-26 v1.04 Tels
+1.04 2002-01-26 Tels
 
  * use $zero,$one,$two etc instead of 0,1,2 in some routines
 
@@ -617,11 +630,9 @@ Using Math::BigInt::GMP v1.22
 
  * added _gcd() and _fac() for more speed in bgcd() and bfac(), respectively
 
-2001-11-01 v1.04a Tels (never released)
-
  * _is_odd()/_is_even() use $two instead of 2: 5600 op/s instead of 4700
 
-2001-11-01 v1.03 Tels
+1.03 2001-11-01 Tels
 
  * taken over tests from BigInt v1.45
 
@@ -649,13 +660,13 @@ Using Math::BigInt::GMP v1.22
       mod_l    1111    2325
       div_l    1260    1300
 
-2001-09-02 v1.02 Tels
+1.02 2001-09-02 Tels
 
  * removed auto-export and added empty import()
 
  * taken over tests from BigInt v1.42
 
-2001-08-06 v1.01 Tels
+1.01 2001-08-06 Tels
 
  * first release
 
@@ -663,11 +674,6 @@ Using Math::BigInt::GMP v1.22
 
  * taken over tests from BigInt v1.40
 
-2001-07-22 v1.00 Tels
+1.00 2001-07-22 Tels
 
  * First version (basically working with some quirks)
-
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
-
-Tels <http://bloodgate.com/>

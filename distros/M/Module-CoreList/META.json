@@ -49,6 +49,6 @@
          "url" : "git://perl5.git.perl.org/perl.git"
       }
    },
-   "version" : "5.20180221",
+   "version" : "5.20180414",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -2,6 +2,7 @@
     use strict;
     use warnings;
     use POSIX;
+    use Config;
     use Math::MPFR::Prec;
     use Math::MPFR::Random;
 
@@ -176,9 +177,10 @@ Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
 Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
+atonv
 );
 
-    our $VERSION = '4.02';
+    our $VERSION = '4.03';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -280,7 +282,9 @@ Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
 Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
+atonv
 )]);
+
 
 $Math::MPFR::NNW = 0; # Set to 1 to allow "non-numeric" warnings for operations involving
                       # strings that contain non-numeric characters.
@@ -289,6 +293,10 @@ $Math::MPFR::NOK_POK = 0; # Set to 1 to allow warnings in new() and overloaded o
                           # a scalar that has set both NOK (NV) and POK (PV) flags is encountered
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
+
+if($Config{nvtype} eq 'double')        {$Math::MPFR::BITS = 53}
+elsif($Config{nvtype} eq '__float128') {$Math::MPFR::BITS = 113}
+else                                   {$Math::MPFR::BITS = _required_ldbl_mant_dig()}
 
 sub Rmpfr_out_str {
     if(@_ == 4) {

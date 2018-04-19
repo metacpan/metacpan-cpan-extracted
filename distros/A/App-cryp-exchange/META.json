@@ -33,17 +33,21 @@
       },
       "runtime" : {
          "requires" : {
-            "App::btcindo" : "0.018",
+            "App::indodax" : "0",
             "Complete::Util" : "0.57",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
-            "Finance::BTCIndo" : "0.007",
             "Finance::GDAX::Lite" : "0",
+            "Finance::Indodax" : "0",
+            "Log::Log4perl" : "0",
+            "Log::Log4perl::Appender::LogGer" : "0",
+            "Log::Log4perl::Layout::SimpleLayout" : "0",
             "Log::ger" : "0.023",
             "PERLANCAR::Module::List" : "0",
             "Perinci::CmdLine::cryp" : "0.004",
             "Role::Tiny" : "0",
             "Role::Tiny::With" : "0",
+            "WebService::Cryptopia" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -70,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-App-cryp-exchange"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

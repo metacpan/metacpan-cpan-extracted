@@ -66,9 +66,9 @@ is_deeply ($am_pm, { am => 'a', noon => 'n', pm => 'p', midnight => 'mi', mornin
 $am_pm = $locale->am_pm_stand_alone_wide();
 is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'morning', afternoon1 => 'afternoon', evening1 => 'evening', night1 => 'night' }, 'AM PM stand alone wide');
 $am_pm = $locale->am_pm_stand_alone_abbreviated();
-is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'in the morning', afternoon1 => 'in the afternoon', evening1 => 'in the evening', night1 => 'at night' }, 'AM PM stand alone abbreviated');
+is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'morning', afternoon1 => 'afternoon', evening1 => 'evening', night1 => 'night' }, 'AM PM stand alone abbreviated');
 $am_pm = $locale->am_pm_stand_alone_narrow();
-is_deeply ($am_pm, { am => 'a', noon => 'noon', pm => 'p', midnight => 'midnight', morning1 => 'in the morning', afternoon1 => 'in the afternoon', evening1 => 'in the evening', night1 => 'at night' }, 'AM PM stand alone narrow');
+is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'morning', afternoon1 => 'afternoon', evening1 => 'evening', night1 => 'night' }, 'AM PM stand alone narrow');
 
 my $era = $locale->era_wide();
 is_deeply ($era, ['Before Christ', 'Anno Domini'], 'Era wide');

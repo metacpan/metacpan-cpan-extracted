@@ -170,7 +170,7 @@ $t->post_ok('/api/v1/add' => {Accept => '*/*'} => json => $data);
 $t->get_ok('/api/v1/stats')->status_is(200);
 $got = $t->tx->res->json;
 is($got->{count_datapoints}, 8, "stats - count data points");
-is($got->{count_metrics},    5, "stats - count metrics");
-is($got->{count_keys},       3, "stats - count keys");
+#is($got->{count_metrics},    5, "stats - count metrics");
+#is($got->{count_keys},       3, "stats - count keys");
 
 done_testing();

@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.9.2';
+$Git::Hooks::Notify::VERSION = '2.9.3';
 use 5.010;
 use utf8;
 use strict;
@@ -275,7 +275,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.9.2
+version 2.9.3
 
 =head1 SYNOPSIS
 

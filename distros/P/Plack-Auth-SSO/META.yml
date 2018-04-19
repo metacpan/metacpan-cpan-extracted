@@ -3,7 +3,19 @@ abstract: 'role for Single Sign On (SSO) authentication'
 author:
   - 'Nicolas Franck, C<< <nicolas.franck at ugent.be> >>'
 build_requires:
+  Dancer::Middleware::Rebase: '0'
+  Devel::Cover: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  LWP::UserAgent: '0'
   Module::Build: '0.28'
+  Plack::Builder: '0'
+  Plack::Session: '0'
+  Plack::Test: '0'
+  Plack::Test::Server: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  URI::Escape: '0'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
@@ -38,9 +50,10 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-Auth-SSO/issues
   homepage: https://github.com/LibreCat/Plack-Auth-SSO
   repository: https://github.com/LibreCat/Plack-Auth-SSO.git
-version: '0.0132'
+version: '0.0133'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'Nicolas Franck <njfranck@auster0.ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c526.ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
   - 'Nicolas Franck <njfranck@nicolasfranck.local>'

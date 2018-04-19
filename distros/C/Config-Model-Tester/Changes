@@ -1,3 +1,12 @@
+3.006 2018-04-14
+
+    * Tester: can call run_tests without arguments. Calling
+      run_tests with arguments is deprecated
+    * Setup: allow customised command line options (command line
+      args are processed by init_test)
+    * Setup: fix synopsis
+    * init_test: initialize log4perl when -l option is passed
+
 3.005 2018-04-02
 
     * Setup: clarify doc

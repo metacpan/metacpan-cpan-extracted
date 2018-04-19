@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use File::Slurper qw( read_binary );
-use JSON::MaybeXS;
+use JSON::MaybeXS qw( decode_json JSON );
 use Test::Fatal qw( exception );
 use Test::More 0.88;
 
@@ -104,12 +104,13 @@ sub test_insights {
             'country',
             'is_issued_in_billing_address_country',
             'is_prepaid',
+            'is_virtual',
             {
                 issuer => [ keys %{ $response->{credit_card}{issuer} } ],
             },
             'type',
         ],
-        device     => [ 'confidence', 'id',      'last_seen' ],
+        device     => [ 'confidence', 'id',      'last_seen', 'local_time' ],
         email      => [ 'first_seen', 'is_free', 'is_high_risk' ],
         ip_address => \@ip_address_hashes,
     };

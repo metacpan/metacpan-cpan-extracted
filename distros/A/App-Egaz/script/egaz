@@ -56,7 +56,7 @@ perl -I lib/ t/11-raxml.t
 perl -I lib/ script/egaz plottree t/YDL184C.nwk
 perl -I lib/ t/12-plottree.t
 
-perl -I lib/ script/egaz blastn t/pig2.fa t/pseudopig.fa --verbose
+perl -I lib/ script/egaz blastn t/pig2.fa t/pseudopig.fa --verbose -o t/pig2.blast
 perl -I lib/ t/13-blastn.t
 
 egaz partition t/pseudocat/cat.fa --chunk 10000 --overlap 100
@@ -81,5 +81,19 @@ perl -I lib/ script/egaz multiz t/Q_rubravsQ_aliena t/Q_rubravsQ_aquifolioides t
 rm -fr Q_rubra_n4
 perl -I lib/ t/17-multiz.t
 
-sortaxt
+perl -I lib/ script/egaz repeatmasker t/pseudocat.fa -v
+perl -I lib/ t/18-repeatmasker.t
 
+perl -I lib/ script/egaz blastmatch t/pig2.blast
+perl -I lib/ t/19-blastmatch.t
+
+perl -I lib/ t/20-blastlink.t
+
+perl -I lib/ script/egaz fas2vcf t/YDL184C.fas t/S288c.chr.sizes -v
+cat t/example.fas | perl -I lib/ script/egaz fas2vcf \
+    stdin t/S288c.chr.sizes --list <(echo -e "S288c\nYJM789") -v
+perl -I lib/ t/21-fas2vcf.t
+
+perl -I lib/ script/egaz template t/pseudocat t/pseudopig --multi -o tmp/ -v
+rm -fr tmp/
+perl -I lib/ t/91-template.t

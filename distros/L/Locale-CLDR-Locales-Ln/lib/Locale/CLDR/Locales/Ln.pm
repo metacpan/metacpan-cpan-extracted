@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ln - Package for language Lingala
 
 package Locale::CLDR::Locales::Ln;
 # This file auto generated from Data\common\main\ln.xml
-#	on Fri 29 Apr  7:14:37 pm GMT
+#	on Fri 13 Apr  7:18:11 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -131,7 +132,7 @@ has 'display_name_region' => (
  			'154' => 'Erópa ya Nola',
  			'155' => 'Erópa ya Wɛ́sita',
  			'419' => 'Ameríka Latína',
- 			'AC' => 'Esenga ya Mbuta o likoló',
+ 			'AC' => 'Esanga ya Mbuta o Likoló',
  			'AD' => 'Andorɛ',
  			'AE' => 'Lɛmila alabo',
  			'AF' => 'Afiganisitá',
@@ -157,19 +158,20 @@ has 'display_name_region' => (
  			'BH' => 'Bahrɛnɛ',
  			'BI' => 'Burundi',
  			'BJ' => 'Benɛ',
+ 			'BL' => 'Sántu Barthélemy',
  			'BM' => 'Bermuda',
  			'BN' => 'Brineyi',
  			'BO' => 'Bolivi',
  			'BR' => 'Brezílɛ',
  			'BS' => 'Bahamasɛ',
  			'BT' => 'Butáni',
- 			'BV' => 'Esenga Buvé',
+ 			'BV' => 'Esanga Buvé',
  			'BW' => 'Botswana',
  			'BY' => 'Byelorisi',
  			'BZ' => 'Belizɛ',
  			'CA' => 'Kanada',
  			'CC' => 'Bisanga Kokos',
- 			'CD' => 'Repibiki demokratiki ya Kongó',
+ 			'CD' => 'Republíki ya Kongó Demokratíki',
  			'CD@alt=variant' => 'Kongó-Kinsásá',
  			'CF' => 'Repibiki ya Afríka ya Káti',
  			'CG' => 'Kongo',
@@ -181,12 +183,14 @@ has 'display_name_region' => (
  			'CM' => 'Kamɛrune',
  			'CN' => 'Sinɛ',
  			'CO' => 'Kolombi',
+ 			'CP' => 'Esanga Clipperton',
  			'CR' => 'Kositarika',
  			'CU' => 'Kiba',
  			'CV' => 'Bisanga bya Kapevɛrɛ',
- 			'CX' => 'Esenga ya Mbótama',
+ 			'CX' => 'Esanga ya Mbótama',
  			'CY' => 'Sípɛlɛ',
- 			'CZ' => 'Repibiki Tsekɛ',
+ 			'CZ' => 'Shekia',
+ 			'CZ@alt=variant' => 'Repibiki Tsekɛ',
  			'DE' => 'Alemani',
  			'DJ' => 'Dzibuti',
  			'DK' => 'Danɛmarike',
@@ -205,9 +209,9 @@ has 'display_name_region' => (
  			'FI' => 'Filandɛ',
  			'FJ' => 'Fidzi',
  			'FK' => 'Bisanga bya Maluni',
- 			'FK@alt=variant' => 'Bisanga bya Falkland',
+ 			'FK@alt=variant' => 'Bisanga bya Falklandí (Bisanga bya Maluni)',
  			'FM' => 'Mikronezi',
- 			'FO' => 'Bisanga ya Fɛróa',
+ 			'FO' => 'Bisanga bya Faloé',
  			'FR' => 'Falánsɛ',
  			'GA' => 'Gabɔ',
  			'GB' => 'Angɛlɛtɛ́lɛ',
@@ -228,6 +232,7 @@ has 'display_name_region' => (
  			'GU' => 'Gwamɛ',
  			'GW' => 'Ginɛbisau',
  			'GY' => 'Giyane',
+ 			'HK' => 'Hong Kong (Shina)',
  			'HK@alt=short' => 'Hong Kong',
  			'HM' => 'Ile Heard et Iles McDonald',
  			'HN' => 'Ondurasɛ',
@@ -245,6 +250,7 @@ has 'display_name_region' => (
  			'IR' => 'Irâ',
  			'IS' => 'Isilandɛ',
  			'IT' => 'Itali',
+ 			'JE' => 'Jelezy',
  			'JM' => 'Zamaiki',
  			'JO' => 'Zɔdani',
  			'JP' => 'Zapɔ',
@@ -274,13 +280,15 @@ has 'display_name_region' => (
  			'MC' => 'Monako',
  			'MD' => 'Molidavi',
  			'ME' => 'Monténégro',
+ 			'MF' => 'Sántu Martin',
  			'MG' => 'Madagasikari',
  			'MH' => 'Bisanga bya Marishalɛ',
  			'MK' => 'Masedwanɛ',
- 			'MK@alt=variant' => 'Masedoni',
+ 			'MK@alt=variant' => 'Masedoni (RYYYK)',
  			'ML' => 'Malí',
  			'MM' => 'Birmanie',
  			'MN' => 'Mongolí',
+ 			'MO' => 'Makau (Shina)',
  			'MO@alt=short' => 'Makau',
  			'MP' => 'Bisanga bya Marianɛ ya nɔ́rdi',
  			'MQ' => 'Martiniki',
@@ -354,7 +362,7 @@ has 'display_name_region' => (
  			'TJ' => 'Tazikisitá',
  			'TK' => 'Tokelau',
  			'TL' => 'Timorɛ ya Moniɛlɛ',
- 			'TL@alt=variant' => 'Timor ya monyɛlɛ',
+ 			'TL@alt=variant' => 'Timor ya Monyɛlɛ',
  			'TM' => 'Tikɛménisitá',
  			'TN' => 'Tinizi',
  			'TO' => 'Tonga',
@@ -365,6 +373,7 @@ has 'display_name_region' => (
  			'TZ' => 'Tanzani',
  			'UA' => 'Ikrɛni',
  			'UG' => 'Uganda',
+ 			'UM' => 'Bisanga Mokɛ́na Mosíká bya Lisangá lya Ameríka',
  			'US' => 'Ameriki',
  			'UY' => 'Irigwei',
  			'UZ' => 'Uzibɛkisitá',
@@ -437,9 +446,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[j q x])},
+			auxiliary => qr{[j q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', '{Gb}', 'H', 'I', 'K', 'L', 'M', '{Mb}', '{Mp}', 'N', '{Nd}', '{Ng}', '{Nk}', '{Ns}', '{Nt}', '{Ny}', '{Nz}', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a á â ǎ b c d e é ê ě ɛ {ɛ́} {ɛ̂} {ɛ̌} f g {gb} h i í î ǐ k l m {mb} {mp} n {nd} {ng} {nk} {ns} {nt} {ny} {nz} o ó ô ǒ ɔ {ɔ́} {ɔ̂} {ɔ̌} p r s t u ú v w y z])},
+			main => qr{[a á â ǎ b c d e é ê ě ɛ {ɛ́} {ɛ̂} {ɛ̌} f g {gb} h i í î ǐ k l m {mb} {mp} n {nd} {ng} {nk} {ns} {nt} {ny} {nz} o ó ô ǒ ɔ {ɔ́} {ɔ̂} {ɔ̌} p r s t u ú v w y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -482,6 +492,185 @@ has 'alternate_quote_end' => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{’},
+);
+
+has 'duration_units' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { {
+				hm => 'h:mm',
+				hms => 'h:mm:ss',
+				ms => 'm:ss',
+			} }
+);
+
+has 'units' => (
+	is			=> 'ro',
+	isa			=> HashRef[HashRef[HashRef[Str]]],
+	init_arg	=> undef,
+	default		=> sub { {
+				'long' => {
+					'century' => {
+						'name' => q(sekúlo),
+						'one' => q({0} sekúlo),
+						'other' => q({0} sekúlo),
+					},
+					'day' => {
+						'name' => q(mikɔlɔ),
+						'one' => q({0} mokɔlɔ),
+						'other' => q({0} mikɔlɔ),
+						'per' => q({0}/d),
+					},
+					'hour' => {
+						'name' => q(ngonga),
+						'one' => q({0} ngonga),
+						'other' => q({0} ngonga),
+						'per' => q({0}/h),
+					},
+					'microsecond' => {
+						'name' => q(mikrosekundí),
+						'one' => q({0} mikrosekundí),
+						'other' => q({0} mikrosekundí),
+					},
+					'millisecond' => {
+						'name' => q(millisekundí),
+						'one' => q({0} millisekundí),
+						'other' => q({0} millisekundí),
+					},
+					'minute' => {
+						'name' => q(minúti),
+						'one' => q({0} monúti),
+						'other' => q({0} minúti),
+						'per' => q({0}/monúti),
+					},
+					'month' => {
+						'name' => q(sánzá),
+						'one' => q({0} sánzá),
+						'other' => q({0} sánzá),
+						'per' => q({0}/sán),
+					},
+					'nanosecond' => {
+						'name' => q(nanosekundí),
+						'one' => q({0} nanosekundí),
+						'other' => q({0} nanosekundí),
+					},
+					'second' => {
+						'name' => q(sekundí),
+						'one' => q({0} sekundí),
+						'other' => q({0} sekundí),
+					},
+					'week' => {
+						'name' => q(mpɔ́sɔ),
+						'one' => q({0} mpɔ́sɔ),
+						'other' => q({0} mpɔ́sɔ),
+						'per' => q({0}/mps),
+					},
+					'year' => {
+						'name' => q(mibú),
+						'one' => q({0} mobú),
+						'other' => q({0} mibú),
+					},
+				},
+				'narrow' => {
+					'day' => {
+						'name' => q(mokɔlɔ),
+						'one' => q({0} d),
+						'other' => q({0} d),
+					},
+					'hour' => {
+						'name' => q(ngonga),
+						'one' => q({0} h),
+						'other' => q({0} h),
+					},
+					'millisecond' => {
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					'minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+					},
+					'month' => {
+						'name' => q(sánzá),
+						'one' => q({0} sán),
+						'other' => q({0} sán),
+					},
+					'second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+					},
+					'week' => {
+						'name' => q(mps),
+						'one' => q({0} mps),
+						'other' => q({0} mps),
+					},
+				},
+				'short' => {
+					'century' => {
+						'name' => q(sek),
+						'one' => q({0} sek),
+						'other' => q({0} sek),
+					},
+					'day' => {
+						'name' => q(mikɔlɔ),
+						'one' => q({0} mokɔlɔ),
+						'other' => q({0} mikɔlɔ),
+						'per' => q({0}/d),
+					},
+					'hour' => {
+						'name' => q(ngonga),
+						'one' => q({0} h),
+						'other' => q({0} h),
+						'per' => q({0}/h),
+					},
+					'microsecond' => {
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
+					'millisecond' => {
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					'minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+						'per' => q({0}/min),
+					},
+					'month' => {
+						'name' => q(sánzá),
+						'one' => q({0} sán),
+						'other' => q({0} sán),
+						'per' => q({0}/sán),
+					},
+					'nanosecond' => {
+						'name' => q(ns),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
+					},
+					'second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+						'per' => q({0}/s),
+					},
+					'week' => {
+						'name' => q(mpɔ́sɔ),
+						'one' => q({0} mps),
+						'other' => q({0} mps),
+						'per' => q({0}/mps),
+					},
+					'year' => {
+						'name' => q(mibú),
+					},
+				},
+			} }
 );
 
 has 'yesstr' => (
@@ -535,7 +724,7 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
@@ -569,7 +758,15 @@ has 'currencies' => (
 				'currency' => q(Dirihamɛ ya Lémila alabo),
 			},
 		},
+		'ALL' => {
+			display_name => {
+				'currency' => q(Lek),
+				'one' => q(Lek),
+				'other' => q(Lek),
+			},
+		},
 		'AOA' => {
+			symbol => 'Kz',
 			display_name => {
 				'currency' => q(Kwanza ya Angóla),
 			},
@@ -582,8 +779,38 @@ has 'currencies' => (
 			},
 		},
 		'AUD' => {
+			symbol => 'A$',
 			display_name => {
 				'currency' => q(Dolarɛ ya Ositali),
+			},
+		},
+		'AWG' => {
+			display_name => {
+				'currency' => q(Guldeni y’ Aruba),
+				'one' => q(Guldeni y’ Aruba),
+				'other' => q(Guldeni y’ Aruba),
+			},
+		},
+		'BAM' => {
+			symbol => 'BAM',
+			display_name => {
+				'currency' => q(Mark ya kobóngwama),
+				'one' => q(Mark ya kobóngwama),
+				'other' => q(Mark ya kobóngwama),
+			},
+		},
+		'BBD' => {
+			display_name => {
+				'currency' => q(Dolále ya Barbados),
+				'one' => q(Dolále ya Barbados),
+				'other' => q(Dolále ya Barbados),
+			},
+		},
+		'BGN' => {
+			display_name => {
+				'currency' => q(Lev ya Bulgaria),
+				'one' => q(Lev ya Bulgaria),
+				'other' => q(Leva ya Bulgaria),
 			},
 		},
 		'BHD' => {
@@ -608,9 +835,38 @@ has 'currencies' => (
 				'currency' => q(Real ya Brazil),
 			},
 		},
+		'BSD' => {
+			display_name => {
+				'currency' => q(Dolále ya Bahamas),
+				'one' => q(Dolále ya Bahamas),
+				'other' => q(Dolále ya Bahamas),
+			},
+		},
 		'BWP' => {
 			display_name => {
 				'currency' => q(Pula ya Botswana),
+			},
+		},
+		'BYN' => {
+			display_name => {
+				'currency' => q(Rubelé ya Bielorusí),
+				'one' => q(Rubelé ya Bielorusí),
+				'other' => q(Rubelé ya Bielorusí),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(Rubelé ya Bielorusí \(2000–2016\)),
+				'one' => q(Rubelé ya Bielorusí \(2000–2016\)),
+				'other' => q(Rubelé ya Bielorusí \(2000–2016\)),
+			},
+		},
+		'BZD' => {
+			symbol => 'BZD',
+			display_name => {
+				'currency' => q(Dolále ya Belíze),
+				'one' => q(Dolále ya Belíze),
+				'other' => q(Dolále ya Belíze),
 			},
 		},
 		'CAD' => {
@@ -625,6 +881,7 @@ has 'currencies' => (
 			},
 		},
 		'CHF' => {
+			symbol => 'Fr.',
 			display_name => {
 				'currency' => q(Falánga ya Swisɛ),
 			},
@@ -668,6 +925,7 @@ has 'currencies' => (
 			},
 		},
 		'CZK' => {
+			symbol => 'CZK',
 			display_name => {
 				'currency' => q(Motolé Sheki),
 				'one' => q(Motolé Sheki),
@@ -680,6 +938,7 @@ has 'currencies' => (
 			},
 		},
 		'DKK' => {
+			symbol => 'DKK',
 			display_name => {
 				'currency' => q(Motolé ya Danemark),
 				'one' => q(Motolé ya Danemark),
@@ -714,11 +973,21 @@ has 'currencies' => (
 			},
 		},
 		'EUR' => {
+			symbol => '€',
 			display_name => {
 				'currency' => q(Ɛlɔ́),
 			},
 		},
+		'FJD' => {
+			symbol => 'FJD',
+			display_name => {
+				'currency' => q(Dolále ya Fiji),
+				'one' => q(Dolále ya Fiji),
+				'other' => q(Dolále ya Fiji),
+			},
+		},
 		'GBP' => {
+			symbol => '£',
 			display_name => {
 				'currency' => q(Paunɛ ya Angɛlɛtɛ́lɛ),
 			},
@@ -733,6 +1002,14 @@ has 'currencies' => (
 				'currency' => q(Cedi),
 				'one' => q(Cedi),
 				'other' => q(Cedi),
+			},
+		},
+		'GIP' => {
+			symbol => 'GIP',
+			display_name => {
+				'currency' => q(Bojito ya Gibraltar),
+				'one' => q(Bojito ya Gibraltar),
+				'other' => q(Bojito ya Gibraltar),
 			},
 		},
 		'GMD' => {
@@ -752,11 +1029,41 @@ has 'currencies' => (
 				'currency' => q(Falánga ya Ginɛ),
 			},
 		},
+		'GTQ' => {
+			display_name => {
+				'currency' => q(Quetzal),
+				'one' => q(Quetzal),
+				'other' => q(Quetzal),
+			},
+		},
+		'HNL' => {
+			display_name => {
+				'currency' => q(Lempira),
+				'one' => q(Lempira),
+				'other' => q(Lempira),
+			},
+		},
+		'HRK' => {
+			symbol => 'HRK',
+			display_name => {
+				'currency' => q(Kuna ya Kroasia),
+				'one' => q(Kuna ya Kroasia),
+				'other' => q(Kuna ya Kroasia),
+			},
+		},
 		'HTG' => {
 			display_name => {
 				'currency' => q(Gurde),
 				'one' => q(Gurde),
 				'other' => q(Gurde),
+			},
+		},
+		'HUF' => {
+			symbol => 'HUF',
+			display_name => {
+				'currency' => q(Folinte),
+				'one' => q(Folinte),
+				'other' => q(Folinte),
 			},
 		},
 		'INR' => {
@@ -765,10 +1072,18 @@ has 'currencies' => (
 			},
 		},
 		'ISK' => {
+			symbol => 'ISK',
 			display_name => {
 				'currency' => q(Motolé ya Islandi),
 				'one' => q(Motolé ya Islandi),
 				'other' => q(Motolé ya Islandi),
+			},
+		},
+		'JMD' => {
+			display_name => {
+				'currency' => q(Dolále ya Jamaïke),
+				'one' => q(Dolále ya Jamaïke),
+				'other' => q(Dolále ya Jamaïke),
 			},
 		},
 		'JPY' => {
@@ -784,6 +1099,13 @@ has 'currencies' => (
 		'KMF' => {
 			display_name => {
 				'currency' => q(Falánga ya Komoro),
+			},
+		},
+		'KYD' => {
+			display_name => {
+				'currency' => q(Dolále ya Bisanga bya Kayman),
+				'one' => q(Dolále ya Bisanga bya Kayman),
+				'other' => q(Dolále ya Bisanga bya Kayman),
 			},
 		},
 		'LRD' => {
@@ -825,6 +1147,14 @@ has 'currencies' => (
 				'currency' => q(Falánga ya Madagasikarɛ),
 			},
 		},
+		'MKD' => {
+			symbol => 'MKD',
+			display_name => {
+				'currency' => q(Denalé),
+				'one' => q(Denalé),
+				'other' => q(Denalé),
+			},
+		},
 		'MRO' => {
 			display_name => {
 				'currency' => q(Ugwiya ya Moritani),
@@ -852,6 +1182,11 @@ has 'currencies' => (
 				'currency' => q(Metikali ya Mozambiki),
 			},
 		},
+		'MZN' => {
+			display_name => {
+				'currency' => q(Métikal),
+			},
+		},
 		'NAD' => {
 			display_name => {
 				'currency' => q(Dolarɛ ya Namibi),
@@ -863,10 +1198,19 @@ has 'currencies' => (
 			},
 		},
 		'NOK' => {
+			symbol => 'NOK',
 			display_name => {
 				'currency' => q(Motolé ya Norvej),
 				'one' => q(Motolé ya Norvej),
 				'other' => q(Motolé ya Norvej),
+			},
+		},
+		'NZD' => {
+			symbol => 'NZ$',
+			display_name => {
+				'currency' => q(Dolále ya Zeland ya Sika),
+				'one' => q(Dolále ya Zeland ya Sika),
+				'other' => q(Dolále ya Zeland ya Sika),
 			},
 		},
 		'PAB' => {
@@ -883,6 +1227,22 @@ has 'currencies' => (
 				'other' => q(Sol Sika),
 			},
 		},
+		'PGK' => {
+			symbol => 'PGK',
+			display_name => {
+				'currency' => q(Kina),
+				'one' => q(Kina),
+				'other' => q(Kina),
+			},
+		},
+		'PLN' => {
+			symbol => 'PLN',
+			display_name => {
+				'currency' => q(Sloty),
+				'one' => q(Sloty),
+				'other' => q(Sloty),
+			},
+		},
 		'PYG' => {
 			display_name => {
 				'currency' => q(Guarani),
@@ -890,7 +1250,31 @@ has 'currencies' => (
 				'other' => q(Guarani),
 			},
 		},
+		'RON' => {
+			display_name => {
+				'currency' => q(Leu Sika),
+				'one' => q(Leu Sika),
+				'other' => q(Leu Sika),
+			},
+		},
+		'RSD' => {
+			symbol => 'RSD',
+			display_name => {
+				'currency' => q(Dinalé ya Serbia),
+				'one' => q(Dinalé ya Serbia),
+				'other' => q(Dinalé ya Serbia),
+			},
+		},
+		'RUB' => {
+			symbol => 'RUB',
+			display_name => {
+				'currency' => q(Rubelé ya Rusí),
+				'one' => q(Rubelé ya Rusí),
+				'other' => q(Rubelé ya Rusí),
+			},
+		},
 		'RWF' => {
+			symbol => 'RF',
 			display_name => {
 				'currency' => q(Falánga ya Rwanda),
 			},
@@ -898,6 +1282,12 @@ has 'currencies' => (
 		'SAR' => {
 			display_name => {
 				'currency' => q(Riyalɛ ya Alabi Sawuditɛ),
+			},
+		},
+		'SBD' => {
+			symbol => 'SBD',
+			display_name => {
+				'currency' => q(Dolále ya Bisanga Solomoni),
 			},
 		},
 		'SCR' => {
@@ -916,6 +1306,7 @@ has 'currencies' => (
 			},
 		},
 		'SEK' => {
+			symbol => 'SEK',
 			display_name => {
 				'currency' => q(Motolé ya Swédi),
 				'one' => q(Motolé ya Swédi),
@@ -937,6 +1328,11 @@ has 'currencies' => (
 				'currency' => q(Shilingɛ ya Somali),
 			},
 		},
+		'SSP' => {
+			display_name => {
+				'currency' => q(Bojito ya Sudaní ya Súdi),
+			},
+		},
 		'STD' => {
 			display_name => {
 				'currency' => q(Dobra ya Sao Tomé mpé Presipe),
@@ -952,9 +1348,30 @@ has 'currencies' => (
 				'currency' => q(Dinarɛ ya Tinizi),
 			},
 		},
+		'TOP' => {
+			symbol => 'T$',
+			display_name => {
+				'currency' => q(Pa’Anga),
+			},
+		},
+		'TTD' => {
+			display_name => {
+				'currency' => q(Dolále ya Trinidad mpé Tobago),
+				'one' => q(Dolále ya Trinidad mpé Tobago),
+				'other' => q(Dolále ya Trinidad mpé Tobago),
+			},
+		},
 		'TZS' => {
 			display_name => {
 				'currency' => q(Shilingɛ ya Tanzani),
+			},
+		},
+		'UAH' => {
+			symbol => 'UAH',
+			display_name => {
+				'currency' => q(Griwná),
+				'one' => q(Griwná),
+				'other' => q(Griwná),
 			},
 		},
 		'UGX' => {
@@ -967,14 +1384,38 @@ has 'currencies' => (
 				'currency' => q(Dolarɛ ya Ameriki),
 			},
 		},
+		'VUV' => {
+			display_name => {
+				'currency' => q(Vatu),
+			},
+		},
+		'WST' => {
+			display_name => {
+				'currency' => q(Tala),
+			},
+		},
 		'XAF' => {
+			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(Falánga CFA BEAC),
+			},
+		},
+		'XCD' => {
+			display_name => {
+				'currency' => q(Dolále ya Kalibí Monyɛlɛ),
+				'one' => q(Dolále ya Kalibí Monyɛlɛ),
+				'other' => q(Dolále ya Kalibí Monyɛlɛ),
 			},
 		},
 		'XOF' => {
 			display_name => {
 				'currency' => q(Falánga CFA BCEAO),
+			},
+		},
+		'XPF' => {
+			symbol => 'F CFP',
+			display_name => {
+				'currency' => q(Falánga CFP),
 			},
 		},
 		'ZAR' => {
@@ -1304,27 +1745,27 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Ntángo ya Lubumbashi),
+				'standard' => q#Ntángo ya Lubumbashi#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Ntángo ya Afríka ya Ɛ́sita),
+				'standard' => q#Ntángo ya Afríka ya Ɛ́sita#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Ntángo ya Afríka ya Sidi),
+				'standard' => q#Ntángo ya Afríka ya Sidi#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Ntángo ya Londoni),
+				'standard' => q#Ntángo ya Londoni#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Ntángo ya Seyshel),
+				'standard' => q#Ntángo ya Seyshel#,
 			},
 		},
 	 } }

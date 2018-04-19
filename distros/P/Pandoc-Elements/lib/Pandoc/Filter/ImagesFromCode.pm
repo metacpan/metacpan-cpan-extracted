@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.26';
+our $VERSION = '0.34';
 
 use Digest::MD5 'md5_hex';
 use IPC::Run3;

@@ -15,11 +15,11 @@ my $file = basename $0;
 use FindBin;
 
 use SPVM 'TestCase'; my $use_test_line = __LINE__;
-use SPVM 'CORE'; my $use_core_line = __LINE__;
+use SPVM 'Std'; my $use_core_line = __LINE__;
 
 use POSIX ();
 
-use SPVM::Core::Object::Package;
+use SPVM::Perl::Object::Package;
 
 my $BYTE_MAX = 127;
 my $BYTE_MIN = -128;
@@ -52,7 +52,7 @@ my $NaN = SPVM::NaN();
 
 use SPVM 'Double';
 use SPVM 'Float';
-use SPVM 'CORE';
+use SPVM 'Std';
 
 {
   # SPVM::Build tests
@@ -67,7 +67,7 @@ my $start_objects_count = SPVM::get_objects_count();
 
 # time
 {
-  cmp_ok(abs(time - SPVM::CORE::time()), '<', 2);
+  cmp_ok(abs(time - SPVM::Std::time()), '<', 2);
 }
 
 {
@@ -95,7 +95,7 @@ is_deeply(
   \@SPVM::PACKAGE_INFOS,
   [
     {name => 'TestCase', file => $file, line => $use_test_line},
-    {name => 'CORE', file => $file, line => $use_core_line}
+    {name => 'Std', file => $file, line => $use_core_line}
   ]
 );
 =cut
@@ -653,9 +653,9 @@ is_deeply(
 }
 
 
-# SPVM::Core::Object::Array
+# SPVM::Perl::Object::Array
 {
-  my $sp_values = SPVM::Core::Object::Array::Int->new_len(3);
+  my $sp_values = SPVM::Perl::Object::Array::Int->new_len(3);
   $sp_values->set_elements([1, 2, 3]);
 }
 

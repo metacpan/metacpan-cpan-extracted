@@ -3,7 +3,7 @@
  *
  *    Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
  *    2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
- *    2013, 2014, 2015, 2016, 2017 by Larry Wall and others
+ *    2013, 2014, 2015, 2016, 2017, 2018 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -284,6 +284,14 @@ perl_construct(pTHXx)
 
 #if defined(LOCAL_PATCH_COUNT)
     PL_localpatches = local_patches;	/* For possible -v */
+#endif
+
+#if defined(LIBM_LIB_VERSION)
+    /*
+     * Some BSDs and Cygwin default to POSIX math instead of IEEE.
+     * This switches them over to IEEE.
+     */
+    _LIB_VERSION = _IEEE_;
 #endif
 
 #ifdef HAVE_INTERP_INTERN
@@ -3593,7 +3601,7 @@ S_minus_v(pTHX)
 #endif
 
 	PerlIO_printf(PIO_stdout,
-		      "\n\nCopyright 1987-2017, Larry Wall\n");
+		      "\n\nCopyright 1987-2018, Larry Wall\n");
 #ifdef MSDOS
 	PerlIO_printf(PIO_stdout,
 		      "\nMS-DOS port Copyright (c) 1989, 1990, Diomidis Spinellis\n");

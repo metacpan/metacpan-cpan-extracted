@@ -1,5 +1,9 @@
 Revision history for Class::Usul
 
+0.84.1    2018-04-14 13:26:37
+          - Comments out IPC::Run test since failing on newer Perls
+          - Updates copyright year
+
 0.83.1    2017-07-01 12:52:53
           - Removes obsolete Response::Table
           - Dependency version bumps

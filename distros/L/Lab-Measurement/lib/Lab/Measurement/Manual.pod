@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 OVERVIEW
 
@@ -24,20 +24,15 @@ Currently, the Lab::Measurement API consists of:
 
 =item *
 
-The currently most-used interface consting of the Lab::Instrument virtual
-instruments and the high-level Lab::XPRESS interface, which provides simple
-generation of nested sweeps and logging of output data into a customizable
-folder structure.
+L</Lab::Moose> is the recommended API, it is based on B<Modern Perl>
+techniques.
 
 =item *
 
-L</Lab::Moose> is a new implementation based on B<Modern Perl> techniques.
-So far, this is focused on providing a new infrastructure for instrument
-drivers, connection backends, ascii datafiles/datafolders with live-plotting.
-High-level functionality (something like
-Lab::XPRESS) will follow soon.
-Until then, the Lab::Moose drivers
-can be used with XPRESS, just like the Lab::Instrument drivers.
+The hisorical API, consisting of the Lab::Instrument virtual
+instruments and the high-level Lab::XPRESS interface, which provides simple
+generation of nested sweeps and logging of output data into a customizable
+folder structure.
 
 =back
 
@@ -52,6 +47,280 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =item * L<Lab::Measurement::Backends>
 
 =item * L<Lab::Measurement::Developer::Testing>
+
+=back
+
+=head1 Lab::Moose
+
+=over
+
+=item * L<Lab::Moose::Tutorial>
+
+=item * L<Lab::Moose::Developer>
+
+=back
+
+=head2 High-level tool classes
+
+=over
+
+=item * L<Lab::Moose>
+
+=item * L<Lab::Moose::DataFolder>
+
+=item * L<Lab::Moose::DataFile>
+
+=item * L<Lab::Moose::DataFile::Gnuplot>
+
+=item * L<Lab::Moose::DataFile::Meta>
+
+=item * L<Lab::Moose::DataFile::Read>
+
+=item * L<Lab::Moose::Plot>
+
+=back
+
+=head2 Sweep classes
+
+=over
+
+=item * L<Lab::Moose::Sweep>
+
+=item * L<Lab::Moose::Sweep::Step>
+
+=item * L<Lab::Moose::Sweep::Step::Voltage>
+
+=item * L<Lab::Moose::Sweep::Step::Frequency>
+
+=item * L<Lab::Moose::Sweep::Step::Magnet>
+
+=item * L<Lab::Moose::Sweep::Continuous>
+
+=item * L<Lab::Moose::Sweep::Continuous::Time>
+
+=item * L<Lab::Moose::Sweep::Continuous::Magnet>
+
+=item * L<Lab::Moose::Sweep::Continuous::Voltage>
+
+=back
+
+=head2 Instrument control classes
+
+=over
+
+=item * L<Lab::Moose::Instrument>
+
+=item * L<Lab::Moose::Instrument::Cache>
+
+=item * L<Lab::Moose::Instrument::Zhinst>
+
+=back
+
+=head3 Multimeters
+
+=over
+
+=item * L<Lab::Moose::Instrument::HP3458A>
+
+=item * L<Lab::Moose::Instrument::HP34410A>
+
+alias: L<Lab::Moose::Instrument::Agilent34410A>
+
+=item * L<Lab::Moose::Instrument::Keysight34470A>
+
+=back
+
+=head3 Voltage sources
+
+=over
+
+=item * L<Lab::Moose::Instrument::YokogawaGS200>
+
+=item * L<Lab::Moose::Instrument::Yokogawa7651>
+
+=item * L<Lab::Moose::Instrument::DummySource>
+
+=back
+
+=head3 Lock-in amplifiers
+
+=over
+
+=item * L<Lab::Moose::Instrument::SR830>
+
+=item * L<Lab::Moose::Instrument::ZI_MFLI>
+
+=back
+
+=head3 Impedance analyzers
+
+=over
+
+=item * L<Lab::Moose::Instrument::ZI_MFIA>
+
+=back
+
+=head3 RF generators
+
+=over
+
+=item * L<Lab::Moose::Instrument::RS_SMB>
+
+=back
+
+=head3 Spectrum analyzers
+
+=over
+
+=item * L<Lab::Moose::Instrument::RS_FSV>
+
+=item * L<Lab::Moose::Instrument::HP8596E>
+
+=back
+
+=head3 Network analyzers
+
+=over
+
+=item * L<Lab::Moose::Instrument::RS_ZVA>
+
+=item * L<Lab::Moose::Instrument::RS_ZVM>
+
+=back
+
+=head3 Superconducting magnet power supplies
+
+=over
+
+=item * L<Lab::Moose::Instrument::OI_Mercury::Magnet>
+
+contains support for temperature sensor and He/N2 level meters.
+
+=back
+
+=head2 Moose::Instrument Roles
+
+=over
+
+=item * L<Lab::Moose::Instrument::Common>
+
+=item * L<Lab::Moose::Instrument::LinearStepSweep>
+
+=item * L<Lab::Moose::Instrument::Log>
+
+=item * L<Lab::Moose::Instrument::SCPIBlock>
+
+=item * L<Lab::Moose::Instrument::VNASweep>
+
+=item * L<Lab::Moose::Instrument::SCPI::Display::Window>
+
+=item * L<Lab::Moose::Instrument::SCPI::Format>
+
+=item * L<Lab::Moose::Instrument::SCPI::Initiate>
+
+=item * L<Lab::Moose::Instrument::SCPI::Instrument>
+
+=item * L<Lab::Moose::Instrument::SCPI::Output::State>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Average>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Bandwidth>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Frequency>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Function>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Range>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Sweep>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Function>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Level>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Power>
+
+=item * L<Lab::Moose::Instrument::SCPI::Source::Range>
+
+=item * L<Lab::Moose::Instrument::SCPI::Unit>
+
+=back
+
+=head2 Connecting instruments
+
+=over
+
+=item * L<Lab::Moose::Connection>
+
+=item * L<Lab::Moose::Connection::Mock>
+
+=item * L<Lab::Moose::Connection::Debug>
+
+=back
+
+=head3 National Instruments VISA base class
+
+=over
+
+=item * L<Lab::Moose::Connection::VISA>
+
+=back
+
+=head3 GPIB (IEEE 488.2)
+
+=over
+
+=item * L<Lab::Moose::Connection::LinuxGPIB>
+
+=item * L<Lab::Moose::Connection::VISA::GPIB>
+
+alias: C<Lab::Moose::Connection::VISA_GPIB>
+
+=back
+
+=head3 USB Test & Measurement
+
+=over
+
+=item * L<Lab::Moose::Connection::USB>
+
+=item * L<Lab::Moose::Connection::VISA::USB>
+
+=back
+
+=head3 Network socket
+
+=over
+
+=item * L<Lab::Moose::Connection::Socket>
+
+=back
+
+=head3 VXI-11
+
+=over
+
+=item * L<Lab::Moose::Connection::VXI11>
+
+=item * L<Lab::Moose::Connection::VISA::VXI11>
+
+=back
+
+=head3 Zurich Instruments LabONE API
+
+=over
+
+=item * L<Lab::Moose::Connection::Zhinst>
+
+=back
+
+=head1 Old Lab::Measurement API
+
+=over
+
+=item * L<Lab::Measurement::OldTutorial>
 
 =back
 
@@ -324,272 +593,6 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =item * L<Lab::Connection::MODBUS_RS232>
 
 =item * L<Lab::Bus::MODBUS_RS232>
-
-=back
-
-=head1 Lab::Moose
-
-=over
-
-=item * L<Lab::Moose::Sweep::Tutorial>
-
-=item * L<Lab::Moose::Developer>
-
-=back
-
-=head2 High-level tool classes
-
-=over
-
-=item * L<Lab::Moose>
-
-=item * L<Lab::Moose::DataFolder>
-
-=item * L<Lab::Moose::DataFile>
-
-=item * L<Lab::Moose::DataFile::Gnuplot>
-
-=item * L<Lab::Moose::DataFile::Meta>
-
-=item * L<Lab::Moose::DataFile::Read>
-
-=item * L<Lab::Moose::Plot>
-
-=back
-
-=head2 Sweep classes
-
-=over
-
-=item * L<Lab::Moose::Sweep>
-
-=item * L<Lab::Moose::Sweep::Step>
-
-=item * L<Lab::Moose::Sweep::Step::Voltage>
-
-=item * L<Lab::Moose::Sweep::Step::Frequency>
-
-=item * L<Lab::Moose::Sweep::Step::Magnet>
-
-=item * L<Lab::Moose::Sweep::Continuous>
-
-=item * L<Lab::Moose::Sweep::Continuous::Time>
-
-=item * L<Lab::Moose::Sweep::Continuous::Magnet>
-
-=item * L<Lab::Moose::Sweep::Continuous::Voltage>
-
-=back
-
-=head2 Instrument control classes
-
-=over
-
-=item * L<Lab::Moose::Instrument>
-
-=item * L<Lab::Moose::Instrument::Cache>
-
-=item * L<Lab::Moose::Instrument::Zhinst>
-
-=back
-
-=head3 Multimeters
-
-=over
-
-=item * L<Lab::Moose::Instrument::HP3458A>
-
-=item * L<Lab::Moose::Instrument::HP34410A>
-
-alias: L<Lab::Moose::Instrument::Agilent34410A>
-
-=item * L<Lab::Moose::Instrument::Keysight34470A>
-
-=back
-
-=head3 Voltage sources
-
-=over
-
-=item * L<Lab::Moose::Instrument::YokogawaGS200>
-
-=item * L<Lab::Moose::Instrument::Yokogawa7651>
-
-=item * L<Lab::Moose::Instrument::DummySource>
-
-=back
-
-=head3 Lock-in amplifiers
-
-=over
-
-=item * L<Lab::Moose::Instrument::SR830>
-
-=item * L<Lab::Moose::Instrument::ZI_MFLI>
-
-=back
-
-=head3 Impedance analyzers
-
-=over
-
-=item * L<Lab::Moose::Instrument::ZI_MFIA>
-
-=back
-
-=head3 RF generators
-
-=over
-
-=item * L<Lab::Moose::Instrument::RS_SMB>
-
-=back
-
-=head3 Spectrum analyzers
-
-=over
-
-=item * L<Lab::Moose::Instrument::RS_FSV>
-
-=item * L<Lab::Moose::Instrument::HP8596E>
-
-=back
-
-=head3 Network analyzers
-
-=over
-
-=item * L<Lab::Moose::Instrument::RS_ZVA>
-
-=item * L<Lab::Moose::Instrument::RS_ZVM>
-
-=back
-
-=head3 Superconducting magnet power supplies
-
-=over
-
-=item * L<Lab::Moose::Instrument::OI_Mercury::Magnet>
-
-contains support for temperature sensor and He/N2 level meters.
-
-=back
-
-=head2 Moose::Instrument Roles
-
-=over
-
-=item * L<Lab::Moose::Instrument::Common>
-
-=item * L<Lab::Moose::Instrument::LinearStepSweep>
-
-=item * L<Lab::Moose::Instrument::Log>
-
-=item * L<Lab::Moose::Instrument::SCPIBlock>
-
-=item * L<Lab::Moose::Instrument::VNASweep>
-
-=item * L<Lab::Moose::Instrument::SCPI::Display::Window>
-
-=item * L<Lab::Moose::Instrument::SCPI::Format>
-
-=item * L<Lab::Moose::Instrument::SCPI::Initiate>
-
-=item * L<Lab::Moose::Instrument::SCPI::Instrument>
-
-=item * L<Lab::Moose::Instrument::SCPI::Output::State>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::Average>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::Bandwidth>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::Frequency>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::Function>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::Range>
-
-=item * L<Lab::Moose::Instrument::SCPI::Sense::Sweep>
-
-=item * L<Lab::Moose::Instrument::SCPI::Source::Function>
-
-=item * L<Lab::Moose::Instrument::SCPI::Source::Level>
-
-=item * L<Lab::Moose::Instrument::SCPI::Source::Power>
-
-=item * L<Lab::Moose::Instrument::SCPI::Source::Range>
-
-=item * L<Lab::Moose::Instrument::SCPI::Unit>
-
-=back
-
-=head2 Connecting instruments
-
-=over
-
-=item * L<Lab::Moose::Connection>
-
-=item * L<Lab::Moose::Connection::Mock>
-
-=item * L<Lab::Moose::Connection::Debug>
-
-=back
-
-=head3 National Instruments VISA base class
-
-=over
-
-=item * L<Lab::Moose::Connection::VISA>
-
-=back
-
-=head3 GPIB (IEEE 488.2)
-
-=over
-
-=item * L<Lab::Moose::Connection::LinuxGPIB>
-
-=item * L<Lab::Moose::Connection::VISA::GPIB>
-
-alias: C<Lab::Moose::Connection::VISA_GPIB>
-
-=back
-
-=head3 USB Test & Measurement
-
-=over
-
-=item * L<Lab::Moose::Connection::USB>
-
-=item * L<Lab::Moose::Connection::VISA::USB>
-
-=back
-
-=head3 Network socket
-
-=over
-
-=item * L<Lab::Moose::Connection::Socket>
-
-=back
-
-=head3 VXI-11
-
-=over
-
-=item * L<Lab::Moose::Connection::VXI11>
-
-=item * L<Lab::Moose::Connection::VISA::VXI11>
-
-=back
-
-=head3 Zurich Instruments LabONE API
-
-=over
-
-=item * L<Lab::Moose::Connection::Zhinst>
 
 =back
 

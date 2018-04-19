@@ -6,11 +6,11 @@ use Filter::Heredoc qw( hd_getstate hd_labels );
 my %label = hd_labels();  # get the default labels
 my %state;
 while ( defined (my $line = <DATA> )) {
-    %state= hd_getstate( $line );
-        chomp $line;
-        if ( $state{statemarker} eq $label{heredoc}) {
-            print "The here document line: '$line'\n";
-        }
+    %state = hd_getstate( $line );
+    chomp $line;
+    if ( $state{statemarker} eq $label{heredoc}) {
+        print "The here document line: '$line'\n";
+    }
 } 
 __DATA__
 #!/bin/bash --posix

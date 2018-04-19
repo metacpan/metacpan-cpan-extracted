@@ -4,7 +4,7 @@
       "FROGGS <froggs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "perl_5"
    ],
@@ -16,46 +16,46 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Archive::Extract" : 0,
-            "Archive::Zip" : 0,
-            "Digest::SHA" : 0,
-            "ExtUtils::CppGuess" : 0,
-            "ExtUtils::Liblist" : 0,
-            "File::Copy" : 0,
-            "File::Fetch" : 0,
-            "File::Find" : 0,
-            "File::Path" : 0,
-            "File::ShareDir" : 0,
-            "File::Spec" : 0,
+            "Archive::Extract" : "0",
+            "Archive::Zip" : "0",
+            "Digest::SHA" : "0",
+            "ExtUtils::CppGuess" : "0",
+            "ExtUtils::Liblist" : "0",
+            "File::Copy" : "0",
+            "File::Fetch" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
             "Module::Build" : "0.36",
-            "Text::Patch" : 0
+            "Text::Patch" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Archive::Extract" : 0,
-            "Digest::SHA" : 0,
-            "File::Copy" : 0,
-            "File::Fetch" : 0,
-            "File::Find" : 0,
-            "File::Path" : 0,
-            "File::ShareDir" : 0,
-            "File::Spec" : 0,
+            "Archive::Extract" : "0",
+            "Digest::SHA" : "0",
+            "File::Copy" : "0",
+            "File::Fetch" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
             "Module::Build" : "0.36",
-            "Text::Patch" : 0
+            "Text::Patch" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "1.00",
-            "File::Spec" : 0
+            "File::Spec" : "0"
          }
       }
    },
    "provides" : {
       "Alien::Box2D" : {
          "file" : "lib/Alien/Box2D.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       }
    },
    "release_status" : "stable",
@@ -70,5 +70,6 @@
          "url" : "http://github.com/PerlGameDev/Alien-Box2D"
       }
    },
-   "version" : "0.105"
+   "version" : "0.106",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

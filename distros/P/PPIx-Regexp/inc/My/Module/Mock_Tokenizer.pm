@@ -7,7 +7,9 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
+
+use constant ARRAY_REF	=> ref [];
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -16,7 +18,7 @@ sub new {
 
 sub capture {
     my ( $self ) = @_;
-    'ARRAY' eq ref $self->{capture}
+    ARRAY_REF eq ref $self->{capture}
 	or return;
     return @{ $self->{capture} };
 }
@@ -55,8 +57,8 @@ This Perl class is private to the C<PPIx-Regexp> package, and may be
 modified or retracted without notice. Documentation is for the benefit
 of the author.
 
-represents a mock tokenizer to be used in testing. It implements those
-methods that the author finds useful.
+It represents a mock tokenizer to be used in testing. It implements
+those methods that the author finds useful.
 
 =head1 METHODS
 

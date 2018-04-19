@@ -10,6 +10,7 @@ my %fixture = (
     country                              => 'US',
     is_issued_in_billing_address_country => 1,
     is_prepaid                           => 1,
+    is_virtual                           => 1,
     issuer                               => { name => 'Bank' },
     type                                 => 'credit',
 );
@@ -23,6 +24,7 @@ is(
     test_name('issued in billing country')
 );
 is( $cc->is_prepaid,   $fixture{is_prepaid},   test_name('is prepaid') );
+is( $cc->is_virtual,   $fixture{is_virtual},   test_name('is virtual') );
 is( $cc->issuer->name, $fixture{issuer}{name}, test_name('issuer name') );
 is( $cc->type,         $fixture{type},         test_name('type') );
 

@@ -5,7 +5,7 @@ use DBI;
 use DBD::SQLite;
 use version;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our $VERSION_INT =
   1_000_000 * version->parse($VERSION)->numify;
@@ -70,7 +70,7 @@ sub new {
       FOREIGN KEY (vertex)
         REFERENCES Vertex(vertex_name)
         ON DELETE CASCADE
-        ON UPDATE NO ACTION
+        ON UPDATE CASCADE
     );
 
     -----------------------------------------------------------------
@@ -84,11 +84,11 @@ sub new {
       FOREIGN KEY (src)
         REFERENCES Vertex(vertex_name)
         ON DELETE CASCADE
-        ON UPDATE NO ACTION
+        ON UPDATE CASCADE
       FOREIGN KEY (dst)
         REFERENCES Vertex(vertex_name)
         ON DELETE CASCADE 
-        ON UPDATE NO ACTION
+        ON UPDATE CASCADE
     );
 
     -- Can use covering index instead
@@ -107,7 +107,7 @@ sub new {
       FOREIGN KEY (src, dst)
         REFERENCES Edge(src, dst)
         ON DELETE CASCADE
-        ON UPDATE NO ACTION
+        ON UPDATE CASCADE
     );
 
     -----------------------------------------------------------------

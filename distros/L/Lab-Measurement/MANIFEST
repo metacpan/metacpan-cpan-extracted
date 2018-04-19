@@ -9,7 +9,6 @@ MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
-Measurement/t/Instrument/load_moose_instrument.t
 README
 appveyor.yml
 dist.ini
@@ -153,6 +152,7 @@ lib/Lab/Measurement/Developer/Write-A-Source-Driver.pod
 lib/Lab/Measurement/Installation.pod
 lib/Lab/Measurement/KeyboardHandling.pm
 lib/Lab/Measurement/Manual.pod
+lib/Lab/Measurement/OldTutorial.pod
 lib/Lab/Measurement/Tutorial.pod
 lib/Lab/Moose.pm
 lib/Lab/Moose/Connection.pm
@@ -226,7 +226,7 @@ lib/Lab/Moose/Sweep/Step.pm
 lib/Lab/Moose/Sweep/Step/Frequency.pm
 lib/Lab/Moose/Sweep/Step/Magnet.pm
 lib/Lab/Moose/Sweep/Step/Voltage.pm
-lib/Lab/Moose/Sweep/Tutorial.pod
+lib/Lab/Moose/Tutorial.pod
 lib/Lab/MultiChannelInstrument.pm
 lib/Lab/MultiChannelInstrument/DeviceCache.pm
 lib/Lab/SCPI.pm

@@ -12,7 +12,7 @@ use Data::Record::Serialize::Error { errors =>
         insert
    )] }, -all;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Data::Record::Serialize::Types -types;
 
@@ -592,7 +592,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 SYNOPSIS
 

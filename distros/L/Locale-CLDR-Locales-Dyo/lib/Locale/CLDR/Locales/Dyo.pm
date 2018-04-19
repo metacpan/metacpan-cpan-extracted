@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Dyo - Package for language Jola-Fonyi
 
 package Locale::CLDR::Locales::Dyo;
 # This file auto generated from Data\common\main\dyo.xml
-#	on Fri 29 Apr  6:58:11 pm GMT
+#	on Fri 13 Apr  7:06:50 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -211,9 +212,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[z])},
+			auxiliary => qr{[z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'],
-			main => qr{(?^u:[a á b c d e é f g h i í j k l m n ñ ŋ o ó p q r s t u ú v w x y])},
+			main => qr{[a á b c d e é f g h i í j k l m n ñ ŋ o ó p q r s t u ú v w x y]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -285,14 +287,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},

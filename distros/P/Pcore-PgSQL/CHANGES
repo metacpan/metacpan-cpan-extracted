@@ -1,3 +1,19 @@
+v0.14.16 2018-04-15T04:06:44Z
+ - docker.sh default command
+ - Docker base image changed from "softvisio/pcore:v0.61.2" to
+   "softvisio/pcore:v0.61.4"
+
+v0.14.15 2018-04-12T18:27:52Z
+ - docker wrapper updated
+ - bash source wget updated to return false in case of HTTP error
+ - blocking methods using Coro::rouse_cb
+ - DBI::Response class
+ - universal response object used
+ - DBI response removed
+ - universal response object
+ - Docker base image changed from "softvisio/pcore:v0.59.0" to
+   "softvisio/pcore:v0.61.2"
+
 v0.14.14 2018-04-05T08:07:24Z
  - dist.perl renamed to dist.yaml
  - Docker base image changed from "softvisio/pcore:v0.58.5" to

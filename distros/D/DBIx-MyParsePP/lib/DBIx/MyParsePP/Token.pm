@@ -114,6 +114,12 @@ sub print {
 	return $_[0]->toString();
 }
 
+sub isEqual {
+    return 0 if !$_[1]->isa( 'DBIx::MyParsePP::Token' );
+    return $_[0]->type() eq $_[1]->type() &&
+           $_[0]->value() eq $_[1]->value();
+}
+
 1;
 
 __END__

@@ -1,15 +1,17 @@
 use strict;
 use warnings;
 
+use lib qw(t/lib);
+
 use Test::More;
 use Test::Exception;
 use Test::Deep;
 
 use Test::Mock::One;
 use Test::Mock::Two qw(:all);
+use Test::Mock::Testsuite;
 use DateTime;
 
-use lib qw(t/lib);
 
 {
     note "Called-By";
@@ -36,14 +38,6 @@ use lib qw(t/lib);
         "We need a method name for one_called"
     );
 
-    throws_ok(
-        sub {
-            one_called($mock, 'foo');
-        },
-        qr/Failed to provide a caller/,
-        "We need a caller name for one_called"
-    );
-
     {
         my $warn;
         local $SIG{__WARN__} = sub {
@@ -53,12 +47,15 @@ use lib qw(t/lib);
         like($warn, qr/Using Pkg::Name instead of Pkg::Name::Function/, "Fires a warning");
     }
 
+    my $rv = one_called($mock, 'didnotcallme');
+    is($rv, undef, "didnotcallme wasn't called");
+
     sub baz { $mock->foo(@_) };
     baz();
     baz('bar');
     baz(foo => 'bar');
 
-    my $rv = one_called($mock, 'foo', 'main::baz');
+    $rv = one_called($mock, 'foo', 'main::baz');
     ok($rv, "One called by main::baz");
 
     one_called_ok($mock, 'foo', 'main::baz');
@@ -72,7 +69,6 @@ use lib qw(t/lib);
         my $mock = Test::Mock::One->new(
             'X-Mock-Called' => 1,
         );
-        use Test::Mock::Testsuite;
 
         my $pkg = Test::Mock::Testsuite->new(
             mock => $mock,

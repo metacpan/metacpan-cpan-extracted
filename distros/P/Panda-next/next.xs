@@ -1,0 +1,268 @@
+#include <xs/next.h>
+#include <stdexcept>
+
+#define _TRYNEXT(code) {                                                                                            \
+    try { code; }                                                                                                   \
+    catch (std::logic_error err) { croak_sv(newSVpvn_flags(err.what(), strlen(err.what()), SVf_UTF8 | SVs_TEMP)); } \
+}
+
+#define PP_METHOD_EXEC(sub) {   \
+    dSP;                        \
+    XPUSHs((SV*)sub);           \
+    PUTBACK;                    \
+    return PL_op->op_next;      \
+}
+
+#define PP_SUB_EXEC(sub) {                  \
+    TOPs = (SV*)sub;                        \
+    return PL_ppaddr[OP_ENTERSUB](aTHX);    \
+}
+
+#define PP_EMPTY_RETURN {                                                                   \
+    if (GIMME_V == G_SCALAR) *(PL_stack_sp = PL_stack_base + TOPMARK + 1) = &PL_sv_undef;   \
+    else PL_stack_sp = PL_stack_base + TOPMARK;                                             \
+}
+
+#define PP_METHOD_MAYBE_EXEC(sub) {     \
+    if (sub) { PP_METHOD_EXEC(sub); }   \
+    else {                              \
+        PP_EMPTY_RETURN;                \
+        return PL_op->op_next->op_next; \
+    }                                   \
+}
+
+#define PP_SUB_MAYBE_EXEC(sub) {    \
+    if (sub) { PP_SUB_EXEC(sub); }  \
+    else {                          \
+        PP_EMPTY_RETURN;            \
+        return PL_op->op_next;      \
+    }                               \
+}
+
+#ifdef USE_ITHREADS
+#  define cGVOPx_gv_set(o,gv) (PAD_SVl(cPADOPx(o)->op_padix) = (SV*)gv)
+#else
+#  define cGVOPx_gv_set(o,gv) (cSVOPx(o)->op_sv = (SV*)gv)
+#endif
+
+
+static void optimize (pTHX_ OP* op, OP* (*pp_method)(pTHX), OP* (*pp_sub)(pTHX), CV* check, GV* payload = NULL) {
+    if ((op->op_spare & 1) || op->op_type != OP_ENTERSUB || !(op->op_flags & OPf_STACKED) || op->op_ppaddr != PL_ppaddr[OP_ENTERSUB]) return;
+    op->op_spare |= 1;
+    OP* curop = cUNOPx(op)->op_first;
+    if (!curop) return; /* Such op can be created by call_sv(G_METHOD_NAMED) */
+    while (OpHAS_SIBLING(curop)) curop = OpSIBLING(curop);
+    
+    // optimize METHOD_REDIR $self->next::method
+    if (curop->op_next == op && curop->op_type == OP_METHOD_REDIR && curop->op_ppaddr == PL_ppaddr[OP_METHOD_REDIR]) {
+        curop->op_ppaddr = pp_method;
+        if (!payload) return;
+        // payload will be in cMETHOPx_rclass(PL_op)
+        SV* old = cMETHOPx_rclass(curop);
+        cMETHOPx_rclass(curop) = (SV*)payload;
+        SvREFCNT_inc(payload);
+        SvREFCNT_dec(old);
+        return;
+    }
+    
+    // OPTIMIZE ENTERSUB FOR CASE next::method($self) - compile-time identified subroutines
+    if (!OP_TYPE_IS_OR_WAS(curop, OP_LIST)) return;
+    curop = cUNOPx(curop)->op_first;
+    if (!curop) return;
+    
+    while (OpHAS_SIBLING(curop)) curop = OpSIBLING(curop);
+    if (!OP_TYPE_IS_OR_WAS(curop, OP_RV2CV)) return;
+    
+    curop = cUNOPx(curop)->op_first;
+    if (!curop || curop->op_type != OP_GV) return;
+    GV* gv = cGVOPx_gv(curop);
+    if (GvCV(gv) != check) return;
+    
+    op->op_ppaddr = pp_sub;
+    
+    if (!payload) return;
+    // payload will be in TOPs
+    cGVOPx_gv_set(curop, payload);
+    SvREFCNT_inc(payload);
+    SvREFCNT_dec(gv);
+}
+
+static inline HV* proto_stash (pTHX_ SV* proto) {
+    if (SvROK(proto)) {
+        SV* val = SvRV(proto);
+        if (SvOBJECT(val)) return SvSTASH(val);
+    }
+    return gv_stashsv(proto, GV_ADD);
+}
+
+static inline GV* get_current_opsub (pTHX_ const char* name, STRLEN len, bool is_utf8, U32 hash) {
+    const HE* const ent = (HE*)hv_common(CopSTASH(PL_curcop), NULL, name, len, is_utf8, 0, NULL, hash);
+    if (ent) return (GV*)HeVAL(ent);
+    
+    SV* fqn = sv_newmortal();
+    sv_catpvn(fqn, HvNAME(CopSTASH(PL_curcop)), HvNAMELEN(CopSTASH(PL_curcop)));
+    sv_catpvs(fqn, "::");
+    sv_catpvn(fqn, name, len);
+    return gv_fetchpvn_flags(SvPVX(fqn), SvCUR(fqn), GV_ADD|(is_utf8 ? SVf_UTF8 : 0), SVt_PVCV);
+}
+
+// $self->next::can
+static OP* ppm_nextcan (pTHX) {
+    PL_stack_sp = PL_stack_base + TOPMARK + 1;
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ *PL_stack_sp)); });
+    *PL_stack_sp = sub ? sv_2mortal(newRV((SV*)sub)) : &PL_sv_undef;
+    return PL_op->op_next->op_next; // skip ENTERSUB
+}
+
+// next::can($self)
+static OP* pps_nextcan (pTHX) {
+    PL_stack_sp = PL_stack_base + TOPMARK + 1;
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ *PL_stack_sp)); });
+    *PL_stack_sp = sub ? sv_2mortal(newRV((SV*)sub)) : &PL_sv_undef;
+    return PL_op->op_next;
+}
+
+// $self->next::method
+static OP* ppm_next (pTHX) {
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    PP_METHOD_EXEC(sub);
+}
+
+// next::method($self)
+static OP* pps_next (pTHX) {
+    dSP;
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    PP_SUB_EXEC(sub);
+}
+
+// $self->maybe::next::method
+static OP* ppm_next_maybe (pTHX) {
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    PP_METHOD_MAYBE_EXEC(sub);
+}
+
+// maybe::next::method($self)
+static OP* pps_next_maybe (pTHX) {
+    dSP;
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1])); });
+    PP_SUB_MAYBE_EXEC(sub);
+}
+
+// $self->super::subname
+static OP* ppm_super (pTHX) {
+    CV* sub;
+    _TRYNEXT({ sub = xs::super::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)cMETHOPx_rclass(PL_op)); });
+    PP_METHOD_EXEC(sub);
+}
+
+// super::subname($self)
+static OP* pps_super (pTHX) {
+    dSP;
+    CV* sub;
+    _TRYNEXT({ sub = xs::super::method_strict(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
+    PP_SUB_EXEC(sub);
+}
+
+// $self->super::maybe::subname
+static OP* ppm_super_maybe (pTHX) {
+    CV* sub;
+    _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)cMETHOPx_rclass(PL_op)); });
+    PP_METHOD_MAYBE_EXEC(sub);
+}
+
+// super::maybe::subname($self)
+static OP* pps_super_maybe (pTHX) {
+    dSP;
+    CV* sub;
+    _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ PL_stack_base[TOPMARK+1]), (GV*)TOPs); });
+    PP_SUB_MAYBE_EXEC(sub);
+}
+
+static void super_xsub (pTHX_ CV* cv) {
+    dXSARGS; dXSI32;
+    if (items < 1) croak_xs_usage(cv,  "proto, ...");
+    SP -= items;
+    SV* proto = ST(0);
+    
+    GV* gv = CvGV(cv);
+    HEK* hek = GvNAME_HEK(gv);
+    GV* context = get_current_opsub(aTHX_ HEK_KEY(hek), HEK_LEN(hek), HEK_UTF8(hek), HEK_HASH(hek));
+    
+    CV* sub;
+    if (ix == 0) { // super
+        optimize(aTHX_ PL_op, &ppm_super, &pps_super, cv, context);
+        _TRYNEXT({ sub = xs::super::method_strict(aTHX_ proto_stash(aTHX_ proto), context); });
+    } else { // super::maybe
+        optimize(aTHX_ PL_op, &ppm_super_maybe, &pps_super_maybe, cv, context);
+        _TRYNEXT({ sub = xs::super::method(aTHX_ proto_stash(aTHX_ proto), context); });
+        if (!sub) XSRETURN_EMPTY;
+    }
+    
+    ENTER;
+    PUSHMARK(SP);
+    call_sv((SV*)sub, GIMME_V);
+    LEAVE;
+}
+
+// This sub is defined by hand instead of XSUB syntax because we MUST NOT do POPMARK, because super_xsub will
+static void super_AUTOLOAD (pTHX_ CV* cv) {
+    dXSI32;
+    SV* fqn = get_sv(ix == 0 ? "super::AUTOLOAD" : "super::maybe::AUTOLOAD", 0);
+    CV* xsub = newXS(SvPVX(fqn), super_xsub, __FILE__);
+    CvXSUBANY(xsub).any_i32 = ix;
+    super_xsub(aTHX_ xsub);
+    return;
+}
+
+MODULE = Panda::next                PACKAGE = next
+PROTOTYPES: DISABLE
+
+SV* can (SV* proto) {
+    optimize(aTHX_ PL_op, &ppm_nextcan, &pps_nextcan, cv);
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ proto)); });
+    RETVAL = sub ? newRV((SV*)sub) : &PL_sv_undef;
+}
+
+void method (SV* proto, ...) {
+    optimize(aTHX_ PL_op, &ppm_next, &pps_next, cv);
+    
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method_strict(aTHX_ proto_stash(aTHX_ proto)); });
+    
+    ENTER;
+    PUSHMARK(SP);
+    call_sv((SV*)sub, GIMME_V);
+    LEAVE;
+    return;
+}
+
+MODULE = Panda::next                PACKAGE = maybe::next
+PROTOTYPES: DISABLE
+
+void method (SV* proto, ...) {
+    optimize(aTHX_ PL_op, &ppm_next_maybe, &pps_next_maybe, cv);
+    
+    CV* sub;
+    _TRYNEXT({ sub = xs::next::method(aTHX_ proto_stash(aTHX_ proto)); });
+    if (!sub) XSRETURN_EMPTY;
+    
+    ENTER;
+    PUSHMARK(SP);
+    call_sv((SV*)sub, GIMME_V);
+    LEAVE;
+    return;
+}
+
+BOOT {
+    cv = newXS_deffile("super::AUTOLOAD", super_AUTOLOAD);
+    XSANY.any_i32 = 0;
+    cv = newXS_deffile("super::maybe::AUTOLOAD", super_AUTOLOAD);
+    XSANY.any_i32 = 1;
+}

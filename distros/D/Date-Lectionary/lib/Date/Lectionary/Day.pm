@@ -27,11 +27,11 @@ Date::Lectionary::Day - Determines the Day in the Christian Liturgical Year
 
 =head1 VERSION
 
-Version 1.20180410
+Version 1.20180417
 
 =cut
 
-use version; our $VERSION = version->declare("v1.20180410");
+use version; our $VERSION = version->declare("v1.20180417");
 
 =head1 SYNOPSIS
 

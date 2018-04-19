@@ -49,7 +49,7 @@ use Sub::Override;
 
 use strict;
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 sub new {
     my $class = shift;
@@ -349,7 +349,8 @@ sub _replaceWithPrototype {
     my ($FullyQualifiedMethodName, $Sub) = @_;
     Error ('not a code ref ') unless ref $Sub eq 'CODE';
     my $Prototype = prototype($FullyQualifiedMethodName);
-    if($Prototype){
+
+    if(defined $Prototype){
         my $SubWithPrototype =  eval( 'return sub ('. $Prototype .') {$Sub->(@_)}'); ## no critic (ProhibitStringyEval RequireInterpolationOfMetachars ) This is the only dynamic way to add the prototype
         Error($@, {'Error in eval, line' => __LINE__ - 1}) if($@); # Rethrow error if something went wrong in the eval. (For debugging)
         $self->{'__override'}->replace($FullyQualifiedMethodName, $SubWithPrototype);

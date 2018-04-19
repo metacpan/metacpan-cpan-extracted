@@ -15,13 +15,13 @@ sub API_create_hash ( $self, $cb, $str ) {
 
     my $hash = Crypt::Argon2::argon2i_pass( $str, $salt, $self->{argon2_time}, $self->{argon2_memory}, $self->{argon2_parallelism}, 32 );
 
-    $cb->( 200, hash => $hash );
+    $cb->( 200, $hash );
 
     return;
 }
 
 sub API_verify_hash ( $self, $cb, $str, $hash ) {
-    $cb->( 200, match => eval { Crypt::Argon2::argon2i_verify( $hash, $str ) } ? 1 : 0 );
+    $cb->( 200, eval { Crypt::Argon2::argon2i_verify( $hash, $str ) } ? 1 : 0 );
 
     return;
 }

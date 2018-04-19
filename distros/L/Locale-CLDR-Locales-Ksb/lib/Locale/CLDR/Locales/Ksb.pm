@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ksb - Package for language Shambala
 
 package Locale::CLDR::Locales::Ksb;
 # This file auto generated from Data\common\main\ksb.xml
-#	on Fri 29 Apr  7:13:43 pm GMT
+#	on Fri 13 Apr  7:17:36 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -326,9 +327,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q r x])},
+			auxiliary => qr{[q r x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p s t u v w y z])},
+			main => qr{[a b c d e f g h i j k l m n o p s t u v w y z]},
 		};
 	},
 EOT
@@ -828,13 +829,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{nyiaghuo},
-					'am' => q{makeo},
-				},
 				'abbreviated' => {
 					'pm' => q{nyiaghuo},
 					'am' => q{makeo},
+				},
+				'wide' => {
+					'am' => q{makeo},
+					'pm' => q{nyiaghuo},
 				},
 			},
 		},

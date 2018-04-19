@@ -2,8 +2,9 @@ package JavaScript::Beautifier;
 
 use warnings;
 use strict;
+use JavaScript::Packer1 qw/js_packer/;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 use base 'Exporter';
@@ -26,7 +27,7 @@ my ( $opt_indent_level, $opt_indent_size, $opt_indent_character, $opt_preserve_n
 sub js_beautify {
     my ( $js_source_code, $opts ) = @_;
 
-    $js_source_code =~ s/\\/\\\\/g;  # prevent \\ -> \
+    $js_source_code = js_packer($js_source_code);
 
     $opt_indent_size = $opts->{indent_size} || 4;
     $opt_indent_character = $opts->{indent_character} || ' ';
@@ -717,11 +718,16 @@ You can check it through L<http://jsbeautifier.org/>
 
 =head1 FUNCTIONS
 
+$js_source_code = <<'EOF';
+  a = 12;
+  {return '\\w+';}
+EOF
+
 =head2 js_beautify( $js_source_code, $opts );
 
-beautify javascript.
+Beautify javascript source code contained in a string with the included options, described below.
 
-=head3 options
+=head3 Options
 
 =over 4
 
@@ -738,7 +744,7 @@ if you prefer Tab than Space, try:
 
 =item preserve_newlines
 
-default is 1
+Default is 1
 
     my $in = "var\na=dont_preserve_newlines";
     my $out = "var a = dont_preserve_newlines";
@@ -751,7 +757,7 @@ default is 1
 
 =item space_after_anon_function
 
-default is 0
+Default is 0
 
 =back
 
@@ -761,7 +767,7 @@ Fayland Lam, C<< <fayland at gmail.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Fayland Lam, all rights reserved.
+Copyright 2008-2018 Fayland Lam, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

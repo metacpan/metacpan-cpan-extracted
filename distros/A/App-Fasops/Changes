@@ -1,5 +1,8 @@
 Revision history for App-Fasops
 
+0.5.16 2018-04-16T16:07:23Z
+    - Add --simple to `fasops split`
+
 0.5.15 2018-04-01T17:27:20Z
     - Fix maf2fas for reverse-complemented strands
 

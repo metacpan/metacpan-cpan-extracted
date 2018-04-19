@@ -1,5 +1,5 @@
 package Module::Build::XSUtil;
-use 5.008005;
+use 5.008001;
 use strict;
 use warnings;
 use Config;
@@ -8,7 +8,7 @@ use File::Basename;
 use File::Path;
 our @ISA = qw(Module::Build);
 
-our $VERSION = "0.18";
+our $VERSION = "0.19";
 
 __PACKAGE__->add_property( 'ppport_h_path'   => undef );
 __PACKAGE__->add_property( 'xshelper_h_path' => undef );

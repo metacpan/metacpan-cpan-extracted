@@ -1,6 +1,6 @@
 package Pcore::App::Controller::Ext;
 
-use Pcore -const, -role, -result;
+use Pcore -const, -role;
 use Pcore::Ext;
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
@@ -98,6 +98,9 @@ sub _return_html ( $self, $req ) {
     if ( !$self->{cache}->{app}->{$locale}->{html} ) {
         my $resources = [ $self->ext_resources->@* ];
 
+        # pcoreApi
+        push $resources->@*, q[<script src="/static/pcoreApi.js" integrity="" crossorigin="anonymous"></script>];
+
         # FontAwesome
         push $resources->@*, Pcore::Share::WWW->fontawesome;
 
@@ -122,7 +125,7 @@ sub _return_html ( $self, $req ) {
         # Ext locale
         push $resources->@*, $ext_framework->ext_locale( $EXT_FRAMEWORK, $locale, $self->{app}->{devel} );
 
-        # TODO calc checksum 'sha384-' . P->digest->sha384_b64( $res->body->$* );
+        # TODO calc checksum 'sha384-' . P->digest->sha384_b64( $res->{body}->$* );
         push $resources->@*, qq[<script src="$self->{path}overrides.js" integrity="" crossorigin="anonymous"></script>];
         push $resources->@*, qq[<script src="$self->{path}app.js?locale=$locale" integrity="" crossorigin="anonymous"></script>];
 
@@ -449,7 +452,7 @@ sub _prepare_js ( $self, $js ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 361                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 364                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

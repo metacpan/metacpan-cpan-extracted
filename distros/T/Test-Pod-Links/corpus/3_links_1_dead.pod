@@ -1,0 +1,13 @@
+=head1 NAME
+
+Test::Pod::Links - a valid pod file
+
+=head1 DESCRIPTION
+
+This is a pod file with 3 links.
+
+=head1 SEE ALSO
+
+L<https://www.perl.com/>, L<http://192.0.2.7/>, L<https://metacpan.org/>
+
+=cut

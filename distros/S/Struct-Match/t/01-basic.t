@@ -9,7 +9,7 @@ $m = match 'one', 'two';
 is($m, 0);
 
 # array
-$m = match ['one', 'two'], ['one', 'two'];
+$m = match ['one', 'two', 'three'], ['one', 'two', 'three'];
 is($m, 1);
 $m = match ['one', 'two'], ['one', 'three'];
 is($m, 0);
@@ -57,6 +57,5 @@ is($m, 1);
 $obj3 = bless {qw/one three/}, 'TEST::HASH';
 $m = match $obj, $obj3;
 is($m, 0);
-
 
 done_testing();

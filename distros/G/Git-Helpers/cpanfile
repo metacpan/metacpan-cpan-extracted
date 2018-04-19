@@ -1,10 +1,15 @@
+requires "Browser::Open" => "0";
 requires "Capture::Tiny" => "0";
 requires "Carp" => "0";
 requires "File::pushd" => "0";
+requires "Getopt::Long" => "0";
 requires "Git::Sub" => "0";
 requires "MetaCPAN::Client" => "0";
 requires "Moo" => "0";
+requires "MooX::Options" => "0";
+requires "String::Trim" => "0";
 requires "Sub::Exporter" => "0";
+requires "Term::Choose" => "0";
 requires "Try::Tiny" => "0";
 requires "Types::Standard" => "0";
 requires "URI" => "0";
@@ -50,5 +55,5 @@ on 'develop' => sub {
 };
 
 on 'develop' => sub {
-  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.005";
+  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007";
 };

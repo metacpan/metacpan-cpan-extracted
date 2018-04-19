@@ -17,12 +17,12 @@ my %WriteMakefileArgs =
                             'ExtUtils::MakeMaker' => 6.64,
                            },
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999718,
+                            'Math::BigInt'        => 1.999812,
                             'Math::BigRat'        => 0.12,
                             #'Math::BigInt::Lite'  => 0.09,      # optional
                            },
    'TEST_REQUIRES'      => {
-                            'Test::More'          => 0.47,
+                            'Test::More'          => 0.88,
                            },
    'LICENSE'            => 'perl_5',
    'LIBS'               => [''],        # e.g., '-lm'

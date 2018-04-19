@@ -19,7 +19,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
     	'Import::Export' => '0.04',
-		'Struct::Match' => '0.03'
+		'Struct::Match' => '0.04'
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Switch-Again-*' },

@@ -5,9 +5,9 @@ use warnings;
 use utf8;
 
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
-use Test::BDD::Cucumber::Definitions::Var qw(:util);
+use Test::BDD::Cucumber::Definitions::Var qw(Var);
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -40,8 +40,8 @@ Test::BDD::Cucumber::Definitions::Var::Ru - Шаги на русском язы�
         Работа с переменными
 
     Scenario: Создание переменной
-        When переменной сценария "code" присвоено значение "200"
-        And HTTP-запрос "GET" отправлен на "http://metacpan.org"
+        Given переменной сценария "code" присвоено значение "200"
+        When HTTP-запрос "GET" отправлен на "http://metacpan.org"
         Then код HTTP-ответа равен "S{code}"
 
 =head1 ШАГИ
@@ -56,28 +56,28 @@ sub import {
 
 Создание переменной:
 
-    When переменной сценария "user" присвоено значение "name"
+    Given переменной сценария "user" присвоено значение "name"
 
 =cut
 
-    #       var scenario var "(.+?)" set "(.*)"
-    When qr/переменной сценария "(.+?)" присвоено значение "(.*)"/, sub {
-        var_scenario_var_set( $1, $2 );
+    #        var scenario var "(.+?)" set "(.*)"
+    Given qr/переменной сценария "(.+?)" присвоено значение "(.*)"/, sub {
+        Var->scenario_var_set( $1, $2 );
     };
 
 =pod
 
 Создание переменной со случайным значением (символы из диапазона Base62):
 
-    When переменной сценария "password" присвоено случайное значение длиной "6" символов
+    Given переменной сценария "password" присвоено случайное значение длиной "6" символов
 
 =cut
 
-    #       var scenario var "(.+?)" random "(.*)"
-    When
+    #        var scenario var "(.+?)" random "(.*)"
+    Given
         qr/переменной сценария "(.+?)" присвоено случайное значение длиной "(.*)" символов/,
         sub {
-        var_scenario_var_random( $1, $2 );
+        Var->scenario_var_random( $1, $2 );
         };
 
     return;

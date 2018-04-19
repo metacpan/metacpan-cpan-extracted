@@ -25,10 +25,10 @@ sub load ( $self, $cb ) {
         sub ($res) {
             my $proxies;
 
-            if ( $res->status == 200 && $res->{body} ) {
-                decode_eol $res->body->$*;
+            if ( $res->{status} == 200 && $res->{body} ) {
+                decode_eol $res->{body}->$*;
 
-                for my $addr ( split /\n/sm, $res->body->$* ) {
+                for my $addr ( split /\n/sm, $res->{body}->$* ) {
                     my ( $addr, $real_ip, $country, $speed, $time ) = split /;/sm, $addr;
 
                     push $proxies->@*, $addr;

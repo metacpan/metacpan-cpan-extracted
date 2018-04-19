@@ -14,6 +14,8 @@ END
     }
 }
 
+Config::AutoConf->check_header("stdio.h") or plan skip_all => "No working compile environment";
+
 my $ac_1;
 
 ok($ac_1 = Config::AutoConf->new(logfile => "config3.log"), "Instantiating Config::AutoConf for check_lib() tests");

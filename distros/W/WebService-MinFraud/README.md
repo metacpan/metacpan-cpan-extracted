@@ -4,7 +4,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 # VERSION
 
-version 1.006000
+version 1.007000
 
 # SYNOPSIS
 
@@ -13,10 +13,10 @@ version 1.006000
     use WebService::MinFraud::Client;
 
     # The Client object can be re-used across several requests.
-    # Your MaxMind user_id and license_key are available at
+    # Your MaxMind account_id and license_key are available at
     # https://www.maxmind.com/en/my_license_key
     my $client = WebService::MinFraud::Client->new(
-        user_id     => 42,
+        account_id  => 42,
         license_key => 'abcdef123456',
     );
 
@@ -57,7 +57,7 @@ dependencies.
 
 # VERSIONING POLICY
 
-The minFraud Perl API uses [Semantic Versioning](http://semver.org/).
+The minFraud Perl API uses [Semantic Versioning](https://semver.org/).
 
 # PERL VERSION SUPPORT
 
@@ -74,7 +74,7 @@ Please report all issues with this distribution using the GitHub issue tracker
 at [https://github.com/maxmind/minfraud-api-perl/issues](https://github.com/maxmind/minfraud-api-perl/issues).
 
 If you are having an issue with a MaxMind service that is not specific to the
-client API please visit [http://www.maxmind.com/en/support](http://www.maxmind.com/en/support) for details.
+client API please visit [https://www.maxmind.com/en/support](https://www.maxmind.com/en/support) for details.
 
 Bugs may be submitted through [https://github.com/maxmind/minfraud-api-perl/issues](https://github.com/maxmind/minfraud-api-perl/issues).
 
@@ -87,12 +87,12 @@ Mateu Hunter <mhunter@maxmind.com>
 - Andy Jack <ajack@maxmind.com>
 - Dave Rolsky <drolsky@maxmind.com>
 - Florian Ragwitz <rafl@debian.org>
-- Greg <goschwald@maxmind.com>
+- Greg Oschwald <goschwald@maxmind.com>
 - Mark Fowler <mark@twoshortplanks.com>
 - Olaf Alders <oalders@maxmind.com>
-- Patrick Cronin <PatrickCronin@users.noreply.github.com>
-- Ruben Navarro <rbnx@users.noreply.github.com>
-- Will Storey <will@summercat.com>
+- Patrick Cronin <pcronin@maxmind.com>
+- Ruben Navarro <rnavarro@maxmind.com>
+- William Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
             "Exporter::Shiny" : "0",
             "Exporter::Tiny" : "1",
             "File::Glob" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.076",
             "Ref::Util" : "0",
             "Scalar::Util" : "0",
             "perl" : "5.010",
@@ -45,7 +45,7 @@
             "File::Share" : "0",
             "File::ShareDir" : "0",
             "Log::Any::Adapter" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.076",
             "Test2::Tools::Spec" : "0",
             "Test2::V0" : "0",
             "perl" : "5.010"
@@ -55,7 +55,7 @@
    "provides" : {
       "Config::AWS" : {
          "file" : "lib/Config/AWS.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://gitlab.com/jjatria/Config-AWS"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

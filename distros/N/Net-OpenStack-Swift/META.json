@@ -4,7 +4,7 @@
       "masakyst <masakyst.public@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.9",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
    "provides" : {
       "Net::OpenStack::Swift" : {
          "file" : "lib/Net/OpenStack/Swift.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Net::OpenStack::Swift::InnerKeystone::Base" : {
          "file" : "lib/Net/OpenStack/Swift/InnerKeystone.pm"
@@ -99,13 +99,13 @@
          "web" : "https://github.com/masakyst/Net-OpenStack-Swift"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
-      "RenatoCRON <renato.cron@gmail.com>",
-      "yasu47b <yasu47b@gmail.com>",
       "Marios Titas <redneb@gmx.com>",
+      "Masaaki Saito <masakyst.mobile@gmail.com>",
+      "RenatoCRON <renato.cron@gmail.com>",
       "bork1n <24889495+bork1n@users.noreply.github.com>",
-      "Masaaki Saito <masakyst.mobile@gmail.com>"
+      "yasu47b <yasu47b@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

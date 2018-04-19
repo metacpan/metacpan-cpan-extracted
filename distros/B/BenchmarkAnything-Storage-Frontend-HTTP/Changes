@@ -1,5 +1,9 @@
 Revision history for BenchmarkAnything-Storage-Frontend-HTTP
 
+0.012     2018-04-11
+        - config allows to disable recurring task
+        - fix passthrough of config to lib and backend
+
 0.011     2017-02-07
         - require latest ::Backend::SQL
 

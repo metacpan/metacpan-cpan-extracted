@@ -26,5 +26,5 @@ requires:
   DBI: '1.635'
 resources:
   repository: https://github.com/hoehrmann/Graph-Feather.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

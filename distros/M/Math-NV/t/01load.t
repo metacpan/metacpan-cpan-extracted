@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-print "1..2\n";
+print "1..3\n";
 
 eval{require Math::NV; Math::NV->import(':all');};
+
 
 unless($@) {print "ok 1\n"}
 else {
@@ -12,11 +13,23 @@ else {
 }
 
 if(!$@) {
-  if($Math::NV::VERSION eq '1.02') {print "ok 2\n"}
+  if($Math::NV::VERSION eq '2.0') {print "ok 2\n"}
   else {
     warn "Wrong version of Math::NV - we have $Math::NV::VERSION\n";
     print "not ok 2\n";
   }
 }
 else {print "ok 2\n"}
+
+if(!$@) {
+  if($Math::MPFR::VERSION >= '4.02') {
+    warn "\nUsing MATH::MPFR-$Math::MPFR::VERSION\n";
+    print "ok 3\n";
+  }
+  else {
+    warn "Wrong version of Math::MPFR - we have $Math::MPFR::VERSION\n";
+    print "not ok 3\n";
+  }
+}
+else {print "ok 3\n"}
 

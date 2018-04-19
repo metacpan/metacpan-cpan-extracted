@@ -1,4 +1,4 @@
-package Pcore::Redis v0.9.2;
+package Pcore::Redis v0.9.4;
 
 use Pcore -dist, -class;
 

@@ -5,9 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Crypt::OpenSSL::Guess: '0.11'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
 resources:
-  MailingList: perl-openssl-users@lists.sourceforge.net
-  homepage: http://sourceforge.net/projects/perl-openssl/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Crypt-OpenSSL-Random
-version: '0.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

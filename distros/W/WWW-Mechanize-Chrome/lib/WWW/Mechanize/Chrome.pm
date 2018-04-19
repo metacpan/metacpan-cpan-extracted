@@ -12,11 +12,12 @@ use Carp qw(croak carp);
 use WWW::Mechanize::Link;
 use IO::Socket::INET;
 use Chrome::DevToolsProtocol;
+use WWW::Mechanize::Chrome::Node;
 use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our @CARP_NOT;
 
 =head1 NAME
@@ -102,6 +103,7 @@ Interesting parameters might be
     '--disable-prompt-on-repost',
     '--disable-sync',
     '--disable-web-resources',
+    '--disable-save-password-bubble'
 
     '--disable-default-apps',
     '--disable-infobars',
@@ -187,6 +189,10 @@ sub build_command_line {
 
     if( ! exists $options->{enable_first_run}) {
         push @{ $options->{ launch_arg }}, "--no-first-run";
+    };
+
+    if( ! exists $options->{disable_prompt_on_repost}) {
+        push @{ $options->{ launch_arg }}, "--disable-prompt-on-repost";
     };
 
     push @{ $options->{ launch_arg }}, "--headless"
@@ -326,12 +332,13 @@ sub new($class, %options) {
     $options{start_url} = 'about:blank'
         unless exists $options{start_url};
 
-    unless ( defined $options{ port } ) {
-        # Find free port
-        $options{ port } = $self->_find_free_port( 9222 );
-    }
-
     unless ($options{pid} or $options{reuse}) {
+
+        unless ( defined $options{ port } ) {
+            # Find free port for Chrome to listen on
+            $options{ port } = $self->_find_free_port( 9222 );
+        };
+
         my @cmd= $class->build_command_line( \%options );
         $self->log('debug', "Spawning", \@cmd);
         $self->{pid} = $self->spawn_child( $host, @cmd );
@@ -339,7 +346,11 @@ sub new($class, %options) {
 
         # Just to give Chrome time to start up, make sure it accepts connections
         $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
-    }
+    } else {
+
+        # Assume some defaults for the already running Chrome executable
+        $options{ port } //= 9222;
+    };
 
     if( $options{ tab } and $options{ tab } eq 'current' ) {
         $options{ tab } = 0; # use tab at index 0
@@ -370,9 +381,12 @@ sub new($class, %options) {
     $self->driver->connect(
         new_tab => !$options{ reuse },
         tab     => $options{ tab },
-    )->catch( sub($_err) {
-        $err = $_err;
-        Future->done( $err );
+    )->catch( sub(@args) {
+        $err = $args[0];
+        if( ref $args[1] eq 'HASH') {
+            $err .= $args[1]->{Reason};
+        };
+        Future->done( @args );
     })->get;
 
     # if Chrome started, but so slow or unresponsive that we cannot connect
@@ -398,11 +412,19 @@ sub new($class, %options) {
         $self->add_listener( 'DOM.attributeModified', sub { $s->new_generation() } );
     $self->new_generation;
 
-    Future->wait_all(
+    my @setup = (
         $self->driver->send_message('Page.enable'),    # capture DOMLoaded
         $self->driver->send_message('Network.enable'), # capture network
         $self->driver->send_message('Runtime.enable'), # capture console messages
         $self->set_download_directory_future($self->{download_directory}),
+    );
+
+    if( my $agent = delete $options{ user_agent }) {
+        push @setup, $self->agent_async( $agent );
+    };
+
+    Future->wait_all(
+        @setup,
     )->get;
 
     if( ! exists $options{ tab }) {
@@ -554,7 +576,7 @@ sub allow {
 
     my @await;
     if( exists $options{ javascript } ) {
-        my $disabled = !$options{ javascript } ? JSON::true : JSON::false;
+        my $disabled = !$options{ javascript } ? JSON::PP::true : JSON::PP::false;
         push @await,
             $self->driver->send_message('Emulation.setScriptExecutionDisabled', value => $disabled );
     };
@@ -644,6 +666,35 @@ sub on_request_intercepted( $self, $cb ) {
     $self->{ on_request_intercepted } = $cb;
 }
 
+=head2 C<< $mech->searchInResponseBody( $id, %options ) >>
+
+  my $request_id = ...;
+  my @matches = $mech->searchInResponseBody(
+      requestId     => $request_id,
+      query         => 'rumpelstiltskin',
+      caseSensitive => JSON::PP::true,
+      isRegex       => JSON::PP::false,
+  );
+  for( @matches ) {
+      print $_->{lineNumber}, ":", $_->{lineContent}, "\n";
+  };
+
+Returns the matches (if any) for a string or regular expression within
+a response.
+
+=cut
+
+sub searchInResponseBody_future( $self, %options ) {
+    $self->driver->send_message('Network.searchInResponseBody', %options)
+    ->then(sub( $res ) {
+        return Future->done( @{ $res->{result}} )
+    })
+}
+
+sub searchInResponseBody( $self, @patterns ) {
+    $self->searchInResponseBody_future( @patterns )->get
+}
+
 =head2 C<< $mech->on_dialog( $cb ) >>
 
   $mech->on_dialog( sub {
@@ -686,7 +737,7 @@ Closes the current Javascript dialog. Depending on
 =cut
 
 sub handle_dialog( $self, $accept, $prompt = undef ) {
-    my $v = $accept ? JSON::true : JSON::false;
+    my $v = $accept ? JSON::PP::true : JSON::PP::false;
     $self->log('debug', sprintf 'Dismissing Javascript dialog with %d', $accept);
     my $f;
     $f = $self->driver->send_message(
@@ -812,9 +863,13 @@ sub eval_in_chrome {
     croak "Can't call eval_in_chrome";
 };
 
+sub agent_async( $self, $ua ) {
+    $self->driver->send_message('Network.setUserAgentOverride', userAgent => $ua )
+}
+
 sub agent( $self, $ua ) {
     if( $ua ) {
-        $self->driver->send_message('Network.setUserAgentOverride', userAgent => $ua )->get
+        $self->agent_async( $ua )->get;
     };
 
     $self->chrome_version_info->{"User-Agent"}
@@ -939,10 +994,12 @@ sub _collectEvents( $self, @info ) {
 
 sub _fetchFrameId( $self, $ev ) {
     if( $ev->{method} eq 'Page.frameStartedLoading'
-        || $ev->{method} eq 'Page.frameScheduledNavigation' ) {
+        || $ev->{method} eq 'Page.frameScheduledNavigation'
+        || $ev->{method} eq 'Network.requestWillBeSent'
+    ) {
         $self->log('debug', sprintf "Found frame id as %s", $ev->{params}->{frameId});
         return $ev->{params}->{frameId};
-    };
+    }
 };
 
 sub _waitForNavigationEnd( $self, %options ) {
@@ -970,6 +1027,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     my $scheduled = $self->driver->one_shot(
         'Page.frameScheduledNavigation',
         'Page.frameStartedLoading',
+        'Network.requestWillBeSent',      # trial
         #'Page.frameResized',              # download
         'Inspector.detached',             # Browser (window) was closed by user
     );
@@ -1120,6 +1178,37 @@ sub httpRequestFromChromeRequest( $self, $event ) {
     );
 };
 
+=head2 C<< $mech->getRequestPostData >>
+
+    if( $info->{params}->{response}->{requestHeaders}->{":method"} eq 'POST' ) {
+        $req->{postBody} = $m->getRequestPostData( $id );
+    };
+
+Retrieves the data sent with a POST request
+
+=cut
+
+sub getRequestPostData_future( $self, $requestId ) {
+    $self->log('debug', "Fetching request POST body for $requestId");
+    weaken( my $s = $self );
+    return
+        $self->driver->send_message('Network.getRequestPostData', requestId => $requestId)
+        ->then(sub {
+        $s->log('trace', "Have POST body", @_);
+        my ($body_obj) = @_;
+
+        my $body = $body_obj->{postData};
+        # WTF? The documentation says the body is base64 encoded, but
+        # experimentation shows it isn't, at least for JSON content :-/
+        #$body = decode_base64( $body );
+        Future->done( $body )
+    });
+}
+
+sub getRequestPostData( $self, $requestId ) {
+    $self->getRequestPostData_future( $requestId )->get
+}
+
 sub getResponseBody( $self, $requestId ) {
     $self->log('debug', "Fetching response body for $requestId");
     my $s = $self;
@@ -1152,17 +1241,19 @@ sub httpResponseFromChromeResponse( $self, $res ) {
     # The proper way might be to return a proxy object...
     my $requestId = $res->{params}->{requestId};
 
-    my $full_response_future;
+    if( $requestId ) {
+        my $full_response_future;
 
-    my $s = $self;
-    weaken $s;
-    $full_response_future = $self->getResponseBody( $requestId )->then( sub( $body ) {
-        $s->log('debug', "Response body arrived");
-        $response->content( $body );
-        undef $full_response_future;
-        Future->done
-    });
-    #$response->content_ref( \$body );
+        my $s = $self;
+        weaken $s;
+        $full_response_future = $self->getResponseBody( $requestId )->then( sub( $body ) {
+            $s->log('debug', "Response body arrived");
+            $response->content( $body );
+            undef $full_response_future;
+            Future->done
+        });
+        #$response->content_ref( \$body );
+    };
     $response
 };
 
@@ -1201,6 +1292,9 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
     # Just silence some undef warnings
     if( ! defined $requestId) {
         $requestId = ''
+    };
+    if( ! defined $frameId) {
+        $frameId = ''
     };
 
     my @events = grep {
@@ -1257,8 +1351,31 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
 
     } elsif ( $res = $events{ 'Page.frameNavigated' }
               and $res->{params}->{frame}->{unreachableUrl}) {
-    #warn "Network.frameNavigated";
+    #warn "Network.frameNavigated (unreachable)";
         $response = $self->httpResponseFromChromeUrlUnreachable( $res );
+        $response->request( $request );
+
+    } elsif ( $res = $events{ 'Page.frameNavigated' }
+              and $res->{params}->{frame}->{url} =~ m!^file://!) {
+    #warn "Network.frameNavigated (file)";
+        # Chrome v67+ doesn't send network events for file:// navigation
+        $response = HTTP::Response->new(
+            200, # is 0 for files?!
+            "OK",
+            HTTP::Headers->new(),
+        );
+        $response->request( $request );
+
+    } elsif ( $res = $events{ 'Page.frameStoppedLoading' }
+              and $res->{params}->{frameId} eq $frameId) {
+    #warn "Network.frameStoppedLoading";
+        # Chrome v67+ doesn't send network events for file:// navigation
+        # so we need to fake it completely
+        $response = HTTP::Response->new(
+            200, # is 0 for files?!
+            "OK",
+            HTTP::Headers->new(),
+        );
         $response->request( $request );
 
     } elsif( $res = $events{ "MechanizeChrome.download" } ) {
@@ -2326,7 +2443,7 @@ C<< any >> - no error is raised, no matter if an item is found or not.
 
 =back
 
-Returns the matched results.
+Returns the matched results as L<WWW::Mechanize::Chrome::Node> objects.
 
 You can pass in a list of queries as an array reference for the first parameter.
 The result will then be the list of all elements matching any of the queries.
@@ -3143,7 +3260,7 @@ sub get_set_value {
                     $self->driver->send_message(
                         'Runtime.callFunctionOn',
                         objectId => $id,
-                        functionDeclaration => q|
+                        functionDeclaration => <<'JS',
 function(newValue) {
   var i, j;
   if (this.multiple == true) {
@@ -3158,12 +3275,17 @@ function(newValue) {
       }
     }
   }
-}|,
+}
+JS
                         arguments => [{ value => $value }],
                     )->get;
                 }
             } elsif( 'content' eq $method ) {
-                $self->driver->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function(newValue) { this.innerHTML = newValue }', arguments => [{ value => $value }])->get;
+                $self->driver->send_message('Runtime.callFunctionOn',
+                    objectId => $id,
+                    functionDeclaration => 'function(newValue) { this.innerHTML = newValue }',
+                    arguments => [{ value => $value }]
+                )->get;
             } else {
                 die "Don't know how to set the value for node '$tag', sorry";
             };
@@ -3181,7 +3303,7 @@ function(newValue) {
             my $arr = $self->driver->send_message(
                     'Runtime.callFunctionOn',
                     objectId => $id,
-                    functionDeclaration => '
+                    functionDeclaration => <<'JS',
 function() {
   var i;
   var arr = [];
@@ -3191,9 +3313,10 @@ function() {
     }
   }
   return arr;
-}',
+}
+JS
                     arguments => [],
-                    returnByValue => JSON::true)->get->{result};
+                    returnByValue => JSON::PP::true)->get->{result};
 
             my @values = @{$arr->{value}};
             if (wantarray) {
@@ -3532,7 +3655,7 @@ towards rendering HTML.
 
 sub element_coordinates {
     my ($self, $element) = @_;
-    my $cliprect = $self->driver->send_message('Runtime.callFunctionOn', objectId => $element->objectId, functionDeclaration => <<'JS', arguments => [], returnByValue => JSON::true)->get->{result}->{value};
+    my $cliprect = $self->driver->send_message('Runtime.callFunctionOn', objectId => $element->objectId, functionDeclaration => <<'JS', arguments => [], returnByValue => JSON::PP::true)->get->{result}->{value};
     function() {
         var r = this.getBoundingClientRect();
         return {
@@ -3655,7 +3778,7 @@ sub report_js_errors
     ( @{$_->{trace}} ? " at $_->{trace}->[-1]->{file} line $_->{trace}->[-1]->{line}" : '') .
     ( @{$_->{trace}} && $_->{trace}->[-1]->{function} ? " in function $_->{trace}->[-1]->{function}" : '')
     } @errors;
-    Carp::carp("javascript error: @errors") ;
+    Carp::carp("javascript error: @errors") if @errors;
 }
 
 =head1 DEBUGGING METHODS
@@ -3736,118 +3859,6 @@ screencast frames and to catch up before shutting down the connection.
 
 sub sleep( $self, $seconds ) {
     $self->driver->sleep( $seconds )->get;
-}
-
-package WWW::Mechanize::Chrome::Node;
-use strict;
-use Moo 2;
-use Filter::signatures;
-no warnings 'experimental::signatures';
-use feature 'signatures';
-
-use Scalar::Util 'weaken';
-
-our $VERSION = '0.10';
-
-has 'attributes' => (
-    is => 'lazy',
-    default => sub { {} },
-);
-
-has 'nodeName' => (
-    is => 'ro',
-);
-
-has 'localName' => (
-    is => 'ro',
-);
-
-has 'backendNodeId' => (
-    is => 'ro',
-);
-
-has 'objectId' => (
-    is => 'lazy',
-    default => sub( $self ) {
-        my $obj = $self->driver->send_message('DOM.resolveNode', nodeId => $self->nodeId)->get;
-        $obj->{object}->{objectId}
-    },
-);
-
-has 'driver' => (
-    is => 'ro',
-);
-
-# The generation from when our ->nodeId was valid
-has '_generation' => (
-    is => 'rw',
-);
-
-has 'mech' => (
-    is => 'ro',
-    weak_ref => 1,
-);
-
-sub _fetchNodeId($self) {
-    $self->driver->send_message('DOM.requestNode', objectId => $self->objectId)->then(sub($d) {
-        Future->done( $d->{nodeId} );
-    });
-}
-
-sub _nodeId($self) {
-    my $nid = $self->{nodeId};
-    my $generation = $self->mech->_generation;
-    if( !$nid or ( $self->_generation and $self->_generation != $generation )) {
-        # Re-resolve, and hopefully we still have our objectId
-        $nid = $self->_fetchNodeId();
-        $self->_generation( $generation );
-    } else {
-        $nid = Future->done( $nid );
-    }
-    $nid;
-}
-
-sub nodeId($self) {
-    $self->_nodeId()->get;
-}
-
-sub get_attribute( $self, $attribute ) {
-    my $s = $self;
-    weaken $s;
-    if( $attribute eq 'innerText' ) {
-        my $nid = $self->_nodeId();
-        my $html = $nid->then(sub( $nodeId ) {
-            $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
-        })->get()->{outerHTML};
-
-        # Strip first and last tag in a not so elegant way
-        $html =~ s!\A<[^>]+>!!;
-        $html =~ s!<[^>]+>\z!!;
-        return $html
-
-    } elsif( $attribute eq 'innerHTML' ) {
-        my $nid = $self->_nodeId();
-        my $html = $nid->then(sub( $nodeId ) {
-            $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
-        })->get()->{outerHTML};
-
-        # Strip first and last tag in a not so elegant way
-        $html =~ s!\A<[^>]+>!!;
-        $html =~ s!<[^>]+>\z!!;
-        return $html
-    } else {
-        return $self->attributes->{ $attribute }
-    }
-}
-
-sub get_tag_name( $self ) {
-    my $tag = $self->nodeName;
-    $tag =~ s!\..*!!; # strip away the eventual classname
-    $tag
-}
-
-sub get_text( $self ) {
-    $self->get_attribute('innerText')
 }
 
 1;
@@ -3964,15 +3975,14 @@ C<chrome.exe> or is not in your path, then set the environment variable
 C<CHROME_BIN> to the absolute path.
 
 If you have Chrome already running, it must have been started with the
-C<<--remote-debugging-port=9222>> option to enable the developer console. You
-may want to set up a dedicated and version pinned version of Chrome for your
+C<<--remote-debugging-port=9222>> option to enable access to the developer API.
+You may want to set up a dedicated and version pinned version of Chrome for your
 automation.
 
-The test suite is apt to disturb your display when a locally running
-chrome browser gets animated. On unixish systems you can avoid this
-kind of disturbance by (1) not running any chrome binary and (2) start
-a separate display with Xvfb and (3) set the DISPLAY variable
-accordingly. E.g.:
+The test suite is apt to disturb your display when a locally running chrome
+browser gets animated. On unixish systems you can avoid this kind of disturbance
+by (1) not running any chrome binary and (2) start a separate display with Xvfb
+and (3) set the DISPLAY variable accordingly. E.g.:
 
   Xvfb :121 &
   DISPLAY=:121 CHROME_BIN=/usr/bin/google-chrome-stable make test
@@ -3994,6 +4004,10 @@ client of the Chrome API
 =item *
 
 L<WWW::Mechanize> - the module whose API grandfathered this module
+
+=item *
+
+L<WWW::Mechanize::Chrome::Node> - objects representing HTML in Chrome
 
 =item *
 
@@ -4025,6 +4039,11 @@ At The Perl Conference 2017 in Amsterdam, I also presented a talk, see
 L<http://act.perlconference.org/tpc-2017-amsterdam/talk/7022>.
 The slides for the English presentation at TPCiA 2017 are at
 L<https://corion.net/talks/WWW-Mechanize-Chrome/www-mechanize-chrome.en.html>.
+
+At the London Perl Workshop 2017 in London, I also presented a talk, see
+L<Youtube|https://www.youtube.com/watch?v=V3WeO-iVkAc> . The slides for
+that talk are
+L<here|https://corion.net/talks/WWW-Mechanize-Chrome/www-mechanize-chrome.en.html>.
 
 =head1 BUG TRACKER
 

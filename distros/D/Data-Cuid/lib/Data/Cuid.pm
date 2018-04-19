@@ -11,15 +11,14 @@ BEGIN {
 }
 
 use List::Util 'reduce';
-use Math::Base36 'encode_base36';
 use Sys::Hostname 'hostname';
 use Time::HiRes ();
 
 our $size = 4;
 our $base = 36;
-our $cmax = $base**$size;
+our $cmax = ($base)**($size);
 
-our $VERSION = "0.02";
+our $VERSION = "0.04";
 
 {
     my $c = 0;
@@ -30,33 +29,55 @@ our $VERSION = "0.02";
     }
 }
 
+# from Math::Base36, but without using Math::BigInt (since only
+# timestamp is the largest int used here )
+sub _encode_base36 {
+    my ( $n, $max ) = ( @_, 1 );
+
+    my @res;
+    while ($n) {
+        my $remainder = $n % 36;
+        unshift @res, $remainder <= 9 ? $remainder : chr( 55 + $remainder );
+        $n = int $n / 36;
+    }
+
+    # also return this as a string of exactly $max characters; note
+    # that this means numbers above 36**$max - 1 will be truncated to
+    # $max size and be incorrect, unless $max is increased
+    unshift @res, '0' while @res < $max;
+    join '' => @res[ @res - $max .. $#res ];
+}
+
 # taken from the NodeJS version of fingerprint
 # https://github.com/ericelliott/cuid/blob/master/lib/fingerprint.js
 sub _fingerprint {
     my $padding = 2;
-    my $pid = encode_base36 $$, $padding;
+    my $pid = _encode_base36 $$, $padding;
 
     my $hostname = hostname;
     my $id = reduce { $a + ord($b) } length($hostname) + $base,
         split // => $hostname;
 
-    join '' => $pid, encode_base36 $id, $padding;
+    join '' => $pid, _encode_base36 $id, $padding;
 }
 
-sub _random_block { encode_base36 rand() * $cmax << 0, $size }
-sub _timestamp { encode_base36 sprintf '%.0f' => Time::HiRes::time * 1000 }
+sub _random_block { _encode_base36 $cmax * rand() << 0, $size }
+
+sub _timestamp {
+    _encode_base36 sprintf( '%.0f' => Time::HiRes::time * 1000 ), 8;
+}
 
 sub cuid {
     lc join '' => 'c',
         _timestamp,
-        encode_base36( _safe_counter, $size ),
+        _encode_base36( _safe_counter, $size ),
         _fingerprint,
         _random_block, _random_block;
 }
 
 sub slug {
     lc join '' => substr( _timestamp, -2 ),
-        substr( encode_base36(_safe_counter), -4 ),
+        substr( _encode_base36(_safe_counter), -4 ),
         substr( _fingerprint, 0, 1 ), substr( _fingerprint, -1 ),
         substr( _random_block, -2 );
 }
@@ -76,8 +97,8 @@ Data::Cuid - collision-resistant IDs
 
     use Data::Cuid qw(cuid slug);
 
-    my $id   = cuid();          # cjfphfcxm0000e5i19lls09lovq
-    my $slug = slug();          # y81elxl
+    my $id   = cuid();          # cjg0i57uu0000ng9lwvds8vb3
+    my $slug = slug();          # uv1nlmi
 
 =head1 DESCRIPTION
 

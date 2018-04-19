@@ -1,5 +1,5 @@
 package QBit::QueryData;
-$QBit::QueryData::VERSION = '0.010';
+$QBit::QueryData::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Class);
@@ -124,6 +124,8 @@ sub fields {
         throw Exception $error_message if $error_message;
     }
 
+    delete($self->{'__PROCESS__'});
+
     return $self;
 }
 
@@ -149,14 +151,26 @@ sub get_fields {
     return $self->{'__FIELDS__'} // $self->{'fields'} // $self->{'__ALL_FIELDS__'};
 }
 
+my $VAR_COUNT = 1;
+
 sub filter {
     my ($self, $filter) = @_;
 
     if (defined($filter)) {
-        $self->{'__FILTER__'} = eval($self->_get_filter($filter));
+        my $filter_code = '';
+
+        $VAR_COUNT = 1;
+        my $filter_variables_code = '';
+
+        $self->_filter(\$filter_code, \$filter_variables_code, $filter);
+
+        $self->{'__FILTER__'}           = $filter_code;
+        $self->{'__FILTER_VARIABLES__'} = $filter_variables_code;
     } else {
         delete($self->{'__FILTER__'});
     }
+
+    delete($self->{'__PROCESS__'});
 
     return $self;
 }
@@ -173,6 +187,8 @@ sub distinct {
     my ($self, $value) = @_;
 
     $self->{'__DISTINCT__'} = $value // TRUE;
+
+    delete($self->{'__PROCESS__'});
 
     return $self;
 }
@@ -235,80 +251,10 @@ sub found_rows {
 sub get_all {
     my ($self, %opts) = @_;
 
-    my $fields      = $self->get_fields() // {};
-    my @fields      = keys(%$fields);
-    my @aggregators = ();
-
-    foreach (@fields) {
-        if ($self->{'__PROCESS_FIELDS__'}{$_}) {
-            if ($self->{'__PROCESS_FIELDS__'}{$_}->can('init_storage')) {
-                $self->{'__PROCESS_FIELDS__'}{$_}->init_storage();
-            }
-
-            if ($self->{'__PROCESS_FIELDS__'}{$_}->can('aggregation')) {
-                push(@aggregators, $_);
-            }
-
-            #TODO: подумать над реализацией двух функций над одним полем
-            #проверить что две группирующие функции не используются над одним полем
-        }
-    }
-
-    my @group_by = @{$self->{'__PATHS_GROUP_BY__'} // []};
-
-    my %uniq = ();
     my @data = ();
-    foreach my $row (@{$self->{'data'}}) {
-        next if defined($self->{'__FILTER__'}) && !$self->{'__FILTER__'}->($row);
 
-        my $new_row = {};
-        foreach my $field (@fields) {
-            $new_row->{$field} = $self->{'__PROCESS_FIELDS__'}{$field}->process($row);
-        }
-
-        if (@group_by) {
-            my $key =
-              join($;, map {$self->get_field_value_by_path($row, $new_row, undef, @$_) // '__UNDEF__'} @group_by);
-
-            unless (exists($uniq{$key})) {
-                # строка с новым ключом
-                push(@data, $new_row);
-
-                $uniq{$key} = $#data;
-            }
-
-            # агрегируем
-            $data[$uniq{$key}]->{$_} = $self->{'__PROCESS_FIELDS__'}{$_}->aggregation($row, $key) foreach @aggregators;
-        } elsif (@aggregators) {
-            # нет группировок но есть агригирующие функции
-            unless (@data) {
-                # результат одна строка
-                push(@data, $new_row);
-            }
-
-            $data[0]->{$_} = $self->{'__PROCESS_FIELDS__'}{$_}->aggregation($row, $_) foreach @aggregators;
-        } else {
-            push(@data, $new_row);
-        }
-    }
-
-    if ($self->_has_distinct && (!@group_by || !$self->_grouping_has_resulting_fields())) {
-        %uniq = ();
-
-        #TODO: inplace algorithm?
-        my @tmp_data = ();
-        foreach my $row (@data) {
-            my $key = join($;, map {$row->{$_} // '__UNDEF__'} @fields);
-
-            unless ($uniq{$key}) {
-                $uniq{$key} = TRUE;
-
-                push(@tmp_data, $row);
-            }
-        }
-
-        @data = @tmp_data;
-    }
+    $self->{'__PROCESS__'} //= $self->_get_process_sub();
+    $self->{'__PROCESS__'}->($self, \@data);
 
     if (defined($self->{'__ORDER_BY__'})) {
         @data = sort {$self->{'__ORDER_BY__'}->($a, $b)} @data;
@@ -329,6 +275,154 @@ sub get_all {
     return \@data;
 }
 
+sub _get_process_sub {
+    my ($self) = @_;
+
+    my $code = '
+sub {
+    # PARAMS
+    # $_[0] - $self (QD)
+    # $_[1] - ref array, result
+
+    no warnings;
+';
+
+    if ($self->{'__FILTER_VARIABLES__'}) {
+        $code .= $self->{'__FILTER_VARIABLES__'};
+    }
+
+    my @group_by = @{$self->{'__PATHS_GROUP_BY__'} // []};
+
+    my $has_distinct = $self->_has_distinct();
+
+    if (@group_by || $has_distinct) {
+        $code .= '
+    my %uniq = ();
+';
+    }
+
+    $code .= '
+    foreach my $row (@{$_[0]->{data}}) {
+';
+
+    if ($self->{'__FILTER__'}) {
+        $code .= "        next unless $self->{'__FILTER__'};
+
+";
+    }
+
+    $code .= '        my $new_row = {};
+
+';
+
+    my $fields      = $self->get_fields() // {};
+    my @fields      = sort keys(%$fields);
+    my @aggregators = ();
+
+    foreach my $field (@fields) {
+        my $field_obj = $self->{'__PROCESS_FIELDS__'}{$field} or next;
+
+        if ($field_obj->can('aggregation')) {
+            push(@aggregators, $field);
+        }
+
+        $code .= $field_obj->process();
+
+        #TODO: подумать над реализацией двух функций над одним полем
+        #проверить что две группирующие функции не используются над одним полем
+    }
+
+    if (@group_by) {
+        if (@group_by == 1) {
+            $code .= '
+        my $key = ' . $self->_get_field_code_by_path('$row', $group_by[0]) . ';
+';
+        } else {
+            $code .= '
+        my $key = join($;, ' . join(', ', map {$self->_get_field_code_by_path('$row', $_)} @group_by) . ');
+';
+        }
+
+        $code .= '
+        if (exists($uniq{$key})) {
+            # ключ совпадает, только агрегируем
+';
+
+        $code .= $self->{'__PROCESS_FIELDS__'}{$_}->aggregation('$_[1]->[$uniq{$key}]->{' . $_ . '}')
+          foreach @aggregators;
+
+        $code .= '        } else {
+            # строка с новым ключом
+            push(@{$_[1]}, $new_row);
+
+            $uniq{$key} = $#{$_[1]};
+        }
+';
+    } elsif (@aggregators) {
+        $code .= '
+        # нет группировок но есть агрегирующие функции
+
+        if (@{$_[1]}) {
+';
+
+        $code .= $self->{'__PROCESS_FIELDS__'}{$_}->aggregation('$_[1]->[0]->{' . $_ . '}') foreach @aggregators;
+
+        $code .= '        } else {
+            # результат одна строка
+
+            push(@{$_[1]}, $new_row);
+        }
+';
+    } else {
+        $code .= '
+        push(@{$_[1]}, $new_row);
+';
+    }
+
+    #END foreach
+    $code .= '
+    }
+';
+
+    if ($has_distinct && (!@group_by || !$self->_grouping_has_resulting_fields())) {
+        $code .= '
+    %uniq = ();
+
+    my @tmp_data = ();
+
+    foreach my $row (@{$_[1]}) {
+';
+
+        if (@fields == 1) {
+            $code .= '        my $key = $row->{$fields[0]};
+';
+        } else {
+            $code .= '        my $key = join($;, ' . join(', ', map {"\$row->{$_} // '__UNDEF__'"} @fields) . ');
+';
+        }
+
+        $code .= '
+        unless ($uniq{$key}) {
+            $uniq{$key} = TRUE;
+
+            push(@tmp_data, $row);
+        }
+    }
+
+    @{$_[1]} = @tmp_data;
+';
+    }
+
+    #END sub
+    $code .= '
+}';
+
+    my $sub_ref = eval($code);
+    throw $@ . "\n" . ('-' x 80) . "\n$code\n" . ('-' x 80) . "\n" if $@;
+
+    return $sub_ref;
+}
+
 sub _has_distinct {
     my ($self) = @_;
 
@@ -342,8 +436,7 @@ sub _grouping_has_resulting_fields {
     my %group_by = map {$_ => TRUE} @{$self->{'__GROUP_BY__'} // []};
 
     foreach my $field (keys(%{$self->{'__PROCESS_FIELDS__'}})) {
-        my $main_field = $self->{'__PROCESS_FIELDS__'}{$field}->get_main_field();
-        return TRUE if $group_by{$main_field};
+        return TRUE if $group_by{$self->{'__PROCESS_FIELDS__'}{$field}->get_main_field()};
     }
 
     return FALSE;
@@ -351,6 +444,8 @@ sub _grouping_has_resulting_fields {
 
 sub group_by {
     my ($self, @group_by) = @_;
+
+    delete($self->{'__PROCESS__'});
 
     unless (@group_by) {
         delete($self->{'__GROUP_BY__'});
@@ -387,34 +482,24 @@ sub group_by {
     return $self;
 }
 
-sub _get_filter {
-    my ($self, $filter) = @_;
-
-    my $body = '';
-
-    $self->_filter(\$body, $filter);
-
-    return $self->_get_sub($body);
-}
-
 sub _get_sub {
     my ($self, $body) = @_;
 
-    return "sub {\n    no warnings;\n\n    return " . $body . ";\n}";
+    return "sub {\n    no warnings;\n\n    return $body\n}";
 }
 
 sub _filter {
-    my ($self, $body, $filter) = @_;
+    my ($self, $code, $variables, $filter) = @_;
 
     my $operation = ' && ';
 
-    $$body .= '(';
+    $$code .= '(';
 
     my @part = ();
     if (ref($filter) eq 'HASH') {
         if ([%$filter]->[0] eq 'NOT' && ref($filter->{'NOT'}) eq 'ARRAY') {
             my $sub_body .= 'not (';
-            $self->_filter(\$sub_body, $filter->{'NOT'}[0]);
+            $self->_filter(\$sub_body, $variables, $filter->{'NOT'}[0]);
             $sub_body .= ')';
 
             push(@part, $sub_body);
@@ -427,13 +512,21 @@ sub _filter {
 
                 my $type_operation = $self->_get_filter_operation($field, '=');
 
-                my $field_code = $self->_get_field_code_by_path('$_[0]', $path);
+                my $field_code = $self->_get_field_code_by_path('$row', $path);
 
                 if (ref($filter->{$field}) eq 'ARRAY') {
-                    push(@part,
-                            "(grep {$field_code $type_operation \$_} ("
-                          . join(', ', map {$self->_get_value($field, $_)} @{$filter->{$field}})
-                          . "))");
+                    my $var_name = 'hash_' . $VAR_COUNT++;
+
+                    $$variables .= '
+    my %' . $var_name . ' = (
+'
+                      . join(",\n",
+                        map {'        ' . (defined($_) ? $self->_get_value($field, $_) : "'__UNDEF__'") . ' => TRUE'}
+                          @{$filter->{$field}})
+                      . '
+    );
+';
+                    push(@part, '$' . $var_name . '{' . $field_code . ' // "__UNDEF__"}');
                 } else {
                     my $value = $self->_get_value($field, $filter->{$field});
 
@@ -446,7 +539,7 @@ sub _filter {
 
         foreach my $sub_filter (@{$filter->[1]}) {
             my $sub_body = '';
-            $self->_filter(\$sub_body, $sub_filter);
+            $self->_filter(\$sub_body, $variables, $sub_filter);
             push(@part, $sub_body);
         }
     } elsif (ref($filter) eq 'ARRAY' && @$filter == 3) {
@@ -462,18 +555,27 @@ sub _filter {
 
         my $type_operation = $self->_get_filter_operation($field, $op);
 
-        my $field_code = $self->_get_field_code_by_path('$_[0]', $path);
+        my $field_code = $self->_get_field_code_by_path('$row', $path);
 
         if (ref($value) eq 'ARRAY') {
             throw gettext('Operation "%s" is not applied to the array', $op)
               if grep {$op eq $_} ('>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IS', 'IS NOT');
 
+            my $var_name = 'hash_' . $VAR_COUNT++;
+
+            $$variables .= '
+    my %' . $var_name . ' = (
+'
+              . join(",\n",
+                map {'        ' . (defined($_) ? $self->_get_value($field, $_) : "'__UNDEF__'") . ' => TRUE'} @$value)
+              . '
+    );
+';
             push(@part,
-                    "("
-                  . ($op eq '<>' || $op eq '!=' || $op eq 'NOT IN' ? '!' : '')
-                  . "grep {$field_code $type_operation \$_} ("
-                  . join(', ', map {$self->_get_value($field, $_)} @$value)
-                  . "))");
+                    ($op eq '<>' || $op eq '!=' || $op eq 'NOT IN' ? '!' : '') . '$'
+                  . $var_name . '{'
+                  . $field_code
+                  . ' // "__UNDEF__"}');
         } else {
             throw gettext('Operation "%s" is only applied to the undef', $op)
               if (grep {$op eq $_} ('IS', 'IS NOT')) && defined($value);
@@ -486,9 +588,9 @@ sub _filter {
         }
     }
 
-    $$body .= join($operation, @part);
+    $$code .= join($operation, @part);
 
-    $$body .= ')';
+    $$code .= ')';
 }
 
 sub _get_order {
@@ -546,34 +648,6 @@ sub _get_field_code_by_path {
     return $value;
 }
 
-sub get_field_value_by_path {
-    my ($self, $row, $new_row, $last_field, @paths) = @_;
-    #last argument is a array, for shallow copy
-
-    unless (@paths) {
-        return $last_field eq 'new_row' ? $new_row : $row;
-    }
-
-    my $path = shift(@paths);
-    my $fields = $self->get_fields() // {};
-
-    if ($path->{'type'} eq 'array') {
-        if ((defined($last_field) && $last_field eq 'new_row') || (!defined($last_field) && $fields->{$path->{'key'}}))
-        {
-            return $self->get_field_value_by_path($row, $new_row->[$path->{'key'}], 'new_row', @paths);
-        } else {
-            return $self->get_field_value_by_path($row->[$path->{'key'}], $new_row, 'row', @paths);
-        }
-    } else {
-        if ((defined($last_field) && $last_field eq 'new_row') || (!defined($last_field) && $fields->{$path->{'key'}}))
-        {
-            return $self->get_field_value_by_path($row, $new_row->{$path->{'key'}}, 'new_row', @paths);
-        } else {
-            return $self->get_field_value_by_path($row->{$path->{'key'}}, $new_row, 'row', @paths);
-        }
-    }
-}
-
 sub _get_filter_operation {
     my ($self, $field, $op) = @_;
 
@@ -600,15 +674,23 @@ sub _get_value {
         return 'm/' . quotemeta($value) . '/' . ($self->{'__INSENSITIVE__'} ? 'i' : '');
     }
 
-    my $type = $self->definition->{$field}{'type'} // 'string';
+    my $type = $self->definition->{$field} ? $self->definition->{$field}{'type'} // 'string' : 'string';
 
     if ($type eq 'string') {
-        $value =~ s/\\/\\\\/g;
-        $value =~ s/'/\\'/g;
-        $value = "'$value'";
+        return $self->quote($value);
     } else {
         throw gettext('%s - not number', $value) unless looks_like_number($value);
     }
+
+    return $value;
+}
+
+sub quote {
+    my ($self, $value) = @_;
+
+    $value =~ s/\\/\\\\/g;
+    $value =~ s/'/\\'/g;
+    $value = "'$value'";
 
     return $value;
 }

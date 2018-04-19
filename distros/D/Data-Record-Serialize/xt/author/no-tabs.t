@@ -28,7 +28,6 @@ my @files = (
     't/bugs/rename-field-to-self.t',
     't/constructor.t',
     't/encoders/dbi.t',
-    't/encoders/dbi.t.resolve',
     't/encoders/ddump.t',
     't/encoders/json.t',
     't/encoders/null.t',

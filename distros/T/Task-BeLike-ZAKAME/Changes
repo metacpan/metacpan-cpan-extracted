@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.18 2018-04-16T15:38:27Z
+
+    - Add Benchmark::Forking and Math::BigInt::Lite to recommends
+    - Move indirect to requires
+
 0.17 2018-04-02T17:03:38Z
 
     - Add curry

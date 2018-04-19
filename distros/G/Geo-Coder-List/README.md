@@ -10,12 +10,16 @@ Call many geocoders
 
 # VERSION
 
-Version 0.18
+Version 0.20
 
 # SYNOPSIS
 
-[Geo::Coder::All](https://metacpan.org/pod/Geo::Coder::All) and [Geo::Coder::Many](https://metacpan.org/pod/Geo::Coder::Many) are great routines but neither quite does what I want.
-This module's primary use is to allow many backends to be used by [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
+[Geo::Coder::All](https://metacpan.org/pod/Geo::Coder::All)
+and
+[Geo::Coder::Many](https://metacpan.org/pod/Geo::Coder::Many)
+are great routines but neither quite does what I want.
+This module's primary use is to allow many backends to be used by
+[HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
 
 # SUBROUTINES/METHODS
 
@@ -130,6 +134,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Nigel Horne.
+Copyright 2016-2018 Nigel Horne.
 
 This program is released under the following licence: GPL

@@ -13,8 +13,8 @@ sub all($self, $opts = {}) {
   $opts->{limit} = 100 unless $opts->{limit} =~/^\d+$/;
   $opts->{offset} //= 0;
   $opts->{offset} = 0 unless $opts->{offset} =~/^\d+$/;
-  state $abstract = $self-><%= $a->{db_helper} %>->abstract;
-  my ($sql, @bind) = $abstract->select('<%= $a->{t} %>', '*', $opts->{where}//());
+  state $abstr = $self-><%= $a->{db_helper} %>->abstract;
+  my ($sql, @bind) = $abstr->select('<%= $a->{t} %>', '*', $opts->{where}//());
   $sql .= " LIMIT $opts->{limit}" . ($opts->{offset} ? " OFFSET $opts->{offset}" : '');
   return $self-><%= $a->{db_helper} %>->db->query($sql, @bind)->hashes->to_array;
 }

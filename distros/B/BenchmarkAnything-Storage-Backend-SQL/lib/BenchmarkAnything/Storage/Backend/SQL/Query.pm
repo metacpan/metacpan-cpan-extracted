@@ -1,10 +1,11 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - base class
-$BenchmarkAnything::Storage::Backend::SQL::Query::VERSION = '0.023';
+$BenchmarkAnything::Storage::Backend::SQL::Query::VERSION = '0.024';
 use strict;
 use warnings;
 use Digest::MD5;
+#use Try::Tiny;
 
 sub new {
 
@@ -36,16 +37,28 @@ sub execute_query {
     }
 
     local $or_self->{dbh}{RaiseError} = 1;
+    local $or_self->{dbh}{PrintError} = 0;
 
     my $s_key = Digest::MD5::md5($s_statement);
     if ( $or_self->{prepared}{$s_key} ) {
         $or_self->{prepared}{$s_key}->finish();
     }
-    else {
-        $or_self->{prepared}{$s_key} = $or_self->{dbh}->prepare( $s_statement );
-    }
-
+    $or_self->{prepared}{$s_key} = $or_self->{dbh}->prepare( $s_statement );
     $or_self->{prepared}{$s_key}->execute( @a_vals );
+
+    # try/catch - this should better be handled in upper levels
+    # try {
+    #     $or_self->{prepared}{$s_key}->execute( @a_vals );
+    # }
+    # catch {
+    #     warn("CATCH");
+    #     if (/Deadlock found when trying to get lock/) {
+    #         warn("IGNORED DEADLOCK");
+    #     } else {
+    #         Carp::cluck("INNER UNKNOWN {{{\n$_\n}}}\n");
+    #         die $_;
+    #     }
+    # };
 
     return $or_self->{prepared}{$s_key};
 
@@ -87,7 +100,7 @@ sub start_transaction {
 
 sub finish_transaction {
 
-    my ( $or_self, $s_error ) = @_;
+    my ( $or_self, $s_error, $hr_opts ) = @_;
 
     if ( $or_self->{transaction_supported} ) {
 
@@ -95,7 +108,7 @@ sub finish_transaction {
 
         if ( $s_error ) {
             require Carp;
-            Carp::confess("transaction failed: $s_error");
+            Carp::cluck("transaction failed: $s_error") unless $hr_opts->{silent};
             $or_self->{dbh}->rollback();
         }
         else {
@@ -128,7 +141,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2018 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

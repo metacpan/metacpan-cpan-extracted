@@ -1,5 +1,11 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.35 2018-04-12T20:08:03Z
+
+    [ Var ]
+    - Module "Var" is rewritten in object-oriented style
+    - The Var::scenario function was added
+
 0.34 2018-04-10T20:09:17Z
 
     [ Zip ]

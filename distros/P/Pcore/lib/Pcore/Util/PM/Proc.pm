@@ -11,10 +11,10 @@ use overload    #
     return $_[0]->is_success;
   },
   q[0+] => sub {
-    return $_[0]->status;
+    return $_[0]->{status};
   },
   q[<=>] => sub {
-    return !$_[2] ? $_[0]->status <=> $_[1] : $_[1] <=> $_[0]->status;
+    return !$_[2] ? $_[0]->{status} <=> $_[1] : $_[1] <=> $_[0]->{status};
   },
   fallback => undef;
 
@@ -161,7 +161,9 @@ sub _redirect_std ( $self, $args ) {
         ( $hdl->{out_r}, $hdl->{out_w} ) = portable_socketpair();
 
         # backup current STDOUT handle
+        binmode *STDOUT or die if $MSWIN;
         open $hdl->{old_out}, '>&', *STDOUT or die;
+        Pcore::config_stdout(*STDOUT) if $MSWIN;
     }
 
     # create STDERR
@@ -174,7 +176,9 @@ sub _redirect_std ( $self, $args ) {
         }
 
         # backup current STDERR handle
+        binmode *STDERR or die if $MSWIN;
         open $hdl->{old_err}, '>&', *STDERR or die;
+        Pcore::config_stdout(*STDERR) if $MSWIN;
     }
 
     # redirect STD* handles
@@ -309,7 +313,7 @@ sub _create_sigchild ( $self, $win32_alive_timeout ) {
 sub is_success ($self) {
     return if !$self->pid;
 
-    return !$self->status;
+    return !$self->{status};
 }
 
 sub _on_exit ( $self, $status ) {
@@ -356,6 +360,8 @@ sub _on_exit ( $self, $status ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (25)                               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 148                  | Subroutines::ProhibitExcessComplexity - Subroutine "_redirect_std" with high complexity score (23)             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

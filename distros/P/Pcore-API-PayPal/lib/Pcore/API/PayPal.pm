@@ -1,6 +1,6 @@
-package Pcore::API::PayPal v0.3.1;
+package Pcore::API::PayPal v0.3.2;
 
-use Pcore -dist, -class, -result, -const;
+use Pcore -dist, -class, -res, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
 
 const our $SANDBOX_ENDPOINT => 'https://api.sandbox.paypal.com';
@@ -28,7 +28,7 @@ sub _get_access_token ( $self, $cb ) {
         },
         body      => 'grant_type=client_credentials',
         on_finish => sub ($res) {
-            $self->{_access_token} = from_json $res->body;
+            $self->{_access_token} = from_json $res->{body};
 
             $self->{_access_token}->{expires} = time + $self->{_access_token}->{expires_in} - 5;
 
@@ -58,18 +58,18 @@ sub create_payment ( $self, $payment, $cb ) {
                 my $api_res;
 
                 if ( !$res ) {
-                    my $data = $res->body ? from_json $res->body : {};
+                    my $data = $res->{body} ? from_json $res->{body} : {};
 
-                    $api_res = result [ $res->status, $data->{message} // $res->reason ];
+                    $api_res = res [ $res->{status}, $data->{message} // $res->{reason} ];
                 }
                 else {
-                    my $data = from_json $res->body;
+                    my $data = from_json $res->{body};
 
                     if ( $data->{state} eq 'failed' ) {
-                        $api_res = result [ 400, $data->{failure_reason} ], $data;
+                        $api_res = res [ 400, $data->{failure_reason} ], $data;
                     }
                     else {
-                        $api_res = result 200, $data;
+                        $api_res = res 200, $data;
                     }
                 }
 
@@ -102,18 +102,18 @@ sub exec_payment ( $self, $payment_id, $payer_id, $cb ) {
                 my $api_res;
 
                 if ( !$res ) {
-                    my $data = $res->body ? from_json $res->body : {};
+                    my $data = $res->{body} ? from_json $res->{body} : {};
 
-                    $api_res = result [ $res->status, $data->{message} // $res->reason ];
+                    $api_res = res [ $res->{status}, $data->{message} // $res->{reason} ];
                 }
                 else {
-                    my $data = from_json $res->body;
+                    my $data = from_json $res->{body};
 
                     if ( $data->{state} eq 'failed' ) {
-                        $api_res = result [ 400, $data->{failure_reason} ], $data;
+                        $api_res = res [ 400, $data->{failure_reason} ], $data;
                     }
                     else {
-                        $api_res = result 200, $data;
+                        $api_res = res 200, $data;
                     }
                 }
 
@@ -146,14 +146,14 @@ sub payout ( $self, $payment, $cb ) {
                 my $api_res;
 
                 if ( !$res ) {
-                    my $data = $res->body ? from_json $res->body : {};
+                    my $data = $res->{body} ? from_json $res->{body} : {};
 
-                    $api_res = result [ $res->status, $res->reason ], $data;
+                    $api_res = res [ $res->{status}, $res->{reason} ], $data;
                 }
                 else {
-                    my $data = from_json $res->body;
+                    my $data = from_json $res->{body};
 
-                    $api_res = result 200, $data;
+                    $api_res = res 200, $data;
                 }
 
                 $cb->($api_res);

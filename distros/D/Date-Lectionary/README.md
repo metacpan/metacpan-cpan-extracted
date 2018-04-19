@@ -4,7 +4,7 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 # VERSION
 
-Version 1.20180410
+Version 1.20180417
 
 # SYNOPSIS
 
@@ -123,7 +123,7 @@ You can also look for information at:
 
 # ACKNOWLEDGEMENTS
 
-Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
 
 # LICENSE
 

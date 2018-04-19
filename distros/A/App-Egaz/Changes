@@ -1,5 +1,35 @@
 Revision history for Perl extension App-Egaz
 
+0.1.2 2018-04-16T19:39:57Z
+    - Create chr.fasta and chr.fasta.fai in `egaz prepseq`
+    - Add `egaz fas2vcf`
+    - `egaz template`
+        - Fix --taxon
+        - Symlink chr.fasta in 3_proc_cmd.sh
+        - Add 4_vcf.sh
+        - Add 4_circos.sh
+        - Add prebuilt karyotype files
+        - Add 7_chr_length.sh
+    - Add optional dependencies
+
+0.1.1 2018-04-15T18:21:46Z
+    - Add `egaz blastmatch`
+    - Add `egaz blastlink`
+    - `egaz template`
+        - Add 1_self_cmd.sh
+        - Add 3_proc_cmd.sh
+
+0.1.0 2018-04-14T21:55:22Z
+    - Add `egaz template`
+        - Add --outdir, --taxon
+        - Add 1_pair_cmd.sh
+        - Add 2_rawphylo.sh
+        - Add 3_multi_cmd.sh
+    - Add `egaz repeatmasker`
+    - Add --about, --repeatmasker, --min, and --gi to `egaz prepseq`
+    - `egaz raxml` supports one or more infiles
+    - Requires pigz
+
 0.0.14 2018-04-02T20:22:09Z
     - Add `egaz multiz`
     - Add normalize section to `egaz lastz`

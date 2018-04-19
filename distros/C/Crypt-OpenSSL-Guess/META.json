@@ -1,0 +1,78 @@
+{
+   "abstract" : "Guess OpenSSL include path",
+   "author" : [
+      "Takumi Akiyama <t.akiym@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-OpenSSL-Guess",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "Exporter" : "5.57",
+            "File::Spec" : "0",
+            "Symbol" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::OpenSSL::Guess" : {
+         "file" : "lib/Crypt/OpenSSL/Guess.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akiym/Crypt-OpenSSL-Guess/issues"
+      },
+      "homepage" : "https://github.com/akiym/Crypt-OpenSSL-Guess",
+      "repository" : {
+         "url" : "git://github.com/akiym/Crypt-OpenSSL-Guess.git",
+         "web" : "https://github.com/akiym/Crypt-OpenSSL-Guess"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:AKIYM",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

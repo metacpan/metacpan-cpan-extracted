@@ -18,7 +18,7 @@ use version 0.77;
 # Clean Up the Namespace
 use namespace::autoclean;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 
 has 'protocol' => (
@@ -94,7 +94,7 @@ has 'ua' => (
 has 'api_version' => (
     is       => 'ro',
     isa      => Str,
-    default  => sub { '1.14.0' },
+    default  => sub { '1.15.0' },
 );
 
 
@@ -174,7 +174,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -287,13 +287,17 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brad Lhotsky Mohammad S Anwar
+=for stopwords Brad Lhotsky José Joaquín Atria Mohammad S Anwar
 
 =over 4
 
 =item *
 
 Brad Lhotsky <brad.lhotsky@gmail.com>
+
+=item *
+
+José Joaquín Atria <jjatria@gmail.com>
 
 =item *
 

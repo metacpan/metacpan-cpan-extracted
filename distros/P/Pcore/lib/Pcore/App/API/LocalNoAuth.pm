@@ -1,13 +1,11 @@
 package Pcore::App::API::LocalNoAuth;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 
 with qw[Pcore::App::API];
 
-sub init ( $self, $cb ) {
-    $cb->( result 200 );
-
-    return;
+sub init ( $self ) {
+    return res 200;
 }
 
 # AUTHENTICATE
@@ -23,19 +21,15 @@ sub authenticate_private ( $self, $private_token, $cb ) {
     return;
 }
 
-sub do_authenticate_private ( $self, $private_token, $cb ) {
-    $cb->( result [ 404, 'User not found' ] );
-
-    return;
+sub do_authenticate_private ( $self, $private_token ) {
+    return res [ 404, 'User not found' ];
 }
 
 # USER
-sub create_user ( $self, $user_name, $password, $enabled, $permissions, $cb ) {
+sub create_user ( $self, $user_name, $password, $enabled, $permissions ) {
 
     # user already exists
-    $cb->( result [ 400, 'Auth backend is not available' ] );
-
-    return;
+    return res [ 400, 'Auth backend is not available' ];
 }
 
 1;
@@ -45,7 +39,7 @@ sub create_user ( $self, $user_name, $password, $enabled, $permissions, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14, 33               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 12, 29               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

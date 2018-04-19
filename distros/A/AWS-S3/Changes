@@ -1,6 +1,9 @@
 
 Changelog for perl module AWS::S3
 
+0.14 2018-04-13
+  - Fix sending of undefined location param in ->add_bucket (GH #9)
+
 0.13 2017-02-06
   - Add documentation for parameter 'prefix' for AWS::S3::FileIterator
   - Add test coverage (GH #8, thanks to simbabque for these changes)

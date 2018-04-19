@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Sk - Package for language Slovak
 
 package Locale::CLDR::Locales::Sk;
 # This file auto generated from Data\common\main\sk.xml
-#	on Fri 29 Apr  7:24:27 pm GMT
+#	on Fri 13 Apr  7:27:59 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -39,7 +40,7 @@ has 'algorithmic_number_format_data' => (
 			'public' => {
 				'-x' => {
 					divisor => q(1),
-					rule => q(minus →→),
+					rule => q(mínus →→),
 				},
 				'0' => {
 					base_value => q(0),
@@ -68,12 +69,12 @@ has 'algorithmic_number_format_data' => (
 				'20' => {
 					base_value => q(20),
 					divisor => q(10),
-					rule => q(dvasať[­→→]),
+					rule => q(dvadsať[­→→]),
 				},
 				'30' => {
 					base_value => q(30),
 					divisor => q(10),
-					rule => q(trisať[­→→]),
+					rule => q(tridsať[­→→]),
 				},
 				'40' => {
 					base_value => q(40),
@@ -98,62 +99,22 @@ has 'algorithmic_number_format_data' => (
 				'1000000' => {
 					base_value => q(1000000),
 					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← milión[ →→]),
-				},
-				'2000000' => {
-					base_value => q(2000000),
-					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← milióny[ →→]),
-				},
-				'5000000' => {
-					base_value => q(5000000),
-					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← miliónov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{milión}few{milióny}other{miliónov})$[ →→]),
 				},
 				'1000000000' => {
 					base_value => q(1000000000),
 					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliarda[ →→]),
-				},
-				'2000000000' => {
-					base_value => q(2000000000),
-					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliardy[ →→]),
-				},
-				'5000000000' => {
-					base_value => q(5000000000),
-					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliardov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{miliarda}few{miliardy}other{miliardov})$[ →→]),
 				},
 				'1000000000000' => {
 					base_value => q(1000000000000),
 					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← bilión[ →→]),
-				},
-				'2000000000000' => {
-					base_value => q(2000000000000),
-					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← bilióny[ →→]),
-				},
-				'5000000000000' => {
-					base_value => q(5000000000000),
-					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliónov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{bilión}few{bilióny}other{biliónov})$[ →→]),
 				},
 				'1000000000000000' => {
 					base_value => q(1000000000000000),
 					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliarda[ →→]),
-				},
-				'2000000000000000' => {
-					base_value => q(2000000000000000),
-					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliardy[ →→]),
-				},
-				'5000000000000000' => {
-					base_value => q(5000000000000000),
-					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliardov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{biliarda}few{biliardy}other{biliardov})$[ →→]),
 				},
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
@@ -171,7 +132,7 @@ has 'algorithmic_number_format_data' => (
 			'public' => {
 				'-x' => {
 					divisor => q(1),
-					rule => q(minus →→),
+					rule => q(mínus →→),
 				},
 				'0' => {
 					base_value => q(0),
@@ -240,7 +201,7 @@ has 'algorithmic_number_format_data' => (
 				'12' => {
 					base_value => q(12),
 					divisor => q(10),
-					rule => q(dvaásť),
+					rule => q(dvanásť),
 				},
 				'13' => {
 					base_value => q(13),
@@ -280,12 +241,12 @@ has 'algorithmic_number_format_data' => (
 				'20' => {
 					base_value => q(20),
 					divisor => q(10),
-					rule => q(dvasať[­→→]),
+					rule => q(dvadsať[­→→]),
 				},
 				'30' => {
 					base_value => q(30),
 					divisor => q(10),
-					rule => q(trisať[­→→]),
+					rule => q(tridsať[­→→]),
 				},
 				'40' => {
 					base_value => q(40),
@@ -310,62 +271,22 @@ has 'algorithmic_number_format_data' => (
 				'1000000' => {
 					base_value => q(1000000),
 					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← milión[ →→]),
-				},
-				'2000000' => {
-					base_value => q(2000000),
-					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← milióny[ →→]),
-				},
-				'5000000' => {
-					base_value => q(5000000),
-					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← miliónov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{milión}few{milióny}other{miliónov})$[ →→]),
 				},
 				'1000000000' => {
 					base_value => q(1000000000),
 					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliarda[ →→]),
-				},
-				'2000000000' => {
-					base_value => q(2000000000),
-					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliardy[ →→]),
-				},
-				'5000000000' => {
-					base_value => q(5000000000),
-					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliardov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{miliarda}few{miliardy}other{miliardov})$[ →→]),
 				},
 				'1000000000000' => {
 					base_value => q(1000000000000),
 					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← bilión[ →→]),
-				},
-				'2000000000000' => {
-					base_value => q(2000000000000),
-					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← bilióny[ →→]),
-				},
-				'5000000000000' => {
-					base_value => q(5000000000000),
-					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliónov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{bilión}few{bilióny}other{biliónov})$[ →→]),
 				},
 				'1000000000000000' => {
 					base_value => q(1000000000000000),
 					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliarda[ →→]),
-				},
-				'2000000000000000' => {
-					base_value => q(2000000000000000),
-					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliardy[ →→]),
-				},
-				'5000000000000000' => {
-					base_value => q(5000000000000000),
-					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliardov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{biliarda}few{biliardy}other{biliardov})$[ →→]),
 				},
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
@@ -383,7 +304,7 @@ has 'algorithmic_number_format_data' => (
 			'public' => {
 				'-x' => {
 					divisor => q(1),
-					rule => q(minus →→),
+					rule => q(mínus →→),
 				},
 				'0' => {
 					base_value => q(0),
@@ -412,12 +333,12 @@ has 'algorithmic_number_format_data' => (
 				'20' => {
 					base_value => q(20),
 					divisor => q(10),
-					rule => q(dvasať[­→→]),
+					rule => q(dvadsať[­→→]),
 				},
 				'30' => {
 					base_value => q(30),
 					divisor => q(10),
-					rule => q(trisať[­→→]),
+					rule => q(tridsať[­→→]),
 				},
 				'40' => {
 					base_value => q(40),
@@ -442,62 +363,22 @@ has 'algorithmic_number_format_data' => (
 				'1000000' => {
 					base_value => q(1000000),
 					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← milión[ →→]),
-				},
-				'2000000' => {
-					base_value => q(2000000),
-					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← milióny[ →→]),
-				},
-				'5000000' => {
-					base_value => q(5000000),
-					divisor => q(1000000),
-					rule => q(←%spellout-cardinal-masculine← miliónov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{milión}few{milióny}other{miliónov})$[ →→]),
 				},
 				'1000000000' => {
 					base_value => q(1000000000),
 					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliarda[ →→]),
-				},
-				'2000000000' => {
-					base_value => q(2000000000),
-					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliardy[ →→]),
-				},
-				'5000000000' => {
-					base_value => q(5000000000),
-					divisor => q(1000000000),
-					rule => q(←%spellout-cardinal-masculine← miliardov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{miliarda}few{miliardy}other{miliardov})$[ →→]),
 				},
 				'1000000000000' => {
 					base_value => q(1000000000000),
 					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← bilión[ →→]),
-				},
-				'2000000000000' => {
-					base_value => q(2000000000000),
-					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← bilióny[ →→]),
-				},
-				'5000000000000' => {
-					base_value => q(5000000000000),
-					divisor => q(1000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliónov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{bilión}few{bilióny}other{biliónov})$[ →→]),
 				},
 				'1000000000000000' => {
 					base_value => q(1000000000000000),
 					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliarda[ →→]),
-				},
-				'2000000000000000' => {
-					base_value => q(2000000000000000),
-					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliardy[ →→]),
-				},
-				'5000000000000000' => {
-					base_value => q(5000000000000000),
-					divisor => q(1000000000000000),
-					rule => q(←%spellout-cardinal-masculine← biliardov[ →→]),
+					rule => q(←%spellout-cardinal-masculine← $(cardinal,one{biliarda}few{biliardy}other{biliardov})$[ →→]),
 				},
 				'1000000000000000000' => {
 					base_value => q(1000000000000000000),
@@ -534,11 +415,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -573,7 +454,7 @@ has 'display_name_language' => (
  				'ace' => 'acehčina',
  				'ach' => 'ačoli',
  				'ada' => 'adangme',
- 				'ady' => 'adygčina',
+ 				'ady' => 'adygejčina',
  				'ae' => 'avestčina',
  				'af' => 'afrikánčina',
  				'afh' => 'afrihili',
@@ -590,14 +471,14 @@ has 'display_name_language' => (
  				'ar' => 'arabčina',
  				'ar_001' => 'arabčina (moderná štandardná)',
  				'arc' => 'aramejčina',
- 				'arn' => 'araukánčina',
- 				'arp' => 'arapaho',
+ 				'arn' => 'mapudungun',
+ 				'arp' => 'arapažština',
  				'arw' => 'arawačtina',
  				'as' => 'ásamčina',
  				'asa' => 'asu',
  				'ast' => 'astúrčina',
  				'av' => 'avarčina',
- 				'awa' => 'avadhčina',
+ 				'awa' => 'awadhi',
  				'ay' => 'aymarčina',
  				'az' => 'azerbajdžančina',
  				'az@alt=short' => 'azerbajdžančina',
@@ -616,7 +497,7 @@ has 'display_name_language' => (
  				'bgn' => 'západná balúčtina',
  				'bho' => 'bhódžpurčina',
  				'bi' => 'bislama',
- 				'bik' => 'bikol',
+ 				'bik' => 'bikolčina',
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
@@ -635,8 +516,8 @@ has 'display_name_language' => (
  				'byv' => 'medumba',
  				'ca' => 'katalánčina',
  				'cad' => 'kaddo',
- 				'car' => 'karibský',
- 				'cay' => 'cayuga',
+ 				'car' => 'karibčina',
+ 				'cay' => 'kajugčina',
  				'cch' => 'atsam',
  				'ce' => 'čečenčina',
  				'ceb' => 'cebuánčina',
@@ -644,10 +525,10 @@ has 'display_name_language' => (
  				'ch' => 'čamorčina',
  				'chb' => 'čibča',
  				'chg' => 'čagatajčina',
- 				'chk' => 'truk',
+ 				'chk' => 'chuuk',
  				'chm' => 'marijčina',
  				'chn' => 'činucký žargón',
- 				'cho' => 'čoktavčina',
+ 				'cho' => 'čoktčina',
  				'chp' => 'čipevajčina',
  				'chr' => 'čerokí',
  				'chy' => 'čejenčina',
@@ -655,7 +536,8 @@ has 'display_name_language' => (
  				'co' => 'korzičtina',
  				'cop' => 'koptčina',
  				'cr' => 'krí',
- 				'crh' => 'krymská turečtina',
+ 				'crh' => 'krymská tatárčina',
+ 				'crs' => 'seychelská kreolčina',
  				'cs' => 'čeština',
  				'csb' => 'kašubčina',
  				'cu' => 'cirkevná slovančina',
@@ -669,23 +551,23 @@ has 'display_name_language' => (
  				'de_AT' => 'nemčina (rakúska)',
  				'de_CH' => 'nemčina (švajčiarska spisovná)',
  				'del' => 'delawarčina',
- 				'den' => 'slovančina',
+ 				'den' => 'slavé',
  				'dgr' => 'dogribčina',
- 				'din' => 'dinka',
+ 				'din' => 'dinkčina',
  				'dje' => 'zarma',
  				'doi' => 'dógrí',
  				'dsb' => 'dolnolužická srbčina',
  				'dua' => 'duala',
  				'dum' => 'stredná holandčina',
- 				'dv' => 'divehi',
+ 				'dv' => 'maldivčina',
  				'dyo' => 'jola-fonyi',
  				'dyu' => 'ďula',
- 				'dz' => 'dzongkä',
+ 				'dz' => 'dzongkha',
  				'dzg' => 'dazaga',
  				'ebu' => 'embu',
  				'ee' => 'eweština',
  				'efi' => 'efik',
- 				'egy' => 'staroegyptský',
+ 				'egy' => 'staroegyptčina',
  				'eka' => 'ekadžuk',
  				'el' => 'gréčtina',
  				'elx' => 'elamčina',
@@ -717,10 +599,11 @@ has 'display_name_language' => (
  				'fr' => 'francúzština',
  				'fr_CA' => 'francúzština (kanadská)',
  				'fr_CH' => 'francúzština (švajčiarska)',
+ 				'frc' => 'francúzština (Cajun)',
  				'frm' => 'stredná francúzština',
  				'fro' => 'stará francúzština',
  				'frr' => 'severná frízština',
- 				'frs' => 'východná frízština',
+ 				'frs' => 'východofrízština',
  				'fur' => 'friulčina',
  				'fy' => 'západná frízština',
  				'ga' => 'írčina',
@@ -744,7 +627,7 @@ has 'display_name_language' => (
  				'gu' => 'gudžarátčina',
  				'guz' => 'gusii',
  				'gv' => 'mančina',
- 				'gwi' => 'gwichʼin',
+ 				'gwi' => 'kučinčina',
  				'ha' => 'hauština',
  				'hai' => 'haida',
  				'haw' => 'havajčina',
@@ -752,11 +635,11 @@ has 'display_name_language' => (
  				'hi' => 'hindčina',
  				'hil' => 'hiligajnončina',
  				'hit' => 'chetitčina',
- 				'hmn' => 'hmong',
+ 				'hmn' => 'hmongčina',
  				'ho' => 'hiri motu',
  				'hr' => 'chorvátčina',
  				'hsb' => 'hornolužická srbčina',
- 				'ht' => 'haitčina',
+ 				'ht' => 'haitská kreolčina',
  				'hu' => 'maďarčina',
  				'hup' => 'hupčina',
  				'hy' => 'arménčina',
@@ -767,8 +650,8 @@ has 'display_name_language' => (
  				'id' => 'indonézština',
  				'ie' => 'interlingue',
  				'ig' => 'igboština',
- 				'ii' => 's’čchuanská ioština',
- 				'ik' => 'inupiaq',
+ 				'ii' => 's’čchuanská iovčina',
+ 				'ik' => 'inupik',
  				'ilo' => 'ilokánčina',
  				'inh' => 'inguština',
  				'io' => 'ido',
@@ -814,9 +697,9 @@ has 'display_name_language' => (
  				'kos' => 'kusaie',
  				'kpe' => 'kpelle',
  				'kr' => 'kanurijčina',
- 				'krc' => 'karačajevsko-balkarský jazyk',
+ 				'krc' => 'karačajevsko-balkarčina',
  				'krl' => 'karelčina',
- 				'kru' => 'kurukhčina',
+ 				'kru' => 'kuruchčina',
  				'ks' => 'kašmírčina',
  				'ksb' => 'šambala',
  				'ksf' => 'bafia',
@@ -840,11 +723,12 @@ has 'display_name_language' => (
  				'ln' => 'lingalčina',
  				'lo' => 'laoština',
  				'lol' => 'mongo',
+ 				'lou' => 'kreolčina (Louisiana)',
  				'loz' => 'lozi',
  				'lrc' => 'severné luri',
  				'lt' => 'litovčina',
  				'lu' => 'lubčina (katanžská)',
- 				'lua' => 'luba-luluánčina',
+ 				'lua' => 'lubčina (luluánska)',
  				'lui' => 'luiseňo',
  				'lun' => 'lunda',
  				'luo' => 'luo',
@@ -861,14 +745,14 @@ has 'display_name_language' => (
  				'mde' => 'maba',
  				'mdf' => 'mokšiančina',
  				'mdr' => 'mandarčina',
- 				'men' => 'mendi',
+ 				'men' => 'mendejčina',
  				'mer' => 'meru',
  				'mfe' => 'maurícijská kreolčina',
  				'mg' => 'malgaština',
  				'mga' => 'stredná írčina',
  				'mgh' => 'makua-meetto',
  				'mgo' => 'meta’',
- 				'mh' => 'kajin-majol',
+ 				'mh' => 'marshallčina',
  				'mi' => 'maorijčina',
  				'mic' => 'mikmakčina',
  				'min' => 'minangkabaučina',
@@ -886,16 +770,16 @@ has 'display_name_language' => (
  				'mul' => 'viaceré jazyky',
  				'mus' => 'kríkčina',
  				'mwl' => 'mirandčina',
- 				'mwr' => 'marawari',
+ 				'mwr' => 'marwari',
  				'my' => 'barmčina',
  				'mye' => 'myene',
  				'myv' => 'erzjančina',
  				'mzn' => 'mázandaránčina',
- 				'na' => 'nauru',
+ 				'na' => 'nauruština',
  				'nap' => 'neapolčina',
  				'naq' => 'nama',
- 				'nb' => 'nórčina (bokmål)',
- 				'nd' => 'severné ndebele',
+ 				'nb' => 'nórčina (bokmal)',
+ 				'nd' => 'severná ndebelčina',
  				'nds' => 'dolná nemčina',
  				'nds_NL' => 'dolná saština',
  				'ne' => 'nepálčina',
@@ -915,9 +799,9 @@ has 'display_name_language' => (
  				'nr' => 'južná ndebelčina',
  				'nso' => 'severná sothčina',
  				'nus' => 'nuer',
- 				'nv' => 'navajo',
+ 				'nv' => 'navaho',
  				'nwc' => 'klasická nevárčina',
- 				'ny' => 'čewa',
+ 				'ny' => 'ňandža',
  				'nym' => 'ňamwezi',
  				'nyn' => 'ňankole',
  				'nyo' => 'ňoro',
@@ -927,31 +811,33 @@ has 'display_name_language' => (
  				'om' => 'oromčina',
  				'or' => 'uríjčina',
  				'os' => 'osetčina',
- 				'osa' => 'osagčina',
+ 				'osa' => 'osedžština',
  				'ota' => 'osmanská turečtina',
  				'pa' => 'pandžábčina',
  				'pag' => 'pangasinančina',
  				'pal' => 'pahlaví',
- 				'pam' => 'pampanga',
+ 				'pam' => 'kapampangančina',
  				'pap' => 'papiamento',
  				'pau' => 'palaučina',
+ 				'pcm' => 'nigerijský pidžin',
  				'peo' => 'stará perzština',
  				'phn' => 'feničtina',
  				'pi' => 'pálí',
  				'pl' => 'poľština',
- 				'pon' => 'pohnpeičina',
+ 				'pon' => 'pohnpeiština',
+ 				'prg' => 'pruština',
  				'pro' => 'stará okcitánčina',
  				'ps' => 'paštčina',
  				'pt' => 'portugalčina',
  				'pt_BR' => 'portugalčina (brazílska)',
  				'pt_PT' => 'portugalčina (európska)',
  				'qu' => 'kečuánčina',
- 				'quc' => 'kičé',
+ 				'quc' => 'quiché',
  				'raj' => 'radžastančina',
  				'rap' => 'rapanujčina',
- 				'rar' => 'rarotongan',
+ 				'rar' => 'rarotongská maorijčina',
  				'rm' => 'rétorománčina',
- 				'rn' => 'kirundčina',
+ 				'rn' => 'rundčina',
  				'ro' => 'rumunčina',
  				'ro_MD' => 'moldavčina',
  				'rof' => 'rombo',
@@ -959,10 +845,10 @@ has 'display_name_language' => (
  				'root' => 'koreň',
  				'ru' => 'ruština',
  				'rup' => 'arumunčina',
- 				'rw' => 'kiňarwanda',
+ 				'rw' => 'rwandčina',
  				'rwk' => 'rwa',
  				'sa' => 'sanskrit',
- 				'sad' => 'sandawe',
+ 				'sad' => 'sandaweština',
  				'sah' => 'jakutčina',
  				'sam' => 'samaritánska aramejčina',
  				'saq' => 'samburu',
@@ -974,9 +860,9 @@ has 'display_name_language' => (
  				'scn' => 'sicílčina',
  				'sco' => 'škótčina',
  				'sd' => 'sindhčina',
- 				'sdh' => 'kurdčina (južná)',
- 				'se' => 'lapončina (severná)',
- 				'see' => 'seneca',
+ 				'sdh' => 'južná kurdčina',
+ 				'se' => 'severná saamčina',
+ 				'see' => 'senekčina',
  				'seh' => 'sena',
  				'sel' => 'selkupčina',
  				'ses' => 'koyraboro senni',
@@ -991,18 +877,18 @@ has 'display_name_language' => (
  				'sk' => 'slovenčina',
  				'sl' => 'slovinčina',
  				'sm' => 'samojčina',
- 				'sma' => 'lapončina (južná)',
- 				'smj' => 'lapončina (lulská)',
- 				'smn' => 'lapončina (inarijská)',
- 				'sms' => 'lapončina (skoltská)',
+ 				'sma' => 'južná saamčina',
+ 				'smj' => 'lulská saamčina',
+ 				'smn' => 'inarijská saamčina',
+ 				'sms' => 'skoltská saamčina',
  				'sn' => 'šončina',
  				'snk' => 'soninke',
  				'so' => 'somálčina',
  				'sog' => 'sogdijčina',
  				'sq' => 'albánčina',
  				'sr' => 'srbčina',
- 				'srn' => 'sranan',
- 				'srr' => 'serer',
+ 				'srn' => 'surinamčina',
+ 				'srr' => 'sererčina',
  				'ss' => 'svazijčina',
  				'ssy' => 'saho',
  				'st' => 'južná sothčina',
@@ -1011,36 +897,36 @@ has 'display_name_language' => (
  				'sus' => 'susu',
  				'sux' => 'sumerčina',
  				'sv' => 'švédčina',
- 				'sw' => 'svahilčina',
+ 				'sw' => 'swahilčina',
  				'sw_CD' => 'svahilčina (konžská)',
  				'swb' => 'komorčina',
- 				'syc' => 'klasická sýrčina',
+ 				'syc' => 'sýrčina (klasická)',
  				'syr' => 'sýrčina',
  				'ta' => 'tamilčina',
  				'te' => 'telugčina',
  				'tem' => 'temne',
  				'teo' => 'teso',
- 				'ter' => 'tereno',
- 				'tet' => 'tetum',
+ 				'ter' => 'terêna',
+ 				'tet' => 'tetumčina',
  				'tg' => 'tadžičtina',
  				'th' => 'thajčina',
  				'ti' => 'tigriňa',
  				'tig' => 'tigrejčina',
  				'tiv' => 'tiv',
  				'tk' => 'turkménčina',
- 				'tkl' => 'tokelaučina',
+ 				'tkl' => 'tokelauština',
  				'tl' => 'tagalčina',
  				'tlh' => 'klingónčina',
  				'tli' => 'tlingitčina',
- 				'tmh' => 'tamašek',
+ 				'tmh' => 'tuaregčina',
  				'tn' => 'tswančina',
  				'to' => 'tongčina',
  				'tog' => 'ňasa tonga',
- 				'tpi' => 'tok pisin',
+ 				'tpi' => 'novoguinejský pidžin',
  				'tr' => 'turečtina',
  				'trv' => 'taroko',
- 				'ts' => 'tsonga',
- 				'tsi' => 'tsimshijské jazyky',
+ 				'ts' => 'tsongčina',
+ 				'tsi' => 'cimšjančina',
  				'tt' => 'tatárčina',
  				'tum' => 'tumbuka',
  				'tvl' => 'tuvalčina',
@@ -1048,7 +934,7 @@ has 'display_name_language' => (
  				'twq' => 'tasawaq',
  				'ty' => 'tahitčina',
  				'tyv' => 'tuviančina',
- 				'tzm' => 'tamašek (stredomarocký)',
+ 				'tzm' => 'stredomarocká tuaregčina',
  				'udm' => 'udmurtčina',
  				'ug' => 'ujgurčina',
  				'uga' => 'ugaritčina',
@@ -1065,7 +951,7 @@ has 'display_name_language' => (
  				'vun' => 'vunjo',
  				'wa' => 'valónčina',
  				'wae' => 'walserčina',
- 				'wal' => 'walamo',
+ 				'wal' => 'walamčina',
  				'war' => 'waray',
  				'was' => 'washo',
  				'wbp' => 'warlpiri',
@@ -1084,14 +970,14 @@ has 'display_name_language' => (
  				'zap' => 'zapotéčtina',
  				'zbl' => 'systém Bliss',
  				'zen' => 'zenaga',
- 				'zgh' => 'tamašek (štandardný marocký)',
+ 				'zgh' => 'tuaregčina (štandardná marocká)',
  				'zh' => 'čínština',
  				'zh_Hans' => 'čínština (zjednodušená)',
  				'zh_Hant' => 'čínština (tradičná)',
  				'zu' => 'zuluština',
  				'zun' => 'zuniština',
  				'zxx' => 'bez jazykového obsahu',
- 				'zza' => 'zázá',
+ 				'zza' => 'zaza',
 
 			);
 			if (@_) {
@@ -1126,6 +1012,7 @@ has 'display_name_script' => (
  			'Grek' => 'grécke',
  			'Gujr' => 'gudžarátí',
  			'Guru' => 'gurmukhi',
+ 			'Hanb' => 'čínske a bopomofo',
  			'Hang' => 'hangul',
  			'Hani' => 'čínske',
  			'Hans' => 'zjednodušené',
@@ -1134,6 +1021,8 @@ has 'display_name_script' => (
  			'Hant@alt=stand-alone' => 'čínske tradičné',
  			'Hebr' => 'hebrejské',
  			'Hira' => 'hiragana',
+ 			'Hrkt' => 'kana',
+ 			'Jamo' => 'jamo',
  			'Jpan' => 'japonské',
  			'Kana' => 'katakana',
  			'Khmr' => 'khmérske',
@@ -1156,6 +1045,8 @@ has 'display_name_script' => (
  			'Thaa' => 'tána',
  			'Thai' => 'thajské',
  			'Tibt' => 'tibetské',
+ 			'Zmth' => 'matematický zápis',
+ 			'Zsye' => 'emodži',
  			'Zsym' => 'symboly',
  			'Zxxx' => 'bez zápisu',
  			'Zyyy' => 'všeobecné',
@@ -1206,7 +1097,7 @@ has 'display_name_region' => (
  			'154' => 'severná Európa',
  			'155' => 'západná Európa',
  			'419' => 'Latinská Amerika',
- 			'AC' => 'Ascensión',
+ 			'AC' => 'Ascension',
  			'AD' => 'Andorra',
  			'AE' => 'Spojené arabské emiráty',
  			'AF' => 'Afganistan',
@@ -1221,7 +1112,7 @@ has 'display_name_region' => (
  			'AT' => 'Rakúsko',
  			'AU' => 'Austrália',
  			'AW' => 'Aruba',
- 			'AX' => 'Ålandy',
+ 			'AX' => 'Alandy',
  			'AZ' => 'Azerbajdžan',
  			'BA' => 'Bosna a Hercegovina',
  			'BB' => 'Barbados',
@@ -1246,11 +1137,9 @@ has 'display_name_region' => (
  			'BZ' => 'Belize',
  			'CA' => 'Kanada',
  			'CC' => 'Kokosové ostrovy',
- 			'CD' => 'Kongo - Kinshasa',
- 			'CD@alt=variant' => 'Konžská demokratická republika',
+ 			'CD' => 'Konžská demokratická republika',
  			'CF' => 'Stredoafrická republika',
- 			'CG' => 'Kongo - Brazzaville',
- 			'CG@alt=variant' => 'Konžská republika',
+ 			'CG' => 'Konžská republika',
  			'CH' => 'Švajčiarsko',
  			'CI' => 'Pobrežie Slonoviny',
  			'CK' => 'Cookove ostrovy',
@@ -1265,9 +1154,10 @@ has 'display_name_region' => (
  			'CW' => 'Curaçao',
  			'CX' => 'Vianočný ostrov',
  			'CY' => 'Cyprus',
- 			'CZ' => 'Česká republika',
+ 			'CZ' => 'Česko',
+ 			'CZ@alt=variant' => 'Česká republika',
  			'DE' => 'Nemecko',
- 			'DG' => 'Diego García',
+ 			'DG' => 'Diego Garcia',
  			'DJ' => 'Džibutsko',
  			'DK' => 'Dánsko',
  			'DM' => 'Dominika',
@@ -1282,6 +1172,7 @@ has 'display_name_region' => (
  			'ES' => 'Španielsko',
  			'ET' => 'Etiópia',
  			'EU' => 'Európska únia',
+ 			'EZ' => 'eurozóna',
  			'FI' => 'Fínsko',
  			'FJ' => 'Fidži',
  			'FK' => 'Falklandy',
@@ -1294,7 +1185,7 @@ has 'display_name_region' => (
  			'GB@alt=short' => 'UK',
  			'GD' => 'Grenada',
  			'GE' => 'Gruzínsko',
- 			'GF' => 'Francúzska Guayana',
+ 			'GF' => 'Francúzska Guyana',
  			'GG' => 'Guernsey',
  			'GH' => 'Ghana',
  			'GI' => 'Gibraltár',
@@ -1308,10 +1199,10 @@ has 'display_name_region' => (
  			'GT' => 'Guatemala',
  			'GU' => 'Guam',
  			'GW' => 'Guinea-Bissau',
- 			'GY' => 'Guayana',
+ 			'GY' => 'Guyana',
  			'HK' => 'Hongkong – OAO Číny',
  			'HK@alt=short' => 'Hongkong',
- 			'HM' => 'Heardov ostrov a McDonaldove ostrovy',
+ 			'HM' => 'Heardov ostrov a Macdonaldove ostrovy',
  			'HN' => 'Honduras',
  			'HR' => 'Chorvátsko',
  			'HT' => 'Haiti',
@@ -1357,7 +1248,7 @@ has 'display_name_region' => (
  			'MC' => 'Monako',
  			'MD' => 'Moldavsko',
  			'ME' => 'Čierna Hora',
- 			'MF' => 'Svätý Martin',
+ 			'MF' => 'Svätý Martin (fr.)',
  			'MG' => 'Madagaskar',
  			'MH' => 'Marshallove ostrovy',
  			'MK' => 'Macedónsko',
@@ -1394,7 +1285,7 @@ has 'display_name_region' => (
  			'PA' => 'Panama',
  			'PE' => 'Peru',
  			'PF' => 'Francúzska Polynézia',
- 			'PG' => 'Papua Nová Guinea',
+ 			'PG' => 'Papua-Nová Guinea',
  			'PH' => 'Filipíny',
  			'PK' => 'Pakistan',
  			'PL' => 'Poľsko',
@@ -1402,7 +1293,7 @@ has 'display_name_region' => (
  			'PN' => 'Pitcairnove ostrovy',
  			'PR' => 'Portoriko',
  			'PS' => 'Palestínske územia',
- 			'PS@alt=short' => 'Palestína',
+ 			'PS@alt=short' => 'Palestínska samospráva',
  			'PT' => 'Portugalsko',
  			'PW' => 'Palau',
  			'PY' => 'Paraguaj',
@@ -1431,7 +1322,7 @@ has 'display_name_region' => (
  			'SS' => 'Južný Sudán',
  			'ST' => 'Svätý Tomáš a Princov ostrov',
  			'SV' => 'Salvádor',
- 			'SX' => 'Sint Maarten',
+ 			'SX' => 'Svätý Martin (hol.)',
  			'SY' => 'Sýria',
  			'SZ' => 'Svazijsko',
  			'TA' => 'Tristan da Cunha',
@@ -1454,6 +1345,8 @@ has 'display_name_region' => (
  			'UA' => 'Ukrajina',
  			'UG' => 'Uganda',
  			'UM' => 'Menšie odľahlé ostrovy USA',
+ 			'UN' => 'Organizácia Spojených národov',
+ 			'UN@alt=short' => 'OSN',
  			'US' => 'Spojené štáty',
  			'US@alt=short' => 'USA',
  			'UY' => 'Uruguaj',
@@ -1500,11 +1393,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'kalendár',
+ 			'cf' => 'formát meny',
  			'colalternate' => 'Ignorovať radenie symbolov',
  			'colbackwards' => 'Obrátené radenie akcentov',
  			'colcasefirst' => 'Radenie veľkých a malých písmen',
  			'colcaselevel' => 'Rozlišovanie veľkých a malých písmen pri radení',
- 			'colhiraganaquaternary' => 'Radenie podľa slabičných písiem (kana)',
  			'collation' => 'zoradenie',
  			'colnormalization' => 'Normalizované radenie',
  			'colnumeric' => 'Číselné radenie',
@@ -1516,7 +1409,6 @@ has 'display_name_key' => (
  			'numbers' => 'čísla',
  			'timezone' => 'Časové pásmo',
  			'va' => 'Variant miestneho nastavenia',
- 			'variabletop' => 'Radiť ako symboly',
  			'x' => 'Súkromné použitie',
 
 		}
@@ -1541,10 +1433,15 @@ has 'display_name_type' => (
  				'indian' => q{Indický národný kalendár},
  				'islamic' => q{islamský kalendár},
  				'islamic-civil' => q{Islamský občiansky kalendár},
+ 				'islamic-umalqura' => q{islamský kalendár (Umm al-Qura)},
  				'iso8601' => q{kalendár ISO 8601},
  				'japanese' => q{japonský kalendár},
  				'persian' => q{perzský kalendár},
  				'roc' => q{čínsky republikánsky kalendár},
+ 			},
+ 			'cf' => {
+ 				'account' => q{účtovný formát meny},
+ 				'standard' => q{štandardný formát meny},
  			},
  			'colalternate' => {
  				'non-ignorable' => q{Radiť symboly},
@@ -1563,14 +1460,12 @@ has 'display_name_type' => (
  				'no' => q{Pri radení nerozlišovať veľké a malé písmená},
  				'yes' => q{Pri radení rozlišovať veľké a malé písmená},
  			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{Radiť slabičné písma (kana) samostatne},
- 				'yes' => q{Radiť slabičné písma (kana) inak},
- 			},
  			'collation' => {
  				'big5han' => q{Tradičný čínsky Big5},
+ 				'compat' => q{predchádzajúce zoradenie, kompatibilita},
  				'dictionary' => q{Usporiadanie slovníka},
  				'ducet' => q{predvolené zoradenie unicode},
+ 				'eor' => q{európske zoradenie},
  				'gb2312han' => q{Zjednodušený čínsky GB2312},
  				'phonebook' => q{Lexikografické triedenie},
  				'phonetic' => q{Fonetické radenie},
@@ -1598,6 +1493,11 @@ has 'display_name_type' => (
  				'secondary' => q{Radiť akcenty},
  				'tertiary' => q{Radiť akcenty/veľké a malé písmená/šírku},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{celá šírka},
+ 				'hwidth' => q{polovičná šírka},
+ 				'npinyin' => q{Číslice},
+ 			},
  			'hc' => {
  				'h11' => q{12-hodinový cyklus (0 – 11)},
  				'h12' => q{12-hodinový cyklus (1 – 12)},
@@ -1608,6 +1508,10 @@ has 'display_name_type' => (
  				'loose' => q{voľný štýl koncov riadka},
  				'normal' => q{bežný štýl koncov riadka},
  				'strict' => q{presný štýl koncov riadka},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{americká transliterácia BGN},
+ 				'ungegn' => q{medzinárodná transliterácia GEGN},
  			},
  			'ms' => {
  				'metric' => q{metrická sústava},
@@ -1675,27 +1579,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN',
- 			'numeric' => 'Číslice',
- 			'tone' => 'Tón',
- 			'ungegn' => 'UNGEGN',
- 			'x-accents' => 'Diakritika',
- 			'x-fullwidth' => 'Celá šírka',
- 			'x-halfwidth' => 'Polovičná šírka',
- 			'x-jamo' => 'Jamo',
- 			'x-pinyin' => 'Pinyin',
- 			'x-publishing' => 'Uverejnenie',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1719,10 +1602,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[à ă â å ā æ ç è ĕ ê ë ē ì ĭ î ï ī ñ ò ŏ ö ø ō œ ř ù ŭ û ü ū ÿ])},
+			auxiliary => qr{[à ă â å ā æ ç è ĕ ê ë ē ì ĭ î ï ī ñ ò ŏ ö ø ō œ ř ù ŭ û ü ū ÿ]},
 			index => ['A', 'Ä', 'B', 'C', 'Č', 'D', 'Ď', 'E', 'F', 'G', 'H', '{CH}', 'I', 'J', 'K', 'L', 'Ľ', 'M', 'N', 'O', 'Ô', 'P', 'Q', 'R', 'S', 'Š', 'T', 'Ť', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{(?^u:[a á ä b c č d ď e é f g h {ch} i í j k l ĺ ľ m n ň o ó ô p q r ŕ s š t ť u ú v w x y ý z ž])},
-			punctuation => qr{(?^u:[\- ‐ – , ; \: ! ? . … ‘ ‚ “ „ ( ) \[ \] § @ * / \&])},
+			main => qr{[a á ä b c č d ď e é f g h {ch} i í j k l ĺ ľ m n ň o ó ô p q r ŕ s š t ť u ú v w x y ý z ž]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – , ; \: ! ? . … ‘ ‚ “ „ ( ) \[ \] § @ * / \&]},
 		};
 	},
 EOT
@@ -2043,12 +1927,20 @@ has 'units' => (
 						'other' => q({0} galónov),
 						'per' => q({0} na galón),
 					},
+					'gallon-imperial' => {
+						'few' => q({0} britské galóny),
+						'many' => q({0} britského galónu),
+						'name' => q(britské galóny),
+						'one' => q({0} britský galón),
+						'other' => q({0} britských galónov),
+						'per' => q({0} na britský galón),
+					},
 					'generic' => {
-						'few' => q({0} °),
-						'many' => q({0} °),
-						'name' => q(°),
-						'one' => q({0} °),
-						'other' => q({0} °),
+						'few' => q({0} stupne),
+						'many' => q({0} stupňa),
+						'name' => q(stupne),
+						'one' => q({0} stupeň),
+						'other' => q({0} stupňov),
 					},
 					'gigabit' => {
 						'few' => q({0} gigabity),
@@ -2379,6 +2271,13 @@ has 'units' => (
 						'one' => q({0} míľa na galón),
 						'other' => q({0} míľ na galón),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} míle na britský galón),
+						'many' => q({0} míle na britský galón),
+						'name' => q(míle na britský galón),
+						'one' => q({0} míľa na britský galón),
+						'other' => q({0} míľ na britský galón),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} míle za hodinu),
 						'many' => q({0} míle za hodinu),
@@ -2414,6 +2313,13 @@ has 'units' => (
 						'one' => q({0} miligram),
 						'other' => q({0} miligramov),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} miligramy na deciliter),
+						'many' => q({0} miligramu na deciliter),
+						'name' => q(miligramy na deciliter),
+						'one' => q({0} miligram na deciliter),
+						'other' => q({0} miligramov na deciliter),
+					},
 					'milliliter' => {
 						'few' => q({0} mililitre),
 						'many' => q({0} mililitra),
@@ -2434,6 +2340,13 @@ has 'units' => (
 						'name' => q(milimetre ortuťového stĺpca),
 						'one' => q({0} milimeter ortuťového stĺpca),
 						'other' => q({0} milimetrov ortuťového stĺpca),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} milimoly na liter),
+						'many' => q({0} milimolu na liter),
+						'name' => q(milimoly na liter),
+						'one' => q({0} milimol na liter),
+						'other' => q({0} milimolov na liter),
 					},
 					'millisecond' => {
 						'few' => q({0} milisekundy),
@@ -2515,8 +2428,15 @@ has 'units' => (
 						'one' => q({0} parsek),
 						'other' => q({0} parsekov),
 					},
+					'part-per-million' => {
+						'few' => q({0} milióntiny),
+						'many' => q({0} milióntiny),
+						'name' => q(milióntiny),
+						'one' => q({0} milióntina),
+						'other' => q({0} milióntin),
+					},
 					'per' => {
-						'1' => q({0} za {1}),
+						'1' => q({0}/{1}),
 					},
 					'picometer' => {
 						'few' => q({0} pikometre),
@@ -2538,6 +2458,13 @@ has 'units' => (
 						'name' => q(metrické pinty),
 						'one' => q({0} metrická pinta),
 						'other' => q({0} metrických pínt),
+					},
+					'point' => {
+						'few' => q({0} body),
+						'many' => q({0} bodu),
+						'name' => q(body),
+						'one' => q({0} bod),
+						'other' => q({0} bodov),
 					},
 					'pound' => {
 						'few' => q({0} libry),
@@ -2584,12 +2511,12 @@ has 'units' => (
 						'per' => q({0} za sekundu),
 					},
 					'square-centimeter' => {
-						'few' => q({0} štvorcové centimetre),
-						'many' => q({0} štvorcového centimetra),
+						'few' => q({0} centimetre štvorcové),
+						'many' => q({0} centimetra štvorcového),
 						'name' => q(štvorcové centimetre),
-						'one' => q({0} štvorcový centimeter),
-						'other' => q({0} štvorcových centimetrov),
-						'per' => q({0} na štvorcový centimeter),
+						'one' => q({0} centimeter štvorcový),
+						'other' => q({0} centimetrov štvorcových),
+						'per' => q({0} na centimeter štvorcový),
 					},
 					'square-foot' => {
 						'few' => q({0} štvorcové stopy),
@@ -2612,6 +2539,7 @@ has 'units' => (
 						'name' => q(štvorcové kilometre),
 						'one' => q({0} kilometer štvorcový),
 						'other' => q({0} kilometrov štvorcových),
+						'per' => q({0} na kilometer štvorcový),
 					},
 					'square-meter' => {
 						'few' => q({0} metre štvorcové),
@@ -2627,6 +2555,7 @@ has 'units' => (
 						'name' => q(štvorcové míle),
 						'one' => q({0} míľa štvorcová),
 						'other' => q({0} míľ štvorcových),
+						'per' => q({0} na míľu štvorcovú),
 					},
 					'square-yard' => {
 						'few' => q({0} štvorcové yardy),
@@ -2634,6 +2563,13 @@ has 'units' => (
 						'name' => q(štvorcové yardy),
 						'one' => q({0} štvorcový yard),
 						'other' => q({0} štvorcových yardov),
+					},
+					'stone' => {
+						'few' => q({0} kamene),
+						'many' => q({0} kameňa),
+						'name' => q(kamene),
+						'one' => q({0} kameň),
+						'other' => q({0} kameňov),
 					},
 					'tablespoon' => {
 						'few' => q({0} polievkové lyžice),
@@ -2755,6 +2691,7 @@ has 'units' => (
 					'carat' => {
 						'few' => q({0} ct),
 						'many' => q({0} ct),
+						'name' => q(ct),
 						'one' => q({0} ct),
 						'other' => q({0} ct),
 					},
@@ -2777,6 +2714,14 @@ has 'units' => (
 						'name' => q(cm),
 						'one' => q({0} cm),
 						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					'century' => {
+						'few' => q({0} stor.),
+						'many' => q({0} stor.),
+						'name' => q(stor.),
+						'one' => q({0} stor.),
+						'other' => q({0} stor.),
 					},
 					'coordinate' => {
 						'east' => q({0} E),
@@ -2838,6 +2783,7 @@ has 'units' => (
 						'name' => q(d.),
 						'one' => q({0} d.),
 						'other' => q({0} d.),
+						'per' => q({0}/d.),
 					},
 					'deciliter' => {
 						'few' => q({0} dl),
@@ -2859,10 +2805,11 @@ has 'units' => (
 						'other' => q({0}°),
 					},
 					'fahrenheit' => {
-						'few' => q({0}°F),
-						'many' => q({0}°F),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
+						'few' => q({0} °F),
+						'many' => q({0} °F),
+						'name' => q(°F),
+						'one' => q({0} °F),
+						'other' => q({0} °F),
 					},
 					'fluid-ounce' => {
 						'few' => q({0} fl oz),
@@ -2873,12 +2820,15 @@ has 'units' => (
 					'foot' => {
 						'few' => q({0}′),
 						'many' => q({0}′),
+						'name' => q(ft),
 						'one' => q({0}′),
 						'other' => q({0}′),
+						'per' => q({0}/ft),
 					},
 					'g-force' => {
 						'few' => q({0}G),
 						'many' => q({0}G),
+						'name' => q(G),
 						'one' => q({0}G),
 						'other' => q({0}G),
 					},
@@ -2888,12 +2838,20 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 					},
+					'generic' => {
+						'few' => q({0} °),
+						'many' => q({0} °),
+						'name' => q(°),
+						'one' => q({0} °),
+						'other' => q({0} °),
+					},
 					'gram' => {
 						'few' => q({0} g),
 						'many' => q({0} g),
 						'name' => q(g),
 						'one' => q({0} g),
 						'other' => q({0} g),
+						'per' => q({0}/g),
 					},
 					'hectare' => {
 						'few' => q({0}ha),
@@ -2908,10 +2866,11 @@ has 'units' => (
 						'other' => q({0} hl),
 					},
 					'hectopascal' => {
-						'few' => q({0}hPa),
-						'many' => q({0}hPa),
-						'one' => q({0}hPa),
-						'other' => q({0}hPa),
+						'few' => q({0} hPa),
+						'many' => q({0} hPa),
+						'name' => q(hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
 					},
 					'horsepower' => {
 						'few' => q({0}hp),
@@ -2925,16 +2884,20 @@ has 'units' => (
 						'name' => q(h),
 						'one' => q({0} h),
 						'other' => q({0} h),
+						'per' => q({0}/h),
 					},
 					'inch' => {
-						'few' => q({0}in),
-						'many' => q({0}in),
-						'one' => q({0}in),
-						'other' => q({0}in),
+						'few' => q({0}″),
+						'many' => q({0}″),
+						'name' => q(in),
+						'one' => q({0}″),
+						'other' => q({0}″),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
 						'few' => q({0}" Hg),
 						'many' => q({0}" Hg),
+						'name' => q(inHg),
 						'one' => q({0}" Hg),
 						'other' => q({0}" Hg),
 					},
@@ -2947,6 +2910,7 @@ has 'units' => (
 					'kelvin' => {
 						'few' => q({0} K),
 						'many' => q({0} K),
+						'name' => q(K),
 						'one' => q({0} K),
 						'other' => q({0} K),
 					},
@@ -2956,6 +2920,7 @@ has 'units' => (
 						'name' => q(kg),
 						'one' => q({0} kg),
 						'other' => q({0} kg),
+						'per' => q({0}/kg),
 					},
 					'kilometer' => {
 						'few' => q({0} km),
@@ -2963,6 +2928,7 @@ has 'units' => (
 						'name' => q(km),
 						'one' => q({0} km),
 						'other' => q({0} km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'few' => q({0} km/h),
@@ -2977,11 +2943,19 @@ has 'units' => (
 						'one' => q({0}kW),
 						'other' => q({0}kW),
 					},
+					'knot' => {
+						'few' => q({0} kn),
+						'many' => q({0} kn),
+						'name' => q(kn),
+						'one' => q({0} kn),
+						'other' => q({0} kn),
+					},
 					'light-year' => {
-						'few' => q({0}ly),
-						'many' => q({0}ly),
-						'one' => q({0}ly),
-						'other' => q({0}ly),
+						'few' => q({0} ly),
+						'many' => q({0} ly),
+						'name' => q(ly),
+						'one' => q({0} ly),
+						'other' => q({0} ly),
 					},
 					'liter' => {
 						'few' => q({0} l),
@@ -3027,28 +3001,33 @@ has 'units' => (
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
-						'few' => q({0}m/s),
-						'many' => q({0}m/s),
-						'one' => q({0}m/s),
-						'other' => q({0}m/s),
+						'few' => q({0} m/s),
+						'many' => q({0} m/s),
+						'name' => q(m/s),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
 					},
 					'meter-per-second-squared' => {
 						'few' => q({0} m/s²),
 						'many' => q({0} m/s²),
+						'name' => q(m/s²),
 						'one' => q({0} m/s²),
 						'other' => q({0} m/s²),
 					},
 					'metric-ton' => {
 						'few' => q({0} t),
 						'many' => q({0} t),
+						'name' => q(t),
 						'one' => q({0} t),
 						'other' => q({0} t),
 					},
 					'microgram' => {
 						'few' => q({0} µg),
 						'many' => q({0} µg),
+						'name' => q(µg),
 						'one' => q({0} µg),
 						'other' => q({0} µg),
 					},
@@ -3062,14 +3041,16 @@ has 'units' => (
 					'microsecond' => {
 						'few' => q({0} μs),
 						'many' => q({0} μs),
+						'name' => q(μs),
 						'one' => q({0} μs),
 						'other' => q({0} μs),
 					},
 					'mile' => {
-						'few' => q({0}mi),
-						'many' => q({0}mi),
-						'one' => q({0}mi),
-						'other' => q({0}mi),
+						'few' => q({0} mi),
+						'many' => q({0} mi),
+						'name' => q(mi),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
 					},
 					'mile-per-gallon' => {
 						'few' => q({0} mpg),
@@ -3078,20 +3059,30 @@ has 'units' => (
 						'other' => q({0} mpg),
 					},
 					'mile-per-hour' => {
-						'few' => q({0}mph),
-						'many' => q({0}mph),
-						'one' => q({0}mph),
-						'other' => q({0}mph),
+						'few' => q({0} mi/h),
+						'many' => q({0} mi/h),
+						'name' => q(mi/h),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					'mile-scandinavian' => {
+						'few' => q({0} ŠM),
+						'many' => q({0} ŠM),
+						'name' => q(ŠM),
+						'one' => q({0} ŠM),
+						'other' => q({0} ŠM),
 					},
 					'millibar' => {
-						'few' => q({0}mb),
-						'many' => q({0}mb),
-						'one' => q({0}mb),
-						'other' => q({0}mb),
+						'few' => q({0} mb),
+						'many' => q({0} mb),
+						'name' => q(mbar),
+						'one' => q({0} mb),
+						'other' => q({0} mb),
 					},
 					'milligram' => {
 						'few' => q({0} mg),
 						'many' => q({0} mg),
+						'name' => q(mg),
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
@@ -3107,6 +3098,13 @@ has 'units' => (
 						'name' => q(mm),
 						'one' => q({0} mm),
 						'other' => q({0} mm),
+					},
+					'millimeter-of-mercury' => {
+						'few' => q({0} mm Hg),
+						'many' => q({0} mm Hg),
+						'name' => q(mm Hg),
+						'one' => q({0} mm Hg),
+						'other' => q({0} mm Hg),
 					},
 					'millisecond' => {
 						'few' => q({0} ms),
@@ -3127,6 +3125,7 @@ has 'units' => (
 						'name' => q(min),
 						'one' => q({0} min),
 						'other' => q({0} min),
+						'per' => q({0}/min),
 					},
 					'month' => {
 						'few' => q({0} m.),
@@ -3134,6 +3133,7 @@ has 'units' => (
 						'name' => q(m.),
 						'one' => q({0} m.),
 						'other' => q({0} m.),
+						'per' => q({0}/m.),
 					},
 					'nanometer' => {
 						'few' => q({0} nm),
@@ -3145,29 +3145,48 @@ has 'units' => (
 					'nanosecond' => {
 						'few' => q({0} ns),
 						'many' => q({0} ns),
+						'name' => q(ns),
 						'one' => q({0} ns),
 						'other' => q({0} ns),
 					},
+					'nautical-mile' => {
+						'few' => q({0} NM),
+						'many' => q({0} NM),
+						'name' => q(NM),
+						'one' => q({0} NM),
+						'other' => q({0} NM),
+					},
 					'ounce' => {
-						'few' => q({0}oz),
-						'many' => q({0}oz),
-						'one' => q({0}oz),
-						'other' => q({0}oz),
+						'few' => q({0} oz),
+						'many' => q({0} oz),
+						'name' => q(oz),
+						'one' => q({0} oz),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
 					},
 					'ounce-troy' => {
 						'few' => q({0} oz t),
 						'many' => q({0} oz t),
+						'name' => q(oz t),
 						'one' => q({0} oz t),
 						'other' => q({0} oz t),
+					},
+					'parsec' => {
+						'few' => q({0} pc),
+						'many' => q({0} pc),
+						'name' => q(pc),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
 					'picometer' => {
-						'few' => q({0}pm),
-						'many' => q({0}pm),
-						'one' => q({0}pm),
-						'other' => q({0}pm),
+						'few' => q({0} pm),
+						'many' => q({0} pm),
+						'name' => q(pm),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
 					},
 					'pint' => {
 						'few' => q({0} pt),
@@ -3175,11 +3194,27 @@ has 'units' => (
 						'one' => q({0} pt),
 						'other' => q({0} pt),
 					},
+					'point' => {
+						'few' => q({0} pt),
+						'many' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+					},
 					'pound' => {
-						'few' => q({0}lb),
-						'many' => q({0}lb),
-						'one' => q({0}lb),
-						'other' => q({0}lb),
+						'few' => q({0} lb),
+						'many' => q({0} lb),
+						'name' => q(lb),
+						'one' => q({0} lb),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					'pound-per-square-inch' => {
+						'few' => q({0} psi),
+						'many' => q({0} psi),
+						'name' => q(psi),
+						'one' => q({0} psi),
+						'other' => q({0} psi),
 					},
 					'quart' => {
 						'few' => q({0} qt),
@@ -3199,6 +3234,7 @@ has 'units' => (
 						'name' => q(s),
 						'one' => q({0} s),
 						'other' => q({0} s),
+						'per' => q({0}/s),
 					},
 					'square-centimeter' => {
 						'few' => q({0} cm²),
@@ -3242,6 +3278,13 @@ has 'units' => (
 						'one' => q({0} yd²),
 						'other' => q({0} yd²),
 					},
+					'stone' => {
+						'few' => q({0} st),
+						'many' => q({0} st),
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
+					},
 					'tablespoon' => {
 						'few' => q({0} tbsp),
 						'many' => q({0} tbsp),
@@ -3257,6 +3300,7 @@ has 'units' => (
 					'ton' => {
 						'few' => q({0} to),
 						'many' => q({0} to),
+						'name' => q(to),
 						'one' => q({0} to),
 						'other' => q({0} to),
 					},
@@ -3272,12 +3316,14 @@ has 'units' => (
 						'name' => q(t.),
 						'one' => q({0} t.),
 						'other' => q({0} t.),
+						'per' => q({0}/t.),
 					},
 					'yard' => {
-						'few' => q({0}yd),
-						'many' => q({0}yd),
-						'one' => q({0}yd),
-						'other' => q({0}yd),
+						'few' => q({0} yd),
+						'many' => q({0} yd),
+						'name' => q(yd),
+						'one' => q({0} yd),
+						'other' => q({0} yd),
 					},
 					'year' => {
 						'few' => q({0} r.),
@@ -3285,6 +3331,7 @@ has 'units' => (
 						'name' => q(r.),
 						'one' => q({0} r.),
 						'other' => q({0} r.),
+						'per' => q({0}/r.),
 					},
 				},
 				'short' => {
@@ -3530,6 +3577,14 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'few' => q({0} brit. gal.),
+						'many' => q({0} brit. gal.),
+						'name' => q(brit. gal.),
+						'one' => q({0} brit. gal.),
+						'other' => q({0} brit. gal.),
+						'per' => q({0}/brit. gal.),
 					},
 					'generic' => {
 						'few' => q({0} °),
@@ -3867,6 +3922,13 @@ has 'units' => (
 						'one' => q({0} mpg),
 						'other' => q({0} mpg),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mpg brit.),
+						'many' => q({0} mpg brit.),
+						'name' => q(mpg brit.),
+						'one' => q({0} mpg brit.),
+						'other' => q({0} mpg brit.),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} mi/h),
 						'many' => q({0} mi/h),
@@ -3902,6 +3964,13 @@ has 'units' => (
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mg/dl),
+						'many' => q({0} mg/dl),
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
 					'milliliter' => {
 						'few' => q({0} ml),
 						'many' => q({0} ml),
@@ -3922,6 +3991,13 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} mmol/l),
+						'many' => q({0} mmol/l),
+						'name' => q(mmol/l),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
 					},
 					'millisecond' => {
 						'few' => q({0} ms),
@@ -4003,6 +4079,13 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'few' => q({0} ppm),
+						'many' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -4026,6 +4109,13 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'few' => q({0} pt),
+						'many' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'few' => q({0} lb),
@@ -4100,6 +4190,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'few' => q({0} m²),
@@ -4115,6 +4206,7 @@ has 'units' => (
 						'name' => q(mi²),
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'few' => q({0} yd²),
@@ -4122,6 +4214,13 @@ has 'units' => (
 						'name' => q(yd²),
 						'one' => q({0} yd²),
 						'other' => q({0} yd²),
+					},
+					'stone' => {
+						'few' => q({0} st),
+						'many' => q({0} st),
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
 					},
 					'tablespoon' => {
 						'few' => q({0} tbsp),
@@ -4253,7 +4352,7 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
+			'exponential' => q(e),
 			'group' => q( ),
 			'infinity' => q(∞),
 			'list' => q(;),
@@ -4348,7 +4447,7 @@ has 'number_formats' => (
 					'other' => '000 bil'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -4503,14 +4602,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -4544,8 +4643,13 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'ADP' => {
+			symbol => 'ADP',
 			display_name => {
-				'currency' => q(andorská peseta),
+				'currency' => q(andorrská peseta),
+				'few' => q(andorrské pesety),
+				'many' => q(andorrskej pesety),
+				'one' => q(andorrská peseta),
+				'other' => q(andorrských pesiet),
 			},
 		},
 		'AED' => {
@@ -4558,6 +4662,16 @@ has 'currencies' => (
 				'other' => q(SAE dirhamov),
 			},
 		},
+		'AFA' => {
+			symbol => 'AFA',
+			display_name => {
+				'currency' => q(afganský afgání \(1927 – 2002\)),
+				'few' => q(afganské afgání \(1927 – 2002\)),
+				'many' => q(afganského afgání \(1927 – 2002\)),
+				'one' => q(afganský afgání \(1927 – 2002\)),
+				'other' => q(afganských afgání \(1927 – 2002\)),
+			},
+		},
 		'AFN' => {
 			symbol => 'AFN',
 			display_name => {
@@ -4566,6 +4680,16 @@ has 'currencies' => (
 				'many' => q(afganského afgání),
 				'one' => q(afganský afgání),
 				'other' => q(afganských afgání),
+			},
+		},
+		'ALK' => {
+			symbol => 'ALK',
+			display_name => {
+				'currency' => q(albánsky lek \(1946 – 1965\)),
+				'few' => q(albánske leky \(1946 – 1965\)),
+				'many' => q(albánskeho leku \(1946 – 1965\)),
+				'one' => q(albánsky lek \(1946 – 1965\)),
+				'other' => q(albánskych lekov \(1946 – 1965\)),
 			},
 		},
 		'ALL' => {
@@ -4609,28 +4733,73 @@ has 'currencies' => (
 			},
 		},
 		'AOK' => {
+			symbol => 'AOK',
 			display_name => {
-				'currency' => q(angolská kwanza \(1977–1990\)),
+				'currency' => q(angolská kwanza \(1977 – 1990\)),
+				'few' => q(angolské kwanzy \(1977 – 1990\)),
+				'many' => q(angolskej kwanzy \(1977 – 1990\)),
+				'one' => q(angolská kwanza \(1977 – 1990\)),
+				'other' => q(angolských kwánz \(1977 – 1990\)),
 			},
 		},
 		'AON' => {
+			symbol => 'AON',
 			display_name => {
-				'currency' => q(Angolská nová kwanza \(1990–2000\)),
+				'currency' => q(angolská nová kwanza \(1990 – 2000\)),
+				'few' => q(angolské nové kwanzy \(1990 – 2000\)),
+				'many' => q(angolskej novej kwanzy \(1990 – 2000\)),
+				'one' => q(angolská nová kwanza \(1990 – 2000\)),
+				'other' => q(angolských nových kwánz \(1990 – 2000\)),
 			},
 		},
 		'AOR' => {
+			symbol => 'AOR',
 			display_name => {
-				'currency' => q(angolská kwanza reajustado \(1995–1999\)),
+				'currency' => q(angolská upravená kwanza \(1995 – 1999\)),
+				'few' => q(angolské upravené kwanzy \(1995 – 1999\)),
+				'many' => q(angolskej upravenej kwanzy \(1995 – 1999\)),
+				'one' => q(angolská upravená kwanza \(1995 – 1999\)),
+				'other' => q(angolských upravených kwánz \(1995 – 1999\)),
 			},
 		},
 		'ARA' => {
+			symbol => 'ARA',
 			display_name => {
 				'currency' => q(argentínsky austral),
+				'few' => q(argentínske australy),
+				'many' => q(argentínskeho australu),
+				'one' => q(argentínsky austral),
+				'other' => q(argentínskych australov),
+			},
+		},
+		'ARL' => {
+			symbol => 'ARL',
+			display_name => {
+				'currency' => q(argentínske peso ley \(1970 – 1983\)),
+				'few' => q(argentínske pesos ley \(1970 – 1983\)),
+				'many' => q(argentínskeho pesa ley \(1970 – 1983\)),
+				'one' => q(argentínske peso ley \(1970 – 1983\)),
+				'other' => q(argentínskych pesos ley \(1970 – 1983\)),
+			},
+		},
+		'ARM' => {
+			symbol => 'ARM',
+			display_name => {
+				'currency' => q(argentínske peso \(1881 – 1970\)),
+				'few' => q(argentínske pesos \(1881 – 1970\)),
+				'many' => q(argentínskeho pesa \(1881 – 1970\)),
+				'one' => q(argentínske peso \(1881 – 1970\)),
+				'other' => q(argentínskych pesos \(1881 – 1970\)),
 			},
 		},
 		'ARP' => {
+			symbol => 'ARP',
 			display_name => {
 				'currency' => q(argentínske peso \(1983 – 1985\)),
+				'few' => q(argentínske pesos \(1983 – 1985\)),
+				'many' => q(argentínskeho pesa \(1983 – 1985\)),
+				'one' => q(argentínske peso \(1983 – 1985\)),
+				'other' => q(argentínskych pesos \(1983 – 1985\)),
 			},
 		},
 		'ARS' => {
@@ -4644,8 +4813,13 @@ has 'currencies' => (
 			},
 		},
 		'ATS' => {
+			symbol => 'ATS',
 			display_name => {
 				'currency' => q(rakúsky šiling),
+				'few' => q(rakúske šilingy),
+				'many' => q(rakúskeho šilingu),
+				'one' => q(rakúsky šiling),
+				'other' => q(rakúskych šilingov),
 			},
 		},
 		'AUD' => {
@@ -4689,18 +4863,33 @@ has 'currencies' => (
 			},
 		},
 		'BAD' => {
+			symbol => 'BAD',
 			display_name => {
-				'currency' => q(bosniansko-hercegovinský dinár \(1992–1994\)),
+				'currency' => q(bosniansko-hercegovinský dinár \(1992 – 1994\)),
+				'few' => q(bosniansko-hercegovinské dináre \(1992 – 1994\)),
+				'many' => q(bosniansko-hercegovinského dinára \(1992 – 1994\)),
+				'one' => q(bosniansko-hercegovinský dinár \(1992 – 1994\)),
+				'other' => q(bosniansko-hercegovinských dinárov \(1992 – 1994\)),
 			},
 		},
 		'BAM' => {
 			symbol => 'BAM',
 			display_name => {
-				'currency' => q(konvertibilná marka),
-				'few' => q(konvertibilné marky),
-				'many' => q(konvertibilnej marky),
-				'one' => q(konvertibilná marka),
-				'other' => q(konvertibilných mariek),
+				'currency' => q(bosniansko-hercegovinská konvertibilná marka),
+				'few' => q(bosniansko-hercegovinské konvertibilné marky),
+				'many' => q(bosniansko-hercegovinskej konvertibilnej marky),
+				'one' => q(bosniansko-hercegovinská konvertibilná marka),
+				'other' => q(bosniansko-hercegovinských konvertibilných mariek),
+			},
+		},
+		'BAN' => {
+			symbol => 'BAN',
+			display_name => {
+				'currency' => q(bosniansko-hercegovinský nový dinár \(1994 – 1997\)),
+				'few' => q(bosniansko-hercegovinské nové dináre \(1994 – 1997\)),
+				'many' => q(bosniansko-hercegovinského nového dinára \(1994 – 1997\)),
+				'one' => q(bosniansko-hercegovinský nový dinár \(1994 – 1997\)),
+				'other' => q(bosniansko-hercegovinské nové dináre \(1994 – 1997\)),
 			},
 		},
 		'BBD' => {
@@ -4724,23 +4913,53 @@ has 'currencies' => (
 			},
 		},
 		'BEC' => {
+			symbol => 'BEC',
 			display_name => {
 				'currency' => q(belgický frank \(konvertibilný\)),
+				'few' => q(belgické franky \(konvertibilné\)),
+				'many' => q(belgického franku \(konvertibilného\)),
+				'one' => q(belgický frank \(konvertibilný\)),
+				'other' => q(belgických frankov \(konvertibilných\)),
 			},
 		},
 		'BEF' => {
+			symbol => 'BEF',
 			display_name => {
 				'currency' => q(belgický frank),
+				'few' => q(belgické franky),
+				'many' => q(belgického franku),
+				'one' => q(belgický frank),
+				'other' => q(belgických frankov),
 			},
 		},
 		'BEL' => {
+			symbol => 'BEL',
 			display_name => {
 				'currency' => q(belgický frank \(finančný\)),
+				'few' => q(belgické franky \(finančné\)),
+				'many' => q(belgického franku \(finančného\)),
+				'one' => q(belgický frank \(finančný\)),
+				'other' => q(belgických frankov \(finančných\)),
 			},
 		},
 		'BGL' => {
+			symbol => 'BGL',
 			display_name => {
 				'currency' => q(bulharský tvrdý lev),
+				'few' => q(bulharské tvrdé leva),
+				'many' => q(bulharského tvrdého leva),
+				'one' => q(bulharský tvrdý lev),
+				'other' => q(bulharských tvrdých leva),
+			},
+		},
+		'BGM' => {
+			symbol => 'BGM',
+			display_name => {
+				'currency' => q(bulharský socialistický lev),
+				'few' => q(bulharské socialistické leva),
+				'many' => q(bulharského socialistického leva),
+				'one' => q(bulharský socialistický lev),
+				'other' => q(bulharských socialistických leva),
 			},
 		},
 		'BGN' => {
@@ -4751,6 +4970,16 @@ has 'currencies' => (
 				'many' => q(bulharského leva),
 				'one' => q(bulharský lev),
 				'other' => q(bulharských leva),
+			},
+		},
+		'BGO' => {
+			symbol => 'BGO',
+			display_name => {
+				'currency' => q(bulharský lev \(1879 – 1952\)),
+				'few' => q(bulharské leva \(1879 – 1952\)),
+				'many' => q(bulharského leva \(1879 – 1952\)),
+				'one' => q(bulharský lev \(1879 – 1952\)),
+				'other' => q(bulharských leva \(1879 – 1952\)),
 			},
 		},
 		'BHD' => {
@@ -4803,29 +5032,64 @@ has 'currencies' => (
 				'other' => q(bolívijských bolivian),
 			},
 		},
+		'BOL' => {
+			symbol => 'BOL',
+			display_name => {
+				'currency' => q(bolívijské boliviano \(1863 – 1963\)),
+				'few' => q(bolívijské boliviana \(1863 – 1963\)),
+				'many' => q(bolívijského boliviana \(1863 – 1963\)),
+				'one' => q(bolívijské boliviano \(1863 – 1963\)),
+				'other' => q(bolívijských bolivian \(1863 – 1963\)),
+			},
+		},
 		'BOP' => {
+			symbol => 'BOP',
 			display_name => {
 				'currency' => q(bolívijské peso),
+				'few' => q(bolívijské pesos),
+				'many' => q(bolívijského pesa),
+				'one' => q(bolívijské peso),
+				'other' => q(bolívijských pesos),
 			},
 		},
 		'BOV' => {
+			symbol => 'BOV',
 			display_name => {
 				'currency' => q(bolívijské MVDOL),
+				'few' => q(bolívijské mvdoly),
+				'many' => q(bolívijského mvdolu),
+				'one' => q(bolívijský mvdol),
+				'other' => q(bolívijských mvdolov),
 			},
 		},
 		'BRB' => {
+			symbol => 'BRB',
 			display_name => {
-				'currency' => q(brazílske cruzeiro novo \(1967–1986\)),
+				'currency' => q(brazílske nové cruzeiro \(1967 – 1986\)),
+				'few' => q(brazílske nové cruzeirá \(1967 – 1986\)),
+				'many' => q(brazílskeho nového cruzeira \(1967 – 1986\)),
+				'one' => q(brazílske nové cruzeiro \(1967 – 1986\)),
+				'other' => q(brazílskych nových cruzeir \(1967 – 1986\)),
 			},
 		},
 		'BRC' => {
+			symbol => 'BRC',
 			display_name => {
 				'currency' => q(brazílske cruzado \(1986 – 1989\)),
+				'few' => q(brazílske cruzadá \(1986 – 1989\)),
+				'many' => q(brazílskeho cruzada \(1986 – 1989\)),
+				'one' => q(brazílske cruzado \(1986 – 1989\)),
+				'other' => q(brazílskych cruzad \(1986 – 1989\)),
 			},
 		},
 		'BRE' => {
+			symbol => 'BRE',
 			display_name => {
 				'currency' => q(brazílske cruzeiro \(1990 – 1993\)),
+				'few' => q(brazílske cruzeirá \(1990 – 1993\)),
+				'many' => q(brazílskeho cruzeira \(1990 – 1993\)),
+				'one' => q(brazílske cruzeiro \(1990 – 1993\)),
+				'other' => q(brazílskych cruzeir \(1990 – 1993\)),
 			},
 		},
 		'BRL' => {
@@ -4839,13 +5103,33 @@ has 'currencies' => (
 			},
 		},
 		'BRN' => {
+			symbol => 'BRN',
 			display_name => {
-				'currency' => q(Brazílske Cruzado Novo),
+				'currency' => q(brazílske nové cruzado \(1989 – 1990\)),
+				'few' => q(brazílske nové cruzadá \(1989 – 1990\)),
+				'many' => q(brazílskeho nového cruzada \(1989 – 1990\)),
+				'one' => q(brazílske nové cruzado \(1989 – 1990\)),
+				'other' => q(brazílskych nových cruzad \(1989 – 1990\)),
 			},
 		},
 		'BRR' => {
+			symbol => 'BRR',
 			display_name => {
 				'currency' => q(Brazílske cruzeiro),
+				'few' => q(brazílske cruzeirá \(1993 – 1994\)),
+				'many' => q(brazílskeho cruzeira \(1993 – 1994\)),
+				'one' => q(brazílske cruzeiro \(1993 – 1994\)),
+				'other' => q(brazílskych cruzeir \(1993 – 1994\)),
+			},
+		},
+		'BRZ' => {
+			symbol => 'BRZ',
+			display_name => {
+				'currency' => q(brazílske cruzeiro \(1942 – 1967\)),
+				'few' => q(brazílske cruzeirá \(1942 – 1967\)),
+				'many' => q(brazílskeho cruzeira \(1942 – 1967\)),
+				'one' => q(brazílske cruzeiro \(1942 – 1967\)),
+				'other' => q(brazílskych cruzeir \(1942 – 1967\)),
 			},
 		},
 		'BSD' => {
@@ -4869,8 +5153,13 @@ has 'currencies' => (
 			},
 		},
 		'BUK' => {
+			symbol => 'BUK',
 			display_name => {
-				'currency' => q(Burmese Kyat),
+				'currency' => q(barmský kyat),
+				'few' => q(barmské kyaty),
+				'many' => q(barmského kyatu),
+				'one' => q(barmský kyat),
+				'other' => q(barmských kyatov),
 			},
 		},
 		'BWP' => {
@@ -4884,22 +5173,33 @@ has 'currencies' => (
 			},
 		},
 		'BYB' => {
+			symbol => 'BYB',
 			display_name => {
-				'currency' => q(Bieloruský nový rubeľ \(1994–1999\)),
-				'few' => q(bieloruské nové ruble \(1994–1999\)),
-				'many' => q(bieloruského nového rubľa \(1994–1999\)),
-				'one' => q(bieloruský nový rubeľ \(1994–1999\)),
-				'other' => q(bieloruských nových rubľov \(1994–1999\)),
+				'currency' => q(bieloruský rubeľ \(1994 – 1999\)),
+				'few' => q(bieloruské ruble \(1994 – 1999\)),
+				'many' => q(bieloruského rubľa \(1994 – 1999\)),
+				'one' => q(bieloruský rubeľ \(1994 – 1999\)),
+				'other' => q(bieloruských rubľov \(1994 – 1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(bieloruský rubeľ),
 				'few' => q(bieloruské ruble),
 				'many' => q(bieloruského rubľa),
 				'one' => q(bieloruský rubeľ),
 				'other' => q(bieloruských rubľov),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(bieloruský rubeľ \(2000–2016\)),
+				'few' => q(bieloruské ruble \(2000–2016\)),
+				'many' => q(bieloruského rubľa \(2000–2016\)),
+				'one' => q(bieloruský rubeľ \(2000–2016\)),
+				'other' => q(bieloruských rubľov \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -4932,6 +5232,16 @@ has 'currencies' => (
 				'other' => q(konžských frankov),
 			},
 		},
+		'CHE' => {
+			symbol => 'CHE',
+			display_name => {
+				'currency' => q(švajčiarske WIR euro),
+				'few' => q(švajčiarske WIR eurá),
+				'many' => q(švajčiarskeho WIR eura),
+				'one' => q(švajčiarske WIR euro),
+				'other' => q(švajčiarskych WIR eur),
+			},
+		},
 		'CHF' => {
 			symbol => 'CHF',
 			display_name => {
@@ -4942,9 +5252,34 @@ has 'currencies' => (
 				'other' => q(švajčiarskych frankov),
 			},
 		},
-		'CLF' => {
+		'CHW' => {
+			symbol => 'CHW',
 			display_name => {
-				'currency' => q(Čílske Unidades de Fomento),
+				'currency' => q(švajčiarsky WIR frank),
+				'few' => q(švajčiarske WIR franky),
+				'many' => q(švajčiarskeho WIR franku),
+				'one' => q(švajčiarsky WIR frank),
+				'other' => q(švajčiarskych WIR frankov),
+			},
+		},
+		'CLE' => {
+			symbol => 'CLE',
+			display_name => {
+				'currency' => q(čilské escudo),
+				'few' => q(čilské escudá),
+				'many' => q(čilského escuda),
+				'one' => q(čilské escudo),
+				'other' => q(čilských escúd),
+			},
+		},
+		'CLF' => {
+			symbol => 'CLF',
+			display_name => {
+				'currency' => q(čilská účtovná jednotka \(UF\)),
+				'few' => q(čilské účtovné jednotky \(UF\)),
+				'many' => q(čilskej účtovnej jednotky \(UF\)),
+				'one' => q(čilská účtovná jednotka \(UF\)),
+				'other' => q(čilských účtovných jednotiek \(UF\)),
 			},
 		},
 		'CLP' => {
@@ -4955,6 +5290,26 @@ has 'currencies' => (
 				'many' => q(čilského pesa),
 				'one' => q(čilské peso),
 				'other' => q(čilských pesos),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(čínsky jüan \(pobrežný\)),
+				'few' => q(čínske jüany \(pobrežné\)),
+				'many' => q(čínskeho jüana \(pobrežného\)),
+				'one' => q(čínsky jüan \(pobrežný\)),
+				'other' => q(čínskych jüanov \(pobrežných\)),
+			},
+		},
+		'CNX' => {
+			symbol => 'CNX',
+			display_name => {
+				'currency' => q(čínsky dolár ČĽB),
+				'few' => q(čínske doláre ČĽB),
+				'many' => q(čínskeho dolára ČĽB),
+				'one' => q(čínsky dolár ČĽB),
+				'other' => q(čínskych dolárov ČĽB),
 			},
 		},
 		'CNY' => {
@@ -4977,6 +5332,16 @@ has 'currencies' => (
 				'other' => q(kolumbijských pesos),
 			},
 		},
+		'COU' => {
+			symbol => 'COU',
+			display_name => {
+				'currency' => q(kolumbijská jednotka reálnej hodnoty),
+				'few' => q(kolumbijské jednotky reálnej hodnoty),
+				'many' => q(kolumbijskej jednotky reálnej hodnoty),
+				'one' => q(kolumbijská jednotka reálnej hodnoty),
+				'other' => q(kolumbijských jednotiek reálnej hodnoty),
+			},
+		},
 		'CRC' => {
 			symbol => 'CRC',
 			display_name => {
@@ -4987,9 +5352,24 @@ has 'currencies' => (
 				'other' => q(kostarických colónov),
 			},
 		},
-		'CSK' => {
+		'CSD' => {
+			symbol => 'CSD',
 			display_name => {
-				'currency' => q(Československá koruna),
+				'currency' => q(srbský dinár \(2002 – 2006\)),
+				'few' => q(srbské dináre \(2002 – 2006\)),
+				'many' => q(srbského dinára \(2002 – 2006\)),
+				'one' => q(srbský dinár \(2002 – 2006\)),
+				'other' => q(srbských dinárov \(2002 – 2006\)),
+			},
+		},
+		'CSK' => {
+			symbol => 'CSK',
+			display_name => {
+				'currency' => q(československá koruna),
+				'few' => q(československé koruny),
+				'many' => q(československej koruny),
+				'one' => q(československá koruna),
+				'other' => q(československých korún),
 			},
 		},
 		'CUC' => {
@@ -5023,8 +5403,13 @@ has 'currencies' => (
 			},
 		},
 		'CYP' => {
+			symbol => 'CYP',
 			display_name => {
-				'currency' => q(Cypruská libra),
+				'currency' => q(cyperská libra),
+				'few' => q(cyperské libry),
+				'many' => q(cyperskej libry),
+				'one' => q(cyperská libra),
+				'other' => q(cyperských libier),
 			},
 		},
 		'CZK' => {
@@ -5038,13 +5423,23 @@ has 'currencies' => (
 			},
 		},
 		'DDM' => {
+			symbol => 'DDM',
 			display_name => {
-				'currency' => q(Východonemecká marka),
+				'currency' => q(východonemecká marka),
+				'few' => q(východonemecké marky),
+				'many' => q(východonemeckej marky),
+				'one' => q(východonemecká marka),
+				'other' => q(východonemeckých mariek),
 			},
 		},
 		'DEM' => {
+			symbol => 'DEM',
 			display_name => {
-				'currency' => q(Nemecká marka),
+				'currency' => q(nemecká marka),
+				'few' => q(nemecké marky),
+				'many' => q(nemeckej marky),
+				'one' => q(nemecká marka),
+				'other' => q(nemeckých mariek),
 			},
 		},
 		'DJF' => {
@@ -5088,23 +5483,33 @@ has 'currencies' => (
 			},
 		},
 		'ECS' => {
+			symbol => 'ECS',
 			display_name => {
-				'currency' => q(Ekuadorský sucre),
+				'currency' => q(ekvádorský sucre),
+				'few' => q(ekvádorské sucre),
+				'many' => q(ekvádorského sucre),
+				'one' => q(ekvádorský sucre),
+				'other' => q(ekvádorských sucre),
 			},
 		},
 		'ECV' => {
+			symbol => 'ECV',
 			display_name => {
-				'currency' => q(Ekuadorský Unidad de Valor Constante \(UVC\)),
+				'currency' => q(ekvádorská jednotka konštantnej hodnoty),
+				'few' => q(ekvádorské jednotky konštantnej hodnoty),
+				'many' => q(ekvádorskej jednotky konštantnej hodnoty),
+				'one' => q(ekvádorská jednotka konštantnej hodnoty),
+				'other' => q(ekvádorských jednotiek konštantnej hodnoty),
 			},
 		},
 		'EEK' => {
 			symbol => 'EEK',
 			display_name => {
-				'currency' => q(Estónska kroon),
-				'few' => q(estónske kroony),
-				'many' => q(estónskej kroony),
-				'one' => q(estónska kroon),
-				'other' => q(estónskych kroon),
+				'currency' => q(estónska koruna),
+				'few' => q(estónske koruny),
+				'many' => q(estónskej koruny),
+				'one' => q(estónska koruna),
+				'other' => q(estónskych korún),
 			},
 		},
 		'EGP' => {
@@ -5127,9 +5532,34 @@ has 'currencies' => (
 				'other' => q(eritrejských nakief),
 			},
 		},
-		'ESP' => {
+		'ESA' => {
+			symbol => 'ESA',
 			display_name => {
-				'currency' => q(Španielská peseta),
+				'currency' => q(španielska peseta \(účet A\)),
+				'few' => q(španielske pesety \(účet A\)),
+				'many' => q(španielskej pesety \(účet A\)),
+				'one' => q(španielska peseta \(účet A\)),
+				'other' => q(španielskych pesiet \(účet A\)),
+			},
+		},
+		'ESB' => {
+			symbol => 'ESB',
+			display_name => {
+				'currency' => q(španielska peseta \(konvertibilný účet\)),
+				'few' => q(španielske pesety \(konvertibilný účet\)),
+				'many' => q(španielskej pesety \(konvertibilný účet\)),
+				'one' => q(španielska peseta \(konvertibilný účet\)),
+				'other' => q(španielskych pesiet \(konvertibilný účet\)),
+			},
+		},
+		'ESP' => {
+			symbol => 'ESP',
+			display_name => {
+				'currency' => q(španielska peseta),
+				'few' => q(španielske pesety),
+				'many' => q(španielskej pesety),
+				'one' => q(španielska peseta),
+				'other' => q(španielskych pesiet),
 			},
 		},
 		'ETB' => {
@@ -5153,8 +5583,13 @@ has 'currencies' => (
 			},
 		},
 		'FIM' => {
+			symbol => 'FIM',
 			display_name => {
-				'currency' => q(Finská marka),
+				'currency' => q(fínska marka),
+				'few' => q(fínske marky),
+				'many' => q(fínskej marky),
+				'one' => q(fínska marka),
+				'other' => q(fínskych mariek),
 			},
 		},
 		'FJD' => {
@@ -5178,8 +5613,13 @@ has 'currencies' => (
 			},
 		},
 		'FRF' => {
+			symbol => 'FRF',
 			display_name => {
-				'currency' => q(Francúzsky frank),
+				'currency' => q(francúzsky frank),
+				'few' => q(francúzske franky),
+				'many' => q(francúzskeho franku),
+				'one' => q(francúzsky frank),
+				'other' => q(francúzskych frankov),
 			},
 		},
 		'GBP' => {
@@ -5193,8 +5633,13 @@ has 'currencies' => (
 			},
 		},
 		'GEK' => {
+			symbol => 'GEK',
 			display_name => {
-				'currency' => q(Gruzínsky Kupon Larit),
+				'currency' => q(gruzínske kupónové lari),
+				'few' => q(gruzínske kupónové lari),
+				'many' => q(gruzínskeho kupónového lari),
+				'one' => q(gruzínske kupónové lari),
+				'other' => q(gruzínskych kupónových lari),
 			},
 		},
 		'GEL' => {
@@ -5208,12 +5653,13 @@ has 'currencies' => (
 			},
 		},
 		'GHC' => {
+			symbol => 'GHC',
 			display_name => {
-				'currency' => q(Ghanský cedi \(1979–2007\)),
-				'few' => q(ghanské cedi \(1979–2007\)),
-				'many' => q(ghanského cedi \(1979–2007\)),
-				'one' => q(ghanský cedi \(1979–2007\)),
-				'other' => q(ghanských cedi \(1979–2007\)),
+				'currency' => q(ghanské cedi \(1979 – 2007\)),
+				'few' => q(ghanské cedi \(1979 – 2007\)),
+				'many' => q(ghanského cedi \(1979 – 2007\)),
+				'one' => q(ghanské cedi \(1979 – 2007\)),
+				'other' => q(ghanských cedi \(1979 – 2007\)),
 			},
 		},
 		'GHS' => {
@@ -5257,18 +5703,33 @@ has 'currencies' => (
 			},
 		},
 		'GNS' => {
+			symbol => 'GNS',
 			display_name => {
-				'currency' => q(Guinejský syli),
+				'currency' => q(guinejské syli),
+				'few' => q(guinejské syli),
+				'many' => q(guinejského syli),
+				'one' => q(guinejské syli),
+				'other' => q(guinejských syli),
 			},
 		},
 		'GQE' => {
+			symbol => 'GQE',
 			display_name => {
-				'currency' => q(Rovníková Guinea Ekwele Guineana),
+				'currency' => q(rovníkovoguinejský ekwele),
+				'few' => q(rovníkovoguinejské ekwele),
+				'many' => q(rovníkovoguinejského ekwele),
+				'one' => q(rovníkovoguinejský ekwele),
+				'other' => q(rovníkovoguinejských ekwele),
 			},
 		},
 		'GRD' => {
+			symbol => 'GRD',
 			display_name => {
-				'currency' => q(Grécka drachma),
+				'currency' => q(grécka drachma),
+				'few' => q(grécke drachmy),
+				'many' => q(gréckej drachmy),
+				'one' => q(grécka drachma),
+				'other' => q(gréckych drachiem),
 			},
 		},
 		'GTQ' => {
@@ -5282,18 +5743,23 @@ has 'currencies' => (
 			},
 		},
 		'GWE' => {
+			symbol => 'GWE',
 			display_name => {
-				'currency' => q(Portugalská Guinea eskudo),
+				'currency' => q(portugalsko-guinejské escudo),
+				'few' => q(portugalsko-guinejské escudá),
+				'many' => q(portugalsko-guinejského escuda),
+				'one' => q(portugalsko-guinejské escudo),
+				'other' => q(portugalsko-guinejských escúd),
 			},
 		},
 		'GWP' => {
 			symbol => 'GWP',
 			display_name => {
-				'currency' => q(Guinejsko-bissauské peso),
-				'few' => q(Guinea-Bissau pesos),
-				'many' => q(Guinea-Bissau pesa),
-				'one' => q(Guinea-Bissau peso),
-				'other' => q(Guinea-Bissau pesos),
+				'currency' => q(guinejsko-bissauské peso),
+				'few' => q(guinejsko-bissauské pesos),
+				'many' => q(guinejsko-bissauského pesa),
+				'one' => q(guinejsko-bissauské peso),
+				'other' => q(guinejsko-bissauských pesos),
 			},
 		},
 		'GYD' => {
@@ -5327,8 +5793,13 @@ has 'currencies' => (
 			},
 		},
 		'HRD' => {
+			symbol => 'HRD',
 			display_name => {
-				'currency' => q(Chorvátsky dinár),
+				'currency' => q(chorvátsky dinár),
+				'few' => q(chorvátske dináre),
+				'many' => q(chorvátskeho dinára),
+				'one' => q(chorvátsky dinár),
+				'other' => q(chorvátskych dinárov),
 			},
 		},
 		'HRK' => {
@@ -5372,13 +5843,33 @@ has 'currencies' => (
 			},
 		},
 		'IEP' => {
+			symbol => 'IEP',
 			display_name => {
-				'currency' => q(Írska libra),
+				'currency' => q(írska libra),
+				'few' => q(írske libry),
+				'many' => q(írskej libry),
+				'one' => q(írska libra),
+				'other' => q(írskych libier),
 			},
 		},
 		'ILP' => {
+			symbol => 'ILP',
 			display_name => {
-				'currency' => q(Izraelská libra),
+				'currency' => q(izraelská libra),
+				'few' => q(izraelské libry),
+				'many' => q(izraelskej libry),
+				'one' => q(izraelská libra),
+				'other' => q(izraelských libier),
+			},
+		},
+		'ILR' => {
+			symbol => 'ILR',
+			display_name => {
+				'currency' => q(izraelský šekel \(1980 – 1985\)),
+				'few' => q(izraelské šekely \(1980 – 1985\)),
+				'many' => q(izraelského šekela \(1980 – 1985\)),
+				'one' => q(izraelský šekel \(1980 – 1985\)),
+				'other' => q(izraelských šekelov \(1980 – 1985\)),
 			},
 		},
 		'ILS' => {
@@ -5421,6 +5912,16 @@ has 'currencies' => (
 				'other' => q(iránskych rialov),
 			},
 		},
+		'ISJ' => {
+			symbol => 'ISJ',
+			display_name => {
+				'currency' => q(islandská koruna \(1918 – 1981\)),
+				'few' => q(islandské koruny \(1918 – 1981\)),
+				'many' => q(islandskej koruny \(1918 – 1981\)),
+				'one' => q(islandská koruna \(1918 – 1981\)),
+				'other' => q(islandských korún \(1918 – 1981\)),
+			},
+		},
 		'ISK' => {
 			symbol => 'ISK',
 			display_name => {
@@ -5432,8 +5933,13 @@ has 'currencies' => (
 			},
 		},
 		'ITL' => {
+			symbol => 'ITL',
 			display_name => {
-				'currency' => q(Talianská lira),
+				'currency' => q(talianska líra),
+				'few' => q(talianske líry),
+				'many' => q(talianskej líry),
+				'one' => q(talianska líra),
+				'other' => q(talianskych lír),
 			},
 		},
 		'JMD' => {
@@ -5514,6 +6020,26 @@ has 'currencies' => (
 				'many' => q(severokórejskeho wonu),
 				'one' => q(severokórejský won),
 				'other' => q(severokórejských wonov),
+			},
+		},
+		'KRH' => {
+			symbol => 'KRH',
+			display_name => {
+				'currency' => q(juhokórejský hwan \(1953 – 1962\)),
+				'few' => q(juhokórejské hwany \(1953 – 1962\)),
+				'many' => q(juhokórejského hwanu \(1953 – 1962\)),
+				'one' => q(juhokórejský hwan \(1953 – 1962\)),
+				'other' => q(juhokórejských hwanov \(1953 – 1962\)),
+			},
+		},
+		'KRO' => {
+			symbol => 'KRO',
+			display_name => {
+				'currency' => q(juhokórejský won \(1945 – 1953\)),
+				'few' => q(juhokórejské wony \(1945 – 1953\)),
+				'many' => q(juhokórejského wonu \(1945 – 1953\)),
+				'one' => q(juhokórejský won \(1945 – 1953\)),
+				'other' => q(juhokórejských wonov \(1945 – 1953\)),
 			},
 		},
 		'KRW' => {
@@ -5597,8 +6123,13 @@ has 'currencies' => (
 			},
 		},
 		'LSL' => {
+			symbol => 'LSL',
 			display_name => {
-				'currency' => q(Lesothský loti),
+				'currency' => q(lesothský loti),
+				'few' => q(lesothské loti),
+				'many' => q(lesothského loti),
+				'one' => q(lesothský loti),
+				'other' => q(lesothských loti),
 			},
 		},
 		'LTL' => {
@@ -5612,19 +6143,49 @@ has 'currencies' => (
 			},
 		},
 		'LTT' => {
+			symbol => 'LTT',
 			display_name => {
-				'currency' => q(Litevský talonas),
+				'currency' => q(litovský talonas),
+				'few' => q(litovské talony),
+				'many' => q(litovského talonu),
+				'one' => q(litovský talonas),
+				'other' => q(litovských talonov),
+			},
+		},
+		'LUC' => {
+			symbol => 'LUC',
+			display_name => {
+				'currency' => q(luxemburský frank \(konvertibilný\)),
+				'few' => q(luxemburské franky \(konvertibilné\)),
+				'many' => q(luxemburského franku \(konvertibilného\)),
+				'one' => q(luxemburský frank \(konvertibilný\)),
+				'other' => q(luxemburských frankov \(konvertibilných\)),
 			},
 		},
 		'LUF' => {
+			symbol => 'LUF',
 			display_name => {
-				'currency' => q(Luxemburský frank),
+				'currency' => q(luxemburský frank),
+				'few' => q(luxemburské franky),
+				'many' => q(luxemburského franku),
+				'one' => q(luxemburský frank),
+				'other' => q(luxemburských frankov),
+			},
+		},
+		'LUL' => {
+			symbol => 'LUL',
+			display_name => {
+				'currency' => q(luxemburský frank \(finančný\)),
+				'few' => q(luxemburské franky \(finančné\)),
+				'many' => q(luxemburského franku \(finančného\)),
+				'one' => q(luxemburský frank \(finančný\)),
+				'other' => q(luxemburských frankov \(finančných\)),
 			},
 		},
 		'LVL' => {
 			symbol => 'LVL',
 			display_name => {
-				'currency' => q(Lotyšský lat),
+				'currency' => q(lotyšský lat),
 				'few' => q(lotyšské laty),
 				'many' => q(lotyšského latu),
 				'one' => q(lotyšský lat),
@@ -5632,8 +6193,13 @@ has 'currencies' => (
 			},
 		},
 		'LVR' => {
+			symbol => 'LVR',
 			display_name => {
-				'currency' => q(Lotyšský rubeľ),
+				'currency' => q(lotyšský rubeľ),
+				'few' => q(lotyšské ruble),
+				'many' => q(lotyšského rubľa),
+				'one' => q(lotyšský rubeľ),
+				'other' => q(lotyšských rubľov),
 			},
 		},
 		'LYD' => {
@@ -5657,8 +6223,33 @@ has 'currencies' => (
 			},
 		},
 		'MAF' => {
+			symbol => 'MAF',
 			display_name => {
-				'currency' => q(Marocký frank),
+				'currency' => q(marocký frank),
+				'few' => q(marocké franky),
+				'many' => q(marockého franku),
+				'one' => q(marocký frank),
+				'other' => q(marockých frankov),
+			},
+		},
+		'MCF' => {
+			symbol => 'MCF',
+			display_name => {
+				'currency' => q(monacký frank),
+				'few' => q(monacké franky),
+				'many' => q(monackého franku),
+				'one' => q(monacký frank),
+				'other' => q(monackých frankov),
+			},
+		},
+		'MDC' => {
+			symbol => 'MDC',
+			display_name => {
+				'currency' => q(moldavský kupón),
+				'few' => q(moldavské kupóny),
+				'many' => q(moldavského kupónu),
+				'one' => q(moldavský kupón),
+				'other' => q(moldavských kupónov),
 			},
 		},
 		'MDL' => {
@@ -5682,8 +6273,13 @@ has 'currencies' => (
 			},
 		},
 		'MGF' => {
+			symbol => 'MGF',
 			display_name => {
-				'currency' => q(Madagaskarský frank),
+				'currency' => q(madagaskarský frank),
+				'few' => q(madagaskarské franky),
+				'many' => q(madagaskarského franku),
+				'one' => q(madagaskarský frank),
+				'other' => q(madagaskarských frankov),
 			},
 		},
 		'MKD' => {
@@ -5696,9 +6292,24 @@ has 'currencies' => (
 				'other' => q(macedónskych denárov),
 			},
 		},
-		'MLF' => {
+		'MKN' => {
+			symbol => 'MKN',
 			display_name => {
-				'currency' => q(Malský frank),
+				'currency' => q(macedónsky denár \(1992 – 1993\)),
+				'few' => q(macedónske denáre \(1992 – 1993\)),
+				'many' => q(macedónskeho denára \(1992 – 1993\)),
+				'one' => q(macedónsky denár \(1992 – 1993\)),
+				'other' => q(macedónskych denárov \(1992 – 1993\)),
+			},
+		},
+		'MLF' => {
+			symbol => 'MLF',
+			display_name => {
+				'currency' => q(malijský frank),
+				'few' => q(malijské franky),
+				'many' => q(malijského franku),
+				'one' => q(malijský frank),
+				'other' => q(malijské franky),
 			},
 		},
 		'MMK' => {
@@ -5742,13 +6353,23 @@ has 'currencies' => (
 			},
 		},
 		'MTL' => {
+			symbol => 'MTL',
 			display_name => {
-				'currency' => q(Maltská lira),
+				'currency' => q(maltská líra),
+				'few' => q(maltské líry),
+				'many' => q(maltskej líry),
+				'one' => q(maltská líra),
+				'other' => q(maltských lír),
 			},
 		},
 		'MTP' => {
+			symbol => 'MTP',
 			display_name => {
-				'currency' => q(Maltská libra),
+				'currency' => q(maltská libra),
+				'few' => q(maltské libry),
+				'many' => q(maltskej libry),
+				'one' => q(maltská libra),
+				'other' => q(maltských libier),
 			},
 		},
 		'MUR' => {
@@ -5759,6 +6380,16 @@ has 'currencies' => (
 				'many' => q(maurícijskej rupie),
 				'one' => q(maurícijská rupia),
 				'other' => q(maurícijských rupií),
+			},
+		},
+		'MVP' => {
+			symbol => 'MVP',
+			display_name => {
+				'currency' => q(maldivská rupia \(1947 – 1981\)),
+				'few' => q(maldivské rupie \(1947 – 1981\)),
+				'many' => q(maldivskej rupie \(1947 – 1981\)),
+				'one' => q(maldivská rupia \(1947 – 1981\)),
+				'other' => q(maldivských rupií \(1947 – 1981\)),
 			},
 		},
 		'MVR' => {
@@ -5792,13 +6423,23 @@ has 'currencies' => (
 			},
 		},
 		'MXP' => {
+			symbol => 'MXP',
 			display_name => {
-				'currency' => q(Mexické striborné peso \(1861–1992\)),
+				'currency' => q(mexické strieborné peso \(1861 – 1992\)),
+				'few' => q(mexické strieborné pesos \(1861 – 1992\)),
+				'many' => q(mexického strieborného pesa \(1861 – 1992\)),
+				'one' => q(mexické strieborné peso \(1861 – 1992\)),
+				'other' => q(mexických strieborných pesos \(1861 – 1992\)),
 			},
 		},
 		'MXV' => {
+			symbol => 'MXV',
 			display_name => {
-				'currency' => q(Mexické Unidad de Inversion \(UDI\)),
+				'currency' => q(mexická investičná jednotka),
+				'few' => q(mexické investičné jednotky),
+				'many' => q(mexickej investičnej jednotky),
+				'one' => q(mexická investičná jednotka),
+				'other' => q(mexických investičných jednotiek),
 			},
 		},
 		'MYR' => {
@@ -5814,16 +6455,17 @@ has 'currencies' => (
 		'MZE' => {
 			symbol => 'MZE',
 			display_name => {
-				'currency' => q(Mozambické escudo),
-				'few' => q(mozabické escudá),
-				'many' => q(mozabického escuda),
-				'one' => q(mozabické escudo),
-				'other' => q(mozabických escúd),
+				'currency' => q(mozambické escudo),
+				'few' => q(mozambické escudá),
+				'many' => q(mozambického escuda),
+				'one' => q(mozambické escudo),
+				'other' => q(mozambických escúd),
 			},
 		},
 		'MZM' => {
+			symbol => 'MZM',
 			display_name => {
-				'currency' => q(Mozambický metical \(1980–2006\)),
+				'currency' => q(mozambický metical \(1980 – 2006\)),
 				'few' => q(mozambické meticaly \(1980–2006\)),
 				'many' => q(mozambického meticalu \(1980–2006\)),
 				'one' => q(mozambický metical \(1980–2006\)),
@@ -5861,8 +6503,9 @@ has 'currencies' => (
 			},
 		},
 		'NIC' => {
+			symbol => 'NIC',
 			display_name => {
-				'currency' => q(Nikaragujská Cordoba \(1988–1991\)),
+				'currency' => q(nikaragujská córdoba \(1988 – 1991\)),
 				'few' => q(nikaragujské córdoby \(1988–1991\)),
 				'many' => q(nikaragujskej córdoby \(1988–1991\)),
 				'one' => q(nikaragujská córdoba \(1988–1991\)),
@@ -5880,8 +6523,13 @@ has 'currencies' => (
 			},
 		},
 		'NLG' => {
+			symbol => 'NLG',
 			display_name => {
-				'currency' => q(Nizozemský guilder),
+				'currency' => q(holandský gulden),
+				'few' => q(holandské guldeny),
+				'many' => q(holandského guldena),
+				'one' => q(holandský gulden),
+				'other' => q(holandských guldenov),
 			},
 		},
 		'NOK' => {
@@ -5935,23 +6583,33 @@ has 'currencies' => (
 			},
 		},
 		'PEI' => {
+			symbol => 'PEI',
 			display_name => {
-				'currency' => q(Peruvský inti),
+				'currency' => q(peruánsky inti),
+				'few' => q(peruánske inti),
+				'many' => q(peruánskeho inti),
+				'one' => q(peruánsky inti),
+				'other' => q(peruánskych inti),
 			},
 		},
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(peruánsky nový sol),
-				'few' => q(peruánske nové soly),
-				'many' => q(peruánskeho nového sola),
-				'one' => q(peruánsky nový sol),
-				'other' => q(peruánskych nových solov),
+				'currency' => q(peruánsky sol),
+				'few' => q(peruánske soly),
+				'many' => q(peruánskeho sola),
+				'one' => q(peruánsky sol),
+				'other' => q(peruánskych solov),
 			},
 		},
 		'PES' => {
+			symbol => 'PES',
 			display_name => {
-				'currency' => q(Peruvský sol),
+				'currency' => q(peruánsky sol \(1863 – 1965\)),
+				'few' => q(peruánske soly \(1863–1965\)),
+				'many' => q(peruánskeho sola \(1863–1965\)),
+				'one' => q(peruánsky sol \(1863–1965\)),
+				'other' => q(peruánskych solov \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -5995,17 +6653,23 @@ has 'currencies' => (
 			},
 		},
 		'PLZ' => {
+			symbol => 'PLZ',
 			display_name => {
-				'currency' => q(Polský zloty \(1950–1995\)),
-				'few' => q(poľské zloté \(1950–1995\)),
-				'many' => q(poľského zlotého \(1950–1995\)),
-				'one' => q(poľský zlotý \(1950–1995\)),
-				'other' => q(poľských zlotých \(1950–1995\)),
+				'currency' => q(poľský zlotý \(1950 – 1995\)),
+				'few' => q(poľské zloté \(1950 – 1995\)),
+				'many' => q(poľského zlotého \(1950 – 1995\)),
+				'one' => q(poľský zlotý \(1950 – 1995\)),
+				'other' => q(poľských zlotých \(1950 – 1995\)),
 			},
 		},
 		'PTE' => {
+			symbol => 'PTE',
 			display_name => {
-				'currency' => q(Portugalské eskudo),
+				'currency' => q(portugalské escudo),
+				'few' => q(portugalské escudá),
+				'many' => q(portugalského escuda),
+				'one' => q(portugalské escudo),
+				'other' => q(portugalských escúd),
 			},
 		},
 		'PYG' => {
@@ -6028,13 +6692,24 @@ has 'currencies' => (
 				'other' => q(katarských rialov),
 			},
 		},
-		'ROL' => {
+		'RHD' => {
+			symbol => 'RHD',
 			display_name => {
-				'currency' => q(Rumunský leu \(1952–2006\)),
-				'few' => q(rumunské leu \(1952–2006\)),
-				'many' => q(rumunského leu \(1952–2006\)),
-				'one' => q(rumunský leu \(1952–2006\)),
-				'other' => q(rumunských leu \(1952–2006\)),
+				'currency' => q(rodézsky dolár),
+				'few' => q(rodézske doláre),
+				'many' => q(rodézskeho dolára),
+				'one' => q(rodézsky dolár),
+				'other' => q(rodézskych dolárov),
+			},
+		},
+		'ROL' => {
+			symbol => 'ROL',
+			display_name => {
+				'currency' => q(rumunský lei \(1952 – 2006\)),
+				'few' => q(rumunské lei \(1952 – 2006\)),
+				'many' => q(rumunského lei \(1952 – 2006\)),
+				'one' => q(rumunský lei \(1952 – 2006\)),
+				'other' => q(rumunských lei \(1952 – 2006\)),
 			},
 		},
 		'RON' => {
@@ -6068,8 +6743,13 @@ has 'currencies' => (
 			},
 		},
 		'RUR' => {
+			symbol => 'RUR',
 			display_name => {
-				'currency' => q(Ruský rubeľ \(1991–1998\)),
+				'currency' => q(ruský rubeľ \(1991 – 1998\)),
+				'few' => q(ruské ruble \(1991 – 1998\)),
+				'many' => q(ruského rubľa \(1991 – 1998\)),
+				'one' => q(ruský rubeľ \(1991 – 1998\)),
+				'other' => q(ruských rubľov \(1991 – 1998\)),
 			},
 		},
 		'RWF' => {
@@ -6113,8 +6793,13 @@ has 'currencies' => (
 			},
 		},
 		'SDD' => {
+			symbol => 'SDD',
 			display_name => {
-				'currency' => q(Sudánsky dinár),
+				'currency' => q(sudánsky dinár \(1992 – 2007\)),
+				'few' => q(sudánske dináre \(1992 – 2007\)),
+				'many' => q(sudánskeho dinára \(1992 – 2007\)),
+				'one' => q(sudánsky dinár \(1992 – 2007\)),
+				'other' => q(sudánskych dinárov \(1992 – 2007\)),
 			},
 		},
 		'SDG' => {
@@ -6128,12 +6813,13 @@ has 'currencies' => (
 			},
 		},
 		'SDP' => {
+			symbol => 'SDP',
 			display_name => {
-				'currency' => q(Sudánska libra \(1957–1998\)),
-				'few' => q(sudánske libry \(1957–1998\)),
-				'many' => q(sudánskej libry \(1957–1998\)),
-				'one' => q(sudánska libra \(1957–1998\)),
-				'other' => q(sudánskych libier \(1957–1998\)),
+				'currency' => q(sudánska libra \(1957 – 1998\)),
+				'few' => q(sudánske libry \(1957 – 1998\)),
+				'many' => q(sudánskej libry \(1957 – 1998\)),
+				'one' => q(sudánska libra \(1957 – 1998\)),
+				'other' => q(sudánskych libier \(1957 – 1998\)),
 			},
 		},
 		'SEK' => {
@@ -6167,13 +6853,23 @@ has 'currencies' => (
 			},
 		},
 		'SIT' => {
+			symbol => 'SIT',
 			display_name => {
-				'currency' => q(Slovinský Tolar),
+				'currency' => q(slovinský toliar),
+				'few' => q(slovinské toliare),
+				'many' => q(slovinského toliara),
+				'one' => q(slovinský toliar),
+				'other' => q(slovinských toliarov),
 			},
 		},
 		'SKK' => {
+			symbol => 'SKK',
 			display_name => {
-				'currency' => q(Slovenská koruna),
+				'currency' => q(slovenská koruna),
+				'few' => q(slovenské koruny),
+				'many' => q(slovenskej koruny),
+				'one' => q(slovenská koruna),
+				'other' => q(slovenských korún),
 			},
 		},
 		'SLL' => {
@@ -6207,8 +6903,13 @@ has 'currencies' => (
 			},
 		},
 		'SRG' => {
+			symbol => 'SRG',
 			display_name => {
-				'currency' => q(Surinamský guilder),
+				'currency' => q(surinamský zlatý),
+				'few' => q(surinamské zlaté),
+				'many' => q(surinamského zlatého),
+				'one' => q(surinamský zlatý),
+				'other' => q(surinamských zlatých),
 			},
 		},
 		'SSP' => {
@@ -6232,14 +6933,19 @@ has 'currencies' => (
 			},
 		},
 		'SUR' => {
+			symbol => 'SUR',
 			display_name => {
-				'currency' => q(Sovietsky rubeľ),
+				'currency' => q(sovietsky rubeľ),
+				'few' => q(sovietske ruble),
+				'many' => q(sovietskeho rubľa),
+				'one' => q(sovietsky rubeľ),
+				'other' => q(sovietskych rubľov),
 			},
 		},
 		'SVC' => {
 			symbol => 'SVC',
 			display_name => {
-				'currency' => q(Salvádorský colón),
+				'currency' => q(salvádorský colón),
 				'few' => q(salvádorské colóny),
 				'many' => q(salvádorského colóna),
 				'one' => q(salvádorský colón),
@@ -6277,8 +6983,13 @@ has 'currencies' => (
 			},
 		},
 		'TJR' => {
+			symbol => 'TJR',
 			display_name => {
-				'currency' => q(Tadžický rubeľ),
+				'currency' => q(tadžický rubeľ),
+				'few' => q(tadžické ruble),
+				'many' => q(tadžického rubľa),
+				'one' => q(tadžický rubeľ),
+				'other' => q(tadžických rubľov),
 			},
 		},
 		'TJS' => {
@@ -6292,12 +7003,13 @@ has 'currencies' => (
 			},
 		},
 		'TMM' => {
+			symbol => 'TMM',
 			display_name => {
-				'currency' => q(Turkménsky manat \(1993–2009\)),
-				'few' => q(turkménske manaty \(1993–2009\)),
-				'many' => q(turkménskeho manatu \(1993–2009\)),
-				'one' => q(turkménsky manat \(1993–2009\)),
-				'other' => q(turkménskych manatov \(1993–2009\)),
+				'currency' => q(turkménsky manat \(1993 – 2009\)),
+				'few' => q(turkménske manaty \(1993 – 2009\)),
+				'many' => q(turkménskeho manatu \(1993 – 2009\)),
+				'one' => q(turkménsky manat \(1993 – 2009\)),
+				'other' => q(turkménskych manatov \(1993 – 2009\)),
 			},
 		},
 		'TMT' => {
@@ -6331,17 +7043,23 @@ has 'currencies' => (
 			},
 		},
 		'TPE' => {
+			symbol => 'TPE',
 			display_name => {
-				'currency' => q(Timorské eskudo),
+				'currency' => q(timorské escudo),
+				'few' => q(timorské escudá),
+				'many' => q(timorského escuda),
+				'one' => q(timorské escudo),
+				'other' => q(timorských escúd),
 			},
 		},
 		'TRL' => {
+			symbol => 'TRL',
 			display_name => {
-				'currency' => q(Turecká lira \(1922–2005\)),
-				'few' => q(turecké líry \(1922–2005\)),
-				'many' => q(tureckej líry \(1922–2005\)),
-				'one' => q(turecká líra \(1922–2005\)),
-				'other' => q(tureckých lír \(1922–2005\)),
+				'currency' => q(turecká líra \(1922 – 2005\)),
+				'few' => q(turecké líry \(1922 – 2005\)),
+				'many' => q(tureckej líry \(1922 – 2005\)),
+				'one' => q(turecká líra \(1922 – 2005\)),
+				'other' => q(tureckých lír \(1922 – 2005\)),
 			},
 		},
 		'TRY' => {
@@ -6395,13 +7113,23 @@ has 'currencies' => (
 			},
 		},
 		'UAK' => {
+			symbol => 'UAK',
 			display_name => {
-				'currency' => q(Ukrainský karbovanetz),
+				'currency' => q(ukrajinský karbovanec),
+				'few' => q(ukrajinské karbovance),
+				'many' => q(ukrajinského karbovanca),
+				'one' => q(ukrajinský karbovanec),
+				'other' => q(ukrajinských karbovancov),
 			},
 		},
 		'UGS' => {
+			symbol => 'UGS',
 			display_name => {
-				'currency' => q(Ugandan šiling \(1966–1987\)),
+				'currency' => q(ugandský šiling \(1966 – 1987\)),
+				'few' => q(ugandské šilingy \(1966 – 1987\)),
+				'many' => q(ugandského šilingu \(1966 – 1987\)),
+				'one' => q(ugandský šiling \(1966 – 1987\)),
+				'other' => q(ugandských šilingov \(1966 – 1987\)),
 			},
 		},
 		'UGX' => {
@@ -6425,18 +7153,43 @@ has 'currencies' => (
 			},
 		},
 		'USN' => {
+			symbol => 'USN',
 			display_name => {
-				'currency' => q(US dolár \(Next day\)),
+				'currency' => q(americký dolár \(ďalší deň\)),
+				'few' => q(americké doláre \(ďalší deň\)),
+				'many' => q(amerického dolára \(ďalší deň\)),
+				'one' => q(americký dolár \(ďalší deň\)),
+				'other' => q(amerických dolárov \(ďalší deň\)),
 			},
 		},
 		'USS' => {
+			symbol => 'USS',
 			display_name => {
-				'currency' => q(US dolár \(Same day\)),
+				'currency' => q(americký dolár \(rovnaký deň\)),
+				'few' => q(americké doláre \(rovnaký deň\)),
+				'many' => q(amerického dolára \(rovnaký deň\)),
+				'one' => q(americký dolár \(rovnaký deň\)),
+				'other' => q(amerických dolárov \(rovnaký deň\)),
+			},
+		},
+		'UYI' => {
+			symbol => 'UYI',
+			display_name => {
+				'currency' => q(uruguajské peso \(v indexovaných jednotkách\)),
+				'few' => q(uruguajské pesos \(v indexovaných jednotkách\)),
+				'many' => q(uruguajského pesa \(v indexovaných jednotkách\)),
+				'one' => q(uruguajské peso \(v indexovaných jednotkách\)),
+				'other' => q(uruguajských pesos \(v indexovaných jednotkách\)),
 			},
 		},
 		'UYP' => {
+			symbol => 'UYP',
 			display_name => {
-				'currency' => q(Uruguajské peso \(1975–1993\)),
+				'currency' => q(uruguajské peso \(1975 – 1993\)),
+				'few' => q(uruguajské pesos \(1975 – 1993\)),
+				'many' => q(uruguajského pesa \(1975 – 1993\)),
+				'one' => q(uruguajské peso \(1975 – 1993\)),
+				'other' => q(uruguajských pesos \(1975 – 1993\)),
 			},
 		},
 		'UYU' => {
@@ -6460,8 +7213,13 @@ has 'currencies' => (
 			},
 		},
 		'VEB' => {
+			symbol => 'VEB',
 			display_name => {
-				'currency' => q(Venezuelský bolívar \(1871–2008\)),
+				'currency' => q(venezuelský bolívar \(1871 – 2008\)),
+				'few' => q(venezuelské bolívary \(1871 – 2008\)),
+				'many' => q(venezuelského bolívaru \(1871 – 2008\)),
+				'one' => q(venezuelský bolívar \(1871 – 2008\)),
+				'other' => q(venezuelských bolívarov \(1871 – 2008\)),
 			},
 		},
 		'VEF' => {
@@ -6482,6 +7240,16 @@ has 'currencies' => (
 				'many' => q(vietnamského dongu),
 				'one' => q(vietnamský dong),
 				'other' => q(vietnamských dongov),
+			},
+		},
+		'VNN' => {
+			symbol => 'VNN',
+			display_name => {
+				'currency' => q(vietnamský dong \(1978 – 1985\)),
+				'few' => q(vietnamské dongy \(1978 – 1985\)),
+				'many' => q(vietnamského dongu \(1978 – 1985\)),
+				'one' => q(vietnamský dong \(1978 – 1985\)),
+				'other' => q(vietnamských dongov \(1978 – 1985\)),
 			},
 		},
 		'VUV' => {
@@ -6514,9 +7282,64 @@ has 'currencies' => (
 				'other' => q(stredoafrických frankov),
 			},
 		},
-		'XAU' => {
+		'XAG' => {
+			symbol => 'XAG',
 			display_name => {
-				'currency' => q(Zlato),
+				'currency' => q(striebro),
+				'few' => q(trójske unce striebra),
+				'many' => q(trójskej unce striebra),
+				'one' => q(trójska unca striebra),
+				'other' => q(trójskych uncí striebra),
+			},
+		},
+		'XAU' => {
+			symbol => 'XAU',
+			display_name => {
+				'currency' => q(zlato),
+				'few' => q(trójske unce zlata),
+				'many' => q(trójskej unce zlata),
+				'one' => q(trójska unca zlata),
+				'other' => q(trójskych uncí zlata),
+			},
+		},
+		'XBA' => {
+			symbol => 'XBA',
+			display_name => {
+				'currency' => q(európska zmiešaná jednotka),
+				'few' => q(európske zmiešané jednotky),
+				'many' => q(európskej zmiešanej jednotky),
+				'one' => q(európska zmiešaná jednotka),
+				'other' => q(európskych zmiešaných jednotiek),
+			},
+		},
+		'XBB' => {
+			symbol => 'XBB',
+			display_name => {
+				'currency' => q(európska peňažná jednotka),
+				'few' => q(európske peňažné jednotky),
+				'many' => q(európskej peňažnek jednotky),
+				'one' => q(európska peňažná jednotka),
+				'other' => q(európskych peňažných jednotiek),
+			},
+		},
+		'XBC' => {
+			symbol => 'XBC',
+			display_name => {
+				'currency' => q(európska jednotka účtu 9 \(XBC\)),
+				'few' => q(európske jednotky účtu 9 \(XBC\)),
+				'many' => q(európskej jednotky účtu 9 \(XBC\)),
+				'one' => q(európska jednotka účtu 9 \(XBC\)),
+				'other' => q(európskych jednotiek účtu 9 \(XBC\)),
+			},
+		},
+		'XBD' => {
+			symbol => 'XBD',
+			display_name => {
+				'currency' => q(európska jednotka účtu 17 \(XBC\)),
+				'few' => q(európske jednotky účtu 17 \(XBC\)),
+				'many' => q(európskej jednotky účtu 17 \(XBC\)),
+				'one' => q(európska jednotka účtu 17 \(XBC\)),
+				'other' => q(európskych jednotiek účtu 17 \(XBC\)),
 			},
 		},
 		'XCD' => {
@@ -6530,18 +7353,43 @@ has 'currencies' => (
 			},
 		},
 		'XDR' => {
+			symbol => 'XDR',
 			display_name => {
-				'currency' => q(Špeciálne práva čerpania),
+				'currency' => q(SDR),
+				'few' => q(SDR),
+				'many' => q(SDR),
+				'one' => q(SDR),
+				'other' => q(SDR),
+			},
+		},
+		'XEU' => {
+			symbol => 'XEU',
+			display_name => {
+				'currency' => q(európska menová jednotka),
+				'few' => q(európske menové jednotky),
+				'many' => q(európskej menovej jednotky),
+				'one' => q(európska menová jednotka),
+				'other' => q(európskych menových jednotiek),
 			},
 		},
 		'XFO' => {
+			symbol => 'XFO',
 			display_name => {
-				'currency' => q(Francúzsky zlatý frank),
+				'currency' => q(francúzsky zlatý frank),
+				'few' => q(francúzske zlaté franky),
+				'many' => q(francúzskeho zlatého franku),
+				'one' => q(francúzsky zlatý frank),
+				'other' => q(francúzskych zlatých frankov),
 			},
 		},
 		'XFU' => {
+			symbol => 'XFU',
 			display_name => {
-				'currency' => q(Francúzsky UIC-frank),
+				'currency' => q(francúzsky UIC frank),
+				'few' => q(francúzske UIC franky),
+				'many' => q(francúzskeho UIC franku),
+				'one' => q(francúzsky UIC frank),
+				'other' => q(francúzskych UIC frankov),
 			},
 		},
 		'XOF' => {
@@ -6554,6 +7402,16 @@ has 'currencies' => (
 				'other' => q(západoafrických frankov),
 			},
 		},
+		'XPD' => {
+			symbol => 'XPD',
+			display_name => {
+				'currency' => q(paládium),
+				'few' => q(trójske unce paládia),
+				'many' => q(trójskej unce paládia),
+				'one' => q(trójska unca paládia),
+				'other' => q(trójskych uncí paládia),
+			},
+		},
 		'XPF' => {
 			symbol => 'CFPF',
 			display_name => {
@@ -6564,7 +7422,58 @@ has 'currencies' => (
 				'other' => q(CFP frankov),
 			},
 		},
+		'XPT' => {
+			symbol => 'XPT',
+			display_name => {
+				'currency' => q(platina),
+				'few' => q(trójske unce platiny),
+				'many' => q(trójskej unce platiny),
+				'one' => q(trójska unca platiny),
+				'other' => q(trójskej unce platiny),
+			},
+		},
+		'XRE' => {
+			symbol => 'XRE',
+			display_name => {
+				'currency' => q(fondy RINET),
+				'few' => q(jednotky fondov RINET),
+				'many' => q(jednotky fondov RINET),
+				'one' => q(jednotka fondov RINET),
+				'other' => q(jednotiek fondov RINET),
+			},
+		},
+		'XSU' => {
+			symbol => 'XSU',
+			display_name => {
+				'currency' => q(sucre),
+				'few' => q(sucre),
+				'many' => q(sucre),
+				'one' => q(sucre),
+				'other' => q(sucre),
+			},
+		},
+		'XTS' => {
+			symbol => 'XTS',
+			display_name => {
+				'currency' => q(kód testovacej meny),
+				'few' => q(jednotky testovacej meny),
+				'many' => q(jednotky testovacej meny),
+				'one' => q(jednotka testovacej meny),
+				'other' => q(jednotiek testovacej meny),
+			},
+		},
+		'XUA' => {
+			symbol => 'XUA',
+			display_name => {
+				'currency' => q(jednotka účtu ADB),
+				'few' => q(jednotky účtu ADB),
+				'many' => q(jednotky účtu ADB),
+				'one' => q(jednotka účtu ADB),
+				'other' => q(jednotiek účtu ADB),
+			},
+		},
 		'XXX' => {
+			symbol => 'XXX',
 			display_name => {
 				'currency' => q(neznáma mena),
 				'few' => q(\(neznáma mena\)),
@@ -6574,8 +7483,13 @@ has 'currencies' => (
 			},
 		},
 		'YDD' => {
+			symbol => 'YDD',
 			display_name => {
-				'currency' => q(Jemenský dinár),
+				'currency' => q(jemenský dinár),
+				'few' => q(jemenské dináre),
+				'many' => q(jemenského dinára),
+				'one' => q(jemenský dinár),
+				'other' => q(jemenských dinárov),
 			},
 		},
 		'YER' => {
@@ -6589,23 +7503,53 @@ has 'currencies' => (
 			},
 		},
 		'YUD' => {
+			symbol => 'YUD',
 			display_name => {
 				'currency' => q(Juhoslávsky dinár [YUD]),
+				'few' => q(juhoslovanské dináre \(1966 – 1990\)),
+				'many' => q(juhoslovanského dinára \(1966 – 1990\)),
+				'one' => q(juhoslovanský dinár \(1966 – 1990\)),
+				'other' => q(juhoslovanských dinárov \(1966 – 1990\)),
 			},
 		},
 		'YUM' => {
+			symbol => 'YUM',
 			display_name => {
-				'currency' => q(Juhoslávsky Noviy dinár),
+				'currency' => q(juhoslovanský nový dinár \(1994 – 2002\)),
+				'few' => q(juhoslovanské nové dináre \(1994 – 2002\)),
+				'many' => q(juhoslovanského nového dinára \(1994 – 2002\)),
+				'one' => q(juhoslovanský nový dinár \(1994 – 2002\)),
+				'other' => q(juhoslovanských nových dinárov \(1994 – 2002\)),
 			},
 		},
 		'YUN' => {
+			symbol => 'YUN',
 			display_name => {
-				'currency' => q(Juhoslávsky dinár),
+				'currency' => q(juhoslovanský konvertibilný dinár \(1990 – 1992\)),
+				'few' => q(juhoslovanské konvertibilné dináre \(1990 – 1992\)),
+				'many' => q(juhoslovanského konvertibilného dinára \(1990 – 1992\)),
+				'one' => q(juhoslovanský konvertibilný dinár \(1990 – 1992\)),
+				'other' => q(juhoslovanských konvertibilných dinárov \(1990 – 1992\)),
+			},
+		},
+		'YUR' => {
+			symbol => 'YUR',
+			display_name => {
+				'currency' => q(juhoslovanský reformovaný dinár \(1992 – 1993\)),
+				'few' => q(juhoslovanské reformované dináre \(1992 – 1993\)),
+				'many' => q(juhoslovanského reformovaného dinára \(1992 – 1993\)),
+				'one' => q(juhoslovanský reformovaný dinár \(1992 – 1993\)),
+				'other' => q(juhoslovanských reformovaných dinárov \(1992 – 1993\)),
 			},
 		},
 		'ZAL' => {
+			symbol => 'ZAL',
 			display_name => {
-				'currency' => q(Juhoafrický rand \(financial\)),
+				'currency' => q(juhoafrický rand \(finančný\)),
+				'few' => q(juhoafrické randy \(finančné\)),
+				'many' => q(juhoafrického randu \(finančného\)),
+				'one' => q(juhoafrický rand \(finančný\)),
+				'other' => q(juhoafrických randov \(finančných\)),
 			},
 		},
 		'ZAR' => {
@@ -6619,12 +7563,13 @@ has 'currencies' => (
 			},
 		},
 		'ZMK' => {
+			symbol => 'ZMK',
 			display_name => {
-				'currency' => q(Zambijská kwacha \(1968–2012\)),
-				'few' => q(zambijské kwachy \(1968–2012\)),
-				'many' => q(zambijskej kwachy \(1968–2012\)),
-				'one' => q(zambijská kwacha \(1968–2012\)),
-				'other' => q(zambijských kwách \(1968–2012\)),
+				'currency' => q(zambijská kwacha \(1968 – 2012\)),
+				'few' => q(zambijské kwachy \(1968 – 2012\)),
+				'many' => q(zambijskej kwachy \(1968 – 2012\)),
+				'one' => q(zambijská kwacha \(1968 – 2012\)),
+				'other' => q(zambijských kwách \(1968 – 2012\)),
 			},
 		},
 		'ZMW' => {
@@ -6638,28 +7583,39 @@ has 'currencies' => (
 			},
 		},
 		'ZRN' => {
+			symbol => 'ZRN',
 			display_name => {
-				'currency' => q(Zairský nový zaire),
+				'currency' => q(zairský nový zaire \(1993 – 1998\)),
+				'few' => q(zairské nové zairy \(1993 – 1998\)),
+				'many' => q(zairského nového zairu \(1993 – 1998\)),
+				'one' => q(zairský nový zaire \(1993 – 1998\)),
+				'other' => q(zairských nových zairov \(1993 – 1998\)),
 			},
 		},
 		'ZRZ' => {
+			symbol => 'ZRZ',
 			display_name => {
-				'currency' => q(Zairský Zaire),
+				'currency' => q(zairský zaire \(1971 – 1993\)),
+				'few' => q(zairské zairy \(1971 – 1993\)),
+				'many' => q(zairského zairu \(1971 – 1993\)),
+				'one' => q(zairský zaire \(1971 – 1993\)),
+				'other' => q(zairských zairov \(1971 – 1993\)),
 			},
 		},
 		'ZWD' => {
+			symbol => 'ZWD',
 			display_name => {
-				'currency' => q(Zimbabwiansky dolár \(1980–2008\)),
-				'few' => q(zimbabwianske doláre \(1980–2008\)),
-				'many' => q(zimbabwianskeho dolára \(1980–2008\)),
-				'one' => q(zimbabwiansky dolár \(1980–2008\)),
-				'other' => q(zimbabwianskych dolárov \(1980–2008\)),
+				'currency' => q(zimbabwiansky dolár \(1980 – 2008\)),
+				'few' => q(zimbabwianske doláre \(1980 – 2008\)),
+				'many' => q(zimbabwianskeho dolára \(1980 – 2008\)),
+				'one' => q(zimbabwiansky dolár \(1980 – 2008\)),
+				'other' => q(zimbabwianskych dolárov \(1980 – 2008\)),
 			},
 		},
 		'ZWL' => {
 			symbol => 'ZWL',
 			display_name => {
-				'currency' => q(Zimbabwiansky dolár \(2009\)),
+				'currency' => q(zimbabwiansky dolár \(2009\)),
 				'few' => q(zimbabwianske doláre \(2009\)),
 				'many' => q(zimbabwianskeho dolára \(2009\)),
 				'one' => q(zimbabwiansky dolár \(2009\)),
@@ -6667,8 +7623,9 @@ has 'currencies' => (
 			},
 		},
 		'ZWR' => {
+			symbol => 'ZWR',
 			display_name => {
-				'currency' => q(Zimbabwiansky dolár \(2008\)),
+				'currency' => q(zimbabwiansky dolár \(2008\)),
 				'few' => q(zimbabwianske doláre \(2008\)),
 				'many' => q(zimbabwianskeho dolára \(2008\)),
 				'one' => q(zimbabwiansky dolár \(2008\)),
@@ -6684,6 +7641,178 @@ has 'calendar_months' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+			'coptic' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hator',
+							'kiahk',
+							'toba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hator',
+							'kiahk',
+							'toba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hator',
+							'kiahk',
+							'toba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hator',
+							'kiahk',
+							'toba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+			'ethiopic' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
@@ -6797,6 +7926,362 @@ has 'calendar_months' => (
 							'október',
 							'november',
 							'december'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+			'hebrew' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
+					wide => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
+					wide => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
+				},
+			},
+			'indian' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+			'islamic' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'muh.',
+							'saf.',
+							'rab. I',
+							'rab. II',
+							'džum. I',
+							'džum. II',
+							'rad.',
+							'ša.',
+							'ram.',
+							'šau.',
+							'dhú l-k.',
+							'dhú l-h.'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'al-muharram',
+							'safar',
+							'rabí´ al-avval',
+							'rabí´ath-thání',
+							'džumádá l-úlá',
+							'džumádá l-áchira',
+							'radžab',
+							'ša´ bán',
+							'ramadán',
+							'šauvál',
+							'dhú l-ka´ da',
+							'dhú l-hidždža'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'muh.',
+							'saf.',
+							'rab. I',
+							'rab. II',
+							'džum. I',
+							'džum. II',
+							'rad.',
+							'ša.',
+							'ram.',
+							'šau.',
+							'dhú l-k.',
+							'dhú l-h.'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'al-muharram',
+							'safar',
+							'rabí´ al-avval',
+							'rabí´ath-thání',
+							'džumádá l-úlá',
+							'džumádá l-áchira',
+							'radžab',
+							'ša´ bán',
+							'ramadán',
+							'šauvál',
+							'dhú l-ka´ da',
+							'dhú l-hidždža'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+			'persian' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
 						],
 						leap => [
 							
@@ -6947,61 +8432,293 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'persian') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
@@ -7021,73 +8738,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'midnight' => q{o poln.},
-					'noon' => q{nap.},
-					'night1' => q{v n.},
-					'morning1' => q{ráno},
-					'morning2' => q{dop.},
-					'evening1' => q{več.},
-					'afternoon1' => q{pop.},
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'wide' => {
+					'am' => q{AM},
+					'evening1' => q{večer},
+					'morning2' => q{dopoludnia},
+					'afternoon1' => q{popoludní},
+					'morning1' => q{ráno},
 					'night1' => q{v noci},
 					'noon' => q{napoludnie},
-					'morning1' => q{ráno},
-					'midnight' => q{o polnoci},
-					'morning2' => q{dopoludnia},
 					'pm' => q{PM},
+					'midnight' => q{o polnoci},
+				},
+				'narrow' => {
+					'evening1' => q{več.},
 					'am' => q{AM},
-					'afternoon1' => q{popoludní},
-					'evening1' => q{večer},
+					'morning2' => q{dop.},
+					'afternoon1' => q{pop.},
+					'morning1' => q{ráno},
+					'noon' => q{nap.},
+					'night1' => q{v n.},
+					'pm' => q{PM},
+					'midnight' => q{o poln.},
 				},
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
-					'afternoon1' => q{popol.},
 					'evening1' => q{večer},
-					'morning1' => q{ráno},
+					'morning2' => q{dopol.},
+					'midnight' => q{o poln.},
+					'pm' => q{PM},
 					'night1' => q{v noci},
 					'noon' => q{napol.},
-					'midnight' => q{o poln.},
-					'morning2' => q{dopol.},
+					'afternoon1' => q{popol.},
+					'morning1' => q{ráno},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-					'afternoon1' => q{popol.},
-					'evening1' => q{večer},
-					'morning1' => q{ráno},
-					'night1' => q{noc},
-					'noon' => q{pol.},
-					'midnight' => q{poln.},
-					'morning2' => q{dopol.},
-				},
 				'narrow' => {
-					'am' => q{AM},
 					'pm' => q{PM},
-					'afternoon1' => q{pop.},
-					'evening1' => q{več.},
-					'morning2' => q{dop.},
-					'night1' => q{noc},
-					'noon' => q{pol.},
-					'morning1' => q{ráno},
 					'midnight' => q{poln.},
+					'noon' => q{pol.},
+					'night1' => q{noc},
+					'morning1' => q{ráno},
+					'afternoon1' => q{pop.},
+					'morning2' => q{dop.},
+					'evening1' => q{več.},
+					'am' => q{AM},
 				},
 				'wide' => {
-					'evening1' => q{večer},
-					'afternoon1' => q{popoludnie},
-					'pm' => q{PM},
-					'am' => q{AM},
-					'midnight' => q{polnoc},
-					'night1' => q{noc},
-					'noon' => q{poludnie},
 					'morning1' => q{ráno},
+					'afternoon1' => q{popoludnie},
+					'noon' => q{poludnie},
+					'night1' => q{noc},
+					'pm' => q{PM},
+					'midnight' => q{polnoc},
+					'am' => q{AM},
 					'morning2' => q{dopoludnie},
+					'evening1' => q{večer},
+				},
+				'abbreviated' => {
+					'morning2' => q{dopol.},
+					'am' => q{AM},
+					'evening1' => q{večer},
+					'pm' => q{PM},
+					'midnight' => q{poln.},
+					'afternoon1' => q{popol.},
+					'morning1' => q{ráno},
+					'night1' => q{noc},
+					'noon' => q{pol.},
 				},
 			},
 		},
@@ -7099,6 +8816,45 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+			abbreviated => {
+				'0' => 'BE'
+			},
+			narrow => {
+				'0' => 'BE'
+			},
+			wide => {
+				'0' => 'BE'
+			},
+		},
+		'coptic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+		},
+		'ethiopic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -7111,6 +8867,64 @@ has 'eras' => (
 				'1' => 'po Kristovi'
 			},
 		},
+		'hebrew' => {
+			abbreviated => {
+				'0' => 'AM'
+			},
+			narrow => {
+				'0' => 'AM'
+			},
+			wide => {
+				'0' => 'AM'
+			},
+		},
+		'indian' => {
+			abbreviated => {
+				'0' => 'Šaka'
+			},
+			narrow => {
+				'0' => 'Šaka'
+			},
+			wide => {
+				'0' => 'Šaka'
+			},
+		},
+		'islamic' => {
+			abbreviated => {
+				'0' => 'AH'
+			},
+			narrow => {
+				'0' => 'AH'
+			},
+			wide => {
+				'0' => 'AH'
+			},
+		},
+		'persian' => {
+			abbreviated => {
+				'0' => 'AP'
+			},
+			narrow => {
+				'0' => 'AP'
+			},
+			wide => {
+				'0' => 'AP'
+			},
+		},
+		'roc' => {
+			abbreviated => {
+				'0' => 'pred ROC',
+				'1' => 'ROC'
+			},
+			narrow => {
+				'0' => 'pred ROC',
+				'1' => 'ROC'
+			},
+			wide => {
+				'0' => 'pred ROC',
+				'1' => 'ROC'
+			},
+		},
 	} },
 );
 
@@ -7119,6 +8933,12 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
+		'coptic' => {
+		},
+		'ethiopic' => {
+		},
 		'generic' => {
 			'full' => q{EEEE, d. M. y G},
 			'long' => q{d. M. y G},
@@ -7126,10 +8946,20 @@ has 'date_formats' => (
 			'short' => q{d.M.y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE, d. MMMM y},
+			'full' => q{EEEE d. MMMM y},
 			'long' => q{d. MMMM y},
 			'medium' => q{d. M. y},
-			'short' => q{d.M.yy},
+			'short' => q{d. M. y},
+		},
+		'hebrew' => {
+		},
+		'indian' => {
+		},
+		'islamic' => {
+		},
+		'persian' => {
+		},
+		'roc' => {
 		},
 	} },
 );
@@ -7139,6 +8969,12 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
+		'coptic' => {
+		},
+		'ethiopic' => {
+		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -7146,6 +8982,16 @@ has 'time_formats' => (
 			'long' => q{H:mm:ss z},
 			'medium' => q{H:mm:ss},
 			'short' => q{H:mm},
+		},
+		'hebrew' => {
+		},
+		'indian' => {
+		},
+		'islamic' => {
+		},
+		'persian' => {
+		},
+		'roc' => {
 		},
 	} },
 );
@@ -7155,6 +9001,12 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
+		'coptic' => {
+		},
+		'ethiopic' => {
+		},
 		'generic' => {
 			'full' => q{{1}, {0}},
 			'long' => q{{1}, {0}},
@@ -7167,6 +9019,16 @@ has 'datetime_formats' => (
 			'medium' => q{{1}, {0}},
 			'short' => q{{1} {0}},
 		},
+		'hebrew' => {
+		},
+		'indian' => {
+		},
+		'islamic' => {
+		},
+		'persian' => {
+		},
+		'roc' => {
+		},
 	} },
 );
 
@@ -7176,7 +9038,12 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{E d.},
@@ -7184,7 +9051,7 @@ has 'datetime_formats_available_formats' => (
 			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{LLLL y G},
-			GyMMMEd => q{E, d. M. y G},
+			GyMMMEd => q{E d. M. y G},
 			GyMMMMd => q{d. M. y G},
 			GyMMMd => q{d. M. y G},
 			H => q{H},
@@ -7197,6 +9064,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E d. M.},
 			MMMMEd => q{E d. MMMM},
+			MMMMW => q{W. 'týždeň' 'v' MMM},
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. M.},
 			Md => q{d. M.},
@@ -7219,10 +9087,20 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d. M. y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{w. 'týždeň' 'v' 'roku' Y},
 		},
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E H:mm},
+			EHms => q{E H:mm:ss},
 			Ed => q{E d.},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{LLL y G},
 			GyMMMEd => q{E d. M. y G},
@@ -7488,9 +9366,16 @@ has 'time_zone_names' => (
 		regionFormat => q({0} (+1)),
 		regionFormat => q({0} (+0)),
 		fallbackFormat => q({1} ({0})),
+		'Acre' => {
+			long => {
+				'daylight' => q#acrejský letný čas#,
+				'generic' => q#acrejský čas#,
+				'standard' => q#acrejský štandardný čas#,
+			},
+		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(afganský čas),
+				'standard' => q#afganský čas#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -7651,38 +9536,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(stredoafrický čas),
+				'standard' => q#stredoafrický čas#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(východoafrický čas),
+				'standard' => q#východoafrický čas#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(juhoafrický čas),
+				'standard' => q#juhoafrický čas#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(západoafrický letný čas),
-				'generic' => q(západoafrický čas),
-				'standard' => q(západoafrický štandardný čas),
+				'daylight' => q#západoafrický letný čas#,
+				'generic' => q#západoafrický čas#,
+				'standard' => q#západoafrický štandardný čas#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(aljašský letný čas),
-				'generic' => q(aljašský čas),
-				'standard' => q(aljašský štandardný čas),
+				'daylight' => q#aljašský letný čas#,
+				'generic' => q#aljašský čas#,
+				'standard' => q#aljašský štandardný čas#,
+			},
+		},
+		'Almaty' => {
+			long => {
+				'daylight' => q#almaatský letný čas#,
+				'generic' => q#almaatský čas#,
+				'standard' => q#almaatský štandardný čas#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(amazonský letný čas),
-				'generic' => q(amazonský čas),
-				'standard' => q(amazonský štandardný čas),
+				'daylight' => q#amazonský letný čas#,
+				'generic' => q#amazonský čas#,
+				'standard' => q#amazonský štandardný čas#,
 			},
 		},
 		'America/Adak' => {
@@ -7828,6 +9720,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvádor#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -8030,6 +9925,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portoriko#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
 		},
@@ -8125,37 +10023,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(severoamerický centrálny letný čas),
-				'generic' => q(severoamerický centrálny čas),
-				'standard' => q(severoamerický centrálny štandardný čas),
+				'daylight' => q#severoamerický centrálny letný čas#,
+				'generic' => q#severoamerický centrálny čas#,
+				'standard' => q#severoamerický centrálny štandardný čas#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(severoamerický východný letný čas),
-				'generic' => q(severoamerický východný čas),
-				'standard' => q(severoamerický východný štandardný čas),
+				'daylight' => q#severoamerický východný letný čas#,
+				'generic' => q#severoamerický východný čas#,
+				'standard' => q#severoamerický východný štandardný čas#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(severoamerický horský letný čas),
-				'generic' => q(severoamerický horský čas),
-				'standard' => q(severoamerický horský štandardný čas),
+				'daylight' => q#severoamerický horský letný čas#,
+				'generic' => q#severoamerický horský čas#,
+				'standard' => q#severoamerický horský štandardný čas#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(severoamerický tichomorský letný čas),
-				'generic' => q(severoamerický tichomorský čas),
-				'standard' => q(severoamerický tichomorský štandardný čas),
+				'daylight' => q#severoamerický tichomorský letný čas#,
+				'generic' => q#severoamerický tichomorský čas#,
+				'standard' => q#severoamerický tichomorský štandardný čas#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadyrský letný čas),
-				'generic' => q(Anadyrský čas),
-				'standard' => q(Anadyrský štandardný čas),
+				'daylight' => q#Anadyrský letný čas#,
+				'generic' => q#Anadyrský čas#,
+				'standard' => q#Anadyrský štandardný čas#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -8165,7 +10063,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Davis#,
 		},
 		'Antarctica/DumontDUrville' => {
-			exemplarCity => q#Dumont D’Urville#,
+			exemplarCity => q#Dumont d’Urville#,
 		},
 		'Antarctica/Macquarie' => {
 			exemplarCity => q#Macquarie#,
@@ -8193,16 +10091,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(apijský letný čas),
-				'generic' => q(apijský čas),
-				'standard' => q(apijský štandardný čas),
+				'daylight' => q#apijský letný čas#,
+				'generic' => q#apijský čas#,
+				'standard' => q#apijský štandardný čas#,
+			},
+		},
+		'Aqtau' => {
+			long => {
+				'daylight' => q#aktauský letný čas#,
+				'generic' => q#aktauský čas#,
+				'standard' => q#aktauský štandardný čas#,
+			},
+		},
+		'Aqtobe' => {
+			long => {
+				'daylight' => q#aktobský letný čas#,
+				'generic' => q#aktobský čas#,
+				'standard' => q#aktobský štandardný čas#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(arabský letný čas),
-				'generic' => q(arabský čas),
-				'standard' => q(arabský štandardný čas),
+				'daylight' => q#arabský letný čas#,
+				'generic' => q#arabský čas#,
+				'standard' => q#arabský štandardný čas#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -8210,23 +10122,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(argentínsky letný čas),
-				'generic' => q(argentínsky čas),
-				'standard' => q(argentínsky štandardný čas),
+				'daylight' => q#argentínsky letný čas#,
+				'generic' => q#argentínsky čas#,
+				'standard' => q#argentínsky štandardný čas#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(západoargentínsky letný čas),
-				'generic' => q(západoargentínsky čas),
-				'standard' => q(západoargentínsky štandardný čas),
+				'daylight' => q#západoargentínsky letný čas#,
+				'generic' => q#západoargentínsky čas#,
+				'standard' => q#západoargentínsky štandardný čas#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(arménsky letný čas),
-				'generic' => q(arménsky čas),
-				'standard' => q(arménsky štandardný čas),
+				'daylight' => q#arménsky letný čas#,
+				'generic' => q#arménsky čas#,
+				'standard' => q#arménsky štandardný čas#,
 			},
 		},
 		'Asia/Aden' => {
@@ -8250,6 +10162,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ašchabad#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Bagdad#,
 		},
@@ -8261,6 +10176,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Bejrút#,
@@ -8297,6 +10215,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dušanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gaza#,
@@ -8439,6 +10360,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokio#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulanbátar#,
 		},
@@ -8465,9 +10389,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(atlantický letný čas),
-				'generic' => q(atlantický čas),
-				'standard' => q(atlantický štandardný čas),
+				'daylight' => q#atlantický letný čas#,
+				'generic' => q#atlantický čas#,
+				'standard' => q#atlantický štandardný čas#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -8538,171 +10462,184 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(stredoaustrálsky letný čas),
-				'generic' => q(stredoaustrálsky čas),
-				'standard' => q(stredoaustrálsky štandardný čas),
+				'daylight' => q#stredoaustrálsky letný čas#,
+				'generic' => q#stredoaustrálsky čas#,
+				'standard' => q#stredoaustrálsky štandardný čas#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(stredozápadný austrálsky letný čas),
-				'generic' => q(stredozápadný austrálsky čas),
-				'standard' => q(stredozápadný austrálsky štandardný čas),
+				'daylight' => q#stredozápadný austrálsky letný čas#,
+				'generic' => q#stredozápadný austrálsky čas#,
+				'standard' => q#stredozápadný austrálsky štandardný čas#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(východoaustrálsky letný čas),
-				'generic' => q(východoaustrálsky čas),
-				'standard' => q(východoaustrálsky štandardný čas),
+				'daylight' => q#východoaustrálsky letný čas#,
+				'generic' => q#východoaustrálsky čas#,
+				'standard' => q#východoaustrálsky štandardný čas#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(západoaustrálsky letný čas),
-				'generic' => q(západoaustrálsky čas),
-				'standard' => q(západoaustrálsky štandardný čas),
+				'daylight' => q#západoaustrálsky letný čas#,
+				'generic' => q#západoaustrálsky čas#,
+				'standard' => q#západoaustrálsky štandardný čas#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(azerbajdžanský letný čas),
-				'generic' => q(azerbajdžanský čas),
-				'standard' => q(azerbajdžanský štandardný čas),
+				'daylight' => q#azerbajdžanský letný čas#,
+				'generic' => q#azerbajdžanský čas#,
+				'standard' => q#azerbajdžanský štandardný čas#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(azorský letný čas),
-				'generic' => q(azorský čas),
-				'standard' => q(azorský štandardný čas),
+				'daylight' => q#azorský letný čas#,
+				'generic' => q#azorský čas#,
+				'standard' => q#azorský štandardný čas#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(bangladéšsky letný čas),
-				'generic' => q(bangladéšsky čas),
-				'standard' => q(bangladéšsky štandardný čas),
+				'daylight' => q#bangladéšsky letný čas#,
+				'generic' => q#bangladéšsky čas#,
+				'standard' => q#bangladéšsky štandardný čas#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(bhutánsky čas),
+				'standard' => q#bhutánsky čas#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(bolívijský čas),
+				'standard' => q#bolívijský čas#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(brazílsky letný čas),
-				'generic' => q(brazílsky čas),
-				'standard' => q(brazílsky štandardný čas),
+				'daylight' => q#brazílsky letný čas#,
+				'generic' => q#brazílsky čas#,
+				'standard' => q#brazílsky štandardný čas#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(brunejský čas),
+				'standard' => q#brunejský čas#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(kapverdský letný čas),
-				'generic' => q(kapverdský čas),
-				'standard' => q(kapverdský štandardný čas),
+				'daylight' => q#kapverdský letný čas#,
+				'generic' => q#kapverdský čas#,
+				'standard' => q#kapverdský štandardný čas#,
+			},
+		},
+		'Casey' => {
+			long => {
+				'standard' => q#čas Caseyho stanice#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(chamorrský štandardný čas),
+				'standard' => q#chamorrský čas#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(chathamský letný čas),
-				'generic' => q(chathamský čas),
-				'standard' => q(chathamský štandardný čas),
+				'daylight' => q#chathamský letný čas#,
+				'generic' => q#chathamský čas#,
+				'standard' => q#chathamský štandardný čas#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(čilský letný čas),
-				'generic' => q(čilský čas),
-				'standard' => q(čilský štandardný čas),
+				'daylight' => q#čilský letný čas#,
+				'generic' => q#čilský čas#,
+				'standard' => q#čilský štandardný čas#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(čínsky letný čas),
-				'generic' => q(čínsky čas),
-				'standard' => q(čínsky štandardný čas),
+				'daylight' => q#čínsky letný čas#,
+				'generic' => q#čínsky čas#,
+				'standard' => q#čínsky štandardný čas#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(čojbalsanský letný čas),
-				'generic' => q(čojbalsanský čas),
-				'standard' => q(čojbalsanský štandardný čas),
+				'daylight' => q#čojbalsanský letný čas#,
+				'generic' => q#čojbalsanský čas#,
+				'standard' => q#čojbalsanský štandardný čas#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(čas Vianočného ostrova),
+				'standard' => q#čas Vianočného ostrova#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(čas Kokosových ostrovov),
+				'standard' => q#čas Kokosových ostrovov#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(kolumbijský letný čas),
-				'generic' => q(kolumbijský čas),
-				'standard' => q(kolumbijský štandardný čas),
+				'daylight' => q#kolumbijský letný čas#,
+				'generic' => q#kolumbijský čas#,
+				'standard' => q#kolumbijský štandardný čas#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(letný čas Cookových ostrovov),
-				'generic' => q(čas Cookových ostrovov),
-				'standard' => q(štandardný čas Cookových ostrovov),
+				'daylight' => q#letný čas Cookových ostrovov#,
+				'generic' => q#čas Cookových ostrovov#,
+				'standard' => q#štandardný čas Cookových ostrovov#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(kubánsky letný čas),
-				'generic' => q(kubánsky čas),
-				'standard' => q(kubánsky štandardný čas),
+				'daylight' => q#kubánsky letný čas#,
+				'generic' => q#kubánsky čas#,
+				'standard' => q#kubánsky štandardný čas#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(čas Davisovej stanice),
+				'standard' => q#čas Davisovej stanice#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(čas stanice Dumonta d’Urvillea),
+				'standard' => q#čas stanice Dumonta d’Urvillea#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(východotimorský čas),
+				'standard' => q#východotimorský čas#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(letný čas Veľkonočného ostrova),
-				'generic' => q(čas Veľkonočného ostrova),
-				'standard' => q(štandardný čas Veľkonočného ostrova),
+				'daylight' => q#letný čas Veľkonočného ostrova#,
+				'generic' => q#čas Veľkonočného ostrova#,
+				'standard' => q#štandardný čas Veľkonočného ostrova#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ekvádorský čas),
+				'standard' => q#ekvádorský čas#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#koordinovaný svetový čas#,
+			},
+			short => {
+				'standard' => q#UTC#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -8713,6 +10650,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrachán#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#Atény#,
@@ -8747,7 +10687,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(írsky štandardný čas),
+				'daylight' => q#írsky štandardný čas#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -8774,6 +10714,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kyjev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisabon#,
 		},
@@ -8783,7 +10726,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Londýn#,
 			long => {
-				'daylight' => q(britský letný čas),
+				'daylight' => q#britský letný čas#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -8834,6 +10777,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -8851,6 +10797,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Uľjanovsk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Užhorod#,
@@ -8884,134 +10833,139 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(stredoeurópsky letný čas),
-				'generic' => q(stredoeurópsky čas),
-				'standard' => q(stredoeurópsky štandardný čas),
+				'daylight' => q#stredoeurópsky letný čas#,
+				'generic' => q#stredoeurópsky čas#,
+				'standard' => q#stredoeurópsky štandardný čas#,
 			},
 			short => {
-				'daylight' => q(SELČ),
-				'generic' => q(SEČ),
-				'standard' => q(SEČ),
+				'daylight' => q#SELČ#,
+				'generic' => q#SEČ#,
+				'standard' => q#SEČ#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(východoeurópsky letný čas),
-				'generic' => q(východoeurópsky čas),
-				'standard' => q(východoeurópsky štandardný čas),
+				'daylight' => q#východoeurópsky letný čas#,
+				'generic' => q#východoeurópsky čas#,
+				'standard' => q#východoeurópsky štandardný čas#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(minský čas),
+				'standard' => q#minský čas#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(západoeurópsky letný čas),
-				'generic' => q(západoeurópsky čas),
-				'standard' => q(západoeurópsky štandardný čas),
+				'daylight' => q#západoeurópsky letný čas#,
+				'generic' => q#západoeurópsky čas#,
+				'standard' => q#západoeurópsky štandardný čas#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(falklandský letný čas),
-				'generic' => q(falklandský čas),
-				'standard' => q(falklandský štandardný čas),
+				'daylight' => q#falklandský letný čas#,
+				'generic' => q#falklandský čas#,
+				'standard' => q#falklandský štandardný čas#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(fidžijský letný čas),
-				'generic' => q(fidžijský čas),
-				'standard' => q(fidžijský štandardný čas),
+				'daylight' => q#fidžijský letný čas#,
+				'generic' => q#fidžijský čas#,
+				'standard' => q#fidžijský štandardný čas#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(francúzskoguyanský čas),
+				'standard' => q#francúzskoguyanský čas#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(čas Francúzskych južných a antarktických území),
+				'standard' => q#čas Francúzskych južných a antarktických území#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(greenwichský čas),
+				'standard' => q#greenwichský čas#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(galapágsky čas),
+				'standard' => q#galapágsky čas#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(gambierský čas),
+				'standard' => q#gambierský čas#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(gruzínsky letný čas),
-				'generic' => q(gruzínsky čas),
-				'standard' => q(gruzínsky štandardný čas),
+				'daylight' => q#gruzínsky letný čas#,
+				'generic' => q#gruzínsky čas#,
+				'standard' => q#gruzínsky štandardný čas#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(čas Gilbertových ostrovov),
+				'standard' => q#čas Gilbertových ostrovov#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(východogrónsky letný čas),
-				'generic' => q(východogrónsky čas),
-				'standard' => q(východogrónsky štandardný čas),
+				'daylight' => q#východogrónsky letný čas#,
+				'generic' => q#východogrónsky čas#,
+				'standard' => q#východogrónsky štandardný čas#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(západogrónsky letný čas),
-				'generic' => q(západogrónsky čas),
-				'standard' => q(západogrónsky štandardný čas),
+				'daylight' => q#západogrónsky letný čas#,
+				'generic' => q#západogrónsky čas#,
+				'standard' => q#západogrónsky štandardný čas#,
+			},
+		},
+		'Guam' => {
+			long => {
+				'standard' => q#guamský čas#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(štandardný čas Perzského zálivu),
+				'standard' => q#štandardný čas Perzského zálivu#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(guyanský čas),
+				'standard' => q#guyanský čas#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(havajsko-aleutský letný čas),
-				'generic' => q(havajsko-aleutský čas),
-				'standard' => q(havajsko-aleutský štandardný čas),
+				'daylight' => q#havajsko-aleutský letný čas#,
+				'generic' => q#havajsko-aleutský čas#,
+				'standard' => q#havajsko-aleutský štandardný čas#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(hongkonský letný čas),
-				'generic' => q(hongkonský čas),
-				'standard' => q(hongkonský štandardný čas),
+				'daylight' => q#hongkonský letný čas#,
+				'generic' => q#hongkonský čas#,
+				'standard' => q#hongkonský štandardný čas#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(chovdský letný čas),
-				'generic' => q(chovdský čas),
-				'standard' => q(chovdský štandardný čas),
+				'daylight' => q#chovdský letný čas#,
+				'generic' => q#chovdský čas#,
+				'standard' => q#chovdský štandardný čas#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(indický čas),
+				'standard' => q#indický čas#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -9049,247 +11003,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(indickooceánsky čas),
+				'standard' => q#indickooceánsky čas#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(indočínsky čas),
+				'standard' => q#indočínsky čas#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(stredoindonézsky čas),
+				'standard' => q#stredoindonézsky čas#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(východoindonézsky čas),
+				'standard' => q#východoindonézsky čas#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(západoindonézsky čas),
+				'standard' => q#západoindonézsky čas#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(iránsky letný čas),
-				'generic' => q(iránsky čas),
-				'standard' => q(iránsky štandardný čas),
+				'daylight' => q#iránsky letný čas#,
+				'generic' => q#iránsky čas#,
+				'standard' => q#iránsky štandardný čas#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(irkutský letný čas),
-				'generic' => q(irkutský čas),
-				'standard' => q(irkutský štandardný čas),
+				'daylight' => q#irkutský letný čas#,
+				'generic' => q#irkutský čas#,
+				'standard' => q#irkutský štandardný čas#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(izraelský letný čas),
-				'generic' => q(izraelský čas),
-				'standard' => q(izraelský štandardný čas),
+				'daylight' => q#izraelský letný čas#,
+				'generic' => q#izraelský čas#,
+				'standard' => q#izraelský štandardný čas#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(japonský letný čas),
-				'generic' => q(japonský čas),
-				'standard' => q(japonský štandardný čas),
+				'daylight' => q#japonský letný čas#,
+				'generic' => q#japonský čas#,
+				'standard' => q#japonský štandardný čas#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Petropavlovsk-Kamčatskijský letný čas),
-				'generic' => q(Petropavlovsk-Kamčatský čas),
-				'standard' => q(Petropavlovsk-Kamčatský štandardný čas),
+				'daylight' => q#Petropavlovsk-Kamčatskijský letný čas#,
+				'generic' => q#Petropavlovsk-Kamčatský čas#,
+				'standard' => q#Petropavlovsk-Kamčatský štandardný čas#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(východokazachstanský čas),
+				'standard' => q#východokazachstanský čas#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(západokazachstanský čas),
+				'standard' => q#západokazachstanský čas#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(kórejský letný čas),
-				'generic' => q(kórejský čas),
-				'standard' => q(kórejský štandardný čas),
+				'daylight' => q#kórejský letný čas#,
+				'generic' => q#kórejský čas#,
+				'standard' => q#kórejský štandardný čas#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(kosrajský čas),
+				'standard' => q#kosrajský čas#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(krasnojarský letný čas),
-				'generic' => q(krasnojarský čas),
-				'standard' => q(krasnojarský štandardný čas),
+				'daylight' => q#krasnojarský letný čas#,
+				'generic' => q#krasnojarský čas#,
+				'standard' => q#krasnojarský štandardný čas#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(kirgizský čas),
+				'standard' => q#kirgizský čas#,
+			},
+		},
+		'Lanka' => {
+			long => {
+				'standard' => q#srílanský čas#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(čas Rovníkových ostrovov),
+				'standard' => q#čas Rovníkových ostrovov#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(letný čas ostrova lorda Howa),
-				'generic' => q(čas ostrova lorda Howa),
-				'standard' => q(štandardný čas ostrova lorda Howa),
+				'daylight' => q#letný čas ostrova lorda Howa#,
+				'generic' => q#čas ostrova lorda Howa#,
+				'standard' => q#štandardný čas ostrova lorda Howa#,
+			},
+		},
+		'Macau' => {
+			long => {
+				'daylight' => q#macajský letný čas#,
+				'generic' => q#macajský čas#,
+				'standard' => q#macajský štandardný čas#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(čas ostrova Macquarie),
+				'standard' => q#čas ostrova Macquarie#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(magadanský letný čas),
-				'generic' => q(magadanský čas),
-				'standard' => q(magadanský štandardný čas),
+				'daylight' => q#magadanský letný čas#,
+				'generic' => q#magadanský čas#,
+				'standard' => q#magadanský štandardný čas#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(malajzijský čas),
+				'standard' => q#malajzijský čas#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(maldivský čas),
+				'standard' => q#maldivský čas#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(markézsky čas),
+				'standard' => q#markézsky čas#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(čas Marshallových ostrovov),
+				'standard' => q#čas Marshallových ostrovov#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(maurícijský letný čas),
-				'generic' => q(maurícijský čas),
-				'standard' => q(maurícijský štandardný čas),
+				'daylight' => q#maurícijský letný čas#,
+				'generic' => q#maurícijský čas#,
+				'standard' => q#maurícijský štandardný čas#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(čas Mawsonovej stanice),
+				'standard' => q#čas Mawsonovej stanice#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(severozápadný mexický letný čas),
-				'generic' => q(severozápadný mexický čas),
-				'standard' => q(severozápadný mexický štandardný čas),
+				'daylight' => q#severozápadný mexický letný čas#,
+				'generic' => q#severozápadný mexický čas#,
+				'standard' => q#severozápadný mexický štandardný čas#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(mexický tichomorský letný čas),
-				'generic' => q(mexický tichomorský čas),
-				'standard' => q(mexický tichomorský štandardný čas),
+				'daylight' => q#mexický tichomorský letný čas#,
+				'generic' => q#mexický tichomorský čas#,
+				'standard' => q#mexický tichomorský štandardný čas#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(ulanbátarský letný čas),
-				'generic' => q(ulanbátarský čas),
-				'standard' => q(ulanbátarský štandardný čas),
+				'daylight' => q#ulanbátarský letný čas#,
+				'generic' => q#ulanbátarský čas#,
+				'standard' => q#ulanbátarský štandardný čas#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(moskovský letný čas),
-				'generic' => q(moskovský čas),
-				'standard' => q(moskovský štandardný čas),
+				'daylight' => q#moskovský letný čas#,
+				'generic' => q#moskovský čas#,
+				'standard' => q#moskovský štandardný čas#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(mjanmarský čas),
+				'standard' => q#mjanmarský čas#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(nauruský čas),
+				'standard' => q#nauruský čas#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(nepálsky čas),
+				'standard' => q#nepálsky čas#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(novokaledónsky letný čas),
-				'generic' => q(novokaledónsky čas),
-				'standard' => q(novokaledónsky štandardný čas),
+				'daylight' => q#novokaledónsky letný čas#,
+				'generic' => q#novokaledónsky čas#,
+				'standard' => q#novokaledónsky štandardný čas#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(novozélandský letný čas),
-				'generic' => q(novozélandský čas),
-				'standard' => q(novozélandský štandardný čas),
+				'daylight' => q#novozélandský letný čas#,
+				'generic' => q#novozélandský čas#,
+				'standard' => q#novozélandský štandardný čas#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(newfoundlandský letný čas),
-				'generic' => q(newfoundlandský čas),
-				'standard' => q(newfoundlandský štandardný čas),
+				'daylight' => q#newfoundlandský letný čas#,
+				'generic' => q#newfoundlandský čas#,
+				'standard' => q#newfoundlandský štandardný čas#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(niuejský čas),
+				'standard' => q#niuejský čas#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(norfolský čas),
+				'standard' => q#norfolský čas#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(letný čas súostrovia Fernando de Noronha),
-				'generic' => q(čas súostrovia Fernando de Noronha),
-				'standard' => q(štandardný čas súostrovia Fernando de Noronha),
+				'daylight' => q#letný čas súostrovia Fernando de Noronha#,
+				'generic' => q#čas súostrovia Fernando de Noronha#,
+				'standard' => q#štandardný čas súostrovia Fernando de Noronha#,
+			},
+		},
+		'North_Mariana' => {
+			long => {
+				'standard' => q#severomariánsky čas#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(novosibirský letný čas),
-				'generic' => q(novosibirský čas),
-				'standard' => q(novosibirský štandardný čas),
+				'daylight' => q#novosibirský letný čas#,
+				'generic' => q#novosibirský čas#,
+				'standard' => q#novosibirský štandardný čas#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(omský letný čas),
-				'generic' => q(omský čas),
-				'standard' => q(omský štandardný čas),
+				'daylight' => q#omský letný čas#,
+				'generic' => q#omský čas#,
+				'standard' => q#omský štandardný čas#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -9336,6 +11307,11 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
+			short => {
+				'daylight' => q#HDT#,
+				'generic' => q#HST#,
+				'standard' => q#HST#,
+			},
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#Johnston#,
@@ -9411,238 +11387,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(pakistanský letný čas),
-				'generic' => q(pakistanský čas),
-				'standard' => q(pakistanský štandardný čas),
+				'daylight' => q#pakistanský letný čas#,
+				'generic' => q#pakistanský čas#,
+				'standard' => q#pakistanský štandardný čas#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(palauský čas),
+				'standard' => q#palauský čas#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(čas Papuy-Novej Guiney),
+				'standard' => q#čas Papuy-Novej Guiney#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(paraguajský letný čas),
-				'generic' => q(paraguajský čas),
-				'standard' => q(paraguajský štandardný čas),
+				'daylight' => q#paraguajský letný čas#,
+				'generic' => q#paraguajský čas#,
+				'standard' => q#paraguajský štandardný čas#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(peruánsky letný čas),
-				'generic' => q(peruánsky čas),
-				'standard' => q(peruánsky štandardný čas),
+				'daylight' => q#peruánsky letný čas#,
+				'generic' => q#peruánsky čas#,
+				'standard' => q#peruánsky štandardný čas#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(filipínsky letný čas),
-				'generic' => q(filipínsky čas),
-				'standard' => q(filipínsky štandardný čas),
+				'daylight' => q#filipínsky letný čas#,
+				'generic' => q#filipínsky čas#,
+				'standard' => q#filipínsky štandardný čas#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(čas Fénixových ostrovov),
+				'standard' => q#čas Fénixových ostrovov#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(pierre-miquelonský letný čas),
-				'generic' => q(pierre-miquelonský čas),
-				'standard' => q(pierre-miquelonský štandardný čas),
+				'daylight' => q#pierre-miquelonský letný čas#,
+				'generic' => q#pierre-miquelonský čas#,
+				'standard' => q#pierre-miquelonský štandardný čas#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(čas Pitcairnových ostrovov),
+				'standard' => q#čas Pitcairnových ostrovov#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(ponapský čas),
+				'standard' => q#ponapský čas#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#pchjongjanský čas#,
+			},
+		},
+		'Qyzylorda' => {
+			long => {
+				'daylight' => q#kyzylordský letný čas#,
+				'generic' => q#kyzylordský čas#,
+				'standard' => q#kyzylordský štandardný čas#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(réunionský čas),
+				'standard' => q#réunionský čas#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(čas Rotherovej stanice),
+				'standard' => q#čas Rotherovej stanice#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(sachalinský letný čas),
-				'generic' => q(sachalinský čas),
-				'standard' => q(sachalinský štandardný čas),
+				'daylight' => q#sachalinský letný čas#,
+				'generic' => q#sachalinský čas#,
+				'standard' => q#sachalinský štandardný čas#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samarský letný čas),
-				'generic' => q(Samarský čas),
-				'standard' => q(Samarský štandardný čas),
+				'daylight' => q#Samarský letný čas#,
+				'generic' => q#Samarský čas#,
+				'standard' => q#Samarský štandardný čas#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(samojský letný čas),
-				'generic' => q(samojský čas),
-				'standard' => q(samojský štandardný čas),
+				'daylight' => q#samojský letný čas#,
+				'generic' => q#samojský čas#,
+				'standard' => q#samojský štandardný čas#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(seychelský čas),
+				'standard' => q#seychelský čas#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(singapurský štandardný čas),
+				'standard' => q#singapurský štandardný čas#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(čas Šalamúnových ostrovov),
+				'standard' => q#čas Šalamúnových ostrovov#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(čas Južnej Georgie),
+				'standard' => q#čas Južnej Georgie#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(surinamský čas),
+				'standard' => q#surinamský čas#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(čas stanice Šówa),
+				'standard' => q#čas stanice Šówa#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(tahitský čas),
+				'standard' => q#tahitský čas#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(tchajpejský letný čas),
-				'generic' => q(tchajpejský čas),
-				'standard' => q(tchajpejský štandardný čas),
+				'daylight' => q#tchajpejský letný čas#,
+				'generic' => q#tchajpejský čas#,
+				'standard' => q#tchajpejský štandardný čas#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(tadžický čas),
+				'standard' => q#tadžický čas#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(tokelauský čas),
+				'standard' => q#tokelauský čas#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(tonžský letný čas),
-				'generic' => q(tonžský čas),
-				'standard' => q(tonžský štandardný čas),
+				'daylight' => q#tonžský letný čas#,
+				'generic' => q#tonžský čas#,
+				'standard' => q#tonžský štandardný čas#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(chuukský čas),
+				'standard' => q#chuukský čas#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(turkménsky letný čas),
-				'generic' => q(turkménsky čas),
-				'standard' => q(turkménsky štandardný čas),
+				'daylight' => q#turkménsky letný čas#,
+				'generic' => q#turkménsky čas#,
+				'standard' => q#turkménsky štandardný čas#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(tuvalský čas),
+				'standard' => q#tuvalský čas#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(uruguajský letný čas),
-				'generic' => q(uruguajský čas),
-				'standard' => q(uruguajský štandardný čas),
+				'daylight' => q#uruguajský letný čas#,
+				'generic' => q#uruguajský čas#,
+				'standard' => q#uruguajský štandardný čas#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(uzbecký letný čas),
-				'generic' => q(uzbecký čas),
-				'standard' => q(uzbecký štandardný čas),
+				'daylight' => q#uzbecký letný čas#,
+				'generic' => q#uzbecký čas#,
+				'standard' => q#uzbecký štandardný čas#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(vanuatský letný čas),
-				'generic' => q(vanuatský čas),
-				'standard' => q(vanuatský štandardný čas),
+				'daylight' => q#vanuatský letný čas#,
+				'generic' => q#vanuatský čas#,
+				'standard' => q#vanuatský štandardný čas#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(venezuelský čas),
+				'standard' => q#venezuelský čas#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(vladivostocký letný čas),
-				'generic' => q(vladivostocký čas),
-				'standard' => q(vladivostocký štandardný čas),
+				'daylight' => q#vladivostocký letný čas#,
+				'generic' => q#vladivostocký čas#,
+				'standard' => q#vladivostocký štandardný čas#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(volgogradský letný čas),
-				'generic' => q(volgogradský čas),
-				'standard' => q(volgogradský štandardný čas),
+				'daylight' => q#volgogradský letný čas#,
+				'generic' => q#volgogradský čas#,
+				'standard' => q#volgogradský štandardný čas#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(čas stanice Vostok),
+				'standard' => q#čas stanice Vostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(čas ostrova Wake),
+				'standard' => q#čas ostrova Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(čas ostrovov Wallis a Futuna),
+				'standard' => q#čas ostrovov Wallis a Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(jakutský letný čas),
-				'generic' => q(jakutský čas),
-				'standard' => q(jakutský štandardný čas),
+				'daylight' => q#jakutský letný čas#,
+				'generic' => q#jakutský čas#,
+				'standard' => q#jakutský štandardný čas#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(jekaterinburský letný čas),
-				'generic' => q(jekaterinburský čas),
-				'standard' => q(jekaterinburský štandardný čas),
+				'daylight' => q#jekaterinburský letný čas#,
+				'generic' => q#jekaterinburský čas#,
+				'standard' => q#jekaterinburský štandardný čas#,
 			},
 		},
 	 } }

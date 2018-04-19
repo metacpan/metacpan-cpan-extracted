@@ -1,0 +1,193 @@
+=head1 NAME
+
+Panda::next - Replacement for next::method, performing very fast, and super::method (next-by-mro), with Perl and C++ interface.
+
+=cut
+
+=head1 SYNOPSIS
+
+    use Panda::next; # redefines next::method, maybe::next::method and next::can
+    
+    package MyClass;
+    
+    sub meth  { shift->next::method }
+    sub meth2 { shift->maybe::next::method }
+    sub meth3 { return $_[0]->next::can ? $_[0]->next::method : 12 }
+    
+    sub meth4 { shift->super::meth4 }
+    sub meth5 { shift->super::maybe::meth5 }
+    sub on_connect {
+        my $self = shift;
+        $async->do_something_and_on_complete(sub {
+            $self->super::on_connect(); # won't work via next::method
+        });
+    }
+    
+
+=head1 DESCRIPTION
+
+Perl's C<next::method> is a powerful tool which is required if you want to use C3 method resolution order.
+However it is very slow (more than 10 times slower than C<SUPER::subname>), so that if you actively use it,
+and your code is fast, it can become slow quite soon.
+
+C<Panda::next> replaces C<next::method>, C<maybe::next::method> and C<next::can> with very fast versions which are nearly the same speed as
+C<SUPER::subname> calls and behave exactly as original methods. It replaces them globally even for modules that were loaded before C<Panda::next>.
+
+However using C<next::> or C<SUPER::> may lead to inconsistency in your code, because you could use C<next::method> for a class which didn't say
+C<use mro 'c3'>, or use C<SUPER::> for a class which said C<use mro 'c3'>. Those methods don't care about your class's method resolution order, 
+they always behave the same. This may lead to hard-to-diagnose bugs in code, for example image hierarchy
+
+        A
+       / \
+      B   C
+       \ /
+        D
+
+where all of classes have (except for A, it just says __PACKAGE__)
+    
+    sub func { say __PACKAGE__; shift->next::method }
+    
+and C<D> didn't say C<use mro 'c3'>. For now it's okay, if you run this method, you will see C<DBCA> as expected.
+However if you remove methods from class C<D> and class C<B> you might expect to see <CA> however instead you will see just C<A>.
+That happens because there are 2 separate things: finding the entry method and finding the next method. Finding the first method is always
+based on the MRO you selected (in our case it's DFS), while C<next::method> or C<SUPER::func> always uses certain MRO to find next method.
+
+C<Panda::next> introduces the new keyword <super::subname> which goes to the next method according to MRO of object's class
+(or the class you initially called method on, in case of Class->method()). So if you replace shift->next::method with 
+shift->super::func, you will see C<DBA> and C<A> in our example because MRO is DFS. If you say C<use mro 'c3'> in class C<D>, you will see
+C<DBCA> and C<CA> as expected without even changing your code.
+
+However there are more reasons to use that than just a convenience. Using C<super::> you can write classes that are suitable both for including
+in C3 hierarchies and simple (DFS) hierarchies.
+
+C<super::> performs at nearly the same speeds as C<SUPER::> and upgraded C<next::>.
+
+Why does C<super::maybe::> exists? Perl doesn't have C<SUPER::maybe::> version because it's only for DFS and with DFS you always know
+if your class has any parents and if they have such a method. However with C<super::> you don't know which MRO the end class uses, so it might be
+C3 for which you are not able to detect if there is next method or no if your class is not expected to be the last for that method.
+
+=head1 METHODS
+
+=head4 next::method ([@args])
+
+Same as Perl's C<next::method>. Goes to next method using C<C3> algorithm and croaks if there is no next method
+(with the same error as original next::method).
+
+=head4 maybe::next::method ([@args])
+
+Same as Perl's C<maybe::next::method>. Goes to next method using C<C3> algorithm and returns nothing if there is no next method.
+
+=head4 next::can()
+
+Same as Perl's C<next::can>. Returns next method using C<C3> algorithm or undef if there is no next method.
+
+=head4 super::<subname> ([@args])
+
+Goest to next method according to target class' MRO and croaks if there is no next method.
+
+=head4 super::maybe::<subname> ([@args])
+
+Goest to next method according to target class' MRO and returns nothing if there is no next method.
+
+=head1 C++ FUNCTIONS
+
+See L<Panda::Install> to find out how to make headers visible for your module.
+
+    #include <xs/next.h>
+
+=head4 CV* xs::next::method (HV* target_class, CV*/GV* context_sub)
+
+Returns next method for object/class method of class C<target_class> considering C<context_sub> as a subroutine a call to C<next::method> is into.
+Always uses C3 algorithm. If there is no next method, returns C<nullptr>. Example:
+
+    void
+    somefunc (SV* obj, ...)
+    PPCODE:
+        ...
+        auto nextsub = xs::next::method(SvSTASH(SvRV(obj)), cv);
+        ...
+        call_sv((SV*)nextsub);
+        ...
+        
+Note that you always have C<context_sub> inside XSUBs as variable C<cv> which C<xsubpp> sets.
+
+See L<Panda::XS> for a more convenient way to call next method.
+
+=head4 CV* xs::next::method_strict (HV* target_class, CV*/GV* context_sub)
+
+Same as above but throws std::logic_error if there is no next method (with the same text as perl call would).
+
+=head4 CV* xs::next::method (HV* target_class)
+
+=head4 CV* xs::next::method_strict (HV* target_class)
+
+Same as above, but automatically detects context subroutine by unwinding the call stack at runtime (what C<next::method> called from perl does).
+If you want to go to next method from XSUB then this function is definitely NOT what you want, because XSUBs are not on the calls stack, so that
+you will simply go to the next method of the closest enclosing native perl subroutine. Always use two-param version function from XSUB.
+It is used by perl C<next::method> interface and may be used for rare cases when you know what you want :)
+
+=head4 xs::super::method (HV* targret_class, CV*/GV* context_sub)
+
+Returns next method for object/class method of class C<target_class> considering C<context_sub> as a subroutine a call to C<super::subname> is into.
+Uses MRO of C<target_class>. If there is no next method, returns C<nullptr>.
+
+=head4 CV* xs::super::method_strict (HV* target_class, CV*/GV* context_sub)
+
+Same as above but throws std::logic_error if there is no next method.
+
+=head1 CONTEXT SUB DIFFERENCES
+
+Perl's C<next::method> unwinds the callstack at runtime to find the enclosing sub. It takes the first not-ANON (and not debugging) sub.
+So that this case will work:
+
+    sub mymethod {
+        my $self = shift;
+        my $sub = sub { $self->next::method };
+        $sub->(); # goes to mymethod's next method
+    }
+    
+However it doesn't work in the following case:
+
+    sub mymethod {
+        my $self = shift;
+        Benchmark::timethis(-1, sub { $self->next::method });
+    }
+    
+Because at runtime the closest enclosing sub for C<next::method> call is Benchmark::timeit() your ANON sub is called from.
+And you get something like "no next::method 'timeit' for 'Benchmark'".
+
+However C<super::> and Perl's C<SUPER::> will work fine in the case above,
+because they use the package where your line C<SUPER::subname()> is written as a context.
+
+=head1 PERFORMANCE
+
+Rate per 1000 executions (i.e. 17305/s means actually 17.3 M/s). Windows 10 x64, Strawberry Perl 5.26.1. Core i7 3.3 Ghz.
+
+                     Rate  perl_nextcan panda_nextcan
+    perl_nextcan    968/s            --          -94%
+    panda_nextcan 17305/s         1687%            --
+    
+                         Rate  perl_next_method       panda_super panda_next_method
+    perl_next_method    696/s                --              -95%              -95%
+    panda_super       13474/s             1835%                --               -5%
+    panda_next_method 14147/s             1931%                5%                --
+    
+                                    Rate perl_maybe_next_method perl_maybe_next_method_last panda_maybe_super panda_maybe_next_method panda_maybe_super_last panda_maybe_next_method_last
+    perl_maybe_next_method         621/s                     --                        -19%              -95%                    -96%                   -97%                         -97%
+    perl_maybe_next_method_last    769/s                    24%                          --              -94%                    -94%                   -96%                         -97%
+    panda_maybe_super            13740/s                  2114%                       1686%                --                     -1%                   -36%                         -38%
+    panda_maybe_next_method      13941/s                  2146%                       1712%                1%                      --                   -36%                         -38%
+    panda_maybe_super_last       21630/s                  3385%                       2711%               57%                     55%                     --                          -3%
+    panda_maybe_next_method_last 22306/s                  3495%                       2799%               62%                     60%                     3%                           --
+        
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

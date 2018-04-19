@@ -1,0 +1,11 @@
+Revision history for Perl extension Mojolicious-Plugin-NamedHelpers
+
+0.03 2018-04-19T08:32:58Z
+  - Fixes for Perl 5.26
+  - Tests for custom namespaces
+
+0.02 2018-04-19T06:11:32Z
+  - Clean up packaging (Thanks Grinnz, pink_mist and mst)
+
+0.01 2018-04-18T21:03:01Z
+  - Initial test release

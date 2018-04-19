@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Struct::Match qw/struct/;
 use base qw/Import::Export/;
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 our %EX = (
 	'switch' => [qw/all/],
 	'sr' => [qw/all/]
@@ -14,7 +14,7 @@ our %EX = (
 BEGIN {
 	@STRUCT{qw/Regexp CODE/} = (
 		sub { $_[0] =~ $_[1]; }, 
-		sub { eval { $_[1]->($_[0]) } // '' } 
+		sub { eval { $_[1]->($_[0]) } } 
 	);
 }
 
@@ -25,15 +25,15 @@ sub switch {
 		while (@_); # I could map to a hash but...
 	my $evil = sub {
 		my ($val, @result) = ($_[0]);
-		do {@result = $STRUCT{$_->{ref}}($val, $_->{case});} and scalar @result && $result[0] ne '' and do {@result = ref $_->{cb} eq 'CODE' ? $_->{cb}->($val, @result) : $_->{cb}} and last for @cases;	
-		@result && (wantarray && @result) || shift @result or $default and $default->($val) or undef;
+		eval {@result = $STRUCT{$_->{ref}}($val, $_->{case});} and defined $result[0] && $result[0] ne '' and do {@result = ref $_->{cb} eq 'CODE' ? $_->{cb}->($val, @result) : $_->{cb}} and last for @cases;	
+		$#result && (wantarray && @result) || shift @result or $default and $default->($val) or undef;
 	};
 	$value ? $evil->($value) : $evil;
 }
 
 sub sr {
 	my ($search, $replace) = @_;
-	return sub { (my $val = $_[0]) =~ s/$search/$replace/g; $val};
+	return sub {my $v589 = shift; $v589 =~ s/$search/$replace/g; $v589;};
 }
 
 __END__;
@@ -44,7 +44,7 @@ Switch::Again - Switch`ing
 
 =head1 VERSION
 
-Version 0.02
+Version 0.05
 
 =cut
 

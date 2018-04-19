@@ -11,7 +11,7 @@ my %cppflags = $cppguess->module_build_options;
 
 # Ugly MSVC compiler hack 
 my $libs = Alien::Box2D->config('libs');
-$libs = ExtUtils::Liblist->ext($libs) if $Config{cc} =~ /cl/;
+$libs = ExtUtils::Liblist->ext($libs) if $Config{cc} =~ /\bcl\b/;
 
 my $cflags = Alien::Box2D->config('cflags') . ' ' . $cppflags{extra_compiler_flags} . ' ' . $Config{ccflags};
 my $lflags = $libs . ' ' . $cppflags{extra_linker_flags} . ' ' . $Config{ldflags};

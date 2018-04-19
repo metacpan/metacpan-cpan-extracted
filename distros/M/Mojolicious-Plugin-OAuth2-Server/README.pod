@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.40
+0.41
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -227,13 +227,20 @@ sub register {
     oauth => sub {
       my $c = shift;
       my @scopes = @_;
-      $Grant = $AuthCodeGrant;
+      $Grant ||= $AuthCodeGrant;
       my @res = $Grant->verify_token_and_scope(
         scopes           => [ @scopes ],
         auth_header      => $c->req->headers->header( 'Authorization' ),
         mojo_controller  => $c,
       );
-      return $res[0];
+
+      my $oauth_details = $res[0];
+
+      if ( ref( $oauth_details ) ) {
+        $oauth_details->{client_id} ||= $oauth_details->{client};
+      }
+
+      return $oauth_details;
     },
   );
 }
@@ -605,6 +612,10 @@ sub _verify_credentials {
       mojo_controller => $self,
     );
   }
+
+  $client = ! ref $client
+    ? $client
+    : ( $client->{client_id} || $client->{client} );
 
   return ( $client,$error,$scope,$user_id,$old_refresh_token );
 }

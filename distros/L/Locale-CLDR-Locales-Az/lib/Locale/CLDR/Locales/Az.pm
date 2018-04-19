@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Az - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az;
 # This file auto generated from Data\common\main\az.xml
-#	on Fri 29 Apr  6:51:35 pm GMT
+#	on Fri 13 Apr  7:01:54 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -294,11 +295,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -513,43 +514,43 @@ has 'display_name_language' => (
 	default		=> sub { 
 		 sub {
 			 my %languages = (
-				'aa' => 'afarca',
+				'aa' => 'afar',
  				'ab' => 'abxaz',
  				'ace' => 'akin',
  				'ach' => 'akoli',
- 				'ada' => 'adangme',
+ 				'ada' => 'adanqme',
  				'ady' => 'aduge',
- 				'ae' => 'avestanca',
+ 				'ae' => 'avestan',
  				'af' => 'afrikaans',
  				'afh' => 'afrihili',
  				'agq' => 'aqhem',
- 				'ain' => 'aynuca',
- 				'ak' => 'akanca',
- 				'akk' => 'akadianca',
- 				'ale' => 'aleutca',
- 				'alt' => 'cənub altay',
+ 				'ain' => 'aynu',
+ 				'ak' => 'akan',
+ 				'akk' => 'akkad',
+ 				'ale' => 'aleut',
+ 				'alt' => 'cənubi altay',
  				'am' => 'amhar',
- 				'an' => 'aragonca',
- 				'ang' => 'qədimi ingiliscə',
- 				'anp' => 'angikə',
+ 				'an' => 'araqon',
+ 				'ang' => 'qədim ingilis',
+ 				'anp' => 'angika',
  				'ar' => 'ərəb',
- 				'ar_001' => 'Modern Standart Ərəbcə',
+ 				'ar_001' => 'müasir standart ərəb',
  				'arc' => 'aramik',
- 				'arn' => 'araukanca',
+ 				'arn' => 'mapuçe',
  				'arp' => 'arapaho',
- 				'arw' => 'aravakça',
+ 				'arw' => 'aravak',
  				'as' => 'assam',
  				'asa' => 'asu',
- 				'ast' => 'asturicə',
- 				'av' => 'avarikcə',
- 				'awa' => 'avadicə',
- 				'ay' => 'aymarca',
- 				'az' => 'azərbaycan dili',
+ 				'ast' => 'asturiya',
+ 				'av' => 'avar',
+ 				'awa' => 'avadhi',
+ 				'ay' => 'aymara',
+ 				'az' => 'azərbaycan',
  				'az@alt=short' => 'azəri',
  				'az_Arab' => 'cənubi azərbaycan',
  				'ba' => 'başqırd',
  				'bal' => 'baluc',
- 				'ban' => 'balincə',
+ 				'ban' => 'bali',
  				'bas' => 'basa',
  				'be' => 'belarus',
  				'bej' => 'beja',
@@ -559,44 +560,45 @@ has 'display_name_language' => (
  				'bgn' => 'qərbi bəluc',
  				'bho' => 'bxoçpuri',
  				'bi' => 'bislama',
- 				'bik' => 'bikolca',
+ 				'bik' => 'bikol',
  				'bin' => 'bini',
  				'bla' => 'siksikə',
  				'bm' => 'bambara',
  				'bn' => 'benqal',
  				'bo' => 'tibet',
- 				'br' => 'Bretonca',
+ 				'br' => 'breton',
  				'bra' => 'braj',
  				'brx' => 'bodo',
- 				'bs' => 'bosniak',
+ 				'bs' => 'bosniya',
  				'bua' => 'buryat',
  				'bug' => 'bugin',
- 				'byn' => 'bilincə',
+ 				'byn' => 'blin',
  				'ca' => 'katalan',
- 				'cad' => 'kado',
+ 				'cad' => 'keddo',
  				'car' => 'karib',
- 				'cch' => 'atsamca',
+ 				'cch' => 'atsam',
  				'ce' => 'çeçen',
- 				'ceb' => 'kebuano',
+ 				'ceb' => 'sebuan',
  				'cgg' => 'çiqa',
  				'ch' => 'çamoro',
- 				'chb' => 'çibçə',
+ 				'chb' => 'çibça',
  				'chg' => 'çağatay',
  				'chk' => 'çukiz',
  				'chm' => 'mari',
  				'chn' => 'çinuk ləhçəsi',
  				'cho' => 'çoktau',
  				'chp' => 'çipevyan',
- 				'chr' => 'çiroki',
+ 				'chr' => 'çeroki',
  				'chy' => 'çeyen',
- 				'ckb' => 'sorani kürd',
+ 				'ckb' => 'soran',
  				'co' => 'korsika',
  				'cop' => 'kopt',
- 				'cr' => 'kri dili',
- 				'crh' => 'krım türkçə',
+ 				'cr' => 'kri',
+ 				'crh' => 'krım türkcəsi',
+ 				'crs' => 'Seyşel kreol fransızcası',
  				'cs' => 'çex',
  				'csb' => 'kaşubyan',
- 				'cu' => 'kilsə slav',
+ 				'cu' => 'slavyan',
  				'cv' => 'çuvaş',
  				'cy' => 'uels',
  				'da' => 'danimarka',
@@ -614,15 +616,16 @@ has 'display_name_language' => (
  				'doi' => 'doqri',
  				'dsb' => 'aşağı sorb',
  				'dua' => 'duala',
- 				'dum' => 'ortacaq hollandca',
- 				'dv' => 'diveh',
+ 				'dum' => 'orta holland',
+ 				'dv' => 'maldiv',
  				'dyo' => 'diola',
  				'dyu' => 'dyula',
- 				'dz' => 'dzonqa',
+ 				'dz' => 'dzonqxa',
+ 				'dzg' => 'dazaqa',
  				'ebu' => 'embu',
  				'ee' => 'eve',
  				'efi' => 'efik',
- 				'egy' => 'qədimi misir',
+ 				'egy' => 'qədim misir',
  				'eka' => 'ekacuk',
  				'el' => 'yunan',
  				'elx' => 'elamit',
@@ -630,10 +633,10 @@ has 'display_name_language' => (
  				'en_AU' => 'Avstraliya ingiliscəsi',
  				'en_CA' => 'Kanada ingiliscəsi',
  				'en_GB' => 'Britaniya ingiliscəsi',
- 				'en_GB@alt=short' => 'ingilis (B.K.)',
+ 				'en_GB@alt=short' => 'ingilis (BK)',
  				'en_US' => 'Amerika ingiliscəsi',
- 				'en_US@alt=short' => 'ingilis (A.B.Ş.)',
- 				'enm' => 'ortacaq ingiliscə',
+ 				'en_US@alt=short' => 'ingilis (ABŞ)',
+ 				'enm' => 'orta ingilis',
  				'eo' => 'esperanto',
  				'es' => 'ispan',
  				'es_419' => 'Latın Amerikası ispancası',
@@ -654,28 +657,29 @@ has 'display_name_language' => (
  				'fr' => 'fransız',
  				'fr_CA' => 'Kanada fransızcası',
  				'fr_CH' => 'İsveçrə fransızcası',
- 				'frm' => 'ortacaq fransızca',
- 				'fro' => 'qədimi fransızca',
- 				'frr' => 'şimal fris',
+ 				'frm' => 'orta fransız',
+ 				'fro' => 'qədim fransız',
+ 				'frr' => 'şimali fris',
  				'fur' => 'friul',
  				'fy' => 'qərbi friz',
  				'ga' => 'irland',
  				'gaa' => 'qa',
  				'gag' => 'qaqauz',
+ 				'gan' => 'qan',
  				'gay' => 'qayo',
  				'gba' => 'qabaya',
- 				'gd' => 'skot gaelik',
+ 				'gd' => 'Şotlandiya keltcəsi',
  				'gez' => 'qez',
- 				'gil' => 'qilbert gili',
- 				'gl' => 'qalisian',
- 				'gmh' => 'ortacaq yüksək almanca',
+ 				'gil' => 'qilbert',
+ 				'gl' => 'qalisiya',
+ 				'gmh' => 'orta yüksək alman',
  				'gn' => 'quarani',
- 				'goh' => 'qədimi almanca',
+ 				'goh' => 'qədim alman',
  				'gon' => 'qondi',
  				'gor' => 'qorontalo',
- 				'got' => 'gotça',
+ 				'got' => 'qotika',
  				'grb' => 'qrebo',
- 				'grc' => 'qədimi yunanca',
+ 				'grc' => 'qədim yunan',
  				'gsw' => 'İsveçrə almancası',
  				'gu' => 'qucarat',
  				'guz' => 'qusi',
@@ -683,24 +687,27 @@ has 'display_name_language' => (
  				'gwi' => 'qviçin',
  				'ha' => 'hausa',
  				'hai' => 'hayda',
+ 				'hak' => 'hakka',
  				'haw' => 'havay',
  				'he' => 'ivrit',
- 				'hi' => 'hindi',
+ 				'hi' => 'hind',
  				'hil' => 'hiliqaynon',
  				'hit' => 'hittit',
  				'hmn' => 'monq',
  				'ho' => 'hiri motu',
  				'hr' => 'xorvat',
  				'hsb' => 'yuxarı sorb',
- 				'ht' => 'haiti',
+ 				'hsn' => 'syan',
+ 				'ht' => 'haiti kreol',
  				'hu' => 'macar',
  				'hup' => 'hupa',
  				'hy' => 'erməni',
- 				'hz' => 'Herer',
- 				'ia' => 'interlingua',
+ 				'hz' => 'herero',
+ 				'ia' => 'interlinqua',
  				'iba' => 'iban',
- 				'id' => 'indonez',
- 				'ie' => 'interlingue',
+ 				'ibb' => 'ibibio',
+ 				'id' => 'indoneziya',
+ 				'ie' => 'interlinqve',
  				'ig' => 'iqbo',
  				'ii' => 'siçuan yi',
  				'ik' => 'inupiaq',
@@ -714,17 +721,17 @@ has 'display_name_language' => (
  				'jbo' => 'loğban',
  				'jgo' => 'nqomba',
  				'jmc' => 'maçam',
- 				'jpr' => 'judo-farsca',
- 				'jrb' => 'jude-ərəbcə',
+ 				'jpr' => 'ivrit-fars',
+ 				'jrb' => 'ivrit-ərəb',
  				'jv' => 'yava',
  				'ka' => 'gürcü',
- 				'kaa' => 'qara-qalpaq',
+ 				'kaa' => 'qaraqalpaq',
  				'kab' => 'kabile',
- 				'kac' => 'kaçinca',
+ 				'kac' => 'kaçin',
  				'kaj' => 'ju',
  				'kam' => 'kamba',
  				'kaw' => 'kavi',
- 				'kbd' => 'kabardca',
+ 				'kbd' => 'kabarda-çərkəz',
  				'kcg' => 'tiyap',
  				'kde' => 'makond',
  				'kea' => 'kabuverdian',
@@ -736,6 +743,7 @@ has 'display_name_language' => (
  				'ki' => 'kikuyu',
  				'kj' => 'kuanyama',
  				'kk' => 'qazax',
+ 				'kkj' => 'kako',
  				'kl' => 'kalaallisut',
  				'kln' => 'kalencin',
  				'km' => 'kxmer',
@@ -743,31 +751,32 @@ has 'display_name_language' => (
  				'kn' => 'kannada',
  				'ko' => 'koreya',
  				'koi' => 'komi-permyak',
- 				'kok' => 'konkan',
+ 				'kok' => 'konkani',
  				'kos' => 'kosreyan',
  				'kpe' => 'kpelle',
- 				'kr' => 'kanur',
+ 				'kr' => 'kanuri',
  				'krc' => 'qaraçay-balkar',
- 				'krl' => 'karelyan',
+ 				'krl' => 'karel',
  				'kru' => 'kurux',
- 				'ks' => 'kaşmir',
+ 				'ks' => 'kəşmir',
  				'ksb' => 'şambala',
  				'ksf' => 'bafia',
+ 				'ksh' => 'köln',
  				'ku' => 'kürd',
- 				'kum' => 'kumuk',
+ 				'kum' => 'kumık',
  				'kut' => 'kutenay',
  				'kv' => 'komi',
  				'kw' => 'korn',
  				'ky' => 'qırğız',
  				'la' => 'latın',
- 				'lad' => 'ladin',
+ 				'lad' => 'sefard',
  				'lag' => 'langi',
- 				'lah' => 'laxnda',
+ 				'lah' => 'qərbi pəncab',
  				'lam' => 'lamba',
  				'lb' => 'lüksemburq',
- 				'lez' => 'ləzqi',
+ 				'lez' => 'ləzgi',
  				'lg' => 'qanda',
- 				'li' => 'limburqiş',
+ 				'li' => 'limburq',
  				'lkt' => 'lakota',
  				'ln' => 'linqala',
  				'lo' => 'laos',
@@ -780,7 +789,7 @@ has 'display_name_language' => (
  				'lui' => 'luyseno',
  				'lun' => 'lunda',
  				'luo' => 'luo',
- 				'lus' => 'lushayca',
+ 				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'latış',
  				'mad' => 'maduriz',
@@ -795,7 +804,7 @@ has 'display_name_language' => (
  				'mer' => 'meru',
  				'mfe' => 'morisien',
  				'mg' => 'malaqas',
- 				'mga' => 'ortacaq irlandca',
+ 				'mga' => 'orta irland',
  				'mgh' => 'maxuva-meetto',
  				'mgo' => 'meta’',
  				'mh' => 'marşal',
@@ -809,75 +818,79 @@ has 'display_name_language' => (
  				'mni' => 'manipüri',
  				'moh' => 'mohavk',
  				'mos' => 'mosi',
- 				'mr' => 'marati',
+ 				'mr' => 'marathi',
  				'ms' => 'malay',
  				'mt' => 'malta',
  				'mua' => 'mundanq',
- 				'mul' => 'digər dillər',
+ 				'mul' => 'çoxsaylı dillər',
  				'mus' => 'krik',
  				'mwl' => 'mirand',
  				'mwr' => 'maruari',
- 				'my' => 'birma',
+ 				'my' => 'birman',
  				'myv' => 'erzya',
  				'mzn' => 'mazandaran',
  				'na' => 'nauru',
- 				'nap' => 'neapolital',
+ 				'nan' => 'Min Nan',
+ 				'nap' => 'neapolitan',
  				'naq' => 'nama',
  				'nb' => 'bokmal norveç',
  				'nd' => 'şimali ndebele',
- 				'nds' => 'aşağı almanca',
+ 				'nds' => 'aşağı alman',
  				'nds_NL' => 'aşağı sakson',
  				'ne' => 'nepal',
  				'new' => 'nevari',
- 				'ng' => 'nqonka',
- 				'nia' => 'nyas',
+ 				'ng' => 'ndonqa',
+ 				'nia' => 'nias',
  				'niu' => 'niyuan',
  				'nl' => 'holland',
  				'nl_BE' => 'flamand',
  				'nmg' => 'kvasio',
  				'nn' => 'nünorsk norveç',
+ 				'nnh' => 'ngiemboon',
  				'no' => 'norveç',
  				'nog' => 'noqay',
- 				'non' => 'qədimi norsca',
+ 				'non' => 'qədim nors',
  				'nqo' => 'nqo',
- 				'nr' => 'cənub ndebele',
+ 				'nr' => 'cənubi ndebele',
  				'nso' => 'şimal soto',
  				'nus' => 'nuer',
  				'nv' => 'navayo',
  				'ny' => 'nyanca',
  				'nym' => 'nyamvezi',
  				'nyn' => 'nyankol',
- 				'nyo' => 'niyoro',
- 				'nzi' => 'nizima',
- 				'oc' => 'oksitanca',
+ 				'nyo' => 'nyoro',
+ 				'nzi' => 'nzima',
+ 				'oc' => 'oksitan',
  				'oj' => 'ocibva',
  				'om' => 'oromo',
- 				'or' => 'oriya',
- 				'os' => 'osetik',
+ 				'or' => 'odiya',
+ 				'os' => 'osetin',
  				'osa' => 'osage',
  				'ota' => 'osman',
  				'pa' => 'pəncab',
  				'pag' => 'panqasinan',
- 				'pal' => 'paxlavi',
+ 				'pal' => 'pəhləvi',
  				'pam' => 'pampanqa',
  				'pap' => 'papyamento',
- 				'pau' => 'palayanca',
- 				'peo' => 'qədimi farsca',
+ 				'pau' => 'palayan',
+ 				'pcm' => 'niger kreol',
+ 				'peo' => 'qədim fars',
  				'phn' => 'foyenik',
  				'pi' => 'pali',
  				'pl' => 'polyak',
- 				'pon' => 'ponpeyan',
- 				'pro' => 'qədimi provensialca',
+ 				'pon' => 'ponpey',
+ 				'prg' => 'pruss',
+ 				'pro' => 'qədim provansal',
  				'ps' => 'puştu',
  				'pt' => 'portuqal',
  				'pt_BR' => 'Braziliya portuqalcası',
  				'pt_PT' => 'Portuqaliya portuqalcası',
  				'qu' => 'keçua',
  				'quc' => 'kiçe',
- 				'raj' => 'racastan',
- 				'rap' => 'rapanu',
+ 				'raj' => 'racastani',
+ 				'rap' => 'rapanui',
  				'rar' => 'rarotonqan',
- 				'rm' => 'retoroman',
+ 				'rm' => 'romanş',
  				'rn' => 'rundi',
  				'ro' => 'rumın',
  				'ro_MD' => 'moldav',
@@ -885,19 +898,20 @@ has 'display_name_language' => (
  				'rom' => 'roman',
  				'root' => 'rut',
  				'ru' => 'rus',
- 				'rup' => 'aromanca',
+ 				'rup' => 'aroman',
  				'rw' => 'kinyarvanda',
  				'rwk' => 'rua',
  				'sa' => 'sanskrit',
  				'sad' => 'sandave',
- 				'sah' => 'yakut',
+ 				'sah' => 'saxa',
  				'sam' => 'samaritan',
  				'saq' => 'samburu',
  				'sas' => 'sasak',
  				'sat' => 'santal',
+ 				'sba' => 'nqambay',
  				'sbp' => 'sanqu',
  				'sc' => 'sardin',
- 				'scn' => 'sisili',
+ 				'scn' => 'siciliya',
  				'sco' => 'skots',
  				'sd' => 'sindhi',
  				'sdh' => 'cənubi kürd',
@@ -906,11 +920,11 @@ has 'display_name_language' => (
  				'sel' => 'selkup',
  				'ses' => 'koyraboro senni',
  				'sg' => 'sanqo',
- 				'sga' => 'qədimi irlandca',
- 				'sh' => 'serb-xorvatca',
+ 				'sga' => 'qədim irland',
+ 				'sh' => 'serb-xorvat',
  				'shi' => 'taçelit',
  				'shn' => 'şan',
- 				'si' => 'sinhal',
+ 				'si' => 'sinhala',
  				'sid' => 'sidamo',
  				'sk' => 'slovak',
  				'sl' => 'sloven',
@@ -918,7 +932,7 @@ has 'display_name_language' => (
  				'sma' => 'cənubi sami',
  				'smj' => 'lule sami',
  				'smn' => 'inari sami',
- 				'sms' => 'skolt',
+ 				'sms' => 'skolt sami',
  				'sn' => 'şona',
  				'snk' => 'soninke',
  				'so' => 'somali',
@@ -926,16 +940,19 @@ has 'display_name_language' => (
  				'sq' => 'alban',
  				'sr' => 'serb',
  				'srn' => 'sranan tonqo',
- 				'srr' => 'serer dilii',
+ 				'srr' => 'serer',
  				'ss' => 'svati',
- 				'st' => 'Sesoto',
+ 				'ssy' => 'saho',
+ 				'st' => 'sesoto',
+ 				'su' => 'sundan',
  				'suk' => 'sukuma',
  				'sus' => 'susu',
  				'sux' => 'sumeryan',
  				'sv' => 'isveç',
  				'sw' => 'suahili',
  				'sw_CD' => 'Konqo suahilicəsi',
- 				'syr' => 'siryak',
+ 				'swb' => 'komor',
+ 				'syr' => 'suriya',
  				'ta' => 'tamil',
  				'te' => 'teluqu',
  				'tem' => 'timne',
@@ -955,22 +972,23 @@ has 'display_name_language' => (
  				'tmh' => 'tamaşek',
  				'tn' => 'svana',
  				'to' => 'tonqa',
- 				'tog' => 'niyasa tonga',
+ 				'tog' => 'nyasa tonqa',
  				'tpi' => 'tok pisin',
  				'tr' => 'türk',
+ 				'trv' => 'taroko',
  				'ts' => 'sonqa',
  				'tsi' => 'simşyan',
  				'tt' => 'tatar',
  				'tum' => 'tumbuka',
  				'tvl' => 'tuvalu',
- 				'tw' => 'Tvi',
+ 				'tw' => 'tvi',
  				'twq' => 'tasavaq',
  				'ty' => 'taxiti',
  				'tyv' => 'tuvinyan',
  				'tzm' => 'Mərkəzi Atlas tamazicəsi',
  				'udm' => 'udmurt',
  				'ug' => 'uyğur',
- 				'uga' => 'uqaritik',
+ 				'uga' => 'uqarit',
  				'uk' => 'ukrayna',
  				'umb' => 'umbundu',
  				'und' => 'naməlum dil',
@@ -983,19 +1001,24 @@ has 'display_name_language' => (
  				'vot' => 'votik',
  				'vun' => 'vunyo',
  				'wa' => 'valun',
+ 				'wae' => 'valles',
  				'wal' => 'valamo',
  				'war' => 'varay',
  				'was' => 'vaşo',
- 				'wbp' => 'Valpiri',
+ 				'wbp' => 'valpiri',
  				'wo' => 'volof',
- 				'xal' => 'kalmıqca',
+ 				'wuu' => 'vu',
+ 				'xal' => 'kalmık',
  				'xh' => 'xosa',
  				'xog' => 'soqa',
  				'yao' => 'yao',
  				'yap' => 'yapiz',
- 				'yi' => 'Yahudi',
+ 				'yav' => 'yanqben',
+ 				'ybb' => 'yemba',
+ 				'yi' => 'idiş',
  				'yo' => 'yoruba',
- 				'za' => 'juənq',
+ 				'yue' => 'kanton',
+ 				'za' => 'çjuan',
  				'zap' => 'zapotek',
  				'zbl' => 'blisimbols',
  				'zen' => 'zenaqa',
@@ -1060,6 +1083,7 @@ has 'display_name_script' => (
  			'Grek' => 'yunan',
  			'Gujr' => 'qucarat',
  			'Guru' => 'qurmuxi',
+ 			'Hanb' => 'hanb',
  			'Hang' => 'hanqıl',
  			'Hani' => 'han',
  			'Hano' => 'hanunu',
@@ -1070,10 +1094,11 @@ has 'display_name_script' => (
  			'Hebr' => 'ibrani',
  			'Hira' => 'iraqana',
  			'Hmng' => 'pahav monq',
- 			'Hrkt' => 'katakana vəya hiraqana',
+ 			'Hrkt' => 'hecalı yapon əlifbası',
  			'Hung' => 'qədimi macar',
  			'Inds' => 'hindistan',
  			'Ital' => 'qədimi italyalı',
+ 			'Jamo' => 'jamo',
  			'Java' => 'cava',
  			'Jpan' => 'yapon',
  			'Kali' => 'kayax li',
@@ -1146,11 +1171,12 @@ has 'display_name_script' => (
  			'Xpeo' => 'qədimi fars',
  			'Xsux' => 'sumer-akadyan kuneyform',
  			'Yiii' => 'yi',
- 			'Zmth' => 'zmth',
+ 			'Zmth' => 'riyazi notasiya',
+ 			'Zsye' => 'emoji',
  			'Zsym' => 'simvollar',
  			'Zxxx' => 'yazısız',
  			'Zyyy' => 'ümumi yazı',
- 			'Zzzz' => 'naməlum skript',
+ 			'Zzzz' => 'tanınmayan yazı',
 
 			);
 			if ( @_ ) {
@@ -1178,7 +1204,7 @@ has 'display_name_region' => (
  			'015' => 'Şimali Afrika',
  			'017' => 'Mərkəzi Afrika',
  			'018' => 'Cənubi Afrika',
- 			'019' => 'Amerikalar',
+ 			'019' => 'Amerika',
  			'021' => 'Şimal Amerikası',
  			'029' => 'Karib',
  			'030' => 'Şərqi Asiya',
@@ -1197,12 +1223,12 @@ has 'display_name_region' => (
  			'154' => 'Şimali Avropa',
  			'155' => 'Qərbi Avropa',
  			'419' => 'Latın Amerikası',
- 			'AC' => 'Yüksəliş Adası',
+ 			'AC' => 'Askenson adası',
  			'AD' => 'Andorra',
  			'AE' => 'Birləşmiş Ərəb Əmirlikləri',
  			'AF' => 'Əfqanıstan',
  			'AG' => 'Antiqua və Barbuda',
- 			'AI' => 'Angila',
+ 			'AI' => 'Angilya',
  			'AL' => 'Albaniya',
  			'AM' => 'Ermənistan',
  			'AO' => 'Anqola',
@@ -1212,51 +1238,53 @@ has 'display_name_region' => (
  			'AT' => 'Avstriya',
  			'AU' => 'Avstraliya',
  			'AW' => 'Aruba',
- 			'AX' => 'Aland Adaları',
+ 			'AX' => 'Aland adaları',
  			'AZ' => 'Azərbaycan',
- 			'BA' => 'Bosniya və Hersoqovina',
+ 			'BA' => 'Bosniya və Herseqovina',
  			'BB' => 'Barbados',
  			'BD' => 'Banqladeş',
  			'BE' => 'Belçika',
  			'BF' => 'Burkina Faso',
- 			'BG' => 'Bolqariya',
+ 			'BG' => 'Bolqarıstan',
  			'BH' => 'Bəhreyn',
  			'BI' => 'Burundi',
  			'BJ' => 'Benin',
- 			'BL' => 'San Bartolomey',
- 			'BM' => 'Bermuda',
+ 			'BL' => 'Sent-Bartelemi',
+ 			'BM' => 'Bermud adaları',
  			'BN' => 'Bruney',
  			'BO' => 'Boliviya',
  			'BQ' => 'Karib Niderlandı',
  			'BR' => 'Braziliya',
- 			'BS' => 'Baham Adaları',
+ 			'BS' => 'Baham adaları',
  			'BT' => 'Butan',
- 			'BV' => 'Buve Adası',
+ 			'BV' => 'Buve adası',
  			'BW' => 'Botsvana',
  			'BY' => 'Belarus',
  			'BZ' => 'Beliz',
  			'CA' => 'Kanada',
- 			'CC' => 'Kokos Adaları',
+ 			'CC' => 'Kokos (Kilinq) adaları',
  			'CD' => 'Konqo - Kinşasa',
  			'CD@alt=variant' => 'Konqo (KDR)',
  			'CF' => 'Mərkəzi Afrika Respublikası',
  			'CG' => 'Konqo - Brazzavil',
  			'CG@alt=variant' => 'Konqo (Respublika)',
  			'CH' => 'İsveçrə',
- 			'CI' => 'Fil Dişi Sahili',
- 			'CK' => 'Kuk Adaları',
+ 			'CI' => 'Kotd’ivuar',
+ 			'CI@alt=variant' => 'Fil Dişi Sahili',
+ 			'CK' => 'Kuk adaları',
  			'CL' => 'Çili',
  			'CM' => 'Kamerun',
  			'CN' => 'Çin',
  			'CO' => 'Kolumbiya',
- 			'CP' => 'Klipperton Adası',
+ 			'CP' => 'Klipperton adası',
  			'CR' => 'Kosta Rika',
  			'CU' => 'Kuba',
- 			'CV' => 'Kape Verde',
+ 			'CV' => 'Kabo-Verde',
  			'CW' => 'Kurasao',
- 			'CX' => 'Milad Adası',
+ 			'CX' => 'Milad adası',
  			'CY' => 'Kipr',
  			'CZ' => 'Çexiya',
+ 			'CZ@alt=variant' => 'Çex Respublikası',
  			'DE' => 'Almaniya',
  			'DG' => 'Dieqo Qarsiya',
  			'DJ' => 'Cibuti',
@@ -1268,52 +1296,53 @@ has 'display_name_region' => (
  			'EC' => 'Ekvador',
  			'EE' => 'Estoniya',
  			'EG' => 'Misir',
- 			'EH' => 'Qərbi Sahara',
+ 			'EH' => 'Qərbi Saxara',
  			'ER' => 'Eritreya',
  			'ES' => 'İspaniya',
  			'ET' => 'Efiopiya',
  			'EU' => 'Avropa Birliyi',
+ 			'EZ' => 'Avrozona',
  			'FI' => 'Finlandiya',
  			'FJ' => 'Fici',
- 			'FK' => 'Folklend Adaları',
- 			'FK@alt=variant' => 'Folklend Adaları (Malvin Adaları)',
+ 			'FK' => 'Folklend adaları',
+ 			'FK@alt=variant' => 'Folklend adaları (Malvin adaları)',
  			'FM' => 'Mikroneziya',
- 			'FO' => 'Farer Adaları',
+ 			'FO' => 'Farer adaları',
  			'FR' => 'Fransa',
  			'GA' => 'Qabon',
  			'GB' => 'Birləşmiş Krallıq',
- 			'GB@alt=short' => 'B.K.',
+ 			'GB@alt=short' => 'BK',
  			'GD' => 'Qrenada',
  			'GE' => 'Gürcüstan',
- 			'GF' => 'Fransız Qviyanası',
- 			'GG' => 'Gernsey',
+ 			'GF' => 'Fransa Qvianası',
+ 			'GG' => 'Gernsi',
  			'GH' => 'Qana',
- 			'GI' => 'Gibraltar',
+ 			'GI' => 'Cəbəllütariq',
  			'GL' => 'Qrenlandiya',
  			'GM' => 'Qambiya',
  			'GN' => 'Qvineya',
  			'GP' => 'Qvadelupa',
  			'GQ' => 'Ekvatorial Qvineya',
  			'GR' => 'Yunanıstan',
- 			'GS' => 'Cənubi Corciya və Cənubi Sendviç Adaları',
+ 			'GS' => 'Cənubi Corciya və Cənubi Sendviç adaları',
  			'GT' => 'Qvatemala',
  			'GU' => 'Quam',
  			'GW' => 'Qvineya-Bisau',
- 			'GY' => 'Qviyana',
+ 			'GY' => 'Qayana',
  			'HK' => 'Honq Konq Xüsusi İnzibati Ərazi Çin',
  			'HK@alt=short' => 'Honq Konq',
- 			'HM' => 'Herd və Mak Donald Adaları',
+ 			'HM' => 'Herd və Makdonald adaları',
  			'HN' => 'Honduras',
  			'HR' => 'Xorvatiya',
  			'HT' => 'Haiti',
  			'HU' => 'Macarıstan',
- 			'IC' => 'Kanar Adaları',
+ 			'IC' => 'Kanar adaları',
  			'ID' => 'İndoneziya',
  			'IE' => 'İrlandiya',
  			'IL' => 'İsrail',
- 			'IM' => 'Men Adası',
+ 			'IM' => 'Men adası',
  			'IN' => 'Hindistan',
- 			'IO' => 'Britaniya Hind Okeanı Ərazisi',
+ 			'IO' => 'Britaniyanın Hind Okeanı Ərazisi',
  			'IQ' => 'İraq',
  			'IR' => 'İran',
  			'IS' => 'İslandiya',
@@ -1326,18 +1355,18 @@ has 'display_name_region' => (
  			'KG' => 'Qırğızıstan',
  			'KH' => 'Kamboca',
  			'KI' => 'Kiribati',
- 			'KM' => 'Komor Adaları',
- 			'KN' => 'San Kits və Nevis',
+ 			'KM' => 'Komor adaları',
+ 			'KN' => 'Sent-Kits və Nevis',
  			'KP' => 'Şimali Koreya',
  			'KR' => 'Cənubi Koreya',
  			'KW' => 'Küveyt',
- 			'KY' => 'Kayman Adaları',
+ 			'KY' => 'Kayman adaları',
  			'KZ' => 'Qazaxıstan',
  			'LA' => 'Laos',
  			'LB' => 'Livan',
- 			'LC' => 'San Lüsiya',
+ 			'LC' => 'Sent-Lusiya',
  			'LI' => 'Lixtenşteyn',
- 			'LK' => 'Şri Lanka',
+ 			'LK' => 'Şri-Lanka',
  			'LR' => 'Liberiya',
  			'LS' => 'Lesoto',
  			'LT' => 'Litva',
@@ -1348,23 +1377,23 @@ has 'display_name_region' => (
  			'MC' => 'Monako',
  			'MD' => 'Moldova',
  			'ME' => 'Monteneqro',
- 			'MF' => 'San Martin',
+ 			'MF' => 'Sent Martin',
  			'MG' => 'Madaqaskar',
- 			'MH' => 'Marşal Adaları',
+ 			'MH' => 'Marşal adaları',
  			'MK' => 'Makedoniya',
- 			'MK@alt=variant' => 'Makedoniya (FYROM)',
+ 			'MK@alt=variant' => 'Makedoniya (KYRM)',
  			'ML' => 'Mali',
  			'MM' => 'Myanma',
- 			'MN' => 'Monqoliya',
+ 			'MN' => 'Monqolustan',
  			'MO' => 'Makao Xüsusi İnzibati Ərazi Çin',
  			'MO@alt=short' => 'Makao',
- 			'MP' => 'Şimali Mariana Adaları',
+ 			'MP' => 'Şimali Marian adaları',
  			'MQ' => 'Martinik',
  			'MR' => 'Mavritaniya',
  			'MS' => 'Monserat',
  			'MT' => 'Malta',
  			'MU' => 'Mavriki',
- 			'MV' => 'Maldiv Adaları',
+ 			'MV' => 'Maldiv adaları',
  			'MW' => 'Malavi',
  			'MX' => 'Meksika',
  			'MY' => 'Malayziya',
@@ -1372,7 +1401,7 @@ has 'display_name_region' => (
  			'NA' => 'Namibiya',
  			'NC' => 'Yeni Kaledoniya',
  			'NE' => 'Niger',
- 			'NF' => 'Norfolk Adası',
+ 			'NF' => 'Norfolk adası',
  			'NG' => 'Nigeriya',
  			'NI' => 'Nikaraqua',
  			'NL' => 'Niderland',
@@ -1384,53 +1413,53 @@ has 'display_name_region' => (
  			'OM' => 'Oman',
  			'PA' => 'Panama',
  			'PE' => 'Peru',
- 			'PF' => 'Fransız Polineziyası',
- 			'PG' => 'Papua Yeni Qvineya',
+ 			'PF' => 'Fransa Polineziyası',
+ 			'PG' => 'Papua-Yeni Qvineya',
  			'PH' => 'Filippin',
  			'PK' => 'Pakistan',
  			'PL' => 'Polşa',
- 			'PM' => 'San Pier və Mikelon',
- 			'PN' => 'Pitkern Adaları',
+ 			'PM' => 'Müqəddəs Pyer və Mikelon',
+ 			'PN' => 'Pitkern adaları',
  			'PR' => 'Puerto Riko',
  			'PS' => 'Fələstin Əraziləri',
  			'PS@alt=short' => 'Fələstin',
- 			'PT' => 'Portuqal',
+ 			'PT' => 'Portuqaliya',
  			'PW' => 'Palau',
  			'PY' => 'Paraqvay',
- 			'QA' => 'Qatar',
+ 			'QA' => 'Qətər',
  			'QO' => 'Uzaq Okeaniya',
- 			'RE' => 'Reunion',
+ 			'RE' => 'Reyunyon',
  			'RO' => 'Rumıniya',
  			'RS' => 'Serbiya',
  			'RU' => 'Rusiya',
  			'RW' => 'Ruanda',
  			'SA' => 'Səudiyyə Ərəbistanı',
- 			'SB' => 'Solomon Adaları',
- 			'SC' => 'Seyşel Adaları',
+ 			'SB' => 'Solomon adaları',
+ 			'SC' => 'Seyşel adaları',
  			'SD' => 'Sudan',
  			'SE' => 'İsveç',
  			'SG' => 'Sinqapur',
  			'SH' => 'Müqəddəs Yelena',
  			'SI' => 'Sloveniya',
- 			'SJ' => 'Svalbard və Yan Mayen',
+ 			'SJ' => 'Svalbard və Yan-Mayen',
  			'SK' => 'Slovakiya',
- 			'SL' => 'Siera Leon',
- 			'SM' => 'San Marino',
+ 			'SL' => 'Syerra-Leone',
+ 			'SM' => 'San-Marino',
  			'SN' => 'Seneqal',
  			'SO' => 'Somali',
  			'SR' => 'Surinam',
  			'SS' => 'Cənubi Sudan',
- 			'ST' => 'Sao Tome və Prinsip',
+ 			'ST' => 'San-Tome və Prinsipi',
  			'SV' => 'Salvador',
- 			'SX' => 'Sint Maarten',
+ 			'SX' => 'Sint-Marten',
  			'SY' => 'Suriya',
  			'SZ' => 'Svazilend',
  			'TA' => 'Tristan da Kunya',
- 			'TC' => 'Turks və Kaikos Adaları',
+ 			'TC' => 'Törks və Kaykos adaları',
  			'TD' => 'Çad',
- 			'TF' => 'Fransa Cənub Əraziləri',
+ 			'TF' => 'Fransanın Cənub Əraziləri',
  			'TG' => 'Toqo',
- 			'TH' => 'Tayland',
+ 			'TH' => 'Tailand',
  			'TJ' => 'Tacikistan',
  			'TK' => 'Tokelau',
  			'TL' => 'Şərqi Timor',
@@ -1438,26 +1467,28 @@ has 'display_name_region' => (
  			'TM' => 'Türkmənistan',
  			'TN' => 'Tunis',
  			'TO' => 'Tonqa',
- 			'TR' => 'Türkiya',
+ 			'TR' => 'Türkiyə',
  			'TT' => 'Trinidad və Tobaqo',
  			'TV' => 'Tuvalu',
  			'TW' => 'Tayvan',
  			'TZ' => 'Tanzaniya',
  			'UA' => 'Ukrayna',
  			'UG' => 'Uqanda',
- 			'UM' => 'Birləşmiş Ştatlar Uzaq Adalar',
+ 			'UM' => 'ABŞ-a bağlı kiçik adacıqlar',
+ 			'UN' => 'Birləşmiş Millətlər Təşkilatı',
+ 			'UN@alt=short' => 'BMT',
  			'US' => 'Amerika Birləşmiş Ştatları',
- 			'US@alt=short' => 'A.B.Ş.',
+ 			'US@alt=short' => 'ABŞ',
  			'UY' => 'Uruqvay',
  			'UZ' => 'Özbəkistan',
  			'VA' => 'Vatikan',
- 			'VC' => 'San Vinsent və Qrenada',
+ 			'VC' => 'Sent-Vinsent və Qrenadinlər',
  			'VE' => 'Venesuela',
- 			'VG' => 'Britaniya Vircin Adaları',
- 			'VI' => 'ABŞ Vircin Adaları',
+ 			'VG' => 'Britaniyanın Virgin adaları',
+ 			'VI' => 'ABŞ Virgin adaları',
  			'VN' => 'Vyetnam',
  			'VU' => 'Vanuatu',
- 			'WF' => 'Uolis və Futuna',
+ 			'WF' => 'Uollis və Futuna',
  			'WS' => 'Samoa',
  			'XK' => 'Kosovo',
  			'YE' => 'Yəmən',
@@ -1478,7 +1509,8 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Təqvim',
- 			'collation' => 'Çeşidləmə',
+ 			'cf' => 'Valyuta Formatı',
+ 			'collation' => 'Sıralama',
  			'currency' => 'Valyuta',
  			'hc' => 'Saat Sikli (12 / 24)',
  			'lb' => 'Sətirdən sətrə keçirmə üslubu',
@@ -1510,11 +1542,15 @@ has 'display_name_type' => (
  				'persian' => q{İran Təqvimi},
  				'roc' => q{Minquo Təqvimi},
  			},
+ 			'cf' => {
+ 				'account' => q{Uçot Valyuta Formatı},
+ 				'standard' => q{Standart Valyuta Formatı},
+ 			},
  			'collation' => {
- 				'ducet' => q{Defolt Unicode Çeşidləmə},
+ 				'ducet' => q{Standart Unicode Sıralama},
  				'pinyin' => q{Pinyin təqvimi},
  				'search' => q{Ümumi Məqsədli Axtarış},
- 				'standard' => q{Standart Çeşidləmə},
+ 				'standard' => q{Standart Sıralama},
  			},
  			'hc' => {
  				'h11' => q{12 Saatlıq Sistem (0–11)},
@@ -1611,10 +1647,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[w])},
+			auxiliary => qr{[w]},
 			index => ['A', 'B', 'C', 'Ç', 'D', 'E', 'Ə', 'F', 'G', 'Ğ', 'H', 'X', 'I', 'İ', 'J', 'K', 'Q', 'L', 'M', 'N', 'O', 'Ö', 'P', 'R', 'S', 'Ş', 'T', 'U', 'Ü', 'V', 'Y', 'Z', 'W'],
-			main => qr{(?^u:[a b c ç d e ə f g ğ h x ı i İ j k q l m n o ö p r s ş t u ü v y z])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″])},
+			main => qr{[a b c ç d e ə f g ğ h x ı i İ j k q l m n o ö p r s ş t u ü v y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1869,6 +1906,12 @@ has 'units' => (
 						'other' => q({0} qallon),
 						'per' => q({0}/qal),
 					},
+					'gallon-imperial' => {
+						'name' => q(İmp. qallon),
+						'one' => q({0} imp. qallon),
+						'other' => q({0} imp. qallon),
+						'per' => q({0}/imp. qallon),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -2026,9 +2069,9 @@ has 'units' => (
 						'per' => q({0}/l),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'one' => q({0} L/100km),
-						'other' => q({0} L/100km),
+						'name' => q(100 kilometrə litr),
+						'one' => q(100 kilometrə {0} litr),
+						'other' => q(100 kilometrə {0} litr),
 					},
 					'liter-per-kilometer' => {
 						'name' => q(litr/kilometr),
@@ -2107,9 +2150,14 @@ has 'units' => (
 						'other' => q({0} mil),
 					},
 					'mile-per-gallon' => {
-						'name' => q(mil/qallon),
-						'one' => q({0} mil/qallon),
-						'other' => q({0} mil/qallon),
+						'name' => q(qallona mil),
+						'one' => q(qallona {0} mil),
+						'other' => q(qallona {0} mil),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(imp. qallona mil),
+						'one' => q(imp. qallona {0} mil),
+						'other' => q(imp. qallona {0} mil),
 					},
 					'mile-per-hour' => {
 						'name' => q(mil/saat),
@@ -2136,6 +2184,11 @@ has 'units' => (
 						'one' => q({0} milliqram),
 						'other' => q({0} milliqram),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(milliqram/desilitr),
+						'one' => q({0} milliqram/desilitr),
+						'other' => q({0} milliqram/desilitr),
+					},
 					'milliliter' => {
 						'name' => q(millilitr),
 						'one' => q({0} millilitr),
@@ -2150,6 +2203,11 @@ has 'units' => (
 						'name' => q(millimetr civə sütunu),
 						'one' => q({0} millimetr civə sütunu),
 						'other' => q({0} millimetr civə sütunu),
+					},
+					'millimole-per-liter' => {
+						'name' => q(millimol/litr),
+						'one' => q({0} millimol/litr),
+						'other' => q({0} millimol/litr),
 					},
 					'millisecond' => {
 						'name' => q(millisaniyə),
@@ -2209,6 +2267,11 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'name' => q(milyonda hissəcik),
+						'one' => q(milyonda {0} hissəcik),
+						'other' => q(milyonda {0} hissəcik),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2226,6 +2289,11 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'name' => q(xal),
+						'one' => q({0} xal),
+						'other' => q({0} xal),
 					},
 					'pound' => {
 						'name' => q(funt),
@@ -2280,6 +2348,7 @@ has 'units' => (
 						'name' => q(kvadrat kilometr),
 						'one' => q({0} kvadrat kilometr),
 						'other' => q({0} kvadrat kilometr),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(kvadrat metr),
@@ -2291,6 +2360,7 @@ has 'units' => (
 						'name' => q(kvadrat mil),
 						'one' => q({0} kvadrat mil),
 						'other' => q({0} kvadrat mil),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yd²),
@@ -2472,9 +2542,9 @@ has 'units' => (
 						'other' => q({0} l),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'one' => q({0} L/100km),
-						'other' => q({0} L/100km),
+						'name' => q(l/100km),
+						'one' => q({0} l/100km),
+						'other' => q({0} l/100km),
 					},
 					'meter' => {
 						'name' => q(metr),
@@ -2753,6 +2823,12 @@ has 'units' => (
 						'other' => q({0} qal),
 						'per' => q({0}/qal),
 					},
+					'gallon-imperial' => {
+						'name' => q(İmp. qal),
+						'one' => q({0} imp. qal),
+						'other' => q({0} imp. qal),
+						'per' => q({0}/imp. qal),
+					},
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -2910,14 +2986,14 @@ has 'units' => (
 						'per' => q({0}/l),
 					},
 					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'one' => q({0} L/100km),
-						'other' => q({0} L/100km),
+						'name' => q(l/100km),
+						'one' => q({0} l/100km),
+						'other' => q({0} l/100km),
 					},
 					'liter-per-kilometer' => {
-						'name' => q(L/km),
-						'one' => q({0} L/km),
-						'other' => q({0} L/km),
+						'name' => q(l/km),
+						'one' => q({0} l/km),
+						'other' => q({0} l/km),
 					},
 					'lux' => {
 						'name' => q(lx),
@@ -2991,9 +3067,14 @@ has 'units' => (
 						'other' => q({0} mil),
 					},
 					'mile-per-gallon' => {
-						'name' => q(mpg),
-						'one' => q({0} mpg),
-						'other' => q({0} mpg),
+						'name' => q(mil/qal),
+						'one' => q({0} mil/qal),
+						'other' => q({0} mil/qal),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mil/imp. qal),
+						'one' => q({0} m/q imp),
+						'other' => q({0} m/q imp),
 					},
 					'mile-per-hour' => {
 						'name' => q(mil/saat),
@@ -3020,6 +3101,11 @@ has 'units' => (
 						'one' => q({0} mq),
 						'other' => q({0} mq),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mq/dl),
+						'one' => q({0} mq/dl),
+						'other' => q({0} mq/dl),
+					},
 					'milliliter' => {
 						'name' => q(mL),
 						'one' => q({0} mL),
@@ -3034,6 +3120,11 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'name' => q(millimol/litr),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
 					},
 					'millisecond' => {
 						'name' => q(millisaniyə),
@@ -3093,6 +3184,11 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'name' => q(hissəcik/milyon),
+						'one' => q({0} hs/mln),
+						'other' => q({0} hs/mln),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -3110,6 +3206,11 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'name' => q(xal),
+						'one' => q({0} xal),
+						'other' => q({0} xal),
 					},
 					'pound' => {
 						'name' => q(funt),
@@ -3164,6 +3265,7 @@ has 'units' => (
 						'name' => q(kvadrat kilometr),
 						'one' => q({0} kv km),
 						'other' => q({0} kv km),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(kvadrat metr),
@@ -3175,6 +3277,7 @@ has 'units' => (
 						'name' => q(kvadrat mil),
 						'one' => q({0} kv mil),
 						'other' => q({0} kv mil),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yd²),
@@ -3367,57 +3470,57 @@ has 'number_formats' => (
 					'other' => '000T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
 				'1000' => {
-					'one' => '0K',
-					'other' => '0K',
+					'one' => '0 min',
+					'other' => '0 min',
 				},
 				'10000' => {
-					'one' => '00K',
-					'other' => '00K',
+					'one' => '00 min',
+					'other' => '00 min',
 				},
 				'100000' => {
-					'one' => '000K',
-					'other' => '000K',
+					'one' => '000 min',
+					'other' => '000 min',
 				},
 				'1000000' => {
-					'one' => '0M',
-					'other' => '0M',
+					'one' => '0 milyon',
+					'other' => '0 milyon',
 				},
 				'10000000' => {
-					'one' => '00M',
-					'other' => '00M',
+					'one' => '00 milyon',
+					'other' => '00 milyon',
 				},
 				'100000000' => {
-					'one' => '000M',
-					'other' => '000M',
+					'one' => '000 milyon',
+					'other' => '000 milyon',
 				},
 				'1000000000' => {
-					'one' => '0G',
-					'other' => '0G',
+					'one' => '0 milyard',
+					'other' => '0 milyard',
 				},
 				'10000000000' => {
-					'one' => '00G',
-					'other' => '00G',
+					'one' => '00 milyard',
+					'other' => '00 milyard',
 				},
 				'100000000000' => {
-					'one' => '000G',
-					'other' => '000G',
+					'one' => '000 milyard',
+					'other' => '000 milyard',
 				},
 				'1000000000000' => {
-					'one' => '0T',
-					'other' => '0T',
+					'one' => '0 trilyon',
+					'other' => '0 trilyon',
 				},
 				'10000000000000' => {
-					'one' => '00T',
-					'other' => '00T',
+					'one' => '00 trilyon',
+					'other' => '00 trilyon',
 				},
 				'100000000000000' => {
-					'one' => '000T',
-					'other' => '000T',
+					'one' => '000 trilyon',
+					'other' => '000 trilyon',
 				},
 			},
 			'short' => {
@@ -3474,14 +3577,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3865,12 +3968,20 @@ has 'currencies' => (
 				'other' => q(Belarus yeni rublu \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(Belarus Rublu),
 				'one' => q(Belarus rublu),
 				'other' => q(Belarus rublu),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(Belarus Rublu \(2000–2016\)),
+				'one' => q(Belarus rublu \(2000–2016\)),
+				'other' => q(Belarus rublu \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3925,6 +4036,14 @@ has 'currencies' => (
 				'currency' => q(Çili Pesosu),
 				'one' => q(Çili pesosu),
 				'other' => q(Çili pesosu),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(CNH),
+				'one' => q(CNH),
+				'other' => q(CNH),
 			},
 		},
 		'CNY' => {
@@ -4840,16 +4959,16 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(Peru Nuevo Solu),
-				'one' => q(Peru Nuevo solu),
-				'other' => q(Peru Nuevo solu),
+				'currency' => q(Peru Solu),
+				'one' => q(Peru solu),
+				'other' => q(Peru solu),
 			},
 		},
 		'PES' => {
 			display_name => {
-				'currency' => q(Peru Solu),
-				'one' => q(Peru solu),
-				'other' => q(Peru solu),
+				'currency' => q(Peru Solu \(1863–1965\)),
+				'one' => q(Peru solu \(1863–1965\)),
+				'other' => q(Peru solu \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -5790,68 +5909,68 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'night2' if $time >= 0
-						&& $time < 400;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'night2' if $time >= 0
 						&& $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 600;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night2' if $time >= 0
+						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'night2' if $time >= 0
-						&& $time < 400;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'night2' if $time >= 0
 						&& $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 600;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night2' if $time >= 0
+						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -5872,66 +5991,78 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
+					'pm' => q{PM},
 					'midnight' => q{gecəyarı},
-					'night2' => q{gecə},
+					'afternoon1' => q{gündüz},
+					'morning1' => q{sübh},
 					'night1' => q{axşam},
 					'noon' => q{günorta},
-					'morning1' => q{sübh},
-					'morning2' => q{səhər},
-					'pm' => q{PM},
 					'am' => q{AM},
+					'morning2' => q{səhər},
 					'evening1' => q{axşamüstü},
-					'afternoon1' => q{gündüz},
+					'night2' => q{gecə},
 				},
 				'wide' => {
-					'morning2' => q{səhər},
-					'night1' => q{axşam},
 					'morning1' => q{sübh},
-					'noon' => q{günorta},
-					'night2' => q{gecə},
-					'midnight' => q{gecəyarı},
 					'afternoon1' => q{gündüz},
-					'evening1' => q{axşamüstü},
-					'am' => q{AM},
+					'noon' => q{günorta},
+					'night1' => q{axşam},
 					'pm' => q{PM},
+					'midnight' => q{gecəyarı},
+					'night2' => q{gecə},
+					'morning2' => q{səhər},
+					'am' => q{AM},
+					'evening1' => q{axşamüstü},
 				},
 				'narrow' => {
-					'evening1' => q{axşamüstü},
-					'afternoon1' => q{gündüz},
-					'am' => q{a},
-					'pm' => q{p},
-					'morning2' => q{səhər},
-					'night2' => q{gecə},
 					'midnight' => q{gecəyarı},
+					'pm' => q{p},
+					'afternoon1' => q{gündüz},
+					'morning1' => q{sübh},
 					'noon' => q{g},
 					'night1' => q{axşam},
-					'morning1' => q{sübh},
+					'morning2' => q{səhər},
+					'am' => q{a},
+					'evening1' => q{axşamüstü},
+					'night2' => q{gecə},
 				},
 			},
 			'stand-alone' => {
+				'wide' => {
+					'pm' => q{PM},
+					'midnight' => q{gecəyarı},
+					'morning1' => q{sübh},
+					'afternoon1' => q{gündüz},
+					'noon' => q{günorta},
+					'night1' => q{axşam},
+					'am' => q{AM},
+					'morning2' => q{səhər},
+					'evening1' => q{axşamüstü},
+					'night2' => q{gecə},
+				},
+				'narrow' => {
+					'morning2' => q{səhər},
+					'am' => q{AM},
+					'evening1' => q{axşamüstü},
+					'night2' => q{gecə},
+					'pm' => q{PM},
+					'midnight' => q{gecəyarı},
+					'afternoon1' => q{gündüz},
+					'morning1' => q{sübh},
+					'night1' => q{axşam},
+					'noon' => q{günorta},
+				},
 				'abbreviated' => {
 					'morning2' => q{səhər},
-					'morning1' => q{sübh},
-					'night1' => q{axşam},
-					'noon' => q{günorta},
+					'am' => q{AM},
+					'evening1' => q{axşamüstü},
 					'night2' => q{gecə},
 					'midnight' => q{gecəyarı},
-					'am' => q{AM},
 					'pm' => q{PM},
-					'afternoon1' => q{gündüz},
-					'evening1' => q{axşamüstü},
-				},
-				'wide' => {
-					'afternoon1' => q{gündüz},
-					'evening1' => q{axşamüstü},
-					'am' => q{AM},
-					'pm' => q{PM},
-					'morning2' => q{səhər},
-					'noon' => q{günorta},
-					'night1' => q{axşam},
 					'morning1' => q{sübh},
-					'night2' => q{gecə},
-					'midnight' => q{gecəyarı},
+					'afternoon1' => q{gündüz},
+					'night1' => q{axşam},
+					'noon' => q{günorta},
 				},
 			},
 		},
@@ -5948,11 +6079,11 @@ has 'eras' => (
 		'gregorian' => {
 			abbreviated => {
 				'0' => 'e.ə.',
-				'1' => 'b.e.'
+				'1' => 'y.e.'
 			},
 			wide => {
 				'0' => 'eramızdan əvvəl',
-				'1' => 'eramız'
+				'1' => 'yeni era'
 			},
 		},
 	} },
@@ -6019,35 +6150,13 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{G y},
-			GyMMM => q{G MMM y},
-			GyMMMEd => q{G d MMM y, E},
-			GyMMMd => q{G d MMM y},
-			M => q{L},
-			MEd => q{dd.MM, E},
-			MMM => q{LLL},
-			MMMEd => q{d MMM, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{d MMM},
-			Md => q{dd.MM},
-			d => q{d},
-			y => q{G y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG MM y},
-			yyyyMEd => q{GGGGG dd.MM.y, E},
-			yyyyMMM => q{G MMM y},
-			yyyyMMMEd => q{G d MMM y, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G d MMM y},
-			yyyyMd => q{GGGGG dd.MM.y},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 		'gregorian' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
 			E => q{ccc},
+			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
@@ -6066,7 +6175,8 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{dd.MM, E},
 			MMM => q{LLL},
 			MMMEd => q{d MMM, E},
-			MMMMd => q{MMMM d},
+			MMMMW => q{MMM, W 'həftə'},
+			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
 			d => q{d},
@@ -6081,11 +6191,55 @@ has 'datetime_formats_available_formats' => (
 			yMEd => q{dd.MM.y, E},
 			yMMM => q{MMM y},
 			yMMMEd => q{d MMM y, E},
-			yMMMM => q{y MMMM},
+			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM y},
 			yMd => q{dd.MM.y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
+			yw => q{Y, w 'həftə'},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G MMM y},
+			GyMMMEd => q{G d MMM y, E},
+			GyMMMd => q{G d MMM y},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{dd.MM, E},
+			MMM => q{LLL},
+			MMMEd => q{d MMM, E},
+			MMMMd => q{MMMM d},
+			MMMd => q{d MMM},
+			Md => q{dd.MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{G y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG MM y},
+			yyyyMEd => q{GGGGG dd.MM.y, E},
+			yyyyMMM => q{G MMM y},
+			yyyyMMMEd => q{G d MMM y, E},
+			yyyyMMMM => q{G MMMM y},
+			yyyyMMMd => q{G d MMM y},
+			yyyyMd => q{GGGGG dd.MM.y},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
 		},
 	} },
 );
@@ -6106,69 +6260,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{dd.MM, E – dd.MM, E},
-				d => q{dd.MM, E – dd.MM, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{dd.MM – dd.MM},
-				d => q{dd.MM – dd.MM},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG MM/y – MM/y},
-				y => q{GGGGG MM/y – MM/y},
-			},
-			yMEd => {
-				M => q{GGGGG dd/MM/y , E – dd/MM/y, E},
-				d => q{GGGGG dd/MM/y , E – dd/MM/y, E},
-				y => q{GGGGG dd/MM/y , E – dd/MM/y, E},
-			},
-			yMMM => {
-				M => q{G MMM–MMM y},
-				y => q{G MMM y – MMM y},
-			},
-			yMMMEd => {
-				M => q{G d MMM y, E – d MMM, E},
-				d => q{G d MMM y, E – d MMM, E},
-				y => q{G d MMM y, E – d MMM y, E},
-			},
-			yMMMM => {
-				M => q{G MMMM y –MMMM},
-				y => q{G MMMM y – MMMM y},
-			},
-			yMMMd => {
-				M => q{G d MMM y – d MMM},
-				d => q{G d–d MMM y},
-				y => q{G d MMM y – d MMM y},
-			},
-			yMd => {
-				M => q{GGGGG dd/MM/y – dd/MM/y},
-				d => q{GGGGG dd/MM/y – dd/MM/y},
-				y => q{GGGGG dd/MM/y – dd/MM/y},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -6264,6 +6355,69 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{dd.MM, E – dd.MM, E},
+				d => q{dd.MM, E – dd.MM, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{dd.MM – dd.MM},
+				d => q{dd.MM – dd.MM},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG MM/y – MM/y},
+				y => q{GGGGG MM/y – MM/y},
+			},
+			yMEd => {
+				M => q{GGGGG dd/MM/y , E – dd/MM/y, E},
+				d => q{GGGGG dd/MM/y , E – dd/MM/y, E},
+				y => q{GGGGG dd/MM/y , E – dd/MM/y, E},
+			},
+			yMMM => {
+				M => q{G MMM–MMM y},
+				y => q{G MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{G d MMM y, E – d MMM, E},
+				d => q{G d MMM y, E – d MMM, E},
+				y => q{G d MMM y, E – d MMM y, E},
+			},
+			yMMMM => {
+				M => q{G MMMM y –MMMM},
+				y => q{G MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{G d MMM y – d MMM},
+				d => q{G d–d MMM y},
+				y => q{G d MMM y – d MMM y},
+			},
+			yMd => {
+				M => q{GGGGG dd/MM/y – dd/MM/y},
+				d => q{GGGGG dd/MM/y – dd/MM/y},
+				y => q{GGGGG dd/MM/y – dd/MM/y},
+			},
+		},
 	} },
 );
 
@@ -6281,7 +6435,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Əfqanıstan Vaxtı),
+				'standard' => q#Əfqanıstan Vaxtı#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -6442,38 +6596,38 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Mərkəzi Afrika Vaxtı),
+				'standard' => q#Mərkəzi Afrika Vaxtı#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Şərqi Afrika Vaxtı),
+				'standard' => q#Şərqi Afrika Vaxtı#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Cənubi Afrika Vaxtı),
+				'standard' => q#Cənubi Afrika Vaxtı#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Qərbi Afrika Yay Vaxtı),
-				'generic' => q(Qərbi Afrika Vaxtı),
-				'standard' => q(Qərbi Afrika Standart Vaxtı),
+				'daylight' => q#Qərbi Afrika Yay Vaxtı#,
+				'generic' => q#Qərbi Afrika Vaxtı#,
+				'standard' => q#Qərbi Afrika Standart Vaxtı#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Alyaska Yay Vaxtı),
-				'generic' => q(Alyaska Vaxtı),
-				'standard' => q(Alyaska Standart Vaxtı),
+				'daylight' => q#Alyaska Yay Vaxtı#,
+				'generic' => q#Alyaska Vaxtı#,
+				'standard' => q#Alyaska Standart Vaxtı#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazon Yay Vaxtı),
-				'generic' => q(Amazon Vaxtı),
-				'standard' => q(Amazon Standart Vaxtı),
+				'daylight' => q#Amazon Yay Vaxtı#,
+				'generic' => q#Amazon Vaxtı#,
+				'standard' => q#Amazon Standart Vaxtı#,
 			},
 		},
 		'America/Adak' => {
@@ -6619,6 +6773,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -6821,6 +6978,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Riko#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Reyni Çayı#,
 		},
@@ -6861,7 +7021,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Sitka#,
 		},
 		'America/St_Barthelemy' => {
-			exemplarCity => q#San Bartolomey#,
+			exemplarCity => q#Sent-Bartelemi#,
 		},
 		'America/St_Johns' => {
 			exemplarCity => q#Sent Cons#,
@@ -6912,34 +7072,34 @@ has 'time_zone_names' => (
 			exemplarCity => q#Yakutat#,
 		},
 		'America/Yellowknife' => {
-			exemplarCity => q#Yelounayf#,
+			exemplarCity => q#Yellounayf#,
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Şimali Mərkəzi Amerika Yay Vaxtı),
-				'generic' => q(Şimali Mərkəzi Amerika Vaxtı),
-				'standard' => q(Şimali Mərkəzi Amerika Standart Vaxtı),
+				'daylight' => q#Şimali Mərkəzi Amerika Yay Vaxtı#,
+				'generic' => q#Şimali Mərkəzi Amerika Vaxtı#,
+				'standard' => q#Şimali Mərkəzi Amerika Standart Vaxtı#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Şimali Şərqi Amerika Yay Vaxtı),
-				'generic' => q(Şimali Şərqi Amerika Vaxtı),
-				'standard' => q(Şimali Şərqi Amerika Standart Vaxtı),
+				'daylight' => q#Şimali Şərqi Amerika Yay Vaxtı#,
+				'generic' => q#Şimali Şərqi Amerika Vaxtı#,
+				'standard' => q#Şimali Şərqi Amerika Standart Vaxtı#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Şimali Dağlıq Amerika Yay Vaxtı),
-				'generic' => q(Şimali Dağlıq Amerika Vaxtı),
-				'standard' => q(Şimali Dağlıq Amerika Standart Vaxtı),
+				'daylight' => q#Şimali Dağlıq Amerika Yay Vaxtı#,
+				'generic' => q#Şimali Dağlıq Amerika Vaxtı#,
+				'standard' => q#Şimali Dağlıq Amerika Standart Vaxtı#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Şimali Amerika Sakit Okean Yay Vaxtı),
-				'generic' => q(Şimali Amerika Sakit Okean Vaxtı),
-				'standard' => q(Şimali Amerika Sakit Okean Standart Vaxtı),
+				'daylight' => q#Şimali Amerika Sakit Okean Yay Vaxtı#,
+				'generic' => q#Şimali Amerika Sakit Okean Vaxtı#,
+				'standard' => q#Şimali Amerika Sakit Okean Standart Vaxtı#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -6977,16 +7137,16 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Apia Yay Vaxtı),
-				'generic' => q(Apia Vaxtı),
-				'standard' => q(Apia Standart Vaxtı),
+				'daylight' => q#Apia Yay Vaxtı#,
+				'generic' => q#Apia Vaxtı#,
+				'standard' => q#Apia Standart Vaxtı#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Ərəbistan Yay Vaxtı),
-				'generic' => q(Ərəbistan Vaxtı),
-				'standard' => q(Ərəbistan Standart Vaxtı),
+				'daylight' => q#Ərəbistan Yay Vaxtı#,
+				'generic' => q#Ərəbistan Vaxtı#,
+				'standard' => q#Ərəbistan Standart Vaxtı#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -6994,23 +7154,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentina Yay Vaxtı),
-				'generic' => q(Argentina Vaxtı),
-				'standard' => q(Argentina Standart Vaxtı),
+				'daylight' => q#Argentina Yay Vaxtı#,
+				'generic' => q#Argentina Vaxtı#,
+				'standard' => q#Argentina Standart Vaxtı#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Qərbi Argentina Yay Vaxtı),
-				'generic' => q(Qərbi Argentina Vaxtı),
-				'standard' => q(Qərbi Argentina Standart Vaxtı),
+				'daylight' => q#Qərbi Argentina Yay Vaxtı#,
+				'generic' => q#Qərbi Argentina Vaxtı#,
+				'standard' => q#Qərbi Argentina Standart Vaxtı#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Ermənistan Yay Vaxtı),
-				'generic' => q(Ermənistan Vaxtı),
-				'standard' => q(Ermənistan Standart Vaxtı),
+				'daylight' => q#Ermənistan Yay Vaxtı#,
+				'generic' => q#Ermənistan Vaxtı#,
+				'standard' => q#Ermənistan Standart Vaxtı#,
 			},
 		},
 		'Asia/Aden' => {
@@ -7034,6 +7194,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Aşqabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atırau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Bağdad#,
 		},
@@ -7045,6 +7208,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Banqkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Beyrut#,
@@ -7081,6 +7247,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Düşənbə#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famaqusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Qəza#,
@@ -7223,6 +7392,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokyo#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulanbator#,
 		},
@@ -7249,16 +7421,16 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlantik Yay Vaxtı),
-				'generic' => q(Atlantik Vaxt),
-				'standard' => q(Atlantik Standart Vaxt),
+				'daylight' => q#Atlantik Yay Vaxtı#,
+				'generic' => q#Atlantik Vaxt#,
+				'standard' => q#Atlantik Standart Vaxt#,
 			},
 		},
 		'Atlantic/Azores' => {
 			exemplarCity => q#Azor#,
 		},
 		'Atlantic/Bermuda' => {
-			exemplarCity => q#Bermuda#,
+			exemplarCity => q#Bermud adaları#,
 		},
 		'Atlantic/Canary' => {
 			exemplarCity => q#Kanar#,
@@ -7322,171 +7494,176 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Mərkəzi Avstraliya Yay Vaxtı),
-				'generic' => q(Mərkəzi Avstraliya Vaxtı),
-				'standard' => q(Mərkəzi Avstraliya Standart Vaxtı),
+				'daylight' => q#Mərkəzi Avstraliya Yay Vaxtı#,
+				'generic' => q#Mərkəzi Avstraliya Vaxtı#,
+				'standard' => q#Mərkəzi Avstraliya Standart Vaxtı#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Mərkəzi Qərbi Avstraliya Yay Vaxtı),
-				'generic' => q(Mərkəzi Qərbi Avstraliya Vaxtı),
-				'standard' => q(Mərkəzi Qərbi Avstraliya Standart Vaxtı),
+				'daylight' => q#Mərkəzi Qərbi Avstraliya Yay Vaxtı#,
+				'generic' => q#Mərkəzi Qərbi Avstraliya Vaxtı#,
+				'standard' => q#Mərkəzi Qərbi Avstraliya Standart Vaxtı#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Şərqi Avstraliya Yay Vaxtı),
-				'generic' => q(Şərqi Avstraliya Vaxtı),
-				'standard' => q(Şərqi Avstraliya Standart Vaxtı),
+				'daylight' => q#Şərqi Avstraliya Yay Vaxtı#,
+				'generic' => q#Şərqi Avstraliya Vaxtı#,
+				'standard' => q#Şərqi Avstraliya Standart Vaxtı#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Qərbi Avstraliya Yay Vaxtı),
-				'generic' => q(Qərbi Avstraliya Vaxtı),
-				'standard' => q(Qərbi Avstraliya Standart Vaxtı),
+				'daylight' => q#Qərbi Avstraliya Yay Vaxtı#,
+				'generic' => q#Qərbi Avstraliya Vaxtı#,
+				'standard' => q#Qərbi Avstraliya Standart Vaxtı#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Azərbaycan Yay Vaxtı),
-				'generic' => q(Azərbaycan Vaxtı),
-				'standard' => q(Azərbaycan Standart Vaxtı),
+				'daylight' => q#Azərbaycan Yay Vaxtı#,
+				'generic' => q#Azərbaycan Vaxtı#,
+				'standard' => q#Azərbaycan Standart Vaxtı#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Azor Yay Vaxtı),
-				'generic' => q(Azor Vaxtı),
-				'standard' => q(Azor Standart Vaxtı),
+				'daylight' => q#Azor Yay Vaxtı#,
+				'generic' => q#Azor Vaxtı#,
+				'standard' => q#Azor Standart Vaxtı#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Banqladeş Yay Vaxtı),
-				'generic' => q(Banqladeş Vaxtı),
-				'standard' => q(Banqladeş Standart Vaxtı),
+				'daylight' => q#Banqladeş Yay Vaxtı#,
+				'generic' => q#Banqladeş Vaxtı#,
+				'standard' => q#Banqladeş Standart Vaxtı#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Butan Vaxtı),
+				'standard' => q#Butan Vaxtı#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Boliviya Vaxtı),
+				'standard' => q#Boliviya Vaxtı#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Braziliya Yay Vaxtı),
-				'generic' => q(Braziliya Vaxtı),
-				'standard' => q(Braziliya Standart Vaxtı),
+				'daylight' => q#Braziliya Yay Vaxtı#,
+				'generic' => q#Braziliya Vaxtı#,
+				'standard' => q#Braziliya Standart Vaxtı#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Brunei Darussalam vaxtı),
+				'standard' => q#Brunei Darussalam vaxtı#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Kape Verde Yay Vaxtı),
-				'generic' => q(Kape Verde Vaxtı),
-				'standard' => q(Kape Verde Standart Vaxtı),
+				'daylight' => q#Kape Verde Yay Vaxtı#,
+				'generic' => q#Kape Verde Vaxtı#,
+				'standard' => q#Kape Verde Standart Vaxtı#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Çamorro Vaxtı),
+				'standard' => q#Çamorro Vaxtı#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Çatham Yay Vaxtı),
-				'generic' => q(Çatham Vaxtı),
-				'standard' => q(Çatham Standart Vaxtı),
+				'daylight' => q#Çatham Yay Vaxtı#,
+				'generic' => q#Çatham Vaxtı#,
+				'standard' => q#Çatham Standart Vaxtı#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Çili Yay Vaxtı),
-				'generic' => q(Çili Vaxtı),
-				'standard' => q(Çili Standart Vaxtı),
+				'daylight' => q#Çili Yay Vaxtı#,
+				'generic' => q#Çili Vaxtı#,
+				'standard' => q#Çili Standart Vaxtı#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Çin Yay Vaxtı),
-				'generic' => q(Çin Vaxtı),
-				'standard' => q(Çin Standart Vaxtı),
+				'daylight' => q#Çin Yay Vaxtı#,
+				'generic' => q#Çin Vaxtı#,
+				'standard' => q#Çin Standart Vaxtı#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Çoybalsan Yay Vaxtı),
-				'generic' => q(Çoybalsan Vaxtı),
-				'standard' => q(Çoybalsan Standart Vaxtı),
+				'daylight' => q#Çoybalsan Yay Vaxtı#,
+				'generic' => q#Çoybalsan Vaxtı#,
+				'standard' => q#Çoybalsan Standart Vaxtı#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Milad Adası Vaxtı),
+				'standard' => q#Milad Adası Vaxtı#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Kokos Adaları Vaxtı),
+				'standard' => q#Kokos Adaları Vaxtı#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolumbiya Yay Vaxtı),
-				'generic' => q(Kolumbiya Vaxtı),
-				'standard' => q(Kolumbiya Standart Vaxtı),
+				'daylight' => q#Kolumbiya Yay Vaxtı#,
+				'generic' => q#Kolumbiya Vaxtı#,
+				'standard' => q#Kolumbiya Standart Vaxtı#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Kuk Adaları Yarım Yay Vaxtı),
-				'generic' => q(Kuk Adaları Vaxtı),
-				'standard' => q(Kuk Adaları Standart Vaxtı),
+				'daylight' => q#Kuk Adaları Yarım Yay Vaxtı#,
+				'generic' => q#Kuk Adaları Vaxtı#,
+				'standard' => q#Kuk Adaları Standart Vaxtı#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kuba Yay Vaxtı),
-				'generic' => q(Kuba Vaxtı),
-				'standard' => q(Kuba Standart Vaxtı),
+				'daylight' => q#Kuba Yay Vaxtı#,
+				'generic' => q#Kuba Vaxtı#,
+				'standard' => q#Kuba Standart Vaxtı#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Devis Vaxtı),
+				'standard' => q#Devis Vaxtı#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Dümon-d’Ürvil Vaxtı),
+				'standard' => q#Dümon-d’Ürvil Vaxtı#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Şərqi Timor Vaxtı),
+				'standard' => q#Şərqi Timor Vaxtı#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Pasxa Adası Yay Vaxtı),
-				'generic' => q(Pasxa Adası Vaxtı),
-				'standard' => q(Pasxa Adası Standart Vaxtı),
+				'daylight' => q#Pasxa Adası Yay Vaxtı#,
+				'generic' => q#Pasxa Adası Vaxtı#,
+				'standard' => q#Pasxa Adası Standart Vaxtı#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ekvador Vaxtı),
+				'standard' => q#Ekvador Vaxtı#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Koordinasiya edilmiş ümumdünya vaxtı#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -7497,6 +7674,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Həştərxan#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#Afina#,
@@ -7531,7 +7711,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(İrlandiya Yay Vaxtı),
+				'daylight' => q#İrlandiya Yay Vaxtı#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -7547,7 +7727,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Men Adası#,
 		},
 		'Europe/Istanbul' => {
-			exemplarCity => q#Istanbul#,
+			exemplarCity => q#İstanbul#,
 		},
 		'Europe/Jersey' => {
 			exemplarCity => q#Cersi#,
@@ -7558,6 +7738,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiyev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lissabon#,
 		},
@@ -7567,7 +7750,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#London#,
 			long => {
-				'daylight' => q(Britaniya Yay Vaxtı),
+				'daylight' => q#Britaniya Yay Vaxtı#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -7618,6 +7801,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarayevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -7636,8 +7822,11 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ulyanovsk#,
+		},
 		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ujgorod#,
+			exemplarCity => q#Ujqorod#,
 		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduts#,
@@ -7668,129 +7857,129 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Mərkəzi Avropa Yay Vaxtı),
-				'generic' => q(Mərkəzi Avropa Vaxtı),
-				'standard' => q(Mərkəzi Avropa Standart Vaxtı),
+				'daylight' => q#Mərkəzi Avropa Yay Vaxtı#,
+				'generic' => q#Mərkəzi Avropa Vaxtı#,
+				'standard' => q#Mərkəzi Avropa Standart Vaxtı#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Şərqi Avropa Yay Vaxtı),
-				'generic' => q(Şərqi Avropa Vaxtı),
-				'standard' => q(Şərqi Avropa Standart Vaxtı),
+				'daylight' => q#Şərqi Avropa Yay Vaxtı#,
+				'generic' => q#Şərqi Avropa Vaxtı#,
+				'standard' => q#Şərqi Avropa Standart Vaxtı#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Kənar Şərqi Avropa Vaxtı),
+				'standard' => q#Kənar Şərqi Avropa Vaxtı#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Qərbi Avropa Yay Vaxtı),
-				'generic' => q(Qərbi Avropa Vaxtı),
-				'standard' => q(Qərbi Avropa Standart Vaxtı),
+				'daylight' => q#Qərbi Avropa Yay Vaxtı#,
+				'generic' => q#Qərbi Avropa Vaxtı#,
+				'standard' => q#Qərbi Avropa Standart Vaxtı#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Folklend Adaları Yay Vaxtı),
-				'generic' => q(Folklend Adaları Vaxtı),
-				'standard' => q(Folklend Adaları Standart Vaxtı),
+				'daylight' => q#Folklend Adaları Yay Vaxtı#,
+				'generic' => q#Folklend Adaları Vaxtı#,
+				'standard' => q#Folklend Adaları Standart Vaxtı#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Fici Yay Vaxtı),
-				'generic' => q(Fici Vaxtı),
-				'standard' => q(Fici Standart Vaxtı),
+				'daylight' => q#Fici Yay Vaxtı#,
+				'generic' => q#Fici Vaxtı#,
+				'standard' => q#Fici Standart Vaxtı#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Fransız Qvianası Vaxtı),
+				'standard' => q#Fransız Qvianası Vaxtı#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Fransız Cənubi və Antarktik Vaxtı),
+				'standard' => q#Fransız Cənubi və Antarktik Vaxtı#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Qrinviç Orta Vaxtı),
+				'standard' => q#Qrinviç Orta Vaxtı#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Qalapaqos Vaxtı),
+				'standard' => q#Qalapaqos Vaxtı#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Qambier Vaxtı),
+				'standard' => q#Qambier Vaxtı#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Gurcüstan Yay Vaxtı),
-				'generic' => q(Gurcüstan Vaxtı),
-				'standard' => q(Gurcüstan Standart Vaxtı),
+				'daylight' => q#Gurcüstan Yay Vaxtı#,
+				'generic' => q#Gurcüstan Vaxtı#,
+				'standard' => q#Gurcüstan Standart Vaxtı#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Gilbert Adaları Vaxtı),
+				'standard' => q#Gilbert Adaları Vaxtı#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Şərqi Qrenlandiya Yay Vaxtı),
-				'generic' => q(Şərqi Qrenlandiya Vaxtı),
-				'standard' => q(Şərqi Qrenlandiya Standart Vaxtı),
+				'daylight' => q#Şərqi Qrenlandiya Yay Vaxtı#,
+				'generic' => q#Şərqi Qrenlandiya Vaxtı#,
+				'standard' => q#Şərqi Qrenlandiya Standart Vaxtı#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Qərbi Qrenlandiya Yay Vaxtı),
-				'generic' => q(Qərbi Qrenlandiya Vaxtı),
-				'standard' => q(Qərbi Qrenlandiya Standart Vaxtı),
+				'daylight' => q#Qərbi Qrenlandiya Yay Vaxtı#,
+				'generic' => q#Qərbi Qrenlandiya Vaxtı#,
+				'standard' => q#Qərbi Qrenlandiya Standart Vaxtı#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Körfəz Vaxtı),
+				'standard' => q#Körfəz Vaxtı#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Qayana Vaxtı),
+				'standard' => q#Qayana Vaxtı#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Havay-Aleut Yay Vaxtı),
-				'generic' => q(Havay-Aleut Vaxtı),
-				'standard' => q(Havay-Aleut Standart Vaxtı),
+				'daylight' => q#Havay-Aleut Yay Vaxtı#,
+				'generic' => q#Havay-Aleut Vaxtı#,
+				'standard' => q#Havay-Aleut Standart Vaxtı#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Honq Konq Yay Vaxtı),
-				'generic' => q(Honq Konq Vaxtı),
-				'standard' => q(Honq Konq Standart Vaxtı),
+				'daylight' => q#Honq Konq Yay Vaxtı#,
+				'generic' => q#Honq Konq Vaxtı#,
+				'standard' => q#Honq Konq Standart Vaxtı#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Hovd Yay Vaxtı),
-				'generic' => q(Hovd Vaxtı),
-				'standard' => q(Hovd Standart Vaxtı),
+				'daylight' => q#Hovd Yay Vaxtı#,
+				'generic' => q#Hovd Vaxtı#,
+				'standard' => q#Hovd Standart Vaxtı#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Hindistan Vaxtı),
+				'standard' => q#Hindistan Vaxtı#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -7828,240 +8017,240 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Hind Okeanı Vaxtı),
+				'standard' => q#Hind Okeanı Vaxtı#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Hindçin Vaxtı),
+				'standard' => q#Hindçin Vaxtı#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Mərkəzi İndoneziya Vaxtı),
+				'standard' => q#Mərkəzi İndoneziya Vaxtı#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Şərqi İndoneziya Vaxtı),
+				'standard' => q#Şərqi İndoneziya Vaxtı#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Qərbi İndoneziya Vaxtı),
+				'standard' => q#Qərbi İndoneziya Vaxtı#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(İran Yay Vaxtı),
-				'generic' => q(İran Vaxtı),
-				'standard' => q(İran Standart Vaxtı),
+				'daylight' => q#İran Yay Vaxtı#,
+				'generic' => q#İran Vaxtı#,
+				'standard' => q#İran Standart Vaxtı#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(İrkutsk Yay Vaxtı),
-				'generic' => q(İrkutsk Vaxtı),
-				'standard' => q(İrkutsk Standart Vaxtı),
+				'daylight' => q#İrkutsk Yay Vaxtı#,
+				'generic' => q#İrkutsk Vaxtı#,
+				'standard' => q#İrkutsk Standart Vaxtı#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(İsrail Yay Vaxtı),
-				'generic' => q(İsrail Vaxtı),
-				'standard' => q(İsrail Standart Vaxtı),
+				'daylight' => q#İsrail Yay Vaxtı#,
+				'generic' => q#İsrail Vaxtı#,
+				'standard' => q#İsrail Standart Vaxtı#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Yaponiya Yay Vaxtı),
-				'generic' => q(Yaponiya Vaxtı),
-				'standard' => q(Yaponiya Standart Vaxtı),
+				'daylight' => q#Yaponiya Yay Vaxtı#,
+				'generic' => q#Yaponiya Vaxtı#,
+				'standard' => q#Yaponiya Standart Vaxtı#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Şərqi Qazaxıstan Vaxtı),
+				'standard' => q#Şərqi Qazaxıstan Vaxtı#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Qərbi Qazaxıstan Vaxtı),
+				'standard' => q#Qərbi Qazaxıstan Vaxtı#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Koreya Yay Vaxtı),
-				'generic' => q(Koreya Vaxtı),
-				'standard' => q(Koreya Standart Vaxtı),
+				'daylight' => q#Koreya Yay Vaxtı#,
+				'generic' => q#Koreya Vaxtı#,
+				'standard' => q#Koreya Standart Vaxtı#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Korse Vaxtı),
+				'standard' => q#Korse Vaxtı#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnoyarsk Yay Vaxtı),
-				'generic' => q(Krasnoyarsk Vaxtı),
-				'standard' => q(Krasnoyarsk Standart Vaxtı),
+				'daylight' => q#Krasnoyarsk Yay Vaxtı#,
+				'generic' => q#Krasnoyarsk Vaxtı#,
+				'standard' => q#Krasnoyarsk Standart Vaxtı#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Qırğızıstan Vaxtı),
+				'standard' => q#Qırğızıstan Vaxtı#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Layn Adaları Vaxtı),
+				'standard' => q#Layn Adaları Vaxtı#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Lord Hau Yay vaxtı),
-				'generic' => q(Lord Hau Vaxtı),
-				'standard' => q(Lord Hau Standart Vaxtı),
+				'daylight' => q#Lord Hau Yay vaxtı#,
+				'generic' => q#Lord Hau Vaxtı#,
+				'standard' => q#Lord Hau Standart Vaxtı#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Makari Adası Vaxtı),
+				'standard' => q#Makari Adası Vaxtı#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Maqadan Yay Vaxtı),
-				'generic' => q(Maqadan Vaxtı),
-				'standard' => q(Maqadan Standart Vaxtı),
+				'daylight' => q#Maqadan Yay Vaxtı#,
+				'generic' => q#Maqadan Vaxtı#,
+				'standard' => q#Maqadan Standart Vaxtı#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Malayziya Vaxtı),
+				'standard' => q#Malayziya Vaxtı#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Maldiv Vaxtı),
+				'standard' => q#Maldiv Vaxtı#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Markesas Vaxtı),
+				'standard' => q#Markesas Vaxtı#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Marşal Adaları Vaxtı),
+				'standard' => q#Marşal Adaları Vaxtı#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mavriki Yay Vaxtı),
-				'generic' => q(Mavriki Vaxtı),
-				'standard' => q(Mavriki Standart Vaxtı),
+				'daylight' => q#Mavriki Yay Vaxtı#,
+				'generic' => q#Mavriki Vaxtı#,
+				'standard' => q#Mavriki Standart Vaxtı#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Mouson Vaxtı),
+				'standard' => q#Mouson Vaxtı#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Şimal-Qərbi Meksika Yay Vaxtı),
-				'generic' => q(Şimal-Qərbi Meksika Vaxtı),
-				'standard' => q(Şimal-Qərbi Meksika Standart Vaxtı),
+				'daylight' => q#Şimal-Qərbi Meksika Yay Vaxtı#,
+				'generic' => q#Şimal-Qərbi Meksika Vaxtı#,
+				'standard' => q#Şimal-Qərbi Meksika Standart Vaxtı#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Meksika Sakit Okean Yay Vaxtı),
-				'generic' => q(Meksika Sakit Okean Vaxtı),
-				'standard' => q(Meksika Sakit Okean Standart Vaxtı),
+				'daylight' => q#Meksika Sakit Okean Yay Vaxtı#,
+				'generic' => q#Meksika Sakit Okean Vaxtı#,
+				'standard' => q#Meksika Sakit Okean Standart Vaxtı#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulanbator Yay Vaxtı),
-				'generic' => q(Ulanbator Vaxtı),
-				'standard' => q(Ulanbator Standart Vaxtı),
+				'daylight' => q#Ulanbator Yay Vaxtı#,
+				'generic' => q#Ulanbator Vaxtı#,
+				'standard' => q#Ulanbator Standart Vaxtı#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskva Yay vaxtı),
-				'generic' => q(Moskva Vaxtı),
-				'standard' => q(Moskva Standart Vaxtı),
+				'daylight' => q#Moskva Yay vaxtı#,
+				'generic' => q#Moskva Vaxtı#,
+				'standard' => q#Moskva Standart Vaxtı#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Myanma Vaxtı),
+				'standard' => q#Myanma Vaxtı#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Nauru Vaxtı),
+				'standard' => q#Nauru Vaxtı#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Nepal vaxtı),
+				'standard' => q#Nepal vaxtı#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Yeni Kaledoniya Yay Vaxtı),
-				'generic' => q(Yeni Kaledoniya Vaxtı),
-				'standard' => q(Yeni Kaledoniya Standart Vaxtı),
+				'daylight' => q#Yeni Kaledoniya Yay Vaxtı#,
+				'generic' => q#Yeni Kaledoniya Vaxtı#,
+				'standard' => q#Yeni Kaledoniya Standart Vaxtı#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Yeni Zelandiya Yay Vaxtı),
-				'generic' => q(Yeni Zelandiya Vaxtı),
-				'standard' => q(Yeni Zelandiya Standart Vaxtı),
+				'daylight' => q#Yeni Zelandiya Yay Vaxtı#,
+				'generic' => q#Yeni Zelandiya Vaxtı#,
+				'standard' => q#Yeni Zelandiya Standart Vaxtı#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Nyufaundlend Yay Vaxtı),
-				'generic' => q(Nyufaundlend Vaxtı),
-				'standard' => q(Nyufaundlend Standart Vaxtı),
+				'daylight' => q#Nyufaundlend Yay Vaxtı#,
+				'generic' => q#Nyufaundlend Vaxtı#,
+				'standard' => q#Nyufaundlend Standart Vaxtı#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Niue Vaxtı),
+				'standard' => q#Niue Vaxtı#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Norfolk Adası Vaxtı),
+				'standard' => q#Norfolk Adası Vaxtı#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Fernando de Noronya Yay Vaxtı),
-				'generic' => q(Fernando de Noronya Vaxtı),
-				'standard' => q(Fernando de Noronya Standart Vaxtı),
+				'daylight' => q#Fernando de Noronya Yay Vaxtı#,
+				'generic' => q#Fernando de Noronya Vaxtı#,
+				'standard' => q#Fernando de Noronya Standart Vaxtı#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Novosibirsk Yay Vaxtı),
-				'generic' => q(Novosibirsk Vaxtı),
-				'standard' => q(Novosibirsk Standart Vaxtı),
+				'daylight' => q#Novosibirsk Yay Vaxtı#,
+				'generic' => q#Novosibirsk Vaxtı#,
+				'standard' => q#Novosibirsk Standart Vaxtı#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omsk Yay Vaxtı),
-				'generic' => q(Omsk Vaxtı),
-				'standard' => q(Omsk Standart Vaxtı),
+				'daylight' => q#Omsk Yay Vaxtı#,
+				'generic' => q#Omsk Vaxtı#,
+				'standard' => q#Omsk Standart Vaxtı#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -8183,238 +8372,243 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Pakistan Yay Vaxtı),
-				'generic' => q(Pakistan Vaxtı),
-				'standard' => q(Pakistan Standart vaxtı),
+				'daylight' => q#Pakistan Yay Vaxtı#,
+				'generic' => q#Pakistan Vaxtı#,
+				'standard' => q#Pakistan Standart vaxtı#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Palau Vaxtı),
+				'standard' => q#Palau Vaxtı#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Papua Yeni Qvineya Vaxtı),
+				'standard' => q#Papua Yeni Qvineya Vaxtı#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraqvay Yay Vaxtı),
-				'generic' => q(Paraqvay Vaxtı),
-				'standard' => q(Paraqvay Standart Vaxtı),
+				'daylight' => q#Paraqvay Yay Vaxtı#,
+				'generic' => q#Paraqvay Vaxtı#,
+				'standard' => q#Paraqvay Standart Vaxtı#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peru Yay Vaxtı),
-				'generic' => q(Peru Vaxtı),
-				'standard' => q(Peru Standart Vaxtı),
+				'daylight' => q#Peru Yay Vaxtı#,
+				'generic' => q#Peru Vaxtı#,
+				'standard' => q#Peru Standart Vaxtı#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Filippin Yay Vaxtı),
-				'generic' => q(Filippin Vaxtı),
-				'standard' => q(Filippin Standart Vaxtı),
+				'daylight' => q#Filippin Yay Vaxtı#,
+				'generic' => q#Filippin Vaxtı#,
+				'standard' => q#Filippin Standart Vaxtı#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Feniks Adaları Vaxtı),
+				'standard' => q#Feniks Adaları Vaxtı#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(San Pier və Mikelon Yay Vaxtı),
-				'generic' => q(San Pier və Mikelon Vaxtı),
-				'standard' => q(San Pier və Mikelon Standart Vaxtı),
+				'daylight' => q#Müqəddəs Pyer və Mikelon Yay Vaxtı#,
+				'generic' => q#Müqəddəs Pyer və Mikelon Vaxtı#,
+				'standard' => q#Müqəddəs Pyer və Mikelon Standart Vaxtı#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Pitkern Vaxtı),
+				'standard' => q#Pitkern Vaxtı#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Ponape Vaxtı),
+				'standard' => q#Ponape Vaxtı#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Pxenyan Vaxtı#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Reunion Vaxtı),
+				'standard' => q#Reunion Vaxtı#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Rotera Vaxtı),
+				'standard' => q#Rotera Vaxtı#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Saxalin Yay Vaxtı),
-				'generic' => q(Saxalin Vaxtı),
-				'standard' => q(Saxalin Standart Vaxtı),
+				'daylight' => q#Saxalin Yay Vaxtı#,
+				'generic' => q#Saxalin Vaxtı#,
+				'standard' => q#Saxalin Standart Vaxtı#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samara yay vaxtı),
-				'generic' => q(Samara vaxtı),
-				'standard' => q(Samara standart vaxtı),
+				'daylight' => q#Samara yay vaxtı#,
+				'generic' => q#Samara vaxtı#,
+				'standard' => q#Samara standart vaxtı#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samoa Yay Vaxtı),
-				'generic' => q(Samoa Vaxtı),
-				'standard' => q(Samoa Standart Vaxtı),
+				'daylight' => q#Samoa Yay Vaxtı#,
+				'generic' => q#Samoa Vaxtı#,
+				'standard' => q#Samoa Standart Vaxtı#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Seyşel Adaları Vaxtı),
+				'standard' => q#Seyşel Adaları Vaxtı#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Sinqapur Vaxtı),
+				'standard' => q#Sinqapur Vaxtı#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Solomon Adaları Vaxtı),
+				'standard' => q#Solomon Adaları Vaxtı#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Cənubi Corciya Vaxtı),
+				'standard' => q#Cənubi Corciya Vaxtı#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Surinam Vaxtı),
+				'standard' => q#Surinam Vaxtı#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Syova Vaxtı),
+				'standard' => q#Syova Vaxtı#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Tahiti Vaxtı),
+				'standard' => q#Tahiti Vaxtı#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Taybey Yay Vaxtı),
-				'generic' => q(Taybey Vaxtı),
-				'standard' => q(Taybey Standart Vaxtı),
+				'daylight' => q#Taybey Yay Vaxtı#,
+				'generic' => q#Taybey Vaxtı#,
+				'standard' => q#Taybey Standart Vaxtı#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tacikistan Vaxtı),
+				'standard' => q#Tacikistan Vaxtı#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Tokelau Vaxtı),
+				'standard' => q#Tokelau Vaxtı#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tonqa Yay Vaxtı),
-				'generic' => q(Tonqa Vaxtı),
-				'standard' => q(Tonqa Standart Vaxtı),
+				'daylight' => q#Tonqa Yay Vaxtı#,
+				'generic' => q#Tonqa Vaxtı#,
+				'standard' => q#Tonqa Standart Vaxtı#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Çuuk Vaxtı),
+				'standard' => q#Çuuk Vaxtı#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Türkmənistan Yay Vaxtı),
-				'generic' => q(Türkmənistan Vaxtı),
-				'standard' => q(Türkmənistan Standart Vaxtı),
+				'daylight' => q#Türkmənistan Yay Vaxtı#,
+				'generic' => q#Türkmənistan Vaxtı#,
+				'standard' => q#Türkmənistan Standart Vaxtı#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Tuvalu Vaxtı),
+				'standard' => q#Tuvalu Vaxtı#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Uruqvay Yay Vaxtı),
-				'generic' => q(Uruqvay Vaxtı),
-				'standard' => q(Uruqvay Standart Vaxtı),
+				'daylight' => q#Uruqvay Yay Vaxtı#,
+				'generic' => q#Uruqvay Vaxtı#,
+				'standard' => q#Uruqvay Standart Vaxtı#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Özbəkistan Yay Vaxtı),
-				'generic' => q(Özbəkistan Vaxtı),
-				'standard' => q(Özbəkistan Standart Vaxtı),
+				'daylight' => q#Özbəkistan Yay Vaxtı#,
+				'generic' => q#Özbəkistan Vaxtı#,
+				'standard' => q#Özbəkistan Standart Vaxtı#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Vaunatu Yay Vaxtı),
-				'generic' => q(Vanuatu Vaxtı),
-				'standard' => q(Vanuatu Standart Vaxtı),
+				'daylight' => q#Vaunatu Yay Vaxtı#,
+				'generic' => q#Vanuatu Vaxtı#,
+				'standard' => q#Vanuatu Standart Vaxtı#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Venesuela Vaxtı),
+				'standard' => q#Venesuela Vaxtı#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Vladivostok Yay Vaxtı),
-				'generic' => q(Vladivostok Vaxtı),
-				'standard' => q(Vladivostok Standart Vaxtı),
+				'daylight' => q#Vladivostok Yay Vaxtı#,
+				'generic' => q#Vladivostok Vaxtı#,
+				'standard' => q#Vladivostok Standart Vaxtı#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Volqoqrad Yay Vaxtı),
-				'generic' => q(Volqoqrad Vaxtı),
-				'standard' => q(Volqoqrad Standart Vaxtı),
+				'daylight' => q#Volqoqrad Yay Vaxtı#,
+				'generic' => q#Volqoqrad Vaxtı#,
+				'standard' => q#Volqoqrad Standart Vaxtı#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Vostok Vaxtı),
+				'standard' => q#Vostok Vaxtı#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Ueyk Vaxtı),
+				'standard' => q#Ueyk Vaxtı#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Uollis və Futuna Vaxtı),
+				'standard' => q#Uollis və Futuna Vaxtı#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Yakutsk Yay Vaxtı),
-				'generic' => q(Yakutsk Vaxtı),
-				'standard' => q(Yakutsk Standart Vaxtı),
+				'daylight' => q#Yakutsk Yay Vaxtı#,
+				'generic' => q#Yakutsk Vaxtı#,
+				'standard' => q#Yakutsk Standart Vaxtı#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Yekaterinburq Yay Vaxtı),
-				'generic' => q(Yekaterinburq Vaxtı),
-				'standard' => q(Yekaterinburq Standart Vaxtı),
+				'daylight' => q#Yekaterinburq Yay Vaxtı#,
+				'generic' => q#Yekaterinburq Vaxtı#,
+				'standard' => q#Yekaterinburq Standart Vaxtı#,
 			},
 		},
 	 } }

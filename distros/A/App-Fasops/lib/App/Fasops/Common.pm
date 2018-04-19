@@ -270,17 +270,13 @@ sub seq_intspan {
 
 sub align_seqs {
     my $seq_refs = shift;
-    my $aln_prog = shift;
-
-    if ( !defined $aln_prog ) {
-        $aln_prog = "mafft";
-    }
+    my $aln_bin  = shift // "mafft";
 
     # get executable
     my $bin;
 
-    if ( !defined $aln_prog or $aln_prog =~ /clus/i ) {
-        $aln_prog = 'clustalw';
+    if ( $aln_bin =~ /clus/i ) {
+        $aln_bin = 'clustalw';
         for my $e (qw{clustalw clustal-w clustalw2}) {
             if ( IPC::Cmd::can_run($e) ) {
                 $bin = $e;
@@ -288,8 +284,8 @@ sub align_seqs {
             }
         }
     }
-    elsif ( $aln_prog =~ /musc/i ) {
-        $aln_prog = 'muscle';
+    elsif ( $aln_bin =~ /musc/i ) {
+        $aln_bin = 'muscle';
         for my $e (qw{muscle}) {
             if ( IPC::Cmd::can_run($e) ) {
                 $bin = $e;
@@ -297,8 +293,8 @@ sub align_seqs {
             }
         }
     }
-    elsif ( $aln_prog =~ /maff/i ) {
-        $aln_prog = 'mafft';
+    elsif ( $aln_bin =~ /maff/i ) {
+        $aln_bin = 'mafft';
         for my $e (qw{mafft}) {
             if ( IPC::Cmd::can_run($e) ) {
                 $bin = $e;
@@ -308,7 +304,7 @@ sub align_seqs {
     }
 
     if ( !defined $bin ) {
-        Carp::confess "Could not find the executable for $aln_prog\n";
+        Carp::confess "Could not find the executable for $aln_bin\n";
     }
 
     # temp in and out
@@ -330,17 +326,17 @@ sub align_seqs {
     }
 
     my @args;
-    if ( $aln_prog eq "clustalw" ) {
+    if ( $aln_bin eq "clustalw" ) {
         push @args, "-align -type=dna -output=fasta -outorder=input -quiet";
         push @args, "-infile=" . $temp_in->absolute->stringify;
         push @args, "-outfile=" . $temp_out->absolute->stringify;
     }
-    elsif ( $aln_prog eq "muscle" ) {
+    elsif ( $aln_bin eq "muscle" ) {
         push @args, "-quiet";
         push @args, "-in " . $temp_in->absolute->stringify;
         push @args, "-out " . $temp_out->absolute->stringify;
     }
-    elsif ( $aln_prog eq "mafft" ) {
+    elsif ( $aln_bin eq "mafft" ) {
         push @args, "--quiet";
         push @args, "--auto";
         push @args, $temp_in->absolute->stringify;
@@ -351,7 +347,7 @@ sub align_seqs {
     my $ok = IPC::Cmd::run( command => $cmd_line );
 
     if ( !$ok ) {
-        Carp::confess("$aln_prog call failed\n");
+        Carp::confess("$aln_bin call failed\n");
     }
 
     my @aligned;
@@ -362,7 +358,7 @@ sub align_seqs {
 
     # delete .dnd files created by clustalw
     #printf STDERR "%s\n", $temp_in->absolute->stringify;
-    if ( $aln_prog eq "clustalw" ) {
+    if ( $aln_bin eq "clustalw" ) {
         my $dnd = $temp_in->absolute->stringify . ".dnd";
         path($dnd)->remove;
     }
@@ -1029,7 +1025,8 @@ sub polarize_indel {
 
         my ( $indel_type, $indel_occured, $indel_freq );
 
-        my $indel_set = AlignDB::IntSpan->new()->add_pair( $site->{indel_start}, $site->{indel_end} );
+        my $indel_set
+            = AlignDB::IntSpan->new()->add_pair( $site->{indel_start}, $site->{indel_end} );
 
         # this line is different to previous subroutines
         my @uniq_indel_seqs = uniq( @indel_seqs, $indel_outgroup_seq );

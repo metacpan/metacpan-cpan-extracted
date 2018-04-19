@@ -2,13 +2,14 @@
 package Math::NV;
 use warnings;
 use strict;
+use Math::MPFR qw(:mpfr);
 use 5.010;
 
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::NV::VERSION = '1.02';
+$Math::NV::VERSION = '2.0';
 
 DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 
@@ -16,19 +17,77 @@ DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 @Math::NV::EXPORT_OK = qw(
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
+    set_C set_mpfr
     );
 
 %Math::NV::EXPORT_TAGS = (all => [qw(
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
+    set_C set_mpfr
     )]);
 
-eval {require Math::MPFR;};
+if($Math::MPFR::VERSION < 4.03) {
+   die " Math-MPFR version needs to be 4.03 or later\nThis only Math-MPFR-$Math::MPFR::VERSION\n";
+}
 
-if($@) {$Math::NV::no_mpfr = $@}
-else   {$Math::NV_no_mpfr = 0 }
+## normal min values ##
+# double     : (2 ** - 1022) : 0.1E-1021  : 2.2250738585072014e-308
+# long double: (2 ** -16382) : 0.1E-16381 : 3.36210314311209350626e-4932
+# __float128 : (2 ** -16382) : 0.1E-16381 : 3.36210314311209350626267781732175260e-4932
 
-$Math::NV::no_warn = 0; # set to true to disable warning about non-string argument
+  $Math::NV::DBL_MIN    = Math::MPFR->new(2 **  -1022);
+  $Math::NV::LDBL_MIN   = Math::MPFR->new(2 ** -16382);
+  $Math::NV::FLT128_MIN = $Math::NV::LDBL_MIN;
+
+## denorm_min values ##
+# double     : (2 **  -1074) : 0.1E-1073  : 4.9406564584124654e-324
+# long double: (2 ** -16445) : 0.1E-16444 : 3.64519953188247460253e-4951
+# __float128 : (2 ** -16494) : 0.1E-16493 : 6.47517511943802511092443895822764655e-4966
+
+  $Math::NV::DBL_DENORM_MIN = Math::MPFR->new(2);
+  Rmpfr_div_2ui($Math::NV::DBL_DENORM_MIN, $Math::NV::DBL_DENORM_MIN, 1075, 0);        # (2 ** -1074)
+  $Math::NV::LDBL_DENORM_MIN = Math::MPFR->new(2);
+  Rmpfr_div_2ui($Math::NV::LDBL_DENORM_MIN, $Math::NV::LDBL_DENORM_MIN, 16446, 0);     # (2 ** -16445)
+  $Math::NV::FLT128_DENORM_MIN = Math::MPFR->new(2);
+  Rmpfr_div_2ui($Math::NV::FLT128_DENORM_MIN, $Math::NV::FLT128_DENORM_MIN, 16495, 0); # (2 ** -16494)
+
+  $Math::NV::DBL_DENORM_MIN_MIN    = Math::MPFR->new();
+  $Math::NV::LDBL_DENORM_MIN_MIN   = Math::MPFR->new();
+  $Math::NV::FLT128_DENORM_MIN_MIN = Math::MPFR->new();
+
+  # For all x, DENORM_MIN_MIN < x < DENORM_MIN, x should round to DENORM_MIN when subnormalized.
+  # For all x, x <= DENORM_MIN_MIN, x is subnormalized to 0.
+
+  Rmpfr_div_2ui($Math::NV::DBL_DENORM_MIN_MIN,    $Math::NV::DBL_DENORM_MIN,    1, MPFR_RNDN); # (2 ** -1075)
+  Rmpfr_div_2ui($Math::NV::LDBL_DENORM_MIN_MIN,   $Math::NV::LDBL_DENORM_MIN,   1, MPFR_RNDN); # (2 ** -16446)
+  Rmpfr_div_2ui($Math::NV::FLT128_DENORM_MIN_MIN, $Math::NV::FLT128_DENORM_MIN, 1, MPFR_RNDN); # (2 ** -16495)
+
+  %Math::NV::DENORM_MIN = ('0'   => Math::MPFR->new(0),
+                           '53'  => $Math::NV::DBL_DENORM_MIN,
+                           '64'  => $Math::NV::LDBL_DENORM_MIN,
+                           '106' => $Math::NV::DBL_DENORM_MIN,
+                           '113' => $Math::NV::FLT128_DENORM_MIN,
+                           '53MIN'  => $Math::NV::DBL_DENORM_MIN_MIN,
+                           '64MIN'  => $Math::NV::LDBL_DENORM_MIN_MIN,
+                           '106MIN' => $Math::NV::DBL_DENORM_MIN_MIN,
+                           '113MIN' => $Math::NV::FLT128_DENORM_MIN_MIN,
+                           );
+
+if(Math::MPFR::_ld_subnormal_bug()) {
+  $Math::NV::_ld_subnormal_bug = 1;
+}
+else {
+  $Math::NV::_ld_subnormal_bug = 0;
+}
+
+# With mpfr-3.1.5 and earlier, the ternary value returned
+# by mpfr_strtofr is unreliable - thereby making that function
+# unusable with mpfr_subnormalize.
+$Math::NV::mpfr_strtofr_bug = MPFR_VERSION() <= 196869 ? 1 : 0;
+
+$Math::NV::no_warn = 0; # set to 1 to disable warning about non-string argument
+                        # set to 2 to disable output of the 2 non-matching values
+                        # set to 3 to disable both of the above
 
 # %_itsa is utilised in the formulation of the diagnostic message
 # when it's detected that the provided arg is not a string.
@@ -83,120 +142,165 @@ sub bin2val {
 }
 
 sub is_eq {
-  unless($Math::NV::no_warn) {
+  unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa); # make sure that $_[0] IOK flag is not set
+    $itsa = _itsa($itsa); # make sure that $_[0] has POK flag set && all numeric flags unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
   my $nv = $_[0];
   my $check = nv($_[0]);
   return 1 if $nv == $check;
-  if(mant_dig() == 64) {
-    # pack/unpack like to deliver irrelevant (ie ignored) leading bytes
-    # if NV is 80-bit long double
-    my $first = scalar(reverse(unpack("h*", pack("F<", $nv))));
-    $first = substr($first, length($first) - 20, 20);
-    my $second = scalar(reverse(unpack("h*", pack("F<", $check))));
-    $second = substr($second, length($second) - 20, 20);
-    warn "In is_eq:\nperl: $first vs C: $second\n\n";
+  unless($Math::NV::no_warn & 2) {
+    if(mant_dig() == 64) {
+      # pack/unpack like to deliver irrelevant (ie ignored) leading bytes
+      # if NV is 80-bit long double
+      my $first = scalar(reverse(unpack("h*", pack("F<", $nv))));
+      $first = substr($first, length($first) - 20, 20);
+      my $second = scalar(reverse(unpack("h*", pack("F<", $check))));
+      $second = substr($second, length($second) - 20, 20);
+      warn "\nIn is_eq:\nperl: $first vs C: $second\n";
+      if($] > 5.02) {
+        warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", $check), "\n";
+      }
+    }
+    else {
+      warn "\nIn is_eq:\nperl: ",
+        scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs C: ",
+        scalar(reverse(unpack("h*", pack("F<", $check)))), "\n";
+      if($] > 5.02) {
+        warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", $check), "\n";
+      }
+    }
   }
-  else {
-    warn "In is_eq:\nperl: ",
-      scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs C: ",
-      scalar(reverse(unpack("h*", pack("F<", $check)))), "\n\n";
-  }
-
   return 0;
 }
 
 sub is_eq_mpfr {
 
-  if($Math::NV::no_mpfr) {die "In is_eq_mpfr(): $Math::NV::no_mpfr"}
-
-  unless($Math::NV::no_warn) {
+  unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa); # make sure that $_[0] IOK flag is not set
+    $itsa = _itsa($itsa); # make sure that $_[0] has POK flag set && all numeric flags unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
 
-  my $ret = 0;
+  my $fr;
   my $nv = $_[0];
   my $bits = mant_dig();
-  $bits = 2098 if $bits == 106; # double double
+  $bits = 2098 if $bits == 106;
 
-  my $fr = Math::MPFR::Rmpfr_init2($bits);
-  Math::MPFR::Rmpfr_set_str($fr, $nv, 10, 0);
+  if($bits == 2098) {
+    $fr = Rmpfr_init2($bits);
+    Rmpfr_strtofr($fr, $nv, 0, 0);
+  }
+    else { # OPEN ELSE 1
 
-  if($nv == Math::MPFR::Rmpfr_get_NV($fr, 0)) {$ret = 1}
-  else {
+    $fr = Rmpfr_init2($bits);
+    my $inex = Rmpfr_strtofr($fr, $nv, 0, 0);
+
+    unless($Math::NV::mpfr_strtofr_bug) {
+      $fr = _subnormalize($_[0], $bits);
+    }
+    else {
+      $fr = Rmpfr_init2($bits);
+      Rmpfr_strtofr($fr, $nv, 0, 0);
+      my $fr_bits = get_relevant_prec($fr); # check for subnormality
+
+      Rmpfr_set($fr, get_subnormal($_[0], $fr_bits, $bits, $fr), 0);
+    }
+  } # CLOSE ELSE1
+
+  if($nv == Rmpfr_get_NV($fr, 0)) {return 1}
+
+  # Values don't match
+
+  unless($Math::NV::no_warn & 2) {
     if($bits == 64) {
       # pack/unpack like to deliver irrelevant (ie ignored) leading bytes
       # if NV is 80-bit long double
       my $first = scalar(reverse(unpack("h*", pack("F<", $nv))));
       $first = substr($first, length($first) - 20, 20);
-      my $second = scalar(reverse(unpack("h*", pack("F<", Math::MPFR::Rmpfr_get_NV($fr, 0)))));
+      my $second = scalar(reverse(unpack("h*", pack("F<", Rmpfr_get_NV($fr, 0)))));
       $second = substr($second, length($second) - 20, 20);
-      warn "In is_eq_mpfr:\nperl: $first vs mpfr: $second\n\n";
+      warn "\nIn is_eq_mpfr: $_[0]\nperl: $first vs mpfr: $second\n";
+      if($] > 5.02) {
+        warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", Rmpfr_get_NV($fr, 0)), "\n";
+      }
     }
     else {
-      warn "In is_eq_mpfr:\nperl: ",
+      warn "\nIn is_eq_mpfr: $_[0]\nperl: ",
         scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs mpfr: ",
-        scalar(reverse(unpack("h*", pack("F<", Math::MPFR::Rmpfr_get_NV($fr, 0))))), "\n\n";
+        scalar(reverse(unpack("h*", pack("F<", Rmpfr_get_NV($fr, 0))))), "\n";
+      if($] > 5.02) {
+        warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", Rmpfr_get_NV($fr, 0)), "\n";
+      }
     }
   }
-
-  return $ret;
+  return 0;
 
 }
 
 sub nv_mpfr {
 
-  if($Math::NV::no_mpfr) {die "In nv_mpfr(): $Math::NV::no_mpfr"}
-
-  unless($Math::NV::no_warn) {
+  unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa); # make sure that $_[0] IOK flag is not set
+    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
 
-  my $bits;
+  my($val, $bits);
 
-  if(!defined($_[1])) {$bits = mant_dig()}
-  else {$bits = $_[1]}
+  $bits = defined($_[1]) ? $_[1] : mant_dig();
 
   return _double_double($_[0]) if $bits == 106; # doubledouble
 
-  my $val = Math::MPFR::Rmpfr_init2($bits);
-  Math::MPFR::Rmpfr_set_str($val, $_[0], 10, 0);
+  if($bits == mant_dig() ) { # 53, 64 or 113 bits
 
-  if($bits == mant_dig() ) { # 53, 64, 106 or 113 bits
-    my $nv = Math::MPFR::Rmpfr_get_NV($val, 0);
+    unless($Math::NV::mpfr_strtofr_bug) {
+      $val = _subnormalize($_[0], $bits);
+    }
+    else { # ELSE1
+      $val = Rmpfr_init2($bits);
+      Rmpfr_strtofr($val, $_[0], 0, 0);
+      my $val_bits = get_relevant_prec($val); # check for subnormality.
+
+      Rmpfr_set($val, get_subnormal($_[0], $val_bits, $bits, $val), MPFR_RNDN);
+
+    } # ELSE1
+
+    my $nv = Rmpfr_get_NV($val, 0);
     my $ret = scalar(reverse(unpack("h*", pack("F<", $nv))));
 
-    # pack/unpack like to deliver irrelevant (ie ignored) leading bytes
-    # if NV is 80-bit long double
-    if($bits == 64) {
-      return substr($ret, length($ret) - 20, 20);
-    }
     return $ret;
   }
 
   if($bits == 53) {
-    my $nv = Math::MPFR::Rmpfr_get_d($val, 0);
+
+    unless($Math::NV::mpfr_strtofr_bug) {
+      $val = _subnormalize($_[0], 53);
+    }
+    else { # ELSE1
+      $val = Rmpfr_init2($bits);
+      Rmpfr_strtofr($val, $_[0], 0, 0);
+      my $val_bits = get_relevant_prec($val); # check for subnormality.
+
+      Rmpfr_set($val, get_subnormal($_[0], $val_bits, $bits, $val), MPFR_RNDN);
+
+    } # ELSE1
+
+    my $nv = Rmpfr_get_d($val, 0);
     return scalar(reverse(unpack("h*", pack("d<", $nv))));
   }
 
   if($bits == 64) {
-    die "No _ld_bytes with this version ($Math::MPFR::VERSION) - need at least 3.27"
-      unless $Math::MPFR::VERSION > '3.26';
     my @bytes = Math::MPFR::_ld_bytes($_[0], 64);
     return join('', @bytes);
   }
 
   if($bits == 113) {
+
     my $t;
     eval{$t = Math::MPFR::_have_IEEE_754_long_double();}; # needs Math-MPFR-3.33, perl-5.22.
     if(!$@ && $t) {
@@ -204,9 +308,7 @@ sub nv_mpfr {
       return join('', @bytes);
     }
     else { # assume __float128 (though that might not be the case)
-      die "No _f128_bytes with this version ($Math::MPFR::VERSION) - need at least 3.26"
-        unless $Math::MPFR::VERSION > 3.25;
-      my @bytes = Math::MPFR::_f128_bytes($_[0], 113);
+        my @bytes = Math::MPFR::_f128_bytes($_[0], 113);
       return join('', @bytes);
     }
   }
@@ -214,10 +316,62 @@ sub nv_mpfr {
   die "Unrecognized value for bits ($bits)";
 }
 
+sub set_mpfr {
+
+  unless($Math::NV::no_warn & 1) {
+    my $itsa = $_[0];
+    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
+    warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
+    if $itsa != 4;
+  }
+
+  my $bits = mant_dig();
+  $bits = 2098 if $bits == 106;
+
+  my $val;
+
+  # my $val = Rmpfr_init2($bits);
+  # my $inex = Rmpfr_strtofr($val, $_[0], 0, 0);
+
+  if($bits == 2098) {
+    $val = Rmpfr_init2(2098);
+    Rmpfr_strtofr($val, $_[0], 0, 0);
+    return Rmpfr_get_ld($val, 0);
+  }
+
+  die "In set_mpfr: unrecognized nv precision of $bits bits"
+    unless($bits == 53 || $bits == 64 || $bits == 113);
+
+    unless($Math::NV::mpfr_strtofr_bug) {
+      $val = _subnormalize($_[0], $bits);
+    }
+    else { # ELSE1
+      $val = Rmpfr_init2($bits);
+      Rmpfr_strtofr($val, $_[0], 0, 0);
+      my $val_bits = get_relevant_prec($val); # check for subnormality.
+
+      Rmpfr_set($val, get_subnormal($_[0], $val_bits, $bits, $val), MPFR_RNDN);
+
+    } # ELSE1
+
+  return Rmpfr_get_NV($val, MPFR_RNDN);
+
+}
+
+sub set_C {
+  unless($Math::NV::no_warn & 1) {
+    my $itsa = $_[0];
+    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
+    warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
+    if $itsa != 4;
+  }
+  return _set_C($_[0]);
+}
+
 
 sub _double_double {
-  my $val = Math::MPFR::Rmpfr_init2(2098);
-  Math::MPFR::Rmpfr_set_str($val, shift, 10, 0);
+  my $val = Rmpfr_init2(2098);
+  Rmpfr_set_str($val, shift, 0, 0);
   my @val = _dd_obj($val);
   return [scalar(reverse(unpack("h*", pack("d<", $val[0])))),
           scalar(reverse(unpack("h*", pack("d<", $val[1]))))];
@@ -225,207 +379,94 @@ sub _double_double {
 
 sub _dd_obj {
   my $obj = shift;
-  my $msd = Math::MPFR::Rmpfr_get_d($obj, 0);
+  my $msd = Rmpfr_get_d($obj, 0);
+  if($msd == 0 || $msd != $msd || $msd / $msd != 1) {return ($msd, 0.0)} # it's  inf, nan or zero.
   $obj -= $msd;
-  return ($msd, Math::MPFR::Rmpfr_get_d($obj, 0));
+  return ($msd, Rmpfr_get_d($obj, 0));
 }
 
+# use _subnormalize instead if MPFR_VERSION > 196869
+sub get_subnormal {
+
+  my($str, $prec, $bits) = (shift, shift, shift);
+
+  my $signbit = Rmpfr_signbit($_[0]) ? -1 : 1;
+
+  # If $prec < 0, set $val to (appropriately signed) 0.
+  if($prec < 0) {
+    return $Math::NV::DENORM_MIN{'0'} * $signbit;
+  }
+
+  # If prec == 0, then the value is less than the
+  # minimum subnormal number.
+  if($prec == 0) {
+    return $Math::NV::DENORM_MIN{$bits} * $signbit if abs($_[0]) > $Math::NV::DENORM_MIN{"${bits}MIN"};
+    return $Math::NV::DENORM_MIN{'0'} * $signbit;
+  }
+
+  # Can't set precision to 1 bit with
+  # older versions of the mpfr library
+  if($prec == 1) {
+    return ($Math::NV::DENORM_MIN{$bits} * $signbit * 2) if(abs($_[0]) >= $Math::NV::DENORM_MIN{"${bits}MIN"}
+                                                                          + $Math::NV::DENORM_MIN{$bits});
+    return $Math::NV::DENORM_MIN{$bits} * $signbit;
+  }
+
+  my $val = Rmpfr_init2($prec);
+  Rmpfr_set_str($val, $str, 0, 0);
+  return $val;
+}
+
+sub get_relevant_prec {
+  my $bits = Rmpfr_get_prec($_[0]);
+  die "Unrecognized precision ($bits) handed to get_relevant_prec()"
+    unless ($bits == 53 || $bits == 64 || $bits == 113 || $bits == 106 || $bits == 2098);
+
+  my $init = $bits == 53 || $bits == 106 || $bits == 2098 ? 1074
+                                                           : $bits == 64 ? 16445
+                                                                         : 16494;
+
+  return $init + Rmpfr_get_exp($_[0]);
+
+}
+
+# use get_subnormal instead if MPFR_VERSION <= 196869
+sub _subnormalize {
+  # Called as: $val = _subnormalize($string, $bits);
+  # mpfr_subnormalize(fr, inex, MPFR_RNDN);
+
+  my $emin = Rmpfr_get_emin();
+  my $emax = Rmpfr_get_emax();
+
+# Default precision shouldn't matter as we're
+# specifying precision of $val correctly.
+# my $original_prec = Rmpfr_get_default_prec();
+
+  my $sub_emin = $_[1] == 53 ? -1073
+                             : $_[1] == 64 ? -16444
+                                                : -16493; # $_[1] == 113
+
+  my $sub_emax = $_[1] == 53 ? 1024
+                             : 16384;
+
+#  Rmpfr_set_default_prec($_[1]);
+
+  Rmpfr_set_emin($sub_emin);
+  Rmpfr_set_emax($sub_emax);
+
+  my $val = Rmpfr_init2($_[1]);
+  my $inex = Rmpfr_strtofr($val, $_[0], 0, 0);
+
+  Rmpfr_subnormalize($val, $inex, 0);
+
+  Rmpfr_set_emin($emin);
+  Rmpfr_set_emax($emax);
+# Rmpfr_set_default_prec($original_prec);
+
+  return $val;
+}
 
 1;
 
 __END__
 
-=head1 NAME
-
-Math::NV - compare the NV values that perl assigns with C and MPFR
-
-=head1 DESCRIPTION
-
-   use Math::NV qw(:all);
-   $bool = is_eq('1e-298');
-   $bool = is_eq_mpfr('1e-298'); # iff Math::MPFR is available
-
-    If $bool is true, this suggests there is quite possibly no bug
-    in the assignment of the specified value.
-    If $bool is false, this implies that at least one of perl && C
-    (wrt is_eq) or mpfr (wrt is_eq_mpfr) suffer a bug in assigning
-    the specified value.
-    IME, it's perl that's usually wrong - though I've struck buggy
-    assignments with C.
-    I've not yet found a case where mpfr assigns incorrectly - and
-    I firmly expect that I won't ever find such a bug with that
-    library.
-
-    All mpfr values are assigned with a rounding mode of "to nearest,
-    ties to even". (This could be made configurable if requested.)
-
-
-=head1 FUNCTIONS
-
-   $bool = is_eq($str);
-
-     Returns true if the value perl assigns to an NV from the string
-     $str is equal to the value C assigns to the C type specified by
-     $Config{nvtype} from the same string.
-     Else returns false - which implies that either perl or C is buggy
-     in its assignment of that value. (Or they could both be buggy.)
-
-   $bool = is_eq_mpfr($str);
-
-     Returns true if the value perl assigns from the string $str is
-     equal to the value mpfr assigns from the same string.
-     Else returns false - which implies that either perl or mpfr is
-     buggy in its assignment of that value. (Or they could both be
-     buggy - though it's very unlikely that mpfr suffers such a bug.)
-
-   $nv = nv($str);        # scalar context
-   ($nv, $iv) = nv($str); # list context
-
-    On perls whose NV is a C "double", assigns to $nv the value that
-    the C standard library function strtod($str) assigns.
-    On perls whose NV is a C "long double", assigns to $nv the value
-    that the C standard library function strtold($str) assigns.
-    On perls whose NV is a C "__float128", assigns to $nv the value
-    that the C standard library function strtofloat128($str) assigns.
-    In list context, also returns the number of characters that were
-    unparsed (ignored).
-    Generally you'll want $str to be a string - eg the string "2.3",
-    rather than the NV 2.3. Failure to adhere to this will result in
-    a warning - though you can disable this warning by setting
-    $Math::NV::no_warn to 1.
-
-   $hex = nv_mpfr($str, [$bits]);
-
-    If $bits is not specified, it will be set to the value returned by
-    mant_dig() - which is the appropriate value for the current perl
-    that is being run.
-    Valid values for $bits are 53 (double), 64 (80-bit extended
-    precision long double), 106 (double-double) and 113 (128-bit quad
-    long double or __float128). Other values will cause an error.
-    If $bits is set to 113, the string will be treated as a 128-bit
-    IEEE 754 long double iff $Math::MPFR::VERSION >= 3.33 &&
-    $Config{longdblkind} is either 1 or 2. Otherwise the value of 113
-    will be taken to indicate __float128, though this is not
-    necessarily correct when $Math::MPFR::VERSION is less than 3.33 or
-    the version of perl itself is less than 5.22.
-
-    Uses the mpfr library to assign the value represented by $str as a
-    double or long double or double-double or __float128 (as determined
-    by the value of $bits). It then returns a hex dump of the bytes that
-    make up that C data type.
-
-    For example, nv_mpfr('1e+127', 53) returns 5a4d8ba7f519c84f.
-    This is the same as should be returned by
-    scalar(reverse(unpack("h*", pack("d<", 1e+127))))
-    except that, on my Windows machine, it returns 5a4d8ba7f519c851 .
-    (Yes, perl's assignment of that value is out by 2 ULP's.)
-
-    For the double-double, the returned scalar is a reference to a list
-    that contains 2 elements - the hex dump of the most significant
-    double, and the hex dump of the least siginificant double.
-    For all other types, the returned scalar contains the hex dump
-    of the given value.
-    The enticement to use this function in preference to nv() is
-    twofold:
-    1) mpfr reliably sets floating point values correctly (whereas C is
-       more likely to suffer bugs);
-    2) nv_mpfr() can provide hex dumps for any of the four data types
-       (double, long double, double-double and __float128), whereas nv()
-       returns only the value for whichever data type is specified by
-       $Config{nvtype}.
-
-    Note, however, that for nv_mpfr() to return the hex form of the
-    __float128 type, the mpfr library (as used by Math::MPFR) needs to have
-    been built using the configure option --enable-float128, and this
-    configure option is only available with mpfr-3.2.0 or later.
-
-    As is the case with nv(), you'll generally want $str to be a string.
-    For example, specify the string "2.3", rather than the NV 2.3.
-    Failure to adhere to this will result in a warning - though you can
-    disable this warning by setting $Math::NV::no_warn to 1.
-
-   $nv_type = nv_type();
-
-    Returns "double", "long double", or "__float128" depending upon
-    the way perl has been configured.
-    The expectation is that it returns the same as $Config{nvtype}.
-    (Please file a bug report if you find otherwise.)
-
-   $digits = mant_dig();
-
-    Returns the number of bits the NV mantissa contains. This is
-    normally 53 if nv_type() is double - otherwise usually (but by no
-    means always) 64.
-    It returns the value of the C macro DBL_MANT_DIG, LDBL_MANT_DIG,
-    or FLT128_MANT_DIG depending upon whichever is appropriate for
-    perl's configuration.
-
-   ($mantissa, $exponent, $precision) = ld2binary($nv);
-
-    Uses code taken from tests/tset_ld.c in the mpfr library source
-    and returns a base 2 representation of the value contained in the
-    NV $nv - irrespective of whether the NV type ($Config{nvtype}) is
-    double, long double or __float128.
-    $mantissa is the mantissa (significand).
-    $exponent is the exponent.
-    $precision is the precision (in bits) of the mantissa - trailing
-    zero bits are not counted.
-
-
-   ($mantissa, $exponent, $precision) = ld_str2binary($str);
-
-    Uses code taken from tests/tset_ld.c in the mpfr library source
-    and returns a base 2 representation of the value of the NV
-    represented by the string $str - irrespective of whether the NV
-    type ($Config{nvtype}) is double, long double or __float128.
-    $mantissa is the mantissa (significand).
-    $exponent is the exponent.
-    $precision is the precision (in bits) of the mantissa - trailing
-    zero bits are not counted.
-
-   $nv = bin2val($mantissa, $exponent, $precision);
-
-    Takes the return values of ld_str2binary() or ld2binary() and
-    returns the original NV. (Probably doesn't work if the original
-    NV is an inf or a nan.)
-
-   Cprintf($fmt, $nv);
-    Uses C's printf() function to format the NV $nv, according to the
-    formatting specified by the string $fmt.
-
-   $string = Csprintf($fmt, $nv, $buffer_size);
-    Uses C's sprintf() function to format the NV $nv, according to the
-    formatting specified by the string $fmt - and returns the result to
-    $string. It's the responsibility of the caller to ensure that
-    $buffer_size specifies a large enough number of characters to
-    accommodate C's sprintf formatting of $nv.
-
-=head1 PACKAGE VARIABLES
-
-   $Math::NV::no_mpfr
-
-    At startup, NV.pm runs "eval{require Math::MPFR;};".
-    $Math::NV::no_mpfr is automatically set to 0 (if Math::MPFR loads)
-    or to $@ (if Math::MPFR fails to load).
-    Can subsequently be overwritten by assigning directly to it.
-
-   $Math::NV::no_warn
-
-    Initially set to 0 - which means that if either nv(), nv_mpfr(),
-    is_eq() or is_eq_mpfr() are handed an argument that is not a string,
-    then a warning will be emitted.
-    To disable this warning, simply assign 1 (or any other true numeric
-    value) to this variable.
-
-=head1 LICENSE
-
-   This program is free software; you may redistribute it and/or modify
-   it under the same terms as Perl itself.
-   Copyright 2013-16 Sisyphus
-
-
-=head1 AUTHOR
-
-   Sisyphus <sisyphus at(@) cpan dot (.) org>
-
-=cut

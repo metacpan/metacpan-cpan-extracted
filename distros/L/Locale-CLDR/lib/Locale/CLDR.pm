@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.29.0
+Version 0.32.0
 
 =head1 SYNOPSIS
 
@@ -39,11 +39,12 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use open ':encoding(utf8)';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
+use if $^V le v5.16, charnames => 'full';
 
 use Moo;
 use MooX::ClassAttribute;
@@ -62,6 +63,8 @@ use Unicode::Normalize();
 use Locale::CLDR::Collator();
 use File::Spec();
 use Scalar::Util qw(blessed);
+use Unicode::Regex::Set();
+#no warnings "experimental::regex_sets";
 
 # Backwards compatibility
 BEGIN {
@@ -583,9 +586,9 @@ has 'likely_language' => (
 sub _build_likely_language {
 	my $self = shift;
 	
-	my $language = $self->language();
+	my $language = $self->language_id();
 	
-	return $language unless $language eq 'und';
+	return $self->language unless $language eq 'und';
 	
 	return $self->likely_subtag->language;
 }
@@ -1165,6 +1168,80 @@ sub _build_break_vars {
 	return \%vars;
 }
 
+sub IsCLDREmpty {
+	return '';
+}
+
+# Test for missing Unicode properties
+my $has_emoji = eval '1 !~ /\p{emoji}/';
+my $has_Grapheme_Cluster_Break_ZWJ = eval '1 !~ /\p{Grapheme_Cluster_Break=ZWJ}/';
+my $has_Grapheme_Cluster_Break_E_Base = eval '1 !~ /\p{Grapheme_Cluster_Break=E_Base}/';
+my $has_Grapheme_Cluster_Break_E_Base_GAZ = eval '1 !~ /\p{Grapheme_Cluster_Break=E_Base_GAZ}/';
+my $has_Grapheme_Cluster_Break_E_Modifier = eval '1 !~ /\p{Grapheme_Cluster_Break=E_Modifier}/';
+my $has_Word_Break_ZWJ = eval '1 !~ /\p{Word_Break=ZWJ}/';
+my $has_Word_Break_E_Base = eval '1 !~ /\p{Word_Break=E_Base}/';
+my $has_Word_Break_E_Base_GAZ = eval '1 !~ /\p{Word_Break=E_Base_GAZ}/';
+my $has_Word_Break_E_Modifier = eval '1 !~ /\p{Word_Break=E_Modifier}/';
+my $has_Word_Break_Hebrew_Letter = eval '1 !~ \p{Word_Break=Hebrew_Letter}/';
+my $has_Word_Break_Single_Quote = eval '1 !~ \p{Word_Break=Single_Quote}/';
+my $has_Line_Break_ZWJ = eval '1 !~ /\p{Line_Break=ZWJ}/';
+my $has_Line_Break_E_Base = eval '1 !~ /\p{Line_Break=E_Base}/';
+my $has_Line_Break_E_Base_GAZ = eval '1 !~ /\p{Line_Break=E_Base_GAZ}/';
+my $has_Line_Break_E_Modifier = eval '1 !~ /\p{Line_Break=E_Modifier}/';
+
+sub _fix_missing_unicode_properties {
+	my $regex = shift;
+	
+	return unless defined $regex;
+	
+	$regex =~ s/\\(p)\{emoji\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_emoji;
+		
+	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=ZWJ\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Grapheme_Cluster_Break_ZWJ;
+		
+	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=E_Base\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Grapheme_Cluster_Break_E_Base;
+	
+	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=E_Base_GAZ\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Grapheme_Cluster_Break_E_Base_GAZ;
+
+	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Grapheme_Cluster_Break_E_Modifier;
+		
+	$regex =~ s/\\(p)\{Word_Break=ZWJ\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_ZWJ;
+
+	$regex =~ s/\\(p)\{Word_Break=E_Base\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_E_Base;
+
+	$regex =~ s/\\(p)\{Word_Break=E_Base_GAZ\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_E_Base_GAZ;
+
+	$regex =~ s/\\(p)\{Word_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_E_Modifier;
+
+	$regex =~ s/\\(p)\{Word_Break=Hebrew_Letter\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_Hebrew_Letter;
+
+	$regex =~ s/\\(p)\{Word_Break=Single_Quote\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Word_Break_Single_Quote;
+		
+	$regex =~ s/\\(p)\{Line_Break=ZWJ\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Line_Break_ZWJ;
+
+	$regex =~ s/\\(p)\{Line_Break=E_Base\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Line_Break_E_Base;
+
+	$regex =~ s/\\(p)\{Line_Break=E_Base_GAZ\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Line_Break_E_Base_GAZ;
+
+	$regex =~ s/\\(p)\{Line_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Line_Break_E_Modifier;
+
+	return $regex;
+}
+
 sub _build_break_rules {
 	my ($self, $vars, $what) = @_;
 
@@ -1181,7 +1258,7 @@ sub _build_break_rules {
 		# Test for deleted rules
 		next unless defined $rules{$rule_number};
 
-		$rules{$rule_number} =~ s{ ( \$ \p{ID_START} \p{ID_CONTINUE}* ) }{$vars->{$1}}msxeg;
+		$rules{$rule_number} =~ s{ ( \$ \p{ID_START} \p{ID_CONTINUE}* ) }{ _fix_missing_unicode_properties($vars->{$1}) }msxeg;
 		my ($first, $opp, $second) = split /(×|÷)/, $rules{$rule_number};
 
 		foreach my $operand ($first, $second) {
@@ -2149,7 +2226,7 @@ sub _split {
 
 	pos($string)=0;
 	# The Unicode Consortium has deprecated LB=Surrogate but the CLDR still
-	# uses it, at last in this version.
+	# uses it, at least in this version.
 	no warnings 'deprecated';
 	while (length($string) -1 != pos $string) {
 		my $rule_number = 0;
@@ -2185,7 +2262,7 @@ sub _split {
 		$sections[$count] .= '.';
 	}
 	
-	my $regex = '(' . join(')(', @sections) . ')';
+	my $regex = _fix_missing_unicode_properties('(' . join(')(', @sections) . ')');
 	$regex = qr{ \A $regex \z}msx;
 	@split = $string =~ $regex;
 
@@ -2767,6 +2844,8 @@ sub is_no {
 }
 
 =back
+
+=cut
 
 =head2 Transliteration
 
@@ -3823,6 +3902,10 @@ sub {
 		return "$set";
 	}
 	
+	return Unicode::Regex::Set::parse($set);
+
+=begin comment
+	
 	# Fix up [abc[de]] to [[abc][de]]
 	$set =~ s/\[ ( (?>\^? \s*) [^\]]+? ) \s* \[/[[$1][/gx;
 	
@@ -3848,6 +3931,11 @@ sub {
 	$set =~ s/ \] \s* \] (.) /])$1/gx;
 	
 	return "(?$set)";
+
+=end comment
+
+=cut
+	
 }
 
 EOT
@@ -4266,7 +4354,7 @@ correctly format the locale's currency
 This method returns the format string for the currencies for the locale
 
 There are two types of formatting I<standard> and I<accounting> you can
-pass C<standard> or C<account> as the paramater to the method to pick one of
+pass C<standard> or C<accounting> as the paramater to the method to pick one of
 these ot it will use the locales default
 
 =cut
@@ -4274,10 +4362,10 @@ these ot it will use the locales default
 sub currency_format {
 	my ($self, $default_currency_format) = @_;
 	
-	die "Invalid Currency format: must be one of 'standard' or 'account'"
+	die "Invalid Currency format: must be one of 'standard' or 'accounting'"
 		if defined $default_currency_format
 			&& $default_currency_format ne 'standard'
-			&& $default_currency_format ne 'account';
+			&& $default_currency_format ne 'accounting';
 	
 	$default_currency_format //= $self->default_currency_format;
 	my @bundles = $self->_find_bundle('number_currency_formats');

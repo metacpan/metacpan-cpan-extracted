@@ -4,7 +4,7 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 pp_setversion($VERSION);
 
 do "./Config.cache";
@@ -126,7 +126,14 @@ void *svdslepc_libmpi_handle=NULL;
 # define SVDDEBUG(x)
 #endif
 
-//-- SLEPc API isn't too stable: detect version stuff
+//-- PETSc option API change in v3.7
+#if PETSC_VERSION_MAJOR>3 || (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=7)
+  #define OPTIONS_NULL NULL,NULL
+#else
+  #define OPTIONS_NULL NULL
+#endif
+
+//-- PETSc/SLEPc APIs aren't too stable: detect version stuff
 #if SLEPC_VERSION_MAJOR>3 || (SLEPC_VERSION_MAJOR==3 && SLEPC_VERSION_MINOR>=4)
 #define SLEPC_V3_4 1
 #endif
@@ -577,7 +584,7 @@ pp_def
   //-- initialize
   SVDDEBUG(fprintf(stderr, "_slepc_svd_int:init (m=%d, n=%d, nnz=%d, d=%d)\n", $SIZE(m), $SIZE(n), $SIZE(nnz), $SIZE(d));fflush(stderr);)
   svdslepc_init_func("PDL::SVDSLEPc::_slepc_svd_int",INT2PTR(AV*, $COMP(optsArray)),NULL, &argc,&argv);
-  ierr = PetscOptionsHasName(NULL,"-help",&flg_help);CHKERRV(ierr);
+  ierr = PetscOptionsHasName(OPTIONS_NULL,"-help",&flg_help);CHKERRV(ierr);
 
   //-- setup (dummy) input matrix
   if ($SIZE(nnz)==0) {
@@ -613,12 +620,12 @@ pp_def
 
   //-- setup #/singular values from input piddles
   SVDDEBUG(fprintf(stderr, "setup #/values\n");fflush(stderr);)
-  ierr = PetscOptionsGetInt(NULL,"-svd_nsv",&nsv,&flg_nsv);CHKERRV(ierr);
+  ierr = PetscOptionsGetInt(OPTIONS_NULL,"-svd_nsv",&nsv,&flg_nsv);CHKERRV(ierr);
   if (!flg_nsv || nsv != $SIZE(d)) {
     SVDDEBUG(fprintf(stderr, "set nsv=SIZE(d)=%d\n", $SIZE(d));fflush(stderr);)
     nsv = $SIZE(d);
-    ierr = PetscOptionsGetInt(NULL,"-svd_ncv",&ncv,&flg_ncv);CHKERRV(ierr);
-    ierr = PetscOptionsGetInt(NULL,"-svd_mpd",&mpd,&flg_mpd);CHKERRV(ierr);
+    ierr = PetscOptionsGetInt(OPTIONS_NULL,"-svd_ncv",&ncv,&flg_ncv);CHKERRV(ierr);
+    ierr = PetscOptionsGetInt(OPTIONS_NULL,"-svd_mpd",&mpd,&flg_mpd);CHKERRV(ierr);
     if (!flg_ncv) ncv = PETSC_DECIDE;
     if (!flg_mpd) mpd = PETSC_DECIDE;
     ierr = SVDSetDimensions(svd,nsv,ncv,mpd);CHKERRV(ierr);

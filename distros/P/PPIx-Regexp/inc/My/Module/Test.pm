@@ -13,7 +13,9 @@ use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
+
+use constant ARRAY_REF	=> ref [];
 
 our @EXPORT_OK = qw{
     cache_count
@@ -101,10 +103,10 @@ sub content {		## no critic (RequireArgUnpacking)
 sub count {		## no critic (RequireArgUnpacking)
     my ( @args ) = @_;
     my $expect = pop @args;
-    if ( ref $parse eq 'ARRAY' ) {
+    if ( ARRAY_REF eq ref $parse ) {
 	$result = @{ $parse };
 	@_ = ( $result, $expect, "Expect $expect tokens" );
-    } elsif ( ref $obj eq 'ARRAY' ) {
+    } elsif ( ARRAY_REF eq ref $obj ) {
 	$result = @{ $obj };
 	@_ = ( $result, $expect, "Expect $expect tokens" );
     } elsif ( $obj->can( 'children' ) ) {
@@ -185,7 +187,8 @@ sub error {		## no critic (RequireArgUnpacking)
 
 sub false {		## no critic (RequireArgUnpacking)
     my ( $method, $args ) = @_;
-    ref $args eq 'ARRAY' or $args = [ $args ];
+    ARRAY_REF eq ref $args
+	or $args = [ $args ];
     my $class = ref $obj;
     if ( $obj->can( $method ) ) {
 	$result = $obj->$method( @{ $args } );
@@ -216,7 +219,7 @@ sub finis {		## no critic (RequireArgUnpacking)
 	my @args = @_;
 	my $scalar = 1;
 	@args > 1
-	    and ref $args[-1] eq 'ARRAY'
+	    and ARRAY_REF eq ref $args[-1]
 	    and @{ $args[-1] } == 0
 	    and $array{$args[-2]}
 	    and $scalar = 0;
@@ -224,14 +227,15 @@ sub finis {		## no critic (RequireArgUnpacking)
 	while ( @args ) {
 	    if ( __instance( $args[0], 'PPIx::Regexp::Element' ) ) {
 		$obj = shift @args;
-	    } elsif ( ref $obj eq 'ARRAY' ) {
+	    } elsif ( ARRAY_REF eq ref $obj ) {
 		my $inx = shift @args;
 		push @nav, $inx;
 		$obj = $obj->[$inx];
 	    } else {
 		my $method = shift @args;
 		my $args = shift @args;
-		ref $args eq 'ARRAY' or $args = [ $args ];
+		ARRAY_REF eq ref $args
+		    or $args = [ $args ];
 		push @nav, $method, $args;
 		$obj->can( $method ) or return;
 		if ( @args || $scalar ) {
@@ -303,7 +307,8 @@ sub tokenize {		## no critic (RequireArgUnpacking)
 
 sub true {		## no critic (RequireArgUnpacking)
     my ( $method, $args ) = @_;
-    ref $args eq 'ARRAY' or $args = [ $args ];
+    ARRAY_REF eq ref $args
+	or $args = [ $args ];
     my $class = ref $obj;
     if ( $obj->can( $method ) ) {
 	$result = $obj->$method( @{ $args } );
@@ -318,7 +323,8 @@ sub true {		## no critic (RequireArgUnpacking)
 
 sub value {		## no critic (RequireArgUnpacking)
     my ( $method, $args, $expect ) = @_;
-    ref $args eq 'ARRAY' or $args = [ $args ];
+    ARRAY_REF eq ref $args
+	or $args = [ $args ];
 
     my $invocant = $obj || $initial_class;
     my $class = ref $obj || $obj || $initial_class;
@@ -327,7 +333,7 @@ sub value {		## no critic (RequireArgUnpacking)
 	goto &ok;
     }
 
-    $result = ref $expect eq 'ARRAY' ?
+    $result = ARRAY_REF eq ref $expect ?
 	[ $invocant->$method( @{ $args } ) ] :
 	$invocant->$method( @{ $args } );
 
@@ -410,7 +416,7 @@ sub __quote {
 	}
 	if ( ! defined $item ) {
 	    push @rslt, 'undef';
-	} elsif ( ref $item eq 'ARRAY' ) {
+	} elsif ( ARRAY_REF eq ref $item ) {
 	    push @rslt, join( ' ', '[', __quote( @{ $item } ), ']' );
 	} elsif ( looks_like_number( $item ) ) {
 	    push @rslt, $item;

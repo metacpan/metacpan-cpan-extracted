@@ -1,6 +1,6 @@
 package Pcore::App::API::Local::pgsql;
 
-use Pcore -class, -result, -sql;
+use Pcore -class, -res, -sql;
 use Pcore::Util::UUID qw[uuid_v4_str];
 
 with qw[Pcore::App::API::Local];
@@ -58,81 +58,46 @@ SQL
     return;
 }
 
-sub _db_add_roles ( $self, $dbh, $roles, $cb ) {
-    $dbh->do(
-        [ q[INSERT INTO "api_role"], VALUES [ map { { name => $_ } } $roles->@* ], 'ON CONFLICT DO NOTHING' ],
-        sub ( $dbh, $res, $data ) {
-            $cb->($res);
-
-            return;
-        }
-    );
-
-    return;
+sub _db_add_roles ( $self, $dbh, $roles ) {
+    return $dbh->do( [ q[INSERT INTO "api_role"], VALUES [ map { { name => $_ } } $roles->@* ], 'ON CONFLICT DO NOTHING' ] );
 }
 
-sub _db_create_user ( $self, $dbh, $user_name, $hash, $enabled, $cb ) {
+sub _db_create_user ( $self, $dbh, $user_name, $hash, $enabled ) {
     my $user_id = uuid_v4_str;
 
-    $dbh->do(
-        'INSERT INTO "api_user" ("id", "name", "hash", "enabled") VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
-        [ SQL_UUID $user_id, SQL_UUID $user_name, SQL_BYTEA $hash, SQL_BOOL $enabled ],
-        sub ( $dbh, $res, $data ) {
-            if ( !$res->{rows} ) {
-                $cb->( result 500 );
-            }
-            else {
-                $cb->( result 200, { id => $user_id } );
-            }
+    my $res = $dbh->do( 'INSERT INTO "api_user" ("id", "name", "hash", "enabled") VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING', [ SQL_UUID $user_id, SQL_UUID $user_name, SQL_BYTEA $hash, SQL_BOOL $enabled ] );
 
-            return;
-        }
-    );
-
-    return;
+    if ( !$res->{rows} ) {
+        return res 500;
+    }
+    else {
+        return res 200, { id => $user_id };
+    }
 }
 
-sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
-    my $modified;
+sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids ) {
+    my $res = $dbh->do( [ 'INSERT INTO "api_user_permission"', VALUES [ map { { role_id => SQL_UUID $_, user_id => SQL_UUID $user_id } } $roles_ids->@* ], 'ON CONFLICT DO NOTHING' ] );
 
-    $dbh->do(
-        [ 'INSERT INTO "api_user_permission"', VALUES [ map { { role_id => SQL_UUID $_, user_id => SQL_UUID $user_id } } $roles_ids->@* ], 'ON CONFLICT DO NOTHING' ],
-        sub ( $dbh, $res, $data ) {
-            if ( !$res ) {
-                $cb->( result 500 );
-            }
+    return res 500 if !$res;
 
-            # remove permissions
-            else {
-                $modified += $res->{rows};
+    my $modified = $res->{rows};
 
-                $dbh->do(
-                    [ 'DELETE FROM "api_user_permission" WHERE "user_id" =', SQL_UUID $user_id, 'AND "role_id" NOT', IN $roles_ids ],
-                    sub ( $dbh, $res, $data ) {
-                        if ( !$res ) {
-                            $cb->( result 500 );
-                        }
-                        else {
-                            $modified += $res->{rows};
+    # remove permissions
+    $res = $dbh->do( [ 'DELETE FROM "api_user_permission" WHERE "user_id" =', SQL_UUID $user_id, 'AND "role_id" NOT', IN $roles_ids ] );
 
-                            if ($modified) {
-                                $cb->( result 200, { user_id => $user_id } );
-                            }
-                            else {
-                                $cb->( result 204 );
-                            }
-                        }
+    if ( !$res ) {
+        return res 500;
+    }
+    else {
+        $modified += $res->{rows};
 
-                        return;
-                    }
-                );
-            }
-
-            return;
+        if ($modified) {
+            return res 200, { user_id => $user_id };
         }
-    );
-
-    return;
+        else {
+            return res 204;
+        }
+    }
 }
 
 1;
@@ -145,10 +110,10 @@ sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
 ## |      | 8                    | * Private subroutine/method '_db_add_schema_patch' declared but not used                                       |
 ## |      | 61                   | * Private subroutine/method '_db_add_roles' declared but not used                                              |
-## |      | 74                   | * Private subroutine/method '_db_create_user' declared but not used                                            |
-## |      | 95                   | * Private subroutine/method '_db_set_user_permissions' declared but not used                                   |
+## |      | 65                   | * Private subroutine/method '_db_create_user' declared but not used                                            |
+## |      | 78                   | * Private subroutine/method '_db_set_user_permissions' declared but not used                                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 74, 95               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 65, 78               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

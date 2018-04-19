@@ -6,7 +6,7 @@ use parent 'Menlo::CLI::Compat';
 use App::cpm::Logger::File;
 use Menlo::Builder::Static;
 
-our $VERSION = '0.963';
+our $VERSION = '0.964';
 
 use constant WIN32 => Menlo::CLI::Compat::WIN32();
 
@@ -64,6 +64,7 @@ sub run_command {
         unless ($self->{verbose}) {
             $cmd .= " >> " . Menlo::Util::shell_quote($self->{log}) . " 2>&1";
         }
+        $self->{logger}->log("Executing $cmd");
         !system $cmd;
     } else {
         $self->run_exec($cmd);
@@ -73,6 +74,7 @@ sub run_command {
 sub run_exec {
     my($self, $cmd) = @_;
 
+    $self->{logger}->log("Executing " . (ref $cmd ? "@$cmd" : $cmd));
     my $status = App::cpm::Worker::Installer::Menlo::Command
         ->new(ref $cmd ? @$cmd : $cmd)
         ->redirect(1)
@@ -86,6 +88,7 @@ sub run_timeout {
 
     return $self->run_command($cmd) if ref($cmd) eq 'CODE' || WIN32 || $self->{verbose} || !$timeout;
 
+    $self->{logger}->log("Executing " . (ref $cmd ? "@$cmd" : $cmd));
     my $status = App::cpm::Worker::Installer::Menlo::Command
         ->new(ref $cmd ? @$cmd : $cmd)
         ->redirect(1)

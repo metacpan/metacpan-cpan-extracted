@@ -359,17 +359,19 @@ around '_collect_qacct_info' => sub {
 	my $self  = shift;
 	my $stage = $self->stage;
 
-	my %info;
-	my $exit_status;
+	my %info = %{ $orig->($self) };
+	# my $exit_status;
 
 	while (my ( $continue, $value ) = $self->Odrmaa_get_next_attr_value($self->_drmaa_rusage)) {
 		last unless $continue;
 		if (my ( $k, $v ) = $value =~ /(\w+)=(.*)/) {
-			$info{$k} = ($fixer{ $k } // $to_int )->($v);
-			$exit_status = $info{$k} if $k eq 'exit_status';
+			$info{$k} = ($fixer{ $k } // $to_int )->($v)
+				unless $v eq 'unknown' && defined $info{$k};
+			# $exit_status = $info{$k} if $k eq 'exit_status';
 		}
 	}
-	$orig->($self) unless defined $exit_status && $exit_status ne 'unknown'; 
+	# return \%info if defined $exit_status && $exit_status ne 'unknown';
+	# return $orig->($self);
 	return \%info;
 };
 

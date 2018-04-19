@@ -216,7 +216,7 @@ sub _proxy_req ( $self, $url, $env, $body, $cb ) {
         body              => $body,
         tls_ctx           => undef,
         sub ($res) {
-            $res->headers->{CONTENT_LENGTH} = length( $res->body ? $res->body->$* : q[] );
+            $res->headers->{CONTENT_LENGTH} = length( $res->{body} ? $res->{body}->$* : q[] );
             $res->headers->{CONNECTION} = 'close';
             delete $res->headers->{TRANSFER_ENCODING};
 
@@ -236,7 +236,7 @@ sub _return_res ( $self, $h, $res ) {
 
     $buf .= $res->headers->to_string . $CRLF;
 
-    $buf .= $res->body->$* if $res->body;
+    $buf .= $res->{body}->$* if $res->{body};
 
     $h->push_write($buf);
 

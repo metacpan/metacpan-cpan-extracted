@@ -183,6 +183,21 @@ sub print {
 	return $_[0]->toString();
 }
 
+sub isEqual {
+    return 0 if !$_[1]->isa( 'DBIx::MyParsePP::Rule' );
+    return 0 if $_[0]->name() ne $_[1]->name();
+
+    my @left_children = $_[0]->children();
+    my @right_children = $_[1]->children();
+    return 0 if @left_children != @right_children;
+
+    for( my $i = 0; $i < @left_children; $i++ ) {
+        return 0 if !$left_children[$i]->isEqual( $right_children[$i] );
+    }
+
+    return 1;
+}
+
 1;
 
 __END__

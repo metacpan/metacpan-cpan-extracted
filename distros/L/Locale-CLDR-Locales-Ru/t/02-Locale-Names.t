@@ -21,12 +21,12 @@ is ($locale->language_name('wibble'), 'неизвестный язык', 'Unknow
 is ($locale->script_name('Cher'), 'чероки', 'Script name');
 is ($locale->script_name('wibl'), 'неизвестная письменность', 'Invalid Script name');
 is ($locale->region_name('GB'), 'Великобритания', 'Region name');
-is ($locale->region_name('wibble'), 'Неизвестный регион', 'Invalid Region name');
+is ($locale->region_name('wibble'), 'неизвестный регион', 'Invalid Region name');
 is ($locale->variant_name('AREVMDA'), 'Западно-армянский', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'клингонский', 'Language alias');
 is ($locale->region_name('BQ'), 'Бонэйр, Синт-Эстатиус и Саба', 'Region alias');
-is ($locale->region_name('830'), 'Неизвестный регион', 'Region alias');
+is ($locale->region_name('830'), 'неизвестный регион', 'Region alias');
 is ($locale->variant_name('BOKMAL'), '', 'Variant alias');
 is ($locale->key_name('ca'), 'календарь', 'Key name');
 is ($locale->key_name('calendar'), 'календарь', 'Key name');

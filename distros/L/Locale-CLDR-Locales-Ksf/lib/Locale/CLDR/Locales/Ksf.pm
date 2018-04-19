@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Ksf - Package for language Bafia
 
 package Locale::CLDR::Locales::Ksf;
 # This file auto generated from Data\common\main\ksf.xml
-#	on Fri 29 Apr  7:13:45 pm GMT
+#	on Fri 13 Apr  7:17:36 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x])},
+			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ǝ', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a á b c d e é ǝ {ǝ́} ɛ {ɛ́} f g h i í j k l m n ŋ o ó ɔ {ɔ́} p r s t u ú v w y z])},
+			main => qr{[a á b c d e é ǝ {ǝ́} ɛ {ɛ́} f g h i í j k l m n ŋ o ó ɔ {ɔ́} p r s t u ú v w y z]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -401,7 +403,7 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
@@ -834,8 +836,8 @@ has 'day_periods' => (
 					'pm' => q{cɛɛ́nko},
 				},
 				'wide' => {
-					'pm' => q{cɛɛ́nko},
 					'am' => q{sárúwá},
+					'pm' => q{cɛɛ́nko},
 				},
 			},
 		},
@@ -915,7 +917,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -939,7 +941,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

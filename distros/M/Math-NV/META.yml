@@ -17,7 +17,9 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Math::MPFR: '4.03'
 resources:
   repository: https://github.com/sisyphus/math-nv.git
-version: '1.02'
+version: '2.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

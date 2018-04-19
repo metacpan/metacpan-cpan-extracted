@@ -1,7 +1,7 @@
 package App::GoogleAuthUtils;
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-04-18'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,6 +40,10 @@ _
             schema => 'str*',
             pos => 2,
         },
+        output => {
+            schema => 'filename*',
+            cmdline_aliases => {o=>{}},
+        },
     },
     examples => [
         {
@@ -47,27 +51,56 @@ _
                 secret_key => '6XDT6TSOGR5SCWKHXZ4DFBRXJVZGAKAW',
                 issuer => 'example.com',
             },
+            test => 0,
+            'x.doc.show_result' => 0,
         },
     ],
 };
 sub gen_google_auth_qrcode {
+    require File::Which;
+    require String::ShellQuote;
     require URI::Encode;
 
     my %args = @_;
 
-    my $url = join(
-        '',
-        'https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr',
-        '&chl=otpauth://totp/', (
-            URI::Encode::uri_encode(
-                $args{issuer} . ($args{account} ? ":$args{account}" : "")),
-            '%3Fsecret%3D', $args{secret_key}, '%26issuer%3D', $args{issuer},
-        ),
-    );
+    if (File::Which::which("qrencode")) {
+        my $output = $args{output} // '-';
 
-    require Browser::Open;
-    my $err = Browser::Open::open_browser($url);
-    return [500, "Can't open browser for '$url'"] if $err;
+        my $cmd = join(
+            "",
+            "qrencode -o ", String::ShellQuote::shell_quote($output),
+            " -d 300 -s 10 ",
+            String::ShellQuote::shell_quote(
+                join(
+                    "",
+                    "otpauth://totp/",
+                    URI::Encode::uri_encode($args{issuer} . ($args{account} ? ":$args{account}" : "")),
+                    "?secret=", $args{secret_key},
+                    "&issuer=", $args{issuer},
+                )
+            ),
+        );
+        if ($output eq '-') {
+            system "$cmd | display";
+        } else {
+            system $cmd;
+        }
+    } else {
+        my $url = join(
+            '',
+            'https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr',
+            '&chl=otpauth://totp/', (
+                URI::Encode::uri_encode(
+                    $args{issuer} . ($args{account} ? ":$args{account}" : "")),
+                '%3Fsecret%3D', $args{secret_key},
+                '%26issuer%3D', $args{issuer},
+            ),
+        );
+
+        require Browser::Open;
+        my $err = Browser::Open::open_browser($url);
+        return [500, "Can't open browser for '$url'"] if $err;
+    }
     [200];
 }
 
@@ -86,7 +119,7 @@ App::GoogleAuthUtils - Utilities related to Google Authenticator
 
 =head1 VERSION
 
-This document describes version 0.001 of App::GoogleAuthUtils (from Perl distribution App-GoogleAuthUtils), released on 2018-02-08.
+This document describes version 0.004 of App::GoogleAuthUtils (from Perl distribution App-GoogleAuthUtils), released on 2018-04-18.
 
 =head1 DESCRIPTION
 
@@ -120,10 +153,6 @@ Examples:
    issuer => "example.com"
  );
 
-Result:
-
- undef
-
 =back
 
 When generating a new 2FA token, you are usually presented with a secret key as
@@ -145,6 +174,8 @@ Arguments ('*' denotes required arguments):
 =item * B<account> => I<str>
 
 =item * B<issuer>* => I<str>
+
+=item * B<output> => I<filename>
 
 =item * B<secret_key>* => I<str>
 
@@ -178,6 +209,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::QRCodeUtils>
 
 =head1 AUTHOR
 

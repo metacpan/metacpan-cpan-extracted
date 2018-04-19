@@ -3,7 +3,7 @@ package Database::Migrator;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 1;
 
@@ -21,7 +21,7 @@ Database::Migrator - A system for implementing database migrations
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -49,13 +49,20 @@ the migration. Migrations are applied in sorted order. If the migrations start
 with numbers, they are sorted by these numbers, otherwise they are sorted
 alphabetically.
 
-The migration directory can either contain files with SQL or Perl. If a file
-ends in ".sql", the migration runner code will feed it to the appropriate
-command line utility for your database.
+The migration directory can contain files with SQL, Perl, or executable
+programs.
 
-Otherwise the file is assumed to contain Perl code. This code is expected to
-return a single anonymous subroutine when C<eval>ed. This subroutine will then
-be called with the C<Database::Migrator> object as its only argument.
+If a file ends in ".sql", the migration runner code will feed it to the
+appropriate command line utility for your database.
+
+Otherwise, if the file is executable, then it is assumed to be a program that
+will apply a migration when run. The migration runner runs it. It is not
+provided a database handle.
+
+If neither of the above conditions are met, the file is assumed to contain Perl
+code. This code is expected to return a single anonymous subroutine when
+C<eval>ed. This subroutine will then be called with the C<Database::Migrator>
+object as its only argument.
 
 Each file in a single migration's directory is run in sorted order. You can
 use numeric prefixes on these files if necessary.
@@ -207,7 +214,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Ragwitz Gregory Oschwald Kevin Phair Olaf Alders
+=for stopwords Florian Ragwitz Gregory Oschwald Kevin Phair Olaf Alders William Storey
 
 =over 4
 
@@ -226,6 +233,10 @@ Kevin Phair <phair.kevin@gmail.com>
 =item *
 
 Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+William Storey <wstorey@maxmind.com>
 
 =back
 

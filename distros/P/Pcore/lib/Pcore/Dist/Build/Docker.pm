@@ -56,7 +56,7 @@ sub init ( $self, $args ) {
         active  => 1
     );
 
-    say $res->reason;
+    say $res->{reason};
 
     if ( !$res->is_success ) {
         exit 3;
@@ -127,8 +127,9 @@ sub set_from_tag ( $self, $tag ) {
 sub status ( $self ) {
     my ( $tags, $build_history, $build_settings );
 
-    my $cv = AE::cv;
+    my $rouse_cb = Coro::rouse_cb;
 
+    my $cv = AE::cv { $rouse_cb->() };
     $cv->begin;
 
     $cv->begin;
@@ -169,7 +170,7 @@ sub status ( $self ) {
 
     $cv->end;
 
-    $cv->recv;
+    Coro::rouse_wait $rouse_cb;
 
     my $tbl = P->text->table(
         cols => [
@@ -307,8 +308,9 @@ sub build_status ( $self ) {
 
     my $repos;
 
-    my $cv = AE::cv;
+    my $rouse_cb = Coro::rouse_cb;
 
+    my $cv = AE::cv { $rouse_cb->() };
     $cv->begin;
 
     for my $namespace ( $namespaces->@* ) {
@@ -330,14 +332,15 @@ sub build_status ( $self ) {
 
     $cv->end;
 
-    $cv->recv;
+    Coro::rouse_wait $rouse_cb;
 
     return if !$repos;
 
     my ( $build_history, $autobuild_tags );
 
-    $cv = AE::cv;
+    $rouse_cb = Coro::rouse_cb;
 
+    $cv = AE::cv { $rouse_cb->() };
     $cv->begin;
 
     for my $repo_id ( $repos->@* ) {
@@ -383,7 +386,7 @@ sub build_status ( $self ) {
 
     $cv->end;
 
-    $cv->recv;
+    Coro::rouse_wait $rouse_cb;
 
     for my $repo_tag ( keys $build_history->%* ) {
         delete $build_history->{$repo_tag} if !exists $autobuild_tags->{$repo_tag};
@@ -489,7 +492,7 @@ sub create_tag ( $self, $tag_name, $source_name, $source_type, $dockerfile_locat
     my $autobuild_tags = $self->dockerhub_api->get_autobuild_tags( $self->dist->docker->{repo_id} );
 
     if ( !$autobuild_tags ) {
-        say $autobuild_tags->reason;
+        say $autobuild_tags->{reason};
     }
     else {
         for my $autobuild_tag ( values $autobuild_tags->{data}->%* ) {
@@ -526,11 +529,9 @@ sub remove_tag ( $self, $keep, $tags ) {
     };
 
     if ( !defined $tags ) {
-        my $cv = AE::cv;
-
         print q[Get docker tags ... ];
 
-        $self->dockerhub_api->get_tags(
+        $tags = $self->dockerhub_api->get_tags(
             $self->dist->docker->{repo_id},
             sub ($res) {
                 say $res;
@@ -542,24 +543,18 @@ sub remove_tag ( $self, $keep, $tags ) {
                         push @vers, $tag->{name} if $tag->{name} =~ /v\d+[.]\d+[.]\d+/sm;
                     }
 
-                    $tags = [ map {"$_"} reverse sort map { version->new($_) } @vers ];
+                    my $tags = [ map {"$_"} reverse sort map { version->new($_) } @vers ];
 
                     # keep last releases
                     splice $tags->@*, 0, $keep, ();
 
-                    $cv->();
+                    return $tags;
                 }
                 else {
-                    $tags = [];
-
-                    $cv->();
+                    return [];
                 }
-
-                return;
             }
         );
-
-        $cv->recv;
     }
 
     return $remove->($tags);
@@ -584,11 +579,11 @@ sub trigger_build ( $self, $tag ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 127                  | * Subroutine "status" with high complexity score (26)                                                          |
-## |      | 301                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 302                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 486                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 489                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 270, 349, 479        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 271, 352, 482        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

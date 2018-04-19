@@ -5,7 +5,7 @@ use utf8;
 use Data::Util qw(:check);
 use Moo::Role;
 
-our $VERSION = "0.0132";
+our $VERSION = "0.0133";
 
 has session_key => (
     is       => "ro",
@@ -18,6 +18,13 @@ has authorization_path => (
     is       => "ro",
     isa      => sub { is_string($_[0]) or die("authorization_path should be string"); },
     lazy     => 1,
+    default  => sub { "/"; },
+    required => 1
+);
+has error_path => (
+    is => "ro",
+    isa => sub { is_string($_[0]) or die("error_path should be string"); },
+    lazy => 1,
     default  => sub { "/"; },
     required => 1
 );
@@ -34,6 +41,21 @@ has uri_base => (
 );
 
 requires "to_app";
+
+sub redirect_to_authorization {
+
+    my $self = $_[0];
+
+    [ 302, [ Location => $self->uri_for( $self->authorization_path ) ], [] ];
+
+}
+
+sub redirect_to_error {
+
+    my $self = $_[0];
+
+    [ 302, [ Location => $self->uri_for( $self->error_path ) ], [] ];
+}
 
 sub uri_for {
     my ($self, $path) = @_;
@@ -59,6 +81,18 @@ sub set_auth_sso {
     my ($self, $session, $value) = @_;
     _check_plack_session($session);
     $session->set($self->session_key, $value);
+}
+
+sub get_auth_sso_error {
+    my ($self, $session) = @_;
+    _check_plack_session($session);
+    $session->get($self->session_key . "_error" );
+}
+
+sub set_auth_sso_error {
+    my ($self, $session, $value) = @_;
+    _check_plack_session($session);
+    $session->set($self->session_key . "_error", $value);
 }
 
 1;
@@ -121,6 +155,25 @@ Plack::Auth::SSO - role for Single Sign On (SSO) authentication
             #not authenticated: do your internal work
             #..
 
+            #authentication done in external application code, but here something went wrong..
+            unless ( $ok ) {
+
+                #error is set in auth_sso_error..
+                $self->set_auth_sso_error(
+                    $session,
+                    {
+                        package => __PACKAGE__,
+                        package_id => $self->id,
+                        type => "connection_failed",
+                        content => ""
+                    }
+                );
+
+                #user is redirected to error_path
+                return [ 302, [ Location => $self->uri_for($self->error_path) ], [] ];
+
+            }
+
             #everything ok: set auth_sso
             $self->set_auth_sso(
                 $session,
@@ -159,7 +212,8 @@ Plack::Auth::SSO - role for Single Sign On (SSO) authentication
 
             session_key => "auth_sso",
             authorization_path => "/auth/myssoauth/callback",
-            uri_base => "http://localhost:5001"
+            uri_base => "http://localhost:5001",
+            error_path => "/auth/error"
 
         )->to_app;
 
@@ -179,6 +233,24 @@ Plack::Auth::SSO - role for Single Sign On (SSO) authentication
             #process auth_sso (white list, roles ..)
 
             [ 200, ["Content-Type" => "text/html"], ["logged in!"] ];
+
+        };
+
+        mount "/auth/error" => sub {
+
+            my $env = shift;
+            my $session = Plack::Session->new($env);
+            my $auth_sso_error = $session->get("auth_sso_error");
+
+            unless ( $auth_sso_error ) {
+
+                return [ 302, [ Location => $self->uri_for( "/" ) ], [] ];
+
+            }
+
+            [ 200, [ "Content-Type" => "text/plain" ], [
+                $auth_sso_error->{content}
+            ]];
 
         };
 
@@ -256,6 +328,24 @@ create the full url.
 
 When authentication succeeds, this application should redirect you here
 
+=item error_path
+
+(internal) path of the error route. This path will be prepended by "uri_base" to
+create the full url.
+
+When authentication fails, this application should redirect you here
+
+The implementor should expect this in the session key "auth_sso_error" ( "_error" is appended to the configured session_key ):
+
+    {
+        package => "Plack::Auth::SSO::TYPE",
+        package_id => "Plack::Auth::SSO::TYPE",
+        type => "my-error-type",
+        content => "Something went terribly wrong!"
+    }
+
+Error types should be documented by the implementor.
+
 =item uri_for( path )
 
 method that prepends your path with "uri_base".
@@ -302,6 +392,23 @@ $hash should be a hash ref, and look like this:
         uid => "<uid>",
         info => {},
         extra => {}
+    }
+
+=head2 get_auth_sso_error($plack_session)
+
+get saved SSO error response from your session
+
+=head2 set_auth_sso_error($plack_session,$hash)
+
+save SSO error response to your session
+
+$hash should be a hash ref, and look like this:
+
+    {
+        package => __PACKAGE__,
+        package_id => __PACKAGE__ ,
+        type => "my-type",
+        content => "my-content"
     }
 
 =head1 EXAMPLES

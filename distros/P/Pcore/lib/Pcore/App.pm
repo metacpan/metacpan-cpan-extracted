@@ -5,6 +5,7 @@ use Pcore::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
 use Pcore::App::API;
+use Pcore::RPC::Hub;
 
 has app_cfg => ( is => 'ro', isa => HashRef, required => 1 );
 has devel   => ( is => 'ro', isa => Bool,    default  => 0 );
@@ -12,6 +13,7 @@ has devel   => ( is => 'ro', isa => Bool,    default  => 0 );
 has server => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], init_arg => undef );
 has router => ( is => 'ro', isa => InstanceOf ['Pcore::App::Router'],  init_arg => undef );
 has api => ( is => 'ro', isa => Maybe [ ConsumerOf ['Pcore::App::API'] ], init_arg => undef );
+has rpc => ( is => 'lazy', isa => InstanceOf ['Pcore::RPC::Hub'], init_arg => undef );
 
 sub BUILD ( $self, $args ) {
 
@@ -30,68 +32,55 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-around run => sub ( $orig, $self, $cb = undef ) {
-    my $cv = AE::cv sub {
+sub _build_rpc ($self) {
+    return $self->{rpc} = Pcore::RPC::Hub->new;
+}
 
-        # scan HTTP controllers
-        print 'Scanning HTTP controllers ... ';
-        $self->{router}->init;
-        say 'done';
-
-        $self->$orig( sub {
-
-            # start HTTP server
-            if ( defined $self->{app_cfg}->{server}->{listen} ) {
-                $self->{server} = Pcore::HTTP::Server->new( {
-                    $self->{app_cfg}->{server}->%*,    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
-                    app => $self->{router}
-                } );
-
-                $self->{server}->run;
-
-                say qq[Listen: $self->{app_cfg}->{server}->{listen}];
-            }
-
-            say qq[App "@{[ref $self]}" started];
-
-            $cb->($self) if $cb;
-
-            return;
-        } );
-
-        return;
-    };
-
+around run => sub ( $orig, $self ) {
     if ( $self->{api} ) {
 
         # connect api
-        $self->{api}->init( sub ($res) {
-            say 'API initialization ... ' . $res;
+        my $res = $self->{api}->init;
 
-            exit 3 if !$res;
+        say 'API initialization ... ' . $res;
 
-            $cv->send;
-
-            return;
-        } );
+        exit 3 if !$res;
     }
     else {
 
         # die if API controller found, but no API server provided
         die q[API is required] if $self->{router}->{host_api_path} && !$self->{api};
-
-        $cv->send;
     }
 
-    return $self;
+    # scan HTTP controllers
+    print 'Scanning HTTP controllers ... ';
+    $self->{router}->init;
+    say 'done';
+
+    my $res = $self->$orig;
+    exit 3 if !$res;
+
+    # start HTTP server
+    if ( defined $self->{app_cfg}->{server}->{listen} ) {
+        $self->{server} = Pcore::HTTP::Server->new( {
+            $self->{app_cfg}->{server}->%*,    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+            app => $self->{router}
+        } );
+
+        $self->{server}->run;
+
+        say qq[Listen: $self->{app_cfg}->{server}->{listen}];
+    }
+
+    say qq[App "@{[ref $self]}" started];
+
+    return;
 };
 
 sub api_call ( $self, @args ) {
     my $auth = bless { app => $self }, 'Pcore::App::API::Auth';
 
-    $auth->api_call(@args);
-
-    return;
+    return $auth->api_call(@args);
 }
 
 sub nginx_cfg ($self) {

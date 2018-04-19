@@ -126,7 +126,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '3.17';
+$VERSION = '3.21';
 
 use constant {
     DIRECTORY    => 0,
@@ -134,7 +134,7 @@ use constant {
     RECYC_SILO   => 2,
     SILOS        => 3,
     VERSION      => 4,
-    TRANS_RECORD => 5,
+    OPTIONS      => 5,
 
     RECORD_SIZE      => 1,
     FILE_SIZE        => 2,
@@ -152,15 +152,24 @@ use constant {
 
 =head1 METHODS
 
-=head2 open_store( directory )
+=head2 open_store( directory, options )
 
 Takes a single argument - a directory, and constructs the data store in it.
 The directory must be writeable or creatible. If a RecordStore already exists
 there, it opens it, otherwise it creates a new one.
 
+=over 2
+
+=head3 Options
+
+=item group - when files are created, they use this user group if able.
+
+=back
+
 =cut
 
 sub open_store {
+    my $opts = ref( $_[$#_] ) ? pop : {};
     my $directory = pop @_;
     my $pkg = shift @_ || 'Data::RecordStore';
 
@@ -170,11 +179,9 @@ sub open_store {
     #   root/RECYC_SILO        <-- recycle silo directory
     #   root/silos/            <-- directory for silo directories
 
-    
-    make_path( "$directory/silos", { error => \my $err } );
+    make_path( "$directory/silos", { error => \my $err, map { $_ => $opts->{$_} } grep { $opts->{$_} } qw( group mode ) } );
     if( @$err ) {
-        my( $err ) = values %{ $err->[0] };
-        die $err;
+        die join ',',map { values %$_ } @$err;
     }
     my $record_index_directory = "$directory/RECORD_INDEX_SILO";
 
@@ -186,6 +193,7 @@ sub open_store {
     my $FH;
     if( -e $version_file ) {
         CORE::open $FH, "<", $version_file;
+        $opts->{group} && chown -1, $opts->{group}, $FH;
         $version = <$FH>;
         chomp $version;
 
@@ -204,17 +212,18 @@ sub open_store {
         }
         $version = $VERSION;
         CORE::open $FH, ">", $version_file;
+        $opts->{group} && chown -1, $opts->{group}, $FH;
         print $FH "$version\n";
     }
     close $FH;
 
     my $self = [
         $directory,
-        Data::RecordStore::Silo->open_silo( "IL", $record_index_directory ),
-        Data::RecordStore::Silo->open_silo( "L", "$directory/RECYC_SILO" ),
+        Data::RecordStore::Silo->open_silo( "IL", $record_index_directory, $opts ),
+        Data::RecordStore::Silo->open_silo( "L", "$directory/RECYC_SILO", $opts ),
         [],
         $version,
-#        $transaction_record,
+        $opts,
     ];
 
     bless $self, ref( $pkg ) || $pkg;
@@ -240,7 +249,7 @@ Returns a list of currently existing transaction objects that are not marked TRA
 
 sub list_transactions {
     my $self = shift;
-    my $trans_directory = Data::RecordStore::Silo->open_silo( "ILLI", "$self->[DIRECTORY]/TRANS/META" );
+    my $trans_directory = Data::RecordStore::Silo->open_silo( "ILLI", "$self->[DIRECTORY]/TRANS/META", $self->[OPTIONS] );
     my @trans;
     my $items = $trans_directory->entry_count;
     for( my $trans_id=$items; $trans_id > 0; $trans_id-- ) {
@@ -542,7 +551,7 @@ sub _get_silo {
     my $silo_row_size = int( exp $silo_index );
 
     # storing first the size of the record, uuencode flag, then the bytes of the record
-    my $silo = Data::RecordStore::Silo->open_silo( "LIZ*", "$self->[DIRECTORY]/silos/${silo_index}_RECSTORE", $silo_row_size, $silo_index );
+    my $silo = Data::RecordStore::Silo->open_silo( "LIZ*", "$self->[DIRECTORY]/silos/${silo_index}_RECSTORE", $silo_row_size, $self->[OPTIONS] );
 
     $self->[SILOS][ $silo_index ] = $silo;
     $silo;
@@ -609,12 +618,12 @@ use constant {
     FILE_SIZE        => 2,
     FILE_MAX_RECORDS => 3,
     TMPL             => 4,
-    LOCK             => 5,
+    OPTIONS          => 5,
 };
 
 $Data::RecordStore::Silo::MAX_SIZE = 2_000_000_000;
 
-=head2 open_silo( template, filename, record_size )
+=head2 open_silo( template, filename, record_size, options )
 
 Opens or creates the directory for a group of files
 that represent one silo storing records of the given
@@ -623,12 +632,25 @@ If a size is not given, it calculates the size from
 the template, if it can. This will die if a zero byte
 record size is given or calculated.
 
+=over 2
+
+=head3 Options
+
+=item group - when files are created, they use this user group if able.
+
+=back
+
 =cut
 
 sub open_silo {
-    my( $pkg, $template, $directory, $size ) = @_;
+    my( $pkg, $template, $directory, $size, $opts ) = @_;
     my $class = ref( $pkg ) || $pkg;
     my $template_size = $template =~ /\*/ ? 0 : do { use bytes; length( pack( $template ) ) };
+    if( ref( $size ) ) {
+        $opts = $size;
+        undef $size;
+    }
+    $opts //= {};
     my $record_size = $size // $template_size;
 
     die "Data::RecordStore::Silo->open_sile error : given record size does not agree with template size" if $size && $template_size && $template_size != $size;
@@ -639,16 +661,15 @@ sub open_silo {
         $file_max_records = 1;
     }
     my $file_max_size = $file_max_records * $record_size;
-    my $lock_fh;
     unless( -d $directory ) {
         die "Data::RecordStore::Silo->open_silo Error opening record store. $directory exists and is not a directory" if -e $directory;
-        make_path( $directory ) or die "Data::RecordStore::Silo->open_silo : Unable to create directory $directory";
+        make_path( $directory, { map { $_ => $opts->{$_} } grep { $opts->{$_} } qw( group mode ) } ) or die "Data::RecordStore::Silo->open_silo : Unable to create directory $directory";
     }
     unless( -e "$directory/0" ){
         CORE::open( my $fh, ">", "$directory/0" ) or die "Data::RecordStore::Silo->open_silo : Unable to open '$directory/0' : $!";
+        $opts->{group} && chown -1, $opts->{group}, $fh;
         close $fh;
     }
-    CORE::open( $lock_fh, ">", "$directory/l" ) or die "Data::RecordStore::Silo->open_silo : Unable to open '$directory/l' : $!";
 
     unless( -w "$directory/0" ){
         die "Data::RecordStore::Silo->open_silo Error operning record store. $directory exists but is not writeable" if -e $directory;
@@ -660,7 +681,7 @@ sub open_silo {
         $file_max_size,
         $file_max_records,
         $template,
-        $lock_fh,
+        $opts,
     ], $class;
 
     $silo;
@@ -673,13 +694,11 @@ This empties out the database, setting it to zero records.
 =cut
 sub empty {
     my $self = shift;
-    $self->_lock_write;
     my( $first, @files ) = map { "$self->[DIRECTORY]/$_" } $self->_files;
     truncate $first, 0;
     for my $file (@files) {
         unlink $file;
     }
-    $self->_unlock;
     undef;
 } #empty
 
@@ -693,13 +712,11 @@ by the record size.
 sub entry_count {
     # return how many entries this index has
     my $self = shift;
-    $self->_lock_read;
     my @files = $self->_files;
     my $filesize;
     for my $file (@files) {
         $filesize += -s "$self->[DIRECTORY]/$file";
     }
-    $self->_unlock;
     int( $filesize / $self->[RECORD_SIZE] );
 } #entry_count
 
@@ -712,7 +729,6 @@ The array in question is the unpacked template.
 sub get_record {
     my( $self, $id ) = @_;
 
-    $self->_lock_read;
     die "Data::RecordStore::Silo->get_record : index $id out of bounds. Store has entry count of ".$self->entry_count if $id > $self->entry_count || $id < 1;
 
     my( $f_idx, $fh, $file, $file_id ) = $self->_fh( $id );
@@ -721,7 +737,6 @@ sub get_record {
         or die "Data::RecordStore::Silo->get_record : error reading id $id at file $file_id at index $f_idx. Could not seek to ($self->[RECORD_SIZE] * $f_idx) : $@ $!";
     my $srv = sysread $fh, my $data, $self->[RECORD_SIZE];
     close $fh;
-    $self->_unlock;
 
     defined( $srv )
         or die "Data::RecordStore::Silo->get_record : error reading id $id at file $file_id at index $f_idx. Could not read : $@ $!";
@@ -735,10 +750,8 @@ adds an empty record and returns its id, starting with 1
 =cut
 sub next_id {
     my( $self ) = @_;
-    $self->_lock_write;
     my $next_id = 1 + $self->entry_count;
     $self->_ensure_entry_count( $next_id );
-    $self->_unlock;
     $next_id;
 } #next_id
 
@@ -753,7 +766,6 @@ sub pop {
 
     my $entries = $self->entry_count;
     return undef unless $entries;
-    $self->_lock_write;
     my $ret = $self->get_record( $entries );
     my( $f_idx, $fh, $file ) = $self->_fh( $entries );
     my $new_fs = $f_idx * $self->[RECORD_SIZE];
@@ -762,7 +774,6 @@ sub pop {
     } else {
         unlink $file;
     }
-    $self->_unlock;
     close $fh;
 
     $ret;
@@ -821,9 +832,7 @@ sub put_record {
 
     my( $f_idx, $fh, $file, $file_id ) = $self->_fh( $id );
 
-    $self->_lock_write;
     sysseek( $fh, $self->[RECORD_SIZE] * ($f_idx), SEEK_SET ) && ( my $swv = syswrite( $fh, $to_write ) ) || die "Data::RecordStore::Silo->put_record : unable to put record id $id at file $file_id index $f_idx : $@ $!";
-    $self->_unlock;
     close $fh;
 
     1;
@@ -887,11 +896,11 @@ sub _ensure_entry_count {
         my $existing_file_records = int( (-s "$self->[DIRECTORY]/$write_file" ) / $self->[RECORD_SIZE] );
         my $records_needed_to_fill = $self->[FILE_MAX_RECORDS] - $existing_file_records;
         $records_needed_to_fill = $needed if $records_needed_to_fill > $needed;
-        $self->_lock_write;
         if( $records_needed_to_fill > 0 ) {
             # fill the last flie up with \0
 
             CORE::open( my $fh, "+<", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to open '$self->[DIRECTORY]/$write_file' : $!";
+            $self->[OPTIONS]{group} && chown -1, $self->[OPTIONS]{group}, $fh;
             binmode $fh; # for windows
             my $nulls = "\0" x ( $records_needed_to_fill * $self->[RECORD_SIZE] );
             (my $pos = sysseek( $fh, $self->[RECORD_SIZE] * $existing_file_records, SEEK_SET )) && (my $wrote = syswrite( $fh, $nulls )) || die "Data::RecordStore::Silo->ensure_entry_count : unable to write blank to '$self->[DIRECTORY]/$write_file' : $!";
@@ -904,6 +913,7 @@ sub _ensure_entry_count {
 
             die "Data::RecordStore::Silo->ensure_entry_count : file $self->[DIRECTORY]/$write_file already exists" if -e $write_file;
             CORE::open( my $fh, ">", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to create '$self->[DIRECTORY]/$write_file' : $!";
+            $self->[OPTIONS]{group} && chown -1, $self->[OPTIONS]{group}, $fh;
             binmode $fh; # for windows
             my $nulls = "\0" x ( $self->[FILE_MAX_RECORDS] * $self->[RECORD_SIZE] );
             (my $pos = sysseek( $fh, 0, SEEK_SET )) && (my $wrote = syswrite( $fh, $nulls )) || die "Data::RecordStore::Silo->ensure_entry_count : unable to write blank to '$self->[DIRECTORY]/$write_file' : $!";
@@ -916,12 +926,12 @@ sub _ensure_entry_count {
 
             die "Data::RecordStore::Silo->ensure_entry_count : file $self->[DIRECTORY]/$write_file already exists" if -e $write_file;
             CORE::open( my $fh, ">", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to create '$self->[DIRECTORY]/$write_file' : $!";
+            $self->[OPTIONS]{group} && chown -1, $self->[OPTIONS]{group}, $fh;
             binmode $fh; # for windows
             my $nulls = "\0" x ( $needed * $self->[RECORD_SIZE] );
             (my $pos = sysseek( $fh, 0, SEEK_SET )) && (my $wrote = syswrite( $fh, $nulls )) || die "Data::RecordStore::Silo->ensure_entry_count : unable to write blank to '$self->[DIRECTORY]/$write_file' : $!";
             close $fh;
         }
-        $self->_unlock;
     }
 } #_ensure_entry_count
 
@@ -951,6 +961,7 @@ sub _fh {
 
     my $file = $files[$f_idx];
     CORE::open( my $fh, "+<", "$self->[DIRECTORY]/$file" ) or die "Data::RecordStore::Silo->_fhu nable to open '$self->[DIRECTORY]/$file' : $! $?";
+    $self->[OPTIONS]{group} && chown -1, $self->[OPTIONS]{group}, $fh;
     binmode $fh; # for windows
 
     (($id - ($f_idx*$self->[FILE_MAX_RECORDS])) - 1,$fh,"$self->[DIRECTORY]/$file",$f_idx);
@@ -967,19 +978,6 @@ sub _files {
     closedir $dh;
     @files;
 } #_files
-
-sub _lock_read {
-    my $fh = shift->[LOCK];
-    flock( $fh, 1 );
-}
-sub _lock_write {
-    my $fh = shift->[LOCK];
-    flock( $fh, 2 );
-}
-sub _unlock {
-    my $fh = shift->[LOCK];
-    flock( $fh, 8 );
-}
 
 # ----------- end Data::RecordStore::Silo
 
@@ -1052,6 +1050,7 @@ use constant {
     STORE       => 4,
     SILO        => 5,
     CATALOG     => 6,
+    OPTIONS     => 7,
 
     TRA_ACTIVE           => 1, # transaction has been created
     TRA_IN_COMMIT        => 2, # commit has been called, not yet completed
@@ -1068,13 +1067,13 @@ our @STATE_LOOKUP = ('Active','In Commit','In Rollback','In Commit Cleanup','In 
 # Creates a new transaction or returns an existing one based on the data provided
 #
 sub _create {
-    my( $pkg, $record_store, $trans_data ) = @_;
+    my( $pkg, $record_store, $trans_data, $options ) = @_;
 
     # transaction id
     # process id
     # update time
     # state
-    my $trans_catalog = Data::RecordStore::Silo->open_silo( "ILLI", "$record_store->[Data::RecordStore::DIRECTORY]/TRANS/META" );
+    my $trans_catalog = Data::RecordStore::Silo->open_silo( "ILLI", "$record_store->[Data::RecordStore::DIRECTORY]/TRANS/META", $options );
     my $trans_id;
 
     if( $trans_data ) {
@@ -1096,10 +1095,13 @@ sub _create {
     # to record id
     push @$trans_data, Data::RecordStore::Silo->open_silo(
         "ALILIL",
-        "$record_store->[Data::RecordStore::DIRECTORY]/TRANS/instances/$trans_id"
+        "$record_store->[Data::RecordStore::DIRECTORY]/TRANS/instances/$trans_id",
+        $options,
         );
     push @$trans_data, $trans_catalog;
 
+    push @$trans_data, $options;
+    
     bless $trans_data, $pkg;
 
 } #_create
@@ -1394,6 +1396,6 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 3.17  (April, 2018))
+       Version 3.21  (April, 2018))
 
 =cut

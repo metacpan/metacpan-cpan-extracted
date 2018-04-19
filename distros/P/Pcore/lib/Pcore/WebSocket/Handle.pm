@@ -1,6 +1,6 @@
 package Pcore::WebSocket::Handle;
 
-use Pcore -const, -role, -result;
+use Pcore -const, -role, -res;
 use Pcore::Util::Scalar qw[weaken refaddr];
 use Pcore::Util::Text qw[decode_utf8 encode_utf8];
 use Pcore::Util::Data qw[to_b64 to_xor];
@@ -67,7 +67,7 @@ const our $WEBSOCKET_STATUS_REASON => {
 
 sub DEMOLISH ( $self, $global ) {
     if ( !$global ) {
-        $self->disconnect( result [ 1001, $WEBSOCKET_STATUS_REASON ] );
+        $self->disconnect( res [ 1001, $WEBSOCKET_STATUS_REASON ] );
     }
 
     return;
@@ -103,7 +103,7 @@ sub disconnect ( $self, $status = undef ) {
     # mark connection as closed
     $self->{is_connected} = 0;
 
-    $status = result [ 1000, $WEBSOCKET_STATUS_REASON ] if !defined $status;
+    $status = res [ 1000, $WEBSOCKET_STATUS_REASON ] if !defined $status;
 
     # cleanup message data
     undef $self->{_msg};
@@ -143,7 +143,7 @@ sub on_connect ( $self, $h ) {
     # set on_error handler
     $self->{h}->on_error(
         sub ( $h, @ ) {
-            $self->disconnect( result [ 1001, $WEBSOCKET_STATUS_REASON ] ) if $self;    # 1001 - Going Away
+            $self->disconnect( res [ 1001, $WEBSOCKET_STATUS_REASON ] ) if $self;    # 1001 - Going Away
 
             return;
         }
@@ -160,7 +160,7 @@ sub on_connect ( $self, $h ) {
                 if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
 
                     # message was not started, return 1002 - protocol error
-                    return $self->disconnect( result [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
+                    return $self->disconnect( res [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
 
                     # restore message "op", "rsv1"
                     ( $header->{op}, $header->{rsv1} ) = ( $self->{_msg}->[1], $self->{_msg}->[2] );
@@ -179,7 +179,7 @@ sub on_connect ( $self, $h ) {
                 if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
 
                     # message was not started, return 1002 - protocol error
-                    return $self->disconnect( result [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
+                    return $self->disconnect( res [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
 
                     # restore "rsv1" flag
                     $header->{rsv1} = $self->{_msg}->[2];
@@ -205,10 +205,10 @@ sub on_connect ( $self, $h ) {
                 # check max. message size, return 1009 - message too big
                 if ( $self->{max_message_size} ) {
                     if ( $self->{_msg} && $self->{_msg}->[0] ) {
-                        return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} + length $self->{_msg}->[0] > $self->{max_message_size};
+                        return $self->disconnect( res [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} + length $self->{_msg}->[0] > $self->{max_message_size};
                     }
                     else {
-                        return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} > $self->{max_message_size};
+                        return $self->disconnect( res [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} > $self->{max_message_size};
                     }
                 }
 
@@ -265,7 +265,7 @@ sub _on_frame ( $self, $header, $payload_ref ) {
 
             $inflate->inflate( $payload_ref, my $out );
 
-            return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if length $payload_ref->$*;
+            return $self->disconnect( res [ 1009, $WEBSOCKET_STATUS_REASON ] ) if length $payload_ref->$*;
 
             $payload_ref = \$out;
         }
@@ -290,7 +290,7 @@ sub _on_frame ( $self, $header, $payload_ref ) {
         # TEXT message
         if ( $header->{op} == $WEBSOCKET_OP_TEXT ) {
             if ($payload_ref) {
-                return $self->disconnect( result [ 1003, 'UTF-8 decode error', $WEBSOCKET_STATUS_REASON ] ) if $@;
+                return $self->disconnect( res [ 1003, 'UTF-8 decode error', $WEBSOCKET_STATUS_REASON ] ) if $@;
 
                 $self->on_text($payload_ref);
             }
@@ -314,7 +314,7 @@ sub _on_frame ( $self, $header, $payload_ref ) {
                 $status = 1006;    # 1006 - Abnormal Closure - if close status was not specified
             }
 
-            $self->disconnect( result [ $status, $reason, $WEBSOCKET_STATUS_REASON ] );
+            $self->disconnect( res [ $status, $reason, $WEBSOCKET_STATUS_REASON ] );
         }
 
         # PING message

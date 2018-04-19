@@ -132,7 +132,6 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "BOOL",
   "LOOP_INCREMENT",
   "SELF",
-  "CLASS",
   "CHECK_CAST",
   "STRING_EQ",
   "STRING_NE",
@@ -573,7 +572,6 @@ SPVM_OP* SPVM_OP_new_op_use_from_package_name(SPVM_COMPILER* compiler, const cha
   SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, file, line);
   SPVM_USE* use = SPVM_USE_new(compiler);
   use->package_name = package_name;
-  use->package_name_with_template_args = package_name;
   op_use->uv.use = use;
   SPVM_OP_insert_child(compiler, op_use, op_use->last, op_name_package);
   
@@ -935,6 +933,12 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
   SPVM_TYPE*  type = NULL;
   
   switch (op->id) {
+    case SPVM_OP_C_ID_PACKAGE: {
+      SPVM_PACKAGE* package = op->uv.package;
+      const char* package_name = package->op_name->uv.name;
+      type = SPVM_HASH_search(compiler->type_symtable, package_name, strlen(package_name));
+      break;
+    }
     case SPVM_OP_C_ID_EQ:
     case SPVM_OP_C_ID_NE:
     case SPVM_OP_C_ID_GT:
@@ -1085,22 +1089,11 @@ void SPVM_OP_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_sub, SPV
   
   SPVM_OP* found_op_sub;
   
-  if (call_sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD) {
-    const char* package_name = call_sub->op_name_package->uv.name;
-    const char* sub_name = call_sub->op_name->uv.name;
-    
-    const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, package_name, sub_name);
-    
-    found_op_sub= SPVM_HASH_search(
-      compiler->op_sub_symtable,
-      sub_abs_name,
-      strlen(sub_abs_name)
-    );
-  }
-  else if (call_sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD) {
-    SPVM_TYPE* type = SPVM_OP_get_type(compiler, call_sub->op_term);
+  const char* sub_name = call_sub->op_name->uv.name;
+  // $obj->sub_name
+  if (call_sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD) {
+    SPVM_TYPE* type = SPVM_OP_get_type(compiler, call_sub->op_invocant);
     const char* type_name = type->name;
-    const char* sub_name = call_sub->op_name->uv.name;
     const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, type_name, sub_name);
     
     found_op_sub= SPVM_HASH_search(
@@ -1109,19 +1102,20 @@ void SPVM_OP_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_sub, SPV
       strlen(sub_abs_name)
     );
   }
-  else if (call_sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_SUB) {
-    const char* sub_name = call_sub->op_name->uv.name;
-    
-    if (strstr(sub_name, "::")) {
-      const char* sub_abs_name = call_sub->op_name->uv.name;
-      
+  else {
+    // Package->sub_name
+    if (call_sub->op_invocant) {
+      const char* package_name = call_sub->op_invocant->uv.name;
+      const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, package_name, sub_name);
       found_op_sub= SPVM_HASH_search(
         compiler->op_sub_symtable,
         sub_abs_name,
         strlen(sub_abs_name)
       );
     }
+    // sub_name
     else {
+      
       // Search current pacakge
       SPVM_PACKAGE* package = op_package_current->uv.package;
       const char* package_name = package->op_name->uv.name;
@@ -1134,7 +1128,7 @@ void SPVM_OP_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_sub, SPV
       
       // Search CORE
       if (!found_op_sub) {
-        sub_abs_name = SPVM_OP_create_abs_name(compiler, "CORE", sub_name);
+        sub_abs_name = SPVM_OP_create_abs_name(compiler, "Std", sub_name);
         
         found_op_sub= SPVM_HASH_search(
           compiler->op_sub_symtable,
@@ -1143,9 +1137,6 @@ void SPVM_OP_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_sub, SPV
         );
       }
     }
-  }
-  else {
-    assert(0);
   }
   
   if (found_op_sub) {
@@ -1366,6 +1357,20 @@ const char* SPVM_OP_create_package_var_abs_name(SPVM_COMPILER* compiler, const c
 }
 
 SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPVM_OP* op_name_package, SPVM_OP* op_block, SPVM_OP* op_list_descriptors) {
+
+  // Package
+  SPVM_PACKAGE* package = SPVM_PACKAGE_new(compiler);
+  
+  if (!op_name_package) {
+    // Package is anon
+    package->is_anon = 1;
+    
+    // Anon package name
+    char* name_package = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, strlen("@anon2147483647"));
+    sprintf(name_package, "@anon%d", compiler->anon_package_length);
+    compiler->anon_package_length++;
+    op_name_package = SPVM_OP_new_op_name(compiler, name_package, op_package->file, op_package->line);
+  }
   
   SPVM_OP_insert_child(compiler, op_package, op_package->last, op_name_package);
   SPVM_OP_insert_child(compiler, op_package, op_package->last, op_block);
@@ -1380,8 +1385,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     return NULL;
   }
   
-  // Package
-  SPVM_PACKAGE* package = SPVM_PACKAGE_new(compiler);
   package->op_name = op_name_package;
 
   // Package is interface
@@ -1448,6 +1451,9 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         SPVM_yyerror_format(compiler, "Interface package can't have package variable at %s line %d\n", op_decl->file, op_decl->line);
       }
       SPVM_LIST_push(op_ours, op_decl);
+    }
+    else if (op_decl->id == SPVM_OP_C_ID_USE) {
+      // Static import
     }
     else {
       assert(0);
@@ -1628,58 +1634,21 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   return op_package;
 }
 
-SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package_with_template_args) {
+SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package) {
   
-  SPVM_OP_insert_child(compiler, op_use, op_use->last, op_name_package_with_template_args);
+  SPVM_OP_insert_child(compiler, op_use, op_use->last, op_name_package);
   
-  const char* package_name_with_template_args = op_name_package_with_template_args->uv.name;
+  const char* package_name = op_name_package->uv.name;
   
   SPVM_USE* use = SPVM_USE_new(compiler);
   op_use->uv.use = use;
-  use->package_name_with_template_args = package_name_with_template_args;
-  
-  SPVM_LIST* part_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-  
-  const char* found_ptr = package_name_with_template_args;
-  const char* base_ptr = package_name_with_template_args;
-  
-  while (1) {
-    found_ptr = strchr(base_ptr, '_');
-    if (found_ptr) {
-      int32_t length = (int32_t)(found_ptr - base_ptr);
-      char* part_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, length);
-      memcpy(part_name, base_ptr, length);
-      part_name[length] = '\0';
-      SPVM_LIST_push(part_names, part_name);
-      base_ptr = found_ptr + 1;
-    }
-    else {
-      break;
-    }
-  }
-  {
-    int32_t length = (int32_t)(&package_name_with_template_args[strlen(package_name_with_template_args)] - base_ptr);
-    char* part_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, length);
-    memcpy(part_name, base_ptr, length);
-    part_name[length] = '\0';
-    SPVM_LIST_push(part_names, part_name);
-  }
-  
-  const char* package_name = SPVM_LIST_fetch(part_names, 0);
   use->package_name = package_name;
-  if (part_names->length > 1) {
-    int32_t i;
-    for (i = 1; i < part_names->length; i++) {
-      char* part_name = SPVM_LIST_fetch(part_names, i);
-      SPVM_LIST_push(use->template_args, part_name);
-    }
-  }
   
-  SPVM_OP* found_op_use = SPVM_HASH_search(compiler->op_use_symtable, package_name_with_template_args, strlen(package_name));
+  SPVM_OP* found_op_use = SPVM_HASH_search(compiler->op_use_symtable, package_name, strlen(package_name));
   
   if (!found_op_use) {
     SPVM_LIST_push(compiler->op_use_stack, op_use);
-    SPVM_HASH_insert(compiler->op_use_symtable, package_name_with_template_args, strlen(package_name), op_use);
+    SPVM_HASH_insert(compiler->op_use_symtable, package_name, strlen(package_name), op_use);
   }
   
   return op_use;
@@ -1874,22 +1843,15 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
         // Call type
         SPVM_OP* op_type = op_arg->first->uv.my->op_type;
         if (op_type) {
-          if (op_type->id == SPVM_OP_C_ID_CLASS) {
-            sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
-          }
-          else if (op_type->id == SPVM_OP_C_ID_SELF) {
+          if (op_type->id == SPVM_OP_C_ID_SELF) {
             sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_METHOD;
-            SPVM_LIST_push(sub->op_args, op_arg->first);
           }
           else {
-            sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_SUB;
-            SPVM_LIST_push(sub->op_args, op_arg->first);
+            sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
           }
         }
       }
-      else {
-        SPVM_LIST_push(sub->op_args, op_arg->first);
-      }
+      SPVM_LIST_push(sub->op_args, op_arg->first);
       sub_index++;
     }
   }
@@ -2056,28 +2018,24 @@ SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, S
   SPVM_CALL_SUB* call_sub = SPVM_CALL_SUB_new(compiler);
   
   const char* sub_name = op_name_sub->uv.name;
-  SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_invocant->file, op_invocant->line);
   
-  // Normal call
-  if (op_invocant->id == SPVM_OP_C_ID_NULL) {
-    call_sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_SUB;
-    op_name->uv.name = sub_name;
-    call_sub->op_name = op_name;
+  if (strstr(sub_name, "::")) {
+    SPVM_yyerror_format(compiler, "subroutine name can't conatin :: at %s line %d\n", op_name_sub->file, op_name_sub->line);
   }
-  // Class method call
-  else if (op_invocant->id == SPVM_OP_C_ID_NAME) {
-    call_sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
-    op_name->uv.name = sub_name;
-    call_sub->op_name_package = op_invocant;
-    call_sub->op_name = op_name;
-  }
+  
   // Method call
-  else {
+  if (op_invocant && op_invocant->id != SPVM_OP_C_ID_NAME) {
     call_sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_METHOD;
-    call_sub->op_term = op_invocant;
+    call_sub->op_invocant = op_invocant;
     call_sub->op_name = op_name_sub;
     
     SPVM_OP_insert_child(compiler, op_terms, op_terms->first, op_invocant);
+  }
+  // Class method call
+  else {
+    call_sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
+    call_sub->op_invocant = op_invocant;
+    call_sub->op_name = op_name_sub;
   }
   
   op_call_sub->uv.call_sub = call_sub;

@@ -8,6 +8,7 @@ use parent 'TestBase';
 use Test::More;
 use Test::Mockify::Sut;
 use Test::Exception;
+use Test::Warn;
 use Test::Mockify::Matcher qw (
         Number
     );
@@ -17,12 +18,14 @@ use t::TestDummies::DummyImportTools qw (Doubler);
 #----------------------------------------------------------------------------------------
 sub testPlan{
     my $self = shift;
+
     $self->test_InjectionOfImportedMethod_scopes();
     $self->test_InjectionOfImportedMethod_CreatorMethod();
     $self->test_InjectionOfImportedMethod_scopes_spy();
     $self->test_InjectionOfImportedMethod_Verify();
     $self->test_InjectionOfImportedMethod_Verify_spy();
     $self->test_functionNameFormatingErrorHandling_mock();
+    $self->test_EmpthyPrototype();
     $self->test_functionNameFormatingErrorHandling_spy();
 }
 
@@ -53,6 +56,18 @@ sub test_InjectionOfImportedMethod_scopes {
         'In useDummyImportTools, result Doubler call: "4"',
         "$SubTestName - prove the unmocked Result"
     );
+}
+#----------------------------------------------------------------------------------------
+sub test_EmpthyPrototype {
+    my $self = shift;
+    my $SubTestName = (caller(0))[3];
+    warning_is (sub {
+        {# start lexical scope
+            my $Mockify = Test::Mockify::Sut->new('t::TestDummies::DummyImportTools');
+            $Mockify->mockImported('t::TestDummies::DummyImportTools', 'EmptyProtoType')->when()->thenReturnUndef();
+            my $Sut = $Mockify->getMockObject();
+        }# close lexial scope
+    }, '', "$SubTestName - Prove make sure that no warn is throw on mock");
 }
 #----------------------------------------------------------------------------------------
 sub test_InjectionOfImportedMethod_scopes_spy {

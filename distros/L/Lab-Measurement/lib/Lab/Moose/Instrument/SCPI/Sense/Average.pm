@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Average;
 #ABSTRACT: Role for the SCPI SENSe:AVERage subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Average::VERSION = '3.630';
+$Lab::Moose::Instrument::SCPI::Sense::Average::VERSION = '3.631';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -59,7 +59,7 @@ Lab::Moose::Instrument::SCPI::Sense::Average - Role for the SCPI SENSe:AVERage s
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 METHODS
 

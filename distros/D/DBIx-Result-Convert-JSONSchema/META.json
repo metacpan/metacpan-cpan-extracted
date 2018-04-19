@@ -1,0 +1,63 @@
+{
+   "abstract" : "lib/DBIx/Result/Convert/JSONSchema.pm",
+   "author" : [
+      "malishew <malishew@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Result-Convert-JSONSchema",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::Mock" : "0",
+            "DBI" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "FindBin" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "Readonly" : "0",
+            "Storable" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Humanstate/p5-dbix-result-convert-jsonschema/issues"
+      },
+      "homepage" : "https://metacpan.org/module/DBIx::Result::Convert::JSONSchema",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Humanstate/p5-dbix-result-convert-jsonschema"
+      }
+   },
+   "version" : "0.02"
+}

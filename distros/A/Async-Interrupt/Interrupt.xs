@@ -492,7 +492,7 @@ void
 new (const char *klass)
 	PPCODE:
 {
-  	s_epipe *epp;
+	s_epipe *epp;
 
         Newz (0, epp, 1, s_epipe);
         XPUSHs (sv_setref_iv (sv_newmortal (), klass, PTR2IV (epp)));
@@ -543,6 +543,9 @@ signal_func (s_epipe *epp)
 
 void
 s_epipe_wait (s_epipe *epp)
+
+void
+s_epipe_renew (s_epipe *epp)
 
 void
 DESTROY (s_epipe *epp)

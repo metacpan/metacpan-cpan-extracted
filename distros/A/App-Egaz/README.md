@@ -10,23 +10,28 @@ App::Egaz - Backend of **E**asy **G**enome **A**ligner
 
     Available commands:
 
-        commands: list the application's commands
-            help: display a command's help screen
+          commands: list the application's commands
+              help: display a command's help screen
 
-          blastn: blastn wrapper between two fasta files
-      exactmatch: exact matched positions in genome sequences
-         formats: formats of files use in this project
-           lastz: lastz wrapper for two genomes or self alignments
-         lav2axt: convert .lav files to .axt files
-         lav2psl: convert .lav files to .psl files
-          lpcnam: the pipeline of pairwise lav-psl-chain-net-axt-maf
-          masked: masked (or gaps) regions in fasta files
-       maskfasta: soft/hard-masking sequences in a fasta file
-       normalize: normalize lav files
-       partition: partitions fasta files by size
-        plottree: use the ape package to draw newick trees
-         prepseq: preparing steps for lastz
-           raxml: raxml wrapper to construct phylogenetic trees
+         blastlink: link sequences by blastn
+        blastmatch: matched positions by blastn in genome sequences
+            blastn: blastn wrapper between two fasta files
+        exactmatch: exact matched positions in genome sequences
+           formats: formats of files use in this project
+             lastz: lastz wrapper for two genomes or self alignments
+           lav2axt: convert .lav files to .axt files
+           lav2psl: convert .lav files to .psl files
+            lpcnam: the pipeline of pairwise lav-psl-chain-net-axt-maf
+            masked: masked (or gaps) regions in fasta files
+         maskfasta: soft/hard-masking sequences in a fasta file
+            multiz: multiz step by step
+         normalize: normalize lav files
+         partition: partitions fasta files by size
+          plottree: use the ape package to draw newick trees
+           prepseq: preparing steps for lastz
+             raxml: raxml wrapper to construct phylogenetic trees
+      repeatmasker: RepeatMasker wrapper
+          template: create executing bash files
 
 Run `egaz help command-name` for usage information.
 
@@ -47,8 +52,12 @@ chaining mechanism (`C=2`) instead.
 
 # EXAMPLE
 
-- Procedures of multiple genome alignments
-    - Detailed/alternative steps for _Saccharomyces cerevisiae_ strains [https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md](https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md)
+- Multiple genome alignments of _Saccharomyces cerevisiae_ strains and other _Saccharomyces_ species
+    - Detailed/alternative steps [https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md#detailedalternative-steps](https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md#detailedalternative-steps)
+    - `egaz template` steps [https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md#template-steps](https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md#template-steps)
+- Self alignments of _S. cerevisiae_ reference strain S288c
+    - Detailed steps [https://github.com/wang-q/App-Egaz/blob/master/doc/Scer-self.md#detailed-steps](https://github.com/wang-q/App-Egaz/blob/master/doc/Scer-self.md#detailed-steps)
+    - `egaz template` steps [https://github.com/wang-q/App-Egaz/blob/master/doc/Scer-self.md#template-steps](https://github.com/wang-q/App-Egaz/blob/master/doc/Scer-self.md#template-steps)
 
 # AUTHOR
 

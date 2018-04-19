@@ -2,7 +2,7 @@ package CPAN::Perl::Releases::MetaCPAN;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use JSON::PP ();
 use HTTP::Tinyish;
 
@@ -14,7 +14,7 @@ sub new {
     my $uri = $option{uri} || "https://fastapi.metacpan.org/v1/release";
     $uri =~ s{/$}{};
     my $cache = exists $option{cache} ? $option{cache} : 1;
-    my $http = HTTP::Tinyish->new(agent => __PACKAGE__ . "/$VERSION");
+    my $http = HTTP::Tinyish->new(verify_SSL => 1, agent => __PACKAGE__ . "/$VERSION");
     my $json = JSON::PP->new->canonical(1);
     bless { uri => $uri, http => $http, cache => $cache, json => $json }, $class;
 }

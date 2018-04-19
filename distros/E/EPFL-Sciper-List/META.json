@@ -4,7 +4,7 @@
       "William Belle <william.belle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "apache_2_0"
    ],
@@ -16,24 +16,24 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Copy::Recursive" : "0.38",
+            "File::Copy::Recursive" : "0.40",
             "File::Find::Rule" : "0.34",
             "IO::All" : "0.87",
             "Test::JSON" : "0.11",
-            "Test::MockModule" : "0.12",
+            "Test::MockModule" : "0.13",
             "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.4224"
          }
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "2.94",
+            "JSON" : "2.97",
             "LWP::Protocol::https" : "6.07",
-            "LWP::UserAgent" : "6.26",
+            "LWP::UserAgent" : "6.33",
             "Readonly" : "2.05"
          }
       }
@@ -41,7 +41,7 @@
    "provides" : {
       "EPFL::Sciper::List" : {
          "file" : "lib/EPFL/Sciper/List.pm",
-         "version" : "0.02"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/epfl-devrun/epfl-sciper-list"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

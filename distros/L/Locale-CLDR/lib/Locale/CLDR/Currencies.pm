@@ -1,16 +1,17 @@
 package Locale::CLDR::Currencies;
 # This file auto generated from Data.xml
-#	on Fri 29 Apr  6:48:36 pm GMT
+#	on Fri 13 Apr  6:59:48 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -56,6 +57,12 @@ has '_currency_fractions' => (
 			'cashdigits' => '0',
 			'cashrounding' => '0',
 		},
+		BYN => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
+			'cashrounding' => '0',
+		},
 		BYR => {
 			'digits' => '0',
 			'rounding' => '0',
@@ -93,9 +100,9 @@ has '_currency_fractions' => (
 			'cashrounding' => '0',
 		},
 		CRC => {
-			'digits' => '0',
+			'digits' => '2',
 			'rounding' => '0',
-			'cashdigits' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		CZK => {
@@ -115,6 +122,12 @@ has '_currency_fractions' => (
 			'rounding' => '0',
 			'cashdigits' => '0',
 			'cashrounding' => '0',
+		},
+		DKK => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
+			'cashrounding' => '50',
 		},
 		ESP => {
 			'digits' => '0',
@@ -266,6 +279,12 @@ has '_currency_fractions' => (
 			'cashdigits' => '0',
 			'cashrounding' => '0',
 		},
+		NOK => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
+			'cashrounding' => '0',
+		},
 		OMR => {
 			'digits' => '3',
 			'rounding' => '0',
@@ -294,6 +313,12 @@ has '_currency_fractions' => (
 			'digits' => '0',
 			'rounding' => '0',
 			'cashdigits' => '0',
+			'cashrounding' => '0',
+		},
+		SEK => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		SLL => {
@@ -476,7 +501,7 @@ has '_default_currency' => (
 				'BT' => 'BTN',
 				'BV' => 'NOK',
 				'BW' => 'BWP',
-				'BY' => 'BYR',
+				'BY' => 'BYN',
 				'BZ' => 'BZD',
 				'CA' => 'CAD',
 				'CC' => 'AUD',
@@ -654,7 +679,7 @@ has '_default_currency' => (
 				'SO' => 'SOS',
 				'SR' => 'SRD',
 				'SS' => 'SSP',
-				'ST' => 'STD',
+				'ST' => 'STN',
 				'SV' => 'USD',
 				'SX' => 'ANG',
 				'SY' => 'SYP',

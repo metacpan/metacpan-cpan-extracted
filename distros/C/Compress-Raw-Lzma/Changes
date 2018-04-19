@@ -1,6 +1,14 @@
 CHANGES
 -------
 
+  2.082 15 April 2018
+      * README
+        Document clash with older version of liblzma
+        #125046: Undefined symbol "lzma_properties_size"
+
+      * Lzma.pm
+        #125093: [PATCH] fix spelling mistakes: defaut -> default
+
   2.081 4 April 2018
 
       * previous release used $^W instead of use warnings. Fixed.

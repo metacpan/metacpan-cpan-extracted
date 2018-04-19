@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 
 use 5.006;
 use strict;
@@ -7,7 +8,7 @@ use warnings;
 package PDF::Table;
 
 use Carp;
-our $VERSION = '0.10.0';
+our $VERSION = '0.10.1';
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if($ENV{'PDF_TABLE_DEBUG'});
 
@@ -565,6 +566,14 @@ sub table
         {
             $table_top_y = $ybase;
             $bot_marg = $table_top_y - $height;
+
+            # Check for safety reasons
+            if( $bot_marg < 0 )
+            {   # This warning should remain i think
+                carp "!!! Warning: !!! Incorrect Table Geometry! start_h (${height}) is above start_y (${table_top_y}). Setting bottom margin to end of sheet!\n";
+                $bot_marg = 0;
+            }
+
         }
         else
         {
@@ -580,6 +589,13 @@ sub table
             $table_top_y = $next_y;
             $bot_marg = $table_top_y - $next_h;
 
+            # Check for safety reasons
+            if( $bot_marg < 0 )
+            {   # This warning should remain i think
+                carp "!!! Warning: !!! Incorrect Table Geometry! next_y or start_y (${next_y}) is above next_h or start_h (${next_h}). Setting bottom margin to end of sheet!\n";
+                $bot_marg = 0;
+            }
+
             if( ref $header_props and $header_props->{'repeat'})
             {
                 # Copy Header Data
@@ -594,13 +610,6 @@ sub table
                 $first_row = 1; # Means YES
                 $row_index--; # Rollback the row_index because a new header row has been added
             }
-        }
-
-        # Check for safety reasons
-        if( $bot_marg < 0 )
-        {   # This warning should remain i think
-            carp "!!! Warning: !!! Incorrect Table Geometry! Setting bottom margin to end of sheet!\n";
-            $bot_marg = 0;
         }
 
         $gfx_bg = $page->gfx;
@@ -1376,7 +1385,7 @@ Example:
 
 =back
 
-NOTE: If 'min_w' and/or 'max_w' parameter is used in 'col_props', have in mind that it may be overriden by the calculated minimum/maximum cell witdh so that table can be created.
+NOTE: If 'min_w' and/or 'max_w' parameter is used in 'col_props', have in mind that it may be overridden by the calculated minimum/maximum cell witdh so that table can be created.
 When this happens a warning will be issued with some advises what can be done.
 In cases of a conflict between column formatting and odd/even row formatting, 'col_props' will override odd/even.
 
@@ -1456,8 +1465,8 @@ Example:
 
 =back
 
-NOTE: In case of a conflict between column, odd/even and cell formating, cell formating will overwrite the other two.
-In case of a conflict between header row and cell formating, header formating will override cell.
+NOTE: In case of a conflict between column, odd/even and cell formatting, cell formatting will overwrite the other two.
+In case of a conflict between header row and cell formatting, header formatting will override cell.
 
 =head2 text_block()
 
@@ -1468,7 +1477,7 @@ In case of a conflict between header row and cell formating, header formating wi
 =item Description
 
 Utility method to create a block of text. The block may contain multiple paragraphs.
-It is mainly used internaly but you can use it from outside for placing formated text anywhere on the sheet.
+It is mainly used internaly but you can use it from outside for placing formatted text anywhere on the sheet.
 
 NOTE: This method will NOT add more pages to the pdf instance if the space is not enough to place the string inside the block.
 Leftover text will be returned and has to be handled by the caller - i.e. add a new page and a new block with the leftover.

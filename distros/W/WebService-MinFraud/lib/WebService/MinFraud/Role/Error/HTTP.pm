@@ -3,7 +3,7 @@ package WebService::MinFraud::Role::Error::HTTP;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use WebService::MinFraud::Types qw( HTTPStatus URIObject );
 
@@ -35,7 +35,7 @@ WebService::MinFraud::Role::Error::HTTP - An HTTP Error role
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SUPPORT
 

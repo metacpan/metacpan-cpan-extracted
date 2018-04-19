@@ -32,24 +32,14 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.38",
+            "Math::Complex" : "1.59",
             "Math::Round" : "0.06",
             "Object::Simple" : "3.10",
-            "Text::UnicodeTable::Simple" : "0.09",
-            "perl" : "5.010001"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/yuki-kimoto/Rstats/issues"
-      },
-      "license" : [
-         "http://www.opensource.org/licenses/artistic-license-2.0"
-      ],
-      "repository" : {
-         "url" : "https://github.com/yuki-kimoto/Rstats.git"
-      }
-   },
-   "version" : "0.0149"
+   "version" : "0.0150"
 }

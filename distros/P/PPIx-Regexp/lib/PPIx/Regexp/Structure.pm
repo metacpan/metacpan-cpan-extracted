@@ -49,21 +49,26 @@ use warnings;
 use base qw{ PPIx::Regexp::Node };
 
 use Carp qw{ confess };
-use PPIx::Regexp::Constant qw{ STRUCTURE_UNKNOWN };
+use PPIx::Regexp::Constant qw{
+    ARRAY_REF
+    HASH_REF
+    STRUCTURE_UNKNOWN
+};
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use constant ELEMENT_UNKNOWN => STRUCTURE_UNKNOWN;
 
 sub __new {
     my ( $class, @args ) = @_;
     my %brkt;
-    if ( ref $args[0] eq 'HASH' ) {
+    if ( HASH_REF eq ref $args[0] ) {
 	%brkt = %{ shift @args };
 	foreach my $key ( qw{ start type finish } ) {
-	    ref $brkt{$key} eq 'ARRAY' or $brkt{$key} = [ $brkt{$key} ];
+	    ARRAY_REF eq ref $brkt{$key}
+		or $brkt{$key} = [ $brkt{$key} ];
 	}
     } else {
 	$brkt{finish} = [ @args ? pop @args : () ];
@@ -95,7 +100,7 @@ sub __new {
 
     foreach my $key ( qw{ start type finish } ) {
 	$self->{$key} = [];
-	ref $brkt{$key} eq 'ARRAY'
+	ARRAY_REF eq ref $brkt{$key}
 	    or confess "Programming error - '$brkt{$key}' not an ARRAY";
 	foreach my $val ( @{ $brkt{$key} } ) {
 	    defined $val or next;
@@ -141,15 +146,25 @@ sub elements {
     }
 }
 
-sub explain {
-    my ( $self ) = @_;
-    if ( my $type = $self->type() ) {
-	return $type->explain();
+{
+    my %explanation = (
+	q<(>	=> 'Grouping',	# )
+    );
+
+    sub explain {
+	my ( $self ) = @_;
+	if ( my $type = $self->type() ) {
+	    return $type->explain();
+	}
+	if ( my $start = $self->start() ) {
+	    # The check for a left parenthesis before returning
+	    # 'Grouping' is probably superflous, since it appears that
+	    # this method is overridden in all other cases where we
+	    # might get here (i.e.  '[...]', '{...}'). But I'm paranoid.
+	    return $explanation{ $start->content() } || $start->explain();
+	}
+	return $self->__no_explanation();
     }
-    if ( my $start = $self->start() ) {
-	return $start->explain();
-    }
-    return $self->__no_explanation();
 }
 
 =head2 finish

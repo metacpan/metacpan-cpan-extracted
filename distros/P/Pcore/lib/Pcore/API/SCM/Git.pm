@@ -1,6 +1,6 @@
 package Pcore::API::SCM::Git;
 
-use Pcore -class, -result;
+use Pcore -class, -res;
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
@@ -17,7 +17,7 @@ sub _build_upstream ($self) {
 }
 
 sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
 
     my $chdir_guard = $root ? P->file->chdir( $self->{root} ) : undef;
 
@@ -34,21 +34,19 @@ sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
             my $res;
 
             if ( $proc->is_success ) {
-                $res = result 200, $proc->stdout ? [ split /\x00/sm, $proc->stdout ] : undef;
+                $res = res 200, $proc->stdout ? [ split /\x00/sm, $proc->stdout ] : undef;
             }
             else {
-                $res = result [ 500, $proc->stderr ? ( $proc->stderr =~ /\A(.+?)\n/sm )[0] : () ];
+                $res = res [ 500, $proc->stderr ? ( $proc->stderr =~ /\A(.+?)\n/sm )[0] : () ];
             }
 
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
+            $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
 
             return;
         }
     );
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub scm_cmd ( $self, $cmd, $cb = undef ) {
@@ -118,8 +116,8 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 67, 73, 79, 85, 91,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |      | 97, 103, 109         |                                                                                                                |
+## |    3 | 65, 71, 77, 83, 89,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |      | 95, 101, 107         |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Result::Convert::JSONSchema.
+
+0.01  Thu Mar 29 08:35:50 2018
+	- original version; created by h2xs 1.23 with options
+		-AXc -n DBIx::Result::Convert::JSONSchema
+

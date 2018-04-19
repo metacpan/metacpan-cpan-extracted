@@ -4,6 +4,7 @@ use warnings;
 
 use Carp qw(croak);
 use Cwd qw(getcwd);
+use Data::Dumper;
 use File::Copy;
 use File::Copy::Recursive qw(dircopy);
 use File::Find;
@@ -15,10 +16,12 @@ use Logging::Simple;
 use Module::Load;
 use Plugin::Simple default => 'Test::BrewBuild::Plugin::DefaultExec';
 use Test::BrewBuild::BrewCommands;
+use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Dispatch;
+use Test::BrewBuild::Regex;
 use Test::BrewBuild::Tester;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 my $log;
 my $bcmd;
@@ -140,7 +143,7 @@ sub instance_install {
             $timeout = $self->{args}{timeout};
         }
         else {
-            $timeout = 600;
+            $timeout = INSTANCE_INSTALL_TIMEOUT;
         }
     }
 
@@ -337,11 +340,7 @@ sub test {
 
     $log->_7("\n*****\n$results\n*****");
 
-    my @ver_results = $results =~ /
-        [Pp]erl-\d\.\d+\.\d+(?:_\w+)?\s+===
-        .*?
-        (?=(?:[Pp]erl-\d\.\d+\.\d+(?:_\w+)?\s+===|$))
-        /gsx;
+    my @ver_results = $results =~ /${ re_brewbuild('check_result') }/g;
 
     $log->_5("got " . scalar @ver_results . " results");
 
@@ -350,7 +349,7 @@ sub test {
     for my $result (@ver_results){
         my $ver;
 
-        if ($result =~ /^([Pp]erl-\d\.\d+\.\d+(_\d{2})?)/){
+        if ($result =~ /${ re_brewbuild('extract_perl_version') }/){
             $ver = $1;
             $ver =~ s/[Pp]erl-//;
         }
@@ -417,7 +416,8 @@ sub revdeps {
 
     my $mod;
 
-    find({
+    find(
+        {
             wanted => sub {
                 return if $mod;
 
@@ -529,7 +529,7 @@ sub _attach_build_log {
         close $bblog_fh;
     }
 
-    if ($bbfile =~ m|failed.*?See\s+(.*?)\s+for details|){
+    if ($bbfile =~ /${ re_brewbuild('check_failed') }/){
         my $build_log = $1;
         open my $bblog_wfh, '>>', $bblog or croak $!;
         print $bblog_wfh "\n\nCPANM BUILD LOG\n";
@@ -620,7 +620,7 @@ sub _exec {
         my $ret
           = `$brew exec --with $vers perl $fname 2>$self->{tempdir}/stderr.bblog`;
 
-        $self->_dzil_unshim if $self->{is_dzil};
+        $self->_dzil_unshim;
 
         return $ret;
     }
@@ -639,25 +639,16 @@ sub _exec {
                 $log->_5("exec'ing: $brew exec:\n". join ', ', @exec_cmd);
                 my $res = `$brew exec $_`;
 
-                my @results = $res =~ /
-                    [Pp]erl-\d\.\d+\.\d+(?:_\w+)?\s+===
-                    .*?
-                    (?=(?:[Pp]erl-\d\.\d+\.\d+(?:_\w+)?\s+===|$))
-                    /gsx;
+                my @results = $res =~ /${ re_brewbuild('check_result') }/gsx;
 
                 for (@results){
-                    if ($_ =~ /
-                        ([Pp]erl-\d\.\d+\.\d+(?:_\w+)?\s+=+?)
-                        (\s+.*?)
-                        (?=(?:[Pp]erl-\d\.\d+\.\d+(?:_\w+)?\s+===|$))
-                        /gsx)
-                    {
+                    if ($_ =~ /${ re_brewbuild('extract_result') }/gsx){
                         push @{ $res_hash{$1} }, $2;
                     }
                 }
             }
 
-            $self->_dzil_unshim if $self->{is_dzil};
+            $self->_dzil_unshim;
 
             my $result;
 
@@ -686,7 +677,7 @@ sub _exec {
 
             my $ret = `$brew exec perl $fname 2>$self->{tempdir}/stderr.bblog`;
 
-            $self->_dzil_unshim if $self->{is_dzil};
+            $self->_dzil_unshim;
 
             return $ret;
         }
@@ -721,10 +712,10 @@ sub _dzil_shim {
     my ($dist, $version);
 
     while (<$fh>){
-        if (/^name\s+=\s+(.*)$/){
+        if (/${ re_brewbuild('extract_dzil_dist_name') }/){
             $dist = $1;
         }
-        if (/^version\s+=\s+(.*)$/){
+        if (/${ re_brewbuild('extract_dzil_dist_version') }/){
             $version = $1;
         }
         last if $dist && $version;
@@ -746,10 +737,17 @@ sub _dzil_shim {
 sub _dzil_unshim {
     # unshim after doing dzil work
 
+    my $self = shift;
+
     my $log = $log->child('_dzil_unshim');
+
+    if (! $self->{is_dzil}){
+        $log->_7("not a dzil distribution; nothing to do");
+        return;
+    }
+
     $log->_5("removing dzil shim");
 
-    my $self = shift;
     $self->{is_dzil} = 0;
     chdir '..';
     $log->_7("changed to '..' dir");
@@ -771,7 +769,7 @@ sub _get_revdeps {
 
     @revdeps = grep {$_ ne 'Test-BrewBuild'} @revdeps;
 
-    for (@revdeps) {
+    for (@revdeps){
         s/-/::/g;
     }
 
@@ -794,16 +792,12 @@ sub _process_stderr {
         }
         close $errlog_fh;
 
-        my @errors = $error_contents =~ /
-                cpanm\s+\(App::cpanminus\)
-                .*?
-                (?=(?:cpanm\s+\(App::cpanminus\)|$))
-            /xgs;
+        my @errors = $error_contents =~ /${ re_brewbuild('extract_errors') }/g;
 
         my %error_map;
 
         for (@errors){
-            if (/cpanm.*?perl\s(5\.\d+)\s/){
+            if (/${ re_brewbuild('extract_error_perl_ver') }/){
                 $error_map{$1} = $_;
             }
         }

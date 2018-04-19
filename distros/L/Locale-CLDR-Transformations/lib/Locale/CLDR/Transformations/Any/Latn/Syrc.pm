@@ -1,16 +1,17 @@
 package Locale::CLDR::Transformations::Any::Latn::Syrc;
 # This file auto generated from Data\common\transforms\Syriac-Latin.xml
-#	on Fri 29 Apr  6:48:46 pm GMT
+#	on Fri 13 Apr  6:59:55 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -37,196 +38,196 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:o)),
+					replace => q(o),
 					result  => q(ܿ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:u)),
+					replace => q(u),
 					result  => q(ܼ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:i)),
+					replace => q(i),
 					result  => q(݂),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ē)),
+					replace => q(ē),
 					result  => q(ܹ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:e)),
+					replace => q(e),
 					result  => q(ܸ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:a)),
+					replace => q(a),
 					result  => q(ܲ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:t)),
+					replace => q(t),
 					result  => q(ܬ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:r)),
+					replace => q(r),
 					result  => q(ܪ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:q)),
+					replace => q(q),
 					result  => q(ܩ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ṣ)),
+					replace => q(ṣ),
 					result  => q(ܨ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:p)),
+					replace => q(p),
 					result  => q(ܦ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:s)),
+					replace => q(s),
 					result  => q(ܣ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:n)),
+					replace => q(n),
 					result  => q(ܢ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:m)),
+					replace => q(m),
 					result  => q(ܡ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:l)),
+					replace => q(l),
 					result  => q(ܠ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:k)),
+					replace => q(k),
 					result  => q(ܟ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:y)),
+					replace => q(y),
 					result  => q(ܝ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ṭ)),
+					replace => q(ṭ),
 					result  => q(ܛ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ḥ)),
+					replace => q(ḥ),
 					result  => q(ܚ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:z)),
+					replace => q(z),
 					result  => q(ܙ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:w)),
+					replace => q(w),
 					result  => q(ܘ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:h)),
+					replace => q(h),
 					result  => q(ܗ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:d)),
+					replace => q(d),
 					result  => q(ܕ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:g)),
+					replace => q(g),
 					result  => q(ܓ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:b)),
+					replace => q(b),
 					result  => q(ܒ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:ʾ)),
+					replace => q(ʾ),
 					result  => q(ܐ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:dr)),
+					replace => q(dr),
 					result  => q(ܖ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q((?^u:sh)),
+					replace => q(sh),
 					result  => q(ܫ),
 					revisit => 0,
 				},

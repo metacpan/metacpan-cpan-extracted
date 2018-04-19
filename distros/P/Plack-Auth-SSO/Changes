@@ -1,3 +1,9 @@
+0.0133  2018-04-18 08:38:42 CEST
+  - remove request parameter _callback from ORCID handler. request parameter code should mark callback phase.
+  - add error_path to Plack::Auth::SSO. Handle this for CAS and ORCID.
+  - add attribute public to ORCID handler
+  - add attribute scope to ORCID handler
+
 0.0132  2018-03-13 09:54:44 CET
   - require WWW::ORCID 0.0401 to make Auth::ORCID work again
 

@@ -19,7 +19,11 @@ sub run ( $type, $rpc_boot_args ) {
     # create object
     my $rpc = $type->new( $rpc_boot_args->{buildargs} // () );
 
-    $rpc->{rpc} = Pcore::RPC::Hub->new( { id => $rpc_boot_args->{id} // P->uuid->v1mc_str, type => $type } );
+    $rpc->{rpc} = Pcore::RPC::Hub->new( {
+        parent_id => $rpc_boot_args->{parent_id},
+        id        => $rpc_boot_args->{id} // P->uuid->v1mc_str,
+        type      => $type
+    } );
 
     my $can_rpc_on_connect    = $rpc->can('RPC_ON_CONNECT');
     my $can_rpc_on_disconnect = $rpc->can('RPC_ON_DISCONNECT');
@@ -102,7 +106,7 @@ sub run ( $type, $rpc_boot_args ) {
                         },
                         ( $can_rpc_on_connect ? ( on_connect => sub ($ws) { $rpc->RPC_ON_CONNECT($ws); return } ) : () ),    #
                         ( $can_rpc_on_disconnect ? ( on_disconnect => sub ( $ws, $status ) { $rpc->RPC_ON_DISCONNECT( $ws, $status ); return; } ) : () ),
-                        on_rpc => sub ( $ws, $req, $tx ) {
+                        on_rpc => Coro::unblock_sub sub ( $ws, $req, $tx ) {
                             my $method_name = "API_$tx->{method}";
 
                             if ( $rpc->can($method_name) ) {
@@ -172,9 +176,9 @@ sub run ( $type, $rpc_boot_args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 11                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (32)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 111                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 115                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 39                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 43                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

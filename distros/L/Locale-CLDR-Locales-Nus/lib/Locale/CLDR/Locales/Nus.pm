@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Nus - Package for language Nuer
 
 package Locale::CLDR::Locales::Nus;
 # This file auto generated from Data\common\main\nus.xml
-#	on Fri 29 Apr  7:20:25 pm GMT
+#	on Fri 13 Apr  7:24:25 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -155,7 +156,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'Ɣ', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a ä {a̱} b c d e ë {e̱} ɛ {ɛ̈} {ɛ̱} {ɛ̱̈} f g ɣ h i ï {i̱} j k l m n ŋ o ö {o̱} ɔ {ɔ̈} {ɔ̱} p q r s t u v w x y z])},
+			main => qr{[a ä {a̱} b c d e ë {e̱} ɛ {ɛ̈} {ɛ̱} {ɛ̱̈} f g ɣ h i ï {i̱} j k l m n ŋ o ö {o̱} ɔ {ɔ̈} {ɔ̱} p q r s t u v w x y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -227,14 +229,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -419,12 +421,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{RW},
 					'pm' => q{TŊ},
+					'am' => q{RW},
 				},
 				'abbreviated' => {
-					'pm' => q{TŊ},
 					'am' => q{RW},
+					'pm' => q{TŊ},
 				},
 			},
 		},
@@ -504,7 +506,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -528,7 +530,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

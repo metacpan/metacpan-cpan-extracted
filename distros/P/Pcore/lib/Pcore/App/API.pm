@@ -1,6 +1,6 @@
 package Pcore::App::API;
 
-use Pcore -role, -result, -const, -export => { CONST => [qw[$TOKEN_TYPE $TOKEN_TYPE_USER_PASSWORD $TOKEN_TYPE_USER_TOKEN $TOKEN_TYPE_USER_SESSION]] };
+use Pcore -role, -const, -export => { CONST => [qw[$TOKEN_TYPE $TOKEN_TYPE_USER_PASSWORD $TOKEN_TYPE_USER_TOKEN $TOKEN_TYPE_USER_SESSION]] };
 use Pcore::App::API::Map;
 use Pcore::App::API::Auth;
 use Pcore::Util::Data qw[from_b64 from_b64_url];
@@ -49,7 +49,7 @@ sub new ( $self, $app ) {
 }
 
 # setup events listeners
-around init => sub ( $orig, $self, $cb ) {
+around init => sub ( $orig, $self ) {
 
     # build map
     # using class name as string to avoid conflict with Type::Standard Map subroutine, exported to Pcore::App::API
@@ -70,9 +70,7 @@ around init => sub ( $orig, $self, $cb ) {
         }
     );
 
-    $self->$orig($cb);
-
-    return;
+    return $self->$orig;
 };
 
 # AUTHENTICATE
@@ -159,49 +157,43 @@ sub authenticate_private ( $self, $private_token, $cb ) {
     return if $self->{_auth_cb_queue}->{ $private_token->[2] }->@* > 1;
 
     # authenticate on backend
-    $self->do_authenticate_private(
-        $private_token,
-        sub ( $res ) {
+    my $res = $self->do_authenticate_private($private_token);
 
-            # authentication error
-            if ( !$res ) {
+    # authentication error
+    if ( !$res ) {
 
-                # delete private token from cache
-                delete $self->{_auth_cache}->{ $private_token->[2] };
+        # delete private token from cache
+        delete $self->{_auth_cache}->{ $private_token->[2] };
 
-                # return new unauthenticated auth object
-                $auth = bless {
-                    app              => $self->{app},
-                    is_authenticated => 0,
-                    private_token    => $private_token,
-                  },
-                  'Pcore::App::API::Auth';
-            }
+        # return new unauthenticated auth object
+        $auth = bless {
+            app              => $self->{app},
+            is_authenticated => 0,
+            private_token    => $private_token,
+          },
+          'Pcore::App::API::Auth';
+    }
 
-            # authenticated
-            else {
+    # authenticated
+    else {
 
-                # create auth
-                $auth = bless $res->{data}, 'Pcore::App::API::Auth';
+        # create auth
+        $auth = bless $res->{data}, 'Pcore::App::API::Auth';
 
-                $auth->{app}              = $self->{app};
-                $auth->{is_authenticated} = 1;
-                $auth->{private_token}    = $private_token;
+        $auth->{app}              = $self->{app};
+        $auth->{is_authenticated} = 1;
+        $auth->{private_token}    = $private_token;
 
-                # store in cache
-                $self->{_auth_cache}->{ $private_token->[2] } = $auth;
-            }
+        # store in cache
+        $self->{_auth_cache}->{ $private_token->[2] } = $auth;
+    }
 
-            # call callbacks
-            while ( my $cb = shift $self->{_auth_cb_queue}->{ $private_token->[2] }->@* ) {
-                $cb->($auth);
-            }
+    # call callbacks
+    while ( my $cb = shift $self->{_auth_cb_queue}->{ $private_token->[2] }->@* ) {
+        $cb->($auth);
+    }
 
-            delete $self->{_auth_cb_queue}->{ $private_token->[2] };
-
-            return;
-        }
-    );
+    delete $self->{_auth_cb_queue}->{ $private_token->[2] };
 
     return;
 }
@@ -213,9 +205,9 @@ sub authenticate_private ( $self, $private_token, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 80                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 78                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 113                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 111                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

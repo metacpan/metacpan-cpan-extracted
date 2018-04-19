@@ -8,6 +8,14 @@
 # Beware to not override some already defined helper.
 %= $a->{helpers};
 
+# If you use Slovo add the table names to your configuration file
+# and the above helpers will be automatically generated during startup
+# e.g.
+{MojoDBx =>{
+  #...
+  tables => [qw(<%= join(' ',@{$a->{tables}})%>)],
+}
+}
 # Routes go after your already defined routes
 # See below if you are using Mojolicious::Plugin::RoutesConfig.
 % for my $r (@{$a->{routes}}) {
@@ -17,6 +25,7 @@
     % }
 % }
 
+# If you use Mojolicious::Plugin::RoutesConfig.
 [
 % for my $r (@{$a->{routes}}) {
     % for my $via (@{$r->{via}}) {

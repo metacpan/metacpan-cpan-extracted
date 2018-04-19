@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Lo - Package for language Lao
 
 package Locale::CLDR::Locales::Lo;
 # This file auto generated from Data\common\main\lo.xml
-#	on Fri 29 Apr  7:14:40 pm GMT
+#	on Fri 13 Apr  7:18:13 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -207,11 +208,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -280,7 +281,7 @@ has 'display_name_language' => (
  				'ar' => 'ອາຣັບ',
  				'ar_001' => 'ອາຣາບິກມາດຕະຖານສະໄໝໃໝ່',
  				'arc' => 'ອາລາມິກ',
- 				'arn' => 'ອາຣົວຄານຽນ',
+ 				'arn' => 'ມາພຸດຊີ',
  				'arp' => 'ອາຣາປາໂຮ',
  				'arw' => 'ອາຣາແວກ',
  				'as' => 'ອັສຊາມີສ',
@@ -346,6 +347,7 @@ has 'display_name_language' => (
  				'cop' => 'ຄອບຕິກ',
  				'cr' => 'ຄີ',
  				'crh' => 'ຄຣີເມນເຕີຄິຊ',
+ 				'crs' => 'ເຊເຊວາ ໂຄຣດ ຝຣັ່ງ',
  				'cs' => 'ເຊກ',
  				'csb' => 'ກາຊູບຽນ',
  				'cu' => 'ໂບດສລາວິກ',
@@ -381,6 +383,7 @@ has 'display_name_language' => (
  				'elx' => 'ອີລາໄມ',
  				'en' => 'ອັງກິດ',
  				'en_AU' => 'ອັງກິດ (ໂອດສະຕາລີ)',
+ 				'en_CA' => 'ອັງກິດແຄນາດາ',
  				'en_GB' => 'ອັງກິດ (ບຣິດທິຊ)',
  				'en_GB@alt=short' => 'ອັງກິດ (ສະຫະລາດຊະອານາຈັກ)',
  				'en_US' => 'ອັງກິດ (ອາເມລິກັນ)',
@@ -405,6 +408,7 @@ has 'display_name_language' => (
  				'fon' => 'ຟອນ',
  				'fr' => 'ຝຣັ່ງ',
  				'fr_CA' => 'ຟລັງ(ການາດາ)',
+ 				'fr_CH' => 'ຝຣັ່ງ (ສວິສ)',
  				'frm' => 'ຟຮັ່ງເສດກາງ',
  				'fro' => 'ຟຮັ່ງເສດໂບຮານ',
  				'frr' => 'ຟຣີຊຽນເໜືອ',
@@ -560,7 +564,7 @@ has 'display_name_language' => (
  				'mi' => 'ມາວຣິ',
  				'mic' => 'ມິກແມກ',
  				'min' => 'ທີແນງກາບູ',
- 				'mk' => 'ແມັກເຊໂດນຽນ',
+ 				'mk' => 'ແມຊິໂດນຽນ',
  				'ml' => 'ມາເລອາລຳ',
  				'mn' => 'ມອງໂກເລຍ',
  				'mnc' => 'ແມນຈູ',
@@ -623,11 +627,13 @@ has 'display_name_language' => (
  				'pam' => 'ປາມປານກາ',
  				'pap' => 'ປາມເປຍເມັນໂທ',
  				'pau' => 'ປາລົວອານ',
+ 				'pcm' => 'ໄນຈີຣຽນພິດກິນ',
  				'peo' => 'ເປີເຊຍໂບຮານ',
  				'phn' => 'ຟີນີເຊຍ',
  				'pi' => 'ປາລີ',
  				'pl' => 'ໂປລິຊ',
  				'pon' => 'ພອນເພ',
+ 				'prg' => 'ປຣັສຊຽນ',
  				'pro' => 'ໂປວອງຊານໂບຮານ',
  				'ps' => 'ປາສໂຕ',
  				'pt' => 'ປອກຕຸຍກິສ',
@@ -672,7 +678,7 @@ has 'display_name_language' => (
  				'sga' => 'ອີຣິຊເກົ່າ',
  				'sh' => 'ເຊີໂບ-ໂກເຊຍ',
  				'shi' => 'ທາເຊວຫິດ',
- 				'shn' => 'ໄທໃຫ່ຍ',
+ 				'shn' => 'ຊານ',
  				'shu' => 'ອາລັບ-ຊາດ',
  				'si' => 'ສິນຫາລາ',
  				'sid' => 'ຊິດາໂມ',
@@ -798,7 +804,7 @@ has 'display_name_script' => (
 		sub {
 			my %scripts = (
 			'Afak' => 'ອັບຟາກາ',
- 			'Arab' => 'ອາລັບ',
+ 			'Arab' => 'ອາຣາບິກ',
  			'Armi' => 'ອິມພີຮຽນ ອາເມອິກ',
  			'Armn' => 'ອາເມນຽນ',
  			'Avst' => 'ອະເວສຕະ',
@@ -806,7 +812,7 @@ has 'display_name_script' => (
  			'Bamu' => 'ບາມູມ',
  			'Bass' => 'ບັດຊາ',
  			'Batk' => 'ບາຕັກ',
- 			'Beng' => 'ເບັງກາລິ',
+ 			'Beng' => 'ເບັງກາ',
  			'Blis' => 'ບລິກຊິມໂບລສ',
  			'Bopo' => 'ຈູ້ອິນ',
  			'Brah' => 'ພຮາຫມີ',
@@ -835,9 +841,10 @@ has 'display_name_script' => (
  			'Glag' => 'ກລາໂກລິຕິກ',
  			'Goth' => 'ໂກຮິກ',
  			'Gran' => 'ເຄນທາ',
- 			'Grek' => 'ກະເລັກ',
+ 			'Grek' => 'ກຣີກ',
  			'Gujr' => 'ຈູຈາຣາທີ',
  			'Guru' => 'ກົວມູຄີ',
+ 			'Hanb' => 'ຮັນ',
  			'Hang' => 'ຮັນກູນ',
  			'Hani' => 'ຮານ',
  			'Hano' => 'ຮານູໂນໂອ',
@@ -849,17 +856,18 @@ has 'display_name_script' => (
  			'Hira' => 'ຣິຣະງະນະ',
  			'Hluw' => 'ອັກລຮະອານາໂຕເລຍ',
  			'Hmng' => 'ປາເຮາເມັງ',
- 			'Hrkt' => 'ຄະຕະກະນະຫຮືຮີຮະງະນະ',
+ 			'Hrkt' => 'ຕາຕາລາງພະຍາງພາສາຍີ່ປຸ່ນ',
  			'Hung' => 'ຮັງກາຮີໂບຮານ',
  			'Inds' => 'ອິນດັດ',
  			'Ital' => 'ອີຕາລີໂບຮານ',
+ 			'Jamo' => 'ຈາໂມ',
  			'Java' => 'ຈາວາ',
  			'Jpan' => 'ຍີ່ປຸ່ນ',
  			'Jurc' => 'ຈູຮເຊັນ',
  			'Kali' => 'ຄຍາ',
  			'Kana' => 'ຄະຕະກະນະ',
  			'Khar' => 'ຂໍໂຮກສີ',
- 			'Khmr' => 'ຂະໝຽນ',
+ 			'Khmr' => 'ຂະແມ',
  			'Khoj' => 'ຄໍຈຄີ',
  			'Knda' => 'ຄັນນາດາ',
  			'Kore' => 'ເກົາຫຼີ',
@@ -884,7 +892,7 @@ has 'display_name_script' => (
  			'Mend' => 'ເມນເດ',
  			'Merc' => 'ເຄເລີຊີເມໂຮອິຕິກ',
  			'Mero' => 'ເມໂຮຕິກ',
- 			'Mlym' => 'ມາລາຍັນ',
+ 			'Mlym' => 'ມາເລຢາລາມ',
  			'Mong' => 'ມົງໂກນ',
  			'Moon' => 'ມູນ',
  			'Mroo' => 'ເມໂຮ',
@@ -898,7 +906,7 @@ has 'display_name_script' => (
  			'Ogam' => 'ອອກຄອນ',
  			'Olck' => 'ໂອຊິກິ',
  			'Orkh' => 'ອອກສມັນຍາ',
- 			'Orya' => 'ໂອຣິຢາ',
+ 			'Orya' => 'ໂອເດຍ',
  			'Palm' => 'ພາລໄມຮິນ',
  			'Perm' => 'ເພີມີໂບຮານ',
  			'Phag' => 'ຟາກສ-ປາ',
@@ -934,7 +942,7 @@ has 'display_name_script' => (
  			'Taml' => 'ທາມິລ',
  			'Tang' => 'ຕັນກັນ',
  			'Tavt' => 'ໄທຫວຽດ',
- 			'Telu' => 'ເຕລູກູ',
+ 			'Telu' => 'ເທລູກູ',
  			'Teng' => 'ເທງກວາຮ',
  			'Tfng' => 'ທີຟີນາກ',
  			'Tglg' => 'ຕາກາລອກ',
@@ -952,10 +960,11 @@ has 'display_name_script' => (
  			'Yiii' => 'ຍີ',
  			'Zinh' => 'ອິນເຮຮິດ',
  			'Zmth' => 'ເຄື່ອງໝາຍທາງຄະນິດສາດ',
+ 			'Zsye' => 'ອີໂມຈິ',
  			'Zsym' => 'ສັນຍາລັກ',
  			'Zxxx' => 'ບໍ່ມີພາສາຂຽນ',
  			'Zyyy' => 'ສາມັນ',
- 			'Zzzz' => 'ການຂຽນທີ່ບໍ່ຮູ້ຈັກ',
+ 			'Zzzz' => 'ແບບຂຽນທີ່ບໍ່ຮູ້ຈັກ',
 
 			);
 			if ( @_ ) {
@@ -982,7 +991,7 @@ has 'display_name_region' => (
  			'014' => 'ອາຟຣິກາຕາເວັນອອກ',
  			'015' => 'ອາຟຣິກາເໜືອ',
  			'017' => 'ອາຟຣິກາກາງ',
- 			'018' => 'ອາຟຣິກາໃຕ້',
+ 			'018' => 'ອາຟຣິກາຕອນໃຕ້',
  			'019' => 'ອາເມຣິກາ',
  			'021' => 'ພາກເໜືອອາເມລີກາ',
  			'029' => 'ຄາຣິບບຽນ',
@@ -1005,26 +1014,26 @@ has 'display_name_region' => (
  			'AC' => 'ເກາະອາເຊນຊັນ',
  			'AD' => 'ອັນດໍຣາ',
  			'AE' => 'ສະຫະລັດອາຣັບເອມິເຣດ',
- 			'AF' => 'ອາຟການິສຖານ',
- 			'AG' => 'ອາທິກົວ ບາບູດາ',
+ 			'AF' => 'ອາຟການິດສະຖານ',
+ 			'AG' => 'ແອນທິກົວ ແລະ ບາບູດາ',
  			'AI' => 'ແອນກຸຍລາ',
  			'AL' => 'ແອວເບເນຍ',
  			'AM' => 'ອາເມເນຍ',
- 			'AO' => 'ອັນໂກລາ',
+ 			'AO' => 'ແອງໂກລາ',
  			'AQ' => 'ແອນຕາດຕິກາ',
  			'AR' => 'ອາເຈນທິນາ',
  			'AS' => 'ອາເມຣິກາ ຊາມົວ',
- 			'AT' => 'ໂອຕາລິກ',
+ 			'AT' => 'ອອສເທຣຍ',
  			'AU' => 'ອອສເຕຣເລຍ',
- 			'AW' => 'ອໍຣູບາ',
+ 			'AW' => 'ອາຣູບາ',
  			'AX' => 'ຫມູ່ເກາະໂອລັນ',
  			'AZ' => 'ອາເຊີໄບຈານ',
  			'BA' => 'ບອດສະເນຍ ແລະ ແຮສໂກວີນາ',
  			'BB' => 'ບາບາໂດສ',
  			'BD' => 'ບັງກະລາເທດ',
- 			'BE' => 'ແບລຊິກ',
+ 			'BE' => 'ເບວຢຽມ',
  			'BF' => 'ເບີກິນາ ຟາໂຊ',
- 			'BG' => 'ບູລກາຣິ',
+ 			'BG' => 'ບັງກາເຣຍ',
  			'BH' => 'ບາເຣນ',
  			'BI' => 'ບູຣຸນດິ',
  			'BJ' => 'ເບນິນ',
@@ -1033,14 +1042,14 @@ has 'display_name_region' => (
  			'BN' => 'ບຣູໄນ',
  			'BO' => 'ໂບລິເວຍ',
  			'BQ' => 'ຄາຣິບບຽນ ເນເທີແລນ',
- 			'BR' => 'ບະເລຊີນ',
+ 			'BR' => 'ບຣາຊິວ',
  			'BS' => 'ບາຮາມາສ',
  			'BT' => 'ພູຖານ',
  			'BV' => 'ເກາະບູເວດ',
  			'BW' => 'ບອດສະວານາ',
  			'BY' => 'ເບວບາຣຸສ',
  			'BZ' => 'ເບລີຊ',
- 			'CA' => 'ການາດາ',
+ 			'CA' => 'ແຄນາດາ',
  			'CC' => 'ຫມູ່ເກາະໂກໂກສ',
  			'CD' => 'ຄອງໂກ - ຄິນຊາຊາ',
  			'CD@alt=variant' => 'ຄອງໂກ (ສາທາລະນະລັດປະຊາທິປະໄຕ)',
@@ -1051,18 +1060,19 @@ has 'display_name_region' => (
  			'CI' => 'ໂຄຕີ ວົວ',
  			'CI@alt=variant' => 'ໄອໂວຣີ ໂຄທ',
  			'CK' => 'ໝູ່ເກາະຄຸກ',
- 			'CL' => 'ຈີເລ',
+ 			'CL' => 'ຊິລີ',
  			'CM' => 'ຄາເມຣູນ',
  			'CN' => 'ຈີນ',
  			'CO' => 'ໂຄລົມເບຍ',
  			'CP' => 'ເກາະຄລິບເປີຕັນ',
  			'CR' => 'ໂຄສຕາ ຣິກາ',
- 			'CU' => 'ກຸຍບາ',
+ 			'CU' => 'ຄິວບາ',
  			'CV' => 'ເຄບ ເວີດ',
  			'CW' => 'ຄູຣາຊາວ',
  			'CX' => 'ເກາະຄຣິສມາດ',
  			'CY' => 'ໄຊປຣັສ',
- 			'CZ' => 'ສາທາລະນະລັດເຊກ',
+ 			'CZ' => 'ເຊັກເຊຍ',
+ 			'CZ@alt=variant' => 'ສາທາລະນະລັດເຊັກ',
  			'DE' => 'ເຢຍລະມັນ',
  			'DG' => 'ດິເອໂກ ກາເຊຍ',
  			'DJ' => 'ຈິບູຕິ',
@@ -1079,7 +1089,8 @@ has 'display_name_region' => (
  			'ES' => 'ສະເປນ',
  			'ET' => 'ອີທິໂອເປຍ',
  			'EU' => 'ສະຫະພາບຢູໂຣບ',
- 			'FI' => 'ຝຽກລັງ',
+ 			'EZ' => 'ເຂດຢູໂຣບ',
+ 			'FI' => 'ຟິນແລນ',
  			'FJ' => 'ຟິຈິ',
  			'FK' => 'ຫມູ່ເກາະຟອກແລນ',
  			'FK@alt=variant' => 'ໝູ່ເກາະຟອກແລນ (ອິສລາສ ມາວິນນາສ)',
@@ -1099,15 +1110,15 @@ has 'display_name_region' => (
  			'GM' => 'ສາທາລະນະລັດແກມເບຍ',
  			'GN' => 'ກິນີ',
  			'GP' => 'ກົວດາລູບ',
- 			'GQ' => 'ອີຄົວໂຕຣຽວ ກີນີ',
+ 			'GQ' => 'ເອຄົວໂທຣຽວ ກີນີ',
  			'GR' => 'ກຣີຊ',
- 			'GS' => 'ໝູ່ເກາະຈໍເຈຍ & ເຊົາ ແຊນວິດ',
+ 			'GS' => 'ໝູ່ເກາະ ຈໍເຈຍຕອນໃຕ້ ແລະ ແຊນວິດຕອນໃຕ້',
  			'GT' => 'ກົວເທມາລາ',
- 			'GU' => 'ກວມ',
+ 			'GU' => 'ກວາມ',
  			'GW' => 'ກິນີ-ບິສເຊົາ',
  			'GY' => 'ກາຍຢານາ',
- 			'HK' => 'ຮອງກົງ ເຂດປົກຄອງພິເສດ ຈີນ',
- 			'HK@alt=short' => 'ຮອງກົງ',
+ 			'HK' => 'ຮົງກົງ ເຂດປົກຄອງພິເສດ ຈີນ',
+ 			'HK@alt=short' => 'ຮົງກົງ',
  			'HM' => 'ໝູ່ເກາະເຮີດ & ແມັກໂດນອລ',
  			'HN' => 'ຮອນດູຣັສ',
  			'HR' => 'ໂຄຣເອເທຍ',
@@ -1115,13 +1126,13 @@ has 'display_name_region' => (
  			'HU' => 'ຮັງກາຣີ',
  			'IC' => 'ໝູ່ເກາະຄານາຣີ',
  			'ID' => 'ອິນໂດເນເຊຍ',
- 			'IE' => 'ໄອຣ໌ແລນ',
+ 			'IE' => 'ໄອແລນ',
  			'IL' => 'ອິສຣາເອວ',
  			'IM' => 'ເອວ ອອບ ແມນ',
  			'IN' => 'ອິນເດຍ',
- 			'IO' => 'ເຂດແດນບຣິທິສອິນດຽນໂອຊຽນ',
+ 			'IO' => 'ເຂດແດນອັງກິດໃນມະຫາສະມຸດອິນເດຍ',
  			'IQ' => 'ອີຣັກ',
- 			'IR' => 'ອີຣ່ານ',
+ 			'IR' => 'ອີຣານ',
  			'IS' => 'ໄອສແລນ',
  			'IT' => 'ອິຕາລີ',
  			'JE' => 'ເຈີຊີ',
@@ -1129,7 +1140,7 @@ has 'display_name_region' => (
  			'JO' => 'ຈໍແດນ',
  			'JP' => 'ຍີ່ປຸ່ນ',
  			'KE' => 'ເຄນຢາ',
- 			'KG' => 'ຄີກິສຖານ',
+ 			'KG' => 'ຄຽກກິດສະຖານ',
  			'KH' => 'ກຳປູເຈຍ',
  			'KI' => 'ຄິຣິບາທິ',
  			'KM' => 'ໂຄໂມໂຣສ',
@@ -1137,7 +1148,7 @@ has 'display_name_region' => (
  			'KP' => 'ເກົາຫລີເໜືອ',
  			'KR' => 'ເກົາຫລີໃຕ້',
  			'KW' => 'ກູເວດ',
- 			'KY' => 'ເຄແມນ ໄອແລນ',
+ 			'KY' => 'ໝູ່ເກາະ ເຄແມນ',
  			'KZ' => 'ຄາຊັກສະຖານ',
  			'LA' => 'ລາວ',
  			'LB' => 'ເລບານອນ',
@@ -1147,7 +1158,7 @@ has 'display_name_region' => (
  			'LR' => 'ລິເບີເຣຍ',
  			'LS' => 'ເລໂຊໂທ',
  			'LT' => 'ລິທົວເນຍ',
- 			'LU' => 'ລຸກຊຳບົວ',
+ 			'LU' => 'ລຸກແຊມເບີກ',
  			'LV' => 'ລັດເວຍ',
  			'LY' => 'ລິເບຍ',
  			'MA' => 'ໂມຣັອກໂຄ',
@@ -1155,15 +1166,15 @@ has 'display_name_region' => (
  			'MD' => 'ໂມນໂດວາ',
  			'ME' => 'ມອນເຕເນໂກຣ',
  			'MF' => 'ເຊນ ມາທິນ',
- 			'MG' => 'ມາດາກາສກາ',
+ 			'MG' => 'ມາດາກາສະກາ',
  			'MH' => 'ຫມູ່ເກາະມາແຊວ',
  			'MK' => 'ແມຊິໂດເນຍ',
  			'MK@alt=variant' => 'ແມຊິໂດເນຍ (FYROM)',
- 			'ML' => 'ມາລິ',
+ 			'ML' => 'ມາລີ',
  			'MM' => 'ມຽນມາ (ເບີມາ)',
- 			'MN' => 'ມົງໂກລີ',
- 			'MO' => 'ມາເກົ້າ ເຂດປົກຄອງພິເສດ ຈີນ',
- 			'MO@alt=short' => 'ມາເກົ້າ',
+ 			'MN' => 'ມອງໂກເລຍ',
+ 			'MO' => 'ມາກາວ ເຂດປົກຄອງພິເສດ ຈີນ',
+ 			'MO@alt=short' => 'ມາກາວ',
  			'MP' => 'ຫມູ່ເກາະມາແຊວຕອນເຫນືອ',
  			'MQ' => 'ມາຕິນີກ',
  			'MR' => 'ມົວຣິເທເນຍ',
@@ -1172,7 +1183,7 @@ has 'display_name_region' => (
  			'MU' => 'ມົວຣິຊຽສ',
  			'MV' => 'ມັນດິຟ',
  			'MW' => 'ມາລາວີ',
- 			'MX' => 'ແມັກຊີໂກ',
+ 			'MX' => 'ເມັກຊິໂກ',
  			'MY' => 'ມາເລເຊຍ',
  			'MZ' => 'ໂມແຊມບິກ',
  			'NA' => 'ນາມີເບຍ',
@@ -1182,7 +1193,7 @@ has 'display_name_region' => (
  			'NG' => 'ໄນຈີເຣຍ',
  			'NI' => 'ນິກຄາຣາກົວ',
  			'NL' => 'ເນເທີແລນ',
- 			'NO' => 'ນອກແວ໊',
+ 			'NO' => 'ນໍເວ',
  			'NP' => 'ເນປານ',
  			'NR' => 'ນາອູຣູ',
  			'NU' => 'ນີອູເອ',
@@ -1190,23 +1201,23 @@ has 'display_name_region' => (
  			'OM' => 'ໂອມານ',
  			'PA' => 'ພານາມາ',
  			'PE' => 'ເປຣູ',
- 			'PF' => 'ເຟຣນຊ໌ ໂພລີນີເຊຍ',
+ 			'PF' => 'ເຟຣນຊ໌ ໂພລິນີເຊຍ',
  			'PG' => 'ປາປົວນິວກີນີ',
  			'PH' => 'ຟິລິບປິນ',
- 			'PK' => 'ປາກິສຖານ',
- 			'PL' => 'ໂປໂລຍ',
+ 			'PK' => 'ປາກິດສະຖານ',
+ 			'PL' => 'ໂປແລນ',
  			'PM' => 'ເຊນ ປີແອ ມິເກວລອນ',
  			'PN' => 'ໝູ່ເກາະພິດແຄນ',
  			'PR' => 'ເພືອໂຕ ຣິໂກ',
  			'PS' => 'ດິນແດນ ປາເລສຕິນຽນ',
- 			'PS@alt=short' => 'ປາເລສຕິນ',
+ 			'PS@alt=short' => 'ປາເລສຕາຍ',
  			'PT' => 'ພອລທູໂກ',
- 			'PW' => 'ປາເລົາ',
+ 			'PW' => 'ປາລາວ',
  			'PY' => 'ພາຣາກວຍ',
  			'QA' => 'ກາຕາ',
  			'QO' => 'ເຂດຫ່າງໄກໂອຊີເນຍ',
  			'RE' => 'ເຣອູນິຍົງ',
- 			'RO' => 'ໂຣມານີ',
+ 			'RO' => 'ໂຣແມເນຍ',
  			'RS' => 'ເຊີເບຍ',
  			'RU' => 'ຣັດເຊຍ',
  			'RW' => 'ຣວັນດາ',
@@ -1223,7 +1234,7 @@ has 'display_name_region' => (
  			'SL' => 'ເຊຍຣາ ລີໂອນ',
  			'SM' => 'ແຊນ ມາຣິໂນ',
  			'SN' => 'ເຊນີໂກລ',
- 			'SO' => 'ໂຊມາລີ',
+ 			'SO' => 'ໂຊມາເລຍ',
  			'SR' => 'ຊູຣິນາມ',
  			'SS' => 'ຊູດານໃຕ້',
  			'ST' => 'ເຊົາທູເມ ແລະ ພຣິນຊິບ',
@@ -1237,11 +1248,11 @@ has 'display_name_region' => (
  			'TF' => 'ເຂດແດນທາງໃຕ້ຂອຝຮັ່ງ',
  			'TG' => 'ໂຕໂກ',
  			'TH' => 'ໄທ',
- 			'TJ' => 'ທາຈິກິສຖານ',
+ 			'TJ' => 'ທາຈິກິດສະຖານ',
  			'TK' => 'ໂຕເກເລົາ',
  			'TL' => 'ທິມໍ-ເລສເຕ',
  			'TL@alt=variant' => 'ທິມໍ ຕາເວັນອອກ',
- 			'TM' => 'ເທີກເມນິສຖານ',
+ 			'TM' => 'ເທີກເມນິສະຖານ',
  			'TN' => 'ຕູນິເຊຍ',
  			'TO' => 'ທອງກາ',
  			'TR' => 'ເທີຄີ',
@@ -1252,23 +1263,25 @@ has 'display_name_region' => (
  			'UA' => 'ຢູເຄຣນ',
  			'UG' => 'ອູການດາ',
  			'UM' => 'ໝູ່ເກາະຮອບນອກຂອງສະຫະລັດຯ',
+ 			'UN' => 'ສະຫະປະຊາຊາດ',
+ 			'UN@alt=short' => 'ຢູເອັນ',
  			'US' => 'ສະຫະລັດ',
  			'US@alt=short' => 'ສະຫະລັດຯ',
  			'UY' => 'ອູຣຸກວຍ',
- 			'UZ' => 'ອຸສເບກິສຖານ',
+ 			'UZ' => 'ອຸສເບກິສະຖານ',
  			'VA' => 'ນະຄອນ ວາຕິກັນ',
- 			'VC' => 'ເຊນ ວິນເຊນ & ເກຣເນດິນ',
+ 			'VC' => 'ເຊນ ວິນເຊນ ແລະ ເກຣເນດິນ',
  			'VE' => 'ເວເນຊູເອລາ',
- 			'VG' => 'ໝູ່ເກາະ ບຣິທິຊ ເວີຈິນ',
- 			'VI' => 'ໝູ່ເກາະ ຢູເອສ ເວີຈິນ',
+ 			'VG' => 'ໝູ່ເກາະ ເວີຈິນຂອງອັງກິດ',
+ 			'VI' => 'ໝູ່ເກາະ ເວີຈິນ ຂອງສະຫະລັດ',
  			'VN' => 'ຫວຽດນາມ',
  			'VU' => 'ວານົວຕູ',
- 			'WF' => 'ວາລິສ ແລະ ຟຸຕູນາ',
+ 			'WF' => 'ວາລລິສ ແລະ ຟູຕູນາ',
  			'WS' => 'ຊາມົວ',
  			'XK' => 'ໂຄໂຊໂວ',
  			'YE' => 'ເຢເມນ',
  			'YT' => 'ມາຢັອດ',
- 			'ZA' => 'ອາຟະລິກາໃຕ້',
+ 			'ZA' => 'ອາຟຣິກາໃຕ້',
  			'ZM' => 'ແຊມເບຍ',
  			'ZW' => 'ຊິມບັບເວ',
  			'ZZ' => 'ຂົງເຂດທີ່ບໍ່ຮູ້ຈັກ',
@@ -1351,10 +1364,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'ປະຕິທິນ',
+ 			'cf' => 'ຮູບແບບສະກຸນເງິນ',
  			'collation' => 'ຮຽງລຳດັບ',
  			'currency' => 'ສະກຸນເງິນ',
- 			'hc' => 'ຮອບວຽນຊົວໂມງ( 12 ຫຼື 24)',
- 			'lb' => 'ຮູບແບບການຍຸດຜອນຕາມເສັ້ນຕົງ',
+ 			'hc' => 'ຮອບວຽນຊົ່ວໂມງ( 12 ຫຼື 24)',
+ 			'lb' => 'ຮູບແບບເສັ້ນຂັ້ນ',
  			'ms' => 'ລະບົບການວັດແທກ',
  			'numbers' => 'ຕົວເລກ',
 
@@ -1385,6 +1399,10 @@ has 'display_name_type' => (
  				'persian' => q{ປະຕິທິນເປີຊຽນ},
  				'roc' => q{ປະຕິທິນໄຕ້ຫວັນ},
  			},
+ 			'cf' => {
+ 				'account' => q{ຮູບແບບສະກຸນເງິນການບັນຊີ},
+ 				'standard' => q{ຮູບແບບສະກຸນເງິນມາດຕະຖານ},
+ 			},
  			'collation' => {
  				'big5han' => q{ລຽງຕາມອັກສອນຈີນດັ້ງເດີມ},
  				'dictionary' => q{ລຽງຕາມພົດຈະນານຸກົມ},
@@ -1401,19 +1419,19 @@ has 'display_name_type' => (
  				'unihan' => q{ລຽງລຳດັບຕາມຈຳນວນຂີດ},
  			},
  			'hc' => {
- 				'h11' => q{ຕາມລະບົບ 12 ຊົວໂມງ (0–11)},
- 				'h12' => q{ຕາມລະບົບ 12 ຊົວໂມງ (1–12)},
- 				'h23' => q{ຕາມລະບົບ 24 ຊົວໂມງ (0–23)},
- 				'h24' => q{ຕາມລະບົບ 24 ຊົວໂມງ (1–24)},
+ 				'h11' => q{ຕາມລະບົບ 12 ຊົ່ວໂມງ (0–11)},
+ 				'h12' => q{ຕາມລະບົບ 12 ຊົ່ວໂມງ (1–12)},
+ 				'h23' => q{ຕາມລະບົບ 24 ຊົ່ວໂມງ (0–23)},
+ 				'h24' => q{ຕາມລະບົບ 24 ຊົ່ວໂມງ (1–24)},
  			},
  			'lb' => {
- 				'loose' => q{ຮູບແບບການຍຸດຜອນຕາມເສັ້ນລວມ},
- 				'normal' => q{ຮູບແບບການຍຸດຜອນຕາມປົກກະຕິ},
- 				'strict' => q{ຮູບແບບການຍຸດຜອນແບບເຄັ່ມຫງວດ},
+ 				'loose' => q{ຮູບແບບເສັ້ນຂັ້ນແບບຫຼວມ},
+ 				'normal' => q{ຮູບແບບເສັ້ນຂັ້ນແບບປົກກະຕິ},
+ 				'strict' => q{ຮູບແບບເສັ້ນຂັ້ນແບບເຄັ່ງຄັດ},
  			},
  			'ms' => {
- 				'metric' => q{ລະບົບແມັດຕິດ},
- 				'uksystem' => q{ລະບົບການວັດແທກແບບຕາເວັນຕົກ},
+ 				'metric' => q{ລະບົບເມທຣິກ},
+ 				'uksystem' => q{ລະບົບການວັດແທກແບບອິມເພີຣຽວ},
  				'ussystem' => q{ລະບົບການວັດແທກແບບສະຫະລັດ},
  			},
  			'numbers' => {
@@ -1422,17 +1440,17 @@ has 'display_name_type' => (
  				'armn' => q{ຕົວເລກອາເມນຽນ},
  				'armnlow' => q{ຕົວເລກອາເມນຽນຕົວພິມນ້ອຍ},
  				'bali' => q{ຕົວເລກບາລີ},
- 				'beng' => q{ຕົວເລກເບັງກາລີ},
+ 				'beng' => q{ຕົວເລກບັງກລາ},
  				'cham' => q{ຕົວເລກຊຣາມ},
- 				'deva' => q{ຕົວເລກເນວັນເນກາຣີ},
+ 				'deva' => q{ຕົວເລກເດວານາກາຣີ},
  				'ethi' => q{ຕົວເລກເອທິໂອປິກ},
  				'fullwide' => q{ຕົວເລກຄວາມກວ້າງເຕັມ},
  				'geor' => q{ຕົວເລກຈໍຈຽນ},
  				'grek' => q{ຕົວເລກກຣີກ},
  				'greklow' => q{ຕົວເລກກຣີກຕົວພິມນ້ອຍ},
- 				'gujr' => q{ຕົວເລກກຸຈາລາຕິ},
+ 				'gujr' => q{ຕົວເລກກຸຈາຣາທີ},
  				'guru' => q{ຕົວເລກກົວມູຄິ},
- 				'hanidec' => q{ຕົວເລກທົດສະນິນົມຈີນ},
+ 				'hanidec' => q{ຕົວເລກທົດສະນິຍົມຈີນ},
  				'hans' => q{ຕົວເລກຈີນແບບຮຽບງ່າຍ},
  				'hansfin' => q{ຕົວເລກທາງການເງິນແບບຮຽບງ່າຍຂອງຈີນ},
  				'hant' => q{ຕົວເລກຈີນແບບດັ້ງເດີມ},
@@ -1442,7 +1460,7 @@ has 'display_name_type' => (
  				'jpan' => q{ຕົວເລກຍີ່ປຸ່ນ},
  				'jpanfin' => q{ຕົວເລກທາງການເງິນຂອງຍີ່ປຸ່ນ},
  				'kali' => q{ຕົວເລກກາຢາ},
- 				'khmr' => q{ຕົວເລກຂະໝຽນ},
+ 				'khmr' => q{ຕົວເລກຂະແມ},
  				'knda' => q{ຕົວເລກແຄນນາດາ},
  				'lana' => q{ຕົວເລກໄທທຳໂຮລາ},
  				'lanatham' => q{ຕົວເລກໄທທຳທຳ},
@@ -1457,13 +1475,13 @@ has 'display_name_type' => (
  				'mymrshan' => q{ຕົວເລກຊານພະມ້າ},
  				'nkoo' => q{ຕົວເລກເອັນໂກ້},
  				'olck' => q{ຕົວເລກໂອລຈິກິ},
- 				'orya' => q{ຕົວເລກໂອຣິຢາ},
+ 				'orya' => q{ຕົວເລກໂອດິອາ},
  				'roman' => q{ຕົວເລກໂຣມັນ},
  				'romanlow' => q{ຕົວເລກໂຣມັນຕົວພິມນ້ອຍ},
  				'saur' => q{ຕົວເລກເສົາລັດທາ},
  				'sund' => q{ຕົວເລກຊຸນດາ},
  				'talu' => q{ຕົວເລກໄຕລື້ໃໝ່},
- 				'taml' => q{ຕົວເລກທາມິວແບບດັ້ງເດີມ},
+ 				'taml' => q{ຕົວເລກທາມິລແບບດັ້ງເດີມ},
  				'tamldec' => q{ຕົວເລກທາມິວ},
  				'telu' => q{ຕົວເລກເຕລູກູ},
  				'thai' => q{ຕົວເລກໄທ},
@@ -1483,7 +1501,7 @@ has 'display_name_measurement_system' => (
 		{
 			'metric' => q{ເມທຣິກ},
  			'UK' => q{ອັງກິດ},
- 			'US' => q{ອາເມລິກາ},
+ 			'US' => q{ອາເມຣິກາ},
 
 		}
 	},
@@ -1512,9 +1530,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[​ ໐ ໑ ໒ ໓ ໔ ໕ ໖ ໗ ໘ ໙])},
+			auxiliary => qr{[​ ໐ ໑ ໒ ໓ ໔ ໕ ໖ ໗ ໘ ໙]},
 			index => ['ກ', 'ຂ', 'ຄ', 'ງ', 'ຈ', 'ສ', 'ຊ', 'ຍ', 'ດ', 'ຕ', 'ຖ', 'ທ', 'ນ', 'ບ', 'ປ', 'ຜ', 'ຝ', 'ພ', 'ຟ', 'ມ', 'ຢ', 'ຣ', 'ລ', 'ວ', 'ຫ', '{ຫງ}', '{ຫຍ}', '{ຫນ}', '{ຫມ}', '{ຫລ}', '{ຫວ}', 'ອ', 'ຮ'],
-			main => qr{(?^u:[່ ້ ໊ ໋ ໌ ໍ ໆ ກ ຂ ຄ ງ ຈ ສ ຊ ຍ ດ ຕ ຖ ທ ນ ບ ປ ຜ ຝ ພ ຟ ມ ຢ ຣ ລ ວ ຫ ໜ ໝ ອ ຮ ຯ ະ ັ າ ຳ ິ ີ ຶ ື ຸ ູ ົ ຼ ຽ ເ ແ ໂ ໃ ໄ])},
+			main => qr{[່ ້ ໊ ໋ ໌ ໍ ໆ ກ ຂ ຄ ງ ຈ ສ ຊ ຍ ດ ຕ ຖ ທ ນ ບ ປ ຜ ຝ ພ ຟ ມ ຢ ຣ ລ ວ ຫ ໜ ໝ ອ ຮ ຯ ະ ັ າ ຳ ິ ີ ຶ ື ຸ ູ ົ ຼ ຽ ເ ແ ໂ ໃ ໄ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1634,7 +1654,7 @@ has 'units' => (
 					},
 					'celsius' => {
 						'name' => q(ອົງສາເຊວຊຽສ),
-						'other' => q({0} ອົງສາເຊວຊຽສ),
+						'other' => q({0} ອົງສາ ຊີ.),
 					},
 					'centiliter' => {
 						'name' => q(cL),
@@ -1735,6 +1755,11 @@ has 'units' => (
 						'name' => q(gal),
 						'other' => q({0} gal),
 						'per' => q({0} per gallon),
+					},
+					'gallon-imperial' => {
+						'name' => q(ແກລລອນອັງກິດ),
+						'other' => q({0} ແກລລອນອັງກິດ),
+						'per' => q({0}/gal Imp.),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -1924,12 +1949,16 @@ has 'units' => (
 						'other' => q({0} ໄມ​ໂຄຣ​ວິ​ນາ​ທີ),
 					},
 					'mile' => {
-						'name' => q(ໄມ),
-						'other' => q({0} ໄມ),
+						'name' => q(ໄມລ໌),
+						'other' => q({0} ໄມລ໌),
 					},
 					'mile-per-gallon' => {
 						'name' => q(ໄມລ໌ຕໍ່ແກລອນ),
 						'other' => q({0} ໄມລ໌ຕໍ່ແກລອນ),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(ໄມລ໌ຕໍ່ແກລລອນອັງກິດ),
+						'other' => q({0} ໄມລ໌ຕໍ່ແກລລອນອັງກິດ),
 					},
 					'mile-per-hour' => {
 						'name' => q(ໄມລ໌ຕໍ່ຊົ່ວໂມງ),
@@ -1951,6 +1980,10 @@ has 'units' => (
 						'name' => q(mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(ມິລິກຣັມຕໍ່ເດຊິລິດ),
+						'other' => q({0} mg/dL),
+					},
 					'milliliter' => {
 						'name' => q(mL),
 						'other' => q({0} mL),
@@ -1962,6 +1995,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'name' => q(ມິລິໂມລຕໍ່ລິດ),
+						'other' => q({0} ມິລິໂມລຕໍ່ລິດ),
 					},
 					'millisecond' => {
 						'name' => q(ມິນລີວິນາທີ),
@@ -2010,6 +2047,10 @@ has 'units' => (
 						'name' => q(parsecs),
 						'other' => q({0} parsecs),
 					},
+					'part-per-million' => {
+						'name' => q(ພາດຕໍ່ລ້ານ),
+						'other' => q({0} ພາດຕໍ່ລ້ານ),
+					},
 					'per' => {
 						'1' => q({0} ຕໍ່ {1}),
 					},
@@ -2024,6 +2065,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(metric pints),
 						'other' => q({0} metric pints),
+					},
+					'point' => {
+						'name' => q(ຈຸດ),
+						'other' => q({0} ຈຸດ),
 					},
 					'pound' => {
 						'name' => q(ປອນ),
@@ -2068,6 +2113,7 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(ກິໂລຕາແມັດ),
 						'other' => q({0} ກິໂລຕາແມັດ),
+						'per' => q({0} ຕໍ່ຕາກິໂລແມັດກ້ອນ),
 					},
 					'square-meter' => {
 						'name' => q(ຕາແມັດ),
@@ -2077,6 +2123,7 @@ has 'units' => (
 					'square-mile' => {
 						'name' => q(ຕາ​ລາງໄມລ໌),
 						'other' => q({0} ຕາ​ລາງໄມລ໌),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(square yards),
@@ -2217,7 +2264,7 @@ has 'units' => (
 					},
 					'liter' => {
 						'name' => q(ລິດ),
-						'other' => q({0} ລ),
+						'other' => q({0}L),
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(ລ/ 100 ກມ),
@@ -2416,8 +2463,8 @@ has 'units' => (
 						'other' => q({0} dL),
 					},
 					'decimeter' => {
-						'name' => q(dm),
-						'other' => q({0} dm),
+						'name' => q(ດມ),
+						'other' => q({0} ດມ),
 					},
 					'degree' => {
 						'name' => q(ອົງສາ),
@@ -2438,7 +2485,7 @@ has 'units' => (
 					'foot' => {
 						'name' => q(ຟຸດ),
 						'other' => q({0} ຟ),
-						'per' => q({0}/ຟຸດ),
+						'per' => q({0}/ຟ),
 					},
 					'g-force' => {
 						'name' => q(ແຮງຕົກຕາມລຳພັງ),
@@ -2448,6 +2495,11 @@ has 'units' => (
 						'name' => q(gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'name' => q(Imp. gal),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2496,13 +2548,13 @@ has 'units' => (
 					},
 					'hour' => {
 						'name' => q(ຊົ່ວໂມງ),
-						'other' => q({0} ຊມ.),
-						'per' => q({0}/ຊມ.),
+						'other' => q({0} ຊມ),
+						'per' => q({0}/ຊມ),
 					},
 					'inch' => {
 						'name' => q(ນິ້ວ),
 						'other' => q({0} ນິ),
-						'per' => q({0}/ນີວ),
+						'per' => q({0}/ນິ),
 					},
 					'inch-hg' => {
 						'name' => q(in Hg),
@@ -2548,7 +2600,7 @@ has 'units' => (
 					'kilometer' => {
 						'name' => q(ກມ),
 						'other' => q({0} ກມ),
-						'per' => q({0}/ກິໂລແມັດ),
+						'per' => q({0}/ກມ),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(ກມ/ຊມ),
@@ -2572,7 +2624,7 @@ has 'units' => (
 					},
 					'liter' => {
 						'name' => q(ລິດ),
-						'other' => q({0} ລິດ),
+						'other' => q({0} L),
 						'per' => q({0}/l),
 					},
 					'liter-per-100kilometers' => {
@@ -2610,7 +2662,7 @@ has 'units' => (
 					'meter' => {
 						'name' => q(ແມັດ),
 						'other' => q({0} ມ),
-						'per' => q({0}/ແມັດ),
+						'per' => q({0}/ມ),
 					},
 					'meter-per-second' => {
 						'name' => q(ແມັດ/ນທ.),
@@ -2637,12 +2689,16 @@ has 'units' => (
 						'other' => q({0} μວິ),
 					},
 					'mile' => {
-						'name' => q(ໄມ),
+						'name' => q(ໄມລ໌),
 						'other' => q({0} ໄມ),
 					},
 					'mile-per-gallon' => {
 						'name' => q(ໄມລ໌/ແກລ),
 						'other' => q({0} mpg),
+					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(ໄມລ໌/ແກລລອນອັງກິດ),
+						'other' => q({0} mpg Imp.),
 					},
 					'mile-per-hour' => {
 						'name' => q(ໄມລ໌/ຊົ່ວໂມງ),
@@ -2664,6 +2720,10 @@ has 'units' => (
 						'name' => q(mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mg/dL),
+						'other' => q({0} mg/dL),
+					},
 					'milliliter' => {
 						'name' => q(mL),
 						'other' => q({0} mL),
@@ -2676,6 +2736,10 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'other' => q({0} mm Hg),
 					},
+					'millimole-per-liter' => {
+						'name' => q(ມິລິໂມນ/ລິດ),
+						'other' => q({0} mmol/L),
+					},
 					'millisecond' => {
 						'name' => q(ມິນລີວິ),
 						'other' => q({0} ມລວ),
@@ -2686,7 +2750,7 @@ has 'units' => (
 					},
 					'minute' => {
 						'name' => q(ນທ.),
-						'other' => q({0} ນທ.),
+						'other' => q({0} ນທ),
 						'per' => q({0}/ນາທີ),
 					},
 					'month' => {
@@ -2695,8 +2759,8 @@ has 'units' => (
 						'per' => q({0}/ເດືອນ),
 					},
 					'nanometer' => {
-						'name' => q(nm),
-						'other' => q({0} nm),
+						'name' => q(ນມ),
+						'other' => q({0} ນມ),
 					},
 					'nanosecond' => {
 						'name' => q(ນາ​ໂນ​ວິ​),
@@ -2723,12 +2787,16 @@ has 'units' => (
 						'name' => q(parsecs),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'name' => q(ພາດ/ລ້ານ),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
 					'picometer' => {
-						'name' => q(pm),
-						'other' => q({0} pm),
+						'name' => q(ປມ),
+						'other' => q({0} ປມ),
 					},
 					'pint' => {
 						'name' => q(pt),
@@ -2737,6 +2805,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'name' => q(ຈຸດ),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'name' => q(ປອນ),
@@ -2761,8 +2833,8 @@ has 'units' => (
 					},
 					'second' => {
 						'name' => q(ວິ.),
-						'other' => q({0} ວິ.),
-						'per' => q({0}/ວິ.),
+						'other' => q({0} ວິ),
+						'per' => q({0}/ວິ),
 					},
 					'square-centimeter' => {
 						'name' => q(ຊມ²),
@@ -2781,6 +2853,7 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(ກມ²),
 						'other' => q({0} ກມ²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(ແມັດ²),
@@ -2790,6 +2863,7 @@ has 'units' => (
 					'square-mile' => {
 						'name' => q(sq miles),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(yards²),
@@ -2835,7 +2909,7 @@ has 'units' => (
 					'year' => {
 						'name' => q(ປີ),
 						'other' => q({0} ປີ),
-						'per' => q({0}/y),
+						'per' => q({0}/ປີ),
 					},
 				},
 			} }
@@ -2948,13 +3022,13 @@ has 'number_formats' => (
 					'other' => '0 ລ້ານລ້ານ',
 				},
 				'10000000000000' => {
-					'other' => '00 ລ້ານລ້ານ',
+					'other' => '00ລລ',
 				},
 				'100000000000000' => {
-					'other' => '000 ລ້ານລ້ານ',
+					'other' => '000ລລ',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3027,24 +3101,24 @@ has 'number_formats' => (
 					'other' => '0 ລ້ານລ້ານ',
 				},
 				'10000000000000' => {
-					'other' => '00 ລ້ານລ້ານ',
+					'other' => '00ລລ',
 				},
 				'100000000000000' => {
-					'other' => '000 ລ້ານລ້ານ',
+					'other' => '000ລລ',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#',
+					'default' => '#',
 				},
 			},
 		},
@@ -3389,11 +3463,18 @@ has 'currencies' => (
 				'currency' => q(ຣູໂບ ເບຣາຣຸສ ໃໝ່\(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ),
 				'other' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ \(2000–2016\)),
+				'other' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -3449,6 +3530,12 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(ຊິ​ລຽນ ເປ​ໂຊ),
 				'other' => q(ຊິ​ລຽນ ເປ​ໂຊ),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(ຢວນຈີນ \(ນອກປະເທດ\)),
+				'other' => q(ຢວນຈີນ \(ນອກປະເທດ\)),
 			},
 		},
 		'CNY' => {
@@ -4233,8 +4320,8 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(ເປ​ຣູ​ວຽນ ນູ​ໂວ ໂຊ​ລ໌),
-				'other' => q(ເປ​ຣູ​ວຽນ ນູ​ໂວ ໂຊ​ລ໌),
+				'currency' => q(ເປ​ຣູ​ວຽນ ໂຊ​ລ໌),
+				'other' => q(ເປ​ຣູ​ວຽນ ໂຊ​ລ໌),
 			},
 		},
 		'PES' => {
@@ -4614,8 +4701,8 @@ has 'currencies' => (
 		'UZS' => {
 			symbol => 'UZS',
 			display_name => {
-				'currency' => q(ອຸສ​ເບ​ກິ​ສ​ຖານ ໂຊມ),
-				'other' => q(ອຸສ​ເບ​ກິ​ສ​ຖານ ໂຊມ),
+				'currency' => q(ອຸສເບກິສຖານິ ໂຊມ),
+				'other' => q(ອຸສເບກິສຖານິ ໂຊມ),
 			},
 		},
 		'VEB' => {
@@ -4659,7 +4746,7 @@ has 'currencies' => (
 		'XAF' => {
 			symbol => 'FCFA',
 			display_name => {
-				'currency' => q(ຟຣັງ ເຊຟານ ທະນາຄານລັດອາຟຣິກາກາງ),
+				'currency' => q(ສາທາລະນະລັດອາຟຣິກາກາງ),
 				'other' => q(ຟຣັງ ເຊຟານ ທະນາຄານລັດອາຟຣິກາກາງ),
 			},
 		},
@@ -4756,8 +4843,8 @@ has 'currencies' => (
 		},
 		'XXX' => {
 			display_name => {
-				'currency' => q(ສະ​ກຸນ​ເງິນ​ທີ່ບໍ່​ຮູັ​ຈັກ),
-				'other' => q(ສະ​ກຸນ​ເງິນ​ທີ່ບໍ່​ຮູັ​ຈັກ),
+				'currency' => q(ສະກຸນເງິນທີ່ບໍ່ຮູ້ຈັກ),
+				'other' => q(\(ສະກຸນເງິນທີ່ບໍ່ຮູ້ຈັກ\)),
 			},
 		},
 		'YDD' => {
@@ -5823,22 +5910,22 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'ວັນຈັນ',
-						tue => 'ວັນອັງຄານ',
-						wed => 'ວັນພຸດ',
-						thu => 'ວັນພະຫັດ',
-						fri => 'ວັນສຸກ',
-						sat => 'ວັນເສົາ',
-						sun => 'ວັນອາທິດ'
+						mon => 'ຈັນ',
+						tue => 'ອັງຄານ',
+						wed => 'ພຸດ',
+						thu => 'ພະຫັດ',
+						fri => 'ສຸກ',
+						sat => 'ເສົາ',
+						sun => 'ອາທິດ'
 					},
 					narrow => {
-						mon => '2',
-						tue => '3',
-						wed => '4',
-						thu => '5',
-						fri => '6',
-						sat => '7',
-						sun => '1'
+						mon => 'ຈ',
+						tue => 'ອ',
+						wed => 'ພ',
+						thu => 'ພຫ',
+						fri => 'ສຸ',
+						sat => 'ສ',
+						sun => 'ອາ'
 					},
 					short => {
 						mon => 'ຈ.',
@@ -5876,7 +5963,7 @@ has 'calendar_days' => (
 						thu => 'ພຫ',
 						fri => 'ສຸ',
 						sat => 'ສ',
-						sun => 'ອ'
+						sun => 'ອາ'
 					},
 					short => {
 						mon => 'ຈ.',
@@ -5955,303 +6042,303 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'chinese') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'roc') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'japanese') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 500;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'coptic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 500;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
 				}
 				last SWITCH;
 				}
@@ -6271,67 +6358,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'midnight' => q{ທ່ຽງຄືນ},
-					'noon' => q{ທ},
-					'night1' => q{ກາງຄືນ1},
-					'morning1' => q{ຕອນເຊົ້າ},
-					'am' => q{ຕອນເຊົ້າ},
-					'pm' => q{ຫຼທ},
+				'abbreviated' => {
+					'am' => q{ກ່ອນທ່ຽງ},
 					'evening1' => q{ຕອນແລງ},
+					'pm' => q{ຫຼັງທ່ຽງ},
+					'midnight' => q{ທ່ຽງຄືນ},
+					'noon' => q{ຕອນທ່ຽງ},
+					'night1' => q{ກາງຄືນ},
+					'afternoon1' => q{ຕອນບ່າຍ},
+					'morning1' => q{ຕອນເຊົ້າ},
+				},
+				'narrow' => {
+					'night1' => q{ກາງຄືນ},
+					'noon' => q{ທ},
 					'afternoon1' => q{ຕອນທ່ຽງ},
+					'morning1' => q{ຕອນເຊົ້າ},
+					'midnight' => q{ທຄ},
+					'pm' => q{ຫຼທ},
+					'am' => q{ກທ},
+					'evening1' => q{ຕອນແລງ},
 				},
 				'wide' => {
-					'afternoon1' => q{ຕອນບ່າຍ},
-					'evening1' => q{ຕອນແລງ},
-					'pm' => q{ຫຼັງທ່ຽງ},
 					'am' => q{ກ່ອນທ່ຽງ},
+					'evening1' => q{ຕອນແລງ},
+					'afternoon1' => q{ຕອນບ່າຍ},
+					'morning1' => q{ຕອນເຊົ້າ},
+					'noon' => q{ຕອນທ່ຽງ},
 					'night1' => q{ຕອນກາງຄືນ},
-					'morning1' => q{ຕອນເຊົ້າ},
-					'noon' => q{ທ່ຽງ},
-					'midnight' => q{ທ່ຽງຄືນ},
-				},
-				'abbreviated' => {
-					'evening1' => q{ຕອນແລງ},
-					'afternoon1' => q{ຕອນບ່າຍ},
 					'pm' => q{ຫຼັງທ່ຽງ},
-					'am' => q{ກ່ອນທ່ຽງ},
 					'midnight' => q{ທ່ຽງຄືນ},
-					'night1' => q{ກາງຄືນ},
-					'morning1' => q{ຕອນເຊົ້າ},
-					'noon' => q{ທ່ຽງ},
 				},
 			},
 			'stand-alone' => {
 				'narrow' => {
-					'midnight' => q{ທ່ຽງ​ຄືນ},
-					'morning1' => q{​ເຊົ້າ},
-					'night1' => q{​ກາງ​ຄືນ},
 					'noon' => q{ຕອນທ່ຽງ},
-					'evening1' => q{ແລງ},
-					'afternoon1' => q{ສວຍ},
+					'night1' => q{ກຄ},
+					'morning1' => q{ຊ},
+					'afternoon1' => q{ສ},
+					'midnight' => q{ທຄ},
 					'pm' => q{ຫຼທ},
 					'am' => q{ກທ},
+					'evening1' => q{ລ},
 				},
 				'wide' => {
 					'evening1' => q{ແລງ},
-					'afternoon1' => q{ສວຍ},
 					'am' => q{ກ່ອນທ່ຽງ},
 					'pm' => q{ຫຼັງທ່ຽງ},
-					'midnight' => q{ທ່ຽງ​ຄືນ},
+					'midnight' => q{ທ່ຽງຄືນ},
 					'night1' => q{​ກາງ​ຄືນ},
 					'noon' => q{ຕອນທ່ຽງ},
 					'morning1' => q{​ເຊົ້າ},
+					'afternoon1' => q{ສວຍ},
 				},
 				'abbreviated' => {
 					'morning1' => q{​ເຊົ້າ},
-					'night1' => q{​ກາງ​ຄືນ},
-					'noon' => q{ຕອນທ່ຽງ},
-					'midnight' => q{ທ່ຽງ​ຄືນ},
 					'afternoon1' => q{ສວຍ},
+					'night1' => q{​ກາງ​ຄືນ},
+					'noon' => q{ທ່ຽງ},
+					'pm' => q{ຫຼັງທ່ຽງ},
+					'midnight' => q{ທ່ຽງ​ຄືນ},
 					'evening1' => q{ແລງ},
 					'am' => q{ກ່ອນທ່ຽງ},
-					'pm' => q{ຫຼັງທ່ຽງ},
 				},
 			},
 		},
@@ -6763,32 +6850,18 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'islamic' => {
-			H => q{H},
-			Hm => q{H:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E MMM d},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{ha},
-			hm => q{h mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E,MMM d,y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-		},
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{G y},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d, y G},
@@ -6814,14 +6887,19 @@ has 'datetime_formats_available_formats' => (
 			yyyyMEd => q{E, G d/M/y},
 			yyyyMMM => q{G MMM y},
 			yyyyMMMEd => q{E, G d MMM y},
-			yyyyMMMM => q{G y MMMM},
+			yyyyMMMM => q{G MMMM y},
 			yyyyMMMd => q{G d MMM y},
 			yyyyMd => q{G d/M/y},
 			yyyyQQQ => q{G QQQ y},
 			yyyyQQQQ => q{G y QQQQ},
 		},
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{E, d},
@@ -6840,6 +6918,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, d/M},
 			MMM => q{LLL},
 			MMMEd => q{E d MMM},
+			MMMMW => q{ອາທິດທີ່ W ຂອງເດືອນ M},
 			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -6855,9 +6934,33 @@ has 'datetime_formats_available_formats' => (
 			yMEd => q{E, d/M/y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E, d MMM y},
-			yMMMM => q{y MMMM},
+			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM y},
 			yMd => q{d/M/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+			yw => q{ອາທິດທີ່ w ຂອງປີ Y},
+		},
+		'islamic' => {
+			H => q{H},
+			Hm => q{H:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, d/M},
+			MMM => q{LLL},
+			MMMEd => q{E MMM d},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{ha},
+			hm => q{h mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E,MMM d,y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
@@ -6899,23 +7002,23 @@ has 'datetime_formats_interval' => (
 				M => q{M–M},
 			},
 			MEd => {
-				M => q{E, MM-dd – E, MM-dd},
-				d => q{E, MM-dd – E, MM-dd},
+				M => q{E, dd-MM – E, dd-MM},
+				d => q{E, dd-MM – E, dd-MM},
 			},
 			MMM => {
-				M => q{LLL–LLL},
+				M => q{MMM – MMM},
 			},
 			MMMEd => {
-				M => q{E, MM-d – E, MM-d},
-				d => q{E, MM-d – E, MM-d},
+				M => q{E, d-MM – E, d-MM},
+				d => q{E, d-MM – E, d-MM},
 			},
 			MMMd => {
-				M => q{MM-d – MM-d},
+				M => q{d-MM – d-MM},
 				d => q{MM-d – d},
 			},
 			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – dd},
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
 			},
 			d => {
 				d => q{d–d},
@@ -6943,36 +7046,36 @@ has 'datetime_formats_interval' => (
 				y => q{G y–y},
 			},
 			yM => {
-				M => q{G y-MM – MM},
-				y => q{G y-MM – y-MM},
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
 			},
 			yMEd => {
-				M => q{E, G y-MM-dd – E, y-MM-dd},
-				d => q{E, G y-MM-dd – E, y-MM-dd},
-				y => q{E, G y-MM-dd – E, y-MM-dd},
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
 			},
 			yMMM => {
-				M => q{G y-MM – MM},
-				y => q{G y-MM – y-MM},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			yMMMEd => {
-				M => q{E, G y-MM-dd – E, y-MM-dd},
-				d => q{E, G y-MM-dd – E, y-MM-dd},
-				y => q{E, G y-MM-dd – E, y-MM-dd},
+				M => q{E, G dd-MM-y – E, dd-MM-y},
+				d => q{E, G dd-MM-y – E, dd-MM-y},
+				y => q{E, d MMM y – E, d MMM y G},
 			},
 			yMMMM => {
-				M => q{G y-MM – MM},
-				y => q{G y-MM – y-MM},
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
 			},
 			yMMMd => {
-				M => q{G y-MM-dd – MM-d},
-				d => q{G y-MM-d – d},
-				y => q{G y-MM-dd – y-MM-dd},
+				M => q{d MMM – d MMM, y G},
+				d => q{d–d MMM, y G},
+				y => q{d MMM y – d MMM y G},
 			},
 			yMd => {
-				M => q{G y-MM-dd – MM-dd},
-				d => q{G y-MM-dd – dd},
-				y => q{G y-MM-dd – y-MM-dd},
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
 			},
 		},
 		'gregorian' => {
@@ -7194,19 +7297,19 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
 		regionFormat => q(ເວລາ {0}),
-		regionFormat => q({0} (+1)),
-		regionFormat => q({0} (+0)),
+		regionFormat => q(ເວລາກາງເວັນ {0}),
+		regionFormat => q(ເວລາມາດຕະຖານ {0}),
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຂອງອາເກຣ),
-				'generic' => q(ເວລາຂອງອາເກຣ),
-				'standard' => q(ເວລາມາດຕະຖານຂອງອາເກຣ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຂອງອາເກຣ#,
+				'generic' => q#ເວລາຂອງອາເກຣ#,
+				'standard' => q#ເວລາມາດຕະຖານຂອງອາເກຣ#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(ເວລາ ອັຟການິສຖານ),
+				'standard' => q#ເວລາ ອັຟການິສຖານ#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -7367,45 +7470,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ອາ​ຟຣິ​ກາ​ກາງ),
+				'standard' => q#ເວ​ລາ​ອາ​ຟຣິ​ກາ​ກາງ#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ອອກ),
+				'standard' => q#ເວ​ລາ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ອອກ#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ອາ​ຟຣິ​ກາ​ໃຕ້),
+				'standard' => q#ເວ​ລາ​ອາ​ຟຣິ​ກາ​ໃຕ້#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ຕົກ),
-				'generic' => q(ເວ​ລາ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ຕົກ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ຕົກ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ຕົກ#,
+				'generic' => q#ເວ​ລາ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ຕົກ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ອາ​ຟຣິ​ກາ​ຕາ​ເວັນ​ຕົກ#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(ເວລາກາງເວັນອະແລສກາ),
-				'generic' => q(ເວລາອະແລສກາ),
-				'standard' => q(ເວລາມາດຕະຖານອະແລສກາ),
+				'daylight' => q#ເວລາກາງເວັນອະແລສກາ#,
+				'generic' => q#ເວລາອະແລສກາ#,
+				'standard' => q#ເວລາມາດຕະຖານອະແລສກາ#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອໍມາຕີ),
-				'generic' => q(ເວລາອໍມາຕີ),
-				'standard' => q(ເວລາມາດຕະຖານອໍມາຕີ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອໍມາຕີ#,
+				'generic' => q#ເວລາອໍມາຕີ#,
+				'standard' => q#ເວລາມາດຕະຖານອໍມາຕີ#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນອາ​ເມ​ຊອນ),
-				'generic' => q(ເວລາຕາມເຂດອາເມຊອນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ເມ​ຊອນ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນອາ​ເມ​ຊອນ#,
+				'generic' => q#ເວລາຕາມເຂດອາເມຊອນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ເມ​ຊອນ#,
 			},
 		},
 		'America/Adak' => {
@@ -7418,7 +7521,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ແອນກິນລາ#,
 		},
 		'America/Antigua' => {
-			exemplarCity => q#ແອນຕີກາ#,
+			exemplarCity => q#ແອນທິກົວ#,
 		},
 		'America/Araguaina' => {
 			exemplarCity => q#ອາຣາກົວນາ#,
@@ -7552,6 +7655,9 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#ເອວ ຊາວາດໍ#,
 		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#ຟອດ ເນວສັນ#,
+		},
 		'America/Fortaleza' => {
 			exemplarCity => q#ຟໍຕາເລຊາ#,
 		},
@@ -7559,13 +7665,13 @@ has 'time_zone_names' => (
 			exemplarCity => q#ເກລດເບ#,
 		},
 		'America/Godthab' => {
-			exemplarCity => q#ນຸກ#,
+			exemplarCity => q#ນູກ#,
 		},
 		'America/Goose_Bay' => {
 			exemplarCity => q#ກູສເບ#,
 		},
 		'America/Grand_Turk' => {
-			exemplarCity => q#ແກຣນທັກ#,
+			exemplarCity => q#ແກຣນ ເທີກ#,
 		},
 		'America/Grenada' => {
 			exemplarCity => q#ເກຣນາດາ#,
@@ -7730,7 +7836,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ໂອຈິນາກາ#,
 		},
 		'America/Panama' => {
-			exemplarCity => q#ປານາມາ#,
+			exemplarCity => q#ພານາມາ#,
 		},
 		'America/Pangnirtung' => {
 			exemplarCity => q#ແພງເນີດທັງ#,
@@ -7752,6 +7858,9 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#ເປີໂທຣິໂກ#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#ພຸນທາ ອະຣີນາສ໌#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#ເຣນນີ ຣິເວີ#,
@@ -7848,30 +7957,30 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(ເວລາກາງເວັນກາງ),
-				'generic' => q(ເວລາກາງ),
-				'standard' => q(ເວລາມາດຕະຖານກາງ),
+				'daylight' => q#ເວລາກາງເວັນກາງ#,
+				'generic' => q#ເວລາກາງ#,
+				'standard' => q#ເວລາມາດຕະຖານກາງ#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(ເວລາຕອນທ່ຽງທາງຕາເວັນອອກ),
-				'generic' => q(ເວລາຕາເວັນອອກ),
-				'standard' => q(ເວລາມາດຕະຖານຕາເວັນອອກ),
+				'daylight' => q#ເວລາກາງເວັນຕາເວັນອອກ#,
+				'generic' => q#ເວລາຕາເວັນອອກ#,
+				'standard' => q#ເວລາມາດຕະຖານຕາເວັນອອກ#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(ເວລາກາງເວັນແຖວພູເຂົາ),
-				'generic' => q(ເວລາແຖບພູເຂົາ),
-				'standard' => q(ເວລາມາດຕະຖານແຖບພູເຂົາ),
+				'daylight' => q#ເວລາກາງເວັນແຖບພູເຂົາ#,
+				'generic' => q#ເວລາແຖບພູເຂົາ#,
+				'standard' => q#ເວລາມາດຕະຖານແຖບພູເຂົາ#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(ເວລາກາງເວັນຂອງປາຊີຟິກ),
-				'generic' => q(ເວລາປາຊີຟິກ),
-				'standard' => q(ເວລາມາດຕະຖານຂອງປາຊີຟິກ),
+				'daylight' => q#ເວລາກາງເວັນແປຊິຟິກ#,
+				'generic' => q#ເວລາແປຊິຟິກ#,
+				'standard' => q#ເວລາມາດຕະຖານແປຊິຟິກ#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -7909,30 +8018,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(ເວລາກາງເວັນອາເພຍ),
-				'generic' => q(ເວລາເອເພຍ),
-				'standard' => q(ເວລາມາດຕະຖານເອເພຍ),
+				'daylight' => q#ເວລາກາງເວັນອາເພຍ#,
+				'generic' => q#ເວລາເອເພຍ#,
+				'standard' => q#ເວລາມາດຕະຖານເອເພຍ#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອັດຕາອູ),
-				'generic' => q(ເວລາອັດຕາອູ),
-				'standard' => q(ເວລາມາດຕະຖານອັດຕາອູ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອັດຕາອູ#,
+				'generic' => q#ເວລາອັດຕາອູ#,
+				'standard' => q#ເວລາມາດຕະຖານອັດຕາອູ#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອັດໂຕເບ),
-				'generic' => q(ເວລາອັດໂຕເບ),
-				'standard' => q(ເວລາມາດຕະຖານອັດໂຕເບ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອັດໂຕເບ#,
+				'generic' => q#ເວລາອັດໂຕເບ#,
+				'standard' => q#ເວລາມາດຕະຖານອັດໂຕເບ#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງອາ​ຣາ​ບຽນ),
-				'generic' => q(ເວ​ລາ​ອາ​ຣາ​ບຽນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ຣາ​ບຽນ),
+				'daylight' => q#ເວລາກາງເວັນອາຣາບຽນ#,
+				'generic' => q#ເວ​ລາ​ອາ​ຣາ​ບຽນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ຣາ​ບຽນ#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -7940,23 +8049,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອາ​ເຈນ​ທິ​ນາ),
-				'generic' => q(ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ),
-				'standard' => q(​ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ເຈນ​ທິ​ນາ),
+				'daylight' => q#​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອາ​ເຈນ​ທິ​ນາ#,
+				'generic' => q#ເວ​ລາ​ອາ​ເຈ​ທິ​ນາ#,
+				'standard' => q#​ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ເຈນ​ທິ​ນາ#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ),
-				'generic' => q(ເວ​ລາ​ເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ#,
+				'generic' => q#ເວ​ລາ​ເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານເວ​ສ​ເທິນອາ​ເຈນ​ທິ​ນາ#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອາເມເນຍ),
-				'generic' => q(ເວລາອາເມເນຍ),
-				'standard' => q(ເວລາມາດຕະຖານອາເມເນຍ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອາເມເນຍ#,
+				'generic' => q#ເວລາອາເມເນຍ#,
+				'standard' => q#ເວລາມາດຕະຖານອາເມເນຍ#,
 			},
 		},
 		'Asia/Aden' => {
@@ -7980,6 +8089,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#ອາດຊ໌ກາບັດ#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#ອັດທີເຣົາ#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#ແບກແດດ#,
 		},
@@ -7991,6 +8103,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#ບາງກອກ#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#ບານົວ#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#ເບຣຸດ#,
@@ -8027,6 +8142,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#ດູຊານເບ#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#ຟາມາກັສທາ#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#ກາຊາ#,
@@ -8169,6 +8287,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#ໂຕກຽວ#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#ທອມສກ໌#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#ອູລານບາຕາຣ໌#,
 		},
@@ -8195,9 +8316,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(ເວລາກາງເວັນຂອງອາແລນຕິກ),
-				'generic' => q(ເວລາຂອງອາແລນຕິກ),
-				'standard' => q(ເວລາມາດຕະຖານຂອງອາແລນຕິກ),
+				'daylight' => q#ເວລາກາງເວັນຂອງອາແລນຕິກ#,
+				'generic' => q#ເວລາຂອງອາແລນຕິກ#,
+				'standard' => q#ເວລາມາດຕະຖານຂອງອາແລນຕິກ#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -8268,176 +8389,181 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ເລຍ​ກາງ),
-				'generic' => q(ເວ​ລາອອ​ສ​ເຕຣ​ເລຍ​ກາງ),
-				'standard' => q(ເວ​ລາມາດ​ຕະ​ຖານອອ​ສ​ເຕຣ​ເລຍ​ກ​າງ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ເລຍ​ກາງ#,
+				'generic' => q#ເວ​ລາອອ​ສ​ເຕຣ​ເລຍ​ກາງ#,
+				'standard' => q#ເວ​ລາມາດ​ຕະ​ຖານອອ​ສ​ເຕຣ​ເລຍ​ກ​າງ#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ລຽນ​ກາງ​ຕາ​ເວັນ​ຕົກ),
-				'generic' => q(ເວ​ລາອອສ​ເຕຣ​ລຽນ​ກາງ​ຕາ​ເວັນ​ຕົກ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອອສ​ເຕຣ​ລຽນ​ກາງ​ຕາ​ເວັນ​ຕົກ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ລຽນ​ກາງ​ຕາ​ເວັນ​ຕົກ#,
+				'generic' => q#ເວ​ລາອອສ​ເຕຣ​ລຽນ​ກາງ​ຕາ​ເວັນ​ຕົກ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອອສ​ເຕຣ​ລຽນ​ກາງ​ຕາ​ເວັນ​ຕົກ#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ອອກ),
-				'generic' => q(ເວ​ລາອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ອອກ),
-				'standard' => q(ເວ​ລາ​ມາດຕະຖານ​​​ອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ອອກ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ອອກ#,
+				'generic' => q#ເວ​ລາອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ອອກ#,
+				'standard' => q#ເວ​ລາ​ມາດຕະຖານ​​​ອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ອອກ#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ຕົກ),
-				'generic' => q(ເວ​ລາ​ອອສ​ເຕຣ​ເລຍ​ຕາ​ເວັນ​ຕົກ),
-				'standard' => q(ເວ​ລາ​ມາ​ດ​ຕະ​ຖານອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ຕົກ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ຕົກ#,
+				'generic' => q#ເວ​ລາ​ອອສ​ເຕຣ​ເລຍ​ຕາ​ເວັນ​ຕົກ#,
+				'standard' => q#ເວ​ລາ​ມາ​ດ​ຕະ​ຖານອອສ​ເຕຣ​ລຽນ​ຕາ​ເວັນ​ຕົກ#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອັສເຊີໄບຈັນ),
-				'generic' => q(ເວລາອັສເຊີໄບຈັນ),
-				'standard' => q(ເວລາມາດຕະຖານອັສເຊີໄບຈັນ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອັສເຊີໄບຈັນ#,
+				'generic' => q#ເວລາອັສເຊີໄບຈັນ#,
+				'standard' => q#ເວລາມາດຕະຖານອັສເຊີໄບຈັນ#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນອາ​ໂຊ​ເຣ​ສ),
-				'generic' => q(ເວ​ລາ​ອາ​ໂຊ​ເຣ​ສ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ໂຊ​ເຣ​ສ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນອາ​ໂຊ​ເຣ​ສ#,
+				'generic' => q#ເວ​ລາ​ອາ​ໂຊ​ເຣ​ສ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອາ​ໂຊ​ເຣ​ສ#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(ເວລາ ລະດູຮ້ອນ ບັງກະລາເທດ),
-				'generic' => q(ເວລາ ບັງກະລາເທດ),
-				'standard' => q(ເວລາມາດຕະຖານ ບັງກະລາເທດ),
+				'daylight' => q#ເວລາ ລະດູຮ້ອນ ບັງກະລາເທດ#,
+				'generic' => q#ເວລາ ບັງກະລາເທດ#,
+				'standard' => q#ເວລາມາດຕະຖານ ບັງກະລາເທດ#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ພູ​ຖານ),
+				'standard' => q#ເວ​ລາ​ພູ​ຖານ#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ໂບ​ລິ​ເວຍ),
+				'standard' => q#ເວ​ລາ​ໂບ​ລິ​ເວຍ#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(ເວລາຕາມເຂດລະດູຮ້ອນຕາມເຂດບຣາຊີເລຍ),
-				'generic' => q(ເວລາຕາມເຂດບຣາຊິເລຍ),
-				'standard' => q(ເວລາມາດຕາຖານເບຣຊີເລຍ),
+				'daylight' => q#ເວລາຕາມເຂດລະດູຮ້ອນຕາມເຂດບຣາຊີເລຍ#,
+				'generic' => q#ເວລາຕາມເຂດບຣາຊິເລຍ#,
+				'standard' => q#ເວລາມາດຕາຖານເບຣຊີເລຍ#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(​ເວ​ລາບຣູ​ໄນດາ​ຣຸສ​ຊາ​ລາມ),
+				'standard' => q#​ເວ​ລາບຣູ​ໄນດາ​ຣຸສ​ຊາ​ລາມ#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ເຄບ​ເວີດ),
-				'generic' => q(ເວ​ລາ​ເຄບ​ເວີດ),
-				'standard' => q(​ເວ​ລາ​ມາດ​ຕະ​ຖານ​ເຄບ​ເວີດ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ເຄບ​ເວີດ#,
+				'generic' => q#ເວ​ລາ​ເຄບ​ເວີດ#,
+				'standard' => q#​ເວ​ລາ​ມາດ​ຕະ​ຖານ​ເຄບ​ເວີດ#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(ເວລາເຄຊີ),
+				'standard' => q#ເວລາເຄຊີ#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ຈາ​ໂມ​ໂຣ),
+				'standard' => q#ເວ​ລາ​ຈາ​ໂມ​ໂຣ#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ຊາ​ທາມ),
-				'generic' => q(ເວ​ລາ​ຊາ​ທາມ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຊາ​ທາມ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ຊາ​ທາມ#,
+				'generic' => q#ເວ​ລາ​ຊາ​ທາມ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຊາ​ທາມ#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນຊິ​ລີ),
-				'generic' => q(ເວ​ລາ​ຊິ​ລີ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານຊິ​ລີ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນຊິ​ລີ#,
+				'generic' => q#ເວ​ລາ​ຊິ​ລີ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານຊິ​ລີ#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ຕອນ​ທ່ຽງ​ຈີນ),
-				'generic' => q(ເວ​ລາ​ຈີນ),
-				'standard' => q(ເວລາມາດຕະຖານຈີນ),
+				'daylight' => q#​ເວ​ລາ​ຕອນ​ທ່ຽງ​ຈີນ#,
+				'generic' => q#ເວ​ລາ​ຈີນ#,
+				'standard' => q#ເວລາມາດຕະຖານຈີນ#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(ເວລາລະ​ດູ​ຮ້ອນໂຊຍບາຊັນ),
-				'generic' => q(ເວ​ລາ​ໂຊຍ​ບາ​ຊັນ),
-				'standard' => q(ເວລາມາດຕະຖານໂຊຍບາຊັນ),
+				'daylight' => q#ເວລາລະ​ດູ​ຮ້ອນໂຊຍບາຊັນ#,
+				'generic' => q#ເວ​ລາ​ໂຊຍ​ບາ​ຊັນ#,
+				'standard' => q#ເວລາມາດຕະຖານໂຊຍບາຊັນ#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເກາະ​ຄ​ຣິສ​ມາສ),
+				'standard' => q#ເວ​ລາ​ເກາະ​ຄ​ຣິສ​ມາສ#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(ເວລາຫມູ່ເກາະໂກໂກສ),
+				'standard' => q#ເວລາຫມູ່ເກາະໂກໂກສ#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນໂຄລໍາເບຍ),
-				'generic' => q(ເວລາໂຄລໍາເບຍ),
-				'standard' => q(ເວລາມາດຕະຖານໂຄລຳເບຍ),
+				'daylight' => q#ເວລາລະດູຮ້ອນໂຄລໍາເບຍ#,
+				'generic' => q#ເວລາໂຄລໍາເບຍ#,
+				'standard' => q#ເວລາມາດຕະຖານໂຄລຳເບຍ#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ເຄິ່ງ​ລະ​ດູ​ຮ້ອນ​ໝູ່​ເກາະ​ຄຸກ),
-				'generic' => q(ເວລາຫມູ່ເກາະຄຸກ),
-				'standard' => q(ເວລາມາດຕະຖານຫມູ່ເກາະຄຸກ),
+				'daylight' => q#ເວ​ລາ​ເຄິ່ງ​ລະ​ດູ​ຮ້ອນ​ໝູ່​ເກາະ​ຄຸກ#,
+				'generic' => q#ເວລາຫມູ່ເກາະຄຸກ#,
+				'standard' => q#ເວລາມາດຕະຖານຫມູ່ເກາະຄຸກ#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(ເວລາຕອນທ່ຽງຂອງຄິວບາ),
-				'generic' => q(ເວລາຄິວບາ),
-				'standard' => q(ເວລາມາດຕະຖານຂອງຄິວບາ),
+				'daylight' => q#ເວລາກາງເວັນຄິວບາ#,
+				'generic' => q#ເວລາຄິວບາ#,
+				'standard' => q#ເວລາມາດຕະຖານຂອງຄິວບາ#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(ເວລາເດວິດ),
+				'standard' => q#ເວລາເດວິດ#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(ເວລາດູມອງດູວິລ),
+				'standard' => q#ເວລາດູມອງດູວິລ#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(ເວລາຕີມໍຕາເວັນອອກ),
+				'standard' => q#ເວລາຕີມໍຕາເວັນອອກ#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນເກາະ​ອີ​ສ​ເຕີ),
-				'generic' => q(ເວ​ລາ​ເກາະ​ອີ​ສ​ເຕີ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານເກາະ​ອີ​ສ​ເຕີ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນເກາະ​ອີ​ສ​ເຕີ#,
+				'generic' => q#ເວ​ລາ​ເກາະ​ອີ​ສ​ເຕີ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານເກາະ​ອີ​ສ​ເຕີ#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເອ​ກົວ​ດໍ),
+				'standard' => q#ເວ​ລາ​ເອ​ກົວ​ດໍ#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#ເວລາສາກົນເຊີງພິກັດ#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -8448,6 +8574,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#ອິນດໍຣາ#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#ອາສຕຣາຄານ#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#ເອເທນສ໌#,
@@ -8482,7 +8611,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#ດັບບລິນ#,
 			long => {
-				'daylight' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ໄອ​ຣິ​ຊ),
+				'daylight' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ໄອ​ຣິ​ຊ#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -8509,6 +8638,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#ຂຽບ#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#ກິໂຣບ#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#ລິສບອນ#,
 		},
@@ -8518,7 +8650,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#ລອນດອນ#,
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອັງ​ກິດ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອັງ​ກິດ#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -8569,6 +8701,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#ຊາຣາເຢໂວ#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#ຊາຣາທອບ#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#ຊີມເຟໂລໂປ#,
 		},
@@ -8586,6 +8721,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#ທິຣານ#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#ອູລີອານອບສຄ໌#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#ອັສຊ໌ກໍໂຣດ#,
@@ -8619,134 +8757,134 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຢູ​ໂຣບ​ກາງ),
-				'generic' => q(ເວ​ລາ​ຢູ​ໂຣບ​ກາງ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຢູ​ໂຣບກາງ),
+				'daylight' => q#​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຢູ​ໂຣບ​ກາງ#,
+				'generic' => q#ເວ​ລາ​ຢູ​ໂຣບ​ກາງ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຢູ​ໂຣບກາງ#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ),
-				'generic' => q(ເວ​ລາ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ),
-				'standard' => q(ເວ​ລາ​ມາ​ດ​ຕະ​ຖານ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ#,
+				'generic' => q#ເວ​ລາ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ#,
+				'standard' => q#ເວ​ລາ​ມາ​ດ​ຕະ​ຖານ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ອອກ#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(ເວ​ລາ​​ຢູ​ໂຣ​ປຽນ​ຕາ​ເວັນ​ອອກ​ໄກ),
+				'standard' => q#ເວ​ລາ​​ຢູ​ໂຣ​ປຽນ​ຕາ​ເວັນ​ອອກ​ໄກ#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນຢູ​ໂຣບ​ຕາ​ເວັນ​ຕົກ),
-				'generic' => q(ເວ​ລາ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ຕົກ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານຢູ​ໂຣບ​ຕາ​ເວັນ​ຕົກ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນຢູ​ໂຣບ​ຕາ​ເວັນ​ຕົກ#,
+				'generic' => q#ເວ​ລາ​ຢູ​ໂຣບ​ຕາ​ເວັນ​ຕົກ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານຢູ​ໂຣບ​ຕາ​ເວັນ​ຕົກ#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ລະ​ດູ​ຮ້ອນໝູ່​ເກາະ​ຟອ​ລ໌ກ​ແລນ),
-				'generic' => q(​ເວ​ລາ​ໝູ່​ເກາະ​ຟອ​ລ໌ກ​ແລນ),
-				'standard' => q(​ເວ​ລາ​ມາດ​ຕະ​ຖານໝູ່​ເກາະ​ຟອ​ລ໌ກ​ແລນ),
+				'daylight' => q#​ເວ​ລາ​ລະ​ດູ​ຮ້ອນໝູ່​ເກາະ​ຟອ​ລ໌ກ​ແລນ#,
+				'generic' => q#​ເວ​ລາ​ໝູ່​ເກາະ​ຟອ​ລ໌ກ​ແລນ#,
+				'standard' => q#​ເວ​ລາ​ມາດ​ຕະ​ຖານໝູ່​ເກາະ​ຟອ​ລ໌ກ​ແລນ#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຟິຈິ),
-				'generic' => q(ເວລາຟິຈິ),
-				'standard' => q(ເວລາມາດຕະຖານຟິຈິ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຟິຈິ#,
+				'generic' => q#ເວລາຟິຈິ#,
+				'standard' => q#ເວລາມາດຕະຖານຟິຈິ#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເຟ​ຣນ​ຊ໌​ເກຍ​ນາ),
+				'standard' => q#ເວ​ລາ​ເຟ​ຣນ​ຊ໌​ເກຍ​ນາ#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(ເວລາຝຣັ່ງຕອນໃຕ້ແລະແອນຕາກຕິກ),
+				'standard' => q#ເວລາຝຣັ່ງຕອນໃຕ້ ແລະ ແອນຕາກຕິກ#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(ເວ​ລາກຣີນ​ວິ​ຊ),
+				'standard' => q#ເວ​ລາກຣີນ​ວິ​ຊ#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ກາ​ລາ​ປາ​ກອ​ສ),
+				'standard' => q#ເວ​ລາ​ກາ​ລາ​ປາ​ກອ​ສ#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(ເວລາແກມເບຍ),
+				'standard' => q#ເວລາແກມເບຍ#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຈໍເຈຍ),
-				'generic' => q(ເວລາຈໍເຈຍ),
-				'standard' => q(ເວລາມາດຕະຖານຈໍເຈຍ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຈໍເຈຍ#,
+				'generic' => q#ເວລາຈໍເຈຍ#,
+				'standard' => q#ເວລາມາດຕະຖານຈໍເຈຍ#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(ເວລາຫມູ່ເກາະກິລເບີດ),
+				'standard' => q#ເວລາຫມູ່ເກາະກິລເບີດ#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນກຣີນແລນຕາເວັນອອກ),
-				'generic' => q(ເວລາຕາເວັນອອກຂອງກຣີນແລນ),
-				'standard' => q(ເວລາມາດຕະຖານຕາເວັນອອກກຣີນແລນ),
+				'daylight' => q#ເວລາລະດູຮ້ອນກຣີນແລນຕາເວັນອອກ#,
+				'generic' => q#ເວລາຕາເວັນອອກຂອງກຣີນແລນ#,
+				'standard' => q#ເວລາມາດຕະຖານຕາເວັນອອກກຣີນແລນ#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(ເວລາຕອນທ່ຽງກຣີນແລນຕາເວັນຕົກ),
-				'generic' => q(ເວລາກຣີນແລນຕາເວັນຕົກ),
-				'standard' => q(ເວລາມາດຕະຖານກຣີນແລນຕາເວັນຕົກ),
+				'daylight' => q#ເວລາຕອນທ່ຽງກຣີນແລນຕາເວັນຕົກ#,
+				'generic' => q#ເວລາກຣີນແລນຕາເວັນຕົກ#,
+				'standard' => q#ເວລາມາດຕະຖານກຣີນແລນຕາເວັນຕົກ#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(ເວລາກວມ),
+				'standard' => q#ເວລາກວມ#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ກູ​ລ​໌ຟ),
+				'standard' => q#ເວ​ລາ​ກູ​ລ​໌ຟ#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(ເວລາກາຍອານາ),
+				'standard' => q#ເວລາກາຍອານາ#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(ເວລາຕອນທ່ຽງຮາວາຍ-ເອລູທຽນ),
-				'generic' => q(ເວລາຮາວາຍ-ເອລູທຽນ),
-				'standard' => q(ເວລາມາດຕະຖານຮາວາຍ-ເອລູທຽນ),
+				'daylight' => q#ເວລາຕອນທ່ຽງຮາວາຍ-ເອລູທຽນ#,
+				'generic' => q#ເວລາຮາວາຍ-ເອລູທຽນ#,
+				'standard' => q#ເວລາມາດຕະຖານຮາວາຍ-ເອລູທຽນ#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຮອງ​ກົງ),
-				'generic' => q(ເວ​ລາ​ຮອງ​ກົງ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຮອງ​ກົງ),
+				'daylight' => q#​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຮອງ​ກົງ#,
+				'generic' => q#ເວ​ລາ​ຮອງ​ກົງ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຮອງ​ກົງ#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຮອບ​ດ໌),
-				'generic' => q(ເວ​ລາ​ຮອບ​ດ໌),
-				'standard' => q(​ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຮອບ​ດ໌),
+				'daylight' => q#​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຮອບ​ດ໌#,
+				'generic' => q#ເວ​ລາ​ຮອບ​ດ໌#,
+				'standard' => q#​ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຮອບ​ດ໌#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(ເວລາ ອິນເດຍ),
+				'standard' => q#ເວລາ ອິນເດຍ#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -8784,257 +8922,257 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(ເວລາຫມະຫາສະຫມຸດອິນເດຍ),
+				'standard' => q#ເວລາຫມະຫາສະຫມຸດອິນເດຍ#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(ເວລາອິນດູຈີນ),
+				'standard' => q#ເວລາອິນດູຈີນ#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ອິນ​ໂດ​ເນ​ເຊຍ​ກາງ),
+				'standard' => q#ເວ​ລາ​ອິນ​ໂດ​ເນ​ເຊຍ​ກາງ#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ອິນ​ໂດ​ເນ​ເຊຍ​ຕາ​ເວັນ​ອອກ),
+				'standard' => q#ເວ​ລາ​ອິນ​ໂດ​ເນ​ເຊຍ​ຕາ​ເວັນ​ອອກ#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ອິນ​ໂດ​ເນ​ເຊຍ​ຕາ​ເວັນ​ຕົກ),
+				'standard' => q#ເວ​ລາ​ອິນ​ໂດ​ເນ​ເຊຍ​ຕາ​ເວັນ​ຕົກ#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ອີ​ຣາ​ນ),
-				'generic' => q(ເວ​ລາ​ອີ​ຣານ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອີ​ຣານ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ອີ​ຣາ​ນ#,
+				'generic' => q#ເວ​ລາ​ອີ​ຣານ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອີ​ຣານ#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(ເວ​ລາລະ​ດູ​ຮ້ອນອີ​ຄຸດ​ສ​ຄ໌),
-				'generic' => q(ເວ​ລ​າອີ​ຄຸດ​ສ​ຄ໌),
-				'standard' => q(ເວ​ລາມາດ​ຕະ​ຖານອີ​ຄຸດ​ສ​ຄ໌),
+				'daylight' => q#ເວ​ລາລະ​ດູ​ຮ້ອນອີ​ຄຸດ​ສ​ຄ໌#,
+				'generic' => q#ເວ​ລ​າອີ​ຄຸດ​ສ​ຄ໌#,
+				'standard' => q#ເວ​ລາມາດ​ຕະ​ຖານອີ​ຄຸດ​ສ​ຄ໌#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງອິ​ສ​ຣາ​ເອວ),
-				'generic' => q(ເວ​ລາ​ອິ​ສ​ຣາ​ເອວ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອິ​ສ​ຣາ​ເອວ),
+				'daylight' => q#ເວລາກາງເວັນອິສຣາເອວ#,
+				'generic' => q#ເວ​ລາ​ອິ​ສ​ຣາ​ເອວ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອິ​ສ​ຣາ​ເອວ#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ຍີ່​ປຸ່ນ),
-				'generic' => q(ເວ​ລາ​ຍີ່​ປຸ່ນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຍີ່​ປຸ່ນ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ຍີ່​ປຸ່ນ#,
+				'generic' => q#ເວ​ລາ​ຍີ່​ປຸ່ນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຍີ່​ປຸ່ນ#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ຄາ​ຊັກ​ສ​ຖານ​ຕາ​ເວັນ​ອອກ),
+				'standard' => q#ເວ​ລາ​ຄາ​ຊັກ​ສ​ຖານ​ຕາ​ເວັນ​ອອກ#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ຄາ​ຊັກ​ສ​ຖານ​ຕາ​ເວັນ​ຕົກ),
+				'standard' => q#ເວ​ລາ​ຄາ​ຊັກ​ສ​ຖານ​ຕາ​ເວັນ​ຕົກ#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ເກົາ​ຫລີ),
-				'generic' => q(ເວລາເກົາຫຼີ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ເກົາ​ຫລີ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ເກົາ​ຫລີ#,
+				'generic' => q#ເວລາເກົາຫຼີ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ເກົາ​ຫລີ#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(ເວລາຄອສແຣ),
+				'standard' => q#ເວລາຄອສແຣ#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນຄຣັສ​ໂນ​ຢາ​ສ​ຄ໌),
-				'generic' => q(ເວ​ລາ​ຄຣັສ​ໂນ​ຢາ​ສ​ຄ໌),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານຄຣັສ​ໂນ​ຢາ​ສ​ຄ໌),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນຄຣັສ​ໂນ​ຢາ​ສ​ຄ໌#,
+				'generic' => q#ເວ​ລາ​ຄຣັສ​ໂນ​ຢາ​ສ​ຄ໌#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານຄຣັສ​ໂນ​ຢາ​ສ​ຄ໌#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(ເວລາຄຣີກິສຖານ),
+				'standard' => q#ເວລາເຄຍກິສຖານ#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(ເວລາລັງກາ),
+				'standard' => q#ເວລາລັງກາ#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ໝູ່​ເກາະ​ລາຍ),
+				'standard' => q#ເວ​ລາ​ໝູ່​ເກາະ​ລາຍ#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(​ເວ​ລ​ສາ​ຕອນ​​ທ່ຽງ​ລອດ​ເຮົາ​),
-				'generic' => q(ເວ​ລາ​ລອດ​ເຮົາ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ລອດ​ເຮົາ),
+				'daylight' => q#​ເວ​ລ​ສາ​ຕອນ​​ທ່ຽງ​ລອດ​ເຮົາ​#,
+				'generic' => q#ເວ​ລາ​ລອດ​ເຮົາ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ລອດ​ເຮົາ#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນມາເກົາ),
-				'generic' => q(ເວລາມາເກົາ),
-				'standard' => q(ເວລາມາດຕະຖານມາເກົາ),
+				'daylight' => q#ເວລາລະດູຮ້ອນມາເກົາ#,
+				'generic' => q#ເວລາມາເກົາ#,
+				'standard' => q#ເວລາມາດຕະຖານມາເກົາ#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເກາະ​ແມັກ​ຄົວ​ຣີ),
+				'standard' => q#ເວ​ລາ​ເກາະ​ແມັກ​ຄົວ​ຣີ#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນເມັກກາເດນ),
-				'generic' => q(ເວລາເມັກກາເດນ),
-				'standard' => q(ເວລາມາດຕະຖານເມັກກາເດນ),
+				'daylight' => q#ເວລາລະດູຮ້ອນເມັກກາເດນ#,
+				'generic' => q#ເວລາເມັກກາເດນ#,
+				'standard' => q#ເວລາມາດຕະຖານເມັກກາເດນ#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ມາ​ເລ​ເຊຍ),
+				'standard' => q#ເວ​ລາ​ມາ​ເລ​ເຊຍ#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(ເວລາມັນດີຟ),
+				'standard' => q#ເວລາມັນດີຟ#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(ເວລາມາເຄີຊັສ),
+				'standard' => q#ເວລາມາເຄີຊັສ#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ໝູ່​ເກາະ​ມາ​ແຊວ),
+				'standard' => q#ເວ​ລາ​ໝູ່​ເກາະ​ມາ​ແຊວ#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ເມົາ​ຣິ​ທຽ​ສ),
-				'generic' => q(ເວ​ລາ​ເມົາ​ຣິ​ທຽ​ສ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານເມົາ​ຣິ​ທຽ​ສ),
+				'daylight' => q#​ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ເມົາ​ຣິ​ທຽ​ສ#,
+				'generic' => q#ເວ​ລາ​ເມົາ​ຣິ​ທຽ​ສ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານເມົາ​ຣິ​ທຽ​ສ#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(ເວລາມໍສັນ),
+				'standard' => q#ເວລາມໍສັນ#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ຕອນ​ທ່ຽງນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ),
-				'generic' => q(​ເວ​ລາ​ນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ),
-				'standard' => q(​ເວ​ລາ​ມາດ​ຕະ​ຖານນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ),
+				'daylight' => q#ເວລາກາງເວັນເມັກຊິກັນນອດເວສ#,
+				'generic' => q#​ເວ​ລາ​ນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ#,
+				'standard' => q#​ເວ​ລາ​ມາດ​ຕະ​ຖານນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ຕອນ​ທ່ຽງ​ເມັກ​ຊິ​ກັນ​ປາ​ຊິ​ຟິກ),
-				'generic' => q(​ເວ​ລາ​ເມັກ​ຊິ​ກັນ​ປາ​ຊິ​ຟິກ),
-				'standard' => q(​ເວ​ລາ​​ມາດ​ຕະ​ຖານເມັກ​ຊິ​ກັນ​ປາ​ຊິ​ຟິກ​),
+				'daylight' => q#ເວລາກາງເວັນແປຊິຟິກເມັກຊິກັນ#,
+				'generic' => q#ເວລາແປຊິຟິກເມັກຊິກັນ#,
+				'standard' => q#ເວລາມາດຕະຖານແປຊິຟິກເມັກຊິກັນ#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອູລານບາເຕີ),
-				'generic' => q(ເວລາ ອູລານບາເຕີ),
-				'standard' => q(ເວລາມາດຕະຖານ ອູລານບາເຕີ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອູລານບາເຕີ#,
+				'generic' => q#ເວລາ ອູລານບາເຕີ#,
+				'standard' => q#ເວລາມາດຕະຖານ ອູລານບາເຕີ#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນມອ​ສ​ໂຄ),
-				'generic' => q(ເວ​ລາ​ມອ​ສ​ໂຄ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານມອ​ສ​ໂຄ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນມອ​ສ​ໂຄ#,
+				'generic' => q#ເວ​ລາ​ມອ​ສ​ໂຄ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານມອ​ສ​ໂຄ#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(ເວລາມຽນມາ),
+				'standard' => q#ເວລາມຽນມາ#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ນາ​ອູ​ຣຸ),
+				'standard' => q#ເວ​ລາ​ນາ​ອູ​ຣຸ#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(​ເວ​ລາ​ເນ​ປານ),
+				'standard' => q#​ເວ​ລາ​ເນ​ປານ#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນນິວແຄລິໂດເນຍ),
-				'generic' => q(ເວລານິວແຄລິໂດເນຍ),
-				'standard' => q(ເວລາມາດຕະຖານນິວແຄລິໂດເນຍ),
+				'daylight' => q#ເວລາລະດູຮ້ອນນິວແຄລິໂດເນຍ#,
+				'generic' => q#ເວລານິວແຄລິໂດເນຍ#,
+				'standard' => q#ເວລາມາດຕະຖານນິວແຄລິໂດເນຍ#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່ຽງ​ນິວ​ຊີ​ແລນ),
-				'generic' => q(ເວ​ລາ​ນິວ​ຊີ​ແລນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານນິວ​ຊີ​ແລນ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ນິວ​ຊີ​ແລນ#,
+				'generic' => q#ເວ​ລາ​ນິວ​ຊີ​ແລນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານນິວ​ຊີ​ແລນ#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(​ເວ​ລາ​ຕອນ​ທ່ຽງ​ນິວ​ຟາວ​ແລນ),
-				'generic' => q(ເວ​ລາ​ນິວ​ຟາວ​ແລນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ນິວ​ຟາວ​ແລນ),
+				'daylight' => q#ເວລາກາງເວັນນິວຟາວແລນ#,
+				'generic' => q#ເວ​ລາ​ນິວ​ຟາວ​ແລນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ນິວ​ຟາວ​ແລນ#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(ເວລານິອູເອ),
+				'standard' => q#ເວລານິອູເອ#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເກາະ​ນໍ​ຟອ​ລ໌ກ),
+				'standard' => q#ເວ​ລາ​ເກາະ​ນໍ​ຟອ​ລ໌ກ#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນເຟນັນໂດເດໂນຮອນຮາ),
-				'generic' => q(ເວລາເຟນັນໂດເດໂນຮອນຮາ),
-				'standard' => q(ເວລາມາດຕະຖານເຟນັນໂດເດໂນຮອນຮາ),
+				'daylight' => q#ເວລາລະດູຮ້ອນເຟນັນໂດເດໂນຮອນຮາ#,
+				'generic' => q#ເວລາເຟນັນໂດເດໂນຮອນຮາ#,
+				'standard' => q#ເວລາມາດຕະຖານເຟນັນໂດເດໂນຮອນຮາ#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(ເວລາຫມູ່ເກາະມາເຣຍນາເຫນືອ),
+				'standard' => q#ເວລາຫມູ່ເກາະມາເຣຍນາເຫນືອ#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນໂນ​ໂບ​ຊິ​ບິ​ສ​ຄ໌),
-				'generic' => q(ເວ​ລາ​ໂນ​ໂບ​ຊິ​ບິ​ສ​ຄ໌),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານໂນ​ໂບ​ຊິ​ບິ​ສ​ຄ໌),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນໂນ​ໂບ​ຊິ​ບິ​ສ​ຄ໌#,
+				'generic' => q#ເວ​ລາ​ໂນ​ໂບ​ຊິ​ບິ​ສ​ຄ໌#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານໂນ​ໂບ​ຊິ​ບິ​ສ​ຄ໌#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນອອມ​ສ​ຄ໌),
-				'generic' => q(​ເວ​ລາອອມ​ສ​ຄ໌),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານອອມ​ສ​ຄ໌),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນອອມ​ສ​ຄ໌#,
+				'generic' => q#​ເວ​ລາອອມ​ສ​ຄ໌#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານອອມ​ສ​ຄ໌#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -9156,238 +9294,243 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ປາ​ກີ​ສ​ຖານ),
-				'generic' => q(ເວ​ລາ​ປາ​ກີສຖານ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ປາ​ກີສຖານ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ປາ​ກີ​ສ​ຖານ#,
+				'generic' => q#ເວ​ລາ​ປາ​ກີສຖານ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ປາ​ກີສຖານ#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(ເວລາປາເລົາ),
+				'standard' => q#ເວລາປາເລົາ#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(ເວລາປາປົວກິນີ),
+				'standard' => q#ເວລາປາປົວກິນີ#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ປາ​ຣາ​ກວຍ),
-				'generic' => q(ເວ​ລາ​ປາ​ຣາ​ກວຍ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ປາ​ຣາ​ກວຍ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ປາ​ຣາ​ກວຍ#,
+				'generic' => q#ເວ​ລາ​ປາ​ຣາ​ກວຍ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ປາ​ຣາ​ກວຍ#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ເປ​ຣູ),
-				'generic' => q(ເວ​ລາ​ເປ​ຣູ),
-				'standard' => q(ເວ​ລາ​​ມາ​ດ​ຕະ​ຖານເປ​ຣູ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ເປ​ຣູ#,
+				'generic' => q#ເວ​ລາ​ເປ​ຣູ#,
+				'standard' => q#ເວ​ລາ​​ມາ​ດ​ຕະ​ຖານເປ​ຣູ#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຟິ​ລິບ​ປິນ),
-				'generic' => q(​ເວ​ລາ​ຟິ​ລິບ​ປິນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຟິ​ລິບ​ປິນ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ຟິ​ລິບ​ປິນ#,
+				'generic' => q#​ເວ​ລາ​ຟິ​ລິບ​ປິນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຟິ​ລິບ​ປິນ#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(ເວລາຫມູ່ເກາະຟີນິກ),
+				'standard' => q#ເວລາຫມູ່ເກາະຟີນິກ#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(​ເວ​ລາຕອນ​ທ່ຽງເຊນ​ປີ​ແອ ແລະ​ມິ​ກົວ​ລອນ),
-				'generic' => q(​ເວ​ລາເຊນ​ປີ​ແອ ແລະ​ມິ​ກົວ​ລອນ),
-				'standard' => q(​ເວ​ລາມາດ​ຕະ​ຖານເຊນ​ປີ​ແອ ແລະ​ມິ​ກົວ​ລອນ),
+				'daylight' => q#​ເວ​ລາຕອນ​ທ່ຽງເຊນ​ປີ​ແອ ແລະ​ມິ​ກົວ​ລອນ#,
+				'generic' => q#​ເວ​ລາເຊນ​ປີ​ແອ ແລະ​ມິ​ກົວ​ລອນ#,
+				'standard' => q#​ເວ​ລາມາດ​ຕະ​ຖານເຊນ​ປີ​ແອ ແລະ​ມິ​ກົວ​ລອນ#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(ເວລາພິດແຄຣ໌ນ),
+				'standard' => q#ເວລາພິດແຄຣ໌ນ#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(ເວລາໂປເນບ),
+				'standard' => q#ເວລາໂປເນບ#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#ເວລາປຽງຢາງ#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຄີວລໍດາ),
-				'generic' => q(ເວລາຄີວລໍດາ),
-				'standard' => q(ເວລາມາດຕະຖານຄີວລໍດາ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຄີວລໍດາ#,
+				'generic' => q#ເວລາຄີວລໍດາ#,
+				'standard' => q#ເວລາມາດຕະຖານຄີວລໍດາ#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເຣ​ອູ​ນິ​ຢົງ),
+				'standard' => q#ເວ​ລາ​ເຣ​ອູ​ນິ​ຢົງ#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(ເວລາ ໂຣທີຕາ),
+				'standard' => q#ເວລາ ໂຣທີຕາ#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນຊາ​ຮາ​ລິນ),
-				'generic' => q(ເວ​ລາ​ຊາ​ຮາ​ລິນ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານຊາ​ຮາ​ລິນ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນຊາ​ຮາ​ລິນ#,
+				'generic' => q#ເວ​ລາ​ຊາ​ຮາ​ລິນ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານຊາ​ຮາ​ລິນ#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຊາມົວ),
-				'generic' => q(ເວລາຊາມົວ),
-				'standard' => q(ເວລາມາດຕະຖານຊາມົວ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຊາມົວ#,
+				'generic' => q#ເວລາຊາມົວ#,
+				'standard' => q#ເວລາມາດຕະຖານຊາມົວ#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເຊ​ເຊ​ລ​ສ໌),
+				'standard' => q#ເວ​ລາ​ເຊ​ເຊ​ລ​ສ໌#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ສິງ​ກະ​ໂປ),
+				'standard' => q#ເວ​ລາ​ສິງ​ກະ​ໂປ#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(ເວລາຫມູ່ເກາະໂຊໂລມອນ),
+				'standard' => q#ເວລາຫມູ່ເກາະໂຊໂລມອນ#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(ເວລາຈໍເຈຍໃຕ້),
+				'standard' => q#ເວລາຈໍເຈຍໃຕ້#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ຊຸ​ຣິ​ນາມ),
+				'standard' => q#ເວ​ລາ​ຊຸ​ຣິ​ນາມ#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(ເວລາ ໂຊວາ),
+				'standard' => q#ເວລາ ໂຊວາ#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(ເວລາທາຮິຕິ),
+				'standard' => q#ເວລາທາຮິຕິ#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ຕອນ​ທ່​ຽງ​ໄທ​ເປ),
-				'generic' => q(ເວ​ລາ​ໄທ​ເປ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ໄທ​ເປ),
+				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່​ຽງ​ໄທ​ເປ#,
+				'generic' => q#ເວ​ລາ​ໄທ​ເປ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ໄທ​ເປ#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(ເວລາທາຈິກິສຖານ),
+				'standard' => q#ເວລາທາຈິກິສຖານ#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(ເວລາໂຕເກເລົາ),
+				'standard' => q#ເວລາໂຕເກເລົາ#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຕອງກາ),
-				'generic' => q(ເວລາຕອງກາ),
-				'standard' => q(ເວລາມາດຕະຖານຕອງກາ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຕອງກາ#,
+				'generic' => q#ເວລາຕອງກາ#,
+				'standard' => q#ເວລາມາດຕະຖານຕອງກາ#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(ເວລາຊຸກ),
+				'standard' => q#ເວລາຊຸກ#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຕວກເມນິສຖານ),
-				'generic' => q(ເວລາຕວກເມນິສຖານ),
-				'standard' => q(ເວລາມາດຕະຖານຕວກເມນິສຖານ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຕວກເມນິສຖານ#,
+				'generic' => q#ເວລາຕວກເມນິສຖານ#,
+				'standard' => q#ເວລາມາດຕະຖານຕວກເມນິສຖານ#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(ເວລາຕູວາລູ),
+				'standard' => q#ເວລາຕູວາລູ#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອູ​ຣູ​ກວຍ),
-				'generic' => q(​ເວ​ລາ​ອູ​ຣູ​ກວຍ),
-				'standard' => q(ເວ​ລາ​ມາດ​ຕະ​ຖານ​ອູ​ຣູ​ກວຍ),
+				'daylight' => q#ເວ​ລາ​ລະ​ດູ​ຮ້ອນ​ອູ​ຣູ​ກວຍ#,
+				'generic' => q#​ເວ​ລາ​ອູ​ຣູ​ກວຍ#,
+				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ອູ​ຣູ​ກວຍ#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນອຸສເບກິດສະຖານ),
-				'generic' => q(ເວລາອຸສເບກິດສະຖານ),
-				'standard' => q(ເວລາມາດຕະຖານອຸສເບກິດສະຖານ),
+				'daylight' => q#ເວລາລະດູຮ້ອນອຸສເບກິດສະຖານ#,
+				'generic' => q#ເວລາອຸສເບກິດສະຖານ#,
+				'standard' => q#ເວລາມາດຕະຖານອຸສເບກິດສະຖານ#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນວານູອາຕູ),
-				'generic' => q(ເວລາວານູອາຕູ),
-				'standard' => q(ເວລາມາດຕະຖານວານູອາຕູ),
+				'daylight' => q#ເວລາລະດູຮ້ອນວານູອາຕູ#,
+				'generic' => q#ເວລາວານູອາຕູ#,
+				'standard' => q#ເວລາມາດຕະຖານວານູອາຕູ#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(ເວ​ລາ​ເວ​ເນ​ຊູ​ເອ​ລາ),
+				'standard' => q#ເວ​ລາ​ເວ​ເນ​ຊູ​ເອ​ລາ#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນລາດີໂວສຕົກ),
-				'generic' => q(ເວລາລາດີໂວສຕົກ),
-				'standard' => q(ເວລາມາດຕະຖານລາດີໂວສຕົກ),
+				'daylight' => q#ເວລາລະດູຮ້ອນລາດີໂວສຕົກ#,
+				'generic' => q#ເວລາລາດີໂວສຕົກ#,
+				'standard' => q#ເວລາມາດຕະຖານລາດີໂວສຕົກ#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນໂວໂກກຣາດ),
-				'generic' => q(ເວລາໂວໂກກຣາດ),
-				'standard' => q(ເວລາມາດຕະຖານໂວໂກກຣາດ),
+				'daylight' => q#ເວລາລະດູຮ້ອນໂວໂກກຣາດ#,
+				'generic' => q#ເວລາໂວໂກກຣາດ#,
+				'standard' => q#ເວລາມາດຕະຖານໂວໂກກຣາດ#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(ເວລາ ວອສໂຕກ),
+				'standard' => q#ເວລາ ວອສໂຕກ#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(ເວລາເກາະເວກ),
+				'standard' => q#ເວລາເກາະເວກ#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(ເວລາວາລລີສແລະຟຸຕູນາ),
+				'standard' => q#ເວລາວາລລິສ ແລະ ຟູຕູນາ#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນຢາກູດສ),
-				'generic' => q(ເວລາຢາກູດສ),
-				'standard' => q(ເວລາມາດຕະຖານຢາກູດສ),
+				'daylight' => q#ເວລາລະດູຮ້ອນຢາກູດສ#,
+				'generic' => q#ເວລາຢາກູດສ#,
+				'standard' => q#ເວລາມາດຕະຖານຢາກູດສ#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(ເວລາລະດູຮ້ອນເຢກາເຕລິນເບີກ),
-				'generic' => q(ເວລາເຢກາເຕລິນເບີກ),
-				'standard' => q(ເວລາມາດຕະຖານເຢກາເຕລິນເບີກ),
+				'daylight' => q#ເວລາລະດູຮ້ອນເຢກາເຕລິນເບີກ#,
+				'generic' => q#ເວລາເຢກາເຕລິນເບີກ#,
+				'standard' => q#ເວລາມາດຕະຖານເຢກາເຕລິນເບີກ#,
 			},
 		},
 	 } }

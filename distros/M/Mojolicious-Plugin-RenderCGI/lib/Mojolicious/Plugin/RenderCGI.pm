@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::RenderCGI::Template;
 use Mojo::Util qw(encode md5_sum);
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 my $pkg = __PACKAGE__;
 
 has qw(app);
@@ -31,14 +31,14 @@ sub register {
 }
 
 sub handler {
-  my ($plugin, $r, $c, $output, $options) = @_;
+  my ($plugin, $renderer, $c, $output, $options) = @_;
   my $app = $c->app;
   #~ $app->log->debug($app->dumper($options));
   
   # относительный путь шаблона
   my $content = $options->{inline};# встроенный шаблон
   my $name = defined $content ? md5_sum encode('UTF-8', $content) : undef;
-  return unless defined($name //= $r->template_name($options));
+  return unless defined($name //= $renderer->template_path($options) || $renderer->template_name($options));
   
   #~ my $url = Mojo::URL->new($name);
   #~ ($name, my $param) = (url_unescape($url->path), $url->query->to_hash);
@@ -64,11 +64,11 @@ sub handler {
       $from = 'inline';
     } else {
       # подходящий шаблон в секции DATA
-      ($content, $from) = ($r->get_data_template($options), 'DATA section');#,, $name
+      ($content, $from) = ($renderer->get_data_template($options), 'DATA section');#,, $name
       
       unless (defined $content) {# file
       #  абсолютный путь шаблона
-        if (my $path = $r->template_path($options)) {
+        if (my $path = $renderer->template_path($options)) {
           my $file = Mojo::Asset::File->new(path => $path);
           ($content, $from) = ($file->slurp, 'file');
           
@@ -136,7 +136,7 @@ sub error {# харе
 
 =head1 VERSION
 
-0.100
+0.101
 
 =head1 NAME
 
@@ -213,9 +213,9 @@ Is similar to C<< $app->defaults(handler=> <name above>); >>
 
 What subs do you want from CGI.pm import
 
-  $app->plugin('RenderCGI', import=>':html ...');
+  $app->plugin('RenderCGI', cgi_import=>':html ...');
   # or 
-  $app->plugin('RenderCGI', import=>[qw(:html ...)]);
+  $app->plugin('RenderCGI', cgi_import=>[qw(:html ...)]);
 
 See at perldoc CGI.pm section "USING THE FUNCTION-ORIENTED INTERFACE".
 Default is ':html :form' (string) same as [qw(:html :form)] (arrayref).

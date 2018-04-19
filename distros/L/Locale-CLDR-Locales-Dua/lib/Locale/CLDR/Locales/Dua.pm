@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Dua - Package for language Duala
 
 package Locale::CLDR::Locales::Dua;
 # This file auto generated from Data\common\main\dua.xml
-#	on Fri 29 Apr  6:58:10 pm GMT
+#	on Fri 13 Apr  7:06:49 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -60,9 +61,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[h q v x z])},
+			auxiliary => qr{[h q v x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'Ɛ', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'S', 'T', 'U', 'W', 'Y'],
-			main => qr{(?^u:[a á b ɓ c d ɗ e é ɛ {ɛ́} f g i í j k l m n {ny} ŋ o ó ɔ {ɔ́} p r s t u ú ū w y])},
+			main => qr{[a á b ɓ c d ɗ e é ɛ {ɛ́} f g i í j k l m n {ny} ŋ o ó ɔ {ɔ́} p r s t u ú ū w y]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -134,14 +136,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
@@ -306,11 +308,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{idiɓa},
-					'pm' => q{ebyámu},
-				},
 				'wide' => {
+					'pm' => q{ebyámu},
+					'am' => q{idiɓa},
+				},
+				'abbreviated' => {
 					'pm' => q{ebyámu},
 					'am' => q{idiɓa},
 				},

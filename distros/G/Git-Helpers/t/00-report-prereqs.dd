@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
@@ -22,13 +22,18 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Browser::Open' => '0',
                                       'Capture::Tiny' => '0',
                                       'Carp' => '0',
                                       'File::pushd' => '0',
+                                      'Getopt::Long' => '0',
                                       'Git::Sub' => '0',
                                       'MetaCPAN::Client' => '0',
                                       'Moo' => '0',
+                                      'MooX::Options' => '0',
+                                      'String::Trim' => '0',
                                       'Sub::Exporter' => '0',
+                                      'Term::Choose' => '0',
                                       'Try::Tiny' => '0',
                                       'Types::Standard' => '0',
                                       'URI' => '0',

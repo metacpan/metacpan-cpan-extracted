@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +26,17 @@ no_index:
 provides:
   App::Egaz:
     file: lib/App/Egaz.pm
-    version: v0.0.14
+    version: v0.1.2
+  App::Egaz::Command::blastlink:
+    file: lib/App/Egaz/Command/blastlink.pm
+  App::Egaz::Command::blastmatch:
+    file: lib/App/Egaz/Command/blastmatch.pm
   App::Egaz::Command::blastn:
     file: lib/App/Egaz/Command/blastn.pm
   App::Egaz::Command::exactmatch:
     file: lib/App/Egaz/Command/exactmatch.pm
+  App::Egaz::Command::fas2vcf:
+    file: lib/App/Egaz/Command/fas2vcf.pm
   App::Egaz::Command::formats:
     file: lib/App/Egaz/Command/formats.pm
   App::Egaz::Command::lastz:
@@ -57,11 +63,16 @@ provides:
     file: lib/App/Egaz/Command/prepseq.pm
   App::Egaz::Command::raxml:
     file: lib/App/Egaz/Command/raxml.pm
+  App::Egaz::Command::repeatmasker:
+    file: lib/App/Egaz/Command/repeatmasker.pm
+  App::Egaz::Command::template:
+    file: lib/App/Egaz/Command/template.pm
   App::Egaz::Common:
     file: lib/App/Egaz/Common.pm
 requires:
   App::Cmd: '0.330'
-  App::Fasops: v0.5.11
+  App::Fasops: v0.5.16
+  App::Rangeops: v0.1.0
   Bio::Phylo: v2.0.1
   File::Find::Rule: '0.34'
   File::ShareDir: '1.102'
@@ -84,5 +95,6 @@ resources:
   bugtracker: https://github.com/wang-q/App-Egaz/issues
   homepage: https://github.com/wang-q/App-Egaz
   repository: git://github.com/wang-q/App-Egaz.git
-version: 0.0.14
+version: 0.1.2
 x_authority: cpan:WANGQ
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

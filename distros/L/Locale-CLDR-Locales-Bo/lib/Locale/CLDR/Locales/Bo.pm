@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Bo - Package for language Tibetan
 
 package Locale::CLDR::Locales::Bo;
 # This file auto generated from Data\common\main\bo.xml
-#	on Fri 29 Apr  6:53:24 pm GMT
+#	on Fri 13 Apr  7:03:07 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -350,10 +351,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[ༀ])},
+			auxiliary => qr{[ༀ]},
 			index => ['ཀ', 'ཁ', 'ག', 'ང', 'ཅ', 'ཆ', 'ཇ', 'ཉ', 'ཏ', 'ཐ', 'ད', 'ན', 'པ', 'ཕ', 'བ', 'མ', 'ཙ', 'ཚ', 'ཛ', 'ཝ', 'ཞ', 'ཟ', 'འ', 'ཡ', 'ར', 'ལ', 'ཤ', 'ས', 'ཧ', 'ཨ'],
-			main => qr{(?^u:[ཾ ཿ ཀ {ཀྵ} ྐ {ྐྵ} ཁ ྑ ག {གྷ} ྒ {ྒྷ} ང ྔ ཅ ྕ ཆ ྖ ཇ ྗ ཉ ྙ ཊ ྚ ཋ ྛ ཌ {ཌྷ} ྜ {ྜྷ} ཎ ྞ ཏ ྟ ཐ ྠ ད {དྷ} ྡ {ྡྷ} ན ྣ པ ྤ ཕ ྥ བ {བྷ} ྦ {ྦྷ} མ ྨ ཙ ྩ ཚ ྪ ཛ {ཛྷ} ྫ {ྫྷ} ཝ ྭ ྺ ཞ ྮ ཟ ྯ འ ྰ ཡ ྱ ྻ ར ཪ ྲ ྼ ལ ླ ཤ ྴ ཥ ྵ ས ྶ ཧ ྷ ཨ ྸ ི {ཱི} ྀ {ཱྀ} ུ {ཱུ} {ྲྀ} ཷ {ླྀ} ཹ ེ ཻ ོ ཽ ྄])},
-			punctuation => qr{(?^u:[\: ་ །])},
+			main => qr{[ཾ ཿ ཀ {ཀྵ} ྐ {ྐྵ} ཁ ྑ ག {གྷ} ྒ {ྒྷ} ང ྔ ཅ ྕ ཆ ྖ ཇ ྗ ཉ ྙ ཊ ྚ ཋ ྛ ཌ {ཌྷ} ྜ {ྜྷ} ཎ ྞ ཏ ྟ ཐ ྠ ད {དྷ} ྡ {ྡྷ} ན ྣ པ ྤ ཕ ྥ བ {བྷ} ྦ {ྦྷ} མ ྨ ཙ ྩ ཚ ྪ ཛ {ཛྷ} ྫ {ྫྷ} ཝ ྭ ྺ ཞ ྮ ཟ ྯ འ ྰ ཡ ྱ ྻ ར ཪ ྲ ྼ ལ ླ ཤ ྴ ཥ ྵ ས ྶ ཧ ྷ ཨ ྸ ི {ཱི} ྀ {ཱྀ} ུ {ཱུ} {ྲྀ} ཷ {ླྀ} ཹ ེ ཻ ོ ཽ ྄]},
+			numbers => qr{[\- , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
+			punctuation => qr{[\: ་ །]},
 		};
 	},
 EOT
@@ -415,14 +417,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -661,8 +663,8 @@ has 'day_periods' => (
 					'am' => q{སྔ་དྲོ་},
 				},
 				'wide' => {
-					'am' => q{སྔ་དྲོ་},
 					'pm' => q{ཕྱི་དྲོ་},
+					'am' => q{སྔ་དྲོ་},
 				},
 			},
 		},
@@ -736,11 +738,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			yMMMMd => q{G སྤྱི་ལོ་y MMMMའི་ཚེས་d},
-			yMMMd => q{G y ལོའི་MMMཚེས་d},
-			yyyyMMMd => q{G y ལོའི་MMMཚེས་d},
-		},
 		'gregorian' => {
 			GyMMM => q{G y LLLL},
 			MMMEd => q{MMMཚེས་d, E},
@@ -749,6 +746,11 @@ has 'datetime_formats_available_formats' => (
 			yMMM => q{y LLL},
 			yMMMMd => q{སྤྱི་ལོ་y MMMMའི་ཚེས་d},
 			yMMMd => q{y ལོའི་MMMཚེས་d},
+		},
+		'generic' => {
+			yMMMMd => q{G སྤྱི་ལོ་y MMMMའི་ཚེས་d},
+			yMMMd => q{G y ལོའི་MMMཚེས་d},
+			yyyyMMMd => q{G y ལོའི་MMMཚེས་d},
 		},
 	} },
 );

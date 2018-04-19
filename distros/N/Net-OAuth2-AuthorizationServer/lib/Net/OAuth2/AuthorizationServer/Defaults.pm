@@ -79,7 +79,7 @@ sub confirm_by_resource_owner {
 sub verify_token_and_scope {
     my ( $self, %args ) = @_;
 
-    my ( $refresh_token, $scopes_ref, $auth_header, $is_legacy_caller ) =
+    my ( $refresh_token, $scopes_ref, $auth_header ) =
         @args{ qw/ refresh_token scopes auth_header / };
 
     my $access_token;
@@ -237,7 +237,7 @@ sub _verify_access_token {
             }
         }
 
-        return ( $self->refresh_tokens->{ $a_token }{ client_id }, undef );
+        return ( $self->refresh_tokens->{ $a_token }, undef );
     }
     elsif ( exists( $self->access_tokens->{ $a_token } ) ) {
 
@@ -254,7 +254,7 @@ sub _verify_access_token {
 
         }
 
-        return ( $self->access_tokens->{ $a_token }{ client_id }, undef );
+        return ( $self->access_tokens->{ $a_token }, undef );
     }
 
     return ( 0, 'invalid_grant' );
@@ -295,7 +295,7 @@ sub _verify_access_token_jwt {
             }
         }
 
-        return ( $access_token_payload->{client}, undef, $access_token_payload->{scopes} );
+        return ( $access_token_payload, undef, $access_token_payload->{scopes} );
     }
 
     return ( 0, 'invalid_grant' );

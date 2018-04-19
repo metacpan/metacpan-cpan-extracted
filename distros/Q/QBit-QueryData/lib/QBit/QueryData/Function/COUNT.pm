@@ -1,5 +1,5 @@
 package QBit::QueryData::Function::COUNT;
-$QBit::QueryData::Function::COUNT::VERSION = '0.010';
+$QBit::QueryData::Function::COUNT::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::QueryData::Function);
@@ -9,40 +9,39 @@ sub init {
 
     $self->SUPER::init();
 
+    return FALSE if $self->has_errors();
+
     my $arg = $self->args->[0];
 
     $self->{'AGGR_FIELD'} = ref($arg) eq 'SCALAR' && $$arg eq '*' ? $$arg : $arg;
-    $self->{'AGGREGATOR'} = {};
-    $self->{'COUNT'}      = 0;
-}
-
-sub init_storage {
-    $_[0]->{'AGGREGATOR'} = {};
-    $_[0]->{'COUNT'}      = 0;
+    $self->{'PATH'} = $self->qd->_get_path($self->{'AGGR_FIELD'});
 }
 
 sub process {
-    my ($self, $row) = @_;
+    my ($self) = @_;
 
+    my $code;
     if ($self->{'AGGR_FIELD'} eq '*') {
-        $self->{'COUNT'}++;
+        $code = '        $new_row->{' . $self->qd->quote($self->field) . '} = 1;
+';
     } else {
-        my $val = $self->qd->get_field_value_by_path($row, $row, undef, @{$self->qd->_get_path($self->{'AGGR_FIELD'})});
-
-        $self->{'COUNT'}++ if defined($val);
+        $code =
+            '        $new_row->{'
+          . $self->qd->quote($self->field)
+          . '} = defined('
+          . $self->qd->_get_field_code_by_path('$row', $self->{'PATH'})
+          . ') ? 1 : 0;
+';
     }
 
-    return $self->{'COUNT'} // 0;
+    return $code;
 }
 
 sub aggregation {
-    my ($self, $row, $key) = @_;
+    my ($self, $var) = @_;
 
-    $self->{'AGGREGATOR'}{$key} += $self->{'COUNT'} // 0;
-
-    $self->{'COUNT'} = 0;
-
-    return $self->{'AGGREGATOR'}{$key} // 0;
+    return '            ' . $var . ' += $new_row->{' . $self->qd->quote($self->field) . '};
+';
 }
 
 TRUE;

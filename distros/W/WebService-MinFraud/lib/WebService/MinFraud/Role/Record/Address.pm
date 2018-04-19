@@ -3,7 +3,7 @@ package WebService::MinFraud::Role::Record::Address;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use WebService::MinFraud::Types qw( Bool BoolCoercion Num);
 
@@ -55,7 +55,7 @@ WebService::MinFraud::Role::Record::Address - This is an address role that shipp
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SUPPORT
 

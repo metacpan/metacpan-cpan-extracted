@@ -59,7 +59,7 @@ $build->clean_build_done_marker;
 
 #### check what options we have for our platform
 $build->notes('build_params', { dirname => 'Box2D_v2.1.2/Box2D/Box2D',
-                                url => 'http://box2d.googlecode.com/files/Box2D_v2.1.2.zip',
+                                url => 'http://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/box2d/Box2D_v2.1.2.zip',
                                 sha1sum  => 'b1f09f38fc130ae6c17e1767747a3a82bf8e517f',
                                 patches => [ 'patches/mingw-minmax.diff' ],
                               } );

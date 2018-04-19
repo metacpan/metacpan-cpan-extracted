@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Sn - Package for language Shona
 
 package Locale::CLDR::Locales::Sn;
 # This file auto generated from Data\common\main\sn.xml
-#	on Fri 29 Apr  7:25:20 pm GMT
+#	on Fri 13 Apr  7:28:38 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -326,9 +327,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x])},
+			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p r s t u v w y z])},
+			main => qr{[a b c d e f g h i j k l m n o p r s t u v w y z]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -378,6 +380,62 @@ has 'nostr' => (
 	isa			=> RegexpRef,
 	init_arg	=> undef,
 	default		=> sub { qr'^(?i:Kwete|K|no|n)$' }
+);
+
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 1,
+);
+
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'latn' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'minusSign' => q(-),
+			'nan' => q(NaN),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+		},
+	} }
+);
+
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		decimalFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '#,##0.###',
+				},
+			},
+		},
+		percentFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '#,##0%',
+				},
+			},
+		},
+		scientificFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '#E0',
+				},
+			},
+		},
+} },
 );
 
 has 'number_currency_formats' => (
@@ -709,8 +767,27 @@ has 'calendar_months' => (
 							'Nya',
 							'Gun',
 							'Gum',
-							'Mb',
+							'Mbu',
 							'Zvi'
+						],
+						leap => [
+							
+						],
+					},
+					narrow => {
+						nonleap => [
+							'N',
+							'K',
+							'K',
+							'K',
+							'C',
+							'C',
+							'C',
+							'N',
+							'G',
+							'G',
+							'M',
+							'Z'
 						],
 						leap => [
 							
@@ -737,6 +814,25 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'Ndi',
+							'Kuk',
+							'Kur',
+							'Kub',
+							'Chv',
+							'Chk',
+							'Chg',
+							'Nya',
+							'Gun',
+							'Gum',
+							'Mbu',
+							'Zvi'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'N',
@@ -756,6 +852,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'Ndira',
+							'Kukadzi',
+							'Kurume',
+							'Kubvumbi',
+							'Chivabvu',
+							'Chikumi',
+							'Chikunguru',
+							'Nyamavhuvhu',
+							'Gunyana',
+							'Gumiguru',
+							'Mbudzi',
+							'Zvita'
+						],
+						leap => [
+							
+						],
+					},
 				},
 			},
 	} },
@@ -770,12 +885,30 @@ has 'calendar_days' => (
 				'format' => {
 					abbreviated => {
 						mon => 'Muv',
-						tue => 'Chip',
-						wed => 'Chit',
-						thu => 'Chin',
-						fri => 'Chis',
+						tue => 'Chp',
+						wed => 'Cht',
+						thu => 'Chn',
+						fri => 'Chs',
 						sat => 'Mug',
 						sun => 'Svo'
+					},
+					narrow => {
+						mon => 'M',
+						tue => 'C',
+						wed => 'C',
+						thu => 'C',
+						fri => 'C',
+						sat => 'M',
+						sun => 'S'
+					},
+					short => {
+						mon => 'Mu',
+						tue => 'Cp',
+						wed => 'Ct',
+						thu => 'Cn',
+						fri => 'Cs',
+						sat => 'Mg',
+						sun => 'Sv'
 					},
 					wide => {
 						mon => 'Muvhuro',
@@ -788,6 +921,15 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						mon => 'Muv',
+						tue => 'Chp',
+						wed => 'Cht',
+						thu => 'Chn',
+						fri => 'Chs',
+						sat => 'Mug',
+						sun => 'Svo'
+					},
 					narrow => {
 						mon => 'M',
 						tue => 'C',
@@ -796,6 +938,24 @@ has 'calendar_days' => (
 						fri => 'C',
 						sat => 'M',
 						sun => 'S'
+					},
+					short => {
+						mon => 'Mu',
+						tue => 'Cp',
+						wed => 'Ct',
+						thu => 'Cn',
+						fri => 'Cs',
+						sat => 'Mg',
+						sun => 'Sv'
+					},
+					wide => {
+						mon => 'Muvhuro',
+						tue => 'Chipiri',
+						wed => 'Chitatu',
+						thu => 'China',
+						fri => 'Chishanu',
+						sat => 'Mugovera',
+						sun => 'Svondo'
 					},
 				},
 			},
@@ -814,6 +974,28 @@ has 'calendar_quarters' => (
 						2 => 'K3',
 						3 => 'K4'
 					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
+					wide => {0 => 'Kota 1',
+						1 => 'Kota 2',
+						2 => 'Kota 3',
+						3 => 'Kota 4'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => 'K1',
+						1 => 'K2',
+						2 => 'K3',
+						3 => 'K4'
+					},
+					narrow => {0 => '1',
+						1 => '2',
+						2 => '3',
+						3 => '4'
+					},
 					wide => {0 => 'Kota 1',
 						1 => 'Kota 2',
 						2 => 'Kota 3',
@@ -821,6 +1003,44 @@ has 'calendar_quarters' => (
 					},
 				},
 			},
+	} },
+);
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'narrow' => {
+					'am' => q{a},
+					'pm' => q{p},
+				},
+				'wide' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+			},
+			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+			},
+		},
 	} },
 );
 
@@ -838,7 +1058,7 @@ has 'eras' => (
 			},
 			wide => {
 				'0' => 'Kristo asati auya',
-				'1' => 'Kristo ashaya'
+				'1' => 'mugore ramambo vedu'
 			},
 		},
 	} },
@@ -856,10 +1076,10 @@ has 'date_formats' => (
 			'short' => q{dd/MM/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE, d MMMM y},
-			'long' => q{d MMMM y},
-			'medium' => q{d MMM y},
-			'short' => q{dd/MM/y},
+			'full' => q{y MMMM d, EEEE},
+			'long' => q{y MMMM d},
+			'medium' => q{y MMM d},
+			'short' => q{y-MM-dd},
 		},
 	} },
 );
@@ -872,10 +1092,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 	} },
 );
@@ -886,8 +1106,16 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 	} },
 );
@@ -898,6 +1126,9 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{G y},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -921,27 +1152,48 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 		},
 		'gregorian' => {
+			E => q{ccc},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
 			M => q{L},
-			MEd => q{E, M/d},
+			MEd => q{MM-dd, E},
 			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
+			MMMEd => q{MMM d, E},
 			MMMMEd => q{E, MMMM d},
+			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
-			Md => q{M/d},
+			Md => q{MM-dd},
 			d => q{d},
+			h => q{h a},
 			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
 			ms => q{mm:ss},
 			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E, MMM d, y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
+			yM => q{y-MM},
+			yMEd => q{y-MM-dd, E},
+			yMMM => q{y MMM},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y MMMM},
+			yMMMd => q{y MMM d},
+			yMd => q{y-MM-dd},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{'week' w 'of' Y},
 		},
 	} },
 );
@@ -951,6 +1203,9 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			'Timezone' => '{0} {1}',
+		},
 	} },
 );
 
@@ -959,6 +1214,101 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{y MMM–MMM},
+				y => q{y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{y MMM d, E – MMM d, E},
+				d => q{y MMM d, E – MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{y MMMM–MMMM},
+				y => q{y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{y MMM d – MMM d},
+				d => q{y MMM d–d},
+				y => q{y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
+			},
+		},
 	} },
 );
 

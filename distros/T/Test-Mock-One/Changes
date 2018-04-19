@@ -1,5 +1,16 @@
 Revision history for Test::Mock::One
 
+0.010     2018-04-16 11:53:02Z
+
+    * Add test for one_called($mock, 'foo') for when 'foo' isn't called.
+
+0.009     2018-04-13 19:13:39Z
+
+    * Remove unneed blessed from Test::Mock::One
+    * Fix test export tag
+    * Allow one_called($mock, 'func') in order to check if someone
+      called the mock object.
+
 0.008     2018-04-02 19:00:24Z
 
     * Add Test::Mock::Two to provide introspection for Test::Mock::One.

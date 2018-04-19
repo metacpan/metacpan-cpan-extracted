@@ -625,14 +625,15 @@ sub MYSQLlex {
 		} elsif ($state eq 'MY_LEX_USER_END') {
 			if (
 				($state_map->[$lexer->yyPeek()] eq 'MY_LEX_STRING') ||
-				($state_map->[$lexer->yyPeek()] eq 'MY_LEX_USER_VARIABLE_DELIMITER') ||
 				($state_map->[$lexer->yyPeek()] eq 'MY_LEX_STRING_OR_DELIMITER')
 			) {
 				next;
 			} elsif ($state_map->[$lexer->yyPeek()] eq 'MY_LEX_USER_END') {
 				$lexer->[LEXER_NEXT_STATE] = 'MY_LEX_SYSTEM_VAR';
+            } elsif ($state_map->[$lexer->yyPeek()] eq 'MY_LEX_USER_VARIABLE_DELIMITER') {
+                $lexer->[LEXER_NEXT_STATE] = 'MY_LEX_START';
 			} else {
-				$lexer->[LEXER_NEXT_STATE] = 'MY_LEX_HOSTNAME';
+				$lexer->[LEXER_NEXT_STATE] = 'MY_LEX_HOSTNAME'; # could be replaced by 'MY_LEX_START' for homogeneity
 			}
 			my $lex_str = substr($string, $lexer->[LEXER_PTR], 1);
 			return ('@', $lex_str);

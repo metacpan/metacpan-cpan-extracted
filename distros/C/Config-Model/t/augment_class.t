@@ -1,41 +1,16 @@
 # -*- cperl -*-
 
-use warnings;
-
-use ExtUtils::testlib;
 use Test::More;
-use Test::Exception;
 use Test::Memory::Cycle;
 use Test::Differences;
 use Config::Model;
 use Data::Dumper;
-use Log::Log4perl qw(:easy :levels);
+use Config::Model::Tester::Setup qw/init_test/;
 
 use strict;
+use warnings;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-$log  = 1 if $arg =~ /l/;
-$show = 1 if $arg =~ /s/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok( 1, "Compilation done" );
-
-# minimal set up to get things working
-my $model = Config::Model->new();
+my ($model, $trace) = init_test();
 
 $model->create_config_class(
     name => "Master",
@@ -80,7 +55,8 @@ $model->create_config_class(
 
 $model->create_config_class(
     name    => "Two",
-    element => [ two => { type => 'leaf', value_type => 'string', }, ] );
+    element => [ two => { type => 'leaf', value_type => 'string', }, ]
+);
 
 $model->augment_config_class(
     name          => "Master",
@@ -117,7 +93,8 @@ $model->augment_config_class(
 # augment a class which is inherited
 $model->augment_config_class(
     name    => "Two",
-    element => [ two_and_a_half => { type => 'leaf', value_type => 'string', }, ] );
+    element => [ two_and_a_half => { type => 'leaf', value_type => 'string', }, ]
+);
 
 # use Tk::ObjScanner; Tk::ObjScanner::scan_object($model) ;
 

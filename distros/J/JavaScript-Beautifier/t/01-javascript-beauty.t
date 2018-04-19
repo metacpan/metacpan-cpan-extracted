@@ -25,6 +25,16 @@ sub test_beautifier {
     $tests_num++;
     is($result, $expected, $input);
 }
+sub test_beautifier1 {
+    my ($input, $expected) = @_;
+
+    $expected ||= $input;
+    my $result = js_beautify( $input, $opts );
+
+    $tests_num++;
+    $result .= "\n";
+    is($result, $expected, $input);
+}
 
 sub bt {
     my ($input, $expected) = @_;
@@ -188,9 +198,9 @@ bt( '{--bar;}', "{\n    --bar;\n}");
 bt( '{++bar;}', "{\n    ++bar;\n}");
 
 # regexps
-bt( 'a(/abc\\/\\/def/);b()', "a(/abc\\\\/\\\\ / def / );\nb()" );
-bt( 'a(/a[b\\[\\]c]d/);b()', "a(/a[b\\\\[\\\\]c]d/);\nb()" );
-test_beautifier('a(/a[b\\[', "a(/a[b\\\\["); # incomplete char class
+bt( 'a(/abc\\/\\/def/);b()', "a(/abc\\/\\/def/);\nb()" );
+bt( 'a(/a[b\\[\\]c]d/);b()', "a(/a[b\\[\\]c]d/);\nb()" );
+test_beautifier('a(/a[b\\[', "a(/a[b\\["); # incomplete char class
 # allow unescaped / in char classes
 bt( 'a(/[a/b]/);b()', "a(/[a/b]/);\nb()" );
 
@@ -241,6 +251,26 @@ bt( "var\na=dont_preserve_newlines", "var a = dont_preserve_newlines" );
 $opts->{preserve_newlines} = 1;
 bt( "var\na=do_preserve_newlines", "var\na = do_preserve_newlines"  );
 
+my $xxinput = <<'EOF';
+x=2;eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('$(5).4(3(){$(\'.1\').0(2);$(\'.6\').0(d);$(\'.7\').0(b);$(\'.a\').0(8);$(\'.9\').0(c)});',14,14,'html|r5e57|8080|function|ready|document|r1655|rc15b|8888|r39b0|r6ae9|3128|65309|80'.split('|'),0,{}))c=abx;
+EOF
+print $xxinput . "\n";
+
+my $xxexpected = <<'EOF';
+x = 2;
+$(document).ready(function() {
+ $('.r5e57').html(8080);
+ $('.r1655').html(80);
+ $('.rc15b').html(3128);
+ $('.r6ae9').html(8888);
+ $('.r39b0').html(65309);
+});
+c = abx;
+EOF
+
+test_beautifier1($xxinput,$xxexpected);
+
 done_testing( $tests_num );
 
 1;
+

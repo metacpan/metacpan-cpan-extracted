@@ -1,11 +1,34 @@
-2017-03-01 v0.17 pjacklam
+0.18 2018-04-17
+
+ * Sync with recent versions of Math::BigInt. Also fix config() and tests of
+   config().
+
+ * Add test files t/release-test-version.t, t/release-kwalitee.t,
+   t/release-unused-vars.t, t/release-portability.t, t/release-synopsis.t,
+   t/release-whitespaces.t, and t/release-cpan-changes.t.
+
+ * Reformat CHANGES to match the specification in CPAN::Changes::Spec and
+   CPAN::Meta::Spec.
+
+ * Convert test file t/02pod.t to t/release-pod.t and t/03podcov.t to
+   t/release-pod-coverage.t.
+
+ * Use $LIB for the name of the backend math library.
+
+ * Add "use warnings;".
+
+ * No need for "require Exporter" when our parent class loads it.
+
+ * Make sure tests pass for newer versions of Perl where '.' is not in @INC.
+
+0.17 2017-03-01 pjacklam
 
  * Improve the logic in blog() to determine how to call objectify(). The old,
    simpler logic didn't handle an undefined base correctly.
 
  * Fix bexp() which was objectifying one argument too many.
 
-2015-11-30 v0.16 pjacklam
+0.16 2015-11-30 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
@@ -30,7 +53,7 @@
 
  * Remove unused variables in Math/BigInt/Lite.pm.
 
-2015-11-25 v0.15 pjacklam
+0.15 2015-11-25 pjacklam
 
  * POD nits
 
@@ -58,17 +81,17 @@
 
  * Update files NEW, README, and TODO.
 
-2010-09-14 v0.14 rafl (3202 tests)
+0.14 2010-09-14 rafl (3202 tests)
 
  * Add a test for a blog() failure caused by a Math::BigInt bug
 
  * Depend on Math::BigInt 1.94 to fix the above failure
 
-2010-09-10 v0.13 rafl (3200 tests)
+0.13 2010-09-10 rafl (3200 tests)
 
  * Fix tests with Math::BigInt >= 1.90 and depend on it.
 
-2007-05-27 v0.12 Tels (3194 tests)
+0.12 2007-05-27 Tels (3194 tests)
 
  * add round-mode "common"
 
@@ -84,7 +107,7 @@
 
  * add POD tests
 
-2004-01-06 v0.11 Tels (2879 tests)
+0.11 2004-01-06 Tels (2879 tests)
 
  * fix perl -Mbignum -le 'print 10->blog()' (did die with error)
 
@@ -98,7 +121,7 @@
 
  * fixed is_one() to handle sign parameter
 
-2002-06-05 v0.10 Tels
+0.10 2002-06-05 Tels
 
  * fixed bug in bfac() that appeared with BigInt v1.57
 
@@ -109,11 +132,11 @@
 
  * test that Math::BigFloat with Math::BigInt::Lite really works
 
-2002-0?-?? v0.09 Tels
+Unknown Release Date v0.09 Tels
 
  * ?
 
-2002-03-25 v0.08 Tels
+0.08 2002-03-25 Tels
 
  * config() was missing
 
@@ -121,7 +144,7 @@
 
  * ficed bdiv() to upgrade when Math::BigInt upgrade is set
 
-2002-03-17 v0.07 Tels
+0.07 2002-03-17 Tels
 
  * upgrade_2: separate version for mul
 
@@ -131,7 +154,7 @@
 
  * round() works now
 
-2002-03-15 v0.06 Tels
+0.06 2002-03-15 Tels
 
  * passes all tests, yeah!
 
@@ -141,7 +164,7 @@
 
  * assorted fixes all over the place
 
-2002-03-17 v0.05 Tels
+0.05 2002-03-17 Tels
 
  * as_number() does no longer upgrade Lite's to BigInt
 
@@ -153,25 +176,20 @@
 
  * bigintpm.t fails 66/2181 tests
 
-2002-03-08 v0.04 Tels
+0.04 2002-03-08 Tels
 
  * digt/length work now
 
  * bigintpm.t fails 118/2166 tests
 
-2002-03-06 v0.03 Tels
+0.03 2002-03-06 Tels
 
  * bigintpm.t fails 313 tests
 
-2002-03-06 v0.02 Tels
+0.02 2002-03-06 Tels
 
  * bigintpm.t tests runs trough, but fails 545 tests
 
-2002-03-05 v0.01 Tels
+0.01 2002-03-05 Tels
 
  * first release
-
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
-
-Tels <http://bloodgate.com/>

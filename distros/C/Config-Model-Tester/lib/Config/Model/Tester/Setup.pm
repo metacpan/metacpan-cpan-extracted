@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester::Setup;
 # ABSTRACT: Common test setup functions for Config::Model
-$Config::Model::Tester::Setup::VERSION = '3.005';
+$Config::Model::Tester::Setup::VERSION = '3.006';
 use warnings;
 use strict;
 use locale;
@@ -19,7 +19,7 @@ use 5.10.1;
 use Test::More;
 use Log::Log4perl 1.11 qw(:easy :levels);
 use Path::Tiny;
-use Getopt::Std;
+use Getopt::Long;
 
 # use eval so this module does not have a "hard" dependency on Config::Model
 # This way, Config::Model can build-depend on Config::Model::Tester without
@@ -34,22 +34,29 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(init_test setup_test_dir);
 
 sub init_test {
-    my %opts;
-    getopts('tel', \%opts);
+    my @option_specs = qw/trace error log/;
+    push @option_specs, @_;
 
-    if ($opts{e}) {
+    GetOptions( \my %opts,  @option_specs)
+        || die "Unknown option. Expected options are @option_specs";
+
+    if ($opts{error}) {
         Config::Model::Exception::Any->Trace(1);
-    }
-
-    if (not $opts{l}) {
-        Log::Log4perl->easy_init( $ERROR );
     }
 
     my $model = Config::Model->new( );
 
+    if ($opts{log}) {
+        note("enabling logs");
+        $model->initialize_log4perl;
+    }
+    else {
+        Log::Log4perl->easy_init( $ERROR );
+    }
+
     ok( $model, "compiled" );
 
-    return ($model, $opts{t});
+    return ($model, $opts{trace}, \%opts);
 }
 
 sub setup_test_dir {
@@ -81,7 +88,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 3.005
+version 3.006
 
 =head1 SYNOPSIS
 
@@ -91,7 +98,7 @@ version 3.005
 
  use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
- my ($model, $trace) = init_test(shift);
+ my ($model, $trace) = init_test();
 
  # pseudo root where config files are written by config-model as setup
  # by init_test
@@ -108,26 +115,43 @@ be used in most test involving L<Config::Model>.
 
 Scan test command line options and initialise a L<Config::Model> object.
 
-Returns a list containing a L<Config::Model> object and a
-boolean. This boolean is true if option C<-t> was used on the command line.
+Returns a list containing a L<Config::Model> object, a boolean and a
+hash. The boolean is true if option C<--trace> was used on the command
+line.
 
-Command options are:
+Default command options are:
 
 =over
 
 =item *
 
-C<-e>: When set, error handled by L<Config::Model::Exception> shows a
+C<--error>: When set, error handled by L<Config::Model::Exception> shows a
 strack trace when dying.
 
 =item *
 
-C<-l>: When set, L<Log::Log4perl> uses the config from file
+C<--log>: When set, L<Log::Log4perl> uses the config from file
 C<~/.log4config-model> or the default config provided by
 L<Config::Model>. Without 'l', only Error level and above are shown.
 Experimental.
 
 =back
+
+More options can be passed to C<init_test> using option definitions
+like the one defined in L<Getopt::Long> . The value of the command
+line options are returned in the 3rd returned value.
+
+For instance, for a test named C<t/my_test.t> calling :
+
+  init_test('foo', 'bar=s')
+
+The test file can be run with:
+
+  perl t/my_test.t --foo --bar=baz --log --trace
+
+C<init_test> returns:
+
+  ($model, 1, { foo => 1, bar => 'baz', log => 1 , trace => 1, error => 0 })
 
 =head2 setup_test_dir
 

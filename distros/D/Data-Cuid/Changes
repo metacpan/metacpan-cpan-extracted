@@ -1,5 +1,15 @@
 Revision history for Perl extension Data-cuid
 
+0.04 2018-04-16T05:16:56Z
+
+    - Ensure that _encode_base36() returns a fixed-size result,
+      thanks to Michael Ezzell (fixes #1)
+
+0.03 2018-04-13T04:08:17Z
+
+    - Remove Math::Base36 dependency; include its encode function
+      instead
+
 0.02 2018-04-07T15:01:26Z
 
     - Simplify parts of test and module

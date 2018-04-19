@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '5.5'; # VERSION
+our $VERSION = '5.6'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -141,7 +141,6 @@ my %DEF = (
                    exists $_GLOBALS{"date-separator"} ? $_GLOBALS{"date-separator"} :
                    '.',
 );
-debug_var(\%DEF);
 CLI::Helpers::override(verbose => 1) if $DEF{NOOP};
 
 my $BASE_URL = URI->new(sprintf "%s://%s:%d", @DEF{qw(PROTO HOST PORT)});
@@ -354,23 +353,29 @@ sub es_request {
         }
         else {
             # Validate each included index
-            my @valid;
-            my @test = is_arrayref($index_in) ? @{ $index_in } : split /\,/, $index_in;
-            foreach my $i (@test) {
-                push @valid, $i if es_index_valid($i);
-            }
-            $index = join(',', @valid);
+            my @indexes = is_arrayref($index_in) ? @{ $index_in } : split /\,/, $index_in;
+            $index = join(',', @indexes);
         }
     }
-    $options->{index} = $index if defined $index;
-    $index ||= '';
+
+    # For the cat api, index goes *after* the command
+    if( $url =~ /^_cat/ && $index ) {
+        $url =~ s/\/$//;
+        $url = join('/', $url, $index);
+        delete $options->{command};
+    }
+    elsif( $index ) {
+        $options->{index} = $index;
+    }
+    else {
+        $index = '';
+    }
 
 
     # Figure out if we're modifying things
     my $modification = $url eq '_search' && $options->{method} eq 'POST' ? 0
                      : $options->{method} ne 'GET';
 
-    my ($status,$res);
     if($modification) {
         # Set NOOP if necessary
         if(!$DEF{NOOP} && $DEF{MASTERONLY}) {
@@ -425,7 +430,6 @@ sub es_nodes {
             output({color=>"red"}, "es_nodes(): Unable to locate nodes in status!");
             exit 1;
         }
-        debug_var($res);
         foreach my $id ( keys %{ $res->{nodes} } ) {
             $_nodes{$id} = $res->{nodes}{$id}{name};
         }
@@ -472,41 +476,32 @@ sub es_indices {
         my $res = es_request('_cat/indices', { uri_param => { h => 'index,status' } });
         foreach my $entry (@{ $res }) {
             my ($index,$status) = is_hashref($entry) ? @{ $entry }{qw(index status)} : split /\s+/, $entry;
-            debug("Evaluating '$index'");
             if(!exists $args{_all}) {
                 # State Check Disqualification
                 if($args{state} ne 'all'  && $args{check_state})  {
                     my $result = $status eq $args{state};
-                    debug({indent=>1,color=>$result ? 'green' : 'red' },
-                        sprintf('+ method:state=%s, got %s', $args{state}, $status)
-                    );
                     next unless $result;
                 }
 
                 if( defined $DEF{BASE} ) {
-                    debug({indent=>1}, "+ method:base - $DEF{BASE}");
                     my %bases = map { $_ => 1 } es_index_bases($index);
                     next unless exists $bases{$DEF{BASE}};
                 }
                 else {
                     my $p = es_pattern;
-                    debug({indent=>1}, sprintf "+ method:pattern - %s", encode_json($p));
                     next unless $index =~ /$p->{re}/;
                 }
                 debug({indent=>2},"= name checks succeeded");
 
                 if ($args{older} && defined $DEF{DAYS}) {
-                    debug({indent=>2,color=>"yellow"}, "+ checking to see if index is older than $DEF{DAYS} days.");
                     my $days_old = es_index_days_old( $index );
                     if ($days_old < $DEF{DAYS}) {
                         next;
                     }
                 }
                 elsif( $args{check_dates} && defined $DEF{DAYS} ) {
-                    debug({indent=>2,color=>"yellow"}, "+ checking to see if index is in the past $DEF{DAYS} days.");
 
                     my $days_old = es_index_days_old( $index );
-                    debug(sprintf "%s is %s days old", $index, defined $days_old ? $days_old : 'undef');
                     if( !defined $days_old ) {
                         debug({indent=>2,color=>'red'}, "! error locating date in string, skipping !");
                         next;
@@ -825,7 +820,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 5.5
+version 5.6
 
 =head1 SYNOPSIS
 
@@ -1165,7 +1160,7 @@ A pattern to match the indexes.  Can expand the following key words and characte
 
     '*'    expanded to '.*'
     'ANY'  expanded to '.*'
-    'DATE' expanded to a pattern to match a date, based on datesep
+    'DATE' expanded to a pattern to match a date,
 
 The indexes are compared against this pattern.
 
@@ -1354,7 +1349,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/App-ElasticSearch-Utilities>
+L<https://metacpan.org/release/App-ElasticSearch-Utilities>
 
 =item *
 

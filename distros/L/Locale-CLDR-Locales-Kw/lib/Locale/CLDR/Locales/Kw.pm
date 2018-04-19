@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Kw - Package for language Cornish
 
 package Locale::CLDR::Locales::Kw;
 # This file auto generated from Data\common\main\kw.xml
-#	on Fri 29 Apr  7:13:53 pm GMT
+#	on Fri 13 Apr  7:17:42 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -133,7 +134,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{(?^u:[a b c d e f g h i j k l m n o p q r s t u v w x y z])},
+			main => qr{[a b c d e f g h i j k l m n o p q r s t u v w x y z]},
 		};
 	},
 EOT
@@ -261,13 +262,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{a.m.},
-					'pm' => q{p.m.},
-				},
 				'abbreviated' => {
 					'am' => q{a.m.},
 					'pm' => q{p.m.},
+				},
+				'wide' => {
+					'pm' => q{p.m.},
+					'am' => q{a.m.},
 				},
 			},
 		},
@@ -372,28 +373,28 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			short => {
-				'daylight' => q(CEST),
-				'generic' => q(CET),
-				'standard' => q(CET),
+				'daylight' => q#CEST#,
+				'generic' => q#CET#,
+				'standard' => q#CET#,
 			},
 		},
 		'Europe_Eastern' => {
 			short => {
-				'daylight' => q(EEST),
-				'generic' => q(EET),
-				'standard' => q(EET),
+				'daylight' => q#EEST#,
+				'generic' => q#EET#,
+				'standard' => q#EET#,
 			},
 		},
 		'Europe_Western' => {
 			short => {
-				'daylight' => q(WEST),
-				'generic' => q(WET),
-				'standard' => q(WET),
+				'daylight' => q#WEST#,
+				'generic' => q#WET#,
+				'standard' => q#WET#,
 			},
 		},
 		'GMT' => {
 			short => {
-				'standard' => q(GMT),
+				'standard' => q#GMT#,
 			},
 		},
 	 } }

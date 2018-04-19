@@ -3,7 +3,7 @@
 package Main;
 # PODNAME: koha-index-daemon
 # ABSTRACT: Insert/update/delete records into Koha Zebra server
-$Main::VERSION = '0.054';
+$Main::VERSION = '0.055';
 use 5.010;
 use utf8;
 use warnings;
@@ -25,7 +25,7 @@ koha-index-daemon - Insert/update/delete records into Koha Zebra server
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 SYNOPSIS
 

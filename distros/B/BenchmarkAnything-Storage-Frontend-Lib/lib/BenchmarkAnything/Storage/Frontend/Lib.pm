@@ -2,11 +2,11 @@ use 5.008;
 use strict;
 use warnings;
 package BenchmarkAnything::Storage::Frontend::Lib;
-# git description: v0.020-2-g8b989ab
+# git description: v0.021-6-g2fd1fac
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Basic functions to access a BenchmarkAnything store
-$BenchmarkAnything::Storage::Frontend::Lib::VERSION = '0.021';
+$BenchmarkAnything::Storage::Frontend::Lib::VERSION = '0.022';
 use Scalar::Util 'reftype';
 
 
@@ -189,11 +189,11 @@ sub connect
                 no warnings 'once'; # avoid 'Name "DBI::errstr" used only once'
 
                 # connect
-                print "Connect db...\n" if $self->{verbose};
+                print "Connect db...\n" if $self->{debug};
                 my $dsn      = $self->{config}{benchmarkanything}{storage}{backend}{sql}{dsn};
                 my $user     = $self->{config}{benchmarkanything}{storage}{backend}{sql}{user};
                 my $password = $self->{config}{benchmarkanything}{storage}{backend}{sql}{password};
-                my $dbh      = DBI->connect($dsn, $user, $password, {'RaiseError' => 1})
+                my $dbh      = DBI->connect($dsn, $user, $password, {'RaiseError' => 1, 'mysql_auto_reconnect' => 1})
                  or die "benchmarkanything: can not connect: ".$DBI::errstr;
 
                 # external search engine
@@ -203,9 +203,9 @@ sub connect
                 $self->{dbh}     = $dbh;
                 $self->{backend} = BenchmarkAnything::Storage::Backend::SQL->new({dbh => $dbh,
                                                                                   dbh_config => $self->{config}{benchmarkanything}{storage}{backend}{sql},
-                                                                                  debug => $self->{debug},
+                                                                                  debug => $self->{config}{benchmarkanything}{debug},
                                                                                   force => $self->{force},
-                                                                                  verbose => $self->{verbose},
+                                                                                  verbose => $self->{config}{benchmarkanything}{verbose},
                                                                                   (keys %$searchengine ? (searchengine => $searchengine) : ()),
                                                                                  });
         }
@@ -341,7 +341,7 @@ sub _get_benchmark_operators
         {
                 # Hardcoded from BenchmarkAnything::Storage::Backend::SQL::Query::common,
                 # as it is a backend-special and internal thing anyway.
-                return [ '=', '!=', 'like', 'not like', '<', '>', '<=', '>=' ];
+                return [ '=', '!=', 'like', 'not_like', 'is_empty', '<', '>', '<=', '>=' ];
         }
 }
 
@@ -1052,7 +1052,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2018 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

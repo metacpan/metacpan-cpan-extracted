@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::YokogawaGS200;
-$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.630';
+$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.631';
 #ABSTRACT: YokogawaGS200 voltage/current source.
 
 use 5.010;
@@ -118,12 +118,12 @@ sub set_voltage {
 sub config_sweep {
     my ( $self, %args ) = validated_getter(
         \@_,
-        points => { isa => 'Num' },
-        rates  => { isa => 'Num' },
+        point => { isa => 'Num' },
+        rate  => { isa => 'Num' },
     );
 
-    my $target = delete $args{points};
-    my $rate   = delete $args{rates};
+    my $target = delete $args{point};
+    my $rate   = delete $args{rate};
 
     $self->cls(%args);
 
@@ -229,7 +229,7 @@ sub sweep_to_level {
     my $target = delete $args{target};
     my $rate   = delete $args{rate};
 
-    $self->config_sweep( points => $target, rates => $rate, %args );
+    $self->config_sweep( point => $target, rate => $rate, %args );
     $self->trg(%args);
     $self->wait(%args);
 }
@@ -257,7 +257,7 @@ Lab::Moose::Instrument::YokogawaGS200 - YokogawaGS200 voltage/current source.
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 SYNOPSIS
 

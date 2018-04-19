@@ -50,7 +50,8 @@ DIFFERENCES FROM List::Util
     @_ in blocks
         Inside a callback block (such as "any { }"), @_ will be empty when
         using the pure perl implementation. With the XS implementation, the
-        outer @_ will be visible.
+        outer @_ will be visible. Under the perl debugger, the XS
+        implementation will also not be able to see the outer @_.
 
 AUTHORS
     Graham Knop <haarg@haarg.org>

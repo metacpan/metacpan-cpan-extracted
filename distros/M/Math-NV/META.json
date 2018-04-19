@@ -29,6 +29,11 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::MPFR" : "4.03"
+         }
       }
    },
    "release_status" : "stable",
@@ -39,6 +44,6 @@
          "web" : "https://github.com/sisyphus/math-nv"
       }
    },
-   "version" : "1.02",
+   "version" : "2.0",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

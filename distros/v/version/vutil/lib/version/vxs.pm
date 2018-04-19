@@ -4,9 +4,9 @@ package version::vxs;
 use v5.10;
 use strict;
 
-use vars qw(@ISA $VERSION $CLASS );
-$VERSION = 0.9920;
-$CLASS = 'version::vxs';
+our $VERSION = 0.9923;
+our $CLASS = 'version::vxs';
+our @ISA;
 
 eval {
     require XSLoader;

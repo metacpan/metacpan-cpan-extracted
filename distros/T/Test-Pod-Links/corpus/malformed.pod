@@ -1,0 +1,13 @@
+=head1 NAME
+
+Test::Pod::Links - a malformed pod file
+
+=head1 DESCRIPTION
+
+This is a pod file with 1 link.
+
+=head1 SEE ALSO
+
+L<https://www.perl.com/
+
+=cut

@@ -456,7 +456,7 @@ sub renderTemplate{
     my $template = shift;
     my $destination = shift;
     $self->log->debug('['.$self->name.'] processing template '.$template);
-    my $newData = $self->template->render($self->app->home->rel_file('share/'.$template)->slurp);
+    my $newData = $self->template->render($self->app->home->rel_file('templates/system/'.$template)->slurp);
     if (-r $destination){
         my $oldData = Mojo::File->new($destination)->slurp;
         if ($newData eq $oldData){

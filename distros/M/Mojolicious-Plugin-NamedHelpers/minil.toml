@@ -1,0 +1,10 @@
+name = "Mojolicious-Plugin-NamedHelpers"
+module_maker="ModuleBuildTiny"
+tag_format="v%v"
+authority="cpan:TYLDUM"
+license="artistic_2"
+badges = ['metacpan']
+
+[FileGatherer]
+include_dotfiles = false
+

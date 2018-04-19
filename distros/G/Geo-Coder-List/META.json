@@ -40,8 +40,17 @@
       },
       "test" : {
          "requires" : {
+            "Geo::Coder::CA" : "0",
+            "Geo::Coder::GeocodeFarm" : "0",
+            "Geo::Coder::OSM" : "0",
+            "Geo::Coder::Ovi" : "0",
+            "Geo::Coder::Postcodes" : "0",
+            "LWP::UserAgent::Throttled" : "0.04",
+            "Test::Carp" : "0",
+            "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::Number::Delta" : "0"
          }
       }
    },
@@ -57,6 +66,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -2,17 +2,12 @@
 abstract: 'Autonomous SQL backend to store benchmarks'
 author:
   - 'Roberto Schaefer <schaefr@amazon.com>'
-build_requires:
-  File::Spec: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
-  Test::More: '0'
-  blib: '1.01'
+build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,6 +32,7 @@ requires:
   Module::Load: '0'
   Sereal::Decoder: '0'
   Sereal::Encoder: '0'
+  Try::Tiny: '0'
   base: '0'
   perl: '5.008'
   strict: '0'
@@ -46,10 +42,10 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=BenchmarkAnything-Storage-Backend-SQL
   homepage: http://metacpan.org/release/BenchmarkAnything-Storage-Backend-SQL
   repository: git://github.com/benchmarkanything/BenchmarkAnything-Storage-Backend-SQL.git
-version: '0.023'
+version: '0.024'
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.022000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -63,92 +59,74 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@TAPPER/GatherDir'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@TAPPER/PruneCruft'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@TAPPER/ManifestSkip'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@TAPPER/MetaYAML'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@TAPPER/Readme'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@TAPPER/ExtraTests'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@TAPPER/ExecDir'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@TAPPER/ShareDir'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@TAPPER/MakeMaker'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@TAPPER/Manifest'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@TAPPER/TestRelease'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@TAPPER/ConfirmRelease'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@TAPPER/UploadToCPAN'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@TAPPER/MetaConfig'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@TAPPER/MetaJSON'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@TAPPER/PkgVersion'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@TAPPER/PodSyntaxTests'
-      version: '5.043'
-    -
-      class: Dist::Zilla::Plugin::Test::Compile
-      config:
-        Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
-          fail_on_warning: author
-          fake_home: 0
-          filename: t/00-compile.t
-          module_finder:
-            - ':InstallModules'
-          needs_display: 0
-          phase: test
-          script_finder:
-            - ':PerlExecFiles'
-          skips:
-            - MCE
-      name: '@TAPPER/Test::Compile'
-      version: '2.054'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -167,7 +145,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@TAPPER/MetaResources'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@TAPPER/Authority'
@@ -267,7 +245,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@TAPPER/AutoPrereqs'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@TAPPER/Git::Describe'
@@ -279,7 +257,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@TAPPER/NextRelease'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -331,7 +309,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.023
+          tag: v0.024
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -358,7 +336,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -366,50 +344,50 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.043'
+      version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.043'
+      version: '5.041'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.043'
+    version: '5.041'
 x_authority: cpan:TAPPER

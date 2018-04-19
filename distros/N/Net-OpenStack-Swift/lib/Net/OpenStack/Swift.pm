@@ -8,7 +8,7 @@ use Data::Validator;
 use Net::OpenStack::Swift::Util qw/uri_escape uri_unescape debugf/;
 use Net::OpenStack::Swift::InnerKeystone;
 use namespace::clean -except => 'meta';
-our $VERSION = "0.14";
+our $VERSION = "0.15";
 
 
 subtype 'Path' => as 'Path::Tiny';
@@ -482,6 +482,7 @@ sub put_object {
         content_type   => { isa => 'Str', default => ''},
         etag           => { isa => 'Str', default => undef },
         query_string   => { isa => 'Str', default => sub {''} },
+        headers        => { isa => 'HashRef', default => {} },
     );
     my $args = $rule->validate(@_);
 
@@ -493,6 +494,7 @@ sub put_object {
     if ($args->{etag}) {
         push @{$request_header}, ('ETag' => $args->{etag});
     }
+    push @{$request_header}, %{ $args->{headers} };
 
     my $request_url = sprintf "%s/%s/%s", $args->{url},
         uri_escape($args->{container_name}->stringify),
@@ -806,6 +808,8 @@ Create or replace object.
 
 Optional.
 default none
+
+=item headers: HashRef
 
 =back
 

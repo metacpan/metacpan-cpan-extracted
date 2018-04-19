@@ -2,8 +2,8 @@ NAME
     App::GoogleAuthUtils - Utilities related to Google Authenticator
 
 VERSION
-    This document describes version 0.001 of App::GoogleAuthUtils (from Perl
-    distribution App-GoogleAuthUtils), released on 2018-02-08.
+    This document describes version 0.004 of App::GoogleAuthUtils (from Perl
+    distribution App-GoogleAuthUtils), released on 2018-04-18.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -27,10 +27,6 @@ FUNCTIONS
            issuer => "example.com"
          );
 
-        Result:
-
-         undef
-
     When generating a new 2FA token, you are usually presented with a secret
     key as well as a 2D barcode (QR code) representation of this secret key.
     You are advised to store the secret key and it's usually more convenient
@@ -48,6 +44,8 @@ FUNCTIONS
     *   account => *str*
 
     *   issuer* => *str*
+
+    *   output => *filename*
 
     *   secret_key* => *str*
 
@@ -78,6 +76,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    App::QRCodeUtils
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

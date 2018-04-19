@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Lkt - Package for language Lakota
 
 package Locale::CLDR::Locales::Lkt;
 # This file auto generated from Data\common\main\lkt.xml
-#	on Fri 29 Apr  7:14:36 pm GMT
+#	on Fri 13 Apr  7:18:10 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -231,10 +232,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[c d f {ȟʼ} j q r {sʼ} {šʼ} v x])},
+			auxiliary => qr{[c d f {ȟʼ} j q r {sʼ} {šʼ} v x]},
 			index => ['A', 'B', 'Č', 'E', 'G', 'Ǧ', 'H', 'Ȟ', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'S', 'Š', 'T', 'U', 'W', 'Y', 'Z', 'Ž'],
-			main => qr{(?^u:[a á {aŋ} b č {čh} {čʼ} e é g ǧ h ȟ i í {iŋ} k {kh} {kȟ} {kʼ} l m n ŋ o ó p {ph} {pȟ} {pʼ} s š t {th} {tȟ} {tʼ} u ú {uŋ} w y z ž ʼ])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . " “ ” ( ) \[ \] @ * / \& #])},
+			main => qr{[a á {aŋ} b č {čh} {čʼ} e é g ǧ h ȟ i í {iŋ} k {kh} {kȟ} {kʼ} l m n ŋ o ó p {ph} {pȟ} {pʼ} s š t {th} {tȟ} {tʼ} u ú {uŋ} w y z ž ʼ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . " “ ” ( ) \[ \] @ * / \& #]},
 		};
 	},
 EOT

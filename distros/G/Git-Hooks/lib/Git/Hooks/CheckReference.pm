@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.9.2';
+$Git::Hooks::CheckReference::VERSION = '2.9.3';
 use 5.010;
 use utf8;
 use strict;
@@ -55,8 +55,9 @@ sub check_ref {
         if (index($acl->{action}, $action) != -1) {
             unless ($acl->{allow}) {
                 $git->fault(<<EOS, {ref => $ref, option => 'acl'});
-The reference name is not allowed.
-Please, check your ACL options.
+The reference name is not allowed due to the following acl:
+
+  $acl->{acl}
 EOS
                 ++$errors;
             }
@@ -130,7 +131,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.9.2
+version 2.9.3
 
 =head1 SYNOPSIS
 

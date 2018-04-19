@@ -1,42 +1,16 @@
 # -*- cperl -*-
 
-use warnings;
-
-use ExtUtils::testlib;
 use Test::More;
 use Test::Exception;
-use Test::Warn;
 use Test::Differences;
 use Test::Memory::Cycle;
 use Config::Model;
-use Log::Log4perl qw(:easy :levels);
-
-BEGIN { plan tests => 11; }
+use Config::Model::Tester::Setup qw/init_test/;
 
 use strict;
+use warnings;
 
-my $arg = shift || '';
-
-my $log = 0;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-$log = 1 if $arg =~ /l/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-my $model = Config::Model->new();
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok( 1, "compiled" );
+my ($model, $trace) = init_test();
 
 # minimal set up to get things working
 $model->create_config_class(
@@ -107,3 +81,5 @@ ok( $lwdm2, "create list2_with_data_migration element" );
 eq_or_diff( [ $lwdm2->fetch_all_values ], [ baz0 => @old ], "list2 data migration (@old)" );
 
 memory_cycle_ok( $model, "test memory cycles" );
+
+done_testing;

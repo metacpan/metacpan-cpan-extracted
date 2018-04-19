@@ -1,5 +1,16 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.41     2018-04-16
+        - Handle inconsistencies between various grant types and the return
+          data from ->verify_token_and_scope sometimes returning a hash ref
+          and sometimes returning a string - now they always return a hash
+          ref in the case of a successful authentication (GH #20)
+
+        - Note that this may be a BREAKING CHANGE if you are using password
+          grant in your app
+
+        - Requires v0.17 of Net::OAuth2::AuthorizationServer for these changes
+
 0.40     2018-02-02
         - Add oauth2_auth_request helper to get at redirect URI that results
           from the authorization process

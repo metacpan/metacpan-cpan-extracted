@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Os - Package for language Ossetic
 
 package Locale::CLDR::Locales::Os;
 # This file auto generated from Data\common\main\os.xml
-#	on Fri 29 Apr  7:20:30 pm GMT
+#	on Fri 13 Apr  7:24:41 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -76,6 +77,7 @@ has 'display_name_language' => (
  				'es' => 'испайнаг',
  				'es_419' => 'латинаг америкаг англисаг',
  				'es_ES' => 'европӕйаг англисаг',
+ 				'es_MX' => 'мексикӕйаг испайнаг',
  				'et' => 'естойнаг',
  				'eu' => 'баскаг',
  				'fa' => 'персайнаг',
@@ -247,8 +249,9 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['А', 'Ӕ', 'Б', 'В', 'Г', '{Гъ}', 'Д', '{Дж}', '{Дз}', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', '{Къ}', 'Л', 'М', 'Н', 'О', 'П', '{Пъ}', 'Р', 'С', 'Т', '{Тъ}', 'У', 'Ф', 'Х', '{Хъ}', 'Ц', '{Цъ}', 'Ч', '{Чъ}', 'Ш', 'Щ', 'Ы', 'Э', 'Ю', 'Я'],
-			main => qr{(?^u:[а ӕ б в г {гъ} д {дж} {дз} е ё ж з и й к {къ} л м н о п {пъ} р с т {тъ} у ф х {хъ} ц {цъ} ч {чъ} ш щ ъ ы ь э ю я])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #])},
+			main => qr{[а ӕ б в г {гъ} д {дж} {дз} е ё ж з и й к {къ} л м н о п {пъ} р с т {тъ} у ф х {хъ} ц {цъ} ч {чъ} ш щ ъ ы ь э ю я]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -441,21 +444,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -790,8 +793,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'wide' => {
 					'am' => q{ӕмбисбоны размӕ},
@@ -879,7 +882,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -902,7 +905,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{y-'ӕм' 'азы' QQQ},
 			yQQQQ => q{y-'ӕм' 'азы' QQQQ},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -941,7 +944,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -986,7 +989,7 @@ has 'datetime_formats_interval' => (
 				h => q{h–h a v},
 			},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -1058,42 +1061,42 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Астӕуккаг Европӕйаг сӕрдыгон рӕстӕг),
-				'generic' => q(Астӕуккаг Европӕйаг рӕстӕг),
-				'standard' => q(Астӕуккаг Европӕйаг стандартон рӕстӕг),
+				'daylight' => q#Астӕуккаг Европӕйаг сӕрдыгон рӕстӕг#,
+				'generic' => q#Астӕуккаг Европӕйаг рӕстӕг#,
+				'standard' => q#Астӕуккаг Европӕйаг стандартон рӕстӕг#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Скӕсӕн Европӕйаг сӕрдыгон рӕстӕг),
-				'generic' => q(Скӕсӕн Европӕйаг рӕстӕг),
-				'standard' => q(Скӕсӕн Европӕйаг стандартон рӕстӕг),
+				'daylight' => q#Скӕсӕн Европӕйаг сӕрдыгон рӕстӕг#,
+				'generic' => q#Скӕсӕн Европӕйаг рӕстӕг#,
+				'standard' => q#Скӕсӕн Европӕйаг стандартон рӕстӕг#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Ныгъуылӕн Европӕйаг сӕрдыгон рӕстӕг),
-				'generic' => q(Ныгъуылӕн Европӕйаг рӕстӕг),
-				'standard' => q(Ныгъуылӕн Европӕйаг стандартон рӕстӕг),
+				'daylight' => q#Ныгъуылӕн Европӕйаг сӕрдыгон рӕстӕг#,
+				'generic' => q#Ныгъуылӕн Европӕйаг рӕстӕг#,
+				'standard' => q#Ныгъуылӕн Европӕйаг стандартон рӕстӕг#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Гринвичы рӕстӕмбис рӕстӕг),
+				'standard' => q#Гринвичы рӕстӕмбис рӕстӕг#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Гуырдзыстоны сӕрдыгон рӕстӕг),
-				'generic' => q(Гуырдзыстоны рӕстӕг),
-				'standard' => q(Гуырдзыстоны стандартон рӕстӕг),
+				'daylight' => q#Гуырдзыстоны сӕрдыгон рӕстӕг#,
+				'generic' => q#Гуырдзыстоны рӕстӕг#,
+				'standard' => q#Гуырдзыстоны стандартон рӕстӕг#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Мӕскуыйы сӕрдыгон рӕстӕг),
-				'generic' => q(Мӕскуыйы рӕстӕг),
-				'standard' => q(Мӕскуыйы стандартон рӕстӕг),
+				'daylight' => q#Мӕскуыйы сӕрдыгон рӕстӕг#,
+				'generic' => q#Мӕскуыйы рӕстӕг#,
+				'standard' => q#Мӕскуыйы стандартон рӕстӕг#,
 			},
 		},
 	 } }

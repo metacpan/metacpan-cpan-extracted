@@ -60,16 +60,16 @@ WriteMakefile(
         },
         provides => {
             'Date::Lectionary' => {
-                file    => 'lib/Date/Lectionary.pm',
-                version => '1.20180410',
+                file    => 'lib/Date/Lectionary.pm', 
+                version => '1.20180417'
             },
             'Date::Lectionary::Day' => {
-                file    => 'lib/Date/Lectionary/Day.pm',
-                version => '1.20180410',
+                file    => 'lib/Date/Lectionary/Day.pm', 
+                version => '1.20180417'
             },
             'Date::Lectionary::Year' => {
-                file    => 'lib/Date/Lectionary/Year.pm',
-                version => '1.20180410',
+                file    => 'lib/Date/Lectionary/Year.pm', 
+                version => '1.20180417'
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

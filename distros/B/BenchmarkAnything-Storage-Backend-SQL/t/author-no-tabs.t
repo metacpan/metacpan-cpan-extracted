@@ -22,7 +22,6 @@ my @files = (
     'lib/BenchmarkAnything/Storage/Backend/SQL/Query/mysql.pm',
     'lib/BenchmarkAnything/Storage/Backend/SQL/Search.pm',
     'lib/BenchmarkAnything/Storage/Backend/SQL/Search/MCE.pm',
-    't/00-compile.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-syntax.t',

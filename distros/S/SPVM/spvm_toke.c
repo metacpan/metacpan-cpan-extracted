@@ -64,12 +64,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         SPVM_LIST* op_use_stack = compiler->op_use_stack;
         
         while (1) {
-          SPVM_OP* op_use = NULL;
           if (op_use_stack->length > 0) {
-            op_use = SPVM_LIST_pop(op_use_stack);
-          }
-          
-          if (op_use) {
+            SPVM_OP* op_use = SPVM_LIST_pop(op_use_stack);
+            
             const char* package_name = op_use->uv.use->package_name;
             
             SPVM_OP* found_op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
@@ -144,9 +141,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 exit(EXIT_FAILURE);
               }
               
-              const char* package_name_with_template_args = op_use->uv.use->package_name_with_template_args;
               compiler->cur_file = cur_file;
-              compiler->cur_package_name_with_template_args = package_name_with_template_args;
+              compiler->cur_package_name = package_name;
               compiler->cur_op_use = op_use;
               
               // Read file content
@@ -172,16 +168,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               
               // Add package loading information
               const char* package_path = cur_file;
-              SPVM_HASH_insert(compiler->package_load_path_symtable, package_name_with_template_args, strlen(package_name_with_template_args), (void*)package_path);
+              SPVM_HASH_insert(compiler->package_load_path_symtable, package_name, strlen(package_name), (void*)package_path);
               
               compiler->cur_src = cur_src;
               compiler->bufptr = cur_src;
               compiler->befbufptr = cur_src;
-              compiler->current_package_count = 0;
               compiler->cur_line = 1;
-              compiler->cur_template_args = op_use->uv.use->template_args;
               break;
             }
+            
           }
           else {
             return 0;
@@ -1050,89 +1045,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           memcpy(keyword, cur_token_ptr, str_len);
           keyword[str_len] = '\0';
           
-          char* original_keyword = keyword;
-          
-          // Replace template variable
-          const char* found_template_var = strstr(keyword, "type");
-          if (found_template_var) {
-            if (isdigit(found_template_var[4])) {
-              SPVM_LIST* part_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-              
-              char* base_ptr = keyword;
-              char* cur_ptr = keyword;
-              
-              while (1) {
-                if (*cur_ptr == '_' || *cur_ptr == '\0') {
-                  int32_t length = (int32_t)(cur_ptr - base_ptr);
-                  char* part_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, length);
-                  memcpy(part_name, base_ptr, length);
-                  part_name[length] = '\0';
-                  SPVM_LIST_push(part_names, part_name);
-                  if (*cur_ptr == '\0') {
-                    break;
-                  }
-                  cur_ptr++;
-                  base_ptr = cur_ptr;
-                }
-                else {
-                  cur_ptr++;
-                }
-              }
-              
-              SPVM_LIST* replaced_part_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-              int32_t replaced_part_names_length = 0;
-              {
-                int32_t i;
-                for (i = 0; i < part_names->length; i++) {
-                  char* part_name = SPVM_LIST_fetch(part_names, i);
-                  if (strncmp(part_name, "type", 4) == 0 && isdigit(part_name[4])) {
-                    int32_t template_args_index;
-                    errno = 0;
-                    char *end;
-                    template_args_index = strtol(&part_name[4], &end, 10);
-                    if (*end != '\0') {
-                      fprintf(stderr, "Invalid template variable %s at %s line %" PRId32 "\n", &part_name[4], compiler->cur_file, compiler->cur_line);
-                      exit(EXIT_FAILURE);
-                    }
-                    else if (template_args_index == 0 || template_args_index > compiler->cur_template_args->length) {
-                      fprintf(stderr, "Invalid template variable, Index out of range %s at %s line %" PRId32 "\n", part_name, compiler->cur_file, compiler->cur_line);
-                      exit(EXIT_FAILURE);
-                    }
-                    
-                    char* replaced_part_name = SPVM_LIST_fetch(compiler->cur_template_args, template_args_index - 1);
-                    SPVM_LIST_push(replaced_part_names, replaced_part_name);
-                    replaced_part_names_length += strlen(replaced_part_name);
-                  }
-                  else {
-                    SPVM_LIST_push(replaced_part_names, part_name);
-                    replaced_part_names_length += strlen(part_name);
-                  }
-                  // _
-                  if (i != part_names->length - 1) {
-                    replaced_part_names_length += 1;
-                  }
-                }
-              }
-              
-              char* replaced_keyword = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, replaced_part_names_length);
-              {
-                int32_t i;
-                char* base_ptr = replaced_keyword;
-                for (i = 0; i < replaced_part_names->length; i++) {
-                  const char* replaced_part_name = SPVM_LIST_fetch(replaced_part_names, i);
-                  memcpy(base_ptr, replaced_part_name, strlen(replaced_part_name));
-                  base_ptr += strlen(replaced_part_name);
-                  if (i != replaced_part_names->length - 1) {
-                    *base_ptr = '_';
-                    base_ptr++;
-                  }
-                }
-                replaced_keyword[replaced_part_names_length] = '\0';
-              }
-              keyword = replaced_keyword;
-            }
-          }
-          
           if (!expect_name) {
             switch (keyword[0]) {
               // Keyword
@@ -1146,10 +1058,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 if (strcmp(keyword, "case") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CASE);
                   return CASE;
-                }
-                else if (strcmp(keyword, "class") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CLASS);
-                  return CLASS;
                 }
                 else if (strcmp(keyword, "croak") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CROAK);
@@ -1306,12 +1214,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               case 'p' :
                 if (strcmp(keyword, "package") == 0) {
-                  // File can contains only one package
-                  if (compiler->current_package_count) {
-                    fprintf(stderr, "Can't write second package declaration in file at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
-                    exit(EXIT_FAILURE);
-                  }
-                  compiler->current_package_count++;
                   
                   compiler->before_is_package = 1;
                   
@@ -1410,8 +1312,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             SPVM_OP* op_use = compiler->cur_op_use;
             SPVM_USE* use = op_use->uv.use;
             
-            if (strcmp(keyword, use->package_name_with_template_args) != 0) {
-              fprintf(stderr, "Package name \"%s\" must be match corresponding file path at %s line %" PRId32 "\n", original_keyword, compiler->cur_file, compiler->cur_line);
+            if (strcmp(keyword, use->package_name) != 0) {
+              fprintf(stderr, "Package name \"%s\" must be match corresponding file path at %s line %" PRId32 "\n", keyword, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
           }

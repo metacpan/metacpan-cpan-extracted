@@ -1,6 +1,6 @@
 package Pcore::WebSocket::Protocol::pcore;
 
-use Pcore -class, -result, -const;
+use Pcore -class, -res, -const;
 use Pcore::Util::Data;
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Text qw[trim];
@@ -26,22 +26,18 @@ const our $TX_TYPE_EXCEPTION => 'exception';
 my $CBOR = Pcore::Util::Data::get_cbor();
 my $JSON = Pcore::Util::Data::get_json( utf8 => 1 );
 
-sub rpc_call ( $self, $method, @ ) {
+sub rpc_call ( $self, $method, $args, $cb ) {
     my $msg = {
         type   => $TX_TYPE_RPC,
         method => $method,
+        data   => $args,
     };
 
     # detect callback
-    if ( is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
-        $msg->{data} = [ @_[ 2 .. $#_ - 1 ] ];
-
+    if ($cb) {
         $msg->{tid} = uuid_v1mc_str;
 
-        $self->{_callbacks}->{ $msg->{tid} } = $_[-1];
-    }
-    else {
-        $msg->{data} = [ @_[ 2 .. $#_ ] ];
+        $self->{_callbacks}->{ $msg->{tid} } = $cb;
     }
 
     $self->send_binary( \$CBOR->encode($msg) );
@@ -167,7 +163,7 @@ sub on_disconnect ( $self, $status ) {
     for my $tid ( keys $self->{_callbacks}->%* ) {
         my $cb = delete $self->{_callbacks}->{$tid};
 
-        $cb->( result [ $status->{status}, $status->{reason} ] );
+        $cb->( res [ $status->{status}, $status->{reason} ] );
     }
 
     return;
@@ -264,7 +260,7 @@ sub _on_message ( $self, $msg, $is_json ) {
                         my $result = {
                             type    => $TX_TYPE_EXCEPTION,
                             tid     => $tx->{tid},
-                            message => result [ 500, 'RPC is not supported' ],
+                            message => res [ 500, 'RPC is not supported' ],
                         };
 
                         if ($is_json) {
@@ -345,9 +341,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 222                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 218                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 270, 292, 307        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 266, 288, 303        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

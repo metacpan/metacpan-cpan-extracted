@@ -13,7 +13,7 @@ my $builder = Module::Build::WithXSpp->new(
     dist_version_from   => 'lib/Box2D.pm',
     configure_requires => {
         'Module::Build' => 0.38,
-        'Alien::Box2D' => 0.103,
+        'Alien::Box2D' => 0.106,
     },
     build_requires => {
         'Test::More'     => 0,

@@ -1,6 +1,6 @@
 package Pcore::App::Controller::API;
 
-use Pcore -role, -result, -const;
+use Pcore -role, -const;
 use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor from_uri_query];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::WebSocket;
@@ -52,7 +52,7 @@ sub run ( $self, $req ) {
                             return;
                         },
                         on_disconnect => undef,
-                        on_rpc        => sub ( $ws, $req, $tx ) {
+                        on_rpc        => Coro::unblock_sub sub ( $ws, $req, $tx ) {
                             $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{data}, $req );
 
                             return;
@@ -77,7 +77,7 @@ sub run ( $self, $req ) {
 
         # decode API request
         if ( !$env->{CONTENT_TYPE} || $env->{CONTENT_TYPE} =~ m[\bapplication/json\b]smi ) {
-            $msg = eval { from_json $req->body };
+            $msg = eval { from_json $req->{body} };
 
             # content decode error
             if ($@) {
@@ -88,7 +88,7 @@ sub run ( $self, $req ) {
         }
 
         elsif ( $env->{CONTENT_TYPE} =~ m[\bapplication/cbor\b]smi ) {
-            $msg = eval { from_cbor $req->body };
+            $msg = eval { from_cbor $req->{body} };
 
             # content decode error
             if ($@) {

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Json;
-$Config::Model::Backend::Json::VERSION = '2.120';
+$Config::Model::Backend::Json::VERSION = '2.122';
 use Carp;
 use strict;
 use warnings;
@@ -91,7 +91,7 @@ Config::Model::Backend::Json - Read and write config as a JSON data structure
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

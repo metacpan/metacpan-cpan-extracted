@@ -23,9 +23,8 @@ has level => ( is => 'ro', isa => Enum [qw[ERROR WARN]], required => 1 );
 has call_stack => ( is => 'ro', isa => Maybe [ScalarRef], required => 1 );
 has timestamp => ( is => 'ro', isa => Num, required => 1 );
 
-has exit_code      => ( is => 'lazy', isa => Int );
-has with_trace     => ( is => 'ro',   isa => Bool, default => 1 );
-has is_ae_cb_error => ( is => 'ro',   isa => Bool, required => 1 );
+has exit_code => ( is => 'lazy', isa => Int );
+has with_trace => ( is => 'ro', isa => Bool, default => 1 );
 
 has longmess  => ( is => 'lazy', isa => Str, init_arg => undef );
 has to_string => ( is => 'lazy', isa => Str, init_arg => undef );
@@ -68,36 +67,20 @@ around new => sub ( $orig, $self, $msg, %args ) {
         chomp $msg;
     };
 
-    \my $is_ae_cb_error = \$args{is_ae_cb_error};
-
     my $x = $args{skip_frames} + 3;
 
     my @frames;
 
     while ( my @frame = caller $x++ ) {
         push @frames, "$frame[3] at $frame[1] line $frame[2]";
-
-        # detect AnyEvent error in callback
-        if ( !defined $is_ae_cb_error ) {
-            if ( $frame[3] eq '(eval)' ) {
-                if ( $frame[0] eq 'AnyEvent::Impl::EV' ) {
-                    $is_ae_cb_error = 1;
-                }
-                else {
-                    $is_ae_cb_error = 0;
-                }
-            }
-        }
     }
 
-    $args{call_stack} = \join $LF, @frames;
+    $args{call_stack} = \join $LF, @frames if @frames;
 
     $args{timestamp} = Time::HiRes::time();
 
     # stringify $msg
     $args{msg} = "$msg";
-
-    # $args{msg} = "AE: error in callback: $args{msg}" if $is_ae_cb_error;
 
     return bless \%args, $self;
 };

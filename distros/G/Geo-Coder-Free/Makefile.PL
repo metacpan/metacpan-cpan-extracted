@@ -1,6 +1,9 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use version;
 
 if(eval { require Geo::libpostal; }) {
 	my $v = Geo::libpostal->VERSION;
@@ -9,11 +12,48 @@ if(eval { require Geo::libpostal; }) {
 	print "Consider installing Geo::libpostal for improved parsing\n";
 }
 
+unless(eval { require File::Fetch; }) {
+	die 'Install File::Fetch >= 0.56 first';
+}
+
+if(version->parse($File::Fetch::VERSION) < 0.56) {
+	die 'Install File::Fetch >= 0.56 first';
+}
+
+File::Fetch->import();
+my %urls = (
+	'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
+	'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
+	# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
+	'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+);
+
+
+# unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
+
+foreach my $url(keys %urls) {
+	next if(-r $urls{$url});
+	print "Downloading $url\n";
+	my $ff = File::Fetch->new(uri => $url);
+	if(my $path = $ff->fetch($url)) {
+		rename $path, $urls{$url};
+	} elsif(my $err = $ff->error(1)) {
+		die $err;
+	} else {
+		die "There was a problem downloading $url";
+	}
+}
+
+if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
+	print $admin2 "GB.ENG.E7\tLondon\tLondon\t2648110\n",
+		"GB.ENG.H1\tLondon\tLondon\t2648110\n";
+}
+
 WriteMakefile(
 	NAME		=> 'Geo::Coder::Free',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/Geo/Coder/Free.pm',
-	ABSTRACT_FROM	   => 'lib/Geo/Coder/Free.pm',
+	ABSTRACT_FROM   => 'lib/Geo/Coder/Free.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
@@ -21,7 +61,6 @@ WriteMakefile(
 	BUILD_REQUIRES => {	# For bin/createdatabase
 		'App::csv2sqlite' => 0,
 		'File::Copy' => 0,
-		'DBD::SQLite' => 0,
 		'autodie' => 0,
 		'IPC::System::Simple' => 0,
 		'JSON' => 0,
@@ -38,9 +77,11 @@ WriteMakefile(
 		'Digest::MD5' => 0,
 		'File::pfopen' => '0.02',
 		'DBD::CSV' => 0,
+		'DBD::SQLite' => 0,
 		'Encode' => 0,
 		'Locale::Country' => 0,
 		'Locale::CA' => 0,
+		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
 		'Text::xSV::Slurp' => 0,
 		'Geo::StreetAddress::US' => 0,

@@ -13,9 +13,6 @@ if (! $ENV{BBDEV_TESTING}){
     exit;
 }
 
-copy 't/script/bbtester_kill.pl', Test::BrewBuild::workdir 
-  or die "can't copy bbtester_kill.pl file to the workdir: $!\n";
-
 $SIG{CHLD} = 'IGNORE';
 
 my $mod = 'Test::BrewBuild::Tester';
@@ -151,7 +148,8 @@ my $mod = 'Test::BrewBuild::Tester';
 
     # crash the tester
 
-    system "perl bbtester_kill.pl " . $t->pid;
+    kill 'KILL', $t->pid;
+    select(undef, undef, undef, 0.10);
 
     my $stop = capture_merged {
         $t->stop;
@@ -188,7 +186,8 @@ my $mod = 'Test::BrewBuild::Tester';
 
     # crash the tester
 
-    system "perl bbtester_kill.pl " . $t->pid;
+    kill 'KILL', $t->pid;
+    select(undef, undef, undef, 0.10);
 
     my $re_start = capture_merged {
         $t->start
@@ -227,7 +226,8 @@ my $mod = 'Test::BrewBuild::Tester';
 
     # crash the tester
 
-    system "perl bbtester_kill.pl " . $t->pid;
+    kill 'KILL', $t->pid;
+    select(undef, undef, undef, 0.10);
 
     my $status = 1;
 
@@ -242,9 +242,6 @@ my $mod = 'Test::BrewBuild::Tester';
         $t->status;
     };
 }
-
-unlink "bbtester_kill.pl" 
-  or die "couldn't remove bbtester_kill.pl file: $!";
 
 done_testing();
 

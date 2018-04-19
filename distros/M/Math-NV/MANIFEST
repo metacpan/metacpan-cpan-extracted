@@ -2,8 +2,10 @@ MANIFEST
 README
 Changes
 NV.pm
+NV.pod
 NV.xs
 Makefile.PL
+demo/nv.p
 t/01load.t
 t/02mant_dig.t
 t/03nv.t
@@ -11,6 +13,8 @@ t/04nv_type.t
 t/05ld2binary.t
 t/06is_eq.t
 t/07nv_mpfr.t
+t/08subnormal_mpfr.t
+t/09subnormal_mpfr_alt.t
 t/11sprintf.t
 t/pod.t
 

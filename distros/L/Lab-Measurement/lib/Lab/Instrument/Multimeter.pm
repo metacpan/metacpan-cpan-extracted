@@ -1,6 +1,6 @@
 package Lab::Instrument::Multimeter;
 #ABSTRACT: Generic digital multimeter base class
-$Lab::Instrument::Multimeter::VERSION = '3.630';
+$Lab::Instrument::Multimeter::VERSION = '3.631';
 use strict;
 use Lab::Instrument;
 
@@ -85,7 +85,7 @@ Lab::Instrument::Multimeter - Generic digital multimeter base class
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 DESCRIPTION
 

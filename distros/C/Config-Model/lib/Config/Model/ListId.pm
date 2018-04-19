@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ListId;
-$Config::Model::ListId::VERSION = '2.120';
+$Config::Model::ListId::VERSION = '2.122';
 use 5.10.1;
 use Mouse;
 
@@ -22,6 +22,7 @@ with "Config::Model::Role::Grab";
 with "Config::Model::Role::ComputeFunction";
 
 my $logger = get_logger("Tree::Element::Id::List");
+my $user_logger = get_logger("User");
 
 has data => (
     is      => 'rw',
@@ -50,8 +51,9 @@ sub BUILD {
 
     if ( defined $self->{migrate_keys_from} ) {
         if ($::_use_log4perl_to_warn) {
-            $logger->warn($self->name, "Using migrate_keys_from with list element is deprecated.",
-                          " Use migrate_values_from");
+            $user_logger->warn(
+                $self->name, "Using migrate_keys_from with ",
+                "list element is deprecated. Use migrate_values_from");
         }
         else {
             warn $self->name, "Using migrate_keys_from with list element is deprecated.",
@@ -515,7 +517,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.120
+version 2.122
 
 =head1 SYNOPSIS
 

@@ -3,16 +3,19 @@ package PPIx::Regexp::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use base qw{ Exporter };
 
 our @EXPORT_OK = qw{
+    ARRAY_REF
+    CODE_REF
     COOKIE_CLASS
     COOKIE_QUANT
     COOKIE_QUOTE
     COOKIE_REGEX_SET
     FALSE
+    HASH_REF
     LITERAL_LEFT_CURLY_ALLOWED
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
     LITERAL_LEFT_CURLY_REMOVED_PHASE_2
@@ -22,6 +25,8 @@ our @EXPORT_OK = qw{
     MSG_PROHIBITED_BY_STRICT
     NODE_UNKNOWN
     RE_CAPTURE_NAME
+    REGEXP_REF
+    SCALAR_REF
     STRUCTURE_UNKNOWN
     TOKEN_LITERAL
     TOKEN_UNKNOWN
@@ -35,6 +40,12 @@ use constant COOKIE_REGEX_SET	=> '])';
 
 use constant FALSE		=> 0;
 use constant TRUE		=> 1;
+
+use constant ARRAY_REF		=> ref [];
+use constant CODE_REF		=> ref sub {};
+use constant HASH_REF		=> ref {};
+use constant REGEXP_REF		=> ref qr{};
+use constant SCALAR_REF		=> ref \0;
 
 # In the cases where an unescaped literal left curly 'could not' be a
 # quantifier, they are allowed. At least, that was the original idea.
@@ -105,6 +116,14 @@ change them without notice.
 
 This module exports the following manifest constants:
 
+=head2 ARRAY_REF
+
+This is the result of C<ref []>.
+
+=head2 CODE_REF
+
+This is the result of C<ref sub {}>.
+
 =head2 COOKIE_CLASS
 
 The name of the cookie used to control the construction of character
@@ -140,6 +159,10 @@ C<\Q> is encountered, and it persists until the next C<\E>.
 =head2 COOKIE_REGEX_SET
 
 The name of the cookie used to control regular expression sets.
+
+=head2 HASH_REF
+
+This is the result of C<ref {}>.
 
 =head2 LITERAL_LEFT_CURLY_ALLOWED
 
@@ -194,6 +217,14 @@ L<PPIx::Regexp::Node::Unknown|PPIx::Regexp::Node::Unknown>.
 
 A string representation of a regular expression that matches the name of
 a named capture buffer.
+
+=head2 REGEXP_REF
+
+This is the result of C<ref qr{}>.
+
+=head2 SCALAR_REF
+
+This is the result of C<ref \0>.
 
 =head2 STRUCTURE_UNKNOWN
 

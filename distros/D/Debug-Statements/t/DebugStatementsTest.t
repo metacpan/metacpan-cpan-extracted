@@ -1,5 +1,6 @@
-#!/home/utils/perl-5.20/5.20.1-006/bin/perl
-##!/home/utils/perl-5.8.8/bin/perl
+#!/home/utils/perl-5.8.8/bin/perl
+##!/home/utils/perl-5.24/5.24.2-018/bin/perl
+##!/home/utils/perl-5.20/5.20.1-006/bin/perl
 ##!/home/utils/perl-5.14/5.14.1-nothreads-64/bin/perl
 ##!//home/utils/perl-5.16/5.16.2-nothreads-64/bin/perl
 ##!//home/utils/perl-5.18/5.18.4-001/bin/perl
@@ -16,22 +17,21 @@ use Test::Output qw(stdout_is stdout_like);
 # FindBin helps t/DebugStatementsTest.t find lib/Debug/Statements.pm during 'dzil test'
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Debug::Statements qw(d d0 d1 d2 d3 D ls);
-use_ok('Test::More') or die; 
-use_ok('Test::Fatal') or die; 
-use_ok('Test::Output') or die; 
-use_ok('PadWalker') or die; 
-use_ok('Debug::Statements') or die; 
+use lib "$FindBin::Bin"; # For testing outside of dzil
+use Debug::Statements ':all';
+use lib "/home/ate/scripts/regression";    # regression.pm::regression::test in scratch space
+use regression;
 use Data::Dumper;
 $Data::Dumper::Terse = 1;                # eliminate the $VAR1
 
 # Parse options
+my %opt;
 my $d = 0;
 my $dd = 0;
-my %opt;
-$opt{print} = 0;
-$opt{die} = 0;
-Getopt::Long::GetOptions( \%opt, 'd' => sub { $d = 1 }, 'dd' => sub { $dd = 1 }, 'die', 'print' );
+GetOptions( \%opt, 'test|t=s', 'd|d1' => sub { $d = 1 }, 'dd' => sub { $dd = 1 }, 'die', 'print', 'troubleshooting' ) or die $!;
+#die_on_fail() if $opt{die};  # Not in 5.8.8
+$regression::t = defined $opt{test} ? $opt{test} : 'ALL';
+die "ERROR:  Did not expect '@ARGV'.  Did you forget '-t' ? " if @ARGV;
 d( '', 10 ) if $dd;                   # Turn on say statements to help debug Debug::Statements.pm module
 
 # Globals for testing
@@ -55,22 +55,111 @@ my %nestedhash = (
 my $nestedhashref = \%nestedhash;
 my $ref;
 
+if ( $opt{troubleshooting} ) {
+    # For troubleshooting only
+    print "WARNING:  Printing troubleshooting text, not the normal set of tests\n";
+    $d = 1;
+    d '@list';
+    d '$listref';
+    d '%nestedhash';
+    d '$nestedhashref';
+    die;
+    sub myTestSub {
+        d '*** Inside sub ***';
+        d '$scalar';
+        d '@list';
+        d '%nestedhash';
+    }
+    d '*** Outside of sub ***';
+    d '$scalar';
+    d '@list';
+    d '%nestedhash';
+    d '%nestedhash{foo}{bar}';  # Does not create an empty $nestedhash{foo} = {}
+    d '%nestedhash';
+    my $nestedhashref = \%nestedhash;
+    d '$nestedhashref';
+    d '$nestedhashref->{foo}{bar}';  # Creates an empty $nestedhashref>{foo} = {}    <-- PROBLEM, but only happens if $d is 1 (or if D is used)
+    d '$nestedhashref';
+    d;
+    d();
+    d 0;
+    d 2;
+    d '.';
+    d 'Hello World';
+    d '. Hello World';
+    myTestSub();
+    ls '/home/ate/scripts/regression/DebugStatementsTest.t /home/ate/scripts/regression/DebugStatementsTest.t';
+    die;
+    ls '/home/ate/scripts/regression/pintable';
+    ls('/home/ate/scripts/regression');
+    ls('/home/ate/scripts/regression', '-lR'); 
+    die;
+
+    ls '/home/ate/scripts/regression/DebugStatementsTest.t';
+    ls '/home/ate/scripts/regression/DebugStatementsTest.doesnotexist';
+    ls '$scalar';
+    cp '/home/ate/scripts/regression/pintable';
+    cp '/home/ate/scripts/regression/DebugStatementsTest.t';
+    cp '/home/ate/scripts/regression/DebugStatementsTest.doesnotexist';
+    cp '$scalar';
+    die;
+}
+
+
+# Setup
+my $header  = 'DEBUG sub __ANON__:';
+my $header2 = 'DEBUG2 sub __ANON__:';
+my $vr    = '\s+[\$\@\%]\S+\s+=\s+';  # variable regex  '$var ='
+my $r1    = qr($header${vr}2);
+
+my $rn    = qr($header${vr}\{\s+'flintstones'\s+=>\s+\{\s+'husband'\s+=>\s+'fred',\s+'pal'\s+=>\s+'barney'\s+\}\s+\});
+my $rnt   = qr($header${vr}\{\s+'flintstones'\s+=>\s+\{\s+'husband'\s+=>\s+'fred',\s+\.\.\.);  # truncated
+#my $n      = '\\{\\s+\'flintstones\'\\s+=>\\s+\\{\\s+\'husband\'\\s+=>\\s+\'fred\',\\s+\'pal\'\s+=>\\s+\'barney\'\\s+\\}\\s+\\}';
+#my $nt     = '\\{\\s+\'flintstones\'\\s+=>\\s+\\{\\s+\'husband\'\\s+=>\\s+\'fred\',\\s+\\.\\.\\.';
+#(my $nt2     = $n) =~ s/\'pal.*/\\.\\.\\./;
+#say "$nt\n$nt2";die;
+#$nt = $nt2;
+#my $rn    = qr($header${vr}$n);
+#my $rnt   = qr($header${vr}$nt);
+#(my $rnt2 = $rn) =~ s/'pal'.*/\\.\\.\\.)/;
+#say "$rnt\n$rnt2";die;
+#$rnt = $rnt2;
+my $rnf   = qr($header${vr}\{\s+'husband'\s+=>\s+'fred',\s+'pal'\s+=>\s+'barney'\s+\});  # ->{flintstones}
+my $rnfh  = qr($header${vr}'fred');  # ->{flintstones}{husband}
+my $rnfp  = qr($header${vr}'barney');  # ->{flintstones}{pal}
+my $rnfhp = qr($header${vr}'(fred|barney)');  # ->{flintstones}{husband} or ->{flintstones}{pal}
+
+my $l     = '\[\s+\'zero\',\s+1,\s+\'two\',\s+\'3\'\s+\]';  # list
+my $rl    = qr($header${vr}${l});
+my $rld2  = qr($header2${vr}${l});
+my $lsort = '\[\s+1,\s+\'3\',\s+\'two\',\s+\'zero\'\s+\]';
+my $rl1   = qr($header${vr}\[ 'zero', 1, 'two', '3' ]);  # uncompressed
+my $rle   = qr($header${vr}.*\d+.*\s+${l});
+my $rls   = qr($header${vr}${lsort});
+
+my $h     = '\{\s+\'one\'\s+=>\s+2,\s+\'three\'\s+=>\s+4\s+\}';  # hash
+my $rh    = qr($header${vr}${h}); # hash
+my $rhd2  = qr($header2${vr}${h}); # hash with DEBUG2
+my $rh1   = qr($header${vr}\{ 'one' => 2, 'three' => 4 \});  # uncompressed
+my $rhe   = qr($header${vr}.*\d+.*\s+${h}); # hash with number of elements
+my $rhs   = qr($header${vr}${h}); # hash sorted
+
+if ( runtests('use') ) {
+    use_ok('Test::More') or die; 
+    use_ok('Test::Fatal') or die; 
+    use_ok('Test::Output') or die; 
+    use_ok('PadWalker') or die; 
+    use_ok('Debug::Statements') or die; 
+}
+
+# All these are equivalent:
+#     tdd { d('$scalar')  } $exp, 'scalar';
+#     tsub 'd', '$scalar', $exp, '';
+#     td '$scalar', $exp, '';
+
+# These subs are listed early so that they can be used without parentheses
 # td() is the easiest to use since it assumes d() with one argument.  Internally it calls tsub().  td0() td1() td2() also call tsub().
 # tdd() is similar, but supports d() d2() d3().  Also supports a second argument.  Does not automatically assume a description if none is given.
-
-# tdd { d('$scalar')  } $exp, 'scalar';
-sub tdd (&$$) {
-    my ($coderef, $expected, $description) = @_;
-    if ( $opt{print} ) {
-        $coderef->();
-    } else {
-        if( ref $expected eq ref qr// ) {
-            die if ! stdout_like {$coderef->()} $expected, $description  and $opt{die};
-        } else {
-            die if ! stdout_is {$coderef->()} $expected, $description  and $opt{die};
-        }
-    }
-}
 
 # tsub 'd', '$scalar', $exp, '';
 sub tsub {
@@ -100,10 +189,20 @@ sub tsub {
     use strict;
 }
 
-# All these are equivalent:
-#     tdd { d('$scalar')  } $exp, 'scalar';
-#     tsub 'd', '$scalar', $exp, '';
-#     td '$scalar', $exp, '';
+# tdd { d('$scalar')  } $exp, 'scalar';
+sub tdd (&$$) {
+    my ($coderef, $expected, $description) = @_;
+    $description = "test $description";
+    if ( $opt{print} ) {
+        $coderef->();
+    } else {
+        if( ref $expected eq ref qr// ) {
+            die if ! stdout_like {$coderef->()} $expected, $description  and $opt{die};
+        } else {
+            die if ! stdout_is {$coderef->()} $expected, $description  and $opt{die};
+        }
+    }
+}
 sub td {
     my ($argument, $expected, $addl_description) = @_;
     tsub ('d', $argument, $expected, $addl_description);
@@ -121,109 +220,7 @@ sub td2 {
     tsub ('d2', $argument, $expected, $addl_description);
 }
 
-my $header = 'DEBUG sub __ANON__:';
-my $header2 = 'DEBUG2 sub __ANON__:';
-my $vr = '\s+[\$\@\%]\S+\s+=\s+';
-my $r1 = qr($header${vr}2);
-my $rn = qr($header${vr}\{\s+'flintstones'\s+=>\s+\{\s+'husband'\s+=>\s+'fred',\s+'pal'\s+=>\s+'barney'\s+\}\s+\});
-my $rnt = qr($header${vr}\{\s+'flintstones'\s+=>\s+\{\s+'husband'\s+=>\s+'fred',\s+\.\.\.);
-my $rnf = qr($header${vr}\{\s+'husband'\s+=>\s+'fred',\s+'pal'\s+=>\s+'barney'\s+\});
-my $rnfh = qr($header${vr}'fred');
-my $rnfp = qr($header${vr}'barney');
-my $rnfhp = qr($header${vr}'(fred|barney)');
-my $l = '\[\s+\'zero\',\s+1,\s+\'two\',\s+\'3\'\s+\]';
-my $rl = qr($header${vr}${l});
-my $rld2 = qr($header2${vr}${l});
-my $lsort = '\[\s+1,\s+\'3\',\s+\'two\',\s+\'zero\'\s+\]';
-my $rl1 = qr($header${vr}\[ 'zero', 1, 'two', '3' ]);
-my $rle = qr($header${vr}.*\d+.*\s+${l});
-my $rls = qr($header${vr}${lsort});
-my $h = '\{\s+\'one\'\s+=>\s+2,\s+\'three\'\s+=>\s+4\s+\}';
-my $rh = qr($header${vr}${h});
-my $rhd2 = qr($header2${vr}${h});
-my $rh1 = qr($header${vr}\{ 'one' => 2, 'three' => 4 \});
-my $rhe = qr($header${vr}.*\d+.*\s+${h});
-my $rhs = qr($header${vr}${h});
-#D "Hello World";
-#D '$scalar';
-#D '@list %hash';
-#die;
-testScalar();
-testArray();
-testHash();
-testPackageVars();
-testSpecial();
-testLevels();
-testPrefixSuffix();
-testMultipleVars();
-testOption_printdebug();
-testInternalDebug();
-testOption_printsub();
-testOption_compress();
-testOption_disable();
-testOption_flag();
-testOption_Chomp();
-testOption_Elements();
-testOption_lineNumber();
-testOption_tRuncate();
-testOption_Sort();
-testOption_Timestamp();
-testOptions_multiple();
-testOption_Q();
-testOption_Die();
-#say "\n### No subroutine";
-#d('$scalar');
-#d('@list');
-#d('%hash');
-testLsl();
-#test_PerlCritic("/home/ckoknat/s/regression/Debug/Statements.pm");die;  ########
-Test::More::done_testing();
-exit 0;
-
-say "#################";
-say "Should print comments from Statements.pm";
-open FILE, "/home/ate/scripts/regression/Debug/Statements.pm" or die "unable to open file for reading";
-while ( my $line = <FILE> ) {
-    if ( $line =~ /^\s*#\s*Used/ ) {
-        d('$line');
-        d("line $. = '$line'");
-    }
-}
-say "Should print comments from Statements.pm such as       DEBUG:  At line 300:  \$line = '    # Used during development of this module";
-open FILE, "/home/ate/scripts/regression/Debug/Statements.pm" or die "unable to open file for reading";
-while ( my $line = <FILE> ) {
-    if ( $line =~ /^\s*#\s*Used/ ) {
-        d( '$line', 'n' );
-    }
-}
-
-# 0.58 seconds
-#Debug::Statements::disable()
-#for my $i (1..100) {
-#}
-
-#test_PerlCritic($file)
-sub test_PerlCritic {
-    my $file = shift;
-    # 5.8.6 does not have Test::Perl::Critic
-    #my @exclude = ( qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity ) );
-    ###### fix the next few lines and copy to k.t and CPN.t and cpn.t  OR  better yet include it with regression
-    ##use Test::Perl::Critic( -severity => 3, -exclude => ['RequireExtendedFormatting','RequireDotMatchAnything','RequireLineBoundaryMatching','ProhibitImplicitNewlines','ProhibitReusedNames','ProhibitConstantPragma','ProhibitPostfixControls','ProhibitExcessMainComplexity'] ); # reported no failures
-    ##Test::Perl::Critic::critic_ok($file,  "Test::Perl::Critic for $file with severity level 3 but excluding:\n     " . join "\n     ", ('RequireExtendedFormatting','RequireDotMatchAnything','RequireLineBoundaryMatching','ProhibitImplicitNewlines','ProhibitReusedNames','ProhibitConstantPragma','ProhibitPostfixControls','ProhibitExcessMainComplexity') );
-    #use Test::Perl::Critic( -severity => 3, -exclude => [ qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames  ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity] ) );
-    #use Test::Perl::Critic(
-    #    -severity => 3,
-    #    -exclude  => [qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity )]
-    #);    # reported no failures
-    #Test::Perl::Critic::critic_ok( $file, "Test::Perl::Critic for $file with severity level 3 but excluding:\n     " . ( join "\n     ", qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity ) ) );
-    # NOTE - if you get the error "Subroutine "abcd" with high complexity score" you can disable the check:
-    #     sub checkName { ## no critic (ProhibitExcessComplexity)
-    # For other errors see Perl::Critic::PolicySummary
-}
-
-
-
-sub testScalar {
+if ( runtests('testScalar') ) {
     say "\n### testScalar";
     my $exp = "$header  \$scalar = 'myvalue'\n";
     $d = 1;
@@ -284,7 +281,7 @@ sub testScalar {
     }
 }
 
-sub testArray {
+if ( runtests('testArray') ) {
     say "\n### testArray";
     $d = 1;
     stdout_like { d('@list') } $rl, '@list';
@@ -329,7 +326,7 @@ sub testArray {
     td $listref,  $warning, 'warning - reference given instead of single-quoted string';
 }
 
-sub testHash {
+if ( runtests('testHash') ) {
     say "\n### testHash";
     stdout_like { d('$hashref') } $rh, '$hashref';
     stdout_like { d '$hashref'  } $rh, '$hashref';
@@ -379,13 +376,13 @@ sub testHash {
     td $hashref, $warning, 'warning - reference given instead of single-quoted string';
 }
 
-sub testPackageVars {
+if ( runtests('testPackageVars') ) {
     say "\n### testPackageVars";
     $Data::Dumper::Terse = 1;
     td '$Data::Dumper::Terse', "$header  \$Data::Dumper::Terse = 1\n", 'package variable';
 }
 
-sub testSpecial {
+if ( runtests('testSpecial') ) {
     say "\n### testSpecial";
     my $r = qr($header${vr}\S+);
     td '$0', $r;
@@ -407,7 +404,7 @@ sub testSpecial {
     td '$&', $warning, 'Special variables not supported';
 }
 
-sub testLevels {
+if ( runtests('testLevels') ) {
     say "\n### testLevels";
     tdd { d('$scalar') } "$header  \$scalar = 'myvalue'\n", '$scalar  normal';
     tdd { d('@list') }    $rl, '@list  normal';
@@ -443,9 +440,16 @@ sub testLevels {
     tdd { d('%hash', '3') }   '', '%hash  no print';
 }
 
-sub testPrefixSuffix {
+if ( runtests('testPrefixSuffix') ) {
     say "\n### testPrefixSuffix";
-    tdd { d('') } qr($header), '""';
+    tdd { d 'Hello World' } qr($header), '"Hello World"';
+    tdd { d '. Hello World' } qr($header), '"Hello World"';
+    tdd { d '.' } qr($header), '"...................................................................................................."';
+    tdd { d '' } qr($header), '""';
+    tdd { d 0 } qr($header), '0';
+    tdd { d 2 } qr($header), '2';
+    tdd { d() } qr($header), '""';
+    tdd { d } qr($header), '""';
     tdd { d('\S') } qr($header  \\S), '\S';
     tdd { d('\n$scalar') } "\n$header  \$scalar = 'myvalue'\n", 'newline before $scalar';
     tdd { d('\n$scalar\n\n') } "\n$header  \$scalar = 'myvalue'\n\n\n", 'newline before $scalar and two afterwards';
@@ -454,7 +458,7 @@ sub testPrefixSuffix {
     tdd { d('Here is a comment\n$scalar <- here is another comment') } "Here is a comment\n$header  \$scalar = 'myvalue' <- here is another comment\n", 'comment1 one one line, then show value of scalar along with comment2';
 }
 
-sub testMultipleVars {
+if ( runtests('testMultipleVars') ) {
     my $r = $header . $vr . '\S+';
     my $r3 = qr($r\n$r\n$r\n);
     td '$scalar $scalar2 $scalar3', $r3;
@@ -465,7 +469,7 @@ sub testMultipleVars {
     td '$scalar $scalar2 $scalar3\n', qr($r\n$r\n$r\n);
 }
 
-sub testInternalDebug {
+if ( runtests('testInternalDebug') ) {
     if (0) {
         say "\n### testInternalDebug";
         tdd { d('$scalar') } qr($header  \$scalar = 'myvalue'\s*$), 'normal, internal debug is off';
@@ -477,7 +481,7 @@ sub testInternalDebug {
     }
 }
 
-sub testOption_printdebug {
+if ( runtests('testOption_printdebug') ) {
     say "\n### testOption_printdebug";
     my $exp = "$header  \$scalar = 'myvalue'\n";
     $d = 1;
@@ -491,7 +495,7 @@ sub testOption_printdebug {
 }
 
 
-sub testOption_printsub {
+if ( runtests('testOption_printsub') ) {
     say "\n### testOption_printsub";
     tdd { d('$scalar') } "$header  \$scalar = 'myvalue'\n", 'normal';
     tdd { d('$scalar', 'B*') }  "DEBUG:  \$scalar = 'myvalue'\n", 'sub name not printed';
@@ -502,7 +506,7 @@ sub testOption_printsub {
     tdd { d('$scalar', 'b*') }  "$header  \$scalar = 'myvalue'\n", 'normal';
 }
 
-sub testOption_compress {
+if ( runtests('testOption_compress') ) {
     say "\n### testOption_compress";
     tdd { d('$scalar', 'z*') }  "$header  \$scalar = 'myvalue'\n", 'normal';
     td '@list', $rl1;
@@ -513,7 +517,7 @@ sub testOption_compress {
     tdd { d('$scalar', 'z*') }  "$header  \$scalar = 'myvalue'\n", 'normal';
 }
 
-sub testOption_disable {
+if ( runtests('testOption_disable') ) {
     say "\n### testOption_disable";
     Debug::Statements::disable();
     td '$scalar', '', 'should not print';
@@ -522,7 +526,7 @@ sub testOption_disable {
     Debug::Statements::enable();
 }
 
-sub testOption_flag {
+if ( runtests('testOption_flag') ) {
     say "\n### testOption_flag";
     undef $d;
     td '$scalar', '', 'undef $d, should not print';
@@ -540,7 +544,7 @@ sub testOption_flag {
 }
 
 #my $optionsTable = { 'c' => 'Chomp', 'e' => 'Elements', 'n' => 'LineNumber', 's' => 'Sort', 't' => 'Timestamp', 'x' => 'Die' };
-sub testOption_Chomp {
+if ( runtests('testOption_Chomp') ) {
     say "\n### testOption_Chomp";
     my $line = "a b c\n";
     tdd { d('$line') }       "$header  \$line = 'a b c\n'\n", 'normal';
@@ -550,7 +554,7 @@ sub testOption_Chomp {
     tdd { d('$line', 'C*') } "$header  \$line = 'a b c\n'\n", 'C* - newline';
 }
 
-sub testOption_Elements {
+if ( runtests('testOption_Elements') ) {
     say "\n### testOption_Elements";
     d('@list');
     td '@list', $rl, 'normal';
@@ -567,7 +571,7 @@ sub testOption_Elements {
     tdd { d('%hash', 'E*') }    $rh, '%hash  normal';
 }
 
-sub testOption_lineNumber {
+if ( runtests('testOption_lineNumber') ) {
     say "\n### testOption_lineNumber";
     tdd { d('$scalar') }  "$header  \$scalar = 'myvalue'\n", 'normal';
     tdd { d('$scalar', 'n') }  "$header  At line undef:  \$scalar = 'myvalue'\n", 'with line number';
@@ -576,7 +580,7 @@ sub testOption_lineNumber {
     tdd { d('$scalar', 'N*') }  "$header  \$scalar = 'myvalue'\n", 'normal';
 }
 
-sub testOption_tRuncate {
+if ( runtests('testOption_tRuncate') ) {
     say "\n### testOption_tRuncate";
     tdd { d('%nestedhash') }    $rn, '%nestedhash  normal';
     Debug::Statements::setTruncate(3);
@@ -585,7 +589,7 @@ sub testOption_tRuncate {
     tdd { d('%nestedhash') }    $rn, '%nestedhash  normal';
 }
 
-sub testOption_Sort {
+if ( runtests('testOption_Sort') ) {
     say "\n### testOption_Sort";
     tdd { d('@list') }    $rl, '@list  normal';
     tdd { d('%hash') }    $rh, '%hash  normal';
@@ -599,13 +603,13 @@ sub testOption_Sort {
     tdd { d('%hash', 'S*') }    $rh, '%hash  normal';
 }
 
-sub testOption_Timestamp {
+if ( runtests('testOption_Timestamp') ) {
     say "\n### testOption_Timestamp";
     tdd { d('$scalar') }       qr($header${vr}'myvalue'), 'normal';
     tdd { d('$scalar', 't') }  qr($header${vr}'myvalue'\s+at\s+\S+), 'timestamp';
 }
 
-sub testOptions_multiple {
+if ( runtests('testOptions_multiple') ) {
     say "\n### testOptions_multiple";
     tdd { d('$scalar') }       qr($header${vr}'myvalue'), '$scalar normal';
     tdd { d('@list') }    $rl, '@list  normal';
@@ -630,13 +634,13 @@ sub testOptions_multiple {
     #d( '$Data::Dumper::Terse',   $allopt );
 }
 
-sub testOption_Q {
+if ( runtests('testOption_Q') ) {
     say "\n### testOption_Q";
     tdd { d('$scalar = "foo";') }       qr($header${vr}'myvalue'\s+=\s+"foo";), 'default handling of parsed line from Perl script';
     tdd { d('$scalar = "foo";', 'q') }  qr($header\s+\$scalar\s+=\s+"foo";), 'desired behavior';
 }
 
-sub testOption_Die {
+if ( runtests('testOption_Die') ) {
     say "\n### testOption_Die";
     tdd { d('$scalar') }       qr($header${vr}'myvalue'), 'normal';
     $d = 0;
@@ -645,7 +649,7 @@ sub testOption_Die {
     dies_ok { d('$scalar', 'x') } 'should die';
 }
 
-sub testLsl {
+if ( runtests('testLsl') ) {
     say "\n### testLsl";
     my $rd;
     my $windows = ($^O =~ /Win/) ? 1 : 0;
@@ -657,8 +661,11 @@ sub testLsl {
         # -rwxrwxr-x  1 ckoknat hardware 29506 Dec 18 11:28 DebugStatementsTest.t
         $rd = '\S+\s+\d+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+';
     }
-    $d = 1;
     my $header = 'DEBUG:  ls -l = ';
+    $d = 0;
+    tdd { ls($0) }                         qr(), "File ls($0)";
+    tdd { LS($0) }                         qr($header$rd), "File ls($0)";
+    $d = 1;
     tdd { ls("filename_does_not_exist") }  qr(does not exist), 'ls(filename_does_not_exist)';
     tdd { ls('$filename') }                qr(did not understand file name), "ls('\$filename') error";
     tdd { ls($0) }                         qr($header$rd), "File ls($0)";
@@ -668,5 +675,56 @@ sub testLsl {
         tdd { ls("$0 .") }                 qr($header$rd.*\n$header$rd), "ls($0 .)";
         ##tdd { ls($filename), 2 }  '', 'ls() with too high a debug level';
     }
+    ######### Need to create test for directory
+    ######### Need to create test for ls('$dir', '-lR')
 }
+
+#test_PerlCritic("/home/ckoknat/s/regression/Debug/Statements.pm");die;  ########
+#Test::More::done_testing();
+
+# Print pass/fail summary
+regression::summary();
+exit 0;
+
+
+#####################################################################
+
+#test_PerlCritic($file)
+sub test_PerlCritic {
+    my $file = shift;
+    # 5.8.6 does not have Test::Perl::Critic
+    #my @exclude = ( qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity ) );
+    ###### fix the next few lines and copy to k.t and CPN.t and cpn.t  OR  better yet include it with regression
+    ##use Test::Perl::Critic( -severity => 3, -exclude => ['RequireExtendedFormatting','RequireDotMatchAnything','RequireLineBoundaryMatching','ProhibitImplicitNewlines','ProhibitReusedNames','ProhibitConstantPragma','ProhibitPostfixControls','ProhibitExcessMainComplexity'] ); # reported no failures
+    ##Test::Perl::Critic::critic_ok($file,  "Test::Perl::Critic for $file with severity level 3 but excluding:\n     " . join "\n     ", ('RequireExtendedFormatting','RequireDotMatchAnything','RequireLineBoundaryMatching','ProhibitImplicitNewlines','ProhibitReusedNames','ProhibitConstantPragma','ProhibitPostfixControls','ProhibitExcessMainComplexity') );
+    #use Test::Perl::Critic( -severity => 3, -exclude => [ qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames  ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity] ) );
+    #use Test::Perl::Critic(
+    #    -severity => 3,
+    #    -exclude  => [qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity )]
+    #);    # reported no failures
+    #Test::Perl::Critic::critic_ok( $file, "Test::Perl::Critic for $file with severity level 3 but excluding:\n     " . ( join "\n     ", qw( RequireExtendedFormatting RequireDotMatchAnything RequireLineBoundaryMatching ProhibitImplicitNewlines ProhibitReusedNames ProhibitConstantPragma ProhibitPostfixControls ProhibitExcessMainComplexity ) ) );
+    # NOTE - if you get the error "Subroutine "abcd" with high complexity score" you can disable the check:
+    #     sub checkName { ## no critic (ProhibitExcessComplexity)
+    # For other errors see Perl::Critic::PolicySummary
+}
+
+__END__
+
+say "#################";
+say "Should print comments from Statements.pm";
+open FILE, "/home/ate/scripts/regression/Debug/Statements.pm" or die "unable to open file for reading";
+while ( my $line = <FILE> ) {
+    if ( $line =~ /^\s*#\s*Used/ ) {
+        d('$line');
+        d("line $. = '$line'");
+    }
+}
+say "Should print comments from Statements.pm such as       DEBUG:  At line 300:  \$line = '    # Used during development of this module";
+open FILE, "/home/ate/scripts/regression/Debug/Statements.pm" or die "unable to open file for reading";
+while ( my $line = <FILE> ) {
+    if ( $line =~ /^\s*#\s*Used/ ) {
+        d( '$line', 'n' );
+    }
+}
+
 

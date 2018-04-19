@@ -8,5 +8,6 @@ lib/Data/Cuid.pm
 minil.toml
 t/00_compile.t
 t/01_cuid.t
+t/02_collisions.t
 META.yml
 MANIFEST

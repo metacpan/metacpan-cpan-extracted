@@ -110,7 +110,7 @@ my $verify_access_token_sub = sub {
 
   my $client_id = 1;
 
-  return $client_id;
+  return { client_id => $client_id };
 };
 
 MOJO_APP: {
@@ -129,7 +129,7 @@ MOJO_APP: {
     # /api - must be authorized
     under '/api' => sub {
       my ( $c ) = @_;
-      return 1 if $c->oauth;
+      return 1 if $c->oauth && $c->oauth->{client_id};
       $c->render( status => 401, text => 'Unauthorized' );
       return undef;
     };

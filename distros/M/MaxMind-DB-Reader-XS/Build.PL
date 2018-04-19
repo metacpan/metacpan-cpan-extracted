@@ -50,7 +50,7 @@ sub _mb_args {
     "Ran Eilam <reilam\@maxmind.com>"
   ],
   "dist_name" => "MaxMind-DB-Reader-XS",
-  "dist_version" => "1.000004",
+  "dist_version" => "1.000005",
   "license" => "artistic_2",
   "module_name" => "MaxMind::DB::Reader::XS",
   "recursive_test_files" => 1,
@@ -81,7 +81,8 @@ sub _mb_args {
     "Test::Requires" => 0,
     "autodie" => 0,
     "lib" => 0,
-    "utf8" => 0
+    "utf8" => 0,
+    "version" => 0
   }
 );
 

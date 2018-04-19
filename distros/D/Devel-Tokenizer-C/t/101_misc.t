@@ -22,7 +22,7 @@ do 't/common.sub';
 
 $^W = 1;
 
-BEGIN { plan tests => 7 }
+BEGIN { plan tests => 8 }
 
 my($o,$c);
 

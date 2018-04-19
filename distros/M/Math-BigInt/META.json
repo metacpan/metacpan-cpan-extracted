@@ -4,13 +4,13 @@
       "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-BigInt",
    "no_index" : {
@@ -39,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.999811",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.999813",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

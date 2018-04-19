@@ -238,7 +238,7 @@ BEGIN {
    # etc. might be null pointers.
    $SIG{KILL} = sub { };
 
-   our $VERSION = 1.22;
+   our $VERSION = 1.24;
 
    require XSLoader;
    XSLoader::load ("Async::Interrupt", $VERSION);
@@ -619,8 +619,9 @@ An example call would look like:
 
 =item $epipe->renew
 
-Recreates the pipe (useful after a fork). The reading side will not change
-it's file descriptor number, but the writing side might.
+Recreates the pipe (usually required in the child after a fork). The
+reading side will not change it's file descriptor number, but the writing
+side might.
 
 =item $epipe->wait
 

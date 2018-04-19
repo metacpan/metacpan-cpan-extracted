@@ -13,6 +13,7 @@ lib/Text/Continuation/Parser.pm
 t/00-compile.t
 t/inc/data/text.txt
 t/parser.t
+xt/author/critic.t
 xt/author/eol.t
 xt/author/mojibake.t
 xt/author/no-tabs.t

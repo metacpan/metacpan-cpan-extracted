@@ -24,5 +24,7 @@ cmd = brewbuild -N
 forks = 4
 auto_sleep = 60
 rpi = 0
+rpi_lcd_rows = 4
+rpi_lcd_cols = 20
 debug = 0
 

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Eo - Package for language Esperanto
 
 package Locale::CLDR::Locales::Eo;
 # This file auto generated from Data\common\main\eo.xml
-#	on Fri 29 Apr  7:00:05 pm GMT
+#	on Fri 13 Apr  7:08:09 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -200,11 +201,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -757,10 +758,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q w x y])},
+			auxiliary => qr{[q w x y]},
 			index => ['A', 'B', 'C', 'Ĉ', 'D', 'E', 'F', 'G', 'Ĝ', 'H', 'Ĥ', 'I', 'J', 'Ĵ', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'Ŝ', 'T', 'U', 'Ŭ', 'V', 'Z'],
-			main => qr{(?^u:[a b c ĉ d e f g ĝ h ĥ i j ĵ k l m n o p r s ŝ t u ŭ v z])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} /])},
+			main => qr{[a b c ĉ d e f g ĝ h ĥ i j ĵ k l m n o p r s ŝ t u ŭ v z]},
+			numbers => qr{[  , % ‰ + − 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} /]},
 		};
 	},
 EOT
@@ -1436,14 +1438,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -1870,16 +1872,16 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
+					'pm' => q{ptm},
+					'am' => q{atm},
+				},
+				'wide' => {
 					'am' => q{atm},
 					'pm' => q{ptm},
 				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},
-				},
-				'wide' => {
-					'pm' => q{ptm},
-					'am' => q{atm},
 				},
 			},
 		},
@@ -1991,93 +1993,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E, MM-dd – E, MM-dd},
-				d => q{E, MM-dd – E, MM-dd},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E, MMM-dd – E, MMM-dd},
-				d => q{E, MMM-dd – E, MMM-dd},
-			},
-			MMMd => {
-				M => q{MMM-dd – MMM-dd},
-				d => q{MMM-dd – MMM-dd},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				h => q{h–h a},
-			},
-			hm => {
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{G y-MM – y-MM},
-				y => q{G y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{E, y-MM-dd – E, y-MM-dd},
-				d => q{E, y-MM-dd – E, y-MM-dd},
-				y => q{E, y-MM-dd – E, y-MM-dd},
-			},
-			yMMM => {
-				M => q{G y-MMM – y-MMM},
-				y => q{G y-MMM – y-MMM},
-			},
-			yMMMEd => {
-				M => q{E, d-'a' 'de' MMM – E, d-'a' 'de' MMM y G},
-				d => q{E, d-'a' - E, d-'a' 'de' MMM y G},
-				y => q{E, d-'a' 'de' MMM y – E, d-'a' 'de' MMM y G},
-			},
-			yMMMd => {
-				M => q{G y-MMM-dd – y-MMM-dd},
-				d => q{G y-MMM-dd – y-MMM-dd},
-				y => q{G y-MMM-dd – y-MMM-dd},
-			},
-			yMd => {
-				M => q{G y-MM-dd – y-MM-dd},
-				d => q{G y-MM-dd – y-MM-dd},
-				y => q{G y-MM-dd – y-MM-dd},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -2165,6 +2080,93 @@ has 'datetime_formats_interval' => (
 				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
+		'generic' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E, MM-dd – E, MM-dd},
+				d => q{E, MM-dd – E, MM-dd},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM-dd – E, MMM-dd},
+				d => q{E, MMM-dd – E, MMM-dd},
+			},
+			MMMd => {
+				M => q{MMM-dd – MMM-dd},
+				d => q{MMM-dd – MMM-dd},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				h => q{h–h a},
+			},
+			hm => {
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{G y-MM – y-MM},
+				y => q{G y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{E, y-MM-dd – E, y-MM-dd},
+				d => q{E, y-MM-dd – E, y-MM-dd},
+				y => q{E, y-MM-dd – E, y-MM-dd},
+			},
+			yMMM => {
+				M => q{G y-MMM – y-MMM},
+				y => q{G y-MMM – y-MMM},
+			},
+			yMMMEd => {
+				M => q{E, d-'a' 'de' MMM – E, d-'a' 'de' MMM y G},
+				d => q{E, d-'a' - E, d-'a' 'de' MMM y G},
+				y => q{E, d-'a' 'de' MMM y – E, d-'a' 'de' MMM y G},
+			},
+			yMMMd => {
+				M => q{G y-MMM-dd – y-MMM-dd},
+				d => q{G y-MMM-dd – y-MMM-dd},
+				y => q{G y-MMM-dd – y-MMM-dd},
+			},
+			yMd => {
+				M => q{G y-MM-dd – y-MM-dd},
+				d => q{G y-MM-dd – y-MM-dd},
+				y => q{G y-MM-dd – y-MM-dd},
+			},
+		},
 	} },
 );
 
@@ -2182,101 +2184,101 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Africa_Central' => {
 			long => {
-				'standard' => q(centra afrika tempo),
+				'standard' => q#centra afrika tempo#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(orienta afrika tempo),
+				'standard' => q#orienta afrika tempo#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(suda afrika tempo),
+				'standard' => q#suda afrika tempo#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(okcidenta afrika somera tempo),
-				'generic' => q(okcidenta afrika tempo),
-				'standard' => q(okcidenta afrika norma tempo),
+				'daylight' => q#okcidenta afrika somera tempo#,
+				'generic' => q#okcidenta afrika tempo#,
+				'standard' => q#okcidenta afrika norma tempo#,
 			},
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(centra nord-amerika somera tempo),
-				'generic' => q(centra nord-amerika tempo),
-				'standard' => q(centra nord-amerika norma tempo),
+				'daylight' => q#centra nord-amerika somera tempo#,
+				'generic' => q#centra nord-amerika tempo#,
+				'standard' => q#centra nord-amerika norma tempo#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(orienta nord-amerika somera tempo),
-				'generic' => q(orienta nord-amerika tempo),
-				'standard' => q(orienta nord-amerika norma tempo),
+				'daylight' => q#orienta nord-amerika somera tempo#,
+				'generic' => q#orienta nord-amerika tempo#,
+				'standard' => q#orienta nord-amerika norma tempo#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(monta nord-amerika somera tempo),
-				'generic' => q(monta nord-amerika tempo),
-				'standard' => q(monta nord-amerika norma tempo),
+				'daylight' => q#monta nord-amerika somera tempo#,
+				'generic' => q#monta nord-amerika tempo#,
+				'standard' => q#monta nord-amerika norma tempo#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(pacifika nord-amerika somera tempo),
-				'generic' => q(pacifika nord-amerika tempo),
-				'standard' => q(pacifika nord-amerika norma tempo),
+				'daylight' => q#pacifika nord-amerika somera tempo#,
+				'generic' => q#pacifika nord-amerika tempo#,
+				'standard' => q#pacifika nord-amerika norma tempo#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(araba somera tempo),
-				'generic' => q(araba tempo),
-				'standard' => q(araba norma tempo),
+				'daylight' => q#araba somera tempo#,
+				'generic' => q#araba tempo#,
+				'standard' => q#araba norma tempo#,
 			},
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(atlantika nord-amerika somera tempo),
-				'generic' => q(atlantika nord-amerika tempo),
-				'standard' => q(atlantika nord-amerika norma tempo),
+				'daylight' => q#atlantika nord-amerika somera tempo#,
+				'generic' => q#atlantika nord-amerika tempo#,
+				'standard' => q#atlantika nord-amerika norma tempo#,
 			},
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(centra aŭstralia somera tempo),
-				'generic' => q(centra aŭstralia tempo),
-				'standard' => q(centra aŭstralia norma tempo),
+				'daylight' => q#centra aŭstralia somera tempo#,
+				'generic' => q#centra aŭstralia tempo#,
+				'standard' => q#centra aŭstralia norma tempo#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(centrokcidenta aŭstralia somera tempo),
-				'generic' => q(centrokcidenta aŭstralia tempo),
-				'standard' => q(centrokcidenta aŭstralia norma tempo),
+				'daylight' => q#centrokcidenta aŭstralia somera tempo#,
+				'generic' => q#centrokcidenta aŭstralia tempo#,
+				'standard' => q#centrokcidenta aŭstralia norma tempo#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(orienta aŭstralia somera tempo),
-				'generic' => q(orienta aŭstralia tempo),
-				'standard' => q(orienta aŭstralia norma tempo),
+				'daylight' => q#orienta aŭstralia somera tempo#,
+				'generic' => q#orienta aŭstralia tempo#,
+				'standard' => q#orienta aŭstralia norma tempo#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(okcidenta aŭstralia somera tempo),
-				'generic' => q(okcidenta aŭstralia tempo),
-				'standard' => q(okcidenta aŭstralia norma tempo),
+				'daylight' => q#okcidenta aŭstralia somera tempo#,
+				'generic' => q#okcidenta aŭstralia tempo#,
+				'standard' => q#okcidenta aŭstralia norma tempo#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(ĉina somera tempo),
-				'generic' => q(ĉina tempo),
-				'standard' => q(ĉina norma tempo),
+				'daylight' => q#ĉina somera tempo#,
+				'generic' => q#ĉina tempo#,
+				'standard' => q#ĉina norma tempo#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -2284,81 +2286,81 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(centra eŭropa somera tempo),
-				'generic' => q(centra eŭropa tempo),
-				'standard' => q(centra eŭropa norma tempo),
+				'daylight' => q#centra eŭropa somera tempo#,
+				'generic' => q#centra eŭropa tempo#,
+				'standard' => q#centra eŭropa norma tempo#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(orienta eŭropa somera tempo),
-				'generic' => q(orienta eŭropa tempo),
-				'standard' => q(orienta eŭropa norma tempo),
+				'daylight' => q#orienta eŭropa somera tempo#,
+				'generic' => q#orienta eŭropa tempo#,
+				'standard' => q#orienta eŭropa norma tempo#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(okcidenta eŭropa somera tempo),
-				'generic' => q(okcidenta eŭropa tempo),
-				'standard' => q(okcidenta eŭropa norma tempo),
+				'daylight' => q#okcidenta eŭropa somera tempo#,
+				'generic' => q#okcidenta eŭropa tempo#,
+				'standard' => q#okcidenta eŭropa norma tempo#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(universala tempo kunordigita),
+				'standard' => q#universala tempo kunordigita#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(barata tempo),
+				'standard' => q#barata tempo#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(hindoĉina tempo),
+				'standard' => q#hindoĉina tempo#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(centra indonezia tempo),
+				'standard' => q#centra indonezia tempo#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(orienta indonezia tempo),
+				'standard' => q#orienta indonezia tempo#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(okcidenta indonezia tempo),
+				'standard' => q#okcidenta indonezia tempo#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(israela somera tempo),
-				'generic' => q(israela tempo),
-				'standard' => q(israela norma tempo),
+				'daylight' => q#israela somera tempo#,
+				'generic' => q#israela tempo#,
+				'standard' => q#israela norma tempo#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(japana somera tempo),
-				'generic' => q(japana tempo),
-				'standard' => q(japana norma tempo),
+				'daylight' => q#japana somera tempo#,
+				'generic' => q#japana tempo#,
+				'standard' => q#japana norma tempo#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(korea somera tempo),
-				'generic' => q(korea tempo),
-				'standard' => q(korea norma tempo),
+				'daylight' => q#korea somera tempo#,
+				'generic' => q#korea tempo#,
+				'standard' => q#korea norma tempo#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(moskva somera tempo),
-				'generic' => q(moskva tempo),
-				'standard' => q(moskva norma tempo),
+				'daylight' => q#moskva somera tempo#,
+				'generic' => q#moskva tempo#,
+				'standard' => q#moskva norma tempo#,
 			},
 		},
 	 } }

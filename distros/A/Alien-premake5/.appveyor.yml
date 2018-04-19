@@ -1,0 +1,53 @@
+environment:
+    install_berry_perl: "cmd /C git clone https://github.com/stevieb9/berrybrew && cd berrybrew/bin && berrybrew.exe install %version% && berrybrew.exe switch %version%"
+    install_active_perl: "cmd /C choco install activeperl --version %version%"
+
+    matrix:
+      - install_perl: "%install_berry_perl%"
+        version: "5.26.0_64"
+      - install_perl: "%install_active_perl%"
+        version: "5.24.1.2402"
+
+init:
+  - git config --global user.email "app@veyor.pizza"
+  - git config --global user.name "App Veyor"
+
+install:
+  # Install perl
+  - cmd: "%install_perl%"
+  # Make sure we are in project root
+  - cmd: "cd %APPVEYOR_BUILD_FOLDER%"
+  # Set path for berrybrew
+  - SET PATH=C:\berrybrew\%version%\c\bin;C:\berrybrew\%version%\perl\site\bin;C:\berrybrew\%version%\perl\bin;%PATH%
+  # ActivePerl does not include cpanminus
+  - cpan      App::cpanminus
+  - cpanm -nq PerlIO::utf8_strict
+  - cpanm -nq Mixin::Linewise::Readers
+  - cpanm -nq Params::Validate
+
+for:
+-
+  branches:
+    except:
+      - build
+
+  before_test:
+    - cpanm -nq Getopt::Long::Descriptive
+    - cpanm -nq Log::Dispatch::Output Software::LicenseUtils Config::MVP::Reader::INI Config::MVP::Assembler Text::Template Data::Section App::Cmd::Tester Log::Dispatchouli MooseX::Types::Perl String::Formatter MooseX::SetOnce CPAN::Uploader Config::MVP::Section Perl::PrereqScanner App::Cmd::Setup Config::MVP::Reader Software::License Config::MVP::Reader::Findable::ByExtension Config::MVP::Reader::Finder Pod::Eventual Mixin::Linewise::Readers Config::MVP::Assembler::WithBundles App::Cmd::Command::version Config::INI::Reader App::Cmd::Tester::CaptureExternal Term::Encoding
+    - cpanm -nq Module::Build
+    - cpanm -nq Dist::Zilla
+    - dzil authordeps | cpanm -nq
+    - dzil listdeps   | cpanm -nq
+
+  test_script:
+    - dzil test
+-
+  branches:
+    only:
+      - build
+
+  test_script:
+    - perl Makefile.PL
+    - make test
+
+build: off

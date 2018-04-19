@@ -6,7 +6,7 @@ use DBIx::MyParsePP::Parser;
 use DBIx::MyParsePP::Query;
 
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use constant MYPARSEPP_YAPP			=> 0;
 use constant MYPARSEPP_CHARSET			=> 1;
@@ -165,8 +165,5 @@ the README and LICENCE files.
 Please note that this module contains code copyright by MySQL AB released under
 the GNU General Public Licence, and not the GNU Lesser General Public Licence.
 Using this code for commercial purposes may require purchasing a licence from MySQL AB.
-
-The Parse::Yapp module and its related modules and shell scripts are copyright (c)
-1998-2001 Francois Desarmenien, France. All rights reserved.
 
 =cut

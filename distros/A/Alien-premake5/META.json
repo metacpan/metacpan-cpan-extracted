@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,7 +56,7 @@
    "provides" : {
       "Alien::premake5" : {
          "file" : "lib/Alien/premake5.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -71,16 +71,17 @@
          "web" : "https://github.com/jjatria/Alien-premake5"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
       "requires" : {
          "share" : {
-            "Archive::Zip" : "0",
+            "Archive::Tar" : "0",
             "Capture::Tiny" : "0",
             "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
             "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "Sort::Versions" : "0",
@@ -92,6 +93,6 @@
          }
       }
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

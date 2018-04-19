@@ -2,7 +2,7 @@ package Locale::CLDR::NumberFormatter;
 
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 
 use v5.10.1;
@@ -311,6 +311,9 @@ sub get_formatted_number {
 			# Fast commify using unpack
 			my $pattern = "(A$minor_group)(A$major_group)*";
 			$number = reverse join $separator, grep {length} unpack $pattern, reverse $integer;
+		}
+		else {
+			$number = $integer;
 		}
 	}
 	else {

@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Nmg - Package for language Kwasio
 
 package Locale::CLDR::Locales::Nmg;
 # This file auto generated from Data\common\main\nmg.xml
-#	on Fri 29 Apr  7:20:12 pm GMT
+#	on Fri 13 Apr  7:24:06 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -327,9 +328,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[q x z])},
+			auxiliary => qr{[q x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'E', 'Ǝ', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'],
-			main => qr{(?^u:[a á â ǎ ä ā b ɓ c d e é ê ě ē ǝ {ǝ́} {ǝ̂} {ǝ̌} {ǝ̄} ɛ {ɛ́} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ ï ī j k l m n ń ŋ o ó ô ǒ ö ō ɔ {ɔ́} {ɔ̂} {ɔ̌} {ɔ̄} p r ŕ s t u ú û ǔ ū v w y])},
+			main => qr{[a á â ǎ ä ā b ɓ c d e é ê ě ē ǝ {ǝ́} {ǝ̂} {ǝ̌} {ǝ̄} ɛ {ɛ́} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ ï ī j k l m n ń ŋ o ó ô ǒ ö ō ɔ {ɔ́} {ɔ̂} {ɔ̌} {ɔ̄} p r ŕ s t u ú û ǔ ū v w y]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -401,14 +403,14 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
@@ -846,8 +848,8 @@ has 'day_periods' => (
 					'pm' => q{kugú},
 				},
 				'wide' => {
-					'pm' => q{kugú},
 					'am' => q{maná},
+					'pm' => q{kugú},
 				},
 			},
 		},

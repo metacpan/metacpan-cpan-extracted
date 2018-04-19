@@ -1,0 +1,13 @@
+=head1 NAME
+
+Test::Pod::Links - a valid pod file
+
+=head1 DESCRIPTION
+
+This is a pod file with 1 non-web link.
+
+=head1 SEE ALSO
+
+L<Test::Pod::Links>
+
+=cut

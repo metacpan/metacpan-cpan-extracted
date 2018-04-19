@@ -1,7 +1,7 @@
     Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 VERSION
-    Version 1.20180410
+    Version 1.20180417
 
 SYNOPSIS
         use Time::Piece;

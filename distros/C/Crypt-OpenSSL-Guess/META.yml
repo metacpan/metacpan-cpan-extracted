@@ -1,0 +1,42 @@
+---
+abstract: 'Guess OpenSSL include path'
+author:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenSSL-Guess
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Crypt::OpenSSL::Guess:
+    file: lib/Crypt/OpenSSL/Guess.pm
+    version: '0.11'
+requires:
+  Config: '0'
+  Exporter: '5.57'
+  File::Spec: '0'
+  Symbol: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/akiym/Crypt-OpenSSL-Guess/issues
+  homepage: https://github.com/akiym/Crypt-OpenSSL-Guess
+  repository: git://github.com/akiym/Crypt-OpenSSL-Guess.git
+version: '0.11'
+x_authority: cpan:AKIYM
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

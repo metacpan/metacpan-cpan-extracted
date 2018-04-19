@@ -1,0 +1,16 @@
+.gitignore
+Changes
+utils.xs
+lib/Math/Utils/XS.pm
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+ppport.h
+README.md
+t/00_fsum.t
+t/01_logs.t
+t/02_signs.t
+tools/bench.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

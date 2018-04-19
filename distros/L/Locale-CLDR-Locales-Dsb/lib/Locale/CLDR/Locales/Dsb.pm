@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
 
 package Locale::CLDR::Locales::Dsb;
 # This file auto generated from Data\common\main\dsb.xml
-#	on Fri 29 Apr  6:57:58 pm GMT
+#	on Fri 13 Apr  7:06:41 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -817,10 +818,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[á à ă â å ä ã ą ā æ ç ď đ é è ĕ ê ë ė ę ē ğ í ì ĭ î ï İ ī ı ĺ ľ ň ñ ò ŏ ô ö ő ø ō œ ř ş ß ť ú ù ŭ û ů ü ű ū ý ÿ ż])},
+			auxiliary => qr{[á à ă â å ä ã ą ā æ ç ď đ é è ĕ ê ë ė ę ē ğ í ì ĭ î ï İ ī ı ĺ ľ ň ñ ò ŏ ô ö ő ø ō œ ř ş ß ť ú ù ŭ û ů ü ű ū ý ÿ ż]},
 			index => ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', '{Ch}', 'I', 'J', 'K', 'Ł', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'Š', 'Ś', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'Ź'],
-			main => qr{(?^u:[a b c č ć d e ě f g h {ch} i j k ł l m n ń o ó p q r ŕ s š ś t u v w x y z ž ź])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #])},
+			main => qr{[a b c č ć d e ě f g h {ch} i j k ł l m n ń o ó p q r ŕ s š ś t u v w x y z ž ź]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -2952,7 +2954,7 @@ has 'number_formats' => (
 					'two' => '000 bil'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3107,14 +3109,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3554,13 +3556,22 @@ has 'currencies' => (
 				'two' => q(běłoruskej rubla \(1994–1999\)),
 			},
 		},
-		'BYR' => {
+		'BYN' => {
 			display_name => {
 				'currency' => q(běłoruski rubl),
 				'few' => q(běłoruske ruble),
 				'one' => q(běłoruski rubl),
 				'other' => q(běłoruskich rublow),
 				'two' => q(běłoruskej rubla),
+			},
+		},
+		'BYR' => {
+			display_name => {
+				'currency' => q(běłoruski rubl \(2000–2016\)),
+				'few' => q(běłoruske ruble \(2000–2016\)),
+				'one' => q(běłoruski rubl \(2000–2016\)),
+				'other' => q(běłoruskich rublow \(2000–2016\)),
+				'two' => q(běłoruskej rubla \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -4341,11 +4352,11 @@ has 'currencies' => (
 		},
 		'PEN' => {
 			display_name => {
-				'currency' => q(peruski nowy sol),
-				'few' => q(peruske nowe sole),
-				'one' => q(peruski nowy sol),
-				'other' => q(peruskich nowych solow),
-				'two' => q(peruskej nowej sola),
+				'currency' => q(peruski sol),
+				'few' => q(peruske sole),
+				'one' => q(peruski sol),
+				'other' => q(peruskich solow),
+				'two' => q(peruskej sola),
 			},
 		},
 		'PGK' => {
@@ -5085,17 +5096,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'am' => q{dop.},
-					'pm' => q{wótp.},
-				},
 				'wide' => {
 					'pm' => q{wótpołdnja},
 					'am' => q{dopołdnja},
 				},
+				'narrow' => {
+					'am' => q{dop.},
+					'pm' => q{wótp.},
+				},
 				'abbreviated' => {
-					'am' => q{dopołdnja},
 					'pm' => q{wótpołdnja},
+					'am' => q{dopołdnja},
 				},
 			},
 		},
@@ -5183,30 +5194,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			Ed => q{E, d.},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, d. MMM y G},
-			GyMMMd => q{d. MMM y G},
-			M => q{L},
-			MEd => q{E, d.M.},
-			MMM => q{LLL},
-			MMMEd => q{E, d. MMM},
-			MMMd => q{d. MMM},
-			Md => q{d.M.},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M.y GGGGG},
-			yyyyMEd => q{E, d.M.y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d. MMM y G},
-			yyyyMMMd => q{d. MMM y G},
-			yyyyMd => q{d.M.y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E, 'zeg'. H:mm},
@@ -5242,6 +5229,30 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
+		'generic' => {
+			Ed => q{E, d.},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d. MMM y G},
+			GyMMMd => q{d. MMM y G},
+			M => q{L},
+			MEd => q{E, d.M.},
+			MMM => q{LLL},
+			MMMEd => q{E, d. MMM},
+			MMMd => q{d. MMM},
+			Md => q{d.M.},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M.y GGGGG},
+			yyyyMEd => q{E, d.M.y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d. MMM y G},
+			yyyyMMMd => q{d. MMM y G},
+			yyyyMd => q{d.M.y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 	} },
 );
 
@@ -5261,69 +5272,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{M. – M.},
-			},
-			MEd => {
-				M => q{E, d.M. – E, d.M.},
-				d => q{E, d.M. – E, d.M.},
-			},
-			MMM => {
-				M => q{LLL – LLL},
-			},
-			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
-			},
-			MMMd => {
-				M => q{d. MMM – d. MMM},
-				d => q{d. – d. MMM},
-			},
-			Md => {
-				M => q{d.M. – d.M.},
-				d => q{d.M. – d.M.},
-			},
-			d => {
-				d => q{d. – d.},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{y–y G},
-			},
-			yM => {
-				M => q{M.y – M.y G},
-				y => q{M.y – M.y G},
-			},
-			yMEd => {
-				M => q{E, d.M.y – E, d.M.y G},
-				d => q{E, d.M.y – E, d.M.y G},
-				y => q{E, d.M.y – E, d.M.y G},
-			},
-			yMMM => {
-				M => q{LLL – LLL y G},
-				y => q{LLL y – LLL y G},
-			},
-			yMMMEd => {
-				M => q{E, d. MMM – E, d. MMM y G},
-				d => q{E, d. – E, d. MMM y G},
-				y => q{E, d. MMM y – E, d. MMM y G},
-			},
-			yMMMM => {
-				M => q{LLLL – LLLL y G},
-				y => q{LLLL y – LLLL y G},
-			},
-			yMMMd => {
-				M => q{d. MMM – d. MMM y G},
-				d => q{d. – d. MMM y G},
-				y => q{d. MMM y – d. MMM y G},
-			},
-			yMd => {
-				M => q{d.M.y – d.M.y G},
-				d => q{d.M.y – d.M.y G},
-				y => q{d.M.y – d.M.y G},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{'zeg'. H–H},
@@ -5419,6 +5367,69 @@ has 'datetime_formats_interval' => (
 				y => q{d.M.y – d.M.y},
 			},
 		},
+		'generic' => {
+			M => {
+				M => q{M. – M.},
+			},
+			MEd => {
+				M => q{E, d.M. – E, d.M.},
+				d => q{E, d.M. – E, d.M.},
+			},
+			MMM => {
+				M => q{LLL – LLL},
+			},
+			MMMEd => {
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. – E, d. MMM},
+			},
+			MMMd => {
+				M => q{d. MMM – d. MMM},
+				d => q{d. – d. MMM},
+			},
+			Md => {
+				M => q{d.M. – d.M.},
+				d => q{d.M. – d.M.},
+			},
+			d => {
+				d => q{d. – d.},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M.y – M.y G},
+				y => q{M.y – M.y G},
+			},
+			yMEd => {
+				M => q{E, d.M.y – E, d.M.y G},
+				d => q{E, d.M.y – E, d.M.y G},
+				y => q{E, d.M.y – E, d.M.y G},
+			},
+			yMMM => {
+				M => q{LLL – LLL y G},
+				y => q{LLL y – LLL y G},
+			},
+			yMMMEd => {
+				M => q{E, d. MMM – E, d. MMM y G},
+				d => q{E, d. – E, d. MMM y G},
+				y => q{E, d. MMM y – E, d. MMM y G},
+			},
+			yMMMM => {
+				M => q{LLLL – LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. MMM – d. MMM y G},
+				d => q{d. – d. MMM y G},
+				y => q{d. MMM y – d. MMM y G},
+			},
+			yMd => {
+				M => q{d.M.y – d.M.y G},
+				d => q{d.M.y – d.M.y G},
+				y => q{d.M.y – d.M.y G},
+			},
+		},
 	} },
 );
 
@@ -5436,7 +5447,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Afghaniski cas),
+				'standard' => q#Afghaniski cas#,
 			},
 		},
 		'Africa/Accra' => {
@@ -5486,38 +5497,38 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Srjejźoafriski cas),
+				'standard' => q#Srjejźoafriski cas#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Pódzajtšnoafriski cas),
+				'standard' => q#Pódzajtšnoafriski cas#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Pódpołdnjowoafriski cas),
+				'standard' => q#Pódpołdnjowoafriski cas#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Pódwjacornoafriski lěśojski cas),
-				'generic' => q(Pódwjacornoafriski cas),
-				'standard' => q(Pódwjacornoafriski standardny cas),
+				'daylight' => q#Pódwjacornoafriski lěśojski cas#,
+				'generic' => q#Pódwjacornoafriski cas#,
+				'standard' => q#Pódwjacornoafriski standardny cas#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Alaskojski lěśojski cas),
-				'generic' => q(Alaskojski cas),
-				'standard' => q(Alaskojski standardny cas),
+				'daylight' => q#Alaskojski lěśojski cas#,
+				'generic' => q#Alaskojski cas#,
+				'standard' => q#Alaskojski standardny cas#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amaconaski lěśojski cas),
-				'generic' => q(Amaconaski cas),
-				'standard' => q(Amaconaski standardny cas),
+				'daylight' => q#Amaconaski lěśojski cas#,
+				'generic' => q#Amaconaski cas#,
+				'standard' => q#Amaconaski standardny cas#,
 			},
 		},
 		'America/Asuncion' => {
@@ -5615,30 +5626,30 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Pódpołnocnoameriski centralny lěśojski cas),
-				'generic' => q(Pódpołnocnoameriski centralny cas),
-				'standard' => q(Pódpołnocnoameriski centralny standardny cas),
+				'daylight' => q#Pódpołnocnoameriski centralny lěśojski cas#,
+				'generic' => q#Pódpołnocnoameriski centralny cas#,
+				'standard' => q#Pódpołnocnoameriski centralny standardny cas#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Pódpołnocnoameriski pódzajtšny lěśojski cas),
-				'generic' => q(Pódpołnocnoameriski pódzajtšny cas),
-				'standard' => q(Pódpołnocnoameriski pódzajtšny standardny cas),
+				'daylight' => q#Pódpołnocnoameriski pódzajtšny lěśojski cas#,
+				'generic' => q#Pódpołnocnoameriski pódzajtšny cas#,
+				'standard' => q#Pódpołnocnoameriski pódzajtšny standardny cas#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Pódpołnocnoameriski górski lěśojski cas),
-				'generic' => q(Pódpołnocnoameriski górski cas),
-				'standard' => q(Pódpołnocnoameriski górski standardny cas),
+				'daylight' => q#Pódpołnocnoameriski górski lěśojski cas#,
+				'generic' => q#Pódpołnocnoameriski górski cas#,
+				'standard' => q#Pódpołnocnoameriski górski standardny cas#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Pódpołnocnoameriski pacifiski lěśojski cas),
-				'generic' => q(Pódpołnocnoameriski pacifiski cas),
-				'standard' => q(Pódpołnocnoameriski pacifiski standardny cas),
+				'daylight' => q#Pódpołnocnoameriski pacifiski lěśojski cas#,
+				'generic' => q#Pódpołnocnoameriski pacifiski cas#,
+				'standard' => q#Pódpołnocnoameriski pacifiski standardny cas#,
 			},
 		},
 		'Antarctica/DumontDUrville' => {
@@ -5649,37 +5660,37 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Apiaski lěśojski cas),
-				'generic' => q(Apiaski cas),
-				'standard' => q(Apiaski standardny cas),
+				'daylight' => q#Apiaski lěśojski cas#,
+				'generic' => q#Apiaski cas#,
+				'standard' => q#Apiaski standardny cas#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabiski lěśojski cas),
-				'generic' => q(Arabiski cas),
-				'standard' => q(Arabiski standardny cas),
+				'daylight' => q#Arabiski lěśojski cas#,
+				'generic' => q#Arabiski cas#,
+				'standard' => q#Arabiski standardny cas#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentinski lěśojski cas),
-				'generic' => q(Argentinski cas),
-				'standard' => q(Argentinski standardny cas),
+				'daylight' => q#Argentinski lěśojski cas#,
+				'generic' => q#Argentinski cas#,
+				'standard' => q#Argentinski standardny cas#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Pódwjacornoargentinski lěśojski cas),
-				'generic' => q(Pódwjacornoargentinski cas),
-				'standard' => q(Pódwjacornoargentinski standardny cas),
+				'daylight' => q#Pódwjacornoargentinski lěśojski cas#,
+				'generic' => q#Pódwjacornoargentinski cas#,
+				'standard' => q#Pódwjacornoargentinski standardny cas#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Armeński lěśojski cas),
-				'generic' => q(Armeński cas),
-				'standard' => q(Armeński standardny cas),
+				'daylight' => q#Armeński lěśojski cas#,
+				'generic' => q#Armeński cas#,
+				'standard' => q#Armeński standardny cas#,
 			},
 		},
 		'Asia/Aqtobe' => {
@@ -5777,9 +5788,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlantiski lěśojski cas),
-				'generic' => q(Atlantiski cas),
-				'standard' => q(Atlantiski standardny cas),
+				'daylight' => q#Atlantiski lěśojski cas#,
+				'generic' => q#Atlantiski cas#,
+				'standard' => q#Atlantiski standardny cas#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -5808,171 +5819,171 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Srjejźoawstralski lěśojski cas),
-				'generic' => q(Srjejźoawstralski cas),
-				'standard' => q(Srjejźoawstralski standardny cas),
+				'daylight' => q#Srjejźoawstralski lěśojski cas#,
+				'generic' => q#Srjejźoawstralski cas#,
+				'standard' => q#Srjejźoawstralski standardny cas#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Srjejźopódwjacorny awstralski lěśojski cas),
-				'generic' => q(Srjejźopódwjacorny awstralski cas),
-				'standard' => q(Srjejźopódwjacorny awstralski standardny cas),
+				'daylight' => q#Srjejźopódwjacorny awstralski lěśojski cas#,
+				'generic' => q#Srjejźopódwjacorny awstralski cas#,
+				'standard' => q#Srjejźopódwjacorny awstralski standardny cas#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Pódzajtšnoawstralski lěśojski cas),
-				'generic' => q(Pódzajtšnoawstralski cas),
-				'standard' => q(Pódzajtšnoawstralski standardny cas),
+				'daylight' => q#Pódzajtšnoawstralski lěśojski cas#,
+				'generic' => q#Pódzajtšnoawstralski cas#,
+				'standard' => q#Pódzajtšnoawstralski standardny cas#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Pódwjacornoawstralski lěśojski cas),
-				'generic' => q(Pódwjacornoawstralski cas),
-				'standard' => q(Pódwjacornoawstralski standardny cas),
+				'daylight' => q#Pódwjacornoawstralski lěśojski cas#,
+				'generic' => q#Pódwjacornoawstralski cas#,
+				'standard' => q#Pódwjacornoawstralski standardny cas#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Azerbajdžaniski lěśojski cas),
-				'generic' => q(Azerbajdžaniski cas),
-				'standard' => q(Azerbajdžaniski standardny cas),
+				'daylight' => q#Azerbajdžaniski lěśojski cas#,
+				'generic' => q#Azerbajdžaniski cas#,
+				'standard' => q#Azerbajdžaniski standardny cas#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Acorski lěśojski cas),
-				'generic' => q(Acorski cas),
-				'standard' => q(Acorski standardny cas),
+				'daylight' => q#Acorski lěśojski cas#,
+				'generic' => q#Acorski cas#,
+				'standard' => q#Acorski standardny cas#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Bangladešski lěśojski cas),
-				'generic' => q(Bangladešski cas),
-				'standard' => q(Bangladešski standardny cas),
+				'daylight' => q#Bangladešski lěśojski cas#,
+				'generic' => q#Bangladešski cas#,
+				'standard' => q#Bangladešski standardny cas#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Bhutański cas),
+				'standard' => q#Bhutański cas#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Boliwiski cas),
+				'standard' => q#Boliwiski cas#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brasília lěśojski cas),
-				'generic' => q(Brasília cas),
-				'standard' => q(Brasília standardny cas),
+				'daylight' => q#Brasília lěśojski cas#,
+				'generic' => q#Brasília cas#,
+				'standard' => q#Brasília standardny cas#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Bruneiski cas),
+				'standard' => q#Bruneiski cas#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Kapverdski lěśojski cas),
-				'generic' => q(Kapverdski cas),
-				'standard' => q(Kapverdski standardny cas),
+				'daylight' => q#Kapverdski lěśojski cas#,
+				'generic' => q#Kapverdski cas#,
+				'standard' => q#Kapverdski standardny cas#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Chamorrski cas),
+				'standard' => q#Chamorrski cas#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Chathamski lěśojski cas),
-				'generic' => q(Chathamski cas),
-				'standard' => q(Chathamski standardny cas),
+				'daylight' => q#Chathamski lěśojski cas#,
+				'generic' => q#Chathamski cas#,
+				'standard' => q#Chathamski standardny cas#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Chilski lěśojski cas),
-				'generic' => q(Chilski cas),
-				'standard' => q(Chilski standardny cas),
+				'daylight' => q#Chilski lěśojski cas#,
+				'generic' => q#Chilski cas#,
+				'standard' => q#Chilski standardny cas#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Chinski lěśojski cas),
-				'generic' => q(Chinski cas),
-				'standard' => q(Chinski standardny cas),
+				'daylight' => q#Chinski lěśojski cas#,
+				'generic' => q#Chinski cas#,
+				'standard' => q#Chinski standardny cas#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Choibalsański lěśojski cas),
-				'generic' => q(Choibalsański cas),
-				'standard' => q(Choibalsański standardny cas),
+				'daylight' => q#Choibalsański lěśojski cas#,
+				'generic' => q#Choibalsański cas#,
+				'standard' => q#Choibalsański standardny cas#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(cas Gódownych kupow),
+				'standard' => q#cas Gódownych kupow#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(cas Kokosowych kupow),
+				'standard' => q#cas Kokosowych kupow#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolumbiski lěśojski cas),
-				'generic' => q(Kolumbiski cas),
-				'standard' => q(Kolumbiski standardny cas),
+				'daylight' => q#Kolumbiski lěśojski cas#,
+				'generic' => q#Kolumbiski cas#,
+				'standard' => q#Kolumbiski standardny cas#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(lěśojski cas Cookowych kupow),
-				'generic' => q(cas Cookowych kupow),
-				'standard' => q(Standardny cas Cookowych kupow),
+				'daylight' => q#lěśojski cas Cookowych kupow#,
+				'generic' => q#cas Cookowych kupow#,
+				'standard' => q#Standardny cas Cookowych kupow#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kubański lěśojski cas),
-				'generic' => q(Kubański cas),
-				'standard' => q(Kubański standardny cas),
+				'daylight' => q#Kubański lěśojski cas#,
+				'generic' => q#Kubański cas#,
+				'standard' => q#Kubański standardny cas#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Davis cas),
+				'standard' => q#Davis cas#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(DumontDUrville cas),
+				'standard' => q#DumontDUrville cas#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Pódzajtšnotimorski cas),
+				'standard' => q#Pódzajtšnotimorski cas#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(lěśojski cas Jatšowneje kupy),
-				'generic' => q(cas Jatšowneje kupy),
-				'standard' => q(standardny cas Jatšowneje kupy),
+				'daylight' => q#lěśojski cas Jatšowneje kupy#,
+				'generic' => q#cas Jatšowneje kupy#,
+				'standard' => q#standardny cas Jatšowneje kupy#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ekuadorski cas),
+				'standard' => q#Ekuadorski cas#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -6001,7 +6012,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q(Iriski lěśojski cas),
+				'daylight' => q#Iriski lěśojski cas#,
 			},
 		},
 		'Europe/Kiev' => {
@@ -6012,7 +6023,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/London' => {
 			long => {
-				'daylight' => q(Britiski lěśojski cas),
+				'daylight' => q#Britiski lěśojski cas#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -6056,144 +6067,144 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Srjejźoeuropski lěśojski cas),
-				'generic' => q(Srjejźoeuropski cas),
-				'standard' => q(Srjejźoeuropski standardny cas),
+				'daylight' => q#Srjejźoeuropski lěśojski cas#,
+				'generic' => q#Srjejźoeuropski cas#,
+				'standard' => q#Srjejźoeuropski standardny cas#,
 			},
 			short => {
-				'daylight' => q(MESZ),
-				'generic' => q(MEZ),
-				'standard' => q(MEZ),
+				'daylight' => q#MESZ#,
+				'generic' => q#MEZ#,
+				'standard' => q#MEZ#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Pódzajtšnoeuropski lěśojski cas),
-				'generic' => q(Pódzajtšnoeuropski cas),
-				'standard' => q(Pódzajtšnoeuropski standardny cas),
+				'daylight' => q#Pódzajtšnoeuropski lěśojski cas#,
+				'generic' => q#Pódzajtšnoeuropski cas#,
+				'standard' => q#Pódzajtšnoeuropski standardny cas#,
 			},
 			short => {
-				'daylight' => q(OESZ),
-				'generic' => q(OEZ),
-				'standard' => q(OEZ),
+				'daylight' => q#OESZ#,
+				'generic' => q#OEZ#,
+				'standard' => q#OEZ#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Kaliningradski cas),
+				'standard' => q#Kaliningradski cas#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Pódwjacornoeuropski lěśojski cas),
-				'generic' => q(Pódwjacornoeuropski cas),
-				'standard' => q(Pódwjacornoeuropski standardny cas),
+				'daylight' => q#Pódwjacornoeuropski lěśojski cas#,
+				'generic' => q#Pódwjacornoeuropski cas#,
+				'standard' => q#Pódwjacornoeuropski standardny cas#,
 			},
 			short => {
-				'daylight' => q(WESZ),
-				'generic' => q(WEZ),
-				'standard' => q(WEZ),
+				'daylight' => q#WESZ#,
+				'generic' => q#WEZ#,
+				'standard' => q#WEZ#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Falklandski lěśojski cas),
-				'generic' => q(Falklandski cas),
-				'standard' => q(Falklandski standardny cas),
+				'daylight' => q#Falklandski lěśojski cas#,
+				'generic' => q#Falklandski cas#,
+				'standard' => q#Falklandski standardny cas#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Fidźiski lěśojski cas),
-				'generic' => q(Fidźiski cas),
-				'standard' => q(Fidźiski standardny cas),
+				'daylight' => q#Fidźiski lěśojski cas#,
+				'generic' => q#Fidźiski cas#,
+				'standard' => q#Fidźiski standardny cas#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Francojskoguyański cas),
+				'standard' => q#Francojskoguyański cas#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(cas francojskego pódpołdnjowego a antarktiskeho teritoriuma),
+				'standard' => q#cas francojskego pódpołdnjowego a antarktiskeho teritoriuma#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwichski cas),
+				'standard' => q#Greenwichski cas#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Galapagoski cas),
+				'standard' => q#Galapagoski cas#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Gambierski cas),
+				'standard' => q#Gambierski cas#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Georgiski lěśojski cas),
-				'generic' => q(Georgiski cas),
-				'standard' => q(Georgiski standardny cas),
+				'daylight' => q#Georgiski lěśojski cas#,
+				'generic' => q#Georgiski cas#,
+				'standard' => q#Georgiski standardny cas#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(cas Gilbertowych kupow),
+				'standard' => q#cas Gilbertowych kupow#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Pódzajtšnogrönlandski lěśojski cas),
-				'generic' => q(Pódzajtšnogrönlandski cas),
-				'standard' => q(Pódzajtšnogrönlandski standardny cas),
+				'daylight' => q#Pódzajtšnogrönlandski lěśojski cas#,
+				'generic' => q#Pódzajtšnogrönlandski cas#,
+				'standard' => q#Pódzajtšnogrönlandski standardny cas#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Pódwjacornogrönlandski lěśojski cas),
-				'generic' => q(Pódwjacornogrönlandski cas),
-				'standard' => q(Pódwjacornogrönlandski standardny cas),
+				'daylight' => q#Pódwjacornogrönlandski lěśojski cas#,
+				'generic' => q#Pódwjacornogrönlandski cas#,
+				'standard' => q#Pódwjacornogrönlandski standardny cas#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(cas Persiskego golfa),
+				'standard' => q#cas Persiskego golfa#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Guyański cas),
+				'standard' => q#Guyański cas#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Hawaiisko-aleutski lěśojski cas),
-				'generic' => q(Hawaiisko-aleutski cas),
-				'standard' => q(Hawaiisko-aleutski standardny cas),
+				'daylight' => q#Hawaiisko-aleutski lěśojski cas#,
+				'generic' => q#Hawaiisko-aleutski cas#,
+				'standard' => q#Hawaiisko-aleutski standardny cas#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Hongkongski lěśojski cas),
-				'generic' => q(Hongkongski cas),
-				'standard' => q(Hongkongski standardny cas),
+				'daylight' => q#Hongkongski lěśojski cas#,
+				'generic' => q#Hongkongski cas#,
+				'standard' => q#Hongkongski standardny cas#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Chowdski lěśojski cas),
-				'generic' => q(Chowdski cas),
-				'standard' => q(Chowdski standardny cas),
+				'daylight' => q#Chowdski lěśojski cas#,
+				'generic' => q#Chowdski cas#,
+				'standard' => q#Chowdski standardny cas#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Indiski cas),
+				'standard' => q#Indiski cas#,
 			},
 		},
 		'Indian/Christmas' => {
@@ -6210,240 +6221,240 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Indiskooceaniski cas),
+				'standard' => q#Indiskooceaniski cas#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Indochinski cas),
+				'standard' => q#Indochinski cas#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Srjejźoindoneski cas),
+				'standard' => q#Srjejźoindoneski cas#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Pódzajtšnoindoneski),
+				'standard' => q#Pódzajtšnoindoneski#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Pódwjacornoindoneski cas),
+				'standard' => q#Pódwjacornoindoneski cas#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Irański lěśojski cas),
-				'generic' => q(Irański cas),
-				'standard' => q(Irański standardny cas),
+				'daylight' => q#Irański lěśojski cas#,
+				'generic' => q#Irański cas#,
+				'standard' => q#Irański standardny cas#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkutski lěśojski cas),
-				'generic' => q(Irkutski cas),
-				'standard' => q(Irkutski standardny cas),
+				'daylight' => q#Irkutski lěśojski cas#,
+				'generic' => q#Irkutski cas#,
+				'standard' => q#Irkutski standardny cas#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Israelski lěśojski cas),
-				'generic' => q(Israelski cas),
-				'standard' => q(Israelski standardny cas),
+				'daylight' => q#Israelski lěśojski cas#,
+				'generic' => q#Israelski cas#,
+				'standard' => q#Israelski standardny cas#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japański lěśojski cas),
-				'generic' => q(Japański cas),
-				'standard' => q(Japański standardny cas),
+				'daylight' => q#Japański lěśojski cas#,
+				'generic' => q#Japański cas#,
+				'standard' => q#Japański standardny cas#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Pódzajtšnokazachski cas),
+				'standard' => q#Pódzajtšnokazachski cas#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Pódwjacornokazachski cas),
+				'standard' => q#Pódwjacornokazachski cas#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Korejski lěśojski cas),
-				'generic' => q(Korejski cas),
-				'standard' => q(Korejski standardny cas),
+				'daylight' => q#Korejski lěśojski cas#,
+				'generic' => q#Korejski cas#,
+				'standard' => q#Korejski standardny cas#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Kosraeski cas),
+				'standard' => q#Kosraeski cas#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnojarski lěśojski cas),
-				'generic' => q(Krasnojarski cas),
-				'standard' => q(Krasnojarski standardny cas),
+				'daylight' => q#Krasnojarski lěśojski cas#,
+				'generic' => q#Krasnojarski cas#,
+				'standard' => q#Krasnojarski standardny cas#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Kirgiski cas),
+				'standard' => q#Kirgiski cas#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(cas Linijowych kupow),
+				'standard' => q#cas Linijowych kupow#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(lěśojski cas kupy Lord-Howe),
-				'generic' => q(cas kupy Lord-Howe),
-				'standard' => q(Standardny cas kupy Lord-Howe),
+				'daylight' => q#lěśojski cas kupy Lord-Howe#,
+				'generic' => q#cas kupy Lord-Howe#,
+				'standard' => q#Standardny cas kupy Lord-Howe#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(cas kupy Macquarie),
+				'standard' => q#cas kupy Macquarie#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadański lěśojski cas),
-				'generic' => q(Magadański cas),
-				'standard' => q(Magadański standardny cas),
+				'daylight' => q#Magadański lěśojski cas#,
+				'generic' => q#Magadański cas#,
+				'standard' => q#Magadański standardny cas#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Malajziski cas),
+				'standard' => q#Malajziski cas#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Malediwski cas),
+				'standard' => q#Malediwski cas#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Marqueski cas),
+				'standard' => q#Marqueski cas#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(cas Marshallowych kupow),
+				'standard' => q#cas Marshallowych kupow#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mauriciski lěśojski cas),
-				'generic' => q(Mauriciski cas),
-				'standard' => q(Mauriciski standardny cas),
+				'daylight' => q#Mauriciski lěśojski cas#,
+				'generic' => q#Mauriciski cas#,
+				'standard' => q#Mauriciski standardny cas#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Mawson cas),
+				'standard' => q#Mawson cas#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Mexiski dłujkowjacorny lěśojski cas),
-				'generic' => q(Mexiski dłujkowjacorny cas),
-				'standard' => q(Mexiski dłujkowjacorny standardny cas),
+				'daylight' => q#Mexiski dłujkowjacorny lěśojski cas#,
+				'generic' => q#Mexiski dłujkowjacorny cas#,
+				'standard' => q#Mexiski dłujkowjacorny standardny cas#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Mexiski pacifiski lěśojski cas),
-				'generic' => q(Mexiski pacifiski cas),
-				'standard' => q(Mexiski pacifiski standardny cas),
+				'daylight' => q#Mexiski pacifiski lěśojski cas#,
+				'generic' => q#Mexiski pacifiski cas#,
+				'standard' => q#Mexiski pacifiski standardny cas#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulan-Batorski lěśojski cas),
-				'generic' => q(Ulan-Batorski cas),
-				'standard' => q(Ulan-Batorski standardny cas),
+				'daylight' => q#Ulan-Batorski lěśojski cas#,
+				'generic' => q#Ulan-Batorski cas#,
+				'standard' => q#Ulan-Batorski standardny cas#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskowski lěśojski cas),
-				'generic' => q(Moskowski cas),
-				'standard' => q(Moskowski standardny cas),
+				'daylight' => q#Moskowski lěśojski cas#,
+				'generic' => q#Moskowski cas#,
+				'standard' => q#Moskowski standardny cas#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Myanmarski cas),
+				'standard' => q#Myanmarski cas#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Nauruski cas),
+				'standard' => q#Nauruski cas#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Nepalski cas),
+				'standard' => q#Nepalski cas#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Nowokaledoniski lěśojski cas),
-				'generic' => q(Nowokaledoniski cas),
-				'standard' => q(Nowokaledoniski standardny cas),
+				'daylight' => q#Nowokaledoniski lěśojski cas#,
+				'generic' => q#Nowokaledoniski cas#,
+				'standard' => q#Nowokaledoniski standardny cas#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Nowoseelandski lěśojski cas),
-				'generic' => q(Nowoseelandski cas),
-				'standard' => q(Nowoseelandski standardny cas),
+				'daylight' => q#Nowoseelandski lěśojski cas#,
+				'generic' => q#Nowoseelandski cas#,
+				'standard' => q#Nowoseelandski standardny cas#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Nowofundlandski lěśojski cas),
-				'generic' => q(Nowofundlandski cas),
-				'standard' => q(Nowofundlandski standardny cas),
+				'daylight' => q#Nowofundlandski lěśojski cas#,
+				'generic' => q#Nowofundlandski cas#,
+				'standard' => q#Nowofundlandski standardny cas#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Niueski cas),
+				'standard' => q#Niueski cas#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(cas kupy Norfolk),
+				'standard' => q#cas kupy Norfolk#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(lěśojski cas Fernando de Noronha),
-				'generic' => q(cas Fernando de Noronha),
-				'standard' => q(standardny cas Fernando de Noronha),
+				'daylight' => q#lěśojski cas Fernando de Noronha#,
+				'generic' => q#cas Fernando de Noronha#,
+				'standard' => q#standardny cas Fernando de Noronha#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Nowosibirski lěśojski cas),
-				'generic' => q(Nowosibirski cas),
-				'standard' => q(Nowosibirski standardny cas),
+				'daylight' => q#Nowosibirski lěśojski cas#,
+				'generic' => q#Nowosibirski cas#,
+				'standard' => q#Nowosibirski standardny cas#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omski lěśojski cas),
-				'generic' => q(Omski cas),
-				'standard' => q(Omski standardny cas),
+				'daylight' => q#Omski lěśojski cas#,
+				'generic' => q#Omski cas#,
+				'standard' => q#Omski standardny cas#,
 			},
 		},
 		'Pacific/Easter' => {
@@ -6460,231 +6471,231 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Pakistański lěśojski cas),
-				'generic' => q(Pakistański cas),
-				'standard' => q(Pakistański standardny cas),
+				'daylight' => q#Pakistański lěśojski cas#,
+				'generic' => q#Pakistański cas#,
+				'standard' => q#Pakistański standardny cas#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Palauski cas),
+				'standard' => q#Palauski cas#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Papua-Nowoginejski cas),
+				'standard' => q#Papua-Nowoginejski cas#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraguayski lěśojski cas),
-				'generic' => q(Paraguayski cas),
-				'standard' => q(Paraguayski standardny cas),
+				'daylight' => q#Paraguayski lěśojski cas#,
+				'generic' => q#Paraguayski cas#,
+				'standard' => q#Paraguayski standardny cas#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peruski lěśojski cas),
-				'generic' => q(Peruski cas),
-				'standard' => q(Peruski standardny cas),
+				'daylight' => q#Peruski lěśojski cas#,
+				'generic' => q#Peruski cas#,
+				'standard' => q#Peruski standardny cas#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Filipinski lěśojski cas),
-				'generic' => q(Filipinski cas),
-				'standard' => q(Filipinski standardny cas),
+				'daylight' => q#Filipinski lěśojski cas#,
+				'generic' => q#Filipinski cas#,
+				'standard' => q#Filipinski standardny cas#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(cas Phoenixowych kupow),
+				'standard' => q#cas Phoenixowych kupow#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(St.-Pierre-a-Miqueloński lěśojski cas),
-				'generic' => q(St.-Pierre-a-Miqueloński cas),
-				'standard' => q(St.-Pierre-a-Miqueloński standardny cas),
+				'daylight' => q#St.-Pierre-a-Miqueloński lěśojski cas#,
+				'generic' => q#St.-Pierre-a-Miqueloński cas#,
+				'standard' => q#St.-Pierre-a-Miqueloński standardny cas#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(cas Pitcairnowych kupow),
+				'standard' => q#cas Pitcairnowych kupow#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Ponapski cas),
+				'standard' => q#Ponapski cas#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Reunionski cas),
+				'standard' => q#Reunionski cas#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(cas Rothera),
+				'standard' => q#cas Rothera#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Sachalinski lěśojski cas),
-				'generic' => q(Sachalinski cas),
-				'standard' => q(Sachalinski standardny cas),
+				'daylight' => q#Sachalinski lěśojski cas#,
+				'generic' => q#Sachalinski cas#,
+				'standard' => q#Sachalinski standardny cas#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samoaski lěśojski cas),
-				'generic' => q(Samoaski cas),
-				'standard' => q(Samoaski standardny cas),
+				'daylight' => q#Samoaski lěśojski cas#,
+				'generic' => q#Samoaski cas#,
+				'standard' => q#Samoaski standardny cas#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Seychelski cas),
+				'standard' => q#Seychelski cas#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Singapurski cas),
+				'standard' => q#Singapurski cas#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Salomoński cas),
+				'standard' => q#Salomoński cas#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Pódpołdnjowogeorgiski cas),
+				'standard' => q#Pódpołdnjowogeorgiski cas#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Surinamski cas),
+				'standard' => q#Surinamski cas#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Syowa cas),
+				'standard' => q#Syowa cas#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Tahitiski cas),
+				'standard' => q#Tahitiski cas#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Tchajpejski lěśojski cas),
-				'generic' => q(Tchajpejski cas),
-				'standard' => q(Tchajpejski standardny cas),
+				'daylight' => q#Tchajpejski lěśojski cas#,
+				'generic' => q#Tchajpejski cas#,
+				'standard' => q#Tchajpejski standardny cas#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tadźikiski cas),
+				'standard' => q#Tadźikiski cas#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Tokelauski cas),
+				'standard' => q#Tokelauski cas#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tongaski lěśojski cas),
-				'generic' => q(Tongaski cas),
-				'standard' => q(Tongaski standardny cas),
+				'daylight' => q#Tongaski lěśojski cas#,
+				'generic' => q#Tongaski cas#,
+				'standard' => q#Tongaski standardny cas#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Chuukski cas),
+				'standard' => q#Chuukski cas#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Turkmeniski lěśojski cas),
-				'generic' => q(Turkmeniski cas),
-				'standard' => q(Turkmeniski standardny cas),
+				'daylight' => q#Turkmeniski lěśojski cas#,
+				'generic' => q#Turkmeniski cas#,
+				'standard' => q#Turkmeniski standardny cas#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Tuvalski cas),
+				'standard' => q#Tuvalski cas#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Uruguayski lěśojski cas),
-				'generic' => q(Uruguayski cas),
-				'standard' => q(Uruguayski standardny cas),
+				'daylight' => q#Uruguayski lěśojski cas#,
+				'generic' => q#Uruguayski cas#,
+				'standard' => q#Uruguayski standardny cas#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Uzbekiski lěśojski cas),
-				'generic' => q(Uzbekiski cas),
-				'standard' => q(Uzbekiski standardny cas),
+				'daylight' => q#Uzbekiski lěśojski cas#,
+				'generic' => q#Uzbekiski cas#,
+				'standard' => q#Uzbekiski standardny cas#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Vanuatski lěśojski cas),
-				'generic' => q(Vanuatski cas),
-				'standard' => q(Vanuatski standardny cas),
+				'daylight' => q#Vanuatski lěśojski cas#,
+				'generic' => q#Vanuatski cas#,
+				'standard' => q#Vanuatski standardny cas#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Venezuelski cas),
+				'standard' => q#Venezuelski cas#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Wladiwostokski lěśojski cas),
-				'generic' => q(Wladiwostokski cas),
-				'standard' => q(Wladiwostokski standardny cas),
+				'daylight' => q#Wladiwostokski lěśojski cas#,
+				'generic' => q#Wladiwostokski cas#,
+				'standard' => q#Wladiwostokski standardny cas#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Wolgogradski lěśojski cas),
-				'generic' => q(Wolgogradski cas),
-				'standard' => q(Wolgogradski standardny cas),
+				'daylight' => q#Wolgogradski lěśojski cas#,
+				'generic' => q#Wolgogradski cas#,
+				'standard' => q#Wolgogradski standardny cas#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(cas Wostok),
+				'standard' => q#cas Wostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(cas kupy Wake),
+				'standard' => q#cas kupy Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(cas kupow Wallis a Futuna),
+				'standard' => q#cas kupow Wallis a Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakutski lěśojski cas),
-				'generic' => q(Jakutski cas),
-				'standard' => q(Jakutski standardny cas),
+				'daylight' => q#Jakutski lěśojski cas#,
+				'generic' => q#Jakutski cas#,
+				'standard' => q#Jakutski standardny cas#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekaterinburgski lěśojski cas),
-				'generic' => q(Jekaterinburgski cas),
-				'standard' => q(Jekaterinburgski standardny cas),
+				'daylight' => q#Jekaterinburgski lěśojski cas#,
+				'generic' => q#Jekaterinburgski cas#,
+				'standard' => q#Jekaterinburgski standardny cas#,
 			},
 		},
 	 } }

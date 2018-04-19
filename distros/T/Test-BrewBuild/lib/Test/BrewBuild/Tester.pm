@@ -11,9 +11,10 @@ use Logging::Simple;
 use Proc::Background;
 use Storable;
 use Test::BrewBuild;
+use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Git;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 $| = 1;
 

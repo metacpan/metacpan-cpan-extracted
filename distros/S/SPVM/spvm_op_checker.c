@@ -541,6 +541,22 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           // [START]Preorder traversal position
           
           switch (op_cur->id) {
+            case SPVM_OP_C_ID_NEW: {
+              if (op_cur->first->id == SPVM_OP_C_ID_PACKAGE) {
+                SPVM_OP* op_package = op_cur->first;
+                SPVM_PACKAGE* package = op_package->uv.package;
+
+                SPVM_TYPE* type = SPVM_HASH_search(compiler->type_symtable, package->op_name->uv.name, strlen(package->op_name->uv.name));
+                
+                SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, op_package->file, op_package->line);
+                op_type->uv.type = type;
+                
+                SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur->first);
+                SPVM_OP_replace_op(compiler, op_stab, op_type);
+              }
+              
+              break;
+            }
             case SPVM_OP_C_ID_SWITCH: {
               SPVM_LIST_push(op_switch_stack, op_cur);
               break;
@@ -1066,6 +1082,8 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   break;
                 }
                 case SPVM_OP_C_ID_NEW: {
+                  assert(op_cur->first);
+
                   if (op_cur->first->id == SPVM_OP_C_ID_TYPE) {
                     SPVM_OP* op_type = op_cur->first;
                     SPVM_TYPE* type = op_type->uv.type;

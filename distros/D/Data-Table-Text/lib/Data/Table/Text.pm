@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180328';
+our $VERSION = '20180416';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -152,6 +152,14 @@ sub fileOutOfDate(&$@)                                                          
   @o                                                                            # Return a list of the files that were remade
  }
 
+sub firstFileThatExists(@)                                                      # Returns the name of the first file that exists or undef if none of the named files exist
+ {my (@files) = @_;                                                             # Files to check
+  for(@files)
+   {return $_ if -e $_;
+   }
+  undef                                                                         # No such file 
+ }
+  
 #2 Components                                                                   # Create file names from file name components
 
 sub denormalizeFolderName($)                                                    #P Remove any trailing folder separator from a folder name component.
@@ -253,6 +261,7 @@ sub currentDirectoryAbove                                                       
 
 sub parseFileName($)                                                            # Parse a file name into (path, name, extension)
  {my ($file) = @_;                                                              # File name to parse
+  return ($file) if $file =~ m{\/\Z}s;                                          # Its a folder
   if ($file =~ m/\.[^\/]+\Z/s)                                                  # The file name has an extension
    {if ($file =~ m/\A.+[\/]/s)                                                  # The file name has a preceding path
      {my @f = $file =~ m/(\A.+[\/])([^\/]+)\.([^\/]+)\Z/s;                      # File components
@@ -348,7 +357,6 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
   my @extensions = grep {!-d $_ } @_;                                           # Extensions
   my $e = join '|', @extensions;                                                # Files
   my @f;                                                                        # Files
-confess;
   for my $dir(@folder)                                                          # Directory
    {for(split /\0/, qx(find $dir -print0))
      {next if -d $_;                                                            # Do not include folder names
@@ -508,7 +516,7 @@ sub imageSize($)                                                                
    }
  }
 
-sub convertImageToJpx($$;$)                                                     # Convert an image to jpx format as the latest version of ImageMagick no longer seems to tile.
+sub convertImageToJpx2($$;$)                                                    # Convert an image to jpx format as the latest version of ImageMagick no longer seems to tile.
  {my ($source, $target, $Size) = @_;                                            # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256
   -e $source or confess
    "Cannot convert image file as file does not exist:\n$source\n";
@@ -542,7 +550,7 @@ END
    }
  }
 
-sub convertImageToJpx2($$;$)                                                    # Convert an image to jpx format - works with: Version: ImageMagick 6.8.9-9 Q16 x86_64 2017-03-14
+sub convertImageToJpx($$;$)                                                     # Convert an image to jpx format - works with: Version: ImageMagick 6.8.9-9 Q16 x86_64 2017-03-14
  {my ($source, $target, $Size) = @_;                                            # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256
   -e $source or confess
    "Cannot convert image file as file does not exist:\n$source\n";
@@ -1452,7 +1460,7 @@ sub updatePerlModuleDocumentation($)                                            
   updateDocumentation($perlModule);                                             # Update documentation
 
   zzz("pod2html --infile=$perlModule --outfile=zzz.html && ".                   # View documentation
-      " google-chrome zzz.html pods2 && ".
+      " firefox file:zzz.html && ".
       " rm zzz.html pod2htmd.tmp");
  }
 
@@ -1491,7 +1499,9 @@ dateStamp dateTimeStamp decodeJson decodeBase64
 encodeJson encodeBase64
 fileList fileModTime fileOutOfDate
 filePath filePathDir filePathExt fileSize findDirs findFiles
-findFileWithExtension formatTableBasic fpd fpe fpf fullFileName
+findFileWithExtension 
+firstFileThatExists
+formatTableBasic fpd fpe fpf fullFileName
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 hostName htmlToc
@@ -2728,7 +2738,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 142;
+use Test::More tests => 146;
 
 #Test::More->builder->output("/dev/null");
 my $windows = $^O =~ m(MSWin32)is;
@@ -2789,6 +2799,8 @@ if (1)                                                                          
   is_deeply [parseFileName "phil/test.data"],       ["phil/",       "test", "data"];
   is_deeply [parseFileName "phil/test"],            ["phil/",       "test"];
   is_deeply [parseFileName "test.data"],            [undef,         "test", "data"];
+  is_deeply [parseFileName "phil/"],                [qw(phil/)];
+  is_deeply [parseFileName "/phil/"],               [qw(/phil/)];
  }
 
 if (1)                                                                          # Unicode
@@ -3204,4 +3216,10 @@ if (1)
   ok !-e $f;
   rmdir $d;
   ok !-d $d;
+ }
+
+if (1)
+ {my $d = temporaryFolder;
+  ok $d eq firstFileThatExists($d);
+  ok $d eq firstFileThatExists("$d/$d", $d);
  }

@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README.pod
+README.md
+.travis.yaml
+lib/DBIx/Result/Convert/JSONSchema.pm
+lib/DBIx/Result/Convert/JSONSchema/Default/MySQL.pm
+lib/DBIx/Result/Convert/JSONSchema/Type/MySQL.pm
+t/01-basic.t
+t/02-schema.t
+t/03-convert-default.t
+t/04-convert-custom.t
+t/05-convert-options.t
+t/lib/Test/Schema.pm
+t/lib/Test/SchemaMock.pm
+t/lib/Test/Schema/Result/MySQLTypeTest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

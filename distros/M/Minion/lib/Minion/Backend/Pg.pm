@@ -50,6 +50,31 @@ sub enqueue {
 sub fail_job   { shift->_update(1, @_) }
 sub finish_job { shift->_update(0, @_) }
 
+sub history {
+  my $self = shift;
+
+  my $daily = $self->pg->db->query(
+    "select extract(epoch from ts) as epoch, extract(hour from ts) as hour,
+       coalesce(failed_jobs, 0) as failed_jobs,
+       coalesce(finished_jobs, 0) as finished_jobs
+     from (
+       select extract (day from finished) as day,
+         extract(hour from finished) as hour,
+         count(*) filter (where state = 'failed') as failed_jobs,
+         count(*) filter (where state = 'finished') as finished_jobs
+       from minion_jobs
+       where finished > now() - interval '23 hours'
+       group by day, hour
+     ) as j right outer join (
+       select *
+       from generate_series(now() - interval '23 hour', now(), '1 hour') as ts
+     ) as s on extract(hour from ts) = j.hour and extract(day from ts) = j.day
+     order by epoch asc"
+  )->hashes->to_array;
+
+  return {daily => $daily};
+}
+
 sub list_jobs {
   my ($self, $offset, $limit, $options) = @_;
 
@@ -63,10 +88,11 @@ sub list_jobs {
        extract(epoch from started) as started, state, task,
        count(*) over() as total, worker
      from minion_jobs as j
-     where (id = any ($1) or $1 is null) and (queue = $2 or $2 is null)
-       and (state = $3 or $3 is null) and (task = $4 or $4 is null)
+     where (id = any ($1) or $1 is null) and (queue = any ($2) or $2 is null)
+       and (state = any ($3) or $3 is null) and (task = any ($4) or $4 is null)
      order by id desc
-     limit $5 offset $6', @$options{qw(ids queue state task)}, $limit, $offset
+     limit $5 offset $6', @$options{qw(ids queues states tasks)}, $limit,
+    $offset
   )->expand->hashes->to_array;
   return _total('jobs', $jobs);
 }
@@ -77,8 +103,8 @@ sub list_locks {
   my $locks = $self->pg->db->query(
     'select name, extract(epoch from expires) as expires,
        count(*) over() as total from minion_locks
-     where expires > now() and (name = $1 or $1 is null)
-     order by id desc limit $2 offset $3', $options->{name}, $limit, $offset
+     where expires > now() and (name = any ($1) or $1 is null)
+     order by id desc limit $2 offset $3', $options->{names}, $limit, $offset
   )->hashes->to_array;
   return _total('locks', $locks);
 }
@@ -119,11 +145,10 @@ sub new {
 }
 
 sub note {
-  my ($self, $id, $key, $value) = @_;
+  my ($self, $id, $merge) = @_;
   return !!$self->pg->db->query(
-    'update minion_jobs set notes = jsonb_set(notes, ?, ?, true) where id = ?',
-    [$key], {json => $value}, $id
-  )->rows;
+    'update minion_jobs set notes = notes || ? where id = ?',
+    {json => $merge}, $id)->rows;
 }
 
 sub receive {
@@ -464,10 +489,30 @@ L<Minion/"backoff">.
 
 Transition from C<active> to C<finished> state.
 
+=head2 history
+
+  my $history = $backend->history;
+
+Get history information for job queue. Note that this method is EXPERIMENTAL and
+might change without warning!
+
+These fields are currently available:
+
+=over 2
+
+=item daily
+
+  daily =>
+    [{epoch => 12345, hour => 20, finished_jobs => 95, failed_jobs => 2}, ...]
+
+Hourly counts for processed jobs from the past day.
+
+=back
+
 =head2 list_jobs
 
   my $results = $backend->list_jobs($offset, $limit);
-  my $results = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+  my $results = $backend->list_jobs($offset, $limit, {states => ['inactive']});
 
 Returns the information about jobs in batches.
 
@@ -489,23 +534,23 @@ These options are currently available:
 
 List only jobs with these ids.
 
-=item queue
+=item queues
 
-  queue => 'important'
+  queues => ['important', 'unimportant']
 
-List only jobs in this queue.
+List only jobs in these queues.
 
-=item state
+=item states
 
-  state => 'inactive'
+  states => ['inactive', 'active']
 
-List only jobs in this state.
+List only jobs in these states.
 
-=item task
+=item tasks
 
-  task => 'test'
+  tasks => ['foo', 'bar']
 
-List only jobs for this task.
+List only jobs for these tasks.
 
 =back
 
@@ -620,23 +665,23 @@ Id of worker that is processing the job.
 =head2 list_locks
 
   my $results = $backend->list_locks($offset, $limit);
-  my $results = $backend->list_locks($offset, $limit, {name => 'foo'});
+  my $results = $backend->list_locks($offset, $limit, {names => ['foo']});
 
 Returns information about locks in batches.
 
   # Check expiration time
-  my $results = $backend->list_locks(0, 1, {name => 'foo'});
+  my $results = $backend->list_locks(0, 1, {names => ['foo']});
   my $expires = $results->{locks}[0]{expires};
 
 These options are currently available:
 
 =over 2
 
-=item name
+=item names
 
-  name => 'foo'
+  names => ['foo', 'bar']
 
-List only locks with this name.
+List only locks with these names.
 
 =back
 
@@ -754,9 +799,9 @@ Construct a new L<Minion::Backend::Pg> object.
 
 =head2 note
 
-  my $bool = $backend->note($job_id, foo => 'bar');
+  my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-Change a metadata field for a job.
+Change one or more metadata fields for a job.
 
 =head2 receive
 

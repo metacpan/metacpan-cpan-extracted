@@ -6,21 +6,50 @@ Locale::CLDR::Locales::Ru::Any::Ua - Package for language Russian
 
 package Locale::CLDR::Locales::Ru::Any::Ua;
 # This file auto generated from Data\common\main\ru_UA.xml
-#	on Fri 29 Apr  7:23:49 pm GMT
+#	on Fri 13 Apr  7:27:16 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Ru::Any');
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { 
+		{
+			'AC' => 'О-в Вознесения',
+ 			'AE' => 'Объединенные Арабские Эмираты',
+ 			'BV' => 'О-в Буве',
+ 			'CK' => 'О-ва Кука',
+ 			'CP' => 'О-в Клиппертон',
+ 			'CX' => 'О-в Рождества',
+ 			'HM' => 'О-ва Херд и Макдональд',
+ 			'NF' => 'О-в Норфолк',
+ 			'TL' => 'Тимор-Лесте',
+ 			'UM' => 'Малые Тихоокеанские Отдаленные Острова США',
+
+		}
+	},
+);
+
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 2,
+);
+
 has 'day_period_data' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -35,24 +64,24 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 				}
 				last SWITCH;
 				}
@@ -60,24 +89,24 @@ has 'day_period_data' => (
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 				}
 				last SWITCH;
 				}
@@ -151,6 +180,15 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			GyMMM => q{LLL y 'г'. G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			yMEd => q{ccc, d.MM.y},
+		},
 	} },
 );
 
@@ -210,41 +248,29 @@ has 'datetime_formats_interval' => (
 		},
 		'gregorian' => {
 			H => {
-				H => q{HH–HH 'ч'.},
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
 			},
 			Hv => {
-				H => q{HH–HH 'ч'., v},
-			},
-			MMMEd => {
-				d => q{E, d – E, d MMM},
-			},
-			h => {
-				h => q{h–h 'ч'. a},
-			},
-			hv => {
-				h => q{h–h 'ч'. a, v},
-			},
-			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y},
-				d => q{E, dd.MM.y – E, dd.MM.y},
-				y => q{E, dd.MM.y – E, dd.MM.y},
+				H => q{HH–HH v},
 			},
 			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM y – MMM y},
+				y => q{LLL y – LLL y},
 			},
 			yMMMEd => {
-				M => q{E, d MMM – E, d MMM y 'г'.},
-				d => q{E, d – E, d MMM y 'г'.},
-				y => q{E, d MMM y – E, d MMM y 'г'.},
+				y => q{ccc, d MMM y – ccc, d MMM y},
 			},
 			yMMMM => {
-				M => q{LLLL–LLLL y},
 				y => q{LLLL y – LLLL y},
 			},
 			yMMMd => {
-				M => q{d MMM – d MMM y},
-				d => q{d–d MMM y},
 				y => q{d MMM y – d MMM y},
 			},
 		},

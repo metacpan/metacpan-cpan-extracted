@@ -66,9 +66,9 @@ is_deeply ($am_pm, { am => 'a', noon => 'n', pm => 'p', midnight => 'mi', mornin
 $am_pm = $locale->am_pm_stand_alone_wide();
 is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'morning', afternoon1 => 'afternoon', evening1 => 'evening', night1 => 'night' }, 'Islamic AM PM stand alone wide');
 $am_pm = $locale->am_pm_stand_alone_abbreviated();
-is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'in the morning', afternoon1 => 'in the afternoon', evening1 => 'in the evening', night1 => 'at night' }, 'Islamic AM PM stand alone abbreviated');
+is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'morning', afternoon1 => 'afternoon', evening1 => 'evening', night1 => 'night' }, 'Islamic AM PM stand alone abbreviated');
 $am_pm = $locale->am_pm_stand_alone_narrow();
-is_deeply ($am_pm, { am => 'a', noon => 'noon', pm => 'p', midnight => 'midnight', morning1 => 'in the morning', afternoon1 => 'in the afternoon', evening1 => 'in the evening', night1 => 'at night' }, 'Islamic AM PM stand alone narrow');
+is_deeply ($am_pm, { am => 'am', noon => 'noon', pm => 'pm', midnight => 'midnight', morning1 => 'morning', afternoon1 => 'afternoon', evening1 => 'evening', night1 => 'night' }, 'Islamic AM PM stand alone narrow');
 
 my $era = $locale->era_wide();
 is_deeply ($era, [ 'AH', undef() ], 'Islamic Era wide');
@@ -91,11 +91,11 @@ is_deeply ($era, [ 'AH' ], 'Islamic Era stand alone narrow');
 
 
 my $day_period_data = $locale->get_day_period('0000');
-is($day_period_data, 'am', 'Islamic Day period data AM');
+is($day_period_data, 'midnight', 'Islamic Day period data AM');
 $day_period_data = $locale->get_day_period('1200');
-is($day_period_data, 'pm', 'Islamic Day period data Noon');
+is($day_period_data, 'noon', 'Islamic Day period data Noon');
 $day_period_data = $locale->get_day_period('1210');
-is($day_period_data, 'pm', 'Islamic Day period data PM');
+is($day_period_data, 'in the afternoon', 'Islamic Day period data PM');
 
 my $date_format = $locale->date_format_full;
 is($date_format, 'EEEE, d MMMM y', 'Islamic Date Format Full');

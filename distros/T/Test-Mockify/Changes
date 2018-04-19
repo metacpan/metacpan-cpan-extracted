@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel-Mockify
 
+2.4 2018-04-12T14:54:53Z
+    - remove restriction for using mock in SUT
+
 2.3 2018-04-10T11:46:19Z
     - fix issue with alternative constructor name
 

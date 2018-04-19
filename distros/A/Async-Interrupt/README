@@ -537,8 +537,9 @@ THE Async::Interrupt::EventPipe CLASS
            c_func (c_arg);
 
     $epipe->renew
-        Recreates the pipe (useful after a fork). The reading side will not
-        change it's file descriptor number, but the writing side might.
+        Recreates the pipe (usually required in the child after a fork). The
+        reading side will not change it's file descriptor number, but the
+        writing side might.
 
     $epipe->wait
         This method blocks the process until there are events on the pipe.

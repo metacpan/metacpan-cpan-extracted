@@ -1,3 +1,7 @@
+0.09 April 2018
+- Cascade Vertex.vertex_name updates
+  (the module never does this though)
+
 0.08 March 2018
 - Fix for delete_edges
 - add feather_delete_edges

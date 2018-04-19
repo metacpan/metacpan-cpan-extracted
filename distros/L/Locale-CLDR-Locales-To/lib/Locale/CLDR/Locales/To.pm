@@ -6,17 +6,18 @@ Locale::CLDR::Locales::To - Package for language Tongan
 
 package Locale::CLDR::Locales::To;
 # This file auto generated from Data\common\main\to.xml
-#	on Fri 29 Apr  7:29:17 pm GMT
+#	on Fri 13 Apr  7:31:25 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -111,7 +112,7 @@ has 'display_name_language' => (
  				'bkm' => 'lea fakakome',
  				'bla' => 'lea fakasikesikā',
  				'bm' => 'lea fakapamipala',
- 				'bn' => 'lea fakapengikali',
+ 				'bn' => 'lea fakapāngilā',
  				'bo' => 'lea fakatipeti',
  				'bpy' => 'lea fakapisinupilia',
  				'bqi' => 'lea fakapakitiāli',
@@ -150,6 +151,7 @@ has 'display_name_language' => (
  				'cps' => 'lea fakakapiseno',
  				'cr' => 'lea fakakelī',
  				'crh' => 'lea fakatoake-kilimea',
+ 				'crs' => 'lea fakaseselua-falanisē',
  				'cs' => 'lea fakaseki',
  				'csb' => 'lea fakakasiupia',
  				'cu' => 'lea fakasilavia-fakasiasi',
@@ -175,7 +177,7 @@ has 'display_name_language' => (
  				'dv' => 'lea fakativehi',
  				'dyo' => 'lea fakaiola-fonī',
  				'dyu' => 'lea fakatiula',
- 				'dz' => 'lea fakaputeni',
+ 				'dz' => 'lea fakatisōngika',
  				'dzg' => 'lea fakatasaka',
  				'ebu' => 'lea fakaʻemipū',
  				'ee' => 'lea fakaʻeue',
@@ -191,7 +193,7 @@ has 'display_name_language' => (
  				'en_GB' => 'lea fakapilitānia',
  				'en_GB@alt=short' => 'lea fakapilitānia',
  				'en_US' => 'lea fakapālangi-ʻamelika',
- 				'en_US@alt=short' => 'lea fakapālangi (ʻAmelika)',
+ 				'en_US@alt=short' => 'lea fakapālangi-ʻAmelika',
  				'enm' => 'lea fakapālangi-lotoloto',
  				'eo' => 'lea fakaʻesipulanito',
  				'es' => 'lea fakasipēnisi',
@@ -393,7 +395,7 @@ has 'display_name_language' => (
  				'mg' => 'lea fakamalakasi',
  				'mga' => 'lea fakaʻaelani-lotoloto',
  				'mgh' => 'lea fakamakūa-meʻeto',
- 				'mgo' => 'lea fakameta',
+ 				'mgo' => 'lea fakametā',
  				'mh' => 'lea fakamāsolo',
  				'mi' => 'lea fakamauli',
  				'mic' => 'lea fakamikemaki',
@@ -456,7 +458,7 @@ has 'display_name_language' => (
  				'oc' => 'lea fakaʻokitane',
  				'oj' => 'lea fakaʻosipiuā',
  				'om' => 'lea fakaʻolomo',
- 				'or' => 'lea fakaʻinitia-ʻolāea',
+ 				'or' => 'lea faka-ʻotia',
  				'os' => 'lea fakaʻosetiki',
  				'osa' => 'lea fakaʻosēse',
  				'ota' => 'lea fakatoake-ʻotomani',
@@ -467,6 +469,7 @@ has 'display_name_language' => (
  				'pap' => 'lea fakapapiamēnito',
  				'pau' => 'lea fakapalau',
  				'pcd' => 'lea fakapikāti',
+ 				'pcm' => 'lea fakanaisilia',
  				'pdc' => 'lea fakasiamane-penisilivania',
  				'pdt' => 'lea fakasiamane-lafalafa',
  				'peo' => 'lea fakapēsia-motuʻa',
@@ -551,7 +554,7 @@ has 'display_name_language' => (
  				'sog' => 'lea fakasokitiana',
  				'sq' => 'lea fakaʻalapēnia',
  				'sr' => 'lea fakasēpia',
- 				'srn' => 'lea fakasuranane-tongikō',
+ 				'srn' => 'lea fakasulanane-tongikō',
  				'srr' => 'lea fakasēlēle',
  				'ss' => 'lea fakasuati',
  				'ssy' => 'lea fakasaho',
@@ -588,7 +591,7 @@ has 'display_name_language' => (
  				'tli' => 'lea fakatilingikīte',
  				'tly' => 'lea fakatalisi',
  				'tmh' => 'lea fakatamasieki',
- 				'tn' => 'lea suana',
+ 				'tn' => 'lea fakatisuana',
  				'to' => 'lea fakatonga',
  				'tog' => 'lea fakaniasa-tonga',
  				'tpi' => 'lea fakatoki-pisini',
@@ -676,7 +679,8 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'tohinima fakaʻafaka',
+			'Adlm' => 'tohinima fakaʻatilami',
+ 			'Afak' => 'tohinima fakaʻafaka',
  			'Aghb' => 'tohinima fakaʻalapēnia-kaukasia',
  			'Ahom' => 'tohinima fakaʻahomi',
  			'Arab' => 'tohinima fakaʻalepea',
@@ -687,7 +691,8 @@ has 'display_name_script' => (
  			'Bamu' => 'tohinima fakapamumi',
  			'Bass' => 'tohinima fakapasa-vā',
  			'Batk' => 'tohinima fakapātaki',
- 			'Beng' => 'tohinima fakapengikali',
+ 			'Beng' => 'tohinima fakapāngilā',
+ 			'Bhks' => 'tohinima fakapaikisuki',
  			'Blis' => 'tohinima fakaʻilonga-pilisi',
  			'Bopo' => 'tohinima fakapopomofo',
  			'Brah' => 'tohinima fakapalāmī',
@@ -715,11 +720,13 @@ has 'display_name_script' => (
  			'Geok' => 'tohinima fakakutusuli-seōsia',
  			'Geor' => 'tohinima fakaseōsia',
  			'Glag' => 'tohinima fakakalakoliti',
+ 			'Gonm' => 'tohinima fakakōniti-masalami',
  			'Goth' => 'tohinima fakakotika',
  			'Gran' => 'tohinima fakasilanitā',
  			'Grek' => 'tohinima fakakalisi',
  			'Gujr' => 'tohinima fakaʻinitia-kutalati',
  			'Guru' => 'tohinima fakakūmuki',
+ 			'Hanb' => 'tohinima fakahānipi',
  			'Hang' => 'tohinima fakakōlea-hāngūlu',
  			'Hani' => 'tohinima fakasiaina',
  			'Hano' => 'tohinima fakahanunōʻo',
@@ -736,6 +743,7 @@ has 'display_name_script' => (
  			'Hung' => 'tohinima fakahungakalia-motuʻa',
  			'Inds' => 'tohinima fakaʻinitusi',
  			'Ital' => 'tohinima fakaʻītali-motuʻa',
+ 			'Jamo' => 'tohinima fakasamo',
  			'Java' => 'tohinima fakasava',
  			'Jpan' => 'tohinima fakasiapani',
  			'Jurc' => 'tohinima fakaiūkeni',
@@ -764,6 +772,7 @@ has 'display_name_script' => (
  			'Mahj' => 'tohinima fakamahasani',
  			'Mand' => 'tohinima fakamanitaea',
  			'Mani' => 'tohinima fakamanikaea',
+ 			'Marc' => 'tohinima fakamaʻake',
  			'Maya' => 'tohinima tongitapu fakamaia',
  			'Mend' => 'tohinima fakamēniti',
  			'Merc' => 'tohinima fakameloue-heihei',
@@ -778,13 +787,15 @@ has 'display_name_script' => (
  			'Mymr' => 'tohinima fakapema',
  			'Narb' => 'tohinima fakaʻalepea-tokelau-motuʻa',
  			'Nbat' => 'tohinima fakanapatea',
+ 			'Newa' => 'tohinima fakaneua',
  			'Nkgb' => 'tohinima fakanati-sepa',
  			'Nkoo' => 'tohinima fakanikō',
  			'Nshu' => 'tohinima fakanasiū',
  			'Ogam' => 'tohinima fakaʻokami',
  			'Olck' => 'tohinima fakaʻolisiki',
  			'Orkh' => 'tohinima fakaʻolikoni',
- 			'Orya' => 'tohinima fakaʻinitia-ʻolāea',
+ 			'Orya' => 'tohinima fakaʻotia',
+ 			'Osge' => 'tohinima fakaʻosase',
  			'Osma' => 'tohinima fakaʻosimānia',
  			'Palm' => 'tohinima fakapalamilene',
  			'Pauc' => 'tohinima fakapausinihau',
@@ -858,6 +869,7 @@ has 'display_name_script' => (
  			'Sind' => 'tohinima fakakutauāti',
  			'Sinh' => 'tohinima fakasingihala',
  			'Sora' => 'tohinima fakasolasomipengi',
+ 			'Soyo' => 'tohinima fakasoiōmipo',
  			'Sund' => 'tohinima fakasunitā',
  			'Sylo' => 'tohinima fakasailoti-nakili',
  			'Syrc' => 'tohinima fakasuliāiā',
@@ -887,8 +899,10 @@ has 'display_name_script' => (
  			'Xpeo' => 'tohinima fakapēsiamuʻa',
  			'Xsux' => 'tohinima fakamataʻingahau-sumelo-akatia',
  			'Yiii' => 'tohinima fakaīī',
+ 			'Zanb' => 'tohinima fakasanapasā-tapafā',
  			'Zinh' => 'tohinima hokosi',
  			'Zmth' => 'tohinima fakamatematika',
+ 			'Zsye' => 'tohinima fakatātā',
  			'Zsym' => 'tohinima fakaʻilonga',
  			'Zxxx' => 'tohinima taʻetohitohiʻi',
  			'Zyyy' => 'tohinima fakatatau',
@@ -926,7 +940,7 @@ has 'display_name_region' => (
  			'030' => 'ʻĒsia fakahahake',
  			'034' => 'ʻĒsia fakatonga',
  			'035' => 'ʻĒsia fakatongahahake',
- 			'039' => 'ʻIulope fakatonga',
+ 			'039' => 'ʻEulope fakatonga',
  			'053' => 'ʻAositelēlēsia',
  			'054' => 'Melanīsia',
  			'057' => 'Potu fonua Mikolonīsia',
@@ -934,10 +948,10 @@ has 'display_name_region' => (
  			'142' => 'ʻĒsia',
  			'143' => 'ʻĒsia lotoloto',
  			'145' => 'ʻĒsia fakahihifo',
- 			'150' => 'ʻIulope',
- 			'151' => 'ʻIulope fakahahake',
- 			'154' => 'ʻIulope fakatokelau',
- 			'155' => 'ʻIulope fakahihifo',
+ 			'150' => 'ʻEulope',
+ 			'151' => 'ʻEulope fakahahake',
+ 			'154' => 'ʻEulope fakatokelau',
+ 			'155' => 'ʻEulope fakahihifo',
  			'419' => 'ʻAmelika fakalatina',
  			'AC' => 'Motu ʻAsenisini',
  			'AD' => 'ʻAnitola',
@@ -981,9 +995,9 @@ has 'display_name_region' => (
  			'CC' => 'ʻOtumotu Koko',
  			'CD' => 'Kongo - Kinisasa',
  			'CD@alt=variant' => 'Kongo (LTK)',
- 			'CF' => 'Lipapilika ʻAfilika Lotoloto',
+ 			'CF' => 'Lepupelika ʻAfilika Lotoloto',
  			'CG' => 'Kongo - Palasavila',
- 			'CG@alt=variant' => 'Kongo (Lipapilika)',
+ 			'CG@alt=variant' => 'Kongo (Lepupelika)',
  			'CH' => 'Suisilani',
  			'CI' => 'Matafonua ʻAivolī',
  			'CK' => 'ʻOtumotu Kuki',
@@ -998,14 +1012,15 @@ has 'display_name_region' => (
  			'CW' => 'Kulasao',
  			'CX' => 'Motu Kilisimasi',
  			'CY' => 'Saipalesi',
- 			'CZ' => 'Lipapilika Seki',
+ 			'CZ' => 'Sēkia',
+ 			'CZ@alt=variant' => 'Lepupelika Seki',
  			'DE' => 'Siamane',
  			'DG' => 'Tieko Kāsia',
  			'DJ' => 'Siputi',
  			'DK' => 'Tenimaʻake',
  			'DM' => 'Tominika',
- 			'DO' => 'Lipapilika Tominika',
- 			'DZ' => 'ʻAisilia',
+ 			'DO' => 'Lepupelika Tominika',
+ 			'DZ' => 'ʻAlisilia',
  			'EA' => 'Siuta mo Melila',
  			'EC' => 'ʻEkuetoa',
  			'EE' => 'ʻEsitōnia',
@@ -1014,7 +1029,8 @@ has 'display_name_region' => (
  			'ER' => 'ʻElitulia',
  			'ES' => 'Sipeini',
  			'ET' => 'ʻĪtiōpia',
- 			'EU' => 'ʻIulope fakatahataha',
+ 			'EU' => 'ʻEulope fakatahataha',
+ 			'EZ' => 'ʻEulope fekauʻaki-paʻanga',
  			'FI' => 'Finilani',
  			'FJ' => 'Fisi',
  			'FK' => 'ʻOtumotu Fokulani',
@@ -1100,7 +1116,7 @@ has 'display_name_region' => (
  			'MO' => 'Makau SAR Siaina',
  			'MO@alt=short' => 'Makau',
  			'MP' => 'ʻOtumotu Maliana tokelau',
- 			'MQ' => 'Māteniki',
+ 			'MQ' => 'Mātiniki',
  			'MR' => 'Maulitenia',
  			'MS' => 'Moʻungaselati',
  			'MT' => 'Malita',
@@ -1132,7 +1148,7 @@ has 'display_name_region' => (
  			'PL' => 'Polani',
  			'PM' => 'Sā Piea mo Mikeloni',
  			'PN' => 'ʻOtumotu Pitikeni',
- 			'PR' => 'Pueto Liko',
+ 			'PR' => 'Puēto Liko',
  			'PS' => 'Potu Palesitaine',
  			'PS@alt=short' => 'Palesitaine',
  			'PT' => 'Potukali',
@@ -1166,7 +1182,7 @@ has 'display_name_region' => (
  			'SX' => 'Sā Mātini (fakahōlani)',
  			'SY' => 'Sīlia',
  			'SZ' => 'Suasilani',
- 			'TA' => 'Tulisiteni ta Kunuha',
+ 			'TA' => 'Tulisitani ta Kunuha',
  			'TC' => 'ʻOtumotu Tuki mo Kaikosi',
  			'TD' => 'Sāti',
  			'TF' => 'Potu fonua tonga fakafalanisē',
@@ -1186,6 +1202,7 @@ has 'display_name_region' => (
  			'UA' => 'ʻŪkalaʻine',
  			'UG' => 'ʻIukanitā',
  			'UM' => 'ʻOtumotu siʻi ʻo ʻAmelika',
+ 			'UN' => 'ʻŪ fonua fakatahataha',
  			'US' => 'Puleʻanga fakatahataha ʻAmelika',
  			'US@alt=short' => 'ʻAmelika',
  			'UY' => 'ʻUlukuai',
@@ -1211,6 +1228,69 @@ has 'display_name_region' => (
 	},
 );
 
+has 'display_name_variant' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub { 
+		{
+			'1901' => 'sipelatotonu ʻoe lea fakasiamane tukufakaholo',
+ 			'1994' => 'sipelatotonu fakasīpinga ʻo Lesia',
+ 			'1996' => 'sipelatotonu ʻoe lea fakasiamane 1996',
+ 			'1606NICT' => 'lea fakafalanisē fakaloto-tōmui',
+ 			'1694ACAD' => 'lea fakafalanisē fakaonopooni-tōmuʻa',
+ 			'1959ACAD' => 'fakaako',
+ 			'ABL1943' => 'sipelatotonu fokotuʻu 1943',
+ 			'ALUKU' => 'lea fakafeituʻu fakaʻaluku',
+ 			'AO1990' => 'sipelatotonu ʻoe lea fakapotukali he 1990',
+ 			'AREVELA' => 'lea fakaʻāmenia-hahake',
+ 			'AREVMDA' => 'lea fakaʻāmenia-hihifo',
+ 			'BAKU1926' => 'motuʻalea fakalatina fakatahataha ki Toake',
+ 			'BALANKA' => 'lea fakafeituʻu fakapalanika ʻo Anii',
+ 			'BARLA' => 'lea fakafeituʻu fakapālavenito-pupunga',
+ 			'BISKE' => 'lea fakafeituʻu fakapila mo fakasā-siōsio',
+ 			'BOHORIC' => 'motuʻalea fakapoholisi',
+ 			'BOONT' => 'lea fakapunavila',
+ 			'COLB1945' => 'sipelatotonu ʻoe lea fakapotukali-palāsili he 1945',
+ 			'DAJNKO' => 'motuʻalea fakatainikō',
+ 			'EKAVSK' => 'lea fakasēpia (puʻaki fakaʻekavia)',
+ 			'EMODENG' => 'lea fakapilitānia fakonopooni-tōmuʻa',
+ 			'FONIPA' => 'fonētiki IPA',
+ 			'FONUPA' => 'fonētiki UPA',
+ 			'HEPBURN' => 'mataʻitohi liliu fakahepipūnu',
+ 			'IJEKAVSK' => 'lea fakasēpia (puʻaki fakaʻisekavia)',
+ 			'KKCOR' => 'sipelatotonu fakatatau',
+ 			'KSCOR' => 'sipelatotonu fakasīpinga',
+ 			'LIPAW' => 'lea fakafeituʻu fakalipovasi ʻo Lesia',
+ 			'METELKO' => 'motuʻalea fakametēliko',
+ 			'MONOTON' => 'fasiʻalea taha',
+ 			'NDYUKA' => 'lea fakafeituʻu fakanitiuka',
+ 			'NEDIS' => 'lea fakafeituʻu fakanatisone',
+ 			'NJIVA' => 'lea fakafeituʻu fakangiva',
+ 			'NULIK' => 'lea fakavolapuki fakaonopooni',
+ 			'OSOJS' => 'lea fakafeituʻu fakaʻoseako',
+ 			'OXENDICT' => 'sipelatotonu fakapilitānia tikisinale fakaʻokisifooti',
+ 			'PAMAKA' => 'lea fakafeituʻu fakapamaka',
+ 			'PINYIN' => 'mataʻitohi liliu fakapīnīni',
+ 			'POLYTON' => 'fasiʻalea lahi',
+ 			'POSIX' => 'fakakomipiuta',
+ 			'REVISED' => 'sipelatotonu kuo sivi',
+ 			'RIGIK' => 'lea fakavolapuki motuʻa',
+ 			'ROZAJ' => 'lea fakafeituʻu fakalesia',
+ 			'SCOTLAND' => 'lea fakasikotilani fakasīpinga',
+ 			'SOLBA' => 'lea fakafeituʻu fakasolipika',
+ 			'SOTAV' => 'lea fakafeituʻu fakasotavenito-pupunga',
+ 			'TARASK' => 'sipelatotunu fakatalasikievika',
+ 			'UCCOR' => 'sipelatotonu fakatahataha',
+ 			'UCRCOR' => 'sipelatotonu fakatahataha kuo sivi',
+ 			'UNIFON' => 'motuʻalea fonētiki ʻo Unifoni',
+ 			'VALENCIA' => 'lea fakavalenisia',
+ 			'WADEGILE' => 'mataʻitohi liliu fakauate-kilesi',
+
+		}
+	},
+);
+
 has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1218,6 +1298,7 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'tohi māhina',
+ 			'cf' => 'anga paʻanga',
  			'collation' => 'tohi hokohoko',
  			'currency' => 'paʻanga',
  			'hc' => 'takai houa',
@@ -1253,14 +1334,19 @@ has 'display_name_type' => (
  				'iso8601' => q{faka-iso8601},
  				'japanese' => q{fakasiapani},
  				'persian' => q{fakapēsia},
- 				'roc' => q{fakalēpupelika siaina},
+ 				'roc' => q{fakalepupelika siaina},
+ 			},
+ 			'cf' => {
+ 				'account' => q{anga paʻanga-kalake},
+ 				'standard' => q{anga paʻanga-sīpinga},
  			},
  			'collation' => {
  				'big5han' => q{siaina-nimalahi},
+ 				'compat' => q{ki muʻa, hoa},
  				'dictionary' => q{tikisinale},
  				'ducet' => q{ʻunikōti},
- 				'emoji' => q{ʻemosi},
- 				'eor' => q{fakaʻiulope},
+ 				'emoji' => q{ngaahi ongo},
+ 				'eor' => q{fakaʻeulope},
  				'gb2312han' => q{siaina-fakafaingofua},
  				'phonebook' => q{fika telefoni},
  				'pinyin' => q{piniini},
@@ -1277,7 +1363,7 @@ has 'display_name_type' => (
  				'h11' => q{takai houa 0–11},
  				'h12' => q{takai houa 1–12},
  				'h23' => q{takai houa 0–23},
- 				'h24' => q{taki houa 1–24},
+ 				'h24' => q{takai houa 1–24},
  			},
  			'lb' => {
  				'loose' => q{fesiʻilaine ngaloku},
@@ -1290,15 +1376,17 @@ has 'display_name_type' => (
  				'ussystem' => q{founga fakaʻamelika},
  			},
  			'numbers' => {
+ 				'ahom' => q{fika fakaʻahomi},
  				'arab' => q{fika fakaʻalepea},
  				'arabext' => q{fika fakaʻalepea fakalahi},
  				'armn' => q{fika fakaʻāmenia},
  				'armnlow' => q{fika fakaʻāmenia fakalalo},
  				'bali' => q{fika fakapali},
- 				'beng' => q{fika fakapengikali},
+ 				'beng' => q{faka fakapāngilā},
  				'brah' => q{fika fakapalami},
  				'cakm' => q{fika fakakakema},
  				'cham' => q{fika fakakami},
+ 				'cyrl' => q{fika fakalūsia},
  				'deva' => q{fika fakatevanākalī},
  				'ethi' => q{fika fakaʻītiōpia},
  				'fullwide' => q{fika laulahi},
@@ -1313,6 +1401,7 @@ has 'display_name_type' => (
  				'hant' => q{fika fakasiaina tukufakaholo},
  				'hantfin' => q{fika fakasiaina tukufakaholo fakapaʻanga},
  				'hebr' => q{fika fakahepelū},
+ 				'hmng' => q{fika fakapahaumongi},
  				'java' => q{fika fakasava},
  				'jpan' => q{fika fakasiapani},
  				'jpanfin' => q{fika fakasiapani fakapaʻanga},
@@ -1325,19 +1414,29 @@ has 'display_name_type' => (
  				'latn' => q{fika fakalatina},
  				'lepc' => q{fika fakalepasā},
  				'limb' => q{fika fakalimipū},
+ 				'mathbold' => q{fika fakamatematika-lotolahi},
+ 				'mathdbl' => q{fika fakamatematika-tukiua},
+ 				'mathmono' => q{fika fakamatematika-vahataha},
+ 				'mathsanb' => q{fika fakamatematika-taʻehiku-lotolahi},
+ 				'mathsans' => q{fika fakamatematika-taʻehiku},
  				'mlym' => q{fika fakamalāialami},
+ 				'modi' => q{fika fakamotī},
  				'mong' => q{fika fakamongokōlia},
+ 				'mroo' => q{fika fakamolō},
  				'mtei' => q{fika fakametei-maieki},
  				'mymr' => q{fika fakapema},
  				'mymrshan' => q{fika fakapema-siani},
+ 				'mymrtlng' => q{fika fakapema-tai},
  				'nkoo' => q{fika fakanikō},
  				'olck' => q{fika fakaʻolisiki},
- 				'orya' => q{fika fakaʻolia},
+ 				'orya' => q{fika fakaʻotia},
  				'osma' => q{fika fakaʻosimania},
  				'roman' => q{fika fakaloma},
  				'romanlow' => q{fika fakaloma fakalalo},
  				'saur' => q{fika fakasaulasitā},
  				'shrd' => q{fika fakasalata},
+ 				'sind' => q{fika fakakutasuāti},
+ 				'sinh' => q{fika fakasingihala},
  				'sora' => q{fika fakasola-somipenga},
  				'sund' => q{fika fakasunitā},
  				'takr' => q{fika fakatakili},
@@ -1347,7 +1446,9 @@ has 'display_name_type' => (
  				'telu' => q{fika fakateluku},
  				'thai' => q{fika fakatailani},
  				'tibt' => q{fika fakatipeti},
+ 				'tirh' => q{fika fakatīhuta},
  				'vaii' => q{fika fakavai},
+ 				'wara' => q{fika fakavalangi},
  			},
 
 		}
@@ -1391,10 +1492,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[à ă â å ä æ b c ç d è ĕ ê ë g ì ĭ î ï j ñ ò ŏ ô ö ø œ q r ù ŭ û ü w x y ÿ z])},
+			auxiliary => qr{[à ă â å ä æ b c ç d è ĕ ê ë g ì ĭ î ï j ñ ò ŏ ô ö ø œ q r ù ŭ û ü w x y ÿ z]},
 			index => ['A', 'E', 'F', 'H', 'I', 'K', 'L', 'M', 'N', '{NG}', 'O', 'P', 'S', 'T', 'U', 'V', 'ʻ'],
-			main => qr{(?^u:[a á ā e é ē f h i í ī k l m n {ng} o ó ō p s t u ú ū v ʻ])},
-			punctuation => qr{(?^u:[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″])},
+			main => qr{[a á ā e é ē f h i í ī k l m n {ng} o ó ō p s t u ú ū v ʻ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1473,7 +1575,7 @@ has 'units' => (
 	default		=> sub { {
 				'long' => {
 					'acre' => {
-						'name' => q(ʻeka ʻe),
+						'name' => q(ʻeka),
 						'other' => q(ʻeka ʻe {0}),
 					},
 					'acre-foot' => {
@@ -1497,7 +1599,7 @@ has 'units' => (
 						'other' => q(ʻiuniti fakaʻasitalōnoma ʻe {0}),
 					},
 					'bit' => {
-						'name' => q(ʻū piti),
+						'name' => q(piti),
 						'other' => q(piti ʻe {0}),
 					},
 					'bushel' => {
@@ -1509,7 +1611,7 @@ has 'units' => (
 						'other' => q(paiti ʻe {0}),
 					},
 					'calorie' => {
-						'name' => q(ʻū kaloli),
+						'name' => q(kaloli),
 						'other' => q(kaloli ʻe {0}),
 					},
 					'carat' => {
@@ -1607,7 +1709,7 @@ has 'units' => (
 						'other' => q(ʻaunise tafe ʻe {0}),
 					},
 					'foodcalorie' => {
-						'name' => q(ʻū kaloli-kai),
+						'name' => q(kaloli-kai),
 						'other' => q(kaloli-kai ʻe {0}),
 					},
 					'foot' => {
@@ -1628,9 +1730,14 @@ has 'units' => (
 						'other' => q(kālani ʻe {0}),
 						'per' => q({0} ki he kālani),
 					},
+					'gallon-imperial' => {
+						'name' => q(kālani fakaʻemipaea),
+						'other' => q(kālani fakaʻemipaea ʻe {0}),
+						'per' => q({0} ki he kālani fakaʻemipaea),
+					},
 					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
+						'name' => q(tikili),
+						'other' => q(tikili ʻe {0}),
 					},
 					'gigabit' => {
 						'name' => q(kikapiti),
@@ -1823,9 +1930,17 @@ has 'units' => (
 						'name' => q(maile he kālani),
 						'other' => q(maile ʻe {0} he kālani),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(maile he kālani fakaʻemipaea),
+						'other' => q(maile ʻe {0} he kālani fakaʻemipaea),
+					},
 					'mile-per-hour' => {
 						'name' => q(maile he houa),
 						'other' => q(maile he houa ʻe {0}),
+					},
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0} smi),
 					},
 					'milliampere' => {
 						'name' => q(miliʻamipele),
@@ -1839,6 +1954,10 @@ has 'units' => (
 						'name' => q(milikalami),
 						'other' => q(milikalami ʻe {0}),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(milikalami he tesilita),
+						'other' => q(milikalami ʻe {0} he tesilita),
+					},
 					'milliliter' => {
 						'name' => q(mililita),
 						'other' => q(mililita ʻe {0}),
@@ -1850,6 +1969,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(milimita mēkuli),
 						'other' => q(milimita mēkuli ʻe {0}),
+					},
+					'millimole-per-liter' => {
+						'name' => q(milimole he lita),
+						'other' => q(milimole ʻe {0} he lita),
 					},
 					'millisecond' => {
 						'name' => q(milisekoni),
@@ -1898,6 +2021,10 @@ has 'units' => (
 						'name' => q(ngaofesekoni),
 						'other' => q(ngaofesekoni ʻe {0}),
 					},
+					'part-per-million' => {
+						'name' => q(konga he miliona),
+						'other' => q(konga ʻe {0} he miliona),
+					},
 					'per' => {
 						'1' => q({0} ʻi he {1}),
 					},
@@ -1912,6 +2039,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(painite fakamita),
 						'other' => q(painite fakamita ʻe {0}),
+					},
+					'point' => {
+						'name' => q(pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'name' => q(pāuni),
@@ -1956,6 +2087,7 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(kilomita sikuea),
 						'other' => q(kilomita sikuea ʻe {0}),
+						'per' => q({0} ki he kilomita sikuea),
 					},
 					'square-meter' => {
 						'name' => q(mita sikuea ʻe),
@@ -1965,6 +2097,7 @@ has 'units' => (
 					'square-mile' => {
 						'name' => q(maile sikuea),
 						'other' => q(maile sikuea ʻe {0}),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(iate sikuea),
@@ -2073,7 +2206,7 @@ has 'units' => (
 					'centimeter' => {
 						'name' => q(sm),
 						'other' => q({0} sm),
-						'per' => q({0} /sm),
+						'per' => q({0}/sm),
 					},
 					'century' => {
 						'name' => q(tt),
@@ -2088,7 +2221,7 @@ has 'units' => (
 					'cubic-centimeter' => {
 						'name' => q(sm³),
 						'other' => q({0} sm³),
-						'per' => q({0} /sm³),
+						'per' => q({0}/sm³),
 					},
 					'cubic-foot' => {
 						'name' => q(ft³),
@@ -2105,7 +2238,7 @@ has 'units' => (
 					'cubic-meter' => {
 						'name' => q(m³),
 						'other' => q({0} m³),
-						'per' => q({0} /m³),
+						'per' => q({0}/m³),
 					},
 					'cubic-mile' => {
 						'name' => q(mi³),
@@ -2126,7 +2259,7 @@ has 'units' => (
 					'day' => {
 						'name' => q(ʻa),
 						'other' => q({0} ʻa),
-						'per' => q({0} /ʻa),
+						'per' => q({0}/ʻa),
 					},
 					'deciliter' => {
 						'name' => q(tl),
@@ -2159,7 +2292,7 @@ has 'units' => (
 					'foot' => {
 						'name' => q(ft),
 						'other' => q({0} ft),
-						'per' => q({0} /ft),
+						'per' => q({0}/ft),
 					},
 					'furlong' => {
 						'name' => q(fāl),
@@ -2172,7 +2305,12 @@ has 'units' => (
 					'gallon' => {
 						'name' => q(kā),
 						'other' => q({0} kā),
-						'per' => q({0} /kā),
+						'per' => q({0}/kā),
+					},
+					'gallon-imperial' => {
+						'name' => q(kāʻem),
+						'other' => q({0} kāʻem),
+						'per' => q({0}/kāʻem),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2197,6 +2335,7 @@ has 'units' => (
 					'gram' => {
 						'name' => q(k),
 						'other' => q({0} k),
+						'per' => q({0}/k),
 					},
 					'hectare' => {
 						'name' => q(ha),
@@ -2226,7 +2365,7 @@ has 'units' => (
 					'inch' => {
 						'name' => q(in),
 						'other' => q({0} in),
-						'per' => q({0} /in),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
 						'name' => q(in-Hg),
@@ -2259,7 +2398,7 @@ has 'units' => (
 					'kilogram' => {
 						'name' => q(kk),
 						'other' => q({0} kk),
-						'per' => q({0} /kk),
+						'per' => q({0}/kk),
 					},
 					'kilohertz' => {
 						'name' => q(kHz),
@@ -2272,7 +2411,7 @@ has 'units' => (
 					'kilometer' => {
 						'name' => q(km),
 						'other' => q({0} km),
-						'per' => q({0} /km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'name' => q(km/h),
@@ -2334,7 +2473,7 @@ has 'units' => (
 					'meter' => {
 						'name' => q(m),
 						'other' => q({0} m),
-						'per' => q({0} /m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
 						'name' => q(m/s),
@@ -2368,9 +2507,17 @@ has 'units' => (
 						'name' => q(mi/kā),
 						'other' => q({0} mi/kā),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mi/kāʻem),
+						'other' => q({0}m/kāʻe),
+					},
 					'mile-per-hour' => {
 						'name' => q(mi/h),
 						'other' => q({0} mi/h),
+					},
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0} smi),
 					},
 					'milliampere' => {
 						'name' => q(mA),
@@ -2384,6 +2531,10 @@ has 'units' => (
 						'name' => q(mk),
 						'other' => q({0} mk),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mk/tl),
+						'other' => q({0} mk/tl),
+					},
 					'milliliter' => {
 						'name' => q(ml),
 						'other' => q({0} ml),
@@ -2396,6 +2547,10 @@ has 'units' => (
 						'name' => q(mm-Hg),
 						'other' => q({0} mm-Hg),
 					},
+					'millimole-per-liter' => {
+						'name' => q(mmol/l),
+						'other' => q({0} mmol/l),
+					},
 					'millisecond' => {
 						'name' => q(ms),
 						'other' => q({0} ms),
@@ -2407,12 +2562,12 @@ has 'units' => (
 					'minute' => {
 						'name' => q(m),
 						'other' => q({0} m),
-						'per' => q({0} /m),
+						'per' => q({0}/m),
 					},
 					'month' => {
 						'name' => q(m),
 						'other' => q({0} m),
-						'per' => q({0} /m),
+						'per' => q({0}/m),
 					},
 					'nanometer' => {
 						'name' => q(nm),
@@ -2433,7 +2588,7 @@ has 'units' => (
 					'ounce' => {
 						'name' => q(ʻau),
 						'other' => q({0} ʻau),
-						'per' => q({0} /ʻau),
+						'per' => q({0}/ʻau),
 					},
 					'ounce-troy' => {
 						'name' => q(ʻau-k),
@@ -2442,6 +2597,10 @@ has 'units' => (
 					'parsec' => {
 						'name' => q(ngs),
 						'other' => q({0} ngs),
+					},
+					'part-per-million' => {
+						'name' => q(khm),
+						'other' => q({0} khm),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -2458,10 +2617,14 @@ has 'units' => (
 						'name' => q(ptm),
 						'other' => q({0} ptm),
 					},
+					'point' => {
+						'name' => q(pt),
+						'other' => q({0} pt),
+					},
 					'pound' => {
 						'name' => q(pā),
 						'other' => q({0} pā),
-						'per' => q({0} /pā),
+						'per' => q({0}/pā),
 					},
 					'pound-per-square-inch' => {
 						'name' => q(pā/in²),
@@ -2487,7 +2650,7 @@ has 'units' => (
 					'square-centimeter' => {
 						'name' => q(sm²),
 						'other' => q({0} sm²),
-						'per' => q({0} /sm²),
+						'per' => q({0}/sm²),
 					},
 					'square-foot' => {
 						'name' => q(ft²),
@@ -2496,20 +2659,22 @@ has 'units' => (
 					'square-inch' => {
 						'name' => q(in²),
 						'other' => q({0} in²),
-						'per' => q({0} /in²),
+						'per' => q({0}/in²),
 					},
 					'square-kilometer' => {
 						'name' => q(km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'name' => q(m²),
 						'other' => q({0} m²),
-						'per' => q({0} /m²),
+						'per' => q({0}/m²),
 					},
 					'square-mile' => {
 						'name' => q(mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'name' => q(it²),
@@ -2550,7 +2715,7 @@ has 'units' => (
 					'week' => {
 						'name' => q(u),
 						'other' => q({0} u),
-						'per' => q({0} /u),
+						'per' => q({0}/u),
 					},
 					'yard' => {
 						'name' => q(it),
@@ -2559,12 +2724,12 @@ has 'units' => (
 					'year' => {
 						'name' => q(t),
 						'other' => q({0} t),
-						'per' => q({0} /t),
+						'per' => q({0}/t),
 					},
 				},
 				'short' => {
 					'acre' => {
-						'name' => q(ʻeka ʻe),
+						'name' => q(ʻek),
 						'other' => q(ʻek ʻe {0}),
 					},
 					'acre-foot' => {
@@ -2596,7 +2761,7 @@ has 'units' => (
 						'other' => q(pū ʻe {0}),
 					},
 					'byte' => {
-						'name' => q(ʻū paiti),
+						'name' => q(paiti),
 						'other' => q(paiti ʻe {0}),
 					},
 					'calorie' => {
@@ -2718,6 +2883,11 @@ has 'units' => (
 						'name' => q(kā),
 						'other' => q(kā ʻe {0}),
 						'per' => q({0} /kā),
+					},
+					'gallon-imperial' => {
+						'name' => q(kāʻem),
+						'other' => q(kāʻem ʻe {0}),
+						'per' => q({0} / kāʻem),
 					},
 					'generic' => {
 						'name' => q(°),
@@ -2843,7 +3013,7 @@ has 'units' => (
 					'liter' => {
 						'name' => q(l),
 						'other' => q(l ʻe {0}),
-						'per' => q({0} /l),
+						'per' => q({0}/l),
 					},
 					'liter-per-100kilometers' => {
 						'name' => q(l/100km),
@@ -2914,9 +3084,17 @@ has 'units' => (
 						'name' => q(mi/kā),
 						'other' => q(mi ʻe {0}/kā),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mi/kāʻem),
+						'other' => q(mi ʻe {0}/kāʻem),
+					},
 					'mile-per-hour' => {
 						'name' => q(mi/h),
 						'other' => q(mi/h ʻe {0}),
+					},
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0} smi),
 					},
 					'milliampere' => {
 						'name' => q(mA),
@@ -2930,6 +3108,10 @@ has 'units' => (
 						'name' => q(mk),
 						'other' => q(mk ʻe {0}),
 					},
+					'milligram-per-deciliter' => {
+						'name' => q(mk/tl),
+						'other' => q(mk ʻe {0}/tl),
+					},
 					'milliliter' => {
 						'name' => q(ml),
 						'other' => q(ml ʻe {0}),
@@ -2941,6 +3123,10 @@ has 'units' => (
 					'millimeter-of-mercury' => {
 						'name' => q(mm-Hg),
 						'other' => q(mm-Hg ʻe {0}),
+					},
+					'millimole-per-liter' => {
+						'name' => q(mmol/l),
+						'other' => q(mmol ʻe {0}/l),
 					},
 					'millisecond' => {
 						'name' => q(ms),
@@ -2989,6 +3175,10 @@ has 'units' => (
 						'name' => q(ngs),
 						'other' => q(ngs ʻe {0}),
 					},
+					'part-per-million' => {
+						'name' => q(khm),
+						'other' => q(khm ʻe {0}),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -3003,6 +3193,10 @@ has 'units' => (
 					'pint-metric' => {
 						'name' => q(ptm),
 						'other' => q(ptm ʻe {0}),
+					},
+					'point' => {
+						'name' => q(pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'name' => q(pā),
@@ -3047,15 +3241,17 @@ has 'units' => (
 					'square-kilometer' => {
 						'name' => q(km²),
 						'other' => q(km² ʻe {0}),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
-						'name' => q(mita sikuea ʻe),
+						'name' => q(m²),
 						'other' => q(m² ʻe {0}),
 						'per' => q({0} /m²),
 					},
 					'square-mile' => {
-						'name' => q(maile sikuea ʻe),
+						'name' => q(mi²),
 						'other' => q(mi² ʻe {0}),
+						'per' => q({0} /mi²),
 					},
 					'square-yard' => {
 						'name' => q(it²),
@@ -3163,7 +3359,595 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'decimal' => q(٫),
+			'exponential' => q(اس),
+			'group' => q(٬),
+			'infinity' => q(∞),
+			'list' => q(؛),
+			'minusSign' => q(‏-),
+			'nan' => q(NaN),
+			'perMille' => q(؉),
+			'percentSign' => q(٪؜),
+			'plusSign' => q(‏+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'arabext' => {
+			'decimal' => q(٫),
+			'exponential' => q(×۱۰^),
+			'group' => q(٬),
+			'infinity' => q(∞),
+			'list' => q(؛),
+			'minusSign' => q(‎-‎),
+			'nan' => q(NaN),
+			'perMille' => q(؉),
+			'percentSign' => q(٪),
+			'plusSign' => q(‎+‎),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(٫),
+		},
+		'bali' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'beng' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'brah' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'cakm' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'cham' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'deva' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'fullwide' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'gonm' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'gujr' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'guru' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'hanidec' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'java' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'kali' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'khmr' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'knda' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'lana' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'lanatham' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'laoo' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
 		'latn' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'lepc' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'limb' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'mlym' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'mong' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'mtei' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'mymr' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'mymrshan' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'nkoo' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'olck' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'orya' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'osma' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'saur' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'shrd' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'sora' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'sund' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'takr' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'talu' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'tamldec' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'telu' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'thai' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'tibt' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(TF),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'vaii' => {
 			'decimal' => q(.),
 			'exponential' => q(E),
 			'group' => q(,),
@@ -3188,13 +3972,13 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'other' => '0k',
+					'other' => '0a',
 				},
 				'10000' => {
-					'other' => '00k',
+					'other' => '0m',
 				},
 				'100000' => {
-					'other' => '000k',
+					'other' => '0k',
 				},
 				'1000000' => {
 					'other' => '0M',
@@ -3206,13 +3990,13 @@ has 'number_formats' => (
 					'other' => '000M',
 				},
 				'1000000000' => {
-					'other' => '0Ki',
+					'other' => '0P',
 				},
 				'10000000000' => {
-					'other' => '00Ki',
+					'other' => '00P',
 				},
 				'100000000000' => {
-					'other' => '000Ki',
+					'other' => '000P',
 				},
 				'1000000000000' => {
 					'other' => '0T',
@@ -3224,7 +4008,7 @@ has 'number_formats' => (
 					'other' => '000T',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -3267,13 +4051,13 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'other' => '0k',
+					'other' => '0a',
 				},
 				'10000' => {
-					'other' => '00k',
+					'other' => '0m',
 				},
 				'100000' => {
-					'other' => '000k',
+					'other' => '0k',
 				},
 				'1000000' => {
 					'other' => '0M',
@@ -3285,13 +4069,13 @@ has 'number_formats' => (
 					'other' => '000M',
 				},
 				'1000000000' => {
-					'other' => '0Ki',
+					'other' => '0P',
 				},
 				'10000000000' => {
-					'other' => '00Ki',
+					'other' => '00P',
 				},
 				'100000000000' => {
-					'other' => '000Ki',
+					'other' => '000P',
 				},
 				'1000000000000' => {
 					'other' => '0T',
@@ -3307,14 +4091,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -3326,7 +4110,511 @@ has 'number_currency_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '#,##0.00 ¤',
+					},
+					'standard' => {
+						'positive' => '#,##0.00 ¤',
+					},
+				},
+			},
+		},
+		'arabext' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'bali' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'beng' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'brah' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'cakm' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'cham' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'deva' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'fullwide' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'gonm' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'gujr' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'guru' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'hanidec' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'java' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'kali' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'khmr' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'knda' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'lana' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'lanatham' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'laoo' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
 		'latn' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'lepc' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'limb' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'mlym' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'mong' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'mtei' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'mymr' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'mymrshan' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'nkoo' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'olck' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'orya' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'osma' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'saur' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'shrd' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'sora' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'sund' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'takr' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'talu' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'tamldec' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'telu' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'thai' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'tibt' => {
+			'pattern' => {
+				'default' => {
+					'accounting' => {
+						'positive' => '¤ #,##0.00',
+					},
+					'standard' => {
+						'positive' => '¤ #,##0.00',
+					},
+				},
+			},
+		},
+		'vaii' => {
 			'pattern' => {
 				'default' => {
 					'accounting' => {
@@ -3348,6 +4636,10 @@ has 'currencies' => (
 	default		=> sub { {
 		'AUD' => {
 			symbol => 'AUD$',
+			display_name => {
+				'currency' => q(Australian Dollar),
+				'other' => q(Australian Dollar),
+			},
 		},
 		'BRL' => {
 			display_name => {
@@ -3667,29 +4959,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
+				'wide' => {
+					'am' => q{hengihengi},
+					'pm' => q{efiafi},
+				},
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'wide' => {
+					'am' => q{HH},
+					'pm' => q{EA},
+				},
+				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
@@ -3707,6 +4999,10 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
+				'0' => 'KM',
+				'1' => 'TS'
+			},
+			narrow => {
 				'0' => 'KM',
 				'1' => 'TS'
 			},
@@ -3780,10 +5076,15 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
-			Ed => q{d E},
+			Ed => q{E d},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
@@ -3800,6 +5101,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMMEd => q{E d MMMM},
+			MMMMW => q{'uike' 'hono' W ʻ'o' MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -3821,10 +5123,20 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
+			yw => q{'uike' 'hono' w ʻ'o' y},
 		},
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E d MMM y G},
@@ -3983,18 +5295,18 @@ has 'datetime_formats_interval' => (
 		},
 		'generic' => {
 			H => {
-				H => q{HH–HH},
+				H => q{HH – HH},
 			},
 			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
 			},
 			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
 			},
 			Hv => {
-				H => q{HH–HH v},
+				H => q{HH – HH v},
 			},
 			M => {
 				M => q{M – M},
@@ -4088,19 +5400,19 @@ has 'time_zone_names' => (
 		gmtFormat => q(GMT{0}),
 		gmtZeroFormat => q(GMT),
 		regionFormat => q(Taimi {0}),
-		regionFormat => q({0} Taimi Liliu),
+		regionFormat => q({0} Taimi liliu),
 		regionFormat => q({0} Taimi totonu),
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(houa fakaʻakelī taimi fakaliliu),
-				'generic' => q(houa fakaʻakelī),
-				'standard' => q(houa fakaʻakelī taimi totonu),
+				'daylight' => q#houa fakaʻakelī taimi liliu#,
+				'generic' => q#houa fakaʻakelī#,
+				'standard' => q#houa fakaʻakelī taimi totonu#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(houa fakaʻafikānisitani),
+				'standard' => q#houa fakaʻafikānisitani#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -4248,7 +5560,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Porto-Novo#,
 		},
 		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
+			exemplarCity => q#Sao Tomé#,
 		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Tripoli#,
@@ -4261,45 +5573,45 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(houa fakaʻafelika-loto),
+				'standard' => q#houa fakaʻafelika-loto#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(houa fakaʻafelika-hahake),
+				'standard' => q#houa fakaʻafelika-hahake#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(houa fakaʻafelika-tonga),
+				'standard' => q#houa fakaʻafelika-tonga#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(houa fakaʻafelika-hihifo taimi liliu),
-				'generic' => q(houa fakaʻafelika-hihifo),
-				'standard' => q(houa fakaʻafelika-hihifo taimi totonu),
+				'daylight' => q#houa fakaʻafelika-hihifo taimi liliu#,
+				'generic' => q#houa fakaʻafelika-hihifo#,
+				'standard' => q#houa fakaʻafelika-hihifo taimi totonu#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(houa fakaʻalasika taimi liliu),
-				'generic' => q(houa fakaʻalasika),
-				'standard' => q(houa fakaʻalasika taimi totonu),
+				'daylight' => q#houa fakaʻalasika taimi liliu#,
+				'generic' => q#houa fakaʻalasika#,
+				'standard' => q#houa fakaʻalasika taimi totonu#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(houa fakaʻalamati taimi liliu),
-				'generic' => q(houa fakaʻalamati),
-				'standard' => q(houa fakaʻalamati taimi totonu),
+				'daylight' => q#houa fakaʻalamati taimi liliu#,
+				'generic' => q#houa fakaʻalamati#,
+				'standard' => q#houa fakaʻalamati taimi totonu#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(houa fakaʻamasōne taimi liliu),
-				'generic' => q(houa fakaʻamasōne),
-				'standard' => q(houa fakaʻamasōne taimi totonu),
+				'daylight' => q#houa fakaʻamasōne taimi liliu#,
+				'generic' => q#houa fakaʻamasōne#,
+				'standard' => q#houa fakaʻamasōne taimi totonu#,
 			},
 		},
 		'America/Adak' => {
@@ -4417,7 +5729,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Cuiaba#,
 		},
 		'America/Curacao' => {
-			exemplarCity => q#Curacao#,
+			exemplarCity => q#Curaçao#,
 		},
 		'America/Danmarkshavn' => {
 			exemplarCity => q#Danmarkshavn#,
@@ -4445,6 +5757,9 @@ has 'time_zone_names' => (
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#El Salvador#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
@@ -4647,6 +5962,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Rico#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
 		},
@@ -4742,37 +6060,37 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(houa fakaʻamelika-tokelau loto taimi liliu),
-				'generic' => q(houa fakaʻamelika-tokelau loto),
-				'standard' => q(houa fakaʻamelika-tokelau loto taimi totonu),
+				'daylight' => q#houa fakaʻamelika-tokelau loto taimi liliu#,
+				'generic' => q#houa fakaʻamelika-tokelau loto#,
+				'standard' => q#houa fakaʻamelika-tokelau loto taimi totonu#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(houa fakaʻamelika-tokelau hahake taimi liliu),
-				'generic' => q(houa fakaʻamelika-tokelau hahake),
-				'standard' => q(houa fakaʻamelika-tokelau hahake taimi totonu),
+				'daylight' => q#houa fakaʻamelika-tokelau hahake taimi liliu#,
+				'generic' => q#houa fakaʻamelika-tokelau hahake#,
+				'standard' => q#houa fakaʻamelika-tokelau hahake taimi totonu#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(houa fakaʻamelika-tokelau moʻunga taimi liliu),
-				'generic' => q(houa fakaʻamelika-tokelau moʻunga),
-				'standard' => q(houa fakaʻamelika-tokelau moʻunga taimi totonu),
+				'daylight' => q#houa fakaʻamelika-tokelau moʻunga taimi liliu#,
+				'generic' => q#houa fakaʻamelika-tokelau moʻunga#,
+				'standard' => q#houa fakaʻamelika-tokelau moʻunga taimi totonu#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(houa fakaʻamelika-tokelau pasifika taimi liliu),
-				'generic' => q(houa fakaʻamelika-tokelau pasifika),
-				'standard' => q(houa fakaʻamelika-tokelau pasifika taimi totonu),
+				'daylight' => q#houa fakaʻamelika-tokelau pasifika taimi liliu#,
+				'generic' => q#houa fakaʻamelika-tokelau pasifika#,
+				'standard' => q#houa fakaʻamelika-tokelau pasifika taimi totonu#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(houa fakalūsia-ʻanatili taimi liliu),
-				'generic' => q(houa fakalūsia-ʻanatili),
-				'standard' => q(houa fakalūsia-ʻanatili taimi totonu),
+				'daylight' => q#houa fakalūsia-ʻanatili taimi liliu#,
+				'generic' => q#houa fakalūsia-ʻanatili#,
+				'standard' => q#houa fakalūsia-ʻanatili taimi totonu#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -4810,30 +6128,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(houa fakaapia taimi liliu),
-				'generic' => q(houa fakaapia),
-				'standard' => q(houa fakaapia taimi totonu),
+				'daylight' => q#houa fakaapia taimi liliu#,
+				'generic' => q#houa fakaapia#,
+				'standard' => q#houa fakaapia taimi totonu#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(houa fakaʻakitau taimi liliu),
-				'generic' => q(houa fakaʻakitau),
-				'standard' => q(houa fakaʻakitau taimi totonu),
+				'daylight' => q#houa fakaʻakitau taimi liliu#,
+				'generic' => q#houa fakaʻakitau#,
+				'standard' => q#houa fakaʻakitau taimi totonu#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(houa fakaʻakitōpe taimi liliu),
-				'generic' => q(houa fakaʻakitōpe),
-				'standard' => q(houa fakaʻakitōpe taimi totonu),
+				'daylight' => q#houa fakaʻakitōpe taimi liliu#,
+				'generic' => q#houa fakaʻakitōpe#,
+				'standard' => q#houa fakaʻakitōpe taimi totonu#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(houa fakaʻalepea taimi liliu),
-				'generic' => q(houa fakaʻalepea),
-				'standard' => q(houa fakaʻalepea taimi totonu),
+				'daylight' => q#houa fakaʻalepea taimi liliu#,
+				'generic' => q#houa fakaʻalepea#,
+				'standard' => q#houa fakaʻalepea taimi totonu#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -4841,23 +6159,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(houa fakaʻasenitina taimi liliu),
-				'generic' => q(houa fakaʻasenitina),
-				'standard' => q(houa fakaʻasenitina taimi totonu),
+				'daylight' => q#houa fakaʻasenitina taimi liliu#,
+				'generic' => q#houa fakaʻasenitina#,
+				'standard' => q#houa fakaʻasenitina taimi totonu#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(houa fakaʻasenitina-hihifo taimi liliu),
-				'generic' => q(houa fakaʻasenitina-hihifo),
-				'standard' => q(houa fakaʻasenitina-hihifo taimi totonu),
+				'daylight' => q#houa fakaʻasenitina-hihifo taimi liliu#,
+				'generic' => q#houa fakaʻasenitina-hihifo#,
+				'standard' => q#houa fakaʻasenitina-hihifo taimi totonu#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(houa fakaʻāmenia taimi liliu),
-				'generic' => q(houa fakaʻāmenia),
-				'standard' => q(houa fakaʻāmenia taimi totonu),
+				'daylight' => q#houa fakaʻāmenia taimi liliu#,
+				'generic' => q#houa fakaʻāmenia#,
+				'standard' => q#houa fakaʻāmenia taimi totonu#,
 			},
 		},
 		'Asia/Aden' => {
@@ -4881,6 +6199,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ashgabat#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Baghdad#,
 		},
@@ -4892,6 +6213,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Beirut#,
@@ -4928,6 +6252,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dushanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gaza#,
@@ -5070,6 +6397,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokyo#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulaanbaatar#,
 		},
@@ -5096,9 +6426,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(houa fakaʻamelika-tokelau ʻatalanitiki taimi liliu),
-				'generic' => q(houa fakaʻamelika-tokelau ʻatalanitiki),
-				'standard' => q(houa fakaʻamelika-tokelau ʻatalanitiki taimi totonu),
+				'daylight' => q#houa fakaʻamelika-tokelau ʻatalanitiki taimi liliu#,
+				'generic' => q#houa fakaʻamelika-tokelau ʻatalanitiki#,
+				'standard' => q#houa fakaʻamelika-tokelau ʻatalanitiki taimi totonu#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -5169,186 +6499,197 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(houa fakaʻaositelēlia-loto taimi liliu),
-				'generic' => q(houa fakaʻaositelēlia-loto),
-				'standard' => q(houa fakaʻaositelēlia-loto taimi totonu),
+				'daylight' => q#houa fakaʻaositelēlia-loto taimi liliu#,
+				'generic' => q#houa fakaʻaositelēlia-loto#,
+				'standard' => q#houa fakaʻaositelēlia-loto taimi totonu#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(houa fakaʻaositelēlia-loto-hihifo taimi liliu),
-				'generic' => q(houa fakaʻaositelēlia-loto-hihifo),
-				'standard' => q(houa fakaʻaositelēlia-loto-hihifo taimi totonu),
+				'daylight' => q#houa fakaʻaositelēlia-loto-hihifo taimi liliu#,
+				'generic' => q#houa fakaʻaositelēlia-loto-hihifo#,
+				'standard' => q#houa fakaʻaositelēlia-loto-hihifo taimi totonu#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(houa fakaʻaositelēlia-hahake taimi liliu),
-				'generic' => q(houa fakaʻaositelēlia-hahake),
-				'standard' => q(houa fakaʻaositelēlia-hahake taimi totonu),
+				'daylight' => q#houa fakaʻaositelēlia-hahake taimi liliu#,
+				'generic' => q#houa fakaʻaositelēlia-hahake#,
+				'standard' => q#houa fakaʻaositelēlia-hahake taimi totonu#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(houa fakaʻaositelēlia-hihifo taimi liliu),
-				'generic' => q(houa fakaʻaositelēlia-hihifo),
-				'standard' => q(houa fakaʻaositelēlia-hihifo taimi totonu),
+				'daylight' => q#houa fakaʻaositelēlia-hihifo taimi liliu#,
+				'generic' => q#houa fakaʻaositelēlia-hihifo#,
+				'standard' => q#houa fakaʻaositelēlia-hihifo taimi totonu#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(houa fakaʻasapaisani taimi liliu),
-				'generic' => q(houa fakaʻasapaisani),
-				'standard' => q(houa fakaʻasapaisani taimi totonu),
+				'daylight' => q#houa fakaʻasapaisani taimi liliu#,
+				'generic' => q#houa fakaʻasapaisani#,
+				'standard' => q#houa fakaʻasapaisani taimi totonu#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(houa fakaʻāsolesi taimi liliu),
-				'generic' => q(houa fakaʻāsolesi),
-				'standard' => q(houa fakaʻāsolesi taimi totonu),
+				'daylight' => q#houa fakaʻāsolesi taimi liliu#,
+				'generic' => q#houa fakaʻāsolesi#,
+				'standard' => q#houa fakaʻāsolesi taimi totonu#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(houa fakapengilātesi taimi liliu),
-				'generic' => q(houa fakapengilātesi),
-				'standard' => q(houa fakapengilātesi taimi totonu),
+				'daylight' => q#houa fakapāngilātesi taimi liliu#,
+				'generic' => q#houa fakapāngilātesi#,
+				'standard' => q#houa fakapāngilātesi taimi totonu#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(houa fakapūtani),
+				'standard' => q#houa fakapūtani#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(houa fakapolīvia),
+				'standard' => q#houa fakapolīvia#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(houa fakapalāsila taimi liliu),
-				'generic' => q(houa fakapalāsila),
-				'standard' => q(houa fakapalāsila taimi totonu),
+				'daylight' => q#houa fakapalāsila taimi liliu#,
+				'generic' => q#houa fakapalāsila#,
+				'standard' => q#houa fakapalāsila taimi totonu#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(houa fakapulunei),
+				'standard' => q#houa fakapulunei#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(houa fakamuiʻi-vēte taimi liliu),
-				'generic' => q(houa fakamuiʻi-vēte),
-				'standard' => q(houa fakamuiʻi-vēte taimi totonu),
+				'daylight' => q#houa fakamuiʻi-vēte taimi liliu#,
+				'generic' => q#houa fakamuiʻi-vēte#,
+				'standard' => q#houa fakamuiʻi-vēte taimi totonu#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(houa fakakeesi),
+				'standard' => q#houa fakakeesi#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(houa fakakamolo),
+				'standard' => q#houa fakakamolo#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(houa fakasatihami taimi liliu),
-				'generic' => q(houa fakasatihami),
-				'standard' => q(houa fakasatihami taimi totonu),
+				'daylight' => q#houa fakasatihami taimi liliu#,
+				'generic' => q#houa fakasatihami#,
+				'standard' => q#houa fakasatihami taimi totonu#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(houa fakasili taimi liliu),
-				'generic' => q(houa fakasili),
-				'standard' => q(houa fakasili taimi totonu),
+				'daylight' => q#houa fakasili taimi liliu#,
+				'generic' => q#houa fakasili#,
+				'standard' => q#houa fakasili taimi totonu#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(houa fakasiaina taimi liliu),
-				'generic' => q(houa fakasiaina),
-				'standard' => q(houa fakasiaina taimi totonu),
+				'daylight' => q#houa fakasiaina taimi liliu#,
+				'generic' => q#houa fakasiaina#,
+				'standard' => q#houa fakasiaina taimi totonu#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(houa fakakoipalisani taimi liliu),
-				'generic' => q(houa fakakoipalisani),
-				'standard' => q(houa fakakoipalisani taimi totonu),
+				'daylight' => q#houa fakakoipalisani taimi liliu#,
+				'generic' => q#houa fakakoipalisani#,
+				'standard' => q#houa fakakoipalisani taimi totonu#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(houa fakamotukilisimasi),
+				'standard' => q#houa fakamotukilisimasi#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(houa fakamotukokosi),
+				'standard' => q#houa fakamotukokosi#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(houa fakakolomipia taimi liliu),
-				'generic' => q(houa fakakolomipia),
-				'standard' => q(houa fakakolomipia taimi totonu),
+				'daylight' => q#houa fakakolomipia taimi liliu#,
+				'generic' => q#houa fakakolomipia#,
+				'standard' => q#houa fakakolomipia taimi totonu#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(houa fakaʻotumotukuki taimi liliu),
-				'generic' => q(houa fakaʻotumotukuki),
-				'standard' => q(houa fakaʻotumotukuki taimi totonu),
+				'daylight' => q#houa fakaʻotumotukuki taimi liliu#,
+				'generic' => q#houa fakaʻotumotukuki#,
+				'standard' => q#houa fakaʻotumotukuki taimi totonu#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(houa fakakiupa taimi liliu),
-				'generic' => q(houa fakakiupa),
-				'standard' => q(houa fakakiupa taimi totonu),
+				'daylight' => q#houa fakakiupa taimi liliu#,
+				'generic' => q#houa fakakiupa#,
+				'standard' => q#houa fakakiupa taimi totonu#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(houa fakatavisi),
+				'standard' => q#houa fakatavisi#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(houa fakatūmoni-tūvile),
+				'standard' => q#houa fakatūmoni-tūvile#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(houa fakatimoa-hahake),
+				'standard' => q#houa fakatimoa-hahake#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(houa fakalapanui taimi liliu),
-				'generic' => q(houa fakalapanui),
-				'standard' => q(houa fakalapanui taimi totonu),
+				'daylight' => q#houa fakalapanui taimi liliu#,
+				'generic' => q#houa fakalapanui#,
+				'standard' => q#houa fakalapanui taimi totonu#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(houa fakaʻekuetoa),
+				'standard' => q#houa fakaʻekuetoa#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#taimi fakaemāmani#,
+			},
+			short => {
+				'standard' => q#UTC#,
 			},
 		},
 		'Etc/Unknown' => {
-			exemplarCity => q#Halaʻata#,
+			exemplarCity => q#Feituʻu taʻeʻiloa#,
 		},
 		'Europe/Amsterdam' => {
 			exemplarCity => q#Amsterdam#,
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrakhan#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#ʻAtenisi#,
@@ -5383,7 +6724,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(houa fakaʻaealani taimi totonu),
+				'daylight' => q#houa fakaʻaealani taimi totonu#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -5410,6 +6751,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisbon#,
 		},
@@ -5419,7 +6763,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Lonitoni#,
 			long => {
-				'daylight' => q(houa fakapilitānia taimi liliu),
+				'daylight' => q#houa fakapilitānia taimi liliu#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -5470,6 +6814,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -5487,6 +6834,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirane#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ulyanovsk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Uzhhorod#,
@@ -5520,134 +6870,134 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(houa fakaʻeulope-loto taimi liliu),
-				'generic' => q(houa fakaʻeulope-loto),
-				'standard' => q(houa fakaʻeulope-loto taimi totonu),
+				'daylight' => q#houa fakaʻeulope-loto taimi liliu#,
+				'generic' => q#houa fakaʻeulope-loto#,
+				'standard' => q#houa fakaʻeulope-loto taimi totonu#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(houa fakaʻeulope-hahake taimi liliu),
-				'generic' => q(houa fakaʻeulope-hahake),
-				'standard' => q(houa fakaʻeulope-hahake taimi totonu),
+				'daylight' => q#houa fakaʻeulope-hahake taimi liliu#,
+				'generic' => q#houa fakaʻeulope-hahake#,
+				'standard' => q#houa fakaʻeulope-hahake taimi totonu#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(houa fakaʻeulope-hahake-ange),
+				'standard' => q#houa fakaʻeulope-hahake-ange#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(houa fakaʻeulope-hihifo taimi liliu),
-				'generic' => q(houa fakaʻeulope-hihifo),
-				'standard' => q(houa fakaʻeulope-hihifo taimi totonu),
+				'daylight' => q#houa fakaʻeulope-hihifo taimi liliu#,
+				'generic' => q#houa fakaʻeulope-hihifo#,
+				'standard' => q#houa fakaʻeulope-hihifo taimi totonu#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(houa fakaʻotumotu-fokulani taimi liliu),
-				'generic' => q(houa fakaʻotumotu-fokulani),
-				'standard' => q(houa fakaʻotumotu-fokulani taimi totonu),
+				'daylight' => q#houa fakaʻotumotu-fokulani taimi liliu#,
+				'generic' => q#houa fakaʻotumotu-fokulani#,
+				'standard' => q#houa fakaʻotumotu-fokulani taimi totonu#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(houa fakafisi taimi liliu),
-				'generic' => q(houa fakafisi),
-				'standard' => q(houa fakafisi taimi totonu),
+				'daylight' => q#houa fakafisi taimi liliu#,
+				'generic' => q#houa fakafisi#,
+				'standard' => q#houa fakafisi taimi totonu#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(houa fakakuiana-fakafalanisē),
+				'standard' => q#houa fakakuiana-fakafalanisē#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(houa fakaʻanetātikafalanisē),
+				'standard' => q#houa fakaʻanetātikafalanisē#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(houa fakakiliniuisi mālie),
+				'standard' => q#houa fakakiliniuisi mālie#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(houa fakakalapakosi),
+				'standard' => q#houa fakakalapakosi#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(houa fakakamipiē),
+				'standard' => q#houa fakakamipiē#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(houa fakaseōsia taimi liliu),
-				'generic' => q(houa fakaseōsia),
-				'standard' => q(houa fakaseōsia taimi totonu),
+				'daylight' => q#houa fakaseōsia taimi liliu#,
+				'generic' => q#houa fakaseōsia#,
+				'standard' => q#houa fakaseōsia taimi totonu#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(houa fakakilipasi),
+				'standard' => q#houa fakakilipasi#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(houa fakafonuamata-hahake taimi liliu),
-				'generic' => q(houa fakafonuamata-hahake),
-				'standard' => q(houa fakafonuamata-hahake taimi totonu),
+				'daylight' => q#houa fakafonuamata-hahake taimi liliu#,
+				'generic' => q#houa fakafonuamata-hahake#,
+				'standard' => q#houa fakafonuamata-hahake taimi totonu#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(houa fakafonuamata-hihifo taimi liliu),
-				'generic' => q(houa fakafonuamata-hihifo),
-				'standard' => q(houa fakafonuamata-hihifo taimi totonu),
+				'daylight' => q#houa fakafonuamata-hihifo taimi liliu#,
+				'generic' => q#houa fakafonuamata-hihifo#,
+				'standard' => q#houa fakafonuamata-hihifo taimi totonu#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(houa fakakuami),
+				'standard' => q#houa fakakuami#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(houa fakakūlifi),
+				'standard' => q#houa fakakūlifi#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(houa fakakuiana),
+				'standard' => q#houa fakakuiana#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(houa fakahauaʻi taimi liliu),
-				'generic' => q(houa fakahauaʻi),
-				'standard' => q(houa fakahauaʻi taimi totonu),
+				'daylight' => q#houa fakahauaʻi taimi liliu#,
+				'generic' => q#houa fakahauaʻi#,
+				'standard' => q#houa fakahauaʻi taimi totonu#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(houa fakahongi-kongi taimi liliu),
-				'generic' => q(houa fakahongi-kongi),
-				'standard' => q(houa fakahongi-kongi taimi totonu),
+				'daylight' => q#houa fakahongi-kongi taimi liliu#,
+				'generic' => q#houa fakahongi-kongi#,
+				'standard' => q#houa fakahongi-kongi taimi totonu#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(houa fakahovite taimi liliu),
-				'generic' => q(houa fakahovite),
-				'standard' => q(houa fakahovite taimi totonu),
+				'daylight' => q#houa fakahovite taimi liliu#,
+				'generic' => q#houa fakahovite#,
+				'standard' => q#houa fakahovite taimi totonu#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(houa fakaʻinitia),
+				'standard' => q#houa fakaʻinitia#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -5685,264 +7035,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(houa fakamoanaʻinitia),
+				'standard' => q#houa fakamoanaʻinitia#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(houa fakaʻinitosiaina),
+				'standard' => q#houa fakaʻinitosiaina#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(houa fakaʻinitonisia-loto),
+				'standard' => q#houa fakaʻinitonisia-loto#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(houa fakaʻinitonisia-hahake),
+				'standard' => q#houa fakaʻinitonisia-hahake#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(houa fakaʻinitonisia-hihifo),
+				'standard' => q#houa fakaʻinitonisia-hihifo#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(houa fakaʻilaani taimi liliu),
-				'generic' => q(houa fakaʻilaani),
-				'standard' => q(houa fakaʻilaani taimi totonu),
+				'daylight' => q#houa fakaʻilaani taimi liliu#,
+				'generic' => q#houa fakaʻilaani#,
+				'standard' => q#houa fakaʻilaani taimi totonu#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(houa fakalūsia-ʻīkutisiki taimi liliu),
-				'generic' => q(houa fakalūsia-ʻīkutisiki),
-				'standard' => q(houa fakalūsia-ʻīkutisiki taimi totonu),
+				'daylight' => q#houa fakalūsia-ʻīkutisiki taimi liliu#,
+				'generic' => q#houa fakalūsia-ʻīkutisiki#,
+				'standard' => q#houa fakalūsia-ʻīkutisiki taimi totonu#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(houa fakaʻisileli taimi liliu),
-				'generic' => q(houa fakaʻisileli),
-				'standard' => q(houa fakaʻisileli taimi totonu),
+				'daylight' => q#houa fakaʻisileli taimi liliu#,
+				'generic' => q#houa fakaʻisileli#,
+				'standard' => q#houa fakaʻisileli taimi totonu#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(houa fakasiapani taimi liliu),
-				'generic' => q(houa fakasiapani),
-				'standard' => q(houa fakasiapani taimi totonu),
+				'daylight' => q#houa fakasiapani taimi liliu#,
+				'generic' => q#houa fakasiapani#,
+				'standard' => q#houa fakasiapani taimi totonu#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(houa fakalūsia-petelopavilovisiki taimi liliu),
-				'generic' => q(houa fakalūsia-petelopavilovisiki),
-				'standard' => q(houa fakalūsia-petelopavilovisiki taimi totonu),
+				'daylight' => q#houa fakalūsia-petelopavilovisiki taimi liliu#,
+				'generic' => q#houa fakalūsia-petelopavilovisiki#,
+				'standard' => q#houa fakalūsia-petelopavilovisiki taimi totonu#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(houa fakakasakitani-hahake),
+				'standard' => q#houa fakakasakitani-hahake#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(houa fakakasakitani-hihifo),
+				'standard' => q#houa fakakasakitani-hihifo#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(houa fakakōlea taimi liliu),
-				'generic' => q(houa fakakōlea),
-				'standard' => q(houa fakakōlea taimi totonu),
+				'daylight' => q#houa fakakōlea taimi liliu#,
+				'generic' => q#houa fakakōlea#,
+				'standard' => q#houa fakakōlea taimi totonu#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(houa fakakosilae),
+				'standard' => q#houa fakakosilae#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(houa fakalūsia-kalasinoiāsiki taimi liliu),
-				'generic' => q(houa fakalūsia-kalasinoiāsiki),
-				'standard' => q(houa fakalūsia-kalasinoiāsiki taimi totonu),
+				'daylight' => q#houa fakalūsia-kalasinoiāsiki taimi liliu#,
+				'generic' => q#houa fakalūsia-kalasinoiāsiki#,
+				'standard' => q#houa fakalūsia-kalasinoiāsiki taimi totonu#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(houa fakakīkisitani),
+				'standard' => q#houa fakakīkisitani#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(houa fakalangikā),
+				'standard' => q#houa fakalangikā#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(houa fakaʻotumotulaine),
+				'standard' => q#houa fakaʻotumotulaine#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(houa fakamotuʻeikihoue taimi liliu),
-				'generic' => q(houa fakamotuʻeikihoue),
-				'standard' => q(houa fakamotuʻeikihoue taimi totonu),
+				'daylight' => q#houa fakamotuʻeikihoue taimi liliu#,
+				'generic' => q#houa fakamotuʻeikihoue#,
+				'standard' => q#houa fakamotuʻeikihoue taimi totonu#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(houa fakamakau taimi liliu),
-				'generic' => q(houa fakamakau),
-				'standard' => q(houa fakamakau taimi totonu),
+				'daylight' => q#houa fakamakau taimi liliu#,
+				'generic' => q#houa fakamakau#,
+				'standard' => q#houa fakamakau taimi totonu#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(houa fakamotumakuali),
+				'standard' => q#houa fakamotumakuali#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(houa fakalūsia-makatani taimi liliu),
-				'generic' => q(houa fakalūsia-makatani),
-				'standard' => q(houa fakalūsia-makatani taimi totonu),
+				'daylight' => q#houa fakalūsia-makatani taimi liliu#,
+				'generic' => q#houa fakalūsia-makatani#,
+				'standard' => q#houa fakalūsia-makatani taimi totonu#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(houa fakamaleisia),
+				'standard' => q#houa fakamaleisia#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(houa fakamalativisi),
+				'standard' => q#houa fakamalativisi#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(houa fakamākesasi),
+				'standard' => q#houa fakamākesasi#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(houa fakaʻotumotumasolo),
+				'standard' => q#houa fakaʻotumotumasolo#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(houa fakamaulitiusi taimi liliu),
-				'generic' => q(houa fakamaulitiusi),
-				'standard' => q(houa fakamaulitiusi taimi totonu),
+				'daylight' => q#houa fakamaulitiusi taimi liliu#,
+				'generic' => q#houa fakamaulitiusi#,
+				'standard' => q#houa fakamaulitiusi taimi totonu#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(houa fakamausoni),
+				'standard' => q#houa fakamausoni#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(houa fakamekisikou-tokelauhihifo taimi liliu),
-				'generic' => q(houa fakamekisikou-tokelauhihifo),
-				'standard' => q(houa fakamekisikou-tokelauhihifo taimi totonu),
+				'daylight' => q#houa fakamekisikou-tokelauhihifo taimi liliu#,
+				'generic' => q#houa fakamekisikou-tokelauhihifo#,
+				'standard' => q#houa fakamekisikou-tokelauhihifo taimi totonu#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(houa fakamekisikou-pasifika taimi liliu),
-				'generic' => q(houa fakamekisikou-pasifika),
-				'standard' => q(houa fakamekisikou-pasifika taimi totonu),
+				'daylight' => q#houa fakamekisikou-pasifika taimi liliu#,
+				'generic' => q#houa fakamekisikou-pasifika#,
+				'standard' => q#houa fakamekisikou-pasifika taimi totonu#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(houa fakaʻulānipātā taimi liliu),
-				'generic' => q(houa fakaʻulānipātā),
-				'standard' => q(houa fakaʻulānipātā taimi totonu),
+				'daylight' => q#houa fakaʻulānipātā taimi liliu#,
+				'generic' => q#houa fakaʻulānipātā#,
+				'standard' => q#houa fakaʻulānipātā taimi totonu#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(houa fakalūsia-mosikou taimi liliu),
-				'generic' => q(houa fakalūsia-mosikou),
-				'standard' => q(houa fakalūsia-mosikou taimi totonu),
+				'daylight' => q#houa fakalūsia-mosikou taimi liliu#,
+				'generic' => q#houa fakalūsia-mosikou#,
+				'standard' => q#houa fakalūsia-mosikou taimi totonu#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(houa fakapema),
+				'standard' => q#houa fakapema#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(houa fakanaulu),
+				'standard' => q#houa fakanaulu#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(houa fakanepali),
+				'standard' => q#houa fakanepali#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(houa fakakaletōniafoʻou taimi liliu),
-				'generic' => q(houa fakakaletōniafoʻou),
-				'standard' => q(houa fakakaletōniafoʻou taimi totonu),
+				'daylight' => q#houa fakakaletōniafoʻou taimi liliu#,
+				'generic' => q#houa fakakaletōniafoʻou#,
+				'standard' => q#houa fakakaletōniafoʻou taimi totonu#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(houa fakanuʻusila taimi liliu),
-				'generic' => q(houa fakanuʻusila),
-				'standard' => q(houa fakanuʻusila taimi totonu),
+				'daylight' => q#houa fakanuʻusila taimi liliu#,
+				'generic' => q#houa fakanuʻusila#,
+				'standard' => q#houa fakanuʻusila taimi totonu#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(houa fakafonuaʻilofoʻou taimi liliu),
-				'generic' => q(houa fakafonuaʻilofoʻou),
-				'standard' => q(houa fakafonuaʻilofoʻou taimi totonu),
+				'daylight' => q#houa fakafonuaʻilofoʻou taimi liliu#,
+				'generic' => q#houa fakafonuaʻilofoʻou#,
+				'standard' => q#houa fakafonuaʻilofoʻou taimi totonu#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(houa fakaniuē),
+				'standard' => q#houa fakaniuē#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(houa fakanoafōki),
+				'standard' => q#houa fakanoafōki#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(houa fakafēnanito-te-nolōnia taimi liliu),
-				'generic' => q(houa fakafēnanito-te-nolōnia),
-				'standard' => q(houa fakafēnanito-te-nolōnia taimi totonu),
+				'daylight' => q#houa fakafēnanito-te-nolōnia taimi liliu#,
+				'generic' => q#houa fakafēnanito-te-nolōnia#,
+				'standard' => q#houa fakafēnanito-te-nolōnia taimi totonu#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(houa fakamalianatokelau),
+				'standard' => q#houa fakamalianatokelau#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(houa fakalūsia-novosipīsiki taimi liliu),
-				'generic' => q(houa fakalūsia-novosipīsiki),
-				'standard' => q(houa fakalūsia-novosipīsiki taimi totonu),
+				'daylight' => q#houa fakalūsia-novosipīsiki taimi liliu#,
+				'generic' => q#houa fakalūsia-novosipīsiki#,
+				'standard' => q#houa fakalūsia-novosipīsiki taimi totonu#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(houa fakalūsia-ʻomisiki taimi liliu),
-				'generic' => q(houa fakalūsia-ʻomisiki),
-				'standard' => q(houa fakalūsia-ʻomisiki taimi totonu),
+				'daylight' => q#houa fakalūsia-ʻomisiki taimi liliu#,
+				'generic' => q#houa fakalūsia-ʻomisiki#,
+				'standard' => q#houa fakalūsia-ʻomisiki taimi totonu#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -6064,245 +7414,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(houa fakapākisitani taimi liliu),
-				'generic' => q(houa fakapākisitani),
-				'standard' => q(houa fakapākisitani taimi totonu),
+				'daylight' => q#houa fakapākisitani taimi liliu#,
+				'generic' => q#houa fakapākisitani#,
+				'standard' => q#houa fakapākisitani taimi totonu#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(houa fakapalau),
+				'standard' => q#houa fakapalau#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(houa fakapapuaniukini),
+				'standard' => q#houa fakapapuaniukini#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(houa fakapalakuai taimi liliu),
-				'generic' => q(houa fakapalakuai),
-				'standard' => q(houa fakapalakuai taimi totonu),
+				'daylight' => q#houa fakapalakuai taimi liliu#,
+				'generic' => q#houa fakapalakuai#,
+				'standard' => q#houa fakapalakuai taimi totonu#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(houa fakapelū taimi liliu),
-				'generic' => q(houa fakapelū),
-				'standard' => q(houa fakapelū taimi totonu),
+				'daylight' => q#houa fakapelū taimi liliu#,
+				'generic' => q#houa fakapelū#,
+				'standard' => q#houa fakapelū taimi totonu#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(houa fakafilipaine taimi liliu),
-				'generic' => q(houa fakafilipaine),
-				'standard' => q(houa fakafilipaine taimi totonu),
+				'daylight' => q#houa fakafilipaine taimi liliu#,
+				'generic' => q#houa fakafilipaine#,
+				'standard' => q#houa fakafilipaine taimi totonu#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(houa fakaʻotumotufoinikisi),
+				'standard' => q#houa fakaʻotumotufoinikisi#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(houa fakasā-piea-mo-mikeloni taimi liliu),
-				'generic' => q(houa fakasā-piea-mo-mikeloni),
-				'standard' => q(houa fakasā-piea-mo-mikeloni taimi totonu),
+				'daylight' => q#houa fakasā-piea-mo-mikeloni taimi liliu#,
+				'generic' => q#houa fakasā-piea-mo-mikeloni#,
+				'standard' => q#houa fakasā-piea-mo-mikeloni taimi totonu#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(houa fakapitikani),
+				'standard' => q#houa fakapitikani#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(houa fakapōnapē),
+				'standard' => q#houa fakapōnapē#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#houa fakapiongiangi#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(houa fakakisilōta taimi liliu),
-				'generic' => q(houa fakakisilōta),
-				'standard' => q(houa fakakisilōta taimi totonu),
+				'daylight' => q#houa fakakisilōta taimi liliu#,
+				'generic' => q#houa fakakisilōta#,
+				'standard' => q#houa fakakisilōta taimi totonu#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(houa fakalēunioni),
+				'standard' => q#houa fakalēunioni#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(houa fakalotela),
+				'standard' => q#houa fakalotela#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(houa fakalūsia-sakāline taimi liliu),
-				'generic' => q(houa fakalūsia-sakāline),
-				'standard' => q(houa fakalūsia-sakāline taimi totonu),
+				'daylight' => q#houa fakalūsia-sakāline taimi liliu#,
+				'generic' => q#houa fakalūsia-sakāline#,
+				'standard' => q#houa fakalūsia-sakāline taimi totonu#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(houa fakalūsia-samala taimi liliu),
-				'generic' => q(houa fakalūsia-samala),
-				'standard' => q(houa fakalūsia-samala taimi totonu),
+				'daylight' => q#houa fakalūsia-samala taimi liliu#,
+				'generic' => q#houa fakalūsia-samala#,
+				'standard' => q#houa fakalūsia-samala taimi totonu#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(houa fakahaʻamoa taimi liliu),
-				'generic' => q(houa fakahaʻamoa),
-				'standard' => q(houa fakahaʻamoa taimi totonu),
+				'daylight' => q#houa fakahaʻamoa taimi liliu#,
+				'generic' => q#houa fakahaʻamoa#,
+				'standard' => q#houa fakahaʻamoa taimi totonu#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(houa fakaʻotumotu-seiseli),
+				'standard' => q#houa fakaʻotumotu-seiseli#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(houa fakasingapoa),
+				'standard' => q#houa fakasingapoa#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(houa fakaʻotumotusolomone),
+				'standard' => q#houa fakaʻotumotusolomone#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(houa fakasiosiatonga),
+				'standard' => q#houa fakasiosiatonga#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(houa fakasuliname),
+				'standard' => q#houa fakasuliname#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(houa fakasioua),
+				'standard' => q#houa fakasioua#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(houa fakatahisi),
+				'standard' => q#houa fakatahisi#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(houa fakataipei taimi liliu),
-				'generic' => q(houa fakataipei),
-				'standard' => q(houa fakataipei taimi totonu),
+				'daylight' => q#houa fakataipei taimi liliu#,
+				'generic' => q#houa fakataipei#,
+				'standard' => q#houa fakataipei taimi totonu#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(houa fakatasikitani),
+				'standard' => q#houa fakatasikitani#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(houa fakatokelau),
+				'standard' => q#houa fakatokelau#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(houa fakatonga taimi liliu),
-				'generic' => q(houa fakatonga),
-				'standard' => q(houa fakatonga taimi totonu),
+				'daylight' => q#houa fakatonga taimi liliu#,
+				'generic' => q#houa fakatonga#,
+				'standard' => q#houa fakatonga taimi totonu#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(houa fakatūke),
+				'standard' => q#houa fakatūke#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(houa fakatūkimenisitani taimi liliu),
-				'generic' => q(houa fakatūkimenisitani),
-				'standard' => q(houa fakatūkimenisitani taimi totonu),
+				'daylight' => q#houa fakatūkimenisitani taimi liliu#,
+				'generic' => q#houa fakatūkimenisitani#,
+				'standard' => q#houa fakatūkimenisitani taimi totonu#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(houa fakatūvalu),
+				'standard' => q#houa fakatūvalu#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(houa fakaʻulukuai taimi liliu),
-				'generic' => q(houa fakaʻulukuai),
-				'standard' => q(houa fakaʻulukuai taimi totonu),
+				'daylight' => q#houa fakaʻulukuai taimi liliu#,
+				'generic' => q#houa fakaʻulukuai#,
+				'standard' => q#houa fakaʻulukuai taimi totonu#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(houa fakaʻusipekitani taimi liliu),
-				'generic' => q(houa fakaʻusipekitani),
-				'standard' => q(houa fakaʻusipekitani taimi totonu),
+				'daylight' => q#houa fakaʻusipekitani taimi liliu#,
+				'generic' => q#houa fakaʻusipekitani#,
+				'standard' => q#houa fakaʻusipekitani taimi totonu#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(houa fakavanuatu taimi liliu),
-				'generic' => q(houa fakavanuatu),
-				'standard' => q(houa fakavanuatu taimi totonu),
+				'daylight' => q#houa fakavanuatu taimi liliu#,
+				'generic' => q#houa fakavanuatu#,
+				'standard' => q#houa fakavanuatu taimi totonu#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(houa fakavenesuela),
+				'standard' => q#houa fakavenesuela#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(houa fakalūsia-valativositoki taimi liliu),
-				'generic' => q(houa fakalūsia-valativositoki),
-				'standard' => q(houa fakalūsia-valativositoki taimi totonu),
+				'daylight' => q#houa fakalūsia-valativositoki taimi liliu#,
+				'generic' => q#houa fakalūsia-valativositoki#,
+				'standard' => q#houa fakalūsia-valativositoki taimi totonu#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(houa fakalūsia-volikokalati taimi liliu),
-				'generic' => q(houa fakalūsia-volikokalati),
-				'standard' => q(houa fakalūsia-volikokalati taimi totonu),
+				'daylight' => q#houa fakalūsia-volikokalati taimi liliu#,
+				'generic' => q#houa fakalūsia-volikokalati#,
+				'standard' => q#houa fakalūsia-volikokalati taimi totonu#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(houa fakavositoki),
+				'standard' => q#houa fakavositoki#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(houa fakamotuueke),
+				'standard' => q#houa fakamotuueke#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(houa fakaʻuvea mo futuna),
+				'standard' => q#houa fakaʻuvea mo futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(houa fakalūsia-ʻiākutisiki taimi liliu),
-				'generic' => q(houa fakalūsia-ʻiākutisiki),
-				'standard' => q(houa fakalūsia-ʻiākutisiki taimi totonu),
+				'daylight' => q#houa fakalūsia-ʻiākutisiki taimi liliu#,
+				'generic' => q#houa fakalūsia-ʻiākutisiki#,
+				'standard' => q#houa fakalūsia-ʻiākutisiki taimi totonu#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(houa fakalūsia-ʻiekatelinepūki taimi liliu),
-				'generic' => q(houa fakalūsia-ʻiekatelinepūki),
-				'standard' => q(houa fakalūsia-ʻiekatelinepūki taimi totonu),
+				'daylight' => q#houa fakalūsia-ʻiekatelinepūki taimi liliu#,
+				'generic' => q#houa fakalūsia-ʻiekatelinepūki#,
+				'standard' => q#houa fakalūsia-ʻiekatelinepūki taimi totonu#,
 			},
 		},
 	 } }

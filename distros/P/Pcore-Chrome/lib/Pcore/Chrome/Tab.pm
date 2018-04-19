@@ -28,29 +28,21 @@ sub new_tab ( $self, @args ) {
 }
 
 sub close ( $self, $cb = undef ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms NamingConventions::ProhibitAmbiguousNames]
-    P->http->get(
+    return P->http->get(
         "http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/close/$self->{id}",
-        on_finish => sub ($res) {
-            $cb->( $self, $res ) if $cb;
-
-            return;
+        sub ($res) {
+            return $cb ? $cb->( $self, $res ) : ( $self, $res );
         }
     );
-
-    return;
 }
 
 sub activate ( $self, $cb = undef ) {
-    P->http->get(
+    return P->http->get(
         "http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/activate/$self->{id}",
-        on_finish => sub ($res) {
-            $cb->( $self, $res ) if $cb;
-
-            return;
+        sub ($res) {
+            return $cb ? $cb->( $self, $res ) : ( $self, $res );
         }
     );
-
-    return;
 }
 
 sub _cmd ( $self, $cmd, @args ) {

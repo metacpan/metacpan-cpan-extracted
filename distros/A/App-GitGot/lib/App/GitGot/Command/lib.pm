@@ -1,6 +1,6 @@
 package App::GitGot::Command::lib;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::lib::VERSION = '1.335';
+$App::GitGot::Command::lib::VERSION = '1.336';
 # ABSTRACT: Generate a lib listing off a .gotlib file
 use 5.014;
 
@@ -75,7 +75,7 @@ App::GitGot::Command::lib - Generate a lib listing off a .gotlib file
 
 =head1 VERSION
 
-version 1.335
+version 1.336
 
 =head1 SYNOPSIS
 

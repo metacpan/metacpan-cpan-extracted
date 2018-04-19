@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 85;
+use Test::Most tests => 87;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -189,6 +189,9 @@ OPENADDR: {
 			delta_within($location->{latitude}, 38.63, 1e-2);
 			delta_within($location->{longitude}, -90.20, 1e-2);
 
+			$location = $geocoder->geocode(location => 'Caboolture, Queensland, Australia');
+			delta_within($location->{latitude}, -27.09, 1e-2);
+			delta_within($location->{longitude}, 152.98, 1e-2);
 
 			# my $address = $geocoder->reverse_geocode(latlng => '51.50,-0.13');
 			# like($address->{'city'}, qr/^London$/i, 'test reverse');
@@ -206,7 +209,7 @@ OPENADDR: {
 			});
 		} else {
 			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
-			skip 'OPENADDR_HOME not defined', 84;
+			skip 'OPENADDR_HOME not defined', 86;
 		}
 	}
 }

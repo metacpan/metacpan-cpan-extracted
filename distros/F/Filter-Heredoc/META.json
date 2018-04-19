@@ -4,7 +4,7 @@
       "Bertil Kronlund <bkron at cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : 0
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -33,22 +33,26 @@
    "provides" : {
       "Filter::Heredoc" : {
          "file" : "lib/Filter/Heredoc.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Filter::Heredoc::App" : {
          "file" : "lib/Filter/Heredoc/App.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       },
       "Filter::Heredoc::Rule" : {
          "file" : "lib/Filter/Heredoc/Rule.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/bkron/Filter-Heredoc"
+      }
    },
-   "version" : "0.02"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

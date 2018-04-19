@@ -63,4 +63,14 @@ subtest 'File::HomeDir' => sub {
   is $data, "xx\n";  
 };
 
+subtest 'real_home_dir' => sub {
+
+  my $real = eval { Test2::Plugin::FauxHomeDir->real_home_dir };
+  is $@, '', 'calling real_home_dir does not die';
+
+  note "real_home_dir = $real";
+
+  isnt $real, $faux, 'real and fuax are different';
+};
+
 done_testing

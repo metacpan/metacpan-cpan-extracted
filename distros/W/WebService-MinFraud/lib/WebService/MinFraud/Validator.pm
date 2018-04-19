@@ -3,7 +3,7 @@ package WebService::MinFraud::Validator;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.006000';
+our $VERSION = '1.007000';
 
 use Data::Delete 0.05;
 use Data::Rx;
@@ -164,10 +164,15 @@ sub _build_request_schema_definition {
                         contents => {
                             type   => '//str',
                             values => [
-                                'account_creation', 'account_login',
-                                'email_change',     'password_reset',
-                                'purchase',         'recurring_purchase',
-                                'referral',         'survey',
+                                'account_creation',
+                                'account_login',
+                                'email_change',
+                                'password_reset',
+                                'payout_change',
+                                'purchase',
+                                'recurring_purchase',
+                                'referral',
+                                'survey',
                             ],
                         },
                     },
@@ -208,6 +213,7 @@ sub _build_request_schema_definition {
                                 'bluesnap',
                                 'bpoint',
                                 'braintree',
+                                'ccavenue',
                                 'ccnow',
                                 'chase_paymentech',
                                 'checkout_com',
@@ -217,9 +223,11 @@ sub _build_request_schema_definition {
                                 'compropago',
                                 'concept_payments',
                                 'conekta',
+                                'ct_payments',
                                 'cuentadigital',
                                 'curopayments',
                                 'cybersource',
+                                'dalenys',
                                 'dalpay',
                                 'dibs',
                                 'digital_river',
@@ -248,6 +256,7 @@ sub _build_request_schema_definition {
                                 'moneris_solutions',
                                 'nmi',
                                 'oceanpayment',
+                                'oney',
                                 'openpaymx',
                                 'optimal_payments',
                                 'orangepay',
@@ -268,6 +277,7 @@ sub _build_request_schema_definition {
                                 'payway',
                                 'payza',
                                 'pinpayments',
+                                'posconnect',
                                 'princeton_payment_solutions',
                                 'psigate',
                                 'qiwi',
@@ -389,7 +399,7 @@ WebService::MinFraud::Validator - Validation for the minFraud requests
 
 =head1 VERSION
 
-version 1.006000
+version 1.007000
 
 =head1 SYNOPSIS
 
@@ -405,7 +415,7 @@ version 1.006000
 
 This module defines the request schema for the minFraud API. In addition, it
 provides a C<validate_request> method that is used to validate any request
-passed to the C<score> or C<insights> methods.
+passed to the C<score>, C<insights>, or C<factors> methods.
 
 =head1 METHODS
 

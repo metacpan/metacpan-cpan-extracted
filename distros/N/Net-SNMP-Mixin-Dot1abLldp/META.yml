@@ -17,7 +17,7 @@ name: Net-SNMP-Mixin-Dot1abLldp
 provides:
   Net::SNMP::Mixin::Dot1abLldp:
     file: lib/Net/SNMP/Mixin/Dot1abLldp.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Net::SNMP: '0'
   Net::SNMP::Mixin: '0.14'
@@ -25,5 +25,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,9 +4,9 @@ author:
   - 'Frédéric Demians <f.demians@tamil.fr>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,6 +16,7 @@ requires:
   DateTime: '0'
   FindBin: '0'
   Getopt::Long: '0'
+  Koha::Contrib::Tamil::Koha: '0'
   LWP::Simple: '0'
   List::Util: '0'
   MARC::Moose::Field::Std: '0'
@@ -27,4 +28,4 @@ requires:
   utf8: '0'
 resources:
   repository: https://github.com/fredericd/Koha-Contrib-Mirabel
-version: 0.0.5
+version: 0.0.6

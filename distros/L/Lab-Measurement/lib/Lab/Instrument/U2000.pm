@@ -1,6 +1,6 @@
 package Lab::Instrument::U2000;
 #ABSTRACT: Agilent U2000 series USB Power Sensor
-$Lab::Instrument::U2000::VERSION = '3.630';
+$Lab::Instrument::U2000::VERSION = '3.631';
 use strict;
 use Lab::Instrument;
 
@@ -249,7 +249,7 @@ Lab::Instrument::U2000 - Agilent U2000 series USB Power Sensor
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 DESCRIPTION
 

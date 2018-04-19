@@ -28,7 +28,9 @@
       },
       "runtime" : {
          "requires" : {
-            "JSONAPI::Document" : "0",
+            "CHI" : "0",
+            "Carp" : "0",
+            "JSONAPI::Document" : "1.1",
             "Lingua::EN::Inflexion" : "0",
             "Mojo::Base" : "0",
             "perl" : "5.010"
@@ -49,7 +51,7 @@
    "provides" : {
       "Mojolicious::Plugin::JSONAPI" : {
          "file" : "lib/Mojolicious/Plugin/JSONAPI.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       }
    },
    "release_status" : "stable",
@@ -59,7 +61,7 @@
          "web" : "https://github.com/ziali088/mojolicious-plugin-jsonapi.git"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

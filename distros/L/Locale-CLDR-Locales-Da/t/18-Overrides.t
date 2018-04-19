@@ -13,13 +13,13 @@ use ok 'Locale::CLDR';
 my $locale = Locale::CLDR->new('da_DK_u_ca_islamic');
 
 my $months = $locale->month_format_wide();
-is_deeply ($months, [ 'Muharram', 'Safar', "Rabiʻ I", 'Rabiʻ II', 'Jumada I', 'Jumada II', 'Rajab', "Shaʻban", 'Ramadan', 'Shawwal', "Dhuʻl-Qiʻdah", "Dhuʻl-Hijjah" ], 'Islamic Month format wide');
+is_deeply ($months, [ 'muharram', 'safar', "rabiʻ I", 'rabiʻ II', 'jumada I', 'jumada II', 'rajab', "shaʻban", 'ramadan', 'shawwal', "dhuʻl-Qiʻdah", "dhuʻl-Hijjah" ], 'Islamic Month format wide');
 $months = $locale->month_format_abbreviated();
 is_deeply ($months, [ 'Muh.', 'Saf.', "Rab. I", 'Rab. II', 'Jum. I', 'Jum. II', 'Raj.', "Sha.", 'Ram.', 'Shaw.', "Dhuʻl-Q.", "Dhuʻl-H." ], 'Islamic Month format abbreviated');
 $months = $locale->month_format_narrow();
 is_deeply ($months, [qw( 1 2 3 4 5 6 7 8 9 10 11 12 )], 'Islamic Month format narrow');
 $months = $locale->month_stand_alone_wide();
-is_deeply ($months, ['Muharram', 'Safar', "Rabiʻ I", 'Rabiʻ II', 'Jumada I', 'Jumada II', 'Rajab', "Shaʻban", 'Ramadan', 'Shawwal', "Dhuʻl-Qiʻdah", "Dhuʻl-Hijjah"], 'Islamic Month stand alone wide');
+is_deeply ($months, ['muharram', 'safar', "rabiʻ I", 'rabiʻ II', 'jumada I', 'jumada II', 'rajab', "shaʻban", 'ramadan', 'shawwal', "dhuʻl-Qiʻdah", "dhuʻl-Hijjah"], 'Islamic Month stand alone wide');
 $months = $locale->month_stand_alone_abbreviated();
 is_deeply ($months, [ 'Muh.', 'Saf.', "Rab. I", 'Rab. II', 'Jum. I', 'Jum. II', 'Raj.', "Sha.", 'Ram.', 'Shaw.', "Dhuʻl-Q.", "Dhuʻl-H."], 'Islamic Month stand alone abbreviated');
 $months = $locale->month_stand_alone_narrow();

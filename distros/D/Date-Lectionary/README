@@ -2,7 +2,7 @@ NAME
     Date::Lectionary - Readings for the Christian Lectionary
 
 VERSION
-    Version 1.20180410
+    Version 1.20180417
 
 SYNOPSIS
         use Time::Piece;
@@ -133,8 +133,8 @@ SUPPORT
         <http://search.cpan.org/dist/Date-Lectionary/>
 
 ACKNOWLEDGEMENTS
-    Many thanks to my beautiful wife, Jennifer, and my amazing daughter,
-    Rosemary. But, above all, SOLI DEO GLORIA!
+    Many thanks to my beautiful wife, Jennifer, my amazing daughter,
+    Rosemary, and my sweet son, Oliver. But, above all, SOLI DEO GLORIA!
 
 LICENSE
     Copyright 2016-2018 MICHAEL WAYNE ARNOLD

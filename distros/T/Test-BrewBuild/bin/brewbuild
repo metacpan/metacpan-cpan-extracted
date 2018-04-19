@@ -4,8 +4,9 @@ use strict;
 
 use Carp qw(croak);
 use Test::BrewBuild;
+use Test::BrewBuild::Constant qw(:all);
 
-our $VERSION = '2.18';
+our $VERSION = '2.20';
 
 # we let BrewBuild manage the argument list so that the other scripts can
 # simply pass in the args directly and use the API instead of wrapping around
@@ -30,10 +31,11 @@ my $is_win = Test::BrewBuild->is_win;
 
 # configure output for if *brew isn't installed
 
-my $brew_prog = $is_win ? 'berrybrew.exe' : 'perlbrew';
+my $brew_prog = $is_win ? BERRYBREW : PERLBREW;
 my $brew_link = $is_win
-    ? 'https://github.com/stevieb9/berrybrew'
-    : 'http://perlbrew.pl';
+    ? BERRYBREW_LINK
+    : PERLBREW_LINK;
+
 my $sep = $is_win ? ';' : ':';
 
 # check in PATH to see if berry/perlbrew exists

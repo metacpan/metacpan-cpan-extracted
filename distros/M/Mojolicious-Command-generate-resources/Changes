@@ -1,5 +1,10 @@
 Revision history for Perl module Mojolicious::Command::generate::resources
 
+0.21 Mon Apr 16 23:12:19 CEST 2018
+
+    - Small improvements in generated code while using this command for
+      generating boilerplate for the Slovo project.
+
 0.20 Sat Apr  7 18:36:22 CEST 2018
     - Fixed bug in generated code - missing @bind parameters passed to query in
       model class.

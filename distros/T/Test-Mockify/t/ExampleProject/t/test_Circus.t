@@ -14,7 +14,7 @@ sub testPlan{
 
     $self->test_WithoutMock();
     $self->test_WithMock ();
-    $self->test_ErrorShowCase();
+    $self->test_Mock();
 }
 #----------------------------------------------------------------------------------------
 sub test_WithoutMock {
@@ -48,15 +48,13 @@ sub test_WithMock {
     ], "$SubTestName - Prove mocked result");
 }
 #----------------------------------------------------------------------------------------
-sub test_ErrorShowCase {
+sub test_Mock{
     my $self = shift;
     my $SubTestName = (caller(0))[3];
     my $Mockify = Test::Mockify::Sut->new('ExampleProject::Circus',[$self->_createMagican()]);
-    throws_ok( sub { $Mockify->mock('getLineUp') },
-                   qr/Don't mock the code you like to test/sm,
-                   "$SubTestName - Show case why to use Mockify::Sut"
-         );
-    ;
+    $Mockify->mock('getLineUp')->when()->thenReturn('Dummy');
+    my $Sut = $Mockify->getMockObject();
+    is($Sut->getLineUp(), 'Dummy', "$SubTestName - Prove mocked result");
 }
 #----------------------------------------------------------------------------------------
 sub _createMagican {

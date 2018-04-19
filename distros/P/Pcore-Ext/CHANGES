@@ -1,3 +1,10 @@
+v0.13.7 2018-04-17T11:02:38Z
+ - pcoreApi.js added
+
+v0.13.6 2018-04-12T18:26:03Z
+ - result pragma replaced
+ - access to http status using hash key
+
 v0.13.5 2018-04-05T10:52:15Z
  - load et resources before www
 

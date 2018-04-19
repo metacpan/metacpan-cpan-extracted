@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.055 2018-04-17
+
+  - Update koha-overdue. Fix a bug with locales on some Ubuntu server.
+
 0.054 2018-03-05
 
   - Update koha-dump-biblio for Koha 17.11

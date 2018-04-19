@@ -24,7 +24,7 @@ sub opt_spec {
 }
 
 sub usage_desc {
-    return "egaz raxml [options] <infile>";
+    return "egaz raxml [options] <infile> [more infiles]";
 }
 
 sub description {
@@ -45,8 +45,8 @@ MARKDOWN
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
-    if ( @{$args} != 1 ) {
-        my $message = "This command need one input file.\n\tIt found";
+    if ( @{$args} < 1 ) {
+        my $message = "This command need one or more input files.\n\tIt found";
         $message .= sprintf " [%s]", $_ for @{$args};
         $message .= ".\n";
         $self->usage_error($message);
@@ -63,7 +63,10 @@ sub execute {
     my ( $self, $opt, $args ) = @_;
 
     # absolute pathes as we will chdir to tempdir later
-    my $infile = Path::Tiny::path( $args->[0] )->absolute->stringify;
+    my @infiles;
+    for my $infile ( @{$args} ) {
+        push @infiles, Path::Tiny::path($infile)->absolute->stringify;
+    }
 
     if ( lc $opt->{outfile} ne "stdout" ) {
         $opt->{outfile} = Path::Tiny::path( $opt->{outfile} )->absolute->stringify;
@@ -87,13 +90,16 @@ sub execute {
     $basename =~ s/\W+/_/g;
 
     {    # .phy
-        my $cmd = "fasops names $infile -o stdout > names.list";
+        my $cmd = "fasops names $infiles[0] -o stdout > names.list";
         App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
         if ( !$tempdir->child("names.list")->is_file ) {
             Carp::croak "Failed: fasops names\n";
         }
 
-        $cmd = "fasops concat $infile names.list --relaxed -o stdout > $basename.phy";
+        $cmd = "gzip -dcf ";
+        $cmd .= join " ", @infiles;
+        $cmd .= " |";
+        $cmd .= " fasops concat stdin names.list --relaxed -o stdout > $basename.phy";
         App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
         if ( !$tempdir->child("$basename.phy")->is_file ) {
             Carp::croak "Failed: fasops concat\n";

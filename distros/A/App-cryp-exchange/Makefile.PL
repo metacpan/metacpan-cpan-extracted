@@ -20,17 +20,21 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::cryp::exchange",
   "PREREQ_PM" => {
-    "App::btcindo" => "0.018",
+    "App::indodax" => 0,
     "Complete::Util" => "0.57",
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "Finance::BTCIndo" => "0.007",
     "Finance::GDAX::Lite" => 0,
+    "Finance::Indodax" => 0,
+    "Log::Log4perl" => 0,
+    "Log::Log4perl::Appender::LogGer" => 0,
+    "Log::Log4perl::Layout::SimpleLayout" => 0,
     "Log::ger" => "0.023",
     "PERLANCAR::Module::List" => 0,
     "Perinci::CmdLine::cryp" => "0.004",
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
+    "WebService::Cryptopia" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -40,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,21 +52,25 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::btcindo" => "0.018",
+  "App::indodax" => 0,
   "Complete::Util" => "0.57",
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
-  "Finance::BTCIndo" => "0.007",
   "Finance::GDAX::Lite" => 0,
+  "Finance::Indodax" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::Log4perl" => 0,
+  "Log::Log4perl::Appender::LogGer" => 0,
+  "Log::Log4perl::Layout::SimpleLayout" => 0,
   "Log::ger" => "0.023",
   "PERLANCAR::Module::List" => 0,
   "Perinci::CmdLine::cryp" => "0.004",
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
   "Test::More" => 0,
+  "WebService::Cryptopia" => 0,
   "strict" => 0,
   "warnings" => 0
 );

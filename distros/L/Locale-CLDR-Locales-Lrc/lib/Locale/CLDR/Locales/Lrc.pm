@@ -6,21 +6,297 @@ Locale::CLDR::Locales::Lrc - Package for language Northern Luri
 
 package Locale::CLDR::Locales::Lrc;
 # This file auto generated from Data\common\main\lrc.xml
-#	on Fri 29 Apr  7:15:09 pm GMT
+#	on Fri 13 Apr  7:18:32 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
+has 'valid_algorithmic_formats' => (
+	is => 'ro',
+	isa => ArrayRef,
+	init_arg => undef,
+	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal' ]},
+);
+
+has 'algorithmic_number_format_data' => (
+	is => 'ro',
+	isa => HashRef,
+	init_arg => undef,
+	default => sub { 
+		use bignum;
+		return {
+		'spellout-cardinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(منفی →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(صفر),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← مومٱیز →→),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(یٱک),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(دۏ),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(ساٛ),
+				},
+				'4' => {
+					base_value => q(4),
+					divisor => q(1),
+					rule => q(چار),
+				},
+				'5' => {
+					base_value => q(5),
+					divisor => q(1),
+					rule => q(پنج),
+				},
+				'6' => {
+					base_value => q(6),
+					divisor => q(1),
+					rule => q(شٱش),
+				},
+				'7' => {
+					base_value => q(7),
+					divisor => q(1),
+					rule => q(هفت),
+				},
+				'8' => {
+					base_value => q(8),
+					divisor => q(1),
+					rule => q(هشت),
+				},
+				'9' => {
+					base_value => q(9),
+					divisor => q(1),
+					rule => q(نۏ),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(دٱ),
+				},
+				'11' => {
+					base_value => q(11),
+					divisor => q(10),
+					rule => q(یازدٱ),
+				},
+				'12' => {
+					base_value => q(12),
+					divisor => q(10),
+					rule => q(دۊۋازدٱ),
+				},
+				'13' => {
+					base_value => q(13),
+					divisor => q(10),
+					rule => q(سینزٱ),
+				},
+				'14' => {
+					base_value => q(14),
+					divisor => q(10),
+					rule => q(چاردٱ),
+				},
+				'15' => {
+					base_value => q(15),
+					divisor => q(10),
+					rule => q(پۊمزٱ),
+				},
+				'16' => {
+					base_value => q(16),
+					divisor => q(10),
+					rule => q(شۊمزٱ),
+				},
+				'17' => {
+					base_value => q(17),
+					divisor => q(10),
+					rule => q(هاٛبدٱ),
+				},
+				'18' => {
+					base_value => q(18),
+					divisor => q(10),
+					rule => q(هیژدٱ),
+				},
+				'19' => {
+					base_value => q(19),
+					divisor => q(10),
+					rule => q(نۊزدٱ),
+				},
+				'20' => {
+					base_value => q(20),
+					divisor => q(10),
+					rule => q(بیست[ و →→]),
+				},
+				'30' => {
+					base_value => q(30),
+					divisor => q(10),
+					rule => q(سی[ و →→]),
+				},
+				'40' => {
+					base_value => q(40),
+					divisor => q(10),
+					rule => q(چاٛهل[ و →→]),
+				},
+				'50' => {
+					base_value => q(50),
+					divisor => q(10),
+					rule => q(پنجا[ و →→]),
+				},
+				'60' => {
+					base_value => q(60),
+					divisor => q(10),
+					rule => q(شٱصد[ و →→]),
+				},
+				'70' => {
+					base_value => q(70),
+					divisor => q(10),
+					rule => q(هفتاد[ و →→]),
+				},
+				'80' => {
+					base_value => q(80),
+					divisor => q(10),
+					rule => q(هشتاد[ و →→]),
+				},
+				'90' => {
+					base_value => q(90),
+					divisor => q(10),
+					rule => q(نٱۋد[ و →→]),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(صد[ و →→]),
+				},
+				'200' => {
+					base_value => q(200),
+					divisor => q(100),
+					rule => q(داٛۋیسد[ و →→]),
+				},
+				'300' => {
+					base_value => q(300),
+					divisor => q(100),
+					rule => q(سیصد[ و →→]),
+				},
+				'400' => {
+					base_value => q(400),
+					divisor => q(100),
+					rule => q(چارصد[ و →→]),
+				},
+				'500' => {
+					base_value => q(500),
+					divisor => q(100),
+					rule => q(پۊمصد[ و →→]),
+				},
+				'600' => {
+					base_value => q(600),
+					divisor => q(100),
+					rule => q(شٱشصد[ و →→]),
+				},
+				'700' => {
+					base_value => q(700),
+					divisor => q(100),
+					rule => q(هفصد[ و →→]),
+				},
+				'800' => {
+					base_value => q(800),
+					divisor => q(100),
+					rule => q(هشصد[ و →→]),
+				},
+				'900' => {
+					base_value => q(900),
+					divisor => q(100),
+					rule => q(نۏصد[ و →→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(←← هزار[ و →→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(←← ماٛلیۊن[ و →→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(←← میلیارد[ و →→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(←← هزار میلیاد[ و →→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+				'max' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+			},
+		},
+		'spellout-numbering' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+			},
+		},
+		'spellout-numbering-year' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-numbering=),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+			},
+		},
+	} },
+);
+
 # Need to add code for Key type pattern
 sub display_name_pattern {
 	my ($self, $name, $region, $script, $variant) = @_;
@@ -448,10 +724,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[​‌‍‎‏ ً ٌ ٍ َ ُ ِ ّ ْ ٔ إ ة ك ه ى ي])},
+			auxiliary => qr{[​‌‍‎‏ ً ٌ ٍ َ ُ ِ ّ ْ ٔ إ ة ك ه ى ي]},
 			index => ['آ', 'ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'ھ', 'و', 'ی'],
-			main => qr{(?^u:[ٙ ٛ آ أ ؤ ئ ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ڤ ق ک گ ل م ن ھ ە و ۉ ۊ ی ؽ])},
-			punctuation => qr{(?^u:[\- ‐ ، ٫ ٬ ؛ \: ! ؟ . … ‹ › « » ( ) \[ \] * / \\])},
+			main => qr{[ٙ ٛ آ أ ؤ ئ ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ڤ ق ک گ ل م ن ھ ە و ۉ ۊ ی ؽ]},
+			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ، ٫ ٬ ؛ \: ! ؟ . … ‹ › « » ( ) \[ \] * / \\]},
 		};
 	},
 EOT
@@ -505,6 +782,11 @@ has 'units' => (
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
+				'long' => {
+					'square-kilometer' => {
+						'other' => q({0} km²),
+					},
+				},
 			} }
 );
 
@@ -571,21 +853,21 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0%',
+					'default' => '#,##0%',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -648,6 +930,9 @@ has 'currencies' => (
 				'currency' => q(روٙپیه هئن),
 				'other' => q(روٙپیه هئن),
 			},
+		},
+		'IQD' => {
+			symbol => 'د.ع.‏',
 		},
 		'JPY' => {
 			symbol => 'JP¥',
@@ -859,11 +1144,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
@@ -982,9 +1267,9 @@ has 'time_zone_names' => (
 		regionFormat => q({0}),
 		'America_Central' => {
 			long => {
-				'daylight' => q(روٙشنایی نئهادار روٙز),
-				'generic' => q(گاٛت مینجاٛیی),
-				'standard' => q(گاٛت مینجاٛیی ئستاٛنداٛرد),
+				'daylight' => q#روٙشنایی نئهادار روٙز#,
+				'generic' => q#گاٛت مینجاٛیی#,
+				'standard' => q#گاٛت مینجاٛیی ئستاٛنداٛرد#,
 			},
 		},
 		'Etc/Unknown' => {

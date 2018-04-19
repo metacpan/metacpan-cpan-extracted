@@ -12,4 +12,4 @@ use Math::BigInt::Lite;
 our $CLASS;
 $CLASS = 'Math::BigInt::Lite';
 
-require 't/alias.inc';
+require './t/alias.inc';

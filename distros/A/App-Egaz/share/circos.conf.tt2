@@ -1,0 +1,163 @@
+<image>
+dir*   = [% dir %]/Circos/[% id %]
+file*  = [% id %].circos.png
+background*     = white
+
+# radius of inscribed circle in image
+radius         = 1500p
+background     = white
+
+# by default angle=0 is at 3 o'clock position
+angle_offset   = -90
+
+24bit             = yes
+auto_alpha_colors = yes
+auto_alpha_steps  = 5
+</image>
+
+karyotype = karyotype.[% id %].txt
+chromosomes_units = 1000
+
+chromosomes_display_default = yes
+
+<links>
+
+<link>
+file          = [% id %].link4.txt
+radius        = 0.88r
+bezier_radius = 0.2r
+color         = purple
+thickness     = 2
+ribbon        = yes
+stroke_color  = purple
+stroke_thickness = 2
+</link>
+
+<link>
+file          = [% id %].link3.txt
+radius        = 0.88r
+bezier_radius = 0.1r
+color         = dgreen
+thickness     = 3
+ribbon        = yes
+stroke_color  = dgreen
+stroke_thickness = 2
+</link>
+
+<link>
+file          = [% id %].link2.txt
+radius        = 0.88r
+bezier_radius = 0r
+color         = dorange
+thickness     = 3
+ribbon        = yes
+stroke_color  = dorange
+stroke_thickness = 2
+</link>
+
+</links>
+
+<highlights>
+
+<highlight>
+file = highlight.features.[% id %].txt
+r0 = 0.95r
+r1 = 0.98r
+</highlight>
+
+<highlight>
+file = highlight.repeats.[% id %].txt
+r0 = 0.93r
+r1 = 0.98r
+</highlight>
+
+<highlight>
+file = [% id %].linkN.txt
+r0 = 0.89r
+r1 = 0.92r
+stroke_thickness = 2
+stroke_color = grey
+</highlight>
+
+</highlights>
+
+<ideogram>
+
+<spacing>
+    default = 0r
+</spacing>
+
+# thickness (px) of chromosome ideogram
+thickness        = 20p
+stroke_thickness = 2p
+
+# ideogram border color
+stroke_color     = dgrey
+fill             = yes
+
+# the default chromosome color is set here and any value
+# defined in the karyotype file overrides it
+fill_color       = black
+
+# fractional radius position of chromosome ideogram within image
+radius         = 0.85r
+show_label     = no
+label_font     = condensedbold
+label_radius   = dims(ideogram,radius) + 0.05r
+label_size     = 36
+
+label_parallel   = yes
+
+show_bands            = yes
+fill_bands            = yes
+band_stroke_thickness = 2
+band_stroke_color     = white
+band_transparency     = 1
+
+</ideogram>
+
+show_ticks       = yes
+show_tick_labels = yes
+
+show_grid        = no
+grid_start       = dims(ideogram,radius_inner)-0.5r
+grid_end         = dims(ideogram,radius_inner)
+
+<ticks>
+    skip_first_label           = yes
+    skip_last_label            = no
+    radius                     = dims(ideogram,radius_outer)
+    tick_separation            = 2p
+    min_label_distance_to_edge = 0p
+    label_separation           = 5p
+    label_offset               = 2p
+    label_size                 = 8p
+    multiplier                 = 0.001
+    color                      = black
+    show_label                 = no
+
+<tick>
+    spacing        = 10u
+    size           = 8p
+    thickness      = 2p
+    color          = black
+    grid           = yes
+    grid_color     = grey
+    grid_thickness = 1p
+</tick>
+
+<tick>
+    spacing        = 100u
+    size           = 8p
+    thickness      = 2p
+    color          = black
+    grid           = yes
+    grid_color     = dgrey
+    grid_thickness = 1p
+</tick>
+
+</ticks>
+
+<<include etc/colors_fonts_patterns.conf>>
+
+<<include etc/housekeeping.conf>>

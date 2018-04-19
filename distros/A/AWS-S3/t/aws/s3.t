@@ -89,7 +89,7 @@ subtest 'create bucket strange temporary redirect' => sub {
         }
     };
 
-    my $bucket = $s3->add_bucket( name => 'bar', location => 'us-west-1' );
+    my $bucket = $s3->add_bucket( name => 'bar' );
     isa_ok( $bucket, 'AWS::S3::Bucket' );
     is( $bucket->name, 'bar', '... and the right bucket got returned' );
 };

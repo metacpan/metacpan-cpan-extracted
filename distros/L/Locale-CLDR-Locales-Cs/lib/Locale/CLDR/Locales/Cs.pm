@@ -6,17 +6,18 @@ Locale::CLDR::Locales::Cs - Package for language Czech
 
 package Locale::CLDR::Locales::Cs;
 # This file auto generated from Data\common\main\cs.xml
-#	on Fri 29 Apr  6:55:54 pm GMT
+#	on Fri 13 Apr  7:05:14 am GMT
 
+use strict;
+use warnings;
 use version;
 
-our $VERSION = version->declare('v0.29.0');
+our $VERSION = version->declare('v0.32.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
-
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -639,11 +640,11 @@ has 'algorithmic_number_format_data' => (
 				},
 				'x.x' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,###0.#=),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -698,7 +699,7 @@ has 'display_name_language' => (
  				'ar' => 'arabština',
  				'ar_001' => 'arabština (moderní standardní)',
  				'arc' => 'aramejština',
- 				'arn' => 'araukánština',
+ 				'arn' => 'mapudungunština',
  				'aro' => 'araonština',
  				'arp' => 'arapažština',
  				'arq' => 'arabština (alžírská)',
@@ -732,7 +733,7 @@ has 'display_name_language' => (
  				'bfq' => 'badagština',
  				'bg' => 'bulharština',
  				'bgn' => 'balúčština (západní)',
- 				'bho' => 'bhojpurština',
+ 				'bho' => 'bhódžpurština',
  				'bi' => 'bislamština',
  				'bik' => 'bikolština',
  				'bin' => 'bini',
@@ -779,6 +780,7 @@ has 'display_name_language' => (
  				'cps' => 'kapiznonština',
  				'cr' => 'kríjština',
  				'crh' => 'turečtina (krymská)',
+ 				'crs' => 'kreolština (seychelská)',
  				'cs' => 'čeština',
  				'csb' => 'kašubština',
  				'cu' => 'staroslověnština',
@@ -814,6 +816,7 @@ has 'display_name_language' => (
  				'el' => 'řečtina',
  				'elx' => 'elamitština',
  				'en' => 'angličtina',
+ 				'en_GB' => 'angličtina (Velká Británie)',
  				'en_GB@alt=short' => 'angličtina (VB)',
  				'en_US' => 'angličtina (USA)',
  				'en_US@alt=short' => 'angličtina (USA)',
@@ -837,14 +840,14 @@ has 'display_name_language' => (
  				'fo' => 'faerština',
  				'fon' => 'fonština',
  				'fr' => 'francouzština',
- 				'frc' => 'francouzština (kajunská)',
+ 				'frc' => 'francouzština (cajunská)',
  				'frm' => 'francouzština (středověká)',
  				'fro' => 'francouzština (stará)',
  				'frp' => 'franko-provensálština',
  				'frr' => 'fríština (severní)',
  				'frs' => 'fríština (východní)',
  				'fur' => 'furlanština',
- 				'fy' => 'fríština',
+ 				'fy' => 'fríština (západní)',
  				'ga' => 'irština',
  				'gaa' => 'gaština',
  				'gag' => 'gagauzština',
@@ -984,6 +987,7 @@ has 'display_name_language' => (
  				'ln' => 'lingalština',
  				'lo' => 'laoština',
  				'lol' => 'mongština',
+ 				'lou' => 'kreolština (Louisiana)',
  				'loz' => 'lozština',
  				'lrc' => 'lúrština (severní)',
  				'lt' => 'litevština',
@@ -1031,7 +1035,7 @@ has 'display_name_language' => (
  				'ms' => 'malajština',
  				'mt' => 'maltština',
  				'mua' => 'mundang',
- 				'mul' => 'složené (víceřádkové) jazyky',
+ 				'mul' => 'více jazyků',
  				'mus' => 'kríkština',
  				'mwl' => 'mirandština',
  				'mwr' => 'márvárština',
@@ -1088,6 +1092,7 @@ has 'display_name_language' => (
  				'pap' => 'papiamento',
  				'pau' => 'palauština',
  				'pcd' => 'picardština',
+ 				'pcm' => 'nigerijský pidžin',
  				'pdc' => 'němčina (pensylvánská)',
  				'pdt' => 'němčina (plautdietsch)',
  				'peo' => 'staroperština',
@@ -1151,7 +1156,7 @@ has 'display_name_language' => (
  				'sga' => 'irština (stará)',
  				'sgs' => 'žemaitština',
  				'sh' => 'srbochorvatština',
- 				'shi' => 'tachelhit',
+ 				'shi' => 'tašelhit',
  				'shn' => 'šanština',
  				'shu' => 'arabština (čadská)',
  				'si' => 'sinhálština',
@@ -1323,7 +1328,7 @@ has 'display_name_script' => (
  			'Cprt' => 'kyperské',
  			'Cyrl' => 'cyrilice',
  			'Cyrs' => 'cyrilce - staroslověnská',
- 			'Deva' => 'dévanágárí',
+ 			'Deva' => 'dévanágarí',
  			'Dsrt' => 'deseret',
  			'Dupl' => 'Duployého těsnopis',
  			'Egyd' => 'egyptské démotické',
@@ -1339,6 +1344,7 @@ has 'display_name_script' => (
  			'Grek' => 'řecké',
  			'Gujr' => 'gudžarátí',
  			'Guru' => 'gurmukhi',
+ 			'Hanb' => 'hanb',
  			'Hang' => 'hangul',
  			'Hani' => 'han',
  			'Hano' => 'hanunóo',
@@ -1354,6 +1360,7 @@ has 'display_name_script' => (
  			'Hung' => 'staromaďarské',
  			'Inds' => 'harappské',
  			'Ital' => 'etruské',
+ 			'Jamo' => 'jamo',
  			'Java' => 'javánské',
  			'Jpan' => 'japonské',
  			'Jurc' => 'džürčenské',
@@ -1389,7 +1396,7 @@ has 'display_name_script' => (
  			'Mlym' => 'malajlámské',
  			'Modi' => 'modí',
  			'Mong' => 'mongolské',
- 			'Moon' => 'Moonovo',
+ 			'Moon' => 'Moonovo písmo',
  			'Mroo' => 'mro',
  			'Mtei' => 'mejtej majek (manipurské)',
  			'Mymr' => 'myanmarské',
@@ -1457,6 +1464,7 @@ has 'display_name_script' => (
  			'Xsux' => 'sumero-akkadské klínové písmo',
  			'Yiii' => 'yi',
  			'Zmth' => 'matematický zápis',
+ 			'Zsye' => 'emodži',
  			'Zsym' => 'symboly',
  			'Zxxx' => 'bez zápisu',
  			'Zyyy' => 'obecné',
@@ -1477,35 +1485,35 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub { 
 		{
-			'001' => 'Svět',
+			'001' => 'svět',
  			'002' => 'Afrika',
  			'003' => 'Severní Amerika',
  			'005' => 'Jižní Amerika',
  			'009' => 'Oceánie',
- 			'011' => 'Západní Afrika',
+ 			'011' => 'západní Afrika',
  			'013' => 'Střední Amerika',
- 			'014' => 'Východní Afrika',
- 			'015' => 'Severní Afrika',
- 			'017' => 'Střední Afrika',
- 			'018' => 'Jižní Afrika',
+ 			'014' => 'východní Afrika',
+ 			'015' => 'severní Afrika',
+ 			'017' => 'střední Afrika',
+ 			'018' => 'jižní Afrika',
  			'019' => 'Amerika',
  			'021' => 'Severní Amerika (oblast)',
  			'029' => 'Karibik',
- 			'030' => 'Východní Asie',
- 			'034' => 'Jižní Asie',
- 			'035' => 'Jihovýchodní Asie',
- 			'039' => 'Jižní Evropa',
+ 			'030' => 'východní Asie',
+ 			'034' => 'jižní Asie',
+ 			'035' => 'jihovýchodní Asie',
+ 			'039' => 'jižní Evropa',
  			'053' => 'Australasie',
  			'054' => 'Melanésie',
  			'057' => 'Mikronésie (region)',
  			'061' => 'Polynésie',
  			'142' => 'Asie',
  			'143' => 'Střední Asie',
- 			'145' => 'Západní Asie',
+ 			'145' => 'západní Asie',
  			'150' => 'Evropa',
- 			'151' => 'Východní Evropa',
- 			'154' => 'Severní Evropa',
- 			'155' => 'Západní Evropa',
+ 			'151' => 'východní Evropa',
+ 			'154' => 'severní Evropa',
+ 			'155' => 'západní Evropa',
  			'419' => 'Latinská Amerika',
  			'AC' => 'Ascension',
  			'AD' => 'Andorra',
@@ -1567,7 +1575,8 @@ has 'display_name_region' => (
  			'CW' => 'Curaçao',
  			'CX' => 'Vánoční ostrov',
  			'CY' => 'Kypr',
- 			'CZ' => 'Česká republika',
+ 			'CZ' => 'Česko',
+ 			'CZ@alt=variant' => 'Česká republika',
  			'DE' => 'Německo',
  			'DG' => 'Diego García',
  			'DJ' => 'Džibutsko',
@@ -1584,6 +1593,7 @@ has 'display_name_region' => (
  			'ES' => 'Španělsko',
  			'ET' => 'Etiopie',
  			'EU' => 'Evropská unie',
+ 			'EZ' => 'eurozóna',
  			'FI' => 'Finsko',
  			'FJ' => 'Fidži',
  			'FK' => 'Falklandské ostrovy',
@@ -1592,8 +1602,8 @@ has 'display_name_region' => (
  			'FO' => 'Faerské ostrovy',
  			'FR' => 'Francie',
  			'GA' => 'Gabon',
- 			'GB' => 'Velká Británie',
- 			'GB@alt=short' => 'VB',
+ 			'GB' => 'Spojené království',
+ 			'GB@alt=short' => 'GB',
  			'GD' => 'Grenada',
  			'GE' => 'Gruzie',
  			'GF' => 'Francouzská Guyana',
@@ -1709,7 +1719,7 @@ has 'display_name_region' => (
  			'PW' => 'Palau',
  			'PY' => 'Paraguay',
  			'QA' => 'Katar',
- 			'QO' => 'Vnější Oceánie',
+ 			'QO' => 'vnější Oceánie',
  			'RE' => 'Réunion',
  			'RO' => 'Rumunsko',
  			'RS' => 'Srbsko',
@@ -1756,6 +1766,8 @@ has 'display_name_region' => (
  			'UA' => 'Ukrajina',
  			'UG' => 'Uganda',
  			'UM' => 'Menší odlehlé ostrovy USA',
+ 			'UN' => 'Organizace spojených národů',
+ 			'UN@alt=short' => 'OSN',
  			'US' => 'Spojené státy',
  			'US@alt=short' => 'USA',
  			'UY' => 'Uruguay',
@@ -1775,7 +1787,7 @@ has 'display_name_region' => (
  			'ZA' => 'Jihoafrická republika',
  			'ZM' => 'Zambie',
  			'ZW' => 'Zimbabwe',
- 			'ZZ' => 'Neznámá oblast',
+ 			'ZZ' => 'neznámá oblast',
 
 		}
 	},
@@ -1802,11 +1814,11 @@ has 'display_name_key' => (
 	default		=> sub { 
 		{
 			'calendar' => 'Kalendář',
+ 			'cf' => 'Měnový formát',
  			'colalternate' => 'Ignorovat řazení symbolů',
  			'colbackwards' => 'Obrácené řazení akcentů',
  			'colcasefirst' => 'Řazení velkých a malých písmen',
  			'colcaselevel' => 'Rozlišovaní velkých a malých písmen při řazení',
- 			'colhiraganaquaternary' => 'Řazení podle slabičných písem (kana)',
  			'collation' => 'Řazení',
  			'colnormalization' => 'Normalizované řazení',
  			'colnumeric' => 'Číselné řazení',
@@ -1818,7 +1830,6 @@ has 'display_name_key' => (
  			'numbers' => 'Čísla',
  			'timezone' => 'Časové pásmo',
  			'va' => 'Varianta národního prostředí',
- 			'variabletop' => 'Řadit jako symboly',
  			'x' => 'Soukromé použití',
 
 		}
@@ -1841,12 +1852,17 @@ has 'display_name_type' => (
  				'gregorian' => q{Gregoriánský kalendář},
  				'hebrew' => q{Hebrejský kalendář},
  				'indian' => q{Indický národní kalendář},
- 				'islamic' => q{Muslimský kalendář},
+ 				'islamic' => q{Islámský kalendář},
  				'islamic-civil' => q{Muslimský občanský kalendář},
+ 				'islamic-umalqura' => q{Muslimský kalendář (Umm al-Qura)},
  				'iso8601' => q{Kalendář ISO-8601},
  				'japanese' => q{Japonský kalendář},
  				'persian' => q{Perský kalendář},
  				'roc' => q{Kalendář Čínské republiky},
+ 			},
+ 			'cf' => {
+ 				'account' => q{Účetní měnový formát},
+ 				'standard' => q{Standardní měnový formát},
  			},
  			'colalternate' => {
  				'non-ignorable' => q{Řadit symboly},
@@ -1865,17 +1881,14 @@ has 'display_name_type' => (
  				'no' => q{Nerozlišovat při řazení velká a malá písmena},
  				'yes' => q{Rozlišovat při řazení velká a malá písmena},
  			},
- 			'colhiraganaquaternary' => {
- 				'no' => q{Řadit slabičná písma (kana) samostatně},
- 				'yes' => q{Řadit jednotlivé typy slabičných písem (kana) různě},
- 			},
  			'collation' => {
  				'big5han' => q{Řazení pro tradiční čínštinu – Big5},
+ 				'compat' => q{Předchozí řazení, kompatibilita},
  				'dictionary' => q{Slovníkové řazení},
  				'ducet' => q{Výchozí řazení Unicode},
  				'eor' => q{Evropské řazení},
  				'gb2312han' => q{Řazení pro zjednodušenou čínštinu – GB2312},
- 				'phonebook' => q{Řazení jako v telefonním seznamu},
+ 				'phonebook' => q{Řazení telefonního seznamu},
  				'phonetic' => q{Fonetické řazení},
  				'pinyin' => q{Řazení podle pchin-jinu},
  				'reformed' => q{Reformované řazení},
@@ -1902,6 +1915,11 @@ has 'display_name_type' => (
  				'secondary' => q{Řadit akcenty},
  				'tertiary' => q{Řadit akcenty/velká a malá písmena/šířku},
  			},
+ 			'd0' => {
+ 				'fwidth' => q{Plná šířka},
+ 				'hwidth' => q{Poloviční šířka},
+ 				'npinyin' => q{Numerický},
+ 			},
  			'hc' => {
  				'h11' => q{12hodinový systém (0–11)},
  				'h12' => q{12hodinový systém (1–12)},
@@ -1912,6 +1930,10 @@ has 'display_name_type' => (
  				'loose' => q{Volný styl zalamování řádků},
  				'normal' => q{Běžný styl zalamování řádků},
  				'strict' => q{Striktní styl zalamování řádků},
+ 			},
+ 			'm0' => {
+ 				'bgn' => q{Transliterace podle BGN},
+ 				'ungegn' => q{Transliterace podle UNGEGN},
  			},
  			'ms' => {
  				'metric' => q{Metrická soustava},
@@ -1984,27 +2006,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_transform_name' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { 
-		{
-			'bgn' => 'BGN',
- 			'numeric' => 'Numerický',
- 			'tone' => 'Tón',
- 			'ungegn' => 'UNGEGN',
- 			'x-accents' => 'Přízvuky',
- 			'x-fullwidth' => 'Plná šířka',
- 			'x-halfwidth' => 'Poloviční šířka',
- 			'x-jamo' => 'Jamo',
- 			'x-pinyin' => 'Pchin-jin',
- 			'x-publishing' => 'Publikování',
-
-		}
-	},
-);
-
 has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -2028,10 +2029,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{(?^u:[à ă â å ä ã ā æ ç è ĕ ê ë ē ì ĭ î ï ī ľ ł ñ ò ŏ ô ö ø ō œ ŕ ù ŭ û ü ū ÿ])},
+			auxiliary => qr{[à ă â å ä ã ā æ ç è ĕ ê ë ē ì ĭ î ï ī ľ ł ñ ò ŏ ô ö ø ō œ ŕ ù ŭ û ü ū ÿ]},
 			index => ['A', 'B', 'C', 'Č', 'D', 'E', 'F', 'G', 'H', '{CH}', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'Ř', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{(?^u:[a á b c č d ď e é ě f g h {ch} i í j k l m n ň o ó p q r ř s š t ť u ú ů v w x y ý z ž])},
-			punctuation => qr{(?^u:[\- ‐ – , ; \: ! ? . … ‘ ‚ “ „ ( ) \[ \] § @ * / \&])},
+			main => qr{[a á b c č d ď e é ě f g h {ch} i í j k l m n ň o ó p q r ř s š t ť u ú ů v w x y ý z ž]},
+			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ – , ; \: ! ? . … ‘ ‚ “ „ ( ) \[ \] § @ * / \&]},
 		};
 	},
 EOT
@@ -2368,10 +2370,18 @@ has 'units' => (
 					'gallon' => {
 						'few' => q({0} galony),
 						'many' => q({0} galonu),
-						'name' => q(galon),
+						'name' => q(galony),
 						'one' => q({0} galon),
 						'other' => q({0} galonů),
 						'per' => q({0} na galon),
+					},
+					'gallon-imperial' => {
+						'few' => q({0} imp. galony),
+						'many' => q({0} imp. galonu),
+						'name' => q(imp. galony),
+						'one' => q({0} imp. galon),
+						'other' => q({0} imp. galonů),
+						'per' => q({0} na imp. galon),
 					},
 					'generic' => {
 						'few' => q({0} stupně),
@@ -2709,6 +2719,13 @@ has 'units' => (
 						'one' => q({0} míle na galon),
 						'other' => q({0} mil na galon),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} míle na imp. galon),
+						'many' => q({0} míle na imp. galon),
+						'name' => q(míle na imp. galon),
+						'one' => q({0} míle na imp. galon),
+						'other' => q({0} mil na imp. galon),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} míle za hodinu),
 						'many' => q({0} míle za hodinu),
@@ -2744,6 +2761,13 @@ has 'units' => (
 						'one' => q({0} miligram),
 						'other' => q({0} miligramů),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} miligramy na decilitr),
+						'many' => q({0} miligramu na decilitr),
+						'name' => q(miligramy na decilitr),
+						'one' => q({0} miligram na decilitr),
+						'other' => q({0} miligramů na decilitr),
+					},
 					'milliliter' => {
 						'few' => q({0} mililitry),
 						'many' => q({0} mililitru),
@@ -2764,6 +2788,13 @@ has 'units' => (
 						'name' => q(milimetry rtuti),
 						'one' => q({0} milimetr rtuti),
 						'other' => q({0} milimetrů rtuti),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} milimoly na litr),
+						'many' => q({0} milimolu na litr),
+						'name' => q(milimoly na litr),
+						'one' => q({0} milimol na litr),
+						'other' => q({0} milimolů na litr),
 					},
 					'millisecond' => {
 						'few' => q({0} milisekundy),
@@ -2845,6 +2876,13 @@ has 'units' => (
 						'one' => q({0} parsek),
 						'other' => q({0} parseků),
 					},
+					'part-per-million' => {
+						'few' => q({0} díly z milionu),
+						'many' => q({0} dílu z milionu),
+						'name' => q(díly z milionu),
+						'one' => q({0} díl z milionu),
+						'other' => q({0} dílů z milionu),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -2868,6 +2906,13 @@ has 'units' => (
 						'name' => q(metrické pinty),
 						'one' => q({0} metrická pinta),
 						'other' => q({0} metrických pint),
+					},
+					'point' => {
+						'few' => q({0} body),
+						'many' => q({0} bodu),
+						'name' => q(body),
+						'one' => q({0} bod),
+						'other' => q({0} bodů),
 					},
 					'pound' => {
 						'few' => q({0} libry),
@@ -2942,6 +2987,7 @@ has 'units' => (
 						'name' => q(kilometry čtvereční),
 						'one' => q({0} kilometr čtvereční),
 						'other' => q({0} kilometrů čtverečních),
+						'per' => q({0} na kilometr čtvereční),
 					},
 					'square-meter' => {
 						'few' => q({0} metry čtvereční),
@@ -2957,6 +3003,7 @@ has 'units' => (
 						'name' => q(míle čtvereční),
 						'one' => q({0} míle čtvereční),
 						'other' => q({0} mil čtverečních),
+						'per' => q({0} na míli čtvereční),
 					},
 					'square-yard' => {
 						'few' => q({0} yardy čtvereční),
@@ -3056,6 +3103,7 @@ has 'units' => (
 					'acre-foot' => {
 						'few' => q({0} ac ft),
 						'many' => q({0} ac ft),
+						'name' => q(ac ft),
 						'one' => q({0} ac ft),
 						'other' => q({0} ac ft),
 					},
@@ -3142,6 +3190,14 @@ has 'units' => (
 						'name' => q(cm),
 						'one' => q({0} cm),
 						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					'century' => {
+						'few' => q({0} stol.),
+						'many' => q({0} stol.),
+						'name' => q(stol.),
+						'one' => q({0} stol.),
+						'other' => q({0} stol.),
 					},
 					'coordinate' => {
 						'east' => q({0}E),
@@ -3220,6 +3276,7 @@ has 'units' => (
 						'name' => q(d),
 						'one' => q({0} d),
 						'other' => q({0} d),
+						'per' => q({0}/d),
 					},
 					'deciliter' => {
 						'few' => q({0} dl),
@@ -3276,6 +3333,7 @@ has 'units' => (
 						'name' => q(ft),
 						'one' => q({0}′),
 						'other' => q({0}′),
+						'per' => q({0}/ft),
 					},
 					'furlong' => {
 						'few' => q({0} fur),
@@ -3298,6 +3356,16 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'name' => q(gal Imp.),
+					},
+					'generic' => {
+						'few' => q({0}°),
+						'many' => q({0}°),
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
 					},
 					'gigabit' => {
 						'few' => q({0} Gb),
@@ -3333,6 +3401,7 @@ has 'units' => (
 						'name' => q(g),
 						'one' => q({0} g),
 						'other' => q({0} g),
+						'per' => q({0}/g),
 					},
 					'hectare' => {
 						'few' => q({0} ha),
@@ -3383,6 +3452,7 @@ has 'units' => (
 						'name' => q(in),
 						'one' => q({0}″),
 						'other' => q({0}″),
+						'per' => q({0}/in),
 					},
 					'inch-hg' => {
 						'few' => q({0} inHg),
@@ -3439,6 +3509,7 @@ has 'units' => (
 						'name' => q(kg),
 						'one' => q({0} kg),
 						'other' => q({0} kg),
+						'per' => q({0}/kg),
 					},
 					'kilohertz' => {
 						'few' => q({0} kHz),
@@ -3460,6 +3531,7 @@ has 'units' => (
 						'name' => q(km),
 						'one' => q({0} km),
 						'other' => q({0} km),
+						'per' => q({0}/km),
 					},
 					'kilometer-per-hour' => {
 						'few' => q({0} km/h),
@@ -3566,6 +3638,7 @@ has 'units' => (
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
+						'per' => q({0}/m),
 					},
 					'meter-per-second' => {
 						'few' => q({0} m/s),
@@ -3623,12 +3696,22 @@ has 'units' => (
 						'one' => q({0} mpg),
 						'other' => q({0} mpg),
 					},
+					'mile-per-gallon-imperial' => {
+						'name' => q(mpg Imp.),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} mi/h),
 						'many' => q({0} mi/h),
 						'name' => q(mi/h),
 						'one' => q({0} mi/h),
 						'other' => q({0} mi/h),
+					},
+					'mile-scandinavian' => {
+						'few' => q({0} smi),
+						'many' => q({0} smi),
+						'name' => q(smi),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
 					},
 					'milliampere' => {
 						'few' => q({0} mA),
@@ -3651,6 +3734,13 @@ has 'units' => (
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mg/dl),
+						'many' => q({0} mg/dl),
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
 					'milliliter' => {
 						'few' => q({0} ml),
 						'many' => q({0} ml),
@@ -3672,6 +3762,13 @@ has 'units' => (
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
 					},
+					'millimole-per-liter' => {
+						'few' => q({0} mmol/l),
+						'many' => q({0} mmol/l),
+						'name' => q(mmol/l),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
+					},
 					'millisecond' => {
 						'few' => q({0} ms),
 						'many' => q({0} ms),
@@ -3692,6 +3789,7 @@ has 'units' => (
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
+						'per' => q({0}/m),
 					},
 					'month' => {
 						'few' => q({0} m),
@@ -3699,6 +3797,7 @@ has 'units' => (
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
+						'per' => q({0}/měs.),
 					},
 					'nanometer' => {
 						'few' => q({0} nm),
@@ -3734,6 +3833,7 @@ has 'units' => (
 						'name' => q(oz),
 						'one' => q({0} oz),
 						'other' => q({0} oz),
+						'per' => q({0}/oz),
 					},
 					'ounce-troy' => {
 						'few' => q({0} oz t),
@@ -3748,6 +3848,13 @@ has 'units' => (
 						'name' => q(pc),
 						'one' => q({0} pc),
 						'other' => q({0} pc),
+					},
+					'part-per-million' => {
+						'few' => q({0} ppm),
+						'many' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
 					},
 					'per' => {
 						'1' => q({0}/{1}),
@@ -3773,12 +3880,20 @@ has 'units' => (
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
 					},
+					'point' => {
+						'few' => q({0} pt),
+						'many' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+					},
 					'pound' => {
 						'few' => q({0} lb),
 						'many' => q({0} lb),
 						'name' => q(lb),
 						'one' => q({0} lb),
 						'other' => q({0} lb),
+						'per' => q({0}/lb),
 					},
 					'pound-per-square-inch' => {
 						'few' => q({0} psi),
@@ -3801,6 +3916,13 @@ has 'units' => (
 						'one' => q({0} rad),
 						'other' => q({0} rad),
 					},
+					'revolution' => {
+						'few' => q({0} ot.),
+						'many' => q({0} ot.),
+						'name' => q(ot.),
+						'one' => q({0} ot.),
+						'other' => q({0} ot.),
+					},
 					'second' => {
 						'few' => q({0} s),
 						'many' => q({0} s),
@@ -3815,6 +3937,7 @@ has 'units' => (
 						'name' => q(cm²),
 						'one' => q({0} cm²),
 						'other' => q({0} cm²),
+						'per' => q({0}/cm²),
 					},
 					'square-foot' => {
 						'few' => q({0} ft²),
@@ -3829,6 +3952,7 @@ has 'units' => (
 						'name' => q(in²),
 						'one' => q({0} in²),
 						'other' => q({0} in²),
+						'per' => q({0}/in²),
 					},
 					'square-kilometer' => {
 						'few' => q({0} km²),
@@ -3836,6 +3960,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'few' => q({0} m²),
@@ -3843,6 +3968,7 @@ has 'units' => (
 						'name' => q(m²),
 						'one' => q({0} m²),
 						'other' => q({0} m²),
+						'per' => q({0}/m²),
 					},
 					'square-mile' => {
 						'few' => q({0} mi²),
@@ -3850,6 +3976,7 @@ has 'units' => (
 						'name' => q(mi²),
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'few' => q({0} yd²),
@@ -3920,6 +4047,7 @@ has 'units' => (
 						'name' => q(t),
 						'one' => q({0} t),
 						'other' => q({0} t),
+						'per' => q({0}/týd.),
 					},
 					'yard' => {
 						'few' => q({0} yd),
@@ -3934,6 +4062,7 @@ has 'units' => (
 						'name' => q(r),
 						'one' => q({0} r),
 						'other' => q({0} r),
+						'per' => q({0}/r),
 					},
 				},
 				'short' => {
@@ -4200,6 +4329,14 @@ has 'units' => (
 						'one' => q({0} gal),
 						'other' => q({0} gal),
 						'per' => q({0}/gal),
+					},
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'many' => q({0} gal Imp.),
+						'name' => q(gal Imp.),
+						'one' => q({0} gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
 					},
 					'generic' => {
 						'few' => q({0}°),
@@ -4537,6 +4674,13 @@ has 'units' => (
 						'one' => q({0} mpg),
 						'other' => q({0} mpg),
 					},
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mpg Imp.),
+						'many' => q({0} mpg Imp.),
+						'name' => q(mpg Imp.),
+						'one' => q({0} mpg Imp.),
+						'other' => q({0} mpg Imp.),
+					},
 					'mile-per-hour' => {
 						'few' => q({0} mi/h),
 						'many' => q({0} mi/h),
@@ -4572,6 +4716,13 @@ has 'units' => (
 						'one' => q({0} mg),
 						'other' => q({0} mg),
 					},
+					'milligram-per-deciliter' => {
+						'few' => q({0} mg/dl),
+						'many' => q({0} mg/dl),
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
 					'milliliter' => {
 						'few' => q({0} ml),
 						'many' => q({0} ml),
@@ -4592,6 +4743,13 @@ has 'units' => (
 						'name' => q(mm Hg),
 						'one' => q({0} mm Hg),
 						'other' => q({0} mm Hg),
+					},
+					'millimole-per-liter' => {
+						'few' => q({0} mmol/l),
+						'many' => q({0} mmol/l),
+						'name' => q(mmol/l),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
 					},
 					'millisecond' => {
 						'few' => q({0} ms),
@@ -4673,6 +4831,13 @@ has 'units' => (
 						'one' => q({0} pc),
 						'other' => q({0} pc),
 					},
+					'part-per-million' => {
+						'few' => q({0} ppm),
+						'many' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
 					'per' => {
 						'1' => q({0}/{1}),
 					},
@@ -4696,6 +4861,13 @@ has 'units' => (
 						'name' => q(mpt),
 						'one' => q({0} mpt),
 						'other' => q({0} mpt),
+					},
+					'point' => {
+						'few' => q({0} pt),
+						'many' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
 					},
 					'pound' => {
 						'few' => q({0} lb),
@@ -4770,6 +4942,7 @@ has 'units' => (
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
+						'per' => q({0}/km²),
 					},
 					'square-meter' => {
 						'few' => q({0} m²),
@@ -4785,6 +4958,7 @@ has 'units' => (
 						'name' => q(mi²),
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
 					},
 					'square-yard' => {
 						'few' => q({0} yd²),
@@ -4929,6 +5103,85 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'arab' => {
+			'decimal' => q(٫),
+			'exponential' => q(اس),
+			'group' => q(٬),
+			'infinity' => q(∞),
+			'list' => q(؛),
+			'minusSign' => q(؜-),
+			'nan' => q(NaN),
+			'perMille' => q(؉),
+			'percentSign' => q(٪؜),
+			'plusSign' => q(؜+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'arabext' => {
+			'timeSeparator' => q(٫),
+		},
+		'bali' => {
+			'timeSeparator' => q(:),
+		},
+		'beng' => {
+			'timeSeparator' => q(:),
+		},
+		'brah' => {
+			'timeSeparator' => q(:),
+		},
+		'cakm' => {
+			'timeSeparator' => q(:),
+		},
+		'cham' => {
+			'timeSeparator' => q(:),
+		},
+		'deva' => {
+			'timeSeparator' => q(:),
+		},
+		'fullwide' => {
+			'timeSeparator' => q(:),
+		},
+		'gonm' => {
+			'timeSeparator' => q(:),
+		},
+		'gujr' => {
+			'timeSeparator' => q(:),
+		},
+		'guru' => {
+			'timeSeparator' => q(:),
+		},
+		'hanidec' => {
+			'timeSeparator' => q(:),
+		},
+		'java' => {
+			'timeSeparator' => q(:),
+		},
+		'kali' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'infinity' => q(∞),
+			'list' => q(;),
+			'minusSign' => q(-),
+			'nan' => q(NaN),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'khmr' => {
+			'timeSeparator' => q(:),
+		},
+		'knda' => {
+			'timeSeparator' => q(:),
+		},
+		'lana' => {
+			'timeSeparator' => q(:),
+		},
+		'lanatham' => {
+			'timeSeparator' => q(:),
+		},
+		'laoo' => {
 			'timeSeparator' => q(:),
 		},
 		'latn' => {
@@ -4943,6 +5196,72 @@ has 'number_symbols' => (
 			'percentSign' => q(%),
 			'plusSign' => q(+),
 			'superscriptingExponent' => q(×),
+			'timeSeparator' => q(:),
+		},
+		'lepc' => {
+			'timeSeparator' => q(:),
+		},
+		'limb' => {
+			'timeSeparator' => q(:),
+		},
+		'mlym' => {
+			'timeSeparator' => q(:),
+		},
+		'mong' => {
+			'timeSeparator' => q(:),
+		},
+		'mtei' => {
+			'timeSeparator' => q(:),
+		},
+		'mymr' => {
+			'timeSeparator' => q(:),
+		},
+		'mymrshan' => {
+			'timeSeparator' => q(:),
+		},
+		'nkoo' => {
+			'timeSeparator' => q(:),
+		},
+		'olck' => {
+			'timeSeparator' => q(:),
+		},
+		'orya' => {
+			'timeSeparator' => q(:),
+		},
+		'osma' => {
+			'timeSeparator' => q(:),
+		},
+		'saur' => {
+			'timeSeparator' => q(:),
+		},
+		'shrd' => {
+			'timeSeparator' => q(:),
+		},
+		'sora' => {
+			'timeSeparator' => q(:),
+		},
+		'sund' => {
+			'timeSeparator' => q(:),
+		},
+		'takr' => {
+			'timeSeparator' => q(:),
+		},
+		'talu' => {
+			'timeSeparator' => q(:),
+		},
+		'tamldec' => {
+			'timeSeparator' => q(:),
+		},
+		'telu' => {
+			'timeSeparator' => q(:),
+		},
+		'thai' => {
+			'timeSeparator' => q(:),
+		},
+		'tibt' => {
+			'timeSeparator' => q(:),
+		},
+		'vaii' => {
 			'timeSeparator' => q(:),
 		},
 	} }
@@ -5028,7 +5347,7 @@ has 'number_formats' => (
 					'other' => '000 bil'.'',
 				},
 				'standard' => {
-					'' => '#,##0.###',
+					'default' => '#,##0.###',
 				},
 			},
 			'long' => {
@@ -5183,14 +5502,14 @@ has 'number_formats' => (
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#,##0 %',
+					'default' => '#,##0 %',
 				},
 			},
 		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
-					'' => '#E0',
+					'default' => '#E0',
 				},
 			},
 		},
@@ -5525,20 +5844,31 @@ has 'currencies' => (
 		'BGL' => {
 			symbol => 'BGL',
 			display_name => {
-				'currency' => q(BGL),
+				'currency' => q(bulharský tvrdý leva),
+				'few' => q(bulharské tvrdé leva),
+				'many' => q(bulharského tvrdého leva),
+				'one' => q(bulharský tvrdý leva),
+				'other' => q(bulharských tvrdých leva),
 			},
 		},
 		'BGM' => {
 			symbol => 'BGM',
+			display_name => {
+				'currency' => q(bulharský socialistický leva),
+				'few' => q(bulharské socialistické leva),
+				'many' => q(bulharského socialistického leva),
+				'one' => q(bulharský socialistický leva),
+				'other' => q(bulharských socialistických leva),
+			},
 		},
 		'BGN' => {
 			symbol => 'BGN',
 			display_name => {
-				'currency' => q(bulharský lev),
-				'few' => q(bulharské lvy),
-				'many' => q(bulharského lva),
-				'one' => q(bulharský lev),
-				'other' => q(bulharských lvů),
+				'currency' => q(bulharský leva),
+				'few' => q(bulharské leva),
+				'many' => q(bulharského leva),
+				'one' => q(bulharský leva),
+				'other' => q(bulharských leva),
 			},
 		},
 		'BGO' => {
@@ -5751,14 +6081,24 @@ has 'currencies' => (
 				'other' => q(běloruských rublů \(1994–1999\)),
 			},
 		},
-		'BYR' => {
-			symbol => 'BYR',
+		'BYN' => {
+			symbol => 'BYN',
 			display_name => {
 				'currency' => q(běloruský rubl),
 				'few' => q(běloruské rubly),
 				'many' => q(běloruského rublu),
 				'one' => q(běloruský rubl),
 				'other' => q(běloruských rublů),
+			},
+		},
+		'BYR' => {
+			symbol => 'BYR',
+			display_name => {
+				'currency' => q(běloruský rubl \(2000–2016\)),
+				'few' => q(běloruské rubly \(2000–2016\)),
+				'many' => q(běloruského rublu \(2000–2016\)),
+				'one' => q(běloruský rubl \(2000–2016\)),
+				'other' => q(běloruských rublů \(2000–2016\)),
 			},
 		},
 		'BZD' => {
@@ -5849,6 +6189,26 @@ has 'currencies' => (
 				'many' => q(chilského pesa),
 				'one' => q(chilské peso),
 				'other' => q(chilských pes),
+			},
+		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(čínský jüan \(offshore\)),
+				'few' => q(čínské jüany \(offshore\)),
+				'many' => q(čínského jüanu \(offshore\)),
+				'one' => q(čínský jüan \(offshore\)),
+				'other' => q(čínských jüanů \(offshore\)),
+			},
+		},
+		'CNX' => {
+			symbol => 'CNX',
+			display_name => {
+				'currency' => q(čínský dolar ČLB),
+				'few' => q(čínské dolary ČLB),
+				'many' => q(čínského dolaru ČLB),
+				'one' => q(čínský dolar ČLB),
+				'other' => q(čínských dolarů ČLB),
 			},
 		},
 		'CNY' => {
@@ -7134,11 +7494,11 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(peruánský nový sol),
-				'few' => q(peruánské nové soly),
-				'many' => q(peruánského nového solu),
-				'one' => q(peruánský nový sol),
-				'other' => q(peruánských nových solů),
+				'currency' => q(peruánský sol),
+				'few' => q(peruánské soly),
+				'many' => q(peruánského solu),
+				'one' => q(peruánský sol),
+				'other' => q(peruánských solů),
 			},
 		},
 		'PES' => {
@@ -7254,10 +7614,10 @@ has 'currencies' => (
 		'RON' => {
 			symbol => 'RON',
 			display_name => {
-				'currency' => q(rumunské leu),
+				'currency' => q(rumunský leu),
 				'few' => q(rumunské lei),
 				'many' => q(rumunského leu),
-				'one' => q(rumunské leu),
+				'one' => q(rumunský leu),
 				'other' => q(rumunských lei),
 			},
 		},
@@ -7971,6 +8331,10 @@ has 'currencies' => (
 			symbol => 'XRE',
 			display_name => {
 				'currency' => q(kód fondů RINET),
+				'few' => q(kód fondů RINET),
+				'many' => q(kód fondů RINET),
+				'one' => q(kód fondů RINET),
+				'other' => q(kód fondů RINET),
 			},
 		},
 		'XSU' => {
@@ -8211,6 +8575,26 @@ has 'calendar_months' => (
 			},
 			'coptic' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hatour',
+							'kiahk',
+							'touba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8231,8 +8615,48 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hatour',
+							'kiahk',
+							'touba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hatour',
+							'kiahk',
+							'touba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8248,6 +8672,146 @@ has 'calendar_months' => (
 							'11',
 							'12',
 							'13'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'tout',
+							'baba',
+							'hatour',
+							'kiahk',
+							'touba',
+							'amshir',
+							'baramhat',
+							'baramouda',
+							'bashans',
+							'ba’ouna',
+							'abib',
+							'mesra',
+							'nasie'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+			'dangi' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'M01',
+							'M02',
+							'M03',
+							'M04',
+							'M05',
+							'M06',
+							'M07',
+							'M08',
+							'M09',
+							'M10',
+							'M11',
+							'M12'
+						],
+						leap => [
+							
+						],
+					},
+					narrow => {
+						nonleap => [
+							'1',
+							'2',
+							'3',
+							'4',
+							'5',
+							'6',
+							'7',
+							'8',
+							'9',
+							'10',
+							'11',
+							'12'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'První měsíc',
+							'Druhý měsíc',
+							'Třetí měsíc',
+							'Čtvrtý měsíc',
+							'Pátý měsíc',
+							'Šestý měsíc',
+							'Sedmý měsíc',
+							'Osmý měsíc',
+							'Devátý měsíc',
+							'Desátý měsíc',
+							'Jedenáctý měsíc',
+							'Dvanáctý měsíc'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'M01',
+							'M02',
+							'M03',
+							'M04',
+							'M05',
+							'M06',
+							'M07',
+							'M08',
+							'M09',
+							'M10',
+							'M11',
+							'M12'
+						],
+						leap => [
+							
+						],
+					},
+					narrow => {
+						nonleap => [
+							'1',
+							'2',
+							'3',
+							'4',
+							'5',
+							'6',
+							'7',
+							'8',
+							'9',
+							'10',
+							'11',
+							'12'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'První měsíc',
+							'Druhý měsíc',
+							'Třetí měsíc',
+							'Čtvrtý měsíc',
+							'Pátý měsíc',
+							'Šestý měsíc',
+							'Sedmý měsíc',
+							'Osmý měsíc',
+							'Devátý měsíc',
+							'Desátý měsíc',
+							'Jedenáctý měsíc',
+							'Dvanáctý měsíc'
 						],
 						leap => [
 							
@@ -8257,6 +8821,26 @@ has 'calendar_months' => (
 			},
 			'ethiopic' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8277,8 +8861,48 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8294,6 +8918,26 @@ has 'calendar_months' => (
 							'11',
 							'12',
 							'13'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'meskerem',
+							'tikemet',
+							'hidar',
+							'tahesas',
+							'tir',
+							'yekatit',
+							'megabit',
+							'miyaza',
+							'ginbot',
+							'sene',
+							'hamle',
+							'nehase',
+							'pagume'
 						],
 						leap => [
 							
@@ -8423,6 +9067,32 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8449,8 +9119,60 @@ has 'calendar_months' => (
 							'7'
 						],
 					},
+					wide => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8475,12 +9197,57 @@ has 'calendar_months' => (
 							'',
 							'',
 							'7'
+						],
+					},
+					wide => {
+						nonleap => [
+							'tišri',
+							'chešvan',
+							'kislev',
+							'tevet',
+							'ševat',
+							'adar I',
+							'adar',
+							'nisan',
+							'ijar',
+							'sivan',
+							'tamuz',
+							'av',
+							'elul'
+						],
+						leap => [
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'adar II'
 						],
 					},
 				},
 			},
 			'indian' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8500,8 +9267,46 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8516,6 +9321,25 @@ has 'calendar_months' => (
 							'10',
 							'11',
 							'12'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'čaitra',
+							'vaišákh',
+							'džjéšth',
+							'ášádh',
+							'šrávana',
+							'bhádrapad',
+							'ášvin',
+							'kártik',
+							'agrahajana',
+							'pauš',
+							'mágh',
+							'phálgun'
 						],
 						leap => [
 							
@@ -8525,6 +9349,25 @@ has 'calendar_months' => (
 			},
 			'islamic' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'muh.',
+							'saf.',
+							'reb. I',
+							'reb. II',
+							'džum. I',
+							'džum. II',
+							'red.',
+							'ša.',
+							'ram.',
+							'šaw.',
+							'zú l-k.',
+							'zú l-h.'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8544,8 +9387,46 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'muharrem',
+							'safar',
+							'rebí’u l-awwal',
+							'rebí’u s-sání',
+							'džumádá al-úlá',
+							'džumádá al-áchira',
+							'redžeb',
+							'ša’bán',
+							'ramadán',
+							'šawwal',
+							'zú l-ka’da',
+							'zú l-hidždža'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'muh.',
+							'saf.',
+							'reb. I',
+							'reb. II',
+							'džum. I',
+							'džum. II',
+							'red.',
+							'ša.',
+							'ram.',
+							'šaw.',
+							'zú l-k.',
+							'zú l-h.'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8560,6 +9441,25 @@ has 'calendar_months' => (
 							'10',
 							'11',
 							'12'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'muharrem',
+							'safar',
+							'rebí’u l-awwal',
+							'rebí’u s-sání',
+							'džumádá al-úlá',
+							'džumádá al-áchira',
+							'redžeb',
+							'ša’bán',
+							'ramadán',
+							'šawwal',
+							'zú l-ka’da',
+							'zú l-hidždža'
 						],
 						leap => [
 							
@@ -8569,6 +9469,25 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8588,8 +9507,46 @@ has 'calendar_months' => (
 							
 						],
 					},
+					wide => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'1',
@@ -8604,6 +9561,25 @@ has 'calendar_months' => (
 							'10',
 							'11',
 							'12'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'farvardin',
+							'ordibehešt',
+							'chordád',
+							'tír',
+							'mordád',
+							'šahrívar',
+							'mehr',
+							'ábán',
+							'ázar',
+							'dei',
+							'bahman',
+							'esfand'
 						],
 						leap => [
 							
@@ -8754,351 +9730,380 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'japanese') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
+			if ($_ eq 'dangi') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'roc') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
 					return 'morning1' if $time >= 400
 						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'chinese') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-				}
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'night1' if $time >= 2200;
 					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'roc') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'hebrew') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'indian') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'selection') {
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
 				}
 				last SWITCH;
 				}
@@ -9118,73 +10123,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'midnight' => q{půl.},
-					'night1' => q{n.},
-					'noon' => q{pol.},
-					'morning1' => q{r.},
-					'morning2' => q{d.},
-					'pm' => q{odp.},
-					'am' => q{dop.},
-					'evening1' => q{v.},
-					'afternoon1' => q{o.},
-				},
-				'wide' => {
-					'noon' => q{poledne},
-					'night1' => q{v noci},
-					'morning1' => q{ráno},
-					'midnight' => q{půlnoc},
-					'morning2' => q{dopoledne},
-					'afternoon1' => q{odpoledne},
-					'evening1' => q{večer},
-					'pm' => q{odp.},
-					'am' => q{dop.},
-				},
 				'abbreviated' => {
-					'pm' => q{odp.},
-					'am' => q{dop.},
-					'afternoon1' => q{odp.},
-					'evening1' => q{več.},
-					'morning1' => q{r.},
 					'night1' => q{v n.},
 					'noon' => q{pol.},
+					'morning1' => q{r.},
+					'afternoon1' => q{odp.},
+					'pm' => q{odp.},
 					'midnight' => q{půln.},
+					'evening1' => q{več.},
+					'am' => q{dop.},
 					'morning2' => q{dop.},
+				},
+				'wide' => {
+					'am' => q{dop.},
+					'evening1' => q{večer},
+					'morning2' => q{dopoledne},
+					'night1' => q{v noci},
+					'noon' => q{poledne},
+					'morning1' => q{ráno},
+					'afternoon1' => q{odpoledne},
+					'pm' => q{odp.},
+					'midnight' => q{půlnoc},
+				},
+				'narrow' => {
+					'morning1' => q{r.},
+					'afternoon1' => q{o.},
+					'night1' => q{n.},
+					'noon' => q{pol.},
+					'pm' => q{odp.},
+					'midnight' => q{půl.},
+					'morning2' => q{d.},
+					'am' => q{dop.},
+					'evening1' => q{v.},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'afternoon1' => q{odpoledne},
-					'evening1' => q{večer},
 					'am' => q{dop.},
-					'pm' => q{odp.},
 					'morning2' => q{dopoledne},
+					'evening1' => q{večer},
+					'afternoon1' => q{odpoledne},
 					'morning1' => q{ráno},
 					'night1' => q{noc},
 					'noon' => q{poledne},
 					'midnight' => q{půlnoc},
+					'pm' => q{odp.},
 				},
 				'narrow' => {
-					'noon' => q{pol.},
-					'night1' => q{noc},
-					'morning1' => q{ráno},
-					'midnight' => q{půl.},
-					'morning2' => q{dop.},
-					'afternoon1' => q{odp.},
 					'evening1' => q{več.},
-					'pm' => q{odp.},
 					'am' => q{dop.},
+					'morning2' => q{dop.},
+					'midnight' => q{půl.},
+					'pm' => q{odp.},
+					'night1' => q{noc},
+					'noon' => q{pol.},
+					'morning1' => q{ráno},
+					'afternoon1' => q{odp.},
 				},
 				'abbreviated' => {
-					'afternoon1' => q{odpoledne},
 					'evening1' => q{večer},
-					'pm' => q{odp.},
 					'am' => q{dop.},
-					'night1' => q{noc},
-					'noon' => q{poledne},
-					'morning1' => q{ráno},
-					'midnight' => q{půlnoc},
 					'morning2' => q{dopoledne},
+					'midnight' => q{půlnoc},
+					'pm' => q{odp.},
+					'noon' => q{poledne},
+					'night1' => q{noc},
+					'morning1' => q{ráno},
+					'afternoon1' => q{odpoledne},
 				},
 			},
 		},
@@ -9200,12 +10205,44 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'BE'
 			},
+			narrow => {
+				'0' => 'BE'
+			},
+			wide => {
+				'0' => 'BE'
+			},
 		},
 		'chinese' => {
 		},
 		'coptic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+		},
+		'dangi' => {
 		},
 		'ethiopic' => {
+			abbreviated => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			narrow => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
+			wide => {
+				'0' => 'ERA0',
+				'1' => 'ERA1'
+			},
 		},
 		'generic' => {
 		},
@@ -9219,32 +10256,782 @@ has 'eras' => (
 				'1' => 'n.l.'
 			},
 			wide => {
-				'0' => 'př. n. l.',
-				'1' => 'n. l.'
+				'0' => 'před naším letopočtem',
+				'1' => 'našeho letopočtu'
 			},
 		},
 		'hebrew' => {
 			abbreviated => {
 				'0' => 'AM'
 			},
+			narrow => {
+				'0' => 'AM'
+			},
+			wide => {
+				'0' => 'AM'
+			},
 		},
 		'indian' => {
+			abbreviated => {
+				'0' => 'Šaka'
+			},
+			narrow => {
+				'0' => 'Šaka'
+			},
+			wide => {
+				'0' => 'Šaka'
+			},
 		},
 		'islamic' => {
 			abbreviated => {
 				'0' => 'AH'
 			},
+			narrow => {
+				'0' => 'AH'
+			},
+			wide => {
+				'0' => 'AH'
+			},
 		},
 		'japanese' => {
+			abbreviated => {
+				'0' => 'Taika (645–650)',
+				'1' => 'Hakuchi (650–671)',
+				'2' => 'Hakuhō (672–686)',
+				'3' => 'Shuchō (686–701)',
+				'4' => 'Taihō (701–704)',
+				'5' => 'Keiun (704–708)',
+				'6' => 'Wadō (708–715)',
+				'7' => 'Reiki (715–717)',
+				'8' => 'Yōrō (717–724)',
+				'9' => 'Jinki (724–729)',
+				'10' => 'Tenpyō (729–749)',
+				'11' => 'Tenpyō-kampō (749-749)',
+				'12' => 'Tenpyō-shōhō (749-757)',
+				'13' => 'Tenpyō-hōji (757-765)',
+				'14' => 'Tenpyō-jingo (765-767)',
+				'15' => 'Jingo-keiun (767-770)',
+				'16' => 'Hōki (770–780)',
+				'17' => 'Ten-ō (781-782)',
+				'18' => 'Enryaku (782–806)',
+				'19' => 'Daidō (806–810)',
+				'20' => 'Kōnin (810–824)',
+				'21' => 'Tenchō (824–834)',
+				'22' => 'Jōwa (834–848)',
+				'23' => 'Kajō (848–851)',
+				'24' => 'Ninju (851–854)',
+				'25' => 'Saikō (854–857)',
+				'26' => 'Ten-an (857-859)',
+				'27' => 'Jōgan (859–877)',
+				'28' => 'Gangyō (877–885)',
+				'29' => 'Ninna (885–889)',
+				'30' => 'Kanpyō (889–898)',
+				'31' => 'Shōtai (898–901)',
+				'32' => 'Engi (901–923)',
+				'33' => 'Enchō (923–931)',
+				'34' => 'Jōhei (931–938)',
+				'35' => 'Tengyō (938–947)',
+				'36' => 'Tenryaku (947–957)',
+				'37' => 'Tentoku (957–961)',
+				'38' => 'Ōwa (961–964)',
+				'39' => 'Kōhō (964–968)',
+				'40' => 'Anna (968–970)',
+				'41' => 'Tenroku (970–973)',
+				'42' => 'Ten’en (973–976)',
+				'43' => 'Jōgen (976–978)',
+				'44' => 'Tengen (978–983)',
+				'45' => 'Eikan (983–985)',
+				'46' => 'Kanna (985–987)',
+				'47' => 'Eien (987–989)',
+				'48' => 'Eiso (989–990)',
+				'49' => 'Shōryaku (990–995)',
+				'50' => 'Chōtoku (995–999)',
+				'51' => 'Chōhō (999–1004)',
+				'52' => 'Kankō (1004–1012)',
+				'53' => 'Chōwa (1012–1017)',
+				'54' => 'Kannin (1017–1021)',
+				'55' => 'Jian (1021–1024)',
+				'56' => 'Manju (1024–1028)',
+				'57' => 'Chōgen (1028–1037)',
+				'58' => 'Chōryaku (1037–1040)',
+				'59' => 'Chōkyū (1040–1044)',
+				'60' => 'Kantoku (1044–1046)',
+				'61' => 'Eishō (1046–1053)',
+				'62' => 'Tengi (1053–1058)',
+				'63' => 'Kōhei (1058–1065)',
+				'64' => 'Jiryaku (1065–1069)',
+				'65' => 'Enkyū (1069–1074)',
+				'66' => 'Shōho (1074–1077)',
+				'67' => 'Shōryaku (1077–1081)',
+				'68' => 'Eihō (1081–1084)',
+				'69' => 'Ōtoku (1084–1087)',
+				'70' => 'Kanji (1087–1094)',
+				'71' => 'Kahō (1094–1096)',
+				'72' => 'Eichō (1096–1097)',
+				'73' => 'Jōtoku (1097–1099)',
+				'74' => 'Kōwa (1099–1104)',
+				'75' => 'Chōji (1104–1106)',
+				'76' => 'Kashō (1106–1108)',
+				'77' => 'Tennin (1108–1110)',
+				'78' => 'Ten-ei (1110-1113)',
+				'79' => 'Eikyū (1113–1118)',
+				'80' => 'Gen’ei (1118–1120)',
+				'81' => 'Hōan (1120–1124)',
+				'82' => 'Tenji (1124–1126)',
+				'83' => 'Daiji (1126–1131)',
+				'84' => 'Tenshō (1131–1132)',
+				'85' => 'Chōshō (1132–1135)',
+				'86' => 'Hōen (1135–1141)',
+				'87' => 'Eiji (1141–1142)',
+				'88' => 'Kōji (1142–1144)',
+				'89' => 'Ten’yō (1144–1145)',
+				'90' => 'Kyūan (1145–1151)',
+				'91' => 'Ninpei (1151–1154)',
+				'92' => 'Kyūju (1154–1156)',
+				'93' => 'Hōgen (1156–1159)',
+				'94' => 'Heiji (1159–1160)',
+				'95' => 'Eiryaku (1160–1161)',
+				'96' => 'Ōho (1161–1163)',
+				'97' => 'Chōkan (1163–1165)',
+				'98' => 'Eiman (1165–1166)',
+				'99' => 'Nin’an (1166–1169)',
+				'100' => 'Kaō (1169–1171)',
+				'101' => 'Shōan (1171–1175)',
+				'102' => 'Angen (1175–1177)',
+				'103' => 'Jishō (1177–1181)',
+				'104' => 'Yōwa (1181–1182)',
+				'105' => 'Juei (1182–1184)',
+				'106' => 'Genryaku (1184–1185)',
+				'107' => 'Bunji (1185–1190)',
+				'108' => 'Kenkyū (1190–1199)',
+				'109' => 'Shōji (1199–1201)',
+				'110' => 'Kennin (1201–1204)',
+				'111' => 'Genkyū (1204–1206)',
+				'112' => 'Ken’ei (1206–1207)',
+				'113' => 'Jōgen (1207–1211)',
+				'114' => 'Kenryaku (1211–1213)',
+				'115' => 'Kenpō (1213–1219)',
+				'116' => 'Jōkyū (1219–1222)',
+				'117' => 'Jōō (1222–1224)',
+				'118' => 'Gennin (1224–1225)',
+				'119' => 'Karoku (1225–1227)',
+				'120' => 'Antei (1227–1229)',
+				'121' => 'Kanki (1229–1232)',
+				'122' => 'Jōei (1232–1233)',
+				'123' => 'Tenpuku (1233–1234)',
+				'124' => 'Bunryaku (1234–1235)',
+				'125' => 'Katei (1235–1238)',
+				'126' => 'Ryakunin (1238–1239)',
+				'127' => 'En’ō (1239–1240)',
+				'128' => 'Ninji (1240–1243)',
+				'129' => 'Kangen (1243–1247)',
+				'130' => 'Hōji (1247–1249)',
+				'131' => 'Kenchō (1249–1256)',
+				'132' => 'Kōgen (1256–1257)',
+				'133' => 'Shōka (1257–1259)',
+				'134' => 'Shōgen (1259–1260)',
+				'135' => 'Bun’ō (1260–1261)',
+				'136' => 'Kōchō (1261–1264)',
+				'137' => 'Bun’ei (1264–1275)',
+				'138' => 'Kenji (1275–1278)',
+				'139' => 'Kōan (1278–1288)',
+				'140' => 'Shōō (1288–1293)',
+				'141' => 'Einin (1293–1299)',
+				'142' => 'Shōan (1299–1302)',
+				'143' => 'Kengen (1302–1303)',
+				'144' => 'Kagen (1303–1306)',
+				'145' => 'Tokuji (1306–1308)',
+				'146' => 'Enkyō (1308–1311)',
+				'147' => 'Ōchō (1311–1312)',
+				'148' => 'Shōwa (1312–1317)',
+				'149' => 'Bunpō (1317–1319)',
+				'150' => 'Genō (1319–1321)',
+				'151' => 'Genkō (1321–1324)',
+				'152' => 'Shōchū (1324–1326)',
+				'153' => 'Karyaku (1326–1329)',
+				'154' => 'Gentoku (1329–1331)',
+				'155' => 'Genkō (1331–1334)',
+				'156' => 'Kenmu (1334–1336)',
+				'157' => 'Engen (1336–1340)',
+				'158' => 'Kōkoku (1340–1346)',
+				'159' => 'Shōhei (1346–1370)',
+				'160' => 'Kentoku (1370–1372)',
+				'161' => 'Bunchū (1372–1375)',
+				'162' => 'Tenju (1375–1379)',
+				'163' => 'Kōryaku (1379–1381)',
+				'164' => 'Kōwa (1381–1384)',
+				'165' => 'Genchū (1384–1392)',
+				'166' => 'Meitoku (1384–1387)',
+				'167' => 'Kakei (1387–1389)',
+				'168' => 'Kōō (1389–1390)',
+				'169' => 'Meitoku (1390–1394)',
+				'170' => 'Ōei (1394–1428)',
+				'171' => 'Shōchō (1428–1429)',
+				'172' => 'Eikyō (1429–1441)',
+				'173' => 'Kakitsu (1441–1444)',
+				'174' => 'Bun’an (1444–1449)',
+				'175' => 'Hōtoku (1449–1452)',
+				'176' => 'Kyōtoku (1452–1455)',
+				'177' => 'Kōshō (1455–1457)',
+				'178' => 'Chōroku (1457–1460)',
+				'179' => 'Kanshō (1460–1466)',
+				'180' => 'Bunshō (1466–1467)',
+				'181' => 'Ōnin (1467–1469)',
+				'182' => 'Bunmei (1469–1487)',
+				'183' => 'Chōkyō (1487–1489)',
+				'184' => 'Entoku (1489–1492)',
+				'185' => 'Meiō (1492–1501)',
+				'186' => 'Bunki (1501–1504)',
+				'187' => 'Eishō (1504–1521)',
+				'188' => 'Taiei (1521–1528)',
+				'189' => 'Kyōroku (1528–1532)',
+				'190' => 'Tenbun (1532–1555)',
+				'191' => 'Kōji (1555–1558)',
+				'192' => 'Eiroku (1558–1570)',
+				'193' => 'Genki (1570–1573)',
+				'194' => 'Tenshō (1573–1592)',
+				'195' => 'Bunroku (1592–1596)',
+				'196' => 'Keichō (1596–1615)',
+				'197' => 'Genna (1615–1624)',
+				'198' => 'Kan’ei (1624–1644)',
+				'199' => 'Shōho (1644–1648)',
+				'200' => 'Keian (1648–1652)',
+				'201' => 'Jōō (1652–1655)',
+				'202' => 'Meireki (1655–1658)',
+				'203' => 'Manji (1658–1661)',
+				'204' => 'Kanbun (1661–1673)',
+				'205' => 'Enpō (1673–1681)',
+				'206' => 'Tenna (1681–1684)',
+				'207' => 'Jōkyō (1684–1688)',
+				'208' => 'Genroku (1688–1704)',
+				'209' => 'Hōei (1704–1711)',
+				'210' => 'Shōtoku (1711–1716)',
+				'211' => 'Kyōhō (1716–1736)',
+				'212' => 'Genbun (1736–1741)',
+				'213' => 'Kanpō (1741–1744)',
+				'214' => 'Enkyō (1744–1748)',
+				'215' => 'Kan’en (1748–1751)',
+				'216' => 'Hōreki (1751–1764)',
+				'217' => 'Meiwa (1764–1772)',
+				'218' => 'An’ei (1772–1781)',
+				'219' => 'Tenmei (1781–1789)',
+				'220' => 'Kansei (1789–1801)',
+				'221' => 'Kyōwa (1801–1804)',
+				'222' => 'Bunka (1804–1818)',
+				'223' => 'Bunsei (1818–1830)',
+				'224' => 'Tenpō (1830–1844)',
+				'225' => 'Kōka (1844–1848)',
+				'226' => 'Kaei (1848–1854)',
+				'227' => 'Ansei (1854–1860)',
+				'228' => 'Man’en (1860–1861)',
+				'229' => 'Bunkyū (1861–1864)',
+				'230' => 'Genji (1864–1865)',
+				'231' => 'Keiō (1865–1868)',
+				'232' => 'Meiji',
+				'233' => 'Taishō',
+				'234' => 'Shōwa',
+				'235' => 'Heisei'
+			},
+			narrow => {
+				'0' => 'Taika (645–650)',
+				'1' => 'Hakuchi (650–671)',
+				'2' => 'Hakuhō (672–686)',
+				'3' => 'Shuchō (686–701)',
+				'4' => 'Taihō (701–704)',
+				'5' => 'Keiun (704–708)',
+				'6' => 'Wadō (708–715)',
+				'7' => 'Reiki (715–717)',
+				'8' => 'Yōrō (717–724)',
+				'9' => 'Jinki (724–729)',
+				'10' => 'Tenpyō (729–749)',
+				'11' => 'Tenpyō-kampō (749-749)',
+				'12' => 'Tenpyō-shōhō (749-757)',
+				'13' => 'Tenpyō-hōji (757-765)',
+				'14' => 'Tenpyō-jingo (765-767)',
+				'15' => 'Jingo-keiun (767-770)',
+				'16' => 'Hōki (770–780)',
+				'17' => 'Ten-ō (781-782)',
+				'18' => 'Enryaku (782–806)',
+				'19' => 'Daidō (806–810)',
+				'20' => 'Kōnin (810–824)',
+				'21' => 'Tenchō (824–834)',
+				'22' => 'Jōwa (834–848)',
+				'23' => 'Kajō (848–851)',
+				'24' => 'Ninju (851–854)',
+				'25' => 'Saikō (854–857)',
+				'26' => 'Ten-an (857-859)',
+				'27' => 'Jōgan (859–877)',
+				'28' => 'Gangyō (877–885)',
+				'29' => 'Ninna (885–889)',
+				'30' => 'Kanpyō (889–898)',
+				'31' => 'Shōtai (898–901)',
+				'32' => 'Engi (901–923)',
+				'33' => 'Enchō (923–931)',
+				'34' => 'Jōhei (931–938)',
+				'35' => 'Tengyō (938–947)',
+				'36' => 'Tenryaku (947–957)',
+				'37' => 'Tentoku (957–961)',
+				'38' => 'Ōwa (961–964)',
+				'39' => 'Kōhō (964–968)',
+				'40' => 'Anna (968–970)',
+				'41' => 'Tenroku (970–973)',
+				'42' => 'Ten’en (973–976)',
+				'43' => 'Jōgen (976–978)',
+				'44' => 'Tengen (978–983)',
+				'45' => 'Eikan (983–985)',
+				'46' => 'Kanna (985–987)',
+				'47' => 'Eien (987–989)',
+				'48' => 'Eiso (989–990)',
+				'49' => 'Shōryaku (990–995)',
+				'50' => 'Chōtoku (995–999)',
+				'51' => 'Chōhō (999–1004)',
+				'52' => 'Kankō (1004–1012)',
+				'53' => 'Chōwa (1012–1017)',
+				'54' => 'Kannin (1017–1021)',
+				'55' => 'Jian (1021–1024)',
+				'56' => 'Manju (1024–1028)',
+				'57' => 'Chōgen (1028–1037)',
+				'58' => 'Chōryaku (1037–1040)',
+				'59' => 'Chōkyū (1040–1044)',
+				'60' => 'Kantoku (1044–1046)',
+				'61' => 'Eishō (1046–1053)',
+				'62' => 'Tengi (1053–1058)',
+				'63' => 'Kōhei (1058–1065)',
+				'64' => 'Jiryaku (1065–1069)',
+				'65' => 'Enkyū (1069–1074)',
+				'66' => 'Shōho (1074–1077)',
+				'67' => 'Shōryaku (1077–1081)',
+				'68' => 'Eihō (1081–1084)',
+				'69' => 'Ōtoku (1084–1087)',
+				'70' => 'Kanji (1087–1094)',
+				'71' => 'Kahō (1094–1096)',
+				'72' => 'Eichō (1096–1097)',
+				'73' => 'Jōtoku (1097–1099)',
+				'74' => 'Kōwa (1099–1104)',
+				'75' => 'Chōji (1104–1106)',
+				'76' => 'Kashō (1106–1108)',
+				'77' => 'Tennin (1108–1110)',
+				'78' => 'Ten-ei (1110-1113)',
+				'79' => 'Eikyū (1113–1118)',
+				'80' => 'Gen’ei (1118–1120)',
+				'81' => 'Hōan (1120–1124)',
+				'82' => 'Tenji (1124–1126)',
+				'83' => 'Daiji (1126–1131)',
+				'84' => 'Tenshō (1131–1132)',
+				'85' => 'Chōshō (1132–1135)',
+				'86' => 'Hōen (1135–1141)',
+				'87' => 'Eiji (1141–1142)',
+				'88' => 'Kōji (1142–1144)',
+				'89' => 'Ten’yō (1144–1145)',
+				'90' => 'Kyūan (1145–1151)',
+				'91' => 'Ninpei (1151–1154)',
+				'92' => 'Kyūju (1154–1156)',
+				'93' => 'Hōgen (1156–1159)',
+				'94' => 'Heiji (1159–1160)',
+				'95' => 'Eiryaku (1160–1161)',
+				'96' => 'Ōho (1161–1163)',
+				'97' => 'Chōkan (1163–1165)',
+				'98' => 'Eiman (1165–1166)',
+				'99' => 'Nin’an (1166–1169)',
+				'100' => 'Kaō (1169–1171)',
+				'101' => 'Shōan (1171–1175)',
+				'102' => 'Angen (1175–1177)',
+				'103' => 'Jishō (1177–1181)',
+				'104' => 'Yōwa (1181–1182)',
+				'105' => 'Juei (1182–1184)',
+				'106' => 'Genryaku (1184–1185)',
+				'107' => 'Bunji (1185–1190)',
+				'108' => 'Kenkyū (1190–1199)',
+				'109' => 'Shōji (1199–1201)',
+				'110' => 'Kennin (1201–1204)',
+				'111' => 'Genkyū (1204–1206)',
+				'112' => 'Ken’ei (1206–1207)',
+				'113' => 'Jōgen (1207–1211)',
+				'114' => 'Kenryaku (1211–1213)',
+				'115' => 'Kenpō (1213–1219)',
+				'116' => 'Jōkyū (1219–1222)',
+				'117' => 'Jōō (1222–1224)',
+				'118' => 'Gennin (1224–1225)',
+				'119' => 'Karoku (1225–1227)',
+				'120' => 'Antei (1227–1229)',
+				'121' => 'Kanki (1229–1232)',
+				'122' => 'Jōei (1232–1233)',
+				'123' => 'Tenpuku (1233–1234)',
+				'124' => 'Bunryaku (1234–1235)',
+				'125' => 'Katei (1235–1238)',
+				'126' => 'Ryakunin (1238–1239)',
+				'127' => 'En’ō (1239–1240)',
+				'128' => 'Ninji (1240–1243)',
+				'129' => 'Kangen (1243–1247)',
+				'130' => 'Hōji (1247–1249)',
+				'131' => 'Kenchō (1249–1256)',
+				'132' => 'Kōgen (1256–1257)',
+				'133' => 'Shōka (1257–1259)',
+				'134' => 'Shōgen (1259–1260)',
+				'135' => 'Bun’ō (1260–1261)',
+				'136' => 'Kōchō (1261–1264)',
+				'137' => 'Bun’ei (1264–1275)',
+				'138' => 'Kenji (1275–1278)',
+				'139' => 'Kōan (1278–1288)',
+				'140' => 'Shōō (1288–1293)',
+				'141' => 'Einin (1293–1299)',
+				'142' => 'Shōan (1299–1302)',
+				'143' => 'Kengen (1302–1303)',
+				'144' => 'Kagen (1303–1306)',
+				'145' => 'Tokuji (1306–1308)',
+				'146' => 'Enkyō (1308–1311)',
+				'147' => 'Ōchō (1311–1312)',
+				'148' => 'Shōwa (1312–1317)',
+				'149' => 'Bunpō (1317–1319)',
+				'150' => 'Genō (1319–1321)',
+				'151' => 'Genkō (1321–1324)',
+				'152' => 'Shōchū (1324–1326)',
+				'153' => 'Karyaku (1326–1329)',
+				'154' => 'Gentoku (1329–1331)',
+				'155' => 'Genkō (1331–1334)',
+				'156' => 'Kenmu (1334–1336)',
+				'157' => 'Engen (1336–1340)',
+				'158' => 'Kōkoku (1340–1346)',
+				'159' => 'Shōhei (1346–1370)',
+				'160' => 'Kentoku (1370–1372)',
+				'161' => 'Bunchū (1372–1375)',
+				'162' => 'Tenju (1375–1379)',
+				'163' => 'Kōryaku (1379–1381)',
+				'164' => 'Kōwa (1381–1384)',
+				'165' => 'Genchū (1384–1392)',
+				'166' => 'Meitoku (1384–1387)',
+				'167' => 'Kakei (1387–1389)',
+				'168' => 'Kōō (1389–1390)',
+				'169' => 'Meitoku (1390–1394)',
+				'170' => 'Ōei (1394–1428)',
+				'171' => 'Shōchō (1428–1429)',
+				'172' => 'Eikyō (1429–1441)',
+				'173' => 'Kakitsu (1441–1444)',
+				'174' => 'Bun’an (1444–1449)',
+				'175' => 'Hōtoku (1449–1452)',
+				'176' => 'Kyōtoku (1452–1455)',
+				'177' => 'Kōshō (1455–1457)',
+				'178' => 'Chōroku (1457–1460)',
+				'179' => 'Kanshō (1460–1466)',
+				'180' => 'Bunshō (1466–1467)',
+				'181' => 'Ōnin (1467–1469)',
+				'182' => 'Bunmei (1469–1487)',
+				'183' => 'Chōkyō (1487–1489)',
+				'184' => 'Entoku (1489–1492)',
+				'185' => 'Meiō (1492–1501)',
+				'186' => 'Bunki (1501–1504)',
+				'187' => 'Eishō (1504–1521)',
+				'188' => 'Taiei (1521–1528)',
+				'189' => 'Kyōroku (1528–1532)',
+				'190' => 'Tenbun (1532–1555)',
+				'191' => 'Kōji (1555–1558)',
+				'192' => 'Eiroku (1558–1570)',
+				'193' => 'Genki (1570–1573)',
+				'194' => 'Tenshō (1573–1592)',
+				'195' => 'Bunroku (1592–1596)',
+				'196' => 'Keichō (1596–1615)',
+				'197' => 'Genna (1615–1624)',
+				'198' => 'Kan’ei (1624–1644)',
+				'199' => 'Shōho (1644–1648)',
+				'200' => 'Keian (1648–1652)',
+				'201' => 'Jōō (1652–1655)',
+				'202' => 'Meireki (1655–1658)',
+				'203' => 'Manji (1658–1661)',
+				'204' => 'Kanbun (1661–1673)',
+				'205' => 'Enpō (1673–1681)',
+				'206' => 'Tenna (1681–1684)',
+				'207' => 'Jōkyō (1684–1688)',
+				'208' => 'Genroku (1688–1704)',
+				'209' => 'Hōei (1704–1711)',
+				'210' => 'Shōtoku (1711–1716)',
+				'211' => 'Kyōhō (1716–1736)',
+				'212' => 'Genbun (1736–1741)',
+				'213' => 'Kanpō (1741–1744)',
+				'214' => 'Enkyō (1744–1748)',
+				'215' => 'Kan’en (1748–1751)',
+				'216' => 'Hōreki (1751–1764)',
+				'217' => 'Meiwa (1764–1772)',
+				'218' => 'An’ei (1772–1781)',
+				'219' => 'Tenmei (1781–1789)',
+				'220' => 'Kansei (1789–1801)',
+				'221' => 'Kyōwa (1801–1804)',
+				'222' => 'Bunka (1804–1818)',
+				'223' => 'Bunsei (1818–1830)',
+				'224' => 'Tenpō (1830–1844)',
+				'225' => 'Kōka (1844–1848)',
+				'226' => 'Kaei (1848–1854)',
+				'227' => 'Ansei (1854–1860)',
+				'228' => 'Man’en (1860–1861)',
+				'229' => 'Bunkyū (1861–1864)',
+				'230' => 'Genji (1864–1865)',
+				'231' => 'Keiō (1865–1868)',
+				'232' => 'M',
+				'233' => 'T',
+				'234' => 'S',
+				'235' => 'H'
+			},
+			wide => {
+				'0' => 'Taika (645–650)',
+				'1' => 'Hakuchi (650–671)',
+				'2' => 'Hakuhō (672–686)',
+				'3' => 'Shuchō (686–701)',
+				'4' => 'Taihō (701–704)',
+				'5' => 'Keiun (704–708)',
+				'6' => 'Wadō (708–715)',
+				'7' => 'Reiki (715–717)',
+				'8' => 'Yōrō (717–724)',
+				'9' => 'Jinki (724–729)',
+				'10' => 'Tenpyō (729–749)',
+				'11' => 'Tenpyō-kampō (749-749)',
+				'12' => 'Tenpyō-shōhō (749-757)',
+				'13' => 'Tenpyō-hōji (757-765)',
+				'14' => 'Tenpyō-jingo (765-767)',
+				'15' => 'Jingo-keiun (767-770)',
+				'16' => 'Hōki (770–780)',
+				'17' => 'Ten-ō (781-782)',
+				'18' => 'Enryaku (782–806)',
+				'19' => 'Daidō (806–810)',
+				'20' => 'Kōnin (810–824)',
+				'21' => 'Tenchō (824–834)',
+				'22' => 'Jōwa (834–848)',
+				'23' => 'Kajō (848–851)',
+				'24' => 'Ninju (851–854)',
+				'25' => 'Saikō (854–857)',
+				'26' => 'Ten-an (857-859)',
+				'27' => 'Jōgan (859–877)',
+				'28' => 'Gangyō (877–885)',
+				'29' => 'Ninna (885–889)',
+				'30' => 'Kanpyō (889–898)',
+				'31' => 'Shōtai (898–901)',
+				'32' => 'Engi (901–923)',
+				'33' => 'Enchō (923–931)',
+				'34' => 'Jōhei (931–938)',
+				'35' => 'Tengyō (938–947)',
+				'36' => 'Tenryaku (947–957)',
+				'37' => 'Tentoku (957–961)',
+				'38' => 'Ōwa (961–964)',
+				'39' => 'Kōhō (964–968)',
+				'40' => 'Anna (968–970)',
+				'41' => 'Tenroku (970–973)',
+				'42' => 'Ten’en (973–976)',
+				'43' => 'Jōgen (976–978)',
+				'44' => 'Tengen (978–983)',
+				'45' => 'Eikan (983–985)',
+				'46' => 'Kanna (985–987)',
+				'47' => 'Eien (987–989)',
+				'48' => 'Eiso (989–990)',
+				'49' => 'Shōryaku (990–995)',
+				'50' => 'Chōtoku (995–999)',
+				'51' => 'Chōhō (999–1004)',
+				'52' => 'Kankō (1004–1012)',
+				'53' => 'Chōwa (1012–1017)',
+				'54' => 'Kannin (1017–1021)',
+				'55' => 'Jian (1021–1024)',
+				'56' => 'Manju (1024–1028)',
+				'57' => 'Chōgen (1028–1037)',
+				'58' => 'Chōryaku (1037–1040)',
+				'59' => 'Chōkyū (1040–1044)',
+				'60' => 'Kantoku (1044–1046)',
+				'61' => 'Eishō (1046–1053)',
+				'62' => 'Tengi (1053–1058)',
+				'63' => 'Kōhei (1058–1065)',
+				'64' => 'Jiryaku (1065–1069)',
+				'65' => 'Enkyū (1069–1074)',
+				'66' => 'Shōho (1074–1077)',
+				'67' => 'Shōryaku (1077–1081)',
+				'68' => 'Eihō (1081–1084)',
+				'69' => 'Ōtoku (1084–1087)',
+				'70' => 'Kanji (1087–1094)',
+				'71' => 'Kahō (1094–1096)',
+				'72' => 'Eichō (1096–1097)',
+				'73' => 'Jōtoku (1097–1099)',
+				'74' => 'Kōwa (1099–1104)',
+				'75' => 'Chōji (1104–1106)',
+				'76' => 'Kashō (1106–1108)',
+				'77' => 'Tennin (1108–1110)',
+				'78' => 'Ten-ei (1110-1113)',
+				'79' => 'Eikyū (1113–1118)',
+				'80' => 'Gen’ei (1118–1120)',
+				'81' => 'Hōan (1120–1124)',
+				'82' => 'Tenji (1124–1126)',
+				'83' => 'Daiji (1126–1131)',
+				'84' => 'Tenshō (1131–1132)',
+				'85' => 'Chōshō (1132–1135)',
+				'86' => 'Hōen (1135–1141)',
+				'87' => 'Eiji (1141–1142)',
+				'88' => 'Kōji (1142–1144)',
+				'89' => 'Ten’yō (1144–1145)',
+				'90' => 'Kyūan (1145–1151)',
+				'91' => 'Ninpei (1151–1154)',
+				'92' => 'Kyūju (1154–1156)',
+				'93' => 'Hōgen (1156–1159)',
+				'94' => 'Heiji (1159–1160)',
+				'95' => 'Eiryaku (1160–1161)',
+				'96' => 'Ōho (1161–1163)',
+				'97' => 'Chōkan (1163–1165)',
+				'98' => 'Eiman (1165–1166)',
+				'99' => 'Nin’an (1166–1169)',
+				'100' => 'Kaō (1169–1171)',
+				'101' => 'Shōan (1171–1175)',
+				'102' => 'Angen (1175–1177)',
+				'103' => 'Jishō (1177–1181)',
+				'104' => 'Yōwa (1181–1182)',
+				'105' => 'Juei (1182–1184)',
+				'106' => 'Genryaku (1184–1185)',
+				'107' => 'Bunji (1185–1190)',
+				'108' => 'Kenkyū (1190–1199)',
+				'109' => 'Shōji (1199–1201)',
+				'110' => 'Kennin (1201–1204)',
+				'111' => 'Genkyū (1204–1206)',
+				'112' => 'Ken’ei (1206–1207)',
+				'113' => 'Jōgen (1207–1211)',
+				'114' => 'Kenryaku (1211–1213)',
+				'115' => 'Kenpō (1213–1219)',
+				'116' => 'Jōkyū (1219–1222)',
+				'117' => 'Jōō (1222–1224)',
+				'118' => 'Gennin (1224–1225)',
+				'119' => 'Karoku (1225–1227)',
+				'120' => 'Antei (1227–1229)',
+				'121' => 'Kanki (1229–1232)',
+				'122' => 'Jōei (1232–1233)',
+				'123' => 'Tenpuku (1233–1234)',
+				'124' => 'Bunryaku (1234–1235)',
+				'125' => 'Katei (1235–1238)',
+				'126' => 'Ryakunin (1238–1239)',
+				'127' => 'En’ō (1239–1240)',
+				'128' => 'Ninji (1240–1243)',
+				'129' => 'Kangen (1243–1247)',
+				'130' => 'Hōji (1247–1249)',
+				'131' => 'Kenchō (1249–1256)',
+				'132' => 'Kōgen (1256–1257)',
+				'133' => 'Shōka (1257–1259)',
+				'134' => 'Shōgen (1259–1260)',
+				'135' => 'Bun’ō (1260–1261)',
+				'136' => 'Kōchō (1261–1264)',
+				'137' => 'Bun’ei (1264–1275)',
+				'138' => 'Kenji (1275–1278)',
+				'139' => 'Kōan (1278–1288)',
+				'140' => 'Shōō (1288–1293)',
+				'141' => 'Einin (1293–1299)',
+				'142' => 'Shōan (1299–1302)',
+				'143' => 'Kengen (1302–1303)',
+				'144' => 'Kagen (1303–1306)',
+				'145' => 'Tokuji (1306–1308)',
+				'146' => 'Enkyō (1308–1311)',
+				'147' => 'Ōchō (1311–1312)',
+				'148' => 'Shōwa (1312–1317)',
+				'149' => 'Bunpō (1317–1319)',
+				'150' => 'Genō (1319–1321)',
+				'151' => 'Genkō (1321–1324)',
+				'152' => 'Shōchū (1324–1326)',
+				'153' => 'Karyaku (1326–1329)',
+				'154' => 'Gentoku (1329–1331)',
+				'155' => 'Genkō (1331–1334)',
+				'156' => 'Kenmu (1334–1336)',
+				'157' => 'Engen (1336–1340)',
+				'158' => 'Kōkoku (1340–1346)',
+				'159' => 'Shōhei (1346–1370)',
+				'160' => 'Kentoku (1370–1372)',
+				'161' => 'Bunchū (1372–1375)',
+				'162' => 'Tenju (1375–1379)',
+				'163' => 'Kōryaku (1379–1381)',
+				'164' => 'Kōwa (1381–1384)',
+				'165' => 'Genchū (1384–1392)',
+				'166' => 'Meitoku (1384–1387)',
+				'167' => 'Kakei (1387–1389)',
+				'168' => 'Kōō (1389–1390)',
+				'169' => 'Meitoku (1390–1394)',
+				'170' => 'Ōei (1394–1428)',
+				'171' => 'Shōchō (1428–1429)',
+				'172' => 'Eikyō (1429–1441)',
+				'173' => 'Kakitsu (1441–1444)',
+				'174' => 'Bun’an (1444–1449)',
+				'175' => 'Hōtoku (1449–1452)',
+				'176' => 'Kyōtoku (1452–1455)',
+				'177' => 'Kōshō (1455–1457)',
+				'178' => 'Chōroku (1457–1460)',
+				'179' => 'Kanshō (1460–1466)',
+				'180' => 'Bunshō (1466–1467)',
+				'181' => 'Ōnin (1467–1469)',
+				'182' => 'Bunmei (1469–1487)',
+				'183' => 'Chōkyō (1487–1489)',
+				'184' => 'Entoku (1489–1492)',
+				'185' => 'Meiō (1492–1501)',
+				'186' => 'Bunki (1501–1504)',
+				'187' => 'Eishō (1504–1521)',
+				'188' => 'Taiei (1521–1528)',
+				'189' => 'Kyōroku (1528–1532)',
+				'190' => 'Tenbun (1532–1555)',
+				'191' => 'Kōji (1555–1558)',
+				'192' => 'Eiroku (1558–1570)',
+				'193' => 'Genki (1570–1573)',
+				'194' => 'Tenshō (1573–1592)',
+				'195' => 'Bunroku (1592–1596)',
+				'196' => 'Keichō (1596–1615)',
+				'197' => 'Genna (1615–1624)',
+				'198' => 'Kan’ei (1624–1644)',
+				'199' => 'Shōho (1644–1648)',
+				'200' => 'Keian (1648–1652)',
+				'201' => 'Jōō (1652–1655)',
+				'202' => 'Meireki (1655–1658)',
+				'203' => 'Manji (1658–1661)',
+				'204' => 'Kanbun (1661–1673)',
+				'205' => 'Enpō (1673–1681)',
+				'206' => 'Tenna (1681–1684)',
+				'207' => 'Jōkyō (1684–1688)',
+				'208' => 'Genroku (1688–1704)',
+				'209' => 'Hōei (1704–1711)',
+				'210' => 'Shōtoku (1711–1716)',
+				'211' => 'Kyōhō (1716–1736)',
+				'212' => 'Genbun (1736–1741)',
+				'213' => 'Kanpō (1741–1744)',
+				'214' => 'Enkyō (1744–1748)',
+				'215' => 'Kan’en (1748–1751)',
+				'216' => 'Hōreki (1751–1764)',
+				'217' => 'Meiwa (1764–1772)',
+				'218' => 'An’ei (1772–1781)',
+				'219' => 'Tenmei (1781–1789)',
+				'220' => 'Kansei (1789–1801)',
+				'221' => 'Kyōwa (1801–1804)',
+				'222' => 'Bunka (1804–1818)',
+				'223' => 'Bunsei (1818–1830)',
+				'224' => 'Tenpō (1830–1844)',
+				'225' => 'Kōka (1844–1848)',
+				'226' => 'Kaei (1848–1854)',
+				'227' => 'Ansei (1854–1860)',
+				'228' => 'Man’en (1860–1861)',
+				'229' => 'Bunkyū (1861–1864)',
+				'230' => 'Genji (1864–1865)',
+				'231' => 'Keiō (1865–1868)',
+				'232' => 'Meiji',
+				'233' => 'Taishō',
+				'234' => 'Shōwa',
+				'235' => 'Heisei'
+			},
 		},
 		'persian' => {
 			abbreviated => {
 				'0' => 'AP'
 			},
+			narrow => {
+				'0' => 'AP'
+			},
+			wide => {
+				'0' => 'AP'
+			},
 		},
 		'roc' => {
 			abbreviated => {
-				'0' => 'Před R. O. C.'
+				'0' => 'před ROC',
+				'1' => 'ROC'
+			},
+			narrow => {
+				'0' => 'před ROC',
+				'1' => 'ROC'
+			},
+			wide => {
+				'0' => 'před ROC',
+				'1' => 'ROC'
 			},
 		},
 	} },
@@ -9256,6 +11043,10 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 		'chinese' => {
 			'full' => q{EEEE, d. M. y},
@@ -9264,8 +11055,18 @@ has 'date_formats' => (
 			'short' => q{d. M. y},
 		},
 		'coptic' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
+		},
+		'dangi' => {
 		},
 		'ethiopic' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 		'generic' => {
 			'full' => q{EEEE d. MMMM y G},
@@ -9280,10 +11081,22 @@ has 'date_formats' => (
 			'short' => q{dd.MM.yy},
 		},
 		'hebrew' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 		'indian' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 		'islamic' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 		'japanese' => {
 			'full' => q{EEEE, d. MMMM y G},
@@ -9292,8 +11105,16 @@ has 'date_formats' => (
 			'short' => q{dd.MM.yy GGGGG},
 		},
 		'persian' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 		'roc' => {
+			'full' => q{EEEE d. MMMM y G},
+			'long' => q{d. MMMM y G},
+			'medium' => q{d. M. y G},
+			'short' => q{dd.MM.yy GGGGG},
 		},
 	} },
 );
@@ -9308,6 +11129,8 @@ has 'time_formats' => (
 		'chinese' => {
 		},
 		'coptic' => {
+		},
+		'dangi' => {
 		},
 		'ethiopic' => {
 		},
@@ -9340,12 +11163,26 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'chinese' => {
 		},
 		'coptic' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
+		},
+		'dangi' => {
 		},
 		'ethiopic' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'generic' => {
 			'full' => q{{1} {0}},
@@ -9360,16 +11197,40 @@ has 'datetime_formats' => (
 			'short' => q{{1} {0}},
 		},
 		'hebrew' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'indian' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'islamic' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'japanese' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'persian' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'roc' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 	} },
 );
@@ -9379,8 +11240,173 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'persian' => {
 			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'coptic' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'ethiopic' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'islamic' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'hebrew' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E H:mm},
 			EHms => q{E H:mm:ss},
 			Ed => q{E d.},
@@ -9402,6 +11428,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E d. M.},
 			MMMMEd => q{E d. MMMM},
+			MMMMW => q{W. 'týden' MMMM},
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. M.},
 			Md => q{d. M.},
@@ -9424,15 +11451,52 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d. M. y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{w. 'týden' 'roku' Y},
 		},
-		'buddhist' => {
-			MEd => q{E d. M.},
-			MMMd => q{d. M.},
-			Md => q{d. M.},
-		},
-		'generic' => {
+		'indian' => {
 			E => q{ccc},
 			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E H:mm},
+			EHms => q{E H:mm:ss},
+			Ed => q{E d.},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{LLLL y G},
 			GyMMMEd => q{E d. M. y G},
@@ -9469,6 +11533,70 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ y G},
 			yyyyQQQQ => q{QQQQ y G},
 		},
+		'buddhist' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
+		'japanese' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLLL y G},
+			GyMMMEd => q{E d. M. y G},
+			GyMMMMEd => q{E d. MMMM y G},
+			GyMMMMd => q{d. MMMM y G},
+			GyMMMd => q{d. M. y G},
+			M => q{L},
+			MEd => q{E d. M.},
+			MMM => q{LLL},
+			MMMEd => q{E d. M.},
+			MMMMEd => q{E d. MMMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. M.},
+			Md => q{d. M.},
+			d => q{d.},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E d. M. y GGGGG},
+			yyyyMMM => q{LLLL y G},
+			yyyyMMMEd => q{E d. M. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMMEd => q{E d. MMMM y G},
+			yyyyMMMMd => q{d. MMMM y G},
+			yyyyMMMd => q{d. M. y G},
+			yyyyMd => q{d. M. y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 	} },
 );
 
@@ -9488,6 +11616,481 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'persian' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
+		'coptic' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
+		'ethiopic' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
+		'islamic' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
+		'hebrew' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{H–H},
@@ -9581,6 +12184,101 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM.y – dd.MM.y},
 				d => q{dd.MM.y – dd.MM.y},
 				y => q{dd.MM.y – dd.MM.y},
+			},
+		},
+		'indian' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
 			},
 		},
 		'generic' => {
@@ -9678,6 +12376,905 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y G},
 			},
 		},
+		'buddhist' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
+		'japanese' => {
+			H => {
+				H => q{H–H},
+			},
+			Hm => {
+				H => q{H:mm–H:mm},
+				m => q{H:mm–H:mm},
+			},
+			Hmv => {
+				H => q{H:mm–H:mm v},
+				m => q{H:mm–H:mm v},
+			},
+			Hv => {
+				H => q{H–H v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. M. – E d. M.},
+				d => q{E d. M. – E d. M.},
+			},
+			MMMd => {
+				M => q{d. M. – d. M.},
+				d => q{d.–d. M.},
+			},
+			Md => {
+				M => q{d. M. – d. M.},
+				d => q{d. M. – d. M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			yMEd => {
+				M => q{E dd.MM.y – E dd.MM.y G},
+				d => q{E dd.MM.y – E dd.MM.y G},
+				y => q{E dd.MM.y – E dd.MM.y G},
+			},
+			yMMM => {
+				M => q{MMM–MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E d. M. – E d. M. y G},
+				d => q{E d. M. – E d. M. y G},
+				y => q{E d. M. y – E d. M. y G},
+			},
+			yMMMM => {
+				M => q{LLLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{d. M. – d. M. y G},
+				d => q{d.–d. M. y G},
+				y => q{d. M. y – d. M. y G},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y G},
+				d => q{dd.MM.y – dd.MM.y G},
+				y => q{dd.MM.y – dd.MM.y G},
+			},
+		},
+	} },
+);
+
+has 'month_patterns' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'dangi' => {
+			'format' => {
+				'abbreviated' => {
+					'leap' => q{{0}bis},
+				},
+				'narrow' => {
+					'leap' => q{{0}b},
+				},
+				'wide' => {
+					'leap' => q{{0}bis},
+				},
+			},
+			'numeric' => {
+				'all' => {
+					'leap' => q{{0}bis},
+				},
+			},
+			'stand-alone' => {
+				'abbreviated' => {
+					'leap' => q{{0}bis},
+				},
+				'narrow' => {
+					'leap' => q{{0}b},
+				},
+				'wide' => {
+					'leap' => q{{0}bis},
+				},
+			},
+		},
+	} },
+);
+
+has 'cyclic_name_sets' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'dangi' => {
+			'dayParts' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(zi),
+						1 => q(chou),
+						2 => q(yin),
+						3 => q(mao),
+						4 => q(chen),
+						5 => q(si),
+						6 => q(wu),
+						7 => q(wei),
+						8 => q(shen),
+						9 => q(you),
+						10 => q(xu),
+						11 => q(hai),
+					},
+					'narrow' => {
+						0 => q(zi),
+						1 => q(chou),
+						2 => q(yin),
+						3 => q(mao),
+						4 => q(chen),
+						5 => q(si),
+						6 => q(wu),
+						7 => q(wei),
+						8 => q(shen),
+						9 => q(you),
+						10 => q(xu),
+						11 => q(hai),
+					},
+					'wide' => {
+						0 => q(zi),
+						1 => q(chou),
+						2 => q(yin),
+						3 => q(mao),
+						4 => q(chen),
+						5 => q(si),
+						6 => q(wu),
+						7 => q(wei),
+						8 => q(shen),
+						9 => q(you),
+						10 => q(xu),
+						11 => q(hai),
+					},
+				},
+			},
+			'days' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+					'narrow' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+					'wide' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+				},
+			},
+			'months' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+					'narrow' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+					'wide' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+				},
+			},
+			'years' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+					'narrow' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+					'wide' => {
+						0 => q(jia-zi),
+						1 => q(yi-chou),
+						2 => q(bing-yin),
+						3 => q(ding-mao),
+						4 => q(wu-chen),
+						5 => q(ji-si),
+						6 => q(geng-wu),
+						7 => q(xin-wei),
+						8 => q(ren-shen),
+						9 => q(gui-you),
+						10 => q(jia-xu),
+						11 => q(yi-hai),
+						12 => q(bing-zi),
+						13 => q(ding-chou),
+						14 => q(wu-yin),
+						15 => q(ji-mao),
+						16 => q(geng-chen),
+						17 => q(xin-si),
+						18 => q(ren-wu),
+						19 => q(gui-wei),
+						20 => q(jia-shen),
+						21 => q(yi-you),
+						22 => q(bing-xu),
+						23 => q(ding-hai),
+						24 => q(wu-zi),
+						25 => q(ji-chou),
+						26 => q(geng-yin),
+						27 => q(xin-mao),
+						28 => q(ren-chen),
+						29 => q(gui-si),
+						30 => q(jia-wu),
+						31 => q(yi-wei),
+						32 => q(bing-shen),
+						33 => q(ding-you),
+						34 => q(wu-xu),
+						35 => q(ji-hai),
+						36 => q(geng-zi),
+						37 => q(xin-chou),
+						38 => q(ren-yin),
+						39 => q(gui-mao),
+						40 => q(jia-chen),
+						41 => q(yi-si),
+						42 => q(bing-wu),
+						43 => q(ding-wei),
+						44 => q(wu-shen),
+						45 => q(ji-you),
+						46 => q(geng-xu),
+						47 => q(xin-hai),
+						48 => q(ren-zi),
+						49 => q(gui-chou),
+						50 => q(jia-yin),
+						51 => q(yi-mao),
+						52 => q(bing-chen),
+						53 => q(ding-si),
+						54 => q(wu-wu),
+						55 => q(ji-wei),
+						56 => q(geng-shen),
+						57 => q(xin-you),
+						58 => q(ren-xu),
+						59 => q(gui-hai),
+					},
+				},
+			},
+			'zodiacs' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(Krysa),
+						1 => q(Buvol),
+						2 => q(Tygr),
+						3 => q(Zajíc),
+						4 => q(Drak),
+						5 => q(Had),
+						6 => q(Kůň),
+						7 => q(Koza),
+						8 => q(Opice),
+						9 => q(Kohout),
+						10 => q(Pes),
+						11 => q(Vepř),
+					},
+					'narrow' => {
+						0 => q(Krysa),
+						1 => q(Buvol),
+						2 => q(Tygr),
+						3 => q(Zajíc),
+						4 => q(Drak),
+						5 => q(Had),
+						6 => q(Kůň),
+						7 => q(Koza),
+						8 => q(Opice),
+						9 => q(Kohout),
+						10 => q(Pes),
+						11 => q(Vepř),
+					},
+					'wide' => {
+						0 => q(Krysa),
+						1 => q(Buvol),
+						2 => q(Tygr),
+						3 => q(Zajíc),
+						4 => q(Drak),
+						5 => q(Had),
+						6 => q(Kůň),
+						7 => q(Koza),
+						8 => q(Opice),
+						9 => q(Kohout),
+						10 => q(Pes),
+						11 => q(Vepř),
+					},
+				},
+			},
+		},
 	} },
 );
 
@@ -9695,14 +13292,14 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
-				'daylight' => q(Acrejský letní čas),
-				'generic' => q(Acrejský čas),
-				'standard' => q(Acrejský standardní čas),
+				'daylight' => q#Acrejský letní čas#,
+				'generic' => q#Acrejský čas#,
+				'standard' => q#Acrejský standardní čas#,
 			},
 		},
 		'Afghanistan' => {
 			long => {
-				'standard' => q(Afghánský čas),
+				'standard' => q#Afghánský čas#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -9863,45 +13460,50 @@ has 'time_zone_names' => (
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q(Středoafrický čas),
+				'standard' => q#Středoafrický čas#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q(Východoafrický čas),
+				'standard' => q#Východoafrický čas#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q(Jihoafrický čas),
+				'standard' => q#Jihoafrický čas#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q(Západoafrický letní čas),
-				'generic' => q(Západoafrický čas),
-				'standard' => q(Západoafrický standardní čas),
+				'daylight' => q#Západoafrický letní čas#,
+				'generic' => q#Západoafrický čas#,
+				'standard' => q#Západoafrický standardní čas#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q(Aljašský letní čas),
-				'generic' => q(Aljašský čas),
-				'standard' => q(Aljašský standardní čas),
+				'daylight' => q#Aljašský letní čas#,
+				'generic' => q#Aljašský čas#,
+				'standard' => q#Aljašský standardní čas#,
+			},
+			short => {
+				'daylight' => q#AKDT#,
+				'generic' => q#AKT#,
+				'standard' => q#AKST#,
 			},
 		},
 		'Almaty' => {
 			long => {
-				'daylight' => q(Almatský letní čas),
-				'generic' => q(Almatský čas),
-				'standard' => q(Almatský standardní čas),
+				'daylight' => q#Almatský letní čas#,
+				'generic' => q#Almatský čas#,
+				'standard' => q#Almatský standardní čas#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q(Amazonský letní čas),
-				'generic' => q(Amazonský čas),
-				'standard' => q(Amazonský standardní čas),
+				'daylight' => q#Amazonský letní čas#,
+				'generic' => q#Amazonský čas#,
+				'standard' => q#Amazonský standardní čas#,
 			},
 		},
 		'America/Adak' => {
@@ -10048,6 +13650,9 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvador#,
 		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fort Nelson#,
+		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Fortaleza#,
 		},
@@ -10181,7 +13786,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Metlakatla#,
 		},
 		'America/Mexico_City' => {
-			exemplarCity => q#México#,
+			exemplarCity => q#Ciudad de México#,
 		},
 		'America/Miquelon' => {
 			exemplarCity => q#Miquelon#,
@@ -10248,6 +13853,9 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portoriko#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Punta Arenas#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Rainy River#,
@@ -10344,37 +13952,57 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q(Severoamerický centrální letní čas),
-				'generic' => q(Severoamerický centrální čas),
-				'standard' => q(Severoamerický centrální standardní čas),
+				'daylight' => q#Severoamerický centrální letní čas#,
+				'generic' => q#Severoamerický centrální čas#,
+				'standard' => q#Severoamerický centrální standardní čas#,
+			},
+			short => {
+				'daylight' => q#CDT#,
+				'generic' => q#CT#,
+				'standard' => q#CST#,
 			},
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q(Severoamerický východní letní čas),
-				'generic' => q(Severoamerický východní čas),
-				'standard' => q(Severoamerický východní standardní čas),
+				'daylight' => q#Severoamerický východní letní čas#,
+				'generic' => q#Severoamerický východní čas#,
+				'standard' => q#Severoamerický východní standardní čas#,
+			},
+			short => {
+				'daylight' => q#EDT#,
+				'generic' => q#ET#,
+				'standard' => q#EST#,
 			},
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q(Severoamerický horský letní čas),
-				'generic' => q(Severoamerický horský čas),
-				'standard' => q(Severoamerický horský standardní čas),
+				'daylight' => q#Severoamerický horský letní čas#,
+				'generic' => q#Severoamerický horský čas#,
+				'standard' => q#Severoamerický horský standardní čas#,
+			},
+			short => {
+				'daylight' => q#MDT#,
+				'generic' => q#MT#,
+				'standard' => q#MST#,
 			},
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q(Severoamerický pacifický letní čas),
-				'generic' => q(Severoamerický pacifický čas),
-				'standard' => q(Severoamerický pacifický standardní čas),
+				'daylight' => q#Severoamerický pacifický letní čas#,
+				'generic' => q#Severoamerický pacifický čas#,
+				'standard' => q#Severoamerický pacifický standardní čas#,
+			},
+			short => {
+				'daylight' => q#PDT#,
+				'generic' => q#PT#,
+				'standard' => q#PST#,
 			},
 		},
 		'Anadyr' => {
 			long => {
-				'daylight' => q(Anadyrský letní čas),
-				'generic' => q(Anadyrský čas),
-				'standard' => q(Anadyrský standardní čas),
+				'daylight' => q#Anadyrský letní čas#,
+				'generic' => q#Anadyrský čas#,
+				'standard' => q#Anadyrský standardní čas#,
 			},
 		},
 		'Antarctica/Casey' => {
@@ -10412,30 +14040,30 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q(Apijský letní čas),
-				'generic' => q(Apijský čas),
-				'standard' => q(Apijský standardní čas),
+				'daylight' => q#Apijský letní čas#,
+				'generic' => q#Apijský čas#,
+				'standard' => q#Apijský standardní čas#,
 			},
 		},
 		'Aqtau' => {
 			long => {
-				'daylight' => q(Aktauský letní čas),
-				'generic' => q(Aktauský čas),
-				'standard' => q(Aktauský standardní čas),
+				'daylight' => q#Aktauský letní čas#,
+				'generic' => q#Aktauský čas#,
+				'standard' => q#Aktauský standardní čas#,
 			},
 		},
 		'Aqtobe' => {
 			long => {
-				'daylight' => q(Aktobský letní čas),
-				'generic' => q(Aktobský čas),
-				'standard' => q(Aktobský standardní čas),
+				'daylight' => q#Aktobský letní čas#,
+				'generic' => q#Aktobský čas#,
+				'standard' => q#Aktobský standardní čas#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q(Arabský letní čas),
-				'generic' => q(Arabský čas),
-				'standard' => q(Arabský standardní čas),
+				'daylight' => q#Arabský letní čas#,
+				'generic' => q#Arabský čas#,
+				'standard' => q#Arabský standardní čas#,
 			},
 		},
 		'Arctic/Longyearbyen' => {
@@ -10443,23 +14071,23 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q(Argentinský letní čas),
-				'generic' => q(Argentinský čas),
-				'standard' => q(Argentinský standardní čas),
+				'daylight' => q#Argentinský letní čas#,
+				'generic' => q#Argentinský čas#,
+				'standard' => q#Argentinský standardní čas#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q(Západoargentinský letní čas),
-				'generic' => q(Západoargentinský čas),
-				'standard' => q(Západoargentinský standardní čas),
+				'daylight' => q#Západoargentinský letní čas#,
+				'generic' => q#Západoargentinský čas#,
+				'standard' => q#Západoargentinský standardní čas#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q(Arménský letní čas),
-				'generic' => q(Arménský čas),
-				'standard' => q(Arménský standardní čas),
+				'daylight' => q#Arménský letní čas#,
+				'generic' => q#Arménský čas#,
+				'standard' => q#Arménský standardní čas#,
 			},
 		},
 		'Asia/Aden' => {
@@ -10483,6 +14111,9 @@ has 'time_zone_names' => (
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Ašchabad#,
 		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Atyrau#,
+		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#Bagdád#,
 		},
@@ -10494,6 +14125,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bangkok#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Barnaul#,
 		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Bejrút#,
@@ -10530,6 +14164,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Dušanbe#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Famagusta#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gaza#,
@@ -10672,6 +14309,9 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokio#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Tomsk#,
+		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulánbátar#,
 		},
@@ -10698,9 +14338,14 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q(Atlantický letní čas),
-				'generic' => q(Atlantický čas),
-				'standard' => q(Atlantický standardní čas),
+				'daylight' => q#Atlantický letní čas#,
+				'generic' => q#Atlantický čas#,
+				'standard' => q#Atlantický standardní čas#,
+			},
+			short => {
+				'daylight' => q#ADT#,
+				'generic' => q#AT#,
+				'standard' => q#AST#,
 			},
 		},
 		'Atlantic/Azores' => {
@@ -10771,176 +14416,184 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q(Středoaustralský letní čas),
-				'generic' => q(Středoaustralský čas),
-				'standard' => q(Středoaustralský standardní čas),
+				'daylight' => q#Středoaustralský letní čas#,
+				'generic' => q#Středoaustralský čas#,
+				'standard' => q#Středoaustralský standardní čas#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q(Středozápadní australský letní čas),
-				'generic' => q(Středozápadní australský čas),
-				'standard' => q(Středozápadní australský standardní čas),
+				'daylight' => q#Středozápadní australský letní čas#,
+				'generic' => q#Středozápadní australský čas#,
+				'standard' => q#Středozápadní australský standardní čas#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q(Východoaustralský letní čas),
-				'generic' => q(Východoaustralský čas),
-				'standard' => q(Východoaustralský standardní čas),
+				'daylight' => q#Východoaustralský letní čas#,
+				'generic' => q#Východoaustralský čas#,
+				'standard' => q#Východoaustralský standardní čas#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q(Západoaustralský letní čas),
-				'generic' => q(Západoaustralský čas),
-				'standard' => q(Západoaustralský standardní čas),
+				'daylight' => q#Západoaustralský letní čas#,
+				'generic' => q#Západoaustralský čas#,
+				'standard' => q#Západoaustralský standardní čas#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q(Ázerbájdžánský letní čas),
-				'generic' => q(Ázerbájdžánský čas),
-				'standard' => q(Ázerbájdžánský standardní čas),
+				'daylight' => q#Ázerbájdžánský letní čas#,
+				'generic' => q#Ázerbájdžánský čas#,
+				'standard' => q#Ázerbájdžánský standardní čas#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q(Azorský letní čas),
-				'generic' => q(Azorský čas),
-				'standard' => q(Azorský standardní čas),
+				'daylight' => q#Azorský letní čas#,
+				'generic' => q#Azorský čas#,
+				'standard' => q#Azorský standardní čas#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q(Bangladéšský letní čas),
-				'generic' => q(Bangladéšský čas),
-				'standard' => q(Bangladéšský standardní čas),
+				'daylight' => q#Bangladéšský letní čas#,
+				'generic' => q#Bangladéšský čas#,
+				'standard' => q#Bangladéšský standardní čas#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q(Bhútánský čas),
+				'standard' => q#Bhútánský čas#,
 			},
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q(Bolivijský čas),
+				'standard' => q#Bolivijský čas#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q(Brasilijský letní čas),
-				'generic' => q(Brasilijský čas),
-				'standard' => q(Brasilijský standardní čas),
+				'daylight' => q#Brasilijský letní čas#,
+				'generic' => q#Brasilijský čas#,
+				'standard' => q#Brasilijský standardní čas#,
 			},
 		},
 		'Brunei' => {
 			long => {
-				'standard' => q(Brunejský čas),
+				'standard' => q#Brunejský čas#,
 			},
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q(Kapverdský letní čas),
-				'generic' => q(Kapverdský čas),
-				'standard' => q(Kapverdský standardní čas),
+				'daylight' => q#Kapverdský letní čas#,
+				'generic' => q#Kapverdský čas#,
+				'standard' => q#Kapverdský standardní čas#,
 			},
 		},
 		'Casey' => {
 			long => {
-				'standard' => q(Čas Caseyho stanice),
+				'standard' => q#Čas Caseyho stanice#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q(Chamorrský čas),
+				'standard' => q#Chamorrský čas#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q(Chathamský letní čas),
-				'generic' => q(Chathamský čas),
-				'standard' => q(Chathamský standardní čas),
+				'daylight' => q#Chathamský letní čas#,
+				'generic' => q#Chathamský čas#,
+				'standard' => q#Chathamský standardní čas#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q(Chilský letní čas),
-				'generic' => q(Chilský čas),
-				'standard' => q(Chilský standardní čas),
+				'daylight' => q#Chilský letní čas#,
+				'generic' => q#Chilský čas#,
+				'standard' => q#Chilský standardní čas#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q(Čínský letní čas),
-				'generic' => q(Čínský čas),
-				'standard' => q(Čínský standardní čas),
+				'daylight' => q#Čínský letní čas#,
+				'generic' => q#Čínský čas#,
+				'standard' => q#Čínský standardní čas#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
-				'daylight' => q(Čojbalsanský letní čas),
-				'generic' => q(Čojbalsanský čas),
-				'standard' => q(Čojbalsanský standardní čas),
+				'daylight' => q#Čojbalsanský letní čas#,
+				'generic' => q#Čojbalsanský čas#,
+				'standard' => q#Čojbalsanský standardní čas#,
 			},
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q(Čas Vánočního ostrova),
+				'standard' => q#Čas Vánočního ostrova#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q(Čas Kokosových ostrovů),
+				'standard' => q#Čas Kokosových ostrovů#,
 			},
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q(Kolumbijský letní čas),
-				'generic' => q(Kolumbijský čas),
-				'standard' => q(Kolumbijský standardní čas),
+				'daylight' => q#Kolumbijský letní čas#,
+				'generic' => q#Kolumbijský čas#,
+				'standard' => q#Kolumbijský standardní čas#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q(Letní čas Cookových ostrovů),
-				'generic' => q(Čas Cookových ostrovů),
-				'standard' => q(Standardní čas Cookových ostrovů),
+				'daylight' => q#Letní čas Cookových ostrovů#,
+				'generic' => q#Čas Cookových ostrovů#,
+				'standard' => q#Standardní čas Cookových ostrovů#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q(Kubánský letní čas),
-				'generic' => q(Kubánský čas),
-				'standard' => q(Kubánský standardní čas),
+				'daylight' => q#Kubánský letní čas#,
+				'generic' => q#Kubánský čas#,
+				'standard' => q#Kubánský standardní čas#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q(Čas Davisovy stanice),
+				'standard' => q#Čas Davisovy stanice#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q(Čas stanice Dumonta d’Urvilla),
+				'standard' => q#Čas stanice Dumonta d’Urvilla#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q(Východotimorský čas),
+				'standard' => q#Východotimorský čas#,
 			},
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q(Letní čas Velikonočního ostrova),
-				'generic' => q(Čas Velikonočního ostrova),
-				'standard' => q(Standardní čas Velikonočního ostrova),
+				'daylight' => q#Letní čas Velikonočního ostrova#,
+				'generic' => q#Čas Velikonočního ostrova#,
+				'standard' => q#Standardní čas Velikonočního ostrova#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q(Ekvádorský čas),
+				'standard' => q#Ekvádorský čas#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Koordinovaný světový čas#,
+			},
+			short => {
+				'standard' => q#UTC#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -10951,6 +14604,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#Andorra#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Astrachaň#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#Athény#,
@@ -10985,7 +14641,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublin#,
 			long => {
-				'daylight' => q(Irský letní čas),
+				'daylight' => q#Irský letní čas#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -11012,6 +14668,9 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kyjev#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Kirov#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisabon#,
 		},
@@ -11021,7 +14680,7 @@ has 'time_zone_names' => (
 		'Europe/London' => {
 			exemplarCity => q#Londýn#,
 			long => {
-				'daylight' => q(Britský letní čas),
+				'daylight' => q#Britský letní čas#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -11072,6 +14731,9 @@ has 'time_zone_names' => (
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Sarajevo#,
 		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Saratov#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#Simferopol#,
 		},
@@ -11089,6 +14751,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Uljanovsk#,
 		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Užhorod#,
@@ -11122,139 +14787,139 @@ has 'time_zone_names' => (
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q(Středoevropský letní čas),
-				'generic' => q(Středoevropský čas),
-				'standard' => q(Středoevropský standardní čas),
+				'daylight' => q#Středoevropský letní čas#,
+				'generic' => q#Středoevropský čas#,
+				'standard' => q#Středoevropský standardní čas#,
 			},
 			short => {
-				'daylight' => q(SELČ),
-				'generic' => q(SEČ),
-				'standard' => q(SEČ),
+				'daylight' => q#SELČ#,
+				'generic' => q#SEČ#,
+				'standard' => q#SEČ#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q(Východoevropský letní čas),
-				'generic' => q(Východoevropský čas),
-				'standard' => q(Východoevropský standardní čas),
+				'daylight' => q#Východoevropský letní čas#,
+				'generic' => q#Východoevropský čas#,
+				'standard' => q#Východoevropský standardní čas#,
 			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q(Dálněvýchodoevropský čas),
+				'standard' => q#Dálněvýchodoevropský čas#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q(Západoevropský letní čas),
-				'generic' => q(Západoevropský čas),
-				'standard' => q(Západoevropský standardní čas),
+				'daylight' => q#Západoevropský letní čas#,
+				'generic' => q#Západoevropský čas#,
+				'standard' => q#Západoevropský standardní čas#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q(Falklandský letní čas),
-				'generic' => q(Falklandský čas),
-				'standard' => q(Falklandský standardní čas),
+				'daylight' => q#Falklandský letní čas#,
+				'generic' => q#Falklandský čas#,
+				'standard' => q#Falklandský standardní čas#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q(Fidžijský letní čas),
-				'generic' => q(Fidžijský čas),
-				'standard' => q(Fidžijský standardní čas),
+				'daylight' => q#Fidžijský letní čas#,
+				'generic' => q#Fidžijský čas#,
+				'standard' => q#Fidžijský standardní čas#,
 			},
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q(Francouzskoguyanský čas),
+				'standard' => q#Francouzskoguyanský čas#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q(Čas Francouzských jižních a antarktických území),
+				'standard' => q#Čas Francouzských jižních a antarktických území#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q(Greenwichský střední čas),
+				'standard' => q#Greenwichský střední čas#,
 			},
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q(Galapážský čas),
+				'standard' => q#Galapážský čas#,
 			},
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q(Gambierský čas),
+				'standard' => q#Gambierský čas#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q(Gruzínský letní čas),
-				'generic' => q(Gruzínský čas),
-				'standard' => q(Gruzínský standardní čas),
+				'daylight' => q#Gruzínský letní čas#,
+				'generic' => q#Gruzínský čas#,
+				'standard' => q#Gruzínský standardní čas#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q(Čas Gilbertových ostrovů),
+				'standard' => q#Čas Gilbertových ostrovů#,
 			},
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q(Východogrónský letní čas),
-				'generic' => q(Východogrónský čas),
-				'standard' => q(Východogrónský standardní čas),
+				'daylight' => q#Východogrónský letní čas#,
+				'generic' => q#Východogrónský čas#,
+				'standard' => q#Východogrónský standardní čas#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q(Západogrónský letní čas),
-				'generic' => q(Západogrónský čas),
-				'standard' => q(Západogrónský standardní čas),
+				'daylight' => q#Západogrónský letní čas#,
+				'generic' => q#Západogrónský čas#,
+				'standard' => q#Západogrónský standardní čas#,
 			},
 		},
 		'Guam' => {
 			long => {
-				'standard' => q(Guamský čas),
+				'standard' => q#Guamský čas#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q(Standardní čas Perského zálivu),
+				'standard' => q#Standardní čas Perského zálivu#,
 			},
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q(Guyanský čas),
+				'standard' => q#Guyanský čas#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q(Havajsko-aleutský letní čas),
-				'generic' => q(Havajsko-aleutský čas),
-				'standard' => q(Havajsko-aleutský standardní čas),
+				'daylight' => q#Havajsko-aleutský letní čas#,
+				'generic' => q#Havajsko-aleutský čas#,
+				'standard' => q#Havajsko-aleutský standardní čas#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q(Hongkongský letní čas),
-				'generic' => q(Hongkongský čas),
-				'standard' => q(Hongkongský standardní čas),
+				'daylight' => q#Hongkongský letní čas#,
+				'generic' => q#Hongkongský čas#,
+				'standard' => q#Hongkongský standardní čas#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q(Hovdský letní čas),
-				'generic' => q(Hovdský čas),
-				'standard' => q(Hovdský standardní čas),
+				'daylight' => q#Hovdský letní čas#,
+				'generic' => q#Hovdský čas#,
+				'standard' => q#Hovdský standardní čas#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q(Indický čas),
+				'standard' => q#Indický čas#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -11292,264 +14957,264 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q(Indickooceánský čas),
+				'standard' => q#Indickooceánský čas#,
 			},
 		},
 		'Indochina' => {
 			long => {
-				'standard' => q(Indočínský čas),
+				'standard' => q#Indočínský čas#,
 			},
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q(Středoindonéský čas),
+				'standard' => q#Středoindonéský čas#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q(Východoindonéský čas),
+				'standard' => q#Východoindonéský čas#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q(Západoindonéský čas),
+				'standard' => q#Západoindonéský čas#,
 			},
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q(Íránský letní čas),
-				'generic' => q(Íránský čas),
-				'standard' => q(Íránský standardní čas),
+				'daylight' => q#Íránský letní čas#,
+				'generic' => q#Íránský čas#,
+				'standard' => q#Íránský standardní čas#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q(Irkutský letní čas),
-				'generic' => q(Irkutský čas),
-				'standard' => q(Irkutský standardní čas),
+				'daylight' => q#Irkutský letní čas#,
+				'generic' => q#Irkutský čas#,
+				'standard' => q#Irkutský standardní čas#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q(Izraelský letní čas),
-				'generic' => q(Izraelský čas),
-				'standard' => q(Izraelský standardní čas),
+				'daylight' => q#Izraelský letní čas#,
+				'generic' => q#Izraelský čas#,
+				'standard' => q#Izraelský standardní čas#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q(Japonský letní čas),
-				'generic' => q(Japonský čas),
-				'standard' => q(Japonský standardní čas),
+				'daylight' => q#Japonský letní čas#,
+				'generic' => q#Japonský čas#,
+				'standard' => q#Japonský standardní čas#,
 			},
 		},
 		'Kamchatka' => {
 			long => {
-				'daylight' => q(Petropavlovsko-kamčatský letní čas),
-				'generic' => q(Petropavlovsko-kamčatský čas),
-				'standard' => q(Petropavlovsko-kamčatský standardní čas),
+				'daylight' => q#Petropavlovsko-kamčatský letní čas#,
+				'generic' => q#Petropavlovsko-kamčatský čas#,
+				'standard' => q#Petropavlovsko-kamčatský standardní čas#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q(Východokazachstánský čas),
+				'standard' => q#Východokazachstánský čas#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q(Západokazachstánský čas),
+				'standard' => q#Západokazachstánský čas#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q(Korejský letní čas),
-				'generic' => q(Korejský čas),
-				'standard' => q(Korejský standardní čas),
+				'daylight' => q#Korejský letní čas#,
+				'generic' => q#Korejský čas#,
+				'standard' => q#Korejský standardní čas#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q(Kosrajský čas),
+				'standard' => q#Kosrajský čas#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q(Krasnojarský letní čas),
-				'generic' => q(Krasnojarský čas),
-				'standard' => q(Krasnojarský standardní čas),
+				'daylight' => q#Krasnojarský letní čas#,
+				'generic' => q#Krasnojarský čas#,
+				'standard' => q#Krasnojarský standardní čas#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q(Kyrgyzský čas),
+				'standard' => q#Kyrgyzský čas#,
 			},
 		},
 		'Lanka' => {
 			long => {
-				'standard' => q(Srílanský čas),
+				'standard' => q#Srílanský čas#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q(Čas Rovníkových ostrovů),
+				'standard' => q#Čas Rovníkových ostrovů#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q(Letní čas ostrova lorda Howa),
-				'generic' => q(Čas ostrova lorda Howa),
-				'standard' => q(Standardní čas ostrova lorda Howa),
+				'daylight' => q#Letní čas ostrova lorda Howa#,
+				'generic' => q#Čas ostrova lorda Howa#,
+				'standard' => q#Standardní čas ostrova lorda Howa#,
 			},
 		},
 		'Macau' => {
 			long => {
-				'daylight' => q(Macajský letní čas),
-				'generic' => q(Macajský čas),
-				'standard' => q(Macajský standardní čas),
+				'daylight' => q#Macajský letní čas#,
+				'generic' => q#Macajský čas#,
+				'standard' => q#Macajský standardní čas#,
 			},
 		},
 		'Macquarie' => {
 			long => {
-				'standard' => q(Čas ostrova Macquarie),
+				'standard' => q#Čas ostrova Macquarie#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q(Magadanský letní čas),
-				'generic' => q(Magadanský čas),
-				'standard' => q(Magadanský standardní čas),
+				'daylight' => q#Magadanský letní čas#,
+				'generic' => q#Magadanský čas#,
+				'standard' => q#Magadanský standardní čas#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q(Malajský čas),
+				'standard' => q#Malajský čas#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q(Maledivský čas),
+				'standard' => q#Maledivský čas#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q(Markézský čas),
+				'standard' => q#Markézský čas#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q(Čas Marshallových ostrovů),
+				'standard' => q#Čas Marshallových ostrovů#,
 			},
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q(Mauricijský letní čas),
-				'generic' => q(Mauricijský čas),
-				'standard' => q(Mauricijský standardní čas),
+				'daylight' => q#Mauricijský letní čas#,
+				'generic' => q#Mauricijský čas#,
+				'standard' => q#Mauricijský standardní čas#,
 			},
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q(Čas Mawsonovy stanice),
+				'standard' => q#Čas Mawsonovy stanice#,
 			},
 		},
 		'Mexico_Northwest' => {
 			long => {
-				'daylight' => q(Severozápadní mexický letní čas),
-				'generic' => q(Severozápadní mexický čas),
-				'standard' => q(Severozápadní mexický standardní čas),
+				'daylight' => q#Severozápadní mexický letní čas#,
+				'generic' => q#Severozápadní mexický čas#,
+				'standard' => q#Severozápadní mexický standardní čas#,
 			},
 		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q(Mexický pacifický letní čas),
-				'generic' => q(Mexický pacifický čas),
-				'standard' => q(Mexický pacifický standardní čas),
+				'daylight' => q#Mexický pacifický letní čas#,
+				'generic' => q#Mexický pacifický čas#,
+				'standard' => q#Mexický pacifický standardní čas#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q(Ulánbátarský letní čas),
-				'generic' => q(Ulánbátarský čas),
-				'standard' => q(Ulánbátarský standardní čas),
+				'daylight' => q#Ulánbátarský letní čas#,
+				'generic' => q#Ulánbátarský čas#,
+				'standard' => q#Ulánbátarský standardní čas#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q(Moskevský letní čas),
-				'generic' => q(Moskevský čas),
-				'standard' => q(Moskevský standardní čas),
+				'daylight' => q#Moskevský letní čas#,
+				'generic' => q#Moskevský čas#,
+				'standard' => q#Moskevský standardní čas#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q(Myanmarský čas),
+				'standard' => q#Myanmarský čas#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q(Naurský čas),
+				'standard' => q#Naurský čas#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q(Nepálský čas),
+				'standard' => q#Nepálský čas#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q(Novokaledonský letní čas),
-				'generic' => q(Novokaledonský čas),
-				'standard' => q(Novokaledonský standardní čas),
+				'daylight' => q#Novokaledonský letní čas#,
+				'generic' => q#Novokaledonský čas#,
+				'standard' => q#Novokaledonský standardní čas#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q(Novozélandský letní čas),
-				'generic' => q(Novozélandský čas),
-				'standard' => q(Novozélandský standardní čas),
+				'daylight' => q#Novozélandský letní čas#,
+				'generic' => q#Novozélandský čas#,
+				'standard' => q#Novozélandský standardní čas#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q(Newfoundlandský letní čas),
-				'generic' => q(Newfoundlandský čas),
-				'standard' => q(Newfoundlandský standardní čas),
+				'daylight' => q#Newfoundlandský letní čas#,
+				'generic' => q#Newfoundlandský čas#,
+				'standard' => q#Newfoundlandský standardní čas#,
 			},
 		},
 		'Niue' => {
 			long => {
-				'standard' => q(Niuejský čas),
+				'standard' => q#Niuejský čas#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q(Norfolský čas),
+				'standard' => q#Norfolský čas#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q(Letní čas souostroví Fernando de Noronha),
-				'generic' => q(Čas souostroví Fernando de Noronha),
-				'standard' => q(Standardní čas souostroví Fernando de Noronha),
+				'daylight' => q#Letní čas souostroví Fernando de Noronha#,
+				'generic' => q#Čas souostroví Fernando de Noronha#,
+				'standard' => q#Standardní čas souostroví Fernando de Noronha#,
 			},
 		},
 		'North_Mariana' => {
 			long => {
-				'standard' => q(Severomariánský čas),
+				'standard' => q#Severomariánský čas#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q(Novosibirský letní čas),
-				'generic' => q(Novosibirský čas),
-				'standard' => q(Novosibirský standardní čas),
+				'daylight' => q#Novosibirský letní čas#,
+				'generic' => q#Novosibirský čas#,
+				'standard' => q#Novosibirský standardní čas#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q(Omský letní čas),
-				'generic' => q(Omský čas),
-				'standard' => q(Omský standardní čas),
+				'daylight' => q#Omský letní čas#,
+				'generic' => q#Omský čas#,
+				'standard' => q#Omský standardní čas#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -11596,6 +15261,11 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
+			short => {
+				'daylight' => q#HDT#,
+				'generic' => q#HST#,
+				'standard' => q#HST#,
+			},
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#Johnston#,
@@ -11671,245 +15341,250 @@ has 'time_zone_names' => (
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q(Pákistánský letní čas),
-				'generic' => q(Pákistánský čas),
-				'standard' => q(Pákistánský standardní čas),
+				'daylight' => q#Pákistánský letní čas#,
+				'generic' => q#Pákistánský čas#,
+				'standard' => q#Pákistánský standardní čas#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q(Palauský čas),
+				'standard' => q#Palauský čas#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q(Čas Papuy-Nové Guiney),
+				'standard' => q#Čas Papuy-Nové Guiney#,
 			},
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q(Paraguayský letní čas),
-				'generic' => q(Paraguayský čas),
-				'standard' => q(Paraguayský standardní čas),
+				'daylight' => q#Paraguayský letní čas#,
+				'generic' => q#Paraguayský čas#,
+				'standard' => q#Paraguayský standardní čas#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q(Peruánský letní čas),
-				'generic' => q(Peruánský čas),
-				'standard' => q(Peruánský standardní čas),
+				'daylight' => q#Peruánský letní čas#,
+				'generic' => q#Peruánský čas#,
+				'standard' => q#Peruánský standardní čas#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q(Filipínský letní čas),
-				'generic' => q(Filipínský čas),
-				'standard' => q(Filipínský standardní čas),
+				'daylight' => q#Filipínský letní čas#,
+				'generic' => q#Filipínský čas#,
+				'standard' => q#Filipínský standardní čas#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q(Čas Fénixových ostrovů),
+				'standard' => q#Čas Fénixových ostrovů#,
 			},
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q(Pierre-miquelonský letní čas),
-				'generic' => q(Pierre-miquelonský čas),
-				'standard' => q(Pierre-miquelonský standardní čas),
+				'daylight' => q#Pierre-miquelonský letní čas#,
+				'generic' => q#Pierre-miquelonský čas#,
+				'standard' => q#Pierre-miquelonský standardní čas#,
 			},
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q(Čas Pitcairnova ostrova),
+				'standard' => q#Čas Pitcairnova ostrova#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q(Ponapský čas),
+				'standard' => q#Ponapský čas#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Pchjongjangský čas#,
 			},
 		},
 		'Qyzylorda' => {
 			long => {
-				'daylight' => q(Kyzylordský letní čas),
-				'generic' => q(Kyzylordský čas),
-				'standard' => q(Kyzylordský standardní čas),
+				'daylight' => q#Kyzylordský letní čas#,
+				'generic' => q#Kyzylordský čas#,
+				'standard' => q#Kyzylordský standardní čas#,
 			},
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q(Réunionský čas),
+				'standard' => q#Réunionský čas#,
 			},
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q(Čas Rotherovy stanice),
+				'standard' => q#Čas Rotherovy stanice#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q(Sachalinský letní čas),
-				'generic' => q(Sachalinský čas),
-				'standard' => q(Sachalinský standardní čas),
+				'daylight' => q#Sachalinský letní čas#,
+				'generic' => q#Sachalinský čas#,
+				'standard' => q#Sachalinský standardní čas#,
 			},
 		},
 		'Samara' => {
 			long => {
-				'daylight' => q(Samarský letní čas),
-				'generic' => q(Samarský čas),
-				'standard' => q(Samarský standardní čas),
+				'daylight' => q#Samarský letní čas#,
+				'generic' => q#Samarský čas#,
+				'standard' => q#Samarský standardní čas#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q(Samojský letní čas),
-				'generic' => q(Samojský čas),
-				'standard' => q(Samojský standardní čas),
+				'daylight' => q#Samojský letní čas#,
+				'generic' => q#Samojský čas#,
+				'standard' => q#Samojský standardní čas#,
 			},
 		},
 		'Seychelles' => {
 			long => {
-				'standard' => q(Seychelský čas),
+				'standard' => q#Seychelský čas#,
 			},
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q(Singapurský čas),
+				'standard' => q#Singapurský čas#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q(Čas Šalamounových ostrovů),
+				'standard' => q#Čas Šalamounových ostrovů#,
 			},
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q(Čas Jižní Georgie),
+				'standard' => q#Čas Jižní Georgie#,
 			},
 		},
 		'Suriname' => {
 			long => {
-				'standard' => q(Surinamský čas),
+				'standard' => q#Surinamský čas#,
 			},
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q(Čas stanice Šówa),
+				'standard' => q#Čas stanice Šówa#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q(Tahitský čas),
+				'standard' => q#Tahitský čas#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q(Tchajpejský letní čas),
-				'generic' => q(Tchajpejský čas),
-				'standard' => q(Tchajpejský standardní čas),
+				'daylight' => q#Tchajpejský letní čas#,
+				'generic' => q#Tchajpejský čas#,
+				'standard' => q#Tchajpejský standardní čas#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q(Tádžický čas),
+				'standard' => q#Tádžický čas#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q(Tokelauský čas),
+				'standard' => q#Tokelauský čas#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q(Tonžský letní čas),
-				'generic' => q(Tonžský čas),
-				'standard' => q(Tonžský standardní čas),
+				'daylight' => q#Tonžský letní čas#,
+				'generic' => q#Tonžský čas#,
+				'standard' => q#Tonžský standardní čas#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q(Chuukský čas),
+				'standard' => q#Chuukský čas#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q(Turkmenský letní čas),
-				'generic' => q(Turkmenský čas),
-				'standard' => q(Turkmenský standardní čas),
+				'daylight' => q#Turkmenský letní čas#,
+				'generic' => q#Turkmenský čas#,
+				'standard' => q#Turkmenský standardní čas#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q(Tuvalský čas),
+				'standard' => q#Tuvalský čas#,
 			},
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q(Uruguayský letní čas),
-				'generic' => q(Uruguayský čas),
-				'standard' => q(Uruguayský standardní čas),
+				'daylight' => q#Uruguayský letní čas#,
+				'generic' => q#Uruguayský čas#,
+				'standard' => q#Uruguayský standardní čas#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q(Uzbecký letní čas),
-				'generic' => q(Uzbecký čas),
-				'standard' => q(Uzbecký standardní čas),
+				'daylight' => q#Uzbecký letní čas#,
+				'generic' => q#Uzbecký čas#,
+				'standard' => q#Uzbecký standardní čas#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q(Vanuatský letní čas),
-				'generic' => q(Vanuatský čas),
-				'standard' => q(Vanuatský standardní čas),
+				'daylight' => q#Vanuatský letní čas#,
+				'generic' => q#Vanuatský čas#,
+				'standard' => q#Vanuatský standardní čas#,
 			},
 		},
 		'Venezuela' => {
 			long => {
-				'standard' => q(Venezuelský čas),
+				'standard' => q#Venezuelský čas#,
 			},
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q(Vladivostocký letní čas),
-				'generic' => q(Vladivostocký čas),
-				'standard' => q(Vladivostocký standardní čas),
+				'daylight' => q#Vladivostocký letní čas#,
+				'generic' => q#Vladivostocký čas#,
+				'standard' => q#Vladivostocký standardní čas#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q(Volgogradský letní čas),
-				'generic' => q(Volgogradský čas),
-				'standard' => q(Volgogradský standardní čas),
+				'daylight' => q#Volgogradský letní čas#,
+				'generic' => q#Volgogradský čas#,
+				'standard' => q#Volgogradský standardní čas#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q(Čas stanice Vostok),
+				'standard' => q#Čas stanice Vostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q(Čas ostrova Wake),
+				'standard' => q#Čas ostrova Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q(Čas ostrovů Wallis a Futuna),
+				'standard' => q#Čas ostrovů Wallis a Futuna#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q(Jakutský letní čas),
-				'generic' => q(Jakutský čas),
-				'standard' => q(Jakutský standardní čas),
+				'daylight' => q#Jakutský letní čas#,
+				'generic' => q#Jakutský čas#,
+				'standard' => q#Jakutský standardní čas#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q(Jekatěrinburský letní čas),
-				'generic' => q(Jekatěrinburský čas),
-				'standard' => q(Jekatěrinburský standardní čas),
+				'daylight' => q#Jekatěrinburský letní čas#,
+				'generic' => q#Jekatěrinburský čas#,
+				'standard' => q#Jekatěrinburský standardní čas#,
 			},
 		},
 	 } }

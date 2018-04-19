@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 33 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/GitGot.pm',
@@ -42,6 +42,7 @@ my @module_files = (
 );
 
 my @scripts = (
+    'bin/git-got',
     'bin/got',
     'bin/got-complete'
 );

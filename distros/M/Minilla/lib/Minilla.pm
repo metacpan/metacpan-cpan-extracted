@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.0.16");
+use version; our $VERSION = version->declare("v3.0.17");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -366,6 +366,16 @@ This variable disables CPAN upload feature.
     ]
 
 Commands that are specified by this option will be executed when releasing. If result of commands is not successful, it will abort.
+
+=item unsupported.os
+
+    [unsupported]
+    os = [
+        "MSWin32",
+        "darwin"
+    ]
+
+By setting this value to add unsupported OS checks for (Build.PL|Makefile.PL).
 
 =item ReleaseTest.MinimumVersion
 

@@ -1,4 +1,5 @@
 use utf8;
+
 package Net::Etcd::Role::Actions;
 
 use strict;
@@ -23,7 +24,7 @@ Net::Etcd::Role::Actions
 
 =cut
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 has etcd => (
     is  => 'ro',
@@ -58,7 +59,7 @@ AnyEvent callback must be a CodeRef
 has cb => (
     is  => 'ro',
     isa => sub {
-        die "$_[0] is not a CodeRef!" if ( $_[0] && ref($_[0]) ne 'CODE')
+        die "$_[0] is not a CodeRef!" if ( $_[0] && ref( $_[0] ) ne 'CODE' );
     },
 );
 
@@ -66,16 +67,14 @@ has cb => (
 
 =cut
 
-has cv => (
-    is  => 'ro',
-);
+has cv => ( is => 'ro', );
 
 =head2 init
 
 =cut
 
 sub init {
-    my ($self)  = @_;
+    my ($self) = @_;
     my $init = $self->json_args;
     $init or return;
     return $self;
@@ -101,19 +100,25 @@ sub _build_headers {
     return $headers;
 }
 
-has tls_ctx => ( is  => 'lazy', );
+has tls_ctx => ( is => 'lazy', );
 
 sub _build_tls_ctx {
-    my ($self) = @_;
-    my $cacert = $self->etcd->cacert;
-    if ($cacert) {
-        my $tls =({
-            verify  => 0,
-            ca_path => $cacert,
-		});
+    my ($self)    = @_;
+    my $ca_file   = $self->etcd->ca_file;
+    my $key_file  = $self->etcd->key_file;
+    my $cert_file = $self->etcd->cert_file;
+    my $cacert    = $self->etcd->cacert;
+    my $tls;
+    $tls->{ca_file}   = $ca_file   if $ca_file;
+    $tls->{key_file}  = $key_file  if $key_file;
+    $tls->{cert_file} = $cert_file if $cert_file;
+    $tls->{cacert}    = $cacert    if $cacert;
+
+    if ( $ca_file || $key_file || $cert_file ) {
+        $tls->{verify} = 1;
         return $tls;
     }
-    return 'low'; #default
+    return 'low';
 }
 
 =head2 hold
@@ -149,8 +154,9 @@ has request => ( is => 'lazy', );
 
 sub _build_request {
     my ($self) = @_;
-    if ($self->{retry_auth} > 1) {
-        confess "Error: Unable to authenticate, check your username and password";
+    if ( $self->{retry_auth} > 1 ) {
+        confess
+          "Error: Unable to authenticate, check your username and password";
         $self->{retry_auth} = 0;
         return;
     }
@@ -162,53 +168,65 @@ sub _build_request {
     http_request(
         'POST',
         $self->etcd->api_path . $self->{endpoint},
-        headers => $self->headers,
-        body => $self->json_args,
-        tls_ctx => $self->tls_ctx,
+        headers   => $self->headers,
+        body      => $self->json_args,
+        tls_ctx   => $self->tls_ctx,
         on_header => sub {
-            my($headers) = @_;
+            my ($headers) = @_;
             $self->{response}{headers} = $headers;
         },
         want_body_handle => 1,
         sub {
-            my ($handle, $hdr) = @_;
+            my ( $handle, $hdr ) = @_;
             my $json_reader = sub {
-                my ($handle, $json) = @_;
+                my ( $handle, $json ) = @_;
                 return unless $json;
                 $self->{response}{content} = JSON::encode_json($json);
-                $cb->($json, $hdr) if $cb;
+                $cb->( $json, $hdr ) if $cb;
                 my $status = $hdr->{Status};
                 $self->check_hdr($status);
                 $cv->send;
             };
             my $chunk_reader = sub {
-                my($handle, $line) = @_;
+                my ( $handle, $line ) = @_;
                 return unless $line;
+
                 #read chunk size
-                $line =~ /^([0-9a-fA-F]+)/ or die 'bad chunk (incorrect length) -['.$line.']-';
+                $line =~ /^([0-9a-fA-F]+)/
+                  or die 'bad chunk (incorrect length) -[' . $line . ']-';
                 my $len = hex $1;
+
                 #read chunk
-                $handle->push_read(chunk => $len, sub {
-                    my($handle, $chunk) = @_;
-                    $handle->push_read(line => sub {
-                        length $_[1] and die 'bad chunk (missing last empty line)';
-                    });
-                    $self->{response}{content} = $chunk;
-                    $cb->($chunk, $hdr) if $cb;
-                    my $status = $hdr->{Status};
-                    $self->check_hdr($status);
-                    $cv->send;
-                });
+                $handle->push_read(
+                    chunk => $len,
+                    sub {
+                        my ( $handle, $chunk ) = @_;
+                        $handle->push_read(
+                            line => sub {
+                                length $_[1]
+                                  and die 'bad chunk (missing last empty line)';
+                            }
+                        );
+                        $self->{response}{content} = $chunk;
+                        $cb->( $chunk, $hdr ) if $cb;
+                        my $status = $hdr->{Status};
+                        $self->check_hdr($status);
+                        $cv->send;
+                    }
+                );
             };
 
-            if (($hdr->{'transfer-encoding'} || '') =~ /\bchunked\b/i) {
-                $handle->on_read(sub {$handle->push_read(line => $chunk_reader)});
-            } else {
-                $handle->on_read(sub {$handle->push_read(json => $json_reader)});
+            if ( ( $hdr->{'transfer-encoding'} || '' ) =~ /\bchunked\b/i ) {
+                $handle->on_read(
+                    sub { $handle->push_read( line => $chunk_reader ) } );
+            }
+            else {
+                $handle->on_read(
+                    sub { $handle->push_read( json => $json_reader ) } );
             }
 
-            $handle->on_eof(sub {$handle->destroy; $cv->end});
-            $handle->on_error(sub {$handle->destroy; $cv->end});
+            $handle->on_eof( sub   { $handle->destroy; $cv->end } );
+            $handle->on_error( sub { $handle->destroy; $cv->end } );
         }
     );
     $cv->recv;
@@ -234,6 +252,7 @@ sub get_value {
     my ($self)   = @_;
     my $response = $self->response;
     my $content  = from_json( $response->{content} );
+
     #print STDERR Dumper($content);
     my $value = $content->{kvs}->[0]->{value};
     $value or return;
@@ -275,7 +294,7 @@ Success is returned if the response is a 200
 =cut
 
 sub is_success {
-    my ($self)   = @_;
+    my ($self) = @_;
     my $response = $self->response;
     if ( defined $response->{success} ) {
         return $response->{success};
@@ -304,7 +323,7 @@ check response header then define success and retry_auth.
 =cut
 
 sub check_hdr {
-    my ($self, $status)   = @_;
+    my ( $self, $status ) = @_;
     my $success = $status == 200 ? 1 : 0;
     $self->{response}{success} = $success;
     $self->{retry_auth}++ if $status == 401;

@@ -3,7 +3,7 @@ package GeoIP2::Model::Country;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -37,7 +37,7 @@ GeoIP2::Model::Country - Model class for the GeoIP2 Precision: Country and GeoIP
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ version 2.005000
   use GeoIP2::WebService::Client;
 
   my $client = GeoIP2::WebService::Client->new(
-      user_id     => 42,
+      account_id  => 42,
       license_key => 'abcdef123456',
   );
 

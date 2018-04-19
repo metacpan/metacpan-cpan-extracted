@@ -1,6 +1,6 @@
 package Lab::Connection::IsoBus;
 #ABSTRACT: Oxford Instruments IsoBus connection
-$Lab::Connection::IsoBus::VERSION = '3.630';
+$Lab::Connection::IsoBus::VERSION = '3.631';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -94,7 +94,7 @@ Lab::Connection::IsoBus - Oxford Instruments IsoBus connection
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 SYNOPSIS
 

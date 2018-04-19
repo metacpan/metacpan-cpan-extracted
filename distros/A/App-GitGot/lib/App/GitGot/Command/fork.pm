@@ -1,6 +1,6 @@
 package App::GitGot::Command::fork;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::fork::VERSION = '1.335';
+$App::GitGot::Command::fork::VERSION = '1.336';
 # ABSTRACT: fork a github repo
 use 5.014;
 
@@ -120,7 +120,7 @@ App::GitGot::Command::fork - fork a github repo
 
 =head1 VERSION
 
-version 1.335
+version 1.336
 
 =head1 SYNOPSIS
 

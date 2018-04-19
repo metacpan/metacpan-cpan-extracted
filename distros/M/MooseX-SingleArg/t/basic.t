@@ -1,11 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-
-use Test::More;
-use Test::Fatal;
-
-require_ok('MooseX::SingleArg');
+use Test2::V0;
 
 {
     package MyClass;
@@ -78,7 +74,7 @@ require_ok('MooseX::SingleArg');
 }
 
 like(
-    exception {
+    dies {
         package Broken;
         use Moose;
         use MooseX::SingleArg;

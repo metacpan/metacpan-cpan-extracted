@@ -1,6 +1,6 @@
 package Lab::Instrument::LabViewHeater;
 #ABSTRACT: ?????
-$Lab::Instrument::LabViewHeater::VERSION = '3.630';
+$Lab::Instrument::LabViewHeater::VERSION = '3.631';
 use strict;
 use warnings;
 use Lab::Instrument;
@@ -88,7 +88,7 @@ Lab::Instrument::LabViewHeater - ?????
 
 =head1 VERSION
 
-version 3.630
+version 3.631
 
 =head1 COPYRIGHT AND LICENSE
 

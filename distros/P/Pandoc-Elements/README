@@ -319,11 +319,18 @@ ELEMENTS AND METHODS
 
     meta( [ $metadata ] )
 
-      Get and/or set document metadata elements.
+      Get and/or set combined document metadata. Use method value to get
+      selected metadata fields and values.
 
-    metavalue( [ $field ] )
+    value( [ $pointer ] [ %options ] )
 
-      Shortcut for meta->value.
+      Get selected document metadata field value(s). See Pandoc::Metadata
+      for documentation. Can also be called as metavalue, so the following
+      are equivalent:
+
+        $doc->value( ... );
+        $doc->meta->value( ... );
+        $doc->metavalue( ... );
 
     to_pandoc( [ [ $pandoc, ] @arguments ])
 
@@ -622,7 +629,12 @@ ELEMENTS AND METHODS
 
  METADATA ELEMENTS
 
-    See Pandoc::Metadata for documentation.
+    See Pandoc::Metadata for documentation of metadata elements MetaBool,
+    MetaString, MetaMap, MetaInlines, MetaList, and MetaBlocks.
+
+    Helper function metadata can be used to convert scalars, hash
+    references, array references, and Pandoc Inline/Block elements into
+    metadata elements.
 
  TYPE KEYWORDS
 

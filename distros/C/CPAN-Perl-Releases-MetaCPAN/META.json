@@ -44,6 +44,12 @@
          }
       }
    },
+   "provides" : {
+      "CPAN::Perl::Releases::MetaCPAN" : {
+         "file" : "lib/CPAN/Perl/Releases/MetaCPAN.pm",
+         "version" : "0.005"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -56,12 +62,12 @@
          "web" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>",
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_static_install" : 1
 }
 

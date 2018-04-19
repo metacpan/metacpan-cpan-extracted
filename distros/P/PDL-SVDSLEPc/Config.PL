@@ -36,7 +36,7 @@ my @SLEPC_DIRS = (
 		 );
 my $SLEPC_DIR;
 foreach my $d (@SLEPC_DIRS) {
-  if (-d $d && -r "$d/conf/slepc_variables") {
+  if (-d $d && -r "$d/lib/slepc/conf/slepc_variables") {
     $SLEPC_DIR = $d;
     last;
   }
@@ -44,7 +44,7 @@ foreach my $d (@SLEPC_DIRS) {
 
 ##-- prompt and check
 cprompt("SLEPC_DIR", "SLEPc root directory", $SLEPC_DIR);
-if (!$cconfig{SLEPC_DIR} || !-d $cconfig{SLEPC_DIR} || !-r "$cconfig{SLEPC_DIR}/conf/slepc_variables") {
+if (!$cconfig{SLEPC_DIR} || !-d $cconfig{SLEPC_DIR} || !-r "$cconfig{SLEPC_DIR}/lib/slepc/conf/slepc_variables") {
   warn("Warning: could not find SLEPc sources in SLEPC_DIR=".($cconfig{SLEPC_DIR}||''));
   exit 0; ##-- cpantesters -> NA
 }
@@ -62,7 +62,7 @@ my @PETSC_DIRS = (
 		 );
 my $PETSC_DIR;
 foreach my $d (@PETSC_DIRS) {
-  if (-d $d && -r "$d/conf/petscvariables") {
+  if (-d $d && -r "$d/lib/petsc/conf/petscvariables") {
     $PETSC_DIR = $d;
     last;
   }
@@ -70,7 +70,7 @@ foreach my $d (@PETSC_DIRS) {
 
 ##-- prompt and check
 cprompt("PETSC_DIR", "PETSc root directory", $PETSC_DIR);
-if (!$cconfig{PETSC_DIR} || !-d $cconfig{PETSC_DIR} || !-r "$cconfig{PETSC_DIR}/conf/petscvariables") {
+if (!$cconfig{PETSC_DIR} || !-d $cconfig{PETSC_DIR} || !-r "$cconfig{PETSC_DIR}/lib/petsc/conf/petscvariables") {
   warn("Warning: could not find PETSc sources in PETSC_DIR=".($cconfig{PETSC_DIR}||''));
   exit 0; ##-- cpantesters -> NA
 }

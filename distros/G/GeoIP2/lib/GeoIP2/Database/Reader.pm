@@ -3,7 +3,7 @@ package GeoIP2::Database::Reader;
 use strict;
 use warnings;
 
-our $VERSION = '2.005000';
+our $VERSION = '2.005001';
 
 use Moo;
 
@@ -202,7 +202,7 @@ GeoIP2::Database::Reader - Perl API for GeoIP2 databases
 
 =head1 VERSION
 
-version 2.005000
+version 2.005001
 
 =head1 SYNOPSIS
 
