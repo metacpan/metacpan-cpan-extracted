@@ -10,12 +10,12 @@ const our $TYPE_COUNTRY2   => 5;
 const our $TYPE_CITY2      => 6;
 
 const our $RES => {
-    $TYPE_COUNTRY    => [ '/data/geoip_country.dat',    'https://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz' ],
-    $TYPE_COUNTRY_V6 => [ '/data/geoip_country_v6.dat', 'https://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz' ],
-    $TYPE_CITY       => [ '/data/geoip_city.dat',       'https://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz' ],
-    $TYPE_CITY_V6    => [ '/data/geoip_city_v6.dat',    'https://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz' ],
-    $TYPE_COUNTRY2   => [ '/data/geoip2_country.mmdb',  'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz' ],
-    $TYPE_CITY2      => [ '/data/geoip2_city.mmdb',     'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz' ],
+    $TYPE_COUNTRY    => [ 'data/geoip_country.dat',    'https://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz' ],
+    $TYPE_COUNTRY_V6 => [ 'data/geoip_country_v6.dat', 'https://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz' ],
+    $TYPE_CITY       => [ 'data/geoip_city.dat',       'https://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz' ],
+    $TYPE_CITY_V6    => [ 'data/geoip_city_v6.dat',    'https://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz' ],
+    $TYPE_COUNTRY2   => [ 'data/geoip2_country.mmdb',  'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz' ],
+    $TYPE_CITY2      => [ 'data/geoip2_city.mmdb',     'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz' ],
 };
 
 my $H;
@@ -75,7 +75,7 @@ sub update ( $type, $cb = undef ) {
 
                     IO::Uncompress::Gunzip::gunzip( $res->{body}, $temp->path, BinModeOut => 1 );
 
-                    $ENV->share->store( $RES->{$type}->[0], $temp->path, 'Pcore-GeoIP' );
+                    $ENV->{share}->store( 'Pcore-GeoIP', $RES->{$type}->[0], $temp->path );
 
                     delete $H->{$type};
 
@@ -125,7 +125,7 @@ sub city2 {
 }
 
 sub _get_h ($type) {
-    my $path = $ENV->share->get( $RES->{$type}->[0] );
+    my $path = $ENV->{share}->get( $RES->{$type}->[0] );
 
     return if !$path;
 

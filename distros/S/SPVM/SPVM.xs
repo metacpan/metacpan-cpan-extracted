@@ -103,7 +103,7 @@ int SPVM_XS_UTIL_compile_jit_sub(SPVM_API* api, int32_t sub_id) {
   XPUSHs(sv_jitcode_source);
   PUTBACK;
 
-  return_value_count = call_pv("SPVM::compile_jit_sub", G_SCALAR);
+  return_value_count = call_pv("SPVM::Build::JIT::compile_jit_sub_func", G_SCALAR);
 
   SPAGAIN;
   SP -= return_value_count;
@@ -3033,76 +3033,134 @@ get(...)
 
 MODULE = SPVM::Perl::Object::Array		PACKAGE = SPVM::Perl::Object::Array
 
-
-MODULE = SPVM		PACKAGE = SPVM
-
-SV*
-POSITIVE_INFINITY(...)
-  PPCODE :
-{
-  (void)RETVAL;
-
-  uint64_t positive_infinity_bits = 0x7ff0000000000000L;
-  
-  double positive_infinity;
-  
-  memcpy((void*)&positive_infinity, (void*)&positive_infinity_bits, sizeof(double));
-  
-  SV* sv_positive_infinity = sv_2mortal(newSVnv((NV)positive_infinity));
-  
-  XPUSHs(sv_positive_infinity);
-  XSRETURN(1);
-}
+MODULE = SPVM::Build::SPVMInfo		PACKAGE = SPVM::Build::SPVMInfo
 
 SV*
-NEGATIVE_INFINITY(...)
-  PPCODE :
-{
-  (void)RETVAL;
-
-  uint64_t negative_infinity_bits = 0xfff0000000000000L;
-  
-  double negative_infinity;
-  
-  memcpy((void*)&negative_infinity, (void*)&negative_infinity_bits, sizeof(double));
-
-  SV* sv_negative_infinity = sv_2mortal(newSVnv((NV)negative_infinity));
-
-  XPUSHs(sv_negative_infinity);
-  XSRETURN(1);
-}
-
-SV*
-NaN(...)
-  PPCODE :
-{
-  (void)RETVAL;
-
-  uint64_t nan_bits = 0x7ff8000000000000L;
-  
-  double nan;
-  
-  memcpy((void*)&nan, (void*)&nan_bits, sizeof(double));
-  
-  SV* sv_nan = sv_2mortal(newSVnv((NV)nan));
-  
-  XPUSHs(sv_nan);
-  XSRETURN(1);
-}
-
-SV*
-get_objects_count(...)
+get_sub_name(...)
   PPCODE:
 {
   (void)RETVAL;
   
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  int32_t objects_count = api->get_objects_count(api);
-  SV* sv_objects_count = sv_2mortal(newSViv(objects_count));
+  SV* sv_sub_id = ST(0);
   
-  XPUSHs(sv_objects_count);
+  int32_t sub_id = (int32_t)SvIV(sv_sub_id);
+  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
+  SPVM_SUB* sub = op_sub->uv.sub;
+
+  const char* sub_name = sub->abs_name;
+  
+  SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
+  
+  XPUSHs(sv_sub_name);
   XSRETURN(1);
 }
+
+SV*
+get_sub_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < compiler->op_subs->length; sub_index++) {
+      SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_index);
+      SPVM_SUB* sub = op_sub->uv.sub;
+
+      const char* sub_name = sub->abs_name;
+      
+      SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
+      av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
+    }
+  }
+  
+  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
+  
+  XPUSHs(sv_sub_names);
+  XSRETURN(1);
+}
+
+SV*
+get_native_sub_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  
+  // Get compiler
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  
+  SPVM_LIST* op_subs = compiler->op_subs;
+  
+  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < op_subs->length; sub_index++) {
+      SPVM_OP* op_sub = SPVM_LIST_fetch(op_subs, sub_index);
+      SPVM_SUB* sub = op_sub->uv.sub;
+      
+      if (sub->is_native) {
+        const char* sub_name = sub->abs_name;
+        SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
+        av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
+      }
+    }
+  }
+  
+  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
+  
+  XPUSHs(sv_sub_names);
+  XSRETURN(1);
+}
+
+SV*
+get_package_load_path(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_package_name = ST(0);
+  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+  SPVM_COMPILER* compiler = runtime->compiler;
+
+
+  const char* package_name = SvPV_nolen(sv_package_name);
+  
+
+  // Subroutine information
+  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));;
+  SPVM_PACKAGE* package = op_package->uv.package;
+  
+  const char* package_load_path = package->load_path;
+  
+  SV* sv_package_load_path = sv_2mortal(newSVpvn(package_load_path, strlen(package_load_path)));
+  
+  XPUSHs(sv_package_load_path);
+  
+  XSRETURN(1);
+}
+
+MODULE = SPVM::Build		PACKAGE = SPVM::Build
 
 SV*
 compile(...)
@@ -3110,8 +3168,14 @@ compile(...)
 {
   (void)RETVAL;
   
+  SV* sv_self = ST(0);
+  
   // Create compiler
   SPVM_COMPILER* compiler = SPVM_COMPILER_new();
+  
+  // Enable JIT
+  SV* sv_enable_jit = get_sv("SPVM::ENABLE_JIT", 0);
+  compiler->enable_jit = SvTRUE(sv_enable_jit) ? 1 : 0;
   
   // Add package
   AV* av_package_infos = get_av("SPVM::PACKAGE_INFOS", 0);
@@ -3185,6 +3249,8 @@ build_opcode(...)
   PPCODE:
 {
   (void)RETVAL;
+  
+  SV* sv_self = ST(0);
 
   // Get compiler
   SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
@@ -3196,175 +3262,21 @@ build_opcode(...)
 }
 
 SV*
-get_sub_name(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_sub_id = ST(0);
-  int32_t sub_id = (int32_t)SvIV(sv_sub_id);
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  SPVM_COMPILER* compiler = runtime->compiler;
-  
-  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
-  SPVM_SUB* sub = op_sub->uv.sub;
-
-  const char* sub_name = sub->abs_name;
-  
-  SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
-  
-  XPUSHs(sv_sub_name);
-  XSRETURN(1);
-}
-
-SV*
-get_sub_names(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  SPVM_COMPILER* compiler = runtime->compiler;
-  
-  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
-  
-  {
-    int32_t sub_index;
-    for (sub_index = 0; sub_index < compiler->op_subs->length; sub_index++) {
-      SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_index);
-      SPVM_SUB* sub = op_sub->uv.sub;
-
-      const char* sub_name = sub->abs_name;
-      
-      SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
-      av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
-    }
-  }
-  
-  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
-  
-  XPUSHs(sv_sub_names);
-  XSRETURN(1);
-}
-
-SV*
-get_native_sub_names(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
-  
-  SPVM_LIST* op_subs = compiler->op_subs;
-  
-  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
-  {
-    int32_t sub_index;
-    for (sub_index = 0; sub_index < op_subs->length; sub_index++) {
-      SPVM_OP* op_sub = SPVM_LIST_fetch(op_subs, sub_index);
-      SPVM_SUB* sub = op_sub->uv.sub;
-      
-      if (sub->is_native) {
-        const char* sub_name = sub->abs_name;
-        SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
-        av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
-      }
-    }
-  }
-  
-  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
-  
-  XPUSHs(sv_sub_names);
-  XSRETURN(1);
-}
-
-SV*
-get_no_native_sub_names(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  SPVM_COMPILER* compiler = runtime->compiler;
-  
-  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
-  
-  {
-    int32_t sub_index;
-    for (sub_index = 0; sub_index < compiler->op_subs->length; sub_index++) {
-      SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_index);
-      SPVM_SUB* sub = op_sub->uv.sub;
-
-      if (!sub->is_native) {
-        const char* sub_name = sub->abs_name;
-        
-        SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
-        av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
-      }
-    }
-  }
-  
-  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
-  
-  XPUSHs(sv_sub_names);
-  XSRETURN(1);
-}
-
-SV*
-get_package_load_path(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  SPVM_COMPILER* compiler = runtime->compiler;
-
-
-  SV* sv_package_name = ST(0);
-  const char* package_name = SvPV_nolen(sv_package_name);
-  
-
-  // Subroutine information
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));;
-  SPVM_PACKAGE* package = op_package->uv.package;
-  
-  const char* package_load_path = package->load_path;
-  
-  SV* sv_package_load_path = sv_2mortal(newSVpvn(package_load_path, strlen(package_load_path)));
-  
-  XPUSHs(sv_package_load_path);
-  
-  XSRETURN(1);
-}
-
-SV*
 bind_native_sub(...)
   PPCODE:
 {
   (void)RETVAL;
   
+  SV* sv_self = ST(0);
+  SV* sv_native_sub_name = ST(1);
+  SV* sv_native_address = ST(2);
+  
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
 
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
   SPVM_COMPILER* compiler = runtime->compiler;
   
-  SV* sv_native_sub_name = ST(0);
-  SV* sv_native_address = ST(1);
   
   // Native subroutine name
   const char* native_sub_name = SvPV_nolen(sv_native_sub_name);
@@ -3382,13 +3294,62 @@ bind_native_sub(...)
 }
 
 SV*
+build_runtime(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  
+  // Get compiler
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  
+  // Create run-time
+  SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
+  
+  // Set API
+  SPVM_API* api = runtime->api;
+  size_t iv_api = PTR2IV(api);
+  SV* sviv_api = sv_2mortal(newSViv(iv_api));
+  SV* sv_api = sv_2mortal(newRV_inc(sviv_api));
+  sv_setsv(get_sv("SPVM::API", 0), sv_api);
+  
+  api->compile_jit_sub = &SPVM_XS_UTIL_compile_jit_sub;
+  
+  XSRETURN(0);
+}
+
+SV*
+free_compiler(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  
+  // Get compiler
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  
+  // Free compiler
+  SPVM_COMPILER_free(compiler);
+  
+  // Set undef to compiler
+  sv_setsv(get_sv("SPVM::COMPILER", 0), &PL_sv_undef);
+  
+  XSRETURN(0);
+}
+
+MODULE = SPVM::Build::JIT		PACKAGE = SPVM::Build::JIT
+
+SV*
 bind_jitcode_sub(...)
   PPCODE:
 {
   (void)RETVAL;
   
-  SV* sv_sub_abs_name = ST(0);
-  SV* sv_sub_native_address = ST(1);
+  SV* sv_self = ST(0);
+  SV* sv_sub_abs_name = ST(1);
+  SV* sv_sub_native_address = ST(2);
   
   const char* sub_abs_name = SvPV_nolen(sv_sub_abs_name);
   void* sub_jit_address = (void*)SvIV(sv_sub_native_address);
@@ -3411,126 +3372,20 @@ bind_jitcode_sub(...)
   XSRETURN(0);
 }
 
+MODULE = SPVM		PACKAGE = SPVM
+
 SV*
-build_field_symtable(...)
+get_objects_count(...)
   PPCODE:
 {
   (void)RETVAL;
   
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  int32_t objects_count = api->get_objects_count(api);
+  SV* sv_objects_count = sv_2mortal(newSViv(objects_count));
   
-  // Field symbol table
-  HV* hv_field_symtable = get_hv("SPVM::FIELD_SYMTABLE", 0);
-  
-  // name, arg_types, return_type
-  SPVM_LIST* op_packages = compiler->op_packages;
-  {
-    int32_t package_index;
-    for (package_index = 0; package_index < op_packages->length; package_index++) {
-      SPVM_OP* op_package = SPVM_LIST_fetch(op_packages, package_index);
-      const char* package_name = op_package->uv.package->op_name->uv.name;
-      
-      HV* hv_package_info = (HV*)sv_2mortal((SV*)newHV());
-      
-      SPVM_LIST* op_fields = op_package->uv.package->op_fields;
-      {
-        int32_t field_index;
-        for (field_index = 0; field_index < op_fields->length; field_index++) {
-          SPVM_OP* op_field = SPVM_LIST_fetch(op_fields, field_index);
-          SPVM_FIELD* field = op_field->uv.field;
-          const char* field_name = field->op_name->uv.name;
-          
-          // Field type id
-          int32_t field_type_id = field->op_type->uv.type->id;
-          SV* sv_field_type_id = sv_2mortal(newSViv(field_type_id));
-
-          // Field id
-          int32_t field_id = field->index;
-          SV* sv_field_id = sv_2mortal(newSViv(field_id));
-          
-          HV* hv_field = (HV*)sv_2mortal((SV*)newHV());
-          (void)hv_store(hv_field, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
-          (void)hv_store(hv_field, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
-          (void)hv_store(hv_field, "type_id", strlen("type_id"), SvREFCNT_inc(sv_field_type_id), 0);
-          SV* sv_field = sv_2mortal(newRV_inc((SV*)hv_field));
-          
-          (void)hv_store(hv_package_info, field_name, strlen(field_name), SvREFCNT_inc(sv_field), 0);
-        }
-      }
-      
-      SV* sv_package_info = sv_2mortal(newRV_inc((SV*)hv_package_info));
-      (void)hv_store(hv_field_symtable, package_name, strlen(package_name), SvREFCNT_inc(sv_package_info), 0);
-    }
-  }
-  
-  XSRETURN(0);
-}
-
-SV*
-build_runtime(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
-  
-  // Create run-time
-  SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
-  
-  // Set API
-  SPVM_API* api = runtime->api;
-  size_t iv_api = PTR2IV(api);
-  SV* sviv_api = sv_2mortal(newSViv(iv_api));
-  SV* sv_api = sv_2mortal(newRV_inc(sviv_api));
-  sv_setsv(get_sv("SPVM::API", 0), sv_api);
-  
-  api->compile_jit_sub = &SPVM_XS_UTIL_compile_jit_sub;
-  
-  // JIT mode
-  HV* hv_env = get_hv("ENV", 0);
-  SV** sv_jit_mode_ptr = hv_fetch(hv_env, "SPVM_JIT_MODE", strlen("SPVM_JIT_MODE"), 0);
-  const char* pv_jit_mode;
-  if (sv_jit_mode_ptr) {
-    pv_jit_mode = SvPV_nolen(*sv_jit_mode_ptr);
-  }
-  else {
-    pv_jit_mode = "auto";
-  }
-  
-  if (strcmp(pv_jit_mode, "auto") == 0) {
-    runtime->jit_mode = SPVM_RUNTIME_C_JIT_MODE_AUTO;
-  }
-  else if (strcmp(pv_jit_mode, "all") == 0) {
-    runtime->jit_mode = SPVM_RUNTIME_C_JIT_MODE_ALL;
-  }
-  else if (strcmp(pv_jit_mode, "none") == 0) {
-    runtime->jit_mode = SPVM_RUNTIME_C_JIT_MODE_NONE;
-  }
-  else {
-    croak("Unknown jit mode");
-  }
-  
-  XSRETURN(0);
-}
-
-SV*
-free_compiler(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
-  
-  // Free compiler
-  SPVM_COMPILER_free(compiler);
-  
-  // Set undef to compiler
-  sv_setsv(get_sv("SPVM::COMPILER", 0), &PL_sv_undef);
-  
-  XSRETURN(0);
+  XPUSHs(sv_objects_count);
+  XSRETURN(1);
 }
 
 SV*
@@ -3538,8 +3393,11 @@ call_sub(...)
   PPCODE:
 {
   (void)RETVAL;
+
+  int32_t stack_arg_start = 0;
   
   SV* sv_sub_abs_name = ST(0);
+  stack_arg_start++;
   
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
@@ -3554,16 +3412,22 @@ call_sub(...)
   SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
   SPVM_SUB* sub = op_sub->uv.sub;
   
+  
   // Arguments
   {
+    // If class method, first argument is ignored
+    if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD) {
+      stack_arg_start++;
+    }
+    
     int32_t arg_index;
     // Check argument count
-    if (items - 1 != sub->op_args->length) {
+    if (items - stack_arg_start != sub->op_args->length) {
       croak("Argument count is defferent");
     }
     
     for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
-      SV* sv_value = ST(arg_index + 1);
+      SV* sv_value = ST(arg_index + stack_arg_start);
       
       SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, arg_index);
       SPVM_TYPE* arg_type = op_arg->uv.my->op_type->uv.type;

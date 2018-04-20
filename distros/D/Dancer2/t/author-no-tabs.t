@@ -169,6 +169,7 @@ my @files = (
     't/dsl/to_app.t',
     't/engine.t',
     't/error.t',
+    't/examples/hello_world.t',
     't/factory.t',
     't/file_utils.t',
     't/forward.t',

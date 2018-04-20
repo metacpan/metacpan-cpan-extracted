@@ -8,3 +8,7 @@ Revision history for Perl extension Business::BR::CNJ
 	- Added cnj_extract_numbers_lwp feature
 0.04  Oct 11 10:00:00 2017
 	- package fix
+0.05  Apr 19 10:00:00 2018
+	- Better LWP documentation and bug fixes.
+0.06  Apr 19 10:10:00 2018
+	- Fixed MakeMaker PREREQ_PM.

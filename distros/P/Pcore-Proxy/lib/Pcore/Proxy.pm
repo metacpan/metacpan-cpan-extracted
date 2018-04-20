@@ -1,4 +1,4 @@
-package Pcore::Proxy v0.2.2;
+package Pcore::Proxy v0.2.3;
 
 use Pcore -dist;
 

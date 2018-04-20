@@ -1,12 +1,7 @@
 #!./perl
 
 BEGIN {
-    unless(grep /blib/, @INC) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-
-    require($ENV{PERL_CORE} ? './test.pl' : './t/test.pl');
+    require($ENV{PERL_CORE} ? '../../t/test.pl' : './t/test.pl');
 
     use Config;
     my $can_fork = $Config{d_fork} ||
@@ -79,7 +74,8 @@ package main;
 
 use IO::Socket;
 
-$listen = IO::Socket::INET->new(Listen => 2,
+$listen = IO::Socket::INET->new(LocalAddr => 'localhost',
+				Listen => 2,
 				Proto => 'tcp',
 				Timeout => 5,
 			       ) or die "$!";

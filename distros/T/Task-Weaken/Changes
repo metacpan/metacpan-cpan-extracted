@@ -1,5 +1,9 @@
 Revision history for Task-Weaken
 
+1.06      2018-04-19 15:27:23Z
+        - merge last commits from adamk's svn repository, which bump the
+          minimum version of Scalar::Util in some cases (PR#1)
+
 1.05      2017-12-21 01:10:56Z
         - switch packaging to Dist::Zilla
         - Require List::Util::XS in some cases (unreleased commit from 2012,

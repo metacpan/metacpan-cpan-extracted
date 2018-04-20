@@ -9,7 +9,7 @@ use Plack::Request;
 use Plack::Session;
 use JSON;
 
-our $VERSION = "0.0133";
+our $VERSION = "0.0134";
 
 with "Plack::Auth::SSO";
 

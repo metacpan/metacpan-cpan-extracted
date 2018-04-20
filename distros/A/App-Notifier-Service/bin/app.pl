@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-
-use Dancer;
+use Dancer2;
 use App::Notifier::Service;
 
 {

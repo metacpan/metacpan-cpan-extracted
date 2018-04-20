@@ -7,9 +7,9 @@ build_requires:
   ExtUtils::MakeMaker: '6.52'
   Text::Diff: '0.35'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,18 +17,21 @@ meta-spec:
 name: Test-Base
 no_index:
   directory:
+    - example
     - inc
     - t
     - xt
-    - example
 recommends:
   Test::Deep: '0'
 requires:
   Filter::Util::Call: '0'
+  Scalar::Util: '1.07'
   Spiffy: '0.40'
+  Test::More: '0.88'
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/ingydotnet/test-base-pm/issues
   homepage: https://github.com/ingydotnet/test-base-pm
   repository: https://github.com/ingydotnet/test-base-pm.git
-version: '0.88'
+version: '0.89'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -2,326 +2,252 @@ package SPVM::Build;
 
 use strict;
 use warnings;
-use Carp 'croak', 'confess';
 
-use ExtUtils::CBuilder;
 use Config;
-use File::Copy 'move';
-use File::Path 'mkpath';
+use Carp 'confess';
 
-use File::Basename 'dirname', 'basename';
+use SPVM::Build::SPVMInfo;
+use SPVM::Build::ExtUtil;
+use SPVM::Build::JIT;
+use SPVM::Build::Inline;
 
-my $compiled = {};
+use File::Path 'rmtree';
+use File::Spec;
 
 sub new {
   my $class = shift;
   
   my $self = {};
   
+  $self->{extutil} = SPVM::Build::ExtUtil->new;
+  
+  $self->{jit} = SPVM::Build::JIT->new;
+  
   return bless $self, $class;
 }
 
-sub convert_module_name_to_shared_lib_rel_dir {
-  my ($self, $module_name) = @_;
+sub cleanup_build_dir {
+  my $build_dir = $SPVM::BUILD_DIR;
   
-  my $module_base_name = $module_name;
-  $module_base_name =~ s/^.+:://;
-  
-  my $shared_lib_rel_dir = $module_name;
-  $shared_lib_rel_dir =~ s/::/\//g;
-  $shared_lib_rel_dir = "$shared_lib_rel_dir.native";
-  
-  return $shared_lib_rel_dir;
-}
-
-sub convert_module_name_to_shared_lib_rel_file {
-  my ($self, $module_name) = @_;
-  
-  my $dlext = $Config{dlext};
-  
-  my $module_base_name = $module_name;
-  $module_base_name =~ s/^.+:://;
-  
-  my $shared_lib_rel_dir = $self->convert_module_name_to_shared_lib_rel_dir($module_name);
-  my $shared_lib_rel_file = "$shared_lib_rel_dir/$module_base_name.$dlext";
-  
-  return $shared_lib_rel_file;
-}
-
-sub convert_module_name_to_shared_lib_bilb_file {
-  my ($self, $module_name) = @_;
-
-  # Shared library file
-  my $shared_lib_rel_file = $self->convert_module_name_to_shared_lib_rel_file($module_name);
-  my $shared_lib_bilb_file = "blib/lib/$shared_lib_rel_file";
-
-  return $shared_lib_bilb_file;
-}
-
-sub convert_module_name_to_shared_lib_blib_dir {
-  my ($self, $module_name) = @_;
-  
-  # Shared library file
-  my $shared_lib_rel_dir = $self->convert_module_name_to_shared_lib_rel_dir($module_name);
-  my $shared_lib_blib_dir = "blib/lib/$shared_lib_rel_dir";
-  
-  return $shared_lib_blib_dir;
-}
-
-sub create_build_shared_lib_make_rule {
-  my ($self, $module_name) = @_;
-  
-  my $make_rule;
-  
-  # dynamic section
-  $make_rule
-  = "dynamic :: ";
-
-  my $module_name_under_score = $module_name;
-  $module_name_under_score =~ s/:/_/g;
-  
-  $make_rule
-    .= "shared_lib_$module_name_under_score ";
-  $make_rule .= "\n\n";
-  
-  my $module_base_name = $module_name;
-  $module_base_name =~ s/^.+:://;
-  
-  my $src_dir = $module_name;
-  $src_dir =~ s/::/\//g;
-  $src_dir = "lib_native/$src_dir.native";
-  
-  # Dependency
-  my @deps = grep { $_ ne '.' && $_ ne '..' } glob "$src_dir/*";
-  
-  # Shared library file
-  my $shared_lib_bilb_file = $self->convert_module_name_to_shared_lib_bilb_file($module_name);
-  
-  # Get native source files
-  $make_rule
-    .= "shared_lib_$module_name_under_score :: $shared_lib_bilb_file\n\n";
-  $make_rule
-    .= "$shared_lib_bilb_file :: @deps\n\n";
-  $make_rule
-    .= "\tperl -Ilib -MSPVM::Build -e \"SPVM::Build->new->build_shared_lib_blib('$module_name')\"\n\n";
-  
-  return $make_rule;
-}
-
-sub move_shared_lib_to_blib {
-  my ($self, $shared_lib_file, $module_name) = @_;
-  
-  # Create shared lib blib directory
-  my $shared_lib_blib_dir = $self->convert_module_name_to_shared_lib_blib_dir($module_name);
-  mkpath $shared_lib_blib_dir;
-  
-  # shared lib blib file
-  my $shared_lib_blib_file = $self->convert_module_name_to_shared_lib_bilb_file($module_name);
-  
-  # Move shared library file to blib directory
-  move($shared_lib_file, $shared_lib_blib_file)
-    or die "Can't move $shared_lib_file to $shared_lib_blib_file";
-}
-
-sub build_shared_lib_blib {
-  my ($self, $module_name) = @_;
-
-  my $spvm_build = SPVM::Build->new;
-
-  # Build shared library
-  my $shared_lib_file = $spvm_build->build_shared_lib(
-    module_name => $module_name,
-    module_dir => 'lib',
-    source_dir => 'lib_native',
-    object_dir => '.'
-  );
-  
-  $spvm_build->move_shared_lib_to_blib($shared_lib_file, $module_name);
-}
-
-sub build_shared_lib {
-  my ($self, %opt) = @_;
-  
-  # Module name
-  my $module_name = $opt{module_name};
-  
-  # Module directory
-  my $module_dir = $opt{module_dir};
-
-  # Source directory
-  my $source_dir = $opt{source_dir};
-  unless (defined $source_dir) {
-    $source_dir = $module_dir;
-  }
-  
-  # Object created directory
-  my $object_dir = $opt{object_dir};
-  
-  if ($compiled->{$module_name}) {
-    return $compiled->{$module_name};
-  }
-  
-  my $module_base_name = $module_name;
-  $module_base_name =~ s/^.+:://;
-  
-  my $native_dir = $module_name;
-  $native_dir =~ s/::/\//g;
-  $native_dir .= '.native';
-  $native_dir = "$source_dir/$native_dir";
-  
-  # Correct source files
-  my $src_files = [];
-  my @valid_exts = ('c', 'C', 'cpp', 'i', 's', 'cxx', 'cc');
-  for my $src_file (glob "$native_dir/*") {
-    if (grep { $src_file =~ /\.$_$/ } @valid_exts) {
-      push @$src_files, $src_file;
+  if (defined $build_dir && -d $build_dir) {
+    opendir(my $build_dh, $build_dir);
+    if ($build_dh) {
+      while (my $build_process_dir_base = readdir $build_dh) {
+        if ($build_process_dir_base =~ /^([0-9]+?)\.([0-9]+)?$/) {
+          my $process_id = $1;
+          my $process_start_time = $2;
+          
+          # Remove only old directory than self-process
+          if ($process_start_time < $SPVM::PROCESS_START_TIME) {
+            my $alive = kill 0, $process_id;
+            
+            # Only remove finished process's directory
+            unless ($alive) {
+              my $build_process_dir = "$build_dir/$build_process_dir_base";
+              my @source_files =  glob "$build_process_dir/*";
+              for my $source_file (@source_files) {
+                # Never throw exception even if file is not removed.
+                unlink $source_file;
+              }
+              # Never throw exception even if directory is not removed.
+              rmdir $build_process_dir;
+            }
+          }
+        }
+      }
     }
   }
+}
+
+sub create_build_process_dir {
+  my $build_dir = $SPVM::BUILD_DIR;
   
-  # Config
-  my $config_file = "$native_dir/$module_base_name.config";
-  my $config;
-  if (-f $config_file) {
-    $config = do $config_file
-      or confess "Can't parser $config_file: $!$@";
+  unless (defined $build_dir) {
+    confess "Can't create build process directory because build directory is not specified";
   }
   
-  # Include directory
-  my $include_dirs = [];
+  unless (-d $build_dir) {
+    confess "Can't create build process directory because build directory $build_dir don't eixsts";
+  }
   
-  # Default include path
-  my $api_header_include_dir = $INC{"SPVM/Build.pm"};
-  $api_header_include_dir =~ s/\/Build\.pm$//;
-  push @$include_dirs, $api_header_include_dir;
+  my $build_process_dir = File::Spec->catfile($build_dir, "$$.$SPVM::PROCESS_START_TIME");
   
-  push @$include_dirs, $native_dir;
+  # Don't error check
+  mkdir $build_process_dir;
+  my $mkdir_error = $!;
   
-  # CBuilder config
-  my $cbuilder_config = {};
+  if (!-d $build_process_dir) {
+    my $message = "Can't create build process directory $build_process_dir because mkdir fail";
+    if ($mkdir_error) {
+      $message .= " : $!";
+    }
+    confess $message;
+  }
   
-  # Convert ExtUitls::MakeMaker config to ExtUtils::CBuilder config
-  if ($config) {
-    # CBuilder config name which compatible with ExtUtils::MakeMaker
-    my @cbuilder_config_names_compatible = qw(
-      optimize
-      cc
-      ccflags
-      ld
-      lddlflags
-    );
-    for my $cbuilder_name (@cbuilder_config_names_compatible) {
-      my $makemaker_name = uc $cbuilder_name;
+  return $build_process_dir;
+}
+
+sub extutil {
+  my $self = shift;
+  
+  return $self->{extutil};
+}
+
+sub jit {
+  my $self = shift;
+  
+  return $self->{jit};
+}
+
+sub compile_spvm {
+  my $self = shift;
+  
+  # Compile SPVM source code
+  my $compile_success = $self->compile();
+  
+  if ($compile_success) {
+    # Build opcode
+    $self->build_opcode;
+    
+    # Build run-time
+    $self->build_runtime;
+    
+    # Bind native subroutines
+    $self->bind_native_subs;
+    
+    # Build SPVM subroutines
+    $self->build_spvm_subs;
+  }
+  
+  return $compile_success;
+}
+
+my $package_name_h = {};
+
+sub build_spvm_subs {
+  my $self = shift;
+  
+  my $sub_names = SPVM::Build::SPVMInfo::get_sub_names();
+  
+  for my $abs_name (@$sub_names) {
+    # Define SPVM subroutine
+    no strict 'refs';
+    
+    # Declare package
+    my ($package_name, $sub_name) = $abs_name =~ /^(?:(.+)::)(.+)/;
+    $package_name = "SPVM::$package_name";
+    unless ($package_name_h->{$package_name}) {
       
-      if (defined $config->{$makemaker_name}) {
-        $cbuilder_config->{$cbuilder_name} = delete $config->{$makemaker_name};
+      my $code = "package $package_name; our \@ISA = ('SPVM::Perl::Object::Package');";
+      eval $code;
+      
+      if (my $error = $@) {
+        confess $error;
       }
-    }
-  }
-  
-  # Include directory
-  if (defined $config->{INC}) {
-    my $inc = delete $config->{INC};
-    
-    my @include_dirs_tmp = split /\s+/, $inc;
-    for my $include_dir_tmp (reverse @include_dirs_tmp) {
-      if ($include_dir_tmp =~ s/^-I//) {
-        unshift @$include_dirs, $include_dir_tmp;
-      }
-      else {
-        confess "Invalid include option \"$inc\"";
-      }
-    }
-  }
-  
-  # Shared library
-  my $extra_linker_flags = '';
-  if (defined $config->{LIBS}) {
-    my $libs = delete $config->{LIBS};
-    
-    if (ref $libs eq 'ARRAY') {
-      $libs = join(' ', @$libs);
+      $package_name_h->{$package_name} = 1;
     }
     
-    $extra_linker_flags .= $libs;
+    # Declare subroutine
+    *{"SPVM::$abs_name"} = sub {
+      
+      my $return_value;
+      eval { $return_value = SPVM::call_sub("$abs_name", @_) };
+      my $error = $@;
+      if ($error) {
+        confess $error;
+      }
+      $return_value;
+    };
   }
-  
-  my @keys = keys %$config;
-  if (@keys) {
-    confess "$keys[0] is not supported option";
-  }
-  
-  # OPTIMIZE default is -O3
-  $cbuilder_config->{optimize} ||= '-O3';
-  
-  # Compile source files
-  my $quiet = 1;
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $cbuilder_config);
-  my $object_files = [];
-  unless (defined $object_dir) {
-    confess "object_dir option is needed";
-  }
-  for my $src_file (@$src_files) {
-    # Object file
-    my $object_file = $module_name;
-    $object_file =~ s/:/_/g;
-    my $src_file_under_score = $src_file;
-    $src_file_under_score =~ s/^.+\///;
-    $src_file_under_score =~ s/[^a-zA-Z0-9]/_/g;
-    $object_file = "$object_dir/${object_file}____$src_file_under_score.o";
-    
-    # Compile source file
-    $cbuilder->compile(
-      source => $src_file,
-      object_file => $object_file,
-      include_dirs => $include_dirs,
-      extra_compiler_flags => '-Wall -Wextra -std=c99'
-    );
-    push @$object_files, $object_file;
-  }
-  
-  my $dlext = $Config{dlext};
-  my $native_func_names = $self->get_native_func_names($module_dir, $module_name);
-
-  # This is dummy to suppress boot strap function
-  # This is bad hack
-  unless (@$native_func_names) {
-    push @$native_func_names, '';
-  }
-  
-  my $shared_lib_file = $cbuilder->link(
-    objects => $object_files,
-    module_name => $module_name,
-    dl_func_list => $native_func_names,
-    extra_linker_flags => ''
-  );
-  
-  $compiled->{$module_name} = $shared_lib_file;
-  
-  return $shared_lib_file;
 }
 
-sub get_native_func_names {
-  my ($self, $module_dir, $module_name) = @_;
+sub get_shared_lib_file {
+  my ($self, $module_name) = @_;
   
-  my $module_file = $module_name;
-  $module_file =~ s/::/\//g;
-  $module_file = "$module_dir/$module_file.spvm";
+  my $module_name2 = $module_name;
+  $module_name2 =~ s/SPVM:://;
+  my @module_name_parts = split(/::/, $module_name2);
+  my $module_load_path = SPVM::Build::SPVMInfo::get_package_load_path($module_name2);
   
-  open my $module_fh, '<', $module_file
-    or croak "Can't open $module_file: $!";
+  my $shared_lib_path = $self->extutil->convert_module_path_to_shared_lib_path($module_load_path);
   
-  my $native_func_names = [];
+  return $shared_lib_path;
+}
+
+sub bind_native_subs {
+  my $self = shift;
   
-  my $src = do { local $/; <$module_fh> };
+  my $native_func_names = SPVM::Build::SPVMInfo::get_native_sub_names();
+  for my $native_func_name (@$native_func_names) {
+    my $native_func_name_spvm = "SPVM::$native_func_name";
+    my $native_address = $self->get_sub_native_address($native_func_name_spvm);
+    unless ($native_address) {
+      my $native_func_name_c = $native_func_name_spvm;
+      $native_func_name_c =~ s/:/_/g;
+      confess "Can't find native address of $native_func_name_spvm(). Native function name must be $native_func_name_c";
+    }
+    $self->bind_native_sub($native_func_name, $native_address);
+  }
+}
+
+my $compiled_inline_shared_lib_file_h = {};
+
+sub get_sub_native_address {
+  my ($self, $sub_abs_name) = @_;
   
-  while ($src =~ /native\s+sub\s+([^\s]+)\s/g) {
-    my $sub_name = $1;
-    my $native_func_name = "${module_name}::$sub_name";
-    $native_func_name =~ s/:/_/g;
-    push @$native_func_names, $native_func_name;
+  my $package_name;
+  my $sub_name;
+  if ($sub_abs_name =~ /^(?:(.+)::)(.+)$/) {
+    $package_name = $1;
+    $sub_name = $2;
   }
   
-  return $native_func_names;
+  my $dll_package_name = $package_name;
+  my $shared_lib_file = $self->get_shared_lib_file($dll_package_name);
+  
+  my $shared_lib_func_name = $sub_abs_name;
+  $shared_lib_func_name =~ s/:/_/g;
+  my $native_address = $self->extutil->search_shared_lib_func_address($shared_lib_file, $shared_lib_func_name);
+  
+  # Try inline compile
+  unless ($native_address) {
+    my $module_name = $package_name;
+    $module_name =~ s/^SPVM:://;
+    
+    unless ($compiled_inline_shared_lib_file_h->{$module_name}) {
+      my $module_dir = SPVM::Build::SPVMInfo::get_package_load_path($module_name);
+      $module_dir =~ s/\.spvm$//;
+      
+      my $module_name_slash = $package_name;
+      $module_name_slash =~ s/::/\//g;
+      
+      $module_dir =~ s/$module_name_slash$//;
+      $module_dir =~ s/\/$//;
+      
+      # Build inline code
+      my $build_dir = $SPVM::BUILD_DIR;
+      unless (defined $build_dir && -d $build_dir) {
+        confess "SPVM build directory must be specified for inline compile";
+      }
+      
+      # Create build process directory
+      my $build_process_dir = $SPVM::BUILD->create_build_process_dir;
+      
+      my $inline_shared_lib_file = $self->extutil->build_shared_lib(
+        module_dir => $module_dir,
+        module_name => "SPVM::$module_name",
+        build_dir => $build_process_dir,
+        inline => 1,
+        quiet => 1,
+      );
+      
+      $compiled_inline_shared_lib_file_h->{$module_name} = $inline_shared_lib_file;
+    }
+    
+    $native_address = $self->extutil->search_shared_lib_func_address($compiled_inline_shared_lib_file_h->{$module_name}, $shared_lib_func_name);
+  }
+  
+  return $native_address;
 }
 
 1;

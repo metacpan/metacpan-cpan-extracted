@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -42,7 +44,7 @@ WriteMakefile(
         'RPi::HCSR04'               => 2.3604,
         'RPi::I2C'                  => 2.3605,
         'RPi::LCD'                  => 2.3603,
-        'RPi::Pin'                  => 2.3604,
+        'RPi::Pin'                  => 2.3606,
         'RPi::Serial'               => 2.3603,
         'RPi::SPI'                  => 2.3608,
         'RPi::StepperMotor'         => 2.3604,

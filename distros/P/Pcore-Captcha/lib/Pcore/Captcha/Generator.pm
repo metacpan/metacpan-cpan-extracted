@@ -48,7 +48,7 @@ sub generate {
         $task->{$t}->{font_size} = 1000;
         $task->{$t}->{width}     = int( $width_per_symbol * length( $task->{$t}->{text} ) );
         $task->{$t}->{height}    = $options{height} - $options{padding_y} * 2;
-        $task->{$t}->{font_obj}  = Imager::Font->new( file => $ENV->share->get( '/www/static/fonts/' . $task->{$t}->{font} ), type => 'ft2' ) or die Imager->errstr;
+        $task->{$t}->{font_obj}  = Imager::Font->new( file => $ENV->{share}->get( 'www/static/fonts/' . $task->{$t}->{font} ), type => 'ft2' ) or die Imager->errstr;
         $task->{$t}->{matrix}    = $options{rotate} ? Imager::Matrix2d->rotate( degrees => $task->{$t}->{angle} ) : Imager::Matrix2d->shear( x => sin( $task->{$t}->{angle} * ( $PI / 180 ) ) / cos( $task->{$t}->{angle} * ( $PI / 180 ) ) );
         $task->{$t}->{font_obj}->transform( matrix => $task->{$t}->{matrix} );
     }

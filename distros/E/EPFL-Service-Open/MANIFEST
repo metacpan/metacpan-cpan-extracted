@@ -1,0 +1,18 @@
+bin/epfl-service-open
+Changes
+CONTRIBUTING.md
+ignore.txt
+lib/EPFL/Service/Open.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-get-service.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

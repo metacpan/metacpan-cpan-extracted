@@ -1,21 +1,19 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    unless(grep /blib/, @INC) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
+    if ($ENV{PERL_CORE}) {
 	require Config;
 	if ($Config::Config{'extensions'} !~ /\bSocket\b/) {
 		print "1..0 # Skip: Socket not built - IO.pm uses Socket";
 		exit 0;
 	}
+    }
 }
 
 use strict;
 use File::Path;
 use File::Spec;
-require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+require($ENV{PERL_CORE} ? "../../t/test.pl" : "./t/test.pl");
 plan(tests => 18);
 
 {
@@ -23,8 +21,10 @@ plan(tests => 18);
 
 	my @load;
 	local $^W;
+	my $xsl = \&XSLoader::load;
 	local *XSLoader::load = sub {
 		push @load, \@_;
+		&$xsl(@_);
 	};
 
 	# use_ok() calls import, which we do not want to do
@@ -49,6 +49,7 @@ local $SIG{__WARN__} = sub { $warn = "@_" } ;
 
 {
     local $^W = 0;
+    no if $^V >= 5.17.4, warnings => "deprecated";
     IO->import();
     is( $warn, '', "... import default, should not warn");
     $warn = '' ;
@@ -92,7 +93,7 @@ my $fakemod = File::Spec->catfile( $fakedir, 'fakemod.pm' );
 my $flag;
 if ( -d $fakedir or mkpath( $fakedir ))
 {
-	if (open( OUT, ">$fakemod"))
+	if (open( OUT, '>', $fakemod ))
 	{
 		(my $package = <<'		END_HERE') =~ tr/\t//d;
 		package IO::fakemod;

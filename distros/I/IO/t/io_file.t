@@ -1,14 +1,7 @@
 #!./perl -w
 
-BEGIN {
-    unless(grep /blib/, @INC) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-}
-
 use strict;
-require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+require($ENV{PERL_CORE} ? "../../t/test.pl" : "./t/test.pl");
 plan(tests => ($^O =~ /MSWin32/ ? 9 : 6));
 
 my $Class       = 'IO::File';
@@ -23,7 +16,7 @@ can_ok( $Class,                 "binmode" );
 ### use standard open to make sure we can compare binmodes
 ### on both.
 {   my $tmp;
-    open $tmp, ">$File" or die "Could not open '$File': $!";
+    open $tmp, '>', $File or die "Could not open '$File': $!";
     binmode $tmp;
     print $tmp $All_Chars; 
     close $tmp;

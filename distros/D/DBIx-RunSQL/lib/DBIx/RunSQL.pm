@@ -3,7 +3,7 @@ use strict;
 use DBI;
 
 use vars qw($VERSION);
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 =head1 NAME
 
@@ -136,6 +136,10 @@ C<sql> - name of the file containing the SQL statements
 
 =item *
 
+C<fh> - filehandle to the file containing the SQL statements
+
+=item *
+
 C<force> - continue even if errors are encountered
 
 =item *
@@ -170,13 +174,15 @@ headers
 sub run_sql_file {
     my ($self,%args) = @_;
     my @sql;
-    {
-        open my $fh, "<", $args{sql}
+    if( ! $args{ fh }) {
+        open $args{ fh }, "<", $args{sql}
             or die "Couldn't read '$args{sql}' : $!";
+    };
+    {
         # potentially this should become C<< $/ = ";\n"; >>
         # and a while loop to handle large SQL files
         local $/;
-        $args{ sql }= <$fh>; # sluuurp
+        $args{ sql }= readline $args{ fh }; # sluuurp
     };
     $self->run_sql(
         %args
@@ -446,7 +452,6 @@ will be modified instead.
 sub parse_command_line {
     my ($package,$appname,$argv) =  @_;
     require Getopt::Long; Getopt::Long->import('GetOptionsFromArray');
-    require Pod::Usage; Pod::Usage->import();
 
     if (! $argv) { $argv = \@ARGV };
 
@@ -465,8 +470,14 @@ sub parse_command_line {
         'man'        => \my $man,
     )) {
         no warnings 'newline';
+        $sql ||= join " ", @$argv;
         if( $sql and ! -f $sql ) {
             $sql = \"$sql",
+        };
+        my $fh;
+        if( ! $sql and not @$argv) {
+            # Assume we'll read the SQL from stdin
+            $fh = \*STDIN;
         };
         return {
         user                 => $user,
@@ -475,6 +486,7 @@ sub parse_command_line {
         verbose              => $verbose,
         force                => $force,
         sql                  => $sql,
+        fh                   => $fh,
         no_header_when_empty => $no_header_when_empty,
         output_bool          => $output_bool,
         output_string        => $output_string,
@@ -489,6 +501,7 @@ sub parse_command_line {
 
 sub handle_command_line {
     my ($package,$appname,$argv) =  @_;
+    require Pod::Usage; Pod::Usage->import();
 
     my $opts = $package->parse_command_line($appname,$argv)
         or pod2usage(2);
@@ -526,6 +539,8 @@ In addition, it handles the following switches through L<Pod::Usage>:
 
   --help
   --man
+
+If no SQL is given, this function will read the SQL from STDIN.
 
 If no dsn is given, this function will use
 C< dbi:SQLite:dbname=db/$appname.sqlite >

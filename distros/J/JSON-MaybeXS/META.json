@@ -64,7 +64,7 @@
          "web" : "https://github.com/p5sagit/JSON-MaybeXS"
       }
    },
-   "version" : "1.003010",
+   "version" : "1.004000",
    "x_contributors" : [
       "Clinton Gormley <develop@traveljury.com>",
       "Graham Knop <haarg@haarg.org>",
@@ -73,5 +73,5 @@
       "Kieren Diment <diment@gmail.com>",
       "Matt S Trout <mst@shadowcat.co.uk>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

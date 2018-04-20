@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Lingua-Boolean-Tiny";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-lingua-boolean-tiny>;
@@ -138,6 +138,20 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Boolean-Tiny-0.008"^^xsd:string;
+	dc:issued            "2018-04-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Improvements to German.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/124322>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/daxim>
 	a                    foaf:Person;
 	foaf:name            "Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯";
@@ -156,6 +170,11 @@
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/124322>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "124322"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=124322>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/97328>
 	a                    doap-bugs:Issue;

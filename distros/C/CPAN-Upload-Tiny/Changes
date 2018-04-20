@@ -1,5 +1,9 @@
 Revision history for CPAN-Upload-Tiny
 
+0.005     2018-04-19 16:58:28+02:00 Europe/Amsterdam
+          - Support reserved characters in credentials
+          - Improve error messages for internal errors
+
 0.004     2017-05-14 12:30:44+02:00 Europe/Paris
           - Fix user attribute name
 

@@ -4,11 +4,8 @@ use 5.008007;
 use strict;
 use warnings;
 
-use Config;
 use DynaLoader;
-use SPVM::Build;
 use File::Basename 'basename', 'dirname';
-use File::Temp ();
 
 use SPVM::Perl::Object;
 use SPVM::Perl::Object::Array;
@@ -22,148 +19,46 @@ use SPVM::Perl::Object::Array::Object;
 use SPVM::Perl::Object::Package;
 use SPVM::Perl::Object::Package::String;
 
+use SPVM::Build;
+
 use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0325';
+our $VERSION = '0.0326';
 
 our $COMPILER;
 our $API;
 our @PACKAGE_INFOS;
 our %PACKAGE_INFO_SYMTABLE;
-our $HOME_DIR;
-our $SPVM_BUILD;
+our $ENABLE_JIT;
+our $BUILD_DIR;
+our $PROCESS_START_TIME;
+our $INITIALIZED;
+our $BUILD;
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
 
-$SPVM_BUILD = SPVM::Build->new;
-
-sub compile_jitcode {
-  my ($source_file) = @_;
-  
-  # Source directory
-  my $source_dir = dirname $source_file;
-  
-  # Object created directory
-  my $object_dir = $source_dir;
-  
-  # Include directory
-  my $include_dirs = [];
-  
-  # Default include path
-  my $api_header_include_dir = $INC{"SPVM/Build.pm"};
-  $api_header_include_dir =~ s/\/Build\.pm$//;
-  push @$include_dirs, $api_header_include_dir;
-  
-  my $cbuilder_config = {};
-  
-  # OPTIMIZE default is -O3
-  $cbuilder_config->{optimize} ||= '-O3';
-  
-  # Compile source files
-  my $quiet = 1;
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $cbuilder_config);
-  my $object_files = [];
-  
-  # Object file
-  my $object_file = $source_file;
-  $object_file =~ s/\.c$//;
-  $object_file .= '.o';
-  
-  # Compile source file
-  $cbuilder->compile(
-    source => $source_file,
-    object_file => $object_file,
-    include_dirs => $include_dirs,
-    extra_compiler_flags => '-std=c99'
-    # extra_compiler_flags => '-Wall -Wextra -Wno-unused-label'
-  );
-  push @$object_files, $object_file;
-  
-  # JIT Subroutine names
-  my $sub_names = SPVM::get_sub_names();
-  my @jit_sub_names;
-  for my $abs_name (@$sub_names) {
-    my $jit_sub_name = $abs_name;
-    $jit_sub_name =~ s/:/_/g;
-    $jit_sub_name = "SPVM_JITCODE_$jit_sub_name";
-    push @jit_sub_names, $jit_sub_name;
-  }
-  
-  my $lib_file = $cbuilder->link(
-    objects => $object_files,
-    module_name => 'SPVM::JITCode',
-    dl_func_list => ['SPVM_JITCODE_call_sub', @jit_sub_names],
-    extra_linker_flags => ''
-  );
-  
-  return $lib_file;
-}
-
-sub create_jit_sub_name {
-  my $sub_name = shift;
-  
-  my $jit_sub_name = $sub_name;
-  
-  $jit_sub_name =~ s/:/_/g;
-  
-  $jit_sub_name = "SPVM_JITCODE_$jit_sub_name";
-  
-  return $jit_sub_name;
-}
-
-sub compile_jit_sub {
-  my ($sub_id, $sub_jitcode_source) = @_;
-  
-  my $sub_abs_name = SPVM::get_sub_name($sub_id);
-  my $jit_sub_name = SPVM::create_jit_sub_name($sub_abs_name);
-  
-  # Build JIT code
-  my $tmp_dir = File::Temp->newdir;
-  my $jit_source_dir = $SPVM::HOME_DIR  || $tmp_dir->dirname;
-  my $jit_source_file = "$jit_source_dir/$jit_sub_name.c";
-  my $jit_shared_lib_file = "$jit_source_dir/$jit_sub_name.$Config{dlext}";
-  
-  # Get old jit source
-  my $old_sub_jitcode_source;
-  if (-f $jit_source_file) {
-    open my $fh, '<', $jit_source_file
-      or die "Can't open $jit_source_file";
-    $old_sub_jitcode_source = do { local $/; <$fh> };
-  }
-  else {
-    $old_sub_jitcode_source = '';
-  }
-  
-  # Only compile when source is different
-  if (!-f $jit_shared_lib_file || ($sub_jitcode_source ne $old_sub_jitcode_source)) {
-    open my $fh, '>', $jit_source_file
-      or die "Can't create $jit_source_file";
-    print $fh $sub_jitcode_source;
-    close $fh;
-    
-    compile_jitcode($jit_source_file);
-  }
-  
-  my $sub_jit_address = search_shared_lib_func_address($jit_shared_lib_file, $jit_sub_name);
-  unless ($sub_jit_address) {
-    confess "Can't get $sub_abs_name jitcode address";
-  }
-  
-  bind_jitcode_sub($sub_abs_name, $sub_jit_address);
-  
-  my $success = 1;
-  
-  return $success;
-}
-
 sub import {
   my ($class, $package_name) = @_;
   
-  $SPVM::HOME_DIR ||= $ENV{SPVM_HOME_DIR};
-  
+  unless ($INITIALIZED) {
+    $BUILD = SPVM::Build->new;
+    $ENABLE_JIT = $ENV{SPVM_ENABLE_JIT};
+    $BUILD_DIR = $ENV{SPVM_BUILD_DIR};
+    if (defined $BUILD_DIR) {
+      # Remove traling slash
+      $BUILD_DIR = File::Spec->catdir(File::Spec->splitdir($BUILD_DIR));
+    }
+    $PROCESS_START_TIME = time;
+    
+    # Cleanup build directory
+    $BUILD->cleanup_build_dir;
+    
+    $INITIALIZED = 1;
+  }
+
   # Add package informations
   if (defined $package_name) {
     unless ($SPVM::PACKAGE_INFO_SYMTABLE{$package_name}) {
@@ -185,138 +80,15 @@ sub import {
   return;
 }
 
-sub _get_dll_file {
-  my $package_name = shift;
-  
-  my $package_name2 = $package_name;
-  $package_name2 =~ s/SPVM:://;
-  my @package_name_parts = split(/::/, $package_name2);
-  my $package_load_path = get_package_load_path($package_name2);
-  my $dll_file = $package_load_path;
-  $dll_file =~ s/\.[^.]+$//;
-  $dll_file .= ".native/$package_name_parts[-1].$Config{dlext}";
-  
-  return $dll_file;
-}
-
-sub search_shared_lib_func_address {
-  my ($shared_lib_file, $shared_lib_func_name) = @_;
-  
-  my $native_address;
-  
-  if ($shared_lib_file) {
-    my $dll_libref = DynaLoader::dl_load_file($shared_lib_file);
-    if ($dll_libref) {
-      $native_address = DynaLoader::dl_find_symbol($dll_libref, $shared_lib_func_name);
-    }
-    else {
-      return;
-    }
-  }
-  else {
-    return;
-  }
-  
-  return $native_address;
-}
-
-sub get_sub_native_address {
-  my $sub_abs_name = shift;
-  
-  my $package_name;
-  my $sub_name;
-  if ($sub_abs_name =~ /^(?:(.+)::)(.+)$/) {
-    $package_name = $1;
-    $sub_name = $2;
-  }
-  
-  my $dll_package_name = $package_name;
-  my $shared_lib_file = _get_dll_file($dll_package_name);
-  
-  my $shared_lib_func_name = $sub_abs_name;
-  $shared_lib_func_name =~ s/:/_/g;
-  my $native_address = search_shared_lib_func_address($shared_lib_file, $shared_lib_func_name);
-  
-  # Try runtime compile
-  unless ($native_address) {
-    
-    my $module_name = $package_name;
-    $module_name =~ s/^SPVM:://;
-    my $module_dir = get_package_load_path($module_name);
-    $module_dir =~ s/\.spvm$//;
-    
-    my $module_name_slash = $package_name;
-    $module_name_slash =~ s/::/\//g;
-    
-    $module_dir =~ s/$module_name_slash$//;
-    $module_dir =~ s/\/$//;
-    
-    my $shared_lib_file;
-    
-    my $tmp_dir = File::Temp->newdir;
-    eval {
-      $shared_lib_file = $SPVM_BUILD->build_shared_lib(
-        module_dir => $module_dir,
-        module_name => "SPVM::$module_name",
-        object_dir => $tmp_dir->dirname
-      );
-    };
-    
-    if ($@) {
-      return;
-    }
-    else {
-      $native_address = search_shared_lib_func_address($shared_lib_file, $shared_lib_func_name);
-    }
-  }
-  
-  return $native_address;
-}
-
-sub bind_native_subs {
-  my $native_func_names = get_native_sub_names();
-  for my $native_func_name (@$native_func_names) {
-    my $native_func_name_spvm = "SPVM::$native_func_name";
-    my $native_address = get_sub_native_address($native_func_name_spvm);
-    unless ($native_address) {
-      my $native_func_name_c = $native_func_name_spvm;
-      $native_func_name_c =~ s/:/_/g;
-      confess "Can't find native address of $native_func_name_spvm(). Native function name must be $native_func_name_c";
-    }
-    bind_native_sub($native_func_name, $native_address);
-  }
-}
-
 # Compile SPVM source code just after compile-time of Perl
 CHECK {
+  
   unless ($ENV{SPVM_NO_COMPILE}) {
-    my $compile_success = compile_spvm();
+    my $compile_success = $BUILD->compile_spvm();
     unless ($compile_success) {
       croak("SPVM compile error");
     }
   }
-}
-
-sub compile_spvm {
-  
-  # Compile SPVM source code
-  my $compile_success = compile();
-  
-  if ($compile_success) {
-    # Build opcode
-    build_opcode();
-    
-    # Build run-time
-    build_runtime();
-    
-    # Bind native subroutines
-    bind_native_subs();
-    
-    # Build SPVM subroutines
-    build_spvm_subs();
-  }
-  
-  return $compile_success;
 }
 
 sub new_byte_array_len {
@@ -605,42 +377,6 @@ sub new_object {
   return $object;
 }
 
-my $package_name_h = {};
-
-sub build_spvm_subs {
-  my $sub_names = get_sub_names();
-  
-  for my $abs_name (@$sub_names) {
-    # Define SPVM subroutine
-    no strict 'refs';
-    
-    # Declare package
-    my ($package_name) = $abs_name =~ /^(?:(.+)::)/;
-    $package_name = "SPVM::$package_name";
-    unless ($package_name_h->{$package_name}) {
-      
-      my $code = "package $package_name; our \@ISA = ('SPVM::Perl::Object::Package');";
-      eval $code;
-      
-      if (my $error = $@) {
-        confess $error;
-      }
-      $package_name_h->{$package_name} = 1;
-    }
-    
-    # Declare subroutine
-    *{"SPVM::$abs_name"} = sub {
-      my $return_value;
-      eval { $return_value = SPVM::call_sub("$abs_name", @_) };
-      my $error = $@;
-      if ($error) {
-        confess $error;
-      }
-      $return_value;
-    };
-  }
-}
-
 1;
 
 =encoding UTF-8
@@ -687,7 +423,7 @@ Use SPVM Module from Perl
   my $sp_nums = SPVM::new_int_array([3, 6, 8, 9]);
   
   # Call SPVM subroutine
-  my $total = SPVM::MyMath::sum($sp_nums);
+  my $total = SPVM::MyMath->sum($sp_nums);
   
   print $total . "\n";
 
@@ -708,7 +444,7 @@ SPVM Module:
 
 C Source File;
 
-  // lib/SPVM/MyMathNative.native/MyMathNative.c
+  // lib/SPVM/MyMathNative.inline/MyMathNative.c
   #include <spvm_api.h>
 
   int32_t SPVM__MyMathNative__sum(SPVM_API* api, SPVM_API_VALUE* args) {
@@ -746,7 +482,7 @@ Use Extension Module from Perl:
   my $sp_nums = SPVM::new_int_array([3, 6, 8, 9]);
   
   # Call SPVM subroutine
-  my $total = SPVM::MyMathNative::sum($sp_nums);
+  my $total = SPVM::MyMathNative->sum($sp_nums);
   
   print $total . "\n";
 

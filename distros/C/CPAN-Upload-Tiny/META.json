@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -16,33 +16,25 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Test::More" : "0",
-            "Test::Pod" : "1.41",
-            "blib" : "1.01",
-            "perl" : "5.006"
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "File::Basename" : "0",
-            "Getopt::Long" : "0",
             "HTTP::Tiny" : "0",
             "HTTP::Tiny::Multipart" : "0",
             "IO::Socket::SSL" : "1.56",
+            "MIME::Base64" : "0",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "Pod::Usage" : "0",
-            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          },
@@ -53,15 +45,14 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "CPAN::Upload::Tiny" : {
          "file" : "lib/CPAN/Upload/Tiny.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -76,11 +67,7 @@
          "web" : "https://github.com/Leont/cpan-upload-tiny"
       }
    },
-   "version" : "0.004",
-   "x_contributors" : [
-      "Leon Timmermans <fawaka@gmail.com>",
-      "Shoichi Kaji <skaji@cpan.org>"
-   ],
+   "version" : "0.005",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

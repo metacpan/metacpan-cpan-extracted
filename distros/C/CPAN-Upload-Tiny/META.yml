@@ -5,12 +5,10 @@ author:
 build_requires:
   File::Temp: '0'
   Test::More: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,25 +17,20 @@ name: CPAN-Upload-Tiny
 provides:
   CPAN::Upload::Tiny:
     file: lib/CPAN/Upload/Tiny.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   File::Basename: '0'
-  Getopt::Long: '0'
   HTTP::Tiny: '0'
   HTTP::Tiny::Multipart: '0'
   IO::Socket::SSL: '1.56'
+  MIME::Base64: '0'
   Mozilla::CA: '0'
   Net::SSLeay: '1.49'
-  Pod::Usage: '0'
-  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Upload-Tiny
   repository: git://github.com/Leont/cpan-upload-tiny.git
-version: '0.004'
-x_contributors:
-  - 'Leon Timmermans <fawaka@gmail.com>'
-  - 'Shoichi Kaji <skaji@cpan.org>'
+version: '0.005'
 x_serialization_backend: 'YAML::Tiny version 1.69'

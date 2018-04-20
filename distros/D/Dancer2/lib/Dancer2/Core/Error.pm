@@ -1,6 +1,6 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '0.205002';
+$Dancer2::Core::Error::VERSION = '0.206000';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
@@ -10,6 +10,7 @@ use Dancer2::FileUtils qw/path open_file/;
 use Sub::Quote;
 use Module::Runtime 'require_module';
 use Ref::Util qw< is_hashref >;
+use Clone qw(clone);
 
 has app => (
     is        => 'ro',
@@ -368,11 +369,11 @@ sub dumper {
     my $obj = shift;
 
     # Take a copy of the data, so we can mask sensitive-looking stuff:
-    my %data     = %$obj;
-    my $censored = _censor( \%data );
+    my $data     = clone($obj);
+    my $censored = _censor( $data );
 
     #use Data::Dumper;
-    my $dd = Data::Dumper->new( [ \%data ] );
+    my $dd = Data::Dumper->new( [ $data ] );
     my $hash_separator = '  @@!%,+$$#._(--  '; # Very unlikely string to exist already
     my $prefix_padding = '  #+#+@%.,$_-!((  '; # Very unlikely string to exist already
     $dd->Terse(1)->Quotekeys(0)->Indent(1)->Sortkeys(1)->Pair($hash_separator)->Pad($prefix_padding);
@@ -426,6 +427,8 @@ sub get_caller {
 
 sub _censor {
     my $hash = shift;
+    my $visited = shift || {};
+
     unless ( $hash && is_hashref($hash) ) {
         carp "_censor given incorrect input: $hash";
         return;
@@ -434,9 +437,12 @@ sub _censor {
     my $censored = 0;
     for my $key ( keys %$hash ) {
         if ( is_hashref( $hash->{$key} ) ) {
-            # Take a copy of the data, so we can hide sensitive-looking stuff:
-            $hash->{$key} = { %{ $hash->{$key} } };
-            $censored += _censor( $hash->{$key} );
+            if (!$visited->{ $hash->{$key} }) {
+                # mark the new ref as visited
+                $visited->{ $hash->{$key} } = 1;
+
+                $censored += _censor( $hash->{$key}, $visited );
+            }
         }
         elsif ( $key =~ /(pass|card?num|pan|secret)/i ) {
             $hash->{$key} = "Hidden (looks potentially sensitive)";
@@ -476,7 +482,7 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 SYNOPSIS
 
@@ -582,7 +588,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

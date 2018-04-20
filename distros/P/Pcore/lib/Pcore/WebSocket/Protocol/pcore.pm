@@ -18,10 +18,9 @@ has _callbacks => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg 
 
 with qw[Pcore::WebSocket::Handle];
 
-const our $TX_TYPE_LISTEN    => 'listen';
-const our $TX_TYPE_EVENT     => 'event';
-const our $TX_TYPE_RPC       => 'rpc';
-const our $TX_TYPE_EXCEPTION => 'exception';
+const our $TX_TYPE_LISTEN => 'listen';
+const our $TX_TYPE_EVENT  => 'event';
+const our $TX_TYPE_RPC    => 'rpc';
 
 my $CBOR = Pcore::Util::Data::get_cbor();
 my $JSON = Pcore::Util::Data::get_json( utf8 => 1 );
@@ -30,7 +29,7 @@ sub rpc_call ( $self, $method, $args, $cb ) {
     my $msg = {
         type   => $TX_TYPE_RPC,
         method => $method,
-        data   => $args,
+        args   => $args,
     };
 
     # detect callback
@@ -51,10 +50,10 @@ sub forward_events ( $self, $masks ) {
     return;
 }
 
-sub listen_events ( $self, $masks ) {
+sub listen_remote_events ( $self, $events ) {
     my $msg = {
-        type  => $TX_TYPE_LISTEN,
-        masks => $masks,
+        type   => $TX_TYPE_LISTEN,
+        events => $events,
     };
 
     $self->send_binary( \$CBOR->encode($msg) );
@@ -64,13 +63,12 @@ sub listen_events ( $self, $masks ) {
 
 sub fire_remote_event ( $self, $key, $data = undef ) {
     my $msg = {
-        type => $TX_TYPE_EVENT,
-        ev   => {                 #
-            key => $key,
+        type  => $TX_TYPE_EVENT,
+        event => {                 #
+            key  => $key,
+            data => $data,
         },
     };
-
-    \$msg->{ev}->{data} = \$data;
 
     $self->send_binary( \$CBOR->encode($msg) );
 
@@ -84,8 +82,8 @@ sub forward_remote_event ( $self, $ev ) {
     return if !defined $self->{h};
 
     my $msg = {
-        type => $TX_TYPE_EVENT,
-        ev   => $ev,
+        type  => $TX_TYPE_EVENT,
+        event => $ev,
     };
 
     $self->send_binary( \$CBOR->encode($msg) );
@@ -221,7 +219,7 @@ sub _on_message ( $self, $msg, $is_json ) {
 
         # forward local events to remote peer
         if ( $tx->{type} eq $TX_TYPE_LISTEN ) {
-            $self->_set_listeners( $tx->{masks} );
+            $self->_set_listeners( $tx->{events} );
 
             next;
         }
@@ -230,22 +228,9 @@ sub _on_message ( $self, $msg, $is_json ) {
         if ( $tx->{type} eq $TX_TYPE_EVENT ) {
 
             # ignore event, if not authorized
-            next if $self->{on_fire_event} && !$self->{on_fire_event}->( $self, $tx->{ev}->{key} );
+            next if $self->{on_fire_event} && !$self->{on_fire_event}->( $self, $tx->{event}->{key} );
 
-            P->forward_event( $tx->{ev} );
-
-            next;
-        }
-
-        # exception
-        if ( $tx->{type} eq $TX_TYPE_EXCEPTION ) {
-            if ( $tx->{tid} ) {
-                if ( my $cb = delete $self->{_callbacks}->{ $tx->{tid} } ) {
-
-                    # convert result to response object
-                    $cb->( bless $tx->{message}, 'Pcore::Util::Result' );
-                }
-            }
+            P->forward_event( $tx->{event} );
 
             next;
         }
@@ -255,12 +240,17 @@ sub _on_message ( $self, $msg, $is_json ) {
 
             # method is specified, this is rpc call
             if ( $tx->{method} ) {
+
+                # RPC calls are not supported be this peer
                 if ( !$self->{on_rpc} ) {
                     if ( $tx->{tid} ) {
                         my $result = {
-                            type    => $TX_TYPE_EXCEPTION,
-                            tid     => $tx->{tid},
-                            message => res [ 500, 'RPC is not supported' ],
+                            type   => $TX_TYPE_RPC,
+                            tid    => $tx->{tid},
+                            result => {
+                                status => 400,
+                                reason => 'RPC calls are not supported',
+                            }
                         };
 
                         if ($is_json) {
@@ -283,22 +273,11 @@ sub _on_message ( $self, $msg, $is_json ) {
                         $req->{_cb} = sub ($res) {
                             return if !defined $weak_self;
 
-                            my $result;
-
-                            if ( $res->is_success ) {
-                                $result = {
-                                    type   => $TX_TYPE_RPC,
-                                    tid    => $tx->{tid},
-                                    result => $res,
-                                };
-                            }
-                            else {
-                                $result = {
-                                    type    => $TX_TYPE_EXCEPTION,
-                                    tid     => $tx->{tid},
-                                    message => $res,
-                                };
-                            }
+                            my $result = {
+                                type   => $TX_TYPE_RPC,
+                                tid    => $tx->{tid},
+                                result => $res,
+                            };
 
                             if ($is_json) {
                                 $weak_self->send_text( \$JSON->encode($result) );
@@ -309,11 +288,6 @@ sub _on_message ( $self, $msg, $is_json ) {
 
                             return;
                         };
-                    }
-
-                    # combine method with action
-                    if ( my $action = delete $tx->{action} ) {
-                        $tx->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$tx->{method}";
                     }
 
                     $self->{on_rpc}->( $self, $req, $tx );
@@ -341,9 +315,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 218                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 216                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (21)               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 266, 288, 303        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 256, 282             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

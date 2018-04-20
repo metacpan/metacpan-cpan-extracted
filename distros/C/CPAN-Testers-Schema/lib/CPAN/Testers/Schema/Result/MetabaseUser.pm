@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::MetabaseUser;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: Legacy user information from the Metabase
 
 #pod =head1 SYNOPSIS
@@ -82,7 +82,7 @@ CPAN::Testers::Schema::Result::MetabaseUser - Legacy user information from the M
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Oriol Soriano, Doug Bell.
+This software is copyright (c) 2018 by Oriol Soriano, Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

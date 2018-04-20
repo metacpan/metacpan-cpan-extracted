@@ -37,6 +37,19 @@ lives_ok(
             uri_base => $uri_base,
             session_key => $session_key,
             id => $id,
+            authorization_path => $authorization_path
+        );
+    }
+);
+
+is $auth_app->error_path, $authorization_path, "error_path equals authorizaton_path if not set";
+
+lives_ok(
+    sub{
+        $auth_app = $pkg->new(
+            uri_base => $uri_base,
+            session_key => $session_key,
+            id => $id,
             authorization_path => $authorization_path,
             error_path => $error_path
         );
@@ -47,6 +60,7 @@ is $auth_app->uri_base, $uri_base, "uri_base set";
 is $auth_app->session_key, $session_key, "session_key set";
 is $auth_app->id, $id, "id set";
 is $auth_app->authorization_path, $authorization_path, "authorization_path set";
+is $auth_app->error_path, $error_path, "error_path set";
 
 my $plack_test;
 my $plack_app;

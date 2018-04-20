@@ -4,21 +4,21 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Types-Path-Tiny",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -27,15 +27,30 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008001"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -51,21 +66,23 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::Find" : "0",
-            "File::Spec::Functions" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0.18",
             "File::pushd" : "0",
-            "List::Util" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "perl" : "5.008001"
          }
       }
    },
    "provides" : {
       "Types::Path::Tiny" : {
          "file" : "lib/Types/Path/Tiny.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -73,16 +90,20 @@
       "bugtracker" : {
          "web" : "https://github.com/dagolden/types-path-tiny/issues"
       },
-      "homepage" : "https://metacpan.org/release/Types-Path-Tiny",
+      "homepage" : "https://github.com/dagolden/types-path-tiny",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/dagolden/types-path-tiny.git",
+         "url" : "https://github.com/dagolden/types-path-tiny.git",
          "web" : "https://github.com/dagolden/types-path-tiny"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
+   "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
+      "Hobbestigrou <hobbestigrou@erakis.eu>",
+      "Hobbestigrou <natal.ngetal@novapost.fr>",
       "Toby Inkster <tobyink@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

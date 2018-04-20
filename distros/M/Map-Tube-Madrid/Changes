@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.03  2018-04-19
+      - Added key 'resources' to the Makefile.PL script.
+
 0.02  2018-04-14
       - Updated dependency on Map::Tube v3.49.
 

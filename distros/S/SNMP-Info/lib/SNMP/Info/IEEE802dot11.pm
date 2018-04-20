@@ -32,13 +32,14 @@ package SNMP::Info::IEEE802dot11;
 
 use strict;
 use Exporter;
+use SNMP::Info;
 
-@SNMP::Info::IEEE802dot11::ISA       = qw/Exporter/;
+@SNMP::Info::IEEE802dot11::ISA       = qw/SNMP::Info Exporter/;
 @SNMP::Info::IEEE802dot11::EXPORT_OK = qw//;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = ( 'IEEE802dot11-MIB' => 'dot11DesiredSSID', );
 

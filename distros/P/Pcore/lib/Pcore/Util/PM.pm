@@ -68,18 +68,6 @@ sub run_proc (@) {
     return Pcore::Util::PM::Proc->new(@_);
 }
 
-sub run_rpc ( $class, @ ) {
-    state $init = !!require Pcore::RPC;
-
-    return Pcore::RPC->run_rpc(@_);
-}
-
-sub connect_rpc ( $connect, %args ) {
-    state $init = !!require Pcore::RPC;
-
-    return Pcore::RPC->connect_rpc( %args, connect => $connect );
-}
-
 1;
 __END__
 =pod

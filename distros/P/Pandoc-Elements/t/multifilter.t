@@ -6,6 +6,10 @@ use Pandoc::Filter::Multifilter qw(find_filter apply_filter);
 use IPC::Cmd 'can_run';
 use Pandoc;
 
+# used to test ~/.pandoc/filters as default filter location
+# this does not work on Windows because of symlinks
+my ($PANDOC_SYMLINK) = grep { -d $_ } ('t/.pandoc');
+
 # find_filter( ... )
 {
     my @tests = (
@@ -25,7 +29,7 @@ use Pandoc;
     );
 
     local $ENV{HOME} = 't';
-    if ( -e 't/.pandoc' ) {    # only in git repository
+    if ( $PANDOC_SYMLINK ) {
         push @tests,
             (
             {   input    => ['empty.pl'],
@@ -65,7 +69,7 @@ if ( $ENV{RELEASE_TESTING} and pandoc and pandoc->version('1.12') ) {
     }
     qr{^filter emitted no valid JSON};
 
-    if ( -e 't/.pandoc' ) {    # only in git repository
+    if ( $PANDOC_SYMLINK ) {
         $in->meta( { multifilter => MetaList [ MetaInlines [ Str 'caps' ] ] } );
         local $ENV{HOME} = 't';
         Pandoc::Filter::Multifilter->new->apply($in)->to_json;

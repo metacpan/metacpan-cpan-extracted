@@ -33,12 +33,12 @@ use strict;
 use Exporter;
 use SNMP::Info;
 
-@SNMP::Info::LLDP::ISA       = qw/SNMP::Info Exporter/;
-@SNMP::Info::LLDP::EXPORT_OK = qw//;
+@SNMP::Info::AMAP::ISA       = qw/SNMP::Info Exporter/;
+@SNMP::Info::AMAP::EXPORT_OK = qw//;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS
     = ( 'ALCATEL-IND1-INTERSWITCH-PROTOCOL-MIB' => 'aipAMAPRemDeviceType', );

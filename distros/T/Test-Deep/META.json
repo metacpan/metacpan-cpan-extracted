@@ -4,7 +4,7 @@
       "Fergal Daly <fergal@esatclear.ie>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,6 +58,6 @@
       "x_IRC" : "irc://irc.perl.org/#perl-qa",
       "x_MailingList" : "http://lists.perl.org/list/perl-qa.html"
    },
-   "version" : "1.127",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.128",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

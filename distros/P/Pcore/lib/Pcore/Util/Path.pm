@@ -185,6 +185,41 @@ around new => sub ( $orig, $self, $path = q[], @ ) {
     return bless $path_args, $self;
 };
 
+# TODO new, faster code, to use in new
+sub _normalize_path_new ( $path ) {
+    my @res;
+
+    my @tokens = split m[(?:/|\\)+]sm, $path, -1;
+
+    my $is_abs = $tokens[0] eq q[]  ? q[/] : q[];
+    my $is_dir = $tokens[-1] eq q[] ? q[/] : q[];
+
+    for my $token (@tokens) {
+        next if $token eq q[];
+
+        next if $token eq '.';
+
+        if ( $token eq '..' ) {
+            if ($is_abs) {
+                pop @res;
+
+                next;
+            }
+            else {
+                if ( @res && $res[-1] ne '..' ) {
+                    pop @res;
+
+                    next;
+                }
+            }
+        }
+
+        push @res, $token;
+    }
+
+    return $is_abs . join( '/', @res ) . $is_dir;
+}
+
 around mime_type => sub ( $orig, $self, $shebang = undef ) {
     return q[] if !$self->is_file;
 
@@ -410,7 +445,7 @@ sub is_root ($self) {
 # MIME
 sub _get_mime_types ($self) {
     unless ($MIME_TYPES) {
-        $MIME_TYPES = P->cfg->load( $ENV->share->get('/data/mime.json') );
+        $MIME_TYPES = P->cfg->load( $ENV->{share}->get('data/mime.json') );
 
         # index MIME categories
         for my $suffix ( keys $MIME_TYPES->{suffix}->%* ) {
@@ -473,6 +508,11 @@ sub TO_DUMP {
 ## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (58)                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 19                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 189                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_normalize_path_new' declared but   |
+## |      |                      | not used                                                                                                       |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 192                  | RegularExpressions::ProhibitSingleCharAlternation - Use [/\\] instead of /|\\                                  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

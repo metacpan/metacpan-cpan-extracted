@@ -1,6 +1,6 @@
 package Dancer2::Plugin;
 # ABSTRACT: base class for Dancer2 plugins
-$Dancer2::Plugin::VERSION = '0.205002';
+$Dancer2::Plugin::VERSION = '0.206000';
 use strict;
 use warnings;
 
@@ -348,8 +348,18 @@ sub _exporter_plugin {
             our \@EXPORT = ( ':app' );
 
             around has => sub {
-                my( \$orig, \@args ) = \@_;
-                \$orig->( ${caller}->_p2_has( \@args) );
+                my( \$orig, \$name, \%args ) = \@_;
+
+                if (ref \$name eq 'ARRAY'
+                        && exists \$args{'plugin_keyword'}
+                        && ref \$args{'plugin_keyword'} eq 'ARRAY') {
+
+                    Carp::croak('Setting "plugin_keyword" to an array is disallowed'
+                        . ' when defining multiple attributes simultaneously');
+                }
+
+                \$orig->( ${caller}->_p2_has( \$_, \%args) )
+                    for ref \$name ? @\$name : \$name;
             };
 
             sub PluginKeyword :ATTR(CODE,BEGIN) {
@@ -626,7 +636,7 @@ Dancer2::Plugin - base class for Dancer2 plugins
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 SYNOPSIS
 
@@ -1089,7 +1099,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

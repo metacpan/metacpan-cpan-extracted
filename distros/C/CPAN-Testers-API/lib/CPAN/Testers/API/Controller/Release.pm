@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Release;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: API for test reports collected by CPAN release
 
 #pod =head1 DESCRIPTION
@@ -117,28 +117,18 @@ sub release( $c ) {
     if ( $limit and $limit < 1 ) {
         return $c->render_error( 400 => 'The value for "limit" must be a positive integer' );
     }
+    if ( $limit ) {
+        $rs = $rs->slice( 0, $limit - 1 );
+    }
 
     if ( my $dist = $c->validation->param( 'dist' ) ) {
         $rs = $rs->by_dist( $dist );
-        @results = $limit ? $rs->slice( 0, $limit - 1 ) : $rs->all;
-        if ( !@results ) {
-            return $c->render_error( 404, sprintf 'Distribution "%s" not found', $dist );
-        }
     }
     elsif ( my $author = $c->validation->param( 'author' ) ) {
         $rs = $rs->by_author( $author );
-        @results = $limit ? $rs->slice( 0, $limit - 1 ) : $rs->all;
-        if ( !@results ) {
-            return $c->render_error( 404, sprintf 'Author "%s" not found', $author );
-        }
-    }
-    else {
-        @results = $limit ? $rs->slice( 0, $limit - 1 ) : $rs->all;
     }
 
-    return $c->render(
-        openapi => \@results,
-    );
+    return $c->stream_rs( $rs );
 }
 
 1;
@@ -153,7 +143,7 @@ CPAN::Testers::API::Controller::Release - API for test reports collected by CPAN
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -236,7 +226,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

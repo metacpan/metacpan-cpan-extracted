@@ -1,5 +1,18 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.37 2018-04-19T21:10:31Z
+
+    [ All ]
+    - Сompilation tests were added
+
+0.36 2018-04-19T19:32:36Z
+
+    [Base]
+    - Module "Base" was added
+
+    [Struct]
+    - In the module "Struct" a step is added to read the result of the query to the database
+
 0.35 2018-04-12T20:08:03Z
 
     [ Var ]

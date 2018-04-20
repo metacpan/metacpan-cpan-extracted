@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <sys/time.h>
+#include "duk_console.h"
 #include "util.h"
 
 #define FILE_MEMORY_STATUS "/proc/self/statm"
@@ -56,3 +57,31 @@ long total_memory_pages(void)
     return pages;
 }
 
+int check_duktape_call_for_errors(int rc, duk_context* ctx)
+{
+    if (rc == DUK_EXEC_SUCCESS) {
+        /* no error */
+        return 1;
+    }
+
+    if (duk_is_error(ctx, -1)) {
+        /*
+         * Error and we should have a stack trace.
+         * Accessing .stack might cause an error to be thrown, so wrap this
+         * access in a duk_safe_call() if it matters.
+         */
+        duk_get_prop_string(ctx, -1, "stack");
+        duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
+                        "error: %s\n", duk_safe_to_string(ctx, -1));
+        duk_pop(ctx);
+        return 0;
+    }
+
+    /*
+     * Error without a stack trace.
+     * Non-Error value, coerce safely to string.
+     */
+    duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
+                    "error: %s\n", duk_safe_to_string(ctx, -1));
+    return 1;
+}

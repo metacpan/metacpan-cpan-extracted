@@ -6,13 +6,13 @@ build_requires:
   Capture::Tiny: '0.12'
   ExtUtils::MakeMaker: '7.1101'
   File::Spec: '0'
-  HTTP::Body: '0'
   HTTP::Cookies: '0'
   HTTP::Headers: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Template: '0'
   Test::Builder: '0'
+  Test::CPAN::Meta: '0'
   Test::EOL: '0'
   Test::Fatal: '0'
   Test::More: '0.92'
@@ -22,7 +22,7 @@ configure_requires:
 conflicts:
   YAML: '1.16'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,175 +31,175 @@ name: Dancer2
 provides:
   Dancer2:
     file: lib/Dancer2.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::CLI:
     file: lib/Dancer2/CLI.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::CLI::Command::gen:
     file: lib/Dancer2/CLI/Command/gen.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::CLI::Command::version:
     file: lib/Dancer2/CLI/Command/version.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core:
     file: lib/Dancer2/Core.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::App:
     file: lib/Dancer2/Core/App.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Cookie:
     file: lib/Dancer2/Core/Cookie.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::DSL:
     file: lib/Dancer2/Core/DSL.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Dispatcher:
     file: lib/Dancer2/Core/Dispatcher.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Error:
     file: lib/Dancer2/Core/Error.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Factory:
     file: lib/Dancer2/Core/Factory.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::HTTP:
     file: lib/Dancer2/Core/HTTP.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Hook:
     file: lib/Dancer2/Core/Hook.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::MIME:
     file: lib/Dancer2/Core/MIME.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Request:
     file: lib/Dancer2/Core/Request.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Request::Upload:
     file: lib/Dancer2/Core/Request/Upload.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Response:
     file: lib/Dancer2/Core/Response.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Response::Delayed:
     file: lib/Dancer2/Core/Response/Delayed.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::ConfigReader:
     file: lib/Dancer2/Core/Role/ConfigReader.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::DSL:
     file: lib/Dancer2/Core/Role/DSL.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::Engine:
     file: lib/Dancer2/Core/Role/Engine.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::Handler:
     file: lib/Dancer2/Core/Role/Handler.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::HasLocation:
     file: lib/Dancer2/Core/Role/HasLocation.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::Hookable:
     file: lib/Dancer2/Core/Role/Hookable.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::Logger:
     file: lib/Dancer2/Core/Role/Logger.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::Serializer:
     file: lib/Dancer2/Core/Role/Serializer.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::SessionFactory:
     file: lib/Dancer2/Core/Role/SessionFactory.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::SessionFactory::File:
     file: lib/Dancer2/Core/Role/SessionFactory/File.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::StandardResponses:
     file: lib/Dancer2/Core/Role/StandardResponses.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Role::Template:
     file: lib/Dancer2/Core/Role/Template.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Route:
     file: lib/Dancer2/Core/Route.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Runner:
     file: lib/Dancer2/Core/Runner.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Session:
     file: lib/Dancer2/Core/Session.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Time:
     file: lib/Dancer2/Core/Time.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Core::Types:
     file: lib/Dancer2/Core/Types.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::FileUtils:
     file: lib/Dancer2/FileUtils.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Handler::AutoPage:
     file: lib/Dancer2/Handler/AutoPage.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Handler::File:
     file: lib/Dancer2/Handler/File.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::Capture:
     file: lib/Dancer2/Logger/Capture.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::Capture::Trap:
     file: lib/Dancer2/Logger/Capture/Trap.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::Console:
     file: lib/Dancer2/Logger/Console.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::Diag:
     file: lib/Dancer2/Logger/Diag.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::File:
     file: lib/Dancer2/Logger/File.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::Note:
     file: lib/Dancer2/Logger/Note.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Logger::Null:
     file: lib/Dancer2/Logger/Null.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Plugin:
     file: lib/Dancer2/Plugin.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Serializer::Dumper:
     file: lib/Dancer2/Serializer/Dumper.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Serializer::JSON:
     file: lib/Dancer2/Serializer/JSON.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Serializer::Mutable:
     file: lib/Dancer2/Serializer/Mutable.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Serializer::YAML:
     file: lib/Dancer2/Serializer/YAML.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Session::Simple:
     file: lib/Dancer2/Session/Simple.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Session::YAML:
     file: lib/Dancer2/Session/YAML.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Template::Implementation::ForkedTiny:
     file: lib/Dancer2/Template/Implementation/ForkedTiny.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Template::Simple:
     file: lib/Dancer2/Template/Simple.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Template::TemplateToolkit:
     file: lib/Dancer2/Template/TemplateToolkit.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Template::Tiny:
     file: lib/Dancer2/Template/Tiny.pm
-    version: '0.205002'
+    version: '0.206000'
   Dancer2::Test:
     file: lib/Dancer2/Test.pm
-    version: '0.205002'
+    version: '0.206000'
 recommends:
   CGI::Deurl::XS: '0'
   Class::XSAccessor: '0'
@@ -219,6 +219,7 @@ requires:
   App::Cmd::Setup: '0'
   Attribute::Handlers: '0'
   Carp: '0'
+  Clone: '0'
   Config::Any: '0'
   Digest::SHA: '0'
   Encode: '0'
@@ -228,12 +229,11 @@ requires:
   File::Copy: '0'
   File::Find: '0'
   File::Path: '0'
-  File::ShareDir: '0'
+  File::Share: '0'
   File::Spec: '0'
   File::Temp: '0'
-  HTTP::Body: '0'
   HTTP::Date: '0'
-  HTTP::Headers::Fast: '0'
+  HTTP::Headers::Fast: '0.21'
   HTTP::Tiny: '0'
   HTTP::XSCookies: '0.000007'
   Hash::Merge::Simple: '0'
@@ -246,7 +246,7 @@ requires:
   Moo: '2.000000'
   Moo::Role: '0'
   POSIX: '0'
-  Plack: '1.0035'
+  Plack: '1.0040'
   Plack::Middleware::FixMissingBodyInRedirect: '0'
   Plack::Middleware::RemoveRedundantBody: '0'
   Ref::Util: '0'
@@ -268,5 +268,5 @@ resources:
   bugtracker: https://github.com/PerlDancer/Dancer2/issues
   homepage: http://perldancer.org/
   repository: git://github.com/PerlDancer/Dancer2.git
-version: '0.205002'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.206000'
+x_serialization_backend: 'YAML::Tiny version 1.69'

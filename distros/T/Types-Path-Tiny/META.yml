@@ -3,47 +3,51 @@ abstract: 'Path::Tiny types and coercions for Moose and Moo'
 author:
   - 'David Golden <dagolden@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-  File::Find: 0
-  File::Spec::Functions: 0
-  File::Temp: 0.18
-  File::pushd: 0
-  List::Util: 0
-  Test::More: 0.96
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.18'
+  File::pushd: '0'
+  Test::More: '0.96'
+  perl: '5.008001'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Types-Path-Tiny
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Types::Path::Tiny:
     file: lib/Types/Path/Tiny.pm
-    version: 0.005
+    version: '0.006'
 requires:
-  Path::Tiny: 0
-  Type::Library: 0.008
-  Type::Utils: 0
-  Types::Standard: 0
-  Types::TypeTiny: 0.004
-  perl: 5.008001
-  strict: 0
-  warnings: 0
+  Path::Tiny: '0'
+  Type::Library: '0.008'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  Types::TypeTiny: '0.004'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/dagolden/types-path-tiny/issues
-  homepage: https://metacpan.org/release/Types-Path-Tiny
-  repository: git://github.com/dagolden/types-path-tiny.git
-version: 0.005
+  homepage: https://github.com/dagolden/types-path-tiny
+  repository: https://github.com/dagolden/types-path-tiny.git
+version: '0.006'
+x_authority: cpan:DAGOLDEN
 x_contributors:
+  - 'Hobbestigrou <hobbestigrou@erakis.eu>'
+  - 'Hobbestigrou <natal.ngetal@novapost.fr>'
   - 'Toby Inkster <tobyink@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

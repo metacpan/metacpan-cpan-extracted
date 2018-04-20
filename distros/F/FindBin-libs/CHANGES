@@ -1,9 +1,10 @@
--   2.12.12 Thu Apr 19 00:17:37 CDT 2018
+-   2.12.14 Thu Apr 19 00:17:37 CDT 2018
 
     POD.
 
     Makefile.PL boilerplate.
 
+    add config_requires.
 
 -   2.17.11 Wed Apr 18 10:46:42 CDT 2018
 

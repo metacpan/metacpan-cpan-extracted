@@ -52,7 +52,7 @@ sub write_makefile
         'parent'                => 0.221,
     );
 
-    WriteMakefile( VERSION         => '0.9923',
+    WriteMakefile( VERSION         => '0.9924',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,
@@ -95,8 +95,9 @@ sub write_makefile
                        "meta-spec" => { version => 2 },
                        resources => {
                            repository => {
-                               type => 'hg',
-                               url => 'https://bitbucket.org/jpeacock/version'
+                               type => 'git',
+                               url => 'git://github.com/JohnPeacock/version.pm.git',
+                               web  => 'http://github.com/JohnPeacock/version.pm',
                            },
                            bugtracker => {
                                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',

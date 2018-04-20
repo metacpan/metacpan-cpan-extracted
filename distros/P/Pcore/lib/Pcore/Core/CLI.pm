@@ -554,11 +554,11 @@ sub help_version ($self) {
         say join q[ ], $ENV->{SCRIPT_NAME}, ( $main::VERSION ? version->new($main::VERSION)->normal : () );
     }
 
-    say $ENV->pcore->version_string if !$ENV->dist || $ENV->dist->name ne $ENV->pcore->name;
+    say $ENV->{pcore}->version_string if !$ENV->dist || $ENV->dist->name ne $ENV->{pcore}->name;
 
     say 'Perl ' . $^V->normal . " $Config{archname}";
 
-    say join $LF, q[], 'Image path: ' . $ENV{PAR_PROGNAME}, 'Temp dir: ' . $ENV{PAR_TEMP} if $ENV->is_par;
+    say join $LF, q[], 'Image path: ' . $ENV{PAR_PROGNAME}, 'Temp dir: ' . $ENV{PAR_TEMP} if $ENV->{is_par};
 
     exit 2;
 }

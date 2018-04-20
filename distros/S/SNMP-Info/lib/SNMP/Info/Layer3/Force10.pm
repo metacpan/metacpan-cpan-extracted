@@ -43,13 +43,13 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION $DEBUG %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
     %SNMP::Info::MAU::MIBS,
     %SNMP::Info::LLDP::MIBS,
-    'F10-PRODUCTS-MIB' => 'f10Products',
+    'F10-PRODUCTS-MIB' => 'f10ESeriesProducts',
 );
 
 %GLOBALS = (

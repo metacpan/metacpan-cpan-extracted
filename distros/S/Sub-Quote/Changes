@@ -1,5 +1,8 @@
 Revision history for Sub::Quote
 
+2.005001 - 2018-04-20
+  - add a workaround for test failures on early 5.8 releases with threads
+
 2.005000 - 2018-02-06
   - fixed defer_info and undefer_sub from returning data for a deferred sub
     after it expires, even if the ref address matches

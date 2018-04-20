@@ -1,4 +1,4 @@
-Business-BR-CNJ-NumberExtractor version 0.01
+Business-BR-CNJ-NumberExtractor version 0.06
 ================================
 
 Business::BR::CNJ::NumberExtractor extract CNJ numbers from a text file.
@@ -24,7 +24,7 @@ AUTHOR
 
 Diego de Lima
 
-SPACIAL THANKS
+SPECIAL THANKS
 
 This module was kindly made available by the https://modeloinicial.com.br/ team.
 

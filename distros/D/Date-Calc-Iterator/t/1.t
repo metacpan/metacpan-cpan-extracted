@@ -1,4 +1,4 @@
-# $Id: 1.t,v 1.1.1.1 2004/03/17 19:18:12 bronto Exp $
+# $Id: 1.t,v 1.1 2004/03/17 19:18:12 bronto Exp $
 
 use Test::More tests => 4 ;
 #use Test::More 'no_plan' ;

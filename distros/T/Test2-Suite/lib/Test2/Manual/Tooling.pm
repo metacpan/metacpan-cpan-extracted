@@ -2,7 +2,7 @@ package Test2::Manual::Tooling;
 use strict;
 use warnings;
 
-our $VERSION = '0.000111';
+our $VERSION = '0.000114';
 
 1;
 
@@ -23,6 +23,11 @@ This section covers writing new tools, plugins, and other Test2 components.
 L<Test2::Manual::Tooling::FirstTool> - Introduction to writing tools by cloning
 L<ok()>.
 
+=head2 MOVING FROM Test::Builder
+
+L<Test2::Manual::Tooling::TestBuilder> - This section maps Test::Builder
+methods to Test2 concepts.
+
 =head2 NESTING TOOLS
 
 L<Test2::Manual::Tooling::Nesting> - How to call other tools from your tool.
@@ -37,33 +42,30 @@ L<Test2::Manual::Tooling::Testing> - How to write tests for your test tools.
 
 =head1 PLUGIN TUTORIALS
 
-=head2 IMPLEMENTING SRAND
+=head2 TAKING ACTION WHEN A NEW TOOL STARTS
 
-COMING SOON.
+L<Test2::Manual::Tooling::Plugin::ToolStarts> - How to add behaviors that occur
+when a tool starts work.
 
-=head2 IMPLEMENTING DIE-ON-FAIL
+=head2 TAKING ACTION AFTER A TOOL IS DONE
 
-COMING SOON.
+L<Test2::Manual::Tooling::Plugin::ToolCompletes> - How to add behaviors that
+occur when a tool completes work.
 
 =head2 TAKING ACTION AT THE END OF TESTING
 
-COMING SOON.
+L<Test2::Manual::Tooling::Plugin::TestingDone> - How to add behaviors that
+occur when testing is complete (IE done_testing, or end of test).
 
 =head2 TAKING ACTION JUST BEFORE EXIT
 
-COMING SOON.
+L<Test2::Manual::Tooling::Plugin::TestExit> - How to safely add pre-exit
+behaviors.
 
-=head1 FORMATTER TUTORIALS
+=head1 WRITING A SIMPLE JSONL FORMATTER
 
-COMING SOON.
-
-=head2 WRITING A SIMPLE JSON FORMATTER
-
-COMING SOON.
-
-=head1 CUSTOM EVENT TUTORIAL
-
-COMING SOON.
+L<Test2::Manual::Tooling::Formatter> - How to write a custom formatter, in our
+case a JSONL formatter.
 
 =head1 WHERE TO FIND HOOKS AND APIS
 
@@ -108,7 +110,7 @@ F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 COPYRIGHT
 
-Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

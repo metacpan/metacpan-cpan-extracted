@@ -7,7 +7,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = "1.25";
+our $VERSION = "1.39";
 XSLoader::load 'IO', $VERSION;
 
 sub import {
@@ -18,6 +18,8 @@ sub import {
     
     my @l = @_ ? @_ : qw(Handle Seekable File Pipe Socket Dir);
 
+    local @INC = @INC;
+    pop @INC if $INC[-1] eq '.';
     eval join("", map { "require IO::" . (/(\w+)/)[0] . ";\n" } @l)
 	or croak $@;
 }
@@ -32,8 +34,8 @@ IO - load various IO modules
 
 =head1 SYNOPSIS
 
-    use IO qw(Handle File);  # loads IO modules, here IO::Handle, IO::File
-    use IO;                  # DEPRECATED
+   use IO qw(Handle File); # loads IO modules, here IO::Handle, IO::File
+   use IO;                 # DEPRECATED
 
 =head1 DESCRIPTION
 

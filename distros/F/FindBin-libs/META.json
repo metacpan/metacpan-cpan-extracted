@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "File::Copy::Recursive::Reduced" : "0.002"
          }
       },
       "runtime" : {
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.017012",
+   "version" : "2.017014",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

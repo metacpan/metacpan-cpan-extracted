@@ -130,7 +130,7 @@ sub _test_api( $base ) {
             $t->get_ok( $base . '/release/dist/NOT_FOUND' )
               ->status_is( 404 )
               ->json_is( {
-                  errors => [ { message =>  'Distribution "NOT_FOUND" not found', 'path' => '/' } ],
+                  errors => [ { message =>  'No results found', 'path' => '/' } ],
               } );
         };
     };
@@ -144,7 +144,7 @@ sub _test_api( $base ) {
             $t->get_ok( $base . '/release/author/PREACTION?since=2016-08-20T00:00:00' )
               ->status_is( 200 )
               ->json_is( [ map { +{ $_->%{ @API_FIELDS } } } $data{Release}->@[2,5..8] ] )
-              ->or( sub { diag explain shift->tx->res->json } );
+              ->or( sub { diag shift->tx->res->body } );
         };
 
         subtest 'limit' => sub {
@@ -201,7 +201,7 @@ sub _test_api( $base ) {
             $t->get_ok( $base . '/release/author/NOT_FOUND' )
               ->status_is( 404 )
               ->json_is( {
-                  errors => [ { message =>  'Author "NOT_FOUND" not found', path => '/' } ],
+                  errors => [ { message =>  'No results found', path => '/' } ],
               } );
         };
     };

@@ -1,3 +1,8 @@
+v0.14.17 2018-04-20T07:25:52Z
+ - sh wraper script
+ - Docker base image changed from "softvisio/pcore:v0.61.4" to
+   "softvisio/pcore:v0.62.0"
+
 v0.14.16 2018-04-15T04:06:44Z
  - docker.sh default command
  - Docker base image changed from "softvisio/pcore:v0.61.2" to

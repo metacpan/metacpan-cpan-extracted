@@ -40,7 +40,7 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::MIBS,
@@ -51,6 +51,7 @@ $VERSION = '3.54';
     'TRAPEZE-NETWORKS-CLIENT-SESSION-MIB'       => 'trpzClSessTotalSessions',
     'TRAPEZE-NETWORKS-SYSTEM-MIB'               => 'trpzSysCpuAverageLoad',
     'TRAPEZE-NETWORKS-BASIC-MIB'                => 'trpzVersionString',
+    'TRAPEZE-NETWORKS-AP-CONFIG-MIB'  => 'trpzApConfServProfBeaconEnabled',
 );
 
 %GLOBALS = (

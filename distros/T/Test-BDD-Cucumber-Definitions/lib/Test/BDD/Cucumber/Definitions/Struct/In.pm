@@ -7,7 +7,7 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::Struct qw(Struct);
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -28,6 +28,11 @@ sub import {
     #        read zip archive members as list
     Given qr/read zip archive members as list/, sub {
         Struct->read_zip_archive_members_as_list();
+    };
+
+    #        read base response as struct
+    Given qr/read base response as struct/, sub {
+        Struct->read_base_response_as_struct();
     };
 
     #       struct data element "(.+?)" eq "(.*)"

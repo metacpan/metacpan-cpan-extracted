@@ -1,9 +1,11 @@
 package Pandoc::Filter::ImagesFromCode;
 use strict;
 use warnings;
+use utf8;
+use Encode;
 use 5.010;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Digest::MD5 'md5_hex';
 use IPC::Run3;
@@ -12,15 +14,14 @@ use parent 'Pandoc::Filter';
 
 sub new {
     my ($class, %opts) = @_;
+
+    $opts{from} //= 'code';
+    $opts{dir} //= '.';
+    $opts{dir} =~ s!/$!!;
+
     bless \%opts, $class;
 }
 
-# input type extension
-sub from {
-    $_[0]->{from} // 'code';
-}
-
-# output type extension
 sub to {
     my $to     = $_[0]->{to};
     my $format = $_[1];
@@ -48,14 +49,16 @@ sub action {
         return if $e->name ne 'CodeBlock';
 
         my $code = $e->content;
-        my $dir  = "."; # TODO: configure this
-     
+        my $dir  = $filter->{dir};
+    
         my %args;
-        $args{md5}      = md5_hex($code);
-        $args{from}     = $filter->from;
+        my $name = $e->id;
+        $name = md5_hex( encode( 'utf8', $code ) ) if $name !~ /^[a-z0-9_]+$/i;
+
+        $args{from}     = $filter->{from};
         $args{to}       = $filter->to($f);
-        $args{infile}   = "$dir/".$args{md5}.".".$args{from};
-        $args{outfile}  = "$dir/".$args{md5}.".".$args{to};
+        $args{infile}   = $filter->{dir} . "/$name." . $args{from};
+        $args{outfile}  = $filter->{dir} . "/$name." . $args{to};
 
         # TODO: document this
         my $kv = $e->keyvals;
@@ -65,18 +68,18 @@ sub action {
 
         # TODO: print args in debug mode?
 
-        open my $fh, ">", $args{infile} 
+        # TODO: check if file exists and only override if it has changed!
+        open my $fh, '>:encoding(UTF-8)', $args{infile}
             or die "failed to create file: ".$args{infile}."\n";
-        binmode $fh, ':encoding(UTF-8)';
         print $fh $code;
         close $fh;
 
         my ($stderr, $stdout);
-        my @command = map { 
-                  my $s = $_; 
-                  #if ($args{substr $s, 1, -1}) 
-                  $s =~ s|\$([^\$]+)\$| $args{$1} // $1 |eg; 
-                  $s 
+        my @command = map {
+                  my $s = $_;
+                  #if ($args{substr $s, 1, -1})
+                  $s =~ s|\$([^\$]+)\$| $args{$1} // $1 |eg;
+                  $s
                 } @$run;
         push @command, @options;
 
@@ -109,7 +112,7 @@ sub build_image {
     my $e = shift;
     my $filename = shift // '';
 
-    my $img = Image [$e->id, $e->classes, []], [], [$filename, ''];
+    my $img = Image attributes { id => $e->id, class => $e->class }, [], [$filename, ''];
     my $keyvals = $e->keyvals;
 
     my $caption = $keyvals->get('caption');
@@ -134,6 +137,39 @@ Pandoc::Filter::ImagesFromCode - transform code blocks into images
 =head1 DESCRIPTION
 
 This L<Pandoc::Filter> transforms L<CodeBlock|Pandoc::Elements/CodeBlock>
-elements into images. The specific interface may change in a future version.
+elements into images. 
+
+Content of transformed code section and resulting image files are written to
+files. Files are named after code block's C<id> if given or based on the code
+content if no id is available or if the id contains characters other than
+C<a-z0-9_->.
+
+=head1 CONFIGURATION
+
+=over
+
+=item from
+
+File extension of input files extracted from code blocks. Defaults to C<code>.
+
+=item to
+
+File extension of created image files. Can be a fixed string or a code reference that
+gets the document output format (for instance L<latex> or C<html>) as argument to 
+produce different image formats depending on output format.
+
+=item dir
+
+Directory where to place input and output files.
+
+=item run
+
+Command to transform input files to output files. Variable references C<$...$>
+can be used to refer to C<$infile$>, C<$outfile$>, C<$dir$>, C<$from$>, and
+C<$to$>. Example:
+
+  run => ['ditaa', '-o', '$infile$', '$outfile$'],
+
+=back
 
 =cut

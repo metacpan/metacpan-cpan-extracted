@@ -1,9 +1,9 @@
-package Task::Weaken; # git description: b27f165
+package Task::Weaken; # git description: v1.05-5-g1336c7b
 
 use 5.005;
 use strict;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 1;
 
@@ -17,7 +17,7 @@ Task::Weaken - Ensure that a platform has weaken support
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 DESCRIPTION
 

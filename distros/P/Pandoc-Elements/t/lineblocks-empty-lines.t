@@ -1,8 +1,11 @@
 use Test::More 0.96;
-use Test::Warnings qw[ warnings :no_end_test ];
+use Test::Warnings qw(warnings :no_end_test);
 
 use Pandoc::Elements;
 use Pandoc;
+
+plan skip_all => 'pandoc >= 1.18 not available'
+    unless (pandoc and pandoc->version >= '1.18');
 
 my $lineblock = <<'END_OF_MD';
 | Sven Svensson

@@ -9,6 +9,7 @@ use GPSD::Parse;
 use RPi::ADC::ADS;
 use RPi::ADC::MCP3008;
 use RPi::BMP180;
+use RPi::Const qw(:all);
 use RPi::DAC::MCP4922;
 use RPi::DigiPot::MCP4XXXX;
 use RPi::HCSR04;
@@ -18,9 +19,8 @@ use RPi::Pin;
 use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
-use RPi::Const qw(:all);
 
-our $VERSION = '2.3624';
+our $VERSION = '2.3625';
 
 my $fatal_exit = 1;
 
@@ -176,12 +176,15 @@ sub serial {
     return RPi::Serial->new($device, $baud);
 }
 sub servo {
-    my ($self, $pin_num) = @_;
+    my ($self, $pin_num, %config) = @_;
 
     if ($> != 0){
         die "\n\nat this time, servo() requires PWM functionality, and PWM " .
             "requires your script to be run as the 'root' user (sudo)\n\n";
     }
+
+    $config{clock} = exists $config{clock} ? $config{clock} : 192;
+    $config{range} = exists $config{range} ? $config{range} : 2000;
 
     $self->_pwm_in_use(1);
 
@@ -189,8 +192,8 @@ sub servo {
     $servo->mode(PWM_OUT);
 
     $self->pwm_mode(PWM_MODE_MS);
-    $self->pwm_clock(192);
-    $self->pwm_range(2000);
+    $self->pwm_clock($config{clock});
+    $self->pwm_range($config{range});
 
     return $servo;
 }
@@ -420,10 +423,10 @@ various items
 
     my $gps = $pi->gps;
 
-    print $gps->tpv('lat')   . "\n";
-    print $gps->tpv('lon')   . "\n";
-    print $gps->tpv('speed') . "\n";
-    print $gps->direction    . "\n";
+    print $gps->lat;
+    print $gps->lon;
+    print $gps->speed;
+    print $gps->direction;
 
     #
     # LCD
@@ -692,6 +695,15 @@ Parameters:
 Mandatory, Integer: The pin number (technically, this *must* be C<18> on the
 Raspberry Pi 3, as that's the only hardware PWM pin.
 
+    %pwm_config
+
+Optional, Hash. This parameter should only be used if you know what you're
+doing and are having very specific issues.
+
+Keys are C<clock> with a value that coincides with the PWM clock speed. It
+defaults to C<192>. The other key is C<range>, the value being an integer that
+sets the range of the PWM. Defaults to C<2000>.
+
 Example:
 
     my $servo = $pi->servo(18);
@@ -774,6 +786,11 @@ by. The smaller this number, the faster the motor will turn.
 =head1 RUNNING TESTS
 
 Please see L<RUNNING TESTS|RPi::WiringPi::FAQ/RUNNING TESTS> in the
+L<FAQ|RPi::WiringPi::FAQ>.
+
+=head1 TROUBLESHOOTING
+
+Please read through the L<SETUP|RPi::WiringPi::FAQ/SETUP> section in the
 L<FAQ|RPi::WiringPi::FAQ>.
 
 =head1 AUTHOR

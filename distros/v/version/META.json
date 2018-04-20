@@ -53,10 +53,11 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=version"
       },
       "repository" : {
-         "type" : "hg",
-         "url" : "https://bitbucket.org/jpeacock/version"
+         "type" : "git",
+         "url" : "git://github.com/JohnPeacock/version.pm.git",
+         "web" : "http://github.com/JohnPeacock/version.pm"
       }
    },
-   "version" : "0.9923",
+   "version" : "0.9924",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -7,7 +7,7 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::Struct qw(Struct);
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -89,7 +89,7 @@ sub import {
 
 =pod
 
-Прочитать список файлов L<Zip-архива|Test::BDD::Cucumber::Definitions::HTTP::Ru>
+Прочитать список файлов L<Zip-архива|Test::BDD::Cucumber::Definitions::Zip::Ru>
 в perl-структуру
 
     Given перечень файлов Zip-архива прочитан как список
@@ -99,6 +99,20 @@ sub import {
     #        read zip archive members as list
     Given qr/перечень файлов Zip-архива прочитан как список/, sub {
         Struct->read_zip_archive_members_as_list();
+    };
+
+=pod
+
+Прочитать результат запроса к L<Базе|Test::BDD::Cucumber::Definitions::Base::Ru>
+в perl-структуру
+
+    Given результат запроса к базе прочитан как структура
+
+=cut
+
+    #        read base response as struct
+    Given qr/результат запроса к базе прочитан как структура/, sub {
+        Struct->read_base_response_as_struct();
     };
 
 =head2 Проверка данных

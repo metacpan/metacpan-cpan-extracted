@@ -47,7 +47,7 @@ use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
 @SNMP::Info::Layer3::C3550::EXPORT_OK = qw//;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 # NOTE: Order creates precedence
 #       Example: v_name exists in Bridge.pm and CiscoVTP.pm
@@ -96,8 +96,8 @@ sub ports {
     my $c3550 = shift;
 
     my $id    = $c3550->id();
-    my $model = &SNMP::translateObj($id);
-    if ( $model =~ /(12|24|48)(C|T|TS|G|TS-E|TS-S|T-E)?$/ ) {
+    my $model = SNMP::translateObj($id);
+    if ( defined $model && $model =~ /(12|24|48)(C|T|TS|G|TS-E|TS-S|T-E)?$/ ) {
         return $1;
     }
 

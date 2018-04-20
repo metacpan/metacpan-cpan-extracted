@@ -39,7 +39,7 @@ use SNMP::Info::Bridge;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::MIBS,
@@ -49,6 +49,7 @@ $VERSION = '3.54';
     'NTWS-CLIENT-SESSION-MIB'       => 'ntwsClSessTotalSessions',
     'NTWS-SYSTEM-MIB'               => 'ntwsSysCpuAverageLoad',
     'NTWS-BASIC-MIB'                => 'ntwsVersionString',
+    'NTWS-AP-CONFIG-MIB'            => 'ntwsApConfServProfBeaconEnabled',
 );
 
 %GLOBALS = (

@@ -30,7 +30,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
             # copy files
             my $files = Pcore::Util::File::Tree->new;
 
-            $files->add_dir( $ENV->share->get_storage( 'dist-tmpl', 'Pcore' ) . '/par/' );
+            $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/par/' );
 
             $files->render_tmpl( { main_script => 'main.pl' } );
 

@@ -2,10 +2,12 @@ package Test2::Tools::Spec;
 use strict;
 use warnings;
 
-our $VERSION = '0.000111';
+our $VERSION = '0.000114';
 
 use Carp qw/croak/;
 use Test2::Workflow qw/parse_args build current_build root_build init_root build_stack/;
+
+use Test2::API qw/test2_add_callback_testing_done/;
 
 use Test2::Workflow::Runner();
 use Test2::Workflow::Task::Action();
@@ -94,11 +96,7 @@ sub import {
             }
         );
 
-        my $stack = Test2::API::test2_stack;
-        $stack->top; # Insure we have a hub
-        my ($hub) = Test2::API::test2_stack->all;
-        $hub->set_active(1);
-        $hub->follow_up(
+        test2_add_callback_testing_done(
             sub {
                 return unless $root->populated;
                 my $g = $root->compile;
@@ -667,7 +665,7 @@ F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 COPYRIGHT
 
-Copyright 2016 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2018 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

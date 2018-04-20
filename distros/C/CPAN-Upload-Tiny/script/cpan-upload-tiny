@@ -20,20 +20,6 @@ for my $filename (@ARGV) {
 
 #PODNAME: cpan-upload-tiny
 
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-cpan-upload-tiny
-
-=head1 VERSION
-
-version 0.004
-
 =head1 USAGE
 
   usage: cpan-upload-tiny [options] file-to-upload-1 [ file-to-upload-2 ... ]
@@ -73,16 +59,3 @@ This is used to implement cpan-upload-tiny
 This is optionally used for secure storage of PAUSE credentials.
 
 =back
-
-=head1 AUTHOR
-
-Leon Timmermans <leont@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by Leon Timmermans.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

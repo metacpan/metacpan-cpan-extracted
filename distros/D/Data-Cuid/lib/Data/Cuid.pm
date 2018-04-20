@@ -18,7 +18,7 @@ our $size = 4;
 our $base = 36;
 our $cmax = ($base)**($size);
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 {
     my $c = 0;

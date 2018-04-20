@@ -1,4 +1,4 @@
-# SNMP::Info::Layer::CiscoIPS
+# SNMP::Info::Layer7::CiscoIPS
 # $Id$
 #
 # Copyright (c) 2013 Moe Kraus
@@ -46,7 +46,7 @@ use SNMP::Info::Entity;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = ( %SNMP::Info::Layer7::MIBS, %SNMP::Info::Entity::MIBS, );
 

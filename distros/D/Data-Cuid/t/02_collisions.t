@@ -3,12 +3,16 @@ use strict;
 use warnings;
 
 use Test::More;
+
+
+BEGIN {
+    plan skip_all => 'Testing collisions only upon release'
+        unless $ENV{RELEASE_TESTING};
+}
+
 use Sub::Util;
 
 use Data::Cuid;
-
-plan skip_all => 'Testing collisions only upon release'
-    unless $ENV{RELEASE_TESTING};
 
 my $max = 1_200_000;
 plan tests => $max * 2;

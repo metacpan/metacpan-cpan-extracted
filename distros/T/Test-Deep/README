@@ -1,4 +1,4 @@
-This module gives you lots of flexibility when testing deep structres.
+This module gives you lots of flexibility when testing deep structures.
 
 Install as usual - untar it the
 
@@ -7,4 +7,4 @@ make
 make test
 make install
 
-See the pod for full deatils of how to use this.
+See the pod for full details of how to use this.

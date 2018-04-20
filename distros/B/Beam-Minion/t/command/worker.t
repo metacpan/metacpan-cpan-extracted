@@ -96,4 +96,11 @@ subtest 'BEAM_MINION must be set' => sub {
         'BEAM_MINION missing raises exception';
 };
 
+subtest 'test that object is destroyed' => sub {
+    my $id = $minion->enqueue( 'container:success', [] );
+    my $job = $minion->job( $id );
+    $job->execute;
+    is $Local::Service::DESTROYED, 1, 'DESTROY was called';
+};
+
 done_testing;

@@ -1,7 +1,19 @@
 
 Release history for Kevin-Command-kevin
 
-0.6.0     2018-03-12 15:21:58-07:00 America/Los_Angeles
+0.7.1     2018-04-19 18:13:25-07:00 America/Los_Angeles
+
+    [Minion 9.03]
+    - kevin jobs: accept multiple values for -q, -S, -t
+
+    [prereqs]
+    - Require 9.00+
+    - Require Role::Tiny 2.000005+
+
+    [maint]
+    - Get rid of files mistakenly included in v0.7
+
+v0.6     2018-03-12 15:21:58-07:00 America/Los_Angeles
 
     [Minion 8.08]
     - Added busy and wait events to Minion::Worker

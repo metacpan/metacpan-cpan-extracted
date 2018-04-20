@@ -1,6 +1,43 @@
+Version 3.55 (2018-04-19)
+
+  [NEW FEATURES]
+  * #260 Oneaccess (robwwd)
+  * #259 Add ERX (Old Juniper E-Series JunOSe) Support (robwwd)
+  * #258 Add support for Arbor devices (robwwd)
+  * #253 Nexans switch support (paecker)
+  * #142 Sixnet Switch Support
+
+  [ENHANCEMENTS]
+
+  * #117 Recognition for HP Blade switches (J R Binks)
+  * #196 Support for powerconnect 8164F
+  * Refactor Layer3::Dell for better support of newer models
+  * Increase capture of i_vlan on router interfaces in L3::Cisco
+  * Factor out logic to determine serial number from ENTITY-MIB in Layer2 and
+    Layer3 to new method entity_derived_serial in Entity class and added new
+    method entity_derived_os_ver in Entity class to determine OS version
+    in a similar manner
+
+  [BUG FIXES]
+
+  * #67 Juniper EX4300 Missing/Wrong information
+  * #61 ZyXEL (X)GS1900 family MIB - Fix loop in layers method
+  * Fix ISA in AMAP and EDP classes
+  * Add missing MIB in L2::Trapeze, L2::NWSS2300, and L3::Dell
+  * Fix gigabit logic in i_duplex_admin() of CiscoStack
+  * Prevent potential undefined warnings in i_speed_admin() of L2::C2900 and
+    ports() of L3::C3550
+  * Correct validation and IID/key used in mau_set_i_speed_admin() and
+    mau_set_i_duplex_admin() of MAU
+  * Correct typo in MIB leaf names in L3::Aironet 
+  * Don't use MIB leafs that are not-accessible according to MIB
+    NOTE: Fixing this logic now results in methods on MIB leafs specified as
+    not-accessible failing validation in _validate_autoload_method()
+
 Version 3.54 (2018-04-01)
 
   [NEW FEATURES]
+
   * #141 Avocent ACS files for correct discovery in Netdisco
   * Add support for Avocent ACS 5K/6K/8K terminal servers in Layer1::Cyclades
 

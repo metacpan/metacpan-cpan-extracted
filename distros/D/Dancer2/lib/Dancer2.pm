@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '0.205002';
+$Dancer2::VERSION = '0.206000';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use strict;
@@ -128,7 +128,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 DESCRIPTION
 
@@ -269,6 +269,7 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Daniel Muey
     Daniel Perrett
     Dave Jacoby
+    Dave Webb
     David (sbts)
     David Steinbrunner
     David Zurborg
@@ -301,7 +302,8 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Joel Berger
     Jonathan Cast
     Jonathan Scott Duff
-    Julien Fiegehenn
+    Joseph Frazer
+    Julien Fiegehenn (simbabque)
     Julio Fraire
     Kaitlyn Parkhurst (SYMKAT)
     kbeyazli
@@ -324,6 +326,7 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     mokko
     Nick Patch
     Nick Tonkin
+    Nigel Gregoire
     Nikita K
     Nuno Carvalho
     Olaf Alders
@@ -340,13 +343,14 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Ricardo Signes
     Rick Yakubowski
     Ruben Amortegui
-    sakshee3
+    Sakshee Vijay (sakshee3)
     Sam Kington
     Samit Badle
+    Sebastien Deseille (sdeseille)
     Shlomi Fish
-    simbabque
     Slava Goltser
     Snigdha
+    Steve Dondley
     Tatsuhiko Miyagawa
     Tina Müller
     Tom Hukins
@@ -363,7 +367,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

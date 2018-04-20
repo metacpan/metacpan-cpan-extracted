@@ -18,9 +18,7 @@
 #ifdef I_SYS_TIME
 # include <sys/time.h>
 #endif
-#ifdef I_TIME
-# include <time.h>
-#endif
+#include <time.h>
 #include <sys/types.h>
 #if defined(HAS_SOCKET) && !defined(VMS) && !defined(ultrix) /* VMS handles sockets via vmsish.h, ULTRIX dies of socket struct redefinitions */
 #  include <sys/socket.h>
@@ -54,7 +52,9 @@ poll(struct pollfd *fds, unsigned long nfds, int timeout)
 
     FD_ZERO(&ifd);
 
+#ifdef HAS_FSTAT
 again:
+#endif
 
     FD_ZERO(&rfd);
     FD_ZERO(&wfd);

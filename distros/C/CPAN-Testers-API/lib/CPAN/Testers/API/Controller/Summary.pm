@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Summary;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: API for test report summary data
 
 #pod =head1 DESCRIPTION
@@ -25,6 +25,7 @@ use CPAN::Testers::API::Base;
 #pod =method summary
 #pod
 #pod     ### Requests:
+#pod     GET /v3/summary/My-Dist
 #pod     GET /v3/summary/My-Dist/1.000
 #pod
 #pod     ### Response:
@@ -59,14 +60,21 @@ sub summary( $c ) {
 
     my $dist = $c->validation->param( 'dist' );
     my $version = $c->validation->param( 'version' );
-
     my $grade = $c->validation->param( 'grade' );
+    my $perl = $c->validation->every_param( 'perl' );
+    my $osname = $c->validation->every_param( 'osname' );
+
+    if ( !$dist && !$version && ( !$perl || !@$perl ) && ( !$osname || !@$osname ) ) {
+        return $c->render_error( 400, "You must provide one of 'perl' or 'osname'" );
+    }
 
     my $rs = $c->schema->resultset( 'Stats' );
     $rs = $rs->search(
         {
-            dist => $dist,
-            version => $version,
+            ( $dist ? ( dist => $dist ) : () ),
+            ( $version ? ( version => $version ) : () ),
+            ( $perl && @$perl ? ( perl => $perl ) : () ),
+            ( $osname && @$osname ? ( osname => $osname ) : () ),
             ( $grade ? ( state => $grade ) : () ),
         },
         {
@@ -76,20 +84,17 @@ sub summary( $c ) {
         }
     );
 
-    my @results = $rs->all;
-    if ( !@results ) {
-        return $c->render_error( 404, sprintf 'No results found for dist "%s" version "%s"', $dist, $version );
+    if ( my $since = $c->validation->param( 'since' ) ) {
+        $rs = $rs->since( $since );
     }
 
-    for my $result ( @results ) {
+    $c->stream_rs( $rs, sub {
+        my $result = shift;
         $result->{grade} = delete $result->{state};
         $result->{date} = _format_date( delete $result->{fulldate} );
         $result->{reporter} = delete $result->{tester};
-    }
-
-    return $c->render(
-        openapi => \@results,
-    );
+        return $result;
+    } );
 }
 
 sub _format_date( $fulldate ) {
@@ -109,7 +114,7 @@ CPAN::Testers::API::Controller::Summary - API for test report summary data
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -121,6 +126,7 @@ the larger test report data structure that are useful for reporting.
 =head2 summary
 
     ### Requests:
+    GET /v3/summary/My-Dist
     GET /v3/summary/My-Dist/1.000
 
     ### Response:
@@ -164,7 +170,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

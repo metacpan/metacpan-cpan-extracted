@@ -8,7 +8,7 @@ use DateTime::Locale;
 use DateTime;
 use Catmandu::Fix::Has;
 
-our $VERSION = "0.0131";
+our $VERSION = "0.0132";
 
 with 'Catmandu::Fix::Base';
 

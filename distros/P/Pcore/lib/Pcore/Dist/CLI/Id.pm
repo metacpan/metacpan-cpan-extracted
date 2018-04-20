@@ -22,11 +22,11 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $dist;
 
     if ( $opt->{pcore} ) {
-        $dist = $ENV->pcore;
+        $dist = $ENV->{pcore};
     }
     elsif ( $arg->{dist} ) {
         if ( $arg->{dist} =~ /\APcore\z/smi ) {
-            $dist = $ENV->pcore;
+            $dist = $ENV->{pcore};
         }
         else {
             $dist = Pcore::Dist->new( $arg->{dist} );

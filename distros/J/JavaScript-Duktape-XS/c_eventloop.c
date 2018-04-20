@@ -171,15 +171,8 @@ static void expire_timers(duk_context *ctx) {
         duk_push_number(ctx, (double) t->id);
         duk_get_prop(ctx, -2);  /* -> [ ... stash eventTimers func ] */
         rc = duk_pcall(ctx, 0 /*nargs*/);  /* -> [ ... stash eventTimers retval ] */
-        if (rc != 0) {
-#if defined(DUKTAPE_EVENTLOOP_DEBUG) && DUKTAPE_EVENTLOOP_DEBUG > 0
-            duktape_debug("timer callback failed for timer %d: %s\n", (int) t->id, duk_to_string(ctx, -1));
-#endif
-            duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
-                            "%s (while running callback id %d)\n",
-                            duk_safe_to_string(ctx, -1), (int) t->id);
-        }
-        duk_pop(ctx);    /* ignore errors for now -> [ ... stash eventTimers ] */
+        check_duktape_call_for_errors(rc, ctx);
+        duk_pop(ctx);    /* [ ... stash eventTimers ] */
 
         if (t->removed) {
             /* One-shot timer (always removed) or removed by user callback. */
@@ -365,14 +358,7 @@ duk_ret_t eventloop_run(duk_context *ctx, void *udata) {
                 duk_push_int(ctx, pfd->fd);
                 duk_push_int(ctx, pfd->revents);
                 rc = duk_pcall_method(ctx, 2 /*nargs*/);
-                if (rc) {
-#if defined(DUKTAPE_EVENTLOOP_DEBUG) && DUKTAPE_EVENTLOOP_DEBUG > 0
-                    duktape_debug("fd callback failed for fd %d: %s\n", (int) pfd->fd, duk_to_string(ctx, -1));
-#endif
-                    duk_console_log(DUK_CONSOLE_FLUSH | DUK_CONSOLE_TO_STDERR,
-                                    "%s (while running callback id %d on fd %d)\n",
-                                    duk_safe_to_string(ctx, -1), (int) t->id, (int) pfd->fd);
-                }
+                check_duktape_call_for_errors(rc, ctx);
                 duk_pop(ctx);
 
                 pfd->revents = 0;

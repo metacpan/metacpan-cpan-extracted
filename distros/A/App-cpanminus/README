@@ -190,7 +190,16 @@ COPYRIGHT
 
     CPAN::Meta::YAML Copyright 2010 Adam Kennedy
 
+    CPAN::Meta::Check Copyright (c) 2012 by Leon Timmermans
+
     File::pushd Copyright 2012 David Golden
+
+    parent Copyright (c) 2007-10 Max Maischein
+
+    Parse::PMFile Copyright 1995 - 2013 by Andreas Koenig, Copyright 2013
+    by Kenichi Ishigaki
+
+    String::ShellQuote by Roderick Schertler
 
 LICENSE
 

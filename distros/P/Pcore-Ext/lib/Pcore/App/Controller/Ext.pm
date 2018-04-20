@@ -164,8 +164,9 @@ sub _return_app ( $self, $req ) {
         my $ext_app = $Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
 
         my $data = {
-            locale  => $self->_get_app_locale($locale),
-            api_map => to_json( {
+            locale   => $self->_get_app_locale($locale),
+            api_path => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+            api_map  => to_json( {
                 type    => 'websocket',                                                 # remoting
                 url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
                 actions => $ext_app->{api},
@@ -202,6 +203,17 @@ JS
         my $footer = <<"JS";
             Ext.onReady(function() {
                 Ext.ariaWarn = Ext.emptyFn;
+
+                SERVER_API = new PCORE({
+                    url: '$data->{api_path}',
+                    version: 'v1',
+                    listenEvents: null,
+                    onConnect: function(api) {},
+                    onDisconnect: function(api, status, reason) {},
+                    onEvent: function(api, ev) {},
+                    onListen: function(api, events) {},
+                    onRpc: null
+                });
 
                 Ext.direct.Manager.addProvider($data->{api_map}->$*);
 
@@ -452,7 +464,7 @@ sub _prepare_js ( $self, $js ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 364                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 376                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

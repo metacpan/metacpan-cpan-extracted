@@ -1,14 +1,12 @@
 NAME
-
     Pandoc::Elements - create and process Pandoc documents
 
 SYNOPSIS
-
-    The output of this script hello.pl
+    The output of this script "hello.pl"
 
         use Pandoc::Elements;
         use JSON;
-    
+
         print Document(
             {
                 title => MetaInlines [ Str "Greeting" ]
@@ -31,98 +29,94 @@ SYNOPSIS
         Hello, world!
 
 DESCRIPTION
-
     Pandoc::Elements provides utility functions to parse, serialize, and
     modify abstract syntax trees (AST) of Pandoc <http://pandoc.org/>
-    documents. Pandoc can convert this data structure to many other
-    document formats, such as HTML, LaTeX, ODT, and ePUB.
+    documents. Pandoc can convert this data structure to many other document
+    formats, such as HTML, LaTeX, ODT, and ePUB.
 
     See also module Pandoc::Filter, command line script pod2pandoc, and the
     internal modules Pandoc::Walker and Pod::Simple::Pandoc.
 
 PANDOC VERSIONS
-
     The Pandoc document model is defined in file Text.Pandoc.Definition
-    <https://hackage.haskell.org/package/pandoc-types/docs/Text-Pandoc-Defi
-    nition.html> as part of Haskell package pandoc-types.
+    <https://hackage.haskell.org/package/pandoc-types/docs/Text-Pandoc-Defin
+    ition.html> as part of Haskell package pandoc-types
+    <https://hackage.haskell.org/package/pandoc-types>.
 
     Pandoc::Elements is compatible with pandoc-types 1.12.3 (released with
-    pandoc 1.12.1) up to at least pandoc-types-1.17.0.4 (first releases
+    pandoc 1.12.1) up to *at least* pandoc-types-1.17.0.4 (first releases
     with pandoc 1.18). JSON output of all pandoc releases since 1.12.1 can
-    be parsed with function pandoc_json, the "Document" constructor or
-    method parse of module Pandoc. The AST is always upgraded to
-    pandoc-types 1.17 and downgraded to another api version on
-    serialization with to_json.
+    be parsed with function "pandoc_json", the "Document" constructor or
+    method "parse" of module Pandoc. The AST is always upgraded to
+    pandoc-types 1.17 and downgraded to another api version on serialization
+    with "to_json".
 
     To determine the api version required by a version of pandoc executable
-    since version 1.18 execute pandoc with the --version option and check
-    which version of the pandoc-types library pandoc was compiled with.
+    since version 1.18 execute pandoc with the "--version" option and check
+    which version of the "pandoc-types" library pandoc was compiled with.
 
     Beginning with version 1.18 pandoc will not decode a JSON AST
     representation unless the major and minor version numbers (Document
-    method api_version) match those built into that version of pandoc. The
+    method "api_version") match those built into that version of pandoc. The
     following changes in pandoc document model have been implemented:
 
-      * pandoc-types 1.17, released for pandoc 1.18, introduced the
-      LineBlock element and modified representation of the root Document
-      element.
+    *   pandoc-types 1.17, released for pandoc 1.18, introduced the
+        LineBlock element and modified representation of the root Document
+        element.
 
-      * pandoc-types 1.16, released with pandoc 1.16, introduced attributes
-      to Link and Image elements
+    *   pandoc-types 1.16, released with pandoc 1.16, introduced attributes
+        to Link and Image elements
 
-      * pandoc-types 1.12.3, released with pandoc 1.12.1, modified the
-      representation of elements to objects with field t and c. This is
-      also the internal representation of documents used in this module.
+    *   pandoc-types 1.12.3, released with pandoc 1.12.1, modified the
+        representation of elements to objects with field "t" and "c". This
+        is also the internal representation of documents used in this
+        module.
 
 FUNCTIONS
-
     The following functions and keywords are exported by default:
 
-      * Constructors for all Pandoc document element (block elements such
-      as Para and inline elements such as Emph, metadata elements and the
-      Document).
+    *   Constructors for all Pandoc document element (block elements such as
+        "Para" and inline elements such as "Emph", metadata elements and the
+        Document).
 
-      * Type keywords such as Decimal and LowerAlpha to be used as types in
-      other document elements.
+    *   Type keywords such as "Decimal" and "LowerAlpha" to be used as types
+        in other document elements.
 
-      * The following helper functions pandoc_json, pandoc_version,
-      attributes, metadata, citation, and element.
+    *   The following helper functions "pandoc_json", "pandoc_version",
+        "attributes", "metadata", "citation", and "element".
 
- pandoc_json $json
-
+  pandoc_json $json
     Parse a JSON string, as emitted by pandoc in JSON format. This is the
-    reverse to method to_json but it can read both old (before Pandoc 1.16)
-    and new format.
+    reverse to method "to_json" but it can read both old (before Pandoc
+    1.16) and new format.
 
- attributes { key => $value, ... }
-
+  attributes { key => $value, ... }
     Maps a hash reference or instance of Hash::MultiValue into the internal
-    structure of Pandoc attributes. The special keys id (string), and class
-    (string or array reference with space-separated class names) are
+    structure of Pandoc attributes. The special keys "id" (string), and
+    "class" (string or array reference with space-separated class names) are
     recognized. See attribute methods for details.
 
- citation { ... }
-
+  citation { ... }
     A citation as part of document element Cite must be a hash reference
-    with fields citationID (string), citationPrefix (list of inline
-    elements) citationSuffix (list of inline elements), citationMode (one
-    of NormalCitation, AuthorInText, SuppressAuthor), citationNoteNum
-    (integer), and citationHash (integer). The helper method citation can
-    be used to construct such hash by filling in default values and using
-    shorter field names (id, prefix, suffix, mode, note, and hash):
+    with fields "citationID" (string), "citationPrefix" (list of inline
+    elements) "citationSuffix" (list of inline elements), "citationMode"
+    (one of "NormalCitation", "AuthorInText", "SuppressAuthor"),
+    "citationNoteNum" (integer), and "citationHash" (integer). The helper
+    method "citation" can be used to construct such hash by filling in
+    default values and using shorter field names ("id", "prefix", "suffix",
+    "mode", "note", and "hash"):
 
         citation {
             id => 'foo',
             prefix => [ Str "see" ],
             suffix => [ Str "p.", Space, Str "42" ]
         }
-    
+
         # in Pandoc Markdown
-    
+
         [see @foo p. 42]
 
- pandoc_version( [ $document ] )
-
+  pandoc_version( [ $document ] )
     Return a Pandoc::Version object with expected version number of pandoc
     executable to be used for serializing documents with to_json.
 
@@ -136,104 +130,86 @@ FUNCTIONS
     first pandoc release compatible with most recent api version supported
     by this module.
 
-    See also method version of module Pandoc to get the current version of
+    See also method "version" of module Pandoc to get the current version of
     pandoc executable on your system.
 
- element( $name => $content )
-
+  element( $name => $content )
     Create a Pandoc document element of arbitrary name. This function is
     only exported on request.
 
 ELEMENTS AND METHODS
-
     Document elements are encoded as Perl data structures equivalent to the
-    JSON structure, emitted with pandoc output format json. This JSON
+    JSON structure, emitted with pandoc output format "json". This JSON
     structure is subject to minor changes between versions of pandoc. All
     elements are blessed objects that provide common element methods (all
     elements), attribute methods (elements with attributes), and additional
     element-specific methods.
 
- COMMON METHODS
-
-  to_json
-
-    Return the element as JSON encoded string. The following are
-    equivalent:
+  COMMON METHODS
+   to_json
+    Return the element as JSON encoded string. The following are equivalent:
 
         $element->to_json;
         JSON->new->utf8->canonical->convert_blessed->encode($element);
 
     The serialization format can be adjusted to different pandoc versions
-    with module and environment variable PANDOC_VERSION or with Document
-    element properties api_version and pandoc_version.
+    with module and environment variable "PANDOC_VERSION" or with Document
+    element properties "api_version" and "pandoc_version".
 
-    When writing filters you can normally just rely on the api version
-    value obtained from pandoc, since pandoc expects to receive the same
-    JSON format as it emits.
+    When writing filters you can normally just rely on the api version value
+    obtained from pandoc, since pandoc expects to receive the same JSON
+    format as it emits.
 
-  name
-
+   name
     Return the name of the element, e.g. "Para" for a paragraph element.
 
-  content
-
+   content
     Return the element content. For most elements (Para, Emph, Str...) the
     content is an array reference with child elements. Other elements
     consist of multiple parts; for instance the Link element has attributes
-    (attr, id, class, classes, keyvals) a link text (content) and a link
-    target (target) with url and title.
+    ("attr", "id", "class", "classes", "keyvals") a link text ("content")
+    and a link target ("target") with "url" and "title".
 
-  is_block
-
+   is_block
     True if the element is a Block element
 
-  is_inline
-
+   is_inline
     True if the element is an inline Inline element
 
-  is_meta
-
+   is_meta
     True if the element is a Metadata element
 
-  is_document
-
+   is_document
     True if the element is a Document element
 
-  walk(...)
-
+   walk(...)
     Walk the element tree with Pandoc::Walker
 
-  query(...)
-
+   query(...)
     Query the element to extract results with Pandoc::Walker
 
-  transform(...)
-
+   transform(...)
     Transform the element tree with Pandoc::Walker
 
-  string
-
+   string
     Returns a concatenated string of element content, leaving out all
     formatting.
 
- ATTRIBUTE METHODS
-
+  ATTRIBUTE METHODS
     Some elements have attributes which can be an identifier, ordered class
     names and ordered key-value pairs. Elements with attributes provide the
     following methods:
 
-  attr
-
+   attr
     Get or set the attributes in Pandoc internal structure:
 
       [ $id, [ @classes ], [ [ key => $value ], ... ] ]
 
     See helper function attributes to create this structure.
 
-  keyvals
-
+   keyvals
     Get all attributes (id, class, and key-value pairs) as new
-    Hash::MultiValue instance, or replace all key-value pairs plus id
+    Hash::MultiValue instance, or replace *all* key-value pairs plus id
     and/or class if these are included as field names. All class fields are
     split by whitespaces.
 
@@ -244,28 +220,23 @@ ELEMENTS AND METHODS
       $e->keyvals( { } )                    # remove all key-value pairs
       $e->keyvals( id => '', class => '' )  # remove all key-value pairs, id, class
 
-  id
-
+   id
     Get or set the identifier. See also Pandoc::Filter::HeaderIdentifiers
     for utility functions to handle Header identifiers.
 
-  class
-
+   class
     Get or set the list of classes, separated by whitespace.
 
-  add_attribute( $name => $value )
-
-    Append an attribute. The special attribute names id and class set or
+   add_attribute( $name => $value )
+    Append an attribute. The special attribute names "id" and "class" set or
     append identifier or class, respectively.
 
- DOCUMENT ELEMENT
-
-  Document
-
-    Root element, consisting of metadata hash (meta), document element
-    array (content=blocks) and optional api_version. The constructor
+  DOCUMENT ELEMENT
+   Document
+    Root element, consisting of metadata hash ("meta"), document element
+    array ("content"="blocks") and optional "api_version". The constructor
     accepts either two arguments and an optional named parameter
-    api_version:
+    "api_version":
 
         Document { %meta }, [ @blocks ], api_version => $version_string
 
@@ -278,8 +249,8 @@ ELEMENTS AND METHODS
             pandoc-api-version => [ $major, $minor, $revision ]
         }
 
-    The latter form is used as pandoc JSON format since pandoc release
-    1.18. If no api version is given, it will be set 1.17 which was also
+    The latter form is used as pandoc JSON format since pandoc release 1.18.
+    If no api version is given, it will be set 1.17 which was also
     introduced with pandoc release 1.18.
 
     A third ("old") form is accepted for compatibility with pandoc JSON
@@ -295,137 +266,117 @@ ELEMENTS AND METHODS
     common element methods:
 
     api_version( [ $api_version ] )
+        Return the pandoc-types version (aka "pandoc-api-version") of this
+        document as Pandoc::Version object or sets it to a new value. This
+        version determines how method to_json serializes the document.
 
-      Return the pandoc-types version (aka "pandoc-api-version") of this
-      document as Pandoc::Version object or sets it to a new value. This
-      version determines how method to_json serializes the document.
-
-      See "PANDOC VERSIONS" for details.
+        See "PANDOC VERSIONS" for details.
 
     pandoc_version( [ $pandoc_version ] )
+        Return the minimum required version of pandoc executable compatible
+        with the api_version of this document. The following are equivalent:
 
-      Return the minimum required version of pandoc executable compatible
-      with the api_version of this document. The following are equivalent:
+          $doc->pandoc_version;
+          pandoc_version( $doc );
 
-        $doc->pandoc_version;
-        pandoc_version( $doc );
-
-      If used as setter, sets the api version of this document to be
-      compatible with the given pandoc version.
+        If used as setter, sets the api version of this document to be
+        compatible with the given pandoc version.
 
     content or blocks
-
-      Get or set the array of block elements of the document.
+        Get or set the array of block elements of the document.
 
     meta( [ $metadata ] )
-
-      Get and/or set combined document metadata. Use method value to get
-      selected metadata fields and values.
+        Get and/or set combined document metadata. Use method "value" to get
+        selected metadata fields and values.
 
     value( [ $pointer ] [ %options ] )
+        Get selected document metadata field value(s). See Pandoc::Metadata
+        for documentation. Can also be called as "metavalue", so the
+        following are equivalent:
 
-      Get selected document metadata field value(s). See Pandoc::Metadata
-      for documentation. Can also be called as metavalue, so the following
-      are equivalent:
-
-        $doc->value( ... );
-        $doc->meta->value( ... );
-        $doc->metavalue( ... );
+          $doc->value( ... );
+          $doc->meta->value( ... );
+          $doc->metavalue( ... );
 
     to_pandoc( [ [ $pandoc, ] @arguments ])
+        Process the document with Pandoc executable and return its output:
 
-      Process the document with Pandoc executable and return its output:
+            $doc->to_pandoc( -o => 'doc.html' );
+            my $markdown = $doc->to_pandoc( -t => 'markdown' );
 
-          $doc->to_pandoc( -o => 'doc.html' );
-          my $markdown = $doc->to_pandoc( -t => 'markdown' );
-
-      The first argument can optionally be an instance of Pandoc to use a
-      specific executable.
+        The first argument can optionally be an instance of Pandoc to use a
+        specific executable.
 
     to_...( [ @arguments ] )
+        Process the document into "markdown" (pandoc's extended Markdown),
+        "latex" (LaTeX), "html" (HTML), "rst" (reStructuredText), or "plain"
+        (plain text). The following are equivalent:
 
-      Process the document into markdown (pandoc's extended Markdown),
-      latex (LaTeX), html (HTML), rst (reStructuredText), or plain (plain
-      text). The following are equivalent:
-
-          $doc->to_markdown( @args );
-          $doc->to_pandoc( @args, '-t' => 'markdown' );
+            $doc->to_markdown( @args );
+            $doc->to_pandoc( @args, '-t' => 'markdown' );
 
     outline( [ $depth ] )
+        Returns an outline of the document structure based on Header
+        elements. The outline is a hierarchical hash reference with the
+        following fields:
 
-      Returns an outline of the document structure based on Header
-      elements. The outline is a hierarchical hash reference with the
-      following fields:
+        header
+            Header element (not included at the document root)
 
-      header
+        blocks
+            List of block elements before the next Header element (of given
+            depth or less if a maximum depth was given)
 
-	Header element (not included at the document root)
+        sections
+            List of subsections, each having the same outline structure.
 
-      blocks
-
-	List of block elements before the next Header element (of given
-	depth or less if a maximum depth was given)
-
-      sections
-
-	List of subsections, each having the same outline structure.
-
- BLOCK ELEMENTS
-
-  BlockQuote
-
-    Block quote, consisting of a list of blocks (content)
+  BLOCK ELEMENTS
+   BlockQuote
+    Block quote, consisting of a list of blocks ("content")
 
         BlockQuote [ @blocks ]
 
-  BulletList
-
-    Unnumbered list of items (content=items), each a list of blocks
+   BulletList
+    Unnumbered list of items ("content"="items"), each a list of blocks
 
         BulletList [ [ @blocks ] ]
 
-  CodeBlock
-
-    Code block (literal string content) with attributes (attr, id, class,
-    classes, keyvals)
+   CodeBlock
+    Code block (literal string "content") with attributes ("attr", "id",
+    "class", "classes", "keyvals")
 
         CodeBlock $attributes, $content
 
-  DefinitionList
-
-    Definition list, consisting of a list of pairs (content=items), each a
-    term (term, a list of inlines) and one or more definitions
-    (definitions, a list of blocks).
+   DefinitionList
+    Definition list, consisting of a list of pairs ("content"="items"), each
+    a term ("term", a list of inlines) and one or more definitions
+    ("definitions", a list of blocks).
 
         DefinitionList [ @definitions ]
-    
+
         # each item in @definitions being a pair of the form
-    
+
             [ [ @inlines ], [ @blocks ] ]
 
-  Div
-
-    Generic container of blocks (content) with attributes (attr, id, class,
-    classes, keyvals).
+   Div
+    Generic container of blocks ("content") with attributes ("attr", "id",
+    "class", "classes", "keyvals").
 
         Div $attributes, [ @blocks ]
 
-  Header
-
-    Header with level (integer), attributes (attr, id, class, classes,
-    keyvals), and text (content, a list of inlines).
+   Header
+    Header with "level" (integer), attributes ("attr", "id", "class",
+    "classes", "keyvals"), and text ("content", a list of inlines).
 
         Header $level, $attributes, [ @inlines ]
 
-  HorizontalRule
-
+   HorizontalRule
     Horizontal rule
 
         HorizontalRule
 
-  LineBlock
-
-    List of lines (content), each a list of inlines.
+   LineBlock
+    List of lines ("content"), each a list of inlines.
 
         LineBlock [ @lines ]
 
@@ -434,54 +385,49 @@ ELEMENTS AND METHODS
     can be enabled by setting $PANDOC_VERSION package variable to a lower
     version number.
 
-  Null
-
+   Null
     Nothing
 
         Null
 
-  OrderedList
-
-    Numbered list of items (content=items), each a list of blocks),
+   OrderedList
+    Numbered list of items ("content"="items"), each a list of blocks),
     preceded by list attributes (start number, numbering style, and
     delimiter).
 
         OrderedList [ $start, $style, $delim ], [ [ @blocks ] ]
 
-    Supported styles are DefaultStyle, Example, Decimal, LowerRoman,
-    UpperRoman, LowerAlpha, and UpperAlpha.
+    Supported styles are "DefaultStyle", "Example", "Decimal", "LowerRoman",
+    "UpperRoman", "LowerAlpha", and "UpperAlpha".
 
-    Supported delimiters are DefaultDelim, Period, OneParen, and TwoParens.
+    Supported delimiters are "DefaultDelim", "Period", "OneParen", and
+    "TwoParens".
 
-  Para
-
-    Paragraph, consisting of a list of Inline elements (content).
+   Para
+    Paragraph, consisting of a list of Inline elements ("content").
 
         Para [ $elements ]
 
-  Plain
-
+   Plain
     Plain text, not a paragraph, consisting of a list of Inline elements
-    (content).
+    ("content").
 
         Plain [ @inlines ]
 
-  RawBlock
-
-    Raw block with format and content string.
+   RawBlock
+    Raw block with "format" and "content" string.
 
         RawBlock $format, $content
 
-  Table
-
-    Table, with caption, column alignments, relative column widths (0 =
-    default), column headers (each a list of blocks), and rows (each a list
-    of lists of blocks).
+   Table
+    Table, with "caption", column "alignments", relative column "widths" (0
+    = default), column "headers" (each a list of blocks), and "rows" (each a
+    list of lists of blocks).
 
         Table [ @inlines ], [ @alignments ], [ @width ], [ @headers ], [ @rows ]
 
-    Possible alignments are AlignLeft, AlignRight, AlignCenter, and
-    AlignDefault.
+    Possible alignments are "AlignLeft", "AlignRight", "AlignCenter", and
+    "AlignDefault".
 
     An example:
 
@@ -493,184 +439,159 @@ ELEMENTS AND METHODS
          ,[[Plain [Str "Bob"]]
           ,[Plain [Str "23"]]]];
 
- INLINE ELEMENTS
-
-  Cite
-
-    Citation, a list of citations and a list of inlines (content). See
+  INLINE ELEMENTS
+   Cite
+    Citation, a list of "citations" and a list of inlines ("content"). See
     helper function citation to construct citations.
 
         Cite [ @citations ], [ @inlines ]
 
-  Code
-
-    Inline code, a literal string (content) with attributes (attr, id,
-    class, classes, keyvals)
+   Code
+    Inline code, a literal string ("content") with attributes ("attr", "id",
+    "class", "classes", "keyvals")
 
         Code attributes { %attr }, $content
 
-  Emph
-
-    Emphasized text, a list of inlines (content).
+   Emph
+    Emphasized text, a list of inlines ("content").
 
         Emph [ @inlines ]
 
-  Image
-
-    Image with alt text (content, a list of inlines) and target (list of
-    url and title) with attributes (attr, id, class, classes, keyvals).
+   Image
+    Image with alt text ("content", a list of inlines) and "target" (list of
+    "url" and "title") with attributes ("attr", "id", "class", "classes",
+    "keyvals").
 
         Image attributes { %attr }, [ @inlines ], [ $url, $title ]
 
     Serializing the attributes is disabled in api version less then 1.16.
 
-  LineBreak
-
+   LineBreak
     Hard line break
 
         LineBreak
 
-  Link
-
-    Hyperlink with link text (content, a list of inlines) and target (list
-    of url and title) with attributes (attr, id, class, classes, keyvals).
+   Link
+    Hyperlink with link text ("content", a list of inlines) and "target"
+    (list of "url" and "title") with attributes ("attr", "id", "class",
+    "classes", "keyvals").
 
         Link attributes { %attr }, [ @inlines ], [ $url, $title ]
 
     Serializing the attributes is disabled in api version less then 1.16.
 
-  Math
-
-    TeX math, given as literal string (content) with type (one of
-    DisplayMath and InlineMath).
+   Math
+    TeX math, given as literal string ("content") with "type" (one of
+    "DisplayMath" and "InlineMath").
 
         Math $type, $content
 
-  Note
-
-    Footnote or Endnote, a list of blocks (content).
+   Note
+    Footnote or Endnote, a list of blocks ("content").
 
         Note [ @blocks ]
 
-  Quoted
-
-    Quoted text with quote type (one of SingleQuote and DoubleQuote) and a
-    list of inlines (content).
+   Quoted
+    Quoted text with quote "type" (one of "SingleQuote" and "DoubleQuote")
+    and a list of inlines ("content").
 
         Quoted $type, [ @inlines ]
 
-  RawInline
-
-    Raw inline with format (a string) and content (a string).
+   RawInline
+    Raw inline with "format" (a string) and "content" (a string).
 
         RawInline $format, $content
 
-  SmallCaps
-
-    Small caps text, a list of inlines (content).
+   SmallCaps
+    Small caps text, a list of inlines ("content").
 
         SmallCaps [ @inlines ]
 
-  SoftBreak
-
+   SoftBreak
     Soft line break
 
         SoftBreak
 
-    This element was added in pandoc 1.16 as a matter of editing
-    convenience to preserve line breaks (as opposed to paragraph breaks)
-    from input source to output. If you are going to feed a document
-    containing SoftBreak elements to Pandoc < 1.16 you will have to set the
-    package variable or environment variable PANDOC_VERSION to 1.15 or
-    below.
+    This element was added in pandoc 1.16 as a matter of editing convenience
+    to preserve line breaks (as opposed to paragraph breaks) from input
+    source to output. If you are going to feed a document containing
+    "SoftBreak" elements to Pandoc < 1.16 you will have to set the package
+    variable or environment variable "PANDOC_VERSION" to 1.15 or below.
 
-  Space
-
+   Space
     Inter-word space
 
         Space
 
-  Span
-
-    Generic container of inlines (content) with attributes (attr, id,
-    class, classes, keyvals).
+   Span
+    Generic container of inlines ("content") with attributes ("attr", "id",
+    "class", "classes", "keyvals").
 
         Span attributes { %attr }, [ @inlines ]
 
-  Str
-
-    Plain text, a string (content).
+   Str
+    Plain text, a string ("content").
 
         Str $content
 
-  Strikeout
-
-    Strikeout text, a list of inlines (content).
+   Strikeout
+    Strikeout text, a list of inlines ("content").
 
         Strikeout [ @inlines ]
 
-  Strong
-
-    Strongly emphasized text, a list of inlines (content).
+   Strong
+    Strongly emphasized text, a list of inlines ("content").
 
         Strong [ @inlines ]
 
-  Subscript
-
-    Subscripted text, a list of inlines (content).
+   Subscript
+    Subscripted text, a list of inlines ("content").
 
         Supscript [ @inlines ]
 
-  Superscript
-
-    Superscripted text, a list of inlines (content).
+   Superscript
+    Superscripted text, a list of inlines ("content").
 
         Superscript [ @inlines ]
 
- METADATA ELEMENTS
+  METADATA ELEMENTS
+    See Pandoc::Metadata for documentation of metadata elements "MetaBool",
+    "MetaString", "MetaMap", "MetaInlines", "MetaList", and "MetaBlocks".
 
-    See Pandoc::Metadata for documentation of metadata elements MetaBool,
-    MetaString, MetaMap, MetaInlines, MetaList, and MetaBlocks.
-
-    Helper function metadata can be used to convert scalars, hash
+    Helper function "metadata" can be used to convert scalars, hash
     references, array references, and Pandoc Inline/Block elements into
     metadata elements.
 
- TYPE KEYWORDS
-
+  TYPE KEYWORDS
     The following document elements are only as used as type keywords in
     other document elements:
 
-      * SingleQuote, DoubleQuote
+    *   "SingleQuote", "DoubleQuote"
 
-      * DisplayMath, InlineMath
+    *   "DisplayMath", "InlineMath"
 
-      * AuthorInText, SuppressAuthor, NormalCitation
+    *   "AuthorInText", "SuppressAuthor", "NormalCitation"
 
-      * AlignLeft, AlignRight, AlignCenter, AlignDefault
+    *   "AlignLeft", "AlignRight", "AlignCenter", "AlignDefault"
 
-      * DefaultStyle, Example, Decimal, LowerRoman, UpperRoman, LowerAlpha,
-      UpperAlpha
+    *   "DefaultStyle", "Example", "Decimal", "LowerRoman", "UpperRoman",
+        "LowerAlpha", "UpperAlpha"
 
-      * DefaultDelim, Period, OneParen, TwoParens
+    *   "DefaultDelim", "Period", "OneParen", "TwoParens"
 
 SEE ALSO
-
     Perl module Pandoc implements a wrapper around the pandoc executable.
 
     Similar libraries in other programming languages are listed at
-    https://github.com/jgm/pandoc/wiki/Pandoc-wrappers-and-interfaces.
+    <https://github.com/jgm/pandoc/wiki/Pandoc-wrappers-and-interfaces>.
 
 AUTHOR
-
     Jakob Voß <jakob.voss@gbv.de>
 
 CONTRIBUTORS
-
     Benct Philip Jonsson <bpjonsson@gmail.com>
 
 COPYRIGHT AND LICENSE
-
     Copyright 2014- Jakob Voß
 
     GNU General Public License, Version 2

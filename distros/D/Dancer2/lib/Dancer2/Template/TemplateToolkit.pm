@@ -1,7 +1,7 @@
 # ABSTRACT: Template toolkit engine for Dancer2
 
 package Dancer2::Template::TemplateToolkit;
-$Dancer2::Template::TemplateToolkit::VERSION = '0.205002';
+$Dancer2::Template::TemplateToolkit::VERSION = '0.206000';
 use Moo;
 use Carp qw<croak>;
 use Dancer2::Core::Types;
@@ -78,11 +78,13 @@ sub layout_pathname {
 
 sub pathname_exists {
     my ( $self, $pathname ) = @_;
-    return eval {
+    my $exists = eval {
         # dies if pathname can not be found via TT2's INCLUDE_PATH search
         $self->engine->service->context->template( $pathname );
         1;
     };
+    $self->log_cb->( debug => $@ ) if ! $exists;
+    return $exists;
 }
 
 1;
@@ -99,7 +101,7 @@ Dancer2::Template::TemplateToolkit - Template toolkit engine for Dancer2
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 SYNOPSIS
 
@@ -198,6 +200,28 @@ PARSER (L<Template::Parser>) and GRAMMAR (L<Template::Grammar>). If you intend t
 several of these components in your app, it is suggested to create an app-specific subclass
 that handles all of them at the same time.
 
+=head2 Template Caching
+
+L<Template>::Tookit templates can be cached by adding the C<COMPILE_EXT> property to your
+template configuration settings:
+
+    # in config.yml
+    engines:
+      template_toolkit:
+        start_tag: '<%'
+        end_tag:   '%>'
+        COMPILE_EXT: '.tcc' # cached file extension
+
+Template caching will avoid the need to re-parse template files or blocks each time they are
+used. Cached templates are automatically updated when you update the original template file.
+
+By default, cached templates are saved in the same directory as your template. To save
+cached templates in a different directory, you can set the C<COMPILE_DIR> property in your
+Dancer2 configuration file. 
+
+Please see L<Template::Manual::Config/Caching_and_Compiling_Options> for further
+details and more caching options.
+
 =head1 SEE ALSO
 
 L<Dancer2>, L<Dancer2::Core::Role::Template>, L<Template::Toolkit>.
@@ -208,7 +232,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

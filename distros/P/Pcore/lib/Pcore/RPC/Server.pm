@@ -21,7 +21,7 @@ sub run ( $type, $rpc_boot_args ) {
 
     $rpc->{rpc} = Pcore::RPC::Hub->new( {
         parent_id => $rpc_boot_args->{parent_id},
-        id        => $rpc_boot_args->{id} // P->uuid->v1mc_str,
+        id        => P->uuid->v1mc_str,
         type      => $type
     } );
 
@@ -56,27 +56,6 @@ sub run ( $type, $rpc_boot_args ) {
         }
     }
 
-    # create RPC.TERM event listener
-    P->listen_events(
-        'RPC.TERM',
-        sub ( $ev ) {
-            $rpc->RPC_ON_TERM if $rpc->can('RPC_ON_TERM');
-
-            exit;
-        }
-    );
-
-    # compose listen events
-    my $listen_events = ['RPC.TERM'];
-
-    {
-        no strict qw[refs];
-
-        if ( ${"$type\::RPC_LISTEN_EVENTS"} ) {
-            push $listen_events->@*, is_plain_arrayref ${"$type\::RPC_LISTEN_EVENTS"} ? ${"$type\::RPC_LISTEN_EVENTS"}->@* : ${"$type\::RPC_LISTEN_EVENTS"};
-        }
-    }
-
     # start websocket server
     my $http_server = Pcore::HTTP::Server->new( {
         listen => $listen,
@@ -101,7 +80,7 @@ sub run ( $type, $rpc_boot_args ) {
                         on_listen_event  => sub ( $ws, $mask ) { return 1 },    # RPC client can listen server events
                         on_fire_event    => sub ( $ws, $key ) { return 1 },     # RPC client can fire server events
                         before_connect   => {
-                            listen_events  => $listen_events,
+                            listen_events  => ${"$type\::RPC_LISTEN_EVENTS"},
                             forward_events => ${"$type\::RPC_FORWARD_EVENTS"},
                         },
                         ( $can_rpc_on_connect ? ( on_connect => sub ($ws) { $rpc->RPC_ON_CONNECT($ws); return } ) : () ),    #
@@ -112,7 +91,7 @@ sub run ( $type, $rpc_boot_args ) {
                             if ( $rpc->can($method_name) ) {
 
                                 # call method
-                                eval { $rpc->$method_name( $req, $tx->{data} ? $tx->{data}->@* : () ) };
+                                eval { $rpc->$method_name( $req, $tx->{args} ? $tx->{args}->@* : () ) };
 
                                 $@->sendlog if $@;
                             }
@@ -132,35 +111,27 @@ sub run ( $type, $rpc_boot_args ) {
         },
     } )->run;
 
-    my $data = to_cbor( {
+    my $data = to_cbor {
         pid    => $$,
         id     => $rpc->{rpc}->{id},
         type   => $type,
         listen => $listen,
-        token  => $rpc_boot_args->{token}
-    } )->$*
-      . $LF;
+        token  => $rpc_boot_args->{token},
+    };
 
     # open control handle
-    if ( is_globref $rpc_boot_args->{ctrl_fh} ) {
-        syswrite $rpc_boot_args->{ctrl_fh}, $data or die $!;
-
-        close $rpc_boot_args->{ctrl_fh} or die $!;
+    if ($MSWIN) {
+        Win32API::File::OsFHandleOpen( *FH, $rpc_boot_args->{fh}, 'w' ) or die $!;
     }
     else {
-        if ($MSWIN) {
-            Win32API::File::OsFHandleOpen( *FH, $rpc_boot_args->{ctrl_fh}, 'w' ) or die $!;
-        }
-        else {
-            open *FH, '>&=', $rpc_boot_args->{ctrl_fh} or die $!;
-        }
-
-        binmode *FH or die;
-
-        syswrite *FH, $data or die $!;
-
-        close *FH or die $!;
+        open *FH, '>&=', $rpc_boot_args->{fh} or die $!;
     }
+
+    binmode *FH or die;
+
+    syswrite *FH, unpack( 'H*', $data->$* ) . $LF or die $!;
+
+    close *FH or die $!;
 
     $cv->recv;
 
@@ -174,9 +145,9 @@ sub run ( $type, $rpc_boot_args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 11                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (32)                       |
+## |    3 | 11                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (25)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 115                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 94                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 43                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

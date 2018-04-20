@@ -1,5 +1,11 @@
 Revision history for Types-Path-Tiny
 
+0.006     2018-04-19 16:31:15+02:00 Europe/Oslo
+
+    - Added Moo example to SYNOPSIS
+
+    - Modernized repo metadata and build system
+
 0.005     2013-06-21 15:58:27 America/New_York
 
     - Removed MooseX::Types::Path::Tiny given pending

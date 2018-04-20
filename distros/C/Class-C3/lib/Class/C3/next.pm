@@ -7,7 +7,7 @@ no warnings 'redefine'; # for 00load.t w/ core support
 
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 our %METHOD_CACHE;
 
@@ -66,7 +66,7 @@ use strict;
 use warnings;
 no warnings 'redefine'; # for 00load.t w/ core support
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 sub method { (next::method($_[0]) || return)->(@_) }
 
@@ -90,9 +90,9 @@ C<maybe::next::method> in pure perl.
 
 =head1 AUTHOR
 
-Stevan Little, E<lt>stevan@iinteractive.comE<gt>
+Stevan Little, <stevan@iinteractive.com>
 
-Brandon L. Black, E<lt>blblack@gmail.comE<gt>
+Brandon L. Black, <blblack@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

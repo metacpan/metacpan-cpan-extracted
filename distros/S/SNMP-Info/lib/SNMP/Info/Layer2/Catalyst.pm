@@ -42,7 +42,7 @@ use SNMP::Info::Layer2::Cisco;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::Layer2::Cisco::MIBS,
@@ -70,7 +70,7 @@ $VERSION = '3.54';
 sub i_physical {
     my $cat = shift;
 
-    my $p_port = $cat->p_port();
+    my $p_port = $cat->p_port() || {};
 
     my %i_physical;
     foreach my $port ( keys %$p_port ) {
@@ -104,8 +104,8 @@ sub os_ver {
 # Workaround for incomplete bp_index
 sub bp_index {
     my $cat     = shift;
-    my $p_index = $cat->p_port();
-    my $b_index = $cat->p_oidx();
+    my $p_index = $cat->p_port() || {};
+    my $b_index = $cat->p_oidx() || {};
 
     my %bp_index;
     foreach my $iid ( keys %$p_index ) {

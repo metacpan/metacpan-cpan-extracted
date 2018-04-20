@@ -227,6 +227,48 @@ Pcore::RPC::Hub
 
 =head1 SYNOPSIS
 
+    # client
+    my $hub = Pcore::RPC::Hub->new;
+
+    $hub->run_rpc( {
+        type           => 'RPC',
+        workers        => 50,
+        token          => undef,
+        listen_events  => undef,
+        forward_events => ['APP.SETTINGS_UPDATED'],
+        buildargs      => {},
+    } );
+
+    $hub->rpc_call( 'RPC', 'test', @args, $cb );
+
+    # server
+    package RPC;
+
+    use Pcore -rpc, -const, -class;
+
+    const our $RPC_LISTEN_EVENTS  => ['APP.EV2'];
+    const our $RPC_FORWARD_EVENTS => ['APP.EV1'];
+
+    sub BUILD ( $self, $args ) {
+        return;
+    }
+
+    sub RPC_ON_CONNECT ( $self, $ws ) {
+        return;
+    }
+
+    sub RPC_ON_DISCONNECT ( $self, $ws, $status ) {
+        return;
+    }
+
+    sub API_test ( $self, $req, $args ) {
+        $req->( 200, time );
+
+        return;
+    }
+
+    1;
+
 =head1 DESCRIPTION
 
 =head1 ATTRIBUTES

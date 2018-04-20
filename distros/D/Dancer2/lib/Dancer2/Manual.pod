@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 DESCRIPTION
 
@@ -30,7 +30,8 @@ way, easily.
 
 =head1 INSTALL
 
-Installation of Dancer2 is simple:
+Installation of Dancer2 is simple, using your favourite method to install from
+CPAN, e.g.:
 
     perl -MCPAN -e 'install Dancer2'
 
@@ -42,6 +43,14 @@ least on Unix-like systems:
 
 (If you don't have root access, omit the 'sudo', and cpanminus will install
 Dancer2 and prereqs into C<~/perl5>.)
+
+Dancer2 is also available as a package from the package repository of several
+distributions, for example on Debian/Ubuntu you should be able to just:
+
+    apt-get install libdancer2-perl
+
+Do be aware, though, that distribution-packaged versions sometimes lag behind
+the most recent version on CPAN.
 
 =head1 BOOTSTRAPPING A NEW APP
 
@@ -188,11 +197,12 @@ requests.
 =head2 Route Handlers
 
 The route action is the code reference declared. It can access parameters
-through the specific C<route_parameters>, C<query_parameters>, and 
-C<body_parameters> keywords, which return a L<Hash::MultiValue> object. 
+through the specific L<route_parameters|/route_parameters>, 
+L<query_parameters|/query_parameters>, and  L<body_parameters|/body_parameters>
+keywords, which return a L<Hash::MultiValue> object. 
 This hashref is a merge of the route pattern matches and the request params.
 
-You can have more details about how params are built and how to access them
+You can find more details about how params are built and how to access them
 in the L<Dancer2::Core::Request> documentation.
 
 =head3 Declaring Routes
@@ -472,9 +482,10 @@ This is done with the B<pass> keyword, like in the following example
 =head1 HOOKS
 
 Hooks are code references (or anonymous subroutines) that are triggered at
-specific moments during the resolution of a request.
+specific moments during the resolution of a request.  They are set up using the
+L<hook|/hook> keyword.
 
-Many of them are supported by the core but plugins and engines can also
+Many of them are provided by Dancer2's core, but plugins and engines can also
 define their own.
 
 =over 4
@@ -485,7 +496,7 @@ C<before> hooks are evaluated before each request within the context of the
 request and receives as argument the app (a L<Dancer2::Core::App> object).
 
 It's possible to define variables which will be accessible in the action
-blocks with the keyword C<var>.
+blocks with the L<var keyword|/var>.
 
     hook before => sub {
         var note => 'Hi there';
@@ -594,7 +605,7 @@ string.
 
 =head2 Error Handling
 
-Refer to L<Error Handling|Dancer2::Manual/error-hooks>
+Refer to L<Error Hooks|Dancer2::Manual/Error-Hooks>
 for details about the following hooks:
 
 =over 4
@@ -611,7 +622,7 @@ for details about the following hooks:
 
 =head2 File Rendering
 
-Refer to L<File Handler|Dancer2::Manual/file-handler>
+Refer to L<File Handler|Dancer2::Manual/File-Handler>
 for details on the following hooks:
 
 =over 4
@@ -867,7 +878,7 @@ storage to help with debugging, but shouldn't be used on production systems.
 There are other session backends, such as L<Dancer2::Session::Memcached>,
 which are recommended for production use.
 
-You can then use the L<session|Dancer2/session> keyword to manipulate the
+You can then use the L<session|Dancer2::Manual/session> keyword to manipulate the
 session:
 
 =head3 Storing data in the session
@@ -889,8 +900,8 @@ Or, alternatively,
 =head3 Controlling where sessions are stored
 
 For disc-based session backends like L<Dancer2::Session::YAML>,
-L<Dancer2::Session::Storable> etc., session files are written to the session
-dir specified by the C<session_dir> setting, which defaults to C<./sessions>
+session files are written to the session dir specified by
+the C<session_dir> setting, which defaults to C<./sessions>
 if not specifically set.
 
 If you need to control where session files are created, you can do so
@@ -1283,28 +1294,28 @@ Current version of Dancer2, effectively C<< Dancer2->VERSION >>.
 =item * B<settings>
 
 A hash of the application configuration. This is like
-the L<config|#config> keyword.
+the L<config|Dancer2::Manual/config> keyword.
 
 =item * B<request>
 
-The current request object. This is like the L<request|#request> keyword.
+The current request object. This is like the L<request|Dancer2::Manual/request> keyword.
 
 =item * B<params>
 
 A hash reference of all the parameters.
 
 Currently the equivalent of C<< $request->params >>, and like the
-L<params|#params> keyword.
+L<params|Dancer2::Manual/params> keyword.
 
 =item * B<vars>
 
 The list of request variables, which is what you would get if you
-called the L<vars|#vars> keyword.
+called the L<vars|Dancer2::Manual/vars> keyword.
 
 =item * B<session>
 
 The current session data, if a session exists. This is like
-the L<session|#session> keyword.
+the L<session|Dancer2::Manual/session> keyword.
 
 =back
 
@@ -1381,8 +1392,14 @@ C<appdir/environments>. That way, the appropriate environment config file
 will be loaded according to the running environment (if none is specified,
 it will be 'development').
 
-Note that you can change the running environment using the C<--environment>
-command line switch.
+You can change the running environment when starting your app using the
+C<plackup> command's C<--env> or C<--E> switch:
+
+    plackup -E production bin/app.psgi
+
+Altenatively, you can set the
+L<C<DANCER_ENVIRONMENT>|https://metacpan.org/pod/Dancer2::Config#DANCER_ENVIRONMENT>
+environment variable in the shell or in your web server's configuration file.
 
 Typically, you'll want to set the following values in a development config
 file:
@@ -2502,6 +2519,8 @@ Adds a hook at some position. For example :
 There can be multiple hooks assigned to a given position, and each will be
 executed in order.
 
+See the L<HOOKS|/HOOKS> section for a list of available hooks.
+
 =head2 info
 
 Logs a message of C<info> level:
@@ -2911,6 +2930,10 @@ use.
    send_file( \$data, content_type => 'image/png'
                       filename     => 'onion.png' );
 
+By default the Content-Disposition header uses the "attachment" type, which
+triggers a "Save" dialog in some browsers. Supply a C<content_disposition>
+attribute of "inline" to have the file displayed inline by the browser.
+
 =head2 set
 
 Defines a setting:
@@ -3095,7 +3118,8 @@ Or to request a specific layout, of course:
 
 Some tokens are automatically added to your template (C<perl_version>,
 C<dancer_version>, C<settings>, C<request>, C<vars> and, if you
-have sessions enabled, C<session>). Check L<#Default Template Variables>
+have sessions enabled, C<session>). Check L<Default Template
+Variables|Dancer2::Manual/Default-Template-Variables>
 for further details.
 
 =head2 to_dumper ($structure)
@@ -3243,7 +3267,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

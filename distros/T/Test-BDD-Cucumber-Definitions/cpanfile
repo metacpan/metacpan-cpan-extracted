@@ -1,6 +1,7 @@
 requires 'Archive::Zip';
 requires 'Const::Fast';
 requires 'Data::Printer';
+requires 'DBI';
 requires 'File::Slurper';
 requires 'HTTP::Response';
 requires 'HTTP::Tiny';
@@ -20,4 +21,8 @@ requires 'Try::Tiny';
 
 on build => sub {
     requires 'Test::More';
+};
+
+on 'test' => sub {
+  requires 'Test::Compile';
 };

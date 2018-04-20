@@ -1,4 +1,4 @@
-Date::Calc::Iterator version 1.00
+Date::Calc::Iterator version 1.01
 =================================
 
 Date::Calc::Iterator lets you iterate over a range of dates; by default it
@@ -26,9 +26,10 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2003,2004 Marco Marongiu
+Copyright (C) 2003-2018 Marco Marongiu.
+
+Contributions in the 1.01 release by Neil Bowers.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
-$Id: README,v 1.2 2004/03/17 19:44:40 bronto Exp $

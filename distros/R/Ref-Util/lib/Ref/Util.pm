@@ -1,6 +1,6 @@
 package Ref::Util;
 # ABSTRACT: Utility functions for checking references
-$Ref::Util::VERSION = '0.203';
+$Ref::Util::VERSION = '0.204';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ Ref::Util - Utility functions for checking references
 
 =head1 VERSION
 
-version 0.203
+version 0.204
 
 =head1 SYNOPSIS
 

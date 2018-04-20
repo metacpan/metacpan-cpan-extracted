@@ -39,14 +39,14 @@ use SNMP::Info::Layer2;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 # Set for No CDP
 %GLOBALS = ( %SNMP::Info::Layer2::GLOBALS );
 
 %FUNCS = (
     %SNMP::Info::Layer2::FUNCS,
-    'ip_adresses'   => 'ipAdEntAddr',
+    'ip_addresses'  => 'ipAdEntAddr',
     'i_name'        => 'ifDescr',
     'i_description' => 'adslLineConfProfile',
 );
@@ -58,7 +58,7 @@ $VERSION = '3.54';
 
 sub layers {
     my $zyxel  = shift;
-    my $layers = $zyxel->layers();
+    my $layers = $zyxel->SUPER::layers();
     return $layers if defined $layers;
 
     # If these don't claim to have any layers, so we'll give them 1+2
@@ -102,7 +102,9 @@ sub ip {
     my $ip_hash = $zyxel->ip_addresses();
     my $found_ip;
 
-    foreach my $ip ( keys %{$ip_hash} ) {
+    # Since hashes are random add sort so we get the same address each time
+    # if there happens to be more than one. Will return highest numbered address 
+    foreach my $ip ( sort keys %{$ip_hash} ) {
         $found_ip = $ip
             if ( defined $ip
             and $ip =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ );

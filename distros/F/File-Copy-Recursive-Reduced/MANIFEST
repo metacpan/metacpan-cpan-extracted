@@ -7,6 +7,7 @@ MANIFEST.SKIP
 README
 t/001-fcopy.t
 t/002-dircopy.t
+t/003-rcopy.t
 t/lib/Helper.pm
 t/lib/MockHomeDir.pm
 Todo

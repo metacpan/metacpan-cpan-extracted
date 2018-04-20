@@ -4,7 +4,7 @@ use warnings;
 
 use Importer;
 
-our $VERSION = '0.000111';
+our $VERSION = '0.000114';
 
 use Carp qw/croak/;
 
@@ -451,7 +451,7 @@ See L<Test2::Tools::Subtest>.
 
 =over 4
 
-=item subtest $name => sub { ... }
+=item subtest $name => sub { ... };
 
 (Note: This is called C<subtest_buffered()> in the Tools module.)
 
@@ -572,7 +572,7 @@ F<https://github.com/Test-More/Test2-Suite/>.
 
 =head1 COPYRIGHT
 
-Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

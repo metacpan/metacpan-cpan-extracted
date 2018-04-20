@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  File::Copy::Recursive::Reduced: '0.002'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -30,5 +30,5 @@ requires:
   Test::More: '0'
   strict: '0'
   version: '0'
-version: '2.017012'
+version: '2.017014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

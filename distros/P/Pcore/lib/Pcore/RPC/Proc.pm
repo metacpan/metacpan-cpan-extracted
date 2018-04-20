@@ -3,9 +3,9 @@ package Pcore::RPC::Proc;
 use Pcore -class;
 use Fcntl;
 use Pcore::AE::Handle;
-use AnyEvent::Util qw[portable_socketpair];
+use AnyEvent::Util qw[portable_pipe];
 use if $MSWIN, 'Win32API::File';
-use Pcore::Util::Data qw[:CONST];
+use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::Scalar qw[weaken];
 
 has proc => ( is => 'ro', isa =>, InstanceOf ['Pcore::Util::PM::Proc'], init_arg => undef );
@@ -27,35 +27,8 @@ around new => sub ( $orig, $self, $type, % ) {
     # create self instance
     $self = $self->$orig( { on_finish => $args{on_finish} } );
 
-    if ($Pcore::RPC::Tmpl::CPID) {
-        Pcore::RPC::Tmpl::run(
-            $type,
-            {   parent_id => $args{parent_id},
-                listen    => $args{listen},
-                token     => $args{token},
-                buildargs => $args{buildargs},
-            },
-            sub ($proc) {
-                $args{on_ready}->($proc);
-
-                return;
-            }
-        );
-
-        return;
-    }
-
     # create handles
-    my ( $ctrl_r, $ctrl_w ) = portable_socketpair();
-
-    state $perl = do {
-        if ( $ENV->is_par ) {
-            "$ENV{PAR_TEMP}/perl" . ( $MSWIN ? '.exe' : q[] );
-        }
-        else {
-            $^X;
-        }
-    };
+    my ( $fh_r, $fh_w ) = portable_pipe();
 
     my $boot_args = {
         script_path => $ENV->{SCRIPT_PATH},
@@ -68,76 +41,97 @@ around new => sub ( $orig, $self, $type, % ) {
     };
 
     if ($MSWIN) {
-        $boot_args->{ctrl_fh} = Win32API::File::FdGetOsFHandle( fileno $ctrl_w );
+        $boot_args->{fh} = Win32API::File::FdGetOsFHandle( fileno $fh_w );
     }
     else {
-        fcntl $ctrl_w, Fcntl::F_SETFD, fcntl( $ctrl_w, Fcntl::F_GETFD, 0 ) & ~Fcntl::FD_CLOEXEC or die;
+        fcntl $fh_w, Fcntl::F_SETFD, fcntl( $fh_w, Fcntl::F_GETFD, 0 ) & ~Fcntl::FD_CLOEXEC or die;
 
-        $boot_args->{ctrl_fh} = fileno $ctrl_w;
+        $boot_args->{fh} = fileno $fh_w;
     }
 
-    # serialize CBOR + HEX
-    $boot_args = unpack 'H*', P->data->to_cbor($boot_args)->$*;
+    if ($Pcore::Util::PM::ForkTmpl::CHILD_PID) {
+        Pcore::Util::PM::ForkTmpl::run_rpc( $type, $boot_args );
 
-    my $cmd = [];
+        $self->_handshake(
+            $fh_r,
+            sub {
+                $self->{proc} = bless { pid => $self->{conn}->{pid} }, 'Pcore::Util::PM::Proc';
 
-    if ($MSWIN) {
-        push $cmd->@*, $perl, "-M$type";
+                $args{on_ready}->($self);
+
+                return;
+            }
+        );
     }
     else {
-        push $cmd->@*, $perl, "-M$type";
-    }
+        state $perl = do {
+            if ( $ENV->{is_par} ) {
+                "$ENV{PAR_TEMP}/perl" . ( $MSWIN ? '.exe' : q[] );
+            }
+            else {
+                $^X;
+            }
+        };
 
-    my $weaken_self = $self;
+        my $cmd = [];
 
-    weaken $weaken_self;
-
-    # create proc
-    P->pm->run_proc(
-        $cmd,
-        stdin    => 1,
-        on_ready => sub ($proc) {
-            $self->{proc} = $proc;
-
-            # send configuration to RPC STDIN
-            $proc->stdin->push_write( $boot_args . $LF );
-
-            # wrap AE handles and perform handshale
-            $self->_handshake(
-                $ctrl_r,
-                sub {
-                    $args{on_ready}->($self);
-
-                    return;
-                }
-            );
-
-            return;
-        },
-        on_finish => sub ($proc) {
-            $weaken_self->{on_finish}->($weaken_self) if $weaken_self && $weaken_self->{on_finish};
-
-            return;
+        if ($MSWIN) {
+            push $cmd->@*, $perl, "-M$type";
         }
-    );
+        else {
+            push $cmd->@*, $perl, "-M$type";
+        }
+
+        my $weaken_self = $self;
+
+        weaken $weaken_self;
+
+        # create proc
+        P->pm->run_proc(
+            $cmd,
+            stdin    => 1,
+            on_ready => sub ($proc) {
+                $self->{proc} = $proc;
+
+                # send configuration to RPC STDIN
+                $proc->stdin->push_write( unpack( 'H*', to_cbor($boot_args)->$* ) . $LF );
+
+                $self->_handshake(
+                    $fh_r,
+                    sub {
+                        $args{on_ready}->($self);
+
+                        return;
+                    }
+                );
+
+                return;
+            },
+            on_finish => sub ($proc) {
+                $weaken_self->{on_finish}->($weaken_self) if $weaken_self && $weaken_self->{on_finish};
+
+                return;
+            }
+        );
+    }
 
     return;
 };
 
-sub _handshake ( $self, $ctrl_fh, $cb ) {
+sub _handshake ( $self, $fh, $cb ) {
 
     # wrap control_fh
     Pcore::AE::Handle->new(
-        fh         => $ctrl_fh,
+        fh         => $fh,
         on_connect => sub ( $h, @ ) {
             $h->push_read(
-                line => "\n",
+                line => $LF,
                 sub ( $h1, $line, $eol ) {
 
                     # destroy control fh
                     $h->destroy;
 
-                    my $conn = eval { P->data->from_cbor($line) };
+                    my $conn = eval { from_cbor pack 'H*', $line };
 
                     if ($@) {
                         die 'RPC handshake error';

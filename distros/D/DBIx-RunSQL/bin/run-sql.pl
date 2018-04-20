@@ -13,6 +13,10 @@ run-db.pl - Run SQL
 
   run-sql.pl "select * from mytable where 1=0"
 
+  run-sql.pl --sql create-table.sql
+
+  echo "select * from mytable where 1=0" | run-sql.pl
+
 =head1 ABSTRACT
 
 This sets up the database. The following

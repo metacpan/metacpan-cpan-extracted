@@ -12,7 +12,6 @@ lib/Pcore/AE/Handle.pm
 lib/Pcore/AE/Handle/Cache.pm
 lib/Pcore/AE/Handle/Cache2.pm
 lib/Pcore/AE/Handle/Cache2/Storage.pm
-lib/Pcore/AE/Handle2.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/BitBucket.pm
 lib/Pcore/API/Client.pm
@@ -20,17 +19,7 @@ lib/Pcore/API/DockerHub.pm
 lib/Pcore/API/GitHub.pm
 lib/Pcore/API/IPPool.pm
 lib/Pcore/API/PAUSE.pm
-lib/Pcore/API/ProxyPool.pm
-lib/Pcore/API/ProxyPool/Proxy.pm
-lib/Pcore/API/ProxyPool/Proxy/Removed.pm
-lib/Pcore/API/ProxyPool/Source.pm
-lib/Pcore/API/ProxyPool/Source/AwmProxy.pm
-lib/Pcore/API/ProxyPool/Source/File.pm
-lib/Pcore/API/ProxyPool/Source/List.pm
-lib/Pcore/API/ProxyPool/Source/ProxyRack.pm
-lib/Pcore/API/ProxyPool/Source/Tor.pm
-lib/Pcore/API/ProxyPool/Source/WorldOfProxy.pm
-lib/Pcore/API/ProxyPool/Storage.pm
+lib/Pcore/API/Proxy.pm
 lib/Pcore/API/SCM.pm
 lib/Pcore/API/SCM/Const.pm
 lib/Pcore/API/SCM/Git.pm
@@ -128,11 +117,9 @@ lib/Pcore/Handle/DBI.pm
 lib/Pcore/Handle/DBI/Const.pm
 lib/Pcore/Handle/DBI/Response.pm
 lib/Pcore/Handle/DBI/STH.pm
-lib/Pcore/RPC.pm
 lib/Pcore/RPC/Hub.pm
 lib/Pcore/RPC/Proc.pm
 lib/Pcore/RPC/Server.pm
-lib/Pcore/RPC/Tmpl.pm
 lib/Pcore/Src.pm
 lib/Pcore/Src/File.pm
 lib/Pcore/Src/Filter.pm
@@ -163,6 +150,7 @@ lib/Pcore/Util/Hash/RandKey.pm
 lib/Pcore/Util/IDN.pm
 lib/Pcore/Util/List.pm
 lib/Pcore/Util/PM.pm
+lib/Pcore/Util/PM/ForkTmpl.pm
 lib/Pcore/Util/PM/Proc.pm
 lib/Pcore/Util/Path.pm
 lib/Pcore/Util/Perl.pm
@@ -267,6 +255,7 @@ share/dist-tmpl/tmpl-dist/xt/release/README.md
 share/dist-tmpl/tmpl-dist/xt/smoke/README.md
 share/dist.yaml
 share/docker.json
+share/www/static/pcoreApi.js
 t/author-pod-syntax.t
 t/p-http-cookies.t
 t/p-util-path.t

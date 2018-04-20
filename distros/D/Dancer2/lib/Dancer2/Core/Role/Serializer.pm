@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Serializer;
 # ABSTRACT: Role for Serializer engines
-$Dancer2::Core::Role::Serializer::VERSION = '0.205002';
+$Dancer2::Core::Role::Serializer::VERSION = '0.206000';
 use Moo::Role;
 use Dancer2::Core::Types;
 use Scalar::Util 'blessed';
@@ -98,7 +98,7 @@ Dancer2::Core::Role::Serializer - Role for Serializer engines
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 DESCRIPTION
 
@@ -144,13 +144,30 @@ serializer.
 The deserialize method receives encoded bytes and must therefore
 handle any decoding required.
 
+=head1 CONFIGURATION
+
+The B<serializer> configuration variable tells Dancer2 which engine to use.
+
+You can change it either in your config.yml file:
+
+    #Set JSON engine
+    serializer: "JSON"
+
+    # Prettify JSON output
+    engines:
+      serializer:
+        JSON:
+          pretty: 1
+
+To know which engines are availables please see L<Dancer2::Manual/"Serializers">
+
 =head1 AUTHOR
 
 Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

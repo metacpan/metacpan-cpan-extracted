@@ -19,22 +19,32 @@ if (eval { require Test::Tester; require Test::Builder; 1 } &&
 
 my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
+my %t_prereq = (
+  'Test::More'       => '0.88',
+  'Test::Tester'     => $tt_prereq,
+);
+
+my %prereq = (
+  'Test::Builder'    => '0',
+  'Scalar::Util'     => '1.09',
+
+  # apparently CPAN doesn't get the version of Scalar::Util
+  'List::Util'       => '1.09',
+
+  ($mm_ver < 6.55_01 ? %t_prereq : ()),
+);
+
+my %extra_meta  = $mm_ver >= 6.55_01
+                ? $mm_ver >= 6.63_03 ? (TEST_REQUIRES  => \%t_prereq)
+                                     : (BUILD_REQUIRES => \%t_prereq)
+                : ();
+
 WriteMakefile(
   AUTHOR       => 'Fergal Daly <fergal@esatclear.ie>',
   NAME         => 'Test::Deep',
   VERSION_FROM => './lib/Test/Deep.pm',
-  PREREQ_PM    => {
-    'Test::Builder'    => '0',
-    'Scalar::Util'     => '1.09',
-
-    # apparently CPAN doesn't get the version of Scalar::Util
-    'List::Util'       => '1.09',
-  },
-
-  ( $ExtUtils::MakeMaker::VERSION < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) => {
-    'Test::More'       => '0.88',
-    'Test::Tester'     => $tt_prereq,
-  },
+  PREREQ_PM    => \%prereq,
+  %extra_meta,
 
   LICENSE => "perl",
 

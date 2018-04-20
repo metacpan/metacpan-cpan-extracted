@@ -20,10 +20,6 @@ sub RPC_ON_DISCONNECT ( $self, $ws, $status ) {
     return;
 }
 
-sub RPC_ON_TERM ($self) {
-    return;
-}
-
 sub API_test ( $self, $req, @args ) {
     $req->( 200, time );
 
@@ -39,7 +35,7 @@ sub API_test ( $self, $req, @args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 4                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 47                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 51 does not match the package declaration       |
+## |    1 | 43                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 47 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

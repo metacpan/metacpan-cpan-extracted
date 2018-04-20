@@ -1,6 +1,6 @@
 
 package Kevin::Commands::Util;
-$Kevin::Commands::Util::VERSION = '0.6.0';
+$Kevin::Commands::Util::VERSION = '0.7.1';
 use Mojo::Base -strict;
 
 # Borrowed from https://github.com/docker/go-units/blob/master/duration.go
@@ -67,7 +67,7 @@ Kevin::Commands::Util
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.1
 
 =head1 AUTHOR
 
@@ -75,7 +75,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

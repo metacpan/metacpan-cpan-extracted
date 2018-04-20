@@ -1,7 +1,7 @@
 ---
 abstract: 'Efficient generation of subroutines via string eval'
 author:
-  - unknown
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
 build_requires:
   Test::Fatal: '0.003'
   Test::More: '0.94'
@@ -28,6 +28,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Quote
   license: http://dev.perl.org/licenses/
   repository: https://github.com/moose/Sub-Quote.git
-version: '2.005000'
+version: '2.005001'
 x_authority: cpan:MSTROUT
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -42,14 +42,14 @@ use SNMP::Info;
 
 use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     'SNMPv2-MIB'            => 'sysDescr',
     'CISCO-PROCESS-MIB'     => 'cpmCPUTotal5sec',
     'CISCO-MEMORY-POOL-MIB' => 'ciscoMemoryPoolUsed',
     'OLD-CISCO-SYSTEM-MIB'  => 'writeMem',
-    'CISCO-PRODUCTS-MIB'    => 'sysName',
+    'CISCO-PRODUCTS-MIB'    => 'ciscoIGS',
     'ENTITY-MIB'            => 'entPhysicalSoftwareRev',
     'CISCO-IMAGE-MIB'       => 'ciscoImageString',
 

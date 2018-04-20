@@ -1,3 +1,8 @@
+0.18 20180420
+    + List the Getopt::Long version we need
+    + Read SQL from STDIN if not given on the command line
+	  This allows run-sql.pl to be used in a pipe
+
 0.17 20180223
     ! API change: ->handle_command_line() and ->parse_command_line()
 	  now take an arrayREF for the command line items and modify that arrayref.

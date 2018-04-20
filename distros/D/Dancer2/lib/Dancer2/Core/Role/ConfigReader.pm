@@ -1,6 +1,6 @@
 # ABSTRACT: Config role for Dancer2 core objects
 package Dancer2::Core::Role::ConfigReader;
-$Dancer2::Core::Role::ConfigReader::VERSION = '0.205002';
+$Dancer2::Core::Role::ConfigReader::VERSION = '0.206000';
 use Moo::Role;
 
 use File::Spec;
@@ -129,22 +129,18 @@ sub _build_config_files {
         }
     }
 
-    foreach my $ext (@exts) {
-        foreach my $file ( [ $location, "config.$ext" ],
-            [ $self->environments_location, "$running_env.$ext" ] )
-        {
-            my $path = path( @{$file} );
+    foreach my $file ( [ $location, "config" ],
+        [ $self->environments_location, $running_env ] )
+    {
+        foreach my $ext (@exts) {
+            my $path = path( $file->[0], $file->[1] . ".$ext" );
             next if !-r $path;
 
-            push @files, $path;
+            # Look for *_local.ext files
+            my $local = path( $file->[0], $file->[1] . "_local.$ext" );
+            push @files, $path, ( -r $local ? $local : () );
         }
     }
-
-    # Look for *_local.ext files
-    @files = map {
-        (my $l = $_) =~ s/(\w+)(\.\w+)$/${1}_local$2/;
-        $_, (-r $l ? $l : () );
-    } sort @files;
 
     return \@files;
 }
@@ -293,7 +289,7 @@ Dancer2::Core::Role::ConfigReader - Config role for Dancer2 core objects
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 DESCRIPTION
 
@@ -353,7 +349,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

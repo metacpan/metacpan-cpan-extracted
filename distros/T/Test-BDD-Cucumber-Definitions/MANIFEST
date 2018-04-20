@@ -5,6 +5,9 @@ META.json
 README.md
 cpanfile
 lib/Test/BDD/Cucumber/Definitions.pm
+lib/Test/BDD/Cucumber/Definitions/Base.pm
+lib/Test/BDD/Cucumber/Definitions/Base/In.pm
+lib/Test/BDD/Cucumber/Definitions/Base/Ru.pm
 lib/Test/BDD/Cucumber/Definitions/File.pm
 lib/Test/BDD/Cucumber/Definitions/File/In.pm
 lib/Test/BDD/Cucumber/Definitions/File/Ru.pm

@@ -5,7 +5,7 @@ use utf8;
 use Data::Util qw(:check);
 use Moo::Role;
 
-our $VERSION = "0.0133";
+our $VERSION = "0.0134";
 
 has session_key => (
     is       => "ro",
@@ -22,11 +22,7 @@ has authorization_path => (
     required => 1
 );
 has error_path => (
-    is => "ro",
-    isa => sub { is_string($_[0]) or die("error_path should be string"); },
-    lazy => 1,
-    default  => sub { "/"; },
-    required => 1
+    is => "lazy"
 );
 has id => (
     is => "ro",
@@ -41,6 +37,12 @@ has uri_base => (
 );
 
 requires "to_app";
+
+sub _build_error_path {
+
+    $_[0]->authorization_path;
+
+}
 
 sub redirect_to_authorization {
 
@@ -334,6 +336,10 @@ When authentication succeeds, this application should redirect you here
 create the full url.
 
 When authentication fails, this application should redirect you here
+
+If not set, it has the same value as the authorizaton_path. In that case make sure that you also
+
+check for auth_sso_error in your authorization route.
 
 The implementor should expect this in the session key "auth_sso_error" ( "_error" is appended to the configured session_key ):
 

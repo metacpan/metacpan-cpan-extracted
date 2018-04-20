@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 plan skip_all => 'This test requires a Makefile in the built distribution' if not -f 'Makefile';
 
-plan tests => 16;
+plan tests => 22;
 
 my $FILE = "test-$$-Makefile";
 rmtree( [ "tlib-$$", "troot-$$" ], 0, 0 );
@@ -34,8 +34,7 @@ WriteMakefile(
     MAKEFILE          => $FILE,
     PREREQ_PM         => {},
     ($] >= 5.005 ?
-      (ABSTRACT_FROM  => 'lib/File/ShareDir/Install.pm',
-       AUTHOR         => 'Philip Gwyn <fil@localdomain>') : ()),
+      (AUTHOR         => 'Philip Gwyn <fil@localdomain>') : ()),
 );
 
 sub slurp
@@ -50,7 +49,9 @@ sub slurp
 #####
 ok( -f $FILE, "Created $FILE" );
 my $content = slurp $FILE;
-ok( $content =~ m(t.share.honk.+share.dist...DISTNAME..honk), "Shared by dist" );
+ok( $content =~ m(t.share.honk.+share.dist...DISTNAME..honk), "Shared by dist - regular file" );
+ok( $content =~ m(t.share.hello world.+share.dist...DISTNAME..hello world), "Shared by dist - file with spaces" );
+ok( $content =~ m(t.share.#hello.+share.dist...DISTNAME..#hello), "Shared by dist - file with special char" );
 ok( $content =~ m(t.module.bonk.+share.module.My-Test.bonk), "Shared by module" );
 ok( $content =~ m(t.module.again.+share.module.My-Test.again), "Shared by module again" );
 ok( $content =~ m(t.module.deeper.bonk.+share.module.My-Test.deeper.bonk), "Shared by module in subdirectory" );
@@ -60,7 +61,9 @@ ok( $content !~ m(t.share.\.something), "Don't share dot files" );
 #####
 mysystem( $Config{make}, '-f', $FILE );
 my $TOP = "tlib-$$/lib/auto/share";
-ok( -f "$TOP/dist/File-ShareDir-Install/honk", "Copied to blib for dist" );
+ok( -f "$TOP/dist/File-ShareDir-Install/honk", "Copied to blib for dist - regular file" );
+ok( -f "$TOP/dist/File-ShareDir-Install/hello world", "Copied to blib for dist - file with spaces" );
+ok( -f "$TOP/dist/File-ShareDir-Install/#hello", "Copied to blib for dist - file with special char" );
 ok( -f "$TOP/module/My-Test/bonk", "Copied to blib for module" );
 ok( -f "$TOP/module/My-Test/again", "Copied to blib for module again" );
 ok( -f "$TOP/module/My-Test/deeper/bonk", "Copied to blib for module, in subdir" );
@@ -80,7 +83,9 @@ unless( $content =~ m(INSTALLSITELIB = (.+)) ) {
 else {
     $TOP = "$1/auto/share";
     $TOP =~ s/\$\(SITEPREFIX\)/troot-$$/;
-    ok( -f "$TOP/dist/File-ShareDir-Install/honk", "Copied to blib for dist" );
+    ok( -f "$TOP/dist/File-ShareDir-Install/honk", "Copied to blib for dist - regular file" );
+    ok( -f "$TOP/dist/File-ShareDir-Install/hello world", "Copied to blib for dist - file with spaces" );
+    ok( -f "$TOP/dist/File-ShareDir-Install/#hello", "Copied to blib for dist - file with special char" );
     ok( -f "$TOP/module/My-Test/bonk", "Copied to blib for module" );
     ok( -f "$TOP/module/My-Test/again", "Copied to blib for module again" );
     ok( -f "$TOP/module/My-Test/deeper/bonk", "Copied to blib for module, in subdir" );

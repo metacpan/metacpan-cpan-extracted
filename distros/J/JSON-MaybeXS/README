@@ -122,6 +122,14 @@ BOOLEANS
         my $true = JSON()->true;
         my $false = JSON()->false;
 
+    The booleans are also available as subs or methods on JSON::MaybeXS.
+
+        use JSON::MaybeXS ();
+        my $true = JSON::MaybeXS::true;
+        my $true = JSON::MaybeXS->true;
+        my $false = JSON::MaybeXS::false;
+        my $false = JSON::MaybeXS->false;
+
 CONVERTING FROM JSON::Any
     JSON::Any used to be the favoured compatibility layer above the various
     JSON backends, but over time has grown a lot of extra code to deal with

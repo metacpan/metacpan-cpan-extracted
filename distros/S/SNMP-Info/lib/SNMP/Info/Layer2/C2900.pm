@@ -41,7 +41,7 @@ use SNMP::Info::Layer2::Cisco;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %GLOBALS = (
     %SNMP::Info::Layer2::Cisco::GLOBALS,
@@ -128,25 +128,24 @@ sub i_speed_admin {
     my $c2900   = shift;
     my $partial = shift;
 
-    my %i_speed_admin;
-    my $p_port        = $c2900->p_port() || {};
     my $interfaces    = $c2900->interfaces($partial);
     my $c2900_p_index = $c2900->c2900_p_index() || {};
+    my $c2900_p_admin = $c2900->c2900_p_speed_admin();
 
     my %reverse_2900 = reverse %$c2900_p_index;
-    my $c2900_p_speed
-        = $c2900->c2900_p_speed_admin( $reverse_2900{$partial} );
 
-    my %speeds = (
-        'autoDetect' => 'auto',
-        's10000000'  => '10 Mbps',
-        's100000000' => '100 Mbps',
-    );
+    my %i_speed_admin;
+    foreach my $if ( keys %$interfaces ) {
+        my $port_2900 = $reverse_2900{$if};
+        next unless defined $port_2900;
+        my $speed = $c2900_p_admin->{$port_2900};
+        next unless defined $speed;
 
-    %i_speed_admin
-        = map { $c2900_p_index->{$_} => $speeds{ $c2900_p_speed->{$_} } }
-        keys %$c2900_p_index;
-
+        $speed = 'auto' if $speed eq 'autoDetect';
+        $speed = '10 Mbps' if $speed eq 's10000000';
+        $speed = '100 Mbps' if $speed eq 's100000000';
+        $i_speed_admin{$if} = $speed;
+    }
     return \%i_speed_admin;
 }
 
@@ -190,7 +189,7 @@ sub set_i_duplex_admin {
     return $c2900->set_c2900_p_duplex_admin( $duplexes{$duplex}, $iid );
 }
 
-# Use i_descritption for port key, cuz i_name can be manually entered.
+# Use i_description for port key, cuz i_name can be manually entered.
 sub interfaces {
     my $c2900   = shift;
     my $partial = shift;

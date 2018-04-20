@@ -12,7 +12,7 @@ use Plack::Auth::SSO::ResponseParser::CAS;
 use XML::LibXML::XPathContext;
 use XML::LibXML;
 
-our $VERSION = "0.0133";
+our $VERSION = "0.0134";
 
 with "Plack::Auth::SSO";
 

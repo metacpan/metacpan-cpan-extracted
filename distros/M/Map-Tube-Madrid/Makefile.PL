@@ -30,6 +30,17 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Madrid-*' },
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/manwar/Map-Tube-Madrid.git',
+                web  => 'https://github.com/manwar/Map-Tube-Madrid',
+            },
+        }})
+     : ()
+    ),
 );
 
 package MY;

@@ -46,9 +46,13 @@ lib/Test2/Compare/Wildcard.pm
 lib/Test2/Event/Times.pm
 lib/Test2/Manual.pm
 lib/Test2/Manual/Anatomy.pm
+lib/Test2/Manual/Anatomy/API.pm
 lib/Test2/Manual/Anatomy/Context.pm
 lib/Test2/Manual/Anatomy/EndToEnd.pm
 lib/Test2/Manual/Anatomy/Event.pm
+lib/Test2/Manual/Anatomy/Hubs.pm
+lib/Test2/Manual/Anatomy/IPC.pm
+lib/Test2/Manual/Anatomy/Utilities.pm
 lib/Test2/Manual/Concurrency.pm
 lib/Test2/Manual/Contributing.pm
 lib/Test2/Manual/Testing.pm
@@ -58,8 +62,14 @@ lib/Test2/Manual/Testing/Planning.pm
 lib/Test2/Manual/Testing/Todo.pm
 lib/Test2/Manual/Tooling.pm
 lib/Test2/Manual/Tooling/FirstTool.pm
+lib/Test2/Manual/Tooling/Formatter.pm
 lib/Test2/Manual/Tooling/Nesting.pm
+lib/Test2/Manual/Tooling/Plugin/TestExit.pm
+lib/Test2/Manual/Tooling/Plugin/TestingDone.pm
+lib/Test2/Manual/Tooling/Plugin/ToolCompletes.pm
+lib/Test2/Manual/Tooling/Plugin/ToolStarts.pm
 lib/Test2/Manual/Tooling/Subtest.pm
+lib/Test2/Manual/Tooling/TestBuilder.pm
 lib/Test2/Manual/Tooling/Testing.pm
 lib/Test2/Mock.pm
 lib/Test2/Plugin.pm
@@ -126,6 +136,7 @@ t/acceptance/Workflow-Acceptance3.t
 t/acceptance/Workflow-Acceptance4.t
 t/acceptance/Workflow-Acceptance5.t
 t/acceptance/skip.t
+t/acceptance/spec.t
 t/behavior/Mocking.t
 t/behavior/async_trace.t
 t/behavior/filtering.t

@@ -3,9 +3,6 @@ use warnings;
 require 5.008;
 use ExtUtils::MakeMaker;
 
-my $developer = -f '.gitignore';
-ExtUtils::MakeMaker->VERSION(6.98) if $developer;
-
 my %WriteMakefileArgs = (
     NAME                => 'Test::Pod',
     VERSION_FROM        => 'lib/Test/Pod.pm',
@@ -42,6 +39,7 @@ my %WriteMakefileArgs = (
     },
 
     META_ADD => {
+        'meta-spec' => { version => 2 },
         prereqs => {
             configure => {
                 requires => {
@@ -68,7 +66,17 @@ my %WriteMakefileArgs = (
     },
 );
 
+my $developer = -f '.gitignore';
+if ($developer) {
+    ExtUtils::MakeMaker->VERSION('6.98');
+    require ExtUtils::Manifest;
+    ExtUtils::Manifest->VERSION('1.70');
+    $WriteMakefileArgs{NORECURS} = 1;
+}
+
+
 my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
+ExtUtils::MakeMaker->VERSION(6.98) if $developer;
 
 for (qw(configure build test runtime)) {
     my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
@@ -105,7 +113,7 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
     if $eumm_version < 6.48;
 
 delete @WriteMakefileArgs{qw(META_ADD META_MERGE)}
-    if $eumm_version < 6.46;
+    if not $developer;
 
 delete $WriteMakefileArgs{LICENSE}
     if $eumm_version < 6.31;

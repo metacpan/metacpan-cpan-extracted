@@ -290,7 +290,7 @@ sub _add_module ( $self, $module ) {
 sub _process_main_modules ($self) {
 
     # add Pcore dist
-    $self->_add_dist( $ENV->pcore );
+    $self->_add_dist( $ENV->{pcore} );
 
     for my $main_mod ( keys $self->main_mod->%* ) {
         next if $main_mod eq 'Pcore.pm' or $main_mod eq $self->dist->module->name;
@@ -510,7 +510,7 @@ sub _patch_icon ( $self, $path ) {
         # path should be passed as plain string
         my $exe = Win32::Exe->new("$path");
 
-        $exe->update( icon => $ENV->share->get('/data/par.ico') );
+        $exe->update( icon => $ENV->{share}->get('data/par.ico') );
     }
 
     return;

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.0524, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ resources:
   homepage: http://search.cpan.org/dist/Test-Pod/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl-pod/test-pod.git
-version: '1.51'
+version: '1.52'
 x_IRC: irc://irc.perl.org/#perl-qa
 x_MailingList: http://lists.perl.org/list/pod-people-qa.html
 x_contributors:
@@ -41,5 +41,4 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'ChrisWi <chris@computersalat.de>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
-
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

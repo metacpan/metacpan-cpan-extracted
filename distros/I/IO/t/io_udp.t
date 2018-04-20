@@ -1,12 +1,7 @@
 #!./perl
 
 BEGIN {
-    unless(grep /blib/, @INC) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-
-    require($ENV{PERL_CORE} ? './test.pl' : './t/test.pl');
+    require($ENV{PERL_CORE} ? '../../t/test.pl' : './t/test.pl');
 
     use Config;
     my $reason;
@@ -15,9 +10,6 @@ BEGIN {
     }
     elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
       $reason = 'IO was not built';
-    }
-    elsif ($^O eq 'apollo') {
-      $reason = "unknown *FIXME*";
     }
     undef $reason if $^O eq 'VMS' and $Config{d_socket};
     skip_all($reason) if $reason;

@@ -44,7 +44,12 @@
             in CPAN Testers. This data includes:</p>
 
             <ul>
-            <li>Test report summaries (releases) for <a
+            <li>Test report summaries for <a
+            href="/docs/?url=/v3#!/Summary/v3_summary_all">all of CPAN</a>,
+            <a href="/docs/?url=/v3#!/Summary/v3_summary_dist">by
+            distribution</a>, or <a href="/docs/?url=/v3#!/Summary/v3_summary">by distribution and
+            version</a>, optionally filtered by Perl version and OS name.</li>
+            <li>Release summaries for <a
             href="/docs/?url=/v3#!/Release/v3_release_all">all of CPAN</a>,
             <a href="/docs/?url=/v3#!/Release/v3_release_author">by
             author</a>, or <a
@@ -62,12 +67,6 @@
             example WebSocket subscriber using Mojo::UserAgent</a>).</li>
             <li><a href="/docs/?url=/v3#!/Report/v3_report_post">Posting new test reports</a></li>
             <li><a href="/docs/?url=/v3#!/Report/v3_report_get">Getting individual test reports by ID</a></li>
-            </ul>
-
-            <p>Future data that can be made available by this API include:</p>
-
-            <ul>
-            <li>CPAN Testers reports</li>
             </ul>
 
             <p>For full documentation on the available APIs, see <a

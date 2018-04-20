@@ -18,7 +18,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.02';
+our $VERSION = '9.03';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -524,8 +524,7 @@ These fields are currently available:
 
 =item daily
 
-  daily =>
-    [{epoch => 12345, hour => 20, finished_jobs => 95, failed_jobs => 2}, ...]
+  daily => [{epoch => 12345, finished_jobs => 95, failed_jobs => 2}, ...]
 
 Hourly counts for processed jobs from the past day.
 

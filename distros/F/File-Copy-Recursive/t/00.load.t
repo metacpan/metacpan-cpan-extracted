@@ -1,2 +1,2 @@
 use Test::More tests => 1;
-BEGIN { use_ok('File::Copy::Recursive') };
+BEGIN { use_ok('File::Copy::Recursive') }

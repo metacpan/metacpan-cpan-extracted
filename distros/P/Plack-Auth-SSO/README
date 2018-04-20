@@ -224,6 +224,11 @@ CONFIG
 
       When authentication fails, this application should redirect you here
 
+      If not set, it has the same value as the authorizaton_path. In that
+      case make sure that you also
+
+      check for auth_sso_error in your authorization route.
+
       The implementor should expect this in the session key
       "auth_sso_error" ( "_error" is appended to the configured session_key
       ):

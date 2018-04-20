@@ -1,3 +1,9 @@
+0.000048    2018-04-19
+            * Unify error checking after calling a JS function.
+
+0.000047    2018-04-19
+            * Stop forcing all console output to stderr.
+
 0.000046    2018-04-19
             * Clean up implementation of console handlers.
 

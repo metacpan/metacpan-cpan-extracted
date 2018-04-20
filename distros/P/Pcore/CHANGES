@@ -1,3 +1,26 @@
+v0.62.0 2018-04-20T07:22:57Z
+ - docker.sh default command
+ - docker status logic updated
+ - simple htp proxy support
+ - https proxy support added
+ - proxy pool removed
+ - AE::Handle2 removed
+ - proxy socks5 support added
+ - cpanfile
+ - Docker base image changed from "softvisio/perl:v5.26.2" to
+   "softvisio/perl:softvisio/perl:v5.26.2"
+ - pcore RPC protocol updated
+ - pcoreApi.js added
+ - $ENV refactoring
+ - fork template process refactored
+ - Pcore::RPC removed
+ - RPC.TERM removed
+ - share realpath fixed
+ - SQL VALUES keyword produce values only if arrays refs were passed
+ - dix
+ - sql keywords OFFSET, LIMIT added
+ - dockerfile
+
 v0.61.4 2018-04-14T07:51:47Z
  - handle die in coro
  - result get reason fixed

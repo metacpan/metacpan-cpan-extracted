@@ -15,7 +15,7 @@ my $builder = Test::Run::Builder->new(
         'Module::Build' => '0.39',
     },
     requires => {
-        'Dancer'     => '1.3097',
+        'Dancer2' => 0,
         'Errno' => 0,
         'File::Spec' => 0,
         'JSON::MaybeXS' => 0,

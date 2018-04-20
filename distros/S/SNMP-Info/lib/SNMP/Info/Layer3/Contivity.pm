@@ -42,7 +42,7 @@ use SNMP::Info::Entity;
 
 use vars qw/$VERSION %GLOBALS %FUNCS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::MIBS, %SNMP::Info::Layer3::MIBS, %SNMP::Info::Entity::MIBS,
@@ -101,7 +101,7 @@ sub mac {
     my $i_mac     = $contivity->i_mac();
 
     # Return Interface MAC
-    foreach my $entry ( keys %$i_mac ) {
+    foreach my $entry ( sort keys %$i_mac ) {
         my $sn = $i_mac->{$entry};
         next unless $sn;
         return $sn;

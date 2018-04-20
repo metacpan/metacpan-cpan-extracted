@@ -7,24 +7,23 @@ use Cwd qw[];           ## no critic qw[Modules::ProhibitEvilModules]
 use Pcore::Dist;
 use Pcore::Core::Env::Share;
 use Fcntl qw[LOCK_EX SEEK_SET];
+use Pcore::Util::Scalar qw[is_ref];
 
-has is_par => ( is => 'lazy', isa => Bool, init_arg => undef );    # process run from PAR distribution
-has _main_dist => ( is => 'lazy', isa => Maybe      [ InstanceOf ['Pcore::Dist'] ], init_arg => undef );    # main dist
-has pcore      => ( is => 'lazy', isa => InstanceOf ['Pcore::Dist'],                init_arg => undef );    # pcore dist
-has share      => ( is => 'lazy', isa => InstanceOf ['Pcore::Core::Env::Share'],    init_arg => undef );    # share object
-has _dist_idx     => ( is => 'lazy', isa => HashRef, default  => sub { {} }, init_arg => undef );           # registered dists. index
-has cli           => ( is => 'ro',   isa => HashRef, init_arg => undef );                                   # parsed CLI data
+has is_par => ( is => 'ro', isa => Bool, init_arg => undef );    # process run from PAR distribution
+has main_dist => ( is => 'ro', isa => Maybe      [ InstanceOf ['Pcore::Dist'] ], init_arg => undef );    # main dist
+has pcore     => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'],                init_arg => undef );    # pcore dist
+has share     => ( is => 'ro', isa => InstanceOf ['Pcore::Core::Env::Share'],    init_arg => undef );    # share object
+has _dist_idx     => ( is => 'ro',   isa => HashRef, init_arg => undef );                                # registered dists. index
+has cli           => ( is => 'ro',   isa => HashRef, init_arg => undef );                                # parsed CLI data
 has user_cfg_path => ( is => 'lazy', isa => Str,     init_arg => undef );
-has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );                                   # $HOME/.pcore/pcore.ini config
+has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );                                # $HOME/.pcore/pcore.ini config
 
 has can_scan_deps => ( is => 'lazy', isa => Bool, init_arg => undef );
 
 _normalize_inc();
 
 # create $ENV object
-$ENV = __PACKAGE__->new;                                                                                    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
-
-$ENV->_INIT;
+$ENV = __PACKAGE__->new;                                                                                 ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
 _configure_inc();
 
@@ -81,7 +80,7 @@ sub _configure_inc {
     }
 
     # not for PAR
-    if ( !$ENV->is_par ) {
+    if ( !$ENV->{is_par} ) {
         my $is_module_build_test = 0;    # $ENV->dist && exists $inc_index->{ $ENV->dist->root . 'blib/lib' } ? 1 : 0;
 
         # add dist lib and PCORE_LIB to @INC only if we are int on the PAR archive and not in the Module::Build testing environment
@@ -117,7 +116,12 @@ sub _configure_inc {
     return;
 }
 
-sub _INIT ($self) {
+sub BUILD ( $self, $args ) {
+    $self->{is_par} = $ENV{PAR_TEMP} ? 1 : 0;
+
+    # init share
+    $self->{share} = Pcore::Core::Env::Share->new;
+
     $self->{START_DIR} = P->file->cwd->to_string;
 
     if ( $Pcore::SCRIPT_PATH eq '-e' || $Pcore::SCRIPT_PATH eq '-' ) {
@@ -140,7 +144,7 @@ sub _INIT ($self) {
     $self->{USER_DIR} = P->path( $ENV{HOME} || $ENV{USERPROFILE}, is_dir => 1 );
     $self->{PCORE_USER_DIR} = P->path( $self->{USER_DIR} . '.pcore/',     is_dir => 1, lazy => 1 );
     $self->{PCORE_SYS_DIR}  = P->path( $self->{SYS_TEMP_DIR} . '.pcore/', is_dir => 1, lazy => 1 );
-    $self->{INLINE_DIR} = $self->is_par ? undef : P->path( $self->{PCORE_USER_DIR} . "inline/$Config{version}/$Config{archname}/", is_dir => 1, lazy => 1 );
+    $self->{INLINE_DIR} = $self->{is_par} ? undef : P->path( $self->{PCORE_USER_DIR} . "inline/$Config{version}/$Config{archname}/", is_dir => 1, lazy => 1 );
 
     # CLI options
     $self->{SCAN_DEPS} = 0;
@@ -150,7 +154,7 @@ sub _INIT ($self) {
 
     # load dist cfg
     if ( my $dist = $self->dist ) {
-        if ( $self->is_par ) {
+        if ( $self->{is_par} ) {
             $self->{DATA_DIR} = $self->{SCRIPT_DIR};
         }
         else {
@@ -161,50 +165,32 @@ sub _INIT ($self) {
         $self->{DATA_DIR} = $self->{START_DIR};
     }
 
-    # init pcore dist, needed to register pcore resources during bootstrap
-    $self->pcore;
+    # find main dist
+    if ( $self->{is_par} ) {
+        $self->{main_dist} = Pcore::Dist->new( $ENV{PAR_TEMP} );
+    }
+    else {
+        $self->{main_dist} = Pcore::Dist->new( $self->{SCRIPT_DIR} );
+    }
+
+    # register main dist
+    if ( $self->{main_dist} ) {
+        $self->{main_dist}->{is_main} = 1;
+
+        $self->register_dist( $self->{main_dist} );
+    }
+
+    # init pcore dist, required for register pcore resources during bootstrap
+    if ( $self->{main_dist} && $self->{main_dist}->is_pcore ) {
+        $self->{pcore} = $self->{main_dist};
+    }
+    else {
+        $self->{pcore} = Pcore::Dist->new('Pcore.pm');
+
+        $self->register_dist( $self->{pcore} );
+    }
 
     return;
-}
-
-sub _build_is_par ($self) {
-    return $ENV{PAR_TEMP} ? 1 : 0;
-}
-
-sub _build__main_dist ($self) {
-    my $dist;
-
-    if ( $self->is_par ) {
-        $dist = Pcore::Dist->new( $ENV{PAR_TEMP} );
-    }
-    else {
-        $dist = Pcore::Dist->new( $self->{SCRIPT_DIR} );
-    }
-
-    if ($dist) {
-        $dist->{is_main} = 1;
-
-        $self->register_dist($dist);
-    }
-
-    return $dist;
-}
-
-sub _build_pcore ($self) {
-    if ( $self->dist && $self->dist->is_pcore ) {
-        return $self->dist;
-    }
-    else {
-        my $pcore = Pcore::Dist->new('Pcore.pm');
-
-        $self->register_dist($pcore);
-
-        return $pcore;
-    }
-}
-
-sub _build_share ($self) {
-    return Pcore::Core::Env::Share->new;
 }
 
 sub _build_user_cfg_path ($self) {
@@ -223,50 +209,35 @@ sub _build_user_cfg ($self) {
 sub register_dist ( $self, $dist ) {
 
     # create dist object
-    $dist = Pcore::Dist->new($dist) if !ref $dist;
+    $dist = Pcore::Dist->new($dist) if !is_ref $dist;
 
     # dist was not found
     die qq[Invlaid Pcore -dist pragma usage, "$dist" is not a Pcore dist main module] if !$dist;
 
     # dist is already registered
-    return if exists $self->_dist_idx->{ $dist->name };
+    return if exists $self->{_dist_idx}->{ $dist->name };
 
     # add dist to the dists index
-    $self->_dist_idx->{ $dist->name } = $dist;
+    $self->{_dist_idx}->{ $dist->name } = $dist;
 
-    # register dist share
-    my $share_lib_level;
-
-    if ( $dist->is_pcore ) {    # pcore dist is always first
-        $share_lib_level = 0;
-    }
-    elsif ( $dist->is_main ) {    # main dist is always on top
-        $share_lib_level = 9_999;
-
-    }
-    else {
-        state $next_level = 10;
-
-        $share_lib_level = $next_level++;
-    }
-
-    $self->share->add_lib( $dist->name, $dist->share_dir, $share_lib_level );
+    # register dist share lib
+    $self->{share}->register_lib( $dist->name, $dist->share_dir );
 
     return;
 }
 
 sub dist ( $self, $dist_name = undef ) {
     if ($dist_name) {
-        return $self->_dist_idx->{ $dist_name =~ s/::/-/smgr };
+        return $self->{_dist_idx}->{ $dist_name =~ s/::/-/smgr };
     }
     else {
-        return $self->_main_dist;
+        return $self->{main_dist};
     }
 }
 
 # SCAN DEPS
 sub _build_can_scan_deps ($self) {
-    return !$self->is_par && $self->dist && $self->dist->par_cfg && exists $self->dist->par_cfg->{ $self->{SCRIPT_NAME} };
+    return !$self->{is_par} && $self->dist && $self->dist->par_cfg && exists $self->dist->par_cfg->{ $self->{SCRIPT_NAME} };
 }
 
 sub scan_deps ($self) {
@@ -373,17 +344,17 @@ sub DEMOLISH ( $self, $global ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 278                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 249                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 286                  | Subroutines::ProhibitExcessComplexity - Subroutine "DEMOLISH" with high complexity score (22)                  |
+## |    3 | 257                  | Subroutines::ProhibitExcessComplexity - Subroutine "DEMOLISH" with high complexity score (22)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 295                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 266                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 333                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 304                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 360                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 331                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 101                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 100                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

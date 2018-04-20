@@ -17,7 +17,7 @@
 #include "duk_console.h"
 
 /* set this to non-zero to send all console ouput to stderr */
-#define CONSOLE_USE_STDERR_ALWAYS 1
+#define CONSOLE_USE_STDERR_ALWAYS 0
 
 /* XXX: Add some form of log level filtering. */
 

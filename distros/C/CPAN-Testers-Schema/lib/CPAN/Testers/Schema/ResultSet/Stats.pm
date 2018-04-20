@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Stats;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -21,6 +21,20 @@ our $VERSION = '0.021';
 
 use CPAN::Testers::Schema::Base 'ResultSet';
 use Log::Any '$LOG';
+
+#pod =method since
+#pod
+#pod     my $rs = $rs->since( $iso_dt );
+#pod
+#pod Restrict the resultset to reports submitted since the given date/time (in ISO8601 format).
+#pod
+#pod =cut
+
+sub since( $self, $date ) {
+    my $fulldate = $date =~ s/[-:T]//gr;
+    $fulldate = substr $fulldate, 0, 12; # 12 digits makes YYYYMMDDHHNN
+    return $self->search( { fulldate => { '>=', $fulldate } } );
+}
 
 #pod =method insert_test_report
 #pod
@@ -96,7 +110,7 @@ CPAN::Testers::Schema::ResultSet::Stats - Query the raw test reports
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -108,6 +122,12 @@ version 0.021
 This object helps to insert and query the legacy test reports (cpanstats).
 
 =head1 METHODS
+
+=head2 since
+
+    my $rs = $rs->since( $iso_dt );
+
+Restrict the resultset to reports submitted since the given date/time (in ISO8601 format).
 
 =head2 insert_test_report
 
@@ -143,7 +163,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Oriol Soriano, Doug Bell.
+This software is copyright (c) 2018 by Oriol Soriano, Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

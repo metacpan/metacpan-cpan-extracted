@@ -76,6 +76,7 @@ my %data = (
             state => 'fail',
             postdate => '201608',
             fulldate => '201608120000',
+            perl => '5.20.0',
         },
         {
             %stats_default,
@@ -89,6 +90,7 @@ my %data = (
             state => 'fail',
             postdate => '201608',
             fulldate => '201608200000',
+            osname => 'linux',
         },
         {
             %stats_default,
@@ -120,6 +122,30 @@ subtest '/v3/summary/{dist}/{version}' => \&_test_api, '/v3';
 
 sub _test_api( $base ) {
 
+    subtest 'by dist' => sub {
+        $t->get_ok( $base . '/summary/My-Dist' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[0]{guid} )
+          ->json_is( '/1/guid' => $data{Stats}[1]{guid} )
+          ->json_is( '/2/guid' => $data{Stats}[2]{guid} )
+          ->json_is( '/0/date' => '2016-08-12T04:01:00Z' )
+          ->json_is( '/1/date' => '2016-08-12T00:00:00Z' )
+          ->json_is( '/2/date' => '2016-08-20T00:00:00Z' )
+          ->json_hasnt( '/0/fulldate' )
+          ->json_hasnt( '/1/fulldate' )
+          ->json_hasnt( '/2/fulldate' )
+          ->json_is( '/0/grade' => 'pass' )
+          ->json_is( '/1/grade' => 'fail' )
+          ->json_is( '/2/grade' => 'fail' )
+          ->json_hasnt( '/0/state' )
+          ->json_hasnt( '/1/state' )
+          ->json_hasnt( '/2/state' )
+          ->json_is( '/0/reporter' => $data{Stats}[0]{tester} )
+          ->json_is( '/1/reporter' => $data{Stats}[1]{tester} )
+          ->json_is( '/2/reporter' => $data{Stats}[2]{tester} )
+          ;
+    };
+
     subtest 'by dist/version' => sub {
         $t->get_ok( $base . '/summary/My-Dist/1.001' )
           ->status_is( 200 )
@@ -146,11 +172,79 @@ sub _test_api( $base ) {
           ;
     };
 
+    subtest 'by dist/perl' => sub {
+        $t->get_ok( $base . '/summary/My-Dist?perl=5.20.0' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[1]{guid} )
+          ->json_is( '/0/date' => '2016-08-12T00:00:00Z' )
+          ->json_is( '/0/grade' => 'fail' )
+          ->json_hasnt( '/0/state' )
+          ->json_is( '/0/reporter' => $data{Stats}[1]{tester} )
+          ->json_hasnt( '/1' )
+          ;
+    };
+
+    subtest 'by dist/osname' => sub {
+        $t->get_ok( $base . '/summary/My-Dist?osname=linux' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[2]{guid} )
+          ->json_is( '/0/date' => '2016-08-20T00:00:00Z' )
+          ->json_is( '/0/grade' => 'fail' )
+          ->json_hasnt( '/0/state' )
+          ->json_is( '/0/reporter' => $data{Stats}[2]{tester} )
+          ->json_hasnt( '/1' )
+          ;
+    };
+
+    subtest 'by perl' => sub {
+        $t->get_ok( $base . '/summary?perl=5.20.0' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[1]{guid} )
+          ->json_is( '/0/date' => '2016-08-12T00:00:00Z' )
+          ->json_is( '/0/grade' => 'fail' )
+          ->json_hasnt( '/0/state' )
+          ->json_is( '/0/reporter' => $data{Stats}[1]{tester} )
+          ->json_hasnt( '/1' )
+          ;
+    };
+
+    subtest 'by osname' => sub {
+        $t->get_ok( $base . '/summary?osname=linux' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[2]{guid} )
+          ->json_is( '/0/date' => '2016-08-20T00:00:00Z' )
+          ->json_is( '/0/grade' => 'fail' )
+          ->json_hasnt( '/0/state' )
+          ->json_is( '/0/reporter' => $data{Stats}[2]{tester} )
+          ->json_hasnt( '/1' )
+          ;
+    };
+
+    subtest 'since' => sub {
+        $t->get_ok( $base . '/summary/My-Dist?since=2016-08-20T00:00:00Z' )
+          ->status_is( 200 )
+          ->json_is( '/0/guid' => $data{Stats}[2]{guid} )
+          ->json_is( '/0/date' => '2016-08-20T00:00:00Z' )
+          ->json_hasnt( '/0/fulldate' )
+          ->json_is( '/0/grade' => 'fail' )
+          ->json_hasnt( '/0/state' )
+          ->json_is( '/0/reporter' => $data{Stats}[2]{tester} )
+          ;
+    };
+
     subtest 'dist not found' => sub {
         $t->get_ok( $base . '/summary/Not-Found/1.001' )
           ->status_is( 404 )
           ->json_is( {
-              errors => [ { message =>  'No results found for dist "Not-Found" version "1.001"', 'path' => '/' } ],
+              errors => [ { message =>  'No results found', 'path' => '/' } ],
+          } );
+    };
+
+    subtest 'perl/osname not provided' => sub {
+        $t->get_ok( $base . '/summary' )
+          ->status_is( 400 )
+          ->json_is( {
+              errors => [ { message =>  q{You must provide one of 'perl' or 'osname'}, 'path' => '/' } ],
           } );
     };
 

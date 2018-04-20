@@ -35,8 +35,7 @@ WriteMakefile(
     MAKEFILE          => $FILE,
     PREREQ_PM         => {},
     ($] >= 5.005 ?
-      (ABSTRACT_FROM  => 'lib/File/ShareDir/Install.pm',
-       AUTHOR         => 'Philip Gwyn <fil@localdomain>') : ()),
+      (AUTHOR         => 'Philip Gwyn <fil@localdomain>') : ()),
 );
 
 sub slurp

@@ -20,7 +20,7 @@ around run => sub ( $orig, $self, $req ) {
 sub get_nginx_cfg ($self) {
     my @buf;
 
-    my $locations = $ENV->share->get_storage('www');
+    my $locations = $ENV->{share}->get_storage('www');
 
     # add_header    Cache-Control "public, private, must-revalidate, proxy-revalidate";
 

@@ -1,5 +1,5 @@
 package Beam::Runner::Command::minion;
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 # ABSTRACT: Command for L<beam> to run distributed tasks
 
 #pod =head1 SYNOPSIS
@@ -50,7 +50,7 @@ Beam::Runner::Command::minion - Command for L<beam> to run distributed tasks
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

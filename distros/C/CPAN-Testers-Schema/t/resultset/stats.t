@@ -104,6 +104,32 @@ subtest 'insert_test_report' => sub {
     };
 };
 
+subtest 'since' => sub {
+    my $rs = $schema->resultset( 'Stats' )->since( '2017-05-07T16:40:00' );
+    $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+    is_deeply [ $rs->all ],
+        [
+            {
+                'dist' => 'Sorauta-SVN-AutoCommit',
+                'fulldate' => '201705071640',
+                'guid' => 'd0ab4d36-3343-11e7-b830-917e22bfee97',
+                'id' => 1,
+                'osname' => 'linux',
+                'osvers' => '4.8.0-2-amd64',
+                'perl' => '5.22.2',
+                'platform' => 'x86_64-linux',
+                'postdate' => 201705,
+                'state' => 'pass',
+                'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
+                'type' => 2,
+                'uploadid' => 169497,
+                'version' => '0.02',
+            },
+        ],
+        'get items since 2017-05-07'
+            or diag explain [ $rs->all ];
+};
+
 done_testing;
 
 

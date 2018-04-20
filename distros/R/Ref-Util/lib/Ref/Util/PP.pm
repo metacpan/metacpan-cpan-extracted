@@ -1,5 +1,5 @@
 package Ref::Util::PP;
-$Ref::Util::PP::VERSION = '0.203';
+$Ref::Util::PP::VERSION = '0.204';
 # ABSTRACT: pure-Perl version of Ref::Util
 
 use strict;
@@ -257,7 +257,7 @@ Ref::Util::PP - pure-Perl version of Ref::Util
 
 =head1 VERSION
 
-version 0.203
+version 0.204
 
 =head1 SYNOPSIS
 

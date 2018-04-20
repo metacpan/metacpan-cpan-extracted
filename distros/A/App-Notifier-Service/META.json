@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "notify",
       "notifier",
@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Dancer" : "1.3097",
+            "Dancer2" : "0",
             "Errno" : "0",
             "File::Spec" : "0",
             "JSON::MaybeXS" : "0",
@@ -48,7 +48,7 @@
    "provides" : {
       "App::Notifier::Service" : {
          "file" : "lib/App/Notifier/Service.pm",
-         "version" : "0.0401"
+         "version" : "0.0600"
       }
    },
    "release_status" : "stable",
@@ -61,5 +61,6 @@
          "url" : "https://bitbucket.org/shlomif/app-notifier"
       }
    },
-   "version" : "0.0401"
+   "version" : "0.0600",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

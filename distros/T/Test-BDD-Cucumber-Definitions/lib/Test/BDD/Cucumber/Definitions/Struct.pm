@@ -13,7 +13,7 @@ use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 our @EXPORT_OK = qw(Struct);
 
@@ -97,6 +97,19 @@ sub read_zip_archive_members_as_list {
     S->{_Struct}->{data} = \@members;
 
     pass('Zip archive members was read as list');
+
+    return 1;
+}
+
+sub read_base_response_as_struct {
+    my $self = shift;
+
+    S->{Struct} = __PACKAGE__;
+
+    # Clean data
+    S->{_Struct}->{data} = S->{Base}->response();
+
+    pass('Base response was read as struct');
 
     return 1;
 }

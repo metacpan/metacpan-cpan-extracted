@@ -41,4 +41,10 @@ sub run {
     return $self->exit_code;
 }
 
+our $DESTROYED = 0;
+sub DESTROY {
+    $DESTROYED++;
+}
+
 1;
+

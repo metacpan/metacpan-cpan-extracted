@@ -41,7 +41,7 @@ use SNMP::Info::Layer3;
 
 use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -69,8 +69,8 @@ $VERSION = '3.54';
     'bp_index2' => 'dot1dBasePortIfIndex',
 
     # AWC Interface Table (awcIfTable)
-    'awc_default_mac' => 'awcIfDefaultPhyAddress',
-    'awc_mac'         => 'awcIfPhyAddress',
+    'awc_default_mac' => 'awcIfDefaultPhysAddress',
+    'awc_mac'         => 'awcIfPhysAddress',
     'awc_ip'          => 'awcIfIpAddress',
     'awc_netmask'     => 'awcIfIpNetMask',
     'awc_msdu'        => 'awcIfMSDUMaxLength',
@@ -364,13 +364,13 @@ Ignores ports that are of type ``rptr'' and ``lo''.
 
 Gives the default MAC address of each interface.
 
-C<awcIfDefaultPhyAddress>
+C<awcIfDefaultPhysAddress>
 
 =item $aironet->awc_mac()
 
 Gives the actual MAC address of each interface.
 
-C<awcIfPhyAddress>
+C<awcIfPhysAddress>
 
 =item $aironet->awc_ip()
 

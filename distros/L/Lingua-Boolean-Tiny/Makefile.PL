@@ -4,45 +4,46 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "a smaller Lingua::Boolean, with support for more languages",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>", "unknown"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Lingua-Boolean-Tiny",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { perl => 5.006002 } },
-                        test => { requires => { "Test::More" => 0 } },
-                      },
-  "provides"       => {
-                        "Lingua::Boolean::Tiny"        => { file => "lib/Lingua/Boolean/Tiny.pm", version => 0.007 },
-                        "Lingua::Boolean::Tiny::BASE"  => { file => "lib/Lingua/Boolean/Tiny.pm", version => 0.007 },
-                        "Lingua::Boolean::Tiny::More"  => { file => "lib/Lingua/Boolean/Tiny/More.pm", version => 0.007 },
-                        "Lingua::Boolean::Tiny::Union" => { file => "lib/Lingua/Boolean/Tiny.pm", version => 0.007 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Boolean-Tiny",
-                                        },
-                        homepage     => "https://metacpan.org/release/Lingua-Boolean-Tiny",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-lingua-boolean-tiny.git",
-                                          web  => "https://github.com/tobyink/p5-lingua-boolean-tiny",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/project",
-                      },
-  "version"        => 0.007,
-  "x_contributors" => ["Diab Jerius (DJERIUS) <djerius\@cpan.org>"],
+  "abstract"         => "a smaller Lingua::Boolean, with support for more languages",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Lingua-Boolean-Tiny",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => { requires => { perl => 5.006002 } },
+                          test => { requires => { "Test::More" => 0 } },
+                        },
+  "provides"         => {
+                          "Lingua::Boolean::Tiny"        => { file => "lib/Lingua/Boolean/Tiny.pm", version => 0.008 },
+                          "Lingua::Boolean::Tiny::BASE"  => { file => "lib/Lingua/Boolean/Tiny.pm", version => 0.008 },
+                          "Lingua::Boolean::Tiny::More"  => { file => "lib/Lingua/Boolean/Tiny/More.pm", version => 0.008 },
+                          "Lingua::Boolean::Tiny::Union" => { file => "lib/Lingua/Boolean/Tiny.pm", version => 0.008 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Boolean-Tiny",
+                                          },
+                          homepage     => "https://metacpan.org/release/Lingua-Boolean-Tiny",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-lingua-boolean-tiny.git",
+                                            web  => "https://github.com/tobyink/p5-lingua-boolean-tiny",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/project",
+                        },
+  "version"          => 0.008,
+  "x_contributors"   => ["Diab Jerius (DJERIUS) <djerius\@cpan.org>"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

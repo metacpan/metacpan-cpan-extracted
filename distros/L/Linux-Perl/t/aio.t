@@ -18,8 +18,6 @@ use LP_EnsureArch;
 
 my $arch = LP_EnsureArch::ensure_support('aio');
 
-plan 'skip_all' if !$arch;
-
 my $base_class = 'Linux::Perl::aio';
 
 for my $class ( $base_class, "$base_class\::$arch" ) {
@@ -245,4 +243,4 @@ for my $class ( $base_class, "$base_class\::$arch" ) {
     ok( !$?, $class );
 }
 
-done_testing() if $arch;
+done_testing();

@@ -1,6 +1,6 @@
 
 package Kevin::Command::kevin::jobs;
-$Kevin::Command::kevin::jobs::VERSION = '0.6.0';
+$Kevin::Command::kevin::jobs::VERSION = '0.7.1';
 # ABSTRACT: Command to list Minion jobs
 use Mojo::Base 'Mojolicious::Command';
 
@@ -22,9 +22,9 @@ sub run {
   getopt \@args,
     'l|limit=i'  => \(my $limit  = 100),
     'o|offset=i' => \(my $offset = 0),
-    'q|queue=s'  => \$options->{queue},
-    'S|state=s'  => \$options->{state},
-    't|task=s'   => \$options->{task};
+    'q|queue=s@' => \$options->{queues},
+    'S|state=s@' => \$options->{states},
+    't|task=s@'  => \$options->{tasks};
 
   my $results = $minion->backend->list_jobs($offset, $limit, $options);
   my $items = $results->{jobs};
@@ -59,7 +59,7 @@ sub _table_spec {
 #pod
 #pod     ./myapp.pl kevin jobs
 #pod     ./myapp.pl kevin jobs -l 10 -o 20
-#pod     ./myapp.pl kevin jobs -q important -t foo -S inactive
+#pod     ./myapp.pl kevin jobs -q important -t foo -t bar -S inactive
 #pod
 #pod   Options:
 #pod     -h, --help                  Show this summary of available options
@@ -67,9 +67,9 @@ sub _table_spec {
 #pod                                 them, defaults to 100
 #pod     -o, --offset <number>       Number of jobs to skip when listing
 #pod                                 them, defaults to 0
-#pod     -q, --queue <name>          List only jobs in this queue
-#pod     -S, --state <name>          List only jobs in this state
-#pod     -t, --task <name>           List only jobs for this task
+#pod     -q, --queue <name>          List only jobs in these queues
+#pod     -S, --state <name>          List only jobs in these states
+#pod     -t, --task <name>           List only jobs for these tasks
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -132,7 +132,7 @@ Kevin::Command::kevin::jobs - Command to list Minion jobs
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.1
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ version 0.6.0
 
     ./myapp.pl kevin jobs
     ./myapp.pl kevin jobs -l 10 -o 20
-    ./myapp.pl kevin jobs -q important -t foo -S inactive
+    ./myapp.pl kevin jobs -q important -t foo -t bar -S inactive
 
   Options:
     -h, --help                  Show this summary of available options
@@ -148,9 +148,9 @@ version 0.6.0
                                 them, defaults to 100
     -o, --offset <number>       Number of jobs to skip when listing
                                 them, defaults to 0
-    -q, --queue <name>          List only jobs in this queue
-    -S, --state <name>          List only jobs in this state
-    -t, --task <name>           List only jobs for this task
+    -q, --queue <name>          List only jobs in these queues
+    -S, --state <name>          List only jobs in these states
+    -t, --task <name>           List only jobs for these tasks
 
 =head1 DESCRIPTION
 
@@ -205,7 +205,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

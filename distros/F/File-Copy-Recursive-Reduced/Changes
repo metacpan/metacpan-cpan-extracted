@@ -1,5 +1,17 @@
 Revision history for Perl module File::Copy::Recursive::Reduced
 
+0.005 Thu Apr 19 21:03:28 EDT 2018
+    - Implement copying of symlinks within all three public functions.
+      At this point we should be able to make substitutions for
+      File::Copy::Recursive's fcopy(), dircopy() and rcopy() functions
+      in a large proportion of toolchain libraries, particularly in
+      test suites.
+
+0.004 Thu Apr 19 11:20:52 EDT 2018
+    - Introduce rcopy(), a stripped-down replacement for
+      File::Copy::Recursive::rcopy().  (But no support for symlinks
+      yet in this or any other exportable function.)
+
 0.003 Tue Apr 17 09:14:19 EDT 2018
     - No changes in functionality; changes only to documentation.
 

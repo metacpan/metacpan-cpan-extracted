@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +29,5 @@ resources:
   bugtracker: http://github.com/rjbs/Test-Deep/issues
   homepage: http://github.com/rjbs/Test-Deep/
   repository: https://github.com/rjbs/Test-Deep.git
-version: '1.127'
+version: '1.128'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,13 +4,13 @@
       "David E. Wheeler <david@justatheory.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0524, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Pod",
    "no_index" : {
@@ -20,9 +20,6 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {}
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -60,7 +57,7 @@
          "web" : "https://github.com/perl-pod/test-pod"
       }
    },
-   "version" : "1.51",
+   "version" : "1.52",
    "x_IRC" : "irc://irc.perl.org/#perl-qa",
    "x_MailingList" : "http://lists.perl.org/list/pod-people-qa.html",
    "x_contributors" : [
@@ -72,6 +69,5 @@
       "ChrisWi <chris@computersalat.de>",
       "David Steinbrunner <dsteinbrunner@pobox.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::MaybeXS version 1.00301"
 }
-

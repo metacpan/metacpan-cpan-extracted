@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 use parent qw( Exporter );
-our @EXPORT_OK = qw( dircopy fcopy );
-our $VERSION = '0.003';
+our @EXPORT_OK = qw( dircopy fcopy rcopy );
+our $VERSION = '0.005';
 
 use File::Copy;
 use File::Find;
@@ -33,17 +33,17 @@ File::Copy::Recursive::Reduced - Recursive copying of files and directories with
 This library is intended as a not-quite-drop-in replacement for certain
 functionality provided by L<CPAN distribution
 File-Copy-Recursive|http://search.cpan.org/dist/File-Copy-Recursive/>.  The
-library provides methods similar enough to that distribution's C<fcopy()> and
-C<dircopy()> functions to be usable in those CPAN distributions often
-described as being part of the Perl toolchain.
+library provides methods similar enough to that distribution's C<fcopy()>,
+C<dircopy()> and C<rcopy()> functions to be usable in those CPAN distributions
+often described as being part of the Perl toolchain.
 
 =head2 Rationale
 
 F<File::Copy::Recursive> (hereinafter referred to as B<FCR>) is heavily used
 in other CPAN libraries.  Out of over 30,000 other CPAN distributions studied
-in early 2018, it ranks in one calculation as the 129th highest distribution
+in early 2018, it ranks by one calculation as the 129th highest distribution
 in terms of its total direct and indirect reverse dependencies.  In current
-parlance, it sits C<high upstream on the CPAN river.> Hence, it ought to work
+parlance, it sits C<high upstream on the CPAN river.>  Hence, it ought to work
 correctly and be installable on all operating systems where Perl is well
 supported.
 
@@ -52,26 +52,29 @@ However, as of the time of creation of F<File::Copy::Recursive::Reduced>
 Perl 5.26 or Perl 5 blead on important operating systems including Windows,
 FreeBSD and NetBSD
 (L<http://fast-matrix.cpantesters.org/?dist=File-Copy-Recursive%200.40>).  As
-a consequence, CPAN installers such as F<cpan> and F<cpanm> will not install
-it without use of the C<--force> option.  This will prevent distributions
-dependent on FCR from being installed as well.  Some patches have been
-provided to the
-L<FCR bug tracker|https://rt.cpan.org/Dist/Display.html?Name=File-Copy-Recursive> for
-this problem but as of the date on which this distribution is being uploaded
-to CPAN, FCR's author has not yet applied them.  However, even if those
-patches are applied, FCR may face other installability problems on certain platforms.
+a consequence, CPAN installers such as F<cpan> and F<cpanm> are failing to
+install it (unless you resort to the C<--force> option).  This prevents
+distributions dependent (directly or indirectly) on FCR from being installed
+as well.
+
+Some patches have been provided to the L<FCR bug
+tracker|https://rt.cpan.org/Dist/Display.html?Name=File-Copy-Recursive> for
+this problem.  However, as of the date on which this distribution is being
+uploaded to CPAN, FCR's maintainer has not yet applied them.  Moreover, even
+if those patches are applied, FCR may face other installability problems on
+certain platforms.
 
 F<File::Copy::Recursive::Reduced> (hereinafter referred to as B<FCR2>) is
-intended to provide an almost minimal subset of FCR's functionality
--- just enough to get the Perl toolchain working on the platforms where FCR is
-currently failing.  Functions will be added to FCR2 only insofar as
-investigation shows that they can replace usage of FCR functions in toolchain
-and other heavily used modules.  No attempt will be made to reproduce all the
-functionality currently provided or claimed to be provided by FCR.
+intended to provide a minimal subset of FCR's functionality -- just enough to
+get the Perl toolchain working on the platforms where FCR is currently
+failing.  Functions will be added to FCR2 only insofar as investigation shows
+that they can replace usage of FCR functions in toolchain and other heavily
+used modules.  No attempt will be made to reproduce all the functionality
+currently provided or claimed to be provided by FCR.
 
 =head1 SUBROUTINES
 
-The current version of FCR2 provides two exportable and publicly supported
+The current version of FCR2 provides three exportable and publicly supported
 subroutines partially equivalent to the similarly named subroutines exported
 by FCR.
 
@@ -148,25 +151,27 @@ Since C<fcopy()> internally uses C<File::Copy::copy()> to perform the copying,
 the arguments are subject to the same qualifications as that function's
 arguments.  Call F<perldoc File::Copy> for discussion of those arguments.
 
-=item * Restrictions
-
-=over 4
-
-=item *
-
-Does not currently handle copying of symlinks, though it may do so in a future
-version.
-
-=back
-
 =back
 
 =cut
 
 sub fcopy {
-    return if @_ != 2;
+    return unless @_ == 2;
     my ($from, $to) = @_;
-    return unless _samecheck($from, $to);
+    #return unless _samecheck($from, $to);
+    return unless _basic_samecheck($from, $to);
+
+    # TODO:  Explore whether we should check (-e $from) here.
+    # If we don't have a starting point, it shouldn't make any sense to go
+    # farther.
+
+    return unless _dev_ino_check($from, $to);
+
+    return _fcopy($from, $to);
+}
+
+sub _fcopy {
+    my ($from, $to) = @_;
     my ( $volm, $path ) = File::Spec->splitpath($to);
 
     # TODO: Explore whether it's possible for $path to be Perl-false in
@@ -174,7 +179,17 @@ sub fcopy {
     if ( $path && !-d $path ) {
         pathmk(File::Spec->catpath($volm, $path, ''));
     }
-    if (-l $from) { return; }
+
+    if ( -l $from && $CopyLink ) {
+        my $target = readlink( $from );
+        # FCR: mass-untaint is OK since we have to allow what the file system does
+        ($target) = $target =~ m/(.*)/;
+        warn "Copying a symlink ($from) whose target does not exist"
+          if !-e $target;
+        my $new = $to;
+        unlink $new if -l $new;
+        symlink( $target, $new ) or return;
+    }
     elsif (-d $from && -f $to) { return; }
     else {
         copy($from, $to) or return;
@@ -241,12 +256,16 @@ Should the function not complete (but not C<die>), an undefined value will be
 returned.  That generally indicates problems with argument validation.  This
 approach is taken for consistency with C<File::Copy::Recursive::dircopy()>.
 
+In list context the return value is a one-item list holding the same value as
+returned in scalar context.  The three-item list return value of
+C<File::Copy::Recursive::dircopy()> is not supported.
+
 =item * Restrictions
 
-None of C<File::Copy::Recursive::dircopy>'s bells and whistles.  No provision
-for special handling of symlinks.  No preservation of file or directory modes.
-No restriction on maximum depth.  No nothing; this is fine-tuned to the needs
-of Perl toolchain modules and their test suites.
+None of C<File::Copy::Recursive::dircopy>'s bells and whistles.  No guaranteed
+preservation of file or directory modes.  No restriction on maximum depth.  No
+nothing; this is fine-tuned to the needs of Perl toolchain modules and their
+test suites.
 
 =back
 
@@ -255,7 +274,7 @@ of Perl toolchain modules and their test suites.
 sub dircopy {
 
     # I'm not supporting the buffer limitation, at this point I can insert a
-    # Check for the correct number of arguments:  2
+    # check for the correct number of arguments:  2
     # FCR2 dircopy does not support buffer limit as third argument
 
     return unless @_ == 2;
@@ -272,6 +291,10 @@ sub dircopy {
     # is effectively reduced to '/path/to/directory/' but inside $globstar is
     # set to true.  Have to see what impact of $globstar true is.
 
+    return _dircopy(@_);
+}
+
+sub _dircopy {
     my $globstar = 0;
     my $_zero    = $_[0];
     my $_one     = $_[1];
@@ -328,37 +351,36 @@ sub dircopy {
 
         for my $entity (@entities) {
             my ($entity_ut) = $entity =~ m{ (.*) }xms;
-            my $org = File::Spec->catfile( $str, $entity_ut );
-            my $new = File::Spec->catfile( $end, $entity_ut );
-#            if ( -l $org && $CopyLink ) {
-#                my $target = readlink($org);
-#                ($target) = $target =~ m/(.*)/;    # mass-untaint is OK since we have to allow what the file system does
-#                carp "Copying a symlink ($org) whose target does not exist"
-#                  if !-e $target && $BdTrgWrn;
-#                unlink $new if -l $new;
-#                symlink( $target, $new ) or return;
-#            }
-#            elsif ( -d $org ) {
-            if ( -d $org ) {
+            my $from = File::Spec->catfile( $str, $entity_ut );
+            my $to = File::Spec->catfile( $end, $entity_ut );
+            if ( -l $from && $CopyLink ) {
+                my $target = readlink($from);
+                # mass-untaint is OK since we have to allow what the file system does
+                ($target) = $target =~ m/(.*)/;
+                warn "Copying a symlink ($from) whose target does not exist"
+                  if !-e $target;
+                unlink $to if -l $to;
+                symlink( $target, $to ) or return;
+            }
+            elsif ( -d $from ) {
                 my $rc;
-#                if ( !-w $org && $KeepMode ) {
+#                if ( !-w $from && $KeepMode ) {
 #                    local $KeepMode = 0;
-#                    carp "Copying readonly directory ($org); mode of its contents may not be preserved.";
-##                    $rc = $recurs->( $org, $new ) if !defined $buf;
-#                    $rc = $recurs->( $org, $new );
-#                    chmod scalar( ( stat($org) )[2] ), $new;
+#                    carp "Copying readonly directory ($from); mode of its contents may not be preserved.";
+#                    $rc = $recurs->( $from, $to );
+#                    chmod scalar( ( stat($from) )[2] ), $to;
 #                }
 #                else {
-##                    $rc = $recurs->( $org, $new ) if !defined $buf;
-                    $rc = $recurs->( $org, $new );
+#                    $rc = $recurs->( $from, $to );
 #                }
+                $rc = $recurs->( $from, $to );
                 return unless $rc;
                 $filen++;
                 $dirn++;
             }
             else {
-                fcopy( $org, $new ) or return;
-#                chmod scalar( ( stat($org) )[2] ), $new if $KeepMode;
+                fcopy( $from, $to ) or return;
+#                chmod scalar( ( stat($from) )[2] ), $to if $KeepMode;
                 $filen++;
             }
         } # End 'for' loop around @entities
@@ -395,37 +417,69 @@ sub _dev_ino_check {
     return 1;
 }
 
-sub _samecheck {
-    # Adapted from File::Copy::Recursive
+=head2 C<rcopy()>
+
+=over 4
+
+=item * Purpose
+
+A stripped-down replacement for C<File::Copy::Recursive::rcopy()>.  As is the
+case with that FCR function, C<rcopy()> is more or less a wrapper around
+C<fcopy()> or C<dircopy()>, depending on the nature of the first argument.
+
+=item * Arguments
+
+    rcopy($orig, $new) or die $!;
+
+List of two required arguments:
+
+=over 4
+
+=item * Absolute path to the entity (file or directory) being copied; and
+
+=item * Absolute path to the location to which the entity is being copied.
+
+=back
+
+=item * Return Value
+
+Returns C<1> upon success; C<0> upon failure.  Returns an undefined value if,
+for example, function cannot validate arguments.
+
+=item * Comment
+
+Please read the documentation for C<fcopy()> or C<dircopy()>, depending on the
+nature of the first argument.
+
+=back
+
+=cut
+
+sub rcopy {
+    return unless @_ == 2;
     my ($from, $to) = @_;
-    #return if !defined $from || !defined $to;
-    #return if $from eq $to;
     return unless _basic_samecheck($from, $to);
 
     # TODO:  Explore whether we should check (-e $from) here.
     # If we don't have a starting point, it shouldn't make any sense to go
     # farther.
 
-#    if ($^O ne 'MSWin32') {
-#        # perldoc perlport: "(Win32) "dev" and "ino" are not meaningful."
-#        # Will probably have to add restrictions for VMS and other OSes.
-#        my $one = join( '-', ( stat $from )[ 0, 1 ] ) || '';
-#        my $two = join( '-', ( stat $to   )[ 0, 1 ] ) || '';
-#        if ( $one and $one eq $two ) {
-#            warn "$from and $to are identical";
-#            return;
-#        }
-#    }
     return unless _dev_ino_check($from, $to);
-    return 1;
+
+    # symlinks not yet supported
+    #return if -l $_[0];
+    goto &fcopy if -l $_[0] && $CopyLink;
+
+    goto &_dircopy if -d $_[0] || substr( $_[0], ( 1 * -1 ), 1 ) eq '*';
+    goto &_fcopy;
 }
+
 
 =head2 File::Copy::Recursive Subroutines Not Supported in File::Copy::Recursive::Reduced
 
 As of the current version, FCR2 has no publicly documented, exportable subroutines equivalent
 to the following FCR exportable subroutines:
 
-    rcopy
     rcopy_glob
     fmove
     rmove

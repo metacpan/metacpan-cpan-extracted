@@ -113,6 +113,89 @@
       }
     },
 
+    "/summary": {
+      "get": {
+        "tags": [ "Summary" ],
+        "operationId": "v3_summary_all",
+        "summary": "Get test report summary info with various filters. One of either 'perl' or 'osname' must be provided.",
+        "x-mojo-to": {
+          "controller": "Summary",
+          "action": "summary"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" },
+          { "$ref": "#/parameters/grade" },
+          { "$ref": "#/parameters/perl" },
+          { "$ref": "#/parameters/osname" }
+        ],
+        "responses": {
+          "200": {
+             "description": "The summary results",
+             "schema": {
+               "type": "array",
+               "title": "SummaryArray",
+               "items": { "$ref": "#/definitions/ReportSummary" }
+             }
+          },
+          "400": {
+            "description": "You did not provide one of 'perl' or 'osname' query parameters",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "500": {
+            "description": "We were unable to get the test summaries",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "404": {
+            "description": "The distribution version was not found",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        }
+      }
+    },
+
+    "/summary/{dist}": {
+      "get": {
+        "tags": [ "Summary" ],
+        "operationId": "v3_summary_dist",
+        "summary": "Get test report summary info for a specific distribution",
+        "x-mojo-to": {
+          "controller": "Summary",
+          "action": "summary"
+        },
+        "parameters": [
+          {
+            "name": "dist",
+            "in": "path",
+            "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+            "type": "string",
+            "required": true
+          },
+          { "$ref": "#/parameters/since" },
+          { "$ref": "#/parameters/grade" },
+          { "$ref": "#/parameters/perl" },
+          { "$ref": "#/parameters/osname" }
+        ],
+        "responses": {
+          "200": {
+             "description": "The summary results",
+             "schema": {
+               "type": "array",
+               "title": "SummaryArray",
+               "items": { "$ref": "#/definitions/ReportSummary" }
+             }
+          },
+          "500": {
+            "description": "We were unable to get the test summaries",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "404": {
+            "description": "The distribution was not found",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        }
+      }
+    },
+
     "/summary/{dist}/{version}": {
       "get": {
         "tags": [ "Summary" ],
@@ -138,14 +221,10 @@
             "x-mojo-placeholder": "#",
             "required": true
           },
-          {
-            "name": "grade",
-            "in": "query",
-            "description": "Filter results by grade",
-            "type": "string",
-            "enum": [ "pass", "fail", "na", "unknown" ],
-            "required": false
-          }
+          { "$ref": "#/parameters/since" },
+          { "$ref": "#/parameters/grade" },
+          { "$ref": "#/parameters/perl" },
+          { "$ref": "#/parameters/osname" }
         ],
         "responses": {
           "200": {
@@ -371,6 +450,32 @@
       "in": "query",
       "type": "integer",
       "description": "Only send up to a maximum of the given number of records"
+    },
+    "grade": {
+        "name": "grade",
+        "in": "query",
+        "description": "Filter results by grade",
+        "type": "string",
+        "enum": [ "pass", "fail", "na", "unknown" ],
+        "required": false
+    },
+    "perl": {
+        "name": "perl",
+        "in": "query",
+        "description": "One or more Perl versions to return data for.",
+        "type": "array",
+        "items": { "type": "string" },
+        "collectionFormat": "multi",
+        "required": false
+    },
+    "osname": {
+        "name": "osname",
+        "in": "query",
+        "description": "One or more OS names to return data for. The OS name is 'osname' in Config or the '$^O' special variable. Some examples: 'linux' (Linux), 'mswin32' (Windows), 'darwin' (MacOS)",
+        "type": "array",
+        "items": { "type": "string" },
+        "collectionFormat": "multi",
+        "required": false
     }
   },
 

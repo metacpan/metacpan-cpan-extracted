@@ -9,7 +9,7 @@ has web2_id     => ( is => 'lazy', isa => Maybe [Str],      init_arg => undef );
 has is_web2 => ( is => 'lazy', isa => Bool, init_arg => undef );
 has web2_canon => ( is => 'lazy', isa => Maybe [Str], init_arg => undef );    # subdomain.domain.tld, domain.tld/path/, without scheme
 
-our $WEB2_CFG = P->cfg->load( $ENV->share->get('/data/web2.ini') );
+our $WEB2_CFG = P->cfg->load( $ENV->{share}->get('data/web2.ini') );
 
 our $WEB2_HOST_RE;
 our $WEB2_RE;
@@ -40,7 +40,7 @@ sub web2_cfg ($self) {
 }
 
 sub web2_load_default_cfg ( $self, $cfg, $merge = 1 ) {
-    $WEB2_CFG = P->cfg->load( $ENV->share->get('/data/web2.ini') );
+    $WEB2_CFG = P->cfg->load( $ENV->{share}->get('data/web2.ini') );
 
     undef $WEB2_HOST_RE;
     undef $WEB2_RE;

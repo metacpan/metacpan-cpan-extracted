@@ -32,7 +32,7 @@ t/25-sig_die.t
 t/35-pin_map.t
 t/40-interrupt_rising_and_pud.t
 t/41-interrupt_falling_and_pud.t
-t/42-interrupt_both_and_pud.t-norun
+t/42-interrupt_both_and_pud.t
 t/45-shift_reg_adc.t
 t/55-dac.t
 t/60-lcd.t
@@ -57,5 +57,7 @@ test/registered_pins.pl
 test/sg90_servo.pl
 test/shift.pl
 test/spi.pl
+test/stepper_motor.pl
+test/tripwire.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

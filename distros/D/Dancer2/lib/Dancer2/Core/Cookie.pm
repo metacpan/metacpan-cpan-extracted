@@ -1,6 +1,6 @@
 package Dancer2::Core::Cookie;
 # ABSTRACT: A cookie representing class
-$Dancer2::Core::Cookie::VERSION = '0.205002';
+$Dancer2::Core::Cookie::VERSION = '0.206000';
 use Moo;
 use URI::Escape;
 use Dancer2::Core::Types;
@@ -41,7 +41,7 @@ sub xs_to_header {
             path     => $self->path,
             domain   => $self->domain,
             expires  => $self->expires,
-            httponly => $self->http_only,
+            httponly => !!$self->http_only, # HTTP::XSCookies seems to distinguish between '"0"' and '0'
             secure   => $self->secure,
             samesite => $self->same_site,
         }
@@ -152,7 +152,7 @@ Dancer2::Core::Cookie - A cookie representing class
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 SYNOPSIS
 
@@ -242,7 +242,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

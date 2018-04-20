@@ -1,17 +1,7 @@
 #!./perl
 
 BEGIN {
-    unless(grep /blib/, @INC) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    require Config; import Config;
-    if ($] < 5.00326 || not $Config{'d_readdir'}) {
-	print "1..0 # Skip: readdir() not available\n";
-	exit 0;
-    }
-
-    require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+    require($ENV{PERL_CORE} ? "../../t/test.pl" : "./t/test.pl");
     plan(16);
 
     use_ok('IO::Dir');
@@ -44,7 +34,7 @@ ok(!$dot->rewind, "rewind on closed");
 ok(!defined($dot->read));
 }
 
-open(FH,'>X') || die "Can't create x";
+open(FH,'>','X') || die "Can't create x";
 print FH "X";
 close(FH) or die "Can't close: $!";
 

@@ -138,4 +138,30 @@ use_ok('Catmandu::Fix::datetime_format');
   }
 }
 
-done_testing 11;
+#locale
+{
+
+  my $fixer = Catmandu::Fix->new(
+    fixes => [
+      "clone()",
+      "datetime_format('date','source_pattern' => '%Y-%m-%dT%H:%M:%SZ','destination_pattern' => '%A %B','time_zone' => 'Europe/Brussels','set_time_zone' => 'UTC', 'set_locale' => 'fr_FR')"
+    ]
+  );
+  my $tests = [
+    {
+      input => {
+        date => '2018-04-19T12:00:00Z'
+      },
+      expected => {
+        date => 'jeudi avril'
+      }
+    }
+  ];
+
+  for my $test(@$tests){
+    is_deeply($fixer->fix($test->{input}),$test->{expected});
+  }
+
+}
+
+done_testing 12;

@@ -1,5 +1,15 @@
 Changelog for CPAN-Testers-API
 
+0.025     2018-04-19 15:25:00+02:00 Europe/Oslo
+
+    [Added]
+
+    - Added "perl", "osname", and "since" filters to test summary data
+    - Added API to get all of the test summary data for a given set of
+      Perl versions and OS names.
+    - Added API to get all test summary data for a distribution (over
+      all versions).
+
 0.024     2018-02-08 21:04:03-06:00 America/Chicago
 
     [Added]

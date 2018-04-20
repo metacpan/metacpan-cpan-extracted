@@ -54,6 +54,7 @@ my %META = (
   no_index => {
     directory => [ 't', 'xt', 'inc' ]
   },
+  x_authority => 'cpan:MSTROUT',
 );
 
 my %MM_ARGS = (
@@ -76,7 +77,7 @@ sub parse_args {
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;
-(do 'maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
 
 # have to do this since old EUMM dev releases miss the eval $VERSION line
 my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;

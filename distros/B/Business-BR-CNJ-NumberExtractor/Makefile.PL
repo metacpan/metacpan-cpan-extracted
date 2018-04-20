@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Business::BR::CNJ::NumberExtractor',
     VERSION_FROM      => 'lib/Business/BR/CNJ/NumberExtractor.pm', # finds $VERSION
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => { 'Business::BR::CNJ' => 0 }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Business/BR/CNJ/NumberExtractor.pm', # retrieve abstract from module
        AUTHOR         => 'Diego de Lima <diego_de_lima@hotmail.com>') : ()),

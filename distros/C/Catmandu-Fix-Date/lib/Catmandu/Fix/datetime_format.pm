@@ -6,7 +6,7 @@ use DateTime::Format::Strptime;
 use DateTime::TimeZone;
 use DateTime::Locale;
 use DateTime;
-our $VERSION = "0.0131";
+our $VERSION = "0.0132";
 
 with 'Catmandu::Fix::Base';
 
@@ -191,7 +191,7 @@ sub emit {
             $p .= " if($d){";
             $p .= "   $d->set_time_zone(${set_time_zone}) if ".${d}."->time_zone->name() ne ".${set_time_zone}."->name();";
             $p .= "   $d->set_locale($set_locale);";
-            $p .= "   ${var} = DateTime::Format::Strptime::strftime('".$self->destination_pattern()."',$d);";
+            $p .= "   ${var} = $d->strftime( '".$self->destination_pattern()."' );";
             $p .= " }";
             if($self->delete){
                 $p .= " else { ".$fixer->emit_delete_key($pvar,$key)." }";

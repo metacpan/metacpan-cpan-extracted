@@ -2,13 +2,12 @@ package App::Notifier::Service;
 
 use 5.014;
 
-use Dancer ':syntax';
+use Dancer2;
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0600';
 
 use File::Spec;
 use YAML::XS qw( LoadFile );
-use JSON::MaybeXS qw(decode_json);
 use List::MoreUtils qw();
 
 use POSIX ":sys_wait_h";
@@ -131,6 +130,7 @@ get '/' => sub {
 };
 
 true;
+# start;
 
 __END__
 
@@ -161,12 +161,12 @@ notifying that an event (such as the finish of a task) occured.
     EOF
 
     # Run the Dancer application from the distribution's root directory.
-    ./bin/app.pl
+    plackup ./bin/app.psgi
 
     # Alternatively run the following Perl code:
-    use Dancer;
+    use Dancer2;
     use App::Notifier::Service;
-    dance;
+    start;
 
     # When you want to notify that an event occured:
     $ curl 'http://127.0.0.1:3000/notify'

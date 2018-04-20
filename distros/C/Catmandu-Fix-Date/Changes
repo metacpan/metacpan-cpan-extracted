@@ -1,3 +1,6 @@
+0.0132  2018-04-19 13:44:28 CEST
+  - use DateTime strftime instead of DateTime::Parser::Strptime::strftime to support locale
+
 0.0131  2017-01-20 13:18:24 CET
   - add fix Catmandu::Fix::datetime_diff
 0.0130  2016-08-08 08:55:18 CEST

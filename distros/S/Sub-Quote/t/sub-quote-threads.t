@@ -1,8 +1,12 @@
 use lib 't/lib';
 use ThreadsCheck;
-use threads;
 use strict;
 use warnings;
+use threads;
+BEGIN {
+  # lie to Test2 to avoid thread handling, which will crash on early 5.8.
+  delete $INC{'threads.pm'};
+}
 use Test::More;
 
 use Sub::Quote;

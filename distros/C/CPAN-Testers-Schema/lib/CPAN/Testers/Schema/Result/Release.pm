@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Release;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: Collected test report stats about a single CPAN release
 
 #pod =head1 SYNOPSIS
@@ -221,7 +221,7 @@ CPAN::Testers::Schema::Result::Release - Collected test report stats about a sin
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -341,7 +341,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Oriol Soriano, Doug Bell.
+This software is copyright (c) 2018 by Oriol Soriano, Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

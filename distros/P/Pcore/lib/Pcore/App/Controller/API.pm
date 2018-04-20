@@ -11,8 +11,7 @@ const our $WS_MAX_MESSAGE_SIZE => 1_024 * 1_024 * 100;    # 100 Mb
 const our $WS_PONG_INTERVAL    => 50;
 const our $WS_COMPRESSION      => 0;
 
-const our $TX_TYPE_RPC       => 'rpc';
-const our $TX_TYPE_EXCEPTION => 'exception';
+const our $TX_TYPE_RPC => 'rpc';
 
 sub run ( $self, $req ) {
     if ( $req->{path_tail} ) {
@@ -53,7 +52,7 @@ sub run ( $self, $req ) {
                         },
                         on_disconnect => undef,
                         on_rpc        => Coro::unblock_sub sub ( $ws, $req, $tx ) {
-                            $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{data}, $req );
+                            $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{args}, $req );
 
                             return;
                         },
@@ -109,33 +108,26 @@ sub run ( $self, $req ) {
 
         # authenticate request
         $req->authenticate( sub ( $auth ) {
+            $self->_http_api_router(
+                $auth, $msg,
+                sub ($res) {
+                    if ($CBOR) {
 
-            # this is app connection, disabled
-            if ( $auth->{is_app} ) {
-                $req->( [ 403, q[App must connect via WebSocket interface] ] )->finish;
-            }
-            else {
-                $self->_http_api_router(
-                    $auth, $msg,
-                    sub ($res) {
-                        if ($CBOR) {
-
-                            # write HTTP response
-                            $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
-                        }
-                        else {
-
-                            # write HTTP response
-                            $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
-                        }
-
-                        # free HTTP request object
-                        undef $req;
-
-                        return;
+                        # write HTTP response
+                        $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
                     }
-                );
-            }
+                    else {
+
+                        # write HTTP response
+                        $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
+                    }
+
+                    # free HTTP request object
+                    undef $req;
+
+                    return;
+                }
+            );
 
             return;
         } );
@@ -156,69 +148,43 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
     $cv->begin;
 
     for my $tx ( is_plain_arrayref $data ? $data->@* : $data ) {
-
-        # TODO required only for compatibility with old clients, can be removed
-        $tx->{type} ||= $TX_TYPE_RPC;
+        next if !$tx->{type};
 
         # check message type, only rpc calls are enabled here
-        if ( $tx->{type} ne $TX_TYPE_RPC ) {
-            push $response->@*,
-              { tid     => $tx->{tid},
-                type    => $TX_TYPE_EXCEPTION,
-                message => {
-                    status => 400,
-                    reason => 'Invalid API request type',
-                },
-              };
+        if ( $tx->{type} eq $TX_TYPE_RPC ) {
 
-            next;
-        }
+            # method is not specified, this is callback, not supported in HTTP API server
+            if ( !$tx->{method} ) {
+                push $response->@*,
+                  { type   => $TX_TYPE_RPC,
+                    tid    => $tx->{tid},
+                    result => {
+                        status => 400,
+                        reason => 'Method is required',
+                    },
+                  };
 
-        # method is not specified, this is callback, not supported in API server
-        if ( !$tx->{method} ) {
-            push $response->@*,
-              { tid     => $tx->{tid},
-                type    => $TX_TYPE_EXCEPTION,
-                message => {
-                    status => 400,
-                    reason => 'Method is required',
-                },
-              };
+                next;
+            }
 
-            next;
-        }
+            $cv->begin;
 
-        $cv->begin;
-
-        # combine method with action
-        if ( my $action = delete $tx->{action} ) {
-            $tx->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$tx->{method}";
-        }
-
-        $auth->api_call_arrayref(
-            $tx->{method},
-            $tx->{data},
-            sub ($res) {
-                if ( $res->is_success ) {
+            $auth->api_call_arrayref(
+                $tx->{method},
+                $tx->{args},
+                sub ($res) {
                     push $response->@*,
                       { type   => $TX_TYPE_RPC,
                         tid    => $tx->{tid},
                         result => $res,
                       };
-                }
-                else {
-                    push $response->@*,
-                      { type    => $TX_TYPE_EXCEPTION,
-                        tid     => $tx->{tid},
-                        message => $res,
-                      };
-                }
 
-                $cv->end;
+                    $cv->end;
 
-                return;
-            }
-        );
+                    return;
+                }
+            );
+        }
     }
 
     $cv->end;

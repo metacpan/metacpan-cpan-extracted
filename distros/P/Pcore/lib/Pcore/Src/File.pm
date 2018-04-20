@@ -29,7 +29,7 @@ has dist_cfg => ( is => 'lazy', isa => HashRef, init_arg => undef );
 
 # CLASS METHODS
 sub cfg ($self) {
-    state $cfg = P->cfg->load( $ENV->share->get('/data/src.perl') );
+    state $cfg = P->cfg->load( $ENV->{share}->get('data/src.perl') );
 
     return $cfg;
 }

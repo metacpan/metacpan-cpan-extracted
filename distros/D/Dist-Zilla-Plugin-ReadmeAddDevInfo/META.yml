@@ -1,0 +1,27 @@
+---
+abstract: 'Dist::Zilla::Plugin::ReadmeAddDevInfo - add info how to contribute to the project'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ReadmeAddDevInfo
+provides:
+  Dist::Zilla::Plugin::ReadmeAddDevInfo:
+    file: lib/Dist/Zilla/Plugin/ReadmeAddDevInfo.pm
+    version: '0.01'
+requires:
+  Dist::Zilla: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo/issues
+  homepage: http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo
+  repository: http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

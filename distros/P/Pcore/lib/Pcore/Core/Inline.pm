@@ -2,7 +2,7 @@ package Pcore::Core::Inline;
 
 use Pcore;
 
-if ( $ENV->is_par ) {
+if ( $ENV->{is_par} ) {
     $INC{'Inline.pm'} = $INC{'Pcore/Core/Inline.pm'};    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     state $init = !!require XSLoader;

@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -176,6 +176,7 @@ sub startup ( $app ) {
     } );
     $app->helper( schema => sub { shift->app->schema } );
     $app->helper( render_error => \&render_error );
+    $app->helper( stream_rs => \&stream_rs );
 
     Log::Any::Adapter->set( 'MojoLog', logger => $app->log );
 }
@@ -226,6 +227,61 @@ sub render_error( $c, $status, @errors ) {
     );
 }
 
+#pod =method stream_rs
+#pod
+#pod     $c->stream_rs( $rs, $processor );
+#pod
+#pod Stream a L<DBIx::Class::ResultSet> object to the browser. This prevents
+#pod problems with proxy servers and CDNs timing out waiting for data. This
+#pod uses L<Mojolicious::Controller/write_chunk> to transfer a chunked
+#pod response. If there are no results in the ResultSet object, this method
+#pod returns a 404 error.
+#pod
+#pod C<$processor> is an optional subref that allows for processing each row
+#pod before it is written. Use this to translate column names or values into
+#pod the format the API expects.
+#pod
+#pod For this to work usefully behind Fastly, we also need to enable streaming
+#pod miss so that Fastly streams the data to the end-user as it gets it:
+#pod L<https://docs.fastly.com/guides/performance-tuning/improving-caching-performance-with-large-files#streaming-miss>.
+#pod
+#pod =cut
+
+sub stream_rs {
+    my ( $c, $rs, $process ) = @_;
+    $process //= sub { shift };
+    my $wrote_open = 0;
+    my $written = 0;
+    my @to_write;
+
+    my $flush_write = sub {
+        my $leading_comma = ',';
+        if ( !$wrote_open ) {
+            $c->write_chunk( '[' );
+            $wrote_open = 1;
+            $leading_comma = '';
+        }
+        my $to_write = join ",", map { encode_json( $process->( $_ ) ) } @to_write;
+        $c->write_chunk( $leading_comma . $to_write );
+        $written += @to_write;
+        @to_write = ();
+    };
+
+    while ( my $row = $rs->next ) {
+        push @to_write, $row;
+        if ( @to_write >= 5 ) {
+            $flush_write->();
+        }
+    }
+    if ( !$written && !@to_write ) {
+        return $c->render_error( 404, 'No results found' );
+    }
+    if ( @to_write ) {
+        $flush_write->();
+    }
+    return $c->write_chunk( ']', sub { shift->finish } );
+}
+
 1;
 
 __END__
@@ -238,7 +294,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -300,6 +356,24 @@ The resulting JSON looks like so:
             }
         ]
     }
+
+=head2 stream_rs
+
+    $c->stream_rs( $rs, $processor );
+
+Stream a L<DBIx::Class::ResultSet> object to the browser. This prevents
+problems with proxy servers and CDNs timing out waiting for data. This
+uses L<Mojolicious::Controller/write_chunk> to transfer a chunked
+response. If there are no results in the ResultSet object, this method
+returns a 404 error.
+
+C<$processor> is an optional subref that allows for processing each row
+before it is written. Use this to translate column names or values into
+the format the API expects.
+
+For this to work usefully behind Fastly, we also need to enable streaming
+miss so that Fastly streams the data to the end-user as it gets it:
+L<https://docs.fastly.com/guides/performance-tuning/improving-caching-performance-with-large-files#streaming-miss>.
 
 =head1 CONFIG
 
@@ -381,7 +455,7 @@ Nick Tonkin <1nickt@users.noreply.github.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

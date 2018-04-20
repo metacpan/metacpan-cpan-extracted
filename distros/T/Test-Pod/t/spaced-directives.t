@@ -1,6 +1,7 @@
 #!perl -T
 
 use strict;
+use warnings;
 
 use Test::More skip_all => "Not written yet";
 use Test::Builder::Tester tests => 2;

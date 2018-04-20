@@ -7,7 +7,7 @@ sub check_scalar_util {
 	};
 	if ( $@ ) {
 		# Scalar::Util not installed (really old Perl?)
-		requires 'Scalar::Util' => '1.14';
+		requires 'Scalar::Util' => '1.24';
 		return;
 	}
 
@@ -25,13 +25,11 @@ sub check_scalar_util {
 	# Scalar::Util, or a broken one.
 	if ( $module_version <= 1.01 ) {
 		# Very old Scalar::Util, upgrade it
-		requires 'Scalar::Util' => '1.14';
+		requires 'Scalar::Util' => '1.24';
 		return;
 	}
 
-	my $latest_scalar_util = 1.21; #does not support 5.5, but weak references were introduced in 5.6
-	$latest_scalar_util = 1.19 if $] < 5.006;
-	# will not work of course - CPAN automatically installs only latest version
+	my $latest_scalar_util = 1.24;
         
 	# Broken Scalar::Util
 	# That is, it does NOT contain the weaken function

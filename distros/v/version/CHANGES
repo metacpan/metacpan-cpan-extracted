@@ -4,6 +4,10 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/JohnPeacock/version.pm.git
 
+0.9924 - 2018-04-19
+  * Revise CPAN metadata to advertise correct repo
+	Patch from Ed <ej_zg@hotmail.com>
+
 0.9923 - 2018-04-15
   * Add back spaces for picky C++ compilers 
 	Patch from Karl Williamson <khw@cpan.org>

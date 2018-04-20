@@ -8,7 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use LP_EnsureArch;
 
-my $arch = LP_EnsureArch::ensure_support('eventfd');
+LP_EnsureArch::ensure_support('eventfd');
 
 use Errno;
 use Fcntl;
@@ -17,8 +17,6 @@ use IO::File;
 use Test::More;
 use Test::FailWarnings;
 use Test::SharedFork;
-
-plan 'skip_all' if !$arch;
 
 use Linux::Perl::eventfd;
 
@@ -113,4 +111,4 @@ sub _do_tests {
     return;
 }
 
-done_testing() if $arch;
+done_testing();

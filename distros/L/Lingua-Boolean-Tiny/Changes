@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Lingua-Boolean-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Boolean-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2018-04-19
+
+ - Improvements to German.
+   Fixes RT#124322.
+   <https://rt.cpan.org/Ticket/Display.html?id=124322>
+
 0.007	2014-07-23	Bond... James Bond
 
  [ Bug Fixes ]

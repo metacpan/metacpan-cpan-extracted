@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 TAG=latest
 NAME=<: $dockerhub_dist_repo_name :>
 DOCKERHUB_NAMESPACE=<: $dockerhub_dist_repo_namespace :>
+SERVICE=0
 KILL_TIMEOUT=10
 
 DOCKER_CONTAINER_ARGS="

@@ -77,6 +77,7 @@ separated with tabs.
 
 - `dbh` - a premade database handle
 - `sql` - name of the file containing the SQL statements
+- `fh` - filehandle to the file containing the SQL statements
 - `force` - continue even if errors are encountered
 - `verbose` - print each SQL statement as it is run
 - `verbose_handler` - callback to call with each SQL statement instead of
@@ -199,6 +200,8 @@ In addition, it handles the following switches through [Pod::Usage](https://meta
 
     --help
     --man
+
+If no SQL is given, this function will read the SQL from STDIN.
 
 If no dsn is given, this function will use
 ` dbi:SQLite:dbname=db/$appname.sqlite `

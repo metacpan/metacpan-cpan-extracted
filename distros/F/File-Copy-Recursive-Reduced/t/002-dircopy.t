@@ -3,23 +3,27 @@
 use strict;
 use warnings;
 
-use Test::More qw(no_plan); # tests => 16;
+use Test::More tests => 115;
 use File::Copy::Recursive::Reduced qw(dircopy);
 
-use Capture::Tiny qw(capture_stdout capture_stderr);
+use Capture::Tiny qw(capture_stderr);
+use File::Find;
 use File::Path qw(mkpath);
 use File::Spec;
-use File::Temp qw(tempfile tempdir);
-use Path::Tiny;
+use File::Temp qw(tempdir);
 use lib qw( t/lib );
 use MockHomeDir;
 use Helper ( qw|
     create_tfile
     create_tfile_and_name_for_new_file_in_same_dir
     create_tsubdir
+    touch_a_file_and_test
+    touch_directories_and_test
+    touch_left_path_and_test
+    prepare_left_side_directories
+    make_mixed_directory
+    make_imperfect_mixed_directory
 | );
-    #get_mode
-    #get_fresh_tmp_dir
 
 my ($from, $to, $rv);
 
@@ -110,17 +114,9 @@ note("Begin tests with valid arguments");
     note("Copying of subdirs containing no files");
     my $topdir = tempdir(CLEANUP => 1);
     my @tdir_names = ('xray', 'yeller');
-    my @tdirs = ();
-    for my $d (@tdir_names) {
-        my $s = File::Spec->catdir($topdir, $d);
-        mkpath($s) or die "Unable to mkpath $s: $!";
-        ok(-d $s, "Directory $s created");
-        push @tdirs, $s;
-    }
+    my @tdirs = touch_directories_and_test($topdir, \@tdir_names);
     my @subdir_names = ('alpha', 'beta', 'gamma');
-    my $ldir = File::Spec->catdir($tdirs[0], @subdir_names);
-    mkpath($ldir) or die "Unable to mkpath $ldir: $!";
-    ok(-d $ldir, "Directory $ldir created");
+    my $ldir = touch_left_path_and_test($tdirs[0], @subdir_names);
     my @expected_subdirs = ();
     my $intermed = $tdirs[1];
     for my $d (@subdir_names) {
@@ -145,17 +141,9 @@ note("Begin tests with valid arguments");
     note("Copying of subdirs containing 1 file at bottom level");
     my $topdir = tempdir(CLEANUP => 1);
     my @tdir_names = ('xray', 'yeller');
-    my @tdirs = ();
-    for my $d (@tdir_names) {
-        my $s = File::Spec->catdir($topdir, $d);
-        mkpath($s) or die "Unable to mkpath $s: $!";
-        ok(-d $s, "Directory $s created");
-        push @tdirs, $s;
-    }
+    my @tdirs = touch_directories_and_test($topdir, \@tdir_names);
     my @subdir_names = ('alpha', 'beta', 'gamma');
-    my $ldir = File::Spec->catdir($tdirs[0], @subdir_names);
-    mkpath($ldir) or die "Unable to mkpath $ldir: $!";
-    ok(-d $ldir, "Directory $ldir created");
+    my $ldir = touch_left_path_and_test($tdirs[0], @subdir_names);
     my $fname = 'foo';
     my $f1 = create_tfile($ldir, $fname);
     ok(-f $f1, "File      $f1 created at bottom level");
@@ -186,17 +174,9 @@ note("Begin tests with valid arguments");
     note("Copying of subdirs containing 1 file at non-bottom level");
     my $topdir = tempdir(CLEANUP => 1);
     my @tdir_names = ('xray', 'yeller');
-    my @tdirs = ();
-    for my $d (@tdir_names) {
-        my $s = File::Spec->catdir($topdir, $d);
-        mkpath($s) or die "Unable to mkpath $s: $!";
-        ok(-d $s, "Directory $s created");
-        push @tdirs, $s;
-    }
+    my @tdirs = touch_directories_and_test($topdir, \@tdir_names);
     my @subdir_names = ('alpha', 'beta', 'gamma');
-    my $ldir = File::Spec->catdir($tdirs[0], @subdir_names);
-    mkpath($ldir) or die "Unable to mkpath $ldir: $!";
-    ok(-d $ldir, "Directory $ldir created");
+    my $ldir = touch_left_path_and_test($tdirs[0], @subdir_names);
     my $fname = 'foo';
     my $f1 = create_tfile(File::Spec->catdir($tdirs[0], @subdir_names[0..1]), $fname);
     ok(-f $f1, "File      $f1 created at non-bottom level");
@@ -248,25 +228,52 @@ my @dirnames = ( qw|
     ultra victor windy xray yellow zebra
 | );
 
-sub basic_tests {
+{
+    note("Basic tests of File::Copy::Recursive::Reduced::dircopy()");
+    basic_dircopy_tests(@dirnames);
+    SKIP: {
+        skip "System does not support symlinks", 13
+            unless $File::Copy::Recursive::Reduced::CopyLink;
+
+        note("Copy directory which holds symlinks");
+        mixed_block();
+        mixed_imperfect_block();
+    }
+}
+
+SKIP: {
+    skip "Set PERL_AUTHOR_TESTING to true to compare with FCR::dircopy()", 26
+        unless $ENV{PERL_AUTHOR_TESTING};
+
+    my $rv = eval { require File::Copy::Recursive; };
+    die unless $rv;
+    no warnings ('redefine');
+    local *dircopy = \&File::Copy::Recursive::dircopy;
+    use warnings;
+
+    note("COMPARISON: Basic tests of File::Copy::Recursive::dircopy()");
+    basic_dircopy_tests(@dirnames);
+    SKIP: {
+        skip "System does not support symlinks",  6
+            unless $File::Copy::Recursive::Reduced::CopyLink;
+
+        note("Copy directory which holds symlinks");
+        mixed_block();
+    }
+}
+
+#################### SUBROUTINES ####################
+
+sub basic_dircopy_tests {
     my @dirnames = @_;
     {
         note("Multiple directories; no files");
         my $topdir = tempdir(CLEANUP => 1);
         my ($tdir, $tdir2, $old, $oldtree, $new, $rv, $expected);
-        my (@created);
         my @subdirs = @dirnames[0..4];
 
         # Prepare left side
-        $tdir = File::Spec->catdir($topdir, 'alpha');
-        mkpath($tdir) or die "Unable to mkpath $tdir";
-        ok(-d $tdir, "Directory $tdir created");
-        $tdir   = tempdir( CLEANUP => 1 );
-        $old        = File::Spec->catdir($tdir);
-        $oldtree    = File::Spec->catdir($tdir, @subdirs);
-        @created = mkpath($oldtree, { mode => 0711 });
-        die "Unable to create directory $oldtree for testing: $!" unless -d $oldtree;
-        ok(-d $oldtree, "Directory $oldtree created for testing");
+        ($old, $oldtree) = prepare_left_side_directories($topdir, 'alpha', \@subdirs);
 
         # Prepare right side
         $tdir2  = File::Spec->catdir($topdir, 'beta');
@@ -286,18 +293,11 @@ sub basic_tests {
         note("Multiple directories; files at bottom level");
         my $topdir = tempdir(CLEANUP => 1);
         my ($tdir, $tdir2, $old, $oldtree, $new, $rv, $expected);
-        my (@created, @basenames);
+        my (@basenames);
         my @subdirs = @dirnames[5..7];
 
         # Prepare left side
-        $tdir = File::Spec->catdir($topdir, 'alpha');
-        mkpath($tdir) or die "Unable to mkpath $tdir";
-        ok(-d $tdir, "Directory $tdir created");
-        $old        = File::Spec->catdir($tdir);
-        $oldtree    = File::Spec->catdir($tdir, @subdirs);
-        @created = mkpath($oldtree, { mode => 0711 });
-        die "Unable to create directory $oldtree for testing: $!" unless -d $oldtree;
-        ok(-d $oldtree, "Directory $oldtree created for testing");
+        ($old, $oldtree) = prepare_left_side_directories($topdir, 'alpha', \@subdirs);
         @basenames = qw| foo bar |;
         for my $b (@basenames) {
             my $f = touch_a_file_and_test(File::Spec->catfile($oldtree, $b));
@@ -324,18 +324,10 @@ sub basic_tests {
         note("Multiple directories; files at intermediate levels");
         my $topdir = tempdir(CLEANUP => 1);
         my ($tdir, $tdir2, $old, $oldtree, $new, $rv, $expected);
-        my (@created);
         my @subdirs = @dirnames[8..11];
 
         # Prepare left side
-        $tdir = File::Spec->catdir($topdir, 'alpha');
-        mkpath($tdir) or die "Unable to mkpath $tdir";
-        ok(-d $tdir, "Directory $tdir created");
-        $old        = File::Spec->catdir($tdir);
-        $oldtree    = File::Spec->catdir($tdir, @subdirs);
-        @created = mkpath($oldtree, { mode => 0711 });
-        die "Unable to create directory $oldtree for testing: $!" unless -d $oldtree;
-        ok(-d $oldtree, "Directory $oldtree created for testing");
+        ($old, $oldtree) = prepare_left_side_directories($topdir, 'alpha', \@subdirs);
         my $f = File::Spec->catfile(@subdirs[0..1], 'foo');
         my $g = File::Spec->catfile(@subdirs[0..2], 'bar');
         for my $h ($f, $g) {
@@ -362,18 +354,107 @@ sub basic_tests {
             ok(-f $b, "dircopy(): file $b created");
         }
     }
-} # END definition of basic_tests()
+} # END definition of basic_dircopy_tests()
 
-{
-    note("Basic tests of File::Copy::Recursive::Reduced::dircopy()");
-    basic_tests(@dirnames);
-}
+sub mixed_block {
+    my $tdir = tempdir(CLEANUP => 1);
+    my $old = File::Spec->catdir($tdir, 'old');
+    mkpath $old or die "Unable to mkpath $old";
+    ok(-d $old, "Created $old for testing");
+    my $rv = make_mixed_directory($old);
+    ok($rv, "make_mixed_directory() returned true value");
+    is(ref($rv), 'HASH', "make_mixed_directory() returned hashref");
+    my $counts = {
+        dirs => scalar @{$rv->{dirs}},
+        files => scalar @{$rv->{files}},
+        symlinks => scalar @{$rv->{symlinks}},
+    };
+    my $exp = {
+        dirs => 9,
+        files => 6,
+        symlinks => 3,
+    };
+    is_deeply($counts, $exp,
+        "Got expected number of directories, files and symlinks for testing");
 
-sub touch_a_file_and_test {
-    my $f = shift;
-    open my $OUT, '>', $f or die "Unable to open $f for writing";
-    print $OUT "\n";
-    close $OUT or die "Unable to close $f after writing";
-    ok(-f $f, "Created $f for testing");
-}
+    my $new = File::Spec->catdir($tdir, 'new');
+    $rv = dircopy($old, $new) or die "Unable to dircopy";
+    ok(defined $rv, "dircopy() returned defined value");
+    my %seen = ();
+    my $wanted = sub {
+        unless ($File::Find::name eq $new) {
+            $seen{dirs}{$File::Find::name}++ if -d $File::Find::name;
+            if (-l $File::Find::name) {
+                $seen{symlinks}{$File::Find::name}++;
+            }
+            elsif (-f $File::Find::name) {
+                $seen{files}{$File::Find::name}++;
+            }
+        }
+    };
+    find($wanted, $new);
+    #require Data::Dump;
+    #Data::Dump::pp(\%seen);
+    my $created_counts = {
+        dirs => scalar keys %{$seen{dirs}},
+        files => scalar keys %{$seen{files}},
+        symlinks => scalar keys %{$seen{symlinks}},
+    };
+    is_deeply($created_counts, $counts,
+        "Got expected number of directories, files and symlinks by copying");
+} # END definition of mixed_block()
+
+sub mixed_imperfect_block {
+    my $tdir = tempdir(CLEANUP => 1);
+    my $old = File::Spec->catdir($tdir, 'old');
+    mkpath $old or die "Unable to mkpath $old";
+    ok(-d $old, "Created $old for testing");
+    my $rv = make_imperfect_mixed_directory($old);
+    ok($rv, "make_imperfect_mixed_directory() returned true value");
+    is(ref($rv), 'HASH', "make_imperfect_mixed_directory() returned hashref");
+    my $counts = {
+        dirs => scalar @{$rv->{dirs}},
+        files => scalar @{$rv->{files}},
+        symlinks => scalar @{$rv->{symlinks}},
+    };
+    my $exp = {
+        dirs => 9,
+        files => 5,
+        symlinks => 3,
+    };
+    is_deeply($counts, $exp,
+        "Got expected number of directories, files and symlinks for testing");
+
+    my $new = File::Spec->catdir($tdir, 'new');
+    my $stderr = capture_stderr { $rv = dircopy($old, $new) or die "Unable to dircopy"; };
+    ok(defined $rv, "dircopy() returned defined value");
+    like(
+        $stderr,
+        qr/Copying a symlink.*?whose target does not exist/,
+        "Got expected warning when copying a symlink whose target does not exist"
+    );
+
+    my %seen = ();
+    my $wanted = sub {
+        unless ($File::Find::name eq $new) {
+            $seen{dirs}{$File::Find::name}++ if -d $File::Find::name;
+            if (-l $File::Find::name) {
+                $seen{symlinks}{$File::Find::name}++;
+            }
+            elsif (-f $File::Find::name) {
+                $seen{files}{$File::Find::name}++;
+            }
+        }
+    };
+    find($wanted, $new);
+    #require Data::Dump;
+    #Data::Dump::pp(\%seen);
+    my $created_counts = {
+        dirs => scalar keys %{$seen{dirs}},
+        files => scalar keys %{$seen{files}},
+        symlinks => scalar keys %{$seen{symlinks}},
+    };
+    is_deeply($created_counts, $counts,
+        "Got expected number of directories, files and symlinks by copying");
+} # END definition of mixed_imperfect_block()
 

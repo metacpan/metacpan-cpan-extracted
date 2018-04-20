@@ -4,7 +4,8 @@ use warnings;
 
 package Types::Path::Tiny;
 # ABSTRACT: Path::Tiny types and coercions for Moose and Moo
-our $VERSION = '0.005'; # VERSION
+
+our $VERSION = '0.006';
 
 use Path::Tiny qw();
 use Type::Library 0.008 -base, -declare => qw( Path AbsPath File AbsFile Dir AbsDir );
@@ -84,7 +85,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -92,9 +93,11 @@ Types::Path::Tiny - Path::Tiny types and coercions for Moose and Moo
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
+
+Example with Moose:
 
   ### specification of type constraint with coercion
 
@@ -119,6 +122,26 @@ version 0.005
 
   Foo->new( filename => 'foo.txt' ); # coerced to Path::Tiny
   Foo->new( directory => '.' ); # coerced to path('.')->absolute
+
+Example with Moo:
+
+    ### specification of type constraint with coercion
+
+    package Foo;
+
+    use Moo;
+    use Types::Path::Tiny qw/Path AbsPath/;
+
+    has 'directory' => (
+        is       => 'rw',
+        isa      => AbsPath,
+        required => 1,
+        coerce   => AbsPath->coercion,
+    );
+
+    ### usage in code
+
+    Foo->new( directory => '.' ); # coerced to path('.')->absolute
 
 =head1 DESCRIPTION
 
@@ -218,15 +241,31 @@ public review and contribution under the terms of the license.
 
 L<https://github.com/dagolden/types-path-tiny>
 
-  git clone git://github.com/dagolden/types-path-tiny.git
+  git clone https://github.com/dagolden/types-path-tiny.git
 
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
+
+=for stopwords Hobbestigrou Toby Inkster
+
+=over 4
+
+=item *
+
+Hobbestigrou <hobbestigrou@erakis.eu>
+
+=item *
+
+Hobbestigrou <natal.ngetal@novapost.fr>
+
+=item *
 
 Toby Inkster <tobyink@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -40,14 +40,14 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
     %SNMP::Info::LLDP::MIBS,
     'CHECKPOINT-MIB'      => 'fwProduct',
     'UCD-SNMP-MIB'        => 'versionTag',
-    'NET-SNMP-TC'         => 'netSnmpAgentOIDs',
+    'NET-SNMP-TC'         => 'netSnmpAliasDomain',
     'NET-SNMP-EXTEND-MIB' => 'nsExtendNumEntries',
     'HOST-RESOURCES-MIB'  => 'hrSystem',
 );

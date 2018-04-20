@@ -1,196 +1,109 @@
 package Pcore::Core::Env::Share;
 
-use Pcore -class, -const;
-use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
+use Pcore -class;
+use Pcore::Util::Scalar qw[is_plain_scalarref is_plain_arrayref is_plain_hashref];
 
-has _temp => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::File::TempDir'], init_arg => undef );
-has _lib         => ( is => 'ro',   isa => HashRef, default => sub { {} }, init_arg => undef );                   # name => [$level, $path]
-has _storage     => ( is => 'lazy', isa => HashRef, default => sub { {} }, clearer  => 1, init_arg => undef );    # storage cache, name => [$path, ...]
-has _lib_storage => ( is => 'lazy', isa => HashRef, default => sub { {} }, init_arg => undef );                   # lib storage cache, {lib}->{storage} = $path
+has _lib_idx  => ( is => 'ro', isa => HashRef,  init_arg => undef );
+has _lib_path => ( is => 'ro', isa => ArrayRef, init_arg => undef );
 
-const our $RESERVED_LIB_NAME => {
-    dist => 1,                                                                                                    # alias for main dist
-    temp => 1,                                                                                                    # temporary resources lib
-};
-
-sub _build__temp ($self) {
-    return P->file->tempdir;
-}
-
-sub add_lib ( $self, $name, $path, $level ) {
-    die qq[resource lib name "$name" is reserved] if exists $RESERVED_LIB_NAME->{$name};
-
-    die qq[resource lib "$name" already exists] if exists $self->_lib->{$name};
+sub register_lib ( $self, $name, $path ) {
+    die qq[share lib "$name" already exists] if exists $self->{_lib_idx}->{$name};
 
     # register lib
-    $self->_lib->{$name} = [ $level, $path ];
+    $self->{_lib_idx}->{$name} = $path;
 
-    # clear cache
-    $self->_clear_storage;
+    push $self->{_lib_path}->@*, $path;
 
     return;
-}
-
-# return lib path by name
-sub get_lib ( $self, $lib_name ) {
-    \my $libs = \$self->_lib;
-
-    if ( $ENV->is_par ) {
-
-        # under the PAR all resources libs are merged under the "dist" alias
-        return $libs->{dist}->[1];
-    }
-    elsif ( $lib_name eq 'temp' ) {
-        return $self->_temp->path;
-    }
-    else {
-        if ( $lib_name eq 'dist' ) {
-            if ( my $dist = $ENV->dist ) {
-                $lib_name = lc $dist->name;
-            }
-            else {
-                return;
-            }
-        }
-
-        return if !exists $libs->{$lib_name};
-
-        return $libs->{$lib_name}->[1];
-    }
 }
 
 # return undef if storage is not exists
 # return $storage_path if lib is specified
 # return ArrayRef[$storage_path] if lib is not specified
-sub get_storage ( $self, $storage_name, $lib_name = undef ) {
-    \my $libs = \$self->_lib;
+sub get_storage ( $self, @ ) {
+    my ( $lib, $path );
 
-    if ($lib_name) {
-        my $lib_path = $self->get_lib($lib_name);
+    if ( @_ == 2 ) {
+        $path = $_[1];
+    }
+    elsif ( @_ == 3 ) {
+        $lib = $_[1];
 
-        die qq[resource lib is not exists "$lib_name"] if !$lib_path;
+        $path = $_[2];
+    }
 
-        \my $lib_storage = \$self->_lib_storage;
+    if ($lib) {
+        die qq[share lib "$lib" is not exists] if !exists $self->{_lib_idx}->{$lib};
 
-        # cache lib/storage path, if not cached yet
-        if ( !exists $lib_storage->{$lib_name}->{$storage_name} ) {
-            if ( -d "${lib_path}${storage_name}" ) {
-                $lib_storage->{$lib_name}->{$storage_name} = $lib_path . $storage_name;
-            }
-            else {
-                $lib_storage->{$lib_name}->{$storage_name} = undef;
-            }
-        }
-
-        # return cached path
-        return $lib_storage->{$lib_name}->{$storage_name};
+        return -d $self->{_lib_idx}->{$lib} . $path ? $self->{_lib_idx}->{$lib} . $path : ();
     }
     else {
-        \my $storage = \$self->_storage;
+        my @res;
 
-        # build and cache storage paths array
-        if ( !exists $storage->{$storage_name} ) {
-            for my $lib_name ( sort { $libs->{$b}->[0] <=> $libs->{$a}->[0] } keys $libs->%* ) {
-                my $storage_path = $libs->{$lib_name}->[1] . $storage_name;
-
-                push $storage->{$storage_name}->@*, $storage_path if -d $storage_path;
-            }
-
-            $storage->{$storage_name} = undef if !exists $storage->{$storage_name};
+        for my $lib_path ( $self->{_lib_path}->@* ) {
+            push @res, $lib_path . $path if -d $lib_path . $path;
         }
 
-        # return cached value
-        return $storage->{$storage_name};
+        return \@res;
     }
 }
 
-sub get ( $self, $path, @ ) {
-    my %args = (
-        storage => undef,
-        lib     => undef,
-        splice @_, 2,
-    );
+# $ENV->{share}->get( 'www', 'static/file.html' );
+# $ENV->{share}->get( 'Pcore', 'www', 'static/file.html' );
+sub get ( $self, @ ) {
+    my ( $lib, $root, $path );
 
-    # get storage name from path
-    if ( !$args{storage} ) {
-        if ( $path =~ m[\A/?([^/]+)/(.+)]sm ) {
-            $args{storage} = $1;
-
-            $path = P->path( q[/] . $2 );
-        }
-        else {
-            die qq[invalid resource path "$path"];
-        }
+    if ( @_ == 2 ) {
+        $path = $_[1];
     }
-    else {
-        $path = P->path( q[/] . $path );
+    elsif ( @_ == 3 ) {
+        ( $root, $path ) = ( $_[1], $_[2] );
+    }
+    elsif ( @_ == 4 ) {
+        ( $lib, $root, $path ) = ( $_[1], $_[2], $_[3] );
     }
 
-    if ( $args{lib} ) {
-        if ( my $storage_path = $self->get_storage( $args{storage}, $args{lib} ) ) {
-            my $res = $storage_path . $path;
+    for my $lib_path ( $lib ? exists $self->{_lib_idx}->{$lib} ? $self->{_lib_idx}->{$lib} : () : $self->{_lib_path}->@* ) {
+        my $root_path = $lib_path;
 
-            return $res if -f $res;
-        }
-    }
-    elsif ( my $storage = $self->get_storage( $args{storage} ) ) {
-        for my $storage_path ( $storage->@* ) {
-            my $res = $storage_path . $path;
+        $root_path .= $root if $root;
 
-            return $res if -f $res;
+        my $real_path = Cwd::realpath("$root_path/$path");
+
+        if ( $real_path && -f $real_path ) {
+
+            # convert slashes
+            $path =~ s[\\][/]smg;
+
+            if ( substr( $real_path, 0, length $root_path ) eq $root_path ) {
+                return $real_path;
+            }
         }
     }
 
     return;
 }
 
-sub store ( $self, $path, $file, $lib_name, @ ) {
-    my %args = (
-        storage => undef,
-        splice @_, 4,
-    );
+sub store ( $self, $lib, $path, $file ) {
+    die qq[share lib "$lib" is not exists] if !exists $self->{_lib_idx}->{$lib};
 
-    my $lib_path = $self->get_lib($lib_name);
-
-    die qq[resource lib is not exists "$lib_name"] if !$lib_path;
-
-    # get storage name from path
-    if ( !$args{storage} ) {
-        if ( $path =~ m[\A/?([^/]+)/(.+)]sm ) {
-            $args{storage} = $1;
-
-            $path = P->path( q[/] . $2 );
-        }
-        else {
-            die qq[invalid resource path "$path"];
-        }
-    }
-    else {
-        $path = P->path( q[/] . $path );
-    }
-
-    # clear storage cache if new storage was created
-    if ( !-d "${lib_path}$args{storage}" ) {
-        delete $self->_storage->{ $args{storage} };
-
-        delete $self->_lib_storage->{$lib_name}->{ $args{storage} } if exists $self->_lib_storage->{$lib_name};
-    }
+    $path = P->path( $self->{_lib_idx}->{$lib} . $path );
 
     # create path
-    P->file->mkpath( $lib_path . $args{storage} . $path->dirname ) if !-d "${lib_path}$args{storage}@{[$path->dirname]}";
+    P->file->mkpath( $path->dirname ) if !-d $path->dirname;
 
     # create file
-    if ( ref $file eq 'SCALAR' ) {
-        P->file->write_bin( $lib_path . $args{storage} . $path, $file );
+    if ( is_plain_scalarref $file ) {
+        P->file->write_bin( $path, $file );
     }
     elsif ( is_plain_arrayref $file || is_plain_hashref $file ) {
-        P->cfg->store( $lib_path . $args{storage} . $path, $file, readable => 1 );
+        P->cfg->store( $path, $file, readable => 1 );
     }
     else {
-        P->file->copy( $file, $lib_path . $args{storage} . $path );
+        P->file->copy( $file, $path );
     }
 
-    return $lib_path . $args{storage} . $path;
+    return $path;
 }
 
 1;
@@ -200,9 +113,7 @@ sub store ( $self, $path, $file, $lib_name, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 147                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 93                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    3 | 44                   | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

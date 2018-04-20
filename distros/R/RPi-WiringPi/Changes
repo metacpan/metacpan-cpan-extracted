@@ -1,5 +1,15 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3625  2018-04-19
+        - in FAQ, add the 4 row 20 col config to env vars (closes #65)
+        - bumped prereq RPi::Pin to 2.3606
+        - added I2C, Serial and SPI configuration details at the top of the FAQ
+          (closes #63; closes #64)
+        - re-enabled "both" interrupt test file (closes #48)
+        - servo() now accepts a configuration hash that allows sending in a
+          non-default PWM clock speed and PWM range (closes #45)
+        - modified GPS examples to use the new GPSD::Parse methods
+
 2.3624  2018-03-27
         - added blurb in FAQ Testing section that describes setting up I2C and
           serial properly

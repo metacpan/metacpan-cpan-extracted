@@ -37,7 +37,7 @@ L<RPi::Const> module.
 
 =head1 SETUP
 
-=head2 System configuration
+=head2 Perlbrew configuration
 
 If you want to avoid using your system installed Perl installation to use this
 software (or you want to use interrupts), you should do some pre-configuration
@@ -58,6 +58,11 @@ Then, install an instance of Perl, and switch to it:
     perlbrew install perl-5.26.0
     perlbrew switch perl-5.26.0
 
+=head2 sudo configuration
+
+NOTE: Only when using PWM features do you need to use C<sudo>. All other aspects
+of this software work properly with a non-privileged user account.
+
 To use C<sudo> to run your scripts within the appropriate Perl
 installation, you need to modify the C</etc/sudoers> file. Prepend the string
 value for the C<secure_path> directive to include the path to the new
@@ -69,15 +74,75 @@ Now, you can do everything with the normal user account, using their personal
 installation of Perl, and you just need C<sudo> to run your scripts, leaving
 your default system installation intact.
 
-NOTE: Only when using PWM features do you need to use C<sudo>. All other aspects
-of this software work properly with a non-privileged user account.
-
 NOTE: If you get errors about "Permission Denied" accessing C</dev/mem> or
 C</dev/gpiomem>, you need to add the C<pi> user to the C<gpio> group:
 
     sudo adduser pi gpio
 
-=head1 PI 
+=head2 I2C configuration
+
+You need to have some core software installed before using the I2C bus. The
+Raspberry Pi 3 already has everything pre-loaded. On a typical Unix computer,
+you'd do something along these lines:
+
+    sudo apt-get install libi2c-dev i2c-tools build-essential
+
+To test your I2C bus:
+
+    i2cdetect -y 1
+
+...or on some machines:
+
+    i2cdetect -y 0
+
+First thing you need to do is enable the I2C bus. You can do so in
+C<raspi-config>, or ensure the C<ram=i2c_arm> directive is set to C<on> in the
+C</boot/config.txt> file:
+
+    dtparam=i2c_arm=on
+
+NOTE: If you get permission errors accessing the I2C bus, you may need to add
+the C<pi> user to the C<i2c> group:
+
+    sudo adduser pi i2c
+
+=head2 Arduino I2C configuration
+
+Often, the default speed of the I2C bus master is too fast for an Arduino. If
+you do not get any results, try changing the speed. On a Raspberry Pi, you do
+that by setting the C<dtparam=i2c_arm_baudrate> directive in the
+C</boot/config.txt> file:
+
+    dtparam=i2c_arm_baudrate=10000
+
+=head2 SPI configuration
+
+First thing you need to do is enable the SPI bus. You can do so in
+C<raspi-config>, or ensure the C<dtparam=spi> directive is set to C<on> in the
+C</boot/config.txt> file:
+
+    dtparam=spi=on
+
+NOTE: If you get permission errors accessing the SPI bus, you may need to add
+the C<pi> user to the C<spi> group:
+
+    sudo adduser pi spi
+
+=head1 Serial configuration
+
+In order to use GPIO pins 14 and 15 as a serial interface on the Raspberry Pi,
+you need to disable the built-in Bluetooth adaptor. This distribution will not
+operate correctly without this being done.
+
+First, in C<raspi-config>, in the C<Serial> section in C<Interfacing Options>,
+disable "login shell" on the serial interface, then disable Bluetooth by editing
+the C</boot/config.txt>, and add the following line:
+
+    dtoverlay=pi3-disable-bt-overlay
+
+Save the file, then reboot the Pi.
+
+=head1 PI
 
 =head2 Create a Raspberry Pi object
 
@@ -465,10 +530,10 @@ full usage instructions.
 
     my gps = $pi->gps;
 
-    print $gps->lat   ."\n"; # latitude
-    print $gps->lon   ."\n"; # longitude
-    print $gps->speed ."\n"; # current speed
-    print $gps->track ."\n"; # current heading
+    print $gps->lat;        # latitude
+    print $gps->lon;        # longitude
+    print $gps->speed;      # current speed
+    print $gps->direction;  # current heading
 
 =head1 LCD TOUCH SCREENS
 
@@ -756,9 +821,10 @@ number of runs if desired.
 To use the LCD functionality which displays the last date/time that a test run
 succeeded, along with the last commit tested and it's result (PASS/FAIL), set
 up an environment variable that contains a comma-separated list of GPIO pin
-numbers that the LCD is connected to:
+numbers that the LCD is connected to (leave off the last two digits if all you
+have is a two row by 16 column LCD.
 
-    export BB_RPI_LCD=5,6,4,17,27,22
+    export BB_RPI_LCD=5,6,4,17,27,22,4,20
 
 ...which represents LCD pins:
 
@@ -775,15 +841,17 @@ a feature that most likely I'll be the only consumer of.
 =head2 Testing Environment Variable List
 
 Here's the contents of my C</etc/environment> file, setting the various testing
-environment variables for the full test platform.
+environment variables for the full test platform. For LCD, the last two digits
+(4, 20) are for four row, 20 column units. If you only have a two row by four
+column unit, leave those last two digits off.
 
-    PI_BOARD=1                  # It's a Pi
-    RPI_ARDUINO=1               # Arduino I2C connected
-    RPI_LCD=1                   # LCD is connected
-    RPI_SERIAL=1                # Serial enabled, and loopback
-    RPI_HCSR04=1                # sonic distance sensor
-    BB_RPI_LCD=5,6,4,17,27,22   # Auto-testing LCD enabled
-    RELEASE_TESTING=1           # Author tests (POD, manifest etc)
+    PI_BOARD=1
+    RPI_ARDUINO=1
+    RPI_LCD=1
+    RPI_SERIAL=1
+    RPI_HCSR04=1
+    BB_RPI_LCD=5,6,4,17,27,22,4,20
+    RELEASE_TESTING=1
 
 =head1 DEVELOPMENT
 
@@ -794,7 +862,7 @@ add things as I think of them.
 =head2 Pins
 
 Any time you accept a pin number to pass along to an external module for use,
-you *must* call C<< $self->register_pin($pin_num) >> in order to have the
+you *must* call C<< $pi->register_pin($pin_num) >> in order to have the
 cleanup functionality tidy things up properly. Neglecting to do this will
 prevent the cleanup regimen from knowing about these pins, and therefore will be
 left in an inconsistent state, possibly causing damage on a different run.

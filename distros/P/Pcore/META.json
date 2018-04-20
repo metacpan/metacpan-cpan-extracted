@@ -102,6 +102,7 @@
             "HTTP::Date" : "0",
             "HTTP::Message" : "v6.13.0",
             "HTTP::Parser::XS" : "v0.17.0",
+            "IO::FDPass" : "0",
             "Import::Into" : "0",
             "Inline" : "0",
             "Inline::C" : "0",
@@ -140,7 +141,7 @@
             "XML::Hash::XS" : "0",
             "YAML::XS" : "0",
             "multidimensional" : "0",
-            "perl" : "v5.26.1"
+            "perl" : "v5.26.2"
          }
       },
       "test" : {
@@ -161,6 +162,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.61.4",
+   "version" : "v0.62.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -3,7 +3,7 @@ package Class::C3;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 our $C3_IN_CORE;
 our $C3_XS;
@@ -419,9 +419,9 @@ method along the C3 linearization. This is best shown with an example.
   package ClassD;
   use base ('ClassB', 'ClassC');
   use Class::C3;
-  sub foo { 'D::foo => ' . (shift)->next::method() }
+  sub foo { 'ClassD::foo => ' . (shift)->next::method() }
 
-  print D->foo; # prints out "D::foo => B::foo => C::foo => A::foo"
+  print ClassD->foo; # prints out "ClassD::foo => ClassB::foo => ClassC::foo => ClassA::foo"
 
 A few things to note. First, we do not require you to add on the method name to the C<next::method>
 call (this is unlike C<NEXT::> and C<SUPER::> which do require that). This helps to enforce the rule

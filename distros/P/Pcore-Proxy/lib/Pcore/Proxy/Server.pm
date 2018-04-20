@@ -20,11 +20,11 @@ sub _build_port ($self) {
 }
 
 sub _build_key_file ($self) {
-    return $ENV->share->get('/data/proxy.pem');
+    return $ENV->{share}->get('data/proxy.pem');
 }
 
 sub _build_cert_file ($self) {
-    return $ENV->share->get('/data/proxy.crt');
+    return $ENV->{share}->get('data/proxy.crt');
 }
 
 sub run ($self) {

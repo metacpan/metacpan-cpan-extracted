@@ -1,0 +1,50 @@
+{
+   "abstract" : "Dist::Zilla::Plugin::ReadmeAddDevInfo - add info how to contribute to the project",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-ReadmeAddDevInfo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::ReadmeAddDevInfo" : {
+         "file" : "lib/Dist/Zilla/Plugin/ReadmeAddDevInfo.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo.git",
+         "web" : "http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

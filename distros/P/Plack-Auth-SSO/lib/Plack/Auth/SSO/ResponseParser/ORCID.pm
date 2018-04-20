@@ -7,7 +7,7 @@ use JSON;
 use Moo;
 use Clone qw();
 
-our $VERSION = "0.0133";
+our $VERSION = "0.0134";
 
 with "Plack::Auth::SSO::ResponseParser";
 

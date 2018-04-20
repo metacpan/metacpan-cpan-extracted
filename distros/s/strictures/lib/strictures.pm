@@ -10,7 +10,7 @@ BEGIN {
   *_CAN_GOTO_VERSION = ($] >= 5.010000) ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '2.000003';
+our $VERSION = '2.000004';
 $VERSION = eval $VERSION;
 
 our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
@@ -22,6 +22,7 @@ our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
     experimental::autoderef
     experimental::bitwise
     experimental::const_attr
+    experimental::declared_refs
     experimental::lexical_subs
     experimental::lexical_topic
     experimental::postderef

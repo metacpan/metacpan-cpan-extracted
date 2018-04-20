@@ -42,9 +42,9 @@ sub _build_tmpl_params ($self) {
         copyright_year          => P->date->now->year,
         copyright_holder        => $ENV->user_cfg->{_}->{copyright_holder} || $ENV->user_cfg->{_}->{author},
         license                 => $ENV->user_cfg->{_}->{license},
-        pcore_version           => $ENV->pcore->version->normal,
+        pcore_version           => $ENV->{pcore}->version->normal,
         cpan_distribution       => 0,
-        dockerhub_pcore_repo_id => $ENV->pcore->docker->{repo_id},
+        dockerhub_pcore_repo_id => $ENV->{pcore}->docker->{repo_id},
     };
 }
 
@@ -67,7 +67,7 @@ sub run ($self) {
     # copy files
     my $files = Pcore::Util::File::Tree->new;
 
-    my $tmpl_cfg = P->cfg->load( $ENV->share->get( 'cfg.ini', storage => 'dist-tmpl', lib => 'Pcore' ) );
+    my $tmpl_cfg = P->cfg->load( $ENV->{share}->get( 'Pcore', 'dist-tmpl', 'cfg.ini' ) );
 
     my $tmpl_params = $self->tmpl_params;
 
@@ -76,7 +76,7 @@ sub run ($self) {
             __SUB__->($parent);
         }
 
-        my $tmpl_path = $ENV->share->get_storage( 'dist-tmpl', 'Pcore' ) . "/tmpl-$name/";
+        my $tmpl_path = $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . "/tmpl-$name/";
 
         $files->add_dir($tmpl_path) if -d $tmpl_path;
 
@@ -90,10 +90,10 @@ sub run ($self) {
     # add SCM files
     if ( $self->{upstream_hosting} ) {
         if ( $self->{local_scm_type} eq $SCM_TYPE_HG ) {
-            $files->add_dir( $ENV->share->get_storage( 'dist-tmpl', 'Pcore' ) . '/hg/' );
+            $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/hg/' );
         }
         elsif ( $self->{local_scm_type} eq $SCM_TYPE_GIT ) {
-            $files->add_dir( $ENV->share->get_storage( 'dist-tmpl', 'Pcore' ) . '/git/' );
+            $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/git/' );
         }
     }
 

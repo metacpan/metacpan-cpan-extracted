@@ -15,6 +15,7 @@ lib/App/cpm/Job.pm
 lib/App/cpm/Logger.pm
 lib/App/cpm/Logger/File.pm
 lib/App/cpm/Master.pm
+lib/App/cpm/Requirement.pm
 lib/App/cpm/Resolver.pm
 lib/App/cpm/Resolver/02Packages.pm
 lib/App/cpm/Resolver/Cascade.pm

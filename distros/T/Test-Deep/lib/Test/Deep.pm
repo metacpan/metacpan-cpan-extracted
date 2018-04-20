@@ -21,7 +21,7 @@ unless (defined $Test::Deep::NoTest::NoTest)
 
 our ($Stack, %Compared, $CompareCache, %WrapCache, $Shallow);
 
-our $VERSION = '1.127';
+our $VERSION = '1.128';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -646,7 +646,7 @@ Test::Deep - Extremely flexible deep comparison
   cmp_deeply(
     $object,
     noclass({value => 5}),
-    "object looks ok, not checking it's class"
+    "object looks ok, not checking its class"
   );
 
   cmp_deeply(
@@ -658,11 +658,11 @@ Test::Deep - Extremely flexible deep comparison
 =head1 DESCRIPTION
 
 If you don't know anything about automated testing in Perl then you should
-probably read about Test::Simple and Test::More before preceding.
-Test::Deep uses the Test::Builder framework.
+probably read about L<Test::Simple> and L<Test::More> before preceding.
+Test::Deep uses the L<Test::Builder> framework.
 
 Test::Deep gives you very flexible ways to check that the result you got is
-the result you were expecting. At it's simplest it compares two structures
+the result you were expecting. At its simplest it compares two structures
 by going through each level, ensuring that the values match, that arrays and
 hashes have the same elements and that references are blessed into the
 correct class. It also handles circular data structures without getting
@@ -833,7 +833,7 @@ include themselves. Simply do
 
 This will now check that $person->{Children} is an array and that every
 element of that array also matches C<$person_cmp>, this includes checking
-that it's children also match the same pattern and so on.
+that its children also match the same pattern and so on.
 
 =head2 Circular data structures
 
@@ -972,7 +972,7 @@ or if it is unpredictable.
     $got,
     {
       name    => 'John',
-      rando m => ignore(),
+      random  => ignore(),
       address => [ '5 A street', 'a town', 'a country' ],
     }
   );
@@ -1053,9 +1053,9 @@ B<NOTE> The same caveats apply as for methods().
 
   cmp_deeply( $got, shallow($thing) );
 
-$thing is a ref.
+C<$thing> is a ref.
 
-This prevents Test::Deep from looking inside $thing. It allows you to
+This prevents Test::Deep from looking inside C<$thing>. It allows you to
 check that C<$got_v> and C<$thing> are references to the same variable. So
 
   my @a = @b = (1, 2, 3);
@@ -1072,12 +1072,12 @@ references to different arrays.
 
   cmp_deeply( $got, noclass($thing) );
 
-$thing is a structure to be compared against.
+C<$thing> is a structure to be compared against.
 
 This makes Test::Deep ignore the class of objects, so it just looks at the
 data they contain. Class checking will be turned off until Test::Deep is
 finished comparing C<$got_v> against C<$thing>. Once Test::Deep comes out of
-C<$thing> it will go back to it's previous setting for checking class.
+C<$thing> it will go back to its previous setting for checking class.
 
 This can be useful when you want to check that objects have been
 constructed correctly but you don't want to write lots of
@@ -1261,7 +1261,7 @@ Unlike the C<Isa> test, this test will never accept class names.
 C<$thing> is a structure to be compared against.
 
 <$got_v> must be an array reference. Each element of it will be compared to
-$thing. This is useful when you have an array of similar things, for example
+C<$thing>. This is useful when you have an array of similar things, for example
 objects of a known type and you don't want to have to repeat the same test
 for each one.
 
@@ -1283,7 +1283,7 @@ is similar to
 
 Except it will not explode if C<$got> is not an array reference. It will
 check that each of the objects in C<@$got> is a MyFile and that each one
-gives the correct results for it's methods.
+gives the correct results for its methods.
 
 You could go further, if for example there were 3 files and you knew the
 size of each one you could do this
@@ -1458,6 +1458,13 @@ in C<$got_v> must be in C<@elements>.
   cmp_deeply([1,2,4,5], subsetof(2,3,3)    ) # Fail: 1,4 & 5 extra
   cmp_deeply([2,3,3],   subsetof(1,2,4,5)  ) # Fail: 3 extra
   cmp_deeply([2,3,3],   subsetof(1,2,4,5,3)) # Pass
+
+=head3 none
+
+  cmp_deeply( $got, none(@elements) );
+
+@elements is an array of elements, wherein no elements in C<@elements> may
+be equal to C<$got_v>.
 
 =head3 noneof
 
@@ -1688,7 +1695,7 @@ other bag comparison, giving us something like
 
 =head1 USING TEST::DEEP WITH TEST::BUILDER
 
-Combining C<cmp_details> and C<test_diag> makes it possible to use
+Combining C<cmp_details> and C<deep_diag> makes it possible to use
 Test::Deep in your own test classes.
 
 In a L<Test::Builder> subclass, create a test method in the following
@@ -1748,7 +1755,7 @@ algorithm for set and bag matching. Something for the future...
 
 A special comparison (SC) is simply an object that inherits from
 Test::Deep::Cmp. Whenever C<$expected_v> is an SC then instead of checking
-C<$got_v eq $expected_v>, we pass control over to the SC and let it do it's
+C<$got_v eq $expected_v>, we pass control over to the SC and let it do its
 thing.
 
 Test::Deep exports lots of SC constructors, to make it easy for you to use
@@ -1765,7 +1772,7 @@ by do something like C<< $expected_v->descend($got_v) >>. The C<descend()>
 method should just return true or false.
 
 This gives you enough to write your own SCs but I haven't documented how
-diagnostics works because it's about to get an overhaul.
+diagnostics works because it's about to get an overhaul (theoretically).
 
 =head1 EXPORTS
 

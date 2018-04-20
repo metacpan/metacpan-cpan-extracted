@@ -1,5 +1,9 @@
 Revision history for Pandoc-Elements
 
+0.35  2018-04-20 13:07:19 CEST
+    - Fix test failures (#77, #78)
+    - Fix, extend and document ImageFromCode filter (#79)
+
 0.34  2018-04-18 09:46:41 CEST
     - Extend metadata value method with JSON Pointer and options (#73)
     - Change default stringification of MetaBlocks

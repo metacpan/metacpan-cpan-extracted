@@ -5,7 +5,7 @@ use utf8;
 use Exporter 'import';
 use Business::BR::CNJ;
 
-our $VERSION = 0.03;
+our $VERSION = 0.06;
 our @EXPORT_OK = qw/ cnj_extract_numbers cnj_extract_numbers_lwp /;
 
 sub cnj_extract_numbers {
@@ -17,11 +17,11 @@ sub cnj_extract_numbers {
  return map { ( Business::BR::CNJ::cnj_check_number($_) ? ($_) : () ) } @n; 
 }
 
-sub cnj_extract_lwp {
+sub cnj_extract_numbers_lwp {
  require LWP::UserAgent;
  require Mojo::DOM;
 
- my $req = LWP::UserAgent->new()->get( @_ );
+ my $req = LWP::UserAgent->new( agent => __PACKAGE__ )->get( @_ );
 
  die $req->status_line if !$req->is_success;
 
@@ -50,19 +50,19 @@ Business::BR::CNJ::NumberExtractor - Extract brazilian CNJ numbers (Conselho Nac
 
    use Business::BR::CNJ::NumberExtractor ( qw/ cnj_extract_numbers / );
 
-   my @numbers =  cnj_extract_numbers(' This is a test: 0058967-77.2016.8.19.0000, but this is not: 0058967-71.2016.8.99.0000 - wrong verification digits.');
+   my @numbers =  cnj_extract_numbers(' This is a good number: 0058967-77.2016.8.19.0000, but this is not: 0058967-71.2016.8.99.0000 - wrong verification digits.');
 
    # or...
 
    use Business::BR::CNJ::NumberExtractor;
 
-   my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers('This is a test: 0058967-77.2016.8.19.0000');
+   my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers('This is good number: 0058967-77.2016.8.19.0000');
 
    # Or, using LWP::UseAgent and Mojo::DOM (if text/html repsonse)
 
-   my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('http://arquivo.trf1.jus.br/PesquisaMenuArquivo.asp?p1=10284120114013819&pN=10284120114013819&pA=10284120114013819&data_publicacao=02/10/2017&nome_orgao=%20Todos%20&orgao=');
+   my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('https://modeloinicial.com.br/peticao/reclamacao-trabalhista');
 
-   # Works even od DOC or PDF files
+   # Works even on DOC or PDF files
 
    my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('http://arquivo.trf1.gov.br/AGText/2011/0001000/00010284120114013819_3.doc');
 
@@ -88,9 +88,26 @@ Art. 1º Fica instituída a numeração única de processos no âmbito do Poder 
 
 =head2 cnj_extract_numbers_lwp
 
-Same as cnj_extract_numbers, but instead of a string, it expects a URI to be sent to LWP::UserAgent.
+Same as cnj_extract_numbers, but instead of a string, it expects a URI to be fetched with LWP::UserAgent.
 
 If the response is a text/html, Mojo::DOM is used to extract the visible text. Otherwise, response data won't be parsed and will be processed as is.
+
+To sse it in action, call it on https://modeloinicial.com.br/peticao/reclamacao-trabalhista - it will give you dozens of CNJ numbers, some of them properly formated, and some not, but all valid.
+This happens because not all courts publishes the process numbers properly formated.
+
+Calling it on https://modeloinicial.com.br/peticao/11078499/Acao-aposentadoria-idade should give you a few numbers, returning an array like:
+
+00405084620174039999
+00430097020174039999
+50035143820174047110
+5003514-38.2017.4.04.7110
+05063719420144058102
+00116012120084036105
+5011707-12.2012.4.04.7112
+5008061-10.2010.404.7000
+
+If you call it on a URL with no valid CNJ numbers (like https://modeloinicial.com.br/peticao/11000689/Inventario-Judicial-Novo-CPC or https://modeloinicial.com.br/peticao/11081958/Recurso-multa-transito-Excesso-velocidade),
+it wont throw an execption, and will only return an empty list.
 
 =over
 

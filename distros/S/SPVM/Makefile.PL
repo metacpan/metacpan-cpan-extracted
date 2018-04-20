@@ -8,7 +8,9 @@ use Config;
 use Getopt::Long;
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use SPVM::Build;
+use SPVM::Build::ExtUtil;
+
+my $extutil= SPVM::Build::ExtUtil->new;
 
 my $ivsize = $Config{ivsize};
 if ($ivsize < 8) {
@@ -19,7 +21,7 @@ my $debug;
 GetOptions('d' => \$debug);
 
 # Edit CCFLAGS
-my $ccflags = "$Config{ccflags} -Wall -Wextra -std=c99";
+my $ccflags = "$Config{ccflags} " . $extutil->extra_compiler_flags;
 
 WriteMakefile(
     NAME              => 'SPVM',
@@ -31,7 +33,7 @@ WriteMakefile(
     LIBS              => ['-lm'], # e.g., '-lm'
     INC               => '-I. -Ilib/SPVM', # e.g., '-I. -I/usr/include/other'
     CCFLAGS => $ccflags,
-    OPTIMIZE => '-O3',
+    OPTIMIZE => $extutil->optimize,
     OBJECT            => '$(O_FILES)', # link all the C files too
     $debug ? (DEFINE => '-DDEBUG') : (),
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
@@ -40,19 +42,18 @@ WriteMakefile(
 
 # Add Build shared library make rule
 sub MY::postamble {
-  my $spvm_build = SPVM::Build->new;
   
   my @module_names = qw(
     SPVM::Std::IO
     SPVM::Std::Time
     SPVM::Std::Math
-    SPVM::Std::Arrays
+    SPVM::Std::Array::Util
     SPVM::Std::Number::Util
   );
   
   my $make_rule = '';
   for my $module_name (@module_names) {
-    $make_rule .= $spvm_build->create_build_shared_lib_make_rule($module_name);
+    $make_rule .= $extutil->create_build_shared_lib_make_rule($module_name);
   }
   
   return $make_rule;

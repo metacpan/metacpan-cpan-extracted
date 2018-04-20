@@ -254,7 +254,7 @@ sub _build_authority ($self) {
 sub _build_userinfo_b64 ($self) {
     return q[] if $self->{userinfo} eq q[];
 
-    return P->data->to_b64_url( URI::Escape::XS::decodeURIComponent( $self->{userinfo} ) );
+    return P->data->to_b64( URI::Escape::XS::decodeURIComponent( $self->{userinfo} ), q[] );
 }
 
 sub _build_username ($self) {

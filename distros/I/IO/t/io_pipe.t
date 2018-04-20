@@ -3,14 +3,7 @@
 my $perl;
 
 BEGIN {
-    unless(grep /blib/, @INC) {
-	$perl = './perl';
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-    else {
-	$perl = $^X;
-    }
+    $perl = $^X;
 }
 
 use Config;
@@ -115,7 +108,11 @@ if ($is_win32) {
   $stdout = bless \*STDOUT, "IO::Handle";
   $stdout->fdopen($pipe,"w");
   print STDOUT "not ok 7\n";
-  exec 'echo', 'not ok 8';
+  my @echo = 'echo';
+  if ( $^O =~ /android/ ) {
+     @echo = ('sh', '-c', q{echo $@}, '--');
+  }
+  exec @echo, 'not ok 8';
  }
     else
  {

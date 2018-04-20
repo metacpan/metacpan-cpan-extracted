@@ -200,6 +200,8 @@ sub _error ( $self, $errno, $fatal = undef, $message = undef ) {
 
 sub DESTROY ($self) {
     if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
+        $self->{proxy}->finish_thread if defined $self->{proxy};
+
         $self->SUPER::DESTROY;
     }
 
@@ -573,25 +575,25 @@ sub get_connect ($connect) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 210                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
-## |      | 336                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
+## |      | 212                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
+## |      | 338                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 246, 247             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 248, 249             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 49                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 161                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 283                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 285                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 601                  | * Link L<AnyEvent::Handle> on line 607 does not specify text                                                   |
-## |      | 601                  | * Link L<AnyEvent::Handle> on line 615 does not specify text                                                   |
-## |      | 601                  | * Link L<AnyEvent::Handle> on line 643 does not specify text                                                   |
-## |      | 601                  | * Link L<AnyEvent::Handle> on line 659 does not specify text                                                   |
-## |      | 601                  | * Link L<AnyEvent::Socket> on line 659 does not specify text                                                   |
-## |      | 601, 601             | * Link L<Pcore::Proxy> on line 625 does not specify text                                                       |
-## |      | 601                  | * Link L<Pcore::Proxy> on line 659 does not specify text                                                       |
+## |      | 603                  | * Link L<AnyEvent::Handle> on line 609 does not specify text                                                   |
+## |      | 603                  | * Link L<AnyEvent::Handle> on line 617 does not specify text                                                   |
+## |      | 603                  | * Link L<AnyEvent::Handle> on line 645 does not specify text                                                   |
+## |      | 603                  | * Link L<AnyEvent::Handle> on line 661 does not specify text                                                   |
+## |      | 603                  | * Link L<AnyEvent::Socket> on line 661 does not specify text                                                   |
+## |      | 603, 603             | * Link L<Pcore::Proxy> on line 627 does not specify text                                                       |
+## |      | 603                  | * Link L<Pcore::Proxy> on line 661 does not specify text                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 45, 50               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

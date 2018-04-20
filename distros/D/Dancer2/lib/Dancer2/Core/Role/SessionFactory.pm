@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::SessionFactory;
 # ABSTRACT: Role for session factories
-$Dancer2::Core::Role::SessionFactory::VERSION = '0.205002';
+$Dancer2::Core::Role::SessionFactory::VERSION = '0.206000';
 use Moo::Role;
 with 'Dancer2::Core::Role::Engine';
 
@@ -149,6 +149,11 @@ sub create {
     }
 }
 
+sub validate_id {
+    my ($self, $id) = @_;
+    return $id =~ m/^[A-Za-z0-9_\-~]+$/;
+}
+
 requires '_retrieve';
 
 sub retrieve {
@@ -157,9 +162,13 @@ sub retrieve {
 
     $self->execute_hook( 'engine.session.before_retrieve', $id );
 
-    my $data = eval { $self->_retrieve($id) };
+    my $data;
+    # validate format of session id before attempt to retrieve
+    my $rc = eval {
+        $self->validate_id($id) && ( $data = $self->_retrieve($id) );
+    };
     croak "Unable to retrieve session with id '$id'"
-      if $@;
+      if ! $rc;
 
     my %args = ( id => $id, );
 
@@ -282,7 +291,7 @@ Dancer2::Core::Role::SessionFactory - Role for session factories
 
 =head1 VERSION
 
-version 0.205002
+version 0.206000
 
 =head1 DESCRIPTION
 
@@ -368,6 +377,16 @@ This method is used internally by create() to set the session ID.
 
 This method does not need to be implemented in the class unless an
 alternative method for session ID generation is desired.
+
+=head2 validate_id
+
+Returns true if a session id is of the correct format, or false otherwise.
+
+By default, this ensures that the session ID is a string of characters
+from the Base64 schema for "URL Applications" plus the C<~> character.
+
+This method does not need to be implemented in the class unless an
+alternative set of characters for session IDs is desired.
 
 =head2 retrieve
 
@@ -476,7 +495,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexis Sukrieh.
+This software is copyright (c) 2018 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

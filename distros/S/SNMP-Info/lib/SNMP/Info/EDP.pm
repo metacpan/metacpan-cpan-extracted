@@ -34,12 +34,12 @@ use strict;
 use Exporter;
 use SNMP::Info;
 
-@SNMP::Info::LLDP::ISA       = qw/SNMP::Info Exporter/;
-@SNMP::Info::LLDP::EXPORT_OK = qw//;
+@SNMP::Info::EDP::ISA       = qw/SNMP::Info Exporter/;
+@SNMP::Info::EDP::EXPORT_OK = qw//;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 %MIBS = (
     'EXTREME-EDP-MIB'   => 'extremeEdpPortIfIndex',
