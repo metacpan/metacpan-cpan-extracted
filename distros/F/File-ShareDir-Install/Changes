@@ -1,5 +1,8 @@
 Revision history for File-ShareDir-Install.
 
+0.13      2018-04-22 08:19:00Z
+    - re-instate testrules.yml file to force serialize testing
+
 0.12      2018-04-20 11:00:09Z
     - add rules files for 'prove' and Test::Harness to specify that tests need
       to be run serially for now

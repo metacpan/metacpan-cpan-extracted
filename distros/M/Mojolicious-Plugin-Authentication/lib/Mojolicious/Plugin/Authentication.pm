@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 package Mojolicious::Plugin::Authentication;
-$Mojolicious::Plugin::Authentication::VERSION = '1.32';
+$Mojolicious::Plugin::Authentication::VERSION = '1.33';
 use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
@@ -167,11 +167,11 @@ Mojolicious::Plugin::Authentication - A plugin to make authentication a bit easi
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Plugin::Authentication
+    use Mojolicious::Plugin::Authentication;
 
     $self->plugin('authentication' => {
         autoload_user   => 1,
@@ -320,7 +320,7 @@ coderef you pass to the C<validate_user> configuration key has the following
 signature:
 
     sub {
-        my ($app, $username, $password, $extradata) = @_;
+        my ($c, $username, $password, $extradata) = @_;
         ...
         return $uid;
     }

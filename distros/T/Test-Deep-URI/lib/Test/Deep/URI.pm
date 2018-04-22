@@ -3,30 +3,57 @@ package Test::Deep::URI;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-# ABSTRACT:
+# ABSTRACT: Easier testing of URIs for Test::Deep
 
 use base qw(Exporter::Tiny);
-our @EXPORT = qw(uri);
+our @EXPORT = qw(uri uri_qf);
 
-use Test::Deep::Cmp; # exports "new", other stuff.
 use URI;
 use Test::Deep ();
+use Test::Deep::Cmp; # exports "new", other stuff.
 
-sub uri { __PACKAGE__->new(@_); }
+
+################################################################################
+
+sub uri {
+    my ($expected_uri) = @_;
+    return __PACKAGE__->new($expected_uri);
+}
+
+sub uri_qf {
+    my ($expected_uri, $expected_query_form) = @_;
+    my $self = __PACKAGE__->new($expected_uri, $expected_query_form);
+}
 
 sub init
 {
-    my ($self, $uri) = @_;
-    warn "Missing arguement to uri()!" unless defined $uri;
+    my ($self, $expected_uri, $expected_query_form) = @_;
+
+    my $is_deep_qf = scalar(@_) == 3;
+
+    if (! $is_deep_qf && ! defined $expected_uri) {
+        warn "Missing argument to uri()!";
+    }
+    elsif ($is_deep_qf) {
+        warn "Missing uri for uri_qf()!"
+            unless defined $expected_uri;
+        warn "Missing query form for uri_qf()!"
+            unless defined $expected_query_form;
+    }
+
     # URI objects act a little weird on URIs like "//host/path".
     # "/path" can be pulled via path(), but host() dies. Thus I'm
     # copying the host string if necessary.
-    if (($uri || '') =~ m{//([^/]+)/}) {
+    if (($expected_uri || '') =~ m{//([^/]+)/}) {
         $self->{host} = $1;
     }
-    $self->{uri} = URI->new($uri);
+    $self->{uri} = URI->new($expected_uri);
+    if ($is_deep_qf) {
+        $self->{is_deep_qf} = $is_deep_qf;
+        $self->{expected_qf} = $expected_query_form;
+    }
 }
 
 sub descend
@@ -49,7 +76,7 @@ sub descend
     push @methods, fragment => $uri->fragment;
 
     my @expected = (
-        _to_hashref([ $uri->query_form ]),
+        $self->_get_expected_qf(),
         Test::Deep::methods(@methods)
     );
     my @received = (
@@ -70,9 +97,16 @@ sub descend
     return Test::Deep::wrap(\@expected)->descend(\@received);
 }
 
+sub _get_expected_qf {
+    my ($self) = @_;
+    return $self->{expected_qf}
+        if exists $self->{expected_qf};
+    return _to_hashref([ $self->{uri}->query_form ]);
+}
+
 sub _to_hashref
 {
-    my $list = shift;
+    my ($list) = @_;
     my %hash;
     while (my ($key, $val) = splice(@$list, 0, 2))
     {
@@ -96,26 +130,34 @@ __END__
 
 Test::Deep::URI - Easier testing of URIs for Test::Deep
 
+=for markdown [![Build Status](https://travis-ci.org/nfg/Test-Deep-URI.svg?branch=master)](https://travis-ci.org/nfg/Test-Deep-URI)
+
 =head1 SYNOPSIS
 
-  use Test::Deep;
-  use Test::Deep::URI;
+    use Test::Deep;
+    use Test::Deep::URI;
 
-  $testing_url = "http://site.com/path?a=1&b=2";
-  cmp_deeply(
-    $testing_url,
-    all(
-      uri("http://site.com/path?a=1&b=2"),
-      # or
-      uri("//site.com/path?a=1&b=2"),
-      # or
-      uri("/path?b=2&a=1"),
-    )
-  );
+    $testing_url = "http://site.com/path?a=1&b=2";
+    cmp_deeply(
+        $testing_url,
+        all(
+            uri("http://site.com/path?a=1&b=2"),
+            # or
+            uri("//site.com/path?a=1&b=2"),
+            # or
+            uri("/path?b=2&a=1"),
+        )
+    );
+
+    cmp_deeply(
+        $testing_url,
+        uri_qf("/path", { a => 1, b => ignore() }),
+    );
 
 =head1 DESCRIPTION
 
-Test::Deep::URI provides the function C<uri($expected)> for L<Test::Deep>.
+Test::Deep::URI provides the functions C<uri($expected)> and
+C<uri_qf($expected, $query_form)> for L<Test::Deep>.
 Use it in combination with C<cmp_deeply> to test against partial URIs.
 
 In particular I wrote this because I was tired of stumbling across unit
@@ -133,6 +175,15 @@ for duplicate parameters.
 Exported by default.
 
 I<$expected> should be a string that can be passed to C<URI-E<gt>new()>.
+
+=item uri_qf($expected, $query_form)
+
+Exported by default.
+
+I<$expected> should be a string that can be passed to C<URI-E<gt>new()>.
+
+I<$query_form> should be whatever structure you want to check the query
+form against.
 
 =back
 

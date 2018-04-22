@@ -1,5 +1,9 @@
 Revision history for Task-BeLike-DAGOLDEN
 
+1.011     2018-04-21 22:41:52+02:00 Europe/Oslo
+
+    - removed File::Slurp
+
 1.010     2015-02-02 11:29:16-05:00 America/New_York
 
     - add cpanlistoutdated, cpanoutdated, Moo, namespace::clean,

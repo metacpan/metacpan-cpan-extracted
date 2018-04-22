@@ -16,6 +16,7 @@ t/cfg-for-parse.t
 t/clean.t
 t/clean-crash.t
 t/extra-quote.t
+t/html_fragment_tidy_ok.t
 t/html_tidy_ok.t
 t/ignore-text.t
 t/ignore.t

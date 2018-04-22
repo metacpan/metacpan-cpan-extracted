@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::smoke 6.011;
+package Dist::Zilla::App::Command::smoke 6.012;
 # ABSTRACT: smoke your dist
 
 use Dist::Zilla::App -command;
@@ -78,7 +78,7 @@ Dist::Zilla::App::Command::smoke - smoke your dist
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "git",
       "wrapper"
@@ -80,8 +80,10 @@
          "web" : "https://github.com/book/Git-Repository"
       }
    },
-   "version" : "1.321",
+   "version" : "1.322",
    "x_contributors" : [
+      "H.Merijn Brand <hmbrand@cpan.org>",
+      "Jan Pazdziora <janpaz@cpan.org>",
       "Ron Savage <rsavage@cpan.org>",
       "Samit Badle <Samit.Badle@gmail.com>",
       "Lisa Hansen <Lisa.Hansen@sas.com>",
@@ -107,6 +109,6 @@
       "Alessandro Ghedini <alexbio@cpan.org>",
       "Gustavo Leite de Mendon\u00e7a Chaves <gnustavo@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

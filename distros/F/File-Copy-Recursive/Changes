@@ -1,5 +1,14 @@
 Revision history for Perl extension File::Copy::Recursive.
 
+0.43 Sat Apr 21 15:39:09 2018
+    - pull request #16 - strip down list of prerequisites to modules that are safe to use high on
+      the CPAN river (thanks karenetheridge)
+
+0.42 Fri Apr 20 23:42:41 2018
+    - rt 125136 - reinstate 5.8 compat by not using // operator in the new unc test (thanks SREZIC)
+    - pull request #14 - Add .gitignore. (thanks jkeenan)
+    - pull request #13 - File::Find::Rule is used in the test suite but not named as a prequisite in Makefile.PL. (thanks jkeenan)
+
 0.41 Thu Apr 19 15:58:12 2018
     - Issue #10 and #8: fix Makefile.PL; add github metadata (thanks karenetheridge and chorny)
     - Issue #11: Fix the test failure described in RT#123964 (thanks tomhukins and SREZIC)

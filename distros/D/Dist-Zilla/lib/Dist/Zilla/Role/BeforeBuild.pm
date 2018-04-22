@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::BeforeBuild 6.011;
+package Dist::Zilla::Role::BeforeBuild 6.012;
 # ABSTRACT: something that runs before building really begins
 
 use Moose::Role;
@@ -29,7 +29,7 @@ Dist::Zilla::Role::BeforeBuild - something that runs before building really begi
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 DESCRIPTION
 

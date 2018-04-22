@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Role::Entity;
 # ABSTRACT: A role for MetaCPAN entities
-$MetaCPAN::Client::Role::Entity::VERSION = '2.023000';
+$MetaCPAN::Client::Role::Entity::VERSION = '2.024000';
 use Moo::Role;
 
 use JSON::PP;
@@ -34,7 +34,7 @@ sub BUILDARGS {
             if is_arrayref( $args{data}{$k} ) and @{$args{data}{$k}} == 1;
 
         if ( JSON::PP::is_bool($args{data}{$k}) ) {
-            $args{data}{$k} = JSON::PP::true == $args{data}{$k} ? 1 : 0;
+            $args{data}{$k} = !!$args{data}{$k};
         }
         elsif ( is_ref( $args{data}{$k} ) ) {
             delete $args{data}{$k};
@@ -89,7 +89,7 @@ MetaCPAN::Client::Role::Entity - A role for MetaCPAN entities
 
 =head1 VERSION
 
-version 2.023000
+version 2.024000
 
 =head1 DESCRIPTION
 

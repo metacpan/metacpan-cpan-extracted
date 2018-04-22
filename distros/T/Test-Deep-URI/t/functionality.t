@@ -38,14 +38,19 @@ cmp_deeply(
     'Can match partial URIs against each other',
 );
 
-cmp_deeply(
-    'tel:+1-555-123-1234',
-    all(
-        uri('tel:+1-555-123-1234'),
-        uri('+1-555-123-1234'),
-    ),
-    "Works with tel URIs"
-);
+SKIP: {
+    skip 'URI::tel objects behave weirdly. See URI::tel\'s RT#124996', 1
+        if eval { require URI::tel; 1 };
+
+    cmp_deeply(
+        'tel:+1-555-123-1234',
+        all(
+            uri('tel:+1-555-123-1234'),
+            uri('+1-555-123-1234'),
+        ),
+        "Works with tel URIs"
+    );
+} # end skip block.
 
 cmp_deeply(
     'file:///home/user/foo',

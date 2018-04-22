@@ -62,9 +62,10 @@
          "web" : "https://github.com/polettix/YAML-Dump"
       }
    },
-   "version" : "1.82",
+   "version" : "1.84",
    "x_contributors" : [
-      "Flavio Poletti <flavio@polettix.it>"
+      "Flavio Poletti <flavio@polettix.it>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }

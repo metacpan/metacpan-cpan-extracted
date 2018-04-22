@@ -1,14 +1,28 @@
---- #YAML:1.0
-name:                XML-FeedPP
-version:             0.43
-abstract:            ~
-license:             perl
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Test::More:                    0
-    XML::TreePP:                   0.39
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-FeedPP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  XML::TreePP: '0.39'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kawanet/XML-FeedPP.git
+version: '0.95'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

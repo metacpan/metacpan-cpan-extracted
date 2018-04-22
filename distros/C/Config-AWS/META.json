@@ -44,7 +44,7 @@
          "requires" : {
             "File::Share" : "0",
             "File::ShareDir" : "0",
-            "Log::Any::Adapter" : "0",
+            "File::ShareDir::Install" : "0.10",
             "Path::Tiny" : "0.076",
             "Test2::Tools::Spec" : "0",
             "Test2::V0" : "0",
@@ -55,7 +55,7 @@
    "provides" : {
       "Config::AWS" : {
          "file" : "lib/Config/AWS.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://gitlab.com/jjatria/Config-AWS"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

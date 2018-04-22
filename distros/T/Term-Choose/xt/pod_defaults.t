@@ -5,10 +5,10 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Test::More;
 
 
-my @long = ( qw( pad empty undef ll default max_height max_width lf keep no_spacebar mark ) );
-my @simple = ( qw( justify layout order clear_screen page mouse beep hide_cursor index ) ); # prompt
+my @long = qw( pad empty undef ll default max_height max_width lf keep no_spacebar mark );
+my @simple = qw( justify layout order clear_screen page mouse beep hide_cursor index ); # prompt
 my @all = ( @long, @simple );
-my @skip = ( qw( info ) );
+my @skip = qw(info prompt include_highlighted);
 
 
 plan tests => 2 + scalar @all;
@@ -23,7 +23,7 @@ while ( my $line = <$fh> ) {
     if ( $line =~ /^sub __defaults \{/ .. $line =~ /^\}/ ) {
         if ( $line =~ m|^\s+#?\s*(\w+)\s+=>\s(\S+),| ) {
             my $op = $1;
-            next if $op eq 'prompt';
+            #next if $op eq 'prompt';
             next if $op ~~ @skip;
             $option_default{$op} = $2;
             $option_default{$op} =~ s/^undef\z/undefined/;

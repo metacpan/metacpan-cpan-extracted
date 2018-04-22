@@ -254,13 +254,13 @@ if ($version =~ /^\./) {
 if ($perlformance_local) {
         $giturl             = ".";
         @default_modules    = qw(Benchmark::Perl::Formance);
-        @default_mirrors    = qw(http://perlformance.net/PINTO/perlformance/);
+        @default_mirrors    = "file://".$ENV{HOME}."/CPAN/";
         @default_runscripts = qw(benchmark-perlformance);
         @default_runargs    = ("--plugins=Fib,FibOO,DPath,Mem,Rx,Shootout::fasta,Shootout::binarytrees,Shootout::nbody,Shootout::spectralnorm");
 }
 if ($perlformance or $perlformance_report) {
         @default_modules    = qw(Task::PerlFormance);
-        @default_mirrors    = qw(http://perlformance.net/PINTO/perlformance/);
+        @default_mirrors    = "file://".$ENV{HOME}."/CPAN/";
         @default_runscripts = qw(benchmark-perlformance);
         @default_runargs    = qw(--plugins=ALL);
 }
@@ -583,7 +583,7 @@ sub cpan_command {
         print $LOGFILE "cpan_command ", $cmd, "\n";
         print $CPAN_COMMAND $cmd, "\n";
         my $rc = <$CPAN_OUTPUT>;
-        defined $rc || die "could not get cpan helper output";
+        defined $rc || die "no more cpan output - module installation problem? check ~/.bootstrapperl/bootstrap-perl-build/cpan_helper.log";
         chomp $rc;
         $rc == 0 || die "rc is $rc";
 }
@@ -591,6 +591,15 @@ sub cpan_command {
 sub bin_cpan { $bin_cpan || "" }
 
 # ========== cpan ==========
+
+sub install_cpan_module {
+        my ($perl, $cpan, $cfg, $force, $module) = @_;
+
+        my $_f = $force ? "-f" : "";
+        if (system "$perl -M$module -e1 2> /dev/null") { # remember shell bool logic, exitcode!=0 means fail means we install
+            print_and_system qq{$cpan -j $cfg $_f -i $module};
+        }
+}
 
 if ($cpan)
 {
@@ -667,9 +676,9 @@ if ($cpan)
         print $USER "*** INSTALL cpan dependencies\n";
 
         # install extended cpan toolchain; contains some "force" where we know they are really required
-        print_and_system qq{if ! $PERL -MExtUtils::Config -e1 ; then $bin_cpan -j $CFG -f -i ExtUtils::Config ; fi };
-        print_and_system qq{if ! $PERL -MYAML::XS         -e1 ; then $bin_cpan -j $CFG -f -i YAML::XS         ; fi };
-        print_and_system qq{if ! $PERL -MYAML             -e1 ; then $bin_cpan -j $CFG -f -i YAML             ; fi };
+        install_cpan_module($PERL, $bin_cpan, $CFG, 1, "ExtUtils::Config");
+        install_cpan_module($PERL, $bin_cpan, $CFG, 1, "YAML::XS");
+        install_cpan_module($PERL, $bin_cpan, $CFG, 1, "YAML");
 
         # try really hard with some modules until we find a version
         # that fits currrent Perl
@@ -696,7 +705,7 @@ if ($cpan)
                 foreach my $dist (@{$mod_dists{$mod}}) {
                         print_and_system qq{if ! $PERL -M$mod -e1 ; then $bin_cpan -j $CFG $dist ; fi };
                 }
-                print_and_system qq{if ! $PERL -M$mod -e1 ; then $bin_cpan -j $CFG -f -i $mod ; fi };
+                install_cpan_module($PERL, $bin_cpan, $CFG, 1, $mod);
         }
 
         print_and_system qq{if ! $PERL -MIO::Compress::Base -e1 ; then $bin_cpan -j $CFG -f -i IO::Compress::Base ; fi };
@@ -715,12 +724,11 @@ if ($cpan)
 
         # install dependencies needed for CPAN itself
         foreach my $module (qw(version YAML::Syck IO::Tty Expect LWP Task::Bootstrap::Perl)) {
-                print $USER "$module\n";
-                print_and_system qq{if ! $PERL -M$module -e1 ; then $bin_cpan -j $CFG -f -i $module ; fi };
+                install_cpan_module($PERL, $bin_cpan, $CFG, 1, $module);
         }
         if ($perlformance || $perlformance_report) {
                 print $USER "AAAA::Mail::SpamAssassin (for Benchmark::Perl::Formance)\n";
-                print_and_system qq{if ! $PERL -MAAAA::Mail::SpamAssassin -e1 ; then $bin_cpan -j $CFG -f -i AAAA::Mail::SpamAssassin ; fi };
+                install_cpan_module($PERL, $bin_cpan, $CFG, 1, "AAAA::Mail::SpamAssassin");
         }
 
         # install requested modules from CPAN
@@ -728,7 +736,7 @@ if ($cpan)
                 print_and_system qq!$bin_cpan -j $CFG -i $module!;
                 if ($module =~ qr/^(Benchmark::Perl::Formance|Mail::SPF)$/) {
                         # That's the whole deal, so we force it.
-                        print_and_system qq{if ! $PERL -M$module -e1 ; then $bin_cpan -j $CFG -f -i $module ; fi };
+                        install_cpan_module($PERL, $bin_cpan, $CFG, 1, $module);
                 }
         }
 } else {
@@ -736,8 +744,11 @@ if ($cpan)
 } # if ($cpan)
 
 # Run scripts from inside the just installed Perl
+print $USER "*** RUN scripts - output redirected to $logfile\n" if @RUNSCRIPTS;
 foreach my $runscript (@RUNSCRIPTS) {
-        print_and_system qq!$PREFIX/bin/$runscript !.join(" ", @RUNARGS);
+        my $cmd = qq!$PREFIX/bin/$runscript !.join(" ", @RUNARGS);
+        print $USER "# $cmd\n";
+        print_and_system $cmd;
 }
 
 =pod
@@ -997,7 +1008,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Steffen Schwigon.
+This software is copyright (c) 2018 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

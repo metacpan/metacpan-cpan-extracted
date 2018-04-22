@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller::HTML::FormFu';
 
-__PACKAGE__->config(
-    { 'Controller::HTML::FormFu' => { request_token_enable => 1 } } );
+__PACKAGE__->config( { 'Controller::HTML::FormFu' => { request_token_enable => 1 } } );
 
 sub multiformtoken : Chained : CaptureArgs(0) {
     my ( $self, $c ) = @_;
@@ -13,8 +12,7 @@ sub multiformtoken : Chained : CaptureArgs(0) {
     $c->stash->{template} = 'multiform.tt';
 }
 
-sub formconfig : Chained('multiformtoken') : Args(0) :
-    MultiFormConfig('multiform/formconfig') {
+sub formconfig : Chained('multiformtoken') : Args(0) : MultiFormConfig('multiform/formconfig') {
     my ( $self, $c ) = @_;
 
     my $multi = $c->stash->{multiform};
@@ -22,8 +20,7 @@ sub formconfig : Chained('multiformtoken') : Args(0) :
     if ( $multi->complete ) {
         my $params = $multi->current_form->params;
 
-        $c->stash->{results} = join "\n",
-            map { sprintf "%s: %s", $_, $params->{$_} } keys %$params;
+        $c->stash->{results} = join "\n", map { sprintf "%s: %s", $_, $params->{$_} } keys %$params;
 
         $c->stash->{message} = 'Complete';
     }

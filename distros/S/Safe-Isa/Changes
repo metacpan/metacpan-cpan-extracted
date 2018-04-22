@@ -1,5 +1,9 @@
 Revision history for Safe-Isa
 
+1.000009 - 2018-04-21
+  - Fix handling of DOES and does (they no longer fall back to isa in most
+    situations outside of Moo/Moose)
+
 1.000008 - 2017-10-03
   - fix scalar/list context handling for $_call_if_can
 

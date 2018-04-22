@@ -1,7 +1,7 @@
 use strict;
 use warnings FATAL => 'all';
 use Test::More
-  $] < 5.008004 ? ( skip_all => "can't test extra loading on perl < 5.8.4" )
+  "$]" < 5.008004 ? ( skip_all => "can't test extra loading on perl < 5.8.4" )
                 : ( tests => 1 );
 use File::Spec;
 

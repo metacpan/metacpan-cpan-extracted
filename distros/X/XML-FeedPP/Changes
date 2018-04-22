@@ -1,4 +1,30 @@
-# XML::FeedPP Changes
+=== version history of XML::FeedPP
+
+version 0.95: Sat 21 Apr 01:15:08 CEST 2018
+    * fixed #35061: use guid for uniqueness, when available.
+      (thanks to avbidder)
+    * improved #58422: XML::FeedPP cannot be subclassed.
+      (thanks to bitcard)
+    * remove useless XML::FeedPP::Common layer
+    * fixed #71318: save use of timegm
+      (thanks to Brian Gomes Bascoy)
+    * fixed #72523: merge of items in channel changes guid
+      (thanks to Никулин Юрий)
+    * fixed #78407: Empty item in RSS-feed breaks processing
+      (thanks to colink)
+    * fixed #84798: forgot the 'use' in the documentation
+      (thanks to jidanny)
+    * fixed #87373: ignore namespace prefixes when you collect a value
+      (thanks to Jesse Quinn)
+    * fixed #124569: timegm should be called with 4-digit year
+      (thanks to bitcardbmw)
+    * fixed #125052: returns HASH for empty field
+      (thanks to Mark Overmeer)
+
+2011/05/09 (0.45_01) ** DEVELOPER RELEASE
+    * supports subclassing. t/47_subclass_content.t added.
+      https://rt.cpan.org/Public/Bug/Display.html?id=58422
+      (thanks to bitcard)
 
 2011/05/08 (0.43)
     * fixed #67268: Wrong return value of description() with xhtml content in atom feeds

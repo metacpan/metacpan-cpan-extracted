@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Assembler::GlobalConfig 6.011;
+package Dist::Zilla::MVP::Assembler::GlobalConfig 6.012;
 # ABSTRACT: Dist::Zilla::MVP::Assembler for global configuration
 
 use Moose;
@@ -59,7 +59,7 @@ Dist::Zilla::MVP::Assembler::GlobalConfig - Dist::Zilla::MVP::Assembler for glob
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 OVERVIEW
 

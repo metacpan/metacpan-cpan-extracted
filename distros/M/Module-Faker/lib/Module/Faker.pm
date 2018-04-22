@@ -1,6 +1,6 @@
 package Module::Faker;
 # ABSTRACT: build fake dists for testing CPAN tools
-$Module::Faker::VERSION = '0.017';
+$Module::Faker::VERSION = '0.018';
 use 5.008;
 use Moose 0.33;
 
@@ -11,7 +11,7 @@ use File::Next ();
 #pod =head1 SYNOPSIS
 #pod
 #pod   Module::Faker->make_fakes({
-#pod     source => './dir-of-specs',
+#pod     source => './dir-of-specs', # ...or a single file
 #pod     dest   => './will-contain-tarballs',
 #pod   });
 #pod
@@ -43,10 +43,82 @@ use File::Next ();
 #pod
 #pod   dist_class - the class used to fake dists; default: Module::Faker::Dist
 #pod
+#pod The source files are essentially a subset of CPAN::Meta files with some
+#pod optional extra features.  All the you really require are the name and
+#pod abstract.  Other bits like requirements can be specified and will be passed
+#pod through.  Out of the box the module will create the main module file based
+#pod on the module name and a single test file.  You can either use the provides
+#pod section of the CPAN::META file or to specify their contents use the
+#pod X_Module_Faker append section.
+#pod
+#pod The X_Module_Faker also allows you to alter the cpan_author from the
+#pod default 'LOCAL <LOCAL@cpan.local>' which overrides whatever is in the
+#pod usual CPAN::Meta file.
+#pod
+#pod Here is an example yaml specification from the tests,
+#pod
+#pod     name: Append
+#pod     abstract: nothing to see here
+#pod     provides:
+#pod       Provides::Inner:
+#pod         file: lib/Provides/Inner.pm
+#pod         version: 0.001
+#pod       Provides::Inner::Util:
+#pod         file: lib/Provides/Inner.pm
+#pod     X_Module_Faker:
+#pod       cpan_author: SOMEONE
+#pod       append:
+#pod         - file: lib/Provides/Inner.pm
+#pod           content: "\n=head1 NAME\n\nAppend - here I am"
+#pod         - file: t/foo.t
+#pod           content: |
+#pod             use Test::More;
+#pod         - file: t/foo.t
+#pod           content: "ok(1);"
+#pod
+#pod If you need to sort the packages within a file you
+#pod can use an X_Module_Faker:order parameter on the
+#pod provides class.
+#pod
+#pod     provides:
+#pod       Provides::Inner::Sorted::Charlie:
+#pod         file: lib/Provides/Inner/Sorted.pm
+#pod         version: 0.008
+#pod         X_Module_Faker:
+#pod           order: 2
+#pod       Provides::Inner::Sorted::Alfa:
+#pod         file: lib/Provides/Inner/Sorted.pm
+#pod         version: 0.001
+#pod         X_Module_Faker:
+#pod           order: 1
+#pod
+#pod The supported keys from CPAN::Meta are,
+#pod
+#pod =over
+#pod
+#pod =item *  abstract
+#pod
+#pod =item *  license
+#pod
+#pod =item *  name
+#pod
+#pod =item *  release_status
+#pod
+#pod =item *  version
+#pod
+#pod =item *  provides
+#pod
+#pod =item *  prereqs
+#pod
+#pod =item *  x_authority
+#pod
+#pod =back
+#pod
 #pod =cut
 
 has source => (is => 'ro', required => 1);
 has dest   => (is => 'ro', required => 1);
+has author_prefix => (is => 'ro', default => 0);
 
 has dist_class => (
   is  => 'ro',
@@ -61,7 +133,6 @@ sub BUILD {
   for (qw(source dest)) {
     my $dir = $self->$_;
     Carp::croak "$_ directory does not exist"     unless -e $dir;
-    Carp::croak "$_ directory is not a directory" unless -d $dir;
     Carp::croak "$_ directory is not readable"    unless -r $dir;
   }
 
@@ -77,7 +148,10 @@ sub make_fakes {
 
   while (my $file = $iter->()) {
     my $dist = $self->dist_class->from_file($file);
-    $dist->make_archive({ dir => $self->dest });
+    $dist->make_archive({
+      dir => $self->dest,
+      author_prefix => $self->author_prefix,
+    });
   }
 }
 
@@ -96,12 +170,12 @@ Module::Faker - build fake dists for testing CPAN tools
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
   Module::Faker->make_fakes({
-    source => './dir-of-specs',
+    source => './dir-of-specs', # ...or a single file
     dest   => './will-contain-tarballs',
   });
 
@@ -135,9 +209,112 @@ methods of the same name.  Valid arguments are:
 
   dist_class - the class used to fake dists; default: Module::Faker::Dist
 
+The source files are essentially a subset of CPAN::Meta files with some
+optional extra features.  All the you really require are the name and
+abstract.  Other bits like requirements can be specified and will be passed
+through.  Out of the box the module will create the main module file based
+on the module name and a single test file.  You can either use the provides
+section of the CPAN::META file or to specify their contents use the
+X_Module_Faker append section.
+
+The X_Module_Faker also allows you to alter the cpan_author from the
+default 'LOCAL <LOCAL@cpan.local>' which overrides whatever is in the
+usual CPAN::Meta file.
+
+Here is an example yaml specification from the tests,
+
+    name: Append
+    abstract: nothing to see here
+    provides:
+      Provides::Inner:
+        file: lib/Provides/Inner.pm
+        version: 0.001
+      Provides::Inner::Util:
+        file: lib/Provides/Inner.pm
+    X_Module_Faker:
+      cpan_author: SOMEONE
+      append:
+        - file: lib/Provides/Inner.pm
+          content: "\n=head1 NAME\n\nAppend - here I am"
+        - file: t/foo.t
+          content: |
+            use Test::More;
+        - file: t/foo.t
+          content: "ok(1);"
+
+If you need to sort the packages within a file you
+can use an X_Module_Faker:order parameter on the
+provides class.
+
+    provides:
+      Provides::Inner::Sorted::Charlie:
+        file: lib/Provides/Inner/Sorted.pm
+        version: 0.008
+        X_Module_Faker:
+          order: 2
+      Provides::Inner::Sorted::Alfa:
+        file: lib/Provides/Inner/Sorted.pm
+        version: 0.001
+        X_Module_Faker:
+          order: 1
+
+The supported keys from CPAN::Meta are,
+
+=over
+
+=item *  abstract
+
+=item *  license
+
+=item *  name
+
+=item *  release_status
+
+=item *  version
+
+=item *  provides
+
+=item *  prereqs
+
+=item *  x_authority
+
+=back
+
 =head1 AUTHOR
 
 Ricardo Signes <rjbs@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Colin Newell David Golden Steinbrunner Jeffrey Ryan Thalhammer Moritz Onken Randy Stauner
+
+=over 4
+
+=item *
+
+Colin Newell <colin.newell@gmail.com>
+
+=item *
+
+David Golden <dagolden@cpan.org>
+
+=item *
+
+David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
+
+=item *
+
+Moritz Onken <onken@netcubed.de>
+
+=item *
+
+Randy Stauner <randy@magnificent-tears.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

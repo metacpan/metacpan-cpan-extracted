@@ -5,8 +5,6 @@ use Config::AWS;
 use Path::Tiny qw( path );
 use File::Share qw( dist_dir );
 
-use Log::Any::Adapter 'Stderr';
-
 describe 'Config::AWS list_profiles tests' => sub {
 
     it 'Dies with unparseable arguments' => sub {
@@ -31,7 +29,7 @@ describe 'Config::AWS list_profiles tests' => sub {
             $input = undef;
             $result = ['default'];
         };
-#
+
         case 'Config from ENV' => sub {
             $ENV{AWS_SHARED_CREDENTIALS_FILE} = {}; # Not a file that exists
             $ENV{AWS_CONFIG_FILE} = $dir->child('config/.aws/config');

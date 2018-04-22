@@ -1,5 +1,5 @@
 package Git::Repository::Command;
-$Git::Repository::Command::VERSION = '1.321';
+$Git::Repository::Command::VERSION = '1.322';
 use strict;
 use warnings;
 use 5.006;

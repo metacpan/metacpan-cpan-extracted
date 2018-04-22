@@ -3,7 +3,7 @@ NAME
     programs
 
 VERSION
-    version 0.46
+    version 0.48
 
 SYNOPSIS
       use Capture::Tiny ':all';

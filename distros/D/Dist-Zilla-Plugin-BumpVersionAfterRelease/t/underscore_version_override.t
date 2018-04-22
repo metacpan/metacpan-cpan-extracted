@@ -33,10 +33,18 @@ my $tzil = Builder->from_config(
             ),
             # test files with the eval and without
             path(qw(source lib Foo.pm)) => "package Foo;\n\nour \$VERSION = '0.004_003'; # TRIAL\n\n1;\n",
-            path(qw(source lib Foo Bar.pm)) =>
-              "package Foo::Bar;\n\nour \$VERSION = '0.004_003';\n\$VERSION = eval \$VERSION;\n\n1;\n",
-            path(qw(source lib Foo Baz.pm)) =>
-              "package Foo::Baz;\n\nour \$VERSION = '0.004_003'; # TRIAL\n\$VERSION = eval \$VERSION;\n\n1;\n",
+            path(qw(source lib Foo Eval.pm)) =>
+              "package Foo::Eval;\n\nour \$VERSION = '0.004_003';\n\$VERSION = eval \$VERSION;\n\n1;\n",
+            path(qw(source lib Foo Eval Trial.pm)) =>
+              "package Foo::Eval::Trial;\n\nour \$VERSION = '0.004_003'; # TRIAL\n\$VERSION = eval \$VERSION;\n\n1;\n",
+            path(qw(source lib Foo Transliterate.pm)) =>
+              "package Foo::Transliterate;\n\nour \$VERSION = '0.004_003';\n\$VERSION =~ tr/_//d;\n\n1;\n",
+            path(qw(source lib Foo Transliterate Trial.pm)) =>
+              "package Foo::Transliterate::Trial;\n\nour \$VERSION = '0.004_003'; # TRIAL\n\$VERSION =~ tr/_//d;\n\n1;\n",
+            path(qw(source lib Foo Substitute.pm)) =>
+              "package Foo::Substitute;\n\nour \$VERSION = '0.004_003';\n\$VERSION =~ s/_//g;\n\n1;\n",
+            path(qw(source lib Foo Substitute Trial.pm)) =>
+              "package Foo::Substitute::Trial;\n\nour \$VERSION = '0.004_003'; # TRIAL\n\$VERSION =~ s/_//g;\n\n1;\n",
         },
     },
 );
@@ -53,15 +61,39 @@ is(
 );
 
 is(
-    path( $tzil->tempdir, qw(build lib Foo Bar.pm) )->slurp_utf8,
-    "package Foo::Bar;\n\nour \$VERSION = '0.005';\n\n1;\n",
+    path( $tzil->tempdir, qw(build lib Foo Eval.pm) )->slurp_utf8,
+    "package Foo::Eval;\n\nour \$VERSION = '0.005';\n\n1;\n",
     'eval line is removed and version reset',
 );
 
 is(
-    path( $tzil->tempdir, qw(build lib Foo Baz.pm) )->slurp_utf8,
-    "package Foo::Baz;\n\nour \$VERSION = '0.005';\n\n1;\n",
+    path( $tzil->tempdir, qw(build lib Foo Eval Trial.pm) )->slurp_utf8,
+    "package Foo::Eval::Trial;\n\nour \$VERSION = '0.005';\n\n1;\n",
     'TRIAL comment and eval line are removed and version reset',
+);
+
+is(
+    path( $tzil->tempdir, qw(build lib Foo Transliterate.pm) )->slurp_utf8,
+    "package Foo::Transliterate;\n\nour \$VERSION = '0.005';\n\n1;\n",
+    'tr line is removed and version reset',
+);
+
+is(
+    path( $tzil->tempdir, qw(build lib Foo Transliterate Trial.pm) )->slurp_utf8,
+    "package Foo::Transliterate::Trial;\n\nour \$VERSION = '0.005';\n\n1;\n",
+    'TRIAL comment and tr line are removed and version reset',
+);
+
+is(
+    path( $tzil->tempdir, qw(build lib Foo Substitute.pm) )->slurp_utf8,
+    "package Foo::Substitute;\n\nour \$VERSION = '0.005';\n\n1;\n",
+    'substitution line is removed and version reset',
+);
+
+is(
+    path( $tzil->tempdir, qw(build lib Foo Substitute Trial.pm) )->slurp_utf8,
+    "package Foo::Substitute::Trial;\n\nour \$VERSION = '0.005';\n\n1;\n",
+    'TRIAL comment and substiution line are removed and version reset',
 );
 
 is(
@@ -71,15 +103,39 @@ is(
 );
 
 is(
-    path( $tzil->tempdir, qw(source lib Foo Bar.pm) )->slurp_utf8,
-    "package Foo::Bar;\n\nour \$VERSION = '0.006';\n\n1;\n",
+    path( $tzil->tempdir, qw(source lib Foo Eval.pm) )->slurp_utf8,
+    "package Foo::Eval;\n\nour \$VERSION = '0.006';\n\n1;\n",
     '.pm contents in source saw the version incremented and eval removed',
 );
 
 is(
-    path( $tzil->tempdir, qw(source lib Foo Baz.pm) )->slurp_utf8,
-    "package Foo::Baz;\n\nour \$VERSION = '0.006';\n\n1;\n",
+    path( $tzil->tempdir, qw(source lib Foo Eval Trial.pm) )->slurp_utf8,
+    "package Foo::Eval::Trial;\n\nour \$VERSION = '0.006';\n\n1;\n",
     '.pm contents in source saw the version incremented and TRIAL and eval removed',
+);
+
+is(
+    path( $tzil->tempdir, qw(source lib Foo Transliterate.pm) )->slurp_utf8,
+    "package Foo::Transliterate;\n\nour \$VERSION = '0.006';\n\n1;\n",
+    '.pm contents in source saw the version incremented and tr removed',
+);
+
+is(
+    path( $tzil->tempdir, qw(source lib Foo Transliterate Trial.pm) )->slurp_utf8,
+    "package Foo::Transliterate::Trial;\n\nour \$VERSION = '0.006';\n\n1;\n",
+    '.pm contents in source saw the version incremented and TRIAL and tr removed',
+);
+
+is(
+    path( $tzil->tempdir, qw(source lib Foo Substitute.pm) )->slurp_utf8,
+    "package Foo::Substitute;\n\nour \$VERSION = '0.006';\n\n1;\n",
+    '.pm contents in source saw the version incremented and substitution removed',
+);
+
+is(
+    path( $tzil->tempdir, qw(source lib Foo Substitute Trial.pm) )->slurp_utf8,
+    "package Foo::Substitute::Trial;\n\nour \$VERSION = '0.006';\n\n1;\n",
+    '.pm contents in source saw the version incremented and TRIAL and substitution removed',
 );
 
 diag 'got log messages: ', explain $tzil->log_messages

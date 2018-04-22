@@ -1,5 +1,8 @@
 Revision history for CPAN-Testers-Common-Client
 
+0.14  2018-04-22
+      - fixed multiple bugs on older perls (Karen Etheridge)
+
 0.13  2016-04-24
       - fixed long path issue on Windows
 

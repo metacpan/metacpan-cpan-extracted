@@ -3,7 +3,7 @@ use strict;
 use DBI;
 
 use vars qw($VERSION);
-$VERSION = '0.18';
+$VERSION = '0.19';
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ DBIx::RunSQL - run SQL from a file
         verbose => 1,
     );
 
-    ... # run your tests with a DB setup fresh from setup.sql
+    # now run your tests with a DB setup fresh from setup.sql
 
 =head1 METHODS
 

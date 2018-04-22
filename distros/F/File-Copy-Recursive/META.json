@@ -43,10 +43,10 @@
             "File::Temp" : "0",
             "Path::Tiny" : "0",
             "Test::Deep" : "0",
-            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
             "Test::File" : "0",
-            "Test::More" : "0",
-            "Test::Warn" : "0"
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
          }
       }
    },
@@ -62,5 +62,5 @@
          "web" : "https://github.com/drmuey/p5-File-Copy-Recursive"
       }
    },
-   "version" : "0.41"
+   "version" : "0.43"
 }

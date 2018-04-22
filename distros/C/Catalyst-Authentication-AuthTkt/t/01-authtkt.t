@@ -1,6 +1,6 @@
 #!/usr/bin/env/perl
 use strict;
-use Test::More tests => 20;
+use Test::More tests => 21;
 
 use lib 't/MyApp/lib';
 use Catalyst::Test 'MyApp';
@@ -116,6 +116,7 @@ ok( my $used_tkt = $AAT->ticket(
     "create used ticket"
 );
 ok( $res = my_request("/?$cookie_name=$used_tkt"), "get / with used_tkt" );
+like $res->content, qr/Logged in as user catalyst-tester with roles/;
 
 #diag( dump $res );
 ok( my $cookies = extract_cookies($res), "extract cookies" );

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::NextRelease 6.011;
+package Dist::Zilla::Plugin::NextRelease 6.012;
 # ABSTRACT: update the next release number in your changelog
 
 use namespace::autoclean;
@@ -281,7 +281,7 @@ Dist::Zilla::Plugin::NextRelease - update the next release number in your change
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 SYNOPSIS
 

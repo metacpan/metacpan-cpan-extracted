@@ -1,6 +1,14 @@
 Revision history for Dist-Iller-Config-Author-Csson
 
-0.0320 2018-02-28 19:06:16 UTC
+0.0321 2018-04-22 10:24:57 UTC
+ [Config Changes]
+ - Move [PromptIfStale] to build phase.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 5 insertions(+), 4 deletions(-)
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0320 --> 0.0321
+
+0.0320 2018-02-28T19:06:16Z UTC
  [Config Changes]
  - Stop testing *prereq_matches use (due to unexpected failures)
 

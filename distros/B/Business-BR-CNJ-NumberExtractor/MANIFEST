@@ -4,3 +4,6 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/Business-BR-CNJ-NumberExtractor.t
+t/t1-risco-sucumbencia-a-prova-pericial-emprestada-Justica-Trabalho.html
+t/t2-INSS-nao-pode-exigir-carencia-casos-gravidez-risco-Decide-TRF4-sobre-auxilio-doenca.html
+t/t3-5-defesas-mais-comuns-numa-Acao-Cobranca.html

@@ -1,0 +1,91 @@
+{
+   "abstract" : "Implementation of the IndieWeb Webmention protocol",
+   "author" : [
+      "$author = $wm->author;"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Mention",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "LWP" : "0",
+            "Moose" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "MooseX::Enumeration" : "0",
+            "MooseX::Types::URI" : "0",
+            "Path::Class::Dir" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "Web::Microformats2::Parser" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Path::Class::Dir" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Web::Mention" : {
+         "file" : "lib/Web/Mention.pm",
+         "version" : "0.2"
+      },
+      "Web::Mention::Author" : {
+         "file" : "lib/Web/Mention/Author.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmacdotorg/webmention-perl/issues"
+      },
+      "homepage" : "https://github.com/jmacdotorg/webmention-perl",
+      "repository" : {
+         "url" : "git://github.com/jmacdotorg/webmention-perl.git",
+         "web" : "https://github.com/jmacdotorg/webmention-perl"
+      }
+   },
+   "version" : "0.2",
+   "x_contributors" : [
+      "JmacDotOrg <jmac@jmac.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

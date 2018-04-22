@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Config-IniFiles",
-  "dist_version" => "2.96",
+  "dist_version" => "2.98",
   "license" => "perl",
   "module_name" => "Config::IniFiles",
   "recursive_test_files" => 1,
@@ -45,7 +45,7 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Scalar::Util" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.88",
     "base" => 0,
     "lib" => 0,
     "parent" => 0
@@ -63,7 +63,7 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Scalar::Util" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.88",
   "base" => 0,
   "lib" => 0,
   "parent" => 0

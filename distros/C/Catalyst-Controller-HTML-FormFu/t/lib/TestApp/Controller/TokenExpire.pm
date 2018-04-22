@@ -5,13 +5,15 @@ use warnings;
 use Data::Dumper;
 use base 'Catalyst::Controller::HTML::FormFu';
 
-__PACKAGE__->config( {
-        'Controller::HTML::FormFu' => {
+__PACKAGE__->config(
+    {   'Controller::HTML::FormFu' => {
             request_token_session_key     => '_token',
             request_token_enable          => 1,
             request_token_field_name      => 'token',
             request_token_expiration_time => -10
-        } } );
+        }
+    }
+);
 
 sub tokenexpire : Chained : CaptureArgs(0) {
     my ( $self, $c ) = @_;

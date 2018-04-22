@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.02
+    version 2.04
 
 SYNOPSIS
 
@@ -478,27 +478,147 @@ CAVEATS
     any modifications to the form, such as adding or changing it's
     elements, you must call $form->process before rendering the form.
 
-GITHUB REPOSITORY
+AUTHORS
 
-    This module's sourcecode is maintained in a git repository at
-    git://github.com/fireartist/Catalyst-Controller-HTML-FormFu.git
+      * Carl Franks <cpan@fireartist.com>
 
-    The project page is
-    https://github.com/fireartist/Catalyst-Controller-HTML-FormFu
+      * Nigel Metheringham <nigelm@cpan.org>
 
-SEE ALSO
-
-    HTML::FormFu, Catalyst::Helper::HTML::FormFu
-
-AUTHOR
-
-    Carl Franks, cfranks@cpan.org
+      * Dean Hamstead <dean@bytefoundry.com.au>
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2007 by Carl Franks
+    This software is copyright (c) 2007-2018 by Carl Franks / Nigel
+    Metheringham / Dean Hamstead.
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself, either Perl version 5.8.8 or, at
-    your option, any later version of Perl 5 you may have available.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Catalyst::Controller::HTML::FormFu
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Catalyst-Controller-HTML-FormFu
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Catalyst-Controller-HTML-FormFu
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Controller-HTML-FormFu
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Catalyst-Controller-HTML-FormFu
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Catalyst-Controller-HTML-FormFu
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Catalyst-Controller-HTML-FormFu
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/Catalyst-Controller-HTML-FormFu
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/C/Catalyst-Controller-HTML-FormFu
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Catalyst-Controller-HTML-FormFu
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Catalyst::Controller::HTML::FormFu
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-catalyst-controller-html-formfu at rt.cpan.org, or through the web
+    interface at
+    https://rt.cpan.org/Public/Bug/Report.html?Queue=Catalyst-Controller-HTML-FormFu.
+    You will be automatically notified of any progress on the request by
+    the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/FormFu/Catalyst-Controller-HTML-FormFu
+
+      git clone https://github.com/FormFu/Catalyst-Controller-HTML-FormFu.git
+
+CONTRIBUTORS
+
+      * Aran Deltac <aran@ziprecruiter.com>
+
+      * bricas <brian.cassidy@gmail.com>
+
+      * dandv <ddascalescu@gmail.com>
+
+      * fireartist <fireartist@gmail.com>
+
+      * lestrrat <lestrrat+github@gmail.com>
+
+      * marcusramberg <marcus.ramberg@gmail.com>
+
+      * mariominati <mario.minati@googlemail.com>
+
+      * Moritz Onken <1nd@gmx.de>
+
+      * Moritz Onken <onken@netcubed.de>
+
+      * Nigel Metheringham <nm9762github@muesli.org.uk>
+
+      * omega <andreas.marienborg@gmail.com>
+
+      * Petr Písař <ppisar@redhat.com>
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.001
+    Version 0.002
 
 SYNOPSIS
 
@@ -32,7 +32,7 @@ USAGE
 
         Test::Pod::Links->new({
             ignore       => 'url_to_ignore',
-            ignore_match => qr{url to skip},
+            ignore_match => qr{url to ignore},
             ua           => HTTP::Tiny->new,
         });
 
@@ -61,7 +61,7 @@ USAGE
  pod_file_ok( FILENAME )
 
     This will run a test for parsing the Pod and another test for every web
-    link found in the Pod. It is therefore impossible to know the exact
+    link found in the Pod. It is therefore unlikely to know the exact
     number of tests that will run in advance. Use done_testing from
     Test::More if you call this test directly instead of a plan.
 
@@ -70,22 +70,27 @@ USAGE
 
  all_pod_files_ok( [ @entries ] )
 
-    Checks all the web links in all files under @entries. It runs
-    all_pod_files from Test::Pod on directories and assumes everything else
-    to be a file to be tested. It calls done_testing method for you, so you
-    can't have already called plan.
+    Checks all the web links in all files under @entries by calling
+    pod_file_ok on every file. Directories are recursive searched for files
+    containing Pod. Everything not a file and not a directory (e.g. a
+    symlink) is ignored. It calls done_testing or skip_all so you can't
+    have already called plan.
 
-    If @entries is empty or not passed, the method calls all_pod_files from
-    Test::Pod without arguments.
+    If @entries is empty default directories are searched for files
+    containing Pod. The default directories are blib, or lib if it doesn't
+    exist, bin and script.
 
-    all_pod_files_ok returns something true if all web links are reachable
-    and false otherwise.
+    The method contains_pod from Pod::Simple::Search is used to identify
+    files that contain Pod.
+
+    <all_pod_files_ok> returns something true if all web links are
+    reachable and false otherwise.
 
 EXAMPLES
 
  Example 1 Default Usage
 
-    Check the web links in all files in the lib directory.
+    Check the web links in all files in the bin, script and lib directory.
 
         use 5.006;
         use strict;
@@ -114,10 +119,10 @@ EXAMPLES
         }
 
         Test::Pod::Links->new->all_pod_files_ok(qw(
-            bin
             corpus/7_links.pod
             corpus/hello
             lib
+            tools
         ));
 
  Example 3 Specify a different user agent for HTTP::Tiny
@@ -238,8 +243,7 @@ RATIONALE
 
 SEE ALSO
 
-    HTTP::Tiny, Test::More, Test::Pod::LinkCheck, Test::Pod::No404s,
-    Test::Pod
+    HTTP::Tiny, Test::More, Test::Pod::LinkCheck, Test::Pod::No404s
 
 SUPPORT
 

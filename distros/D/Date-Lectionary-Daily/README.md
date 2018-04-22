@@ -2,7 +2,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 # VERSION
 
-Version 1.20180417
+Version 1.20180422
 
 # SYNOPSIS
 
@@ -93,9 +93,17 @@ Private method that returns an ArrayRef of strings for the lectionary readings a
 
 # AUTHOR
 
-Michael Wayne Arnold, `<marmanold at cpan.org>`
+Michael Wayne Arnold, `<michael at rnold.info>`
 
 # BUGS
+
+<div>
+    <a href="https://travis-ci.org/marmanold/Date-Lectionary-Daily"><img src="https://travis-ci.org/marmanold/Date-Lectionary-Daily.svg?branch=master"></a>
+</div>
+
+<div>
+    <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Daily?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Daily/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
 
 Please report any bugs or feature requests to `bug-date-lectionary-daily at rt.cpan.org`, or through
 the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary-Daily](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary-Daily).  I will be notified, and then you'll
@@ -129,7 +137,7 @@ You can also look for information at:
 
 Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
 
-# LICENSE BSD-2-Clause 
+# LICENSE
 
 Copyright 2017-2018 MICHAEL WAYNE ARNOLD
 

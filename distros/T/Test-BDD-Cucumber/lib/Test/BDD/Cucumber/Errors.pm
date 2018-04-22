@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Errors;
-$Test::BDD::Cucumber::Errors::VERSION = '0.54';
+$Test::BDD::Cucumber::Errors::VERSION = '0.56';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ Test::BDD::Cucumber::Errors - Consistently formatted errors
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 DESCRIPTION
 

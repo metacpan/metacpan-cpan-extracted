@@ -19,7 +19,7 @@
     local $@;
     my $source = '<dummy></dummy>';
     eval { XML::FeedPP->new( $source, -type => 'string' ); };
-    like( $@, qr/Invalid feed format/, 'Invalid XML type' );
+    like( $@, qr/Invalid.*feed format/, 'Invalid XML type' );
 }
 {
     local $@;

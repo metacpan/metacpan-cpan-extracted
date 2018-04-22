@@ -1,5 +1,14 @@
 Revision history for B-Hooks-EndOfScope
 
+0.24      2018-04-21 14:11:08Z
+  - no changes since last trial release
+
+0.23      2018-03-17 23:33:09Z (TRIAL RELEASE)
+  - improve use of constants in compile-time perl version checks
+
+0.22      2018-03-17 19:31:37Z (TRIAL RELEASE)
+  - Fix memory corruption on perls 5.8.0 - 5.8.3
+
 0.21      2016-05-25 18:34:46Z
   - work with Object::Remote by removing require() call on Tie::StdHash in PP
 

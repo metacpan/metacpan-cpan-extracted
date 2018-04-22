@@ -4,15 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
-use Carp ();
+use Carp       ();
+use File::Find ();
 use HTTP::Tiny 0.014 ();
+use Pod::Simple::Search     ();
 use Pod::Simple::SimpleTree ();
-use Safe::Isa qw($_can);
-use Test::Builder ();
-use Test::Pod     ();
-use URI           ();
+use Scalar::Util            ();
+use Test::Builder           ();
 
 my $TEST = Test::Builder->new();
 
@@ -24,36 +24,66 @@ my $TEST = Test::Builder->new();
 #   Test::Builder::Tester because TBT cannot test them.
 
 sub all_pod_files_ok {
-    my ( $self, @args ) = @_;
+    my $self = shift;
+
+    my @args = scalar @_ ? @_ : $self->_default_dirs();
+    if ( !@args ) {
+        $TEST->skip_all("No files found\n");
+        return 1;
+    }
 
     my @files;
-    if (@args) {
-        for my $file (@args) {
-            if ( -d $file ) {
-                push @files, Test::Pod::all_pod_files($file);
-            }
-            else {
-                push @files, $file;
-            }
+  ARG:
+    for my $arg (@args) {
+        if ( !-e $arg ) {
+            $TEST->carp("File '$arg' does not exist");
+            next ARG;
         }
-    }
-    else {
-        @files = Test::Pod::all_pod_files();
+
+        if ( -l $arg ) {
+            $TEST->carp("Ignoring symlink '$arg'");
+            next ARG;
+        }
+
+        if ( -f $arg ) {
+            push @files, $arg;
+            next ARG;
+        }
+
+        if ( !-d $arg ) {
+            $TEST->carp("File '$arg' is not a file nor a directory. Ignoring it.");
+            next ARG;
+        }
+
+        File::Find::find(
+            {
+                no_chdir   => 1,
+                preprocess => sub {
+                    my @sorted = sort grep { !-l "$File::Find::dir/$_" } @_;
+                    return @sorted;
+                },
+                wanted => sub {
+                    return if !-f $File::Find::name;
+                    push @files, $File::Find::name;
+                },
+            },
+            $arg,
+        );
     }
 
     if ( !@files ) {
-        if (@args) {
-            $TEST->skip_all("No files found in (@args)\n");
-        }
-        else {
-            $TEST->skip_all("No files found\n");
-        }
+        $TEST->skip_all("No files found in (@args)\n");
+        return 1;
+    }
 
+    my @pod_files = grep { Pod::Simple::Search->new->contains_pod($_) } @files;
+    if ( !@pod_files ) {
+        $TEST->skip_all("No files with Pod found in (@args)\n");
         return 1;
     }
 
     my $rc = 1;
-    for my $file ( sort @files ) {
+    for my $file (@pod_files) {
         if ( !$self->pod_file_ok($file) ) {
             $rc = 0;
         }
@@ -148,10 +178,8 @@ sub pod_file_ok {
     $TEST->ok( 1, $parse_msg );
 
     my @links =
-      map { $_->[1] }
-      grep { defined $_->[0] && $_->[0] =~ m{ ^ http (?:s)? $ }xsm }
-      map { [ URI->new($_)->scheme(), $_ ] }
-      map { ${ $_->{to} }[2] }
+      grep { defined && m{ ^ http(?:s)? :// }xsmi }
+      map  { ${ $_->{to} }[2] }
       grep { $_->{type} eq 'url' } $self->_extract_links_from_pod( $pod->root );
 
     my $ignore_regex = $self->_ignore_regex;
@@ -185,6 +213,29 @@ sub pod_file_ok {
 
     return 1 if $rc;
     return;
+}
+
+sub _default_dirs {
+    my ($self) = @_;
+
+    my @dirs;
+    if ( -d 'blib' ) {
+        push @dirs, 'blib';
+    }
+    elsif ( -d 'lib' ) {
+        push @dirs, 'lib';
+    }
+
+    if ( -d 'bin' ) {
+        push @dirs, 'bin';
+    }
+
+    if ( -d 'script' ) {
+        push @dirs, 'script';
+    }
+
+    my @sorted = sort @dirs;
+    return @sorted;
 }
 
 sub _extract_links_from_pod {
@@ -225,7 +276,7 @@ sub _ua {
 
     if (@_) {
         my $ua = shift;
-        Carp::croak q{ua must have method 'head'} if !$ua->$_can('head');
+        Carp::croak q{ua must have method 'head'} if !Scalar::Util::blessed($ua) || !$ua->can('head');
         $self->{_ua} = $ua;
     }
 
@@ -246,7 +297,7 @@ Test::Pod::Links - Test Pod for invalid HTTP/S links
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =head1 SYNOPSIS
 
@@ -273,7 +324,7 @@ with its arguments.
 
     Test::Pod::Links->new({
         ignore       => 'url_to_ignore',
-        ignore_match => qr{url to skip},
+        ignore_match => qr{url to ignore},
         ua           => HTTP::Tiny->new,
     });
 
@@ -303,7 +354,7 @@ agent.
 =head2 pod_file_ok( FILENAME )
 
 This will run a test for parsing the Pod and another test for every web link
-found in the Pod. It is therefore impossible to know the exact number of
+found in the Pod. It is therefore unlikely to know the exact number of
 tests that will run in advance. Use C<done_testing> from L<Test::More> if
 you call this test directly instead of a C<plan>.
 
@@ -312,22 +363,28 @@ and I<false> otherwise.
 
 =head2 all_pod_files_ok( [ @entries ] )
 
-Checks all the web links in all files under C<@entries>. It runs
-C<all_pod_files> from L<Test::Pod> on directories and assumes everything
-else to be a file to be tested. It calls C<done_testing> method for you,
-so you can't have already called C<plan>.
+Checks all the web links in all files under C<@entries> by calling
+C<pod_file_ok> on every file. Directories are recursive searched for files
+containing Pod. Everything not a file and not a directory (e.g. a symlink)
+is ignored. It calls C<done_testing> or C<skip_all> so you can't have
+already called plan.
 
-If C<@entries> is empty or not passed, the method calls C<all_pod_files>
-from L<Test::Pod> without arguments.
+If C<@entries> is empty default directories are searched for files
+containing Pod. The default directories are F<blib>, or F<lib> if it doesn't
+exist, F<bin> and F<script>.
 
-C<all_pod_files_ok> returns something I<true> if all web links are reachable
+The method C<contains_pod> from L<Pod::Simple::Search> is used to identify
+files that contain Pod.
+
+<all_pod_files_ok> returns something I<true> if all web links are reachable
 and I<false> otherwise.
 
 =head1 EXAMPLES
 
 =head2 Example 1 Default Usage
 
-Check the web links in all files in the F<lib> directory.
+Check the web links in all files in the F<bin>, F<script> and F<lib>
+directory.
 
     use 5.006;
     use strict;
@@ -356,10 +413,10 @@ Check the web links in all files in the F<lib> directory.
     }
 
     Test::Pod::Links->new->all_pod_files_ok(qw(
-        bin
         corpus/7_links.pod
         corpus/hello
         lib
+        tools
     ));
 
 =head2 Example 3 Specify a different user agent for L<HTTP::Tiny>
@@ -491,8 +548,7 @@ decide which URLs to skip over.
 
 =head1 SEE ALSO
 
-L<HTTP::Tiny>, L<Test::More>, L<Test::Pod::LinkCheck>, L<Test::Pod::No404s>,
-L<Test::Pod>
+L<HTTP::Tiny>, L<Test::More>, L<Test::Pod::LinkCheck>, L<Test::Pod::No404s>
 
 =head1 SUPPORT
 

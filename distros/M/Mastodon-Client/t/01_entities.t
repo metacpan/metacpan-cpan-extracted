@@ -1,8 +1,4 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::More;
+use Test2::V0;
 
 # Test data uses only minimum arguments for entity constructors
 # These were set as required only to aid in automatic detection,

@@ -13,3 +13,4 @@ CVS/
 ^blibdirs$
 .bak$
 ^MYMETA.*
+^.travis.yml

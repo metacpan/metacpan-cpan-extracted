@@ -72,102 +72,104 @@
       },
       "test" : {
          "requires" : {
-            "Test::Compile" : "0"
+            "Test::Compile" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0"
          }
       }
    },
    "provides" : {
       "Test::BDD::Cucumber::Definitions" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Base" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Base.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Base::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Base/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Base::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Base/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::File" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/File.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::File::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/File/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::File::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/File/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::HTTP" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/HTTP.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::HTTP::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/HTTP/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::HTTP::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/HTTP/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Struct" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Struct.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Struct::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Struct/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Struct::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Struct/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::TBCD::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/TBCD/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::TBCD::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/TBCD/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Types" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Types.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Validator" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Validator.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Var" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Var.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Var::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Var/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Var::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Var/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Zip" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Zip.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Zip::In" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Zip/In.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Test::BDD::Cucumber::Definitions::Zip::Ru" : {
          "file" : "lib/Test/BDD/Cucumber/Definitions/Zip/Ru.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       }
    },
    "release_status" : "stable",
@@ -181,7 +183,7 @@
          "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_contributors" : [
       "Mikhail Ivanov <m.ivanych@gmail.com>"
    ],

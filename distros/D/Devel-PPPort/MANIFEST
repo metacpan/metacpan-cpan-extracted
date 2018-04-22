@@ -9,7 +9,7 @@ devel/regenerate
 devel/scanprov
 HACKERS
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 mktests.PL
 module2.c
@@ -163,7 +163,9 @@ parts/inc/gv
 parts/inc/HvNAME
 parts/inc/limits
 parts/inc/magic
+parts/inc/magic_defs
 parts/inc/memory
+parts/inc/mess
 parts/inc/misc
 parts/inc/mPUSH
 parts/inc/MY_CXT
@@ -334,8 +336,6 @@ PPPort.xs
 ppport_h.PL
 PPPort_pm.PL
 PPPort_xs.PL
-README
-README.md
 soak
 t/call.t
 t/cop.t
@@ -347,6 +347,7 @@ t/HvNAME.t
 t/limits.t
 t/magic.t
 t/memory.t
+t/mess.t
 t/misc.t
 t/mPUSH.t
 t/MY_CXT.t
@@ -371,7 +372,6 @@ t/threads.t
 t/uv.t
 t/variables.t
 t/warn.t
-TODO
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

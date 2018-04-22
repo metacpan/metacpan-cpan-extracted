@@ -3,7 +3,7 @@ package Catalyst::Authentication::AuthTkt;
 use warnings;
 use strict;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 NAME
 

@@ -4,7 +4,8 @@ use warnings;
 
 package TAP::Harness::Restricted;
 # ABSTRACT: Skip some test files
-our $VERSION = '0.003'; # VERSION
+
+our $VERSION = '0.004';
 
 use superclass 'TAP::Harness' => 3.18;
 use Path::Tiny;
@@ -19,11 +20,19 @@ sub aggregate_tests {
 
 my $maybe_prefix = qr/(?:\d+[_-]?)?/;
 
-my @banned_names =
-  ( qr/${maybe_prefix}pod\.t/, qr/${maybe_prefix}pod[_-]?coverage\.t/, );
+my @banned_names = (
+    qr/${maybe_prefix}pod\.t/,
+    qr/${maybe_prefix}pod[_-]?coverage\.t/,
+    qr/${maybe_prefix}pod[_-]?spell(?:ing)?\.t/,
+    qr/${maybe_prefix}perl[_-]?critic\.t/,
+    qr/${maybe_prefix}kwalitee\.t/,
+);
 
 my @banned_code = (
-    qr/use Test::Pod/, # also gets Test::Pod::Coverage
+    qr/\b (?: use | require )\ Test::(?:
+        CleanNamespaces | DependentModules | EOL | Kwalitee | Mojibake
+        | NoTabs | Perl::Critic | Pod | Portability::Files | Spelling | Vars
+    )\b/x,
 );
 
 sub _file_ok {
@@ -55,7 +64,7 @@ TAP::Harness::Restricted - Skip some test files
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -81,11 +90,61 @@ File names that look like F<pod.t> or F<pod-coverage.t>, with optional leading n
 
 =item *
 
-Files that contain the text C<use Test::Pod>
+Files matching any of the space-separated glob patterns in C<$ENV{HARNESS_SKIP}>
 
 =item *
 
-Files matching any of the space-separated glob patterns in C<$ENV{HARNESS_SKIP}>
+Files that look like author tests based on the modules they use or require
+
+=back
+
+The list of modules to exclude is:
+
+=over 4
+
+=item *
+
+Test::CleanNamespaces
+
+=item *
+
+Test::DependentModules
+
+=item *
+
+Test::EOL
+
+=item *
+
+Test::Kwalitee
+
+=item *
+
+Test::Mojibake
+
+=item *
+
+Test::NoTabs
+
+=item *
+
+Test::Perl::Critic
+
+=item *
+
+Test::Pod
+
+=item *
+
+Test::Portability::Files
+
+=item *
+
+Test::Spelling
+
+=item *
+
+Test::Vars
 
 =back
 
@@ -119,9 +178,21 @@ L<https://github.com/dagolden/TAP-Harness-Restricted>
 
 David Golden <dagolden@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
+
+=for stopwords Dagfinn Ilmari Mannsåker grr
+
+=over 4
+
+=item *
 
 Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+=item *
+
+grr <grr@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

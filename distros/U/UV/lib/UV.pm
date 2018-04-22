@@ -1,557 +1,574 @@
 package UV;
+
+our $VERSION = '1.000008';
+our $XS_VERSION = $VERSION;
+
 use strict;
-use XSLoader;
+use warnings;
+use Carp ();
+use Exporter qw(import);
+use Math::Int64 ();
+use XS::Object::Magic ();
+require XSLoader;
+XSLoader::load('UV', $XS_VERSION);
 
-our $VERSION = '0.24';
+our @EXPORT_OK = (
+    @UV::EXPORT_XS,
+    qw(default_loop loop err_name hrtime strerr translate_sys_error),
+    qw(check timer),
+);
 
-XSLoader::load __PACKAGE__, $VERSION;
+# _parse_args (static, private)
+sub _parse_args {
+    my $args;
+    if ( @_ == 1 && ref $_[0] ) {
+        my %copy = eval { %{ $_[0] } }; # try shallow copy
+        Carp::croak("Argument to method could not be dereferenced as a hash") if $@;
+        $args = \%copy;
+    }
+    elsif (@_==1 && !ref($_[0])) {
+        $args = {single_arg => $_[0]};
+    }
+    elsif ( @_ % 2 == 0 ) {
+        $args = {@_};
+    }
+    else {
+        Carp::croak("Method got an odd number of elements");
+    }
+    return $args;
+}
+
+sub check {
+    require UV::Check;
+    return UV::Check->new(@_);
+}
+
+sub default_loop {
+    require UV::Loop;
+    return UV::Loop->default();
+}
+
+sub idle {
+    require UV::Idle;
+    return UV::Idle->new(@_);
+}
+
+sub loop {
+    require UV::Loop;
+    return UV::Loop->default();
+}
+
+sub poll {
+    require UV::Poll;
+    return UV::Poll->new(@_);
+}
+
+sub prepare {
+    require UV::Prepare;
+    return UV::Prepare->new(@_);
+}
+
+sub timer {
+    require UV::Timer;
+    return UV::Timer->new(@_);
+}
 
 1;
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
-UV - perl interface to libuv
+UV - Perl interface to libuv
 
 =head1 SYNOPSIS
 
-    use UV;
-    
-    # TIMERS
-    my $timer = UV::timer_init();
-    UV::timer_start($timer, 2000, 0, sub {
-        warn "is called after 2000ms";
-    });
-    
-    my $timer = UV::timer_init();
-    UV::timer_start($timer, 2000, 2000, sub {
-        warn "is called roughly every 2s (repeat = 2)";
-    });
-    
-    UV::timer_stop($timer); # stop timer
-    UV::close($timer); # destroy timer object
-    
-    # IO (Simple tcp echo server)
-    my $server = UV::tcp_init();
-    UV::tcp_bind($server, '0.0.0.0', 5000)
-        && die 'bind error: ', UV::strerror(UV::last_error());
-    
-    UV::listen($server, 10, sub {
-        my $client = UV::tcp_init();
-        UV::accept($server, $client) && die 'accept failed: ', UV::strerror(UV::last_error());
-    
-        UV::read_start($client, sub {
-            my ($nread, $buf) = @_;
-    
-            if ($nread < 0) {
-                my $err = UV::last_error();
-                if ($err != UV::EOF) {
-                    warn 'client read error: ', UV::strerror($err);
-                }
-                UV::close($client);
-            }
-            elsif ($nread == 0) {
-                # nothing to read
-            }
-            else {
-                UV::write($client, $buf, sub {
-                    my ($status) = @_;
-    
-                    if ($status) {
-                        warn 'client write error: ', UV::strerror(UV::last_error());
-                        UV::close($client);
-                    }
-                });
-            }
-        });
-    
-    }) && die 'listen error: ', UV::strerror(UV::last_error());
-    
-    # MAINLOOP
-    UV::run()
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+
+  use UV;
+  use UV::Loop;
+
+  # hi-resolution time
+  my $hi_res_time = UV::hrtime();
+
+  # A new loop
+  my $loop = UV::Loop->new();
+
+  # default loop
+  my $loop = UV::Loop->default_loop(); # convenience singleton constructor
+  my $loop = UV::Loop->default(); # convenience singleton constructor
+
+  # run a loop with one of three options:
+  # UV_RUN_DEFAULT, UV_RUN_ONCE, UV_RUN_NOWAIT
+  $loop->run(); # runs with UV_RUN_DEFAULT
+  $loop->run(UV::Loop::UV_RUN_DEFAULT); # explicitly state UV_RUN_DEFAULT
+  $loop->run(UV::Loop::UV_RUN_ONCE);
+  $loop->run(UV::Loop::UV_RUN_NOWAIT);
+
 
 =head1 DESCRIPTION
 
-UV provides low-level interface to libuv, https://github.com/joyent/libuv, platform layer for node.js.
+This module provides an interface to L<libuv|http://libuv.org>. We will try to
+document things here as best as we can, but we also suggest you look at the
+L<libuv docs|http://docs.libuv.org> directly for more details on how things
+work.
 
-Low-level means this module's functions maps to libuv functions directry.
-C<uv_listen> maps to C<UV::listen>, C<uv_tcp_connect> to C<UV::tcp_connect>, and so on.
+Event loops that work properly on all platforms. YAY!
 
-This is because I'm using this module to make some prototypes for native C application which uses libuv.
-Perl codes using this module can be easily converted to C programs.
+=head1 CONSTANTS
 
-=head1 CAUTION
+=head2 VERSION CONSTANTS
 
-Currently this module is in early development stage. The APIs are still fluid, and may change.
+=head3 UV_VERSION_MAJOR
 
-=head1 THERE IS SOME LIMITATIONS AT THIS TIME
+=head3 UV_VERSION_MINOR
 
-No file-system apis, no threads apis at this time, it's not nessesary for my prototyping purpose now.
+=head3 UV_VERSION_PATCH
 
-But patches always welcome :)
+=head3 UV_VERSION_IS_RELEASE
+
+=head3 UV_VERSION_SUFFIX
+
+=head3 UV_VERSION_HEX
+
+=head2 ERROR CONSTANTS
+
+=head3 UV_E2BIG
+
+Argument list too long
+
+=head3 UV_EACCES
+
+Permission denied
+
+=head3 UV_EADDRINUSE
+
+Address already in use
+
+=head3 UV_EADDRNOTAVAIL
+
+Address not available
+
+=head3 UV_EAFNOSUPPORT
+
+Address family not supported
+
+=head3 UV_EAGAIN
+
+Resource temporarily unavailable
+
+=head3 UV_EAI_ADDRFAMILY
+
+Address family not supported
+
+=head3 UV_EAI_AGAIN
+
+Temporary failure
+
+=head3 UV_EAI_BADFLAGS
+
+Bad ai_flags value
+
+=head3 UV_EAI_BADHINTS
+
+Invalid value for hints
+
+=head3 UV_EAI_CANCELED
+
+Request canceled
+
+=head3 UV_EAI_FAIL
+
+Permanent failure
+
+=head3 UV_EAI_FAMILY
+
+ai_family not supported
+
+=head3 UV_EAI_MEMORY
+
+Out of memory
+
+=head3 UV_EAI_NODATA
+
+No address
+
+=head3 UV_EAI_NONAME
+
+Unknown node or service
+
+=head3 UV_EAI_OVERFLOW
+
+Argument buffer overflow
+
+=head3 UV_EAI_PROTOCOL
+
+Resolved protocol is unknown
+
+=head3 UV_EAI_SERVICE
+
+Service not available for socket type
+
+=head3 UV_EAI_SOCKTYPE
+
+Socket type not supported
+
+=head3 UV_EALREADY
+
+Connection already in progress
+
+=head3 UV_EBADF
+
+Bad file descriptor
+
+=head3 UV_EBUSY
+
+Resource busy or locked
+
+=head3 UV_ECANCELED
+
+Operation canceled
+
+=head3 UV_ECHARSET
+
+Invalid Unicode character
+
+=head3 UV_ECONNABORTED
+
+Software caused connection abort
+
+=head3 UV_ECONNREFUSED
+
+Connection refused
+
+=head3 UV_ECONNRESET
+
+Connection reset by peer
+
+=head3 UV_EDESTADDRREQ
+
+Destination address required
+
+=head3 UV_EEXIST
+
+File already exists
+
+=head3 UV_EFAULT
+
+Bad address in system call argument
+
+=head3 UV_EFBIG
+
+File too large
+
+=head3 UV_EHOSTUNREACH
+
+Host is unreachable
+
+=head3 UV_EINTR
+
+Interrupted system call
+
+=head3 UV_EINVAL
+
+Invalid argument
+
+=head3 UV_EIO
+
+i/o error
+
+=head3 UV_EISCONN
+
+Socket is already connected
+
+=head3 UV_EISDIR
+
+Illegal operation on a directory
+
+=head3 UV_ELOOP
+
+Too many symbolic links encountered
+
+=head3 UV_EMFILE
+
+Too many open files
+
+=head3 UV_EMLINK
+
+Too many links
+
+=head3 UV_EMSGSIZE
+
+Message too long
+
+=head3 UV_ENAMETOOLONG
+
+Name too long
+
+=head3 UV_ENETDOWN
+
+Network is down
+
+=head3 UV_ENETUNREACH
+
+Network is unreachable
+
+=head3 UV_ENFILE
+
+File table overflow
+
+=head3 UV_ENOBUFS
+
+No buffer space available
+
+=head3 UV_ENODEV
+
+No such device
+
+=head3 UV_ENOENT
+
+No such file or directory
+
+=head3 UV_ENOMEM
+
+Not enough memory
+
+=head3 UV_ENONET
+
+Machine is not on the network
+
+=head3 UV_ENOPROTOOPT
+
+Protocol not available
+
+=head3 UV_ENOSPC
+
+No space left on device
+
+=head3 UV_ENOSYS
+
+Function not implemented
+
+=head3 UV_ENOTCONN
+
+Socket is not connected
+
+=head3 UV_ENOTDIR
+
+Not a directory
+
+=head3 UV_ENOTEMPTY
+
+Directory not empty
+
+=head3 UV_ENOTSOCK
+
+Socket operation on non-socket
+
+=head3 UV_ENOTSUP
+
+Operation not supported on socket
+
+=head3 UV_ENXIO
+
+No such device or address
+
+=head3 UV_EOF
+
+End of file
+
+=head3 UV_EPERM
+
+Operation not permitted
+
+=head3 UV_EPIPE
+
+Broken pipe
+
+=head3 UV_EPROTO
+
+Protocol error
+
+=head3 UV_EPROTONOSUPPORT
+
+Protocol not supported
+
+=head3 UV_EPROTOTYPE
+
+Protocol wrong type for socket
+
+=head3 UV_ERANGE
+
+Result too large
+
+=head3 UV_EROFS
+
+Read-only file system
+
+=head3 UV_ESHUTDOWN
+
+Cannot send after transport endpoint shutdown
+
+=head3 UV_ESPIPE
+
+Invalid seek
+
+=head3 UV_ESRCH
+
+No such process
+
+=head3 UV_ETIMEDOUT
+
+Connection timed out
+
+=head3 UV_ETXTBSY
+
+Text file is busy
+
+=head3 UV_EXDEV
+
+Cross-device link not permitted
+
+=head3 UV_UNKNOWN
+
+Unknown error
+
 
 =head1 FUNCTIONS
 
-List of currently supported functions. Descriptions after function name are copied and pasted from uv.h
+The following functions are available:
 
-=head2 my $loop = UV::default_loop()
+=head2 check
 
-Get default loop handle. In p5-UV, this default_loop is only loop that is supported.
-Other functions that depends loop handle uses this default_loop implicitly.
+    my $handle = UV::check(); # uses the default loop
+    my $handle = UV::check(loop => $some_other_loop); # non-default loop
 
-Currently this C<$loop> object contains only active_handles information.
-You can get active_handles count by doing following:
+Returns a new L<UV::Check> Handle object.
 
-    my $count = $loop->active_handles;
+=head2 default_loop
 
-=head2 UV::run()
+    my $loop = UV::default_loop();
+    # You can also get it with the UV::Loop methods below:
+    my $loop = UV::Loop->default_loop();
+    my $loop = UV::Loop->default();
+    # Passing a true value as the first arg to the UV::Loop constructor
+    # will also return the default loop
+    my $loop = UV::Loop->new(1);
 
-This function starts the event loop. It blocks until the reference count of the loop drops to zero. Always returns zero.
+Returns the default loop (which is a singleton object). This module already
+creates the default loop and you get access to it with this method.
 
-=head2 UV::run_once()
+=head2 err_name
 
-Poll for new events once. Note that this function blocks if there are no
-pending events. Returns zero when done (no active handles or requests left),
-or non-zero if more events are expected (meaning you should call
-uv_run_once() again sometime in the future).
+    my $error_name = UV::err_name(UV::UV_EAI_BADFLAGS);
+    say $error_name; # EAI_BADFLAGS
 
-=head2 my $err = UV::last_error()
+The L<err_name|http://docs.libuv.org/en/v1.x/errors.html#c.uv_err_name>
+function returns the error name for the given error code. Leaks a few bytes of
+memory when you call it with an unknown error code.
 
-=head2 my $str_error = UV::strerror($err)
+In libuv errors are negative numbered constants. As a rule of thumb, whenever
+there is a status parameter, or an API functions returns an integer, a negative
+number will imply an error.
 
-=head2 my $err_name = UV::err_name($err)
+When a function which takes a callback returns an error, the callback will
+never be called.
 
-Most functions return boolean: 0 for success and -1 for failure.
-On error the user should then call uv_last_error() to determine
-the error code.
+=head2 hrtime
 
-=head2 UV::shutdown($handle, $cb)
+    my $uint64_t = UV::hrtime();
 
-Shutdown the outgoing (write) side of a duplex stream. It waits for
-pending write requests to complete. The handle should refer to a
-initialized stream. req should be an uninitialized shutdown request
-struct. The cb is called after shutdown is complete.
+Get the current Hi-Res time (C<uint64_t>).
 
-=head2 UV::is_active($handle)
+=head2 idle
 
-Returns 1 if the prepare/check/idle/timer handle has been started, 0
-otherwise. For other handle types this always returns 1.
+    my $handle = UV::idle(); # uses the default loop
+    my $handle = UV::idle(loop => $some_other_loop); # non-default loop
 
-=head2 UV::walk($walk_cb)
+Returns a new L<UV::Idle> Handle object.
 
-Walk the list of open handles.
+=head2 loop
 
-=head2 UV::close($handle)
+    my $loop = UV::loop();
+    # You can also get it with the UV::Loop methods below:
+    my $loop = UV::Loop->default_loop();
+    my $loop = UV::Loop->default();
 
-Request handle to be closed. This MUST be called on each handle before memory is released.
+Returns the default loop (which is a singleton object). This module already
+creates the default loop and you get access to it with this method.
 
-In-progress requests, like C<UV::connect> or C<UV::write>, are cancelled and
-have their callbacks called asynchronously with status=-1 and the error code
-set to C<UV::ECANCELED>.
+=head2 poll
 
-=head2 UV::listen($stream, $backlog, $connection_cb)
+    my $handle = UV::poll(); # uses the default loop
+    my $handle = UV::poll(loop => $some_other_loop); # non-default loop
 
-=head2 UV::accept($server_stream, $client_stream)
+Returns a new L<UV::Poll> Handle object.
 
-This call is used in conjunction with `UV::listen` to accept incoming
-connections. Call `UV::accept` after receiving a C<$connection_cb> to accept
-the connection. Before calling C<UV::accept> use C<UV::*_init()> must be
-called on the client. Non-zero return value indicates an error.
+=head2 prepare
 
-When the C<$connection_cb> is called it is guaranteed that C<UV::accept> will
-complete successfully the first time. If you attempt to use it more than
-once, it may fail. It is suggested to only call uv_accept once per
-uv_connection_cb call.
+    my $handle = UV::prepare(); # uses the default loop
+    my $handle = UV::prepare(loop => $some_other_loop); # non-default loop
 
-=head2 UV::read_start($stream, $read_cb)
+Returns a new L<UV::Prepare> Handle object.
 
-=head2 UV::read_stop($stream)
+=head2 strerror
 
-Read data from an incoming stream. The callback will be made several
-several times until there is no more data to read or uv_read_stop is
-called. When we've reached EOF nread will be set to -1 and the error is
-set to UV_EOF. When nread == -1 the buf parameter might not point to a
-valid buffer; in that case buf.len and buf.base are both set to 0.
-Note that nread might also be 0, which does *not* indicate an error or
-eof; it happens when libuv requested a buffer through the alloc callback
-but then decided that it didn't need that buffer.
+    my $error = UV::strerror(UV::UV_EAI_BADFLAGS);
+    say $error; # bad ai_flags value
 
-=head2 UV::read2_start($stream, $read2_cb)
+The L<strerror|http://docs.libuv.org/en/v1.x/errors.html#c.uv_strerror>
+function returns the error message for the given error code. Leaks a few bytes
+of memory when you call it with an unknown error code.
 
-Extended read methods for receiving handles over a pipe. The pipe must be
-initialized with ipc == 1.
+In libuv errors are negative numbered constants. As a rule of thumb, whenever
+there is a status parameter, or an API functions returns an integer, a negative
+number will imply an error.
 
-=head2 UV::write($stream, $buf)
+When a function which takes a callback returns an error, the callback will
+never be called.
 
-=head2 UV::write($stream, $buf, $write_cb)
+=head2 timer
 
-Write C<$buf> to stream.
+    my $timer = UV::timer(); # uses the default loop
+    my $timer = UV::timer(loop => $some_other_loop); # non-default loop
 
-=head2 UV::write2($stream, $buf, $send_stream)
+Returns a new L<UV::Timer> object.
 
-=head2 UV::write2($stream, $buf, $send_stream, $write_cb)
+=head2 version
 
-Extended write function for sending handles over a pipe. The pipe must be
-initialized with ipc == 1.
-send_handle must be a TCP socket or pipe, which is a server or a connection
-(listening or connected state).  Bound sockets or pipes will be assumed to
-be servers.
+    my $int = UV::version();
 
-=head2 UV::is_readable($stream)
+The L<version|http://docs.libuv.org/en/v1.x/version.html#c.uv_version> function
+returns C<UV::UV_VERSION_HEX>, the libuv version packed into a single integer.
+8 bits are used for each component, with the patch number stored in the 8 least
+significant bits. E.g. for libuv 1.2.3 this would be C<0x010203>.
 
-=head2 UV::is_writeable($stream)
+=head2 version_string
 
-Used to determine whether a stream is readable or writable.
+    say UV::version_string();
+    # 1.13.1
 
-=head2 UV::is_closing($handle)
-
-Used to determine whether a stream is closing or closed.
-
-N.B. is only valid between the initialization of the handle
-     and the arrival of the close callback, and cannot be used
-     to validate the handle.
-
-=head2 my $tcp_stream = UV::tcp_init()
-
-Initialize tcp_stream object.
-
-=head2 UV::tcp_nodelay($handle, $enable = 1)
-
-Enable/disable Nagle's algorithm.
-
-=head2 UV::tcp_keepalive($handle, $enable, $delay)
-
-Enable/disable TCP keep-alive.
-
-`ms` is the initial delay in seconds, ignored when `enable` is zero.
-
-=head2 UV::tcp_simultaneous_accepts($handle, $enable)
-
-This setting applies to Windows only.
-Enable/disable simultaneous asynchronous accept requests that are
-queued by the operating system when listening for new tcp connections.
-This setting is used to tune a tcp server for the desired performance.
-Having simultaneous accepts can significantly improve the rate of
-accepting connections (which is why it is enabled by default).
-
-=head2 UV::tcp_bind($handle, $ip, $port)
-
-=head2 UV::tcp_bind6($handle, $ip, $port)
-
-Bind tcp handles to $ip:$port
-
-=head2 my ($ip, $port) = UV::tcp_getsockname($handle)
-
-=head2 my ($ip, $port) = UV::tcp_getpeername($handle)
-
-get tcp sockname or peername and return it as array.
-
-=head2 UV::tcp_connect($handle, $ip, $port, $connect_cb)
-
-=head2 UV::tcp_connect6($handle, $ip, $port, $connect_cb)
-
-uv_tcp_connect, uv_tcp_connect6
-These functions establish IPv4 and IPv6 TCP connections. Provide an
-initialized TCP handle and an uninitialized uv_connect_t*. The callback
-will be made when the connection is established.
-
-=head2 my $udp = UV::udp_init()
-
-Initialize a new UDP handle. The actual socket is created lazily.
-Returns 0 on success.
-
-=head2 UV::udp_bind($handle, $ip, $port, $flags = 0)
-
-=head2 UV::udp_bind6($handle, $ip, $port, $flags = 0)
-
-Bind to a IPv4/IPv6 address and port.
-
-Arguments:
- handle    UDP handle. Should have been initialized with `uv_udp_init`.
- addr      struct sockaddr_in with the address and port to bind to.
- flags     Unused.
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 my ($ip, $port) = UV::udp_getsockname($handle)
-
-get udp sockname and return it as array
-
-=head2 UV::udp_set_membership($handle, $multicast_addr, $interface_addr, $membership)
-
-Set membership for a multicast address
-
-Arguments:
- handle              UDP handle. Should have been initialized with
-                     `uv_udp_init`.
- multicast_addr      multicast address to set membership for
- interface_addr      interface address
- membership          Should be UV_JOIN_GROUP or UV_LEAVE_GROUP
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::set_multicast_loop($handle, $on)
-
-Set IP multicast loop flag. Makes multicast packets loop back to
-local sockets.
-
-Arguments:
- handle              UDP handle. Should have been initialized with
-                     `uv_udp_init`.
- on                  1 for on, 0 for off
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::set_multicast_ttl($handle, $ttl)
-
-Set the multicast ttl
-
-Arguments:
- handle              UDP handle. Should have been initialized with
-                     `uv_udp_init`.
- ttl                 1 through 255
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::udp_set_broadcast($handle, $on)
-
-Set broadcast on or off
-
-Arguments:
- handle              UDP handle. Should have been initialized with
-                     `uv_udp_init`.
- on                  1 for on, 0 for off
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::udp_set_ttl($handle, $ttl)
-
-Set the time to live
-
-Arguments:
- handle              UDP handle. Should have been initialized with
-                     `uv_udp_init`.
- ttl                 1 through 255
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::udp_send($handle, $buf, $ip, $port, $send_cb)
-
-=head2 UV::udp_send6($handle, $buf, $ip, $port, $send_cb)
-
-Send data. If the socket has not previously been bound with `uv_udp_bind`
-or `uv_udp_bind6`, it is bound to 0.0.0.0 / ::0 (the "all interfaces" address)
-and a random port number.
-
-Arguments:
- handle    UDP handle. Should have been initialized with `uv_udp_init`.
- buf       buffer to send.
- ip        target ip
- port      target port
- send_cb   Callback to invoke when the data has been sent out.
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::udp_recv_start($handle, $recv_cb)
-
-Receive data. If the socket has not previously been bound with `uv_udp_bind`
-or `uv_udp_bind6`, it is bound to 0.0.0.0 (the "all interfaces" address)
-and a random port number.
-
-Arguments:
- handle    UDP handle. Should have been initialized with `uv_udp_init`.
- recv_cb   Callback to invoke with received data.
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 UV::udp_recv_stop($handle)
-
-Stop listening for incoming datagrams.
-
-Arguments:
- handle    UDP handle. Should have been initialized with `uv_udp_init`.
-
-Returns:
- 0 on success, -1 on error.
-
-=head2 my $tty = UV::tty_init($fd, $readable)
-
-Initialize a new TTY stream with the given file descriptor. Usually the
-file descriptor will be
-  0 = stdin
-  1 = stdout
-  2 = stderr
-The last argument, readable, specifies if you plan on calling
-uv_read_start with this stream. stdin is readable, stdout is not.
-
-TTY streams which are not readable have blocking writes.
-
-=head2 UV::tty_set_mode($tty, $mode)
-
-Set mode. 0 for normal, 1 for raw.
-
-=head2 UV::tty_reset_mode()
-
-To be called when the program exits. Resets TTY settings to default
-values for the next process to take over.
-
-=head2 my ($width, $height) = UV::tty_get_winsize($tty)
-
-Gets the current Window size as array.
-
-=head2 my $poll = UV::poll_init($fd)
-
-Initialize the poll watcher using a file descriptor.
-
-=head2 UV::poll_start($handle, $events, $poll_cb)
-
-Starts polling the file descriptor. `events` is a bitmask consisting made up
-of UV_READABLE and UV_WRITABLE. As soon as an event is detected the callback
-will be called with `status` set to 0, and the detected events set en the
-`events` field.
-
-If an error happens while polling status may be set to -1 and the error
-code can be retrieved with uv_last_error. The user should not close the
-socket while uv_poll is active. If the user does that anyway, the callback
-*may* be called reporting an error status, but this is not guaranteed.
-
-Calling uv_poll_start on an uv_poll watcher that is already active is fine.
-Doing so will update the events mask that is being watched for.
-
-=head2 UV::poll_stop($handle)
-
-Stops polling the file descriptor.
-
-=head2 UV::guess_handle($fd)
-
-Used to detect what type of stream should be used with a given file
-descriptor. Usually this will be used during initialization to guess the
-type of the stdio streams.
-For isatty() functionality use this function and test for UV_TTY.
-
-=head2 my $pipe = UV::pipe_init()
-
-Initialize a pipe. The last argument is a boolean to indicate if
-this pipe will be used for handle passing between processes.
-
-=head2 UV::pipe_open($handle, $fd)
-
-=head2 UV::pipd_bind($handle, $name)
-
-=head2 UV::pipe_connect($handle, $name, $connect_cb)
-
-Opens an existing file descriptor or HANDLE as a pipe.
-
-
-=head2 my $prepare = UV::prepare_init()
-
-=head2 UV::prepare_start($prepare, $prepare_cb)
-
-=head2 UV::prepare_stop($prepare)
-
-libev wrapper. Every active prepare handle gets its callback called
-exactly once per loop iteration, just before the system blocks to wait
-for completed i/o.
-
-=head2 my $check = UV::check_init()
-
-=head2 UV::check_start($check, $check_cb)
-
-=head2 UV::check_stop($check)
-
-libev wrapper. Every active check handle gets its callback called exactly
-once per loop iteration, just after the system returns from blocking.
-
-=head2 my $idle = UV::idle_init()
-
-=head2 UV::idle_start($idle, $idle_cb)
-
-=head2 UV::idle_stop($idle)
-
-libev wrapper. Every active idle handle gets its callback called
-repeatedly until it is stopped. This happens after all other types of
-callbacks are processed.  When there are multiple "idle" handles active,
-their callbacks are called in turn.
-
-=head2 my $async = UV::async_init()
-
-=head2 UV::async_send($async)
-
-libev wrapper. uv_async_send wakes up the event
-loop and calls the async handle's callback There is no guarantee that
-every uv_async_send call leads to exactly one invocation of the callback;
-The only guarantee is that the callback function is  called at least once
-after the call to async_send. Unlike all other libuv functions,
-uv_async_send can be called from another thread.
-
-=head2 my $timer = UV::timer_init()
-
-Create timer handle
-
-=head2 UV::timer_start($timer, $timeout, $repeat, $timer_cb)
-
-=head2 UV::timer_stop($timer)
-
-Start the timer. `timeout` and `repeat` are in milliseconds.
-
-If timeout is zero, the callback fires on the next tick of the event loop.
-
-If repeat is non-zero, the callback fires first after timeout milliseconds
-and then repeatedly after repeat milliseconds.
-
-timeout and repeat are signed integers but that will change in a future
-version of libuv. Don't pass in negative values, you'll get a nasty surprise
-when that change becomes effective.
-
-=head2 UV::timer_again($timer)
-
-Stop the timer, and if it is repeating restart it using the repeat value
-as the timeout. If the timer has never been started before it returns -1 and
-sets the error to UV_EINVAL.
-
-=head2 UV::timer_set_repeat($timer, $repeat)
-
-=head2 UV::timer_get_repeat($timer)
-
-Set the repeat value in milliseconds. Note that if the repeat value is set
-from a timer callback it does not immediately take effect. If the timer was
-non-repeating before, it will have been stopped. If it was repeating, then
-the old repeat value will have been used to schedule the next timeout.
-
-=head2 UV::getaddrinfo($node, $service, $getaddrinfo_cb, $hint = 0)
-
-Asynchronous getaddrinfo(3).
-
-Either node or service may be NULL but not both.
-
-hints is a pointer to a struct addrinfo with additional address type
-constraints, or NULL. Consult `man -s 3 getaddrinfo` for details.
-
-Returns 0 on success, -1 on error. Call uv_last_error() to get the error.
-
-If successful, your callback gets called sometime in the future with the
-lookup result, which is either:
-
- a) status == 0, the res argument points to a valid struct addrinfo, or
- b) status == -1, the res argument is NULL.
-
-On NXDOMAIN, the status code is -1 and uv_last_error() returns UV_ENOENT.
-
-Call uv_freeaddrinfo() to free the addrinfo structure.
+The L<version_string|http://docs.libuv.org/en/v1.x/version.html#c.uv_version_string>
+function returns the libuv version number as a string. For non-release versions
+the version suffix is included.
 
 =head1 AUTHOR
 
-Daisuke Murase <typester@cpan.org>
+Chase Whitener <F<capoeirab@cpan.org>>
 
-TAGOMORI Satoshi
+=head1 AUTHOR EMERITUS
+
+Daisuke Murase <F<typester@cpan.org>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012, Daisuke Murase.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

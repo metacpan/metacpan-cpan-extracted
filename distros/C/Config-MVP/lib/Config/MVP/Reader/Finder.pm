@@ -1,6 +1,6 @@
 package Config::MVP::Reader::Finder;
 # ABSTRACT: a reader that finds an appropriate file
-$Config::MVP::Reader::Finder::VERSION = '2.200010';
+$Config::MVP::Reader::Finder::VERSION = '2.200011';
 use Moose;
 extends 'Config::MVP::Reader';
 
@@ -110,7 +110,9 @@ sub read_config {
 
   return $instead unless $which;
 
-  my $reader = $which->{package}->new;
+  my $reader = $which->{package}->new({
+    add_cwd_to_lib => $self->add_cwd_to_lib,
+  });
 
   return $reader->read_config( $which->{location}, $arg );
 }
@@ -137,7 +139,7 @@ Config::MVP::Reader::Finder - a reader that finds an appropriate file
 
 =head1 VERSION
 
-version 2.200010
+version 2.200011
 
 =head1 DESCRIPTION
 
@@ -170,7 +172,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

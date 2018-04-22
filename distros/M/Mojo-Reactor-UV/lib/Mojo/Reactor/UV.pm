@@ -1,26 +1,40 @@
 package Mojo::Reactor::UV;
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 
 $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::UV';
 
 use Carp 'croak';
-use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
 use Scalar::Util 'weaken';
 use UV;
+use UV::Poll;
+use UV::Timer;
+use UV::Loop;
 
 use constant DEBUG => $ENV{MOJO_REACTOR_UV_DEBUG} || 0;
 
-our $VERSION = '0.001';
+our $VERSION = '1.001';
 
 my $UV;
 
-sub DESTROY { undef $UV }
+# Use UV::Loop singleton for the first instance only
+sub new {
+	my $self = shift->SUPER::new;
+	if ($UV++) {
+		$self->{loop} = UV::Loop->new;
+	} else {
+		$self->{loop} = UV::Loop->default_loop;
+		$self->{loop_singleton} = 1;
+	}
+	return $self;
+}
+
+sub DESTROY { undef $UV if shift->{loop_singleton} }
 
 sub again {
 	my $self = shift;
 	croak 'Timer not active' unless my $timer = $self->{timers}{shift()};
-	$self->_error if UV::timer_again($timer->{watcher}) < 0;
+	$self->_error($timer->{watcher}->again);
 }
 
 sub io {
@@ -31,23 +45,11 @@ sub io {
 	return $self->watch($handle, 1, 1);
 }
 
-sub is_running { !!(shift->{running}) }
-
-# We have to fall back to Mojo::Reactor::Poll, since UV is unique
-sub new { $UV++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
-
-sub next_tick {
-	my ($self, $cb) = @_;
-	push @{$self->{next_tick}}, $cb;
-	$self->{next_timer} //= $self->timer(0 => \&_next);
-	return undef;
-}
-
 sub one_tick {
 	my $self = shift;
 	# Just one tick
 	local $self->{running} = 1 unless $self->{running};
-	UV::run(UV::RUN_ONCE) or $self->stop;
+	$self->{loop}->run(UV::Loop::UV_RUN_ONCE) or $self->stop;
 }
 
 sub recurring { shift->_timer(1, @_) }
@@ -60,14 +62,14 @@ sub remove {
 		if (exists $self->{io}{$fd}) {
 			warn "-- Removed IO watcher for $fd\n" if DEBUG;
 			my $w = delete $self->{io}{$fd}{watcher};
-			UV::close($w) if $w;
+			$w->close if $w;
 		}
 		return !!delete $self->{io}{$fd};
 	} else {
 		if (exists $self->{timers}{$remove}) {
 			warn "-- Removed timer $remove\n" if DEBUG;
 			my $w = delete $self->{timers}{$remove}{watcher};
-			UV::close($w) if $w;
+			$w->close if $w;
 		}
 		return !!delete $self->{timers}{$remove};
 	}
@@ -75,17 +77,9 @@ sub remove {
 
 sub reset {
 	my $self = shift;
-	UV::walk(sub { UV::close($_[0]) });
+	$self->{loop}->walk(sub { $_[0]->close });
 	delete @{$self}{qw(io next_tick next_timer timers)};
 }
-
-sub start {
-	my $self = shift;
-	$self->{running}++;
-	$self->one_tick while $self->{running};
-}
-
-sub stop { delete shift->{running} }
 
 sub timer { shift->_timer(0, @_) }
 
@@ -96,45 +90,40 @@ sub watch {
 	croak 'I/O watcher not active' unless my $io = $self->{io}{$fd};
 	
 	my $mode = 0;
-	$mode |= UV::READABLE if $read;
-	$mode |= UV::WRITABLE if $write;
+	$mode |= UV::Poll::UV_READABLE if $read;
+	$mode |= UV::Poll::UV_WRITABLE if $write;
 	
 	my $w;
-	unless ($w = $io->{watcher}) { $w = $io->{watcher} = UV::poll_init($fd); }
+	unless ($w = $io->{watcher}) { $w = $io->{watcher} = UV::Poll->new(loop => $self->{loop}, fd => $fd); }
 	
-	if ($mode == 0) { $self->_error if UV::poll_stop($w) < 0; }
+	if ($mode == 0) { $self->_error($w->stop); }
 	else {
 		weaken $self;
 		my $cb = sub {
-			my ($status, $events) = @_;
-			return $self->_error if $status < 0;
+			my ($w, $status, $events) = @_;
+			return $self->_error($status) if $status < 0;
 			$self->_try('I/O watcher', $self->{io}{$fd}{cb}, 0)
-				if UV::READABLE & $events;
+				if UV::Poll::UV_READABLE & $events;
 			$self->_try('I/O watcher', $self->{io}{$fd}{cb}, 1)
-				if UV::WRITABLE & $events && $self->{io}{$fd};
+				if UV::Poll::UV_WRITABLE & $events && $self->{io}{$fd};
 		};
-		$self->_error if UV::poll_start($w, $mode, $cb) < 0;
+		$self->_error($w->start($mode, $cb));
 	}
 	
 	return $self;
 }
 
 sub _error {
-	my $self = shift;
-	$self->emit(error => sprintf "UV error: %s", UV::strerror(UV::last_error()));
+	my ($self, $code) = @_;
+	$self->emit(error => sprintf "UV error: %s", UV::strerror($code)) if $code < 0;
+	return $code;
 }
 
 sub _id {
 	my $self = shift;
 	my $id;
-	do { $id = md5_sum 't' . UV::now() . rand 999 } while $self->{timers}{$id};
+	do { $id = md5_sum 't' . $self->{loop}->now() . rand 999 } while $self->{timers}{$id};
 	return $id;
-}
-
-sub _next {
-	my $self = shift;
-	delete $self->{next_timer};
-	while (my $cb = shift @{$self->{next_tick}}) { $self->$cb }
 }
 
 sub _timer {
@@ -150,8 +139,8 @@ sub _timer {
 		$self->remove($id) unless $recurring;
 		$self->_try('Timer', $cb);
 	};
-	my $w = $self->{timers}{$id}{watcher} = UV::timer_init();
-	$self->_error if UV::timer_start($w, $after, $recur_after, $wrapper) < 0;
+	my $w = $self->{timers}{$id}{watcher} = UV::Timer->new(loop => $self->{loop});
+	$self->_error($w->start($after, $recur_after, $wrapper));
 	
 	if (DEBUG) {
 		my $is_recurring = $recurring ? ' (recurring)' : '';
@@ -227,12 +216,18 @@ C<Mojo::Reactor::UV>.
 
 =head1 EVENTS
 
-L<Mojo::Reactor::UV> inherits all events from L<Mojo::Reactor>.
+L<Mojo::Reactor::UV> inherits all events from L<Mojo::Reactor::Poll>.
 
 =head1 METHODS
 
-L<Mojo::Reactor::UV> inherits all methods from L<Mojo::Reactor> and implements
-the following new ones.
+L<Mojo::Reactor::UV> inherits all methods from L<Mojo::Reactor::Poll> and
+implements the following new ones.
+
+=head2 new
+
+  my $reactor = Mojo::Reactor::UV->new;
+
+Construct a new L<Mojo::Reactor::UV> object.
 
 =head2 again
 
@@ -252,25 +247,6 @@ readable or writable.
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
-
-=head2 is_running
-
-  my $bool = $reactor->is_running;
-
-Check if reactor is running.
-
-=head2 new
-
-  my $reactor = Mojo::Reactor::UV->new;
-
-Construct a new L<Mojo::Reactor::UV> object.
-
-=head2 next_tick
-
-  my $undef = $reactor->next_tick(sub {...});
-
-Invoke callback as soon as possible, but not before returning or other
-callbacks that have been registered with this method, always returns C<undef>.
 
 =head2 one_tick
 
@@ -303,22 +279,6 @@ Remove handle or timer.
   $reactor->reset;
 
 Remove all handles and timers.
-
-=head2 start
-
-  $reactor->start;
-
-Start watching for I/O and timer events, this will block until L</"stop"> is
-called or no events are being watched anymore.
-
-  # Start reactor only if it is not running already
-  $reactor->start unless $reactor->is_running;
-
-=head2 stop
-
-  $reactor->stop;
-
-Stop watching for I/O and timer events.
 
 =head2 timer
 

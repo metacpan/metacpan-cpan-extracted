@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::RewriteVersion;
 # ABSTRACT: Get and/or rewrite module versions to match distribution version
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use Moose;
 use namespace::autoclean;
@@ -122,7 +122,7 @@ sub rewrite_version {
         $code .= ( $self->zilla->is_trial ? "" : " #" ) . " from $tarball";
     }
 
-    $code .= "\n\$VERSION = eval \$VERSION;"
+    $code .= "\n\$VERSION =~ tr/_//d;"
       if $version =~ /_/ and scalar( $version =~ /\./g ) <= 1;
 
     my $assign_regex = $self->assign_re();
@@ -181,7 +181,7 @@ Dist::Zilla::Plugin::RewriteVersion - Get and/or rewrite module versions to matc
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

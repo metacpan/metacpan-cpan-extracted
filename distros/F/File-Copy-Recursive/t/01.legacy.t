@@ -11,7 +11,7 @@ BEGIN {
 use Test::More;
 use Test::Deep;
 use Test::File;
-use Test::Warn;
+use Test::Warnings 'warnings';
 use Path::Tiny;
 
 use File::Temp;
@@ -262,17 +262,17 @@ note "functionality w/ 'behavior' globals";
         mkdir "$tmpd/derp";
         path("$tmpd/derp/data")->spew("I exist therefor I am.");
 
-        warning_like {
+        my @warnings = warnings {
             my $rv = File::Copy::Recursive::fcopy( "$tmpd/orig/data", "$tmpd/derp/data" );
             ok( $rv, "fcopy() w/ \$RMTrgFil = 1 to file-returned true" );
-        }
-        qr/RMTrgFil failed/, "fcopy() w/ \$RMTrgFil = 1 to file-warned";
+        };
+        cmp_deeply \@warnings, [ re(qr/RMTrgFil failed/) ], "fcopy() w/ \$RMTrgFil = 1 to file-warned";
 
-        warning_like {
+        @warnings = warnings {
             my $rv = File::Copy::Recursive::fcopy( "$tmpd/orig/data", "$tmpd/derp" );
             ok( $rv, "fcopy() w/ \$RMTrgFil = 1 to dir-returned true" );
-        }
-        qr/RMTrgFil failed/, "fcopy() w/ \$RMTrgFil = 1 to dir-warned";
+        };
+        cmp_deeply \@warnings, [ re(qr/RMTrgFil failed/) ], "fcopy() w/ \$RMTrgFil = 1 to dir-warned";
     }
 
     {
@@ -283,17 +283,17 @@ note "functionality w/ 'behavior' globals";
         mkdir "$tmpd/derp";
         path("$tmpd/derp/data")->spew("I exist therefor I am.");
 
-        warnings_are {
+        my @warnings = warnings {
             my $rv = File::Copy::Recursive::fcopy( "$tmpd/orig/data", "$tmpd/derp/data" );
             ok( !$rv, "fcopy() w/ \$RMTrgFil = 2 to file-returned false" );
-        }
-        [], "fcopy() w/ \$RMTrgFil = 2 to file-no warning";
+        };
+        cmp_deeply \@warnings, [], "fcopy() w/ \$RMTrgFil = 2 to file-no warning";
 
-        warnings_are {
+        @warnings = warnings {
             my $rv = File::Copy::Recursive::fcopy( "$tmpd/orig/data", "$tmpd/derp" );
             ok( !$rv, "fcopy() w/ \$RMTrgFil = 2 to dir-returned false" );
-        }
-        [], "fcopy() w/ \$RMTrgFil = 2 to dir-no warning";
+        };
+        cmp_deeply \@warnings, [], "fcopy() w/ \$RMTrgFil = 2 to dir-no warning";
     }
 
     # TODO (this is one reason why globals are not awesome :/)

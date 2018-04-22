@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::new 6.011;
+package Dist::Zilla::App::Command::new 6.012;
 # ABSTRACT: mint a new dist
 
 use Dist::Zilla::App -command;
@@ -41,7 +41,7 @@ use Dist::Zilla::App -command;
 
 sub abstract { 'mint a new dist' }
 
-sub usage_desc { '%c %o <ModuleName>' }
+sub usage_desc { '%c new %o <ModuleName>' }
 
 sub opt_spec {
   [ 'profile|p=s',  'name of the profile to use',
@@ -109,7 +109,7 @@ Dist::Zilla::App::Command::new - mint a new dist
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 SYNOPSIS
 

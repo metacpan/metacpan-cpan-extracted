@@ -31,6 +31,11 @@ WriteMakefile(
     clean => { FILES => 'Dancer2-Plugin-Map-Tube-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Dancer2::Plugin::Map::Tube'        => { file => 'lib/Dancer2/Plugin/Map/Tube.pm'      , version => '0.02' },
+            'Dancer2::Plugin::Map::Tube::API'   => { file => 'lib/Dancer2/Plugin/Map/Tube/API.pm'  , version => '0.02' },
+            'Dancer2::Plugin::Map::Tube::Error' => { file => 'lib/Dancer2/Plugin/Map/Tube/Error.pm', version => '0.02' },
+        },
         resources => {
             repository => {
                 type => 'git',

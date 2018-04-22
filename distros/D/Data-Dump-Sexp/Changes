@@ -1,4 +1,7 @@
 Revision history for Perl extension Data::Dump::Sexp.
 
+0.002 2018-04-21T14:42+03:00
+ - Improve test coverage
+
 0.001 2018-03-31T22:38+03:00
  - Initial release

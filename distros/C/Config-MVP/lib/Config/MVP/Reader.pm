@@ -1,9 +1,10 @@
 package Config::MVP::Reader;
 # ABSTRACT: object to read config from storage into an assembler
-$Config::MVP::Reader::VERSION = '2.200010';
+$Config::MVP::Reader::VERSION = '2.200011';
 use Moose;
 
 use Config::MVP::Assembler;
+use Cwd ();
 
 #pod =head1 SYNOPSIS
 #pod
@@ -20,6 +21,20 @@ use Config::MVP::Assembler;
 #pod which will in turn convert them into a L<Config::MVP::Sequence>, the final
 #pod product.
 #pod
+#pod =attr add_cwd_to_lib
+#pod
+#pod If true (which it is by default) then the current working directly will be
+#pod locally added to C<@INC> during config loading.  This helps deal with changes
+#pod made in Perl v5.26.1.
+#pod
+#pod =cut
+
+has add_cwd_to_lib => (
+  is  => 'ro',
+  isa => 'Bool',
+  default => 1,
+);
+
 #pod =method read_config
 #pod
 #pod   my $sequence = $reader->read_config($location, \%arg);
@@ -38,7 +53,9 @@ use Config::MVP::Assembler;
 #pod Reader's C<build_assembler> method.
 #pod
 #pod Subclasses should generally not override C<read_config>, but should instead
-#pod implement a C<read_into_assembler> method, described below.
+#pod implement a C<read_into_assembler> method, described below.  If a subclass
+#pod I<does> override C<read_config> it should take care to respect the
+#pod C<add_cwd_to_lib> attribute, above.
 #pod
 #pod =cut
 
@@ -50,7 +67,14 @@ sub read_config {
 
   my $assembler = $arg->{assembler} || $self->build_assembler;
 
-  $self->read_into_assembler($location, $assembler);
+  {
+    local @INC = @INC;
+    if ($self->add_cwd_to_lib) {
+      my $cwd = Cwd::getcwd();
+      push @INC, $cwd unless grep {; $_ eq $cwd } @INC;
+    }
+    $self->read_into_assembler($location, $assembler);
+  }
 
   return $assembler->sequence;
 }
@@ -102,7 +126,7 @@ Config::MVP::Reader - object to read config from storage into an assembler
 
 =head1 VERSION
 
-version 2.200010
+version 2.200011
 
 =head1 SYNOPSIS
 
@@ -118,6 +142,14 @@ A Config::MVP::Reader exists to read configuration data from storage (like a
 file) and convert that data into instructions to a L<Config::MVP::Assembler>,
 which will in turn convert them into a L<Config::MVP::Sequence>, the final
 product.
+
+=head1 ATTRIBUTES
+
+=head2 add_cwd_to_lib
+
+If true (which it is by default) then the current working directly will be
+locally added to C<@INC> during config loading.  This helps deal with changes
+made in Perl v5.26.1.
 
 =head1 METHODS
 
@@ -139,7 +171,9 @@ If no assembler argument is passed, one will be constructed by calling the
 Reader's C<build_assembler> method.
 
 Subclasses should generally not override C<read_config>, but should instead
-implement a C<read_into_assembler> method, described below.
+implement a C<read_into_assembler> method, described below.  If a subclass
+I<does> override C<read_config> it should take care to respect the
+C<add_cwd_to_lib> attribute, above.
 
 =head2 read_into_assembler
 
@@ -169,7 +203,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

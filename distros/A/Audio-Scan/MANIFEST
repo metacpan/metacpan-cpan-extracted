@@ -82,6 +82,7 @@ t/dsdiff.t
 t/dsdiff/dff128.dff
 t/dsdiff/dff64.dff
 t/dsf.t
+t/dsf/6channel.dsf
 t/dsf/dsf128.dsf
 t/dsf/dsf64.dsf
 t/flac.t

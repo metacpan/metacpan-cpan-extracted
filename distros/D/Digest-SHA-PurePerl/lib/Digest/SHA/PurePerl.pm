@@ -5,11 +5,11 @@ require 5.003000;
 use strict;
 use warnings;
 use vars qw($VERSION @ISA @EXPORT_OK $errmsg);
-use Fcntl qw(O_RDONLY);
+use Fcntl qw(O_RDONLY O_RDWR);
 use integer;
 use Carp qw(croak);
 
-$VERSION = '6.01';
+$VERSION = '6.02';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -942,11 +942,13 @@ sub addfile {
 		map { $_ eq $mode } ("b", "U", "0");
 
 		## Always interpret "-" to mean STDIN; otherwise use
-		## sysopen to handle full range of POSIX file names
+		##	sysopen to handle full range of POSIX file names.
+		## If $file is a directory, force an EISDIR error
+		##	by attempting to open with mode O_RDWR
 
 	local *FH;
 	$file eq '-' and open(FH, '< -')
-		or sysopen(FH, $file, O_RDONLY)
+		or sysopen(FH, $file, -d $file ? O_RDWR : O_RDONLY)
 			or _bail('Open failed');
 
 	if ($BITS) {
@@ -1574,7 +1576,7 @@ the M and the last R were missing."
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2017 Mark Shelor
+Copyright (C) 2003-2018 Mark Shelor
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

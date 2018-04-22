@@ -1,9 +1,9 @@
 package App::Bootstrap::Perl;
-BEGIN {
-  $App::Bootstrap::Perl::AUTHORITY = 'cpan:SCHWIGON';
-}
+# git description: v0.12-6-g8e3d0ce
+
+our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Bootstrap Perl inclusive CPAN from git
-$App::Bootstrap::Perl::VERSION = '0.12';
+$App::Bootstrap::Perl::VERSION = '0.13';
 use 5.006;
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Steffen Schwigon.
+This software is copyright (c) 2018 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,15 @@
+2.04      2018-04-20 12:25:55+01:00 Europe/London
+    - No code changes from Trial release
+    - Updated list of contributors.
+
+2.03      2018-04-17 17:19:27+01:00 Europe/London (TRIAL RELEASE)
+    - Tweaks for travis CI and release tooling
+
+    - Revert to using MooseX::Attribute::Chained as per HTML::FormFu v2.06
+      Requires HTML::FormFu v2.06
+      fixes CPAN RT#125102
+      Thanks to Petr Písař <ppisar@redhat.com>
+
 2.02      2017-05-22 13:20:48+01:00 Europe/London
     - Stop using Test::Aggregate::Nested for tests - RT#121792
 

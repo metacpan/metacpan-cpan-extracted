@@ -4,14 +4,14 @@ use strict;
 use warnings FATAL => 'all';
 
 BEGIN {
-  *_PERL_LT_5_8_4 = ($] < 5.008004) ? sub(){1} : sub(){0};
+  *_PERL_LT_5_8_4 = ("$]" < 5.008004) ? sub(){1} : sub(){0};
   # goto &UNIVERSAL::VERSION usually works on 5.8, but fails on some ARM
   # machines.  Seems to always work on 5.10 though.
-  *_CAN_GOTO_VERSION = ($] >= 5.010000) ? sub(){1} : sub(){0};
+  *_CAN_GOTO_VERSION = ("$]" >= 5.010000) ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '2.000004';
-$VERSION = eval $VERSION;
+our $VERSION = '2.000005';
+$VERSION =~ tr/_//d;
 
 our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
   closure
@@ -19,6 +19,7 @@ our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
   deprecated
   exiting
   experimental
+    experimental::alpha_assertions
     experimental::autoderef
     experimental::bitwise
     experimental::const_attr
@@ -29,6 +30,7 @@ our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
     experimental::re_strict
     experimental::refaliasing
     experimental::regex_sets
+    experimental::script_run
     experimental::signatures
     experimental::smartmatch
     experimental::win32_perlio
@@ -59,6 +61,7 @@ our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
     inplace
     internal
     malloc
+  shadow
   signal
   substr
   syntax

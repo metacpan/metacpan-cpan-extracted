@@ -46,7 +46,6 @@ on 'test' => sub {
   requires "Test::MockObject::Extends" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
-  requires "blib" => "1.01";
   requires "lib" => "0";
   requires "perl" => "5.006";
 };
@@ -62,6 +61,7 @@ on 'configure' => sub {
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::Kwalitee" => "1.21";
+  requires "Test::MinimumVersion" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
 };

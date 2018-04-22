@@ -1,5 +1,10 @@
 Revision history for Catalyst-Authentication-AuthTkt
 
+0.16 20 April 2018
+ - @bokutin fixed a bug with renew_ticket not respecting use_req_address config.
+   https://github.com/karpet/catalyst-authentication-authtkt/pull/1
+ - added Travis CI to Github
+
 0.15 18 Dec 2013
  - move src repos to github
  - switch to Module::Install

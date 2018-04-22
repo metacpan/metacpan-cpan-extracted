@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use Test::More; # tests => 3;
-use t::MockHomeDir;
+use lib 't';
+use MockHomeDir;
 use Capture::Tiny qw( capture   );
 use File::Path    qw( make_path );
 

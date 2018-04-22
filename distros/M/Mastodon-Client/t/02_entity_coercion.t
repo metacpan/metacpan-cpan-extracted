@@ -1,8 +1,4 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::More;
+use Test2::V0;
 
 use Mastodon::Types qw( to_Entity to_Instance );
 

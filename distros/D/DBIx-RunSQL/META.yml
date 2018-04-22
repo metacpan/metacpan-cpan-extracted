@@ -18,6 +18,6 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-RunSQL
   license: http://dev.perl.org/licenses/
   repository: git://github.com/Corion/dbix--runsql.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

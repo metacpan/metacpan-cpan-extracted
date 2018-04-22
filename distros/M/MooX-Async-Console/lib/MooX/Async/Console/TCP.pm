@@ -41,7 +41,7 @@ with 'MooX::Role::Logger';
 
 =over
 
-=item address (default: C<0.0.0.0>)
+=item address (default: C<127.0.0.1>)
 
 The IP address to listen for connections on.
 
@@ -55,7 +55,7 @@ the socket is bound.
 
 =cut
 
-has address => is => ro  => default => '0.0.0.0';
+has address => is => ro  => default => '127.0.0.1';
 has port    => is => rwp => default => ($ENV{MXACPORT} // 0);
 
 =head2 EVENTS
@@ -128,8 +128,8 @@ Begins listening on the port when it's added to the loop.
 
 after _add_to_loop => sub {
   my $self = shift;
-  $self->_logger->informf('TCP Console starting on port %s', $self->port);
   $self->listen(
+    host     => $self->address,
     service  => $self->port,
     socktype => 'stream',
   )->then(sub {

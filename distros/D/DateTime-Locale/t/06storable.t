@@ -9,6 +9,9 @@ use Test::More;
 use Test::File::ShareDir::Dist { 'DateTime-Locale' => 'share' };
 
 use DateTime::Locale;
+use File::Spec;
+use File::Temp qw( tempdir );
+use IPC::System::Simple qw( capturex );
 use Storable;
 
 my $loc1   = DateTime::Locale->load('en-US');
@@ -21,10 +24,39 @@ ok(
 
 my $loc2 = Storable::thaw($frozen);
 
-is( $loc2->id, 'en-US', 'thaw frozen locale object' );
+is( $loc2->code, 'en-US', 'thaw frozen locale object' );
 
 my $loc3 = Storable::dclone($loc1);
 
-is( $loc3->id, 'en-US', 'dclone object' );
+is( $loc3->code, 'en-US', 'dclone object' );
+
+my $dir = tempdir( CLEANUP => 1 );
+my $file = File::Spec->catfile( $dir, 'dt-locale.storable' );
+
+open my $fh, '>', $file or die $!;
+print {$fh} $frozen or die $!;
+close $fh or die $!;
+
+# We need to make sure that the object can be thawed in a process that has not
+# yet loaded DateTime::Locale. See
+# https://github.com/houseabsolute/DateTime-Locale/issues/18.
+my $code = <<'EOF';
+use strict;
+use warnings;
+
+use Storable qw( thaw );
+
+open my $fh, '<', shift or die $!;
+my $loc = thaw( do { local $/; <$fh> });
+print $loc->code . "\n";
+EOF
+
+my $id = capturex( $^X, '-e', $code, $file );
+chomp $id;
+is(
+    $id,
+    'en-US',
+    'can thaw a DateTime::Locale::FromData object in a process that has not loaded DateTime::Locale yet'
+);
 
 done_testing();

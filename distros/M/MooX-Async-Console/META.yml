@@ -31,5 +31,5 @@ requires:
   namespace::clean: '0.27'
   perl: '5.024'
   strictures: '2'
-version: '0.103'
+version: '0.105'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

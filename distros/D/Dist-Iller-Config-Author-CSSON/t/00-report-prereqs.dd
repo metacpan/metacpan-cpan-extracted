@@ -87,7 +87,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Iller' => '0.1408',
-                                      'Dist::Iller::Config::Author::CSSON' => '0.0320'
+                                      'Dist::Iller::Config::Author::CSSON' => '0.0321'
                                     }
                     },
        'runtime' => {

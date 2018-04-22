@@ -149,7 +149,7 @@ CODE:
 			data += MAX_WRITE_SIZE;
 			len  -= MAX_WRITE_SIZE;
 		}
-		shawrite(data, len << 3, &sha3);
+		shawrite(data, (ULNG) len << 3, &sha3);
 	}
 	shafinish(&sha3);
 	len = 0;
@@ -198,7 +198,7 @@ PPCODE:
 			data += MAX_WRITE_SIZE;
 			len  -= MAX_WRITE_SIZE;
 		}
-		shawrite(data, len << 3, state);
+		shawrite(data, (ULNG) len << 3, state);
 	}
 	XSRETURN(1);
 
@@ -249,7 +249,7 @@ PREINIT:
 PPCODE:
 	if (!f || (state = getSHA3(aTHX_ self)) == NULL)
 		XSRETURN_UNDEF;
-	while ((n = PerlIO_read(f, in, sizeof(in))) > 0)
+	while ((n = (int) PerlIO_read(f, in, sizeof(in))) > 0)
 		shawrite(in, (ULNG) n << 3, state);
 	XSRETURN(1);
 
@@ -267,7 +267,7 @@ PREINIT:
 PPCODE:
 	if (!f || (state = getSHA3(aTHX_ self)) == NULL)
 		XSRETURN_UNDEF;
-	while ((n = PerlIO_read(f, in+1, IO_BUFFER_SIZE)) > 0) {
+	while ((n = (int) PerlIO_read(f, in+1, IO_BUFFER_SIZE)) > 0) {
 		for (dst = in, src = in + 1; n; n--) {
 			c = *src++;
 			if (!cr) {

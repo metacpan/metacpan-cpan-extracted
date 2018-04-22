@@ -15,7 +15,8 @@ my $contents = $tzil->slurp_file('build/Makefile.PL');
 
 {
     my $conditional = q|if ( $^O eq 'MSWin32' ) {|;
-    my $prereq      = q|$WriteMakefileArgs{PREREQ_PM}{'Win32API::File'} = '0.11'|;
+    my $prereq =
+      q|$WriteMakefileArgs{PREREQ_PM}{'Win32API::File'} = $FallbackPrereqs{'Win32API::File'} = '0.11'|;
 
     like(
         $contents,
@@ -26,7 +27,8 @@ my $contents = $tzil->slurp_file('build/Makefile.PL');
 
 {
     my $conditional = q|if ( $^O eq 'Haiku' ) {|;
-    my $prereq      = q|$WriteMakefileArgs{PREREQ_PM}{'File::Temp'} = '0.18'|;
+    my $prereq =
+      q|$WriteMakefileArgs{PREREQ_PM}{'File::Temp'} = $FallbackPrereqs{'File::Temp'} = '0.18'|;
 
     like(
         $contents,

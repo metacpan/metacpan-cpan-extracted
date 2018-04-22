@@ -1,5 +1,10 @@
 Revision history for Task-Devel-Essentials
 
+0.007   Fri, 20 Apr 2018 13:50:27 +0200
+        upgraded versions
+        sorted modules topologically
+        added tidbits
+
 0.006   Mon, 30 Oct 2017 12:20:51 +0100
         upgraded versions
         added more modules

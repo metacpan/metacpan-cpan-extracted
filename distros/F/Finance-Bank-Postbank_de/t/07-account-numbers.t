@@ -14,10 +14,10 @@ BEGIN {
                           );
 };
 
-use Test::More tests => 5 + scalar @related_accounts *2;
+use Test::More tests => 4 + scalar @related_accounts *2;
 use Test::MockObject;
 
-BEGIN { use_ok("Finance::Bank::Postbank_de"); };
+use Finance::Bank::Postbank_de;
 
 sub login {
   Finance::Bank::Postbank_de->new(
@@ -49,20 +49,26 @@ SKIP: {
   skip "Need SSL capability to access the website",3 + + scalar @related_accounts *2
     unless LWP::Protocol::implementor('https');
 
-  my $account = login;
+
+  my $account = login();
 
   # Get the login page:
   my $status = $account->get_login_page(&Finance::Bank::Postbank_de::LOGIN);
 
   # Check that we got a wellformed page back
   SKIP: {
-    unless ($status == 200) {
+    if ($status != 200) {
       diag $account->agent->res->as_string;
       skip "Didn't get a connection to ".&Finance::Bank::Postbank_de::LOGIN."(LWP: $status)",3;
+    } elsif( $account->maintenance ) {
+        skip "Banking is unavailable due to maintenance", 3 + @related_accounts*2;
     };
-    skip "Banking is unavailable due to maintenance", 3 + @related_accounts*2
-      if $account->maintenance;
     $account->agent(undef);
+    $account->new_session;
+    $account->select_function('accountstatement');
+    if( $account->maintenance ) {
+        skip "Banking is unavailable due to maintenance", 3 + @related_accounts*2;
+    };
 
     my @fetched_accounts = sort $account->account_numbers;
     if (! is_deeply(\@fetched_accounts,\@related_accounts,"Retrieve account numbers")) {

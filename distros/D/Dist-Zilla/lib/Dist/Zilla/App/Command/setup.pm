@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::setup 6.011;
+package Dist::Zilla::App::Command::setup 6.012;
 # ABSTRACT: set up a basic global config file
 
 use Dist::Zilla::App -command;
@@ -168,7 +168,7 @@ Dist::Zilla::App::Command::setup - set up a basic global config file
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 SYNOPSIS
 

@@ -20,9 +20,9 @@ my @files = (
     't/00-compile.t',
     't/author-eol.t',
     't/author-no-tabs.t',
+    't/author-pod-syntax.t',
     't/basic.t',
-    't/release-pod-coverage.t',
-    't/release-pod-syntax.t'
+    't/release-pod-coverage.t'
 );
 
 notabs_ok($_) foreach @files;

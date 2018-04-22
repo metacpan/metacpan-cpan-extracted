@@ -4,25 +4,31 @@ NAME
 
 SYNOPSIS
 
-      use Test::Deep;
-      use Test::Deep::URI;
+        use Test::Deep;
+        use Test::Deep::URI;
     
-      $testing_url = "http://site.com/path?a=1&b=2";
-      cmp_deeply(
-        $testing_url,
-        all(
-          uri("http://site.com/path?a=1&b=2"),
-          # or
-          uri("//site.com/path?a=1&b=2"),
-          # or
-          uri("/path?b=2&a=1"),
-        )
-      );
+        $testing_url = "http://site.com/path?a=1&b=2";
+        cmp_deeply(
+            $testing_url,
+            all(
+                uri("http://site.com/path?a=1&b=2"),
+                # or
+                uri("//site.com/path?a=1&b=2"),
+                # or
+                uri("/path?b=2&a=1"),
+            )
+        );
+    
+        cmp_deeply(
+            $testing_url,
+            uri_qf("/path", { a => 1, b => ignore() }),
+        );
 
 DESCRIPTION
 
-    Test::Deep::URI provides the function uri($expected) for Test::Deep.
-    Use it in combination with cmp_deeply to test against partial URIs.
+    Test::Deep::URI provides the functions uri($expected) and
+    uri_qf($expected, $query_form) for Test::Deep. Use it in combination
+    with cmp_deeply to test against partial URIs.
 
     In particular I wrote this because I was tired of stumbling across unit
     tests that failed because http://site.com/?foo=1&bar=2 didn't match
@@ -37,6 +43,15 @@ FUNCTIONS
       Exported by default.
 
       $expected should be a string that can be passed to URI->new().
+
+    uri_qf($expected, $query_form)
+
+      Exported by default.
+
+      $expected should be a string that can be passed to URI->new().
+
+      $query_form should be whatever structure you want to check the query
+      form against.
 
 ERRATA
 

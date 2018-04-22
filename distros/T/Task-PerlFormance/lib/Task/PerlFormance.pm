@@ -2,11 +2,11 @@ use 5.008;
 use strict;
 use warnings;
 package Task::PerlFormance;
-# git description: v0.006-1-g64290b4
+# git description: v0.007-1-g7163d42
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Max dependencies for Benchmark::Perl::Formance
-$Task::PerlFormance::VERSION = '0.007';
+$Task::PerlFormance::VERSION = '0.008';
 
 __END__
 
@@ -20,7 +20,7 @@ Task::PerlFormance - Max dependencies for Benchmark::Perl::Formance
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 TASK CONTENTS
 
@@ -37,6 +37,10 @@ version 0.007
 =head3 L<Benchmark::Perl::Formance>
 
 =head3 L<Benchmark::Perl::Formance::Cargo>
+
+=head3 L<Benchmark::Perl::Formance::Plugin::PerlStone2015>
+
+=head3 L<Benchmark::Perl::Formance::Plugin::Mandelbrot>
 
 =head3 L<BenchmarkAnything::Reporter>
 
@@ -136,7 +140,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Steffen Schwigon.
+This software is copyright (c) 2018 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

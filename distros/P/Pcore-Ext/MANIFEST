@@ -8,6 +8,7 @@ cpanfile
 lib/Build.PL
 lib/Pcore/App/Controller/Ext.pm
 lib/Pcore/Ext.pm
+lib/Pcore/Ext/Base.pm
 lib/Pcore/Ext/Class/AmCharts.pm
 lib/Pcore/Ext/Class/Grid.pm
 lib/Pcore/Ext/Class/PayPal.pm

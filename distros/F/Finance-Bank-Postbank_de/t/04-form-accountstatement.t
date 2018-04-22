@@ -38,16 +38,18 @@ SKIP: {
       diag $account->agent->title;
       skip "Didn't get a connection to ".&Finance::Bank::Postbank_de::LOGIN."(LWP: $status)", 7;
     };
-    skip "Banking is unavailable due to maintenance", 9
+    skip "Banking is unavailable due to maintenance", 7
       if $account->maintenance;
     $account->agent(undef);
-
     $status = $account->new_session();
+
     $status = $account->select_function("accountstatement");
-    unless ($status == 200) {
+    if ($status != 200) {
       diag $account->agent->res->as_string;
-      skip "Couldn't get to account statement (LWP: $status)",5;
-    };
+      skip "Couldn't get to account statement (LWP: $status)",7;
+    } elsif( $account->maintenance ) {
+      skip "Couldn't get to account statement (maintenance)",7;
+    }
 
     form_ok( $account->agent, '' => @fields );
     ok($account->close_session(),"Closed session");

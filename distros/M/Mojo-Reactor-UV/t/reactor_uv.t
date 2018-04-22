@@ -2,17 +2,21 @@ use Mojo::Base -strict;
 
 use Test::More;
 use IO::Socket::INET;
+use Mojo::Reactor::UV;
+use Scalar::Util 'refaddr';
 
 # Instantiation
-use_ok 'Mojo::Reactor::UV';
 my $reactor = Mojo::Reactor::UV->new;
+my $refaddr = refaddr $reactor->{loop};
 is ref $reactor, 'Mojo::Reactor::UV', 'right object';
-is ref Mojo::Reactor::UV->new, 'Mojo::Reactor::Poll', 'right object';
+is ref Mojo::Reactor::UV->new, 'Mojo::Reactor::UV', 'right object';
+isnt refaddr(Mojo::Reactor::UV->new->{loop}), $refaddr, 'loop is not singleton';
 undef $reactor;
 is ref Mojo::Reactor::UV->new, 'Mojo::Reactor::UV', 'right object';
-use_ok 'Mojo::IOLoop';
+require Mojo::IOLoop;
 $reactor = Mojo::IOLoop->singleton->reactor;
 is ref $reactor, 'Mojo::Reactor::UV', 'right object';
+is refaddr($reactor->{loop}), $refaddr, 'loop is singleton';
 
 # Make sure it stops automatically when not watching for events
 my $triggered;
@@ -142,7 +146,8 @@ ok !$readable,  'io event was not triggered again';
 ok !$writable,  'io event was not triggered again';
 ok !$recurring, 'recurring was not triggered again';
 my $reactor2 = Mojo::Reactor::UV->new;
-is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
+is ref $reactor2, 'Mojo::Reactor::UV', 'right object';
+isnt refaddr($reactor->{loop}), refaddr($reactor2->{loop}), 'different refaddr';
 
 # Ordered next_tick
 my $result = [];
@@ -241,7 +246,7 @@ is(Mojo::Reactor->detect, 'Mojo::Reactor::UV', 'right class');
 
 # Dummy reactor
 package Mojo::Reactor::Test;
-use Mojo::Base 'Mojo::Reactor::Poll';
+use Mojo::Base 'Mojo::Reactor::UV';
 
 package main;
 

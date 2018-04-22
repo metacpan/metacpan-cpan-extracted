@@ -2,7 +2,7 @@ NAME
     Time::Tiny - A time object, with as little code as possible
 
 VERSION
-    version 1.07
+    version 1.08
 
 SYNOPSIS
       # Create a time manually
@@ -68,14 +68,14 @@ DESCRIPTION
     the usefulness greatly.
 
     To make up for this, if you have DateTime installed, any Time::Tiny
-    module can be inflated into the equivalent DateTime as needing, loading
+    module can be inflated into the equivalent DateTime as needed, loading
     DateTime on the fly if necessary.
 
     For the purposes of date/time logic, all Time::Tiny objects exist in the
     "C" locale, and the "floating" time zone (although obviously in a pure
     date context, the time zone largely doesn't matter).
 
-    When converting up to full DateTime objects, these local and time zone
+    When converting up to full DateTime objects, these locale and time zone
     settings will be applied (although an ability is provided to override
     this).
 
@@ -186,6 +186,9 @@ AUTHORS
     *   Adam Kennedy <adamk@cpan.org>
 
     *   David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Tim Heaney <oylenshpeegul@gmail.com>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2006 by Adam Kennedy.

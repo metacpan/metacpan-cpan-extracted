@@ -1,5 +1,36 @@
 See http://github.com/miyagawa/cpanminus/ for the latest development.
 
+1.9017  2018-04-21 19:30:21 CEST
+   [Bug Fixes]
+      - Change the log output to say App::cpanminus for downstream consumers such as
+        App::cpanminus::reporter
+
+1.9016  2018-04-21 13:17:14 CEST
+   [Improvements]
+      - Support version in x_static_install (leont)
+
+1.9015  2018-04-21 12:55:01 CEST
+   [Improvements]
+      - Make static install work out of the box, and require TAP::Harness::Env only
+        when tesing is enabled
+
+1.9014  2018-04-21 11:39:11 CEST
+   [Bug Fixes]
+      - Fix quoting in commands in Win32 #545
+      - Disable static_install when required modules are not installed
+
+1.9013  2018-04-20 23:17:33 CEST
+   [New Features]
+      - Support dist, mirror and url options in cpanfile (#568)
+
+1.9012  2018-04-20 16:53:04 CEST
+   [Releng]
+      - Change git tag format to identify Menlo and App-cpanminus
+
+1.9011  2018-04-20 14:38:47 CEST
+   [Bug Fixes]
+      - Restore arguments to Menlo::CLI::Compat->new for cpm (skaji)
+
 1.9010  2018-04-20 11:57:17 CEST
    [Bug Fixes]
       - Stop passing command-line supplied arguments to Menlo::CLI::Compat object directly

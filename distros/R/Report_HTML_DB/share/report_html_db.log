@@ -1,0 +1,77 @@
+
+example.json read!
+
+/usr/local/genome/databases/TCDB/TCDB_ID_list read!
+
+Deleting old fasta directories
+
+Separating sequences od multifasta and create directory
+
+Reading sequences
+
+Creating website...
+
+Creating services...
+
+Creating view
+
+Editing view
+
+Creating SQL file	script.sql
+
+Creating database file	/home/wendelhlc/git/report_html_db/report_html_db/teste_diretorio/db/saida_db/website/database.db
+
+Creating models
+
+Creating controllers...
+Copying files assets
+
+Creating html views
+
+Criando diretorio about
+
+Criando arquivo index.tt
+
+Criando arquivo _content.tt
+
+Criando diretorio shared
+
+Criando arquivo _menu.tt
+
+Criando arquivo _header.tt
+
+Criando arquivo _footer.tt
+
+Criando arquivo _head.tt
+
+Criando diretorio downloads
+
+Criando arquivo _content.tt
+
+Criando arquivo index.tt
+
+Criando diretorio home
+
+Criando arquivo _panelInformation.tt
+
+Criando arquivo index.tt
+
+Criando diretorio blast
+
+Criando arquivo index.tt
+
+Criando arquivo _forms.tt
+
+Criando diretorio help
+
+Criando arquivo index.tt
+
+Criando arquivo _content.tt
+
+Creating wrapper
+
+Editing root file
+Done
+Turn on the server with this command:
+./website/script/website_server.pl -r
+http://localhost:3000

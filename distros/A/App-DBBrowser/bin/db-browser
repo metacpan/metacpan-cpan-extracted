@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.013';
+our $VERSION = '2.014';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.013
+Version 2.014
 
 =cut
 
@@ -267,7 +267,7 @@ Delete records.
 
 =head3 The Sub Statements
 
-Use I<Print TABLE> the get the output from the formed statement.
+Use I<Print TABLE> to get the output from the formed statement.
 
 To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
 
@@ -458,6 +458,11 @@ To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head3 Subqueries
 
+If at least one of the following sub-query options is enabled, the last 20 I<Print TABLE>-statements are saved
+temporary.
+
+Available sub-queries: the statements saved in the L<SQ File> and the temporarily saved statements.
+
 =over
 
 =item I<Subqueries in SELECT>
@@ -477,10 +482,6 @@ Choose C<=(Q> to use a query as a C<SET> value in an C<UPDATE>.
 =item I<Subqueries as table>
 
 Choose C<SQ> in the I<Tables Menu> to use a query instead of a table.
-
-If at least one of the sub-query options is enabled, the last 20 queries are saved temporary.
-
-Available sub-queries: the statements saved in the L<SQ File> and the temporarily saved statements.
 
 =back
 

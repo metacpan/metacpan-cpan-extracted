@@ -2,7 +2,7 @@ NAME
     Date::Advent - Calculate the Sundays of Advent
 
 VERSION
-    Version 1.20171223
+    Version 1.20180422
 
 SYNOPSIS
     Date::Advent takes a Time::Piece date and calculates all four Sundays of
@@ -23,9 +23,6 @@ SYNOPSIS
         say $testAdvent->thirdSunday; #Gives date for third Sunday of Advent
         say $testAdvent->fourthSunday; #Gives date for fourth Sunday of Advent
         say $testAdvent->christmas; #Gives date of Christmas
-
-    The development of this module is hosted on GitHub --
-    <https://github.com/marmanold/Date-Advent> -- and tested via TravisCI.
 
 Object Attributes
   date
@@ -61,7 +58,7 @@ Object Constructor
       my $testAdvent = Date::Advent->new(date => Time::Piece->strptime("2016-01-01", "%Y-%m-%d"));
 
 AUTHOR
-    Michael Wayne Arnold, "<marmanold at cpan.org>"
+    Michael Wayne Arnold, "<michael at rnold.info>"
 
 BUGS
     Please report any bugs or feature requests to "bug-date-advent at
@@ -94,11 +91,11 @@ SUPPORT
         <http://search.cpan.org/dist/Date-Advent/>
 
 ACKNOWLEDGEMENTS
-    Many thanks to my beautiful wife, Jennifer, and my amazing daughter,
-    Rosemary. But, above all, SOLI DEO GLORIA!
+    Many thanks to my beautiful wife, Jennifer, my amazing daughter,
+    Rosemary, and my sweet son, Oliver. But, above all, SOLI DEO GLORIA!
 
-LICENSE AND COPYRIGHT
-    Copyright 2016-2017 MICHAEL WAYNE ARNOLD
+LICENSE
+    Copyright 2016-2018 MICHAEL WAYNE ARNOLD
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -19,10 +19,15 @@ my @files = (
     't/02-localise.t',
     't/05-exception_xs.t',
     't/06-exception_pp.t',
+    't/07-nested.t',
     't/10-test_without_vm_pure_pp.t',
     't/11-direct_xs.t',
     't/12-direct_pp.t',
+    't/lib/OtherClass.pm',
+    't/lib/YetAnotherClass.pm',
     'xt/author/00-compile.t',
+    'xt/author/changes_has_content.t',
+    'xt/author/check-inc.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
     'xt/author/mojibake.t',
@@ -30,11 +35,10 @@ my @files = (
     'xt/author/pod-no404s.t',
     'xt/author/pod-spell.t',
     'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/minimum-version.t',
-    'xt/release/portability.t'
+    'xt/release/distmeta.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

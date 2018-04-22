@@ -4,12 +4,26 @@ use strict;
 use warnings;
 use version 0.77;
 use Module::Version qw(get_version);
+use Module::CoreList;
 
+my $in_core      = $Module::CoreList::version{$]} || {};
 my $MAKEFILE_PL  = 'Makefile.PL';
 my $MAKEFILE_TMP = 'Makefile.TMP';
+my $OVERRIDE     = 'OVERRIDE';
 my $THIS_YEAR    = this_year();
 
-my $changes = 0;
+my $changes   = 0;
+my @core_mods = ();
+my %override  = ();
+
+if (open my $of, '<', $OVERRIDE) {
+    while (<$of>) {
+        if (/^([\w:]+)\s+([\d._]+)\s*\z/) {
+            $override{$1} = $2;
+        }
+    }
+    close $of;
+}
 
 open my $mf, '<', $MAKEFILE_PL  or die "$MAKEFILE_PL: cannot open: $!\n";
 open my $tf, '>', $MAKEFILE_TMP or die "$MAKEFILE_TMP: cannot create: $!\n";
@@ -22,6 +36,9 @@ while (<$mf>) {
 close $tf or die "$MAKEFILE_TMP: cannot write+close: $!\n";
 close $mf;
 
+foreach my $module (@core_mods) {
+    warn "WARNING: $module $in_core->{$module} is from core\n";
+}
 if ($changes) {
     die "To commit these changes, move $MAKEFILE_TMP to $MAKEFILE_PL\n";
 }
@@ -32,19 +49,30 @@ sub this_year { (localtime)[5] + 1900 }
 
 sub _get_version {
     my ($module, $old_version) = @_;
-    my $version = get_version($module);
+    my $version =
+        exists($override{$module})? $override{$module}:
+        get_version($module);
     if (!defined $version) {
         warn "$module: not present, keeping version $old_version\n";
         return $old_version;
     }
-    my $cmp = version->parse($old_version) <=> version->parse($version);
-    if ($cmp > 1) {
+    my $version_obj = version->parse($version);
+    my $cmp = version->parse($old_version) <=> $version_obj;
+    if ($cmp > 0) {
         warn "$module: too old, keeping version $old_version\n";
         return $old_version;
     }
-    if ($cmp) {
-        warn "$module: upgrading to version $version from $old_version\n";
-        ++$changes;
+    return $old_version if !$cmp;
+    if (exists $in_core->{$module}) {
+        my $ccmp = version->parse($in_core->{$module}) <=> $version_obj;
+        if (!$ccmp) {
+            push @core_mods, $module;
+        }
+    }
+    warn "$module: upgrading to version $version from $old_version\n";
+    ++$changes;
+    if ('v' eq substr $version, 0, 1) {
+        return version->parse($version)->numify;
     }
     return $version;
 }

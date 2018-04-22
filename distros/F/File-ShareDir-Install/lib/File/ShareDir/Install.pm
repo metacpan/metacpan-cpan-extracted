@@ -1,7 +1,6 @@
-package File::ShareDir::Install; # git description: v0.11-16-gbf1b753
+package File::ShareDir::Install; # git description: v0.12-6-g29a6ff7
 # ABSTRACT: Install shared files
 
-use 5.008;
 use strict;
 use warnings;
 
@@ -10,7 +9,7 @@ use Carp ();
 use File::Spec;
 use IO::Dir;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @DIRS;
 our %ALREADY;
@@ -249,7 +248,7 @@ File::ShareDir::Install - Install shared files
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

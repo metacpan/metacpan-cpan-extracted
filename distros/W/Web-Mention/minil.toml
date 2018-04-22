@@ -1,0 +1,4 @@
+name = "Web-Mention"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

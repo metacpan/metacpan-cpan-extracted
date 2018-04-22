@@ -1,23 +1,33 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.17'
+                                        'ExtUtils::MakeMaker' => '6.17',
+                                        'perl' => '5.008001'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
                       'requires' => {
                                       'Dist::Zilla' => '5',
-                                      'Dist::Zilla::PluginBundle::DAGOLDEN' => '0.060',
+                                      'Dist::Zilla::PluginBundle::DAGOLDEN' => '0.072',
                                       'File::Spec' => '0',
                                       'File::Temp' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::License::Apache_2_0' => '0',
                                       'Test::CPAN::Meta' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
-                                      'Test::Spelling' => '0.12'
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {
@@ -32,20 +42,15 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '0',
-                                     'CPAN::Meta::Prereqs' => '0',
-                                     'CPAN::Meta::Requirements' => '2.120900'
+                                     'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'File::Spec::Functions' => '0',
                                    'File::pushd' => '0',
-                                   'List::Util' => '0',
-                                   'Scalar::Util' => '0',
                                    'Test::FailWarnings' => '0',
                                    'Test::More' => '0.96',
-                                   'version' => '0.77'
+                                   'perl' => '5.008001'
                                  }
                  }
      };

@@ -1,0 +1,13 @@
+Changes
+lib/Class/Slot.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.pod
+t/basics.t
+t/inheritance.t
+t/late_binding.t
+t/playing_nice.t
+t/util.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

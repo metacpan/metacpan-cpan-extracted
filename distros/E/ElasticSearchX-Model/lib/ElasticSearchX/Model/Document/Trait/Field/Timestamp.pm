@@ -1,14 +1,14 @@
 #
 # This file is part of ElasticSearchX-Model
 #
-# This software is Copyright (c) 2016 by Moritz Onken.
+# This software is Copyright (c) 2018 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document::Trait::Field::Timestamp;
-$ElasticSearchX::Model::Document::Trait::Field::Timestamp::VERSION = '1.0.2';
+$ElasticSearchX::Model::Document::Trait::Field::Timestamp::VERSION = '1.0.3';
 use Moose::Role;
 use ElasticSearchX::Model::Document::Types qw(:all);
 
@@ -33,7 +33,7 @@ around query_property => sub {1};
 around property => sub {0};
 
 package ElasticSearchX::Model::Document::Trait::Class::Timestamp;
-$ElasticSearchX::Model::Document::Trait::Class::Timestamp::VERSION = '1.0.2';
+$ElasticSearchX::Model::Document::Trait::Class::Timestamp::VERSION = '1.0.3';
 use Moose::Role;
 
 1;
@@ -50,7 +50,7 @@ ElasticSearchX::Model::Document::Trait::Field::Timestamp
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 AUTHOR
 
@@ -58,7 +58,7 @@ Moritz Onken
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Moritz Onken.
+This software is Copyright (c) 2018 by Moritz Onken.
 
 This is free software, licensed under:
 

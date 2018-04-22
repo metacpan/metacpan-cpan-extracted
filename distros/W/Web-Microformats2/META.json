@@ -1,0 +1,96 @@
+{
+   "abstract" : "Read Microformats2 metadata from HTML or JSON",
+   "author" : [
+      "Jason McIntosh (jmac@jmac.org)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.17",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Microformats2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::ISO8601" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "JSON" : "0",
+            "Moose" : "0",
+            "MooseX::Types::URI" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Path::Class::Dir" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Web::Microformats2" : {
+         "file" : "lib/Web/Microformats2.pm",
+         "version" : "0.02"
+      },
+      "Web::Microformats2::Document" : {
+         "file" : "lib/Web/Microformats2/Document.pm"
+      },
+      "Web::Microformats2::Item" : {
+         "file" : "lib/Web/Microformats2/Item.pm"
+      },
+      "Web::Microformats2::Parser" : {
+         "file" : "lib/Web/Microformats2/Parser.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmacdotorg/microformats2-perl/issues"
+      },
+      "homepage" : "https://github.com/jmacdotorg/microformats2-perl",
+      "repository" : {
+         "url" : "git://github.com/jmacdotorg/microformats2-perl.git",
+         "web" : "https://github.com/jmacdotorg/microformats2-perl"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Jason McIntosh <jmac@jmac.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -222,7 +222,7 @@ JS
                     requires: ['$data->{viewport_class}'],
                     name: '$data->{app_namespace}',
                     appFolder: '.',
-                    glyphFontFamily: 'FontAwesome',
+                    glyphFontFamily: '&quot;Font Awesome 5 Free&quot;;font-weight:900',
                     mainView: '$data->{viewport_class}'
                 });
             });

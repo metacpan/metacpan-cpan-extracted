@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,21 +20,22 @@ name: Mojolicious-Plugin-Authentication
 provides:
   Mojolicious::Plugin::Authentication:
     file: lib/Mojolicious/Plugin/Authentication.pm
-    version: '1.32'
+    version: '1.33'
 requires:
   Mojo::Base: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://gitlab.com/benvanstaveren/Mojolicious-Plugin-Authentication/issues
+  bugtracker: https://github.com/benvanstaveren/Mojolicious-Plugin-Authentication/issues
   repository: git://github.com/benvanstaveren/Mojolicious-Plugin-Authentication.git
-version: '1.32'
+version: '1.33'
 x_contributors:
   - 'Carlos Ramos <carragom@gmail.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Doug Bell <preaction@cpan.org>'
   - 'Edward Wildgoose <cpan@wildgooses.com>'
+  - 'Florian Schlichting <fsfs@debian.org>'
   - 'Hernan Lopes <hernan@cpan.org>'
   - 'Jose Joaquin Atria <jjatria@cpan.org>'
   - 'Karpich Dmitry <meettya@cpan.org>'
@@ -42,4 +43,5 @@ x_contributors:
   - 'Mirko Westermeier <mirko@westermeier.de>'
   - 'Roman F. <romanf@cpan.org>'
   - 'Terrence Brannon <tbone@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  - 'Красимир Беров <k.berov@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -20,8 +20,7 @@ sub formconfig_FORM_COMPLETE {
     if ( $multi->complete ) {
         my $params = $multi->current_form->params;
 
-        $c->stash->{results} = join "\n",
-            map { sprintf "%s: %s", $_, $params->{$_} } keys %$params;
+        $c->stash->{results} = join "\n", map { sprintf "%s: %s", $_, $params->{$_} } keys %$params;
 
         $c->stash->{message} = 'Complete';
     }
@@ -37,8 +36,7 @@ sub formmethod_FORM_COMPLETE {
     if ( $multi->complete ) {
         my $params = $multi->current_form->params;
 
-        $c->stash->{results} = join "\n",
-            map { sprintf "%s: %s", $_, $params->{$_} } keys %$params;
+        $c->stash->{results} = join "\n", map { sprintf "%s: %s", $_, $params->{$_} } keys %$params;
 
         $c->stash->{message} = 'Complete';
     }
@@ -51,10 +49,7 @@ sub _load_form : Private {
 
         crypt_args => { '-key' => 'my secret', },
 
-        forms => [
-            { element => { name => 'page1' }, },
-            { element => { name => 'page2' }, }
-        ],
+        forms => [ { element => { name => 'page1' }, }, { element => { name => 'page2' }, } ],
     };
 }
 

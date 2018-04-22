@@ -12,13 +12,15 @@ lib/Catalyst/Authentication/User/AuthTkt.pm
 Makefile.PL
 MANIFEST
 META.yml
-README
+README.pod
 t/00-load.t
 t/01-authtkt.t
+t/02-ignore_ip.t
 t/MyApp/lib/MyApp.pm
 t/MyApp/lib/MyApp/Controller/Root.pm
 t/MyApp/Makefile.PL
 t/MyApp/myapp.conf
+t/MyApp/myapp_ignore_ip.conf
 t/MyApp/script/myapp_server.pl
 t/pod-coverage.t
 t/pod.t

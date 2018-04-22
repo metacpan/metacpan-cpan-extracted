@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,16 +19,16 @@ meta-spec:
 name: Task-BeLike-DAGOLDEN
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Task::BeLike::DAGOLDEN:
     file: lib/Task/BeLike/DAGOLDEN.pm
-    version: '1.010'
+    version: '1.011'
 requires:
   Acme::require::case: '0'
   App::Ack: '0'
@@ -68,7 +68,6 @@ requires:
   Email::Simple::Creator: '0'
   File::Find::Rule: '0'
   File::Find::Rule::Perl: '0'
-  File::Slurp: '0'
   File::pushd: '0'
   Getopt::Lucid: '0'
   Git::Wrapper: '0'
@@ -135,5 +134,9 @@ resources:
   bugtracker: https://github.com/dagolden/Task-BeLike-DAGOLDEN/issues
   homepage: https://github.com/dagolden/Task-BeLike-DAGOLDEN
   repository: https://github.com/dagolden/Task-BeLike-DAGOLDEN.git
-version: '1.010'
+version: '1.011'
 x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

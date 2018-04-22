@@ -1,4 +1,4 @@
-package Dist::Zilla 6.011;
+package Dist::Zilla 6.012;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -612,6 +612,7 @@ sub _build_distmeta {
     generated_by   => $self->_metadata_generator_id
                     . ' version '
                     . ($self->VERSION // '(undef)'),
+    x_generated_by_perl => "$^V", # v5.24.0
   });
 
   return $meta;
@@ -891,7 +892,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 DESCRIPTION
 

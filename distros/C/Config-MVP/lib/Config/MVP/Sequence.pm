@@ -1,6 +1,6 @@
 package Config::MVP::Sequence;
 # ABSTRACT: an ordered set of named configuration sections
-$Config::MVP::Sequence::VERSION = '2.200010';
+$Config::MVP::Sequence::VERSION = '2.200011';
 use Moose 0.91;
 
 #pod =head1 DESCRIPTION
@@ -188,7 +188,7 @@ Config::MVP::Sequence - an ordered set of named configuration sections
 
 =head1 VERSION
 
-version 2.200010
+version 2.200011
 
 =head1 DESCRIPTION
 
@@ -248,7 +248,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

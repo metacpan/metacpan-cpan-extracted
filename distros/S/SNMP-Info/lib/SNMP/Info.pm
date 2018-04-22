@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.55';
+$VERSION = '3.56';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.55
+SNMP::Info - Version 3.56
 
 =head1 AUTHOR
 
@@ -4285,7 +4285,10 @@ sub _load_attr {
         # the match to make sure we didn't leave the table during getnext
         # requests
 
-        my ($leaf) = $qual_leaf =~ /::(\w+)$/;
+        my ($leaf) = $qual_leaf =~ /::(.+)$/;
+        
+        # If we weren't able to translate, we'll only have an OID
+        $leaf = $oid unless defined $leaf;
 
         $self->debug()
             and print "SNMP::Info::_load_attr $method : $qual_leaf",
@@ -4656,7 +4659,12 @@ sub _validate_autoload_method {
     }
 
     # Validate that we have proper access for the operation
-    my $access = $SNMP::MIB{$oid}{'access'} || '';
+    my $access = '';
+    
+    # Prevent autovivification by checking that MIB leaf exists
+    if (exists $SNMP::MIB{$oid}) {
+        $access = $SNMP::MIB{$oid}{'access'} || '';
+    }
 
     # If we were given a fully qualified OID because we don't have the MIB
     # file, it will translate above but we won't be able to check access so

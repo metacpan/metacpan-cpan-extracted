@@ -49,3 +49,4 @@ t/43_indent_atom.t
 t/44_cdata.t
 t/45_cdata_multi.t
 t/46_atom_xhtml.t
+META.json                                Module JSON meta-data (added by MakeMaker)

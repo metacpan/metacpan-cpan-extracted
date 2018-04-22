@@ -1,5 +1,10 @@
 Revision history for Perl module Digest::SHA::PurePerl.
 
+6.02  Fri Apr 20 16:25:30 MST 2018
+	- modified addfile to return error when given a directory name
+		-- makes behavior consistent with GNU coreutils shaXsum
+		-- thanks to Scott Baker for pointing this out
+
 6.01  Mon Dec 25 00:08:08 MST 2017
 	- added "--ignore-missing" and "--strict" options to shasumpp
 		-- consistent with GNU coreutils

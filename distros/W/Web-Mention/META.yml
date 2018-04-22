@@ -1,0 +1,53 @@
+---
+abstract: 'Implementation of the IndieWeb Webmention protocol'
+author:
+  - '$author = $wm->author;'
+build_requires:
+  List::Util: '0'
+  Path::Class::Dir: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-Mention
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Web::Mention:
+    file: lib/Web/Mention.pm
+    version: '0.2'
+  Web::Mention::Author:
+    file: lib/Web/Mention/Author.pm
+requires:
+  DateTime: '0'
+  LWP: '0'
+  Moose: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::Enumeration: '0'
+  MooseX::Types::URI: '0'
+  Path::Class::Dir: '0'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  Web::Microformats2::Parser: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/jmacdotorg/webmention-perl/issues
+  homepage: https://github.com/jmacdotorg/webmention-perl
+  repository: git://github.com/jmacdotorg/webmention-perl.git
+version: '0.2'
+x_contributors:
+  - 'JmacDotOrg <jmac@jmac.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

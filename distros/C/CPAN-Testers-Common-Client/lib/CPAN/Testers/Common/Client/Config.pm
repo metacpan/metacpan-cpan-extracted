@@ -18,7 +18,7 @@ sub new {
         _config => {},
     }, $class;
 
-    my $warn = exists $args{'warn'} ? $args{'warn'} : \&CORE::warn;
+    my $warn = exists $args{'warn'} ? $args{'warn'} : sub { warn @_ };
     $self->_set_mywarn( $warn )
         or Carp::croak q(the 'warn' parameter must be a coderef);
 
@@ -723,7 +723,7 @@ END_ID_FILE
 sub _parse_transport_args {
     my ($transport_args) = @_;
     my @args;
-    while ($transport_args =~ /\s*((?:[^'"\s]\S*)|(["'])(?:\\?+.)*?\2)/g) {
+    while ($transport_args =~ /\s*((?:[^'"\s]\S*)|(["'])(?:(?>\\?).)*?\2)/g) {
         my $arg = $1;
         if ($2) {
             $arg =~ s/\A(['"])(.+)\1\z/$2/;

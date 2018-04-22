@@ -29,7 +29,8 @@ resources:
   bugtracker: https://github.com/polettix/YAML-Dump/issues
   homepage: https://github.com/polettix/YAML-Dump
   repository: https://github.com/polettix/YAML-Dump.git
-version: '1.82'
+version: '1.84'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

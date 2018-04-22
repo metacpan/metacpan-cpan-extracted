@@ -1,5 +1,9 @@
 Revision history for Config-MVP
 
+2.200011  2018-04-21 10:12:06+02:00 Europe/Oslo
+        - cwd is now locally added to @INC during config reading (but this can
+          be disabled by setting add_cwd_to_lib to false)
+
 2.200010  2015-03-17 07:43:04-04:00 America/New_York
         - copypaste code!  apply section_name fix from Section to WithBundles
           (thanks, Karen Etheridge)

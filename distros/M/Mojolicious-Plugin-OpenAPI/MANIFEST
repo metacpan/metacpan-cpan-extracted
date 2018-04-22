@@ -4,6 +4,7 @@
 Changes
 cpanfile
 lib/Mojolicious/Plugin/OpenAPI.pm
+lib/Mojolicious/Plugin/OpenAPI/Cors.pm
 lib/Mojolicious/Plugin/OpenAPI/Guides/Swagger2.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/Tutorial.pod
 lib/Mojolicious/Plugin/OpenAPI/Security.pm
@@ -36,6 +37,7 @@ t/route-names.t
 t/security-disabled.t
 t/security.t
 t/set-request.t
+t/simple-cors.t
 t/spec.t
 t/swagger2.t
 t/tutorial.t

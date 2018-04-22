@@ -1,15 +1,12 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::More;
+use Test2::V0;
 
 use Mastodon::Client;
 
 my $client = Mastodon::Client->new();
 
-dies_ok { $client->authorize; }
-  'Cannot authorize a client without ID and secret';
+like dies { $client->authorize; },
+    qr/cannot authorize client without/i,
+    'Cannot authorize a client without ID and secret';
 
 $client = Mastodon::Client->new(
     client_id     => 'id',

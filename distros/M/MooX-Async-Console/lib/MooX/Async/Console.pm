@@ -1,6 +1,6 @@
 package MooX::Async::Console;
 
-our $VERSION = '0.103';
+our $VERSION = '0.105';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -47,7 +47,7 @@ use Moo::Role;
 use Future;
 use Module::Runtime qw(compose_module_name use_module);
 use MooX::Async;
-use Scalar::Util    qw(blessed);
+use Scalar::Util    qw(blessed weaken);
 use Syntax::Keyword::Try;
 use namespace::clean;
 
@@ -81,7 +81,15 @@ Its interface is desribed in L</on_command> in L</COMMANDS>.
 sub _launch_console {
     my $self = shift;
     my $module = compose_module_name(__PACKAGE__, shift);
-    my $executive = sub { unshift @_, $self; goto \&__execute };
+    weaken $self;
+    my $executive = sub {
+        if (not $self) {
+            warn "MooX::Async::Console went away with events pending";
+            return;
+        }
+        unshift @_, $self;
+        goto \&__execute;
+    };
     use_module($module)->new(@_, on_command => $executive);
 }
 

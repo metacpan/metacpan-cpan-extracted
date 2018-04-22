@@ -1,8 +1,9 @@
 BEGIN { delete $ENV{PERL_STRICTURES_EXTRA} }
 use strict;
 use warnings;
-use Test::More $] >= 5.008_004 ? qw(no_plan)
-  : (skip_all => 'Extra tests disabled on perls <= 5.008003');
+use Test::More 0.88;
+
+plan skip_all => 'Extra tests disabled on perls <= 5.008003' unless "$]" >= 5.008_004;
 
 use File::Temp;
 use Cwd 'cwd';
@@ -130,3 +131,5 @@ use strictures $version;
     }
   }
 }
+
+done_testing;

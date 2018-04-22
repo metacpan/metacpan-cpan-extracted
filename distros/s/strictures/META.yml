@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,14 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=strictures
   license: http://dev.perl.org/licenses/
-  repository: git://git.shadowcat.co.uk/p5sagit/strictures.git
-version: '2.000004'
+  repository: https://github.com/p5sagit/strictures.git
+version: '2.000005'
 x_authority: cpan:MSTROUT
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Matt S Trout <mst@shadowcat.co.uk>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'Diab Jerius <djerius@cfa.harvard.edu>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

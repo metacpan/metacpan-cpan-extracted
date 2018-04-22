@@ -33,6 +33,7 @@ share {
 
   plugin 'Decode::HTML';
   plugin 'Extract' => $format;
+  plugin 'Build::Make' => 'gmake';
 
   build sub {
     my ($build) = @_;
@@ -85,7 +86,7 @@ sub build_from_source {
     ->child('build', "gmake.$platform");
 
   local $CWD = $src_dir->stringify;
-  $build->system('%{make}', 'config=release');
+  $build->system('%{gmake}', 'config=release');
 
   return Path::Tiny::path( $build->install_prop->{extract} )
     ->child('bin', 'release', $executable);

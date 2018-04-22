@@ -18,7 +18,7 @@ use IO::Socket::SSL qw(SSL_VERIFY_PEER SSL_VERIFY_NONE);
 
 use vars qw[ $VERSION ];
 
-$VERSION = '0.48';
+$VERSION = '0.49';
 
 
 BEGIN {
@@ -30,8 +30,8 @@ use constant LOGIN => 'https://banking.postbank.de/rai/login';
 use vars qw(%functions);
 BEGIN {
   %functions = (
-    quit		=> [ text_regex => qr'Banking beenden' ],
-    accountstatement	=> [ text_regex => qr'Ums.tze' ],
+    quit		=> [ text_regex => qr'\bBanking\s+beenden\b' ],
+    accountstatement	=> [ text_regex => qr'\bUms.*?tze\b' ],
   );
 };
 
@@ -59,7 +59,7 @@ sub new {
 };
 
 sub log { $_[0]->{logger}->(@_); };
-sub log_httpresult { $_[0]->log("HTTP Code",$_[0]->agent->status,$_[0]->agent->res->as_string) };
+sub log_httpresult { $_[0]->log("HTTP Code",$_[0]->agent->status,$_[0]->agent->res->headers->as_string . $_[0]->agent->content) };
 
 sub new_session {
   my ($self) = @_;
@@ -76,23 +76,27 @@ sub new_session {
     };
     my $agent = $self->agent();
     $agent->form_id("id4");
-    eval {
+    my $ok = eval {
       $agent->current_form->value( 'nutzernameStateEnclosure:nutzername' => $self->login );
       $agent->current_form->value( 'kennwortStateEnclosure:kennwort' => $self->password );
+      1;
     };
-    if ($@) {
-      warn $agent->content;
+    if (! $ok) {
+      #warn $agent->content;
       croak $@;
     };
-    #$agent->submit;
     $agent->click('loginButton');
     $self->log_httpresult();
     $result = $agent->status;
-
-    if ($self->is_security_advice) {
-      $self->skip_security_advice;
+    if( $self->is_nutzungshinweis ) {
+print "Nutzungshinweis\n";
+      $self->skip_nutzungshinweis;
     };
 
+    if ($self->is_security_advice) {
+print "Security advice\n";
+      $self->skip_security_advice;
+    };
     $self->init_session_urls()
         if not $self->access_denied();
   };
@@ -149,10 +153,23 @@ sub is_security_advice {
   $self->agent->content() =~ /\bZum\s+Finanzstatus\b/;
 };
 
+sub is_nutzungshinweis {
+  my ($self) = @_;
+  $self->agent->content() =~ /\bAus Sicherheitsgr.*?nden haben wir einige\b/;
+};
+
+
 sub skip_security_advice {
   my ($self) = @_;
   $self->log('Skipping security advice page');
   $self->agent->follow_link(text_regex => qr/\bZum\s+Finanzstatus\b/);
+  # $self->agent->content() =~ /Sicherheitshinweis/;
+};
+
+sub skip_nutzungshinweis {
+  my ($self) = @_;
+  $self->log('Skipping nutzungshinweis page');
+  $self->agent->follow_link(text_regex => qr/\bZur\s+Konten.bersicht\b/);
   # $self->agent->content() =~ /Sicherheitshinweis/;
 };
 
@@ -172,11 +189,13 @@ sub error_message {
   return unless $self->agent;
   die "No error condition detected in:\n" . $self->agent->content
     unless $self->error_page;
+  if( 
   $self->agent->content =~ m!<p\s+class="form-error">\s*<strong>\s*(.*?)\s*</strong>\s*</p>!sm
     or
   $self->agent->content =~ m!<p\s+class="field-error">\s*(.*?)\s*</p>!sm
-    or die "No error message found in:\n" . $self->agent->content;
-  $1
+    ) { return $1 }
+    #or croak "No error message found in:\n" . $self->agent->content;
+  return ''
 };
 
 sub maintenance {
@@ -184,7 +203,8 @@ sub maintenance {
   return unless $self->agent;
   #$self->error_page and
   $self->agent->content =~ m!Sehr geehrter <span lang="en">Online-Banking</span>\s+Nutzer,\s+wegen einer hohen Auslastung kommt es derzeit im Online-Banking zu\s*l&auml;ngeren Wartezeiten.!sm
-  or $self->agent->content =~ m!&nbsp;Wartung\b!;
+  or $self->agent->content =~ m!&nbsp;Wartung\b!
+  or $self->agent->content =~ m!<p class="important">\s*<strong>\s*Diese Funktion steht auf Grund einer technischen St.*?rung derzeit leider nicht zur Verf.*?gung.*?</strong>\s*</p>!sm # Testumgebung...
 };
 
 sub access_denied {
@@ -219,8 +239,9 @@ sub init_session_urls {
             $self->log( "init_functions: $function : " . $url );
             $self->urls->{$function} = $url;
         } else {
-            warn "No URL found for function $function - website may have changed";
-            croak $agent->content;
+            #carp $agent->content;
+            #croak $agent->title;
+            croak "No URL found for function $function - website may have changed";
         };
     };
 };
@@ -230,16 +251,13 @@ sub select_function {
     if (! $self->agent) {
         $self->new_session;
     };
-    carp "Unknown account function '$function'"
-        unless exists $self->urls->{$function};
-    my $func= $self->urls->{$function};
-    $self->agent->get( $func )
-        or die "Couldn't get $func";
-    # Reload all function URLs for this page
-    if( 'quit' ne $function ) {
-        $self->init_session_urls()
-            if not $self->access_denied();
+    croak "Unknown account function '$function'"
+        unless exists $functions{$function};
+    my $url = $self->agent->find_link(@{$functions{ $function }});
+    if( !$url ) {
+        die "No URL found for function $function - website may have changed";
     };
+    $self->agent->follow_link(@{$functions{ $function }});
     $self->agent->status
 };
 
@@ -248,10 +266,16 @@ sub close_session {
   my $result;
   if (not ($self->access_denied or $self->maintenance)) {
     $self->log("Closing session");
+    if(     not $self->maintenance
+        and not $self->agent->content =~ m!<p class="important">\s*<strong>\s*Diese Funktion steht auf Grund einer technischen St.*?rung derzeit leider nicht zur Verf.*?gung.*?</strong>\s*</p>!sm # Testumgebung...
+     ) {
     $self->select_function('quit');
+    };
+my $content = ($self->agent->content =~ m!<p class="important">(.*?)</p>!);
     #$result = $self->agent->res->as_string =~ m!<p class="important">\s*<strong>Sie haben sich beim Postbank Online-Banking abgemeldet.</strong>\s*</p>!sm
     $result = $self->agent->content =~ m!<p class="important">\s*<strong>Sie haben sich beim Postbank Online-Banking abgemeldet.</strong>\s*</p>!sm
-      or $result = $self->agent->content =~ m!<p class="important">\s*<strong>\s*Diese Funktion steht auf Grund einer technischen St.rung derzeit leider nicht zur Verf.gung.*</strong>\s*</p>!sm # Testumgebung...
+      or $result = $self->agent->content =~ m!<p class="important">\s*<strong>\s*Diese Funktion steht auf Grund einer technischen St.*?rung derzeit leider nicht zur Verf.*?gung.*?</strong>\s*</p>!sm # Testumgebung...
+      or $result = $self->agent->content =~ m!<p class="important">\s*<strong>Sie haben eine Browser-Funktion genutzt, die das Postbanks\s+Online-Banking nicht unterst.*?tzt. Aus Sicherheitsgr.*?nden haben wir einige\s+Funktionen, die Ihr Browser normalerweise bietet, unterbunden.\s*</strong>\s*</p>!sm # Testumgebung...
       or warn $self->agent->content;
   } else {
     $result = 'Never logged in';
@@ -365,6 +389,7 @@ sub get_account_statement {
   $self->log("Downloading text version");
   $agent->click('selectForm:kontoauswahlButton');
   # Neue Seite, neue URLs
+warn "Initializing session urls";
   $self->init_session_urls();
 
   my $response;

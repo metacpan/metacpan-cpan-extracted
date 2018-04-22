@@ -1,4 +1,4 @@
-Business-BR-CNJ-NumberExtractor version 0.06
+Business-BR-CNJ-NumberExtractor version 0.07
 ================================
 
 Business::BR::CNJ::NumberExtractor extract CNJ numbers from a text file.

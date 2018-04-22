@@ -1,5 +1,11 @@
 Revision history for Perl module File::Copy::Recursive::Reduced
 
+0.006 Fri Apr 20 10:21:48 EDT 2018
+    - File::Copy::Recursive 0.41 has been released to CPAN and
+      addresses the problem which was the focus of
+      File::Copy::Recursive::Reduced.  Hence, FCR2 is now
+      feature-complete.
+
 0.005 Thu Apr 19 21:03:28 EDT 2018
     - Implement copying of symlinks within all three public functions.
       At this point we should be able to make substitutions for

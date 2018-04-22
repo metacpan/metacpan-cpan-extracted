@@ -6,24 +6,43 @@ README for Perl extension File-Copy-Recursive-Reduced
   <http://search.cpan.org/~dmuey/File-Copy-Recursive-0.40/> (FCR).
 
  What Problem Does This Library Address?
-  Because of certain problems in FCR, it is currently (April 2018)
-  failing to install on several important operating systems
-  including FreeBSD and Windows. As a consequence, other CPAN
-  distributions which have a direct or indirect dependency on
-  File-Copy-Recursive (*e.g.*, CPAN-Reporter, DateTime,
-  Dist-Zilla) are failing to install on those platforms as well.
+  As of early April 2018, FCR was failing to install on several
+  important operating systems including FreeBSD and Windows. As a
+  consequence, other CPAN distributions which had a direct or
+  indirect dependency on FCR (*e.g.*, CPAN-Reporter, DateTime,
+  Dist-Zilla) were failing to install on those platforms as well.
 
-  Such failures are "silent" in the sense that CPANtesters
+  Such failures were "silent" in the sense that CPANtesters
   installations generate no report authors when a distribution's
   upstream dependencies fail to install. No report to the
   CPANtesters database means no email notification to CPAN
-  authors. So many authors may be unaware that their distributions
-  are currently failing to install on important platforms.
+  authors. So many authors were unaware that their distributions
+  were failing to install on important platforms.
 
-  A patch has been submitted to address the problems in FCR.
-  However, until it is applied and a new CPAN release made,
-  consumers of FCR should consider using the replacement functions
-  exported by File-Copy-Recursive-Reduced.
+  Uncertainty as to when FCR would be fixed led to the creation of
+  File-Copy-Recursive-Reduced (FCR2). Certain CPAN distributions
+  adopted it in place of FCR. With the April 19 2018 release of
+  FCR version 0.41, the problems that motivated the creation of
+  FCR2 have been addressed.
+
+  FCR2 is now feature-complete. It exports three functions on
+  demand which are substantially equivalent to their FCR
+  equivalents:
+
+  *   "fcopy()"
+
+  *   "dircopy()"
+
+  *   "rcopy()"
+
+  After installation, call perldoc File::Copy::Recursive::Reduced
+  for more usage details.
+
+  These functions are quite appropriate in situations such as test
+  suites where the user has full knowledge of the files,
+  directories and symlinks to be recursively copied and does not
+  need to manipulate the environment by setting localized versions
+  of FCR's package global variables.
 
  Install
   This library can be installed in the customary way, *i.e.,* by a

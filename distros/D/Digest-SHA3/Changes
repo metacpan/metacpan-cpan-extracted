@@ -1,5 +1,13 @@
 Revision history for Perl extension Digest::SHA3.
 
+1.04  Fri Apr 20 16:25:30 MST 2018
+	- silenced compiler warnings from VS2017
+		-- ref. rt.cpan.org #124477
+		-- thanks to Sergey Aleynikov for diagnostics
+	- modified addfile to return error when given a directory name
+		-- makes behavior consistent with GNU coreutils shaXsum
+		-- thanks to Scott Baker for pointing this out
+
 1.03  Mon Dec 25 00:08:10 MST 2017
 	- added "--ignore-missing" and "--strict" options to sha3sum
 		-- consistent with GNU coreutils

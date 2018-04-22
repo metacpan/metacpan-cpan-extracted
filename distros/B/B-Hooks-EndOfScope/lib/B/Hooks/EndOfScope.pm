@@ -1,16 +1,13 @@
-package B::Hooks::EndOfScope; # git description: 0.20-3-ge7283e2
+package B::Hooks::EndOfScope; # git description: 0.23-2-ga391106
 # ABSTRACT: Execute code after a scope finished compilation
 # KEYWORDS: code hooks execution scope
 
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
-# note - a %^H tie() fallback will probably work on 5.6 as well,
-# if you need to go that low - sane patches passing *all* tests
-# will be gladly accepted
-use 5.008001;
+use 5.006001;
 
 BEGIN {
   use Module::Implementation 0.05;
@@ -39,7 +36,7 @@ B::Hooks::EndOfScope - Execute code after a scope finished compilation
 
 =head1 VERSION
 
-version 0.21
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -63,13 +60,18 @@ compiled.
 
 This is exported by default. See L<Sub::Exporter> on how to customize it.
 
-=head1 PURE-PERL MODE CAVEAT
+=head1 LIMITATIONS
+
+=head2 Pure-perl mode caveat
+
+This caveat applies to B<any> version of perl where L<Variable::Magic>
+is unavailable or otherwise disabled.
 
 While L<Variable::Magic> has access to some very dark sorcery to make it
 possible to throw an exception from within a callback, the pure-perl
 implementation does not have access to these hacks. Therefore, what
-would have been a compile-time exception is instead converted to a
-warning, and your execution will continue as if the exception never
+would have been a B<compile-time exception> is instead B<converted to a
+warning>, and your execution will continue as if the exception never
 happened.
 
 To explicitly request an XS (or PP) implementation one has two choices. Either
@@ -81,6 +83,32 @@ to import from the desired implementation explicitly:
 
 or by setting C<$ENV{B_HOOKS_ENDOFSCOPE_IMPLEMENTATION}> to either C<XS> or
 C<PP>.
+
+=head2 Perl 5.8.0 ~ 5.8.3
+
+Due to a L<core interpreter bug
+|https://rt.perl.org/Public/Bug/Display.html?id=27040#txn-82797> present in
+older perl versions, the implementation of B::Hooks::EndOfScope deliberately
+leaks a single empty hash for every scope being cleaned. This is done to
+avoid the memory corruption associated with the bug mentioned above.
+
+In order to stabilize this workaround use of L<Variable::Magic> is disabled
+on perls prior to version 5.8.4. On such systems loading/requesting
+L<B::Hooks::EndOfScope::XS> explicitly will result in a compile-time
+exception.
+
+=head2 Perl versions 5.6.x
+
+Versions of perl before 5.8.0 lack a feature allowing changing the visibility
+of C<%^H> via setting bit 17 within C<$^H>. As such the only way to achieve
+the effect necessary for this module to work, is to use the C<local> operator
+explicitly on these platforms. This might lead to unexpected interference
+with other scope-driven libraries relying on the same mechanism. On the flip
+side there are no such known incompatibilities at the time this note was
+written.
+
+For further details on the unavailable behavior please refer to the test
+file F<t/02-localise.t> included with the distribution.
 
 =head1 SEE ALSO
 
@@ -103,13 +131,13 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Peter Rabbitson <ribasushi@cpan.org>
+Peter Rabbitson <ribasushi@leporine.io>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Christian Walde Simon Wilper Tatsuhiko Miyagawa Tomas Doran
+=for stopwords Karen Etheridge Tatsuhiko Miyagawa Christian Walde Tomas Doran Graham Knop Simon Wilper
 
 =over 4
 
@@ -119,19 +147,23 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Christian Walde <walde.christian@googlemail.com>
-
-=item *
-
-Simon Wilper <sxw@chronowerks.de>
-
-=item *
-
 Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
 =item *
 
+Christian Walde <walde.christian@googlemail.com>
+
+=item *
+
 Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Simon Wilper <sxw@chronowerks.de>
 
 =back
 

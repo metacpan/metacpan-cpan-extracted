@@ -1,0 +1,73 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/Config/IniFiles.pm',
+    't/00-compile.t',
+    't/00load.t',
+    't/01basic.t',
+    't/02weird.t',
+    't/03comments.t',
+    't/04import.t',
+    't/05hash.t',
+    't/06oo.t',
+    't/07misc.t',
+    't/08group.t',
+    't/09case.t',
+    't/10delta.t',
+    't/11copy-ties-with-array-vals.t',
+    't/12open-empty-file.t',
+    't/13val-in-list-context.t',
+    't/14brackets-within-values.t',
+    't/15store-and-retrieve-here-doc-terminator.t',
+    't/16case-sensitive-default.t',
+    't/17untainted-multiline-values.t',
+    't/18non-contiguous-groups.t',
+    't/19param-found-outside-section.t',
+    't/20allowedcommentchars.t',
+    't/22trailing-comment-lines.t',
+    't/23scalar-ref.t',
+    't/24case-sensitive-exists.t',
+    't/25line-endings.t',
+    't/26scalar-filehandle.t',
+    't/27empty-ini.t',
+    't/28nomultiline.t',
+    't/29end-of-line-comment.t',
+    't/30parameters-with-empty-values.t',
+    't/31comments_with_spaces.t',
+    't/32mswin-outputs-contain-crs.t',
+    't/33update-using-tied-fh-w-shorter-names.t',
+    't/34trailing-comments-double-delimeter.t',
+    't/35reload-config-no-file.t',
+    't/35section-iterators.t',
+    't/36php-compat.t',
+    't/allowed-comment-chars.ini',
+    't/array.ini',
+    't/bad.ini',
+    't/blank.ini',
+    't/brackets-in-values.ini',
+    't/ca.ini',
+    't/case-sensitive-default.ini',
+    't/case-sensitive.ini',
+    't/cmt.ini',
+    't/en.ini',
+    't/end-of-line-comment.ini',
+    't/es.ini',
+    't/for-27-empty.ini',
+    't/lib/Config/IniFiles/Debug.pm',
+    't/lib/Config/IniFiles/Slurp.pm',
+    't/lib/Config/IniFiles/TestPaths.pm',
+    't/non-contiguous-groups.ini',
+    't/php-compat.ini',
+    't/php-compat.php',
+    't/test.ini',
+    't/trailing-comments.ini'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

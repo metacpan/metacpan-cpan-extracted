@@ -106,13 +106,16 @@ EXPORTS
       $maybe_an_object->$_does('Foo');
 
     If called on an object, calls "does" on it and returns the result,
-    otherwise returns nothing.
+    otherwise returns nothing. If the "does" method does not exist, returns
+    nothing rather than failing.
 
   $_DOES
       $maybe_an_object->$_DOES('Foo');
 
     If called on an object, calls "DOES" on it and returns the result,
-    otherwise returns nothing.
+    otherwise returns nothing. On perl versions prior to 5.10.0, the built
+    in core "DOES" method doesn't exist. If the method doesn't exist, this
+    will fall back to calling "isa" just like the core "DOES" method.
 
   $_call_if_object
       $maybe_an_object->$_call_if_object(method_name => @args);

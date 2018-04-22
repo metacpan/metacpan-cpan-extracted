@@ -1,7 +1,8 @@
-package Pcore::Ext v0.13.8;
+package Pcore::Ext v0.14.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Context;
+use Pcore::Ext::Base;
 
 our $SCANNED;
 
@@ -14,13 +15,15 @@ our $CFG = {
 };
 
 our $EXT;
+our $EXT_FRAMEWORK;
 
 sub SCAN ( $self, $app, $ext, $framework ) {
     return if $SCANNED;
 
     $SCANNED = 1;
 
-    $EXT = $ext;
+    $EXT           = $ext;
+    $EXT_FRAMEWORK = $framework;
 
     my $namespaces;
 
@@ -93,16 +96,22 @@ sub SCAN ( $self, $app, $ext, $framework ) {
     }
 
     for my $namespace ( keys $namespaces->%* ) {
-        P->class->load($namespace);
+        {
+            no strict qw[refs];
+
+            push @{"$namespace\::ISA"}, 'Pcore::Ext::Base';
+
+            P->class->load($namespace);
+        }
 
         # get EXT MAP
         my ( $ext_map, $ext_api_ver ) = do {
             no strict qw[refs];
 
-            ( ${"$namespace\::EXT_MAP"}, ${"$namespace\::EXT_API_VER"} );
+            ( ${"$namespace\::_EXT_MAP"}, ${"$namespace\::EXT_API_VER"} );
         };
 
-        die qq[\$EXT_MAP is not definde in "$namespace"] if !defined $ext_map;
+        die qq[\$_EXT_MAP is not defined in "$namespace"] if !defined $ext_map;
 
         # configure namespace
         my $namespace_cfg = $namespaces->{$namespace};
@@ -271,9 +280,9 @@ sub _get_ctx ( $self, $class, $app, $framework ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 18                   | Subroutines::ProhibitExcessComplexity - Subroutine "SCAN" with high complexity score (35)                      |
+## |    3 | 20                   | Subroutines::ProhibitExcessComplexity - Subroutine "SCAN" with high complexity score (35)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 249                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 258                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

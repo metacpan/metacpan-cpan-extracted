@@ -12,8 +12,7 @@ share/config/.aws/config
 share/credentials/.aws/credentials
 t/author-pod-syntax.t
 t/environment.t
-t/imports.t
+t/import.t
 t/ini.t
 t/list_profiles.t
-t/no_imports.t
 t/read.t

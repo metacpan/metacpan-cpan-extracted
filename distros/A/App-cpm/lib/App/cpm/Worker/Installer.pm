@@ -2,7 +2,7 @@ package App::cpm::Worker::Installer;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.965';
+our $VERSION = '0.969';
 
 use App::cpm::Logger::File;
 use App::cpm::Worker::Installer::Menlo;
@@ -398,7 +398,7 @@ sub configure {
     {
         if ($menlo->opts_in_static_install($meta)) {
             my $state = {};
-            $menlo->static_install_configure($state, "dummy", 1);
+            $menlo->static_install_configure($state, { cpanmeta => $meta }, 1);
             $static_builder = $state->{static_install};
             ++$configure_ok and last;
         }

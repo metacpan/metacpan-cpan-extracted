@@ -3,10 +3,11 @@
 .travis.yml
 Changes
 cpanfile
+Dockerfile
 lib/App/mojopaste.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 script/mojopaste
 t/00-basic.t
 t/charts.t

@@ -62,6 +62,6 @@
          "web" : "https://github.com/jkeenan/file-copy-recursive-reduced"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

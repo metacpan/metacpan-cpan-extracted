@@ -2,7 +2,6 @@
 Changes
 LICENSE
 MANIFEST
-MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
@@ -17,5 +16,5 @@ lib/Menlo/Index/MetaCPAN.pm
 lib/Menlo/Index/MetaDB.pm
 lib/Menlo/Index/Mirror.pm
 lib/Menlo/Util.pm
-script/cpanm-menlo
-t/compile.t
+t/author-pod-syntax.t
+t/basic.t

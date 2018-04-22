@@ -140,10 +140,10 @@ authentication URL.
 The methods facilitating this process are detailed below:
 
 - **register()**
-- **register($data)**
+- **register(%data)**
 
     Obtain a client secret and ID from a given mastodon instance. Takes a single
-    hash reference as an argument, with the following possible keys:
+    hash as an argument, with the following possible keys:
 
     - **redirect\_uris**
 
@@ -159,8 +159,8 @@ The methods facilitating this process are detailed below:
 
         The client's website. Defaults to the value of the `website` attribute.
 
-    When successful, sets the `client_secret` and `client_id` attributes of
-    the Mastodon::Client object and returns the modified object.
+    When successful, sets the `client_secret`, `scopes`, and `client_id`
+    attributes of the Mastodon::Client object and returns the modified object.
 
     This should be called **once** per client and its contents cached locally.
 

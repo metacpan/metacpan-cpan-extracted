@@ -12,6 +12,7 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Task/Devel/Essentials.pm
+maint/modlist
 maint/upgrade
 t/01_requirements.t
 t/80_documentation.t

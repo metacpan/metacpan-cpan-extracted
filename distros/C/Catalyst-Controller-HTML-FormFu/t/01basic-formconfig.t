@@ -26,24 +26,24 @@ my $uri = $form->action;
 
 {
     $mech->post_ok( $uri, { unknown_field => 'foo' } );
-    
+
     $mech->content_contains('<p>not submitted, render</p>');
 }
 
 {
     $mech->post_ok( $uri, { submit => 'foo' } );
-    
+
     $mech->content_contains('<p>submitted, not valid, render</p>');
 }
 
 {
     $mech->post_ok( $uri, { basic_formconfig => '' } );
-    
+
     $mech->content_contains('<p>submitted, not valid, render</p>');
 }
 
 {
     $mech->post_ok( $uri, { basic_formconfig => 'foo' } );
-    
+
     $mech->content_contains('<p>submitted, valid</p>');
 }

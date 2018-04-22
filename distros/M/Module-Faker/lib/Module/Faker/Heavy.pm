@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Module::Faker::Heavy;
 # ABSTRACT: where the fake sausage gets made
-$Module::Faker::Heavy::VERSION = '0.017';
+$Module::Faker::Heavy::VERSION = '0.018';
 use Carp ();
 use Text::Template;
 
@@ -56,7 +56,7 @@ Module::Faker::Heavy - where the fake sausage gets made
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

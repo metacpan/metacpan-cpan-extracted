@@ -13,9 +13,6 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Menlo",
-  "EXE_FILES" => [
-    "script/cpanm-menlo"
-  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Menlo",
@@ -29,13 +26,16 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Class::Tiny" => "1.001",
     "Exporter" => 0,
+    "ExtUtils::Config" => "0.003",
+    "ExtUtils::Helpers" => "0.020",
+    "ExtUtils::InstallPaths" => "0.002",
     "File::Temp" => 0,
     "File::Which" => 0,
     "File::pushd" => 0,
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.36",
     "HTTP::Tiny" => "0.054",
     "HTTP::Tinyish" => "0.04",
-    "JSON::PP" => 0,
+    "JSON::PP" => 2,
     "Module::CPANfile" => 0,
     "Module::CoreList" => 0,
     "Module::Metadata" => 0,
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "1.9010",
+  "VERSION" => "1.9017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,13 +68,16 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Class::Tiny" => "1.001",
   "Exporter" => 0,
+  "ExtUtils::Config" => "0.003",
+  "ExtUtils::Helpers" => "0.020",
+  "ExtUtils::InstallPaths" => "0.002",
   "File::Temp" => 0,
   "File::Which" => 0,
   "File::pushd" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.36",
   "HTTP::Tiny" => "0.054",
   "HTTP::Tinyish" => "0.04",
-  "JSON::PP" => 0,
+  "JSON::PP" => 2,
   "Module::CPANfile" => 0,
   "Module::CoreList" => 0,
   "Module::Metadata" => 0,

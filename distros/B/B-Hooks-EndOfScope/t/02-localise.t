@@ -1,7 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More 0.89;
+use Test::More 0.88;
+
+BEGIN {
+  plan skip_all => "User-requested %^H local()ization works only on perl 5.8.0+"
+    if "$]" < 5.008;
+}
+
 
 use B::Hooks::EndOfScope;
 

@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Map::Tube::API;
 
-$Dancer2::Plugin::Map::Tube::API::VERSION   = '0.01';
+$Dancer2::Plugin::Map::Tube::API::VERSION   = '0.02';
 $Dancer2::Plugin::Map::Tube::API::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Map::Tube::API - API for Map::Tube.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

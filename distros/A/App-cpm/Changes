@@ -1,5 +1,20 @@
 Revision history for App-cpm
 
+0.969  2018-04-21 21:06:56 CEST
+        - Use Command::Runner 0.002
+        - Follow Menlo-1.9017 change
+
+0.968  2018-04-21 19:32:57 CEST
+        - Support dist/url/mirror syntax in cpanfile (#123)
+        - Fix a minor typo for instead (atoomic #122)
+
+0.967  2018-04-20 16:27:14 CEST
+        - Add some requirements for static install
+
+0.966  2018-04-20 15:33:30 CEST
+        - Use Command::Runner (#120)
+        - Bump Menlo prereq
+
 0.965  2018-04-19 15:20:38 CEST
         - Introduce App::cpm::Requirement class; this will improve merging versions for requirements
 

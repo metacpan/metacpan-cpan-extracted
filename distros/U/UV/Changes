@@ -1,27 +1,119 @@
 Revision history for Perl extension UV
 
-0.24 2013-03-29T17:00:00+09:00
-     - fixed a packaging issue
+1.000008  2018-04-21
+    - Fix bug in call to Newx(). (Jim Keenan: issues/24)
+    - Update UV::Loop documentation to better cover the close method.
+    - No longer need Devel::GlobalDestruction.
+    - First real release.
 
-0.23 2013-03-29T15:21:00+09:00
-     - libuv updated to 0.10.2 (first officially versioned release of libuv)
-     - supported following new functions:
-           uv_version_string, uv_stop, uv_tcp_open, uv_udp_open, uv_interface_addresses
+1.000007  2018-04-20 (TRIAL)
+    - Fixed typo in test suite
+    - Added in Test::CleanNamespaces
+    - Consolidate down to one BOOT block
+    - Fix a bug when removing structs from objects
+    - Add some debug statements when built with PERL_UV_DEBUG environment var
+      set
+    - Loop destructor should just call ->close()
+    - Simplify the loop singleton
 
-0.22 2012-10-12T14:18:36+09:00
-     - added a dirty (hopefully temporary) hack to make libuv with -fPIC.
 
-0.21 2012-10-10T08:25:36+09:00
-     - added a Makefile.PL treak avoiding segmentation fault. (ref RT #115206)
+1.000006  2018-04-16 (TRIAL)
+    - Removed is_closing()
+    - Removed is_active()
+    - Removed loop_configure()
+    - Removed loop_alive()
+    - Removed reference to UV::Poll->new_socket() as that's all done in the
+      standard ->new() constructor now.
+    - Updated documentation for the Handle classes to better indicate their
+      use.
+    - Removed extra library detection for windows as this is now done in
+      Alien::libuv
+    - Bumped the requirement of Alien::libuv to 1.000
+    - Removed some bad Poll tests
+    - Add try/catch block for all Handle start methods
+    - Removed Moo requirements
 
-0.2  2012-10-05T17:49:02+09:00
-     - added UV::loop namespace and UV::default_loop() to get default_loop,
-       it contains active_handles information.
-     - added uv_walk
-     - added deps/ to ignoring list for CPAN indexer
+1.000005  2018-01-28 (TRIAL)
+    - Update 02-loop-alive.t to more closely resemble libuv's
+    - Remove lib/p5uv_handles.h (no longer needed)
+    - Remove lib/p5uv_loops.h (no longer needed)
+    - Ensure all Handle objects call ->_destruct() on destruction rather than
+      just calling close.
+    - Provide the current "closed" state of the handle to its destructor to
+      assist with knowing when to free safely.
+    - Rename Loop->_destroy() to Loop->_destruct() to be consistent
+    - Make Loop->_destroy() use p5uv_destroy_loop() to free properly
+    - A few changes at the suggestion of Devel::PPPort
+    - Added a few more tests to ensure we can export things correctly
+    - Added a UV::check() function. A convenience wrapper to UV::Check->new
+    - Added a UV::idle() function. A convenience wrapper to UV::Idle->new
+    - Added a UV::poll() function. A convenience wrapper to UV::Poll->new
+    - Added a UV::prepare() function. A convenience wrapper to UV::Prepare->new
+    - Reworked the tests to exercise the above convenience wrappers
+    - Removed a few superfluous 'use' statements
 
-0.12 2012-10-01T05:55:32+09:00
-     - added CAUTION section in doc ;)
+1.000004  2018-01-25 (TRIAL)
+    - Require at least ExtUtils::MakeMaker v7.12 for XSMULTI
+    - Move all *.[ch] into lib with the module using XSMULTI (mohawk)
+    - Redesign everything
+    - Now using XS::Object::Magic to hide the C structs within our Perl objects
+    - Now using Moo
+    - Doing more of the work in Perl-land
+    - Pretty much a complete-rewrite from v1.000003
 
-0.1  2012-09-30T15:45:53+09:00
-     - initial version
+1.000003  2017-10-26 (TRIAL)
+    - Don't store Loop stashes globally (thread safety)
+    - Moved constant declarations / some de-dupe efforts (Thanks Paul Evans)
+    - Added Perl context to all functions that call the Perl API
+    - Separated loop and handle functions from the XS interface
+
+1.000002  2017-09-24 (TRIAL)
+    - Don't store Handle stashes globally for Handle types (thread safety)
+    - Simplified the typemap
+    - Removed UV::default_loop from UV.xs and added to UV.pm instead
+    - Renamed some macros to make more sense.
+    - Removed unused macros
+    - Default value for SIGPROF as it doesn't exist in Windows (useful in *nix)
+
+1.000001  2017-08-17 (TRIAL)
+    - Update some prereqs
+    - Remove use of SO_REUSEPORT in the tests. We store the port already.
+    - Made 05-poll-closesocket.t a windows-only test
+
+1.000000_01 2017-08-12 (TRIAL)
+    - ****** MAJOR, BREAKING CHANGES AHEAD ******
+    - Migrated to Dist::Zilla
+    - Moved the version of libuv from 0.x to 1.x
+    - Dropped the included src of libuv
+    - Dropped the libuv license since we no longer include their source
+    - Use Alien::libuv for ensuring we have a libuv to build against
+    - Completely rewrote the software due to massive changes between 0.x - 1.x
+    - Added Math::Int64 for proper uint64_t support
+    - Reworked the UV::loop into a new UV::Loop area
+    - Added the ability to get non-default loops
+
+0.24      2013-03-29
+    - fixed a packaging issue
+
+0.23      2013-03-29T
+    - libuv updated to 0.10.2 (first officially versioned release of libuv)
+    - supported following new functions:
+      uv_version_string, uv_stop, uv_tcp_open, uv_udp_open, uv_interface_addresses
+
+0.22      2012-10-12
+    - added a dirty (hopefully temporary) hack to make libuv with -fPIC.
+
+0.21      2012-10-10
+    - added a Makefile.PL treak avoiding segmentation fault. (ref RT #115206)
+
+0.2       2012-10-05
+    - added UV::loop namespace and UV::default_loop() to get default_loop,
+      it contains active_handles information.
+    - added uv_walk
+    - added deps/ to ignoring list for CPAN indexer
+
+0.12      2012-10-01
+    - added CAUTION section in doc ;)
+
+0.1       2012-09-30
+    - initial version

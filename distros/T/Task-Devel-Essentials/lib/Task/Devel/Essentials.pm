@@ -10,11 +10,11 @@ Task::Devel::Essentials - Bundle of modules useful for developers
 
 =head1 VERSION
 
-Version 0.006
+Version 0.007
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 SYNOPSIS
 
@@ -92,6 +92,8 @@ our $VERSION = '0.006';
 =item L<Kwalify>
 
 =item L<List::MoreUtils>
+
+=item L<List::MoreUtils::XS> (optional)
 
 =item L<LWP>
 
@@ -197,7 +199,7 @@ Martin Becker, C<< <mhasch at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Martin Becker.
+Copyright 2013-2018 Martin Becker.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -3,7 +3,7 @@ package Mastodon::Entity::Status;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Moo;
 with 'Mastodon::Role::Entity';
@@ -30,6 +30,10 @@ has content => (
 
 has created_at => (
   is => 'ro', isa => DateTime, coerce => 1,
+);
+
+has emojis => (
+  is => 'ro', isa => ArrayRef,
 );
 
 has favourited => (

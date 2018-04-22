@@ -13,6 +13,9 @@ WriteMakefile(
 	PREREQ_PM         => {
 		qw/Data::SExpression 0.41/,
 	},
+	TEST_REQUIRES     => {
+		qw/Test::Exception 0/,
+	},
 	META_ADD          => {
 		dynamic_config => 0,
 		resources      => {

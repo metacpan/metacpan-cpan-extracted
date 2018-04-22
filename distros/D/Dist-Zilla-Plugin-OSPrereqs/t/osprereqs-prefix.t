@@ -15,7 +15,8 @@ my $contents = $tzil->slurp_file('build/Makefile.PL');
 
 {
     my $conditional = q|if ( $^O ne 'MSWin32' ) {|;
-    my $prereq      = q|$WriteMakefileArgs{PREREQ_PM}{'Proc::ProcessTable'} = '0.50'|;
+    my $prereq =
+      q|$WriteMakefileArgs{PREREQ_PM}{'Proc::ProcessTable'} = $FallbackPrereqs{'Proc::ProcessTable'} = '0.50'|;
     like(
         $contents,
         qr/\Q$conditional\E.*?\Q$prereq\E.*?^\}/ms,
@@ -25,7 +26,8 @@ my $contents = $tzil->slurp_file('build/Makefile.PL');
 
 {
     my $conditional = q|if ( $^O =~ /foo/i ) {|;
-    my $prereq      = q|$WriteMakefileArgs{PREREQ_PM}{'Acme::One'} = '0.01'|;
+    my $prereq =
+      q|$WriteMakefileArgs{PREREQ_PM}{'Acme::One'} = $FallbackPrereqs{'Acme::One'} = '0.01'|;
     like(
         $contents,
         qr/\Q$conditional\E.*?\Q$prereq\E.*?^\}/ms,
@@ -35,7 +37,8 @@ my $contents = $tzil->slurp_file('build/Makefile.PL');
 
 {
     my $conditional = q|if ( $^O !~ /bar/i ) {|;
-    my $prereq      = q|$WriteMakefileArgs{PREREQ_PM}{'Acme::Two'} = '0.02'|;
+    my $prereq =
+      q|$WriteMakefileArgs{PREREQ_PM}{'Acme::Two'} = $FallbackPrereqs{'Acme::Two'} = '0.02'|;
     like(
         $contents,
         qr/\Q$conditional\E.*?\Q$prereq\E.*?^\}/ms,

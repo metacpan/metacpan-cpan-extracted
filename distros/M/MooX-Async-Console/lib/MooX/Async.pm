@@ -1,6 +1,6 @@
 package MooX::Async;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -41,8 +41,7 @@ use namespace::clean;
 
 sub import {
   my $pkg = caller;
-  my $has = $pkg->can('has')
-    or die __PACKAGE__ . ' can only be imported into a Mooish package';
+  my $has = $pkg->can('has') or return;
   Moo::_install_tracked $pkg, event => sub {
     my $event = shift;
     my $sub = @_ % 2 ? pop : sub { die "$event event unimplemented" };
@@ -93,7 +92,6 @@ sub MooXAsync {
       use Moo;
       extends '$parent';
 TOP
-      with 'MooX::Async';
       sub configure_unknown {  }
       sub FOREIGNBUILDARGS { shift; @_ }
       around can_event => sub {

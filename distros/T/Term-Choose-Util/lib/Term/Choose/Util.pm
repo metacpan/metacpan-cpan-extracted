@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -28,6 +28,9 @@ use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 sub choose_dirs {
     my ( $opt ) = @_;
     my ( $o, $start_dir ) = _prepare_opt_choose_path( $opt );
+    if ( ! defined $o->{prompt} ) {
+        $o->{prompt} = ' ';
+    }
     my $new         = [];
     my $dir         = realpath $start_dir;
     my $previous    = $dir;
@@ -60,7 +63,7 @@ sub choose_dirs {
         }
         push @tmp, $o->{name} . join( ', ', map { s/ /\ /g; $_ } @$new );
         push @tmp, ' ++' . decode( 'locale_fs', "[$previous]" );
-        if ( defined $o->{prompt} ) {
+        if ( length $o->{prompt} ) {
             push @tmp, $o->{prompt};
         }
         my $lines = join( "\n", @tmp );
@@ -191,7 +194,7 @@ sub _choose_a_path {
         else {
             push @tmp, $o->{name} . _prepare_string( $dir );
         }
-        if ( defined $o->{prompt} ) {
+        if ( defined $o->{prompt} && length $o->{prompt} ) {
             push @tmp, $o->{prompt};
         }
         my $lines = join( "\n", @tmp );
@@ -265,7 +268,7 @@ sub _a_file {
             $o->{name} = 'New: '; # file
         }
         push @tmp, $o->{name} . _prepare_string( catfile $dir, length $previous ? $previous : $wildcard );
-        if ( defined $o->{prompt} ) {
+        if ( defined $o->{prompt} && length $o->{prompt} ) {
             push @tmp, $o->{prompt};
         }
         my $lines = join( "\n", @tmp );
@@ -297,7 +300,7 @@ sub choose_a_number {
     }
     $opt = {} if ! defined $opt;
     my $info       = defined $opt->{info}         ? $opt->{info}         : '';
-    my $prompt     =         $opt->{prompt};
+    my $prompt     = defined $opt->{prompt}       ? $opt->{prompt}       : '';
     my $name       =         $opt->{name};
     my $clear      = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
     my $small      = defined $opt->{small_on_top} ? $opt->{small_on_top} : 0;
@@ -349,7 +352,7 @@ sub choose_a_number {
             $row = $new_result;
         }
         push @tmp, $row;
-        if ( defined $prompt ) {
+        if ( length $prompt ) {
             push @tmp, $prompt;
         }
         my $lines = join "\n", @tmp;
@@ -411,7 +414,7 @@ sub choose_a_subset {
     $opt = {} if ! defined $opt;
     my $info          = defined $opt->{info}          ? $opt->{info}          : '';
     my $name          =         $opt->{name};
-    my $prompt        =         $opt->{prompt};
+    my $prompt        = defined $opt->{prompt}        ? $opt->{prompt}        : '';
     my $fmt_chosen    = defined $opt->{fmt_chosen}    ? $opt->{fmt_chosen}    : 0;
     my $remove_chosen = defined $opt->{remove_chosen} ? $opt->{remove_chosen} : 1;
     my $mark          =         $opt->{mark};
@@ -444,7 +447,7 @@ sub choose_a_subset {
             push @tmp, $name if defined $name;
             push @tmp, join( "\n", map { ( ' ' x length $prefix ) . ( defined $_ ? $_ : '' ) } @{$available}[@$new_idx] ) if @{$available}[@$new_idx]; # prefix
         }
-        if ( defined $prompt ) {
+        if ( length $prompt ) {
             push @tmp, $prompt;
         }
         my @pre = ( undef, $confirm );
@@ -514,7 +517,7 @@ sub settings_menu {
     if ( length $info ) {
         push @tmp, $info;
     }
-    if ( defined $prompt ) {
+    if ( length $prompt ) {
         push @tmp, $prompt;
     }
     my $lines;
@@ -699,7 +702,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.062
+Version 0.063
 
 =cut
 
@@ -876,7 +879,8 @@ To return the chosen list of directories (as an array reference) select the "con
 The "back"-menu-entry ( C< << > ) removes the last added directory. If the list of chosen directories is empty,
 C< << > causes C<choose_dirs> to return nothing.
 
-C<choose_dirs> uses the same option as C<choose_a_dir>
+C<choose_dirs> uses the same option as C<choose_a_dir>. The option I<prompt> can used to put empty lines between the
+header row and the menu (I<prompt> set to a single space means one empty line).
 
 =over
 

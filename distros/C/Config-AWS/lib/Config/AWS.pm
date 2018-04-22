@@ -4,7 +4,7 @@ package Config::AWS;
 use strict;
 use warnings;
 
-use File::Glob ':bsd_glob';
+use File::Glob qw( bsd_glob );
 use Ref::Util qw( is_ref is_arrayref is_scalarref is_blessed_ref );
 use Carp qw( carp croak );
 use Scalar::Util qw();
@@ -21,7 +21,7 @@ use Exporter::Shiny qw(
     default_profile
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 our %EXPORT_TAGS = (
     ini  => [qw( read_file read_string read_handle )],
     aws  => [qw( config_file default_profile credentials_file )],

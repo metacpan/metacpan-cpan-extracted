@@ -13,7 +13,7 @@ use AWS::S3::ResponseParser;
 use AWS::S3::Owner;
 use AWS::S3::Bucket;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 has [qw/access_key_id secret_access_key/] => ( is => 'ro', isa => 'Str' );
 
@@ -301,7 +301,7 @@ L<AWS::S3::Owner>
 =head1 AUTHOR
 
 Originally John Drago C<jdrago_999@yahoo.com>, currently maintained by Lee Johnson (LEEJO) C<leejo@cpan.org>
-with contributions from Evan Carroll, Robin Clarke, Ulrich Kautz, simbabque
+with contributions from Evan Carroll, Robin Clarke, Ulrich Kautz, simbabque, Dave Rolsky
 
 =head1 LICENSE
 

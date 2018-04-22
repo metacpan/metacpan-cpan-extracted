@@ -3,7 +3,7 @@ use warnings;
 package Time::Tiny;
 # ABSTRACT: A time object, with as little code as possible
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use overload 'bool' => sub () { 1 };
 use overload '""'   => 'as_string';
@@ -219,7 +219,7 @@ Time::Tiny - A time object, with as little code as possible
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -290,13 +290,13 @@ the usefulness greatly.
 
 To make up for this, B<if> you have L<DateTime> installed, any
 B<Time::Tiny> module can be inflated into the equivalent L<DateTime>
-as needing, loading L<DateTime> on the fly if necessary.
+as needed, loading L<DateTime> on the fly if necessary.
 
 For the purposes of date/time logic, all B<Time::Tiny> objects exist
 in the "C" locale, and the "floating" time zone (although obviously in a
 pure date context, the time zone largely doesn't matter).
 
-When converting up to full L<DateTime> objects, these local and time
+When converting up to full L<DateTime> objects, these locale and time
 zone settings will be applied (although an ability is provided to
 override this).
 
@@ -434,6 +434,12 @@ Adam Kennedy <adamk@cpan.org>
 David Golden <dagolden@cpan.org>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Tim Heaney
+
+Tim Heaney <oylenshpeegul@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

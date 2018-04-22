@@ -3,7 +3,7 @@ package Mastodon::Entity::Attachment;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Moo;
 with 'Mastodon::Role::Entity';
@@ -13,7 +13,7 @@ use Mastodon::Types qw( Acct URI );
 
 has id          => ( is => 'ro', isa => Int, );
 has preview_url => ( is => 'ro', isa => URI, coerce => 1, required => 1, );
-has remote_url  => ( is => 'ro', isa => URI, coerce => 1, );
+has remote_url  => ( is => 'ro', isa => Maybe [URI], coerce => 1, );
 has text_url    => ( is => 'ro', isa => Maybe [URI], coerce => 1, );
 has url         => ( is => 'ro', isa => URI, coerce => 1, );
 has type        => ( is => 'ro', isa => Enum[qw( image video gifv )], );

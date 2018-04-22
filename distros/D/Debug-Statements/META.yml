@@ -10,7 +10,6 @@ build_requires:
   Test::Output: '0'
   lib: '0'
   perl: '5.006'
-  regression: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
@@ -34,5 +33,5 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '1.006'
+version: '1.007'
 x_serialization_backend: 'YAML::Tiny version 1.73'

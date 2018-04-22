@@ -2,11 +2,7 @@ package Pcore::Ext::Class::ReCaptcha;
 
 use Pcore;
 
-our $EXT_MAP = {    #
-    field => 'Ext.form.field.Base',
-};
-
-sub EXT_field ($ext) {
+sub EXT_field ($ext) : Extend('Ext.form.field.Base') {
     return {
         allowBlank => \0,
         hideLabel  => \0,

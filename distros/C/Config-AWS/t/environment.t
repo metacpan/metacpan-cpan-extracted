@@ -4,8 +4,6 @@ use Test2::Tools::Spec;
 use Config::AWS;
 use Path::Tiny qw( path );
 
-use Log::Any::Adapter 'Stderr';
-
 describe 'Config::AWS environment tests' => sub {
     local $ENV{HOME}    = 'tester';
     local $ENV{HOMEDIR} = 'tester';

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.031-2-gf4f7111
+package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.033-3-g6151582
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Add contributor names from git to your distribution
 # KEYWORDS: plugin distribution metadata git contributors authors commits
 
-our $VERSION = '0.032';
+our $VERSION = '0.034';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -66,10 +66,7 @@ around dump_config => sub
         include_authors => $self->include_authors ? 1 : 0,
         include_releaser  => $self->include_releaser ? 1 : 0,
         order_by => $self->order_by,
-        paths => [ sort map {
-                     my $p = path($_)->realpath;
-                     ($dist_root->subsumes($p) ? $p->relative($dist_root) : $p)->stringify
-                   } $self->paths ],
+        paths => [ sort $self->paths ],
         $self->remove ? ( remove => '...' ) : (),
         git_version => $self->_git('version'),
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
@@ -176,7 +173,10 @@ sub _build_contributors
 
     if (not $self->include_authors)
     {
-        my @author_emails = map { /(<[^>]+>)/g } @{ $self->zilla->authors };
+        my @authors = $self->zilla->authors;
+        @authors = @{ $authors[0] } if @authors == 1 && ref $authors[0];
+
+        my @author_emails = map { /(<[^>]+>)/g } @authors;
         @contributors = grep {
             my $contributor = $_;
             none { $contributor =~ /\Q$_\E/i } @author_emails;
@@ -267,7 +267,7 @@ Dist::Zilla::Plugin::Git::Contributors - Add contributor names from git to your 
 
 =head1 VERSION
 
-version 0.032
+version 0.034
 
 =head1 SYNOPSIS
 
@@ -378,10 +378,6 @@ L<Dist::Zilla::Plugin::Meta::Contributors> - adds an explicit list of names to x
 
 =item *
 
-L<Dist::Zilla::Plugin::ContributorsFile> - takes a list of names from a file
-
-=item *
-
 L<Dist::Zilla::Plugin::ContributorsFromGit> - more dependencies, problematic tests, passes around a lot of extra data in stashes unnecessarily
 
 =item *
@@ -391,6 +387,10 @@ L<Dist::Zilla::Plugin::ContributorsFromPod> - takes the list of contributors fro
 =item *
 
 L<Module::Install::Contributors>
+
+=item *
+
+L<Dist::Zilla::Plugin::ContributorsFile> - adds CONTRIBUTORS file, containing names from x_contributors metadata
 
 =back
 
@@ -415,7 +415,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Kent Fredric Ioan Rogers Klaus Eichner Matthew Horsfall Mohammad S Anwar
+=for stopwords Kent Fredric Matthew Horsfall Mohammad S Anwar Ricardo Signes Klaus Eichner Ioan Rogers
 
 =over 4
 
@@ -425,7 +425,15 @@ Kent Fredric <kentnl@cpan.org>
 
 =item *
 
-Ioan Rogers <ioan@dirtysoft.ca>
+Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
@@ -433,11 +441,7 @@ Klaus Eichner <klaus03@gmail.com>
 
 =item *
 
-Matthew Horsfall <wolfsage@gmail.com>
-
-=item *
-
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
+Ioan Rogers <ioan@dirtysoft.ca>
 
 =back
 

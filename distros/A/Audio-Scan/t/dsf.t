@@ -2,7 +2,7 @@ use strict;
 
 use File::Spec::Functions;
 use FindBin ();
-use Test::More tests => 24;
+use Test::More tests => 35;
 
 use Audio::Scan;
 
@@ -50,6 +50,28 @@ use Audio::Scan;
 
     is( $tags->{TDRC}, '2013-12-29T19:40', 'TALB ok' );
     is( $tags->{TSSE}, 'KORG AudioGate ver.2.3.3 (Windows 7)', 'TCON ok' );
+}
+
+# 6-channel DSF
+{
+    my $s = Audio::Scan->scan( _f('6channel.dsf') );
+
+    my $info = $s->{info};
+    my $tags = $s->{tags};
+
+    is( $info->{audio_offset}, 92, 'Audio offset ok' );
+    is( $info->{audio_size}, 567803904, 'Audio size ok' );
+    is( $info->{bitrate}, 9, 'Bitrate ok' );
+    is( $info->{bits_per_sample}, 1, 'Bits/sample ok' );
+    is( $info->{file_size}, 397, 'File size ok' );
+    is( $info->{channels}, 6, 'Channels ok' );
+    is( $info->{song_length_ms}, 268226, 'Song length ok' );
+    is( $info->{samplerate}, 2822400, 'Sample rate ok' );
+    is( $info->{block_size_per_channel}, 4096, 'Block align ok' );
+
+    is( $info->{id3_version}, 'ID3v2.3.0', 'ID3 version ok' );
+
+    is( $tags->{TALB}, 'Depeche Mode', 'TALB ok' );
 }
 
 sub _f {

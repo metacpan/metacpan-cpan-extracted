@@ -34,7 +34,7 @@
             "Beam::Runner" : "0.014",
             "Beam::Wire" : "1.019",
             "Getopt::Long" : "2.36",
-            "Minion" : "8",
+            "Minion" : "9",
             "Module::Runtime" : "0",
             "Mojolicious" : "7",
             "perl" : "5.010"
@@ -61,27 +61,27 @@
    "provides" : {
       "Beam::Minion" : {
          "file" : "lib/Beam/Minion.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Beam::Minion::Command::job" : {
          "file" : "lib/Beam/Minion/Command/job.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Beam::Minion::Command::run" : {
          "file" : "lib/Beam/Minion/Command/run.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Beam::Minion::Command::worker" : {
          "file" : "lib/Beam/Minion/Command/worker.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Beam::Minion::Util" : {
          "file" : "lib/Beam/Minion/Util.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "Beam::Runner::Command::minion" : {
          "file" : "lib/Beam/Runner/Command/minion.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/preaction/Beam-Minion"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

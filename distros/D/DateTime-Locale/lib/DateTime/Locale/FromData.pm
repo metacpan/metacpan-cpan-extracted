@@ -8,7 +8,7 @@ use DateTime::Locale::Util qw( parse_locale_code );
 use Params::ValidationCompiler 0.13 qw( validation_for );
 use Specio::Declare;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 my @FormatLengths;
 
@@ -259,6 +259,7 @@ sub STORABLE_thaw {
     shift;
     my $serialized = shift;
 
+    require DateTime::Locale;
     my $obj = DateTime::Locale->load($serialized);
 
     %{$self} = %{$obj};
@@ -282,7 +283,7 @@ DateTime::Locale::FromData - Class for locale objects instantiated from pre-defi
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =head1 SYNOPSIS
 

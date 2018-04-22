@@ -2,7 +2,7 @@ NAME
     Date::Lectionary - Readings for the Christian Lectionary
 
 VERSION
-    Version 1.20180417
+    Version 1.20180422
 
 SYNOPSIS
         use Time::Piece;
@@ -100,7 +100,7 @@ SUBROUTINES/METHODS
     liturgical year.
 
 AUTHOR
-    Michael Wayne Arnold, "<marmanold at cpan.org>"
+    Michael Wayne Arnold, "<michael at rnold.info>"
 
 BUGS
     Please report any bugs or feature requests to "bug-date-lectionary at

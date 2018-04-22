@@ -15,8 +15,8 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
-license: http://dev.perl.org/licenses/
+generated_by: 'Module::Install version 1.19'
+license: perl_5
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/karpet/catalyst-authentication-authtkt
   license: http://dev.perl.org/licenses/
   repository: http://github.com/karpet/catalyst-authentication-authtkt
-version: 0.15
+version: '0.16'

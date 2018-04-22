@@ -3,11 +3,7 @@ package Pcore::Ext::Class::AmCharts;
 use Pcore -class;
 use Pcore::Share::WWW;
 
-our $EXT_MAP = {    #
-    panel => 'Ext.panel.Panel',
-};
-
-sub EXT_panel ($ext) {
+sub EXT_panel ($ext) : Extend('panel') {
     return {
         mixins => ['Ext.util.StoreHolder'],
 

@@ -2,11 +2,7 @@ package Pcore::Ext::Class::Grid;
 
 use Pcore -l10n => 'Pcore-Ext';
 
-our $EXT_MAP = {    #
-    statusbar => 'Ext.toolbar.Toolbar',
-};
-
-sub EXT_statusbar($ext) {
+sub EXT_statusbar($ext) : Extend('Ext.toolbar.Toolbar') {
     return {
         mixins => ['Ext.util.StoreHolder'],
 

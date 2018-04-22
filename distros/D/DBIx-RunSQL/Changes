@@ -1,3 +1,7 @@
+0.19 20180421
+    . Fix implicit test prerequisite in formatter.t
+      This addresses RT 125157, reported and diagnosed by Slaven Rezic
+
 0.18 20180420
     + List the Getopt::Long version we need
     + Read SQL from STDIN if not given on the command line

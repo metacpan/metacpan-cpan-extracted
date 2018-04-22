@@ -17,6 +17,16 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Dancer2::Plugin::Map::Tube:
+    file: lib/Dancer2/Plugin/Map/Tube.pm
+    version: '0.02'
+  Dancer2::Plugin::Map::Tube::API:
+    file: lib/Dancer2/Plugin/Map/Tube/API.pm
+    version: '0.02'
+  Dancer2::Plugin::Map::Tube::Error:
+    file: lib/Dancer2/Plugin/Map/Tube/Error.pm
+    version: '0.02'
 requires:
   Cache::Memcached::Fast: '0.25'
   Class::Load: '0.22'
@@ -28,5 +38,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Dancer2-Plugin-Map-Tube.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

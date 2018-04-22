@@ -1,10 +1,10 @@
 {
    "abstract" : "Date::Advent takes a Time::Piece date and calculates all four Sundays of Advent for the current Christian liturgical year.",
    "author" : [
-      "Michael Wayne Arnold <marmanold@cpan.org>"
+      "Michael Wayne Arnold <michael@rnold.info>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "advent",
       "christmas",
@@ -29,9 +29,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::CheckManifest" : "0.9",
+            "Pod::Markdown" : "3.005",
+            "Test::CPAN::Changes" : "0.400002",
+            "Test::DistManifest" : "1.014",
             "Test::Exception" : "0.43",
-            "Test::More" : "1.302040"
+            "Test::Kwalitee" : "1.27",
+            "Test::Kwalitee::Extra" : "v0.4.0",
+            "Test::MinimumVersion" : "0.101082",
+            "Test::More" : "1.302040",
+            "Test::Pod" : "1.51",
+            "Test::Pod::Coverage" : "1.10",
+            "Test::Version" : "2.07"
          }
       },
       "configure" : {
@@ -42,7 +50,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.38",
-            "Date::Lectionary::Time" : "1.20160727",
+            "Date::Lectionary::Time" : "1.20180422",
             "Moose" : "2.1804",
             "MooseX::StrictConstructor" : "0.21",
             "Time::Piece" : "1.31",
@@ -54,7 +62,7 @@
    "provides" : {
       "Date::Advent" : {
          "file" : "lib/Date/Advent.pm",
-         "version" : "1.20171223"
+         "version" : "1.20180422"
       }
    },
    "release_status" : "stable",
@@ -65,7 +73,7 @@
          "web" : "https://github.com/marmanold/Date-Advent"
       }
    },
-   "version" : "1.20171223",
+   "version" : "v1.20180422",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_twitter" : "https://www.twitter.com/marmanold/"
 }

@@ -2,9 +2,11 @@ BEGIN { $ENV{PERL_STRICTURES_EXTRA} = 0 }
 
 sub _eval { eval $_[0] }
 
+use Test::More 0.88;
+
 use strict;
 use warnings;
-use Test::More qw(no_plan);
+use Test::More;
 
 sub capture_hints {
   my $code = shift;
@@ -76,3 +78,5 @@ eval qq{ use strictures $strictures::VERSION; };
 
 is $@, '',
   "Can use current strictures version";
+
+done_testing;

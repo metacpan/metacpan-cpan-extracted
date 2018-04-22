@@ -2,7 +2,7 @@ NAME
     DateTime::Tiny - A date object, with as little code as possible
 
 VERSION
-    version 1.06
+    version 1.07
 
 SYNOPSIS
       # Create a date manually
@@ -219,6 +219,8 @@ CONTRIBUTORS
     *   Ken Williams <Ken.Williams@WindLogics.com>
 
     *   Nigel Gregoire <nigelg@airg.com>
+
+    *   Ovid <curtis_ovid_poe@yahoo.com>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2006 by Adam Kennedy.

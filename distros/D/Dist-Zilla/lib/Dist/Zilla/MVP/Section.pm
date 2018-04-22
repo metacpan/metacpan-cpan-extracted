@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Section 6.011;
+package Dist::Zilla::MVP::Section 6.012;
 # ABSTRACT: a standard section in Dist::Zilla's configuration sequence
 
 use Moose;
@@ -56,7 +56,7 @@ Dist::Zilla::MVP::Section - a standard section in Dist::Zilla's configuration se
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 AUTHOR
 

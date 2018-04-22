@@ -9,7 +9,7 @@ install_share dist => 'share';
 
 WriteMakefile(
     NAME               => 'Date::Lectionary::Daily',
-    AUTHOR             => q{Michael Wayne Arnold <marmanold@cpan.org>},
+    AUTHOR             => q{Michael Wayne Arnold <michael@rnold.info>},
     VERSION_FROM       => 'lib/Date/Lectionary/Daily.pm',
     ABSTRACT           => 'Date::Lectionary::Daily - Daily Readings for the Christian Lectionary',
     LICENSE            => 'freebsd',
@@ -34,18 +34,17 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Carp'                         => '1.38',
-        'Try::Tiny::Tiny'              => '0.001',
         'Try::Catch'                   => '1.1.0',
         'Time::Piece'                  => '1.3204',
         'Time::Seconds'                => '1.3204',
         'Moose'                        => '2.2010',
         'Moose::Util::TypeConstraints' => '2.2010',
         'MooseX::Aliases'              => '0.11',
-        'Date::Advent'                 => '1.20171223',
+        'Date::Advent'                 => '1.20180422',
         'Date::Easter'                 => '1.22',
-        'Date::Lectionary::Time'       => '1.20170311',
-        'Date::Lectionary'             => '1.20180302',
-        'Date::Lectionary::Day'        => '1.20180302',
+        'Date::Lectionary::Time'       => '1.20180422',
+        'Date::Lectionary'             => '1.20180422',
+        'Date::Lectionary::Day'        => '1.20180422',
         'namespace::autoclean'         => '0.28',
         'File::Share'                  => '0.25',
         'XML::LibXML'                  => '2.0132',
@@ -64,7 +63,7 @@ WriteMakefile(
         provides => {
             'Date::Lectionary::Daily' => {
                 file    => 'lib/Date/Lectionary/Daily.pm', 
-                version => '1.20180417'
+                version => '1.20180422'
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

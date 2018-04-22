@@ -6,7 +6,7 @@ use utf8;
 package Dist::Zilla::Plugin::OSPrereqs;
 # ABSTRACT: List prereqs conditional on operating system
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 use List::Util 1.33 'first';
@@ -120,8 +120,11 @@ sub munge_files {
         }
         my $prereq_hash = $self->_prereq;
         for my $k ( sort keys %$prereq_hash ) {
-            my $v = $prereq_hash->{$k};
-            $prereq_str .= $self->_prereq_str->{$builder} . "{'$k'} = '$v';\n";
+            my $v        = $prereq_hash->{$k};
+            my $preamble = $self->_prereq_str->{$builder} . "{'$k'}";
+            $preamble .= " = \$FallbackPrereqs{'$k'}"
+              if $builder eq 'makemaker';
+            $prereq_str .= "$preamble = '$v';\n";
         }
         $prereq_str .= "}\n\n";
 
@@ -155,7 +158,7 @@ Dist::Zilla::Plugin::OSPrereqs - List prereqs conditional on operating system
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

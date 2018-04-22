@@ -5,7 +5,7 @@ use utf8;
 use Exporter 'import';
 use Business::BR::CNJ;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 our @EXPORT_OK = qw/ cnj_extract_numbers cnj_extract_numbers_lwp /;
 
 sub cnj_extract_numbers {
@@ -14,7 +14,7 @@ sub cnj_extract_numbers {
  my @n = $txt =~ m|(\d{7}.?\d{2}.?\d{4}.?\d.?\d{2}.?\d{4})|g;
 
  # Hard check and return
- return map { ( Business::BR::CNJ::cnj_check_number($_) ? ($_) : () ) } @n; 
+ return map { ( Business::BR::CNJ::cnj_check_number($_) ? ($_) : () ) } @n;
 }
 
 sub cnj_extract_numbers_lwp {
@@ -59,11 +59,13 @@ Business::BR::CNJ::NumberExtractor - Extract brazilian CNJ numbers (Conselho Nac
    my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers('This is good number: 0058967-77.2016.8.19.0000');
 
    # Or, using LWP::UseAgent and Mojo::DOM (if text/html repsonse)
-
    my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('https://modeloinicial.com.br/peticao/reclamacao-trabalhista');
 
-   # Works even on DOC or PDF files
+   # Pass on args to LWP's get method, like cookies or user agent:
+   my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('https://modeloinicial.com.br/peticao/11040619/Acao-aposentadoria-invalidez', 'User-Agent', 'That is me.');
+   my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('https://modeloinicial.com.br/peticao/11000717/Acao-aposentadoria-Especial', 'Cookie', 'AUTH=123');
 
+   # Works even on DOC or PDF files
    my @numbers = Business::BR::CNJ::NumberExtractor::cnj_extract_numbers_lwp('http://arquivo.trf1.gov.br/AGText/2011/0001000/00010284120114013819_3.doc');
 
 =head1 DESCRIPTION

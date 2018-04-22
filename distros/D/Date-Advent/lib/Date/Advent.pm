@@ -1,6 +1,9 @@
 package Date::Advent;
 
 use v5.22;
+use strict;
+use warnings;
+
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -15,11 +18,11 @@ Date::Advent - Calculate the Sundays of Advent
 
 =head1 VERSION
 
-Version 1.20171223
+Version 1.20180422
 
 =cut
 
-our $VERSION = '1.20171223';
+use version; our $VERSION = version->declare("v1.20180422");
 
 =head1 SYNOPSIS
 
@@ -36,12 +39,6 @@ As Advent is the beginning of the Christian liturgical calendar, this usually re
     say $testAdvent->thirdSunday; #Gives date for third Sunday of Advent
     say $testAdvent->fourthSunday; #Gives date for fourth Sunday of Advent
     say $testAdvent->christmas; #Gives date of Christmas
-
-The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Advent> -- and tested via TravisCI.
-
-=for html <a href='https://travis-ci.org/marmanold/Date-Advent'><img src='https://travis-ci.org/marmanold/Date-Advent.svg?branch=master' /></a>
-
-=for html <a href='https://coveralls.io/github/marmanold/Date-Advent?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Advent/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 =head1 Object Attributes
 
@@ -157,9 +154,13 @@ sub BUILD {
 
 =head1 AUTHOR
 
-Michael Wayne Arnold, C<< <marmanold at cpan.org> >>
+Michael Wayne Arnold, C<< <michael at rnold.info> >>
 
 =head1 BUGS
+
+=for html <a href='https://travis-ci.org/marmanold/Date-Advent'><img src='https://travis-ci.org/marmanold/Date-Advent.svg?branch=master' /></a>
+
+=for html <a href='https://coveralls.io/github/marmanold/Date-Advent?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Advent/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 Please report any bugs or feature requests to C<bug-date-advent at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Advent>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -196,11 +197,11 @@ L<http://search.cpan.org/dist/Date-Advent/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE
 
-Copyright 2016-2017 MICHAEL WAYNE ARNOLD
+Copyright 2016-2018 MICHAEL WAYNE ARNOLD
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

@@ -37,12 +37,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Share" => 0,
     "File::ShareDir" => 0,
-    "Log::Any::Adapter" => 0,
+    "File::ShareDir::Install" => "0.10",
     "Path::Tiny" => "0.076",
     "Test2::Tools::Spec" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "File::Glob" => 0,
   "File::Share" => 0,
   "File::ShareDir" => 0,
-  "Log::Any::Adapter" => 0,
+  "File::ShareDir::Install" => "0.10",
   "Path::Tiny" => "0.076",
   "Ref::Util" => 0,
   "Scalar::Util" => 0,

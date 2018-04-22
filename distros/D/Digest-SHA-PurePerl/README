@@ -1,4 +1,4 @@
-Digest::SHA::PurePerl version 6.01
+Digest::SHA::PurePerl version 6.02
 ==================================
 
 Digest::SHA::PurePerl is a complete implementation of the NIST
@@ -29,7 +29,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2017 Mark Shelor
+Copyright (C) 2003-2018 Mark Shelor
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

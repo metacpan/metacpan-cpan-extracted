@@ -11,92 +11,7 @@ use Cwd             qw( getcwd      );
 use File::Basename  qw( basename    );
 use List::Util      qw( first       );
 
-my $version = version->parse( '2.17.14' )->numify;
-my $mm_v    = ExtUtils::MakeMaker->VERSION;
-
-#my @merge_spec
-#= do
-#{
-#    if( $mm_v < 6.46 )
-#    {
-#        ()
-#    }
-#    else
-#    {
-#        META_MERGE => 
-#        {
-#            'meta-spec' =>
-#            {
-#                version => 2
-#            }
-#
-#            dynamic_config => 1,
-#
-#            configure_requires =>
-#            {
-#                qw
-#                (
-#                    Module::FromPerlVer 0.004,
-#                )
-#            },
-#        }
-#    }
-#};
-
-my @config_spec
-= $mm_v < 6.52
-? ()
-:   (
-        CONFIGURE_REQUIRES => 
-        {
-            qw
-            (
-                File::Copy::Recursive::Reduced  0.002
-            )
-        }
-    )
-; 
-
-WriteMakefile
-(
-    qw
-    (
-        NAME            FindBin::libs
-        LICENSE         perl
-    ),
-    VERSION         => $version,
-	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
-    PREREQ_PM       =>
-    {
-        # standard distro, particular versions 
-        # are unlikely to cause pain.
-
-        Cwd                     => version->parse( '3.73'  )->numify,
-
-#        Module::FromPerlVer     => version->parse( '0.9.5' )->numify,
-
-        File::Copy::Recursive::Reduced
-        => version->parse( '0.002' )->numify,
-
-		qw
-        (
-
-            Carp                    0
-            File::Basename          0
-            File::Spec::Functions   0
-            File::Temp              0
-            FindBin                 0
-            List::Util              0
-            Test::More              0
-            Symbol                  0
-            strict                  0
-            version                 0
-        )
-    },
-
-    @config_spec,
-    @merge_spec,
-);
+# figure out which of the source paths to use.
 
 my $perl_v
 = eval
@@ -158,6 +73,102 @@ or die "Failed copy from $src_d.\n";
 
 # at this point there is a module, and whatever else, in place
 # for the perl version.
+
+# deal with using the recursive module.
+
+my $version = version->parse( '2.17.15' )->numify;
+my $mm_v    = ExtUtils::MakeMaker->VERSION;
+
+#my @merge_spec
+#= do
+#{
+#    if( $mm_v < 6.46 )
+#    {
+#        ()
+#    }
+#    else
+#    {
+#        META_MERGE => 
+#        {
+#            'meta-spec' =>
+#            {
+#                version => 2
+#            }
+#
+#            dynamic_config => 1,
+#
+#            configure_requires =>
+#            {
+#                qw
+#                (
+#                    Module::FromPerlVer 0.004,
+#                )
+#            },
+#        }
+#    }
+#};
+
+my @config_spec
+= $mm_v < 6.52
+? ()
+:   (
+        CONFIGURE_REQUIRES => 
+        {
+            qw
+            (
+				version							0
+				Cwd								0
+				ExtUtils::MakeMaker				0
+				File::Basename					0
+				List::Util						0
+
+                File::Copy::Recursive::Reduced  0.002
+            )
+        }
+    )
+; 
+
+WriteMakefile
+(
+    qw
+    (
+        NAME            FindBin::libs
+        LICENSE         perl
+    ),
+    VERSION         => $version,
+	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
+    ABSTRACT_FROM   => 'lib/FindBin/libs.pm',
+    PREREQ_PM       =>
+    {
+        # standard distro, particular versions 
+        # are unlikely to cause pain.
+
+        Cwd                     => version->parse( '3.73'  )->numify,
+
+#        Module::FromPerlVer     => version->parse( '0.9.5' )->numify,
+
+        File::Copy::Recursive::Reduced
+        => version->parse( '0.002' )->numify,
+
+		qw
+        (
+
+            Carp                    0
+            File::Basename          0
+            File::Spec::Functions   0
+            File::Temp              0
+            FindBin                 0
+            List::Util              0
+            Test::More              0
+            Symbol                  0
+            strict                  0
+            version                 0
+        )
+    },
+
+    @config_requires,
+    @merge_spec,
+);
 
 
 __END__

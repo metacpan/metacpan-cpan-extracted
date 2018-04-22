@@ -2,9 +2,9 @@
 use strict;
 use FindBin;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
-use_ok("Finance::Bank::Postbank_de");
+use Finance::Bank::Postbank_de;
 
 sub save_content {
   my ($account,$name) = @_;
@@ -13,7 +13,8 @@ sub save_content {
   open F, "> $filename"
     or diag "Couldn't dump current page to '$filename': $!";
   binmode F;
-  print F $account->agent->content;
+  my $agent = $account->agent;
+  print F $agent->content if $agent;
   close F;
   diag "Current page saved to '$filename'";
 };
@@ -46,15 +47,18 @@ SKIP: {
     skip "Banking is unavailable due to maintenance", 4
       if $account->maintenance;
     $account->agent(undef);
+    $account->new_session();
 
     # Check that all functions are available
-    for (keys %Finance::Banking::Postbank_de::functions) {
+    for (sort keys %Finance::Bank::Postbank_de::functions) {
         isn't undef,
-            $account->agent->find_link(text_regex => $Finance::Banking::Postbank_de::functions{ $_ }),
+            $account->agent->find_link(@{ $Finance::Bank::Postbank_de::functions{ $_ }}),
             "Function '$_' available";
     };
 
-    $status = $account->select_function("accountstatement");
+    eval {
+        $status = $account->select_function("accountstatement");
+    };
     unless ($status == 200) {
       diag $account->agent->res->as_string;
       skip "Couldn't get to account statement (LWP: $status)", 2;

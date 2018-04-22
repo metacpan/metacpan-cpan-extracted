@@ -5,7 +5,7 @@ use warnings;
 use App::RewriteVersion;
 use Getopt::Long::Modern 'auto_help';
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 GetOptions(
 	'D|dist-dir=s'       => \my $dist_dir,

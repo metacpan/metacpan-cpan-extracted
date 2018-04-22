@@ -3,11 +3,12 @@ abstract: 'Parse cpanfile'
 author:
   - 'Tatsuhiko Miyagawa'
 build_requires:
+  File::pushd: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,13 +27,12 @@ recommends:
 requires:
   CPAN::Meta: '2.12091'
   CPAN::Meta::Prereqs: '2.12091'
-  JSON::PP: '2.27300'
   parent: '0'
 resources:
   bugtracker: https://github.com/miyagawa/cpanfile/issues
   homepage: https://github.com/miyagawa/cpanfile
   repository: https://github.com/miyagawa/cpanfile.git
-version: '1.1002'
+version: '1.1003'
 x_contributors:
   - 'Atsushi Kato <ktat@cpan.org>'
   - 'David Golden <dagolden@cpan.org>'
@@ -46,3 +46,5 @@ x_contributors:
   - 'Michiel Beijen <michiel.beijen@gmail.com>'
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -8,7 +8,7 @@ use parent qw/Exporter/;
 our @EXPORT = qw/dump_sexp/;
 our @EXPORT_OK = @EXPORT;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw/croak/;
 use Data::SExpression;
@@ -153,8 +153,8 @@ procedure is restarted.
 
 =item 10
 
-Anything else (regexp, filehandle, format, glob, version string)
-causes an exception to be raised
+Anything else (coderef, regexp, filehandle, format, globref, version
+string) causes an exception to be raised.
 
 =back
 

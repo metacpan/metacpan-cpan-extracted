@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,10 +34,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::BumpVersionAfterRelease:
     file: lib/Dist/Zilla/Plugin/BumpVersionAfterRelease.pm
-    version: '0.017'
+    version: '0.018'
   Dist::Zilla::Plugin::RewriteVersion:
     file: lib/Dist/Zilla/Plugin/RewriteVersion.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Dist::Zilla: '5.040'
   Dist::Zilla::Role::AfterRelease: '5'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease/issues
   homepage: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease
   repository: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease.git
-version: '0.017'
+version: '0.018'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Dave Rolsky <autarch@urth.org>'
@@ -65,4 +65,5 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Klaus Eichner <klaus03@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

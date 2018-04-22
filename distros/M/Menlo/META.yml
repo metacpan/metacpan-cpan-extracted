@@ -31,13 +31,16 @@ requires:
   Capture::Tiny: '0'
   Class::Tiny: '1.001'
   Exporter: '0'
+  ExtUtils::Config: '0.003'
+  ExtUtils::Helpers: '0.020'
+  ExtUtils::InstallPaths: '0.002'
   File::Temp: '0'
   File::Which: '0'
   File::pushd: '0'
-  Getopt::Long: '0'
+  Getopt::Long: '2.36'
   HTTP::Tiny: '0.054'
   HTTP::Tinyish: '0.04'
-  JSON::PP: '0'
+  JSON::PP: '2'
   Module::CPANfile: '0'
   Module::CoreList: '0'
   Module::Metadata: '0'
@@ -51,10 +54,10 @@ requires:
   perl: '5.008001'
   version: '0'
 resources:
-  bugtracker: https://github.com/miyagawa/Menlo/issues
-  homepage: https://github.com/miyagawa/Menlo
-  repository: https://github.com/miyagawa/Menlo.git
-version: '1.9010'
+  bugtracker: https://github.com/miyagawa/cpanminus/issues
+  homepage: https://github.com/miyagawa/cpanminus
+  repository: https://github.com/miyagawa/cpanminus.git
+version: '1.9017'
 x_contributors:
   - 'Aaron Moses <mosesa02@localhost.localdomain>'
   - 'Alessandro Ghedini <al3xbio@gmail.com>'
@@ -68,7 +71,7 @@ x_contributors:
   - 'cho45 <cho45@lowreal.net>'
   - 'Christian Walde <walde.christian@googlemail.com>'
   - 'chromatic <chromatic@wgz.org>'
-  - 'Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'Dana M. Diederich <diederich@gmail.com>'
   - 'Dave Goodell <davidjgoodell@gmail.com>'
   - 'Dave Rolsky <autarch@urth.org>'
@@ -107,7 +110,7 @@ x_contributors:
   - 'Nicolas R <atoomic@cpan.org>'
   - 'Norman Nunley <nnunley@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-  - 'Olivier Mengue <dolmen@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Pedro Melo <melo@simplicidade.org>'
   - 'Rafal Pocztarski <r.pocztarski@gmail.com>'
   - 'reezer <kind@gmx.at>'

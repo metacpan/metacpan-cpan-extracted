@@ -2,7 +2,7 @@ NAME
     TAP::Harness::Restricted - Skip some test files
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
         # command line
@@ -21,10 +21,35 @@ DESCRIPTION
     *   File names that look like pod.t or pod-coverage.t, with optional
         leading numbers
 
-    *   Files that contain the text "use Test::Pod"
-
     *   Files matching any of the space-separated glob patterns in
         $ENV{HARNESS_SKIP}
+
+    *   Files that look like author tests based on the modules they use or
+        require
+
+    The list of modules to exclude is:
+
+    *   Test::CleanNamespaces
+
+    *   Test::DependentModules
+
+    *   Test::EOL
+
+    *   Test::Kwalitee
+
+    *   Test::Mojibake
+
+    *   Test::NoTabs
+
+    *   Test::Perl::Critic
+
+    *   Test::Pod
+
+    *   Test::Portability::Files
+
+    *   Test::Spelling
+
+    *   Test::Vars
 
     Suggestions for other annoying things to filter out are welcome.
 
@@ -49,8 +74,10 @@ SUPPORT
 AUTHOR
     David Golden <dagolden@cpan.org>
 
-CONTRIBUTOR
-    Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+CONTRIBUTORS
+    *   Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+    *   grr <grr@users.noreply.github.com>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2013 by David Golden.

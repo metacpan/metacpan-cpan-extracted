@@ -1,0 +1,293 @@
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 11695
+Ter Dez  6 17:07:36 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Ter Dez  6 17:13:52 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 24424
+Qua Dez  7 12:06:43 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Qua Dez  7 12:13:53 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 25872
+Qua Dez  7 15:54:26 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Qua Dez  7 16:02:34 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 4042
+Qui Dez  8 12:13:34 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE2::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE2/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Qui Dez  8 12:20:22 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 21950
+Qui Dez  8 13:15:13 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE2::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE2/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Qui Dez  8 13:22:05 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 31634
+Qui Dez  8 13:46:12 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE2::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE2/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Qui Dez  8 13:51:54 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 24946
+Qui Dez  8 16:52:17 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE2::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE2/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Qui Dez  8 16:59:46 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 18389
+Seg Dez 19 15:37:08 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 15:42:54 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 24236
+Seg Dez 19 15:57:20 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 15:59:23 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 14389
+Seg Dez 19 16:19:26 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 16:21:23 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 19081
+Seg Dez 19 16:25:10 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 16:28:20 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 20864
+Seg Dez 19 16:29:34 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 16:31:36 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 26183
+Seg Dez 19 16:34:18 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 16:36:16 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 6065
+Seg Dez 19 16:45:03 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 16:47:17 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 10171
+Seg Dez 19 16:48:59 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 16:51:21 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 1844
+Seg Dez 19 17:11:36 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Dez 19 17:13:31 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 6109
+Ter Dez 20 10:09:47 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Ter Dez 20 10:11:35 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 8118
+Ter Dez 20 10:15:48 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE3::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE3/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Ter Dez 20 10:18:32 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 29921
+Ter Dez 20 11:27:13 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE4::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE4/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Ter Dez 20 11:30:06 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 4005
+Ter Dez 20 11:44:48 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE4::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE4/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Ter Dez 20 11:47:57 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 10946
+Ter Dez 20 12:05:40 BRST 2016
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE4::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE4/script/../lib ...
+Schema dump completed.
+ln: falhou ao criar link simbólico 'TESTE4/root/alienhunter_dir/alienhunter_dir': Arquivo existe
+ln: falhou ao criar link simbólico 'TESTE4/root/infernal_dir/infernal_dir': Arquivo existe
+ln: falhou ao criar link simbólico 'TESTE4/root/rbsfinder_dir/rbsfinder_dir': Arquivo existe
+ln: falhou ao criar link simbólico 'TESTE4/root/rnammer_dir/rnammer_dir': Arquivo existe
+ln: falhou ao criar link simbólico 'TESTE4/root/transterm_dir/transterm_dir': Arquivo existe
+ln: falhou ao criar link simbólico 'TESTE4/root/trf_dir/trf_dir': Arquivo existe
+ln: falhou ao criar link simbólico 'TESTE4/root/trna_dir/trna_dir': Arquivo existe
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Ter Dez 20 12:08:32 BRST 2016
+
+
+Running Report_HTML_da_Bactéria_do_curso pipeline
+preparing phase: Upload XML
+preparing phase: Report HTML
+Pipeline group id is 28765
+Seg Jan  9 14:27:10 BRST 2017
+
+DEBUG: Eliminating SequenceObjectDB: Process upload_xml.pl terminated
+Dumping manual schema for TESTE4::Basic to directory /home/wendelhlc/git/report_html_db/report_html_db/TESTE4/script/../lib ...
+Schema dump completed.
+DEBUG: Eliminating SequenceObjectDB: Process   terminated
+Seg Jan  9 14:31:09 BRST 2017
+

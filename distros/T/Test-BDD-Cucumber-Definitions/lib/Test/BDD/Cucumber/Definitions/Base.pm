@@ -10,7 +10,7 @@ use Test::BDD::Cucumber::Definitions qw(S);
 use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 our @EXPORT_OK = qw(Base);
 

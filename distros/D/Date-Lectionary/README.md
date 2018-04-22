@@ -4,7 +4,7 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 # VERSION
 
-Version 1.20180417
+Version 1.20180422
 
 # SYNOPSIS
 
@@ -89,9 +89,17 @@ Private method that takes a Time::Piece date object to returns a Date::Advent ob
 
 # AUTHOR
 
-Michael Wayne Arnold, `<marmanold at cpan.org>`
+Michael Wayne Arnold, `<michael at rnold.info>`
 
 # BUGS
+
+<div>
+    <a href="https://travis-ci.org/marmanold/Date-Lectionary"><img src="https://travis-ci.org/marmanold/Date-Lectionary.svg?branch=master"></a>
+</div>
+
+<div>
+    <a href='https://coveralls.io/github/marmanold/Date-Lectionary?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
 
 Please report any bugs or feature requests to `bug-date-lectionary at rt.cpan.org`, or through
 the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary).  I will be notified, and then you'll

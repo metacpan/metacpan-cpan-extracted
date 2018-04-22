@@ -1,0 +1,61 @@
+#***********************************************************************************
+#
+PIPELINE= Report HTML da Bactéria do curso 
+#
+#***********************************************************************************
+#===================================================================================
+PHASE= Upload XML
+program = upload_xml.pl
+xml_file = bacteria.xml
+#===================================================================================
+                              # _||_ #
+                              # \  / #
+                              #  \/  #
+#===================================================================================
+PHASE= Report HTML
+program = report_html_db.pl
+#===================================================================================
+html_dir=TESTE4
+organism_name=Bacteria do curso
+uniquename=Bacteria
+type_target_class_id=81525
+pipeline=4528
+fasta_dir = seq
+aa_fasta_dir = orfs_aa
+nt_fasta_dir = orfs_nt
+fasta_file = bacteria.fasta
+aa_orf_file = glimmer3_dir/genes_aa.fasta
+nt_orf_file = glimmer3_dir/genes_nt.fasta
+trf_dir = /home/wendelhlc/git/report_html_db/report_html_db/trf_dir
+trna_dir = /home/wendelhlc/git/report_html_db/report_html_db/trna_dir
+alienhunter_dir = /home/wendelhlc/git/report_html_db/report_html_db/alienhunter_dir
+alienhunter_output_file = alienhunter.txt
+infernal_dir = /home/wendelhlc/git/report_html_db/report_html_db/infernal_dir
+infernal_output_file = infernal.txt
+rnammer_dir = /home/wendelhlc/git/report_html_db/report_html_db/rnammer_dir
+transterm_dir = /home/wendelhlc/git/report_html_db/report_html_db/transterm_dir
+rbs_dir = /home/wendelhlc/git/report_html_db/report_html_db/rbsfinder_dir
+tcdb_dir = /home/wendelhlc/git/report_html_db/report_html_db/tcdb_dir
+phobius_dir = /home/wendelhlc/git/report_html_db/report_html_db/phobius_dir
+tmhmm_dir = /home/wendelhlc/git/report_html_db/report_html_db/tmhmm_dir
+signalp_dir = /home/wendelhlc/git/report_html_db/report_html_db/signalp_dir
+blast_dir = /home/wendelhlc/git/report_html_db/report_html_db/blastp_dir
+rpsblast_dir = /home/wendelhlc/git/report_html_db/report_html_db/rpsblast_dir
+interpro_dir = /home/wendelhlc/git/report_html_db/report_html_db/interpro_dir
+orthology_dir = /home/wendelhlc/git/report_html_db/report_html_db/eggnog_dir
+
+
+report_go_dir=/home/wendelhlc/git/report_html_db/report_html_db/go_report/go_mapping.html;
+report_eggnog_dir= /home/wendelhlc/git/report_html_db/report_html_db/eggnog_report/classes.html;
+report_pathways_dir = /home/wendelhlc/git/report_html_db/report_html_db/kegg_report/classes.html;
+report_kegg_organism_dir=/home/wendelhlc/git/report_html_db/report_html_db/kegg_report/classes.html;/home/wendelhlc/git/report_html_db/report_html_db/kegg_report/classes.html
+
+blast_dir_list=/home/wendelhlc/git/report_html_db/report_html_db/blastp_dir
+database_code_list=INSD
+TCDB_file=/usr/local/genome/databases/TCDB/TCDB_ID_list
+ko_file= /usr/local/genome/databases/kegg/ko/ko
+homepage_text_file = example.json
+homepage_banner_image = /home/wendelhlc/Downloads/rsz_platypus256x256.png
+filepath_log = /home/wendelhlc/git/report_html_db/report_html_db/report_html_db.log
+
+#===================================================================================

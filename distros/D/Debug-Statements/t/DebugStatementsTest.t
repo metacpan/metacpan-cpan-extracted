@@ -19,8 +19,6 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin"; # For testing outside of dzil
 use Debug::Statements ':all';
-use lib "/home/ate/scripts/regression";    # regression.pm::regression::test in scratch space
-use regression;
 use Data::Dumper;
 $Data::Dumper::Terse = 1;                # eliminate the $VAR1
 
@@ -30,7 +28,7 @@ my $d = 0;
 my $dd = 0;
 GetOptions( \%opt, 'test|t=s', 'd|d1' => sub { $d = 1 }, 'dd' => sub { $dd = 1 }, 'die', 'print', 'troubleshooting' ) or die $!;
 #die_on_fail() if $opt{die};  # Not in 5.8.8
-$regression::t = defined $opt{test} ? $opt{test} : 'ALL';
+my $t = defined $opt{test} ? $opt{test} : 'ALL';
 die "ERROR:  Did not expect '@ARGV'.  Did you forget '-t' ? " if @ARGV;
 d( '', 10 ) if $dd;                   # Turn on say statements to help debug Debug::Statements.pm module
 
@@ -656,7 +654,7 @@ if ( runtests('testLsl') ) {
     if ( $windows ) {
         # Volume in drive C is OSDisk
         $rd = '\s*Volume in';
-        return; # ls() seems to work on Windows, but my tests fail
+        #return; # ls() seems to work on Windows, but my tests fail
     } else {
         # -rwxrwxr-x  1 ckoknat hardware 29506 Dec 18 11:28 DebugStatementsTest.t
         $rd = '\S+\s+\d+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+';
@@ -680,14 +678,44 @@ if ( runtests('testLsl') ) {
 }
 
 #test_PerlCritic("/home/ckoknat/s/regression/Debug/Statements.pm");die;  ########
-#Test::More::done_testing();
+Test::More::done_testing();
 
-# Print pass/fail summary
-regression::summary();
+## Print pass/fail summary
+summary();
 exit 0;
 
 
 #####################################################################
+
+sub summary {
+    # Print message if any test failed
+    my ($passed,$failed) = (0,0);
+    my @tests = Test::More->builder->details;
+    my @failed;
+    my $i = 0;
+    for my $test (@tests) {
+        $i++;
+        if ($test->{ok}) {$passed++} else {$failed++; push @failed, $i};
+    }
+    if ( $failed ) {
+        #print "\n################################ $failed tests FAILED ################################\n";
+        print "\n################################ tests " . (join " ", @failed) . " FAILED ################################\n";
+    } else {
+        #print "\nAll tests passed\n";
+        print "\n################################ all tests passed ################################\n";
+    }
+    return $failed;
+}
+
+sub runtests {
+	my $regex = shift;
+	if ( $t =~ /^($regex|ALL)$/ ) {
+        print "\n*** $regex ***\n";
+        return 1;
+	} else {
+        return 0;
+    }
+}
 
 #test_PerlCritic($file)
 sub test_PerlCritic {

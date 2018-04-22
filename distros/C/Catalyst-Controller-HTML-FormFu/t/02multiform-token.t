@@ -51,7 +51,8 @@ $mech->post_ok(
     $uri,
     {   _multiform => $hidden_value,
         page2      => 'bar',
-    } );
+    }
+);
 
 # check final output
 

@@ -1,0 +1,858 @@
+=pod
+if (defined($config->{"blast_dir"})){
+   $blast_dir = $config->{"blast_dir"};
+}
+
+=cut
+
+=head2 getPipeline
+
+  Title    : getPipeline
+  Usage    : my \$results = \$my_object->getPipeline();
+  Function : Method used to get pipeline from database
+  Returns  : Reference to a hash
+           :
+
+=cut
+
+=head2 getRibosomalRNAs
+
+  Title    : getRibosomalRNAs
+  Usage    : my \$results = \$my_object->getRibosomalRNAs( -hash => \%{ ( "pipeline_id" => "4528" ) } );
+  Function : Method used to get rRNAs availables in the sequence
+  Returns  : list reference of rRNAs available
+  Args     : named arguments:
+           : -hash => referenced hash with pipeline_id property
+           :
+
+=cut
+
+=head2 analyses_CDS
+
+  Title    : analyses_CDS
+  Usage    : my \$results = \$my_object->analyses_CDS( -hash => \%{ (
+    "pipeline" => "4528"
+  ) } );
+  Function : Method used to realize search based on parameters received by form of analyses of protein-coding genes
+  Returns  : Return a referenced hash with a list of feature IDs and total number of results
+  Args     : named arguments:
+           : -hash => referenced hash with the following properties:
+| Key | Description |
+| :-- | :-- |
+| pipeline | Scalar variable with pipeline ID |
+| contig | Scalar variable with feature ID from contig |
+| geneDesc | Scalar variable which realize search by all CDS with this description |
+| noDesc | Scalar variable which realize search by all CDS that doesn’t have this description |
+| individually | Scalar variable which make all terms from geneDesc and noDesc match  |
+| noGO | Scalar variable, if you don’t want to have results related to GO annotation |
+| goID | Scalar variable with GO Identifier  |
+| goDesc | Scalar variable with GO Description  |
+| noTC | Scalar variable, if you don’t want to have results related to TCDB annotation  |
+| tcdbID | Scalar variable with TCDB ID  |
+| tcdbFam | Scalar variable with TCDB Family |
+| tcdbSubclass | Scalar variable with TCDB subclass  |
+| tcdbClass | Scalar variable with TCDB class  |
+| tcdbDesc | Scalar variable with TCDB description  |
+| noBlast | Scalar variable, if you don’t want to have results related to BLAST annotations  |
+| blastID | Scalar variable with BLAST identifier  |
+| blastDesc | Scalar variable with BLAST description  |
+| noRps | Scalar variable, if you don’t want to have results related to RPS-BLAST annotations  |
+| rpsID | Scalar variable with RPS-BLAST Identifier  |
+| rpsDesc | Scalar variable with RPS-BLAST Description  |
+| noKEGG | Scalar variable, if you don’t want to have results related to KEGG annotations  |
+| koID | Scalar variable with KEGG Identifier  |
+| keggPath | Scalar variable with KEGG Pathway |
+| keggDesc | Scalar variable with KEGG description  |
+| noOrth | Scalar variable, if you don’t want to see results related to orthology annotations.  |
+| orthID | Scalar variable with orthology Identifier  |
+| orthDesc | Scalar variable with orthology description  |
+| noIP | Scalar variable, if you don’t want to see results related to InterProScan annotations.  |
+| interproID | Scalar variable with InterProScan identifier  |
+| interproDesc | Scalar variable with InterProScan description  |
+| noTMHMM | Scalar variable, if you don’t want results related to TMHMM annotations.  |
+| TMHMMdom | Scalar variable with number of transmembrane domains  |
+| tmhmmQuant | Scalar variable which auxiliate search of TMHMMdom, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none" |
+| noDGPI | Scalar variable, if you don’t want results related to DGPI annotations.  |
+| cleavageSiteDGPI | Scalar variable with cleavage site from DGPI  |
+| scoreDGPI | Scalar variable with score from DGPI  |
+| cleavageQuant | Scalar variable which auxiliate search of cleavageSiteDGPI, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| scoreQuant | Scalar variable which auxiliate search of scoreDGPI, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| noPreDGPI | Scalar variable, if you don’t want results related to PreDGPI annotations.  |
+| namePreDGPI | Scalar variable with name of PreDGPI  |
+| positionPreDGPI | Scalar variable with position from PreDGPI  |
+| positionQuantPreDGPI | Scalar variable which auxiliate search of positionPreDGPI, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| specificityPreDGPI | Scalar variable specifity from PreDGPI  |
+| specificityQuantPreDGPI | Scalar variable which auxiliate search of specificityPreDGPI, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| sequencePreDGPI | Scalar variable with sequence to compare with PreDGPI annotations  |
+| noBigGPI | Scalar variable, if you don’t want results related to BiGPI annotations.  |
+| pvalueBigpi | Scalar variable value from BiGPI  |
+| pvalueQuantBigpi | Scalar variable which auxiliate search of quantity BiGPI, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| positionBigpi | Scalar variable value with the position of BiGPI annotation  |
+| positionQuantBigpi | Scalar variable which auxiliate search of position BiGPI, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| noPhobius | Scalar variable, if you don’t want results related to Phobius annotations.  |
+| TMdom | Scalar vairable, quantity of transmembrane domains  |
+| tmQuant | Scalar variable which auxiliate search of parameter TMdom, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none"  |
+| sigP | Scalar variable if you want the phobius with result with signal peptide. If you don’t care: “sigPwhatever”, if you want: “sigPyes”, if you don’t want: “sigPno”  |
+| pageSize | Scalar variable with the page size |
+| offset | Scalar variable with the offset |
+| components | Scalar variable with annotation component names used |            
+           :
+
+
+
+=cut
+
+=head2 generate_clause
+
+Method used to generate clause for any query
+
+
+=cut
+
+=head2 rRNA_search
+
+  Title    : rRNA_search
+  Usage    : my \$results = \$my_object->rRNA_search( -hash => \%{ ("pipeline" => "4528", "pageSize" => "10", "offset" => "0") } );
+  Function : Method used to realize search of rRNAs by contig and type 
+  Returns  : Returns a array of feature IDs of rRNA results as response
+  Args     : named arguments:
+           : -hash => referenced hash with the following properties:
+| Key | Descriptions |
+| :-- | :-- |
+| pipeline | Pipeline ID |
+| pageSize | Quantity of elements |
+| offset   | Offset of search |
+| type     | Type of rRNA |
+| contig   | Contig ID |
+
+           :
+
+=cut
+
+=head2 tRNA_search
+
+  Title    : tRNA_search
+  Usage    : my \$results = \$my_object->tRNA_search( -hash => \%{ ("pipeline" => "4528") } );
+  Function : Method used to return tRNA data from database 
+  Returns  : Returns hash with Report_HTML_DB::Models::Application::TRNASearch list and total number of results
+  Args     : named arguments:
+           : -hash => referenced hash with the following properties:
+| Key | Description |
+| :-- | :-- |
+| pipeline | Scalar variable with pipeline ID |
+| pageSize | Scalar variable with the page size |
+| offset | Scalar variable with the offset |
+| contig | Scalar variable with feature ID from contig |
+| tRNAaa | Scalar variable to search tRNA by amino acid |
+| tRNAcd | Scalar variable to search tRNA by codon |           
+           :
+
+
+=cut
+
+=head2 trf_search
+
+  Title    : trf_search
+  Usage    : my \$results = \$my_object->trf_search( -hash => \%{ ("pipeline" => "4528") } );
+  Function : Method used to return tandem repeats data from database 
+  Returns  : Returns a referenced hash with Report_HTML_DB::Models::Application::TRFSearch list and total number of results available
+  Args     : named arguments:
+           : -hash => referenced hash with the following properties:
+| Key | Description |
+| :-- | :-- |
+| pipeline | Scalar variable with pipeline ID |
+| pageSize | Scalar variable with the page size |
+| offset | Scalar variable with the offset |
+| contig | Scalar variable with feature ID from contig |
+| TRFrepSeq | Scalar variable with sequence in repetition unit |
+| TRFrepSize | Scalar variable with repetition units of bases |
+| TRFsize | Scalar variable which auxiliate search of repetition units of bases, if you want exatly value: “exact”, less: “orLess”, more: “orMore”, or none: "none" |
+| TRFrepNumMin | Scalar variable with occurrences in this min value |
+| TRFrepNumMax | Scalar variable with occurrences in this max value |
+
+
+=cut
+
+=head2
+
+Method used to return non coding RNAs data from database
+
+
+=cut
+
+=head2
+
+Method used to return transcriptional terminator data from database
+
+
+=cut
+
+=head2
+
+Method used to return ribosomal binding sites data from database
+
+
+=cut
+
+=head2
+
+Method used to return horizontal transferences data from database
+
+
+=cut
+
+=head2
+
+Method used to return the reverse complement
+
+
+=cut
+
+=head2
+
+Method used to realize search by feature
+
+
+=cut
+
+=head2
+
+Method used to realize search for basic content of any feature
+
+=cut
+
+=head2
+
+Method used to get gene by position
+
+
+=cut
+
+=head2
+
+Method used to realize search by subevidences
+
+
+=cut
+
+=head2
+
+Method used to realize search by interval evidence properties
+
+
+=cut
+
+=head2
+
+Method used to realize search by similarity evidence properties
+
+
+=cut
+
+=head2
+
+Method used to get identifier and description of similarity
+
+
+=cut
+
+=head2
+
+Method used to get feature ID by uniquename
+
+
+=cut
+
+=head2
+
+Method used to get target class
+
+
+=cut
+
+=head2
+
+Method used to get GO results from feature ID
+
+
+=cut
+
+=head1 NAME
+
+  $packageDBI - DBI Model Class 
+
+=head1 SYNOPSIS
+  
+  This repository execute queries in annotation database created by EGene2
+
+=head1 DESCRIPTION
+
+DBI Model Class.
+
+=head1 AUTHOR - Wendel Hime Lino Castro
+
+Wendel Hime Lino Castro wendelhime\@hotmail.com
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=head1 NAME
+
+TESTE2::Controller::Site - Catalyst Controller
+
+=head1 DESCRIPTION
+
+Catalyst Controller.
+
+=head1 METHODS
+
+
+=cut
+
+=head2 getHTMLContent
+Method used to get HTML content from file by filepath
+
+=cut
+
+=head2
+
+Method used to return components used
+
+
+=cut
+
+=head2
+
+Method used to get file by component id
+
+
+=cut
+
+=head2
+
+Method used to view result by component ID
+
+
+=cut
+
+=head2
+
+Method used to get filename by filepath
+
+
+=cut
+
+=head2 searchContig
+
+Method used to realize search by contigs, optional return a stretch or a reverse complement
+
+
+=cut
+
+=head2 reverseComplement
+
+Method used to return the reverse complement of a sequence
+
+
+=cut
+
+=head2 formatSequence
+
+Method used to format sequence
+
+
+=cut
+
+=head2
+Standard return of status ok
+
+=cut
+
+=encoding utf8
+
+=head1 AUTHOR
+
+Wendel Hime L. Castro,,,
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=head1 NAME
+
+services::Controller::Blast - Catalyst Controller
+
+=head1 DESCRIPTION
+
+Catalyst Controller.
+
+=head1 METHODS
+
+
+=cut
+
+=head2
+
+Method used to realize search blast
+
+
+=cut
+
+=head2
+
+Method used to make a default return of every ok request using BaseResponse model
+
+
+=cut
+
+=encoding utf8
+
+=head1 AUTHOR
+
+Wendel Hime L. Castro,,,
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=head1 NAME
+
+services::Controller::SearchDatabase - Catalyst Controller
+
+=head1 DESCRIPTION
+
+Catalyst Controller.
+
+=head1 METHODS
+
+
+=cut
+
+=head2 getFeatureID
+
+Method used to get feature id
+
+
+=cut
+
+=head2
+
+Method used to realize search of rRNA
+
+
+=cut
+
+=head2 searchGene
+
+Method used to search on database genes
+
+
+=cut
+
+=head2 encodingCorrection
+
+Method used to correct encoding strings come from SQLite
+
+
+=cut
+
+=head2 getGeneBasics
+Method used to return basic data of genes from database: the beginning position from sequence, final position from the sequence, type, name
+return a list of hash containing the basic data
+
+
+=cut
+
+=head2 getSubsequence
+
+Method used to get subsequence stretch of gene, returning the sequence, had to return in a json!
+
+
+=cut
+
+=head2
+
+Method used to return subevidences based on feature id
+
+
+=cut
+
+=head2
+
+Method used to return properties of evidences that the type is interval and basic data of everything isn't CDS
+
+
+=cut
+
+=head2
+
+Method used to return properties of evidence typed like similarity
+
+
+=cut
+
+=head2 reverseComplement
+
+Method used to return the reverse complement of a sequence
+
+
+=cut
+
+=head2 formatSequence
+
+Method used to format sequence
+
+
+=cut
+
+=head2 analysesCDS
+
+Method used to make search of analyses of protein-coding genes
+
+
+=cut
+
+=head2
+
+Method used to realize search of tRNA
+
+
+=cut
+
+=head2
+
+Method used to get data of tandem repeats
+
+
+=cut
+
+=head2
+
+Method used to get data of non coding RNAs
+
+
+=cut
+
+=head2
+
+Method used to get data of transcriptional terminators
+
+
+=cut
+
+=head2
+
+Method used to get data of ribosomal binding sites
+
+
+=cut
+
+=head2
+
+Method used to get data of horizontal gene transfers
+
+
+=cut
+
+=head2
+
+Method used to get feature by position
+
+
+=cut
+
+=head2
+
+Method used to make a default return of every ok request using BaseResponse model
+
+
+=cut
+
+=encoding utf8
+
+=head1 AUTHOR
+
+Wendel Hime L. Castro,,,
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=head1 NAME
+
+$temporaryPackage - Catalyst Controller
+
+=head1 DESCRIPTION
+
+Catalyst Controller.
+
+=head1 METHODS
+
+
+=cut
+
+=head2
+Standard return of status ok
+
+=cut
+
+=encoding utf8
+
+=head1 AUTHOR
+
+Wendel Hime L. Castro,,,
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=head1 NAME
+
+$temporaryPackage - Catalyst Controller
+
+=head1 DESCRIPTION
+
+Catalyst Controller.
+
+=head1 METHODS
+
+
+=cut
+
+=head2
+Standard return of status ok
+
+=cut
+
+=encoding utf8
+
+=head1 AUTHOR
+
+Wendel Hime L. Castro,,,
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=encoding utf-8
+
+=head1 NAME
+
+$temporaryPackage - Root Controller for $html_dir
+
+=head1 DESCRIPTION
+
+Root where will have the main pages
+
+=head1 METHODS
+
+
+=cut
+
+=head2 globalAnalyses
+
+Global analyses page
+
+
+=cut
+
+=head2 searchDatabase
+
+Search database page (/SearchDatabase)
+
+
+=cut
+
+=head2 about
+
+About page (/About)
+
+
+=cut
+
+=head2 blast
+
+The blast page (/Blast)
+
+
+=cut
+
+=head2 downloads
+
+The download page (/Downloads)
+
+
+=cut
+
+=head2 encodingCorrection
+
+Method used to correct encoding strings come from SQLite
+
+
+=cut
+
+=head2
+
+Method used to get feature id
+
+
+=cut
+
+=head2 help
+
+The help page (/Help)
+
+
+=cut
+
+=head2 index
+
+The root page (/)
+
+
+=cut
+
+=head2 reverseComplement
+
+Method used to return the reverse complement of a sequence
+
+
+=cut
+
+=head2 formatSequence
+
+Method used to format sequence
+
+
+=cut
+
+=head2 default
+
+
+Standard 404 error page
+
+
+=cut
+
+=head2 renderView
+
+Attempt to render a view, if needed.
+
+
+=cut
+
+=head1 AUTHOR
+
+Wendel Hime L. Castro,,,
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+=head2
+Method used to get content of TCDB file
+@param tcdb_file => filepath
+return sql to be used
+
+=cut
+
+=head2
+Method used to get code number of the product
+@param subject_id
+return list with code number and product
+
+=cut
+
+=head2 reverseComplement
+
+Method used to return the reverse complement of a sequence
+
+
+=cut
+
+=head2 formatSequence
+
+Method used to format sequence
+
+
+=cut
+
+=head2 verify_element
+
+Method used to verify if element exists in list reference
+
+
+=cut
+
+=head2
+
+Method used to get filename by filepath
+
+
+=cut
+
+=head1 NAME
+
+report_html_db.pl - Generate a dynamic web page based on EGene2 database results.
+
+=head1 DESCRIPTION
+
+Responsible for generation of applications like website and services that allow users to access dynamic pages with the possibility to realize a complex query with the database of annotations created as a result of execution of pipelines by the platform EGene2, execute BLAST searches, and turn available annotation files and results.
+
+=head1 SYNOPSIS
+
+  $ Report_HTML_DB
+  report_html_db.pl
+
+=head1 AUTHOR
+
+Wendel Hime Lino Castro
+
+=head1 LICENSE
+
+GNU General Public License v3.0
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan Report_HTML_DB
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+
+=cut
+

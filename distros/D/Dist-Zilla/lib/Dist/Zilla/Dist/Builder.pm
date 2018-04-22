@@ -1,4 +1,4 @@
-package Dist::Zilla::Dist::Builder 6.011;
+package Dist::Zilla::Dist::Builder 6.012;
 # ABSTRACT: dist zilla subclass for building dists
 
 use Moose 0.92; # role composition fixes
@@ -480,7 +480,7 @@ sub build_archive {
 
   $_->before_archive for @{ $self->plugins_with(-BeforeArchive) };
 
-  my $method = eval { require Archive::Tar::Wrapper;
+  my $method = eval { +require Archive::Tar::Wrapper;
                       Archive::Tar::Wrapper->VERSION('0.15'); 1 }
              ? '_build_archive_with_wrapper'
              : '_build_archive';
@@ -875,7 +875,7 @@ Dist::Zilla::Dist::Builder - dist zilla subclass for building dists
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 ATTRIBUTES
 

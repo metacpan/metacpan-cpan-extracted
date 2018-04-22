@@ -17,6 +17,7 @@ my %extra_prereqs = (
 my %META = (
   name => 'strictures',
   license => 'perl_5',
+  dynamic_config => 1,
   prereqs => {
     configure => { requires => { } },
     build => { requires => { } },
@@ -39,10 +40,14 @@ my %META = (
     } },
   },
   resources => {
+    # GitHub mirrors from Shadowcat. We list it so we can get pull requests.
+    # The canonical repo is:
+    # r/o: git://git.shadowcat.co.uk/p5sagit/strictures.git
     # r/w: p5sagit@git.shadowcat.co.uk:strictures.git
+    # web: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/strictures.git
     repository => {
-      url => 'git://git.shadowcat.co.uk/p5sagit/strictures.git',
-      web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/strictures.git',
+      url => 'https://github.com/p5sagit/strictures.git',
+      web => 'https://github.com/p5sagit/strictures',
       type => 'git',
     },
     bugtracker => {
@@ -55,11 +60,19 @@ my %META = (
     directory => [ 't', 'xt', 'inc' ]
   },
   x_authority => 'cpan:MSTROUT',
+  x_contributors => [ # manually added, from git shortlog -e -s -n
+    'Graham Knop <haarg@haarg.org>',
+    'Karen Etheridge <ether@cpan.org>',
+    'Matt S Trout <mst@shadowcat.co.uk>',
+    'Peter Rabbitson <ribasushi@cpan.org>',
+    'Christian Walde <walde.christian@googlemail.com>',
+    'Diab Jerius <djerius@cfa.harvard.edu>',
+  ],
 );
 
 my %MM_ARGS = (
   PREREQ_PM => {
-    ($] >= 5.008004 && $have_compiler ? %extra_prereqs : () )
+    ("$]" >= 5.008004 && $have_compiler ? %extra_prereqs : () )
   },
 );
 

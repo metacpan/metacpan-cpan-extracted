@@ -1,20 +1,28 @@
 ---
 abstract: 'Working in the liturgical time of the lectionary means tracking time relative to Sundays.  This is a quick utility to find the next, previous, or the closest Sunday to a given date.'
 author:
-  - 'Michael Wayne Arnold <marmanold@cpan.org>'
+  - 'Michael Wayne Arnold <michael@rnold.info>'
 build_requires:
-  Test::CheckManifest: '0.9'
+  Pod::Markdown: '3.005'
+  Test::CPAN::Changes: '0.400002'
+  Test::DistManifest: '1.014'
   Test::Exception: '0.43'
+  Test::Kwalitee: '1.27'
+  Test::Kwalitee::Extra: v0.4.0
+  Test::MinimumVersion: '0.101082'
   Test::More: '1.302040'
+  Test::Pod: '1.51'
+  Test::Pod::Coverage: '1.10'
+  Test::Version: '2.07'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 keywords:
   - lectionary
   - christian
   - liturgical
-license: perl
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -26,15 +34,17 @@ no_index:
 provides:
   Date::Lectionary::Time:
     file: lib/Date/Lectionary/Time.pm
-    version: '1.20170311'
+    version: v1.20180422.1
 requires:
   Carp: '1.38'
   Exporter::Easy: '0.18'
   Time::Piece: '1.31'
   Time::Seconds: '1.31'
+  Try::Catch: v1.1.0
   Try::Tiny: '0.24'
   perl: '5.022'
 resources:
   repository: git://github.com/marmanold/Date-Lectionary-Time.git
-version: '1.20170311'
+version: v1.20180422.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_twitter: https://www.twitter.com/marmanold/

@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "1.19",
     "Alien::Build::MM" => "0.32",
+    "Alien::Build::Plugin::Build::Make" => "0.99",
     "ExtUtils::MakeMaker" => "6.52",
     "File::chdir" => 0
   },
@@ -27,6 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Alien::premake5",
   "PREREQ_PM" => {
     "Alien::Base" => 0,
+    "Alien::gmake" => 0,
     "base" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::Alien" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +48,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => 0,
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Alien::gmake" => 0,
   "Capture::Tiny" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "Test2::V0" => 0,

@@ -1,4 +1,4 @@
-package Dist::Zilla::Chrome::Term 6.011;
+package Dist::Zilla::Chrome::Term 6.012;
 # ABSTRACT: chrome used for terminal-based interaction
 
 use Moose;
@@ -168,7 +168,7 @@ Dist::Zilla::Chrome::Term - chrome used for terminal-based interaction
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 OVERVIEW
 

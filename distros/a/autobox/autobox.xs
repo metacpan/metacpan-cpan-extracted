@@ -10,117 +10,181 @@
 
 static PTABLE_t *AUTOBOX_OP_MAP = NULL;
 static U32 AUTOBOX_SCOPE_DEPTH = 0;
-static OP *(*autobox_old_ck_subr)(pTHX_ OP *op) = NULL;
+static OP *(*autobox_old_check_entersub)(pTHX_ OP *op) = NULL;
 
-static SV * autobox_method_common(pTHX_ SV *meth, U32 *hashp);
+static SV * autobox_method_common(pTHX_ SV *method, U32 *hashp);
 static const char * autobox_type(pTHX_ SV * const sv, STRLEN *len);
 static void autobox_cleanup(pTHX_ void * unused);
 
-OP * autobox_ck_subr(pTHX_ OP *o);
+OP * autobox_check_entersub(pTHX_ OP *o);
 OP * autobox_method_named(pTHX);
 OP * autobox_method(pTHX);
 
-OP * autobox_ck_subr(pTHX_ OP *o) {
+void auto_ref(pTHX_ OP *invocant, UNOP *parent, OP *prev);
+
+/* handle non-reference invocants e.g. @foo->bar, %foo->bar etc. */
+void auto_ref(pTHX_ OP *invocant, UNOP *parent, OP *prev) {
     /*
-     * work around a %^H scoping bug by checking that PL_hints (which is properly scoped) & an unused
-     * PL_hints bit (0x100000) is true
+     * perlref:
      *
-     * XXX this is fixed in #33311: http://www.nntp.perl.org/group/perl.perl5.porters/2008/02/msg134131.html
+     *     As a special case, "\(@foo)" returns a list of references to the
+     *     contents of @foo, not a reference to @foo itself. Likewise for %foo,
+     *     except that the key references are to copies (since the keys are just
+     *     strings rather than full-fledged scalars).
+     *
+     * we don't want that (it results in the invocant being a reference to the
+     * last element in the list), so we toggle the parentheses off while creating
+     * the reference then toggle them back on in case they're needed elsewhere
+     *
      */
-    if ((PL_hints & 0x80020000) == 0x80020000) {
-        UNOP *parent = (OpHAS_SIBLING(cUNOPo->op_first)) ? cUNOPo : ((UNOP*)cUNOPo->op_first);
-        OP *prev = parent->op_first;
-        OP *o2 = OpSIBLING(prev);
-        OP *cvop;
+    bool toggled = FALSE;
 
-        for (cvop = o2; OpHAS_SIBLING(cvop); cvop = OpSIBLING(cvop));
-
-        /* don't autobox if the receiver is a bareword */
-        if ((cvop->op_type == OP_METHOD) || ((cvop->op_type == OP_METHOD_NAMED) && !(o2->op_private & OPpCONST_BARE))) {
-            const char * meth;
-            /*
-             * the bareword flag is not set on the receivers of the import, unimport
-             * and VERSION messages faked up by use() and no(), so exempt them
-             */
-            if ((cvop->op_type == OP_METHOD) ||
-                (((meth = SvPVX_const(((SVOP *)cvop)->op_sv))) && /* SvPVX_const should be sane for method_named */
-                strNE(meth, "import") && strNE(meth, "unimport") && strNE(meth, "VERSION"))) {
-                HV *table = GvHV(PL_hintgv);
-                SV **svp;
-
-                /* if there are bindings for this scope */
-                if (table && (svp = hv_fetch(table, "autobox", 7, FALSE)) && *svp && SvOK(*svp)) {
-                    /*
-                     * if the receiver is an @array, %hash, @{ ... } or %{ ... }, then "autoref" it
-                     * i.e. the op tree equivalent of inserting a backslash before it
-                     */
-
-#ifndef op_sibling_splice
-                    OP *refgen;
-#endif
-                    U32 toggled = 0;
-
-                    switch (o2->op_type) {
-                        case OP_PADAV:
-                        case OP_PADHV:
-                        case OP_RV2AV:
-                        case OP_RV2HV:
-                            /*
-                             * perlref:
-                             *
-                             *   As a special case, "\(@foo)" returns a list of references to the contents of @foo,
-                             *   not a reference to @foo itself. Likewise for %foo, except that the key references
-                             *   are to copies (since the keys are just strings rather than full-fledged scalars).
-                             *
-                             * we don't want that (it results in the receiver being a reference to the last element
-                             * in the list), so we toggle the parentheses off while creating the reference
-                             * then toggle them back on in case they're needed elsewhere
-                             *
-                             */
-                            if (o2->op_flags & OPf_PARENS) {
-                                o2->op_flags &= ~OPf_PARENS;
-                                toggled = 1;
-                            }
+    if (invocant->op_flags & OPf_PARENS) {
+        invocant->op_flags &= ~OPf_PARENS;
+        toggled = TRUE;
+    }
 
 #ifdef op_sibling_splice
-                            op_sibling_splice(
-                                (OP *)parent,
-                                prev,
-                                0,
-                                newUNOP(
-                                    OP_REFGEN,
-                                    0,
-                                    op_sibling_splice(
-                                        (OP *)parent,
-                                        prev,
-                                        1,
-                                        NULL
-                                    )
-                                )
-                            );
+    op_sibling_splice(
+        (OP *)parent,
+        prev,
+        0,
+        newUNOP(
+            OP_REFGEN,
+            0,
+            op_sibling_splice(
+                (OP *)parent,
+                prev,
+                1,
+                NULL
+            )
+        )
+    );
 #else
-                            refgen = newUNOP(OP_REFGEN, 0, o2);
-                            prev->op_sibling = refgen;
-                            refgen->op_sibling = o2->op_sibling;
-                            o2->op_sibling = NULL;
+    /* XXX if this (old?) way works, why do we need both? */
+    OP *refgen = newUNOP(OP_REFGEN, 0, invocant);
+    prev->op_sibling = refgen;
+    refgen->op_sibling = invocant->op_sibling;
+    invocant->op_sibling = NULL;
 #endif
 
-                            /* Restore the parentheses in case something else expects them */
-                            if (toggled) {
-                                o2->op_flags |= OPf_PARENS;
-                            }
-                        /* otherwise do nothing */
-                    }
+    /* Restore the parentheses in case something else expects them */
+    if (toggled) {
+        invocant->op_flags |= OPf_PARENS;
+    }
+}
 
-                    cvop->op_flags |= OPf_SPECIAL;
-                    cvop->op_ppaddr = cvop->op_type == OP_METHOD ? autobox_method : autobox_method_named;
-                    PTABLE_store(AUTOBOX_OP_MAP, cvop, SvRV(*svp));
-                }
-            }
+OP * autobox_check_entersub(pTHX_ OP *o) {
+    UNOP *parent;
+    OP *prev, *invocant, *cvop;
+    SV **svp;
+    HV *hh;
+    bool has_bindings = FALSE;
+
+    /*
+     * XXX note: perl adopts a convention of calling the OP `o` and has shortcut
+     * macros based on this convention like cUNOPo, among others. if the name
+     * changes, the macro will need to change as well e.g. to cUNOPx(op)
+     */
+
+    /*
+     * work around a %^H scoping bug by checking that PL_hints (which is
+     * properly scoped) & an unused PL_hints bit (0x100000) is true
+     *
+     * XXX this is fixed in #33311:
+     *
+     *     http://www.nntp.perl.org/group/perl.perl5.porters/2008/02/msg134131.html
+     */
+    if ((PL_hints & 0x80020000) != 0x80020000) {
+        goto done;
+    }
+
+    /*
+     * the OP which yields the CV is the last OP in the ENTERSUB OP's list of
+     * children. navigate to it by following the `op_sibling` pointers from the
+     * first child in the list (the invocant)
+     */
+
+    parent = OpHAS_SIBLING(cUNOPo->op_first) ? cUNOPo : ((UNOP *)cUNOPo->op_first);
+    prev = parent->op_first;
+    invocant = OpSIBLING(prev);
+
+    for (cvop = invocant; OpHAS_SIBLING(cvop); cvop = OpSIBLING(cvop));
+
+    /*
+     * now we have the CV OP, we can check if it's a method lookup.
+     * bail out if it's not
+     */
+    if ((cvop->op_type != OP_METHOD) && (cvop->op_type != OP_METHOD_NAMED)) {
+        goto done;
+    }
+
+    /* bail out if the invocant is a bareword e.g. Foo->bar */
+    if ((invocant->op_type == OP_CONST) && (invocant->op_private & OPpCONST_BARE)) {
+        goto done;
+    }
+
+    /*
+     * the bareword flag is not set on the invocants of the `import`, `unimport`
+     * and `VERSION` methods faked up by `use` and `no` [1]. we have no other way
+     * to detect if an OP_CONST invocant is a bareword for these methods,
+     * so we have no choice but to assume it is and bail out so that we don't
+     * break `use`, `no` etc.
+     *
+     * (this is documented: the solution/workaround is to use
+     * $value->autobox_class instead.)
+     *
+     * [1] XXX this is a bug (in perl)
+     */
+    if (cvop->op_type == OP_METHOD_NAMED) {
+        /* SvPVX_const should be sane for the method name */
+        const char * method_name = SvPVX_const(((SVOP *)cvop)->op_sv);
+
+        if (
+            strEQ(method_name, "import")   ||
+            strEQ(method_name, "unimport") ||
+            strEQ(method_name, "VERSION")
+        ) {
+            goto done;
         }
     }
 
-    return autobox_old_ck_subr(aTHX_ o);
+    hh = GvHV(PL_hintgv); /* the hints hash (%^H) */
+
+    /* is there a bindings hashref for this scope? */
+    has_bindings = hh
+        && (svp = hv_fetch(hh, "autobox", 7, FALSE))
+        && *svp
+        && SvROK(*svp);
+
+    if (!has_bindings) {
+        goto done;
+    }
+
+    /*
+     * if the invocant is an @array, %hash, @{ ... } or %{ ... }, then
+     * "auto-ref" it i.e. the optree equivalent of inserting a backslash
+     * before it:
+     *
+     *     @foo->bar -> (\@foo)->bar
+     */
+    switch (invocant->op_type) {
+        case OP_PADAV:
+        case OP_PADHV:
+        case OP_RV2AV:
+        case OP_RV2HV:
+            auto_ref(aTHX_ invocant, parent, prev);
+    }
+
+    cvop->op_flags |= OPf_SPECIAL;
+    cvop->op_ppaddr = cvop->op_type == OP_METHOD
+        ? autobox_method
+        : autobox_method_named;
+
+    PTABLE_store(AUTOBOX_OP_MAP, cvop, SvRV(*svp));
+
+    done:
+        return autobox_old_check_entersub(aTHX_ o);
 }
 
 OP* autobox_method(pTHX) {
@@ -130,6 +194,7 @@ OP* autobox_method(pTHX) {
 
     if (SvROK(sv)) {
         cv = SvRV(sv);
+
         if (SvTYPE(cv) == SVt_PVCV) {
             SETs(cv);
             RETURN;
@@ -162,7 +227,9 @@ OP* autobox_method_named(pTHX) {
     }
 }
 
-#define AUTOBOX_TYPE_RETURN(type) STMT_START { *len = (sizeof(type) - 1); return type; } STMT_END
+#define AUTOBOX_TYPE_RETURN(type) STMT_START { \
+    *len = (sizeof(type) - 1); return type;    \
+} STMT_END
 
 static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
     switch (SvTYPE(sv)) {
@@ -183,7 +250,10 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
                 AUTOBOX_TYPE_RETURN("FLOAT");
             }
         case SVt_PVNV:
-            /* integer before float: https://rt.cpan.org/Ticket/Display.html?id=46814 */
+            /*
+             * integer before float:
+             * https://rt.cpan.org/Ticket/Display.html?id=46814
+             */
             if (SvIOK(sv)) {
                 AUTOBOX_TYPE_RETURN("INTEGER");
             } else if (SvNOK(sv)) {
@@ -246,10 +316,14 @@ static const char *autobox_type(pTHX_ SV * const sv, STRLEN *len) {
 }
 
 /* returns either the method, or NULL, meaning delegate to the original op */
-static SV * autobox_method_common(pTHX_ SV * meth, U32* hashp) {
+/* FIXME this has diverged from the implementation in pp_hot.c */
+static SV * autobox_method_common(pTHX_ SV * method, U32* hashp) {
     SV * const sv = *(PL_stack_base + TOPMARK + 1);
 
-    /* if autobox is enabled (in scope) for this op and the receiver isn't an object... */
+    /*
+     * if autobox is enabled (in scope) for this op and the invocant isn't
+     * an object...
+     */
     /* don't use sv_isobject - we don't want to call SvGETMAGIC twice */
     if ((PL_op->op_flags & OPf_SPECIAL) && ((!SvROK(sv)) || !SvOBJECT(SvRV(sv)))) {
         HV * autobox_bindings;
@@ -265,8 +339,8 @@ static SV * autobox_method_common(pTHX_ SV * meth, U32* hashp) {
             STRLEN typelen = 0;
 
             /*
-             * the type is either the receiver's reftype(), a subtype of SCALAR if it's
-             * not a ref, or UNDEF if it's not defined
+             * the type is either the invocant's reftype(), a subtype of
+             * SCALAR if it's not a ref, or UNDEF if it's not defined
              */
 
             if (SvOK(sv)) {
@@ -288,21 +362,35 @@ static SV * autobox_method_common(pTHX_ SV * meth, U32* hashp) {
                 stash = gv_stashpvn(packname, packlen, FALSE);
 
                 if (hashp) {
-                    const HE* const he = hv_fetch_ent(stash, meth, 0, *hashp);  /* shortcut for simple names */
+                    /* shortcut for simple names */
+                    const HE* const he = hv_fetch_ent(stash, method, 0, *hashp);
 
                     if (he) {
                         gv = (GV*)HeVAL(he);
-                        if (isGV(gv) && GvCV(gv) && (!GvCVGEN(gv) || GvCVGEN(gv) == PL_sub_generation)) {
+
+                        /*
+                         * FIXME this has diverged from the implementation
+                         * in pp_hot.c
+                         */
+                        if (
+                               isGV(gv)
+                            && GvCV(gv)
+                            && (!GvCVGEN(gv) || GvCVGEN(gv) == PL_sub_generation)
+                        ) {
                             return ((SV*)GvCV(gv));
                         }
                     }
                 }
 
                 /*
-                 * SvPV_nolen_const returns the method name as a const char *, stringifying names that
-                 * are not strings (e.g. undef, SvIV,  SvNV &c.) - see name.t
+                 * SvPV_nolen_const returns the method name as a const char *,
+                 * stringifying names that are not strings (e.g. undef, SvIV,
+                 * SvNV &c.) - see name.t
                  */
-                gv = gv_fetchmethod(stash ? stash : (HV*)packsv, SvPV_nolen_const(meth));
+                gv = gv_fetchmethod(
+                    stash ? stash : (HV*)packsv,
+                    SvPV_nolen_const(method)
+                );
 
                 if (gv) {
                     return(isGV(gv) ? (SV*)GvCV(gv) : (SV*)gv);
@@ -328,7 +416,10 @@ MODULE = autobox                PACKAGE = autobox
 PROTOTYPES: ENABLE
 
 BOOT:
-/* XXX the BOOT section extends to the next blank line, so don't add one for readability */
+/*
+ * XXX the BOOT section extends to the next blank line, so don't add one
+ * for readability
+ */
 AUTOBOX_OP_MAP = PTABLE_new();
 if (AUTOBOX_OP_MAP) {
     Perl_call_atexit(aTHX_ autobox_cleanup, NULL);
@@ -349,8 +440,8 @@ _enter()
              * usually, this will be Perl_ck_subr, though, in principle,
              * it could be a bespoke checker spliced in by another module.
              */
-            autobox_old_ck_subr = PL_check[OP_ENTERSUB];
-            PL_check[OP_ENTERSUB] = autobox_ck_subr;
+            autobox_old_check_entersub = PL_check[OP_ENTERSUB];
+            PL_check[OP_ENTERSUB] = autobox_check_entersub;
         }
 
 void
@@ -365,7 +456,7 @@ _leave()
             --AUTOBOX_SCOPE_DEPTH;
         } else {
             AUTOBOX_SCOPE_DEPTH = 0;
-            PL_check[OP_ENTERSUB] = autobox_old_ck_subr;
+            PL_check[OP_ENTERSUB] = autobox_old_check_entersub;
         }
 
 void

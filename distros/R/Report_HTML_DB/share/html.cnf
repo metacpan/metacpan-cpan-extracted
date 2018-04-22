@@ -1,0 +1,59 @@
+#***********************************************************************************
+#
+PIPELINE= Report HTML da Bactéria do curso 
+#
+#***********************************************************************************
+#===================================================================================
+PHASE= Upload XML
+program = upload_xml.pl
+xml_file = bacteria.xml
+#===================================================================================
+                              # _||_ #
+                              # \  / #
+                              #  \/  #
+#===================================================================================
+PHASE= Report HTML
+program = report_html.pl
+#===================================================================================
+organism_name = Bacteria do curso
+index_file = index.html
+background_image_file = 
+component_name_list = annotation_trf.pl;annotation_trna.pl;annotation_alienhunter.pl;annotation_infernal.pl;annotation_rnammer.pl;annotation_transterm.pl;annotation_rbsfinder.pl;annotation_tcdb.pl;annotation_phobius.pl;annotation_tmhmm.pl;annotation_signalP.pl;annotation_blast.pl;annotation_rpsblast.pl;annotation_interpro.pl;annotation_orthology.pl;annotation_pathways.pl
+FT_artemis_dir = artemis_report
+FT_submission_dir = genbank_report
+#FT_artemis_selected_dir = artemis_dir_selected
+#FT_submission_selected_dir = genbank_dir_selected
+#GFF_dir = gff_dir
+#GFF_selected_dir = gff_dir_selected
+fasta_dir = seq
+aa_fasta_dir = orfs_aa
+nt_fasta_dir = orfs_nt
+fasta_file = bacteria.fasta
+aa_orf_file = glimmer3_dir/genes_aa.fasta
+nt_orf_file = glimmer3_dir/genes_nt.fasta
+trf_dir = trf_dir
+trna_dir = trna_dir
+alienhunter_dir = alienhunter_dir
+alienhunter_output_file = alienhunter.txt
+infernal_dir = infernal_dir
+infernal_output_file = infernal.txt
+rnammer_dir = rnammer_dir
+transterm_dir = transterm_dir
+rbs_dir = rbsfinder_dir
+tcdb_dir = tcdb_dir
+phobius_dir = phobius_dir
+tmhmm_dir = tmhmm_dir
+signalp_dir = signalp_dir
+blast_dir = blastp_dir
+rpsblast_dir = rpsblast_dir
+interpro_dir = interpro_dir
+orthology_dir = eggnog_dir
+report_pathways_dir = kegg_report
+pathways_dir = kegg_dir
+report_go_dir=go_report
+go_file=go_mapping.html
+report_eggnog_dir= eggnog_report
+eggnog_dir=eggnog_dir
+blast_dir_list=blastp_dir
+database_code_list=INSD
+#===================================================================================

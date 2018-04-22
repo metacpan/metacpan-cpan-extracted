@@ -1,7 +1,7 @@
 package Alien::premake5;
 # ABSTRACT: Build or find premake5
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use strict;
 use warnings;

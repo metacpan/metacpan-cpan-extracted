@@ -1,4 +1,4 @@
-Data-Dump-Sexp version 0.001
+Data-Dump-Sexp version 0.002
 ============================
 
 Data::Dump::Sexp converts Perl structures to S-expressions.
@@ -30,8 +30,8 @@ The conversion rules are as follows:
 9. A scalarref or a reference to another ref is dereferenced and this
    procedure is restarted.
 
-10. Anything else (regexp, filehandle, format, glob, version string)
-    causes an exception to be raised
+10. Anything else (coderef, regexp, filehandle, format, globref,
+    version string) causes an exception to be raised.
 
 INSTALLATION
 

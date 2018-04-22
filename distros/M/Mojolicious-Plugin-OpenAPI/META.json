@@ -30,8 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "2.00",
-            "Mojolicious" : "6.40"
+            "JSON::Validator" : "2.07",
+            "Mojolicious" : "7.75"
          }
       },
       "test" : {
@@ -52,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
       }
    },
-   "version" : "1.27",
+   "version" : "1.28",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

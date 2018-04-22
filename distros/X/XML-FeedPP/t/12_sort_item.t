@@ -38,8 +38,18 @@
         is( 5, scalar $f->get_item(), "$mode count #2" );
         is( $date2, $f->get_item(3)->pubDate(), "$mode sort #1" );
         is( $date4, $f->get_item(1)->pubDate(), "$mode sort #2" );
-        $f->get_item(4)->link( $link3 );
-        $f->get_item(3)->link( $link3 );
+
+        # Test de-duplication.  Detection of duplicates is tricky: differs
+        # per feed type.
+        if(my $x = $f->get_item(3)->guid) {
+            $f->get_item(4)->guid( $link3 );
+            $f->get_item(3)->guid( $link3 );
+        } else {
+            # RDF does not support guid
+            $f->get_item(4)->link( $link3 );
+            $f->get_item(3)->link( $link3 );
+        }
+
         $f->normalize();
         is( 3, scalar $f->get_item(), "$mode count #3" );
         $f->limit_item( 1 );

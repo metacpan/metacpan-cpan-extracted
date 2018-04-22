@@ -14,7 +14,7 @@ use CPAN::Testers::Common::Client::History;
 
 use constant MAX_OUTPUT_LENGTH => 1_000_000;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 #==================================

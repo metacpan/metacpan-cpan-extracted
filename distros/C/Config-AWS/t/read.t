@@ -138,4 +138,3 @@ describe 'Config::AWS read tests' => sub {
 };
 
 done_testing;
-

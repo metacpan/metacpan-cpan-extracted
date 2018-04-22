@@ -13,6 +13,7 @@ use parent 'Exporter';
 
 our @EXPORT_OK = qw(
     html_tidy_ok
+    html_fragment_tidy_ok
 );
 
 our @EXPORT = @EXPORT_OK;
@@ -23,11 +24,11 @@ Test::HTML::Tidy5 - Test::More-style wrapper around HTML::Tidy5
 
 =head1 VERSION
 
-Version 1.02
+Version 1.04
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 my $TB = Test::Builder->new;
 
@@ -91,24 +92,81 @@ sub html_tidy_ok {
     my $ok = defined $html;
     if ( !$ok ) {
         $TB->ok( 0, $name );
+        $TB->diag( 'Error: html_tidy_ok() got undef' );
     }
     else {
-        $tidy->clear_messages();
-        $tidy->parse( undef, $html );
+        $ok = _parse_and_complain( $tidy, $html, $name, 0 );
+    }
 
-        my @messages = $tidy->messages;
-        my $nmessages = @messages;
+    return $ok;
+}
 
-        $ok = !$nmessages;
-        $TB->ok( $ok, $name );
-        if ( !$ok ) {
-            my $msg = 'Errors:';
-            $msg .= " $name" if $name;
-            $TB->diag( $msg );
-            $TB->diag( $_->as_string ) for @messages;
-            my $s = $nmessages == 1 ? '' : 's';
-            $TB->diag( "$nmessages message$s on the page" );
+
+=head2 html_fragment_tidy_ok( [$tidy, ] $html, $name )
+
+Works the same as C<html_tidy_ok>, but first wraps it up an HTML document.
+This is useful for when want to validate self-contained snippets of HTML,
+such as from templates or an HTML feed from a third party, and check
+that it is valid.
+
+=cut
+
+sub html_fragment_tidy_ok {
+    my $tidy = (ref($_[0]) eq 'HTML::Tidy5') ? shift : HTML::Tidy5->new;
+    my $html = shift;
+    my $name = shift;
+
+    my $ok = defined $html;
+    if ( !$ok ) {
+        $TB->ok( 0, $name );
+        $TB->diag( 'Error: html_fragment_tidy_ok() got undef' );
+    }
+    else {
+        $html = <<"HTML";
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> </title>
+    </head>
+    <body>
+$html
+    </body>
+</html>
+HTML
+
+        $ok = _parse_and_complain( $tidy, $html, $name, 6 );
+    }
+
+    return $ok;
+}
+
+
+sub _parse_and_complain {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $tidy   = shift;
+    my $html   = shift;
+    my $name   = shift;
+    my $offset = shift;
+
+    $tidy->clear_messages();
+    $tidy->parse( undef, $html );
+
+    my @messages = $tidy->messages;
+    my $nmessages = @messages;
+
+    my $ok = !$nmessages;
+    $TB->ok( $ok, $name );
+    if ( !$ok ) {
+        if ( $offset ) {
+            $_->{_line} -= $offset for @messages;
         }
+        my $msg = 'Errors:';
+        $msg .= " $name" if $name;
+        $TB->diag( $msg );
+        $TB->diag( $_->as_string ) for @messages;
+        my $s = $nmessages == 1 ? '' : 's';
+        $TB->diag( "$nmessages message$s on the page" );
     }
 
     return $ok;

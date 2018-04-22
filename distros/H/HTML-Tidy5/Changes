@@ -4,6 +4,13 @@ The HTML::Tidy5 module is an HTML5-compatible upgrade from the HTML::Tidy
 module.
 
 
+1.04    Fri Apr 20 16:45:00 CDT 2018
+====================================
+[ENHANCEMENTS]
+Added html_fragment_tidy_ok() for running tidy checks against HTML that
+is not a full document.
+
+
 1.02    Wed Apr  4 15:06:44 CDT 2018
 ====================================
 [FIXES]

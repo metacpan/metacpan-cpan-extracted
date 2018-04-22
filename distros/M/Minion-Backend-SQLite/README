@@ -188,6 +188,21 @@ METHODS
 
     Transition from active to finished state.
 
+ history
+
+      my $history = $backend->history;
+
+    Get history information for job queue. Note that this method is
+    EXPERIMENTAL and might change without warning!
+
+    These fields are currently available:
+
+    daily
+
+        daily => [{epoch => 12345, finished_jobs => 95, failed_jobs => 2}, ...]
+
+      Hourly counts for processed jobs from the past day.
+
  list_jobs
 
       my $results = $backend->list_jobs($offset, $limit);

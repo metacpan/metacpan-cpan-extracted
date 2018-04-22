@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.514';
+our $VERSION = '1.516';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -54,12 +54,13 @@ sub __defaults {        #hae
     my $prompt = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     return {
         prompt       => $prompt,
-        info         => '',         # documentation
+        info         => '',
         beep         => 0,
         clear_screen => 0,
         #default     => undef,
         empty        => '<empty>',
         hide_cursor  => 1,
+        include_highlighted => 1,
         index        => 0,
         justify      => 0,
         keep         => 5,
@@ -93,6 +94,7 @@ sub __valid_options {       #hae
         beep            => '[ 0 1 ]',
         clear_screen    => '[ 0 1 ]',
         hide_cursor     => '[ 0 1 ]',
+        include_highlighted => '[ 0 1 ]',
         index           => '[ 0 1 ]',
         order           => '[ 0 1 ]',
         page            => '[ 0 1 ]',
@@ -508,7 +510,9 @@ sub __choose {
                 return;
             }
             elsif ( $self->{wantarray} ) {
-                $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
+                if ( $self->{include_highlighted} ) {
+                    $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
+                }
                 my $chosen = $self->__marked_rc2idx();
                 $self->__reset_term( 1 );
                 return $index ? @$chosen : @{$orig_list_ref}[@$chosen];
@@ -736,7 +740,7 @@ sub __write_first_screen {
     if ( $self->{clear_screen} ) {
         $self->{plugin}->__clear_screen();
     }
-    if ( $self->{prompt} ne '' ) {
+    if ( $self->{prompt_copy} ne '' ) {
         print $self->{prompt_copy};
     }
     $self->__wr_screen();
@@ -749,11 +753,14 @@ sub __write_first_screen {
 
 sub __prepare_promptline {
     my ( $self ) = @_;
-    my $prompt = $self->{prompt};
+    my $prompt = '';
     if ( length $self->{info} ) {
-        $prompt = $self->{info} . "\n" . $prompt;
+        $prompt .= $self->{info};
+        $prompt .= "\n" if length $self->{prompt};
     }
+    $prompt .= $self->{prompt};
     if ( $prompt eq '' ) {
+        $self->{prompt_copy} = '';
         $self->{nr_prompt_lines} = 0;
         return;
     }
@@ -1084,7 +1091,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.514
+Version 1.516
 
 =cut
 
@@ -1355,13 +1362,19 @@ Allowed values: 0 or greater
 
 Sets the string displayed on the screen instead an empty string.
 
-default: "<empty>"
+(default: "<empty>")
 
 =head2 hide_cursor
 
 0 - keep the terminals highlighting of the cursor position
 
 1 - hide the terminals highlighting of the cursor position (default)
+
+=head2 info
+
+Expects as its value a string. The string is printed above the prompt string.
+
+(default: not set)
 
 =head2 index
 

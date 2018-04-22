@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PPI 6.011;
+package Dist::Zilla::Role::PPI 6.012;
 # ABSTRACT: a role for plugins which use PPI
 
 use Moose::Role;
@@ -127,7 +127,7 @@ Dist::Zilla::Role::PPI - a role for plugins which use PPI
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 DESCRIPTION
 

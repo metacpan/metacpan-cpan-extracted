@@ -7,7 +7,7 @@ use warnings;
 use Exporter::Easy ( OK => [qw(nextSunday prevSunday closestSunday isSunday)], );
 
 use Carp;
-use Try::Tiny;
+use Try::Catch;
 use Time::Piece;
 use Time::Seconds;
 
@@ -17,20 +17,20 @@ Date::Lectionary::Time - Find your way in time relative to Sundays.
 
 =head1 VERSION
 
-Version 1.20170311
+Version 1.20180422.1
 
 =cut
 
-our $VERSION = '1.20170311';
+use version; our $VERSION = version->declare("v1.20180422.1");
 
 =head1 SYNOPSIS
 
 Working in the liturgical time of the lectionary means tracking time relative to Sundays.  This is a quick utility to find the next, previous, or the closest Sunday to a given date.  Further, it can determine if the date given is a Sunday or not.
 
-	use Time::Piece;
-	use Date::Lectionary::Time qw(nextSunday prevSunday closestSunday isSunday);
+    use Time::Piece;
+    use Date::Lectionary::Time qw(nextSunday prevSunday closestSunday isSunday);
 
-	my $christmasDay = Time::Piece->strptime("2015-12-25", "%Y-%m-%d");
+    my $christmasDay = Time::Piece->strptime("2015-12-25", "%Y-%m-%d");
 
     if (isSunday($christmasDay)) {
         say "Christmas is on a Sunday!";
@@ -39,9 +39,9 @@ Working in the liturgical time of the lectionary means tracking time relative to
         say "Christmas isn't on a Sunday.";
     }
 
-	my $sundayAfterChristmas = nextSunday($christmasDay);
-	my $sundayBeforeChristmas = prevSunday($christmasDay);
-	my $sundayClosestToChristmas = closestSunday($christmasDay);
+    my $sundayAfterChristmas = nextSunday($christmasDay);
+    my $sundayBeforeChristmas = prevSunday($christmasDay);
+    my $sundayClosestToChristmas = closestSunday($christmasDay);
 
 =head1 EXPORTS
 
@@ -65,12 +65,11 @@ For a given Time::Piece date returns a Time::Piece object of the date of the Sun
 
 sub nextSunday {
     my ( $class, @params ) = @_;
-    my $date = $params[0] // $class;
+    my $date       = $params[0] // $class;
     my $nextSunday = undef;
 
     if ( !length $date ) {
-        croak
-"Method [nextSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
+        croak "Method [nextSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
     }
 
     if ( $date->isa('Time::Piece') ) {
@@ -84,8 +83,7 @@ sub nextSunday {
         };
     }
     else {
-        croak
-          "Method [nextSunday] expects an input argument of type Time::Piece.";
+        croak "Method [nextSunday] expects an input argument of type Time::Piece.";
     }
 
     return $nextSunday;
@@ -99,12 +97,11 @@ For a given Time::Piece date returns a Time::Piece object of the date of the Sun
 
 sub prevSunday {
     my ( $class, @params ) = @_;
-    my $date = $params[0] // $class;
+    my $date       = $params[0] // $class;
     my $prevSunday = undef;
 
     if ( !length $date ) {
-        croak
-"Method [prevSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
+        croak "Method [prevSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
     }
 
     if ( $date->isa('Time::Piece') ) {
@@ -119,8 +116,7 @@ sub prevSunday {
         };
     }
     else {
-        croak
-          "Method [prevSunday] expects an input argument of type Time::Piece.";
+        croak "Method [prevSunday] expects an input argument of type Time::Piece.";
     }
 
     return $prevSunday;
@@ -134,12 +130,11 @@ For a given Time::Piece date returns a Time::Piece object of the date of the Sun
 
 sub closestSunday {
     my ( $class, @params ) = @_;
-    my $date = $params[0] // $class;
+    my $date          = $params[0] // $class;
     my $closestSunday = undef;
 
     if ( !length $date ) {
-        croak
-"Method [closestSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
+        croak "Method [closestSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
     }
 
     if ( $date->isa('Time::Piece') ) {
@@ -167,8 +162,7 @@ sub closestSunday {
         };
     }
     else {
-        croak
-"Method [closestSunday] expects an input argument of type Time::Piece.";
+        croak "Method [closestSunday] expects an input argument of type Time::Piece.";
     }
 
     return $closestSunday;
@@ -182,17 +176,16 @@ For a given Time::Piece date returns C<1> if the date is a Sunday or C<0> if the
 
 sub isSunday {
     my ( $class, @params ) = @_;
-    my $date = $params[0] // $class;
+    my $date     = $params[0] // $class;
     my $isSunday = 0;
 
     if ( !length $date ) {
-        croak
-"Method [isSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
+        croak "Method [isSunday] expects an input argument of type Time::Piece.  The given type could not be determined.";
     }
 
     if ( $date->isa('Time::Piece') ) {
         try {
-            if ($date->wday == 1) {
+            if ( $date->wday == 1 ) {
                 $isSunday = 1;
             }
         }
@@ -201,8 +194,7 @@ sub isSunday {
         };
     }
     else {
-        croak
-"Method [isSunday] expects an input argument of type Time::Piece.";
+        croak "Method [isSunday] expects an input argument of type Time::Piece.";
     }
 
     return $isSunday;
@@ -210,9 +202,13 @@ sub isSunday {
 
 =head1 AUTHOR
 
-Michael Wayne Arnold, C<< <marmanold at cpan.org> >>
+Michael Wayne Arnold, C<< <michael at rnold.info> >>
 
 =head1 BUGS
+
+=for html <a href='https://travis-ci.org/marmanold/Date-Lectionary-Time'><img src='https://travis-ci.org/marmanold/Date-Lectionary-Time.svg?branch=master' /></a>
+
+=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Time?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Time/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 Please report any bugs or feature requests to C<bug-date-lectionary-time at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary-Time>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -223,11 +219,6 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Date::Lectionary::Time
 
-The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Lectionary-Time> -- and tested via TravisCI.
-
-=for html <a href='https://travis-ci.org/marmanold/Date-Lectionary-Time'><img src='https://travis-ci.org/marmanold/Date-Lectionary-Time.svg?branch=master' /></a>
-
-=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Time?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Time/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 You can also look for information at:
 
@@ -253,17 +244,19 @@ L<http://search.cpan.org/dist/Date-Lectionary-Time/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Michael Wayne Arnold.
+Copyright 2016-2018 MICHAEL WAYNE ARNOLD
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-See L<http://dev.perl.org/licenses/> for more information.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 =cut

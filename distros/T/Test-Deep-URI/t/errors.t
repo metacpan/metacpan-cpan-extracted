@@ -1,4 +1,5 @@
-# vim: set ft=perl use strict;
+# vim: set ft=perl
+use strict;
 use warnings;
 
 # This test checks various permutations of bad input.
@@ -202,7 +203,7 @@ subtest 'missing arg to uri()' => sub {
         @results = run_tests(sub { cmp_deeply($test_uri, uri()) });
     };
 
-    cmp_deeply(\@warnings, [ re(qr/Missing arguement to uri\(\)/) ], 'Warned about missing argument');
+    cmp_deeply(\@warnings, [ re(qr/Missing argument to uri\(\)/) ], 'Warned about missing argument');
     cmp_deeply(\@results,
         [
             bool(0), # premature = false

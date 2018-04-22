@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PodCoverageTests 6.011;
+package Dist::Zilla::Plugin::PodCoverageTests 6.012;
 # ABSTRACT: a author test for Pod coverage
 
 use Moose;
@@ -53,7 +53,7 @@ Dist::Zilla::Plugin::PodCoverageTests - a author test for Pod coverage
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 DESCRIPTION
 

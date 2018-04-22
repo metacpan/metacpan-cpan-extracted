@@ -14,11 +14,15 @@ Revision history for Date::Lectionary
  - Added author tests to ensure better distribution quality
  - Tidied up the code a little bit
 
-1.20180410 2018-04-16
+1.20180416 2018-04-16
 
  - Corrected the look-up value for the Fourth Sunday of Easter in the ACNA Year B lectionary to resolve an issue for 2018-04-22 was not returning any readings
 
-1.20180410 2018-04-17
+1.20180417 2018-04-17
 
  - Corrected the look-up value for the Fourth Sunday of Easter in the RCL Year B lectionary to resolve an issue for 2018-04-22 was not returning any readings
  - Corrected the pax headers issue in the distribution package
+
+1.20180418 2018-04-18
+
+ - Improved quality of distribution.

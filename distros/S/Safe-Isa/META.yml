@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.3103, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3501, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,11 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Safe-Isa
-  repository: git://git.shadowcat.co.uk/p5sagit/Safe-Isa.git
-version: '1.000008'
+  repository: https://github.com/p5sagit/Safe-Isa.git
+version: '1.000009'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Matt S Trout <mst@shadowcat.co.uk>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

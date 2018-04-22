@@ -3,8 +3,10 @@ Changes
 lib/autobox.pm
 lib/autobox.pod
 lib/autobox/universal.pm
+LICENSE.md
 Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 ppport.h
 ptable.h
@@ -12,6 +14,8 @@ README
 t/all.t
 t/autoref.t
 t/coderef.t
+t/debugger.pl
+t/debugger.t
 t/default.t
 t/export.t
 t/hints.t
@@ -22,6 +26,7 @@ t/lib/autobox_scope_2.pm
 t/lib/Versioned.pm
 t/merge.t
 t/name.t
+t/pod.t
 t/rt_46814.t
 t/rt_55652.t
 t/rt_71777.t
@@ -31,4 +36,3 @@ t/type.t
 t/universal_type.t
 t/unmerge.t
 t/version.t
-META.json                                Module JSON meta-data (added by MakeMaker)

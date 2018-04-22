@@ -3,7 +3,7 @@ use warnings;
 package DateTime::Tiny;
 # ABSTRACT:  A date object, with as little code as possible
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use overload 'bool' => sub () { 1 };
 use overload '""'   => 'as_string';
@@ -197,7 +197,8 @@ sub from_string {
 		require Carp;
 		Carp::croak("Did not provide a string to from_string");
 	}
-	unless ( $string =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)$/ ) {
+    my $d = '[0-9]'; # backwards-compatible way of not matching anything but ASCII digits
+	unless ( $string =~ /^($d$d$d$d)-($d$d)-($d$d)T($d$d):($d$d):($d$d)$/ ) {
 		require Carp;
 		Carp::croak("Invalid time format (does not match ISO 8601)");
 	}
@@ -275,7 +276,7 @@ DateTime::Tiny - A date object, with as little code as possible
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -522,7 +523,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ken Williams Nigel Gregoire
+=for stopwords Ken Williams Nigel Gregoire Ovid
 
 =over 4
 
@@ -533,6 +534,10 @@ Ken Williams <Ken.Williams@WindLogics.com>
 =item *
 
 Nigel Gregoire <nigelg@airg.com>
+
+=item *
+
+Ovid <curtis_ovid_poe@yahoo.com>
 
 =back
 

@@ -2,11 +2,7 @@ package Pcore::Ext::Class::PayPal;
 
 use Pcore;
 
-our $EXT_MAP = {    #
-    button => 'Ext.Component',
-};
-
-sub EXT_button ($ext) {
+sub EXT_button ($ext) : Extend('Ext.Component') {
     return {
         config => {
             onCreatePayment    => undef,    # mandatory

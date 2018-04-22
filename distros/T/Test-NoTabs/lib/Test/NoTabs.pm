@@ -1,10 +1,10 @@
-package Test::NoTabs; # git description: 1.4-13-g68640dd
+package Test::NoTabs; # git description: v2.01-2-g72da909
 # ABSTRACT: Check the presence of tabs in your project
 
 use strict;
 use warnings;
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 
 use Test::Builder;
 use File::Spec;
@@ -143,7 +143,7 @@ Test::NoTabs - Check the presence of tabs in your project
 
 =head1 VERSION
 
-version 2.00
+version 2.02
 
 =head1 SYNOPSIS
 

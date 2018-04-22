@@ -26,34 +26,53 @@ my @filter_on_name = map { "t/$_" } qw(
   pod-coverage.t
   99-pod-coverage.t
   99_pod_coverage.t
+  99_podcoverage.t
   skipped.t
   99_skipped.t
   99-skipped.t
+  release-kwalitee.t
+  99_pod_spell.t
+  99-perlcritic.t
 );
 
 path($_)->touchpath for @filter_on_name;
 
-my %bad_content = (
-    't/foo.t' => <<'HERE',
-use Test::More;
-eval "use Test::Pod 1.00";
-plan skip_all => "Test::Pod 1.00 required for testing POD" if $@;
-all_pod_files_ok();
-HERE
-
-    't/bar.t' => <<'HERE',
-use Test::More;
-eval "use Test::Pod::Coverage";
-plan skip_all => "Test::Pod::Coverage required for testing pod coverage" if $@;
-plan tests => 1;
-pod_coverage_ok( "Pod::Master::Html");
-HERE
+my @bad_test = qw(
+  Test::CleanNamespaces
+  Test::DependentModules
+  Test::EOL
+  Test::Kwalitee
+  Test::Mojibake
+  Test::NoTabs
+  Test::Perl::Critic
+  Test::Pod
+  Test::Pod::Coverage
+  Test::Pod::No404s
+  Test::Portability::Files
+  Test::Spelling
+  Test::Vars
 );
 
-for my $k ( keys %bad_content ) {
-    my $f = path($k);
+my @bad_content;
+for my $test (@bad_test) {
+    my $file = "t/$test.t";
+    $file =~ s/::/_/g;
+    $file =~ tr/A-Z/a-z/;
+    push @bad_content, $file;
+
+    my $f = path($file);
     $f->touchpath;
-    $f->spew( $bad_content{$k} );
+
+    my $content = <<"    HERE";
+        use Test::More;
+        eval "use $test";
+        plan skip_all => "$test required for testing pod coverage" if \$@;
+        plan tests => 1;
+        is 1, 1;
+    HERE
+    $content =~ s/^\s+//gm;
+
+    $f->spew($content);
 }
 
 my @ok_files = qw(
@@ -65,7 +84,7 @@ path($_)->touchpath for @ok_files;
 
 my ( undef, undef, @got ) =
   TAP::Harness::Restricted->aggregate_tests( undef, @filter_on_name, @ok_files,
-    keys %bad_content );
+    @bad_content );
 
 is_deeply( [ sort @got ], [ sort @ok_files ], "files filtered" );
 

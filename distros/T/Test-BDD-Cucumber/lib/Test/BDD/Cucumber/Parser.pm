@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Parser;
-$Test::BDD::Cucumber::Parser::VERSION = '0.54';
+$Test::BDD::Cucumber::Parser::VERSION = '0.56';
 =head1 NAME
 
 Test::BDD::Cucumber::Parser - Parse Feature files
 
 =head1 VERSION
 
-version 0.54
+version 0.56
 
 =head1 DESCRIPTION
 
@@ -273,6 +273,11 @@ m/^((?:$langdef->{given})|(?:$langdef->{and})|(?:$langdef->{when})|(?:$langdef->
         } elsif ( $line->content =~ m/^($langdef->{examples}):$/ ) {
             return $self->_extract_table( 6, $scenario,
                 $self->_remove_next_blanks(@lines) );
+        } elsif ( $line->content =~
+            m/^(?:(?:$langdef->{scenario})|(?:$langdef->{scenario_outline})):/ )
+        {
+            # next scenario begins here
+            return ($line, @lines);
         } else {
             die parse_error_from_line( "Malformed step line", $line );
         }

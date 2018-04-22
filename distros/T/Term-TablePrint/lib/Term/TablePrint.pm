@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.064';
+our $VERSION = '0.065';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -126,9 +126,9 @@ sub print_table {
     # ###
     my $table_rows = @$table_ref - 1;
     if ( $self->{max_rows} && $table_rows >= $self->{max_rows} ) {
-        $self->{info_row} = sprintf( 'Reached the row LIMIT %d', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
+        $self->{info_row} = sprintf( 'Reached the row LIMIT %s', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
         if ( $table_rows > $self->{max_rows} ) { # because for App::DBBrowser adding "(Total %d)" would be wrong
-            $self->{info_row} .= sprintf( '  (total %d)', insert_sep( $table_rows, $self->{thsd_sep} ) );
+            $self->{info_row} .= sprintf( '  (total %s)', insert_sep( $table_rows, $self->{thsd_sep} ) );
         }
         $self->{idx_last_row} = $self->{max_rows}; # -1 for index and +1 for header row
     }
@@ -137,7 +137,7 @@ sub print_table {
     }
     my $col_idxs = [];
     if ( $self->{choose_columns}  ) {
-        $col_idxs = $self->__choose_columns( $table_ref->[0] ) if $self->{choose_columns};
+        $col_idxs = $self->__choose_columns( $table_ref->[0] );
         return if ! defined $col_idxs;
     }
     my $a_ref = [];
@@ -608,7 +608,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.064
+Version 0.065
 
 =cut
 

@@ -1,0 +1,12 @@
+---
+  seq:
+    # tests that are not parallel-ready (will run in isolation)
+    - seq:
+      - t/10_makefile.t
+      - t/11_dotfile.t
+      - t/12_delete.t
+
+    # tests that can run in parallel
+    - par:
+      # wildcard for everything else
+      - **

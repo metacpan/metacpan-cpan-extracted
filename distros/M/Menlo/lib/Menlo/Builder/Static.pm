@@ -1,6 +1,3 @@
-# This is a fork of:
-#package Module::Build::Tiny;
-#$Module::Build::Tiny::VERSION = '0.039';
 package Menlo::Builder::Static;
 use strict;
 use warnings;
@@ -10,20 +7,22 @@ use ExtUtils::Config 0.003;
 use ExtUtils::Helpers 0.020 qw/make_executable split_like_shell man1_pagename man3_pagename detildefy/;
 use ExtUtils::Install qw/pm_to_blib install/;
 use ExtUtils::InstallPaths 0.002;
-use File::Basename qw/basename dirname/;
+use File::Basename qw/dirname/;
 use File::Find ();
-use File::Path qw/mkpath rmtree/;
+use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catfile catdir rel2abs abs2rel splitdir curdir/;
 use Getopt::Long 2.36 qw/GetOptionsFromArray/;
-use JSON::PP 2 qw/encode_json decode_json/;
 
 sub new {
-	bless {}, shift;
+    my($class, %args) = @_;
+    bless {
+        meta => $args{meta},
+    }, $class;
 }
 
-sub get_meta {
-	my ($metafile) = grep { -e $_ } qw/META.json META.yml/ or die "No META information provided\n";
-	return CPAN::Meta->load_file($metafile);
+sub meta {
+    my $self = shift;
+    $self->{meta};
 }
 
 sub manify {
@@ -82,14 +81,6 @@ my %actions = (
 		install($opt{install_paths}->install_map, @opt{qw/verbose dry_run uninst/});
                 1;
 	},
-	clean => sub {
-		my %opt = @_;
-		rmtree($_, $opt{verbose}) for qw/blib temp/;
-	},
-	realclean => sub {
-		my %opt = @_;
-		rmtree($_, $opt{verbose}) for qw/blib temp Build _build_params MYMETA.yml MYMETA.json/;
-	},
 );
 
 sub build {
@@ -99,16 +90,15 @@ sub build {
 	my %opt;
 	GetOptionsFromArray([@$_], \%opt, qw/install_base=s install_path=s% installdirs=s destdir=s prefix=s config=s% uninst:1 verbose:1 dry_run:1 pureperl-only:1 create_packlist=i jobs=i/) for ($self->{env}, $self->{configure_args}, \@_);
 	$_ = detildefy($_) for grep { defined } @opt{qw/install_base destdir prefix/}, values %{ $opt{install_path} };
-	@opt{ 'config', 'meta' } = (ExtUtils::Config->new($opt{config}), get_meta());
+	@opt{ 'config', 'meta' } = (ExtUtils::Config->new($opt{config}), $self->meta);
 	$actions{$action}->(%opt, install_paths => ExtUtils::InstallPaths->new(%opt, dist_name => $opt{meta}->name));
 }
 
 sub configure {
 	my $self = shift;   
-	my $meta = get_meta();
 	$self->{env} = defined $ENV{PERL_MB_OPT} ? [split_like_shell($ENV{PERL_MB_OPT})] : [];
         $self->{configure_args} = [@_];
-	$meta->save(@$_) for ['MYMETA.json'], [ 'MYMETA.yml' => { version => 1.4 } ];
+	$self->meta->save(@$_) for ['MYMETA.json'], [ 'MYMETA.yml' => { version => 1.4 } ];
 }
 
 1;

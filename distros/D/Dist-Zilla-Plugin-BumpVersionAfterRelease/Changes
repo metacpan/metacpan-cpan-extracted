@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-BumpVersionAfterRelease
 
+0.018     2018-04-21 22:32:15+02:00 Europe/Oslo
+
+    [CHANGED]
+
+    - Now uses 'tr' instead of 'eval' for underscore versions.
+
 0.017     2017-12-27 11:47:28-05:00 America/New_York
 
     [CHANGED]

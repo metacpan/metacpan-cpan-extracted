@@ -1,3 +1,14 @@
+2.98        2018-04-21
+    * Remove old author-only test scripts.
+        - https://rt.cpan.org/Ticket/Display.html?id=125161
+        - Thanks to SREZIC for the report.
+
+2.97        2018-04-21
+    * Apply pull-request to implement -php_compat
+        - https://github.com/shlomif/perl-Config-IniFiles/pull/3
+        - https://rt.cpan.org/Ticket/Display.html?id=102339
+        - Thanks to @Sadrak !
+
 2.96        2018-04-07
     * Fix https://rt.cpan.org/Ticket/Display.html?id=125025 .
         - Apply patch from Debian.

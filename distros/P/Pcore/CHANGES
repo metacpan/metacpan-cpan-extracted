@@ -1,3 +1,6 @@
+v0.62.1 2018-04-20T14:06:08Z
+ - ENV DATA_DIR fixed
+
 v0.62.0 2018-04-20T07:22:57Z
  - docker.sh default command
  - docker status logic updated

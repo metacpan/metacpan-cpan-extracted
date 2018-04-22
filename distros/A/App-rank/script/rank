@@ -1,0 +1,305 @@
+#!perl
+
+our $DATE = '2018-04-22'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+    ignore_leading_blanks => 0,
+    reverse => 0,
+    sort => 'ascii',
+    field_separator => "\t",
+    sort_field => 0,
+    show_rank => 1,
+    show_percentile => 0,
+    rank => 'default',
+    # TODO: --dictionary-order, -d
+    # TODO: --ignore-nonprinting, -i
+    # TODO: --human-numeric-sort, -h
+    # TODO: --version-sort, -V
+    # TODO: --percentile-format=s
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'ignore-leading-blanks|b' => \$Opts{ignore_leading_blanks},
+        'ignore-case|f' => \$Opts{ignore_case},
+        'reverse|r' => \$Opts{reverse},
+        'field-separator|t=s' => \$Opts{field_separator},
+        'numeric-sort|n' => sub { $Opts{sort} = 'numeric' },
+        'sort=s' => \$Opts{sort},
+        'sort-field=i' => \$Opts{sort_field},
+        'rank=s' => \$Opts{rank},
+        'show-rank!' => \$Opts{show_rank},
+        'show-percentile!' => \$Opts{show_percentile},
+        '-p' => sub { $Opts{show_percentile} = 1 },
+        'help|h' => sub {
+            print <<USAGE;
+Usage:
+  rank [OPTIONS]... [INPUT]...
+  rank --help
+
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            say "rank version ".($main::VERSION // 'dev');
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my $fs = $Opts{field_separator};
+
+    my @data; # elem: [sortkey, $orig_line]
+    my $re_split_fields = qr/\Q$fs\E/;
+    while (defined (my $line = <>)) {
+        if ($Opts{ignore_leading_blanks}) {
+            $line =~ s/\A\s+//;
+        }
+        my @fields = split $re_split_fields, $line;
+        my $sortkey = $fields[$Opts{sort_field}] // '';
+        if ($Opts{ignore_case}) { $sortkey = lc $sortkey };
+        push @data, [$sortkey, $line];
+    }
+
+    my $sortsub;
+    if ($Opts{sort} eq 'numeric') {
+        if ($Opts{reverse}) {
+            $sortsub = sub { $_[0] <=> $_[1] };
+        } else {
+            $sortsub = sub { $_[1] <=> $_[0] };
+        }
+    } else {
+        if ($Opts{reverse}) {
+            $sortsub = sub { $_[1] cmp $_[0] };
+        } else {
+            $sortsub = sub { $_[0] cmp $_[1] };
+        }
+    }
+
+    @data = sort { $sortsub->($a->[0], $b->[0]) } @data;
+
+    # if we're using the 'no-skip' ranking system, we'll need to calculate
+    # the lowest ranking (highest number)first
+    my $lowest_rank;
+    if ($Opts{rank} eq 'no-skip') {
+        my $prev_sortkey;
+        for my $row_num (0..$#data) {
+            my $item = $data[$row_num];
+            my $sortkey = $item->[0];
+            if (!defined($prev_sortkey) ||
+                    $sortsub->($sortkey, $prev_sortkey) > 0) {
+                $lowest_rank //= 0;
+                $lowest_rank++;
+            }
+            $prev_sortkey = $sortkey;
+        }
+    }
+
+    my $rank;
+    my $prev_sortkey;
+    for my $row_num (0..$#data) {
+        my $item = $data[$row_num];
+        my $sortkey = $item->[0];
+
+        my $percentile;
+        if ($Opts{rank} eq 'default') {
+            if (!defined($prev_sortkey) ||
+                    $sortsub->($sortkey, $prev_sortkey) > 0) {
+                $rank = $row_num+1;
+            }
+            $percentile = (@data - $rank + 1)/@data * 100;
+        } elsif ($Opts{rank} eq 'no-skip') {
+            if (!defined($prev_sortkey) ||
+                    $sortsub->($sortkey, $prev_sortkey) > 0) {
+                $rank //= 0;
+                $rank++;
+            }
+            $percentile = ($lowest_rank - $rank+1) / $lowest_rank * 100;
+        } else { # no-same
+            $rank = $row_num+1;
+            $percentile = (@data - $rank + 1)/@data * 100;
+        }
+
+        print $rank, $fs if $Opts{show_rank};
+        printf "%.3f%s", $percentile, $fs
+            if $Opts{show_percentile};
+        print $item->[1];
+        $prev_sortkey = $sortkey;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Rank lines of text
+# PODNAME: rank
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rank - Rank lines of text
+
+=head1 VERSION
+
+This document describes version 0.003 of rank (from Perl distribution App-rank), released on 2018-04-22.
+
+=head1 SYNOPSIS
+
+ rank [OPTION]... [FILE]...
+
+=head1 DESCRIPTION
+
+C<rank> ranks lines of text, by default using the first field as the sort key
+(can be changed with C<--sort-field> option). When there are multiple lines that
+have the same sort key, C<rank> will assign the same rank to the lines. Finally,
+the lines will be displayed with the ranks, starting from the highest ranked
+(1).
+
+Sample input:
+
+ 21    ujang
+ 30    budi
+ 50    atang
+ 75    robi
+ 89    parjiyem
+ 77    nono
+ 75    tedi
+
+Sample output using C<rank -n>:
+
+ 1    89    parjiyem
+ 2    77    nono
+ 3    75    robi
+ 3    75    tedi
+ 5    30    budi
+ 6    21    ujang
+
+Sample output using C<rank -np>:
+
+ 1    100.000   89    parjiyem
+ 2    85.714    77    nono
+ 3    71.429    75    robi
+ 3    71.429    75    tedi
+ 5    42.857    30    budi
+ 6    14.286    21    ujang
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --reverse, -r
+
+=item * --ignore-leading-blanks, -b
+
+=item * --ignore-case, -i
+
+=item * --field-separator, -f (default: Tab)
+
+=item * --sort=s
+
+=item * --numeric-sort, -n
+
+=item * --sort-field=i (default: 0)
+
+=item * rank=s (default: default)
+
+Change ranking system. The default is to have all lines that have the same sort
+keys to be ranked the same, but the next ranking will skip numbers:
+
+ 1    89    parjiyem
+ 2    77    nono
+ 3    75    robi
+ 3    75    tedi
+ 5    30    budi
+ 6    21    ujang
+
+The C<no-skip> ranking system will not do these skips:
+
+ 1    89    parjiyem
+ 2    77    nono
+ 3    75    robi
+ 3    75    tedi
+ 4    30    budi
+ 5    21    ujang
+
+The C<no-same> ranking system will assign different ranks to lines that have the
+same sort key:
+
+ 1    89    parjiyem
+ 2    77    nono
+ 3    75    robi
+ 4    75    tedi
+ 5    30    budi
+ 6    21    ujang
+
+=item * --no-show-rank
+
+=item * --show-percentile, -p
+
+=item * --help, -h
+
+=item * --version, -v
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-rank>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-rank>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rank>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<sort>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

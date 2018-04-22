@@ -1,15 +1,25 @@
+Changes
+INSTALL
 lib/Date/Lectionary/Time.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README
+README.md
 README.pod
 t/00-load.t
 t/01-nextSunday.t
 t/02-prevSunday.t
 t/03-closestSunday.t
 t/04-isSunday.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
-xt/boilerplate.t
+xt/01-pod.t
+xt/02-pod-coverage.t
+xt/03-minimum_perl_version.t
+xt/04-kwalitee.t
+xt/05-kwalitee-extra.t
+xt/06-manifest.t
+xt/07-changes.t
+xt/08-version.t
+xt/09-greater-verison.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -142,10 +142,15 @@ sub _write_data_pm ($self) {
     my %native_names;
     my %raw_locales;
     for my $locale ( $self->_locales->@* ) {
-        $codes{ $locale->code }               = 1;
-        $names{ $locale->en_name }            = $locale->code;
-        $native_names{ $locale->native_name } = $locale->code;
-        $raw_locales{ $locale->code }         = $locale->data_hash;
+        $codes{ $locale->code }    = 1;
+        $names{ $locale->en_name } = $locale->code;
+
+        # As of CLDR 33.0.0 the nds locale does not specify a native name for
+        # itself (wtf).
+        if ( $locale->native_name ) {
+            $native_names{ $locale->native_name } = $locale->code;
+        }
+        $raw_locales{ $locale->code } = $locale->data_hash;
     }
 
     my $data_pm_file = path(qw( lib DateTime Locale Data.pm ));

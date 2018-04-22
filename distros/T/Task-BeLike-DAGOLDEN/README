@@ -2,7 +2,7 @@ NAME
     Task::BeLike::DAGOLDEN - DAGOLDEN's frequently-used or favorite modules
 
 VERSION
-    version 1.010
+    version 1.011
 
 TASK CONTENTS
   Apps
@@ -22,7 +22,6 @@ TASK CONTENTS
   Filesystem tools
    File::Find::Rule
    File::Find::Rule::Perl
-   File::Slurp
    File::pushd
    Path::Class
    Path::Class::Rule

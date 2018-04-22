@@ -26,7 +26,7 @@ unless ($ENV{'PERL_CORE'}) {
 
 @ARGV = map { /^--with-(apicheck)$/ && ++$opt{$1} ? () : $_ } @ARGV;
 
-WriteMakefile(
+my %mf = (
   NAME          => 'Devel::PPPort',
   VERSION_FROM  => 'PPPort_pm.PL',
   PM            => { 'PPPort.pm' => '$(INST_LIBDIR)/PPPort.pm' },
@@ -40,16 +40,18 @@ WriteMakefile(
     },
     resources => {
       bugtracker => {
-        web => 'https://github.com/mhx/Devel-PPPort/issues/',
+        web => 'https://rt.perl.org/rt3/',
       },
       repository => {
         type => 'git',
-        url  => 'git://github.com/mhx/Devel-PPPort.git',
-        web  => 'https://github.com/mhx/Devel-PPPort/',
+        url  => 'git://perl5.git.perl.org/perl.git',
+        web  => 'https://perl5.git.perl.org/perl.git',
       },
     },
   },
 );
+delete $mf{META_MERGE} unless eval { ExtUtils::MakeMaker->VERSION (6.46) };
+WriteMakefile(%mf);
 
 sub configure
 {
@@ -83,7 +85,7 @@ sub configure
     # Devel::PPPort is in the core since 5.7.3
     # 5.11.0+ has site before perl
     push @moreopts, INSTALLDIRS => (
-      ($] >= 5.007003 and $] < 5.011)
+      ("$]" >= 5.007003 and "$]" < 5.011)
         ? 'perl'
         : 'site'
     );

@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $MAKEFILE_PL  = 'Makefile.PL';
+
+open my $mf, '<', $MAKEFILE_PL  or die "$MAKEFILE_PL: cannot open: $!\n";
+while (<$mf>) {
+    if (/^(?:requires|recommends)\s+'([\w\:]+)'\s*=>/) {
+        print "$1\n";
+    }
+}
+close $mf;
+
+__END__

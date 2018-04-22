@@ -77,6 +77,7 @@ for my $opt ( sort keys %$zero_or_greater ) {
 
 my $string = {
     empty  => '',
+    info   => '',
     prompt => '',
     undef  => '',
 };
@@ -116,7 +117,7 @@ for my $opt ( sort keys %$no_spacebar ) {
 ok( ! defined( exception {  $d = choose( $choices, {
     beep  => 0, clear_screen => undef, hide_cursor => 1, index => 0, justify => 0, layout => 0, mouse => 0,
     order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9,
-    pad => 3, empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ] } ) } ) );
+    pad => 3, empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ], info => 'hello' } ) } ) );
 
 ok( ! defined( exception {  $d = choose( [ 'aaa' .. 'zzz' ], {
     no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad => 3,

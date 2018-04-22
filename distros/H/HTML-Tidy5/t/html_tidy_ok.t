@@ -4,10 +4,23 @@ use 5.010001;
 use warnings;
 use strict;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use Test::Builder::Tester;
 use Test::HTML::Tidy5;
+
+
+subtest 'html_tidy_ok fails on undef' => sub {
+    plan tests => 1;
+
+    my $msg = 'Fails on undef';
+    test_out( "not ok 1 - $msg" );
+    test_fail( +2 );
+    test_diag( 'Error: html_tidy_ok() got undef' );
+    html_tidy_ok( undef, $msg );
+    test_test( $msg );
+};
+
 
 subtest 'html_tidy_ok without errors' => sub {
     plan tests => 1;
@@ -20,7 +33,7 @@ subtest 'html_tidy_ok without errors' => sub {
     </head>
     <body>
         <p>
-            This is a valid fragment (with some errors), but an incomplete document.
+            This is a full document.
             <img src="alpha.jpg" height="21" width="12" alt="alpha">
             <input type="image">
         </p>
@@ -39,24 +52,24 @@ subtest 'html_tidy_ok with failures' => sub {
 
     my $html = <<'HTML';
 <p>
-    This is a valid fragment (with some errors), but an incomplete document.
+    This is an incomplete document, and it has some errors besides that as well.
     <img src="alpha.jpg" height="21" width="12">
     <input type="image">
 </p>
 <p>
 HTML
 
-    test_out( 'not ok 1 - Called html_tidy_ok on fragment' );
+    test_out( 'not ok 1 - Called html_tidy_ok on incomplete document' );
     test_fail( +8 );
-    test_diag( 'Errors: Called html_tidy_ok on fragment' );
+    test_diag( 'Errors: Called html_tidy_ok on incomplete document' );
     test_diag( '(1:1) Warning: missing <!DOCTYPE> declaration' );
     test_diag( '(1:1) Warning: inserting implicit <body>' );
     test_diag( '(1:1) Warning: inserting missing \'title\' element' );
     test_diag( '(3:5) Warning: <img> lacks "alt" attribute' );
     test_diag( '(6:1) Warning: trimming empty <p>' );
     test_diag( '5 messages on the page' );
-    html_tidy_ok( $html, 'Called html_tidy_ok on fragment' );
-    test_test( 'html_tidy_ok works on fragment' );
+    html_tidy_ok( $html, 'Called html_tidy_ok on incomplete document' );
+    test_test( 'html_tidy_ok works on incomplete document' );
 };
 
 
@@ -71,7 +84,7 @@ subtest 'Test passing our own Tidy object' => sub {
     </head>
     <body>
         <p>
-            This is a valid fragment (with some errors), but an incomplete document.
+            This is a complete document, with an empty paragraph.
             <img src="alpha.jpg" height="21" width="12" alt="alpha">
             <input type="image">
         </p>
@@ -141,7 +154,7 @@ HTML
     </head>
     <body>
         <p>
-            This is a valid fragment (with some errors), but an incomplete document.
+            This is a complete document with an extra unclosed paragraph.
             <img src="alpha.jpg" height="21" width="12" alt="alpha">
             <input type="image">
         </p>

@@ -1,4 +1,4 @@
-Digest::SHA version 6.01
+Digest::SHA version 6.02
 ========================
 
 Digest::SHA is a complete implementation of the NIST Secure Hash
@@ -25,10 +25,7 @@ To install this module type the following:
 
 The Makefile.PL options are:
 
-	-t : build a thread-safe version of module
 	-x : exclude support for SHA-384/512
-
-	NOTE: Option -t is still allowed but no longer necessary.
 
 DEPENDENCIES
 
@@ -36,7 +33,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2017 Mark Shelor
+Copyright (C) 2003-2018 Mark Shelor
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -72,8 +72,6 @@ get_dsf_metadata(PerlIO *infile, char *file, HV *info, HV *tags)
     if ( (chunk_size != 52) ||
 				 (format_version != 1) ||
 				 (format_id != 0) ||
-				 (channel_type != 2) ||
-				 (channel_num != 2) ||
 				 (block_size_per_channel != 4096) ||
 				 strncmp( (char *)buffer_ptr(&buf), "\0\0\0\0", 4 ) ) {
       PerlIO_printf(PerlIO_stderr(), "Invalid DSF file: unsupported fmt header: %s\n", file);

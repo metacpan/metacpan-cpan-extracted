@@ -1,6 +1,6 @@
 package Config::MVP;
 # ABSTRACT: multivalue-property package-oriented configuration
-$Config::MVP::VERSION = '2.200010';
+$Config::MVP::VERSION = '2.200011';
 use strict;
 use warnings;
 
@@ -27,6 +27,9 @@ use warnings;
 #pod   $assembler->add_value(y => 200);
 #pod
 #pod This doesn't make sense?  Well, read on.
+#pod
+#pod (You can also read the L<2009 RJBS Advent Calendar
+#pod article|http://advent.rjbs.manxome.org/2009/2009-12-20.html> on Config::MVP!)
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -219,7 +222,7 @@ Config::MVP - multivalue-property package-oriented configuration
 
 =head1 VERSION
 
-version 2.200010
+version 2.200011
 
 =head1 SYNOPSIS
 
@@ -244,6 +247,9 @@ L<Config::MVP::Assembler|Config::MVP::Assembler>:
   $assembler->add_value(y => 200);
 
 This doesn't make sense?  Well, read on.
+
+(You can also read the L<2009 RJBS Advent Calendar
+article|http://advent.rjbs.manxome.org/2009/2009-12-20.html> on Config::MVP!)
 
 =head1 DESCRIPTION
 
@@ -454,7 +460,7 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

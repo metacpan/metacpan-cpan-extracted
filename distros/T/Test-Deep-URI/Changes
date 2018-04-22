@@ -1,5 +1,9 @@
 Revision history for Test-Deep-URI
 
+0.03  2018-04-20 17:03:25 PDT
+        - Add uri_qf()
+        - Skip tel: unit test if URI::tel is installed.
+
 0.02  2016-02-14 18:57:43 PST
         - Require at least version 0.005 of Test::Warnings for the
           "warnings" function.

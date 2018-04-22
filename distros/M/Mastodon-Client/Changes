@@ -1,5 +1,23 @@
 Revision history for Mastodon::Client
 
+0.015     2018-04-22 02:36:42+01:00 Europe/London
+
+  * New:
+    * Status entities now have a placeholder `emojis` attribute.
+      This will likely need to be populated with a new entity.
+  * Changes:
+    * A successful call to `register` will overwrite the value
+      of the client's `scopes` attribute to that passed as an
+      argument (since those are the scopes that were requested
+      from the server; thanks Shura0!).
+  * Fixes:
+    * Fixed an issue with authorisation of clients that used
+      scopes other than `read` (thanks Shura0!)
+    * Corrected an error in the documentation that stated that
+      `register` accepted a hash reference instead of a hash.
+    * Coercing attachment entities without `remote_url`s no longer
+      results in an error.
+
 0.014     2018-01-23 19:27:43+00:00 Europe/London
 
   * Changes:

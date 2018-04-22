@@ -6,11 +6,12 @@ use DBIx::RunSQL;
 
 my $can_run = eval {
     require Text::Table;
+    require DBD::SQLite;
     1
 };
 
 if (not $can_run) {
-    plan skip_all => "Text::Table not installed: $@";
+    plan skip_all => "Test prerequisite modules not installed: $@";
     exit;
 };
 

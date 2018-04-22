@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Reader::Finder 6.011;
+package Dist::Zilla::MVP::Reader::Finder 6.012;
 # ABSTRACT: the reader for dist.ini files
 
 use Moose;
@@ -28,7 +28,7 @@ Dist::Zilla::MVP::Reader::Finder - the reader for dist.ini files
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 AUTHOR
 

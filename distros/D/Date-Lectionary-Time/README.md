@@ -1,0 +1,114 @@
+# NAME
+
+Date::Lectionary::Time - Find your way in time relative to Sundays.
+
+# VERSION
+
+Version 1.20180422.1
+
+# SYNOPSIS
+
+Working in the liturgical time of the lectionary means tracking time relative to Sundays.  This is a quick utility to find the next, previous, or the closest Sunday to a given date.  Further, it can determine if the date given is a Sunday or not.
+
+    use Time::Piece;
+    use Date::Lectionary::Time qw(nextSunday prevSunday closestSunday isSunday);
+
+    my $christmasDay = Time::Piece->strptime("2015-12-25", "%Y-%m-%d");
+
+    if (isSunday($christmasDay)) {
+        say "Christmas is on a Sunday!";
+    }
+    else {
+        say "Christmas isn't on a Sunday.";
+    }
+
+    my $sundayAfterChristmas = nextSunday($christmasDay);
+    my $sundayBeforeChristmas = prevSunday($christmasDay);
+    my $sundayClosestToChristmas = closestSunday($christmasDay);
+
+# EXPORTS
+
+nextSunday
+
+prevSunday
+
+closestSunday
+
+isSunday
+
+    use Date::Lectionary::Time qw(nextSunday prevSunday closestSunday isSunday);
+
+# SUBROUTINES/METHODS
+
+## nextSunday
+
+For a given Time::Piece date returns a Time::Piece object of the date of the Sunday immediately following the given date.
+
+## prevSunday
+
+For a given Time::Piece date returns a Time::Piece object of the date of the Sunday immediately before the given date.
+
+## closestSunday
+
+For a given Time::Piece date returns a Time::Piece object of the date of the Sunday closest to the given date.
+
+## isSunday
+
+For a given Time::Piece date returns `1` if the date is a Sunday or `0` if the date isn't a Sunday.
+
+# AUTHOR
+
+Michael Wayne Arnold, `<michael at rnold.info>`
+
+# BUGS
+
+<div>
+    <a href='https://travis-ci.org/marmanold/Date-Lectionary-Time'><img src='https://travis-ci.org/marmanold/Date-Lectionary-Time.svg?branch=master' /></a>
+</div>
+
+<div>
+    <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Time?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Time/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
+
+Please report any bugs or feature requests to `bug-date-lectionary-time at rt.cpan.org`, or through
+the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary-Time](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Lectionary-Time).  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Date::Lectionary::Time
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary-Time](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary-Time)
+
+- AnnoCPAN: Annotated CPAN documentation
+
+    [http://annocpan.org/dist/Date-Lectionary-Time](http://annocpan.org/dist/Date-Lectionary-Time)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/Date-Lectionary-Time](http://cpanratings.perl.org/d/Date-Lectionary-Time)
+
+- Search CPAN
+
+    [http://search.cpan.org/dist/Date-Lectionary-Time/](http://search.cpan.org/dist/Date-Lectionary-Time/)
+
+# ACKNOWLEDGEMENTS
+
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet son, Oliver.  But, above all, SOLI DEO GLORIA!
+
+# LICENSE AND COPYRIGHT
+
+Copyright 2016-2018 MICHAEL WAYNE ARNOLD
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1\. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2\. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

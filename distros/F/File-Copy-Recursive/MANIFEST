@@ -1,13 +1,14 @@
 Changes
-Makefile.PL
-MANIFEST
-README
 lib/File/Copy/Recursive.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
 t/00.load.t
 t/01.legacy.t
 t/02.legacy-symtogsafe.t
 t/03.github-issue-5.t
 t/04.readonly-dir.t
 t/05.legacy-pathmk_unc.t
-META.yml                                Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

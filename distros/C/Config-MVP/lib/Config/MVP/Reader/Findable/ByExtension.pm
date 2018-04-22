@@ -1,6 +1,6 @@
 package Config::MVP::Reader::Findable::ByExtension;
 # ABSTRACT: a Findable Reader that looks for files by extension
-$Config::MVP::Reader::Findable::ByExtension::VERSION = '2.200010';
+$Config::MVP::Reader::Findable::ByExtension::VERSION = '2.200011';
 use Moose::Role;
 
 with qw(Config::MVP::Reader::Findable);
@@ -54,7 +54,7 @@ Config::MVP::Reader::Findable::ByExtension - a Findable Reader that looks for fi
 
 =head1 VERSION
 
-version 2.200010
+version 2.200011
 
 =head1 METHODS
 
@@ -82,7 +82,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

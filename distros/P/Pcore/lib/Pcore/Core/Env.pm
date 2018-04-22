@@ -152,19 +152,6 @@ sub BUILD ( $self, $args ) {
     $self->{UID}       = undef;
     $self->{GID}       = undef;
 
-    # load dist cfg
-    if ( my $dist = $self->dist ) {
-        if ( $self->{is_par} ) {
-            $self->{DATA_DIR} = $self->{SCRIPT_DIR};
-        }
-        else {
-            $self->{DATA_DIR} = P->path( $dist->root . 'data/', is_dir => 1, lazy => 1 );
-        }
-    }
-    else {
-        $self->{DATA_DIR} = $self->{START_DIR};
-    }
-
     # find main dist
     if ( $self->{is_par} ) {
         $self->{main_dist} = Pcore::Dist->new( $ENV{PAR_TEMP} );
@@ -178,6 +165,19 @@ sub BUILD ( $self, $args ) {
         $self->{main_dist}->{is_main} = 1;
 
         $self->register_dist( $self->{main_dist} );
+    }
+
+    # set DATA_DIR
+    if ( my $dist = $self->{main_dist} ) {
+        if ( $self->{is_par} ) {
+            $self->{DATA_DIR} = $self->{SCRIPT_DIR};
+        }
+        else {
+            $self->{DATA_DIR} = P->path( $dist->root . 'data/', is_dir => 1, lazy => 1 );
+        }
+    }
+    else {
+        $self->{DATA_DIR} = $self->{START_DIR};
     }
 
     # init pcore dist, required for register pcore resources during bootstrap

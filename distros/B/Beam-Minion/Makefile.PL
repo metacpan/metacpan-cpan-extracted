@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Beam::Runner" => "0.014",
     "Beam::Wire" => "1.019",
     "Getopt::Long" => "2.36",
-    "Minion" => 8,
+    "Minion" => 9,
     "Module::Runtime" => 0,
     "Mojolicious" => 7
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t t/command/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => "2.36",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Minion" => 8,
+  "Minion" => 9,
   "Minion::Backend::SQLite" => "3.001",
   "Mock::MonkeyPatch" => 0,
   "Module::Runtime" => 0,

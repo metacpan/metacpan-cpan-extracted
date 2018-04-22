@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl 
 #-------------------------------------------------------------------------------
 # Write data in tabular text format
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180416';
+our $VERSION = '20180421';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -410,7 +410,7 @@ sub readFile($)                                                                 
   $f =~ m(\n) and confess "File name contains a new line:\n=$file=\n";
   -e $f or confess "Cannot read file because it does not exist, file:\n$f\n";
   open(my $F, "<:encoding(UTF-8)", $f) or confess
-    "Cannot open file for unicode input, file:\n$f\n";
+    "Cannot open file for unicode input, file:\n$f\n$!\n";
   local $/ = undef;
   my $s = eval {<$F>};
   $@ and confess $@;
@@ -421,7 +421,7 @@ sub readBinaryFile($)                                                           
  {my ($file) = @_;                                                              # File to read
   my $f = $file;
   -e $f or confess "Cannot read binary file because it does not exist:\n$f\n";
-  open my $F, "<$f" or confess "Cannot open binary file for input:\n$f\n";
+  open my $F, "<$f" or confess "Cannot open binary file for input:\n$f\n$!\n";
   local $/ = undef;
   <$F>;
  }
@@ -443,7 +443,8 @@ sub writeFile($$)                                                               
   $file or confess "No file name supplied\n";
   $string or carp "No string for file:\n$file\n";
   makePath($file);
-  open my $F, ">$file" or confess "Cannot open for write file:\n$file\n";
+  open my $F, ">$file" or confess "Cannot open file for write because:\n".
+               "$file\n$!\n";
   binmode($F, ":utf8");
   print  {$F} $string;
   close  ($F);
@@ -463,7 +464,7 @@ sub appendFile($$)                                                              
   $file or confess "No file name supplied\n";
   $string or carp "No string for file:\n$file\n";
   makePath($file);
-  open my $F, ">>$file" or confess "Cannot open for write file:\n$file\n";
+  open my $F, ">>$file" or confess "Cannot open for write file:\n$file\n$!\n";
   binmode($F, ":utf8");
   print  {$F} $string;
   close  ($F);
@@ -476,7 +477,8 @@ sub writeBinaryFile($$)                                                         
   $file or confess "No file name supplied\n";
   $string or confess "No string for file:\n$file\n";
   makePath($file);
-  open my $F, ">$file" or confess "Cannot open file for binary write:\n$file\n";
+  open my $F, ">$file" or confess "Cannot open file for binary write:\n".
+               "$file\n$!\n";
   binmode($F);
   print  {$F} $string;
   close  ($F);
@@ -489,7 +491,7 @@ sub createEmptyFile($)                                                          
   $file or confess "No file name supplied\n";
   return $file if -e $file;                                                     # Return file name as proxy for success if file already exists
   makePath($file);
-  open my $F, ">$file" or confess "Cannot create empty file:\n$file\n";
+  open my $F, ">$file" or confess "Cannot create empty file:\n$file\n$!\n";
   binmode($F);
   print  {$F} '';
   close  ($F);
@@ -2800,9 +2802,9 @@ if (1)                                                                          
   is_deeply [parseFileName "phil/test"],            ["phil/",       "test"];
   is_deeply [parseFileName "test.data"],            [undef,         "test", "data"];
   is_deeply [parseFileName "phil/"],                [qw(phil/)];
-  is_deeply [parseFileName "/phil/"],               [qw(/phil/)];
+  is_deeply [parseFileName "/var/www/html/translations/"], [qw(/var/www/html/translations/)];
  }
-
+  
 if (1)                                                                          # Unicode
  {use utf8;
   my $z = "𝝰 𝝱 𝝲";

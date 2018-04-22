@@ -1,5 +1,9 @@
 Revision history for Perl extension Finance::Bank::Postbank_de.
 
+0.49 20180421
+  + Better maintenance detection, mostly for the demo site
+  + Better test resiliency, mostly for the demo site
+
 0.48 20180222
   + Add some text aliases used/produced by some BSD version of SSL
 

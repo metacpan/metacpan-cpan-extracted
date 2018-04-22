@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use blib;
 
 # simplified version of the test case provided by Tomas Doran (t0m)
 # https://rt.cpan.org/Ticket/Display.html?id=71777

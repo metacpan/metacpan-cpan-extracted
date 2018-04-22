@@ -1,0 +1,56 @@
+---
+abstract: 'Read Microformats2 metadata from HTML or JSON'
+author:
+  - 'Jason McIntosh (jmac@jmac.org)'
+build_requires:
+  List::Util: '0'
+  Path::Class::Dir: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-Microformats2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Web::Microformats2:
+    file: lib/Web/Microformats2.pm
+    version: '0.02'
+  Web::Microformats2::Document:
+    file: lib/Web/Microformats2/Document.pm
+  Web::Microformats2::Item:
+    file: lib/Web/Microformats2/Item.pm
+  Web::Microformats2::Parser:
+    file: lib/Web/Microformats2/Parser.pm
+requires:
+  DateTime::Format::ISO8601: '0'
+  HTML::Entities: '0'
+  HTML::TreeBuilder::XPath: '0'
+  JSON: '0'
+  Moose: '0'
+  MooseX::Types::URI: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/jmacdotorg/microformats2-perl/issues
+  homepage: https://github.com/jmacdotorg/microformats2-perl
+  repository: git://github.com/jmacdotorg/microformats2-perl.git
+version: '0.02'
+x_contributors:
+  - 'Jason McIntosh <jmac@jmac.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

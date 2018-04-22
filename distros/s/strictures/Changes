@@ -1,8 +1,13 @@
 Release history for strictures
 
+2.000005 - 2018-04-20
+  - update internal list of warnings for categories added in 5.28.0 (no
+    behaviour change)
+
 2.000004 - 2018-04-19
   - update bundled ExtUtils::HasCompiler to 0.021
-  - update internal list of warnings (no behavior change)
+  - update internal list of warnings for categories added in 5.26.0 (no
+    behavior change)
 
 2.000003 - 2016-04-19
   - update bundled ExtUtils::HasCompiler to 0.013 to fix potential false

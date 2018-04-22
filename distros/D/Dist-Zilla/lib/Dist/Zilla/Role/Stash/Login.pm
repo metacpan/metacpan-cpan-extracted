@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::Stash::Login 6.011;
+package Dist::Zilla::Role::Stash::Login 6.012;
 # ABSTRACT: a stash with username/password credentials
 
 use Moose::Role;
@@ -29,7 +29,7 @@ Dist::Zilla::Role::Stash::Login - a stash with username/password credentials
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 OVERVIEW
 

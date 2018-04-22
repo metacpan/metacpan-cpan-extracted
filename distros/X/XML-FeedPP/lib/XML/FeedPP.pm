@@ -6,6 +6,7 @@ XML::FeedPP -- Parse/write/merge/edit RSS/RDF/Atom syndication feeds
 
 Get an RSS file and parse it:
 
+    use XML::FeedPP ();
     my $source = 'http://use.perl.org/index.rss';
     my $feed = XML::FeedPP->new( $source );
     print "Title: ", $feed->title(), "\n";
@@ -17,6 +18,7 @@ Get an RSS file and parse it:
 
 Generate an RDF file and save it:
 
+    use XML::FeedPP ();
     my $feed = XML::FeedPP::RDF->new();
     $feed->title( "use Perl" );
     $feed->link( "http://use.perl.org/" );
@@ -28,6 +30,7 @@ Generate an RDF file and save it:
 
 Convert some RSS/RDF files to Atom format:
 
+    use XML::FeedPP ();
     my $feed = XML::FeedPP::Atom::Atom10->new();        # create empty atom file
     $feed->merge( "rss.xml" );                          # load local RSS file
     $feed->merge( "http://www.kawa.net/index.rdf" );    # load remote RDF file
@@ -69,7 +72,7 @@ from choice of C<'file'>, C<'url'> or C<'string'>.
 
 =head2  $feed = XML::FeedPP->new( $source, utf8_flag => 1 );
 
-This makes utf8 flag on for every feed elements.
+This makes utf8 flag on for all feed elements.
 Perl 5.8.1 or later is required to use this.
 
 Note that any other options for C<XML::TreePP> constructor are also
@@ -187,8 +190,8 @@ This method sorts the order of items in $feed by C<pubDate>.
 
 =head2  $feed->uniq_item();
 
-This method makes items unique. The second and succeeding items
-that have the same link URL are removed.
+Reduces the list of items, not to include duplicates.  RDF and Atoms
+have a guid attribute to defined uniqueness, for RSS we use the link.
 
 =head2  $feed->normalize();
 
@@ -295,8 +298,10 @@ C<author> for Atom 0.3/1.0.
 
 This method sets/gets the item's C<guid> element,
 returning its current value when $guid is undefined.
-It is mapped to C<id> element for Atom, and ignored for RDF.
-The second argument is optional.
+
+It is mapped to C<id> element for Atom, and ignored for RDF.  In case of
+RSS, it will return a HASH.  The C<isParmaLink> is supported by RSS only,
+and optional.
 
 =head2  $item->set( $key => $value, ... );
 
@@ -420,7 +425,7 @@ use vars qw(
     $XMLNS_ATOM10
 );
 
-$VERSION = "0.43";
+$VERSION = "0.95";
 
 $RSS20_VERSION  = '2.0';
 $ATOM03_VERSION = '0.3';
@@ -477,46 +482,54 @@ $ITEM_METHODS = [qw(
 sub new {
     my $package = shift;
     my( $init, $source, @rest ) = &XML::FeedPP::Util::param_even_odd(@_);
-    Carp::croak "No feed source" unless defined $source;
+    my $do_autodetect = $package eq __PACKAGE__;
 
-    my $self  = {};
-    bless $self, $package;
-    $self->load($source, @rest);
+    Carp::croak "No feed source"
+        if $do_autodetect && !$source;
 
-    if ( exists $self->{rss} ) {
-        XML::FeedPP::RSS->feed_bless($self);
-    }
-    elsif ( exists $self->{'rdf:RDF'} ) {
-        XML::FeedPP::RDF->feed_bless($self);
-    }
-    elsif ( exists $self->{feed} ) {
-        my $xmlns = $self->{feed}->{-xmlns} if exists $self->{feed}->{-xmlns};
-        if ( $xmlns eq $XMLNS_ATOM10 ) {
-            XML::FeedPP::Atom::Atom10->feed_bless($self);
+    my $self = bless {}, $package;
+    $self->load($source, @rest) if $source;
+
+    if($do_autodetect) {
+        my $class = $self->detect_format;
+        unless ( $class ) {
+            my $root = ref $self ? join( " ", sort keys %$self ) : $self;
+            my $class = ref $self ? ref $self : $self;
+            Carp::croak "Invalid $class feed format: $root";
         }
-        elsif ( $xmlns eq $XMLNS_ATOM03 ) {
-            XML::FeedPP::Atom::Atom03->feed_bless($self);
-        }
-        else {
-            XML::FeedPP::Atom->feed_bless($self);
-        }
-    }
-    else {
-        my $root = join( " ", sort keys %$self );
-        Carp::croak "Invalid feed format: $root";
+        bless $self, $class;
     }
 
-    $self->validate_feed($source);
+    $self->validate_feed() if $source;
     $self->init_feed();
     $self->elements(@$init) if ref $init;
     $self;
 }
 
-sub feed_bless {
-    my $package = shift;
-    my $self    = shift;
-    bless $self, $package;
-    $self;
+sub validate_feed {
+    my $self = shift;
+    return if $self->test_feed(@_);
+    my $root = ref $self ? join( " ", sort keys %$self ) : $self;
+    my $class = ref $self ? ref $self : $self;
+    Carp::croak "Invalid $class feed format: $root";
+}
+
+sub detect_format {
+    my $self = shift;
+    my $list = $self->available_format;
+    foreach my $class ( @$list ) {
+        my $hit = $class->test_feed($self);
+        return $class if $hit;
+    }
+    undef;
+}
+
+sub available_format {
+    [ 'XML::FeedPP::RSS',
+      'XML::FeedPP::RDF',
+      'XML::FeedPP::Atom::Atom10',
+      'XML::FeedPP::Atom::Atom03',
+      'XML::FeedPP::Atom' ];
 }
 
 sub load {
@@ -586,7 +599,7 @@ sub to_file {
 sub merge {
     my $self   = shift;
     my $source = shift;
-    my $target = ref $source ? $source : XML::FeedPP->new($source);
+    my $target = ref $source ? $source : XML::FeedPP->new($source, @_);
     $self->merge_channel($target);
     $self->merge_item($target);
     $self->normalize();
@@ -665,11 +678,15 @@ sub add_clone_item {
 
     if ( ref $dstitem eq ref $srcitem ) {
         XML::FeedPP::Util::merge_hash( $dstitem, $srcitem );
+
+        # A new item starts with a link, and then a merge.  Setting the
+        # link often affects the guid.  The merge will not set the guid
+        # anymore.  So, let's overrule that.
+        if(my $guid = $srcitem->{guid}) {
+            $dstitem->{guid} = $guid;
+        }
     }
     else {
-#       my $link = $srcitem->link();
-#       $dstitem->link($link) if defined $link;
-
         my $title = $srcitem->title();
         $dstitem->title($title) if defined $title;
 
@@ -815,6 +832,29 @@ sub match_item {
     @$out;
 }
 
+sub channel_class { Carp::croak((ref $_[0])."->channel_class() is not implemented"); }
+sub item_class { Carp::croak((ref $_[0])."->item_class() is not implemented"); }
+sub test_feed { Carp::croak((ref $_[0])."->test_feed() is not implemented"); }
+sub init_feed { Carp::croak((ref $_[0])."->init_feed() is not implemented"); }
+sub add_item { Carp::croak((ref $_[0])."->add_item() is not implemented"); }
+sub clear_item { Carp::croak((ref $_[0])."->clear_item() is not implemented"); }
+sub remove_item { Carp::croak((ref $_[0])."->remove_item() is not implemented"); }
+sub get_item { Carp::croak((ref $_[0])."->get_item() is not implemented"); }
+sub sort_item { Carp::croak((ref $_[0])."->sort_item() is not implemented"); }
+sub uniq_item { Carp::croak((ref $_[0])."->uniq_item() is not implemented"); }
+sub limit_item { Carp::croak((ref $_[0])."->limit_item() is not implemented"); }
+sub docroot { Carp::croak((ref $_[0])."->docroot() is not implemented"); }
+sub channel { Carp::croak((ref $_[0])."->channel() is not implemented"); }
+sub set { Carp::croak((ref $_[0])."->set() is not implemented"); }
+sub get { Carp::croak((ref $_[0])."->get() is not implemented"); }
+sub title { Carp::croak((ref $_[0])."->title() is not implemented"); }
+sub description { Carp::croak((ref $_[0])."->description() is not implemented"); }
+sub link { Carp::croak((ref $_[0])."->link() is not implemented"); }
+sub language { Carp::croak((ref $_[0])."->language() is not implemented"); }
+sub copyright { Carp::croak((ref $_[0])."->copyright() is not implemented"); }
+sub pubDate { Carp::croak((ref $_[0])."->pubDate() is not implemented"); }
+sub image { Carp::croak((ref $_[0])."->image() is not implemented"); }
+
 # ----------------------------------------------------------------
 package XML::FeedPP::Plugin;
 use strict;
@@ -856,21 +896,6 @@ use strict;
 use vars qw( @ISA );
 @ISA = qw( XML::FeedPP );
 
-sub new {
-    my $package = shift;
-    my( $init, $source, @rest ) = &XML::FeedPP::Util::param_even_odd(@_);
-
-    my $self    = {};
-    bless $self, $package;
-    if ( defined $source ) {
-        $self->load($source, @rest);
-        $self->validate_feed($source);
-    }
-    $self->init_feed();
-    $self->elements(@$init) if ref $init;
-    $self;
-}
-
 sub channel_class {
     'XML::FeedPP::RSS::Channel';
 }
@@ -879,12 +904,12 @@ sub item_class {
     'XML::FeedPP::RSS::Item';
 }
 
-sub validate_feed {
+sub test_feed {
     my $self   = shift;
     my $source = shift || $self;
-    if ( !ref $self || !ref $self->{rss} ) {
-        Carp::croak "Invalid RSS format: $source";
-    }
+    return unless ref $source;
+    return unless ref $source->{rss};
+    __PACKAGE__;
 }
 
 sub init_feed {
@@ -892,22 +917,19 @@ sub init_feed {
 
     $self->{rss} ||= {};
     if ( ! UNIVERSAL::isa( $self->{rss}, 'HASH' ) ) {
-        Carp::croak "Invalid RSS format: $self->{rss}";
+        Carp::croak "Invalid RSS 2.0 feed format: $self->{rss}";
     }
     $self->{rss}->{'-version'} ||= $XML::FeedPP::RSS20_VERSION;
 
-    $self->{rss}->{channel} ||= $self->channel_class->new();
-    $self->channel_class->ref_bless( $self->{rss}->{channel} );
+    my $channel = $self->{rss}{channel} ||= $self->channel_class->new();
+    $self->channel_class->ref_bless($channel);
 
-    $self->{rss}->{channel}->{item} ||= [];
-    if ( UNIVERSAL::isa( $self->{rss}->{channel}->{item}, 'HASH' ) ) {
+    my $items = $channel->{item} || [];
+	my @items = grep ref $_,    # skip empty items
+        UNIVERSAL::isa($items, 'HASH') ? $items : @$items;
 
-        # only one item
-        $self->{rss}->{channel}->{item} = [ $self->{rss}->{channel}->{item} ];
-    }
-    foreach my $item ( @{ $self->{rss}->{channel}->{item} } ) {
-        $self->item_class->ref_bless($item);
-    }
+    $self->item_class->ref_bless($_) for @items;
+    $channel->{item} = \@items;
 
     $self;
 }
@@ -991,13 +1013,12 @@ sub sort_item {
 sub uniq_item {
     my $self  = shift;
     my $list  = $self->{rss}->{channel}->{item} or return;
-    my $check = {};
-    my $uniq  = [];
+    my (%check, @uniq);
     foreach my $item (@$list) {
-        my $link = $item->link();
-        push( @$uniq, $item ) unless $check->{$link}++;
+        my $key = $item->guid() || $item->link();
+        push( @uniq, $item ) unless $check{$key}++;
     }
-    @$list = @$uniq;
+    @$list = @uniq;
     scalar @$list;
 }
 
@@ -1157,21 +1178,6 @@ use strict;
 use vars qw( @ISA );
 @ISA = qw( XML::FeedPP );
 
-sub new {
-    my $package = shift;
-    my( $init, $source, @rest ) = &XML::FeedPP::Util::param_even_odd(@_);
-
-    my $self    = {};
-    bless $self, $package;
-    if ( defined $source ) {
-        $self->load($source, @rest);
-        $self->validate_feed($source);
-    }
-    $self->init_feed();
-    $self->elements(@$init) if ref $init;
-    $self;
-}
-
 sub channel_class {
     'XML::FeedPP::RDF::Channel';
 }
@@ -1180,19 +1186,20 @@ sub item_class {
     'XML::FeedPP::RDF::Item';
 }
 
-sub validate_feed {
+sub test_feed {
     my $self   = shift;
     my $source = shift || $self;
-    if ( !ref $self || !ref $self->{'rdf:RDF'} ) {
-        Carp::croak "Invalid RDF format: $source";
-    }
+    return unless ref $source;
+    return unless ref $source->{'rdf:RDF'};
+    __PACKAGE__;
 }
+
 sub init_feed {
     my $self = shift or return;
 
     $self->{'rdf:RDF'} ||= {};
     if ( ! UNIVERSAL::isa( $self->{'rdf:RDF'}, 'HASH' ) ) {
-        Carp::croak "Invalid RDF format: $self->{'rdf:RDF'}";
+        Carp::croak "Invalid RDF 1.0 feed format: $self->{'rdf:RDF'}";
     }
     $self->xmlns( 'xmlns'     => $XML::FeedPP::XMLNS_RSS );
     $self->xmlns( 'xmlns:rdf' => $XML::FeedPP::XMLNS_RDF );
@@ -1241,6 +1248,7 @@ sub merge_native_channel {
 
     XML::FeedPP::Util::merge_hash( $self->{'rdf:RDF'}, $tree->{'rdf:RDF'},
         qw( channel item ) );
+
     XML::FeedPP::Util::merge_hash(
         $self->{'rdf:RDF'}->{channel},
         $tree->{'rdf:RDF'}->{channel},
@@ -1327,13 +1335,12 @@ sub sort_item {
 sub uniq_item {
     my $self  = shift;
     my $list  = $self->{'rdf:RDF'}->{item} or return;
-    my $check = {};
-    my $uniq  = [];
+    my (%check, @uniq);
     foreach my $item (@$list) {
         my $link = $item->link();
-        push( @$uniq, $item ) unless $check->{$link}++;
+        push( @uniq, $item ) unless $check{$link}++;
     }
-    $self->{'rdf:RDF'}->{item} = $uniq;
+    $self->{'rdf:RDF'}->{item} = \@uniq;
     $self->__refresh_items();
 }
 
@@ -1476,29 +1483,6 @@ use strict;
 use vars qw( @ISA );
 @ISA = qw( XML::FeedPP );
 
-sub new {
-    my $package = shift;
-    my( $init, $source, @rest ) = &XML::FeedPP::Util::param_even_odd(@_);
-
-    my $self    = {};
-    bless $self, $package;
-    if ( defined $source ) {
-        $self->load($source, @rest);
-        $self->validate_feed($source);
-    }
-    $self->init_feed();
-    $self->elements(@$init) if ref $init;
-    $self;
-}
-
-sub validate_feed {
-    my $self   = shift;
-    my $source = shift || $self;
-    if ( !ref $self || !ref $self->{feed} ) {
-        Carp::croak "Invalid Atom format: $source";
-    }
-}
-
 sub merge_native_channel {
     my $self = shift;
     my $tree = shift or next;
@@ -1574,13 +1558,12 @@ sub sort_item {
 sub uniq_item {
     my $self  = shift;
     my $list  = $self->{feed}->{entry} or return;
-    my $check = {};
-    my $uniq  = [];
+    my (%check, @uniq);
     foreach my $item (@$list) {
-        my $link = $item->link();
-        push( @$uniq, $item ) unless $check->{$link}++;
+        my $link = $item->guid();
+        push( @uniq, $item ) unless $check{$link}++;
     }
-    @$list = @$uniq;
+    @$list = @uniq;
 }
 
 sub limit_item {
@@ -1674,6 +1657,17 @@ sub item_class {
     'XML::FeedPP::Atom::Atom03::Entry';
 }
 
+sub test_feed {
+    my $self   = shift;
+    my $source = shift || $self;
+    return unless ref $source;
+    return unless ref $source->{feed};
+    return unless exists $source->{feed}->{-xmlns};
+    my $xmlns = $source->{feed}->{-xmlns};
+    return if ($xmlns ne $XML::FeedPP::XMLNS_ATOM03);
+    __PACKAGE__;
+}
+
 sub init_feed {
     my $self = shift or return;
 
@@ -1681,7 +1675,7 @@ sub init_feed {
     $self->channel_class->ref_bless( $self->{feed} );
 
     if ( ! UNIVERSAL::isa( $self->{feed}, 'HASH' ) ) {
-        Carp::croak "Invalid Atom 0.3 format: $self->{feed}";
+        Carp::croak "Invalid Atom 0.3 feed format: $self->{feed}";
     }
 
     $self->xmlns( 'xmlns' => $XML::FeedPP::XMLNS_ATOM03 );
@@ -1795,6 +1789,17 @@ sub item_class {
     'XML::FeedPP::Atom::Atom10::Entry';
 }
 
+sub test_feed {
+    my $self   = shift;
+    my $source = shift || $self;
+    return unless ref $source;
+    return unless ref $source->{feed};
+    return unless exists $source->{feed}->{-xmlns};
+    my $xmlns = $source->{feed}->{-xmlns};
+    return if ($xmlns ne $XML::FeedPP::XMLNS_ATOM10);
+    __PACKAGE__;
+}
+
 sub init_feed {
     my $self = shift or return;
 
@@ -1802,7 +1807,7 @@ sub init_feed {
     $self->channel_class->ref_bless( $self->{feed} );
 
     if ( ! UNIVERSAL::isa( $self->{feed}, 'HASH' ) ) {
-        Carp::croak "Invalid Atom 1.0 format: $self->{feed}";
+        Carp::croak "Invalid Atom 1.0 feed format: $self->{feed}";
     }
 
     $self->xmlns( 'xmlns' => $XML::FeedPP::XMLNS_ATOM10 );
@@ -1907,6 +1912,14 @@ use vars qw( @ISA );
 @ISA = qw( XML::FeedPP::Atom::Atom03 );
 
 # @ISA = qw( XML::FeedPP::Atom::Atom10 );   # if Atom 1.0 for default
+
+sub test_feed {
+    my $self   = shift;
+    my $source = shift || $self;
+    return unless ref $source;
+    return unless ref $source->{feed};
+    __PACKAGE__;
+}
 
 # ----------------------------------------------------------------
 package XML::FeedPP::Atom::Common::Feed;
@@ -2306,7 +2319,15 @@ sub get_or_set {
 sub get_value {
     my $self = shift;
     my $elem = shift;
-    return unless exists $self->{$elem};
+    unless(exists $self->{$elem}) {
+        #XXX TreePP does not understand prefixes, which is usually not a
+        # problem because most clients break on them... "best practices"
+        # for feeds often explicitly state to use "the default" namespace.
+        # Let's try to ignore the namespace here.
+        ($elem) = grep /\:\Q$elem\E$/, keys %$self;
+        defined $elem or return;
+    }
+
     my $value = $self->{$elem};
     return $value unless ref $value;
 
@@ -2328,10 +2349,12 @@ sub _fetch_value {
 
     if ( UNIVERSAL::isa( $value, 'HASH' )) {
         # text node of an element with attributes
-        if ( exists $value->{'#text'} ) {
-            return $self->_fetch_value($value->{'#text'})
-        }
-    } elsif ( UNIVERSAL::isa( $value, 'SCALAR' )) {
+        return defined $value->{'#text'}
+          ? $self->_fetch_value($value->{'#text'})
+          : '';
+    }
+
+    if ( UNIVERSAL::isa( $value, 'SCALAR' )) {
         # CDATA section as a scalar reference
         return $$value;
     }
@@ -2468,7 +2491,9 @@ sub w3cdtf_to_rfc1123 {
     $hour ||= 0;
     $min ||= 0;
     $sec ||= 0;
-    my $epoch = Time::Local::timegm( $sec, $min, $hour, $mday, $mon-1, $year-1900 );
+    my $epoch = eval { Time::Local::timegm( $sec, $min, $hour, $mday, $mon-1, $year ) }
+        or return;
+
     my $wday = ( gmtime($epoch) )[6];
     if ( defined $tz && $tz ne '' && $tz ne 'Z' ) {
         my $off = &get_tz_offset($tz) / 60;
@@ -2491,7 +2516,8 @@ sub rfc1123_to_epoch {
     $year += 2000 if $year < 77;
     $year += 1900 if $year < 100;
     $mon = $MoY{ uc($mon) } or return;
-    my $epoch = Time::Local::timegm( $sec, $min, $hour, $mday, $mon-1, $year-1900 );
+    my $epoch = eval { Time::Local::timegm( $sec, $min, $hour, $mday, $mon-1, $year ) }
+        or return;
     $epoch -= &get_tz_offset( $tz );
     $epoch;
 }
@@ -2504,7 +2530,9 @@ sub w3cdtf_to_epoch {
     $hour ||= 0;
     $min ||= 0;
     $sec ||= 0;
-    my $epoch = Time::Local::timegm( $sec, $min, $hour, $mday, $mon-1, $year-1900 );
+    my $epoch = eval { Time::Local::timegm( $sec, $min, $hour, $mday, $mon-1, $year ) }
+        or return;
+
     $epoch -= &get_tz_offset( $tz );
     $epoch;
 }
@@ -2568,10 +2596,10 @@ sub get_epoch {
 sub merge_hash {
     my $base  = shift or return;
     my $merge = shift or return;
-    my $map = { map { $_ => 1 } @_ };
+
+    my %exclude = map { $_ => 1 } @_;
     foreach my $key ( keys %$merge ) {
-        next if exists $map->{$key};
-        next if exists $base->{$key};
+        next if $exclude{$key} || exists $base->{$key};
         $base->{$key} = $merge->{$key};
     }
 }

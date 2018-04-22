@@ -2,7 +2,7 @@ package Test2::Formatter::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.001064';
+our $VERSION = '0.001065';
 
 use Carp qw/croak confess/;
 use Time::HiRes qw/time/;
@@ -20,7 +20,6 @@ BEGIN {
     $J->indent(0);
     $J->convert_blessed(1);
     $J->allow_blessed(1);
-    $J->utf8(1);
 
     require constant;
     constant->import(ENCODER => $J);

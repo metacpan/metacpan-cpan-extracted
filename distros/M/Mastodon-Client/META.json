@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -72,6 +72,7 @@
             "Plack::Runner" : "0",
             "Plack::Util" : "0",
             "Term::ANSIColor" : "0",
+            "Test2::V0" : "0",
             "Test::Exception" : "0.043",
             "Test::More" : "1.302078",
             "Test::Pod" : "1.51",
@@ -86,79 +87,79 @@
    "provides" : {
       "Mastodon::Client" : {
          "file" : "lib/Mastodon/Client.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Account" : {
          "file" : "lib/Mastodon/Entity/Account.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Application" : {
          "file" : "lib/Mastodon/Entity/Application.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Attachment" : {
          "file" : "lib/Mastodon/Entity/Attachment.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Card" : {
          "file" : "lib/Mastodon/Entity/Card.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Context" : {
          "file" : "lib/Mastodon/Entity/Context.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Error" : {
          "file" : "lib/Mastodon/Entity/Error.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Instance" : {
          "file" : "lib/Mastodon/Entity/Instance.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Mention" : {
          "file" : "lib/Mastodon/Entity/Mention.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Notification" : {
          "file" : "lib/Mastodon/Entity/Notification.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Relationship" : {
          "file" : "lib/Mastodon/Entity/Relationship.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Report" : {
          "file" : "lib/Mastodon/Entity/Report.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Results" : {
          "file" : "lib/Mastodon/Entity/Results.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Status" : {
          "file" : "lib/Mastodon/Entity/Status.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Entity::Tag" : {
          "file" : "lib/Mastodon/Entity/Tag.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Listener" : {
          "file" : "lib/Mastodon/Listener.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Role::Entity" : {
          "file" : "lib/Mastodon/Role/Entity.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Role::UserAgent" : {
          "file" : "lib/Mastodon/Role/UserAgent.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Mastodon::Types" : {
          "file" : "lib/Mastodon/Types.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -173,12 +174,13 @@
          "web" : "https://gitlab.com/jjatria/Mastodon-Client"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_contributors" : [
       "Al Beano <albino@autistici.org>",
       "Florian Obser <florian+gitlab@narrans.de>",
-      "Lance Wicks <lancew@cpan.org>"
+      "Lance Wicks <lancew@cpan.org>",
+      "Shura <shura0@yandex.ru>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

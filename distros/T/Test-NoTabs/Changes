@@ -1,5 +1,12 @@
 Revision history for Test-NoTabs
 
+2.02      2018-04-21 13:57:54Z
+     - no changes since trial release
+
+2.01      2017-06-08 23:38:48Z (TRIAL RELEASE)
+     - altered a test to not bake @INC into -I options for a subprocess, to
+       avoid too-long commands
+
 2.00      2017-04-11 19:06:44Z
      - migrated off of Module::Install, added META.json and other modern tooling
 

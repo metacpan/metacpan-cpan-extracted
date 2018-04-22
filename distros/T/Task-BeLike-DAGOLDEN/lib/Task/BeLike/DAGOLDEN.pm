@@ -5,7 +5,7 @@ use warnings;
 package Task::BeLike::DAGOLDEN;
 # ABSTRACT: DAGOLDEN's frequently-used or favorite modules
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 
 
@@ -25,7 +25,7 @@ Task::BeLike::DAGOLDEN - DAGOLDEN's frequently-used or favorite modules
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 TASK CONTENTS
 
@@ -62,8 +62,6 @@ version 1.010
 =head3 L<File::Find::Rule>
 
 =head3 L<File::Find::Rule::Perl>
-
-=head3 L<File::Slurp>
 
 =head3 L<File::pushd>
 

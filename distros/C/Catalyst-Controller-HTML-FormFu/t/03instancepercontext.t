@@ -10,6 +10,6 @@ eval {
     map { TestApp->controller($_) } TestApp->controllers;
 };
 
-ok(!$@, 'lives ok');
+ok( !$@, 'lives ok' );
 
 done_testing;

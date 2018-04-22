@@ -1,2 +1,10 @@
+1.001     2018-04-21 20:19:51 EDT
+  - Stable release using UV 1.0
+  - Use UV loops instead of Poll when multiple reactors are constructed
+
+1.000     2018-01-26 04:02:07 EST (TRIAL RELEASE)
+  - Switch installer to Module::Build::Tiny
+  - Changes to support UV 1.0
+
 0.001     2015-06-05 18:10:25 EDT
   - First release

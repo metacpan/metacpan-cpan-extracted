@@ -1,14 +1,14 @@
 #
 # This file is part of ElasticSearchX-Model
 #
-# This software is Copyright (c) 2016 by Moritz Onken.
+# This software is Copyright (c) 2018 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Document;
-$ElasticSearchX::Model::Document::VERSION = '1.0.2';
+$ElasticSearchX::Model::Document::VERSION = '1.0.3';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ ElasticSearchX::Model::Document
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,7 @@ Moritz Onken
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Moritz Onken.
+This software is Copyright (c) 2018 by Moritz Onken.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 package Beam::Minion::Util;
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # ABSTRACT: Utility functions for Beam::Minion
 
 #pod =head1 SYNOPSIS
@@ -127,6 +127,7 @@ sub build_mojo_app {
             next unless $wire->is_meta( $config->{ $service_name }, 1 );
             $minion->add_task( "$container_name:$service_name" => sub {
                 my ( $job, @args ) = @_;
+                my $wire = Beam::Wire->new( file => $path );
 
                 my $obj = eval { $wire->get( $service_name, lifecycle => 'factory' ) };
                 if ( $@ ) {
@@ -142,6 +143,7 @@ sub build_mojo_app {
                 $job->$method( { exit => $exit } );
             } );
         }
+        undef $wire;
     }
 
     return $app;
@@ -159,7 +161,7 @@ Beam::Minion::Util - Utility functions for Beam::Minion
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

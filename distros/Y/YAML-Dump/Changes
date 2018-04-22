@@ -1,3 +1,7 @@
+1.84  2018-04-21 00:50:31 CEST
+   - Fix typo in documentation (thanks manwar)
+      -> https://github.com/polettix/YAML-Dump/pull/1
+
 1.82  2018-03-10 23:21:31 CET
    - POD documentation fixes
    - inclusion of LICENSE file in distribution

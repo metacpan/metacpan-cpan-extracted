@@ -23,7 +23,7 @@ requires:
   List::MoreUtils: '0'
   List::Util: '0'
   Module::Runtime: '0'
-  Moo: '0'
+  Moo: '2.002002'
   MooX::HandlesVia: '0'
   Number::Range: '0'
   Path::Class: '0'
@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/pjlsergeant/test-bdd-cucumber-perl/issues
   repository: https://github.com/pjlsergeant/test-bdd-cucumber-perl.git
-version: '0.54'
+version: '0.56'
 x_serialization_backend: 'YAML::Tiny version 1.73'

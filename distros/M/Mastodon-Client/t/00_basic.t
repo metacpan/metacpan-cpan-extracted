@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0;
 
 use Mastodon::Client;
 
@@ -14,18 +11,17 @@ my $client = Mastodon::Client->new(
     scopes        => [qw( read write )],
 );
 
-
 isa_ok( $client, 'Mastodon::Client' );
 
 is $client->name, 'JJ', 'Correct name';
 
-is_deeply $client->scopes, [qw( read write )], 'Correct scopes';
+is $client->scopes, [qw( read write )], 'Correct scopes';
 
 $client = Mastodon::Client->new;
 
 is $client->name, undef, 'Name has no default';
 
-is_deeply $client->scopes, ['read'],
+is $client->scopes, ['read'],
   'Scopes default to read only';
 
 like $client->instance->uri, qr/mastodon\.social/,

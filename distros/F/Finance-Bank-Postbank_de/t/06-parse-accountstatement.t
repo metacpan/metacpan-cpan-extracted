@@ -26,6 +26,7 @@ my $canned_statement = do {local $/ = undef;
 {
   my ($get_called,$open_called);
   no warnings 'redefine';
+  no warnings 'once';
   local *Finance::Bank::Postbank_de::Account::slurp_file = sub { die "slurp file called\n" };
   local *Finance::Bank::Postbank_de::Account::get_statement = sub { die "get called\n" };
 

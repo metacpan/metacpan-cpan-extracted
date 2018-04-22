@@ -4,7 +4,7 @@ use warnings;
 
 use parent qw( Exporter );
 our @EXPORT_OK = qw( dircopy fcopy rcopy );
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use File::Copy;
 use File::Find;
@@ -47,22 +47,21 @@ parlance, it sits C<high upstream on the CPAN river.>  Hence, it ought to work
 correctly and be installable on all operating systems where Perl is well
 supported.
 
-However, as of the time of creation of F<File::Copy::Recursive::Reduced>
-(April 2018), FCR version 0.40 is failing to pass its tests against either
+However, as of early April 2018, FCR version 0.40 wass failing to pass its tests against either
 Perl 5.26 or Perl 5 blead on important operating systems including Windows,
 FreeBSD and NetBSD
 (L<http://fast-matrix.cpantesters.org/?dist=File-Copy-Recursive%200.40>).  As
-a consequence, CPAN installers such as F<cpan> and F<cpanm> are failing to
-install it (unless you resort to the C<--force> option).  This prevents
+a consequence, CPAN installers such as F<cpan> and F<cpanm> were failing to
+install it (unless one resorted to the C<--force> option).  This prevented
 distributions dependent (directly or indirectly) on FCR from being installed
 as well.
 
-Some patches have been provided to the L<FCR bug
+Some patches had been provided to the L<FCR bug
 tracker|https://rt.cpan.org/Dist/Display.html?Name=File-Copy-Recursive> for
-this problem.  However, as of the date on which this distribution is being
-uploaded to CPAN, FCR's maintainer has not yet applied them.  Moreover, even
-if those patches are applied, FCR may face other installability problems on
-certain platforms.
+this problem.  However, as late as April 18 2018 those patches had not yet
+been applied.  This posed a critical problem for the ability to assess the
+impact of the soon-to-be-released perl-5.28.0 on CPAN distributions (the
+so-called "Blead Breaks CPAN" ("BBC") problem) on platforms other than Linux.
 
 F<File::Copy::Recursive::Reduced> (hereinafter referred to as B<FCR2>) is
 intended to provide a minimal subset of FCR's functionality -- just enough to
@@ -71,6 +70,17 @@ failing.  Functions will be added to FCR2 only insofar as investigation shows
 that they can replace usage of FCR functions in toolchain and other heavily
 used modules.  No attempt will be made to reproduce all the functionality
 currently provided or claimed to be provided by FCR.
+
+On April 19 2018, FCR's author, Daniel Muey, released version 0.41 to CPAN.
+This version included a patch submitted by Tom Hukins which corrected the
+problem addressed by FCR2.  FCR once again built and tested correctly on
+FreeBSD.  That meant that its 6000-plus reverse dependencies can once again be
+reached by F<cpan> and other installers.  That in turn means that we can
+conduct exhaustive BBC investigations on FreeBSD and other platforms.
+
+With that correction in FCR, the original rationale for FCR2 has been
+superseded.  I will continue to maintain the code and respond to bug reports,
+but am suspending active development.  I now deem FCR2 feature-complete.
 
 =head1 SUBROUTINES
 
@@ -364,15 +374,6 @@ sub _dircopy {
             }
             elsif ( -d $from ) {
                 my $rc;
-#                if ( !-w $from && $KeepMode ) {
-#                    local $KeepMode = 0;
-#                    carp "Copying readonly directory ($from); mode of its contents may not be preserved.";
-#                    $rc = $recurs->( $from, $to );
-#                    chmod scalar( ( stat($from) )[2] ), $to;
-#                }
-#                else {
-#                    $rc = $recurs->( $from, $to );
-#                }
                 $rc = $recurs->( $from, $to );
                 return unless $rc;
                 $filen++;
@@ -380,18 +381,15 @@ sub _dircopy {
             }
             else {
                 fcopy( $from, $to ) or return;
-#                chmod scalar( ( stat($from) )[2] ), $to if $KeepMode;
                 $filen++;
             }
         } # End 'for' loop around @entities
         $level--;
-#        chmod scalar( ( stat($str) )[2] ), $end if $KeepMode;
         1;
 
     }; # END definition of $recurs
 
     $recurs->( $_zero, $_one ) or return;
-#    return wantarray ? ( $filen, $dirn, $level ) : $filen;
     return $filen;
 }
 

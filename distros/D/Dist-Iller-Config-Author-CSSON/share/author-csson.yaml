@@ -39,14 +39,14 @@ prereqs:
 
   develop:
     requires:
-      - Dist::Zilla: 6.010
+      - Dist::Zilla: 6.012
       - Test::Warnings: 0.026
       - Test::NoTabs: 1.4
 
 plugins:
  - +plugin: Git::GatherDir
    +prereqs:
-    - develop_requires: Dist::Zilla::Plugin::Git 2.041
+    - develop_requires: Dist::Zilla::Plugin::Git 2.043
    exclude_filename:
    - META.json
    - LICENSE
@@ -56,6 +56,7 @@ plugins:
  - +plugin: PromptIfStale
    +version: 0.054
    check_all_plugins: 1
+   phase: build
 
  - +plugin: CopyFilesFromBuild
    +version: 0.170880

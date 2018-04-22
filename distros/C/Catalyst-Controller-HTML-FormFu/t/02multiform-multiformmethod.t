@@ -2,9 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-eval {
-    require HTML::FormFu::MultiForm;
-};
+eval { require HTML::FormFu::MultiForm; };
 if ($@) {
     plan skip_all => 'HTML::FormFu::MultiForm required for MultiForm tests';
     die $@;
@@ -58,7 +56,8 @@ $mech->post_ok(
     $uri,
     {   _multiform => $hidden_value,
         page2      => 'bar',
-    } );
+    }
+);
 
 # check final output
 

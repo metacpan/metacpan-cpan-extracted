@@ -1,4 +1,7 @@
 Revision history for Dancer2::Plugin::Map::Tube
 
+0.02  2018-04-22
+      - Added key 'provides' to the Makefile.PL script.
+
 0.01  2018-04-02
       - First draft released.

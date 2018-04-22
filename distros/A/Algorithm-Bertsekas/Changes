@@ -6,6 +6,10 @@ SYNOPSIS
 
 DESCRIPTION
 
+    Version 0.82 (Algorithm::Bertsekas-0.82 Released on 20th Abr 2018)
+		1. a variable $max_epsilon_scaling was entered to calculate the 
+		   total number of $epsilon_scaling iterations.
+		
     Version 0.81 (Algorithm::Bertsekas-0.81 Released on 19th Abr 2018)
 		1. Little changes and improvements.
 		

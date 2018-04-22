@@ -4,21 +4,21 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-BeLike-DAGOLDEN",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -40,10 +40,15 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Version" : "1"
          }
@@ -88,7 +93,6 @@
             "Email::Simple::Creator" : "0",
             "File::Find::Rule" : "0",
             "File::Find::Rule::Perl" : "0",
-            "File::Slurp" : "0",
             "File::pushd" : "0",
             "Getopt::Lucid" : "0",
             "Git::Wrapper" : "0",
@@ -168,7 +172,7 @@
    "provides" : {
       "Task::BeLike::DAGOLDEN" : {
          "file" : "lib/Task/BeLike/DAGOLDEN.pm",
-         "version" : "1.010"
+         "version" : "1.011"
       }
    },
    "release_status" : "stable",
@@ -183,7 +187,12 @@
          "web" : "https://github.com/dagolden/Task-BeLike-DAGOLDEN"
       }
    },
-   "version" : "1.010",
-   "x_authority" : "cpan:DAGOLDEN"
+   "version" : "1.011",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "David Golden <xdg@xdg.me>"
+   ],
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

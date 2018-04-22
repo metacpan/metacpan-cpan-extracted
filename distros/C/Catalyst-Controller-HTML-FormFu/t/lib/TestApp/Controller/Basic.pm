@@ -50,8 +50,7 @@ sub formconfig_FORM_RENDER {
     push @{ $c->stash->{message} }, 'render';
 }
 
-sub formconfig_conf_ext : Chained('basic') : Args(0) :
-    FormConfig('basic/formconfig_conf_ext') {
+sub formconfig_conf_ext : Chained('basic') : Args(0) : FormConfig('basic/formconfig_conf_ext') {
 }
 
 sub formmethod : Chained('basic') : Args(0) : FormMethod('_load_form') {

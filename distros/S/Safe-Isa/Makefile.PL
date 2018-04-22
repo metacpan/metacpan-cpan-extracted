@@ -11,12 +11,15 @@ my %WriteMakefileArgs = (
   META_MERGE => {
       'meta-spec' => { version => 2 },
       dynamic_config => 0,
-
       resources => {
+        # GitHub mirrors from Shadowcat. We list it so we can get pull requests.
+        # The canonical repo is:
+        # r/o: git://git.shadowcat.co.uk/p5sagit/Safe-Isa.git
         # r/w: p5sagit@git.shadowcat.co.uk:Safe-Isa.git
+        # web: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Safe-Isa.git
         repository => {
-          url => 'git://git.shadowcat.co.uk/p5sagit/Safe-Isa.git',
-          web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Safe-Isa.git',
+          url => 'https://github.com/p5sagit/Safe-Isa.git',
+          web => 'https://github.com/p5sagit/Safe-Isa',
           type => 'git',
         },
         bugtracker => {
@@ -24,6 +27,12 @@ my %WriteMakefileArgs = (
             web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Safe-Isa',
         },
       },
+      x_contributors => [ # manually added, from git shortlog -e -s -n
+        'Karen Etheridge <ether@cpan.org>',
+        'Matt S Trout <mst@shadowcat.co.uk>',
+        'Graham Knop <haarg@haarg.org>',
+        'David Steinbrunner <dsteinbrunner@pobox.com>',
+      ],
   },
 
   META_ADD => {

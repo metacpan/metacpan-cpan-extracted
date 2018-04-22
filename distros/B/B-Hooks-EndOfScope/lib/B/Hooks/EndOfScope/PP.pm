@@ -4,7 +4,7 @@ package B::Hooks::EndOfScope::PP;
 use warnings;
 use strict;
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
 use constant _PERL_VERSION => "$]";
 
@@ -58,7 +58,7 @@ B::Hooks::EndOfScope::PP - Execute code after a scope finished compilation - PP 
 
 =head1 VERSION
 
-version 0.21
+version 0.24
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Peter Rabbitson <ribasushi@cpan.org>
+Peter Rabbitson <ribasushi@leporine.io>
 
 =back
 

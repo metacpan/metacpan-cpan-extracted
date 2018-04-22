@@ -1,3 +1,6 @@
+4.001     2018-04-21 19:29:24 EDT
+  - Implement EXPERIMENTAL history method used for Minion Admin plugin history graph.
+
 4.000     2018-04-16 14:58:35 EDT
   - Minion requirement bumped to 9.0.
   - Replace queue, state, and task options of list_jobs method with queues,

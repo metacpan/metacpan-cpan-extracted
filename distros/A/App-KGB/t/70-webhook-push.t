@@ -38,9 +38,15 @@ use Cwd;
 my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
-my $webhook_url = sprintf( 'http://%s:%d/webhook/?%s',
-    $test_bot->addr, $test_bot->port,
-    join( '&', 'channel=test', 'network=local', 'shorten_urls=0' ) );
+my $webhook_url = sprintf(
+    'http://%s:%d/webhook/?%s',
+    $test_bot->addr,
+    $test_bot->port,
+    join( '&',
+        'channel=test',   'network=local',
+        'shorten_urls=0', 'only_branch=master',
+        "only_branch=old_branch" )
+);
 
 sub webhook_post {
     my $response = $ua->post(
@@ -119,6 +125,40 @@ TestBot->expect(
         '04.',
         '* branch deleted' )
 );
+
+# a push outside the designated branch
+
+$resp = webhook_post(
+    {   object_kind   => 'push',
+        ref           => 'refs/heads/random-branch',
+        user_name     => 'Test User',
+        user_username => 'ser',
+        project       => { name => 'test-repo', },
+        before        => '284ffdd4c525547f6ae848d768fff92ff9a89743',
+        after         => '2189572634934075403487349534879534875349',
+        commits       => [
+            {   id      => 'b9b55876e288bba29d1579d308eea5758bc148ef',
+                message => "Commit three files (add, mod, rm)",
+                url => "http://git/b9b55876e288bba29d1579d308eea5758bc148ef",
+                author => { name => 'Test User', },
+                added    => [ 'file-one' ],
+                modified => [ 'mod-one' ],
+                removed  => [ 'rm-one' ],
+            },
+            {   id      => '284ffdd4c525547f6ae848d768fff92ff9a89743',
+                message => "Commit six files (2×(add, mod, rm))\n\nThese were all needed",
+                url => "http://git/284ffdd4c525547f6ae848d768fff92ff9a89743",
+                author => { name => 'Test User', },
+                added    => [ 'file-one', 'file-two.txt' ],
+                modified => [ 'mod-one',  'mod-two.txt' ],
+                removed  => [ 'rm-one',   'rm-two.txt' ],
+            },
+        ],
+    }
+);
+
+is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
+
 diag `cat t/bot/kgb-bot.log`;
 
 my $output = $test_bot->get_output;

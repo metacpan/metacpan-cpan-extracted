@@ -52,6 +52,10 @@ sub filter {
 
 __END__
 
+=head1 DEPRECATED
+
+This module and distribution have now been deprecated.
+
 =head1 SYNOPSIS
 
  package MyModel::Tweet;

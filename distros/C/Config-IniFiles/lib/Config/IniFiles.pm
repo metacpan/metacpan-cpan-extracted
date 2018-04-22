@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '2.96';
+our $VERSION = '2.98';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -153,6 +153,10 @@ sub new
     {
         $self->{handle_trailing_comment} = $v ? 1 : 0;
     }
+    if ( defined( $v = delete $parms{'-php_compat'} ) )
+    {
+        $self->{php_compat} = $v ? 1 : 0;
+    }
 
     $self->{comment_char} = '#' unless exists $self->{comment_char};
     $self->{allowed_comment_char} = ';'
@@ -187,14 +191,33 @@ sub _caseify
 {
     my ( $self, @refs ) = @_;
 
-    if ( not $self->_nocase )
+    if ( $self->_nocase )
     {
-        return;
+        foreach my $ref (grep { defined } @refs[0..1])
+        {
+            ${$ref} = lc( ${$ref} );
+        }
     }
 
-    foreach my $ref (@refs)
+    if ( $self->{php_compat} )
     {
-        ${$ref} = lc( ${$ref} );
+        foreach my $ref (grep { defined } @refs[1..1])
+        {
+            ${$ref} =~ s{\[\]$}{};
+        }
+        foreach my $ref (grep { defined } @refs[2..$#refs])
+        {
+            if (length(${$ref}) >= 2)
+            {
+                my $quote = substr(${$ref}, 0, 1);
+                if (($quote eq q{"} or $quote eq q{'}) and substr(${$ref}, -1, 1) eq $quote)
+                {
+                    ${$ref} = substr(${$ref}, 1, -1);
+                    ${$ref} =~ s{$quote$quote}{}g;
+                    ${$ref} =~ s{\\$quote}{$quote}g if $quote eq q{"};
+                }
+            }
+        }
     }
 
     return;
@@ -626,7 +649,7 @@ sub _ReadConfig_new_section
 {
     my ( $self, $sect ) = @_;
 
-    $self->_caseify( \$sect );
+    $self->_caseify( undef, \$sect );
 
     $self->_curr_sect($sect);
     $self->AddSection( $self->_curr_sect );
@@ -778,15 +801,17 @@ sub _ReadConfig_param_assignment
 {
     my ( $self, $fh, $line, $parm, $value_to_assign ) = @_;
 
+    $self->_caseify( undef, \$parm, \$value_to_assign );
+
     $self->_curr_val($value_to_assign);
     $self->_curr_end_comment( undef() );
 
     if ( !defined( $self->_test_for_fallback_or_no_sect($fh) ) )
     {
+
         return $RET_BREAK;
     }
 
-    $self->_caseify( \$parm );
     $self->_curr_parm($parm);
 
     my @val = ();
@@ -2356,7 +2381,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 2.96
+version 2.98
 
 =head1 SYNOPSIS
 
@@ -2370,6 +2395,10 @@ version 2.96
 Config::IniFiles provides a way to have readable configuration files outside
 your Perl script. Configurations can be imported (inherited, stacked,...),
 sections can be grouped, and settings can be accessed from a tied hash.
+
+=head1 VERSION
+
+version 2.98
 
 =head1 FILE FORMAT
 
@@ -2670,6 +2699,34 @@ I<param1>.
 
 Set and get methods for trailing comments are provided as
 L</SetParameterTrailingComment> and L</GetParameterTrailingComment>.
+
+=item I<-php_compat> 0|1
+
+Set -php_compat => 1 to enable support for PHP like configfiles.
+
+The differences between parse_ini_file and Config::IniFiles are:
+
+ # parse_ini_file
+ [group]
+ val1="value"
+ val2[]=1
+ val2[]=2
+
+ vs
+
+ # Config::IniFiles
+ [group]
+ val1=value
+ val2=1
+ val2=2
+
+This option only affect parsing, not writing new configfiles.
+
+Some features from parse_ini_file are not compatible:
+
+ [group]
+ val1="val"'ue'
+ val1[key]=1
 
 =back
 
@@ -3285,8 +3342,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-IniFiles> or by email to
-L<bug-config-inifiles@rt.cpan.org|mailto:bug-config-inifiles@rt.cpan.org>.
+L<https://github.com/shlomif/Config-IniFiles/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -3395,8 +3451,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/perl-Config-IniFiles>
+L<https://github.com/shlomif/Config-IniFiles>
 
-  git clone ssh://git@github.com:shlomif/perl-Config-IniFiles.git
+  git clone git://github.com/shlomif/Config-IniFiles.git
 
 =cut

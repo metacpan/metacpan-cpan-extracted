@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "List::MoreUtils" => 0,
     "List::Util" => 0,
     "Module::Runtime" => 0,
-    "Moo" => 0,
+    "Moo" => "2.002002",
     "MooX::HandlesVia" => 0,
     "Number::Range" => 0,
     "Path::Class" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Type::Tiny" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "0.54",
+  "VERSION" => "0.56",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "List::MoreUtils" => 0,
   "List::Util" => 0,
   "Module::Runtime" => 0,
-  "Moo" => 0,
+  "Moo" => "2.002002",
   "MooX::HandlesVia" => 0,
   "Number::Range" => 0,
   "Path::Class" => 0,

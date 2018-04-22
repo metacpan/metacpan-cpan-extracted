@@ -11,7 +11,7 @@ use Scalar::Util;
 use Scope::Guard;
 use Storable;
 
-our $VERSION = '2.85';
+our $VERSION = '2.86';
 
 XSLoader::load 'autobox', $VERSION;
 

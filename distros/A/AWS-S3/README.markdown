@@ -168,9 +168,10 @@ Returns the [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket) object m
 
 Returns nothing otherwise.
 
-## add\_bucket( name => $name )
+## add\_bucket( name => $name, location => 'us-west-1' )
 
-Attempts to create a new bucket with the name provided.
+Attempts to create a new bucket with the name provided. The location parameter is optional
+and, as per the AWS docs, will default to "us-east-1".
 
 On success, returns the new [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket)
 
@@ -193,7 +194,7 @@ See [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket) for details on h
 # AUTHOR
 
 Originally John Drago `jdrago_999@yahoo.com`, currently maintained by Lee Johnson (LEEJO) `leejo@cpan.org`
-with contributions from Evan Carroll, Robin Clarke, Ulrich Kautz, simbabque
+with contributions from Evan Carroll, Robin Clarke, Ulrich Kautz, simbabque, Dave Rolsky
 
 # LICENSE
 

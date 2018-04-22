@@ -11,7 +11,7 @@ has 'aat'         => ( is => 'rw', isa => 'Apache::AuthTkt', required => 1, );
 has 'config'      => ( is => 'rw', isa => 'HashRef', required => 1, );
 has 'debug'       => ( is => 'rw', isa => 'Int', );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 NAME
 
@@ -257,7 +257,7 @@ sub renew_ticket {
         }
         my $new_ticket = $authtkt->ticket(
             uid     => $ticket->{uid},
-            ip_addr => $c->request->address,
+            ip_addr => $self->config->{use_req_address} || $c->request->address,
             data    => $ticket->{data},
             tokens  => $ticket->{tokens},
         );

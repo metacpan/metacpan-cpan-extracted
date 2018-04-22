@@ -1,0 +1,10 @@
+Revision history for Web::Microformats2
+
+0.02 2018-04-20T19:59:48Z
+
+    - Changing the public method used for returning a item's types. (New, flexible "all_types" method, removing blunt "types" from POD.)
+
+0.01 2018-04-18T01:23:53Z
+
+    - original version
+

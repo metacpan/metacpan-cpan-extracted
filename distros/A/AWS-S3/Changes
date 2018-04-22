@@ -1,6 +1,10 @@
 
 Changelog for perl module AWS::S3
 
+0.15 2018-04-20
+  - More fixes for ->add_bucket. Fix an error when no location is provided or
+    us-east-1 is explicitly asked for. Patch by Dave Rolsky. (GH #9)
+
 0.14 2018-04-13
   - Fix sending of undefined location param in ->add_bucket (GH #9)
 

@@ -8,7 +8,7 @@ YAML::Dump - Dump stuff, (simplified) YAML style
 
 =head1 VERSION
 
-This document describes YAML::Dump version 1.82.
+This document describes YAML::Dump version 1.84.
 
 =begin html
 
@@ -114,7 +114,7 @@ switched to L<JSON::PP::Boolean>).
 
 =head2 Unsupported References
 
-When a reference that is neither a hash or an array reference is found,
+When a reference that is neither a hash nor an array reference is found,
 method L</dumper_for_objects> is called. This method first tries to figure
 out if the reference is one of the allowed L</Booleans> representations,
 then hands over to a method L</dumper_for_unknown> (if the class has one),

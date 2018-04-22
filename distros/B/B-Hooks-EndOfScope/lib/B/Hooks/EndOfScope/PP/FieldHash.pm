@@ -7,7 +7,7 @@ package # hide from pause
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
 use Tie::Hash ();
 use Hash::Util::FieldHash 'fieldhash';
@@ -39,7 +39,7 @@ sub on_scope_end (&) {
   tie(%hh, 'B::Hooks::EndOfScope::PP::_TieHintHashFieldHash')
     unless tied %hh;
 
-  push @{ $hh{\%^H} ||= [] }, shift;
+  push @{ $hh{\%^H} ||= [] }, $_[0];
 }
 
 1;

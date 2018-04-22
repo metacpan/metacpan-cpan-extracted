@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Map::Tube.
 
+0.42  Fri Apr 20 16:55:00 2018
+      - Updated dependency on Map::Tube v3.49.
+
 0.41  Fri Apr 06 02:30:00 2018
       - Updated dependency on Map::Tube v3.48.
       - Added unit test for method get_next_stations().

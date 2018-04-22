@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Map::Tube::Error;
 
-$Dancer2::Plugin::Map::Tube::Error::VERSION   = '0.01';
+$Dancer2::Plugin::Map::Tube::Error::VERSION   = '0.02';
 $Dancer2::Plugin::Map::Tube::Error::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Map::Tube::Error - Error codes for Map::Tube API.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

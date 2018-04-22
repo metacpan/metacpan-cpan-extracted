@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use File::Copy::Recursive qw(pathempty pathrm pathrmdir);
 
@@ -103,7 +103,7 @@ sub _test {
             chdir "$func/cwd" || die "could not toggle dir/symlink (back into $func/cwd): $!\n";
         };
 
-        throws_ok { no strict "refs"; $func->("foo/bar/baz") }
+        like exception { no strict "refs"; $func->("foo/bar/baz") },
         qr/directory .* changed: expected dev=.* ino=.*, actual dev=.* ino=.*, aborting/,
           "$func() detected symlink toggle: $label";
 

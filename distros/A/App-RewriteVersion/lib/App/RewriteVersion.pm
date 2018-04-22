@@ -16,7 +16,7 @@ use Class::Tiny::Chained {
 	verbose => 0,
 };
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 sub bump_version {
 	my ($self, $version, $bump) = @_;
@@ -62,7 +62,7 @@ sub rewrite_version {
 	my $code = qq{our \$VERSION = '$version';};
 	$code .= " # TRIAL" if $is_trial;
 	
-	$code .= qq{\n\$VERSION = eval \$VERSION;}
+	$code .= qq{\n\$VERSION =~ tr/_//d;}
 		if $version =~ m/_/ and scalar($version =~ m/\./g) <= 1;
 	
 	my $assign_regex = _assign_re();
@@ -207,6 +207,8 @@ sub _assign_re {
         (['"])($LAX_DECIMAL_VERSION | $LAX_DOTTED_DECIMAL_VERSION)\1 \s* ;
         (?:\s* \# \s TRIAL)? [^\n]*
         (?:\n \$VERSION \s = \s eval \s \$VERSION;)?
+        (?:\n \$VERSION \s =~ \s tr/_//d;)?
+        (?:\n \$VERSION \s =~ \s s/_//g?;)?
     }x;
 }
 

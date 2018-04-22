@@ -20,7 +20,7 @@ use namespace::autoclean;
 
 use File::ShareDir qw( dist_file );
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 #<<<
 ### :start CLDRVersion:
@@ -1515,7 +1515,6 @@ our %Names = (
 #<<<
 ### :start NativeNames:
 our %NativeNames = (
-  "" => "nds",
   Afrikaans => "af",
   "Afrikaans Namibi\N{U+00eb}" => "af-NA",
   "Afrikaans Suid-Afrika" => "af-ZA",
@@ -5902,7 +5901,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =head1 DESCRIPTION
 

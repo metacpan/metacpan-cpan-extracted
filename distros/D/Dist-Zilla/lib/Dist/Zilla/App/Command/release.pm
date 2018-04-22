@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::release 6.011;
+package Dist::Zilla::App::Command::release 6.012;
 # ABSTRACT: release your dist to the CPAN
 
 use Dist::Zilla::App -command;
@@ -52,7 +52,7 @@ Dist::Zilla::App::Command::release - release your dist to the CPAN
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 SYNOPSIS
 

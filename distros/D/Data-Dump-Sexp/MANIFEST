@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 README
 t/Data-Dump-Sexp.t
+t/Opaque.pm
 lib/Data/Dump/Sexp.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

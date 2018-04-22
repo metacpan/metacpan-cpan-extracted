@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::Util 6.011;
+package Dist::Zilla::Util 6.012;
 # ABSTRACT: random snippets of code that Dist::Zilla wants
 
 use Carp ();
@@ -97,6 +97,7 @@ use String::RewritePrefix 0.006 rewrite => {
     ''  => 'Dist::Zilla::Plugin::',
   },
 };
+
 sub expand_config_package_name {
   shift; goto &_expand_config_package_name
 }
@@ -145,7 +146,7 @@ Dist::Zilla::Util - random snippets of code that Dist::Zilla wants
 
 =head1 VERSION
 
-version 6.011
+version 6.012
 
 =head1 METHODS
 

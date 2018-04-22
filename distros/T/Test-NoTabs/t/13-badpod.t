@@ -6,8 +6,6 @@ use Test::More qw(no_plan);
 use File::Temp qw( tempdir tempfile );
 
 my $perl  = $^X || 'perl';
-my $inc = join(' -I ', map { qq{"$_"} } @INC) || '';
-$inc = "-I $inc" if $inc;
 
 # Test to check that bad Pod doesn't break subsequent files. Here the test is that
 # both files should be detected as containing tabs, when tested one after the
@@ -18,7 +16,7 @@ $inc = "-I $inc" if $inc;
     make_bad_pod_file($dir);
     make_bad_tab_file($dir);
     my (undef, $outfile) = tempfile();
-    ok( `$perl $inc -MTest::NoTabs -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile` );
+    ok( `$perl -MTest::NoTabs -e "all_perl_files_ok( '$dir' )" 2>&1 > $outfile` );
     local $/ = undef;
     open my $fh, '<', $outfile or die $!;
     my $content = <$fh>;

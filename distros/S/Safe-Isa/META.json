@@ -4,7 +4,7 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3103, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3501, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,10 +46,16 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://git.shadowcat.co.uk/p5sagit/Safe-Isa.git",
-         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Safe-Isa.git"
+         "url" : "https://github.com/p5sagit/Safe-Isa.git",
+         "web" : "https://github.com/p5sagit/Safe-Isa"
       }
    },
-   "version" : "1.000008",
-   "x_serialization_backend" : "JSON::MaybeXS version 1.003009"
+   "version" : "1.000009",
+   "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>",
+      "Matt S Trout <mst@shadowcat.co.uk>",
+      "Graham Knop <haarg@haarg.org>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>"
+   ],
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004"
 }

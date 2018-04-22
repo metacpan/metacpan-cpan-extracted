@@ -1,5 +1,20 @@
 Revision history for Config::AWS
 
+0.04      2018-04-21 17:04:18+01:00 Europe/London
+
+  Fixes:
+    * Test requires File::ShareDir::Install 0.10 or greater.
+  Changes:
+    * Import tests are more reasonable and useful.
+
+0.03      2018-04-21 00:56:35+01:00 Europe/London
+
+  Fixes:
+    * Changed a faulty import from File::Glob which caused
+      issues with installations in Perl <5.16
+    * Removed a mistaken dependency on Log::Any::Adapter
+      and added a missing development dependency on Test::Pod
+
 0.02      2018-04-16 22:07:31+01:00 Europe/London
 
   Changes:

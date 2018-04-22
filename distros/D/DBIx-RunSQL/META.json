@@ -34,7 +34,7 @@
          "web" : "https://github.com/Corion/dbix--runsql"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 2.27202",
    "x_static_install" : 1
 }

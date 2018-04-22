@@ -25,11 +25,8 @@ if ($INC{"App/FatPacker/Trace.pm"}) {
     require version::vpp;
 }
 
-sub agent {
-    my $self = shift;
-    my $agent = "cpanminus/$VERSION";
-    $agent .= " perl/$]" if $self->{report_perl_version};
-    $agent;
+sub qs($) {
+    Menlo::Util::shell_quote($_[0]);
 }
 
 sub determine_home {
@@ -51,6 +48,7 @@ sub new {
     my $class = shift;
 
     my $self = bless {
+        name => "Menlo",
         home => $class->determine_home,
         cmd  => 'install',
         seen => {},
@@ -102,9 +100,9 @@ sub new {
         features => {},
         pure_perl => 0,
         cpanfile_path => 'cpanfile',
+        @_,
     }, $class;
 
-    $self->parse_options(@_);
     $self;
 }
 
@@ -414,7 +412,7 @@ sub setup_home {
         }
     }
 
-    $self->chat("cpanm (Menlo) $VERSION on perl $] built for $Config{archname}\n" .
+    $self->chat("cpanm ($self->{name}) $VERSION on perl $] built for $Config{archname}\n" .
                 "Work directory is $self->{base}\n");
 }
 
@@ -574,7 +572,7 @@ sub load_argv_from_fh {
 sub show_version {
     my $self = shift;
 
-    print "cpanm (Menlo) version $VERSION ($0)\n";
+    print "cpanm ($self->{name}) version $VERSION ($0)\n";
     print "perl version $] ($^X)\n\n";
 
     print "  \%Config:\n";
@@ -1136,8 +1134,11 @@ sub show_build_log {
     }
 
     if ($pager) {
-        # win32 'more' doesn't allow "more build.log", the < is required
-        system("$pager < $self->{log}");
+        if (WIN32) {
+            system "@{[ qs $pager ]} < @{[ qs $self->{log}]}";
+        } else {
+            system $pager, $self->{log};
+        }
     }
     else {
         $self->diag_fail("You don't seem to have a PAGER :/");
@@ -1168,7 +1169,7 @@ sub self_upgrade {
 }
 
 sub install_module {
-    my($self, $module, $depth, $version) = @_;
+    my($self, $module, $depth, $version, $dep) = @_;
 
     $self->check_libs;
 
@@ -1186,7 +1187,7 @@ sub install_module {
         }
     }
 
-    my $dist = $self->resolve_name($module, $version);
+    my $dist = $self->resolve_name($module, $version, $dep);
     unless ($dist) {
         my $what = $module . ($version ? " ($version)" : "");
         $self->diag_fail("Couldn't find module or a distribution $what", 1);
@@ -1565,7 +1566,7 @@ sub verify_signature {
     my($self, $dist) = @_;
 
     $self->diag_progress("Verifying the SIGNATURE file");
-    my $out = `$self->{cpansign} -v --skip 2>&1`;
+    my $out = `@{[ qs $self->{cpansign} ]} -v --skip 2>&1`;
     $self->log($out);
 
     if ($out =~ /Signature verified OK/) {
@@ -1578,7 +1579,19 @@ sub verify_signature {
 }
 
 sub resolve_name {
-    my($self, $module, $version) = @_;
+    my($self, $module, $version, $dep) = @_;
+
+    if ($dep && $dep->url) {
+        if ($dep->url =~ m!authors/id/(.*)!) {
+            return $self->cpan_dist($1, $dep->url);
+        } else {
+            return { uris => [ $dep->url ] };
+        }
+    }
+
+    if ($dep && $dep->dist) {
+        return $self->cpan_dist($dep->dist, undef, $dep->mirror);
+    }
 
     # Git
     if ($module =~ /(?:^git:|\.git(?:@.+)?$)/) {
@@ -1651,7 +1664,10 @@ sub cpan_module {
 }
 
 sub cpan_dist {
-    my($self, $dist, $url) = @_;
+    my($self, $dist, $url, $mirror) = @_;
+
+    # strip trailing slash
+    $mirror =~ s!/$!! if $mirror;
 
     $dist =~ s!^([A-Z]{2})!substr($1,0,1)."/".substr($1,0,2)."/".$1!e;
 
@@ -1664,7 +1680,7 @@ sub cpan_dist {
         my $id = $d->cpanid;
         my $fn = substr($id, 0, 1) . "/" . substr($id, 0, 2) . "/" . $id . "/" . $d->filename;
 
-        my @mirrors = @{$self->{mirrors}};
+        my @mirrors = $mirror ? ($mirror) : @{$self->{mirrors}};
         my @urls    = map "$_/authors/id/$fn", @mirrors;
 
         $url = \@urls,
@@ -1863,7 +1879,7 @@ sub install_deps {
     }
 
     for my $dep (@install) {
-        $self->install_module($dep->module, $depth + 1, $dep->version);
+        $self->install_module($dep->module, $depth + 1, $dep->version, $dep);
     }
 
     $self->chdir($self->{base});
@@ -1929,6 +1945,10 @@ sub build_stuff {
     }
 
     $dist->{meta} = $dist->{cpanmeta} ? $dist->{cpanmeta}->as_struct : {};
+
+    if ($self->opts_in_static_install($dist->{cpanmeta})) {
+        $dist->{static_install} = 1;
+    }
 
     my @config_deps;
 
@@ -2086,15 +2106,15 @@ sub opts_in_static_install {
     # uninstall-shadows (default on < 5.12) is not supported in BuildPL spec, yet.
 
     return $meta->{x_static_install} &&
-           !($self->{sudo} or $self->{uninstall_shadows});
+      $meta->{x_static_install} == 1 &&
+      !($self->{sudo} or $self->{uninstall_shadows});
 }
-
 
 sub skip_configure {
     my($self, $dist, $depth) = @_;
 
     return 1 if $self->{skip_configure};
-    return 1 if $self->opts_in_static_install($dist->{meta});
+    return 1 if $dist->{static_install};
     return 1 if $self->no_dynamic_config($dist->{meta}) && $self->deps_only($depth);
 
     return;
@@ -2133,6 +2153,9 @@ sub configure_this {
         require Module::CPANfile;
         $dist->{cpanfile} = eval { Module::CPANfile->load($self->{cpanfile_path}) };
         $self->diag_fail($@, 1) if $@;
+
+        $self->{cpanfile_global} ||= $dist->{cpanfile};
+
         return {
             configured       => 1,
             configured_ok    => !!$dist->{cpanfile},
@@ -2161,7 +2184,7 @@ sub configure_this {
     my $state = {};
 
     my $try_static = sub {
-        if ($self->opts_in_static_install($dist->{meta})) {
+        if ($dist->{static_install}) {
             $self->chat("Distribution opts in x_static_install: $dist->{meta}{x_static_install}\n");
             $self->static_install_configure($state, $dist, $depth);
         }
@@ -2217,7 +2240,7 @@ sub static_install_configure {
     my $args = $depth == 0 ? $self->{build_args}{configure} : [];
 
     require Menlo::Builder::Static;
-    my $builder = Menlo::Builder::Static->new;
+    my $builder = Menlo::Builder::Static->new(meta => $dist->{cpanmeta});
     $self->configure(sub { $builder->configure($args || []) }, $depth);
 
     $state->{configured_ok} = 1;
@@ -2410,6 +2433,17 @@ sub merge_with_cpanfile {
             $dep->merge_with($self->{cpanfile_requirements});
         }
     }
+
+    if ($self->{cpanfile_global}) {
+        for my $dep (@$deps) {
+            my $opts = $self->{cpanfile_global}->options_for_module($dep->module)
+              or next;
+
+            $dep->dist($opts->{dist})     if $opts->{dist};
+            $dep->mirror($opts->{mirror}) if $opts->{mirror};
+            $dep->url($opts->{url})       if $opts->{url};
+        }
+    }
 }
 
 sub extract_meta_prereqs {
@@ -2496,28 +2530,34 @@ sub extract_prereqs {
     my($self, $meta, $dist) = @_;
 
     my @features = $self->configure_features($dist, $meta->features);
-    my $prereqs  = $self->soften_makemaker_prereqs($meta->effective_prereqs(\@features)->clone);
+
+    my $prereqs = $meta->effective_prereqs(\@features)->clone;
+    $self->adjust_prereqs($dist, $prereqs);
 
     return Menlo::Dependency->from_prereqs($prereqs, $dist->{want_phases}, $self->{install_types});
 }
 
-# Workaround for Module::Install 1.04 creating a bogus (higher) MakeMaker requirement that it needs in build_requires
-# Assuming MakeMaker requirement is already satisfied in configure_requires, there's no need to have higher version of
-# MakeMaker in build/test anyway. https://github.com/miyagawa/cpanminus/issues/463
-sub soften_makemaker_prereqs {
-    my($self, $prereqs) = @_;
+sub adjust_prereqs {
+    my($self, $dist, $prereqs) = @_;
 
-    return $prereqs unless -e "inc/Module/Install.pm";
-
-    for my $phase (qw( build test runtime )) {
-        my $reqs = $prereqs->requirements_for($phase, 'requires');
-        if ($reqs->requirements_for_module('ExtUtils::MakeMaker')) {
-            $reqs->clear_requirement('ExtUtils::MakeMaker');
-            $reqs->add_minimum('ExtUtils::MakeMaker' => 0);
+    # Workaround for Module::Install 1.04 creating a bogus (higher) MakeMaker requirement that it needs in build_requires
+    # Assuming MakeMaker requirement is already satisfied in configure_requires, there's no need to have higher version of
+    # MakeMaker in build/test anyway. https://github.com/miyagawa/cpanminus/issues/463
+    if (-e "inc/Module/Install.pm") {
+        for my $phase (qw( build test runtime )) {
+            my $reqs = $prereqs->requirements_for($phase, 'requires');
+            if ($reqs->requirements_for_module('ExtUtils::MakeMaker')) {
+                $reqs->clear_requirement('ExtUtils::MakeMaker');
+                $reqs->add_minimum('ExtUtils::MakeMaker' => 0);
+            }
         }
     }
 
-    $prereqs;
+    # Static installation is optional and we're adding runtime dependencies
+    if ($dist->{static_install}) {
+        my $reqs = $prereqs->requirements_for('test' => 'requires');
+        $reqs->add_minimum('TAP::Harness::Env' => 0);
+    }
 }
 
 sub cleanup_workdirs {
@@ -2699,7 +2739,7 @@ sub init_tools {
 
     my $tar = which('tar');
     my $tar_ver;
-    my $maybe_bad_tar = sub { WIN32 || BAD_TAR || (($tar_ver = `$tar --version 2>/dev/null`) =~ /GNU.*1\.13/i) };
+    my $maybe_bad_tar = sub { WIN32 || BAD_TAR || (($tar_ver = `@{[ qs $tar ]} --version 2>/dev/null`) =~ /GNU.*1\.13/i) };
 
     if ($tar && !$maybe_bad_tar->()) {
         chomp $tar_ver;
@@ -2710,7 +2750,7 @@ sub init_tools {
             my $xf = ($self->{verbose} ? 'v' : '')."xf";
             my $ar = $tarfile =~ /bz2$/ ? 'j' : 'z';
 
-            my($root, @others) = `$tar ${ar}tf $tarfile`
+            my($root, @others) = `@{[ qs $tar ]} ${ar}tf @{[ qs $tarfile ]}`
                 or return undef;
 
             FILE: {
@@ -2725,7 +2765,7 @@ sub init_tools {
                 }
             }
 
-            system "$tar $ar$xf $tarfile";
+            $self->run_command([ $tar, $ar.$xf, $tarfile ]);
             return $root if -d $root;
 
             $self->diag_fail("Bad archive: $tarfile");
@@ -2741,7 +2781,7 @@ sub init_tools {
             my $x  = "x" . ($self->{verbose} ? 'v' : '') . "f -";
             my $ar = $tarfile =~ /bz2$/ ? $bzip2 : $gzip;
 
-            my($root, @others) = `$ar -dc $tarfile | $tar tf -`
+            my($root, @others) = `@{[ qs $ar ]} -dc @{[ qs $tarfile ]} | @{[ qs $tar ]} tf -`
                 or return undef;
 
             FILE: {
@@ -2756,7 +2796,7 @@ sub init_tools {
                 }
             }
 
-            system "$ar -dc $tarfile | $tar $x";
+            system "@{[ qs $ar ]} -dc @{[ qs $tarfile ]} | @{[ qs $tar ]} $x";
             return $root if -d $root;
 
             $self->diag_fail("Bad archive: $tarfile");
@@ -2792,8 +2832,8 @@ sub init_tools {
         $self->{_backends}{unzip} = sub {
             my($self, $zipfile) = @_;
 
-            my $opt = $self->{verbose} ? '' : '-q';
-            my(undef, $root, @others) = `$unzip -t $zipfile`
+            my @opt = $self->{verbose} ? () : ('-q');
+            my(undef, $root, @others) = `@{[ qs $unzip ]} -t @{[ qs $zipfile ]}`
                 or return undef;
             FILE: {
                 chomp $root;
@@ -2803,7 +2843,7 @@ sub init_tools {
                 }
             }
 
-            system "$unzip $opt $zipfile";
+            $self->run_command([ $unzip, @opt, $zipfile ]);
             return $root if -d $root;
 
             $self->diag_fail("Bad archive: '$root' $zipfile");

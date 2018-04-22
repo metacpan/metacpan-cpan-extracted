@@ -8,8 +8,9 @@ BEGIN {
 	$^W = 1;	
 }
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 use DateTime::Tiny;
+use utf8;
 
 
 
@@ -113,4 +114,11 @@ SCOPE: {
 		DateTime::Tiny->from_string( $tiny->as_string ),
 		$tiny, '->from_string ok',
 	);
+}
+
+SCOPE: {
+    eval { DateTime::Tiny->from_string('୭୮୯௦-௧௨-௩௪T௫௬:௭௮:௯౦') };
+    my $error = $@;
+    like $error, qr/\QInvalid time format (does not match ISO 8601)/,
+      'Only ASCII digits are valid in datetime strings';
 }

@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 keywords:
   - git
   - wrapper
@@ -44,8 +44,10 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Repository
   repository: https://github.com/book/Git-Repository.git
-version: '1.321'
+version: '1.322'
 x_contributors:
+  - 'H.Merijn Brand <hmbrand@cpan.org>'
+  - 'Jan Pazdziora <janpaz@cpan.org>'
   - 'Ron Savage <rsavage@cpan.org>'
   - 'Samit Badle <Samit.Badle@gmail.com>'
   - 'Lisa Hansen <Lisa.Hansen@sas.com>'
@@ -70,4 +72,4 @@ x_contributors:
   - 'Anton Berezin <gruber@cpan.org>'
   - 'Alessandro Ghedini <alexbio@cpan.org>'
   - 'Gustavo Leite de Mendonça Chaves <gnustavo@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

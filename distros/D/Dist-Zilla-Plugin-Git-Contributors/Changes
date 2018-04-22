@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-Git-Contributors
 
+0.034     2018-04-22 08:59:29Z
+          - also handle $zilla->authors possibly returning a list (as in
+            Dist::Zilla v7)
+
+0.033     2018-04-22 08:48:13Z
+          - 'paths' as reported in config metadata is now once again the exact
+            string passed to zilla, rather than normalized paths (fixes issues
+            in upcoming Dist::Zilla v7)
+
 0.032     2017-12-06 01:30:30Z
           - fix tests to work on git before 2.0.0, where gpgsign is not
             implemented

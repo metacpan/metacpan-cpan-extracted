@@ -26,6 +26,7 @@
          "requires" : {
             "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::Make" : "0.99",
             "ExtUtils::MakeMaker" : "6.52",
             "File::chdir" : "0",
             "perl" : "5.006"
@@ -39,6 +40,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0",
+            "Alien::gmake" : "0",
             "base" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -56,7 +58,7 @@
    "provides" : {
       "Alien::premake5" : {
          "file" : "lib/Alien/premake5.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -71,7 +73,7 @@
          "web" : "https://github.com/jjatria/Alien-premake5"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
       "requires" : {

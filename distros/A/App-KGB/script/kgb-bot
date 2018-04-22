@@ -1534,7 +1534,7 @@ C<gitlab_webhook_*> event, asynchronously.
 =cut
 
 my @array_webhook_params =
-    qw( channel pipeline_only_status always_squash_branch );
+    qw( channel pipeline_only_status always_squash_branch only_branch );
 my %array_webhook_params = map( ( $_ => 1 ), @array_webhook_params );
 
 sub webhook_request {
@@ -1881,6 +1881,10 @@ sub gitlab_webhook_push {
     my $branch = $body->{ref};
     $branch =~ s{^refs/heads/}{};
 
+    return
+        if @{ $opts->{only_branch} }
+        and not grep { $_ eq $branch } @{ $opts->{only_branch} };
+
     my $rev_prefix = $opts->{rev_prefix} // '';
 
     if ( $body->{after} =~ /^0+$/ ) {
@@ -1985,7 +1989,8 @@ sub gitlab_webhook_push {
             if $body->{user_name}
             and $body->{user_email}
             and $commit->{author}{email}
-            and $body->{user_email} ne $commit->{author}{email};
+            and $body->{user_email} ne $commit->{author}{email}
+            and $body->{user_name} ne $commit->{author}{name};
 
         my @changes;
         push @changes,

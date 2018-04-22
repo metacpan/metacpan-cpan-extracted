@@ -1,31 +1,29 @@
 {
-package 
-  main;
+    package main;
 
-use strict;
-use warnings;
+    use strict;
+    use warnings;
 
-use Test::More tests => 2;
+    use Test::More tests => 2;
 
-use HTML::FormFu;
+    use HTML::FormFu;
 
-my $form = HTML::FormFu->new;
+    my $form = HTML::FormFu->new;
 
-$form->stash->{context} = new C::Fake;
+    $form->stash->{context} = new C::Fake;
 
-$form->load_config_file('t/elements/requesttoken.yml');
+    $form->load_config_file('t/elements/requesttoken.yml');
 
-like( $form, qr/<input name="_token" type="hidden" value="/, "RequestToken field is a hidden field" );
+    like( $form, qr/<input name="_token" type="hidden" value="/, "RequestToken field is a hidden field" );
 
-like( $form, qr/value="\w+"/, "RequestToken field has a random value" );
+    like( $form, qr/value="\w+"/, "RequestToken field has a random value" );
 
 }
 {
-package 
-  C::Fake;
+    package C::Fake;
 
-sub new { return bless({}, shift) }
+    sub new { return bless( {}, shift ) }
 
-sub session { return {} }
+    sub session { return {} }
 
 }

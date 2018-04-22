@@ -11,7 +11,7 @@ Mojo::Util::monkey_patch(__PACKAGE__,
   ? sub { Mojo::ByteStream->new(Text::Markdown::markdown($_[0])) }
   : sub { $_[0] });
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -263,6 +263,9 @@ sub _helper_validate {
   my $self    = _self($c);
   my $op_spec = $c->openapi->spec;
 
+  # code() can be set by other methods such as $c->openapi->cors_simple()
+  return [{message => 'Already rendered.'}] if $c->res->code;
+
   # Write validated data to $c->validation->output
   local $op_spec->{parameters} = $c->stash('openapi.parameters');
   my @errors = $self->validator->validate_request($c, $op_spec, $c->validation->output);
@@ -292,7 +295,7 @@ sub _register_plugins {
   my ($self, $app, $config) = @_;
   my @plugins;
 
-  for my $plugin (@{$config->{plugins} || ['+Security']}) {
+  for my $plugin (@{$config->{plugins} || [qw(+Cors +Security)]}) {
     $plugin = "Mojolicious::Plugin::OpenAPI::$plugin" if $plugin =~ s!^\+!!;
     eval "require $plugin;1" or Carp::confess("require $plugin: $@");
     push @plugins, $plugin->new->register($app, $self, $config);
@@ -338,7 +341,7 @@ sub _route_path {
   $path =~ s/{([^}]+)}/{
     my $pname = $1;
     my $type = $parameters{$pname}{'x-mojo-placeholder'} || ':';
-    "($type$pname)";
+    "<$type$pname>";
   }/ge;
   return $path;
 }

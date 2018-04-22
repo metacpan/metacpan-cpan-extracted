@@ -3,10 +3,10 @@ use warnings;
 
 use Cwd;
 use File::Copy::Recursive qw(pathmk pathempty);
-use File::Find::Rule;
 use File::Temp ();
-use Test::Exception;
+use Path::Tiny;
 use Test::More;
+use Test::Deep;
 
 diag("Testing legacy File::Copy::Recursive::pathmk() $File::Copy::Recursive::VERSION");
 
@@ -26,7 +26,7 @@ sub translate_to_unc {
     else {
         # a relative path
         my ($sep) = $path =~ m|([\\/])|;    # locate path separator
-        $sep //= '\\';                      # default to backslash
+        $sep ||= '\\';                      # default to backslash
         $path = translate_to_unc( Cwd::getcwd() . $sep . $path );
 
         # assumes that Cwd::getcwd() returns a path with a drive letter!
@@ -50,23 +50,23 @@ if ( $^O eq 'MSWin32' ) {
 
 my $tempdir = File::Temp->newdir();
 
-my @members = File::Find::Rule->in($tempdir);
-is_deeply( \@members, [$tempdir], 'create temp dir' );
+my @members = _all_files_in($tempdir);
+is_deeply( \@members, [], 'created empty temp dir' );
 
 # create regular path
 pathmk("$tempdir/foo/bar/baz");
 
-@members = File::Find::Rule->in($tempdir);
-is_deeply(
+@members = _all_files_in($tempdir);
+cmp_deeply(
     \@members,
-    [ $tempdir, "$tempdir/foo", "$tempdir/foo/bar", "$tempdir/foo/bar/baz" ],
+    bag("$tempdir/foo", "$tempdir/foo/bar", "$tempdir/foo/bar/baz"),
     'pathmk regular path'
 );
 
 pathempty($tempdir);
 
-@members = File::Find::Rule->in($tempdir);
-is_deeply( \@members, [$tempdir], 'temp dir empty again' );
+@members = _all_files_in($tempdir);
+is_deeply( \@members, [], 'temp dir empty again' );
 
 if ( $^O eq 'MSWin32' ) {
     my $uncpath = translate_to_unc($tempdir);
@@ -74,7 +74,7 @@ if ( $^O eq 'MSWin32' ) {
     # create UNC path
     pathmk("$uncpath/foo/bar/baz");
 
-    @members = File::Find::Rule->in($tempdir);
+    @members = _all_files_in($tempdir);
     is_deeply(
         \@members,
         [
@@ -86,5 +86,17 @@ if ( $^O eq 'MSWin32' ) {
 }
 
 done_testing();
+
+sub _all_files_in {
+    my $dir = shift;
+    my $state = path($dir)->visit(
+        sub {
+            my ($path, $state) = @_;
+            push @{ $state->{files} }, $path;
+        },
+        { recurse => 1 },
+    );
+    return map { "$_" } @{ $state->{files} || [] };
+}
 
 # temp dir is deleted automatically when $tempdir goes out of scope

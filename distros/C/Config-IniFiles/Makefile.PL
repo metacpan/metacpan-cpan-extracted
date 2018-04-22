@@ -41,12 +41,12 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Scalar::Util" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.88",
     "base" => 0,
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "2.96",
+  "VERSION" => "2.98",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "Module::Build" => "0.28",
   "Scalar::Util" => 0,
   "Symbol" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.88",
   "base" => 0,
   "lib" => 0,
   "parent" => 0,

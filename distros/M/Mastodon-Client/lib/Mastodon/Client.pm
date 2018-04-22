@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Carp;
 use Mastodon::Types qw( Acct Account DateTime Image URI Instance );
@@ -125,6 +125,8 @@ sub authorize {
     $data->{username}   = $params->{username};
     $data->{password}   = $params->{password};
   }
+
+  $data->{scope} = join q{ }, sort @{ $self->scopes };
 
   my $response = $self->post( 'oauth/token' => $data );
 
@@ -282,6 +284,7 @@ sub register {
 
   $self->client_id( $response->{client_id} );
   $self->client_secret( $response->{client_secret} );
+  $self->scopes( $params->{scopes} );
 
   return $self;
 }
@@ -300,7 +303,7 @@ sub statuses {
   return $self->get( "accounts/$id/statuses", $params );
 }
 
-# Reject follow requsts by account ID
+# Reject follow requests by account ID
 sub reject_follow {
   my $self = shift;
   state $check = compile( Int );
@@ -683,10 +686,10 @@ The methods facilitating this process are detailed below:
 
 =item B<register()>
 
-=item B<register($data)>
+=item B<register(%data)>
 
 Obtain a client secret and ID from a given mastodon instance. Takes a single
-hash reference as an argument, with the following possible keys:
+hash as an argument, with the following possible keys:
 
 =over 4
 
@@ -706,8 +709,8 @@ The client's website. Defaults to the value of the C<website> attribute.
 
 =back
 
-When successful, sets the C<client_secret> and C<client_id> attributes of
-the Mastodon::Client object and returns the modified object.
+When successful, sets the C<client_secret>, C<scopes>, and C<client_id>
+attributes of the Mastodon::Client object and returns the modified object.
 
 This should be called B<once> per client and its contents cached locally.
 
