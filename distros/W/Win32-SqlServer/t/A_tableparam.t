@@ -1,10 +1,17 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/A_tableparam.t 10    16-07-11 23:59 Sommar $
+# $Header: /Perl/OlleDB/t/A_tableparam.t 11    18-04-13 17:23 Sommar $
 #
 # This test script tests table parameters with sql_sp and sql in with
 # all data types.
 #
 # $History: A_tableparam.t $
+# 
+# *****************  Version 11  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 10  *****************
 # User: Sommar       Date: 16-07-11   Time: 23:59
@@ -1916,11 +1923,7 @@ drop_test_objects('clr_builtin');
 
 #------------------------------- UDT -----------------------------------
 # We cannot do UDT tests, if the CLR is not enabled on the server.
-my $clr_enabled = sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-SELECT value
-FROM   sys.configurations
-WHERE  name = 'clr enabled'
-SQLEND
+my $clr_enabled = clr_enabled($X);
 
 if ($clr_enabled) {
 

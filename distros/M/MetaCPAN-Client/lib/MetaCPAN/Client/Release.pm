@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Release;
 # ABSTRACT: A Release data object
-$MetaCPAN::Client::Release::VERSION = '2.024000';
+$MetaCPAN::Client::Release::VERSION = '2.025000';
 use Moo;
 use Ref::Util qw< is_hashref >;
 use JSON::MaybeXS qw< decode_json >;
@@ -97,7 +97,7 @@ MetaCPAN::Client::Release - A Release data object
 
 =head1 VERSION
 
-version 2.024000
+version 2.025000
 
 =head1 SYNOPSIS
 

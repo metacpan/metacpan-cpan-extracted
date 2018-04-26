@@ -1,5 +1,5 @@
 gonzo/.*
 trash/.*
 \.git/.*
-.*\.swp
+.*\.sw.*
 .*.tar.gz

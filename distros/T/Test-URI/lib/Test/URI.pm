@@ -12,7 +12,7 @@ my $Test = Test::Builder->new();
 @EXPORT = qw(uri_scheme_ok uri_host_ok uri_port_ok uri_fragment_ok
 	uri_path_ok);
 
-$VERSION = '1.081';
+$VERSION = '1.082';
 
 =encoding utf8
 
@@ -199,7 +199,7 @@ sub _same_thing_caseless { _same_think_exactly( map { lc } @_ ) }
 
 This source is in GitHub
 
-	https://github.com/briandfoy/Test-URI
+	https://github.com/briandfoy/test-uri
 
 =head1 AUTHOR
 
@@ -207,10 +207,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

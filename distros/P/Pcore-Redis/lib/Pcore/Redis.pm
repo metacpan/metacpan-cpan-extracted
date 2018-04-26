@@ -1,16 +1,16 @@
-package Pcore::Redis v0.9.4;
+package Pcore::Redis v0.9.6;
 
 use Pcore -dist, -class;
 
 has data_dir => ( is => 'ro', isa => Str, required => 1 );
 
 sub run ( $self, $cb ) {
-    my $cfg = -f $self->data_dir . '/redis.json' ? P->cfg->load( $self->data_dir . '/redis.json' ) : $self->default_config;
+    my $cfg = -f $self->data_dir . '/redis.json' ? P->cfg->read( $self->data_dir . '/redis.json' ) : $self->default_config;
 
     # generate password
     $cfg->{requirepass} //= P->random->bytes_hex(32);
 
-    P->cfg->store( $self->data_dir . '/redis.json', $cfg, readable => 1 ) if !-f $self->data_dir . '/redis.json';
+    P->cfg->write( $self->data_dir . '/redis.json', $cfg, readable => 1 ) if !-f $self->data_dir . '/redis.json';
 
     $self->store_config($cfg);
 

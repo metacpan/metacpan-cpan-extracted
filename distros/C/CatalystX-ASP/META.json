@@ -4,7 +4,7 @@
       "Steven Leung < sleung@cpan.org >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.0.17",
    "license" : [
       "gpl_1"
    ],
@@ -86,7 +86,7 @@
    "provides" : {
       "CatalystX::ASP" : {
          "file" : "lib/CatalystX/ASP.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "CatalystX::ASP::Application" : {
          "file" : "lib/CatalystX/ASP/Application.pm"
@@ -136,7 +136,7 @@
          "web" : "https://github.com/stvleung/CatalystX-ASP"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_contributors" : [
       "Steven Leung <sleung@turnitin.com>",
       "Steven Leung <stvleung@gmail.com>"

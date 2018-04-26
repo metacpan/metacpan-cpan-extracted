@@ -35,11 +35,12 @@ my %WriteMakefileArgs = (
     "Sub::Exporter" => 0,
     "Test::Deep" => 0,
     "Test::Deep::JSON" => 0,
+    "Test::Fatal" => 0,
     "Test::More" => "0.88",
     "YAML::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %FallbackPrereqs = (
   "Sub::Exporter" => 0,
   "Test::Deep" => 0,
   "Test::Deep::JSON" => 0,
+  "Test::Fatal" => 0,
   "Test::More" => "0.88",
   "YAML::Tiny" => 0,
   "lib" => 0,

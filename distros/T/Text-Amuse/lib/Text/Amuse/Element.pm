@@ -22,6 +22,7 @@ sub new {
     my ($class, %args) = @_;
     my $self = {
                 rawline => '',
+                raw_without_anchors => '',
                 block => '',      # the block it says to belong
                 type => 'null', # the type
                 string => '',      # the string
@@ -35,6 +36,7 @@ sub new {
                 footnote_number => 0,
                 footnote_symbol => '',
                 footnote_index => '',
+                anchors => [],
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -46,6 +48,14 @@ sub new {
     unless ($provided{indentation}) {
         $self->{indentation} = length($self->{removed});
     }
+
+    die "anchors passed to the constructor but not a reference $self->{anchors}"
+      unless ref($self->{anchors}) eq 'ARRAY';
+
+    if (exists $args{anchor} and length $args{anchor}) {
+        push @{$self->{anchors}}, $args{anchor};
+    }
+
     bless $self, $class;
 }
 
@@ -58,6 +68,17 @@ Accessor to the raw input line
 sub rawline {
     my $self = shift;
     return $self->{rawline};
+}
+
+=head3 raw_without_anchors
+
+Return the original string, but with anchors stripped out.
+
+=cut
+
+sub raw_without_anchors {
+    my $self = shift;
+    return $self->{raw_without_anchors};
 }
 
 sub _reset_rawline {
@@ -78,6 +99,47 @@ sub will_not_merge {
     }
     return $self->{_will_not_merge};
 }
+
+=head2 anchors
+
+A list of anchors for this element.
+
+=head2 add_to_anchors(@list)
+
+Add the anchors passed to the constructor to this element.
+
+=head2 remove_anchors
+
+Empty the anchors array in the element
+
+=head2 move_anchors_to($element)
+
+Remove the anchors from this element and add them to the one passed as
+argument.
+
+=cut
+
+sub anchors {
+    my $self = shift;
+    return @{$self->{anchors}};
+}
+
+sub add_to_anchors {
+    my ($self, @anchors) = @_;
+    push @{$self->{anchors}}, @anchors;
+}
+
+sub remove_anchors {
+    my ($self) = @_;
+    $self->{anchors} = [];
+}
+
+sub move_anchors_to {
+    my ($self, $el) = @_;
+    $el->add_to_anchors($self->anchors);
+    $self->remove_anchors;
+}
+
 
 =head2 ACCESSORS
 
@@ -404,15 +466,22 @@ Append the element passed as argument to this one, setting the raw_line
 sub append {
     my ($self, $element) = @_;
     $self->{rawline} .= $element->rawline;
+    $self->{raw_without_anchors} .= $element->raw_without_anchors;
     my $type = $self->type;
     # greedy elements
-    if ($type eq 'example' or $type eq 'verse' or $type eq 'footnote') {
+    if ($type eq 'example') {
         $self->{string} .= $element->rawline;
+        # ignore the anchors, they can't be inside.
+        return;
+    }
+    elsif ($type eq 'verse' or $type eq 'footnote') {
+        $self->{string} .= $element->raw_without_anchors;
     }
     else {
         $self->{string} .= $element->string;
     }
-
+    # inherit the anchors
+    $self->add_to_anchors($element->anchors);
 }
 
 =head3 can_append($element)
@@ -464,6 +533,22 @@ sub element_number {
 sub _set_element_number {
     my ($self, $num) = @_;
     $self->{element_number} = $num;
+}
+
+=head3 is_header
+
+Return 1 if the element type is h1/h6, 0 otherwise.
+
+=cut
+
+sub is_header {
+    my $self = shift;
+    if ($self->type =~ m/h[1-6]/) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 1;

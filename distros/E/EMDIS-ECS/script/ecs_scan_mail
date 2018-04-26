@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_scan_mail).
@@ -435,7 +435,7 @@ sub process_maildrop
 
         # don't process the message, if the receiving node is disabled
         if (not ( (exists $node->{node_disabled}) and
-                  ($node->{node_disabled} =~ /^\s*(yes|true)\s*$/i) ) )
+                  is_yes($node->{node_disabled}) ) )
         {
            my $err = $msg->send_via_email($msg->hub_rcv);
            undef $msg;   # closes file
@@ -491,7 +491,7 @@ sub process_to_XX
 
           # don't process the folder, if the receiving node is disabled
           if((exists $node->{node_disabled}) and
-              $node->{node_disabled} =~ /^\s*(yes|true)\s*$/i)
+              is_yes($node->{node_disabled}))
           {
              log_info("process_to_XX(): skipping directory to_$node_id " .
                       "(node_disabled=$node->{node_disabled}).");
@@ -624,7 +624,7 @@ sub process_store
         }
         # is node marked as disabled?
         if((exists $node->{node_disabled}) and
-            $node->{node_disabled} =~ /^\s*(yes|true)\s*$/i)
+            is_yes($node->{node_disabled}))
         {
             log_info("process_store(): skipping node $node_id " .
                 "(node_disabled=$node->{node_disabled}).");
@@ -1017,31 +1017,32 @@ sub mbox_open
     print "$DEBUG_LABEL mbox_open()\n"
         if $ECS_CFG->ECS_DEBUG > 0;
 
-    my $use_ssl = ($ECS_CFG->INBOX_USE_SSL =~ /^YES$/io or $ECS_CFG->INBOX_USE_SSL =~ /^TRUE$/io);
-
     # log in to mail server and check number of messages
     for ($ECS_CFG->INBOX_PROTOCOL)
     {
         /POP3/ and do {
-            if($use_ssl) {
-                return("To use SSL please install Net::POP3 with version >= 3.05", undef)
+            if(is_yes($ECS_CFG->INBOX_USE_SSL) or is_yes($ECS_CFG->INBOX_USE_STARTTLS)) {
+                return("To use SSL or TLS please install Net::POP3 with version >= 3.05", undef)
                     if CPAN::Version->vlt($Net::POP3::VERSION, '3.05');
-                my $port = $ECS_CFG->INBOX_PORT ? $ECS_CFG->INBOX_PORT : 995;
+            }
+            if(is_yes($ECS_CFG->INBOX_USE_SSL)) {
                 $mbox = new Net::POP3($ECS_CFG->INBOX_HOST,
-                                      Port     => $port,
+                                      Port     => $ECS_CFG->INBOX_PORT,
                                       Timeout  => $ECS_CFG->INBOX_TIMEOUT,
                                       Debug    => $ECS_CFG->INBOX_DEBUG,
                                       SSL      => 1);
             }
             else {
-                my $port = $ECS_CFG->INBOX_PORT ? $ECS_CFG->INBOX_PORT : 110;
                 $mbox = new Net::POP3($ECS_CFG->INBOX_HOST,
-                                      Port     => $port,
+                                      Port     => $ECS_CFG->INBOX_PORT,
                                       Timeout  => $ECS_CFG->INBOX_TIMEOUT,
                                       Debug    => $ECS_CFG->INBOX_DEBUG);
             }
             return("Unable to create Net::POP3 object: $@", undef)
                 if not $mbox;
+            if(is_yes($ECS_CFG->INBOX_USE_STARTTLS)) {
+                return("STARTTLS failed.", undef) unless $mbox->starttls();
+            }
             my $msgcount = $mbox->login($ECS_CFG->INBOX_USERNAME,
                                         $ECS_CFG->INBOX_PASSWORD);
             return("Unable to log in to POP server.", undef)
@@ -1051,19 +1052,20 @@ sub mbox_open
         /IMAP/ and do {
             return('Mail::IMAPClient module not available.', undef)
                 if not $found_Mail_IMAPClient;
+            if(is_yes($ECS_CFG->INBOX_USE_SSL) or is_yes($ECS_CFG->INBOX_USE_STARTTLS)) {
+                return('To use SSL or TLS please install Mail::IMAPClient with version >= 3.22', undef)
+                    if CPAN::Version->vlt($Mail::IMAPClient::VERSION, '3.22');
+            }
             $mbox = new Mail::IMAPClient;
             return("Unable to create Mail::IMAPClient object: $@", undef)
                 if not $mbox;
             $mbox->Server($ECS_CFG->INBOX_HOST);
-            my $port = $ECS_CFG->INBOX_PORT ? $ECS_CFG->INBOX_PORT : $use_ssl ? 993 : 143;
-            $mbox->Port($port);
+            $mbox->Port($ECS_CFG->INBOX_PORT);
             $mbox->Timeout($ECS_CFG->INBOX_TIMEOUT);
             $mbox->Debug($ECS_CFG->INBOX_DEBUG);
             $mbox->User($ECS_CFG->INBOX_USERNAME);
             $mbox->Password($ECS_CFG->INBOX_PASSWORD);
-            if($use_ssl) {
-                return('To use SSL please install Mail::IMAPClient with version >= 3.18', undef)
-                    if CPAN::Version->vlt($Mail::IMAPClient::VERSION, '3.18');
+            if(is_yes($ECS_CFG->INBOX_USE_SSL)) {
                 $mbox->Ssl(1);
             }
             $mbox->Uid(0);
@@ -1075,6 +1077,9 @@ sub mbox_open
                        ":" .     $ECS_CFG->INBOX_PORT .
                        ") as " . $ECS_CFG->INBOX_USERNAME .
                        ": $!", undef);
+            }
+            if(is_yes($ECS_CFG->INBOX_USE_STARTTLS)) {
+                return("STARTTLS failed.", undef) unless $mbox->starttls();
             }
             if(not $mbox->select($ECS_CFG->INBOX_FOLDER)) {
                 return("Unable to select folder " . $ECS_CFG->INBOX_FOLDER . ".",
@@ -1556,7 +1561,7 @@ sub process_message
         $node->{in_seq}++;
         if($msg->seq_num == $node->{in_seq})
         {
-            if($ECS_CFG->ALWAYS_ACK =~ /^YES$/io or $ECS_CFG->ALWAYS_ACK =~ /^TRUE$/io)
+            if(is_yes($ECS_CFG->ALWAYS_ACK))
             {
                 # only send MSG_ACK if $ECS_CFG->ALWAYS_ACK is set
                 # (adds rand() to help defend against encryption attack)
@@ -1678,7 +1683,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

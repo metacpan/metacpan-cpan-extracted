@@ -1,0 +1,32 @@
+NAME
+    Mojolicious::Plugin::GzipStatic - Mojolicious Plugin to compress the
+    static files before serving them.
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin('GzipStatic');
+
+      # Mojolicious::Lite
+      plugin 'GzipStatic';
+
+DESCRIPTION
+    Mojolicious::Plugin::GzipStatic is a Mojolicious plugin to compress the
+    static files before serving them.
+
+    See <https://en.wikipedia.org/wiki/HTTP_compression> and
+    <http://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Post-proces
+    sing-dynamic-content>.
+
+METHODS
+    Mojolicious::Plugin::GzipStatic inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  register
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+SEE ALSO
+    Mojolicious, Mojolicious::Guides, <http://mojolicious.org>,
+    Mojolicious::Static, IO::Compress::Gzip.
+

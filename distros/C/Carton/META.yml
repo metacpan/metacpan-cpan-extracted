@@ -7,7 +7,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   version: '0.77'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ requires:
   Class::Tiny: '1.001'
   Getopt::Long: '2.39'
   JSON::PP: '2.27300'
-  Menlo: '1.9016'
+  Menlo::CLI::Compat: '1.9018'
   Module::CPANfile: '0.9031'
   Module::CoreList: '0'
   Path::Tiny: '0.033'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/perl-carton/carton/issues
   homepage: https://github.com/perl-carton/carton
   repository: https://github.com/perl-carton/carton.git
-version: v1.0.29
+version: v1.0.30
 x_contributors:
   - 'Christian Walde <walde.christian@googlemail.com>'
   - 'David Golden <dagolden@cpan.org>'
@@ -62,3 +62,4 @@ x_contributors:
   - 'WATANABE Hiroaki <hwat@mac.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 0

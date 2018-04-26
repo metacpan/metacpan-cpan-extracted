@@ -17,3 +17,6 @@ Revision history for Date::Lectionary::Daily
 1.20180418 2018-04-18
 
  - Improved quality of distribution.
+
+1.20180423 2018-04-23
+ - Force upgrade to Date-Lectionary-Time to 1.20180422.1

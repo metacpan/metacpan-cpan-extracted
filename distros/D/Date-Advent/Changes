@@ -2,3 +2,6 @@ Revision history for Date::Advent
 
 1.20180418 2018-04-18
  - Added author tests to ensure better distribution quality
+
+1.20180423 2018-04-23
+ - Force upgrade to Date-Lectionary-Time to 1.20180422.1

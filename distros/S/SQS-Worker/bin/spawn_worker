@@ -12,7 +12,7 @@ package SpawnWorkerArgs {
   has worker    => (is => 'ro', isa => 'Str', required => 1, documentation => 'The SQS::Worker class name');
   has queue_url => (is => 'ro', isa => 'Str', required => 1, documentation => 'The SQS queue URL to poll for messages');
   has region    => (is => 'ro', isa => 'Str', required => 1, documentation => 'The SQS region identifier');
-  has log_conf  => (is => 'ro', isa => 'Str', required => 1, documentation => 'Path to a Log4perl config file');
+  has log_conf  => (is => 'ro', isa => 'Str', required => 0, documentation => 'Path to a Log4perl config file');
   has consumer  => (is => 'ro', isa => 'Str', required => 0, default => sub { 'Default' },
       documentation => 'The SQS::Consumers model to use. Either Default or DeleteAlways. If empty Default processing model is assumed.');
   has _consumer  => (is => 'ro', lazy => 1, builder => '_consumer_builder');
@@ -28,7 +28,18 @@ package SpawnWorkerArgs {
 
 my $args = SpawnWorkerArgs->new_with_options();
 
-Log::Log4perl::init($args->log_conf);
+if ($args->log_conf) {
+  Log::Log4perl::init($args->log_conf);
+} else {
+  Log::Log4perl->init(\ qq{
+log4perl.rootLogger=ERROR, SCREEN
+    
+log4perl.appender.SCREEN=Log::Log4perl::Appender::Screen
+
+log4perl.appender.SCREEN.layout=PatternLayout
+log4perl.appender.SCREEN.layout.ConversionPattern=[%r] %F %L %c - %m%n
+  });
+}
 
 require_module($args->worker);
 

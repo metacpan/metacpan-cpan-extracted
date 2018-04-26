@@ -13,6 +13,11 @@ use JSON::PP;
     # key-value map of metadata fields
     package Pandoc::Document::Metadata;
 
+    {
+        no warnings 'once';
+        *to_json = \&Pandoc::Document::Element::to_json;
+    }
+
     sub TO_JSON {
         return { map { $_ => $_[0]->{$_} } keys %{ $_[0] } };
     }

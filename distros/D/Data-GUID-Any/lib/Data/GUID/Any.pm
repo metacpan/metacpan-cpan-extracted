@@ -3,7 +3,8 @@ use strict;
 use warnings;
 package Data::GUID::Any;
 # ABSTRACT: Generic interface for GUID/UUID creation
-our $VERSION = '0.004'; # VERSION
+
+our $VERSION = '0.005';
 
 use IPC::Cmd;
 use Exporter;
@@ -174,13 +175,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::GUID::Any - Generic interface for GUID/UUID creation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -354,7 +357,7 @@ RFC 4122 [http://tools.ietf.org/html/rfc4122]
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-GUID-Any>.
+at L<https://github.com/dagolden/Data-GUID-Any/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -362,9 +365,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/dagolden/data-guid-any>
+L<https://github.com/dagolden/Data-GUID-Any>
 
-  git clone git://github.com/dagolden/data-guid-any.git
+  git clone https://github.com/dagolden/Data-GUID-Any.git
 
 =head1 AUTHOR
 
@@ -372,7 +375,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by David Golden.
+This software is Copyright (c) 2018 by David Golden.
 
 This is free software, licensed under:
 

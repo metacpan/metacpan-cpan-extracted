@@ -1,0 +1,10 @@
+TODO
+====
+
+ * Add Mojolicious plugin that gzips the response automatically
+   Something like http://mojolicio.us/perldoc/Mojolicious/Guides/Rendering#Post-processing-dynamic-content
+
+ * Make content-types configurable (see https://github.com/reneeb/MojoX-Encode-Gzip/blob/master/lib/MojoX/Encode/Gzip.pm#L33)
+
+ * Add more tests
+

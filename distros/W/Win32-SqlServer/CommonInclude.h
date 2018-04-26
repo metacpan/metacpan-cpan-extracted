@@ -1,13 +1,23 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/CommonInclude.h 3     11-08-07 23:17 Sommar $
+ $Header: /Perl/OlleDB/CommonInclude.h 5     18-04-09 22:47 Sommar $
 
   This file is included by all files for Win32::SqlServer and it includes
   header files from Windows and Perl that are needed about everywhere.
   It also define some macros that are needed universally.
 
-  Copyright (c) 2004-2011   Erland Sommarskog
+  Copyright (c) 2004-2018   Erland Sommarskog
 
   $History: CommonInclude.h $
+ * 
+ * *****************  Version 5  *****************
+ * User: Sommar       Date: 18-04-09   Time: 22:47
+ * Updated in $/Perl/OlleDB
+ * Oops, msdasc.h should not be commented out.
+ * 
+ * *****************  Version 4  *****************
+ * User: Sommar       Date: 18-04-09   Time: 22:45
+ * Updated in $/Perl/OlleDB
+ * Use the new Microsoft OLE DB Driver for SQL Server.
  * 
  * *****************  Version 3  *****************
  * User: Sommar       Date: 11-08-07   Time: 23:17
@@ -32,7 +42,6 @@
 #define _UNICODE
 #define DBINITCONSTANTS
 #define INITGUID
-#define _SQLNCLI_OLEDB
 #define STRICT
 
 
@@ -41,7 +50,7 @@
 #include <oledberr.h>
 #include <msdasc.h>
 #include <msdadc.h>
-#include <SQLNCLI.h>
+#include <msoledbsql.h>
 
 // Here we include the Perl stuff.
 #include <EXTERN.h>

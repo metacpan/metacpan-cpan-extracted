@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.181000';
+$Bio::MUST::Core::SeqId::VERSION = '0.181120';
 use Moose;
 use namespace::autoclean;
 
@@ -16,7 +16,7 @@ use Carp;
 use Const::Fast;
 
 use Bio::MUST::Core::Types;
-use Bio::MUST::Core::Constants qw(:ncbi);
+use Bio::MUST::Core::Constants qw(:ncbi :seqids);
 
 
 has 'full_id' => (
@@ -107,10 +107,6 @@ const my $TAIL       => qr{
     $GENUS                  # as genus
 }xms;
 
-const my $NEW        => qr{
-    \#NEW\#                 # literal #NEW#
-}xms;
-
 # regex for parsing (valid) full_id
 const my $FULL_ID    => qr{
     \A                      # begins with...
@@ -127,7 +123,7 @@ const my $FULL_ID    => qr{
     ($ACCESSION)            # accession
     (?: \.{3}               # optional literal ellipsis (...)
     ($TAIL) )?              #   followed by a single-word tail
-    (?: ($NEW) )?           # optional #NEW# tag
+    ($NEW_TAG)?             # optional #NEW# tag
     \z                      # ... at the end
 }xms;
 
@@ -203,8 +199,8 @@ const my @GENERA  => qw(
     4-nitrophenol
     A-2
     Activation-tagging
-    Adeno-associated
     Adeno-Associated
+    Adeno-associated
     Aids-associated
     alk-system
     Altai-like
@@ -232,7 +228,6 @@ const my @GENERA  => qw(
     Avian-like
     Avon-Heathcote
     B-lymphotropic
-    Babu-
     Bacteroides-like
     Banna-like
     Bas-Congo
@@ -422,7 +417,6 @@ const my @GENERA  => qw(
     Gram-negative
     Gram-positive
     Grass-Cactus
-    Gymnodinium-like
     H-1
     H-Pelican
     H-Stinger
@@ -591,8 +585,8 @@ const my @GENERA  => qw(
     PCB-dechlorinating
     Pechuel-loeschea
     Peptococcus-like
-    perchlorate-reducing
     Perchlorate-reducing
+    perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     Pfiesteria-like
@@ -617,6 +611,7 @@ const my @GENERA  => qw(
     Polycystine-like
     Porphyromonas-like
     Port-miou
+    Posa-like
     PreXMRV-1
     PreXMRV-1/PreXMRV-2
     PreXMRV-2
@@ -725,8 +720,8 @@ const my @GENERA  => qw(
     Stripa-derived
     Stx1-converting
     Stx2-converting
-    Sulfate-reducing
     sulfate-reducing
+    Sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
     sulfur-oxidizing
@@ -2644,6 +2639,7 @@ const my @SPECIES => qw(
     Hu/GII/JP/2013/GII.P16_GII.2/Saitama-124
     Hu/GII/JP/2013/GII.P16_GII.2/Saitama-125
     Hu/GII/JP/2013/GII.P16_GII.2/Tochigi-46
+    Hu/GII/JP/2013/GII.P17_GII.17/FE21_2013
     Hu/GII/JP/2013/GII.P17_GII.17/Saitama5203
     Hu/GII/JP/2013/GII.P17_GII.17/Saitama5309
     Hu/GII/JP/2014/GII.P16_GII.2/Hiroshima-30
@@ -2657,7 +2653,15 @@ const my @SPECIES => qw(
     Hu/GII/JP/2014/GII.P17_GII.17/Nagano8-1
     Hu/GII/JP/2014/GII.P2_GII.2/Yamaguchi-014
     Hu/GII/JP/2014/GII.Pe_GII.2/Saitama-127
+    Hu/GII/JP/2015/GII.P17_GII.17/FE20-2015
+    Hu/GII/JP/2015/GII.P17_GII.17/FE44-2014
+    Hu/GII/JP/2015/GII.P17_GII.17/FE47-2014
+    Hu/GII/JP/2015/GII.P17_GII.17/FE58-2014
     Hu/GII/JP/2015/GII.P17_GII.17/Kawasaki308
+    Hu/GII/JP/2015/GII.P17_GII.17/Oyster1-2015
+    Hu/GII/JP/2015/GII.P17_GII.17/Oyster2-2015
+    Hu/GII/JP/2015/GII.P17_GII.17/Oyster3-2015
+    Hu/GII/JP/2015/GII.P17_GII.17/Oyster4-2015
     Hu/GII/JP/2015/GII.P2_GII.2/Miyagi-63
     Hu/GII/JP/2015/GII.P2_GII.2/Saitama-169
     Hu/GII/JP/2015/GII.Pe_GII.4/Osaka/OSF78
@@ -6075,7 +6079,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 SYNOPSIS
 

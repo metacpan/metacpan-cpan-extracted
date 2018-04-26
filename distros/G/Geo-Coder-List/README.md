@@ -10,7 +10,7 @@ Call many geocoders
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # SYNOPSIS
 
@@ -41,8 +41,8 @@ For example this code uses geocode.ca for Canada and US addresses,
 and OpenStreetMap for other places:
 
     my $geocoderlist = Geo::Coder::List->new()
-        ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
-        ->push(new_ok('Geo::Coder::OSM'));
+        ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => Geo::Coder::CA->new() })
+        ->push(Geo::Coder::OSM->new());
 
     # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
     my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
@@ -52,6 +52,9 @@ and OpenStreetMap for other places:
             $location->{geometry}{location}{lat}, ',',
             $location->{geometry}{location}{lng}, "\n";
     }
+
+    # It is also possible to limit the number of enquires used by a particular encoder
+    $geocoderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
 
 ## geocode
 

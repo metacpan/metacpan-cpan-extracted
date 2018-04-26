@@ -13,18 +13,10 @@ use Pandoc::Walker;
 use Pandoc::Elements qw(Image Str);
 
 use parent 'Exporter';
-our @EXPORT = qw(pandoc_filter pandoc_filter_document pandoc_walk stringify);
+our @EXPORT = qw(pandoc_filter pandoc_filter_document pandoc_walk);
 
 # FUNCTIONS
 
-sub stringify {
-
-    # warning added in version 0.18 (04/2016)
-    warn "Pandoc::Filter::stringify deprecated => Pandoc::Element::stringify\n";
-    $_[0]->string;
-}
-
-# TODO: deprecate this function
 sub pandoc_walk(@) {    ## no critic
     my $filter = Pandoc::Filter->new(@_);
     my $ast    = Pandoc::Elements::pandoc_json(<STDIN>);

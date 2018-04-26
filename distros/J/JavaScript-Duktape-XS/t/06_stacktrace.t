@@ -74,6 +74,7 @@ EOS
         my $method = $code->{method};
         next unless $method;
         my $err = stderr_from(sub { $duk->$method(@{ $code->{args} }) });
+        # print STDERR Dumper($err);
 
         check_functions($type, $err, $js_file, \@funcs);
         check_variables($type, $err, $js_file, \@vars);

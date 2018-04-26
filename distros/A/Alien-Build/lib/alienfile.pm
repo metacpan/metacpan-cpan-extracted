@@ -10,10 +10,10 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '1.39'; # VERSION
+our $VERSION = '1.41'; # VERSION
 
 
-our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test start_url );
+our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test start_url before after );
 
 
 sub requires
@@ -285,6 +285,69 @@ sub test
   }
 }
 
+
+my %modifiers = (
+  probe    => { any   => 'probe'    },
+  download => { share => 'download' },
+  fetch    => { share => 'fetch'    },
+  decode   => { share => 'fetch'    },
+  prefer   => { share => 'prefer'   },
+  extract  => { share => 'extract'  },
+  patch    => { share => 'patch$'   },
+  build    => { share => 'build$'   },
+  test     => { share => 'test$'    },
+  # Note: below special case gather_ffi for the ffi block :P
+  gather   => { share => 'gather_share', system => 'gather_system', any => 'gather_share,gather_system' },
+);
+
+sub _add_modifier
+{
+  my($type, $stage, $sub) = @_;
+
+  my $method = "${type}_hook";
+
+  Carp::croak "No such stage $stage" unless defined $modifiers{$stage};
+  Carp::croak "$type $stage argument must be a code reference" unless defined $sub && ref($sub) eq 'CODE';
+
+  my $caller = caller;
+  my $meta = $caller->meta;
+  Carp::croak "$type $stage is not allowed in sys block" unless defined $modifiers{$stage}->{$meta->{phase}};
+
+  $meta->add_requires('configure' => 'Alien::Build' => '1.40');
+
+  my $suffix = $meta->{build_suffix};
+  if($suffix eq '_ffi' && $stage eq 'gather')
+  {
+    $meta->$method('gather_ffi' => $sub);
+  }
+
+  foreach my $hook (
+    map { split /,/, $_ }                    # split on , for when multiple hooks must be attachewd (gather in any)
+    map { s/\$/$suffix/; $_ }                # substitute $ at the end for a suffix (_ffi) if any
+    map { "$_" }                             # copy so that we don't subregex on the original
+    $modifiers{$stage}->{$meta->{phase}})    # get the list of modifiers
+  {
+    $meta->$method($hook => $sub);
+  }
+
+  return;  
+}
+
+sub before
+{
+  my($stage, $sub) = @_;
+  @_ = ('before', @_);
+  goto &alienfile::_add_modifier;
+}
+
+
+sub after
+{
+  my($stage, $sub) = @_;
+  @_ = ('after', @_);
+  goto &alienfile::_add_modifier;
+}
+
 sub import
 {
   strict->import;
@@ -306,7 +369,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 1.39
+version 1.41
 
 =head1 SYNOPSIS
 
@@ -658,6 +721,48 @@ Prints the given log to stdout.
  };
 
 Run the tests
+
+=head2 before
+
+ before $stage => \&code;
+
+Execute the given code before the given stage.  Stage should be one of
+C<probe>, C<download>, C<fetch>, C<decode>, C<prefer>, C<extract>,
+C<patch>, C<build>, C<test>, and C<gather>.
+
+The before directive is only legal in the same blocks as the stage would
+normally be legal in.  For example, you can't do this:
+
+ use alienfile;
+ 
+ sys {
+   before 'build' => sub {
+     ...
+   };
+ };
+
+Because a C<build> wouldn't be legal inside a C<sys> block.
+
+=head2 after
+
+ after $stage => \&code;
+
+Execute the given code after the given stage.  Stage should be one of
+C<probe>, C<download>, C<fetch>, C<decode>, C<prefer>, C<extract>,
+C<patch>, C<build>, C<test>, and C<gather>.
+
+The after directive is only legal in the same blocks as the stage would
+normally be legal in.  For example, you can't do this:
+
+ use alienfile;
+ 
+ sys {
+   after 'build' => sub {
+     ...
+   };
+ };
+
+Because a C<build> wouldn't be legal inside a C<sys> block.
 
 =head1 SEE ALSO
 

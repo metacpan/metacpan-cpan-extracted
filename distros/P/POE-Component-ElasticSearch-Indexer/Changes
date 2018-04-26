@@ -1,9 +1,81 @@
 ==================================================
-Changes from 2016-03-03 00:00:00 +0000 to present.
+Changes from 2016-04-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2018-03-03 00:36:51 +0000
+version 0.002 at 2018-04-25 21:07:43 +0000
+------------------------------------------
+
+  Change: 3ba4bfa2a3b7a04aa3c8aa03b7c3ce285a757eff
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-25 14:05:40 +0000
+
+    Add documentation to the file-to-elasticsearch.pl script 
+
+  Change: e23668fa086fe3e6e8dfaa4c6804cc0a930e4e48
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-25 13:48:55 +0000
+
+    Release version 0.002
+
+    * Fix StatsHandler * ship file-to-elasticsearch.pl which provides a sample
+    implementation 
+
+  Change: 2aa98b914c765cb6c149886e27ab50024c26578b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-25 12:05:24 +0000
+
+    Process a shutdown event. 
+
+  Change: e08cce392ee63cb958ef4cd8d59f2aeb1107a08b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-05 16:32:35 +0000
+
+    Enable the split extracter's "from" parameter. 
+
+  Change: f60872eb6db203e977e5fdcb93d10e8622ee5b09
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-05 11:21:58 +0000
+
+    Allow _index to contain a strftime compatible string 
+
+  Change: 39ce4995e73016d9749d88771c2a4a3aeb1701a3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-05 10:30:29 +0000
+
+    Make it prettier when there's nothing to report. 
+
+  Change: cc66b59afdd34fc11d439fccad500190c7547408
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-04 12:16:03 +0000
+
+    Fixes for the file-to-elasticsearch.pl script
+
+    This enables logging, stats collections, records the source of the event in
+    the _path attribute, and allows the user to specify a different index/type
+    for each log file. 
+
+  Change: 0227a1c0a3a8662235113600d8110da032141ec5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-02 23:24:45 +0000
+
+    Fixing compile errors on the example implementation 
+
+  Change: 237c52dabaeba87a9bfcbe551a3090d57226e8b8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-02 23:16:03 +0000
+
+    Example implmentation of filebeats/logstash style flat file to
+    elasticsearch shipper 
+
+  Change: 4b260fe789b512a31b0c945f297391905c93a243
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-02 16:42:06 +0000
+
+    Servers Parameter documented 
+
+------------------------------------------
+version 0.001 at 2018-02-23 05:59:53 +0000
 ------------------------------------------
 
   Change: 5b1928e1e8ce911c8bc6bf14e4635da8115b50ee

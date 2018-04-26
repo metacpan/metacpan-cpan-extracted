@@ -1,5 +1,9 @@
 Revision history for Perl module MARC::Moose
 
+1.0.38 2018-04-26
+
+  - Fix various bugs in RuleFile linter. Thanks to Marios lyberak
+
 1.0.35 2018-03-09
 
   - Fix bug encoding in ISO2709 Formater

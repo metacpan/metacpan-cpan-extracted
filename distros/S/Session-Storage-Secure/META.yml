@@ -4,17 +4,17 @@ author:
   - 'David Golden <dagolden@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Spec::Functions: '0'
-  List::Util: '0'
+  File::Spec: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::More: '0.96'
   Test::Tolerant: '0'
-  version: '0'
+  perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,16 +22,16 @@ meta-spec:
 name: Session-Storage-Secure
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Session::Storage::Secure:
     file: lib/Session/Storage/Secure.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Carp: '0'
   Crypt::CBC: '0'
@@ -42,8 +42,8 @@ requires:
   Math::Random::ISAAC::XS: '0'
   Moo: '0'
   MooX::Types::MooseLike::Base: '0.16'
-  Sereal::Decoder: '0'
-  Sereal::Encoder: '0'
+  Sereal::Decoder: '4.005'
+  Sereal::Encoder: '4.005'
   String::Compare::ConstantTime: '0'
   namespace::clean: '0'
   perl: '5.008001'
@@ -53,7 +53,9 @@ resources:
   bugtracker: https://github.com/dagolden/Session-Storage-Secure/issues
   homepage: https://github.com/dagolden/Session-Storage-Secure
   repository: https://github.com/dagolden/Session-Storage-Secure.git
-version: '0.010'
+version: '0.011'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

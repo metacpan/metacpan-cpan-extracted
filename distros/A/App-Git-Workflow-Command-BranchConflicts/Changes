@@ -1,5 +1,14 @@
 Revision history for module
 
+0.5   2018-04-23
+        Updating for release of version 0.5
+        Updated date (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Removing perl 5.8 as git-workflow doesn't support it any more (Ivan Wills)
+        Adding missing .travis.yml file (Ivan Wills)
+        Adding missing config (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.4   2015-12-19
         Updating for release of version 0.4
         Removed creation of makefile (Ivan Wills)

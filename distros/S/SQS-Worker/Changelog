@@ -1,3 +1,6 @@
+0.06 2016-04-24
+ - initialize log4perl with a default config if no logger
+   config is passed
 0.05 2017-05-10
  - Extend documentation
  - Add DeleteAndFork process model 

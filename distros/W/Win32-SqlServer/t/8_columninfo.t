@@ -1,10 +1,17 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/8_columninfo.t 6     15-05-24 22:27 Sommar $
+# $Header: /Perl/OlleDB/t/8_columninfo.t 7     18-04-13 17:23 Sommar $
 #
 # This test suite tests the data type information returned by
 # getcolumninfo.
 #
 # $History: 8_columninfo.t $
+# 
+# *****************  Version 7  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 6  *****************
 # User: Sommar       Date: 15-05-24   Time: 22:27
@@ -552,11 +559,7 @@ else {
 
 # CLR UDTs
 if ($sqlver >= 9 and $X->{Provider} >= PROVIDER_SQLNCLI) {
-   $clr_enabled = sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-   SELECT value
-   FROM   sys.configurations
-   WHERE  name = 'clr enabled'
-SQLEND
+   $clr_enabled = clr_enabled($X);
 }
 
 if ($clr_enabled) {

@@ -1,6 +1,6 @@
 
 package YAML::Hobo;
-$YAML::Hobo::VERSION = '0.1.0';
+$YAML::Hobo::VERSION = '0.2.0';
 # ABSTRACT: Poor man's YAML
 
 BEGIN {
@@ -26,6 +26,21 @@ sub Load {
     }
 }
 
+### Constants
+
+# Printed form of the unprintable characters in the lowest range
+# of ASCII characters, listed by ASCII ordinal position.
+my @UNPRINTABLE = qw(
+  0    x01  x02  x03  x04  x05  x06  a    b    t    n    v    f    r    x0E  x0F
+  x10  x11  x12  x13  x14  x15  x16  x17  x18  x19  x1A  e    x1C  x1D  x1E  x1F
+);
+
+# These 3 values have special meaning when unquoted and using the
+# default YAML schema. They need quotes if they are strings.
+my %QUOTE = map { $_ => 1 } qw( null true false );
+
+### Dumper functions
+
 sub _dump_scalar {
     my $string = $_[1];
     my $is_key = $_[2];
@@ -44,7 +59,9 @@ sub _dump_scalar {
             return $string;
         }
     }
-    if ( $string =~ /[\x00-\x09\x0b-\x0d\x0e-\x1f\x7f-\x9f\'\n]/ ) {
+    if (   $string =~ /[\x00-\x09\x0b-\x0d\x0e-\x1f\x7f-\x9f\'\n\s]/
+        or $QUOTE{$string} )
+    {
         $string =~ s/\\/\\\\/g;
         $string =~ s/"/\\"/g;
         $string =~ s/\n/\\n/g;
@@ -53,9 +70,7 @@ sub _dump_scalar {
         $string =~ s/([\x7f-\x9f])/'\x' . sprintf("%X",ord($1))/ge;
         return qq|"$string"|;
     }
-    if (   $string =~ /(?:^[~!@#%&*|>?:,'"`{}\[\]]|^-+$|\s|:\z)/
-        or $QUOTE{$string} )
-    {
+    if ( $string =~ /(?:^[~!@#%&*|>?:,'"`{}\[\]]|^-+$|:\z)/ ) {
         return "'$string'";
     }
     return $is_key ? $string : qq|"$string"|;
@@ -150,7 +165,7 @@ YAML::Hobo - Poor man's YAML
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
 

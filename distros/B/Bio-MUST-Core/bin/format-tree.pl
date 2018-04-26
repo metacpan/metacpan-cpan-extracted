@@ -100,7 +100,7 @@ for my $infile (@ARGV_infiles) {
             $tree->collapse_subtrees if $ARGV_collapse;
             if ($ARGV_colorize) {
                 ### Coloring tree using: $ARGV_colorize
-                my $scheme = ColorScheme->load($ARGV_colorize);
+                my $scheme = $tax->load_color_scheme($ARGV_colorize);
                 $scheme->attach_colors_to_entities($tree);
             }
         }
@@ -162,7 +162,7 @@ format-tree.pl - Format trees for printing
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 USAGE
 

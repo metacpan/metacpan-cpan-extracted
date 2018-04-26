@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/datetime.cpp 7     16-07-11 22:21 Sommar $
+ $Header: /Perl/OlleDB/datetime.cpp 8     16-07-15 22:00 Sommar $
 
   All routines converting between Perl values and the datetime data types
   in SQL Server.
@@ -7,6 +7,11 @@
   Copyright (c) 2004-2016   Erland Sommarskog
 
   $History: datetime.cpp $
+ * 
+ * *****************  Version 8  *****************
+ * User: Sommar       Date: 16-07-15   Time: 22:00
+ * Updated in $/Perl/OlleDB
+ * Round fraction before converting to ULONG.
  * 
  * *****************  Version 7  *****************
  * User: Sommar       Date: 16-07-11   Time: 22:21
@@ -151,7 +156,8 @@ static BOOL HV_to_datetimetypes (SV               * sv,
                             break;
          case DT_second   : dtoffset.second = (USHORT) partvalue;
                             break;
-         case DT_fraction : dtoffset.fraction = (ULONG) (SvNV(sv) * 1000000);
+         case DT_fraction : dtoffset.fraction = (ULONG) 
+                                         round((SvNV(sv) * 1000000));
                             break;
          case DT_tzhour   : dtoffset.timezone_hour = (SHORT) partvalue;
                             break;

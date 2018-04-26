@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "YAML-Hobo",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.2.0",
   "license" => "perl",
   "module_name" => "YAML::Hobo",
   "recursive_test_files" => 1,

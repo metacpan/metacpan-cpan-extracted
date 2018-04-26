@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin qw( $RealBin );
+use POSIX qw(uname);
+use MYDan::Diagnosis;
+
+my( $os, $arch ) = (uname())[0,4];
+
+print "os: $os arch:$arch\n";
+my $x = MYDan::Diagnosis->new( os => $os, arch => $arch )->run( "$RealBin/../plugin/code" );
+printf "\nscore: %d\n", 100 - $x;

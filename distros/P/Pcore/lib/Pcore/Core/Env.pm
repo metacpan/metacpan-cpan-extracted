@@ -202,7 +202,7 @@ sub _build_user_cfg ($self) {
         return {};
     }
     else {
-        return P->cfg->load( $self->user_cfg_path );
+        return P->cfg->read( $self->user_cfg_path );
     }
 }
 

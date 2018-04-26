@@ -16,7 +16,7 @@ use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use MooseX::StrictConstructor;
 
-use version; our $VERSION = version->declare("v1.20180422");
+use version; our $VERSION = version->declare("v1.20180423");
 
 =encoding utf8
 =head1 NAME
@@ -25,7 +25,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180422
+Version 1.20180423
 
 =cut
 

@@ -1,6 +1,10 @@
 Revision history for MojoX-Encode-Gzip
 ======================================
 
+1.12 2018-04-24 10:00:00
+
+  * Fix #1, Set new content for response when body was gzipped
+
 1.11 2015-01-26
 
   [MISC]

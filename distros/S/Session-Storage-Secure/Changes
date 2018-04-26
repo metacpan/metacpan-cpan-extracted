@@ -1,5 +1,11 @@
 Revision history for Session-Storage-Secure
 
+0.011     2018-04-22 22:12:40+02:00 Europe/Oslo
+
+    [CHANGED]
+
+    - Bumped prereq on Sereal::Decoder to 4.005
+
 0.010     2014-05-04 13:52:13-04:00 America/New_York
 
     [ADDED]

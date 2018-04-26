@@ -22,24 +22,22 @@ sub new_set {
 }
 
 sub read_lines {
-    my $fn = shift;
+    my $infile = shift;
 
-    my @lines;
-
-    if ( lc $fn eq "stdin" ) {
-        while (<STDIN>) {
-            chomp;
-            push @lines, $_;
-        }
+    my $in_fh;
+    if ( lc $infile eq "stdin" ) {
+        $in_fh = *STDIN{IO};
     }
     else {
-        open my $fh, "<", $fn;
-        while (<$fh>) {
-            chomp;
-            push @lines, $_;
-        }
-        close $fh;
+        $in_fh = IO::Zlib->new( $infile, "rb" );
     }
+
+    my @lines;
+    while ( my $line = $in_fh->getline ) {
+        chomp $line;
+        push @lines, $line;
+    }
+    close $in_fh;
 
     return @lines;
 }

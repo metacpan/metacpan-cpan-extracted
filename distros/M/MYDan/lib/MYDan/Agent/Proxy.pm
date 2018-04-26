@@ -22,62 +22,74 @@ use strict;
 use warnings;
 
 use Carp;
+use JSON;
 use YAML::XS;
 use Net::IP::Match::Regexp qw( match_ip create_iprange_regexp_depthfirst );
 use Data::Validate::IP qw( is_ipv4 );
 use Socket;
+use MYDan::Util::Hosts;
+use LWP::UserAgent;
 
 sub new
 {
     my ( $class, $conf, %self ) = splice @_, 0, 2;
 
-
-    if( my $addr =  $ENV{MYDan_Agent_Proxy_Addr} )
+    unless( $self{node} = $ENV{MYDan_Agent_Proxy_Node} )
     {
-        $self{addr} = $addr;
-    }
-    else
-    {
-        confess "no conf" unless $conf;
-        my %conf;
-        for my $c ( $conf, $ENV{MYDan_Agent_Proxy_Config} )
+        if( my $addr =  $ENV{MYDan_Agent_Proxy_Addr} )
         {
-            next unless $c;
-            confess "no conf: $c" unless  -e $c;
-            my $y = eval{ YAML::XS::LoadFile( $c ) };
+            my ( $ua, $header, $res ) 
+                = ( LWP::UserAgent->new, $ENV{MYDan_Agent_Proxy_Header} );
+            $ua->default_header( map{ split /:/, $_ }split /,/, $header ) if $header;
+            $ua->timeout(5);
+            for( 0 .. 1 )
+            {
+                $res = $ua->get($addr);
+                last if $res->is_success;
+            }
+    		my $data = eval{ JSON::from_json $res->content };
+            die "from_json fail: $@" if $@;
+            $self{conf} = $data->{stat} ? $data->{data} : die "stat fail";
+    
+        }
+        else
+        {
+            confess "no conf" unless $conf && -e $conf;
+            $self{conf} = eval{ YAML::XS::LoadFile( $conf ) };
             confess "error: $@" if $@;
-            $y = +{} unless defined $y;
-            confess "error: not HASH" if ref $y ne 'HASH';
-            %conf = ( %conf, %$y );
-       }
-
-        $self{conf} = \%conf;
-
-        if( my $cache = $ENV{MYDan_Agent_Proxy_Cache} )
-	{
-            $self{cache} = eval{ YAML::XS::LoadFile( $cache ) };
-	    confess "error: $@" if $@;
-	    confess "error: not HASH" if ref $self{cache} ne 'HASH';
-	}
-	$self{cache} = +{} unless defined $self{cache};
-
+        }
+    
+        $self{conf} = [ $self{conf} ] if ref $self{conf} ne 'ARRAY';
+        map{ confess "error: not HASH" unless ref $_; }@{$self{conf}};
     }
-
     bless \%self, ref $class || $class;
 }
 
 sub search
 {
-    my ( $this, @node, %innet, %cache ) = @_;
+    my ( $this, @node, %innet, %result ) = @_;
 
-    return map{ $_ => $this->{addr} eq '0.0.0.0' ? undef : $this->{addr} }@node if $this->{addr};
+    if( my $node = $this->{node} )
+    {
+        return map{ $_ => $node }@node;
+    }
 
-    my ( $conf, $cache )= @$this{qw( conf cache )};
+    for ( @{$this->{conf}} )
+    {
+        @node = grep{ ! defined $result{$_} }@node;
+        my %r = $this->_search( $_ => @node );
+        %result = ( %result, %r );
+    }
+    return %result;
+}
 
-    map{ $cache{$_} = $cache->{$_} if defined $cache->{$_} }@node;
-    @node = grep{ ! defined $cache{$_} }@node;
+sub _search
+{
+    my ( $this, $conf,  @node, %innet, %result ) = @_;
+    map{ $result{$_} = $conf->{$_} if defined $conf->{$_} }@node;
+    @node = grep{ ! defined $result{$_} }@node;
 
-    return %cache unless @node;
+    return %result unless @node;
 
     for ( keys %$conf )
     {
@@ -85,18 +97,19 @@ sub search
         $innet{$_} = $conf->{$_} if is_ipv4( $1 ) && $2 >=0 && $2 <= 32;
     }
 
-    return ( %cache, map{ $_ => undef }@node ) unless %innet;
+    return ( %result, map{ $_ => undef }@node ) unless %innet;
 
     my $regexp = create_iprange_regexp_depthfirst( \%innet );
 
-
     my %hosts = MYDan::Util::Hosts->new()->match( @node );
-    map{
-        $hosts{$_} = inet_ntoa( gethostbyname $_ ) 
-	    unless is_ipv4( $hosts{$_} )
-    }keys %hosts;
+    for( keys %hosts )
+    {
+        next if is_ipv4( $hosts{$_} );
+        next unless my $name = gethostbyname $_;
+        $hosts{$_} = inet_ntoa( $name  );
+    }
 
-    return ( %cache, map{ $_ => match_ip( $hosts{$_}, $regexp )}@node );
+    return ( %result, map{ $_ => is_ipv4( $hosts{$_} ) ? match_ip( $hosts{$_}, $regexp ) : undef }@node );
 }
 
 1;

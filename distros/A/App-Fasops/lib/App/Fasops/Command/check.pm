@@ -7,7 +7,10 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'check genome locations in (blocked) fasta headers';
+
+sub abstract {
+    return 'check genome locations in (blocked) fasta headers';
+}
 
 sub opt_spec {
     return (
@@ -24,9 +27,14 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infile> is the path to blocked fasta file, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
-    $desc .= "\t<genome.fa> is one multi fasta file contains genome sequences.\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+* <genome.fa> is one multi fasta file contains genome sequences
+
+MARKDOWN
+
     return $desc;
 }
 

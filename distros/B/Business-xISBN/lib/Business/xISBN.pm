@@ -37,7 +37,7 @@ send a pull request!
 
 =cut
 
-$VERSION = "1.002";
+$VERSION = "1.003";
 
 =item xisbn
 
@@ -115,8 +115,8 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2016-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.
 
 =cut

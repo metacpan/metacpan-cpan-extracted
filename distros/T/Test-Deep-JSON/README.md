@@ -17,7 +17,7 @@ Test::Deep::JSON - Compare JSON with Test::Deep
 
 # DESCRIPTION
 
-Test::Deep::JSON provides `json($expected)` function to expect that
+Test::Deep::JSON provides the `json($expected)` function to expect that
 target can be parsed as a JSON string and matches (by `cmp_deeply`) with
 _$expected_.
 
@@ -32,7 +32,7 @@ _$expected_.
     This parses the data as a JSON string, and compares the parsed object
     and _$expected_ by `Test::Deep` functionality.
 
-    Fails if the data cannot be parsed as a JSON.
+    Fails if the data cannot be parsed as a JSON string.
 
 # AUTHOR
 

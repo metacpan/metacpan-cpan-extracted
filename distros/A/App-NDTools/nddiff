@@ -23,6 +23,12 @@ and machine-readable (JSON) output format.
 
 =over 4
 
+=item B<--[no]X>
+
+Where X is an op tag: C<A> (added), C<N> (new value), C<O> (old value), C<R>
+(removed) or C<U> (unchanged). All ops enabled by default, except C<U>. See
+L<Struct::Diff/DIFF FORMAT> for more info about nested diff format.
+
 =item B<--brief>
 
 Show where differences has happend, but don't show what exactly changed.
@@ -37,7 +43,8 @@ Amount of lines for multiline values context. Default is 3.
 
 =item B<--full>
 
-Don't suppresss common items in JSON mode.
+Don't suppress common items in JSON mode. Deprecated, C<--U> should be used
+instead.
 
 =item B<--full-headers>
 
@@ -101,6 +108,10 @@ Machine-readable diff:
 
     nddiff --json a.json b.json
 
+Same as above, but without added items:
+
+    nddiff --noA --json a.json b.json
+
 =head1 EXIT STATUS
 
  0   No errors, no diff.
@@ -117,7 +128,7 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 L<ndpatch>, L<ndproc>, L<ndquery>
 
-L<App::NDTools::NDDiff>
+L<App::NDTools::NDDiff>, L<Struct::Diff>
 
 =head1 LICENSE AND COPYRIGHT
 

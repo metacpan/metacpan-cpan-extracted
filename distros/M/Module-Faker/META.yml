@@ -34,14 +34,14 @@ requires:
   Parse::CPAN::Meta: '1.4401'
   Path::Class: '0.06'
   Text::Template: '0'
-  perl: v5.20.0
+  perl: v5.14.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/rjbs/Module-Faker/issues
   homepage: https://github.com/rjbs/Module-Faker
   repository: https://github.com/rjbs/Module-Faker.git
-version: '0.018'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -331,7 +331,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.018'
+          tag: '0.020'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

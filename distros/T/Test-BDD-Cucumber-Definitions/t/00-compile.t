@@ -7,6 +7,6 @@ use Test::Compile;
 
 my $test = Test::Compile->new();
 
-$test->plan( tests => 23 );
+$test->plan( tests => 21 );
 
 $test->all_files_ok();

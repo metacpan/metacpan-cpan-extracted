@@ -30,7 +30,7 @@ WriteMakefile(
         'Carp'                      => '1.38',
         'Time::Piece'               => '1.31',
         'Moose'                     => '2.1804',
-        'Date::Lectionary::Time'    => '1.20180422',
+        'Date::Lectionary::Time'    => '1.20180422.1',
         'namespace::autoclean'      => '0.28',
         'MooseX::StrictConstructor' => '0.21',
     },
@@ -46,7 +46,7 @@ WriteMakefile(
         provides => {
             'Date::Advent' => {
                 file    => 'lib/Date/Advent.pm',
-                version => '1.20180422',
+                version => '1.20180423',
             },
         },
         keywords  => [qw/ advent christmas lectionary christian liturgical /],

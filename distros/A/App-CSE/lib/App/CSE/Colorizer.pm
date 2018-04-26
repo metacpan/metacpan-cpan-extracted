@@ -1,5 +1,5 @@
 package App::CSE::Colorizer;
-$App::CSE::Colorizer::VERSION = '0.013';
+$App::CSE::Colorizer::VERSION = '0.014';
 use Moose;
 
 has 'cse' => ( is => 'ro' , isa => 'App::CSE', required => 1);

@@ -5,13 +5,13 @@ use 5.18.2;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.032';
 
 =pod
 
 =head1 NAME
 
-Data::Enumerable::Lazy
+Data::Enumerable::Lazy - Lazy generator + enumerable for Perl5.
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ Usage:
 =head2 Prime numbers
 
 Prime numbers is an infinite sequence of natural numbers. This example
-implements a very basic prime number generator.
+implements a very naive suboptimal prime number generator.
 
   my $prime_num_stream = Data::Enumerable::Lazy->new({
     # This is an infinite sequence
@@ -125,12 +125,12 @@ will throw an exception claiming it's an infinitive sequence. Therefore, we
 should use C<next()> in order to get elements one by one or use another handy
 method C<take()> which returns first N results.
 
-=head2 Nested enumerables
+=head2 Flat enumeration (Nested generators)
 
 In this example we will output a numbers of a multiplication table 10x10.
-What's interesting in this example is that there are 2 sequences: primary and
-secondary. Primary C<on_next()> returns secondary sequence, which generates the
-result of multiplication of 2 numbers.
+What's interesting in this example is that there are 2 levels of sequences:
+primary and secondary. Primary C<on_next()> returns secondary sequence, which
+multiplicates 2 numbers.
 
   # A new stream based on a range from 1 to 10
   my $mult_table = Data::Enumerable::Lazy->from_list(1..10)->continue({
@@ -147,8 +147,8 @@ result of multiplication of 2 numbers.
     },
   });
 
-Another feature which is demonstrated here is the batched result generation.
-Let's iterate the sequence step by step and see what happens inside.
+Another feature which is represented here is the nested result generation.
+Let's walk trough the sequence generation step by step and see what happens.
 
   $mult_table->has_next; # returns true based on the primary range, _buffer is
                          # empty
@@ -316,11 +316,13 @@ buffer, C<on_next()> would be called.
 
 C<$element> is defined when the current collection is a contuniation of another
 enumerable. I.e.:
+
   my $enum = Data::Enumerable::Lazy->from_list(1, 2, 3);
   my $enum2 = $enum->continue({
     on_next => sub { my ($self, $i) = @_; $self->yield($i * $i) }
   });
   $enum2->to_list; # generates 1, 4, 9
+
 In this case $i would be defined and it comes from the original enumerable.
 
 The function is supposed to return an enumerable, in this case it would be
@@ -443,7 +445,10 @@ sub has_next {
 =head2 reset()
 
 This method is a generic entry point for a enum reset. In fact, it is basically
-a wrapper around user-defined C<on_reset()>.
+a wrapper around user-defined C<on_reset()>. Use with caution: if C<on_reset()>
+was not defined, it will reset the buffer and might cause a partial calculation
+skip (reset implicitly clears the internal buffer) if the buffer was not fully
+iterated yet.
 
 =cut
 
@@ -477,6 +482,15 @@ sub to_list {
 Creates a new enumerable by applying a user-defined function to the original
 enumerable. Works the same way as perl map {} function but it's lazy.
 
+Example
+
+  Data::Enumerable::Lazy
+    ->from_array(1, 2, 3)
+    ->map(sub {
+      my ($number) = @_;
+      return $number * $number
+    });
+
 =cut
 
 sub map {
@@ -496,6 +510,15 @@ provided as the 1st argument. C<$callback> should always return the new state of
 C<$acc>.
 
 C<reduce()> is defined for finite enumerables only.
+
+Example
+
+  Data::Enumerable::Lazy
+    ->from_array(1, 2, 3)
+    ->reduce(1, sub {
+      my ($acc, $number) = @_;
+      return $acc *= $number
+    });
 
 =cut
 
@@ -523,6 +546,15 @@ will perform a look ahead and call the original enumerable C<next()> method
 in order to find an element for which the user-defined function will return
 true. C<next()>, on the other side, returns the value that was pre-fetched
 by C<has_next()>.
+
+Example
+
+  Data::Enumerable::Lazy
+    ->from_list(1, 2, 3)
+    ->grep(sub {
+      my ($number) = @_;
+      return $number % 2
+    });
 
 =cut
 
@@ -941,15 +973,15 @@ L<https://github.com/icanhazbroccoli/Data-Enumerable-Lazy>
 
 =head2 Alternative implementations:
 
-L<https://metacpan.org/pod/List::Generator>
-L<https://metacpan.org/pod/Generator::Object>
-L<https://metacpan.org/pod/Iterator>
+L<List::Generator>
+L<Generator::Object>
+L<Iterator>
 
 =cut
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Oleg S <me@whitebox.io>
+Copyright 2017, 2018 Oleg S <me@whitebox.io>
 
 Copying and distribution of this file, with or without modification, are
 permitted in any medium without royalty provided the copyright notice and this

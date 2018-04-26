@@ -505,7 +505,18 @@ sub _parse_string {
     die unless defined $l;
     my %element = (
                    rawline => $l,
+                   raw_without_anchors => $l,
                   );
+    if ($l =~ m/\A
+                (\s*)
+                (\#([A-Za-z][A-Za-z0-9-]+)\x{20}*)
+                (.*)
+                \z
+                /sx) {
+        $element{anchor} = $3;
+        $l = $1 . $4;
+        $element{raw_without_anchors} = $l;
+    }
     my $blockre = qr{(
                          biblio   |
                          play     |
@@ -759,6 +770,20 @@ sub _construct_element {
     my %args = $self->_parse_string($line);
     my $element = Text::Amuse::Element->new(%args);
 
+    if ($current and ($current->type eq 'null' or $current->type eq 'startblock') and $current->anchors) {
+        # previous element is null, carry on
+        $current->move_anchors_to($element);
+    }
+    if ($element->type eq 'null' and
+        $element->anchors and
+        $current->type ne 'null' and
+        $current->type ne 'example') {
+        # incoming has anchors
+        $element->move_anchors_to($current);
+        # null element with anchors. it was fully merged, so return
+        return;
+    }
+
     # catch the examples, comments and the verse in bloks.
     # <example> is greedy, and will stop only at another </example> or
     # at the end of input. Same is true for verse and comments.
@@ -766,11 +791,10 @@ sub _construct_element {
     foreach my $block (qw/example comment verse/) {
         if ($current && $current->type eq $block) {
             if ($element->is_stop_element($current)) {
-                # print Dumper($element) . " is closing\n";
-
                 $self->_current_el(undef);
                 return Text::Amuse::Element->new(type => 'null',
                                                  removed => $element->rawline,
+                                                 anchors => [ $element->anchors ],
                                                  rawline => $element->rawline);
             }
             else {
@@ -787,13 +811,14 @@ sub _construct_element {
         elsif ($element->is_start_block($block)) {
             $current = Text::Amuse::Element->new(type => $block,
                                                  style => $element->style,
+                                                 anchors => [ $element->anchors ],
                                                  removed => $element->rawline,
+                                                 raw_without_anchors => $element->raw_without_anchors,
                                                  rawline => $element->rawline);
             $self->_current_el($current);
             return $current;
         }
     }
-
     # Pack the lines
     if ($current && $current->can_append($element)) {
         # print "Packing " . Dumper($element) . ' into ' . Dumper($current);

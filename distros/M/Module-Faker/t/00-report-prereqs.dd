@@ -28,7 +28,7 @@ do { my $x = {
                                       'Parse::CPAN::Meta' => '1.4401',
                                       'Path::Class' => '0.06',
                                       'Text::Template' => '0',
-                                      'perl' => 'v5.20.0',
+                                      'perl' => 'v5.14.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

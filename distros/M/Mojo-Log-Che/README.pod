@@ -108,7 +108,7 @@ sub _message {
   my $time = time;
   my $trace = _trace($self->trace)
     if $self->trace;
-  unshift @_, join(":", @$trace[$$trace[0] eq 'main' ? (1,2) : (0,2)]). ' ' . shift
+  unshift @_, "$$〉". join(":", @$trace[$$trace[0] eq 'main' ? (1,2) : (0,2)]). ' ' . shift
     if $trace && @$trace;
   push @$history, my $msg = [$time, $level, @_];
   shift @$history while @$history > $max;
@@ -133,7 +133,7 @@ sub AUTOLOAD {
   
 }
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf8
 
@@ -145,7 +145,7 @@ I<¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !>
 
 =head1 VERSION
 
-0.06
+0.07
 
 =head1 NAME
 
@@ -153,13 +153,13 @@ Mojo::Log::Che - Little child of great parent Mojo::Log.
 
 =head1 SYNOPSIS
 
+Parent Mojo::Log behavior just works
+
   use Mojo::Log::Che;
-  
-  # Parent Mojo::Log behavior just works
   my $log = Mojo::Log::Log->new(path => '/var/log/mojo.log', level => 'warn');
   $log->debug(...);
 
-=head2 EXTENDED THINGS of this module
+=head2 EXTENDED THINGS
 
   # Set "path" to folder + have default "paths" for levels (be sure that mkdir /var/log/mojo)
   my $log = Mojo::Log::Log->new(path => '/var/log/mojo'); 

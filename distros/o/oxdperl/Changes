@@ -1,4 +1,4 @@
-Revision history for OxdPerlModule
+Revision history for oxdperl
 
 0.01    Date/time
         First version, released on an unsuspecting world.
@@ -9,3 +9,5 @@ Revision history for OxdPerlModule
 0.03    07-Mar-2018
         Release of version 3.1.2
 
+0.04	25-Apr-2018
+		Library for oxd-server 3.1.3

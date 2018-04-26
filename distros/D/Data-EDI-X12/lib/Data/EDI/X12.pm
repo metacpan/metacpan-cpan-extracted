@@ -4,7 +4,7 @@ use strict;
 use YAML qw(LoadFile Load);
 use IO::File;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -515,7 +515,8 @@ sub _parse_edi
             # parse a record
             my %segment_to_section;
             my %loop_def;
-            for my $section (keys %{ $spec->{structure} || { } })
+
+            for my $section (qw(footer detail header))
             {
                 for my $segment (@{ $spec->{structure}{$section} || [ ] })
                 {
@@ -1083,31 +1084,7 @@ sub _write_edi
 
 =head2 LOOPS
 
- Both implicit and explicit loop segments are also supported by this module.
-
- Loops are specified within the structure segment of the spec definition.
-
- Example:
-
- 850:
-     structure:
-         header:
-             - BEG
-             - DTM
-             - N9
-             - N1:
-                 - N1
-                 - N2
-         detail:
-             - PO1
-             - PID
-         footer:
-             - CTT
-
-  In this structure, the N1 element would load as an arrayref of both N1 and N2 hasherefs.
-
-  
-
+ Both implicit and explicit loop segments are also supported by this module.  Please review the loops test for an example.
 
 =head1 HISTORY
 

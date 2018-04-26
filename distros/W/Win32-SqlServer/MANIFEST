@@ -59,8 +59,10 @@ t/Helpers/spatial.data.10       Test data for spatial queries for SQL 2008.
 t/Helpers/spatial.data.11       Test data for spatial queries for SQL 2012.
 t/Helpers/spatial.data.12       Test data for spatial queries for SQL 2014.
 t/Helpers/spatial.data.13       Test data for spatial queries for SQL 2016.
+t/Helpers/spatial.data.14       Test data for spatial queries for SQL 2017
 t/Helpers/spatial.queries       Queries to genereate spatial.data
 t/Helpers/udt_create.sql        SQL script to create the assemblies from DLLs.
 t/Helpers/Utf8String.cs         Source code for CLR UDT.
 t/Helpers/Utf8StringMax.cs      Source code for CLR UDT.
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

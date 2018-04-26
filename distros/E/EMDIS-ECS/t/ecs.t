@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 
 use strict;
 use Test;
@@ -11,7 +11,7 @@ use lib "$FindBin::Bin";
 require 'setup';
 
 # print test plan before loading modules
-BEGIN { plan(tests => 67); }
+BEGIN { plan(tests => 75); }
 use EMDIS::ECS qw(:ALL);
 
 # [1] Was module successfully loaded?
@@ -25,7 +25,7 @@ open STDERR, ">&STDOUT" or die "Unable to dup STDOUT: $!\n";
 select STDERR; $| = 1;   # make unbuffered
 select STDOUT; $| = 1;   # make unbuffered
 
-# [2..19] some easy ones
+# [2..27] some easy ones
 ok('"aaa' eq dequote('"aaa'));
 ok('aaa"' eq dequote('aaa"'));
 ok('aaa' eq dequote('"aaa"'));
@@ -50,8 +50,16 @@ ok(valid_encr_typ('PGP2'));
 ok(valid_encr_typ('PGP2-verify'));
 ok(valid_encr_typ('OpenPGP'));
 ok(valid_encr_typ('OpenPGP-verify'));
+ok(is_yes('yEs'));
+ok(is_yes('tRue'));
+ok(not is_yes('nO'));
+ok(not is_yes('faLse'));
+ok(is_no('nO'));
+ok(is_no('faLse'));
+ok(not is_no('yEs'));
+ok(not is_no('tRue'));
 
-# [20..35] "ECS has not been configured"
+# [28..43] "ECS has not been configured"
 $msg = "ECS has not been configured";
 ok(log(0, "error text") =~ /$msg/);
 ok(log_debug("error text") =~ /$msg/);
@@ -76,7 +84,8 @@ ok(pgp2_encrypt("infile", "outfile", "recipient") =~ /$msg/);
 # [] aaaaa
 #ok('AA_BB_0000012345.msg' eq format_msg_filename('AA', 'BB', 12345));
 
-# [36..66] read_ecs_message_id
+# [44..75] read_ecs_message_id
+require EMDIS::ECS::Config;
 $ECS_CFG = { MAIL_MRK => 'EMDIS' };
 bless $ECS_CFG, 'EMDIS::ECS::Config';
 $EMDIS::ECS::configured = 1;

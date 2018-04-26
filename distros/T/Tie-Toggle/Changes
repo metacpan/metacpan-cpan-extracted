@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Toggle
 
+1.082 2018-04-24T11:55:40Z
+	* Clarify that it's Artistic License 2.0
+
 1.081 2016-01-12T19:49:03Z
 	* Freshen the module with all the current info
 

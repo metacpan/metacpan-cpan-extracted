@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.19, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,6 +48,7 @@ requires:
   Dist::Zilla::Plugin::ReadmeFromPod: '0'
   Dist::Zilla::Plugin::ReversionOnRelease: '0.04'
   Dist::Zilla::Plugin::ShareDir: '0'
+  Dist::Zilla::Plugin::StaticInstall: '0'
   Dist::Zilla::Plugin::Test::Compile: '0'
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
@@ -61,7 +62,7 @@ resources:
   bugtracker: https://github.com/miyagawa/Dist-Milla/issues
   homepage: https://github.com/miyagawa/Dist-Milla
   repository: https://github.com/miyagawa/Dist-Milla.git
-version: v1.0.18
+version: v1.0.20
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'
   - 'Curtis Brandt <curtis@cpan.org>'
@@ -74,3 +75,4 @@ x_contributors:
   - 'Shawn M Moore <code@sartak.org>'
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 0

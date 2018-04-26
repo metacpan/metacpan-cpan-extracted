@@ -1,0 +1,96 @@
+% A comment to make sure anchor is not parsed as a directive
+\chapter{First chapter}
+\hyperdef{amuse}{start-label}{}%
+
+
+Starting here
+
+\chapter{More info 1}
+\hyperdef{amuse}{more-info-1}{}%
+\hyperdef{amuse}{hello-1}{}%
+
+
+\hyperdef{amuse}{more-info-2}{}%
+and more
+
+\chapter{More info 2
+and more}
+\hyperdef{amuse}{hello-2}{}%
+
+
+\hyperdef{amuse}{valid-before}{}%
+paragraph with a label before
+
+
+\hyperdef{amuse}{valid-after}{}%
+paragraph with a label after
+
+
+\hyperdef{amuse}{label-middle}{}%
+paragraph with label in the middle
+paragraph.
+
+
+\hyperdef{amuse}{label-begin}{}%
+with material
+Here the paragraph continues\footnote{\hyperdef{amuse}{footnote}{}%
+Can I have a label in a footnote?}
+
+\chapter{heading, this is ok}
+\hyperdef{amuse}{before}{}%
+
+\chapter{heading after, this is ok as well}
+\hyperdef{amuse}{after}{}%
+
+\chapter{\#inside header}
+
+
+\begin{itemize}
+\item\relax 
+\#inlist in  list
+
+
+
+
+\end{itemize}
+
+\begin{enumerate}[1.]
+\item\relax 
+\#inlist-2 as well
+
+
+
+
+\end{enumerate}
+\section{References}
+
+
+\hyperref{}{amuse}{more-info-1}{Begin}
+
+
+\hyperref{}{amuse}{hello-1}{Second}
+
+
+\hyperref{}{amuse}{more-info-2}{3rd}
+
+
+\hyperref{}{amuse}{hello-2}{4th}
+
+
+\hyperref{}{amuse}{valid-before}{before}
+
+
+\hyperref{}{amuse}{valid-after}{after}
+
+
+\hyperref{}{amuse}{label-middle}{middle}
+
+
+\hyperref{}{amuse}{label-begin}{begin}
+
+
+\hyperref{}{amuse}{before}{before}
+
+
+\hyperref{}{amuse}{after}{after}
+

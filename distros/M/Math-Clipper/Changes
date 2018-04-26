@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::Clipper.
 
+1.24  Fri April 20 15:19:00 2018
+
+  - Fix Integerize.t to handle '-0' from sprintf("%.0f")
+    in Perl 5.27.8.
+
 1.23  Thu May 22 20:30:00 2014
 
   - Fix 5.20 compatibility: av_extend is now using

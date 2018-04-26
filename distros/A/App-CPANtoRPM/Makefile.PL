@@ -13,7 +13,6 @@ my $Pvers   = $];
 my $ConvVers= $ExtUtils::MakeMaker::VERSION;
 
 my %module_prereq = (
-   'Config'                   => '0',
    'IO::File'                 => '0',
    'POSIX'                    => '0',
 );
@@ -38,7 +37,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "App::CPANtoRPM",
-   VERSION          => "1.06",
+   VERSION          => "1.08",
    ABSTRACT         => "An RPM packager for perl modules",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -58,12 +57,12 @@ WriteMakefile(
     ? (META_ADD => {
           provides     => {
              'App::CPANtoRPM' => {
-                file    => 'CPANtoRPM.pm',
-                version => '1.06',
+                file    => 'lib/App/CPANtoRPM.pm',
+                version => '1.08',
              },
              'cpantorpm' => {
                 file    => 'cpantorpm',
-                version => '1.06',
+                version => '1.08',
              },
 
           },

@@ -44,7 +44,9 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Exporter'         => 5, # for 'import'
+        'Exporter'           => 5, # for 'import'
+        'POSIX'              => 0, # for 'setsid' on POSIXish systems
+
         'Filter::signatures' => '0.09',
         'Carp'               => 0,
         'Future'             => 0,
@@ -60,6 +62,9 @@ my %module = (
         'Algorithm::Loops'   => 0,
 
         'Log::Log4perl'      => 0, # configurable logging
+
+        'URI'                => 0,    # For URL handling
+        'URI::file'          => 0,    # For URL handling, just to be explicit
         'Future::HTTP'       => 0.06, # fixes Mojolicious error handling
         'JSON'               => 0,
         'JSON::PP'           => 0, # for JSON::PP::true and JSON::PP::false
@@ -74,12 +79,14 @@ my %module = (
         'WWW::Mechanize::Link'             => 0,
         'IO::Socket::INET'                 => 0,
         'Object::Import'                   => 0,
+
         # for extracting element screenshots, loaded dynamically
         'Imager'                           => 0,
         'Imager::File::PNG'                => 0,
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,
+        'Test::Deep'   => 0,
         'Data::Dumper' => 0,
         'Image::Info'  => 0,
         'Test::HTTP::LocalServer' => 0.61, # we want the improved IPC

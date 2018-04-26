@@ -2,8 +2,37 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
-1.00  2012-11-30
-  - Initial release
+1.08
+  - Added %changelog section to SPEC file.  Ji-Hyeon Gim
+  - Fixed date format to match the standard.  Ji-Hyeon Gim
+  - Fixed a problem where emails of the form 'Name <Email>'
+    caused problems when adding them to the templated.  Ji-Hyeon Gim
+    GitHub #6
+
+1.07  2018-04-23
+  - cpantorpm-depreq ignores Config (which isn't indexed, so it shouldn't
+    be listed as a prereq)
+  - --optfile was broken due to how the arguments were parsed.
+  - Fixed a bug where --config and --build were broken
+
+1.06  2016-08-11
+  - Fixed a problem where multi-line strings in the META.* files caused
+    problems.  GitHub #2 by divereigh
+
+1.05  2016-04-04
+  - Fixes for AIX.   Douglas Irvine
+
+1.04  2016-02-01
+  - Fixed a typo.  Mike Schmidt
+
+1.03  2016-01-11
+  - Renamed to App-CPANtoRPM.  
+
+1.02  2015-10-12
+  - Fixed a problem where the package was getting named with two dashes.
+    GitHub #1 by divereigh
+  - Fixed a problem where packages with .so files weren't handled correctly
+    on CentOS (and perhaps others).  github contribution by divereigh
 
 1.01  2015-09-23
   - Minor correction to 'sub commands' arguments.  Mark Knutsen
@@ -20,23 +49,5 @@ Any suggestions, bug reports, or donations :-) should be sent to me.
     better with CPAN)
   - Move to github.  Gabor Szabo
 
-1.02  2015-10-12
-  - Fixed a problem where the package was getting named with two dashes.
-    github contribution by divereigh
-  - Fixed a problem where packages with .so files weren't handled correctly
-    on CentOS (and perhaps others).  github contribution by divereigh
-
-1.03  2016-01-11
-  - Renamed to App-CPANtoRPM.  
-
-1.04  2016-02-01
-  - Fixed a typo.  Mike Schmidt
-
-1.05  2016-04-04
-  - Fixes for AIX.   Douglas Irvine
-
-1.06  2016-08-11
-  - Fixed a problem where multi-line strings in the META.* files caused
-    problems.  github contribution by divereigh
-
-1.07
+1.00  2012-11-30
+  - Initial release

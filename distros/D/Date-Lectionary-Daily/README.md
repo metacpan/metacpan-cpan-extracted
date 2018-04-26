@@ -2,7 +2,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 # VERSION
 
-Version 1.20180422
+Version 1.20180423
 
 # SYNOPSIS
 

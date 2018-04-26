@@ -3,6 +3,7 @@ abstract: 'Log::Any adapter for Log::Log4perl'
 author:
   - 'Jonathan Swartz <swartz@pobox.com>'
   - 'David Golden <dagolden@cpan.org>'
+  - 'Doug Bell <preaction@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -14,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,16 +23,16 @@ meta-spec:
 name: Log-Any-Adapter-Log4perl
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Log::Any::Adapter::Log4perl:
     file: lib/Log/Any/Adapter/Log4perl.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Log::Any::Adapter::Base: '0'
   Log::Any::Adapter::Util: '1.03'
@@ -41,8 +42,13 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/dagolden/Log-Any-Adapter-Log4perl/issues
-  homepage: https://github.com/dagolden/Log-Any-Adapter-Log4perl
-  repository: https://github.com/dagolden/Log-Any-Adapter-Log4perl.git
-version: '0.08'
+  bugtracker: https://github.com/preaction/Log-Any-Adapter-Log4perl/issues
+  homepage: https://github.com/preaction/Log-Any-Adapter-Log4perl
+  repository: https://github.com/preaction/Log-Any-Adapter-Log4perl.git
+version: '0.09'
 x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Doug Bell <doug@preaction.me>'
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

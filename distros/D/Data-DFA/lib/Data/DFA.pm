@@ -1,11 +1,11 @@
-#!/usr/bin/perl
+#!/usr/bin/perl   
 #-------------------------------------------------------------------------------
 # Deterministic finite state parser from a regular expression
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2018
 #-------------------------------------------------------------------------------
 
 package Data::DFA;
-our $VERSION = "20180329";
+our $VERSION = "20180406";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -13,12 +13,15 @@ use Carp qw(confess);
 use Data::Dump qw(dump);
 use Data::NFA;
 use Data::Table::Text qw(:all);
+use Storable qw(freeze);
 use utf8;
 
 sub StateName{0}                                                                # Constants describing a state of the finite state automaton: [{transition label=>new state}, {jump target=>1}, final state if true]
 sub States{1}
 sub Transitions{2}
 sub Final{3}
+
+sub compressDfa{1}                                                              # Compress the DFA once constructed - uncompressed is useful for testing
 
 #1 Construct regular expression                                                 # Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
 
@@ -52,6 +55,11 @@ sub choice(@)                                                                   
   &Data::NFA::choice(@_);
  }
 
+sub except(@)                                                                   #ES Choice from amongst one or more elements.
+ {my (@elements) = @_;                                                          # Elements to be chosen from
+  &Data::NFA::except(@_);
+ }
+
 #1 Deterministic finite state parser                                            # Create a deterministic finite state automaton to parse sequences of symbols in the language defined by a regular expression.
 
 sub fromExpr(@)                                                                 #S Create a DFA from a regular expression.
@@ -59,12 +67,17 @@ sub fromExpr(@)                                                                 
   my $nfa = Data::NFA::fromExpr(@expr);
 
   my $dfa  = bless {};                                                          # States in DFA
-  $$dfa{0} = bless [0,                                                          # Start state
-    bless({0=>1}, "Data::DFA::NfaStates"),
-    bless({},     "Data::DFA::Transitions"),
-    $nfa->isFinal(0)], "Data::DFA::State";
-  $dfa->superStates(0, $nfa);
-  $dfa
+  $$dfa{0} = bless                                                              # Start state
+   [0,                                                                          # Name of the state - the join of the NFA keys
+    bless({0=>1}, "Data::DFA::NfaStates"),                                      # Hash whose keys are the NFA states that contributed to this super state
+    bless({},     "Data::DFA::Transitions"),                                    # Transitions from this state
+    $nfa->isFinal(0)                                                            # Whether this state is final
+   ], "Data::DFA::State";
+
+  $dfa->superStates(0, $nfa);                                                   # Create DFA
+  return $dfa unless compressDfa;                                               # Uncompressed DFA
+  my $cfa = $dfa->compress;                                                               # Rename states so that they occupy less space and remove NFA states as no longer needed
+  $cfa
  }
 
 sub finalState($$)                                                              #P Check whether any of the specified states in the NFA are final
@@ -75,23 +88,24 @@ sub finalState($$)                                                              
   0
  }
 
-sub superState($$$)                                                             #P Create super states from existing superstate
- {my ($dfa, $superStateName, $nfa) = @_;                                        # DFA, start state in DFA, NFA we are tracking
+sub superState($$$$$)                                                           #P Create super states from existing superstate
+ {my ($dfa, $superStateName, $nfa, $symbols, $nfaSymbolTransitions) = @_;       # DFA, start state in DFA, NFA we are converting, symbols in the NFA we are converting, states reachable from each state by symbol
   my $superState = $$dfa{$superStateName};
   my (undef, $nfaStates, $transitions) = @$superState;
 
   my @created;                                                                  # New super states created
-  for my $symbol($nfa->symbols)                                                 # Each symbol
+  for my $symbol(@$symbols)                                                     # Each symbol
    {my $reach = {};                                                             # States in NFS reachable from start state in dfa
     for my $nfaState(sort keys %$nfaStates)                                     # Each NFA state in the dfa start state
-     {my $r = $nfa->statesReachableViaSymbol($nfaState, $symbol);               # States in the NFA reachable on the symbol
-      $$reach{$_}++ for sort keys %$r;                                          # Accumulate NFA reachable NFA states
+     {if (my $r = $$nfaSymbolTransitions{$nfaState}{$symbol})                   # States in the NFA reachable on the symbol
+       {$$reach{$_}++ for @$r;                                                  # Accumulate NFA reachable NFA states
+       }
      }
     if (keys %$reach)                                                           # Current symbol takes us somewhere
      {my $newSuperStateName = join ' ', sort keys %$reach;                      # Name of the super state reached from the start state via the current symbol
       if (!$$dfa{$newSuperStateName})                                           # Super state does not exists so create it
        {my $newState = $$dfa{$newSuperStateName} = bless
-         [$newSuperStateName,
+         [undef, #$newSuperStateName,   not needed
           bless($reach, "Data::DFA::NfaStates"),
           bless({},     "Data::DFA::Transitions"),
           finalState($nfa, $reach)], "Data::DFA::State";
@@ -105,9 +119,11 @@ sub superState($$$)                                                             
 
 sub superStates($$$)                                                            #P Create super states from existing superstate
  {my ($dfa, $SuperStateName, $nfa) = @_;                                        # DFA, start state in DFA, NFA we are tracking
+  my $symbols = [$nfa->symbols];                                                # Symbols in nfa
+  my $nfaSymbolTransitions = $nfa->allTransitions;                              # Precompute transitions in the NFA
   my @fix = ($SuperStateName);
   while(@fix)                                                                   # Create each superstate as the set of all nfa states we could be in after each transition on a symbol
-   {push @fix, superState($dfa, pop @fix, $nfa);
+   {push @fix, superState($dfa, pop @fix, $nfa, $symbols,$nfaSymbolTransitions);
    }
  }
 
@@ -118,7 +134,27 @@ sub transitionOnSymbol($$$)                                                     
   $$transitions{$symbol}
  }
 
-sub print($$$)                                                                  # Print DFA
+sub compress($)                                                                 # Compress DFA by renaming states and deleting no longered needed NFA dstates
+ {my ($dfa) = @_;                                                               # DFA
+  my %rename;
+  my $cfa = bless {};
+  for my $superStateName(sort keys %$dfa)                                       # Each state
+   {$rename{$superStateName} = scalar keys %rename;                             # Rename state
+   }
+  for my $superStateName(sort keys %$dfa)                                       # Each state
+   {my $sourceState = $rename{$superStateName};
+    my $s = $$cfa{$sourceState} = [];
+    my $superState  = $$dfa{$superStateName};
+    my (undef, $nfaStates, $transitions, $final) = @$superState;
+    for my $symbol(sort keys %$transitions)                                     # Rename the target of every transition
+     {$$s[Transitions]{$symbol} = $rename{$$transitions{$symbol}};
+     }
+    $$s[Final] = $final;
+   }
+  $cfa
+ }
+
+sub print($$;$)                                                                 # Print DFA to a string and optionally to STDERR or STDOUT
  {my ($dfa, $title, $print) = @_;                                               # DFA, title, 1 - STDOUT or 2 - STDERR
   my @out;
   for my $superStateName(sort keys %$dfa)                                       # Each state
@@ -142,9 +178,14 @@ sub print($$$)                                                                  
    {my $s = "$title\n".formatTable([@out], [qw(State Final Symbol Target Final)])."\n";
     say STDOUT $s if $print and $print == 1;
     say STDERR $s if $print and $print == 2;
-    return nws $s;
+    return $s;
    }
   "$title: No states in Dfa";
+ }
+
+sub printNws($$;$)                                                              # Print DFA with whitespace normalized
+ {my ($dfa, $title, $print) = @_;                                               # DFA, title, 1 - STDOUT or 2 - STDERR
+  nws &print(@_);
  }
 
 sub symbols($)                                                                  # Return an array of all the symbols accepated by the DFA
@@ -186,10 +227,11 @@ sub Data::DFA::Parser::accept($$)                                               
     $parser->{next} = [@next];
     my $next = join ' ', @next;
     die join "\n",
-      "Already processed: ".              join(' ', @processed),
-       @next > 0 ? "Expected one of  : ". join(' ', @next) :
-                   "Expected nothing more.",
-      "But was given    : $symbol",
+      "Already processed: ". join(' ', @processed),
+      @next > 0 ? 
+      "Expected one of  : ". join(' ', @next) :
+      "Expected nothing more.",
+      "But found        : ", $symbol,
       '';
    }
  }
@@ -232,6 +274,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 choice
 fromExpr
 element
+except
 oneOrMore optional
 parser
 print
@@ -441,7 +484,16 @@ This is a static method and so should be invoked as:
 
 =head2 print($$$)
 
-Print DFA
+Print DFA to a string and optionally to STDERR or STDOUT
+
+     Parameter  Description
+  1  $dfa       DFA
+  2  $title     Title
+  3  $print     1 - STDOUT or 2 - STDERR
+
+=head2 printNws($$$)
+
+Print DFA with whitespace normalized
 
      Parameter  Description
   1  $dfa       DFA
@@ -512,14 +564,16 @@ Check whether any of the specified states in the NFA are final
   1  $nfa       NFA
   2  $reach     Hash of states in the NFA
 
-=head2 superState($$$)
+=head2 superState($$$$$)
 
 Create super states from existing superstate
 
-     Parameter        Description
-  1  $dfa             DFA
-  2  $superStateName  Start state in DFA
-  3  $nfa             NFA we are tracking
+     Parameter              Description
+  1  $dfa                   DFA
+  2  $superStateName        Start state in DFA
+  3  $nfa                   NFA we are converting
+  4  $symbols               Symbols in the NFA we are converting
+  5  $nfaSymbolTransitions  States reachable from each state by symbol
 
 =head2 superStates($$$)
 
@@ -567,17 +621,19 @@ The super state reached by transition on a symbol from a specified state
 
 12 L<print|/print>
 
-13 L<sequence|/sequence>
+13 L<printNws|/printNws>
 
-14 L<superState|/superState>
+14 L<sequence|/sequence>
 
-15 L<superStates|/superStates>
+15 L<superState|/superState>
 
-16 L<symbols|/symbols>
+16 L<superStates|/superStates>
 
-17 L<transitionOnSymbol|/transitionOnSymbol>
+17 L<symbols|/symbols>
 
-18 L<zeroOrMore|/zeroOrMore>
+18 L<transitionOnSymbol|/transitionOnSymbol>
+
+19 L<zeroOrMore|/zeroOrMore>
 
 
 
@@ -658,7 +714,12 @@ use Test::More tests=>11;
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
   my $dfa = fromExpr(zeroOrMore(choice(element("a"))), zeroOrMore(choice(element("a"))), );
-  ok $dfa->print("a*a* 2: ") eq nws <<END;
+  ok $dfa->printNws("a*a* 2: ") eq nws(compressDfa ? <<END : <<END);
+a*a* 2:
+   State  Final  Symbol  Target  Final
+1  0      1      a       1       1
+2  1      1      a       1       1
+END
 a*a* 2:
    State      Final  Symbol  Target     Final
 1          0      1  a       0 1 2 3 4      1
@@ -669,7 +730,12 @@ END
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
   my $dfa = eval qq(fromExpr(&sequence($s,$s,$s,$s)));
-  ok $dfa->print("a*a* 2: ") eq nws <<END;
+  ok $dfa->printNws("a*a* 2: ") eq nws(compressDfa ? <<END : <<END);
+a*a* 2:
+   State  Final  Symbol  Target  Final
+1  0      1      a       1       1
+2  1      1      a       1       1
+END
 a*a* 2:
    State              Final  Symbol  Target             Final
 1                  0      1  a       0 1 2 3 4 5 6 7 8      1
@@ -695,7 +761,22 @@ if (1)
 
   is_deeply ['a'..'e'], [$dfa->symbols];
 
-  ok $dfa->print("Dfa for a(b|c)+d?e :") eq nws <<END;
+  ok $dfa->printNws("Dfa for a(b|c)+d?e :") eq nws(compressDfa ? <<END : <<END);
+Dfa for a(b|c)+d?e :
+    State  Final  Symbol  Target  Final
+1   0             a       2       0
+2   1      0      b       1       0
+3                 c       3       0
+4                 d       4       0
+5                 e       5       1
+6   2      0      b       1       0
+7                 c       3       0
+8   3      0      b       1       0
+9                 c       3       0
+10                d       4       0
+11                e       5       1
+12  4      0      e       5       1
+END
 Dfa for a(b|c)+d?e :
     State        Final  Symbol  Target       Final
 1   0                   a       1 3          0
@@ -711,7 +792,6 @@ Dfa for a(b|c)+d?e :
 11                      e       7            1
 12  6            0      e       7            1
 END
-
 # Create a parser and use it to parse a sequence of symbols
 
   my $parser = $dfa->parser;                                                    # New parser

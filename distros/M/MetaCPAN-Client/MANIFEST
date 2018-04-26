@@ -22,6 +22,7 @@ examples/complex-either-not.pl
 examples/complex-nested-either-and.pl
 examples/complex.pl
 examples/contributors.pl
+examples/cover.pl
 examples/distribution.pl
 examples/download_url.pl
 examples/es_filter.pl
@@ -41,6 +42,7 @@ examples/rev_deps.pl
 examples/totals.pl
 lib/MetaCPAN/Client.pm
 lib/MetaCPAN/Client/Author.pm
+lib/MetaCPAN/Client/Cover.pm
 lib/MetaCPAN/Client/Distribution.pm
 lib/MetaCPAN/Client/DownloadURL.pm
 lib/MetaCPAN/Client/Favorite.pm
@@ -64,6 +66,7 @@ t/api/_get.t
 t/api/_get_or_search.t
 t/api/_search.t
 t/api/author.t
+t/api/cover.t
 t/api/distribution.t
 t/api/download_url.t
 t/api/favorite.t

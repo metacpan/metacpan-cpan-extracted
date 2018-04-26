@@ -75,7 +75,7 @@ sub update ( $type, $cb = undef ) {
 
                     IO::Uncompress::Gunzip::gunzip( $res->{body}, $temp->path, BinModeOut => 1 );
 
-                    $ENV->{share}->store( 'Pcore-GeoIP', $RES->{$type}->[0], $temp->path );
+                    $ENV->{share}->write( 'Pcore-GeoIP', $RES->{$type}->[0], $temp->path );
 
                     delete $H->{$type};
 

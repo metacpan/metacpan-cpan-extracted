@@ -1,6 +1,9 @@
-use String::Compare::ConstantTime qw/equals/;
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
+
+use String::Compare::ConstantTime qw/equals/;
 
 use Test::More tests => 2;
 

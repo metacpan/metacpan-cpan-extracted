@@ -22,6 +22,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Moritz Grosch</foaf:name>
       <foaf:nick>LittleFox</foaf:nick>
       <foaf:mbox rdf:resource="mailto:littlefox@fsfe.org" />
@@ -100,6 +106,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.007</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-08-15</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.008</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-11-04</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

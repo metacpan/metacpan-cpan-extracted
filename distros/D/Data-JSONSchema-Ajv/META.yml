@@ -19,6 +19,6 @@ requires:
   Test::JSON::Schema::Acceptance: '0'
   Test::More: '0'
   Types::Serialiser: '0'
-  perl: v5.10.0
-version: '0.03'
+  perl: v5.20.0
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.73'

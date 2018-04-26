@@ -47,9 +47,9 @@ Print a help message and exit.
 Force specified input format usage. Automatically choosed (using file
 extension) if omitted.
 
-=item B<--items>
+=item B<--keys>
 
-List keys for hash maps and indexes for arrays, other types printed as is.
+List keys for hash maps and indexes for arrays, others printed as is.
 
 =item B<--list|-l>
 

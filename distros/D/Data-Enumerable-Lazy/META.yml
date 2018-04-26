@@ -1,11 +1,11 @@
 ---
-abstract: unknown
+abstract: 'Lazy generator + enumerable for Perl5.'
 author:
   - 'Oleg S <me@whitebox.io>'
 build_requires: {}
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -17,4 +17,4 @@ no_index:
 resources:
   homepage: https://github.com/icanhazbroccoli/Data-Enumerable-Lazy
   repository: https://github.com/icanhazbroccoli/Data-Enumerable-Lazy.git
-version: 0.03
+version: 0.032

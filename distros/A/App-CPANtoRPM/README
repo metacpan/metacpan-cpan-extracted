@@ -411,6 +411,10 @@ OPTIONS
         password can be passed in at the command line (or a file containing
         the password) using one of these two commands.
 
+    --env VAR=VAL
+        Sets an environment variable before building the package. This
+        option can be used any number of times.
+
 OBTAIN THE PERL MODULE
     The perl module may be obtained in a number of different ways. The perl
     module may exist on local disk either as an archive file or a directory,

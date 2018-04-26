@@ -3,10 +3,11 @@ package Data::Mining::Apriori;
 use 5.010001;
 use strict;
 use warnings;
-use Algorithm::Combinatorics qw(subsets variations);
+use List::PowerSet qw(powerset);
+use Algorithm::Combinatorics qw(variations);
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 my$self;
 
@@ -67,8 +68,8 @@ sub insert_key_items_transaction{
 	(ref($_[1]) eq "ARRAY")
 		or die('Error: $apriori->insert_key_items_transaction(\@items) parameter key items is not an array reference!');
 	my@items=sort(@{$_[1]});
-	my @itemsets=subsets(\@items);
-	foreach my$itemset(@itemsets){
+	my $itemsets=powerset(@items);
+	foreach my$itemset(@{$itemsets}){
 		$self->{keyItemsTransactions}{"@{$itemset}"}++;
 	}
 	$self->{totalTransactions}++;

@@ -49,5 +49,5 @@ requires:
 resources:
   homepage: https://github.com/jeteve/App-CSE
   repository: https://github.com/jeteve/App-CSE.git
-version: '0.013'
+version: '0.014'
 x_serialization_backend: 'YAML::Tiny version 1.73'

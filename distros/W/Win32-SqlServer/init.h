@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.h 4     12-08-15 21:27 Sommar $
+ $Header: /Perl/OlleDB/init.h 5     18-04-09 22:49 Sommar $
 
   This file holds code associated with module and object initialitaion.
   This file also declares global variables that exist through the lifetime
@@ -8,9 +8,14 @@
   The header file also define some enums related to initialisation.
 
 
-  Copyright (c) 2004-2008   Erland Sommarskog
+  Copyright (c) 2004-2018   Erland Sommarskog
 
   $History: init.h $
+ * 
+ * *****************  Version 5  *****************
+ * User: Sommar       Date: 18-04-09   Time: 22:49
+ * Updated in $/Perl/OlleDB
+ * Added support for the new MSOLEDBSQL provider.
  * 
  * *****************  Version 4  *****************
  * User: Sommar       Date: 12-08-15   Time: 21:27
@@ -40,7 +45,7 @@
 // Definitions of all possible providers as an enum.
 typedef enum provider_enum {
     provider_default, provider_sqloledb, provider_sqlncli, 
-    provider_sqlncli10, provider_sqlncli11
+    provider_sqlncli10, provider_sqlncli11, provider_msoledbsql
 } provider_enum;
 
 // And here is global variables for the classids for the possible providers.
@@ -48,6 +53,7 @@ extern CLSID  clsid_sqloledb;
 extern CLSID  clsid_sqlncli;
 extern CLSID  clsid_sqlncli10;
 extern CLSID  clsid_sqlncli11;
+extern CLSID  clsid_msoledbsql;
 
 
 // This is stuff for init properties. When the module starts up, we set up a

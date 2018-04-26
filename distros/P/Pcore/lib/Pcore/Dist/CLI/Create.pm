@@ -8,7 +8,7 @@ with qw[Pcore::Core::CLI::Cmd];
 
 # CLI
 sub CLI ($self) {
-    my $tmpl_cfg = P->cfg->load( $ENV->{share}->get( 'Pcore', 'dist-tmpl', 'cfg.ini' ) );
+    my $tmpl_cfg = P->cfg->read( $ENV->{share}->get( 'Pcore', 'dist-tmpl', 'cfg.ini' ) );
 
     return {
         abstract => 'create new distribution',

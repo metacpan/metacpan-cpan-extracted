@@ -275,6 +275,7 @@ foreach my $file (@FILES) {
                         $mod eq 'constant' ||
                         $mod eq 'base'     ||
                         $mod eq 're'       ||
+                        $mod eq 'Config'   ||
                         $mod eq 'Exporter'
                        );
 

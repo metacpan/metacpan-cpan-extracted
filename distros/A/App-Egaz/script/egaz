@@ -33,6 +33,7 @@ perl -I lib/ t/06-formats.t
 perl -I lib/ t/07-maskfasta.t
 
 perl -I lib/ script/egaz masked <(echo -e ">1\nNNNN\n")
+perl -I lib/ script/egaz masked <(echo -e ">1\nAAAA\n")
 perl -I lib/ t/08-masked.t
 
 perl -I lib/ script/egaz partition
@@ -95,5 +96,6 @@ cat t/example.fas | perl -I lib/ script/egaz fas2vcf \
 perl -I lib/ t/21-fas2vcf.t
 
 perl -I lib/ script/egaz template t/pseudocat t/pseudopig --multi -o tmp/ -v
+perl -I lib/ script/egaz template t/ --prep -o tmp/ --suffix ".fa" --exclude "pig" --perseq t -v
 rm -fr tmp/
 perl -I lib/ t/91-template.t

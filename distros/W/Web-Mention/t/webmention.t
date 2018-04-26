@@ -1,5 +1,6 @@
 use warnings; use strict;
 use Test::More;
+use Test::Exception;
 use FindBin;
 
 use_ok ("Web::Mention");
@@ -32,6 +33,27 @@ my $nonexistent_wm = Web::Mention->new(
     target => $target,
 );
 ok (not($nonexistent_wm->is_verified), "Nonexistent webmention did not get verified.");
+
+throws_ok {
+    my $bad_wm = Web::Mention->new(
+	source => $valid_source,
+	target => $valid_source,
+	);
+}
+qr/same URL/,
+    'Caught identical-URL error.'
+    ;
+
+throws_ok {
+    my $bad_wm = Web::Mention->new(
+	source => $valid_source,
+	target => $valid_source . '#foobar'
+	);
+}
+qr/same URL/,
+    'Caught identical-URL error (with extra fragment).'
+    ;
+
 
 done_testing();
 

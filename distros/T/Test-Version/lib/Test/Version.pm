@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '2.07'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 use parent 'Exporter';
 use Test::Builder;
@@ -74,6 +74,23 @@ my %versions;
 my $test = Test::Builder->new;
 
 our $_IN_VERSION_ALL_OK = 0;
+our %FILE_FIND_RULE_EXTRAS = (
+  untaint => 1,
+  #
+  # the untainting pattern for Windows used by File::Find seems to be wrong.
+  #
+  #  - cwd returns an absolute directory will usually return a volume (e.g. 'C:')
+  #  - windows file systems frequently include directorieswith parans and spaces in them
+  #    I am a little dubious that accepting them is safe.  The alternative is that
+  #    this module would not be installable in a lot of environments, and I honestly
+  #    don't believe that many people are using Test::Version in taint mode on Windows
+  #    anyway, so I am weighing the risk as worth it.
+  #  - windows has short names with tildes in them (e.g. "FOO~1").  Tilde is not a
+  #    special character in windows shells anyway, so I think we should be safe there.
+  #
+  ($^O eq 'MSWin32' ? (untaint_pattern => qr|^(([a-zA-Z]:)?[-+@\w./\~\(\) ]+)$|x) : ()),
+);
+
 
 sub version_ok {
   my ( $file, $name ) = @_;
@@ -211,10 +228,7 @@ sub version_all_ok {
 
   $name ||= "all modules in $dir have valid versions";
 
-  my @files = File::Find::Rule->perl_module->extras({
-    untaint => 1,
-    ($^O eq 'MSWin32' ? (untaint_pattern => qr|^(([a-zA-Z]:)?[-+@\w./]+)$|x) : ()),
-  })->in($dir);
+  my @files = File::Find::Rule->perl_module->extras(\%FILE_FIND_RULE_EXTRAS)->in($dir);
 
   {
     local $_IN_VERSION_ALL_OK = 1;
@@ -265,7 +279,7 @@ Test::Version - Check to see that version's in modules are sane
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 

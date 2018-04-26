@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/module-faker"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Module::Faker",
   "PREREQ_PM" => {
     "Archive::Any::Create" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "Path::Class" => "0.06",
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.018",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }

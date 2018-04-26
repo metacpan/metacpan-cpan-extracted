@@ -112,6 +112,15 @@ my $content_dir = Path::Class::Dir->new('t/toindex');
 }
 
 {
+  ## Searching a scala file excluding declaration
+  local @ARGV = (  '--idx='.$idx_dir, 'scala -decl:FooClass mime:text/x-scala');
+  my $cse = App::CSE->new();
+  is( $cse->command()->execute(), 0 , "Ok execute has terminated just fine");
+  ok( $cse->command()->hits() , "Ok got hits");
+  is( $cse->command()->hits()->total_hits() , 0, "Ok no hit because FooClass is in declarations");
+}
+
+{
   ## Searching for CSharp
   local @ARGV = (  '--idx='.$idx_dir, 'CSHarp mime:text/x-csharp');
   my $cse = App::CSE->new();

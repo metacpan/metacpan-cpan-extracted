@@ -1,5 +1,5 @@
 package App::CSE::File::TextHtml;
-$App::CSE::File::TextHtml::VERSION = '0.013';
+$App::CSE::File::TextHtml::VERSION = '0.014';
 use Moose;
 extends qw/App::CSE::File/;
 

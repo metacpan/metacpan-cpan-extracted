@@ -1,11 +1,18 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/4_conversion.t 13    12-08-19 14:54 Sommar $
+# $Header: /Perl/OlleDB/t/4_conversion.t 14    18-04-13 17:23 Sommar $
 #
 # Tests that it's possible to set up a conversion based on the local
 # OEM character set and the server charset. Mainly is this is test that
 # we can access Win32::Registry properly.
 #
 # $History: 4_conversion.t $
+# 
+# *****************  Version 14  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 13  *****************
 # User: Sommar       Date: 12-08-19   Time: 14:54
@@ -121,14 +128,7 @@ else {
 my $X = testsqllogin(0);
 my ($sqlver) = split(/\./, $X->{SQL_version});
 my $provider = $X->{Provider};
-my $clr_enabled;
-if ($sqlver >= 9) {
-   $clr_enabled = $X->sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-   SELECT value
-   FROM   sys.configurations
-   WHERE  name = 'clr enabled'
-SQLEND
-}
+my $clr_enabled = clr_enabled($X);
 
 # Investigate the code page for the server collation. The test only runs 
 # if this is 1252, since we don't what distortions that happens with other

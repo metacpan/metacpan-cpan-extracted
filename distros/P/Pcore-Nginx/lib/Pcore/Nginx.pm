@@ -1,4 +1,4 @@
-package Pcore::Nginx v1.6.4;
+package Pcore::Nginx v1.6.6;
 
 use Pcore -dist, -class;
 
@@ -36,7 +36,7 @@ sub _build_vhost_dir ($self) {
 sub run ($self) {
 
     # generate mime types
-    my $mime_types = P->cfg->load( $ENV->{share}->get('data/mime.json') )->{suffix};
+    my $mime_types = P->cfg->read( $ENV->{share}->get('data/mime.json') )->{suffix};
 
     my $nginx_mime_types;
 
@@ -49,8 +49,8 @@ sub run ($self) {
         pid                => $self->conf_dir . 'nginx.pid',
         mime_types         => $self->conf_dir . 'mime.types',
         error_log          => $self->data_dir . 'nginx-error.log',
-        geoip_country_path => $ENV->{share}->get('data/geoip_country.dat'),
-        geoip_city_path    => $ENV->{share}->get('data/geoip_city.dat'),
+        geoip_country_path => $ENV->{share}->get('data/geoip_country.dat') || undef,
+        geoip_city_path    => $ENV->{share}->get('data/geoip_city.dat') || undef,
         vhost_dir          => $self->vhost_dir,
         ssl_dhparam        => $ENV->{share}->get('data/nginx/dhparam-4096.pem'),
         mime_types         => $nginx_mime_types,

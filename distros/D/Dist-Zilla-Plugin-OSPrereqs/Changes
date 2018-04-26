@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-OSPrereqs
 
+0.010     2018-04-22 22:00:43+02:00 Europe/Oslo
+
+  [ADDED]
+
+  - detect incorrect usage of plugin from a bundle, rather than allowing
+    invalid code to be silently added to Makefile.PL
+
 0.009     2018-04-21 20:36:30+02:00 Europe/Oslo
 
   [ADDED]

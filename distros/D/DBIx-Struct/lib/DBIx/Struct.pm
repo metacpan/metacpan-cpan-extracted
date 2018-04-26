@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 our @EXPORT = qw{
   one_row
@@ -494,7 +494,7 @@ sub populate {
     my @tables;
     DBIx::Struct::connect->run(
         sub {
-            my $sth = $_->table_info('', '', '%', "TABLE");
+            my $sth = $_->table_info('', '%', '%', "TABLE");
             return if not $sth;
             my $tables = $sth->fetchall_arrayref;
             @tables = map {
@@ -728,14 +728,14 @@ sub make_object_filter_timestamp {
 			if(\@_ == 1) {
 				for my \$f ($timestamps) {
 					if(\$self->[@{[_row_data]}][\$fields{\$f}]) {
-						\$self->[@{[_row_data]}][\$fields{\$f}] =~ s/\\.\\d+(\$|\\+|\\-)/$1/;
+						\$self->[@{[_row_data]}][\$fields{\$f}] =~ s/\\.\\d+(\$|\\+|\\-)/\$1/;
 						\$self->[@{[_row_data]}][\$fields{\$f}] =~ s/(\\+|\\-)(\\d{2})\$/\$1\${2}00/;
 					}
 				}
 			} else {
 				for my \$f (\@_[1..\$#_]) {
 					if(\$self->[@{[_row_data]}][\$fields{\$f}]) {
-						\$self->[@{[_row_data]}][\$fields{\$f}] =~ s/\\.\\d+(\$|\\+|\\-)/$1/;
+						\$self->[@{[_row_data]}][\$fields{\$f}] =~ s/\\.\\d+(\$|\\+|\\-)/\$1/;
 						\$self->[@{[_row_data]}][\$fields{\$f}] =~ s/(\\+|\\-)(\\d{2})\$/\$1\${2}00/;
 					}
 				}
@@ -1249,6 +1249,18 @@ sub setup_row {
         # means this is just one simple table
         $connector->run(
             sub {
+                my $ssth = $_->prepare('select * from ' . $_->quote_identifier($table) . ' where 0 == 1');
+                error_message {
+                    result  => 'SQLERR',
+                    message => "Unknown table $table",
+                  }
+                  if not $ssth;
+                $ssth->execute
+                  or error_message {
+                    result  => 'SQLERR',
+                    message => "Probably unknown table $table: " . $_->errstr,
+
+                  };
                 my $cih = $_->column_info(undef, undef, $table, undef);
                 error_message {
                     result  => 'SQLERR',
@@ -1701,11 +1713,13 @@ sub _build_complex_query {
         if (substr($le, 0, 1) ne '-') {
             my ($tn, $ta) = split ' ', $le;
             $ta = $tn if not $ta;
+            my $ncn = make_name($tn);
+            $ncn = _schema_name($ncn);
             error_message {
                 result  => 'SQLERR',
                 message => "Unknown table $tn"
               }
-              unless _exists_row(make_name($tn));
+              unless setup_row($tn, $ncn);
             push @from, [$tn, $ta];
         } else {
             my $cmd = substr($le, 1);

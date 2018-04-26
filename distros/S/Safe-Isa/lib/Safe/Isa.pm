@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Scalar::Util ();
 use Exporter 5.57 qw(import);
 
-our $VERSION = '1.000009';
+our $VERSION = '1.000010';
 
 our @EXPORT = qw($_call_if_object $_isa $_can $_does $_DOES $_call_if_can);
 

@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 145;
+plan tests => 151;
 
 foreach my $testfile (qw/comments
                          inline
@@ -87,11 +87,14 @@ foreach my $testfile (qw/comments
                          enumerations
                          empty-tags
                          verb
+                         verb-2
                          headers
                          prova
                          recursiv
                          broken-inline
                          splat
+                         labels
+                         anchors-2
                         /) {
     test_testfile($testfile);
 }
@@ -152,4 +155,5 @@ sub show_diff {
     else {
         diag "GOT:\n$got\n\nEXP:\n$exp\n\n";
     }
+    die if $ENV{FAILURE_IS_FATAL};
 }

@@ -29,12 +29,15 @@ sub run
     my $print = MYDan::VSSH::Print->new();
     $print->welcome();
 
+    my $audit = $run{audit};
     my $c = scalar @{$this->{node}};
     while ( 1 )
     {
-	next unless my $cmd = $this->_comp( $c, @run{qw( user sudo )} );
+        next unless my $cmd = $this->_comp( $c, @run{qw( user sudo )} );
         exit if $cmd eq 'exit' || $cmd eq 'quit' ||  $cmd eq 'logout';
    
+        &$audit( $cmd ) if $audit;
+
         my %result = $execute->run( %run, cmd => $cmd );
         $print->result( %result );
 

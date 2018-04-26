@@ -25,4 +25,8 @@ $option->assert( 'cmd', 'log' );
 
 $0 = $o{name} if $o{name};
 
+close STDOUT;close STDERR;
+
+exit if fork;
+
 MYDan::Util::Supervisor->new( %o )->run( %o );

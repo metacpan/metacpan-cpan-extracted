@@ -445,7 +445,7 @@ sub is_root ($self) {
 # MIME
 sub _get_mime_types ($self) {
     unless ($MIME_TYPES) {
-        $MIME_TYPES = P->cfg->load( $ENV->{share}->get('data/mime.json') );
+        $MIME_TYPES = P->cfg->read( $ENV->{share}->get('data/mime.json') );
 
         # index MIME categories
         for my $suffix ( keys $MIME_TYPES->{suffix}->%* ) {

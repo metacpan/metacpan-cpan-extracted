@@ -25,5 +25,5 @@ requires:
   Convert::Scalar: '1.12'
   DBI: '1'
   common::sense: '3.3'
-version: '3.03'
+version: '3.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

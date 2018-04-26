@@ -8,11 +8,10 @@ use strict;
 
 use ExtUtils::MakeMaker 6.64;
 
-
 my %WriteMakefileArgs = (
     NAME     => 'CatalystX::ASP',
     DISTNAME => 'CatalystX-ASP',
-    VERSION  => '1.14',
+    VERSION  => '1.15',
     EXE_FILES => [glob('script/*'), glob('bin/*')],
     CONFIGURE_REQUIRES => {
   "ExtUtils::MakeMaker" => "6.64"

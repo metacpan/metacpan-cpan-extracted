@@ -17,7 +17,7 @@ sub CLI {
     };
 }
 
-my $cfg = P->cfg->load("$ENV->{DATA_DIR}cfg.ini");
+my $cfg = P->cfg->read("$ENV->{DATA_DIR}cfg.ini");
 
 my $app = <: $module_name :>->new( {    #
     app_cfg => {

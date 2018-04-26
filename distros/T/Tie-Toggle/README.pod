@@ -73,16 +73,16 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/Tie-Toggle>
+=item *	L<https://github.com/briandfoy/tie-toggle>
 
 =back
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/Tie-Toggle/issues>:
+tracker|https://github.com/briandfoy/tie-toggle/issues>:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/Tie-Toggle/issues>
+=item *	L<https://github.com/briandfoy/tie-toggle/issues>
 
 =back
 

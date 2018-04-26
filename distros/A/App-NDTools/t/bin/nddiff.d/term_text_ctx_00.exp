@@ -1,5 +1,5 @@
   {text}
-    @@ 4,- -,- @@
+    @@ -5,4  +5,4 @@
 -   First string for a.
 -   Second striing for a.
 -   Third string, belongs to file a.
@@ -8,7 +8,7 @@
 +   Second striing for b.
 +   Third string, belongs to file b.
 +   And fourth. Again to b.
-    @@ 14,- -,- @@
+    @@ -11,3  +11,3 @@
 -   Different line. AAaaaaa!!
 -   Aaaaa!!
 -   A!

@@ -4,7 +4,7 @@
 
 
 
-static int do_compare(unsigned char *a, unsigned char *b, size_t n) {   
+static int do_compare(unsigned char *a, unsigned char *b, size_t n) {
   size_t i;
   unsigned char r = 0;
 
@@ -17,7 +17,7 @@ static int do_compare(unsigned char *a, unsigned char *b, size_t n) {
 
 
 
-MODULE = String::Compare::ConstantTime		PACKAGE = String::Compare::ConstantTime		
+MODULE = String::Compare::ConstantTime		PACKAGE = String::Compare::ConstantTime
 
 PROTOTYPES: ENABLE
 
@@ -38,10 +38,10 @@ equals(a, b)
         SvGETMAGIC(b);
 
         if (SvOK(a) && SvOK(b)) {
-          alen = SvCUR(a);
+          alen = sv_len_utf8(a);
           ap = SvPV(a, alen);
 
-          blen = SvCUR(b);
+          blen = sv_len_utf8(b);
           bp = SvPV(b, blen);
 
           if (alen == blen) {

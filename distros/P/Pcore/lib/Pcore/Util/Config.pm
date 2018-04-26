@@ -15,7 +15,7 @@ const our $EXT_TYPE_MAP => {
     toml => $DATA_TYPE_TOML,
 };
 
-sub load ( $cfg, @ ) {
+sub read ( $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my %args = (
         type => undef,
         splice @_, 1,
@@ -39,7 +39,7 @@ sub load ( $cfg, @ ) {
     return decode_data( $type, $cfg, %args );
 }
 
-sub store ( $path, $cfg, @ ) {
+sub write ( $path, $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my %args = (
         type => undef,
         splice @_, 2,

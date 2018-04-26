@@ -179,12 +179,12 @@ sub _build_module ($self) {
 }
 
 sub _build_cfg ($self) {
-    return P->cfg->load( $self->share_dir . 'dist.' . $Pcore::Core::Const::DIST_CFG_TYPE );
+    return P->cfg->read( $self->share_dir . 'dist.' . $Pcore::Core::Const::DIST_CFG_TYPE );
 }
 
 sub _build_docker_cfg ($self) {
     if ( -f $self->share_dir . 'docker.json' ) {
-        return P->cfg->load( $self->share_dir . 'docker.json' );
+        return P->cfg->read( $self->share_dir . 'docker.json' );
     }
 
     return;
@@ -192,7 +192,7 @@ sub _build_docker_cfg ($self) {
 
 sub _build_par_cfg ($self) {
     if ( -f $self->share_dir . 'par.ini' ) {
-        return P->cfg->load( $self->share_dir . 'par.ini' );
+        return P->cfg->read( $self->share_dir . 'par.ini' );
     }
 
     return;
@@ -239,7 +239,7 @@ sub _build_id ($self) {
         }
     }
     elsif ( -f $self->share_dir . 'dist-id.json' ) {
-        $id = P->cfg->load( $self->share_dir . 'dist-id.json' );
+        $id = P->cfg->read( $self->share_dir . 'dist-id.json' );
     }
 
     # convert date to UTC

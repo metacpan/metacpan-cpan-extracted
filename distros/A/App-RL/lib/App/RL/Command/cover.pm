@@ -6,23 +6,31 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'output covers of positions on chromosomes';
+sub abstract {
+    return 'output covers of positions on chromosomes';
+}
+
 
 sub opt_spec {
-    return ( [ "outfile|o=s", "Output filename. [stdout] for screen" ], { show_defaults => 1, } );
+    return ( [ "outfile|o=s", "output filename. [stdout] for screen" ], { show_defaults => 1, } );
 }
 
 sub usage_desc {
-    return "runlist cover [options] <infiles>";
+    return "runlist cover [options] <infile> [more infiles]";
 }
 
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= " " x 4 . "Like `runlist combine`, but <infiles> are genome positions.\n";
-    $desc .= " " x 4 . "I:1-100\n";
-    $desc .= " " x 4 . "I(+):90-150\n";
-    $desc .= " " x 4 . "S288c.I(-):190-200\tSpecies names will be omitted.\n";
+    $desc .= <<'MARKDOWN';
+
+Like `runlist combine`, but <infile> are genome positions
+
+    I:1-100
+    I(+):90-150
+    S288c.I(-):190-200      # Species names will be omitted
+
+MARKDOWN
     return $desc;
 }
 

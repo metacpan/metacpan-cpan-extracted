@@ -1,0 +1,46 @@
+---
+abstract: 'Tool for generating simple PMLTQ query based on given nodes'
+author:
+  - 'Matyáš Kopp <matyas.kopp@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PMLTQ-Suggest
+no_index: {}
+provides:
+  PMLTQ::Command::suggest:
+    file: lib/PMLTQ/Command/suggest.pm
+    version: v0.0.1
+  PMLTQ::Suggest:
+    file: lib/PMLTQ/Suggest.pm
+    version: v0.0.1
+  PMLTQ::Suggest::Server:
+    file: lib/PMLTQ/Suggest/Server.pm
+    version: v0.0.1
+  PMLTQ::Suggest::Utils:
+    file: lib/PMLTQ/Suggest/Utils.pm
+    version: v0.0.1
+requires:
+  HTTP::Server::Simple::CGI: '0'
+  PMLTQ: v1.4.0
+  Treex::PML: '2.18'
+resources:
+  bugtracker: https://github.com/ufal/pmltq-suggest-server/issues
+  homepage: http://ufal.mff.cuni.cz/pmltq/
+  repository: https://github.com/ufal/pmltq-suggest-server.git
+version: 0.0.1
+x_authority: cpan:MATY
+x_authority_from_module: PMLTQ::Suggest
+x_permissions_from_module: PMLTQ::Suggest
+x_serialization_backend: 'YAML::Tiny version 1.70'

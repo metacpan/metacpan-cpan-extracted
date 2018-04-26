@@ -37,7 +37,7 @@ sub action {
 
     # $selector => $action [, @arguments ]
     if ( !ref $_[0] ) {
-        @actions = ( shift, shift );
+        @actions = ( shift, shift // sub { $_ } );
         @args = @_;
     }
 

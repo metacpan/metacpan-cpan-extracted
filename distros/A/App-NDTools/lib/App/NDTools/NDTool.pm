@@ -7,11 +7,11 @@ use App::NDTools::INC;
 use App::NDTools::Slurp qw(s_dump s_load);
 use Encode::Locale;
 use Encode qw(decode);
-use Getopt::Long qw(GetOptionsFromArray :config bundling);
+use Getopt::Long qw(GetOptionsFromArray :config bundling noignore_case);
 use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 sub arg_opts {
     my $self = shift;
@@ -67,15 +67,36 @@ sub grep {
     my @out;
 
     for my $struct (@structs) {
-        my $tmp;
+        my (%map_idx, $path, $ref, $grepped);
+
         for (@{$spaths}) {
             my @found = eval { path($struct, $_, deref => 1, paths => 1) };
-            while (@found) {
-                my ($p, $r) = splice @found, 0, 2;
-                path($tmp, $p, assign => $r, expand => 'append');
+
+            while (($path, $ref) = splice @found, 0, 2) {
+                # remap array's indexes
+                my $map_key = "";
+                my $map_path = [];
+
+                for my $step (@{$path}) {
+                    if (ref $step eq 'ARRAY') {
+                        $map_key .= "[]";
+                        unless (exists $map_idx{$map_key}->{$step->[0]}) {
+                            $map_idx{$map_key}->{$step->[0]} =
+                                keys %{$map_idx{$map_key}};
+                        }
+
+                        push @{$map_path}, [$map_idx{$map_key}->{$step->[0]}];
+                    } else { # HASH
+                        $map_key .= "{$step->{K}->[0]}";
+                        push @{$map_path}, $step;
+                    }
+                }
+
+                path($grepped, $map_path, assign => $ref, expand => 1);
             }
         }
-        push @out, $tmp if (defined $tmp);
+
+        push @out, $grepped if (defined $grepped);
     }
 
     return @out;

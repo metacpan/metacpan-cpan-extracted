@@ -91,7 +91,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.39",
+   "version" : "1.41",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -119,7 +119,7 @@
       "Duke Leto (LETO)",
       "Shoichi Kaji (SKAJI)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_use_unsafe_inc" : 0
 }
 

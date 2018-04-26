@@ -207,26 +207,24 @@ result set(s).</P>
    <DD>x86 and AMD64 are supported. </DD>
    <DT>&nbsp;</DT>
    <DT><B>Perl</B></DT>
-   <DD>Perl 5.12 or later is required. </DD>
+   <DD>Perl 5.18 or later is required. </DD>
    <DT>&nbsp;</DT>
    <DT><B>Operating Systems</B></DT>
-   <DD>All versions of Windows from Windows 2000 and later. (However, version 2.010 is the last version to support that old versions of Windows. The minimum level for the next version of Win32::SqlServer will be Window Vista and Windows Server 2008.)</DD>
+   <DD>Minimum level is Windows 7 SP1 (client O/S) and Windows 2008 R2 SP1 (server O/S). For versions before Windows 10, you need to have the update in <A HREF="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">KB2999226</A> installed. </DD>
    <DT>&nbsp;</DT>
-   <DT><B>MDAC/SQL Server Native Client </B></DT>
+   <DT><B>OLE DB Provider</B></DT>
    <DD>To connect to <SMALL>SQL</SMALL> Server you need a <SMALL>OLE DB</SMALL> Provider for <SMALL>SQL</SMALL> Server. There
    are several of them, or at least there are several names (they can been seen as
-   different versions of the same provider).<UL>
-   <LI><SMALL>SQLOLEDB</SMALL> - Ships with Windows as part of the <SMALL>MDAC</SMALL>, and supports all features of <SMALL>SQL</SMALL>&nbsp;2000.
-   You need at least
-   version 2.6 of the <SMALL>MDAC</SMALL>. Note that Windows 2000 shipped with <SMALL>MDAC</SMALL> 2.5. A computer on which you have
-   installed any components of <SMALL>SQL</SMALL>&nbsp;2000 is likely to have <SMALL>MDAC</SMALL> 2.6.</LI>
-   <LI><SMALL>SQLNCLI &#8211; SQL</SMALL> (Server) Native Client. The provider that ships with <SMALL>SQL</SMALL>&nbsp;2005, and
-   you need at least <SMALL>SQLNCLI</SMALL> to have full access to all features in <SMALL>SQL</SMALL>&nbsp;2005.</LI>
-   <LI><SMALL>SQLNCLI10</SMALL> &#8211; The provider that
-     ships with <SMALL>SQL</SMALL>&nbsp;2008, and you need at least <SMALL>SQLNCLI10</SMALL> for support of <SMALL>SQL</SMALL>&nbsp;2008
-     features.</LI>
-      <LI><SMALL>SQLNCLI11</SMALL> &#8211; The provider that ships with <SMALL>SQL</SMALL> 2012 and you need this provider for full support of <SMALL>SQL</SMALL> 2012 features. (Then again, the only feature in Win32::SqlServer that requires this provider is the login property <B>ApplicationIntent</B>.)</LI>
-   </UL>
+   different versions of the same provider). They are here listed in reverse order of release:</DD>
+   <DD>
+     <UL>
+       <LI><SMALL>MSOLEDBSQL</SMALL> &#8211; <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Originally released in March 2018, the first release of <SMALL>OLE DB</SMALL> for SQL Server after some years of deprecation. This is the recommended provider.</LI>
+       <LI><SMALL>SQLNCLI11</SMALL> &#8211; SQL Serer Native Client 11.0. The provider that ships with <SMALL>SQL</SMALL> 2012 and later versions.</LI>
+       <LI><SMALL>SQLNCLI10</SMALL> &#8211; SQL Server Native Client 10.0. The provider that
+       shipped with <SMALL>SQL</SMALL>&nbsp;2008.</LI>
+       <LI><SMALL>SQLNCLI &#8211; SQL</SMALL> (Server) Native Client. The provider that shipped with <SMALL>SQL</SMALL>&nbsp;2005.</LI>
+       <LI><SMALL>SQLOLEDB</SMALL> &#8211; The original <SMALL>OLE DB</SMALL> provider that shipped with <SMALL>SQL</SMALL> 2000 and earlier versions and still ships with all operating systems. That is, if you install no <SMALL>OLE DB</SMALL> provider on the machine, <SMALL>SQLOLEDB</SMALL> will always be there for you, but you will not have support for features added in <SMALL>SQL</SMALL> 2005 or later.</LI>
+     </UL>
    </DD>
    <DT>&nbsp;</DT>
    <DT><B>SQL Server</B></DT>
@@ -234,18 +232,21 @@ result set(s).</P>
    are supported. When it comes to Windows Azure SQL Database, I have not tested Win32::SqlServer on this platform, but I would expect it work.</DD>
    <DT>&nbsp;</DT>
    <DT><B>Compiler</B></DT>
-   <DD>If you want to compile Win32::SqlServer on your own, you need Visual Studio 2005 or
-     later. You will also need the <SMALL>SDK</SMALL> file for <SMALL>SQL</SMALL> Native Client
-     that comes with <SMALL>SQL</SMALL>&nbsp;2012 or later. Note that the
-     <SMALL>SDK</SMALL> comes with <SMALL>SQL</SMALL>&nbsp;2008 or earlier will not 
-   suffice. (If you use any other compiler than
-     Visual C++, feel free to try. I have not tested that, nor do I support it.)
-     If you have downloaded a binary, you do not need any compiler.
-   </DD>
+   <DD>If you want to compile Win32::SqlServer on your own, you need Visual Studio 2015 or
+   later. You will also need the <SMALL>SDK</SMALL> file for Microsoft OLE DB Driver for SQL Server. (Note that the SDK is not installed by default when you install the provider.) If you use any other compiler than
+     Visual C++, feel free to try. I have not tested that, nor do I support it.
+   If you have downloaded a binary, you do not need any compiler. </DD>
+  <DT>&nbsp;</DT>   
    <DT><B>Binary Support</B></DT>
-   <DD>The binary distribution includes 32-bit and 64-bit binaries for Perl 5.12, 5.14, 5.16, 5.18, 5.20, 5.22 and 5.24. I have tested all binaries with ActivePerl, and the binaries for 5.18 and up have also been tested with Strawberry Perl. Note that the 32-bit binaries for Perl 5.18 and up are built with USE_64_BIT_INT and they will not run with a 32-bit Perl built without this option.</DD>
+   <DD>The binary distribution includes 32-bit and 64-bit binaries for Perl 5.18, 5.20, 5.22, 5.24 and 5.26. I have tested all binaries with ActivePerl with Strawberry Perl. Note that the 32-bit binaries for Perl 5.18 and up are built with USE_64_BIT_INT and they will not run with a 32-bit Perl built without this option. Generally, I have a five-version policy for binaries. That is, when Perl 5.28 is released, you can expect me to drop support for Perl 5.18</DD>
 </DL>
-<P>If you want to run Win32::SqlServer with SQL Server 6.5, Perl 5.8 or Perl 5.10, you can use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> which was the last version of the module to support these versions.</P>
+<P>To run Win32::SqlServer on platforms not included above, you can use older versions as follows:</P>
+<UL>
+  <LI>For support for Perl 5.12, 5.14 or 5.16, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.010.zip">version 2.010</A> of Win32::SqlServer.</LI>
+  <LI>For support for older operating systems (Windows Vista, Windows 2008, Windows XP, Windows 2003, Windows 2000), use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.010.zip">version 2.010</A> of Win32::SqlServer.</LI>
+  <LI>For support for Perl 5.8 or 5.10, you can use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> of Win32::SqlServer.</LI>
+  <LI>To connect to SQL Server 6.5, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> of Win32::SqlServer.</LI>
+</UL>
 <H2><A NAME="functionsummary">Summary of Functions</A></H2>
 <P>The functions of Win32::SqlServer fall into five groups: 1) Connection
    routines. 2) High-level query functions. 3) Mid-level query functions 4)
@@ -483,9 +484,8 @@ Win32::SqlServer <CODE>croaks</CODE>.</P>
    an unhandled error at login.</DD>
    <DT>&nbsp;</DT>
    <DT><B>Provider</B></DT>
-   <DD>Selects which <SMALL>OLE DB</SMALL> provider to use, <SMALL>SQLOLEDB, SQLNCLI, </SMALL>&nbsp;<SMALL>SQLNCLI10</SMALL> 
-   or <SMALL>SQLNCLI11</SMALL>. By default, Win32::SqlServer uses the most recent provider
-   that is installed. That is, if <SMALL>SQLNCLI11</SMALL> is available this is the default.</DD>
+   <DD>Selects which <SMALL>OLE DB</SMALL> provider to use, <SMALL>MSOLEDBSQL</SMALL>, <SMALL>SQLNCLI11</SMALL>, <SMALL>SQLNCLI10</SMALL>, <SMALL>SQLNCLI</SMALL> or <SMALL>SQLOLEDB</SMALL>. By default, Win32::SqlServer uses the most recent provider
+   that is installed. That is, if <SMALL>MSOLEDBSQL</SMALL> is available, this is the default.</DD>
    <DT>&nbsp;</DT>
    <DT><B>QueryNotification</B></DT>
    <DD>A hash that specifies parameters for query notification.</DD>
@@ -1433,7 +1433,7 @@ to both kinds as <SMALL>UDT</SMALL>s.</P>
 <H3>Large CLR UDTs</H3>
 <P>Large <SMALL>CLR UDT</SMALL>s are types that are defined with MaxByteSize&nbsp;=&nbsp;-1, and thus can
 exceed 8000 bytes. Large <SMALL>UDT</SMALL>s were added in <SMALL>SQL</SMALL>&nbsp;2008, and as long as you are
-using <SMALL>SQLNCLI10</SMALL>, Win32::SqlServer handles large UDTs in the same way as regular
+using <SMALL>SQLNCLI10</SMALL> or later, Win32::SqlServer handles large UDTs in the same way as regular
 UDTs. (But see the general caveats on large types below).</P>
 <P>If you use <SMALL>SQLNCLI</SMALL>, you cannot receive <SMALL>OUTPUT</SMALL> parameters of large <SMALL>UDT</SMALL>s, but
 you can still pass values to input parameters of large <SMALL>UDT</SMALL>s. If you use
@@ -1567,7 +1567,7 @@ but for now <CODE><SPAN CLASS="nowrap">Win32::SqlServer-&gt;sql_init()</SPAN></C
    <SMALL>SSPROP_</SMALL>). I will have to
    admit that for some of these, I have only a vague notion of what they are
    good for. So I will have to refer you to Books Online for complete
-   description in several cases. A start is the topic <A HREF="http://msdn.microsoft.com/en-us/library/ms131377.aspx"><I>Initialization and Authorization Properties</I></A> in Books Online.</P>
+   description in several cases. A start is the topic <A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/applications/using-connection-string-keywords-with-oledb-driver-for-sql-server"><I>Using Connection String Keywords with OLE DB Driver for SQL Server</I></A> in Books Online.</P>
 <P>Not all <SMALL>OLE DB</SMALL> properties are exposed by <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A>, as not all are
    applicable in the context of Win32::SqlServer. Note below that when I say that
    Win32::SqlServer does not set a default value for a
@@ -1589,7 +1589,7 @@ the provider fancies.</P>
 read-only replica in <SMALL>SQL</SMALL> Server 2012 or later, and controls whether you are 
 directed to the main instance or the read-only replica. The possible values are
 <I>ReadWrite</I> (the default) and <I>ReadOnly</I>. This property is only 
-available with the <SMALL>SQLNCLI11</SMALL> provider.</P>
+available with the <SMALL>SQLNCLI11</SMALL> provider or later.</P>
 <H3><A NAME="Appname">Appname</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -1751,6 +1751,15 @@ clears <B><A HREF="#IntegratedSecurity">IntegratedSecurity</A></B>. </P>
 <P>The locale ID. My interpretation of Books
 Online is that it does not have much effect. Nevertheless, Win32::SqlServer sets a default
 value by calling the Windows function <I>GetUserDefault<SMALL>LCID</SMALL></I>.</P>
+<H3><A NAME="MultiSubnetFailover">MultiSubnetFailover</A></H3>
+<P>
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
+<TR><TH>Data type</TH>
+<TD CLASS="extrapad">boolean</TD><TH>Default</TH>
+<TD CLASS="extrapad">false</TD><TH><SMALL>OLE DB</SMALL> Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_MULTISUBNETFAILOVER</SMALL></TD></TR>
+</TABLE>
+</P>
+<P>Set this property to a true value when connecting to an availability group. This property is only available with the <SMALL>MSOLEDBSQL</SMALL> provider.</P>
 <H3><A NAME="Netlib">Netlib</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -1836,7 +1845,7 @@ When this setting is false, the connection is physically disconnected when you c
   2000. On <SMALL>SQL</SMALL> 2005 and later, it is possible, but you need to take some precautions, as
 discussed in Books Online.</P>
 <P> (Readers well versed <SMALL>in OLE DB</SMALL> may know that <SMALL>DBPROP_INIT_OLEDBSERVICES</SMALL> is in fact a bit mask that controls other <SMALL>OLE DB</SMALL>
-    services as well. Currently Win32::SqlServer always turns off these services.)
+    services as well. Currently Win32::SqlServer always turns off these other services.)
 </P>
 <H3><A NAME="LogpropPrompt">Prompt</A></H3>
 <P>
@@ -4718,29 +4727,33 @@ an result
 <TR><TH>Data type</TH><TD CLASS="extrapad">enumeration</TD><TH>Default</TH><TD CLASS="extrapad">see below</TD></TR>
 </TABLE>
 </P>
-   <P>There are four <SMALL>OLE DB</SMALL> providers that Win32::SqlServer can use when
-   connecting to <SMALL>SQL</SMALL> Server: </P>
+   <P>There are five generations of <SMALL>OLE DB</SMALL> providers that Win32::SqlServer supports for connecting to <SMALL>SQL</SMALL> Server. They are here listed in reverse order of release:</P>
 <UL>
+   <LI><SMALL>MSOLEDBSQL</SMALL> (<I>Microsoft <SMALL>OLE DB</SMALL> Driver for <SMALL>SQL</SMALL> Server) </I>which is released out-of-band with SQL Server versions. The first version was released in March SQL 2018. Officially, the lowest version it supports is SQL 2012, but it permits connections to SQL 2005 and SQL 2008 as well. This is the recommended version.</LI>
+   <LI><SMALL>SQLNCLI11</SMALL> (<I>SQL Server Native Client 11.0</I>) is the version of <SMALL>SQL</SMALL> Server Native Client that ships with <SMALL>SQL</SMALL> 2012 and later versions of SQL Server. </LI>
+   <LI><SMALL>SQLNCLI10</SMALL> (<I>SQL Server Native Client 10.0</I>) is the version of <SMALL>SQL</SMALL> Server Native Client that shipped with <SMALL>SQL</SMALL>
+   2008.</LI>
+   <LI><SMALL>SQLNCLI</SMALL> (<I><SMALL>SQL</SMALL>
+   Native Client</I>)
+      which shipped with <SMALL>SQL</SMALL>&nbsp;2005.   </LI>
    <LI><SMALL>SQLOLEDB</SMALL> (<I>Microsoft
-   <SMALL>OLE DB</SMALL> Provider for <SMALL>SQL</SMALL> Server</I>), which comes
-   with the <SMALL>MDAC</SMALL> and Windows.</LI>
-   <LI><SMALL>SQLNCLI</SMALL> (<I>Microsoft <SMALL>SQL</SMALL>
-   Server Native Client</I>)
-      which is a redistributable component that comes with <SMALL>SQL</SMALL>&nbsp;2005.
-   You need at least <SMALL>SQLNCLI</SMALL> to have full support for <SMALL>SQL</SMALL>&nbsp;2005.</LI>
-   <LI><SMALL>SQLNCLI10</SMALL> is the version of <SMALL>SQL</SMALL> Server Native Client that ships with <SMALL>SQL</SMALL>
-   2008. You need <SMALL>SQLNCLI10</SMALL> to have full support for features in <SMALL>SQL</SMALL>&nbsp;2008.</LI>
-   <LI><SMALL>SQLNCLI11</SMALL> is the version of <SMALL>SQL</SMALL> Server Native Client that ships with <SMALL>SQL</SMALL> 2012. You need <SMALL>SQLNCLI11</SMALL> to have full support for features in <SMALL>SQL</SMALL>&nbsp;2012.</LI>
+    <SMALL>OLE DB</SMALL> Provider for <SMALL>SQL</SMALL> Server</I>), which comes
+     with all versions of Windows, but only has support on the level of SQL 2000.</LI>
 </UL>
-<P>There are five different values for this property.</P>
+<P>There are six different values for this property.</P>
 <DL>
+   <DT><B><A NAME="PROVIDER_MSOLEDBSQL">PROVIDER_MSOLEDBSQL</A></B></DT>
+   <DD>Use <SMALL>Microsoft OLE DB Driver for SQL Server </SMALL>as the <SMALL>OLE DB</SMALL> provider. This is the
+     default, if <SMALL>MSOLEDBSQL</SMALL><SMALL></SMALL> is installed.</DD>
+   <DT></DT>
+   <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLNCLI11">PROVIDER_SQLNCLI11</A></B></DT>
    <DD>Use <SMALL>SQL</SMALL> Server Native Client 11 as the <SMALL>OLE DB</SMALL> provider. This is the
-   default if <SMALL>SQLNCLI11</SMALL> is installed.</DD>
+   default if <SMALL>SQLNCLI11</SMALL> is installed, but <SMALL>MSOLEDBSQL</SMALL> is not available.</DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLNCLI10">PROVIDER_SQLNCLI10</A></B></DT>
    <DD>Use <SMALL>SQL</SMALL> Server Native Client 10 as the <SMALL>OLE DB</SMALL> provider. This is the
-   default if <SMALL>SQLNCLI10</SMALL> is installed, but <SMALL>SQLNCLI11</SMALL> is not.</DD>
+   default if <SMALL>SQLNCLI10</SMALL> is installed, but <SMALL>SQLNCLI11</SMALL> and <SMALL>MSOLEDBSQL</SMALL> are not.</DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLNCLI">PROVIDER_SQLNCLI</A></B></DT>
    <DD>Use <SMALL>SQL</SMALL> Native Client as the <SMALL>OLE DB</SMALL> provider. This is the default if
@@ -4748,16 +4761,14 @@ an result
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLOLEDB">PROVIDER_SQLOLEDB</A></B></DT>
    <DD>Use the <SMALL>SQLOLEDB</SMALL> provider. This is the default if
-   no version of <SMALL>SQL</SMALL> Server Native Client is
-   available. Note that you need at least <SMALL>MDAC</SMALL>&nbsp;2.6 to be able to use
-   <SMALL>SQLOLEDB</SMALL>.</DD>
+   no later version is available. </DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_DEFAULT">PROVIDER_DEFAULT</A></B></DT>
    <DD>Use this value when you want to set the provider to the default provider
    for the machine. When you set the property to this value, Win32::SqlServer will
-   automatically change it to one of the other four.</DD>
+   automatically change it to one of the other five.</DD>
 </DL>
-<P>Note that if you connect to an older version of <SMALL>SQL</SMALL> Server, you may need to specify the provider explicitly, as <SMALL>SQL</SMALL> Server Native Client only supports connections two versions back. That is, if you have <SMALL>SQLNCLI11</SMALL> installed and need to connect <SMALL>SQL</SMALL> 2000, this will fail, unless you explicitly specify any of the other providers.</P>
+<P>As long as you are connecting to SQL 2005 or later, you can use any of the providers above. (But note that officially, <SMALL>MSOLEDBSQL</SMALL> only supports SQL 2012 and later.) To connect to SQL 2000, the most recent version you can use is SQLNCLI10. For SQL 7, this is SQLNCLI. In practice, you would use SQLOLEDB to connect to these legacy versions.</P>
 <P>You cannot set this property when you are connected. You can check whether
    you are connected with the function <A HREF="#isconnected"><SPAN CLASS="nowrap">isconnected()</SPAN></A>.</P>
 <H2>QueryNotification</H2>
@@ -5967,7 +5978,7 @@ WAITFOR DELAY &#39;00:00:05&#39;</PRE>
  want, as long as you don&#39;t claim that you wrote it yourself.</P>
 <HR />
 <I>
-This file was last updated <!--$$Modtime:--> 16-07-15 14:09 <!-- $-->
+This file was last updated <!--$$Modtime:--> 18-04-17 21:32 <!-- $-->
 </I>
 </BODY>
 </HTML>

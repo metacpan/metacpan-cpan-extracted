@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Egaz:
     file: lib/App/Egaz.pm
-    version: v0.1.2
+    version: v0.2.0
   App::Egaz::Command::blastlink:
     file: lib/App/Egaz/Command/blastlink.pm
   App::Egaz::Command::blastmatch:
@@ -72,6 +72,7 @@ provides:
 requires:
   App::Cmd: '0.330'
   App::Fasops: v0.5.16
+  App::RL: v0.3.0
   App::Rangeops: v0.1.0
   Bio::Phylo: v2.0.1
   File::Find::Rule: '0.34'
@@ -95,6 +96,6 @@ resources:
   bugtracker: https://github.com/wang-q/App-Egaz/issues
   homepage: https://github.com/wang-q/App-Egaz
   repository: git://github.com/wang-q/App-Egaz.git
-version: 0.1.2
+version: 0.2.0
 x_authority: cpan:WANGQ
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

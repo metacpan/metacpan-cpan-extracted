@@ -1,0 +1,3 @@
+  {files}
++   {"/etc/cron.d/beta"}
++     * * * * * root sleep 5

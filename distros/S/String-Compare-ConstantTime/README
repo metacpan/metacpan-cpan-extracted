@@ -97,7 +97,7 @@ LOCK-PICKING ANALOGY
     the manufacturing tolerances). The attacker lifts this pin until the
     cylinder gives a little bit, indicating that this pin has been solved
     and the next widest pin is now the one being pressed against the
-    cylinder the tighest. This process is repeated until all the pins are
+    cylinder the tightest. This process is repeated until all the pins are
     solved and the lock opens.
 
     Just like an attacker trying to solve HMAC digests can work on one
@@ -114,7 +114,8 @@ SEE ALSO
     as it pertains to password storage (mostly, it doesn't).
 
     The famous TENEX password bug
-    <http://www.meadhbh.org/services/passwords>
+    <https://web.archive.org/web/20150913074712/http://www.meadhbh.org/servi
+    ces/passwords>
 
     Example of a timing bug
     <http://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-librar
@@ -132,7 +133,9 @@ AUTHOR
     Doug Hoyte, "<doug@hcsw.org>"
 
 COPYRIGHT & LICENSE
-    Copyright 2012-2017 Doug Hoyte.
+    Copyright 2012-2018 Doug Hoyte.
+
+    Contributions from Paul Cochrane.
 
     This module is licensed under the same terms as perl itself.
 

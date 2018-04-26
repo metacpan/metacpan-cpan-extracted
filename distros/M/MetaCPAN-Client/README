@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.024000
+    version 2.025000
 
 SYNOPSIS
 
@@ -79,19 +79,11 @@ METHODS
     MetaCPAN::Client::Author objects on a complex (search spec based)
     search.
 
- module
+ cover
 
-        my $module = $mcpan->module('MetaCPAN::Client');
-        my $module = $mcpan->module($search_spec);
+        my $cover = $mcpan->cover('Moose-2.2007');
 
-    Finds a module by either its module name or by a search spec defined by
-    a hash reference. Since it is common to many other searches, it is
-    explained below under SEARCH SPEC.
-
-    Returns a MetaCPAN::Client::Module object on a simple search (module
-    name), or a MetaCPAN::Client::ResultSet object propagated with
-    MetaCPAN::Client::Module objects on a complex (search spec based)
-    search.
+    Returns a MetaCPAN::Client::Cover object.
 
  distribution
 
@@ -144,6 +136,20 @@ METHODS
         my $mirror = $mcpan->mirror('kr.freebsd.org');
 
     Returns a MetaCPAN::Client::Mirror object.
+
+ module
+
+        my $module = $mcpan->module('MetaCPAN::Client');
+        my $module = $mcpan->module($search_spec);
+
+    Finds a module by either its module name or by a search spec defined by
+    a hash reference. Since it is common to many other searches, it is
+    explained below under SEARCH SPEC.
+
+    Returns a MetaCPAN::Client::Module object on a simple search (module
+    name), or a MetaCPAN::Client::ResultSet object propagated with
+    MetaCPAN::Client::Module objects on a complex (search spec based)
+    search.
 
  package
 

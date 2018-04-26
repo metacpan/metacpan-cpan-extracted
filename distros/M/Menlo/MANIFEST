@@ -10,7 +10,6 @@ cpanfile
 dist.ini
 lib/Menlo.pm
 lib/Menlo/Builder/Static.pm
-lib/Menlo/CLI/Compat.pm
 lib/Menlo/Dependency.pm
 lib/Menlo/Index/MetaCPAN.pm
 lib/Menlo/Index/MetaDB.pm

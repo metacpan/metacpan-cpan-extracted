@@ -507,6 +507,11 @@ When signing a package, this script become interactive unless B<expect>
 password can be passed in at the command line (or a file containing the
 password) using one of these two commands.
 
+=item B<--env VAR=VAL>
+
+Sets an environment variable before building the package.  This option
+can be used any number of times.
+
 =back
 
 =head1 OBTAIN THE PERL MODULE

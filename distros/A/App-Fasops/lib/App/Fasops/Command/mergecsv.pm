@@ -6,13 +6,15 @@ use autodie;
 use App::Fasops -command;
 use App::Fasops::Common;
 
-use constant abstract => 'merge csv files based on @fields';
+sub abstract {
+    return 'merge csv files based on @fields';
+}
 
 sub opt_spec {
     return (
         [ "outfile|o=s", "Output filename. [stdout] for screen",    { default => "stdout" }, ],
         [ 'fields|f=i@', 'fields as identifies, 0 as first column', { default => [0] }, ],
-        [ 'concat|c', 'do concat other than merge. Keep first ID fields', ],
+        [ 'concat|c',    'do concat other than merge. Keep first ID fields', ],
         { show_defaults => 1, }
     );
 }
@@ -24,12 +26,16 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\tAccept one or more csv files.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
-    $desc .= "\n";
-    $desc .= "\tcat 1.csv 2.csv | egaz mergecsv -f 0 -f 1\n";
-    $desc .= "\tegaz mergecsv -f 0 -f 1 1.csv 2.csv\n";
-    $desc .= "\n";
+    $desc .= <<'MARKDOWN';
+
+* Accept one or more csv files
+* infile == stdin means reading from STDIN
+
+    cat 1.csv 2.csv | egaz mergecsv -f 0 -f 1
+    egaz mergecsv -f 0 -f 1 1.csv 2.csv
+
+MARKDOWN
+
     return $desc;
 }
 

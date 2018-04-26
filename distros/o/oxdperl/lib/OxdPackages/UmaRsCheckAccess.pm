@@ -28,13 +28,13 @@
  # THE SOFTWARE.
  #
  # @package		Gluu-oxd-library
- # @version     	3.1.2
+ # @version     	3.1.3
  # @author		Inderpal Singh, Sobhan Panda
  # @author_email	inderpal@ourdesignz.com, sobhan@centroxy.com
  # @copyright		Copyright (c) 2018, Gluu inc federation (https://gluu.org/)
  # @license		http://opensource.org/licenses/MIT	MIT License
  # @link		https://gluu.org/
- # @since		Version 3.1.2
+ # @since		Version 3.1.3
  # @filesource
  #/
 

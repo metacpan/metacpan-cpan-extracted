@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::Random.
 
+0.15  2018-04-22 rurban
+        - fix mingw hints for pkg-config support (akiym, PR #7)
+
 0.14  2018-04-17 rurban
         - add library paths to LIBS from Crypt::OpenSSL::Guess (akiym, PR #6)
 

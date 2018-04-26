@@ -1,3 +1,13 @@
+0.320  2018-04-22
+  * Added Travis and Appveyor testing (thanks Paul Cochrane)
+  * Use warnings pragmas (thanks Paul Cochrane)
+  * Many documentation and meta-data fixes/updates (thanks Paul Cochrane)
+  * Better test coverage for strings with/without utf8 flag
+    (thanks Paul Cochrane)
+  * Replace SvCUR with sv_len_utf8 to work around issue in debugging
+    versions of perl (see https://github.com/hoytech/String-Compare-ConstantTime/issues/4)
+    (thanks Paul Cochrane)
+
 0.312  2017-02-14
   * Now works with variables that have magic such as results of
     substr, tied variables, etc. (thanks James Raspass)

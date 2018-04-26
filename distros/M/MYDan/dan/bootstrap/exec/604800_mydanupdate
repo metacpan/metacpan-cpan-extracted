@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ ! -f $MYDanPATH/etc/env ];then
     echo "on env file: $MYDanPATH/etc/env"
     exit;

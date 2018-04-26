@@ -1,0 +1,22 @@
+name: Pcore-API-ReCaptcha
+author: zdm <zdm@softvisio.net>
+copyright_holder: zdm
+
+# https://metacpan.org/pod/Software::License#SEE-ALSO
+license: Perl_5
+
+# is the CPAN distributive
+cpan: 1
+
+# paths to skip while create the CPAN distributive
+cpan_manifest_skip:
+    - \Abin/        # ignore "/bin/" directory
+
+meta:
+    homepage:       # project homepage url
+    repository:
+        web:        # upstream repository web url
+        url:        # upstream repository clone url
+        type:       # upstream repository SCM type: hg, git
+    bugtracker:
+        web:        # bugtracker url

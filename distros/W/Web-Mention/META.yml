@@ -3,8 +3,8 @@ abstract: 'Implementation of the IndieWeb Webmention protocol'
 author:
   - '$author = $wm->author;'
 build_requires:
-  List::Util: '0'
   Path::Class::Dir: '0'
+  Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -28,17 +28,19 @@ no_index:
 provides:
   Web::Mention:
     file: lib/Web/Mention.pm
-    version: '0.2'
+    version: '0.3'
   Web::Mention::Author:
     file: lib/Web/Mention/Author.pm
 requires:
   DateTime: '0'
   LWP: '0'
+  List::Util: '0'
   Moose: '0'
   MooseX::ClassAttribute: '0'
   MooseX::Enumeration: '0'
   MooseX::Types::URI: '0'
   Path::Class::Dir: '0'
+  Scalar::Util: '0'
   Try::Tiny: '0'
   Types::Standard: '0'
   Web::Microformats2::Parser: '0'
@@ -47,7 +49,8 @@ resources:
   bugtracker: https://github.com/jmacdotorg/webmention-perl/issues
   homepage: https://github.com/jmacdotorg/webmention-perl
   repository: git://github.com/jmacdotorg/webmention-perl.git
-version: '0.2'
+version: '0.3'
 x_contributors:
-  - 'JmacDotOrg <jmac@jmac.org>'
+  - 'Jason McIntosh <jmac@jmac.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

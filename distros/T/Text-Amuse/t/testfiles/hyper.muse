@@ -4,17 +4,17 @@
 
 #label
 Here the doc start
-#label here blablabla
+#label1 here blablabla
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
 
 ** Middle
 
 #label2
-#label2 Continue here
+#label2x #label2 Continue here
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page. 
- #label3 not a label
+ #label3 #label3 is a label
 
 ** Next
 
@@ -49,8 +49,10 @@ This is a label despite of the leading whitespace.
  1. #label8 not a label
 
  2. #lable9
-    This is a label
+    This is a not label
 
+#label3enum
+ 3. This *is* a label
 
 ** End
 

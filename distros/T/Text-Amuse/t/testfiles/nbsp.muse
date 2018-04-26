@@ -2,14 +2,20 @@
 #title nbsp
 #---------------------------
 
+** first
+
 hello
 
  
 
 there~~there <em>there</em> [1] [2] hello~~there <verbatim>~~</verbatim>
 
+** second
+
 <verse>
 Hello~~there and hello~~there
+
+  With some leading space
 </verse>
 
 <example>

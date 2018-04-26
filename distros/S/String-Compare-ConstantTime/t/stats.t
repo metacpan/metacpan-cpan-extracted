@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use String::Compare::ConstantTime;
 
 use strict;

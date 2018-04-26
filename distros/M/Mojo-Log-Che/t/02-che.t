@@ -7,7 +7,7 @@ use Mojo::Util qw'decode';
 #~ binmode STDERR, ":utf8";
 
 my $time_re = qr/\w{2} \d{1,2} \w{3} \d{2}:\d{2}:\d{2}/;
-my $line_re = qr/t\/02-che.t:\d+/;
+my $line_re = qr/\d+〉t\/02-che.t:\d+/;
 
 # Logging to folder
 my $dir  = tempdir();

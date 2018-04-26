@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 55;
+use Test::More tests => 62;
 
 use App::NDTools::Test;
 
@@ -69,11 +69,20 @@ run_ok(
     exit => 8,
 );
 
+$test = "json_full";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--json', '--full', "_menu.a.json", "_menu.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    stderr => qr/ ALERT] --full opt is deprecated and will be removed soon. --U should be used instead/,
+    exit => 8,
+);
+
 $test = "json_ignore";
 run_ok(
     name => $test,
     cmd => [
-        @cmd, '--json', '--full', '--ignore', '{some}[5]{text}[0]{buried}[1]{"deep down"}{in}[0]{"the structure"}',
+        @cmd, '--json', '--U', '--ignore', '{some}[5]{text}[0]{buried}[1]{"deep down"}{in}[0]{"the structure"}',
         "_deep-down-lorem.a.json", "_deep-down-lorem.b.json"
     ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
@@ -91,7 +100,7 @@ run_ok(
 $test = "json_ignore_unexisted_path";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--json', '--full', '--ignore', '[1]{notexists}[5]', "_menu.a.json", "_menu.b.json" ],
+    cmd => [ @cmd, '--json', '--U', '--ignore', '[1]{notexists}[5]', "_menu.a.json", "_menu.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );
@@ -231,6 +240,53 @@ $test = "term_hash";
 run_ok(
     name => $test,
     cmd => [ @cmd, "_cfg.alpha.json", "_cfg.beta.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_noA";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--noA', "_struct-subkey-AR.a.json", "_struct-subkey-AR.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_noAR";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--noA', '--noR', "_struct-subkey-AR.a.json", "_struct-subkey-AR.b.json" ],
+    exit => 0, # yep, no diff
+);
+
+$test = "term_noN";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--noN', "_cfg.alpha.json", "_cfg.beta.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_noNO";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--noN', '--noO', "_cfg.alpha.json", "_cfg.beta.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_noO";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--noO', "_cfg.alpha.json", "_cfg.beta.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_noR";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--noR', "_struct-subkey-AR.a.json", "_struct-subkey-AR.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );

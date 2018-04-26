@@ -1,5 +1,5 @@
 {
-   "abstract" : "Find or build gdal",
+   "abstract" : "Alien package for the Geospatial Data Abstraction Library (GDAL)",
    "author" : [
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
@@ -71,9 +71,9 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.32",
+      "generated_by" : "Alien::Build::MM version 1.39",
       "requires" : {
          "share" : {
             "Alien::MSYS" : "0.07",

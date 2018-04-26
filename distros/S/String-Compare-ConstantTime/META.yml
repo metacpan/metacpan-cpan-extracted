@@ -1,7 +1,7 @@
 ---
-abstract: unknown
+abstract: 'Timing side-channel protected string compare'
 author:
-  - unknown
+  - 'Doug Hoyte <doug@hcsw.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -17,9 +17,10 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  perl: '5.008000'
 resources:
   bugtracker: https://github.com/hoytech/String-Compare-ConstantTime/issues
   repository: git://github.com/hoytech/String-Compare-ConstantTime.git
-version: '0.312'
+version: '0.320'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

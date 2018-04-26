@@ -1,8 +1,9 @@
 package String::Compare::ConstantTime;
 
 use strict;
+use warnings;
 
-our $VERSION = '0.312';
+our $VERSION = '0.320';
 
 require XSLoader;
 XSLoader::load('String::Compare::ConstantTime', $VERSION);
@@ -84,7 +85,7 @@ B<NOTE>: Although this module protects against a common attack against applicati
 
 Pin tumbler locks are susceptible to being picked in a similar way to an attacker forging HMAC digests using a timing side-channel.
 
-The traditional way to pick cheap pin tumbler locks is to apply torque to the lock cylinder so that the pins are pressed against the cylinder. However, because of slight manufacturing discrepancies one particular pin will be the widest by a slight margin and will be pressed against the cylinder tighter than the others (the cheaper the lock, the higher the manufacturing tolerances). The attacker lifts this pin until the cylinder gives a little bit, indicating that this pin has been solved and the next widest pin is now the one being pressed against the cylinder the tighest. This process is repeated until all the pins are solved and the lock opens.
+The traditional way to pick cheap pin tumbler locks is to apply torque to the lock cylinder so that the pins are pressed against the cylinder. However, because of slight manufacturing discrepancies one particular pin will be the widest by a slight margin and will be pressed against the cylinder tighter than the others (the cheaper the lock, the higher the manufacturing tolerances). The attacker lifts this pin until the cylinder gives a little bit, indicating that this pin has been solved and the next widest pin is now the one being pressed against the cylinder the tightest. This process is repeated until all the pins are solved and the lock opens.
 
 Just like an attacker trying to solve HMAC digests can work on one character at a time, a lock pick can work on each pin in isolation. To protect against this, quality locks force all pins to be fixed into place before the cylinder rotation can be attempted, just as secure HMAC verifiers force attackers to guess the entire digest on each attempt.
 
@@ -97,7 +98,7 @@ L<The String-Compare-ConstantTime github repo|https://github.com/hoytech/String-
 
 L<Authen::Passphrase> has a good section on side-channel cryptanalysis such as it pertains to password storage (mostly, it doesn't).
 
-L<The famous TENEX password bug|http://www.meadhbh.org/services/passwords>
+L<The famous TENEX password bug|https://web.archive.org/web/20150913074712/http://www.meadhbh.org/services/passwords>
 
 L<Example of a timing bug|http://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-library/>
 
@@ -117,7 +118,9 @@ Doug Hoyte, C<< <doug@hcsw.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012-2017 Doug Hoyte.
+Copyright 2012-2018 Doug Hoyte.
+
+Contributions from Paul Cochrane.
 
 This module is licensed under the same terms as perl itself.
 

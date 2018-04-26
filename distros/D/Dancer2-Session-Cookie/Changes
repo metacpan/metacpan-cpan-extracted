@@ -1,58 +1,62 @@
 Revision history for Dancer2-Session-Cookie
 
-0.008     2016-11-04
- - Up Dancer2 dependency to 0.165, as 0.164 was a broken one. (GH#13)
+0.009 2018-04-25
+  - Dependency upped for Session::Storage::Secure. (GH#19, manwar)
 
- [ENHANCEMENTS]
- - Add 'with_request_address' option to configuration. (GH#1)
+  [ STATISTICS ]
+    - code churn: 6 files changed, 40 insertions(+), 21 deletions(-)
 
- [DOCUMENTATION]
- - Clarify where 'cookie_duration' is set. (GH#14)
+0.008 2016-11-04
+  - Up Dancer2 dependency to 0.165, as 0.164 was a broken one. (GH#13)
 
+  [ DOCUMENTATION ]
+    - Clarify where 'cookie_duration' is set. (GH#14)
 
-0.007     2016-08-15
- [BUG FIXES]
- - Remove context usage (GH#9, Sawyer X)
+  [ ENHANCEMENTS ]
+    - Add 'with_request_address' option to configuration. (GH#1)
 
- [CHANGED]
- - Link to base package added in POD (GH#11, Moritz Grosch)
- - Simplify dzil config (Peter Mottram)
- - Rewrite tests to use Plack::Test (Peter Mottram)
- - Add noop _change_id method (Peter Mottram)
+0.007 2016-08-15
+  [ BUG FIXES ]
+    - Remove context usage (GH#9, Sawyer X)
 
- [ENHANCEMENTS]
+  [ CHANGED ]
+    - Link to base package added in POD (GH#11, Moritz Grosch)
+    - Simplify dzil config (Peter Mottram)
+    - Rewrite tests to use Plack::Test (Peter Mottram)
+    - Add noop _change_id method (Peter Mottram)
 
- [NEW FEATURES]
+  [ ENHANCEMENTS ]
 
- [STATISTICS]
+  [ NEW FEATURES ]
+
+  [ STATISTICS ]
 
 0.006 2014-07-28
- [CHANGED]
- - Requires Session::Storage::Secure 0.010 to allow storing objects, which
-   is specially relevant to JSON::bool data.
+  [ CHANGED ]
+    - Requires Session::Storage::Secure 0.010 to allow storing objects,
+      which is specially relevant to JSON::bool data.
 
- [STATISTICS]
- - code churn: 12 files changed, 423 insertions(+), 477 deletions(-)
+  [ STATISTICS ]
+    - code churn: 12 files changed, 423 insertions(+), 477 deletions(-)
 
 0.005 2013-06-05T22:56:23Z America/New_York
- [FIXED]
- - Bumped Test::TCP dependency to 1.30 to avoid parallel testing bugs
+  [ FIXED ]
+    - Bumped Test::TCP dependency to 1.30 to avoid parallel testing bugs
 
 0.004 2013-05-31T23:40:09Z America/New_York
- [CHANGED]
- - Requires Session::Storage::Secure 0.007 for improved resistance to
-   timing attacks
+  [ CHANGED ]
+    - Requires Session::Storage::Secure 0.007 for improved resistance to
+      timing attacks
 
 0.003 2013-05-28T13:42:39Z America/New_York
- [FIXED]
- - Fixed Dancer2 dependency version
- - Fixed tests for new, lazy session creation behavior in Dancer2
+  [ FIXED ]
+    - Fixed Dancer2 dependency version
+    - Fixed tests for new, lazy session creation behavior in Dancer2
 
 0.002 2013-02-22T22:26:31Z America/New_York
- [CHANGED]
- - Renamed from Dancer-Session-Factory-Cookie to Dancer2-Session-Cookie
- - Internals updated for new Dancer2 release
+  [ CHANGED ]
+    - Renamed from Dancer-Session-Factory-Cookie to Dancer2-Session-Cookie
+    - Internals updated for new Dancer2 release
 
 0.001 2013-01-24T17:33:57Z America/New_York
- - First release
-
+  - First release

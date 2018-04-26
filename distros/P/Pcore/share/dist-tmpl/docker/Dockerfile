@@ -6,7 +6,7 @@ USER root
 
 ENV DIST_PATH="$PCORE_LIB/<: $dist_path :>"
 
-ADD . $DIST_PATH
+ADD . $DIST_PATH/data
 
 WORKDIR $DIST_PATH
 
@@ -23,4 +23,4 @@ RUN /bin/bash -c ' \
     && source <( wget -q -O - https://bitbucket.org/softvisio/scripts/raw/tip/perl-build-env.sh || echo false ) cleanup \
 '
 
-ENTRYPOINT ["bin/main.pl"]
+ENTRYPOINT ["../bin/main.pl"]

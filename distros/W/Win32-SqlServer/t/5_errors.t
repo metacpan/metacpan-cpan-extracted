@@ -1,9 +1,19 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/5_errors.t 30    15-05-24 22:27 Sommar $
+# $Header: /Perl/OlleDB/t/5_errors.t 32    18-04-11 21:08 Sommar $
 #
 # Tests sql_message_handler and errors raised by OlleDB itself.
 #
 # $History: 5_errors.t $
+# 
+# *****************  Version 32  *****************
+# User: Sommar       Date: 18-04-11   Time: 21:08
+# Updated in $/Perl/OlleDB/t
+# Support for the new provider MSOLEDBSQL.
+# 
+# *****************  Version 31  *****************
+# User: Sommar       Date: 17-07-28   Time: 17:44
+# Updated in $/Perl/OlleDB/t
+# Adjustments for SQL 2017.
 # 
 # *****************  Version 30  *****************
 # User: Sommar       Date: 15-05-24   Time: 22:27
@@ -202,8 +212,11 @@ elsif ($X->{Provider} == Win32::SqlServer::PROVIDER_SQLNCLI) {
 elsif ($X->{Provider} == Win32::SqlServer::PROVIDER_SQLNCLI10) {
    $PROVIDERNAME = 'Microsoft SQL Server Native Client 10.0';
 }
-else {
+elsif ($X->{Provider} == Win32::SqlServer::PROVIDER_SQLNCLI11) {
    $PROVIDERNAME = 'Microsoft SQL Server Native Client 11.0';
+}
+else {
+   $PROVIDERNAME = 'Microsoft OLE DB Driver for SQL Server'
 }
 
 
@@ -215,7 +228,7 @@ SQLEND
 # Default setting for error. Should die and print it all.
 setup_a_test(11);
 $expect_print = ["=~ /^$msg_part\\n/i",
-                 "=~ /Procedure\\s+#nisse_sp[_0-9A-F]+,\\s+Line 2/",
+                 "=~ /Procedure\\s+#nisse_sp[_0-9A-F]*,\\s+Line 2/",
                  "eq '$msgtext\n'",
                  "=~ /$linestart$sp_sql\n/"];
 do_test($sp_call, 1, 1, $expect_print);
@@ -224,7 +237,7 @@ do_test($sp_call, 1, 1, $expect_print);
 # lines, and not die.
 setup_a_test(9);
 $expect_print = ["=~ /^$msg_part\\n/i",
-                 "=~ /Procedure\\s+#nisse_sp[_0-9A-F]+,\\s+Line 2/",
+                 "=~ /Procedure\\s+#nisse_sp[_0-9A-F]*,\\s+Line 2/",
                  "eq '$msgtext\n'"];
 do_test($sp_call, 4, 0, $expect_print);
 
@@ -299,7 +312,7 @@ do_test($sp_call, 28, 0, $expect_print);
 # We now test the default XS handler.
 setup_a_test(11);
 $X->{MsgHandler} = undef;
-$expect_print = [q!=~ /^(Server .+, )?Msg 50000, Level 11, State 12, Procedure '#nisse_sp[_0-9a-fA-F]+', Line 2/!,
+$expect_print = [q!=~ /^(Server .+, )?Msg 50000, Level 11, State 12, Procedure '#nisse_sp[_0-9a-fA-F]*', Line 2/!,
                  "=~ /\\s+$msgtext\\n/"];
 do_test($sp_call, 31, 0, $expect_print);
 
@@ -775,7 +788,7 @@ $expect_msgs = [{State    => '>= 1',
                  SQLstate => 'eq "01000"',
                  Server   => 'or 1',
                  Line     => '== 3',
-                 Proc     => '=~ /^#partest_sp[_[0-9A-F]+/'}];
+                 Proc     => '=~ /^#partest_sp[_[0-9A-F]*/'}];
 do_test($sql_call, 103, 0, $expect_print, $expect_msgs);
 
 
@@ -802,7 +815,7 @@ $expect_msgs = [{State    => '>= 1',
                  SQLstate => 'eq "01000"',
                  Server   => 'or 1',
                  Line     => '== 3',
-                 Proc     => '=~ /^#partest_sp[_[0-9A-F]+/'}];
+                 Proc     => '=~ /^#partest_sp[_[0-9A-F]*/'}];
 do_test($sql_call, 106, 0, $expect_print, $expect_msgs);
 
 

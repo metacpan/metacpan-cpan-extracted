@@ -7,7 +7,9 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'scan blocked fasta files and output bi/multi-lateral range links';
+sub abstract {
+    return 'scan blocked fasta files and output bi/multi-lateral range links';
+}
 
 sub opt_spec {
     return (
@@ -25,8 +27,13 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infiles> are paths to blocked fasta files, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+
+MARKDOWN
+
     return $desc;
 }
 

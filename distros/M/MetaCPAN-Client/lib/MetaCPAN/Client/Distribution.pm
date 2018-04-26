@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Distribution;
 # ABSTRACT: A Distribution data object
-$MetaCPAN::Client::Distribution::VERSION = '2.024000';
+$MetaCPAN::Client::Distribution::VERSION = '2.025000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -58,7 +58,7 @@ MetaCPAN::Client::Distribution - A Distribution data object
 
 =head1 VERSION
 
-version 2.024000
+version 2.025000
 
 =head1 SYNOPSIS
 

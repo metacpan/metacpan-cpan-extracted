@@ -44,9 +44,13 @@ sub _chmod ($self) {
         P->file->find(
             q[.],
             sub ($path) {
+
+                # directory
                 if ( -d $path ) {
-                    P->file->chmod( 'rwx------', $path ) or say qq[$!: $path];
+                    P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
                 }
+
+                # file
                 else {
                     my $is_exe;
 
@@ -57,11 +61,14 @@ sub _chmod ($self) {
                         $is_exe = 1;
                     }
 
+                    # executable script
                     if ($is_exe) {
-                        P->file->chmod( 'r-x------', $path ) or say qq[$!: $path];
+                        P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
                     }
+
+                    # non-executable file
                     else {
-                        P->file->chmod( 'rw-------', $path ) or say qq[$!: $path];
+                        P->file->chmod( 'rw-r--r--', $path ) or say qq[$!: $path];
                     }
                 }
 
@@ -197,11 +204,11 @@ SH
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 101                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 108                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 125, 142, 147, 168   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 132, 149, 154, 175   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 156                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 163                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

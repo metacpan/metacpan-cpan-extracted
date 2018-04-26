@@ -4,10 +4,10 @@ use warnings;
 use 5.008_001;
 use Test::Deep ();
 use Test::Deep::Cmp;
-use JSON;
+use JSON::MaybeXS;
 use Exporter::Lite;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @EXPORT = qw(json);
 
@@ -60,7 +60,7 @@ Test::Deep::JSON - Compare JSON with Test::Deep
 
 =head1 DESCRIPTION
 
-Test::Deep::JSON provides C<json($expected)> function to expect that
+Test::Deep::JSON provides the C<json($expected)> function to expect that
 target can be parsed as a JSON string and matches (by C<cmp_deeply>) with
 I<$expected>.
 
@@ -77,7 +77,7 @@ I<$expected> can be anything that C<Test::Deep> recognizes.
 This parses the data as a JSON string, and compares the parsed object
 and I<$expected> by C<Test::Deep> functionality.
 
-Fails if the data cannot be parsed as a JSON.
+Fails if the data cannot be parsed as a JSON string.
 
 =back
 

@@ -114,7 +114,7 @@ sub match {
 
     $self->_init_config( $c->config->{'CatalystX::ASP'}{Dispatcher} );
     my $match_pattern = $self->match_pattern;
-    if ( $path =~ m/$match_pattern/ && -f $c->path_to( 'root', $path ) ) {
+    if ( $c->req->path =~ m/$match_pattern/ && -f $c->path_to( 'root', $c->req->path ) ) {
         $c->req->action( $path );
         $c->req->match( $path );
         $c->action( $self->default_action );

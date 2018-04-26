@@ -7,7 +7,9 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'extract alignment slices from a blocked fasta';
+sub abstract {
+    return 'extract alignment slices from a blocked fasta';
+}
 
 sub opt_spec {
     return (
@@ -25,9 +27,14 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infile> is the path to blocked fasta file, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
-    $desc .= "\t<runlist.yml> is a App::RL dump.\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+* <runlist.yml> is a App::RL dump
+
+MARKDOWN
+
     return $desc;
 }
 

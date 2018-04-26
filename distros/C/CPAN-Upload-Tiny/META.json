@@ -29,12 +29,14 @@
          "requires" : {
             "Carp" : "0",
             "File::Basename" : "0",
+            "Getopt::Long" : "0",
             "HTTP::Tiny" : "0",
             "HTTP::Tiny::Multipart" : "0",
             "IO::Socket::SSL" : "1.56",
             "MIME::Base64" : "0",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
+            "Pod::Usage" : "0",
             "strict" : "0",
             "warnings" : "0"
          },
@@ -52,7 +54,7 @@
    "provides" : {
       "CPAN::Upload::Tiny" : {
          "file" : "lib/CPAN/Upload/Tiny.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -67,7 +69,7 @@
          "web" : "https://github.com/Leont/cpan-upload-tiny"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

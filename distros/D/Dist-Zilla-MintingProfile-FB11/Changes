@@ -1,0 +1,68 @@
+0.016     2018-04-23 13:55:49+01:00 Europe/London
+    - New apps (default profile) now have their PSGI put in bin/ so it is
+      installed by CPAN and thus discoverable.
+
+0.015     2016-06-27 15:48:40+01:00 Europe/London
+    - Remove use of signatures feature in minted Controller - it's experimental
+
+0.014     2016-06-27 15:27:30+01:00 Europe/London
+    - Fix warnings in minted Controller by moving 'no warnings'
+
+0.013     2016-06-27 14:52:10+01:00 Europe/London
+    - Add minting profile for Controller
+
+0.012     2016-06-27 12:30:34+01:00 Europe/London
+    - Add Parsley role to form by default
+
+0.011     2016-06-27 12:12:21+01:00 Europe/London
+    - Added minting profile for Form
+
+0.010     2016-06-25 13:46:14+01:00 Europe/London
+
+    - Removed unnecessary dependencies.
+
+0.009     2016-06-22 13:23:37+01:00 Europe/London
+    - Tests now pass on a newly-minted FB11X component (FB11X profile)
+    - We now have a test script to check FB11X minting succeeds
+
+0.008     2016-06-21 14:19:36+01:00 Europe/London
+    - Tests now pass on a newly-minted FB11 app (default profile)
+    - Using "legacy" lib/auto type of sharedir, so it can be found during
+      development
+    - Therefore using ShareDir minting profile that came with DZil
+
+0.007     2016-06-17 16:02:05+01:00 Europe/London
+
+    - Fix spelling errors in generated cpanfiles (requiers -> requires)
+    - Fix minted git URL to be an ssh://git/ URL instead of scp-style git:/
+
+0.006     2016-04-05 15:46:41+01:00 Europe/London
+
+    - Remove use of experimental copy parameter to GenerateFile
+    - Remove sqlite stuff
+    - Fixed missing lib directory
+    - Fix compilation issues
+    - Correct Plugin::Static::Simple configuration
+    - Add cpanfile
+
+0.005     2015-11-12 12:49:44+00:00 Europe/London
+
+    - The FB11X profile now generates a component whose tests pass
+    - The FB11X profile now generates a component without binary .db files in the repo
+    - The FB11X profile now initialises the git repository after minting
+
+0.004     2015-11-11 15:27:42+00:00 Europe/London
+
+    - Declared a missing dependency
+
+0.003     2015-10-22 13:16:43+01:00 Europe/London
+    
+    - No longer extend from the HTML::FormFu base controller
+
+0.002     2015-10-22 12:14:18+01:00 Europe/London
+
+    - Add FB11X as a profile of this
+
+0.001     2015-10-22 12:07:15+01:00 Europe/London
+
+    - Created FB11 profile based on AppKit profile

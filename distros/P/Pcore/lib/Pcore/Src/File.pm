@@ -29,7 +29,7 @@ has dist_cfg => ( is => 'lazy', isa => HashRef, init_arg => undef );
 
 # CLASS METHODS
 sub cfg ($self) {
-    state $cfg = P->cfg->load( $ENV->{share}->get('data/src.perl') );
+    state $cfg = P->cfg->read( $ENV->{share}->get('data/src.perl') );
 
     return $cfg;
 }
@@ -75,7 +75,7 @@ sub _build_dist_cfg ($self) {
         # load and cache dist config if path is related to some dist
         if ( $path->{$dirname} ) {
             if ( !exists $dists->{ $path->{$dirname} } ) {
-                my $dist_cfg = P->cfg->load( $path->{$dirname} . "share/dist.$Pcore::Core::Const::DIST_CFG_TYPE" );
+                my $dist_cfg = P->cfg->read( $path->{$dirname} . "share/dist.$Pcore::Core::Const::DIST_CFG_TYPE" );
 
                 if ( exists $dist_cfg->{src} ) {
                     $dists->{ $path->{$dirname} } = $dist_cfg->{src};

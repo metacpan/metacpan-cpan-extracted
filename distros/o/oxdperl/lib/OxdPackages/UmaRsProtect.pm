@@ -28,13 +28,13 @@
  # THE SOFTWARE.
  #
  # @package		Gluu-oxd-library
- # @version     	3.1.2
+ # @version     	3.1.3
  # @author		Inderpal Singh, Sobhan Panda
  # @author_email	inderpal@ourdesignz.com, sobhan@centroxy.com
  # @copyright		Copyright (c) 2018, Gluu inc federation (https://gluu.org/)
  # @license		http://opensource.org/licenses/MIT	MIT License
  # @link		https://gluu.org/
- # @since		Version 3.1.2
+ # @since		Version 3.1.3
  # @filesource
  #/
 
@@ -68,6 +68,8 @@ use Data::Dumper;
 			# @var string $request_oxd_id                         This parameter you must get after registration site in gluu-server
 			_request_oxd_id  => shift,
 			
+			_request_overwrite  => shift,
+			
 			_request_protection_access_token => shift,
 
 			# @var array $request_resources                       This parameter your resources parameter
@@ -97,6 +99,20 @@ use Data::Dumper;
 		return $self->{_request_oxd_id};
 	}
 
+    # @return string
+    sub getOverwrite {
+		my( $self ) = @_;
+		return $self->{_request_overwrite};
+    }
+
+    # @param string $request_overwrite
+    # @return void
+    sub setOverwrite {
+		my ( $self, $request_overwrite ) = @_;
+		$self->{_request_overwrite} = $request_overwrite if defined($request_overwrite);
+		return $self->{_request_overwrite};
+	}
+	
     # @return array
     sub getRequestProtectionAccessToken
     {   
@@ -209,6 +225,8 @@ use Data::Dumper;
     #
     #	string $oxd_id - (Required) oxd Id from Client registration
     #
+    #	bool $overwrite - (Optional) If true, Allows existing resource to overwrite
+    #
     #	dict $resources - (Required) Resources to be protected
     #
     #	string $protection_access_token - Protection Acccess Token. OPTIONAL for `oxd-server` but REQUIRED for `oxd-https-extension`
@@ -227,6 +245,7 @@ use Data::Dumper;
         my ( $self, $params ) = @_;
         my $paramsArray = {
             "oxd_id" => $self->getRequestOxdId(),
+            "overwrite" => $self->getOverwrite(),
             "resources" => $self->getRequestResources(),
             "protection_access_token" => $self->getRequestProtectionAccessToken()
 

@@ -6,12 +6,14 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'convert chr.size to full genome runlists';
+sub abstract {
+    return 'convert chr.size to whole genome runlists';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen." ],
-        [ "remove|r",    "Remove 'chr0' from chromosome names." ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
+        [ "remove|r",    "remove 'chr0' from chromosome names" ],
         { show_defaults => 1, }
     );
 }

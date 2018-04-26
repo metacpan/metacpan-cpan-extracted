@@ -41,7 +41,7 @@ sub run ($self) {
         my $pardeps_path = $self->dist->root . "share/pardeps-$script-@{[$^V->normal]}-$Config{archname}.json";
 
         if ( -f $pardeps_path ) {
-            $pardeps = P->cfg->load($pardeps_path);
+            $pardeps = P->cfg->read($pardeps_path);
         }
         else {
             say qq["$pardeps_path" is not exists.];

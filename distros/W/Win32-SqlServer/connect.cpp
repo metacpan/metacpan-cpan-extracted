@@ -1,11 +1,16 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/connect.cpp 8     12-09-23 22:52 Sommar $
+ $Header: /Perl/OlleDB/connect.cpp 9     18-04-09 22:46 Sommar $
 
   Implements the connection routines on Win32::SqlServer.
 
-  Copyright (c) 2004-2012   Erland Sommarskog
+  Copyright (c) 2004-2018   Erland Sommarskog
 
   $History: connect.cpp $
+ * 
+ * *****************  Version 9  *****************
+ * User: Sommar       Date: 18-04-09   Time: 22:46
+ * Updated in $/Perl/OlleDB
+ * Add support for the new MSOLEDBSQL provider.
  * 
  * *****************  Version 8  *****************
  * User: Sommar       Date: 12-09-23   Time: 22:52
@@ -77,6 +82,11 @@ BOOL do_connect (SV    * olle_ptr,
 
     switch (mydata->provider) {
        // At this point provider_default should never appear.
+       case provider_msoledbsql :
+         clsid = &clsid_msoledbsql;
+         provider_name = "MSOLEDBSQL";
+         break;
+
        case provider_sqlncli11 :
          clsid = &clsid_sqlncli11;
          provider_name = "SQLNCLI11";

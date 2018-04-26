@@ -1,3 +1,6 @@
+v0.14.1 2018-04-24T12:48:23Z
+ - pcoreApi.js renamed
+
 v0.14.0 2018-04-22T09:26:31Z
  - fontawesome 5 support added
  - use attributes

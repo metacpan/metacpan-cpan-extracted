@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+$| ++;
+
+return sub
+{
+    my %status;
+    map{ 
+        if ( $_ =~ /^tcp/ )
+        {
+            my ( $x ) = reverse split /\s+/, $_;
+            $status{$x} ++;
+        }
+    } `netstat -an`;
+    print YAML::XS::Dump \%status;
+
+    my $x = 0; 
+    map{ $x ++ if $_ > 2000 } values %status; 
+    return $x;
+}

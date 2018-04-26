@@ -20,6 +20,16 @@ WriteMakefile(
     PREREQ_PM => {
         'Mojolicious'              => 7.26,
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+          repository => {
+            type => 'git',
+            url => 'git://github.com/mche/Mojo-Log-Che.git',
+            web => 'https://github.com/mche/Mojo-Log-Che',
+          },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojo-Log-Che-*' },
 );

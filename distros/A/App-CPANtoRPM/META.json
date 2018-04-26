@@ -4,13 +4,13 @@
       "Sullivan Beck (sbeck@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-CPANtoRPM",
    "no_index" : {
@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Config" : "0",
             "IO::File" : "0",
             "POSIX" : "0",
             "perl" : "5.006"
@@ -46,12 +45,12 @@
    },
    "provides" : {
       "App::CPANtoRPM" : {
-         "file" : "CPANtoRPM.pm",
-         "version" : "1.06"
+         "file" : "lib/App/CPANtoRPM.pm",
+         "version" : "1.08"
       },
       "cpantorpm" : {
          "file" : "cpantorpm",
-         "version" : "1.06"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -62,6 +61,6 @@
          "web" : "https://github.com/SBECK-github/App-CPANtoRPM"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

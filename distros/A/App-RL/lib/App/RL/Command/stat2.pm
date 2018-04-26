@@ -6,17 +6,19 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'coverage statistics on another runlist for runlists';
+sub abstract {
+    return 'coverage statistics on another runlist for runlists';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen" ],
-        [ "op=s",     "Operations: intersect, union, diff or xor", { default  => "intersect" } ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
+        [ "op=s",     "operations: intersect, union, diff or xor", { default  => "intersect" } ],
         [ "size|s=s", "chr.sizes",                                 { required => 1 } ],
         [ "base|b=s", "basename of infile2", ],
-        [ "remove|r", "Remove 'chr0' from chromosome names" ],
-        [ "mk",  "First YAML file contains multiple sets of runlists" ],
-        [ "all", "Only write whole genome stats" ],
+        [ "remove|r", "remove 'chr0' from chromosome names" ],
+        [ "mk",       "first YAML file contains multiple sets of runlists" ],
+        [ "all",      "only write whole genome stats" ],
         { show_defaults => 1, }
     );
 }

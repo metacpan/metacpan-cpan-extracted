@@ -18,11 +18,11 @@ Date::Advent - Calculate the Sundays of Advent
 
 =head1 VERSION
 
-Version 1.20180422
+Version 1.20180423
 
 =cut
 
-use version; our $VERSION = version->declare("v1.20180422");
+use version; our $VERSION = version->declare("v1.20180423");
 
 =head1 SYNOPSIS
 

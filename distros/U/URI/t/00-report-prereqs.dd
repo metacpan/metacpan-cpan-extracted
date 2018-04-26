@@ -10,6 +10,7 @@ do { my $x = {
        'develop' => {
                       'recommends' => {
                                         'Business::ISBN' => '0',
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
                                         'Storable' => '0'
                                       },
                       'requires' => {

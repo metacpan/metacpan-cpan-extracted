@@ -17,7 +17,7 @@ plan skip_all => "Test::Pod::Coverage $min_tpc required for testing POD coverage
 
 # Test::Pod::Coverage doesn't require a minimum Pod::Coverage version,
 # but older versions don't recognize some common documentation styles
-my $min_pc = 0.48;
+my $min_pc = 0.58;
 eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;

@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse
 
+1.10 2018-04-24
+
+ - Improve anchors restoring compatibility with Emacs Muse (#39)
+
+   Now anchors are interpreted even if followed by material, as in
+   Emacs Muse, and attach to the next block if they have no adjacent
+   material.
+
 1.01 2018-03-31
 
  - Removed noisy warning (thanks @labdsf)

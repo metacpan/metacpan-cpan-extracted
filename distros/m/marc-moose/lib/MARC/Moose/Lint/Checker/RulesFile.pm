@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Checker::RulesFile;
 # ABSTRACT: A class to 'lint' biblio record based on a rules file
-$MARC::Moose::Lint::Checker::RulesFile::VERSION = '1.0.35';
+$MARC::Moose::Lint::Checker::RulesFile::VERSION = '1.0.38';
 use Moose;
 use Modern::Perl;
 
@@ -110,15 +110,13 @@ sub _set_file {
                 };
             }
             else {
-                $self->table->{$code}->{$_} = 1;
+                $self->table->{$code}->{$_} = 1 if length($_) > 0;
             }
             while (<$fh>) {
                 chop;
-                last if $_;
+                last if defined $_;
             }
-            last unless $_;
-            s/^ *//;
-            s/ *$//;
+            last unless defined $_;
         }
     }
 }
@@ -184,17 +182,17 @@ sub check {
                     for ( @{$field->subf} ) {
                         my ($letter, $value ) = @$_;
                         next if $letter ne $check_letter;
-                        if ( $from ) {
+                        if ( length($from) > 0 ) {
                             my $val = substr($value, $from);
                             next unless $val;
                             $val = substr($val, 0, $len);
-                            unless ( $table->{$val} ) {
-                                $append->("subfield \$$letter, position $from,$len, invalid coded value: $val");
+                            unless ( exists $table->{$val} ) {
+                                $append->("subfield \$$letter, position $from,$len, invalid coded value: '$val'");
                             }
                         }
                         else {
-                            unless ( $table->{$value} ) {
-                                $append->("subfield \$$letter, invalid coded value: $value");
+                            unless ( exists $table->{$value} ) {
+                                $append->("subfield \$$letter, invalid coded value (without from): '$value'");
                             }
                         }
                     }
@@ -298,7 +296,7 @@ MARC::Moose::Lint::Checker::RulesFile - A class to 'lint' biblio record based on
 
 =head1 VERSION
 
-version 1.0.35
+version 1.0.38
 
 =head1 DESCRIPTION
 
@@ -441,7 +439,9 @@ This could be:
 
 In this case, the table will be used to validate coded values in coded fields.
 In this example, the language table will check 100$a subfield, position 22,
-length 3, and 101$a.
+length 3, and 101$a. A table must contain all possible values. It not possible
+to use regular expressions. If you can have a blank value, you need a line
+containing juste a blank.
 
 =back
 

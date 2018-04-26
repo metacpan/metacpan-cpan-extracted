@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/senddata.cpp 18    16-07-12 19:28 Sommar $
+ $Header: /Perl/OlleDB/senddata.cpp 19    16-07-17 22:58 Sommar $
 
   Implements the routines for sending data and command to SQL Server:
   initbatch, enterparameter and executebatch, including routines to
@@ -9,6 +9,12 @@
   Copyright (c) 2004-2016   Erland Sommarskog
 
   $History: senddata.cpp $
+ * 
+ * *****************  Version 19  *****************
+ * User: Sommar       Date: 16-07-17   Time: 22:58
+ * Updated in $/Perl/OlleDB
+ * Check explicitly for scanret = 1, since it can return -1 as well, which
+ * is not any form of success.
  * 
  * *****************  Version 18  *****************
  * User: Sommar       Date: 16-07-12   Time: 19:28
@@ -302,7 +308,6 @@ static void get_xmlencoding (SV              * sv,
       return;
    }
    str = SvPV_nolen(sv);
-
    // If there is an encoding, it must come in the prolog which must be at
    // the very first in the file. This is heaviliy regimented by the XML
    // standard. sscanf comes in handy here.
@@ -310,7 +315,7 @@ static void get_xmlencoding (SV              * sv,
                       encoding, 20);
 
    // scanret == 1 => we found an encoding string.
-   if (scanret) {
+   if (scanret == 1) {
       // Get the position.
       char *tmp = strstr(str, encoding);
       charsetpos = (int) (tmp - str);

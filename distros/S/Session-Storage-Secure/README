@@ -3,7 +3,7 @@ NAME
     session data with integrity
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
       my $store = Session::Storage::Secure->new(

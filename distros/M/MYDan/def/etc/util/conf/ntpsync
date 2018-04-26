@@ -1,0 +1,7 @@
+my_hostname_regex:
+ - my.ntp.org
+.:
+ - 0.cn.pool.ntp.org
+ - 1.cn.pool.ntp.org
+ - 2.cn.pool.ntp.org
+ - 3.cn.pool.ntp.org

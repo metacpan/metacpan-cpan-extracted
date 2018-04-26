@@ -4,7 +4,7 @@ use warnings;
 package HTTP::Tiny::UA::Response;
 # ABSTRACT: Wrap HTTP::Tiny response as objects with accessors
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 # Declare custom accessor before Class::Tiny loads
 use subs 'headers';
@@ -82,11 +82,11 @@ HTTP::Tiny::UA::Response - Wrap HTTP::Tiny response as objects with accessors
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
-    my $res = HTTP::Tiny->new->get( $url );
+    my $res = HTTP::Tiny::UA->new->get( $url );
 
     if ( $res->success ) {
         say "Got " . $res->header("Content-Length") . " bytes";

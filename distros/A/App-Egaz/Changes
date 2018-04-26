@@ -1,5 +1,26 @@
 Revision history for Perl extension App-Egaz
 
+0.2.0 2018-04-24T21:32:24Z
+    - `egaz template`
+        - Add 7_multi_aligndb.sh
+        - Add 7_self_aligndb.sh
+        - Add 9_pack_up.sh
+        - Store anno.yml and chr_length.csv to Results/
+    - `egaz repeatmasker`
+        - Try hard to find rmOutToGFF3.pl
+    - `egaz prepseq`
+        - Simplify headers for sequences in directory
+    - `egaz masked`
+        - Handle unmasked sequences
+
+0.1.3 2018-04-22T20:03:24Z
+    - `egaz template`
+        - Add 0_prep.sh
+        - and companion options
+    - `egaz repeatmasker`
+        - Masked files always with suffix of .fa
+        - Find rmOutToGFF3.pl and create .rm.gff
+
 0.1.2 2018-04-16T19:39:57Z
     - Create chr.fasta and chr.fasta.fai in `egaz prepseq`
     - Add `egaz fas2vcf`

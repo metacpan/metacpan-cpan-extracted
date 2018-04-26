@@ -1,5 +1,12 @@
 Revision history for Module-Faker
 
+0.020     2018-04-22 21:59:37+02:00 Europe/Oslo
+        - x_authority, provides, and prereqs will no longer be present in the
+          META for built dists unless they're defined
+
+0.019     2018-04-22 13:50:16+02:00 Europe/Oslo
+        - lower version required to v5.14, for PAUSE
+
 0.018     2018-04-22 12:02:52+02:00 Europe/Oslo
         - add a new tool, module-faker
         - allow source directory to be a single file instead

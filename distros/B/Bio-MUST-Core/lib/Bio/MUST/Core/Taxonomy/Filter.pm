@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Filter;
 # ABSTRACT: Helper class for filtering seqs according to taxonomy
-$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.181000';
+$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.181120';
 use Moose;
 use namespace::autoclean;
 
@@ -15,17 +15,7 @@ use List::AllUtils;
 
 use Bio::MUST::Core::Types;
 use aliased 'Bio::MUST::Core::IdList';
-
-
-has '_tax' => (
-    is       => 'ro',
-    isa      => 'Bio::MUST::Core::Taxonomy',
-    required => 1,
-    handles  => {
-        _fetch_lineage => 'get_taxonomy_from_seq_id',       # private method
-         is_dupe       => 'is_dupe',
-    },
-);
+with 'Bio::MUST::Core::Roles::Taxable';
 
 
 has '_specs' => (
@@ -63,12 +53,10 @@ sub BUILD {
     my   @wanted = map { $_ =~   $WANTED ? $1 : () } $self->all_specs;
     my @unwanted = map { $_ =~ $UNWANTED ? $1 : () } $self->all_specs;
 
-    # TODO: allow using MUST baseid specifications?
-
     # warn in case of ambiguous taxa
     for my $taxon (@wanted, @unwanted) {
-        carp "Warning: $taxon is taxonomically ambiguous in tax_filter!"
-            if $self->is_dupe($taxon);
+        carp "Warning: $taxon is taxonomically ambiguous in filter!"
+            if $self->tax->is_dupe($taxon);
     }
 
     # build filtering hashes from wanted and unwanted arrays
@@ -94,7 +82,7 @@ sub is_allowed {
     #                         ... or has at least one unwanted taxon
     # non-matching taxa are allowed by default
 
-    my @lineage = $self->_fetch_lineage($seq_id);
+    my @lineage = $self->tax->fetch_lineage($seq_id);
     return undef unless @lineage;   ## no critic (ProhibitExplicitReturnUndef)
 
     return 0 unless List::AllUtils::any { $self->is_wanted(  $_) } @lineage;
@@ -129,7 +117,7 @@ Bio::MUST::Core::Taxonomy::Filter - Helper class for filtering seqs according to
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 SYNOPSIS
 

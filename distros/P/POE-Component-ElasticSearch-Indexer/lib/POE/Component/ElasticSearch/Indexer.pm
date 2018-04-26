@@ -4,7 +4,7 @@ package POE::Component::ElasticSearch::Indexer;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Const::Fast;
 use Digest::SHA1 qw(sha1_hex);
@@ -53,6 +53,7 @@ sub spawn {
         DefaultIndex  => 'logs-%Y.%m.%d',
         DefaultType   => 'log',
         BatchDir      => '/tmp/es_index_backlog',
+        StatsInterval => 60,
         %params,
     );
     if( $CONFIG{Templates} ) {
@@ -74,7 +75,7 @@ sub spawn {
     }
 
     # Management Session
-    POE::Session->create(
+    my $session = POE::Session->create(
         inline_states => {
             _start    => \&_start,
             _child    => \&_child,
@@ -84,6 +85,7 @@ sub spawn {
             batch     => \&es_batch,
             save      => \&es_save,
             backlog   => \&es_backlog,
+            shutdown  => \&es_shutdown,
             #health    => \&es_health,
 
             # Templates
@@ -149,7 +151,12 @@ sub _start {
     # Run through the backlog
     $kernel->delay( backlog => 2 );
     $heap->{backlog_scheduled} = 1;
+
+    # For now, we just state we're ready
     $heap->{es_ready} = 1;
+
+    # Schedule Statistics Run
+    $kernel->delay( stats => $heap->{cfg}{StatsInterval} );
 }
 
 sub _child {
@@ -181,7 +188,7 @@ sub _stats {
         };
     }
     # Also output at TRACE level
-    INFO( "STATS - " .
+    TRACE( "STATS - " .
         scalar(keys %$stats) ? join(', ', map { "$_=$stats->{$_}" } sort keys %$stats )
                              : 'Nothing to report.'
     );
@@ -209,8 +216,9 @@ sub es_queue {
         elsif( is_hashref($doc) ) {
             # Assemble Metadata
             my $epoch = $doc->{_epoch} ? delete $doc->{_epoch} : time;
+            my $index = $doc->{_index} ? delete $doc->{_index} : $heap->{cfg}{DefaultIndex};
             my %meta = (
-                _index => $doc->{_index} ? delete $doc->{_index} : strftime($heap->{cfg}{DefaultIndex},localtime($epoch)),
+                _index => index($index,'%') >= 0 ? strftime($index,localtime($epoch)) : $index,
                 _type  => $doc->{_type}  ? delete $doc->{_type}  : $heap->{cfg}{DefaultType},
                 $doc->{_id} ? ( _id => delete $doc->{_id} ) : (),
             );
@@ -255,6 +263,10 @@ sub es_flush {
 
     my $count_docs = exists $heap->{queue} && is_arrayref($heap->{queue}) ? scalar(@{ $heap->{queue} }) : 0;
     my $reason     = exists $heap->{force_flush} && delete $heap->{force_flush} ? 'force' : 'schedule';
+
+    # Record the flush
+    $heap->{stats}{"es_flush_$reason"} ||= 0;
+    $heap->{stats}{"es_flush_$reason"}++;
 
     if( $count_docs > 0 ) {
         # Build the batch
@@ -576,7 +588,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -858,7 +870,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/POE-Component-ElasticSearch-Indexer>
+L<https://metacpan.org/release/POE-Component-ElasticSearch-Indexer>
 
 =item *
 

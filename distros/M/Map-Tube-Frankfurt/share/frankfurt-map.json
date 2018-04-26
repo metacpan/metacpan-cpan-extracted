@@ -1,0 +1,1044 @@
+{
+   "stations" : {
+      "station" : [
+         {
+            "link" : "SFRA002",
+            "id" : "SFRA001",
+            "line" : "S1",
+            "name" : "Hochheim (Main)"
+         },
+         {
+            "link" : "SFRA001,SFRA003",
+            "name" : "Flörsheim (Main)",
+            "id" : "SFRA002",
+            "line" : "S1"
+         },
+         {
+            "name" : "Hattersheim (Main)-Eddersheim",
+            "line" : "S1",
+            "id" : "SFRA003",
+            "link" : "SFRA002,SFRA004"
+         },
+         {
+            "link" : "SFRA003,SFRA005",
+            "name" : "Sindlingen",
+            "line" : "S1",
+            "id" : "SFRA004"
+         },
+         {
+            "line" : "S1",
+            "id" : "SFRA005",
+            "name" : "Farbwerke",
+            "link" : "SFRA004,SFRA006"
+         },
+         {
+            "link" : "SFRA005,SFRA007,SFRA018",
+            "line" : "S1,S2",
+            "id" : "SFRA006",
+            "name" : "Höchst"
+         },
+         {
+            "link" : "SFRA006,SFRA008",
+            "name" : "Nied",
+            "line" : "S1,S2",
+            "id" : "SFRA007"
+         },
+         {
+            "link" : "SFRA007,SFRA009",
+            "name" : "Griesheim",
+            "id" : "SFRA008",
+            "line" : "S1,S2"
+         },
+         {
+            "line" : "S1,S2,S3,S4,S5,S6,S7,S8,S9",
+            "id" : "SFRA009",
+            "name" : "Hauptbahnhof",
+            "link" : "SFRA008,SFRA019,SFRA046,SFRA080"
+         },
+         {
+            "id" : "SFRA010",
+            "line" : "S2",
+            "name" : "Niedernhausen",
+            "link" : "SFRA011"
+         },
+         {
+            "link" : "SFRA010,SFRA012",
+            "line" : "S2",
+            "id" : "SFRA011",
+            "name" : "Eppstein-Niederjosbach"
+         },
+         {
+            "line" : "S2",
+            "id" : "SFRA012",
+            "name" : "Eppstein-Bremthal",
+            "link" : "SFRA011,SFRA013"
+         },
+         {
+            "link" : "SFRA012,SFRA014",
+            "name" : "Eppstein",
+            "line" : "S2",
+            "id" : "SFRA013"
+         },
+         {
+            "link" : "SFRA013,SFRA015",
+            "line" : "S2",
+            "id" : "SFRA014",
+            "name" : "Hofheim Am Taunus-Lorsbach"
+         },
+         {
+            "line" : "S2",
+            "id" : "SFRA015",
+            "name" : "Hofheim Am Taunus",
+            "link" : "SFRA014,SFRA016"
+         },
+         {
+            "link" : "SFRA015,SFRA017",
+            "name" : "Kriftel",
+            "line" : "S2",
+            "id" : "SFRA016"
+         },
+         {
+            "link" : "SFRA016,SFRA018",
+            "name" : "Zeilsheim",
+            "id" : "SFRA017",
+            "line" : "S2"
+         },
+         {
+            "link" : "SFRA006,SFRA017",
+            "name" : "Industriepark Höchst Tor Nord",
+            "id" : "SFRA018",
+            "line" : "S2"
+         },
+         {
+            "link" : "SFRA009,SFRA020",
+            "id" : "SFRA019",
+            "line" : "S2,S3,S4,S5,S6,S9",
+            "name" : "Taunusanlage"
+         },
+         {
+            "link" : "SFRA019,SFRA021,SFRA096,SFRA097,SFRA143",
+            "line" : "S2,S3,S4,S5,S6,S9,U1,U2,U3,U6,U7",
+            "id" : "SFRA020",
+            "name" : "Hauptwache"
+         },
+         {
+            "link" : "SFRA020,SFRA022,SFRA132,SFRA133,SFRA140,SFRA142",
+            "line" : "S2,S3,S4,S5,S6,S9,U4,U5,U6,U7",
+            "id" : "SFRA021",
+            "name" : "Konstablerwache"
+         },
+         {
+            "link" : "SFRA021,SFRA023,SFRA045",
+            "name" : "Ostendstraße",
+            "line" : "S2,S3,S4,S5,S6,S9",
+            "id" : "SFRA022"
+         },
+         {
+            "link" : "SFRA022,SFRA024,SFRA090",
+            "name" : "Mühlberg",
+            "line" : "S2,S9",
+            "id" : "SFRA023"
+         },
+         {
+            "line" : "S2",
+            "id" : "SFRA024",
+            "name" : "Offenbach (Main)-Kaiserlei S-Bahn Ostseite",
+            "link" : "SFRA023,SFRA025"
+         },
+         {
+            "link" : "SFRA024,SFRA026,SFRA090",
+            "id" : "SFRA025",
+            "line" : "S2,S9",
+            "name" : "Offenbach (Main) Ledermuseum"
+         },
+         {
+            "line" : "S2,S9",
+            "id" : "SFRA026",
+            "name" : "Offenbach (Main) Marktplatz",
+            "link" : "SFRA025,SFRA027"
+         },
+         {
+            "link" : "SFRA026,SFRA028,SFRA091",
+            "id" : "SFRA027",
+            "line" : "S2,S9",
+            "name" : "Offenbach (Main) Ost"
+         },
+         {
+            "link" : "SFRA027,SFRA029",
+            "line" : "S2",
+            "id" : "SFRA028",
+            "name" : "Offenbach (Main)-Bieber"
+         },
+         {
+            "name" : "Heusenstamm",
+            "line" : "S2",
+            "id" : "SFRA029",
+            "link" : "SFRA028,SFRA030"
+         },
+         {
+            "id" : "SFRA030",
+            "line" : "S2",
+            "name" : "Dietzenbach Steinberg",
+            "link" : "SFRA029,SFRA031"
+         },
+         {
+            "name" : "Dietzenbach Mitte",
+            "line" : "S2",
+            "id" : "SFRA031",
+            "link" : "SFRA030,SFRA032"
+         },
+         {
+            "name" : "Dietzenbach",
+            "line" : "S2",
+            "id" : "SFRA032",
+            "link" : "SFRA031"
+         },
+         {
+            "link" : "SFRA034",
+            "name" : "Darmstadt Hauptbahnhof",
+            "line" : "S3,S4",
+            "id" : "SFRA033"
+         },
+         {
+            "line" : "S3,S4",
+            "id" : "SFRA034",
+            "name" : "Darmstadt-Arheilgen",
+            "link" : "SFRA033,SFRA035"
+         },
+         {
+            "link" : "SFRA034,SFRA036",
+            "id" : "SFRA035",
+            "line" : "S3,S4",
+            "name" : "Darmstadt-Wixhausen"
+         },
+         {
+            "name" : "Erzhausen",
+            "line" : "S3,S4",
+            "id" : "SFRA036",
+            "link" : "SFRA035,SFRA037"
+         },
+         {
+            "link" : "SFRA036,SFRA038",
+            "id" : "SFRA037",
+            "line" : "S3,S4",
+            "name" : "Egelsbach"
+         },
+         {
+            "name" : "Langen (Hessen)",
+            "line" : "S3,S4",
+            "id" : "SFRA038",
+            "link" : "SFRA037,SFRA039"
+         },
+         {
+            "link" : "SFRA038,SFRA040",
+            "line" : "S3,S4",
+            "id" : "SFRA039",
+            "name" : "Langen (Hessen) Flugsicherung"
+         },
+         {
+            "link" : "SFRA039,SFRA041",
+            "id" : "SFRA040",
+            "line" : "S3,S4",
+            "name" : "Dreieich-Buchschlag"
+         },
+         {
+            "link" : "SFRA040,SFRA042",
+            "line" : "S3,S4",
+            "id" : "SFRA041",
+            "name" : "Neu-Isenburg Ostseite"
+         },
+         {
+            "link" : "SFRA041,SFRA043",
+            "line" : "S3,S4",
+            "id" : "SFRA042",
+            "name" : "Louisa"
+         },
+         {
+            "link" : "SFRA042,SFRA044",
+            "name" : "Stresemannallee",
+            "id" : "SFRA043",
+            "line" : "S3,S4"
+         },
+         {
+            "line" : "S3,S4,S5,S6,U1,U2,U3",
+            "id" : "SFRA044",
+            "name" : "Südbahnhof",
+            "link" : "SFRA043,SFRA045,SFRA095"
+         },
+         {
+            "line" : "S3,S4,S5,S6",
+            "id" : "SFRA045",
+            "name" : "Lokalbahnhof",
+            "link" : "SFRA022,SFRA044"
+         },
+         {
+            "link" : "SFRA009,SFRA047",
+            "name" : "Galluswarte",
+            "line" : "S3,S4,S5,S6",
+            "id" : "SFRA046"
+         },
+         {
+            "line" : "S3,S4,S5,S6",
+            "id" : "SFRA047",
+            "name" : "Messe",
+            "link" : "SFRA046,SFRA048"
+         },
+         {
+            "link" : "SFRA047,SFRA049,SFRA071",
+            "name" : "Westbahnhof",
+            "id" : "SFRA048",
+            "line" : "S3,S4,S5,S6"
+         },
+         {
+            "line" : "S3,S4,S5",
+            "id" : "SFRA049",
+            "name" : "Rödelheim",
+            "link" : "SFRA048,SFRA050,SFRA060"
+         },
+         {
+            "link" : "SFRA049,SFRA051",
+            "name" : "Eschborn Südbahnhof",
+            "line" : "S3,S4",
+            "id" : "SFRA050"
+         },
+         {
+            "link" : "SFRA050,SFRA052",
+            "line" : "S3,S4",
+            "id" : "SFRA051",
+            "name" : "Eschborn"
+         },
+         {
+            "link" : "SFRA051,SFRA053",
+            "name" : "Eschborn-Niederhöchstadt",
+            "line" : "S3,S4",
+            "id" : "SFRA052"
+         },
+         {
+            "name" : "Schwalbach (Taunus) Nord",
+            "line" : "S3,S4",
+            "id" : "SFRA053",
+            "link" : "SFRA052,SFRA054"
+         },
+         {
+            "link" : "SFRA053,SFRA055",
+            "id" : "SFRA054",
+            "line" : "S3,S4",
+            "name" : "Schwalbach (Taunus) Limes"
+         },
+         {
+            "link" : "SFRA054,SFRA056",
+            "name" : "Sulzbach (Taunus) Nordbahnhof",
+            "line" : "S3,S4",
+            "id" : "SFRA055"
+         },
+         {
+            "id" : "SFRA056",
+            "line" : "S3,S4",
+            "name" : "Bad Soden (Taunus)",
+            "link" : "SFRA055"
+         },
+         {
+            "line" : "S5",
+            "id" : "SFRA057",
+            "name" : "Bad Homburg V.D.H.",
+            "link" : "SFRA058"
+         },
+         {
+            "link" : "SFRA057,SFRA059,SFRA120",
+            "line" : "S5,U3",
+            "id" : "SFRA058",
+            "name" : "Oberursel (Taunus)"
+         },
+         {
+            "id" : "SFRA059",
+            "line" : "S5",
+            "name" : "Oberursel (Taunus)-Stierstadt",
+            "link" : "SFRA058,SFRA060"
+         },
+         {
+            "line" : "S5",
+            "id" : "SFRA060",
+            "name" : "Oberursel (Taunus)-Weißkirchen/Steinbach",
+            "link" : "SFRA049,SFRA059"
+         },
+         {
+            "link" : "SFRA062",
+            "line" : "S6",
+            "id" : "SFRA061",
+            "name" : "Friedberg (Hessen)"
+         },
+         {
+            "link" : "SFRA061,SFRA063",
+            "id" : "SFRA062",
+            "line" : "S6",
+            "name" : "Friedberg (Hessen)-Bruchenbrücken"
+         },
+         {
+            "link" : "SFRA062,SFRA064",
+            "id" : "SFRA063",
+            "line" : "S6",
+            "name" : "Wöllstadt-Nieder-Wöllstadt"
+         },
+         {
+            "name" : "Karben-Okarben",
+            "line" : "S6",
+            "id" : "SFRA064",
+            "link" : "SFRA063,SFRA065"
+         },
+         {
+            "link" : "SFRA064,SFRA066",
+            "name" : "Karben-Groß-Karben",
+            "id" : "SFRA065",
+            "line" : "S6"
+         },
+         {
+            "line" : "S6",
+            "id" : "SFRA066",
+            "name" : "Bad Vilbel-Dortelweil",
+            "link" : "SFRA065,SFRA067"
+         },
+         {
+            "link" : "SFRA066,SFRA068",
+            "id" : "SFRA067",
+            "line" : "S6",
+            "name" : "Bad Vilbel"
+         },
+         {
+            "id" : "SFRA068",
+            "line" : "S6",
+            "name" : "Bad Vilbel S�Dbahnhof",
+            "link" : "SFRA067,SFRA069"
+         },
+         {
+            "line" : "S6",
+            "id" : "SFRA069",
+            "name" : "Berkersheim",
+            "link" : "SFRA068,SFRA070"
+         },
+         {
+            "name" : "Frankfurter Berg",
+            "id" : "SFRA070",
+            "line" : "S6",
+            "link" : "SFRA069,SFRA071"
+         },
+         {
+            "link" : "SFRA048,SFRA070",
+            "line" : "S6",
+            "id" : "SFRA071",
+            "name" : "Eschersheim"
+         },
+         {
+            "link" : "SFRA073",
+            "id" : "SFRA072",
+            "line" : "S7",
+            "name" : "Riedstadt-Goddelau"
+         },
+         {
+            "id" : "SFRA073",
+            "line" : "S7",
+            "name" : "Riedstadt-Wolfskehlen",
+            "link" : "SFRA072,SFRA074"
+         },
+         {
+            "name" : "Groß-Gerau Dornheim",
+            "line" : "S7",
+            "id" : "SFRA074",
+            "link" : "SFRA073,SFRA075"
+         },
+         {
+            "link" : "SFRA074,SFRA076",
+            "line" : "S7",
+            "id" : "SFRA075",
+            "name" : "Groß-Gerau Dornberg"
+         },
+         {
+            "id" : "SFRA076",
+            "line" : "S7",
+            "name" : "Mörfelden",
+            "link" : "SFRA075,SFRA077"
+         },
+         {
+            "link" : "SFRA076,SFRA078",
+            "id" : "SFRA077",
+            "line" : "S7",
+            "name" : "Walldorf"
+         },
+         {
+            "link" : "SFRA077,SFRA079",
+            "name" : "Neu-Isenburg-Zeppelinheim",
+            "id" : "SFRA078",
+            "line" : "S7"
+         },
+         {
+            "id" : "SFRA079",
+            "line" : "S7,S8,S9",
+            "name" : "Stadion",
+            "link" : "SFRA078,SFRA080,SFRA081"
+         },
+         {
+            "name" : "Niederrad",
+            "id" : "SFRA080",
+            "line" : "S7,S8,S9",
+            "link" : "SFRA009,SFRA079"
+         },
+         {
+            "link" : "SFRA079,SFRA089",
+            "line" : "S8,S9",
+            "id" : "SFRA081",
+            "name" : "Flughafen Regionalbahnhof"
+         },
+         {
+            "link" : "SFRA083",
+            "line" : "S9",
+            "id" : "SFRA082",
+            "name" : "Wiesbaden Hauptbahnhof"
+         },
+         {
+            "name" : "Wiesbaden-Biebrich Wiesbaden Ost",
+            "id" : "SFRA083",
+            "line" : "S9",
+            "link" : "SFRA082,SFRA084"
+         },
+         {
+            "link" : "SFRA083,SFRA085",
+            "id" : "SFRA084",
+            "line" : "S9",
+            "name" : "Wiesbaden-Mainz-Kastel"
+         },
+         {
+            "name" : "Mainz-Bischofsheim",
+            "line" : "S9",
+            "id" : "SFRA085",
+            "link" : "SFRA084,SFRA086"
+         },
+         {
+            "id" : "SFRA086",
+            "line" : "S9",
+            "name" : "Rüsselsheim Opelwerk",
+            "link" : "SFRA085,SFRA087"
+         },
+         {
+            "link" : "SFRA086,SFRA088",
+            "line" : "S9",
+            "id" : "SFRA087",
+            "name" : "Rüsselsheim"
+         },
+         {
+            "link" : "SFRA087,SFRA089",
+            "id" : "SFRA088",
+            "line" : "S9",
+            "name" : "Raunheim"
+         },
+         {
+            "link" : "SFRA081,SFRA088",
+            "name" : "Kelsterbach",
+            "line" : "S9",
+            "id" : "SFRA089"
+         },
+         {
+            "link" : "SFRA023,SFRA025",
+            "line" : "S9",
+            "id" : "SFRA090",
+            "name" : "Offenbach (Main)-Kaiserlei"
+         },
+         {
+            "link" : "SFRA027,SFRA092",
+            "id" : "SFRA091",
+            "line" : "S9",
+            "name" : "Mühlheim (Main)"
+         },
+         {
+            "link" : "SFRA091,SFRA093",
+            "name" : "M�Hlheim (Main)-Dietesheim S-Bahn",
+            "line" : "S9",
+            "id" : "SFRA092"
+         },
+         {
+            "link" : "SFRA092,SFRA094",
+            "name" : "Hanau-Steinheim (Main)",
+            "line" : "S9",
+            "id" : "SFRA093"
+         },
+         {
+            "link" : "SFRA093",
+            "name" : "Hanau Hauptbahnhof",
+            "id" : "SFRA094",
+            "line" : "S9"
+         },
+         {
+            "link" : "SFRA044,SFRA096",
+            "name" : "Schweizer Platz",
+            "line" : "U1,U2,U3",
+            "id" : "SFRA095"
+         },
+         {
+            "link" : "SFRA020,SFRA095,SFRA133,SFRA134",
+            "line" : "U1,U2,U3,U4,U5",
+            "id" : "SFRA096",
+            "name" : "Willy-Brandt-Platz"
+         },
+         {
+            "name" : "Eschenheimer Tor",
+            "id" : "SFRA097",
+            "line" : "U1,U2,U3",
+            "link" : "SFRA020,SFRA098"
+         },
+         {
+            "line" : "U1,U2,U3",
+            "id" : "SFRA098",
+            "name" : "Grüneburgweg",
+            "link" : "SFRA097,SFRA099"
+         },
+         {
+            "link" : "SFRA098,SFRA100",
+            "line" : "U1,U2,U3",
+            "id" : "SFRA099",
+            "name" : "Holzhausenstraße"
+         },
+         {
+            "name" : "Miquel-/Adickesallee",
+            "line" : "U1,U2,U3",
+            "id" : "SFRA100",
+            "link" : "SFRA099,SFRA101"
+         },
+         {
+            "link" : "SFRA100,SFRA102",
+            "name" : "Dornbusch",
+            "line" : "U1,U2,U3",
+            "id" : "SFRA101"
+         },
+         {
+            "link" : "SFRA101,SFRA103",
+            "id" : "SFRA102",
+            "line" : "U1,U2,U3",
+            "name" : "Eschersheimer Landstraße"
+         },
+         {
+            "link" : "SFRA102,SFRA104",
+            "name" : "H�Gelstra�",
+            "id" : "SFRA103",
+            "line" : "U1,U2,U3"
+         },
+         {
+            "id" : "SFRA104",
+            "line" : "U1,U2,U3",
+            "name" : "Lindenbaum",
+            "link" : "SFRA103,SFRA105"
+         },
+         {
+            "id" : "SFRA105",
+            "line" : "U1,U2,U3",
+            "name" : "Weißer Stein",
+            "link" : "SFRA104,SFRA106"
+         },
+         {
+            "link" : "SFRA105,SFRA107,SFRA113",
+            "id" : "SFRA106",
+            "line" : "U1,U2,U3,U8",
+            "name" : "Heddernheim"
+         },
+         {
+            "id" : "SFRA107",
+            "line" : "U1,U3,U8",
+            "name" : "Zeilweg",
+            "link" : "SFRA106,SFRA108,SFRA123"
+         },
+         {
+            "name" : "Heddernheimer Landstraße",
+            "line" : "U1,U9",
+            "id" : "SFRA108",
+            "link" : "SFRA107,SFRA109,SFRA123"
+         },
+         {
+            "link" : "SFRA108,SFRA110",
+            "name" : "Nordwestzentrum",
+            "line" : "U1,U9",
+            "id" : "SFRA109"
+         },
+         {
+            "link" : "SFRA109,SFRA111",
+            "name" : "Römerstadt",
+            "id" : "SFRA110",
+            "line" : "U1,U9"
+         },
+         {
+            "name" : "Niddapark",
+            "line" : "U1,U9",
+            "id" : "SFRA111",
+            "link" : "SFRA110,SFRA112"
+         },
+         {
+            "id" : "SFRA112",
+            "line" : "U1,U9",
+            "name" : "Ginnheim",
+            "link" : "SFRA111"
+         },
+         {
+            "link" : "SFRA106,SFRA114",
+            "name" : "Sandelm�Hle",
+            "line" : "U2",
+            "id" : "SFRA113"
+         },
+         {
+            "name" : "Riedwiese/Mertonviertel",
+            "line" : "U2",
+            "id" : "SFRA114",
+            "link" : "SFRA113,SFRA115"
+         },
+         {
+            "link" : "SFRA114,SFRA116,SFRA159",
+            "line" : "U2,U9",
+            "id" : "SFRA115",
+            "name" : "Kalbach"
+         },
+         {
+            "name" : "Bonames Mitte",
+            "id" : "SFRA116",
+            "line" : "U2,U9",
+            "link" : "SFRA115,SFRA117"
+         },
+         {
+            "id" : "SFRA117",
+            "line" : "U2,U9",
+            "name" : "Nieder-Eschbach",
+            "link" : "SFRA116,SFRA118"
+         },
+         {
+            "name" : "Ober-Eschbach",
+            "id" : "SFRA118",
+            "line" : "U2",
+            "link" : "SFRA117,SFRA119"
+         },
+         {
+            "id" : "SFRA119",
+            "line" : "U2",
+            "name" : "Bad Homburg V.D.H.-Gonzenheim (U)",
+            "link" : "SFRA118"
+         },
+         {
+            "line" : "U3",
+            "id" : "SFRA120",
+            "name" : "Oberursel (Taunus)-Bommersheim",
+            "link" : "SFRA058,SFRA121"
+         },
+         {
+            "link" : "SFRA120,SFRA122",
+            "id" : "SFRA121",
+            "line" : "U3",
+            "name" : "Oberursel (Taunus)-Weißkirchen Ost"
+         },
+         {
+            "link" : "SFRA121,SFRA123,SFRA160",
+            "id" : "SFRA122",
+            "line" : "U3,U8,U9",
+            "name" : "Niederursel"
+         },
+         {
+            "name" : "Wiesenau",
+            "id" : "SFRA123",
+            "line" : "U3,U8,U9",
+            "link" : "SFRA107,SFRA108,SFRA122"
+         },
+         {
+            "link" : "SFRA125",
+            "id" : "SFRA124",
+            "line" : "U4,U7",
+            "name" : "Enkheim"
+         },
+         {
+            "link" : "SFRA124,SFRA126",
+            "name" : "Hessen-Center",
+            "id" : "SFRA125",
+            "line" : "U4,U7"
+         },
+         {
+            "name" : "Kruppstraße",
+            "id" : "SFRA126",
+            "line" : "U4,U7",
+            "link" : "SFRA125,SFRA127"
+         },
+         {
+            "link" : "SFRA126,SFRA128",
+            "name" : "Gwinnerstraße",
+            "id" : "SFRA127",
+            "line" : "U4,U7"
+         },
+         {
+            "name" : "Schäfflestraße",
+            "line" : "U4,U7",
+            "id" : "SFRA128",
+            "link" : "SFRA127,SFRA129,SFRA158"
+         },
+         {
+            "link" : "SFRA128,SFRA130",
+            "name" : "Seckbacher Landstraße",
+            "id" : "SFRA129",
+            "line" : "U4"
+         },
+         {
+            "name" : "Bornheim Mitte",
+            "id" : "SFRA130",
+            "line" : "U4",
+            "link" : "SFRA129,SFRA131"
+         },
+         {
+            "link" : "SFRA130,SFRA132",
+            "line" : "U4",
+            "id" : "SFRA131",
+            "name" : "Höhenstraße"
+         },
+         {
+            "name" : "Merianplatz",
+            "id" : "SFRA132",
+            "line" : "U4",
+            "link" : "SFRA021,SFRA131"
+         },
+         {
+            "link" : "SFRA021,SFRA096",
+            "id" : "SFRA133",
+            "line" : "U4,U5",
+            "name" : "Dom/Römer"
+         },
+         {
+            "link" : "SFRA096,SFRA135",
+            "id" : "SFRA134",
+            "line" : "U4,U5",
+            "name" : "Hauptbahnhof Tief"
+         },
+         {
+            "link" : "SFRA134,SFRA136",
+            "name" : "Festhalle/Messe",
+            "id" : "SFRA135",
+            "line" : "U4"
+         },
+         {
+            "name" : "Bockenheimer Warte",
+            "line" : "U4,U6,U7",
+            "id" : "SFRA136",
+            "link" : "SFRA135,SFRA144,SFRA145"
+         },
+         {
+            "line" : "U5",
+            "id" : "SFRA137",
+            "name" : "Hauptfriedhof",
+            "link" : "SFRA138"
+         },
+         {
+            "link" : "SFRA137,SFRA139",
+            "line" : "U5",
+            "id" : "SFRA138",
+            "name" : "Deutsche Nationalbibliothek"
+         },
+         {
+            "link" : "SFRA138,SFRA140",
+            "id" : "SFRA139",
+            "line" : "U5",
+            "name" : "Glauburgstraße"
+         },
+         {
+            "link" : "SFRA021,SFRA139",
+            "id" : "SFRA140",
+            "line" : "U5",
+            "name" : "Musterschule"
+         },
+         {
+            "name" : "Ostbahnhof",
+            "line" : "U6",
+            "id" : "SFRA141",
+            "link" : "SFRA142"
+         },
+         {
+            "line" : "U6,U7",
+            "id" : "SFRA142",
+            "name" : "Zoo",
+            "link" : "SFRA021,SFRA141,SFRA155"
+         },
+         {
+            "id" : "SFRA143",
+            "line" : "U6,U7",
+            "name" : "Alte Oper",
+            "link" : "SFRA020,SFRA144"
+         },
+         {
+            "link" : "SFRA136,SFRA143",
+            "name" : "Westend",
+            "line" : "U6,U7",
+            "id" : "SFRA144"
+         },
+         {
+            "link" : "SFRA136,SFRA146",
+            "id" : "SFRA145",
+            "line" : "U6,U7",
+            "name" : "Leipziger Straße"
+         },
+         {
+            "link" : "SFRA145,SFRA147",
+            "name" : "Kirchplatz",
+            "id" : "SFRA146",
+            "line" : "U6,U7"
+         },
+         {
+            "link" : "SFRA146,SFRA148,SFRA154",
+            "name" : "Industriehof",
+            "id" : "SFRA147",
+            "line" : "U6,U7"
+         },
+         {
+            "link" : "SFRA147,SFRA149",
+            "line" : "U6",
+            "id" : "SFRA148",
+            "name" : "Fischstein"
+         },
+         {
+            "id" : "SFRA149",
+            "line" : "U6",
+            "name" : "Hausener Weg",
+            "link" : "SFRA148,SFRA150"
+         },
+         {
+            "name" : "Stephan-Heise-Straße",
+            "line" : "U6",
+            "id" : "SFRA150",
+            "link" : "SFRA149,SFRA151"
+         },
+         {
+            "line" : "U6",
+            "id" : "SFRA151",
+            "name" : "Friedhof Westhausen",
+            "link" : "SFRA150,SFRA152"
+         },
+         {
+            "name" : "Heerstraße",
+            "id" : "SFRA152",
+            "line" : "U6",
+            "link" : "SFRA151"
+         },
+         {
+            "id" : "SFRA153",
+            "line" : "U7",
+            "name" : "Hausen",
+            "link" : "SFRA154"
+         },
+         {
+            "name" : "Große Nelkenstraße",
+            "line" : "U7",
+            "id" : "SFRA154",
+            "link" : "SFRA147,SFRA153"
+         },
+         {
+            "link" : "SFRA142,SFRA156",
+            "id" : "SFRA155",
+            "line" : "U7",
+            "name" : "Habsburgerallee"
+         },
+         {
+            "link" : "SFRA155,SFRA157",
+            "name" : "Parlamentsplatz",
+            "id" : "SFRA156",
+            "line" : "U7"
+         },
+         {
+            "line" : "U7",
+            "id" : "SFRA157",
+            "name" : "Eissporthalle/Festplatz",
+            "link" : "SFRA156,SFRA158"
+         },
+         {
+            "line" : "U7",
+            "id" : "SFRA158",
+            "name" : "Johanna-Tesch-Platz",
+            "link" : "SFRA128,SFRA157"
+         },
+         {
+            "link" : "SFRA115,SFRA160",
+            "line" : "U8,U9",
+            "id" : "SFRA159",
+            "name" : "Riedberg"
+         },
+         {
+            "name" : "Uni Campus Riedberg",
+            "line" : "U8,U9",
+            "id" : "SFRA160",
+            "link" : "SFRA122,SFRA159"
+         }
+      ]
+   },
+   "lines" : {
+      "line" : [
+         {
+            "name" : "S1",
+            "id" : "S1"
+         },
+         {
+            "name" : "S2",
+            "id" : "S2"
+         },
+         {
+            "name" : "S3",
+            "id" : "S3"
+         },
+         {
+            "name" : "S4",
+            "id" : "S4"
+         },
+         {
+            "id" : "S5",
+            "name" : "S5"
+         },
+         {
+            "name" : "S6",
+            "id" : "S6"
+         },
+         {
+            "name" : "S7",
+            "id" : "S7"
+         },
+         {
+            "name" : "S8",
+            "id" : "S8"
+         },
+         {
+            "id" : "S9",
+            "name" : "S9"
+         },
+         {
+            "name" : "U1",
+            "id" : "U1"
+         },
+         {
+            "name" : "U2",
+            "id" : "U2"
+         },
+         {
+            "id" : "U3",
+            "name" : "U3"
+         },
+         {
+            "name" : "U4",
+            "id" : "U4"
+         },
+         {
+            "id" : "U5",
+            "name" : "U5"
+         },
+         {
+            "name" : "U6",
+            "id" : "U6"
+         },
+         {
+            "id" : "U7",
+            "name" : "U7"
+         },
+         {
+            "name" : "U8",
+            "id" : "U8"
+         },
+         {
+            "id" : "U9",
+            "name" : "U9"
+         }
+      ]
+   },
+   "name" : "Frankfurt"
+}
+

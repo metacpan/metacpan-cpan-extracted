@@ -7,7 +7,7 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.39'; # VERSION
+our $VERSION = '1.41'; # VERSION
 
 
 has '+url' => undef;
@@ -157,7 +157,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.39
+version 1.41
 
 =head1 SYNOPSIS
 

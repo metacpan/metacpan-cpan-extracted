@@ -1,5 +1,11 @@
 Revision history for CPAN-Upload-Tiny
 
+0.007     2018-04-23 13:12:48+02:00 Europe/Amsterdam
+          - Fix typo in dist.ini
+
+0.006     2018-04-23 11:55:10+02:00 Europe/Amsterdam
+          - Re-add ExecDir to the dzil configuration
+
 0.005     2018-04-19 16:58:28+02:00 Europe/Amsterdam
           - Support reserved characters in credentials
           - Improve error messages for internal errors

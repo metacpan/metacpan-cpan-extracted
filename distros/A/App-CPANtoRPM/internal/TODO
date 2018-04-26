@@ -1,3 +1,5 @@
+Add '--env VAR VAL' to automatically set evironmentvariables during build.
+
 Add user defines at the top of the SPEC file
   --define foo 'bar %{xxx}'
 would add the line:

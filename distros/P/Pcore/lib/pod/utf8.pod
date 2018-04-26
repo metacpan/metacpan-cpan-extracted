@@ -4,7 +4,7 @@
 
 =head1 PERL UTF-8
 
-=head2 encode variable to bytes;
+=head2 encode variable to bytes
 
     Encode::_utf8_off $buf;
 

@@ -5,11 +5,10 @@ use warnings;
 
 use DDP ( show_unicode => 1 );
 use Exporter qw(import);
-use Test::BDD::Cucumber::Definitions qw(S);
-use Test::BDD::Cucumber::Definitions::Validator qw(:all);
+use Test::BDD::Cucumber::Definitions qw(S :validator);
 use Test::More;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 our @EXPORT_OK = qw(Var);
 

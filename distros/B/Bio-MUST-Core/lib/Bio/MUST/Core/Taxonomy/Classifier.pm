@@ -1,11 +1,12 @@
 package Bio::MUST::Core::Taxonomy::Classifier;
 # ABSTRACT: Helper class for multiple-criterion classifier based on taxonomy
-$Bio::MUST::Core::Taxonomy::Classifier::VERSION = '0.181000';
+$Bio::MUST::Core::Taxonomy::Classifier::VERSION = '0.181120';
 use Moose;
 use namespace::autoclean;
 
 use Bio::MUST::Core::Types;
 use aliased 'Bio::MUST::Core::IdList';
+
 
 has 'categories' => (
     traits   => ['Array'],
@@ -16,6 +17,13 @@ has 'categories' => (
         all_categories => 'elements',
     },
 );
+
+
+
+sub all_labels {
+    my $self = shift;
+    return map { $_->label } $self->all_categories;
+}
 
 
 
@@ -46,7 +54,7 @@ Bio::MUST::Core::Taxonomy::Classifier - Helper class for multiple-criterion clas
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 SYNOPSIS
 
@@ -57,6 +65,8 @@ version 0.181000
     # TODO
 
 =head1 METHODS
+
+=head2 all_labels
 
 =head2 classify
 

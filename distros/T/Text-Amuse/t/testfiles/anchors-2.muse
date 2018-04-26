@@ -1,0 +1,250 @@
+#title Anchors
+
+paragraph with label in the middle
+#label-middle and material in a
+paragraph.
+
+#label-begin with material
+Here the paragraph continues
+
+Here the paragraph continues
+#label-end with material
+
+#label-1
+#label-2 Start
+#label-3 Middle
+#label-4
+#label-5 End
+#label-6
+
+paragraph with label in the middle
+#label-another-middle
+paragraph.
+
+#start
+paragraph
+
+end
+#end
+
+#item
+
+ - Item
+
+ - Another
+   #another-item
+
+
+ #enum-1
+ 1. Enum
+
+<quote>
+#quote
+In quotation
+</quote>
+
+
+<right>
+#right
+In right
+</right>
+
+
+<center>
+#center
+In center
+</center>
+
+
+  #quote-1
+  In quotation 1
+
+
+
+                                                   #right-1
+                                                   In right 1
+
+
+
+         #center-1
+         In center 1
+
+
+ #dt
+ Desc :: list
+
+ Desc :: list
+ #dt-1
+
+
+#example
+
+{{{
+#title My text
+
+#badanchor
+This is not an anchor, it's part of the header with a dummy name.
+
+<br>
+
+#begin
+This will work.
+
+*** Section
+
+#anchor
+Here we have our text.
+
+More text.
+
+*** Next section with an anchor
+#nextsection
+
+And here we can link to [[#anchor][our anchor]] and to the
+[[#begin][begin]] and to [[#nextsection][this section]].
+
+}}}
+
+#example-after
+
+
+#verse
+
+> This is a verse
+
+#verse-1
+
+<verse>
+A verse
+#a-in-verse anchor
+</verse>
+
+
+#table-1
+
+ This | is | a | table
+
+
+This is a table
+
+ This | is | a | table
+ #table-2 hello | there |
+
+
+#verse-2
+> This is a verse
+
+#verse-3
+<verse>
+Another verse
+
+A stanza
+#stanza
+</verse>
+
+<comment>
+#irrelevant
+</comment>
+
+Body [1] and [2]
+
+[1] A label in a footnote
+    #footnote and contine
+
+    Here continues (1)
+    because of the indentation (1)
+
+
+#footnote-2
+[2] This footnote is labeled.
+
+    Here continues (2)
+    #label-fn-1
+    #label-fn-2 with material
+    because of the indentation (2)
+    #label-fn-3
+
+** List
+
+[[#title][#title]]
+
+[[#label-middle][#label-middle]]
+
+[[#label-begin][#label-begin]]
+
+[[#label-end][#label-end]]
+
+[[#label-1][#label-1]]
+
+[[#label-2][#label-2]]
+
+[[#label-3][#label-3]]
+
+[[#label-4][#label-4]]
+
+[[#label-5][#label-5]]
+
+[[#label-6][#label-6]]
+
+[[#label-another-middle][#label-another-middle]]
+
+[[#start][#start]]
+
+[[#end][#end]]
+
+[[#item][#item]]
+
+[[#another-item][#another-item]]
+
+[[#enum-1][#enum-1]]
+
+[[#quote][#quote]]
+
+[[#right][#right]]
+
+[[#center][#center]]
+
+[[#quote-1][#quote-1]]
+
+[[#right-1][#right-1]]
+
+[[#center-1][#center-1]]
+
+[[#dt][#dt]]
+
+[[#dt-1][#dt-1]]
+
+[[#example][#example]]
+
+[[#title][#title]]
+
+[[#badanchor][#badanchor]]
+
+[[#begin][#begin]]
+
+[[#anchor][#anchor]]
+
+[[#nextsection][#nextsection]]
+
+[[#example-after][#example-after]]
+
+[[#verse][#verse]]
+
+[[#verse-1][#verse-1]]
+
+[[#a-in-verse][#a-in-verse]]
+
+[[#table-1][#table-1]]
+
+[[#verse-2][#verse-2]]
+
+[[#verse-3][#verse-3]]
+
+[[#stanza][#stanza]]
+
+[[#irrelevant][#irrelevant]]
+
+[[#footnote][#footnote]]
+
+[[#footnote-2][#footnote-2]]
+

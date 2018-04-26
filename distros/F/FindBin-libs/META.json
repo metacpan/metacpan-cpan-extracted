@@ -1,10 +1,10 @@
 {
-   "abstract" : "locate and a 'use lib' or export  directories based on $FindBin::Bin.",
+   "abstract" : "unknown",
    "author" : [
       "Steven Lembark <lembark@wrkhors.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Cwd" : "3.730",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Copy::Recursive::Reduced" : "0.200",
+            "List::Util" : "0",
+            "strict" : "0",
+            "version" : "0"
          }
       },
       "runtime" : {
@@ -48,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.017015",
+   "version" : "2.018000",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,10 +1,11 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_setup).
 
+use EMDIS::ECS qw(is_yes);
 use EMDIS::ECS::Config;
 use File::Basename;
 use File::Copy;
@@ -132,7 +133,7 @@ $CFGFMT = "%-14s | %-14s | %s\n";
   'or IMAP email server.'
   ],
  INBOX_PORT =>
- ['POP3/IMAP server port (e.g. 110/143, or 995/993 if using SSL)',
+ ['POP3/IMAP server port (e.g. 110/143, or 995/993 for immediate SSL)',
   ''
   ],
  INBOX_PROTOCOL =>
@@ -151,9 +152,18 @@ $CFGFMT = "%-14s | %-14s | %s\n";
   'or IMAP email server.'
   ],
  INBOX_USE_SSL =>
- ['Use SSL encryption when retrieving mail from inbox?',
-  'If INBOX_USE_SSL is set to YES or TRUE, the ecs_scan_mail program will',
-  'use SSL when retrieving mail via POP3 or IMAP.'
+ ['Use SSL (or TLS) encryption when retrieving mail from inbox?',
+  'If INBOX_USE_SSL is set to YES or TRUE, the software will use',
+  'immediate SSL/TLS encrypted communication with the POP3 or IMAP',
+  'server when retrieving mail.',
+  '(Mutually exclusive with INBOX_USE_STARTTLS.)'
+  ],
+ INBOX_USE_STARTTLS =>
+ ['Use STARTTLS encryption when retrieving mail from inbox?',
+  'If INBOX_USE_STARTTLS is set to YES or TRUE, the software will use',
+  'STARTTLS to initiate encrypted communication with the POP3 or IMAP',
+  'server when retrieving mail.',
+  '(Mutually exclusive with INBOX_USE_SSL.)'
   ],
  INBOX_DIRECTORY  =>
  ['Inbox Directory',
@@ -249,7 +259,7 @@ $CFGFMT = "%-14s | %-14s | %s\n";
   'server.'
   ],
  SMTP_PORT =>
- ['SMTP server port (e.g. 25, or 465/587 if using SSL)',
+ ['SMTP server port (e.g. 25, 465 for immediate SSL, 587 for STARTTLS)',
   ''
   ],
  SMTP_TIMEOUT =>
@@ -257,14 +267,23 @@ $CFGFMT = "%-14s | %-14s | %s\n";
   ''
   ],
  SMTP_USE_SSL =>
- ['Use SSL encryption when sending mail?',
-  'If SMTP_USE_SSL is set to YES or TRUE, the ecs_scan_mail program',
-  'will use SSL when sending mail via SMTP.'
+ ['Use SSL (or TLS) encryption when sending mail?',
+  'If SMTP_USE_SSL is set to YES or TRUE, the software will use',
+  'immediate SSL/TLS encrypted communication with the SMTP server',
+  'when sending mail.',
+  '(Mutually exclusive with SMTP_USE_STARTTLS.)'
+  ],
+ SMTP_USE_STARTTLS =>
+ ['Use SMTP+STARTTLS encryption when sending mail?',
+  'If SMTP_USE_STARTTLS is set to YES or TRUE, the software will use',
+  'STARTTLS to initiate encrypted communication with the SMTP server',
+  'when sending mail.',
+  '(Mutually exclusive with INBOX_USE_SSL.)'
   ],
  SMTP_USERNAME =>
  ['user name',
   'SMTP_USERNAME specifies the user name for connecting to the SMTP',
-  'server via SSL (using SASL).'
+  'server (using SASL).'
   ],
  THIS_NODE =>
  ['ECS node name for this node',
@@ -388,7 +407,8 @@ ask('SMTP_DOMAIN');
 ask('SMTP_HOST');
 ask('SMTP_FROM');
 ask('SMTP_USE_SSL');
-if($cfg->{SMTP_USE_SSL} =~ /^yes$/i or $cfg->{SMTP_USE_SSL} =~ /^true$/i) {
+ask('SMTP_USE_STARTTLS');
+if(is_yes($cfg->{SMTP_USE_SSL}) or is_yes($cfg->{SMTP_USE_STARTTLS})) {
     ask('SMTP_USERNAME');
     ask('SMTP_PASSWORD');
 }
@@ -414,13 +434,14 @@ ask('INBOX_DIRECTORY')
 
 if($cfg->{INBOX_PROTOCOL} =~ /pop3/i or $cfg->{INBOX_PROTOCOL} =~ /imap/i) {
     ask('INBOX_USE_SSL');
+    ask('INBOX_USE_STARTTLS');
 }
 
 $cfg->{GPG_HOMEDIR} = '/home/username/gpg'
     unless $cfg->{GPG_HOMEDIR};
 $cfg->{GPG_KEYID} = '0x00000000'
     unless $cfg->{GPG_KEYID};
-$cfg->{GPG_PASSPHRASE} = 'gpgpg'
+$cfg->{GPG_PASSPHRASE} = ''
     unless $cfg->{GPG_PASSPHRASE};
 if(yes($term->readline("\nConfigure GnuPG encryption [Y/n]? ")))
 {
@@ -655,11 +676,13 @@ EOF
     print CFG cfgline('SMTP_TIMEOUT');
     print CFG cfgline('SMTP_DEBUG');
     print CFG cfgline('SMTP_FROM');
-    print CFG '#' if $cfg->{SMTP_USE_SSL} !~ /yes/i and $cfg->{SMTP_USE_SSL} !~ /true/i;
+    print CFG '#' if not is_yes($cfg->{SMTP_USE_SSL});
     print CFG cfgline('SMTP_USE_SSL');
-    print CFG '#' if $cfg->{SMTP_USE_SSL} !~ /yes/i and $cfg->{SMTP_USE_SSL} !~ /true/i;
+    print CFG '#' if not is_yes($cfg->{SMTP_USE_STARTTLS});
+    print CFG cfgline('SMTP_USE_STARTTLS');
+    print CFG '#' if not is_yes($cfg->{SMTP_USE_SSL}) and not is_yes($cfg->{SMTP_USE_STARTTLS});
     print CFG cfgline('SMTP_USERNAME');
-    print CFG '#' if $cfg->{SMTP_USE_SSL} !~ /yes/i and $cfg->{SMTP_USE_SSL} !~ /true/i;
+    print CFG '#' if not is_yes($cfg->{SMTP_USE_SSL}) and not is_yes($cfg->{SMTP_USE_STARTTLS});
     print CFG cfgline('SMTP_PASSWORD');
 
     print CFG "\n# POP3/IMAP email inbox configuration parameters\n";
@@ -672,8 +695,10 @@ EOF
     print CFG cfgline('INBOX_DEBUG');
     print CFG '#' if $cfg->{INBOX_PROTOCOL} !~ /imap/i;
     print CFG cfgline('INBOX_FOLDER');
-    print CFG '#' if $cfg->{INBOX_USE_SSL} !~ /yes/i and $cfg->{INBOX_USE_SSL} !~ /true/i;
+    print CFG '#' if not is_yes($cfg->{INBOX_USE_SSL});
     print CFG cfgline('INBOX_USE_SSL');
+    print CFG '#' if not is_yes($cfg->{INBOX_USE_STARTTLS});
+    print CFG cfgline('INBOX_USE_STARTTLS');
    
     print CFG '#' if $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;    
     print CFG cfgline('INBOX_USERNAME');
@@ -745,7 +770,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

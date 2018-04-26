@@ -1,6 +1,13 @@
 Changes
-Dockerfile.centos
-Dockerfile.ubuntu
+docker/centos/Dockerfile
+docker/dist/Dockerfile
+docker/dist/README
+docker/dist/ecs-AA.tar.gz
+docker/dist/ecs-BB.tar.gz
+docker/dist/ecs-CC.tar.gz
+docker/dist/gnupg.tar.gz
+docker/greenmail/Dockerfile
+docker/ubuntu/Dockerfile
 generate_pdf.sh
 lib/EMDIS/ECS.pm
 lib/EMDIS/ECS/Config.pm

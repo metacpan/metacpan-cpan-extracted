@@ -12,11 +12,12 @@ sub abstract {
 
 sub opt_spec {
     return (
-        [ "outdir|o=s",   "Output directory",           { default => "." }, ],
+        [ "outdir|o=s",   "Output directory",  { default => "." }, ],
         [ "species=s",    "the species or clade of the input sequence", ],
-        [ "opt=s",        "other options should be passed to RepeatMasker", ],
+        [ "opt=s",        "other options be passed to RepeatMasker", ],
+        [ "gff",          "create .rm.gff by rmOutToGFF3.pl", ],
         [ "tmp=s",        "user defined tempdir", ],
-        [ "parallel|p=i", "number of threads",          { default => 2 }, ],
+        [ "parallel|p=i", "number of threads", { default => 2 }, ],
         [ "verbose|v",    "verbose mode", ],
         { show_defaults => 1, }
     );
@@ -34,6 +35,9 @@ sub description {
 * <infile> should be fasta files (*.fa, *.fasta)
 * setting --outdir to the same one of infiles will replace original files
 * `repeatmasker` should be in $PATH
+* suffix of masked files is .fa, when --outdir is the same as infile:
+    * infile.fa may be replaced
+    * infile.fasta or infile.others will coexist with infile.fa
 
 MARKDOWN
 
@@ -82,7 +86,8 @@ sub execute {
     chdir $tempdir;
 
     for my $infile (@infiles) {
-        my $basename = Path::Tiny::path($infile)->basename();
+        my $filename = Path::Tiny::path($infile)->basename();
+        my $basename = Path::Tiny::path($infile)->basename(qr/\..+?/);
 
         my $cmd = "RepeatMasker";
         $cmd .= " $infile";
@@ -91,12 +96,56 @@ sub execute {
         $cmd .= " $opt->{opt}" if $opt->{opt};
         $cmd .= " -xsmall --parallel $opt->{parallel}";
         App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
-        if ( !$tempdir->child("$basename.masked")->is_file ) {
+        if ( !$tempdir->child("$filename.masked")->is_file ) {
             Carp::croak "RepeatMasker on [$infile] failed\n";
         }
 
-        Path::Tiny::path("$basename.masked")->copy( "$opt->{outdir}/$basename" );
-        Path::Tiny::path("$basename.out")->copy( "$opt->{outdir}" );
+        Path::Tiny::path("$filename.masked")->copy("$opt->{outdir}/$basename.fa");
+        Path::Tiny::path("$filename.out")->copy("$opt->{outdir}/$basename.rm.out");
+
+        if ( $opt->{gff} ) {
+
+            # RepeatMasker can be
+            # a symlink
+            #   /home/linuxbrew/.linuxbrew/bin/RepeatMasker
+            # or a real executable file
+            #   /home/linuxbrew/.linuxbrew/Cellar/repeatmasker/4.0.7_2/bin/RepeatMasker
+            #   /home/linuxbrew/.linuxbrew/Cellar/repeatmasker/4.0.7_2/libexec/RepeatMasker
+            #
+            # We want find here
+            #   /home/linuxbrew/.linuxbrew/Cellar/repeatmasker/4.0.7_2/libexec/util/rmOutToGFF3.pl
+            my $rm_bin  = IPC::Cmd::can_run("RepeatMasker");
+            my $rm_path = Path::Tiny::path($rm_bin)->realpath;
+
+            #@type Path::Tiny
+            my $rm2gff;
+
+            if ( $rm_path->parent->child("util")->is_dir ) {
+                $rm2gff = $rm_path->parent()->child("util/rmOutToGFF3.pl");
+            }
+            else {
+                $rm2gff = $rm_path->parent(2)->child("libexec/util/rmOutToGFF3.pl");
+            }
+            if ( !$rm2gff->is_file ) {
+                print STDERR YAML::Syck::Dump(
+                    {   "rm_bin"  => $rm_bin,
+                        "rm_path" => $rm_path,
+                        "rm2gff"  => $rm2gff
+                    }
+                );
+                Carp::croak "Can't find rmOutToGFF3.pl\n";
+            }
+
+            $cmd = "perl $rm2gff";
+            $cmd .= " $filename.out";
+            $cmd .= " > $filename.gff";
+            App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
+            if ( !$tempdir->child("$filename.gff")->is_file ) {
+                Carp::croak "rmOutToGFF3.pl on [$infile] failed\n";
+            }
+
+            Path::Tiny::path("$filename.gff")->copy("$opt->{outdir}/$basename.rm.gff");
+        }
     }
 
     chdir $cwd;

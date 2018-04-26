@@ -16,7 +16,8 @@ has ua => (
 sub _build_ua {
   my $self = $_[0];
   my $ua = LWP::UserAgent->new(
-    cookie_jar => {}
+    cookie_jar => {},
+    timeout => $self->timeout()
   );
   if(is_string($ENV{LWP_TRACE})){
     $ua->add_handler("request_send",  sub { shift->dump; return });

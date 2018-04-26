@@ -28,13 +28,15 @@ no_index:
 provides:
   App::Fasops:
     file: lib/App/Fasops.pm
-    version: v0.5.16
+    version: v0.6.0
   App::Fasops::Command::axt2fas:
     file: lib/App/Fasops/Command/axt2fas.pm
   App::Fasops::Command::check:
     file: lib/App/Fasops/Command/check.pm
   App::Fasops::Command::concat:
     file: lib/App/Fasops/Command/concat.pm
+  App::Fasops::Command::consensus:
+    file: lib/App/Fasops/Command/consensus.pm
   App::Fasops::Command::covers:
     file: lib/App/Fasops/Command/covers.pm
   App::Fasops::Command::join:
@@ -70,18 +72,20 @@ requires:
   App::Cmd: '0.330'
   App::RL: v0.2.23
   Excel::Writer::XLSX: '0.95'
+  File::ShareDir: '1.102'
   IO::Zlib: '0'
+  IPC::Cmd: '0'
   List::Util: '0'
   MCE: '1.810'
   Path::Tiny: '0.076'
   Text::CSV_XS: '1.21'
   Tie::IxHash: '1.23'
   YAML::Syck: '1.29'
-  perl: '5.010001'
+  perl: '5.018001'
 resources:
   bugtracker: https://github.com/wang-q/App-Fasops/issues
   homepage: https://github.com/wang-q/App-Fasops
   repository: git://github.com/wang-q/App-Fasops.git
-version: 0.5.16
+version: 0.6.0
 x_authority: cpan:WANGQ
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

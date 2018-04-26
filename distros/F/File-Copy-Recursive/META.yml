@@ -32,4 +32,4 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Copy-Recursive
   repository: https://github.com/drmuey/p5-File-Copy-Recursive.git
-version: '0.43'
+version: '0.44'

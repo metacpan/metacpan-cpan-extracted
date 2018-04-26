@@ -22,10 +22,10 @@ if (0 && $have_alien_gdal) {
 
 use Cwd;
 my $base_dir = getcwd();
-my $patch_file = "$base_dir/patch_isnan_gcc.patch";
-
-say "Patch file is $patch_file";
-#say -r $patch_file or die $!;
+my $patch_file_isnan
+  = "$base_dir/patch_isnan_gcc.patch";
+my $patch_file_configure
+  = "$base_dir/0001-Enable-shared-build-on-freebsd-10.patch";
 
 my $min_target_version = '2.2.0';
 
@@ -34,21 +34,6 @@ plugin 'PkgConfig' => (
     minimum_version => $min_target_version,
 );
 
-#  we need to probe for gdal v2
-#  Do we need this probe?  PkgConfig seems to handle things?
-#plugin 'Probe::CommandLine' => (
-#  command   => 'gdalwarp',
-#  args      => [ '--version' ],
-#  match     => qr/GDAL 2\.[0-9\.]+/,
-#  version   => qr/GDAL ([0-9\.]+)/,
-#  secondary => 1,
-#  #minimum_version => $min_target_version,
-#);
-
-#  some feedback
-say '$ENV{PATH} is ' . $ENV{PATH};
-
-#print 'gdalwarp version is ' . ($1 //'') ."\n";
 
 share {
 
@@ -62,32 +47,46 @@ share {
   if ($^O =~ /mswin/i) {
     #  fix known issue in 2.2.3, but need to make this more conditional
     #  as it should be fixed in 2.2.4
+    #  Update 2018-04-07: It is not fixed in 2.2.4.
     patch [
-      '%{patch} --verbose --backup port/cpl_port.h < ' . $patch_file,
+      '%{patch} --verbose --backup port/cpl_port.h < ' . $patch_file_isnan,
+    ];
+  }
+  elsif ($^O =~ /freebsd/i) {
+    #  make sure we run a shared install on freebsd by default
+    patch [
+      '%{patch} --backup configure < ' . $patch_file_configure,
     ];
   }
 
   plugin 'Build::Autoconf' => ();
 
   my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
-  #  disable by default - we don't want huge binaries and likely don't need a static build
-  #  but travis CI has a 4MB log limit which we otherwise hit
-  #$build_static = ($ENV{CONTINUOUS_INTEGRATION} && $ENV{TRAVIS})
-  #      ? '--disable-shared'
-  #      : '';
-
+  $build_static = '';
+  $build_static = '--enable-static=no';  #  override
   $build_static = '' if $ENV{FORCE_DYNAMIC};
   
+  my $with_local = '';
+  my $with_cpp11 = '';
+  
+  if ($^O =~ /bsd/) {
+    #print "bsd OS detected, using gmake for make phase\n";
+    #$make_cmd = 'gmake';
+    plugin 'Build::Make' => 'gmake';
+    $with_cpp11 = ' --without-cpp11 ';
+    if (-d '/usr/local') {
+        $with_local = '--with-local=/usr/local';
+    }
+  }
+  elsif ($^O =~ /dragonfly/) {
+    #  might need to be combined with bsd check above
+    #  but not sure if /usr/local is needed yet
+    plugin 'Build::Make' => 'gmake';
+  }
+
   my $make_cmd = '%{make}';
-  #  try not to fill up the cpan-testers disk space,
-  #  but need to think more on the approach - the || will likely trap any fails,
-  #  thus installation will proceed regardless
-  #if ($^O =~ /mswin/i) {
-  #  $make_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
-  #}
-  #else {
-  #  $make_cmd .= q/ | perl -ne 'BEGIN {$|=1; open our $log, ">", "build.log"}; print "\n" if 0 == ($. % 90); print "."; print {$log} $_;' || cat build.log/;
-  #}
+  my @make_clean;
+  #  try not to fill up the cpan-testers disk space
   if ($ENV{PERL_CPAN_REPORTER_DIR} || $ENV{AUTOMATED_TESTING}) {
     print "Running under automated testing\n";
     $make_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
@@ -96,16 +95,19 @@ share {
         $make_cmd =~ s/type/cat/;
         $make_cmd =~ s/"/'/g;
     }
+    $with_cpp11 ||= ' --without-cpp11 ';
+    push @make_clean, '%{make} clean';
   }
   
   # the build step is only necessary if you need to customize the
   # options passed to ./configure.  The default set by the
   # Build::Autoconf plugin is frequently sufficient.
   build [
-    '%{configure} ' . $build_static,
+    '%{configure} --with-libtiff=internal ' . $with_local . $with_cpp11 . $build_static,
     $make_cmd,
     \&patch_pkgconfig,
     '%{make} install',
+    @make_clean
   ];
 
 };

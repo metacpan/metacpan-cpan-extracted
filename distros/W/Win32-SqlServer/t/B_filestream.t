@@ -1,9 +1,14 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/B_filestream.t 8     15-05-24 22:27 Sommar $
+# $Header: /Perl/OlleDB/t/B_filestream.t 9     18-04-11 21:08 Sommar $
 #
 # Tests for OpenSqlFilestream.
 #
 # $History: B_filestream.t $
+# 
+# *****************  Version 9  *****************
+# User: Sommar       Date: 18-04-11   Time: 21:08
+# Updated in $/Perl/OlleDB/t
+# Added protection on blue screen on my own machine at home.
 # 
 # *****************  Version 8  *****************
 # User: Sommar       Date: 15-05-24   Time: 22:27
@@ -87,7 +92,7 @@ if ($fs_config < 2) {
    exit;
 }
 
-my $username = sql_one("SELECT SYSTEM_USER", SCALAR);
+my ($username, $servername) = sql_one('SELECT SYSTEM_USER, @@servername', LIST);
 if ($username !~ /\\/) {
    print "1..0 # Skipped: filestream requires Windows authentication.\n";
    exit;
@@ -283,22 +288,29 @@ else {
     $alloclen = int(80E12);
 }
 
-$fh = $X->OpenSqlFilestream($path, FILESTREAM_READWRITE, $context, 0,
-                            $alloclen);
-if ($fh > 0) {
-   print "not ok 9  # You don't have a 80 TB disk, do you?\n";
-}
-else {
-   my $errmsg = $X->{ErrInfo}{Messages}[0];
-   if ($errmsg and
-	   $errmsg->{Source} eq 'OpenSqlFilestream' and
-       $errmsg->{Errno} = -112 and
-	   $errmsg->{Severity} = 16) { 
-       print "ok 9\n";
+# Special test: on my machine machine, this test blue-screens because of a
+# collision of filter drivers.
+unless ($servername =~ /^SOMMERWALD/) {
+   $fh = $X->OpenSqlFilestream($path, FILESTREAM_READWRITE, $context, 0,
+                               $alloclen);
+   if ($fh > 0) {
+      print "not ok 9  # You don't have a 80 TB disk, do you?\n";
    }
    else {
-	   print "not ok 9\n";
-   }	  
+      my $errmsg = $X->{ErrInfo}{Messages}[0];
+      if ($errmsg and
+         $errmsg->{Source} eq 'OpenSqlFilestream' and
+          $errmsg->{Errno} = -112 and
+         $errmsg->{Severity} = 16) { 
+          print "ok 9\n";
+      }
+      else {
+         print "not ok 9\n";
+      }	  
+   }
+}
+else {
+   print "ok 9 # skip, would blue-screen the SQL Server machine";
 }
 
 # Close this transaction.

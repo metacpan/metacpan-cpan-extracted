@@ -6,8 +6,8 @@ package Dancer2::Session::Cookie;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Dancer 2 session storage in secure cookies
 # VERSION
-$Dancer2::Session::Cookie::VERSION = '0.008';
-use Session::Storage::Secure 0.010 ();
+$Dancer2::Session::Cookie::VERSION = '0.009';
+use Session::Storage::Secure 0.011 ();
 
 use Moo;
 use Dancer2::Core::Types;
@@ -119,7 +119,7 @@ Dancer2::Session::Cookie - Dancer 2 session storage in secure cookies
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by David Golden.
+This software is Copyright (c) 2018, 2016, 2014 by David Golden.
 
 This is free software, licensed under:
 

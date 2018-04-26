@@ -1,5 +1,5 @@
 requires 'Exporter::Lite';
-requires 'JSON';
+requires 'JSON::MaybeXS';
 requires 'Test::Deep';
 requires 'perl', '5.008001';
 

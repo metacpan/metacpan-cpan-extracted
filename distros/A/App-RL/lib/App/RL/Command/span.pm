@@ -6,15 +6,17 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'operate spans in a YAML file';
+sub abstract {
+    return 'operate spans in a YAML file';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen." ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
         [ "op=s", "operations: cover, holes, trim, pad, excise or fill", { default => "cover" } ],
-        [ "number|n=i", "Apply this number to trim, pad, excise or fill", { default => 0 } ],
-        [ "remove|r",   "Remove 'chr0' from chromosome names." ],
-        [ "mk",         "YAML file contains multiple sets of runlists." ],
+        [ "number|n=i", "apply this number to trim, pad, excise or fill", { default => 0 } ],
+        [ "remove|r",   "remove 'chr0' from chromosome names" ],
+        [ "mk",         "YAML file contains multiple sets of runlists" ],
         { show_defaults => 1, }
     );
 }
@@ -26,13 +28,19 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "List of operations.\n";
-    $desc .= " " x 4 . "cover:  a single span from min to max;\n";
-    $desc .= " " x 4 . "holes:  all the holes in runlist;\n";
-    $desc .= " " x 4 . "trim:   remove N integers from each end of each span of runlist;\n";
-    $desc .= " " x 4 . "pad:    add N integers from each end of each span of runlist;\n";
-    $desc .= " " x 4 . "excise: remove all spans smaller than N;\n";
-    $desc .= " " x 4 . "fill:   fill in all holes smaller than N.\n";
+    $desc .= <<'MARKDOWN';
+
+List of operations:
+
+* cover:  a single span from min to max
+* holes:  all the holes in runlist
+* trim:   remove N integers from each end of each span of runlist
+* pad:    add N integers from each end of each span of runlist
+* excise: remove all spans smaller than N
+* fill:   fill in all holes smaller than N
+
+MARKDOWN
+
     return $desc;
 }
 

@@ -1,5 +1,5 @@
   {text}
-    @@ 4,- -,- @@
+    @@ -4,10  +4,10 @@
     Still a common line, but last, next will be different.
 -   First string for a.
 -   Second striing for a.
@@ -10,7 +10,6 @@
 +   Third string, belongs to file b.
 +   And fourth. Again to b.
     Wow! Common strings began! =)
-    @@ 14,- -,- @@
     Another common line.
 -   Different line. AAaaaaa!!
 -   Aaaaa!!

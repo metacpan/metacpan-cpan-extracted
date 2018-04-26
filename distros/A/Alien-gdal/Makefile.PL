@@ -13,7 +13,7 @@ my %common_reqs = (
 );
 
 my %WriteMakefileArgs = (
-    "ABSTRACT" => "Find or build gdal",
+    "ABSTRACT" => "Alien package for the Geospatial Data Abstraction Library (GDAL)",
     "AUTHOR"   => 'Shawn Laffan <shawnlaffan@gmail.com>',
     "NAME"     => "Alien::gdal",
     "VERSION_FROM" => "lib/Alien/gdal.pm",
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new;
+my $abmm = Alien::Build::MM->new ();
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 
 WriteMakefile(%WriteMakefileArgs);

@@ -8,7 +8,9 @@ use Text::CSV_XS;
 use App::Fasops -command;
 use App::Fasops::Common;
 
-use constant abstract => 'basic statistics on alignments';
+sub abstract {
+    return 'basic statistics on alignments';
+}
 
 sub opt_spec {
     return (
@@ -26,8 +28,13 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infile> are blocked fasta files, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+
+MARKDOWN
+
     return $desc;
 }
 

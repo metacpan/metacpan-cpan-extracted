@@ -1,0 +1,13 @@
+Revision history for CPAN-Test-Dummy-Perl5-UseUnsafeINC-Fail
+
+0.04  2018-04-22 15:25:37 CEST
+        - use PERL_MM_USE_DEFAULT because PERL5_CPAN_IS_RUNNING is unset during tests
+
+0.03  2018-04-22 14:40:00 CEST
+        - skip tests outside CPAN
+
+0.02  2018-04-22 14:31:38 CEST
+        - Fix the test that checks for a wrong value
+
+0.01  2018-04-22 14:24:46 CEST
+        - Initial release

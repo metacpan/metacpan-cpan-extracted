@@ -93,7 +93,7 @@ split-ppred-ali.pl - Split ALI files into subsets of sites based on ppred data
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 SYNOPSIS
 

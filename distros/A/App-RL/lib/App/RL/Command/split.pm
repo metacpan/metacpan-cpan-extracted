@@ -6,12 +6,14 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'split runlist yaml files';
+sub abstract {
+    return 'split runlist yaml files';
+}
 
 sub opt_spec {
     return (
         [ "outdir|o=s", "output location, [stdout] for screen", { default => '.' } ],
-        [ "suffix|s=s", "extension of output files,",           { default => '.yml' } ],
+        [ "suffix|s=s", "extension of output files",            { default => '.yml' } ],
         { show_defaults => 1, }
     );
 }

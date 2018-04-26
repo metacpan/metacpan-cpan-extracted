@@ -652,29 +652,34 @@ if ( runtests('testLsl') ) {
     my $rd;
     my $windows = ($^O =~ /Win/) ? 1 : 0;
     if ( $windows ) {
-        # Volume in drive C is OSDisk
-        $rd = '\s*Volume in';
-        #return; # ls() seems to work on Windows, but my tests fail
+        # do nothing
     } else {
-        # -rwxrwxr-x  1 ckoknat hardware 29506 Dec 18 11:28 DebugStatementsTest.t
-        $rd = '\S+\s+\d+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+';
+        if ( $windows ) {
+            # Volume in drive C is OSDisk
+            $rd = '\s*Volume in';
+            #$rd = '\s*';
+            #return; # ls() seems to work on Windows, but my tests fail
+        } else {
+            # -rwxrwxr-x  1 ckoknat hardware 29506 Dec 18 11:28 DebugStatementsTest.t
+            $rd = '\S+\s+\d+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+';
+        }
+        my $header = 'DEBUG:  ls -l = ';
+        $d = 0;
+        tdd { ls($0) }                         qr(), "File ls($0)";
+        tdd { LS($0) }                         qr($header$rd), "File ls($0)";
+        $d = 1;
+        tdd { ls("filename_does_not_exist") }  qr(does not exist), 'ls(filename_does_not_exist)';
+        tdd { ls('$filename') }                qr(did not understand file name), "ls('\$filename') error";
+        tdd { ls($0) }                         qr($header$rd), "File ls($0)";
+        if ( $] lt '5.018' ) {
+            tdd { ls('.') }                    qr($header$rd), "Directory ls(.)";
+            tdd { ls("$0 $0") }                qr($header$rd.*\n$header$rd), "ls($0 $0)";
+            tdd { ls("$0 .") }                 qr($header$rd.*\n$header$rd), "ls($0 .)";
+            ##tdd { ls($filename), 2 }  '', 'ls() with too high a debug level';
+        }
+        ######### Need to create test for directory
+        ######### Need to create test for ls('$dir', '-lR')
     }
-    my $header = 'DEBUG:  ls -l = ';
-    $d = 0;
-    tdd { ls($0) }                         qr(), "File ls($0)";
-    tdd { LS($0) }                         qr($header$rd), "File ls($0)";
-    $d = 1;
-    tdd { ls("filename_does_not_exist") }  qr(does not exist), 'ls(filename_does_not_exist)';
-    tdd { ls('$filename') }                qr(did not understand file name), "ls('\$filename') error";
-    tdd { ls($0) }                         qr($header$rd), "File ls($0)";
-    if ( $] lt '5.018' ) {
-        tdd { ls('.') }                    qr($header$rd), "Directory ls(.)";
-        tdd { ls("$0 $0") }                qr($header$rd.*\n$header$rd), "ls($0 $0)";
-        tdd { ls("$0 .") }                 qr($header$rd.*\n$header$rd), "ls($0 .)";
-        ##tdd { ls($filename), 2 }  '', 'ls() with too high a debug level';
-    }
-    ######### Need to create test for directory
-    ######### Need to create test for ls('$dir', '-lR')
 }
 
 #test_PerlCritic("/home/ckoknat/s/regression/Debug/Statements.pm");die;  ########

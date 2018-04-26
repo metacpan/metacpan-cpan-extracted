@@ -1,11 +1,16 @@
 ﻿/*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/filestream.cpp 2     15-05-24 21:06 Sommar $
+ $Header: /Perl/OlleDB/filestream.cpp 3     18-04-09 22:48 Sommar $
 
   This file includes the support for OpenSqlFileStream.
 
-  Copyright (c) 2004-2015   Erland Sommarskog
+  Copyright (c) 2004-2018   Erland Sommarskog
 
   $History: filestream.cpp $
+ * 
+ * *****************  Version 3  *****************
+ * User: Sommar       Date: 18-04-09   Time: 22:48
+ * Updated in $/Perl/OlleDB
+ * Added support for the new MSOLEDBSQL provider.
  * 
  * *****************  Version 2  *****************
  * User: Sommar       Date: 15-05-24   Time: 21:06
@@ -50,25 +55,28 @@ void * OpenSqlFilestream (SV         * olle_ptr,
    int             msgno;
    internaldata  * mydata = get_internaldata(olle_ptr);
    const int       namelen = 20;
-   char            sqlncli_name[namelen];
+   char            library_name[namelen];
 
    // Set the library name.
-   if (mydata->provider == provider_sqlncli11) {
-      sprintf_s(sqlncli_name, namelen, "sqlncli11.dll");
+   if (mydata->provider == provider_msoledbsql) {
+      sprintf_s(library_name, namelen, "msoledbsql.dll");
+   }
+   else if (mydata->provider == provider_sqlncli11) {
+      sprintf_s(library_name, namelen, "sqlncli11.dll");
    }
    else if (mydata->provider == provider_sqlncli10) {
-      sprintf_s(sqlncli_name, namelen, "sqlncli10.dll");
+      sprintf_s(library_name, namelen, "sqlncli10.dll");
    }
    else {
       croak("To use OpenSqlFilestream you must use the SQLNCLI10 provider or later.\n");
    }
 
    // Try to get the library.
-   HMODULE libhandle = LoadLibraryA(sqlncli_name);
+   HMODULE libhandle = LoadLibraryA(library_name);
    if (libhandle == NULL) {
       msgno = GetLastError();
       olle_croak(olle_ptr, "Load of %s failed with error %d.\n", 
-                 sqlncli_name, msgno);
+                 library_name, msgno);
    }
 
    // And then get a pointer to OpenSqlFilestream

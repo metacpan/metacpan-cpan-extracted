@@ -1,0 +1,19 @@
+Changes
+lib/Yahoo/Weather/Api.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/01-json.t
+t/02-json.t
+t/03-json.t
+t/04-json.t
+t/05-json.t
+t/06-xml.t
+t/07-xml.t
+t/08-xml.t
+t/09-xml.t
+t/10-xml.t
+t/11-non-json-xml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-package Long : private {
+package Long {
   has value : private long;
   
   sub new : Long ($value : long) {
@@ -11,5 +11,9 @@ package Long : private {
   
   sub get_value : long ($self : self) {
     return $self->{value};
+  }
+
+  sub set_value : void ($self : self, $value : long) {
+    $self->{value} = $value;
   }
 }

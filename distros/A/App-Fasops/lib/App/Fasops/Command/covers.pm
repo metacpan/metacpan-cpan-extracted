@@ -6,7 +6,9 @@ use autodie;
 use App::Fasops -command;
 use App::Fasops::Common;
 
-use constant abstract => 'scan blocked fasta files and output covers on chromosomes';
+sub abstract {
+    return 'scan blocked fasta files and output covers on chromosomes';
+}
 
 sub opt_spec {
     return (
@@ -28,8 +30,13 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infiles> are blocked fasta files, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+
+MARKDOWN
+
     return $desc;
 }
 

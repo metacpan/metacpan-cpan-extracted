@@ -1,0 +1,335 @@
+##gff-version 3
+##sequence-region NC_007942 1 152218
+# conversion-by bp_genbank2gff3.pl
+# organism Glycine max
+# Note Glycine max chloroplast, complete genome.
+# date 15-APR-2009
+NC_007942	GenBank	region	1	152218	.	+	1	ID=NC_007942;Dbxref=Project:16683,taxon:3847;Name=NC_007942;Note=Glycine max chloroplast%2C complete genome.,PROVISIONAL REFSEQ: This record has not yet been subject to final NCBI review. The reference sequence was derived from DQ317523.  COMPLETENESS: full length. ;authority=Glycine max (L.) Merrill;comment1=PROVISIONAL REFSEQ: This record has not yet been subject to final NCBI review. The reference sequence was derived from DQ317523.  COMPLETENESS: full length. ;cultivar=PI 437654;date=15-APR-2009;mol_type=genomic DNA;organelle=plastid:chloroplast;organism=Glycine max
+NC_007942	GenBank	gene	3	77	.	-	1	ID=GlmaCt001;Dbxref=GeneID:3989258;Name=trnH-GUG;locus_tag=GlmaCt001
+NC_007942	GenBank	tRNA	3	77	.	-	1	ID=GlmaCt001.r01;Parent=GlmaCt001;Dbxref=GeneID:3989258;Name=trnH-GUG;locus_tag=GlmaCt001;product=tRNA-His
+NC_007942	GenBank	gene	315	1376	.	-	1	ID=GlmaCp001;Dbxref=GeneID:3989259;Name=psbA;locus_tag=GlmaCp001
+NC_007942	GenBank	mRNA	315	1376	.	-	1	ID=GlmaCp001.t01;Parent=GlmaCp001
+NC_007942	GenBank	CDS	315	1376	.	-	1	ID=GlmaCp001.p01;Parent=GlmaCp001.t01;Dbxref=GeneID:3989259;Name=psbA;codon_start=1;locus_tag=GlmaCp001;product=photosystem II protein D1;protein_id=YP_538745.1;transl_table=11;translation=length.353
+NC_007942	GenBank	gene	1638	4286	.	-	1	ID=GlmaCt002;Dbxref=GeneID:3989260;Name=trnK-UUU;locus_tag=GlmaCt002
+NC_007942	GenBank	tRNA	1638	1672	.	-	1	ID=GlmaCt002.r01;Parent=GlmaCt002;Dbxref=GeneID:3989260;Name=trnK-UUU;locus_tag=GlmaCt002;product=tRNA-Lys
+NC_007942	GenBank	tRNA	4250	4286	.	-	1	ID=GlmaCt002.r01;Parent=GlmaCt002;Dbxref=GeneID:3989260;Name=trnK-UUU;locus_tag=GlmaCt002;product=tRNA-Lys
+NC_007942	GenBank	gene	2011	3528	.	-	1	ID=GlmaCp002;Dbxref=GeneID:3989261;Name=matK;locus_tag=GlmaCp002
+NC_007942	GenBank	mRNA	2011	3528	.	-	1	ID=GlmaCp002.t01;Parent=GlmaCp002
+NC_007942	GenBank	CDS	2011	3528	.	-	1	ID=GlmaCp002.p01;Parent=GlmaCp002.t01;Dbxref=GeneID:3989261;Name=matK;codon_start=1;locus_tag=GlmaCp002;product=maturase K;protein_id=YP_538746.1;transl_table=11;translation=length.505
+NC_007942	GenBank	gene	5312	6739	.	-	1	ID=GlmaCp003;Dbxref=GeneID:3989271;Name=rbcL;locus_tag=GlmaCp003
+NC_007942	GenBank	mRNA	5312	6739	.	-	1	ID=GlmaCp003.t01;Parent=GlmaCp003
+NC_007942	GenBank	CDS	5312	6739	.	-	1	ID=GlmaCp003.p01;Parent=GlmaCp003.t01;Dbxref=GeneID:3989271;Name=rbcL;Note=RuBisCO large subunit;codon_start=1;locus_tag=GlmaCp003;product=ribulose-1%2C5-bisphosphate carboxylase/oxygenase large subunit;protein_id=YP_538747.1;transl_table=11;translation=length.475
+NC_007942	GenBank	gene	7522	9018	.	+	1	ID=GlmaCp004;Dbxref=GeneID:3989272;Name=atpB;locus_tag=GlmaCp004
+NC_007942	GenBank	mRNA	7522	9018	.	+	1	ID=GlmaCp004.t01;Parent=GlmaCp004
+NC_007942	GenBank	CDS	7522	9018	.	+	1	ID=GlmaCp004.p01;Parent=GlmaCp004.t01;Dbxref=GeneID:3989272;Name=atpB;codon_start=1;locus_tag=GlmaCp004;product=ATP synthase CF1 beta subunit;protein_id=YP_538748.1;transl_table=11;translation=length.498
+NC_007942	GenBank	gene	9015	9419	.	+	1	ID=GlmaCp005;Dbxref=GeneID:3989273;Name=atpE;locus_tag=GlmaCp005
+NC_007942	GenBank	mRNA	9015	9419	.	+	1	ID=GlmaCp005.t01;Parent=GlmaCp005
+NC_007942	GenBank	CDS	9015	9419	.	+	1	ID=GlmaCp005.p01;Parent=GlmaCp005.t01;Dbxref=GeneID:3989273;Name=atpE;Note=ATP synthase epsilon chain;codon_start=1;locus_tag=GlmaCp005;product=ATP synthase CF1 epsilon subunit;protein_id=YP_538749.1;transl_table=11;translation=length.134
+NC_007942	GenBank	gene	9561	9634	.	-	1	ID=GlmaCt003;Dbxref=GeneID:3989274;Name=trnM-CAU;locus_tag=GlmaCt003
+NC_007942	GenBank	tRNA	9561	9634	.	-	1	ID=GlmaCt003.r01;Parent=GlmaCt003;Dbxref=GeneID:3989274;Name=trnM-CAU;locus_tag=GlmaCt003;product=tRNA-Met
+NC_007942	GenBank	gene	9832	10493	.	+	1	ID=GlmaCt004;Dbxref=GeneID:3989275;Name=trnV-UAC;locus_tag=GlmaCt004
+NC_007942	GenBank	tRNA	9832	9870	.	+	1	ID=GlmaCt004.r01;Parent=GlmaCt004;Dbxref=GeneID:3989275;Name=trnV-UAC;locus_tag=GlmaCt004;product=tRNA-Val
+NC_007942	GenBank	tRNA	10459	10493	.	+	1	ID=GlmaCt004.r01;Parent=GlmaCt004;Dbxref=GeneID:3989275;Name=trnV-UAC;locus_tag=GlmaCt004;product=tRNA-Val
+NC_007942	GenBank	gene	10740	11102	.	+	1	ID=GlmaCp006;Dbxref=GeneID:3989276;Name=ndhC;gene_synonym=ndh3;locus_tag=GlmaCp006
+NC_007942	GenBank	mRNA	10740	11102	.	+	1	ID=GlmaCp006.t01;Parent=GlmaCp006
+NC_007942	GenBank	CDS	10740	11102	.	+	1	ID=GlmaCp006.p01;Parent=GlmaCp006.t01;Dbxref=GeneID:3989276;Name=ndhC;codon_start=1;gene_synonym=ndh3;locus_tag=GlmaCp006;product=NADH dehydrogenase subunit 3;protein_id=YP_538750.1;transl_table=11;translation=length.120
+NC_007942	GenBank	gene	11159	11797	.	+	1	ID=GlmaCp007;Dbxref=GeneID:3989277;Name=ndhK;locus_tag=GlmaCp007
+NC_007942	GenBank	mRNA	11159	11797	.	+	1	ID=GlmaCp007.t01;Parent=GlmaCp007
+NC_007942	GenBank	CDS	11159	11797	.	+	1	ID=GlmaCp007.p01;Parent=GlmaCp007.t01;Dbxref=GeneID:3989277;Name=ndhK;Note=NADH dehydrogenase 27 kDa subunit;codon_start=1;locus_tag=GlmaCp007;product=NADH dehydrogenase subunit K;protein_id=YP_538751.1;transl_table=11;translation=length.212
+NC_007942	GenBank	gene	11900	12376	.	+	1	ID=GlmaCp008;Dbxref=GeneID:3989278;Name=ndhJ;locus_tag=GlmaCp008
+NC_007942	GenBank	mRNA	11900	12376	.	+	1	ID=GlmaCp008.t01;Parent=GlmaCp008
+NC_007942	GenBank	CDS	11900	12376	.	+	1	ID=GlmaCp008.p01;Parent=GlmaCp008.t01;Dbxref=GeneID:3989278;Name=ndhJ;Note=NADH dehydrogenase 30 kDa subunit;codon_start=1;locus_tag=GlmaCp008;product=NADH dehydrogenase subunit J;protein_id=YP_538752.1;transl_table=11;translation=length.158
+NC_007942	GenBank	gene	13066	13138	.	-	1	ID=GlmaCt005;Dbxref=GeneID:3989279;Name=trnF-GAA;locus_tag=GlmaCt005
+NC_007942	GenBank	tRNA	13066	13138	.	-	1	ID=GlmaCt005.r01;Parent=GlmaCt005;Dbxref=GeneID:3989279;Name=trnF-GAA;locus_tag=GlmaCt005;product=tRNA-Phe
+NC_007942	GenBank	gene	13562	14154	.	-	1	ID=GlmaCt006;Dbxref=GeneID:3989280;Name=trnL-UAA;locus_tag=GlmaCt006
+NC_007942	GenBank	tRNA	13562	13609	.	-	1	ID=GlmaCt006.r01;Parent=GlmaCt006;Dbxref=GeneID:3989280;Name=trnL-UAA;locus_tag=GlmaCt006;product=tRNA-Leu
+NC_007942	GenBank	tRNA	14120	14154	.	-	1	ID=GlmaCt006.r01;Parent=GlmaCt006;Dbxref=GeneID:3989280;Name=trnL-UAA;locus_tag=GlmaCt006;product=tRNA-Leu
+NC_007942	GenBank	gene	14915	14987	.	+	1	ID=GlmaCt007;Dbxref=GeneID:3989262;Name=trnT-UGU;locus_tag=GlmaCt007
+NC_007942	GenBank	tRNA	14915	14987	.	+	1	ID=GlmaCt007.r01;Parent=GlmaCt007;Dbxref=GeneID:3989262;Name=trnT-UGU;locus_tag=GlmaCt007;product=tRNA-Thr
+NC_007942	GenBank	gene	15272	15877	.	+	1	ID=GlmaCp009;Dbxref=GeneID:3989263;Name=rps4;locus_tag=GlmaCp009
+NC_007942	GenBank	mRNA	15272	15877	.	+	1	ID=GlmaCp009.t01;Parent=GlmaCp009
+NC_007942	GenBank	CDS	15272	15877	.	+	1	ID=GlmaCp009.p01;Parent=GlmaCp009.t01;Dbxref=GeneID:3989263;Name=rps4;codon_start=1;locus_tag=GlmaCp009;product=ribosomal protein S4;protein_id=YP_538753.1;transl_table=11;translation=length.201
+NC_007942	GenBank	gene	16087	16174	.	-	1	ID=GlmaCt008;Dbxref=GeneID:3989264;Name=trnS-GGA;locus_tag=GlmaCt008
+NC_007942	GenBank	tRNA	16087	16174	.	-	1	ID=GlmaCt008.r01;Parent=GlmaCt008;Dbxref=GeneID:3989264;Name=trnS-GGA;locus_tag=GlmaCt008;product=tRNA-Ser
+NC_007942	GenBank	gene	16430	18376	.	+	1	ID=GlmaCp010;Dbxref=GeneID:3989265;Name=ycf3;locus_tag=GlmaCp010
+NC_007942	GenBank	mRNA	16430	16555	.	+	1	ID=GlmaCp010.t01;Parent=GlmaCp010
+NC_007942	GenBank	mRNA	17252	17479	.	+	1	ID=GlmaCp010.t01;Parent=GlmaCp010
+NC_007942	GenBank	mRNA	18224	18376	.	+	1	ID=GlmaCp010.t01;Parent=GlmaCp010
+NC_007942	GenBank	CDS	16430	16555	.	+	1	ID=GlmaCp010.p01;Parent=GlmaCp010.t01;Dbxref=GeneID:3989265;Name=ycf3;codon_start=1;locus_tag=GlmaCp010;product=photosystem I assembly protein Ycf3;protein_id=YP_538754.1;transl_table=11;translation=length.168
+NC_007942	GenBank	CDS	17252	17479	.	+	1	ID=GlmaCp010.p01;Parent=GlmaCp010.t01;Dbxref=GeneID:3989265;Name=ycf3;codon_start=1;locus_tag=GlmaCp010;product=photosystem I assembly protein Ycf3;protein_id=YP_538754.1;transl_table=11;translation=length.168
+NC_007942	GenBank	CDS	18224	18376	.	+	1	ID=GlmaCp010.p01;Parent=GlmaCp010.t01;Dbxref=GeneID:3989265;Name=ycf3;codon_start=1;locus_tag=GlmaCp010;product=photosystem I assembly protein Ycf3;protein_id=YP_538754.1;transl_table=11;translation=length.168
+NC_007942	GenBank	gene	18972	21224	.	+	1	ID=GlmaCp011;Dbxref=GeneID:3989266;Name=psaA;locus_tag=GlmaCp011
+NC_007942	GenBank	mRNA	18972	21224	.	+	1	ID=GlmaCp011.t01;Parent=GlmaCp011
+NC_007942	GenBank	CDS	18972	21224	.	+	1	ID=GlmaCp011.p01;Parent=GlmaCp011.t01;Dbxref=GeneID:3989266;Name=psaA;Note=PsaA;codon_start=1;locus_tag=GlmaCp011;product=photosystem I P700 chlorophyll a apoprotein A1;protein_id=YP_538755.1;transl_table=11;translation=length.750
+NC_007942	GenBank	gene	21250	23454	.	+	1	ID=GlmaCp012;Dbxref=GeneID:3989267;Name=psaB;locus_tag=GlmaCp012
+NC_007942	GenBank	mRNA	21250	23454	.	+	1	ID=GlmaCp012.t01;Parent=GlmaCp012
+NC_007942	GenBank	CDS	21250	23454	.	+	1	ID=GlmaCp012.p01;Parent=GlmaCp012.t01;Dbxref=GeneID:3989267;Name=psaB;Note=PsaB;codon_start=1;locus_tag=GlmaCp012;product=photosystem I P700 chlorophyll a apoprotein A2;protein_id=YP_538756.1;transl_table=11;translation=length.734
+NC_007942	GenBank	gene	23572	23874	.	+	1	ID=GlmaCp013;Dbxref=GeneID:3989268;Name=rps14;locus_tag=GlmaCp013
+NC_007942	GenBank	mRNA	23572	23874	.	+	1	ID=GlmaCp013.t01;Parent=GlmaCp013
+NC_007942	GenBank	CDS	23572	23874	.	+	1	ID=GlmaCp013.p01;Parent=GlmaCp013.t01;Dbxref=GeneID:3989268;Name=rps14;Note=30S ribosomal protein S14;codon_start=1;locus_tag=GlmaCp013;product=ribosomal protein S14;protein_id=YP_538757.1;transl_table=11;translation=length.100
+NC_007942	GenBank	gene	24049	24122	.	+	1	ID=GlmaCt009;Dbxref=GeneID:3989269;Name=trnfM-CAU;locus_tag=GlmaCt009
+NC_007942	GenBank	tRNA	24049	24122	.	+	1	ID=GlmaCt009.r01;Parent=GlmaCt009;Dbxref=GeneID:3989269;Name=trnfM-CAU;locus_tag=GlmaCt009;product=tRNA-Met
+NC_007942	GenBank	gene	24241	24311	.	-	1	ID=GlmaCt010;Dbxref=GeneID:3989270;Name=trnG-GCC;locus_tag=GlmaCt010
+NC_007942	GenBank	tRNA	24241	24311	.	-	1	ID=GlmaCt010.r01;Parent=GlmaCt010;Dbxref=GeneID:3989270;Name=trnG-GCC;locus_tag=GlmaCt010;product=tRNA-Gly
+NC_007942	GenBank	gene	24842	25030	.	-	1	ID=GlmaCp014;Dbxref=GeneID:3989281;Name=psbZ;locus_tag=GlmaCp014
+NC_007942	GenBank	mRNA	24842	25030	.	-	1	ID=GlmaCp014.t01;Parent=GlmaCp014
+NC_007942	GenBank	CDS	24842	25030	.	-	1	ID=GlmaCp014.p01;Parent=GlmaCp014.t01;Dbxref=GeneID:3989281;Name=psbZ;Note=photosystem II reaction center Z protein%3B YCF9;codon_start=1;locus_tag=GlmaCp014;product=photosystem II protein Z;protein_id=YP_538758.1;transl_table=11;translation=length.62
+NC_007942	GenBank	gene	25395	25487	.	+	1	ID=GlmaCt011;Dbxref=GeneID:3989282;Name=trnS-UGA;locus_tag=GlmaCt011
+NC_007942	GenBank	tRNA	25395	25487	.	+	1	ID=GlmaCt011.r01;Parent=GlmaCt011;Dbxref=GeneID:3989282;Name=trnS-UGA;locus_tag=GlmaCt011;product=tRNA-Ser
+NC_007942	GenBank	gene	25671	27092	.	-	1	ID=GlmaCp015;Dbxref=GeneID:3989283;Name=psbC;locus_tag=GlmaCp015
+NC_007942	GenBank	mRNA	25671	27092	.	-	1	ID=GlmaCp015.t01;Parent=GlmaCp015
+NC_007942	GenBank	CDS	25671	27092	.	-	1	ID=GlmaCp015.p01;Parent=GlmaCp015.t01;Dbxref=GeneID:3989283;Name=psbC;Note=PSII 43 kDa protein%3B CP43;codon_start=1;locus_tag=GlmaCp015;product=photosystem II 44 kDa protein;protein_id=YP_538759.1;transl_table=11;translation=length.473
+NC_007942	GenBank	gene	27040	28101	.	-	1	ID=GlmaCp016;Dbxref=GeneID:3989284;Name=psbD;locus_tag=GlmaCp016
+NC_007942	GenBank	mRNA	27040	28101	.	-	1	ID=GlmaCp016.t01;Parent=GlmaCp016
+NC_007942	GenBank	CDS	27040	28101	.	-	1	ID=GlmaCp016.p01;Parent=GlmaCp016.t01;Dbxref=GeneID:3989284;Name=psbD;codon_start=1;locus_tag=GlmaCp016;product=photosystem II protein D2;protein_id=YP_538760.1;transl_table=11;translation=length.353
+NC_007942	GenBank	gene	29351	29422	.	-	1	ID=GlmaCt012;Dbxref=GeneID:3989285;Name=trnT-GGU;locus_tag=GlmaCt012
+NC_007942	GenBank	tRNA	29351	29422	.	-	1	ID=GlmaCt012.r01;Parent=GlmaCt012;Dbxref=GeneID:3989285;Name=trnT-GGU;locus_tag=GlmaCt012;product=tRNA-Thr
+NC_007942	GenBank	gene	30181	30253	.	+	1	ID=GlmaCt013;Dbxref=GeneID:3989286;Name=trnE-UUC;locus_tag=GlmaCt013
+NC_007942	GenBank	tRNA	30181	30253	.	+	1	ID=GlmaCt013.r01;Parent=GlmaCt013;Dbxref=GeneID:3989286;Name=trnE-UUC;locus_tag=GlmaCt013;product=tRNA-Glu
+NC_007942	GenBank	gene	30320	30403	.	+	1	ID=GlmaCt014;Dbxref=GeneID:3989287;Name=trnY-GUA;locus_tag=GlmaCt014
+NC_007942	GenBank	tRNA	30320	30403	.	+	1	ID=GlmaCt014.r01;Parent=GlmaCt014;Dbxref=GeneID:3989287;Name=trnY-GUA;locus_tag=GlmaCt014;product=tRNA-Tyr
+NC_007942	GenBank	gene	30853	30926	.	+	1	ID=GlmaCt015;Dbxref=GeneID:3989251;Name=trnD-GUC;locus_tag=GlmaCt015
+NC_007942	GenBank	tRNA	30853	30926	.	+	1	ID=GlmaCt015.r01;Parent=GlmaCt015;Dbxref=GeneID:3989251;Name=trnD-GUC;locus_tag=GlmaCt015;product=tRNA-Asp
+NC_007942	GenBank	gene	31295	31399	.	+	1	ID=GlmaCp017;Dbxref=GeneID:3989288;Name=psbM;locus_tag=GlmaCp017
+NC_007942	GenBank	mRNA	31295	31399	.	+	1	ID=GlmaCp017.t01;Parent=GlmaCp017
+NC_007942	GenBank	CDS	31295	31399	.	+	1	ID=GlmaCp017.p01;Parent=GlmaCp017.t01;Dbxref=GeneID:3989288;Name=psbM;codon_start=1;locus_tag=GlmaCp017;product=photosystem II protein M;protein_id=YP_538761.1;transl_table=11;translation=length.34
+NC_007942	GenBank	gene	32118	32207	.	-	1	ID=GlmaCp018;Dbxref=GeneID:3989289;Name=petN;gene_synonym=ycf6;locus_tag=GlmaCp018
+NC_007942	GenBank	mRNA	32118	32207	.	-	1	ID=GlmaCp018.t01;Parent=GlmaCp018
+NC_007942	GenBank	CDS	32118	32207	.	-	1	ID=GlmaCp018.p01;Parent=GlmaCp018.t01;Dbxref=GeneID:3989289;Name=petN;Note=cytochrome b6/f complex subunit N;codon_start=1;gene_synonym=ycf6;locus_tag=GlmaCp018;product=cytochrome b6/f complex subunit VIII;protein_id=YP_538762.1;transl_table=11;translation=length.29
+NC_007942	GenBank	gene	33295	33365	.	-	1	ID=GlmaCt016;Dbxref=GeneID:3989290;Name=trnC-GCA;locus_tag=GlmaCt016
+NC_007942	GenBank	tRNA	33295	33365	.	-	1	ID=GlmaCt016.r01;Parent=GlmaCt016;Dbxref=GeneID:3989290;Name=trnC-GCA;locus_tag=GlmaCt016;product=tRNA-Cys
+NC_007942	GenBank	gene	34250	37462	.	+	1	ID=GlmaCp019;Dbxref=GeneID:3989291;Name=rpoB;locus_tag=GlmaCp019
+NC_007942	GenBank	mRNA	34250	37462	.	+	1	ID=GlmaCp019.t01;Parent=GlmaCp019
+NC_007942	GenBank	CDS	34250	37462	.	+	1	ID=GlmaCp019.p01;Parent=GlmaCp019.t01;Dbxref=GeneID:3989291;Name=rpoB;Note=RNA polymerase beta chain%3B one of four subunits of the minimal PEP RNA polymerase catalytic core;codon_start=1;locus_tag=GlmaCp019;product=RNA polymerase beta subunit;protein_id=YP_538763.1;transl_table=11;translation=length.1070
+NC_007942	GenBank	gene	37489	40354	.	+	1	ID=GlmaCp020;Dbxref=GeneID:3989292;Name=rpoC1;locus_tag=GlmaCp020
+NC_007942	GenBank	mRNA	37489	37920	.	+	1	ID=GlmaCp020.t01;Parent=GlmaCp020
+NC_007942	GenBank	mRNA	38723	40354	.	+	1	ID=GlmaCp020.t01;Parent=GlmaCp020
+NC_007942	GenBank	CDS	37489	37920	.	+	1	ID=GlmaCp020.p01;Parent=GlmaCp020.t01;Dbxref=GeneID:3989292;Name=rpoC1;Note=RNA polymerase beta' chain;codon_start=1;locus_tag=GlmaCp020;product=RNA polymerase beta' subunit;protein_id=YP_538764.1;transl_table=11;translation=length.687
+NC_007942	GenBank	CDS	38723	40354	.	+	1	ID=GlmaCp020.p01;Parent=GlmaCp020.t01;Dbxref=GeneID:3989292;Name=rpoC1;Note=RNA polymerase beta' chain;codon_start=1;locus_tag=GlmaCp020;product=RNA polymerase beta' subunit;protein_id=YP_538764.1;transl_table=11;translation=length.687
+NC_007942	GenBank	gene	40569	44729	.	+	1	ID=GlmaCp021;Dbxref=GeneID:3989293;Name=rpoC2;locus_tag=GlmaCp021
+NC_007942	GenBank	mRNA	40569	44729	.	+	1	ID=GlmaCp021.t01;Parent=GlmaCp021
+NC_007942	GenBank	CDS	40569	44729	.	+	1	ID=GlmaCp021.p01;Parent=GlmaCp021.t01;Dbxref=GeneID:3989293;Name=rpoC2;Note=RNA polymerase beta'' chain%3B one of four subunits of the minimal PEP RNA polymerase catalytic core;codon_start=1;locus_tag=GlmaCp021;product=RNA polymerase beta'' subunit;protein_id=YP_538765.1;transl_table=11;translation=length.1386
+NC_007942	GenBank	gene	45000	45710	.	+	1	ID=GlmaCp022;Dbxref=GeneID:3989294;Name=rps2;locus_tag=GlmaCp022
+NC_007942	GenBank	mRNA	45000	45710	.	+	1	ID=GlmaCp022.t01;Parent=GlmaCp022
+NC_007942	GenBank	CDS	45000	45710	.	+	1	ID=GlmaCp022.p01;Parent=GlmaCp022.t01;Dbxref=GeneID:3989294;Name=rps2;Note=30S ribosomal protein S2;codon_start=1;locus_tag=GlmaCp022;product=ribosomal protein S2;protein_id=YP_538766.1;transl_table=11;translation=length.236
+NC_007942	GenBank	gene	45971	46714	.	+	1	ID=GlmaCp023;Dbxref=GeneID:3989295;Name=atpI;locus_tag=GlmaCp023
+NC_007942	GenBank	mRNA	45971	46714	.	+	1	ID=GlmaCp023.t01;Parent=GlmaCp023
+NC_007942	GenBank	CDS	45971	46714	.	+	1	ID=GlmaCp023.p01;Parent=GlmaCp023.t01;Dbxref=GeneID:3989295;Name=atpI;Note=ATPase IV subunit%3B ATP synthase CF0 A chain;codon_start=1;locus_tag=GlmaCp023;product=ATP synthase CF0 A subunit;protein_id=YP_538767.1;transl_table=11;translation=length.247
+NC_007942	GenBank	gene	47818	48063	.	+	1	ID=GlmaCp024;Dbxref=GeneID:3989296;Name=atpH;locus_tag=GlmaCp024
+NC_007942	GenBank	mRNA	47818	48063	.	+	1	ID=GlmaCp024.t01;Parent=GlmaCp024
+NC_007942	GenBank	CDS	47818	48063	.	+	1	ID=GlmaCp024.p01;Parent=GlmaCp024.t01;Dbxref=GeneID:3989296;Name=atpH;Note=ATPase III subunit%3B ATP synthase CF0 C chain;codon_start=1;locus_tag=GlmaCp024;product=ATP synthase CF0 C subunit;protein_id=YP_538768.1;transl_table=11;translation=length.81
+NC_007942	GenBank	gene	48505	49798	.	+	1	ID=GlmaCp025;Dbxref=GeneID:3989297;Name=atpF;locus_tag=GlmaCp025
+NC_007942	GenBank	mRNA	48505	48648	.	+	1	ID=GlmaCp025.t01;Parent=GlmaCp025
+NC_007942	GenBank	mRNA	49385	49798	.	+	1	ID=GlmaCp025.t01;Parent=GlmaCp025
+NC_007942	GenBank	CDS	48505	48648	.	+	1	ID=GlmaCp025.p01;Parent=GlmaCp025.t01;Dbxref=GeneID:3989297;Name=atpF;Note=ATPase subunit I;codon_start=1;locus_tag=GlmaCp025;product=ATP synthase CF0 B subunit;protein_id=YP_538769.1;transl_table=11;translation=length.185
+NC_007942	GenBank	CDS	49385	49798	.	+	1	ID=GlmaCp025.p01;Parent=GlmaCp025.t01;Dbxref=GeneID:3989297;Name=atpF;Note=ATPase subunit I;codon_start=1;locus_tag=GlmaCp025;product=ATP synthase CF0 B subunit;protein_id=YP_538769.1;transl_table=11;translation=length.185
+NC_007942	GenBank	gene	49868	51400	.	+	1	ID=GlmaCp026;Dbxref=GeneID:3989298;Name=atpA;locus_tag=GlmaCp026
+NC_007942	GenBank	mRNA	49868	51400	.	+	1	ID=GlmaCp026.t01;Parent=GlmaCp026
+NC_007942	GenBank	CDS	49868	51400	.	+	1	ID=GlmaCp026.p01;Parent=GlmaCp026.t01;Dbxref=GeneID:3989298;Name=atpA;Note=ATPase alpha subunit;codon_start=1;locus_tag=GlmaCp026;product=ATP synthase CF1 alpha subunit;protein_id=YP_538770.1;transl_table=11;translation=length.510
+NC_007942	GenBank	gene	51617	51688	.	-	1	ID=GlmaCt017;Dbxref=GeneID:3989299;Name=trnR-UCU;locus_tag=GlmaCt017
+NC_007942	GenBank	tRNA	51617	51688	.	-	1	ID=GlmaCt017.r01;Parent=GlmaCt017;Dbxref=GeneID:3989299;Name=trnR-UCU;locus_tag=GlmaCt017;product=tRNA-Arg
+NC_007942	GenBank	gene	51973	52736	.	-	1	ID=GlmaCt018;Dbxref=GeneID:3989300;Name=trnG-UCC;locus_tag=GlmaCt018
+NC_007942	GenBank	tRNA	51973	52021	.	-	1	ID=GlmaCt018.r01;Parent=GlmaCt018;Dbxref=GeneID:3989300;Name=trnG-UCC;locus_tag=GlmaCt018;product=tRNA-Gly
+NC_007942	GenBank	tRNA	52714	52736	.	-	1	ID=GlmaCt018.r01;Parent=GlmaCt018;Dbxref=GeneID:3989300;Name=trnG-UCC;locus_tag=GlmaCt018;product=tRNA-Gly
+NC_007942	GenBank	gene	53214	53300	.	+	1	ID=GlmaCt019;Dbxref=GeneID:3989301;Name=trnS-GCU;locus_tag=GlmaCt019
+NC_007942	GenBank	tRNA	53214	53300	.	+	1	ID=GlmaCt019.r01;Parent=GlmaCt019;Dbxref=GeneID:3989301;Name=trnS-GCU;locus_tag=GlmaCt019;product=tRNA-Ser
+NC_007942	GenBank	gene	53453	53563	.	-	1	ID=GlmaCp027;Dbxref=GeneID:3989302;Name=psbI;locus_tag=GlmaCp027
+NC_007942	GenBank	mRNA	53453	53563	.	-	1	ID=GlmaCp027.t01;Parent=GlmaCp027
+NC_007942	GenBank	CDS	53453	53563	.	-	1	ID=GlmaCp027.p01;Parent=GlmaCp027.t01;Dbxref=GeneID:3989302;Name=psbI;codon_start=1;locus_tag=GlmaCp027;product=photosystem II protein I;protein_id=YP_538771.1;transl_table=11;translation=length.36
+NC_007942	GenBank	gene	54025	54210	.	-	1	ID=GlmaCp028;Dbxref=GeneID:3989303;Name=psbK;locus_tag=GlmaCp028
+NC_007942	GenBank	mRNA	54025	54210	.	-	1	ID=GlmaCp028.t01;Parent=GlmaCp028
+NC_007942	GenBank	CDS	54025	54210	.	-	1	ID=GlmaCp028.p01;Parent=GlmaCp028.t01;Dbxref=GeneID:3989303;Name=psbK;Note=PSII K protein;codon_start=1;locus_tag=GlmaCp028;product=photosystem II protein K;protein_id=YP_538772.1;transl_table=11;translation=length.61
+NC_007942	GenBank	gene	54662	54733	.	+	1	ID=GlmaCt020;Dbxref=GeneID:3989304;Name=trnQ-UUG;locus_tag=GlmaCt020
+NC_007942	GenBank	tRNA	54662	54733	.	+	1	ID=GlmaCt020.r01;Parent=GlmaCt020;Dbxref=GeneID:3989304;Name=trnQ-UUG;locus_tag=GlmaCt020;product=tRNA-Gln
+NC_007942	GenBank	gene	55216	56371	.	+	1	ID=GlmaCp029;Dbxref=GeneID:3989305;Name=rps16;locus_tag=GlmaCp029
+NC_007942	GenBank	mRNA	55216	55255	.	+	1	ID=GlmaCp029.t01;Parent=GlmaCp029
+NC_007942	GenBank	mRNA	56142	56371	.	+	1	ID=GlmaCp029.t01;Parent=GlmaCp029
+NC_007942	GenBank	CDS	55216	55255	.	+	1	ID=GlmaCp029.p01;Parent=GlmaCp029.t01;Dbxref=GeneID:3989305;Name=rps16;codon_start=1;locus_tag=GlmaCp029;product=ribosomal protein S16;protein_id=YP_538773.1;transl_table=11;translation=length.89
+NC_007942	GenBank	CDS	56142	56371	.	+	1	ID=GlmaCp029.p01;Parent=GlmaCp029.t01;Dbxref=GeneID:3989305;Name=rps16;codon_start=1;locus_tag=GlmaCp029;product=ribosomal protein S16;protein_id=YP_538773.1;transl_table=11;translation=length.89
+NC_007942	GenBank	gene	56902	58200	.	+	1	ID=GlmaCp030;Dbxref=GeneID:3989306;Name=accD;locus_tag=GlmaCp030
+NC_007942	GenBank	mRNA	56902	58200	.	+	1	ID=GlmaCp030.t01;Parent=GlmaCp030
+NC_007942	GenBank	CDS	56902	58200	.	+	1	ID=GlmaCp030.p01;Parent=GlmaCp030.t01;Dbxref=GeneID:3989306;Name=accD;codon_start=1;locus_tag=GlmaCp030;product=acetyl-CoA carboxylase beta subunit;protein_id=YP_538774.1;transl_table=11;translation=length.432
+NC_007942	GenBank	gene	58434	58538	.	+	1	ID=GlmaCp031;Dbxref=GeneID:3989307;Name=psaI;locus_tag=GlmaCp031
+NC_007942	GenBank	mRNA	58434	58538	.	+	1	ID=GlmaCp031.t01;Parent=GlmaCp031
+NC_007942	GenBank	CDS	58434	58538	.	+	1	ID=GlmaCp031.p01;Parent=GlmaCp031.t01;Dbxref=GeneID:3989307;Name=psaI;codon_start=1;locus_tag=GlmaCp031;product=photosystem I subunit VIII;protein_id=YP_538775.1;transl_table=11;translation=length.34
+NC_007942	GenBank	gene	59728	60417	.	+	1	ID=GlmaCp032;Dbxref=GeneID:3989308;Name=cemA;gene_synonym=ycf10;locus_tag=GlmaCp032
+NC_007942	GenBank	mRNA	59728	60417	.	+	1	ID=GlmaCp032.t01;Parent=GlmaCp032
+NC_007942	GenBank	CDS	59728	60417	.	+	1	ID=GlmaCp032.p01;Parent=GlmaCp032.t01;Dbxref=GeneID:3989308;Name=cemA;Note=heme-binding protein;codon_start=1;gene_synonym=ycf10;locus_tag=GlmaCp032;product=envelope membrane protein;protein_id=YP_538776.1;transl_table=11;translation=length.229
+NC_007942	GenBank	gene	60604	61566	.	+	1	ID=GlmaCp033;Dbxref=GeneID:3989309;Name=petA;locus_tag=GlmaCp033
+NC_007942	GenBank	mRNA	60604	61566	.	+	1	ID=GlmaCp033.t01;Parent=GlmaCp033
+NC_007942	GenBank	CDS	60604	61566	.	+	1	ID=GlmaCp033.p01;Parent=GlmaCp033.t01;Dbxref=GeneID:3989309;Name=petA;Note=apocytochrome f precursor%3B component of cytochrome b6/f complex;codon_start=1;locus_tag=GlmaCp033;product=cytochrome f;protein_id=YP_538777.1;transl_table=11;translation=length.320
+NC_007942	GenBank	gene	62442	62564	.	-	1	ID=GlmaCp034;Dbxref=GeneID:3989310;Name=psbJ;locus_tag=GlmaCp034
+NC_007942	GenBank	mRNA	62442	62564	.	-	1	ID=GlmaCp034.t01;Parent=GlmaCp034
+NC_007942	GenBank	CDS	62442	62564	.	-	1	ID=GlmaCp034.p01;Parent=GlmaCp034.t01;Dbxref=GeneID:3989310;Name=psbJ;Note=photosystem II reaction center subunit X;codon_start=1;locus_tag=GlmaCp034;product=photosystem II protein J;protein_id=YP_538778.1;transl_table=11;translation=length.40
+NC_007942	GenBank	gene	62705	62821	.	-	1	ID=GlmaCp035;Dbxref=GeneID:3989311;Name=psbL;locus_tag=GlmaCp035
+NC_007942	GenBank	mRNA	62705	62821	.	-	1	ID=GlmaCp035.t01;Parent=GlmaCp035
+NC_007942	GenBank	CDS	62705	62821	.	-	1	ID=GlmaCp035.p01;Parent=GlmaCp035.t01;Dbxref=GeneID:3989311;Name=psbL;Note=PSII reaction center subunit XII;codon_start=1;exception=RNA editing;locus_tag=GlmaCp035;product=photosystem II protein L;protein_id=YP_538779.1;transl_table=11;translation=length.38
+NC_007942	GenBank	gene	62844	62963	.	-	1	ID=GlmaCp036;Dbxref=GeneID:3989312;Name=psbF;locus_tag=GlmaCp036
+NC_007942	GenBank	mRNA	62844	62963	.	-	1	ID=GlmaCp036.t01;Parent=GlmaCp036
+NC_007942	GenBank	CDS	62844	62963	.	-	1	ID=GlmaCp036.p01;Parent=GlmaCp036.t01;Dbxref=GeneID:3989312;Name=psbF;Note=photosystem II reaction center subunit VI;codon_start=1;locus_tag=GlmaCp036;product=photosystem II protein VI;protein_id=YP_538780.1;transl_table=11;translation=length.39
+NC_007942	GenBank	gene	62973	63224	.	-	1	ID=GlmaCp037;Dbxref=GeneID:3989313;Name=psbE;locus_tag=GlmaCp037
+NC_007942	GenBank	mRNA	62973	63224	.	-	1	ID=GlmaCp037.t01;Parent=GlmaCp037
+NC_007942	GenBank	CDS	62973	63224	.	-	1	ID=GlmaCp037.p01;Parent=GlmaCp037.t01;Dbxref=GeneID:3989313;Name=psbE;Note=cytochrome b559 alpha subunit;codon_start=1;locus_tag=GlmaCp037;product=photosystem II protein V;protein_id=YP_538781.1;transl_table=11;translation=length.83
+NC_007942	GenBank	gene	64134	64229	.	+	1	ID=GlmaCp038;Dbxref=GeneID:3989314;Name=petL;locus_tag=GlmaCp038
+NC_007942	GenBank	mRNA	64134	64229	.	+	1	ID=GlmaCp038.t01;Parent=GlmaCp038
+NC_007942	GenBank	CDS	64134	64229	.	+	1	ID=GlmaCp038.p01;Parent=GlmaCp038.t01;Dbxref=GeneID:3989314;Name=petL;codon_start=1;locus_tag=GlmaCp038;product=cytochrome b6/f complex subunit VI;protein_id=YP_538782.1;transl_table=11;translation=length.31
+NC_007942	GenBank	gene	64388	64501	.	+	1	ID=GlmaCp039;Dbxref=GeneID:3989315;Name=petG;locus_tag=GlmaCp039
+NC_007942	GenBank	mRNA	64388	64501	.	+	1	ID=GlmaCp039.t01;Parent=GlmaCp039
+NC_007942	GenBank	CDS	64388	64501	.	+	1	ID=GlmaCp039.p01;Parent=GlmaCp039.t01;Dbxref=GeneID:3989315;Name=petG;Note=cytochrome B6-F complex subunit 5%3B required for the either the stability or assembly of the cytochrome b6/f complex;codon_start=1;locus_tag=GlmaCp039;product=cytochrome b6/f complex subunit V;protein_id=YP_538783.1;transl_table=11;translation=length.37
+NC_007942	GenBank	gene	64653	64726	.	-	1	ID=GlmaCt021;Dbxref=GeneID:3989316;Name=trnW-CCA;locus_tag=GlmaCt021
+NC_007942	GenBank	tRNA	64653	64726	.	-	1	ID=GlmaCt021.r01;Parent=GlmaCt021;Dbxref=GeneID:3989316;Name=trnW-CCA;locus_tag=GlmaCt021;product=tRNA-Trp
+NC_007942	GenBank	gene	64929	65002	.	-	1	ID=GlmaCt022;Dbxref=GeneID:3989317;Name=trnP-UGG;locus_tag=GlmaCt022
+NC_007942	GenBank	tRNA	64929	65002	.	-	1	ID=GlmaCt022.r01;Parent=GlmaCt022;Dbxref=GeneID:3989317;Name=trnP-UGG;locus_tag=GlmaCt022;product=tRNA-Pro
+NC_007942	GenBank	gene	65277	65411	.	+	1	ID=GlmaCp040;Dbxref=GeneID:3989318;Name=psaJ;locus_tag=GlmaCp040
+NC_007942	GenBank	mRNA	65277	65411	.	+	1	ID=GlmaCp040.t01;Parent=GlmaCp040
+NC_007942	GenBank	CDS	65277	65411	.	+	1	ID=GlmaCp040.p01;Parent=GlmaCp040.t01;Dbxref=GeneID:3989318;Name=psaJ;codon_start=1;locus_tag=GlmaCp040;product=photosystem I subunit IX;protein_id=YP_538784.1;transl_table=11;translation=length.44
+NC_007942	GenBank	gene	65969	66169	.	+	1	ID=GlmaCp041;Dbxref=GeneID:3989319;Name=rpl33;locus_tag=GlmaCp041
+NC_007942	GenBank	mRNA	65969	66169	.	+	1	ID=GlmaCp041.t01;Parent=GlmaCp041
+NC_007942	GenBank	CDS	65969	66169	.	+	1	ID=GlmaCp041.p01;Parent=GlmaCp041.t01;Dbxref=GeneID:3989319;Name=rpl33;codon_start=1;locus_tag=GlmaCp041;product=ribosomal protein L33;protein_id=YP_538785.1;transl_table=11;translation=length.66
+NC_007942	GenBank	gene	66421	66732	.	+	1	ID=GlmaCp042;Dbxref=GeneID:3989320;Name=rps18;locus_tag=GlmaCp042
+NC_007942	GenBank	mRNA	66421	66732	.	+	1	ID=GlmaCp042.t01;Parent=GlmaCp042
+NC_007942	GenBank	CDS	66421	66732	.	+	1	ID=GlmaCp042.p01;Parent=GlmaCp042.t01;Dbxref=GeneID:3989320;Name=rps18;Note=30S ribosomal protein S18;codon_start=1;locus_tag=GlmaCp042;product=ribosomal protein S18;protein_id=YP_538786.1;transl_table=11;translation=length.103
+NC_007942	GenBank	gene	66954	67346	.	-	1	ID=GlmaCp043;Dbxref=GeneID:3989321;Name=rpl20;locus_tag=GlmaCp043
+NC_007942	GenBank	mRNA	66954	67346	.	-	1	ID=GlmaCp043.t01;Parent=GlmaCp043
+NC_007942	GenBank	CDS	66954	67346	.	-	1	ID=GlmaCp043.p01;Parent=GlmaCp043.t01;Dbxref=GeneID:3989321;Name=rpl20;Note=50S ribosomal protein L20;codon_start=1;locus_tag=GlmaCp043;product=ribosomal protein L20;protein_id=YP_538787.1;transl_table=11;translation=length.130
+NC_007942	GenBank	CDS	68190	68303	.	.	1	ID=GlmaCp044;Dbxref=GeneID:3989256;Name=rps12;codon_start=1;locus_tag=GlmaCp044;product=ribosomal protein S12;protein_id=YP_538788.1;trans_splicing=_no_value;transl_table=11;translation=length.123
+NC_007942	GenBank	CDS	137863	138094	.	.	1	ID=GlmaCp044;Dbxref=GeneID:3989256;Name=rps12;codon_start=1;locus_tag=GlmaCp044;product=ribosomal protein S12;protein_id=YP_538788.1;trans_splicing=_no_value;transl_table=11;translation=length.123
+NC_007942	GenBank	CDS	138626	138651	.	.	1	ID=GlmaCp044;Dbxref=GeneID:3989256;Name=rps12;codon_start=1;locus_tag=GlmaCp044;product=ribosomal protein S12;protein_id=YP_538788.1;trans_splicing=_no_value;transl_table=11;translation=length.123
+NC_007942	GenBank	gene	68190	68303	.	.	1	ID=GlmaCp044.gene;Alias=GlmaCp044;Dbxref=GeneID:3989256;Name=rps12;locus_tag=GlmaCp044;trans_splicing=_no_value
+NC_007942	GenBank	gene	137863	138651	.	.	1	ID=GlmaCp044.gene;Alias=GlmaCp044;Dbxref=GeneID:3989256;Name=rps12;locus_tag=GlmaCp044;trans_splicing=_no_value
+NC_007942	GenBank	CDS	68517	68744	.	-	1	ID=GlmaCp046;Dbxref=GeneID:3989322;Name=clpP;codon_start=1;locus_tag=GlmaCp046;product=ATP-dependent Clp protease proteolytic subunit;protein_id=YP_538790.1;transl_table=11;translation=length.196
+NC_007942	GenBank	CDS	69519	69810	.	-	1	ID=GlmaCp046;Dbxref=GeneID:3989322;Name=clpP;codon_start=1;locus_tag=GlmaCp046;product=ATP-dependent Clp protease proteolytic subunit;protein_id=YP_538790.1;transl_table=11;translation=length.196
+NC_007942	GenBank	CDS	70523	70593	.	-	1	ID=GlmaCp046;Dbxref=GeneID:3989322;Name=clpP;codon_start=1;locus_tag=GlmaCp046;product=ATP-dependent Clp protease proteolytic subunit;protein_id=YP_538790.1;transl_table=11;translation=length.196
+NC_007942	GenBank	gene	68517	70593	.	-	1	ID=GlmaCp046.gene;Alias=GlmaCp046;Dbxref=GeneID:3989322;Name=clpP;locus_tag=GlmaCp046
+NC_007942	GenBank	CDS	71019	72545	.	+	1	ID=GlmaCp047;Dbxref=GeneID:3989323;Name=psbB;Note=photosystem II P680 chlorophyll A apoprotein%3B PSII 47 kDa protein;codon_start=1;locus_tag=GlmaCp047;product=photosystem II 47 kDa protein;protein_id=YP_538791.1;transl_table=11;translation=length.508
+NC_007942	GenBank	gene	71019	72545	.	+	1	ID=GlmaCp047.gene;Alias=GlmaCp047;Dbxref=GeneID:3989323;Name=psbB;locus_tag=GlmaCp047
+NC_007942	GenBank	CDS	72712	72816	.	+	1	ID=GlmaCp048;Dbxref=GeneID:3989324;Name=psbT;codon_start=1;locus_tag=GlmaCp048;product=photosystem II protein T;protein_id=YP_538792.1;transl_table=11;translation=length.34
+NC_007942	GenBank	gene	72712	72816	.	+	1	ID=GlmaCp048.gene;Alias=GlmaCp048;Dbxref=GeneID:3989324;Name=psbT;locus_tag=GlmaCp048
+NC_007942	GenBank	CDS	72879	73010	.	-	1	ID=GlmaCp049;Dbxref=GeneID:3989325;Name=psbN;Note=photosystem II reaction center N protein;codon_start=1;locus_tag=GlmaCp049;product=photosystem II protein N;protein_id=YP_538793.1;transl_table=11;translation=length.43
+NC_007942	GenBank	gene	72879	73010	.	-	1	ID=GlmaCp049.gene;Alias=GlmaCp049;Dbxref=GeneID:3989325;Name=psbN;locus_tag=GlmaCp049
+NC_007942	GenBank	CDS	73124	73345	.	+	1	ID=GlmaCp050;Dbxref=GeneID:3989326;Name=psbH;Note=photosystem II reaction center protein H%3B photosystem II phosphoprotein;codon_start=1;locus_tag=GlmaCp050;product=photosystem II protein H;protein_id=YP_538794.1;transl_table=11;translation=length.73
+NC_007942	GenBank	gene	73124	73345	.	+	1	ID=GlmaCp050.gene;Alias=GlmaCp050;Dbxref=GeneID:3989326;Name=psbH;locus_tag=GlmaCp050
+NC_007942	GenBank	CDS	73482	73487	.	+	1	ID=GlmaCp051;Dbxref=GeneID:3989327;Name=petB;codon_start=1;locus_tag=GlmaCp051;product=cytochrome b6;protein_id=YP_538795.1;transl_table=11;translation=length.215
+NC_007942	GenBank	CDS	74295	74936	.	+	1	ID=GlmaCp051;Dbxref=GeneID:3989327;Name=petB;codon_start=1;locus_tag=GlmaCp051;product=cytochrome b6;protein_id=YP_538795.1;transl_table=11;translation=length.215
+NC_007942	GenBank	gene	73482	74936	.	+	1	ID=GlmaCp051.gene;Alias=GlmaCp051;Dbxref=GeneID:3989327;Name=petB;locus_tag=GlmaCp051
+NC_007942	GenBank	CDS	75133	75140	.	+	1	ID=GlmaCp052;Dbxref=GeneID:3989328;Name=petD;Note=cytochrome b6/f complex subunit 4;codon_start=1;locus_tag=GlmaCp052;product=cytochrome b6/f complex subunit IV;protein_id=YP_538796.1;transl_table=11;translation=length.160
+NC_007942	GenBank	CDS	75869	76343	.	+	1	ID=GlmaCp052;Dbxref=GeneID:3989328;Name=petD;Note=cytochrome b6/f complex subunit 4;codon_start=1;locus_tag=GlmaCp052;product=cytochrome b6/f complex subunit IV;protein_id=YP_538796.1;transl_table=11;translation=length.160
+NC_007942	GenBank	gene	75133	76343	.	+	1	ID=GlmaCp052.gene;Alias=GlmaCp052;Dbxref=GeneID:3989328;Name=petD;locus_tag=GlmaCp052
+NC_007942	GenBank	CDS	76584	77585	.	-	1	ID=GlmaCp053;Dbxref=GeneID:3989329;Name=rpoA;Note=RNA polymerase alpha chain;codon_start=1;locus_tag=GlmaCp053;product=RNA polymerase alpha subunit;protein_id=YP_538797.1;transl_table=11;translation=length.333
+NC_007942	GenBank	gene	76584	77585	.	-	1	ID=GlmaCp053.gene;Alias=GlmaCp053;Dbxref=GeneID:3989329;Name=rpoA;locus_tag=GlmaCp053
+NC_007942	GenBank	CDS	77660	78076	.	-	1	ID=GlmaCp054;Dbxref=GeneID:3989330;Name=rps11;Note=30S ribosomal protein S11;codon_start=1;locus_tag=GlmaCp054;product=ribosomal protein S11;protein_id=YP_538798.1;transl_table=11;translation=length.138
+NC_007942	GenBank	gene	77660	78076	.	-	1	ID=GlmaCp054.gene;Alias=GlmaCp054;Dbxref=GeneID:3989330;Name=rps11;locus_tag=GlmaCp054
+NC_007942	GenBank	CDS	78422	78535	.	-	1	ID=GlmaCp055;Dbxref=GeneID:3989331;Name=rpl36;Note=50S ribosomal protein L36;codon_start=1;gene_synonym=secX;locus_tag=GlmaCp055;product=ribosomal protein L36;protein_id=YP_538799.1;transl_table=11;translation=length.37
+NC_007942	GenBank	gene	78422	78535	.	-	1	ID=GlmaCp055.gene;Alias=GlmaCp055;Dbxref=GeneID:3989331;Name=rpl36;gene_synonym=secX;locus_tag=GlmaCp055
+NC_007942	GenBank	CDS	79007	79411	.	-	1	ID=GlmaCp056;Dbxref=GeneID:3989332;Name=rps8;Note=30S ribosomal protein S8;codon_start=1;locus_tag=GlmaCp056;product=ribosomal protein S8;protein_id=YP_538800.1;transl_table=11;translation=length.134
+NC_007942	GenBank	gene	79007	79411	.	-	1	ID=GlmaCp056.gene;Alias=GlmaCp056;Dbxref=GeneID:3989332;Name=rps8;locus_tag=GlmaCp056
+NC_007942	GenBank	CDS	79709	80077	.	-	1	ID=GlmaCp057;Dbxref=GeneID:3989333;Name=rpl14;Note=50S ribosomal protein L14;codon_start=1;locus_tag=GlmaCp057;product=ribosomal protein L14;protein_id=YP_538801.1;transl_table=11;translation=length.122
+NC_007942	GenBank	gene	79709	80077	.	-	1	ID=GlmaCp057.gene;Alias=GlmaCp057;Dbxref=GeneID:3989333;Name=rpl14;locus_tag=GlmaCp057
+NC_007942	GenBank	CDS	80200	80598	.	-	1	ID=GlmaCp058;Dbxref=GeneID:3989334;Name=rpl16;codon_start=1;locus_tag=GlmaCp058;product=ribosomal protein L16;protein_id=YP_538802.1;transl_table=11;translation=length.135
+NC_007942	GenBank	CDS	81766	81774	.	-	1	ID=GlmaCp058;Dbxref=GeneID:3989334;Name=rpl16;codon_start=1;locus_tag=GlmaCp058;product=ribosomal protein L16;protein_id=YP_538802.1;transl_table=11;translation=length.135
+NC_007942	GenBank	gene	80200	81774	.	-	1	ID=GlmaCp058.gene;Alias=GlmaCp058;Dbxref=GeneID:3989334;Name=rpl16;locus_tag=GlmaCp058
+NC_007942	GenBank	CDS	81954	82604	.	-	1	ID=GlmaCp059;Dbxref=GeneID:3989335;Name=rps3;Note=30S ribosomal protein S3;codon_start=1;locus_tag=GlmaCp059;product=ribosomal protein S3;protein_id=YP_538803.1;transl_table=11;translation=length.216
+NC_007942	GenBank	gene	81954	82604	.	-	1	ID=GlmaCp059.gene;Alias=GlmaCp059;Dbxref=GeneID:3989335;Name=rps3;locus_tag=GlmaCp059
+NC_007942	GenBank	CDS	82965	83243	.	-	1	ID=GlmaCp060;Dbxref=GeneID:3989336;Name=rps19;Note=30S ribosomal protein S19;codon_start=1;locus_tag=GlmaCp060;product=ribosomal protein S19;protein_id=YP_538804.1;transl_table=11;translation=length.92
+NC_007942	GenBank	gene	82965	83243	.	-	1	ID=GlmaCp060.gene;Alias=GlmaCp060;Dbxref=GeneID:3989336;Name=rps19;locus_tag=GlmaCp060
+NC_007942	GenBank	CDS	83298	83732	.	-	1	ID=GlmaCp061;Dbxref=GeneID:3989337;Name=rpl2;Note=50S ribosomal protein L2;codon_start=1;locus_tag=GlmaCp061;product=ribosomal protein L2;protein_id=YP_538805.1;transl_table=11;translation=length.274
+NC_007942	GenBank	CDS	84452	84841	.	-	1	ID=GlmaCp061;Dbxref=GeneID:3989337;Name=rpl2;Note=50S ribosomal protein L2;codon_start=1;locus_tag=GlmaCp061;product=ribosomal protein L2;protein_id=YP_538805.1;transl_table=11;translation=length.274
+NC_007942	GenBank	gene	83298	84841	.	-	1	ID=GlmaCp061.gene;Alias=GlmaCp061;Dbxref=GeneID:3989337;Name=rpl2;locus_tag=GlmaCp061
+NC_007942	GenBank	CDS	84860	85141	.	-	1	ID=GlmaCp062;Dbxref=GeneID:3989338;Name=rpl23;Note=50S ribosomal protein L23;codon_start=1;locus_tag=GlmaCp062;product=ribosomal protein L23;protein_id=YP_538806.1;transl_table=11;translation=length.93
+NC_007942	GenBank	gene	84860	85141	.	-	1	ID=GlmaCp062.gene;Alias=GlmaCp062;Dbxref=GeneID:3989338;Name=rpl23;locus_tag=GlmaCp062
+NC_007942	GenBank	gene	85586	85659	.	-	1	ID=GlmaCt023;Dbxref=GeneID:3989339;Name=trnI-CAU;locus_tag=GlmaCt023
+NC_007942	GenBank	tRNA	85586	85659	.	-	1	ID=GlmaCt023.r01;Parent=GlmaCt023;Dbxref=GeneID:3989339;Name=trnI-CAU;locus_tag=GlmaCt023;product=tRNA-Ile
+NC_007942	GenBank	CDS	85747	92610	.	+	1	ID=GlmaCp063;Dbxref=GeneID:3989340;Name=ycf2;Note=hypothetical protein RF2;codon_start=1;locus_tag=GlmaCp063;product=Ycf2;protein_id=YP_538807.1;transl_table=11;translation=length.2287
+NC_007942	GenBank	gene	85747	92610	.	+	1	ID=GlmaCp063.gene;Alias=GlmaCp063;Dbxref=GeneID:3989340;Name=ycf2;locus_tag=GlmaCp063
+NC_007942	GenBank	gene	93011	93091	.	-	1	ID=GlmaCt024;Dbxref=GeneID:3989341;Name=trnL-CAA;locus_tag=GlmaCt024
+NC_007942	GenBank	tRNA	93011	93091	.	-	1	ID=GlmaCt024.r01;Parent=GlmaCt024;Dbxref=GeneID:3989341;Name=trnL-CAA;locus_tag=GlmaCt024;product=tRNA-Leu
+NC_007942	GenBank	CDS	93692	94447	.	-	1	ID=GlmaCp064;Dbxref=GeneID:3989342;Name=ndhB;codon_start=1;gene_synonym=ndh2;locus_tag=GlmaCp064;product=NADH dehydrogenase subunit 2;protein_id=YP_538808.1;transl_table=11;translation=length.510
+NC_007942	GenBank	CDS	95139	95915	.	-	1	ID=GlmaCp064;Dbxref=GeneID:3989342;Name=ndhB;codon_start=1;gene_synonym=ndh2;locus_tag=GlmaCp064;product=NADH dehydrogenase subunit 2;protein_id=YP_538808.1;transl_table=11;translation=length.510
+NC_007942	GenBank	gene	93692	95915	.	-	1	ID=GlmaCp064.gene;Alias=GlmaCp064;Dbxref=GeneID:3989342;Name=ndhB;gene_synonym=ndh2;locus_tag=GlmaCp064
+NC_007942	GenBank	CDS	96221	96688	.	-	1	ID=GlmaCp065;Dbxref=GeneID:3989343;Name=rps7;Note=30S ribosomal protein S7;codon_start=1;locus_tag=GlmaCp065;product=ribosomal protein S7;protein_id=YP_538809.1;transl_table=11;translation=length.155
+NC_007942	GenBank	gene	96221	96688	.	-	1	ID=GlmaCp065.gene;Alias=GlmaCp065;Dbxref=GeneID:3989343;Name=rps7;locus_tag=GlmaCp065
+NC_007942	GenBank	gene	99309	99380	.	+	1	ID=GlmaCt025;Dbxref=GeneID:3989344;Name=trnV-GAC;locus_tag=GlmaCt025
+NC_007942	GenBank	tRNA	99309	99380	.	+	1	ID=GlmaCt025.r01;Parent=GlmaCt025;Dbxref=GeneID:3989344;Name=trnV-GAC;locus_tag=GlmaCt025;product=tRNA-Val
+NC_007942	GenBank	gene	99602	101092	.	+	1	ID=GlmaCr001;Dbxref=GeneID:3989345;Name=rrn16;locus_tag=GlmaCr001
+NC_007942	GenBank	rRNA	99602	101092	.	+	1	ID=GlmaCr001.r01;Parent=GlmaCr001;Dbxref=GeneID:3989345;Name=rrn16;locus_tag=GlmaCr001;product=16S ribosomal RNA
+NC_007942	GenBank	gene	101394	102418	.	+	1	ID=GlmaCt026;Dbxref=GeneID:3989346;Name=trnI-GAU;locus_tag=GlmaCt026
+NC_007942	GenBank	tRNA	101394	101430	.	+	1	ID=GlmaCt026.r01;Parent=GlmaCt026;Dbxref=GeneID:3989346;Name=trnI-GAU;locus_tag=GlmaCt026;product=tRNA-Ile
+NC_007942	GenBank	tRNA	102384	102418	.	+	1	ID=GlmaCt026.r01;Parent=GlmaCt026;Dbxref=GeneID:3989346;Name=trnI-GAU;locus_tag=GlmaCt026;product=tRNA-Ile
+NC_007942	GenBank	gene	102483	103365	.	+	1	ID=GlmaCt027;Dbxref=GeneID:3989347;Name=trnA-UGC;locus_tag=GlmaCt027
+NC_007942	GenBank	tRNA	102483	102520	.	+	1	ID=GlmaCt027.r01;Parent=GlmaCt027;Dbxref=GeneID:3989347;Name=trnA-UGC;locus_tag=GlmaCt027;product=tRNA-Ala
+NC_007942	GenBank	tRNA	103331	103365	.	+	1	ID=GlmaCt027.r01;Parent=GlmaCt027;Dbxref=GeneID:3989347;Name=trnA-UGC;locus_tag=GlmaCt027;product=tRNA-Ala
+NC_007942	GenBank	gene	103524	106334	.	+	1	ID=GlmaCr002;Dbxref=GeneID:3989348;Name=rrn23;locus_tag=GlmaCr002
+NC_007942	GenBank	rRNA	103524	106334	.	+	1	ID=GlmaCr002.r01;Parent=GlmaCr002;Dbxref=GeneID:3989348;Name=rrn23;locus_tag=GlmaCr002;product=23S ribosomal RNA
+NC_007942	GenBank	gene	106436	106539	.	+	1	ID=GlmaCr003;Dbxref=GeneID:3989349;Name=rrn4.5;locus_tag=GlmaCr003
+NC_007942	GenBank	rRNA	106436	106539	.	+	1	ID=GlmaCr003.r01;Parent=GlmaCr003;Dbxref=GeneID:3989349;Name=rrn4.5;locus_tag=GlmaCr003;product=4.5S ribosomal RNA
+NC_007942	GenBank	gene	106768	106888	.	+	1	ID=GlmaCr004;Dbxref=GeneID:3989350;Name=rrn5;locus_tag=GlmaCr004
+NC_007942	GenBank	rRNA	106768	106888	.	+	1	ID=GlmaCr004.r01;Parent=GlmaCr004;Dbxref=GeneID:3989350;Name=rrn5;locus_tag=GlmaCr004;product=5S ribosomal RNA
+NC_007942	GenBank	gene	107141	107214	.	+	1	ID=GlmaCt028;Dbxref=GeneID:3989351;Name=trnR-ACG;locus_tag=GlmaCt028
+NC_007942	GenBank	tRNA	107141	107214	.	+	1	ID=GlmaCt028.r01;Parent=GlmaCt028;Dbxref=GeneID:3989351;Name=trnR-ACG;locus_tag=GlmaCt028;product=tRNA-Arg
+NC_007942	GenBank	gene	107838	107909	.	-	1	ID=GlmaCt029;Dbxref=GeneID:3989352;Name=trnN-GUU;locus_tag=GlmaCt029
+NC_007942	GenBank	tRNA	107838	107909	.	-	1	ID=GlmaCt029.r01;Parent=GlmaCt029;Dbxref=GeneID:3989352;Name=trnN-GUU;locus_tag=GlmaCt029;product=tRNA-Asn
+NC_007942	GenBank	CDS	108272	113650	.	+	1	ID=GlmaCp066;Dbxref=GeneID:3989353;Name=ycf1;codon_start=1;locus_tag=GlmaCp066;product=hypothetical chloroplast RF1;protein_id=YP_538810.1;transl_table=11;translation=length.1792
+NC_007942	GenBank	gene	108272	113650	.	+	1	ID=GlmaCp066.gene;Alias=GlmaCp066;Dbxref=GeneID:3989353;Name=ycf1;locus_tag=GlmaCp066
+NC_007942	GenBank	CDS	114086	114358	.	+	1	ID=GlmaCp067;Dbxref=GeneID:3989354;Name=rps15;codon_start=1;locus_tag=GlmaCp067;product=ribosomal protein S15;protein_id=YP_538811.1;transl_table=11;translation=length.90
+NC_007942	GenBank	gene	114086	114358	.	+	1	ID=GlmaCp067.gene;Alias=GlmaCp067;Dbxref=GeneID:3989354;Name=rps15;locus_tag=GlmaCp067
+NC_007942	GenBank	CDS	114459	115640	.	+	1	ID=GlmaCp068;Dbxref=GeneID:3989355;Name=ndhH;Note=NADH dehydrogenase 49 kDa subunit;codon_start=1;locus_tag=GlmaCp068;product=NADH dehydrogenase subunit 7;protein_id=YP_538812.1;transl_table=11;translation=length.393
+NC_007942	GenBank	gene	114459	115640	.	+	1	ID=GlmaCp068.gene;Alias=GlmaCp068;Dbxref=GeneID:3989355;Name=ndhH;locus_tag=GlmaCp068
+NC_007942	GenBank	CDS	115642	116193	.	+	1	ID=GlmaCp069;Dbxref=GeneID:3989356;Name=ndhA;codon_start=1;gene_synonym=ndh1;locus_tag=GlmaCp069;product=NADH dehydrogenase subunit 1;protein_id=YP_538813.1;transl_table=11;translation=length.363
+NC_007942	GenBank	CDS	117462	118001	.	+	1	ID=GlmaCp069;Dbxref=GeneID:3989356;Name=ndhA;codon_start=1;gene_synonym=ndh1;locus_tag=GlmaCp069;product=NADH dehydrogenase subunit 1;protein_id=YP_538813.1;transl_table=11;translation=length.363
+NC_007942	GenBank	gene	115642	118001	.	+	1	ID=GlmaCp069.gene;Alias=GlmaCp069;Dbxref=GeneID:3989356;Name=ndhA;gene_synonym=ndh1;locus_tag=GlmaCp069
+NC_007942	GenBank	CDS	118077	118568	.	+	1	ID=GlmaCp070;Dbxref=GeneID:3989357;Name=ndhI;Note=NADH dehydrogenase 18 kDa subunit;codon_start=1;gene_synonym=frxB;locus_tag=GlmaCp070;product=NADH dehydrogenase subunit I;protein_id=YP_538814.1;transl_table=11;translation=length.163
+NC_007942	GenBank	gene	118077	118568	.	+	1	ID=GlmaCp070.gene;Alias=GlmaCp070;Dbxref=GeneID:3989357;Name=ndhI;gene_synonym=frxB;locus_tag=GlmaCp070
+NC_007942	GenBank	CDS	118871	119401	.	+	1	ID=GlmaCp071;Dbxref=GeneID:3989358;Name=ndhG;codon_start=1;locus_tag=GlmaCp071;product=NADH dehydrogenase subunit 6;protein_id=YP_538815.1;transl_table=11;translation=length.176
+NC_007942	GenBank	gene	118871	119401	.	+	1	ID=GlmaCp071.gene;Alias=GlmaCp071;Dbxref=GeneID:3989358;Name=ndhG;locus_tag=GlmaCp071
+NC_007942	GenBank	CDS	119641	119946	.	+	1	ID=GlmaCp072;Dbxref=GeneID:3989359;Name=ndhE;codon_start=1;gene_synonym=ndh4L;locus_tag=GlmaCp072;product=NADH dehydrogenase subunit 4L;protein_id=YP_538816.1;transl_table=11;translation=length.101
+NC_007942	GenBank	gene	119641	119946	.	+	1	ID=GlmaCp072.gene;Alias=GlmaCp072;Dbxref=GeneID:3989359;Name=ndhE;gene_synonym=ndh4L;locus_tag=GlmaCp072
+NC_007942	GenBank	CDS	120242	120487	.	+	1	ID=GlmaCp073;Dbxref=GeneID:3989360;Name=psaC;Note=photosystem I iron-sulfur center%3B 9 kDa protein;codon_start=1;locus_tag=GlmaCp073;product=photosystem I subunit VII;protein_id=YP_538817.1;transl_table=11;translation=length.81
+NC_007942	GenBank	gene	120242	120487	.	+	1	ID=GlmaCp073.gene;Alias=GlmaCp073;Dbxref=GeneID:3989360;Name=psaC;locus_tag=GlmaCp073
+NC_007942	GenBank	CDS	120617	122113	.	+	1	ID=GlmaCp074;Dbxref=GeneID:3989361;Name=ndhD;Note=start codon may be formed as a result of RNA editing;codon_start=1;gene_synonym=ndh4;locus_tag=GlmaCp074;product=NADH dehydrogenase subunit 4;protein_id=YP_538818.1;transl_except=(pos:120617..120619%2Caa:Met);transl_table=11;translation=length.498
+NC_007942	GenBank	gene	120617	122113	.	+	1	ID=GlmaCp074.gene;Alias=GlmaCp074;Dbxref=GeneID:3989361;Name=ndhD;gene_synonym=ndh4;locus_tag=GlmaCp074
+NC_007942	GenBank	CDS	122382	123359	.	-	1	ID=GlmaCp075;Dbxref=GeneID:3989362;Name=ccsA;codon_start=1;gene_synonym=ycf5;locus_tag=GlmaCp075;product=cytochrome c biogenesis protein;protein_id=YP_538819.1;transl_table=11;translation=length.325
+NC_007942	GenBank	gene	122382	123359	.	-	1	ID=GlmaCp075.gene;Alias=GlmaCp075;Dbxref=GeneID:3989362;Name=ccsA;gene_synonym=ycf5;locus_tag=GlmaCp075
+NC_007942	GenBank	gene	123445	123524	.	-	1	ID=GlmaCt030;Dbxref=GeneID:3989363;Name=trnL-UAG;locus_tag=GlmaCt030
+NC_007942	GenBank	tRNA	123445	123524	.	-	1	ID=GlmaCt030.r01;Parent=GlmaCt030;Dbxref=GeneID:3989363;Name=trnL-UAG;locus_tag=GlmaCt030;product=tRNA-Leu
+NC_007942	GenBank	CDS	123822	123983	.	-	1	ID=GlmaCp076;Dbxref=GeneID:3989364;Name=rpl32;codon_start=1;locus_tag=GlmaCp076;product=ribosomal protein L32;protein_id=YP_538820.1;transl_table=11;translation=length.53
+NC_007942	GenBank	gene	123822	123983	.	-	1	ID=GlmaCp076.gene;Alias=GlmaCp076;Dbxref=GeneID:3989364;Name=rpl32;locus_tag=GlmaCp076
+NC_007942	GenBank	CDS	124392	126644	.	+	1	ID=GlmaCp077;Dbxref=GeneID:3989365;Name=ndhF;codon_start=1;gene_synonym=ndh5;locus_tag=GlmaCp077;product=NADH dehydrogenase subunit 5;protein_id=YP_538821.1;transl_table=11;translation=length.750
+NC_007942	GenBank	gene	124392	126644	.	+	1	ID=GlmaCp077.gene;Alias=GlmaCp077;Dbxref=GeneID:3989365;Name=ndhF;gene_synonym=ndh5;locus_tag=GlmaCp077
+NC_007942	GenBank	CDS	126634	127122	.	-	1	ID=GlmaCp078;Dbxref=GeneID:3989366;Name=ycf1;codon_start=1;locus_tag=GlmaCp078;product=hypothetical chloroplast RF1;protein_id=YP_538822.1;transl_table=11;translation=length.162
+NC_007942	GenBank	gene	126634	127122	.	-	1	ID=GlmaCp078.gene;Alias=GlmaCp078;Dbxref=GeneID:3989366;Name=ycf1;locus_tag=GlmaCp078
+NC_007942	GenBank	gene	127485	127556	.	+	1	ID=GlmaCt031;Dbxref=GeneID:3989367;Name=trnN-GUU;locus_tag=GlmaCt031
+NC_007942	GenBank	tRNA	127485	127556	.	+	1	ID=GlmaCt031.r01;Parent=GlmaCt031;Dbxref=GeneID:3989367;Name=trnN-GUU;locus_tag=GlmaCt031;product=tRNA-Asn
+NC_007942	GenBank	gene	128180	128253	.	-	1	ID=GlmaCt032;Dbxref=GeneID:3989368;Name=trnR-ACG;locus_tag=GlmaCt032
+NC_007942	GenBank	tRNA	128180	128253	.	-	1	ID=GlmaCt032.r01;Parent=GlmaCt032;Dbxref=GeneID:3989368;Name=trnR-ACG;locus_tag=GlmaCt032;product=tRNA-Arg
+NC_007942	GenBank	gene	128506	128626	.	-	1	ID=GlmaCr005;Dbxref=GeneID:3989369;Name=rrn5;locus_tag=GlmaCr005
+NC_007942	GenBank	rRNA	128506	128626	.	-	1	ID=GlmaCr005.r01;Parent=GlmaCr005;Dbxref=GeneID:3989369;Name=rrn5;locus_tag=GlmaCr005;product=5S ribosomal RNA
+NC_007942	GenBank	gene	128855	128958	.	-	1	ID=GlmaCr006;Dbxref=GeneID:3989370;Name=rrn4.5;locus_tag=GlmaCr006
+NC_007942	GenBank	rRNA	128855	128958	.	-	1	ID=GlmaCr006.r01;Parent=GlmaCr006;Dbxref=GeneID:3989370;Name=rrn4.5;locus_tag=GlmaCr006;product=4.5S ribosomal RNA
+NC_007942	GenBank	gene	129057	131867	.	-	1	ID=GlmaCr007;Dbxref=GeneID:3989371;Name=rrn23;locus_tag=GlmaCr007
+NC_007942	GenBank	rRNA	129057	131867	.	-	1	ID=GlmaCr007.r01;Parent=GlmaCr007;Dbxref=GeneID:3989371;Name=rrn23;locus_tag=GlmaCr007;product=23S ribosomal RNA
+NC_007942	GenBank	gene	132029	132911	.	-	1	ID=GlmaCt033;Dbxref=GeneID:3989372;Name=trnA-UGC;locus_tag=GlmaCt033
+NC_007942	GenBank	tRNA	132029	132063	.	-	1	ID=GlmaCt033.r01;Parent=GlmaCt033;Dbxref=GeneID:3989372;Name=trnA-UGC;locus_tag=GlmaCt033;product=tRNA-Ala
+NC_007942	GenBank	tRNA	132874	132911	.	-	1	ID=GlmaCt033.r01;Parent=GlmaCt033;Dbxref=GeneID:3989372;Name=trnA-UGC;locus_tag=GlmaCt033;product=tRNA-Ala
+NC_007942	GenBank	gene	132976	134001	.	-	1	ID=GlmaCt034;Dbxref=GeneID:3989373;Name=trnI-UAG;locus_tag=GlmaCt034
+NC_007942	GenBank	tRNA	132976	133010	.	-	1	ID=GlmaCt034.r01;Parent=GlmaCt034;Dbxref=GeneID:3989373;Name=trnI-UAG;locus_tag=GlmaCt034;product=tRNA-Ile
+NC_007942	GenBank	tRNA	133964	134001	.	-	1	ID=GlmaCt034.r01;Parent=GlmaCt034;Dbxref=GeneID:3989373;Name=trnI-UAG;locus_tag=GlmaCt034;product=tRNA-Ile
+NC_007942	GenBank	gene	134302	135792	.	-	1	ID=GlmaCr008;Dbxref=GeneID:3989374;Name=rrn16;locus_tag=GlmaCr008
+NC_007942	GenBank	rRNA	134302	135792	.	-	1	ID=GlmaCr008.r01;Parent=GlmaCr008;Dbxref=GeneID:3989374;Name=rrn16;locus_tag=GlmaCr008;product=16S ribosomal RNA
+NC_007942	GenBank	gene	136014	136085	.	-	1	ID=GlmaCt035;Dbxref=GeneID:3989375;Name=trnV-GAC;locus_tag=GlmaCt035
+NC_007942	GenBank	tRNA	136014	136085	.	-	1	ID=GlmaCt035.r01;Parent=GlmaCt035;Dbxref=GeneID:3989375;Name=trnV-GAC;locus_tag=GlmaCt035;product=tRNA-Val
+NC_007942	GenBank	CDS	138706	139173	.	+	1	ID=GlmaCp079;Dbxref=GeneID:3989376;Name=rps7;Note=30S ribosomal protein S7;codon_start=1;locus_tag=GlmaCp079;product=ribosomal protein S7;protein_id=YP_538823.1;transl_table=11;translation=length.155
+NC_007942	GenBank	gene	138706	139173	.	+	1	ID=GlmaCp079.gene;Alias=GlmaCp079;Dbxref=GeneID:3989376;Name=rps7;locus_tag=GlmaCp079
+NC_007942	GenBank	CDS	139479	140255	.	+	1	ID=GlmaCp080;Dbxref=GeneID:3989377;Name=ndhB;codon_start=1;gene_synonym=ndh2;locus_tag=GlmaCp080;product=NADH dehydrogenase subunit 2;protein_id=YP_538824.1;transl_table=11;translation=length.510
+NC_007942	GenBank	CDS	140947	141702	.	+	1	ID=GlmaCp080;Dbxref=GeneID:3989377;Name=ndhB;codon_start=1;gene_synonym=ndh2;locus_tag=GlmaCp080;product=NADH dehydrogenase subunit 2;protein_id=YP_538824.1;transl_table=11;translation=length.510
+NC_007942	GenBank	gene	139479	141702	.	+	1	ID=GlmaCp080.gene;Alias=GlmaCp080;Dbxref=GeneID:3989377;Name=ndhB;gene_synonym=ndh2;locus_tag=GlmaCp080
+NC_007942	GenBank	gene	142303	142383	.	+	1	ID=GlmaCt036;Dbxref=GeneID:3989378;Name=trnL-CAA;locus_tag=GlmaCt036
+NC_007942	GenBank	tRNA	142303	142383	.	+	1	ID=GlmaCt036.r01;Parent=GlmaCt036;Dbxref=GeneID:3989378;Name=trnL-CAA;locus_tag=GlmaCt036;product=tRNA-Leu
+NC_007942	GenBank	CDS	142784	149647	.	-	1	ID=GlmaCp081;Dbxref=GeneID:3989252;Name=ycf2;Note=hypothetical protein RF2;codon_start=1;locus_tag=GlmaCp081;product=Ycf2;protein_id=YP_538825.1;transl_table=11;translation=length.2287
+NC_007942	GenBank	gene	142784	149647	.	-	1	ID=GlmaCp081.gene;Alias=GlmaCp081;Dbxref=GeneID:3989252;Name=ycf2;locus_tag=GlmaCp081
+NC_007942	GenBank	gene	149735	149808	.	+	1	ID=GlmaCt037;Dbxref=GeneID:3989253;Name=trnI-CAU;locus_tag=GlmaCt037
+NC_007942	GenBank	tRNA	149735	149808	.	+	1	ID=GlmaCt037.r01;Parent=GlmaCt037;Dbxref=GeneID:3989253;Name=trnI-CAU;locus_tag=GlmaCt037;product=tRNA-Ile
+NC_007942	GenBank	CDS	150253	150534	.	+	1	ID=GlmaCp082;Dbxref=GeneID:3989254;Name=rpl23;Note=50S ribosomal protein L23;codon_start=1;locus_tag=GlmaCp082;product=ribosomal protein L23;protein_id=YP_538826.1;transl_table=11;translation=length.93
+NC_007942	GenBank	gene	150253	150534	.	+	1	ID=GlmaCp082.gene;Alias=GlmaCp082;Dbxref=GeneID:3989254;Name=rpl23;locus_tag=GlmaCp082
+NC_007942	GenBank	CDS	150553	150945	.	+	1	ID=GlmaCp083;Dbxref=GeneID:3989255;Name=rpl2;Note=50S ribosomal protein L2;codon_start=1;locus_tag=GlmaCp083;product=ribosomal protein L2;protein_id=YP_538827.1;transl_table=11;translation=length.274
+NC_007942	GenBank	CDS	151665	152096	.	+	1	ID=GlmaCp083;Dbxref=GeneID:3989255;Name=rpl2;Note=50S ribosomal protein L2;codon_start=1;locus_tag=GlmaCp083;product=ribosomal protein L2;protein_id=YP_538827.1;transl_table=11;translation=length.274
+NC_007942	GenBank	gene	150553	152096	.	+	1	ID=GlmaCp083.gene;Alias=GlmaCp083;Dbxref=GeneID:3989255;Name=rpl2;locus_tag=GlmaCp083

@@ -564,7 +564,7 @@ sub setup_client_req {
 	my $setup_client = new OxdSetupClient( );
 	
 	$setup_client->setRequestOpHost($ophost_ui);
-	$setup_client->setRequestAcrValues($acrValues);
+	#$setup_client->setRequestAcrValues($acrValues);
 	$setup_client->setRequestAuthorizationRedirectUri($auth_redirect_uri_ui);
 	$setup_client->setRequestPostLogoutRedirectUri($post_logout_uri_ui);
 	$setup_client->setRequestClientLogoutUris([$clientFrontChannelLogoutUrl]);

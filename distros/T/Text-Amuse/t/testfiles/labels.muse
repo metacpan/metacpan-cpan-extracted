@@ -1,0 +1,68 @@
+#title Labels
+
+; A comment to make sure anchor is not parsed as a directive
+
+#start-label
+
+** First chapter
+
+Starting here
+
+#more-info-1
+** More info 1
+#hello-1
+
+
+#more-info-2 and more
+** More info 2
+#hello-2 and more
+
+#valid-before
+paragraph with a label before
+
+paragraph with a label after
+#valid-after
+
+paragraph with label in the middle
+#label-middle
+paragraph.
+
+#label-begin with material
+Here the paragraph continues [1]
+
+[1] Can I have a label in a
+    #footnote footnote?
+
+#before
+** heading, this is ok
+
+** heading after, this is ok as well
+#after
+
+** #inside header
+
+ - #inlist in  list
+
+ 1. #inlist-2 as well
+
+*** References
+
+[[#more-info-1][Begin]]
+
+[[#hello-1][Second]]
+
+[[#more-info-2][3rd]]
+
+[[#hello-2][4th]]
+
+[[#valid-before][before]]
+
+[[#valid-after][after]]
+
+[[#label-middle][middle]]
+
+[[#label-begin][begin]]
+
+[[#before][before]]
+
+[[#after][after]]

@@ -13,7 +13,7 @@ Data::JSONSchema::Ajv - JSON Schema Validator wrapping Ajv
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -240,10 +240,10 @@ package Data::JSONSchema::Ajv {
         $js->eval("$name = data_json_schema_ajv_type_exchange($name);");
     }
 }
-$Data::JSONSchema::Ajv::VERSION = '0.03';;
+$Data::JSONSchema::Ajv::VERSION = '0.04';;
 
 package Data::JSONSchema::Ajv::Validator {
-$Data::JSONSchema::Ajv::Validator::VERSION = '0.03';
+$Data::JSONSchema::Ajv::Validator::VERSION = '0.04';
 use strict;
     use warnings;
 

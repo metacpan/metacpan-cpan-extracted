@@ -727,7 +727,7 @@ C<refEmployeeInvitedBy> and C<refEmployeeInvitedBys>.
 
 =head1 Known issues
 
-This module is tested only with PostgreSQL and MySQL databases. 
+This module is tested only with PostgreSQL, MySQL and SQLite databases. 
 If you need other database support be prepared to help me to test
 and debug it.
 

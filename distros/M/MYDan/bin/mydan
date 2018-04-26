@@ -45,6 +45,7 @@ my @cmd =
     [ 'release', "发布${name}.", 'dan/tools/release' ],
     [ 'supervisor', '守护方式启动进程.', 'dan/tools/supervisor', 'box/tools/supervisor' ],
     [ 'tai64nlocal', '查看tai64格式日志.', 'dan/tools/tai64nlocal' ],
+    [ 'diagnosis', "系统诊断.\n", 'dan/diagnosis/bin/diagnosis' ],
     [ 'tcpserver', "脚本提供tcp服务.\n", 'dan/tools/tcpserver' ],
 
     [ 'diskSpaceControl', "控制磁盘使用空间在某个百分比.\n", 'dan/tools/diskSpaceControl', 'box/tools/diskSpaceControl' ],

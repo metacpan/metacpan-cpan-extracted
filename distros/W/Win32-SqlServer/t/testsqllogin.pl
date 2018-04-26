@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/testsqllogin.pl 7     12-08-18 21:32 Sommar $
+# $Header: /Perl/OlleDB/t/testsqllogin.pl 9     18-04-13 21:49 Sommar $
 #
 # This file is C<required> by all test scripts. It defines a sub that
 # connects to SQL Server, and changes current directory to the test
@@ -7,6 +7,18 @@
 # are written there.
 #
 # $History: testsqllogin.pl $
+# 
+# *****************  Version 9  *****************
+# User: Sommar       Date: 18-04-13   Time: 21:49
+# Updated in $/Perl/OlleDB/t
+# Correction to clr_enabled function.
+# 
+# *****************  Version 8  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 7  *****************
 # User: Sommar       Date: 12-08-18   Time: 21:32
@@ -104,6 +116,32 @@ SQLEND
 SQLEND
       return ($csid == 1);
    }
+}
+
+
+sub clr_enabled {
+   my($X) = @_;
+
+   my ($sqlver) = split(/\./, $X->{SQL_version});
+
+   return 0 if $sqlver <= 8;
+
+   my $clr_enabled = $X->sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
+   SELECT CASE WHEN SUM(value)> 0 THEN 1 ELSE 0 END
+   FROM   (SELECT convert(int, value_in_use) AS value
+           FROM   sys.configurations
+           WHERE  name = 'clr enabled'
+           UNION ALL
+           SELECT -convert(int, value_in_use)
+           FROM   sys.configurations
+           WHERE  name = 'clr strict security') AS u
+SQLEND
+
+   if ($clr_enabled and $sqlver >= 11 and $sqlver <=13) {
+      my $tracestatus = $X->sql_one('DBCC TRACESTATUS(6545) WITH NO_INFOMSGS', Win32::SqlServer::HASH);
+      if ($$tracestatus{'Status'}) {$clr_enabled = 0}
+   }
+   return $clr_enabled;
 }
 
 

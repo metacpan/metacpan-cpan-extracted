@@ -1,5 +1,11 @@
 Revision history for App-Fasops
 
+0.6.0 2018-04-22T14:40:50Z
+    - Add `fasops consensus`
+    - Add poa_consensus() to Common.pm
+    - Require Perl 5.18 as previous versions failed to find shared file
+    - Better description() for all commands
+
 0.5.16 2018-04-16T16:07:23Z
     - Add --simple to `fasops split`
 

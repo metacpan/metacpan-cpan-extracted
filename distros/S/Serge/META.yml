@@ -1,0 +1,216 @@
+---
+abstract: 'Solution for continuous localization'
+author:
+  - 'Igor Afanasyev <igor.afanasyev@gmail.com>'
+build_requires:
+  File::Copy::Recursive: 0
+  IO::String: 0
+  Test::More: 0.94
+  Text::CSV_XS: 0
+  Text::Diff: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Serge
+provides:
+  Serge:
+    file: lib/Serge.pm
+    version: v1.3.2
+  Serge::Application:
+    file: lib/Serge/Application.pm
+  Serge::Command:
+    file: lib/Serge/Command.pm
+  Serge::Command::clean_ts:
+    file: lib/Serge/Command/clean_ts.pm
+  Serge::Command::gendocs:
+    file: lib/Serge/Command/gendocs.pm
+  Serge::Command::help:
+    file: lib/Serge/Command/help.pm
+  Serge::Command::import:
+    file: lib/Serge/Command/import.pm
+  Serge::Command::sync:
+    file: lib/Serge/Command/sync.pm
+  Serge::Command::test_parser:
+    file: lib/Serge/Command/test_parser.pm
+  Serge::Config:
+    file: lib/Serge/Config.pm
+  Serge::Config::Collector:
+    file: lib/Serge/Config/Collector.pm
+  Serge::DB:
+    file: lib/Serge/DB.pm
+  Serge::DB::Cached:
+    file: lib/Serge/DB/Cached.pm
+  Serge::Engine:
+    file: lib/Serge/Engine.pm
+  Serge::Engine::Job:
+    file: lib/Serge/Engine/Job.pm
+  Serge::Engine::Plugin::Base::Parser:
+    file: lib/Serge/Engine/Plugin/Base/Parser.pm
+  Serge::Engine::Plugin::Base::Serializer:
+    file: lib/Serge/Engine/Plugin/Base/Serializer.pm
+  Serge::Engine::Plugin::Base::Transform:
+    file: lib/Serge/Engine/Plugin/Base/Transform.pm
+  Serge::Engine::Plugin::Transform::case:
+    file: lib/Serge/Engine/Plugin/Transform/case.pm
+  Serge::Engine::Plugin::Transform::endpunc:
+    file: lib/Serge/Engine/Plugin/Transform/endpunc.pm
+  Serge::Engine::Plugin::Transform::tags:
+    file: lib/Serge/Engine/Plugin/Transform/tags.pm
+  Serge::Engine::Plugin::Transform::whitespace:
+    file: lib/Serge/Engine/Plugin/Transform/whitespace.pm
+  Serge::Engine::Plugin::Transform::wrappertag:
+    file: lib/Serge/Engine/Plugin/Transform/wrappertag.pm
+  Serge::Engine::Plugin::append_hint_message:
+    file: lib/Serge/Engine/Plugin/append_hint_message.pm
+  Serge::Engine::Plugin::completeness:
+    file: lib/Serge/Engine/Plugin/completeness.pm
+  Serge::Engine::Plugin::control_commands:
+    file: lib/Serge/Engine/Plugin/control_commands.pm
+  Serge::Engine::Plugin::feature_branch:
+    file: lib/Serge/Engine/Plugin/feature_branch.pm
+  Serge::Engine::Plugin::if:
+    file: lib/Serge/Engine/Plugin/if.pm
+  Serge::Engine::Plugin::limit_languages:
+    file: lib/Serge/Engine/Plugin/limit_languages.pm
+  Serge::Engine::Plugin::metaparser:
+    file: lib/Serge/Engine/Plugin/metaparser.pm
+  Serge::Engine::Plugin::parse_android:
+    file: lib/Serge/Engine/Plugin/parse_android.pm
+  Serge::Engine::Plugin::parse_bypass:
+    file: lib/Serge/Engine/Plugin/parse_bypass.pm
+  Serge::Engine::Plugin::parse_chrome_json:
+    file: lib/Serge/Engine/Plugin/parse_chrome_json.pm
+  Serge::Engine::Plugin::parse_csv:
+    file: lib/Serge/Engine/Plugin/parse_csv.pm
+  Serge::Engine::Plugin::parse_dtd:
+    file: lib/Serge/Engine/Plugin/parse_dtd.pm
+  Serge::Engine::Plugin::parse_go:
+    file: lib/Serge/Engine/Plugin/parse_go.pm
+  Serge::Engine::Plugin::parse_hash:
+    file: lib/Serge/Engine/Plugin/parse_hash.pm
+  Serge::Engine::Plugin::parse_js:
+    file: lib/Serge/Engine/Plugin/parse_js.pm
+  Serge::Engine::Plugin::parse_json:
+    file: lib/Serge/Engine/Plugin/parse_json.pm
+  Serge::Engine::Plugin::parse_json_keyvalue:
+    file: lib/Serge/Engine/Plugin/parse_json_keyvalue.pm
+  Serge::Engine::Plugin::parse_key_space_value:
+    file: lib/Serge/Engine/Plugin/parse_key_space_value.pm
+  Serge::Engine::Plugin::parse_keyvalue:
+    file: lib/Serge/Engine/Plugin/parse_keyvalue.pm
+  Serge::Engine::Plugin::parse_master:
+    file: lib/Serge/Engine/Plugin/parse_master.pm
+  Serge::Engine::Plugin::parse_php_xhtml:
+    file: lib/Serge/Engine/Plugin/parse_php_xhtml.pm
+  Serge::Engine::Plugin::parse_plist:
+    file: lib/Serge/Engine/Plugin/parse_plist.pm
+  Serge::Engine::Plugin::parse_pot:
+    file: lib/Serge/Engine/Plugin/parse_pot.pm
+  Serge::Engine::Plugin::parse_properties:
+    file: lib/Serge/Engine/Plugin/parse_properties.pm
+  Serge::Engine::Plugin::parse_rc:
+    file: lib/Serge/Engine/Plugin/parse_rc.pm
+  Serge::Engine::Plugin::parse_resx:
+    file: lib/Serge/Engine/Plugin/parse_resx.pm
+  Serge::Engine::Plugin::parse_rrc:
+    file: lib/Serge/Engine/Plugin/parse_rrc.pm
+  Serge::Engine::Plugin::parse_strings:
+    file: lib/Serge/Engine/Plugin/parse_strings.pm
+  Serge::Engine::Plugin::parse_ts:
+    file: lib/Serge/Engine/Plugin/parse_ts.pm
+  Serge::Engine::Plugin::parse_wxl:
+    file: lib/Serge/Engine/Plugin/parse_wxl.pm
+  Serge::Engine::Plugin::parse_xliff:
+    file: lib/Serge/Engine/Plugin/parse_xliff.pm
+  Serge::Engine::Plugin::parse_xml:
+    file: lib/Serge/Engine/Plugin/parse_xml.pm
+  Serge::Engine::Plugin::parse_yaml:
+    file: lib/Serge/Engine/Plugin/parse_yaml.pm
+  Serge::Engine::Plugin::process_if:
+    file: lib/Serge/Engine/Plugin/process_if.pm
+  Serge::Engine::Plugin::replace_strings:
+    file: lib/Serge/Engine/Plugin/replace_strings.pm
+  Serge::Engine::Plugin::run_command:
+    file: lib/Serge/Engine/Plugin/run_command.pm
+  Serge::Engine::Plugin::serialize_csv:
+    file: lib/Serge/Engine/Plugin/serialize_csv.pm
+  Serge::Engine::Plugin::serialize_po:
+    file: lib/Serge/Engine/Plugin/serialize_po.pm
+  Serge::Engine::Plugin::test_language:
+    file: lib/Serge/Engine/Plugin/test_language.pm
+  Serge::Engine::Plugin::trademarks:
+    file: lib/Serge/Engine/Plugin/trademarks.pm
+  Serge::Engine::Plugin::transform:
+    file: lib/Serge/Engine/Plugin/transform.pm
+  Serge::Engine::Processor:
+    file: lib/Serge/Engine/Processor.pm
+  Serge::FindFiles:
+    file: lib/Serge/FindFiles.pm
+  Serge::Importer:
+    file: lib/Serge/Importer.pm
+  Serge::Interface::PluginHost:
+    file: lib/Serge/Interface/PluginHost.pm
+  Serge::Interface::SysCmdRunner:
+    file: lib/Serge/Interface/SysCmdRunner.pm
+  Serge::Mail:
+    file: lib/Serge/Mail.pm
+  Serge::Plugin::Base:
+    file: lib/Serge/Plugin/Base.pm
+  Serge::Plugin::Base::Callback:
+    file: lib/Serge/Plugin/Base/Callback.pm
+  Serge::Pod:
+    file: lib/Serge/Pod.pm
+  Serge::ScanTSFiles:
+    file: lib/Serge/ScanTSFiles.pm
+  Serge::Sync:
+    file: lib/Serge/Sync.pm
+  Serge::Sync::Plugin::Base::TranslationService:
+    file: lib/Serge/Sync/Plugin/Base/TranslationService.pm
+  Serge::Sync::Plugin::Base::VCS:
+    file: lib/Serge/Sync/Plugin/Base/VCS.pm
+  Serge::Sync::Plugin::TranslationService::pootle:
+    file: lib/Serge/Sync/Plugin/TranslationService/pootle.pm
+  Serge::Sync::Plugin::VCS::gerrit:
+    file: lib/Serge/Sync/Plugin/VCS/gerrit.pm
+  Serge::Sync::Plugin::VCS::git:
+    file: lib/Serge/Sync/Plugin/VCS/git.pm
+  Serge::Sync::Plugin::VCS::mercurial:
+    file: lib/Serge/Sync/Plugin/VCS/mercurial.pm
+  Serge::Sync::Plugin::VCS::svn:
+    file: lib/Serge/Sync/Plugin/VCS/svn.pm
+  Serge::Sync::Util:
+    file: lib/Serge/Sync/Util.pm
+  Serge::Util:
+    file: lib/Serge/Util.pm
+  Serge::Util::CLDRPlurals:
+    file: lib/Serge/Util/CLDRPlurals.pm
+  Serge::Util::LangID:
+    file: lib/Serge/Util/LangID.pm
+  Serge::Util::Pager:
+    file: lib/Serge/Util/Pager.pm
+  Serge::Util::WordStats:
+    file: lib/Serge/Util/WordStats.pm
+recommends:
+  IO::String: 0
+  Text::CSV_XS: 0
+requires:
+  Authen::SASL: 0
+  Config::Neat: 1.302
+  DBD::SQLite: 0
+  JSON: 0
+  JSON::XS: 0
+  MIME::Lite: 0
+  Net::SMTP::SSL: 0
+  XML::Parser: 0
+  XML::Parser::Style::IxTree: 0
+  XML::Twig: 0
+  YAML::XS: 0
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.3.2

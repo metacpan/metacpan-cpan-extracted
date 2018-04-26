@@ -1,0 +1,58 @@
+{
+   "abstract" : "Gzip a Mojo::Message::Response",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MojoX-Encode-Gzip",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : "0",
+            "Mojolicious" : "7.75",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::Encode::Gzip" : {
+         "file" : "lib/MojoX/Encode/Gzip.pm",
+         "version" : "1.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/MojoX-Encode-Gzip/issues"
+      },
+      "homepage" : "http://github.com/reneeb/MojoX-Encode-Gzip",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/MojoX-Encode-Gzip.git",
+         "web" : "http://github.com/reneeb/MojoX-Encode-Gzip"
+      }
+   },
+   "version" : "1.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

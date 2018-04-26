@@ -1,3 +1,14 @@
+v0.9.6 2018-04-24T17:12:52Z
+ - P->cfg API updated
+ - Docker base image changed from "softvisio/pcore:v0.62.4" to
+   "softvisio/pcore:v0.62.5"
+
+v0.9.5 2018-04-24T13:45:38Z
+ - Docker base image changed from "softvisio/pcore:v0.61.4" to
+   "softvisio/pcore:v0.62.3"
+ - Docker base image changed from "softvisio/pcore:v0.62.3" to
+   "softvisio/pcore:v0.62.4"
+
 v0.9.4 2018-04-15T04:16:03Z
  - Docker base image changed from "softvisio/pcore:v0.61.2" to
    "softvisio/pcore:v0.61.4"

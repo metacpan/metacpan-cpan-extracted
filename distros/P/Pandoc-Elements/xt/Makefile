@@ -1,10 +1,10 @@
 # Usage:
-# $ make -F xt/Makefile
+# $ make -f xt/Makefile
 PANDOC_BINDIR=~/.pandoc/bin
 
 test:
 	for P in ${PANDOC_BINDIR}/pandoc-*; do\
-		prove -lv -Pandoc=$$P t;\
+		RELEASE_TESTING=1 prove -lv -Pandoc=$$P t;\
 	done
 
 index.html: ../lib/Pandoc/Elements.pm 

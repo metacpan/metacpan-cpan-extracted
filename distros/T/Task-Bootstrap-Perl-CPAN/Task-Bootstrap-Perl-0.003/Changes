@@ -1,0 +1,11 @@
+Revision history for Task-Bootstrap-Perl
+
+0.003     2018-04-22
+        - renamed into Task::Bootstrap::Perl::CPAN and re-uploaded
+
+0.002     2015-04-23
+        - actual CPAN release (again?)
+
+0.001     2015-04-18
+        - initial version
+        - dependencies for App::Bootstrap::Perl

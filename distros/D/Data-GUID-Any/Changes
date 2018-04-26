@@ -1,5 +1,11 @@
 Revision history for Data-GUID-Any
 
+0.005     2018-04-22 15:23:46+02:00 Europe/Oslo
+
+    [FIXED]
+
+    - Fixed tests for Perls without . in @INC
+
 0.004     2012-12-03 11:59:00 America/New_York
 
     - Documented that uppercase strings are not compliant with RFC 4122

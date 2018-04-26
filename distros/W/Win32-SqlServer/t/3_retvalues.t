@@ -1,10 +1,17 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/3_retvalues.t 14    08-08-17 20:00 Sommar $
+# $Header: /Perl/OlleDB/t/3_retvalues.t 15    18-04-13 17:23 Sommar $
 #
 # This test suite tests return values from sql_sp. Most of the tests
 # concerns UDFs.
 #
 # $History: 3_retvalues.t $
+# 
+# *****************  Version 15  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 14  *****************
 # User: Sommar       Date: 08-08-17   Time: 20:00
@@ -438,11 +445,7 @@ SQLEND
 $no_of_tests += 8;
 
 
-$clr_enabled = sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-SELECT value
-FROM   sys.configurations
-WHERE  name = 'clr enabled'
-SQLEND
+$clr_enabled = clr_enabled($X);
 
 if ($clr_enabled) {
    create_the_udts($X, 'OlleComplexInteger', 'Olle.Point', 'OlleString',

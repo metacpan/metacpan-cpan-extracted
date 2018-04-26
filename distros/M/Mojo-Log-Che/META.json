@@ -4,7 +4,7 @@
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,5 +38,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mche/Mojo-Log-Che.git",
+         "web" : "https://github.com/mche/Mojo-Log-Che"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

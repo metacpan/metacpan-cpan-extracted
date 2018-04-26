@@ -1,9 +1,16 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/6_paramsql.t 21    15-05-24 22:27 Sommar $
+# $Header: /Perl/OlleDB/t/6_paramsql.t 22    18-04-13 17:23 Sommar $
 #
 # This test suite concerns sql with parameterised SQL statements.
 #
 # $History: 6_paramsql.t $
+# 
+# *****************  Version 22  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 21  *****************
 # User: Sommar       Date: 15-05-24   Time: 22:27
@@ -213,11 +220,7 @@ sql_sp('#create_type', ['datetime2_type', ' datetime2(4)'])
 $X->{errInfo}{printText}  = 0;
 
 if ($sqlver >= 9 and $X->{Provider} >= PROVIDER_SQLNCLI) {
-   $clr_enabled = sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-   SELECT value
-   FROM   sys.configurations
-   WHERE  name = 'clr enabled'
-SQLEND
+   $clr_enabled = clr_enabled($X);
 
    create_the_udts($X, 'OlleComplexInteger', 'OllePoint', 'Olle-String',
                    'OlleString MAX') if $clr_enabled;

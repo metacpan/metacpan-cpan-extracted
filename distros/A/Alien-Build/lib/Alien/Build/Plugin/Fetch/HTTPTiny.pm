@@ -7,7 +7,7 @@ use File::Basename ();
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using HTTP::Tiny
-our $VERSION = '1.39'; # VERSION
+our $VERSION = '1.41'; # VERSION
 
 
 has '+url' => '';
@@ -120,7 +120,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - Plugin for fetching files using HTTP::Ti
 
 =head1 VERSION
 
-version 1.39
+version 1.41
 
 =head1 SYNOPSIS
 

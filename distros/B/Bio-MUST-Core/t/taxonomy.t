@@ -19,13 +19,63 @@ use Bio::MUST::Core::Utils qw(cmp_store);
 
 my $class = 'Bio::MUST::Core::Taxonomy';
 
+# skip all Taxonomy tests unless asked to do so
+const my $TAX_VAR => 'BMC_TEST_TAX';
+unless ( $ENV{$TAX_VAR} ) {
+    plan skip_all => <<"EOT";
+skipped all $class tests!
+These tests are long to run and require downloading the NCBI Taxonomy database.
+To enable them use:
+\$ $TAX_VAR=1 make test
+EOT
+}
+
+
+# database load
+
+# use local database
+my $tax_dir = dir('test', 'taxdump')->stringify;
+
+SKIP: {
+  skip 'due to NCBI Taxonomy database already installed', 1
+    if -e file($tax_dir, 'names.dmp');
+    ok $class->setup_taxdir($tax_dir),
+        'rightly setup the taxdump directory';
+}
+
+SKIP: {
+  skip 'due to binary cache file already built', 1
+    if -e file($tax_dir, 'cachedb.bin');
+    my $tax4cache = $class->new( tax_dir => $tax_dir );
+    $tax4cache->update_cache;
+}
+
+# new_from_cache
+my $tax = $class->new_from_cache( tax_dir => $tax_dir );
+isa_ok $tax, $class;
+
+{
+    my @items = qw(Canis Felis Homo Rattus Gallus);
+
+    my @exp_items = @items;
+    my @exp_ids = qw(9611 9682 9605 10114 9030);
+
+    my @taxon_ids = map { $tax->get_taxid_from_seq_id($_) } @items;
+
+    cmp_deeply \@items, \@exp_items, 'lazy bug: got expected items';
+    cmp_deeply \@taxon_ids, \@exp_ids, 'lazy bug: got expected taxon_ids';
+}
+
+
+# fetch lineages
+
 my @valid_ids = (
 
     # viruses
     [ 'HIV-1 M:C_505006@210038491',     # Note the unusual names of viruses
-        'Viruses; Retro-transcribing viruses; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
-        'Viruses; Retro-transcribing viruses; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
-       ('Viruses; Retro-transcribing viruses; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
+        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
+        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
+       ('Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Primate lentivirus group; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
         q{'HIV-1 M:C U2226'},
         q{'HIV-1 M:C U2226 [210038491]'} ],
 
@@ -184,51 +234,6 @@ my @valid_ids = (
         q{'seq1'} ],
 );
 
-
-# skip all Taxonomy tests unless asked to do so
-const my $TAX_VAR => 'BMC_TEST_TAX';
-unless ( $ENV{$TAX_VAR} ) {
-    plan skip_all => <<"EOT";
-skipped all $class tests!
-These tests are long to run and require downloading the NCBI Taxonomy database.
-To enable them use:
-\$ $TAX_VAR=1 make test
-EOT
-}
-
-# use local database
-my $tax_dir = dir('test', 'taxdump')->stringify;
-
-SKIP: {
-  skip 'due to NCBI Taxonomy database already installed', 1
-    if -e file($tax_dir, 'names.dmp');
-    ok $class->setup_taxdir($tax_dir),
-        'rightly setup the taxdump directory';
-}
-
-SKIP: {
-  skip 'due to binary cache file already built', 1
-    if -e file($tax_dir, 'cachedb.bin');
-    my $tax4cache = $class->new( tax_dir => $tax_dir );
-    $tax4cache->update_cache;
-}
-
-# new_from_cache
-my $tax = $class->new_from_cache( tax_dir => $tax_dir );
-isa_ok $tax, $class;
-
-{
-    my @items = qw(Canis Felis Homo Rattus Gallus);
-
-    my @exp_items = @items;
-    my @exp_ids = qw(9611 9682 9605 10114 9030);
-
-    my @taxon_ids = map { $tax->get_taxid_from_seq_id($_) } @items;
-
-    cmp_deeply \@items, \@exp_items, 'lazy bug: got expected items';
-    cmp_deeply \@taxon_ids, \@exp_ids, 'lazy bug: got expected taxon_ids';
-}
-
 {
     for my $exp_row (@valid_ids) {
         my $seq_id = Bio::MUST::Core::SeqId->new( full_id => $exp_row->[0] );
@@ -249,104 +254,143 @@ isa_ok $tax, $class;
     }
 }
 
-{
-    my $infile = file('test', 'cyanos.arb');
-    my $tree = Bio::MUST::Core::Tree->load($infile);
 
-    $tax->attach_taxonomies_to_terminals($tree);
-    $tax->attach_taxonomies_to_internals($tree);
+# strains and gca numbers
 
-    $tax->attach_taxa_to_entities($tree);
-    $tree->switch_attributes_and_labels_for_internals('taxon');
-    cmp_store(
-        obj => $tree, method => 'store',
-        file => 'cyanos_taxa.tre',
-        test => 'wrote expected taxonomically-annotated tree',
-    );
+sub check_legacy {
+    my $method  = shift;
+
+    tie my     %taxid_for, 'Tie::IxHash';
+    tie my %exp_taxid_for, 'Tie::IxHash';
+
+    my $infile = $method . '.test';
+    open my $in, '<', file('test', $infile);
+
+    my $outfile = "my_$infile";
+    open my $out, '>', file('test', $outfile);
+
+    LINE:
+    while ( my $line = <$in> ) {
+        chomp $line;
+
+        # skip empty lines and comment lines
+        if ($line =~ $EMPTY_LINE
+         || $line =~ $COMMENT_LINE) {
+            say {$out} $line;
+            next LINE;
+        }
+
+        # fetch full_id
+        my ($full_id) = $line =~ m/ (\w+ \s+ \S+) /xms;
+
+        # get taxon_id from seq_id
+        my $seq_id = Bio::MUST::Core::SeqId->new(full_id => $full_id);
+        my $taxid = $tax->$method($seq_id);
+
+        # output full_id => taxon_id pair
+        say {$out} join "\t", $full_id, $taxid // 'NA';
+    }
+
+    close $out;
+    close $in;
+
+    # compare file contents
+    compare_filter_ok(file('test', $outfile), file('test', $infile), \&canonize,
+        "Fetched expected taxon_ids from legacy seq_ids: $infile");
+
+    return;
 }
 
-{
-    my $infile = file('test', 'collapse.tre');
-    my $tree = Bio::MUST::Core::Tree->load($infile);
-
-    $tax->attach_taxonomies_to_terminals($tree);
-    $tax->attach_taxonomies_to_internals($tree);
-
-    $tax->attach_taxa_to_entities($tree, { name => 'family' });
-    $tree->collapse_subtrees;
-    $tree->switch_attributes_and_labels_for_internals('taxon');
-    cmp_store(
-        obj => $tree, method => 'store_figtree',
-        file => 'collapse.nex',
-        test => 'wrote expected taxonomically-annotated tree',
-    );
+sub canonize {
+    my $line = shift;
+    $line =~ s{GC[AF]_(\d+)\.\d+}{GCA_$1.1}xms;
+    return $line;
 }
 
+# TODO: try to make this work again
+
+SKIP: {
+    skip 'due to change in handling of exceptions', 2;
+    check_legacy('get_taxid_from_legacy_seq_id', $tax);
+    check_legacy('get_taxid_from_seq_id', $tax);
+}
+
+
 {
-    # TODO: rewrite using a convenience sub
+    my $infile = 'get_taxonomy_from_gca.test';
 
-    my $infile = file('test', 'PBP3.tre');
-    my $tree = Bio::MUST::Core::Tree->load($infile);
+    open my $in, '<', file('test', $infile);
 
-    $tax->attach_taxonomies_to_terminals($tree);
-    $tax->attach_taxonomies_to_internals($tree);
+    my $outfile = "my_$infile";
+    open my $out, '>', file('test', $outfile);
 
-    # test auto naming with no collapsing and .tre output
-    $tax->attach_taxa_to_entities($tree);
-    $tree->switch_attributes_and_labels_for_internals('taxon');
-    cmp_store(
-        obj => $tree, method => 'store',
-        file => 'PBP3_auto.tre',
-        test => 'wrote expected taxonomically-annotated tree',
+    LINE:
+    while ( my $line = <$in> ) {
+        chomp $line;
+
+        # skip empty lines and comment lines
+        if ($line =~ $EMPTY_LINE
+         || $line =~ $COMMENT_LINE) {
+            say {$out} $line;
+            next LINE;
+        }
+
+        # fetch gca
+        my ($gca) = $line =~ m/^ (\w+ \. \d+) \s /xms;
+
+        # get taxon_id from seq_id
+        my @taxonomy = $tax->get_taxonomy($gca);
+        my $org = $taxonomy[-1];
+
+        # output full_id => taxon_id pair
+        say {$out} join "\t", $gca, $org // 'NA';
+    }
+
+    close $out;
+    close $in;
+
+    # compare file contents
+    compare_filter_ok(file('test', $outfile), file('test', $infile), \&canonize,
+        "Fetched expected taxonomy from GCAs: $infile");
+}
+
+
+# filters and lca inference
+
+{
+    my   @wanted = qw(Fungi Cnidaria);
+    my @unwanted = qw(Ascomycota Anthozoa);
+
+    my $infile = 'test/filters.idl';
+    my $filter = $tax->tax_filter($infile);
+
+    cmp_bag [ $filter->all_wanted ], \@wanted,
+        "loaded expected wanted specs from file: $infile";
+    cmp_bag [ $filter->all_unwanted ], \@unwanted,
+        "loaded expected unwanted specs from file: $infile";
+
+    ok( (List::AllUtils::all { $filter->is_wanted(  $_) } @wanted),
+        "identified wanted taxa as expected:");
+    explain [ $filter->all_wanted ];
+    ok( (List::AllUtils::all { $filter->is_unwanted($_) } @unwanted),
+        "identified unwanted taxa as expected:");
+    explain [ $filter->all_unwanted ];
+
+    my @orgs = (
+        'Phytophthora infestans',
+        'Nessiteras rhombopteryx',          # unknown name   (should be undef)
+        'Podocoryne carnea',                # misspelling    (should be 1)
+        'Podocoryna carnea',
+        'Hydra sp.',                        # non-dupe genus (should be 1)
+        'Arabidopsis thaliana',
+        'Saccharomyces cerevisiae',
+        'Liriope sp.',                      # dupe genus     (should be undef)
     );
-    $tree->switch_attributes_and_labels_for_internals('taxon');
 
-    SKIP: {
-      skip 'due to reccurrent issues linked to NCBI Taxonomy updates', 4
-        unless 1;
-
-        # test auto naming with phylum-level collapsing and .nex output
-        $tax->attach_taxa_to_entities($tree, { collapse => 'phylum' } );
-        $tree->collapse_subtrees;
-        cmp_store(
-            obj => $tree, method => 'store_figtree',
-            file => 'PBP3_auto_phylum.nex',
-            test => 'wrote expected taxonomically-annotated tree',
-        );
-
-        # test family-level naming with no collapsing and .tre output
-        $tax->attach_taxa_to_entities($tree, {     name => 'family' } );
-        $tree->switch_attributes_and_labels_for_internals('taxon');
-        cmp_store(
-            obj => $tree, method => 'store',
-            file => 'PBP3_family.tre',
-            test => 'wrote expected taxonomically-annotated tree',
-        );
-        $tree->switch_attributes_and_labels_for_internals('taxon');
-
-        # test family-level naming with phylum-level collapsing and .nex output
-        $tax->attach_taxa_to_entities($tree, {     name => 'family',
-                                               collapse => 'phylum' } );
-        $tree->collapse_subtrees;
-        cmp_store(
-            obj => $tree, method => 'store_figtree',
-            file => 'PBP3_family_phylum.nex',
-            test => 'wrote expected taxonomically-annotated tree',
-        );
-
-        # test phylum-level naming with phylum-level collapsing, coloring
-        # ... and .nex output!
-        $tax->attach_taxa_to_entities($tree, {     name => 'phylum',
-                                               collapse => 'phylum' } );
-        $tree->collapse_subtrees;
-        my $scheme = Bio::MUST::Core::ColorScheme->load(file('test', 'bacteria.cls'));
-        $scheme->attach_colors_to_entities($tree);
-        cmp_store(
-            obj => $tree, method => 'store_figtree',
-            file => 'PBP3_phylum_4color.nex',
-            test => 'wrote expected taxonomically-annotated tree',
-        );
-     }
+    my @exp_filters = (0, undef, 1, 1, 1, 0, 0, undef);
+    is_deeply [ map { $filter->is_allowed($_) } @orgs ], \@exp_filters,
+        'got expected allowances for:';
+    explain \@orgs;
 }
 
 my @filters = (
@@ -454,6 +498,9 @@ my @filters = (
     );
 }
 
+
+# mappers
+
 {
     my $infile = file('test', 'tab_mapper_mustids.tsv');
 
@@ -496,41 +543,8 @@ SKIP: {
     );
 }
 
-{
-    my   @wanted = qw(Fungi Cnidaria);
-    my @unwanted = qw(Ascomycota Anthozoa);
 
-    my $infile = 'test/filters.idl';
-    my $filter = $tax->tax_filter($infile);
-
-    cmp_bag [ $filter->all_wanted ], \@wanted,
-        "loaded expected wanted specs from file: $infile";
-    cmp_bag [ $filter->all_unwanted ], \@unwanted,
-        "loaded expected unwanted specs from file: $infile";
-
-    ok( (List::AllUtils::all { $filter->is_wanted(  $_) } @wanted),
-        "identified wanted taxa as expected:");
-    explain [ $filter->all_wanted ];
-    ok( (List::AllUtils::all { $filter->is_unwanted($_) } @unwanted),
-        "identified unwanted taxa as expected:");
-    explain [ $filter->all_unwanted ];
-
-    my @orgs = (
-        'Phytophthora infestans',
-        'Nessiteras rhombopteryx',          # unknown name   (should be undef)
-        'Podocoryne carnea',                # misspelling    (should be 1)
-        'Podocoryna carnea',
-        'Hydra sp.',                        # non-dupe genus (should be 1)
-        'Arabidopsis thaliana',
-        'Saccharomyces cerevisiae',
-        'Liriope sp.',                      # dupe genus     (should be undef)
-    );
-
-    my @exp_filters = (0, undef, 1, 1, 1, 0, 0, undef);
-    is_deeply [ map { $filter->is_allowed($_) } @orgs ], \@exp_filters,
-        'got expected allowances for:';
-    explain \@orgs;
-}
+# classifiers
 
 {
     # read configuration file
@@ -545,9 +559,12 @@ SKIP: {
     # build classifier
     my $classifier = $tax->tax_classifier( $config->{$infile} );
 
-    my @exp_cats = ('strict', ('loose') x 5);
+    my @exp_labels = qw(strict loose);
+    is_deeply [ $classifier->all_labels ], \@exp_labels,
+        'got expected label list for classifier';
 
     # classify Ali files
+    my @exp_cats = ('strict', ('loose') x 5);
     for my $num ( qw(392 590 593 618 639 649) ) {
         my $infile = file('test', "GNTPAN19$num.ali");
         my $ali = Bio::MUST::Core::Ali->load($infile);
@@ -557,104 +574,9 @@ SKIP: {
     }
 }
 
-sub check_legacy {
-    my $method  = shift;
-
-    tie my     %taxid_for, 'Tie::IxHash';
-    tie my %exp_taxid_for, 'Tie::IxHash';
-
-    my $infile = $method . '.test';
-    open my $in, '<', file('test', $infile);
-
-    my $outfile = "my_$infile";
-    open my $out, '>', file('test', $outfile);
-
-    LINE:
-    while ( my $line = <$in> ) {
-        chomp $line;
-
-        # skip empty lines and comment lines
-        if ($line =~ $EMPTY_LINE
-         || $line =~ $COMMENT_LINE) {
-            say {$out} $line;
-            next LINE;
-        }
-
-        # fetch full_id
-        my ($full_id) = $line =~ m/ (\w+ \s+ \S+) /xms;
-
-        # get taxon_id from seq_id
-        my $seq_id = Bio::MUST::Core::SeqId->new(full_id => $full_id);
-        my $taxid = $tax->$method($seq_id);
-
-        # output full_id => taxon_id pair
-        say {$out} join "\t", $full_id, $taxid // 'NA';
-    }
-
-    close $out;
-    close $in;
-
-    # compare file contents
-    compare_filter_ok(file('test', $outfile), file('test', $infile), \&canonize,
-        "Fetched expected taxon_ids from legacy seq_ids: $infile");
-
-    return;
-}
-
-sub canonize {
-    my $line = shift;
-    $line =~ s{GC[AF]_(\d+)\.\d+}{GCA_$1.1}xms;
-    return $line;
-}
-
-SKIP: {
-    skip 'due to defaulting to prefer_gca', 2;
-    check_legacy('get_taxid_from_legacy_seq_id', $tax);
-    check_legacy('get_taxid_from_seq_id', $tax);
-}
-
-
-{
-    my $infile = 'get_taxonomy_from_gca.test';
-
-    open my $in, '<', file('test', $infile);
-
-    my $outfile = "my_$infile";
-    open my $out, '>', file('test', $outfile);
-
-    LINE:
-    while ( my $line = <$in> ) {
-        chomp $line;
-
-        # skip empty lines and comment lines
-        if ($line =~ $EMPTY_LINE
-         || $line =~ $COMMENT_LINE) {
-            say {$out} $line;
-            next LINE;
-        }
-
-        # fetch gca
-        my ($gca) = $line =~ m/^ (\w+ \. \d+) \s /xms;
-
-        # get taxon_id from seq_id
-        my @taxonomy = $tax->get_taxonomy($gca);
-        my $org = $taxonomy[-1];
-
-        # output full_id => taxon_id pair
-        say {$out} join "\t", $gca, $org // 'NA';
-    }
-
-    close $out;
-    close $in;
-
-    # compare file contents
-    compare_filter_ok(file('test', $outfile), file('test', $infile), \&canonize,
-        "Fetched expected taxonomy from GCAs: $infile");
-}
-
 {
     my $frfile = file('test', 'lifemrch.fra');
-    my $classifier = $tax->classifier_from_systematic_frame($frfile);
+    my $classifier = $tax->tax_labeler_from_systematic_frame($frfile);
 
     my $infile = file('test', 'fetch-tax-mustid.idl');
     my $list = Bio::MUST::Core::IdList->load($infile);
@@ -672,37 +594,350 @@ SKIP: {
         'got expected taxa for seq_ids compared to a systematic frame';
 }
 
+
+# eq_tax
+
 my @lcas = (
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons; Gunneridae; Pentapetalae; rosids; malvids; Brassicales; Brassicaceae; Camelineae; Arabidopsis; Arabidopsis thaliana', 1 ],
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons; Gunneridae; Pentapetalae; rosids; malvids; Brassicales', 1 ],
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons', 1 ],
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta', 1 ],
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina', 1 ],
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta', 0 ],
-    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae', 0 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons; Gunneridae; Pentapetalae; rosids; malvids; Brassicales; Brassicaceae; Camelineae; Arabidopsis; Arabidopsis thaliana', 1, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons; Gunneridae; Pentapetalae; rosids; malvids; Brassicales', 1, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons', 1, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta', 1, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina', 1, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Klebsormidiophyceae', 0, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta', 0, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae', 0, 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota', 0, 0 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Rhodophyta; Bangiophyceae; Cyanidiales; Cyanidiaceae', 0, 0 ],
 );
 
 {
-    my $frfile = file('test', 'debrief42-accurate.fra');
-
-    # TODO: fix warnings due to residual dupes
-    # Warning: Actinobacteria is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Elusimicrobia is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Thermotogae is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Aquificae is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Chrysiogenetes is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Deferribacteres is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Thermodesulfobacteria is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-    # Warning: Gemmatimonadetes is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
-
-    my $classifier = $tax->classifier_from_systematic_frame($frfile);
+    my $infile = file('test', 'classifier-simple.idl');
+    my $classifier = $tax->tax_labeler_from_list($infile);
 
     for my $exp_row (@lcas) {
-        my ($org, $lca, $exp) = @{$exp_row}[0..2];
-        cmp_ok $tax->eq_tax($org, $lca, $classifier), '==', $exp,
+        my ($org, $lca, $exp, $exp_gr) = @{$exp_row};
+
+        my $got = $tax->eq_tax($org, $lca, $classifier);
+        cmp_ok $got, '==', $exp,
             "got expected result for eq_tax with $lca";
+
+        my $got_gr = $tax->eq_tax($org, $lca, $classifier, { greedy => 1 });
+        cmp_ok $got_gr, '==', $exp_gr,
+            "got expected result for greedy eq_tax with $lca";
     }
 }
+
+
+# color schemes and tree annotation
+
+my @exp_names = (
+    'Acidobacteria',
+    'Actinobacteria',
+    'Aquificae',
+    'Bacteroidetes',
+    'Chlamydiae',
+    'Chlorobi',
+    'Chloroflexi',
+    'Cyanobacteria',
+    'Deferribacteres',
+    'Deinococcus-Thermus',
+    'Dictyoglomi',
+    'Firmicutes',
+    'Fusobacteria',
+    'Ignavibacteria',
+    'Nitrospirae',
+    'Planctomycetes',
+    'Proteobacteria',
+    'Spirochaetes',
+    'Synergistetes',
+    'Thermodesulfobacteria',
+    'Thermotogae',
+    'Verrucomicrobia',
+);
+
+my @exp_colors = (
+    '#E5585D',
+    '#B64348',
+    '#DDA35D',
+    '#AF8147',
+    '#C6D95E',
+    '#9DAC48',
+    '#73DC63',
+    '#5BAF4C',
+    '#00DD7C',
+    '#00AF61',
+    '#0BDBBC',
+    '#02AE94',
+    '#46BCD8',
+    '#3494AC',
+    '#6876D8',
+    '#505DAC',
+    '#9E58D8',
+    '#7D43AB',
+    '#DF4FD6',
+    '#B13CAA',
+    '#E753A3',
+    '#B73F80',
+);
+
+my @lineages = (
+    [
+        'Viruses',
+        'Retro-transcribing viruses',
+        'Retroviridae',
+        'Orthoretrovirinae',
+        'Lentivirus',
+        'Primate lentivirus group',
+        'Human immunodeficiency virus 1',
+        'HIV-1 group M',
+        'HIV-1 M:C',
+        'HIV-1 M:C U2226'
+    ],
+    [
+        'cellular organisms',
+        'Archaea',
+        'Euryarchaeota',
+        'Methanobacteria',
+        'Methanobacteriales',
+        'Methanobacteriaceae',
+        'Methanobrevibacter',
+        'Methanobrevibacter ruminantium',
+        'Methanobrevibacter ruminantium M1'
+    ],
+    [
+        'cellular organisms',
+        'Bacteria',
+        'Tenericutes',
+        'Mollicutes',
+        'Acholeplasmatales',
+        'Acholeplasmataceae',
+        'Acholeplasma',
+        'Acholeplasma laidlawii',
+        'Acholeplasma laidlawii PG-8A'
+    ],
+    [
+        'cellular organisms',
+        'Bacteria',
+        'Proteobacteria',
+        'Betaproteobacteria',
+        'Burkholderiales',
+        'Comamonadaceae',
+        'Curvibacter',
+        'Curvibacter putative symbiont of Hydra magnipapillata'
+    ],
+    [
+        'cellular organisms',
+        'Bacteria',
+        'Firmicutes',
+        'Clostridia',
+        'Clostridiales',
+        'Peptococcaceae',
+        'Desulfotomaculum',
+        'Desulfotomaculum gibsoniae',
+        'Desulfotomaculum gibsoniae DSM 7213'
+    ],
+    [
+        'cellular organisms',
+        'Eukaryota',
+        'Viridiplantae',
+        'Streptophyta',
+        'Streptophytina',
+        'Embryophyta',
+        'Tracheophyta',
+        'Euphyllophyta',
+        'Spermatophyta',
+        'Magnoliophyta',
+        'eudicotyledons',
+        'core eudicotyledons',
+        'rosids',
+        'malvids',
+        'Brassicales',
+        'Brassicaceae',
+        'Camelineae',
+        'Arabidopsis',
+        'Arabidopsis halleri',
+        'Arabidopsis halleri subsp. halleri'
+    ],
+    [
+        'cellular organisms',
+        'Eukaryota',
+        'Viridiplantae',
+        'Streptophyta',
+        'Streptophytina',
+        'Embryophyta',
+        'Tracheophyta',
+        'Euphyllophyta',
+        'Spermatophyta',
+        'Magnoliophyta',
+        'eudicotyledons',
+        'core eudicotyledons',
+        'rosids',
+        'malvids',
+        'Brassicales',
+        'Brassicaceae',
+        'Noccaeeae',
+        'Noccaea',
+        'Noccaea caerulescens'
+    ],
+);
+
+my @bact_colors = qw( 000000 000000 000000 9e58d8 02ae94 000000 000000 );
+
+my @exp_icols = (1..22);
+
+{
+    my $class = 'Bio::MUST::Core::Taxonomy::ColorScheme';
+
+    my $infile = file('test', 'bacteria.cls');
+    my $scheme = $tax->load_color_scheme($infile);
+    isa_ok $scheme, $class, $infile;
+    is $scheme->count_comments, 2, 'read expected number of comments';
+    is $scheme->count_names, 22, 'read expected number of names';
+    is $scheme->count_colors, 22, 'read expected number of colors';
+    is $scheme->header, <<'EOT', 'got expected header';
+# HSB spectrum built by FigTree
+# RGB values obtained with Mountain Lion's Digital Color Meter
+EOT
+    is_deeply $scheme->names, \@exp_names,
+        'got expected names from .cls file';
+    is_deeply $scheme->colors, \@exp_colors,
+        'got expected colors from .cls file';
+
+    cmp_store(
+        obj => $scheme, method => 'store',
+        file => 'bacteria.cls',
+        test => 'wrote expected .cls file',
+    );
+
+    my @got = map { uc $scheme->hex($_, '#') } $scheme->all_names;
+    is_deeply [ map { uc $scheme->hex($_, '#') } $scheme->all_names ],
+        $scheme->colors, "got expected color translations using $infile";
+
+    is_deeply [ map { $scheme->hex($_) } @lineages ], \@bact_colors,
+        "got expected colors for lineages using $infile";
+
+    is_deeply [ map { $scheme->icol($_) } $scheme->all_names ], \@exp_icols,
+        'got expected indexed colors from .cls file';
+}
+
+my @life_colors = qw( ffa500 0000ff 008000 008000 a52a2a ff0000 ffff00 );
+
+{
+    my $infile = file('test', 'life.cls');
+    my $scheme = $tax->load_color_scheme($infile);
+    is_deeply [ map { $scheme->hex($_) } @lineages ], \@life_colors,
+        "got expected colors for lineages using $infile";
+}
+
+my @html_colors = qw( ff6347 6a5acd 228b22 228b22 a0522d b22222 ffd700 );
+
+{
+    my $infile = file('test', 'life_html.cls');
+    my $scheme = $tax->load_color_scheme($infile);
+    is_deeply [ map { $scheme->hex($_) } @lineages ], \@html_colors,
+        "got expected colors for lineages using $infile";
+}
+
+{
+    my $infile = file('test', 'cyanos.arb');
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+
+    $tax->attach_taxonomies_to_terminals($tree);
+    $tax->attach_taxonomies_to_internals($tree);
+
+    $tax->attach_taxa_to_entities($tree);
+    $tree->switch_attributes_and_labels_for_internals('taxon');
+    cmp_store(
+        obj => $tree, method => 'store',
+        file => 'cyanos_taxa.tre',
+        test => 'wrote expected taxonomically-annotated tree',
+    );
+}
+
+{
+    my $infile = file('test', 'collapse.tre');
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+
+    $tax->attach_taxonomies_to_terminals($tree);
+    $tax->attach_taxonomies_to_internals($tree);
+
+    $tax->attach_taxa_to_entities($tree, { name => 'family' });
+    $tree->collapse_subtrees;
+    $tree->switch_attributes_and_labels_for_internals('taxon');
+    cmp_store(
+        obj => $tree, method => 'store_figtree',
+        file => 'collapse.nex',
+        test => 'wrote expected taxonomically-annotated tree',
+    );
+}
+
+{
+    # TODO: rewrite using a convenience sub
+
+    my $infile = file('test', 'PBP3.tre');
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+
+    $tax->attach_taxonomies_to_terminals($tree);
+    $tax->attach_taxonomies_to_internals($tree);
+
+    # test auto naming with no collapsing and .tre output
+    $tax->attach_taxa_to_entities($tree);
+    $tree->switch_attributes_and_labels_for_internals('taxon');
+    cmp_store(
+        obj => $tree, method => 'store',
+        file => 'PBP3_auto.tre',
+        test => 'wrote expected taxonomically-annotated tree',
+    );
+    $tree->switch_attributes_and_labels_for_internals('taxon');
+
+    SKIP: {
+      skip 'due to reccurrent issues linked to NCBI Taxonomy updates', 4
+        unless 1;
+
+        # test auto naming with phylum-level collapsing and .nex output
+        $tax->attach_taxa_to_entities($tree, { collapse => 'phylum' } );
+        $tree->collapse_subtrees;
+        cmp_store(
+            obj => $tree, method => 'store_figtree',
+            file => 'PBP3_auto_phylum.nex',
+            test => 'wrote expected taxonomically-annotated tree',
+        );
+
+        # test family-level naming with no collapsing and .tre output
+        $tax->attach_taxa_to_entities($tree, {     name => 'family' } );
+        $tree->switch_attributes_and_labels_for_internals('taxon');
+        cmp_store(
+            obj => $tree, method => 'store',
+            file => 'PBP3_family.tre',
+            test => 'wrote expected taxonomically-annotated tree',
+        );
+        $tree->switch_attributes_and_labels_for_internals('taxon');
+
+        # test family-level naming with phylum-level collapsing and .nex output
+        $tax->attach_taxa_to_entities($tree, {     name => 'family',
+                                               collapse => 'phylum' } );
+        $tree->collapse_subtrees;
+        cmp_store(
+            obj => $tree, method => 'store_figtree',
+            file => 'PBP3_family_phylum.nex',
+            test => 'wrote expected taxonomically-annotated tree',
+        );
+
+        # test phylum-level naming with phylum-level collapsing, coloring
+        # ... and .nex output!
+        $tax->attach_taxa_to_entities($tree, {     name => 'phylum',
+                                               collapse => 'phylum' } );
+        $tree->collapse_subtrees;
+        my $scheme = Bio::MUST::Core::ColorScheme->load(file('test', 'bacteria.cls'));
+        $scheme->attach_colors_to_entities($tree);
+        cmp_store(
+            obj => $tree, method => 'store_figtree',
+            file => 'PBP3_phylum_4color.nex',
+            test => 'wrote expected taxonomically-annotated tree',
+        );
+     }
+}
+
 
 # {
 #     use Bio::Phylo::Treedrawer;

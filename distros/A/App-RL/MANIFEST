@@ -11,6 +11,7 @@ lib/App/RL/Command/convert.pm
 lib/App/RL/Command/cover.pm
 lib/App/RL/Command/coverage.pm
 lib/App/RL/Command/genome.pm
+lib/App/RL/Command/gff.pm
 lib/App/RL/Command/merge.pm
 lib/App/RL/Command/position.pm
 lib/App/RL/Command/some.pm
@@ -36,6 +37,7 @@ t/12-stat2.t
 t/13-position.t
 t/14-coverage.t
 t/15-convert.t
+t/16-gff.t
 t/90-decode-encode.t
 t/Atha.chr.sizes
 t/Atha.list
@@ -43,7 +45,10 @@ t/Atha.trf.yml
 t/Atha.yml
 t/I.yml
 t/II.yml
+t/NC_007942.gff
+t/NC_007942.rm.gff
 t/S288c.txt
+t/anno.yml
 t/brca2.yml
 t/chr.sizes
 t/intergenic.yml

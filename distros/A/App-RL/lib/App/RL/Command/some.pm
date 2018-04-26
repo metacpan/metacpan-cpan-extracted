@@ -6,10 +6,12 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'extract some records from YAML file';
+sub abstract {
+    return 'extract some records from YAML file';
+}
 
 sub opt_spec {
-    return ( [ "outfile|o=s", "Output filename. [stdout] for screen." ], { show_defaults => 1, } );
+    return ( [ "outfile|o=s", "output filename. [stdout] for screen" ], { show_defaults => 1, } );
 }
 
 sub usage_desc {

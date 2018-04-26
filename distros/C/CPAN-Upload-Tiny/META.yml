@@ -17,20 +17,22 @@ name: CPAN-Upload-Tiny
 provides:
   CPAN::Upload::Tiny:
     file: lib/CPAN/Upload/Tiny.pm
-    version: '0.005'
+    version: '0.007'
 requires:
   Carp: '0'
   File::Basename: '0'
+  Getopt::Long: '0'
   HTTP::Tiny: '0'
   HTTP::Tiny::Multipart: '0'
   IO::Socket::SSL: '1.56'
   MIME::Base64: '0'
   Mozilla::CA: '0'
   Net::SSLeay: '1.49'
+  Pod::Usage: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Upload-Tiny
   repository: git://github.com/Leont/cpan-upload-tiny.git
-version: '0.005'
+version: '0.007'
 x_serialization_backend: 'YAML::Tiny version 1.69'

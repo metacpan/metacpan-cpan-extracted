@@ -1,11 +1,21 @@
 Revision history for Web::Mention
 
+0.3 2018-04-23T14:19:45Z
+
+    - Constructor throws an exception if the source and target URLs are
+    too similar. (Thanks to Christian Weiske for the heads-up.)
+
+    - The cpanfile better reflects prerequisites. (Thanks to Mohammad S
+    Anwar for the patch.)
+
+    - Documentation updates.
+
 0.2 2018-04-21T20:33:29Z
 
     - Made JSON de/serialization less fragile.
 
-    - Serializing a webmention object no longer tries to verify it as
-      a side effect.
+    - Serializing a webmention object no longer tries to verify it as a
+    side effect.
 
     - Improved encoding-handling of web-fetched content.
 

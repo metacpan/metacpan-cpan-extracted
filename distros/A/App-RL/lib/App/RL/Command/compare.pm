@@ -6,14 +6,16 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'compare 2 chromosome runlists';
+sub abstract {
+    return 'compare 2 chromosome runlists';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen" ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
         [ "op=s",     "operations: intersect, union, diff or xor", { default => "intersect" } ],
-        [ "remove|r", "Remove 'chr0' from chromosome names" ],
-        [ "mk", "*Fisrt* YAML file contains multiple sets of runlists" ],
+        [ "remove|r", "remove 'chr0' from chromosome names" ],
+        [ "mk",       "*first* YAML file contains multiple sets of runlists" ],
         { show_defaults => 1, }
     );
 }

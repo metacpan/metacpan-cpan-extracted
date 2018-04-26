@@ -53,6 +53,7 @@ t/bin/nddiff.d/ifmt_yaml_ofmt_yaml.a.data
 t/bin/nddiff.d/ifmt_yaml_ofmt_yaml.b.data
 t/bin/nddiff.d/ifmt_yaml_ofmt_yaml.exp
 t/bin/nddiff.d/json.exp
+t/bin/nddiff.d/json_full.exp
 t/bin/nddiff.d/json_ignore.exp
 t/bin/nddiff.d/json_ignore_unexisted_path.exp
 t/bin/nddiff.d/json_nopretty.exp
@@ -71,7 +72,12 @@ t/bin/nddiff.d/term_grep_2.exp
 t/bin/nddiff.d/term_grep_absent_part.exp
 t/bin/nddiff.d/term_grep_utf8_path.exp
 t/bin/nddiff.d/term_hash.exp
+t/bin/nddiff.d/term_noA.exp
+t/bin/nddiff.d/term_noN.exp
+t/bin/nddiff.d/term_noNO.exp
+t/bin/nddiff.d/term_noO.exp
 t/bin/nddiff.d/term_nopretty.exp
+t/bin/nddiff.d/term_noR.exp
 t/bin/nddiff.d/term_path.exp
 t/bin/nddiff.d/term_show.exp
 t/bin/nddiff.d/term_show.json
@@ -228,6 +234,9 @@ t/bin/ndquery.d/grep_0.exp
 t/bin/ndquery.d/grep_1.exp
 t/bin/ndquery.d/grep_2.exp
 t/bin/ndquery.d/grep_3.exp
+t/bin/ndquery.d/grep_4.exp
+t/bin/ndquery.d/grep_5.exp
+t/bin/ndquery.d/grep_6.exp
 t/bin/ndquery.d/help.exp
 t/bin/ndquery.d/ifmt_yaml.data
 t/bin/ndquery.d/ifmt_yaml.exp

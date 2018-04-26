@@ -1,10 +1,13 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.11  Mon Apr 23 11:47:33 AEDT 2018
+    - Added optional Headers argument to Download function
+
 0.10  Fri Dec 29 12:38:24 AEDT 2017
     - added CallMethods() API for wrapping new-style JMAP
     - change Request() back to raw wire control
 
-0.09  unreleased
+0.09  Fri Dec 29 12:38:24 AEDT 2017
     - changed Request to new JMAP style
 
 0.08  Tue Aug 8 16:45:54 AEST 2017

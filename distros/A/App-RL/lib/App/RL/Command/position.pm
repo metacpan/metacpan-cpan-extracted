@@ -6,13 +6,15 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'compare runlists against positions';
+sub abstract {
+    return 'compare runlists against positions';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen." ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
         [ "op=s",     "operations: overlap, non-overlap or superset", { default => "overlap" } ],
-        [ "remove|r", "Remove 'chr0' from chromosome names." ],
+        [ "remove|r", "remove 'chr0' from chromosome names" ],
         { show_defaults => 1, }
     );
 }
@@ -24,10 +26,16 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= " " x 4 . "Genome positions:\n";
-    $desc .= " " x 4 . "I:1-100\tPreferred format;\n";
-    $desc .= " " x 4 . "I(+):90-150\tStrand will be ommitted;\n";
-    $desc .= " " x 4 . "S288c.I(-):190-200\tSpecies names will be omitted\.n";
+    $desc .= <<'MARKDOWN';
+
+Genome positions:
+
+    I:1-100                 # Preferred format
+    I(+):90-150             # Strand will be omitted
+    S288c.I(-):190-200      # Species names will be omitted
+
+MARKDOWN
+
     return $desc;
 }
 

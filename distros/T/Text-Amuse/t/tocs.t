@@ -72,7 +72,7 @@ my $exp = [
            }
           ];
 
-is_deeply([$document->raw_html_toc], $exp, "Raw toc ok");
+is_deeply([$document->raw_html_toc], $exp, "Raw toc ok") or diag Dumper($document->_html_obj->{_toc_entries});
 
 
 $document =

@@ -6,7 +6,7 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.91';
+our $VERSION = '0.93';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
@@ -1822,7 +1822,7 @@ sub _scan_re {
 
     if ($c1 eq '{') {
       # quantifier shouldn't be nested
-      if ($$rstr =~ m/\G({[0-9]+(?:,(?:[0-9]+)?)?})/gcs) {
+      if ($$rstr =~ m/\G(\{[0-9]+(?:,(?:[0-9]+)?)?})/gcs) {
         _debug(" quantifier $1") if DEBUG_RE;
         next;
       }

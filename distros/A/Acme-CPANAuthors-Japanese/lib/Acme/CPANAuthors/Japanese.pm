@@ -3,7 +3,7 @@ package Acme::CPANAuthors::Japanese;
 use strict;
 use warnings;
 
-our $VERSION = '0.180304';
+our $VERSION = '0.180422';
 
 use Acme::CPANAuthors::Register (
     ABUI      => 'DAISUKE ABUI',
@@ -369,6 +369,7 @@ use Acme::CPANAuthors::Register (
     OINUME    => 'Kazuhiro Oinuma',
     OISHI     => 'Eisuke Oishi',
     OKAMUUU   => 'Masao Okamura',
+    OKAWARI   => 'okawara ayato',
     OKAZUDM   => 'Kazuma Okada',
     OKLAHOMER => 'Go Hagiwara',
     ONISHI    => 'Yasuhiro Onishi',
@@ -407,6 +408,7 @@ use Acme::CPANAuthors::Register (
     RYOCHIN   => 'Okamoto RYO',
     RYOPEKO   => 'Ryoichi SEKIGUCHI',
     SADAHIRO  => 'SADAHIRO Tomoyuki',
+    SAITORYC  => 'Ryoichi Saito',
     SASAKURE  => 'Kei Shimada (sasakure_kei)',
     SASAO     => 'SASAO Takahiro',
     SASARON   => 'Katsuhiro Sasaki',
@@ -551,6 +553,7 @@ use Acme::CPANAuthors::Register (
     TSUCCHI   => 'Takuya Tsuchida',
     TSUKAMOTO => 'Makio Tsukamoto',
     TSUNODA   => 'TSUNODA Kazuya',
+    TULAMILI  => 'Toshiyuki Shimono',
     TURUGINA  => 'KATOU Akira',
     TWOGMON   => 'Takaaki TSUJIMOTO',
     TXIWASAKI => 'Tooru Iwasaki',

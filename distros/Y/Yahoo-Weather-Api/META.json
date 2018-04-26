@@ -1,0 +1,49 @@
+{
+   "abstract" : "The great new 2018 Yahoo::Weather::Api ",
+   "author" : [
+      "Sushrut Pajai <spajai@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Yahoo-Weather-Api",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "2.0",
+            "JSON::Parse" : "0",
+            "Test::More" : "0",
+            "URL::Builder" : "0.06",
+            "XML::LibXML" : "0",
+            "XML::Validate" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "LWP::UserAgent" : "0",
+            "URL::Builder" : "0.06",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.10"
+}

@@ -39,7 +39,7 @@ WriteMakefile(
         'JSON'                      => 0,
         'Log::Log4Cli'              => 0.21,
         'Module::Find'              => 0,
-        'Struct::Diff'              => 0.95,
+        'Struct::Diff'              => 0.96,
         'Struct::Path'              => 0.81,
         'Struct::Path::PerlStyle'   => 0.80,
         'YAML::XS'                  => 0,

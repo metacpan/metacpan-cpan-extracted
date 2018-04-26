@@ -1,5 +1,5 @@
 package App::CSE::File::TextXCsharp;
-$App::CSE::File::TextXCsharp::VERSION = '0.013';
+$App::CSE::File::TextXCsharp::VERSION = '0.014';
 use Moose;
 extends qw/App::CSE::File/;
 

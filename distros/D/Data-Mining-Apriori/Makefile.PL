@@ -7,7 +7,8 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Data/Mining/Apriori.pm', # finds $VERSION
 	LICENSE           => "perl",
     PREREQ_PM => {
-        'Algorithm::Combinatorics'     => 0.27
+        'Algorithm::Combinatorics'     => 0.27,
+        'List::PowerSet'     => 0.01
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Data/Mining/Apriori.pm', # retrieve abstract from module

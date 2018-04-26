@@ -9,4 +9,6 @@ Revision history for Perl extension Yandex::Disk.
 0.02  Thu Feb  22 16:14:00 2018
 	- Added methods: listAllFiles, lastUploadedFiles
 		-b 5.8.1 -XAn Yandex::Disk
+0.04  Wed Apr  25 11:07:00 2018
+    - Changed bug with method deleteResource. Not work '-permanently' options
 

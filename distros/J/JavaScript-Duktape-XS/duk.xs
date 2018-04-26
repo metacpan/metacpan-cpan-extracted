@@ -601,11 +601,21 @@ get_stats(Duk* duk)
     RETVAL = duk->stats;
   OUTPUT: RETVAL
 
+void
+reset_stats(Duk* duk)
+  PPCODE:
+    duk->stats = newHV();
+
 HV*
 get_msgs(Duk* duk)
   CODE:
     RETVAL = duk->msgs;
   OUTPUT: RETVAL
+
+void
+reset_msgs(Duk* duk)
+  PPCODE:
+    duk->msgs = newHV();
 
 SV*
 get(Duk* duk, const char* name)

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 1;
 
@@ -51,6 +51,8 @@ L<https://github.com/shawnlaffan/perl-alien-gdal/issues>.
 =head1 SEE ALSO
 
 L<Geo::GDAL>
+
+L<Geo::GDAL::FFI>
 
 =head1 AUTHORS
 

@@ -205,7 +205,9 @@ egaz template \
 bash selfS288c/1_self.sh
 bash selfS288c/3_proc.sh
 bash selfS288c/4_circos.sh
-bash selfS288c/7_chr_length.sh
+bash selfS288c/6_chr_length.sh
+bash selfS288c/7_self_aligndb.sh
+bash selfS288c/9_pack_up.sh
 
 ```
 

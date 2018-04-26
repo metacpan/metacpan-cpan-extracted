@@ -12,7 +12,7 @@ use File::LibMagic;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our $CLIENT = "Net-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -251,9 +251,12 @@ sub Download {
   if (ref($_[0]) eq 'CODE') {
     $cb = shift;
   }
+  my %Headers;
+  if (ref($_[0]) eq 'HASH') {
+      %Headers = %{ (shift) };
+  }
   my $uri = $Self->downloaduri(@_);
 
-  my %Headers;
   if ($Self->{user}) {
     $Headers{'Authorization'} = $Self->auth_header();
   }

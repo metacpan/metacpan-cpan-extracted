@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   URI:
     file: lib/URI.pm
-    version: '1.73'
+    version: '1.74'
   URI::Escape:
     file: lib/URI/Escape.pm
     version: '3.31'
@@ -36,13 +36,13 @@ provides:
     version: '4.20'
   URI::IRI:
     file: lib/URI/IRI.pm
-    version: '1.73'
+    version: '1.74'
   URI::QueryParam:
     file: lib/URI/QueryParam.pm
-    version: '1.73'
+    version: '1.74'
   URI::Split:
     file: lib/URI/Split.pm
-    version: '1.73'
+    version: '1.74'
   URI::URL:
     file: lib/URI/URL.pm
     version: '5.04'
@@ -51,109 +51,109 @@ provides:
     version: '2.20'
   URI::data:
     file: lib/URI/data.pm
-    version: '1.73'
+    version: '1.74'
   URI::file:
     file: lib/URI/file.pm
     version: '4.21'
   URI::file::Base:
     file: lib/URI/file/Base.pm
-    version: '1.73'
+    version: '1.74'
   URI::file::FAT:
     file: lib/URI/file/FAT.pm
-    version: '1.73'
+    version: '1.74'
   URI::file::Mac:
     file: lib/URI/file/Mac.pm
-    version: '1.73'
+    version: '1.74'
   URI::file::OS2:
     file: lib/URI/file/OS2.pm
-    version: '1.73'
+    version: '1.74'
   URI::file::QNX:
     file: lib/URI/file/QNX.pm
-    version: '1.73'
+    version: '1.74'
   URI::file::Unix:
     file: lib/URI/file/Unix.pm
-    version: '1.73'
+    version: '1.74'
   URI::file::Win32:
     file: lib/URI/file/Win32.pm
-    version: '1.73'
+    version: '1.74'
   URI::ftp:
     file: lib/URI/ftp.pm
-    version: '1.73'
+    version: '1.74'
   URI::gopher:
     file: lib/URI/gopher.pm
-    version: '1.73'
+    version: '1.74'
   URI::http:
     file: lib/URI/http.pm
-    version: '1.73'
+    version: '1.74'
   URI::https:
     file: lib/URI/https.pm
-    version: '1.73'
+    version: '1.74'
   URI::ldap:
     file: lib/URI/ldap.pm
-    version: '1.73'
+    version: '1.74'
   URI::ldapi:
     file: lib/URI/ldapi.pm
-    version: '1.73'
+    version: '1.74'
   URI::ldaps:
     file: lib/URI/ldaps.pm
-    version: '1.73'
+    version: '1.74'
   URI::mailto:
     file: lib/URI/mailto.pm
-    version: '1.73'
+    version: '1.74'
   URI::mms:
     file: lib/URI/mms.pm
-    version: '1.73'
+    version: '1.74'
   URI::news:
     file: lib/URI/news.pm
-    version: '1.73'
+    version: '1.74'
   URI::nntp:
     file: lib/URI/nntp.pm
-    version: '1.73'
+    version: '1.74'
   URI::pop:
     file: lib/URI/pop.pm
-    version: '1.73'
+    version: '1.74'
   URI::rlogin:
     file: lib/URI/rlogin.pm
-    version: '1.73'
+    version: '1.74'
   URI::rsync:
     file: lib/URI/rsync.pm
-    version: '1.73'
+    version: '1.74'
   URI::rtsp:
     file: lib/URI/rtsp.pm
-    version: '1.73'
+    version: '1.74'
   URI::rtspu:
     file: lib/URI/rtspu.pm
-    version: '1.73'
+    version: '1.74'
   URI::sftp:
     file: lib/URI/sftp.pm
-    version: '1.73'
+    version: '1.74'
   URI::sip:
     file: lib/URI/sip.pm
-    version: '1.73'
+    version: '1.74'
   URI::sips:
     file: lib/URI/sips.pm
-    version: '1.73'
+    version: '1.74'
   URI::snews:
     file: lib/URI/snews.pm
-    version: '1.73'
+    version: '1.74'
   URI::ssh:
     file: lib/URI/ssh.pm
-    version: '1.73'
+    version: '1.74'
   URI::telnet:
     file: lib/URI/telnet.pm
-    version: '1.73'
+    version: '1.74'
   URI::tn3270:
     file: lib/URI/tn3270.pm
-    version: '1.73'
+    version: '1.74'
   URI::urn:
     file: lib/URI/urn.pm
-    version: '1.73'
+    version: '1.74'
   URI::urn::isbn:
     file: lib/URI/urn/isbn.pm
-    version: '1.73'
+    version: '1.74'
   URI::urn::oid:
     file: lib/URI/urn/oid.pm
-    version: '1.73'
+    version: '1.74'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -177,10 +177,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/URI/issues
   homepage: https://github.com/libwww-perl/URI
   repository: https://github.com/libwww-perl/URI.git
-version: '1.73'
+version: '1.74'
 x_Dist_Zilla:
   perl:
-    version: '5.027006'
+    version: '5.027011'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -206,11 +206,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -219,7 +219,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.010'
+              version: '6.012'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -228,25 +228,25 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.004'
+          version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -257,7 +257,7 @@ x_Dist_Zilla:
           order_by: commits
           paths: []
       name: Git::Contributors
-      version: '0.032'
+      version: '0.034'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -269,15 +269,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: Prereqs::FromCPANfile
@@ -288,7 +288,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: MakeMaker
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
@@ -333,7 +333,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: MetaTests
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: Test::ChangesHasContent
@@ -341,15 +341,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       name: Test::MinimumVersion
-      version: '2.000007'
+      version: '2.000008'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: Test::Pod::Coverage::Configurable
-      version: '0.06'
+      version: '0.07'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -421,7 +421,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -432,7 +432,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -441,13 +441,25 @@ x_Dist_Zilla:
       name: Markdown_Readme
       version: '0.163250'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Git::VersionManager/pluginbundle version'
+      version: '6.012'
+    -
       class: Dist::Zilla::Plugin::VersionFromMainModule
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@Git::VersionManager/VersionFromMainModule'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Git::VersionManager/MetaProvides::Update'
-      version: '0.004'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -484,7 +496,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.73
+          tag: v1.74
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -504,11 +516,11 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
       name: '@Git::VersionManager/BumpVersionAfterRelease'
-      version: '0.017'
+      version: '0.018'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Git::VersionManager/NextRelease'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -531,58 +543,70 @@ x_Dist_Zilla:
       name: '@Git::VersionManager/post-release commit'
       version: '2.043'
     -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.2
+          repo_root: .
+      name: Git::Push
+      version: '2.043'
+    -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.010'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.012'
 x_authority: cpan:LWWWP
 x_contributors:
   - 'Gisle Aas <gisle@aas.no>'
@@ -592,8 +616,8 @@ x_contributors:
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
-  - 'Slaven Rezic <slaven@rezic.de>'
   - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Slaven Rezic <slaven@rezic.de>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Masahiro Honma <hiratara@cpan.org>'
   - 'Matt Lawrence <matthewlawrence@venda.com>'
@@ -612,4 +636,5 @@ x_contributors:
   - 'John Miller <john@rimmkaufman.com>'
   - 'Kaitlyn Parkhurst <symkat@symkat.com>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.72'
+x_generated_by_perl: v5.27.11
+x_serialization_backend: 'YAML::Tiny version 1.73'

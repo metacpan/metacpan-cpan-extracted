@@ -1,6 +1,6 @@
-package Pcore::API::ReCaptcha v0.2.2;
+package Pcore::API::ReCaptcha v0.2.6;
 
-use Pcore -dist, -class, -result;
+use Pcore -dist, -class, -res;
 use Pcore::Util::Data qw[from_json];
 
 has secret_key => ( is => 'ro', isa => Str, required => 1 );
@@ -10,37 +10,34 @@ has site_key => ( is => 'ro', isa => Str );
 # https://developers.google.com/recaptcha/docs/
 
 sub verify ( $self, $response, $user_ip = undef, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    P->http->post(
+    return P->http->post(
         'https://www.google.com/recaptcha/api/siteverify',
         accept_compressed => 0,
         headers           => {    #
             CONTENT_TYPE => 'application/x-www-form-urlencoded',
         },
-        body => P->data->to_uri(
-            {   secret   => $self->{secret_key},
-                response => $response,
-                remoteip => $user_ip,
-            }
-        ),
+        body => P->data->to_uri( {
+            secret   => $self->{secret_key},
+            response => $response,
+            remoteip => $user_ip,
+        } ),
         on_finish => sub ($res) {
             my $api_res;
 
             if ( !$res ) {
-                $api_res = result [ $res->status, $res->reason ];
+                $api_res = res [ $res->{status}, $res->{reason} ];
             }
             else {
-                my $data = from_json( $res->body );
+                my $data = from_json( $res->{body} );
 
                 if ( $data->{success} ) {
-                    $api_res = result 200,
+                    $api_res = res 200,
                       { callenge_ts => $data->{callenge_ts},
                         hostname    => $data->{hostname},
                       };
                 }
                 else {
-                    $api_res = result 400,
+                    $api_res = res 400,
                       error => $data->{'error-codes'},
                       data  => {
                         callenge_ts => $data->{callenge_ts},
@@ -49,15 +46,9 @@ sub verify ( $self, $response, $user_ip = undef, $cb = undef ) {
                 }
             }
 
-            $cb->($api_res) if $cb;
-
-            $blocking_cv->($api_res) if $blocking_cv;
-
-            return;
+            return $cb ? $cb->($api_res) : $api_res;
         }
     );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
 }
 
 1;

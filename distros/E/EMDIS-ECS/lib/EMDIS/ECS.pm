@@ -7,8 +7,6 @@
 
 package EMDIS::ECS;
 
-use EMDIS::ECS::Config;
-use EMDIS::ECS::LockedHash;
 use CPAN::Version;
 use Fcntl qw(:DEFAULT :flock);
 use File::Basename;
@@ -35,7 +33,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.39';
+$VERSION = '0.40';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -54,7 +52,8 @@ require Exporter;
        send_email send_encrypted_email format_datetime
        format_msg_filename openpgp_decrypt openpgp_encrypt
        pgp2_decrypt pgp2_encrypt check_pid save_pid
-       timelimit_cmd remove_pidfile trim valid_encr_typ EOL) ] );
+       timelimit_cmd remove_pidfile trim valid_encr_typ EOL
+       is_yes is_no) ] );
 Exporter::export_ok_tags('ALL');   # use tag handling fn to define EXPORT_OK
 
 BEGIN {
@@ -72,16 +71,38 @@ sub EOL
 }
 
 # ----------------------------------------------------------------------
+# test for YES or TRUE
+sub is_yes
+{
+    my $val = shift;
+    return 0 if not defined $val;
+    return 1 if $val =~ /^\s*YES\s*$/io or $val =~ /^\s*TRUE\s*$/io;
+    return 0;
+}
+
+# ----------------------------------------------------------------------
+# test for NO or FALSE
+sub is_no
+{
+    my $val = shift;
+    return 0 if not defined $val;
+    return 1 if $val =~ /^\s*NO\s*$/io or $val =~ /^\s*FALSE\s*$/io;
+    return 0;
+}
+
+# ----------------------------------------------------------------------
 # Load ECS configuration into global variables.
 # returns empty string if successful or error message if error encountered
 sub load_ecs_config
 {
     my $cfg_file = shift;
 
+    require EMDIS::ECS::Config;
     my $cfg = new EMDIS::ECS::Config($cfg_file);
     return "Unable to load ECS configuration ($cfg_file): $cfg"
         unless ref $cfg;
 
+    require EMDIS::ECS::LockedHash;
     my $node_tbl = new EMDIS::ECS::LockedHash($cfg->NODE_TBL, $cfg->NODE_TBL_LCK);
     return "Unable to open ECS node_tbl (" . $cfg->NODE_TBL .
         "): $node_tbl"
@@ -477,34 +498,45 @@ sub send_email {
     my $cfg = $ECS_CFG;
 
     my $smtp;
-    if($cfg->SMTP_USE_SSL =~ /^YES$/io or $cfg->SMTP_USE_SSL =~ /^TRUE$/io) {
-        return "To use SSL please install Net::SMTP with version >= 3.05"
+    if(is_yes($cfg->SMTP_USE_SSL) or is_yes($cfg->SMTP_USE_STARTTLS)) {
+        return "To use SSL or TLS please install Net::SMTP with version >= 3.05"
             if CPAN::Version->vlt($Net::SMTP::VERSION, '3.05');
+    }
+    if(is_yes($cfg->SMTP_USE_SSL)) {
         $smtp = Net::SMTP->new($cfg->SMTP_HOST,
                               Hello   => $cfg->SMTP_DOMAIN,
                               Timeout => $cfg->SMTP_TIMEOUT,
                               Debug   => $cfg->SMTP_DEBUG,
-                              Port    => ($cfg->SMTP_PORT ? $cfg->SMTP_PORT : 465),
+                              Port    => $cfg->SMTP_PORT,
                               SSL     => 1)
         or return "Unable to open SMTP connection to " .
             $cfg->SMTP_HOST . ": $@";
-        if($cfg->SMTP_USERNAME) {
-            if(not $smtp->auth($cfg->SMTP_USERNAME, $cfg->SMTP_PASSWORD)) {
-                $smtp->quit();
-                return "Unable to authenticate with " . $cfg->SMTP_DOMAIN .
-                    " SMTP server as user " . $cfg->SMTP_USERNAME;
-            }
-        }
     }
     else {
         $smtp = Net::SMTP->new($cfg->SMTP_HOST,
                               Hello   => $cfg->SMTP_DOMAIN,
                               Timeout => $cfg->SMTP_TIMEOUT,
                               Debug   => $cfg->SMTP_DEBUG,
-                              Port    => ($cfg->SMTP_PORT ? $cfg->SMTP_PORT : 25))
+                              Port    => $cfg->SMTP_PORT)
         or return "Unable to open SMTP connection to " .
             $cfg->SMTP_HOST . ": $@";
-   }
+        if(is_yes($cfg->SMTP_USE_STARTTLS)) {
+            if(not $smtp->starttls()) {
+                my $err = "STARTTLS failed:  " . $smtp->message();
+                $smtp->quit();
+                return $err;
+            }
+        }
+    }
+    if($cfg->SMTP_USERNAME and $cfg->SMTP_PASSWORD) {
+        if(not $smtp->auth($cfg->SMTP_USERNAME, $cfg->SMTP_PASSWORD)) {
+            my $err = "Unable to authenticate with " . $cfg->SMTP_DOMAIN .
+                " SMTP server as user " . $cfg->SMTP_USERNAME . ":  " .
+                $smtp->message();
+            $smtp->quit();
+            return $err;
+        }
+    }
     $smtp->mail($cfg->SMTP_FROM)
         or return "Unable to initiate sending of email message.";
     $smtp->to($recipient)
@@ -662,7 +694,9 @@ sub openpgp_decrypt
     # attempt to execute command
     my $result = timelimit_cmd($cfg->T_MSG_PROC, $cmd,
         (defined $encr_out_passphrase and 0 < length $encr_out_passphrase) ?
-            $encr_out_passphrase : $cfg->GPG_PASSPHRASE);
+            $encr_out_passphrase :
+            (defined $cfg->GPG_PASSPHRASE and 0 < length $cfg->GPG_PASSPHRASE ?
+                $cfg->GPG_PASSPHRASE : undef));
     $result = "EMDIS::ECS::openpgp_decrypt(): $result" if $result;
 
     # check signature, if indicated
@@ -709,7 +743,9 @@ sub openpgp_encrypt
     # attempt to execute command
     my $result = timelimit_cmd($cfg->T_MSG_PROC, $cmd,
         (defined $encr_out_passphrase and 0 < length $encr_out_passphrase) ?
-            $encr_out_passphrase : $cfg->GPG_PASSPHRASE);
+            $encr_out_passphrase :
+            (defined $cfg->GPG_PASSPHRASE and 0 < length $cfg->GPG_PASSPHRASE ?
+                $cfg->GPG_PASSPHRASE : undef));
     $result = "EMDIS::ECS::openpgp_encrypt(): $result" if $result;
     return $result;
 }

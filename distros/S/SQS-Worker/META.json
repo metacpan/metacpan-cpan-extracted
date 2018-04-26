@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -61,7 +61,8 @@
          "web" : "https://github.com/capside/SQS-Worker"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

@@ -15,6 +15,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/file-to-elasticsearch.pl',
     'lib/POE/Component/ElasticSearch/Indexer.pm',
     't/00-compile.t'
 );

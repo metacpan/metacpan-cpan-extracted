@@ -54,3 +54,6 @@ perl -I lib/ script/runlist genome t/chr.sizes -o stdout \
 
 perl -I lib/ script/runlist convert t/repeat.yml -o stdout
 perl -I lib/ t/15-convert.t
+
+perl -I lib/ script/runlist gff t/NC_007942.gff -t CDS -o stdout
+perl -I lib/ t/16-gff.t

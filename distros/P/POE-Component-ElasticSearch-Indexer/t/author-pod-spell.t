@@ -34,5 +34,7 @@ LoggingConfig
 POE
 StatsHandler
 StatsInterval
+bin
 brad
+file
 lib

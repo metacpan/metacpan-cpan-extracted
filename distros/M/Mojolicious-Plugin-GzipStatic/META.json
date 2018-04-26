@@ -1,0 +1,50 @@
+{
+   "abstract" : "Mojolicious Plugin to compress the static files before serving them.",
+   "author" : [
+      "Luc Didry <ldidry@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-GzipStatic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Compress::Gzip" : "0",
+            "Mojolicious" : "7.75"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://framagit.org/luc/mojolicious-plugin-gzipstatic.git",
+         "web" : "https://framagit.org/luc/mojolicious-plugin-gzipstatic"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

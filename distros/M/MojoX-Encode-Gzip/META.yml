@@ -6,18 +6,23 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MojoX-Encode-Gzip
+provides:
+  MojoX::Encode::Gzip:
+    file: lib/MojoX/Encode/Gzip.pm
+    version: '1.12'
 requires:
   Compress::Zlib: '0'
-  Mojolicious: '4.50'
+  Mojolicious: '7.75'
   Test::More: '0'
 resources:
   bugtracker: http://github.com/reneeb/MojoX-Encode-Gzip/issues
   homepage: http://github.com/reneeb/MojoX-Encode-Gzip
   repository: http://github.com/reneeb/MojoX-Encode-Gzip.git
-version: '1.11'
+version: '1.12'
+x_serialization_backend: 'YAML::Tiny version 1.69'

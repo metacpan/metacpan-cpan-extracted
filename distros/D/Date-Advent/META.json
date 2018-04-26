@@ -50,7 +50,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.38",
-            "Date::Lectionary::Time" : "1.20180422",
+            "Date::Lectionary::Time" : "v1.20180422.1",
             "Moose" : "2.1804",
             "MooseX::StrictConstructor" : "0.21",
             "Time::Piece" : "1.31",
@@ -62,7 +62,7 @@
    "provides" : {
       "Date::Advent" : {
          "file" : "lib/Date/Advent.pm",
-         "version" : "1.20180422"
+         "version" : "1.20180423"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/marmanold/Date-Advent"
       }
    },
-   "version" : "v1.20180422",
+   "version" : "v1.20180423",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_twitter" : "https://www.twitter.com/marmanold/"
 }

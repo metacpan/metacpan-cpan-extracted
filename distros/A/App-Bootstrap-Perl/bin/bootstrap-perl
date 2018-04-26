@@ -42,8 +42,9 @@ my $help                = 0;
 my $test                = 0;
 my $cpan                = 1;
 my $cleancpansources    = 0;
-my $forcecpancfg        = 1;
+my $forcecpancfg        = 0;
 my $forcebuildperl      = 0;
+my $forcemoduleinstall  = 0;
 my $perlformance        = 0;
 my $perlformance_local  = 0;
 my $perlformance_report = 0;
@@ -80,8 +81,8 @@ sub setup_user {
 sub setup_log {
         open($OLDSTDOUT, ">&", \*STDOUT) || die;
         open($OLDSTDERR, ">&", \*STDERR) || die;
-        open($LOGFILE,   ">" , $logfile) || die;
-        open($COMMAND,   ">",  $logcommand) || die;
+        open($LOGFILE,   ">>" , $logfile) || die;
+        open($COMMAND,   ">>",  $logcommand) || die;
 }
 
 # Execute a command via system(). Output goes to log file.
@@ -95,8 +96,8 @@ sub print_and_system {
         my $is_cpan = $bin eq bin_cpan();
 
         if (! $is_cpan) {
-                open(STDOUT, ">&", $LOGFILE) || die;
-                open(STDERR, ">&", $LOGFILE) || die;
+                open(STDOUT, ">>&", $LOGFILE) || die;
+                open(STDERR, ">>&", $LOGFILE) || die;
 
                 print $COMMAND $cmd, "\n";
                 print $LOGFILE $cmd, "\n";
@@ -175,6 +176,10 @@ sub _perl_pathprefix {
                    );
 }
 
+# ========== setup user log ==========
+
+setup_user();
+
 # ========== getopt ==========
 
 my $ok = GetOptions (
@@ -193,6 +198,7 @@ my $ok = GetOptions (
                      "cleancpansources!" => \$cleancpansources,
                      "forcecpancfg!" => \$forcecpancfg,
                      "forcebuildperl!" => \$forcebuildperl,
+                     "forcemoduleinstall!" => \$forcemoduleinstall,
                      'perlformance' => \$perlformance,
                      'perlformance-local' => \$perlformance_local,
                      'perlformance-report' => \$perlformance_report,
@@ -229,10 +235,9 @@ my @default_modules    = ();
 my @default_mirrors    = (qw( http://search.cpan.org/CPAN/ ));
 
 return if defined($::{"no_run"});
-setup_user();
 print $USER "\n";
 print $USER "============================================================\n";
-print $USER "Bootstrap Perl\n";
+print $USER "Bootstrap Perl - ".localtime()."\n";
 print $USER "============================================================\n";
 
 # giturl "." means clone from local dir
@@ -325,6 +330,10 @@ if ($installdeps) {
 
 system("mkdir -p $build_path") == 0 || die;
 setup_log();
+print $LOGFILE "\n";
+print $LOGFILE "============================================================\n";
+print $LOGFILE "Bootstrap Perl - ".localtime()."\n";
+print $LOGFILE "============================================================\n";
 
 if (-d "$build_path_perl/.git") {
         print_and_system "cd $build_path_perl && git config remote.origin.url $giturl";
@@ -526,7 +535,7 @@ my $text_cpan_helper = <<'END_HELPER';
 
         my ($result_pipe, $logfile) = @ARGV;
 
-        open(my $LOGFILE, ">", $logfile) || die;
+        open(my $LOGFILE, ">>", $logfile) || die;
         open(STDOUT, ">&", $LOGFILE) || die;
         open(STDERR, ">&", \*STDOUT) || die;
         print "*** HELPER_START ".localtime()."\n";
@@ -538,7 +547,7 @@ my $text_cpan_helper = <<'END_HELPER';
 
         while (my $cmd = <STDIN>) {
                 chomp $cmd;
-                print "*** COMMAND_START [$cmd]\n";
+                print "*** CPAN_COMMAND_START [$cmd]\n";
 
                 # pass cfg to run() only once
                 # run() uses @ARGV
@@ -550,7 +559,7 @@ my $text_cpan_helper = <<'END_HELPER';
                 print "cmd now [", join(" ", @ARGV),"]\n";
 
                 my $rc = App::Cpan->run(@ARGV);
-                print "*** COMMAND_END [$rc] [$cmd]\n";
+                print "*** CPAN_COMMAND_END [$rc] [$cmd]\n";
                 print $RESULT $rc, "\n";
         }
 
@@ -607,7 +616,7 @@ if ($cpan)
 
         # distroprefs: get all from git
         print_and_system "mkdir -p $DISTROPREFSSRCBASE";
-        print_and_system "cd $DISTROPREFSSRCBASE && git clone $DISTROPREFSREPO";
+        print_and_system "cd $DISTROPREFSSRCBASE && git clone $DISTROPREFSREPO" unless -d "$DISTROPREFSSRCBASE/cpanpm-distroprefs";
         print_and_system "cd $DISTROPREFSSRCBASE/cpanpm-distroprefs && git pull";
         print_and_system "cd $DISTROPREFSSRCBASE/cpanpm-distroprefs && git submodule update --init --recursive";
         print_and_system "cd $DISTROPREFSSRCBASE/cpanpm-distroprefs && git pull";
@@ -723,7 +732,7 @@ if ($cpan)
         }
 
         # install dependencies needed for CPAN itself
-        foreach my $module (qw(version YAML::Syck IO::Tty Expect LWP Task::Bootstrap::Perl)) {
+        foreach my $module (qw(version YAML::Syck IO::Tty Expect LWP Task::Bootstrap::Perl::CPAN)) {
                 install_cpan_module($PERL, $bin_cpan, $CFG, 1, $module);
         }
         if ($perlformance || $perlformance_report) {
@@ -733,11 +742,7 @@ if ($cpan)
 
         # install requested modules from CPAN
         foreach my $module (@MODULES) {
-                print_and_system qq!$bin_cpan -j $CFG -i $module!;
-                if ($module =~ qr/^(Benchmark::Perl::Formance|Mail::SPF)$/) {
-                        # That's the whole deal, so we force it.
-                        install_cpan_module($PERL, $bin_cpan, $CFG, 1, $module);
-                }
+                install_cpan_module($PERL, $bin_cpan, $CFG, $forcemoduleinstall, $module);
         }
 } else {
         print $USER "*** SKIP bootstrapping cpan.\n";
@@ -933,6 +938,7 @@ Configure CPAN to use these mirrors:
 Install these modules from CPAN:
 
   $ bootstrap-perl --module YAML::Syck
+  $ bootstrap-perl --module YAML::Syck --forcemoduleinstall
   $ bootstrap-perl -M YAML::Syck -M Digest::SHA1 -M IO::Tty -M LWP
   $ bootstrap-perl -M YAML::Syck,Digest::SHA1 -M IO::Tty,LWP
 

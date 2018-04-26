@@ -13,7 +13,7 @@ sub load_and_merge {
   my $self;
   if (-f $file) {
     $self = $class->load($file);
-    $self->_add_prereqs($prereqs);
+    $self->_merge_prereqs($prereqs);
   } else {
     $self = $class->from_prereqs($prereqs);
   }
@@ -22,7 +22,7 @@ sub load_and_merge {
     for my $identifier (keys %$features) {
       my $feature = $features->{$identifier};
       $self->{_prereqs}->add_feature($identifier, $feature->{description});
-      $self->_add_prereqs($feature->{prereqs}, $identifier);
+      $self->_merge_prereqs($feature->{prereqs}, $identifier);
     }
   }
 
@@ -31,34 +31,25 @@ sub load_and_merge {
   $self;
 }
 
-sub _add_prereqs {
+sub _merge_prereqs {
   my ($self, $prereqs, $feature_id) = @_;
   $prereqs = $prereqs->as_string_hash unless ref $prereqs eq 'HASH';
 
-  my (%spec, @rest);
-  for my $prereq (@{$self->{_prereqs}{prereqs}}) {
-    if ($prereq->match_feature($feature_id)) {
-      $spec{$prereq->phase}{$prereq->type}{$prereq->module} = $prereq->requirement->version;
-    } else {
-      push @rest, $prereq;
-    }
-  }
-  @{$self->{_prereqs}{prereqs}} = @rest;
-
-  my $current = CPAN::Meta::Prereqs->new(\%spec);
+  my $current = CPAN::Meta::Prereqs->new($self->{_prereqs}->specs($feature_id));
   my $merged = $current->with_merged_prereqs(CPAN::Meta::Prereqs->new($prereqs));
 
-  $self->__add_prereqs($merged, $feature_id);
+  $self->__replace_prereqs($merged, $feature_id);
 }
 
-sub __add_prereqs {
+sub __replace_prereqs {
   my ($self, $prereqs, $feature_id) = @_;
-  my $hash = $prereqs->as_string_hash;
+  $prereqs = $prereqs->as_string_hash unless ref $prereqs eq 'HASH';
 
-  for my $phase (keys %$hash) {
-    for my $type (keys %{$hash->{$phase}}) {
-      while (my($module, $requirement) = each %{$hash->{$phase}{$type}}) {
-        $self->{_prereqs}->add_prereq(
+  @{$self->{_prereqs}{prereqs}{$feature_id || ''}} = ();
+  for my $phase (keys %$prereqs) {
+    for my $type (keys %{$prereqs->{$phase}}) {
+      while (my($module, $requirement) = each %{$prereqs->{$phase}{$type}}) {
+        $self->{_prereqs}->add(
           feature => $feature_id,
           phase => $phase,
           type  => $type,
@@ -75,13 +66,11 @@ sub _dedupe {
   my $prereqs = $self->prereqs;
   my %features = map {$_ => $self->feature($_)->{prereqs} } $self->{_prereqs}->identifiers;
 
-  @{$self->{_prereqs}{prereqs}} = ();
-
   dedupe_prereqs_and_features($prereqs, \%features);
 
-  $self->__add_prereqs($prereqs);
+  $self->__replace_prereqs($prereqs);
   for my $feature_id (keys %features) {
-    $self->__add_prereqs($features{$feature_id}, $feature_id);
+    $self->__replace_prereqs($features{$feature_id}, $feature_id);
   }
 }
 
@@ -96,7 +85,7 @@ sub to_string {
   $code .= $self->_dump_prereqs($prereqs, $include_empty);
 
   for my $feature ($self->features) {
-    $code .= sprintf "feature %s, %s => sub {\n", Module::CPANfile::_dump($feature->{identifier}), Module::CPANfile::_dump($feature->{description});
+    $code .= sprintf "feature %s, %s => sub {\n", Module::CPANfile::_d($feature->{identifier}), Module::CPANfile::_d($feature->{description});
     # See https://github.com/miyagawa/cpanfile/pull/32
     $code .= $self->_dump_prereqs($feature->{prereqs}->as_string_hash, $include_empty, 4);
     $code .= "};\n\n"; # ALSO TWEAKED

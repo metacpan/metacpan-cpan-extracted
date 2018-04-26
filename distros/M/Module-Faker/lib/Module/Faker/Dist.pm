@@ -1,6 +1,6 @@
 package Module::Faker::Dist;
 # ABSTRACT: a fake CPAN distribution
-$Module::Faker::Dist::VERSION = '0.018';
+$Module::Faker::Dist::VERSION = '0.020';
 use Moose;
 
 
@@ -316,7 +316,8 @@ sub _build__cpan_meta {
   }
   # optional fields
   for my $key ( qw/provides prereqs x_authority/ ) {
-    $meta->{$key} = $self->$key;
+    my $value = $self->$key;
+    $meta->{$key} = $value if $value;
   }
   return CPAN::Meta->new( $meta, {lazy_validation => 1} );
 }
@@ -430,7 +431,7 @@ Module::Faker::Dist - a fake CPAN distribution
 
 =head1 VERSION
 
-version 0.018
+version 0.020
 
 =head1 AUTHOR
 

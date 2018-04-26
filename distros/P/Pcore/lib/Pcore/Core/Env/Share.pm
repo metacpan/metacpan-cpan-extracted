@@ -73,7 +73,7 @@ sub get ( $self, @ ) {
         if ( $real_path && -f $real_path ) {
 
             # convert slashes
-            $path =~ s[\\][/]smg;
+            $real_path =~ s[\\][/]smg;
 
             if ( substr( $real_path, 0, length $root_path ) eq $root_path ) {
                 return $real_path;
@@ -84,7 +84,7 @@ sub get ( $self, @ ) {
     return;
 }
 
-sub store ( $self, $lib, $path, $file ) {
+sub write ( $self, $lib, $path, $file ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     die qq[share lib "$lib" is not exists] if !exists $self->{_lib_idx}->{$lib};
 
     $path = P->path( $self->{_lib_idx}->{$lib} . $path );
@@ -97,7 +97,7 @@ sub store ( $self, $lib, $path, $file ) {
         P->file->write_bin( $path, $file );
     }
     elsif ( is_plain_arrayref $file || is_plain_hashref $file ) {
-        P->cfg->store( $path, $file, readable => 1 );
+        P->cfg->read( $path, $file, readable => 1 );
     }
     else {
         P->file->copy( $file, $path );

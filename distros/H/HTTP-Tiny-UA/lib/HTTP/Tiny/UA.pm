@@ -4,7 +4,7 @@ use warnings;
 package HTTP::Tiny::UA;
 # ABSTRACT: Higher-level UA features for HTTP::Tiny
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use superclass 'HTTP::Tiny' => 0.036;
 
@@ -85,7 +85,7 @@ HTTP::Tiny::UA - Higher-level UA features for HTTP::Tiny
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -275,13 +275,9 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Golden Felipe Gasper Graham Ollis
+=for stopwords Felipe Gasper Graham Ollis Michael G. Schwern
 
 =over 4
-
-=item *
-
-David Golden <xdg@xdg.me>
 
 =item *
 
@@ -290,6 +286,10 @@ Felipe Gasper <felipe@felipegasper.com>
 =item *
 
 Graham Ollis <perl@wdlabs.com>
+
+=item *
+
+Michael G. Schwern <schwern@pobox.com>
 
 =back
 

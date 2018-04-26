@@ -11,7 +11,7 @@ use POSIX;
 use IO::File;
 
 our($VERSION);
-$VERSION = "1.06";
+$VERSION = "1.08";
 
 $| = 1;
 
@@ -39,7 +39,7 @@ our %Macros     = (0 => {
 
 our ($OUTPUT,@OUTPUT,%package,$MAN);
 $package{'VERSION'} = $VERSION;
-$package{'date'}    = POSIX::strftime("%a %B %d %Y",localtime());
+$package{'date'}    = POSIX::strftime("%a %b %d %Y",localtime());
 
 ###############################################################################
 ###############################################################################
@@ -112,7 +112,7 @@ sub _new {
    $package{'CMD'}     = $COM;
    $package{'command'} = $0;
    $package{'args'}    = $self->_args();
-   $package{'date'}    = POSIX::strftime("%a %B %d %Y",localtime());
+   $package{'date'}    = POSIX::strftime("%a %b %d %Y",localtime());
    $package{'self'}    = $self;
 
    return $self;
@@ -122,7 +122,7 @@ sub _args {
    my($self) = @_;
    my @args = @ARGV;
    map {
-      s/([;<>\*\|`&\$!#\(\)\[\]\{\}:'"\ \	])/\\$1/g;
+      s/([<>\*\|`&\$!#\(\)\[\]\{\}:'"\ \	])/\\$1/g;
    } @args;
    return join(' ',@args);
 }
@@ -134,6 +134,8 @@ sub _args {
 #   VERSION    => 1.00                   Version of this script
 #   command    => STRING                 The command executed
 #   args       => STRING                 The command line arguments
+#                                        This must only be used in a comment
+#                                        in the SPEC file.
 #   date       => STRING                 Current timestamp
 #   incl_tests => 0/1                    1 if we'll be adding tests to SPEC
 #   incl_deps  => 0/1                    1 if we'll be included requires
@@ -441,6 +443,9 @@ sub _parse_args {
    my($self) = @_;
    my @a     = @ARGV;
 
+   # We have to get the package first or else --optfile will not work.
+   $$self{'package'} = pop(@a);
+
    while ($_ = shift(@a)) {
 
       $self->_usage,                           exit  if ($_ eq '-h'  ||
@@ -475,8 +480,8 @@ sub _parse_args {
       $$self{'clean_macros'} = 1,              next  if ($_ eq '--clean-macros');
       $$self{'build_type'} = shift(@a),        next  if ($_ eq '--build-type');
       $$self{'group'} = shift(@a),             next  if ($_ eq '--group');
-      push(@{ $$self{'config'} }, shift),      next  if ($_ eq '--config');
-      push(@{ $$self{'build'} }, shift),       next  if ($_ eq '--build');
+      push(@{ $$self{'config'} }, shift(@a)),  next  if ($_ eq '--config');
+      push(@{ $$self{'build'} }, shift(@a)),   next  if ($_ eq '--build');
       $$self{'release'} = shift(@a),           next  if ($_ eq '--release');
       $$self{'disttag'} = shift(@a),           next  if ($_ eq '--disttag');
       $$self{'epoch'} = shift(@a),             next  if ($_ eq '--epoch');
@@ -529,8 +534,15 @@ sub _parse_args {
          next;
       }
 
-      $$self{'package'} = $_;
       die "ERROR: unknown arguments: $_ @a\n"  if (@a);
+   }
+
+   if (! -d $TMPDIR) {
+      warn "WARN: temporary directory ($TMPDIR) does not exist; creating...\n";
+      system("mkdir -p '$TMPDIR'");
+      if (! -d $TMPDIR) {
+         die "ERROR: temporary directory not created\n";
+      }
    }
 
    if (! $$self{'package'}) {
@@ -1456,6 +1468,24 @@ sub _make_spec {
    }
 
    #
+   # Some values may contain email addresses which might be of the form:
+   #    Name <Email>
+   # and the brackets <> conflict with the SPEC file templated.
+   #
+   # The values where this can occur are:
+   #    args     : this is already taken care of (< was turned to \<)
+   #    packager : a single value
+   #    author   : multiple values
+   #
+   # We need to escape the brackets in the unhandled cases.
+   #
+
+   foreach my $val ($package{'packager'},@{ $package{'author'} }) {
+      $val =~ s/</\\</g;
+      $val =~ s/>/\\>/g;
+   }
+
+   #
    # Start spec file creation...
    #
 
@@ -1554,7 +1584,7 @@ sub _make_spec {
          }
       }
 
-      while ($line =~ /(<(?:(quiet):)?([^>]+)>)/) {
+      while ($line =~ /(?<!\\)(<(?:(quiet):)?([^>]+)>)/) {
          my ($tag,$flag,$var) = ($1,$2,$3);
          $flag = ''  if (! $flag);
 
@@ -1576,6 +1606,8 @@ sub _make_spec {
          }
       }
 
+      $line =~ s/\\</</g;
+      $line =~ s/\\>/>/g;
       push(@lines,$line);
    }
 
@@ -4279,6 +4311,10 @@ rm -rf <_buildroot>
 <if:man3_inst>
 <man_dir>/man3/*
 <endif:man3_inst>
+
+%changelog
+* <date> <packager> <version>-<release>
+- Generated using cpantorpm
 
 <eof>
 # Local Variables:

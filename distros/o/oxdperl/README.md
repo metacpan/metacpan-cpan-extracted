@@ -47,7 +47,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Gluu Inc
+Copyright (C) 2016 Gaurav Chhabra
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -323,7 +323,7 @@ The oxd-perl configuration file is located in 'oxd-settings.json'. The values he
 ```        
 -    oxd_host_port - oxd port or socket
 
-## Sample code
+### Sample code
 
 ### index.cgi
 
@@ -353,7 +353,7 @@ OxdConfig:
 
 ### OxdSetupClient.pm
 
-- [Setup client api description](https://gluu.org/docs/oxd/3.1.2/api/#setup-client).
+- [Setup client protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#setup-client).
 
 **Example**
 
@@ -381,7 +381,7 @@ print Dumper($setup_client->getResponseObject());
 
 ### GetClientToken.pm
 
-- [Get client token api description](https://gluu.org/docs/oxd/3.1.2/api/#get-client-token).
+- [Get client token protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#get-client-token).
 
 **Example**
 
@@ -398,26 +398,9 @@ my $protection_access_token = $get_client_token->getResponseAccessToken();
 print Dumper($get_client_token->getResponseObject());
 ```
 
-### IntrospectAccessToken.pm
-
-- [Introspect_access_token protocol description](https://gluu.org/docs/oxd/3.1.2/api/#introspect-access-token).
-
-**Example**
-
-``` {.code}
-IntrospectAccessToken:
-
-my $introspect_access_token = new IntrospectAccessToken( );
-$introspect_access_token->setRequestOxdId($oxd_id);
-$introspect_access_token->setRequestAccessToken($access_token);
-$introspect_access_token->request();
-
-print Dumper($introspect_access_token->getResponseData());
-```
-
 ### OxdRegister.pm
 
-- [Register_site api description](https://gluu.org/docs/oxd/3.1.2/api/#register-site).
+- [Register_site protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#register-site).
 
 **Example**
 
@@ -439,7 +422,7 @@ print Dumper($register_site->getResponseObject());
 
 ### UpdateRegistration.pm
 
-- [Update_site_registration api description](https://gluu.org/docs/oxd/3.1.2/api/#update-site-registration).
+- [Update_site_registration protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#update-site-registration).
 
 **Example**
 
@@ -459,26 +442,9 @@ my $oxd_id = $update_site_registration->getResponseOxdId();
 print Dumper($update_site_registration->getResponseObject());
 ```
 
-### OxdRemove.pm
-
-- [Remove_site protocol description](https://gluu.org/docs/oxd/3.1.2/api/#remove-site)
-
-**Example**
-
-``` {.code}
-OxdRemove:
-
-my $oxd_remove = new OxdRemove();
-$oxd_remove->setRequestOxdId($oxd_id);
-$oxd_remove->setRequestProtectionAccessToken($protection_access_token);
-$oxd_remove->request();
-
-print Dumper($oxd_remove->getResponseObject());
-```
-
 ### GetAuthorizationUrl.pm
 
-- [Get_authorization_url api description](https://gluu.org/docs/oxd/3.1.2/api/#get-authorization-url).
+- [Get_authorization_url protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#get-authorization-url).
 
 **Example**
 
@@ -499,7 +465,7 @@ print Dumper($get_authorization_url->getResponseObject());
 
 ###  GetTokenByCode.pm
 
-- [Get_tokens_by_code api description](https://gluu.org/docs/oxd/3.1.2/api/#get-tokens-id-access-by-code).
+- [Get_tokens_by_code protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#get-tokens-id-access-by-code).
 
 **Example**
 
@@ -526,7 +492,7 @@ print Dumper($get_tokens_by_code->getResponseObject());
 
 ### GetAccessTokenByRefreshToken.pm
 
-- [Get_access token_by_refresh_token api description](https://gluu.org/docs/oxd/3.1.2/api/#get-access-token-by-refresh-token).
+- [Get_access token_by_refresh token protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#get-access-token-by-refresh-token).
 
 **Example**
 
@@ -547,7 +513,7 @@ print Dumper($get_access_token_by_refresh_token->getResponseObject());
 
 ### GetUserInfo.pm
 
-- [Get_user_info api description](https://gluu.org/docs/oxd/3.1.2/api/#get-user-info).
+- [Get_user_info protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#get-user-info).
 
 **Example**
 
@@ -568,7 +534,7 @@ print Dumper($get_user_info->getResponseObject());
 
 ### OxdLogout.pm
 
-- [Get_logout_uri api description](https://gluu.org/docs/oxd/3.1.2/api/#get-logout-uri).
+- [Get_logout_uri protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#log-out-uri).
 
 **Example**
 
@@ -595,7 +561,7 @@ print Dumper($logout->getResponseObject());
 
 ### UmaRsProtect.pm
 
-- [Uma_rs_protect api description](https://gluu.org/docs/oxd/3.1.2/api/#uma-rs-protect-resources).
+- [Uma_rs_protect protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#uma-rs-protect-resources).
 
 **Example**
 
@@ -604,7 +570,7 @@ UmaRsProtect:
 
 $uma_rs_protect = new UmaRsProtect();
 $uma_rs_protect->setRequestOxdId($oxd_id);
-
+$uma_rs_protect->setOverwrite(true);
 $uma_rs_protect->addConditionForPath(["GET"],["https://photoz.example.com/dev/actions/view"], ["https://photoz.example.com/dev/actions/view"]);
 $uma_rs_protect->addConditionForPath(["POST"],[ "https://photoz.example.com/dev/actions/add"],[ "https://photoz.example.com/dev/actions/add"]);
 $uma_rs_protect->addConditionForPath(["DELETE"],["https://photoz.example.com/dev/actions/remove"], ["https://photoz.example.com/dev/actions/remove"]);
@@ -615,11 +581,14 @@ $uma_rs_protect->request();
 print Dumper( $uma_rs_protect->getResponseObject() );
 ```
 
-***RS Protect with scope_expression***
+**RS Protect with scope_expression**
 
-```perl
-my $uma_rs_protect = new UmaRsProtect();
+``` {.code}
+UmaRsProtect:
+
+$uma_rs_protect = new UmaRsProtect();
 $uma_rs_protect->setRequestOxdId($oxdId);
+$uma_rs_protect->setOverwrite(true);
 
 %rule = ('and' => [{'or' => [{'var' => 0},{'var' => 1}]},{'var' => 2}]);
 $data = ["http://photoz.example.com/dev/actions/all", "http://photoz.example.com/dev/actions/add", "http://photoz.example.com/dev/actions/internalClient"];
@@ -632,9 +601,10 @@ $uma_rs_protect->request();
 print Dumper( $uma_rs_protect->getResponseObject() );
 ```
 
+
 ### UmaRsCheckAccess.pm
 
-- [Uma_rs_check_access api description](https://gluu.org/docs/oxd/3.1.2/api/#uma-rs-check-access).
+- [Uma_rs_check_access protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#uma-rs-check-access).
 
 **Example**
 
@@ -654,26 +624,9 @@ print Dumper($uma_rs_check_access->getResponseObject());
 
 ```
 
-### UmaIntrospectRpt.pm
-
-- [Introspect_rpt protocol description](https://gluu.org/docs/oxd/3.1.2/api/#uma-2-introspect-rpt).
-
-**Example**
-
-``` {.code}
-UmaIntrospectRpt:
-
-my $introspect_rpt = new UmaIntrospectRpt();
-$introspect_rpt->setRequestOxdId($oxdId);
-$introspect_rpt->setRequestRPT($rpt);
-$introspect_rpt->request();
-
-print Dumper($introspect_rpt->getResponseObject());
-```
-
 ### UmaRpGetRpt.pm
 
-- [Uma_rp_get_rpt api description](https://gluu.org/docs/oxd/3.1.2/api/#uma-rp-get-rpt).
+- [Uma_rp_get_rpt protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#uma-rp-get-rpt).
 
 **Example**
 
@@ -693,7 +646,7 @@ print Dumper($uma_rp_get_rpt->getResponseObject());
 
 ### UmaRpGetClaimsGatheringUrl.pm
 
-- [Uma_rp_get_claims_gathering_url api description](https://gluu.org/docs/oxd/3.1.2/api/#uma-rp-get-claims-gathering-url).
+- [Uma_rp_get_claims_gathering_url protocol description](https://gluu.org/docs/oxd/3.1.0/protocol/#uma-rp-get-claims-gathering-url).
 
 **Example**
 
@@ -713,3 +666,4 @@ print Dumper($uma_rp_get_claims_gathering_url->getResponseObject());
 
 Now your perl app should work from https://client.example.com/
 
+##Enjoy!

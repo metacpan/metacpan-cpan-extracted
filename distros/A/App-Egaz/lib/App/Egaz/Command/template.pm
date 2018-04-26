@@ -17,6 +17,7 @@ sub opt_spec {
                 one_of  => [
                     [ "multi" => "multiple genome alignments, orthologs" ],
                     [ "self"  => "self genome alignments, paralogs" ],
+                    [ "prep"  => "prepare sequences" ],
                 ],
             }
         ],
@@ -30,7 +31,7 @@ sub opt_spec {
         [],
         [ "length=i", "minimal length of alignment fragments",  { default => 1000 }, ],
         [ "msa=s",    "aligning program for refine alignments", { default => "mafft" }, ],
-        [ "taxon=s",  "taxons in this project", ],
+        [ "taxon=s",  "taxon.csv for this project", ],
         [ "aligndb",  "create aligndb scripts", ],
         [],
         [ "multiname=s", "naming multiply alignment", ],
@@ -41,6 +42,16 @@ sub opt_spec {
         [],
         [ "noblast", "don't blast paralogs against genomes", ],
         [ "circos",  "create circos script", ],
+        [],
+        [ "repeatmasker=s", "options passed to RepeatMasker", ],
+        [ "perseq=s@",      "split these files by names", ],
+        [ "min=i",   "minimal length of sequences",                      { default => 5000 }, ],
+        [ "about=i", "split sequences to chunks about approximate size", { default => 5000000 }, ],
+        [   "suffix=s@",
+            "suffix of wanted files",
+            { default => [ "_genomic.fna.gz", ".fsa_nt.gz" ] },
+        ],
+        [ "exclude=s", "regex to exclude some files", { default => "_from_" }, ],
         { show_defaults => 1, }
     );
 }
@@ -61,6 +72,8 @@ sub description {
 * without --tree and --rawphylo, the order of multiz stitch is the same as the one from command line
 * --outgroup uses basename, not full path. *DON'T* set --outgroup to target
 * --taxon may also contain unused taxons, for constructing chr_length.csv
+* --preq is designed for NCBI ASSEMBLY and WGS, <path/seqdir> are directories containing multiple
+    directories
 
 MARKDOWN
 
@@ -133,7 +146,7 @@ sub execute {
         Path::Tiny::path( $opt->{outdir}, 'Pairwise' )->mkpath();
         Path::Tiny::path( $opt->{outdir}, 'Results' )->mkpath();
     }
-    else {
+    elsif ( $opt->{mode} eq "self" ) {
         Path::Tiny::path( $opt->{outdir}, 'Pairwise' )->mkpath();
         Path::Tiny::path( $opt->{outdir}, 'Processing' )->mkpath();
         Path::Tiny::path( $opt->{outdir}, 'Results' )->mkpath();
@@ -171,7 +184,7 @@ sub execute {
     if ( $opt->{mode} eq "multi" and $opt->{outgroup} ) {
         my ($exist) = grep { $_->{name} eq $opt->{outgroup} } @data;
         if ( !defined $exist ) {
-            Carp::croak "--outgroup [$opt->{outgroup}] does not exist!\n";
+            Carp::confess "--outgroup [$opt->{outgroup}] does not exist!\n";
         }
 
         @data = grep { $_->{name} ne $opt->{outgroup} } @data;
@@ -179,7 +192,7 @@ sub execute {
     }
     $opt->{data} = \@data;    # store in $opt
 
-    print STDERR YAML::Syck::Dump( $opt->{data} ) if $opt->{verbose};
+    print STDERR YAML::Syck::Dump( $opt->{data} ) if $opt->{verbose} and $opt->{mode} ne "prep";
 
     # If there's no phylo tree, generate a fake one.
     if ( $opt->{mode} eq "multi" and !$opt->{tree} ) {
@@ -192,6 +205,11 @@ sub execute {
         print {$fh} ";\n";
         close $fh;
     }
+
+    #----------------------------#
+    # prep *.sh files
+    #----------------------------#
+    $self->gen_prep( $opt, $args );
 
     #----------------------------#
     # multi *.sh files
@@ -209,19 +227,41 @@ sub execute {
     $self->gen_circos( $opt, $args );
 
     $self->gen_aligndb( $opt, $args );
+    $self->gen_packup( $opt, $args );
 
 }
 
-sub gen_aligndb {
+sub gen_prep {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{aligndb};
+    return unless $opt->{mode} eq "prep";
+
+    my @patterns = map {"*$_"} @{ $opt->{suffix} };
+    my %perseq = map { $_ => 1, } @{ $opt->{perseq} };
+
+    my @files;
+    for ( @{$args} ) {
+        push @files, File::Find::Rule->file->name(@patterns)->in($_);
+    }
+
+    {
+        @files = grep { !/$opt->{exclude}/ } @files;
+        @files = map  { Path::Tiny::path($_)->absolute()->stringify } @files;
+        @files = map {
+            {   basename => Path::Tiny::path($_)->parent()->basename(),
+                perseq   => exists $perseq{ Path::Tiny::path($_)->parent()->basename() } ? 1 : 0,
+                file     => $_,
+            }
+        } @files;
+
+        print STDERR YAML::Syck::Dump \@files if $opt->{verbose};
+    }
 
     my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
     my $template;
     my $sh_name;
 
-    $sh_name = "7_chr_length.sh";
+    $sh_name = "0_prep.sh";
     print STDERR "Create $sh_name\n";
     $template = <<'EOF';
 [% INCLUDE header.tt2 %]
@@ -231,7 +271,65 @@ sub gen_aligndb {
 #----------------------------#
 log_warn [% sh %]
 
-echo "common_name,taxon_id,chr,length,assembly" > chr_length.csv
+[% FOREACH item IN files -%]
+log_info [% item.basename %]
+
+if [ -d [% item.basename %] ]; then
+    log_debug "[% item.basename %] presents"
+else
+    log_debug Processing [% item.file %]
+
+    egaz prepseq \
+        [% item.file %] \
+[% IF not item.perseq -%]
+        --about [% opt.about %] \
+[% END -%]
+[% IF opt.repeatmasker -%]
+        --repeatmasker "[% opt.repeatmasker %]" \
+[% END -%]
+        --min [% opt.min %] --gi -v \
+        -o [% opt.outdir %]/[% item.basename %]
+fi
+
+[% END -%]
+
+exit;
+
+EOF
+    $tt->process(
+        \$template,
+        {   args  => $args,
+            opt   => $opt,
+            files => \@files,
+            sh    => $sh_name,
+        },
+        Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
+    ) or Carp::confess Template->error;
+
+}
+
+sub gen_aligndb {
+    my ( $self, $opt, $args ) = @_;
+
+    return unless ( $opt->{mode} eq "multi" or $opt->{mode} eq "self" ) and $opt->{aligndb};
+
+    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $template;
+    my $sh_name;
+
+    $sh_name = "6_chr_length.sh";
+    print STDERR "Create $sh_name\n";
+    $template = <<'EOF';
+[% INCLUDE header.tt2 %]
+
+#----------------------------#
+# [% sh %]
+#----------------------------#
+log_warn [% sh %]
+
+mkdir -p Results;
+
+echo "common_name,taxon_id,chr,length,assembly" > Results/chr_length.csv
 
 [% FOREACH item IN opt.data -%]
 # [% item.name %]
@@ -239,7 +337,7 @@ perl -nla -F"\t" -e '
     print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}
     ' \
     [% item.dir %]/chr.sizes \
-    >> chr_length.csv;
+    >> Results/chr_length.csv;
 
 [% END -%]
 
@@ -255,7 +353,199 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
+
+    if ( $opt->{mode} eq "multi" ) {
+        $sh_name = "7_multi_aligndb.sh";
+        print STDERR "Create $sh_name\n";
+        $template = <<'EOF';
+[% INCLUDE header.tt2 %]
+
+#----------------------------#
+# [% sh %]
+#----------------------------#
+log_warn [% sh %]
+
+mkdir -p Results;
+
+cd Results
+
+#----------------------------#
+# Create anno.yml
+#----------------------------#
+log_info create anno.yml
+
+if [ -e [% opt.data.0.dir -%]/anno.yml ]; then
+    cp [% opt.data.0.dir -%]/anno.yml anno.yml;
+else
+    if [ -e [% opt.data.0.dir -%]/cds.yml ]; then
+        cp [% opt.data.0.dir -%]/cds.yml cds.yml;
+    else
+        runlist gff --tag CDS --remove \
+            [% opt.data.0.dir -%]/*.gff \
+            -o cds.yml
+    fi
+
+    if [ -e [% opt.data.0.dir -%]/repeat.yml ]; then
+        cp [% opt.data.0.dir -%]/repeat.yml repeat.yml;
+    else
+        runlist gff --remove \
+            [% opt.data.0.dir -%]/*.rm.gff \
+            -o repeat.yml
+    fi
+
+    # create empty cds.yml or repeat.yml
+    runlist genome [% opt.data.0.dir -%]/chr.sizes -o chr.yml
+    runlist compare --op diff chr.yml chr.yml -o empty.yml
+
+    for type in cds repeat; do
+        if [ ! -e ${type}.yml ]; then
+            cp empty.yml ${type}.yml
+        fi
+    done
+
+    runlist merge \
+        cds.yml repeat.yml \
+        -o anno.yml
+
+    rm -f repeat.yml cds.yml chr.yml empty.yml
+fi
+
+#----------------------------#
+# alignDB.pl
+#----------------------------#
+log_info run alignDB.pl
+
+alignDB.pl \
+    -d [% opt.multiname %] \
+    --da [% opt.outdir %]/[% opt.multiname %]_refined \
+    -a [% opt.outdir %]/Results/anno.yml \
+[% IF opt.outgroup -%]
+    --outgroup \
+[% END -%]
+    --chr [% opt.outdir %]/Results/chr_length.csv \
+    --lt [% opt.length %] --parallel [% opt.parallel %] --batch 10 \
+    --run 1,2,5,10,21,30-32,40-42,44
+
+exit;
+
+EOF
+        $tt->process(
+            \$template,
+            {   args => $args,
+                opt  => $opt,
+                sh   => $sh_name,
+            },
+            Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
+        ) or Carp::confess Template->error;
+    }
+    elsif ( $opt->{mode} eq "self" ) {
+        $sh_name = "7_self_aligndb.sh";
+        print STDERR "Create $sh_name\n";
+        $template = <<'EOF';
+[% INCLUDE header.tt2 %]
+
+#----------------------------#
+# [% sh %]
+#----------------------------#
+log_warn [% sh %]
+
+mkdir -p Results;
+
+cd Results
+
+#----------------------------#
+# [% opt.multiname %]
+#----------------------------#
+# steal multiname from --multi
+
+log_info init_alignDB
+
+alignDB.pl \
+    -d [% opt.multiname %]_self \
+    --chr [% opt.outdir %]/Results/chr_length.csv \
+    --run 1
+
+
+#----------------------------#
+# gen_alignDB.pl
+#----------------------------#
+# gen_alignDB to existing database
+
+log_info gen_alignDB
+
+[% FOREACH item IN opt.data -%]
+# [% item.name %]
+alignDB.pl \
+    -d [% opt.multiname %]_self \
+    --da [% opt.outdir %]/Results/[% item.name %]/[% item.name %].pair.fas \
+    --lt 1000 --parallel [% opt.parallel %] \
+    --run 2
+
+[% END -%]
+
+#----------------------------#
+# rest steps
+#----------------------------#
+alignDB.pl \
+    -d [% opt.multiname %]_self \
+    --parallel [% opt.parallel %] --batch 10 \
+    --run 5,10,21,30-32,40,42,44
+
+exit;
+
+EOF
+        $tt->process(
+            \$template,
+            {   args => $args,
+                opt  => $opt,
+                sh   => $sh_name,
+            },
+            Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
+        ) or Carp::confess Template->error;
+
+    }
+}
+
+sub gen_packup {
+    my ( $self, $opt, $args ) = @_;
+
+    return unless ( $opt->{mode} eq "multi" or $opt->{mode} eq "self" );
+
+    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $template;
+    my $sh_name;
+
+    $sh_name = "9_pack_up.sh";
+    print STDERR "Create $sh_name\n";
+    $template = <<'EOF';
+[% INCLUDE header.tt2 %]
+
+#----------------------------#
+# [% sh %]
+#----------------------------#
+log_warn [% sh %]
+
+find . -type f \
+    | grep -v -E "\.(sh|2bit)$" \
+    | grep -v -F "fake_tree.nwk" \
+    > file_list.txt
+
+tar -czvf [% opt.multiname %].tar.gz -T file_list.txt
+
+log_info [% opt.multiname %].tar.gz generated
+
+exit;
+
+EOF
+    $tt->process(
+        \$template,
+        {   args => $args,
+            opt  => $opt,
+            sh   => $sh_name,
+        },
+        Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
+    ) or Carp::confess Template->error;
 
 }
 
@@ -315,7 +605,7 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 }
 
 sub gen_rawphylo {
@@ -476,7 +766,7 @@ fasops refine \
 log_info RAxML
 
 egaz raxml \
-    --parallel [% IF opt.parallel > 8 %] 8 [% ELSIF opt.parallel > 3 %] [% opt.parallel - 1 %] [% ELSE %] 2 [% END %] \
+    --parallel [% IF opt.parallel > 3 %] [% opt.parallel - 1 %] [% ELSE %] 2 [% END %] \
 [% IF opt.outgroup -%]
     --outgroup [% opt.outgroup %] \
 [% END -%]
@@ -506,7 +796,7 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 }
 
 sub gen_multi {
@@ -635,7 +925,7 @@ find [% opt.multiname %]_refined -type f -name "*.fas" |
 log_info RAxML
 
 egaz raxml \
-    --parallel [% IF opt.parallel > 8 %] 8 [% ELSIF opt.parallel > 3 %] [% opt.parallel - 1 %] [% ELSE %] 2 [% END %] \
+    --parallel [% IF opt.parallel > 3 %] [% opt.parallel - 1 %] [% ELSE %] 2 [% END %] \
 [% IF opt.outgroup -%]
     --outgroup [% opt.outgroup %] \
 [% END -%]
@@ -665,7 +955,7 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 }
 
 sub gen_vcf {
@@ -738,7 +1028,7 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 
 }
 
@@ -791,7 +1081,7 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 }
 
 sub gen_proc {
@@ -1047,7 +1337,7 @@ EOF
             jrange => IPC::Cmd::can_run('jrange'),
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 }
 
 sub gen_circos {
@@ -1066,7 +1356,7 @@ sub gen_circos {
                 id  => $item->{name},
             },
             Path::Tiny::path( $opt->{outdir}, 'Circos', $item->{name}, "circos.conf" )->stringify
-        ) or Carp::croak Template->error;
+        ) or Carp::confess Template->error;
 
         # copy prebuilt karyotype file
         if ( $item->{taxon} != 0 ) {
@@ -1209,7 +1499,7 @@ EOF
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
-    ) or Carp::croak Template->error;
+    ) or Carp::confess Template->error;
 
 }
 

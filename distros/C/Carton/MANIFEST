@@ -46,6 +46,7 @@ xt/cli/check.t
 xt/cli/cpanfile.t
 xt/cli/deployment.t
 xt/cli/deps_phase.t
+xt/cli/dist.t
 xt/cli/exec.t
 xt/cli/freeze.t
 xt/cli/help.t

@@ -1,0 +1,58 @@
+NAME
+
+    Dist::Zilla::MintingProfile::FB11 - Mints a new FB11 site
+
+VERSION
+
+    version 0.016
+
+NAME
+
+    Dist::Zilla::MintingProfile::FB11 - Mints a new FB11 site
+
+PROFILES
+
+ default
+
+    Mints a new FB11 top-level application.
+
+    This is the default if you don't provide -p.
+
+        dzil new -P FB11 MyApp
+
+ FB11X
+
+    Mints a new FB11X component.
+
+        dzil new -P FB11 -p FB11X MyApp::FB11X::ComponentName
+
+ Form
+
+    Mints a new form (use with dzil add)
+
+        cd MyApp-FB11X-ComponentName
+        dzil add -P FB11 -p Form MyApp::FB11X::ComponentName::Form::EntityName
+
+ Controller
+
+    Mints a new controller (use with dzil add)
+
+        cd MyApp-FB11X-ComponentName
+        dzil add -P FB11 -p Form MyApp::FB11X::ComponentName::Controller::EntityName
+
+    The templates will need to be created in the directory:
+
+        lib/auto/MyApp/FB11X/ComponentName/root/templates/entityname/*.tt
+
+AUTHOR
+
+    Alastair McGowan-Douglas <altreus@altre.us>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Alastair McGowan-Douglas.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

@@ -69,3 +69,7 @@ cat t/example.fas | perl -I lib script/fasops stat stdin -o stdout
 
 perl -I lib/ script/fasops mergecsv -c t/links.copy.csv t/links.count.csv
 perl -I lib/ t/19-mergecsv.t
+
+perl -I lib/ script/fasops consensus t/example.fas -o stdout
+perl -I lib/ script/fasops consensus t/refine.fas -p 2 -o stdout
+perl -I lib/ t/20-consensus.t

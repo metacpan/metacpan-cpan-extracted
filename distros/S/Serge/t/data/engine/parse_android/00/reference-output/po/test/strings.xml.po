@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: test\n"
+"Generated-By: Serge 1.3\n"
+
+#. string1
+#: File: strings.xml
+#: ID: 52b8425aa485a7e3b7a02e1b586f9cef
+msgid "Value 1"
+msgstr "Ṽáļũē 1"
+
+#. string3
+#: File: strings.xml
+#: ID: 6442053438e70c7092f9735ab72ba9cf
+msgid ""
+"Text <xliff:g id=\"p_1\">\"placeholder\"</xliff:g> \"text\" (<xliff:g "
+"id=\"p_2\">placeholder</xliff:g> \"text\""
+msgstr ""
+"Ŧēҳţ <xliff:g id=\"p_1\">\"ṕļáçēĥőļđēŕ\"</xliff:g> \"ţēҳţ\" (<xliff:g "
+"id=\"p_2\">ṕļáçēĥőļđēŕ</xliff:g> \"ţēҳţ\""
+
+#. string4
+#: File: strings.xml
+#: ID: 5d53789c04f22cfbbb6b4a922ff2ceb8
+msgid ""
+"Text <xliff:g id='p_1'>'placeholder'</xliff:g> 'text' (<xliff:g "
+"id='p_2'>placeholder</xliff:g> 'text'"
+msgstr ""
+"Ŧēҳţ <xliff:g id='p_1'>'ṕļáçēĥőļđēŕ'</xliff:g> 'ţēҳţ' (<xliff:g "
+"id='p_2'>ṕļáçēĥőļđēŕ</xliff:g> 'ţēҳţ'"
+
+#. plural1:one
+#: File: strings.xml
+#: ID: 61b41427621f6f1d7fdb9ad94dd25d5b
+msgid "%d foo"
+msgstr "%d ḟőő"
+
+#. plural1:other
+#: File: strings.xml
+#: ID: 388cc53dd02ec6bd021fce7a776b2e28
+msgid "%d foos"
+msgstr "%d ḟőőš"
+
+#. array1:item
+#: File: strings.xml
+#: ID: 31fa23f81dbbf84fd6ef2038bc578b54
+msgid "Item 1.1"
+msgstr "Ĩţēḿ 1.1"
+
+#. array1:item
+#: File: strings.xml
+#: ID: 7e4c90246929fb35bf3b6c8f6c41c244
+msgid "Item 1.2"
+msgstr "Ĩţēḿ 1.2"

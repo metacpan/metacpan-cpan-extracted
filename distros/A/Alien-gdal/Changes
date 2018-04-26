@@ -1,5 +1,40 @@
 Revision history for Alien::gdal
 
+1.04 2018-04-25
+    - Run make clean on cpantesters to reduce number of build artefacts.
+    - See also 1.03_* release notes.  
+
+1.03_010 2018-04-18
+    - Add patch file to manifest.  It is needed on freebsd.
+
+1.03_009 2018-04-17
+    - Disable static build options to reduce build size (it was too big for many cpan testers).
+      Total size should be ~1GB on most systems now.
+
+1.03_008 2018-04-17
+    - disable cpp11 on freebsd to avoid CAD build failures
+
+1.03_007 2018-04-16
+    - patch configure so we generate a shared build on freebsd
+
+1.03_006 2018-04-16
+    - bsd variants use --with-local config arg to ensure /usr/local/include is used
+
+1.03_005 2018-04-14
+    - try to add /usr/local/include to include path on bsd variants
+
+1.03_004 2018-04-13
+    - use internal tiff library to avoid cpan testers fails
+
+1.03_003 2018-04-11
+    - Use plugin for GNU make on bsd variants
+
+1.03_002 2018-04-11
+    - Force use of gmake on freebsd
+
+1.03_001 2018-04-10
+    - Use a dynamic build on all platforms by default
+
 1.03 2018-04-04
     - Add CI badges
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Business::xISBN
 
+1.003 2018-04-23T21:50:29Z
+	* Clarify that it's the Artistic License 2.0.
+
 1.002 2016-08-10T09:32:34Z
 	* Bump to stable version
 

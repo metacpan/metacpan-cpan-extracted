@@ -6,23 +6,23 @@ Driven Development
 
 # VERSION
 
-Version 0.38
+Version 0.40
 
 # SYNOPSIS
 
-In file **features/step\_definitions/http\_steps.pl**:
+In file **features/step\_definitions/tbcd\_steps.pl**:
 
     #!/usr/bin/perl
 
     use strict;
     use warnings;
 
-    use Test::BDD::Cucumber::Definitions::HTTP::In;
+    use Test::BDD::Cucumber::Definitions::TBCD::In;
 
-In file **features/http.feature**:
+In file **features/site.feature**:
 
-    Feature: HTTP
-        Site test by HTTP
+    Feature: Site
+        Site tests
 
     Scenario: Loading the page
         When http request "GET" send "http://metacpan.org"
@@ -32,8 +32,8 @@ In file **features/http.feature**:
 
     $ pherkin
 
-      HTTP
-        Site test by HTTP
+      Site
+        Site tests
 
         Scenario: Loading the page
           When http request "GET" send "http://metacpan.org"
@@ -44,6 +44,9 @@ In file **features/http.feature**:
 The module exports functions `S`, `C`, `Given`, `When` and `Then`.
 These functions are identical to the same functions from the module
 [Test::BDD::Cucumber](https://metacpan.org/pod/Test::BDD::Cucumber).
+
+Additionally, the module exports several functions for parameter validation.
+These functions are exported by the `:validator` tag.
 
 By default, no functions are exported. All functions must be imported
 explicitly.

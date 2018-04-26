@@ -18,7 +18,7 @@ $result = test_app( 'App::Egaz' => [qw(repeatmasker t/not_exists t/pseudopig.fa)
 like( $result->error, qr{doesn't exist}, 'infile not exists' );
 
 SKIP: {
-    skip "RepeatMasker or faops not installed", 6
+    skip "RepeatMasker or faops not installed", 7
         unless IPC::Cmd::can_run('RepeatMasker')
         and IPC::Cmd::can_run('faops');
 
@@ -28,13 +28,15 @@ SKIP: {
     my $tempdir = Path::Tiny->tempdir;
     chdir $tempdir;
 
-    $result = test_app( 'App::Egaz' => [ "repeatmasker", "$t_path/pseudocat.fa", "--verbose", ] );
+    $result = test_app(
+        'App::Egaz' => [ "repeatmasker", "$t_path/pseudocat.fa", "--gff", "--verbose", ] );
 
     is( $result->error, undef, 'threw no exceptions' );
-    is( ( scalar grep {/\S/} split( /\n/, $result->stderr ) ), 1, 'stderr line count' );
+    is( ( scalar grep {/\S/} split( /\n/, $result->stderr ) ), 2, 'stderr line count' );
     is( ( scalar grep {/\S/} split( /\n/, $result->stdout ) ), 0, 'no stdout' );
     ok( $tempdir->child("pseudocat.fa")->is_file,     'pseudocat.fa exists' );
-    ok( $tempdir->child("pseudocat.fa.out")->is_file, 'pseudocat.fa.out exists' );
+    ok( $tempdir->child("pseudocat.rm.out")->is_file, 'pseudocat.rm.out exists' );
+    ok( $tempdir->child("pseudocat.rm.gff")->is_file, 'pseudocat.rm.gff exists' );
     is( `faops size $t_path/pseudocat.fa`, `faops size pseudocat.fa`, 'same length' );
 
     chdir $cwd;    # Won't keep tempdir

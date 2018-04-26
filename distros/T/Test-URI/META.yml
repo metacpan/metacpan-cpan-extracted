@@ -9,8 +9,8 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -23,7 +23,8 @@ requires:
   URI: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/briandfoy/Test-URI/issues
-  homepage: https://github.com/briandfoy/Test-URI
-  repository: https://github.com/briandfoy/Test-URI.git
-version: '1.081'
+  bugtracker: https://github.com/briandfoy/test-uri/issues
+  homepage: https://github.com/briandfoy/test-uri
+  repository: https://github.com/briandfoy/test-uri.git
+version: '1.082'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

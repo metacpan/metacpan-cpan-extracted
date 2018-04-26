@@ -31,15 +31,17 @@ sub description {
     $desc .= ucfirst(abstract) . ".\n";
     $desc .= <<'MARKDOWN';
 
+* Call `faops filter -N -s to convert IUPAC codes to 'N' and simplify sequence names
+* for --gi, see [this link](https://ncbiinsights.ncbi.nlm.nih.gov/2016/07/15/ncbi-is-phasing-out-sequence-gis-heres-what-you-need-to-know/)
 * If <path/seqfile> is a file
-    * call `faops filter -N -s to convert IUPAC codes to 'N' and simplify sequence names
     * call `faops split-name` to separate each sequences into `--outdir`
     * with --about, call `faops split-about` to split sequences to chunks about specified size
-    * for --gi, see [this link](https://ncbiinsights.ncbi.nlm.nih.gov/2016/07/15/ncbi-is-phasing-out-sequence-gis-heres-what-you-need-to-know/)
     * gzipped file is OK
 * If <path/> is a directory
     * --outdir will be omitted and set to <path/>
+    * --min, --about will be omitted
     * only files with suffix of '.fa' will be processed
+    * each files should contain only 1 sequences and names of file and sequence should be matched
 * Create chr.sizes via `faops size`
 * Create chr.2bit via `faToTwoBit`
 * `faops` and `faToTwoBit` should be in $PATH
@@ -102,6 +104,26 @@ sub execute {
             $cmd .= " faops split-name stdin $outdir";
         }
         App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
+    }
+    else {
+        # Store files in tempdir and then copy back
+        my $tempdir = Path::Tiny::tempdir("prepseq_XXXXXXXX");
+
+        my @paths = Path::Tiny::path( $args->[0] )->children(qr/\.fa$/);
+        for my Path::Tiny $path (@paths) {
+            my $basename = $path->basename(".fa");
+
+            my $cmd;
+            $cmd .= " faops filter -N -s";
+            $cmd .= " $path stdout";
+            if ( $opt->{gi} ) {
+                $cmd .= " |";
+                $cmd .= q{ perl -p -e '/\>gi\|/ and s/gi\|\d+\|gb\|//'};
+            }
+            $cmd .= " > $tempdir/$basename.fa";
+            App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
+            $tempdir->child("$basename.fa")->copy( $args->[0], "$basename.fa" );
+        }
     }
 
     #----------------------------#

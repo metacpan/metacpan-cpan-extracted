@@ -8,12 +8,11 @@ use Exporter qw(import);
 use JSON::Path qw(jpath jpath1);
 use JSON::XS;
 use List::Util qw(any all);
-use Test::BDD::Cucumber::Definitions qw(S);
-use Test::BDD::Cucumber::Definitions::Validator qw(:all);
+use Test::BDD::Cucumber::Definitions qw(S :validator);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 our @EXPORT_OK = qw(Struct);
 

@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Data::Enumerable::Lazy',
     VERSION_FROM      => 'lib/Data/Enumerable/Lazy.pm', # finds $VERSION
+    LICENSE           => 'perl_5',
     PREREQ_PM         => {
       'Test::More'      => '0',
       'Test::Exception'	=> '0',

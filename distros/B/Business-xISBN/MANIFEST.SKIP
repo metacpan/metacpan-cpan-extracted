@@ -59,8 +59,10 @@
 
 
 \.travis\.yml
+\.?appveyor.yml
 \.releaserc
 \.lwpcookies
+
 Business-.*
 
 

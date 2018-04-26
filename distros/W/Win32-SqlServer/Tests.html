@@ -62,7 +62,7 @@ server(s) the test scripts should access. <SMALL>OLLEDBTEST</SMALL> has this for
    with <SMALL>SQL</SMALL> authentication, you would say:</P>
 <PRE>   SET OLLEDBTEST=.;;;DEVSERVER;sa;notstrong</PRE>
 <P>The last option in the string is <B>Provider</B>. Use this if you want to force a
-certain provider. You will neeed to use this if you want to test against a version of SQL Server which is not supported by the default provider, which always is the most recently released proivder. The values for <B>Provider</B> are: 1&nbsp;&#8211;&nbsp;<SMALL>SQLOLEDB</SMALL>, 2&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI</SMALL>, 3&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI10</SMALL>, 4&nbsp;&#8211;<SMALL>&nbsp;SQLNCLI11</SMALL>.</P>
+certain provider. You will neeed to use this if you want to test against a version of SQL Server which is not supported by the default provider, which always is the most recently released proivder. The values for <B>Provider</B> are: 1&nbsp;&#8211;&nbsp;<SMALL>SQLOLEDB</SMALL>, 2&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI</SMALL>, 3&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI10</SMALL>, 4&nbsp;&#8211;<SMALL>&nbsp;SQLNCLI1</SMALL>, 5 &#8211; <SMALL>MSOLEDBSQL</SMALL>.</P>
 <P>The simplest way to run the scripts is to run them with <KBD>MAKE test</KBD>. </P>
 <P>A poor man's test harness is avilable in the t directory. Do:</P>
 <PRE>   CD t
@@ -94,16 +94,15 @@ correctly. As a side effect it also tests <A HREF="Win32-SqlServer.html#sql_sp">
 sql_insert()</A></SPAN> and that the <A HREF="Win32-SqlServer.html#LogHandle">log
 file</A> is correctly constructed.
 </P>
-<P><B>Notes</B>: Four tests related to the datetimeoffset data type may fail. This is due to, cough, a bug in Win32::SqlServer. I have not been able to address the bug in the current verison of Win32::SqlServer, because there does not seem to be any rounding function available in Visual Studio 2005 which I have used to build the binaries.</P>
 <P>
-<B>Number of tests</B>: Many. From a 1269 on <SMALL>SQL</SMALL>&nbsp;7 to over 
-4100
-on <SMALL>SQL</SMALL>&nbsp;2008 when you use SQLNCLI10 and you 
+  <B>Number of tests</B>: Many. From a 1269 on <SMALL>SQL</SMALL>&nbsp;7 to over 
+  4100
+  on <SMALL>SQL</SMALL>&nbsp;2008 when you use SQLNCLI10 or later and you 
 have the <SMALL>CLR</SMALL> enabled.</P>
 <P>
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: Tables and stored
 procedures in tempdb, and on <SMALL>SQL</SMALL> 2005 and later also an <SMALL>XML</SMALL> schema collection and three
-<SMALL>CLR</SMALL> user-defined types (the latter only if <SMALL>CLR</SMALL> is enabled). If you have SQL 2012 and your server collation is one of the new SC (surrogate-aware) collations, the script creates a <I><FONT COLOR="#FF0000">database</FONT></I>, and runs all tests in that database rather than tempdb. (Because the old data types <B>text</B> and <B>ntext</B> are not supported with SC collations.)</P>
+<SMALL>CLR</SMALL> user-defined types (the latter only if <SMALL>CLR</SMALL> is enabled and CLR strict security is not in force). If you have SQL 2012 or later and your server collation is one of the new SC (surrogate-aware) collations, the script creates a <I><FONT COLOR="#FF0000">database</FONT></I>, and runs all tests in that database rather than tempdb. (Because the old data types <B>text</B> and <B>ntext</B> are not supported with SC collations.)</P>
 <H3>
 <B>3_retvalues.t</B> </H3>
 <P>
@@ -116,7 +115,7 @@ procedures and user-defined functions for <A HREF="Win32-SqlServer.html#sql_sp">
 <P>
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: stored procedures and
 user-defined function in tempdb, and on <SMALL>SQL</SMALL> 2005 and later also an <SMALL>XML</SMALL> schema collection
-and <SMALL>CLR</SMALL> user-defined types (if the <SMALL>CLR</SMALL> is enabled).</P>
+and <SMALL>CLR</SMALL> user-defined types (if the <SMALL>CLR</SMALL> is enabled and CLR strict security is not in force).</P>
 <H3>
 <B>4_conversion.t</B> </H3>
 <P>
@@ -127,7 +126,7 @@ some of the tests are skipped. If the code page for your system collation is not
 <B>Notes</B>: the script requires Win32::Registry and will not compile if this
 module is not available. This an issue with the test script, not with Win32::SqlServer itself.</P>
 <P>
-<B>Number of tests</B>: 37.  Some tests are skipped if the <SMALL>CLR</SMALL> is not enabled. 
+<B>Number of tests</B>: 37.  Some tests are skipped if the <SMALL>CLR</SMALL> is not enabled  and CLR strict security is not in force. 
   Tests for table-valued parameters are only performed if you have SQL 2008 and 
 <SMALL>SQLNCLI10</SMALL> or later.</P>
 <P>
@@ -151,7 +150,7 @@ objects.</P>
 <B>Tests:</B> passing parameters to <SPAN CLASS="nowrap">
 <A HREF="Win32-SqlServer.html#sql">sql()</A></SPAN>.</P>
 <P>
-<B>Number of tests</B>: 113. With SQL 7/2000 a few tests are skipped and even fewer for later versions. For all tests to be run, you must have SQL 2008 or later, <SMALL>SQLNCLI10</SMALL> or later and the <SMALL>CLR</SMALL> must be enabled.</P>
+<B>Number of tests</B>: 113. With SQL 7/2000 a few tests are skipped and even fewer for later versions. For all tests to be run, you must have SQL 2008 or later, <SMALL>SQLNCLI10</SMALL> or later and the <SMALL>CLR</SMALL> must be enabled and CLR strict security must not be in force.</P>
 <P>
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: User-defined types in tempdb. On <SMALL>SQL</SMALL>&nbsp;2005 
   and later, it creates an <SMALL>XML</SMALL> schema collection in 
@@ -183,7 +182,7 @@ Server version, the <SMALL>OLE DB</SMALL> provider, the collation and the availa
 <P>
 <B>Creates in SQL Server</B>: Temp tables. On <SMALL>SQL</SMALL>&nbsp;2005 and later, it creates an <SMALL>XML</SMALL> 
 schema collection in tempdb, as well as four <SMALL>CLR</SMALL> user-defined types, if the <SMALL>CLR</SMALL> is
-enabled.</P>
+enabled  and CLR strict security is not in force.</P>
 <H3>
 <B>9_loginproperties.t</B> </H3>
 <P>
@@ -196,7 +195,7 @@ second test server with the <SMALL>OLLEDBTEST</SMALL> environment variable.</P>
 <P>
 <B>Number of tests</B>: 44, whereof three will be skipped if no second server
 is defined. Some tests are skipped depending on the <SMALL>SQL</SMALL> Server and the provider.
-Only with <SMALL>SQL</SMALL> 2005 or later and <SMALL>SQL</SMALL> Native Client and a second server all tests will be
+Only with <SMALL>SQL</SMALL> 2005 or later and <SMALL>SQLNCLI</SMALL> or later and a second server all tests will be
 performed. And even in that case, two tests will be skipped if <SMALL>SQL</SMALL>
 Server is configured for Windows authentication only.</P>
 <P>
@@ -217,12 +216,12 @@ tested in other scripts).</P>
 <B>Notes</B>: this test is skipped entirely unless you have SQL 2008 or later 
 and the provider is <SMALL>SQLNCLI10</SMALL> or later. </P>
 <P>
-<B>Number of tests</B>: 1554 (somewhat fewer if the <SMALL>CLR</SMALL> is disabled).</P>
+<B>Number of tests</B>: 1554 (somewhat fewer if the <SMALL>CLR</SMALL> is disabled or CLR strict security is in force).</P>
 <P>
 <B>Creates in SQL Server</B>: various table types, a XML schema collection and 
 four <SMALL>CLR UDT</SMALL>s if the 
 <SAMLL>CLR</SAMLL>
-is enabled.</P>
+is available.</P>
 <H3>
 B_filestream.t</H3>
 <P>
@@ -244,8 +243,9 @@ according to <B>sys.configurations</B>.
 database</FONT></I>, Olle$DB, with a <SMALL>FILESTREAM</SMALL> file group. It creates a table 
 with filestream data in that database. The database is dropped at the end of the 
 script.</P>
-<P><B>Known issues</B>: All tests but the last fails on Windows 10 when connected to SQL 2008, but not to SQL 2008 R2 and higher versions.</P>
+<P><B>Known issues</B>: Some tests fail on Windows 10 when connected to SQL 2008, but not to SQL 2008 R2 and higher versions.</P>
 <P>On 32-bit Perl with USE_64_BIT_INT, the last test fails for reasons I have not been able to understand. The test intends to pre-allocate a 80 TB record which is expected to fail, but the call unexpectedly succeeds.</P>
+<P><B>WARNING</B>! I have experienced Blue Screens with this test on one of my machines. Specifically it is the last test where I test to allocate too much that crashes Windows.  The Blue Screen occurs on the machine where SQL Server is running and the error code is BAD POOL CALLER. I have not nailed the exact conditions for the crash to occur, but it seems to be a combination of filter drivers. The machine in question has an installation of Storagecraft's Shadowprotect which sets up a filter driver. There is also the fileinfo filter driver, which I am told is only comes with client O/S like Windows 10, but not server O/Ss.</P>
 <H3>
 Y<B>_rowsetprops.t</B> </H3>
 <P>
@@ -291,7 +291,7 @@ generate output files.
 </P>
 <HR />
 <I>
-Last updated <!--$$Modtime:--> 16-07-15 14:14 <!-- $-->
+Last updated <!--$$Modtime:--> 18-04-13 17:31 <!-- $-->
 </I>
 </P>
 </BODY>

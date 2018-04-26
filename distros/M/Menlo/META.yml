@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/miyagawa/cpanminus/issues
   homepage: https://github.com/miyagawa/cpanminus
   repository: https://github.com/miyagawa/cpanminus.git
-version: '1.9017'
+version: '1.9019'
 x_contributors:
   - 'Aaron Moses <mosesa02@localhost.localdomain>'
   - 'Alessandro Ghedini <al3xbio@gmail.com>'
@@ -136,3 +136,4 @@ x_contributors:
   - 'yappo <yappo@shibuya.pl>'
   - 'zebardy <zebardy@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

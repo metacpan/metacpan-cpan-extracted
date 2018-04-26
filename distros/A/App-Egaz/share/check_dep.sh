@@ -45,6 +45,11 @@ hash multiz 2>/dev/null || {
     exit 1;
 }
 
+hash mafft 2>/dev/null || {
+    echo >&2 "mafft is required but it's not installed.";
+    exit 1;
+}
+
 hash fasops 2>/dev/null || {
     echo >&2 "fasops is required but it's not installed.";
     exit 1;
@@ -74,6 +79,10 @@ hash Rscript 2>/dev/null || {
 
 hash circos 2>/dev/null || {
     echo >&2 "circos is optional but it's not installed.";
+}
+
+hash RepeatMasker 2>/dev/null || {
+    echo >&2 "RepeatMasker is optional but it's not installed.";
 }
 
 hash jrange 2>/dev/null || {

@@ -1,7 +1,7 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Timing side-channel protected string compare",
    "author" : [
-      "unknown"
+      "Doug Hoyte <doug@hcsw.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.008000"
+         }
       }
    },
    "release_status" : "stable",
@@ -43,6 +45,6 @@
          "url" : "git://github.com/hoytech/String-Compare-ConstantTime.git"
       }
    },
-   "version" : "0.312",
+   "version" : "0.320",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

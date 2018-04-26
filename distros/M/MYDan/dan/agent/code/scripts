@@ -15,11 +15,19 @@ unless( $param{argv} && ref $param{argv} eq 'ARRAY' && @{$param{argv}} )
     exit 1;
 }
 
+my ( $pid, $filename );
+
+$SIG{INT} = $SIG{TERM} = sub {
+    kill 'TERM', $pid if $pid;
+    unlink $filename if -e $filename;
+    exit 1;
+};
+
 map
 {
-    my ( $type, $cont, $argv, $md5 ) = @$_{qw( type cont argv md5 )};
+    my ( $type, $cont, $argv, $md5, $fh ) = @$_{qw( type cont argv md5 )};
 
-    my ( $fh, $filename ) = tempfile();
+    ( $fh, $filename ) = tempfile();
     print $fh $cont;
     seek $fh, 0, 0;
     my $m = Digest::MD5->new()->addfile( $fh )->hexdigest();
@@ -31,33 +39,38 @@ map
         exit 1;
     }
 
-    if( $type )
+    if( $pid = fork )
     {
-        system "$type $filename $argv";
+        wait;
+        unlink $filename;
+
+        if( $? == -1 )
+        {
+            print "failed to execute: $!\n";
+            exit 1;
+        }
+        elsif ( $? & 127 )
+        {
+            printf "child died with signal %d, %s coredump\n",
+                ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
+            exit 1;
+        }
+
+        my $exit = $? >> 8;
+        exit $exit if $exit && print "child exited with value $exit\n";
     }
     else
     {
-        chmod 0755, $filename;
-        system "$filename $argv";
+        if( $type )
+        {
+            exec "$type $filename $argv";
+        }
+        else
+        {
+            chmod 0755, $filename;
+            exec "$filename $argv";
+        }
     }
-
-    unlink $filename;
-
-    if( $? == -1 )
-    {
-        print "failed to execute: $!\n";
-        exit 1;
-    }
-    elsif ( $? & 127 )
-    {
-        printf "child died with signal %d, %s coredump\n",
-            ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
-        exit 1;
-    }
-
-    my $exit = $? >> 8;
-    exit $exit if $exit && print "child exited with value $exit\n";
-
 }@{$param{argv}};
 
 exit 0;

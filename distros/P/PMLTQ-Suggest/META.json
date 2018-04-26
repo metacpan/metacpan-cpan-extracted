@@ -1,0 +1,80 @@
+{
+   "abstract" : "Tool for generating simple PMLTQ query based on given nodes",
+   "author" : [
+      "Maty\u00e1\u0161 Kopp <matyas.kopp@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PMLTQ-Suggest",
+   "no_index" : {},
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Server::Simple::CGI" : "0",
+            "PMLTQ" : "v1.4.0",
+            "Treex::PML" : "2.18"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PMLTQ::Command::suggest" : {
+         "file" : "lib/PMLTQ/Command/suggest.pm",
+         "version" : "v0.0.1"
+      },
+      "PMLTQ::Suggest" : {
+         "file" : "lib/PMLTQ/Suggest.pm",
+         "version" : "v0.0.1"
+      },
+      "PMLTQ::Suggest::Server" : {
+         "file" : "lib/PMLTQ/Suggest/Server.pm",
+         "version" : "v0.0.1"
+      },
+      "PMLTQ::Suggest::Utils" : {
+         "file" : "lib/PMLTQ/Suggest/Utils.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufal/pmltq-suggest-server/issues"
+      },
+      "homepage" : "http://ufal.mff.cuni.cz/pmltq/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ufal/pmltq-suggest-server.git",
+         "web" : "https://github.com/ufal/pmltq-suggest-server"
+      }
+   },
+   "version" : "0.0.1",
+   "x_authority" : "cpan:MATY",
+   "x_authority_from_module" : "PMLTQ::Suggest",
+   "x_permissions_from_module" : "PMLTQ::Suggest",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

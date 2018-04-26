@@ -6,27 +6,32 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'combine multiple sets of runlists';
+sub abstract {
+    return 'combine multiple sets of runlists';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen." ],
-        [ "remove|r",    "Remove 'chr0' from chromosome names." ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
+        [ "remove|r",    "remove 'chr0' from chromosome names" ],
+        { show_defaults => 1, }
     );
 }
 
 sub usage_desc {
-    my $self = shift;
-    my $desc = $self->SUPER::usage_desc;    # "%c COMMAND %o"
-    $desc .= " <infile>";
-    return $desc;
+    return "runlist combine [options] <infile>";
 }
 
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= " " x 4 . "It's expected that the YAML file is --mk.\n";
-    $desc .= " " x 4 . "Otherwise this command will make no effects.\n";
+    $desc .= <<'MARKDOWN';
+
+* It's expected that the YAML file is --mk
+* Otherwise this command will make no effects
+
+MARKDOWN
+
     return $desc;
 }
 

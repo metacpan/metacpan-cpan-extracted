@@ -83,8 +83,13 @@ sub execute {
                 }
             }
 
-            my $runlist = AlignDB::IntSpan->new()->add(@lists)->runlist;
-            $region_of->{$seq_name} = $runlist;
+            if (@lists) {
+                my $runlist = AlignDB::IntSpan->new()->add(@lists)->runlist;
+                $region_of->{$seq_name} = $runlist;
+            }
+            else {
+                $region_of->{$seq_name} = "-";
+            }
         }
     }
 

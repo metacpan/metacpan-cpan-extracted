@@ -16,16 +16,20 @@ $MYDan::Util::OptConf::THIS = 'bootstrap';
 =head1 SYNOPSIS
 
  $0 --install
-
  $0 --uninstall  
-         ( uninstall: Not recommended )
 
- $0 --reload
- $0 --run
-    
+ $0 --stop
+ $0 --start
+ $0 --restart
+
 =cut
 
-my %o = MYDan::Util::OptConf->load()->get( qw( install uninstall run reload ) )->dump();
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( install uninstall start stop restart ) )->dump();
+
+$option->assert() unless grep{ $o{$_} }qw( install uninstall start stop restart );
+
+( $o{stop}, $o{start} ) = ( 1, 1 ) if $o{restart};
 
 my $bootstrap = MYDan::Bootstrap->new( %o );
 
@@ -35,46 +39,57 @@ my $os = ( uname() )[0];
 my $user = `id -un`;
 chomp $user if $user;
 
-if( $o{reload} )
-{
-    for my $name ( map{  $_ =~ /\*/ ? ( map{ basename $_ }glob "$o{lock}/$_" ): "$_.lock"} @ARGV ? @ARGV : ( '*' ) )
-    {
-        next unless $name =~ s/\.lock$//g;
-        printf "$name: %s\n", $bootstrap->kill( $name, 'TERM' ) ? "kill" : "undo";
-    }
-}
-elsif( $o{install} )
+
+if( $o{install} )
 {
     my $rs = "$MYDan::PATH/var/ReservedSpace";
-    system( "mkdir -p '$rs'" ) unless -d $rs;
-    map{ system( "echo ReservedSpace > '$rs/$_'" ) unless -f "$rs/$_"; } 1..100;
+    unless( -d $rs )
+    {
+        die "mkdir fail:$!" if system "mkdir -p '$rs'";
+    }
+    map{ 
+        unless( -f "$rs/$_" )
+        {
+            die "make ReservedSpace fail:$!" if system "echo ReservedSpace > '$rs/$_'";
+        }
+    
+    } 1..100;
 
     if( $os =~ /CYGWIN/ )
     {
         die "user undef" unless $user;
         my $path = "/var/cron/tabs/$user";
-        system "sed -i '/mydan_bootstrap_cron_$uuid/d' $path";
-        system "echo '* * * * * $MYDan::PATH/dan/bootstrap/bin/bootstrap --run > /tmp/mydan_bootstrap_cron_$uuid.log 2>&1' >> $path"
+        die "sed fail: $!" if system "sed -i '/mydan_bootstrap_cron_$uuid/d' $path";
+        die "install fail:$!" if system "echo '\@reboot $MYDan::PATH/dan/bootstrap/bin/bootstrap --start > /dev/null 2>&1' >> $path"
     }
     else
     {
-        system "echo '* * * * * root $MYDan::PATH/dan/bootstrap/bin/bootstrap --run' > /etc/cron.d/mydan_bootstrap_cron_$uuid";
+        die "insall fail:$!" if system "echo '\@reboot root $MYDan::PATH/dan/bootstrap/bin/bootstrap --start >/dev/null 2>&1' > /etc/cron.d/mydan_bootstrap_cron_$uuid";
     }
+    exit;
 }
-elsif( $o{uninstall} )
+if( $o{uninstall} )
 {
     if( $os =~ /CYGWIN/ )
     {
         die "user undef" unless $user;
-        system "sed -i '/mydan_bootstrap_cron_$uuid/d' '/var/cron/tabs/$user'";
+        die "sed fail: $!" if system "sed -i '/mydan_bootstrap_cron_$uuid/d' '/var/cron/tabs/$user'";
     }
     else
     {
         unlink "/etc/cron.d/mydan_bootstrap_cron_$uuid";
     }
-    system "killall $uuid.mydan.bootstrap.master";
+    die "stop fail: $!" if system "killall $uuid.mydan.bootstrap.master";
+    exit;
 }
-elsif( $o{run} )
+
+if( $o{stop} )
 {
+    die "stop fail:$!" if system "killall $uuid.mydan.bootstrap.master";
+}
+if( $o{start} )
+{
+    exit 0 if fork;
+    $0 = "$uuid.mydan.bootstrap.master";
     $bootstrap->run();
 }

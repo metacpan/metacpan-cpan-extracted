@@ -1,10 +1,14 @@
-use String::Compare::ConstantTime qw/equals/;
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
+
+use String::Compare::ConstantTime qw/equals/;
 
 use utf8;
+use Encode;
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 
 
 ok(equals("asdf", "asdf"));
@@ -32,3 +36,9 @@ ok(equals(join("", ( map { chr } (0 .. 255) )) x 10,
 ok(!equals("asdf", undef));
 ok(!equals(undef, "asdf"));
 ok(equals(undef, undef));
+
+my $string_utf8_on = "äßλ";
+ok( utf8::is_utf8($string_utf8_on), "utf8 flag on");
+my $string_utf8_off = Encode::encode("utf8", $string_utf8_on);
+ok( !utf8::is_utf8($string_utf8_off), "utf8 flag off");
+ok(equals($string_utf8_on, $string_utf8_off));

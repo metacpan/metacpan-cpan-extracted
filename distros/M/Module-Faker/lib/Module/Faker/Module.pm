@@ -1,6 +1,6 @@
 package Module::Faker::Module;
 # ABSTRACT: a faked module
-$Module::Faker::Module::VERSION = '0.018';
+$Module::Faker::Module::VERSION = '0.020';
 use Moose;
 with 'Module::Faker::Appendix';
 
@@ -53,7 +53,7 @@ Module::Faker::Module - a faked module
 
 =head1 VERSION
 
-version 0.018
+version 0.020
 
 =head1 AUTHOR
 

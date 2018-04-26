@@ -1,10 +1,27 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/SqlServer.pm 81    16-07-11 22:24 Sommar $
+# $Header: /Perl/OlleDB/SqlServer.pm 84    18-04-10 22:22 Sommar $
 #
-# Copyright (c) 2004-2016 Erland Sommarskog
+# Copyright (c) 2004-2018 Erland Sommarskog
 #
 #
 # $History: SqlServer.pm $
+# 
+# *****************  Version 84  *****************
+# User: Sommar       Date: 18-04-10   Time: 22:22
+# Updated in $/Perl/OlleDB
+# Win32::SqlServer 2.011
+# 
+# *****************  Version 83  *****************
+# User: Sommar       Date: 18-04-09   Time: 22:51
+# Updated in $/Perl/OlleDB
+# Added support for the new MSOLEDBSQL provider.
+# 
+# *****************  Version 82  *****************
+# User: Sommar       Date: 16-11-16   Time: 9:01
+# Updated in $/Perl/OlleDB
+# Parsing @@version failed when it included information about the CU and
+# GDR. Instead use xp_msver when available, else use
+# serverproperty('ProductVersion').
 # 
 # *****************  Version 81  *****************
 # User: Sommar       Date: 16-07-11   Time: 22:24
@@ -260,7 +277,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS
             %NEWDATETIMETYPES %MAXTYPES %TYPEINFOTYPES $VERSION);
 
 
-$VERSION = '2.010';
+$VERSION = '2.011';
 
 @ISA = qw(Exporter DynaLoader Tie::StdHash);
 
@@ -371,14 +388,15 @@ use constant RETURN_ERROR      =>  0;
 use constant RETURN_ABORT      => -1;
 
 # Constants for option Provider
-use constant PROVIDER_DEFAULT   => 0;
-use constant PROVIDER_SQLOLEDB  => 1;
-use constant PROVIDER_SQLNCLI   => 2;
-use constant PROVIDER_SQLNCLI10 => 3;
-use constant PROVIDER_SQLNCLI11 => 4;
-use constant PROVIDER_OPTIONS   => (PROVIDER_DEFAULT, PROVIDER_SQLOLEDB,
-                                    PROVIDER_SQLNCLI, PROVIDER_SQLNCLI10,
-                                    PROVIDER_SQLNCLI11);
+use constant PROVIDER_DEFAULT    => 0;
+use constant PROVIDER_SQLOLEDB   => 1;
+use constant PROVIDER_SQLNCLI    => 2;
+use constant PROVIDER_SQLNCLI10  => 3;
+use constant PROVIDER_SQLNCLI11  => 4;
+use constant PROVIDER_MSOLEDBSQL => 5;
+use constant PROVIDER_OPTIONS    => (PROVIDER_DEFAULT, PROVIDER_SQLOLEDB,
+                                     PROVIDER_SQLNCLI, PROVIDER_SQLNCLI10,
+                                     PROVIDER_SQLNCLI11, PROVIDER_MSOLEDBSQL);
 
 # Constants for datetime options
 use constant DATETIME_HASH     => 0;
@@ -2723,17 +2741,22 @@ sub get_sqlserver_version {
 
     my ($exec_ok, $sqlver);
 
-    $self->initbatch('SELECT @@version');
+    # Use xp_msver if possible, but it is not present in Azure SQL Database.
+    # Note that we denote it with master.dbo so that it works on SQL 7.
+    # We need to embed calls in EXEC to avoid compilation errors.
+    $self->initbatch(<<'SQLEND');
+       IF object_id('master.dbo.xp_msver') IS NOT NULL
+          EXEC('EXEC master.dbo.xp_msver ''ProductVersion''')
+       ELSE
+          EXEC('SELECT serverproperty(''ProductVersion'') AS Character_Value')
+SQLEND
     $exec_ok = $self->executebatch();
     $self->olle_croak("Could not retrieve SQL Server version.\n")
         if not $exec_ok;
     while ($self->nextresultset()) {
-       my $arrayref;
-       if ($self->nextrow(undef, $arrayref)) {
-          my $atatversion = $$arrayref[0];
-          $atatversion =~ s/^[^\-]+-\s*//;
-          $atatversion =~ s/\s.*$//s;
-          $sqlver = $atatversion;
+       my $hashref;
+       if ($self->nextrow($hashref, undef)) {
+          $sqlver = $$hashref{'Character_Value'};
        }
        last if $sqlver;
     }

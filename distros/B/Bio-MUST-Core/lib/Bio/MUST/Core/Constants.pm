@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Constants;
 # ABSTRACT: Distribution-wide constants for Bio::MUST::Core
-$Bio::MUST::Core::Constants::VERSION = '0.181000';
+$Bio::MUST::Core::Constants::VERSION = '0.181120';
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ use Exporter::Easy (
                               $GAPPROTMISS $GAPDNAMISS $FRAMESHIFT) ],
         ncbi     => [ qw($NCBIPART $NCBIACC  $NCBIDBABBR
                          $NCBIPKEY $PKEYONLY $NCBIGCA $GCAONLY) ],
-        seqids   => [ qw($NOID_CHARS
+        seqids   => [ qw($NOID_CHARS $NEW_TAG $TAIL_42
                          $DEF_ID $GI_ID $LCL_ID $GNL_ID $JGI_ID $PAC_ID) ],
         files    => [ qw($EMPTY_LINE $COMMENT_LINE $DEF_LINE
                          $DIM_LINE $PHY_LINE
@@ -68,6 +68,8 @@ const our $GCAONLY       => qr{\A $NCBIGCA \z}xms;
 
 # regexes for parsing seq_ids
 const our $NOID_CHARS    => qr{[,;:]}xms;
+const our $NEW_TAG       => qr{\#NEW\#}xms;
+const our $TAIL_42       => qr{(?: \.H\d+\.\d+ | \.E\.bf | \.E\.lc) $NEW_TAG? \z}xms;
 const our $DEF_ID        => qr{\A (\S+) }xms;
 const our $GI_ID         => qr{\A  gi \| ($NCBIPKEY) }xms;
 const our $LCL_ID        => qr{\A lcl \| (\S+) }xms;
@@ -101,7 +103,7 @@ const our $ALI_SUFFIX    => qr{\.ali \z}xmsi;
 # Note: hash values correspond to -name arg in File::Find::Rule constructor
 
 const our %SUFFICES_FOR => (
-    Ali => qr{\. ali|fasta|fas \z}xmsi,
+    Ali => qr{\. (?: ali|fasta|fas ) \z}xmsi,
 );
 
 1;
@@ -116,7 +118,7 @@ Bio::MUST::Core::Constants - Distribution-wide constants for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 AUTHOR
 

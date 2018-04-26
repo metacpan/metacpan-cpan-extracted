@@ -53,7 +53,7 @@
    "provides" : {
       "YAML::Hobo" : {
          "file" : "lib/YAML/Hobo.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/aferreira/cpan-YAML-Hobo"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.2.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

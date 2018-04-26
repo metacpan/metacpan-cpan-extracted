@@ -36,10 +36,10 @@ no_index:
 provides:
   Date::Advent:
     file: lib/Date/Advent.pm
-    version: '1.20180422'
+    version: '1.20180423'
 requires:
   Carp: '1.38'
-  Date::Lectionary::Time: '1.20180422'
+  Date::Lectionary::Time: v1.20180422.1
   Moose: '2.1804'
   MooseX::StrictConstructor: '0.21'
   Time::Piece: '1.31'
@@ -47,6 +47,6 @@ requires:
   perl: '5.022'
 resources:
   repository: git://github.com/marmanold/Date-Advent.git
-version: v1.20180422
+version: v1.20180423
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_twitter: https://www.twitter.com/marmanold/

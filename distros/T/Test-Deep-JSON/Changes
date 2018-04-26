@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Deep::JSON
 
+0.05 2018-04-24T11:24:14Z
+        - switch to JSON::MaybeXS (#2, @karenetheridge)
+
 0.04 2017-09-29T00:18:37Z
         - added Test::Tester as an explicit dependency (#1)
 

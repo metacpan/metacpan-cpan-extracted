@@ -1,5 +1,8 @@
 Revision history for Perl module Test::URI
 
+1.082 2018-04-25T17:56:59Z
+	* Clarify that it's Artistic License 2.0.
+
 1.081 2016-01-25T16:53:44Z
 	* Freshen the distro, move to GitHub
 	* The code is the same

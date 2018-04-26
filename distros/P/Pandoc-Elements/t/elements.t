@@ -1,6 +1,6 @@
 use strict;
 use Test::More;
-use Pandoc::Elements qw(Emph Str attributes element);
+use Pandoc::Elements qw(Plain Emph Str attributes element);
 use JSON;
 
 is_deeply [ Str 'hello' ], 
@@ -23,5 +23,11 @@ is_deeply decode_json(Str('今日は')->to_json),
 
 my $ast = element ( Header => 6, attributes { foo => 6 }, Str 6 );
 is_deeply [ $ast->to_json =~ /(.6.)/g ], [ '[6,', '"6"', '"6"',], 'stringify numbers';
+
+# as_block
+{
+    is_deeply $ast->as_block, $ast, ':block->as_block';
+    is_deeply Str('x')->as_block, Plain([ Str 'x' ]), ':inline->as_block';
+}
 
 done_testing;

@@ -23,7 +23,7 @@ require Exporter;
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(fcopy rcopy dircopy fmove rmove dirmove pathmk pathrm pathempty pathrmdir rcopy_glob rmove_glob);
 
-$VERSION = '0.43';
+$VERSION = '0.44';
 
 $MaxDepth = 0;
 $KeepMode = 1;

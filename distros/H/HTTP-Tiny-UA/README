@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny::UA - Higher-level UA features for HTTP::Tiny
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
         use HTTP::Tiny::UA;
@@ -136,11 +136,11 @@ AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
-    *   David Golden <xdg@xdg.me>
-
     *   Felipe Gasper <felipe@felipegasper.com>
 
     *   Graham Ollis <perl@wdlabs.com>
+
+    *   Michael G. Schwern <schwern@pobox.com>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2013 by David Golden.

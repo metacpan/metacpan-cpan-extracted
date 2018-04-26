@@ -1,10 +1,16 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/makefile.pl 26    16-07-11 22:25 Sommar $
+# $Header: /Perl/OlleDB/makefile.pl 27    18-04-09 22:50 Sommar $
 #
 # Makefile.pl for MSSQL::OlleDB. Note that you may need to specify where
 # you ave the include files for OLE DB.
 #
 # $History: makefile.pl $
+# 
+# *****************  Version 27  *****************
+# User: Sommar       Date: 18-04-09   Time: 22:50
+# Updated in $/Perl/OlleDB
+# Change the location for where the OEL DB SDK is installed as well as
+# the name of the provider, which now is MSOLEDBSQL.
 # 
 # *****************  Version 26  *****************
 # User: Sommar       Date: 16-07-11   Time: 22:25
@@ -163,23 +169,23 @@ elsif ($clversion < 13) {
    exit 0
 }
 
-my $SQLDIR  = '\Program Files\Microsoft SQL Server\110\SDK';
-my $sqlnclih = "$SQLDIR\\INCLUDE\\SQLNCLI.H";
-foreach my $device ('C'..'Z') {
-   if (-r "$device:$sqlnclih") {
+my $SQLDIR  = '\Program Files\Microsoft SQL Server\Client SDK\OLEDB\180\SDK';
+my $oleheader = "$SQLDIR\\INCLUDE\\msoledbsql.h";
+foreach my $device ('A'..'Z') {
+   if (-r "$device:$oleheader") {
       $SQLDIR = "$device:$SQLDIR";
       last;
    }
 }
 if ($SQLDIR !~ /^[C-Z]:/) {
-    warn "Can't find '$sqlnclih' on any disk.\n";
+    warn "Can't find '$oleheader' on any disk.\n";
     warn 'Check setting of $SQLDIR in makefile.pl' . "\n";
     warn "No MAKEFILE generated.\n";
     exit 0;
 }
 
 my $archlibdir = ($ENV{PROCESSOR_ARCHITECTURE} eq 'AMD64' ? 'x64' : $ENV{PROCESSOR_ARCHITECTURE});
-my $libfile = qq!"$SQLDIR\\LIB\\$archlibdir\\sqlncli11.lib"!;
+my $libfile = qq!"$SQLDIR\\LIB\\$archlibdir\\msoledbsql.lib"!;
 
 # Set specific flags we want for compilation.
 my $ccflags = $Config{'ccflags'};

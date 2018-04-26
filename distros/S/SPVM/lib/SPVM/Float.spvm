@@ -1,4 +1,4 @@
-package Float : private {
+package Float {
   has value : private float;
   
   sub new : Float ($value : float) {
@@ -11,5 +11,9 @@ package Float : private {
   
   sub get_value : float ($self : self) {
     return $self->{value};
+  }
+  
+  sub set_value : void ($self : self, $value : float) {
+    $self->{value} = $value;
   }
 }

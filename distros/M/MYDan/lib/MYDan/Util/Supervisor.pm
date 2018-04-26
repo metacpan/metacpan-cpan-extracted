@@ -102,8 +102,8 @@ sub run
     );
 
     my $ht = AnyEvent->timer(
-        after => 6,
-        interval => 3,
+        after => 60,
+        interval => 30,
         cb => sub {
 
             my $ua = LWP::UserAgent->new();
@@ -114,7 +114,6 @@ sub run
 
             my $status = $check ? ( $res->is_success && $res->content =~ /$check/ ) ? 'ok' : 'fail'
                                 : ( $res->code() == 200 ) ? 'ok' : 'fail';
-
 
             print $logH unixtai64n(time), " [CHECK] $status\n";
             kill 'KILL', $proc{pid} if $status eq 'fail' && $proc{pid};

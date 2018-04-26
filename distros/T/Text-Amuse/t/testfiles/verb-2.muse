@@ -1,0 +1,12 @@
+#title Verb 2nd
+#lang en
+
+<verbatim>[[verbatim][verbatim]]</verbatim> [[verbatim][<verbatim>*hello*</verbatim>]] [[verbatim][<verbatim>*hello*</verbatim>]] <verbatim>[[verbatim][verbatim]]</verbatim>
+
+[[verbatim][<verbatim>*hello*</verbatim>]] <verbatim>[[verbatim][verbatim]]</verbatim> <verbatim>[[verbatim][verbatim]]</verbatim> [[verbatim][<verbatim>*hello*</verbatim>]] 
+
+<verbatim>[[http://example.com]]</verbatim> [[http://example.com]] <verbatim>[[http://example.com]]</verbatim> [[http://example.com]]
+
+
+
+

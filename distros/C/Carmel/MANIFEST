@@ -24,6 +24,7 @@ xt/cli/binstubs.t
 xt/cli/conflict.t
 xt/cli/core.t
 xt/cli/devel.t
+xt/cli/dist.t
 xt/cli/exact.t
 xt/cli/exec_dash.t
 xt/cli/exec_h.t

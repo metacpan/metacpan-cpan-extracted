@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Lazy generator + enumerable for Perl5.",
    "author" : [
       "Oleg S <me@whitebox.io>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -28,5 +28,5 @@
          "web" : "https://github.com/icanhazbroccoli/Data-Enumerable-Lazy"
       }
    },
-   "version" : "0.03"
+   "version" : "0.032"
 }

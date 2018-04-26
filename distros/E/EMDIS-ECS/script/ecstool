@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecstool).
@@ -9,7 +9,7 @@ use Data::Dumper;
 use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL delete_old_files load_ecs_config
            move_to_dir valid_encr_typ
            pgp2_decrypt openpgp_decrypt read_ecs_message_id
-           send_ecsmsg_email format_datetime send_admin_email);
+           send_ecsmsg_email format_datetime send_admin_email is_yes);
 use EMDIS::ECS::Message;
 use EMDIS::ECS::FileBackedMessage;
 use Fcntl qw(:DEFAULT :flock);
@@ -543,12 +543,12 @@ if($opt_meta) {
                 "msg_type=READY\n",
                 ((exists $node->{in_seq}) &&
                     ((!exists $node->{ready_num_disabled}) ||
-                     ($node->{ready_num_disabled} !~ /(true|yes)/i))
+                     not is_yes($node->{ready_num_disabled}))
                     ? "last_recv_num=" . $node->{in_seq}
                     : "") . "\n",
                 ((exists $node->{out_seq}) &&
                     ((!exists $node->{ready_num_disabled}) ||
-                     ($node->{ready_num_disabled} !~ /(true|yes)/i))
+                     not is_yes($node->{ready_num_disabled}))
                     ? "last_sent_num=" . $node->{out_seq}
                     : "") . "\n",
                 "# Hello Partner, I am alive. " . rand() . "\n");
@@ -672,7 +672,7 @@ if($opt_nodedata) {
 
         # simple sanity check before eval($filedata)
         die "Error: unrecognized nodedata input ($filename).\n"
-            unless $filedata =~ /^\$nodedata = {/;
+            unless $filedata =~ /^\$nodedata = \{/;
         # note: potential security risk -- executing Perl code from input file
         eval($filedata);
 
@@ -1267,7 +1267,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

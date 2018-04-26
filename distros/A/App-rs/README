@@ -1,0 +1,2 @@
+This is the package manager of RSLinux, please see the pod document by
+running `perldoc bin/rs' for more information.

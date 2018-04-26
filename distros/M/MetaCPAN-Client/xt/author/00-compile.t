@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20;
+plan tests => 21;
 
 my @module_files = (
     'MetaCPAN/Client.pm',
     'MetaCPAN/Client/Author.pm',
+    'MetaCPAN/Client/Cover.pm',
     'MetaCPAN/Client/Distribution.pm',
     'MetaCPAN/Client/DownloadURL.pm',
     'MetaCPAN/Client/Favorite.pm',

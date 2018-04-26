@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.001
+version 0.002
 
 # SYNOPSIS
 
@@ -227,7 +227,7 @@ The events provided by this component.
 
 # AUTHOR
 
-Brad Lhotsky <brad@divisionbyzero.net>
+Brad Lhotsky &lt;brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
@@ -248,7 +248,7 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/POE-Component-ElasticSearch-Indexer](http://metacpan.org/release/POE-Component-ElasticSearch-Indexer)
+    [https://metacpan.org/release/POE-Component-ElasticSearch-Indexer](https://metacpan.org/release/POE-Component-ElasticSearch-Indexer)
 
 - RT: CPAN's Bug Tracker
 

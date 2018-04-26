@@ -1,4 +1,11 @@
 
+7.76  2018-04-23
+  - Due to lack of domain experts on the team, Windows is no longer officially
+    supported. Moving foward, we will try to keep Mojolicious installable on
+    Windows, but cannot make any promises regarding security and/or reliability.
+  - Fixed a bug in Mojolicious::Plugin::Config where the config stash value was
+    not available when the config_override feature was used. (tim)
+
 7.75  2018-04-09
   - Deprecated placeholder quoting with "(placeholder)" in favor of
     "<placeholder>".

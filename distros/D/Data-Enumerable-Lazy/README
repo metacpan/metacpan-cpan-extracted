@@ -1,5 +1,5 @@
 NAME
-    Data::Enumerable::Lazy
+    Data::Enumerable::Lazy - Lazy generator + enumerable for Perl5.
 
 SYNOPSIS
     A basic lazy range implementation picking even numbers only:
@@ -78,7 +78,7 @@ EXAMPLES
 
   Prime numbers
     Prime numbers is an infinite sequence of natural numbers. This example
-    implements a very basic prime number generator.
+    implements a very naive suboptimal prime number generator.
 
       my $prime_num_stream = Data::Enumerable::Lazy->new({
         # This is an infinite sequence
@@ -109,11 +109,11 @@ EXAMPLES
     by one or use another handy method `take()' which returns first N
     results.
 
-  Nested enumerables
+  Flat enumeration (Nested generators)
     In this example we will output a numbers of a multiplication table
-    10x10. What's interesting in this example is that there are 2 sequences:
-    primary and secondary. Primary `on_next()' returns secondary sequence,
-    which generates the result of multiplication of 2 numbers.
+    10x10. What's interesting in this example is that there are 2 levels of
+    sequences: primary and secondary. Primary `on_next()' returns secondary
+    sequence, which multiplicates 2 numbers.
 
       # A new stream based on a range from 1 to 10
       my $mult_table = Data::Enumerable::Lazy->from_list(1..10)->continue({
@@ -130,9 +130,9 @@ EXAMPLES
         },
       });
 
-    Another feature which is demonstrated here is the batched result
-    generation. Let's iterate the sequence step by step and see what happens
-    inside.
+    Another feature which is represented here is the nested result
+    generation. Let's walk trough the sequence generation step by step and
+    see what happens.
 
       $mult_table->has_next; # returns true based on the primary range, _buffer is
                              # empty
@@ -280,11 +280,16 @@ OPTIONS
     left in the buffer, `on_next()' would be called.
 
     `$element' is defined when the current collection is a contuniation of
-    another enumerable. I.e.: my $enum =
-    Data::Enumerable::Lazy->from_list(1, 2, 3); my $enum2 =
-    $enum->continue({ on_next => sub { my ($self, $i) = @_; $self->yield($i
-    * $i) } }); $enum2->to_list; # generates 1, 4, 9 In this case $i would
-    be defined and it comes from the original enumerable.
+    another enumerable. I.e.:
+
+      my $enum = Data::Enumerable::Lazy->from_list(1, 2, 3);
+      my $enum2 = $enum->continue({
+        on_next => sub { my ($self, $i) = @_; $self->yield($i * $i) }
+      });
+      $enum2->to_list; # generates 1, 4, 9
+
+    In this case $i would be defined and it comes from the original
+    enumerable.
 
     The function is supposed to return an enumerable, in this case it would
     be kept as the buffer object. If this function method returns any other
@@ -356,7 +361,10 @@ INSTANCE METHODS
 
   reset()
     This method is a generic entry point for a enum reset. In fact, it is
-    basically a wrapper around user-defined `on_reset()'.
+    basically a wrapper around user-defined `on_reset()'. Use with caution:
+    if `on_reset()' was not defined, it will reset the buffer and might
+    cause a partial calculation skip (reset implicitly clears the internal
+    buffer) if the buffer was not fully iterated yet.
 
   to_list()
     This function transforms a lazy enumerable to a list. Only finite
@@ -369,12 +377,30 @@ INSTANCE METHODS
     original enumerable. Works the same way as perl map {} function but it's
     lazy.
 
+    Example
+
+      Data::Enumerable::Lazy
+        ->from_array(1, 2, 3)
+        ->map(sub {
+          my ($number) = @_;
+          return $number * $number
+        });
+
   reduce($acc, $callback)
     Resolves the enumerable and returns the resulting state of the
     accumulator $acc provided as the 1st argument. `$callback' should always
     return the new state of `$acc'.
 
     `reduce()' is defined for finite enumerables only.
+
+    Example
+
+      Data::Enumerable::Lazy
+        ->from_array(1, 2, 3)
+        ->reduce(1, sub {
+          my ($acc, $number) = @_;
+          return $acc *= $number
+        });
 
   grep($callback, $max_lookahead)
     `grep()' is a function which returns a new enumerable by applying a
@@ -391,6 +417,15 @@ INSTANCE METHODS
     `next()' method in order to find an element for which the user-defined
     function will return true. `next()', on the other side, returns the
     value that was pre-fetched by `has_next()'.
+
+    Example
+
+      Data::Enumerable::Lazy
+        ->from_list(1, 2, 3)
+        ->grep(sub {
+          my ($number) = @_;
+          return $number % 2
+        });
 
   resolve()
     Resolves an enumerable completely. Applicable for finite enumerables
@@ -491,12 +526,10 @@ SEE ALSO
     https://github.com/icanhazbroccoli/Data-Enumerable-Lazy
 
   Alternative implementations:
-    https://metacpan.org/pod/List::Generator
-    https://metacpan.org/pod/Generator::Object
-    https://metacpan.org/pod/Iterator
+    List::Generator Generator::Object Iterator
 
 COPYRIGHT AND LICENSE
-    Copyright 2017 Oleg S <me@whitebox.io>
+    Copyright 2017, 2018 Oleg S <me@whitebox.io>
 
     Copying and distribution of this file, with or without modification, are
     permitted in any medium without royalty provided the copyright notice

@@ -1,10 +1,11 @@
 \chapter{Start}
+\hyperdef{amuse}{valid1}{}%
+
+\chapter{Start with invalid anchor \#invalid3}
+
+
 \hyperdef{amuse}{valid2}{}%
-
-\chapter{Start with invalid anchor \#invalid2}
-
-
-\#invalid3 because the text continue
+because the text continue
 
 
 \hyperdef{amuse}{valid3}{}%
@@ -16,7 +17,7 @@ Anchor is on a line by itself (valid3)
 
 \section{Section 2 \#invalid4}
 
-\subsubsection{Section 3 with valid5 anchor (but weird).}
+\subsubsection{Section 3 with valid5 anchor}
 \hyperdef{amuse}{valid5}{}%
 
 \section{\#invalid5\forcelinebreak  In title}
@@ -26,7 +27,8 @@ Anchor is on a line by itself (valid3)
 \begin{quote}
 
 
-\#invalid6 in quote
+\hyperdef{amuse}{valid22}{}%
+in quote
 
 
 
@@ -48,7 +50,8 @@ valid 6 in quote
 
 \begin{center}
 
-\#invalid7 in center
+\hyperdef{amuse}{valid7}{}%
+in center
 
 
 \end{center}
@@ -57,7 +60,7 @@ valid 6 in quote
 
 \begin{center}
 
-\hyperdef{amuse}{valid7}{}%
+\hyperdef{amuse}{valid8}{}%
 valid 7
 in center
 
@@ -68,8 +71,9 @@ in center
 
 \begin{flushright}
 
-\hyperdef{amuse}{valid8}{}%
-\#invalid8 in right
+\hyperdef{amuse}{valid9}{}%
+\hyperdef{amuse}{valid10}{}%
+in right
 valid8
 in right
 
@@ -80,27 +84,30 @@ in right
 \begin{description}
 
 \item[{DL}] 
-\#invalid9 in dl
+\#invalid7 in dl
 
 
 \item[{DL}] 
-\hyperdef{amuse}{valid9}{}%
-valid 9 in dl
+\hyperdef{amuse}{valid11}{}%
+\#invalid8
+valid11 in dl
 
 
 \end{description}
 
 \begin{enumerate}[1.]
 \item\relax 
-\#invalid10 in list
+\#invalid9 in list
 
 
 
 \item\relax 
-\hyperdef{amuse}{valid10}{}%
-\hyperdef{amuse}{valid11}{}%
-valid10 at list beginning list
-\#invalid11 in list par
+\hyperdef{amuse}{valid12}{}%
+\hyperdef{amuse}{valid13}{}%
+\hyperdef{amuse}{valid14}{}%
+\#invalid10
+at list beginning list
+in list par
 valid 11 in list par
 
 
@@ -108,50 +115,68 @@ valid 11 in list par
 
 \end{enumerate}
 
-\hyperdef{amuse}{valid12}{}%
-Try the footnote\footnote{\#invalid12 in footnote}
+\hyperdef{amuse}{valid15}{}%
+Try the footnote\footnote{\hyperdef{amuse}{valid23}{}%
+\#invalid11 in footnote}
 valid12 near the footnote
 
+\hyperdef{amuse}{valid16}{}%
+\hyperdef{amuse}{valid17}{}%
+\hyperdef{amuse}{valid18}{}%
 
 
 \begin{verse}
-\#invalid13 in verse
+in verse
 
-\hyperdef{amuse}{valid13}{}%
 valid13 in verse
 \end{verse}
 
 
+\hyperdef{amuse}{valid19}{}%
+before verse
+
+
 
 \begin{verse}
-\#invalid14 in verse
+\#invalid12 in verse
 
-\hyperdef{amuse}{valid14}{}%
-valid14 in verse
+\#invalid13\forcelinebreak
+invalid14x in verse
+\end{verse}
+
+\hyperdef{amuse}{valid20}{}%
+
+
+\begin{verse}
+verse with anchor
 \end{verse}
 
 
 \begin{alltt}
-\#invalid15
+\#invalid14
 
 In example is not valid.
 \end{alltt}
 
 
 \begin{alltt}
-\#invalid16
+\#invalid15
 In example is not valid.
 \end{alltt}
 
 
-\#invalid17
+\#invalid16
 In \texttt{verbatim} is always neutralized.
+
+
+\hyperdef{amuse}{valid21}{}%
+ :: This is an anchor, but dt breaks, it's not a list anymore
 
 
 \begin{description}
 
-\item[{\#invalid18}] 
-As Dt
+\item[{\#invalid17}] 
+This is a DL
 
 
 \end{description}
@@ -161,6 +186,11 @@ As Dt
 
 
 \begin{itemize}
+\item\relax 
+\hyperref{}{amuse}{valid1}{valid1}
+
+
+
 \item\relax 
 \hyperref{}{amuse}{valid2}{valid2}
 
@@ -223,6 +253,51 @@ As Dt
 
 \item\relax 
 \hyperref{}{amuse}{valid14}{valid14}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid15}{valid15}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid16}{valid16}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid17}{valid17}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid18}{valid18}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid19}{valid19}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid20}{valid20}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid21}{valid21}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid22}{valid22}
+
+
+
+\item\relax 
+\hyperref{}{amuse}{valid23}{valid23}
 
 
 
@@ -314,11 +389,6 @@ As Dt
 
 \item\relax 
 \hyperref{}{amuse}{invalid17}{invalid17}
-
-
-
-\item\relax 
-\hyperref{}{amuse}{invalid18}{invalid18}
 
 
 

@@ -11,7 +11,6 @@ bin/ali2fasta.pl
 bin/ali2phylip.pl
 bin/app-len-ids-ali.pl
 bin/change-ids-ali.pl
-bin/classify-ali.pl
 bin/clust2mapper.pl
 bin/fasta2ali.pl
 bin/fetch-tax.pl
@@ -45,7 +44,6 @@ lib/Bio/MUST/Core.pm
 lib/Bio/MUST/Core/Ali.pm
 lib/Bio/MUST/Core/Ali/Stash.pm
 lib/Bio/MUST/Core/Ali/Temporary.pm
-lib/Bio/MUST/Core/ColorScheme.pm
 lib/Bio/MUST/Core/Constants.pm
 lib/Bio/MUST/Core/GeneticCode.pm
 lib/Bio/MUST/Core/GeneticCode/Factory.pm
@@ -56,6 +54,7 @@ lib/Bio/MUST/Core/PostPred/Composition.pm
 lib/Bio/MUST/Core/Roles/Aliable.pm
 lib/Bio/MUST/Core/Roles/Commentable.pm
 lib/Bio/MUST/Core/Roles/Listable.pm
+lib/Bio/MUST/Core/Roles/Taxable.pm
 lib/Bio/MUST/Core/Seq.pm
 lib/Bio/MUST/Core/SeqId.pm
 lib/Bio/MUST/Core/SeqMask.pm
@@ -65,8 +64,10 @@ lib/Bio/MUST/Core/SeqMask/Rates.pm
 lib/Bio/MUST/Core/Taxonomy.pm
 lib/Bio/MUST/Core/Taxonomy/Category.pm
 lib/Bio/MUST/Core/Taxonomy/Classifier.pm
+lib/Bio/MUST/Core/Taxonomy/ColorScheme.pm
 lib/Bio/MUST/Core/Taxonomy/Criterion.pm
 lib/Bio/MUST/Core/Taxonomy/Filter.pm
+lib/Bio/MUST/Core/Taxonomy/Labeler.pm
 lib/Bio/MUST/Core/Taxonomy/MooseNCBI.pm
 lib/Bio/MUST/Core/Tree.pm
 lib/Bio/MUST/Core/Tree/Forest.pm
@@ -77,7 +78,6 @@ t/ali.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/author-portability.t
-t/color_scheme.t
 t/composition.t
 t/forest.t
 t/genetic_code.t
@@ -149,6 +149,7 @@ test/bmge_strict.fasta
 test/cbs.ali
 test/cbs.fasta
 test/cbs.stockholm
+test/classifier-simple.idl
 test/classifier.yaml
 test/collapse.nex
 test/collapse.tre
@@ -157,7 +158,6 @@ test/complete.fasta
 test/cyano.org-idm
 test/cyanos.arb
 test/cyanos_taxa.tre
-test/debrief42-accurate.fra
 test/empty_seqs.ali
 test/euka-adl.cls
 test/fetch-tax-baseid.idl

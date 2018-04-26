@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdMapper;
 # ABSTRACT: Id mapper for translating sequence ids
-$Bio::MUST::Core::IdMapper::VERSION = '0.181000';
+$Bio::MUST::Core::IdMapper::VERSION = '0.181120';
 use Moose;
 use namespace::autoclean;
 
@@ -114,6 +114,7 @@ sub load {
     my $infile = shift;
     my $args   = shift // {};           # HashRef (should not be empty...)
 
+    # TODO: strip spaces around separator? also in ColorScheme?
     my $sep = $args->{sep} // qr{\t}xms;
 
     open my $in, '<', $infile;
@@ -184,7 +185,7 @@ Bio::MUST::Core::IdMapper - Id mapper for translating sequence ids
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 SYNOPSIS
 

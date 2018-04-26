@@ -234,7 +234,11 @@ sub clone {return [(map {[(@{$_})]} @{$_[0]})]}
 sub f1 {
     return [
         map {
-            [ sprintf("%.0f", $_->[0]), sprintf("%.0f", $_->[1]) ]
+            my $x = sprintf("%.0f", $_->[0]);
+            my $y = sprintf("%.0f", $_->[1]);
+            $x = '0' if $x eq '-0';
+            $y = '0' if $y eq '-0';
+            [ $x, $y ]
         }
         @{$_[0]}
     ];

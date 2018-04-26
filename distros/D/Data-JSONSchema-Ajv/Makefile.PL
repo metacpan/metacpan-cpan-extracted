@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-JSONSchema-Ajv",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Data::JSONSchema::Ajv",
   "PREREQ_PM" => {
     "Data::GUID" => 0,
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Types::Serialiser" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

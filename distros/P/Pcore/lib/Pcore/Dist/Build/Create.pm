@@ -67,7 +67,7 @@ sub run ($self) {
     # copy files
     my $files = Pcore::Util::File::Tree->new;
 
-    my $tmpl_cfg = P->cfg->load( $ENV->{share}->get( 'Pcore', 'dist-tmpl', 'cfg.ini' ) );
+    my $tmpl_cfg = P->cfg->read( $ENV->{share}->get( 'Pcore', 'dist-tmpl', 'cfg.ini' ) );
 
     my $tmpl_params = $self->tmpl_params;
 

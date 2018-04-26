@@ -1,0 +1,19 @@
+This Docker container includes test configurations to facilitate testing
+of EMDIS::ECS email communications.
+
+Email communications testing is dependent on SMTP, POP3, and IMAP services,
+typically provided by a companion GreenMail container.
+
+The ecs-AA, ecs-BB, and ecs-CC subdirectories contain test configurations
+for nodes AA, BB, and CC.  The .gnupg subdirectory contains the GnuPG
+public and secret keyrings used by those test nodes.
+
+For additional information about EMDIS::ECS ...
+
+perldoc EMDIS::ECS
+perldoc ecs_scan_mail
+perldoc ecs_chk_com
+perldoc ecstool
+perldoc ecs_setup
+perldoc EMDIS::ECS::Config
+etc.

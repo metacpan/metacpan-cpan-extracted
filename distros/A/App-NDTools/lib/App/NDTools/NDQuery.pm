@@ -10,9 +10,9 @@ use Log::Log4Cli;
 use App::NDTools::Slurp qw(s_dump);
 use Struct::Path 0.80 qw(list_paths path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
-use Term::ANSIColor qw(colored);
+use Term::ANSIColor qw(color);
 
-our $VERSION = '0.33';
+our $VERSION = '0.36';
 
 sub arg_opts {
     my $self = shift;
@@ -23,7 +23,7 @@ sub arg_opts {
         'delete|ignore=s@' => \$self->{OPTS}->{delete},
         'depth|d=i' => \$self->{OPTS}->{depth},
         'grep=s@' => \$self->{OPTS}->{grep},
-        'items' => \$self->{OPTS}->{items},
+        'keys' => \$self->{OPTS}->{keys},
         'list|l' => \$self->{OPTS}->{list},
         'md5' => \$self->{OPTS}->{md5},
         'path|p=s' => \$self->{OPTS}->{path},
@@ -38,8 +38,8 @@ sub check_args {
     my $self = shift;
 
     if ($self->{OPTS}->{replace}) {
-        die_fatal "--replace opt can't be used with --items", 1
-            if ($self->{OPTS}->{items});
+        die_fatal "--replace opt can't be used with --keys", 1
+            if ($self->{OPTS}->{keys});
         die_fatal "--replace opt can't be used with --list", 1
             if ($self->{OPTS}->{list});
         die_fatal "--replace opt can't be used with --md5", 1
@@ -111,8 +111,8 @@ sub exec {
             map { path($_, $spath, delete => 1) if (ref $_) } @data;
         }
 
-        if ($self->{OPTS}->{items}) {
-            $self->items(\@data);
+        if ($self->{OPTS}->{keys}) {
+            $self->list_keys(\@data);
         } elsif ($self->{OPTS}->{list}) {
             $self->list($uri, \@data);
         } elsif ($self->{OPTS}->{md5}) {
@@ -127,7 +127,7 @@ sub exec {
 
 my $JSON = JSON->new->canonical->allow_nonref;
 
-sub items {
+sub list_keys {
     my ($self, $data) = @_;
     my @out;
 
@@ -147,19 +147,21 @@ sub items {
 sub list {
     my ($self, $uri, $data) = @_;
 
+    my $base_pfx = $self->{OPTS}->{colors}
+        ? color($self->{OPTS}->{'color-common'}) : "";
+    my $base_sfx = $self->{OPTS}->{colors} ? color('reset') : "";
+
     for (@{$data}) {
         my @list = list_paths($_, depth => $self->{OPTS}->{depth});
-        my ($base, @delta, $line, $path, $prev, $value, @out);
+        my (@delta, $line, $path, $prev, $value, @out);
 
         while (@list) {
             ($path, $value) = splice @list, 0, 2;
 
             @delta = path_delta($prev, $path);
-            $base = [ @{$path}[0 .. @{$path} - @delta - 1] ];
-            $line = $self->{OPTS}->{colors}
-                ? colored(path2str($base), $self->{OPTS}->{'color-common'})
-                : path2str($base);
-            $line .= path2str(\@delta);
+            $line = $base_pfx .
+                path2str([@{$path}[0 .. @{$path} - @delta - 1]]) . $base_sfx .
+                path2str(\@delta);
 
             if ($self->{OPTS}->{values}) {
                 $line .= " = ";
@@ -181,9 +183,8 @@ sub list {
 sub md5 {
     my ($self, $uri, $data) = @_;
 
-    print md5_hex($JSON->encode($_)) .
-        (ref $uri ? "\n" : " $uri\n")
-            for (@{$data});
+    print md5_hex($JSON->encode(@{$data} == 1 ? $data->[0] : $data)) .
+        (ref $uri ? " -\n" : " $uri\n");
 }
 
 1; # End of App::NDTools::NDQuery

@@ -4,7 +4,8 @@ use warnings;
 
 package Session::Storage::Secure;
 # ABSTRACT: Encrypted, expiring, compressed, serialized session data with integrity
-our $VERSION = '0.010'; # VERSION
+
+our $VERSION = '0.011';
 
 use Carp                    (qw/croak/);
 use Crypt::CBC              ();
@@ -12,9 +13,9 @@ use Crypt::Rijndael         ();
 use Crypt::URandom          (qw/urandom/);
 use Digest::SHA             (qw/hmac_sha256/);
 use Math::Random::ISAAC::XS ();
-use MIME::Base64 3.12 ();
-use Sereal::Encoder ();
-use Sereal::Decoder ();
+use MIME::Base64 3.12     ();
+use Sereal::Encoder 4.005 ();
+use Sereal::Decoder 4.005 ();
 use String::Compare::ConstantTime qw/equals/;
 use namespace::clean;
 
@@ -291,7 +292,7 @@ Session::Storage::Secure - Encrypted, expiring, compressed, serialized session d
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -673,6 +674,8 @@ L<https://github.com/dagolden/Session-Storage-Secure>
 David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTOR
+
+=for stopwords Tom Hukins
 
 Tom Hukins <tom@eborcom.com>
 

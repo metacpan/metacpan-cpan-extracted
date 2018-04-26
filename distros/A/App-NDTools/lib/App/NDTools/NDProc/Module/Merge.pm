@@ -12,15 +12,18 @@ use Storable qw(dclone);
 use Struct::Path 0.80 qw(implicit_step path);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub MODINFO { "Merge structures according provided rules" }
 
 sub arg_opts {
     my $self = shift;
 
+    my %opts = $self->SUPER::arg_opts();
+    delete $opts{'path=s@'};
+
     return (
-        $self->SUPER::arg_opts(),
+        %opts,
         'ignore=s@' => \$self->{OPTS}->{ignore},
         'merge|path=s' => sub {
             if ($self->{rules} and @{$self->{rules}}) {

@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.14.18;
+package Pcore::PgSQL v0.14.19;
 
 use Pcore -dist, -class;
 

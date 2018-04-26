@@ -1,0 +1,16 @@
+requires 'Catalyst';
+requires 'CatalystX::AppBuilder';
+requires 'Moose';
+requires 'OpusVL::FB11';
+requires 'CatalystX::InjectComponent';
+requires 'File::ShareDir';
+requires 'DateTime::Format::Pg';
+
+requires perl => '5.020';
+
+on test => sub {
+    requires "Test::PostgreSQL" => "1.06";
+    requires "Test::Most";
+    requires "Catalyst::Test";
+    requires "Test::WWW::Mechanize::Catalyst";
+};

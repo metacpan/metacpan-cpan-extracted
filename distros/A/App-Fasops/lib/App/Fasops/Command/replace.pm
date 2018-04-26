@@ -7,7 +7,9 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'replace headers from a blocked fasta';
+sub abstract {
+    return 'replace headers from a blocked fasta';
+}
 
 sub opt_spec {
     return ( [ "outfile|o=s", "Output filename. [stdout] for screen." ], { show_defaults => 1, } );
@@ -20,12 +22,20 @@ sub usage_desc {
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= "\t<infile> is the path to blocked fasta file, .fas.gz is supported.\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
-    $desc .= "\t<replace.tsv> is a tab-separated file containing more than one fields.\n";
-    $desc .= "\t\toriginal_name\treplace_name\tmore_replace_name\n";
-    $desc .= "\t\tWith one field will delete the whole alignment block.\n";
-    $desc .= "\t\tWith three or more fields will duplicate the whole alignment block.\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+
+* <replace.tsv> is a tab-separated file containing more than one fields
+
+        original_name   replace_name    more_replace_name
+
+    * With one field will delete the whole alignment block
+    * With three or more fields will duplicate the whole alignment block
+
+MARKDOWN
+
     return $desc;
 }
 

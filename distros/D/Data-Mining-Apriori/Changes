@@ -49,3 +49,6 @@ Revision history for Perl extension Data::Mining::Apriori.
 0.17  Thu Jan 25 15:32:28 2018
 		- add precision, sets the floating point precision of the metrics.
 		- updated code, synopsis.
+
+0.18  Sat Apr 21 12:05:52 2018
+		- added a subset generator pure with List::PowerSet to performance improvement.

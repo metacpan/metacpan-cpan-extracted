@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-04-22'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-04-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +10,9 @@ use warnings;
 use Getopt::Long;
 
 my %Opts = (
+    action => 'rank',
     ignore_leading_blanks => 0,
+    calc_percentile => [],
     reverse => 0,
     sort => 'ascii',
     field_separator => "\t",
@@ -27,6 +29,11 @@ my %Opts = (
 
 sub parse_cmdline {
     my $res = GetOptions(
+        'action=s' => \$Opts{action},
+        'calc-percentile=s' => sub {
+            $Opts{action} = 'calc-percentile';
+            $Opts{calc_percentile} = [split /\s*,\s*/, $_[1]];
+        },
         'ignore-leading-blanks|b' => \$Opts{ignore_leading_blanks},
         'ignore-case|f' => \$Opts{ignore_case},
         'reverse|r' => \$Opts{reverse},
@@ -89,6 +96,16 @@ sub run {
 
     @data = sort { $sortsub->($a->[0], $b->[0]) } @data;
 
+    # exact percentiles to calculate
+    my @percentiles;
+    for (@{ $Opts{calc_percentile} }) {
+        my $p = $_+0;
+        die "rank: Invalid percentile '$_', must be (0,100]\n"
+            unless $p > 0 && $p <= 100;
+        push @percentiles, $p;
+    }
+    @percentiles = sort {$b <=> $a} @percentiles;
+
     # if we're using the 'no-skip' ranking system, we'll need to calculate
     # the lowest ranking (highest number)first
     my $lowest_rank;
@@ -108,6 +125,7 @@ sub run {
 
     my $rank;
     my $prev_sortkey;
+    my $prev_percentile;
     for my $row_num (0..$#data) {
         my $item = $data[$row_num];
         my $sortkey = $item->[0];
@@ -131,10 +149,34 @@ sub run {
             $percentile = (@data - $rank + 1)/@data * 100;
         }
 
-        print $rank, $fs if $Opts{show_rank};
-        printf "%.3f%s", $percentile, $fs
-            if $Opts{show_percentile};
-        print $item->[1];
+        if ($Opts{action} eq 'rank') {
+            print $rank, $fs if $Opts{show_rank};
+            printf "%.3f%s", $percentile, $fs
+                if $Opts{show_percentile};
+            print $item->[1];
+        } elsif ($Opts{action} eq 'calc-percentile') {
+            while (1) {
+                last unless @percentiles;
+                if ($percentile == $percentiles[0]) {
+                    printf "%.3f\t%.8f\n", $percentile, $sortkey;
+                    shift @percentiles;
+                } elsif ($percentile < $percentiles[0]) {
+                    if (defined $prev_percentile) {
+                        # linear interpolation
+                        my $val = $prev_sortkey +
+                            ($percentiles[0]-$prev_percentile) / ($percentile-$prev_percentile) * ($sortkey - $prev_sortkey);
+                        printf "%.3f\t%.8f\n", $percentiles[0], $val;
+                    } else {
+                        printf "%.3f\t%s\n", $percentile, "N/A";
+                    }
+                    shift @percentiles;
+                } else {
+                    last;
+                }
+            }
+            $prev_percentile = $percentile;
+        }
+
         $prev_sortkey = $sortkey;
     }
 }
@@ -160,7 +202,7 @@ rank - Rank lines of text
 
 =head1 VERSION
 
-This document describes version 0.003 of rank (from Perl distribution App-rank), released on 2018-04-22.
+This document describes version 0.004 of rank (from Perl distribution App-rank), released on 2018-04-25.
 
 =head1 SYNOPSIS
 
@@ -213,6 +255,15 @@ Sample output using C<rank -np>:
 =head1 OPTIONS
 
 =over
+
+=item * --action=s (default: rank)
+
+Valid values: C<rank>, C<calc-percentile>
+
+=item * --calc-percentile=f, ...
+
+Imply C<--action=calc-percentile>. Calculate specific percentile(s). Will use
+linear interpolation to get the percentile values.
 
 =item * --reverse, -r
 

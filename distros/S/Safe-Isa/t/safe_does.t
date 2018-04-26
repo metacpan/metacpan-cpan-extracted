@@ -42,8 +42,17 @@ ok($bar->$_does('Foo'), 'bar $_does Foo');
 ok(eval { $blam->$_does('Foo'); 1 }, 'no boom today');
 ok(eval { $undef->$_does('Foo'); 1 }, 'nor tomorrow either');
 
-ok($foo->$_call_if_object(DOES => 'Foo'), 'foo $_call_if_object(DOES => Foo)');
-ok($bar->$_call_if_object(DOES => 'Foo'), 'bar $_call_if_object(DOES => Foo)');
+if (UNIVERSAL->can('DOES')) {
+  ok($foo->$_call_if_object(DOES => 'Foo'), 'foo $_call_if_object(DOES => Foo)');
+  ok($bar->$_call_if_object(DOES => 'Foo'), 'bar $_call_if_object(DOES => Foo)');
+}
+else {
+  ok(!eval { $foo->$_call_if_object(DOES => 'Foo'); 1 },
+   'foo $_call_if_object(DOES => Foo) fails without UNIVERSAL::DOES');
+  ok(!eval { $bar->$_call_if_object(DOES => 'Foo'); 1 },
+   'bar $_call_if_object(DOES => Foo) fails without UNIVERSAL::DOES');
+}
+
 ok(eval { $blam->$_call_if_object(DOES => 'Foo'); 1 }, 'no boom today');
 ok(eval { $undef->$_call_if_object(DOES => 'Foo'); 1 }, 'nor tomorrow either');
 

@@ -21,12 +21,12 @@ name: YAML-Hobo
 provides:
   YAML::Hobo:
     file: lib/YAML/Hobo.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
   YAML::Tiny: '1.70'
 resources:
   bugtracker: https://github.com/aferreira/cpan-YAML-Hobo/issues
   homepage: https://github.com/aferreira/cpan-YAML-Hobo
   repository: https://github.com/aferreira/cpan-YAML-Hobo.git
-version: 0.1.0
+version: 0.2.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

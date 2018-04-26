@@ -130,7 +130,7 @@ sub _build__local_cfg_path ($self) {
 }
 
 sub _read_local_cfg ($self) {
-    return -f $self->_local_cfg_path ? P->cfg->load( $self->_local_cfg_path ) : {};
+    return -f $self->_local_cfg_path ? P->cfg->read( $self->_local_cfg_path ) : {};
 }
 
 sub _create_local_cfg ($self) {
@@ -171,7 +171,7 @@ sub app_build ($self) {
     # store local config
     $self->report_info( q[Store local config to "] . $self->_local_cfg_path . q["] );
 
-    P->cfg->store( $self->_local_cfg_path, $local_cfg, readable => 1 );
+    P->cfg->write( $self->_local_cfg_path, $local_cfg, readable => 1 );
 
     return;
 }

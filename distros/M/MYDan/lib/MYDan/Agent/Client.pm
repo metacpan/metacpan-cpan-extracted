@@ -101,6 +101,8 @@ sub run
     };
 
     my %hosts = MYDan::Util::Hosts->new()->match( @node );
+
+    my %cut;
     my $work;$work = sub{
         return unless my $node = shift @node;
         $result{$node} = '';
@@ -129,7 +131,14 @@ sub run
                      my $self = shift;
                      $self->unshift_read (
                          chunk => length $self->{rbuf},
-                         sub { $result{$node} .= $_[1];}
+                         sub { 
+                             if ( defined $cut{$node} || length $result{$node} > 102400 )
+                             {
+                                 $cut{$node} = $_[1]; return; 
+                             }
+                             
+                             $result{$node} .= $_[1] unless ! $result{$node} && $_[1] eq '*';
+                         }
                      );
                   },
                   on_eof => sub{
@@ -195,7 +204,7 @@ sub run
                      my $self = shift;
                      $self->unshift_read (
                          chunk => length $self->{rbuf},
-                         sub { $rresult{$node} .= $_[1];}
+                         sub { $rresult{$node} .= $_[1] unless ! $rresult{$node} && $_[1] eq '*'; }
                      );
                   },
                   on_eof => sub{
@@ -250,6 +259,11 @@ sub run
 
     $cv->recv;
     undef $w;
+
+    map{ 
+         my $end = $cut{$_} =~ /--- (\d+)\n$/ ? "--- $1\n" : '';
+         $result{$_} .= "\n==[Warn]The content was truncated\n$end";
+    }keys %cut;
 
     if( $run{version} )
     {

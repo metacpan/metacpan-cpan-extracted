@@ -13,5 +13,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-load.t
 t/02-synopsis.t
+t/03-required-quote.t
+t/04-more-quote.t
 xt/author/pod-syntax.t
 xt/release/changes_has_content.t

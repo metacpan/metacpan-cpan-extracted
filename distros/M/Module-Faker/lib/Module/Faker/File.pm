@@ -1,6 +1,6 @@
 package Module::Faker::File;
 # ABSTRACT: a fake file in a fake dist
-$Module::Faker::File::VERSION = '0.018';
+$Module::Faker::File::VERSION = '0.020';
 use Moose;
 with 'Module::Faker::Appendix';
 
@@ -24,7 +24,7 @@ Module::Faker::File - a fake file in a fake dist
 
 =head1 VERSION
 
-version 0.018
+version 0.020
 
 =head1 AUTHOR
 

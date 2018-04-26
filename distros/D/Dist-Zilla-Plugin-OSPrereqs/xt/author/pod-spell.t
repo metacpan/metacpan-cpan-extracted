@@ -33,4 +33,6 @@ ini
 ioanr
 lib
 on
+pc
+perlancar
 stevenharyanto

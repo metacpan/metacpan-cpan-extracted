@@ -22,12 +22,14 @@ my @files = (
     't/inconsistent.t',
     't/missing-has-version.t',
     't/missing.t',
+    't/mswin32.t',
     't/multiple-inconsistent.t',
     't/multiple.t',
     't/no-file.t',
     't/noversion.t',
     't/pass.t',
-    't/strict.t'
+    't/strict.t',
+    't/taint-workaround.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

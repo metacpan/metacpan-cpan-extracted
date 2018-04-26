@@ -1,3 +1,17 @@
+v0.2.6 2018-04-24T11:57:04Z
+ - fix cpan dist
+
+v0.2.5 2018-04-24T11:55:32Z
+
+v0.2.4 2018-04-12T18:24:56Z
+ - use Coro::rouse_wait instead of $cv->recv
+ - result pragma replaced
+ - access to http status using hash key
+
+v0.2.3 2018-04-05T06:23:39Z
+ - dist.perl renamed to dist.yaml
+ - src formatted
+
 v0.2.2 2017-07-26T22:19:58Z
  - tls_ctx high enabled
 

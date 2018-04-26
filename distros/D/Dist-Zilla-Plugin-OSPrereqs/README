@@ -3,7 +3,7 @@ NAME
     system
 
 VERSION
-    version 0.009
+    version 0.010
 
 SYNOPSIS
     In your dist.ini:
@@ -24,7 +24,7 @@ SYNOPSIS
       BSD::Resource=0
 
       ; require on non-Windows system
-      [OSPrereqs / !win]
+      [OSPrereqs / !~win]
       Proc::ProcessTable = 0.50
 
 DESCRIPTION
@@ -69,6 +69,8 @@ CONTRIBUTORS
     *   Ioan Rogers <ioanr@cpan.org>
 
     *   Karen Etheridge <ether@cpan.org>
+
+    *   perlancar (@pc-office) <perlancar@gmail.com>
 
     *   Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>
 

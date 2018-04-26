@@ -65,6 +65,7 @@ sub run
     };
 
     my $percent =  MYDan::Util::Percent->new( scalar @node, 'run ..' );
+    my %cut;
     my $work;$work = sub{
         return unless my $node = shift @node;
         $result{$node} = '';
@@ -93,7 +94,15 @@ sub run
                      my $self = shift;
                      $self->unshift_read (
                          chunk => length $self->{rbuf},
-                         sub { $result{$node} .= $_[1];}
+                         sub { 
+                             if ( defined $cut{$node} || length $result{$node} > 102400 )
+                             {
+                                 $cut{$node} = $_[1]; return; 
+                             }
+                             
+                             $result{$node} .= $_[1] unless ! $result{$node} && $_[1] eq '*';
+                         }
+ 
                      );
                   },
                   on_eof => sub{
@@ -104,7 +113,7 @@ sub run
              );
              $hdl->push_write($query);
              $hdl->push_shutdown;
-          };
+          }, sub{ return 3; };
     };
 
     my $max = scalar @node > $run{max} ? $run{max} : scalar @node;
@@ -114,6 +123,11 @@ sub run
     my $w = AnyEvent->timer ( after => $run{timeout},  cb => $tocb );
     $cv->recv;
     undef $w;
+
+    map{ 
+        my $end = $cut{$_} =~ /--- (\d+)\n$/ ? "--- $1\n" : '';
+         $result{$_} .= "\n==[Warn]The content was truncated\n$end";
+    } keys %cut;
 
     map{ $_ =~ s/^\**#\*MYDan_\d+\*#//;}values %result;
     return %result;

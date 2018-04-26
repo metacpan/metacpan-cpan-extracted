@@ -6,11 +6,13 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'output detailed depthes of coverages on chromosomes';
+sub abstract {
+    return 'output detailed depths of coverages on chromosomes';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen", ],
+        [ "outfile|o=s", "output filename. [stdout] for screen", ],
         [ "size|s=s", "chr.sizes",           { required => 1 }, ],
         [ "max|m=i",  "count to this depth", { default  => 1 }, ],
         { show_defaults => 1, }
@@ -18,16 +20,22 @@ sub opt_spec {
 }
 
 sub usage_desc {
-    return "runlist coverage [options] <infiles>";
+    return "runlist coverage [options] <infile> [more infiles]";
 }
 
 sub description {
     my $desc;
     $desc .= ucfirst(abstract) . ".\n";
-    $desc .= " " x 4 . "Like `runlist cover`, also output depthes of coverages.\n";
-    $desc .= " " x 4 . "I:1-100\n";
-    $desc .= " " x 4 . "I(+):90-150\n";
-    $desc .= " " x 4 . "S288c.I(-):190-200\tSpecies names will be omitted.\n";
+    $desc .= <<'MARKDOWN';
+
+Like `runlist cover`, also output depths of coverages
+
+    I:1-100
+    I(+):90-150
+    S288c.I(-):190-200      # Species names will be omitted
+
+MARKDOWN
+
     return $desc;
 }
 

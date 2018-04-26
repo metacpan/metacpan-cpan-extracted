@@ -1,6 +1,6 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '3.49';
+$Map::Tube::Utils::VERSION   = '3.50';
 $Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,14 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 3.49
+Version 3.50
 
 =cut
 
 use 5.006;
 use strict; use warnings;
 use JSON;
+use Taint::Util;
 use File::Share ':all';
 use parent 'Exporter';
 
@@ -39,6 +40,7 @@ sub to_perl {
         $text;
     };
 
+    untaint $json_text;
     return JSON->new->allow_nonref->utf8(1)->decode($json_text);
 }
 

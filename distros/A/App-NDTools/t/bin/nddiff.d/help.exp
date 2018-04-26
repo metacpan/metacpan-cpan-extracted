@@ -2,6 +2,12 @@ Usage:
         nddiff [OPTIONS] <file1> <file2> [<file3> ... ]
 
 Options:
+    --[no]X
+        Where X is an op tag: "A" (added), "N" (new value), "O" (old value),
+        "R" (removed) or "U" (unchanged). All ops enabled by default, except
+        "U". See "DIFF FORMAT" in Struct::Diff for more info about nested
+        diff format.
+
     --brief
         Show where differences has happend, but don't show what exactly
         changed.
@@ -13,7 +19,8 @@ Options:
         Amount of lines for multiline values context. Default is 3.
 
     --full
-        Don't suppresss common items in JSON mode.
+        Don't suppress common items in JSON mode. Deprecated, "--U" should
+        be used instead.
 
     --full-headers
         Print full headers (delta printed by default).
@@ -62,4 +69,8 @@ Examples:
     Machine-readable diff:
 
         nddiff --json a.json b.json
+
+    Same as above, but without added items:
+
+        nddiff --noA --json a.json b.json
 

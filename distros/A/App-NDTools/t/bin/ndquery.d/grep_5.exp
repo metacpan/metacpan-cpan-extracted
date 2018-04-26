@@ -1,0 +1,25 @@
+[
+   {
+      "View" : [
+         {
+            "id" : "view_encoding"
+         },
+         {
+            "id" : "view_wrapping"
+         }
+      ]
+   },
+   {
+      "File" : [
+         {
+            "id" : "file_new"
+         },
+         {
+            "id" : "file_open"
+         },
+         {
+            "id" : "file_save"
+         }
+      ]
+   }
+]

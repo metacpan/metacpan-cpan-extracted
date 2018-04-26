@@ -141,7 +141,7 @@ sub stringify {
     }
     elsif ($type eq 'anchor') {
         my $anchor = $string;
-        $anchor =~ s/[^A-Za-z0-9]//g;
+        $anchor =~ s/[^A-Za-z0-9-]//g;
         die "Bad anchor " . $string unless length($anchor);
         if ($self->is_latex) {
             return "\\hyperdef{amuse}{$anchor}{}\%\n";

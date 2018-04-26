@@ -1,11 +1,12 @@
-<h3 id="toc1"><a id="text-amuse-label-valid2" class="text-amuse-internal-anchor"></a>
+<h3 id="toc1"><a id="text-amuse-label-valid1" class="text-amuse-internal-anchor"></a>
 Start</h3>
 
-<h3 id="toc2">Start with invalid anchor #invalid2</h3>
+<h3 id="toc2">Start with invalid anchor #invalid3</h3>
 
 
 <p>
-#invalid3 because the text continue
+<a id="text-amuse-label-valid2" class="text-amuse-internal-anchor"></a>
+because the text continue
 </p>
 
 <p>
@@ -19,7 +20,7 @@ Section valid4</h4>
 <h4 id="toc4">Section 2 #invalid4</h4>
 
 <h6><a id="text-amuse-label-valid5" class="text-amuse-internal-anchor"></a>
-Section 3 with valid5 anchor (but weird).</h6>
+Section 3 with valid5 anchor</h6>
 
 <h4 id="toc5">#invalid5 <br /> In title</h4>
 
@@ -27,7 +28,8 @@ Section 3 with valid5 anchor (but weird).</h6>
 <blockquote>
 
 <p>
-#invalid6 in quote
+<a id="text-amuse-label-valid22" class="text-amuse-internal-anchor"></a>
+in quote
 </p>
 
 </blockquote>
@@ -44,7 +46,8 @@ valid 6 in quote
 <div class="center">
 
 <p>
-#invalid7 in center
+<a id="text-amuse-label-valid7" class="text-amuse-internal-anchor"></a>
+in center
 </p>
 
 </div>
@@ -52,7 +55,7 @@ valid 6 in quote
 <div class="center">
 
 <p>
-<a id="text-amuse-label-valid7" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid8" class="text-amuse-internal-anchor"></a>
 valid 7
 in center
 </p>
@@ -62,8 +65,9 @@ in center
 <div class="right">
 
 <p>
-<a id="text-amuse-label-valid8" class="text-amuse-internal-anchor"></a>
-#invalid8 in right
+<a id="text-amuse-label-valid9" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid10" class="text-amuse-internal-anchor"></a>
+in right
 valid8
 in right
 </p>
@@ -74,14 +78,15 @@ in right
 <dt>DL</dt>
 <dd>
 <p>
-#invalid9 in dl
+#invalid7 in dl
 </p>
 </dd>
 <dt>DL</dt>
 <dd>
 <p>
-<a id="text-amuse-label-valid9" class="text-amuse-internal-anchor"></a>
-valid 9 in dl
+<a id="text-amuse-label-valid11" class="text-amuse-internal-anchor"></a>
+#invalid8
+valid11 in dl
 </p>
 </dd>
 
@@ -90,16 +95,18 @@ valid 9 in dl
 <ol>
 <li>
 <p>
-#invalid10 in list
+#invalid9 in list
 </p>
 
 </li>
 <li>
 <p>
-<a id="text-amuse-label-valid10" class="text-amuse-internal-anchor"></a>
-<a id="text-amuse-label-valid11" class="text-amuse-internal-anchor"></a>
-valid10 at list beginning list
-#invalid11 in list par
+<a id="text-amuse-label-valid12" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid13" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid14" class="text-amuse-internal-anchor"></a>
+#invalid10
+at list beginning list
+in list par
 valid 11 in list par
 </p>
 
@@ -108,44 +115,60 @@ valid 11 in list par
 </ol>
 
 <p>
-<a id="text-amuse-label-valid12" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid15" class="text-amuse-internal-anchor"></a>
 Try the footnote <a href="#fn1" class="footnote" id="fn_back1">[1]</a>
 valid12 near the footnote
 </p>
+<a id="text-amuse-label-valid16" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid17" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-valid18" class="text-amuse-internal-anchor"></a>
 <div class="verse">
-#invalid13 in verse
+in verse
 <br /><br />
-<a id="text-amuse-label-valid13" class="text-amuse-internal-anchor"></a>
 valid13 in verse
 </div>
+
+<p>
+<a id="text-amuse-label-valid19" class="text-amuse-internal-anchor"></a>
+before verse
+</p>
 <div class="verse">
-#invalid14 in verse
+#invalid12 in verse
 <br /><br />
-<a id="text-amuse-label-valid14" class="text-amuse-internal-anchor"></a>
-valid14 in verse
+#invalid13<br />
+invalid14x in verse
 </div>
+<a id="text-amuse-label-valid20" class="text-amuse-internal-anchor"></a>
+<div class="verse">
+verse with anchor
+</div>
+
+<pre class="example">
+#invalid14
+
+In example is not valid.
+</pre>
 
 <pre class="example">
 #invalid15
-
-In example is not valid.
-</pre>
-
-<pre class="example">
-#invalid16
 In example is not valid.
 </pre>
 
 <p>
-#invalid17
+#invalid16
 In <code>verbatim</code> is always neutralized.
 </p>
 
+<p>
+<a id="text-amuse-label-valid21" class="text-amuse-internal-anchor"></a>
+ :: This is an anchor, but dt breaks, it&#x27;s not a list anymore
+</p>
+
 <dl>
-<dt>#invalid18</dt>
+<dt>#invalid17</dt>
 <dd>
 <p>
-As Dt
+This is a DL
 </p>
 </dd>
 
@@ -156,6 +179,12 @@ As Dt
 
 
 <ul>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid1">valid1</a>
+</p>
+
+</li>
 <li>
 <p>
 <a class="text-amuse-link" href="#text-amuse-label-valid2">valid2</a>
@@ -231,6 +260,60 @@ As Dt
 <li>
 <p>
 <a class="text-amuse-link" href="#text-amuse-label-valid14">valid14</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid15">valid15</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid16">valid16</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid17">valid17</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid18">valid18</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid19">valid19</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid20">valid20</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid21">valid21</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid22">valid22</a>
+</p>
+
+</li>
+<li>
+<p>
+<a class="text-amuse-link" href="#text-amuse-label-valid23">valid23</a>
 </p>
 
 </li>
@@ -342,15 +425,10 @@ As Dt
 </p>
 
 </li>
-<li>
-<p>
-<a class="text-amuse-link" href="#text-amuse-label-invalid18">invalid18</a>
-</p>
-
-</li>
 
 </ul>
 
-<p class="fnline"><a class="footnotebody" href="#fn_back1" id="fn1">[1]</a> #invalid12
+<p class="fnline"><a class="footnotebody" href="#fn_back1" id="fn1">[1]</a><a id="text-amuse-label-valid23" class="text-amuse-internal-anchor"></a>
+ #invalid11
     in footnote
 </p>

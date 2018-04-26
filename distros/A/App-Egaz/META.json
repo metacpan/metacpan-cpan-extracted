@@ -44,6 +44,7 @@
          "requires" : {
             "App::Cmd" : "0.330",
             "App::Fasops" : "v0.5.16",
+            "App::RL" : "v0.3.0",
             "App::Rangeops" : "v0.1.0",
             "Bio::Phylo" : "v2.0.1",
             "File::Find::Rule" : "0.34",
@@ -74,7 +75,7 @@
    "provides" : {
       "App::Egaz" : {
          "file" : "lib/App/Egaz.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.2.0"
       },
       "App::Egaz::Command::blastlink" : {
          "file" : "lib/App/Egaz/Command/blastlink.pm"
@@ -151,7 +152,7 @@
          "web" : "https://github.com/wang-q/App-Egaz"
       }
    },
-   "version" : "0.1.2",
+   "version" : "0.2.0",
    "x_authority" : "cpan:WANGQ",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

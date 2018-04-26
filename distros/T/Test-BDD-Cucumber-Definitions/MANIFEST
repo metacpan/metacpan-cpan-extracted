@@ -21,8 +21,6 @@ lib/Test/BDD/Cucumber/Definitions/Struct/In.pm
 lib/Test/BDD/Cucumber/Definitions/Struct/Ru.pm
 lib/Test/BDD/Cucumber/Definitions/TBCD/In.pm
 lib/Test/BDD/Cucumber/Definitions/TBCD/Ru.pm
-lib/Test/BDD/Cucumber/Definitions/Types.pm
-lib/Test/BDD/Cucumber/Definitions/Validator.pm
 lib/Test/BDD/Cucumber/Definitions/Var.pm
 lib/Test/BDD/Cucumber/Definitions/Var/In.pm
 lib/Test/BDD/Cucumber/Definitions/Var/Ru.pm

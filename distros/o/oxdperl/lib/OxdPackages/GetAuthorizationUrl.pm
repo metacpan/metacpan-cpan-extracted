@@ -8,7 +8,7 @@
 #
 # @package	Gluu-oxd-library
 # @subpackage	Libraries
-# @version	3.1.2
+# @version	3.1.3
 # @author	Ourdesignz, Sobhan Panda
 # @author_email	inderpal6785@gmail.com, sobhan@centroxy.com
 # @see	        OxdClientSocket

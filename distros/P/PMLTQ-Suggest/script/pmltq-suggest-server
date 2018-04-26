@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use File::Find::Rule;
+use File::Spec;
+use File::Basename 'dirname';
+use lib File::Spec->rel2abs( File::Spec->catdir( dirname(__FILE__), File::Spec->updir, 'lib' ) );
+use Treex::PML;
+
+use PMLTQ::Suggest::Server;
+
+
+my %opts = @ARGV;
+my $port = ($opts{'--port'} || 8071);
+my $host = ($opts{'--host'} || 'localhost');
+my $prefork = ($opts{'--prefork'} || 0);
+my $resources_path = $opts{'--resources-path'}; # resources should be in any subdirectory. You can set TrEd extenssions directory.
+my $inputenc = "UTF-8";
+
+start_server();
+
+sub start_server {
+  my $server = PMLTQ::Suggest::Server->new($port);
+  $server->host($host);
+  $server->prefork($prefork);
+  if($resources_path && (-d $resources_path)){
+    my @resources = File::Find::Rule->directory->name('resources')->in( $resources_path );
+    print STDERR '['.localtime()."] resources: ". join('|',@resources)."\n";
+    Treex::PML::SetResourcePaths(@resources);
+  }
+  $server->run();
+}

@@ -44,11 +44,13 @@
          "requires" : {
             "DateTime" : "0",
             "LWP" : "0",
+            "List::Util" : "0",
             "Moose" : "0",
             "MooseX::ClassAttribute" : "0",
             "MooseX::Enumeration" : "0",
             "MooseX::Types::URI" : "0",
             "Path::Class::Dir" : "0",
+            "Scalar::Util" : "0",
             "Try::Tiny" : "0",
             "Types::Standard" : "0",
             "Web::Microformats2::Parser" : "0",
@@ -57,8 +59,8 @@
       },
       "test" : {
          "requires" : {
-            "List::Util" : "0",
             "Path::Class::Dir" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0"
          }
       }
@@ -66,7 +68,7 @@
    "provides" : {
       "Web::Mention" : {
          "file" : "lib/Web/Mention.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       },
       "Web::Mention::Author" : {
          "file" : "lib/Web/Mention/Author.pm"
@@ -83,9 +85,10 @@
          "web" : "https://github.com/jmacdotorg/webmention-perl"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_contributors" : [
-      "JmacDotOrg <jmac@jmac.org>"
+      "Jason McIntosh <jmac@jmac.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,5 +1,11 @@
 Revision history for Tie-Handle-Offset
 
+0.004     2018-04-24 05:47:29-04:00 America/New_York
+
+    [FIXED]
+
+    - Remove t/00-compile.t
+
 0.003     2012-04-05 11:05:59 America/New_York
 
     [BUGFIX]

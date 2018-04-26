@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use strict;
+
+BEGIN {
+    use Cwd qw(abs_path);
+    use File::Basename;
+    use File::Spec::Functions qw(catfile);
+    map { unshift(@INC, catfile(dirname(abs_path(__FILE__)), $_)) } qw(../extlibs/lib/perl5 ../lib ../vendor/lib);
+}
+
+use Serge::Application;
+
+$| = 1; # disable buffered output
+binmode(STDOUT, ':utf8'); # to avoid 'Wide character in print' warning
+
+my $app = Serge::Application->new();
+exit($app->run); # exit with the value returned by the command processor

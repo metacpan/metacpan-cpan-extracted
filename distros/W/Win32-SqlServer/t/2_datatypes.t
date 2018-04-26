@@ -1,10 +1,17 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/2_datatypes.t 35    16-07-15 21:34 Sommar $
+# $Header: /Perl/OlleDB/t/2_datatypes.t 36    18-04-13 17:23 Sommar $
 #
 # This test script tests using sql_sp and sql_insert in all possible
 # ways and with testing use of all datatypes.
 #
 # $History: 2_datatypes.t $
+# 
+# *****************  Version 36  *****************
+# User: Sommar       Date: 18-04-13   Time: 17:23
+# Updated in $/Perl/OlleDB/t
+# When checking whether the CLR is enabled, also take CLR strict security
+# in consideration, and do not run CLR tests when strict security is in
+# force.
 # 
 # *****************  Version 35  *****************
 # User: Sommar       Date: 16-07-15   Time: 21:34
@@ -3325,11 +3332,7 @@ drop_test_objects('varbinmax');
 #------------------------------- UDT -----------------------------------
 # We cannot do UDT tests, if the CLR is not enabled on the server.
 udt:
-my $clr_enabled = sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
-SELECT value
-FROM   sys.configurations
-WHERE  name = 'clr enabled'
-SQLEND
+my $clr_enabled = clr_enabled($X);
 # At this point we must turn on ANSI_WARNINGS, to get the XML stuff to
 # work.
 $X->sql("SET ANSI_WARNINGS ON");

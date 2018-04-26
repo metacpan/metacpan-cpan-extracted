@@ -6,12 +6,14 @@ use autodie;
 use App::RL -command;
 use App::RL::Common;
 
-use constant abstract => 'convert runlist file to position file';
+sub abstract {
+    return 'convert runlist file to position file';
+}
 
 sub opt_spec {
     return (
-        [ "outfile|o=s", "Output filename. [stdout] for screen." ],
-        [ "remove|r",    "Remove 'chr0' from chromosome names." ],
+        [ "outfile|o=s", "output filename. [stdout] for screen" ],
+        [ "remove|r",    "remove 'chr0' from chromosome names" ],
         { show_defaults => 1, }
     );
 }

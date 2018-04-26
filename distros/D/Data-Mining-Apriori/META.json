@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Algorithm::Combinatorics" : "0.27"
+            "Algorithm::Combinatorics" : "0.27",
+            "List::PowerSet" : "0.01"
          }
       }
    },
@@ -46,6 +47,6 @@
          "url" : "https://github.com/alexgracianoarj/data-mining-apriori"
       }
    },
-   "version" : 0.17,
+   "version" : 0.18,
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

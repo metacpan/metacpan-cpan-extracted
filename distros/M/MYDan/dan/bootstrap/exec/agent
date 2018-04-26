@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 os=$(uname)
 _exit () { echo $1; sleep 60; exit 1; }
 
@@ -14,4 +14,30 @@ if [ "x$os" == "xLinux" ] ;then
     ulimit -s 10240  || _exit "ulimit -s fail";
 fi
 
-exec $MYDanPATH/dan/tools/tcpserver -p $($MYDanPATH/dan/tools/config agent.port) -m 10 $MYDanPATH/dan/agent/bin/agent 2>&1
+MAX=10
+MEM=$(cat /proc/meminfo 2>/dev/null |head -n 1|awk '{print $2}')
+if [ "X$MEM" != "X" ];then
+    expr $MEM "+" 10 &> /dev/null
+    if [ $? -eq 0 ];then
+      if (( $MEM < 4500000 )) ;then
+          MAX=5
+      fi
+      if (( $MEM < 2500000 )) ;then
+          MAX=4
+      fi
+      if (( $MEM < 1500000 )) ;then
+          MAX=3
+      fi
+    else
+      echo "$MEM not number"
+    fi
+fi
+
+if [ -f $MYDanPATH/etc/iamproxy ];then
+    MAX=$( expr $MAX "*" 10 )
+    echo $MAX : $MEM iamproxy
+else
+    echo $MAX : $MEM iamagent
+fi
+
+exec $MYDanPATH/dan/tools/tcpserver -p $($MYDanPATH/dan/tools/config agent.port) -m $MAX $MYDanPATH/dan/agent/bin/agent 2>&1

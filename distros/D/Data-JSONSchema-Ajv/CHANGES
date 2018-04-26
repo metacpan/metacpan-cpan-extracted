@@ -1,3 +1,6 @@
+0.04  - 21-Apr-2018
+- Forced use to above Perl 5.20 ... 5.18 has some odd number issues, and
+  also JavaScript::Duktape::XS is 5.18 and above anyway
 0.03  - 28-Mar-2018
 - Used JavaScript::Duktape::XS instead, as it's much faster, and no inline C
 - Upgraded to Ajv 4.11.8

@@ -4,7 +4,7 @@ Date::Advent - Calculate the Sundays of Advent
 
 # VERSION
 
-Version 1.20180422
+Version 1.20180423
 
 # SYNOPSIS
 

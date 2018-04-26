@@ -99,7 +99,7 @@ sub _return_html ( $self, $req ) {
         my $resources = [ $self->ext_resources->@* ];
 
         # pcoreApi
-        push $resources->@*, q[<script src="/static/pcoreApi.js" integrity="" crossorigin="anonymous"></script>];
+        push $resources->@*, q[<script src="/static/pcore-api.js" integrity="" crossorigin="anonymous"></script>];
 
         # FontAwesome
         push $resources->@*, Pcore::Share::WWW->fontawesome;

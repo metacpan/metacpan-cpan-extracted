@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2017-03-09 00:00:00 +0000 to present.
+Changes from 2017-04-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.013 at 2018-03-09 14:02:45 +0000
+version 0.014 at 2018-04-23 15:08:16 +0000
+------------------------------------------
+
+  Change: cface63667dc8cf14956f0cdf1188885c25c3ec9
+  Author: Jerome Eteve <jerome.eteve@guardian.co.uk>
+  Date : 2018-04-23 15:54:23 +0000
+
+    Make sure keywords are not mixed with directory 
+
+  Change: 63a01a252e531c06d6c73334234259b93bfa7e24
+  Author: Jerome Eteve <jerome.eteve@guardian.co.uk>
+  Date : 2018-04-23 15:18:10 +0000
+
+    Added basic declarations extraction for scala files 
+
+------------------------------------------
+version 0.013 at 2018-03-09 12:31:10 +0000
 ------------------------------------------
 
   Change: d0c33401bcc0ee5030a08e5ccc53578a8bdac571
@@ -13,5 +29,5 @@ version 0.013 at 2018-03-09 14:02:45 +0000
     Added scala indexing 
 
 =================================================
-Plus 12 releases after 2017-03-09 00:00:00 +0000.
+Plus 12 releases after 2017-04-23 00:00:00 +0000.
 =================================================

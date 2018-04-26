@@ -7,7 +7,6 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
                                       'Test::Vars' => '0'
                                     }
                     },
@@ -17,7 +16,7 @@ do { my $x = {
                                       'Dancer2::Core::Role::SessionFactory' => '0',
                                       'Dancer2::Core::Types' => '0',
                                       'Moo' => '0',
-                                      'Session::Storage::Secure' => '0.010',
+                                      'Session::Storage::Secure' => '0.011',
                                       'perl' => '5.008001',
                                       'strict' => '0',
                                       'warnings' => '0'

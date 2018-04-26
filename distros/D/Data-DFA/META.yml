@@ -15,16 +15,16 @@ name: Data-DFA
 provides:
   Data::DFA:
     file: lib/Data/DFA.pm
-    version: '20180329'
+    version: '20180406'
   Data::DFA::Parser:
     file: lib/Data/DFA.pm
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::NFA: '20180329'
+  Data::NFA: '20180406'
   Data::Table::Text: '20180328'
   Test2::API: '0'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180329'
+version: '20180406'

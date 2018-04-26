@@ -56,6 +56,9 @@ t/tables.t
 t/testfiles/10_theses.exp.html
 t/testfiles/10_theses.exp.ltx
 t/testfiles/10_theses.muse
+t/testfiles/anchors-2.exp.html
+t/testfiles/anchors-2.exp.ltx
+t/testfiles/anchors-2.muse
 t/testfiles/beamer.exp.html
 t/testfiles/beamer.exp.ltx
 t/testfiles/beamer.exp.sl.tex
@@ -166,6 +169,9 @@ t/testfiles/images.muse
 t/testfiles/inline.exp.html
 t/testfiles/inline.exp.ltx
 t/testfiles/inline.muse
+t/testfiles/labels.exp.html
+t/testfiles/labels.exp.ltx
+t/testfiles/labels.muse
 t/testfiles/links-2.exp.html
 t/testfiles/links-2.exp.ltx
 t/testfiles/links-2.muse
@@ -254,6 +260,9 @@ t/testfiles/unroll.exp.html
 t/testfiles/unroll.exp.ltx
 t/testfiles/unroll.muse
 t/testfiles/update.pl
+t/testfiles/verb-2.exp.html
+t/testfiles/verb-2.exp.ltx
+t/testfiles/verb-2.muse
 t/testfiles/verb.exp.html
 t/testfiles/verb.exp.ltx
 t/testfiles/verb.muse

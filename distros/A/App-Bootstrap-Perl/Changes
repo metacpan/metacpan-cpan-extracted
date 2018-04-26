@@ -1,5 +1,12 @@
 Revision history for App-Bootstrap-Perl
 
+0.14      2018-04-22
+        - logs now appended - this might flood your disk, setup
+          your logrotate if you are a power user
+        - cleanup cpan module install force policy
+        - new option --forcemoduleinstall as we no longer
+          force internally
+
 0.13      2018-04-21
         - change default mirror to $HOME/CPAN/ instead of my
           curated Pinto repo which no longer exists.

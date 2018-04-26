@@ -63,6 +63,10 @@ dan/deploy/code/m.mcmd
 dan/deploy/code/m.sync
 dan/deploy/lib/.gitkeep
 dan/deploy/service/watch2subscribe
+dan/diagnosis/bin/diagnosis
+dan/diagnosis/plugin/code/disk/space/data
+dan/diagnosis/plugin/code/disk/space/inode
+dan/diagnosis/plugin/code/net/connect/tcp
 dan/monitor/bin/collector
 dan/monitor/conf/collect/project1
 dan/monitor/conf/collect/project2
@@ -151,6 +155,7 @@ def/etc/util/conf/contact
 def/etc/util/conf/expect
 def/etc/util/conf/gateway
 def/etc/util/conf/go.example
+def/etc/util/conf/ntpsync
 def/etc/util/conf/pass
 def/etc/util/conf/proxy
 def/etc/util/conf/release/agent.sh
@@ -219,6 +224,7 @@ lib/MYDan/Deploy/Code.pm
 lib/MYDan/Deploy/Conf.pm
 lib/MYDan/Deploy/Ctrl.pm
 lib/MYDan/Deploy/Jobs.pm
+lib/MYDan/Diagnosis.pm
 lib/MYDan/Monitor.pm
 lib/MYDan/Monitor/Collector.pm
 lib/MYDan/Monitor/Make.pm

@@ -17,7 +17,7 @@ use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our @CARP_NOT;
 
 =head1 NAME
@@ -267,6 +267,7 @@ sub spawn_child_posix( $self, @cmd ) {
     open(STDIN,  "< /dev/null") || die "can't read /dev/null: $!";
     open(STDOUT, "> /dev/null") || die "can't write to /dev/null: $!";
     exec @cmd;
+    exit 1;
 }
 
 sub spawn_child( $self, $localhost, @cmd ) {

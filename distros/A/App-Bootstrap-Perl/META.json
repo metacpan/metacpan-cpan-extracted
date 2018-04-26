@@ -64,7 +64,7 @@
          "web" : "http://github.com/renormalist/app-bootstrap-perl"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -445,7 +445,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.13",
+                  "tag" : "v0.14",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

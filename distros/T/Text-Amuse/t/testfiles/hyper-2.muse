@@ -1,14 +1,14 @@
 #title Internal anchors
-#notes #invalid0
+#notes #invalid1
 This is the note.
-#subtitle #invalid1
+#subtitle #invalid2
 
 ** Start
-#valid2
+#valid1
 
-** Start with invalid anchor #invalid2
+** Start with invalid anchor #invalid3
 
-#invalid3 because the text continue
+#valid2 because the text continue
 
 This is valid,
 #valid3
@@ -19,78 +19,88 @@ Anchor is on a line by itself (valid3)
 
 *** Section 2 #invalid4
 
-***** #valid5
-Section 3 with valid5 anchor (but weird).
+#valid5
+***** Section 3 with valid5 anchor
 
 *** #invalid5 <br> In title
 
-  #invalid6 in quote
+  #valid22 in quote
 
   #valid6
   valid 6 in quote
 
 
-          #invalid7 in center
+          #valid7 in center
         
-          #valid7
+          #valid8
           valid 7
           in center
 
-                                    #invalid8 in right
-                                    #valid8
+                                    #valid9 in right
+                                    #valid10
                                     valid8
                                     in right
 
- DL :: #invalid9 in dl
- DL :: #valid9
-       valid 9 in dl
+ DL :: #invalid7 in dl
+ DL :: #invalid8
+       #valid11 valid11 in dl
 
- 1. #invalid10 in list
- 2. #valid10
-    valid10 at list beginning list
-    #invalid11 in list par
-    #valid11
+ 1. #invalid9 in list
+ 2. #invalid10
+    #valid12 at list beginning list
+    #valid13 in list par
+    #valid14
     valid 11 in list par
 
 Try the footnote [1]
-#valid12
+#valid15
 valid12 near the footnote
 
-[1] #invalid12
+#valid23
+[1] #invalid11
     in footnote
 
+#valid16
 <verse>
-#invalid13 in verse
+#valid17 in verse
 
-#valid13
+#valid18
 valid13 in verse
 </verse>
 
-> #invalid14 in verse
+#valid19 before verse
+> #invalid12 in verse
 > 
-> #valid14
-> valid14 in verse
+> #invalid13
+> invalid14x in verse
+
+#valid20
+> verse with anchor
+
 
 {{{
-#invalid15
+#invalid14
 
 In example is not valid.
 }}}
 
 <example>
-#invalid16
+#invalid15
 In example is not valid.
 </example>
 
-<verbatim>#invalid17</verbatim>
+<verbatim>#invalid16</verbatim>
 In =verbatim= is always neutralized.
 
- #invalid18 :: As Dt
+ #valid21 :: This is an anchor, but dt breaks, it's not a list anymore
+ 
+ <verbatim>#invalid17</verbatim> :: This is a DL
 
 ** Summary
 
 *** Valid
 
+ - [[#valid1][valid1]]
  - [[#valid2][valid2]]
  - [[#valid3][valid3]]
  - [[#valid4][valid4]]
@@ -104,6 +114,15 @@ In =verbatim= is always neutralized.
  - [[#valid12][valid12]]
  - [[#valid13][valid13]]
  - [[#valid14][valid14]]
+ - [[#valid15][valid15]]
+ - [[#valid16][valid16]]
+ - [[#valid17][valid17]]
+ - [[#valid18][valid18]]
+ - [[#valid19][valid19]]
+ - [[#valid20][valid20]]
+ - [[#valid21][valid21]]
+ - [[#valid22][valid22]]
+ - [[#valid23][valid23]]
 
 *** Invalid
 
@@ -124,4 +143,4 @@ In =verbatim= is always neutralized.
  - [[#invalid15][invalid15]]
  - [[#invalid16][invalid16]]
  - [[#invalid17][invalid17]]
- - [[#invalid18][invalid18]]
+

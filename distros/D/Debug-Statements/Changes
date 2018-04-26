@@ -6,4 +6,5 @@
 1.005  12/23/14  minor change
 1.006  04/17/18  EXPORT_TAGS :all, d '.', sub LS, sub cp, sub Die, fixed unescaped left brace in regex as suggested by dominique.quatravaux
 1.007  04/20/18  Fixed issue with .t
+1.008  04/23/18  Fixed issue with .t
 

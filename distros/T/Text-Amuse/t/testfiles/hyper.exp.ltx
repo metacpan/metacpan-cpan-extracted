@@ -2,19 +2,22 @@
 
 
 \hyperdef{amuse}{label}{}%
+\hyperdef{amuse}{label1}{}%
 Here the doc start
-\#label here blablabla
+here blablabla
 A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
 
 \chapter{Middle}
 
 
+\hyperdef{amuse}{label2x}{}%
 \hyperdef{amuse}{label2}{}%
+\hyperdef{amuse}{label3}{}%
 \#label2 Continue here
 A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
 A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
 A simple internal link is created with \textbackslash{}hypertarget, with two parameters of an anchor name, and anchor text. \textbackslash{}hyperlink has two arguments, the name of a hypertext object defined somewhere by \textbackslash{}hypertarget, and the text which be used as the link on the page.
- \#label3 not a label
+ \#label3 is a label
 
 \chapter{Next}
 
@@ -47,14 +50,14 @@ in quotation is not neutralized,
 
 
 \begin{verse}
-\hyperdef{amuse}{label6}{}%
+\#label6\forcelinebreak
 in verse is not neutralized
 \end{verse}
 
+\hyperdef{amuse}{label7}{}%
 
 
 \begin{verse}
-\hyperdef{amuse}{label7}{}%
 ~in verse again, we have a label
 \end{verse}
 
@@ -74,8 +77,14 @@ This is a label despite of the leading whitespace.
 
 
 \item\relax 
-\hyperdef{amuse}{lable9}{}%
-This is a label
+\#lable9
+This is a not label
+
+
+
+\item\relax 
+\hyperdef{amuse}{label3enum}{}%
+This \emph{is} a label
 
 
 

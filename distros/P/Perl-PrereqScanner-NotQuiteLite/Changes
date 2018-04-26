@@ -1,5 +1,11 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.93 2018/04/26
+  - silence a deprecation warning (RT-125191)
+
+0.92 2018/04/26
+  - fixed to work with Module::CPANfile 1.1003
+
 0.91 2017/11/25
   - fixed packaging issue (RT-123735)
 

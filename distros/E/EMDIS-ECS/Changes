@@ -412,12 +412,37 @@ Version 0.39, 2016-12-05
 - ECS.pm:  add encr_out_keyid and encr_out_passphrase properties to NODE_TBL;
   add encr_out_keyid and encr_out_passphrase parameters to
   send_encrypted_email, openpgp_encrypt, and pgp2_encrypt subroutines;  add
-  encr_out_passphrase parameter to openpgp_encrypt and pgp2_encrypt subroutines
+  encr_out_passphrase parameter to openpgp_decrypt and pgp2_decrypt subroutines
 - FileBackedMessage.pm:  revise usage of send_encrypted_email subroutine
 - Message.pm:  revise usage of openpgp_decrypt and pgp2_decrypt subroutines
 - ecstool:  add encr_out_keyid and encr_out_passphrase properties to NODE_TBL;
   revise usage of openpgp_decrypt and pgp2_decrypt subroutines;  adjust
   formatting of ecstool --view output
+
+Version 0.40, 2018-03-19
+========================
+- ecstool:  revise regex to avoid "Unescaped left brace in regex is illegal"
+  error
+- Config.pm:  add INBOX_USE_STARTTLS and SMTP_USE_STARTTLS settings;
+  assign default INBOX_PORT and SMTP_PORT
+- ecs_setup:  add INBOX_USE_STARTTLS and SMTP_USE_STARTTLS settings;  allow
+  GPG_PASSPHRASE to be the empty string (don't initialize with 'gpgpg')
+- ECS.pm:  add subroutines is_yes and is_no;  add support for
+  SMTP_USE_STARTTLS;  perform SMTP authentication only if both
+  SMTP_USERNAME and SMTP_PASSWORD are configured;  eliminate compile-time
+  circular dependency between ECS.pm and other modules (Config.pm,
+  LockedHash.pm);  revise openpgp_decrypt and openpgp_encrypt subroutines
+  to handle empty GPG_PASSPHRASE (avoid broken pipe error)
+- ecs_scan_mail:  add support for INBOX_USE_STARTTLS
+- Dockerfile.centos:  enable step that installs modules from CPAN into
+  local-lib directory;  various other tweaks and additions;  move to
+  docker/centos/Dockerfile
+- Dockerfile.ubuntu:  update to use Ubuntu 16.04;  move to
+  docker/ubuntu/Dockerfile
+- docker/dist/Dockerfile:  new Dockerfile to build distribution artifacts
+  and to facilitate testing of email communications
+- docker/greenmail/Dockerfile:  new Dockerfile to provide SMTP, POP3, and
+  IMAP email services for testing of email communications
 
 
 Ideas for Future Enhancements

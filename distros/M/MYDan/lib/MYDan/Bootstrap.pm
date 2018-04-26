@@ -38,9 +38,6 @@ sub run
     my $flock = MYDan::Util::FLock->new( "$lock/lock" );
     die "Locked by other processes.\n" unless $flock->lock();
    
-    $0 = 'mydan.bootstrap.master';
-
-    
     my ( $i, $cv ) = ( 0, AnyEvent->condvar );
 
     our ( $logf, $logH ) = ( "$logs/current" );
@@ -48,6 +45,11 @@ sub run
     confess "open log: $!" unless open $logH, ">>$logf"; 
     $logH->autoflush;
 
+    $SIG{TERM} = $SIG{INT} = sub
+    {
+        map{ kill( 9, $_->{pid} ) if $_->{pid}; }values %proc;
+        exit 1;
+    };
 
     $SIG{'CHLD'} = sub {
         while((my $pid = waitpid(-1, WNOHANG)) >0)

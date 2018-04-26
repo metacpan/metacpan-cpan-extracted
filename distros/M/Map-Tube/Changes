@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.50  2018-04-23T20:40:00+00:00
+      - Fixed "Insecure dependency in eval while running with -T switch" error.
+
 3.49  2018-04-07T08:30:00+00:00
       - Updated mininmum version of Test::Map::Tube v0.41.
 

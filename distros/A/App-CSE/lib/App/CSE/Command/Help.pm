@@ -1,5 +1,5 @@
 package App::CSE::Command::Help;
-$App::CSE::Command::Help::VERSION = '0.013';
+$App::CSE::Command::Help::VERSION = '0.014';
 use Moose;
 extends qw/App::CSE::Command/;
 

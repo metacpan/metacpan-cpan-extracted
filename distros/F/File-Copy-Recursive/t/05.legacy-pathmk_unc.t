@@ -6,11 +6,58 @@ use File::Copy::Recursive qw(pathmk pathempty);
 use File::Temp ();
 use Path::Tiny;
 use Test::More;
-use Test::Deep;
+
+if ( $^O ne 'MSWin32' ) {
+    plan skip_all => 'Test irrelevant on non-windows OSs';
+}
+else {
+    plan tests => 6;
+}
 
 diag("Testing legacy File::Copy::Recursive::pathmk() $File::Copy::Recursive::VERSION");
 
-sub translate_to_unc {
+is( _translate_to_unc('C:/foo/bar.txt'),   '//127.0.0.1/C$/foo/bar.txt',      'sanity check: _translate_to_unc w/ /' );
+is( _translate_to_unc('C:\\foo\\bar.txt'), '\\\\127.0.0.1\\C$\\foo\\bar.txt', 'sanity check: _translate_to_unc w/ \\' );
+
+my $tempdir = File::Temp->newdir();
+
+my @members = _all_files_in($tempdir);
+is_deeply( \@members, [], 'sanity check: created empty temp dir' );
+
+pathmk("$tempdir\\foo\\bar\\baz");    # create regular path
+
+@members = _all_files_in($tempdir);
+ok( -d "$tempdir\\foo\\bar\\baz", "pathmk(regular path) creates path" );
+
+pathempty($tempdir);
+
+@members = _all_files_in($tempdir);
+is_deeply( \@members, [], 'sanity check: temp dir empty again' );
+
+my $uncpath = _translate_to_unc($tempdir);
+
+pathmk("$uncpath\\foo\\bar\\baz");    # create UNC path
+
+@members = _all_files_in($tempdir);
+ok( -d "$tempdir\\foo\\bar\\baz", "pathmk(unc path) creates path" );
+
+###############
+#### helpers ##
+###############
+
+sub _all_files_in {
+    my $dir   = shift;
+    my $state = path($dir)->visit(
+        sub {
+            my ( $path, $state ) = @_;
+            push @{ $state->{files} }, $path;
+        },
+        { recurse => 1 },
+    );
+    return map { "$_" } @{ $state->{files} || [] };
+}
+
+sub _translate_to_unc {
     my ($path) = @_;
     die "Should be called on Windows only!" unless $^O eq 'MSWin32';
     if ( $path =~ m|^\w:([/\\])| ) {
@@ -33,70 +80,3 @@ sub translate_to_unc {
     }
     $path;
 }
-
-if ( $^O eq 'MSWin32' ) {
-
-    # test translate_to_unc
-
-    is(
-        translate_to_unc('C:/foo/bar.txt'), '//127.0.0.1/C$/foo/bar.txt',
-        'translate_to_unc /'
-    );
-    is(
-        translate_to_unc('C:\\foo\\bar.txt'),
-        '\\\\127.0.0.1\\C$\\foo\\bar.txt', 'translate_to_unc \\'
-    );
-}
-
-my $tempdir = File::Temp->newdir();
-
-my @members = _all_files_in($tempdir);
-is_deeply( \@members, [], 'created empty temp dir' );
-
-# create regular path
-pathmk("$tempdir/foo/bar/baz");
-
-@members = _all_files_in($tempdir);
-cmp_deeply(
-    \@members,
-    bag("$tempdir/foo", "$tempdir/foo/bar", "$tempdir/foo/bar/baz"),
-    'pathmk regular path'
-);
-
-pathempty($tempdir);
-
-@members = _all_files_in($tempdir);
-is_deeply( \@members, [], 'temp dir empty again' );
-
-if ( $^O eq 'MSWin32' ) {
-    my $uncpath = translate_to_unc($tempdir);
-
-    # create UNC path
-    pathmk("$uncpath/foo/bar/baz");
-
-    @members = _all_files_in($tempdir);
-    is_deeply(
-        \@members,
-        [
-            $tempdir, "$tempdir/foo", "$tempdir/foo/bar",
-            "$tempdir/foo/bar/baz"
-        ],
-        'pathmk unc'
-    );
-}
-
-done_testing();
-
-sub _all_files_in {
-    my $dir = shift;
-    my $state = path($dir)->visit(
-        sub {
-            my ($path, $state) = @_;
-            push @{ $state->{files} }, $path;
-        },
-        { recurse => 1 },
-    );
-    return map { "$_" } @{ $state->{files} || [] };
-}
-
-# temp dir is deleted automatically when $tempdir goes out of scope

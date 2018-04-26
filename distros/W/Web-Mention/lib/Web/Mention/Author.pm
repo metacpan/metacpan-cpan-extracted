@@ -148,7 +148,10 @@ sub _new_with_h_card {
     my %constructor_args;
 
     foreach ( qw (name url photo ) ) {
-        $constructor_args{ $_ } = $h_card->get_property( $_ );
+	my $value = $h_card->get_property( $_ );
+	if ( defined $value ) {
+	    $constructor_args{ $_ } = $value;
+	}
     }
 
     return $class->new( %constructor_args );

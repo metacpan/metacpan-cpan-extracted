@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
     "bin/ali2phylip.pl",
     "bin/app-len-ids-ali.pl",
     "bin/change-ids-ali.pl",
-    "bin/classify-ali.pl",
     "bin/clust2mapper.pl",
     "bin/fasta2ali.pl",
     "bin/fetch-tax.pl",
@@ -52,9 +51,9 @@ my %WriteMakefileArgs = (
     "Bio::FastParsers" => "0.180470",
     "Bio::LITE::Taxonomy::NCBI" => "0.10",
     "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
+    "Bio::MUST::Core::ColorScheme" => 0,
     "Bio::Phylo::IO" => 0,
     "Carp" => 0,
-    "Config::Any" => 0,
     "Const::Fast" => 0,
     "Date::Format" => 0,
     "Exporter::Easy" => 0,
@@ -97,9 +96,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Config::Any" => 0,
     "Test::Deep" => 0
   },
-  "VERSION" => "0.181000",
+  "VERSION" => "0.181120",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -111,6 +111,7 @@ my %FallbackPrereqs = (
   "Bio::FastParsers" => "0.180470",
   "Bio::LITE::Taxonomy::NCBI" => "0.10",
   "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
+  "Bio::MUST::Core::ColorScheme" => 0,
   "Bio::Phylo::IO" => 0,
   "Carp" => 0,
   "Config::Any" => 0,

@@ -4,6 +4,9 @@ use warnings;
 use strict;
 use Carp;
 use Time::HiRes;
+use HTML::Entities;
+
+use constant DEBUG => 0;
 
 # TODO: investigate Geo, Coder::ArcGIS
 
@@ -13,11 +16,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our %locations;
 
 =head1 SYNOPSIS
@@ -62,8 +65,8 @@ For example this code uses geocode.ca for Canada and US addresses,
 and OpenStreetMap for other places:
 
     my $geocoderlist = Geo::Coder::List->new()
-        ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
-        ->push(new_ok('Geo::Coder::OSM'));
+        ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => Geo::Coder::CA->new() })
+        ->push(Geo::Coder::OSM->new());
 
     # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
     my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
@@ -73,6 +76,9 @@ and OpenStreetMap for other places:
             $location->{geometry}{location}{lat}, ',',
             $location->{geometry}{location}{lng}, "\n";
     }
+
+    # It is also possible to limit the number of enquires used by a particular encoder
+    $geocoderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
 
 =cut
 
@@ -117,7 +123,9 @@ sub geocode {
 	return if(length($location) == 0);
 
 	$location =~ s/\s\s+/ /g;
+	$location = decode_entities($location);
 
+	print "location: $location\n" if(DEBUG);
 	if((!wantarray) && (my $rc = $locations{$location})) {
 		if(ref($rc) eq 'ARRAY') {
 			$rc = @{$rc}[0];
@@ -131,6 +139,7 @@ sub geocode {
 				result => $rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
+			print "cached\n" if(DEBUG);
 			return $rc;
 		}
 	}
@@ -150,6 +159,7 @@ sub geocode {
 				result => \@rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
+			print "cached\n" if(DEBUG);
 			if($allempty) {
 				return;
 			}
@@ -161,7 +171,15 @@ sub geocode {
 
 	ENCODER: foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
-		if((ref($geocoder) eq 'HASH') && (my $regex = $g->{'regex'})) {
+		if((ref($geocoder) eq 'HASH') && exists($geocoder->{'limit'}) && defined(my $limit = $geocoder->{'limit'})) {
+			print "limit: $limit\n" if(DEBUG);
+			if($limit <= 0) {
+				next ENCODER;
+			}
+			$geocoder->{'limit'}--;
+		}
+		if((ref($geocoder) eq 'HASH') && (my $regex = $geocoder->{'regex'})) {
+			print 'Consider ', ref($geocoder->{geocoder}), ": $regex\n" if(DEBUG);
 			if($location =~ $regex) {
 				$geocoder = $g->{'geocoder'};
 			} else {
@@ -173,9 +191,15 @@ sub geocode {
 		eval {
 			# e.g. over QUERY LIMIT with this one
 			# TODO: remove from the list of geocoders
+			print "trying ", ref($geocoder), "\n" if(DEBUG);
 			if(ref($geocoder) eq 'Geo::GeoNames') {
+				print "username => ", $geocoder->username(), "\n" if(DEBUG);
+				die "lost username" if(!defined($geocoder->username()));
 				@rc = $geocoder->geocode($location);
 			} else {
+				if(ref($geocoder) eq 'Geo::Coder::GooglePlaces::V3') {
+					print "key: ", $geocoder->key(), "\n" if(DEBUG);
+				}
 				@rc = $geocoder->geocode(%params);
 			}
 		};
@@ -199,6 +223,18 @@ sub geocode {
 				# TODO: should consider all locations in the array
 				$l = $l->[0];
 			}
+			if(!defined($l)) {
+				my $log = {
+					location => $location,
+					timetaken => $timetaken,
+					geocoder => ref($geocoder),
+					wantarray => wantarray,
+				};
+				CORE::push @{$self->{'log'}}, $log;
+				@rc = ();
+				next ENCODER;
+			}
+			print Data::Dumper->new([\$l])->Dump() if(DEBUG >= 2);
 			next if(ref($l) ne 'HASH');
 			if($l->{'error'}) {
 				my $log = {
@@ -259,6 +295,7 @@ sub geocode {
 					}
 				}
 				if(defined($l->{geometry}{location}{lat})) {
+					print $l->{geometry}{location}{lat}, '/', $l->{geometry}{location}{lng}, "\n" if(DEBUG);
 					$l->{geocoder} = $geocoder;
 					my $log = {
 						location => $location,
@@ -274,6 +311,7 @@ sub geocode {
 		}
 
 		if(scalar(@rc)) {
+			print 'Number of matches from ', ref($geocoder), ': ', scalar(@rc), "\n" if(DEBUG);
 			if(wantarray) {
 				$locations{$location} = \@rc;
 				return @rc;

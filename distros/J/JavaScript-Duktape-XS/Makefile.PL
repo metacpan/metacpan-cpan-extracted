@@ -8,11 +8,13 @@ WriteMakefile(
     LICENSE        => 'mit',
     MIN_PERL_VERSION => 5.018000,
     PREREQ_PM      => {
-        'XSLoader'    => 0,
+        'Text::Trim'   => 0,
+        'XSLoader'     => 0,
     },
     TEST_REQUIRES  => {
         'Data::Dumper' => 0,
         'Path::Tiny'   => 0,
+        'Ref::Util'    => 0,
         'Test::More'   => 0,
         'Test::Output' => 0,
         'Time::HiRes'  => 0,

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/miyagawa/cpanfile/issues
   homepage: https://github.com/miyagawa/cpanfile
   repository: https://github.com/miyagawa/cpanfile.git
-version: '1.1003'
+version: '1.1004'
 x_contributors:
   - 'Atsushi Kato <ktat@cpan.org>'
   - 'David Golden <dagolden@cpan.org>'
@@ -41,6 +41,7 @@ x_contributors:
   - 'Gregory Oschwald <oschwald@gmail.com>'
   - 'grtodd <gtodd@iciti.ca>'
   - 'ikasam_a <masaki.nakagawa@gmail.com>'
+  - 'James E Keenan <jkeenan@cpan.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
   - 'Masahiro Honma <hiratara@cpan.org>'
   - 'Michiel Beijen <michiel.beijen@gmail.com>'
@@ -48,3 +49,4 @@ x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

@@ -23,6 +23,7 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Override
+  $app->defaults(config => $app->config);
   return $app->config if $app->config->{config_override};
 
   # Config file
@@ -49,7 +50,7 @@ sub register {
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
-  return $app->defaults(config => $app->config)->config($config)->config;
+  return $app->config($config)->config;
 }
 
 1;

@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-List
 
+0.21	Sun Apr 22 19:53:36 EDT 2018
+	Improved support for Geo::GeoNames error handling
+	Remove HTML entities from locations, it confuses the URLs and breaks Geo::GeoNames
+	Added the limit parameter to push()
+
 0.20	Tue Apr 17 20:03:03 EDT 2018
 	Don't bother to test using Google if you don't have a key
 	Improved support for Geo::GeoNames

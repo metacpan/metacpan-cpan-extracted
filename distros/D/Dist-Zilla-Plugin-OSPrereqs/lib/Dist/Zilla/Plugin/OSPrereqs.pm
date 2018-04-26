@@ -6,7 +6,7 @@ use utf8;
 package Dist::Zilla::Plugin::OSPrereqs;
 # ABSTRACT: List prereqs conditional on operating system
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Moose;
 use List::Util 1.33 'first';
@@ -21,7 +21,10 @@ has prereq_os => (
     init_arg => 'phase',
     default  => sub {
         my ($self) = @_;
-        return $self->plugin_name;
+        my $os = $self->plugin_name;
+        $self->log_fatal([ 'inferred OS name as %s, which looks like it came from a bundle!', $os ])
+            if $os =~ m{/};
+        return $os;
     },
 );
 
@@ -158,7 +161,7 @@ Dist::Zilla::Plugin::OSPrereqs - List prereqs conditional on operating system
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -179,7 +182,7 @@ non-match). Regex matches are done case-insensitively for convenience:
   BSD::Resource=0
 
   ; require on non-Windows system
-  [OSPrereqs / !win]
+  [OSPrereqs / !~win]
   Proc::ProcessTable = 0.50
 
 =head1 DESCRIPTION
@@ -234,7 +237,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Ioan Rogers Karen Etheridge Steven Haryanto (on PC, Bandung)
+=for stopwords Dave Rolsky Ioan Rogers Karen Etheridge perlancar (@pc-office) Steven Haryanto (on PC, Bandung)
 
 =over 4
 
@@ -249,6 +252,10 @@ Ioan Rogers <ioanr@cpan.org>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+perlancar (@pc-office) <perlancar@gmail.com>
 
 =item *
 

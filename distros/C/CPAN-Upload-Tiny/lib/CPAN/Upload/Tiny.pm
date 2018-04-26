@@ -1,5 +1,5 @@
 package CPAN::Upload::Tiny;
-$CPAN::Upload::Tiny::VERSION = '0.005';
+$CPAN::Upload::Tiny::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -101,7 +101,7 @@ CPAN::Upload::Tiny - A tiny CPAN uploader
 
 =head1 VERSION
 
-version 0.005
+version 0.007
 
 =head1 SYNOPSIS
 

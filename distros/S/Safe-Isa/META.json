@@ -4,7 +4,7 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3501, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,7 +50,7 @@
          "web" : "https://github.com/p5sagit/Safe-Isa"
       }
    },
-   "version" : "1.000009",
+   "version" : "1.000010",
    "x_contributors" : [
       "Karen Etheridge <ether@cpan.org>",
       "Matt S Trout <mst@shadowcat.co.uk>",

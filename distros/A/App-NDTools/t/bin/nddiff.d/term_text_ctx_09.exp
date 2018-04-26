@@ -8,10 +8,10 @@
                 {in}
                   [0]
                     {"the structure"}
-                      @@ 1,- -,- @@
+                      @@ -2 +2 @@
 -                     sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                      @@ 4,- -,- @@
+                      @@ -5 +4 @@
 +                     ADDED STRING
-                      @@ 6,- -,- @@
+                      @@ -6 +6 @@
 -                     Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
 +                     EXCEPTEUR sint occaecat cupidatat non proident, sunt in culpa qui officia

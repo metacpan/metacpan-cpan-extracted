@@ -14,7 +14,7 @@ use Carp qw(croak);
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 has 'source' => (
     isa => Uri,
@@ -101,6 +101,23 @@ sub _build_is_verified {
     my $self = shift;
 
     return $self->verify;
+}
+
+sub BUILD {
+    my $self = shift;
+
+    my $source = $self->source->clone;
+    my $target = $self->target->clone;
+
+    foreach ( $source, $target ) {
+	$_->fragment( undef );
+    }
+
+    if ( $source->eq( $target ) ) {
+	die "Inavlid webmention; source and target have the same URL "
+	    . "($source)\n";
+    }
+
 }
 
 sub new_from_request {
@@ -295,9 +312,8 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
  catch {
      say "Oops, this wasn't a webmention at all: $_";
  };
- return unless $wm;
 
- if ( $wm->is_verified ) {
+ if ( $wm && $wm->is_verified ) {
      my $author = $wm->author;
      my $name;
      if ( $author ) {
@@ -331,7 +347,7 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 
  # Manually buidling a webmention:
 
- my $wm = Web::Mention->new(
+ $wm = Web::Mention->new(
     source => $url_of_the_thing_that_got_mentioned,
     target => $url_of_the_thing_that_did_the_mentioning
  );
@@ -479,10 +495,13 @@ property in an C<h-entry> found within the source document.)
 
 =head1 NOTES AND BUGS
 
-Implementation of the content-fetching method is incomplete.
-
 This software is B<alpha>; its author is still determining how it wants
 to work, and its interface might change dramatically.
+
+Implementation of the content-fetching method is incomplete.
+
+The author plans to add webmention-sending functionality to this module.
+But, it isn't there yet.
 
 =head1 SUPPORT
 
@@ -494,6 +513,16 @@ The author also welcomes any direct questions about this module via email.
 =head1 AUTHOR
 
 Jason McIntosh (jmac@jmac.org)
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Mohammad S Anwar (mohammad.anwar@yahoo.com)
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::Config).
@@ -9,7 +9,7 @@ package EMDIS::ECS::Config;
 
 use Carp;
 use Cwd;
-use EMDIS::ECS qw($VERSION);
+use EMDIS::ECS qw($VERSION is_yes is_no);
 use File::Basename;
 use File::Spec::Functions qw(catdir catfile file_name_is_absolute rel2abs);
 use strict;
@@ -27,10 +27,10 @@ BEGIN
         NODE_TBL NODE_TBL_LCK T_ADM_DELAY T_ADM_REMIND T_MSG_PROC
         ADAPTER_CMD ALWAYS_ACK GNU_TAR T_RESEND_DELAY
         SMTP_HOST SMTP_DOMAIN SMTP_TIMEOUT SMTP_DEBUG SMTP_FROM SMTP_PORT
-        SMTP_USE_SSL SMTP_USERNAME SMTP_PASSWORD
+        SMTP_USE_SSL SMTP_USE_STARTTLS SMTP_USERNAME SMTP_PASSWORD
         INBOX_PROTOCOL INBOX_HOST INBOX_PORT INBOX_TIMEOUT INBOX_DEBUG
         INBOX_FOLDER INBOX_USERNAME INBOX_PASSWORD INBOX_MAX_MSG_SIZE
-        INBOX_DIRECTORY INBOX_USE_SSL
+        INBOX_DIRECTORY INBOX_USE_SSL INBOX_USE_STARTTLS
         MSG_PART_SIZE_DFLT
         GPG_HOMEDIR GPG_KEYID GPG_PASSPHRASE
         OPENPGP_CMD_ENCRYPT OPENPGP_CMD_DECRYPT
@@ -240,6 +240,28 @@ sub _massage_config
         }
     }
 
+    # if indicated, assign SMTP_PORT default value
+    if(not defined($this->{SMTP_PORT})) {
+        $this->{SMTP_PORT} = 25;
+        $this->{SMTP_PORT} = 465 if is_yes($this->{SMTP_USE_SSL});
+        $this->{SMTP_PORT} = 587 if is_yes($this->{SMTP_USE_STARTTLS});
+    }
+
+    # if indicated, assign INBOX_PORT default value
+    if(not defined($this->{INBOX_PORT})) {
+        for($this->{INBOX_PROTOCOL})
+        {
+            /POP3/ and do {
+                $this->{INBOX_PORT} = 110;
+                $this->{INBOX_PORT} = 995 if is_yes($this->{INBOX_USE_SSL});
+            };
+            /IMAP/ and do {
+                $this->{INBOX_PORT} = 143;
+                $this->{INBOX_PORT} = 993 if is_yes($this->{INBOX_USE_SSL});
+            };
+        }
+    }
+
     return '';
 }
 
@@ -280,12 +302,14 @@ sub _set_defaults
     $this->{SMTP_TIMEOUT}      = "60";
     $this->{SMTP_DEBUG}        = "0";
     $this->{SMTP_USE_SSL}      = "NO";
+    $this->{SMTP_USE_STARTTLS} = "NO";
     $this->{INBOX_PROTOCOL}    = "POP3";
     $this->{INBOX_HOST}        = "mail";
     $this->{INBOX_FOLDER}      = "INBOX";
     $this->{INBOX_TIMEOUT}     = "60";
     $this->{INBOX_DEBUG}       = "0";
     $this->{INBOX_USE_SSL}     = "NO";
+    $this->{INBOX_USE_STARTTLS} = "NO";
     $this->{INBOX_MAX_MSG_SIZE} = "1048576";
     $this->{OPENPGP_CMD_ENCRYPT} = '/usr/local/bin/gpg --armor --batch ' .
         '--charset ISO-8859-1 --force-mdc --logger-fd 1 --openpgp ' .
@@ -426,21 +450,29 @@ sub _validate_config
              "to be greater than zero.");
     }
 
-    # validate ALWAYS_ACK
-    if((not exists $this->{ALWAYS_ACK}) or
-        $this->{ALWAYS_ACK} =~ /^\s*(no|false)\s*$/i)
+    # validate YES/NO values
+    for my $name (qw(ALWAYS_ACK INBOX_USE_SSL INBOX_USE_STARTTLS SMTP_USE_SSL SMTP_USE_STARTTLS))
     {
-        $this->{ALWAYS_ACK} = 'NO';
+        if(exists $this->{$name} and not is_yes($this->{$name})
+            and not is_no($this->{$name}))
+        {
+            push(@errors, "Unrecognized $name (YES/NO) value:  " .
+                $this->{$name});
+        }
     }
-    elsif($this->{ALWAYS_ACK} =~ /^\s*(yes|true)\s*$/i)
+
+    if(is_yes($this->{INBOX_USE_SSL})
+        and is_yes($this->{INBOX_USE_STARTTLS}))
     {
-        $this->{ALWAYS_ACK} = 'YES';
+        push(@errors, "INBOX_USE_SSL and INBOX_USE_STARTTLS " .
+            "are both selected, but they are mutually exclusive.");
     }
-    else
+
+    if(is_yes($this->{SMTP_USE_SSL})
+        and is_yes($this->{SMTP_USE_STARTTLS}))
     {
-        push(@errors,
-            "Unrecognized ALWAYS_ACK (YES/NO) value:  " .
-            $this->{ALWAYS_ACK});
+        push(@errors, "SMTP_USE_SSL and SMTP_USE_STARTTLS " .
+            "are both selected, but they are mutually exclusive.");
     }
 
     # check whether directories exist
@@ -605,8 +637,15 @@ time limit for mailbox interactions
 
 =item INBOX_USE_SSL
 
-YES/NO value; default is NO.  If set to YES, use SSL when connecting to
-inbox via POP3 or IMAP.
+YES/NO value; default is NO.  If set to YES, when reading inbox, use immediate
+SSL/TLS encryption on the POP3 or IMAP server connection.
+Mutually exclusive with INBOX_USE_STARTTLS.
+
+=item INBOX_USE_STARTTLS
+
+YES/NO value; default is NO.  If set to YES, when reading inbox, use STARTTLS
+to initiate SSL/TLS encryption on the POP3 or IMAP server connection.
+Mutually exclusive with INBOX_USE_SSL.
 
 =item INBOX_USERNAME
 
@@ -714,7 +753,8 @@ password for SMTP server
 
 =item SMTP_PORT
 
-SMTP server port (default 25, or 465 if SMTP_USE_SSL is YES)
+SMTP server port, typically 25, 465, or 587 (465 if SMTP_USE_SSL is selected,
+587 if SMTP_USE_STARTTLS is selected)
 
 =item SMTP_TIMEOUT
 
@@ -722,8 +762,15 @@ maximum time, in seconds, to wait for response from SMTP server
 
 =item SMTP_USE_SSL
 
-YES/NO value; default is NO.  If set to YES, use SSL when sending mail
-via SMTP.
+YES/NO value; default is NO.  If set to YES, when sending email, use immediate
+SSL/TLS encryption on the SMTP server connection.
+Mutually exclusive with SMTP_USE_STARTTLS.
+
+=item SMTP_USE_STARTTLS
+
+YES/NO value; default is NO.  If set to YES, when sending mail, use STARTTLS
+to initiate SSL/TLS encryption on the SMTP server connection.
+Mutually exclusive with SMTP_USE_SSL.
 
 =item SMTP_USERNAME
 

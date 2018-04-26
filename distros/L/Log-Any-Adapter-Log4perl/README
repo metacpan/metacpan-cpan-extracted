@@ -2,7 +2,7 @@ NAME
     Log::Any::Adapter::Log4perl - Log::Any adapter for Log::Log4perl
 
 VERSION
-    version 0.08
+    version 0.09
 
 SYNOPSIS
         use Log::Log4perl;
@@ -23,6 +23,10 @@ LOG LEVEL TRANSLATION
         alert -> fatal
         emergency -> fatal
 
+METHODS
+  structured
+    This adapter supports structured logging, introduced in Log-Any v1.700.
+
 SEE ALSO
     *   Log::Any
 
@@ -33,24 +37,31 @@ SEE ALSO
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/Log-Any-Adapter-Log4perl/issues>. You will
+    <https://github.com/preaction/Log-Any-Adapter-Log4perl/issues>. You will
     be notified automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <https://github.com/dagolden/Log-Any-Adapter-Log4perl>
+    <https://github.com/preaction/Log-Any-Adapter-Log4perl>
 
-      git clone https://github.com/dagolden/Log-Any-Adapter-Log4perl.git
+      git clone https://github.com/preaction/Log-Any-Adapter-Log4perl.git
 
 AUTHORS
     *   Jonathan Swartz <swartz@pobox.com>
 
     *   David Golden <dagolden@cpan.org>
 
+    *   Doug Bell <preaction@cpan.org>
+
+CONTRIBUTORS
+    *   Doug Bell <doug@preaction.me>
+
+    *   Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2015 by Jonathan Swartz.
+    This software is copyright (c) 2018 by Jonathan Swartz.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

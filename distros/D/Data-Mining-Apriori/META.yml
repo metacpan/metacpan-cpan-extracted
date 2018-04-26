@@ -19,9 +19,10 @@ no_index:
     - inc
 requires:
   Algorithm::Combinatorics: '0.27'
+  List::PowerSet: '0.01'
 resources:
   bugtracker: https://github.com/alexgracianoarj/data-mining-apriori/issues
   homepage: https://alexgracianoarj.github.io/data-mining-apriori
   repository: https://github.com/alexgracianoarj/data-mining-apriori
-version: 0.17
+version: 0.18
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

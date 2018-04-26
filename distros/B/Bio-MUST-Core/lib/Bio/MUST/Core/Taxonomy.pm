@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.181000';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.181120';
 use Moose;
 use namespace::autoclean;
 
@@ -45,6 +45,8 @@ use aliased 'Bio::MUST::Core::Taxonomy::Filter';
 use aliased 'Bio::MUST::Core::Taxonomy::Criterion';
 use aliased 'Bio::MUST::Core::Taxonomy::Category';
 use aliased 'Bio::MUST::Core::Taxonomy::Classifier';
+use aliased 'Bio::MUST::Core::Taxonomy::Labeler';
+use aliased 'Bio::MUST::Core::Taxonomy::ColorScheme';
 
 
 # public path to NCBI Taxonomy dump directory
@@ -158,8 +160,8 @@ sub _build_ncbi_tax {
     my $nodes_txid = file($self->tax_dir, 'nodes*.dmp'   );
     my $nodes_gca  = file($self->tax_dir, 'gca*nodes.dmp');
 
-    # Note: gca files are loaded last to get precedence in get_taxid_from_name
-    my @names_files = ($names_txid, $names_gca);
+    # Note: taxid files are loaded last to get precedence in get_taxid_from_name
+    my @names_files = ($names_gca, $names_txid);
     my @nodes_files = ($nodes_txid, $nodes_gca);
 
     # Note: names.dmp files are reordered on-the-fly so as scientific names
@@ -232,9 +234,12 @@ sub _build_is_dupe {
     while (my $line = <$in>) {
 
         # focus on scientific names
-        # do not consider as duplicates genus and subgenus that are the same
         next LINE unless $line =~ m/scientific \s name/xms;
-        next LINE     if $line =~ m/genus>/xms;
+
+        # do not consider as duplicates genus and subgenus that are the same
+        # similarly ignore duplicates involving phylum vs other levels
+        # phyla come after classes and synonyms (and thus should win)
+        next LINE     if $line =~ m/genus>/xms || $line =~ m/<phylum>/xms;
 
         # extract and count taxon
         chomp $line;
@@ -624,6 +629,11 @@ sub get_taxonomy_from_seq_id {
 }
 
 
+sub fetch_lineage {                         ## no critic (RequireArgUnpacking)
+    return shift->get_taxonomy_from_seq_id(@_);
+}
+
+
 sub get_taxonomy_with_levels_from_seq_id {  ## no critic (RequireArgUnpacking)
     return shift->_taxonomy_from_seq_id_(1, @_);
 }
@@ -695,6 +705,10 @@ sub get_common_taxonomy_from_seq_ids {      ## no critic (RequireArgUnpacking)
     return $self->_common_taxonomy($threshold, @lineages);
 }
 
+
+sub compute_lca {                           ## no critic (RequireArgUnpacking)
+    return shift->get_common_taxonomy_from_seq_ids(@_);
+}
 
 sub _common_taxonomy {                      ## no critic (RequireArgUnpacking)
     my $self      = shift;
@@ -870,46 +884,6 @@ sub attach_taxa_to_entities {
     return;
 }
 
-
-
-sub classifier_from_systematic_frame {
-    my $self   = shift;
-    my $infile = shift;
-
-    # Thursday 26 November 2015 at 15 hours 21
-    # ((((((Crenarchaeota:371:88:-1,Korarchaeota:371:72:-1)a:15:80:-1,...)Tree of Life:3:16:-1;
-
-    # ensure that we get a parseable tree from the .fra file
-    # by considering only line 2 and turning all funny 'branch lengths' to 1
-    my @lines = file($infile)->slurp;
-    (my $newick_str = pop @lines) =~ s/(?: :-?(\d+) ){3}/:1/xmsg;
-
-    # parse tree using Bio::Phylo
-    # Note: keep whitespace because tip labels are not between quotes
-    my $tree = parse(
-        -format => 'newick',
-        -string => $newick_str,
-        -keep_whitespace => 1,
-    )->first;
-
-    # extract tip labels
-    my @labels = map { $_->get_name } @{ $tree->get_terminals };
-
-    # build classifier from labels
-    my @categories;
-    for my $label (@labels) {
-        my $filter    = $self->tax_filter( [ '+' . $label ] );
-        my $criterion = Criterion->new( tax_filter => $filter );
-        my $category  = Category->new(
-            label    => $label,
-            criteria => [ $criterion ],
-        );
-        push @categories, $category;
-    }
-    my $classifier = Classifier->new( categories => \@categories );
-
-    return $classifier;
-}
 
 # Listable IdList and IdMapper factory methods
 
@@ -1135,7 +1109,7 @@ sub tax_filter {
     my $self = shift;
     my $list = shift;
 
-    return Filter->new( _tax => $self, _specs => $list );
+    return Filter->new( tax => $self, _specs => $list );
 }
 
 
@@ -1162,6 +1136,8 @@ sub tax_category {
     return Category->new($args);
 }
 
+
+# Classifier/Labeler/ColorScheme factory methods
 
 
 sub tax_classifier {
@@ -1251,22 +1227,71 @@ sub tax_classifier {
 #               ]
 
 
-sub eq_tax {
+
+sub tax_labeler_from_systematic_frame {
+    my $self   = shift;
+    my $infile = shift;
+
+    # Thursday 26 November 2015 at 15 hours 21
+    # ((((((Crenarchaeota:371:88:-1,Korarchaeota:371:72:-1)a:15:80:-1,...)Tree of Life:3:16:-1;
+
+    # ensure that we get a parseable tree from the .fra file
+    # by considering only line 2 and turning all funny 'branch lengths' to 1
+    my @lines = file($infile)->slurp;
+    (my $newick_str = pop @lines) =~ s/(?: :-?(\d+) ){3}/:1/xmsg;
+
+    # parse tree using Bio::Phylo
+    # Note: keep whitespace because tip labels are not between quotes
+    my $tree = parse(
+        -format => 'newick',
+        -string => $newick_str,
+        -keep_whitespace => 1,
+    )->first;
+
+    # extract tip labels
+    my @labels = map { $_->get_name } @{ $tree->get_terminals };
+
+    # build classifier from labels
+    return $self->tax_labeler_from_list( \@labels );
+}
+
+
+
+sub tax_labeler_from_list {
+    my $self = shift;
+    my $list = shift;
+
+    return Labeler->new( tax => $self, labels => $list );
+}
+
+
+
+sub load_color_scheme {                     ## no critic (RequireArgUnpacking)
+    my $self = shift;
+    my $scheme = ColorScheme->new( tax => $self );
+    return $scheme->load(@_);
+}
+
+
+
+sub eq_tax {                                ## no critic (RequireArgUnpacking)
     my $self       = shift;
     my $got        = shift;
     my $expect     = shift;
     my $classifier = shift;
 
-    # compute LCA between got org and expected lineage
-    my $lca = $self->get_common_taxonomy_from_seq_ids($got, $expect);
+    # classify got org
+    my $got_taxon = $classifier->classify($got,    @_);
+    return undef                ## no critic (ProhibitExplicitReturnUndef)
+        unless $got_taxon;
 
-    # classify got org...
-    # ... and use got taxon as a tax_filter...
-    my $taxon = $classifier->classify($got);
-    my $tax_filter = $self->tax_filter( [ '+' . $taxon ] );
+    # classify expect org
+    my $exp_taxon = $classifier->classify($expect, @_);
+    return undef                ## no critic (ProhibitExplicitReturnUndef)
+        unless $exp_taxon;
 
-    # then apply tax_filter to computed LCA
-    return $tax_filter->is_allowed($lca);
+    # compare got and expect taxa
+    return $got_taxon eq $exp_taxon;
 }
 
 
@@ -1614,7 +1639,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.181000
+version 0.181120
 
 =head1 SYNOPSIS
 
@@ -1644,8 +1669,6 @@ version 0.181000
 
 =head2 attach_taxa_to_entities
 
-=head2 classifier_from_systematic_frame
-
 =head2 gi_mapper
 
 =head2 tab_mapper
@@ -1660,6 +1683,12 @@ version 0.181000
 
 =head2 tax_classifier
 
+=head2 tax_labeler_from_systematic_frame
+
+=head2 tax_labeler_from_list
+
+=head2 load_color_scheme
+
 =head2 eq_tax
 
 =head2 setup_taxdir
@@ -1669,6 +1698,12 @@ version 0.181000
 =head2 new_from_cache
 
 =head2 update_cache
+
+=head1 ALIASES
+
+=head2 fetch_lineage
+
+=head2 compute_lca
 
 =head1 AUTHOR
 

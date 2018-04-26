@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.cpp 9     15-05-24 21:04 Sommar $
+ $Header: /Perl/OlleDB/init.cpp 10    18-04-09 22:49 Sommar $
 
   This file holds code that is run when the module initialiases, and
   when a new OlleDB object is created. This file also declares global
@@ -7,9 +7,15 @@
   constants that are set up once and then never changed.
 
 
-  Copyright (c) 2004-2015   Erland Sommarskog
+  Copyright (c) 2004-2018   Erland Sommarskog
 
   $History: init.cpp $
+ * 
+ * *****************  Version 10  *****************
+ * User: Sommar       Date: 18-04-09   Time: 22:49
+ * Updated in $/Perl/OlleDB
+ * Added support for the new MSOLEDBSQL provider. Added new login propery
+ * MultiSubnetFailover, only supported by MSOLEDBSQL.
  * 
  * *****************  Version 9  *****************
  * User: Sommar       Date: 15-05-24   Time: 21:04
@@ -83,20 +89,22 @@ FILE *dbgfile = NULL;
 
 
 // Global variables for class ids for the possible providers.
-CLSID  clsid_sqloledb  = CLSID_NULL;
-CLSID  clsid_sqlncli   = CLSID_NULL;
-CLSID  clsid_sqlncli10 = CLSID_NULL;
-CLSID  clsid_sqlncli11 = CLSID_NULL;
+CLSID  clsid_sqloledb   = CLSID_NULL;
+CLSID  clsid_sqlncli    = CLSID_NULL;
+CLSID  clsid_sqlncli10  = CLSID_NULL;
+CLSID  clsid_sqlncli11  = CLSID_NULL;
+CLSID  clsid_msoledbsql = CLSID_NULL;
 
 // This global array holds definition of all initialisation properties
 // for OLE DB.
 init_property gbl_init_props[MAX_INIT_PROPERTIES];
 
 // Number of properties per provider:
-int no_of_ssprops_sqloledb  = -1;
-int no_of_ssprops_sqlncli   = -1;
-int no_of_ssprops_sqlncli10 = -1;
-int no_of_ssprops_sqlncli11 = -1;
+int no_of_ssprops_sqloledb   = -1;
+int no_of_ssprops_sqlncli    = -1;
+int no_of_ssprops_sqlncli10  = -1;
+int no_of_ssprops_sqlncli11  = -1;
+int no_of_ssprops_msoledbsql = -1;
 
 // This array holds where each property set starts in gbl_init_props;
 propset_info_struct init_propset_info[NO_OF_INIT_PROPSETS];
@@ -304,10 +312,15 @@ static void setup_init_properties ()
                      FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    no_of_ssprops_sqlncli10 = init_propset_info[ssinit_props].no_of_props;
 
-   // And here is a single one that made into SQL 2012.
+   // And here is a single one that made it into SQL 2012.
    add_init_property("ApplicationIntent", ssinit_props, SSPROP_INIT_APPLICATIONINTENT,
                      FALSE, VT_BSTR, FALSE, L"ReadWrite", NULL, ix);
    no_of_ssprops_sqlncli11 = init_propset_info[ssinit_props].no_of_props;
+
+   // This one appeared first with the undeprecated driver in 2018.
+   add_init_property("MultiSubnetFailover", ssinit_props, SSPROP_INIT_MULTISUBNETFAILOVER,
+                     FALSE, VT_BOOL, FALSE, NULL, FALSE, ix);
+   no_of_ssprops_msoledbsql = init_propset_info[ssinit_props].no_of_props;
    
    // DBPROPSET_DATASOURCE, data-source properties.
    init_propset_info[datasrc_props].start = ix;
@@ -364,10 +377,11 @@ void initialize ()
    EnterCriticalSection(&CS);
 
    // Get classIDs for the possible providers.
-   if (IsEqualCLSID(clsid_sqloledb, CLSID_NULL) &&
-       IsEqualCLSID(clsid_sqlncli, CLSID_NULL)  &&
-       IsEqualCLSID(clsid_sqlncli10, CLSID_NULL) && 
-       IsEqualCLSID(clsid_sqlncli11, CLSID_NULL)) {
+   if (IsEqualCLSID(clsid_sqloledb,   CLSID_NULL) &&
+       IsEqualCLSID(clsid_sqlncli,    CLSID_NULL) &&
+       IsEqualCLSID(clsid_sqlncli10,  CLSID_NULL) && 
+       IsEqualCLSID(clsid_sqlncli11,  CLSID_NULL) &&
+       IsEqualCLSID(clsid_msoledbsql, CLSID_NULL)) {
 
       ret = CLSIDFromProgID(L"SQLOLEDB", &clsid_sqloledb);
       if (FAILED(ret)) {
@@ -387,6 +401,11 @@ void initialize ()
       ret = CLSIDFromProgID(L"SQLNCLI11", &clsid_sqlncli11);
       if (FAILED(ret)) {
          clsid_sqlncli11 = CLSID_NULL;
+      }
+
+      ret = CLSIDFromProgID(L"MSOLEDBSQL", &clsid_msoledbsql);
+      if (FAILED(ret)) {
+         clsid_msoledbsql = CLSID_NULL;
       }
    }
 
@@ -440,7 +459,7 @@ void initialize ()
    {
         char buff[256];
         sprintf_s(buff, 256,
-                  "This is Win32::SqlServer, version %s\n\nCopyright (c) 2005-2015 Erland Sommarskog\n",
+                  "This is Win32::SqlServer, version %s\n\nCopyright (c) 2005-2018 Erland Sommarskog\n",
                   XS_VERSION);
         sv_setnv(sv, atof(XS_VERSION));
         sv_setpv(sv, buff);
@@ -453,10 +472,11 @@ void initialize ()
 // given provider.
 int no_of_ssprops(provider_enum provider) {
    switch (provider) {
-      case provider_sqloledb  : return no_of_ssprops_sqloledb;
-      case provider_sqlncli   : return no_of_ssprops_sqlncli;
-      case provider_sqlncli10 : return no_of_ssprops_sqlncli10;
-      case provider_sqlncli11 : return no_of_ssprops_sqlncli11;
+      case provider_sqloledb   : return no_of_ssprops_sqloledb;
+      case provider_sqlncli    : return no_of_ssprops_sqlncli;
+      case provider_sqlncli10  : return no_of_ssprops_sqlncli10;
+      case provider_sqlncli11  : return no_of_ssprops_sqlncli11;
+      case provider_msoledbsql : return no_of_ssprops_msoledbsql;
       default :
          croak("Internal error: Unexpected value %d passed to no_of_ssprops");
          return 0;
@@ -466,7 +486,9 @@ int no_of_ssprops(provider_enum provider) {
 // This routine returns the default provider, which is highest version of
 // SQL Native Client/SQLOLEDB that is installed.
 provider_enum default_provider(void) {
-  if (! IsEqualCLSID(clsid_sqlncli11, CLSID_NULL))
+  if (! IsEqualCLSID(clsid_msoledbsql, CLSID_NULL))
+      return provider_msoledbsql;
+  else if (! IsEqualCLSID(clsid_sqlncli11, CLSID_NULL))
       return provider_sqlncli11;
   else if (! IsEqualCLSID(clsid_sqlncli10, CLSID_NULL))
       return provider_sqlncli10;

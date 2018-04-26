@@ -115,7 +115,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.39",
+  "VERSION" => "1.41",
   "test"    => {
     "TESTS" => "t/*.t"
     }

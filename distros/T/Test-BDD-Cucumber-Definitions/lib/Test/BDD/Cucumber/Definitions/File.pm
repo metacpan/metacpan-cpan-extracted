@@ -11,12 +11,11 @@ use File::Spec::Functions qw(catdir splitdir);
 use File::Basename qw(dirname);
 use IO::Capture::Stderr;
 use IPC::Run3;
-use Test::BDD::Cucumber::Definitions qw(S);
-use Test::BDD::Cucumber::Definitions::Validator qw(:all);
+use Test::BDD::Cucumber::Definitions qw(S :validator);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.38';
+our $VERSION = '0.40';
 
 our @EXPORT_OK = qw(File);
 

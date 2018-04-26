@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010001;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Carp;
 use JSON qw(decode_json);
@@ -136,18 +136,14 @@ our %ELEMENTS = (
     MetaInlines => [ Meta => 'content' ],
     MetaList    => [ Meta => 'content' ],
     MetaBlocks  => [ Meta => 'content' ],
-);
 
-# type constructors
-foreach (
+    # TYPE KEYWORDS
+    map { $_ => ['Keyword'] }
     qw(DefaultDelim Period OneParen TwoParens SingleQuote DoubleQuote
     DisplayMath InlineMath AuthorInText SuppressAuthor NormalCitation
     AlignLeft AlignRight AlignCenter AlignDefault DefaultStyle Example
     Decimal LowerRoman UpperRoman LowerAlpha UpperAlpha)
-  )
-{
-    $ELEMENTS{$_} = ['Inline'];
-}
+);
 
 use parent 'Exporter';
 our @EXPORT = (
@@ -317,7 +313,9 @@ sub citation($) {
     };
 }
 
-use Pandoc::Metadata ();
+# XXX: must require rather than use Pandoc::Metadata
+# or its attempt to use Pandoc::Elements will result in a broken state.
+require Pandoc::Metadata;
 
 sub metadata($);  ## no critic
 
@@ -397,6 +395,9 @@ sub pandoc_json($) {
     }
     *blocks = \&content;
     sub is_document { 1 }
+    sub as_block {
+        bless { t => 'Div', c => [ {}, $_[0]->{blocks} ] }, 'Pandoc::Document::Div';
+    }
     sub value {
         shift->meta->value(@_);
     }
@@ -477,6 +478,11 @@ sub pandoc_json($) {
 }
 
 {
+    package Pandoc::Document::Keyword;
+    our @ISA = ('Pandoc::Document::Element');
+}
+
+{
 
     package Pandoc::Document::Element;
     use strict;
@@ -485,6 +491,7 @@ sub pandoc_json($) {
     use JSON ();
     use Scalar::Util qw(reftype blessed);
     use Pandoc::Walker ();
+    use Pandoc::Selector;
     use subs qw(walk query transform);    # Silence syntax warnings
 
     sub to_json {
@@ -536,6 +543,9 @@ sub pandoc_json($) {
     sub is_block    { 0 }
     sub is_inline   { 0 }
     sub is_meta     { 0 }
+    sub as_block    {
+        bless { t => 'Null', c => [] }, 'Pandoc::Document::Null';
+    }
     *walk      = *Pandoc::Walker::walk;
     *query     = *Pandoc::Walker::query;
     *transform = *Pandoc::Walker::transform;
@@ -559,36 +569,11 @@ sub pandoc_json($) {
         };
     }
 
-    # TODO: replace by new class Pandoc::Selector with compiled code
     sub match {
         my $self = shift;
-        foreach my $selector ( split /\|/, shift ) {
-            return 1 if $self->match_simple($selector);
-        }
-        return 0;
+        my $selector = blessed $_[0] ? shift : Pandoc::Selector->new(shift);
+        $selector->match($self);
     }
-
-    sub match_simple {
-        my ( $self, $selector ) = @_;
-        $selector =~ s/^\s+|\s+$//g;
-
-        # name
-        return 0
-          if $selector =~ s/^([a-z]+)\s*//i and lc($1) ne lc( $self->name );
-        return 1 if $selector eq '';
-
-        # type
-        if ( $selector =~ s/^:(document|block|inline|meta)\s*// ) {
-            my $method = "is_$1";
-            return 0 unless $self->$method;
-            return 1 if $selector eq '';
-        }
-
-        # id and/or classes
-        return 0 unless $self->can('match_attributes');
-        return $self->match_attributes($selector);
-    }
-
 }
 
 {
@@ -597,8 +582,6 @@ sub pandoc_json($) {
     use Hash::MultiValue;
     use Scalar::Util qw(reftype blessed);
     use Carp qw(croak);
-
-    my $IDENTIFIER = qr{\p{L}(\p{L}|[0-9_:.-])*};
 
     sub id {
         $_[0]->attr->[0] = defined $_[1] ? "$_[1]" : "" if @_ > 1;
@@ -655,25 +638,6 @@ sub pandoc_json($) {
         Hash::MultiValue->new( @h, map { @$_ } @{$e->attr->[2]} );
     }
 
-    # TODO: rename and/or extend to keyvals check
-    sub match_attributes {
-        my ( $self, $selector ) = @_;
-        $selector =~ s/^\s+|\s+$//g;
-
-        while ( $selector ne '' ) {
-            if ( $selector =~ s/^#($IDENTIFIER)\s*// ) {
-                return 0 unless $self->id eq $1;
-            }
-            elsif ( $selector =~ s/^\.($IDENTIFIER)\s*// ) {
-                return 0 unless grep { $1 eq $_ } @{ $self->attr->[1] };
-            }
-            else {
-                return 0;
-            }
-        }
-
-        return 1;
-    }
 }
 
 {
@@ -682,7 +646,8 @@ sub pandoc_json($) {
     our $VERSION = $PANDOC::Document::VERSION;
     our @ISA     = ('Pandoc::Document::Element');
     sub is_block { 1 }
-    sub null {
+    sub as_block { $_[0] }
+    sub null { # TODO: document this (?)
         %{$_[0]} = (t => 'Null', c => []);
         bless $_[0], 'Pandoc::Document::Null';
     }
@@ -694,6 +659,9 @@ sub pandoc_json($) {
     our $VERSION = $PANDOC::Document::VERSION;
     our @ISA     = ('Pandoc::Document::Element');
     sub is_inline { 1 }
+    sub as_block {
+        bless { t => 'Plain', c => [ $_[0] ] }, 'Pandoc::Document::Plain';
+    }
 }
 
 {
@@ -1041,6 +1009,16 @@ True if the element is a L<Metadata element|/METADATA ELEMENTS>
 =head3 is_document
 
 True if the element is a L<Document element|/DOCUMENT ELEMENT>
+
+=head3 as_block
+
+Return the element unmodified if it is a block element or wrapped in a
+L<Plain|/Plain> or L<Div|/Div> otherwise.
+
+=head3 match( $selector )
+
+Check whether the element matches a given L<Pandoc::Selector> (given as
+instance or string).
 
 =head3 walk(...)
 
@@ -1537,6 +1515,8 @@ Jakob Voß E<lt>jakob.voss@gbv.deE<gt>
 =head1 CONTRIBUTORS
 
 Benct Philip Jonsson E<lt>bpjonsson@gmail.comE<gt>
+
+L<TakeAsk|https://github.com/TakeAsh>
 
 =head1 COPYRIGHT AND LICENSE
 

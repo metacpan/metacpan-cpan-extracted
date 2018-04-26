@@ -5,7 +5,8 @@ no warnings 'once';
 use Test::More 0.92;
 use Config;
 use File::Spec;
-use t::Util;
+use lib 't/lib';
+use TestUtil;
 
 # Work around buffering that can show diags out of order
 Test::More->builder->failure_output(*STDOUT) if $ENV{HARNESS_VERBOSE};
@@ -76,13 +77,13 @@ for my $style ( qw/any v1 v4/ ) {
         "$style: Data::GUID::Any set to use '$mod'"
       );
       my $guid = $fcn{$style}->();
-      ok( t::Util::looks_like_uc_guid( $guid  ),
+      ok( TestUtil::looks_like_uc_guid( $guid  ),
         "$style: got valid guid from '$mod'"
       ) or diag $guid;
       {
         local $Data::GUID::Any::UC;
         $guid = $fcn{$style}->();
-        ok( t::Util::looks_like_lc_guid( $guid  ),
+        ok( TestUtil::looks_like_lc_guid( $guid  ),
           "$style: got valid lc guid from '$mod' (\$UC=0)"
         ) or diag $guid;
       }

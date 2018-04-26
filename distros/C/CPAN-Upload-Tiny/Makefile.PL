@@ -13,17 +13,22 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "CPAN-Upload-Tiny",
+  "EXE_FILES" => [
+    "script/cpan-upload-tiny"
+  ],
   "LICENSE" => "perl",
   "NAME" => "CPAN::Upload::Tiny",
   "PREREQ_PM" => {
     "Carp" => 0,
     "File::Basename" => 0,
+    "Getopt::Long" => 0,
     "HTTP::Tiny" => 0,
     "HTTP::Tiny::Multipart" => 0,
     "IO::Socket::SSL" => "1.56",
     "MIME::Base64" => 0,
     "Mozilla::CA" => 0,
     "Net::SSLeay" => "1.49",
+    "Pod::Usage" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -31,7 +36,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,12 +47,14 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "File::Basename" => 0,
   "File::Temp" => 0,
+  "Getopt::Long" => 0,
   "HTTP::Tiny" => 0,
   "HTTP::Tiny::Multipart" => 0,
   "IO::Socket::SSL" => "1.56",
   "MIME::Base64" => 0,
   "Mozilla::CA" => 0,
   "Net::SSLeay" => "1.49",
+  "Pod::Usage" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

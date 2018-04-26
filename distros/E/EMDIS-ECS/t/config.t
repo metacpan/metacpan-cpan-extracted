@@ -12,7 +12,7 @@ use lib "$FindBin::Bin";
 require 'setup';
 
 # print test plan before loading modules
-BEGIN { plan(tests => 164); }
+BEGIN { plan(tests => 173); }
 use EMDIS::ECS::Config;
 
 # [1] Was module successfully loaded?
@@ -51,7 +51,7 @@ ok($cfg =~ /ECS_MBX_STORE_DIR \([^\n]+store\) directory not found./);
 ok($cfg =~ /Error\(s\) detected in configuration file .+01-ecs.cfg/);
 ok($cfg =~ /Fatal configuration error\(s\) encountered./);
 
-# [23..78] Read minimal good config file
+# [23..82] Read minimal good config file
 copy catfile($datadir, '02-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -98,11 +98,13 @@ ok($cfg->SMTP_HOST eq 'smtp');
 ok($cfg->SMTP_TIMEOUT == 60);
 ok($cfg->SMTP_DEBUG == 0);
 ok($cfg->SMTP_USE_SSL eq 'NO');
+ok($cfg->SMTP_PORT == 25);
 ok($cfg->INBOX_PROTOCOL eq 'POP3');
 ok($cfg->INBOX_HOST eq 'mail');
 ok($cfg->INBOX_TIMEOUT == 60);
 ok($cfg->INBOX_DEBUG == 0);
 ok($cfg->INBOX_USE_SSL eq 'NO');
+ok($cfg->INBOX_PORT == 110);
 ok($cfg->INBOX_MAX_MSG_SIZE == 1048576);
 ok($cfg->OPENPGP_CMD_ENCRYPT eq '/usr/local/bin/gpg --armor --batch ' .
         '--charset ISO-8859-1 --force-mdc --logger-fd 1 --openpgp ' .
@@ -127,7 +129,7 @@ ok($cfg->ECS_MBX_OUT_DIR =~ /out$/);
 ok($cfg->ECS_MBX_TRASH_DIR =~ /trash$/);
 ok($cfg->ECS_MBX_STORE_DIR =~ /store$/);
 
-# [80..82] Read config file with known errors
+# [83..85] Read config file with known errors
 copy catfile($datadir, '03-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -135,7 +137,7 @@ ok(not ref $cfg);
 ok($cfg =~ /Unexpected input \'BOGUS\' at .+ecs.cfg line 17/);
 ok($cfg =~ /Error\(s\) encountered while attempting to process .+ecs.cfg/);
 
-# [83..93] Read config file with known errors
+# [86..99] Read config file with known errors
 copy catfile($datadir, '04-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -148,19 +150,26 @@ ok($cfg =~ /T_CHK \(0\) is required to be greater than zero./);
 ok($cfg =~ /T_SCN \(0\) is required to be greater than zero./);
 ok($cfg =~ /T_ADM_REMIND \(0\) is required to be greater than zero./);
 ok($cfg =~ /T_MSG_PROC \(0\) is required to be greater than zero./);
+ok($cfg =~ /Unrecognized ALWAYS_ACK \(YES\/NO\) value:  OK/);
+ok($cfg =~ /INBOX_USE_SSL and INBOX_USE_STARTTLS are both selected, but they are mutually exclusive./);
+ok($cfg =~ /SMTP_USE_SSL and SMTP_USE_STARTTLS are both selected, but they are mutually exclusive./);
 ok($cfg =~ /Error\(s\) detected in configuration file .+ecs.cfg/);
 ok($cfg =~ /Fatal configuration error\(s\) encountered./);
 
-# [94..97] Read config file with known errors
+# [100..107] Read config file with known errors
 copy catfile($datadir, '05-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
 ok(not ref $cfg);
+ok($cfg =~ /Unrecognized INBOX_USE_SSL \(YES\/NO\) value:  YESS/);
+ok($cfg =~ /Unrecognized INBOX_USE_STARTTLS \(YES\/NO\) value:  NOO/);
+ok($cfg =~ /Unrecognized SMTP_USE_SSL \(YES\/NO\) value:  YEA/);
+ok($cfg =~ /Unrecognized SMTP_USE_STARTTLS \(YES\/NO\) value:  NAY/);
 ok($cfg =~ /Unrecognized INBOX_PROTOCOL:  PIGEON/);
 ok($cfg =~ /Error\(s\) detected in configuration file .+ecs.cfg/);
 ok($cfg =~ /Fatal configuration error\(s\) encountered./);
 
-# [98..156] Read error-free config file
+# [108..173] Read error-free config file
 copy catfile($datadir, '06-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);

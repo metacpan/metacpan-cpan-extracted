@@ -42,6 +42,12 @@ CONSTRUCTOR parameters
     
       http://kermit:kermit@localhost:8080/activiti-rest/service
 
+ timeout
+
+      timeout in seconds when connecting to the activiti rest api
+    
+      default value is 180
+
 METHODS
 
  deployments
@@ -304,15 +310,17 @@ METHODS
         equal to rest call:
     
             POST query/executions
-    =head2 signal_execution
-    
+
+ signal_execution
+
         send signal to execution
     
         equal to rest call:
     
             PUT runtime/executions/{executionId}
-    =head2 execution
-    
+
+ execution
+
       Get an execution
     
       Parameters:

@@ -19,9 +19,8 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
     catch {
         say "Oops, this wasn't a webmention at all: $_";
     };
-    return unless $wm;
 
-    if ( $wm->is_verified ) {
+    if ( $wm && $wm->is_verified ) {
         my $author = $wm->author;
         my $name;
         if ( $author ) {
@@ -55,7 +54,7 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 
     # Manually buidling a webmention:
 
-    my $wm = Web::Mention->new(
+    $wm = Web::Mention->new(
        source => $url_of_the_thing_that_got_mentioned,
        target => $url_of_the_thing_that_did_the_mentioning
     );
@@ -185,10 +184,13 @@ property in an `h-entry` found within the source document.)
 
 # NOTES AND BUGS
 
-Implementation of the content-fetching method is incomplete.
-
 This software is **alpha**; its author is still determining how it wants
 to work, and its interface might change dramatically.
+
+Implementation of the content-fetching method is incomplete.
+
+The author plans to add webmention-sending functionality to this module.
+But, it isn't there yet.
 
 # SUPPORT
 
@@ -200,6 +202,10 @@ The author also welcomes any direct questions about this module via email.
 # AUTHOR
 
 Jason McIntosh (jmac@jmac.org)
+
+# CONTRIBUTORS
+
+- Mohammad S Anwar (mohammad.anwar@yahoo.com)
 
 # COPYRIGHT AND LICENSE
 

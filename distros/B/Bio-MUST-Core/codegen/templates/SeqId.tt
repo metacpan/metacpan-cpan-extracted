@@ -16,7 +16,7 @@ use Carp;
 use Const::Fast;
 
 use Bio::MUST::Core::Types;
-use Bio::MUST::Core::Constants qw(:ncbi);
+use Bio::MUST::Core::Constants qw(:ncbi :seqids);
 
 
 has 'full_id' => (
@@ -107,10 +107,6 @@ const my $TAIL       => qr{
     $GENUS                  # as genus
 }xms;
 
-const my $NEW        => qr{
-    \#NEW\#                 # literal #NEW#
-}xms;
-
 # regex for parsing (valid) full_id
 const my $FULL_ID    => qr{
     \A                      # begins with...
@@ -127,7 +123,7 @@ const my $FULL_ID    => qr{
     ($ACCESSION)            # accession
     (?: \.{3}               # optional literal ellipsis (...)
     ($TAIL) )?              #   followed by a single-word tail
-    (?: ($NEW) )?           # optional #NEW# tag
+    ($NEW_TAG)?             # optional #NEW# tag
     \z                      # ... at the end
 }xms;
 

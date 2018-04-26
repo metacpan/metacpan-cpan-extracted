@@ -1,5 +1,5 @@
 package App::CSE::File::TextTroff;
-$App::CSE::File::TextTroff::VERSION = '0.013';
+$App::CSE::File::TextTroff::VERSION = '0.014';
 use Moose;
 extends qw/App::CSE::File/;
 

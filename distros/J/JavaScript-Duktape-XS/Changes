@@ -1,3 +1,14 @@
+0.000051    2018-04-25
+            * Add test-time dependencies.
+
+0.000050    2018-04-23
+            * Add routines reset_stats and reset_msgs.
+            * Add routine to parse a JS stacktrace and get structured
+              information from it.
+
+0.000049    2018-04-23
+            * Greatly improved docs.
+
 0.000048    2018-04-19
             * Unify error checking after calling a JS function.
 

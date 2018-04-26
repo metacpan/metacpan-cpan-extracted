@@ -13,7 +13,7 @@ use URI::Escape;
 use Encode;
 use IO::Socket::SSL;
 
-our $VERSION    = '0.03';
+our $VERSION    = '0.04';
 
 my $WAIT_RETRY  = 20;
 my $BUFF_SIZE = 8192;
@@ -126,7 +126,7 @@ sub deleteResource {
 
     $permanently = $permanently ? 'true' : 'false';
 
-    my $res = $self->__request('https://cloud-api.yandex.net/v1/disk/resources?path=' . uri_escape($path), "DELETE");
+    my $res = $self->__request('https://cloud-api.yandex.net/v1/disk/resources?path=' . uri_escape($path) . "&permanently=$permanently", "DELETE");
     my $code = $res->code;
     if ($code eq '204') {
         #Free folder
@@ -366,7 +366,8 @@ __END__
 B<Yandex::Disk> - a simple API for Yandex Disk
 
 =head1 VERSION
-    version 0.02
+
+version 0.04
 
 =head1 SYNOPSYS
     
@@ -468,7 +469,7 @@ Delete file or folder from disk. Return 1 if success
     $disk->deleteResource(-path => 'Temp/test');
     Options:
         -path               => Path to delete file or folder
-        -permanently        => Do not move to trash, delete permanently (default: 0)
+        -permanently        => Do not move to trash, delete permanently (default: 0(moving file to trash))
         -wait               => Wait delete resource (defailt: 0)
 
 =head2 downloadFile(%opt)

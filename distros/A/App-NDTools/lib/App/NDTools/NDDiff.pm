@@ -4,28 +4,34 @@ use strict;
 use warnings FATAL => 'all';
 use parent 'App::NDTools::NDTool';
 
-use Algorithm::Diff;
+use Algorithm::Diff qw(compact_diff);
 use JSON qw();
 use App::NDTools::Slurp qw(s_dump);
 use Log::Log4Cli 0.18;
 use Struct::Diff 0.94 qw();
 use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
-use Term::ANSIColor qw(colored);
+use Term::ANSIColor qw(color);
 
-our $VERSION = '0.38';
+our $VERSION = '0.43';
 
 my $JSON = JSON->new->canonical->allow_nonref;
+my %COLOR;
 
 sub arg_opts {
     my $self = shift;
 
     return (
         $self->SUPER::arg_opts(),
+        'A!' => \$self->{OPTS}->{diff}->{A},
+        'N!' => \$self->{OPTS}->{diff}->{N},
+        'O!' => \$self->{OPTS}->{diff}->{O},
+        'R!' => \$self->{OPTS}->{diff}->{R},
+        'U!' => \$self->{OPTS}->{diff}->{U},
         'brief' => sub { $self->{OPTS}->{ofmt} = $_[0] },
         'colors!' => \$self->{OPTS}->{colors},
         'ctx-text=i' => \$self->{OPTS}->{'ctx-text'},
-        'full' => \$self->{OPTS}->{full},
+        'full' => \$self->{OPTS}->{full}, # deprecated
         'full-headers' => \$self->{OPTS}->{'full-headers'},
         'grep=s@' => \$self->{OPTS}->{grep},
         'json' => sub { $self->{OPTS}->{ofmt} = $_[0] },
@@ -57,6 +63,21 @@ sub configure {
     $self->{OPTS}->{colors} = $self->{TTY}
         unless (defined $self->{OPTS}->{colors});
 
+    # resolve colors
+    while (my ($k, $v) = each %{$self->{OPTS}->{term}->{line}}) {
+        if ($self->{OPTS}->{colors}) {
+            $COLOR{$k} = color($v);
+            $COLOR{"B$k"} = color("bold $v");
+        } else {
+            $COLOR{$k} = $COLOR{"B$k"} = '';
+        }
+    }
+
+    $COLOR{head} = $self->{OPTS}->{colors}
+        ? color($self->{OPTS}->{term}->{head}) : "";
+    $COLOR{reset} = $self->{OPTS}->{colors} ? color('reset') : "";
+
+    # resolve paths
     for (@{$self->{OPTS}->{grep}}, @{$self->{OPTS}->{ignore}}) {
         my $tmp = eval { str2path($_) };
         die_fatal "Failed to parse '$_'", 4 if ($@);
@@ -90,21 +111,39 @@ sub defaults {
             },
         },
         'ofmt' => 'term',
+        'diff' => {
+            'A' => 1,
+            'N' => 1,
+            'O' => 1,
+            'R' => 1,
+            'U' => 0,
+        },
     };
+
     $out->{term}{line}{N} = $out->{term}{line}{A};
     $out->{term}{line}{O} = $out->{term}{line}{R};
     $out->{term}{sign}{N} = $out->{term}{sign}{A};
     $out->{term}{sign}{O} = $out->{term}{sign}{R};
+
     return $out;
 }
 
 sub diff {
     my ($self, $old, $new) = @_;
 
+    if ($self->{OPTS}->{full}) {
+        log_alert {
+            '--full opt is deprecated and will be removed soon. ' .
+            '--U should be used instead'
+        };
+        map {$self->{OPTS}->{diff}->{$_} = 1 } keys %{$self->{OPTS}->{diff}};
+    }
+
     log_debug { "Calculating diff for structure" };
     my $diff = Struct::Diff::diff(
         $old, $new,
-        noU => $self->{OPTS}->{full} ? 0 : 1,
+        map { ("no$_" => 1) } grep { !$self->{OPTS}->{diff}->{$_} }
+            keys %{$self->{OPTS}->{diff}},
     );
 
     # retrieve result from wrapper (see load() for more info)
@@ -114,37 +153,9 @@ sub diff {
         $diff->{U} = $diff->{U}->[0];
     }
 
-    if ($self->{OPTS}->{ofmt} eq 'term') {
-        $self->diff_term($diff) or return undef;
-    }
+    $self->diff_term($diff) if ($self->{OPTS}->{ofmt} eq 'term');
 
     return $diff;
-}
-
-sub _lcsidx2ranges {
-    my ($in_a, $in_b) = @_;
-
-    return [], [] unless (@{$in_a});
-
-    my @out_a = [ shift @{$in_a} ];
-    my @out_b = [ shift @{$in_b} ];
-
-    while (@{$in_a}) {
-        my $i_a = shift @{$in_a};
-        my $i_b = shift @{$in_b};
-        if (
-            ($i_a - $out_a[-1][-1] < 2) and
-            ($i_b - $out_b[-1][-1] < 2)
-        ) { # update ranges - both sequences are continous
-            $out_a[-1][1] = $i_a;
-            $out_b[-1][1] = $i_b;
-        } else { # new ranges
-            push @out_a, [ $i_a ];
-            push @out_b, [ $i_b ];
-        }
-    }
-
-    return \@out_a, \@out_b;
 }
 
 sub diff_term {
@@ -153,24 +164,16 @@ sub diff_term {
     log_debug { "Calculating diffs for text values" };
 
     my $dref;       # ref to diff
-    my ($o, $n);    # LCS ranges
-    my ($po, $pn);  # current positions in splitted texts
-    my ($ro, $rn);  # current LCS range
     my @list = Struct::Diff::list_diff($diff);
 
     while (@list) {
         (undef, $dref) = splice @list, 0, 2;
 
         next unless (exists ${$dref}->{N});
-        unless (exists ${$dref}->{O}) {
-            log_error { "Incomplete diff passed (old value is absent)" };
-            return undef;
-        }
+        next if (ref ${$dref}->{O} or ref ${$dref}->{N});
 
-        my @old = split($/, ${$dref}->{O}, -1)
-            if (${$dref}->{O} and not ref ${$dref}->{O});
-        my @new = split($/, ${$dref}->{N}, -1)
-            if (${$dref}->{N} and not ref ${$dref}->{N});
+        my @old = split($/, ${$dref}->{O}, -1) if (${$dref}->{O});
+        my @new = split($/, ${$dref}->{N}, -1) if (${$dref}->{N});
 
         if (@old > 1 or @new > 1) {
             delete ${$dref}->{O};
@@ -181,25 +184,55 @@ sub diff_term {
                 pop @new; # -"-
             }
 
-            ($o, $n) = _lcsidx2ranges(Algorithm::Diff::LCSidx(\@old, \@new));
-            ($po, $pn) = (0, 0);
+            my @cdiff = compact_diff(\@old, \@new);
+            my ($match, $header);
 
-            while (@{$o}) {
-                ($ro, $rn) = (shift @{$o}, shift @{$n});
-                push @{${$dref}->{T}}, { R => [ @old[$po .. $ro->[0] - 1] ] }
-                    if ($ro->[0] > $po);
-                push @{${$dref}->{T}}, { A => [ @new[$pn .. $rn->[0] - 1] ] }
-                    if ($rn->[0] > $pn);
-                push @{${$dref}->{T}}, { U => [ @new[$rn->[0] .. $rn->[-1]] ] };
-                $po = $ro->[-1] + 1;
-                $pn = $rn->[-1] + 1;
+            while (@cdiff > 2) {
+                my @del = @old[$cdiff[0] .. $cdiff[2] - 1];
+                my @add = @new[$cdiff[1] .. $cdiff[3] - 1];
+
+                if ($match = !$match) {
+                    # trailing context
+                    if ($header) {
+                        my @tail = splice @del, 0, $self->{OPTS}->{'ctx-text'};
+                        push @{${$dref}->{T}}, 'U', \@tail;
+
+                        $header->[1] += @tail;
+                        $header->[3] += @tail;
+                    }
+
+                    # leading context
+                    if (@cdiff > 4) {
+                        my @rest = splice @del, 0, $self->{OPTS}->{'ctx-text'}
+                            ? $self->{OPTS}->{'ctx-text'} * -1 : scalar @del;
+
+                        if (@rest or !$header) {
+                            push @{${$dref}->{T}}, '@', $header = [
+                                $cdiff[2] - @del + 1, 0,
+                                $cdiff[3] - @del + 1, 0,
+                            ];
+                        }
+
+                        if (@del) {
+                            push @{${$dref}->{T}}, 'U', \@del;
+                            $header->[1] += @del;
+                            $header->[3] += @del;
+                        }
+                    }
+                } else {
+                    if (@del) {
+                        push @{${$dref}->{T}}, 'R', \@del;
+                        $header->[1] += @del;
+                    }
+
+                    if (@add) {
+                        push @{${$dref}->{T}}, 'A', \@add;
+                        $header->[3] += @add;
+                    }
+                }
+
+                splice @cdiff, 0, 2;
             }
-
-            # collect tailing added/removed
-            push @{${$dref}->{T}}, { R => [ @old[$po .. $#old] ] }
-                if ($po <= $#old);
-            push @{${$dref}->{T}}, { A => [ @new[$pn .. $#new] ] }
-                if ($pn <= $#new);
         }
     }
 
@@ -308,14 +341,12 @@ sub exec {
 
             $self->print_term_header($items[0]->{name}, $items[1]->{name});
 
-            $diff = $self->diff($items[0]->{data}, $items[1]->{data})
-                or die_fatal undef, 1;
+            $diff = $self->diff($items[0]->{data}, $items[1]->{data});
 
             shift @items;
         }
 
-        $self->dump($diff) or die_fatal undef, 1
-            unless ($self->{OPTS}->{quiet});
+        $self->dump($diff) unless ($self->{OPTS}->{quiet});
 
         $self->{status} = 8 unless (not keys %{$diff} or exists $diff->{U});
     }
@@ -345,26 +376,22 @@ sub print_brief_block {
 
     return unless (@{$path}); # nothing to show
 
-    $path = [ @{$path} ]; # prevent passed path corruption (used later for items with same subpath)
     $status = 'D' if ($status eq 'N');
-    my $last = path2str([pop @{$path}]);
-    my $base = path2str($path);
 
-    if ($self->{OPTS}->{colors}) {
-        $last = colored($last, "bold " . $self->{OPTS}->{term}->{line}->{$status});
-        $base = colored($base, $self->{OPTS}->{term}->{line}->{U});
-    }
+    my $line = $self->{OPTS}->{term}->{sign}->{$status} . " " .
+        $COLOR{U} . path2str([splice @{$path}, 0, -1]) . $COLOR{reset};
+    $line .= $COLOR{"B$status"} . path2str($path) . $COLOR{reset}
+        if (@{$path});
 
-    print $self->{OPTS}->{term}->{sign}->{$status} . " " . $base . $last . "\n";
+    print $line . "\n";
 }
 
 sub print_term_block {
     my ($self, $value, $path, $status) = @_;
 
-    log_trace { "'" . path2str($path) . "' (" . $status . ")" };
+    log_trace { "'" . path2str($path) . "' ($status)" };
 
     my @lines;
-    my $color = $self->{OPTS}->{term}->{line}->{$status};
     my $dsign = $self->{OPTS}->{term}->{sign}->{$status};
 
     # diff for path
@@ -372,20 +399,20 @@ sub print_term_block {
         $self->{'hdr_path'} = [@{$path}];
         for (my $s = 0; $s < @{$path}; $s++) {
             next if (not $self->{OPTS}->{'full-headers'} and $s < @{$path} - @delta);
-            my $line = sprintf("%" . $s * 2 . "s", "") . path2str([$path->[$s]]);
+
+            my $line = "  " x $s . path2str([$path->[$s]]);
             if (($status eq 'A' or $status eq 'R') and $s == $#{$path}) {
-                $line = "$dsign $line";
-                $line = colored($line, "bold $color") if ($self->{OPTS}->{colors});
+                $line = $COLOR{"B$status"} . "$dsign $line" . $COLOR{reset};
             } else {
                 $line = "  $line";
             }
+
             push @lines, $line;
         }
     }
 
     # diff for value
-    my $indent = sprintf "%" . @{$path} * 2 . "s", "";
-    push @lines, $self->term_value_diff($value, $status, $indent);
+    push @lines, $self->term_value_diff($value, $status, "  " x @{$path});
 
     print join("\n", @lines) . "\n";
 }
@@ -398,10 +425,7 @@ sub print_term_header {
     my $header = @names == 1 ? $names[0] :
         "--- a: $names[0] \n+++ b: $names[1]";
 
-    $header = colored($header, $self->{OPTS}->{term}->{head})
-        if ($self->{OPTS}->{colors});
-
-    print $header . "\n";
+    print $COLOR{head} . $header . $COLOR{reset}. "\n";
 }
 
 sub term_value_diff {
@@ -422,9 +446,7 @@ sub term_value_diff_default {
 
     for my $line (split($/, $value)) {
         substr($line, 0, 0, $self->{OPTS}->{term}->{sign}->{$status} . $indent . " ");
-        $line = colored($line, $self->{OPTS}->{term}->{line}->{$status})
-            if ($self->{OPTS}->{colors});
-        push @out, $line;
+        push @out, $COLOR{$status} . $line . $COLOR{reset};
     }
 
     return @out;
@@ -432,47 +454,23 @@ sub term_value_diff_default {
 
 sub term_value_diff_text {
     my ($self, $diff, $indent) = @_;
-    my (@out, @head_ctx, @tail_ctx, $pos);
+    my (@hdr, $lines, @out, $pfx, $sfx, $status);
 
-    while (my $hunk = shift @{$diff}) {
-        my ($status, $lines) = each %{$hunk};
-        my $sign  = $self->{OPTS}->{term}->{sign}->{$status};
-        my $color = $self->{OPTS}->{term}->{line}->{$status};
-        $pos += @{$lines};
+    $sfx = $COLOR{reset};
 
-        if ($status eq 'U') {
-            if ($self->{OPTS}->{'ctx-text'}) {
-                @head_ctx = splice(@{$lines});                                  # before changes
-                @tail_ctx = splice(@head_ctx, 0, $self->{OPTS}->{'ctx-text'})   # after changes
-                    if (@out);
-                splice(@head_ctx, 0, @head_ctx - $self->{OPTS}->{'ctx-text'})
-                    if (@head_ctx > $self->{OPTS}->{'ctx-text'});
+    while (@{$diff}) {
+        ($status, $lines) = splice @{$diff}, 0, 2;
 
-                splice(@head_ctx) unless (@{$diff});
+        $pfx = $COLOR{$status} . $self->{OPTS}->{term}->{sign}->{$status} .
+            " " . $indent;
 
-                @head_ctx = map {
-                    my $l = $sign . " " . $indent . $_;
-                    $self->{OPTS}->{colors} ? colored($l, $color) : $l;
-                } @head_ctx;
-                @tail_ctx = map {
-                    my $l = $sign . " " . $indent . $_;
-                    $self->{OPTS}->{colors} ? colored($l, $color) : $l;
-                } @tail_ctx;
-            } else {
-                splice(@{$lines}); # purge or will be printed in the next block
-            }
+        if ($status eq '@') {
+            @hdr = splice @{$lines};
+            $lines->[0] = "@@ -$hdr[0]" . ($hdr[1] > 1 ? ",$hdr[1] " : "") .
+                " +$hdr[2]" . ($hdr[3] > 1 ? ",$hdr[3] @@" : " @@");
         }
 
-        push @out, splice @tail_ctx;
-        if (@head_ctx or (not $self->{OPTS}->{'ctx-text'} and $status eq 'U' and @{$diff}) or not @out) {
-            my $l = $self->{OPTS}->{term}->{sign}->{'@'} . " " . $indent . "@@ $pos,- -,- @@";
-            push @out, $self->{OPTS}->{colors} ? colored($l, $self->{OPTS}->{term}->{line}->{'@'}) : $l;
-        }
-        push @out, splice @head_ctx;
-        push @out, map {
-            my $l = $sign . " " . $indent . $_;
-            $self->{OPTS}->{colors} ? colored($l, $color) : $l;
-        } @{$lines};
+        map { substr($_ , 0, 0, $pfx); $_ .= $sfx; push @out, $_ } @{$lines};
     }
 
     return @out;

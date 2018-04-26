@@ -1,3 +1,9 @@
+v1.6.6 2018-04-24T17:12:06Z
+ - P->cfg API updated
+
+v1.6.5 2018-04-24T11:49:26Z
+ - geoip fixed
+
 v1.6.4 2018-04-20T07:26:57Z
  - $ENV refactoring
 

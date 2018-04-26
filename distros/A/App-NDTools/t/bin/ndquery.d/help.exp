@@ -23,9 +23,9 @@ Options:
         Force specified input format usage. Automatically choosed (using
         file extension) if omitted.
 
-    --items
-        List keys for hash maps and indexes for arrays, other types printed
-        as is.
+    --keys
+        List keys for hash maps and indexes for arrays, others printed as
+        is.
 
     --list|-l
         List structure's paths.

@@ -1,0 +1,24 @@
+---
+abstract: 'package manager of RSLinux'
+author:
+  - 'Yang Bo <rslovers@yandex.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-rs
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/rslinux/issues
+  homepage: https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/rslinux
+  repository: git://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/rslinux.git
+version: 1.01

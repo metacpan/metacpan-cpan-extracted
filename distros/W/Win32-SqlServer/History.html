@@ -13,6 +13,49 @@
 <CENTER>
 <H1>History Win32::SqlServer</H1>
 </CENTER>
+<H3>2018-04-22 &#8211; 2.011</H3>
+<P>This is a platform-support release:</P>
+<UL>
+  <LI><B>OLE DB Providers</B>:
+    <UL>
+      <LI>Win32::SqlServer now supports the new &quot;undeprecated&quot; OLE DB provider, <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A> or MSOLEDBSQL for short. By default, Win32::SqlServer will connect with this provider when it is installed.</LI>
+      <LI>There is one new login property, <B>MultiSubnetFailover</B>. This property requires that you use the new Microsoft OLE DB Driver for SQL Server.</LI>
+    </UL>
+  </LI>
+  <LI><B>Perl versions</B>:
+<UL>
+      <LI>There are now binaries for Perl 5.26. They have been tested with ActivePerl and Strawberry Perl.</LI>
+      <LI>I no longer supply binaries for 5.12, 5.14 or 5.16. Nor do I officially support them, but building against them is not blocked.</LI>
+      <LI>I'm committing myself to provide binaries five versions back. That is, if Perl 5.28 has been released when the next version of Win32::SqlServer comes out, you can expect binaries for Perl 5.20 and up, but it is less likely there wil be a binary for Perl 5.18.</LI>
+    </UL>
+  </LI>
+  <LI><B>Windows versions</B>:
+    <UL>
+      <LI>I have dropped support for Windows Vista and earlier. The lowest OS versions supported are now Windows 7 SP1 and Windows Server 2008 R2 SP1. For versions before Windows 10, you need to have the update in <A HREF="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">KB2999226</A> installed. The reason for the change is that I now build the binary with the C++ compiler that comes with Visual Studio 2017. (For fans of Windows Vista: I'm sorry that my deprecation notice for version 2.010 suggested that Vista and Windows Server 2008 would continue to be supported, but testing proved that it does not work.) </LI>
+    </UL>
+  </LI>
+  <LI><B>SQL Server versions</B>:
+    <UL>
+      <LI>In contrast to the deprecation notice with 2.010b, connections to SQL 7 are still supported. However, the deprecation notice still applies: <B>Next version of Win32::SqlServer may not support SQL&nbsp;7</B>!</LI>
+      <LI>There are minor corrections to the test suite to make it run without errors against SQL 2017.</LI>
+    </UL>
+  </LI>
+  <LI><B>Bug fix</B>: the rounding issue listed for 2.010 below has been fixed.</LI>
+  <LI><B>Known issue</B>: the test script for Filestream may cause a Blue Screen on the machine SQL Server is running on if there is an unfortunate combination of filter drivers. See <A HREF="Tests.html">Tests.html</A> for more details.</LI></UL>
+<H3>2016-11-16 &#8211; 2.010b</H3>
+<P>This is a fairly critical bugfix: when Win32::SqlServer read the version of SQL Server it parsed @@version, but this failed when this string looked as in this example:</P>
+<PRE>Microsoft SQL Server 2016 (RTM-CU3-GDR) (KB3194717) - 13.0.2186.6 (X64) 
+	Oct 31 2016 18:27:32 
+	Copyright (c) Microsoft Corporation
+	Developer Edition (64-bit) on Windows 10 Pro N 6.3 &lt;X64&gt; (Build 10586: )
+</PRE>
+<P>This has been rectified, and Win32::SqlServer again uses xp_msver if this procedure is available (it's not present in Azure SQL Database), else it uses serverproperty('ProductVersion').</P>
+<P>As this is only a patch to the Perl code, and does not affect the binaries, I am not labelling this with a new version number.</P>
+<P>I like to take the occasion to make two deprecation notices:</P>
+<UL>
+  <LI><B>Next version of Win32::SqlServer may not support Perl versions before 5.18!</B></LI>
+  <LI><B>Next version of Win32::SqlServer may not support SQL 7!</B></LI>
+</UL>
 <H3>2016-07-15 &#8211; 2.010</H3>
 <UL>
   <LI>There are now binaries for Perl 5.22 and Perl 5.24. They have been tested both with ActivePerl and Strawberry Perl.</LI>
@@ -231,7 +274,7 @@ source distribution for further details.
 
 <HR>
 <I>
-Last updated <!--$$Modtime:--> 16-07-15 21:33 <!-- $-->
+Last updated <!--$$Modtime:--> 18-04-22 23:35 <!-- $-->
 </I>
 </BODY>
 </HTML>

@@ -16,12 +16,14 @@ Gasper
 Golden
 Graham
 HTTP
+Michael
 Ollis
 Response
+Schwern
 Tiny
 UA
 dagolden
 felipe
 lib
 perl
-xdg
+schwern

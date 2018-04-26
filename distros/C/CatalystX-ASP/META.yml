@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,7 +35,7 @@ no_index:
 provides:
   CatalystX::ASP:
     file: lib/CatalystX/ASP.pm
-    version: '1.14'
+    version: '1.15'
   CatalystX::ASP::Application:
     file: lib/CatalystX/ASP/Application.pm
   CatalystX::ASP::Compiler:
@@ -87,7 +87,7 @@ resources:
   bugtracker: https://github.com/stvleung/CatalystX-ASP/issues
   homepage: https://github.com/stvleung/CatalystX-ASP
   repository: git://github.com/stvleung/CatalystX-ASP.git
-version: '1.14'
+version: '1.15'
 x_contributors:
   - 'Steven Leung <sleung@turnitin.com>'
   - 'Steven Leung <stvleung@gmail.com>'

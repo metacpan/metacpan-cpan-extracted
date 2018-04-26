@@ -48,6 +48,7 @@ faops filter -N -s download/GCA_000149365.1_ASM14936v1_genomic.fna.gz RM11_1a.fa
 egaz prepseq S288c.fa -o S288c -v
 
 gzip -d -c download/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz > S288c/chr.gff
+egaz masked S288c/*.fa -o S288c/repeat.yml
 
 egaz prepseq \
     RM11_1a.fa -o RM11_1a \
@@ -178,7 +179,8 @@ cd ~/data/alignment/egaz
 
 egaz template \
     S288c RM11_1a YJM789 Spar Spas Seub \
-    --multi --rawphylo -o multi6/ --parallel 8 -v
+    --multi -o multi6/ \
+    --rawphylo --parallel 8 -v
 
 bash multi6/1_pair.sh
 bash multi6/2_rawphylo.sh
@@ -193,7 +195,8 @@ egaz template \
 
 bash multi6/3_multi.sh
 bash multi6/4_vcf.sh
-bash multi6/7_chr_length.sh
-
+bash multi6/6_chr_length.sh
+bash multi6/7_multi_aligndb.sh
+bash multi6/9_pack_up.sh
 
 ```

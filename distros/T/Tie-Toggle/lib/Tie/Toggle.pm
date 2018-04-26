@@ -1,12 +1,12 @@
 package Tie::Toggle;
 use strict;
 
-use base qw( Tie::Cycle );
+use parent qw( Tie::Cycle );
 use vars qw( $VERSION );
 
 use Tie::Cycle;
 
-$VERSION = 1.081;
+$VERSION = '1.082';
 
 sub TIESCALAR {
 	my $class    = shift;
@@ -53,7 +53,7 @@ thing, but with any two values.
 
 This source is in GitHub:
 
-	https://github.com/briandfoy/Tie-Toggle
+	https://github.com/briandfoy/tie-toggle
 
 =head1 AUTHOR
 
@@ -61,10 +61,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2000-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2000-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

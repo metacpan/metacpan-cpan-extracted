@@ -1,5 +1,8 @@
 Revision history for AnyEvent::DBI
 
+3.04 Mon Apr 23 18:30:40 CEST 2018
+	- forgot to bump slave version (reported by Felix Ostmann).
+
 3.03 Thu Apr 19 06:24:14 CEST 2018
 	- the main process socket was not actually set to nonblocking mode,
           causing lockups under load (reported by Felix Ostmann).

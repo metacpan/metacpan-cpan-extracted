@@ -40,7 +40,7 @@ use File::Spec::Functions qw(catfile);
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/briandfoy/Tie-Toggle';
+my $github    = 'https://github.com/briandfoy/tie-toggle';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'		    => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'	=> $main_file,
-	'LICENSE'       => 'perl',
+	'LICENSE'       => 'artistic2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'CONFIGURE_REQUIRES' => {

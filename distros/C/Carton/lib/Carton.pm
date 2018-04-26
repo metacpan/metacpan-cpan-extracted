@@ -1,7 +1,7 @@
 package Carton;
 use strict;
 use 5.008_005;
-use version; our $VERSION = version->declare("v1.0.29");
+use version; our $VERSION = version->declare("v1.0.30");
 
 1;
 __END__
@@ -82,6 +82,24 @@ the modules you just installed.
 
   > git add cpanfile cpanfile.snapshot
   > git commit -m "Added Plack and Starman"
+
+=head2 Specifying a CPAN distribution
+
+You can pin a module resolution to a specific distribution using a
+combination of C<dist>, C<mirror> and C<url> options in C<cpanfile>.
+
+  # specific distribution on PAUSE
+  requires 'Plack', '== 0.9980',
+    dist => 'MIYAGAWA/Plack-0.9980.tar.gz';
+
+  # local mirror (darkpan)
+  requires 'Plack', '== 0.9981',
+    dist => 'MYCOMPANY/Plack-0.9981-p1.tar.gz',
+    mirror => 'https://pause.local/';
+
+  # URL
+  requires 'Plack', '== 1.1000',
+    url => 'https://pause.local/authors/id/M/MY/MYCOMPANY/Plack-1.1000.tar.gz';
 
 =head2 Deploying your application
 

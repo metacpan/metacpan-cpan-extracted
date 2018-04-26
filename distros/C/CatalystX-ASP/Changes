@@ -1,5 +1,13 @@
 Revision history for CatalystX-ASP
 
+1.15    Tue Apr 24 22:38:26 2018 -0700
+        - Patch the match method in the DispatchType
+        - Apparently Catalyst keeps descending the path looking to match
+          a DispatchType. Need to account for this as only full paths that end in
+          .asp are valid
+1.14    Tue Aug 29 23:55:46 2017 -0700
+        - If IncludesDir is relative, prepend Catalyst root
+
 1.13    Wed Mar 22 11:29:27 2017 -0700
         - If Status is set to 500, then error in Catalyst
         - Set $Redirect->{Status} to 302 on redirects

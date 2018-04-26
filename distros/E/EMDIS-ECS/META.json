@@ -4,7 +4,7 @@
       "Joel Schneider <jschneid@nmdp.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "unknown"
    ],
@@ -52,5 +52,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.39"
+   "version" : "0.40"
 }

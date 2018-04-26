@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use File::Copy qw(copy);
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 41;
+use Test::More tests => 44;
 
 use App::NDTools::Test;
 
@@ -97,6 +97,27 @@ run_ok(
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 
+$test = "grep_4";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--grep', '[2,0]', "_menu.a.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
+$test = "grep_5";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--grep', '[2,0]{}[]{id}', "_menu.a.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
+$test = "grep_6";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--grep', '[2,0]{}[]{id}', '--grep', '[0,2]{}[1]{label}', "_menu.a.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
 $test = "ifmt_yaml";
 run_ok(
     name => $test,
@@ -114,28 +135,28 @@ run_ok(
 $test = "items_array";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--items', '--path', '[]{}', "_menu.a.json" ],
+    cmd => [ @cmd, '--keys', '--path', '[]{}', "_menu.a.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 
 $test = "items_bool";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--items', '--path', '{}[]', "_bool.a.json" ],
+    cmd => [ @cmd, '--keys', '--path', '{}[]', "_bool.a.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 
 $test = "items_hash";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--items', "_cfg.alpha.json" ],
+    cmd => [ @cmd, '--keys', "_cfg.alpha.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 
 $test = "items_undef";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--items', '--path', '[]{Edit}[](not defined)', "_menu.a.json" ],
+    cmd => [ @cmd, '--keys', '--path', '[]{Edit}[](not defined)', "_menu.a.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 

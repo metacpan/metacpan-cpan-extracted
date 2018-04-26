@@ -1,5 +1,5 @@
 package App::CSE::Command::Search;
-$App::CSE::Command::Search::VERSION = '0.013';
+$App::CSE::Command::Search::VERSION = '0.014';
 use Moose;
 extends qw/App::CSE::Command/;
 
@@ -172,20 +172,19 @@ sub _build_hits{
 sub _build_query_str{
   my ($self) = @_;
 
-  my $cse = $self->cse();
-
-  my @str_bits = ();
-  while($cse->args()->[0] && ! -e $cse->args()->[0] ){
-      push @str_bits, ( shift @{$cse->args()} );
-  }
+  my @str_bits = @{ $self->cse()->args() };
   return  join(' ', @str_bits);
 }
 
 sub _build_dir_str{
   my ($self) = @_;
   # Give a chance to query STR.
-  $self->query_str();
-  return shift @{$self->cse->args()} || undef;
+  # Dir candidates?
+  my @dirs = grep{ $_ =~ /^\W/ } @{ $self->cse()->args() };
+  if( $dirs[0] && -d $dirs[0] ){
+      return $dirs[0];
+  }
+  return undef;
 }
 
 sub _build_filtered_query{
