@@ -59,15 +59,16 @@ digest(Crypt::Checksum::CRC32 self)
     CODE:
     {
         int rv;
-        unsigned char hash[4], out[8];
-        unsigned long outlen = 8;
+        unsigned char hash[4];
+        char out[9];
+        unsigned long outlen = 9;
         unsigned int ui32;
 
         crc32_finish(self, hash, 4); /* returns void */
         if (ix == 1) {
-          rv = _base16_encode(hash, 4, out, &outlen);
+          rv = base16_encode(hash, 4, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *)out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 2) {
           LOAD32H(ui32, hash);
@@ -89,8 +90,9 @@ crc32_data(...)
     {
         crc32_state st;
         int rv, j;
-        unsigned char hash[4], out[8], *in;
-        unsigned long outlen = 8;
+        unsigned char hash[4], *in;
+        char out[9];
+        unsigned long outlen = 9;
         unsigned int ui32;
         STRLEN inlen;
 
@@ -103,9 +105,9 @@ crc32_data(...)
         }
         crc32_finish(&st, hash, 4); /* returns void */
         if (ix == 1) {
-          rv = _base16_encode(hash, 4, out, &outlen);
+          rv = base16_encode(hash, 4, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *)out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 2) {
           LOAD32H(ui32, hash);

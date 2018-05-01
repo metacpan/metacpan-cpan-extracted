@@ -38,11 +38,10 @@ has returns_status => (
 sub HANDLE_ENCODE_ERROR {
   my ($self, $view, $unencodable_ref, $err) = @_;
   if($self->has_handle_encode_error) {
+    $view->ctx->log->error($@) if $view->ctx->debug;
     $self->has_handle_encode_error->($view, $unencodable_ref, $err);
   } else {
-    return $view->ctx->debug ?
-      $view->response(400, { error => "$err", original=>$unencodable_ref})->detach :
-        $view->response(400, { error => "$err"})->detach;
+    die $err;
   }
 }
 

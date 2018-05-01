@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package Dist::Zilla::Plugin::GenerateFile::ShareDir;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
-# ABSTRACT: (DEPRECATED) Create files in the repository or in the build, based on a template located in a dist sharedir
+# ABSTRACT: (DEPRECATED) Create files in the repository or in the build, based on a template located in a distribution sharedir
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GenerateFile::FromShareDir';
@@ -28,11 +28,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::GenerateFile::ShareDir - (DEPRECATED) Create files in the repository or in the build, based on a template located in a dist sharedir
+Dist::Zilla::Plugin::GenerateFile::ShareDir - (DEPRECATED) Create files in the repository or in the build, based on a template located in a distribution sharedir
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

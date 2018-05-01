@@ -79,24 +79,24 @@ digest(Crypt::Digest self)
         int rv;
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
 
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
 
         outlen = sizeof(out);
         if (ix == 3) {
-          rv = base64url_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+          rv = base64url_encode(hash, self->desc->hashsize, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 2) {
-          rv = base64_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+          rv = base64_encode(hash, self->desc->hashsize, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 1) {
-          rv = _base16_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+          rv = base16_encode(hash, self->desc->hashsize, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
@@ -119,7 +119,7 @@ digest_data(char * digest_name, ...)
         int rv, id, i;
         unsigned char *in, hash[MAXBLOCKSIZE];
         unsigned long len = sizeof(hash), outlen;
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
         hash_state md;
 
         id = _find_hash(digest_name);
@@ -141,19 +141,19 @@ digest_data(char * digest_name, ...)
 
         outlen = sizeof(out);
         if (ix == 3) {
-          rv = base64url_encode(hash, len, (unsigned char *)out, &outlen);
+          rv = base64url_encode(hash, len, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 2) {
-          rv = base64_encode(hash, len, (unsigned char *)out, &outlen);
+          rv = base64_encode(hash, len, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 1) {
-          rv = _base16_encode(hash, len, (unsigned char *)out, &outlen);
+          rv = base16_encode(hash, len, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else {
           RETVAL = newSVpvn((char *) hash, len);

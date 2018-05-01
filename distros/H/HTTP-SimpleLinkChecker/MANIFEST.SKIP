@@ -66,8 +66,9 @@
 #!end included /usr/local/perls/perl-5.22.0/lib/5.22.0/ExtUtils/MANIFEST.SKIP
 
 
+\.travis\.yml
+\.?appveyor.yml
 \.releaserc
 \.lwpcookies
-\.travis\.yml
 
 iterate-new.t

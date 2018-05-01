@@ -62,10 +62,18 @@ considered easier to use.
 The following example excludes reports by the user C<jack.blacksmoke>
 from regression testing:
 
-  ctgetreport --q --solve --filtercb '
+  ctgetreport --solve --filtercb '
     my $rec = shift;
     $rec->{"meta:ok"}="FILTERED" if $rec->{"meta:from"} =~ /jack.blacksmoke/;
     ' String-RewritePrefix-0.005
+
+The following example excludes reports that contain the string
+C<Perl_sv_2pv_flags>:
+
+  ctgetreport --q "qr:Perl_sv_2pv_flags" \
+    --filtercb 'my $rec = shift;
+      $rec->{"meta:ok"}="FILTERED" if $rec->{"qr:Perl_sv_2pv_flags"}
+      ' --solve Text-MiniTmpl-v2.0.0
 
 =item B<--help|h>
 

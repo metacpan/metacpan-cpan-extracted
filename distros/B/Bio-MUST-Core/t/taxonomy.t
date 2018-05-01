@@ -680,110 +680,19 @@ my @exp_colors = (
     '#B73F80',
 );
 
-my @lineages = (
-    [
-        'Viruses',
-        'Retro-transcribing viruses',
-        'Retroviridae',
-        'Orthoretrovirinae',
-        'Lentivirus',
-        'Primate lentivirus group',
-        'Human immunodeficiency virus 1',
-        'HIV-1 group M',
-        'HIV-1 M:C',
-        'HIV-1 M:C U2226'
-    ],
-    [
-        'cellular organisms',
-        'Archaea',
-        'Euryarchaeota',
-        'Methanobacteria',
-        'Methanobacteriales',
-        'Methanobacteriaceae',
-        'Methanobrevibacter',
-        'Methanobrevibacter ruminantium',
-        'Methanobrevibacter ruminantium M1'
-    ],
-    [
-        'cellular organisms',
-        'Bacteria',
-        'Tenericutes',
-        'Mollicutes',
-        'Acholeplasmatales',
-        'Acholeplasmataceae',
-        'Acholeplasma',
-        'Acholeplasma laidlawii',
-        'Acholeplasma laidlawii PG-8A'
-    ],
-    [
-        'cellular organisms',
-        'Bacteria',
-        'Proteobacteria',
-        'Betaproteobacteria',
-        'Burkholderiales',
-        'Comamonadaceae',
-        'Curvibacter',
-        'Curvibacter putative symbiont of Hydra magnipapillata'
-    ],
-    [
-        'cellular organisms',
-        'Bacteria',
-        'Firmicutes',
-        'Clostridia',
-        'Clostridiales',
-        'Peptococcaceae',
-        'Desulfotomaculum',
-        'Desulfotomaculum gibsoniae',
-        'Desulfotomaculum gibsoniae DSM 7213'
-    ],
-    [
-        'cellular organisms',
-        'Eukaryota',
-        'Viridiplantae',
-        'Streptophyta',
-        'Streptophytina',
-        'Embryophyta',
-        'Tracheophyta',
-        'Euphyllophyta',
-        'Spermatophyta',
-        'Magnoliophyta',
-        'eudicotyledons',
-        'core eudicotyledons',
-        'rosids',
-        'malvids',
-        'Brassicales',
-        'Brassicaceae',
-        'Camelineae',
-        'Arabidopsis',
-        'Arabidopsis halleri',
-        'Arabidopsis halleri subsp. halleri'
-    ],
-    [
-        'cellular organisms',
-        'Eukaryota',
-        'Viridiplantae',
-        'Streptophyta',
-        'Streptophytina',
-        'Embryophyta',
-        'Tracheophyta',
-        'Euphyllophyta',
-        'Spermatophyta',
-        'Magnoliophyta',
-        'eudicotyledons',
-        'core eudicotyledons',
-        'rosids',
-        'malvids',
-        'Brassicales',
-        'Brassicaceae',
-        'Noccaeeae',
-        'Noccaea',
-        'Noccaea caerulescens'
-    ],
+my @exp_icols = (1..22);
+
+my @seq_ids = (
+    'HIV-1 M:C_U2226_505006@1',
+    'Methanobrevibacter ruminantium_M1_634498@1',
+    'Acholeplasma laidlawii_PG8A_441768@1',
+    'Curvibacter putative_symbiontofHydramagnipapillata_667019@1',
+    'Desulfotomaculum gibsoniae_DSM7213_767817@1',
+    'Arabidopsis halleri_halleri_81971@1',
+    'Noccaea caerulescens_107243@1',
 );
 
 my @bact_colors = qw( 000000 000000 000000 9e58d8 02ae94 000000 000000 );
-
-my @exp_icols = (1..22);
 
 {
     my $class = 'Bio::MUST::Core::Taxonomy::ColorScheme';
@@ -813,20 +722,37 @@ EOT
     is_deeply [ map { uc $scheme->hex($_, '#') } $scheme->all_names ],
         $scheme->colors, "got expected color translations using $infile";
 
-    is_deeply [ map { $scheme->hex($_) } @lineages ], \@bact_colors,
-        "got expected colors for lineages using $infile";
+    is_deeply [ map { $scheme->hex($_) } @seq_ids ], \@bact_colors,
+        "got expected colors for seq_ids using $infile";
 
     is_deeply [ map { $scheme->icol($_) } $scheme->all_names ], \@exp_icols,
         'got expected indexed colors from .cls file';
 }
 
 my @life_colors = qw( ffa500 0000ff 008000 008000 a52a2a ff0000 ffff00 );
+my @life_icols  = (4, 1, 2, 2, 5, 3, 6);
 
 {
     my $infile = file('test', 'life.cls');
     my $scheme = $tax->load_color_scheme($infile);
-    is_deeply [ map { $scheme->hex($_) } @lineages ], \@life_colors,
-        "got expected colors for lineages using $infile";
+    is_deeply [ map { $scheme->hex($_) } @seq_ids ], \@life_colors,
+        "got expected colors for seq_ids using $infile";
+
+#     explain \@seq_ids;
+    my @lineages = map { scalar $scheme->tax->fetch_lineage($_) } @seq_ids;
+#     explain \@lineages;
+    my @labels   = map { $scheme->classify($_) } @lineages;
+#     explain \@labels;
+    my @colors   = map { $scheme->color_for($_) } @labels;
+#     explain \@colors;
+    my @icols    = map { $scheme->icol_for($_) } @colors;
+#     explain \@icols;
+    is_deeply \@icols, \@life_icols,
+        "got expected indexed colors (indirectly) for seq_ids using $infile";
+
+    my @icols_dir = map { $scheme->icol($_) } @seq_ids;
+    is_deeply \@icols_dir, \@life_icols,
+        "got expected indexed colors (directly) for seq_ids using $infile";
 }
 
 my @html_colors = qw( ff6347 6a5acd 228b22 228b22 a0522d b22222 ffd700 );
@@ -834,7 +760,7 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 a0522d b22222 ffd700 );
 {
     my $infile = file('test', 'life_html.cls');
     my $scheme = $tax->load_color_scheme($infile);
-    is_deeply [ map { $scheme->hex($_) } @lineages ], \@html_colors,
+    is_deeply [ map { $scheme->hex($_) } @seq_ids ], \@html_colors,
         "got expected colors for lineages using $infile";
 }
 
@@ -928,7 +854,7 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 a0522d b22222 ffd700 );
         $tax->attach_taxa_to_entities($tree, {     name => 'phylum',
                                                collapse => 'phylum' } );
         $tree->collapse_subtrees;
-        my $scheme = Bio::MUST::Core::ColorScheme->load(file('test', 'bacteria.cls'));
+        my $scheme = $tax->load_color_scheme(file('test', 'bacteria.cls'));
         $scheme->attach_colors_to_entities($tree);
         cmp_store(
             obj => $tree, method => 'store_figtree',

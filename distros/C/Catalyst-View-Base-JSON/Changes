@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst::View::Base::JSON
 
+0.003 - 27 April 2018
+  - More predictable error messages
+  - tweaked dist.ini for modernization
+
 0.002 - 23 December 2016
   - Fix reported test errors
 

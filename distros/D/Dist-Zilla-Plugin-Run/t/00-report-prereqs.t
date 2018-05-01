@@ -60,6 +60,7 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
+  Encode
   JSON::PP
   Sub::Name
   YAML

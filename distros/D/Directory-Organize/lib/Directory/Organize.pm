@@ -4,7 +4,7 @@ package Directory::Organize;
 
 use strict;
 use warnings;
-use version; our $VERSION = qv('0.9.6');
+use version; our $VERSION = qv('v0.9.9');
 
 sub new {
     my $self = shift;
@@ -257,7 +257,7 @@ Directory::Organize - create and find directories organized by date
 
 =head1 VERSION
 
-This documentation refers to Directory::Organize version 0.8.
+This documentation refers to Directory::Organize version v0.9.9.
 
 =head1 SYNOPSIS
 

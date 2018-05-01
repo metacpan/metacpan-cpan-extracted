@@ -1,3 +1,8 @@
+0.11    2018-04-26 (PERLANCAR)
+
+	- Relax target module version requirement from 6.0.* to 6.*.
+
+
 0.10    2017-06-26 (PERLANCAR)
 
 	- Switch from Log::Any to Log::ger.

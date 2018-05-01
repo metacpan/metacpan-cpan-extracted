@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsurePrereqsInstalled;
-# git description: v0.007-1-g966e8dd
-$Dist::Zilla::Plugin::EnsurePrereqsInstalled::VERSION = '0.008';
+package Dist::Zilla::Plugin::EnsurePrereqsInstalled; # git description: v0.008-27-g1b2eb88
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ensure at build time that all prereqs, including developer, are satisfied
 # KEYWORDS: plugin toolchain prerequisites dependencies modules metadata
-# vim: set ts=8 sw=4 tw=78 et :
+
+our $VERSION = '0.009';
 
 use Moose;
 with
@@ -16,7 +16,7 @@ with
 use CPAN::Meta::Prereqs 2.132830;   # for 'merged_requirements'
 use CPAN::Meta::Requirements;
 use CPAN::Meta::Check 0.007 'check_requirements';
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints 'enum';
 use namespace::autoclean;
 
 sub mvp_aliases {
@@ -44,7 +44,18 @@ has build_phase => (
 
 # there is nothing in this plugin that should affect the outcome of the build
 # -- its configuration is not significant.
-#around dump_config => sub { };
+around dump_config => sub
+{
+    my ($orig, $self) = @_;
+    my $config = $self->$orig;
+
+    my $data = {
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
+    };
+    $config->{+__PACKAGE__} = $data if keys %$data;
+
+    return $config;
+};
 
 sub before_build
 {
@@ -79,7 +90,7 @@ sub _check_authordeps
         $self->log_fatal(join "\n",
             'Unsatisfied authordeps:',
             $unsatisfied,
-            'To remedy, do:  cpanm ' . join(' ', split("\n", $unsatisfied)),
+            'To remedy, do:  cpanm ' . join(' ', split(/\n/, $unsatisfied)),
         );
     }
 }
@@ -158,7 +169,7 @@ sub _get_authordeps
     Dist::Zilla::Util::AuthorDeps->VERSION(5.021);
     Dist::Zilla::Util::AuthorDeps::format_author_deps(
         Dist::Zilla::Util::AuthorDeps::extract_author_deps(
-            '.',                    # repository root
+            $self->zilla->root,     # repository root
             1,                      # --missing
         ),
         (),                         # --versions
@@ -179,7 +190,7 @@ Dist::Zilla::Plugin::EnsurePrereqsInstalled - Ensure at build time that all prer
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -219,7 +230,7 @@ C<< ; authordep Module::Name >> in F<dist.ini>.  When the module is missing, an 
 is printed, without a clear explanation that this module was a developer
 prerequisite that ought to have been installed first.
 
-It is this author's opinion that this check out to be performed by
+It is this author's opinion that this check ought to be performed by
 L<Dist::Zilla> itself, rather than leaving it to an optional plugin.
 
 =for Pod::Coverage mvp_aliases mvp_multivalue_args before_build after_build before_release
@@ -264,14 +275,6 @@ option for different treatment (warn? prompt?) for recommended, suggested prereq
 
 =back
 
-=head1 SUPPORT
-
-=for stopwords irc
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-EnsurePrereqsInstalled>
-(or L<bug-Dist-Zilla-Plugin-EnsurePrereqsInstalled@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-EnsurePrereqsInstalled@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
-
 =head1 SEE ALSO
 
 These plugins all do somewhat similar and overlapping things, but are all useful in their own way:
@@ -304,11 +307,24 @@ L<Dist::Zilla::Plugin::Test::CheckBreaks>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-EnsurePrereqsInstalled>
+(or L<bug-Dist-Zilla-Plugin-EnsurePrereqsInstalled@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-EnsurePrereqsInstalled@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2014 by Karen Etheridge.
 

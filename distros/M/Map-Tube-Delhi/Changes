@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Delhi
 
+0.69  Sun Apr 29 09:10:00 2018
+      - Updated dependency on Map::Tube v3.50.
+
 0.68  Tue Apr 10 15:40:00 2018
       - Updated dependency on Map::Tube v3.49.
 

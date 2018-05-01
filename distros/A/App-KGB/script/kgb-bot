@@ -1534,7 +1534,8 @@ C<gitlab_webhook_*> event, asynchronously.
 =cut
 
 my @array_webhook_params =
-    qw( channel pipeline_only_status always_squash_branch only_branch );
+    qw( channel pipeline_only_status always_squash_branch only_branch
+        always_squash_outside_dir );
 my %array_webhook_params = map( ( $_ => 1 ), @array_webhook_params );
 
 sub webhook_request {
@@ -1936,6 +1937,8 @@ sub gitlab_webhook_push {
         $to_show_count = 0;
     }
 
+    my $number_of_hidden_commits;
+
     if ( $to_show_count != $commit_count ) {
         # not all commits will be shown, prepend a summary of the push
         my @info;
@@ -1976,6 +1979,22 @@ sub gitlab_webhook_push {
     my $shown = 0;
     for my $commit ( @{ $body->{commits} } ) {
         last if $shown + 1 > $to_show_count;
+
+        if ( @{ $opts->{always_squash_outside_dir} } ) {
+            my $has_file_inside;
+            for my $f (
+                @{ $commit->{modified} },
+                @{ $commit->{added} },
+                @{ $commit->{removed} }
+                )
+            {
+                $has_file_inside = 1, last
+                    if grep { substr( $f, 0, length($_) + 1 ) eq "$_/" }
+                    @{ $opts->{always_squash_outside_dir} };
+            }
+
+            $number_of_hidden_commits++, next unless $has_file_inside;
+        }
 
         my $path_string;
         my %dirs;
@@ -2075,6 +2094,26 @@ sub gitlab_webhook_push {
         );
 
         $shown++;
+    }
+
+    if ($number_of_hidden_commits) {
+        my @info;
+        push @info, colorize( author => $body->{user_name} )
+            if $body->{user_name};
+        push @info, colorize( branch => $branch ) if $branch;
+        push @info, colorize( module => $module ) if $module ne '';
+        push @info, colorize( separator => '*' ),
+            sprintf(
+            '%d commit%s touching only files outside monitored directories omitted',
+            $number_of_hidden_commits,
+            ( $number_of_hidden_commits > 1 ) ? 's' : '' );
+        to_irc(
+            {   kernel     => $kernel,
+                strings    => [ join( ' ', @info ) ],
+                repository => $body->{project}{namespace},
+                opts       => $opts,
+            }
+        );
     }
 }
 

@@ -1,8 +1,8 @@
 package App::PPI::Dumper;
 
-use vars qw($VERSION);
+our $VERSION = "1.021";
 
-$VERSION = "1.02";
+=encoding utf8
 
 =head1 NAME
 
@@ -11,17 +11,17 @@ App::PPI::Dumper - Use the PPI to dump the structure of a Perl file
 =head1 SYNOPSIS
 
 	use App::PPI::Dumper;
-	
+
 	App::PPI::Dumper->run( @ARGV );
-	
+
 =head1 DESCRIPTION
 
-Parse a Perl document with PPI and dump the Perl Document Object Model (PDOM). 
+Parse a Perl document with PPI and dump the Perl Document Object Model (PDOM).
 This script is a command-line interface to PPI::Dumper.
 
 =head2 Methods
 
-=over 4 
+=over 4
 
 =item run( OPTIONS, INPUT_FILE )
 
@@ -30,14 +30,14 @@ standard output.
 
 =over 4
 
-=item -m 
+=item -m
 
-Show the memory address of each PDOM element. 
+Show the memory address of each PDOM element.
 
 =item -i N
 
 Ident each level of output by N spaces. The default is 2.
-	
+
 =item -P
 
 Do not show the full package name for each PPI class.
@@ -46,7 +46,7 @@ Do not show the full package name for each PPI class.
 
 Do not show the original source token that goes with each PPI object.
 
-=item -W 
+=item -W
 
 Do not show whitespace tokens.
 
@@ -54,11 +54,11 @@ Do not show whitespace tokens.
 
 Do not show comment tokens.
 
-=item -l 
+=item -l
 
 Show the source code location of each PPI token.
 
-=item -r 
+=item -r
 
 Parse the input in readonly mode. See PPI::Document::new() for the details.
 
@@ -83,9 +83,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009-2013, brian d foy, All Rights Reserved.
+Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 
@@ -98,9 +98,9 @@ __PACKAGE__->run(@ARGV) unless caller;
 # same defaults as PPI::Dumper
 sub run {
 	my $self = shift;
-	
+
 	local @ARGV = @_;
-	
+
 	my %opts = (
 		'm' => 0, # memaddr
 		'i' => 2, # indent
@@ -111,17 +111,17 @@ sub run {
 		'l' => 0, # locations
 		'r' => 0, # read-only, for PPI::Document
 		);
-		
+
 	getopts('mPDWCli:', \%opts);
-	
-	my $Module = PPI::Document->new( 
+
+	my $Module = PPI::Document->new(
 		$ARGV[0],
 		readonly => $opts{'r'},
 		);
-	
-	die "Could not parse [$ARGV[0]] for PPI: " . PPI::Document->errstr . "\n" 
+
+	die "Could not parse [$ARGV[0]] for PPI: " . PPI::Document->errstr . "\n"
 		if PPI::Document->errstr;
-	
+
 	my $Dumper = PPI::Dumper->new( $Module,
 		memaddr    =>   $opts{'m'},
 		indent     =>   $opts{'i'},
@@ -131,7 +131,7 @@ sub run {
 		comments   => ! $opts{'C'},
 		locations  =>   $opts{'l'},
 		);
-	
+
 	$Dumper->print;
 	}
 

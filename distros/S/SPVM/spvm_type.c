@@ -21,13 +21,14 @@ const char* const SPVM_TYPE_C_ID_NAMES[] = {
   "long",
   "float",
   "double",
+  "String",
   "byte[]",
   "short[]",
   "int[]",
   "long[]",
   "float[]",
   "double[]",
-  "String",
+  "String[]",
 };
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler) {

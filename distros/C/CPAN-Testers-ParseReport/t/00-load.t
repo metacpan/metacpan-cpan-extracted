@@ -9,7 +9,7 @@ BEGIN {
 }
 eval "use Test::CPAN::Meta";
 eval "use File::Spec";
-eval "use List::Util qw(sum max)";
+eval "use List::AllUtils qw(sum max)";
 eval "use utf8";
 eval "use Time::HiRes qw(time)";
 if ($do_mvr) {

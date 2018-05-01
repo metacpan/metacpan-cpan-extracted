@@ -14,11 +14,13 @@ lib/Dancer2/Plugin/Auth/OAuth/Provider/Facebook.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Github.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Google.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Linkedin.pm
+lib/Dancer2/Plugin/Auth/OAuth/Provider/MailRU.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Odnoklassniki.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Salesforce.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Stackexchange.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Twitter.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/VKontakte.pm
+lib/Dancer2/Plugin/Auth/OAuth/Provider/Yandex.pm
 t/01-dancer.t
 t/author-pod-syntax.t
 t/basic.t

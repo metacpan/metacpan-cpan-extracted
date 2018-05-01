@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::AfterMint;
 # ABSTRACT: Execute a command after a new distribution is minted
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 use Moose;
 with qw(
@@ -52,7 +52,7 @@ Dist::Zilla::Plugin::Run::AfterMint - Execute a command after a new distribution
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

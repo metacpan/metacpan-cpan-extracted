@@ -5,7 +5,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Minion" : "8",
+            "Minion" : "9.03",
             "Mojo::mysql" : "1.04",
             "Mojolicious" : "0",
             "perl" : "5.010"
@@ -56,7 +56,7 @@
    "provides" : {
       "Minion::Backend::mysql" : {
          "file" : "lib/Minion/Backend/mysql.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Alexander Nalobin <nalobin@reg.ru>",
@@ -81,6 +81,7 @@
       "Paul Cochrane <paul@liekut.de>",
       "Zoffix Znet <cpan@zoffix.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

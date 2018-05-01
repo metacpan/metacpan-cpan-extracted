@@ -1,6 +1,6 @@
 package BibTeX::Parser::Author;
 {
-  $BibTeX::Parser::Author::VERSION = '1.01';
+  $BibTeX::Parser::Author::VERSION = '1.02';
 }
 
 use warnings;
@@ -263,7 +263,7 @@ sub to_string {
 	my $self = shift;
 
 	if ($self->jr) {
-		return $self->von . " " . $self->last . ", " . $self->jr . ", " . $self->first;
+		return ($self->von ? $self->von . " " : '') . " " . $self->last . ", " . $self->jr . ", " . $self->first;
 	} else {
 		return ($self->von ? $self->von . " " : '') . $self->last . ($self->first ? ", " . $self->first : '');
 	}
@@ -393,7 +393,7 @@ the following token is not: C<{von}>
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 
 =head1 AUTHOR

@@ -8,6 +8,13 @@ TAG=latest
 NAME=<: $dockerhub_dist_repo_name :>
 DOCKERHUB_NAMESPACE=<: $dockerhub_dist_repo_namespace :>
 SERVICE=0
+
+# container restart policy
+# https://docs.docker.com/config/containers/start-containers-automatically/
+RESTART=always
+
+# seconds to wait for stop before killing container
+# https://docs.docker.com/engine/reference/commandline/stop/#options
 KILL_TIMEOUT=10
 
 DOCKER_CONTAINER_ARGS="

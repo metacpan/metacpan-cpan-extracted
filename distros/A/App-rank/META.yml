@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-rank
   homepage: https://metacpan.org/release/App-rank
   repository: git://github.com/perlancar/perl-App-rank.git
-version: '0.004'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

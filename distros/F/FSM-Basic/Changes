@@ -1,5 +1,8 @@
 Revision history for FSM-Basic
 
+0.16    Thu Apr 26 16:00:24 CEST 2018
+            Fix POD errors
+
 0.15    Sun Dec 1 21:03:18 UTC 2017
             Correct perl version required 5.010 and not 5.100
             

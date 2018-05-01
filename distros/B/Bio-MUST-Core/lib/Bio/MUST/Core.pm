@@ -5,7 +5,7 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.181120';
+$Bio::MUST::Core::VERSION = '0.181180';
 use strict;
 use warnings;
 
@@ -22,7 +22,6 @@ use Bio::MUST::Core::Ali::Temporary;
 use Bio::MUST::Core::Tree;
 use Bio::MUST::Core::Tree::Forest;
 use Bio::MUST::Core::Taxonomy;
-use Bio::MUST::Core::ColorScheme;
 use Bio::MUST::Core::GeneticCode::Factory;
 use Bio::MUST::Core::PostPred;
 
@@ -40,7 +39,7 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.181120
+version 0.181180
 
 =head1 DESCRIPTION
 

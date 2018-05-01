@@ -1,5 +1,8 @@
 Revision history for Perl module App::Module::Lister
 
+0.153 2018-04-26T16:21:11Z
+	* A minor doc fix
+
 0.152 2018-04-07T19:05:41Z
 	* Change to the Artistic License
 

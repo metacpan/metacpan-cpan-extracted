@@ -3,7 +3,7 @@ package Map::Tube::Frankfurt;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 # ABSTRACT: Map::Tube::Frankfurt - interface to the Frankfurt S- and U-Bahn map
 
@@ -31,7 +31,7 @@ Map::Tube::Frankfurt - Map::Tube::Frankfurt - interface to the Frankfurt S- and 
 
 =head1 VERSION
 
-version 0.01
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -73,5 +73,25 @@ This software is Copyright (c) 2018 by Renee Baecker.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+=head1 CONTRIBUTORS
+
+=for stopwords Mohammad S Anwar reneeb Stefan Limbacher
+
+=over 4
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+reneeb <info@perl-services.de>
+
+=item *
+
+Stefan Limbacher <stefan@stelim.de>
+
+=back
 
 =cut

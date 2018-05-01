@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.44';
+$Map::Tube::CLI::VERSION   = '0.47';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.44
+Version 0.47
 
 =cut
 
@@ -114,6 +114,8 @@ sure you have the latest maps when you install.
 
 =item * L<Dnipropetrovsk|Map::Tube::Dnipropetrovsk>
 
+=item * L<Frankfurt|Map::Tube::Frankfurt>
+
 =item * L<Glasgow|Map::Tube::Glasgow>
 
 =item * L<Kazan|Map::Tube::Kazan>
@@ -141,6 +143,8 @@ sure you have the latest maps when you install.
 =item * L<Minsk|Map::Tube::Minsk>
 
 =item * L<Moscow|Map::Tube::Moscow>
+
+=item * L<Nuremberg|Map::Tube::Nuremberg>
 
 =item * L<NYC|Map::Tube::NYC>
 
@@ -330,6 +334,7 @@ sub _supported_maps {
         'COPENHAGEN'      => 'Map::Tube::Copenhagen',
         'DELHI'           => 'Map::Tube::Delhi',
         'DNIPROPETROVSK'  => 'Map::Tube::Dnipropetrovsk',
+        'FRANKFURT'       => 'Map::Tube::Frankfurt',
         'GLASGOW'         => 'Map::Tube::Glasgow',
         'KAZAN'           => 'Map::Tube::Kazan',
         'KHARKIV'         => 'Map::Tube::Kharkiv',
@@ -344,6 +349,7 @@ sub _supported_maps {
         'MILAN'           => 'Map::Tube::Milan',
         'MINSK'           => 'Map::Tube::Minsk',
         'MOSCOW'          => 'Map::Tube::Moscow',
+        'NUREMBERG'       => 'Map::Tube::Nuremberg',
         'NYC'             => 'Map::Tube::NYC',
         'NANJING'         => 'Map::Tube::Nanjing',
         'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',

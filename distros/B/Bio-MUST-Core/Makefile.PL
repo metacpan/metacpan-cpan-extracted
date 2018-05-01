@@ -51,7 +51,6 @@ my %WriteMakefileArgs = (
     "Bio::FastParsers" => "0.180470",
     "Bio::LITE::Taxonomy::NCBI" => "0.10",
     "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
-    "Bio::MUST::Core::ColorScheme" => 0,
     "Bio::Phylo::IO" => 0,
     "Carp" => 0,
     "Const::Fast" => 0,
@@ -99,7 +98,7 @@ my %WriteMakefileArgs = (
     "Config::Any" => 0,
     "Test::Deep" => 0
   },
-  "VERSION" => "0.181120",
+  "VERSION" => "0.181180",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -111,7 +110,6 @@ my %FallbackPrereqs = (
   "Bio::FastParsers" => "0.180470",
   "Bio::LITE::Taxonomy::NCBI" => "0.10",
   "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
-  "Bio::MUST::Core::ColorScheme" => 0,
   "Bio::Phylo::IO" => 0,
   "Carp" => 0,
   "Config::Any" => 0,

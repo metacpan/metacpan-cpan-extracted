@@ -1,0 +1,34 @@
+Tree-Interval-Fast.xs
+itree/interval.c
+itree/interval.h
+itree/interval_list.c
+itree/interval_list.h
+itree/interval_tree.c
+itree/interval_tree.h
+itree/utils.h
+itree/Makefile.PL
+CONTRIBUTING
+Changes
+LICENSE
+cpanfile
+ignore.txt
+lib/Tree/Interval/Fast.pm
+lib/Tree/Interval/Fast/Interval.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+TODO
+t/00-load.t
+t/01-interval.t
+t/02-interval-tree.t
+t/03-leak.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+TODO
+typemap
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

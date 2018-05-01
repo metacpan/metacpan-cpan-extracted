@@ -15,7 +15,7 @@ name: Data-DFA
 provides:
   Data::DFA:
     file: lib/Data/DFA.pm
-    version: '20180406'
+    version: '20180429'
   Data::DFA::Parser:
     file: lib/Data/DFA.pm
 requires:
@@ -27,4 +27,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180406'
+version: '20180429'

@@ -1012,6 +1012,7 @@ cut(obj, nclusters=0)
     SV* obj
     int nclusters
     PREINIT:
+    int ok;
     int i;
     int n;
     Tree* tree;
@@ -1035,10 +1036,8 @@ cut(obj, nclusters=0)
     if (!clusterid) {
         croak("cut: Insufficient memory\n");
     }
-        /* --------------------------------------------------------------- */
-    cuttree(n, tree->nodes, nclusters, clusterid);
-    /* -- Check for errors flagged by the C routine ------------------ */
-    if (clusterid[0]==-1) {
+    ok = cuttree(n, tree->nodes, nclusters, clusterid);
+    if (!ok) {
         free(clusterid);
         croak("cut: Error in the cuttree routine\n");
     }
@@ -1685,6 +1684,7 @@ _distancematrix(nrows,ncols,data_ref,mask_ref,weight_ref,transpose,dist)
     double  * weight;
     double ** matrix;
 
+    int       i;
     int       ok;
 
 
@@ -1720,16 +1720,40 @@ _distancematrix(nrows,ncols,data_ref,mask_ref,weight_ref,transpose,dist)
         croak("failed to read input data for _distancematrix");
     }
 
+    /* Set up the ragged array */
+    matrix = malloc(nobjects*sizeof(double*));
+    if (matrix) {
+        matrix[0] = NULL;
+        for (i = 1; i < nobjects; i++) {
+            matrix[i] = malloc(i*sizeof(double));
+            if (matrix[i]==NULL) {
+                while (--i >= 0) free(matrix[i]);
+                free(matrix);
+                matrix = NULL;
+                break;
+            }
+        }
+    }
+    if (!matrix) {
+        free_matrix_int(mask, nrows);
+        free_matrix_dbl(data, nrows);
+        free(weight);
+        croak("failed to allocate memory for distance matrix");
+    }
+
+
+
     /* ------------------------
      * Run the library function
      */
-        matrix = distancematrix (nrows,
-                                 ncols,
-                                 data,
-                                 mask,
-                                 weight,
-                                 dist[0],
-                                 transpose);
+    distancematrix(nrows,
+                   ncols,
+                   data,
+                   mask,
+                   weight,
+                   dist[0],
+                   transpose,
+                   matrix);
 
     /* ------------------------
      * Convert generated C matrices to Perl matrices

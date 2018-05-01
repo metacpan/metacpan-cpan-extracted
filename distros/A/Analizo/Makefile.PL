@@ -14,7 +14,7 @@ install_share dist => "share";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "multi-language source code analysis toolkit",
-  "AUTHOR" => "Joenio Costa <joenio\@joenio.me>",
+  "AUTHOR" => "Joenio Marques da Costa <joenio\@joenio.me>",
   "BUILD_REQUIRES" => {
     "File::Share" => 0,
     "File::ShareDir" => 0,
@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Term::UI" => 0
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Doxyparse" => "0.06",
+    "Alien::Doxyparse" => "0.07",
     "Alien::SLOCCount" => "0.05",
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "App::Cmd" => 0,
     "CHI" => 0,
     "Class::Accessor" => 0,
+    "Class::Inspector" => 0,
     "DBD::SQLite" => 0,
     "DBI" => 0,
     "Digest::SHA" => 0,
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "Statistics::Descriptive" => 0,
     "Term::ProgressBar" => 0,
     "YAML" => "1.20",
-    "YAML::Tiny" => 0,
+    "YAML::XS" => 0,
     "ZMQ::FFI" => 0
   },
   "TEST_REQUIRES" => {
@@ -66,7 +67,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => 0,
     "Test::MockObject" => 0
   },
-  "VERSION" => "1.20.8",
+  "VERSION" => "1.21.0",
   "test" => {
     "TESTS" => "t/*.t t/Analizo/*.t t/Analizo/Batch/*.t t/Analizo/Batch/Job/*.t t/Analizo/Batch/Output/*.t t/Analizo/Batch/Runner/*.t t/Analizo/Command/*.t t/Analizo/Extractor/*.t t/Analizo/GlobalMetric/*.t t/Analizo/Metric/*.t"
   }
@@ -78,6 +79,7 @@ my %FallbackPrereqs = (
   "Archive::Extract" => 0,
   "CHI" => 0,
   "Class::Accessor" => 0,
+  "Class::Inspector" => 0,
   "DBD::SQLite" => 0,
   "DBI" => 0,
   "Digest::SHA" => 0,
@@ -105,7 +107,7 @@ my %FallbackPrereqs = (
   "Test::MockModule" => 0,
   "Test::MockObject" => 0,
   "YAML" => "1.20",
-  "YAML::Tiny" => 0,
+  "YAML::XS" => 0,
   "ZMQ::FFI" => 0
 );
 

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 our
-$VERSION = 2.018;
+$VERSION = 2.019;
 
 use vars qw( @ISA @EXPORT @EXPORT_OK );
 
@@ -325,7 +325,7 @@ sub _extract {
 
   my @aoSPAN = $oTree->look_down(_tag => $sTag,
 				 class => $sClass,
-      );
+                                );
   my $iCountSPAN = scalar(@aoSPAN);
   DEBUG_HTML && warn " DDD _extract() found $iCountSPAN $sTag tags of class '$sClass'\n";
  SPAN_TAG:
@@ -372,7 +372,7 @@ sub _extract {
           ||
           ($sURL =~ m!/gp/product/(.+?)/ref!)
           ||
-          ($sURL =~ m!/dp/(.+?)/(_encoding|ref)!)
+          ($sURL =~ m!/dp/(.+?)/(_encoding|ref|\?col)!)
          )
         {
         # It's a match!

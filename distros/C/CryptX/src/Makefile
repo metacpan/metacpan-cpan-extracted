@@ -42,20 +42,22 @@ ltc/mac/xcbc/xcbc_process.o ltc/math/ltm_desc.o ltc/math/multi.o ltc/math/radix_
 ltc/math/rand_bn.o ltc/math/rand_prime.o ltc/math/tfm_desc.o ltc/math/fp/ltc_ecc_fp_mulmod.o \
 ltc/misc/adler32.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/copy_or_zeromem.o \
 ltc/misc/crc32.o ltc/misc/error_to_string.o ltc/misc/mem_neq.o ltc/misc/pk_get_oid.o \
-ltc/misc/zeromem.o ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o \
-ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o \
-ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o \
-ltc/misc/crypt/crypt_constants.o ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o \
-ltc/misc/crypt/crypt_find_cipher_id.o ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o \
-ltc/misc/crypt/crypt_find_hash_id.o ltc/misc/crypt/crypt_find_hash_oid.o ltc/misc/crypt/crypt_find_prng.o \
-ltc/misc/crypt/crypt_fsa.o ltc/misc/crypt/crypt_hash_descriptor.o ltc/misc/crypt/crypt_hash_is_valid.o \
-ltc/misc/crypt/crypt_inits.o ltc/misc/crypt/crypt_ltc_mp_descriptor.o ltc/misc/crypt/crypt_prng_descriptor.o \
-ltc/misc/crypt/crypt_prng_is_valid.o ltc/misc/crypt/crypt_prng_rng_descriptor.o ltc/misc/crypt/crypt_register_all_ciphers.o \
+ltc/misc/pk_oid_str.o ltc/misc/zeromem.o ltc/misc/base16/base16_decode.o ltc/misc/base16/base16_encode.o \
+ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o ltc/misc/base64/base64_decode.o \
+ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o \
+ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_constants.o \
+ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o \
+ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o \
+ltc/misc/crypt/crypt_find_hash_oid.o ltc/misc/crypt/crypt_find_prng.o ltc/misc/crypt/crypt_fsa.o \
+ltc/misc/crypt/crypt_hash_descriptor.o ltc/misc/crypt/crypt_hash_is_valid.o ltc/misc/crypt/crypt_inits.o \
+ltc/misc/crypt/crypt_ltc_mp_descriptor.o ltc/misc/crypt/crypt_prng_descriptor.o ltc/misc/crypt/crypt_prng_is_valid.o \
+ltc/misc/crypt/crypt_prng_rng_descriptor.o ltc/misc/crypt/crypt_register_all_ciphers.o \
 ltc/misc/crypt/crypt_register_all_hashes.o ltc/misc/crypt/crypt_register_all_prngs.o \
 ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o \
 ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \
-ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/hkdf/hkdf.o ltc/misc/pkcs5/pkcs_5_1.o \
-ltc/misc/pkcs5/pkcs_5_2.o ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o \
+ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/hkdf/hkdf.o ltc/misc/padding/padding_depad.o \
+ltc/misc/padding/padding_pad.o ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o \
+ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o \
 ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o ltc/modes/cbc/cbc_start.o ltc/modes/cfb/cfb_decrypt.o \
 ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o \
 ltc/modes/cfb/cfb_start.o ltc/modes/ctr/ctr_decrypt.o ltc/modes/ctr/ctr_done.o ltc/modes/ctr/ctr_encrypt.o \
@@ -100,8 +102,8 @@ ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o 
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
 ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
 ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
-ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o \
-ltc/pk/ecc/ecc_get_set.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
+ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_curve.o \
+ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
 ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o \
 ltc/pk/ecc/ecc_set_dp.o ltc/pk/ecc/ecc_set_dp_internal.o ltc/pk/ecc/ecc_set_key.o \
 ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o \

@@ -9,7 +9,9 @@ README
 cpanfile
 dist.ini
 lib/Command/Runner.pm
+lib/Command/Runner/Format.pm
 lib/Command/Runner/LineBuffer.pm
+lib/Command/Runner/Quote.pm
 t/00_use.t
 t/01_basic.t
 t/02_basic.t

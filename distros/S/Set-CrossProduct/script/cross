@@ -3,14 +3,14 @@ use vars qw($g);
 
 use Set::CrossProduct;
 
-return unless @ARGV > 1;
+exit unless @ARGV > 1;
 
 $g = " " unless defined $g;
 
 my $sets = [
 	map [ split /\s*,\s*/ ], @ARGV
 	];
-	
+
 my $iterator =  Set::CrossProduct->new( $sets );
 
 while( my $tuple = $iterator->get )
@@ -18,7 +18,7 @@ while( my $tuple = $iterator->get )
 	print join $g, @$tuple;
 	print "\n";
 	}
-	
+
 
 =encoding UTF-8
 

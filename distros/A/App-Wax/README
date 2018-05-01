@@ -89,7 +89,7 @@ Node.js man-page viewer
 VERSION
 -------
 
-2.1.0
+2.2.0
 
 SEE ALSO
 --------
@@ -106,8 +106,7 @@ chocolateboy (chocolate@cpan.org)
 COPYRIGHT AND LICENSE
 ---------------------
 
-Copyright (C) 2010-2018 by chocolateboy
+Copyright (c) 2010-2018 by chocolateboy.
 
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself, either Perl version 5.10.1 or, at
-your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under the terms of the
+Artistic License 2.0.

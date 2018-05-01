@@ -23,6 +23,8 @@ use Directory::Organize;
 use Getopt::Long;
 use Term::ReadKey;
 
+use version; our $VERSION = qv('v0.9.9');
+
 $|++;
 
 my %params;
@@ -36,9 +38,9 @@ print choosedir(\%params);
 sub init_params {
     my ($params) = @_;
 
-    my $clo = {};
+    my $clo = { termreadkey => 1, };
 
-    GetOptions($clo, 'basedir=s', 'listlines=i');
+    GetOptions($clo, 'basedir=s', 'columns=i', 'listlines=i', 'termreadkey!');
 
     if ($clo->{basedir}) {
         $params->{basedir} = $clo->{basedir};
@@ -47,12 +49,22 @@ sub init_params {
         $params->{basedir} = "$ENV{HOME}/A";
     }
 
-    if ($clo->{listlines}) {
-        $params->{listlines} = $clo->{listlines};
+    if ($clo->{termreadkey}) {
+        my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize("STDOUT");
+        $params->{columns} = defined $wchar ? $wchar  : 80;
+        $params->{listlines} = defined $hchar ? $hchar - 4 : 21;
     }
     else {
-        my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize("STDOUT");
-        $params->{listlines} = defined $hchar ? $hchar - 4 : 21;
+        $params->{columns} = 80;
+        $params->{listlines} = 21;
+    }
+
+    if ($clo->{columns}) {
+        $params->{columns} = $clo->{columns}
+    }
+
+    if ($clo->{listlines}) {
+        $params->{listlines} = $clo->{listlines};
     }
 
     return $params;
@@ -91,7 +103,7 @@ sub choosedir {
 
         SHOW_DESCRIPTIONS:
         while (1) {
-            show_dirs(\@directories,$listlines,$firstline);
+            show_dirs(\@directories,$params,$firstline);
 
         # let the user choose a directory
             my $input = '';
@@ -163,10 +175,12 @@ sub choosedir {
 } # choosedir()
 
 sub show_dirs {
-    my ($dirs,$listlines,$firstline) = @_;
+    my ($dirs,$params,$firstline) = @_;
+    my $listlines = $params->{listlines};
+    my $columns   = $params->{columns} - 23;
     my $i = 0;
     foreach my $dir (@$dirs) {
-        printf STDERR "%-7s: %-12s: %s\n", $i, $dir->[0], $dir->[1]
+        printf STDERR "%-7s: %-12s: %.*s\n", $i, $dir->[0], $columns, $dir->[1]
             if ($i >= $firstline);
         last if ($i - $firstline >= $listlines);
         $i++;
@@ -187,11 +201,11 @@ mkdir_heute - create and find directories interactive
 
   mkdir_heute --basedir=~/archive
 
-  mkdir_heute --listlines=15
+  mkdir_heute --listlines=15 --columns=80
 
 =head1 VERSION
 
-This documentation refers to version 0.9.
+This documentation refers to version v0.9.9.
 
 =head1 USAGE
 
@@ -258,18 +272,36 @@ directory would be created below this directory.
 
   mkdir_heute -b ~/archive
 
+=item --columns
+
+Limit the displaywidth to the given number of columns.
+
+  mkdir_heute --columns=80
+
+  mkdir_heute -c 80
+
+=back
+
 =item --listlines
 
-Since it is possible that on some systems Term::ReadKey::GetTerminalSize()
-does not deliver a meaningful value, you may skip the invocation of that
-function by providing the nummer of lines for the listing of descriptions on
-the command line.
+Limit the number of listed lines.
+This should be 4 lines less than your screen provides.
 
-  mkdir_heute --listlines=15
+  mkdir_heute --listlines=21
 
   mkdir_heute -l 15
 
 =back
+
+=item --termreadkey / --notermreadkey
+
+The size of the screen is determined by C<Term::ReadKey::GetTerminalSize()>.
+If your system has no functioning module I<Term::ReadKey>, you can switch
+this of and the programs defaults to 80 columns and 21 listlines.
+
+=back
+
+Usually 
 
 =head1 DIAGNOSTICS
 
@@ -287,10 +319,10 @@ although the program works fine when invoked directly.
 One workaround is to install the program I<resize> which comes on
 Debian GNU Linux within the package I<xutils>.
 
-If you can't install the program I<resize>, you could start I<mkdir_heute>
-with a fixed number of list lines like this
+If you can't install the program I<resize>, you could disable I<Term::ReadKey>
+at program startup like this
 
-  cd `mkdir_heute -l 25`
+  cd `mkdir_heute --notermreadkey`
 
 =head1 AUTHOR
 

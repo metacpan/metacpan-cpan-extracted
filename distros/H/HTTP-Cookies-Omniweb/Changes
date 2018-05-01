@@ -1,26 +1,26 @@
-# Changes for HTTP::Cookies::Omniweb
+Revision history for Perl module HTTP::Cookies::Omniweb
 
-1.13 - Mon Apr 18 14:52:11 2011
+1.13 - 2011-04-18
 	* Update tests with later cookie expiry dates
 	* Everything else works the same as the previous version
 
-1.11 - Sat Nov 10 14:50:56 2007
+1.11 - 2007-11-10
 	* Cleanups for the move from CVS to SVN, kwalitee
 	* No need to upgrade
 
-1.09 - Tue Jan  9 22:12:13 2007
+1.09 - 2007-01-09
 	* updated copyright and license info
 	* no code changes, so no need to upgrade
 
-1.08 - Sat May 27 02:55:06 2006
+1.08 - 2006-05-27
 	* Distro cleanups. No need to upgrade.
 
-1.06 - Sat Mar 12 00:00:51 2005
+1.06 - 2005-03-12
 	* Added POD coverages tests
 	* no code changes: no need to upgrade
 
-1.05 - Fri Sep 17 13:21:58 2004
+1.05 - 2004-09-17
 	* distribution cleanups: no need to upgrade
 
-1.03 Mon Dec  2 18:49:29 CST 2002
+1.03 - 2002-12-02
 	* initial release derived from HTTP::Cookies::Netscape

@@ -1,5 +1,11 @@
 Revision history for Perl module MooX::File::ConfigDir
 
+0.007	2018-04-30
+    - Spelling fixes triggered by Mohammed Anwar's PR for
+      File::ConfigDir
+    - CI improvements to ensure constant high software quality
+    - add license files
+
 0.006	2017-05-22
     - add support for vendorapp_cfg_dir
     - add .perltidyrc for common style (repository ...)

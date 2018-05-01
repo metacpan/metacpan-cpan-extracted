@@ -18,7 +18,7 @@
 
 static int _ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen,
-                                prng_state *prng, int wprng, ecc_key *key, int sigformat)
+                                prng_state *prng, int wprng, const ecc_key *key, int sigformat)
 {
    ecc_key       pubkey;
    void          *r, *s, *e, *p;
@@ -67,7 +67,7 @@ static int _ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
 
    /* make up a key and export the public copy */
    do {
-      if ((err = ecc_set_dp_copy(key, &pubkey)) != CRYPT_OK)               { goto errnokey; }
+      if ((err = ecc_copy_dp(key, &pubkey)) != CRYPT_OK)                   { goto errnokey; }
       if ((err = ecc_generate_key(prng, wprng, &pubkey)) != CRYPT_OK)      { goto errnokey; }
 
       /* find r = x1 mod n */
@@ -132,7 +132,7 @@ errnokey:
 */
 int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen,
-                        prng_state *prng, int wprng, ecc_key *key)
+                        prng_state *prng, int wprng, const ecc_key *key)
 {
    return _ecc_sign_hash(in, inlen, out, outlen, prng, wprng, key, 0);
 }
@@ -150,7 +150,7 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
 */
 int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen,
-                                prng_state *prng, int wprng, ecc_key *key)
+                                prng_state *prng, int wprng, const ecc_key *key)
 {
    return _ecc_sign_hash(in, inlen, out, outlen, prng, wprng, key, 1);
 }

@@ -513,7 +513,7 @@ Used to add components at runtime:
 
     into        The Catalyst package to inject into (e.g. My::App)
     component   The component package to inject
-    traits      (Optional) ArrayRef of L<Moose::Role>s that the componet should consume.
+    traits      (Optional) ArrayRef of L<Moose::Role>s that the component should consume.
     as          An optional moniker to use as the package name for the derived component
 
 For example:
@@ -572,7 +572,7 @@ sub inject_component {
             croak "Unable to build component package for \"$component_package\": $@";
         Moose::Util::apply_all_roles($component_package, @{$given{traits}}) if $given{traits};
         (my $file = "$component_package.pm") =~ s{::}{/}g;
-        $INC{$file} ||= 1;    
+        $INC{$file} ||= 1;
     }
 
     my $_setup_component = sub {

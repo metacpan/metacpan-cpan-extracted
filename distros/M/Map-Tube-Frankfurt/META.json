@@ -22,16 +22,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Map::Tube" : "3.49",
-            "Test::Map::Tube" : "0.35",
+            "File::Share" : "0",
+            "Map::Tube" : "3.50",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0",
             "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Map::Tube::Plugin::Formatter" : "0.14",
+            "Test::Map::Tube" : "0.35"
          }
       }
    },
    "provides" : {
       "Map::Tube::Frankfurt" : {
          "file" : "lib/Map/Tube/Frankfurt.pm",
-         "version" : "0.01"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -46,7 +54,12 @@
          "web" : "http://github.com/reneeb/Map-Tube-Frankfurt"
       }
    },
-   "version" : "0.01",
+   "version" : "0.04",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <info@perl-services.de>",
+      "Stefan Limbacher <stefan@stelim.de>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

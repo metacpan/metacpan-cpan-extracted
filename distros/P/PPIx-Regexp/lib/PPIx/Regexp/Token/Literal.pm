@@ -44,7 +44,7 @@ use PPIx::Regexp::Constant qw{
     TOKEN_UNKNOWN
 };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -325,7 +325,7 @@ The following is from perlop:
 		    o [{] [01234567]+ [}] |	# octal as of 5.13.3
 ##		    N (?: \{ (?: [[:alpha:]] [\w\s:()-]* | # must begin w/ alpha
 ##		    U [+] [[:xdigit:]]+ ) \} ) |	# unicode
-		    N (?: [{] (?= \D ) [^\}]* [}] )	# unicode
+		    N (?: [{] (?= [^0-9] ) [^\}]* [}] )	# unicode
 		) >smx ) ) {
 	    my $match = $tokenizer->match();
 	    my $code;

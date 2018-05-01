@@ -1,12 +1,9 @@
 requires 'perl', '5.008001';
 
 requires 'Capture::Tiny';
-
-on test => sub {
-    requires 'Test::Needs';
-};
+requires 'String::ShellQuote';
+requires 'Win32::ShellQuote';
 
 on develop => sub {
-    requires 'Win32::ShellQuote';
-    requires 'String::ShellQuote';
+    requires 'File::Which';
 };

@@ -43,7 +43,7 @@ use base qw{ PPIx::Regexp::Token::CharClass };
 
 use PPIx::Regexp::Constant qw{ COOKIE_CLASS COOKIE_REGEX_SET MINIMUM_PERL };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -74,19 +74,33 @@ sub perl_version_introduced {
 
     my %explanation = (
 	'[:alnum:]'	=> 'Any alphanumeric character',
-	'[:alpha:]'	=> 'Match alphabetic',
+	'[:^alnum:]'	=> 'Anything but an alphanumeric character',
+	'[:alpha:]'	=> 'Any alphabetic',
+	'[:^alpha:]'	=> 'Anything but an alphabetic',
 	'[:ascii:]'	=> 'Any character in the ASCII character set',
+	'[:^ascii:]'	=> 'Anything but a character in the ASCII character set',
 	'[:blank:]'	=> 'A GNU extension, equal to a space or a horizontal tab ("\\t")',
+	'[:^blank:]'	=> 'A GNU extension, anything but a space or a horizontal tab ("\\t")',
 	'[:cntrl:]'	=> 'Any control character',
-	'[:digit:]'	=> 'Any decimal digit ("[0-9]")',
-	'[:graph:]'	=> 'Any printable character, excluding a space',
+	'[:^cntrl:]'	=> 'Anything but a control character',
+	'[:digit:]'	=> 'Any decimal digit',
+	'[:^digit:]'	=> 'Anything but a decimal digit',
+	'[:graph:]'	=> 'Any non-space printable character',
+	'[:^graph:]'	=> 'Anything but a non-space printable character',
 	'[:lower:]'	=> 'Any lowercase character',
+	'[:^lower:]'	=> 'Anything but a lowercase character',
 	'[:print:]'	=> 'Any printable character',
+	'[:^print:]'	=> 'Anything but a printable character',
 	'[:punct:]'	=> 'Any graphical character excluding "word" characters',
+	'[:^punct:]'	=> 'Anything but a graphical character excluding "word" characters',
 	'[:space:]'	=> 'Any whitespace character',
+	'[:^space:]'	=> 'Anything but a whitespace character',
 	'[:upper:]'	=> 'Any uppercase character',
+	'[:^upper:]'	=> 'Anything but an uppercase character',
 	'[:word:]'	=> 'A Perl extension, equivalent to "\\w"',
+	'[:^word:]'	=> 'A Perl extension, equivalent to "\\W"',
 	'[:xdigit:]'	=> 'Any hexadecimal digit',
+	'[:^xdigit:]'	=> 'Anything but a hexadecimal digit',
     );
 
     sub __explanation {

@@ -4,18 +4,15 @@ use 5.008008;
 use strict;
 use warnings;
 
-use AutoLoader qw(AUTOLOAD);
-
 use Carp;
-use CGI;
+use CGI::Simple;
 use DBI;
 use JSON::XS;
+use SQL::Abstract::Limit;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Preloaded methods go here.
-
-# Autoload methods go after =cut, and are processed by the autosplit program.
 
 sub new {
     my $invocant = shift;
@@ -23,16 +20,11 @@ sub new {
     my $self = {
         tables  => undef,
         columns   => undef,
-        user  => undef,
-        pass  => undef,
-        db  => undef,
-        host  => "localhost",
-        port  => "3306",
+        dbh => undef,
+        query => CGI::Simple->new,
         patterns  => {},
         join_clause  => '',
         where_clause  => '',
-        index_col  => "id",
-        index_cols => undef,
         @_,                 # Override previous attributes
     };
     return bless $self, $class;
@@ -60,15 +52,15 @@ sub columns {
     return $self->{columns};
 }
 
-sub index_cols {
+sub dbh {
     my $self = shift;
     
     if (@_) {
-        my $h_ref = shift;
-        croak "index_cols must be a hash ref" unless UNIVERSAL::isa($h_ref,'HASH');
-        $self->{index_cols} = $h_ref;
+        my $ref = shift;
+        croak "dbh must be a DBI object" unless UNIVERSAL::can($ref,'prepare');
+        $self->{dbh} = $ref;
     }
-    return $self->{index_cols};
+    return $self->{dbh};
 }
 
 sub patterns {
@@ -80,51 +72,6 @@ sub patterns {
         $self->{patterns} = $h_ref;
     }
     return $self->{patterns};
-}
-
-sub user {
-    my $self = shift;
-    
-    if (@_) {
-        $self->{user} = shift;
-    }
-    return $self->{user};
-}
-
-sub pass {
-    my $self = shift;
-    
-    if (@_) {
-        $self->{pass} = shift;
-    }
-    return $self->{pass};
-}
-
-sub db {
-    my $self = shift;
-    
-    if (@_) {
-        $self->{db} = shift;
-    }
-    return $self->{db};
-}
-
-sub host {
-    my $self = shift;
-    
-    if (@_) {
-        $self->{host} = shift;
-    }
-    return $self->{host};
-}
-
-sub port {
-    my $self = shift;
-    
-    if (@_) {
-        $self->{port} = shift;
-    }
-    return $self->{port};
 }
 
 sub join_clause {
@@ -143,27 +90,6 @@ sub where_clause {
         $self->{where_clause} = shift;
     }
     return $self->{where_clause};
-}
-
-sub index_col {
-    my $self = shift;
-    
-    if (@_) {
-        $self->{index_col} = shift;
-    }
-    return $self->{index_col};
-}
-
-#for some values in the query we build we can't use
-#placeholders because they add quotes when they shouldn't.
-#So here we use $dbh->quote() to escape these string then we remove
-# the ''. Not as good as placeholders, but we need something
-sub _special_quote { 
-    my ($dbh,$string) = (@_);
-    my $ns = $dbh->quote($string);
-    $ns = substr $ns, 1;
-    $ns= substr $ns, 0,-1;
-    return $ns;
 }
 
 sub _columns_arr { 
@@ -221,172 +147,73 @@ sub print_json {
     print $json;
 }
 
-sub json {     
-    use strict;
+sub table_data {
     my $self = shift;
 
     # CGI OBJECT
-    my $q = new CGI;
+    my $q = $self->{query};
 
-    # DB CONFIG VARIABLES
-    my $platform = "mysql";
-    my $database = $self->{db};
-    my $host = $self->{host};
-    my $port = $self->{port};
-    my $user = $self->{user};
-    my $pw = $self->{pass};
-
-    #DATA SOURCE NAME
-    my $dsn = "dbi:mysql:$database:$host:3306";
-
-    # get database handle
-    my $dbh = DBI->connect($dsn, $user, $pw) or croak "couldn't connect to database: $!";
+    # DB HANDLE
+    my $dbh = $self->{dbh};
+    croak "Database handle not defined" unless defined $dbh;
 
     #columns to use
-    my ($aColumns,$regular_columns,$as_hash) = $self->_columns_arr;
+    my ($aColumns,$regular_columns,undef) = $self->_columns_arr;
 
-    #this bind array is used for secure database queries
-    #in an effort to help prevent sql injection
-    my @bind = ();
-
+    # check table name(s)
     croak "Tables must be provided for the FROM clause" unless $self->tables;
-    my $sTable = join ",",@{$self->tables};
 
     #filtering
-    my $sWhere = "";
-    if ($q->param('sSearch') ne '') {
-        $sWhere = "WHERE (";
-                
-        for(my $i = 0; $i < @$aColumns; $i++) {
-            my $search = $q->param('sSearch');
-            $search = _special_quote($dbh,$search);
-            $sWhere .= "" . $aColumns->[$i] . " LIKE '%$search%' OR ";
-        }
-                                    
-        $sWhere = substr $sWhere,0,-3;
-        $sWhere .= ')';
-    }
-
-    #individual column filtering
-    for (my $i = 0; $i < @$aColumns; $i++) {
-        if($q->param('bSearchable_' . $i) ne '' and $q->param('bSearchable_' . $i) eq "true" and $q->param('sSearch_' . $i) ne '') {
-            if($sWhere eq "") {
-                $sWhere = "WHERE ";
-            }
-            else {
-                $sWhere .= " AND ";
-            }
-            my $search = $q->param('sSearch_' . $i);
-            $search = _special_quote($dbh,$search);
-            $sWhere .= "" . $aColumns->[$i] . " LIKE '%$search%' ";
-        }
-    }
-
-    # add user where if given
-    if($self->where_clause ne '') {
-        if($sWhere eq "") {
-            $sWhere = "WHERE ";
-        }
-        else {
-            $sWhere .= " AND ";
-        }
-        $sWhere .= " " . $self->where_clause . " ";
-    }
-
+    my $where_href = $self->_generate_where_clause($q);
+    
     #ordering
-    my $sOrder = "";
-    if($q->param('iSortCol_0') ne '') {
-        $sOrder = "ORDER BY  ";
-                    
-        for(my $i = 0; $i < $q->param('iSortingCols'); $i++) {
-            if($q->param('bSortable_' . $q->param('iSortCol_'.$i)) eq "true") {
-                  my $sort_col = $aColumns->[$q->param('iSortCol_' . $i)];
-                  my $sort_dir = $q->param('sSortDir_' . $i);
-                                                                                
-                # cannot use bind because bind puts '' around values.
-                # backslash out quotes
-                $sort_col = _special_quote($dbh,$sort_col);
-                $sort_dir = _special_quote($dbh,$sort_dir);
-                                                                                                        
-                $sOrder .= "" . $sort_col . " " . $sort_dir . ", ";
-            }
-        }
-                            
-        $sOrder = substr $sOrder,0,-2;
-        if( $sOrder eq "ORDER BY" ) {
-            $sOrder = "";
-        }
-    }
+    my @order = $self->_generate_order_clause($q);
 
     #paging
-    my $sLimit = "";
-    if ($q->param('iDisplayStart') ne '' and $q->param('iDisplayLength') ne '-1') {
-        $sLimit = "LIMIT ?,? ";
-        push @bind,$q->param('iDisplayStart');
-        push @bind,$q->param('iDisplayLength');
-    }
+    my $limit = $q->param('iDisplayLength') || 10;
+    my $offset = $q->param('iDisplayStart') || 0;
 
     #join
-    my $sJoin = '';
     if($self->join_clause ne '') {
-        if($sWhere ne '') {
-            $sJoin .= ' AND ';
-        }
-        elsif($sWhere eq '') {
-            $sWhere = ' WHERE ';
-        }
-        $sJoin .= ' ' . $self->join_clause . ' ';
+        $where_href = $self->_add_where_clause($where_href, $self->join_clause);
     }
 
     #SQL queries
-    #get data to display
-    my $cols = join ", ", @{$aColumns};
-    my $sQuery = "SELECT SQL_CALC_FOUND_ROWS " . $cols . " FROM $sTable $sWhere $sJoin $sOrder $sLimit ";
+    my $sql = SQL::Abstract::Limit->new( limit_dialect => $dbh );
+    
+    my ($sQuery, @bind) = $sql->select($self->tables, $aColumns, $where_href, \@order, $limit, $offset );
 
     #get columns out of db with query we created
     my $result_sth = $dbh->prepare($sQuery);
     $result_sth->execute(@bind) or croak "error in mysql query: $!\n$sQuery";
-
+    
     # Data set length after filtering
-    $sQuery = " SELECT FOUND_ROWS() ";
-        
-    my $sth = $dbh->prepare($sQuery);
-    $sth->execute() or croak "mysql error: $!";
+    my ($sQuery_cnt_filtered, @bind_cnt_filtered) = $sql->select($self->tables, 'COUNT(*)', $where_href );
+    
+    my $sth_cnt_filtered = $dbh->prepare($sQuery_cnt_filtered);
+    $sth_cnt_filtered->execute(@bind_cnt_filtered) or croak "mysql error: $!";
 
-    my @aResultFilterTotal = $sth->fetchrow_array();
+    my @aResultFilterTotal = $sth_cnt_filtered->fetchrow_array();
     my $iFilteredTotal = $aResultFilterTotal[0];
 
-    my $iTotal = 0;
-
+    
     my $num_tables = scalar(@{$self->tables});
-    my $index_h = $self->index_cols;
 
-    for my $table(@{$self->tables}) {
-        my $sIndexColumn = '';
-        if($num_tables == 1) { 
-            $sIndexColumn = $self->index_col;
-        }
-        else { 
-            $sIndexColumn = $index_h->{$table};
-            $sIndexColumn = "id" unless $sIndexColumn;
-        }
-        # Total data set length 
-        $sQuery = " SELECT COUNT(`" . $sIndexColumn . "`) FROM   $table ";
+    my ($sQuery_cnt_total, @bind_cnt_total) = $sql->select($self->tables, 'COUNT(*)');
+    my $sth_cnt_total = $dbh->prepare($sQuery_cnt_total);
+    $sth_cnt_total->execute() or croak "error in query: $!\n$sQuery";
 
-        $sth = $dbh->prepare($sQuery);
-        $sth->execute() or croak "error in query: $!\n$sQuery\nMost likely related to index columns passed in";
-
-        my @aResultTotal = $sth->fetchrow_array;
-        $iTotal += $aResultTotal[0];
-    }
+    my @aResultTotal = $sth_cnt_total->fetchrow_array;
+    my $iTotal = $aResultTotal[0];
 
     # output hash
+    my $sEcho = $q->param('sEcho');
     my %output = (
-                 "sEcho" => $q->param('sEcho'),
-                 "iTotalRecords" => $iTotal,
-                    "iTotalDisplayRecords" => $iFilteredTotal,
-                 "aaData" => ()
-                   );
+        "sEcho" => $sEcho,
+        "iTotalRecords" => $iTotal,
+        "iTotalDisplayRecords" => $iFilteredTotal,
+        "aaData" => [],
+    );
 
     my $count = 0;
     my $patterns = $self->patterns;
@@ -413,8 +240,124 @@ sub json {
         $output{'aaData'} = ''; #we don't want to have 'null'. will break js
     }
 
-    return encode_json \%output;
+    return \%output;
 }
+
+sub json {
+    my $self = shift;
+
+    my $output_href = $self->table_data;
+
+    return encode_json $output_href;
+} # /json
+
+sub _generate_where_clause {
+    my $self = shift;
+    my $q = shift;
+    
+    my ($aColumns,undef,undef) = $self->_columns_arr;
+    
+    my $where_href = {};
+    
+    if( $q->param('sSearch') ) {
+		my $search_string = $q->param('sSearch');
+        
+		for( my $i = 0; $i < @$aColumns; $i++ ) {
+			# Iterate over each column and check if it is searchable.
+			# If so, add a constraint to the where clause restricting the given
+			# column. In the query, the column is identified by it's index, we
+			# need to translates the index to the column name.
+			my $searchable_ident = 'bSearchable_'.$i;
+			if( $q->param($searchable_ident) and $q->param($searchable_ident) eq 'true' ) {
+				my $column = $aColumns->[$i];
+				push @{$where_href->{'-or'}}, { $column => {-like => '%'.$search_string.'%' } };
+			}
+		}
+	}
+
+    #individual column filtering
+    for (my $i = 0; $i < @$aColumns; $i++) {
+        if( ($q->param('bSearchable_' . $i) and $q->param('bSearchable_' . $i) eq 'true')
+           and $q->param('sSearch_' . $i) ) {
+            my $individual_column_search = $q->param('sSearch_' . $i);
+            $where_href->{$aColumns->[$i]} = {-like => '%'.$individual_column_search.'%'};
+        }
+    }
+
+    # add user where if given
+    if( $self->where_clause ) {
+        $where_href = $self->_add_where_clause($where_href, $self->where_clause);
+    }
+    
+    return $where_href;
+} # /_generate_where_clause
+
+
+=comment
+
+convert
+\%where = {key => value, -or => \@ }
+to
+\%where = {-and => [{key => value, -or => \@ }, $plus]}
+
+$plus can be a hashref for SQL::Abstract.
+$plus can also be scalarref (deprecated).
+
+=cut
+
+sub _add_where_clause {
+    my $self = shift;
+    my $existing_clauses_href = shift or croak('Missing where clause');
+    my $new_clause = shift;
+    
+    return $existing_clauses_href unless $new_clause;
+    
+    if( UNIVERSAL::isa($new_clause, 'HASH') ) {
+        return {
+            -and => [
+                $existing_clauses_href,
+                $new_clause,
+            ],
+        };
+    }
+    
+    # Add arbitrary WHERE clause. This might be dangerous.
+    return {
+        -and => [
+            $existing_clauses_href,
+            \$new_clause
+        ],
+    };
+} # /_add_where_clause
+
+
+
+
+sub _generate_order_clause {
+    my $self = shift;
+    my $q = shift;
+    
+    my ($aColumns,undef,undef) = $self->_columns_arr;
+    
+    my @order = ();
+    if($q->param('iSortCol_0')) {
+        
+        for(my $i = 0; $i < $q->param('iSortingCols'); $i++) {
+            my $sortable_column_nr = $q->param('iSortCol_'.$i);
+            my $sortable_flag = 'bSortable_' . $sortable_column_nr;
+            if($q->param($sortable_flag) eq "true") {
+                my $sort_col = $aColumns->[$sortable_column_nr];
+                my $sort_dir = '-' . $q->param('sSortDir_' . $i);
+                
+                push @order, {$sort_dir => $sort_col};
+            }
+        }
+
+    }
+    
+    return @order;
+} # /_generate_order_clause
+
 
 1;
 __END__
@@ -426,8 +369,10 @@ DataTables - a server-side solution for the jQuery DataTables plugin
 
 =head1 SYNOPSIS
 
+  use DBI;
   use DataTables;
-  my $dt = DataTables->new(user=>'user',pass=>'pass',db=>'db'); #set inital values to connect to db
+  my $dbh = DBI->connect('DBI:mysql:databasename:localhost:3306', 'username', 'password') or die("Could not connect to database: $DBI::errstr");
+  my $dt = DataTables->new(dbh => $dbh);
 
   #set table to select from
   $dt->tables(["dinosaurs"]);
@@ -461,15 +406,7 @@ DataTables - a server-side solution for the jQuery DataTables plugin
                    1=>{"name"=>"pets", AS=>"pet_name"}, # renaming isn't necessary here, unless you wish to use patterns
                 );
 
-  my %index_cols = ( 
-                        "pets"=>"id",
-                        "owners"=>"id",
-                   );
-
   $dt->columns(\%columns);
-  $dt->index_cols(\%index_cols); #Not necessary to set index columns
-                                 #since both index columns are id and this is what
-                                 #DataTables defaults to
 
   $dt->join_clause("owners.id=pets.owner_id");
 
@@ -496,6 +433,7 @@ DataTables - a server-side solution for the jQuery DataTables plugin
 =head1 DESCRIPTION
 
 This module is an easy way to integrate server-side with the jQuery L<DataTables|http://datatables.net/> plugin. 
+Currently this module is designed to work with legacy DataTables 1.9 and lower. 
 It supports basic features like displaying columns
 from a single table, but also supports more advanced features such as:
 
@@ -535,16 +473,10 @@ Here is an explicit list of all of the options and their defaults:
 
     tables  => undef,
     columns   => undef,
-    user  => undef,
-    pass  => undef,
-    db  => undef,
-    host  => "localhost",
-    port  => "3306",
+    dbh  => undef,
     patterns  => {},
     join_clause  => '',
     where_clause  => '',
-    index_col  => "id",
-    index_cols => undef,
 
 =head2 tables
     
@@ -591,22 +523,6 @@ thing, because then they would both get the pattern! Also, if you
 provide a hashref for "columns", there is no need to supply the
 tables; DataTables will figure that out for you.
 
-=head2 index_cols
-
-    $dt->index_cols({"table1"=>"index_col1","table2"=>"index_col2"});
-
-Here you need to provide the indexed columns for all of the tables you 
-are selecting from. However, if you do not provide an indexed column for a table,
-DataTables will default to using "id". If you are only selecting from one table,
-you can just use "index_col".
-
-=head2 index_col
-
-    $dt->index_col("id");
-
-You can use this to set your indexed column if you are only selecting from one
-table. It defaults to "id".
-
 =head2 patterns
 
     $dt->patterns({"column1"=>"[% column1 %] rocks!"});
@@ -619,35 +535,11 @@ The name of the column must be the name that you specified in
 "columns". If you used a hashref in columns and specified the "AS" key,
 then you must use the value for that "AS" key.
 
-=head2 user
+=head2 dbh
 
-    $dt->user("user");
+    $dt->dbh(DBI->connect(...));
 
-Sets the user for the database.
-
-=head2 pass
-
-    $dt->pass("password");
-
-Sets the password for the database.
-
-=head2 db
-
-    $dt->db("database");
-
-Sets the database to use.
-
-=head2 host
-
-    $dt->host("localhost");
-
-Sets the host to connet to for the database. Defaults to localhost.
-
-=head2 port
-
-    $dt->port("3306");
-
-Sets the port to connect on for the database. Defaults to 3306.
+Sets the database handle that should be used for the server-side requests.
 
 =head2 join_clause
 
@@ -692,7 +584,7 @@ so I suggest that you just use that.
 
 =item 2 L<JSON::XS>
 
-=item 3 L<CGI>
+=item 3 L<CGI::Simple>
 
 =back
 
@@ -708,6 +600,8 @@ your web server logs to see what went wrong.
 =head1 SEE ALSO
 
 L<DataTables jQuery Plugin|http://datatables.net/>
+
+L<JQuery::DataTables::Request>, a library for handling DataTables request parameters.
 
 =head1 AUTHOR
 

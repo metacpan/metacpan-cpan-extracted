@@ -1,5 +1,14 @@
 Revision history for Map::Tube::CLI
 
+0.47  Sat Apr 28 19:00:00 2018
+      - Added support for map of Nuremberg.
+
+0.46  Fri Apr 27 16:15:00 2018
+      - Upgraded dependency on Map::Tube v3.50
+
+0.45  Thu Apr 26 12:40:00 2018
+      - Added support for map of Frankfurt.
+
 0.44  Tue Apr 17 20:00:00 2018
       - Upgraded dependency on Map::Tube v3.49
 

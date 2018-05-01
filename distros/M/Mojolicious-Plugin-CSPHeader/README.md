@@ -6,9 +6,23 @@ Mojolicious::Plugin::CSPHeader - Mojolicious Plugin to add Content-Security-Poli
 
     # Mojolicious
     $self->plugin('CSPHeader', csp => "default-src 'none'; font-src 'self'; img-src 'self' data:; style-src 'self'");
+    # or
+    $self->plugin('CSPHeader', directives => {
+        'default-src' => "'none'",
+        'font-src'    => "'self'",
+        'img-src'     => "'self' data:",
+        'style-src'   => "'self'"
+    });
 
     # Mojolicious::Lite
     plugin 'CSPHeader', csp => "default-src 'none'; font-src 'self'; img-src 'self' data:; style-src 'self'";
+    # or
+    plugin 'CSPHeader', directives => {
+        'default-src' => "'none'",
+        'font-src'    => "'self'",
+        'img-src'     => "'self' data:",
+        'style-src'   => "'self'"
+    };
 
 # DESCRIPTION
 
@@ -19,6 +33,19 @@ To know what should be the CSP header to add to your site, you can use this Fire
 [https://content-security-policy.com/](https://content-security-policy.com/) provides a good documentation about CSP.
 
 [https://report-uri.com/home/generate](https://report-uri.com/home/generate) provides a tool to generate a CSP header.
+
+This plugin will warn you in Mojolicious info log if you use the "directives" syntax and use experimental or deprecated directives.
+The list of experimental and deprecated directives is based on [https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) as seen on 28 April 2018.
+
+If you want to use the "directives" syntax and add some directive that this plugin doesn't know, put those new directives in a "extra" hash like this:
+
+    $self->plugin('CSPHeader', directives => {
+        'default-src' => "'none'",
+    }, extra => {
+        'foo-src' => "'self'"
+    });
+
+Please note that the "csp" syntax takes precedence over the "directives" syntax. Don't use both.
 
 # METHODS
 

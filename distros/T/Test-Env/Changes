@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Env
 
+1.084 2018-04-26T16:18:04Z
+	* Clarify that it's Artistic License 2.0
+
 1.082 2016-01-24T17:43:14Z
 	* Remove the Test::Prereq test.
 

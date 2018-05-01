@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Data::DFA;
-our $VERSION = "20180406";
+our $VERSION = "20180429";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -226,13 +226,19 @@ sub Data::DFA::Parser::accept($$)                                               
     my @processed   = @{$parser->processed};
     $parser->{next} = [@next];
     my $next = join ' ', @next;
-    die join "\n",
-      "Already processed: ". join(' ', @processed),
-      @next > 0 ? 
-      "Expected one of  : ". join(' ', @next) :
-      "Expected nothing more.",
-      "But found        : ", $symbol,
-      '';
+
+    push my @m, "Already processed: ". join(' ', @processed);
+
+    if (scalar(@next) > 0)
+     {push  @m, "Expected one of  : ". join(' ', @next);
+     }
+    else   
+     {push  @m, "Expected nothing more.";
+     } 
+
+    push    @m, "But found        : ". $symbol, "";
+
+    die join "\n", @m;
    }
  }
 
@@ -240,7 +246,8 @@ sub Data::DFA::Parser::final($)                                                 
  {my ($parser) = @_;                                                            # DFA Parser
   my $dfa = $parser->dfa;
   my $state = $parser->state;
-  $$dfa{$state}[Final] ? 1 : 0
+  return 1 if $$dfa{$state}[Final];
+  0
  }
 
 sub Data::DFA::Parser::next($)                                                  # Returns an array of symbols that would be accepted in the current state
@@ -253,7 +260,6 @@ sub Data::DFA::Parser::next($)                                                  
 
 sub Data::DFA::Parser::accepts($@)                                              # Confirm that a DFA accepts an array representing a sequence of symbols
  {my ($parser, @symbols) = @_;                                                  # DFA Parser, array of symbols
-  my $dfa = $parser->dfa;
   for my $symbol(@symbols)                                                      # Parse the symbols
    {eval {$parser->accept($symbol)};                                            # Try to accept a symbol
     return 0 if $@;                                                             # Failed
@@ -706,44 +712,53 @@ test unless caller;
 
 1;
 # podDocumentation
-__DATA__
+#__DATA__
 use warnings FATAL=>qw(all);
 use strict;
 use Test::More tests=>11;
 
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
-  my $dfa = fromExpr(zeroOrMore(choice(element("a"))), zeroOrMore(choice(element("a"))), );
-  ok $dfa->printNws("a*a* 2: ") eq nws(compressDfa ? <<END : <<END);
+  my $d = fromExpr(zeroOrMore(choice(element("a"))), zeroOrMore(choice(element("a"))), );
+  if (compressDfa)
+   {ok $d->printNws("a*a* 2: ") eq nws(<<END);
 a*a* 2:
    State  Final  Symbol  Target  Final
 1  0      1      a       1       1
 2  1      1      a       1       1
 END
+   }
+  else
+   {ok $d->printNws("a*a* 2: ") eq nws(<<END);
 a*a* 2:
    State      Final  Symbol  Target     Final
 1          0      1  a       0 1 2 3 4      1
 2  0 1 2 3 4      1  a       0 1 2 3 4      1
 END
+   }
  }
 
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
-  my $dfa = eval qq(fromExpr(&sequence($s,$s,$s,$s)));
-  ok $dfa->printNws("a*a* 2: ") eq nws(compressDfa ? <<END : <<END);
+  my $d = eval qq(fromExpr(&sequence($s,$s,$s,$s)));
+  if (compressDfa)
+   {ok $d->printNws("a*a* 2: ") eq nws(<<END);
 a*a* 2:
    State  Final  Symbol  Target  Final
 1  0      1      a       1       1
 2  1      1      a       1       1
 END
+   }
+  else
+   {ok $d->printNws("a*a* 2: ") eq nws(<<END);
 a*a* 2:
    State              Final  Symbol  Target             Final
 1                  0      1  a       0 1 2 3 4 5 6 7 8      1
 2  0 1 2 3 4 5 6 7 8      1  a       0 1 2 3 4 5 6 7 8      1
 END
-
-  ok  $dfa->parser->accepts(qw(a a a));
-  ok !$dfa->parser->accepts(qw(a b a));
+   }
+  ok  $d->parser->accepts(qw(a a a));
+  ok !$d->parser->accepts(qw(a b a));
  }
 
 if (1)
@@ -761,7 +776,8 @@ if (1)
 
   is_deeply ['a'..'e'], [$dfa->symbols];
 
-  ok $dfa->printNws("Dfa for a(b|c)+d?e :") eq nws(compressDfa ? <<END : <<END);
+  if (compressDfa)
+   {ok $dfa->printNws("Dfa for a(b|c)+d?e :") eq nws(<<END);
 Dfa for a(b|c)+d?e :
     State  Final  Symbol  Target  Final
 1   0             a       2       0
@@ -777,6 +793,10 @@ Dfa for a(b|c)+d?e :
 11                e       5       1
 12  4      0      e       5       1
 END
+   }
+  else
+   {ok $dfa->printNws("Dfa for a(b|c)+d?e :") eq nws(<<END);
+
 Dfa for a(b|c)+d?e :
     State        Final  Symbol  Target       Final
 1   0                   a       1 3          0
@@ -792,6 +812,7 @@ Dfa for a(b|c)+d?e :
 11                      e       7            1
 12  6            0      e       7            1
 END
+   }
 # Create a parser and use it to parse a sequence of symbols
 
   my $parser = $dfa->parser;                                                    # New parser

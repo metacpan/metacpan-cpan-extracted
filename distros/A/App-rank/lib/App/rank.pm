@@ -1,6 +1,6 @@
 package App::rank;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Rank lines of text files
@@ -17,7 +17,7 @@ App::rank - Rank lines of text files
 
 =head1 VERSION
 
-This document describes version 0.004 of App::rank (from Perl distribution App-rank), released on 2018-04-25.
+This document describes version 0.007 of App::rank (from Perl distribution App-rank), released on 2018-05-01.
 
 =head1 SYNOPSIS
 

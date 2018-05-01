@@ -1,5 +1,8 @@
 Revision history for bareword::filehandles
 
+0.006     2018-04-26 22:36:49+01:00 Europe/London
+ - Only use Lexical::SealRequireHints before perl 5.12
+
 0.005     2017-04-20 16:27:24+01:00 Europe/London
  - Switch to Dist::Zilla::PluginBundle::Starter
    and ::Plugin::DymamicPrereqs

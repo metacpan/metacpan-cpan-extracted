@@ -1,8 +1,8 @@
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Fatal;
@@ -11,7 +11,7 @@ use Path::Tiny;
 use Module::Metadata;
 
 my $tzil = Builder->from_config(
-    { dist_root => 't/does-not-exist' },
+    { dist_root => 'does-not-exist' },
     {
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
@@ -50,8 +50,8 @@ my $TM_VERSION = Module::Metadata->new_from_module('Test::More')->version;
 
 my $re;
 cmp_deeply(
-    $tzil->log_messages,
-    superbagof(
+    [ grep { /^\[EnsurePrereqsInstalled\]/ } @{ $tzil->log_messages } ],
+    [
         '[EnsurePrereqsInstalled] checking that all authordeps are satisfied...',
         '[EnsurePrereqsInstalled] checking that all prereqs are satisfied...',
         re(do { $re = qr/^\Q[EnsurePrereqsInstalled] Unsatisfied prerequisites:
@@ -60,9 +60,12 @@ cmp_deeply(
 [EnsurePrereqsInstalled]     \E(Installed version \($]\) of perl is not in range '500'|Your Perl \($]\) is not in the range '500')\Q
 [EnsurePrereqsInstalled] To remedy, do:  cpanm I::Am::Not::Installed Test::More
 [EnsurePrereqsInstalled] And update your perl!\E$/ms }),
-    ),
+    ],
     'release was aborted: checks delayed until the release phase',
 ) or diag 'got log messages: ', explain $tzil->log_messages,
     'expected: ', $re;
+
+diag 'got log messages: ', explain $tzil->log_messages
+    if not Test::Builder->new->is_passing;
 
 done_testing;

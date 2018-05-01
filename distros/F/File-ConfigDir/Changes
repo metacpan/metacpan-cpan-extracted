@@ -1,5 +1,23 @@
 Revision history for Perl module File::ConfigDir
 
+0.020 2018-04-30
+    - spelling fixes (Thanks to Mohammed Anwar for the reminder
+      and pull request)
+    - dependencies correctly expressed
+    - tests for and implementation of _find_common_base_dir
+      fixed
+    - MSWin32 related fixups
+    - add license texts
+
+0.019 2018-04-27
+    - fix local::lib handling and suggest use local::lib
+    - find a users homedir even without File::HomeDir
+    - add Travis and Coverage status badges
+    - add more tests for proving edge cases to improve test coverage
+    - add perlcritic rules and tests
+    - introduce perltidy ensurance
+    - simplify Travis-CI runs, add coverage test
+
 0.018 2017-05-22
     - add vendorapp_cfg_dir
     - have a .perltidyrc

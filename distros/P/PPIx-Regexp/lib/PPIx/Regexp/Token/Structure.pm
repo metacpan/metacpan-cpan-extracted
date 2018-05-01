@@ -53,7 +53,7 @@ use PPIx::Regexp::Token::Backreference	();
 use PPIx::Regexp::Token::Backtrack	();
 use PPIx::Regexp::Token::Recursion	();
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Return true if the token can be quantified, and false otherwise
 
@@ -226,7 +226,7 @@ sub is_quantifier {
 
 		    # Of literals, we accept exactly one comma provided it
 		    # is not immediately after a '{'. We also accept
-		    # anything that matches '\d';
+		    # anything that matches '[0-9]';
 		    if ( $token->isa( TOKEN_LITERAL ) ) {
 			my $character = $token->content();
 			if ( $character eq ',' ) {
@@ -234,7 +234,7 @@ sub is_quantifier {
 			    return $tokenizer->prior_significant_token(
 				'content' ) ne '{';
 			}
-			return $character =~ m/ \A \d \z /smx;
+			return $character =~ m/ \A [0-9] \z /smx;
 		    }
 
 		    # Since we do not know what is in an interpolation, we

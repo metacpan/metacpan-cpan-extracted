@@ -1,11 +1,11 @@
 package multidimensional;
 # ABSTRACT: disables multidimensional array emulation
-$multidimensional::VERSION = '0.013';
-{ use 5.008; }
+$multidimensional::VERSION = '0.014';
+{ use 5.008001; }
 use strict;
 use warnings;
 
-use Lexical::SealRequireHints 0.005;
+use if "$]" < 5.012, 'Lexical::SealRequireHints';
 use B::Hooks::OP::Check 0.19;
 use XSLoader;
 
@@ -39,7 +39,7 @@ multidimensional - disables multidimensional array emulation
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

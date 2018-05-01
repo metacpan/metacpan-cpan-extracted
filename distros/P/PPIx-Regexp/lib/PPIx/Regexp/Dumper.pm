@@ -47,7 +47,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 =head2 new
 
@@ -326,7 +326,7 @@ sub __nav {
     my $rslt = $self->_safe( @args );
     $rslt =~ s/ ' (\w+) ' , /$1 =>/smxg;
     $rslt =~ s/ \[ \s+ \] /[]/smxg;
-    $rslt =~ s/ \[ \s* ( \d+ ) \s* \] /$1/smxg;
+    $rslt =~ s/ \[ \s* ( [0-9]+ ) \s* \] /$1/smxg;
     return $rslt;
 }
 

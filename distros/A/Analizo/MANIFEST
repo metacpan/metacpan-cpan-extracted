@@ -83,6 +83,7 @@ lib/Test/Analizo.pm
 lib/Test/Analizo/BDD/Cucumber/Extension.pm
 lib/Test/Analizo/Class.pm
 lib/Test/Analizo/Git.pm
+profile.pl
 refresh-authors
 share/README
 share/bash-completion/analizo
@@ -170,9 +171,11 @@ t/features/metrics/number_of_methods.feature
 t/features/metrics/number_of_public_methods.feature
 t/features/metrics/output_file.feature
 t/features/metrics/statistics_values.feature
+t/features/metrics/total_modules.feature
 t/features/metrics_history.feature
 t/features/metrics_history_db.feature
 t/features/module_file_mapping.feature
+t/features/sloccount.feature
 t/features/step_definitions/analizo_steps.pl
 t/features/tree_evolution.feature
 t/features/wrapper.feature
@@ -227,6 +230,8 @@ t/samples/cyclical_graph/csharp/D.cs
 t/samples/cyclical_graph/csharp/E.cs
 t/samples/cyclical_graph/csharp/F.cs
 t/samples/cyclical_graph/csharp/Program.cs
+t/samples/enumeration/Enumeration.java
+t/samples/enumeration/Main.java
 t/samples/evolution.tar.gz
 t/samples/file_with_two_modules/cpp/Makefile
 t/samples/file_with_two_modules/cpp/classes.cc
@@ -270,6 +275,7 @@ t/samples/mixed/Backend.java
 t/samples/mixed/CSharp_Backend.cs
 t/samples/mixed/UI.java
 t/samples/mixed/native_backend.c
+t/samples/mlpack-3.0.0/parse_command_line.hpp
 t/samples/multidir/c/Makefile
 t/samples/multidir/c/lib/Makefile
 t/samples/multidir/c/lib/lib.h
@@ -325,4 +331,6 @@ t/samples/sample_basic/csharp/Program.cs
 t/samples/tree-evolution.tar.gz
 t/samples/tree_id/1.c
 t/samples/tree_id/2.c
+t/samples/wildcard/GenericClass.java
+t/samples/wildcard/WildcardClass.java
 templates/analizo-evolution-matrix.html.ep

@@ -130,12 +130,9 @@ sub _get_h ($type) {
     return if !$path;
 
     if ( $type == $TYPE_COUNTRY2 || $type == $TYPE_CITY2 ) {
-        state $init = !!require GeoIP2::Database::Reader;
+        state $init = !!require MaxMind::DB::Reader;
 
-        $H->{$type} = GeoIP2::Database::Reader->new(
-            file    => $path,
-            locales => ['en'],
-        );
+        $H->{$type} = MaxMind::DB::Reader->new( file => $path );
     }
     else {
         state $init = !!require Geo::IP;

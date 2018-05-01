@@ -1,7 +1,7 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Fatal;
@@ -11,7 +11,7 @@ use Path::Tiny;
 foreach my $build_phase (qw(build release))
 {
     my $tzil = Builder->from_config(
-        { dist_root => 't/does-not-exist' },
+        { dist_root => 'does-not-exist' },
         {
             add_files => {
                 path(qw(source dist.ini)) => simple_ini(
@@ -33,15 +33,18 @@ foreach my $build_phase (qw(build release))
     );
 
     cmp_deeply(
-        $tzil->log_messages,
-        superbagof(
+        [ grep { /^\[EnsurePrereqsInstalled\]/ } @{ $tzil->log_messages } ],
+        [
             '[EnsurePrereqsInstalled] checking that all authordeps are satisfied...',
             '[EnsurePrereqsInstalled] Unsatisfied authordeps:
 [EnsurePrereqsInstalled] I::Am::Not::Installed
 [EnsurePrereqsInstalled] To remedy, do:  cpanm I::Am::Not::Installed',
-        ),
+        ],
         $build_phase . ' was aborted: authordeps and all prerequisites were checked',
     ) or diag 'got log messages: ', explain $tzil->log_messages;
+
+    diag 'got log messages: ', explain $tzil->log_messages
+        if not Test::Builder->new->is_passing;
 }
 
 done_testing;

@@ -1,5 +1,5 @@
 #
-# $Id: Online2.pm 365 2014-12-09 18:08:01Z gomor $
+# $Id: Online2.pm,v 453864a37ab6 2018/05/01 07:25:03 gomor $
 #
 package Net::Frame::Dump::Online2;
 use strict;
@@ -304,9 +304,11 @@ sub next {
    my $thisTime = gettimeofday();
 
    # Gather all available frames
-   my $h = { self => $self, frames => $frames };
-   Net::Pcap::pcap_dispatch($self->_pcapd, -1, \&_dispatch, $h);
-   $some_received = scalar(@{$h->{frames}});
+   if ($sel->can_read($self->timeoutOnNext)) {
+      my $h = { self => $self, frames => $frames };
+      Net::Pcap::pcap_dispatch($self->_pcapd, -1, \&_dispatch, $h);
+      $some_received = scalar(@{$h->{frames}});
+   }
 
    # Update the ring buffer, or we loose those frames
    $self->_frames($frames);
@@ -491,7 +493,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2014, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

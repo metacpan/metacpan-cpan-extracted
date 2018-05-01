@@ -1,3 +1,12 @@
+0.4.3 2018-04-28  k  <andk@cpan.org>
+
+	* Add missing new test file to MANIFEST, so that it gets included.
+	Thanks to Slaven Rezić for reporting!
+
+0.4.2 2018-04-28  k  <andk@cpan.org>
+
+	* Support recently changed formatting of the reports coming from cpantesters
+
 0.4.1 2016-08-16  k  <andk@cpan.org>
 
 	* Declare dependency on List::MoreUtil

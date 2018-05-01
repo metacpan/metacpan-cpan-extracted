@@ -24,7 +24,7 @@
          "prereqs" : {
             "runtime" : {
                "requires" : {
-                  "MaxMind::DB::Reader::XS" : "v1.0.3"
+                  "MaxMind::DB::Reader::XS" : "v1.0.5"
                }
             }
          }
@@ -44,7 +44,7 @@
       "runtime" : {
          "requires" : {
             "Geo::IP" : "v1.45.0",
-            "GeoIP2" : "v2.3.1",
+            "MaxMind::DB::Reader" : "v1.0.13",
             "Pcore" : "v0.22.2"
          }
       }
@@ -61,6 +61,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-geoip/overview"
       }
    },
-   "version" : "v1.2.4",
+   "version" : "v1.2.5",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

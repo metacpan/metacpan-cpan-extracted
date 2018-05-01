@@ -1,13 +1,13 @@
 #!perl
 
-our $DATE = '2018-04-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-05-01'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Getopt::Long;
+use Getopt::Long qw(:config bundling no_ignore_case);
 
 my %Opts = (
     action => 'rank',
@@ -160,7 +160,7 @@ sub run {
                 if ($percentile == $percentiles[0]) {
                     printf "%.3f\t%.8f\n", $percentile, $sortkey;
                     shift @percentiles;
-                } elsif ($percentile < $percentiles[0]) {
+                } elsif ($percentile < $percentiles[0] || $row_num == $#data) {
                     if (defined $prev_percentile) {
                         # linear interpolation
                         my $val = $prev_sortkey +
@@ -202,7 +202,7 @@ rank - Rank lines of text
 
 =head1 VERSION
 
-This document describes version 0.004 of rank (from Perl distribution App-rank), released on 2018-04-25.
+This document describes version 0.007 of rank (from Perl distribution App-rank), released on 2018-05-01.
 
 =head1 SYNOPSIS
 
@@ -226,23 +226,34 @@ Sample input:
  77    nono
  75    tedi
 
-Sample output using C<rank -n>:
+Sample output using C<rank -n> (a.k.a. C<rank --numeric-sort>):
 
  1    89    parjiyem
  2    77    nono
  3    75    robi
  3    75    tedi
- 5    30    budi
- 6    21    ujang
+ 5    50    atang
+ 6    30    budi
+ 7    21    ujang
 
-Sample output using C<rank -np>:
+Sample output using C<rank -np> (a.k.a. C<rank --numeric-sort
+--show-percentile>):
 
  1    100.000   89    parjiyem
  2    85.714    77    nono
  3    71.429    75    robi
  3    71.429    75    tedi
- 5    42.857    30    budi
- 6    14.286    21    ujang
+ 5    42.857    50    atang
+ 6    28.571    30    budi
+ 7    14.286    21    ujang
+
+Sample output using C<rank -n --calc-percentile 5,25,50,75,95>):
+
+ 95.000  84.80000000
+ 75.000  75.50000000
+ 50.000  56.25000000
+ 25.000  27.75000000
+ 5.000   15.15000000
 
 =head1 EXIT CODES
 
@@ -260,7 +271,12 @@ Sample output using C<rank -np>:
 
 Valid values: C<rank>, C<calc-percentile>
 
-=item * --calc-percentile=f, ...
+The default action is to show ranking (C<rank>).
+
+Action C<calc-percentile> will calculate specific percentiles. Usually you just
+specify C<--calc-percentile a,b,c,...> to set action to C<calc-percentile>.
+
+=item * --calc-percentile=f1,f2,...
 
 Imply C<--action=calc-percentile>. Calculate specific percentile(s). Will use
 linear interpolation to get the percentile values.
@@ -275,7 +291,12 @@ linear interpolation to get the percentile values.
 
 =item * --sort=s
 
+Valid values: C<numeric>, C<ascii>.
+
 =item * --numeric-sort, -n
+
+Shortcut for C<--sort=numeric>. By default numeric sort order is descending
+instead of ascending. To do ascending sort, add C<-r>.
 
 =item * --sort-field=i (default: 0)
 
@@ -288,8 +309,9 @@ keys to be ranked the same, but the next ranking will skip numbers:
  2    77    nono
  3    75    robi
  3    75    tedi
- 5    30    budi
- 6    21    ujang
+ 5    50    atang
+ 6    30    budi
+ 7    21    ujang
 
 The C<no-skip> ranking system will not do these skips:
 
@@ -297,8 +319,9 @@ The C<no-skip> ranking system will not do these skips:
  2    77    nono
  3    75    robi
  3    75    tedi
- 4    30    budi
- 5    21    ujang
+ 4    50    atang
+ 5    30    budi
+ 6    21    ujang
 
 The C<no-same> ranking system will assign different ranks to lines that have the
 same sort key:
@@ -307,8 +330,9 @@ same sort key:
  2    77    nono
  3    75    robi
  4    75    tedi
- 5    30    budi
- 6    21    ujang
+ 5    50    atang
+ 6    30    budi
+ 7    21    ujang
 
 =item * --no-show-rank
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "The Catalyst Framework Runtime",
    "author" : [
-      "unknown"
+      "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,22 +16,38 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "HTTP::Request::Common" : "0",
-            "HTTP::Status" : "0",
-            "IO::Scalar" : "0",
-            "Test::Fatal" : "0",
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Catalyst::Action::REST" : "0",
+            "Catalyst::Devel" : "1.0",
+            "Catalyst::Plugin::ConfigLoader" : "0",
+            "Catalyst::Plugin::Params::Nested" : "0",
+            "CatalystX::LeakChecker" : "0.05",
+            "Compress::Zlib" : "0",
+            "File::Copy::Recursive" : "0.40",
+            "MooseX::Daemonize" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Proc::ProcessTable" : "0",
+            "Starman" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Spelling" : "0",
+            "Test::TCP" : "2.00",
+            "Test::WWW::Mechanize::Catalyst" : "0.51",
+            "Type::Tiny" : "0"
          }
       },
       "runtime" : {
@@ -40,7 +56,6 @@
             "CGI::Struct" : "0",
             "Carp" : "1.25",
             "Class::C3::Adopt::NEXT" : "0.07",
-            "Class::Data::Inheritable" : "0",
             "Class::Load" : "0.12",
             "Data::Dump" : "0",
             "Data::OptList" : "0",
@@ -51,7 +66,6 @@
             "HTTP::Body" : "1.22",
             "HTTP::Headers" : "1.64",
             "HTTP::Request" : "5.814",
-            "HTTP::Request::AsCGI" : "1.0",
             "HTTP::Response" : "5.813",
             "Hash::MultiValue" : "0",
             "JSON::MaybeXS" : "1.000000",
@@ -89,17 +103,70 @@
             "Text::SimpleTable" : "0.03",
             "Time::HiRes" : "0",
             "Tree::Simple" : "1.15",
-            "Tree::Simple::Visitor::FindByPath" : "0",
+            "Tree::Simple::Visitor::FindByUID" : "0",
             "Try::Tiny" : "0.17",
             "URI" : "1.65",
             "URI::ws" : "0.03",
-            "namespace::autoclean" : "0.28",
             "namespace::clean" : "0.23",
             "perl" : "5.008003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "HTTP::Status" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "5.90117",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Catalyst-Runtime@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Runtime"
+      },
+      "homepage" : "http://dev.catalyst.perl.org/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=summary"
+      },
+      "x_IRC" : "irc://irc.perl.org/#catalyst",
+      "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
+   },
+   "version" : "5.90118",
+   "x_authority" : "cpan:MSTROUT",
+   "x_breaks" : {
+      "Catalyst::Action::REST" : "<= 0.67",
+      "Catalyst::Action::RenderView" : "<= 0.07",
+      "Catalyst::Authentication::Credential::HTTP" : "<= 1.009",
+      "Catalyst::Component::ACCEPT_CONTEXT" : "<= 0.06",
+      "Catalyst::Controller::AllowDisable" : "<= 0.03",
+      "Catalyst::Devel" : "<= 1.19",
+      "Catalyst::Model::Akismet" : "<= 0.02",
+      "Catalyst::Plugin::Authentication" : "<= 0.100091",
+      "Catalyst::Plugin::ConfigLoader" : "<= 0.22",
+      "Catalyst::Plugin::DebugCookie" : "<= 0.999002",
+      "Catalyst::Plugin::ENV" : 0,
+      "Catalyst::Plugin::HashedCookies" : "<= 1.03",
+      "Catalyst::Plugin::Session" : "<= 0.21",
+      "Catalyst::Plugin::Session::State::Cookie" : "<= 0.10",
+      "Catalyst::Plugin::Session::Store::FastMmap" : "<= 0.09",
+      "Catalyst::Plugin::Session::Store::File" : "<= 0.16",
+      "Catalyst::Plugin::SmartURI" : "<= 0.032",
+      "Catalyst::Plugin::SubRequest" : "<= 0.14",
+      "Catalyst::Plugin::Unicode::Encoding" : "<= 0.2",
+      "Catalyst::Plugin::Upload::Image::Magick" : "<= 0.03",
+      "Catalyst::View::Mason" : "<= 0.17",
+      "CatalystX::CRUD" : "<= 0.42",
+      "CatalystX::CRUD::Model::RDBO" : "<= 0.20",
+      "CatalystX::Imports" : "<= 0.03",
+      "Reaction" : "<= 0.001999",
+      "Test::WWW::Mechanize::Catalyst" : "<= 0.53"
+   },
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-my $VERSION = 1.04;
+my $VERSION = 1.05;
 
 use blib;
 use Bit::Vector;
@@ -10,8 +10,7 @@ use Data::Dumper;
 use Test::More 'no_plan';
 
 use WWW::Search::Test;
-BEGIN
-  {
+BEGIN {
   use_ok('WWW::Search::Ebay::Category');
   } # end of BEGIN block
 
@@ -51,7 +50,11 @@ diag("Sending 1-page category query to check contents...");
 $iDebug = 0;
 $iDump = 0;
 $WWW::Search::Test::sSaveOnError = q{category-failed.html};
-tm_run_test('normal', 147399, 1, 199, $iDebug, $iDump);
+my $iCategory = 147399;
+# It's impossible to find a category that reliably only
+# has one page of results:
+my $iMax = 999_999;
+tm_run_test('normal', $iCategory, 1, $iMax, $iDebug, $iDump);
 # Now get the results and inspect them:
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got some results');

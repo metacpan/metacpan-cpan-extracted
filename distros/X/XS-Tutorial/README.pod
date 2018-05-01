@@ -10,6 +10,8 @@ XS::Tutorial - documentation with examples for learning Perl XS
 
 =item * L<XS::Tutorial::Two> - working with more than one value at a time
 
+=item * L<XS::Tutorial::Three> - utility routines that are good to know
+
 =back
 
 =head1 SOURCES OF INFORMATION

@@ -1,3 +1,10 @@
+0.37 Sun Apr 29 19:31:11 PDT 2018
+ - Apply PR/10 @mohawk2++
+
+0.36 Sun Apr 29 17:09:53 PDT 2018
+ - Apply PR/8 @knowledgejunkie++
+ - Apply PR/9 @mohawk2++
+
 0.35 Wed Dec 24 13:10:28 PST 2014
  - Remove Module::Install::PMC from dist
 
@@ -90,4 +97,3 @@
 
 0.10 Sun Mar 12 05:47:06 PST 2006
  - Maiden voyage
-

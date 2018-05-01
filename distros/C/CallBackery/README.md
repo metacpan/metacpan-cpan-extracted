@@ -21,20 +21,20 @@ perl 5.10.1 installed.
 First make sure you have gcc, perl curl and automake installed. The following commands
 will work on debian and ubuntu. 
 
-```
+```console
 sudo apt-get install curl automake perl gcc unzip
 ```
 
 For redhat try
 
-```
+```console
 sudo yum install curl automake perl-core openssl-devel gcc unzip
 ```
 
 Now setup callbackery and all its requirements. You can set the `PREFIX` to
 wherever you want callbackery to be installed.
 
-```
+```console
 PREFIX=$HOME/opt/callbackery
 export PERL_CPANM_HOME=$PREFIX
 export PERL_CPANM_OPT="--local-lib $PREFIX"
@@ -46,7 +46,7 @@ curl -L cpanmin.us \
 
 Finally lets generate the CallBackery sample application.
 
-````
+```console
 mkdir -p ~/src
 cd ~/src
 mojo generate callbackery_app CbDemo

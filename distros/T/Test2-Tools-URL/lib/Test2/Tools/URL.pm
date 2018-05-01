@@ -12,7 +12,7 @@ use base qw( Exporter );
 our @EXPORT = qw( url url_base url_component );
 
 # ABSTRACT: Compare a URL in your Test2 test
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub url (&)
@@ -47,7 +47,7 @@ sub url_component ($$)
 package Test2::Tools::URL::Check;
 
 use overload ();
-use URI;
+use URI 1.61;
 use Scalar::Util qw( blessed );
 use base qw( Test2::Compare::Base );
 
@@ -164,7 +164,7 @@ Test2::Tools::URL - Compare a URL in your Test2 test
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

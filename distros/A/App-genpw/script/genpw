@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/genpw/genpw
-# and generated automatically using Perinci::CmdLine::Gen version 0.484
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-02-20'; # DATE
+our $DATE = '2018-05-01'; # DATE
 our $DIST = 'App-genpw'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,7 +21,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Generate random password
+# ABSTRACT: Generate random password (support patterns + wordlists)
 # PODNAME: genpw
 
 __END__
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
 
-genpw - Generate random password
+genpw - Generate random password (support patterns + wordlists)
 
 =head1 VERSION
 
-This document describes version 0.005 of genpw (from Perl distribution App-genpw), released on 2018-02-20.
+This document describes version 0.007 of genpw (from Perl distribution App-genpw), released on 2018-05-01.
 
 =head1 SYNOPSIS
 
@@ -53,10 +53,67 @@ This is yet another utility to generate random password. Features:
 =item * Allow specifying pattern(s), e.g. '%8a%s' means 8 random alphanumeric
 characters followed by a symbol.
 
+=item * Use words from wordlists.
+
 =item * Use strong random source (L<Math::Random::Secure>) when available, otherwise
 fallback to Perl's builtin C<rand()>.
 
 =back
+
+Examples:
+
+By default generate letters/digits 8-20 characters long:
+
+ % genpw
+ J9K3ZjBVR
+
+Generate 5 passwords instead of 1:
+
+ % genpw 5
+ wAYftKsS
+ knaY7MOBbcvFFS3L1wyW
+ oQGz62aF
+ sG1A9reVOe
+ Zo8GoFEq
+
+Generate random digits between 10 and 12 characters long:
+
+ % genpw -p '%10$12d'
+ 55597085674
+
+Generate password in the form of a random word + 4 random digits. Words will be
+fed from STDIN:
+
+ % genpw -p '%w%4d' < /usr/share/dict/words
+ shafted0412
+
+Like the above, but words will be fetched from C<WordList::*> modules. You need
+to install the L<genpw-wordlist> CLI. By default, will use wordlist from
+L<WordList::EN::Enable>:
+
+ % genpw-wordlist -p '%w%4d'
+ sedimentologists8542
+
+Generate a random GUID:
+
+ % genpw -p '%8h-%4h-%4h-%4h-%12h'
+ ff26d142-37a8-ecdf-c7f6-8b6ae7b27695
+
+Like the above, but in uppercase:
+
+ % genpw -p '%8h-%4h-%4h-%4h-%12h'
+ 22E13D9E-1187-CD95-1D05-2B92A09E740D
+
+Use configuration file to avoid typing the pattern every time, put this in
+C<~/genpw.conf>:
+
+ [profile=guid]
+ patterns = "%8h-%4h-%4h-%4h-%12h"
+
+then:
+
+ % genpw -P guid
+ 008869fa-177e-3a46-24d6-0900a00e56d5
 
 =head1 OPTIONS
 
@@ -131,6 +188,18 @@ Can be specified multiple times.
 Pattern(s) to use (JSON-encoded).
 
 See C<--pattern>.
+
+=item B<-L>
+
+Shortcut for --case=lower.
+
+See C<--case>.
+
+=item B<-U>
+
+Shortcut for --case=upper.
+
+See C<--case>.
 
 =back
 
@@ -307,6 +376,16 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<genpw-base56>.
+
+L<genpw-base64>.
+
+L<genpw-id>.
+
+L<genpw-wordlist>.
 
 =head1 AUTHOR
 

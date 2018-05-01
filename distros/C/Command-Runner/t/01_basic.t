@@ -9,8 +9,8 @@ subtest code => sub {
     my (@stdout, @stderr);
     my $res = Command::Runner->new
         ->command(sub { for (1..2) { warn "1\n"; print "2\n" } warn "1\n"; print 2; return 3 })
-        ->on(stdout => sub { push @stdout, $_[0] })
-        ->on(stderr => sub { push @stderr, $_[0] })
+        ->stdout(sub { push @stdout, $_[0] })
+        ->stderr(sub { push @stderr, $_[0] })
         ->run;
     is $res->{result}, 3;
     is @stdout, 3;
@@ -24,8 +24,8 @@ subtest code_rediret => sub {
     my $res = Command::Runner->new
         ->command(sub { for (1..2) { warn "1\n"; print "2\n" } warn "1\n"; print 2; return 3 })
         ->redirect(1)
-        ->on(stdout => sub { push @stdout, $_[0] })
-        ->on(stderr => sub { push @stderr, $_[0] })
+        ->stdout(sub { push @stdout, $_[0] })
+        ->stderr(sub { push @stderr, $_[0] })
         ->run;
     is $res->{result}, 3;
     is @stdout, 6;
@@ -33,12 +33,11 @@ subtest code_rediret => sub {
 };
 
 subtest array => sub {
-    plan skip_all => 'disable on windows' if $windows;
     my ($stdout, $stderr) = ("", "");
     my  $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; warn "1\n"; print "2\n"; exit 3'])
-        ->on(stdout => sub { $stdout .= $_[0] })
-        ->on(stderr => sub { $stderr .= $_[0] })
+        ->stdout(sub { $stdout .= $_[0] })
+        ->stderr(sub { $stderr .= $_[0] })
         ->run;
     is $res->{result} >> 8, 3;
     is $stdout, "2";
@@ -46,13 +45,12 @@ subtest array => sub {
 };
 
 subtest array_redirect => sub {
-    plan skip_all => 'disable on windows' if $windows;
     my ($stdout, $stderr) = ("", "");
     my  $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; warn "1\n"; print "2\n"; exit 3'])
         ->redirect(1)
-        ->on(stdout => sub { $stdout .= $_[0] })
-        ->on(stderr => sub { $stderr .= $_[0] })
+        ->stdout(sub { $stdout .= $_[0] })
+        ->stderr(sub { $stderr .= $_[0] })
         ->run;
     is $res->{result} >> 8, 3;
     is $stdout, "12";
@@ -61,11 +59,10 @@ subtest array_redirect => sub {
 
 subtest string => sub {
     my ($stdout, $stderr) = ("", "");
-    my $command = qq{"$^X" "-e" "warn 1; print 2; exit 3"};
     my $res = Command::Runner->new
-        ->command($command)
-        ->on(stdout => sub { $stdout .= $_[0] })
-        ->on(stderr => sub { $stderr .= $_[0] })
+        ->commandf("%q -e %q", $^X, "warn 1; print 2; exit 3")
+        ->stdout(sub { $stdout .= $_[0] })
+        ->stderr(sub { $stderr .= $_[0] })
         ->run;
     is $res->{result} >> 8, 3;
     is $stdout, "2";
@@ -74,11 +71,10 @@ subtest string => sub {
 
 subtest string_redirect => sub {
     my ($stdout, $stderr) = ("", "");
-    my $command = qq{"$^X" "-e" "warn 1; print 2; exit 3"};
     my $res = Command::Runner->new
-        ->command($command)
+        ->commandf("%q -e %q", $^X, "warn 1; print 2; exit 3")
         ->redirect(1)
-        ->on(stdout => sub { $stdout .= $_[0] })
+        ->stdout(sub { $stdout .= $_[0] })
         ->run;
     is $res->{result} >> 8, 3;
     is $stdout, "1 at -e line 1.2";
@@ -86,17 +82,17 @@ subtest string_redirect => sub {
 };
 
 subtest timeout => sub {
-    plan skip_all => 'disable on windows' if $windows;
-    my ($stdout, $stderr) = ("", "");
     my $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; warn "1\n"; print "2\n"; sleep 1'])
         ->timeout(0.5)
-        ->on(stdout => sub { $stdout .= $_[0] })
-        ->on(stderr => sub { $stderr .= $_[0] })
         ->run;
     ok $res->{timeout};
-    is $stdout, "2";
-    is $stderr, "1";
+    is $res->{stdout}, "2\n";
+    if ($windows) {
+        # windows has garbage: Terminating on signal SIGBREAK(21)
+    } else {
+        is $res->{stderr}, "1\n";
+    }
 };
 
 done_testing;

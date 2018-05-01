@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions qw(splitdir updir catdir file_name_is_absolute);
 use Cwd qw(abs_path);
 
-our $VERSION = '0.906';
+our $VERSION = '0.908';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -57,16 +57,16 @@ sub register {
             }
         };
 
-        $r->get('/(*prefix)/framework/source/(*a)' => $static_cb );
-        $r->get('/(*prefix)/source/class/(*a)' => $static_cb );
-        $r->get('/(*prefix)/source/resource/(*a)' => $static_cb );
-        $r->get('/(*prefix)/source/script/(*a)' => $static_cb );
-        $r->get('/(*prefix)/downloads/(*a)/source/(*b)' => $static_cb );
+        $r->get('/*prefix/framework/source/*a' => $static_cb );
+        $r->get('/*prefix/source/class/*a' => $static_cb );
+        $r->get('/*prefix/source/resource/*a' => $static_cb );
+        $r->get('/*prefix/source/script/*a' => $static_cb );
+        $r->get('/*prefix/downloads/*a/source/*b' => $static_cb );
         $r->get('/source/index.html' => {prefix=>'source'} => $static_cb );
-        $r->get('/source/class/(*b)' => {prefix=>'source'} => $static_cb );
-        $r->get('/source/resource/(*b)' => {prefix=>'source'} => $static_cb );
-        $r->get('/source/script/(*b)' => {prefix=>'source'} => $static_cb );
-        $r->get($root.'(*file)' => {prefix => 'source', file => 'index.html' } => $static_cb);
+        $r->get('/source/class/*b' => {prefix=>'source'} => $static_cb );
+        $r->get('/source/resource/*b' => {prefix=>'source'} => $static_cb );
+        $r->get('/source/script/*b' => {prefix=>'source'} => $static_cb );
+        $r->get($root.'*file' => {prefix => 'source', file => 'index.html' } => $static_cb);
     }
     else {
         # redirect root to index.html

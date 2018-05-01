@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2018-03-05'; # DATE
-our $VERSION = '1.811'; # VERSION
+our $DATE = '2018-05-01'; # DATE
+our $VERSION = '1.812'; # VERSION
 
 use 5.010001;
 use strict;
@@ -116,16 +116,17 @@ has default_dry_run => (
     default => 0,
 );
 
-# role: requires 'hook_after_get_meta'
-# role: requires 'hook_format_row'
 # role: requires 'default_prompt_template'
 
 # role: requires 'hook_before_run'
+# role: requires 'hook_before_parse_argv'
 # role: requires 'hook_before_read_config_file'
 # role: requires 'hook_config_file_section'
 # role: requires 'hook_after_read_config_file'
+# role: requires 'hook_after_get_meta'
 # role: requires 'hook_after_parse_argv'
 # role: requires 'hook_before_action'
+# role: requires 'hook_format_row' (for action=call)
 # role: requires 'hook_after_action'
 # role: requires 'hook_format_result'
 # role: requires 'hook_display_result'
@@ -701,6 +702,11 @@ sub _read_config {
     $r->{config} = $res->[2];
     $r->{read_config_files} = $res->[3]{'func.read_files'};
     $r->{_config_section_read_order} = $res->[3]{'func.section_read_order'}; # we currently don't want to publish this request key
+
+    if ($ENV{LOG_DUMP_CONFIG}) {
+        log_trace "config: %s", $r->{config};
+        log_trace "read_config_files: %s", $r->{read_config_files};
+    }
 }
 
 sub __min(@) {
@@ -1514,6 +1520,9 @@ sub run {
         log_trace("[pericmd] Running hook_before_run ...");
         $self->hook_before_run($r);
 
+        log_trace("[pericmd] Running hook_before_parse_argv ...");
+        $self->hook_before_parse_argv($r);
+
         my $parse_res = $self->parse_argv($r);
         if ($parse_res->[0] == 501) {
             # we'll need to send ARGV to the server, because it's impossible to
@@ -1667,7 +1676,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.811 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-03-05.
+This document describes version 1.812 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-01.
 
 =head1 DESCRIPTION
 
@@ -2564,41 +2573,50 @@ implement this.
 
 =head1 ENVIRONMENT
 
-=head2 VIEW_RESULT => bool
+=head2 BROWSER
 
-Can be set to 1 to force using viewer to view result. Can be set to 0 to
-explicitly disable using viewer to view result even though
-C<cmdline.view_result> result metadata attribute is active.
+String. When L</"VIEWER"> is not set, then this environment variable will be
+used to select external viewer program.
 
-=head2 VIEWER => str
+=head2 LOG_DUMP_CONFIG
 
-Can be set to select the viewer program to override C<cmdline.viewer>. Can also
-be set to C<''> or C<0> to explicitly disable using viewer to view result even
-though C<cmdline.view_result> result metadata attribute is active.
+Boolean. If set to true, will dump parsed configuration at the trace level.
 
-=head2 PAGE_RESULT => bool
+=head2 PAGE_RESULT
 
-Can be set to 1 to force paging of result. Can be set to 0 to explicitly disable
-paging even though C<cmd.page_result> result metadata attribute is active.
+Boolean. Can be set to 1 to force paging of result. Can be set to 0 to
+explicitly disable paging even though C<cmd.page_result> result metadata
+attribute is active.
 
-=head2 PAGER => str
+See also: L</"PAGER">.
 
-Like in other programs, can be set to select the pager program (when
+=head2 PAGER
+
+String. Like in other programs, can be set to select the pager program (when
 C<cmdline.page_result> result metadata is active). Can also be set to C<''> or
 C<0> to explicitly disable paging even though C<cmd.page_result> result metadata
 is active.
 
-=head2 BROWSER => str
+=head2 PERINCI_CMDLINE_DUMP
 
-When VIEWER is not set, then this environment variable will be used to select
-external viewer program.
+String. Default undef. If set to a true value, will dump Perinci::CmdLine
+object at the start of run() and exit. Useful to get object's attributes and
+reconstruct the object later. Used in, e.g. L<App::shcompgen> to generate an
+appropriate completion script for the CLI, or L<Pod::Weaver::Plugin::Rinci> to
+generate POD documentation about the script. See also L<Perinci::CmdLine::Dump>.
 
-=head2 PERINCI_CMDLINE_OUTPUT_DIR => dirname
+The value of the this variable will be used as the label in the dump delimiter,
+.e.g:
 
-(Experimental) If set, then aside from displaying output as usual, the
-unformatted result (enveloped result) will also be saved as JSON to an output
-directory. The filename will be I<UTC timestamp in ISO8601 format>C<.out>,
-e.g.:
+ # BEGIN DUMP foo
+ ...
+ # END DUMP foo
+
+=head2 PERINCI_CMDLINE_OUTPUT_DIR
+
+String. If set, then aside from displaying output as usual, the unformatted
+result (enveloped result) will also be saved as JSON to an output directory. The
+filename will be I<UTC timestamp in ISO8601 format>C<.out>, e.g.:
 
  2017-12-11T123456.000000000Z.out
  2017-12-11T123456.000000000Z.out.1 (if the same filename already exists)
@@ -2616,15 +2634,27 @@ Streaming output will not be saved appropriately, because streaming output
 contains coderef that will be called repeatedly during the normal displaying of
 result.
 
-=head2 PERINCI_CMDLINE_PROGRAM_NAME => str
+=head2 PERINCI_CMDLINE_PROGRAM_NAME
 
-Can be used to set CLI program name.
+String. Can be used to set CLI program name.
 
-=head2 UTF8 => bool
+=head2 UTF8
 
-To set default for C<use_utf8> attribute.
+Boolean. To set default for C<use_utf8> attribute.
 
-=
+=head2 VIEW_RESULT
+
+Boolean. Can be set to 1 to force using viewer to view result. Can be set to 0
+to explicitly disable using viewer to view result even though
+C<cmdline.view_result> result metadata attribute is active.
+
+=head2 VIEWER
+
+String. Can be set to select the viewer program to override C<cmdline.viewer>.
+Can also be set to C<''> or C<0> to explicitly disable using viewer to view
+result even though C<cmdline.view_result> result metadata attribute is active.
+
+See also L</"BROWSER">.
 
 =head1 HOMEPAGE
 

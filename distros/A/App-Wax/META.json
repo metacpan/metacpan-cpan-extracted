@@ -1,0 +1,62 @@
+{
+   "abstract" : "webify your CLI",
+   "author" : [
+      "chocolateboy <chocolate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Wax",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : "0.64",
+            "Test::TinyMocker" : "0.03"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "File::BaseDir" : "0.07",
+            "File::Slurper" : "0.012",
+            "IPC::System::Simple" : "1.25",
+            "LWP" : "6.31",
+            "MIME::Types" : "2.17",
+            "Method::Signatures::Simple" : "1.07",
+            "Mouse" : "v2.5.2",
+            "Parallel::parallel_map" : "0.02",
+            "Try::Tiny" : "0.30",
+            "URI" : "1.73",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chocolateboy/App-Wax/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/chocolateboy/App-Wax"
+      }
+   },
+   "version" : "v2.2.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

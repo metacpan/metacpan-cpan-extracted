@@ -56,6 +56,8 @@ or
 so that you can say ’cdheute’ on the command line and your working
 directory will be changed to the choosen directory.
 
+Version v0.9.9
+
 Copyright (c) 2009 Mathias Weidner (mathias@weidner.in-bad-schmiedeberg.de).
 All rights reserved.
 

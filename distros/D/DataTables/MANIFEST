@@ -2,7 +2,9 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/DataTables.t
+t/00-load-DataTables.t
+t/01-data-tests-sqlite.t
+t/db/datatables_demo_data.sqlite
 lib/DataTables.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

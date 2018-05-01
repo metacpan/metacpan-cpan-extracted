@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Mafft;
 # ABSTRACT: Bio::MUST driver for running the MAFFT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::Mafft::VERSION = '0.180770';
+$Bio::MUST::Drivers::Mafft::VERSION = '0.181160';
 use Moose;
 use namespace::autoclean;
 
@@ -96,7 +96,7 @@ Bio::MUST::Drivers::Mafft - Bio::MUST driver for running the MAFFT program
 
 =head1 VERSION
 
-version 0.180770
+version 0.181160
 
 =head1 SYNOPSIS
 

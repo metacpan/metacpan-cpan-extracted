@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# $Id: pod2html 237 2007-01-17 19:46:26Z brian $
 
 =head1 NAME
 
@@ -28,7 +27,7 @@ some stuff.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, brian d foy, All Rights Reserved.
+Copyright © 2007-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

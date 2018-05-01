@@ -1,0 +1,55 @@
+{
+   "abstract" : "A base view to create custom JSON Views",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-View-Base-JSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.90100",
+            "HTTP::Status" : "0",
+            "JSON::MaybeXS" : "1.003005",
+            "Moo" : "2.000001",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "5.90100",
+            "JSON::MaybeXS" : "1.003005",
+            "Moo" : "2.000001",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Catalyst-View-Base-JSON/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/Catalyst-View-Base-JSON",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Catalyst-View-Base-JSON",
+         "web" : "https://github.com/jjn1056/Catalyst-View-Base-JSON"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

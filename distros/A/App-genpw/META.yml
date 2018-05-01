@@ -1,5 +1,5 @@
 ---
-abstract: 'Generate random password'
+abstract: 'Generate random password (support patterns + wordlists)'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -22,7 +22,8 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0'
   List::Util: '1.45'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.80'
+  Perinci::CmdLine::Base: '1.810'
+  Perinci::CmdLine::Classic: '1.770'
   Random::Any: '0.003'
   Sah::Schema::posint: '0'
   perl: '5.010001'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-genpw
   homepage: https://metacpan.org/release/App-genpw
   repository: git://github.com/perlancar/perl-App-genpw.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

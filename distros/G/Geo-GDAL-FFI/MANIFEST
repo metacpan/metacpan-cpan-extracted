@@ -6,6 +6,17 @@ Makefile.PL
 build-tools/README
 build-tools/parse_h.pl
 lib/Geo/GDAL/FFI.pm
+lib/Geo/GDAL/FFI/Band.pm
+lib/Geo/GDAL/FFI/Dataset.pm
+lib/Geo/GDAL/FFI/Driver.pm
+lib/Geo/GDAL/FFI/FeatureDefn.pm
+lib/Geo/GDAL/FFI/Feature.pm
+lib/Geo/GDAL/FFI/FieldDefn.pm
+lib/Geo/GDAL/FFI/Geometry.pm
+lib/Geo/GDAL/FFI/GeomFieldDefn.pm
+lib/Geo/GDAL/FFI/Layer.pm
+lib/Geo/GDAL/FFI/Object.pm
+lib/Geo/GDAL/FFI/SpatialReference.pm
 t/00.t
 t/geometry.t
 t/pdl.t

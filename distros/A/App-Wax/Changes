@@ -1,5 +1,12 @@
 Revision history for Perl extension App::Wax.
 
+2.2.0 - Fri 27 Apr 14:51:00 2018
+
+    - the version of the command (wax) is now separate from that
+      of its library (App::Wax). this means breaking changes in the
+      latter no longer trigger major SemVer bumps in the former
+    - log messages now display the index of the URL they apply to
+
 2.1.0 Thu 15 Mar 23:18:36 2018
 
     - update metadata to reflect updated dependencies in the build file

@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.7');
+our $VERSION = version->new('0.6.8');
 
 requires 'repos';
 requires 'verbose';
@@ -33,7 +33,10 @@ sub tag_list_start {
     my ($conf) = $self->conf;
     my $out = '';
 
+    local $ARGV;
     $opt->process;
+
+    return if $opt->opt->verbose;
 
     # repository server generated tags aren't available until repos is called
     # so we call it here.
@@ -53,7 +56,20 @@ sub tag_list_start {
 }
 
 sub tag_list {
-    return;
+    my ($self, $name) = @_;
+    my ($conf) = $self->conf;
+    return unless -d $name;
+
+    return if ! $opt->opt->verbose;
+
+    my $out = '';
+    for my $tag (sort keys %{ $conf->{tags} }) {
+        if ( grep {/^$name$/} @{ $conf->{tags}{$tag} } ) {
+            $out .= "  $tag\n";
+        }
+    }
+
+    return $out;
 }
 
 1;
@@ -66,7 +82,7 @@ Group::Git::Cmd::TagList - Runs git status on a git project
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::TagList version 0.6.7.
+This documentation refers to Group::Git::Cmd::TagList version 0.6.8.
 
 =head1 SYNOPSIS
 

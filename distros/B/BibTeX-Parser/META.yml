@@ -23,4 +23,4 @@ requires:
   IO::String: 0
   LaTeX::ToUnicode: 0.02
   Test::More: 0
-version: 1.01
+version: 1.02

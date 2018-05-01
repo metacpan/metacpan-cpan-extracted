@@ -1,12 +1,13 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.43'; # VERSION
+our $DATE = '2018-04-26'; # DATE
+our $VERSION = '0.441'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
 use Exporter qw(import);
 our @EXPORT_OK = qw(
                        upload_file
@@ -281,16 +282,7 @@ sub upload_files {
                 $res = _htres2envres($httpres);
                 last;
             }
-            if ($httpres->content !~ m!<h3>Submitting query</h3>\s*<p>(.+?)</p>!s) {
-                $res = [543, "Can't scrape upload status from response", $httpres->content];
-                last;
-            }
-            my $str = $1;
-            if ($str =~ /Query succeeded/) {
-                $res = [200, "OK", undef, {"func.raw_status" => $str}];
-            } else {
-                $res = [500, "Failed: $str"];
-            }
+            $res = [200, "OK"];
         }
         $res->[3] //= {};
         $res->[3]{item_id} = $file;
@@ -355,20 +347,22 @@ sub list_files {
     return _htres2envres($httpres) unless $httpres->is_success;
     return [543, "Can't scrape list of files from response",
             $httpres->content]
-        unless $httpres->content =~ m!<h3>Files in directory.+</h3><pre>(.+)</pre>!s;
+        unless $httpres->content =~ m!<h3>Files in directory.+<tbody[^>]*>(.+)</tbody>!s;
     my $str = $1;
     my @files;
   REC:
-    while ($str =~ m!(?:\A |<br/> )(.+?)\s+(\d+)\s+(Scheduled for deletion \(due at )?(\w+, \d\d \w+ \d{4} \d\d:\d\d:\d\d GMT)!g) {
-
-        my $time = Date::Parse::str2time($4, "UTC");
-
+    while ($str =~ m!<td class="file">(.+?)</td>\s+<td class="size">(.+?)</td>\s+<td class="modified">(.+?)</td>!gs) {
         my $rec = {
-            name  => $1,
-            size  => $2,
-            is_scheduled_for_deletion => $3 ? 1:0,
+            name => $1,
+            size => $2,
         };
-        if ($3) {
+        my $time0 = $3;
+        if ($time0 =~ s/^Scheduled for deletion \(due at //) {
+            $rec->{is_scheduled_for_deletion} = 1;
+            $time0 =~ s/\)$//;
+        }
+        my $time = Date::Parse::str2time($time0, "UTC");
+        if ($rec->{is_scheduled_for_deletion}) {
             $rec->{deletion_time} = $time;
         } else {
             $rec->{mtime} = $time;
@@ -400,7 +394,7 @@ sub list_files {
         $resmeta{'table.fields'} =
             [qw/name size mtime is_scheduled_for_deletion deletion_time/];
         $resmeta{'table.field_formats'} =
-            [undef, undef, 'iso8601_datetime', undef, 'iso8601_date'];
+            [undef, undef, 'iso8601_datetime', undef, 'iso8601_datetime'];
     }
     [200, "OK", \@files, \%resmeta];
 }
@@ -651,11 +645,23 @@ sub _delete_or_undelete_or_reindex_files {
         log_info("%s %s ...", $which, \@files);
     }
 
+    my $action;
+    if ($which eq 'delete') {
+        $action = 'delete_files';
+    } elsif ($which eq 'undelete') {
+        $action = 'delete_files';
+    } elsif ($which eq 'reindex') {
+        $action = 'reindex';
+    } else {
+        die "BUG: undefined action";
+    }
+
     my $httpres = _request(
         note => "$which files",
         %args,
         post_data => [
             [
+                ACTION => $action,
                 HIDDENNAME                => $args{username},
                 ($which eq 'delete'   ? (SUBMIT_pause99_delete_files_delete   => "Delete"  ) : ()),
                 ($which eq 'undelete' ? (SUBMIT_pause99_delete_files_undelete => "Undelete") : ()),
@@ -666,8 +672,6 @@ sub _delete_or_undelete_or_reindex_files {
         ],
     );
     return _htres2envres($httpres) unless $httpres->is_success;
-    return [543, "Can't scrape $which status from response", $httpres->content]
-        unless $httpres->content =~ m!<h3>Files in directory!s;
     [200,"OK", undef, {'func.files'=>\@files}];
 }
 
@@ -804,15 +808,15 @@ sub list_modules {
     goto NO_MODS if $httpres->content =~ /No records found/;
     return [543, "Can't scrape list of modules from response",
             $httpres->content]
-        unless $httpres->content =~ m!<tr><td><b>module</b></td>.+?</tr>(.+?)</table>!s;
+        unless $httpres->content =~ m!<th[^>]*>module</th>.+?<tbody[^>]*>(.+?)</tbody>!s;
     my $str = $1;
 
   REC:
-    while ($str =~ m!<tr>
-                     <td><a[^>]+>(.+?)</a></td>\s*
-                     <td><a[^>]+>(.+?)</a></td>\s*
-                     <td>(.+?)</td>\s*
-                     <td>(.*?)</td>\s*
+    while ($str =~ m!<tr>\s*
+                     <td\sclass="module"><a[^>]+>(.+?)</a></td>\s*
+                     <td\sclass="userid"><a[^>]+>(.+?)</a></td>\s*
+                     <td\sclass="type">(.+?)</td>\s*
+                     <td\sclass="owner">(.*?)</td>\s*
                      </tr>!gsx) {
         my $rec = {module=>$1, userid=>$2, type=>$3, owner=>$4};
 
@@ -863,7 +867,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.43 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2017-07-03.
+This document describes version 0.441 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2018-04-26.
 
 =head1 SYNOPSIS
 
@@ -1480,7 +1484,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

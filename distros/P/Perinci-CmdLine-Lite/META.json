@@ -104,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.811",
+   "version" : "1.812",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

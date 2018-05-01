@@ -1,0 +1,16 @@
+---
+abstract: 'continuous delivery workflow dockerhub, gitlab, and cpan'
+author:
+  - 'Joenio Marques da Costa <joenio@joenio.me>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: continuous-delivery-template
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.73'

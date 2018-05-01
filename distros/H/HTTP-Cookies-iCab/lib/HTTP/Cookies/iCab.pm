@@ -27,13 +27,9 @@ See L<HTTP::Cookies>.
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in CVS, as well as all of the previous releases.
+This is an abandoned module. The source might still be at:
 
-	http://sourceforge.net/projects/brian-d-foy/
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/CPAN-Adoptable-Modules/http-cookies-icab
 
 =head1 AUTHOR
 
@@ -41,10 +37,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2003-2011 brian d foy.  All rights reserved.
+Copyright © 2003-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 
@@ -58,7 +54,7 @@ use constant TRUE   => 'TRUE';
 use constant FALSE  => 'FALSE';
 use constant OFFSET => 2_082_823_200;
 
-$VERSION = '1.131';
+$VERSION = '1.132';
 
 my $Debug = $ENV{DEBUG} || 0;
 
@@ -156,8 +152,8 @@ sub save
 			my $bool = $domain =~ /^\./ ? TRUE : FALSE;
 
 			print $fh 'Date', pack( 'N', time + OFFSET ),
-				      'Cook', 
-				      pack( 'N', length $key    ), $key, 
+				      'Cook',
+				      pack( 'N', length $key    ), $key,
 				      pack( 'N', length $path   ), $path,
 				      pack( 'N', length $domain ), $domain,
 				      pack( 'N', length $val    ), $val,

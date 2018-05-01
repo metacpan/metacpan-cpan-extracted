@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.180770';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.181160';
 use Moose::Role;
 
 use autodie;
@@ -144,7 +144,7 @@ sub blastdbcmd {
     my $args_str = stringify_args($args);
 
     # create blastdbcmd command
-    my $pgm = 'blastdbcmd';
+    my $pgm = file($ENV{BMD_BLAST_BINDIR}, 'blastdbcmd');
     my $cmd = join q{ }, $pgm, $args_str;
     ### $cmd
 
@@ -171,7 +171,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.180770
+version 0.181160
 
 =head1 SYNOPSIS
 

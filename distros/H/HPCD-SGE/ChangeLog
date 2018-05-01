@@ -1,3 +1,7 @@
+0.56 - force retry after "Rscript: command not found", which is happening
+       randomly for some unknown reason
+     - added another out of memory test
+
 0.55 - always use qacct status info as to augment drmaa status info
        the drmaa status info doesn't return everything, especially 'host'
 

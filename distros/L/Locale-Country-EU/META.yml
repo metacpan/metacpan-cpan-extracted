@@ -1,0 +1,26 @@
+---
+abstract: 'Module to check if a country is in the European Union ( EU ) using various ISO data formats'
+author:
+  - 'Matthew Green <matt@mattsizzle.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Country-EU
+requires:
+  Carp: '0'
+  Data::Util: '0'
+  Exporter: '0'
+  perl: '5.016003'
+resources:
+  repository: https://github.com/mgreen86/Locale-Country-EU
+version: '0.002'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.69'

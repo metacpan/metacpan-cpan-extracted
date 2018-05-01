@@ -1,15 +1,13 @@
 package App::cpm::Master;
 use strict;
 use warnings;
-use utf8;
+
 use App::cpm::CircularDependency;
 use App::cpm::Distribution;
 use App::cpm::Job;
 use App::cpm::Logger;
-use Module::Metadata;
 use IO::Handle;
-use version;
-our $VERSION = '0.971';
+use Module::Metadata;
 
 sub new {
     my ($class, %option) = @_;

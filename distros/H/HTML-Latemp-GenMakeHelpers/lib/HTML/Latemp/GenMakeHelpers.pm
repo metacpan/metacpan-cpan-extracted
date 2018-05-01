@@ -1,12 +1,12 @@
 package HTML::Latemp::GenMakeHelpers;
-$HTML::Latemp::GenMakeHelpers::VERSION = 'v0.5.3';
+$HTML::Latemp::GenMakeHelpers::VERSION = 'v0.6.1';
 use strict;
 use warnings;
 
 use 5.008;
 
 package HTML::Latemp::GenMakeHelpers::Base;
-$HTML::Latemp::GenMakeHelpers::Base::VERSION = 'v0.5.3';
+$HTML::Latemp::GenMakeHelpers::Base::VERSION = 'v0.6.1';
 sub new
 {
     my $class = shift;
@@ -17,7 +17,7 @@ sub new
 }
 
 package HTML::Latemp::GenMakeHelpers::HostEntry;
-$HTML::Latemp::GenMakeHelpers::HostEntry::VERSION = 'v0.5.3';
+$HTML::Latemp::GenMakeHelpers::HostEntry::VERSION = 'v0.6.1';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 
 use Class::XSAccessor accessors => {'dest_dir' => 'dest_dir', 'id' => 'id', 'source_dir' => 'source_dir',};
@@ -33,11 +33,11 @@ sub initialize
 }
 
 package HTML::Latemp::GenMakeHelpers::Error;
-$HTML::Latemp::GenMakeHelpers::Error::VERSION = 'v0.5.3';
+$HTML::Latemp::GenMakeHelpers::Error::VERSION = 'v0.6.1';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 
 package HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile;
-$HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile::VERSION = 'v0.5.3';
+$HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile::VERSION = 'v0.6.1';
 our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Error));
 
 use Class::XSAccessor accessors => {'file' => 'file', 'host' => 'host',};
@@ -61,7 +61,7 @@ our @ISA=(qw(HTML::Latemp::GenMakeHelpers::Base));
 use File::Find::Rule;
 use File::Basename;
 
-use Class::XSAccessor accessors => {'_common_buckets' => '_common_buckets', '_base_dir' => 'base_dir', '_filename_lists_post_filter' => '_filename_lists_post_filter', 'hosts' => 'hosts', '_hosts_id_map' => 'hosts_id_map',};
+use Class::XSAccessor accessors => {'_common_buckets' => '_common_buckets', '_base_dir' => 'base_dir', '_filename_lists_post_filter' => '_filename_lists_post_filter', 'hosts' => 'hosts', '_hosts_id_map' => 'hosts_id_map', '_out_dir' => '_out_dir',};
 
 
 sub initialize
@@ -88,8 +88,18 @@ sub initialize
         );
     $self->_hosts_id_map(+{ map { $_->{'id'} => $_ } @{$self->hosts()}});
     $self->_common_buckets({});
+    $self->_out_dir($args{'out_dir'});
 
     return;
+}
+
+sub _calc_out_path
+{
+    my ($self, $bn) = @_;
+
+    my $out_dir = $self->_out_dir;
+
+    return $out_dir ? File::Spec->catfile($out_dir, $bn) : $bn;
 }
 
 sub process_all
@@ -99,8 +109,8 @@ sub process_all
 
     my @hosts = @{$self->hosts()};
 
-    open my $file_lists_fh, ">", "include.mak";
-    open my $rules_fh, ">", "rules.mak";
+    open my $file_lists_fh, ">", $self->_calc_out_path("include.mak");
+    open my $rules_fh, ">", $self->_calc_out_path("rules.mak");
 
     print {$rules_fh} "COMMON_SRC_DIR = " . $self->_hosts_id_map()->{'common'}->{'source_dir'} . "\n\n";
 
@@ -427,7 +437,7 @@ HTML::Latemp::GenMakeHelpers - A Latemp Utility Module.
 
 =head1 VERSION
 
-version v0.5.3
+version v0.6.1
 
 =head1 SYNOPSIS
 
@@ -474,6 +484,9 @@ An example for it is:
 
 (This parameter was added in version 0.5.0 of this module.)
 
+An optional parameter is C<'out_dir'> which is the path to the output directory
+of the *.mak files. By default, they get output locally. It was added in version v0.6.1.
+
 =head2 $generator->process_all()
 
 Process all hosts.
@@ -482,7 +495,7 @@ Process all hosts.
 
 =head2 initialize()
 
-Called by the constructor to initialize the object. Can be sub-classes by
+Called by the constructor to initialize the object. Can be sub-classed by
 derived classes.
 
 =head2 $generator->hosts()

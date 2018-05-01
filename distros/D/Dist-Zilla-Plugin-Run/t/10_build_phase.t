@@ -22,10 +22,10 @@ sub test_build {
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
                     [ MetaConfig => ],
-                    [ 'Run::BeforeBuild' => { run => [ '"%x" script%pbefore_build.pl' ] } ],
+                    [ 'Run::BeforeBuild' => { run => [ '"%x" %o%pscript%pbefore_build.pl "%o"' ] } ],
                     [ 'Run::AfterBuild' => {
-                        run => [ '"%x" script%pafter_build.pl "%s"' ],
-                        run_no_trial => [ '"%x" script%pno_trial.pl "%s"' ],
+                        run => [ '"%x" %d%pscript%pafter_build.pl "%s"' ],
+                        run_no_trial => [ '"%x" %d%pscript%pno_trial.pl "%s"' ],
                       }
                     ],
                 ),
@@ -34,7 +34,7 @@ sub test_build {
 use strict;
 use warnings;
 use Path::Tiny;
-path("BEFORE_BUILD.txt")->touch();
+path($ARGV[ 0 ], "BEFORE_BUILD.txt")->touch();
 SCRIPT
                 path(qw(source script after_build.pl)) => <<'SCRIPT',
 use strict;
@@ -55,27 +55,28 @@ SCRIPT
     $tzil->chrome->logger->set_debug(1);
     $tzil->build;
 
-    my $before_build_result = path($tzil->tempdir, qw(source BEFORE_BUILD.txt));
+    my $source_dir = path($tzil->tempdir)->child('source');
+    my $build_dir = path($tzil->tempdir)->child('build');
 
+    my $before_build_result = $source_dir->child('BEFORE_BUILD.txt');
     ok(-f $before_build_result, 'before-build script has been run');
 
-    my $after_build_result  = path($tzil->tempdir)->child(qw(build lib AFTER_BUILD.txt))->slurp_raw;
-
+    my $after_build_result = $build_dir->child(qw(lib AFTER_BUILD.txt))->slurp_raw;
     ok($after_build_result eq 'after_build', 'Correct `after_build` result');
 
-    my $no_trial_file = path($tzil->tempdir, qw(build lib NO_TRIAL.txt));
+    my $no_trial_file = $build_dir->child(qw(lib NO_TRIAL.txt));
     if( $test{trial} ){
         ok( (! -e $no_trial_file), 'is trial - file not written' );
 
         like $tzil->log_messages->[-1],
-            qr{\[Run::AfterBuild\] not executing, because trial: "%x" script%pno_trial.pl "%s"},
+            qr{\[Run::AfterBuild\] not executing, because trial: "%x" %d%pscript%pno_trial.pl "%s"},
             'logged skipping of non-trial command';
     }
     else {
         ok( (  -f $no_trial_file), 'non-trial - file present' );
         is $no_trial_file->slurp_raw, ':-P', 'non-trial content';
 
-        my $script = path('script','no_trial.pl')->canonpath;   # use OS-specific path separators
+        my $script = $build_dir->child('script','no_trial.pl')->canonpath;   # use OS-specific path separators
         like $tzil->log_messages->[-2],
             qr{\[Run::AfterBuild\] executing: .+ \Q$script\E .+},
             'logged execution';
@@ -94,7 +95,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::BeforeBuild',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%pbefore_build.pl' ],
+                                run => [ '"%x" %o%pscript%pbefore_build.pl "%o"' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,
@@ -107,8 +108,8 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::AfterBuild',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%pafter_build.pl "%s"' ],
-                                run_no_trial => [ '"%x" script%pno_trial.pl "%s"' ],
+                                run => [ '"%x" %d%pscript%pafter_build.pl "%s"' ],
+                                run_no_trial => [ '"%x" %d%pscript%pno_trial.pl "%s"' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,

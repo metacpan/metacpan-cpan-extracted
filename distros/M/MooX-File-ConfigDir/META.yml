@@ -27,6 +27,6 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-File-ConfigDir
   homepage: https://metacpan.org/release/MooX-File-ConfigDir
   license: http://dev.perl.org/licenses/
-  repository: https://github.com:perl5-utils/MooX-File-ConfigDir.git
-version: '0.006'
+  repository: https://github.com/perl5-utils/MooX-File-ConfigDir.git
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

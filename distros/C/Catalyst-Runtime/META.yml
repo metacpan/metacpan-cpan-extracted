@@ -1,17 +1,16 @@
 ---
-abstract: unknown
+abstract: 'The Catalyst Framework Runtime'
 author:
-  - unknown
+  - 'Sebastian Riedel <sri@cpan.org>'
 build_requires:
   HTTP::Request::Common: '0'
   HTTP::Status: '0'
-  IO::Scalar: '0'
   Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,13 +19,12 @@ name: Catalyst-Runtime
 no_index:
   directory:
     - t
-    - inc
+    - xt
 requires:
   CGI::Simple::Cookie: '1.109'
   CGI::Struct: '0'
   Carp: '1.25'
   Class::C3::Adopt::NEXT: '0.07'
-  Class::Data::Inheritable: '0'
   Class::Load: '0.12'
   Data::Dump: '0'
   Data::OptList: '0'
@@ -37,7 +35,6 @@ requires:
   HTTP::Body: '1.22'
   HTTP::Headers: '1.64'
   HTTP::Request: '5.814'
-  HTTP::Request::AsCGI: '1.0'
   HTTP::Response: '5.813'
   Hash::MultiValue: '0'
   JSON::MaybeXS: '1.000000'
@@ -75,12 +72,46 @@ requires:
   Text::SimpleTable: '0.03'
   Time::HiRes: '0'
   Tree::Simple: '1.15'
-  Tree::Simple::Visitor::FindByPath: '0'
+  Tree::Simple::Visitor::FindByUID: '0'
   Try::Tiny: '0.17'
   URI: '1.65'
   URI::ws: '0.03'
-  namespace::autoclean: '0.28'
   namespace::clean: '0.23'
   perl: '5.008003'
-version: '5.90117'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+resources:
+  IRC: irc://irc.perl.org/#catalyst
+  MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Runtime
+  homepage: http://dev.catalyst.perl.org/
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git
+version: '5.90118'
+x_authority: cpan:MSTROUT
+x_breaks:
+  Catalyst::Action::REST: '<= 0.67'
+  Catalyst::Action::RenderView: '<= 0.07'
+  Catalyst::Authentication::Credential::HTTP: '<= 1.009'
+  Catalyst::Component::ACCEPT_CONTEXT: '<= 0.06'
+  Catalyst::Controller::AllowDisable: '<= 0.03'
+  Catalyst::Devel: '<= 1.19'
+  Catalyst::Model::Akismet: '<= 0.02'
+  Catalyst::Plugin::Authentication: '<= 0.100091'
+  Catalyst::Plugin::ConfigLoader: '<= 0.22'
+  Catalyst::Plugin::DebugCookie: '<= 0.999002'
+  Catalyst::Plugin::ENV: 0
+  Catalyst::Plugin::HashedCookies: '<= 1.03'
+  Catalyst::Plugin::Session: '<= 0.21'
+  Catalyst::Plugin::Session::State::Cookie: '<= 0.10'
+  Catalyst::Plugin::Session::Store::FastMmap: '<= 0.09'
+  Catalyst::Plugin::Session::Store::File: '<= 0.16'
+  Catalyst::Plugin::SmartURI: '<= 0.032'
+  Catalyst::Plugin::SubRequest: '<= 0.14'
+  Catalyst::Plugin::Unicode::Encoding: '<= 0.2'
+  Catalyst::Plugin::Upload::Image::Magick: '<= 0.03'
+  Catalyst::View::Mason: '<= 0.17'
+  CatalystX::CRUD: '<= 0.42'
+  CatalystX::CRUD::Model::RDBO: '<= 0.20'
+  CatalystX::Imports: '<= 0.03'
+  Reaction: '<= 0.001999'
+  Test::WWW::Mechanize::Catalyst: '<= 0.53'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

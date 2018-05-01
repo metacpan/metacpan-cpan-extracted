@@ -7,14 +7,14 @@ use Scalar::Util ();
 use constant DEBUG => $ENV{MOJO_SNMP_DEBUG} ? 1 : 0;
 use constant MAXREPETITIONS => 10;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $DISPATCHER;
-my @EXCLUDE_METHOD_ARGS = qw( maxrepetitions );
+my @EXCLUDE_METHOD_ARGS = qw(maxrepetitions);
 my %EXCLUDE             = (
-  v1  => [qw( username authkey authpassword authprotocol privkey privpassword privprotocol )],
-  v2c => [qw( username authkey authpassword authprotocol privkey privpassword privprotocol )],
-  v3  => [qw( community )],
+  v1  => [qw(username authkey authpassword authprotocol privkey privpassword privprotocol)],
+  v2c => [qw(username authkey authpassword authprotocol privkey privpassword privprotocol)],
+  v3  => [qw(community)],
 );
 
 my %SNMP_METHOD;
@@ -97,10 +97,10 @@ sub wait {
   $self;
 }
 
-for my $method (qw( get get_bulk get_next set walk bulk_walk )) {
+for my $method (qw(get get_bulk get_next set walk bulk_walk)) {
   eval <<"HERE" or die $@;
     sub $method {
-      my(\$self, \$host) = (shift, shift);
+      my (\$self, \$host) = (shift, shift);
       my \$args = ref \$_[0] eq 'HASH' ? shift : {};
       \$self->prepare(\$host, \$args, $method => \@_);
     }
@@ -109,7 +109,7 @@ HERE
 }
 
 sub _calculate_pool_key {
-  join '|', map { defined $_[1]->{$_} ? $_[1]->{$_} : '' } qw( hostname version community username );
+  join '|', map { defined $_[1]->{$_} ? $_[1]->{$_} : '' } qw(hostname version community username);
 }
 
 sub _dequeue {
@@ -150,7 +150,7 @@ sub _prepare_request {
   my $session = $self->{sessions}{$key};
   my ($error, $success);
 
-  # dispatch to our mojo based dispatcher
+  # Dispatch to our mojo based dispatcher
   $Net::SNMP::DISPATCHER = $self->_dispatcher;
 
   unless ($session->transport) {
@@ -177,22 +177,21 @@ sub _prepare_request {
       my $session = shift;
 
       eval {
-        local @$args{qw( method request )} = @$item[1, 2];
+        local @$args{qw(method request)} = @$item[1, 2];
         $self->{n_requests}--;
         if ($session->var_bind_list) {
           warn "[Mojo::SNMP] >>> success: $method $key @$list\n" if DEBUG;
-          return $self->$cb('', $session) if $cb;
-          return $self->emit(response => $session, $args);
+          $cb ? $self->$cb('', $session) : $self->emit(response => $session, $args);
         }
         else {
           warn "[Mojo::SNMP] >>> error: $method $key @{[$session->error]}\n" if DEBUG;
-          return $self->$cb($session->error, undef) if $cb;
-          return $self->emit(error => $session->error, $session, $args);
+          $cb ? $self->$cb($session->error, $session) : $self->emit(error => $session->error, $session, $args);
         }
         1;
       } or do {
         $self->emit(error => $@);
       };
+
       warn "[Mojo::SNMP] n_requests: $self->{n_requests}\n" if DEBUG;
       $self->_prepare_request($queue);
       warn "[Mojo::SNMP] n_requests: $self->{n_requests}\n" if DEBUG;
@@ -304,106 +303,88 @@ Mojo::SNMP - Run SNMP requests with Mojo::IOLoop
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 SYNOPSIS
+
+=head2 Using methods with callbacks
+
+  use Mojo::SNMP;
+  my $snmp = Mojo::SNMP->new;
+
+  $snmp->defaults({timeout => 3, community => "public"});
+
+  $snmp->get_next(["10.0.0.1", "10.0.0.2"], ["1.3.6.1.2.1.1.3.0"], sub {
+    my ($self, $err, $session) = @_;
+  });
+
+  $snmp->wait unless $snmp->ioloop->is_running;
+
+=head2 Using prepare
 
   use Mojo::SNMP;
   my $snmp = Mojo::SNMP->new;
   my @response;
 
   $snmp->on(response => sub {
-    my($snmp, $session, $args) = @_;
+    my ($snmp, $session, $args) = @_;
     warn "Got response from $args->{hostname} on $args->{method}(@{$args->{request}})...\n";
     push @response, $session->var_bind_list;
   });
 
   $snmp->defaults({
-    community => 'public', # v1, v2c
-    username => 'foo', # v3
-    version => 'v2c', # v1, v2c or v3
+    community => "public", # v1, v2c
+    username  => "foo", # v3
+    version   => "v2c", # v1, v2c or v3
   });
 
-  $snmp->prepare('127.0.0.1', get_next => ['1.3.6.1.2.1.1.3.0']);
-  $snmp->prepare('localhost', { version => 'v3' }, get => ['1.3.6.1.2.1.1.3.0']);
+  $snmp->prepare("127.0.0.1", get_next => ["1.3.6.1.2.1.1.3.0"]);
+  $snmp->prepare("localhost", {version => "v3"}, get => ["1.3.6.1.2.1.1.3.0"]);
 
   # start the IOLoop unless it is already running
   $snmp->wait unless $snmp->ioloop->is_running;
 
 =head1 DESCRIPTION
 
-You should use this module if you need to fetch data from many SNMP servers
-really fast. The module does its best to not get in your way, but rather
+L<Mojo::SNMP> is an async library for fetching or writing data from/to many
+SNMP agents. The module does its best to not get in your way, but rather
 provide a simple API which allow you to extract information from multiple
 servers at the same time.
 
-This module use L<Net::SNMP> and L<Mojo::IOLoop> to fetch data from hosts
-asynchronous. It does this by using a custom dispatcher,
+This module uses L<Net::SNMP> and L<Mojo::IOLoop> to fetch data from hosts
+asynchronously. It does this by using a custom dispatcher,
 L<Mojo::SNMP::Dispatcher>, which attach the sockets created by L<Net::SNMP>
 directly into the ioloop reactor.
 
 If you want greater speed, you should check out L<Net::SNMP::XS> and make sure
-L<Mojo::Reactor::EV> is able to load.
+L<Mojo::Reactor::EV> and L<EV> is installed.
 
 L<Mojo::SNMP> is supposed to be a replacement for a module I wrote earlier,
 called L<SNMP::Effective>. Reason for the rewrite is that I'm using the
 framework L<Mojolicious> which includes an awesome IO loop which allow me to
 do cool stuff inside my web server.
 
-=head1 CUSTOM SNMP REQUEST METHODS
-
-L<Net::SNMP> provide methods to retrieve data from the SNMP agent, such as
-L<get_next()|Net::SNMP/get_next>. It is possible to add custom methods if
-you find yourself doing the same complicated logic over and over again.
-Such methods can be added using L</add_custom_request_method>.
-
-There are two custom methods bundled to this package:
-
-=over 4
-
-=item * bulk_walk
-
-This method will run C<get_bulk_request> until it receives an oid which does
-not match the base OID. maxrepetitions is set to 10 by default, but could be
-overrided by maxrepetitions inside C<%args>.
-
-Example:
-
-  $self->prepare('192.168.0.1' => { maxrepetitions => 25 }, bulk_walk => [$oid, ...]);
-
-=item * walk
-
-This method will run C<get_next_request> until the next oid retrieved does
-not match the base OID or if the tree is exhausted.
-
-=back
-
 =head1 EVENTS
 
 =head2 error
 
-  $self->on(error => sub {
-    my($self, $str, $session, $args) = @_;
-  });
+  $self->on(error => sub { my ($self, $str, $session, $args) = @_; ... });
 
-Emitted on errors which may occur. C<$session> is set if the error is a result
-of a L<Net::SNMP> method, such as L<get_request()|Net::SNMP/get_request>.
+Emitted on errors which may occur. C<$session> is a L<Net::SNMP> object and is
+only available if the error is a result of a L<Net::SNMP> method, such as
+L<get_request()|Net::SNMP/get_request>.
 
 See L</response> for C<$args> description.
 
 =head2 finish
 
-  $self->on(finish => sub {
-    my $self = shift;
-  });
+  $self->on(finish => sub { my $self = shift; ... });
 
-Emitted when all hosts have completed.
+Emitted when all requests have completed.
 
 =head2 response
 
-  $self->on(response => sub {
-    my($self, $session, $args) = @_;
-  });
+  $self->on(response => sub { my ($self, $session, $args) = @_; ... });
 
 Called each time a host responds. The C<$session> is the current L<Net::SNMP>
 object. C<$args> is a hash ref with the arguments given to L</prepare>, with
@@ -412,25 +393,29 @@ some additional information:
   {
     method => $str, # get, get_next, ...
     request => [$oid, ...],
-    # ...
+    ...
   }
 
 =head2 timeout
 
-  $self->on(timeout => sub {
-    my $self = shift;
-  })
+  $self->on(timeout => sub { my $self = shift; ... })
 
-Emitted if L<wait> has been running for more than L</master_timeout> seconds.
+Emitted if L</wait> has been running for more than L</master_timeout> seconds.
 
 =head1 ATTRIBUTES
 
 =head2 concurrent
 
+  $self = $self->concurrent(20);
+  $int = $self->concurrent;
+
 How many hosts to fetch data from at once. Default is 20. (The default may
 change in later versions)
 
 =head2 defaults
+
+  $self = $self->defaults({community => "public"});
+  $hash_ref = $self->community;
 
 This attribute holds a hash ref with default arguments which will be passed
 on to L<Net::SNMP/session>. User-submitted C<%args> will be merged with the
@@ -441,10 +426,20 @@ NOTE: SNMP version will default to "v2c".
 
 =head2 master_timeout
 
+  $self = $self->master_timeout(15);
+  $int = $self->master_timeout;
+
 How long to run in total before timeout. Note: This is NOT per host but for
-the complete run. Default is 0, meaning run for as long as you have to.
+the complete run. Default is 0, which means that it will never time out.
+
+If you want to set a timeout per request request to a host, then this need
+to be set in L</defaults> or in C<$args> passed on to L</prepare> or one of
+the other request methods.
 
 =head2 ioloop
+
+  $self = $self->ioloop(Mojo::IOLoop->new);
+  $ioloop = $self->ioloop;
 
 Holds an instance of L<Mojo::IOLoop>.
 
@@ -452,55 +447,89 @@ Holds an instance of L<Mojo::IOLoop>.
 
 =head2 add_custom_request_method
 
-  $self->add_custom_request_method(name => sub {
-    my($session, %args) = @_;
+  Mojo::SNMP->add_custom_request_method(my_custom_method => sub {
+    my ($session, %args) = @_;
     # do custom stuff..
   });
 
-This method can be used to add custom L<Net::SNMP> request methods. See the
-source code for an example on how to do "walk".
+L<Net::SNMP> has defined basic methods to write/retrieve data from/to the SNMP
+agent. L</add_custom_request_method> allow you to add support for custom
+methods, which can be useful if you find yourself doing the same complicated
+logic over and over again. L</bulk_walk> and L</walk> are custom methods
+bundled with this module.
 
-NOTE: This method will also replace any method, meaning the code below will
-call the custom callback instead of L<Net::SNMP/get_next_request>.
+NOTE: This method will define the methods in a global scope, meaning the code
+below will call the custom callback instead of L<Net::SNMP/get_next_request>
+for all instances of L<Mojo::SNMP>:
 
-  $self->add_custom_request_method(get_next => $custom_callback);
+  $self->add_custom_request_method(get_next => sub { ... });
+
+=head2 bulk_walk
+
+  $self->bulk_walk($host, $args, \@oids, sub {
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
+  });
+
+This is a custom SNMP method added by L</add_custom_request_method>. See
+L</prepare> for generic information about the variables associated with this
+method.
+
+This method will run L<Net::SNMP/get_bulk_request> until it receives an OID
+which does not match the base OID. C<maxrepetitions> in C<$args> will default
+to 10, but could be overrided to potentially increase performance. Example:
+
+  $self->bulk_walk("192.168.0.1" => {maxrepetitions => 25}, sub {
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
+  });
 
 =head2 get
 
-  $self->get($host, $args, \@oids, sub {
-    my($self, $err, $res) = @_;
-    # ...
+  $self->get($host, \%args, \@oids, sub {
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
   });
 
-Will call the callback when data is retrieved, instead of emitting the
-L</response> event.
+Will send a SNMP get-request to the remote agent. See L<Net::SNMP/get_request>
+for details on which C<%args> you can pass on. See L</prepare> for generic
+information about the variables associated with this method.
 
 =head2 get_bulk
 
-  $self->get_bulk($host, $args, \@oids, sub {
-    my($self, $err, $res) = @_;
-    # ...
+  $self->get_bulk($host, \%args, \@oids, sub {
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
   });
 
-Will call the callback when data is retrieved, instead of emitting the
-L</response> event. C<$args> is optional.
+Will send a SNMP get-bulk-request to the remote agent. See
+L<Net::SNMP/get_bulk_request> for details on which C<%args> you can pass on.
+See L</prepare> for generic information about the variables associated with
+this method.
 
 =head2 get_next
 
-  $self->get_next($host, $args, \@oids, sub {
-    my($self, $err, $res) = @_;
-    # ...
+  $self->get_next($host, \%args, \@oids, sub {
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
   });
 
-Will call the callback when data is retrieved, instead of emitting the
-L</response> event. C<$args> is optional.
+Will send a SNMP get-next-request to the remote agent. See
+L<Net::SNMP/get_next_request> for details on which C<$args> you can pass on.
+See L</prepare> for generic information about the variables associated with
+this method.
 
 =head2 prepare
 
   $self = $self->prepare($host, \%args, ...);
   $self = $self->prepare(\@hosts, \%args, ...);
   $self = $self->prepare(\@hosts, ...);
-  $self = $self->prepare('*' => ...);
+  $self = $self->prepare("*" => ...);
 
 =over 4
 
@@ -536,49 +565,51 @@ defined hosts.
 
 Examples:
 
-  $self->prepare('192.168.0.1' => { version => 'v2c' }, get_next => [$oid, ...]);
-  $self->prepare('192.168.0.1' => { version => 'v3' }, get => [$oid, ...]);
-  $self->prepare(localhost => set => [ $oid => OCTET_STRING, $value, ... ]);
-  $self->prepare('*' => get => [ $oid ... ]);
+  $self->prepare("192.168.0.1" => {version => "v2c"}, get_next => [$oid, ...]);
+  $self->prepare("192.168.0.1" => {version => "v3"}, get => [$oid, ...]);
+  $self->prepare(localhost => set => [$oid => OCTET_STRING, $value, ...]);
+  $self->prepare("*" => get => [$oid, ...]);
 
 Note: To get the C<OCTET_STRING> constant and friends you need to do:
 
-  use Net::SNMP ':asn1';
+  use Net::SNMP ":asn1";
 
 =head2 set
 
-  $self->set($host, $args => [ $oid => OCTET_STRING, $value, ... ], sub {
-    my($self, $err, $res) = @_;
-    # ...
+  use Net::SNMP ":asn1"; # Export OCTET_STRING
+
+  $self->set($host, $args => [$oid, OCTET_STRING, $value, ...], sub {
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
   });
 
-Will call the callback when data is set, instead of emitting the
-L</response> event. C<$args> is optional.
+Will send a SNMP set-request to the remote agent. See L<Net::SNMP/set_request>
+for details on which C<$args> you can pass on. See L</prepare> for generic
+information about the variables associated with this method.
 
 =head2 walk
 
   $self->walk($host, $args, \@oids, sub {
-    my($self, $err, $res) = @_;
-    # ...
+    my ($self, $err, $session) = @_;
+    return warn $err if $err;
+    push @{$res{$host}}, $session->var_bind_list;
   });
 
-Will call the callback when data is retrieved, instead of emitting the
-L</response> event. C<$args> is optional.
+This is a custom SNMP method added by L</add_custom_request_method>. See
+L</prepare> for generic information about the variables associated with this
+method.
 
-=head2 bulk_walk
-
-  $self->bulk_walk($host, $args, \@oids, sub {
-    my($self, $err, $res) = @_;
-    # ...
-  });
-
-Will call the callback when data is retrieved, instead of emitting the
-L</response> event. C<$args> is optional.
+This method will run L<Net::SNMP/get_next_request> until an oid retrieved does
+not match the base OID, or if the tree is exhausted. You might want to use
+L</bulk_walk> instead for better performance.
 
 =head2 wait
 
+  $self->wait;
+
 This is useful if you want to block your code: C<wait()> starts the ioloop and
-runs until L</timeout> or L</finish> is reached.
+runs until L</master_timeout> or L</finish> is reached.
 
   my $snmp = Mojo::SNMP->new;
   $snmp->prepare(...)->wait; # blocks while retrieving data
@@ -600,7 +631,7 @@ Per Carlson - C<per.carlson@broadnet.no>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (C) 2012-2016, L</AUTHOR> and L</CONTRIBUTORS>.
+Copyright (C) 2012-2018, L</AUTHOR> and L</CONTRIBUTORS>.
 
 This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.

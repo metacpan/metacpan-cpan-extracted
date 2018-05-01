@@ -8,10 +8,11 @@ use Mojo::IOLoop;
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::mysql;
 use Sys::Hostname 'hostname';
+use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -29,6 +30,46 @@ sub dequeue {
   $self->mysql->pubsub->unlisten("minion.job" => $cb) and Mojo::IOLoop->remove($timer);
 
   return $self->_try($id, $options);
+}
+
+sub history {
+  my $self = shift;
+
+  my $sql = <<SQL;
+SELECT
+  MIN(UNIX_TIMESTAMP(finished)) as `epoch`,
+  DAY(finished) as `day`,
+  HOUR(finished) as `hour`,
+  SUM(CASE state WHEN 'failed' THEN 1 ELSE 0 END) AS failed_jobs,
+  SUM(CASE state WHEN 'finished' THEN 1 ELSE 0 END) AS finished_jobs
+FROM minion_jobs
+WHERE finished > SUBTIME(NOW(), '23:00:00')
+GROUP BY `day`, `hour`
+ORDER BY `day`, `hour`
+SQL
+
+  my $data = $self->mysql->db->query($sql)->hashes;
+
+  # Fill in missing hours to create a full time series
+  my $now = Time::Piece->new();
+  my $current_hour = $now->hour;
+  for my $i ( 0..23 ) {
+    my $i_hour = ( $current_hour - ( 23 - $i ) ) % 24;
+    if ( $data->[ $i ]{ hour } != $i_hour ) {
+      my $epoch = $now->epoch - ( 3600 * ( 24 - $i ) );
+      splice @$data, $i, 0, {
+        epoch => $epoch - ( $epoch % 3600 ),
+        failed_jobs => 0,
+        finished_jobs => 0,
+      };
+    }
+    else {
+      delete $data->[ $i ]{hour};
+      delete $data->[ $i ]{day};
+    }
+  }
+
+  return {daily => $data};
 }
 
 sub enqueue {
@@ -62,12 +103,14 @@ sub enqueue {
 }
 
 sub note {
-  my ($self, $id, $key, $value) = @_;
+  my ($self, $id, $merge) = @_;
   my $job = $self->mysql->db->query(
     'SELECT notes FROM minion_jobs WHERE id=?', $id,
   )->hash || return 0;
   my $notes = decode_json( $job->{notes} );
-  $notes->{ $key } = $value;
+  foreach my $key (keys %$merge){
+      $notes->{ $key } = $merge->{$key};
+  }
   return !!$self->mysql->db->query(
     'UPDATE minion_jobs SET notes = ? WHERE id = ?',
     encode_json( $notes ), $id,
@@ -81,25 +124,21 @@ sub list_jobs {
   my ($self, $offset, $limit, $options) = @_;
 
   my ( @where, @params );
-  if ( my $state = $options->{state} ) {
-    my @states = ref $state eq 'ARRAY' ? @$state : ( $state );
-    push @where, 'state in (' . join( ',', ('?') x @states ) . ')';
-    push @params, @states;
+  if ( my $states = $options->{states} ) {
+    push @where, 'state in (' . join( ',', ('?') x @$states ) . ')';
+    push @params, @$states;
   }
-  if ( my $queue = $options->{queue} ) {
-    my @queues = ref $queue eq 'ARRAY' ? @$queue : ( $queue );
-    push @where, 'queue in (' . join( ',', ('?') x @queues ) . ')';
-    push @params, @queues;
+  if ( my $queues = $options->{queues} ) {
+    push @where, 'queue in (' . join( ',', ('?') x @$queues ) . ')';
+    push @params, @$queues;
   }
-  if ( my $task = $options->{task} ) {
-    my @tasks = ref $task eq 'ARRAY' ? @$task : ( $task );
-    push @where, 'task in (' . join( ',', ('?') x @tasks ) . ')';
-    push @params, @tasks;
+  if ( my $tasks = $options->{tasks} ) {
+    push @where, 'task in (' . join( ',', ('?') x @$tasks ) . ')';
+    push @params, @$tasks;
   }
-  if ( my $id = $options->{ids} ) {
-    my @ids = ref $id eq 'ARRAY' ? @$id : ( $id );
-    push @where, 'id in (' . join( ',', ('?') x @ids ) . ')';
-    push @params, @ids;
+  if ( my $ids = $options->{ids} ) {
+    push @where, 'id in (' . join( ',', ('?') x @$ids ) . ')';
+    push @params, @$ids;
   }
 
   my $where = @where ? 'WHERE ' . join( ' AND ', @where ) : '';
@@ -192,9 +231,10 @@ sub list_locks {
   my ($self, $offset, $limit, $options) = @_;
 
   my ( @where, @params );
-  if ( $options->{name} ) {
-    push @where, 'name = ?';
-    push @params, $options->{name};
+  if ( my $name = $options->{names} // $options->{name} ) {
+    my @names = ref $name eq 'ARRAY' ? @$name : ( $name );
+    push @where, 'name in (' . join( ',', ('?') x @names ) . ')';
+    push @params, @names;
   }
 
   push @where, 'expires > now()';
@@ -312,11 +352,26 @@ sub unlock {
 
 sub retry_job {
   my ($self, $id, $retries) = (shift, shift, shift);
+  my $db = $self->mysql->db;
   my $options = shift // {};
 
-  my $seconds = $self->mysql->db->dbh->quote($options->{delay} // 0);
+  my $seconds = $db->dbh->quote($options->{delay} // 0);
 
-  return !!$self->mysql->db->query(
+  if ( my $parents = delete $options->{ parents } ) {
+    $db->query(
+      'DELETE FROM `minion_jobs_depends` WHERE child_id=?',
+      $id,
+    );
+    if ( @$parents ) {
+      $db->query(
+        "INSERT INTO minion_jobs_depends (`parent_id`, `child_id`) VALUES "
+        . join( ", ", map "( ?, ? )", @$parents ),
+        map { $_, $id  } @$parents
+      );
+    }
+  }
+
+  return !!$db->query(
     "UPDATE `minion_jobs`
      SET attempts = COALESCE(?, attempts),
        `delayed` = DATE_ADD(NOW(), INTERVAL $seconds SECOND),
@@ -725,7 +780,7 @@ sub receive {
 #pod =head2 list_jobs
 #pod
 #pod   my $batch = $backend->list_jobs($offset, $limit);
-#pod   my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+#pod   my $batch = $backend->list_jobs($offset, $limit, {states => 'inactive'});
 #pod
 #pod Returns the same information as L</"job_info"> but in batches.
 #pod
@@ -800,6 +855,12 @@ sub receive {
 #pod   delay => 10
 #pod
 #pod Delay job for this many seconds (from now).
+#pod
+#pod =item parents
+#pod
+#pod   parents => [$id1, $id2, $id3]
+#pod
+#pod Jobs this job depends on.
 #pod
 #pod =item priority
 #pod
@@ -888,7 +949,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -1137,7 +1198,7 @@ Id of worker that is processing the job.
 =head2 list_jobs
 
   my $batch = $backend->list_jobs($offset, $limit);
-  my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+  my $batch = $backend->list_jobs($offset, $limit, {states => 'inactive'});
 
 Returns the same information as L</"job_info"> but in batches.
 
@@ -1212,6 +1273,12 @@ These options are currently available:
   delay => 10
 
 Delay job for this many seconds (from now).
+
+=item parents
+
+  parents => [$id1, $id2, $id3]
+
+Jobs this job depends on.
 
 =item priority
 

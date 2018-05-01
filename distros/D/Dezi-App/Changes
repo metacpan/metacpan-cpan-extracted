@@ -1,5 +1,8 @@
 Revision history for Dezi-App
 
+0.016  27 April 2018
+  - Change shebang line of deziapp tool to /usr/bin/perl so that CPAN will localize on install.
+
 0.015  25 March 2018
   - Lots of packaging and test improvements, thanks to Paul Cochrane.
 

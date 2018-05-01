@@ -2,7 +2,7 @@ package Dancer2::Plugin::Auth::OAuth;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Dancer2::Plugin;
 use Module::Load;
@@ -114,21 +114,48 @@ The YAML below shows all available options.
           tokens:
             consumer_key: your_consumer_token
             consumer_secret: your_consumer_secret
-         Github:
-           tokens:
-             client_id: your_client_id
-             client_secret: your_client_secret
-         Stackexchange:
-           tokens:
-             client_id: your_client_id
-             client_secret: your_client_secret
-             key: your_key
-           site: stackoverflow
-         Linkedin:
-           tokens:
-             client_id: your_client_id
-             client_secret: your_client_secret
-           fields: id,num-connections,picture-url,email-address
+        Github:
+          tokens:
+            client_id: your_client_id
+            client_secret: your_client_secret
+        Stackexchange:
+          tokens:
+            client_id: your_client_id
+            client_secret: your_client_secret
+            key: your_key
+          site: stackoverflow
+        Linkedin:
+          tokens:
+            client_id: your_client_id
+            client_secret: your_client_secret
+          fields: id,num-connections,picture-url,email-address
+        VKontakte: # https://vk.com
+          tokens:
+            client_id: '...'
+            client_secret: '...'
+          fields: 'first_name,last_name,about,bdate,city,country,photo_max_orig,sex,site'
+          api_version: '5.8'
+        Odnoklassniki: # https://ok.ru
+          tokens:
+            client_id: your_client_id
+            client_secret: your_client_secret
+            application_key: your_application_key
+          method: 'users.getCurrentUser'
+          format: 'json'
+          fields: 'email,name,gender,birthday,location,uid,pic_full'
+        MailRU:
+          tokens:
+            client_id: your_client_id
+            client_private: your_client_private
+            client_secret: your_client_secret
+          method: 'users.getInfo'
+          format: 'json'
+          secure: 1
+        Yandex:
+          tokens:
+            client_id: your_client_id
+            client_secret: your_client_secret
+          format: 'json'
 
 [*] default value, may be omitted.
 

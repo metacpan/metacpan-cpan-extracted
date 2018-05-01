@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.9.3';
+$Git::Hooks::CheckFile::VERSION = '2.9.5';
 use 5.010;
 use utf8;
 use strict;
@@ -308,11 +308,11 @@ EOS
     }
 
     # Extract only the lines showing addition of the $regex
-    my @diff = grep {/^+.*?(?:$regex)/}
+    my @diff = grep {/^\+.*?(?:$regex)/}
         ($commit ne ':0'
          ? $git->run(qw/diff-tree  -p --diff-filter=AM --ignore-submodules/,
                      "-G$regex", $commit)
-         : $git->run(qw/diff-index -p --diff-filter=AM --ignore-submodules/,
+         : $git->run(qw/diff-index --cached -p --diff-filter=AM --ignore-submodules/,
                      "-G$regex", $git->get_head_or_empty_tree));
 
     if (@diff) {
@@ -459,12 +459,15 @@ sub check_commit {
 
     return 1 unless $git->is_reference_enabled($current_branch);
 
+    my $extra = $git->run(qw/diff-index --name-status --ignore-submodules --no-commit-id --cached -r/,
+                          $git->get_head_or_empty_tree);
+
     return 0 == check_everything(
         $git,
         $current_branch,
         ':0',                   # mark to signify the index
-        $git->run(qw/diff-index --name-status --ignore-submodules --no-commit-id --cached -r/,
-                  $git->get_head_or_empty_tree));
+        $extra,
+    );
 }
 
 sub check_patchset {
@@ -517,7 +520,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.9.3
+version 2.9.5
 
 =head1 SYNOPSIS
 

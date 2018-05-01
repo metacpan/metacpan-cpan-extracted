@@ -40,3 +40,15 @@ Feature: mapping modules to filenames
     Then analizo must report that file Polygon.cs declares module Polygon
     And analizo must report that file Rect.cs declares module Rect
     And analizo must report that file Triangle.cs declares module Triangle
+
+  Scenario: Java Generics WildCard sample
+    Given I am in t/samples/wildcard
+    When I run "analizo metrics ."
+    Then analizo must report that file WildcardClass.java declares module WildcardClass
+    And analizo must report that file GenericClass.java declares module GenericClass
+
+  Scenario: Java Enumeration sample
+    Given I am in t/samples/enumeration
+    When I run "analizo metrics ."
+    Then analizo must report that file Main.java declares module Main::MyEnumeration
+    And analizo must report that file Enumeration.java declares module Enumeration

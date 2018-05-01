@@ -3,7 +3,7 @@ use App::Cmd::Setup -app;
 use strict;
 use warnings;
 
-our $VERSION = '1.20.8';
+our $VERSION = '1.21.0';
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ sub global_opt_spec {
 sub config {
   my ($self) = @_;
   $self->{config} ||= (-e '.analizo'
-    ? YAML::LoadFile('.analizo')
+    ? YAML::XS::LoadFile('.analizo')
     : {}
   );
 }

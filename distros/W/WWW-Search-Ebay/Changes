@@ -1,3 +1,7 @@
+2018-04-28  Kingpin  <martin@ubuntu>
+
+	* category.t: fixed test
+
 2018-02-03  Kingpin  <martin@ubuntu>
 
 	* lib/WWW/Search/Ebay.pm: parse new HTML format

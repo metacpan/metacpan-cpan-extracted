@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Frame::Dump.
 
+1.15 Tue  1 May 09:16:32 CEST 2018
+   - BUGFIX: Dump::Online2: yes, again. Since some newer version of libpcap 
+             and changes in pcap_dispatch(), we have to call can_read() on the 
+             selectable file descriptor and call pcap_dispatch() only when 
+             there is something to read. Which sounds logical, after all.
+   - update: copyright notice
+
 1.14 Tue Dec  9 19:12:25 CET 2014
    - BUGFIX: Dump::Online2: do not eat 100% and do not block for timeoutOnNext 
              seconds when it is not REALLY needed. We had to remove the 

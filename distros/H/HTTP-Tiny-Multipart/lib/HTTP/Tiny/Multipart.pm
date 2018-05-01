@@ -10,7 +10,7 @@ use File::Basename;
 use Carp;
 use MIME::Base64;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub _get_boundary {
     my ($headers, $content) = @_;
@@ -93,6 +93,8 @@ no warnings 'redefine';
 *HTTP::Tiny::post_multipart = sub {
     my ($self, $url, $data, $args) = @_;
 
+    local $Carp::Internal{ 'HTTP::Tiny::Multipart' } = 1;
+
     (@_ == 3 || @_ == 4 && ref $args eq 'HASH')
         or Carp::croak(q/Usage: $http->post_multipart(URL, DATAREF, [HASHREF])/ . "\n");
 
@@ -104,8 +106,6 @@ no warnings 'redefine';
         $headers->{lc $key} = $value;
     }
 
-    delete $args->{headers};
-
     my $content_parts = _build_content($data);
     my $boundary      = _get_boundary($headers, $content_parts);
 
@@ -115,9 +115,7 @@ no warnings 'redefine';
     return $self->request('POST', $url, {
             %$args,
             content => $boundary . join( $boundary, @{$content_parts}) . $last_boundary,
-            headers => {
-                %$headers,
-            },
+            headers => $headers,
         }
     );
 };
@@ -136,7 +134,7 @@ HTTP::Tiny::Multipart - Add post_multipart to HTTP::Tiny
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -227,7 +225,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

@@ -358,9 +358,30 @@
 
 #ifdef LTC_FORTUNA
 
+#if !defined(LTC_FORTUNA_RESEED_RATELIMIT_STATIC) && \
+      ((defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L) || defined(_WIN32))
+
+/* time-based rate limit of the reseeding */
+#define LTC_FORTUNA_RESEED_RATELIMIT_TIMED
+
+#else
+
 #ifndef LTC_FORTUNA_WD
 /* reseed every N calls to the read function */
 #define LTC_FORTUNA_WD    10
+#endif
+
+#ifdef LTC_FORTUNA_RESEED_RATELIMIT_TIMED
+/* make sure only one of
+ *   LTC_FORTUNA_RESEED_RATELIMIT_STATIC
+ * and
+ *   LTC_FORTUNA_RESEED_RATELIMIT_TIMED
+ * is defined.
+ */
+#undef LTC_FORTUNA_RESEED_RATELIMIT_TIMED
+#warning "undef'ed LTC_FORTUNA_RESEED_RATELIMIT_TIMED, looks like your architecture doesn't support it"
+#endif
+
 #endif
 
 #ifndef LTC_FORTUNA_POOLS
@@ -450,6 +471,8 @@
 #define LTC_BASE64_URL
 /* Base32 encoding/decoding */
 #define LTC_BASE32
+/* Base16/hex encoding/decoding */
+#define LTC_BASE16
 
 /* Keep LTC_NO_HKDF for compatibility reasons
  * superseeded by LTC_NO_MISC*/
@@ -461,6 +484,8 @@
 #define LTC_ADLER32
 
 #define LTC_CRC32
+
+#define LTC_PADDING
 
 #endif /* LTC_NO_MISC */
 
@@ -503,16 +528,14 @@
    #define LTC_ECC_SECP256R1
    #define LTC_ECC_SECP384R1
    #define LTC_ECC_SECP521R1
-   /* OLD deprecated (but still working) defines */
-   #define LTC_ECC112
-   #define LTC_ECC128
-   #define LTC_ECC160
-   #define LTC_ECC192
-   #define LTC_ECC224
-   #define LTC_ECC256
-   #define LTC_ECC384
-   #define LTC_ECC521
 #endif
+#endif
+
+#if defined(LTC_DER)
+   #ifndef LTC_DER_MAX_RECURSION
+      /* Maximum recursion limit when processing nested ASN.1 types. */
+      #define LTC_DER_MAX_RECURSION 30
+   #endif
 #endif
 
 #if defined(LTC_MECC) || defined(LTC_MRSA) || defined(LTC_MDSA) || defined(LTC_MKAT)
@@ -619,6 +642,40 @@
    #ifndef LTC_FILE_READ_BUFSIZE
    #define LTC_FILE_READ_BUFSIZE 8192
    #endif
+#endif
+
+/* ECC backwards compatibility */
+#if !defined(LTC_ECC_SECP112R1) && defined(LTC_ECC112)
+#define LTC_ECC_SECP112R1
+#undef LTC_ECC112
+#endif
+#if !defined(LTC_ECC_SECP128R1) && defined(LTC_ECC128)
+#define LTC_ECC_SECP128R1
+#undef LTC_ECC128
+#endif
+#if !defined(LTC_ECC_SECP160R1) && defined(LTC_ECC160)
+#define LTC_ECC_SECP160R1
+#undef LTC_ECC160
+#endif
+#if !defined(LTC_ECC_SECP192R1) && defined(LTC_ECC192)
+#define LTC_ECC_SECP192R1
+#undef LTC_ECC192
+#endif
+#if !defined(LTC_ECC_SECP224R1) && defined(LTC_ECC224)
+#define LTC_ECC_SECP224R1
+#undef LTC_ECC224
+#endif
+#if !defined(LTC_ECC_SECP256R1) && defined(LTC_ECC256)
+#define LTC_ECC_SECP256R1
+#undef LTC_ECC256
+#endif
+#if !defined(LTC_ECC_SECP384R1) && defined(LTC_ECC384)
+#define LTC_ECC_SECP384R1
+#undef LTC_ECC384
+#endif
+#if !defined(LTC_ECC_SECP512R1) && defined(LTC_ECC521)
+#define LTC_ECC_SECP521R1
+#undef LTC_ECC521
 #endif
 
 /* ref:         $Format:%D$ */

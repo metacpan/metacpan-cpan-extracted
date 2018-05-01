@@ -9,8 +9,7 @@ use File::Basename qw(basename);
 use File::Path qw(mkpath);
 use HTML::Entities qw(decode_entities);
 use LWP::UserAgent;
-use List::Util qw(max min sum);
-use List::MoreUtils qw(uniq);
+use List::AllUtils qw(uniq max min sum);
 use MIME::QuotedPrint ();
 use Time::Local ();
 use Time::HiRes;
@@ -28,7 +27,7 @@ CPAN::Testers::ParseReport - parse reports to www.cpantesters.org from various s
 
 =cut
 
-use version; our $VERSION = qv('0.4.1');
+use version; our $VERSION = qv('0.4.3');
 
 =head1 SYNOPSIS
 
@@ -512,7 +511,8 @@ sub parse_report {
     my @previous_line = ""; # so we can neutralize line breaks
     my @rlines = split /\r?\n/, $report;
  LINE: for (@rlines) {
-        next LINE unless ($isHTML ? m/<title>((\S+)\s+(\S+))/ : m/^Subject:\s*((\S+)\s+(\S+))/);
+        next LINE unless ($isHTML ? m/<title>((\S+)\s+(\S+))/ : m/^Subject:\s*((\S+)\s+(\S+))/)
+            || m{^Subject:\s*<strong>((\S+)\s+(\S+))};
         my $s = $1;
         $s = $1 if $s =~ m{<strong>(.+)};
         if ($s =~ /(\S+)\s+(\S+)/) {

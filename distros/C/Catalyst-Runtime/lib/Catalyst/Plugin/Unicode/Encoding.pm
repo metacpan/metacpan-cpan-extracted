@@ -1,6 +1,6 @@
 package Catalyst::Plugin::Unicode::Encoding;
 
-our $VERSION = '99.0'; # set high so we always overwrite
+our $VERSION = '5.90118';
 
 1;
 

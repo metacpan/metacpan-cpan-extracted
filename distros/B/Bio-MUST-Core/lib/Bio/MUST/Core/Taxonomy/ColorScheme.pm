@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.181120';
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.181180';
 use Moose;
 use namespace::autoclean;
 
@@ -62,15 +62,17 @@ has '_gcn' => (
 
 
 # private hash for indexed colors (e.g., gnuplot colors)
-has '_index_for' => (
+has '_icol_for' => (
     traits   => ['Hash'],
     is       => 'ro',
     isa      => 'HashRef[Str]',
     init_arg => undef,
     lazy     => 1,
-    builder  => '_build_index_for',
+    builder  => '_build_icol_for',
     handles  => {
-        icol => 'get',
+        icol        =>  'get',
+        icol_for    =>  'get',
+        all_icols   =>  'elements',
     },  # Note: should be index_for but this makes more sense
 );
 
@@ -103,18 +105,18 @@ sub _build_gcn {
     return Graphics::ColorNames->new( 'Graphics::ColorNames::WWW' );
 }
 
-sub _build_index_for {
+sub _build_icol_for {
     my $self = shift;
 
-    my %index_for;
+    my %icol_for;
     my $index = 0;
 
     my @colors = uniq $self->all_colors;
     for my $color (@colors) {
-        $index_for{$color} = ++$index;
+        $icol_for{$color} = ++$index;
     }
 
-    return \%index_for;
+    return \%icol_for;
 }
 
 sub _build_labeler {
@@ -243,7 +245,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.181120
+version 0.181180
 
 =head1 SYNOPSIS
 

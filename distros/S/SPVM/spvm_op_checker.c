@@ -1405,46 +1405,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   break;
                 }
                 case SPVM_OP_C_ID_ASSIGN: {
-                  SPVM_OP* op_assign_to = op_cur->last;
-                  SPVM_OP* op_assign_from = op_cur->first;
+                  SPVM_OP* op_term_to = op_cur->last;
+                  SPVM_OP* op_term_from = op_cur->first;
                   
-                  SPVM_OP_CHECKER_check_and_convert_type(compiler, op_assign_to, op_assign_from);
-                  
-                  if (op_assign_to->id == SPVM_OP_C_ID_VAR) {
-                    if (op_assign_from->id == SPVM_OP_C_ID_CONCAT) {
-                      int32_t index_out = SPVM_OP_get_my_index(compiler, op_assign_to);
-                      
-                      if (op_assign_from->first->id == SPVM_OP_C_ID_VAR) {
-                        int32_t index_in1 = SPVM_OP_get_my_index(compiler, op_assign_from->first);
-                        if (index_out == index_in1) {
-                          op_assign_from->first->uv.var->create_tmp_var = 1;
-                        }
-                      }
-                      
-                      if (op_assign_from->last->id == SPVM_OP_C_ID_VAR) {
-                        int32_t index_in2 = SPVM_OP_get_my_index(compiler, op_assign_from->last);
-                        if (index_out == index_in2) {
-                          op_assign_from->last->uv.var->create_tmp_var = 1;
-                        }
-                      }
-                    }
-                    else if (op_assign_from->id == SPVM_OP_C_ID_CALL_SUB) {
-                      int32_t index_out = SPVM_OP_get_my_index(compiler, op_assign_to);
-                      
-                      // Push args
-                      SPVM_OP* op_args =op_assign_from->last;
-                      SPVM_OP* op_arg = op_args->first;
-                      while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
-                        if (op_arg->id == SPVM_OP_C_ID_VAR) {
-                          int32_t index_arg = SPVM_OP_get_my_index(compiler, op_arg);
-                          if (index_arg == index_out) {
-                            op_arg->uv.var->create_tmp_var = 1;
-                            break;
-                          }
-                        }
-                      }
-                    }
-                  }
+                  // Check if source value can be assigned to distination value
+                  // If needed, automatical numeric convertion op is added
+                  SPVM_OP_CHECKER_check_and_convert_type(compiler, op_term_to, op_term_from);
                   
                   break;
                 }
@@ -2098,7 +2064,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   else if (SPVM_TYPE_is_object(compiler, term_type) && SPVM_TYPE_is_object(compiler, type_type)) {
                     if (SPVM_TYPE_is_array_numeric(compiler, term_type) && !SPVM_TYPE_is_array_numeric(compiler, type_type)) {
-                      can_convert = 0;
+                      if (type_type->id == SPVM_TYPE_C_ID_STRING_ARRAY) {
+                        can_convert = 1;
+                      }
+                      else {
+                        can_convert = 0;
+                      }
                     }
                     else if (!SPVM_TYPE_is_array_numeric(compiler, term_type) && SPVM_TYPE_is_array_numeric(compiler, type_type)) {
                       can_convert = 0;
@@ -2117,7 +2088,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   
                   if (!can_convert) {
-                    SPVM_yyerror_format(compiler, "can't convert %s to %s at %s line %d\n",
+                    SPVM_yyerror_format(compiler, "Can't convert %s to %s at %s line %d\n",
                     term_type->name, type_type->name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
@@ -2159,7 +2130,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         SPVM_OP* op_cur = op_base;
         _Bool finish = 0;
         while (op_cur) {
-          
+          // [START]Preorder traversal position
           if (op_cur->first) {
             op_cur = op_cur->first;
           }

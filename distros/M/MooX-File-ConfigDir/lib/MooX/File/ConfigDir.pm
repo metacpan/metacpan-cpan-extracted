@@ -3,7 +3,7 @@ package MooX::File::ConfigDir;
 use strict;
 use warnings;
 
-our $VERSION = "0.006";
+our $VERSION = "0.007";
 
 use Carp qw/croak/;
 use Scalar::Util qw(blessed);
@@ -59,6 +59,13 @@ foreach my $attr (@file_config_dir_attrs)
 
 MooX::File::ConfigDir - Moo eXtension for File::ConfigDir
 
+=begin html
+
+<a href="https://travis-ci.org/perl5-utils/MooX-File-ConfigDir"><img src="https://travis-ci.org/perl5-utils/MooX-File-ConfigDir.svg?branch=master" alt="Travis CI"/></a>
+<a href='https://coveralls.io/github/perl5-utils/MooX-File-ConfigDir?branch=master'><img src='https://coveralls.io/repos/github/perl5-utils/MooX-File-ConfigDir/badge.svg?branch=master' alt='Coverage Status'/></a>
+
+=end html
+
 =head1 SYNOPSIS
 
     my App;
@@ -93,7 +100,7 @@ on the requirements.
 
 Allows to deal with a global unique identifier passed to the functions of
 L<File::ConfigDir>. Using it encapsulates configuration files from the
-other ones (eg. C</etc/apache2> vs. C</etc>).
+other ones (e.g. C</etc/apache2> vs. C</etc>).
 
 C<config_identifier> can be initialized by specifying it as parameter
 during object construction or via inheriting default builder
@@ -133,7 +140,7 @@ For details see L<File::ConfigDir/vendor_cfg_dir>.
 
 Provides the configuration directory of C<$0> if it's installed as
 a separate package - either a program bundle (TSM, Oracle DB) or
-an independent package combination (eg. via L<pkgsrc|http://www.pkgsrc.org/>
+an independent package combination (e.g. via L<PkgSrc|http://www.pkgsrc.org/>
 For details see L<File::ConfigDir/singleapp_cfg_dir>.
 
 =head2 vendorapp_cfg_dir
@@ -216,7 +223,7 @@ L<http://search.cpan.org/dist/MooX-File-ConfigDir/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Jens Rehsack.
+Copyright 2013-2018 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

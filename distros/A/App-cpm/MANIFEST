@@ -9,9 +9,11 @@ README
 cpanfile
 dist.ini
 lib/App/cpm.pm
+lib/App/cpm/CLI.pm
 lib/App/cpm/CircularDependency.pm
 lib/App/cpm/DistNotation.pm
 lib/App/cpm/Distribution.pm
+lib/App/cpm/HTTP.pm
 lib/App/cpm/Job.pm
 lib/App/cpm/Logger.pm
 lib/App/cpm/Logger/File.pm

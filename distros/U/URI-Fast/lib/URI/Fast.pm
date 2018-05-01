@@ -1,6 +1,11 @@
+package URI::Fast::IRI;
+$URI::Fast::IRI::VERSION = '0.23';
+our @ISA = qw(URI::Fast);
+1;
+
 package URI::Fast;
 # ABSTRACT: A fast(er) URI parser
-$URI::Fast::VERSION = '0.22';
+$URI::Fast::VERSION = '0.23';
 use strict;
 use warnings;
 no strict 'refs';
@@ -17,7 +22,7 @@ use Inline
 Inline->init;
 
 use parent 'Exporter';
-our @EXPORT_OK = qw(uri uri_split);
+our @EXPORT_OK = qw(uri iri uri_split);
 
 use overload '""' => sub{ $_[0]->to_string };
 
@@ -138,11 +143,11 @@ sub param {
 
 =head1 NAME
 
-URI::Fast - A fast(er) URI parser
+URI::Fast::IRI - A fast(er) URI parser
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -175,7 +180,17 @@ parameter.
 
 =head2 uri
 
-Accepts a URI string, minimally parses it, and returns a L<URI::Fast> object.
+Accepts a URI string, minimally parses it, and returns a C<URI::Fast> object.
+
+=head2 iri
+
+Similar to L</uri>, but returns a C<URI::Fast::IRI> object. A C<URI::Fast::IRI>
+differs from a C<URI::Fast> in that UTF-8 characters are permitted and will not
+be percent-encoded when modified.
+
+=head2 uri_split
+
+Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
 =head1 ATTRIBUTES
 
@@ -372,7 +387,7 @@ __C__
 #define URI_MEMBER(obj, member) (URI(obj)->member)
 
 // quick sugar for calling uri_encode
-#define URI_ENCODE_MEMBER(uri, mem, val, allow, alen) uri_encode(val, min(strlen(val), URI_SIZE(mem)), URI_MEMBER(uri, mem), allow, alen)
+#define URI_ENCODE_MEMBER(uri, mem, val, allow, alen) uri_encode(val, min(strlen(val), URI_SIZE(mem)), URI_MEMBER(uri, mem), allow, alen, URI_MEMBER(uri, is_iri))
 
 // size constats
 #define URI_SIZE_scheme 32
@@ -449,16 +464,16 @@ static const char uri_encode_tbl[ sizeof(U32) * 0x100 ] = {
 };
 #undef _______
 
-size_t uri_encode(const char* in, size_t len, char* out, const char* allow, size_t allow_len) {
+size_t uri_encode(const char* in, size_t len, char* out, const char* allow, size_t allow_len, int allow_utf8) {
   size_t i = 0;
   size_t j = 0;
-  char   octet;
-  U32    code;
+  char octet;
+  U32 code;
 
   while (i < len) {
     octet = in[i++];
 
-    if (is_allowed(octet, allow, allow_len)) {
+    if (is_allowed(octet, allow, allow_len) || (allow_utf8 && octet & 0X8000)) {
       out[j++] = octet;
     }
     else {
@@ -574,7 +589,7 @@ SV* encode(SV* in, ...) {
 
   Inline_Stack_Done;
 
-  olen = uri_encode(src, ilen, dest, allowed, alen);
+  olen = uri_encode(src, ilen, dest, allowed, alen, 0);
   out  = newSVpv(dest, olen);
   sv_utf8_downgrade(out, FALSE);
 
@@ -623,6 +638,7 @@ typedef char uri_usr_t    [URI_SIZE_usr + 1];
 typedef char uri_pwd_t    [URI_SIZE_pwd + 1];
 typedef char uri_host_t   [URI_SIZE_host + 1];
 typedef char uri_port_t   [URI_SIZE_port + 1];
+typedef int  uri_is_iri_t;
 
 typedef struct {
   uri_scheme_t scheme;
@@ -633,6 +649,7 @@ typedef struct {
   uri_pwd_t    pwd;
   uri_host_t   host;
   uri_port_t   port;
+  uri_is_iri_t is_iri;
 } uri_t;
 
 /*
@@ -839,7 +856,7 @@ SV* get_query_keys(SV* uri) {
     idx = strcspn(src, "=");
     char tmp[idx + 1];
     vlen = uri_decode(src, idx, tmp);
-    hv_store(out, tmp, vlen, &PL_sv_undef, 0);
+    hv_store(out, tmp, -vlen, &PL_sv_undef, 0);
   }
 
   return newRV_noinc((SV*) out);
@@ -889,7 +906,7 @@ SV* query_hash(SV* uri) {
 
     if (!hv_exists(out, key, klen)) {
       arr = newAV();
-      hv_store(out, key, klen, newRV_noinc((SV*) arr), 0);
+      hv_store(out, key, -klen, newRV_noinc((SV*) arr), 0);
     }
     else {
       ref = hv_fetch(out, key, klen, 0);
@@ -908,6 +925,7 @@ SV* query_hash(SV* uri) {
 }
 
 SV* get_param(SV* uri, SV* sv_key) {
+  int is_iri = URI_MEMBER(uri, is_iri);
   const char* src = URI_MEMBER(uri, query);
   size_t idx = 0, brk = 0, klen, elen, vlen, len = min(URI_SIZE_query, strlen(src));
   AV* out = newAV();
@@ -917,7 +935,7 @@ SV* get_param(SV* uri, SV* sv_key) {
   const char* key = SvPV_nomg_const(sv_key, klen);
 
   char enc_key[(klen * 3) + 2];
-  elen = uri_encode(key, klen, enc_key, "", 0);
+  elen = uri_encode(key, klen, enc_key, "", 0, is_iri);
   enc_key[elen] = '=';
   enc_key[++elen] = '\0';
 
@@ -951,7 +969,7 @@ const char* set_scheme(SV* uri_obj, const char* value) {
 
 SV* set_auth(SV* uri_obj, const char* value) {
   char auth[URI_SIZE_auth];
-  size_t len = uri_encode(value, strlen(value), (char*) &auth, ":@", 2);
+  size_t len = uri_encode(value, strlen(value), (char*) &auth, ":@", 2, URI_MEMBER(uri_obj, is_iri));
   uri_scan_auth(URI(uri_obj), auth, len);
   return newSVpv(auth, len);
 }
@@ -1004,6 +1022,7 @@ const char* set_port(SV* uri_obj, const char* value) {
 }
 
 void set_param(SV* uri, SV* sv_key, SV* sv_values, const char* separator) {
+  int    is_iri = URI_MEMBER(uri, is_iri);
   char   dest[1024];
   const  char *key, *src = URI_MEMBER(uri, query), *strval;
   const  char sep = separator[0];
@@ -1014,7 +1033,7 @@ void set_param(SV* uri, SV* sv_key, SV* sv_values, const char* separator) {
   SvGETMAGIC(sv_key);
   key = SvPV_nomg_const(sv_key, klen);
   char enckey[(3 * klen) + 1];
-  klen = uri_encode(key, strlen(key), enckey, "", 0);
+  klen = uri_encode(key, strlen(key), enckey, "", 0, is_iri);
 
   SvGETMAGIC(sv_values);
   if (!SvROK(sv_values) || SvTYPE(SvRV(sv_values)) != SVt_PVAV) {
@@ -1072,7 +1091,7 @@ void set_param(SV* uri, SV* sv_key, SV* sv_values, const char* separator) {
     SvGETMAGIC(*ref);
     strval = SvPV_nomg_const(*ref, slen);
 
-    vlen = uri_encode(strval, slen, &dest[j], "", 0);
+    vlen = uri_encode(strval, slen, &dest[j], "", 0, is_iri);
     j += vlen;
   }
 
@@ -1146,6 +1165,12 @@ SV* new(const char* class, SV* uri_str) {
   uri_scan(uri, src, len);
 
   return obj_ref;
+}
+
+SV* iri(SV* uri_str) {
+  SV* obj = new("URI::Fast::IRI", uri_str);
+  URI_MEMBER(obj, is_iri) = 1;
+  return obj;
 }
 
 void DESTROY(SV* uri_obj) {

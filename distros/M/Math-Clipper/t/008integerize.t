@@ -81,14 +81,14 @@ my $A2expect = [
     [ 1234,  56.77777777777777 * 10**(14+$extraexp)]
 ];
 my $Aexpect_string = [ # in 64 bit environment, we get real integers back from Clipper, expect always in integer form, no exponents
-    [ '-2'.('0' x $extraexp),        '-567'.('9' x 12).('0' x $extraexp)],
-    [ 0,                            '-5678'.('8' x 11).('0' x $extraexp)],
-    [ 0,                             '5677'.('7' x 11).('0' x $extraexp)]
+    [ '-2'.('0' x ($extraexp - 1)),  '-567'.('9' x 12).('0' x ($extraexp - 1))],
+    [ 0,                            '-5678'.('8' x 12).('0' x ($extraexp - 1))],
+    [ 0,                             '5677'.('7' x 12).('0' x ($extraexp - 1))]
 ];
 my $A2expect_string = [
-    [ '-2'.('0' x (15+$extraexp)),   '-567'.('9' x 12).('0' x $extraexp)],
-    [ 1234,                         '-5678'.('8' x 11).('0' x $extraexp)],
-    [ 1234,                          '5677'.('7' x 11).('0' x $extraexp)]
+    [ '-2'.('0' x (15+$extraexp)),   '-567'.('9' x 12).('0' x ($extraexp - 1))],
+    [ '1234'.('0' x $extraexp),     '-5678'.('8' x 12).('0' x ($extraexp - 1))],
+    [ '1234'.('0' x $extraexp),      '5677'.('7' x 12).('0' x ($extraexp - 1))]
 ];
 my $AexpectUnscaled = [
     [ -0.00000000000002,  -5.67999999999999],

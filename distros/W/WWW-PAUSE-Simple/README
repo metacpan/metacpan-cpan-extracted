@@ -1,17 +1,549 @@
+NAME
+    WWW::PAUSE::Simple - An API for PAUSE
+
+VERSION
+    This document describes version 0.441 of WWW::PAUSE::Simple (from Perl
+    distribution WWW-PAUSE-Simple), released on 2018-04-26.
+
 SYNOPSIS
-
 DESCRIPTION
-
     This module provides several functions for performing common tasks on
     PAUSE. There is also a CLI script pause distributed separately in
     App::pause.
 
-SEE ALSO
+FUNCTIONS
+  delete_files
+    Usage:
 
+     delete_files(%args) -> [status, msg, result, meta]
+
+    Delete files.
+
+    When a file is deleted, it is not immediately deleted but has
+    scheduled_for_deletion status for 72 hours, then deleted. During that
+    time, the file can be undeleted.
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[str]*
+
+        File names/wildcard patterns.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   protect_files => *array[str]*
+
+        Protect some files/wildcard patterns from delete/cleanup.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_old_releases
+    Usage:
+
+     delete_old_releases(%args) -> [status, msg, result, meta]
+
+    Delete older versions of distributions.
+
+    Developer releases will not be deleted.
+
+    To delete developer releases, you can use "delete_files" (rm), e.g. from
+    the command line:
+
+     % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases
+     % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Whether to return detailed records.
+
+    *   num_keep => *int* (default: 1)
+
+        Number of new versions (including newest) to keep.
+
+        1 means to only keep the newest version, 2 means to keep the newest
+        and the second newest, and so on.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   protect_files => *array[str]*
+
+        Protect some files/wildcard patterns from delete/cleanup.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_dists
+    Usage:
+
+     list_dists(%args) -> [status, msg, result, meta]
+
+    List distributions.
+
+    Distribution names will be extracted from tarball/zip filenames.
+
+    Unknown/unparseable filenames will be skipped.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Whether to return detailed records.
+
+    *   newest => *bool*
+
+        Only show newest non-dev version.
+
+        Dev versions will be skipped.
+
+    *   newest_n => *int*
+
+        Only show this number of newest non-dev versions.
+
+        Dev versions will be skipped.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_files
+    Usage:
+
+     list_files(%args) -> [status, msg, result, meta]
+
+    List files.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   del => *bool*
+
+        Only list files which are scheduled for deletion.
+
+    *   detail => *bool*
+
+        Whether to return detailed records.
+
+    *   files => *array[str]*
+
+        File names/wildcard patterns.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_modules
+    Usage:
+
+     list_modules(%args) -> [status, msg, result, meta]
+
+    List modules (permissions).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Whether to return detailed records.
+
+    *   modules => *array[str]*
+
+        Module names/wildcard patterns.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   type => *str*
+
+        Only list modules matching certain type.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  reindex_files
+    Usage:
+
+     reindex_files(%args) -> [status, msg, result, meta]
+
+    Force reindexing.
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[str]*
+
+        File names/wildcard patterns.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  undelete_files
+    Usage:
+
+     undelete_files(%args) -> [status, msg, result, meta]
+
+    Undelete files.
+
+    When a file is deleted, it is not immediately deleted but has
+    scheduled_for_deletion status for 72 hours, then deleted. During that
+    time, the file can be undeleted.
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[str]*
+
+        File names/wildcard patterns.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  upload_files
+    Usage:
+
+     upload_files(%args) -> [status, msg, result, meta]
+
+    Upload file(s).
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   delay => *duration*
+
+        Pause a number of seconds between files.
+
+        If you upload a lot of files (e.g. 7-10 or more) at a time, the
+        PAUSE indexer currently might choke with SQLite database locking
+        problem and thus fail to index your releases. Giving a delay of say
+        2-3 minutes (120-180 seconds) between files will alleviate this
+        problem.
+
+    *   files* => *array[str]*
+
+        File names/wildcard patterns.
+
+    *   password => *str*
+
+        PAUSE password.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    *   retries => *int* (default: 5)
+
+        Number of retries when received 5xx HTTP error from server.
+
+    *   retry_delay => *duration* (default: 3)
+
+        How long to wait before retrying.
+
+    *   subdir => *str* (default: "")
+
+        Subdirectory to put the file(s) into.
+
+    *   username => *str*
+
+        PAUSE ID.
+
+        If unset, default value will be searched from "~/.pause". Encrypted
+        ".pause" is not yet supported.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WWW-PAUSE-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WWW-PAUSE-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-PAUSE-Simple>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     CPAN::Uploader which also does uploading from CLI.
 
     WWW::PAUSE::CleanUpHomeDir which can clean old releases from your PAUSE
     account (CLI script is provided in example).
 
-    https://perlancar.wordpress.com/2015/03/25/interacting-with-pause-using-cli/
+    <https://perlancar.wordpress.com/2015/03/25/interacting-with-pause-using
+    -cli/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

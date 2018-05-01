@@ -10,7 +10,7 @@ Provides a geocoding functionality using https://geocode.xyz
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 

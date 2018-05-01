@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,31 +31,33 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.18",
-            "String::ShellQuote" : "0",
-            "Test::Pod" : "1.41",
-            "Win32::ShellQuote" : "0"
+            "Dist::Milla" : "v1.0.20",
+            "File::Which" : "0",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "String::ShellQuote" : "0",
+            "Win32::ShellQuote" : "0",
             "perl" : "5.008001"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::Needs" : "0"
          }
       }
    },
    "provides" : {
       "Command::Runner" : {
          "file" : "lib/Command/Runner.pm",
-         "version" : "0.002"
+         "version" : "0.100"
+      },
+      "Command::Runner::Format" : {
+         "file" : "lib/Command/Runner/Format.pm"
       },
       "Command::Runner::LineBuffer" : {
          "file" : "lib/Command/Runner/LineBuffer.pm"
+      },
+      "Command::Runner::Quote" : {
+         "file" : "lib/Command/Runner/Quote.pm"
       }
    },
    "release_status" : "stable",
@@ -70,7 +72,7 @@
          "web" : "https://github.com/skaji/Command-Runner"
       }
    },
-   "version" : "0.002",
+   "version" : "0.100",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],

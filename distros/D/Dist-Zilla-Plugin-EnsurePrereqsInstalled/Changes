@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-EnsurePrereqsInstalled
 
+0.009     2018-05-01 02:35:18Z
+          - fix for Dist::Zilla 7: ensure that the proper directory is used
+            for determining authordeps
+
 0.008     2014-10-29 03:18:05Z
           - use newer Dist::Zilla::Util::AuthorDeps to avoid using Path::Class
 

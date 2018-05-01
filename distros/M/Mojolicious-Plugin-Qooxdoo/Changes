@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Pugin::Qooxdoo
 
+0.907 2018-05-01
+  - fixed placeholder syntax to not use deprecated braces anymore
+
 0.905 2017-02-24
   - replace deprecated rel_dir with rel_file
 

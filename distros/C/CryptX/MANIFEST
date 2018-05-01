@@ -310,6 +310,8 @@ src/ltc/math/rand_bn.c
 src/ltc/math/rand_prime.c
 src/ltc/math/tfm_desc.c
 src/ltc/misc/adler32.c
+src/ltc/misc/base16/base16_decode.c
+src/ltc/misc/base16/base16_encode.c
 src/ltc/misc/base32/base32_decode.c
 src/ltc/misc/base32/base32_encode.c
 src/ltc/misc/base64/base64_decode.c
@@ -352,7 +354,10 @@ src/ltc/misc/crypt/crypt_unregister_prng.c
 src/ltc/misc/error_to_string.c
 src/ltc/misc/hkdf/hkdf.c
 src/ltc/misc/mem_neq.c
+src/ltc/misc/padding/padding_depad.c
+src/ltc/misc/padding/padding_pad.c
 src/ltc/misc/pk_get_oid.c
+src/ltc/misc/pk_oid_str.c
 src/ltc/misc/pkcs5/pkcs_5_1.c
 src/ltc/misc/pkcs5/pkcs_5_2.c
 src/ltc/misc/zeromem.c
@@ -476,8 +481,8 @@ src/ltc/pk/ecc/ecc_encrypt_key.c
 src/ltc/pk/ecc/ecc_export.c
 src/ltc/pk/ecc/ecc_export_openssl.c
 src/ltc/pk/ecc/ecc_free.c
+src/ltc/pk/ecc/ecc_get_curve.c
 src/ltc/pk/ecc/ecc_get_key.c
-src/ltc/pk/ecc/ecc_get_set.c
 src/ltc/pk/ecc/ecc_get_size.c
 src/ltc/pk/ecc/ecc_import.c
 src/ltc/pk/ecc/ecc_import_openssl.c

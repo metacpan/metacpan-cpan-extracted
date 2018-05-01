@@ -1,3 +1,11 @@
+v0.63.0 2018-04-28T00:31:02Z
+ - docker wrapper tmpl updated
+ - pcore deploy --develop options changed to --devel
+ - SCM clone fixed
+ - perl version fixed
+ - common::header moved to the separated package
+ - Filter::Crypto moved to devel deps
+
 v0.62.5 2018-04-24T17:09:45Z
  - P->cfg API updated
  - $ENV->{share}->store renamed to ->write

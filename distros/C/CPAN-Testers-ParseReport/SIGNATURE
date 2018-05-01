@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,26 +12,26 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 ebaf9660bff10171b456b545ef87541c2f746ce5 Changes
-SHA1 0d99c7a8359fbe3663326c484e4f097ec8a77b69 MANIFEST
+SHA1 0ebc46a9da826dd9256ec02bca54104b48c9c146 Changes
+SHA1 66be703b4f75388659860cc422318fd280f3ccf4 MANIFEST
 SHA1 9affe93993fbf2ef31f3c3f450fdbc6812ab6d03 MANIFEST.SKIP
-SHA1 221f3b3ee4d830c66b87a53146ef1115b4dd3745 META.json
-SHA1 8c5ef3a8a79ecc305b14426e98415a0e8e2fd69f META.yml
-SHA1 e9ccf74d1b7ba302438decfa008207a75e9f3c8c Makefile.PL
+SHA1 1bb4f46e66d713f56f8cde63ff136e6c9a60fc64 META.json
+SHA1 706304a62236117b3a3db90781f15a749f3fb7b6 META.yml
+SHA1 bad1172153da09611148db374c96115434e6d948 Makefile.PL
 SHA1 af348ab0f2fa69ad7dd041744d3fc4c1674acf88 README
 SHA1 75e051bd856dd73b1ac2ca54d910d4f00dc49fbe TODO
 SHA1 8b53bdb4632531b3598bfcafd87a3de4537e13fe bin/conf2conf.pl
-SHA1 717993aae86e6d7d2fe6edfe13efaabe517a3dde bin/ctgetreports
+SHA1 caf8ac2656760605da6c4c6b77fdfcbfc5e04e0e bin/ctgetreports
 SHA1 ba9b408017070abf10118cff7b92a5f0ee5aec08 bin/ctsolvereports
-SHA1 6931044a81cb49340a6a77cf51763cdf86a275b0 lib/CPAN/Testers/ParseReport.pm
-SHA1 214ea606d3bf7bbdc14af4afa8c8bee51a33d8d2 t/00-load.t
+SHA1 afa3e4cf951b2ba12273dd7aab709cafd2f903b3 lib/CPAN/Testers/ParseReport.pm
+SHA1 ebfa4a820935ae1da227ed49e5e0eb0faa839013 t/00-load.t
 SHA1 2c653e503aee9e78f775d237b36756aa38bc92e4 t/01-metayaml.t
-SHA1 563f378233bd3fca1636b206fb1002d31536edc5 t/ctgetreports.t
-SHA1 8eca35b6718a7a24ed5df6c01ad20d34908404df t/ctgr-live.t
-SHA1 865602362ea5d413242733d1e5e6e19c899837e9 t/nytprof.t
-SHA1 2dd80143fcb6f0e7515448406fd8eb842db15238 t/parse_long_report.t
+SHA1 67bfec37701093c139661624cbe5404b933441a7 t/ctgetreports.t
+SHA1 5b6030faee78f91e28dd9e7cea98b9a55a951111 t/ctgr-live.t
+SHA1 07d5a462b23c2a4ce1545539dabdef4967a1d541 t/nytprof.t
+SHA1 81237d2209abcbc67b18600b9826871e3a5ebf0e t/parse_long_report.t
 SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
 SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
 SHA1 dc81efbf47d931f84070d06f36eec909b25fbd03 t/run.t
@@ -184,10 +184,20 @@ SHA1 42c53dbcf0d6aab493823455113467258fdb39c1 t/var/nntp-testers/6115651.gz
 SHA1 7a6197f367308f16ede8ce587f241bb45cb1c05c t/var/nntp-testers/6422067
 SHA1 6bad95bc04c7bc66dd908a59f96ecf69535997c7 t/var/nntp-testers/6525411
 SHA1 25d73b8cf20feb02cfdbfb9f1a408dc4fac3cbcb t/var/nntp-testers/8327429
+SHA1 5ca832ae7898d74de53f1dc7bb7d2a8327ce00ba t/var/nntp-testers/94682624
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlezcooACgkQ7IA58KMXwV2vNwCg0JTETqmxDvqegq7CdtOQOGAJ
-I1UAoO3vz2VJblE1oZu5Vd40xFa01Ysf
-=6Nb9
+iQIzBAEBCgAdFiEE7Fn1fS6Kwn1215l440OC2vfZKqQFAlrkqKsACgkQ40OC2vfZ
+KqSZww/+OxP9lWbXDW4S8bfAdwsfc4yXQpanYJFE5+4Ida7Nyin4FvLo6xlD78gY
+FqVn3RU5VoeRWW3MsgUUMYwupFreEnRBz1d90FWnGtIVjYGGvOi7ne90P6DAE8Fq
+kEsIPnEX54z0qKWgqIQ4n1oVIJ35gPC3rMwxzzk1SBf/FP+zrKGZiTPehr7n3IKC
+8elXS9sk9DpXN/VMtG/2T3Im2WlBHMZVTqJJVGc1hP880xTtoyFjpYTCsLhOA2BD
+wQvxu4PKMO9aKqINqnfe0/yuD3fFeD5xtrJYoCodHK+7z+VWMQf+fypV6givYnU4
+lTsjL2MHfrd3g1VGO3R7A3vSROPU5mf7eJ5KaCe3Ycbro6FeXMBqxD6dDLAUF2rW
+Lu8RmvnHGbIHff7EknqLw/WvFI5cKLEetRTfEOddostRVs4MEQF57QchwnlwGDuq
+h/YcPJXqgpIJlLniIdczmOFislE24GiTusrro+0JnZ5chUVoEG25KlkzjLXsnrJd
+kXv+slrJVtteWEhnyeX/d1biDtp0zkwIEZ7J3dZsEFIwEv8hv4kLo/Gaqm+5gFOq
+M41+EQoPj/IXfbW2i/7Rhaqb9lq0uz1k8sWlgNH/WIqVULn06iH1MMo+5ivDIfAd
+HJqlYORUdiy+XXna7jBfKuhGqd5bEYEt2XHczI8396L1MOvDv8E=
+=oWTm
 -----END PGP SIGNATURE-----

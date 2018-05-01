@@ -1,21 +1,21 @@
 package App::cpm::Resolver::02Packages;
 use strict;
 use warnings;
-use App::cpm::version;
+
 use App::cpm::DistNotation;
+use App::cpm::version;
 use Cwd ();
 use File::Path ();
-our $VERSION = '0.971';
 
 {
     package
         App::cpm::Resolver::02Packages::Impl;
     use parent 'CPAN::Common::Index::Mirror';
+    use App::cpm::HTTP;
     use Class::Tiny qw(path);
-    use File::Spec;
     use File::Basename ();
     use File::Copy ();
-    use HTTP::Tinyish;
+    use File::Spec;
 
     our $HAS_IO_UNCOMPRESS_GUNZIP = eval { require IO::Uncompress::Gunzip };
 
@@ -34,12 +34,12 @@ our $VERSION = '0.971';
         my $path = $self->path;
         my $dest = File::Spec->catfile($self->cache, File::Basename::basename($path));
         if ($path =~ m{^https?://}) {
-            my $res = HTTP::Tinyish->new(agent => "App::cpm/$VERSION", verify_SSL => 1)->mirror($path => $dest);
+            my $res = App::cpm::HTTP->create->mirror($path => $dest);
             die "$res->{status} $res->{reason}, $path\n" unless $res->{success};
         } else {
             $path =~ s{^file://}{};
             die "$path: No such file.\n" unless -f $path;
-            if (!-f $dest or (stat $dest)[9] < (stat $path)[9]) {
+            if (!-f $dest or (stat $dest)[9] <= (stat $path)[9]) {
                 File::Copy::copy($path, $dest) or die "Copy $path $dest: $!\n";
                 my $mtime = (stat $path)[9];
                 utime $mtime, $mtime, $dest;
@@ -49,7 +49,7 @@ our $VERSION = '0.971';
         if ($dest =~ /\.gz$/) {
             ( my $uncompressed = File::Basename::basename($dest) ) =~ s/\.gz$//;
             $uncompressed = File::Spec->catfile( $self->cache, $uncompressed );
-            if ( !-f $uncompressed or (stat $uncompressed)[9] < (stat $dest)[9] ) {
+            if ( !-f $uncompressed or (stat $uncompressed)[9] <= (stat $dest)[9] ) {
                 no warnings 'once';
                 IO::Uncompress::Gunzip::gunzip($dest, $uncompressed)
                     or die "Gunzip $dest: $IO::Uncompress::Gunzip::GunzipError";

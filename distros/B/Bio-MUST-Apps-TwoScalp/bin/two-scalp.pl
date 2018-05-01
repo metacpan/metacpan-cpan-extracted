@@ -42,7 +42,7 @@ two-scalp.pl - Align or re-align sequences using various strategies
 
 =head1 VERSION
 
-version 0.180160
+version 0.181180
 
 =head1 USAGE
 

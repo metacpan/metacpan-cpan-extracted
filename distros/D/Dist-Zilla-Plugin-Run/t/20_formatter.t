@@ -15,12 +15,12 @@ for my $trial (0, 1) {
                     [ GatherDir => ],
                     [ MetaConfig => ],
 
-                    [ 'Run::BeforeBuild' => { run => [ '"%x" script%prun.pl before_build %s %n %v%t .%d.%a. %x' ] } ],
-                    [ 'Run::AfterBuild' => { run => [ '"%x" script%prun.pl after_build %n %v%t %d %s %s %v%t .%a. %x' ] } ],
-                    [ 'Run::BeforeArchive' => { run => [ '"%x" script%prun.pl before_archive %d %v%t %n %a %x' ] } ],
-                    [ 'Run::BeforeRelease' => { run => [ '"%x" script%prun.pl before_release %n -d %d %s -v %v%t .%a. %x' ] } ],
-                    [ 'Run::Release' => { run => [ '"%x" script%prun.pl release %s %n %v%t %d/a %d/b %a %x' ] } ],
-                    [ 'Run::AfterRelease' => { run => [ '"%x" script%prun.pl after_release %d %v%t %s %s %n %a %x' ] } ],
+                    [ 'Run::BeforeBuild' => { run => [ '"%x" %o%pscript%prun.pl before_build %s %n %v%t %o.%d.%a. %x' ] } ],
+                    [ 'Run::AfterBuild' => { run => [ '"%x" %o%pscript%prun.pl after_build %n %v%t %o %d %s %s %v%t .%a. %x' ] } ],
+                    [ 'Run::BeforeArchive' => { run => [ '"%x" %o%pscript%prun.pl before_archive %o %d %v%t %n %a %x' ] } ],
+                    [ 'Run::BeforeRelease' => { run => [ '"%x" %o%pscript%prun.pl before_release %n -d %o %d %s -v %v%t .%a. %x' ] } ],
+                    [ 'Run::Release' => { run => [ '"%x" %o%pscript%prun.pl release %s %n %v%t %o %d/a %d/b %a %x' ] } ],
+                    [ 'Run::AfterRelease' => { run => [ '"%x" %o%pscript%prun.pl after_release %o %d %v%t %s %s %n %a %x' ] } ],
                 ),
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
                 path(qw(source script run.pl)) => <<'SCRIPT',
@@ -33,24 +33,27 @@ SCRIPT
         },
     );
 
-    my $dir = 'fake';
+    my $source_dir = 'fakesource';
+    my $build_dir = 'fakebuild';
 
     my %f = (
         a => 'DZT-Sample-0.001.tar.gz',
         n => 'DZT-Sample',
-        d => $dir,
+        o => $source_dir,
+        d => $build_dir,
         v => '0.001',
         t => $tzil->is_trial ? '-TRIAL' : '',
     );
 
     my $formatter = $tzil->plugin_named('Run::AfterRelease')->build_formatter({
         archive   => $f{a},
-        dir       => $dir,
+        source_dir => $source_dir,
+        dir       => $build_dir,
         pos       => [qw(run run reindeer)]
     });
 
-    is $formatter->format('snowflakes/%v%t|%n\\%s,%s,%s,%s in %d(%a)'),
-        "snowflakes/$f{v}$f{t}|$f{n}\\run,run,reindeer, in $f{d}($f{a})",
+    is $formatter->format('snowflakes/%v%t|%n\\%s,%s,%s,%s in %o %d(%a)'),
+        "snowflakes/$f{v}$f{t}|$f{n}\\run,run,reindeer, in $f{o} $f{d}($f{a})",
         'correct formatting';
 
     is $formatter->format('%v%t%s%n'), "$f{v}$f{t}$f{n}", 'ran out of %s (but not the constants)';
@@ -67,7 +70,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::BeforeBuild',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%prun.pl before_build %s %n %v%t .%d.%a. %x' ],
+                                run => [ '"%x" %o%pscript%prun.pl before_build %s %n %v%t %o.%d.%a. %x' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,
@@ -80,7 +83,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::AfterBuild',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%prun.pl after_build %n %v%t %d %s %s %v%t .%a. %x' ],
+                                run => [ '"%x" %o%pscript%prun.pl after_build %n %v%t %o %d %s %s %v%t .%a. %x' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,
@@ -93,7 +96,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::BeforeArchive',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%prun.pl before_archive %d %v%t %n %a %x' ],
+                                run => [ '"%x" %o%pscript%prun.pl before_archive %o %d %v%t %n %a %x' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,
@@ -106,7 +109,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::BeforeRelease',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%prun.pl before_release %n -d %d %s -v %v%t .%a. %x' ],
+                                run => [ '"%x" %o%pscript%prun.pl before_release %n -d %o %d %s -v %v%t .%a. %x' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,
@@ -119,7 +122,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::Release',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%prun.pl release %s %n %v%t %d/a %d/b %a %x' ],
+                                run => [ '"%x" %o%pscript%prun.pl release %s %n %v%t %o %d/a %d/b %a %x' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,
@@ -132,7 +135,7 @@ SCRIPT
                         class => 'Dist::Zilla::Plugin::Run::AfterRelease',
                         config => {
                             'Dist::Zilla::Plugin::Run::Role::Runner' => {
-                                run => [ '"%x" script%prun.pl after_release %d %v%t %s %s %n %a %x' ],
+                                run => [ '"%x" %o%pscript%prun.pl after_release %o %d %v%t %s %s %n %a %x' ],
                                 fatal_errors => 1,
                                 quiet => 0,
                                 version => Dist::Zilla::Plugin::Run::Role::Runner->VERSION,

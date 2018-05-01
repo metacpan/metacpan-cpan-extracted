@@ -39,7 +39,7 @@ use SNMP::Info;
 
 use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE/;
 
-$VERSION = '3.56';
+$VERSION = '3.58';
 
 %MIBS = ( 'POWER-ETHERNET-MIB' => 'pethPsePortDetectionStatus' );
 
@@ -73,7 +73,7 @@ sub peth_port_ifindex {
     my $partial = shift;
 
     my $peth_port_status = $peth->peth_port_status($partial);
-    my $peth_port_ifindex;
+    my $peth_port_ifindex = {};
 
     foreach my $i ( keys %$peth_port_status ) {
         my ( $module, $port ) = split( /\./, $i );

@@ -1,3 +1,28 @@
+0.007   2018-05-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix *all* the examples, including in the Options section.
+
+
+0.006   2018-05-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix results in Synopsis.
+
+
+0.005   2018-04-25 (PERLANCAR)
+
+	- [doc] Add --calc-percentile example in Synopsis and more
+	  documentation for options.
+
+	- [Fix] Allow extrapolating to get requested low percentiles.
+
+	- Forgot the standard Getopt::Long configuration (bundling +
+	  no_ignore_case).
+
+
 0.004   2018-04-25 (PERLANCAR)
 
 	- Add options: --action (new action calc-percentile),

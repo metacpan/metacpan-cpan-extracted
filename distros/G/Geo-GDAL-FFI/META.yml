@@ -24,5 +24,7 @@ requires:
   Alien::gdal: '0'
   FFI::Platypus: '0'
   PDL: '0'
-version: 0.01
+resources:
+  repository: git://github.com/ajolma/Geo-GDAL-FFI.git
+version: 0.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

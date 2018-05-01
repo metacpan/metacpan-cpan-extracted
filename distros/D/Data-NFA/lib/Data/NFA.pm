@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Data::NFA;
-our $VERSION = "20180406";
+our $VERSION = "20180428";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -351,6 +351,32 @@ sub allTransitions($)                                                           
 
   $nfaSymbolTransitions
  } # allTransitions
+
+sub parse2($$@)                                                                 # Parse an array of symbols
+ {my ($states, $stateName, @symbols) = @_;                                      # States, current state, remaining symbols
+
+  if (my $final = $$states{$stateName}[Final])                                  # Return success if we are in a final sate with no more symbols to parse   
+   {return 1 unless @symbols;
+   }
+
+  return 0 unless @symbols;                                                     # No more symbols but not in a final state  
+
+  my ($symbol, @remainder) = @symbols;                                          # Current symbol to parse 
+  my $reachable = statesReachableViaSymbol($states, $stateName, $symbol, {});   # States reachable from the current state via the current symbol
+  
+  for my $nextState(@$reachable)                                                # Each state reachable from the current state
+   {my $result = &parse2($states, $nextState, @remainder);                      # Try each reachable state
+    return $result if $result;                                                  # Propogate success if a solution was found
+   }
+
+  undef                                                                         # No path to a final state found
+ } 
+
+sub parse($@)                                                                   # Parse an array of symbols
+ {my ($states, @symbols) = @_;                                                  # States, array of symbols
+
+  parse2($states, 0, @symbols); 
+ } 
 
 #sub exitSymbolsForState($$)                                                    #P Find all the symbols that can exit a state via its transitions or jumps
 # {my ($states, $StateName) = @_;                                               # States, name of start state
@@ -1118,7 +1144,7 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>42;
+use Test::More tests=>81;
 
 if (1)
  {my $nfa = fromExpr(element("a"));                                             #Telement
@@ -1131,6 +1157,10 @@ Location  F  Transitions
 END
   ok  $nfa->isFinal(1);                                                         #TisFinal
   ok !$nfa->isFinal(0);                                                         #TisFinal
+  ok  $nfa->parse(qw(a)); 
+  ok !$nfa->parse(qw(a b)); 
+  ok !$nfa->parse(qw(b)); 
+  ok !$nfa->parse(qw(b a)); 
  }
 
 if (1)
@@ -1168,6 +1198,10 @@ Location  F  Transitions
        1  0  { b => 2 }
        2  1  undef
 END
+  ok  $nfa->parse(qw(a b)); 
+  ok !$nfa->parse(qw(b a)); 
+  ok !$nfa->parse(qw(a)); 
+  ok !$nfa->parse(qw(b)); 
  }
 
 if (1)
@@ -1180,6 +1214,9 @@ Location  F  Transitions  Jumps
        2  0  { c => 3 }   undef
        3  1  undef        undef
 END
+  ok  $nfa->parse(qw(a b c)); 
+  ok  $nfa->parse(qw(a c)); 
+  ok !$nfa->parse(qw(a c b)); 
  }
 
 if (1)
@@ -1193,6 +1230,10 @@ Location  F  Transitions  Jumps
        3  0  { c => 4 }   undef
        4  1  undef        undef
 END
+  ok  $nfa->parse(qw(a c)); 
+  ok  $nfa->parse(qw(a b c)); 
+  ok  $nfa->parse(qw(a b b c)); 
+  ok !$nfa->parse(qw(a b b d)); 
  }
 
 if (1)
@@ -1214,6 +1255,11 @@ END
 #  is_deeply [],         [$nfa->exitSymbolsForState(4)];
 #  is_deeply ["b"],      [$nfa->exitSymbolsForState(1)];
 #  is_deeply ["b", "c"], [$nfa->exitSymbolsForState(2)];
+
+  ok !$nfa->parse(qw(a c)); 
+  ok  $nfa->parse(qw(a b c)); 
+  ok  $nfa->parse(qw(a b b c)); 
+  ok !$nfa->parse(qw(a b b d)); 
  }
 
 if (1)
@@ -1235,6 +1281,10 @@ END
   is_deeply [2, 4], $nfa->statesReachableViaSymbol(1, "b");
   is_deeply [4],    $nfa->statesReachableViaSymbol(1, "c");
   is_deeply ['a'..'d'], [$nfa->symbols];
+  
+  ok  $nfa->parse(qw(a b d)); 
+  ok  $nfa->parse(qw(a c d)); 
+  ok !$nfa->parse(qw(a b c d)); 
  }
 
 if (1)
@@ -1258,6 +1308,11 @@ END
   is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(1, "a");
   is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(2, "a");
   is_deeply [1, 3, 4, 5], $nfa->statesReachableViaSymbol(3, "a");
+  
+  ok !$nfa->parse(qw(a)); 
+  ok  $nfa->parse(qw(a a)); 
+  ok  $nfa->parse(qw(a a a)); 
+  ok !$nfa->parse(qw(a b a)); 
  }
 
 if (1)
@@ -1283,6 +1338,10 @@ END
 #  is_deeply [qw(b c d)],  [$nfa->exitSymbolsForState(4)];
 #  is_deeply [qw(d)],      [$nfa->exitSymbolsForState(5)];
 #  is_deeply [],           [$nfa->exitSymbolsForState(6)];
+  
+  ok  $nfa->parse(qw(a d)); 
+  ok  $nfa->parse(qw(a b b c c b b d)); 
+  ok !$nfa->parse(qw(a d b)); 
  }
 
 if (1)
@@ -1308,6 +1367,11 @@ END
 
 
   is_deeply ['a'..'e'], [$nfa->symbols];                                        #Tsymbols
+
+  ok !$nfa->parse(qw(a e)); 
+  ok !$nfa->parse(qw(a d e)); 
+  ok  $nfa->parse(qw(a b c e)); 
+  ok  $nfa->parse(qw(a b c d e)); 
  }
 
 if (1)                                                                          # Nfa from string
@@ -1322,6 +1386,11 @@ Location  F  Transitions  Jumps
        2  0  { b => 3 }   undef
        3  1  undef        undef
 END
+
+  ok  $nfa->parse(qw(a)); 
+  ok  $nfa->parse(qw(b)); 
+  ok !$nfa->parse(qw(c)); 
+  ok !$nfa->parse(qw(a b)); 
  }
 
 if (1)                                                                          # Dfa from string
@@ -1457,27 +1526,8 @@ Location  F  Transitions  Jumps
   12      0  { c => 13 }  undef
   13      1  undef        undef
 END
- }
 
-if (1)                                                                          # Dfa from string elements
- {my $nfa = fromExpr(choice(qw(a b c)), except(qw(c x)), choice(qw(a b c)));            
-
-  ok $nfa->printNws("(a|b|c)(c!x)(a|b|c): ") eq nws <<END;                  
-(a|b|c)(c!x)(a|b|c):
-Location  F  Transitions  Jumps
-   0      0  { a => 1 }   [2, 4]
-   1      0  undef        [5, 7]
-   2      0  { b => 3 }   undef
-   3      0  undef        [5, 7]
-   4      0  { c => 5 }   undef
-   5      0  { a => 6 }   [7]
-   6      0  undef        [8, 10, 12]
-   7      0  { b => 8 }   undef
-   8      0  { a => 9 }   [10, 12]
-   9      1  undef        [13]
-  10      0  { b => 11 }  undef
-  11      1  undef        [13]
-  12      0  { c => 13 }  undef
-  13      1  undef        undef
-END
+  ok !$nfa->parse(qw(a a)); 
+  ok  $nfa->parse(qw(a a a)); 
+  ok !$nfa->parse(qw(a c a)); 
  }

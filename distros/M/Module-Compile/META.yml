@@ -4,9 +4,9 @@ author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,15 +14,18 @@ meta-spec:
 name: Module-Compile
 no_index:
   directory:
+    - example
     - inc
     - t
     - xt
-    - example
 requires:
+  App::Prove: '0'
+  Capture::Tiny: '0'
   Digest::SHA1: '2.13'
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/ingydotnet/module-compile-pm/issues
   homepage: https://github.com/ingydotnet/module-compile-pm
   repository: https://github.com/ingydotnet/module-compile-pm.git
-version: '0.35'
+version: '0.37'
+x_serialization_backend: 'YAML::Tiny version 1.69'

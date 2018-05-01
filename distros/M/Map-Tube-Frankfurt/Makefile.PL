@@ -24,10 +24,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Map::Tube::Frankfurt",
   "PREREQ_PM" => {
-    "Map::Tube" => "3.49",
+    "File::Share" => 0,
+    "Map::Tube" => "3.50",
+    "Moo" => "2.000000",
+    "namespace::clean" => 0
+  },
+  "TEST_REQUIRES" => {
+    "Map::Tube::Plugin::Formatter" => "0.14",
     "Test::Map::Tube" => "0.35"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,8 +41,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Map::Tube" => "3.49",
-  "Test::Map::Tube" => "0.35"
+  "File::Share" => 0,
+  "Map::Tube" => "3.50",
+  "Map::Tube::Plugin::Formatter" => "0.14",
+  "Moo" => "2.000000",
+  "Test::Map::Tube" => "0.35",
+  "namespace::clean" => 0
 );
 
 

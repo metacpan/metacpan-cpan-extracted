@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Role-RepoFileInjector
 
+0.009     2018-04-28 18:42:49Z
+          - fix test failures on MSWin32 and Dist::Zilla 5.x by normalizing
+            paths before logging them
+
+0.008     2018-04-27 00:14:42Z
+          - fix handling of non-default repo_root option
+          - repo_root now defaults to $zilla->root, rather than the current
+            directory, to work with Dist::Zilla 7.000
+
 0.007     2016-06-01 03:58:33Z
           - backwards compatibility fixes for Dist::Zilla 4.x
 

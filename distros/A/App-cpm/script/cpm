@@ -1,10 +1,9 @@
 #!perl
 use strict;
 use warnings;
-use utf8;
 
-use App::cpm;
-exit App::cpm->new->run(@ARGV);
+use App::cpm::CLI;
+exit App::cpm::CLI->new->run(@ARGV);
 
 __END__
 
@@ -64,6 +63,8 @@ cpm - a fast CPAN module installer
         default: https://cpan.metacpan.org
       --pp, --pureperl-only
         prefer pureperl only build
+      --static-install, --no-static-install
+        enable/disable the static install, default: enable
   -r, --resolver=class,args (EXPERIMENTAL, will be removed or renamed)
         specify resolvers, you can use --resolver multiple times
         available classes: metadb/metacpan/02packages/snapshot

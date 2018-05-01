@@ -3,7 +3,9 @@ package App::PPI::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = "1.01";
+$VERSION = "1.011";
+
+=encoding utf8
 
 =head1 NAME
 
@@ -60,7 +62,8 @@ details.
 =head1 SEE ALSO
 
 Most behaviour, including environment variables and configuration,
-comes directly from PPI::Dumper. I just made a command-line tool for it.
+comes directly from L<PPI::Dumper>. I just made a command-line tool
+for it.
 
 =head1 SOURCE AVAILABILITY
 
@@ -74,9 +77,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009-2013, brian d foy, All Rights Reserved.
+Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms as the Artistic License 2.0.
 
 =cut
 

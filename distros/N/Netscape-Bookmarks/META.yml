@@ -4,13 +4,13 @@ author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
   Test::File: '0'
-  Test::More: '0.95'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,15 +19,20 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
+  file:
+    - examples/Visitor.pm
 requires:
   HTML::Entities: '0'
   HTML::Parser: '3.26'
   HTTP::SimpleLinkChecker: '0'
   Text::Diff: '0'
   URI: '0'
-  perl: '5.008'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/briandfoy/netscape-bookmarks/issues
   homepage: https://github.com/briandfoy/netscape-bookmarks
   repository: https://github.com/briandfoy/netscape-bookmarks.git
-version: '2.301'
+version: '2.303'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

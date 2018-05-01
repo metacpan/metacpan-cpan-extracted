@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.9.3';
+$Git::Hooks::Notify::VERSION = '2.9.5';
 use 5.010;
 use utf8;
 use strict;
@@ -110,7 +110,7 @@ sub notify {
     (my $branch = $ref) =~ s:refs/heads/::;
 
     my $repository_name = $git->repository_name;
-    my $pusher = $git->authenticated_user;
+    my $pusher = $git->authenticated_user || '';
 
     my $subject = $git->get_config($CFG => 'subject')
         || '[Git::Hooks::Notify] repo:%R branch:%B';
@@ -275,7 +275,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.9.3
+version 2.9.5
 
 =head1 SYNOPSIS
 

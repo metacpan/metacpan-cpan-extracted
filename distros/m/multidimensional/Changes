@@ -1,5 +1,8 @@
 Revision history for multidimensional
 
+0.014     2018-04-26 22:35:46+01:00 Europe/London
+ - Only use Lexical::SealRequireHints before perl 5.12
+
 0.013     2017-04-20 15:05:14+01:00 Europe/London
  - Switch to Dist::Zilla::PluginBundle::Starter
    and ::Plugin::DymamicPrereqs

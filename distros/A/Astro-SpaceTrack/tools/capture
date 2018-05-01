@@ -18,7 +18,7 @@ use File::Glob qw{ bsd_glob };
 use JSON;
 use Mock::LWP::UserAgent ();
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 my %opt = (
     directory		=> $Mock::LWP::UserAgent::CANNED_RESPONSE_DIR,

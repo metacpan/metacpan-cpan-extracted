@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::SimpleLinkChecker
 
+1.167 2018-04-28T15:27:37Z
+	* Clarify that it's the Artistic License 2.0
+
 1.165 2016-12-07T14:21:25Z
 	* Allow the user agent to redirect a couple times. If you don't like
 	that you can turn it off as documented.

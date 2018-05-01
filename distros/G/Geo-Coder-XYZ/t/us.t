@@ -15,16 +15,15 @@ XYZ: {
 	SKIP: {
 		skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');
 
-		diag("Using Geo::Coder::XYZ $Geo::Coder::XYZ::VERSION");
-
 		my $geocoder = new_ok('Geo::Coder::XYZ');
 
 		# Check list context finds both Portland, ME and Portland, OR
-		my @locations = $geocoder->geocode('Portland, USA');
+		my @locations = $geocoder->geocode('Portland, US');
 
 		ok(scalar(@locations) > 1);
 
-		my ($maine, $oregon);
+		my $maine = 0;
+		my $oregon = 0;
 
 		foreach my $state(map { $_->{'state'} } @locations) {
 			# diag($state);

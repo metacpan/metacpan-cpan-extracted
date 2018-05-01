@@ -3,7 +3,7 @@ use warnings;
 package Dist::Zilla::Plugin::Run::Role::Runner;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -240,11 +240,16 @@ sub build_formatter {
             '';
         },
 
+        # source dir
+        o => sub {
+            my $dir = $params->{source_dir} || $self->zilla->root;
+            return $dir ? "$dir" : '';
+        },
+
         # build dir or mint dir
         d => sub {
             # stringify build directory
             my $dir = $params->{dir} || $self->zilla->built_in;
-            # $self->log(... warn that %d is not available here) if not $dir;  # and test me
             return "$dir" if $dir;
             $self->log('attempting to use %d in before_build');
             '';

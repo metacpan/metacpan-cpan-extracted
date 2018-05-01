@@ -41,7 +41,7 @@ use PPIx::Regexp::Constant qw{
 };
 use PPIx::Regexp::Util qw{ __to_ordinal_en };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -85,8 +85,8 @@ my @external = (	# Recognition used externally
 my @recognize_regexp = (	# recognition used internally
     [
 	qr{ \A \\ (?:		# numbered (including relative)
-	    ( \d+ )	|
-	    g (?: ( -? \d+ ) | \{ ( -? \d+ ) \} )
+	    ( [0-9]+ )	|
+	    g (?: ( -? [0-9]+ ) | \{ ( -? [0-9]+ ) \} )
 	)
 	}smx, { is_named => 0 }, ],
     [
@@ -101,7 +101,7 @@ my @recognize_regexp = (	# recognition used internally
 my %recognize = (
     regexp	=> \@recognize_regexp,
     repl	=> [
-	[ qr{ \A \\ ( \d+ ) }smx, { is_named => 0 } ],
+	[ qr{ \A \\ ( [0-9]+ ) }smx, { is_named => 0 } ],
     ],
 );
 

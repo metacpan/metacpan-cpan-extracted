@@ -10,11 +10,11 @@ FSM::Basic -  Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,11 @@ The keys are the states name.
 "do" for perl code
 
 
-"exec" for system code, and 2 specific commands:
+"exec" for system code,
+
+=back
+
+and 4 dedicated commands:
 
 =over 4
 
@@ -123,39 +127,53 @@ e.g. 'catWRAND' => './t/test_cat.txt:1 ./t/test_cat1.txt:50',   in this case the
 
 =back
 
-=item
+=over 4
 
-"matching" to define the state when the input match the "expect" value
+=item "matching"
+to define the state when the input match the "expect" value
+
+=back
+
+=over 4
+
+=item "final"
+to return a flag
+
+=back
+
+=over 4 
+
+=item "not_matching"
+the state if the input is not matching the "expect" value (if missing stay in the same state)
+ 
+=back
+
+=over 4
+
+=item "repeat"
+a number of trial before the state goes to "not_matching0"
+
+=back
+
+=over 4
+
+=item "not_matching0"
+the state when the number of failled matching number is reached
 
 
-=item
+=back
 
-"final" to return a flag
+=over 4
 
+=item "not_matching_info_last"
+info returned as second value when the  failled matching number is reached
 
-=item
+=back
 
-"not_matching" the state if the input is not matching the "expect" value (if missing stay in the same state)
+=over 4
 
-
-=item
-
-"repeat" a number of trial before the state goes to "not_matching0"
-
-
-=item
-
-"not_matching0" the state when the number of failled matching number is reached
-
-
-=item
-
-"not_matching_info_last" info returned as second value when the  failled matching number is reached
-
-
-=item
-
-"output" the info  returned as second value
+=item "output"
+the info  returned as second value
 
 
 =back
@@ -178,6 +196,7 @@ sub new {
 }
 
 =back
+
 =head2 run
 
 my ( $final, $out ) = $fsm->run( $in );

@@ -1,4 +1,5 @@
-package Visitor;
+package # hide from PAUSE
+	Visitor;
 
 =encoding utf8
 
@@ -57,8 +58,7 @@ Beyond that, look at the code.
 
 =cut
 
-sub visit
-	{
+sub visit {
 	my( $self, $object ) = @_;
 
 	my $class = ref $object;
@@ -67,29 +67,25 @@ sub visit
 	$self->$class($object);
 	}
 
-sub Category
-	{
+sub Category {
 	my( $self, $object ) = @_;
 
 	print STDERR "\tFound category!\n";
 	}
 
-sub Alias
-	{
+sub Alias {
 	my( $self, $object ) = @_;
 
 	print STDERR "\tFound Alias!\n";
 	}
 
-sub Separator
-	{
+sub Separator {
 	my( $self, $object ) = @_;
 
 	print STDERR "\tFound Separator!\n";
 	}
 
-sub Link
-	{
+sub Link {
 	my( $self, $object ) = @_;
 	print STDERR "\tFound Link!\n";
 	return unless require HTTP::SimpleLinkChecker;
@@ -100,7 +96,9 @@ sub Link
 	}
 
 1;
+
 __END__
+
 =back
 
 =head1 AUTHOR
@@ -109,10 +107,10 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 
 =head1 SEE ALSO

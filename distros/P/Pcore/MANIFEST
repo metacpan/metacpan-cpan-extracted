@@ -199,7 +199,6 @@ lib/Pcore/WebSocket/Handle.pm
 lib/Pcore/WebSocket/Protocol/pcore.pm
 lib/Pcore/WebSocket/Protocol/pcore/Request.pm
 lib/Pcore/WebSocket/Protocol/raw.pm
-lib/common/header.pm
 lib/pod/csv.pod
 lib/pod/ext/model.pod
 lib/pod/extjs.pod

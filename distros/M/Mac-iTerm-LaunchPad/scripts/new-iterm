@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Mac::iTerm::LaunchPad;
+
+Mac::iTerm::LaunchPad->run();

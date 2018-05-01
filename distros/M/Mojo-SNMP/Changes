@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-SNMP
 
+0.13 2018-04-29T13:09:07+0200
+ - Improved documentation #11
+
 0.12 2016-03-22T09:34:38+0100
  - Fix bulk_walk against noSuchInstance identifier #10
    Contributor: Oliver Gorwits

@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,7 +16,12 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
+      ],
+      "file" : [
+         "examples/Visitor.pm"
       ]
    },
    "prereqs" : {
@@ -36,13 +41,13 @@
             "HTTP::SimpleLinkChecker" : "0",
             "Text::Diff" : "0",
             "URI" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
             "Test::File" : "0",
-            "Test::More" : "0.95"
+            "Test::More" : "1"
          }
       }
    },
@@ -58,5 +63,6 @@
          "web" : "https://github.com/briandfoy/netscape-bookmarks"
       }
    },
-   "version" : "2.301"
+   "version" : "2.303",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

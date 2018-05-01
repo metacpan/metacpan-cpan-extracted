@@ -13,6 +13,6 @@ diag( "Testing Yahoo::Weather::Api $Yahoo::Weather::Api::VERSION, Perl $], $^X" 
 
 my $api = Yahoo::Weather::Api->new();
 
-is($api->VERSION,'1.10','Version test');
+is($api->VERSION,'2.00','Version test');
 
 done_testing();

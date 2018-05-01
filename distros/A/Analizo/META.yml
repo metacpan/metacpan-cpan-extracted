@@ -1,7 +1,7 @@
 ---
 abstract: 'multi-language source code analysis toolkit'
 author:
-  - 'Joenio Costa <joenio@joenio.me>'
+  - 'Joenio Marques da Costa <joenio@joenio.me>'
 build_requires:
   Archive::Extract: '0'
   File::LibMagic: '0'
@@ -17,7 +17,7 @@ build_requires:
   Test::MockModule: '0'
   Test::MockObject: '0'
 configure_requires:
-  Alien::Doxyparse: '0.06'
+  Alien::Doxyparse: '0.07'
   Alien::SLOCCount: '0.05'
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -32,6 +32,7 @@ requires:
   App::Cmd: '0'
   CHI: '0'
   Class::Accessor: '0'
+  Class::Inspector: '0'
   DBD::SQLite: '0'
   DBI: '0'
   Digest::SHA: '0'
@@ -47,10 +48,10 @@ requires:
   Statistics::Descriptive: '0'
   Term::ProgressBar: '0'
   YAML: '1.20'
-  YAML::Tiny: '0'
+  YAML::XS: '0'
   ZMQ::FFI: '0'
 resources:
   bugtracker: http://github.com/analizo/Analizo/issues
   repository: git://github.com/analizo/analizo.git
-version: 1.20.8
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: 1.21.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

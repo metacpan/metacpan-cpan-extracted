@@ -6,13 +6,11 @@ hints/hpux.pl
 hints/linux.pl
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
 META.yml			Module meta-data (added by MakeMaker)
 ppport.h
 README
 stacksize
-Storable.bs
-Storable.c
-Storable.o
 Storable.pm.PL
 Storable.xs
 t/attach.t
@@ -67,4 +65,3 @@ t/tied_store.t
 t/utf8.t
 t/utf8hash.t
 t/weak.t
-META.json                                Module JSON meta-data (added by MakeMaker)

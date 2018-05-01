@@ -1,5 +1,5 @@
-App-Scheme79asm version 0.005
-=============================
+App-Scheme79asm version 0.005001
+================================
 
 SIMPLE is a LISP processor defined in the 1979
 B<Design of LISP-Based Processors> paper by Steele and Sussman.
@@ -43,6 +43,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
+* Data::Dump::Sexp
 * Data::SExpression
 * List::MoreUtils
 

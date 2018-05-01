@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib 'lib';
+use continuous::delivery::template;
+
+print continuous::delivery::template->hello(), "\n";
+exit 0;

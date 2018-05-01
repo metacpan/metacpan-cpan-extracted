@@ -3,7 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 6;
+use File::Temp qw/ tempdir /;
+use File::Spec;
 
 use HTML::Latemp::GenMakeHelpers;
 
@@ -193,4 +195,29 @@ is ($host_outputs->{'file_lists'}, $file_lists_expected, "File Lists");
 # TEST
 is_deeply ([split(/\n/, $host_outputs->{'rules'}, -1)],
     [split(/\n/, $rules_expected, -1)], "Rules");
+}
+{
+    my $DIR = tempdir( CLEANUP => 1);
+    my $finder = HTML::Latemp::GenMakeHelpers->new(
+        'hosts' =>
+        [
+            {
+                'id' => "common",
+                'source_dir' => "t/sample-data/common-1",
+                'dest_dir' => "\$(HELLO)/src",
+            },
+            {
+                'id' => "src",
+                'source_dir' => "t/sample-data/sample-site-1",
+                'dest_dir' => "\$(HELLO)/src",
+            },
+        ],
+        out_dir => $DIR,
+    );
+    $finder->process_all();
+
+    # TEST
+    ok (scalar (-f File::Spec->catfile($DIR, "include.mak")), "include.mak was written.");
+    # TEST
+    ok (scalar (-f File::Spec->catfile($DIR, "rules.mak")), "rules.mak was written.");
 }

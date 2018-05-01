@@ -279,6 +279,15 @@ simplify_polygons(polygons, fillType)
     delete polygons;
   OUTPUT:
     RETVAL
+
+IV
+_floor(x)
+    SV * x
+  CODE:
+    RETVAL = SvNOK(x) ? Perl_floor(SvNV(x)) : SvIV(x);
+  OUTPUT:
+    RETVAL
+
 %}
 
   %name{clear}

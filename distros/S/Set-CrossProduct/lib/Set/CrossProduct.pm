@@ -7,7 +7,7 @@ no warnings;
 use subs qw();
 use vars qw( $VERSION );
 
-$VERSION = '2.002';
+$VERSION = '2.003';
 
 =encoding utf8
 
@@ -532,10 +532,7 @@ of possibly non-unique tuples.
 
 This source is in Github:
 
-	http://github.com/briandfoy/Set-CrossProduct
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	http://github.com/briandfoy/set-crossproduct
 
 =head1 AUTHOR
 
@@ -545,10 +542,10 @@ Matt Miller implemented the named sets feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

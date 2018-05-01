@@ -1,7 +1,7 @@
 package App::genpw;
 
-our $DATE = '2018-02-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-05-01'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -123,26 +123,90 @@ sub _set_case {
     }
 }
 
+our $re = qr/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[abBdhlmswx%]))/;
+
 sub _fill_pattern {
     my ($pattern, $words) = @_;
 
-    $pattern =~ s/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[abBdhlmswx%]))/
-        _fill_conversion({%+}, $words)/eg;
+    $pattern =~ s/$re/_fill_conversion({%+}, $words)/eg;
 
     $pattern;
 }
 
+sub _pattern_has_w_conversion {
+    my ($pattern) = @_;
+    my $res;
+    $pattern =~ s/$re/if ($+{CONV} eq 'w') { $res = 1 }/eg;
+    $res;
+}
+
 $SPEC{genpw} = {
     v => 1.1,
-    summary => 'Generate random password',
+    summary => 'Generate random password (support patterns + wordlists)',
     description => <<'_',
 
 This is yet another utility to generate random password. Features:
 
 * Allow specifying pattern(s), e.g. '%8a%s' means 8 random alphanumeric
   characters followed by a symbol.
+* Use words from wordlists.
 * Use strong random source (<pm:Math::Random::Secure>) when available, otherwise
   fallback to Perl's builtin `rand()`.
+
+Examples:
+
+By default generate letters/digits 8-20 characters long:
+
+    % genpw
+    J9K3ZjBVR
+
+Generate 5 passwords instead of 1:
+
+    % genpw 5
+    wAYftKsS
+    knaY7MOBbcvFFS3L1wyW
+    oQGz62aF
+    sG1A9reVOe
+    Zo8GoFEq
+
+Generate random digits between 10 and 12 characters long:
+
+    % genpw -p '%10$12d'
+    55597085674
+
+Generate password in the form of a random word + 4 random digits. Words will be
+fed from STDIN:
+
+    % genpw -p '%w%4d' < /usr/share/dict/words
+    shafted0412
+
+Like the above, but words will be fetched from `WordList::*` modules. You need
+to install the <prog:genpw-wordlist> CLI. By default, will use wordlist from
+<pm:WordList::EN::Enable>:
+
+    % genpw-wordlist -p '%w%4d'
+    sedimentologists8542
+
+Generate a random GUID:
+
+    % genpw -p '%8h-%4h-%4h-%4h-%12h'
+    ff26d142-37a8-ecdf-c7f6-8b6ae7b27695
+
+Like the above, but in uppercase:
+
+    % genpw -p '%8h-%4h-%4h-%4h-%12h'
+    22E13D9E-1187-CD95-1D05-2B92A09E740D
+
+Use configuration file to avoid typing the pattern every time, put this in
+`~/genpw.conf`:
+
+    [profile=guid]
+    patterns = "%8h-%4h-%4h-%4h-%12h"
+
+then:
+
+    % genpw -P guid
+    008869fa-177e-3a46-24d6-0900a00e56d5
 
 _
     args => {
@@ -180,9 +244,19 @@ randomly to lower-/uppercase. `lower` forces lower case. `upper` forces
 UPPER CASE. `title` forces Title case.
 
 _
+            cmdline_aliases => {
+                U => {is_flag=>1, summary=>'Shortcut for --case=upper', code=>sub {$_[0]{case} = 'upper'}},
+                L => {is_flag=>1, summary=>'Shortcut for --case=lower', code=>sub {$_[0]{case} = 'lower'}},
+            },
         },
     },
     examples => [
+    ],
+    links => [
+        {url=>'prog:genpw-base56'},
+        {url=>'prog:genpw-base64'},
+        {url=>'prog:genpw-id'},
+        {url=>'prog:genpw-wordlist'},
     ],
 };
 sub genpw {
@@ -193,6 +267,18 @@ sub genpw {
     my $max_len = $args{max_len} // $args{len} // 20;
     my $patterns = $args{patterns} // ["%$min_len\$${max_len}a"];
     my $case = $args{case} // 'default';
+
+  GET_WORDS_FROM_STDIN:
+    {
+        last if defined $args{_words};
+        my $has_w;
+        for (@$patterns) {
+            if (_pattern_has_w_conversion($_)) { $has_w++; last }
+        }
+        last unless $has_w;
+        $args{_words} = [shuffle <STDIN>];
+        chomp for @{ $args{_words} };
+    }
 
     my @passwords;
     for my $i (1..$num) {
@@ -206,7 +292,7 @@ sub genpw {
 }
 
 1;
-# ABSTRACT: Generate random password
+# ABSTRACT: Generate random password (support patterns + wordlists)
 
 __END__
 
@@ -216,11 +302,11 @@ __END__
 
 =head1 NAME
 
-App::genpw - Generate random password
+App::genpw - Generate random password (support patterns + wordlists)
 
 =head1 VERSION
 
-This document describes version 0.005 of App::genpw (from Perl distribution App-genpw), released on 2018-02-20.
+This document describes version 0.007 of App::genpw (from Perl distribution App-genpw), released on 2018-05-01.
 
 =head1 SYNOPSIS
 
@@ -235,7 +321,7 @@ Usage:
 
  genpw(%args) -> [status, msg, result, meta]
 
-Generate random password.
+Generate random password (support patterns + wordlists).
 
 This is yet another utility to generate random password. Features:
 
@@ -244,10 +330,67 @@ This is yet another utility to generate random password. Features:
 =item * Allow specifying pattern(s), e.g. '%8a%s' means 8 random alphanumeric
 characters followed by a symbol.
 
+=item * Use words from wordlists.
+
 =item * Use strong random source (L<Math::Random::Secure>) when available, otherwise
 fallback to Perl's builtin C<rand()>.
 
 =back
+
+Examples:
+
+By default generate letters/digits 8-20 characters long:
+
+ % genpw
+ J9K3ZjBVR
+
+Generate 5 passwords instead of 1:
+
+ % genpw 5
+ wAYftKsS
+ knaY7MOBbcvFFS3L1wyW
+ oQGz62aF
+ sG1A9reVOe
+ Zo8GoFEq
+
+Generate random digits between 10 and 12 characters long:
+
+ % genpw -p '%10$12d'
+ 55597085674
+
+Generate password in the form of a random word + 4 random digits. Words will be
+fed from STDIN:
+
+ % genpw -p '%w%4d' < /usr/share/dict/words
+ shafted0412
+
+Like the above, but words will be fetched from C<WordList::*> modules. You need
+to install the L<genpw-wordlist> CLI. By default, will use wordlist from
+L<WordList::EN::Enable>:
+
+ % genpw-wordlist -p '%w%4d'
+ sedimentologists8542
+
+Generate a random GUID:
+
+ % genpw -p '%8h-%4h-%4h-%4h-%12h'
+ ff26d142-37a8-ecdf-c7f6-8b6ae7b27695
+
+Like the above, but in uppercase:
+
+ % genpw -p '%8h-%4h-%4h-%4h-%12h'
+ 22E13D9E-1187-CD95-1D05-2B92A09E740D
+
+Use configuration file to avoid typing the pattern every time, put this in
+C<~/genpw.conf>:
+
+ [profile=guid]
+ patterns = "%8h-%4h-%4h-%4h-%12h"
+
+then:
+
+ % genpw -P guid
+ 008869fa-177e-3a46-24d6-0900a00e56d5
 
 This function is not exported.
 
@@ -330,8 +473,14 @@ feature.
 
 =head1 SEE ALSO
 
-A few other utilities based on genpw: L<genpw-id> (from L<App::genpw::id>) and
-L<genpw-wordlist> (from L<App::genpw::wordlist>).
+
+L<genpw-base56>.
+
+L<genpw-base64>.
+
+L<genpw-id>.
+
+L<genpw-wordlist>.
 
 =head1 AUTHOR
 

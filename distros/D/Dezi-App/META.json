@@ -91,155 +91,155 @@
    "provides" : {
       "Dezi::Aggregator" : {
          "file" : "lib/Dezi/Aggregator.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::DBI" : {
          "file" : "lib/Dezi/Aggregator/DBI.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::FS" : {
          "file" : "lib/Dezi/Aggregator/FS.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::Mail" : {
          "file" : "lib/Dezi/Aggregator/Mail.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::MailFS" : {
          "file" : "lib/Dezi/Aggregator/MailFS.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::Spider" : {
          "file" : "lib/Dezi/Aggregator/Spider.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::Spider::Response" : {
          "file" : "lib/Dezi/Aggregator/Spider/Response.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Aggregator::Spider::UA" : {
          "file" : "lib/Dezi/Aggregator/Spider/UA.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::App" : {
          "file" : "lib/Dezi/App.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::CLI" : {
          "file" : "lib/Dezi/CLI.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Cache" : {
          "file" : "lib/Dezi/Cache.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Indexer" : {
          "file" : "lib/Dezi/Indexer.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Indexer::Config" : {
          "file" : "lib/Dezi/Indexer/Config.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Indexer::Doc" : {
          "file" : "lib/Dezi/Indexer/Doc.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::InvIndex" : {
          "file" : "lib/Dezi/InvIndex.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::InvIndex::Header" : {
          "file" : "lib/Dezi/InvIndex/Header.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Lucy" : {
          "file" : "lib/Dezi/Lucy.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Lucy::Indexer" : {
          "file" : "lib/Dezi/Lucy/Indexer.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Lucy::InvIndex" : {
          "file" : "lib/Dezi/Lucy/InvIndex.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Lucy::Result" : {
          "file" : "lib/Dezi/Lucy/Result.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Lucy::Results" : {
          "file" : "lib/Dezi/Lucy/Results.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Lucy::Searcher" : {
          "file" : "lib/Dezi/Lucy/Searcher.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Queue" : {
          "file" : "lib/Dezi/Queue.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::ReplaceRules" : {
          "file" : "lib/Dezi/ReplaceRules.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Result" : {
          "file" : "lib/Dezi/Result.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Results" : {
          "file" : "lib/Dezi/Results.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Role" : {
          "file" : "lib/Dezi/Role.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Searcher" : {
          "file" : "lib/Dezi/Searcher.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Searcher::SearchOpts" : {
          "file" : "lib/Dezi/Searcher/SearchOpts.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::Doc" : {
          "file" : "lib/Dezi/Test/Doc.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::Indexer" : {
          "file" : "lib/Dezi/Test/Indexer.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::InvIndex" : {
          "file" : "lib/Dezi/Test/InvIndex.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::Result" : {
          "file" : "lib/Dezi/Test/Result.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::Results" : {
          "file" : "lib/Dezi/Test/Results.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::ResultsPayload" : {
          "file" : "lib/Dezi/Test/ResultsPayload.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Test::Searcher" : {
          "file" : "lib/Dezi/Test/Searcher.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Types" : {
          "file" : "lib/Dezi/Types.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dezi::Utils" : {
          "file" : "lib/Dezi/Utils.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -255,7 +255,7 @@
          "web" : "https://github.com/karpet/dezi-app"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -10,7 +10,7 @@ use Data::Dumper qw/Dumper/;
 use Data::SExpression qw/consp scalarp/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.005';
+our $VERSION = '0.005001';
 
 our %TYPES = (
 	LIST => 0,
@@ -71,6 +71,7 @@ sub process {
 	die "Type too large: $type\n" if $type >= (1 << $self->{type_bits});
 	die "Addr too large: $addr\n" if $addr >= (1 << $self->{addr_bits});
 	my $result = ($type << $self->{addr_bits}) + $addr;
+
 	unless ($location) {
 		$self->{freeptr}++;
 		$location = $self->{freeptr}

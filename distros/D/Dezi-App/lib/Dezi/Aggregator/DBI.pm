@@ -13,7 +13,7 @@ has 'schema'        => ( is => 'rw', isa => 'HashRef', required => 1 );
 has 'use_quotes'    => ( is => 'rw', isa => 'Bool',    default  => sub {1} );
 has 'quote_char' => ( is => 'rw', isa => 'Str', default => sub {q/`/} );
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 my $XMLer = Search::Tools::XML->new();    # included in Utils
 
@@ -395,7 +395,7 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 by Peter Karman
+Copyright 2018 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

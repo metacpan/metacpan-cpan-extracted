@@ -1,6 +1,19 @@
 Change history for HTTP::Tiny::Multipart
 ========================================
 
+0.08  2018-04-30 18:59:00
+
+      [IMPROVEMENTS]
+      * Do not modify the args hash, it is a user supplied reference, and removing headers from it is a noop since the headers key is already defined after the args when calling request().
+      * No need to double clone the headers hash.
+      * Update Carp::Internal so that croak()s actually end up at a useful place.
+      * All done by @bluefeet, thanks!
+
+
+      [MISC]
+      * updated dist.ini to create README, add contributors, ...
+      * add travis config
+
 0.07  2017-08-12
 
       [MISC]

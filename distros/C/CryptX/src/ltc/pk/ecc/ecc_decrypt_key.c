@@ -27,7 +27,7 @@
 */
 int ecc_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                           unsigned char *out, unsigned long *outlen,
-                          ecc_key *key)
+                          const ecc_key *key)
 {
    unsigned char *ecc_shared, *skey, *pub_expt;
    unsigned long  x, y;
@@ -85,7 +85,7 @@ int ecc_decrypt_key(const unsigned char *in,  unsigned long  inlen,
    }
 
    /* import ECC key from packet */
-   if ((err = ecc_set_dp_copy(key, &pubkey)) != CRYPT_OK) { goto LBL_ERR; }
+   if ((err = ecc_copy_dp(key, &pubkey)) != CRYPT_OK) { goto LBL_ERR; }
    if ((err = ecc_set_key(decode[1].data, decode[1].size, PK_PUBLIC, &pubkey)) != CRYPT_OK) { goto LBL_ERR; }
 
    /* make shared key */

@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::CdHit;
 # ABSTRACT: Bio::MUST driver for running the cd-hit program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::CdHit::VERSION = '0.180770';
+$Bio::MUST::Drivers::CdHit::VERSION = '0.181160';
 use Moose;
 use namespace::autoclean;
 
@@ -18,10 +18,17 @@ use Smart::Comments '###';
 use Bio::MUST::Core;
 extends 'Bio::MUST::Core::Ali::Temporary';
 
+use Bio::MUST::Drivers::Utils qw(stringify_args);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::FastParsers::CdHit';
 
+
+has 'cdhit_args' => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    default  => sub { {} },
+);
 
 has '_cluster_seq_ids' => (
     traits   => ['Hash'],
@@ -88,11 +95,13 @@ sub BUILD {
     my $outfile  = $basename . '.out';
     my $outfile_clstr  = $basename . '.out.clstr';
 
-    # TODO: add options if wanted
+    # format cd-hit (optional) arguments
+    my $args = $self->cdhit_args;
+    my $args_str = stringify_args($args);
 
     # create cd-hit command
     my $pgm = 'cd-hit';
-    my $cmd = "$pgm -i $infile -o $outfile > /dev/null 2> /dev/null";
+    my $cmd = "$pgm -i $infile -o $outfile $args_str > /dev/null 2> /dev/null";
 
     # try to robustly execute cd-hit
     my $ret_code = system( [ 0, 127 ], $cmd);
@@ -143,7 +152,7 @@ Bio::MUST::Drivers::CdHit - Bio::MUST driver for running the cd-hit program
 
 =head1 VERSION
 
-version 0.180770
+version 0.181160
 
 =head1 SYNOPSIS
 

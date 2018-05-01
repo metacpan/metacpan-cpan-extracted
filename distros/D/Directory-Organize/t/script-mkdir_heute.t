@@ -19,7 +19,7 @@ else {
 my $perl = Probe::Perl->find_perl_interpreter;
 my $script = File::Spec->catfile(qw/. mkdir_heute/); 
 my $basedir = 't/base';
-my @scriptopts = ( '-b', $basedir, '-l', '5');
+my @scriptopts = ( '-b', $basedir, '-l', '5', '--notermreadkey');
 
 my $in  = gensym;
 my $out = gensym;

@@ -1,9 +1,9 @@
 NAME
-    App::genpw - Generate random password
+    App::genpw - Generate random password (support patterns + wordlists)
 
 VERSION
-    This document describes version 0.005 of App::genpw (from Perl
-    distribution App-genpw), released on 2018-02-20.
+    This document describes version 0.007 of App::genpw (from Perl
+    distribution App-genpw), released on 2018-05-01.
 
 SYNOPSIS
     See the included script genpw.
@@ -14,15 +14,72 @@ FUNCTIONS
 
      genpw(%args) -> [status, msg, result, meta]
 
-    Generate random password.
+    Generate random password (support patterns + wordlists).
 
     This is yet another utility to generate random password. Features:
 
     *   Allow specifying pattern(s), e.g. '%8a%s' means 8 random
         alphanumeric characters followed by a symbol.
 
+    *   Use words from wordlists.
+
     *   Use strong random source (Math::Random::Secure) when available,
         otherwise fallback to Perl's builtin "rand()".
+
+    Examples:
+
+    By default generate letters/digits 8-20 characters long:
+
+     % genpw
+     J9K3ZjBVR
+
+    Generate 5 passwords instead of 1:
+
+     % genpw 5
+     wAYftKsS
+     knaY7MOBbcvFFS3L1wyW
+     oQGz62aF
+     sG1A9reVOe
+     Zo8GoFEq
+
+    Generate random digits between 10 and 12 characters long:
+
+     % genpw -p '%10$12d'
+     55597085674
+
+    Generate password in the form of a random word + 4 random digits. Words
+    will be fed from STDIN:
+
+     % genpw -p '%w%4d' < /usr/share/dict/words
+     shafted0412
+
+    Like the above, but words will be fetched from "WordList::*" modules.
+    You need to install the genpw-wordlist CLI. By default, will use
+    wordlist from WordList::EN::Enable:
+
+     % genpw-wordlist -p '%w%4d'
+     sedimentologists8542
+
+    Generate a random GUID:
+
+     % genpw -p '%8h-%4h-%4h-%4h-%12h'
+     ff26d142-37a8-ecdf-c7f6-8b6ae7b27695
+
+    Like the above, but in uppercase:
+
+     % genpw -p '%8h-%4h-%4h-%4h-%12h'
+     22E13D9E-1187-CD95-1D05-2B92A09E740D
+
+    Use configuration file to avoid typing the pattern every time, put this
+    in "~/genpw.conf":
+
+     [profile=guid]
+     patterns = "%8h-%4h-%4h-%4h-%12h"
+
+    then:
+
+     % genpw -P guid
+     008869fa-177e-3a46-24d6-0900a00e56d5
 
     This function is not exported.
 
@@ -102,8 +159,13 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    A few other utilities based on genpw: genpw-id (from App::genpw::id) and
-    genpw-wordlist (from App::genpw::wordlist).
+    genpw-base56.
+
+    genpw-base64.
+
+    genpw-id.
+
+    genpw-wordlist.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -32,14 +32,13 @@ package SNMP::Info::CiscoStack;
 
 use strict;
 use Exporter;
-use SNMP::Info;
 
-@SNMP::Info::CiscoStack::ISA       = qw/SNMP::Info Exporter/;
+@SNMP::Info::CiscoStack::ISA       = qw/Exporter/;
 @SNMP::Info::CiscoStack::EXPORT_OK = qw//;
 
 use vars qw/$VERSION %MIBS %FUNCS %GLOBALS %MUNGE %PORTSTAT/;
 
-$VERSION = '3.56';
+$VERSION = '3.58';
 
 %MIBS = ( 'CISCO-STACK-MIB' => 'ciscoStackMIB', );
 

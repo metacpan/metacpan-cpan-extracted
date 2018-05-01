@@ -1,25 +1,30 @@
 ---
-abstract: 'a server-side solution for the jQuery DataTables plugin'
+abstract: unknown
 author:
   - 'Adam Hopkins <srchulo@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Data::Compare: '1.23'
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DataTables
 no_index:
   directory:
     - t
     - inc
 requires:
-  CGI: 3.6
-  Carp: 0
-  DBI: 1.611
-  JSON::XS: 2.32
-version: 0.03
+  CGI::Simple: '1.113'
+  Carp: '0'
+  DBI: '1.611'
+  ExtUtils::MakeMaker: '6.64'
+  JSON::XS: '2.32'
+  perl: '5.008008'
+resources:
+  repository: https://github.com/srchulo/DataTables
+version: '0.04'

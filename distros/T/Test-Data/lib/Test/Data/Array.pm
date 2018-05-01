@@ -2,7 +2,7 @@ package Test::Data::Array;
 use strict;
 
 use Exporter qw(import);
-our $VERSION = '1.241';
+our $VERSION = '1.242';
 
 our @EXPORT = qw( array_any_ok array_none_ok array_once_ok array_multiple_ok
 	array_max_ok array_min_ok array_maxstr_ok array_minstr_ok array_sum_ok
@@ -356,10 +356,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

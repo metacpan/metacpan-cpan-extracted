@@ -45,14 +45,14 @@ $tzil->chrome->logger->set_debug(1);
 $tzil->build;
 
 my $build_dir = path($tzil->tempdir)->child('build');
-my $nonfile = path($build_dir, 'data', 'my_file.txt');
-ok(!-e $nonfile, 'file not created in build (' . $build_dir . ')');
+my $build_file = $build_dir->child('data', 'my_file.txt');
+ok(!$build_file->exists, 'file not created in build (' . $build_dir . ')');
 
 my $source_dir = path($tzil->tempdir)->child('source');
-my $file = path($source_dir, 'data', 'my_file.txt');
-ok(-e $file, 'file created in source (' . $source_dir . ')')
+my $target_file = $source_dir->child('data', 'my_file.txt');
+ok($target_file->exists, 'file created in source (' . $source_dir . ')')
  and
-is($file->slurp_utf8, "hello this is a generated file\n", 'file content is correct');
+is($target_file->slurp_utf8, "hello this is a generated file\n", 'file content is correct');
 
 cmp_deeply(
     $tzil->distmeta,

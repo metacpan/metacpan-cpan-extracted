@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "URI-Fast",
    "prereqs" : {
@@ -55,7 +55,11 @@
    "provides" : {
       "URI::Fast" : {
          "file" : "lib/URI/Fast.pm",
-         "version" : "0.22"
+         "version" : "0.23"
+      },
+      "URI::Fast::IRI" : {
+         "file" : "lib/URI/Fast.pm",
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -70,7 +74,7 @@
          "web" : "https://github.com/sysread/URI-Fast"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.23",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

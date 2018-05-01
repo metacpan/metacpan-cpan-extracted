@@ -1,17 +1,16 @@
 package Test::ISBN;
 use strict;
 
-use base qw(Exporter);
-use vars qw(@EXPORT $VERSION);
-
 use Business::ISBN 2.0;
-use Exporter;
+use Exporter qw(import);
 use Test::Builder;
 
 my $Test = Test::Builder->new();
 
-$VERSION = '2.04';
-@EXPORT  = qw(isbn_ok isbn_group_ok isbn_country_ok isbn_publisher_ok);
+our $VERSION = '2.041';
+our @EXPORT  = qw(isbn_ok isbn_group_ok isbn_country_ok isbn_publisher_ok);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -44,12 +43,12 @@ If the first argument is an ISBN object, it checks that object.
 
 sub isbn_ok {
 	my $isbn = shift;
-	
+
 	my $object = _get_object( $isbn );
 
 	my $string = ref $isbn ? eval { $isbn->as_string } : $isbn;
-	
-	my $ok   = ref $object && 
+
+	my $ok   = ref $object &&
 		( $object->is_valid_checksum( $string ) eq Business::ISBN::GOOD_ISBN );
 	$Test->diag( "The argument [$string] is not a valid ISBN" ) unless $ok;
 
@@ -101,10 +100,10 @@ object.
 
 sub isbn_country_ok {
 	$Test->diag( "isbn_country_ok is deprecated. Use isbn_group_ok" );
-	
+
 	&isbn_group_ok;
 	}
-	
+
 =item isbn_publisher_ok( STRING | ISBN, PUBLISHER )
 
 Ok is the STRING is a valid ISBN and its publisher
@@ -153,7 +152,7 @@ sub _get_object {
 
 This source is in GitHub:
 
-	https://github.com/briandfoy/Test-ISBN
+	https://github.com/briandfoy/test-isbn
 
 =head1 AUTHOR
 
@@ -161,10 +160,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2014 brian d foy.  All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

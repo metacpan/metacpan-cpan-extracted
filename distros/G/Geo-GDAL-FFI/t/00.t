@@ -52,14 +52,20 @@ if(1){
 if(1){
     my $dr = $gdal->GetDriver('NITF');
     my $ds = $dr->Create('/vsimem/test.nitf', 10);
+    
     my @d = $ds->GetMetadataDomainList;
-    ok(@d > 0, "GetMetadataDomainList");
-    @d = $ds->GetMetadata('NITF_METADATA');
-    ok(@d > 0, "GetMetadata");
-    $ds->SetMetadata({a => 'b'});
-    @d = $ds->GetMetadata('');
-    ok("@d" eq "a b", "GetMetadata");
-    #say STDERR join(',', @d);
+    ok(@d > 0, "GetMetadataDomainList"); # DERIVED_SUBDATASETS NITF_METADATA CGM
+
+    my %d = $ds->GetMetadata;
+    is_deeply([sort keys %d], [sort @d], "GetMetadata");
+    
+    %d = $ds->GetMetadata('NITF_METADATA');
+    @d = keys %d; # NITFFileHeader NITFImageSubheader
+    ok(@d == 2, "GetMetadata(\$domain)");
+    
+    $ds->SetMetadata({x => {a => 'b'}});
+    %d = $ds->GetMetadata('x');
+    is_deeply(\%d, {a => 'b'}, "SetMetadata");
 }
 
 # test progress function

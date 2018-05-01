@@ -1,0 +1,97 @@
+=pod
+
+=encoding utf8
+
+This is an adoptable module. It has no maintainer and no support.
+
+=head1 The HTTP::Cookies::iCab module
+
+This is the I<README> for the L<HTTP::Cookies::iCab> Perl module. You're probably
+looking at this because you don't know where else to find what you're
+looking for. Read this once and you might never have to read one again
+for any Perl module.
+
+=head2 Documentation
+
+To read about L<HTTP::Cookies::iCab>, look at the embedded documentation
+in the module itself. Inside the distribution, you can format it
+with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+
+	% perldoc lib/HTTP/Cookies/iCab.pm
+
+If you have already installed the module, you can specify the module
+name instead of the file location:
+
+	% perldoc HTTP::Cookies::iCab
+
+You can read the documentation and inspect the meta data on one of the
+CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/HTTP-Cookies-iCab> or
+L<MetaCPAN|http://www.metacpan.org/module/HTTP::Cookies::iCab>:
+
+=over 4
+
+=item *	L<http://search.cpan.org/dist/HTTP-Cookies-iCab>
+
+=item *	L<http://www.metacpan.org/module/HTTP::Cookies::iCab>
+
+=back
+
+The standard module documentation has example uses in the SYNOPSIS
+section, but you can also look in the I<examples/> directory (if it's
+there), or look at the test files in I<t/>.
+
+=head2 Installation
+
+You can install this module with a CPAN client, which will resolve
+and install the dependencies:
+
+	% cpan HTTP::Cookies::iCab
+	% cpanm HTTP::Cookies::iCab
+
+You can also install directly from the distribution directory, which
+will also install the dependencies:
+
+	% cpan .
+	% cpanm .
+
+You could install just this module manually:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+
+You probably don't want to do that unless you're fiddling with the
+module and only want to run the tests without installing anything.
+
+=head2 Source location
+
+The meta data, such as the source repository and bug tracker, is in
+I<Makefile.PL> or the I<META.*> files it creates. You can find that on
+those CPAN web interfaces, but you can also look at files directly in
+the source repository:
+
+=over 4
+
+=item *	L<https://github.com/CPAN-Adoptable-Modules/http-cookies-icab>
+
+=back
+
+=head2 Getting help
+
+This is an abandoned module. It's looking for a maintainer and that might
+be you. Other than that you are on your own.
+
+=head2 Copyright and License
+
+You should have received a I<LICENSE> file, but the license is also noted
+in the module files. About the only thing you can't do is pretend that
+you wrote code that you didn't.
+
+=head2 Good luck!
+
+Enjoy,
+
+brian d foy, bdfoy@cpan.org
+
+=cut

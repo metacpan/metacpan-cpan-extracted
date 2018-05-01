@@ -1,10 +1,12 @@
 Changes
 examples/README
+INSTALL.SKIP
 lib/HTTP/Cookies/Omniweb.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
+MANIFEST.SKIP
+README.pod
 t/compile.t
 t/Cookies.xml
 t/load.t
@@ -13,4 +15,6 @@ t/pod_coverage.t
 t/prereq.t
 t/save.t
 t/test_manifest
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

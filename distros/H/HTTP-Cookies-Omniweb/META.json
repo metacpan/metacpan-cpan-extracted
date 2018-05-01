@@ -1,0 +1,59 @@
+{
+   "abstract" : "Cookie storage and management for Omniweb",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Cookies-Omniweb",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Cookies" : "1.25",
+            "Text::Diff" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/CPAN-Adoptable-Modules/HTTP-Cookies-Omniweb/issues"
+      },
+      "homepage" : "https://github.com/CPAN-Adoptable-Modules/HTTP-Cookies-Omniweb",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CPAN-Adoptable-Modules/HTTP-Cookies-Omniweb.git",
+         "web" : "https://github.com/CPAN-Adoptable-Modules/HTTP-Cookies-Omniweb"
+      }
+   },
+   "version" : "1.131",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

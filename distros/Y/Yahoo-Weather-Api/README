@@ -1,6 +1,5 @@
 Yahoo-Weather-Api
 
-
 Module internally uses following module
 Thanks to the creator of these modules
 URL::Builder http://search.cpan.org/~tokuhirom/URL-Builder-0.06/lib/URL/Builder.pm

@@ -1,0 +1,7 @@
+# This file documents the revision history for Perl extension Catalyst::Plugin::ServeFile.
+
+0.002 - 2018-4-26
+  - tweaked dist.ini to play nicer with modern standards
+
+0.001 - 2018-4-26
+  - initial release

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/jjn1056/Catalyst-View-Base-JSON/issues
   homepage: https://github.com/jjn1056/Catalyst-View-Base-JSON
   repository: https://github.com/jjn1056/Catalyst-View-Base-JSON
-version: '0.002'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

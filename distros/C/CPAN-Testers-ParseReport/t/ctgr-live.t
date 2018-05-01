@@ -19,7 +19,6 @@ use File::Path qw(mkpath);
 use Test::More;
 use File::Spec;
 use CPAN::Testers::ParseReport;
-use List::Util qw(sum);
 use Time::HiRes qw(time);
 
 my $plan;

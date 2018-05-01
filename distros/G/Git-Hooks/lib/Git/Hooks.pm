@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.9.3';
+$Git::Hooks::VERSION = '2.9.5';
 use 5.010;
 use strict;
 use warnings;
@@ -113,7 +113,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.9.3
+version 2.9.5
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ C<git-hooks.pl>, in this directory like this:
 
         $ cd /path/to/repo/.git/hooks
 
-        $ cat >git-hooks.pl <<EOT
+        $ cat >git-hooks.pl <<'EOT'
         #!/usr/bin/env perl
         use Git::Hooks;
         run_hook($0, @ARGV);

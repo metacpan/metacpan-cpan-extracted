@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database::Temporary;
 # ABSTRACT: Internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.180770';
+$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.181160';
 use Moose;
 use namespace::autoclean;
 
@@ -28,7 +28,7 @@ sub BUILD {
     my $dbtype = $self->type;
 
     # create makeblastdb command
-    my $pgm = 'makeblastdb';
+    my $pgm = file($ENV{BMD_BLAST_BINDIR}, 'makeblastdb');
     my $cmd = "$pgm -in $in -dbtype $dbtype > /dev/null 2> /dev/null";
 
     # try to robustly execute makeblastdb
@@ -66,7 +66,7 @@ Bio::MUST::Drivers::Blast::Database::Temporary - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.180770
+version 0.181160
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-XYZ
 
+0.08	Sun 29 Apr 10:55:48 EDT 2018
+	Change tests for changing results from geocode.xyz
+
 0.07	Mon Feb 26 16:17:14 EST 2018
 	Give better error message on failure
 	Only give 'moreinfo' parameter when needed

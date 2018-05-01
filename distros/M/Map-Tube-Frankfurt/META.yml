@@ -2,7 +2,9 @@
 abstract: 'Map::Tube::Frankfurt - interface to the Frankfurt S- and U-Bahn map'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  Map::Tube::Plugin::Formatter: '0.14'
+  Test::Map::Tube: '0.35'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -16,14 +18,20 @@ name: Map-Tube-Frankfurt
 provides:
   Map::Tube::Frankfurt:
     file: lib/Map/Tube/Frankfurt.pm
-    version: '0.01'
+    version: '0.04'
 requires:
-  Map::Tube: '3.49'
-  Test::Map::Tube: '0.35'
+  File::Share: '0'
+  Map::Tube: '3.50'
+  Moo: '2.000000'
+  namespace::clean: '0'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/reneeb/Map-Tube-Frankfurt/issues
   homepage: http://github.com/reneeb/Map-Tube-Frankfurt
   repository: http://github.com/reneeb/Map-Tube-Frankfurt.git
-version: '0.01'
+version: '0.04'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <info@perl-services.de>'
+  - 'Stefan Limbacher <stefan@stelim.de>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

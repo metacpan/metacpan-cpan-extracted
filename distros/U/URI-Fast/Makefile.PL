@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "URI::Encode::XS" => "0.11",
     "URI::Split" => 0
   },
-  "VERSION" => "0.22",
+  "VERSION" => "0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }

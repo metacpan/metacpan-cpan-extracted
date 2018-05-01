@@ -4,6 +4,8 @@ use strict;
 use warnings;
 no warnings;
 
+=encoding utf8
+
 =head1 NAME
 
 HTTP::Cookies::Omniweb - Cookie storage and management for Omniweb
@@ -18,7 +20,7 @@ HTTP::Cookies::Omniweb - Cookie storage and management for Omniweb
 
 =head1 DESCRIPTION
 
-This package overrides the load() and save() methods of HTTP::Cookies
+This package overrides the C<load()> and C<save()> methods of HTTP::Cookies
 so it can work with Omniweb cookie files.
 
 See L<HTTP::Cookies>.
@@ -36,7 +38,7 @@ that out, so output files will not exactly match input files.
 
 This code is in Github:
 
-	http://github.com/briandfoy/HTTP-Cookies-Omniweb/tree/master
+	https://github.com/CPAN-Adoptable-Modules/HTTP-Cookies-Omniweb
 
 =head1 AUTHOR
 
@@ -44,10 +46,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2011 brian d foy.  All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 
@@ -57,7 +59,7 @@ use vars qw( $VERSION );
 use constant TRUE  => 'TRUE';
 use constant FALSE => 'FALSE';
 
-$VERSION = '1.13';
+$VERSION = '1.131';
 
 my $EPOCH_OFFSET = 978_350_400;  # difference from Unix epoch
 
@@ -118,7 +120,7 @@ sub save
 	$file ||= $self->{'file'} || return;
 
 	local $_;
-	open my $fh, "> $file" or return;
+	open my $fh, '>:encoding(UTF-8)',  $file or return;
 
 	print $fh <<'EOT';
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

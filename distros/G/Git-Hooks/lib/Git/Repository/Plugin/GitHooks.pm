@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.9.3';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.9.5';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -1285,6 +1285,10 @@ sub blob {
 
         $tmp->close;
 
+        if (my $exit = $cmd->exit) {
+            croak "Command 'git cat-file blob $blob' exited with code $exit\n";
+        }
+
         $cache->{$blob} = $filepath;
     }
 
@@ -1525,7 +1529,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.9.3
+version 2.9.5
 
 =head1 SYNOPSIS
 

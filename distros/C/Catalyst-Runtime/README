@@ -1,0 +1,17 @@
+NAME
+    Catalyst::Runtime - The Catalyst Framework Runtime
+
+SYNOPSIS
+    See Catalyst.
+
+DESCRIPTION
+    This is the primary class for the Catalyst-Runtime distribution, version
+    5.80.
+
+AUTHORS & COPYRIGHT
+    Catalyst Contributors, see Catalyst.pm
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

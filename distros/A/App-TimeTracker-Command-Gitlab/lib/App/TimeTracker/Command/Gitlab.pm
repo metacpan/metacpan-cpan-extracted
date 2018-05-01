@@ -6,11 +6,12 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Gitlab plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = "1.002";
+our $VERSION = "1.003";
 
 use Moose::Role;
 use HTTP::Tiny;
 use JSON::XS qw(encode_json decode_json);
+use URI::Escape qw(uri_escape);
 
 has 'issue' => (
     is            => 'rw',
@@ -68,12 +69,15 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $issuename = 'issue#' . $self->issue;
     $self->insert_tag($issuename);
 
-    my $issues = $self->_call('GET','projects/'.$self->project_id.'/issues?iid='.$self->issue);
-    my $issue = $issues->[0];
-    unless ($issue) {
+    my $issues = $self->_call('GET','projects/'.$self->project_id.'/issues?iids[]='.$self->issue);
+    my $issue_from_list = $issues->[0];
+    unless ($issue_from_list) {
         error_message("Cannot find issue %s in %s",$self->issue,$self->project_id);
         return;
     }
+    my $issue_id = $issue_from_list->{id};
+    my $issue =  $self->_call('GET','projects/'.$self->project_id.'/issues/'.$issue_id);
+
     my $name = $issue->{title};
 
     if ( defined $self->description ) {
@@ -92,8 +96,54 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
         $self->branch( lc($branch) ) unless $self->branch;
     }
 
-    # TODO set assignee
+    # reopen
+    if ($self->config->{gitlab}{reopen} && $issue->{state} eq 'closed') {
+        $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?state_event=reopen');
+        say "reopend closed issue";
+    }
 
+    # set assignee
+    if ($self->config->{gitlab}{set_assignee}) {
+        my $assignee;
+        if ($issue->{assignees} && $issue->{assignees}[0] && $issue->{assignees}[0]{username}) {
+            $assignee = $issue->{assignees}[0]{username};
+        }
+        elsif ( $issue->{assignee} && $issue->{assignee}{username}) {
+            $assignee = $issue->{assignee}{username};
+        }
+
+        if (my $user = $self->_call('GET','user')) {
+            if ($assignee) {
+                if ($assignee ne $user->{username}) {
+                    warning_message("Assignee already set to ".$assignee);
+                }
+            }
+            else {
+                $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?assignee_id='.$user->{id});
+                say "Assignee set to you";
+            }
+        }
+        else {
+            error_message("Cannot get user-id, thus cannot assign issue");
+        }
+    }
+
+    # un/set labels
+    if (my $on_start = $self->config->{gitlab}{labels_on_start}) {
+        my %l = map {$_ => 1} @{$issue->{labels}};
+        if (my $add = $on_start->{add}) {
+            foreach my $new (@$add) {
+                $l{$new}=1;
+            }
+        }
+        if (my $remove = $on_start->{remove}) {
+            foreach my $remove (@$remove) {
+                delete $l{$remove};
+            }
+        }
+        $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?labels='.uri_escape(join(',',keys %l)));
+        say "Labels are now: ".join(', ',sort keys %l);
+    }
 };
 
 #after [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
@@ -101,12 +151,18 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
 #    TODO: do we want to do something after stop?
 #};
 
+sub _get_user_id {
+    my $self = shift;
+    my $user = $self->_call('GET','user');
+    return $user->{id} if $user && $user->{id};
+    return;
+}
+
 sub _call {
     my ($self,$method,  $endpoint, $args) = @_;
 
     my $url = $self->config->{gitlab}{url}.'/api/v3/'.$endpoint;
     my $res = $self->gitlab_client->request($method,$url);
-
     if ($res->{success}) {
         my $data = decode_json($res->{content});
         return $data;
@@ -137,7 +193,7 @@ App::TimeTracker::Command::Gitlab - App::TimeTracker Gitlab plugin
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 DESCRIPTION
 
@@ -195,6 +251,12 @@ If C<--issue> is set and we can find an issue with this id in your current repo
 =item * add the issue id to the tasks tags ("issue#42")
 
 =item * if C<Git> is also used, determine a save branch name from the issue name, and change into this branch ("42-rev-up-fluxcompensator")
+
+=item * assign to your user, if C<set_assignee> is set and issue is not assigned
+
+=item * reopen a closed issue if C<reopen> is set
+
+=item * modifiy the labels by adding all labels listed in C<labels_on_start.add> and removing all lables listed in C<labels_on_start.add>
 
 =back
 

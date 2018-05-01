@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Exonerate;
 # ABSTRACT: Bio::MUST driver for running the exonerate alignment program
-$Bio::MUST::Drivers::Exonerate::VERSION = '0.180770';
+$Bio::MUST::Drivers::Exonerate::VERSION = '0.181160';
 use Moose;
 use namespace::autoclean;
 
@@ -191,7 +191,7 @@ Bio::MUST::Drivers::Exonerate - Bio::MUST driver for running the exonerate align
 
 =head1 VERSION
 
-version 0.180770
+version 0.181160
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use TestHelper;
 local $ENV{TRIAL};
 local $ENV{RELEASE_STATUS};
 
-my $command = 'Path::Tiny::path(\'eval_out.txt\')->append_raw(';
+my $command = 'Path::Tiny::path(\'%o\', \'eval_out.txt\')->append_raw(';
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {
@@ -55,7 +55,8 @@ my $source_dir = path($tzil->tempdir)->child('source');
 my %f = (
     a => 'DZT-Sample-0.001.tar.gz',
     n => 'DZT-Sample',
-    d => path($tzil->tempdir)->child('build'),
+    o => $source_dir,
+    d => $build_dir,
     v => '0.001',
     x => do { my $path = Dist::Zilla::Plugin::Run::Role::Runner->current_perl_path; $path =~ s{\\}{/}g; $path },
 );
@@ -170,17 +171,17 @@ cmp_deeply(
     [
         '[Run::BeforeBuild] attempting to use %d in before_build',
         '[Run::BeforeBuild] attempting to use %a in a non-Release plugin',
-        re(qr/^\Q[Run::BeforeBuild] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('before_build \E/),
+        re(qr/^\Q[Run::BeforeBuild] evaluating: Path::Tiny::path('$source_dir', 'eval_out.txt')->append_raw('before_build \E/),
 
         '[Run::AfterBuild] attempting to use %a in a non-Release plugin',
-        re(qr/^\Q[Run::AfterBuild] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('after_build \E/),
+        re(qr/^\Q[Run::AfterBuild] evaluating: Path::Tiny::path('$source_dir', 'eval_out.txt')->append_raw('after_build \E/),
 
         '[Run::BeforeArchive] attempting to use %a in a non-Release plugin',
-        re(qr/^\Q[Run::BeforeArchive] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('before_archive \E/),
+        re(qr/^\Q[Run::BeforeArchive] evaluating: Path::Tiny::path('$source_dir', 'eval_out.txt')->append_raw('before_archive \E/),
 
-        re(qr/^\Q[Run::BeforeRelease] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('before_release \E/),
-        re(qr/^\Q[Run::Release] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('release \E/),
-        re(qr/^\Q[Run::AfterRelease] evaluating: Path::Tiny::path('eval_out.txt')->append_raw('after_release \E/),
+        re(qr/^\Q[Run::BeforeRelease] evaluating: Path::Tiny::path('$source_dir', 'eval_out.txt')->append_raw('before_release \E/),
+        re(qr/^\Q[Run::Release] evaluating: Path::Tiny::path('$source_dir', 'eval_out.txt')->append_raw('release \E/),
+        re(qr/^\Q[Run::AfterRelease] evaluating: Path::Tiny::path('$source_dir', 'eval_out.txt')->append_raw('after_release \E/),
     ],
     'got diagnostics when code is evaluated',
 );

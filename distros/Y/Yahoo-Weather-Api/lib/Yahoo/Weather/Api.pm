@@ -10,10 +10,10 @@ Yahoo::Weather::Api - The great new 2018 Yahoo::Weather::Api
 
 =head1 VERSION
 
-Version 1.10
+Version 2.00
 
 =cut
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use URL::Builder qw (build_url);
 use Carp;
@@ -27,17 +27,24 @@ B<Access is limited to 2,000 signed calls per day>
 
 Refer more here L<https://developer.yahoo.com/weather/>
 
+    #using place name
     use Yahoo::Weather::Api;
-
     my $api = Yahoo::Weather::Api->new();
     print  $api->get_weather_data({ 'search' => 'Palo Alto, CA, US' });
 
-                            or
+                                or
 
+    #using cordinate
     use Yahoo::Weather::Api;
+    my $api = Yahoo::Weather::Api->new({ 'unit' => 'F', 'format' => 'xml' , internet_check => 1});
+    print  $api->get_weather_data_by_geo({'long' => '74.932999', 'lat' => '31.7276', 'only'=>1}); 
 
-    my $api = Yahoo::Weather::Api->new({ 'unit' => 'F', 'format' => 'xml'});
-    print  $api->get_weather_data_by_geo({'long' => '74.932999', 'lat' => '31.7276', 'only'=>1});
+                                or
+
+    #using zip
+    use Yahoo::Weather::Api;
+    my $api = Yahoo::Weather::Api->new({ 'unit' => 'C', 'format' => 'xml'});
+    print  $api->get_weather_data_by_geo({ 'search' => '32003' });  #zip
 
 =head1 SUBROUTINES/METHODS
 
@@ -50,7 +57,6 @@ get_weather_data_by_geo()
 get_woeid()
 
 get_woeid_alternate()
-
 
 =cut
 
@@ -76,15 +82,26 @@ hash ref of options supported B<(OPTIONAL)>.
     my $api = Yahoo::Weather::Api->new({ 'unit' => 'F', 'format' => 'xml'});
 
 B<unit> can be either celcius B<c> or farenheit  B<f>
+
 Default is B<c>
 
     my $api = Yahoo::Weather::Api->new({ 'unit' => 'F'});
     my $api = Yahoo::Weather::Api->new({ 'unit' => 'C'});
 
 B<Format> return data type from api JSON B<json> or XML B<xml> 
+
 Default is B<json>
 
     my $api = Yahoo::Weather::Api->new({ 'format' => 'xml' , 'unit' => 'F'});
+
+B<internet_check> boolean value prevents the object creation when internet is not working
+
+values B<1> or B<0>
+
+Default is B<0>
+
+    my $api = Yahoo::Weather::Api->new({ 'internet_check' => 1 });
+    my $api = Yahoo::Weather::Api->new({ 'format' => 'xml' , 'unit' => 'F' ,'internet_check' => 1});
 
 =cut
 
@@ -95,7 +112,10 @@ sub new {
     $self->_validate_set_args ($args);
     $self->{_ua} = $ua;
 
-    croak 'Unable to connect to internet' unless ($ua->is_online);
+    if ( $self->{internet_check} ) {
+        croak 'Unable to connect to internet' unless ($ua->is_online);
+    }
+
     return $self;
 }
 
@@ -301,10 +321,12 @@ sub _validate_set_args {
 
     $args->{format} = $args->{format} || 'json';
     $args->{unit}  = $args->{unit} || 'c';
+    $args->{internet_check} = $args->{internet_check} || 0;
 
     croak "Invalid format use json or xml " unless ($args->{format} =~ /^(json|xml)/i);
     croak "Invalid format use c|celcius or f|farenheit " unless ($args->{unit} =~ /^(c|f)/i);
 
+    $self->{internet_check} = $args->{internet_check};
     $self->{format} = lc ($args->{format});
     $self->{unit} = uc (substr($args->{unit},0,1));
 
@@ -335,8 +357,6 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
-
 =head1 ACK
 
 Module internally uses following module
@@ -346,6 +366,8 @@ Thanks to the creator of these modules
 URL::Builder L<http://search.cpan.org/~tokuhirom/URL-Builder-0.06/lib/URL/Builder.pm>
 
 LWP::UserAgent L<http://search.cpan.org/~oalders/libwww-perl-6.33/lib/LWP/UserAgent.pm>
+
+=over
 
 =item * Git Hub repo 
 

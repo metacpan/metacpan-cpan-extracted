@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2018-03-05'; # DATE
-our $VERSION = '1.811'; # VERSION
+our $DATE = '2018-05-01'; # DATE
+our $VERSION = '1.812'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -169,6 +169,49 @@ sub equal2 {
 }
 # END_BLOCK: equal2
 
+sub hook_before_parse_argv {
+    my ($self, $r) = @_;
+
+    my $copts = $self->common_opts;
+
+    # XXX cache
+    require Perinci::Sub::GetArgs::Argv;
+    my $ggls_res = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
+        meta               => $r->{meta},
+        meta_is_normalized => 1,
+        args               => $r->{args},
+        common_opts        => $copts,
+        per_arg_json       => $self->{per_arg_json},
+        per_arg_yaml       => $self->{per_arg_yaml},
+    );
+
+    my $meta_uses_opt_P = 0;
+    my $meta_uses_opt_c = 0;
+    my $meta_uses_opt_C = 0;
+    {
+        last unless $ggls_res->[0] == 200;
+        my $opts = $ggls_res->[3]{'func.opts'};
+        if (grep { $_ eq '-P' } @$opts) { $meta_uses_opt_P = 1 }
+        if (grep { $_ eq '-c' } @$opts) { $meta_uses_opt_c = 1 }
+        if (grep { $_ eq '-C' } @$opts) { $meta_uses_opt_C = 1 }
+    }
+
+    # add -P shortcut for --config-profile if no conflict
+    if ($copts->{config_profile} && !$meta_uses_opt_P) {
+        $copts->{config_profile}{getopt} = 'config-profile|P=s';
+    }
+
+    # add -c shortcut for --config-path if no conflict
+    if ($copts->{config_path} && !$meta_uses_opt_c) {
+        $copts->{config_path}{getopt} = 'config-path|c=s';
+    }
+
+    # add -P shortcut for --no-config if no conflict
+    if ($copts->{no_config} && !$meta_uses_opt_C) {
+        $copts->{no_config}{getopt} = 'no-config|C';
+    }
+}
+
 sub hook_before_action {
     my ($self, $r) = @_;
 
@@ -309,31 +352,39 @@ sub hook_after_run {
 sub hook_after_get_meta {
     my ($self, $r) = @_;
 
+    my $copts = $self->common_opts;
+
+    # note: we cannot cache this to $r->{_ggls_res} because we produce this
+    # without dry-run
+    require Perinci::Sub::GetArgs::Argv;
+    my $ggls_res = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
+        meta               => $r->{meta},
+        meta_is_normalized => 1,
+        args               => $r->{args},
+        common_opts        => $copts,
+        per_arg_json       => $self->{per_arg_json},
+        per_arg_yaml       => $self->{per_arg_yaml},
+    );
+
+    my $meta_uses_opt_n = 0;
+    {
+        last unless $ggls_res->[0] == 200;
+        my $opts = $ggls_res->[3]{'func.opts'};
+        if (grep { $_ eq '-n' } @$opts) { $meta_uses_opt_n = 1 }
+    }
+
     require Perinci::Object;
     my $metao = Perinci::Object::risub($r->{meta});
-    if ($metao->can_dry_run) {
+
+    # add --dry-run (and -n shortcut, if no conflict)
+    {
+        last unless $metao->can_dry_run;
         my $default_dry_run = $metao->default_dry_run // $self->default_dry_run;
         $r->{dry_run} = 1 if $default_dry_run;
         $r->{dry_run} = ($ENV{DRY_RUN} ? 1:0) if defined $ENV{DRY_RUN};
-        require Perinci::Sub::GetArgs::Argv;
-        # note: we cannot cache this to $r->{_ggls_res} because we produce this
-        # without dry-run
-        my $ggls_res = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
-            meta               => $r->{meta},
-            meta_is_normalized => 1,
-            args               => $r->{args},
-            common_opts        => $self->common_opts,
-            per_arg_json       => $self->{per_arg_json},
-            per_arg_yaml       => $self->{per_arg_yaml},
-        );
-        my $meta_uses_opt_n = 0;
-        {
-            last unless $ggls_res->[0] == 200;
-            my $opts = $ggls_res->[3]{'func.opts'};
-            if (grep { $_ eq '-n' } @$opts) { $meta_uses_opt_n = 1 }
-        }
+
         my $optname = 'dry-run' . ($meta_uses_opt_n ? '' : '|n');
-        $self->common_opts->{dry_run} = {
+        $copts->{dry_run} = {
             getopt  => $default_dry_run ? "$optname!" : $optname,
             summary => $default_dry_run ?
                 "Disable simulation mode (also via DRY_RUN=0)" :
@@ -499,7 +550,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.811 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2018-03-05.
+This document describes version 1.812 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-01.
 
 =head1 SYNOPSIS
 

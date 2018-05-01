@@ -1,14 +1,12 @@
 package App::cpm::Worker::Installer;
 use strict;
 use warnings;
-use utf8;
-our $VERSION = '0.971';
 
 use App::cpm::Logger::File;
+use App::cpm::Requirement;
 use App::cpm::Worker::Installer::Menlo;
 use App::cpm::Worker::Installer::Prebuilt;
 use App::cpm::version;
-use App::cpm::Requirement;
 use CPAN::DistnameInfo;
 use CPAN::Meta;
 use Config;
@@ -82,6 +80,7 @@ sub new {
     $option{logger}->log("Work directory is $option{base}");
 
     my $menlo = App::cpm::Worker::Installer::Menlo->new(
+        static_install => $option{static_install},
         base => $option{base},
         logger => $option{logger},
         quiet => 1,

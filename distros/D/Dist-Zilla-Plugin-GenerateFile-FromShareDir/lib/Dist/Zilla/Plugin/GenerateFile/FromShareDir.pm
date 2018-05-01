@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::GenerateFile::FromShareDir; # git description: v0.012-6-g2cf801b
+package Dist::Zilla::Plugin::GenerateFile::FromShareDir; # git description: v0.013-9-g6265db6
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
-# ABSTRACT: Create files in the repository or in the build, based on a template located in a dist sharedir
+# ABSTRACT: Create files in the repository or in the build, based on a template located in a distribution sharedir
 # KEYWORDS: plugin distribution generate create file sharedir template
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use Moose;
 with (
@@ -115,7 +115,7 @@ sub gather_files
     if ($self->dist eq $self->zilla->name)
     {
         if (my $sharedir = $self->zilla->_share_dir_map->{dist}) {
-            $file_path = path($sharedir, $self->source_filename)->stringify;
+            $file_path = path($self->zilla->root, $sharedir, $self->source_filename)->stringify;
         }
     }
     else
@@ -220,11 +220,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::GenerateFile::FromShareDir - Create files in the repository or in the build, based on a template located in a dist sharedir
+Dist::Zilla::Plugin::GenerateFile::FromShareDir - Create files in the repository or in the build, based on a template located in a distribution sharedir
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -239,13 +239,13 @@ In your F<dist.ini>:
 
 =head1 DESCRIPTION
 
-Generates a file in your dist, indicated by C<-destination_file>, based on the
+Generates a file in your distribution, indicated by C<-destination_file>, based on the
 L<Text::Template> located in the C<-source_file> of C<-dist>'s
 L<distribution sharedir|File::ShareDir>. Any extra config values are passed
 along to the template, in addition to C<$zilla> and C<$plugin> objects.
 
 I expect that usually the C<-dist> that contains the template will be either a
-plugin bundle, so you can generate a custom-tailored file in your dist, or a
+plugin bundle, so you can generate a custom-tailored file in your distribution, or a
 plugin that subclasses this one.  (Otherwise, you can just as easily use
 L<[GatherDir::Template]|Dist::Zilla::Plugin::GatherDir::Template>
 or L<[GenerateFile]|Dist::Zilla::Plugin::GenerateFile>
@@ -264,7 +264,7 @@ Recognized options are:
 =head2 C<-dist>
 
 The distribution name to use when finding the sharedir (see L<File::ShareDir>
-and L<Dist::Zilla::Plugin::ShareDir>). Defaults to the dist corresponding to
+and L<Dist::Zilla::Plugin::ShareDir>). Defaults to the distribution corresponding to
 the running plugin.
 
 =head2 C<-destination_filename> or C<-filename>

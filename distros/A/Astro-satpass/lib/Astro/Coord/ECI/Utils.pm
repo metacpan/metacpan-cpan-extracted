@@ -113,7 +113,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.093';
+our $VERSION = '0.094';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -425,8 +425,8 @@ no zone.
 sub decode_space_track_json_time {
     my ( $string ) = @_;
     $string =~ m{ \A \s*
-	( \d+ ) \D+ ( \d+ ) \D+ ( \d+ ) \D+
-	( \d+ ) \D+ ( \d+ ) \D+ ( \d+ ) (?: ( [.] \d* ) )? \s* \z }smx
+	( [0-9]+ ) [^0-9]+ ( [0-9]+ ) [^0-9]+ ( [0-9]+ ) [^0-9]+
+	( [0-9]+ ) [^0-9]+ ( [0-9]+ ) [^0-9]+ ( [0-9]+ ) (?: ( [.] [0-9]* ) )? \s* \z }smx
 	or return;
     my @time = ( $1, $2, $3, $4, $5, $6 );
     my $frac = $7;
@@ -914,8 +914,8 @@ unless (eval {require Scalar::Util; Scalar::Util->import
 
 	# checks from perlfaq4
 	return 0 if !defined($_) || ref($_);
-	return 1 if (/^[+-]?\d+$/); # is a +/- integer
-	return 1 if (/^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/); # a C float
+	return 1 if (/^[+-]?[0-9]+$/); # is a +/- integer
+	return 1 if (/^([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?$/); # a C float
 	return 1 if ($] >= 5.008 and /^(Inf(inity)?|NaN)$/i)
 	    or ($] >= 5.006001 and /^Inf$/i);
 
@@ -1281,19 +1281,19 @@ sub __instance {
 
 	my @zone;
 	$string =~ s/ \s* (?: ( Z ) |
-		( [+-] ) ( \d{2} ) :? ( \d{2} )? ) \z //smx
+		( [+-] ) ( [0-9]{2} ) :? ( [0-9]{2} )? ) \z //smx
 	    and @zone = ( $1, $2, $3, $4 );
 	my @date;
 
 	# ISO 8601 date
 	if ( $string =~ m{ \A
-		( \d{4} \D? | \d{2} \D )			# year: $1
-		(?: ( \d{1,2} ) \D?				# month: $2
-		    (?: ( \d{1,2} ) (?: \s* | \D? )		# day: $3
-			(?: ( \d{1,2} ) \D?			# hour: $4
-			    (?: ( \d{1,2} ) \D?			# minute: $5
-				(?: ( \d{1,2} ) \D?		# second: $6
-				    ( \d* )			# fract: $7
+		( [0-9]{4} [^0-9]? | [0-9]{2} [^0-9] )		# year: $1
+		(?: ( [0-9]{1,2} ) [^0-9]?			# month: $2
+		    (?: ( [0-9]{1,2} ) (?: \s* | [^0-9]? )	# day: $3
+			(?: ( [0-9]{1,2} ) [^0-9]?		# hour: $4
+			    (?: ( [0-9]{1,2} ) [^0-9]?		# minute: $5
+				(?: ( [0-9]{1,2} ) [^0-9]?	# second: $6
+				    ( [0-9]* )			# fract: $7
 				)?
 			    )?
 			)?
@@ -1304,16 +1304,16 @@ sub __instance {
 	    @date = ( $1, $2, $3, $4, $5, $6, $7, undef );
 
 	# special-case 'yesterday', 'today', and 'tomorrow'.
-	} elsif ( $string =~ m{ \A
+	} elsif ( $string =~ m< \A
 		( yesterday | today | tomorrow )	# day: $1
-		(?: \D* ( \d{1,2} ) \D?			# hour: $2
-		    (?: ( \d{1,2} ) \D?			# minute: $3
-			(?: ( \d{1,2} ) \D?		# second: $4
-			    ( \d* )			# fract: $5
+		(?: [^0-9]* ( [0-9]{1,2} ) [^0-9]?	# hour: $2
+		    (?: ( [0-9]{1,2} ) [^0-9]?		# minute: $3
+			(?: ( [0-9]{1,2} ) [^0-9]?	# second: $4
+			    ( [0-9]* )			# fract: $5
 			)?
 		    )?
 		)?
-		\z }smx ) {
+		\z >smx ) {
 	    my @today = @zone ? gmtime : localtime;
 	    @date = ( $today[5] + 1900, $today[4] + 1, $today[3], $2, $3,
 		$4, $5, $special_day_offset{$1} );
@@ -1332,7 +1332,7 @@ sub __instance {
 	}
 
 	foreach ( @date ) {
-	    defined $_ and s/ \D+ //smxg;
+	    defined $_ and s/ [^0-9]+ //smxg;
 	}
 
 	$date[0] = __tle_year_to_Gregorian_year( $date[0] );

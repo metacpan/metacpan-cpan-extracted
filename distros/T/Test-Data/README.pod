@@ -2,6 +2,16 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/test-data"><img src="https://travis-ci.org/briandfoy/test-data.svg?branch=master" /></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/test-data'><img src='https://ci.appveyor.com/api/projects/status/pbucnowyaqdi5ipx?svg=true' /></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/test-data?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/test-data/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/test-data/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Test-Data.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Test::Data"><img src="https://img.shields.io/cpan/v/Test-Data.svg" /></A>
+
 =head1 The Test::Data module
 
 This is the I<README> for the L<Test::Data> Perl module. It provides

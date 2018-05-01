@@ -1,5 +1,8 @@
+ARTISTIC-1.0
 Changes
+GPL-1
 lib/File/ConfigDir.pm
+LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -7,5 +10,8 @@ README.md
 t/00-load.t
 t/01-simple.t
 t/02-plugg.t
+t/03-without.t
+t/04-internals.t
+t/05-errors.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

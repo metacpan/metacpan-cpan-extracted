@@ -6,7 +6,7 @@ use Config;
 has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
 
 has install    => ( is => 'ro', isa => Bool, default => 0 );
-has develop    => ( is => 'ro', isa => Bool, default => 0 );
+has devel      => ( is => 'ro', isa => Bool, default => 0 );
 has recommends => ( is => 'ro', isa => Bool, default => 0 );
 has suggests   => ( is => 'ro', isa => Bool, default => 0 );
 has verbose    => ( is => 'ro', isa => Bool, default => 0 );
@@ -14,7 +14,7 @@ has verbose    => ( is => 'ro', isa => Bool, default => 0 );
 # TODO under windows acquire superuser automatically with use Win32::RunAsAdmin qw[force];
 
 sub BUILDARGS ( $self, $args ) {
-    $args->{develop} = $args->{recommends} = $args->{suggests} = 1 if $args->{all};
+    $args->{devel} = $args->{recommends} = $args->{suggests} = 1 if $args->{all};
 
     return $args;
 }
@@ -89,7 +89,7 @@ sub _deps ($self) {
         my @args = (    #
             'cpanm',
             '--with-feature', ( $MSWIN ? 'windows' : 'linux' ),
-            ( $self->develop    ? '--with-develop'    : () ),
+            ( $self->devel      ? '--with-develop'    : () ),
             ( $self->recommends ? '--with-recommends' : () ),
             ( $self->suggests   ? '--with-suggests'   : () ),
             ( $self->verbose    ? '--verbose'         : () ),

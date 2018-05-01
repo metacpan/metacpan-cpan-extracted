@@ -7,7 +7,7 @@ use base 'Catalyst::View';
 use HTTP::Status;
 use Scalar::Util;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 our $CLASS_INFO = 'Catalyst::View::Base::JSON::_ClassInfo';
 
 my $inject_http_status_helpers = sub {
@@ -111,6 +111,7 @@ sub render {
     $self->$class_info->json->encode($to_json_encode);
   } || do {
     $self->$class_info->HANDLE_ENCODE_ERROR($self, $to_json_encode, $@);
+    return;
   };
   return $json;
 }

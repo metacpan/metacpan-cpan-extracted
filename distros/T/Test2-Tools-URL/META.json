@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
             "Test2::Compare::Base" : "0.000060",
             "Test2::Compare::Hash" : "0.000060",
             "Test2::Compare::String" : "0.000060",
-            "URI" : "0",
+            "URI" : "1.61",
             "perl" : "5.008001"
          }
       },
@@ -67,7 +67,8 @@
          "web" : "https://github.com/plicease/Test2-Tools-URL"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

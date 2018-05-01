@@ -1,3 +1,5 @@
+0.5.4  2018-04-27  Christopher Lalansingh  Modified the regex for VCF_Alt to conform to the VCF Specification
+
 0.5.3  2017-03-09  John Macdonald   Added '.' to legal VCF_Ref char values
 
 0.5.2  2017-01-08  John Macdonald   Removed trailing semi from info in VCF

@@ -1,3 +1,10 @@
+0.181160  2018-04-26 23:43:10+02:00 Europe/Brussels
+    - Additions
+      - CdHit: added support for optional args to constructor
+    - Fixes
+      - Blast: makeblastdb and blastdbcmd now also honor BMD_BLAST_BINDIR
+      - Blast: disabled some tests failing due to unstable results
+      
 0.180770  2018-03-18 14:40:30+01:00 Europe/Brussels
     - Additions
       - Blast: added support for BMD_BLAST_BINDIR environment variable
@@ -5,6 +12,7 @@
       - Mafft: new driver
     - Fixes
       - CdHit: tests are now disabled in case of missing dependency
+
 0.180270  2018-01-28 00:13:26+01:00 Europe/Brussels
     - Additions
       - CdHit: new driver

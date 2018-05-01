@@ -1,0 +1,35 @@
+---
+abstract: 'interface to arc4random(3) on OpenBSD'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Config: '0'
+  Scalar::Util: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unix-OpenBSD-Random
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.006'
+  strict: '0'
+version: '0.01'
+x_homepageresources:
+  repository:
+    type: git
+    url: git://github.com/thrig/Unix-OpenBSD-Random.git
+    web: https://github.com/thrig/Unix-OpenBSD-Random
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

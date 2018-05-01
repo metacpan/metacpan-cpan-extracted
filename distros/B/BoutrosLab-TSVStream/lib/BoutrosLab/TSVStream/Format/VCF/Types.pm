@@ -2,6 +2,7 @@
 use warnings;
 use strict;
 use Carp;
+use List::Util qw/all/;
 
 =head1 NAME
 
@@ -50,8 +51,10 @@ subtype VCF_Ref_Full,
 
 subtype VCF_Alt,
 	as      Str,
-	where   { /^-$/ || /^[CGAT]+(?:,[CGAT]+)*$/i },
-	message {"VCF_Alt must be '-' (dash), or one or more comma-separated series of 'CGAT' characters"};
+	#where   { /^([\*\[\]:0-9XYMTCGATN-]+|<[^,<>\s]+>)(?:,[\*\[\]:0-9XYMTCGATN-]+|<[^,<>\s]+>)*$/i },
+	#message {"VCF_Alt must be '-' (dash), or one or more comma-separated series of 'CGAT' characters"};
+	where { /^(?:<[^,<>\s]+>|-|[\*\.CGATN]+|[\*\.CGATN]*[\[\]][0-9XYMT]+[ ]?:[ ]?[0-9]+[\[\]][\*\.CGATN]*)(?:,<[^,<>\s]+>|,-|,[\*\.CGATN]+|,[\*\.CGATN]*[\[\]][0-9XYMT]+[ ]?:[ ]?[0-9]+[\[\]][\*\.CGATN]*)*$/i },
+	message {"VCF_Alt must be a comma separated list of {A,C,G,T,N,*}, an angle bracketed string ID \"<ID>\", a single dash "-", or a breakend (e.g. t]p])"};
 
 subtype VCF_Alt_Full,
 	as      Str,

@@ -1,0 +1,314 @@
+{
+    "name": "Nuremberg",
+    "lines": {
+        "line": [
+            {
+                "id": "U1",
+                "name": "U1",
+                "color": "blue"
+            },
+            {
+                "id": "U2",
+                "name": "U2",
+                "color": "red"
+            },
+            {
+                "id": "U3",
+                "name": "U3",
+                "color": "green"
+            }
+        ]
+    },
+    "stations": {
+        "station": [
+            {
+                "id": "0275",
+                "line": "U3:1",
+                "name": "Nordwestring",
+                "link": "0258"
+            },
+            {
+                "id": "0258",
+                "line": "U3:2",
+                "name": "Klinikum Nord",
+                "link": "0275,0232"
+            },
+            {
+                "id": "0232",
+                "line": "U3:3",
+                "name": "Friedr.-Ebert-Platz",
+                "link": "0258,0250"
+            },
+            {
+                "id": "0250",
+                "line": "U3:4",
+                "name": "Kaulbachplatz",
+                "link": "0232,0331"
+            },
+            {
+                "id": "0331",
+                "line": "U3:5",
+                "name": "Maxfeld",
+                "link": "0250,0332"
+            },
+            {
+                "id": "1120",
+                "line": "U3:12",
+                "name": "Sündersbühl",
+                "link": "0710,0654"
+            },
+            {
+                "id": "0654",
+                "line": "U3:13",
+                "name": "Gustav-Adolf-Straße",
+                "link": "1120"
+            },
+            {
+                "id": "1391",
+                "line": "U2:1",
+                "name": "Flughafen",
+                "link": "1320"
+            },
+            {
+                "id": "1320",
+                "line": "U2:2",
+                "name": "Ziegelstein",
+                "link": "1391,1324"
+            },
+            {
+                "id": "1324",
+                "line": "U2:3",
+                "name": "Herrnhütte",
+                "link": "1320,1335"
+            },
+            {
+                "id": "1335",
+                "line": "U2:4",
+                "name": "Nordostbahnhof",
+                "link": "1324,0341"
+            },
+            {
+                "id": "0341",
+                "line": "U2:5",
+                "name": "Schoppershof",
+                "link": "1335,0340"
+            },
+            {
+                "id": "0340",
+                "line": "U2:6",
+                "name": "Rennweg",
+                "link": "0341,0332"
+            },
+            {
+                "id": "0332",
+                "line": "U2:7,U3:6",
+                "name": "Rathenauplatz",
+                "link": "0340,0333"
+            },
+            {
+                "id": "0333",
+                "line": "U2:8,U3:7",
+                "name": "Wöhrder Wiese",
+                "link": "0510,0332"
+            },
+            {
+                "id": "0505",
+                "line": "U2:10,U3:9",
+                "name": "Opernhaus",
+                "link": "0704,0510"
+            },
+            {
+                "id": "0710",
+                "line": "U2:12,U3:11",
+                "name": "Rothenburger Straße",
+                "link": "0704,0602,1120"
+            },
+            {
+                "id": "0602",
+                "line": "U2:13",
+                "name": "St. Leonhard",
+                "link": "0710,0601"
+            },
+            {
+                "id": "0601",
+                "line": "U2:14",
+                "name": "Schweinau",
+                "link": "0602,1902"
+            },
+            {
+                "id": "1902",
+                "line": "U2:15",
+                "name": "Hohe Marter",
+                "link": "0601,1970"
+            },
+            {
+                "id": "1970",
+                "line": "U2:16",
+                "name": "Röthenbach",
+                "link": "1902"
+            },
+            {
+                "id": "1507",
+                "line": "U1:1",
+                "name": "Langwasser Süd",
+                "link": "1506"
+            },
+            {
+                "id": "1506",
+                "line": "U1:2",
+                "name": "Gemeinschaftshaus",
+                "link": "1567,1507"
+            },
+            {
+                "id": "1567",
+                "line": "U1:3",
+                "name": "Langwasser Mitte",
+                "link": "1504,1506"
+            },
+            {
+                "id": "1504",
+                "line": "U1:4",
+                "name": "Scharfreiterring",
+                "link": "1503,1567"
+            },
+            {
+                "id": "1503",
+                "line": "U1:5",
+                "name": "Langwasser Nord",
+                "link": "1502,1504"
+            },
+            {
+                "id": "1502",
+                "line": "U1:6",
+                "name": "Messe",
+                "link": "1550,1503"
+            },
+            {
+                "id": "1550",
+                "line": "U1:7",
+                "name": "Bauernfeindstraße",
+                "link": "1701,1502"
+            },
+            {
+                "id": "1701",
+                "line": "U1:8",
+                "name": "Hasenbuck",
+                "link": "0561,1550"
+            },
+            {
+                "id": "0561",
+                "line": "U1:9",
+                "name": "Frankenstraße",
+                "link": "0503,1701"
+            },
+            {
+                "id": "0503",
+                "line": "U1:10",
+                "name": "Maffeiplatz",
+                "link": "0534,0561"
+            },
+            {
+                "id": "0534",
+                "line": "U1:11",
+                "name": "Aufseßplatz",
+                "link": "0510,0503"
+            },
+            {
+                "id": "0510",
+                "line": "U1:12,U2:9,U3:8",
+                "name": "Hauptbahnhof",
+                "link": "0511,0534,0333,0505"
+            },
+            {
+                "id": "0511",
+                "line": "U1:13",
+                "name": "Lorenzkirche",
+                "link": "0101,0510"
+            },
+            {
+                "id": "0101",
+                "line": "U1:14",
+                "name": "Weißer Turm",
+                "link": "0704,0511"
+            },
+            {
+                "id": "0704",
+                "line": "U1:15,U2:11,U3:10",
+                "name": "Plärrer",
+                "link": "0703,0101,0710,0505"
+            },
+            {
+                "id": "0703",
+                "line": "U1:16",
+                "name": "Gostenhof",
+                "link": "0702,0704"
+            },
+            {
+                "id": "0702",
+                "line": "U1:17",
+                "name": "Bärenschanze",
+                "link": "0701,0703"
+            },
+            {
+                "id": "0701",
+                "line": "U1:18",
+                "name": "Maximilianstraße",
+                "link": "1103,0702"
+            },
+            {
+                "id": "1103",
+                "line": "U1:19",
+                "name": "Eberhardshof",
+                "link": "1102,0701"
+            },
+            {
+                "id": "1102",
+                "line": "U1:20",
+                "name": "Muggenhof",
+                "link": "1101,1103"
+            },
+            {
+                "id": "1101",
+                "line": "U1:21",
+                "name": "Stadtgrenze",
+                "link": "2171,1102"
+            },
+            {
+                "id": "2171",
+                "line": "U1:22",
+                "name": "Jakobinenstraße",
+                "link": "2110,1101"
+            },
+            {
+                "id": "2110",
+                "line": "U1:23",
+                "name": "Fürth Hauptbahnhof",
+                "link": "2171,2164"
+            },
+            {
+                "id": "2164",
+                "line": "U1:24",
+                "name": "Rathaus Fürth",
+                "link": "2110,2130"
+            },
+            {
+                "id": "2130",
+                "line": "U1:25",
+                "name": "Stadthalle",
+                "link": "2164,2180"
+            },
+            {
+                "id": "2180",
+                "line": "U1:26",
+                "name": "Klinikum Fürth",
+                "link": "2130,2390"
+            },
+            {
+                "id": "2390",
+                "line": "U1:27",
+                "name": "Hardhöhe",
+                "link": "2180"
+            }
+        ]
+    }
+}

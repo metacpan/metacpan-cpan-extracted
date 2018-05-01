@@ -4,7 +4,7 @@ extends 'Dezi::Results';
 use Dezi::Lucy::Result;
 use namespace::autoclean;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 has 'find_relevant_fields' =>
     ( is => 'rw', isa => 'Bool', default => sub {0} );
@@ -135,7 +135,7 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 by Peter Karman
+Copyright 2018 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

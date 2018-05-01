@@ -1,4 +1,5 @@
 package HTTP::SimpleLinkChecker;
+use v5.10.1; # Mojolicious requires this
 use strict;
 
 use warnings;
@@ -6,20 +7,21 @@ no warnings;
 
 use Exporter qw(import);
 
-use vars qw($ERROR $VERSION @EXPORT_OK);
+use vars qw($ERROR);
 
 use Mojo::UserAgent;
 
-@EXPORT_OK = qw(check_link);
+our @EXPORT_OK = qw(check_link);
 
 my $UA = Mojo::UserAgent->new();
 $UA->proxy->detect;
 $UA->max_redirects(3);
 
-$VERSION = '1.165';
+our $VERSION = '1.167';
 
 sub check_link {
-	my $link = shift;
+	my( $link ) = @_;
+	say STDERR "Link is $link";
 	unless( defined $link ) {
 		$ERROR = 'Received no argument';
 		return;
@@ -119,10 +121,7 @@ can affect it directly.  See L<Mojo::UserAgent>.
 
 This source is in Github:
 
-	http://github.com/briandfoy/http-simplelinkchecker
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	https://github.com/briandfoy/http-simplelinkchecker
 
 =head1 AUTHOR
 
@@ -138,9 +137,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the Artistic License 2.0.
 
 =cut

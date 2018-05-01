@@ -4,13 +4,13 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "App-TimeTracker-Command-Gitlab",
    "prereqs" : {
@@ -26,9 +26,20 @@
       },
       "runtime" : {
          "requires" : {
-            "App::TimeTracker" : "2.020",
+            "App::TimeTracker::Utils" : "0",
             "HTTP::Tiny" : "0",
-            "JSON::XS" : "0"
+            "JSON::XS" : "0",
+            "Moose::Role" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
          }
       }
    },
@@ -41,7 +52,7 @@
          "web" : "https://github.com/domm/App-TimeTracker-Gitlab"
       }
    },
-   "version" : "1.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "1.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
 }
 

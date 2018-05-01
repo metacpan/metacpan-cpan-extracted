@@ -77,7 +77,7 @@ has 'use_cookies' => ( is => 'rw', isa => Bool, default => sub {1} );
 
 #use LWP::Debug qw(+);
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 # shortcut
 my $UTILS = 'Dezi::Utils';
@@ -1157,7 +1157,7 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2015 by Peter Karman
+Copyright 2008-2018 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

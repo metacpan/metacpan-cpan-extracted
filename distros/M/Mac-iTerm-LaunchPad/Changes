@@ -1,20 +1,18 @@
-1.01 - Sat Jan 20 00:58:16 2007
-	* First release of script to create new iTerm sessions in specified
-	directories, but without a lot of typing
+Revision history for Perl module Mac::iTerm::LaunchPad
 
-1.08 - Fri Jan 18 04:00:17 2008
+1.08 - 2008-01-18
 	* Exit gracefully in Makefile.PL is someone tries to run it
 	on a non-Mac (yeah, that's you CPAN Testers!)
 	* Requires at least Perl 5.006 now
 	* No need to upgrade if you already have this
 
-1.07 - Fri Mar 16 18:16:41 2007
+1.07 - 2007-03-16
 	* Upgraded Mac::Glue prereq to 1.28 (after the Intel fixes)
 
-1.06 - Thu Jan 25 14:27:10 2007
+1.06 - 2007-01-25
 	* turn on strictures to make CPANTS happy
 
-1.05 - Sat Jan 20 16:55:35 2007
+1.05 - 2007-01-20
 	* Added some bits to the Makefile.PL to create the iTerm glue if
 	it isn't already there. If it cannot finally load the iTerm glue,
 	it dies, although it did create the Makefile. The tests will
@@ -22,11 +20,15 @@
 	glue). See Mac::Glue for details about using gluemac.
 	* This resolves RT # 24473 from stennie. Thanks :)
 
-1.04 - Sat Jan 20 01:29:20 2007
+1.04 - 2007-01-20
 	* Added more to the docs to explain the new-iterm program
 	* Fixed up some things that made it into the pre-CVS-imported dir
 	I was accidently working in (two demerits for that!).
 
-1.02 - Sat Jan 20 01:16:33 2007
+1.02 - 2007-01-20
 	* Doc patch to fill in the DESCRIPTION portion
+
+1.01 - 2007-01-20
+	* First release of script to create new iTerm sessions in specified
+	directories, but without a lot of typing
 

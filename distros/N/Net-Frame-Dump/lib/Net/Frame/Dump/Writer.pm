@@ -1,5 +1,5 @@
 #
-# $Id: Writer.pm 364 2014-11-30 11:26:27Z gomor $
+# $Id: Writer.pm,v 453864a37ab6 2018/05/01 07:25:03 gomor $
 #
 package Net::Frame::Dump::Writer;
 use strict;
@@ -239,7 +239,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2014, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

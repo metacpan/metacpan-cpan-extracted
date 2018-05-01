@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Generate random password",
+  "ABSTRACT" => "Generate random password (support patterns + wordlists)",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -25,7 +25,8 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "List::Util" => "1.45",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.80",
+    "Perinci::CmdLine::Base" => "1.810",
+    "Perinci::CmdLine::Classic" => "1.770",
     "Random::Any" => "0.003",
     "Sah::Schema::posint" => 0,
     "strict" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +54,8 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::Util" => "1.45",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.80",
+  "Perinci::CmdLine::Base" => "1.810",
+  "Perinci::CmdLine::Classic" => "1.770",
   "Random::Any" => "0.003",
   "Sah::Schema::posint" => 0,
   "Test::More" => 0,

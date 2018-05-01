@@ -27,4 +27,4 @@ requires:
   LWP::UserAgent: '0'
   URL::Builder: '0.06'
   perl: '5.006'
-version: '1.10'
+version: '2.00'

@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,31 +21,41 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48",
-            "Getopt::Std" : 0,
-            "PPI" : 0,
-            "PPI::Dumper" : 0,
+            "Getopt::Std" : "0",
+            "PPI" : "0",
+            "PPI::Dumper" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0.95",
-            "Test::Output" : 0
+            "Test::Output" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/app-ppi-dumper/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/app-ppi-dumper",
       "repository" : {
-         "url" : "https://github.com/briandfoy/app-ppi-dumper"
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/app-ppi-dumper.git",
+         "web" : "https://github.com/briandfoy/app-ppi-dumper"
       }
    },
-   "version" : "1.02"
+   "version" : "1.021",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,3 +6,7 @@ Revision history for Yahoo-Weather-Api
 1.10    23-Apr-2018
         Pod document corrected
         Dependaciese added for failing test while installation
+2.00    25-Apr-2018
+        is_online flag introduce to bypass obect creation without internet.
+        Pod error fix.
+        Unit test gettting failed for no internet fixed.

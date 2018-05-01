@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::TwoScalp::Seq2Seq;
 # ABSTRACT: internal class for two-scalp tool
-$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.180160';
+$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.181180';
 use Moose;
 use namespace::autoclean;
 
@@ -14,13 +14,12 @@ use List::AllUtils qw(part);
 use Bio::MUST::Core;
 use Bio::MUST::Core::Constants qw(:gaps);
 use Bio::MUST::Core::Utils qw(secure_outfile);
-
+use Bio::MUST::Drivers;
 use aliased 'Bio::MUST::Core::Ali';
+use aliased 'Bio::MUST::Core::Ali::Temporary';
 use aliased 'Bio::MUST::Core::Seq';
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::SeqMask';
-use aliased 'Bio::MUST::Drivers::Blast::Database::Temporary';
-use aliased 'Bio::MUST::Drivers::Blast::Query';
 use aliased 'Bio::MUST::Apps::SlaveAligner::Local';
 
 
@@ -87,7 +86,7 @@ has 'blastdb' => (
 
 has 'query_seqs' => (
     is       => 'ro',
-    isa      => 'Bio::MUST::Drivers::Blast::Query',
+    isa      => 'Bio::MUST::Core::Ali::Temporary',
     init_arg => undef,
     writer   => '_set_query_seqs',
 );
@@ -101,7 +100,7 @@ sub _align_seqs {
 
     my $blastdb = $self->blastdb;
     my $query_seqs = $self->query_seqs;
-    my $parser = $query_seqs->blast($blastdb, $args);
+    my $parser = $blastdb->blast($query_seqs, $args);
     #### [S2S] XML BLASTP/N: $parser->filename
 
     my $bo = $parser->blast_output;
@@ -240,8 +239,10 @@ sub BUILD {
         = part { $_->is_aligned ? 1 : 0 } $ali->all_seqs;
     #### [S2S] seqs to align: display( map { $_->full_id } @{$unaligned_seqs} )
 
-    $self->_set_blastdb( Temporary->new( seqs =>   $aligned_seqs ) );
-    $self->_set_query_seqs(  Query->new( seqs => $unaligned_seqs ) );
+    $self->_set_blastdb( Bio::MUST::Drivers::Blast::Database::Temporary->new(
+        seqs => $aligned_seqs )
+    );
+    $self->_set_query_seqs( Temporary->new( seqs => $unaligned_seqs ) );
 
     my $new_ali = Ali->new( seqs => $aligned_seqs );
     $self->_set_new_ali($new_ali);
@@ -275,7 +276,7 @@ Bio::MUST::Apps::TwoScalp::Seq2Seq - internal class for two-scalp tool
 
 =head1 VERSION
 
-version 0.180160
+version 0.181180
 
 =head1 AUTHOR
 

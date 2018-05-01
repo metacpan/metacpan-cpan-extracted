@@ -3,30 +3,25 @@ abstract: 'webify your CLI'
 author:
   - 'chocolateboy <chocolate@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.59'
   Test::Differences: '0.64'
   Test::TinyMocker: '0.03'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Module::Install version 1.18, CPAN::Meta::Converter version 2.150010'
-license: perl
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-Wax
 no_index:
   directory:
-    - inc
     - t
-    - xt
-recommends:
-  Sereal: '3.015'
+    - inc
 requires:
   Digest::SHA: '0'
   File::BaseDir: '0.07'
-  File::Slurp: '9999.19'
-  HTTP::Message: '6.14'
+  File::Slurper: '0.012'
   IPC::System::Simple: '1.25'
   LWP: '6.31'
   MIME::Types: '2.17'
@@ -38,7 +33,6 @@ requires:
   perl: '5.008008'
 resources:
   bugtracker: https://github.com/chocolateboy/App-Wax/issues
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/chocolateboy/App-Wax
-version: 2.1.0
+version: v2.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

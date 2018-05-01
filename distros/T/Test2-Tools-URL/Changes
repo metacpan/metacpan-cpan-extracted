@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-URL
 
+0.03      2018-04-30 15:44:51 -0400
+  - Require URI 1.61 (needed for has_recognized_scheme)
+
 0.02      2017-08-10 16:35:14 -0400
   - Correctly handle Windows absolute path
 

@@ -1,0 +1,11 @@
+^mypp.yml
+.git
+\.old
+\.swp
+~$
+^blib/
+^Makefile$
+^Mojo-SNMP
+^local.*
+^cover_db.*
+MYMETA.*

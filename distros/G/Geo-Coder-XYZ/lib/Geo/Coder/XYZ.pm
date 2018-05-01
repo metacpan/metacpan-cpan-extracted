@@ -17,11 +17,11 @@ Geo::Coder::XYZ - Provides a geocoding functionality using https://geocode.xyz
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ sub geocode {
 		$location = Encode::encode_utf8($location);
 	}
 
-	my $uri = URI->new("https://$self->{host}/some_location/");
+	my $uri = URI->new("https://$self->{host}/");
 	if($location =~ /(.+),\s*England$/i) {
 		$location = "$1, United Kingdom";	# geocode.xyz gets confused between England and New England
 	}
@@ -97,12 +97,12 @@ sub geocode {
 		$query_parameters{'moreinfo'} = 1;
 	}
 	$uri->query_form(%query_parameters);
-	my $url = $uri->as_string;
+	my $url = $uri->as_string();
 
 	my $res = $self->{ua}->get($url);
 
 	if ($res->is_error) {
-		Carp::carp("geocode.xyz API returned error: on $url " . $res->status_line());
+		Carp::carp("API returned error: on $url " . $res->status_line());
 		return { };
 	}
 

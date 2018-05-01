@@ -44,12 +44,12 @@ my $github    = 'https://github.com/briandfoy/netscape-bookmarks';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.008',
+	'MIN_PERL_VERSION' => '5.010',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'LICENSE'       => 'perl',
+	'LICENSE'       => 'artistic_2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'CONFIGURE_REQUIRES' => {
@@ -62,13 +62,13 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::File'              => '0',
-		'Test::More'              => '0.95',
+		'Test::More'              => '1',
 		},
 
 	'PREREQ_PM'    => {
 		'HTML::Entities'          => '0',
 		'HTML::Parser'            => '3.26',
-		'HTTP::SimpleLinkChecker' => '0',
+		'HTTP::SimpleLinkChecker' => '0',  # requires v5.10
 		'Text::Diff'              => '0',
 		'URI'                     => '0',
 		 },
@@ -85,6 +85,10 @@ my %WriteMakefile = (
 				web    => "$github/issues",
 				},
 			homepage => $github,
+			},
+		no_index => {
+			file      => [ 'examples/Visitor.pm' ],
+			directory => [ 'examples', 't' ],
 			},
 		},
 

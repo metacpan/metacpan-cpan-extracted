@@ -2,12 +2,14 @@
 use strict;
 use warnings;
 
+use Data::Dump::Sexp;
 use Test::More tests => 31;
-BEGIN { use_ok('App::Scheme79asm::Compiler', qw/pretty_print/) };
+
+BEGIN { use_ok('App::Scheme79asm::Compiler') };
 
 sub is_sexp {
 	my ($expr, $expected, $name) = @_;
-	is pretty_print($expr), $expected, $name;
+	is dump_sexp($expr), $expected, $name;
 }
 
 sub to_sexp {
@@ -43,8 +45,8 @@ is_toplevel '(lambda append (x y) (if (atom x) y (cons (car x) (append (cdr x) y
 
 sub pp_roundtrip {
 	my ($string) = @_;
-	my $pp = uc App::Scheme79asm::Compiler::pretty_print(to_sexp $string);
-	is $pp, uc($string), "pretty_print roundtrip $string";
+	my $pp = uc dump_sexp(to_sexp $string);
+	is $pp, uc($string), "dump_sexp roundtrip $string";
 }
 
 pp_roundtrip '()';

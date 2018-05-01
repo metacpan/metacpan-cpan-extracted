@@ -1,7 +1,7 @@
 {
    "abstract" : "assemble sexp to Verilog ROM for SIMPLE processor",
    "author" : [
-      "unknown"
+      "Marius Gavrilescu <marius@ieval.ro>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Data::Dump::Sexp" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -44,6 +45,6 @@
          "url" : "https://git.ieval.ro/?p=app-scheme79asm.git"
       }
    },
-   "version" : "0.005",
+   "version" : "0.005001",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

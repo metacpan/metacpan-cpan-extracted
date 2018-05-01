@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
-$Bio::MUST::Core::Tree::VERSION = '0.181120';
+$Bio::MUST::Core::Tree::VERSION = '0.181180';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -141,7 +141,8 @@ sub _switch_attributes_and_labels_ {
 
 
 sub switch_branch_lengths_and_labels_for_entities {
-    my $self = shift;
+    my $self   = shift;
+    my $length = shift;
 
     # use branch lengths as labels
     my $tree = $self->tree;
@@ -151,7 +152,7 @@ sub switch_branch_lengths_and_labels_for_entities {
 
     # delete branch lengths
     for my $node ( @{ $tree->get_entities } ) {
-        $node->set_branch_length(undef);
+        $node->set_branch_length($length);      # default is undef
     }
 
     return;
@@ -471,7 +472,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.181120
+version 0.181180
 
 =head1 SYNOPSIS
 

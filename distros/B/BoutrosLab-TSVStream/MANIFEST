@@ -42,8 +42,6 @@ lib/BoutrosLab/TSVStream/IO/Writer.pm
 lib/BoutrosLab/TSVStream/IO/Writer/Dyn.pm
 lib/BoutrosLab/TSVStream/IO/Writer/Fixed.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/00-tsvstream.t
 t/01-tsvstreamdyn.t
@@ -55,6 +53,5 @@ t/12-bed-dyn.t
 t/13-nestedfilter.t
 t/20.vcf.as.annovarinput.t
 t/21.vcf.full.t
-t/proftest.pl
-t/timetest.pl
-t/timetest2.pl
+META.yml
+META.json

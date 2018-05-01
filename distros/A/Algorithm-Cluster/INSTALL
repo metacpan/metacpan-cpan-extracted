@@ -86,15 +86,17 @@ Python
 
 In the top directory (containing setup.py and also this INSTALL file), type
   python setup.py install
-You will need a fairly recent version of Python (2.0 or higher) and the
-Numerical Python package (NumPy version 1.1.1 or later), as well as an ANSI C
-compiler such as GNU gcc. You may need to log in as root the install Pycluster.
+You will need a fairly recent version of Python (2.6 or higher), as well as
+an ANSI C compiler such as GNU gcc.
+You may need to log in as root the install Pycluster.
 If you do not have root access, do
   python setup.py install --prefix=/some/other/directory
 and set the environment variable
   PYTHONPATH=/some/other/directory/lib/python2.2/site-packages
 The exact command depends on which shell you are using; the exact path will
 depend on the version of Python you are using.
+To use Pycluster, you will also need numpy (Numerical Python). Pycluster was
+tested with numpy version 1.7.0; older versions may also work.
 
 Note that Pycluster is also available as a tarball containing only the source
 code needed for Pycluster. A Windows installer for Pycluster is available from
@@ -124,5 +126,5 @@ CONTACT
 =======
 
 Michiel de Hoon, University of Tokyo, Human Genome Center
-(currently at the RIKEN Center for Life Science Technologies)
+(currently at the RIKEN Center for Integrative Medical Sciences).
 Email: michiel.dehoon 'AT' riken.jp

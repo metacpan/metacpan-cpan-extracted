@@ -20,10 +20,10 @@ no_index:
 provides:
   Storable:
     file: __Storable__.pm
-    version: '3.09'
+    version: '3.11'
 requires:
   XSLoader: '0'
 resources:
   bugtracker: http://rt.perl.org/perlbug/
-version: '3.09'
+version: '3.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

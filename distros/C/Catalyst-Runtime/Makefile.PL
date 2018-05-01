@@ -16,7 +16,6 @@ my %META = (
         'Test::Fatal' => 0,
         'Test::More' => '0.88',
         'HTTP::Request::Common' => 0,
-        'IO::Scalar' => 0,
         'HTTP::Status' => 0,
       },
     },
@@ -24,11 +23,9 @@ my %META = (
       requires => {
         'perl'                  => 5.008003,
         'List::Util'            => '1.45',
-        'namespace::autoclean'  => '0.28',
         'namespace::clean'      => '0.23',
         'MooseX::Emulate::Class::Accessor::Fast' => '0.00903',
         'Class::Load'           => '0.12',
-        'Data::OptList'         => 0,
         'Moose'                 => '1.03',
         'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24',
         'MooseX::Role::WithOverloading' => '0.09',
@@ -43,7 +40,6 @@ my %META = (
         'HTTP::Headers'         => '1.64',
         'HTTP::Request'         => '5.814',
         'HTTP::Response'        => '5.813',
-        'HTTP::Request::AsCGI'  => '1.0',
         'Module::Pluggable'     => '4.7',
         'Path::Class'           => '0.09',
         'Scalar::Util'          => 0,
@@ -51,7 +47,7 @@ my %META = (
         'Text::SimpleTable'     => '0.03',
         'Time::HiRes'           => 0,
         'Tree::Simple'          => '1.15',
-        'Tree::Simple::Visitor::FindByPath' => 0,
+        'Tree::Simple::Visitor::FindByUID' => 0,
         'Try::Tiny'             => '0.17',
         'Safe::Isa'             => 0,
         'Task::Weaken'          => 0,
@@ -63,7 +59,6 @@ my %META = (
         'Plack'                 => '0.9991', # IIS6+7 fix middleware
         'Plack::Middleware::ReverseProxy' => '0.04',
         'Plack::Test::ExternalServer' => 0,
-        'Class::Data::Inheritable' => 0,
         'Encode'                => '2.49',
         'LWP'                   => '5.837', # LWP had unicode fail in 5.8.26
         'URI'                   => '1.65',
@@ -87,10 +82,8 @@ my %META = (
     },
     develop   => {
       requires => {
-        'Test::Simple'            => '0.88',
         'CatalystX::LeakChecker'  => '0.05',
         'Catalyst::Devel'         => '1.0', # For http server test
-        'Catalyst::Engine::PSGI'  => 0,
         'Test::WWW::Mechanize::Catalyst' => '0.51',
         'Test::TCP'               => '2.00', # ditto, ships Net::EmptyPort
         'File::Copy::Recursive'   => '0.40',
@@ -103,6 +96,10 @@ my %META = (
         'Pod::Coverage::TrustPod' => 0,
         'Catalyst::Plugin::Params::Nested' => 0,
         'Catalyst::Plugin::ConfigLoader' => 0,
+        'Compress::Zlib'          => 0,
+        'Catalyst::Action::REST'  => 0,
+        'Type::Tiny'              => 0,
+        'Proc::ProcessTable'      => 0,
       },
     },
   },
@@ -228,7 +225,6 @@ print <<"EOF";
     For development and use of catalyst.pl and myapp_create.pl, make sure
     you also install the development tools package Catalyst::Devel.
 
-        perl -MCPANPLUS -e 'install Catalyst::Devel' # or
         perl -MCPAN -e 'install Catalyst::Devel'     # or
         cpanm Catalyst::Devel
 

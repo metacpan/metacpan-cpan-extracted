@@ -1,3 +1,36 @@
+Version 3.58 (2018-04-29)
+
+  [NEW FEATURES]
+
+  * #202 Support for Aerohive access points
+
+  [ENHANCEMENTS]
+
+  * #220 Alcatel-Lucent / Nokia SR 7750 missing port information. Add duplex,
+    fan, and power supply status, as well as, module inventory to L3::Timetra
+  * Add fan and power supply status to L3::Huawei
+  * Override ifMTU with max frame size when applicable in L3::Huawei
+
+  [BUG FIXES]
+
+  * Correct POE power module to port mapping in L3::Huawei
+
+Version 3.57 (2018-04-26)
+
+  [ENHANCEMENTS]
+
+  * #145 Patch for Huawei (robwwd)
+  * #228 Huawei aggregate link support
+  * POE and duplex admin support added to L3::Huawei
+  * Significant performance improvement validating AUTOLOAD methods
+
+  [BUG FIXES]
+
+  * IEEE802dot3ad portlist is indexed with a dot1dBasePort, cross reference
+    with dot1dBasePortIfIndex
+  * Fix for macsuck in Cisco classes introduced in 3.55 caused by inheritance
+    issue in CiscoStack
+
 Version 3.56 (2018-04-22)
 
   [BUG FIXES]

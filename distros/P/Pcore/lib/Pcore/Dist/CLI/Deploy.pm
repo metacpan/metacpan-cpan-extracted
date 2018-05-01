@@ -10,7 +10,7 @@ sub CLI ($self) {
         opt      => {
             all        => { desc => 'implies --develop, --recommends and --suggeests', },
             install    => { desc => 'install bin/ to PATH and lib/ to PERL5LIB', },
-            develop    => { desc => 'cpanm --with-develop', },
+            devel      => { desc => 'cpanm --with-develop', },
             recommends => { desc => 'cpanm --with-recommends', },
             suggests   => { desc => 'cpanm --with-suggests', },
             verbose    => { desc => 'cpanm --verbose', },

@@ -1,4 +1,15 @@
-Revision history for Display-Resolution
+0.004   2018-04-26 (PERLANCAR)
+
+	- Add names: UHD-1, True 4K, UHD-2, True 8K, Cinema 8K, DCI 8K,
+	  8640p, Cinema 16K, DCI 16K, True 16K.
+
+
+0.003   2018-04-26 (PERLANCAR)
+
+	- Add new names: 2160p, 4320p, 4K UHD-1, 8K UHD-2, CGA1, CGA2, DVGA,
+	  EGA, HGC, HSXGA, HUXGA, HXGA, MCGA, MDA, QSXGA+, QUXGA, UW10K, UW4K,
+	  UW5K, WHSXGA, WHUXGA, WHXGA, WQSXGA, WQUXGA, qSVGA.
+
 
 0.002   2016-10-07 (PERLANCAR)
 

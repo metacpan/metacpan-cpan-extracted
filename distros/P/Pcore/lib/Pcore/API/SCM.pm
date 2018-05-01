@@ -76,9 +76,7 @@ sub scm_clone ( $self, $uri, $root, $scm_type = $SCM_TYPE_HG, $cb = undef ) {
         sub ($res) {
             P->file->move( $temp->path, $root ) if $res;
 
-            $cb->($res) if $cb;
-
-            return;
+            return $cb ? $cb->($res) : $res;
         }
     );
 }

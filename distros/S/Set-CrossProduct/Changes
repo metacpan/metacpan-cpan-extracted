@@ -1,5 +1,8 @@
 Revision history for Perl module Set::CrossProduct
 
+2.003 2018-04-27T14:33:05Z
+	* Clarify that it's Artistic License 2.0
+
 2.002 2016-09-26T15:05:11Z
 	* Correct prereq in Makefile to match test files
 

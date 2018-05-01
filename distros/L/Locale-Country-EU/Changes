@@ -1,0 +1,6 @@
+Revision history for Perl extension Locale::Country::EU.
+
+0.01  Thu Apr 26 12:10:04 2018
+	- original version; created by h2xs 1.23 with options
+		-AX Locale::Country::EU
+

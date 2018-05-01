@@ -1,6 +1,6 @@
-package Pcore v0.62.5;
+package Pcore v0.63.0;
 
-use v5.26;
+use v5.26.0;
 use common::header;
 use Pcore::Core::Exporter qw[];
 use Pcore::Core::Const qw[:CORE];

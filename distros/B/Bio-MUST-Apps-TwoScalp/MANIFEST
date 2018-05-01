@@ -17,3 +17,11 @@ t/author-portability.t
 t/two_scalp.t
 test/PTHR22663-ts-s2s.ali
 test/PTHR22663.ali
+test/rRNA16S-ts.ali
+test/rRNA16S.ali
+test/recA-ts.ali
+test/recA.ali
+test/rpoB-ts.ali
+test/rpoB.ali
+test/trnB-ts.ali
+test/trnB.ali

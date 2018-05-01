@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTTP-Tiny-Multipart",
    "prereqs" : {
@@ -35,6 +35,12 @@
          }
       }
    },
+   "provides" : {
+      "HTTP::Tiny::Multipart" : {
+         "file" : "lib/HTTP/Tiny/Multipart.pm",
+         "version" : "0.08"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -47,6 +53,16 @@
          "web" : "http://github.com/reneeb/HTTP-Tiny-Multipart"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_contributors" : [
+      "Aran Deltac <bluefeet@gmail.com>",
+      "Mark Glines <mark@glines.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Renee Baecker <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>",
+      "Stephen Thirlwall <sdt@dr.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

@@ -1,4 +1,5 @@
 package Netscape::Bookmarks;
+use v5.10;
 
 =encoding utf8
 
@@ -97,7 +98,7 @@ use Netscape::Bookmarks::Link;
 use Netscape::Bookmarks::Separator;
 use Netscape::Bookmarks::Isa;
 
-$VERSION = "2.301";
+$VERSION = "2.303";
 
 $ID = 0;
 $DEBUG = $ENV{NS_DEBUG} || 0;
@@ -332,9 +333,10 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =head1 SEE ALSO
 

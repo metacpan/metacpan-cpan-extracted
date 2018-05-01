@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 
 BEGIN {
     use XSLoader;
-    $VERSION = '1.24';
+    $VERSION = '1.26';
     XSLoader::load('Math::Clipper', $VERSION);
 }
 
@@ -44,7 +44,7 @@ my %intspecs = (
             maxint    => 1073741822,   # Clipper-imposed max to avoid calculations with large integer types
             maxdigits => 10
             },
-    );
+);
 
 my $is64safe = ((defined($Config{use64bitint})   && $Config{use64bitint}   eq 'define') || $Config{longsize}   >= 8 ) &&
                ((defined($Config{uselongdouble}) && $Config{uselongdouble} eq 'define') || $Config{doublesize} >= 10);
@@ -52,15 +52,15 @@ my $is64safe = ((defined($Config{use64bitint})   && $Config{use64bitint}   eq 'd
 sub offset {
     my ($polygons, $delta, $scale, $jointype, $miterlimit) = @_;
     $scale      ||= 100;
-	$jointype   = JT_MITER if !defined $jointype;
-	$miterlimit ||= 2;
-	
-	my $scalevec=[$scale,$scale];
-	my $polyscopy=[(map {[(map {[(map {$_*$scalevec->[0]} @{$_})]} @{$_})]} @{$polygons})];
-	my $ret = _offset($polyscopy,$delta*$scale, $jointype, $miterlimit);
-	unscale_coordinate_sets($scalevec , $ret) if @$ret;
-	return $ret;
-	}
+    $jointype   = JT_MITER if !defined $jointype;
+    $miterlimit ||= 2;
+
+    my $scalevec=[$scale,$scale];
+    my $polyscopy=[(map {[(map {[(map {$_*$scalevec->[0]} @{$_})]} @{$_})]} @{$polygons})];
+    my $ret = _offset($polyscopy,$delta*$scale, $jointype, $miterlimit);
+    unscale_coordinate_sets($scalevec , $ret) if @$ret;
+    return $ret;
+}
 
 *is_counter_clockwise = *orientation;
 
@@ -73,17 +73,17 @@ sub unscale_coordinate_sets { # to undo what integerize_coordinate_sets() does
         foreach my $vector (@{$set}) {
             for (my $ci=0;$ci<$coord_count;$ci++) {
                 $vector->[$ci] /= $scale_vector->[$ci] if $scale_vector->[$ci]; # avoid divide by zero
-                }
             }
         }
     }
+}
 
 sub integerize_coordinate_sets {
     my %opts=();
     if (ref($_[0]) =~ /HASH/) {%opts=%{(shift)};}
     $opts{constrain} =  1 if !defined($opts{constrain});
     $opts{bits}      = ($is64safe ? 64 : 53) if !defined($opts{bits});
-	if ($opts{bits} == 64 && !$is64safe) {$opts{bits} = 53; carp "Integerize to 64 bits requires both long long and long double underlying Perl's default integer and double types. Using 53 bits instead.";}
+    if ($opts{bits} == 64 && !$is64safe) {$opts{bits} = 53; carp "Integerize to 64 bits requires both long long and long double underlying Perl's default integer and double types. Using 53 bits instead.";}
     $opts{margin} =  0 if !defined($opts{margin});
 
     # assume all coordinate vectors (points) have same number of coordinates; get that count from first one
@@ -91,7 +91,7 @@ sub integerize_coordinate_sets {
 
     # return this with scaled data, so user can "unscale" Clipper results
     my @scale_vector;
-    
+
     # deal with each coordinate "column" (eg. x column, y column, ... possibly more)
     for (my $ci=0;$ci<$coord_count;$ci++) {
         my $maxc=$_[0]->[0]->[$ci];
@@ -107,10 +107,10 @@ sub integerize_coordinate_sets {
                 if (sprintf("%.20e",$vector->[$ci] + ($vector->[$ci]<0?-1:1)*$opts{margin}) =~ /[eE]([+-])0*(\d+)$/) {
                     my $exp1 = eval($1.$2);
                     if (defined $vector->[$ci] && (!defined($max_exp) || $max_exp<$exp1)) {$max_exp=$exp1} 
-                    }
-                else {croak "some coordinate didn't look like a number: ",$vector->[$ci]}
                 }
+                else {croak "some coordinate didn't look like a number: ",$vector->[$ci]}
             }
+        }
 
         # Set scale for this coordinate column to the largest value that will convert the
         # larges coordinate in the set to near the top of the available integer range.
@@ -129,11 +129,15 @@ sub integerize_coordinate_sets {
 
             $scale_vector[$ci]=10**(-$max_exp + ($intspecs{$opts{bits}}->{maxdigits} - 2));
 
-            }
         }
-    
+
+        # brings behavior of FreeBSD + clang systems into harmony with others
+        $scale_vector[$ci] = 0.0 + sprintf("%.0f",$scale_vector[$ci]);
+
+    }
+
     # If the "constrain" option is set false,
-	# scaling is independent for each
+    # scaling is independent for each
     # coordinate column - all the Xs get one scale
     # all the Ys something else - to take the greatest
     # advantage of the available integer domain.
@@ -144,20 +148,22 @@ sub integerize_coordinate_sets {
     if ($opts{constrain}) {
         my $min_scale=(sort {$a<=>$b} @scale_vector)[0];
         @scale_vector = map {$min_scale} @scale_vector;
-        }
+    }
 
     # Scale the original data
     foreach my $set (@_) {
         foreach my $vector (@{$set}) {
             for (my $ci=0;$ci<$coord_count;$ci++) {
                 $vector->[$ci] *= $scale_vector[$ci];
-                if (abs($vector->[$ci] < 1)) {$vector->[$ci] = sprintf("%.1f",$vector->[$ci]/10)*10;}
-                }
+                if    (abs($vector->[$ci]) < 0.5) { $vector->[$ci] = 0; }
+                elsif (abs($vector->[$ci]) < 1) { $vector->[$ci] = $vector->[$ci] < 0 ? -1:1; }
+                $vector->[$ci] = _floor($vector->[$ci]);
             }
         }
+    }
 
     return \@scale_vector;
-    }
+}
 
 # keep this method as a no-op, as it was removed in Clipper 4.5.5
 sub use_full_coordinate_range {}

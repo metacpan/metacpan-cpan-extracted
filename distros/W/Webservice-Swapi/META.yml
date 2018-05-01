@@ -1,0 +1,49 @@
+---
+abstract: 'A Perl module to interface with the Star Wars API (swapi.co) webservice.'
+author:
+  - '(C) Kian-Meng, Ang.'
+build_requires:
+  Minilla: '0'
+  Perl::Critic::Policy::TestingAndDebugging::RequirePackageStricture: '0'
+  Perl::Critic::Policy::TestingAndDebugging::RequirePackageWarnings: '0'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Webservice-Swapi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Webservice::Swapi:
+    file: lib/Webservice/Swapi.pm
+    version: v0.1.2
+requires:
+  Data::Serializer: '0'
+  JSON: '0'
+  Moo: '0'
+  REST::Client: '0'
+  Role::REST::Client: '0'
+  Types::Standard: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kianmeng/webservice-swapi/issues
+  homepage: https://github.com/kianmeng/webservice-swapi
+  repository: git://github.com/kianmeng/webservice-swapi.git
+version: 0.1.2
+x_contributors:
+  - 'Kian-Meng, Ang <kianmeng@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -174,18 +174,23 @@ sub _vmem_usage {
 	my $cmd  = "tail -3 $stderr";
 	my @last = `$cmd`;
 	my $msg;
+	if ($msg = `grep 'Rscript: command not found' $stderr`) {
+		$self->info( "Considering forced retry, found stderr: $msg" );
+		$run->_analysis_chose_retry(1); # force a regular retry if possible
+		return 0;
+	}
 	my $consider_vmem_retry_reason =
-		  ($last[-1] =~ /Out of memory\!/)            ? "found stderr: $last[-1]"
-		: ($last[-1] =~ /(MemoryError)|(Cannot allocate memory)/)
+		  ($last[-1] =~ /(Out of memory\!)|(MemoryError)|(Cannot allocate memory)/)
 													  ? "found stderr: $last[-1]"
 		: ($last[-2] =~ /^Error: cannot allocate vector of size /
 			&& $last[-1] =~ /Execution halted/)       ? "found stderr: $last[-2]"
-		: ($msg = `grep 'java.lang.OutOfMemoryError: GC overhead limit exceeded' $stderr`)
+		: (  ($msg = `grep 'java.lang.OutOfMemoryError: GC overhead limit exceeded' $stderr`)
+		  || ($msg = `grep 'what():  std::bad_alloc' $stderr`) )
 													  ? "found stderr: $msg"
 		: ($pct >= $self->retry_mem_percent)          ? "exceeded allocated memory limit (or close enough to the limit)"
 		: $self->memory_too_small->($stats, $stderr)  ? "user-provided check"
 		:                                               undef;
-	if ($consider_vmem_retry_reason) {
+	if ($consider_vmem_retry_reason) { #retry with increased memory if appropriate
 		$self->info( "Considering vmem retry, $consider_vmem_retry_reason" );
 		return $self->_can_retry_from_vmem(
 			$pct > 100

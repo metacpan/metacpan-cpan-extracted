@@ -1,3 +1,23 @@
+0.441   2018-04-26 (PERLANCAR)
+
+	- [Bugfix] Previous release didn't fix the broken
+	  delete/undelete/reindex, we now need to pass ACTION=... query
+	  parameter.
+
+
+0.440   2018-04-26 (PERLANCAR)
+
+	- Update to server changes: Module listing format.
+
+	- Update to server changes: rely only on HTTP response status for
+	  delete/undelete/reindex result.
+
+	- Update to server changes: File listing format.
+
+	- Update to server changes: rely only on HTTP response status for
+	  upload result.
+
+
 0.43    2017-07-03 (PERLANCAR)
 
         - Really fix jumbled up error message.

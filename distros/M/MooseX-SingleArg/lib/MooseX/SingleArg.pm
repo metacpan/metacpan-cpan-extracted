@@ -1,5 +1,5 @@
 package MooseX::SingleArg;
-$MooseX::SingleArg::VERSION = '0.06';
+$MooseX::SingleArg::VERSION = '0.07';
 use Moose ();
 use Moose::Exporter;
 
@@ -33,22 +33,32 @@ single non-hashref value then that argument will be assigned to whatever
 attribute you have declared.
 
 The reason for this module's existence is that when people want this feature
-they usually find L<Moose::Cookbook::Basics::Recipe10> which asks that something
-like the following be written:
+they usually find L<Moose::Cookbook::Basics::Person_BUILDARGSAndBUILD> which
+asks that something like the following be written:
 
-    around BUILDARGS => sub{
+    around BUILDARGS => sub {
         my $orig = shift;
-        my $self = shift;
+        my $class = shift;
         
-        if (@_==1 and ref($_[0]) ne 'HASH') {
-            return $self->$orig( foo => $_[0] );
+        if ( @_ == 1 && ! ref $_[0] ) {
+            return $class->$orig(ssn => $_[0]);
         }
-        
-        return $self->$orig( @_ );
+        else {
+            return $class->$orig(@_);
+        }
     };
 
 The above is complex boilerplate for a simple feature.  This module aims to make
 it simple and fool-proof to support single-argument Moose object construction.
+
+=head1 INIT_ARG BEHAVIOR
+
+If setting a custom init_arg for an attribute which you will be assigning as the
+single_arg then use the init_arg value, rather than the attribute key, for it.
+For example:
+
+    single_arg 'moniker';
+    has name => ( is=>'ro', isa=>'Str', init_arg=>'moniker' );
 
 =head1 FORCING SINGLE ARG PROCESSING
 

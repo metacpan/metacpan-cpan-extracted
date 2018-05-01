@@ -1,8 +1,13 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 use App::Wax;
 
-exit App::Wax->new->run(\@ARGV);
+our $VERSION = 'v2.2.0';
+
+exit App::Wax->new({ app_version => $VERSION })->run(\@ARGV);
 
 # FIXME reconcile the need for a) GitHub doc display and b) Pod::Usage
 # discoverability by duplicating wax.pod here :-(
@@ -181,7 +186,7 @@ URLs e.g:
 
 =head1 VERSION
 
-2.1.0
+2.2.0
 
 =head1 SEE ALSO
 
@@ -201,10 +206,9 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2018 by chocolateboy
+Copyright (c) 2010-2018 by chocolateboy.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under the
+terms of the L<Artistic License 2.0|http://www.opensource.org/licenses/artistic-license-2.0.php>.
 
 =cut

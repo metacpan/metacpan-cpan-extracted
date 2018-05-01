@@ -21,5 +21,5 @@ requires:
   Mojolicious: '7.75'
 resources:
   repository: https://framagit.org/luc/mojolicious-plugin-cspheader.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

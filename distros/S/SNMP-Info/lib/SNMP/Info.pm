@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.56';
+$VERSION = '3.58';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.56
+SNMP::Info - Version 3.58
 
 =head1 AUTHOR
 
@@ -506,6 +506,12 @@ See documentation in L<SNMP::Info::Layer2::3Com> for details.
 Subclass for Adtran devices.
 
 See documentation in L<SNMP::Info::Layer2::Adtran> for details.
+
+=item SNMP::Info::Layer2::Aerohive
+
+Subclass for Aerohive Access Points.
+
+See documentation in L<SNMP::Info::Layer2::Aerohive> for details.
 
 =item SNMP::Info::Layer2::Airespace
 
@@ -1629,6 +1635,7 @@ sub device_type {
         35098 => 'SNMP::Info::Layer3::Pica8',
         41112 => 'SNMP::Info::Layer2::Ubiquiti',
         4413 => 'SNMP::Info::Layer2::Ubiquiti',
+        26928 => 'SNMP::Info::Layer2::Aerohive',
         30803 => 'SNMP::Info::Layer3::VyOS',
         40310 => 'SNMP::Info::Layer3::Cumulus',
     );
@@ -1663,6 +1670,7 @@ sub device_type {
         17163 => 'SNMP::Info::Layer3::Steelhead',
         20540 => 'SNMP::Info::Layer2::Sixnet',
         26543 => 'SNMP::Info::Layer3::IBMGbTor',
+        26928 => 'SNMP::Info::Layer2::Aerohive',
     );
 
     my %l1sysoidmap = (
@@ -4679,16 +4687,26 @@ sub _validate_autoload_method {
 
     }
 
-    # If the parent of the leaf has indexes it is contained within a table
-    my $indexes    = $SNMP::MIB{$oid}{'parent'}{'indexes'};
-    my $table_leaf = 0;
+     my $table_leaf = 0;
+ 
+    # This is an expensive check so we assume anything in the funcs and globals
+    # hashes are known. Only for actual MIB leafs should we have to check the
+    # MIB. If the parent of the leaf has indexes it is contained within a table.   
+    if ($funcs->{$attr}) {
+      $table_leaf = 1;
+     }
+    elsif (!$globals->{$attr}) {
 
-    if ( !$globals->{$attr}
-        && ( ( defined $indexes && scalar( @{$indexes} ) > 0 )
-            || $funcs->{$attr} ))
-    {
-        $table_leaf = 1;
-    }
+        # Prevent autovivification 
+        if (exists $SNMP::MIB{$oid} &&
+            exists $SNMP::MIB{$oid}{'parent'} &&
+            exists $SNMP::MIB{$oid}{'parent'}{'indexes'} &&
+            defined $SNMP::MIB{$oid}{'parent'}{'indexes'} &&
+            scalar( @{$SNMP::MIB{$oid}{'parent'}{'indexes'}} ) > 0)
+        {
+            $table_leaf = 1;    
+        }
+     }
 
     # Tag on .0 for %GLOBALS and single instance MIB leafs unless
     # the leaf ends in a digit or we are going to use for a set operation

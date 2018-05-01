@@ -2,7 +2,7 @@
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '2.9.3';
+$Git::Hooks::GerritChangeId::VERSION = '2.9.5';
 use 5.010;
 use utf8;
 use strict;
@@ -100,7 +100,7 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 2.9.3
+version 2.9.5
 
 =head1 SYNOPSIS
 

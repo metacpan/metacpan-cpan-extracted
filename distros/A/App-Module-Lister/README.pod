@@ -2,7 +2,16 @@
 
 =encoding utf8
 
-[![AppVeyor status](https://ci.appveyor.com/api/projects/status/xb6li8hgsxmpvf6l?svg=true)](https://ci.appveyor.com/project/briandfoy/app-module-lister)(https://travis-ci.org/briandfoy/app-module-lister.svg?branch=master)](https://travis-ci.org/briandfoy/app-module-liseter) [![artistic2](https://img.shields.io/badge/license-Artistic%202.0-blue.svg?style=flat)](https://opensource.org/licenses/Artistic-2.0)
+=for HTML <a href="https://travis-ci.org/briandfoy/app-module-lister"><img src="https://travis-ci.org/briandfoy/app-module-lister.svg?branch=master"></a>
+
+=for HTML  <a href="https://ci.appveyor.com/project/briandfoy/app-module-lister"><img src="https://ci.appveyor.com/api/projects/status/xb6li8hgsxmpvf6l?svg=true"></a>
+
+=for HTML <a href="http://www.metacpan.org/module/App::Module::Lister"><img src="https://img.shields.io/cpan/v/App::Module::Lister.svg" /></A>
+
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/App-Module-Lister?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/App-Module-Lister/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/app-module-lister/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/App-Module-Lister.svg" /></a>
 
 =head1 The App::Module::Lister module
 

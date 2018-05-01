@@ -1,5 +1,10 @@
 Revision history for App::TimeTracker::Command::Gitlab
 
+1.003   2018-04-30T16:00:20
+    - during --start: assign to current user, reopen if closed, add/remove labels
+    - dep on JSON::MaybeXS via json_maybexs.pl
+
+
 1.002   2016-10-28T21:37:25+0200
     - sane error message if the issue cannot be found
 

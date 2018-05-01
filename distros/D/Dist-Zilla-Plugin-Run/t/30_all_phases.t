@@ -24,12 +24,12 @@ local $ENV{RELEASE_STATUS};
                     # "versioner" voodoo which rewrites @ARGV elements of
                     # "/usr/bin/perl" to "/usr/bin/perl5.18" (rt-101483).
 
-                    [ 'Run::BeforeBuild' => { run => [ '"%x" script%prun.pl before_build %s %n %v .%d.%a. x:%x' ] } ],
-                    [ 'Run::AfterBuild' => { run => [ '"%x" script%prun.pl after_build %n %v %d %s %s %v .%a. x:%x' ] } ],
-                    [ 'Run::BeforeArchive' => { run => [ '"%x" script%prun.pl before_archive %n %v %d .%a. x:%x' ] } ],
-                    [ 'Run::BeforeRelease' => { run => [ '"%x" script%prun.pl before_release %n -d %d %s -v %v .%a. x:%x' ] } ],
-                    [ 'Run::Release' => { run => [ '"%x" script%prun.pl release %s %n %v %d/a %d/b %a x:%x' ] } ],
-                    [ 'Run::AfterRelease' => { run => [ '"%x" script%prun.pl after_release %d %v %s %s %n %a x:%x' ] } ],
+                    [ 'Run::BeforeBuild' => { run => [ '"%x" %o%pscript%prun.pl %o before_build %s %n %v .%d.%a. x:%x' ] } ],
+                    [ 'Run::AfterBuild' => { run => [ '"%x" %o%pscript%prun.pl %o after_build %n %v %d %s %s %v .%a. x:%x' ] } ],
+                    [ 'Run::BeforeArchive' => { run => [ '"%x" %o%pscript%prun.pl %o before_archive %n %v %d .%a. x:%x' ] } ],
+                    [ 'Run::BeforeRelease' => { run => [ '"%x" %o%pscript%prun.pl %o before_release %n -d %d %s -v %v .%a. x:%x' ] } ],
+                    [ 'Run::Release' => { run => [ '"%x" %o%pscript%prun.pl %o release %s %n %v %d/a %d/b %a x:%x' ] } ],
+                    [ 'Run::AfterRelease' => { run => [ '"%x" %o%pscript%prun.pl %o after_release %d %v %s %s %n %a x:%x' ] } ],
                 ),
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
                 path(qw(source script run.pl)) => <<'SCRIPT',
@@ -38,7 +38,7 @@ use warnings;
 
 use Path::Tiny;
 
-path('.')->child('phases.txt')->append_raw(join(' ', @ARGV) . "\n");
+path(shift)->child('phases.txt')->append_raw(join(' ', @ARGV) . "\n");
 SCRIPT
             },
         },
@@ -47,10 +47,14 @@ SCRIPT
     $tzil->chrome->logger->set_debug(1);
     $tzil->release;
 
+    my $source_dir = path($tzil->tempdir)->child('source');
+    my $build_dir = path($tzil->tempdir)->child('build');
+
     my %f = (
         a => 'DZT-Sample-0.001.tar.gz',
         n => 'DZT-Sample',
-        d => path($tzil->tempdir)->child('build'),
+        o => $source_dir,
+        d => $build_dir,
         v => '0.001',
         x => do { my $path = Dist::Zilla::Plugin::Run::Role::Runner->current_perl_path; $path =~ s{\\}{/}g; $path },
     );

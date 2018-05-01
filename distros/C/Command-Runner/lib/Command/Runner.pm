@@ -3,7 +3,9 @@ use strict;
 use warnings;
 
 use Capture::Tiny ();
+use Command::Runner::Format ();
 use Command::Runner::LineBuffer;
+use Command::Runner::Quote ();
 use Config ();
 use IO::Select;
 use POSIX ();
@@ -11,40 +13,38 @@ use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.002';
-our $TICK = 0.05;
+our $VERSION = '0.100';
+our $TICK = 0.02;
 
 sub new {
     my ($class, %option) = @_;
+    my $command = delete $option{command};
+    my $commandf = delete $option{commandf};
+    die "Cannot specify both command and commandf" if $command && $commandf;
+    if (!$command && $commandf) {
+        $command = Command::Runner::Format::commandf @$commandf;
+    }
     bless {
-        keep => 0,
+        keep => 1,
         _buffer => {},
-        on => {},
         %option,
+        ($command ? (command => $command) : ()),
     }, $class;
 }
 
-for my $attr (qw(command redirect timeout keep)) {
+for my $attr (qw(command redirect timeout keep stdout stderr)) {
     no strict 'refs';
     *$attr = sub {
         my $self = shift;
-        if (@_) {
-            $self->{$attr} = $_[0];
-            $self;
-        } else {
-            $self->{$attr};
-        }
+        $self->{$attr} = $_[0];
+        $self;
     };
 }
 
-sub on {
-    my ($self, $type, $sub) = @_;
-    if ($sub) {
-        $self->{on}{$type} = $sub;
-        $self;
-    } else {
-        $self->{on}{$type};
-    }
+sub commandf {
+    my ($self, $format, @args) = @_;
+    $self->{command} = Command::Runner::Format::commandf $format, @args;
+    $self;
 }
 
 sub run {
@@ -62,54 +62,55 @@ sub run {
 sub _wrap {
     my ($self, $code) = @_;
 
-    my ($stdout, $stderr, $res, $timeout);
+    my ($stdout, $stderr, $res);
     if ($self->{redirect}) {
-        ($stdout, $res, $timeout) = &Capture::Tiny::capture_merged($code);
+        ($stdout, $res) = &Capture::Tiny::capture_merged($code);
     } else {
-        ($stdout, $stderr, $res, $timeout) = &Capture::Tiny::capture($code);
+        ($stdout, $stderr, $res) = &Capture::Tiny::capture($code);
     }
 
-    if (length $stdout and my $sub = $self->{on}{stdout}) {
+    if (length $stdout and my $sub = $self->{stdout}) {
         my $buffer = Command::Runner::LineBuffer->new(buffer => $stdout);
         my @line = $buffer->get(1);
         $sub->($_) for @line;
     }
-    if (!$self->{redirect} and length $stderr and my $sub = $self->{on}{stderr}) {
+    if (!$self->{redirect} and length $stderr and my $sub = $self->{stderr}) {
         my $buffer = Command::Runner::LineBuffer->new(buffer => $stderr);
         my @line = $buffer->get(1);
         $sub->($_) for @line;
     }
 
-    return {
-        result => $res,
-        timeout => $timeout,
-        stdout => $self->{keep} ? $stdout : "",
-        stderr => $self->{keep} ? $stderr : "",
-    };
+    if ($self->{keep}) {
+        $res->{stdout} = $stdout;
+        $res->{stderr} = $stderr;
+    }
+
+    return $res;
 }
 
 sub _run_code {
     my ($self, $code) = @_;
 
     if (!$self->{timeout}) {
-        my $res = $code->();
-        return ($res, undef);
+        my $result = $code->();
+        return { pid => $$, result => $result };
     }
 
-    my ($res, $err);
+    my ($result, $err);
     {
         local $SIG{__DIE__} = 'DEFAULT';
         local $SIG{ALRM} = sub { die "__TIMEOUT__\n" };
         eval {
             alarm $self->{timeout};
-            $res = $code->();
+            $result = $code->();
         };
         $err = $@;
         alarm 0;
     }
-    return ($res, undef) unless $err;
-    if ($err eq "__TIMEOUT__\n") {
-        return ($res, 1);
+    if (!$err) {
+        return { pid => $$, result => $result, };
+    } elsif ($err eq "__TIMEOUT__\n") {
+        return { pid => $$, result => $result, timeout => 1 };
     } else {
         die $err;
     }
@@ -117,11 +118,18 @@ sub _run_code {
 
 sub _system_win32 {
     my ($self, $command) = @_;
-    my $pid = system 1, ref $command ? @$command : $command;
+
+    my $pid;
+    if (ref $command) {
+        my @cmd = map { Command::Runner::Quote::quote_win32($_) } @$command;
+        $pid = system { $command->[0] } 1, @cmd;
+    } else {
+        $pid = system 1, $command;
+    }
 
     my $timeout_at = $self->{timeout} ? Time::HiRes::time() + $self->{timeout} : undef;
     my $INT; local $SIG{INT} = sub { $INT++ };
-    my ($exit, $timeout);
+    my ($result, $timeout);
     while (1) {
         if ($INT) {
             kill INT => $pid;
@@ -133,7 +141,7 @@ sub _system_win32 {
             warn "waitpid($pid, POSIX::WNOHANG()) returns unexpectedly -1";
             last;
         } elsif ($res > 0) {
-            $exit = $?;
+            $result = $?;
             last;
         } else {
             if ($timeout_at) {
@@ -146,14 +154,21 @@ sub _system_win32 {
             Time::HiRes::sleep($TICK);
         }
     }
-    return ($exit, $timeout);
+    return { pid => $pid, result => $result, timeout => $timeout };
 }
 
 sub _exec {
     my ($self, $command) = @_;
+
     pipe my $stdout_read, my $stdout_write;
+    $self->{_buffer}{stdout} = Command::Runner::LineBuffer->new(keep => $self->{keep});
+
     my ($stderr_read, $stderr_write);
-    pipe $stderr_read, $stderr_write unless $self->{redirect};
+    if (!$self->{redirect}) {
+        pipe $stderr_read, $stderr_write;
+        $self->{_buffer}{stderr} = Command::Runner::LineBuffer->new(keep => $self->{keep});
+    }
+
     my $pid = fork;
     die "fork: $!" unless defined $pid;
     if ($pid == 0) {
@@ -200,10 +215,10 @@ sub _exec {
                 $select->remove($ready);
                 close $ready;
             } else {
-                next unless my $sub = $self->{on}{$type};
-                my $buffer = $self->{_buffer}{$type} ||= Command::Runner::LineBuffer->new(keep => $self->{keep});
+                my $buffer = $self->{_buffer}{$type};
                 $buffer->add($buf);
                 next unless my @line = $buffer->get;
+                next unless my $sub = $self->{$type};
                 $sub->($_) for @line;
             }
         }
@@ -217,7 +232,7 @@ sub _exec {
         }
     }
     for my $type (qw(stdout stderr)) {
-        next unless my $sub = $self->{on}{$type};
+        next unless my $sub = $self->{$type};
         my $buffer = $self->{_buffer}{$type} or next;
         my @line = $buffer->get(1) or next;
         $sub->($_) for @line;
@@ -250,19 +265,19 @@ Command::Runner - run external commands and Perl code refs
   my $cmd = Command::Runner->new(
     command => ['ls', '-al'],
     timeout => 10,
-    on => {
-      stdout => sub { warn "out: $_[0]\n" },
-      stderr => sub { warn "err: $_[0]\n" },
-    },
+    stdout  => sub { warn "out: $_[0]\n" },
+    stderr  => sub { warn "err: $_[0]\n" },
   );
   my $res = $cmd->run;
 
-  # you can also use method chains
-  my $res = Command::Runner->new
-    ->command(sub { warn 1; print 2 })
-    ->redirect(1)
-    ->on(stdout => sub { warn "merged: $_[0]" })
-    ->run;
+  my $untar = Command::Runner->new;
+  $untar->commandf(
+    '%q -dc %q | %q tf -',
+    'C:\\Program Files (x86)\\GnuWin32\\bin\\gzip.EXE',
+    'File-ShareDir-Install-0.13.tar.gz'
+    'C:\\Program Files (x86)\\GnuWin32\\bin\\tar.EXE',
+  );
+  my $capture = $untar->run->{stdout};
 
 =head1 DESCRIPTION
 
@@ -278,10 +293,25 @@ A constructor, which takes:
 
 =item command
 
-arrays of external commands, strings of external programs, or Perl code refs
+an array of external commands, a string of external programs, or a Perl code ref.
+If an array of external commands is specified, it is automatically quoted on Windows.
 
-B<CAUTION!> Currently this module does NOTHING for quoting.
-YOU are responsible to quote argument lists. See L<Win32::ShellQuote> and L<String::ShellQuote>.
+=item commandf
+
+a command string by C<sprintf>-like syntax.
+You can use positional formatting with conversions C<%q> (with quoting) and C<%s> (as it is).
+
+Here is an example:
+
+  my $cmd = Command::Runner->new(
+    commandf => [ '%q %q >> %q', '/path/to/cat', 'foo bar.txt', 'out.txt' ],
+  );
+
+  # or, you can set it separately
+  my $cmd = Command::Runner->new;
+  $cmd->commandf('%q %q >> %q', '/path/to/cat', 'foo bar.txt', 'out.txt');
+
+See L<String::Formatter> for details.
 
 =item timeout
 
@@ -293,11 +323,12 @@ if this is true, stderr redirects to stdout
 
 =item keep
 
-by default, if stdout/stderr is consumed, it will disappear. Disable this by setting keep option true
+by default, even if stdout/stderr is consumed, it is preserved for return value.
+You can disable this behavior by setting keep option false.
 
-=item on.stdout, on.stderr
+=item stdout / stderr
 
-code refs that will be called whenever stdout/stderr is available
+a code ref that will be called whenever stdout/stderr is available
 
 =back
 
@@ -315,6 +346,8 @@ Run command. It returns a hash reference, which contains:
 
 =item stderr
 
+=item pid
+
 =back
 
 =head1 MOTIVATION
@@ -325,9 +358,9 @@ I develop a CPAN client L<App::cpm>, where I need to execute external commands a
 
 =item timeout
 
-=item flexible logging
+=item quoting
 
-=item high portability
+=item flexible logging
 
 =back
 

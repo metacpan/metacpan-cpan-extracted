@@ -21,11 +21,11 @@
    @return CRYPT_OK if successful
 */
 int base32_encode(const unsigned char *in,  unsigned long inlen,
-                        unsigned char *out, unsigned long *outlen,
+                                 char *out, unsigned long *outlen,
                         base32_alphabet id)
 {
    unsigned long i, x;
-   unsigned char *codes;
+   const char *codes;
    const char *alphabet[4] = {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",     /* id = BASE32_RFC4648   */
       "0123456789ABCDEFGHIJKLMNOPQRSTUV",     /* id = BASE32_BASE32HEX */
@@ -39,21 +39,21 @@ int base32_encode(const unsigned char *in,  unsigned long inlen,
    LTC_ARGCHK(id >= BASE32_RFC4648);
    LTC_ARGCHK(id <= BASE32_CROCKFORD);
 
-   /* no input, nothing to do */
-   if (inlen == 0) {
-      *outlen = 0;
-      return CRYPT_OK;
-   }
-
-   /* check the size of output buffer */
-   x = (8 * inlen + 4) / 5;
+   /* check the size of output buffer +1 byte for terminating NUL */
+   x = (8 * inlen + 4) / 5 + 1;
    if (*outlen < x) {
       *outlen = x;
       return CRYPT_BUFFER_OVERFLOW;
    }
-   *outlen = x;
+   *outlen = x - 1; /* returning the length without terminating NUL */
 
-   codes = (unsigned char*)alphabet[id];
+   /* no input, nothing to do */
+   if (inlen == 0) {
+      *out = '\0';
+      return CRYPT_OK;
+   }
+
+   codes = alphabet[id];
    x = 5 * (inlen / 5);
    for (i = 0; i < x; i += 5) {
       *out++ = codes[(in[0] >> 3) & 0x1F];
@@ -79,12 +79,13 @@ int base32_encode(const unsigned char *in,  unsigned long inlen,
       }
       if (i+2 < inlen) {
          *out++ = codes[(((c & 0xF) << 1) + (d >> 7)) & 0x1F];
-         *out++ = codes[(d >> 2) & 0x1F];
       }
       if (i+3 < inlen) {
+         *out++ = codes[(d >> 2) & 0x1F];
          *out++ = codes[((d & 0x3) << 3) & 0x1F];
       }
    }
+   *out = '\0';
    return CRYPT_OK;
 }
 

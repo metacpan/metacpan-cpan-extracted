@@ -1,5 +1,15 @@
 Revision history for Perl extension Math::Clipper.
 
+1.26  Tue May 1 02:47:00 2018
+
+  - Harmonize differences in float multiplication results found on
+    FreeBSD + clang systems in integerize_coordinate_sets()
+
+1.25  Mon April 30 11:44:00 2018
+
+  - Fix Integerize.t to support Perls with long doubles
+  - More explicit rounding and truncating in integerize_coordinate_sets()
+
 1.24  Fri April 20 15:19:00 2018
 
   - Fix Integerize.t to handle '-0' from sprintf("%.0f")

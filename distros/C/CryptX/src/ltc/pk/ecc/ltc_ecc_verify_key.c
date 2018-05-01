@@ -19,17 +19,13 @@
   @return CRYPT_OK if successful
 */
 
-int ltc_ecc_verify_key(ecc_key *key)
+int ltc_ecc_verify_key(const ecc_key *key)
 {
-   int err;
-   void *prime = NULL;
-   void *order = NULL;
-   void *a = NULL;
+   int err, inf;
    ecc_point *point;
-
-   prime = key->dp.prime;
-   order = key->dp.order;
-   a     = key->dp.A;
+   void *prime = key->dp.prime;
+   void *order = key->dp.order;
+   void *a     = key->dp.A;
 
    /* Test 1: Are the x and y points of the public key in the field? */
    if (ltc_mp.compare_d(key->pubkey.z, 1) == LTC_MP_EQ) {
@@ -52,7 +48,8 @@ int ltc_ecc_verify_key(ecc_key *key)
    point = ltc_ecc_new_point();
    if ((err = ltc_ecc_mulmod(order, &(key->pubkey), point, a, prime, 1)) != CRYPT_OK)     { goto done1; }
 
-   if (ltc_ecc_is_point_at_infinity(point, prime)) {
+   err = ltc_ecc_is_point_at_infinity(point, prime, &inf);
+   if (err != CRYPT_OK || inf) {
       err = CRYPT_ERROR;
    }
    else {

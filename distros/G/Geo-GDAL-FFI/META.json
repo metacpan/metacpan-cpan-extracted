@@ -46,6 +46,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.01,
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ajolma/Geo-GDAL-FFI.git",
+         "web" : "https://github.com/ajolma/Geo-GDAL-FFI"
+      }
+   },
+   "version" : 0.03,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

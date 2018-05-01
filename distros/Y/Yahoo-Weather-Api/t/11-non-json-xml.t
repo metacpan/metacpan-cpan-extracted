@@ -13,20 +13,18 @@ use XML::Validate qw (validate);
 my $valid_xml = new XML::Validate(Type => 'LibXML');
 my $ua = LWP::UserAgent->new();
 
-my $api = Yahoo::Weather::Api->new();
-my $api_xml = Yahoo::Weather::Api->new({'unit' => 'F', 'format' => 'xml' });
-
 is_connected();
 
 sub is_connected {
     if (!$ua->is_online) {
-        plan skip_all=> "SKIPPED no internet connection found" ;
+        plan skip_all=> "Problem with internet connection" ;
         return 0;
     }
     return 1;
 }
 
 eval {
+    my $api = Yahoo::Weather::Api->new();
     print "########### non JSON/XML ##############\n";
     ok (valid_json($api->get_woeid_alternate({search => 'Palo Alto, CA, US'})) , "Search city name") if(is_connected());
     ok (valid_json($api->get_woeid_alternate({search => '555512'})) , "Search zip") if(is_connected());

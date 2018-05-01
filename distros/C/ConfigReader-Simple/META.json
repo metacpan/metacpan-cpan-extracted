@@ -4,12 +4,12 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "config"
    ],
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/briandfoy/ConfigReader-Simple"
       }
    },
-   "version" : "1.291",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.293",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

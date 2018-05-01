@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Token::Reference };
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ RE_CAPTURE_NAME };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -76,7 +76,7 @@ sub perl_version_introduced {
 # the string.
 sub __PPIX_TOKEN__recognize {
     return (
-	[ qr{ \A \( \? (?: ( [-+]? \d+ )) \) }smx, { is_named => 0 } ],
+	[ qr{ \A \( \? (?: ( [-+]? [0-9]+ )) \) }smx, { is_named => 0 } ],
 	[ qr{ \A \( \? (?: R) \) }smx,
 	    { is_named => 0, capture => '0' } ],
 	[ qr{ \A \( \?  (?: & | P> ) ( @{[ RE_CAPTURE_NAME ]} ) \) }smxo,

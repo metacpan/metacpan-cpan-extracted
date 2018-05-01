@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.9.3';
+$Git::Hooks::CheckJira::VERSION = '2.9.5';
 use 5.010;
 use utf8;
 use strict;
@@ -252,6 +252,9 @@ Please, update your issues or fix your $CFG git configuration.
 EOS
         }
     }
+
+    # Return prematurely if there are no issues to check
+    return $errors == 0 unless %issues;
 
     ################
     # Non-JQL checks
@@ -596,7 +599,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.9.3
+version 2.9.5
 
 =head1 SYNOPSIS
 
@@ -906,6 +909,10 @@ JIRA::Client object, which uses JIRA's SOAP API which was deprecated on JIRA
 If you have code relying on the JIRA::Client module you're advised to
 rewrite it using the JIRA::REST module. As a stopgap measure you can
 disregard the JIRA::REST object and create your own JIRA::Client object.
+
+The routine must return a true value to signal success. It may return a false
+value or throw an exception to signal failure. It's best if it uses the 'fault'
+method to produce error messages.
 
 =item * B<ISSUES...>
 

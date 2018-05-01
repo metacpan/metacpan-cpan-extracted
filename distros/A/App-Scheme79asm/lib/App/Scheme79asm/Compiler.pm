@@ -3,10 +3,8 @@ package App::Scheme79asm::Compiler;
 use 5.014000;
 use strict;
 use warnings;
-use parent qw/Exporter/;
 
-our @EXPORT_OK = qw/pretty_print/;
-our $VERSION = '0.005';
+our $VERSION = '0.005001';
 
 use Carp qw/croak/;
 use Data::Dumper qw/Dumper/;
@@ -16,6 +14,22 @@ use Data::SExpression qw/cons consp scalarp/;
 use List::MoreUtils qw/firstidx/;
 
 our @PRIMOPS = qw/car cdr cons atom progn reverse-list/;
+
+sub make_symbol { Data::SExpression::Symbol->new(shift) }
+
+# types
+our $LIST   = make_symbol 'LIST';
+our $SYMBOL = make_symbol 'SYMBOL';
+our $VAR    = make_symbol 'VAR';
+# no need for closures
+our $PROC   = make_symbol 'PROC';
+our $IF     = make_symbol 'IF';
+our $CALL   = make_symbol 'CALL';
+# no need for quoted constants
+
+# primitives
+our $MORE    = make_symbol 'MORE';
+our $FUNCALL = make_symbol 'FUNCALL';
 
 BEGIN {
 	*cons    = *Data::SExpression::cons;
@@ -78,27 +92,6 @@ sub position {
 	my ($expr, $list) = @_;
 	positionacc $expr, $list, 0
 }
-
-sub pretty_print {
-	my ($expr) = @_;
-	if (!defined $expr) {
-		'()'
-	} elsif (scalarp $expr) {
-		"$expr"
-	} elsif (ref $expr eq 'ARRAY') {
-		'(' . join (' ', map { pretty_print($_) } @$expr). ')'
-	} else {
-		my $cdr = $expr->cdr;
-		my $car = $expr->car;
-		my $acc = '(' . pretty_print($car);
-		while (defined $cdr) {
-			$car = $cdr->car;
-			$cdr = $cdr->cdr;
-			$acc .= ' ' . pretty_print($car);
-		}
-		$acc . ')'
-	}
-}
 # end list processing routines
 
 sub new {
@@ -106,7 +99,7 @@ sub new {
 	my %self = (
 		symbols => ['', '', 'T'],
 		nsymbols => 3,
-		symbol_map => {},
+		symbol_map => {T => 2},
 	);
 	bless \%self, $class;
 }
@@ -114,17 +107,20 @@ sub new {
 sub process_quoted {
 	my ($self, $expr) = @_;
 	if (!defined $expr) { # nil
-		[LIST => 0]
+		[$LIST => 0]
 	} elsif (scalarp $expr) {
 		$expr = uc $expr;
+		if ($expr eq 'NIL') {
+			return [$LIST => 0]
+		}
 		if (!exists $self->{symbol_map}{$expr}) {
 			$self->{symbol_map}{$expr} = $self->{nsymbols};
 			$self->{nsymbols}++;
 			push @{$self->{symbols}}, $expr;
 		}
-		[SYMBOL => $self->{symbol_map}{$expr}]
+		[$SYMBOL => $self->{symbol_map}{$expr}]
 	} elsif (consp $expr) {
-		[LIST => $self->process_quoted($expr->cdr), $self->process_quoted($expr->car)]
+		[$LIST => $self->process_quoted($expr->cdr), $self->process_quoted($expr->car)]
 	} else {
 		croak 'argument to process_quoted is not a scalar, cons, or nil: ', Dumper($expr);
 	}
@@ -141,7 +137,7 @@ sub rest_of_funcall {
 	if (!defined $args) {
 		$func
 	} else {
-		[MORE => $self->rest_of_funcall($func, $args->cdr), $args->car]
+		[$MORE => $self->rest_of_funcall($func, $args->cdr), $args->car]
 	}
 }
 
@@ -154,28 +150,28 @@ sub process_funcall {
 		if (!defined $processed_args) {
 			croak "Cannot call primitive $func_name with no arguments";
 		}
-		[CALL => $self->rest_of_funcall([uc $func_name, 0], $processed_args->cdr), $processed_args->car]
+		[$CALL => $self->rest_of_funcall([make_symbol(uc $func_name), 0], $processed_args->cdr), $processed_args->car]
 	} else {
 		my $final_args = append $processed_args, cons ($self->process_toplevel($func_name, $env), undef);
-		[CALL => $self->rest_of_funcall([FUNCALL => 0], $final_args->cdr), $final_args->car]
+		[$CALL => $self->rest_of_funcall([$FUNCALL => 0], $final_args->cdr), $final_args->car]
 	}
 }
 
 sub process_toplevel {
 	my ($self, $expr, $env) = @_;
 	if (!defined $expr) {
-		[LIST => 0]
+		[$LIST => 0]
 	} elsif (scalarp $expr) {
 		if (looks_like_number $expr) {
 			$self->process_quoted($expr);
 		} elsif (uc $expr eq 'T') {
-			[SYMBOL => 2]
+			[$SYMBOL => 2]
 		} elsif (uc $expr eq 'NIL') {
-			[LIST => 0]
+			[$LIST => 0]
 		} else {
 			my $position = position $expr, $env;
 			if (defined $position) {
-				[VAR => -1 - $position]
+				[$VAR => -1 - $position]
 			} else {
 				croak "Variable $expr not in environment";
 			}
@@ -188,12 +184,12 @@ sub process_toplevel {
 			my $func_name = $expr->cdr->car;
 			my $func_args = $expr->cdr->cdr->car;
 			my $func_body = $expr->cdr->cdr->cdr->car; ## no critic (ProhibitLongChainsOfMethodCalls)
-			[PROC => $self->process_proc($func_name, $func_args, $func_body, $env)]
+			[$PROC => $self->process_proc($func_name, $func_args, $func_body, $env)]
 		} elsif ($func eq 'IF') {
 			my ($if_cond, $if_then, $if_else) =
 			  map { $self->process_toplevel($_, $env) }
 			  ($expr->cdr->car, $expr->cdr->cdr->car, $expr->cdr->cdr->cdr->car); ## no critic (ProhibitLongChainsOfMethodCalls)
-			[IF => [LIST => $if_else, $if_then], $if_cond]
+			[$IF => [$LIST => $if_else, $if_then], $if_cond]
 		} else {
 			$self->process_funcall($expr->car, $expr->cdr, $env)
 		}
@@ -245,8 +241,15 @@ L<App::Scheme79asm> wants it to be.
 The two main methods are B<compile_sexp>(I<$sexp>) which compiles an
 already-parsed sexp to assembly format, and
 B<compile_string>(I<$string>) which compiles a string to assembly
-format. The assembly format is a L<Data::SExpression> object that can
-be passed to App::Scheme79asm->B<process>.
+format.
+
+The assembly format is a sexp. These functions return an
+already-parsed sexp (an arrayref like the ones returned by
+L<Data::SExpression>'s B<read> method). This arrayref can be passed
+directly to L<App::Scheme79asm>'s B<process> method.
+
+If a string representation of the sexp is required, it can be obtained
+by calling the B<dump_sexp> function in L<Data::Dump::Sexp> with such an arrayref.
 
 =head1 AUTHOR
 

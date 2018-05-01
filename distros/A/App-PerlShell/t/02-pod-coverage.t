@@ -2,7 +2,7 @@ use Test::More;
 eval "use Test::Pod::Coverage";
 plan skip_all => "Test::Pod::Coverage required for testing" if $@;
 
-my $tests = 5;
+my $tests = 7;
 my $HAVE_LP = 0;
 eval "use Lexical::Persistence 1.01 ()";
 if ( !$@ ) {
@@ -25,6 +25,8 @@ if ( $HAVE_LP ) {
 if ( $HAVE_MR ) {
     pod_coverage_ok("App::PerlShell::ModRefresh");
 }
+pod_coverage_ok("App::PerlShell::AddOn::Gnuplot");
+pod_coverage_ok("App::PerlShell::AddOn::Macros");
 pod_coverage_ok("App::PerlShell::AddOn::ShellCommands");
 pod_coverage_ok("App::PerlShell::AddOn::TextCSV");
 pod_coverage_ok("App::PerlShell::AddOn::TextTable");

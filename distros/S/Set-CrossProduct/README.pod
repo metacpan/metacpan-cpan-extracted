@@ -2,8 +2,9 @@
 
 =encoding utf8
 
-
 =for HTML <a href="https://travis-ci.org/briandfoy/Set-CrossProduct"><img src="https://travis-ci.org/briandfoy/Set-CrossProduct.svg?branch=master"></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/Set-CrossProduct'><img src='https://ci.appveyor.com/api/projects/status/v5d1706f4i4rffcc'></a>
 
 =for HTML <a href='https://coveralls.io/github/briandfoy/Set-CrossProduct?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/Set-CrossProduct/badge.svg?branch=master' alt='Coverage Status' /></a>
 
@@ -80,16 +81,16 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/Set-CrossProduct>
+=item *	L<https://github.com/briandfoy/set-crossproduct>
 
 =back
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/Set-CrossProduct/issues>:
+tracker|https://github.com/briandfoy/set-crossproduct/issues>:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/Set-CrossProduct/issues>
+=item *	L<https://github.com/briandfoy/set-crossproduct/issues>
 
 =back
 

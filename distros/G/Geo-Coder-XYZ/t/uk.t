@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 15;
+use Test::Most tests => 14;
 
 BEGIN {
 	use_ok('Geo::Coder::XYZ');
@@ -10,7 +10,7 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 14 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 13 unless(-e 't/online.enabled');
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
@@ -33,9 +33,7 @@ UK: {
 
 		my $location = $geocoder->geocode('Ramsgate, Kent, England');
 		delta_within($location->{latt}, 51.34, 1e-2);
-		delta_within($location->{longt}, 1.40, 1e-2);
-
-		$geocoder = new_ok('Geo::Coder::XYZ');
+		delta_within($location->{longt}, 1.39, 1e-2);
 
 		$location = $geocoder->geocode('10 Downing St., London, UK');
 		delta_within($location->{latt}, 51.50, 1e-2);
@@ -58,6 +56,6 @@ UK: {
 		$geocoder->ua($ua);
 		does_carp_that_matches(sub {
 			$location = $geocoder->geocode('10 Downing St., London, UK');
-		}, qr/^geocode.xyz API returned error: on.+500/);
+		}, qr/^API returned error: on.+500/);
 	}
 }

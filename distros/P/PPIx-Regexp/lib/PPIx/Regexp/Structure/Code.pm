@@ -39,7 +39,7 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Structure };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # The only child of this structure should be a single
 # PPIx::Regexp::Token::Code. Anything else gets turned into the

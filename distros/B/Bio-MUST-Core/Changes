@@ -1,3 +1,12 @@
+0.181180  2018-04-28 13:43:41+02:00 Europe/Brussels
+    - Fixes
+      - ColorScheme: fixed bug #125225 (rt.cpan.org): depends on module not on CPAN
+
+0.181170  2018-04-27 14:19:02+02:00 Europe/Brussels
+    - Additions
+      - ColorScheme: improved delegation to internal classifier (and tests)
+      - Trees: switch_branch_lengths_and_labels_for_entities method is now compatible with treeplot
+      
 0.181120  2018-04-23 00:34:53+02:00 Europe/Brussels
     - Additions
       - ColorScheme: revamped its internal classifier (which now requires Taxonomy)

@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::TwoScalp;
 # ABSTRACT: Main class for two-scalp tool
-$Bio::MUST::Apps::TwoScalp::VERSION = '0.180160';
+$Bio::MUST::Apps::TwoScalp::VERSION = '0.181180';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Bio::MUST::Apps::TwoScalp - Main class for two-scalp tool
 
 =head1 VERSION
 
-version 0.180160
+version 0.181180
 
 =head1 SYNOPSIS
 

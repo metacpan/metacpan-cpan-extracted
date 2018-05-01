@@ -1,13 +1,13 @@
 package Net::HTTP::Methods::Patch::LogRequest;
 
-our $DATE = '2017-06-26'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2018-04-26'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
-use Module::Patch 0.12 qw();
+use Module::Patch;
 use base qw(Module::Patch);
 
 our %config;
@@ -43,7 +43,7 @@ sub patch_data {
         patches => [
             {
                 action      => 'wrap',
-                mod_version => qr/^6\.0.*/,
+                mod_version => qr/^6\.*/,
                 sub_name    => 'format_request',
                 code        => $p_format_request,
             },
@@ -66,7 +66,7 @@ Net::HTTP::Methods::Patch::LogRequest - Log raw HTTP requests
 
 =head1 VERSION
 
-This document describes version 0.10 of Net::HTTP::Methods::Patch::LogRequest (from Perl distribution Net-HTTP-Methods-Patch-LogRequest), released on 2017-06-26.
+This document describes version 0.11 of Net::HTTP::Methods::Patch::LogRequest (from Perl distribution Net-HTTP-Methods-Patch-LogRequest), released on 2018-04-26.
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

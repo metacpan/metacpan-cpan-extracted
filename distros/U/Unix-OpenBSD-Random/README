@@ -1,0 +1,27 @@
+Unix::OpenBSD::Random - interface to arc4random(3) on OpenBSD
+
+To install this module, use CPAN, for example:
+
+  cpan Unix::OpenBSD::Random
+
+Run perldoc(1) on Unix::OpenBSD::Random for additional documentation.
+
+
+For the source code, see
+
+https://github.com/thrig/Unix-OpenBSD-Random
+
+This can be built and installed by running:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 Jeremy Mates
+
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>

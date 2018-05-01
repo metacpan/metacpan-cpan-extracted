@@ -5,6 +5,7 @@ cpanfile
 DISCLAIMER
 lib/Bio/DB/HTS/Alignment.pm
 lib/Bio/DB/HTS/AlignWrapper.pm
+lib/Bio/DB/HTS/Constants.pm
 lib/Bio/DB/HTS/Faidx.pm
 lib/Bio/DB/HTS/Faidx.xs
 lib/Bio/DB/HTS/FetchIterator.pm
@@ -15,18 +16,18 @@ lib/Bio/DB/HTS/Pileup.pm
 lib/Bio/DB/HTS/PileupWrapper.pm
 lib/Bio/DB/HTS/Query.pm
 lib/Bio/DB/HTS/ReadIterator.pm
-lib/Bio/DB/HTS/Tabix.pm
-lib/Bio/DB/HTS/Target.pm
-lib/Bio/DB/HTS.pm
-lib/Bio/DB/HTS.xs
-lib/Bio/DB/HTS/Constants.pm
 lib/Bio/DB/HTS/Segment.pm
+lib/Bio/DB/HTS/Tabix.pm
+lib/Bio/DB/HTS/Tabix/Iterator.pm
+lib/Bio/DB/HTS/Target.pm
 lib/Bio/DB/HTS/VCF.pm
 lib/Bio/DB/HTS/VCF/Header.pm
 lib/Bio/DB/HTS/VCF/HeaderPtr.pm
+lib/Bio/DB/HTS/VCF/Iterator.pm
 lib/Bio/DB/HTS/VCF/Row.pm
 lib/Bio/DB/HTS/VCF/RowPtr.pm
-lib/Bio/DB/HTS/Tabix/Iterator.pm
+lib/Bio/DB/HTS.pm
+lib/Bio/DB/HTS.xs
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -35,7 +36,7 @@ ppport.h
 README
 scripts/build_options.sh
 scripts/convert_gz_2_bgz.sh
-t/00_load.t
+t/00load.t
 t/01bam.t
 t/02faidx.t
 t/03cram.t
@@ -45,7 +46,7 @@ t/06kseq.t
 t/07cramwrite.t
 t/08bamwrite.t
 t/09sam.t
-t/10-leak.t
+t/10leak.t
 t/kseq_data/bug2335.fastq
 t/kseq_data/evil_wrapping.fastq
 t/kseq_data/example.fasta
@@ -79,6 +80,7 @@ t/data/yeast.fasta
 t/data/yeast.sorted.cram
 t/data/no_index.tsv.gz
 t/data/test.bcf
+t/data/test.bcf.csi
 t/data/test.sam
 t/data/test.tsv.gz
 t/data/test.tsv.gz.tbi

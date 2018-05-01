@@ -58,6 +58,7 @@
             "CSS::Packer" : "0",
             "Devel::Cover" : "0",
             "Devel::NYTProf" : "0",
+            "Filter::Crypto" : "0",
             "HTML::Packer" : "0",
             "JavaScript::Packer" : "0",
             "Module::Build::Tiny" : "0",
@@ -95,7 +96,6 @@
             "Digest::SHA3" : "0",
             "EV" : "0",
             "File::Copy::Recursive" : "0",
-            "Filter::Crypto" : "0",
             "Guard" : "0",
             "HTML::Entities" : "0",
             "HTML::TreeBuilder::LibXML" : "v0.26.0",
@@ -140,7 +140,7 @@
             "Variable::Magic" : "0",
             "XML::Hash::XS" : "0",
             "YAML::XS" : "0",
-            "multidimensional" : "0",
+            "common::header" : "v0.1.2",
             "perl" : "v5.26.0"
          }
       },
@@ -162,6 +162,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.62.5",
+   "version" : "v0.63.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

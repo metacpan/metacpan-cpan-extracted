@@ -37,7 +37,6 @@ is(
     undef,
     'build proceeds normally',
 );
-diag 'got log messages: ', explain $tzil->log_messages;
 
 my $build_dir = path($tzil->tempdir)->child('build');
 my $file = $build_dir->child('data', 'useless_file.txt');
@@ -77,7 +76,7 @@ or diag 'got distmeta: ', explain $tzil->distmeta;
 
 cmp_deeply(
     $tzil->log_messages,
-    supersetof('[GenerateFile::FromShareDir] using template in share/template.txt'),
+    supersetof('[GenerateFile::FromShareDir] using template in ' . path($tzil->tempdir)->child('source', 'share', 'template.txt')),
     'logged the source of the template file',
 );
 

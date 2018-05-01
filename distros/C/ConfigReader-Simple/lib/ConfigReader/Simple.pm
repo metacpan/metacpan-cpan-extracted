@@ -9,7 +9,7 @@ use vars qw($VERSION $AUTOLOAD %ERROR $ERROR $Warn $Die);
 use Carp qw(croak carp);
 
 $ERROR     = '';
-$VERSION   = '1.291';
+$VERSION   = '1.293';
 $Warn      = 0;
 $Die       = '';
 
@@ -787,7 +787,7 @@ Greg White has been a very patient user and tester.
 
 The source is in Github:
 
- http://github.com/briandfoy/ConfigReader-Simple/tree/master
+	http://github.com/briandfoy/ConfigReader-Simple/
 
 =head1 AUTHORS
 
@@ -795,10 +795,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the Artistic License 2.0.
 
 =cut
 

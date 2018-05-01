@@ -1,4 +1,4 @@
-package # Hide from the indexer for now until docs are added later.
+package # Hide from the indexer.
     MooseX::SingleArg::Meta::Class;
 use Moose::Role;
 

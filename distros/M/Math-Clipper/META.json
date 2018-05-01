@@ -4,7 +4,7 @@
       "Steffen Mueller (E<lt>smueller@cpan.orgE<gt>),"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::CppGuess" : "0.11",
+            "ExtUtils::CppGuess" : "0.12",
             "Module::Build" : "0.38",
             "Module::Build::WithXSpp" : "0.14"
          }
@@ -32,7 +32,7 @@
    "provides" : {
       "Math::Clipper" : {
          "file" : "lib/Math/Clipper.pm",
-         "version" : "1.24"
+         "version" : "1.26"
       }
    },
    "release_status" : "stable",
@@ -41,6 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.24",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

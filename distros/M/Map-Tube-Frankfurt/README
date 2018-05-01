@@ -1,0 +1,59 @@
+NAME
+
+    Map::Tube::Frankfurt - Map::Tube::Frankfurt - interface to the
+    Frankfurt S- and U-Bahn map
+
+VERSION
+
+    version 0.04
+
+DESCRIPTION
+
+    It currently provides functionality to find the shortest route between
+    the two given stations. The map contains both U-Bahn and S-Bahn
+    stations.
+
+CONSTRUCTOR
+
+        use Map::Tube::Frankfurt;
+        my $tube = Map::Tube::Frankfurt->new;
+
+METHODS
+
+ get_shortest_route(START, END)
+
+    This method expects two parameters START and END station name. Station
+    names are case insensitive. The station sequence from START to END is
+    returned.
+
+        use Map::Tube::Frankfurt;
+        my $tube = Map::Tube::Frankfurt->new;
+    
+        my $route = $tube->get_shortest_route('Riedstadt-Goddelau', 'Hauptbahnhof');
+    
+        print "Route: $route\n";
+
+SEE ALSO
+
+    Map::Tube.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+CONTRIBUTORS
+
+      * Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+      * reneeb <info@perl-services.de>
+
+      * Stefan Limbacher <stefan@stelim.de>
+

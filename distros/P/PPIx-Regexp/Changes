@@ -1,3 +1,12 @@
+0.058		2018-04-26	T. R. Wyant
+    Prefer /[0-9]/ over /\d/ for numeric checks. The latter can match
+    non-ASCII digits.
+
+    Explain the negated POSIX character classes. Also tweak some of the
+    asserted explanations -- mostly for readability and parallel
+    construction with the negated explanations, but it turns out
+    [[:digit:]] is NOT equivalent to [0-9].
+
 0.057		2018-04-17	T. R. Wyant
     Allow ->asserts( 'a*' ). This modification actually allows wild
     cards in asserts() on all match semantic modifiers, but it is

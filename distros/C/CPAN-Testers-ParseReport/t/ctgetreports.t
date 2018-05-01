@@ -4,7 +4,7 @@ use strict;
 use Test::More;
 use File::Spec;
 use CPAN::Testers::ParseReport;
-use List::Util qw(sum max);
+use List::AllUtils qw(sum max);
 use utf8;
   binmode Test::More->builder->output, ":utf8";
   binmode Test::More->builder->failure_output, ":utf8";
@@ -721,6 +721,36 @@ sub reportedvariableis ($$$$) {
     is $extract->{'mod:Date::Manip'},               'v6.47',  "$id: mod:Date::Manip";
     is $extract->{'mod:Date::Manip::DM5'},          'v6.47',  "$id: mod:Date::Manip::DM5";
     is $extract->{'mod:Date::Manip::DM5abbrevs'},   'v6.47',  "$id: mod:Date::Manip::DM5abbrevs";
+}
+
+{
+    BEGIN {
+        $plan += 8;
+    }
+    my $id = 94682624;
+    my %Opt = (
+               'local' => 1,
+               'cachedir' => 't/var',
+               'quiet' => 1,
+               'dumpvars' => ".",
+               'report' => $id,
+              );
+    my $dumpvars = {};
+    $main::att=1;
+    my $extract = CPAN::Testers::ParseReport::parse_report
+          (
+           "t/var/nntp-testers/$id",
+           $dumpvars,
+           %Opt,
+          );
+    reportedvariableis $extract, $id, 'conf:usesocks', 'undef';
+    reportedvariableis $extract, $id, 'conf:use64bitall', 'define';
+    reportedvariableis $extract, $id, 'conf:use64bitint', 'define';
+    reportedvariableis $extract, $id, 'conf:useposix', 'true';
+    reportedvariableis $extract, $id, 'conf:usemymalloc', 'n';
+    reportedvariableis $extract, $id, 'conf:d_sfio', 'undef';
+    reportedvariableis $extract, $id, 'conf:bincompat5005', 'undef';
+    reportedvariableis $extract, $id, 'mod:File::Path', '2.15';
 }
 
 unlink "ctgetreports.out";

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Run
 
+0.047     2018-05-01 01:39:08Z
+  - added new formatting code %o to represent the source dir
+
 0.046     2017-07-24 02:08:24Z
   - now logging a warning when using %d in [Run::BeforeBuild], or %a in a
     non-release plugin, where these values are not yet defined

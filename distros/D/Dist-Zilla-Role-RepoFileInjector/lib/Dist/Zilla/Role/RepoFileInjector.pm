@@ -1,25 +1,24 @@
 use strict;
 use warnings;
-package Dist::Zilla::Role::RepoFileInjector; # git description: v0.006-2-gaf009ca
+package Dist::Zilla::Role::RepoFileInjector; # git description: v0.008-2-g97bfee5
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Create files outside the build directory
 # KEYWORDS: plugin distribution generate create file repository
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 use Moose::Role;
 
 use MooseX::Types qw(enum role_type);
 use MooseX::Types::Moose qw(ArrayRef Str Bool);
 use Path::Tiny 0.022;
-use Cwd ();
 use namespace::clean;
 
 has repo_root => (
     is => 'ro', isa => Str,
     predicate => '_has_repo_root',
     lazy => 1,
-    default => sub { path(Cwd::getcwd())->stringify },
+    default => sub { shift->zilla->root->stringify },
 );
 
 has allow_overwrite => (
@@ -46,7 +45,7 @@ around dump_config => sub
     $config->{+__PACKAGE__} = {
         version => $VERSION,
         allow_overwrite => ( $self->allow_overwrite ? 1 : 0 ),
-        repo_root => ( $self->_has_repo_root ? $self->repo_root : '.' ),
+        repo_root => ( $self->_has_repo_root ? path($self->repo_root)->stringify : '.' ),
     };
     return $config;
 };
@@ -82,27 +81,28 @@ sub write_repo_files
     {
         my $filename = path($file->name);
         my $abs_filename = $filename->is_relative
-            ? path($self->repo_root)->child($file->name)->stringify
+            ? path($self->repo_root)->child($file->name)
             : $file->name;
 
-        if (-e $abs_filename and $self->allow_overwrite)
+        if ($abs_filename->exists and $self->allow_overwrite)
         {
-            $self->log_debug([ 'removing pre-existing %s', $abs_filename ]);
-            unlink $abs_filename ;
+            $self->log_debug([ 'removing pre-existing %s', $abs_filename->stringify ]);
+            $abs_filename->remove;
         }
-        $self->log_fatal([ '%s already exists (allow_overwrite = 0)', $abs_filename ]) if -e $abs_filename;
+        $self->log_fatal([ '%s already exists (allow_overwrite = 0)', $abs_filename->stringify ])
+            if $abs_filename->exists;
 
         $self->log_debug([ 'writing out %s%s', $file->name,
-            $filename->is_relative ? ' to ' . $self->repo_root : '' ]);
+            $filename->is_relative ? ' to ' . path($self->repo_root)->stringify : '' ]);
 
-        Carp::croak("attempted to write $filename multiple times") if -e $filename;
-        $filename->touchpath;
+        Carp::croak("attempted to write $filename multiple times") if $abs_filename->exists;
+        $abs_filename->touchpath;
 
         # handle dzil v4 files by assuming no (or latin1) encoding
         my $encoded_content = $file->can('encoded_content') ? $file->encoded_content : $file->content;
 
-        $filename->spew_raw($encoded_content);
-        chmod $file->mode, "$filename" or die "couldn't chmod $filename: $!";
+        $abs_filename->spew_raw($encoded_content);
+        chmod $file->mode, "$abs_filename" or die "couldn't chmod $abs_filename: $!";
     }
 }
 
@@ -120,7 +120,7 @@ Dist::Zilla::Role::RepoFileInjector - Create files outside the build directory
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ the distribution.
 =head2 repo_root
 
 A string indicating the base directory where the file(s) are written, when
-relative paths are provided. Defaults to the current working directory.
+relative paths are provided. Defaults to L<Dist::Zilla/root>.
 
 This attribute is available as an option of your plugin in F<dist.ini>.
 

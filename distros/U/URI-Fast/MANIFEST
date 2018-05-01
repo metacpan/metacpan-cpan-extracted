@@ -17,5 +17,6 @@ t/00-report-prereqs.t
 t/author-pod-syntax.t
 t/basics.t
 t/encoding.t
+t/iri.t
 t/parsing.t
 t/tied.t

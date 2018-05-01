@@ -1,3 +1,29 @@
+2.039027 - 2018-04-28
+
+  [BUG FIXES]
+
+  * #405 Inventory reports default to all time to fix missing IPs
+
+2.039026 - 2018-04-28
+
+  [ENHANCEMENTS]
+
+  * #396 dump sshcollector stderr into null (B. De Wolf)
+  * #397 improve Palo Alto SSH Collector support (B. De Wolf)
+
+  [BUG FIXES]
+
+  * do not enqueue the same routed peer more than once
+  * #406 error in check_mac() params causing NBTStat failure
+
+2.039025 - 2018-04-27
+
+  [BUG FIXES]
+
+  * require version 3.57 of SNMP::Info with critical bug fix
+  * make netmap Color By Host Group work with no groups selected
+  * avoid SNMP::Info dependency in web frontend
+
 2.039024 - 2018-04-22
 
   [ENHANCEMENTS]

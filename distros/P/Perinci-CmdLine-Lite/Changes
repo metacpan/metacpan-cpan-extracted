@@ -1,3 +1,15 @@
+1.812   2018-05-01 (PERLANCAR)
+
+        - [ux] Add shortcut options when there is no conflict: -P for
+	  --config-profile, -c for --config-path, -C for --no-config.
+
+	- [internal] Add hook: before_parse_argv.
+
+	- Observe LOG_DUMP_CONFIG environment variable.
+
+	- [doc] Format/sort POD sections, document PERINCI_CMDLINE_DUMP.
+
+
 1.811   2018-03-05 (PERLANCAR)
 
 	- Introduce new hook_config_file_section.

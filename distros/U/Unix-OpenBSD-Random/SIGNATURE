@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5d3591f22e880c928951f0da99db5f3ea2a1eeed Changes
+SHA1 5c67ae1f730d63cf3674a9f6489808ba48e306bf LICENSE
+SHA1 dc8f85fd5fd136fa9847bd669fdec6be066e3992 MANIFEST
+SHA1 34cafd77ebd2c2c683308659aa131193c6f4e15f META.json
+SHA1 fa9ed31aab0296685777aa519fe3bcd4904bca38 META.yml
+SHA1 2c1c21f1470e94aee8238f7a7b09566efc569a65 Makefile.PL
+SHA1 5a98f40b409679658c0d0f119124d38a8c0e01ac README
+SHA1 dbed33bf1aa303dd2c7b539c19f1cf4c245dabd3 Random.xs
+SHA1 0c037dc29d9c5ee0b0202b8928944f83c48e0d2d inc/Devel/AssertOS.pm
+SHA1 153270805ef8ae361eab7e25e0d1bb740a672472 inc/Devel/AssertOS/OpenBSD.pm
+SHA1 9b63a84f927dd9e421aae297f639ebe6f2b1eedc inc/Devel/CheckOS.pm
+SHA1 021e1d0c74e6b9f47ec22aa1651c55f35b18334b lib/Unix/OpenBSD/Random.pm
+SHA1 7a0d9cfeb1bf56ce968b92c06e06311e09219a14 ppport.h
+SHA1 9c8c07ae7b44ca1dd1eee57cf47e7567d398ac26 t/00-load.t
+SHA1 74f231713ee14772a166b02eebb58bc94d59e73f t/pod-coverage.t
+SHA1 6d6ee1e914426c6c5e16f4487578c610f0cdbce6 t/pod.t
+SHA1 1df3547f56b911a97c67b37c13bed5e97fe4ba43 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa5/ISAAoJEFQ1PADZr/+9MvoH/08iI8slJ5YUNOfeYVQ+9g5I
+GquTXeBp8r95EUVGO6FEmocPL+fhTmF5AeALTFpGoUiKrRyJPinl8eNLVVcTDW0D
+0bPwsyeud9PNxpWpM1ezmfrfhVmIvNBu+skmt1XKlEJ05OuZbQ41YkQqM7O618kK
+EYyRnS6fN6dO/zonXb69gGUxmOOeFw2Je6Qp2j50bzVDv9Cgi7AqAeDJkMdGsIja
+agMty+1o/za+6Oa41t+eanA3qY5bHXdMfmjczkhxLn6dlDjMuoNAUUc0oXVOvPTu
+V68J2PeFAzvJX7PHwn/p46iJKXR5Zs2pa31OqTzC5NwsL/p24+bGQm1UJQf8vwI=
+=tRm+
+-----END PGP SIGNATURE-----

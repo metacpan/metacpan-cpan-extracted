@@ -1,11 +1,11 @@
 package bareword::filehandles;
 # ABSTRACT: disables bareword filehandles
-$bareword::filehandles::VERSION = '0.005';
+$bareword::filehandles::VERSION = '0.006';
 { use 5.008001; }
 use strict;
 use warnings;
 
-use Lexical::SealRequireHints;
+use if "$]" < 5.012, 'Lexical::SealRequireHints';
 use B::Hooks::OP::Check;
 use XSLoader;
 
@@ -39,7 +39,7 @@ bareword::filehandles - disables bareword filehandles
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

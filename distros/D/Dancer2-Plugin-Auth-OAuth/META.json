@@ -72,7 +72,7 @@
          "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "B10m <menno@b10m.net>",
       "Biafra <paulo.a.ferreira@gmail.com>",

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.181120';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.181180';
 use Moose;
 use namespace::autoclean;
 
@@ -1489,8 +1489,8 @@ sub _make_gca_files {
             my @taxonomy;
             try_fatal_warnings { @taxonomy = $tax->get_taxonomy($taxon_id) };
             unless (@taxonomy) {
-                carp 'Warning: NCBI assembly reports and Taxonomy'
-                    . "out-of-sync for: $taxon_id; skipping $accession!";
+                carp 'Warning: NCBI assembly reports and Taxonomy out-of-sync'
+                    . " for: $taxon_id; skipping $accession!";
                 next LINE;
             }
             my $org = $taxonomy[-1];
@@ -1639,7 +1639,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.181120
+version 0.181180
 
 =head1 SYNOPSIS
 

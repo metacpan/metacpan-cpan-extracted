@@ -1,5 +1,8 @@
 Revision history for BibTeX-Parser
 
+1.02    2018-04-29 03:19:56 +0000
+	Corrected the bug when Jr is not accompanied by von.  
+
 1.01    2017-11-19 03:12:34 +0000
         New options for to_string:
         - print_pre - whether to print text preceding the entry

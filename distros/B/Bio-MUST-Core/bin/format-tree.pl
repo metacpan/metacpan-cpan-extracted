@@ -11,7 +11,6 @@ use Try::Tiny;
 
 use Bio::MUST::Core;
 use Bio::MUST::Core::Utils qw(change_suffix secure_outfile);
-use aliased 'Bio::MUST::Core::ColorScheme';
 use aliased 'Bio::MUST::Core::IdList';
 use aliased 'Bio::MUST::Core::IdMapper';
 use aliased 'Bio::MUST::Core::Taxonomy';
@@ -76,7 +75,8 @@ for my $infile (@ARGV_infiles) {
     }
 
     if ($ARGV_from_consense) {
-        $tree->switch_branch_lengths_and_labels_for_entities;
+        my $bl = $ARGV_arb ? 1 : undef;     # treeplot wants branch lengths
+        $tree->switch_branch_lengths_and_labels_for_entities($bl);
     }
 
     if ($ARGV_ultrametrize) {
@@ -162,7 +162,7 @@ format-tree.pl - Format trees for printing
 
 =head1 VERSION
 
-version 0.181120
+version 0.181180
 
 =head1 USAGE
 

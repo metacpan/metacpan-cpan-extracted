@@ -1,8 +1,9 @@
 package File::ConfigDir;
 
-use warnings;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use warnings;
+use parent 'Exporter';
+use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS);
 
 use Carp qw(croak);
 use Config;
@@ -16,11 +17,16 @@ use File::Spec     ();
 
 File::ConfigDir - Get directories of configuration files
 
+=begin html
+
+<a href="https://travis-ci.org/perl5-utils/File-ConfigDir"><img src="https://travis-ci.org/perl5-utils/File-ConfigDir.svg?branch=master" alt="Travis CI"/></a>
+<a href='https://coveralls.io/github/perl5-utils/File-ConfigDir?branch=master'><img src='https://coveralls.io/repos/github/perl5-utils/File-ConfigDir/badge.svg?branch=master' alt='Coverage Status'/></a>
+
+=end html
+
 =cut
 
-$VERSION   = '0.018';
-@ISA       = qw(Exporter);
-@EXPORT    = ();
+$VERSION   = '0.020';
 @EXPORT_OK = (
     qw(config_dirs system_cfg_dir desktop_cfg_dir),
     qw(xdg_config_dirs machine_cfg_dir),
@@ -33,16 +39,10 @@ $VERSION   = '0.018';
     ALL => [@EXPORT_OK],
 );
 
-my $haveFileHomeDir = 0;
-eval {
-    require File::HomeDir;
-    $haveFileHomeDir = 1;
-};
-
-eval "use List::MoreUtils qw/uniq/;";
-__PACKAGE__->can("uniq") or eval <<'EOP';
+eval "use List::MoreUtils qw/distinct/;";    ## no strict (BuiltinFunctions::ProhibitStringyEval)
+__PACKAGE__->can("distinct") or eval <<'EOP';
     # from PP part of List::MoreUtils
-sub uniq(&@) {
+sub distinct(&@) {
     my %h;
     map { $h{$_}++ == 0 ? $_ : () } @_;
 }
@@ -63,15 +63,15 @@ EOP
 
 This module is a helper for installing, reading and finding configuration
 file locations. It's intended to work in every supported Perl5 environment
-and will always try to Do The Right Thing(tm).
+and will always try to Do The Right Thing(TM).
 
 C<File::ConfigDir> is a module to help out when perl modules (especially
 applications) need to read and store configuration files from more than
 one location. Writing user configuration is easy thanks to
 L<File::HomeDir>, but what when the system administrator needs to place
 some global configuration or there will be system related configuration
-(in C</etc> on UNIX(tm) or C<$ENV{windir}> on Windows(tm)) and some
-network configuration in nfs mapped C</etc/p5-app> or
+(in C</etc> on UNIX(TM) or C<$ENV{windir}> on Windows(TM)) and some
+network configuration in NFS mapped C</etc/p5-app> or
 C<$ENV{ALLUSERSPROFILE} . "\\Application Data\\p5-app">, respectively.
 
 C<File::ConfigDir> has no "do what I mean" mode - it's entirely up to the
@@ -85,7 +85,7 @@ tag C<:ALL>.
 =head1 SUBROUTINES/METHODS
 
 All functions can take one optional argument as application specific
-configuration directory. If given, it will be embedded at the right (tm)
+configuration directory. If given, it will be embedded at the right (TM)
 place of the resulting path.
 
 =cut
@@ -93,8 +93,8 @@ place of the resulting path.
 sub _find_common_base_dir
 {
     my ($dira, $dirb) = @_;
-    my ($va, $da, undef) = File::Spec->splitpath($dira);
-    my ($vb, $db, undef) = File::Spec->splitpath($dirb);
+    my ($va, $da, undef) = File::Spec->splitpath($dira, 1);
+    my ($vb, $db, undef) = File::Spec->splitpath($dirb, 1);
     my @dirsa = File::Spec->splitdir($da);
     my @dirsb = File::Spec->splitdir($db);
     my @commondir;
@@ -105,7 +105,7 @@ sub _find_common_base_dir
         push(@commondir, $dirsa[$i]);
     }
 
-    File::Spec->catdir($va, @commondir);
+    File::Spec->catpath($va, File::Spec->catdir(@commondir));
 }
 
 =head2 system_cfg_dir
@@ -270,12 +270,12 @@ sub vendor_cfg_dir
 
 =head2 singleapp_cfg_dir
 
-Returns the configuration file for standalone installed applications. In
+Returns the configuration file for stand-alone installed applications. In
 Unix speak, installing JRE to C<< /usr/local/jre-<version> >> means there is
 a C<< /usr/local/jre-<version>/bin/java >> and going from it's directory
 name one above and into C<etc> there is the I<singleapp_cfg_dir>. For a
 Perl module it means, we're assuming that C<$FindBin::Bin> is installed as
-a standalone package somewhere, eg. into C</usr/pkg> - as recommended for
+a stand-alone package somewhere, e.g. into C</usr/pkg> - as recommended for
 L<pkgsrc|http://www.pkgsrc.org/>.
 
 =cut
@@ -300,12 +300,12 @@ sub singleapp_cfg_dir
 
 =head2 vendorapp_cfg_dir
 
-Returns the configuration file for vendot installed applications. In Unix
+Returns the configuration file for vendor installed applications. In Unix
 speak, installing bacula to C<< /opt/${vendor} >> means there is
 a C<< /opt/${vendor}/bin/bacula >> and going from it's directory
 name one above and into C<etc> there is the I<vendorapp_cfg_dir>. For a
 Perl module it means, we're assuming that C<$FindBin::Bin> is installed as
-a standalone package somewhere, eg. into C</usr/pkg> - as recommended for
+a stand-alone package somewhere, e.g. into C</usr/pkg> - as recommended for
 L<pkgsrc|http://www.pkgsrc.org/>.
 
 =cut
@@ -364,17 +364,20 @@ C<etc> directory below it.
 
 =cut
 
+my $haveLocalLib;
+
+BEGIN
+{
+    # uncoverable branch false
+    defined $haveLocalLib or $haveLocalLib = eval "use local::lib (); local::lib->can('active_paths');";
+    defined $haveLocalLib or $haveLocalLib = 0;
+}
+
 my $locallib_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    if (   $INC{'local/lib.pm'}
-        && $ENV{PERL_MM_OPT}
-        && $ENV{PERL_MM_OPT} =~ m/.*INSTALL_BASE=([^"']*)['"]?$/)
-    {
-        (my $cfgdir = $ENV{PERL_MM_OPT}) =~ s/.*INSTALL_BASE=([^"']*)['"]?$/$1/;
-        push(@dirs, File::Spec->catdir($cfgdir, "etc", @cfg_base));
-    }
+    $haveLocalLib and push(@dirs, map { File::Spec->catdir($_, "etc", @cfg_base) } local::lib->active_paths);
 
     @dirs;
 };
@@ -407,6 +410,15 @@ sub here_cfg_dir
     $here_cfg_dir->(@cfg_base);
 }
 
+my $haveFileHomeDir;
+
+BEGIN
+{
+    # uncoverable branch false
+    defined $haveFileHomeDir or $haveFileHomeDir = eval "use File::HomeDir; 1";
+    defined $haveFileHomeDir or $haveFileHomeDir = 0;
+}
+
 =head2 user_cfg_dir
 
 Returns the users home folder using L<File::HomeDir>. Without
@@ -418,7 +430,12 @@ my $user_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    $haveFileHomeDir and @dirs = (File::Spec->catdir(File::HomeDir->my_home(), map { "." . $_ } @cfg_base));
+    my $homedir;
+    $haveFileHomeDir and $homedir = File::HomeDir->my_home();
+    $homedir |= $ENV{HOME} if defined $ENV{HOME};
+    $homedir |= File::Spec->catpath($ENV{HOMEDRIVE}, $ENV{HOMEPATH}) if defined $ENV{HOMEDRIVE} and defined $ENV{HOMEPATH};
+
+    $homedir and @dirs = (File::Spec->catdir($homedir, map { "." . $_ } @cfg_base));
 
     @dirs;
 };
@@ -501,7 +518,7 @@ sub config_dirs
         push(@dirs, $extensible_bases[$idx]->(($pure ? () : @cfg_base)));
     }
 
-    @dirs = grep { -d $_ && -r $_ } uniq(@dirs);
+    @dirs = grep { -d $_ && -r $_ } distinct(@dirs);
 
     @dirs;
 }
@@ -518,7 +535,7 @@ Registers more sources to ask for suitable directories to check or search
 for config files. Each L</config_dirs> will traverse them in subsequent
 invocations, too.
 
-Returns the number of directory sources in case of succes. Returns nothing
+Returns the number of directory sources in case of success. Returns nothing
 when C<$dir_src> is not a code ref.
 
 =cut
@@ -584,7 +601,7 @@ and remind about C</usr/local/etc>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2017 Jens Rehsack.
+Copyright 2010-2018 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

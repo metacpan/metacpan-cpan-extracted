@@ -313,7 +313,13 @@ const char *crypt_build_settings =
     "   ChaCha20\n"
 #endif
 #if defined(LTC_FORTUNA)
-    "   Fortuna (" NAME_VALUE(LTC_FORTUNA_POOLS) ", " NAME_VALUE(LTC_FORTUNA_WD) ")\n"
+    "   Fortuna (" NAME_VALUE(LTC_FORTUNA_POOLS) ", "
+#if defined(LTC_FORTUNA_RESEED_RATELIMIT_TIMED)
+    "LTC_FORTUNA_RESEED_RATELIMIT_TIMED, "
+#else
+    "LTC_FORTUNA_RESEED_RATELIMIT_STATIC, " NAME_VALUE(LTC_FORTUNA_WD)
+#endif
+    ")\n"
 #endif
 #if defined(LTC_SOBER128)
     "   SOBER128\n"
@@ -414,17 +420,24 @@ const char *crypt_build_settings =
 #if defined(LTC_BASE32)
     " BASE32 "
 #endif
+#if defined(LTC_BASE16)
+    " BASE16 "
+#endif
 #if defined(LTC_CRC32)
     " CRC32 "
 #endif
 #if defined(LTC_DER)
     " DER "
+    " " NAME_VALUE(LTC_DER_MAX_RECURSION) " "
 #endif
 #if defined(LTC_PKCS_1)
     " PKCS#1 "
 #endif
 #if defined(LTC_PKCS_5)
     " PKCS#5 "
+#endif
+#if defined(LTC_PADDING)
+    " PADDING "
 #endif
 #if defined(LTC_HKDF)
     " HKDF "
