@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 18;
 use FindBin qw($Bin);
 
 use lib "$Bin/../lib";
@@ -22,19 +22,25 @@ isnt($num1, 0, "Non-empty list of sub-files");
 isa_ok($files->[0], 'SMB::File');
 is($files->[0]->name, '.', 'First file name is dot');
 
+$files = $dir->find_files;
+my $num2 = @$files;
+isnt($num2, 0, "Non-empty list of sub-files");
+is($num2, $num1, "Same list of files");
+isa_ok($files->[0], 'SMB::File');
+is($files->[1]->name, '..', 'Second file name is dot-dot');
+
+$files = $dir->find_files(reopen => 1);
+$num2 = @$files;
+is($num2, $num1, "Same list of files after reopen");
+is($files->[0]->name, '.', 'First file name is dot');
+is($files->[1]->name, '..', 'Second file name is dot-dot');
+
 $files = $dir->find_files(pattern => 'no-such-name');
 is(scalar @$files, 0, "Empty list of sub-files");
 
-$files = $dir->find_files(pattern => '*e*', start_idx => 1);
-my $num2 = @$files;
-isnt($num2, 0, "Non-empty list of sub-files");
-isnt($num2, $num1, "Different list of files");
-isa_ok($files->[0], 'SMB::File');
-
-$files = $dir->find_files;
+$files = $dir->find_files(pattern => '*e*', start_idx => 1, reopen => 1);
 my $num3 = @$files;
 isnt($num3, 0, "Non-empty list of sub-files");
-is($num3, $num1, "Same list of files");
+isnt($num3, $num1, "Different list of files");
 isa_ok($files->[0], 'SMB::File');
-is($files->[1]->name, '..', 'Second file name is dot-dot');
 

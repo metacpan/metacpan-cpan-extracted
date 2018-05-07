@@ -13,11 +13,11 @@ File::PCAP::ACAP2PCAP - convert ASA capture to PCAP
 
 =head1 VERSION
 
-Version v0.0.6
+Version v0.0.7
 
 =cut
 
-use version; our $VERSION = qv('v0.0.6');
+use version; our $VERSION = qv('v0.0.7');
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,8 @@ sub new {
 	
 	$self = bless {
 		state        => 'unknown',
-		sot          => timelocal(@today), # start of today
+		sot          => timegm(@today), # start of today
+        last_sec     => 0,
 		now          => $now,
 		fpw          => $fpw,
 		packet_bytes => "",
@@ -216,12 +217,18 @@ sub _l_stop {
 sub _write_packet {
 	my ($self) = @_;
 	if (my $len = length($self->{packet_bytes})) {
+        if ($self->{last_sec} > $self->{packet_secs}) {
+            # we have probably crossed midnight
+            $self->{packet_secs} += 86400;
+            $self->{sot} += 86400;
+        }
 		my $sec  = $self->{packet_secs};
 		my $usec = $self->{packet_usec};
 		my $buf  = pack('H*', $self->{packet_bytes});
 		$len /= 2;
 		$self->{fpw}->packet($sec,$usec,$len,$len,$buf);
 		$self->{packet_bytes}  = "";
+        $self->{last_sec} = $sec;
 	}
 } # _write_packet()
 

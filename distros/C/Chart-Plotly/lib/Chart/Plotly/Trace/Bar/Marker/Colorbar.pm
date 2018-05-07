@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Bar::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Bar::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Bar::Marker::Colorbar::Titlefont;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace bar.
 
@@ -283,7 +283,7 @@ Chart::Plotly::Trace::Bar::Marker::Colorbar - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

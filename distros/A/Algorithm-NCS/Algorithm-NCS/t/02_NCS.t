@@ -39,11 +39,7 @@ subtest 'NCS basic examples' => sub {
     is( ncs('MONOrkOne','OrkMONOne'), 13, 'trap test');
 };
 
-subtest 'ncs using utf8' => sub {
-    is( ncs('практика математика','математика практика'), 55, 'test NCS with unicode');   
-    is( ncs('определение перемещения','перемещение сбережений'), 55, 'test NCS with unicode');
-    is( ncs('1,2,3,4,5,6,7,8,9и0','0и1,2,3,4,5,6,7,8,9'), 153,  'test NCS with short unicode');
-};
+
 
 done_testing();
 1;

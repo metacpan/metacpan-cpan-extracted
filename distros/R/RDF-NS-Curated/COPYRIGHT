@@ -6,6 +6,7 @@ Source: https://metacpan.org/release/RDF-NS-Curated
 Files: Changes
  META.json
  META.yml
+ dist.ini
  doap.ttl
 Copyright: Copyright 2018 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
@@ -15,11 +16,6 @@ Files: COPYRIGHT
  SIGNATURE
 Copyright: None
 License: public-domain
-
-Files: README
- lib/RDF/NS/Curated.pm
-Copyright: This software is copyright (c) 2015, 2017, 2018 by Kjetil Kjernsmo.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
  LICENSE
@@ -31,8 +27,9 @@ Files: t/01basic.t
 Copyright: This software is copyright (c) 2015 by Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2016 Kjetil Kjernsmo.
+Files: README
+ lib/RDF/NS/Curated.pm
+Copyright: This software is copyright (c) 2015, 2017, 2018 by Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL

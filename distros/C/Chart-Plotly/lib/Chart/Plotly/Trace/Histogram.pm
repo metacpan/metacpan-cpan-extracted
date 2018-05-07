@@ -13,11 +13,12 @@ use Chart::Plotly::Trace::Histogram::Hoverlabel;
 use Chart::Plotly::Trace::Histogram::Marker;
 use Chart::Plotly::Trace::Histogram::Selected;
 use Chart::Plotly::Trace::Histogram::Stream;
+use Chart::Plotly::Trace::Histogram::Transform;
 use Chart::Plotly::Trace::Histogram::Unselected;
 use Chart::Plotly::Trace::Histogram::Xbins;
 use Chart::Plotly::Trace::Histogram::Ybins;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` for vertically spanning histograms and in `y` for horizontally spanning histograms. Binning options are set `xbins` and `ybins` respectively if no aggregation data is provided.
 
@@ -197,6 +198,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Histogram::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -245,7 +249,7 @@ has y => ( is            => "rw",
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ybins => ( is  => "rw",
@@ -280,7 +284,7 @@ Chart::Plotly::Trace::Histogram - The sample data from which statistics are comp
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -427,6 +431,8 @@ Sets text elements associated with each (x,y) pair. If a single string, the same
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * uid
 
 =item * unselected
@@ -459,7 +465,7 @@ Sets the sample data to be binned on the y axis.
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ybins
 

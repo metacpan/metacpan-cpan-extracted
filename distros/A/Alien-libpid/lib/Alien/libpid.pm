@@ -3,11 +3,9 @@ use warnings;
 package Alien::libpid;
 
 # ABSTRACT: Perl distribution for libpid
-# VERSION
+our $VERSION = '0.032'; # VERSION
 
 use parent 'Alien::Base';
-
-our $VERSION = '0.03';
 
 =pod
 
@@ -16,6 +14,10 @@ our $VERSION = '0.03';
 =head1 NAME
 
 Alien::libpid - Perl distribution for libpid
+
+=head1 VERSION
+
+version 0.032
 
 =head1 INSTALL
 

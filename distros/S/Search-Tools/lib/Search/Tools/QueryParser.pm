@@ -13,7 +13,7 @@ use Search::Tools::RegEx;
 
 use namespace::autoclean;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 my $XML = Search::Tools::XML->new();
 my $C2E = $XML->char2ent_map;

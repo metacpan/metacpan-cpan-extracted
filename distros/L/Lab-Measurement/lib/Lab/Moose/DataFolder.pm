@@ -1,5 +1,5 @@
 package Lab::Moose::DataFolder;
-$Lab::Moose::DataFolder::VERSION = '3.631';
+$Lab::Moose::DataFolder::VERSION = '3.641';
 #ABSTRACT: Create a data directory with meta data
 
 use 5.010;
@@ -42,6 +42,12 @@ has path => (
     predicate => 'has_path',
 );
 
+has date_prefix => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0
+);
+
 has meta_file => (
     is       => 'ro',
     isa      => 'Lab::Moose::DataFile::Meta',
@@ -65,12 +71,17 @@ sub BUILD {
     my $dirname  = dirname($folder);
     my $basename = basename($folder);
 
+    if ( $self->date_prefix ) {
+        $basename = strftime( '%Y-%m-%d', localtime() ) . "_$basename";
+        $folder = our_catfile( $dirname, $basename );
+    }
+
     my $folder_number = _get_folder_number(
         basename => $basename,
         dirname  => $dirname
     );
 
-    $folder = $folder . sprintf( '_%03d', $folder_number );
+    $folder .= sprintf( '_%03d', $folder_number );
 
     mkdir $folder
         or croak "cannot make directory '$folder': $!";
@@ -180,7 +191,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Statistics::Descriptive.
 
+3.0613      2018-05-02
+    - Convert to Dist-Zilla.
+
 3.0612      2016-01-09
     - Move the VCS repository to GitHub.
         - People are more used to it, and it can take part in the CPAN pull-req

@@ -1,0 +1,14 @@
+Revision history for Backup-Hanoi
+ 
+0.003     2018-05-06 13:23:28+02:00 Europe/Zurich
+ - corrected spelling in documentation (MANWAR)
+ - added support for FIFO-initialisation via negative numbers
+ - added tests
+ - fixed argument handling in bin/script
+ - updated documentation
+
+0.002     2018-05-05 23:16:52+02:00 Europe/Zurich
+ - fixed minor errors in documentation
+
+0.001     2018-05-05 22:41:15+02:00 Europe/Zurich
+ - initial release

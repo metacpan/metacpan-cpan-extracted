@@ -1,3 +1,14 @@
+v0.10.1 2018-05-06T10:33:50Z
+ - typo
+
+v0.10.0 2018-05-06T10:01:13Z
+ - docker wrapper improved
+ - docker repo relinked
+ - Docker base image changed from "softvisio/pcore:v0.62.5" to
+   "softvisio/pcore:v0.63.4"
+ - allow to set redis password on init
+ - deploy redis from yum
+
 v0.9.6 2018-04-24T17:12:52Z
  - P->cfg API updated
  - Docker base image changed from "softvisio/pcore:v0.62.4" to

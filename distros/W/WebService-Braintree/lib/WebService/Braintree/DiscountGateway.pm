@@ -11,16 +11,11 @@ with 'WebService::Braintree::Role::MakeRequest';
 
 use WebService::Braintree::_::Discount;
 
-use WebService::Braintree::Util qw(to_instance_array);
-
-has 'gateway' => (is => 'ro');
-
 sub all {
     my $self = shift;
-
-    my $response = $self->gateway->http->get("/discounts");
-    my $attrs = $response->{discounts} || [];
-    return to_instance_array($attrs, 'WebService::Braintree::_::Discount');
+    return $self->_array_request(
+        '/discounts', 'discounts', 'WebService::Braintree::_::Discount',
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -16,7 +16,8 @@ use Test::XML::Ordered qw(is_xml_ordered);
 
 # TEST:$num_texts=11
 
-my @tests = (qw(
+my @tests = (
+    qw(
         irc-conversation-4-several-convos
         irc-convos-and-raw-fortunes-1
         raw-fort-empty-info-1
@@ -28,12 +29,13 @@ my @tests = (qw(
         quote-fort-sample-6-with-bold
         quote-fort-sample-7-with-italics
         quote-fort-sample-8-with-em-and-strong
-    ));
+        )
+);
 
 my $parser = XML::LibXML->new();
-my $xslt = XML::LibXSLT->new();
+my $xslt   = XML::LibXSLT->new();
 
-my $style_doc = $parser->parse_file("./extradata/fortune-xml-to-html.xslt");
+my $style_doc  = $parser->parse_file("./extradata/fortune-xml-to-html.xslt");
 my $stylesheet = $xslt->parse_stylesheet($style_doc);
 
 sub read_file
@@ -73,8 +75,8 @@ foreach my $fn_base (@tests)
     my $results = $stylesheet->transform($source);
 
     # TEST*$num_texts
-    eq_or_diff (
-        normalize_xml($stylesheet->output_string($results)),
+    eq_or_diff(
+        normalize_xml( $stylesheet->output_string($results) ),
         read_file("./t/data/xhtml-results/$fn_base.xhtml"),
         "Testing for Good XSLTing of '$fn_base'",
     );
@@ -89,15 +91,24 @@ foreach my $fn_base (@tests)
 
     my $results = $stylesheet->transform(
         $source,
-        'filter.lang' => q{'he-IL'},
+        'filter.lang'          => q{'he-IL'},
         'filter-facts-list.id' => q{'chuck_facts'},
     );
 
-    my @common = (validation => 0, load_ext_dtd => 0, no_network => 1);
+    my @common = ( validation => 0, load_ext_dtd => 0, no_network => 1 );
+
     # TEST
-    is_xml_ordered (
-        [ string => scalar(normalize_xml($stylesheet->output_string($results))), @common, ],
-        [ location => "./t/data/xhtml-results/facts-fort-4-from-shlomifish.org--he-IL.xhtml", @common, ],
+    is_xml_ordered(
+        [
+            string =>
+                scalar( normalize_xml( $stylesheet->output_string($results) ) ),
+            @common,
+        ],
+        [
+            location =>
+"./t/data/xhtml-results/facts-fort-4-from-shlomifish.org--he-IL.xhtml",
+            @common,
+        ],
         {},
         "Testing for Good he-IL XSLTing of '$filename'",
     );

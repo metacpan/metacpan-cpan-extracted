@@ -12,6 +12,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More'      => 0,
         'Devel::Callsite' => 0.06,
+        'Scope::Upper'    => 0,
 ($] < 5.022 ? ('Data::Alias' => 1.16) : ()),
         'PadWalker'       => 1.93,
         'experimental'    => 0,

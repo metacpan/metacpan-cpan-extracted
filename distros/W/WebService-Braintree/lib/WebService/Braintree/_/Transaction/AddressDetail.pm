@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Transaction::AddressDetail;
-$WebService::Braintree::_::Transaction::AddressDetail::VERSION = '1.2';
+$WebService::Braintree::_::Transaction::AddressDetail::VERSION = '1.3';
 =head1 NAME
 
 WebService::Braintree::_::Transaction::AddressDetail

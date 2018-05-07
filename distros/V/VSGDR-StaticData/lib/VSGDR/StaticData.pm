@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 
 sub databaseName {
@@ -114,6 +114,9 @@ sub generateScript {
     my $combinedName                    = "${schema}.${table}"; 
     my $quotedCombinedName              = "[${schema}].[${table}]"; 
     my $tableVarName                    = "LocalTable_${table}"; 
+
+    my $quotedSchema                    = "[${schema}]"; 
+    my $quotedTable                     = "[${table}]"; 
        
     my $database                        = databaseName($dbh);
 
@@ -135,14 +138,14 @@ sub generateScript {
 #warn Dumper $idCol ;    
     my $set_IDENTITY_INSERT_ON  = "";
     my $set_IDENTITY_INSERT_OFF = "";
-    $set_IDENTITY_INSERT_ON     = "set IDENTITY_INSERT ${combinedName} ON"  if $hasId;
-    $set_IDENTITY_INSERT_OFF    = "set IDENTITY_INSERT ${combinedName} OFF" if $hasId;
+    $set_IDENTITY_INSERT_ON     = "set IDENTITY_INSERT ${quotedCombinedName} ON"  if $hasId;
+    $set_IDENTITY_INSERT_OFF    = "set IDENTITY_INSERT ${quotedCombinedName} OFF" if $hasId;
 
 
     my $ra_columns              = columns($dbh,$schema,$table);
-    my $ra_pkcolumns            = pkcolumns($dbh,$schema,$table);
+    my $ra_pkcolumns            = pkcolumns($dbh,$quotedSchema,$quotedTable);
 
-    croak "${combinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
+    croak "${quotedCombinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
     
 #warn Dumper $ra_columns ;
 #exit ;
@@ -787,7 +790,7 @@ sub columns {
     my $table   = shift or croak 'no table' ;
 
     my $sth2    = $dbh->prepare( columnsSQL());
-    my $rs      = $sth2->execute($schema,$table,$schema,$table);
+    my $rs      = $sth2->execute($schema,$table,"[${schema}]","[${table}]");
     my $res     = $sth2->fetchall_arrayref() ;
 
     if ( scalar @{$res} ) { return $res ; } ;

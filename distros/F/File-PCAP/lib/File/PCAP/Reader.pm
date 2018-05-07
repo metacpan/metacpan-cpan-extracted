@@ -13,11 +13,11 @@ File::PCAP::Reader - read PCAP files with pure Perl
 
 =head1 VERSION
 
-Version v0.0.6
+Version v0.0.7
 
 =cut
 
-use version; our $VERSION = qv('v0.0.6');
+use version; our $VERSION = qv('v0.0.7');
 
 
 =head1 SYNOPSIS
@@ -123,8 +123,8 @@ sub link_layer_header_type {
 
 Read the next datagram record in the PCAP file.
 
-Returns a hash reference containing the data of the next packet in the PCAP
-file.
+Returns a hash reference containing the data of the next packet
+or nothing at the end of the PCAP file.
 
 This hash contains the following keys
 
@@ -154,6 +154,12 @@ This buffer should contain at least I<< inc_len >> bytes.
 
 =back
 
+You may want to use it like this:
+
+  while(my $np = $fpr->next_packet()) {
+    # ... do something with $np
+  }
+
 =cut
 
 sub next_packet {
@@ -168,7 +174,7 @@ sub next_packet {
         if ($rr) {
             carp "Reached EOF before reading packet header!";
         }
-        return { eof => 1 }
+        return;
     }
     my ($ts_sec,$ts_usec,$incl_len,$orig_len) = unpack("LLLL",$record);
     my $buf;
@@ -178,7 +184,7 @@ sub next_packet {
     }
     if ($incl_len > $rr) {
         carp "Reached EOF before reading packet buffer!";
-        return { eof => 1 }
+        return;
     }
     return {
         ts_sec   => $ts_sec,

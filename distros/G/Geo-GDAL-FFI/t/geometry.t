@@ -11,6 +11,9 @@ use FFI::Platypus::Buffer;
 
 my $gdal = Geo::GDAL::FFI->new();
 
+my $have_geos = Geo::GDAL::FFI::HaveGEOS;
+#say STDERR $have_geos ? "GEOS OK" : "NO GEOS";
+
 {
     my $geometry = Geo::GDAL::FFI::Geometry->new(WKT => 'POINT(1 1)');
     ok($geometry->GetType eq 'Point', "Create Point from WKT (1).");
@@ -32,7 +35,9 @@ my $gdal = Geo::GDAL::FFI->new();
     ok($p[0] == 5, "Set/GetPoint");
 }
 
-{
+SKIP: {
+    skip "No GEOS support", 1 unless $have_geos;
+
     my $geometry = Geo::GDAL::FFI::Geometry->new(WKT => 'POINT(1 1)');
     my $c = $geometry->Centroid;
     ok($geometry->AsText eq 'POINT (1 1)', "Centroid");

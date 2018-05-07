@@ -527,6 +527,16 @@ Return the
 
 =cut
 
+=head2 bit
+
+Number.bit() -> I<Obj>
+
+Return the
+
+Aliases: I<getbit>, I<testbit>
+
+=cut
+
 =head2 C
 
 Number.C() -> I<Obj>
@@ -585,6 +595,14 @@ Return the
 
 =cut
 
+=head2 clearbit
+
+Number.clearbit() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 combinations
 
 Number.combinations() -> I<Obj>
@@ -624,6 +642,14 @@ Number.conj() -> I<Obj>
 Return the
 
 Aliases: I<conjug>, I<conjugate>
+
+=cut
+
+=head2 consecutive_integer_lcm
+
+Number.consecutive_integer_lcm() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -732,6 +758,16 @@ Return the
 Number.digits() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 digits_sum
+
+Number.digits_sum() -> I<Obj>
+
+Return the
+
+Aliases: I<sum_digits>, I<sumdigits>
 
 =cut
 
@@ -879,6 +915,14 @@ Return the
 
 =cut
 
+=head2 factorial_power
+
+Number.factorial_power() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 falling_factorial
 
 Number.falling_factorial() -> I<Obj>
@@ -904,6 +948,14 @@ Number.fib() -> I<Obj>
 Return the
 
 Aliases: I<fibonacci>
+
+=cut
+
+=head2 flipbit
+
+Number.flipbit() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1072,6 +1124,16 @@ Number.invmod() -> I<Obj>
 Return the
 
 Aliases: I<modinv>
+
+=cut
+
+=head2 inv_totient
+
+Number.inv_totient() -> I<Obj>
+
+Return the
+
+Aliases: I<inv_euler_phi>, I<inverse_totient>, I<inverse_euler_phi>
 
 =cut
 
@@ -1589,6 +1651,22 @@ Return the
 
 =cut
 
+=head2 lucasu
+
+Number.lucasu() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lucasv
+
+Number.lucasv() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 make_coprime
 
 Number.make_coprime() -> I<Obj>
@@ -1732,6 +1810,14 @@ Aliases: I<numerator>
 =head2 nude
 
 Number.nude() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 num2perm
+
+Number.num2perm() -> I<Obj>
 
 Return the
 
@@ -1941,6 +2027,14 @@ Return the
 
 =cut
 
+=head2 random_bytes
+
+Number.random_bytes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 random_nbit_prime
 
 Number.random_nbit_prime() -> I<Obj>
@@ -1960,6 +2054,14 @@ Return the
 =head2 random_prime
 
 Number.random_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_string
+
+Number.random_string() -> I<Obj>
 
 Return the
 
@@ -2062,6 +2164,14 @@ Return the
 =head2 seed
 
 Number.seed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setbit
+
+Number.setbit() -> I<Obj>
 
 Return the
 
@@ -2186,6 +2296,14 @@ Return the
 =head2 subsets
 
 Number.subsets() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 superfactorial
+
+Number.superfactorial() -> I<Obj>
 
 Return the
 
@@ -2392,6 +2510,16 @@ Number.ϕ() -> I<Obj>
 Return the
 
 Aliases: I<totient>, I<euler_phi>, I<euler_totient>
+
+=cut
+
+=head2 ≅
+
+I<Obj> B<≅> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<=~=()>, I<approx_eq>
 
 =cut
 

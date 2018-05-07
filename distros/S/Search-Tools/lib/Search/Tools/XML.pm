@@ -6,7 +6,7 @@ use Search::Tools::UTF8;
 
 use namespace::autoclean;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =pod
 

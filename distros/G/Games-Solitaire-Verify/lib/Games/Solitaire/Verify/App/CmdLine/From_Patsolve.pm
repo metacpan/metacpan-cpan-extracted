@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine::From_Patsolve;
-
+$Games::Solitaire::Verify::App::CmdLine::From_Patsolve::VERSION = '0.1800';
 use strict;
 use warnings;
 
@@ -10,6 +10,7 @@ use parent 'Games::Solitaire::Verify::Base';
 use Games::Solitaire::Verify::VariantsMap;
 use Games::Solitaire::Verify::Solution;
 use Games::Solitaire::Verify::State;
+use Games::Solitaire::Verify::State::LaxParser;
 use Games::Solitaire::Verify::Move;
 
 use List::MoreUtils qw(firstidx);
@@ -176,7 +177,7 @@ sub _read_initial_state
     my $self = shift;
 
     $self->_st(
-        Games::Solitaire::Verify::State->new(
+        Games::Solitaire::Verify::State::LaxParser->new(
             {
                 string => scalar(_slurp($self->_filename)),
                 variant => 'custom',
@@ -385,7 +386,7 @@ converting from patsolve solutions to fc-solve ones.
 
 =head1 VERSION
 
-version 0.1701
+version 0.1800
 
 =head1 SYNOPSIS
 
@@ -395,6 +396,10 @@ version 0.1701
 
 This is a a modulino for
 converting from patsolve solutions to fc-solve ones.
+
+=head1 VERSION
+
+version 0.1800
 
 =head1 METHODS
 
@@ -417,8 +422,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Solitaire-Verify or by email
-to bug-games-solitaire-verify@rt.cpan.org.
+L<https://github.com/shlomif/fc-solve/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -432,7 +436,7 @@ feature.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc Games::Solitaire::Verify
+  perldoc Games::Solitaire::Verify::App::CmdLine::From_Patsolve
 
 =head2 Websites
 
@@ -447,7 +451,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Games-Solitaire-Verify>
+L<https://metacpan.org/release/Games-Solitaire-Verify>
 
 =item *
 
@@ -483,14 +487,6 @@ L<http://cpanratings.perl.org/d/Games-Solitaire-Verify>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Games-Solitaire-Verify>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -501,7 +497,7 @@ L<http://cpants.cpanauthors.org/dist/Games-Solitaire-Verify>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/G/Games-Solitaire-Verify>
 
@@ -535,8 +531,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/fc-solve>
+L<https://github.com/shlomif/fc-solve>
 
-  git clone http://bitbucket.org/shlomif/fc-solve
+  git clone git://github.com/shlomif/fc-solve.git
 
 =cut

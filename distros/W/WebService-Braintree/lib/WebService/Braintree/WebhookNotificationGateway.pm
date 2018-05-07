@@ -6,16 +6,18 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use MIME::Base64;
-use WebService::Braintree::Digest qw(hexdigest);
-use WebService::Braintree::Xml qw(xml_to_hash);
-use Carp qw(confess);
-
 use Moose;
 
-has 'gateway' => (is => 'ro');
+use Carp qw(confess);
+use MIME::Base64;
+
+use WebService::Braintree::Digest qw(hexdigest);
+use WebService::Braintree::Xml qw(xml_to_hash);
 
 use WebService::Braintree::_::WebhookNotification;
+
+# This does not use Role::MakeRequest which provides the gateway attribute.
+has 'gateway' => (is => 'ro');
 
 sub parse {
     my ($self, $signature, $payload) = @_;

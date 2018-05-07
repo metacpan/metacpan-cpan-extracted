@@ -20,5 +20,6 @@ t/10_test.t
 t/11_darwin.t
 t/12_darwin_carbon.t
 t/13_darwin_cocoa.t
+t/20_empty_home.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

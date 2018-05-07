@@ -8,15 +8,16 @@ require Exporter;
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(
                         parse_vcd list_sigs get_timescale get_endtime
-                        get_date get_version get_dumps
+                        get_date get_version get_dumps get_closetime
                         get_decl_comments get_sim_comments
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $timescale;
 my $endtime;
+my $closetime;
 my $date;
 my $version;
 my @decl_comments;
@@ -85,19 +86,7 @@ sub parse_vcd {
     while (<$fh>) {
         if (s/ ^ \s* \$ (\w+) \s+ //x) {
             my $keyword = $1;
-            my $line = $_;
-            my @lines;
-            push @lines, $_ if length $_;
-            while ($line !~ / \$end \b /x) {
-                $line = <$fh>;
-                push @lines, $line;
-            }
-            for my $line (@lines) {
-                trim($line);
-                $line =~ s/ \s* \$end \b //x;
-            }
-            pop @lines unless length $lines[-1];
-
+            my @lines = read_more_lines($fh, $_);
             if ($keyword eq 'date') {
                 $date = join "\n", @lines;
             }
@@ -121,8 +110,10 @@ sub parse_vcd {
                 my $var = "@lines";
                 #   $var reg 1 *@ data $end
                 #   $var wire 4 ) addr [3:0] $end
+                #   $var port [3:0] <4 addr $end
                 my ($type, $size, $code, $name) = split /\s+/, $var, 4;
                 $name =~ s/ \s //xg;
+                $name .= $size if ($type eq 'port') and ($size ne '1');
                 my $path = join '.', @hier;
                 my $full_name = "$path.$name";
                 push @{ $data{$code}{nets} }, {
@@ -159,24 +150,18 @@ sub parse_vcd {
         # Continue reading file
         @sim_comments = ();
         %dumps = ();
+        undef $closetime;
         my $time = 0;
         while (<$fh>) {
             trim($_);
             if (s/ ^ \$ comment \s* //x) {
-                my $line = $_;
-                my @lines;
-                push @lines, $_ if length $_;
-                while ($line !~ / \$end \b /x) {
-                    $line = <$fh>;
-                    push @lines, $line;
-                }
-                for my $line (@lines) {
-                    trim($line);
-                    $line =~ s/ \s* \$end \b //x;
-                }
-                pop @lines unless length $lines[-1];
-                my $comment = join "\n", @lines;
+                my $comment = join "\n", read_more_lines($fh, $_);
                 push @sim_comments, {time => $time, comment => $comment};
+            }
+            if (s/ ^ \$ vcdclose \s* //x) {
+                my $close = join "\n", read_more_lines($fh, $_);
+                ($closetime) = $close =~ / ^ [#] (\d+) /x;
+                $closetime *= $mult;
             }
             elsif (/ ^ \$ (dump \w+) /x) {
                 push @{ $dumps{$1} }, $time;
@@ -196,6 +181,19 @@ sub parse_vcd {
                     }
                 }
             }
+            elsif (/ ^ p /x) { # Extended VCD format
+                my @tokens = split;
+                $tokens[0] =~ s/p//;
+                my $code  = pop @tokens;
+                if (exists $data{$code}) {
+                    if ($use_stdout) {
+                        print "$time @tokens\n";
+                    }
+                    else {
+                        push @{ $data{$code}{tv} }, [$time, @tokens];
+                    }
+                }
+            }
         }
         $endtime = $time;
     }
@@ -203,6 +201,26 @@ sub parse_vcd {
     close $fh;
 
     return \%data;
+}
+
+sub read_more_lines {
+    # Read more lines of the VCD file for keywords terminated with $end.
+    # These keywords may be on one line or multiple lines.
+    # Remove the $end token and return an array of lines.
+    my $fh   = shift;
+    my $line = shift;
+    my @lines;
+    push @lines, $line if length $line;
+    while ($line !~ / \$end \b /x) {
+        $line = <$fh>;
+        push @lines, $line;
+    }
+    for my $line (@lines) {
+        trim($line);
+        $line =~ s/ \s* \$end \b //x;
+    }
+    pop @lines unless length $lines[-1];
+    return @lines;
 }
 
 sub calc_mult {
@@ -279,6 +297,10 @@ sub get_endtime {
     return $endtime;
 }
 
+sub get_closetime {
+    return $closetime;
+}
+
 sub get_date {
     return $date;
 }
@@ -306,7 +328,7 @@ Verilog::VCD - Parse a Verilog VCD text file
 
 =head1 VERSION
 
-This document refers to Verilog::VCD version 0.07.
+This document refers to Verilog::VCD version 0.08.
 
 =head1 SYNOPSIS
 
@@ -324,11 +346,10 @@ standard hash and array operations.
 
 =head2 Input File Syntax
 
-The syntax of the VCD text file is described in the documentation of
-the IEEE standard for Verilog.  Only the four-state VCD format is supported.
-The extended VCD format (with strength information) is not supported.
-Since the input file is assumed to be legal VCD syntax, only minimal
-validation is performed.
+The syntax of the VCD text file is described in the documentation of the
+IEEE standard for Verilog.  Both VCD formats (4-state and Extended) are
+supported.  Since the input file is assumed to be legal VCD syntax, only
+minimal validation is performed.
 
 =head1 SUBROUTINES
 
@@ -346,7 +367,7 @@ specified by the C<$timescale> VCD keyword.
 It returns a reference to a nested data structure.  The top of the
 structure is a Hash-of-Hashes.  The keys to the top hash are the VCD
 identifier codes for each signal.  The following is an example
-representation of a very simple VCD file.  It shows one signal named
+representation of a very simple 4-state VCD file.  It shows one signal named
 C<chip.cpu.alu.clk>, whose VCD code is C<+>.  The time-value pairs
 are stored as an Array-of-Arrays, referenced by the C<tv> key.  The
 time is always the first number in the pair, and the times are stored in
@@ -379,6 +400,9 @@ Since each code could have multiple hierarchical signal names, the names are
 stored as an Array-of-Hashes, referenced by the C<nets> key.  The example above
 only shows one signal name for the code.
 
+For the Extended VCD format, the C<tv> key returns an array of 4-element arrays:
+
+    time value strength0 strength1
 
 =head3 OPTIONS
 
@@ -428,7 +452,7 @@ must only be one signal specified.  For example:
                 });
 
 The time-value pairs are output as space-separated tokens, one per line.
-For example:
+For example, for a 4-state VCD file:
 
     0 x
     15 0
@@ -436,7 +460,7 @@ For example:
     500 0
 
 Times are listed in the first column.
-Times units can be controlled by the C<timescale> option.
+Time units can be controlled by the C<timescale> option.
 
 =item only_sigs
 
@@ -483,9 +507,21 @@ instead of what is in the VCD file.
 This returns the last time found in the VCD file, scaled
 appropriately.  It returns the last time for the last VCD file parsed.
 If called before a file is parsed, it returns an undefined value.
+This should not be confused with closetime.
 
     my $vcd = parse_vcd($file); # Parse a file first
     my $et  = get_endtime();    # Then query the endtime
+
+=head2 get_closetime( )
+
+For the Extended VCD format, this returns the time specified by the
+C<$vcdclose> keyword in the VCD file, scaled appropriately.  It returns the
+last closetime for the last VCD file parsed.  If called before a file is
+parsed, it returns an undefined value.  For the 4-state VCD format, it
+returns an undefined value.
+
+    my $vcd = parse_vcd($file); # Parse a file first
+    my $ct  = get_closetime();  # Then query the closetime
 
 =head2 get_date( )
 
@@ -561,8 +597,6 @@ L<Carp|Carp> Core module.
 
 =head1 LIMITATIONS
 
-The extended VCD format (with strength information) is not supported.
-
 The default mode of C<parse_vcd> is to load the entire VCD file into the
 data structure.  This could be a problem for huge VCD files.  The best solution
 to any memory problem is to plan ahead and keep VCD files as small as possible.
@@ -582,9 +616,10 @@ There are no known bugs in this module.
 
 Refer to the following Verilog documentation:
 
-    IEEE Standard for Verilog (c) Hardware Description Language
-    IEEE Std 1364-2005
-    Section 18.2, "Format of four-state VCD file"
+    IEEE Standard for SystemVerilog
+    Unified Hardware Design, Specification and Verification Language
+    IEEE Std 1800-2012
+    Section 21.7, "Value change dump (VCD) files"
 
 =head1 AUTHOR
 

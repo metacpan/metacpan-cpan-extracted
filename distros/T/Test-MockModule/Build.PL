@@ -27,6 +27,7 @@ my $builder = Module::Build->new(
 	},
 	build_requires => {
 		'Test::More'          => 0.88,
+		'Test::Warnings'      => 0
 	},
 
 	add_to_cleanup => [

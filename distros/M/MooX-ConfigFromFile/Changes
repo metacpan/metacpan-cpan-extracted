@@ -1,5 +1,15 @@
 Revision history for MooX-ConfigFromFile
 
+0.009	2018-05-01
+    - ensure maximal test coverage
+    - improve test diagnostics
+    - fix distribution META data
+    - add license files
+    - introduce sorted_loaded_config to allow implementation
+      of different sort strategies
+    - allow tune merge behavior
+    - improve documentation
+
 0.008	2017-05-23
     - ensure all tests run and report instead of swallowing issues
     - make tests passing with perl 5.26

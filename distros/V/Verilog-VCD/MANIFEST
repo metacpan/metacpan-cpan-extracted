@@ -11,13 +11,16 @@ lib/Verilog/VCD.pm
 t/cr_lf.t
 t/dumps.t
 t/list_sigs.t
+t/parse_evcd.t
 t/parse_vcd.t
 t/pod.t
 t/use_stdout.t
+t/use_stdout_evcd.t
 t/vcd/bad-timescale1.vcd
 t/vcd/bad-timescale2.vcd
 t/vcd/cr-lf.vcd
 t/vcd/nc.vcd
 t/vcd/one-sig.vcd
 t/vcd/plain.txt
+t/vcd/vcs.evcd
 t/vcd/vcs.vcd

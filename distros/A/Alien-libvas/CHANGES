@@ -1,0 +1,163 @@
+==================================================
+Changes from 2017-05-06 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.215 at 2018-05-06 13:03:20 +0000
+------------------------------------------
+
+  Change: fcbbd7097570de560ad292a33b2dc85fd9ffe372
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-06 15:02:26 +0000
+
+    Use AutoPrereqs 
+
+------------------------------------------
+version 0.214 at 2018-05-06 12:53:30 +0000
+------------------------------------------
+
+  Change: 83cda1214ae7073bb8825256d740355c2999d7eb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-06 14:53:30 +0000
+
+    Migrate to alienfile and Alien::cmake3 
+
+------------------------------------------
+version 0.213 at 2017-09-14 12:53:29 +0000
+------------------------------------------
+
+  Change: afceb024deb7bda10c38a489d89bd714947c03dd
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-14 14:53:29 +0000
+
+    Add NEWS file with git-log 
+
+------------------------------------------
+version 0.212 at 2017-09-14 12:28:45 +0000
+------------------------------------------
+
+  Change: 58c72e16bc55bcde217ee4bfa6c03ddab7c864bf
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-14 14:28:45 +0000
+
+    Decrease minimum Perl version to 5.8 
+
+------------------------------------------
+version 0.211 at 2017-09-14 10:12:13 +0000
+------------------------------------------
+
+  Change: 99ae4bd36a9724178ba6e24f9032dfcaf0d791af
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-14 12:12:13 +0000
+
+    Report newly implemened vas_error via TAP diag
+
+    This coupled with the new dependency on A::B::ModuleBuild should help
+    track down the cause of these procfs backend test failures:
+    http://www.cpantesters.org/cpan/report/12565a8a-9804-11e7-bde7-8322e5
+    2e4961
+    http://www.cpantesters.org/cpan/report/104f4ca6-9804-11e7-bde7-8322e5
+    2e4961
+    http://www.cpantesters.org/cpan/report/140a3234-9804-11e7-bde7-8322e5
+    2e4961
+    http://www.cpantesters.org/cpan/report/91b90910-97a2-11e7-8929-daabf0
+    ac1f1e 
+
+------------------------------------------
+version 0.210 at 2017-09-07 17:47:14 +0000
+------------------------------------------
+
+  Change: ef4101fbe13bedbd129fcbb01c60bd740c49099a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-07 19:47:14 +0000
+
+    Explicitly ask for PIC in static library 
+
+------------------------------------------
+version 0.205 at 2017-09-07 11:49:54 +0000
+------------------------------------------
+
+  Change: 3be08e9cf3ce52b21dd2ca9b8b0e2073c21e6013
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-07 13:49:54 +0000
+
+    Bump to v0.205 
+
+  Change: 7ebe16059e70f886cea2fcbf563071738f2cf090
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-07 13:45:04 +0000
+
+    Report Backend used as test diagnostic info 
+
+  Change: 9f945d74abcd1853cce20f730a7ee3c13a1c6608
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-07 13:44:37 +0000
+
+    Isolate dynamic libraries 
+
+  Change: 2b2cf8a2cf2a4d17aff5d4dda34613f3863658e5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-05 17:36:44 +0000
+
+    Add simple self-test
+
+    on ptrace(2) backends (BSDs), it just tests memcpy, but better than
+    nothing. 
+
+------------------------------------------
+version 0.204 at 2017-09-04 20:42:46 +0000
+------------------------------------------
+
+  Change: 2b9773d77ea996742c4ed26f08e5f934976dfee9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-04 22:42:46 +0000
+
+    Require Perl v5.10 at minimum 
+
+------------------------------------------
+version 0.203 at 2017-09-04 11:27:40 +0000
+------------------------------------------
+
+  Change: ed30d09fcb31a68b2ed3b6b216240162c38ca41a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-04 13:27:40 +0000
+
+    Fix CMake defaulting to cl on Windows builds
+
+    If no cl is in PATH, $Config{cc} is taken 
+
+------------------------------------------
+version 0.202 at 2017-09-02 15:29:24 +0000
+------------------------------------------
+
+  Change: 6546c76fa108d5cb2d4cd0c64d4b2033850cc56a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-02 17:29:24 +0000
+
+    Run C test suite on install
+
+    Preferably, this would run in the test stage, but I don't know how. 
+
+-----------------------------------------
+version 0.20 at 2017-08-31 22:09:15 +0000
+-----------------------------------------
+
+  Change: 738f331ff79b469d589f3d8eb64d15071dca635a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-01 00:09:15 +0000
+
+    Add PLATFORMs section to POD 
+
+-----------------------------------------
+version 0.15 at 2017-08-20 13:39:10 +0000
+-----------------------------------------
+
+  Change: be9855e908d7e999e7fc622c5a578e83fc701e19
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-08-20 15:39:10 +0000
+
+    Add Travis CI integration 
+
+================================================
+Plus 5 releases after 2017-05-06 00:00:00 +0000.
+================================================

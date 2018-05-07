@@ -1,0 +1,33 @@
+Log-Log4perl-Layout-ColoredPatternLayout version 0.01
+=====================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Log::Log4perl
+    Term::ANSIColor
+
+The following modules are also required for testing:
+
+    Test::More
+    Log::Log4perl
+    Term::ANSIColor
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2018 by Tom Gracey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

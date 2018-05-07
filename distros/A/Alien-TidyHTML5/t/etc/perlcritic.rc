@@ -1,0 +1,4 @@
+; -*- conf -*-
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = alienfile

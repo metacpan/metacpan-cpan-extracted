@@ -1,0 +1,48 @@
+{
+   "abstract" : "select backup according to algo",
+   "author" : [
+      "Boris D\u00e4ppen <bdaeppen.perl@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Backup-Hanoi",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "feature" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Script" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/borisdaeppen/Backup-Hanoi.git",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com:borisdaeppen/Backup-Hanoi.git",
+         "web" : "https://github.com/borisdaeppen/Backup-Hanoi.git"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

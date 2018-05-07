@@ -1,5 +1,29 @@
 Revision history for Const-Exporter
 
+v0.4.0    2018-05-02 20:42:40+01:00 Europe/London
+  [Enhancements]
+  - Enable strictures.
+
+  - Simplified the enum generation code, and added the ability to
+    specify a custom incrementing function.
+
+  - Check values against types.
+
+  - Miscellaneous improvements to the import method.
+
+  [Documentation]
+  - Added note about support for older Perl versions.
+
+  [Tests]
+  - Remove unnecessary compilation test.
+
+  - Add tests for const export.
+
+  - Added better tests for enums.
+
+  [Toolchain]
+  - Remove core and redundant prerequisites.
+
 v0.3.1    2018-01-16 23:41:07+00:00 Europe/London
   [Enhancements]
   - Check for arrayrefs instead of unblessed arrayrefs.

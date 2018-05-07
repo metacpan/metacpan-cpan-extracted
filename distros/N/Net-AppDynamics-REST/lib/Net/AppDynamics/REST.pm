@@ -16,7 +16,6 @@ use namespace::clean;
 BEGIN { 
   with 'HTTP::MultiGet::Role';
 }
-our $AUTOLOAD;
  
 
 =head1 NAME
@@ -76,7 +75,7 @@ This module makes use of the following roles:  L<HTTP::MultiGet::Role>, L<Log::L
 
 =cut
 
-our $VERSION="1.004";
+our $VERSION="1.005";
 
 has USER=>(
   is=>'ro',
@@ -728,6 +727,43 @@ sub que_find_health_rule_violations {
   return $id;
 }
 
+=back 
+
+=head1 Listing Metrics
+
+=head2 Getting Metrics for an Application
+
+=over 4
+
+=item * Non Blocking my $result=$self->que_get_application_metric($cb,$application,,%args);
+
+Queues a request to fetch a given metric
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
+
+=item * Blocking my $result=$self->get_application_metric($application,,%args);
+
+In a blocking context, $result contains the results when true and why it failed when false.
+
+=cut
+
+sub que_get_application_metric {
+  my ($self,$cb,$app,@args)=@_;
+
+  my $path='/controller/rest/applications/'.$app.'/metric-data';
+  my $get=$self->create_get($path,@args);
+  return $self->queue_request($get,$cb);
+}
+
 =back
 
 =head1 Resolving Objects
@@ -867,13 +903,13 @@ Create a request object for $path with the required arguments
 =cut
 
 sub create_get {
-  my ($self,$path,%args)=@_;
+  my ($self,$path,@args)=@_;
 
   my $str =$self->base_url.$path.'?';
-  $args{output}='JSON';
+  push @args,'output','JSON';
 
   my $count=0;
-  while(my ($key,$value)=each %args) {
+  while(my ($key,$value)=splice @args,0,2) {
     if($count++ ==0) {
       $str .="$key=".uri_escape($value);
     } else {

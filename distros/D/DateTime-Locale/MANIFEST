@@ -9,6 +9,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+appveyor.yml
 cpanfile
 dist.ini
 eg/new-stats

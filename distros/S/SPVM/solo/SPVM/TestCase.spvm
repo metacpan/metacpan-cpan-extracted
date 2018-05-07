@@ -50,6 +50,54 @@ SPVM::Test - SPVM test module
   sub DOUBLE_PRECICE : double () { return 2147483647.0; }
   
   sub main : int ($mvar : int) {
+    # Pre increment and assign
+    {
+      my $num1 = 0;
+      my $num2 = ++$num1;
+      print((String)$num2);
+    }
+
+    # Pre decrement and assign
+    {
+      my $num1 = 0;
+      my $num2 = --$num1;
+      print((String)$num2);
+    }
+
+    # Post increment and assign
+    {
+      my $num1 = 0;
+      my $num2 = $num1++;
+      print((String)$num2);
+    }
+
+    # Post decrement and assign
+    {
+      my $num1 = 0;
+      my $num2 = $num1--;
+      print((String)$num2);
+    }
+    
+    # UNDEF
+    {
+      $PACKAGE_VAR_TEST_CASE = undef;
+      $@ = undef;
+      {
+        my $test_case = new TestCase;
+        $test_case->{minimal} = undef;
+      }
+      {
+        my $nums = new TestCase[3];
+        $nums->[0] = undef;
+      }
+      {
+        my $minimal = new TestCase::Minimal;
+        $minimal = undef;
+      }
+      {
+        receive_undef(undef);
+      }
+    }
     
     # Concat
     {
@@ -1331,6 +1379,10 @@ SPVM::Test - SPVM test module
       $change_cnt--;
     }
   }
+  sub receive_undef : void ($test_case : TestCase) {
+    
+  }
+
 }
 
 =head1 NAME

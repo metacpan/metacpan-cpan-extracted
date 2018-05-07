@@ -1,53 +1,35 @@
 # -*- cperl -*-
 
-use warnings;
-
 use ExtUtils::testlib;
 use Test::Warn;
 use Test::More ;
 use Test::Memory::Cycle;
 use Test::Exception;
 use Config::Model;
-use Log::Log4perl qw(:easy :levels);
+use Config::Model::Tester::Setup qw/init_test/;
 
 use strict;
+use warnings;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
+my ($model, $trace) = init_test();
 
-my $trace = $arg =~ /t/ ? 1 : 0;
-$log  = 1 if $arg =~ /l/;
-$show = 1 if $arg =~ /s/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok( 1, "Compilation done" );
-
-# minimal set up to get things working
-my $model = Config::Model->new( legacy => 'ignore', );
 $model->create_config_class(
     name      => 'Host',
     'element' => [
         if => {
             type              => 'hash',
             index_type        => 'string',
-            cargo_type        => 'node',
-            config_class_name => 'If',
+            cargo => {
+                type        => 'node',
+                config_class_name => 'If'
+            },
         },
         trap => {
             type       => 'leaf',
             value_type => 'string'
-        } ] );
+        }
+    ]
+);
 
 $model->create_config_class(
     name    => 'If',
@@ -55,7 +37,9 @@ $model->create_config_class(
         ip => {
             type       => 'leaf',
             value_type => 'string'
-        } ] );
+        }
+    ]
+);
 
 $model->create_config_class(
     name    => 'Lan',
@@ -63,10 +47,13 @@ $model->create_config_class(
         node => {
             type              => 'hash',
             index_type        => 'string',
-            cargo_type        => 'node',
-            config_class_name => 'Node',
-        },
-    ] );
+            cargo => {
+                type        => 'node',
+                config_class_name => 'Node',
+            },
+        }
+    ]
+);
 
 $model->create_config_class(
     name    => 'Node',
@@ -79,17 +66,25 @@ $model->create_config_class(
         if => {
             type       => 'leaf',
             value_type => 'reference',
-            refer_to   => [ '  ! host:$h if ', h => '- host' ]
+            computed_refer_to   => {
+                formula => '  ! host:$h if ',
+                variables => { h => '- host' }
+            }
         },
         ip => {
             type       => 'leaf',
             value_type => 'string',
-            compute    => [
-                '$ip',
-                ip   => '! host:$h if:$card ip',
-                h    => '- host',
-                card => '- if'
-            ] } ] );
+            compute    => {
+                formula => '$ip',
+                variables => {
+                    ip   => '! host:$h if:$card ip',
+                    h    => '- host',
+                    card => '- if'
+                }
+            }
+        }
+    ]
+);
 
 $model->create_config_class(
     name    => 'Master',
@@ -97,36 +92,42 @@ $model->create_config_class(
         host => {
             type              => 'hash',
             index_type        => 'string',
-            cargo_type        => 'node',
-            config_class_name => 'Host'
+            cargo => {
+                type        => 'node',
+                config_class_name => 'Host'
+            }
         },
         lan => {
             type              => 'hash',
             index_type        => 'string',
-            cargo_type        => 'node',
-            config_class_name => 'Lan'
+            cargo => {
+                type        => 'node',
+                config_class_name => 'Lan'
+            }
         },
         host_reference => {
             type       => 'leaf',
             value_type => 'reference',
-            refer_to   => ['! host '],
+            refer_to   => '! host ',
         },
         host_and_choice => {
             type       => 'leaf',
             value_type => 'reference',
-            refer_to   => ['! host '],
+            refer_to   => '! host ',
             choice     => [qw/foo bar/]
         },
         host_and_replace => {
             type       => 'leaf',
             value_type => 'reference',
-            refer_to   => ['! host '],
+            refer_to   => '! host ',
             replace => { 'fou' => 'Foo', 'barre' => 'Bar' },
         },
         dumb_list => {
             type       => 'list',
-            cargo_type => 'leaf',
-            cargo_args => { value_type => 'string' }
+            cargo => {
+                type => 'leaf',
+                value_type => 'string'
+            }
         },
         refer_to_list_enum => {
             type       => 'leaf',

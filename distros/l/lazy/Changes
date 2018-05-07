@@ -1,4 +1,13 @@
 Revision history for lazy
 
+0.000003  2018-05-05 04:38:01Z
+    - local::lib is now a required dependency
+
+0.000002  2018-05-04 19:15:11Z
+    - App::cpm 0.973 broke this module. Switch to using App::cpm::CLI to fix
+      this.
+    - Default to global installs, except when local::lib has already been
+      loaded
+
 0.000001  2017-09-01 03:21:29Z
     - Initial release.

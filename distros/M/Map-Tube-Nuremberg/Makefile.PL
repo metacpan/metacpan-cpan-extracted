@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Moo" => "2.000000",
     "namespace::clean" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -3,22 +3,21 @@ abstract: 'Package description'
 author:
   - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
 build_requires:
-  Test::Deep: 0
-  Test::More: 0
-  lib: 0
+  Test::Deep: '0'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: QBit-Application
 requires:
-  QBit::Class: 0
-  base: 0
-  qbit: 0
-  strict: 0
-  warnings: 0
-version: 0.015
+  QBit::Class: '0'
+  base: '0'
+  qbit: '0'
+  strict: '0'
+version: '0.016'

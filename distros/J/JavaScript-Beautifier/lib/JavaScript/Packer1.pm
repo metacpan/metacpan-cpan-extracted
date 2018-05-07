@@ -1,11 +1,11 @@
-package  # hidden from PAUSE
-  JavaScript::Packer1;
+package    # hidden from PAUSE
+    JavaScript::Packer1;
 
 use warnings;
 use strict;
 
-our $VERSION   = '0.24';
-# our $AUTHORITY = 'cpan:FAYLAND'; # from eleonora45
+our $VERSION   = '0.25';
+our $AUTHORITY = 'cpan:FAYLAND';
 
 use base 'Exporter';
 use vars qw/@EXPORT_OK/;
@@ -19,6 +19,9 @@ my ($decoded);
 
 sub check_packer($) {
     my ($line) = @_;
+    $before  = '';
+    $after   = '';
+    $decoded = '';
     if ($line =~ /eval\(function\(p,a,c,k,e,([d|r])\)\{/) {
         return 1;
     } else {
@@ -31,16 +34,13 @@ sub get_table_elements($) {
     $before = '';
     $after  = '';
     # caret2.js miatt
-    if ($line =~ /eval\(function\(p,a,c,k,e,[d|r]\)\{.*?\}?\}?return \w+\}\('(.*?)(\}?\)?;?)?',(\d+),(\d+),'(.*?)'\.split\('(.*?)'\).*?\)\)/) {
-        if (defined($2)) {
-            $payload = $1 . $2;
-        } else {
-            $payload = $1;
-        }
-        $radix     = $3;
-        $count     = $4;
-        $symtab    = $5;
-        $splitchar = $6;
+    if ($line =~ /eval\(function\(p,a,c,k,e,[d|r]\)\{.*?\}?\}?return \w+\}\('(.*?[^\\])',(\d+|\[\]),(\d+),'(.*?)'\.split\('(.*?)'\).*?\)\)/) {
+        $payload = $1;
+        if   ($2 eq '[]') { $radix = 62; }
+        else              { $radix = $2; }
+        $count     = $3;
+        $symtab    = $4;
+        $splitchar = $5;
         $after     = $';
         $before    = $`;
         if ($splitchar eq '\\u005e') { $splitchar = '^'; }
@@ -73,11 +73,16 @@ sub do_decode() {
     $rest = $payload;
     while ($rest =~ /(\W+)?(\w+)(\W+)?/) {
         $rest = $';
-        $ix1  = get_index($2);
-        if (defined($1)) {
+        $ix1  = 0;
+        if (defined($2)) { $ix1 = get_index($2); }
+        if (defined($1) and defined($3)) {
             $decoded .= "$1$symbols[$ix1]$3";
-        } else {
+        } elsif (defined($1)) {
+            $decoded .= "$1$symbols[$ix1]";
+        } elsif (defined($3)) {
             $decoded .= "$symbols[$ix1]$3";
+        } elsif (defined($2)) {
+            $decoded .= "$symbols[$ix1]";
         }
     }
     $decoded .= $rest;
@@ -94,9 +99,8 @@ sub js_packer {
             $retval = $js_source_code;
         }
         return $retval;
-    } else {
-      return $js_source_code;
     }
+    return $js_source_code;
 }
 
 1;

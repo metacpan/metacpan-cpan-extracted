@@ -16,7 +16,8 @@ use XML::Grammar::Fortune::ToText;
 
 # TEST:$num_texts=18
 
-my @tests = (qw(
+my @tests = (
+    qw(
         raw-fort-empty-info-1
         raw-fort-with-info-1
         irc-conversation-1
@@ -35,7 +36,8 @@ my @tests = (qw(
         screenplay-fort-sample-2-with-italics
         screenplay-fort-sample-2-long-line
         screenplay-fort-sample-3-with-inlinedesc
-    ));
+        )
+);
 
 sub read_file
 {
@@ -55,11 +57,11 @@ sub read_file
 
 foreach my $fn_base (@tests)
 {
-    my $buffer = "";
-    my $io = IO::String->new($buffer);
+    my $buffer    = "";
+    my $io        = IO::String->new($buffer);
     my $converter = XML::Grammar::Fortune::ToText->new(
         {
-            'input' => "./t/data/xml/$fn_base.xml",
+            'input'  => "./t/data/xml/$fn_base.xml",
             'output' => $io,
         }
     );
@@ -67,7 +69,7 @@ foreach my $fn_base (@tests)
     $converter->run();
 
     # TEST*$num_texts
-    eq_or_diff (
+    eq_or_diff(
         $buffer,
         read_file("./t/data/text-results/$fn_base.txt"),
         "Testing for Good Conversion to Text of '$fn_base'",

@@ -31,10 +31,13 @@ FlushSize
 Indexer
 Lhotsky
 LoggingConfig
+MaxConnsPerServer
+MaxConnsTotal
 POE
 StatsHandler
 StatsInterval
 bin
 brad
+elasticsearch
 file
 lib

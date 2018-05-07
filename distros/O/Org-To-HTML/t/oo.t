@@ -20,7 +20,7 @@ _
 
 # test OO interface
 my $oeh = Org::To::HTML->new(naked=>1);
-is($oeh->export($doc), "<H1>heading 1</H1>\n\n", "export method");
+is($oeh->export($doc), "<h1>heading 1</h1>\n\n", "export method");
 
 # test subclass
 package MyHTMLExporter;
@@ -33,6 +33,6 @@ sub export_setting {
 package main;
 $oeh = MyHTMLExporter->new(naked=>1);
 is($oeh->export($doc),
-   "<!-- setting:TODO -->\n<H1>heading 1</H1>\n\n", "export method (subclass)");
+   "<!-- setting:TODO -->\n<h1>heading 1</h1>\n\n", "export method (subclass)");
 
 done_testing();

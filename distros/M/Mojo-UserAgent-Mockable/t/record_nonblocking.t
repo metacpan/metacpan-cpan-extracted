@@ -9,7 +9,7 @@ use Test::Most;
 my $dir = File::Temp->newdir;
 
 my @transactions;
-push @transactions, Mojo::UserAgent->new->get(q{http://www.vam.ac.uk/api/json/museumobject/O1}), Mojo::UserAgent->new->get(q{http://www.vam.ac.uk/api/json/museumobject/O1}); 
+push @transactions, Mojo::UserAgent->new->get(q{https://www.vam.ac.uk/api/json/museumobject/O1}), Mojo::UserAgent->new->get(q{https://www.vam.ac.uk/api/json/museumobject/O1}); 
 
 my @results = map { $_->res->json } @transactions;
 

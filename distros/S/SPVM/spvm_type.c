@@ -15,12 +15,14 @@
 
 const char* const SPVM_TYPE_C_ID_NAMES[] = {
   "void",
+  "undef",
   "byte",
   "short",
   "int",
   "long",
   "float",
   "double",
+  "Object",
   "String",
   "byte[]",
   "short[]",
@@ -28,6 +30,7 @@ const char* const SPVM_TYPE_C_ID_NAMES[] = {
   "long[]",
   "float[]",
   "double[]",
+  "Object[]",
   "String[]",
 };
 
@@ -43,6 +46,16 @@ SPVM_TYPE* SPVM_TYPE_get_void_type(SPVM_COMPILER* compiler) {
   (void)compiler;
   
   SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, SPVM_TYPE_C_ID_VOID);
+  
+  assert(type);
+  
+  return type;
+}
+
+SPVM_TYPE* SPVM_TYPE_get_undef_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, SPVM_TYPE_C_ID_UNDEF);
   
   assert(type);
   
@@ -129,6 +142,16 @@ SPVM_TYPE* SPVM_TYPE_get_string_type(SPVM_COMPILER* compiler) {
   return type;
 }
 
+SPVM_TYPE* SPVM_TYPE_get_object_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, SPVM_TYPE_C_ID_OBJECT);
+  
+  assert(type);
+  
+  return type;
+}
+
 char* SPVM_TYPE_get_base_name(SPVM_COMPILER* compiler, const char* type_name) {
   int32_t type_name_length = (int32_t)strlen(type_name);
   char* type_base_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, type_name_length);
@@ -201,6 +224,13 @@ _Bool SPVM_TYPE_is_array(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   return type->dimension > 0;
 }
 
+_Bool SPVM_TYPE_is_any_object(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
+  (void)compiler;
+  
+  return type && type->id == SPVM_TYPE_C_ID_OBJECT;
+}
+
+
 _Bool SPVM_TYPE_is_string(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   (void)compiler;
   
@@ -259,6 +289,17 @@ _Bool SPVM_TYPE_is_object(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   (void)compiler;
   
   if (type->id > SPVM_TYPE_C_ID_DOUBLE) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+_Bool SPVM_TYPE_is_undef(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
+  (void)compiler;
+  
+  if (type->id == SPVM_TYPE_C_ID_UNDEF) {
     return 1;
   }
   else {

@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Histogram::Ybins::ImpliedEdits;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram.
 
@@ -68,7 +68,7 @@ Chart::Plotly::Trace::Histogram::Ybins - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

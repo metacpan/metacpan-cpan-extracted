@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune::ToText;
-
+$XML::Grammar::Fortune::ToText::VERSION = '0.0701';
 use warnings;
 use strict;
 
@@ -11,67 +11,34 @@ use Carp ();
 
 use MooX qw/late/;
 
-has '_formatter' => (is => 'rw',
+has '_formatter' => (
+    is      => 'rw',
     default => sub {
         return Text::Format->new(
             {
-                columns => 78,
+                columns     => 78,
                 firstIndent => 0,
-                leftMargin => 0,
+                leftMargin  => 0,
             }
         );
     },
 );
-has '_is_first_line' => (isa => "Bool", is => 'rw');
-has '_input' => (is => 'rw', init_arg => 'input', required => 1,);
-has '_output' => (is => 'rw', init_arg => 'output', required => 1,);
-has '_this_line' => (isa => 'Str', is => 'rw', default => '', );
-has '_buf' => (isa => 'ScalarRef[Str]', is => 'rw',
-    default => sub { my $s = ''; return \$s; });
+has '_is_first_line' => ( isa => "Bool", is       => 'rw' );
+has '_input'         => ( is  => 'rw',   init_arg => 'input', required => 1, );
+has '_output'        => ( is  => 'rw',   init_arg => 'output', required => 1, );
+has '_this_line'     => ( isa => 'Str',  is       => 'rw', default => '', );
+has '_buf' => (
+    isa     => 'ScalarRef[Str]',
+    is      => 'rw',
+    default => sub { my $s = ''; return \$s; }
+);
 
-=head1 NAME
-
-XML::Grammar::Fortune::ToText - convert the FortunesXML grammar to plaintext.
-
-=head1 VERSION
-
-Version 0.0600
-
-=cut
-
-our $VERSION = '0.0600';
-
-
-=head1 SYNOPSIS
-
-    use XML::Grammar::Fortune::ToText;
-
-    open my $out_fh, '>', 'my-fortunes.txt'
-        or die "Cannot open 'my-fortunes.txt' for writing - $!";
-    my $converter = XML::Grammar::Fortune::ToText->new(
-        {
-            'input' => "my-fortunes.fortune-xml.xml",
-            'output' => $out_fh,
-        }
-    );
-
-    $converter->run();
-
-    close($out_fh);
-
-=head1 FUNCTIONS
-
-=head2 my $processor = XML::Grammar::Fortune::ToText->new({input => "path/to/file.xml", output => \*STDOUT,});
-
-Creates a new processor with input and output files.
-
-=cut
 
 sub _out
 {
     my $self = shift;
 
-    ${$self->_buf()} .= join('', @_);
+    ${ $self->_buf() } .= join( '', @_ );
 
     return;
 }
@@ -85,11 +52,11 @@ sub _start_new_line
 
 sub _render_single_fortune_cookie
 {
-    my ($self, $fortune_node) = @_;
+    my ( $self, $fortune_node ) = @_;
 
     my ($node) = $fortune_node->findnodes("raw|irc|screenplay|quote");
 
-    my $method = sprintf("_process_%s_node", $node->localname());
+    my $method = sprintf( "_process_%s_node", $node->localname() );
 
     $self->$method($node);
 
@@ -105,26 +72,25 @@ sub _output_next_fortune_delim
     return $self->_out("%\n");
 }
 
-sub _do_nothing {}
+sub _do_nothing { }
 
 sub _iterate_on_child_elems
 {
-    my ($self, $top_elem, $xpath, $args) = @_;
+    my ( $self, $top_elem, $xpath, $args ) = @_;
 
-    my $process = $args->{'process'};
+    my $process            = $args->{'process'};
     my $if_remainaing_meth = $args->{'if_more'};
-    my $continue_cb = ($args->{'cont'} || \&_do_nothing);
+    my $continue_cb        = ( $args->{'cont'} || \&_do_nothing );
 
-    my $process_cb =
-    (
-        (ref($process) eq "CODE")
+    my $process_cb = (
+        ( ref($process) eq "CODE" )
         ? $process
         : sub { return $self->$process(shift); }
     );
 
     my $list = $top_elem->findnodes($xpath);
 
-    while (my $elem = $list->shift())
+    while ( my $elem = $list->shift() )
     {
         $process_cb->($elem);
     }
@@ -132,7 +98,7 @@ sub _iterate_on_child_elems
     {
         $continue_cb->();
 
-        if ($list->size())
+        if ( $list->size() )
         {
             $self->$if_remainaing_meth();
         }
@@ -141,17 +107,12 @@ sub _iterate_on_child_elems
     return;
 }
 
-=head2 $self->run()
-
-Runs the processor.
-
-=cut
 
 sub run
 {
     my $self = shift;
 
-    my $xml = XML::LibXML->new->parse_file($self->_input());
+    my $xml = XML::LibXML->new->parse_file( $self->_input() );
 
     $self->_iterate_on_child_elems(
         $xml,
@@ -162,7 +123,7 @@ sub run
         }
     );
 
-    my $buf = ${$self->_buf()};
+    my $buf = ${ $self->_buf() };
 
     $buf =~ s/[ \t]+$//gms;
 
@@ -173,9 +134,9 @@ sub run
 
 sub _render_info_if_exists
 {
-    my ($self, $fortune_node) = @_;
+    my ( $self, $fortune_node ) = @_;
 
-    if (my ($info_node) = $fortune_node->findnodes("descendant::info"))
+    if ( my ($info_node) = $fortune_node->findnodes("descendant::info") )
     {
         $self->_render_info_node($info_node);
     }
@@ -185,20 +146,20 @@ sub _render_info_if_exists
 
 sub _process_raw_node
 {
-    my ($self, $raw_node) = @_;
+    my ( $self, $raw_node ) = @_;
 
     my ($text_node) = $raw_node->findnodes("body/text");
 
     my @text_childs = $text_node->childNodes();
 
-    if (@text_childs != 1)
+    if ( @text_childs != 1 )
     {
         Carp::confess('@cdata is not 1');
     }
 
     my $cdata = $text_childs[0];
 
-    if ($cdata->nodeType() != XML_CDATA_SECTION_NODE())
+    if ( $cdata->nodeType() != XML_CDATA_SECTION_NODE() )
     {
         Carp::confess("Not a cdata");
     }
@@ -213,7 +174,7 @@ sub _process_raw_node
 
 sub _process_irc_node
 {
-    my ($self, $irc_node) = @_;
+    my ( $self, $irc_node ) = @_;
 
     my ($body_node) = $irc_node->findnodes("body");
 
@@ -225,138 +186,128 @@ sub _process_irc_node
     my @messages;
     foreach my $line (@lines_list)
     {
-        if ($line->localname() eq "saying")
+        if ( $line->localname() eq "saying" )
         {
             my $nick = $line->getAttribute("who");
             push @messages,
                 {
-                    type => "say",
-                    nick => $nick,
-                    msg => $line->textContent(),
+                type => "say",
+                nick => $nick,
+                msg  => $line->textContent(),
                 };
 
-            $longest_nick_len = max($longest_nick_len, length($nick));
+            $longest_nick_len = max( $longest_nick_len, length($nick) );
         }
-        elsif ($line->localname() eq "me_is")
+        elsif ( $line->localname() eq "me_is" )
         {
             my $nick = $line->getAttribute("who");
             push @messages,
                 {
-                    type => "me_is",
-                    nick => $nick,
-                    msg => $line->textContent(),
+                type => "me_is",
+                nick => $nick,
+                msg  => $line->textContent(),
                 };
 
-            $longest_nick_len = max($longest_nick_len, length("*"));
+            $longest_nick_len = max( $longest_nick_len, length("*") );
         }
-        elsif ($line->localname() eq "joins")
+        elsif ( $line->localname() eq "joins" )
         {
             my $nick = $line->getAttribute("who");
             push @messages,
                 {
-                    type => "joins",
-                    nick => $nick,
-                    msg => $line->textContent(),
+                type => "joins",
+                nick => $nick,
+                msg  => $line->textContent(),
                 };
 
-            $longest_nick_len = max($longest_nick_len, length("<--"));
+            $longest_nick_len = max( $longest_nick_len, length("<--") );
         }
-        elsif ($line->localname() eq "leaves")
+        elsif ( $line->localname() eq "leaves" )
         {
             my $nick = $line->getAttribute("who");
             push @messages,
                 {
-                    type => "leaves",
-                    nick => $nick,
-                    msg => $line->textContent(),
+                type => "leaves",
+                nick => $nick,
+                msg  => $line->textContent(),
                 };
 
-            $longest_nick_len = max($longest_nick_len, length("-->"));
+            $longest_nick_len = max( $longest_nick_len, length("-->") );
         }
         else
         {
             Carp::confess(
-                'Unimplemented localname "' . $line->localname() . '"'
-            );
+                'Unimplemented localname "' . $line->localname() . '"' );
         }
     }
 
-=begin nothing
 
-    {
-        elsif (m{^[^\-]* ---\t(\S+) is now known as (\S+)})
+    my $formatter = Text::Format->new(
         {
-            my ($old_nick, $new_nick) = ($1, $2);
-            push @messages,
-                {'type' => "change_nick", 'old' => $old_nick, 'new' => $new_nick};
-            $longest_nick_len =
-                max($longest_nick_len, length($old_nick), length($new_nick));
+            columns     => 72 - 1 - 2 - $longest_nick_len,
+            firstIndent => 0,
+            leftMargin  => 0,
         }
-        else
-        {
-           push @messages, {'type' => "raw", 'msg' => $_};
-        }
-    }
+    );
 
-=end nothing
-
-=cut
-
-    my $formatter =
-        Text::Format->new(
-            {
-                columns => 72-1-2-$longest_nick_len,
-                firstIndent => 0,
-                leftMargin => 0,
-            }
-        );
-
-    my $line_starts_at = $longest_nick_len
-        + 1  # For the <
-        + 1  # For the >
-        + 1  # For the space at the beginning
-        + 2  # For the space after the nick.
+    my $line_starts_at = $longest_nick_len + 1  # For the <
+        + 1                                     # For the >
+        + 1                                     # For the space at the beginning
+        + 2                                     # For the space after the nick.
         ;
 
-    my $nick_len_with_delim = $longest_nick_len+2;
+    my $nick_len_with_delim = $longest_nick_len + 2;
 
     foreach my $m (@messages)
     {
-        my %cmds = ("me_is" => "*", "joins" => "-->", "leaves" => "<--",);
+        my %cmds = ( "me_is" => "*", "joins" => "-->", "leaves" => "<--", );
 
-        if ($m->{'type'} eq "say")
+        if ( $m->{'type'} eq "say" )
         {
-            my @lines = ($formatter->format([$m->{'msg'}]));
-            $self->_out(" " . sprintf("%${nick_len_with_delim}s", "<" . $m->{'nick'} . ">") .
-                "  " . $lines[0]);
-            $self->_out(join("",
-                    map { (" " x $line_starts_at) . $_ }
-                    @lines[1..$#lines]
-                )
+            my @lines = ( $formatter->format( [ $m->{'msg'} ] ) );
+            $self->_out(
+                " "
+                    . sprintf( "%${nick_len_with_delim}s",
+                    "<" . $m->{'nick'} . ">" )
+                    . "  "
+                    . $lines[0]
+            );
+            $self->_out(
+                join( "",
+                    map { ( " " x $line_starts_at ) . $_ }
+                        @lines[ 1 .. $#lines ] )
             );
         }
-        elsif ($m->{'type'} eq "raw")
+        elsif ( $m->{'type'} eq "raw" )
         {
-            $self->_out($m->{'msg'}. "\n");
+            $self->_out( $m->{'msg'} . "\n" );
         }
-        elsif ($m->{'type'} eq "change_nick")
+        elsif ( $m->{'type'} eq "change_nick" )
         {
-            $self->_out((" " x ($line_starts_at)) .
-                $m->{'old'} ." is now known as " . $m->{'new'} . "\n");
+            $self->_out( ( " " x ($line_starts_at) )
+                . $m->{'old'}
+                    . " is now known as "
+                    . $m->{'new'}
+                    . "\n" );
         }
-        elsif (exists($cmds{$m->{'type'}}))
+        elsif ( exists( $cmds{ $m->{'type'} } ) )
         {
-            my @lines = $formatter->format(
-                    [$m->{'nick'} . " " . $m->{'msg'}]
+            my @lines =
+                $formatter->format( [ $m->{'nick'} . " " . $m->{'msg'} ] );
+
+            $self->_out(
+                " "
+                    . sprintf(
+                    "%${nick_len_with_delim}s", $cmds{ $m->{'type'} }
+                    )
+                    . "  "
+                    . $lines[0]
             );
 
-            $self->_out(" " . sprintf("%${nick_len_with_delim}s",
-                    $cmds{$m->{'type'}}) . "  " . $lines[0]);
-
-            $self->_out(join("",
-                    map { (" " x $line_starts_at) . $_ }
-                    @lines[1..$#lines]
-                )
+            $self->_out(
+                join( "",
+                    map { ( " " x $line_starts_at ) . $_ }
+                        @lines[ 1 .. $#lines ] )
             );
         }
     }
@@ -366,39 +317,37 @@ sub _process_irc_node
 
 sub _render_screenplay_paras
 {
-    my ($self, $portion) = @_;
-    return $self->_render_portion_paras($portion, {para_is => "para"});
+    my ( $self, $portion ) = @_;
+    return $self->_render_portion_paras( $portion, { para_is => "para" } );
 }
 
 sub _is_portion_desc
 {
-    my ($self, $portion) = @_;
+    my ( $self, $portion ) = @_;
 
-    return ($portion->localname() eq "description");
+    return ( $portion->localname() eq "description" );
 }
 
 sub _get_screenplay_portion_opening
 {
-    my ($self, $portion) = @_;
+    my ( $self, $portion ) = @_;
 
     return $self->_is_portion_desc($portion)
         ? "["
+
         # A saying.
-        : ($portion->getAttribute("character") . ": ")
-        ;
+        : ( $portion->getAttribute("character") . ": " );
 }
 
 sub _handle_screenplay_portion
 {
-    my ($self, $portion) = @_;
+    my ( $self, $portion ) = @_;
 
-    $self->_this_line(
-        $self->_get_screenplay_portion_opening($portion)
-    );
+    $self->_this_line( $self->_get_screenplay_portion_opening($portion) );
 
     $self->_render_screenplay_paras($portion);
 
-    if ($self->_is_portion_desc($portion))
+    if ( $self->_is_portion_desc($portion) )
     {
         $self->_out("]");
     }
@@ -410,7 +359,7 @@ sub _handle_screenplay_portion
 
 sub _process_screenplay_node
 {
-    my ($self, $play_node) = @_;
+    my ( $self, $play_node ) = @_;
 
     my ($body_node) = $play_node->findnodes("body");
 
@@ -435,7 +384,7 @@ sub _out_formatted_line
     $text =~ s{\n+\z}{}ms;
     $text =~ s{\s+}{ }gms;
 
-    if ($self->_is_first_line())
+    if ( $self->_is_first_line() )
     {
         $self->_is_first_line(0);
     }
@@ -458,54 +407,51 @@ sub _out_formatted_line
 
 sub _append_to_this_line
 {
-    my ($self, $more_text) = @_;
+    my ( $self, $more_text ) = @_;
 
-    $self->_this_line($self->_this_line() . $more_text);
+    $self->_this_line( $self->_this_line() . $more_text );
 }
 
 sub _append_different_formatting_node
 {
-    my ($self, $prefix, $suffix, $node) = @_;
+    my ( $self, $prefix, $suffix, $node ) = @_;
 
-    return
-        $self->_append_to_this_line(
-            $prefix . $node->textContent() . $suffix
-        );
+    return $self->_append_to_this_line(
+        $prefix . $node->textContent() . $suffix );
 }
 
 {
-    my @_highlights = (['/', [qw(em i italics)]], ['*', [qw(b bold strong)]]);
+    my @_highlights =
+        ( [ '/', [qw(em i italics)] ], [ '*', [qw(b bold strong)] ] );
 
-    my %_formats_map =
-    (
+    my %_formats_map = (
         (
-            map { my ($f, $tags) = @$_; map { $_ => [($f)x2] } @$tags }
-            @_highlights
+            map {
+                my ( $f, $tags ) = @$_;
+                map { $_ => [ ($f) x 2 ] } @$tags
+            } @_highlights
         ),
-        'inlinedesc' => ['[', ']'],
+        'inlinedesc' => [ '[', ']' ],
     );
 
     sub _get_node_formatting_delims
     {
-        my ($self, $node) = @_;
+        my ( $self, $node ) = @_;
 
         my $name = $node->localname();
 
-        return exists($_formats_map{$name})
+        return exists( $_formats_map{$name} )
             ? $_formats_map{$name}
-            : [(q{}) x 2]
-            ;
+            : [ (q{}) x 2 ];
     }
 }
 
 sub _handle_format_node
 {
-    my ($self, $node) = @_;
+    my ( $self, $node ) = @_;
 
     $self->_append_different_formatting_node(
-        @{$self->_get_node_formatting_delims($node)},
-        $node,
-    );
+        @{ $self->_get_node_formatting_delims($node) }, $node, );
 
     return;
 }
@@ -530,34 +476,31 @@ sub _get_formatted_node_text
 
 sub _render_para
 {
-    my ($self, $para) = @_;
+    my ( $self, $para ) = @_;
 
     my $first_text = 1;
 
-    foreach my $node ($para->childNodes())
+    foreach my $node ( $para->childNodes() )
     {
-        if ($node->nodeType() == XML_ELEMENT_NODE())
+        if ( $node->nodeType() == XML_ELEMENT_NODE() )
         {
             my $name = $node->localname();
 
-            if ($name eq "br")
+            if ( $name eq "br" )
             {
                 $self->_out_formatted_line();
             }
-            elsif ($name eq "a")
+            elsif ( $name eq "a" )
             {
-                $self->_append_different_formatting_node(
-                    "[",
-                    ("](". $node->getAttribute("href") . ")"),
-                    $node
-                );
+                $self->_append_different_formatting_node( "[",
+                    ( "](" . $node->getAttribute("href") . ")" ), $node );
             }
             else
             {
                 $self->_handle_format_node($node);
             }
         }
-        elsif ($node->nodeType() == XML_TEXT_NODE())
+        elsif ( $node->nodeType() == XML_TEXT_NODE() )
         {
             my $text = $self->_get_formatted_node_text($node);
 
@@ -566,7 +509,7 @@ sub _render_para
                 $text =~ s/\A\s+//;
             }
 
-            $self->_append_to_this_line( $text );
+            $self->_append_to_this_line($text);
         }
     }
     continue
@@ -577,22 +520,20 @@ sub _render_para
 
 sub _render_quote_list
 {
-    my ($self, $ul) = @_;
+    my ( $self, $ul ) = @_;
 
-    my $is_bullets = ($ul->localname() eq "ul");
+    my $is_bullets = ( $ul->localname() eq "ul" );
 
     my $idx = 1;
 
     $self->_iterate_on_child_elems(
-        $ul,
-        "li",
+        $ul, "li",
         {
             process => sub {
                 my $li = shift;
 
                 $self->_append_to_this_line(
-                    ($is_bullets ? "*" : "$idx.") . " "
-                );
+                    ( $is_bullets ? "*" : "$idx." ) . " " );
 
                 $self->_render_para($li);
 
@@ -614,18 +555,16 @@ sub _render_quote_list
 
 sub _render_quote_portion_paras
 {
-    my ($self, $node) = @_;
+    my ( $self, $node ) = @_;
 
-    $self->_render_portion_paras(
-        $node, { para_is => "blockquote|p|ol|ul" }
-    );
+    $self->_render_portion_paras( $node, { para_is => "blockquote|p|ol|ul" } );
 
     return;
 }
 
 sub _render_quote_blockquote
 {
-    my ($self, $node) = @_;
+    my ( $self, $node ) = @_;
 
     $self->_out("<<<\n\n");
 
@@ -643,13 +582,12 @@ sub _start_new_para
 
 sub _render_generalized_para
 {
-    my ($self, $para) = @_;
+    my ( $self, $para ) = @_;
 
-    return
-    (
-          (($para->localname() eq "ul") || ($para->localname() eq "ol"))
+    return (
+        ( ( $para->localname() eq "ul" ) || ( $para->localname() eq "ol" ) )
         ? $self->_render_quote_list($para)
-        : ($para->localname() eq "blockquote")
+        : ( $para->localname() eq "blockquote" )
         ? $self->_render_quote_blockquote($para)
         : $self->_render_para($para)
     );
@@ -659,7 +597,7 @@ sub _move_to_next_line
 {
     my $self = shift;
 
-    if ($self->_this_line() =~ m{\S})
+    if ( $self->_this_line() =~ m{\S} )
     {
         $self->_out_formatted_line();
         $self->_this_line("");
@@ -670,7 +608,7 @@ sub _move_to_next_line
 
 sub _handle_portion_paragraph
 {
-    my ($self, $para) = @_;
+    my ( $self, $para ) = @_;
 
     $self->_is_first_line(1);
 
@@ -683,7 +621,7 @@ sub _handle_portion_paragraph
 
 sub _render_portion_paras
 {
-    my ($self, $portion, $args) = @_;
+    my ( $self, $portion, $args ) = @_;
 
     my $para_name = $args->{para_is};
 
@@ -701,7 +639,7 @@ sub _render_portion_paras
 
 sub _process_quote_node
 {
-    my ($self, $quote_node) = @_;
+    my ( $self, $quote_node ) = @_;
 
     my ($body_node) = $quote_node->findnodes("body");
 
@@ -715,19 +653,19 @@ sub _process_quote_node
 my @info_fields_order = (qw(work author channel tagline));
 
 my %info_fields_order_map =
-(map { $info_fields_order[$_] => $_+1 } (0 .. $#info_fields_order));
+    ( map { $info_fields_order[$_] => $_ + 1 } ( 0 .. $#info_fields_order ) );
 
 sub _info_field_value
 {
-    my $self = shift;
+    my $self  = shift;
     my $field = shift;
 
-    return $info_fields_order_map{$field->localname()} || (-1);
+    return $info_fields_order_map{ $field->localname() } || (-1);
 }
 
 sub _calc_info_field_processed_content
 {
-    my $self = shift;
+    my $self       = shift;
     my $field_node = shift;
 
     my $content = $field_node->textContent();
@@ -745,39 +683,39 @@ sub _calc_info_field_processed_content
 
 sub _output_info_value
 {
-    my ($self, $string) = @_;
+    my ( $self, $string ) = @_;
 
-    return $self->_out((' ' x 4) . '-- ' . $string . "\n");
+    return $self->_out( ( ' ' x 4 ) . '-- ' . $string . "\n" );
 }
 
 sub _out_info_field_node
 {
-    my ($self, $info_node, $field_node) = @_;
+    my ( $self, $info_node, $field_node ) = @_;
 
-    my $name = $field_node->localname();
+    my $name  = $field_node->localname();
     my $value = $self->_calc_info_field_processed_content($field_node);
 
-    if ($name eq "author")
+    if ( $name eq "author" )
     {
         $self->_output_info_value($value);
     }
-    elsif (($name eq "work") || ($name eq "tagline"))
+    elsif ( ( $name eq "work" ) || ( $name eq "tagline" ) )
     {
         my $url = "";
 
-        if ($field_node->hasAttribute("href"))
+        if ( $field_node->hasAttribute("href") )
         {
             $url = " ( " . $field_node->getAttribute("href") . " )";
         }
 
-        $self->_output_info_value($value.$url);
+        $self->_output_info_value( $value . $url );
     }
-    elsif ($name eq "channel")
+    elsif ( $name eq "channel" )
     {
         my $channel = $field_node->textContent();
         my $network = $info_node->findnodes("network")->shift()->textContent();
 
-        $self->_output_info_value( "$channel, $network" );
+        $self->_output_info_value("$channel, $network");
     }
 
     return;
@@ -785,29 +723,25 @@ sub _out_info_field_node
 
 sub _get_info_node_fields
 {
-    my ($self, $info_node) = @_;
+    my ( $self, $info_node ) = @_;
 
-    return
-        reverse
-        sort {
-            $self->_info_field_value($a) <=> $self->_info_field_value($b)
-        }
-        $info_node->findnodes("*")
-    ;
+    return reverse
+        sort { $self->_info_field_value($a) <=> $self->_info_field_value($b) }
+        $info_node->findnodes("*");
 
 }
 
 sub _render_info_node
 {
-    my ($self, $info_node) = @_;
+    my ( $self, $info_node ) = @_;
 
-    if (my @f = $self->_get_info_node_fields($info_node))
+    if ( my @f = $self->_get_info_node_fields($info_node) )
     {
         $self->_start_new_line;
 
         foreach my $field_node (@f)
         {
-            $self->_out_info_field_node($info_node, $field_node);
+            $self->_out_info_field_node( $info_node, $field_node );
         }
     }
 
@@ -817,6 +751,64 @@ sub _render_info_node
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+XML::Grammar::Fortune::ToText - convert the FortunesXML grammar to plaintext.
+
+=head1 VERSION
+
+version 0.0701
+
+=head1 SYNOPSIS
+
+    use XML::Grammar::Fortune::ToText;
+
+    open my $out_fh, '>', 'my-fortunes.txt'
+        or die "Cannot open 'my-fortunes.txt' for writing - $!";
+    my $converter = XML::Grammar::Fortune::ToText->new(
+        {
+            'input' => "my-fortunes.fortune-xml.xml",
+            'output' => $out_fh,
+        }
+    );
+
+    $converter->run();
+
+    close($out_fh);
+
+=head1 VERSION
+
+version 0.0701
+
+=head1 FUNCTIONS
+
+=head2 my $processor = XML::Grammar::Fortune::ToText->new({input => "path/to/file.xml", output => \*STDOUT,});
+
+Creates a new processor with input and output files.
+
+=head2 $self->run()
+
+Runs the processor.
+
+=for nothing     {
+        elsif (m{^[^\-]* ---\t(\S+) is now known as (\S+)})
+        {
+            my ($old_nick, $new_nick) = ($1, $2);
+            push @messages,
+                {'type' => "change_nick", 'old' => $old_nick, 'new' => $new_nick};
+            $longest_nick_len =
+                max($longest_nick_len, length($old_nick), length($new_nick));
+        }
+        else
+        {
+           push @messages, {'type' => "raw", 'msg' => $_};
+        }
+    }
 
 =head1 AUTHOR
 
@@ -833,7 +825,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc XML::Grammar::Fortune
-
 
 You can also look for information at:
 
@@ -886,5 +877,133 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/xml-grammar-fortune/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc XML::Grammar::Fortune::ToText
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/XML-Grammar-Fortune>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/XML-Grammar-Fortune>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Grammar-Fortune>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/XML-Grammar-Fortune>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/XML-Grammar-Fortune>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/XML-Grammar-Fortune>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/X/XML-Grammar-Fortune>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=XML-Grammar-Fortune>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=XML::Grammar::Fortune>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-xml-grammar-fortune at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-Grammar-Fortune>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/xml-grammar-fortune>
+
+  git clone git://github.com/shlomif/xml-grammar-fortune.git
 
 =cut

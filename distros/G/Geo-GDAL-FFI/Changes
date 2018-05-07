@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::GDAL::FFI
 
+0.04 May 2, 2018
+     - HaveGEOS method for tests.
+
 0.03 Apr 27, 2018
      - Replace failed 0.02.
 

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.122';
+$Config::Model::BackendMgr::VERSION = '2.123';
 use Mouse;
 use strict;
 use warnings;
@@ -335,7 +335,7 @@ sub try_read_backend {
         $res = $backend_obj->$f(
             @read_args,
             file_path => $file_path,
-            io_handle => $fh,
+            io_handle => Config::Model::DeprecatedHandle->new($fh),
             object    => $self->node,
         );
     };
@@ -432,7 +432,7 @@ sub auto_write_init {
         # override needed for "save as" button
         my %backend_args = (
             @wr_args,
-            io_handle => $fh,
+            io_handle => Config::Model::DeprecatedHandle->new($fh),
             file_path => $file_path,
             object    => $node,
             %cb_args            # override from user
@@ -527,6 +527,26 @@ sub is_auto_write_for_type {
 
 __PACKAGE__->meta->make_immutable;
 
+package Config::Model::DeprecatedHandle;
+$Config::Model::DeprecatedHandle::VERSION = '2.123';
+our $AUTOLOAD;
+
+sub new {
+    my $class = shift;
+    my $fh = shift;
+
+    return defined $fh ? bless \$fh, $class : undef;
+}
+
+sub AUTOLOAD {
+    my $self = shift;
+    my $f = $AUTOLOAD;
+    $f =~ s/.*:://;
+    my ($package, $filename, $line) = caller;
+    $logger->warn("io_handle backend parameter is deprecated, please use file_path parameter. ",
+              "($filename:$line)") unless $package eq "Config::Model::BackendMgr";
+    $$self->$f(@_) if $$self; # may not be defined during destruction
+}
 1;
 
 # ABSTRACT: Load configuration node on demand
@@ -543,7 +563,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 

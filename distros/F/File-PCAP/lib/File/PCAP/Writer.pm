@@ -12,11 +12,11 @@ File::PCAP::Writer - write PCAP files with pure Perl
 
 =head1 VERSION
 
-Version v0.0.6
+Version v0.0.7
 
 =cut
 
-use version; our $VERSION = qv('v0.0.6');
+use version; our $VERSION = qv('v0.0.7');
 
 
 =head1 SYNOPSIS

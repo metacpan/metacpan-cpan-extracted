@@ -1,31 +1,21 @@
 # -*- cperl -*-
 
 use ExtUtils::testlib;
-use Test::More tests => 39;
+use Test::More;
 use Test::Memory::Cycle;
 use Test::Log::Log4perl;
 use Config::Model;
+use Config::Model::Tester::Setup qw/init_test/;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
 use lib "t/lib";
 
-my $arg = shift || '';
-my $trace = $arg =~ /t/ ? 1 : 0;
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-#use Log::Log4perl qw(:easy);
-#Log::Log4perl->easy_init( $arg =~ /l/ ? $TRACE : $WARN );
-
-my $model = Config::Model->new( legacy => 'ignore', );
-
-ok( 1, "compiled" );
+my ($model, $trace) = init_test();
 
 my $inst = $model->instance(
     root_class_name => 'Master',
-    model_file      => 'dump_load_model.pm',
+    model_file      => 'dump_load_model.pl',
     instance_name   => 'test1'
 );
 ok( $inst, "created dummy instance" );
@@ -52,7 +42,8 @@ warp warp2 aa2="foo bar"
 
 $step =~ s/\n/ /g;
 
-ok( $root->load( step => $step ), "set up data in tree with '$step'" );
+note("steps are $step") if $trace;
+ok( $root->load( step => $step ), "set up data in tree" );
 
 # load some values with undef
 $root->fetch_element('hash_a')->fetch_with_id('undef_val');
@@ -149,17 +140,18 @@ is_deeply(
     "check dump of ordered hash as hash"
 );
 
-{
-    note ("test ordered_hash warnings");
+subtest "test ordered_hash warnings" => sub {
+    my $tw = Test::Log::Log4perl->get_logger("Tree.Element.Id.Hash");
+    Test::Log::Log4perl->start(ignore_priority => "info");
+    $tw->warn(qr/order is not defined/);
 
-    my $tw = Test::Log::Log4perl->expect( ignore_priority => "info" , ["Tree.Element.Id.Hash", warn => qr/order is not defined/ ]);
-
-    note "load 2 items in ordered_hash without __order produces a warning";
+    # load 2 items in ordered_hash without __order produces a warning";
     $root->load_data( { ordered_hash => { y => '2', 'x' => '3' }});
 
-    note "load one item in ordered_hash without __order produce no warning";
+    # load one item in ordered_hash without __order produce no warning";
     $root->load_data( { ordered_hash => { 'x' => '3' }});
-}
+    Test::Log::Log4perl->end("warnings without __order");
+};
 
 # test ordered hash load with hash ref instead of array ref
 my $inst3 = $model->instance(
@@ -168,7 +160,7 @@ my $inst3 = $model->instance(
 );
 ok( $inst, "created 3rd dummy instance" );
 my $root3 = $inst3->config_root;
-$data->{ordered_hash} = { @{ $expect->{ordered_hash} } };
+$data->{ordered_hash} = { @{ $expect->{ordered_hash} }, __order => [qw/y x z/] };
 $root3->load_data($data);
 
 @tries = (
@@ -176,7 +168,7 @@ $root3->load_data($data);
     [ 'olist:0'         => $expect->{olist}[0] ],
     [ 'olist:0 DX'      => $expect->{olist}[0]{DX} ],
     [ 'string_with_def' => $expect->{string_with_def} ],
-    [ 'ordered_hash'    => [qw/x 3 y 2 z 1/] ],
+    [ 'ordered_hash'    => [qw/y 2 x 3 z 1/] ],
     [ 'hash_a'          => $expect->{hash_a} ],
     [ 'std_id:ab'       => $expect->{std_id}{ab} ],
     [ 'my_check_list'   => $expect->{my_check_list} ],
@@ -213,4 +205,6 @@ my $pod_notes2 = $root2->dump_annotations_as_pod;
 
 is( $pod_notes2, $pod_notes, "check 2nd pod notes" );
 
-memory_cycle_ok($model);
+memory_cycle_ok($model, "memory cycles");
+
+done_testing;

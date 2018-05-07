@@ -1,0 +1,30 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libpid';
+
+share {
+    plugin Download => (
+        url => 'https://github.com/a3f/libpid/archive/'
+             . 'master'
+             . '.tar.gz'
+    );
+
+    plugin Extract => 'tar.gz';
+    plugin 'Build::CMake';
+
+    build [
+        [ '%{cmake}', -G => '%{cmake_generator}',
+          '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DWITH_PIC=ON',
+          '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+          '.'],
+
+        '%{cmake} --build .',
+        '%{cmake} --build . --target install'
+    ];
+
+    test [
+        '%{cmake} --build . --target test',
+    ] if $^O ne 'linux',
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

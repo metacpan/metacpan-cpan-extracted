@@ -12,9 +12,10 @@ use Chart::Plotly::Trace::Scattergeo::Marker;
 use Chart::Plotly::Trace::Scattergeo::Selected;
 use Chart::Plotly::Trace::Scattergeo::Stream;
 use Chart::Plotly::Trace::Scattergeo::Textfont;
+use Chart::Plotly::Trace::Scattergeo::Transform;
 use Chart::Plotly::Trace::Scattergeo::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines on a geographic map is provided either by longitude/latitude pairs in `lon` and `lat` respectively or by geographic location IDs or names in `locations`.
 
@@ -251,6 +252,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scattergeo::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -278,7 +282,7 @@ Chart::Plotly::Trace::Scattergeo - The data visualized as scatter point or lines
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -495,6 +499,8 @@ Sets the source reference on plot.ly for  textposition .
 =item * textsrc
 
 Sets the source reference on plot.ly for  text .
+
+=item * transforms
 
 =item * uid
 

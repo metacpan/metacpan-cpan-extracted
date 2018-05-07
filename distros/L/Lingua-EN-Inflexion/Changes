@@ -81,3 +81,20 @@ Revision history for Lingua-EN-Inflexion
 0.001006  Sun Oct  8 17:38:17 2017
 
     * Fixed t/wordlist.t by removing 'no_plan'
+
+
+0.001007  Sun May  6 06:09:51 2018
+
+    * Extended verb->as_regex() to match preterite and both participles
+      (Thanks, David)
+
+    * Added $person parameter to singular() and plural() methods
+      (Thanks, David)
+
+    * Made singular() and plural() methods called with no argument act
+      as expected wrt terms that are inflected for person. Specifically,
+      these methods now do not change the form of a singular inflection.
+      For example: verb('am')->singular used to return 'is', but now
+      returns 'am'.
+
+    * Improved robustness of "<preposition> <pronoun>" inflexions

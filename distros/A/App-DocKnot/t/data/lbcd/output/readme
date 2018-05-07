@@ -58,13 +58,6 @@ REQUIREMENTS
   The lbcdclient program requires Perl 5.6 or later and requires the
   IO::Socket::INET6 module for IPv6 support.
 
-  To enable tests that don't detect functionality problems but are used to
-  sanity-check the release, set the environment variable RELEASE_TESTING
-  to a true value.  To enable tests that may be sensitive to the local
-  environment or that produce a lot of false positives without uncovering
-  many problems, set the environment variable AUTHOR_TESTING to a true
-  value.
-
   To bootstrap from a Git checkout, or if you change the Automake files
   and need to regenerate Makefile.in, you will need Automake 1.11 or
   later.  For bootstrap or if you change configure.ac or any of the m4
@@ -121,6 +114,13 @@ TESTING
 
   Currently, the test suite only checks the portability and utility
   libraries, not the functionality of lbcd or lbcdclient.
+
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
 
 SUPPORT
 

@@ -5,7 +5,7 @@ use warnings;
 use Cwd;
 use lib Cwd::abs_path('inc');
 
-use Devel::CheckLib;
+eval { require Devel::CheckLib; Devel::CheckLib->import; };
 use 5.010_000;
 use ExtUtils::MakeMaker 6.56;  # for CONFIGURE_REQUIRES support
 use Config;
@@ -242,7 +242,7 @@ our \$VERSION='$PDL::VERSION';
 \$VERSION = eval \$VERSION;
 1;
 EOVF
-  $fh->close();
+  close $fh;
 }
 
 sub make_Types_pm {
@@ -466,16 +466,18 @@ my %makefile_hash = (
 	      'EXE_FILES' => \@exe_files,
 	      'PM' => { @podpms }, #so that the script docs are picked up
               'META_MERGE' => {
+                 "meta-spec" => { version => 2 },
                  resources => {
                     homepage => 'http://pdl.perl.org/',
-                    bugtracker  => 'http://sourceforge.net/p/pdl/bugs/',
+                    bugtracker  => 'https://github.com/PDLPorters/pdl/issues',
                     repository  => {
-                       url => 'git://git.code.sf.net/p/pdl/code',
+                       url => 'git://github.com/PDLPorters/pdl.git',
                        type => 'git',
-                       web => 'http://sourceforge.net/p/pdl/code/ci/master/tree/',
+                       web => 'https://github.com/PDLPorters/pdl',
                     },
                  },
-                 no_index => { file => ['Doc/scantree.pl'] }
+                 no_index => { file => ['Doc/scantree.pl'] },
+                 x_IRC => 'irc://irc.perl.org/#pdl',
               },
               'MAN1PODS' => { 'Bugs.pod' => '$(INST_MAN1DIR)/PDL::Bugs.$(MAN1EXT)',
                               'perldl' => '$(INST_MAN1DIR)/perldl.$(MAN1EXT)',

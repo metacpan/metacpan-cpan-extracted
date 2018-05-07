@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
  
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 =head1 NAME
 

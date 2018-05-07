@@ -22,4 +22,4 @@ requires:
   Lingua::EN::Words2Nums: '0'
   Test::More: '0'
   perl: '5.01'
-version: '0.001006'
+version: '0.001007'

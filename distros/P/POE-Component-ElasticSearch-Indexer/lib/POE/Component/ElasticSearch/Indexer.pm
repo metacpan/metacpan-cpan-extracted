@@ -4,7 +4,7 @@ package POE::Component::ElasticSearch::Indexer;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Const::Fast;
 use Digest::SHA1 qw(sha1_hex);
@@ -45,23 +45,18 @@ sub spawn {
 
     # Build Configuration
     my %CONFIG = (
-        Alias         => 'es',
-        Servers       => [qw(localhost)],
-        Timeout       => 10,
-        FlushInterval => 30,
-        FlushSize     => 1_000,
-        DefaultIndex  => 'logs-%Y.%m.%d',
-        DefaultType   => 'log',
-        BatchDir      => '/tmp/es_index_backlog',
-        StatsInterval => 60,
+        Alias             => 'es',
+        Servers           => [qw(localhost)],
+        Timeout           => 10,
+        FlushInterval     => 30,
+        FlushSize         => 1_000,
+        DefaultIndex      => 'logs-%Y.%m.%d',
+        DefaultType       => 'log',
+        BatchDir          => '/tmp/es_index_backlog',
+        StatsInterval     => 60,
+        MaxConnsPerServer => 3,
         %params,
     );
-    if( $CONFIG{Templates} ) {
-        if( !is_hashref($CONFIG{Templates}) ) {
-            ERROR("Recieved invalid parameter for 'Templates' parameter, ignoring it entirely.");
-            delete $CONFIG{Templates};
-        }
-    }
     if( $CONFIG{BatchDiskSpace} ) {
         # Human Readable to Computer Readable
         if( my ($size,$unit) = ($CONFIG{BatchDiskSpace} =~ /(\d+(?:\.\d+))\s*([kmgt])b?/i) ) {
@@ -88,14 +83,8 @@ sub spawn {
             shutdown  => \&es_shutdown,
             #health    => \&es_health,
 
-            # Templates
-            #get_templates => \&es_get_templates,
-            #put_template  => \&es_put_template,
-
             # HTTP Responses
             resp_bulk          => \&resp_bulk,
-            #resp_get_templates => \&resp_get_templates,
-            #resp_put_template  => \&resp_get_templates,
             #resp_health        => \&resp_health,
         },
         heap => {
@@ -106,18 +95,16 @@ sub spawn {
             health   => '',
             es_ready => 0,
             batches  => 0,
-            pending_templates => $CONFIG{Templates} || {},
         },
     );
 
     # Connection Pooling
     my $num_servers  = scalar( @{ $CONFIG{Servers} } );
-    my $num_per_host = 3;
-    my $num_open     = $num_servers * $num_per_host;
+    $CONFIG{MaxConnsTotal} ||= $num_servers * $CONFIG{MaxConnsPerServer};
     my $pool = POE::Component::Client::Keepalive->new(
         keep_alive   => 60,
-        max_open     => $num_open,
-        max_per_host => $num_per_host,
+        max_open     => $CONFIG{MaxConnsTotal},
+        max_per_host => $CONFIG{MaxConnsPerServer},
         timeout      => $CONFIG{Timeout},
     );
     POE::Component::Client::HTTP->spawn(
@@ -126,9 +113,9 @@ sub spawn {
         Timeout           => $CONFIG{Timeout} + 1,   # Give ES 1 second to transit
     );
     DEBUG(sprintf "Spawned an HTTP Pool for %d servers: %d max connections, %d max per host.",
-        $num_servers, $num_open, $num_per_host
+        $num_servers, @CONFIG{qw(MaxConnsTotal MaxConnsPerServer)}
     );
-    return;
+    return $session;
 }
 
 #------------------------------------------------------------------------#
@@ -201,6 +188,7 @@ sub es_queue {
     return unless $data;
 
     my $events = is_arrayref($data) ? $data : [$data];
+    $heap->{queue} ||= [];
     DOC: foreach my $doc ( @{ $events } ) {
         my $record;
         if( is_blessed_ref($doc) ) {
@@ -236,7 +224,6 @@ sub es_queue {
         }
         # Ensure we wound up with something useful
         next unless $record;
-        $heap->{queue} = [] unless exists $heap->{queue};
         push @{ $heap->{queue} }, $record;
     }
 
@@ -271,7 +258,7 @@ sub es_flush {
     if( $count_docs > 0 ) {
         # Build the batch
         my $to    = $heap->{es_ready} ? 'batch' : 'save';
-        my $docs = delete $heap->{queue};
+        my $docs  = delete $heap->{queue};
         my $batch = join '', @{ $docs };
         my $id    = sha1_hex($batch);
         $heap->{batch}{$id} = $batch;
@@ -588,7 +575,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -636,6 +623,20 @@ B<es>.
 A list of Elasticsearch hosts for connections.  Maybe in the form of
 C<hostname> or C<hostname:port>.
 
+=item B<MaxConnsPerServer>
+
+Maximum number of simultaneous connections to an Elasticsearch node.  Used in
+the creation of a L<POE::Component::Client::Keepalive> connection pool.
+
+Defaults to B<3>.
+
+=item B<MaxConnsTotal>
+
+Maximum number of simultaneous connections to all servers.  Used in
+the creation of a L<POE::Component::Client::Keepalive> connection pool.
+
+Defaults to B<MaxConnsPerServer * number of Servers>.
+
 =item B<LoggingConfig>
 
 The L<Log::Log4perl> configuration file for the indexer to use.  Defaults to
@@ -680,10 +681,10 @@ Checked every ten batches.
 
 You may specify either as absolute bytes or using shortcuts:
 
-    BathDiskSpace => 500kb,
-    BathDiskSpace => 100mb,
-    BathDiskSpace => 10gb,
-    BathDiskSpace => 1tb,
+    BatchDiskSpace => 500kb,
+    BatchDiskSpace => 100mb,
+    BatchDiskSpace => 10gb,
+    BatchDiskSpace => 1tb,
 
 =item B<StatsHandler>
 
@@ -694,19 +695,6 @@ code is run.
 =item B<StatsInterval>
 
 Run the C<StatsHandler> every C<StatsInterval> seconds.  Default to B<60>.
-
-=item B<Templates>
-
-If configured, this will ensure the L<Dynamic
-Templates|https://www.elastic.co/guide/en/elasticsearch/reference/master/dynamic-templates.html>
-specified exist and are up-to-date with your specifications.
-
-    my $idx = POE::Component::ElasticSearch::Indexer->spawn(
-            ...
-            Templates => {
-                base_settings => { template => '*', settings => { 'index.number_of_shards' => 6 } },
-            },
-    );
 
 =back
 

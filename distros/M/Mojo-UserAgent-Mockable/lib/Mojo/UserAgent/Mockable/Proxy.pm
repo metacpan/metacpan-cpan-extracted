@@ -3,7 +3,7 @@ use 5.016;
 # ABSTRACT: Proxy class for Mojo::UserAgent::Mockable that will not set any proxy.
 
 package Mojo::UserAgent::Mockable::Proxy;
-$Mojo::UserAgent::Mockable::Proxy::VERSION = '1.53';
+$Mojo::UserAgent::Mockable::Proxy::VERSION = '1.54';
 use Mojo::Base 'Mojo::UserAgent::Proxy';
 
 1;
@@ -23,15 +23,15 @@ Mojo::UserAgent::Mockable::Proxy - Proxy class for Mojo::UserAgent::Mockable tha
 
 =head1 VERSION
 
-version 1.53
+version 1.54
 
 =head1 AUTHOR
 
-Kit Peters <kit.peters@broadbean.com>
+Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Broadbean Technology.
+This software is copyright (c) 2017 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

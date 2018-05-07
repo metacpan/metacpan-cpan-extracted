@@ -75,6 +75,8 @@ Revision history for VSGDR::StaticData
         Updated non-pk version of insert to use select .. except checks.  Took out the verbose older method.  Now matches the update logic better.
 0.35	06/02/2018
         Re-fixed broken multi-column pk/uk logic.
+0.36	01/05/2018
+        Removed check for embedded '.' in table or schema-name.  Reworked checking logic.
 
         
 	

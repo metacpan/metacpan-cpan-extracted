@@ -22,8 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
-            "Alien::Build::MM" : "0.32",
+            "Alien::Build" : "1.41",
+            "Alien::Build::MM" : "1.41",
             "Alien::MSYS" : "0.07",
             "Alien::patch" : "0.09",
             "Archive::Tar" : "0",
@@ -32,21 +32,24 @@
             "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Zlib" : "0",
+            "PkgConfig" : "0.19026",
             "Sort::Versions" : "0",
             "URI" : "0",
-            "URI::Escape" : "0"
+            "URI::Escape" : "0",
+            "parent" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.32",
-            "Alien::Build::MM" : "0.32",
+            "Alien::Build" : "1.41",
+            "Alien::Build::MM" : "1.41",
             "Alien::MSYS" : "0",
             "Alien::patch" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
             "HTTP::Tiny" : "0.044",
-            "PkgConfig" : "0"
+            "PkgConfig" : "0",
+            "parent" : "0"
          }
       },
       "runtime" : {
@@ -57,7 +60,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::CChecker" : "0"
+            "Test::Alien" : "0"
          }
       }
    },
@@ -71,9 +74,9 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.04",
+   "version" : "1.09",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.39",
+      "generated_by" : "Alien::Build::MM version 1.41",
       "requires" : {
          "share" : {
             "Alien::MSYS" : "0.07",

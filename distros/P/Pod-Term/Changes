@@ -4,3 +4,5 @@ Revision history for Perl extension Pod::Term.
 	- original version; created by h2xs 1.23 with options
 		-AX Pod::Term
 
+0.02  Wed May 02 20:47:10 2018
+	- fix handling of long lines with no spaces

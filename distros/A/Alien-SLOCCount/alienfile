@@ -7,11 +7,12 @@ share {
   start_url 'https://www.dwheeler.com/sloccount/sloccount-2.26.tar.gz';
   download [ 'wget %{.meta.start_url}' ];
   download [ 'wget --no-check-certificate %{.meta.start_url}' ];
+  download [ 'curl %{.meta.start_url} -o sloccount-2.26.tar.gz' ];
   extract [ 'tar zxf %{.install.download}' ];
   build [
-    [ '%{make} EXE_SUFFIX=.exe' ],
+    [ "%{make} EXE_SUFFIX=.exe CC='cc -Wall'" ],
     [ 'mkdir -p %{alien.install.prefix}/bin' ],
-    [ '%{make} install PREFIX=%{alien.install.prefix}' ],
+    [ "%{make} install PREFIX=%{alien.install.prefix} CC='cc -Wall'" ],
   ];
 };
  

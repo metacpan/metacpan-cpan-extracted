@@ -9,12 +9,18 @@ use strictures 1;
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
-has 'gateway' => (is => 'ro');
+use WebService::Braintree::Validations qw(verify_params);
 
 use WebService::Braintree::_::DocumentUpload;
 
 sub create {
     my ($self, $params) = @_;
+
+    confess "ArgumentError" unless verify_params($params, {
+        file => 1,
+        kind => 1,
+    });
+
     $self->_make_request("/document_uploads", "post", {
         'document_upload[kind]' => $params->{kind},
     }, $params->{file});

@@ -4,8 +4,11 @@ use Alien::Base::Wrapper qw( Alien::gdal !export );
 use Config;
  
 WriteMakefile(
+    AUTHOR => ['Ari Jolma <ari.jolma at gmail.com>'],
     NAME => 'Geo::GDAL::FFI',
+    ABSTRACT_FROM => "lib/Geo/GDAL/FFI.pm",
     VERSION_FROM => "lib/Geo/GDAL/FFI.pm",
+    LICENSE => "artistic_2",
     Alien::Base::Wrapper->mm_args,
     CONFIGURE_REQUIRES => {
         'Alien::gdal' => 0

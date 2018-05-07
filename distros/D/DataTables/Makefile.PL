@@ -10,6 +10,7 @@ WriteMakefile(
 							DBI=>1.611,
 							JSON::XS=>2.32,
 							Carp=>0.00,
+							'SQL::Abstract::Limit' => 0,
 							'ExtUtils::MakeMaker' => '6.64',
 						 }, # e.g., Module::Name => 1.1
     TEST_REQUIRES => {

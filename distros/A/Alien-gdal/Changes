@@ -1,5 +1,27 @@
 Revision history for Alien::gdal
 
+1.09 2018-07-05
+    - No further changes from 1.08 dev releases
+
+1.08_002 2018-05-06
+    - Mark the compilation test as to-do until we determine if
+      the failures to find libs are due to us or Alien::Test.
+
+1.08_001 2018-05-06
+    - Dev release, marking more tests as to-do
+
+1.07 2018-05-05
+    - Fallback to PkgConfig to find the share/gdal dir
+    - Use Test::Alien in tests
+    - Add test for utilities, although it is marked as to-do for
+      now due to dynamic lib issues in tests on some platforms
+
+1.05 2018-05-02
+    - Add method to access the share/gdal directory.  This contains the data distributed with gdal.
+    - Turn cpp11 back on, except for bsd cpan testers.
+    - Bump required Alien::Build version to 1.41.
+    - Miscellaneous other changes to address cpan testers failures.
+
 1.04 2018-04-25
     - Run make clean on cpantesters to reduce number of build artefacts.
     - See also 1.03_* release notes.  

@@ -8,8 +8,8 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.133',
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.137',
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Encode' => '0',
@@ -143,7 +143,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Test::Compile' => '2.039',
                                            'Dist::Zilla::Plugin::Test::EOL' => '0.17',
                                            'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
-                                           'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000003',
+                                           'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000008',
                                            'Dist::Zilla::Plugin::Test::NoTabs' => '0',
                                            'Dist::Zilla::Plugin::Test::Pod::No404s' => '1.003',
                                            'Dist::Zilla::Plugin::Test::PodSpelling' => '2.006003',

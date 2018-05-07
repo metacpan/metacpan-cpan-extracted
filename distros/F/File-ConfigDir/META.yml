@@ -35,5 +35,5 @@ resources:
   homepage: https://metacpan.org/release/File-ConfigDir
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/File-ConfigDir.git
-version: '0.020'
+version: '0.021'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

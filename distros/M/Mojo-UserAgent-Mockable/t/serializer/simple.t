@@ -16,7 +16,7 @@ subtest 'Victoria and Albert Museum' => sub {
     my $dir = File::Temp->newdir;
    
     my @transactions;
-    push @transactions, Mojo::UserAgent->new->get(q{http://www.vam.ac.uk/api/json/museumobject/?limit=1});
+    push @transactions, Mojo::UserAgent->new->get(q{https://www.vam.ac.uk/api/json/museumobject/?limit=1});
 
     my $result = $transactions[0]->res->json;
 
@@ -25,7 +25,7 @@ subtest 'Victoria and Albert Museum' => sub {
 
     my $object_number = $result->{'records'}[0]{'fields'}{'object_number'};
 
-    push @transactions, Mojo::UserAgent->new->get(qq{http://www.vam.ac.uk/api/json/museumobject/$object_number}); 
+    push @transactions, Mojo::UserAgent->new->get(qq{https://www.vam.ac.uk/api/json/museumobject/$object_number}); 
     my $museum_object = $transactions[1]->res->json;
 
     plan skip_all => 'Museum object not retrieved properly' unless @{$museum_object} && keys %{$museum_object->[0]};

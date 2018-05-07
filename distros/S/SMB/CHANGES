@@ -1,5 +1,20 @@
 Releases of SMB-Perl library and main changes.
 
+0.08 - 2018-05-03
+
+* Added support for chained SMB v2 commands from client.
+* Added support for SMB v2 command Ioctl.
+* Added SMB::DCERPC implementing basic DCE/RPC over SMB for client/server.
+* Added SMB::File::size[_string] and use it in client file listing (dir).
+* Added SMB::Parser methods align & cut.
+* Added support for STATUS_PENDING responses in client.
+* Fixed work with files on deeper levels in client.
+* Fixed file listings (Find responses) in server.
+* Fixed creating directory in server.
+* Fixed several more problems in server.
+* Added minimal support for Notify and Cancel requests in server.
+* Improved class documentation.
+
 0.07 - 2018-04-06
 
 * Added classes for v2 commands QueryInfo and SetInfo.

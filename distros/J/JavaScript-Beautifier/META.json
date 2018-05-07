@@ -42,7 +42,7 @@
       },
       "JavaScript::Beautifier" : {
          "file" : "lib/JavaScript/Beautifier.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "http://github.com/fayland/perl-javascript-beautifier/tree/master"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

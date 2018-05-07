@@ -22,9 +22,11 @@ use parent 'SMB::Agent';
 
 use File::Basename qw(basename);
 use SMB::Tree;
+use SMB::DCERPC;
 use SMB::v2::Command::Negotiate;
 use SMB::v2::Command::Create;
 use SMB::v2::Command::QueryDirectory;
+use SMB::v2::Command::Ioctl;
 
 sub new ($%) {
 	my $class = shift;
@@ -116,6 +118,7 @@ sub on_command ($$$) {
 		if ($command->is('Negotiate')) {
 			if ($command->supports_smb_dialect(0x0202)) {
 				$command = SMB::v2::Command::Negotiate->new_from_v1($command);
+				$tid = 0;
 			} else {
 				$self->err("Client does not support SMB2, and we do not support SMB1, stopping");
 			}
@@ -130,8 +133,11 @@ sub on_command ($$$) {
 		if (($tid || exists $command->{fid}) && !$tree) {
 			$error = SMB::STATUS_SMB_BAD_TID;
 		}
+		elsif ($command->is('Ioctl') && $command->function == SMB::v2::Command::Ioctl::FSCTL_DFS_GET_REFERRALS) {
+			$error = SMB::STATUS_NOT_FOUND;
+		}
 		elsif ($fid) {
-			$openfile = $connection->{openfiles}{@$fid}
+			$openfile = $connection->{openfiles}{$fid->[0], $fid->[1]}
 				or $error = SMB::STATUS_FILE_CLOSED;
 			$command->openfile($openfile);
 		}
@@ -168,6 +174,7 @@ sub on_command ($$$) {
 				name => $command->file_name,
 				share_root => $tree->root,
 				is_ipc => $tree->is_ipc,
+				is_directory => $command->requested_directory,
 			);
 			my $disposition = $command->disposition;
 			if ($file->exists && $disposition == SMB::File::DISPOSITION_OPEN) {
@@ -180,8 +187,10 @@ sub on_command ($$$) {
 			unless ($error) {
 				$openfile = $file->open_by_disposition($disposition);
 				if ($openfile) {
+					$openfile->{dcerpc} = SMB::DCERPC->new(name => $file->name)
+						if $file->is_svc;
 					$fid = [ ++$connection->{last_fid}, 0 ];
-					$connection->{openfiles}{@$fid} = $openfile;
+					$connection->{openfiles}{$fid->[0], $fid->[1]} = $openfile;
 					$command->fid($fid);
 					$command->openfile($openfile);
 					$openfile->delete_on_close(1) if $command->requested_delete_on_close;
@@ -198,7 +207,7 @@ sub on_command ($$$) {
 					or $self->err("Failed to remove $filename: $!");
 			}
 			$openfile->close;
-			delete $connection->{openfiles}{@$fid};
+			delete $connection->{openfiles}{$fid->[0], $fid->[1]};
 		}
 		elsif ($command->is('SetInfo')) {
 			my $rename_info = $command->requested_rename_info;
@@ -214,22 +223,55 @@ sub on_command ($$$) {
 			$openfile->delete_on_close(1) if $command->requested_delete_on_close;
 		}
 		elsif ($command->is('Read')) {
-			$command->{buffer} = $openfile->read(
-				length => $command->{length},
-				offset => $command->{offset},
-				minlen => $command->{minimum_count},
-				remain => $command->{remaining_bytes},
-			);
-			$error = SMB::STATUS_END_OF_FILE unless defined $command->{buffer};
+			if ($openfile->{dcerpc}) {
+				($command->{buffer}, $error) = $openfile->dcerpc->generate_packet;
+			}
+			else {
+				$command->{buffer} = $openfile->read(
+					length => $command->{length},
+					offset => $command->{offset},
+					minlen => $command->{minimum_count},
+					remain => $command->{remaining_bytes},
+				);
+				$error = SMB::STATUS_END_OF_FILE unless defined $command->{buffer};
+			}
+		}
+		elsif ($command->is('Write')) {
+			if ($openfile->{dcerpc}) {
+				$error = $openfile->dcerpc->process_packet($command->buffer);
+			}
+			else {
+				$error = SMB::STATUS_NOT_IMPLEMENTED;
+			}
+		}
+		elsif ($command->is('Ioctl')) {
+			if ($openfile->{dcerpc}) {
+				$error = $openfile->dcerpc->process_rpc_request($command->buffer);
+				unless ($error) {
+					(my $payload, $error) = $openfile->dcerpc->generate_rpc_response;
+					$command->buffer($payload) unless $error;
+				}
+			}
+			else {
+				$error = SMB::STATUS_NOT_IMPLEMENTED;
+			}
 		}
 		elsif ($command->is('QueryDirectory')) {
-			$command->file_index($openfile->last_index)
-				unless $command->flags & SMB::v2::Command::QueryDirectory::FLAGS_INDEX;
+			my $start_idx = $command->is_reopen ? 0 : $command->is_index_specified
+				? $command->file_index : $openfile->last_index;
 			$command->{files} = $openfile->file->find_files(
 				pattern => $command->file_pattern,
-				start_idx => $command->file_index,
+				start_idx => $start_idx,
+				reopen => $command->is_reopen,
 			);
 			$error = SMB::STATUS_INVALID_PARAMETER unless defined $command->{files};
+		}
+		elsif ($command->is('ChangeNotify')) {
+			$error = SMB::STATUS_PENDING;
+		}
+		elsif ($command->is('Cancel')) {
+			$command->header->code($SMB::v2::Commands::command_codes{'ChangeNotify'});
+			$error = SMB::STATUS_CANCELLED;
 		}
 		$command->prepare_response;
 		$command->set_status($error) if $error;
@@ -265,15 +307,17 @@ sub run ($) {
 			else {
 				my $connection = $self->get_connection($socket)
 					or die "Unexpected data on unmanaged $socket";
-				my $command = $socket->eof
+				my @commands = $socket->eof
 					? $connection->msg("Connection reset by peer")
 					: $self->recv_command($connection);
-				if (!$command) {
+				if (!@commands) {
 					$self->on_disconnect($connection);
 					$self->delete_connection($connection);
 					next;
 				}
-				$self->on_command($connection, $command);
+				for my $command (@commands) {
+					$self->on_command($connection, $command);
+				}
 			}
 		}
 	}

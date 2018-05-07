@@ -12,8 +12,9 @@ use Chart::Plotly::Trace::Sankey::Link;
 use Chart::Plotly::Trace::Sankey::Node;
 use Chart::Plotly::Trace::Sankey::Stream;
 use Chart::Plotly::Trace::Sankey::Textfont;
+use Chart::Plotly::Trace::Sankey::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Sankey plots for network flow data analysis. The nodes are specified in `nodes` and the links between sources and targets in `links`. The colors are set in `nodes[i].color` and `links[i].color`; otherwise defaults are used.
 
@@ -141,6 +142,9 @@ has stream => ( is  => "rw",
 has textfont => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Textfont", );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Sankey::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -179,7 +183,7 @@ Chart::Plotly::Trace::Sankey - Sankey plots for network flow data analysis. The 
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -313,6 +317,8 @@ Determines whether or not an item corresponding to this trace is shown in the le
 =item * stream
 
 =item * textfont
+
+=item * transforms
 
 =item * uid
 

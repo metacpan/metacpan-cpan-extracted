@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.100';
+our $VERSION   = '1.000';
 
 sub new {
   my $class = shift;
@@ -95,6 +95,30 @@ sub prefix {
   return $ns_prefix->{$namespace};
 }
 
+sub qname {
+  my $self = shift;
+  my $uri = shift;
+
+  # regexpes copied from RDF::Trine::Node::Resource
+  our $r_PN_CHARS_BASE ||= qr/([A-Z]|[a-z]|[\x{00C0}-\x{00D6}]|[\x{00D8}-\x{00F6}]|[\x{00F8}-\x{02FF}]|[\x{0370}-\x{037D}]|[\x{037F}-\x{1FFF}]|[\x{200C}-\x{200D}]|[\x{2070}-\x{218F}]|[\x{2C00}-\x{2FEF}]|[\x{3001}-\x{D7FF}]|[\x{F900}-\x{FDCF}]|[\x{FDF0}-\x{FFFD}]|[\x{10000}-\x{EFFFF}])/;
+  our $r_PN_CHARS_U    ||= qr/(_|${r_PN_CHARS_BASE})/;
+  our $r_PN_CHARS      ||= qr/${r_PN_CHARS_U}|-|[0-9]|\x{00B7}|[\x{0300}-\x{036F}]|[\x{203F}-\x{2040}]/;
+  our $r_PN_LOCAL      ||= qr/((${r_PN_CHARS_U})((${r_PN_CHARS}|[.])*${r_PN_CHARS})?)/;
+
+  my $ln;
+  my $pr;
+  while (my ($prefix, $namespace) = each(%{$self->{prefix_namespace}})) {
+	  if($uri =~ m/^$namespace(${r_PN_LOCAL})$/) {
+		  $ln = $1;
+		  $pr = $prefix;
+		  my $n = scalar keys (%{$self->{prefix_namespace}}); # reset iterator
+		  last;
+	  }
+  }
+  return unless defined($ln);
+  return wantarray ? ($pr, $ln) : "$pr:$ln";
+}
+
 sub all {
   my $self = shift;
   return $self->{prefix_namespace};
@@ -144,6 +168,16 @@ This will return the URI (as a plain string) of the supplied prefix or C<undef> 
 
 This will return the prefix corresponding to the supplied URI string or C<undef> if it is not registered.
 
+=item C<< qname($uri) >>
+
+This will return the qualified name corresponding to the supplied URI
+string or C<undef> if it is not registered. In scalar context, it will
+return the prefix and local name with a colon, and list context, a
+two-element array containing prefix and local name.
+
+For example C<http://purl.org/dc/terms/name> will return C<dc:name> in
+scalar context and C<('dc', 'name')> in list context.
+
 =item C<< all >>
 
 This will return a hashref with all prefix and URI pairs.
@@ -162,6 +196,11 @@ L<RDF::NS>, L<XML::CommonNS>, L<RDF::Prefixes>.
 =head1 AUTHOR
 
 Kjetil Kjernsmo E<lt>kjetilk@cpan.orgE<gt>.
+
+=head1 CONTRIBUTORS
+
+Harald Jörg
+
 
 =head1 COPYRIGHT AND LICENCE
 

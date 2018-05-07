@@ -1,8 +1,10 @@
+ARTISTIC-1.0
 calc/etc/large-operands.json
 calc/etc/operands.json
 calc/etc/small-operands.json
 Changes
 etc/calc-operands.json
+etc/calc.json
 etc/MooXCmdTest-test-this-hashmerged.json
 etc/MooXCmdTest-test-this.json
 etc/MooXCmdTest-test.json
@@ -11,9 +13,12 @@ etc/MooXCmdTest.test.this.json
 etc/MooXCmdTest.tested.json
 etc/MooXCmdTest/test-shortcut-hashmerged.json
 etc/MooXCmdTest/test-shortcut.json
+GPL-1
 lib/MooX/ConfigFromFile.pm
 lib/MooX/ConfigFromFile/Role.pm
 lib/MooX/ConfigFromFile/Role/HashMergeLoaded.pm
+lib/MooX/ConfigFromFile/Role/SortedByFilename.pm
+LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP

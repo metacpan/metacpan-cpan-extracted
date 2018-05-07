@@ -12,9 +12,9 @@ use FindBin '$Bin';
 
 use File::ConfigDir ();
 
-my ($bin_vol, $bin_dir, $bin_file) = File::Spec->splitpath(File::Spec->canonpath($Bin), 1);
+my ($bin_vol, $bin_dir, $bin_file) = File::Spec->splitpath(abs_path(File::Spec->canonpath($Bin)), 1);
 my @bin_dirs = File::Spec->splitdir($bin_dir);
-my $abs_bin = abs_path(File::Spec->catpath($bin_vol, File::Spec->catdir(@bin_dirs)));
+my $abs_bin = File::Spec->catpath($bin_vol, File::Spec->catdir(@bin_dirs));
 
 my %common_base_tests = (
     '$a euals $b'        => [$abs_bin, $abs_bin],

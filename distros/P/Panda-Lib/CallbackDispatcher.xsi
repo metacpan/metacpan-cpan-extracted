@@ -2,8 +2,8 @@ MODULE = Panda::Lib                PACKAGE = Panda::Lib::CallbackDispatcher
 PROTOTYPES: DISABLE
 
 BOOT {
-    xs::register_package("Panda::Lib::CallbackDispatcher", "Panda::Lib");
-    xs::register_package("Panda::Lib::CallbackDispatcherEvent", "Panda::Lib");
+    xs::register_package(aTHX_ "Panda::Lib::CallbackDispatcher", "Panda::Lib");
+    xs::register_package(aTHX_ "Panda::Lib::CallbackDispatcherEvent", "Panda::Lib");
 }
 
 TYPEMAP: << END
@@ -27,7 +27,7 @@ void xs::lib::XSCallbackDispatcher::add_ext(CV* cb) {
         SV* full_args[items+1];
         full_args[0] = typemap_outcast<XSCallbackDispatcher::Event*, HV* CLASS>(&event, event_class);
         memcpy(&full_args[1], args, items*sizeof(SV*));
-        return xs::call_sub_scalar(cb_ptr.get<CV>(), full_args, items+1);
+        return xs::call_sub_scalar(aTHX_ cb_ptr.get<CV>(), full_args, items+1);
     }, cb));
 }
 

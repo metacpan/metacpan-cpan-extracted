@@ -3,6 +3,7 @@ use strict;
 
 use Test::MockModule;
 use Test::More;
+use Test::Warnings;
 
 @Bar::ISA = 'Foo';
 @Baz::ISA = 'Bar';
@@ -39,4 +40,51 @@ is(Baz->motto(), "Foo!", "pre-mock: Baz inherit's Bar's inheritance of Foo's mot
 is(Foo->motto(), "Foo!", "post-unmock: Foo original motto is correct");
 is(Bar->motto(), "Foo!", "post-unmock: Bar inherit's Foo's motto");
 is(Baz->motto(), "Foo!", "post-unmock: Baz inherit's Bar's inheritance of Foo's motto");
+
+{
+	BEGIN {
+		$INC{'Mother.pm'} = '__MOCKED__';
+		$INC{'InvalidChild.pm'} = '__MOCKED__';
+		$INC{'ValidChild.pm'} = '__MOCKED__';
+	}
+	package Mother;
+
+	sub do_something { 1 }
+
+	package InvalidChild;
+
+	sub abcd { 1 }
+
+	package ValidChild;
+
+	use parent q{Mother};
+
+	sub abcd { 1 }
+}
+
+package main;
+
+{
+	my $mock_child = Test::MockModule->new( 'InvalidChild' );
+
+	local $@;
+	ok ! eval { $mock_child->redefine( 'do_something', sub { 42 } ); 1 }, "cannot redefine do_something";
+	like $@, qr{InvalidChild::do_something does not exist!}, "throw a die";
+}
+
+{
+	my $mock_child = Test::MockModule->new( 'ValidChild' );
+
+	local $@;
+	ok eval { $mock_child->redefine( 'do_something', sub { 42 } ); 1 }, "cann redefine do_something when parent define this function";
+	is $@, '', 'no warnings';
+
+	my $object = bless {}, 'ValidChild';
+	is $object->do_something(), 42, "mocked value from do_something";
+
+	$mock_child->unmock( 'do_something' );
+	is $object->do_something(), 1, "do_something is now unmocked";
+}
+
+
 done_testing;

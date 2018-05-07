@@ -1,0 +1,6 @@
+Revision history for Perl module Koha::Contrib::ARK
+
+1.0.0
+
+  - New script: koha-ark
+

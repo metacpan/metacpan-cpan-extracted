@@ -81,8 +81,15 @@ sub parse ($$) {
 	my $class = shift;
 	my $parser = shift || die;
 
+	$parser->cut;  # skip any previous data
+
 	if ($parser->size < $MIN_MESSAGE_SIZE) {
 		warn sprintf "Too short message to parse (%d, should be at least %d)\n", $parser->size, $MIN_MESSAGE_SIZE;
+		return;
+	}
+
+	if ($parser->bytes(4) ne $header_stamp) {
+		warn "Expected SMB1 stamp not found, stopping\n";
 		return;
 	}
 
@@ -118,6 +125,7 @@ sub parse ($$) {
 		aid       => $aid,
 		credits   => $credits,
 		credit_charge => $credit_charge,
+		chain_offset => $offset,
 		struct_size => $struct_size,
 	);
 
@@ -144,6 +152,8 @@ sub parse ($$) {
 	} else {
 		warn sprintf "Got unexisting SMB2 command 0x%x\n", $code;
 	}
+
+	$parser->reset($offset) if $offset;  # jump to the next chain command if any
 
 	return $command;
 }
@@ -204,18 +214,18 @@ sub pack ($$$%) {
 	$packer->uint64($header->uid);
 	$packer->bytes("\0" x 16);      # no message signing for now
 
-	$packer->mark('header-end');
-	$packer->uint16($command->is_success ? $struct_size : 9);
 	$packer->mark('command-start');
+	$packer->uint16($command->is_success ? $struct_size : 9);
 
 	my $is_error_packet = $command->is_error && !$command->is('SessionSetup');
 
 	$command->pack($packer) if !$is_error_packet;
-	$packer->zero(6 + 1) if $is_error_packet;
+	$is_error_packet ||= $command->is_error;  # support abort_pack inside pack
+	$packer->skip(6 + 1) if $is_error_packet;
 
 	my $payload_allowed = $struct_size % 2;
 	$payload_allowed = 1 if $command->is('Negotiate') && !$is_response;
-	my $size = $packer->diff('header-end');
+	my $size = $packer->diff('command-start');
 	my $size0 = $struct_size & ~1;
 	die "SMB2 command $command->{name} pack produced size $size, expected $size0\n"
 		if $size > $size0 && !$payload_allowed && !$is_error_packet;

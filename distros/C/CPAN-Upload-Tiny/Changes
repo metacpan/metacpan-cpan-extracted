@@ -1,5 +1,8 @@
 Revision history for CPAN-Upload-Tiny
 
+0.008     2018-05-02 20:28:36+02:00 Europe/Amsterdam
+          - Add ?ACTION=add_uri to PAUSE upload URI
+
 0.007     2018-04-23 13:12:48+02:00 Europe/Amsterdam
           - Fix typo in dist.ini
 

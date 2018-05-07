@@ -16,17 +16,17 @@ name: File-PCAP
 provides:
   File::PCAP:
     file: lib/File/PCAP.pm
-    version: v0.0.6
+    version: v0.0.7
   File::PCAP::ACAP2PCAP:
     file: lib/File/PCAP/ACAP2PCAP.pm
-    version: v0.0.6
+    version: v0.0.7
   File::PCAP::Reader:
     file: lib/File/PCAP/Reader.pm
-    version: v0.0.6
+    version: v0.0.7
   File::PCAP::Writer:
     file: lib/File/PCAP/Writer.pm
-    version: v0.0.6
+    version: v0.0.7
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: v0.0.6
+version: v0.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

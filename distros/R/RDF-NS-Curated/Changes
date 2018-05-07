@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/RDF-NS-Curated>
 Bug tracker:  <https://github.com/kjetilk/p5-rdf-ns-curated/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+1.000	2018-05-07
+
+ - Added: Added qname method. Many thanks to Harald Jörg for a bugfix in my
+   implementation.
+
 0.100	2018-02-05
 
  [ Bug Fixes ]

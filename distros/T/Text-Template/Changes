@@ -1,5 +1,13 @@
 Revision history for Text::Template
 
+1.53  2018-05-02
+    - Add support for decoding template files via ENCODING constructor arg
+      [github #11]
+    - Docs cleanup: replace indirect-object style examples and use class method
+      style constructor calls in the POD docs
+    - Docs cleanup: remove hard tabs from POD, replace dated, unfair synopsis
+      [github #5], convert "THANKS" section to a POD list
+
 1.52  2018-03-19
     - Fix possible 'Subroutine ... redefined' warning (Github #10)
 

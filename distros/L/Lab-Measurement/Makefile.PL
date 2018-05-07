@@ -49,6 +49,7 @@ my %WriteMakefileArgs = (
     "MooseX::StrictConstructor" => 0,
     "PDL" => "2.007",
     "PDL::Core" => 0,
+    "PDL::NiceSlice" => 0,
     "POSIX" => 0,
     "Role::Tiny" => "1.003004",
     "Role::Tiny::With" => 0,
@@ -93,7 +94,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.631",
+  "VERSION" => "3.641",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -138,6 +139,7 @@ my %FallbackPrereqs = (
   "MooseX::StrictConstructor" => 0,
   "PDL" => "2.007",
   "PDL::Core" => 0,
+  "PDL::NiceSlice" => 0,
   "PDL::Ufunc" => 0,
   "POSIX" => 0,
   "Role::Tiny" => "1.003004",

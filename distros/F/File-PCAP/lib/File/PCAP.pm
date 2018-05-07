@@ -10,12 +10,11 @@ File::PCAP - a pure Perl library to handle libpcap based files.
 
 =head1 VERSION
 
-Version v0.0.6
+Version v0.0.7
 
 =cut
 
-use version; our $VERSION = qv('v0.0.6');
-
+use version; our $VERSION = qv('v0.0.7');
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ no_index:
 provides:
   Command::Runner:
     file: lib/Command/Runner.pm
-    version: '0.100'
+    version: '0.101'
   Command::Runner::Format:
     file: lib/Command/Runner/Format.pm
   Command::Runner::LineBuffer:
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/skaji/Command-Runner/issues
   homepage: https://github.com/skaji/Command-Runner
   repository: https://github.com/skaji/Command-Runner.git
-version: '0.100'
+version: '0.101'
 x_contributors:
   - 'Shoichi Kaji <skaji@outlook.com>'
 x_generated_by_perl: v5.26.2

@@ -11,8 +11,9 @@ use Chart::Plotly::Trace::Candlestick::Hoverlabel;
 use Chart::Plotly::Trace::Candlestick::Increasing;
 use Chart::Plotly::Trace::Candlestick::Line;
 use Chart::Plotly::Trace::Candlestick::Stream;
+use Chart::Plotly::Trace::Candlestick::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The candlestick is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The boxes represent the spread between the `open` and `close` values and the lines represent the spread between the `low` and `high` values Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing candles are drawn in green whereas decreasing are drawn in red.
 
@@ -177,6 +178,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Candlestick::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -221,7 +225,7 @@ has xsrc => ( is            => "rw",
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -239,7 +243,7 @@ Chart::Plotly::Trace::Candlestick - The candlestick is a style of financial char
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -391,6 +395,8 @@ Sets hover text elements associated with each sample point. If a single string, 
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * uid
 
 =item * visible
@@ -419,7 +425,7 @@ Sets the source reference on plot.ly for  x .
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =back
 

@@ -37,14 +37,13 @@ is_plural_to_singular  "this"   =>  "these";
 
 is_singular_to_plural  "my"     =>  "our";
 is_singular_to_plural  "your"   =>  "your";
-is_singular_to_plural  "their"  =>  "their";
 is_singular_to_plural  "her"    =>  "their";
 is_singular_to_plural  "his"    =>  "their";
 is_singular_to_plural  "its"    =>  "their";
 
 is_plural_to_singular  "my"     =>  "our";
 is_plural_to_singular  "your"   =>  "your";
-is_plural_to_singular  "their"  =>  "their";
+is_plural_to_singular  "its"    =>  "their";
 
 
 # Normal adjectives...

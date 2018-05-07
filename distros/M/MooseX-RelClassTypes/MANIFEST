@@ -1,5 +1,6 @@
 Changes
 Makefile.PL
+whatgives.PL
 MANIFEST
 README
 t/00_set_isa.t

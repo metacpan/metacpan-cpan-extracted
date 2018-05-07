@@ -1,0 +1,29 @@
+---
+abstract: 'mod_perl2 integration for Devel::Camelcadedb'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON::XS: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-Camelcadedb
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Devel::Camelcadedb: '0'
+  mod_perl2: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/mbarbon/apache2-camelcadedb/issues
+  repository: https://github.com/mbarbon/apache2-camelcadedb
+version: '0.01'

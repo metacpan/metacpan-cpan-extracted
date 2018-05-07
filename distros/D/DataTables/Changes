@@ -1,5 +1,8 @@
 Revision history for Perl extension DataTables.
 
+0.05 May 2, 2018 13:36 PST
+    - Added SQL::Abstract::Limit as a dependency.
+
 0.04 April 28, 2018 17:10 PST
     - Changes by asb-capfan until September 24, 2017
 

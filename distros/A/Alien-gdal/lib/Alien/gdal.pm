@@ -2,9 +2,36 @@ package Alien::gdal;
 
 use strict;
 use warnings;
-use base qw( Alien::Base );
+use parent qw( Alien::Base );
 
-our $VERSION = '1.04';
+our $VERSION = '1.09';
+
+sub data_dir {
+    my $self = shift;
+ 
+    my $path = $self->dist_dir . '/share/gdal';
+    
+    if (!-d $path) {
+        #  try PkgConfig
+        use PkgConfig;
+        my %options;
+        if (-d $self->dist_dir . '/lib/pkgconfig') {
+            $options{search_path_override} = [$self->dist_dir . '/lib/pkgconfig'];
+        }
+        my $o = PkgConfig->find('gdal', %options);
+        if ($o->errmsg) {
+            warn $o->errmsg;       
+        }
+        else {
+            $path = $o->get_var('datadir');
+        }
+    }
+
+    warn "Cannot find gdal data dir"
+      if not (defined $path and -d $path);
+
+    return $path;
+}
 
 1;
 
@@ -35,8 +62,11 @@ Alien::gdal - Compile gdal, the Geographic Data Abstraction Library
 
     print Alien::gdal->dist_dir;
 
-    #  example assumes @args exists already
+    #  assuming you have populated @args already
     system (Alien::gdal->bin_dir, 'gdalwarp', @args);
+    
+    #  access the example data distributed with gdal
+    my $path = Alien::gdal->data_dir;
     
 =head1 DESCRIPTION
 

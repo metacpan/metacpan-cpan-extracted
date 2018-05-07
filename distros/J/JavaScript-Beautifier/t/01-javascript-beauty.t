@@ -21,27 +21,17 @@ sub test_beautifier {
 
     $expected ||= $input;
     my $result = js_beautify( $input, $opts );
-    
-    $tests_num++;
-    is($result, $expected, $input);
-}
-sub test_beautifier1 {
-    my ($input, $expected) = @_;
 
-    $expected ||= $input;
-    my $result = js_beautify( $input, $opts );
-    
     $tests_num++;
-    $result .= "\n";
     is($result, $expected, $input);
 }
 
 sub bt {
     my ($input, $expected) = @_;
-    
+
     test_beautifier(@_);
     $expected ||= $input;
-    
+
     # test also the returned indentation
     # e.g if input = "asdf();"
     # then test that this remains properly formatted as well:
@@ -49,7 +39,7 @@ sub bt {
     # asdf();
     # indent;
     # }
-    
+
     if ( $opts->{indent_size} == 4 && $input ) {
         my $wrapped_input = "{\n" . $input . "\nindent;}";
         my $wrapped_expectation = $expected;
@@ -135,7 +125,7 @@ bt( "a = 1;\n // comment\n", "a = 1;\n// comment" );
 
 bt( "if (a) {\n    do();\n}"); # was: extra space appended
 bt( "if\n(a)\nb();", "if (a) b();" ); # test for proper newline removal
- 
+
 bt( "if (a) {\n// comment\n}else{\n// comment\n}", "if (a) {\n    // comment\n} else {\n    // comment\n}" ); # if/else statement with empty body
 bt( "if (a) {\n// comment\n// comment\n}", "if (a) {\n    // comment\n    // comment\n}" ); # multiple comments indentation
 bt( "if (a) b() else c();", "if (a) b()\nelse c();" );
@@ -207,10 +197,10 @@ bt( 'a(/[a/b]/);b()', "a(/[a/b]/);\nb()" );
 bt( 'a=[[1,2],[4,5],[7,8]]', "a = [\n    [1, 2],\n    [4, 5],\n    [7, 8]]" );
 bt( 'a=[a[1],b[4],c[d[7]]]', "a = [a[1], b[4], c[d[7]]]" );
 bt( '[1,2,[3,4,[5,6],7],8]', "[1, 2, [3, 4, [5, 6], 7], 8]" );
-    
+
 bt( '[[["1","2"],["3","4"]],[["5","6","7"],["8","9","0"]],[["1","2","3"],["4","5","6","7"],["8","9","0"]]]',
       qq~[\n    [\n        ["1", "2"],\n        ["3", "4"]],\n    [\n        ["5", "6", "7"],\n        ["8", "9", "0"]],\n    [\n        ["1", "2", "3"],\n        ["4", "5", "6", "7"],\n        ["8", "9", "0"]]]~ );
-    
+
 bt( '{[x()[0]];indent;}', "{\n    [x()[0]];\n    indent;\n}" );
 
 $opts->{space_after_anon_function} = 1;
@@ -261,7 +251,8 @@ $(document).ready(function() {
  $(\'.r5e57\').html(8080);$(\'.r1655\').html(80);$(\'.rc15b\').html(3128);$(\'.r6ae9\').html(8888);$(\'.r39b0\').html(65309)});c=abx;
 EOF
 
-test_beautifier1($xxinput,$xxexpected);
+chomp $xxexpected;
+test_beautifier($xxinput,$xxexpected);
 
 $xxinput = '';
 $xxexpected = '';
@@ -276,7 +267,20 @@ var n = str.search(/w3Schools/i);
 document.getElementById("demo").innerHTML = n;
 EOF
 
-test_beautifier1($xxinput,$xxexpected);
+chomp $xxexpected;
+test_beautifier($xxinput,$xxexpected);
+
+$xxinput = <<'EOF';
+eval(function(p,a,c,k,e,r){e=function(c){return c.toString(36)};if('0'.replace(0,e)==0){while(c--)r[e(c)]=k[c];k=[function(e){return r[e]||e}];e=function(){return'[0-9ab]'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$(5).a(6(){ $(\'.8\').0(1); $(\'.b\').0(4); $(\'.9\').0(2); $(\'.7\').0(3)})',[],12,'html|52136|555|65103|8088|document|function|r542c|r8ce6|rb0de|ready|rfab0'.split('|'),0,{}))
+EOF
+
+$xxexpected = <<'EOF';
+$(document).ready(function() {
+ $(\'.r8ce6\').html(52136); $(\'.rfab0\').html(8088); $(\'.rb0de\').html(555); $(\'.r542c\').html(65103)})
+EOF
+
+chomp $xxexpected;
+test_beautifier($xxinput,$xxexpected);
 
 done_testing( $tests_num );
 

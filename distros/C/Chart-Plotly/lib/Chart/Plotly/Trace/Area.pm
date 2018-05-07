@@ -9,8 +9,9 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Area::Hoverlabel;
 use Chart::Plotly::Trace::Area::Marker;
 use Chart::Plotly::Trace::Area::Stream;
+use Chart::Plotly::Trace::Area::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT:
 
@@ -134,6 +135,9 @@ has t => ( is  => "rw",
              "For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the angular coordinates.",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Area::Transform]", );
+
 has tsrc => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the source reference on plot.ly for  t .",
@@ -163,7 +167,7 @@ Chart::Plotly::Trace::Area -
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -280,6 +284,8 @@ Determines whether or not an item corresponding to this trace is shown in the le
 =item * t
 
 For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the angular coordinates.
+
+=item * transforms
 
 =item * tsrc
 

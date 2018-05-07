@@ -27,6 +27,7 @@ my $META_MERGE = {
 
 my $TEST_REQUIRES = {
     'IPC::System::Simple' => '1.25',
+    'Test::Fatal'         => '0.014',
 };
 
 WriteMakefile(
@@ -38,7 +39,9 @@ WriteMakefile(
 
     PREREQ_PM => {
         'Scope::Guard' => '0.21',
+        'version'      => '0.77',
     },
+
     ABSTRACT_FROM => 'lib/autobox.pod',
     AUTHOR        => 'chocolateboy <chocolate@cpan.org>',
     INC           => '-I.',

@@ -208,6 +208,8 @@ scripts/Graphical/kronecker_fractal.sf
 scripts/Graphical/LSystem/LSystem.sf
 scripts/Graphical/LSystem/Turtle.sf
 scripts/Graphical/lsystem_complex.sf
+scripts/Graphical/lsystem_hilbert_curve.sf
+scripts/Graphical/lsystem_koch_snowflake.sf
 scripts/Graphical/lsystem_plant_1.sf
 scripts/Graphical/lsystem_plant_2.sf
 scripts/Graphical/lsystem_sierpinski_triangle.sf
@@ -283,6 +285,7 @@ scripts/RosettaCode/bitwise_operations.sf
 scripts/RosettaCode/boolean_values.sf
 scripts/RosettaCode/boolean_values_1.sf
 scripts/RosettaCode/brace_expansion.sf
+scripts/RosettaCode/cantor_set.sf
 scripts/RosettaCode/case-sensitivity_of_identifiers.sf
 scripts/RosettaCode/catalan_numbers.sf
 scripts/RosettaCode/catalan_numbers_1.sf
@@ -726,6 +729,7 @@ scripts/Tests/iban.sf
 scripts/Tests/ilog.sf
 scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/implicit_numberic_conversions.sf
+scripts/Tests/infix_methods.sf
 scripts/Tests/integer_limits.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
@@ -849,6 +853,7 @@ scripts/Tests/roman_numerals_decoding_3.sf
 scripts/Tests/roman_numerals_encoding.sf
 scripts/Tests/roman_numerals_encoding_2.sf
 scripts/Tests/root_mean_square.sf
+scripts/Tests/roots_on_the_rise.sf
 scripts/Tests/round_half_to_even.sf
 scripts/Tests/roundf.sf
 scripts/Tests/run_length_encoding.sf
@@ -892,6 +897,7 @@ scripts/Tests/symbolic_fractions.sf
 scripts/Tests/symmetric_difference.sf
 scripts/Tests/sysopen_and_sysread.sf
 scripts/Tests/tennis_tournament.sf
+scripts/Tests/ternary_operator.sf
 scripts/Tests/token_recursive.sf
 scripts/Tests/top_rank_per_group.sf
 scripts/Tests/topological_sort.sf

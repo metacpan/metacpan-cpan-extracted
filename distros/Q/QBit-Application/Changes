@@ -1,10 +1,46 @@
 ==================================================
-Changes from 2016-07-30 00:00:00 +0000 to present.
+Changes from 2017-05-06 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.015 at 2017-07-30 22:04:13 +0000
+version 0.016 at 2018-05-06 13:59:12 +0000
 ------------------------------------------
+
+  Change: 85ea071398b48f2ec3c8bb46ee3727b1ca2e121e
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-05-06 16:20:36 +0000
+
+    Merge pull request #11 from Madskill/configs
+
+    Configs 
+
+  Change: 0986a9347701a796c5a6f49e25c000a4281b79df
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-06 16:17:00 +0000
+
+    documentations 
+
+  Change: 0558f82f8c095ea5c23b49c4a85b5268cace0499
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-06 16:11:27 +0000
+
+    Merge remote-tracking branch 'upstream/master' into configs 
+
+  Change: 7b98f4c636c320c9f502749dbb27313ec490bbed
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-06 15:03:45 +0000
+
+    configs and added documantations 
+
+------------------------------------------
+version 0.015 at 2017-07-30 22:04:38 +0000
+------------------------------------------
+
+  Change: 7da3e3d7803164bca11d1e5d4ac935c47c1a633b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-07-31 01:04:38 +0000
+
+    Version 0.015 
 
   Change: a46398d0652f8d421223d99c6f783f81228ed914
   Author: Igor <igor-sverdlov@mail.ru>
@@ -20,84 +56,6 @@ version 0.015 at 2017-07-30 22:04:13 +0000
 
     speed up accessors and post_run 
 
-------------------------------------------
-version 0.014 at 2017-01-12 05:40:21 +0000
-------------------------------------------
-
-  Change: 36fcb18b9a1deb8c4a3466add693e1c9b9190006
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-01-12 08:40:21 +0000
-
-    Version 0.014 
-
-  Change: 9d15655ed00260317050464d94b04d4935d3092d
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-01-12 09:39:10 +0000
-
-    Merge pull request #9 from Madskill/fix_current_rights
-
-    clear current user rights 
-
-  Change: f4282d58f86c184b14e4807ca59653f3120fc62f
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-01-12 08:36:34 +0000
-
-    clear current user rights 
-
-------------------------------------------
-version 0.013 at 2016-12-01 18:32:55 +0000
-------------------------------------------
-
-  Change: b22267d7317b7a3ab6bd510bf4f672b89da669ae
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 21:32:55 +0000
-
-    Version 0.013 
-
-  Change: 5749d013b2689336017d6ddd7f1f1cc3a645e4f2
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 21:32:12 +0000
-
-    Merge pull request #8 from Madskill/speed_up
-
-    speed up check_rights 
-
-  Change: 7b53e0b824f3dde4671b0f6c81cac1bdcb37901d
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-26 20:01:00 +0000
-
-    unique rights and added _fix_cur_user 
-
-  Change: e384a8b7bdfc05552b6436dd91d5bce81e47630a
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-25 02:42:02 +0000
-
-    speed up check_rights 
-
-------------------------------------------
-version 0.012 at 2016-10-09 08:57:06 +0000
-------------------------------------------
-
-  Change: e832301f2c9e0ebcdab65d4b0c592770532fdbe5
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 11:57:06 +0000
-
-    Version 0.012 
-
-  Change: fd2ff1623aa5536d42283cbedcaa9ae2ca6beda9
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 12:56:14 +0000
-
-    Merge pull request #7 from Madskill/fix_dependency
-
-    added TestTimeLog 
-
-  Change: 5ca1076977a669332791e8aebe467a4003caced0
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 17:37:47 +0000
-
-    added TestTimeLog 
-
 =================================================
-Plus 11 releases after 2016-07-30 00:00:00 +0000.
+Plus 14 releases after 2017-05-06 00:00:00 +0000.
 =================================================

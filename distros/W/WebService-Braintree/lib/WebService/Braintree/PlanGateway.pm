@@ -9,18 +9,13 @@ use strictures 1;
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
-use WebService::Braintree::Util qw(to_instance_array);
-
-has 'gateway' => (is => 'ro');
-
 use WebService::Braintree::_::Plan;
 
 sub all {
     my $self = shift;
-
-    my $response = $self->gateway->http->get("/plans");
-    my $attrs = $response->{plans} || [];
-    return to_instance_array($attrs, 'WebService::Braintree::_::Plan');
+    return $self->_array_request(
+        '/plans', 'plans', 'WebService::Braintree::_::Plan',
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

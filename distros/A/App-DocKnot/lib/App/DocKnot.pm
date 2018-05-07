@@ -10,9 +10,9 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 1.04;
+package App::DocKnot 1.05;
 
-use 5.018;
+use 5.024;
 use autodie;
 use warnings;
 
@@ -74,7 +74,7 @@ sub _code_for_copyright {
         my ($indent, $lead) = @_;
         my $prefix = ($lead // q{}) . q{ } x $indent;
         my $notice;
-        for my $copyright (@{$copyrights_ref}) {
+        for my $copyright ($copyrights_ref->@*) {
             my $holder = $copyright->{holder};
             my $years  = $copyright->{years};
 
@@ -535,7 +535,7 @@ sub generate {
 
     # Load supplemental README sections.  readme.sections will contain a list
     # of sections to add to the README file.
-    for my $section (@{ $data_ref->{readme}{sections} }) {
+    for my $section ($data_ref->{readme}{sections}->@*) {
         my $title = $section->{title};
 
         # The file containing the section data will match the title, converted
@@ -570,7 +570,7 @@ sub generate {
         die "Unknown license $license\n";
     }
     my $license_text = slurp($self->_appdata_path('licenses', $license));
-    $data_ref->{license} = { %{ $licenses_ref->{$license} } };
+    $data_ref->{license} = { $licenses_ref->{$license}->%* };
     $data_ref->{license}{full} = $license_text;
 
     # Load additional license notices if they exist.
@@ -585,10 +585,14 @@ sub generate {
     $vars{description}  = $self->_load_metadata('description');
     $vars{requirements} = $self->_load_metadata('requirements');
 
-    # Load bootstrap and Debian summary information if it exists.
+    # Load bootstrap, Debian summary information, and extra packaging
+    # information if they exist.
     eval { $vars{bootstrap} = $self->_load_metadata('bootstrap') };
     eval {
         $vars{debian}{summary} = $self->_load_metadata('debian', 'summary');
+    };
+    eval {
+        $vars{packaging}{extra} = $self->_load_metadata('packaging', 'extra');
     };
 
     # Load build sections if they exist.
@@ -649,7 +653,7 @@ App::DocKnot - Generate human-readable documentation from package metadata
 
 =head1 REQUIREMENTS
 
-Perl 5.18 or later and the modules File::BaseDir, File::ShareDir, JSON,
+Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, JSON,
 Perl6::Slurp, and Template (part of Template Toolkit), all of which are
 available from CPAN.
 

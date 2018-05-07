@@ -1,5 +1,11 @@
 Revision history for Test::MockModule
 
+v0.14
+    - Fixes a bug where the `redefine()` function was dying when attempting to
+      mock a function that was defined further up a module's inheritance chain.
+      It now only dies when the mocked function does not exist in the module being
+      mocked, or any of its parent modules. Thanks @atoomic for the improvement!
+
 v0.13
     - Added the `redefine()` function. It works just like `mock()`, except if the
       method being mocked doesn't exist, it causes a panic. Many thanks to Felipe

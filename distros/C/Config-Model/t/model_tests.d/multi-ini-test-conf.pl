@@ -21,12 +21,12 @@ $model->create_config_class(
     element => [
         int_with_max => {qw/type leaf value_type integer max 10/},
     ],
-    read_config => [{
+    rw_config => {
         backend     => 'IniFile',
         config_dir  => '/etc/',
         file        => '&index.conf',
         auto_create => 1,
-    }],
+    },
 );
 
 $model->create_config_class(
@@ -43,12 +43,12 @@ $model->create_config_class(
             }
         },
     ],
-    read_config => [{
+    rw_config => {
         backend     => 'Yaml',
         config_dir  => '/etc/',
         file        => 'service.yml',
         auto_create => 1,
-    }],
+    },
 );
 
 

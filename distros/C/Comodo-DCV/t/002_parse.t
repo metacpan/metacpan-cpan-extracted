@@ -41,6 +41,6 @@ is( $filename, '4547FDDC7118AC1B676C964534F2DB10.txt', 'filename of sample CSR' 
 
 is(
     $contents,
-    "917e8c29d9695f4663635df925f2b528ffa7bd67$/comodoca.com",
+    "0ba404b6326c6790c9abe76fa303b17ba25b90b732507810df280549d1c5d5b0$/comodoca.com",
     'contents',
 );

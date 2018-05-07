@@ -1,0 +1,41 @@
+#!perl
+
+use alienfile;
+
+plugin 'PkgConfig' => (
+    pkg_name        => 'tidy',
+    minimum_version => '5.6.0',
+);
+
+share {
+
+    plugin 'Build::CMake';
+
+    start_url 'https://github.com/htacg/tidy-html5/tags';
+
+    plugin 'Download' => (
+        filter  => qr/(\d\.)+\d\.tar\.gz$/,
+        version => qr/([0-9\.]+)/,
+        prefer  => 1,
+    );
+
+    plugin 'Extract' => 'tar.gz';
+
+    build [
+        [
+            '%{cmake}',
+            -G => '%{cmake_generator}',
+            '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
+            '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.'
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+
+};
+
+gather [
+    [ 'pkg-config --modversion tidy', \'%{.runtime.version}' ],
+    [ 'pkg-config --cflags     tidy', \'%{.runtime.cflags}' ],
+    [ 'pkg-config --libs       tidy', \'%{.runtime.libs}' ],
+];

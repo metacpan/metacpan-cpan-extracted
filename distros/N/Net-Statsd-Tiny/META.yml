@@ -28,20 +28,17 @@ name: Net-Statsd-Tiny
 provides:
   Net::Statsd::Tiny:
     file: lib/Net/Statsd/Tiny.pm
-    version: v0.3.0
+    version: v0.3.1
   Net::Statsd::Tiny::Types:
     file: lib/Net/Statsd/Tiny/Types.pm
-    version: v0.3.0
+    version: v0.3.1
 requires:
   Class::Accessor::Fast: '0'
   IO::Socket: '1.18'
-  base: '0'
   perl: v5.10.1
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Tiny/issues
   repository: git://github.com/robrwo/Net-Statsd-Tiny.git
-version: v0.3.0
+version: v0.3.1
 x_authority: cpan:RRWO
 x_serialization_backend: 'YAML::Tiny version 1.70'

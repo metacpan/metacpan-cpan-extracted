@@ -201,12 +201,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (double phi(); double k(); double n();
+  Signature: (double phi(); double k();
               double [o]y(); double [o]e())
 
 =for ref
 
-Legendre form of incomplete elliptic integrals D(phi,k,n)
+Legendre form of incomplete elliptic integrals D(phi,k)
 
 =for bad
 

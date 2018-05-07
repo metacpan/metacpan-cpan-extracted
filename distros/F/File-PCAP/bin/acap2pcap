@@ -8,6 +8,8 @@ use File::PCAP::ACAP2PCAP;
 use Getopt::Long;
 use Pod::Usage;
 
+use version; our $VERSION = qv('v0.0.7');
+
 my %opt = ();
 my @optdefs = qw(
 	dlt=i

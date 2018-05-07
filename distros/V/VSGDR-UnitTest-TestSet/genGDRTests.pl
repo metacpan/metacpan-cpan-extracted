@@ -84,16 +84,16 @@ my @validSuffixes       = map { '.'.$_ } keys %ValidParserMakeArgs ;
 
 ### Connect to database
 
-my $dbh             = DBI->connect("dbi:ODBC:${dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1 });
-my $dbh_typeinfo    = DBI->connect("dbi:ODBC:${dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1 });
+my $dbh             = DBI->connect("dbi:ODBC:${dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1, 'LongTruncOk' => 0, LongReadLen => 1000000 });
+my $dbh_typeinfo    = DBI->connect("dbi:ODBC:${dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1, 'LongTruncOk' => 0, LongReadLen => 1000000 });
 
 # Always create a $priv_dbh handle, re-use the normal database dsn if no privileged dsn specified.
 my $priv_dbh    = undef ;
 if ( defined $priv_dataBase ) {
-    $priv_dbh       = DBI->connect("dbi:ODBC:${priv_dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1 })
+    $priv_dbh       = DBI->connect("dbi:ODBC:${priv_dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1,'LongTruncOk' => 0, LongReadLen => 1000000  })
 }
 else {
-    $priv_dbh       = DBI->connect("dbi:ODBC:${dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1 })
+    $priv_dbh       = DBI->connect("dbi:ODBC:${dataBase}", q{}, q{}, { AutoCommit => 1, RaiseError => 1,'LongTruncOk' => 0, LongReadLen => 1000000  })
 }
 
 

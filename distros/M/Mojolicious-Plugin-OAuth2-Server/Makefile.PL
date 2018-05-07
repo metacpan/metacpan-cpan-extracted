@@ -12,7 +12,7 @@ WriteMakefile(
   AUTHOR        => 'Lee Johnson <leejo@cpan.org>',
   LICENSE       => 'perl',
   PREREQ_PM => {
-    'Mojolicious'  => '5.37',
+    'Mojolicious'  => '7.76',
     'Net::OAuth2::AuthorizationServer'  => '0.17',
     'Carp'            => 0,
   },

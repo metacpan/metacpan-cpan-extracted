@@ -46,6 +46,7 @@ use constant {
 use constant {
 	OID_SPNEGO       => '1.3.6.1.5.5.2',
 	OID_MECH_NTLMSSP => '1.3.6.1.4.1.311.2.2.10',
+	OID_MECH_NEGOEX  => '1.3.6.1.4.1.311.2.2.30',
 
 	SPNEGO_ACCEPT_COMPLETED  => 0,
 	SPNEGO_ACCEPT_INCOMPLETE => 1,
@@ -141,7 +142,7 @@ sub create_ntlmv2_hash ($$$) {
 	my $username = shift // '';
 	my $domain = shift // '';
 
-	return hmac_md5(encode('UTF-16LE', uc($username . $domain)), $ntlm_hash);
+	return hmac_md5(encode('UTF-16LE', uc($username) . $domain), $ntlm_hash);
 }
 
 sub create_lmv2_response ($$$$) {
@@ -422,6 +423,7 @@ sub generate_spnego ($%) {
 			[ ASN1_OID, OID_SPNEGO ],
 			[ ASN1_CONTEXT, ASN1_SEQUENCE,
 				[ ASN1_CONTEXT, ASN1_SEQUENCE,
+					[ ASN1_OID, OID_MECH_NEGOEX ],
 					[ ASN1_OID, OID_MECH_NTLMSSP ],
 				],
 			],
@@ -594,10 +596,10 @@ sub generate_spnego ($%) {
 		];
 	} elsif (!defined $self->auth_completed) {
 		$self->auth_completed($self->is_user_authenticated ? 1 : 0);
-		my $mechlist_mic = "\x01\x00\x00\x00\x89\x22\x91\x93\xff\xdb\xcb\x26\x00\x00\x00\x00";  #"\x00" x 16;
+		my $mechlist_mic = "\x00" x 16;  # TODO: calculate it correctly when/if needed
 		$struct = [ ASN1_CONTEXT + 1, ASN1_SEQUENCE,
 			[ ASN1_CONTEXT, ASN1_ENUMERATED, SPNEGO_ACCEPT_COMPLETED ],
-			[ ASN1_CONTEXT + 3, ASN1_BINARY, $mechlist_mic ],
+#			[ ASN1_CONTEXT + 3, ASN1_BINARY, $mechlist_mic ],
 		] if $self->auth_completed;
 	} else {
 		$self->err("generate_spnego called after auth_completed");

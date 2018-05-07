@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.14.19;
+package Pcore::PgSQL v0.15.2;
 
 use Pcore -dist, -class;
 
@@ -14,24 +14,26 @@ sub run ( $self, $cb ) {
 
     # init db
     if ( $self->is_empty ) {
-        my $superuser_password;
-
         my $pwfile = "$self->{data_dir}/pgsql-password.txt";
 
-        if ( !-f $pwfile ) {
-            $superuser_password = P->random->bytes_hex(32);
+        my $superuser_password;
 
-            P->file->write_bin( $pwfile, $superuser_password );
-
-            chown $uid, $uid, $pwfile or die;
+        if ( defined $ENV{PGSQL_POSTGRES_PASSWORD} ) {
+            $superuser_password = $ENV{PGSQL_POSTGRES_PASSWORD};
         }
         else {
-            $superuser_password = P->file->read_bin($pwfile);
+            $superuser_password = P->random->bytes_hex(32);
+
+            say "GENERATED POSTGRES PASSWORD: $superuser_password\n";
         }
 
-        say "postgres password: $superuser_password\n";
+        P->file->write_bin( $pwfile, $superuser_password );
+
+        chown $uid, $uid, $pwfile or die;
 
         my $res = P->pm->run_proc( [ 'su', 'postgres', '-c', "$ENV{POSTGRES_HOME}/bin/initdb --encoding UTF8 --no-locale -U postgres --pwfile $pwfile -D $db_dir" ] );
+
+        unlink $pwfile or 1;
 
         exit 3 if !$res;
 

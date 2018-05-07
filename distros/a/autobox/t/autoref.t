@@ -3,7 +3,17 @@
 use strict;
 use warnings;
 
+use Test::Fatal qw(exception);
 use Test::More tests => 27;
+
+our @ISA = ();
+
+my @array  = (1 .. 3);
+my $array = \@array;
+my %hash = (qw(alpha beta gamma vlissides));
+my $hash = \%hash;
+my $ejoin = qr{^Can't (call|locate object) method "join" (without a|via) package\b};
+my $ekeys = qr{^Can't (call|locate object) method "keys" (without a|via) package\b};
 
 sub ARRAY::join {
     my ($array, $delimiter) = @_;
@@ -25,20 +35,18 @@ sub HASH::set {
     $hash->{$key} = $value;
 }
 
-our @ISA = ();
-my @array  = (1 .. 3);
-my $array = \@array;
-my %hash = (qw(alpha beta gamma vlissides));
-my $hash = \%hash;
-my $ejoin = qr{Can't (call|locate object) method "join" (without a|via) package\b};
-my $ekeys = qr{Can't (call|locate object) method "keys" (without a|via) package\b};
-
 # make sure it doesn't work before autobox is enabled
-eval { @array->join(', ') };
-like ($@, $ejoin, '@array->join fails before autobox is enabled');
+like(
+    exception { @array->join(', ') },
+    $ejoin,
+    '@array->join fails before autobox is enabled'
+);
 
-eval { %hash->keys };
-like ($@, $ekeys, '%hash->keys fails before autobox is enabled');
+like(
+    exception { %hash->keys },
+    $ekeys,
+    '%hash->keys fails before autobox is enabled'
+);
 
 {
     use autobox;
@@ -76,11 +84,11 @@ like ($@, $ekeys, '%hash->keys fails before autobox is enabled');
 
     # tied hash
     %ENV->set('autobox_test', 42);
-    is ($ENV{autobox_test}, 42, 'tied hash');
+    is($ENV{autobox_test}, 42, 'tied hash');
 
     # tied array
     @ISA->push('autobox_test');
-    is ($ISA[-1], 'autobox_test', 'tied array');
+    is($ISA[-1], 'autobox_test', 'tied array');
 
     # confirm multiple (> 1) args are passed a) as a list (i.e. not an array ref)
     # and b) unreferenced e.g. (1, 2, ...) rather than (\1, \2, ...)
@@ -102,16 +110,28 @@ like ($@, $ekeys, '%hash->keys fails before autobox is enabled');
     no autobox;
 
     # make sure it doesn't work when autobox is disabled
-    eval { @array->join(', ') };
-    like ($@, $ejoin, '@array->join fails after autobox is disabled');
+    like(
+        exception { @array->join(', ') },
+        $ejoin,
+        '@array->join fails after autobox is disabled'
+    );
 
-    eval { %hash->keys };
-    like ($@, $ekeys, '%hash->keys fails after autobox is disabled');
+    like(
+        exception { %hash->keys },
+        $ekeys,
+        '%hash->keys fails after autobox is disabled'
+    );
 }
 
 # make sure it doesn't work when autobox is out of scope
-eval { @array->join(', ') };
-like ($@, $ejoin, '@array->join fails when autobox is out of scope');
+like(
+    exception { @array->join(', ') },
+    $ejoin,
+    '@array->join fails when autobox is out of scope'
+);
 
-eval { %hash->keys };
-like ($@, $ekeys, '%hash->keys fails when autobox is out of scope');
+like(
+    exception { %hash->keys },
+    $ekeys,
+    '%hash->keys fails when autobox is out of scope'
+);

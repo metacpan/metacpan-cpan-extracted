@@ -98,13 +98,33 @@ package Sidef::Math::Math {
         $min;
     }
 
-    sub avg {
+    sub arithmetic_mean {
         my ($self, @list) = @_;
 
         my $sum = $self->sum(@list);
         my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
 
         $sum->div($n);
+    }
+
+    *avg = \&arithmetic_mean;
+
+    sub geometric_mean {
+        my ($self, @list) = @_;
+
+        my $prod = $self->prod(@list);
+        my $n    = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+
+        $prod->root($n);
+    }
+
+    sub harmonic_mean {
+        my ($self, @list) = @_;
+
+        my $sum = $self->sum(map { $_->inv } @list);
+        my $n = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+
+        $n->div($sum);
     }
 
     sub chinese {
@@ -125,7 +145,7 @@ package Sidef::Math::Math {
 
         my $res = eval { Math::Prime::Util::GMP::chinese(@pairs) } // return Sidef::Types::Number::Number->nan;
 
-        if ($res <= Sidef::Types::Number::Number::ULONG_MAX and $res >= 0) {
+        if ($res < Sidef::Types::Number::Number::ULONG_MAX and $res >= 0) {
             return Sidef::Types::Number::Number->_set_uint($res);
         }
 

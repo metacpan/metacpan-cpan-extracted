@@ -128,6 +128,7 @@ sub recv_command ($) {
 	$self->recv_nbss
 		or return;
 
+	my $smb_stamp_start = $self->parser->offset;
 	my $smb_num = $self->parse_uint8;
 	my $smb_str = $self->parse_bytes(3);
 	if ($smb_str ne 'SMB' || $smb_num != 0xff && $smb_num != 0xfe) {
@@ -137,18 +138,25 @@ sub recv_command ($) {
 	}
 	my $is_smb1 = $smb_num == 0xff;
 	$self->mem($self->parser->data, "<- SMB Packet");
+	$self->parser->reset($smb_stamp_start);
 
-	my $command = $is_smb1
-		? $self->parse_smb1
-		: $self->parse_smb2;
+	my @commands;
 
-	if ($command) {
-		$self->dbg("%s", $command->to_string);
-	} else {
-		$self->err("Failed to parse SMB%d packet", $is_smb1 ? 1 : 2);
+	while (1) {
+		my $command = $is_smb1
+			? $self->parse_smb1
+			: $self->parse_smb2;
+
+		if ($command) {
+			$self->dbg("%s", $command->to_string);
+			push @commands, $command;
+		} else {
+			$self->err("Failed to parse SMB%d packet", $is_smb1 ? 1 : 2);
+		}
+		last unless $command && $command->has_next_in_chain;
 	}
 
-	return $command;
+	return @commands;
 }
 
 sub send_nbss ($$) {

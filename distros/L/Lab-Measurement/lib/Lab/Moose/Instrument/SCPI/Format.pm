@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Format;
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.631';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.641';
 #ABSTRACT: Role for SCPI FORMat subsystem.
 
 use Moose::Role;
@@ -16,7 +16,7 @@ sub format_data_query {
 
     my $format = $self->query( command => 'FORM?', %args );
 
-    if ( $format !~ /^(?<format>\w+),(?<length>\d+)$/ ) {
+    if ( $format !~ /^(?<format>\w+)(,(?<length>\d+))?$/ ) {
         croak "illegal value of DATA:FORMat: $format";
     }
 
@@ -28,12 +28,17 @@ sub format_data {
         \@_,
         setter_params(),
         format => { isa => 'Str' },
-        length => { isa => 'Int' }
+        length => { isa => 'Int', optional => 1 },
     );
-    my $format = delete $args{format};
-    my $length = delete $args{length};
 
-    $self->write( command => "FORM $format, $length", %args );
+    my $format  = delete $args{format};
+    my $length  = delete $args{length};
+    my $command = "FORM $format";
+    if ( defined $length ) {
+        $command .= ", $length";
+    }
+
+    $self->write( command => $command, %args );
 
     return $self->cached_format_data( [ $format, $length ] );
 }
@@ -69,7 +74,7 @@ Lab::Moose::Instrument::SCPI::Format - Role for SCPI FORMat subsystem.
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 METHODS
 
@@ -106,6 +111,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

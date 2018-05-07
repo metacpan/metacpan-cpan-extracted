@@ -30,4 +30,5 @@ t/safe2.t
 t/safe3.t
 t/strict.t
 t/taint.t
+t/template-encoding.t
 t/warnings.t

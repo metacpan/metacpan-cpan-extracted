@@ -11,6 +11,7 @@ use Test::File;
 use File::Path 'remove_tree';
 use Lab::Moose qw/our_catfile/;
 use YAML::XS 'LoadFile';
+use POSIX 'strftime';
 use Lab::Moose;
 
 my $dir = tempdir( CLEANUP => 1 );
@@ -42,11 +43,36 @@ my $name = our_catfile( $dir, 'abc def' );
     }
 }
 
+# Check date prefix
+$dir = tempdir( CLEANUP => 1 );
+$name = our_catfile( $dir, 'abc def' );
+{
+    for ( 1 .. 9 ) {
+        datafolder( path => $name, date_prefix => 1 );
+    }
+    my @entries = get_dir_entries($dir);
+    is( @entries, 9, "created 9 folders with date prefix" );
+    my $date_prefix = strftime( '%Y-%m-%d', localtime() );
+    for my $entry (@entries) {
+
+        # make sure that $date_prefix is actually a date
+        like(
+            $entry, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}/,
+            "date in foldername"
+        );
+        like(
+            $entry, qr/^${date_prefix}_abc def_00[1-9]$/,
+            "correct date in folder name"
+        );
+
+    }
+}
+
 # Check meta file and copy of script.
 {
     my $folder = datafolder( path => $name );
     say "path: ", $folder->path();
-    my $folder_name = 'abc def_1010';
+    my $folder_name = 'abc def_001';
     is( $folder->path(), our_catfile( $dir, $folder_name ) );
     isa_ok( $folder->meta_file, 'Lab::Moose::DataFile::Meta' );
 

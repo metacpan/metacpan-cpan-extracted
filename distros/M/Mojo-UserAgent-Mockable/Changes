@@ -1,6 +1,7 @@
-1.53      2017-02-27 15:58:55-06:00 America/Chicago
+1.54      2018-05-04 22:24:09-05:00 America/Chicago
 
 - Fixed dependencies screwed up in v1.52
+- Fixed issue #18 where tests failed due updates to the V&A site.
 
 1.52      2017-02-27 10:21:36-06:00 America/Chicago
 

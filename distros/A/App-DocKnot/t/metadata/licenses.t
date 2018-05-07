@@ -2,11 +2,11 @@
 #
 # Tests for license metadata.
 #
-# Copyright 2017 Russ Allbery <rra@cpan.org>
+# Copyright 2017-2018 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
-use 5.018;
+use 5.024;
 use autodie;
 use warnings;
 
@@ -26,11 +26,11 @@ $json->relaxed;
 my $licenses_ref = $json->decode(scalar(slurp($path)));
 
 # The number of tests will be one plus two times the number of licenses.
-my $num_tests = 1 + 2 * keys(%{$licenses_ref});
+my $num_tests = 1 + 2 * keys($licenses_ref->%*);
 
 # Ensure that, for every license listed in this file, there is a summary and a
 # corresponding file containing license text.
-for my $key (sort keys(%{$licenses_ref})) {
+for my $key (sort keys($licenses_ref->%*)) {
     ok(defined($licenses_ref->{$key}{summary}), "summary for $key");
     my $license = File::Spec->catfile('licenses', $key);
     eval { $path = module_file('App::DocKnot', $license) };

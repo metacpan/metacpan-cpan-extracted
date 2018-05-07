@@ -49,7 +49,13 @@ void croakSsl(char* p_file, int p_line)
 
 char _is_private(rsaData* p_rsa)
 {
-    return(p_rsa->rsa->d != NULL);
+    const BIGNUM *d;
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+    d = p_rsa->rsa->d;
+#else
+    RSA_get0_key(p_rsa->rsa, NULL, NULL, &d);
+#endif
+    return(d != NULL);
 }
 
 SV* make_rsa_obj(SV* p_proto, RSA* p_rsa)
@@ -58,7 +64,11 @@ SV* make_rsa_obj(SV* p_proto, RSA* p_rsa)
 
     CHECK_NEW(rsa, 1, rsaData);
     rsa->rsa = p_rsa;
+#ifdef SHA512_DIGEST_LENGTH
+    rsa->hashMode = NID_sha256;
+#else
     rsa->hashMode = NID_sha1;
+#endif
     rsa->padding = RSA_PKCS1_OAEP_PADDING;
     return sv_bless(
         newRV_noinc(newSViv((IV) rsa)),
@@ -92,8 +102,13 @@ int get_digest_length(int hash_method)
         case NID_ripemd160:
             return RIPEMD160_DIGEST_LENGTH;
             break;
+#ifdef WHIRLPOOL_DIGEST_LENGTH
+        case NID_whirlpool:
+            return WHIRLPOOL_DIGEST_LENGTH;
+            break;
+#endif
         default:
-            croak("Unknown digest hash code");
+            croak("Unknown digest hash mode %u", hash_method);
             break;
     }
 }
@@ -130,13 +145,18 @@ unsigned char* get_message_digest(SV* text_SV, int hash_method)
         case NID_ripemd160:
             return RIPEMD160(text, text_length, NULL);
             break;
+#ifdef WHIRLPOOL_DIGEST_LENGTH
+        case NID_whirlpool:
+            return WHIRLPOOL(text, text_length, NULL);
+            break;
+#endif
         default:
-            croak("Unknown digest hash code");
+            croak("Unknown digest hash mode %u", hash_method);
             break;
     }
 }
 
-SV* bn2sv(BIGNUM* p_bn)
+SV* bn2sv(const BIGNUM* p_bn)
 {
     return p_bn != NULL
         ? sv_2mortal(newSViv((IV) BN_dup(p_bn)))
@@ -298,7 +318,20 @@ generate_key(proto, bitsSV, exponent = 65537)
   PREINIT:
     RSA* rsa;
   CODE:
-    CHECK_OPEN_SSL(rsa = RSA_generate_key(SvIV(bitsSV), exponent, NULL, NULL));
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+    BIGNUM *e;
+    int rc;
+    e = BN_new();
+    BN_set_word(e, exponent);
+    rsa = RSA_new();
+    rc = RSA_generate_key_ex(rsa, SvIV(bitsSV), e, NULL);
+    BN_free(e);
+    e = NULL;
+    CHECK_OPEN_SSL(rc != -1);
+#else
+    rsa = RSA_generate_key(SvIV(bitsSV), exponent, NULL, NULL);
+#endif
+    CHECK_OPEN_SSL(rsa);
     RETVAL = make_rsa_obj(proto, rsa);
   OUTPUT:
     RETVAL
@@ -317,16 +350,21 @@ _new_key_from_parameters(proto, n, e, d, p, q)
     BN_CTX* ctx;
     BIGNUM* p_minus_1 = NULL;
     BIGNUM* q_minus_1 = NULL;
+    BIGNUM* dmp1 = NULL;
+    BIGNUM* dmq1 = NULL;
+    BIGNUM* iqmp = NULL;
     int error;
   CODE:
 {
     if (!(n && e))
     {
-        croak("At least a modulous and public key must be provided");
+        croak("At least a modulus and public key must be provided");
     }
     CHECK_OPEN_SSL(rsa = RSA_new());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
     rsa->n = n;
     rsa->e = e;
+#endif
     if (p || q)
     {
         error = 0;
@@ -341,8 +379,12 @@ _new_key_from_parameters(proto, n, e, d, p, q)
             q = BN_new();
             THROW(BN_div(q, NULL, n, p, ctx));
         }
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
         rsa->p = p;
         rsa->q = q;
+#else
+        THROW(RSA_set0_factors(rsa, p, q));
+#endif
         THROW(p_minus_1 = BN_new());
         THROW(BN_sub(p_minus_1, p, BN_value_one()));
         THROW(q_minus_1 = BN_new());
@@ -353,17 +395,32 @@ _new_key_from_parameters(proto, n, e, d, p, q)
             THROW(BN_mul(d, p_minus_1, q_minus_1, ctx));
             THROW(BN_mod_inverse(d, e, d, ctx));
         }
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
         rsa->d = d;
-        THROW(rsa->dmp1 = BN_new());
-        THROW(BN_mod(rsa->dmp1, d, p_minus_1, ctx));
-        THROW(rsa->dmq1 = BN_new());
-        THROW(BN_mod(rsa->dmq1, d, q_minus_1, ctx));
-        THROW(rsa->iqmp = BN_new());
-        THROW(BN_mod_inverse(rsa->iqmp, q, p, ctx));
+#else
+        THROW(RSA_set0_key(rsa, n, e, d));
+#endif
+        THROW(dmp1 = BN_new());
+        THROW(BN_mod(dmp1, d, p_minus_1, ctx));
+        THROW(dmq1 = BN_new());
+        THROW(BN_mod(dmq1, d, q_minus_1, ctx));
+        THROW(iqmp = BN_new());
+        THROW(BN_mod_inverse(iqmp, q, p, ctx));
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+        rsa->dmp1 = dmp1;
+        rsa->dmq1 = dmq1;
+        rsa->iqmp = iqmp;
+#else
+        THROW(RSA_set0_crt_params(rsa, dmp1, dmq1, iqmp));
+#endif
+        dmp1 = dmq1 = iqmp = NULL;
         THROW(RSA_check_key(rsa) == 1);
      err:
         if (p_minus_1) BN_clear_free(p_minus_1);
         if (q_minus_1) BN_clear_free(q_minus_1);
+        if (dmp1) BN_clear_free(dmp1);
+        if (dmq1) BN_clear_free(dmq1);
+        if (iqmp) BN_clear_free(iqmp);
         if (ctx) BN_CTX_free(ctx);
         if (error)
         {
@@ -373,7 +430,11 @@ _new_key_from_parameters(proto, n, e, d, p, q)
     }
     else
     {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
         rsa->d = d;
+#else
+        CHECK_OPEN_SSL(RSA_set0_key(rsa, n, e, d));
+#endif
     }
     RETVAL = make_rsa_obj(proto, rsa);
 }
@@ -383,18 +444,41 @@ _new_key_from_parameters(proto, n, e, d, p, q)
 void
 _get_key_parameters(p_rsa)
     rsaData* p_rsa;
+PREINIT:
+    const BIGNUM* n;
+    const BIGNUM* e;
+    const BIGNUM* d;
+    const BIGNUM* p;
+    const BIGNUM* q;
+    const BIGNUM* dmp1;
+    const BIGNUM* dmq1;
+    const BIGNUM* iqmp;
 PPCODE:
 {
     RSA* rsa;
     rsa = p_rsa->rsa;
-    XPUSHs(bn2sv(rsa->n));
-    XPUSHs(bn2sv(rsa->e));
-    XPUSHs(bn2sv(rsa->d));
-    XPUSHs(bn2sv(rsa->p));
-    XPUSHs(bn2sv(rsa->q));
-    XPUSHs(bn2sv(rsa->dmp1));
-    XPUSHs(bn2sv(rsa->dmq1));
-    XPUSHs(bn2sv(rsa->iqmp));
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
+    n = rsa->n;
+    e = rsa->e;
+    d = rsa->d;
+    p = rsa->p;
+    q = rsa->q;
+    dmp1 = rsa->dmp1;
+    dmq1 = rsa->dmq1;
+    iqmp = rsa->iqmp;
+#else
+    RSA_get0_key(rsa, &n, &e, &d);
+    RSA_get0_factors(rsa, &p, &q);
+    RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
+#endif
+    XPUSHs(bn2sv(n));
+    XPUSHs(bn2sv(e));
+    XPUSHs(bn2sv(d));
+    XPUSHs(bn2sv(p));
+    XPUSHs(bn2sv(q));
+    XPUSHs(bn2sv(dmp1));
+    XPUSHs(bn2sv(dmq1));
+    XPUSHs(bn2sv(iqmp));
 }
 
 SV*
@@ -532,6 +616,16 @@ use_ripemd160_hash(p_rsa)
   CODE:
     p_rsa->hashMode =  NID_ripemd160;
 
+#ifdef WHIRLPOOL_DIGEST_LENGTH
+
+void
+use_whirlpool_hash(p_rsa)
+    rsaData* p_rsa;
+  CODE:
+    p_rsa->hashMode =  NID_whirlpool;
+
+#endif
+
 void
 use_no_padding(p_rsa)
     rsaData* p_rsa;
@@ -570,7 +664,7 @@ sign(p_rsa, text_SV)
 {
     if (!_is_private(p_rsa))
     {
-        croak("Public keys cannot sign messages.");
+        croak("Public keys cannot sign messages");
     }
 
     CHECK_NEW(signature, RSA_size(p_rsa->rsa), char);

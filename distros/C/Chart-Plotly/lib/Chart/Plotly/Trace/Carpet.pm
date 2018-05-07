@@ -11,8 +11,9 @@ use Chart::Plotly::Trace::Carpet::Baxis;
 use Chart::Plotly::Trace::Carpet::Font;
 use Chart::Plotly::Trace::Carpet::Hoverlabel;
 use Chart::Plotly::Trace::Carpet::Stream;
+use Chart::Plotly::Trace::Carpet::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data describing carpet axis layout is set in `y` and (optionally) also `x`. If only `y` is present, `x` the plot is interpreted as a cheater plot and is filled in using the `y` values. `x` and `y` may either be 2D arrays matching with each dimension matching that of `a` and `b`, or they may be 1D arrays with total length equal to that of `a` and `b`.
 
@@ -189,6 +190,9 @@ has showlegend => (
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Stream", );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Carpet::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -224,7 +228,7 @@ has y => ( is            => "rw",
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ysrc => ( is            => "rw",
@@ -247,7 +251,7 @@ Chart::Plotly::Trace::Carpet - The data describing carpet axis layout is set in 
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -401,6 +405,8 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 =item * stream
 
+=item * transforms
+
 =item * uid
 
 =item * visible
@@ -425,7 +431,7 @@ A two dimensional array of y coordinates at each carpet point.
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ysrc
 

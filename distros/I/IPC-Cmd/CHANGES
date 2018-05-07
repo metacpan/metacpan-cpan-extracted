@@ -1,3 +1,9 @@
+1.02 Thu May  3 09:42:15 BST 2018
+
+  Bug fixes:
+  - Resolve RT #118424 can't use IPC::Cmd->run_forked in the first process of a container
+  - Make fix for RT #91784 only apply to HPUX
+
 1.00 Wed Feb 14 16:14:01 GMT 2018
 
   Bug fixes:

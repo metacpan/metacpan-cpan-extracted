@@ -4,6 +4,23 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.641 2018-05-05
+
+  * When PDL::Graphics::Gnuplot is not installed, skip tests that need it
+
+3.640 2018-05-04
+
+  * Add SpectrumAnalyzer role
+  * Add Rigol_DSA815 spectrum analyzer driver
+  * Convert HP8596E driver to use SpectrumAnalyzer role
+  * Add DisplayXY trace display module
+  * Add SCPI [:SENSe]:POWer subsystem
+  * Add 'date_prefix' option to prefix output folders with 'YYYY-MM-DD_'
+  * Disable gnuplot 'enhanced' text for png hard copy plots
+  * Add 'refresh_plots' argument for log_block
+  * Documentation and portability improvements
+  * More examples for Moose-based interface
+
 3.631 2018-04-18
 
   * Documentation improvements

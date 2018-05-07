@@ -1,4 +1,9 @@
-# DocKnot 1.04
+# DocKnot 1.05
+
+[![Build
+status](https://travis-ci.org/rra/docknot.svg?branch=master)](https://travis-ci.org/rra/docknot)
+[![CPAN
+version](https://img.shields.io/cpan/v/App-DocKnot.svg)](https://metacpan.org/release/App-DocKnot)
 
 Copyright 2013-2018 Russ Allbery <rra@cpan.org>.  This software is
 distributed under a BSD-style license.  Please see the section
@@ -48,7 +53,7 @@ web publishing framework, time permitting.
 
 ## Requirements
 
-Perl 5.18 or later and Module::Build are required to build this module.
+Perl 5.24 or later and Module::Build are required to build this module.
 The following additional Perl modules are required to use it:
 
 * File::BaseDir
@@ -72,13 +77,6 @@ additional Perl modules will be used by the test suite if present:
 All are available on CPAN.  Those tests will be skipped if the modules are
 not available.
 
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-
 ## Building and Installation
 
 DocKnot uses Module::Build and can be installed using the same process as
@@ -93,6 +91,13 @@ any other Module::Build module:
 
 You will have to run the last command as root unless you're installing
 into a local Perl module tree in your home directory.
+
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
 
 ## Support
 

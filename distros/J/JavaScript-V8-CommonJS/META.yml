@@ -1,0 +1,46 @@
+---
+abstract: 'Modules/1.0 for JavaScript::V8'
+author:
+  - 'Carlos Fernando Avila Gratz <cafe@kreato.com.br>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JavaScript-V8-CommonJS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JavaScript::V8::CommonJS:
+    file: lib/JavaScript/V8/CommonJS.pm
+    version: '0.02'
+  JavaScript::V8::CommonJS::Exception:
+    file: lib/JavaScript/V8/CommonJS/Exception.pm
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::ShareDir: '0'
+  File::Spec::Functions: '0'
+  JavaScript::V8: '0.07'
+resources:
+  bugtracker: https://github.com/cafe01/javascript-v8-commonjs/issues
+  homepage: https://github.com/cafe01/javascript-v8-commonjs
+  repository: git://github.com/cafe01/javascript-v8-commonjs.git
+version: '0.02'
+x_authority: cpan:CAFEGRATZ
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,25 @@
+# dump taken from
+# http://foxnetlab.com/index.php/9-articles/122-traffic-capturing-with-cisco-pix-asa
+#
+pix515# sho capture test dump
+522 packets captured
+ 1: 21:24:38.629087 192.168.1.2 > 192.168.1.1: icmp: echo request
+0x0000   4500 003c 12a7 0000 7e01 9781 ac11 2324        E..<....~.....#$
+0x0010   c0a8 02bb 0800 35cb 0001 1790 6162 6364        ......5.....abcd
+0x0020   6566 6768 696a 6b6c 6d6e 6f70 7172 7374        efghijklmnopqrst
+0x0030   7576 7761 6263 6465 6667 6869                  uvwabcdefghi
+ 2: 21:24:38.630765 192.168.1.1 > 192.168.1.2: icmp: echo reply
+0x0000   4500 003c 4656 0000 ff01 e2d1 c0a8 02bb        E..<FV..........
+0x0010   ac11 2324 0000 3dcb 0001 1790 6162 6364        ..#$..=.....abcd
+0x0020   6566 6768 696a 6b6c 6d6e 6f70 7172 7374        efghijklmnopqrst
+0x0030   7576 7761 6263 6465 6667 6869                  uvwabcdefghi
+ 3: 01:24:38.629087 192.168.1.2 > 192.168.1.1: icmp: echo request
+0x0000   4500 003c 12a7 0000 7e01 9781 ac11 2324        E..<....~.....#$
+0x0010   c0a8 02bb 0800 35cb 0001 1790 6162 6364        ......5.....abcd
+0x0020   6566 6768 696a 6b6c 6d6e 6f70 7172 7374        efghijklmnopqrst
+0x0030   7576 7761 6263 6465 6667 6869                  uvwabcdefghi
+ 4: 01:24:38.630765 192.168.1.1 > 192.168.1.2: icmp: echo reply
+0x0000   4500 003c 4656 0000 ff01 e2d1 c0a8 02bb        E..<FV..........
+0x0010   ac11 2324 0000 3dcb 0001 1790 6162 6364        ..#$..=.....abcd
+0x0020   6566 6768 696a 6b6c 6d6e 6f70 7172 7374        efghijklmnopqrst
+0x0030   7576 7761 6263 6465 6667 6869                  uvwabcdefghi

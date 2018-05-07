@@ -4,7 +4,8 @@ use MooseX::Role::Parameterized;
 use Module::Runtime 'require_module';
 use Carp;
 use Clone 'clone';
-our $VERSION = 0.02;
+use Data::Dumper;
+our $VERSION = 0.03;
 
 parameter parser => (isa => 'CodeRef', default => sub{ sub{
     my @args = @_;
@@ -14,18 +15,24 @@ parameter parser => (isa => 'CodeRef', default => sub{ sub{
 
 parameter auto_default => ( isa => 'Bool', default => 1 );
 
+sub BUILD{};
+
 role {
     my ($p) = @_;
 
+    my $auto_classes = {};
+
     before BUILDARGS => sub{
         my ($class,%args) = @_;
-
         my @att = $class->meta->get_all_attributes;
+        $auto_classes = {};
 
         foreach my $att (@att){
             
             my $tc = clone +$att->type_constraint;
-            my $class_name = $p->parser->( $tc->name, $class );
+            next unless $tc->can('class');
+            my $class_name = $p->parser->( $tc->class, $class );
+
             next unless $class_name;
             
             my %att;
@@ -58,7 +65,6 @@ role {
                 }
             );
             $att{name}->set_value($tc, $class_name);
-            $att{class}->set_value($tc, $class_name);
             $att{inlined}->set_value($tc, sub{
                my $self = shift;
                 my $val  = shift;
@@ -75,17 +81,23 @@ role {
 
             if ( $add_default_cond ){
 
-                my $def = $att->meta->find_attribute_by_name('default');
-                $def->set_value( $att, sub {
-                    require_module( $class_name );
-                    $class_name->new;
-                });
+                $auto_classes->{$att->name} = $class_name;
             }
         }
 
         return \%args;
     };
 
+    before BUILD => sub {
+        my ($self,$args) = @_;
+
+        foreach my $att_name (keys %$auto_classes){
+            my $class = $auto_classes->{$att_name};
+            require_module( $class );
+            my $module = $class->new;
+            $self->meta->find_attribute_by_name( $att_name )->set_value( $self, $module );
+        }
+    };
 };
 
 1;

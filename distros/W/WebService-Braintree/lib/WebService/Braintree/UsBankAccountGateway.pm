@@ -9,6 +9,10 @@ use strictures 1;
 use Moose;
 extends 'WebService::Braintree::PaymentMethodGatewayBase';
 
+use Carp qw(confess);
+
+use WebService::Braintree::Util qw(validate_id);
+
 use WebService::Braintree::_::UsBankAccount;
 
 sub find {

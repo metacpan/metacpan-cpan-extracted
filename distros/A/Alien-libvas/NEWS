@@ -1,0 +1,52 @@
+Overview of changes in Alien::libvas v0.213
+============================================
+* Add NEWS file with git-log
+* 58c72e1 Decrease minimum Perl version to 5.8
+
+Overview of changes in Alien::libvas v0.211
+============================================
+* 99ae4bd Report newly implemened vas_error via TAP diag
+
+Overview of changes in Alien::libvas v0.210
+============================================
+* ef4101f Explicitly ask for PIC in static library
+
+Overview of changes in Alien::libvas v0.205
+============================================
+* 3be08e9 Bump to v0.205
+* 7ebe160 Report Backend used as test diagnostic info
+* 9f945d7 Isolate dynamic libraries
+* 2b2cf8a Add simple self-test
+
+Overview of changes in Alien::libvas v0.204
+============================================
+* 2b9773d Require Perl v5.10 at minimum
+* ed30d09 Fix CMake defaulting to cl on Windows builds
+
+Overview of changes in Alien::libvas v0.202
+============================================
+* 6546c76 Run C test suite on install
+
+Overview of changes in Alien::libvas v0.20
+============================================
+* 738f331 Add PLATFORMs section to POD
+
+Overview of changes in Alien::libvas v0.15
+============================================
+* be9855e Add Travis CI integration
+
+Overview of changes in Alien::libvas v0.13
+============================================
+* 891d219 Laid out future test layout; Added check version test
+* 4bf2ada $Config{cc} as compiler instead of CMake default
+* c55b9e0 Added IO::Socket::SSL as prerequisite
+
+Overview of changes in Alien::libvas v0.02
+============================================
+* 1805165 Removed pwd in Build process
+* 6cee87b Changed note that said it doesn't work
+
+Overview of changes in Alien::libvas v0.01
+============================================
+* 26e6e2a Migrated to Module::Build
+* 55cd0bd Initial commit

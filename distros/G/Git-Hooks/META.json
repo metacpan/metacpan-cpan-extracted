@@ -28,8 +28,13 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0"
          }
       },
       "runtime" : {
@@ -49,6 +54,7 @@
             "Git::Repository" : "0",
             "Git::Repository::Log" : "0",
             "Git::Repository::Plugin" : "0",
+            "IO::Interactive" : "0",
             "List::MoreUtils" : "0",
             "Path::Tiny" : "0.060",
             "Test::More" : "0",
@@ -74,63 +80,63 @@
    "provides" : {
       "Git::Hooks" : {
          "file" : "lib/Git/Hooks.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckAcls" : {
          "file" : "lib/Git/Hooks/CheckAcls.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckCommit" : {
          "file" : "lib/Git/Hooks/CheckCommit.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckFile" : {
          "file" : "lib/Git/Hooks/CheckFile.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckJira" : {
          "file" : "lib/Git/Hooks/CheckJira.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckLog" : {
          "file" : "lib/Git/Hooks/CheckLog.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckReference" : {
          "file" : "lib/Git/Hooks/CheckReference.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckRewrite" : {
          "file" : "lib/Git/Hooks/CheckRewrite.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::CheckWhitespace" : {
          "file" : "lib/Git/Hooks/CheckWhitespace.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::GerritChangeId" : {
          "file" : "lib/Git/Hooks/GerritChangeId.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::Notify" : {
          "file" : "lib/Git/Hooks/Notify.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::PrepareLog" : {
          "file" : "lib/Git/Hooks/PrepareLog.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Hooks::Test" : {
          "file" : "lib/Git/Hooks/Test.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Message" : {
          "file" : "lib/Git/Message.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       },
       "Git::Repository::Plugin::GitHooks" : {
          "file" : "lib/Git/Repository/Plugin/GitHooks.pm",
-         "version" : "v2.9.5"
+         "version" : "v2.9.6"
       }
    },
    "release_status" : "stable",
@@ -143,7 +149,7 @@
          "url" : "https://github.com/gnustavo/Git-Hooks.git"
       }
    },
-   "version" : "2.9.5",
+   "version" : "2.9.6",
    "x_contributors" : [
       "Mikko Koivunalho <mikkoi@cpan.org>",
       "Dave Rolsky <autarch@urth.org>",

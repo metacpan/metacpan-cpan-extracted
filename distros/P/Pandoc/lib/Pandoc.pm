@@ -11,14 +11,15 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.8.0';
+our $VERSION = '0.8.2';
 
 use Pandoc::Version;
 use Carp 'croak';
 use File::Which;
+use File::Spec;
 use IPC::Run3;
 use parent 'Exporter';
-our @EXPORT = qw(pandoc);
+our @EXPORT = qw(pandoc pandoc_data_dir);
 
 our $PANDOC;
 our $PANDOC_PATH ||= $ENV{PANDOC_PATH} || 'pandoc';
@@ -47,9 +48,9 @@ sub new {
 
     my $bin = (@_ and $_[0] !~ /^-./) ? shift : $PANDOC_PATH;
 
-    my $bindir = $ENV{HOME}."/.pandoc/bin";
-    if (!-x $bin && $bin =~ /^\d+(\.\d+)*$/ && -x "$bindir/pandoc-$bin") {
-        $pandoc->{bin} = "$bindir/pandoc-$bin";
+    my $bin_from_version = pandoc_data_dir("bin","pandoc-$bin");
+    if (!-x $bin && $bin =~ /^\d+(\.\d+)*$/ && -x $bin_from_version) {
+        $pandoc->{bin} = $bin_from_version;
     } else {
         $pandoc->{bin} = which($bin);
     }
@@ -216,7 +217,13 @@ sub version {
 }
 
 sub data_dir {
-    $_[0]->{data_dir};
+    File::Spec->catdir(shift->{data_dir}, @_);
+}
+
+sub pandoc_data_dir {
+    my $home = $ENV{HOME} || $ENV{USERPROFILE}
+        || File::Spec->catpath($ENV{HOMEDRIVE}, $ENV{HOMEPATH}, '');
+    File::Spec->catdir($home, '.pandoc', @_);
 }
 
 sub bin {
@@ -315,7 +322,8 @@ __END__
 
 # STATUS
 
-[![Build Status](https://travis-ci.org/nichtich/Pandoc-Wrapper.svg)](https://travis-ci.org/nichtich/Pandoc-Wrapper)
+[![Linux Build Status](https://travis-ci.org/nichtich/Pandoc-Wrapper.svg)](https://travis-ci.org/nichtich/Pandoc-Wrapper)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/8p68qdqv72to633d?svg=true)](https://ci.appveyor.com/project/nichtich/pandoc-wrapper)
 [![Coverage Status](https://coveralls.io/repos/nichtich/Pandoc-Wrapper/badge.svg)](https://coveralls.io/r/nichtich/Pandoc-Wrapper)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/Pandoc.png)](http://cpants.cpanauthors.org/dist/Pandoc)
 
@@ -412,6 +420,12 @@ the following ways:
   pandoc %options;                  # ok, if %options is not empty
 
   pandoc @arguments, %options;      # not ok!
+
+=head2 pandoc_data_dir( [ @subdirs ] [ $file ] )
+
+Returns the default pandoc data directory which is directory C<.pandoc> in the
+home directory. Optional arguments can be given to refer to a specific
+subdirectory or file.
 
 =head3 Options
 
@@ -526,9 +540,11 @@ version and data_dir by calling C<pandoc --version>.
 
 Return or set a list of default arguments.
 
-=head2 data_dir
+=head2 data_dir( [ @subdirs ] [ $file ] )
 
-Return the default data directory (only available since Pandoc 1.11).
+Return the stated default data directory, introduced with Pandoc 1.11.  Use
+function C<pandoc_data_dir> alternatively to get the expected directory without
+calling Pandoc executable.
 
 =head2 input_formats
 

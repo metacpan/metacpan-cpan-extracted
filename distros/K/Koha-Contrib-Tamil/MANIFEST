@@ -7,6 +7,7 @@ MANIFEST.SKIP
 META.yml
 Makefile.PL
 README
+bin/koha-ark
 bin/koha-auth
 bin/koha-authoritize
 bin/koha-claim
@@ -20,6 +21,7 @@ bin/koha-rebuild-editors
 bin/koha-sitemap
 dist.ini
 lib/Koha/Contrib/Tamil.pm
+lib/Koha/Contrib/Tamil/ARK.pm
 lib/Koha/Contrib/Tamil/AuthoritiesLoader.pm
 lib/Koha/Contrib/Tamil/Authority/EditorsBuilder.pm
 lib/Koha/Contrib/Tamil/Authority/EditorsUpdater.pm

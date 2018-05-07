@@ -1,3 +1,16 @@
+v0.15.2 2018-05-06T04:09:32Z
+ - generate passwd improved
+
+v0.15.1 2018-05-06T03:44:42Z
+ - docker volume renamed to pgsql
+
+v0.15.0 2018-05-06T03:35:29Z
+ - docker wrapper improved
+ - Docker base image changed from "softvisio/pcore:v0.62.4" to
+   "softvisio/pcore:v0.63.4"
+ - set postgres password from env
+ - docker repo name changed to pgsql
+
 v0.14.19 2018-04-24T13:46:02Z
  - Docker base image changed from "softvisio/pcore:v0.62.1" to
    "softvisio/pcore:v0.62.3"

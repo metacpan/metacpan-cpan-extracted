@@ -1,3 +1,4 @@
+=encoding UTF-8
 
 =head1 Name
 
@@ -10,7 +11,7 @@ It union all project models.
 =cut
 
 package QBit::Application;
-$QBit::Application::VERSION = '0.015';
+$QBit::Application::VERSION = '0.016';
 use qbit;
 
 use base qw(QBit::Class);
@@ -32,31 +33,52 @@ B<timelog>
 
 __PACKAGE__->mk_ro_accessors(qw(timelog));
 
+=head1 Package methods
+
+=head2 init
+
+Initialization application.
+
+B<It is done:>
+
+=over
+
+=item
+
+Set options ApplicationPath and FrameworkPath
+
+=item
+
+Read all configs
+
+=item
+
+Set default locale
+
+=item
+
+Preload accessors if needed
+
+=item
+
+Install die handler if needed
+
+=back
+
+B<No arguments.>
+
+B<Example:>
+
+  my $app = Application->new(); # Application based on QBit::Application
+
+=cut
+
 sub init {
     my ($self) = @_;
 
     $self->SUPER::init();
 
-    $self->{'__ORIG_OPTIONS__'} = {};
-
-    package_merge_isa_data(
-        ref($self),
-        $self->{'__ORIG_OPTIONS__'},
-        sub {
-            my ($package, $res) = @_;
-
-            my $pkg_stash = package_stash($package);
-
-            foreach my $cfg (@{$pkg_stash->{'__OPTIONS__'} || []}) {
-                foreach (keys %{$cfg->{'config'}}) {
-                    warn gettext('%s: option "%s" replaced', $cfg->{'filename'}, $_)
-                      if exists($res->{$_});
-                    $res->{$_} = $cfg->{'config'}{$_};
-                }
-            }
-        },
-        __PACKAGE__
-    );
+    $self->{'__OPTIONS__'} = $self->{'__ORIG_OPTIONS__'} = {};
 
     my $app_module = ref($self) . '.pm';
     $app_module =~ s/::/\//g;
@@ -67,7 +89,26 @@ sub init {
       ? ($1 || './')
       : './';
 
-    $self->{'__OPTIONS__'} = $self->{'__ORIG_OPTIONS__'};    # To set global options
+    package_merge_isa_data(
+        ref($self),
+        $self->{'__ORIG_OPTIONS__'},
+        sub {
+            my ($package, $res) = @_;
+
+            my $pkg_stash = package_stash($package);
+
+            foreach my $cfg (@{$pkg_stash->{'__OPTIONS__'} || []}) {
+                $cfg->{'config'} //= $self->read_config($cfg->{'filename'});
+
+                foreach (keys %{$cfg->{'config'}}) {
+                    warn gettext('%s: option "%s" replaced', $cfg->{'filename'}, $_)
+                      if exists($res->{$_});
+                    $res->{$_} = $cfg->{'config'}{$_};
+                }
+            }
+        },
+        __PACKAGE__
+    );
 
     my $locales = $self->get_option('locales', {});
     if (%$locales) {
@@ -88,11 +129,9 @@ sub init {
     delete($self->{'__OPTIONS__'});    # Options initializing in pre_run
 }
 
-=head1 Package methods
-
 =head2 config_opts
 
-Short method description
+Set options in config
 
 B<Arguments:>
 
@@ -100,11 +139,17 @@ B<Arguments:>
 
 =item
 
-B<%opts> - additional arguments:
+B<%opts> - Options (type: hash)
 
 =back
 
-B<Return value:> type, description
+B<Example:>
+
+  __PACKAGE__->config_opts(param_name => 'Param');
+  
+  # later in your code:
+  
+  my $param = $app->get_option('param_name'); # 'Param'
 
 =cut
 
@@ -122,7 +167,86 @@ sub config_opts {
 
 =head2 use_config
 
-Short method description
+Set a file in config queue. The configuration is read in sub "init". In the same place are set the settings B<ApplicationPath> and B<FrameworkPath>.
+
+B<QBit::Application options:>
+
+=over
+
+=item
+
+B<locales> - type: hash
+
+  locales => {
+      ru => {name => 'Русский', code => 'ru_RU', default => 1},
+      en => {name => 'English', code => 'en_GB'},
+  },
+
+=item
+
+B<preload_accessors> - type: int, values: 1/0 (1 - preload accessors, 0 - lazy load, default: 0)
+
+=item
+
+B<install_die_handler> - type: int, values: 1/0 (1 - set die handler B<qbit::Exceptions::die_handler>, default: 0)
+
+=item
+
+B<timelog_class> - type: string, values: B<QBit::TimeLog::XS/QBit::TimeLog> (default: B<QBit::TimeLog> - this is not a production solution, in production use XS version)
+
+=item
+
+B<locale_domain> - type: string, value: <your domain> (used in set_locale for B<Locale::Messages::textdomain>, default: 'application')
+
+=item
+
+B<find_app_mem_cycle> - type: int, values: 1/0 (1 - find memory cycle in post_run, used Devel::Cycle, default: 0)
+
+=back
+
+B<QBit::WebInterface options:>
+
+=over
+
+=item
+
+B<error_dump_dir> - type: string, value: <your path for error dumps>
+
+=item
+
+B<salt> - type: string, value: <your salt> (used for generate csrf token)
+
+=item
+
+B<TemplateCachePath> - type: string, value: <your path for template cache> (default: "/tmp")
+
+=item
+
+B<show_timelog> - type: int, values: 1/0 (1 - view timelog in html footer, default: 0)
+
+=item
+
+B<TemplateIncludePaths> - type: array of a string: value: [<your path for templates>]
+
+  already used:
+  - <project_path>/templates         # project_path   = $self->get_option('ApplicationPath')
+  - <framework_path>/QBit/templates  # framework_path = $self->get_option('FrameworkPath')
+
+=back
+
+B<QBit::WebInterface::Routing options:>
+
+=over
+
+=item
+
+B<controller_class> - type: string, value: <your controller class> (default: B<QBit::WebInterface::Controller>)
+
+=item
+
+B<use_base_routing> - type: int, values: 1/0 (1 - also use routing from B<QBit::WebInterface::Controller>, 0 - only use routing from B<QBit::WebInterface::Routing>)
+
+=back
 
 B<Arguments:>
 
@@ -130,50 +254,67 @@ B<Arguments:>
 
 =item
 
-B<$filename> - type, description
+B<$filename> - Config name (type: string)
 
 =back
 
-B<Return value:> type, description
+B<Example:>
+
+  __PACKAGE__->use_config('Application.cfg');  # or __PACKAGE__->use_config('Application.json');
+
+  # later in your code:
+
+  my preload_accessors = $app->get_option('preload_accessors');
 
 =cut
 
 sub use_config {
     my ($self, $filename) = @_;
 
-    my %config = do $filename;
-    throw gettext('Read config file "%s" failed: %s', $filename, $@)
-      if $@;
-    l(gettext('Config file "%s" returned undefined value', $filename))
-      if keys(%config) == 1 && exists($config{''}) && !defined($config{''});
-
-    my %dev_config;
-    {
-        no warnings;
-        %dev_config = do "$filename.dev";
-    }
-    throw gettext('Read devconfig file "%s" failed: %s', "$filename.dev", $@)
-      if $@;
-
-    %dev_config = ()
-      if keys(%dev_config) == 1
-          && exists($dev_config{''})
-          && !defined($dev_config{''});
-    while (my ($key, $value) = each %dev_config) {
-        l(gettext('Option "%s" does not exists in main config "%s"', $key, $filename))
-          unless exists($config{$key})
-              || in_array($key, [qw(find_app_mem_cycle)]);
-        $config{$key} = $value;
-    }
-
-    $self->_push_pkg_opts($filename => \%config);
+    $self->_push_pkg_opts($filename);
 }
 
-=head1 Methods
+=head2 read_config
 
-=head2 get_option
+read config by path or name from folder "configs".
 
-return option by name
+  > tree ./Project
+
+  Project
+  ├── configs
+  │   └── Application.cfg
+  └── lib
+      └── Application.pm
+
+B<Formats:>
+
+=over
+
+=item
+
+B<cfg> - perl code
+
+  > cat ./configs/Application.cfg
+
+  preload_accessors => 1,
+  timelog_class => 'QBit::TimeLog::XS',
+  locale_domain => 'domain.local',
+  TemplateIncludePaths => ['${ApplicationPath}lib/QBit/templates'],
+
+=item
+
+B<json> - json format
+
+  > cat ./configs/Application.json
+
+  {
+    "preload_accessors" : 1,
+    "timelog_class" : "QBit::TimeLog::XS",
+    "locale_domain" : "domain.local",
+    "TemplateIncludePaths" : ["${ApplicationPath}lib/QBit/templates"]
+  }
+
+=back
 
 B<Arguments:>
 
@@ -181,38 +322,85 @@ B<Arguments:>
 
 =item
 
-B<$name> - string
-
-=item
-
-B<$default> - default value
+B<$filename> - Config name (type: string)
 
 =back
 
-B<Return value:> value
+B<Return value:>  Options (type: ref of a hash)
 
-    #> pwd
-    #
-    # /home/app
-    #
-    #> cat ./lib/Application.cfg
-    #
-    # salt => 'terc3s',
-    # path => '${ApplicationPath}data',
-    # lib  => ['./t_lib', '${ApplicationPath}lib'],
-    # opt  => {
-    #     key => 'value',
-    # }
+B<Example:>
 
-    my $salt = $self->get_option('salt', 's3cret'); # 'terc3s'
+  my $config = $app->read_config('Application.cfg');
 
-    my $salt2 = $self->get_option('salt2', 's3cret'); # 's3cret'
+=cut
 
-    my $path = $self->get_option('path'); # '/home/app/data'
+sub read_config {
+    my ($self, $filename) = @_;
 
-    my $lib = $self->get_option('lib'); # ['./t_lib', '/home/app/lib']
+    unless (-f $filename) {
+        foreach (qw(lib configs)) {
+            my $possible_file = $self->get_option('ApplicationPath') . "$_/$filename";
 
-    my $opts = $self->get_option('opt', {key => 'value2'}); # {key => 'value'}
+            if (-f $possible_file) {
+                $filename = $possible_file;
+
+                #TODO: use only configs
+                if ($_ eq 'lib') {
+                    warn gettext('For configs, use the "configs" folder in the project root.');
+                }
+
+                last;
+            }
+        }
+    }
+
+    my $config = {};
+
+    try {
+        if ($filename =~ /\.cfg\z/) {
+            $config = {do $filename};
+        } elsif ($filename =~ /\.json\z/) {
+            $config = from_json(readfile($filename));
+        } else {
+            throw gettext('Unknown config format: %s', $filename);
+        }
+    }
+    catch {
+        my ($exception) = @_;
+
+        throw gettext('Read config file "%s" failed: %s', $filename, $exception->message);
+    };
+
+    throw gettext('Config "%s" must be a hash') if ref($config) ne 'HASH';
+
+    return $config;
+}
+
+=head2 get_option
+
+Returns option value by name
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<$name> - Option name (type: string)
+
+=item
+
+B<$default> - Default value
+
+=back
+
+B<Return value:> Option value
+
+B<Example:>
+
+  my $salt = $app->get_option('salt', 's3cret');
+
+  my $stash = $app->get_option('stash', {});
 
 =cut
 
@@ -234,7 +422,7 @@ sub get_option {
 
 =head2 set_option
 
-set option
+Set option value by name.
 
 B<Arguments:>
 
@@ -242,19 +430,21 @@ B<Arguments:>
 
 =item
 
-B<$name> - string
+B<$name> - Option name (type: string)
 
 =item
 
-B<$value> - value
+B<$value> - Option value
 
 =back
 
-B<Return value:> value
+B<Return value:> Option value
 
-    $app->set_option('salt', 's3cret');
-    
-    $app->set_option('locales', [qw(ru en)]);
+B<Example:>
+
+  $app->set_option('salt', 's3cret');
+
+  $app->set_option('stash', {key => 'val'});
 
 =cut
 
@@ -405,11 +595,20 @@ sub refresh_rights {
 
 =head2 get_models
 
-Short method description
+Returns all models.
 
 B<No arguments.>
 
-B<Return value:> type, description
+B<Return value:> $models - ref of a hash
+
+B<Examples:>
+
+  my $models = $app->get_models();
+
+  # $models = {
+  #     users => 'Application::Model::Users',
+  #     ...
+  # }
 
 =cut
 
@@ -435,11 +634,23 @@ sub get_models {
 
 =head2 get_registered_rights
 
-Short method description
+Returns all registered rights
 
 B<No arguments.>
 
-B<Return value:> type, description
+B<Return value:> ref of a hash
+
+B<Example:>
+
+  my $registered_rights = $app->get_registered_rights();
+  
+  # $registered_rights = {
+  #     view_all => {
+  #         name  => 'Right to view all elements',
+  #         group => 'elemets'
+  #     },
+  #     ...
+  # }
 
 =cut
 
@@ -466,11 +677,19 @@ sub get_registred_rights {&get_registered_rights;}
 
 =head2 get_registered_right_groups
 
-Short method description
+Returns all registered right groups.
 
 B<No arguments.>
 
-B<Return value:> type, description
+B<Return value:> $registered_right_groups - ref of a hash
+
+B<Example:>
+
+  my $registered_right_groups = $app->get_registered_right_groups();
+
+  # $registered_right_groups = {
+  #     elements => 'Elements',
+  # }
 
 =cut
 
@@ -498,7 +717,7 @@ sub get_registred_right_groups {&get_registered_right_groups;}
 
 =head2 check_rights
 
-check rights for current user
+Check rights for current user.
 
 B<Arguments:>
 
@@ -512,9 +731,11 @@ B<@rights> - array of strings or array ref
 
 B<Return value:> boolean
 
-    $app->check_rights('RIGHT1', 'RIGHT2'); # TRUE if has rights 'RIGHT1' and 'RIGHT2'
+B<Example:>
 
-    $app->check_rights(['RIGHT1', 'RIGHT2']); # TRUE if has rights 'RIGHT1' or 'RIGHT2'
+  $app->check_rights('RIGHT1', 'RIGHT2'); # TRUE if has rights 'RIGHT1' and 'RIGHT2'
+
+  $app->check_rights(['RIGHT1', 'RIGHT2']); # TRUE if has rights 'RIGHT1' or 'RIGHT2'
 
 =cut
 
@@ -535,7 +756,7 @@ sub check_rights {
 
 =head2 set_app_locale
 
-Short method description
+Set locale for Application.
 
 B<Arguments:>
 
@@ -543,11 +764,13 @@ B<Arguments:>
 
 =item
 
-B<$locale_id> - type, description
+B<$locale_id> - type: string, values: from config (key "locales")
 
 =back
 
-B<Return value:> type, description
+B<Example:>
+
+  $app->set_app_locale('ru');
 
 =cut
 
@@ -569,7 +792,7 @@ sub set_app_locale {
 
 =head2 set_tmp_app_locale
 
-Short method description
+Set temporary locale.
 
 B<Arguments:>
 
@@ -577,11 +800,18 @@ B<Arguments:>
 
 =item
 
-B<$locale_id> - type, description
+B<$locale_id> - type: string, values: from config (key "locales")
 
 =back
 
-B<Return value:> type, description
+B<Return value:> $tmp_locale - object B<QBit::Application::_Utils::TmpLocale>
+
+B<Example:>
+
+  my $tmp_locale = $app->set_tmp_app_locale('ru');
+  
+  #restore locale
+  undef($tmp_locale);
 
 =cut
 
@@ -596,7 +826,7 @@ sub set_tmp_app_locale {
 
 =head2 add_tmp_rights
 
-Short method description
+Add temporary rights.
 
 B<Arguments:>
 
@@ -604,11 +834,18 @@ B<Arguments:>
 
 =item
 
-B<@rights> - type, description
+B<@rights> - Rights (type: array of a string)
 
 =back
 
-B<Return value:> type, description
+B<Return value:> $tmp_rights - object B<QBit::Application::_Utils::TmpRights>
+
+B<Example:>
+
+  my $tmp_rights = $app->add_tmp_rights('view_all', 'edit_all');
+  
+  #restore rights
+  undef($tmp_rights);
 
 =cut
 
@@ -620,11 +857,35 @@ sub add_tmp_rights {
 
 =head2 pre_run
 
-Short method description
+Called before the request is processed.
+
+B<It is done:>
+
+=over
+
+=item
+
+Resets current user
+
+=item
+
+Refresh options
+
+=item
+
+Resets timelog
+
+=item
+
+Call "pre_run" for models
+
+=back
 
 B<No arguments.>
 
-B<Return value:> type, description
+B<Example:>
+
+  $app->pre_run();
 
 =cut
 
@@ -653,11 +914,35 @@ sub pre_run {
 
 =head2 post_run
 
-Short method description
+Called after the request is processed.
+
+B<It is done:>
+
+=over
+
+=item
+
+Call "post_run" for models
+
+=item
+
+Finish timelog
+
+=item
+
+Call "process_timelog"
+
+=item
+
+Find memory cycles and call "process_mem_cycles" if needed
+
+=back
 
 B<No arguments.>
 
-B<Return value:> type, description
+B<Example:>
+
+  $app->post_run();
 
 =cut
 
@@ -685,7 +970,7 @@ sub post_run {
 
 =head2 process_mem_cycles
 
-Short method description
+Process memory cycles
 
 B<Arguments:>
 
@@ -693,11 +978,11 @@ B<Arguments:>
 
 =item
 
-B<$cycles> - type, description
+B<$cycles> - Cycles. (result: B<Devel::Cycle::find_cycle>)
 
 =back
 
-B<Return value:> type, description
+B<Return value:> $text - info (type: string)
 
 =cut
 
@@ -725,37 +1010,13 @@ sub process_mem_cycles {
 
 =head2 process_timelog
 
-Short method description
+Process time log. Empty method.
 
 B<No arguments.>
-
-B<Return value:> type, description
 
 =cut
 
 sub process_timelog { }
-
-=head2 _push_pkg_opts
-
-Short method description
-
-B<Arguments:>
-
-=over
-
-=item
-
-B<$filename> - type, description
-
-=item
-
-B<$config> - type, description
-
-=back
-
-B<Return value:> type, description
-
-=cut
 
 sub _push_pkg_opts {
     my ($self, $filename, $config) = @_;

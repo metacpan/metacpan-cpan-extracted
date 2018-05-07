@@ -39,18 +39,14 @@
       "runtime" : {
          "recommends" : {
             "Package::Stash::XS" : "0",
-            "Ref::Util::XS" : "0",
-            "Storable" : "0"
+            "Ref::Util::XS" : "0"
          },
          "requires" : {
-            "Carp" : "0",
             "Const::Fast" : "0",
-            "Exporter" : "0",
+            "List::AllUtils" : "0.10",
             "Package::Stash" : "0",
             "Ref::Util" : "0",
-            "perl" : "v5.10.0",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -63,14 +59,15 @@
             "Module::Metadata" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
-            "if" : "0"
+            "if" : "0",
+            "lib" : "0"
          }
       }
    },
    "provides" : {
       "Const::Exporter" : {
          "file" : "lib/Const/Exporter.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -84,7 +81,7 @@
          "web" : "https://github.com/robrwo/Const-Exporter"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.4.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "B. Estrade <estrabd@gmail.com>"

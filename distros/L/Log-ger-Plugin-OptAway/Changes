@@ -1,3 +1,8 @@
+0.006   2018-05-02 (PERLANCAR)
+
+	- [doc] Update documentation on numeric level of warn (3 -> 30).
+
+
 0.005   2017-08-03 (PERLANCAR)
 
 	- Also convert the level detection routines (is_*) to constant.

@@ -105,7 +105,7 @@ for my $cookie (@{$mock->cookie_jar->all}) {
     my $name = $cookie->name;
     my $original_cookie = $cookies{$domain}{$name};
     subtest qq{Cookie "$name"} => sub {
-        for my $attr (qw/domain expires httponly max_age origin path secure/) {
+        for my $attr (qw/domain expires httponly max_age path secure/) {
             is $cookie->$attr, $original_cookie->$attr, qq{"$attr" matches};
         }
     };

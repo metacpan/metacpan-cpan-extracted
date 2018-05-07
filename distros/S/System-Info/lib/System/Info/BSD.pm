@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.050";
+our $VERSION = "0.051";
 
 =head1 NAME
 
@@ -24,6 +24,7 @@ sub prepare_sysinfo {
     $self->SUPER::prepare_sysinfo;
 
     my $sysctl = __get_sysctl ();
+    $self->{__sysctl} = $sysctl;
 
     my $cpu = $sysctl->{model};
 
@@ -42,19 +43,10 @@ sub prepare_sysinfo {
     } # prepare_sysinfo
 
 sub __get_sysctl {
-    my %sysctl;
-
     my $sysctl_cmd = -x "/sbin/sysctl" ? "/sbin/sysctl" : "sysctl";
 
-    my %extra  = (cpufrequency => undef, cpuspeed => undef);
-    my @e_args = map {
-	m/^hw\.(\w+)\s*[:=]/; $1
-	} grep m/^hw\.(\w+)/ && exists $extra{$1} => `$sysctl_cmd -a hw`;
-
-    foreach my $name (qw( model machine ncpu ), @e_args) {
-	chomp ($sysctl{$name} = `$sysctl_cmd hw.$name`);
-	$sysctl{$name} =~ s/^hw\.$name\s*[:=]\s*//;
-	}
+    chomp (my @sysctl = `$sysctl_cmd -a hw`);
+    my %sysctl = map m/^hw\.([\w.]+)\s*[:=]\s*(.*)$/ => @sysctl;
     $sysctl{machine} and $sysctl{machine} =~ s/Power Macintosh/macppc/;
 
     return \%sysctl;

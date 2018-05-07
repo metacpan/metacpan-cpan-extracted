@@ -16,6 +16,7 @@ my %attr = (
     AUTHOR          => [
 	'Eugene van der Pijll <pijll@gmx.net>',
 	'Thomas R. Wyant, III <wyant at cpan dot org>',
+    realclean	=> { FILES => 'cover_db' },
     ],
 );
 
@@ -43,7 +44,8 @@ if ( $mmv >= 6.4501 ) {
 		url	=> 'git://github.com/trwyant/perl-DateTime-Calendar-Christian.git',
 		web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Christian',
 	    },
-	}
+	},
+	provides(),
     };
 }
 
@@ -78,6 +80,17 @@ authortest :: pure_all
 testcover :: pure_all
 	cover -test -ignore_re=inc/ -ignore_re=eg/
 EOD
+}
+
+sub provides {
+    -d 'lib'
+	or return;
+    local $@ = undef;
+    my $provides = eval {
+	require Module::Metadata;
+	Module::Metadata->provides( version => 2, dir => 'lib' );
+    } or return;
+    return ( provides => $provides );
 }
 
 # ex: set textwidth=72 :

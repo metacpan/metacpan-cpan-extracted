@@ -1,6 +1,6 @@
 {
     "name": "DocKnot",
-    "version": "1.04",
+    "version": "1.05",
     "synopsis": "package documentation generator",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [
@@ -24,11 +24,13 @@
         "url": "https://git.eyrie.org/git/devel/docknot.git",
         "browse": "https://git.eyrie.org/?p=devel/docknot.git",
         "github": "rra/docknot",
+        "travis": "rra/docknot",
     },
     "distribution": {
         "section": "devel",
         "tarname": "App-DocKnot",
         "version": "docknot",
+        "cpan": "App-DocKnot",
     },
     "debian": {
         "personal": true,

@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scattergeo::Marker::Colorbar;
 use Chart::Plotly::Trace::Scattergeo::Marker::Gradient;
 use Chart::Plotly::Trace::Scattergeo::Marker::Line;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattergeo.
 
@@ -174,7 +174,7 @@ Chart::Plotly::Trace::Scattergeo::Marker - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 OVERVIEW
 
@@ -176,6 +176,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::HP8596E>
 
+=item * L<Lab::Moose::Instrument::Rigol_DSA815>
+
 =back
 
 =head3 Network analyzers
@@ -212,6 +214,10 @@ contains support for temperature sensor and He/N2 level meters.
 
 =item * L<Lab::Moose::Instrument::VNASweep>
 
+=item * L<Lab::Moose::Instrument::SpectrumAnalyzer>
+
+=item * L<Lab::Moose::Instrument::DisplayXY>
+
 =item * L<Lab::Moose::Instrument::SCPI::Display::Window>
 
 =item * L<Lab::Moose::Instrument::SCPI::Format>
@@ -231,6 +237,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Function>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::NPLC>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Power>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Range>
 

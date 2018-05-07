@@ -22,7 +22,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "0.25"
+            "Alien::Build::MM" : "0.25",
+            "Alien::bison" : "0",
+            "Alien::cmake3" : "0",
+            "Alien::flex" : "0",
+            "Alien::m4" : "0",
+            "Config" : "0"
          }
       },
       "configure" : {
@@ -43,13 +48,13 @@
          "url" : "http://github.com/joenio/alien-doxyparse"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 1.39",
       "requires" : {
          "share" : {
-            "Alien::CMake" : "0",
             "Alien::bison" : "0",
+            "Alien::cmake3" : "0",
             "Alien::flex" : "0",
             "Alien::m4" : "0",
             "Config" : "0"

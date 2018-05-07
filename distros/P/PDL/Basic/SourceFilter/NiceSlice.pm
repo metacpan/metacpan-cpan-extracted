@@ -1104,12 +1104,9 @@ the bottom.
 
 Feedback and bug reports are welcome. Please include an example
 that demonstrates the problem. Log bug reports in the PDL
-bug database at
-
-  http://sourceforge.net/p/pdl/bugs/
-
+issues tracker at L<https://github.com/PDLPorters/pdl/issues>
 or send them to the pdl-devel mailing list
-E<lt>pdl-devel@lists.sourceforge.netE<gt>.
+(see L<http://pdl.perl.org/?page=mailing-lists>).
 
 
 =head1 COPYRIGHT

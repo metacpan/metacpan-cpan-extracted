@@ -1,20 +1,32 @@
-package Pcore::Redis v0.9.6;
+package Pcore::Redis v0.10.1;
 
 use Pcore -dist, -class;
 
 has data_dir => ( is => 'ro', isa => Str, required => 1 );
 
 sub run ( $self, $cb ) {
-    my $cfg = -f $self->data_dir . '/redis.json' ? P->cfg->read( $self->data_dir . '/redis.json' ) : $self->default_config;
+    my $cfg;
 
-    # generate password
-    $cfg->{requirepass} //= P->random->bytes_hex(32);
+    if ( -f "$self->{data_dir}/redis.json" ) {
+        $cfg = P->cfg->read("$self->{data_dir}/redis.json");
+    }
+    else {
+        $cfg = $self->default_config;
 
-    P->cfg->write( $self->data_dir . '/redis.json', $cfg, readable => 1 ) if !-f $self->data_dir . '/redis.json';
+        # password
+        if ( defined $ENV{REDIS_PASSWORD} ) {
+            $cfg->{requirepass} = $ENV{REDIS_PASSWORD};
+        }
+        else {
+            $cfg->{requirepass} = P->random->bytes_hex(32);
+
+            say "GENERATED REDIS PASSWORD: $cfg->{requirepass}\n";
+        }
+
+        P->cfg->write( "$self->{data_dir}/redis.json", $cfg, readable => 1 );
+    }
 
     $self->store_config($cfg);
-
-    say "PASSWORD: $cfg->{requirepass}";
 
     # create and prepare unix socket dir
     P->file->mkdir('/tmp/redis.sock') if !-d '/tmp/redis.sock';
@@ -24,7 +36,7 @@ sub run ( $self, $cb ) {
 
     # run server
     P->pm->run_proc(
-        [ 'redis-server', '--include', $self->data_dir . '/redis.conf' ],
+        [ 'redis-server', '--include', "$self->{data_dir}/redis.conf" ],
         on_finish => sub ($proc) {
             $cb->($proc);
 
@@ -64,7 +76,7 @@ sub store_config ( $self, $cfg ) {
         }
     }
 
-    P->file->write_bin( $self->data_dir . '/redis.conf', $config );
+    P->file->write_bin( "$self->{data_dir}/redis.conf", $config );
 
     return;
 }
@@ -107,7 +119,7 @@ sub default_config ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 98                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 110                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

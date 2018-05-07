@@ -6,7 +6,7 @@ use base qw(Class::Accessor);
 use List::Util qw(first);
 use Carp qw(carp);
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Parse::Snort - Parse and create Snort rules
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -326,6 +326,7 @@ sub _single_opt_accessor {
 *gid       = _single_opt_accessor('gid');
 *metadata  = _single_opt_accessor('metadata');
 *priority  = _single_opt_accessor('priority');
+*flow      = _single_opt_accessor('flow');
 
 =back
 
@@ -344,6 +345,8 @@ sub _single_opt_accessor {
 =item gid
 
 =item metadata
+
+=item flow
 
 =item priority
 

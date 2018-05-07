@@ -11,8 +11,9 @@ use Chart::Plotly::Trace::Contour::Contours;
 use Chart::Plotly::Trace::Contour::Hoverlabel;
 use Chart::Plotly::Trace::Contour::Line;
 use Chart::Plotly::Trace::Contour::Stream;
+use Chart::Plotly::Trace::Contour::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data from which contour lines are computed is set in `z`. Data in `z` must be a {2D array} of numbers. Say that `z` has N rows and M columns, then by default, these N rows correspond to N y coordinates (set in `y` or auto-generated) and the M columns correspond to M x coordinates (set in `x` or auto-generated). By setting `transpose` to *true*, the above behavior is flipped.
 
@@ -193,6 +194,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Contour::Transform]", );
+
 has transpose => ( is            => "rw",
                    isa           => "Bool",
                    documentation => "Transposes the z data.",
@@ -261,7 +265,7 @@ has y0 => (
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ycalendar => ( is  => "rw",
@@ -333,7 +337,7 @@ Chart::Plotly::Trace::Contour - The data from which contour lines are computed i
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -498,6 +502,8 @@ Sets the text elements associated with each z value.
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * transpose
 
 Transposes the z data.
@@ -542,7 +548,7 @@ Alternate to `y`. Builds a linear space of y coordinates. Use with `dy` where `y
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ycalendar
 

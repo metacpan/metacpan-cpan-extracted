@@ -47,4 +47,8 @@ sub is_signed ($) {
 	die "Pure virtual method is called";
 }
 
+sub is_chained ($) {
+	die "Pure virtual method is called";
+}
+
 1;

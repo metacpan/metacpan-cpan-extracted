@@ -6,6 +6,9 @@ do { my $x = {
                                       }
                       },
        'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
+                                      },
                       'requires' => {
                                       'Perl::Tidy' => '20170521',
                                       'Pod::Coverage::TrustPod' => '0',
@@ -19,7 +22,11 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'App::cpm' => '0',
+                                      'App::cpm' => '0.974',
+                                      'App::cpm::CLI' => '0',
+                                      'Getopt::Long' => '0',
+                                      'Module::Loaded' => '0',
+                                      'local::lib' => '2.000024',
                                       'perl' => '5.006',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -30,9 +37,14 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Capture::Tiny' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Path::Iterator::Rule' => '0',
                                    'Test::More' => '0',
+                                   'Test::RequiresInternet' => '0',
+                                   'Test::TempDir::Tiny' => '0',
+                                   'local::lib' => '2.000024',
                                    'perl' => '5.006'
                                  }
                  }

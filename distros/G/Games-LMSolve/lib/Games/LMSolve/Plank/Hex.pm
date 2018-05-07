@@ -1,7 +1,5 @@
 package Games::LMSolve::Plank::Hex;
-$Games::LMSolve::Plank::Hex::VERSION = '0.10.1';
-our $AUTHORITY = 'cpan:SHLOMIF';
-
+$Games::LMSolve::Plank::Hex::VERSION = '0.12.0';
 use strict;
 use warnings;
 
@@ -32,7 +30,7 @@ Games::LMSolve::Plank::Hex - driver for solving the hex plank puzzles
 
 =head1 VERSION
 
-version 0.10.1
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -40,7 +38,7 @@ NA - should not be used directly.
 
 =head1 VERSION
 
-version 0.10.1
+version 0.12.0
 
 =head1 METHODS
 
@@ -66,7 +64,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Shlomi Fish.
+This software is Copyright (c) 2007 by Shlomi Fish.
 
 This is free software, licensed under:
 
@@ -75,8 +73,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/Public/Dist/Display.html?Name=Games-LMSolve or by email
-to bug-games-lmsolve@rt.cpan.org.
+L<https://github.com/shlomif/lm-solve-source/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -90,7 +87,7 @@ feature.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc Games::LMSolve
+  perldoc Games::LMSolve::Plank::Hex
 
 =head2 Websites
 
@@ -105,7 +102,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Games-LMSolve>
+L<https://metacpan.org/release/Games-LMSolve>
 
 =item *
 
@@ -141,14 +138,6 @@ L<http://cpanratings.perl.org/d/Games-LMSolve>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Games-LMSolve>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -159,7 +148,7 @@ L<http://cpants.cpanauthors.org/dist/Games-LMSolve>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/G/Games-LMSolve>
 
@@ -195,6 +184,6 @@ from your repository :)
 
 L<https://github.com/shlomif/lm-solve-source>
 
-  git clone https://github.com/shlomif/lm-solve-source.git
+  git clone git://github.com/shlomif/lm-solve-source.git
 
 =cut

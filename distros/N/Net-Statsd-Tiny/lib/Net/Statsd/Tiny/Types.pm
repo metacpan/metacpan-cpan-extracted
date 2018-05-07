@@ -5,7 +5,7 @@ package Net::Statsd::Tiny::Types;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
 
 
 1;
@@ -22,7 +22,7 @@ Net::Statsd::Tiny::Types - This is no longer used
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.1
 
 =head1 DESCRIPTION
 

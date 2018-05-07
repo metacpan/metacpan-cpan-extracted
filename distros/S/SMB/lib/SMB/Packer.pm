@@ -60,9 +60,9 @@ sub skip ($$) {
 	my $n_avail = $self->{offset} + $n_bytes > $self->size
 		? $self->size - $self->{offset} : $n_bytes;
 
-	$self->zero($n_bytes - $n_avail) if $n_avail < $n_bytes;
-
 	$self->{offset} += $n_avail;
+
+	$self->zero($n_bytes - $n_avail) if $n_avail < $n_bytes;
 
 	return $self;
 }
@@ -122,6 +122,16 @@ sub diff ($$) {
 	my $name = shift // '';
 
 	return $self->{offset} - ($self->{marks}{$name} || 0);
+}
+
+sub align ($;$$) {
+	my $self = shift;
+	my $name = shift;
+	my $step = shift || 4;
+
+	$self->skip(($step - $self->diff($name) % $step) % $step);
+
+	return $self;
 }
 
 my %UINT_MODS = (
@@ -191,6 +201,7 @@ SMB::Packer - Convenient data packer for network protocols like SMB
 	#   secret key (8), flags (1), mode (2 in little-endian),
 	#   payload offset (4) and length (4),
 	#   filename prefixed with length (2 + length),
+	#   padding to 4 bytes,
 	#   payload
 	# SMB::Parser documentation shows how it can be parsed back.
 
@@ -207,6 +218,7 @@ SMB::Packer - Convenient data packer for network protocols like SMB
 		->uint32(bytes::length($payload))
 		->uint16(length($filename) * 2)  # 2-byte chars in utf16
 		->utf16($filename)
+		->align
 		->fill('payload-offset', $packer->diff('body-start'))
 		->bytes($payload)
 	;
@@ -341,6 +353,11 @@ MARK_NAME (if any, otherwise defaults to 0).
 
 Returns the difference between the current data position and the one
 previously labeled with MARK_NAME (if any, otherwise defaults to 0).
+
+=item align [MARK_NAME=undef] [STEP=4]
+
+Skips, if needed, to the next alighment point (that is every STEP bytes
+starting from MARK_NAME if given or from buffer start).
 
 =item stub STUB_NAME TYPE
 

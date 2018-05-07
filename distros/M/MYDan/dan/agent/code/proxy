@@ -6,6 +6,8 @@ use Digest::MD5;
 use MYDan::Agent::Client::Proxy;
 use AnyEvent::Handle;
 use AnyEvent::Socket;
+use Fcntl qw(:flock SEEK_END);
+use MYDan::Agent::FileCache;
 
 eval
 {
@@ -20,35 +22,159 @@ eval
         tcp_connect $argv[0], $argv[1]->{port}, sub {
             my ( $fh ) = @_  or die "tcp_connect: $!";
             my $hdl; $hdl = new AnyEvent::Handle(
-               fh => $fh,
-               on_read => sub {
-                   my $self = shift;
-                   $self->unshift_read (
-                       chunk => length $self->{rbuf},
-                       sub {
-                           if( $skip ) { print $_[1]; }
-                           else
-                           {
-                               $cont .= $_[1];
-                               if( $cont =~ s/^\**#\*MYDan_\d+\*#// )
-                               {
-                                   print $cont;
-                                   $skip = 1;
-                               }
-                           }
-                       }
-                   );
+                fh => $fh,
+                on_read => sub {
+                    my $self = shift;
+                    $self->unshift_read (
+                        chunk => length $self->{rbuf},
+                        sub {
+                            if( $skip ) { print $_[1]; }
+                            else
+                            {
+                                $cont .= $_[1];
+                                if( $cont =~ s/^\**#\*MYDan_\d+\*#// )
+                                {
+                                    print $cont;
+                                    $skip = 1;
+                                }
+                            }
+                        }
+                    );
                 },
                 on_eof => sub{
                     undef $hdl;
-                     $cv->send;
-                 }
+                    $cv->send;
+                }
             );
+            if( my $ef = $ENV{MYDanExtractFile} )
+            {
+                open my $EF, "<$ef" or die "open $ef fail:$!";
+                my $size = (stat $ef )[7];
+                $hdl->push_write("MYDanExtractFile_::${size}::_MYDanExtractFile");
+                my ( $n, $buf );
+                while( $n = sysread( $EF, $buf, 102400 ) )
+                {
+                    $hdl->push_write($buf);
+                }
+                close $EF;
+            }
+
             $hdl->push_write($argv[1]->{query});
             $hdl->push_shutdown;
         };
         $cv->recv;
     }
+    elsif( $param{proxyload} )
+    {
+        my $filecache = MYDan::Agent::FileCache->new();
+        my $path = "$MYDan::PATH/tmp";
+
+        unless( -d $path ){ mkdir $path;chmod 0777, $path; }
+        $path .= '/load.data.';
+        for my $f ( grep{ -f } glob "$path*" )
+        {
+            my $t = ( stat $f )[9];
+            unlink $f if $t && $t < time - 3600;
+        }
+
+        my $temp  = $path. Digest::MD5->new->add( time.'.'.$$.'.'  )->hexdigest;
+        open my $TEMP, '+>>', $temp or die "Can't open '$temp': $!";
+
+
+        my ( $size, $filemd5, $own, $mode, $ok,  %keepalive );
+        my ( $cv, $skip, $cont ) = ( AE::cv, 0, '' );
+        tcp_connect $argv[0], $argv[1]->{port}, sub {
+            my ( $fh ) = @_  or die "tcp_connect: $!";
+            my $hdl; $hdl = new AnyEvent::Handle(
+                fh => $fh,
+                on_read => sub {
+                    my $self = shift;
+                    $self->unshift_read (
+
+                        chunk => length $self->{rbuf},
+                        sub {
+                            if( $keepalive{save} )
+                            {
+                                print $TEMP $_[1];
+                            }
+                            else
+                            {
+                                $keepalive{cont} .= $_[1];
+                                $keepalive{cont} =~ s/^\*+//g;
+
+                                if( length $keepalive{cont} > 1024000 )
+                                {
+                                    undef $hdl;
+                                    $cv->send;
+                                }
+
+                                if( $keepalive{cont} =~ s/\**#\*MYDan_\d+\*#(\d+):([a-z0-9]+):(\w+):(\d+):// )
+                                {
+                                    ( $size, $filemd5, $own, $mode ) = ( $1, $2, $3, $4 );
+
+                                    if( $filecache->check( $filemd5 ) )
+                                    {
+                                        undef $hdl; $cv->send; $ok = $size;
+                                    }
+
+                                    print $TEMP delete $keepalive{cont};
+                                    $keepalive{save} = 1;
+                                }
+                            }
+
+                        }
+
+                    );
+                },
+                on_eof => sub{
+                    undef $hdl;
+                    $cv->send;
+                }
+            );
+
+            $hdl->push_write($argv[1]->{query});
+            $hdl->push_shutdown;
+        };
+        $cv->recv;
+
+		unless( $ok )
+		{
+			seek $TEMP, -6, SEEK_END;
+			sysread $TEMP, my $end, 6;
+
+			unless( $end =~ /^--- 0\n$/  )
+			{
+				unlink $temp;
+				my $err = $keepalive{cont} || '';
+				$err =~ s/\**#\*MYDan_\d+\*#//;
+				die "status error $err $end\n";
+			}
+			truncate $TEMP, $size;
+			seek $TEMP, 0, 0;
+
+			unless( $filemd5 eq Digest::MD5->new()->addfile( $TEMP )->hexdigest() )
+			{
+				unlink $temp;
+				die "md5 nomatch\n";
+			}
+
+		}
+        close $TEMP;
+		eval{ $filecache->save( $temp ); };
+		warn "save filecache fail: $@" if $@;
+
+        print "$size:$filemd5:$own:$mode:";
+
+        my $file = $filecache->check( $filemd5 );
+        open my $X, "<$file" or die "load from proxy, open $file fail: $!";
+        while(<$X>)
+        {
+         print $_;   
+        };
+        close $X;
+
+    }
+
     else
     {
         my %result = MYDan::Agent::Client::Proxy->new(

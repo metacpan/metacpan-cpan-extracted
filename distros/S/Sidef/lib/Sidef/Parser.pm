@@ -292,9 +292,9 @@ package Sidef::Parser {
 
                   ^.. ..^
 
-                  %%
+                  %% ≅
                   ~~ !~
-                  <=>
+                  <=> =~=
                   <<= >>=
                   << >>
                   |= |
@@ -347,7 +347,7 @@ package Sidef::Parser {
                     | <<(?<reduce>[^\W\d]\w*+|(?&ops))>>              # reduce operator (e.g.: <<add>> or <<+>>)
                     | «(?<reduce>[^\W\d]\w*+|(?&ops))»                # reduce operator (e.g.: «add» or «+»)
 
-                    | `(?<op>[^\W\d]\w*+[!:?]?)`                      # method-like operator (e.g.: `add`)
+                    | `(?<op>[^\W\d]\w*+!?)`                          # method-like operator (e.g.: `add` or `add!`)
                     | (?<op>(?&ops))                                  # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
@@ -445,7 +445,7 @@ package Sidef::Parser {
             }
 
             if (my @candidates = Sidef::best_matches($name, \@names)) {
-                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), sort @candidates) . "\n");
+                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), sort(@candidates)) . "\n");
             }
         }
 
@@ -580,7 +580,7 @@ package Sidef::Parser {
     ## get_method_name() returns the following values:
     # 1st: method/operator (or undef)
     # 2nd: a true value if the operator requires an argument
-    # 3rd: type of operator (e.g.: »+« is "uop", «+» is "rop")
+    # 3rd: type of operator (defined in $self->{hyper_ops})
     sub get_method_name {
         my ($self, %opt) = @_;
 
@@ -592,6 +592,11 @@ package Sidef::Parser {
         # Alpha-numeric method name
         if (/\G($self->{method_name_re})/goc) {
             return ($1, 0, '');
+        }
+
+        # Super-script power
+        if (/\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/) {
+            return ('**', 1, 'op');
         }
 
         # Operator-like method name
@@ -1840,6 +1845,12 @@ package Sidef::Parser {
                 return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
             }
 
+            # Super-script power
+            if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
+                my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
+                return Sidef::Types::Number::Number->new($num);
+            }
+
             # Binary, hexadecimal and octal numbers
             if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
                 my $num = $1 =~ tr/_//dr;
@@ -2976,50 +2987,54 @@ package Sidef::Parser {
                             ? do { $self->parse_whitespace(code => $opt{code}); 1 }
                             : 0
                            )
+                        || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/
                        )
                   ) {
 
                     my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
-                    my $has_arg;
-                    if ($req_arg) {
-                        my $arg = $self->parse_obj(code => $opt{code}, multiline => 1);
+                    if (defined($method)) {
 
-                        if (defined $arg) {
-                            if (ref $arg ne 'HASH') {
-                                $arg = {$self->{class} => [{self => $arg}]};
+                        my $has_arg;
+                        if ($req_arg) {
+                            my $arg = $self->parse_obj(code => $opt{code}, multiline => 1);
+
+                            if (defined $arg) {
+                                if (ref $arg ne 'HASH') {
+                                    $arg = {$self->{class} => [{self => $arg}]};
+                                }
+
+                                my $methods = $self->parse_methods(code => $opt{code});
+                                if (@{$methods}) {
+                                    push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
+                                }
+
+                                $has_arg = 1;
+                                $self->append_method(
+                                                     array   => \@{$struct{$self->{class}}[-1]{call}},
+                                                     method  => $method,
+                                                     arg     => $arg,
+                                                     op_type => $op_type,
+                                                    );
                             }
-
-                            my $methods = $self->parse_methods(code => $opt{code});
-                            if (@{$methods}) {
-                                push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
+                            else {
+                                $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_) - 1,
+                                                   error => "operator '$method' requires a right-side operand",
+                                                  );
                             }
+                        }
 
-                            $has_arg = 1;
+                        $has_arg || do {
                             $self->append_method(
                                                  array   => \@{$struct{$self->{class}}[-1]{call}},
                                                  method  => $method,
-                                                 arg     => $arg,
                                                  op_type => $op_type,
                                                 );
-                        }
-                        else {
-                            $self->fatal_error(
-                                               code  => $_,
-                                               pos   => pos($_) - 1,
-                                               error => "operator '$method' requires a right-side operand",
-                                              );
-                        }
+                        };
+                        redo;
                     }
-
-                    $has_arg || do {
-                        $self->append_method(
-                                             array   => \@{$struct{$self->{class}}[-1]{call}},
-                                             method  => $method,
-                                             op_type => $op_type,
-                                            );
-                    };
-                    redo;
                 }
             }
         }

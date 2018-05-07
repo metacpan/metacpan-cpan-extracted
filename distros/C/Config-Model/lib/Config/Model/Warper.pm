@@ -8,13 +8,14 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Warper;
-$Config::Model::Warper::VERSION = '2.122';
+$Config::Model::Warper::VERSION = '2.123';
 use Mouse;
 
 use Log::Log4perl qw(get_logger :levels);
 use Data::Dumper;
 use Storable qw/dclone/;
 use Config::Model::Exception;
+use List::MoreUtils qw/any/;
 use Carp;
 
 has 'follow' => ( is => 'ro', isa => 'HashRef[Str]', required => 1 );
@@ -321,7 +322,7 @@ sub check_warp_args {
                     . "parameter is not allowed, "
                     . "expected '"
                     . join( "' or '", @$allowed ) . "'"
-            ) unless grep( $pkey eq $_, @$allowed );
+            ) unless any {$pkey eq $_}  @$allowed ;
         }
     }
 }
@@ -622,7 +623,7 @@ Config::Model::Warper - Warp tree properties
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 

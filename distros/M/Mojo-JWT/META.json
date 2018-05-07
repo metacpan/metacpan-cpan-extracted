@@ -39,7 +39,7 @@
    "provides" : {
       "Mojo::JWT" : {
          "file" : "lib/Mojo/JWT.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "http://github.com/jberger/Mojo-JWT"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

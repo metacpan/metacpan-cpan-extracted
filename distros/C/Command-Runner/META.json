@@ -48,7 +48,7 @@
    "provides" : {
       "Command::Runner" : {
          "file" : "lib/Command/Runner.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       },
       "Command::Runner::Format" : {
          "file" : "lib/Command/Runner/Format.pm"
@@ -72,7 +72,7 @@
          "web" : "https://github.com/skaji/Command-Runner"
       }
    },
-   "version" : "0.100",
+   "version" : "0.101",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],

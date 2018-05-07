@@ -17,6 +17,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.03'
+requires:
+  Inline::C: '0.78'
+  Test::More: '1.302135'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,14 @@
 
+7.77  2018-04-28
+  - Added support for namespace selectors like "ns|*" to Mojo::DOM::CSS.
+    (jberger)
+  - Added support for :link and :visited pseudo-classes to Mojo::DOM::CSS.
+  - Added support for hyphen-separated list attribute selectors like
+    "[heflang|=en]" to Mojo::DOM::CSS.
+
 7.76  2018-04-23
   - Due to lack of domain experts on the team, Windows is no longer officially
-    supported. Moving foward, we will try to keep Mojolicious installable on
+    supported. Moving forward, we will try to keep Mojolicious installable on
     Windows, but cannot make any promises regarding security and/or reliability.
   - Fixed a bug in Mojolicious::Plugin::Config where the config stash value was
     not available when the config_override feature was used. (tim)

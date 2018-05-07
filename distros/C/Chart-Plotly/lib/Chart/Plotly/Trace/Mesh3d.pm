@@ -12,8 +12,9 @@ use Chart::Plotly::Trace::Mesh3d::Hoverlabel;
 use Chart::Plotly::Trace::Mesh3d::Lighting;
 use Chart::Plotly::Trace::Mesh3d::Lightposition;
 use Chart::Plotly::Trace::Mesh3d::Stream;
+use Chart::Plotly::Trace::Mesh3d::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Draws sets of triangles with coordinates given by three 1-dimensional arrays in `x`, `y`, `z` and (1) a sets of `i`, `j`, `k` indices (2) Delaunay triangulation or (3) the Alpha-shape algorithm or (4) the Convex-hull algorithm
 
@@ -273,6 +274,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Mesh3d::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -370,7 +374,7 @@ Chart::Plotly::Trace::Mesh3d - Draws sets of triangles with coordinates given by
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -583,6 +587,8 @@ Sets the text elements associated with the vertices. If trace `hoverinfo` contai
 =item * textsrc
 
 Sets the source reference on plot.ly for  text .
+
+=item * transforms
 
 =item * uid
 

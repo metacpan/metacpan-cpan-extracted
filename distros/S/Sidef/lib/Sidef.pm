@@ -1,7 +1,7 @@
 package Sidef {
 
     use 5.014;
-    our $VERSION = '3.15';
+    our $VERSION = '3.16';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -457,7 +457,7 @@ package Sidef {
     die(  "[AUTOLOAD] Undefined method `"
         . $method . q{'}
         . " called from $from\n"
-        . (@candidates ? ("[?] Did you mean: " . join("\n" . (' ' x 18), sort @candidates) . "\n") : ''));
+        . (@candidates ? ("[?] Did you mean: " . join("\n" . (' ' x 18), sort(@candidates)) . "\n") : ''));
     return;
 };
 

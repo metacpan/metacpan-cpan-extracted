@@ -3,14 +3,15 @@
 use strict;
 use warnings;
 
+use Test::Fatal qw(exception);
 use Test::More tests => 40;
 
 use vars qw($string $string_error $unblessed_error);
 
 BEGIN {
     $string = 'Hello, world!';
-    $string_error = qr{Can't locate object method "test" via package "$string"};
-    $unblessed_error = qr{Can't call method "test" on unblessed reference\b};
+    $string_error = qr{^Can't locate object method "test" via package "$string"};
+    $unblessed_error = qr{^Can't call method "test" on unblessed reference\b};
 
     no strict 'refs';
 
@@ -25,28 +26,24 @@ no autobox;
 no autobox;
 
 BEGIN {
-    eval { $string->test() };
-    ok ($@ && ($@ =~ /^$string_error/), 'test 1');
+    like(exception { $string->test() }, $string_error);
 }
 
-eval { $string->test() };
-ok ($@ && ($@ =~ /^$string_error/). 'test ');
+like(exception { $string->test() }, $string_error);
 
 use autobox SCALAR => 'Scalar1';
 
-BEGIN { is($string->test(), 'Scalar1', 'test 2') }
+BEGIN { is($string->test(), 'Scalar1') }
 
-is($string->test(), 'Scalar1', 'test ');
+is($string->test(), 'Scalar1');
 
 no autobox qw(SCALAR);
 
 BEGIN {
-    eval { $string->test() };
-    ok ($@ && ($@ =~ /^$string_error/), 'test 3');
+    like(exception { $string->test() }, $string_error);
 }
 
-eval { $string->test() };
-ok ($@ && ($@ =~ /^$string_error/), 'test ');
+like(exception { $string->test() }, $string_error);
 
 {
     # multiple unimports in a nested scope before "use autobox"
@@ -56,7 +53,7 @@ ok ($@ && ($@ =~ /^$string_error/), 'test ');
 
     use autobox SCALAR => 'Scalar2';
 
-    BEGIN { is($string->test(), 'Scalar2', 'test 4') }
+    BEGIN { is($string->test(), 'Scalar2') }
 
     is($string->test(), 'Scalar2');
 
@@ -95,10 +92,10 @@ ok ($@ && ($@ =~ /^$string_error/), 'test ');
 use autobox;
 
 BEGIN {
-    is(''->test(), 'SCALAR', 'test 5');
-    is([]->test(), 'ARRAY', 'test 6');
-    is({}->test(), 'HASH', 'test 7');
-    is(sub {}->test(), 'CODE', 'test 8');
+    is(''->test(), 'SCALAR');
+    is([]->test(), 'ARRAY');
+    is({}->test(), 'HASH');
+    is(sub {}->test(), 'CODE');
 }
 
 is(''->test(), 'SCALAR');
@@ -109,17 +106,15 @@ is(sub {}->test(), 'CODE');
 no autobox qw(SCALAR);
 
 BEGIN {
-    eval { $string->test() };
-    ok ($@ && ($@ =~ /^$string_error/), 'test 9');
+    like(exception { $string->test() }, $string_error);
 }
 
-eval { $string->test() };
-ok ($@ && ($@ =~ /^$string_error/));
+like(exception { $string->test() }, $string_error);
 
 BEGIN {
-    is([]->test(), 'ARRAY', 'test 10');
-    is({}->test(), 'HASH', 'test 11');
-    is(sub {}->test(), 'CODE', 'test 12');
+    is([]->test(), 'ARRAY');
+    is({}->test(), 'HASH');
+    is(sub {}->test(), 'CODE');
 }
 
 is([]->test(), 'ARRAY');
@@ -129,45 +124,31 @@ is(sub {}->test(), 'CODE');
 no autobox qw(ARRAY HASH);
 
 BEGIN {
-    eval { $string->test() };
-    ok ($@ && ($@ =~ /^$string_error/), 'test 13');
-    eval { []->test() };
-    ok ($@ && ($@ =~ /^$unblessed_error/), 'test 14');
-    eval { {}->test() };
-    ok ($@ && ($@ =~ /^$unblessed_error/), 'test 15');
+    like(exception { $string->test() }, $string_error);
+    like(exception { []->test() }, $unblessed_error);
+    like(exception { {}->test() }, $unblessed_error);
 }
 
-eval { $string->test() };
-ok ($@ && ($@ =~ /^$string_error/));
-eval { []->test() };
-ok ($@ && ($@ =~ /^$unblessed_error/));
-eval { {}->test() };
-ok ($@ && ($@ =~ /^$unblessed_error/));
+like(exception { $string->test() }, $string_error);
+like(exception { []->test() }, $unblessed_error);
+like(exception { {}->test() }, $unblessed_error);
 
-BEGIN { is(sub {}->test(), 'CODE', 'test 16') }
+BEGIN { is(sub {}->test(), 'CODE') }
 
 is(sub {}->test(), 'CODE');
 
 no autobox;
 
 BEGIN {
-    eval { $string->test() };
-    ok ($@ && ($@ =~ /^$string_error/), 'test 17');
-    eval { []->test() };
-    ok ($@ && ($@ =~ /^$unblessed_error/), 'test 18');
-    eval { {}->test() };
-    ok ($@ && ($@ =~ /^$unblessed_error/), 'test 19');
-    eval { sub {}->test() };
-    ok ($@ && ($@ =~ /^$unblessed_error/), 'test 20');
+    like(exception { $string->test() }, $string_error);
+    like(exception { []->test() }, $unblessed_error);
+    like(exception { {}->test() }, $unblessed_error);
+    like(exception { sub {}->test() }, $unblessed_error);
 }
 
-eval { $string->test() };
-ok ($@ && ($@ =~ /^$string_error/));
-eval { []->test() };
-ok ($@ && ($@ =~ /^$unblessed_error/));
-eval { {}->test() };
-ok ($@ && ($@ =~ /^$unblessed_error/));
-eval { sub {}->test() };
-ok ($@ && ($@ =~ /^$unblessed_error/));
+like(exception { $string->test() }, $string_error);
+like(exception { []->test() }, $unblessed_error);
+like(exception { {}->test() }, $unblessed_error);
+like(exception { sub {}->test() }, $unblessed_error);
 
 use autobox; # try to cause havoc with a stray trailing "use autobox"

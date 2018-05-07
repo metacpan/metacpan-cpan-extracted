@@ -12,8 +12,9 @@ use Chart::Plotly::Trace::Surface::Hoverlabel;
 use Chart::Plotly::Trace::Surface::Lighting;
 use Chart::Plotly::Trace::Surface::Lightposition;
 use Chart::Plotly::Trace::Surface::Stream;
+use Chart::Plotly::Trace::Surface::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data the describes the coordinates of the surface is set in `z`. Data in `z` should be a {2D array}. Coordinates in `x` and `y` can either be 1D {arrays} or {2D arrays} (e.g. to graph parametric surfaces). If not provided in `x` and `y`, the x and y coordinates are assumed to be linear starting at 0 with a unit step. The color scale corresponds to the `z` values by default. For custom color scales, use `surfacecolor` which should be a {2D array}, where its bounds can be controlled using `cmin` and `cmax`.
 
@@ -203,6 +204,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Surface::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -284,7 +288,7 @@ Chart::Plotly::Trace::Surface - The data the describes the coordinates of the su
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -454,6 +458,8 @@ Sets the text elements associated with each z value. If trace `hoverinfo` contai
 =item * textsrc
 
 Sets the source reference on plot.ly for  text .
+
+=item * transforms
 
 =item * uid
 

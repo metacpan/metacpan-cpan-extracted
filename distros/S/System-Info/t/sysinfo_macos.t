@@ -1,13 +1,16 @@
-#! perl -w
+#!/usr/bin/perl
+
 use strict;
+use warnings;
 
 # We need at least 5.9.5 for the CORE::GLOBEL::readpipe () override
 my $not595;
-BEGIN { eval qq/use 5.009005/; $not595 = $@ }
+BEGIN { eval qq{use 5.009005}; $not595 = $@ }
 
 use Test::More $not595
-    ? ( skip_all => "This is only version $] (needs 5.9.5)" )
-    : "no_plan";
+    ? (skip_all => "This is only version $] (needs 5.9.5)")
+    : (tests    => 4);
+use Test::NoWarnings;
 
 use Carp qw( cluck );
 our $DEBUG = 0;
@@ -90,5 +93,5 @@ for my $model (keys %output) {
 
     local $^O = "Darwin";
     my $info = System::Info::Darwin->new;
-    is $info->si_uname ("m c p"), $output{$model}{uname}, $output{$model}{uname};
+    is ($info->si_uname ("m c p"), $output{$model}{uname}, $output{$model}{uname});
     }

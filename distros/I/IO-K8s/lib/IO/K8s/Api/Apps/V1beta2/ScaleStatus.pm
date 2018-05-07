@@ -1,0 +1,7 @@
+package IO::K8s::Api::Apps::V1beta2::ScaleStatus;
+  use Moose;
+
+  has 'replicas' => (is => 'ro', isa => 'Int'  );
+  has 'selector' => (is => 'ro', isa => 'HashRef[Str]'  );
+  has 'targetSelector' => (is => 'ro', isa => 'Str'  );
+1;

@@ -1,5 +1,9 @@
 # [% name %] [% version %]
+[% IF vcs.travis || distribution.cpan %]
+[% IF vcs.travis %][![Build status](https://travis-ci.org/[% vcs.travis %].svg?branch=master)](https://travis-ci.org/[% vcs.travis %])[% END -%]
+[% IF distribution.cpan %] [![CPAN version](https://img.shields.io/cpan/v/[% distribution.cpan %].svg)](https://metacpan.org/release/[% distribution.cpan %])[% END -%]
 
+[% END %]
 [% FOREACH copr IN copyrights %]Copyright [% copr.years %]
 [% copr.holder %].  [% END %]This software is distributed under
 [% license.summary %].  Please see the section [License](#license) below
@@ -16,14 +20,7 @@ for more information.
 ## Requirements
 
 [% requirements %]
-[% IF build.lancaster %]
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-[% END %][% IF build.autotools %]
+[% IF build.autotools %]
 To bootstrap from a Git checkout, or if you change the Automake files
 and need to regenerate Makefile.in, you will need Automake
 [% build.automake %] or later.  For bootstrap or if you change
@@ -47,7 +44,14 @@ as any other Module::Build module:
 
 You will have to run the last command as root unless you're installing
 into a local Perl module tree in your home directory.
-[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+[% IF build.lancaster %]
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
+[% END %][% ELSIF build.type == 'ExtUtils::MakeMaker' %]
 ## Building and Installation
 
 [% name %] uses ExtUtils::MakeMaker and can be installed using the same
@@ -62,7 +66,14 @@ process as any other ExtUtils::MakeMaker module:
 
 You'll probably need to do the last as root unless you're installing
 into a local Perl module tree in your home directory.
-[% ELSIF build.type == 'Autoconf' %][% IF build.install %]
+[% IF build.lancaster %]
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
+[% END %][% ELSIF build.type == 'Autoconf' %][% IF build.install %]
 ## Building and Installation
 
 You can build and install [% name %] with the standard commands:
@@ -170,9 +181,16 @@ If a test fails, you can run a single test with verbose output via:
 
 Do this instead of running the test program directly since it will ensure
 that necessary environment variables are set up.
-[% END %][% IF test.suffix %]
+[% IF test.suffix %]
 [% test.suffix %]
-[% END %][% END %]
+[% END %][% IF build.lancaster %]
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
+[% END %][% END %][% END %]
 [% FOREACH section IN readme.sections %]## [% section.title %]
 
 [% section.body %]

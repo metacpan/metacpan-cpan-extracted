@@ -11,3 +11,5 @@
   -- Added blocking unit tests that found the problem with HTTP::MultiGet
 1.004
   -- Changed min version of Data::Dumper to 2.161
+1.005
+  -- added support for getting application metrics

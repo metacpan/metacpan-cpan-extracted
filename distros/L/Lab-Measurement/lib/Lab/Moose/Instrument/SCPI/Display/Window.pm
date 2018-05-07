@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Display::Window;
-$Lab::Moose::Instrument::SCPI::Display::Window::VERSION = '3.631';
+$Lab::Moose::Instrument::SCPI::Display::Window::VERSION = '3.641';
 #ABSTRACT: Role for the SCPI DISPlay:WINDow subsystem
 
 use Moose::Role;
@@ -19,13 +19,13 @@ sub display_window_trace_y_scale_rlevel_query {
     my ( $self, $channel, %args ) = validated_channel_getter( \@_ );
 
     return $self->cached_display_window_trace_y_scale_rlevel(
-        $self->query( command => ":DISP:WIND:TRACe:Y:SCALe:RLEV?", %args ) );
+        $self->query( command => ":DISP:WIN:TRACe:Y:SCALe:RLEV?", %args ) );
 }
 
 sub display_window_trace_y_scale_rlevel {
     my ( $self, $channel, $value, %args ) = validated_channel_setter( \@_ );
     $self->write(
-        command => sprintf( ":DISP:WIND:TRACe:Y:SCALe:RLEV %.17g", $value ),
+        command => sprintf( ":DISP:WIN:TRACe:Y:SCALe:RLEV %.17g", $value ),
         %args
     );
     $self->cached_display_window_trace_y_scale_rlevel($value);
@@ -45,7 +45,7 @@ Lab::Moose::Instrument::SCPI::Display::Window - Role for the SCPI DISPlay:WINDow
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 METHODS
 

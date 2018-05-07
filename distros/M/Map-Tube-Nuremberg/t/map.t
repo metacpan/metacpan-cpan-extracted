@@ -22,8 +22,8 @@ ok_map_functions($map);
 my @routes = <DATA>;
 diag ok_map_routes($map, \@routes);
 
-diag $map->to_string( $map->get_shortest_route('Hauptbahnhof', 'Opernhaus') );
-diag $map->to_string( $map->get_shortest_route('Opernhaus', 'Aufseßplatz') );
+diag $map->get_shortest_route('Hauptbahnhof', 'Opernhaus');
+diag $map->get_shortest_route('Opernhaus', 'Aufseßplatz');
 
 
 __DATA__

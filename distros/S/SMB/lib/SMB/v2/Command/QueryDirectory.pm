@@ -30,7 +30,7 @@ use constant {
 
 	FLAGS_RESCAN => 0x1,
 	FLAGS_SINGLE => 0x2,
-	FLAGS_INDEX  => 0x4,
+	FLAGS_INDEXS => 0x4,
 	FLAGS_REOPEN => 0x10,
 };
 
@@ -142,18 +142,19 @@ sub pack ($$) {
 				unless $level == INFO_LEVEL_NAMES
 			;
 			$packer
-				->uint8 (length($short_filename) * 2)
-				->uint8 (0)
+				->uint8(length($short_filename) * 2)
+				->uint8(0)
 				->utf16($short_filename)
 				if $level == INFO_LEVEL_BOTHDIRECTORY || $level == INFO_LEVEL_IDBOTHDIRECTORY
 			;
 			$packer
 				->zero($level == INFO_LEVEL_IDFULLDIRECTORY ? 4 : 2)
-				->uint64($file->{id} || 0)
+				->uint64($file->id)
 				if $level == INFO_LEVEL_IDFULLDIRECTORY || $level == INFO_LEVEL_IDBOTHDIRECTORY
 			;
 			$packer
 				->utf16($filename)
+				->align('file-info-start', 8)
 				->fill('next-diff', ++$i == @$files ? 0 : $packer->diff('file-info-start'))
 			;
 		}
@@ -172,6 +173,18 @@ sub pack ($$) {
 			->utf16($self->file_pattern)
 		;
 	}
+}
+
+sub is_index_specified ($) {
+	my $self = shift;
+
+	return $self->flags & FLAGS_INDEXS ? 1 : 0;
+}
+
+sub is_reopen ($) {
+	my $self = shift;
+
+	return $self->flags & FLAGS_REOPEN ? 1 : 0;
 }
 
 1;

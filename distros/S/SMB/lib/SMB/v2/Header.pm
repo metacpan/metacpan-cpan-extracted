@@ -41,6 +41,7 @@ sub new ($%) {
 		aid           => delete $options{aid} || 0,
 		credits       => delete $options{credits} || 0,
 		credit_charge => delete $options{credit_charge} || ($options{code} ? 1 : 0),
+		chain_offset  => delete $options{chain_offset} || 0,
 		struct_size   => delete $options{struct_size} || 2,
 		%options,
 	);
@@ -59,6 +60,13 @@ sub is_signed ($) {
 	return ref($signature) eq 'ARRAY' && @$signature == 16 &&
 		(join('', $signature) ne "\0" x 16) &&
 		($self->flags & FLAGS_SIGNED) != 0;
+}
+
+sub is_chained ($) {
+	my $self = shift;
+
+	return
+		($self->flags & FLAGS_CHAINED) != 0;
 }
 
 1;

@@ -1,5 +1,9 @@
 Revision history for SWISH-Filters-ImageToMD5Xml
 
+0.05 xxx
+ - Use md5_hex function for string not binary
+ - Fix Makefile.PL to add missing Test::MockObject dependency
+
 0.04 12/04/2015
  - do not attempt to filter XML that does not contain the b64_data tag
 

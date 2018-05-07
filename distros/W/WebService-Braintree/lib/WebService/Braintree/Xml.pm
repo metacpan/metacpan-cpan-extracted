@@ -6,7 +6,6 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use vars qw(@ISA @EXPORT_OK);
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(hash_to_xml xml_to_hash);

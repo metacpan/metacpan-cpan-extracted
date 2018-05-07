@@ -80,6 +80,7 @@ sub pack ($$) {
 
 		$packer
 			->uint8($packer->diff('smb-header') + 14)
+			->uint8(0)
 			->uint32(length $buffer)
 			->uint32($self->remaining_bytes)
 			->uint32(0)  # reserved

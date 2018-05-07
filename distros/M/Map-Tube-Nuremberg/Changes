@@ -1,0 +1,4 @@
+Revision history for Map::Tube::Nuremberg
+
+0.06    2018-05-01
+        * fixed issue #2 (Map::Tube::Plugin::Formatter missing as Dependency)

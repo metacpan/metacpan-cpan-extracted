@@ -1,5 +1,22 @@
 Revision history for Perl extension autobox
 
+3.0.1 Sat 5 May 20:50:14 2018
+
+    - GH #11: fix version declaration on 5.8 (thanks, Grinnz)
+
+3.0.0 Sat 5 May 18:10:16 2018
+
+    - breaking change:
+        - the behaviour of UNIVERSAL methods like $native->can and
+          $native->isa is now defined as being the same as when autobox
+          is not enabled rather than "undefined". (technically, this
+          still falls under the rubric of "undefined", but the switch
+          from "don't know" to "don't" could break buggy code, so bump
+          for safety)
+        - add DOES to the list of non-autoboxed methods
+    - switch to SemVer i.e. 2.86 (v2.860.0) -> 3.0.0 (v3.0.0)
+    - upgrade ppport.h from 3.35 -> 3.42
+
 2.86 Fri 20 Apr 20:07:29 2018
 
     - GH #9: fix bug which prevented autoboxing working
@@ -18,7 +35,7 @@ Revision history for Perl extension autobox
 
     - compatibility fix for perl >= 5.25
       (thanks, mat813, karenetheridge and eserte)
-    - update ppport.h from 3.20 to 3.35
+    - upgrade ppport.h from 3.20 to 3.35
 
 2.83 Sun Feb 1 21:34:01 2015
 
@@ -64,7 +81,7 @@ Revision history for Perl extension autobox
 
     - fix breaking tests in perl >= 5.17.5: update error
       message pattern (thanks, rjbs)
-    - update ppport.h from 3.19 to 3.20
+    - upgrade ppport.h from 3.19 to 3.20
 
 2.75  Thu Jul 21 22:07:26 2011
 

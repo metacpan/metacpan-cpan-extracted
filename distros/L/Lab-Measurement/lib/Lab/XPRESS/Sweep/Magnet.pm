@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Magnet;
-$Lab::XPRESS::Sweep::Magnet::VERSION = '3.631';
+$Lab::XPRESS::Sweep::Magnet::VERSION = '3.641';
 #ABSTRACT: Magnetic field sweep
 
 use Lab::XPRESS::Sweep;
@@ -162,7 +162,7 @@ Lab::XPRESS::Sweep::Magnet - Magnetic field sweep
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 SYNOPSIS
 

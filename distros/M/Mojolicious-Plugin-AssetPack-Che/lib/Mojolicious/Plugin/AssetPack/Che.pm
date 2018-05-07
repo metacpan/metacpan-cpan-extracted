@@ -3,7 +3,9 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack';
 use Mojolicious::Plugin::AssetPack::Util qw( checksum );
 use Mojo::URL;
 
+
 has [qw(app config)];
+has revision => sub { my $app = shift->app; $app->config('revision') // $app->config('version') // $app->config('версия') // ''; };
 
 sub register {
   my ($self, $app, $config) = @_;
@@ -25,6 +27,7 @@ sub register {
 
 sub process {# redefine for nested topics
   my ($self, $topic, @input) = @_;
+  utf8::encode($topic);
  
   $self->route unless $self->{route_added}++;
   return $self->_process_from_def($topic) unless @input;
@@ -34,6 +37,7 @@ sub process {# redefine for nested topics
   # CSS from?
   my $assets = Mojo::Collection->new;
   for my $url (@input) {
+    utf8::encode($url);
     if (my $nested = $self->processed($url)) {
       push @$assets, @$nested;
       next;
@@ -52,14 +56,21 @@ sub serve_cb {
   return sub {
     my $c = shift;
     my $checksum = $c->stash('checksum');
-    if (($c->req->headers->accept_encoding // '') =~ /gzip/i && (my $asset = $self->{by_checksum}{$checksum})) {
+    my $topic_checksum = checksum Mojo::Util::encode 'UTF-8', $c->stash('topic').$self->revision;
+    my $topic_checksum_gzip = checksum Mojo::Util::encode 'UTF-8', $c->stash('topic').$self->revision.'.gzip';
+    if ((my $asset = $self->{by_checksum}{$topic_checksum_gzip}) && ($c->req->headers->accept_encoding // '') =~ /gzip/i) {# 
       #~ warn "serve_cb", $c->dumper($asset);
-      my $cfconfig=$self->config->{CombineFile} || {};
-      my $checksum_gzip = checksum($asset->url.($self->app->config('version') // $self->app->config('версия') // '').'.gzip');
-      $asset = $self->{by_checksum}{$checksum_gzip}
-        and $c->res->headers->content_encoding('gzip')
-        and $self->store->serve_asset($c, $asset)
-        and return $c->rendered;
+      #~ my $cfconfig=$self->config->{CombineFile} || {};
+      #~ $self->app->log->debug($c->dumper($asset));
+      #~ my $checksum_gzip = checksum(Mojo::Util::encode 'UTF-8', $asset->url.$self->revision.'.gzip');#
+      #~ $asset = $self->{by_checksum}{$checksum_gzip}
+      $c->res->headers->content_encoding('gzip');
+      $self->store->serve_asset($c, $asset);
+      return $c->rendered;
+    } elsif ($asset = $self->{by_checksum}{$checksum} || $self->{by_checksum}{$topic_checksum}) {
+      $self->store->serve_asset($c, $asset);
+      return $c->rendered;
+      
     }
     Mojolicious::Plugin::AssetPack::_serve($c, @_);
   };
@@ -93,11 +104,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 1.452 (test on base Mojolicious::Plugin::AssetPack v1.45)
+Version 2.023 (test on base Mojolicious::Plugin::AssetPack v2.02)
 
 =cut
 
-our $VERSION = '1.452';
+our $VERSION = '2.023';
 
 
 =head1 SYNOPSIS
@@ -106,11 +117,16 @@ See parent module L<Mojolicious::Plugin::AssetPack> for full documentation.
 
 On register the plugin  C<config> can contain additional optional argument B<process>:
 
-  $app->plugin(AssetPack => pipes => [...], process => {foo.js=>[...], ...});
-  # or
-  $app->plugin(AssetPack => pipes => [...], process => [[foo.js=>(...)], ...]);
-  # or
-  $app->plugin(AssetPack => pipes => [...], process => [$definition_file1, ...]);
+  $app->plugin('AssetPack::Che',
+    pipes => [qw(Sass Css JavaScript HTML CombineFile)],
+    CombineFile => { gzip => {min_size => 1000},}, # pipe options
+    HTML => {minify_opts=>{remove_newlines => 1,}},# pipe based on HTML::Packer
+    process => [
+      ['foo.js'=>qw(path/to/foo1.js path/to/foo2.js)],
+      ['foo.html'=>qw(path/to/foo1.html path/to/foo2.html)],
+      ...
+    ],
+  );
 
 
 =head1 SEE ALSO
@@ -127,7 +143,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016-2018 Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -3,8 +3,7 @@ use warnings;
 package Alien::libvas;
 
 # ABSTRACT: Perl distribution for libvas
-# VERSION
-our $VERSION = '0.213';
+our $VERSION = '0.215'; # VERSION
 
 use parent 'Alien::Base';
 
@@ -16,6 +15,10 @@ use parent 'Alien::Base';
 =head1 NAME
 
 Alien::libvas - Perl distribution for libvas
+
+=head1 VERSION
+
+version 0.215
 
 =head1 INSTALL
 

@@ -763,7 +763,7 @@ Array.index() -> I<Obj>
 
 Return the
 
-Aliases: I<index_by>, I<first_index>
+Aliases: I<index_by>, I<first_index>, I<first_index_by>
 
 =cut
 
@@ -1129,6 +1129,14 @@ Return the
 
 =cut
 
+=head2 perm2num
+
+Array.perm2num() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 permutations
 
 Array.permutations() -> I<Obj>
@@ -1259,7 +1267,7 @@ Array.rindex() -> I<Obj>
 
 Return the
 
-Aliases: I<rindex_by>, I<last_index>
+Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
 =cut
 

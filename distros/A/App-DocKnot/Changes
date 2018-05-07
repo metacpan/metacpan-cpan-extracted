@@ -1,5 +1,31 @@
                        User-Visible DocKnot Changes
 
+DocKnot 1.05 (2018-05-05)
+
+    Add the Travis-CI badge to README.md and a link to Travis-CI to the
+    thread development links if the vcs.travis key is set in
+    metadata.json.
+
+    Add a Status.io badge for the CPAN version to README.md and a link to
+    metacpan.org in the thread output if the distribution.cpan key is set
+    in metadata.json.
+
+    Move the description of Lancaster Consensus environment variables into
+    the testing section of README and README.md instead of the
+    requirements section, since they're more about running the tests and
+    less about package requirements in general.
+
+    Add support for a new packaging/extra metadata file (setting the
+    packaging.extra key in templates) and use it in the thread template.
+
+    Correctly handle multi-paragraph debian.summary metadata in the thread
+    template.
+
+    Fix formatting bug in the README template when additional bootstrap
+    documentation is provided.
+
+    DocKnot now requires Perl 5.24 or later.
+
 DocKnot 1.04 (2018-03-24)
 
     Fix SPDX test failure on Windows.

@@ -1,3 +1,8 @@
+1.20     2018-05-06
+
+- Fix test failures on Windows. Reported by Adrian Devries. GH #23.
+
+
 1.19     2018-04-21
 
 - Fix handling of a locale (nds) that does not provide a native name for its

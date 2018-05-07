@@ -14,7 +14,7 @@ Lab::Measurement::OldTutorial - Old Tutorial on using the historical/deprecated 
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 Introduction
 

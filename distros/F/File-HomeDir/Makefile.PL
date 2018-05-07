@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.00503;
+use 5.008003;
 
 use Config;
 use ExtUtils::MakeMaker;
@@ -19,7 +19,7 @@ my %RUN_DEPS = (
     (
              $MacPerl::Version and $MacPerl::Version
           or $^O eq 'darwin'   and _check_old_mac_os_x()
-      ) ? ('Mac::Files' => 0) : ($^O eq 'darwin' ? ('Mac::SystemDirectory' => '0.04') : ()),
+    ) ? ('Mac::Files' => 0) : ($^O eq 'darwin' ? ('Mac::SystemDirectory' => '0.04') : ()),
     ($^O eq 'MSWin32') ? ('Win32' => '0.31') : (),
 );
 my %CONFIGURE_DEPS = (
@@ -33,14 +33,14 @@ my %TEST_DEPS = (
 );
 
 WriteMakefile1(
-    MIN_PERL_VERSION => '5.005003',
+    MIN_PERL_VERSION => '5.008003',
     META_ADD         => {
         'meta-spec' => {version => 2},
         resources   => {
             homepage   => 'https://metacpan.org/release/File-HomeDir',
             repository => {
-                url  => 'https://github.com:rehsack/File-HomeDir.git',
-                web  => 'https://github.com/rehsack/File-HomeDir',
+                url  => 'https://github.com/perl5-utils/File-HomeDir.git',
+                web  => 'https://github.com/perl5-utils/File-HomeDir',
                 type => 'git',
             },
             bugtracker => {
@@ -56,6 +56,8 @@ WriteMakefile1(
                     'Test::CheckManifest'                 => 0,
                     'Module::CPANTS::Analyse'             => '0.96',
                     'Test::Kwalitee'                      => 0,
+                    'Test::Perl::Critic'                  => 0,
+                    'Test::PerlTidy'                      => 0,
                     'Test::Pod'                           => 0,
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
@@ -70,7 +72,7 @@ WriteMakefile1(
             runtime => {
                 requires => {
                     %RUN_DEPS,
-                    perl => '5.5.3',
+                    perl => '5.8.3',
                 },
             },
         },

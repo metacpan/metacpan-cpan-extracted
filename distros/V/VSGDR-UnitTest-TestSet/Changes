@@ -74,5 +74,6 @@ Revision history for VSGDR-UnitTest-TestSet
 	genGDRTests.pl now has new option which bypasses running the test and generates two default test conditions. A scalar value which says 'Passed' and a rowcount which check sjust one row is output.
 1.34 	10/11/2015
 	Bug fix.
-
+1.35	02/05/2018
+	Increased the long data length parameter to the connections made in genGDRTests.pl
 

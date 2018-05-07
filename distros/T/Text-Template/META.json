@@ -32,6 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "0",
             "Exporter" : "0",
             "base" : "0",
             "perl" : "5.008",
@@ -44,9 +45,11 @@
             "File::Temp" : "0",
             "Safe" : "0",
             "Test::More" : "0",
+            "Test::More::UTF8" : "0",
             "Test::Warnings" : "0",
             "lib" : "0",
             "perl" : "5.008",
+            "utf8" : "0",
             "vars" : "0"
          }
       }
@@ -54,11 +57,11 @@
    "provides" : {
       "Text::Template" : {
          "file" : "lib/Text/Template.pm",
-         "version" : "1.52"
+         "version" : "1.53"
       },
       "Text::Template::Preprocess" : {
          "file" : "lib/Text/Template/Preprocess.pm",
-         "version" : "1.52"
+         "version" : "1.53"
       }
    },
    "release_status" : "stable",
@@ -73,7 +76,7 @@
          "web" : "https://github.com/mschout/perl-text-template"
       }
    },
-   "version" : "1.52",
+   "version" : "1.53",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

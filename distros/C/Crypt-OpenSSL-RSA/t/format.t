@@ -23,17 +23,17 @@ MBowDQYJKoZIhvcNAQEBBQADCQAwBgIBTQIBBw==
 -----END PUBLIC KEY-----
 EOF
 
-my ($private_key, $public_key);
+my ( $private_key, $public_key );
 
-ok($private_key = Crypt::OpenSSL::RSA->new_private_key($PRIVATE_KEY_STRING));
-ok($PRIVATE_KEY_STRING eq $private_key->get_private_key_string());
-ok($PUBLIC_KEY_PKCS1_STRING eq $private_key->get_public_key_string());
-ok($PUBLIC_KEY_X509_STRING eq $private_key->get_public_key_x509_string());
+ok( $private_key = Crypt::OpenSSL::RSA->new_private_key($PRIVATE_KEY_STRING) );
+ok( $PRIVATE_KEY_STRING eq $private_key->get_private_key_string() );
+ok( $PUBLIC_KEY_PKCS1_STRING eq $private_key->get_public_key_string() );
+ok( $PUBLIC_KEY_X509_STRING eq $private_key->get_public_key_x509_string() );
 
-ok($public_key = Crypt::OpenSSL::RSA->new_public_key($PUBLIC_KEY_PKCS1_STRING));
-ok($PUBLIC_KEY_PKCS1_STRING eq $public_key->get_public_key_string());
-ok($PUBLIC_KEY_X509_STRING eq $public_key->get_public_key_x509_string());
+ok( $public_key = Crypt::OpenSSL::RSA->new_public_key($PUBLIC_KEY_PKCS1_STRING) );
+ok( $PUBLIC_KEY_PKCS1_STRING eq $public_key->get_public_key_string() );
+ok( $PUBLIC_KEY_X509_STRING eq $public_key->get_public_key_x509_string() );
 
-ok($public_key = Crypt::OpenSSL::RSA->new_public_key($PUBLIC_KEY_X509_STRING));
-ok($PUBLIC_KEY_PKCS1_STRING eq $public_key->get_public_key_string());
-ok($PUBLIC_KEY_X509_STRING eq $public_key->get_public_key_x509_string());
+ok( $public_key = Crypt::OpenSSL::RSA->new_public_key($PUBLIC_KEY_X509_STRING) );
+ok( $PUBLIC_KEY_PKCS1_STRING eq $public_key->get_public_key_string() );
+ok( $PUBLIC_KEY_X509_STRING eq $public_key->get_public_key_x509_string() );

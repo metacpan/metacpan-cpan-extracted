@@ -1,3 +1,7 @@
+0.12.0  2018-05-03
+    - Install the lm-solve command-line executable again.
+    - Remove old files.
+
 0.10.1  2017-03-08
     - Fix a bug with the plank puzzles where a plank could be placed right
     over itself or a different plank of the same length.

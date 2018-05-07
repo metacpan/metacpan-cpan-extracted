@@ -13,9 +13,10 @@ use Chart::Plotly::Trace::Scattergl::Line;
 use Chart::Plotly::Trace::Scattergl::Marker;
 use Chart::Plotly::Trace::Scattergl::Selected;
 use Chart::Plotly::Trace::Scattergl::Stream;
+use Chart::Plotly::Trace::Scattergl::Transform;
 use Chart::Plotly::Trace::Scattergl::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines is set in `x` and `y` using the WebGL plotting engine. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to a numerical arrays.
 
@@ -185,6 +186,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scattergl::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -244,7 +248,7 @@ has y0 => (
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ycalendar => ( is  => "rw",
@@ -276,7 +280,7 @@ Chart::Plotly::Trace::Scattergl - The data visualized as scatter point or lines 
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -436,6 +440,8 @@ Sets text elements associated with each (x,y) pair to appear on hover. If a sing
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * uid
 
 =item * unselected
@@ -474,7 +480,7 @@ Alternate to `y`. Builds a linear space of y coordinates. Use with `dy` where `y
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ycalendar
 

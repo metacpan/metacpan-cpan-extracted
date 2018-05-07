@@ -85,7 +85,9 @@ if( $o{uninstall} )
 
 if( $o{stop} )
 {
-    die "stop fail:$!" if system "killall $uuid.mydan.bootstrap.master";
+    system "killall $uuid.mydan.bootstrap.master";
+    map{ chomp }my @x = `ps -ef|grep $uuid.mydan.bootstrap.maste[r]`;
+    die sprintf( "kill fail: %s\n", join ',', @x ) if @x;
 }
 if( $o{start} )
 {

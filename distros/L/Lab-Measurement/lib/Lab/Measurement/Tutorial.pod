@@ -14,12 +14,12 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 How to read the documentation
 
-The documentation of Lab::Measurement can be read on MetaCPAN. The most
-important starting points are
+The documentation of Lab::Measurement can be read both on MetaCPAN and by
+using perldoc. The most important starting points are
 
 =over
 
@@ -41,17 +41,19 @@ This tutorial.
 
 =back
 
-A old tutorial for the historical interfaces
-L<Lab::Instrument> and L<Lab::XPRESS> is provided in
-L<Lab::Measurement::OldTutorial>
+A separate tutorial for the historical interfaces L<Lab::Instrument> and
+L<Lab::XPRESS> is provided in L<Lab::Measurement::OldTutorial>. These
+interfaces as well as the tutorial are not updated anymore, and included for
+compatibility with existing measurement scripts. They will be removed with
+Lab::Measurement release 4.
 
 =head1 Quickstart
 
-In this quickstart we learn how to connect instruments and do simple
-communication to change instrument settings and perform data acquisition.
-In this example we use two simple instruments, the
-HP/Agilent/Keysight 34410A digital multimeter (DMM) and the Stanford Research
-SR830 lock-in amplifier. 
+In this quickstart section we demonstrate how to connect to instruments and do
+simple communication to change instrument settings and perform data acquisition.
+In the examples we use two comparatively simple instruments, the HP (later
+Agilent, now Keysight) 34410A digital multimeter (DMM) and the Stanford Research
+SR830 lock-in amplifier.
 
 We cover the most important connection types and show how to use them on Linux
 and Windows:
@@ -60,27 +62,32 @@ and Windows:
 
 =item * USB
 
-This uses the USB-TMC protocol. Instruments are connected directly to the
-measurement PC or via a hub. Very fast.
+This uses the USB-TMC protocol, which emulates IEEE 488.2 features over a USB
+cable. Instruments are connected directly to the measurement PC or via a hub.
+Depending on your USB hardware data transfer can be very fast.
 
-=item * Lan/VXI11
+=item * Ethernet / VXI11
 
-The recommended Lab-based protocol, if supported by the device, is VXI11.
-Raw TCP sockets are also supported but do not provide the control commands of
-VXI11, such as device clear. This is why VXI11 will be more seamless, if
-available. You might have to create a private LAN to separate you lab devices
-from the internet.
+This is the recommended protocol, if supported by the device; instruments are
+connected via a local area ethernet network with the measurement PC. (Raw TCP
+sockets are also supported by Lab::Measurement, but do not provide the
+IEEE 488.2 style control commands of VXI11, such as device clear. This is why
+VXI11 will be more seamless.) We recommend to create a private, firewalled or
+non-routed LAN to separate you lab devices from the internet. Naturally then
+you will have to take care of IP address assignment yourself.
 
 =item * GPIB
 
-Old IEEE-488 bus. Only option for lots of old equipment in the lab.
+This is the IEEE 488 bus, also called GPIB or HPIB. It is robust and often
+the only option for older equipment in the lab.
 
 =back
 
 =head2 Connecting instruments on Linux
 
-Lets use the Agilent DMM with USB on Linux. This requires the L<USB::TMC>
-driver module installed.
+Let's use the Agilent DMM with USB on Linux. This requires the L<USB::TMC>
+driver module and the libusb system library to be installed. libusb should be
+available for every modern Linux distribution.
 
  use 5.010;
  use Lab::Moose;
@@ -90,6 +97,10 @@ driver module installed.
      connection_type => 'USB',
  );
 
+Note that the connection type USB assumes that we have a USB Test & Measurement
+class device. Devices that emulate a serial port or other USB classes (video,
+audio, ...) are not supported (yet).
+
 When connecting multiple devices of the same model via USB, we have to provide
 serial numbers, which are unique for each device:
 
@@ -98,7 +109,6 @@ serial numbers, which are unique for each device:
      connection_type => 'USB',
      connection_options => {serial => '...'}
  );
-
 
  my $multimeter2 = instrument(
      type => 'Agilent34410A',
@@ -115,10 +125,14 @@ provide the instrument's IP address with the C<connection_options> hash:
      connection_options => {host => '192.168.2.20'},
  );
 
-We connect the SR830 lock-in amplifier via GPIB. This requires that the
-LinuxGPIB kernel driver and perl bindings are installed as described in L<Lab::Measurement::Backends>.
-The GPIB address (primary
-address, short B<pad>), is provided in the C<connection_options> hash:
+The SR830 lock-in amplifier only has a GPIB interface. This means that our
+measurement PC needs a GPIB host adaptor. The LinuxGPIB kernel driver and perl
+bindings have to be installed and configured as described in
+L<Lab::Measurement::Backends>. Note that the kernel driver consists of Linux
+kernel modules, which may have to be compiled specific for the running kernel.
+
+The GPIB address (primary address, short B<pad>) of our lock-in amplifier is
+provided in the C<connection_options> hash:
 
  my $lia = instrument(
      type => 'SR830',
@@ -128,9 +142,10 @@ address, short B<pad>), is provided in the C<connection_options> hash:
 
 =head2 Connecting instruments on Windows
 
-First thing, make sure that VISA is installed (L<Lab::VISA::Installation>).
-I<VISA interactive control>, part of the VISA installation, can be used to
-get a list of connected equipment.
+First, make sure that both National Instruments (NI) VISA and the Lab::VISA
+package are installed, see L<Lab::VISA::Installation>. The I<VISA interactive
+control>, part of the NI VISA installation, can be used to get a list of
+connected equipment.
 
 We first connect the DMM via USB:
 
@@ -151,10 +166,10 @@ provide the instrument's IP address with the C<connection_options> hash:
      connection_options => {host => '192.168.2.20'},
  );
 
-We connect the SR830 lock-in amplifier via GPIB. This requires that the
-National Instruments' NI-488
-driver is installed in addition to VISA. The GPIB address (primary
-address, short B<pad>), is provided in the C<connection_options> hash:
+Finally, we connect the SR830 lock-in amplifier via GPIB. This requires that the
+National Instruments NI-488 driver is installed in addition to VISA. The GPIB
+address (primary address, short B<pad>), is provided in the
+C<connection_options> hash:
 
  my $lia = instrument(
      type => 'SR830',
@@ -167,13 +182,13 @@ address, short B<pad>), is provided in the C<connection_options> hash:
 After initializing the multimeter with the C<instrument> function, let us
 perform some basic operations
 
- # Perform *IDN? query, prints instrument model name
+ # Perform *IDN? query, prints instrument manufacturer, model, serial number
  say $multimeter->idn();
 
  # Set range to 10 Volts (if multimeter is in voltage mode)
  $multimeter->sense_range(value => 10);
 
- # Perform voltage measurement
+ # Perform voltage measurement (if multimeter is in voltage mode)
  my $voltage = $multimeter->get_value();
 
 And for the SR830 lock-in amplifier:
@@ -195,18 +210,22 @@ And for the SR830 lock-in amplifier:
  # Print contents of $xy hashref
  say "x = $xy->{x}, y = $xy->{y}";
 
-=head1 More instrument drivers
+=head1 Types of instrument drivers
 
-Examples of more advanced types of instruments.
-Note that when using sources (voltage, magnetic field, temperature) we will not interface
-the instrument object directly. Instead we use the high-level sweep interfaces
-described below. These provide a common API for creating both discrete and
-continuous sweeps.
+Here we show some examples of more advanced types of instruments.
 
-=head2 Voltage/Current source drivers
+Note that when using sources (voltage, magnetic field, temperature) we often do
+not call the instrument object directly. Instead, we use the high-level sweep
+interfaces as described below. These provide a common API for creating both
+discrete and continuous sweeps of output parameters.
 
-Far a voltage/current source, the instrument initialization requires several
-additional parameters, which enforce step/rate limits to provide more safety.
+=head2 Voltage / current source drivers
+
+For a voltage or current source, the instrument initialization requires several
+additional parameters which enforce step size and rate limits. The intention
+here is that often sensitive devices can be destroyed by large and sudden jumps
+in input voltage; by providing limits at initialization, the later script
+follows these limits automatically without further programming effort.
 
  my $yoko = instrument(
      type => 'YokogawaGS200',
@@ -217,17 +236,19 @@ additional parameters, which enforce step/rate limits to provide more safety.
      max_units => 10,
  );
 
-Use C<set_level> to set output level to 9 Volts. The source will sweep with
-stepsize and speed given by the max_units_per_step/max_units_per_second
-parameters.
+We assume that the Yokogawa GS200 source is in voltage output mode. Now we use
+C<set_level> to set output level to 9V. The source will sweep with step size
+and speed given by the max_units_per_step / max_units_per_second parameters;
+unit is Volt (the corresponding SI unit).
 
  $yoko->set_level(value => 9);
 
-Read the new level value from cache:
+Once this has finished, we can read the new level from the cache that is
+automatically kept by Lab::Measurement:
 
  my $level = $yoko->cached_level();
 
-=head2 Magnet power supplies
+=head2 Superconducting magnet power supplies
 
  my $ips = instrument(
      type => 'OI_Mercury::Magnet',
@@ -236,7 +257,7 @@ Read the new level value from cache:
  );
 
 The following commands perform a continuous sweep of the magnetic field
-from 0T to 0.5T with a rate of 0.1T/min
+from 0T to 0.5T with a rate of 0.1T/min:
 
  # Set field setpoint and rate
  $ips->config_sweep(point => 0.5, rate => 0.1);
@@ -247,11 +268,15 @@ from 0T to 0.5T with a rate of 0.1T/min
  # Show progress until sweep is finished
  $ips->wait();
 
-A more high-level interface for creating continuous sweeps is described below.
+A high-level interface for creating continuous sweeps and measuring while the
+sweep is running is described below.
 
 =head2 Spectrum analyzers
 
-The spectrum data is returned as a L<PDL> (2D).
+Typically, a spectrum analyzer performs a frequency sweep in hardware. The
+resulting spectrum data, i.e., power as function of frequency, is returned as a
+2D L<PDL> object. Here is the corresponding code at the example of a Rohde &
+Schwarz FSV spectrum analyzer:
 
  my $analyzer = instrument(
      type => 'RS_FSV',
@@ -274,9 +299,10 @@ You can always convert a PDL into an ordinary nested arrayref with C<unpdl>:
 
 =head1 Sweeps, datafiles, and datafolders
 
-=head2 Quickstart: Measuring an IV-curve
+=head2 Quick start: Measuring an IV-curve
 
-As a basic example of a 1D sweepm, we measure an IV curve:
+As a basic example of a one-dimensional sweep, we measure an I(V) curve. A
+Yokogawa voltage source is combined with an Agilent multimeter.
 
  # file: IV.pl
  use Lab::Moose; # you get 'use warnings; use strict;' for free
@@ -313,23 +339,23 @@ As a basic example of a 1D sweepm, we measure an IV curve:
  );
 
 Running this script repeatedly creates output folders F<MEAS_000>, F<MEAS_001>,
-...
-The folders contain the following files:
+... Each of these folders contains the following files:
 
 =over
 
 =item * F<IV.pl>
 
-Copy of the measurement script.
+A copy of the measurement script.
 
 =item * F<META.yml>
 
-YAML file with various metadata (time of script run, username, hostname, copy of the
-used commandline, Lab::Measurement version, ...).
+A YAML file with various automatically collected metadata (the time of
+the script run, the user name, the host name, the used command line, the
+Lab::Measurement version, ...).
 
 =item * F<data.dat>
 
-Gnuplot-style datafile:
+A Gnuplot-style datafile:
 
  # voltage        current
  -5               42
@@ -350,9 +376,9 @@ C<backsweep> option:
      backsweep  => 1,
  );
 
-=head2 The datafolder
+=head2 The data folder
 
-You can change the name of the datafolder by providing a C<folder> argument to
+You can change the name of the data folder by providing a C<folder> argument to
 the C<start> method:
 
  $sweep->start(
@@ -363,9 +389,22 @@ the C<start> method:
 
 This will create output folders with names F<IV_curve_xxx>.
 
+Setting the C<date_prefix> attribute to C<1> will prefix the folder name with
+the date:
+
+ $sweep->start(
+     measurement => $meas,
+     datafile    => $datafile,
+     folder      => 'IV_curve',
+     date_prefix => 1
+ );
+
+This will create output folders with names F<YYYY-MM-DD_IV_curve_xxx>. The
+exact timestamp with second precision can always be found in F<META.yml>.
+
 =head2 Multiple datafiles
 
-We can create multiple datafiles:
+The following example creates multiple data files:
 
  my $datafile1 = sweep_datafile(
      filename => 'data1',
@@ -382,7 +421,8 @@ We can create multiple datafiles:
      folder      => 'IV_curve'
  );
 
-And in the C<$meas> subroutine, call the sweeps's C<log> method for both datafiles:
+In the C<$meas> subroutine, we now call the C<log> method for both
+data files:
 
  my $meas = sub {
      my $sweep = shift;
@@ -399,16 +439,17 @@ And in the C<$meas> subroutine, call the sweeps's C<log> method for both datafil
     );
  };
 
-=head2 Multi-dimensional sweeps: Datafile dimensions and filename extensions
+=head2 Multi-dimensional sweeps: Data file dimensions and file name extensions
 
 =head3 2D sweeps
 
-Let us start with a simple 2D sweep: we sweep a gate voltage (outer sweep) and
-a bias voltage and again measure a current:
+We start with a simple 2D sweep: we sweep a gate voltage (outer sweep) and
+a bias voltage (inner sweep) and again measure a current:
 
  use Lab::Moose;
 
- # As we use two Yokogawa's, we need to provide USB serial IDs
+ # As we use two Yokogawas, we need to provide serial numbers to identify them
+ # on the USB bus.
  my $gate_source = instrument(
      type               => 'YokogawaGS200',
      connection_type    => 'USB',
@@ -443,6 +484,7 @@ a bias voltage and again measure a current:
 
  my $datafile = sweep_datafile(columns => [qw/gate bias current/]);
 
+ # We use cached_level since that speeds up measurement a LOT.
  my $meas = sub {
      my $sweep = shift;
      my $v_gate = $gate_source->cached_level();
@@ -460,7 +502,8 @@ a bias voltage and again measure a current:
      datafile    => $datafile,
  );
 
-By default, this will create a 2D block datafile:
+By default, this will create a 2D block data file in the typical gnuplot format,
+i.e., with each bias sweep followed by a blank line as separator.
 
  # gate    bias    current
  0         0       x
@@ -479,7 +522,7 @@ By default, this will create a 2D block datafile:
  ...
  1         1       x
 
-Alternatively, we can create multiple 1D datafiles, one for each value of the
+Alternatively, we can create multiple 1D data files, one for each value of the
 gate voltage. We do this by setting the C<datafile_dim> parameter to 1:
 
  $gate_sweep->start(
@@ -490,9 +533,8 @@ gate voltage. We do this by setting the C<datafile_dim> parameter to 1:
  );
 
 The output files will be F<<data_Voltage=0.dat, data_Voltage=0.1.dat, ...,
-data_Voltage=1.dat>> We can customize the F<Voltage=> part in the datafile
-names by providing a
-B<filename extension> in the gate sweep:
+data_Voltage=1.dat>> We can customize the F<Voltage=> part in the data file
+names by providing a B<filename extension> in the gate sweep:
 
  my $gate_sweep = sweep(
      type               => 'Step::Voltage',
@@ -503,13 +545,12 @@ B<filename extension> in the gate sweep:
 
 =head3 Higher dimensional sweeps
 
-If we create sweeps setups with dimension > 2, the maximum datafile dimension
+If we create sweeps setups with dimension > 2, the maximum data file dimension
 remains 2. E.g. if we create a 3D sweep [Temperature, Gate, Bias], a 2D
-datafile will be created for each value of the temperature sweep.
+data file will be created for each value of the temperature sweep.
 If we set C<datafile_dim> to 1, a subfolder will be created for each value of
-the temperature and the subfolders contain 1D datafiles for each gate voltage.
-
-FIXME: link to example script.
+the temperature and the subfolders contain 1D data files for each gate voltage
+value.
 
 =head2 Live plotting
 
@@ -526,7 +567,7 @@ Let us add a simple line plot to our IV measurement:
 
 This will create a live line plot, which will be updated for each new data
 point. A copy of the plot will be saved in the output folder in png format with
-filename C<"$datafile.png">. You can change this filename with the
+file name C<"$datafile.png">. You can change this file name with the
 C<hard_copy> option:
 
  $datafile->add_plot(
@@ -548,12 +589,13 @@ Let us add a color plot to the gate/bias 2D sweep:
      z    => 'current'
  );
 
-By default, the live plot will be updated after a bias sweep is completed.
+The designation 'pm3d' comes from the gnuplot plot type of this name.
+By default, the live plot will be updated after each bias sweep is completed.
 
 =head3 Terminal options
 
-If we don't want to use gnuplot's default terminal for the live plot or hard copy,
-we use the C<terminal>, C<hard_copy_terminal>, C<terminal_options> and
+If we don't want to use gnuplot's default terminal for the live plot or
+hardcopy, we use the C<terminal>, C<hard_copy_terminal>, C<terminal_options> and
 C<hard_copy_terminal_options> options:
 
  $datafile->add_plot(
@@ -570,7 +612,7 @@ C<hard_copy_terminal_options> options:
 
 =head3 Plot and curve options
 
-L<PDL::Graphics::Gnuplot> separates between plot options and curve options:
+L<PDL::Graphics::Gnuplot> separates between plot options and curve options.
 
  $datafile->add_plot(
      type => 'pm3d',
@@ -592,13 +634,15 @@ L<PDL::Graphics::Gnuplot> separates between plot options and curve options:
      },
  );      
 
-More Plot and curve options are documented in L<PDL::Graphics::Gnuplot>.
+More plot and curve options are documented in L<PDL::Graphics::Gnuplot>.
 
 =head2 Block data
 
 There are types of instruments which return more than a single data. Examples
 are spectrum and network analyzers, which perform a frequency sweep and return
 an array of data after each sweep.
+
+FIXME: We need to link to a good introduction to PDL here.
 
 The C<sparam_sweep> method provided, e.g., by the
 L<Lab::Moose::Instrument::RS_ZVA> returns a 2D PDL with the following format:
@@ -662,6 +706,14 @@ point.
 Without the C<< point_dim => 1 >> setting, only one datafile would be
 generated. One could also log all blocks into a single 2D datafile by setting
 C<< datafile_dim => 2 >>.
+
+=head3 log_block with single-point sweeps
+
+Assume that we use the VNA to measure transmission at a single fixed
+frequency. In this case C<sparam_sweep> returns a 2D PDL where the first
+dimension has length one. One can still use C<log_block> for logging. By
+default C<log_block> does not trigger a refresh of live plots. This can be
+changed by adding C<< refresh_plots => 1 >> to the C<log_block> arguments.
 
 =head2 Continuous sweeps
 
@@ -771,7 +823,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
             2011-2012  Andreas K. Huettel
             2016       Andreas K. Huettel, Simon Reinhardt
             2017       Andreas K. Huettel
-            2018       Simon Reinhardt
+            2018       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

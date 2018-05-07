@@ -20,6 +20,8 @@ use warnings;
 
 use parent 'SMB::v2::Command';
 
+use SMB::Time;
+
 sub new_from_v1 ($$) {
 	my $class = shift;
 	my $command1 = shift;
@@ -46,6 +48,13 @@ sub new_from_v1 ($$) {
 	);
 
 	return $self;
+}
+
+sub get_system_boot_time () {
+	chomp(my $boot_str = `uptime -s 2>/dev/null` || '');
+	chomp(my $boot_time = `date +%s -d "$boot_str" 2>/dev/null`);
+
+	return $boot_time =~ /^(\d{9,10})$/ ? $1 : time;
 }
 
 sub init ($) {
@@ -100,8 +109,11 @@ sub pack ($$) {
 	my $self = shift;
 	my $packer = shift;
 
+	$self->boot_time(to_nttime(get_system_boot_time()));
+
 	if ($self->is_response) {
 		my $security_buffer = $self->security_buffer // die 'No security_buffer';
+		$self->current_time(to_nttime(time()));
 
 		$packer
 			->uint16($self->security_mode)

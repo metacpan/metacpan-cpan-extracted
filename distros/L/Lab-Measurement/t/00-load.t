@@ -70,6 +70,10 @@ my %depencencies = (
         qw{
             Lab/Moose/Plot.pm
             Lab/Moose/DataFile/Gnuplot.pm
+            Lab/Moose/Instrument/DisplayXY.pm
+            Lab/Moose/Instrument/SpectrumAnalyzer.pm
+            Lab/Moose/Instrument/HP8596E.pm
+            Lab/Moose/Instrument/Rigol_DSA815.pm
             }
     ],
 

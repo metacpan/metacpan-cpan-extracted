@@ -11,7 +11,7 @@ use base qw/ Class::Accessor::Fast /;
 
 use IO::Socket 1.18 ();
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -162,7 +162,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -202,8 +202,14 @@ It supports the following features:
 Note that the specification requires the measured values to be
 integers no larger than 64-bits, but ideally 53-bits.
 
-The current implementation does not validate the values. If you want
-validation, see L<Net::Statsd::Lite>.
+The current implementation does not validate that the values you pass
+to metrics conform to the spec, which allows you to take advantage of
+extensions to some StatsD daemons. But the downside is that other
+daemons may ignore those metrics.
+
+For simplicity, it will allow you to specify a sampling rate for any
+metric, not just the ones where it is documented below. But again,
+some daemons may ignore or reject this.
 
 =head1 ATTRIBUTES
 

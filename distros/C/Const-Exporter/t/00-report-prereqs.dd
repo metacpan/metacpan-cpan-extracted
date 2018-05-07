@@ -24,18 +24,14 @@ do { my $x = {
        'runtime' => {
                       'recommends' => {
                                         'Package::Stash::XS' => '0',
-                                        'Ref::Util::XS' => '0',
-                                        'Storable' => '0'
+                                        'Ref::Util::XS' => '0'
                                       },
                       'requires' => {
-                                      'Carp' => '0',
                                       'Const::Fast' => '0',
-                                      'Exporter' => '0',
+                                      'List::AllUtils' => '0.10',
                                       'Package::Stash' => '0',
                                       'Ref::Util' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => 'v5.10.0'
                                     }
                     },
        'test' => {
@@ -48,7 +44,8 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
-                                   'if' => '0'
+                                   'if' => '0',
+                                   'lib' => '0'
                                  }
                  }
      };

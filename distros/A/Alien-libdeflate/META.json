@@ -1,0 +1,85 @@
+{
+   "abstract" : "Fetch/build/stash the libdeflate headers and libs for L<libdeflate|https://github.com/ebiggers/libdeflate>",
+   "author" : [
+      "Roy Storey <kiwiroy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-libdeflate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "1.41",
+            "Alien::Build::MM" : "1.41",
+            "Alien::gmake" : "0.11",
+            "Archive::Tar" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "Test::More" : "0.88",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.41",
+            "Alien::Build::MM" : "0.25",
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "0.25",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kiwiroy/alien-libdeflate/issues"
+      },
+      "homepage" : "https://github.com/kiwiroy/alien-libdeflate",
+      "repository" : {
+         "url" : "https://github.com/kiwiroy/alien-libdeflate.git"
+      }
+   },
+   "version" : "0.02",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 1.41",
+      "requires" : {
+         "share" : {
+            "Alien::gmake" : "0.11",
+            "Archive::Tar" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

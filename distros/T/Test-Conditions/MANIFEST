@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Test/Conditions.pm
+MANIFEST			This list of files
+README
+t/01-basic.t
+t/02-conditions.t
+t/03-limits.t
+t/manifest.t
+t/pod.t
+META.yml
+META.json

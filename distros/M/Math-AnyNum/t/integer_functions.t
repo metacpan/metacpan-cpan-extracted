@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 402;    # be careful
+plan tests => 404;    # be careful
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -31,6 +31,10 @@ is(fibonacci(0),           '0');
 is(fibonacci(12),          '144');
 is(fibonacci(-3),          'NaN');
 is(fibonacci($o->new(12)), '144');
+
+is(join(' ', map { fibonacci($_, 3) } 0 .. 14), '0 0 1 1 2 4 7 13 24 44 81 149 274 504 927');
+is(join(' ', map { fibonacci(Math::AnyNum->new_ui($_), Math::AnyNum->new_ui(4)) } 0 .. 14),
+    '0 0 0 1 1 2 4 8 15 29 56 108 208 401 773');
 
 is(binomial(12,           5),           '792');
 is(binomial(0,            0),           '1');

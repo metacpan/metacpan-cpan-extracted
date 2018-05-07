@@ -131,7 +131,7 @@ my %commands = (
 	dir => sub {
 		return unless check_tree();
 		for my $file (@{$tree->find(@args ? shift @args : '*') || []}) {
-			printf "%-40s %s\n", $file->name, $file->mtime_string;
+			printf "%-40s %9s  %s\n", $file->name, $file->size_string, $file->mtime_string;
 		}
 	},
 	get => sub {

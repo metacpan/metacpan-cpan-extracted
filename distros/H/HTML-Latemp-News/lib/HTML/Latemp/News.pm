@@ -1,34 +1,123 @@
 package HTML::Latemp::News;
-
+$HTML::Latemp::News::VERSION = '0.1.12';
 use warnings;
 use strict;
 
 use 5.008;
 
 
-our $VERSION = '0.1.10';
-
-
 package HTML::Latemp::News::Base;
-
-use base 'Class::Accessor';
+$HTML::Latemp::News::Base::VERSION = '0.1.12';
 use CGI;
 
 sub new
 {
     my $class = shift;
-    my $self = {};
+    my $self  = {};
     bless $self, $class;
     $self->initialize(@_);
     return $self;
 }
 
 package HTML::Latemp::News::Item;
+$HTML::Latemp::News::Item::VERSION = '0.1.12';
+our @ISA = (qw(HTML::Latemp::News::Base));
 
-our @ISA=(qw(HTML::Latemp::News::Base));
+sub author
+{
+    my $self = shift;
 
-__PACKAGE__->mk_accessors(qw(index title id description author date
-    category text));
+    if (@_)
+    {
+        $self->{author} = shift;
+    }
+
+    return $self->{author};
+}
+
+sub category
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{category} = shift;
+    }
+
+    return $self->{category};
+}
+
+sub date
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{date} = shift;
+    }
+
+    return $self->{date};
+}
+
+sub description
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{description} = shift;
+    }
+
+    return $self->{description};
+}
+
+sub id
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{id} = shift;
+    }
+
+    return $self->{id};
+}
+
+sub index
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{index} = shift;
+    }
+
+    return $self->{index};
+}
+
+sub text
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{text} = shift;
+    }
+
+    return $self->{text};
+}
+
+sub title
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{title} = shift;
+    }
+
+    return $self->{title};
+}
 
 sub initialize
 {
@@ -36,23 +125,163 @@ sub initialize
 
     my (%args) = (@_);
 
-    foreach my $k (keys(%args))
+    foreach my $k ( keys(%args) )
     {
-        if (! $self->can($k))
+        if ( !$self->can($k) )
         {
             die "Unknown property for HTML::Latemp::News::Item - \"$k\"!";
         }
-        $self->set($k, $args{$k});
+        $self->can($k)->( $self, $args{$k} );
     }
 }
 
 package HTML::Latemp::News;
 
-our @ISA=(qw(HTML::Latemp::News::Base));
+our @ISA = (qw(HTML::Latemp::News::Base));
 
-__PACKAGE__->mk_accessors(qw(copyright description docs generator items
-    language link managing_editor rating title ttl webmaster));
+sub copyright
+{
+    my $self = shift;
 
+    if (@_)
+    {
+        $self->{copyright} = shift;
+    }
+
+    return $self->{copyright};
+}
+
+sub description
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{description} = shift;
+    }
+
+    return $self->{description};
+}
+
+sub docs
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{docs} = shift;
+    }
+
+    return $self->{docs};
+}
+
+sub generator
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{generator} = shift;
+    }
+
+    return $self->{generator};
+}
+
+sub items
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{items} = shift;
+    }
+
+    return $self->{items};
+}
+
+sub language
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{language} = shift;
+    }
+
+    return $self->{language};
+}
+
+sub link
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{link} = shift;
+    }
+
+    return $self->{link};
+}
+
+sub managing_editor
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{managing_editor} = shift;
+    }
+
+    return $self->{managing_editor};
+}
+
+sub rating
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{rating} = shift;
+    }
+
+    return $self->{rating};
+}
+
+sub title
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{title} = shift;
+    }
+
+    return $self->{title};
+}
+
+sub ttl
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{ttl} = shift;
+    }
+
+    return $self->{ttl};
+}
+
+sub webmaster
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{webmaster} = shift;
+    }
+
+    return $self->{webmaster};
+}
 use XML::RSS;
 
 sub input_items
@@ -61,24 +290,16 @@ sub input_items
 
     my $items = shift;
 
-    return
-    [
-        map
-        { $self->input_single_item($_, $items->[$_]) }
-        (0 .. $#$items)
-    ];
+    return [ map { $self->input_single_item( $_, $items->[$_] ) }
+            ( 0 .. $#$items ) ];
 }
 
 sub input_single_item
 {
     my $self = shift;
-    my ($index, $inputted_item) = (@_);
+    my ( $index, $inputted_item ) = (@_);
 
-    return
-        HTML::Latemp::News::Item->new(
-            %$inputted_item,
-            'index' => $index,
-        );
+    return HTML::Latemp::News::Item->new( %$inputted_item, 'index' => $index, );
 }
 
 sub initialize
@@ -89,21 +310,21 @@ sub initialize
 
     my $items = $args{'news_items'};
 
-    $self->items(
-        $self->input_items($items)
-    );
+    $self->items( $self->input_items($items) );
 
-    $self->title($args{'title'});
-    $self->link($args{'link'});
-    $self->language($args{'language'});
-    $self->rating($args{'rating'} || '(PICS-1.1 "http://www.classify.org/safesurf/" 1 r (SS~~000 1))');
-    $self->copyright($args{'copyright'} || "");
-    $self->docs($args{'docs'} || "http://blogs.law.harvard.edu/tech/rss");
-    $self->ttl($args{'ttl'} || "360");
-    $self->generator($args{'generator'} || "Perl and XML::RSS");
-    $self->webmaster($args{'webmaster'});
-    $self->managing_editor($args{'managing_editor'} || $self->webmaster());
-    $self->description($args{'description'});
+    $self->title( $args{'title'} );
+    $self->link( $args{'link'} );
+    $self->language( $args{'language'} );
+    $self->rating( $args{'rating'}
+            || '(PICS-1.1 "http://www.classify.org/safesurf/" 1 r (SS~~000 1))'
+    );
+    $self->copyright( $args{'copyright'} || "" );
+    $self->docs( $args{'docs'} || "http://blogs.law.harvard.edu/tech/rss" );
+    $self->ttl( $args{'ttl'}   || "360" );
+    $self->generator( $args{'generator'} || "Perl and XML::RSS" );
+    $self->webmaster( $args{'webmaster'} );
+    $self->managing_editor( $args{'managing_editor'} || $self->webmaster() );
+    $self->description( $args{'description'} );
 
     return 0;
 }
@@ -114,20 +335,20 @@ sub add_item_to_rss_feed
     my $self = shift;
     my %args = (@_);
 
-    my $item = $args{'item'};
+    my $item     = $args{'item'};
     my $rss_feed = $args{'feed'};
 
     my $item_url = $self->get_item_url($item);
 
     $rss_feed->add_item(
-        'title' => $item->title(),
-        'link' => $item_url,
-        'permaLink' => $item_url,
-        'enclosure' => { 'url' => $item_url, },
+        'title'       => $item->title(),
+        'link'        => $item_url,
+        'permaLink'   => $item_url,
+        'enclosure'   => { 'url' => $item_url, },
         'description' => $item->description(),
-        'author' => $item->author(),
-        'pubDate' => $item->date(),
-        'category' => $item->category(),
+        'author'      => $item->author(),
+        'pubDate'     => $item->date(),
+        'category'    => $item->category(),
     );
 }
 
@@ -154,12 +375,12 @@ sub get_items_to_include
 
     my $items = $self->items();
 
-    if (@$items < $num_items_to_include)
+    if ( @$items < $num_items_to_include )
     {
         $num_items_to_include = scalar(@$items);
     }
 
-    return [ @$items[(-$num_items_to_include) .. (-1)] ];
+    return [ @$items[ ( -$num_items_to_include ) .. (-1) ] ];
 }
 
 sub generate_rss_feed
@@ -168,24 +389,24 @@ sub generate_rss_feed
 
     my %args = (@_);
 
-    my $rss_feed = XML::RSS->new('version' => "2.0");
+    my $rss_feed = XML::RSS->new( 'version' => "2.0" );
     $rss_feed->channel(
-        'title' => $self->title(),
-        'link' => $self->link(),
-        'language' => $self->language(),
-        'description' => $self->description(),
-        'rating' => $self->rating(),
-        'copyright' => $self->copyright(),
-        'pubDate' => (scalar(localtime())),
-        'lastBuildDate' => (scalar(localtime())),
-        'docs' => $self->docs(),
-        'ttl' => $self->ttl(),
-        'generator' => $self->generator(),
+        'title'          => $self->title(),
+        'link'           => $self->link(),
+        'language'       => $self->language(),
+        'description'    => $self->description(),
+        'rating'         => $self->rating(),
+        'copyright'      => $self->copyright(),
+        'pubDate'        => ( scalar( localtime() ) ),
+        'lastBuildDate'  => ( scalar( localtime() ) ),
+        'docs'           => $self->docs(),
+        'ttl'            => $self->ttl(),
+        'generator'      => $self->generator(),
         'managingEditor' => $self->managing_editor(),
-        'webMaster' => $self->webmaster(),
+        'webMaster'      => $self->webmaster(),
     );
 
-    foreach my $single_item (@{$self->get_items_to_include(\%args)})
+    foreach my $single_item ( @{ $self->get_items_to_include( \%args ) } )
     {
         $self->add_item_to_rss_feed(
             'item' => $single_item,
@@ -206,12 +427,13 @@ sub get_navmenu_items
 
     my @ret;
 
-    foreach my $single_item (reverse(@{$self->get_items_to_include(\%args)}))
+    foreach my $single_item (
+        reverse( @{ $self->get_items_to_include( \%args ) } ) )
     {
         push @ret,
             {
-                'text' => $single_item->title(),
-                'url' => $self->get_item_rel_url($single_item),
+            'text' => $single_item->title(),
+            'url'  => $self->get_item_rel_url($single_item),
             };
     }
     return \@ret;
@@ -223,12 +445,16 @@ sub format_news_page_item
     my $self = shift;
     my (%args) = (@_);
 
-    my $item = $args{'item'};
+    my $item     = $args{'item'};
     my $base_url = $args{'base_url'};
 
-    return "<h3><a href=\"$base_url" . $item->id() . "/\">" .
-        CGI::escapeHTML($item->title()) . "</a></h3>\n" .
-        "<p>\n" . $item->description() . "\n</p>\n";
+    return
+          "<h3><a href=\"$base_url"
+        . $item->id() . "/\">"
+        . CGI::escapeHTML( $item->title() )
+        . "</a></h3>\n" . "<p>\n"
+        . $item->description()
+        . "\n</p>\n";
 }
 
 sub get_news_page_entries
@@ -238,15 +464,15 @@ sub get_news_page_entries
 
     my $html = "";
 
-    my $base_url = exists($args{'base_url'}) ? $args{'base_url'} : "";
+    my $base_url = exists( $args{'base_url'} ) ? $args{'base_url'} : "";
 
-    foreach my $single_item (reverse(@{$self->get_items_to_include(\%args)}))
+    foreach my $single_item (
+        reverse( @{ $self->get_items_to_include( \%args ) } ) )
     {
-        $html .=
-            $self->format_news_page_item(
-                'item' => $single_item,
-                'base_url' => $base_url,
-            );
+        $html .= $self->format_news_page_item(
+            'item'     => $single_item,
+            'base_url' => $base_url,
+        );
     }
     return $html;
 }
@@ -258,15 +484,16 @@ sub get_news_box_contents
     my (%args) = (@_);
 
     my $html = "";
-    foreach my $item (reverse(@{$self->get_items_to_include(\%args)}))
+    foreach my $item ( reverse( @{ $self->get_items_to_include( \%args ) } ) )
     {
-        $html .= "<li><a href=\"" .
-            $self->get_item_rel_url($item) . "\">" .
-        CGI::escapeHTML($item->title()) . "</a></li>\n";
+        $html .=
+              "<li><a href=\""
+            . $self->get_item_rel_url($item) . "\">"
+            . CGI::escapeHTML( $item->title() )
+            . "</a></li>\n";
     }
     return $html;
 }
-
 
 sub get_news_box
 {
@@ -277,10 +504,7 @@ sub get_news_box
     $html .= qq{<div class="news">\n};
     $html .= qq{<h3>News</h3>\n};
     $html .= qq{<ul>\n};
-    $html .=
-        $self->get_news_box_contents(
-            @_
-        );
+    $html .= $self->get_news_box_contents(@_);
     $html .= qq{<li><a href="./news/">More&hellip;</a></li>};
     $html .= qq{</ul>\n};
     $html .= qq{</div>\n};
@@ -303,7 +527,7 @@ web frameworks)
 
 =head1 VERSION
 
-version 0.1.10
+version 0.1.12
 
 =head1 SYNOPSIS
 
@@ -357,6 +581,10 @@ version 0.1.10
 This is a module that maintains news item for a web-site. It can generate
 an RSS feed, as well as a news page, and an HTML newsbox, all from the same
 data.
+
+=head1 VERSION
+
+version 0.1.12
 
 =head1 FUNCTION
 
@@ -495,8 +723,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-News or by email to
-bug-html-latemp-news@rt.cpan.org.
+L<https://github.com/shlomif/html-latemp-news/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -525,7 +752,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Latemp-News>
+L<https://metacpan.org/release/HTML-Latemp-News>
 
 =item *
 
@@ -561,14 +788,6 @@ L<http://cpanratings.perl.org/d/HTML-Latemp-News>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Latemp-News>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -579,7 +798,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Latemp-News>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Latemp-News>
 
@@ -613,8 +832,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/latemp>
+L<https://github.com/shlomif/html-latemp-news>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/latemp
+  git clone git://github.com/shlomif/html-latemp-news.git
 
 =cut

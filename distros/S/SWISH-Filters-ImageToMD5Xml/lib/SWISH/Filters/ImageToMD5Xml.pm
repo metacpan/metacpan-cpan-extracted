@@ -2,7 +2,7 @@ package SWISH::Filters::ImageToMD5Xml;
 use strict;
 use warnings;
 use base 'SWISH::Filters::Base';
-use Digest::MD5 qw(md5);
+use Digest::MD5 qw(md5_hex);
 use XML::Simple;
 
 =head1 NAME
@@ -15,7 +15,7 @@ Version 0.04
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ sub filter {
     if ( my $xml = $doc->fetch_filename ) {
         if ( my $ds = $self->_parse_xml($xml) ) {
             return unless exists $ds->{b64_data};
-            $ds->{md5} = md5($ds->{b64_data});
+            $ds->{md5} = md5_hex($ds->{b64_data});
             my $xml    = Search::Tools::XML->perl_to_xml($ds, { root => 'image_data' });
             $doc->set_content_type('application/xml');
             return ( \$xml );

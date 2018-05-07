@@ -49,13 +49,13 @@ share {
     #  as it should be fixed in 2.2.4
     #  Update 2018-04-07: It is not fixed in 2.2.4.
     patch [
-      '%{patch} --verbose --backup port/cpl_port.h < ' . $patch_file_isnan,
+      '%{patch} --verbose port/cpl_port.h < ' . $patch_file_isnan,
     ];
   }
   elsif ($^O =~ /freebsd/i) {
     #  make sure we run a shared install on freebsd by default
     patch [
-      '%{patch} --backup configure < ' . $patch_file_configure,
+      '%{patch} configure < ' . $patch_file_configure,
     ];
   }
 
@@ -95,7 +95,6 @@ share {
         $make_cmd =~ s/type/cat/;
         $make_cmd =~ s/"/'/g;
     }
-    $with_cpp11 ||= ' --without-cpp11 ';
     push @make_clean, '%{make} clean';
   }
   

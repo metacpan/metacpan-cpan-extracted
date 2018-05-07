@@ -352,7 +352,7 @@ files-to-elasticsearch.pl - A simple utility to tail a file and index each line 
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -370,14 +370,58 @@ the elasticsearch cluster and index you've specified.
 
 =head1 CONFIGURATION
 
-The configuration file is YAML and looks like:
+=head1 Configuration
+
+=head2 ElasticSearch Settings
+
+The C<elasticsearch> section of the config controls the settings passed to the
+L<POE::Component::ElasticSearch::Indexer>.
 
     ---
     elasticsearch:
       servers: [ "localhost:9200" ]
-      type: "log"
-      index: "syslog-%Y.%m.%d"
+      flush_interval: 30
+      flush_size: 1_000
+      index: logstash-%Y.%m.%d
+      type: log
 
+The settings available are:
+
+=over 4
+
+=item B<servers>
+
+An array of servers used to send bulk data to ElasticSearch.  The default is
+just localhost on port 9200.
+
+=item B<flush_interval>
+
+Every C<flush_interval> seconds, the queued documents are send to the Bulk API
+of the cluster.
+
+=item B<flush_size>
+
+If this many documents is received, regardless of the time since the last
+flush, force a flush of the queued documents to the Bulk API.
+
+=item B<index>
+
+A C<strftime> compatible string to use as the C<DefaultIndex> parameter if a
+file doesn't pass one along.
+
+=item B<type>
+
+Mostly useless as Elastic is abandoning "types", but this will be set as the
+C<DefaultType> for documents being indexed.
+
+=back
+
+=head2 Tail Section
+
+The C<files> section contains the list of files to tail and the rules to use to
+index them.
+
+    ---
     tail:
       - file: '/var/log/osquery/result.log'
         index: "osquery-result-%Y.%m.%d"
@@ -394,6 +438,59 @@ The configuration file is YAML and looks like:
           remove: [ "calendarTime", "epoch", "counter", "_raw" ]
           rename:
             unixTime: _epoch
+
+Each element is a hash containing the following information.
+
+=over 4
+
+=item B<file>
+
+B<Required>: The path to the file on the filesystem.
+
+=item B<decode>
+
+This may be a single element, or an array, containing one or more of the implemented decoders.
+
+=over 4
+
+=item json
+
+Decode the discovered JSON in the document to a hash reference.  This finds the
+first occurrence of an C<{> in the string and assumes everything to the end of
+the string is JSON.
+
+Decoding is done by L<JSON::MaybeXS>.
+
+=item syslog
+
+Parses each line as a standard UNIX syslog message.  Parsing is provided via
+L<Parse::Syslog::Line> which isn't a hard requirement of the this package, but
+will be loaded if available.
+
+=back
+
+=item B<index>
+
+A C<strfime> compatible string to use as the index to put documents created
+from this file.  If not specified, the defaults from the ElasticSearch section
+will be used, and failing that, the default as specified in
+L<POE::Component::ElasticSearch::Index>.
+
+=item B<type>
+
+The type to use for documents sourced from this file.
+
+=item B<extract>
+
+Extraction of fields from the document by one of the supported methods.
+
+=over 4
+
+=item by
+
+=back
+
+=back
 
 =head1 AUTHOR
 

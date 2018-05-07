@@ -8,7 +8,7 @@ use Moose;
 
 use overload q{""} => 'stringify';
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 sub stringify {
     my $self = shift();
@@ -31,7 +31,7 @@ Chart::Plotly::Adapter
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

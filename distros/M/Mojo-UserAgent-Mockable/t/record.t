@@ -9,11 +9,11 @@ use Test::Most;
 my $dir = File::Temp->newdir;
 
 my @transactions;
-push @transactions, Mojo::UserAgent->new->get(q{http://www.vam.ac.uk/api/json/museumobject/O1}), Mojo::UserAgent->new->get(q{http://www.vam.ac.uk/api/json/museumobject/O1}); 
+push @transactions, Mojo::UserAgent->new->get(q{https://www.vam.ac.uk/api/json/museumobject/O1}), Mojo::UserAgent->new->get(q{https://www.vam.ac.uk/api/json/museumobject/O1}); 
 
 my @results = map { $_->res->json } @transactions;
 
-BAIL_OUT('Museum API not responding properly') unless $results[0]->[0]->{'pk'};
+plan skip_all => 'Museum API not responding properly' unless $results[0]->[0]->{'pk'};
 
 my $output_file = qq{$dir/victoria_and_albert.json};
 
@@ -31,4 +31,3 @@ my @deserialized = Mojo::UserAgent::Mockable::Serializer->new->retrieve($output_
 
 is scalar @deserialized, scalar @transactions, 'Transaction count matches';
 done_testing;
-

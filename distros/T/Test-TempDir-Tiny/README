@@ -3,7 +3,7 @@ NAME
     fail
 
 VERSION
-    version 0.016
+    version 0.017
 
 SYNOPSIS
         # t/foo.t
@@ -147,11 +147,11 @@ AUTHOR
 CONTRIBUTORS
     *   Christian Walde <walde.christian@googlemail.com>
 
-    *   David Golden <xdg@xdg.me>
-
     *   Kent Fredric <kentfredric@gmail.com>
 
     *   Shawn Laffan <shawnlaffan@gmail.com>
+
+    *   Sven Kirmess <sven.kirmess@kzone.ch>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2014 by David Golden.

@@ -9,6 +9,8 @@ use strictures 1;
 use Moose;
 use Class::Load qw(try_load_class);
 
+use WebService::Braintree::HTTP;
+
 has 'config' => (is => 'ro');
 
 my %gateways = (

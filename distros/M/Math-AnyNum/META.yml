@@ -16,9 +16,10 @@ name: Math-AnyNum
 provides:
   Math::AnyNum:
     file: lib/Math/AnyNum.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Carp: '0'
+  List::Util: '0'
   Math::GMPq: '0.45'
   Math::GMPz: '0.39'
   Math::MPC: '1.07'
@@ -29,5 +30,5 @@ resources:
   homepage: https://github.com/trizen/Math-AnyNum
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Math-AnyNum
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

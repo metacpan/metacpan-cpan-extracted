@@ -10,6 +10,11 @@ sub test :Path(test) Args(0) {
   $c->serve_file("a.txt");
 }
 
+sub test_404 :Path(test_404) Args(0) {
+  my ($self, $c) = @_;
+  $c->serve_file("a.txt", +{code=>404});
+}
+
 sub static :Path(static) Args {
   my ($self, $c, @args) = @_;
   $c->serve_file('static',@args) || do {

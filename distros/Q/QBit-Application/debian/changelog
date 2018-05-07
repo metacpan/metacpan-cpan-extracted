@@ -1,3 +1,11 @@
+libqbit-application-perl (0.016) raring; urgency=low
+
+  * documentations
+
+  * configs and added documantations
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun,  6 May 2018 16:59:12 +0300
+
 libqbit-application-perl (0.015) raring; urgency=low
 
   * speed up accessors and post_run

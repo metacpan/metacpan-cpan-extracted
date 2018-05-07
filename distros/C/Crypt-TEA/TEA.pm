@@ -1,5 +1,4 @@
-# $Id: TEA.pm,v 1.25 2001/05/21 17:32:59 ams Exp $
-# Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
+# Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
 
 package Crypt::TEA;
 
@@ -9,7 +8,7 @@ use DynaLoader;
 use vars qw( @ISA $VERSION );
 
 @ISA = qw( DynaLoader );
-($VERSION) = q$Revision: 1.25 $ =~ /([\d.]+)/;
+($VERSION) = q$Revision: 1.26 $ =~ /([\d.]+)/;
 
 bootstrap Crypt::TEA $VERSION;
 
@@ -65,7 +64,7 @@ number of rounds (32 is recommended). It has a low setup time, and
 depends on a large number of rounds for security, rather than a complex
 algorithm. It was developed by David J. Wheeler and Roger M. Needham,
 and is described at
-<http://www.ftp.cl.cam.ac.uk/ftp/papers/djw-rmn/djw-rmn-tea.html>.
+L<https://web-beta.archive.org/web/20131226114205/http://www.ftp.cl.cam.ac.uk:80/ftp/papers/djw-rmn/djw-rmn-tea.html>
 
 This module implements TEA encryption. It supports the Crypt::CBC
 interface, with the following functions.
@@ -102,7 +101,7 @@ plaintext.
 
 =head1 SEE ALSO
 
-<http://www.vader.brad.ac.uk/tea/tea.shtml>
+L<https://web-beta.archive.org/web/20030208020932/http://www.vader.brad.ac.uk/tea/tea.shtml>
 
 Crypt::CBC, Crypt::Blowfish, Crypt::DES
 
@@ -128,9 +127,9 @@ platforms, and suggesting that I probe for features via %Config.
 
 =head1 AUTHOR
 
-Abhijit Menon-Sen <ams@wiw.org>
+Abhijit Menon-Sen <ams@toroid.org>
 
 Copyright 2001 Abhijit Menon-Sen. All rights reserved.
 
 This software is distributed under the terms of the Artistic License
-<URL:http://ams.wiw.org/code/artistic.txt>.
+L<https://dev.perl.org/licenses/artistic.html>

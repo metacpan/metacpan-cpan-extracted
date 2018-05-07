@@ -57,12 +57,15 @@ while ( $poll->handles && $soc ) {
         my ( $byte, $data );
 	syswrite( $pty, $data, $byte ) if $handle eq $soc && ( $byte = sysread( $soc, $data, 1024 ) );
         syswrite( $soc, $data, $byte ) if $handle eq $pty && ( $byte = sysread( $pty, $data, 1024 ) );
+	goto CLOSE unless $byte;
     }
     if ( $poll->handles( POLLHUP | POLLERR) ) {
         $soc->shutdown( 2 );
         last;
     }
 }
+
+CLOSE:
 
 sub bash {
     my $pty = IO::Pty->new();

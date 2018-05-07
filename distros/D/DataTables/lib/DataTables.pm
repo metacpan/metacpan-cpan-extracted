@@ -10,7 +10,7 @@ use DBI;
 use JSON::XS;
 use SQL::Abstract::Limit;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # Preloaded methods go here.
 

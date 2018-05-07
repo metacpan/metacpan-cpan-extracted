@@ -13,7 +13,7 @@ my $TEST_FILE_DIR = qq{$Bin/files};
 my $vanilla_ua = Mojo::UserAgent->new();
 
 subtest 'Victoria and Albert Museum' => sub {
-    my $url = Mojo::URL->new(q{http://www.vam.ac.uk/api/json/museumobject/O1}); 
+    my $url = Mojo::URL->new(q{https://www.vam.ac.uk/api/json/museumobject/O1});
     my $result = Mojo::UserAgent->new->get($url)->res->json;
 
     plan skip_all => 'Museum API not responding properly' unless ref $result eq 'ARRAY' && $result->[0]{'pk'};

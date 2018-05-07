@@ -1,5 +1,9 @@
 Revision history for Perl module File::ConfigDir
 
+0.021 2018-05-01
+    - more MSWin32 related fixups
+    - include locallib_cfg_dir in config_dirs
+
 0.020 2018-04-30
     - spelling fixes (Thanks to Mohammed Anwar for the reminder
       and pull request)

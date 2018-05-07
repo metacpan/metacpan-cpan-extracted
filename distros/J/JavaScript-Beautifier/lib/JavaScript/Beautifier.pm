@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use JavaScript::Packer1 qw/js_packer/;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 use base 'Exporter';

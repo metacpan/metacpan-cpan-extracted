@@ -1,13 +1,21 @@
 Changes
+hints/MSWin32.pl
+LICENSE
 Makefile.PL
 MANIFEST
-LICENSE
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.md
 RSA.pm
 RSA.xs
-README
-typemap
-t/rsa.t
 t/bignum.t
 t/format.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/rsa.t
+t/z_kwalitee.t
+t/z_meta.t
+t/z_perl_minimum_version.t
+t/z_pod-coverage.t
+t/z_pod.t
+typemap

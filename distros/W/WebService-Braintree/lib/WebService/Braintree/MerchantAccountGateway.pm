@@ -11,11 +11,9 @@ with 'WebService::Braintree::Role::MakeRequest';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
-use WebService::Braintree::Validations qw(verify_params);
-use WebService::Braintree::Util qw(validate_id is_hashref);
-use WebService::Braintree::Result;
 
-has 'gateway' => (is => 'ro');
+use WebService::Braintree::Util qw(validate_id is_hashref);
+use WebService::Braintree::Validations qw(verify_params);
 
 use WebService::Braintree::_::MerchantAccount;
 
@@ -27,6 +25,7 @@ sub create {
 
 sub update {
     my ($self, $merchant_account_id, $params) = @_;
+    confess "NotFoundError" unless validate_id($merchant_account_id);
     confess "ArgumentError" unless verify_params($params, _update_signature());
     $self->_make_request("/merchant_accounts/${merchant_account_id}/update_via_api", "put", {merchant_account => $params});
 }

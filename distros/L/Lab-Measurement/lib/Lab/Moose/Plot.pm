@@ -1,5 +1,5 @@
 package Lab::Moose::Plot;
-$Lab::Moose::Plot::VERSION = '3.631';
+$Lab::Moose::Plot::VERSION = '3.641';
 #ABSTRACT: Frontend to L<PDL::Graphics::Gnuplot>
 
 
@@ -85,7 +85,8 @@ sub BUILD {
 # Cannot simply put 'isa => 'PDL|ArrayRef[Num]'. See
 # http://stackoverflow.com/questions/5196294/why-can-i-use-a-class-name-as-a-moose-type-but-not-when-part-of-a-type-union
 
-union 'Lab::Moose::Plot::DataArg', [ class_type('PDL'), 'ArrayRef[Num]' ];
+union 'Lab::Moose::Plot::DataArg',
+    [ class_type('PDL'), 'ArrayRef[Num]', 'HashRef' ];
 
 sub _parse_options {
     my $self = shift;
@@ -145,7 +146,7 @@ Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 SYNOPSIS
 
@@ -239,6 +240,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

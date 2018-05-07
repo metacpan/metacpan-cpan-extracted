@@ -15,9 +15,10 @@ use Chart::Plotly::Trace::Bar::Outsidetextfont;
 use Chart::Plotly::Trace::Bar::Selected;
 use Chart::Plotly::Trace::Bar::Stream;
 use Chart::Plotly::Trace::Bar::Textfont;
+use Chart::Plotly::Trace::Bar::Transform;
 use Chart::Plotly::Trace::Bar::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data visualized by the span of the bars is set in `y` if `orientation` is set th *v* (the default) and the labels are set in `x`. By setting `orientation` to *h*, the roles are interchanged.
 
@@ -249,6 +250,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Bar::Transform]", );
+
 has tsrc => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the source reference on plot.ly for  t .",
@@ -323,7 +327,7 @@ has y0 => (
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ycalendar => ( is  => "rw",
@@ -355,7 +359,7 @@ Chart::Plotly::Trace::Bar - The data visualized by the span of the bars is set i
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -554,6 +558,8 @@ Sets the source reference on plot.ly for  textposition .
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * tsrc
 
 Sets the source reference on plot.ly for  t .
@@ -604,7 +610,7 @@ Alternate to `y`. Builds a linear space of y coordinates. Use with `dy` where `y
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ycalendar
 

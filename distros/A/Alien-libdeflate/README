@@ -1,0 +1,48 @@
+NAME
+    Alien::libdeflate - Fetch/build/stash the libdeflate headers and libs
+    for libdeflate <https://github.com/ebiggers/libdeflate>
+
+SYNOPSIS
+    In your "Makefile.PL" with ExtUtils::MakeMaker.
+
+      use Alien::libdeflate;
+      use ExtUtils::MakeMaker;
+      use Alien::Base::Wrapper qw( Alien::libdeflate !export );
+      use Config;
+
+      WriteMakefile(
+        # ...
+        Alien::Base::Wrapper->mm_args,
+        # ...
+        );
+
+    In your script or module.
+
+      use Alien::libdeflate;
+      use Env qw( @PATH );
+
+      unshift @PATH, Alien::libdeflate->bin_dir;
+
+DESCRIPTION
+    Download, build, and install the libdeflate C headers and libraries into
+    a well-known location, "Alien::libdeflate->dist_dir", from whence other
+    packages can make use of them.
+
+    The version installed will be the latest release on the master branch
+    from the libdeflate GitHub repository
+    <https://github.com/ebiggers/libdeflate>.
+
+AUTHOR
+    kiwiroy
+
+  Influential Environment Variables
+    ALIEN_LIBDEFLATE_PROBE_CFLAGS
+        If *libdeflate* is installed system wide in an alternate location
+        than the default search paths, set this variable to add the include
+        directory using "-I/path/to/system/libdeflate/include"
+
+    ALIEN_LIBDEFLATE_PROBE_LDFLAGS
+        If *libdeflate* is installed system wide in an alternate location
+        than the default search paths, set this variable to add the lib
+        directory using "-L/path/to/system/libdeflate/lib"
+

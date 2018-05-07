@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
     "Git::Repository" => 0,
     "Git::Repository::Log" => 0,
     "Git::Repository::Plugin" => 0,
+    "IO::Interactive" => 0,
     "List::MoreUtils" => 0,
     "Path::Tiny" => "0.060",
     "Test::More" => 0,
@@ -75,7 +76,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.9.5",
+  "VERSION" => "2.9.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -92,6 +93,7 @@ my %FallbackPrereqs = (
   "Git::Repository" => 0,
   "Git::Repository::Log" => 0,
   "Git::Repository::Plugin" => 0,
+  "IO::Interactive" => 0,
   "List::MoreUtils" => 0,
   "Path::Tiny" => "0.060",
   "Test::More" => 0,

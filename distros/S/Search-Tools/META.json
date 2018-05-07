@@ -59,6 +59,6 @@
          "url" : "https://github.com/karpet/search-tools-perl"
       }
    },
-   "version" : "1.006",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

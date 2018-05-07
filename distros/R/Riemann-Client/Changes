@@ -1,5 +1,8 @@
 Revision history for Riemann-Client
 
+0.05      2018-05-07 11:16:15+01:00 Europe/London
+    - Tanks to cventers: Sending "metric" as 0 results in :metric being nil
+
 0.04      2017-07-30 16:11:41+01:00 Europe/London
     - Thanks to dch: Protocol spec updated
     - Thanks to dch: Add tag support

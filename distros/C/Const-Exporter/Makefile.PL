@@ -17,13 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Const::Exporter",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "Const::Fast" => 0,
-    "Exporter" => 0,
+    "List::AllUtils" => "0.10",
     "Package::Stash" => 0,
-    "Ref::Util" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Ref::Util" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -31,9 +28,10 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "if" => 0
+    "if" => 0,
+    "lib" => 0
   },
-  "VERSION" => "v0.3.1",
+  "VERSION" => "v0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,19 +39,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "Const::Fast" => 0,
-  "Exporter" => 0,
   "File::Spec" => 0,
   "Hash::Objectify" => 0,
+  "List::AllUtils" => "0.10",
   "Module::Metadata" => 0,
   "Package::Stash" => 0,
   "Ref::Util" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "if" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "lib" => 0
 );
 
 

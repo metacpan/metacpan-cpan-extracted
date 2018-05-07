@@ -102,6 +102,7 @@ if( $ENV{dan} || $ENV{box} || $ENV{bin} )
         if $ENV{nickname} && $ENV{nickname} =~ /^[a-z0-9]+$/;
     mysystem "rsync -a bin.i/ '$mydan/bin/'";
     mysystem( "mkdir '$mydan/tmp' && chmod a+rwx,o+t '$mydan/tmp'" ) unless -e "$mydan/tmp";
+    mysystem( "mkdir -p '$mydan/var/run/filecache' && chmod a+rwx '$mydan/var/run/filecache'" ) unless -e "$mydan/var/run/filecache";
 }
 
 if( $ENV{def} )

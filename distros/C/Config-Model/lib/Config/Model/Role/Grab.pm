@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::Grab;
-$Config::Model::Role::Grab::VERSION = '2.122';
+$Config::Model::Role::Grab::VERSION = '2.123';
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
 use Mouse::Role;
@@ -16,6 +16,7 @@ use strict;
 use warnings;
 use Carp;
 
+use List::MoreUtils qw/any/;
 use Mouse::Util;
 use Log::Log4perl qw(get_logger :levels);
 
@@ -247,7 +248,7 @@ COMMAND:
     # check element type
     if ( defined $type ) {
         my @allowed = ref $type ? @$type : ($type);
-        while ( @found and not grep {$found[-1]->get_type eq $_} @allowed ) {
+        while ( @found and not any {$found[-1]->get_type eq $_} @allowed ) {
             Config::Model::Exception::WrongType->throw(
                 object        => $found[-1],
                 function      => 'grab',
@@ -354,6 +355,8 @@ sub grab_ancestor_with_element_named {
     }
 }
 
+1;
+
 __END__
 
 =pod
@@ -366,7 +369,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 

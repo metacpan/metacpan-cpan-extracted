@@ -1,9 +1,12 @@
-#! perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
+no  warnings "redefine";
 use 5.008003;
 
-use Test::More;
+use Test::More tests => 12;
+use Test::NoWarnings;
 
 BEGIN {
     # redefine the CORE functions to mimic themselfs at compile-time
@@ -215,8 +218,6 @@ my $this_system = System::Info::Generic->new;
 	_ncpu     => "2",
 	}, "Read /proc/cpuinfo for s390x Fedora";
     }
-
-done_testing;
 
 # Assign file contents
 BEGIN {

@@ -1,5 +1,5 @@
 package Test::Count::Parser;
-
+$Test::Count::Parser::VERSION = '0.0902';
 use warnings;
 use strict;
 
@@ -9,15 +9,6 @@ use File::Basename (qw(dirname));
 
 use Parse::RecDescent;
 
-=encoding utf8
-
-=head1 NAME
-
-Test::Count::Parser - A Parser for Test::Count.
-
-=cut
-
-our $VERSION = '0.0901';
 
 sub _get_grammar
 {
@@ -70,10 +61,10 @@ sub _calc_parser
 {
     my $self = shift;
 
-    my $parser = Parse::RecDescent->new($self->_get_grammar());
+    my $parser = Parse::RecDescent->new( $self->_get_grammar() );
 
-    $parser->{vars} = {};
-    $parser->{count} = 0;
+    $parser->{vars}     = {};
+    $parser->{count}    = 0;
     $parser->{includes} = [];
 
     return $parser;
@@ -103,11 +94,108 @@ sub _init
 {
     my $self = shift;
 
-    $self->_current_fns([]);
-    $self->_parser($self->_calc_parser());
+    $self->_current_fns( [] );
+    $self->_parser( $self->_calc_parser() );
 
     return 0;
 }
+
+
+sub _push_current_filename
+{
+    my $self     = shift;
+    my $filename = shift;
+
+    push @{ $self->_current_fns() }, $filename;
+
+    return;
+}
+
+sub _pop_current_filenames
+{
+    my $self     = shift;
+    my $filename = shift;
+
+    pop( @{ $self->_current_fns() } );
+
+    return;
+}
+
+sub _get_current_filename
+{
+    my $self = shift;
+
+    return $self->_current_fns->[-1];
+}
+
+sub _parse_filename
+{
+    my $self     = shift;
+    my $filename = shift;
+
+    $filename =~ s{\A"}{};
+    $filename =~ s{"\z}{};
+
+    my $dirname = dirname( $self->_get_current_filename() );
+    $filename =~ s{\$\^CURRENT_DIRNAME}{$dirname}g;
+
+    return $filename;
+}
+
+sub update_assignments
+{
+    my ( $self, $args ) = @_;
+
+    $self->_parser->{includes} = [];
+    my $ret = $self->_parser()->assignments( $args->{text} );
+
+    if ( @{ $self->_parser->{includes} } )
+    {
+        foreach my $include_file ( @{ $self->_parser->{includes} } )
+        {
+            my $counter = Test::Count->new(
+                {
+                    filename => $self->_parse_filename($include_file),
+                },
+            );
+            $counter->process( { parser => $self } );
+        }
+        $self->_parser->{includes} = [];
+    }
+}
+
+
+sub update_count
+{
+    my ( $self, $args ) = @_;
+
+    return $self->_parser()->update_count( $args->{text} );
+}
+
+
+sub get_count
+{
+    my $self = shift;
+
+    return $self->_parser()->{count};
+}
+
+
+1;    # End of Test::Count::Parser
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Count::Parser - A Parser for Test::Count.
+
+=head1 VERSION
+
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -120,6 +208,10 @@ sub _init
     $parser->update_count($string);
 
     my $value = $parser->get_count();
+
+=head1 VERSION
+
+version 0.0902
 
 =head1 DESCRIPTIONS
 
@@ -141,98 +233,14 @@ example if C<$mytext> is:
 
 Then at the end C<$myvar> would be 500 and C<$another_var> would be 508.
 
-=cut
-
-sub _push_current_filename
-{
-    my $self = shift;
-    my $filename = shift;
-
-    push @{$self->_current_fns()}, $filename;
-
-    return;
-}
-
-sub _pop_current_filenames
-{
-    my $self = shift;
-    my $filename = shift;
-
-    pop(@{$self->_current_fns()});
-
-    return;
-}
-
-sub _get_current_filename
-{
-    my $self = shift;
-
-    return $self->_current_fns->[-1];
-}
-
-sub _parse_filename
-{
-    my $self = shift;
-    my $filename = shift;
-
-    $filename =~ s{\A"}{};
-    $filename =~ s{"\z}{};
-
-    my $dirname = dirname($self->_get_current_filename());
-    $filename =~ s{\$\^CURRENT_DIRNAME}{$dirname}g;
-
-    return $filename;
-}
-
-sub update_assignments
-{
-    my ($self, $args) = @_;
-
-    $self->_parser->{includes} = [];
-    my $ret = $self->_parser()->assignments($args->{text});
-
-    if (@{$self->_parser->{includes}})
-    {
-        foreach my $include_file (@{$self->_parser->{includes}})
-        {
-            my $counter =
-                Test::Count->new(
-                    {
-                        filename => $self->_parse_filename($include_file),
-                    },
-                );
-            $counter->process({parser => $self});
-        }
-        $self->_parser->{includes} = [];
-    }
-}
-
 =head2 $parser->update_count({'text' => $mytext,)
 
 Adds the expression inside C<$mytext> to the internal counter of the
 module. This is in order to count the tests.
 
-=cut
-
-sub update_count
-{
-    my ($self, $args) = @_;
-
-    return $self->_parser()->update_count($args->{text});
-}
-
 =head2 my $count = $parser->get_count()
 
 Get the total number of tests in the parser.
-
-=cut
-
-sub get_count
-{
-    my $self = shift;
-
-    return $self->_parser()->{count};
-}
 
 =head1 AUTHOR
 
@@ -287,6 +295,132 @@ Copyright 2006 Shlomi Fish.
 
 This program is released under the following license: MIT X11.
 
-=cut
+=head1 AUTHOR
 
-1; # End of Test::Count::Parser
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/test-count/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc Test::Count::Parser
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Test-Count>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/Test-Count>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Count>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/Test-Count>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/Test-Count>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/Test-Count>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/T/Test-Count>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Test-Count>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Test::Count>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-test-count at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Test-Count>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/test-count>
+
+  git clone git://github.com/shlomif/test-count.git
+
+=cut

@@ -1,7 +1,7 @@
 use 5.014;
 
 package Mojo::UserAgent::Mockable::Serializer;
-$Mojo::UserAgent::Mockable::Serializer::VERSION = '1.53';
+$Mojo::UserAgent::Mockable::Serializer::VERSION = '1.54';
 use warnings::register;
 
 use Carp;
@@ -231,7 +231,7 @@ Mojo::UserAgent::Mockable::Serializer - A class that serializes Mojo transaction
 
 =head1 VERSION
 
-version 1.53
+version 1.54
 
 =head1 SYNOPSIS
 
@@ -419,11 +419,11 @@ This module does not serialize any event listeners.  This is unlikely to change 
 
 =head1 AUTHOR
 
-Kit Peters <kit.peters@broadbean.com>
+Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Broadbean Technology.
+This software is copyright (c) 2017 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

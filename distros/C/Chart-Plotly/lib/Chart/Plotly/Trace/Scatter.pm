@@ -14,9 +14,10 @@ use Chart::Plotly::Trace::Scatter::Marker;
 use Chart::Plotly::Trace::Scatter::Selected;
 use Chart::Plotly::Trace::Scatter::Stream;
 use Chart::Plotly::Trace::Scatter::Textfont;
+use Chart::Plotly::Trace::Scatter::Transform;
 use Chart::Plotly::Trace::Scatter::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The scatter trace type encompasses line charts, scatter charts, text charts, and bubble charts. The data visualized as scatter point or lines is set in `x` and `y`. Text (appearing either on the chart or on hover only) is via `text`. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -255,6 +256,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scatter::Transform]", );
+
 has tsrc => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the source reference on plot.ly for  t .",
@@ -319,7 +323,7 @@ has y0 => (
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ycalendar => ( is  => "rw",
@@ -351,7 +355,7 @@ Chart::Plotly::Trace::Scatter - The scatter trace type encompasses line charts, 
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -532,6 +536,8 @@ Sets the source reference on plot.ly for  textposition .
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * tsrc
 
 Sets the source reference on plot.ly for  t .
@@ -574,7 +580,7 @@ Alternate to `y`. Builds a linear space of y coordinates. Use with `dy` where `y
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ycalendar
 

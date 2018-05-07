@@ -1,0 +1,45 @@
+==================================================
+Changes from 2017-05-06 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.032 at 2018-05-06 13:42:25 +0000
+------------------------------------------
+
+  Change: 9f1cefbfd9ae1d7e5a489d87eaf20ffcee27f5b3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-06 15:41:28 +0000
+
+    Migrate to alienfile and cmake3 
+
+------------------------------------------
+version 0.031 at 2018-05-06 13:38:47 +0000
+------------------------------------------
+
+  Change: 857b448f300b90f1faf6e9d2ca4fbf1160d37ea9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-06 15:38:47 +0000
+
+    Migrate to alienfile and cmake3 
+
+  Change: f20af236e6021c4764c3a67d7426a513a1141015
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-11-19 21:40:03 +0000
+
+    Trigger rebuild because of BSD issue
+
+    Reported here: https://rt.cpan.org/Ticket/Display.html?id=123679 
+
+-----------------------------------------
+version 0.02 at 2017-08-20 13:33:01 +0000
+-----------------------------------------
+
+  Change: 1fbd65d42b8add69326e1cd2013b9574cf259397
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-08-20 15:33:01 +0000
+
+    Add Travis integration 
+
+===============================================
+Plus 1 release after 2017-05-06 00:00:00 +0000.
+===============================================

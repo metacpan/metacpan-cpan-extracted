@@ -67,7 +67,7 @@ my $build = $class->new(
     dist_author   => 'Dominique Dumont (ddumont at cpan dot org)',
 
   'build_requires' => {
-    'Config::Model::Tester' => '2.062',
+    'Config::Model::Tester' => '3.006',
     'Config::Model::Tester::Setup' => '0',
     'File::Copy' => '0',
     'IO::File' => '0',

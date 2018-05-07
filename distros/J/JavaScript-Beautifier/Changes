@@ -1,5 +1,8 @@
 Revision history for JavaScript-Beautifier
 
+0.25    2018-05-02
+        - some fixes on packer by eleonora45 (RT 125117)
+
 0.24    2018-04-22
         - some fixes on packer by eleonora45 (RT 125117)
 

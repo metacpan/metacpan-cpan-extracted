@@ -15,7 +15,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use Capture::Tiny qw/capture_stderr/;
 
-our $VERSION  = 0.5;
+our $VERSION  = 0.6;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -127,7 +127,7 @@ App::Git::Workflow::Command::BranchConflicts - Module to find git branches that 
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Command::BranchConflicts version 0.5
+This documentation refers to App::Git::Workflow::Command::BranchConflicts version 0.6
 
 =head1 SYNOPSIS
 

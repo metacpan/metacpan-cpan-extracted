@@ -217,7 +217,7 @@ sub connect_tree ($%) {
 	my $connection = $self->get_curr_connection || return;
 
 	my ($addr, $share, $username, $password) =
-		map { $connection->{$_} || $options{$_} || die "No $_ to connect_tree\n" }
+		map { $options{$_} || $connection->{$_} || die "No $_ to connect_tree\n" }
 		qw(addr share username password);
 
 	return unless $self->check_session($connection);
@@ -475,7 +475,8 @@ sub perform_tree_command ($$$@) {
 		my $dir = shift // '';
 
 		$tree->cwd(_normalize_path($dir, $tree->cwd));
-	} elsif ($command eq 'find') {
+	}
+	elsif ($command eq 'find') {
 		my $pattern = _normalize_path(shift || "*", $tree->cwd, 1);
 		my $dirname = $pattern =~ /^(.*)\\(.*)/ ? $1 : "";
 		$pattern = $2 if $2;
@@ -497,21 +498,24 @@ sub perform_tree_command ($$$@) {
 
 		return unless $files;
 		return wantarray ? @$files : $files;
-	} elsif ($command eq 'dnload') {
+	}
+	elsif ($command eq 'dnload') {
 		my $filename = shift // '';
 		return $self->err("No filename") if $filename eq '';
 		$filename = _normalize_path($filename, $tree->cwd, 1);
 		my $dst_filename = _normalize_path(shift || _basename($filename, 1), '.');
 
 		return $self->dnload_file($connection, $filename, $dst_filename);
-	} elsif ($command eq 'upload') {
+	}
+	elsif ($command eq 'upload') {
 		my $filename = shift // '';
 		return $self->err("No filename") if $filename eq '';
 		$filename = _normalize_path($filename, '.');
 		my $dst_filename = _normalize_path(shift || _basename($filename), $tree->cwd, 1);
 
 		return $self->upload_file($connection, $filename, $dst_filename);
-	} elsif ($command eq 'remove') {
+	}
+	elsif ($command eq 'remove') {
 		my $filename = shift // '';
 		return $self->err("No filename") if $filename eq '';
 		$filename = _normalize_path($filename, $tree->cwd, 1);
@@ -521,7 +525,8 @@ sub perform_tree_command ($$$@) {
 		my $file = SMB::File->new(name => $filename, is_directory => $is_dir);
 
 		return $self->remove_file($connection, $file, $recursive);
-	} elsif ($command eq 'rename') {
+	}
+	elsif ($command eq 'rename') {
 		my $filename1 = shift // '';
 		return $self->err("No filename1") if $filename1 eq '';
 		$filename1 = _normalize_path($filename1, $tree->cwd, 1);
@@ -531,7 +536,8 @@ sub perform_tree_command ($$$@) {
 		my $force = $options{force};
 
 		return $self->rename_file($connection, $filename1, $filename2, $force);
-	} elsif ($command eq 'copy') {
+	}
+	elsif ($command eq 'copy') {
 		my $filename1 = shift // '';
 		return $self->err("No filename1") if $filename1 eq '';
 		$filename1 = _normalize_path($filename1, $tree->cwd, 1);
@@ -567,10 +573,15 @@ sub wait_for_response ($$) {
 
 	return unless $request;
 
-	my $response = $connection->recv_command;
+	my ($response) = $connection->recv_command;
 	if (!$response) {
 		$self->delete_connection($connection);
 		return;
+	}
+
+	if ($response->is_response_to($request) && $response->status == SMB::STATUS_PENDING) {
+		$self->dbg("Ignoring STATUS_PENDING response");
+		($response) = $connection->recv_command;
 	}
 
 	unless ($response->is_response_to($request)) {

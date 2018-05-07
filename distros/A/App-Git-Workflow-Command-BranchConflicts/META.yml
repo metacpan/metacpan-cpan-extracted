@@ -18,15 +18,15 @@ name: App-Git-Workflow-Command-BranchConflicts
 provides:
   App::Git::Workflow::Command::BranchConflicts:
     file: lib/App/Git/Workflow/Command/BranchConflicts.pm
-    version: '0.5'
+    version: '0.6'
 requires:
   App::Git::Workflow: '0.8'
   App::Git::Workflow::Command: '0.8'
-  Capture::Tiny: '0.54'
+  Capture::Tiny: '0.45'
   perl: '5.006'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Command-BranchConflicts
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-Git-Workflow-Command-BranchConflicts.git
-version: '0.5'
+version: '0.6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

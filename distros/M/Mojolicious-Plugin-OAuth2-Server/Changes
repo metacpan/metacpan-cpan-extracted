@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.42     2018-05-01
+        - Prevent double encoding of URL in oauth2_auth_request helper
+
+        - Note that this requires a much more recent version of Mojolicious
+          so the requirement has been bumped to v7.76
+
 0.41     2018-04-16
         - Handle inconsistencies between various grant types and the return
           data from ->verify_token_and_scope sometimes returning a hash ref

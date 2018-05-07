@@ -1,0 +1,8 @@
+MANIFEST.SKIP
+.build
+.git
+git
+.gitignore
+local
+pre-commit
+.tidyallrc

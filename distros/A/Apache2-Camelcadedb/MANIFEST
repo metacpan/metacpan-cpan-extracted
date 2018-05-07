@@ -1,0 +1,11 @@
+lib/Apache2/Camelcadedb.pm
+Changes
+Makefile.PL
+MANIFEST			This list of files
+t/001_load.t
+t/010_sanity.t
+t/app/HelloWorld.pm
+t/conf/extra.conf.in
+t/lib/LoadCamelcade.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

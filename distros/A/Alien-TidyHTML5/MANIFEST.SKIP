@@ -1,0 +1,26 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+Alien-TidyHTML5.*\.tar\.gz
+Alien-TidyHTML5-v\d+\.\d+\.\d+/
+
+^MYMETA\.*
+
+# Travis-CI
+
+\.travis\.yml
+
+# Distzilla etc
+
+\.build/
+
+# Alien
+
+_alien/

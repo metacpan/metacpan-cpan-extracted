@@ -110,3 +110,11 @@ Revision history for Var-Pairs
     down to pre-5.22
 
 
+
+
+0.003005  Mon May  7 06:55:18 2018
+
+    Made each_pair() and each_kv() clean themselves up
+    at the end of their caller's block, to solve the
+    "last of out a loop messes up the iterator" problem.
+    (Thanks, Rolf!)

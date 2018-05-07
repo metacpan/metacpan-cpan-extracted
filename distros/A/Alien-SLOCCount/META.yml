@@ -24,9 +24,9 @@ requires:
   Alien::Build: '0.25'
 resources:
   repository: https://github.com/joenio/alien-sloccount
-version: '0.05'
+version: '0.07'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 1.32'
+  generated_by: 'Alien::Build::MM version 1.39'
   requires:
     share:
       Alien::flex: '0'

@@ -50,3 +50,9 @@ Revision history for Mylisp
         delete Stack type, use Array replace it.
         rename Stable => Table
         rename Table  => Map
+
+2.04    2018-5-1
+        combin Spp and My module.
+
+3.0     2018-5-4
+        re-disign tidy-perl and string parse

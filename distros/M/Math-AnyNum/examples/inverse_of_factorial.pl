@@ -7,18 +7,18 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(:overload tau e factorial LambertW lgrt);
+use Math::AnyNum qw(:overload tau e factorial LambertW lgrt approx_cmp);
 
 use constant S => tau->sqrt->log;
 use constant T => tau->root(-2.0 * e);
 
-sub inv_fac_W {
+sub inverse_factorial_W {
     my ($n) = @_;
     my $L = log($n) - S;
     $L / LambertW($L / e) - 0.5;
 }
 
-sub inv_fac_lgrt {
+sub inverse_factorial_lgrt {
     my ($n) = @_;
     lgrt(T * $n**(1 / e)) * e - 0.5;
 }
@@ -26,16 +26,16 @@ sub inv_fac_lgrt {
 for my $n (1 .. 100) {
 
     my $f = factorial($n);
-    my $i = inv_fac_W($f);
-    my $j = inv_fac_lgrt($f);
+    my $i = inverse_factorial_W($f);
+    my $j = inverse_factorial_lgrt($f);
 
     printf("F(%2s!) =~ %s\n", $n, $i);
 
-    if ($i->round(-50) != $j->round(-50)) {
+    if (approx_cmp($i, $j) != 0) {
         die "$i != $j";
     }
 
-    if ($i->round != $n) {
+    if (approx_cmp($i, $n, 0) != 0) {
         die "However that is incorrect! (expected: $n -- got ", $i->round, ")";
     }
 }

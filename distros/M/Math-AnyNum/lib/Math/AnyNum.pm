@@ -6,6 +6,7 @@ use warnings;
 
 no warnings qw(numeric uninitialized);
 
+use List::Util qw();
 use Math::MPFR qw();
 use Math::GMPq qw();
 use Math::GMPz qw();
@@ -16,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -255,7 +256,9 @@ use overload
         ceil  => \&ceil,
         round => \&round,
         sgn   => \&sgn,
-        acmp  => \&acmp,
+
+        acmp       => \&acmp,
+        approx_cmp => \&approx_cmp,
 
         popcount => \&popcount,
 
@@ -275,7 +278,8 @@ use overload
         denominator => \&denominator,
         nude        => \&nude,
 
-        digits => \&digits,
+        digits    => \&digits,
+        sumdigits => \&sumdigits,
 
         as_bin  => \&as_bin,
         as_hex  => \&as_hex,
@@ -1275,6 +1279,8 @@ sub cmp ($$) {
     goto &__cmp__;
 }
 
+# Absolute comparison
+
 sub acmp ($$) {
     require Math::AnyNum::abs;
     require Math::AnyNum::cmp;
@@ -1288,6 +1294,42 @@ sub acmp ($$) {
     }
 
     __cmp__(__abs__(ref($x) eq __PACKAGE__ ? $$x : _star2obj($x)), $y);
+}
+
+# Approximate comparison
+
+sub approx_cmp ($$;$) {
+    require Math::AnyNum::cmp;
+    require Math::AnyNum::round;
+    my ($x, $y, $places) = @_;
+
+    if (defined($places)) {
+        if (!ref($places) and CORE::int($places) eq $places and $places > LONG_MIN and $places < ULONG_MAX) {
+            ## places is a native integer
+        }
+        else {
+            $places = _any2si(_star2obj($places)) // return undef;
+        }
+    }
+    else {
+        $places = -((CORE::int($PREC) >> 2) - 1);
+    }
+
+    $x = _star2obj($x);
+    $y = _star2obj($y);
+
+    if (   ref($x) eq 'Math::MPFR'
+        or ref($y) eq 'Math::MPFR'
+        or ref($x) eq 'Math::MPC'
+        or ref($y) eq 'Math::MPC') {
+        $x = _star2mpfr_mpc($x);
+        $y = _star2mpfr_mpc($y);
+    }
+
+    $x = __round__($x, $places);
+    $y = __round__($y, $places);
+
+    __cmp__($x, $y);
 }
 
 #
@@ -1903,29 +1945,25 @@ sub pow ($$) {
 sub ipow ($$) {
     my ($x, $y) = @_;
 
-    # Both `x` and `y` are unsigned native integers
-    if (    !ref($x)
-        and !ref($y)
-        and CORE::int($x) eq $x
-        and $x >= 0
-        and $x < ULONG_MAX
-        and CORE::int($y) eq $y
-        and $y >= 0
-        and $y < ULONG_MAX) {
-
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_ui_pow_ui($r, $x, $y);
-        return bless \$r;
-    }
-
-    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
-
     if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         ## `y` is already a native integer
     }
     else {
         $y = _any2si(ref($y) eq __PACKAGE__ ? $$y : _star2obj($y)) // (goto &nan);
     }
+
+    # Both `x` and `y` are unsigned native integers
+    if (    !ref($x)
+        and CORE::int($x) eq $x
+        and $x >= 0
+        and $x < ULONG_MAX
+        and $y >= 0) {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_pow_ui($r, $x, $y);
+        return bless \$r;
+    }
+
+    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_pow_ui($r, $x, $y < 0 ? -$y : $y);
@@ -3011,21 +3049,68 @@ sub round ($;$) {
 #
 ## Fibonacci
 #
-sub fibonacci ($) {
-    my ($x) = @_;
+sub fibonacci ($;$) {
+    my ($n, $k) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
         ## `x` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    # N-th k-th order Fibonacci number
+    if (defined($k)) {
+
+        if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
+            ## `k` is a native unsigned integer
+        }
+        elsif (ref($k) eq __PACKAGE__) {
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = _any2ui(_star2obj($k)) // goto &nan;
+        }
+
+        if ($k == 2) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_fib_ui($z, $n);
+            return bless \$z;
+        }
+
+        if ($n < $k - 1) {
+            return zero();
+        }
+
+        # Algorithm after M. F. Hasler
+        # See: https://oeis.org/A302990
+
+        my @f = map {
+            $_ < $k
+              ? do {
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_setbit($z, $_);
+                $z;
+              }
+              : Math::GMPz::Rmpz_init_set_ui(1)
+        } 1 .. ($k + 1);
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        foreach my $i (2 * ++$k - 2 .. $n) {
+            Math::GMPz::Rmpz_mul_2exp($t, $f[($i - 1) % $k], 1);
+            Math::GMPz::Rmpz_sub($f[$i % $k], $t, $f[$i % $k]);
+        }
+
+        my $r = $f[$n % $k];
+        return bless \$r;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_fib_ui($r, $x);
+    Math::GMPz::Rmpz_fib_ui($r, $n);
     bless \$r;
 }
 
@@ -4598,59 +4683,116 @@ sub rat_approx ($) {
 }
 
 sub digits ($;$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    $x = _star2mpz($x) // return;
-    $y //= 10;
+    $n = _star2mpz($n) // return;
+    $k //= 10;
 
-    if (!ref($y) and CORE::int($y) eq $y and $y > 1 and $y < ULONG_MAX) {
+    if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
 
-        if ($y <= 10) {
-            my @digits = split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, $y));
-            pop(@digits) if $digits[-1] eq '-';
-            return @digits;
-        }
-
-        if ($y == 16) {
-            my @digits = split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, $y));
-            pop(@digits) if $digits[-1] eq '-';
-            return map { hex($_) } @digits;
+        # Return faster for k=2..16
+        if ($k <= 16) {
+            my @digits = split(//, scalar reverse(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
+            return ($k > 10 ? (map { hex($_) } @digits) : @digits);
         }
     }
 
-    $y = _star2mpz($y) // return;
+    $k = _star2mpz($k) // return;
 
-    # Not defined for y <= 1
-    if (Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0) {
+    # Not defined for k <= 1
+    if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
         return;
     }
 
-    # Return faster when y <= 10
-    if (Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
-        my @digits = split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, Math::GMPz::Rmpz_get_ui($y)));
-        pop(@digits) if $digits[-1] eq '-';
-        return @digits;
+    # Return faster for k=2..16
+    if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
+        $k = Math::GMPz::Rmpz_get_ui($k);
+        my @digits = split(//, scalar reverse(Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r));
+        return ($k > 10 ? (map { hex($_) } @digits) : @digits);
     }
 
-    my $t   = Math::GMPz::Rmpz_init_set($x);
-    my $sgn = Math::GMPz::Rmpz_sgn($t);
+    $n = Math::GMPz::Rmpz_init_set($n);
+
+    my $sgn = Math::GMPz::Rmpz_sgn($n);
 
     if ($sgn == 0) {
         return (zero());
     }
     elsif ($sgn < 0) {
-        Math::GMPz::Rmpz_abs($t, $t);
+        Math::GMPz::Rmpz_abs($n, $n);
     }
 
     my @digits;
 
-    while (Math::GMPz::Rmpz_sgn($t) > 0) {
+    while (Math::GMPz::Rmpz_sgn($n) > 0) {
         my $m = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_divmod($t, $m, $t, $y);
+        Math::GMPz::Rmpz_divmod($n, $m, $n, $k);
         push @digits, bless \$m;
     }
 
     return @digits;
+}
+
+sub sumdigits ($;$) {
+    my ($n, $k) = @_;
+
+    $n = _star2mpz($n) // goto &nan;
+    $k //= 10;
+
+    if (!ref($k) and CORE::int($k) eq $k and $k > 1 and $k < ULONG_MAX) {
+
+        # Return faster for k=2
+        if ($k == 2) {
+
+            if (Math::GMPz::Rmpz_sgn($n) < 0) {
+                $n = Math::GMPz::Rmpz_init_set($n);
+                Math::GMPz::Rmpz_abs($n, $n);
+            }
+
+            return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n));
+        }
+
+        # Return faster for k=3..16
+        if ($k <= 16) {
+            my @digits = split(//, Math::GMPz::Rmpz_get_str($n, $k) =~ s/^-//r);
+            return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum($k > 10 ? (map { hex($_) } @digits) : @digits));
+        }
+    }
+
+    $k = _star2mpz($k) // goto &nan;
+    $n = Math::GMPz::Rmpz_init_set($n);
+
+    # Not defined for k <= 1
+    if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
+        goto &nan;
+    }
+
+    my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+    if ($sgn == 0) {
+        return zero();
+    }
+    elsif ($sgn < 0) {
+        Math::GMPz::Rmpz_abs($n, $n);
+    }
+
+    # Return faster for k=2..16
+    if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
+        $k = Math::GMPz::Rmpz_get_ui($k);
+        return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n)) if $k == 2;
+        my @digits = split(//, Math::GMPz::Rmpz_get_str($n, $k));
+        return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum($k > 10 ? (map { hex($_) } @digits) : @digits));
+    }
+
+    my $m   = Math::GMPz::Rmpz_init();
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+    while (Math::GMPz::Rmpz_sgn($n) > 0) {
+        Math::GMPz::Rmpz_divmod($n, $m, $n, $k);
+        Math::GMPz::Rmpz_add($sum, $sum, $m);
+    }
+
+    bless \$sum;
 }
 
 1;    # End of Math::AnyNum

@@ -3,6 +3,7 @@ abstract: 'Tk GUI to edit config data through Config::Model'
 author:
   - 'Dominique Dumont'
 build_requires:
+  Config::Model::Tester::Setup: '0'
   Config::Model::Value: '0'
   Module::Build: '0.34'
   Test::Memory::Cycle: '0'
@@ -11,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -56,5 +57,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-tk-ui/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-tk-ui.git
-version: '1.365'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.366'
+x_serialization_backend: 'YAML::Tiny version 1.73'

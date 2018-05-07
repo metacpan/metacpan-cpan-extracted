@@ -1,9 +1,12 @@
-package Git::Hooks;
-# ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.9.5';
-use 5.010;
 use strict;
 use warnings;
+
+package Git::Hooks;
+# ABSTRACT: Framework for implementing Git (and Gerrit) hooks
+$Git::Hooks::VERSION = '2.9.6';
+use 5.010;
+use utf8;
+use Carp;
 use Exporter qw/import/;
 use Git::Repository qw/GitHooks Log/;
 
@@ -11,7 +14,7 @@ our @EXPORT; ## no critic (Modules::ProhibitAutomaticExportation)
 
 my %Hooks;
 
-BEGIN {
+BEGIN {                         ## no critic (RequireArgUnpacking)
     my @installers =
         qw/ APPLYPATCH_MSG PRE_APPLYPATCH POST_APPLYPATCH
             PRE_COMMIT PREPARE_COMMIT_MSG COMMIT_MSG
@@ -89,9 +92,9 @@ sub run_hook {
         $faults .= "\n" unless $faults =~ /\n$/;
         if (($hook_basename eq 'commit-msg' or $hook_basename eq 'pre-commit')
                 and not $git->get_config_boolean(githooks => 'abort-commit')) {
-            warn $faults;
+            carp $faults;
         } else {
-            die $faults;
+            croak $faults;
         }
     }
 
@@ -113,7 +116,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.9.5
+version 2.9.6
 
 =head1 SYNOPSIS
 

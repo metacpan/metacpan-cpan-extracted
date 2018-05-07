@@ -1,5 +1,14 @@
 Revision history for HTML-Latemp-News
 
+0.1.12  2018-05-02
+    - Stop using Class-Accessor
+    - perltidy
+0.1.11  Unknown
+    - [RewriteVersion] in dist.ini.
+
+0.1.10  2015-28-12
+    - Move away from old E-mail.
+
 0.1.8   2015-05-30
     - Convert the build system to Dist-Zilla.
         - Some improvements in the process.

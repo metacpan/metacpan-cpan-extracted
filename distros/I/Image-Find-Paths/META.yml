@@ -1,5 +1,5 @@
 ---
-abstract: 'Locate the longest line in an image.'
+abstract: 'Find paths in an image.'
 author:
   - philiprbrenan@gmail.com
 build_requires: {}
@@ -15,7 +15,7 @@ name: Image-Find-Paths
 provides:
   Image::Find::Paths:
     file: lib/Image/Find/Paths.pm
-    version: '20180429'
+    version: '20180505'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -24,4 +24,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180429'
+version: '20180505'

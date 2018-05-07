@@ -2,7 +2,7 @@ package Datahub::Factory::Exporter::Arthub;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 use Lido::XML;
 use Moo;
@@ -35,8 +35,25 @@ sub _build_out {
 sub add {
     my ($self, $item) = @_;
 
+    # Fall back system to determine the ID.
+    #  - If multiple LidoRecID's are present, use the 'preferred' one if this exists.
+    #  - If no preferred id's are defined, use the first one we'll encounter.
+    #  - If there's only one LidoRecID, use that one regardless of it's type.
+    my $id;
+    if (scalar($item->{'lidoRecID'}) > 1) {
+        my @matches = grep { 'preferred' eq $_->{pref} } @{ $item->{'lidoRecID'} };
+        if (@matches) {
+            my $lidoRecID = pop @matches;
+            $id = $lidoRecID->{'_'};
+        } else {
+            $id = $item->{'lidoRecID'}->[0]->{'_'};
+        }
+    } else {
+        $id = $item->{'lidoRecID'}->[0]->{'_'};
+    }
+
     my $data = {
-        'id' => $item->{'lidoRecID'}->[0]->{'_'},
+        'id' => $id,
         '_'  => $self->lido->to_xml($item)
     };
 

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::CdsFile;
-$Config::Model::Backend::CdsFile::VERSION = '2.122';
+$Config::Model::Backend::CdsFile::VERSION = '2.123';
 use 5.10.1;
 use Carp;
 use strict;
@@ -31,14 +31,13 @@ sub read {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $file_path = $args{file_path};
-    return 0 unless defined $args{io_handle};
+    return 0 unless $file_path->exists;
     $logger->info("Read cds data from $file_path");
 
-    $self->node->load( step => [ $args{io_handle}->getlines ] );
+    $self->node->load( step => $file_path->slurp_utf8 );
     return 1;
 }
 
@@ -52,14 +51,13 @@ sub write {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $file_path = $args{file_path};
     $logger->info("Write cds data to $file_path");
 
     my $dump = $self->node->dump_tree( skip_auto_write => 'cds_file', check => $args{check} );
-    $args{io_handle}->print($dump);
+    $file_path->spew_utf8($dump);
     return 1;
 }
 
@@ -79,7 +77,7 @@ Config::Model::Backend::CdsFile - Read and write config as a Cds data structure
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 
@@ -171,9 +169,8 @@ called by L<Config::Model::BackendMgr>.
 
 =head2 read
 
-Of all parameters passed to this read call-back, only C<ifile_path> is
-used. This parameter must be L<IO::File> object already opened for
-read.
+Of all parameters passed to this read call-back, only C<file_path> is
+used.
 
 It can also be undef. In which case C<read()> returns 0.
 
@@ -181,9 +178,8 @@ When a file is read,  C<read()> returns 1.
 
 =head2 write
 
-Of all parameters passed to this write call-back, only C<io_handle> is
-used. This parameter must be L<IO::File> object already opened for
-write.
+Of all parameters passed to this write call-back, only C<file_path> is
+used.
 
 C<write()> returns 1.
 

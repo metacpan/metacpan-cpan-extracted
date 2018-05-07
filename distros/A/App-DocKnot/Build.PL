@@ -2,7 +2,7 @@
 #
 # Build script for the docknot application.
 #
-# Copyright 2013, 2016 Russ Allbery <rra@cpan.org>
+# Copyright 2013, 2016, 2018 Russ Allbery <rra@cpan.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-use 5.018;
+use 5.024;
 use autodie;
 use warnings;
 
@@ -44,7 +44,8 @@ my $build = Module::Build->new(
 
     # Add additional package metadata.
     meta_merge => {
-        resources => {
+        'meta-spec' => { version => '2' },
+        resources   => {
             bugtracker => {
                 mailto => 'bug-App-DocKnot@rt.cpan.org',
                 web =>
@@ -52,7 +53,7 @@ my $build = Module::Build->new(
             },
             homepage   => 'https://www.eyrie.org/~eagle/software/docknot',
             repository => {
-                url  => 'git://github.com/rra/docknot.git',
+                url  => 'https://github.com/rra/docknot.git',
                 web  => 'https://github.com/rra/docknot',
                 type => 'git',
             },
@@ -68,7 +69,7 @@ my $build = Module::Build->new(
         'JSON'           => 0,
         'Perl6::Slurp'   => 0,
         'Template'       => 0,
-        perl             => '5.018',
+        perl             => '5.024',
     },
 );
 

@@ -1,7 +1,7 @@
 package Log::ger::Plugin::OptAway;
 
-our $DATE = '2017-08-03'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-05-02'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ Log::ger::Plugin::OptAway - Optimize away higher-level log statements
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ This plugin replaces logging statements that are higher than the current level
 magic at compile-time. The logging statements will become no-op and will have
 zero run-time overhead.
 
-By default, since C<$Current_Level> is pre-set at 3 (warn) then C<log_info()>,
+By default, since C<$Current_Level> is pre-set at 30 (warn) then C<log_info()>,
 C<log_debug()>, and C<log_trace()> calls will be turned into no-op.
 
 Caveats:
@@ -105,7 +105,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

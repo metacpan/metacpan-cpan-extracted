@@ -6,7 +6,7 @@ use Test::Mojo;
 use Mojo::ByteStream 'b';
 my $t = Test::Mojo->with_roles('+Slovo')->install(
 
-# '.', '/tmp/slovo'
+                     '.', '/tmp/slovo'
 )->new('Slovo');
 my $app = $t->app;
 isa_ok($app, 'Slovo');
@@ -66,18 +66,39 @@ subtest remove_user => sub {
 };
 
 # Create stranici
-my $stranici_url = $app->url_for('store_stranici')->to_string;
+my $stranici_url  = $app->url_for('store_stranici')->to_string;
+my $stranici_url4 = "$stranici_url/4";
+my $sform = {
+             alias       => 'събития',
+             page_type   => 'обичайна',
+             permissions => '-rwxr-xr-x',
+             published   => 1,
+             title       => 'Събития',
+             body        => 'Някaкъв по-дълъг теѯт, който е тяло на писанѥто.',
+             language    => 'bg-bg'
+            };
 subtest create_stranici => sub {
-  my $form = {
-              alias       => 'относно',
-              page_type   => 'заглавѥ',
-              permissions => '-rwxr-xr-x',
-              published   => 1,
-              title       => 'Относно',
-              body        => 'Някякъв по-дълъг теѯт, който е тяло на писанѥто.',
-              language    => 'bg-bg'
-             };
-  $t->post_ok($stranici_url => form => $form)->status_is(201);
+  $t->post_ok($stranici_url => form => $sform)->status_is(201)
+    ->header_is(Location => $stranici_url4, 'Location: /Ꙋправленѥ/stranici/4')
+    ->content_is('', 'empty content')->status_is(201);
+  $t->get_ok($stranici_url4)->status_is(200)->content_like(qr/събития/);
+  is(@{$app->celini->all({where => {alias => 'събития'}})}, 1,
+     'only one title');
+};
+
+# Update stranici
+subtest update_stranica => sub {
+  $sform->{alias} = 'събитияsss';
+  my $dom = $t->get_ok("$stranici_url4/edit?language=bg-bg")->tx->res->dom;
+  $sform->{title_id} = $dom->at('input[name="title_id"]')->{value};
+  $sform->{title}    = $dom->at('input[name="title"]')->{value};
+  $sform->{body}     = $dom->at('textarea[name="body"]')->text;
+
+  $t->put_ok($stranici_url4 => {Accept => '*/*'} => form => $sform)
+    ->status_is(302);
+  $t->get_ok($stranici_url4)->text_is('body p:nth-child(6)' => $sform->{alias});
+  is(@{$app->celini->all({where => {alias => 'събитияsss'}})},
+     1, 'alias for title changed too');
 };
 
 # Create celini

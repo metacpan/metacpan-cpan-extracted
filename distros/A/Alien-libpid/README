@@ -1,0 +1,31 @@
+NAME
+
+    Alien::libpid - Perl distribution for libpid
+
+VERSION
+
+    version 0.032
+
+INSTALL
+
+        cpan Alien::libpid
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-libpid
+
+SEE ALSO
+
+    libpid <http://github.com/a3f/libpid>
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,4 +1,6 @@
-Revision history for Perl extension DateTime::Calendar::Christian.
+0.07		2018-05-01	T. R. Wyant
+    - Add modules provided to the metadata. This is done only if
+      Module::Metadata can be loaded.
 
 0.06		2016-11-20	T. R. Wyant
     - Repackage licenses into LICENSE/ directory

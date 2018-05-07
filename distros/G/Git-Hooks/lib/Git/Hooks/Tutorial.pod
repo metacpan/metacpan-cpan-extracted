@@ -1,5 +1,5 @@
-# PODNAME: Git::Hooks Tutorials
-# ABSTRACT: Gentle introduction on Git::Hooks
+# PODNAME: Git::Hooks Tutorial
+# ABSTRACT: Gentle introduction to Git::Hooks
 
 __END__
 
@@ -9,18 +9,24 @@ __END__
 
 =head1 NAME
 
-Git::Hooks Tutorials - Gentle introduction on Git::Hooks
+Git::Hooks Tutorial - Gentle introduction to Git::Hooks
 
 =head1 VERSION
 
-version 2.9.5
+version 2.9.6
+
+=head1 NAME
+
+Tutorial - Gentle introduction to Git::Hooks users and Git administrators
+
+=head1 INTRODUCTION
 
 This document is intended to make it easy to start using the Git::Hooks
 framework as fast as possible, with a minimum of set up. There are major
 sections for Git users, administrators, and hook developers. After setting it up
 with these instructions you're ready to go.
 
-=head1 Tutorial for Git Users
+=head1 TUTORIAL FOR GIT USERS
 
 As a Git user you may be interested in enabling some hooks for your local Git
 repositories. In particular, you may be interested in guaranteeing that the same
@@ -202,7 +208,7 @@ environment variable homonymous to the plugin (you can use the plugin module
 full name or just its last component, as in the example above) for the duration
 of the commit and the plugin will be disabled.
 
-=head1 Tutorial for Git Administrators
+=head1 TUTORIAL FOR GIT ADMINISTRATORS
 
 As the administrator of a Git server you may be interested in enabling some
 hooks for your Git repositories to enforce project policies through source code
@@ -329,7 +335,7 @@ F<.git/config> files:
 
 Using include files you can manage complex configurations more easily.
 
-=head1 Tutorial for Gerrit Adminitrators
+=head1 TUTORIAL FOR GERRIT ADMINITRATORS
 
 Gerrit is a Git server but since it uses L<JGit|http://eclipse.org/jgit/>
 instead of standard Git, it doesn't support the standard Git hooks. It supports
@@ -399,7 +405,41 @@ mechanism has no such notion, but you can fake it using the same L<include
 mechanism discussed above|/Distributed configuration>. But you have to do it
 manually, though.
 
-=head1 Tutorial for Hook Developers
+=head1 TUTORIAL FOR BITBUCKET ADMINISTRATORS
+
+L<Bitbucket Server|https://www.atlassian.com/software/bitbucket/server> is a
+proprietary Git server made by Atlassian. It doesn't support the standard Git
+hooks natively. Instead, it supports its L<own
+hooks|https://confluence.atlassian.com/bitbucketserver/using-repository-hooks-776639836.html>
+which are L<implemented in Java as
+plugins|https://confluence.atlassian.com/bitbucketserverkb/how-to-create-a-simple-hook-in-bitbucket-server-779171711.html>.
+
+The commercial plugin L<External
+Hooks|https://marketplace.atlassian.com/plugins/com.ngs.stash.externalhooks.external-hooks/server/overview>
+allows you to use standard C<pre-receive> and C<post-receive> Git hooks with
+Bitbucket.
+
+Follow the plugin installation and L<configuration
+instructions|https://github.com/reconquest/atlassian-external-hooks/wiki/Configuration>
+to enable it for particular repositories. The plugin must be configured with an
+I<executable>, which can be our usual C<githooks.pl> script.
+
+Bibucket git repositories are kept in the server but are not easy to locate,
+because they're named after a numeric ID. In order to locate the repository
+directory in the server, go to its I<repository details> page in the
+I<repository settings> section in Bitbucket's web interface. The page shows the
+repository's B<location on disk> where you find the F<config> file which you
+must edit to configure Git::Hooks plugins.
+
+B<Note> that as of April, 2018, the External Hooks plugin's latest version (4.3)
+has an L<issue|https://github.com/reconquest/atlassian-external-hooks/issues/50>
+which prevents it to work with Git 2.11 or newer. Until this problem is fixed
+you have to make Bitbucket use Git 2.10 or older. You can specify which Git to
+use by defining the
+L<plugin.bitbucket-git.path.executable|https://confluence.atlassian.com/bitbucketserver/bitbucket-server-config-properties-776640155.html?_ga=2.152176889.1949745534.1525141700-1507802342.1510178253#BitbucketServerconfigproperties-SCM-git>
+option in the Bitbucket Server config properties file.
+
+=head1 TUTORIAL FOR HOOK DEVELOPERS
 
 I'm sorry but there is no gentle introduction to this. ;-)
 

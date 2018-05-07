@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.122';
+$Config::Model::Instance::VERSION = '2.123';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -524,11 +524,11 @@ sub write_back {
 
     foreach my $k ( keys %args ) {
         if ($k eq 'config_dir') {
-            $args{$_} ||= '';
-            $args{$_} .= '/' if $args{$_} and $args{$_} !~ m(/$);
+            $args{$k} ||= '';
+            $args{$k} .= '/' if $args{$k} and $args{$k} !~ m(/$);
         }
         elsif ( $k !~ /^(config_file|backend)$/ ) {
-            croak "write_back: wrong parameters $_";
+            croak "write_back: wrong parameters $k";
         }
     }
 
@@ -658,7 +658,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 

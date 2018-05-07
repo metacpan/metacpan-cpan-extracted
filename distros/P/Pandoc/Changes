@@ -1,5 +1,8 @@
 Revision history for Pandoc Perl module
 
+0.8.2  2018-05-06 15:37:34 CEST
+    - Add function pandoc_data_dir and extend method data_dir
+
 0.8.0  2018-04-06 12:28:03 CEST
     - Search executable in ~/.pandoc/bin
     - Download executables with 'pandoc-' prefix

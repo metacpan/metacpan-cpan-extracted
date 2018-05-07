@@ -10,15 +10,13 @@ use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
-use WebService::Braintree::CreditCardVerificationSearch;
+use Carp qw(confess);
+
 use WebService::Braintree::Util qw(validate_id);
 use WebService::Braintree::Validations qw(
     verify_params
     credit_card_verification_signature
 );
-use Carp qw(confess);
-
-has 'gateway' => (is => 'ro');
 
 use WebService::Braintree::_::CreditCardVerification;
 use WebService::Braintree::CreditCardVerificationSearch;
@@ -26,7 +24,6 @@ use WebService::Braintree::CreditCardVerificationSearch;
 sub find {
     my ($self, $id) = @_;
     confess "NotFoundError" unless validate_id($id);
-    my $response = $self->gateway->http->get("/verifications/$id");
     $self->_make_request("/verifications/$id", "get", undef)->verification;
 }
 

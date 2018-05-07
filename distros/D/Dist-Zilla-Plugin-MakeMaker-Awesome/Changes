@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Awesome
 
+0.42      2018-05-03 02:47:37Z
+  - fix for Dist::Zilla 7: ensure that the proper directory is used
+    for reading header and footer files
+
 0.41      2018-01-28 02:24:20Z
   - fix test that fails on MSWin32, by using makefile args properly
 

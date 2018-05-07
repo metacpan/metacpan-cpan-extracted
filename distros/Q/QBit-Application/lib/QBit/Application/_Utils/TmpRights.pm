@@ -1,5 +1,5 @@
 package QBit::Application::_Utils::TmpRights;
-$QBit::Application::_Utils::TmpRights::VERSION = '0.015';
+$QBit::Application::_Utils::TmpRights::VERSION = '0.016';
 use qbit;
 
 use base qw(QBit::Class);

@@ -1,8 +1,11 @@
-package Git::Message;
-# ABSTRACT: A Git commit message
-$Git::Message::VERSION = '2.9.5';
 use strict;
 use warnings;
+
+package Git::Message;
+# ABSTRACT: A Git commit message
+$Git::Message::VERSION = '2.9.6';
+use 5.010;
+use utf8;
 use Carp;
 
 sub new {
@@ -192,7 +195,7 @@ Git::Message - A Git commit message
 
 =head1 VERSION
 
-version 2.9.5
+version 2.9.6
 
 =head1 SYNOPSIS
 

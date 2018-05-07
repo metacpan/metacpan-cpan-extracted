@@ -2,6 +2,7 @@ use strict;
 use Test::More;
 use Test::Exception;
 use File::Which;
+use File::Spec::Functions 'catdir';
 use Pandoc;
 use Scalar::Util 'reftype';
 
@@ -99,7 +100,9 @@ plan skip_all => 'pandoc executable required' unless pandoc;
 # data_dir
 {
     if (-d $ENV{HOME}.'/.pandoc' and pandoc->version('1.11')) {
-        ok( pandoc->data_dir, 'pandoc->data_dir' );
+        my $dir = pandoc->data_dir;
+        ok $dir, 'pandoc->data_dir';
+        is catdir($dir, 'filters'), pandoc->data_dir('filters'), 'pandoc->data_dir(...)';
     }
 }
 

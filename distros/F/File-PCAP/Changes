@@ -1,5 +1,12 @@
 Revision history for File-PCAP
 
+v0.0.7  Thu May  3 21:58:22 CEST 2018
+	- changed File::PCAP::Reader->next_packet() to return nothing on
+	  end of file
+	- File::PCAP::ACAP2PCAP: Switch to next day when time of a
+	  datagram is earlier than the time of the last datagram.
+	  This leads to datagrams with timestamp in the future!
+
 v0.0.6  Wed Dec 13 02:21:30 CET 2017
 	- corrected error in
 	  File::PCAP::Reader->_read_pcap_global_header()

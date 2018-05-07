@@ -10,13 +10,11 @@ use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
 use Carp qw(confess);
-use WebService::Braintree::Validations qw(verify_params address_signature);
+
 use WebService::Braintree::Util qw(validate_id);
-use WebService::Braintree::Result;
+use WebService::Braintree::Validations qw(verify_params address_signature);
 
 use WebService::Braintree::_::Address;
-
-has 'gateway' => (is => 'ro');
 
 sub create {
     my($self, $params) = @_;
@@ -27,7 +25,7 @@ sub create {
 
 sub find {
     my ($self, $customer_id, $address_id) = @_;
-    confess "NotFoundError" unless (validate_id($address_id) && validate_id($customer_id));
+    confess "NotFoundError" unless validate_id($address_id) && validate_id($customer_id);
     $self->_make_request("/customers/$customer_id/addresses/$address_id", "get")->address;
 }
 
@@ -39,6 +37,7 @@ sub update {
 
 sub delete {
     my ($self, $customer_id, $address_id) = @_;
+    confess "NotFoundError" unless validate_id($address_id) && validate_id($customer_id);
     $self->_make_request("/customers/$customer_id/addresses/$address_id", "delete");
 }
 

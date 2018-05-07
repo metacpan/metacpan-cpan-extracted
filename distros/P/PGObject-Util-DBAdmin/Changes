@@ -1,6 +1,12 @@
 Revision history for PGObject-Util-DBAdmin
 
 
+0.130.0 2018-04-21
+        Backups use pg_dump and pg_dumpall `-f` option, not stdout capture
+        Document effect of localizing filehandles on output capture
+        Add `compress` parameter to backup() method
+        Set DB_TESTING=1 to run file tests as they require postgreSQL utilities
+
 0.120.0 2018-03-27
         Documentation fixes
         Don't use shell to execute external commands, blocks command injection
@@ -29,7 +35,7 @@ Revision history for PGObject-Util-DBAdmin
 
 0.10.0  2016-12-17
         Removed MYMETA.* (rt.cpan.org#109062)
-        Correct spelling errors reported by Robert James Clay (jame@rocasa.ru)
+        Correct spelling errors reported by Robert James Clay (jame@rocasa.us)
         Correct copyright years (rt.cpan.org#117202 and #10)
 
 0.09    2016-07-18

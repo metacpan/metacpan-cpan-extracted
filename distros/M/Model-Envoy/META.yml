@@ -1,0 +1,39 @@
+---
+abstract: 'A Moose Role that can be used to build a model layer that keeps business logic separate from your storage layer.'
+author:
+  - 'Stephen Howard <stephen@enterity.com>'
+build_requires:
+  Test::Exception: '0.43'
+  Test::More: '1.302085'
+configure_requires:
+  Module::Build: '0.4211'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Model-Envoy
+provides:
+  Model::Envoy:
+    file: lib/Model/Envoy.pm
+    version: '0.1'
+  Model::Envoy::Meta::Attribute::Trait::Envoy:
+    file: lib/Model/Envoy.pm
+  Model::Envoy::Set:
+    file: lib/Model/Envoy/Set.pm
+    version: '0.1'
+  Model::Envoy::Storage::DBIC:
+    file: lib/Model/Envoy/Storage/DBIC.pm
+    version: '0.1'
+  Moose::Meta::Attribute::Custom::Trait::DBIC:
+    file: lib/Model/Envoy/Storage/DBIC.pm
+  Moose::Meta::Attribute::Custom::Trait::Envoy:
+    file: lib/Model/Envoy.pm
+  MooseX::Meta::Attribute::Trait::DBIC:
+    file: lib/Model/Envoy/Storage/DBIC.pm
+requires:
+  DBIx::Class: '0.082840'
+  Moose: '2.2010'
+  perl: v5.18.2
+version: '0.1'

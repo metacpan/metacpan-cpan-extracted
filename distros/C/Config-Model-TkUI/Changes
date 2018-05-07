@@ -1,3 +1,10 @@
+1.366 2018-05-07
+
+    * dist.ini: update © year
+    * use init_test in t/config-model-*.t
+      (build requires Config::Model::Tester 3.006)
+    * Fix test model that broke with Config::Model 2.123
+    
 1.365 2017-11-19
 
     * display node gist in tree widget (req Config::Model 2.114)

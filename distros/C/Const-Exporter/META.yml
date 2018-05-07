@@ -9,6 +9,7 @@ build_requires:
   Test::More: '0'
   Test::Most: '0'
   if: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -21,24 +22,20 @@ name: Const-Exporter
 provides:
   Const::Exporter:
     file: lib/Const/Exporter.pm
-    version: v0.3.1
+    version: v0.4.0
 recommends:
   Package::Stash::XS: '0'
   Ref::Util::XS: '0'
-  Storable: '0'
 requires:
-  Carp: '0'
   Const::Fast: '0'
-  Exporter: '0'
+  List::AllUtils: '0.10'
   Package::Stash: '0'
   Ref::Util: '0'
   perl: v5.10.0
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Const-Exporter/issues
   repository: git://github.com/robrwo/Const-Exporter.git
-version: v0.3.1
+version: v0.4.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'B. Estrade <estrabd@gmail.com>'

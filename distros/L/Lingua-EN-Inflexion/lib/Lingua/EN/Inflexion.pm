@@ -2,7 +2,7 @@ package Lingua::EN::Inflexion;
 use 5.010; use warnings;
 use Carp;
 
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 
 # Import noun, verb, and adj classes...
 use Lingua::EN::Inflexion::Term;
@@ -211,7 +211,7 @@ Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
 
 =head1 VERSION
 
-This document describes Lingua::EN::Inflexion version 0.001006
+This document describes Lingua::EN::Inflexion version 0.001007
 
 
 =head1 SYNOPSIS
@@ -346,9 +346,9 @@ calls, if the term it represents is uninflected. For example:
     adj('typical')->is_plural     # true
 
 
-=item  C<< singular() >>
+=item  C<< singular( $optional_person ) >>
 
-=item  C<< plural() >>
+=item  C<< plural( $optional_person ) >>
 
 Returns a string representing the corresponding inflexion of the term
 represented by the invocant. For example:
@@ -358,6 +358,40 @@ represented by the invocant. For example:
     say verb('is')->plural;        # "are"
 
     say adj("our")->singular;      # "my"
+
+If the optional argument is provided, it must be an integer between 1
+and 3, which specifies the grammatical "person" (1st , 2nd, or 3rd)
+that is wanted. Very few English nouns and adjectives are inflected
+by person, so this option only affects personal and possessive pronouns,
+possessive adjectives, and verbs:
+
+    say noun('she')->singular;      # "she"
+    say noun('she')->singular(1);   # "I"
+    say noun('she')->singular(2);   # "you"
+    say noun('she')->singular(3);   # "she"
+
+    say verb('am')->singular;       # "am"
+    say verb('am')->singular(1);    # "am"
+    say verb('am')->singular(2);    # "are"
+    say verb('am')->singular(3);    # "is"
+
+    say adj("my")->plural;       # "our"
+    say adj("my")->plural(1);    # "our"
+    say adj("my")->plural(2);    # "your"
+    say adj("my")->plural(3);    # "their"
+
+Note that, without the argument, the method always
+attempts to preserve the original person of the term:
+
+    say verb('am')->singular;       # "am"
+    say verb('are')->singular;      # "are"
+    say verb('is')->singular;       # "is"
+
+Also note that, where a plural noun or adjective has multiple 3rd-person
+singular forms, the method always prefers the gender neutral form:
+
+    say noun("they")->singular;     # "it"  (not "she" or "he")
+    say adj("our")->singular(3);    # "its" (not "hers" or "his")
 
 
 =item  C<< classical() >> or C<< unassimilated() >>
@@ -382,6 +416,8 @@ Returns a C<qr>'d regex object which would match (case-insensitively)
 any inflected form of the word. For example:
 
     $word =~ noun('cherub')->as_regex   # qr/cherubs|cherubim|cherub/i
+
+    $word =~ verb('eat')->as_regex      # qr/eats|eating|eaten|eat|ate/i
 
 =back
 

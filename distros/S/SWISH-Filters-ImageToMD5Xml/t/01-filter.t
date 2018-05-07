@@ -11,9 +11,8 @@ use_ok('SWISH::Filters::ImageToMD5Xml');
 my $filename = 't/test.jpg';
 my $subject  = SWISH::Filters::ImageToMD5Xml->new;
 my $xml      = $subject->filter( get_doc($filename) );
-my $md5      = qq/ &#163; L&#142;&#135;&#142;G&#176;&#189;QS&#34;F  /;
 
-like( $$xml, qr/$md5/, "filtered XML contained MD5 checksum" );
+like $$xml, qr/<md5>\w+<\/md5>/, "XML has md5_hex";
 
 done_testing();
 

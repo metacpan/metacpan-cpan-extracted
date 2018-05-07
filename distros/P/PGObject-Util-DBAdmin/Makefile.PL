@@ -14,7 +14,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
         'Test::More' => 0,
         'Test::Exception' => 0,
         'Perl::Critic' => 0,
@@ -34,8 +34,8 @@ WriteMakefile(
          resources => {
              repository => {
                  type => 'git',
-                 url  => 'https://github.com/einhverfr/PGObject-Util-DBAdmin.git',
-                 web  => 'https://github.com/einhverfr/PGObject-Util-DBAdmin',
+                 url  => 'https://github.com/ledgersmb/PGObject-Util-DBAdmin.git',
+                 web  => 'https://github.com/ledgersmb/PGObject-Util-DBAdmin',
              },
          },
     },

@@ -8,13 +8,11 @@ use Pcore -const, -export,
     YAML  => [qw[to_yaml from_yaml]],
     XML   => [qw[to_xml from_xml]],
     INI   => [qw[to_ini from_ini]],
-    TOML  => [qw[to_toml from_toml]],
     B64   => [qw[to_b64 to_b64_url from_b64 from_b64_url]],
-    B85   => [qw[to_b85 from_b85]],
     URI   => [qw[to_uri from_uri from_uri_query]],
     XOR   => [qw[to_xor from_xor]],
-    CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_ENC_B85 $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
-    TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI $DATA_TYPE_TOML]],
+    CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
+    TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI]],
   };
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
 use Pcore::Util::List qw[pairs];
@@ -28,11 +26,9 @@ const our $DATA_TYPE_CBOR => 3;
 const our $DATA_TYPE_YAML => 4;
 const our $DATA_TYPE_XML  => 5;
 const our $DATA_TYPE_INI  => 6;
-const our $DATA_TYPE_TOML => 7;
 
 const our $DATA_ENC_B64 => 1;
 const our $DATA_ENC_HEX => 2;
-const our $DATA_ENC_B85 => 3;
 
 const our $DATA_COMPRESS_ZLIB => 1;
 
@@ -91,9 +87,6 @@ sub encode_data ( $type, $data, @ ) {
     elsif ( $type == $DATA_TYPE_INI ) {
         $res = to_ini($data);
     }
-    elsif ( $type == $DATA_TYPE_TOML ) {
-        $res = to_toml($data);
-    }
     else {
         die qq[Unknown serializer "$type"];
     }
@@ -146,9 +139,6 @@ sub encode_data ( $type, $data, @ ) {
         }
         elsif ( $args{encode} == $DATA_ENC_HEX ) {
             $res = \unpack 'H*', $res->$*;
-        }
-        elsif ( $args{encode} == $DATA_ENC_B85 ) {
-            $res = \to_b85( $res->$* );
         }
         else {
             die qq[Unknown encoder "$args{encode}"];
@@ -204,9 +194,6 @@ sub decode_data ( $type, @ ) {
         }
         elsif ( $args{encode} == $DATA_ENC_HEX ) {
             $data_ref = \pack 'H*', $data_ref->$*;
-        }
-        elsif ( $args{encode} == $DATA_ENC_B85 ) {
-            $data_ref = \from_b85( $data_ref->$* );
         }
         else {
             die qq[Unknown encoder "$args{encode}"];
@@ -269,9 +256,6 @@ sub decode_data ( $type, @ ) {
     }
     elsif ( $type == $DATA_TYPE_INI ) {
         $res = from_ini($data_ref);
-    }
-    elsif ( $type == $DATA_TYPE_TOML ) {
-        $res = from_toml($data_ref);
     }
     else {
         die qq[Unknown serializer "$type"];
@@ -601,23 +585,6 @@ sub from_ini ( $data, @ ) {
     return $cfg;
 }
 
-# TOML
-sub to_toml ( $data, @ ) {
-    state $init = !!require TOML;
-
-    return \TOML::to_toml($data);
-}
-
-sub from_toml ( $data, @ ) {
-    state $init = !!require TOML;
-
-    my ( $hash, $err ) = TOML::from_toml( $data->$* );
-
-    die $err if $err;
-
-    return $hash;
-}
-
 # BASE64
 sub to_b64 {
     state $init = !!require MIME::Base64;
@@ -641,21 +608,6 @@ sub from_b64_url {
     state $init = !!require MIME::Base64;
 
     return &MIME::Base64::decode_base64url;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
-}
-
-# BASE85
-sub to_b85 {
-    state $init = !!require Convert::Ascii85;
-
-    state $args = { compress_zero => 1, compress_space => 1 };
-
-    return Convert::Ascii85::ascii85_encode( $_[0], $args );
-}
-
-sub from_b85 {
-    state $init = !!require Convert::Ascii85;
-
-    return &Convert::Ascii85::ascii85_decode;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
 # URI
@@ -819,16 +771,14 @@ sub to_xor ( $buf, $mask ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 51                   | * Subroutine "encode_data" with high complexity score (28)                                                     |
-## |      | 168                  | * Subroutine "decode_data" with high complexity score (29)                                                     |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 76, 255              | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
+## |      | 47                   | * Subroutine "encode_data" with high complexity score (26)                                                     |
+## |      | 158                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 379, 432             | * Postfix control "for" used                                                                                   |
-## |      | 805                  | * Postfix control "while" used                                                                                 |
+## |      | 363, 416             | * Postfix control "for" used                                                                                   |
+## |      | 757                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 669                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 621                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

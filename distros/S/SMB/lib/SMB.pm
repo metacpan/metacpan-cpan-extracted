@@ -18,15 +18,17 @@ package SMB;
 use strict;
 use warnings;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 use constant {
 	STATUS_SUCCESS                  => 0x00000000,
 	STATUS_PENDING                  => 0x00000103,
 	STATUS_NOTIFY_ENUM_DIR          => 0x0000010c,
+	STATUS_INVALID_SMB              => 0x00010002,
 	STATUS_SMB_BAD_TID              => 0x00050002,
 	STATUS_OS2_INVALID_LEVEL        => 0x007c0001,
 	STATUS_NO_MORE_FILES            => 0x80000006,
+	STATUS_NOT_IMPLEMENTED          => 0xc0000002,
 	STATUS_INVALID_PARAMETER        => 0xc000000d,
 	STATUS_NO_SUCH_DEVICE           => 0xc000000e,
 	STATUS_NO_SUCH_FILE             => 0xc000000f,
@@ -35,6 +37,7 @@ use constant {
 	STATUS_NO_FREE_MEMORY           => 0xc0000017,
 	STATUS_ACCESS_DENIED            => 0xc0000022,
 	STATUS_BUFFER_TOO_SMALL         => 0xc0000023,
+	STATUS_OBJECT_NAME_INVALID      => 0xC0000033,
 	STATUS_OBJECT_NAME_NOT_FOUND    => 0xc0000034,
 	STATUS_OBJECT_NAME_COLLISION    => 0xc0000035,
 	STATUS_OBJECT_PATH_NOT_FOUND    => 0xc000003a,
@@ -52,6 +55,7 @@ use constant {
 	STATUS_FILE_CLOSED              => 0xc0000128,
 	STATUS_INVALID_LEVEL            => 0xc0000148,
 	STATUS_FS_DRIVER_REQUIRED       => 0xc000019c,
+	STATUS_NOT_FOUND                => 0xc0000225,
 	STATUS_NOT_A_REPARSE_POINT      => 0xc0000275,
 };
 
@@ -67,7 +71,7 @@ sub new ($%) {
 	my $class = shift;
 	my %options = @_;
 
-	$options{log_level} ||= LOG_LEVEL_INFO;
+	$options{log_level} //= LOG_LEVEL_INFO;
 
 	my $self = {
 		%options,
@@ -326,24 +330,39 @@ SMB - A humble SMB network protocol implementation in Perl
 
 =head1 SYNOPSIS
 
+	# usage #1 - custom server
 	use SMB::Server;
 
 	my $server = SMB::Server->new(port => 10445);
 	$server->run;
 
 
+	# usage #2 - custom client
 	use SMB::Client;
 
 	my $client = SMB::Client->new('//10.0.2.2/test',
 		username => 'test',
 		password => 'secret',
+		log_level => SMB::LOG_LEVEL_DEBUG,
 	);
 	my $tree = $client->connect_tree;
-	$tree = $client->connect_tree('/test2');
 
+	# try another share if the first is not available
+	$tree ||= $client->connect_tree(share => 'test2') or die;
+
+	# list all txt files in the share
 	for my $file ($tree->find("*.txt")) {
-		printf "%-40s %s\n", $file->name, $file->mtime_string;
+		printf "%-40s %9s %s\n",
+			$file->name, $file->size_string, $file->mtime_string;
 	}
+
+	# rotate, download and remove remote log
+	use POSIX qw(strftime);
+	my $new_filename = strftime("%Y%m%d-%H%M%S.log", localtime);
+
+	$tree->rename("my.log", $new_filename) or die "Failed to rotate";
+	$tree->dnload($new_filename) or die "Failed to download";
+	$tree->remove($new_filename) or die "Failed to remove";
 
 =head1 ABSTRACT
 
@@ -365,10 +384,11 @@ existing SMB server and client implementations.
 SMB-Perl library is an implementation of SMB protocol, including simple
 SMB client and server functionality.
 
-SMB is a base class for many SMB::* classes.
+SMB is a base class for many SMB::* classes. The following documents this
+super-class only. See corresponding sub-classes for their own description.
 
-It provides a common logging and debugging functionality and some sugar,
-like auto-created getter and setter methods for all object fields.
+SMB class provides common logging and debugging functionality, and some
+sugar, like auto-created getter and setter methods for all object fields.
 It also defines some core SMB protocol constants, like status codes.
 
 =head1 METHODS
@@ -384,29 +404,56 @@ The sub-classes may omit a constructor, then this one is used, or they
 may overload it and call $class->SUPER::new(%options) to obtain the newly
 created object.
 
-=item log IS_ERROR FORMAT [ARGS]
+Common fields:
+
+ * log_level - maximal log level to expose to the caller, per object
+
+The default log_level value is 2 (INFO level). To disable logs emitted by
+the object, pass (log_level => 0) in its constructor.
+
+The log levels are:
+
+ * 0 (SMB::LOG_LEVEL_NONE)
+ * 1 (SMB::LOG_LEVEL_ERROR)
+ * 2 (SMB::LOG_LEVEL_INFO)
+ * 3 (SMB::LOG_LEVEL_DEBUG)
+ * 4 (SMB::LOG_LEVEL_TRACE)
+
+=item log LEVEL FORMAT [ARGS]
 
 This method is used for logging. The message is composed by "sprintf"
 FORMAT and ARGS, and is by default written to standard output.
 
-The logging is enabled by default, unless (quiet => 1) is passed in
-constructor.
+The sub-classes may overload this method, to write logs to a file or
+implement a custom logic when and what to log.
 
-The error messages (IS_ERROR=1) are prefixed with "! ", the normal
-messages are prefixed with "* ".
+The logging is enabled by default on at most INFO level, this is
+controllable by passing I<log_level> in the constructor.
 
-=item msg FORMAT [ARGS]
-
-The same as B<log> with IS_ERROR=0.
+The error messages (LEVEL=1) are prefixed with "! ", the normal messages
+are prefixed with "* ".
 
 =item err FORMAT [ARGS]
 
-The same as B<log> with IS_ERROR=1.
+The same as B<log> with LEVEL=1.
 
-=item mem BUFFER [LABEL]
+=item msg FORMAT [ARGS]
 
-If the logging is enabled, logs a message containg LABEL and BUFFER size
-in bytes and then a nice memory dump, looking like:
+The same as B<log> with LEVEL=2.
+
+=item dbg FORMAT [ARGS]
+
+The same as B<log> with LEVEL=3.
+
+=item trc FORMAT [ARGS]
+
+The same as B<log> with LEVEL=4.
+
+=item mem BUFFER [LABEL] [LEVEL=4]
+
+If the logging on TRACE (or other explicitely passed) level is enabled,
+logs a message containg LABEL and BUFFER size in bytes and then a nice
+memory dump, looking like:
 
  * NBSS + SMB Negotiate Request (216 bytes):
  000 | 00 00 00 d4 ff 53 4d 42  72 00 00 00 00 18 43 c8 | ___..SMB r____.C. |
@@ -464,7 +511,7 @@ about what was omitted.
 
 =item FIELD NEW_VALUE
 
-For each field in the object, the method of this name is auto-create on
+For each field in the object, the method of this name is auto-created on
 demand. This method returns the field value if there are no arguments
 (getter) and sets NEW_VALUE if there is a single argument (setter).
 
@@ -472,13 +519,15 @@ demand. This method returns the field value if there are no arguments
 
 =head1 FUNCTIONS
 
-No functions are exported, so functions and status code constants should
-be prefixed by the package namespace, like:
+No functions are exported, so functions and constants (status codes and
+log levels) should be prefixed by the package namespace, like:
 
 	print SMB::dump_value($nested_array);
 
 	$status = SMB::STATUS_CANNOT_DELETE
 		if $status == SMB::STATUS_ACCESS_DENIED;
+
+	my $obj = SMBx::MyClass->new(log_level => SMB::LOG_LEVEL_DEBUG);
 
 =over 4
 

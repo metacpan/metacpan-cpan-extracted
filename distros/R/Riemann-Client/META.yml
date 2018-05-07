@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/miquelruiz/Riemann-Client/issues
   homepage: http://metacpan.org/release/Riemann-Client/
   repository: git://github.com/miquelruiz/Riemann-Client.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

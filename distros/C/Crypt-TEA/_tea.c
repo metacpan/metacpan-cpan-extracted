@@ -1,6 +1,5 @@
 /*
- * $Id: _tea.c,v 1.25 2001/05/21 17:32:59 ams Exp $
- * Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
+ * Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
  */
 
 #include "tea.h"

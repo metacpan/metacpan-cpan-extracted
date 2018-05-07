@@ -2,13 +2,16 @@
 
 use Test::More tests => 3;
 
-BEGIN {
+BEGIN
+{
     # TEST
-	use_ok( 'Test::Count' );
+    use_ok('Test::Count');
+
     # TEST
-	use_ok( 'Test::Count::Parser' );
+    use_ok('Test::Count::Parser');
+
     # TEST
-	use_ok( 'Test::Count::Filter::ByFileType::App');
+    use_ok('Test::Count::Filter::ByFileType::App');
 }
 
-diag( "Testing Test::Count $Test::Count::VERSION, Perl $], $^X" );
+diag("Testing Test::Count $Test::Count::VERSION, Perl $], $^X");

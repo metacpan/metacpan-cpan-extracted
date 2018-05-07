@@ -5,13 +5,15 @@ probe [ 'which doxyparse' ];
 share {
   requires 'Alien::flex';
   requires 'Alien::bison';
-  requires 'Alien::CMake';
+  requires 'Alien::cmake3';
   requires 'Alien::m4';
   start_url 'https://codeload.github.com/analizo/doxyparse/tar.gz/1.8.14-6';
   download [ 'wget %{.meta.start_url}' ];
+  download [ 'wget --no-check-certificate %{.meta.start_url}' ];
+  download [ 'curl %{.meta.start_url} -o doxyparse-1.8.14-6.tar.gz' ];
   extract [ 'tar zxf %{.install.download}' ];
   build [
-    [ 'cmake -G "Unix Makefiles" -Dbuild_parse=ON -DCMAKE_INSTALL_PREFIX=%{alien.install.prefix}' ],
+    [ 'cmake -G "Unix Makefiles" -Dbuild_parse=ON -DCMAKE_INSTALL_PREFIX=%{.install.prefix}' ],
     [ '%{make}' ],
     [ '%{make} install' ],
   ];

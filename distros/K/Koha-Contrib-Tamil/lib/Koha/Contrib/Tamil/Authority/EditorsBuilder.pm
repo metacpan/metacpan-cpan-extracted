@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Authority::EditorsBuilder;
 #ABSTRACT: Build Unimarc editor field bases on ISBN
-$Koha::Contrib::Tamil::Authority::EditorsBuilder::VERSION = '0.055';
+$Koha::Contrib::Tamil::Authority::EditorsBuilder::VERSION = '0.057';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -154,7 +154,7 @@ Koha::Contrib::Tamil::Authority::EditorsBuilder - Build Unimarc editor field bas
 
 =head1 VERSION
 
-version 0.055
+version 0.057
 
 =head1 AUTHOR
 

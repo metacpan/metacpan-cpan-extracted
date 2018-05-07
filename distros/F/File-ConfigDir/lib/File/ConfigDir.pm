@@ -26,7 +26,7 @@ File::ConfigDir - Get directories of configuration files
 
 =cut
 
-$VERSION   = '0.020';
+$VERSION   = '0.021';
 @EXPORT_OK = (
     qw(config_dirs system_cfg_dir desktop_cfg_dir),
     qw(xdg_config_dirs machine_cfg_dir),
@@ -489,8 +489,8 @@ sub xdg_config_home
 
 my (@extensible_bases, @pure_bases);
 push(@extensible_bases,
-    $system_cfg_dir, $desktop_cfg_dir, $local_cfg_dir, $singleapp_cfg_dir, $vendorapp_cfg_dir, $core_cfg_dir,
-    $site_cfg_dir,   $vendor_cfg_dir,  $here_cfg_dir,  $user_cfg_dir,      $xdg_config_home);
+    $system_cfg_dir, $desktop_cfg_dir, $local_cfg_dir,    $singleapp_cfg_dir, $vendorapp_cfg_dir, $core_cfg_dir,
+    $site_cfg_dir,   $vendor_cfg_dir,  $locallib_cfg_dir, $here_cfg_dir,      $user_cfg_dir,      $xdg_config_home);
 push(@pure_bases, 3);
 
 =head2 config_dirs

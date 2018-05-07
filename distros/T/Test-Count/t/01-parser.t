@@ -9,12 +9,14 @@ use Test::Count::Parser;
 
 {
     my $parser = Test::Count::Parser->new();
+
     # TEST
-    ok ($parser, "Checking for parser initialization.");
+    ok( $parser, "Checking for parser initialization." );
 }
 
 {
     my $parser = Test::Count::Parser->new();
+
     # TEST
     $parser->update_assignments(
         {
@@ -26,7 +28,7 @@ use Test::Count::Parser;
             text => q{$NUM_ITERS*$TESTS_PER_ITER}
         },
     );
-    is ($parser->get_count(), 35, "Checking for correct calculation");
+    is( $parser->get_count(), 35, "Checking for correct calculation" );
 }
 
 {
@@ -47,8 +49,9 @@ use Test::Count::Parser;
             text => q{$myvar+$TESTS_PER_ITER}
         },
     );
+
     # TEST
-    is ($parser->get_count(), 10, "2 update_assignments()'s");
+    is( $parser->get_count(), 10, "2 update_assignments()'s" );
 }
 
 {
@@ -64,6 +67,7 @@ use Test::Count::Parser;
             text => q{$var1-30}
         }
     );
+
     # Now count is 70
 
     $parser->update_assignments(
@@ -76,8 +80,9 @@ use Test::Count::Parser;
             text => q{$shlomif*4},
         }
     );
+
     # TEST
-    is ($parser->get_count(), 270, "2 update_count()'s");
+    is( $parser->get_count(), 270, "2 update_count()'s" );
 }
 
 {
@@ -87,8 +92,9 @@ use Test::Count::Parser;
             text => q{7/2}
         }
     );
+
     # TEST
-    is ($parser->get_count(), 3, "use integer");
+    is( $parser->get_count(), 3, "use integer" );
 }
 
 {
@@ -120,9 +126,8 @@ use Test::Count::Parser;
     );
 
     # TEST
-    is ($parser->get_count(), 6,
-        "Using a variable whose value is 0 inside an expression"
-    );
+    is( $parser->get_count(), 6,
+        "Using a variable whose value is 0 inside an expression" );
 }
 
 {
@@ -150,9 +155,7 @@ use Test::Count::Parser;
     );
 
     # TEST
-    is ($parser->get_count(), 2,
-        "Testing ++",
-    );
+    is( $parser->get_count(), 2, "Testing ++", );
 
     $parser->update_assignments(
         {
@@ -173,7 +176,9 @@ use Test::Count::Parser;
     );
 
     # TEST
-    is ($parser->get_count(), (2+(2+1)*3),
+    is(
+        $parser->get_count(),
+        ( 2 + ( 2 + 1 ) * 3 ),
         "Testing assignment to a ++'ed variable",
     );
 }

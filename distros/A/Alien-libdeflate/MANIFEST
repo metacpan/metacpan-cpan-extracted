@@ -1,0 +1,13 @@
+alienfile
+Changes
+cpanfile
+lib/Alien/libdeflate.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/basic.t
+t/compile.t
+xt/kwalitee.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

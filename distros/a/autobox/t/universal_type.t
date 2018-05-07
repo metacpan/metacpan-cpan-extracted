@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Test::Fatal qw(exception);
 use Test::More tests => 32;
 
 my $undef;
@@ -18,12 +19,10 @@ my $eundef = qr{^Can't call method "autobox_class" on an undefined value\b};
 {
     use autobox UNIVERSAL => 'autobox::universal';
 
-    # confirm that UNIVERSAL doesn't include UNDEF if UNDEF is not explicitly bound
-    eval { is(undef->autobox_class->can('type'), $type) };
-    like ($@, $eundef);
-
-    eval { is($undef->autobox_class->can('type'), $type) };
-    like ($@, $eundef);
+    # confirm that UNIVERSAL doesn't include UNDEF if UNDEF is not explicitly
+    # bound
+    like(exception { undef->autobox_class->can('type') }, $eundef);
+    like(exception { $undef->autobox_class->can('type') }, $eundef);
 
     is(42->autobox_class->can('type'), $type);
     is(42->type, 'INTEGER');

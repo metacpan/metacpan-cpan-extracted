@@ -25,5 +25,6 @@ t/to_pair.t
 t/nexted_kv_same_statement.t
 t/hash_while_kv.t
 t/each_via_ref.t
+t/array_while_kv.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

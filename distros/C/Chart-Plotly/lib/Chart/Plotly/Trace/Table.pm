@@ -11,8 +11,9 @@ use Chart::Plotly::Trace::Table::Domain;
 use Chart::Plotly::Trace::Table::Header;
 use Chart::Plotly::Trace::Table::Hoverlabel;
 use Chart::Plotly::Trace::Table::Stream;
+use Chart::Plotly::Trace::Table::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Table view for detailed data viewing. The data are arranged in a grid of rows and columns. Most styling can be specified for columns, rows or individual cells. Table is using a column-major order, ie. the grid is represented as a vector of column vectors.
 
@@ -149,6 +150,9 @@ has showlegend => (
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Table::Stream", );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Table::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -173,7 +177,7 @@ Chart::Plotly::Trace::Table - Table view for detailed data viewing. The data are
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -316,6 +320,8 @@ Array containing integer indices of selected points. Has an effect only for trac
 Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * stream
+
+=item * transforms
 
 =item * uid
 

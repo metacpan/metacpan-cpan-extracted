@@ -4,17 +4,18 @@ use Moo::Role;
 use Plack::Util ();
 use Plack::MIME ();
 use HTTP::Date ();
-use File::Spec;
+use File::Spec ();
+use Cwd ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub serve_file {
   my $c = shift;
   my $options = ref($_[-1]) ? pop @_ : +{};
   my $config = $c->config->{'Plugin::Static::Simple'} || +{};
+  my %settings = (%$config, %$options);
 
-  $c->log->abort(1) unless $config->{show_log}
-    || $options->{show_log};
+  $c->log->abort(1) unless $settings{show_log};
 
   my $file_proto = File::Spec->catdir(
     File::Spec->no_upwards(
@@ -27,13 +28,12 @@ sub serve_file {
 
   my $content_type = Plack::MIME->mime_type($full_path) || 'application/octet';
 
-  my $allowed_content_types = $options->{allowed_content_types} || $config->{allowed_content_types};
-  if($allowed_content_types) {
+  if(my $allowed_content_types = $settings{allowed_content_types}) {
     return undef unless scalar( grep { lc($content_type) eq lc($_) } @$allowed_content_types);
   }
 
   if ($content_type =~ m!^text/!) {
-    my $encoding =  $options->{encoding} || $config->{encoding} || "utf-8";
+    my $encoding =  $settings{encoding} || "utf-8";
     $content_type .= "; charset=$encoding";
   }
 
@@ -42,7 +42,8 @@ sub serve_file {
 
   Plack::Util::set_io_path($fh, Cwd::realpath($full_path)); # Support Xsendfile
 
-  $c->res->status(200);
+  my $status = $settings{status} || $settings{code} || 200;
+  $c->res->status($status);
   $c->res->headers->header(
     'Content-Type'   => $content_type,
     'Content-Length' => $stat->[7],
@@ -166,6 +167,17 @@ by setting this to true.
 By default we allow you to serve any file.  This may be dangerous if you are building
 your path arguments dynamically from uncontrolled sources.  In that case you can set
 this to an arrayref of allowed mime types ('text/html', 'application/javascript', etc.).
+
+=head2 status
+
+=head2 code
+
+Allows you to control the HTTP status code returned by the response.  Probably more
+useful in the controller rather than in config:
+
+    $c->serve_file(@args) || $c->serve_file('not_found', {code=>404});
+
+Both 'status' and 'code' are allowed.
 
 =head1 AUTHOR
 

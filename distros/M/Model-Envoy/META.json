@@ -1,0 +1,64 @@
+{
+   "abstract" : "A Moose Role that can be used to build a model layer that keeps business logic separate from your storage layer.",
+   "author" : [
+      "Stephen Howard <stephen@enterity.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Model-Envoy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4211"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.082840",
+            "Moose" : "2.2010",
+            "perl" : "v5.18.2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302085"
+         }
+      }
+   },
+   "provides" : {
+      "Model::Envoy" : {
+         "file" : "lib/Model/Envoy.pm",
+         "version" : "0.1"
+      },
+      "Model::Envoy::Meta::Attribute::Trait::Envoy" : {
+         "file" : "lib/Model/Envoy.pm"
+      },
+      "Model::Envoy::Set" : {
+         "file" : "lib/Model/Envoy/Set.pm",
+         "version" : "0.1"
+      },
+      "Model::Envoy::Storage::DBIC" : {
+         "file" : "lib/Model/Envoy/Storage/DBIC.pm",
+         "version" : "0.1"
+      },
+      "Moose::Meta::Attribute::Custom::Trait::DBIC" : {
+         "file" : "lib/Model/Envoy/Storage/DBIC.pm"
+      },
+      "Moose::Meta::Attribute::Custom::Trait::Envoy" : {
+         "file" : "lib/Model/Envoy.pm"
+      },
+      "MooseX::Meta::Attribute::Trait::DBIC" : {
+         "file" : "lib/Model/Envoy/Storage/DBIC.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1"
+}

@@ -1,11 +1,13 @@
+use strict;
+use warnings;
+
 package Git::Hooks::Test;
 # ABSTRACT: Git::Hooks testing utilities
-$Git::Hooks::Test::VERSION = '2.9.5';
+$Git::Hooks::Test::VERSION = '2.9.6';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use 5.010;
-use strict;
-use warnings;
+use utf8;
 use Carp;
 use Config;
 use Exporter qw/import/;
@@ -14,15 +16,15 @@ use Git::Repository 'GitHooks';
 use Test::More;
 
 our @EXPORT_OK = qw/
-	install_hooks
-	new_commit
-	newdir
-	new_repos
-	test_command
-	test_nok
-	test_nok_match
-	test_ok
-	test_ok_match
+        install_hooks
+        new_commit
+        newdir
+        new_repos
+        test_command
+        test_nok
+        test_nok_match
+        test_ok
+        test_ok_match
 /;
 
 our %EXPORT_TAGS = (
@@ -72,7 +74,7 @@ sub install_hooks {
         open my $fh, '>', $hook_pl or BAIL_OUT("Can't create $hook_pl: $!");
         state $debug = $ENV{DBG} ? '-d' : '';
         state $bliblib = $cwd->child('blib', 'lib');
-        print $fh <<EOS;
+        print $fh <<"EOS";
 #!$Config{perlpath} $debug
 use strict;
 use warnings;
@@ -86,7 +88,7 @@ EOS
             }
         }
 
-        print $fh <<EOS;
+        print $fh <<'EOS';
 use Git::Hooks;
 EOS
 
@@ -94,9 +96,9 @@ EOS
 
         # Not all hooks defined the GIT_DIR environment variable
         # (e.g., pre-rebase doesn't).
-        print $fh <<EOS;
-\$ENV{GIT_DIR}    = '.git' unless exists \$ENV{GIT_DIR};
-\$ENV{GIT_CONFIG} = "\$ENV{GIT_DIR}/config";
+        print $fh <<'EOS';
+$ENV{GIT_DIR}    = '.git' unless exists $ENV{GIT_DIR};
+$ENV{GIT_CONFIG} = "$ENV{GIT_DIR}/config";
 EOS
 
         # Reset HOME to avoid reading ~/.gitconfig
@@ -131,7 +133,7 @@ EOS
             (my $perl = $^X) =~ tr:\\:/:;
             $hook_pl =~ tr:\\:/:;
             my $d = $ENV{DBG} ? '-d' : '';
-            my $script = <<EOS;
+            my $script = <<"EOS";
 #!/bin/sh
 $perl $d $hook_pl $hook \"\$@\"
 EOS
@@ -319,7 +321,7 @@ Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 2.9.5
+version 2.9.6
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 

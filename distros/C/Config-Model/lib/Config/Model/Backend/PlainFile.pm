@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PlainFile;
-$Config::Model::Backend::PlainFile::VERSION = '2.122';
+$Config::Model::Backend::PlainFile::VERSION = '2.123';
 use 5.10.1;
 use Carp;
 use Mouse;
@@ -30,7 +30,7 @@ sub annotation { return 0; }
 # Hence the files must not be managed by backend manager.
 
 # file not opened by BackendMgr
-# file_path, io_handle are undef
+# file_path is undef
 sub skip_open { 1; }
 
 sub read {
@@ -43,7 +43,6 @@ sub read {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $check = $args{check} || 'yes';
@@ -121,7 +120,6 @@ sub write {
     # config_dir => /etc/foo',    # absolute path read
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $check = $args{check} || 'yes';
@@ -179,7 +177,6 @@ sub delete {
     # config_dir => /etc/foo',    # absolute path read
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $dir = $self->get_tuned_config_dir(%args);
@@ -215,7 +212,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 

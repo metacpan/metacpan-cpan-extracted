@@ -32,7 +32,6 @@
             "Perl::Tidy" : "0",
             "Test::More" : "0",
             "lib" : "0",
-            "lines" : "0",
             "perl" : "5.020"
          }
       },
@@ -70,6 +69,7 @@
             "MooseX::StrictConstructor" : "0",
             "PDL" : "2.007",
             "PDL::Core" : "0",
+            "PDL::NiceSlice" : "0",
             "POSIX" : "0",
             "Role::Tiny" : "1.003004",
             "Role::Tiny::With" : "0",
@@ -133,7 +133,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.631",
+   "version" : "3.641",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

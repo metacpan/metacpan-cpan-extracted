@@ -7,6 +7,7 @@ has enabled => sub { shift->assetpack->minify };
 has app => sub { shift->assetpack->app };
 has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{CombineFile} ||= {}; };
 has serve => sub { shift->assetpack->serve_cb };
+has revision => sub { shift->assetpack->revision // '' };
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -20,7 +21,6 @@ sub process {
   my $combine = Mojo::Collection->new;
   my @other;
   my $topic = $self->topic;
- 
   #~ return unless $self->enabled;!!! below
  
   for my $asset (@$assets) {
@@ -40,7 +40,7 @@ sub process {
   if (@$combine) {
     my $format = $combine->[0]->format;
     #~ my $checksum = checksum $topic;
-    my $checksum = checksum $topic.($self->app->config('version') // $self->app->config('версия') // '');#$combine->map('url')->join(':');
+    my $checksum = checksum $topic.$self->revision;#$combine->map('url')->join(':');
     
     #~ warn "Process CombineFile: ", $self->assetpack->app->dumper($combine), $checksum;
     
@@ -77,9 +77,9 @@ sub process {
     
     if ($self->config->{gzip} && ($self->config->{gzip}{min_size} || 1000) < $content->size) {
       gzip \($content->to_string) => \(my $gzip), {-Level => 9};
-      my $checksum_gzip = checksum($topic.($self->app->config('version') // $self->app->config('версия') // '').'.gzip');
-      DEBUG && diag 'GZIP asset topic=[%s] with checksum=[%s] and format=[%s] and rate=[%s/%s].', $topic, $checksum, $format, $content->size, length($gzip);
-      $self->assetpack->{by_checksum}{$checksum_gzip} = $self->assetpack->store->save(\$gzip, {key => "combine-file-gzip", url=>$topic.'.gzip', name=>$topic.'.gzip', checksum=>$checksum_gzip, minified=>1, format=>$format,});
+      my $checksum_gzip = checksum $topic.$self->revision.'.gzip';
+      DEBUG && diag 'GZIP asset topic=[%s] with checksum=[%s] and format=[%s] and rate=[%s/%s].', $topic, $checksum_gzip, $format, $content->size, length($gzip);
+      $self->assetpack->{by_checksum}{$checksum_gzip} = $self->assetpack->store->save(\$gzip, {key => "combine-file-gzip", url=>$topic.'.gzip', name=>$topic.$self->revision.'.gzip', checksum=>$checksum_gzip, minified=>1, format=>$format,});
       
     }
   }
@@ -94,8 +94,8 @@ sub _cb_route_by_topic {
 return sub {
   my $c  = shift;
   my $topic = $c->stash('topic');
-  $c->stash('name'=>checksum $topic.($self->app->config('version') // $self->app->config('версия') // ''));
-  $c->stash('checksum'=>checksum $topic.($self->app->config('version') // $self->app->config('версия') // ''));
+  $c->stash('name'=>checksum Mojo::Util::encode 'UTF-8', $topic.$self->revision);
+  $c->stash('checksum'=>checksum Mojo::Util::encode 'UTF-8', $topic.$self->revision);
   return $self->serve->($c);
   
    #~ my $assets = $assetpack->processed($topic)

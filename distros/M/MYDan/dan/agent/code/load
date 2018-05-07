@@ -12,15 +12,23 @@ eval
     my ( $file, $position ) = $param{argv} ? @{$param{argv}} : @{$param{data}};
     die "file undef" unless $file;
 
-    die "Can't open '$file': $!" unless open my  $fh, '+<', $file;
+    die "Can't open '$file': $!\n" unless open my  $fh, '+<', $file;
+    syswrite( \*STDOUT, "MYDanExtractFile_::${file}::_MYDanExtractFile" ) unless $position;
 
     my ( $uid, $mode, $size ) = (stat $file)[4,2,7];
     $mode  = sprintf( "%04o", $mode & 07777 );
-    printf "%d:%s:%s:%s:", 
+    syswrite \*STDOUT, sprintf "%d:%s:%s:%s:", 
         $size, Digest::MD5->new()->addfile( $fh )->hexdigest(),( getpwuid($uid) )[0], $mode;
 
-    seek $fh, $position || 0, 0;
-    while( <$fh> ) { print $_; }
+    if( $position )
+    {
+        seek $fh, $position, 0;
+        my ( $n, $buf );
+        while( $n = sysread $fh, $buf, 102400 )
+        {
+            syswrite \*STDOUT, $buf;
+        }
+    }
 
     exit 0;
 };

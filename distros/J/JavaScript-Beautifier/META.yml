@@ -21,7 +21,7 @@ provides:
     version: '0.21'
   JavaScript::Beautifier:
     file: lib/JavaScript/Beautifier.pm
-    version: '0.24'
+    version: '0.25'
 requires:
   Getopt::Long: '0'
   IO::File: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/fayland/perl-javascript-beautifier/tree/master
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

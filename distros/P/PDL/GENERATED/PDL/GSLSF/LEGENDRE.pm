@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::LEGENDRE;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_legendre_Pl PDL::PP gsl_sf_legendre_Pl_array PDL::PP gsl_sf_legendre_Ql PDL::PP gsl_sf_legendre_Plm PDL::PP gsl_sf_legendre_Plm_array PDL::PP gsl_sf_legendre_sphPlm_array PDL::PP gsl_sf_legendre_sphPlm PDL::PP gsl_sf_conicalP_half PDL::PP gsl_sf_conicalP_mhalf PDL::PP gsl_sf_conicalP_0 PDL::PP gsl_sf_conicalP_1 PDL::PP gsl_sf_conicalP_sph_reg PDL::PP gsl_sf_conicalP_cyl_reg_e PDL::PP gsl_sf_legendre_H3d PDL::PP gsl_sf_legendre_H3d_array );
+@EXPORT_OK  = qw( PDL::PP gsl_sf_legendre_Pl PDL::PP gsl_sf_legendre_Pl_array PDL::PP gsl_sf_legendre_Ql PDL::PP gsl_sf_legendre_Plm PDL::PP gsl_sf_legendre_array PDL::PP gsl_sf_legendre_array_index PDL::PP gsl_sf_legendre_sphPlm PDL::PP gsl_sf_conicalP_half PDL::PP gsl_sf_conicalP_mhalf PDL::PP gsl_sf_conicalP_0 PDL::PP gsl_sf_conicalP_1 PDL::PP gsl_sf_conicalP_sph_reg PDL::PP gsl_sf_conicalP_cyl_reg_e PDL::PP gsl_sf_legendre_H3d PDL::PP gsl_sf_legendre_H3d_array );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -167,18 +167,46 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-=head2 gsl_sf_legendre_Plm_array
+=head2 gsl_sf_legendre_array
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int l=>num; int m)
+  Signature: (double x(); double [o]y(n); double [t]work(wn); char norm;  int lmax; int csphase)
 
-P_lm(x) for l from 0 to n-2+m.
-gsl_sf_legendre_Plm_array has been deprecated in GSL version 2.0. It is included here for backwards compatability and may be removed in a future release.  New code should use L<gsl_sf_legendre_array> instead.
+=for ref
+
+Calculate all normalized associated Legendre polynomials.
+
+=for usage
+
+$Plm = gsl_sf_legendre_array($x,'P',4,-1);
+
+The calculation is done for degree 0 <= l <= lmax and order 0 <= m <= l on the range abs(x)<=1.
+
+The parameter norm should be:
+
+=over 3
+
+=item 'P' for unnormalized associated Legendre polynomials P_l^m(x),
+
+=item 'S' for Schmidt semi-normalized associated Legendre polynomials S_l^m(x),
+
+=item 'Y' for spherical harmonic associated Legendre polynomials Y_l^m(x), or
+
+=item 'N' for fully normalized associated Legendre polynomials N_l^m(x).
+
+=back
+
+lmax is the maximum degree l.
+csphase should be (-1) to INCLUDE the Condon-Shortley phase factor (-1)^m, or (+1) to EXCLUDE it.
+
+See L<gsl_sf_legendre_array_index> to get the value of C<l> and C<m> in the returned vector.
+
+
 
 =for bad
 
-gsl_sf_legendre_Plm_array does not process bad values.
+gsl_sf_legendre_array processes bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -189,24 +217,30 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*gsl_sf_legendre_Plm_array = \&PDL::gsl_sf_legendre_Plm_array;
+*gsl_sf_legendre_array = \&PDL::gsl_sf_legendre_array;
 
 
 
 
 
-=head2 gsl_sf_legendre_sphPlm_array
+=head2 gsl_sf_legendre_array_index
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int n=>num; int m)
+  Signature: (int [o]l(n); int [o]m(n); int lmax)
 
-P_lm(x), normalized properly for use in spherical harmonics for l from 0 to n-2+m.
-gsl_sf_legendre_sphPlm_array has been deprecated in GSL version 2.0. It is included here for backwards compatability and may be removed in a future release.  New code should use L<gsl_sf_legendre_array> instead.
+=for ref
+
+Calculate the relation between gsl_sf_legendre_arrays index and l and m values.
+
+=for usage
+($l,$m) = gsl_sf_legendre_array_index($lmax);
+
+Note that this function is called differently than the corresponding GSL function, to make it more useful for PDL: here you just input the maximum l (lmax) that was used in C<gsl_sf_legendre_array> and it calculates all l and m values.
 
 =for bad
 
-gsl_sf_legendre_sphPlm_array does not process bad values.
+gsl_sf_legendre_array_index does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -217,7 +251,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*gsl_sf_legendre_sphPlm_array = \&PDL::gsl_sf_legendre_sphPlm_array;
+*gsl_sf_legendre_array_index = \&PDL::gsl_sf_legendre_array_index;
 
 
 

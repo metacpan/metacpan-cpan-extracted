@@ -41,6 +41,29 @@ sub bundle {
             warn "Couldn't find @{[ $dist->pathname ]}\n";
         }
     }
+
+    my $has_io_gzip = eval { require IO::Compress::Gzip; 1 };
+
+    my $ext   = $has_io_gzip ? ".txt.gz" : ".txt";
+    my $index = $cache_path->child("modules/02packages.details$ext");
+    $index->parent->mkpath;
+
+    warn "Writing $index\n";
+
+    my $out = $index->openw;
+    if ($has_io_gzip) {
+        $out = IO::Compress::Gzip->new($out)
+          or die "gzip failed: $IO::Compress::Gzip::GzipError";
+    }
+
+    $snapshot->index->write($out);
+    close $out;
+
+    unless ($has_io_gzip) {
+        unlink "$index.gz";
+        !system 'gzip', $index
+          or die "Running gzip command failed: $!";
+    }
 }
 
 sub install {

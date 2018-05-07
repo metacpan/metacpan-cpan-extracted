@@ -28,8 +28,8 @@ VERBOSE=
 LIMIT=10
 while getopts v opt; do
     case $opt in
-	v) VERBOSE=1 ;;
-	\?) usage 2
+        v) VERBOSE=1 ;;
+        \?) usage 2
     esac
 done
 shift $((OPTIND - 1))

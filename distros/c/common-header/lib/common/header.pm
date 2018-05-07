@@ -1,4 +1,4 @@
-package common::header v0.1.5;
+package common::header v0.1.6;
 
 # NOTE !!!WARNING!!! don't use indirect with strawberry perl
 # https://rt.cpan.org/Public/Bug/Display.html?id=102321
@@ -46,8 +46,6 @@ use if $^V ge 'v5.10', feature => ':all';
 no  if $^V ge 'v5.16', feature => 'array_base';
 
 use if $^V ge 'v5.22', re => 'strict';    # NOTE https://rt.perl.org/Public/Bug/Display.html?id=128313
-
-no multidimensional;
 
 # TODO mro caller
 BEGIN {

@@ -19,9 +19,17 @@ use VSGDR::StaticData;
 
 use version ; our $VERSION = qv('0.02');
 
-my $schema          = ($opt_tablename =~ m{ \A ([^.]+) \. ([^.]+) \z }xms) ? $1 : "dbo" ;
-my $table           = ($opt_tablename =~ m{ \A ([^.]+) \. ([^.]+) \z }xms) ? $2 : $opt_tablename;
-die 'bad tablename' if $table =~ m{ \. }xms or $schema =~ m{ \. }xms; # it went wrong if we still have an embedded .
+my $schema          = ($opt_tablename =~ m{ \A \[(.+)\] \. (\[.+\]) \z
+                                          | \A \[(.+)\] \. (.+)     \z
+                                          | \A (.+)     \. (\[.+\]) \z
+                                          | \A (.+)     \. (.+)     \z
+                                          }xmis) ? ($1||$3||$5||$7) : "dbo" ;
+my $table           = ($opt_tablename =~ m{ \A (\[.+\]) \. \[(.+)\] \z
+                                          | \A (\[.+\]) \. (.+)     \z
+                                          | \A (.+)     \. \[(.+)\] \z
+                                          | \A (.+)     \. (.+)     \z
+                                          }xmis) ? ($2||$4||$6||$8) : $opt_tablename ;
+#die 'bad tablename' if $table =~ m{ \. }xms or $schema =~ m{ \. }xms; # it went wrong if we still have an embedded .
 
 my $dbh             = DBI->connect("dbi:ODBC:${opt_connection}", q{}, q{}, { LongReadLen => 512000, AutoCommit => 1, RaiseError => 1 });
 
@@ -48,7 +56,7 @@ genStaticData.pl - Creates a static data script for a database table
 
 =head1 VERSION
 
-0.02
+0.03
 
 
 =head1 USAGE

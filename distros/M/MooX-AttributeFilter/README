@@ -1,0 +1,166 @@
+NAME
+    MooX::AttributeFilter - Implements 'filter' option for Moo-class
+    attributes
+
+VERSION
+    version 0.001002
+
+SYNOPSIS
+        package My::Class {
+            use Moo;
+            use MooX::AttributeFilter;
+        
+            has field => (
+                is     => 'rw',
+                filter => 'filterField',
+            );
+        
+            has lazyField => (
+                is      => 'rw',
+                lazy    => 1,
+                builder => sub { [1, 2, 3 ] },
+                filter  => 1,
+            );
+        
+            has incremental => (
+                is => 'rw',
+                filter => sub {
+                    my $this = shift;
+                    my ($val, $oldVal) = @_;
+                    if ( @_ > 1 && defined $oldVal ) {
+                        die "incremental attribute value may only increase"
+                            unless $val > $oldVal;
+                    }
+                    return $_[0];
+                }
+            );
+        
+            sub filterField {
+                my $this = shift;
+                return "filtered($_[0])";
+            }
+        
+            sub _filter_lazyField {
+                my $this = shift;
+                my @a = @{$_[0]};
+                push @a, -1;
+                return \@a;
+            }
+        }
+    
+        my $obj = My::Class->new( field => "initial" );
+        ($obj->field eq "filtered(initial)")  # True!
+        $obj->lazyField;                      # [ 1, 2, 3, -1 ]
+        $obj->field( "value" );               # "filtered(value)"
+        $obj->incremental( -1 );              # -1
+        $obj->incremental( 10 );              # 10
+        $obj->incremental( 9 );               # dies...
+    
+        $obj = My::Class->new( incremental => 1 ); # incremental is set to 1
+        $obj->incremental( 0 );                    # dies too.
+
+DESCRIPTION
+    The idea behind this extension is to overcome the biggest deficiency of
+    coercion: its ignorance about the object it is acting for. While
+    triggers are executed as methods, they don't receive the previous
+    attribute value; and they're called after the attribute is set.
+
+    Filter is a method which is called right before attribute value is about
+    to be set. It receives one or two arguments of which the first is the
+    new attribute value; the second is the old value. Number of arguments
+    passed depends on what stage the filter get called at: one is for the
+    construction, two is when set by writer.
+
+    Note: When an attribute was never set before and a writer is used then
+    the old value filter argument will be undefined.
+
+    It is also worth mentioning that a filter is called *always* upon
+    writing a value into attribute, including initialization from
+    constructor arguments or lazy builders. See the "SYNOPSIS". In both
+    cases the filter gets called with a single argument.
+
+    I.e.:
+
+        package LazyOne {
+            use Moo;
+            use MooX::AttributeFilter;
+        
+            has lazyField => (
+                is => 'rw',
+                lazy => 1,
+                default => "value",
+                filter => sub {
+                    my $this = shift;
+                    say "Arguments: ", scalar(@_);
+                    return $_[0];
+                },
+            );
+        }
+    
+        my $obj = LazyOne->new;
+        $obj->lazyField;        # Arguments: 1
+        $obj->lazyField("foo"); # Arguments: 2
+    
+        $obj = LazyOne->new( lazyField => "bar" );  # Arguments: 1
+        $obj->lazyField( "foobar" );                # Arguments: 2
+
+    Filter method must always return a (possibly modified) value.
+
+    Filter is called *before* any other attribute handlers. Its return value
+    is then subject for passing through "isa" and "coerce".
+
+  Use cases
+    Filters are of the most use when attribute value (or allowed values)
+    depends on other attributes of its object (or even other linked
+    objects). The dependency could be hard ("isa"-like) – i.e. an exception
+    must be thrown if value doesn't pass validation. Or it could be soft: by
+    storing a value calling code *suggest* what it would like to see in the
+    attribute but the result might be changed depending on the current
+    environment. For example:
+
+        package ChDir {
+            use File::Spec;
+            use Moo;
+            extends qw<Project::BaseClass>;
+            use MooX::AttributeFilter;
+        
+            has curDir => (
+                is => 'rw',
+                filter => 'fullPath',
+            );
+        
+            sub fullPath {
+                my $this = shift;
+                my ( $subdir ) = @_;
+            
+                return File::Spec->catdir(
+                    $this->testMode ? $this->baseTestDir : $this->baseDir,
+                    $subdir
+                );
+            }
+        }
+
+CAVEATS
+    * This module doesn't inflate into Moose.
+
+    * The code relies on low-level functionality of Method::Generate family
+    of modules. For this reason it may become incompatible with their future
+    versions if they get drastically changed.
+
+ACKNOWLEDGEMENTS
+    This work is a result of refusal to include filtering functionality into
+    the Moo core. Since the refusal was backed by strong reasoning while the
+    functionality itself is badly wanted there was no other choice but to
+    create the module... So, my great thanks to Graham Knopp
+    <haarg@haarg.org> for his advises, sample code, and Moo itself, of
+    course!
+
+AUTHOR
+    Vadim Belman <vrurg@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by Vadim Belman.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

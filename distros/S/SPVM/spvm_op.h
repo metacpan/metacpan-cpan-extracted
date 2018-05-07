@@ -59,6 +59,8 @@ enum {
   SPVM_OP_C_ID_CLASS_BLOCK,
   SPVM_OP_C_ID_TYPE,
   SPVM_OP_C_ID_CONSTANT,
+  SPVM_OP_C_ID_INC,
+  SPVM_OP_C_ID_DEC,
   SPVM_OP_C_ID_PRE_INC,
   SPVM_OP_C_ID_POST_INC,
   SPVM_OP_C_ID_PRE_DEC,
@@ -140,6 +142,7 @@ enum {
   SPVM_OP_C_ID_STRING_LT,
   SPVM_OP_C_ID_STRING_LE,
   SPVM_OP_C_ID_ISA,
+  SPVM_OP_C_ID_SEQUENCE,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -203,7 +206,6 @@ struct SPVM_op {
     SPVM_CALL_FIELD* call_field;
     SPVM_OUR* our;
     SPVM_PACKAGE_VAR* package_var;
-    SPVM_UNDEF* undef;
     SPVM_BLOCK* block;
     SPVM_DESCRIPTOR* descriptor;
   } uv;
@@ -211,9 +213,9 @@ struct SPVM_op {
   int32_t flag;
   int32_t line;
   _Bool moresib;
-  _Bool is_assign_to;
-  _Bool is_assign_from;
-  _Bool is_var_assign_from;
+  _Bool is_lvalue;
+  _Bool is_assigned_to_var;
+  _Bool is_passed_to_sub;
 };
 
 const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* sub);
@@ -228,7 +230,7 @@ int32_t SPVM_OP_get_my_index(SPVM_COMPILER* compiler, SPVM_OP* op_var);
 
 void SPVM_OP_insert_to_most_left_deep_child(SPVM_COMPILER* compiler, SPVM_OP* op_parent, SPVM_OP* op_child);
 
-SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_TYPE* type, const char* file, int32_t line);
 
 void SPVM_OP_resolve_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_package_var, SPVM_OP* op_package);
 
@@ -298,7 +300,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
 SPVM_OP* SPVM_OP_build_CONSTVALUE(SPVM_COMPILER* compiler, SPVM_OP* op_const);
 SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_field_base_name, SPVM_OP* op_descripters, SPVM_OP* type);
 SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
-SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
+SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages);
 SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package);

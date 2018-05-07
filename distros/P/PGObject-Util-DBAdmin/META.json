@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Perl::Critic" : "0",
-            "Perl::Critic::Policy::Modules::RequireExplicitInclusion" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -42,15 +39,23 @@
             "namespace::clean" : "0",
             "perl" : "5.01"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "Perl::Critic::Policy::Modules::RequireExplicitInclusion" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/einhverfr/PGObject-Util-DBAdmin.git",
-         "web" : "https://github.com/einhverfr/PGObject-Util-DBAdmin"
+         "url" : "https://github.com/ledgersmb/PGObject-Util-DBAdmin.git",
+         "web" : "https://github.com/ledgersmb/PGObject-Util-DBAdmin"
       }
    },
-   "version" : "v0.120.0"
+   "version" : "v0.130.0"
 }

@@ -1,3 +1,7 @@
+1.26    2018-05-01
+
+    * Build fixes for recent versions of Perl.
+
 1.25    2001-05-21
 
     * More Makefile.PL feature-probing updates.
@@ -18,6 +22,6 @@
     * This release should build cleanly under Win32. It still crashes
       under Activeperl; Any help with this problem would be appreciated.
 
-1.00    2001-03-30  (By Abhijit Menon-Sen <ams@wiw.org>)
+1.00    2001-03-30  (By Abhijit Menon-Sen <ams@toroid.org>)
 
     * First stable release.

@@ -13,7 +13,7 @@ use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 our $TICK = 0.02;
 
 sub new {
@@ -198,36 +198,33 @@ sub _exec {
     my $timeout;
     my $timeout_at = $self->{timeout} ? Time::HiRes::time() + $self->{timeout} : undef;
     my $select = IO::Select->new(grep $_, $stdout_read, $stderr_read);
-    while (1) {
+
+    while ($select->count) {
         if ($INT) {
             kill INT => $signal_pid;
-            last;
+            $INT = 0;
+        }
+        if ($timeout_at and !$timeout) {
+            my $now = Time::HiRes::time();
+            if ($now > $timeout_at) {
+                $timeout++;
+                kill TERM => $signal_pid;
+            }
         }
 
-        last if $select->count == 0;
         for my $ready ($select->can_read($TICK)) {
             my $type = $ready == $stdout_read ? "stdout" : "stderr";
             my $len = sysread $ready, my $buf, 64*1024;
-            if (!defined $len) {
-                warn "sysread pipe failed: $!";
-                last;
-            } elsif ($len == 0) {
-                $select->remove($ready);
-                close $ready;
-            } else {
+            if ($len) {
                 my $buffer = $self->{_buffer}{$type};
                 $buffer->add($buf);
                 next unless my @line = $buffer->get;
                 next unless my $sub = $self->{$type};
                 $sub->($_) for @line;
-            }
-        }
-        if ($timeout_at) {
-            my $now = Time::HiRes::time();
-            if ($now > $timeout_at) {
-                $timeout++;
-                kill TERM => $signal_pid;
-                last;
+            } else {
+                warn "sysread $type pipe failed: $!" unless defined $len;
+                $select->remove($ready);
+                close $ready;
             }
         }
     }
@@ -240,6 +237,7 @@ sub _exec {
     close $_ for $select->handles;
     waitpid $pid, 0;
     my $res = {
+        pid => $pid,
         result => $?,
         timeout => $timeout,
         stdout => $self->{_buffer}{stdout} ? $self->{_buffer}{stdout}->raw : "",
@@ -299,7 +297,7 @@ If an array of external commands is specified, it is automatically quoted on Win
 =item commandf
 
 a command string by C<sprintf>-like syntax.
-You can use positional formatting with conversions C<%q> (with quoting) and C<%s> (as it is).
+You can use positional formatting together with a conversion C<%q> (with quoting).
 
 Here is an example:
 
@@ -310,8 +308,6 @@ Here is an example:
   # or, you can set it separately
   my $cmd = Command::Runner->new;
   $cmd->commandf('%q %q >> %q', '/path/to/cat', 'foo bar.txt', 'out.txt');
-
-See L<String::Formatter> for details.
 
 =item timeout
 

@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.40-2-gb03dc7d
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.41-6-g1baeebe
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use Moose;
 use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
@@ -177,7 +177,7 @@ sub _build_WriteMakefile_args {
         }
     }
 
-    my @authors = @{ $self->zilla->authors };
+    my @authors = eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->authors : @{ $self->zilla->authors };
     my $exe_files = $self->exe_files;
 
     my %WriteMakefile = (
@@ -212,8 +212,9 @@ has eumm_version => (
     default => sub {
         my $self = shift;
         # do not unnecessarily raise the version just for listref AUTHOR
-        @{$self->zilla->authors} > 1 && $self->min_perl_version >= 5.013005
-            ? '6.5702' : 0,
+        return 0 if not $self->min_perl_version >= 5.013005;
+        ( eval { Dist::Zilla->VERSION('7.000') } ? ()= $self->zilla->authors : @{ $self->zilla->authors } ) > 1
+            ? '6.5702' : 0;
     },
 );
 
@@ -358,11 +359,16 @@ has header => (
 
 sub _build_header {
     my $self = shift;
-    $self->log_fatal([ 'header_file %s does not exist!', $self->header_file->stringify ])
-        if $self->header_file and not -e $self->header_file;
     join "\n",
         @{$self->header_strs},
-        ( $self->header_file ? path($self->header_file)->slurp_utf8 : () );
+        ( $self->header_file
+            ? do {
+                my $abs_file = path($self->zilla->root, $self->header_file);
+                $self->log_fatal([ 'header_file %s does not exist!', $self->header_file ])
+                    if not $abs_file->exists;
+                $abs_file->slurp_utf8
+            }
+            : () );
 }
 
 has footer_strs => (
@@ -388,11 +394,16 @@ has footer => (
 
 sub _build_footer {
     my $self = shift;
-    $self->log_fatal([ 'footer_file %s does not exist!', $self->footer_file->stringify ])
-        if $self->footer_file and not -e $self->footer_file;
     join "\n",
         @{$self->footer_strs},
-        ( $self->footer_file ? path($self->footer_file)->slurp_utf8 : () );
+        ( $self->footer_file
+            ? do {
+                my $abs_file = path($self->zilla->root, $self->footer_file);
+                $self->log_fatal([ 'footer_file %s does not exist!', $self->footer_file ])
+                    if not $abs_file->exists;
+                $abs_file->slurp_utf8
+            }
+            : () );
 }
 
 sub register_prereqs {
@@ -482,7 +493,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 

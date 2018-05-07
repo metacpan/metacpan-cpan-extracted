@@ -27,7 +27,7 @@ $model->create_config_class(
             qw/type leaf value_type uniline/,
         },
     ],
-    read_config => [{
+    rw_config => {
         backend     => 'IniFile',
         # specify where is the config file. this must match
         # the $conf_file_name and $conf_dir variable above
@@ -35,7 +35,7 @@ $model->create_config_class(
         assign_with => ' : ',
         config_dir  => '/etc/',
         file        => 'test.kv',
-    }],
+    },
 );
 
 

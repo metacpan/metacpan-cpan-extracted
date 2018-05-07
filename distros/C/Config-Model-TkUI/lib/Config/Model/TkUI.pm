@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2017 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.365';
+$Config::Model::TkUI::VERSION = '1.366';
 use 5.10.1;
 use strict;
 use warnings;

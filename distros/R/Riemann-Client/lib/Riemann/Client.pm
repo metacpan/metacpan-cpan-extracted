@@ -1,5 +1,5 @@
 package Riemann::Client;
-$Riemann::Client::VERSION = '0.04';
+$Riemann::Client::VERSION = '0.05';
 use Moo;
 use Net::Domain qw/hostfqdn/;
 
@@ -19,7 +19,7 @@ sub send {
     map {
         $_->{host} = hostfqdn() unless defined $_->{host};
         $_->{time} = time()     unless defined $_->{time};
-        $_->{metric_d} = delete $_->{metric} if $_->{metric};
+        $_->{metric_d} = delete $_->{metric} if exists $_->{metric};
     } @opts;
 
     return $self->transport->send({events => \@opts});

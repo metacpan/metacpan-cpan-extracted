@@ -38,7 +38,7 @@ use SNMP::Info::Layer2;
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.58';
+$VERSION = '3.60';
 
 %MIBS = (
     %SNMP::Info::Layer2::MIBS,
@@ -106,7 +106,7 @@ sub model {
     my $aerohive = shift;
     my $descr    = $aerohive->description();
 
-    if ( $descr =~ m/\bHive(AP\d+)\b/ix ) {
+    if ( $descr =~ m/\b(?:Hive|)(AP\d+)\b/ix ) {
         return $1;
     }
     return;

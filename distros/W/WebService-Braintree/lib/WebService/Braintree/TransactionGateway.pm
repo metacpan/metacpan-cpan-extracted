@@ -11,13 +11,12 @@ with 'WebService::Braintree::Role::MakeRequest';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
+
 use WebService::Braintree::Util qw(validate_id);
 use WebService::Braintree::Validations qw(
     verify_params transaction_signature clone_transaction_signature
     transaction_search_results_signature
 );
-
-has 'gateway' => (is => 'ro');
 
 use WebService::Braintree::_::Transaction;
 use WebService::Braintree::TransactionSearch;
@@ -35,33 +34,52 @@ sub find {
 }
 
 sub retry_subscription_charge {
-    my ($self, $subscription_id, $amount) = @_;
-    my $params = {
-        subscription_id => $subscription_id,
+    my ($self, $id, $amount) = @_;
+    confess "NotFoundError" unless validate_id($id);
+    $self->create({
+        subscription_id => $id,
         amount => $amount,
         type => "sale"
-    };
-
-    $self->create($params);
+    });
 }
 
 sub submit_for_settlement {
     my ($self, $id, $params) = @_;
+
+    confess "NotFoundError" unless validate_id($id);
+    confess "ArgumentError" unless verify_params($params, {
+        order_id => 1,
+        description => {
+            name => 1,
+            phone => 1,
+            url => 1,
+        },
+    });
+
     $self->_make_request("/transactions/$id/submit_for_settlement", "put", {transaction => $params});
 }
 
 sub void {
     my ($self, $id) = @_;
+    confess "NotFoundError" unless validate_id($id);
     $self->_make_request("/transactions/$id/void", "put", undef);
 }
 
 sub refund {
     my ($self, $id, $params) = @_;
+
+    confess "NotFoundError" unless validate_id($id);
+    confess "ArgumentError" unless verify_params($params, {
+        amount => 1,
+        order_id => 1,
+    });
+
     $self->_make_request("/transactions/$id/refund", "post", {transaction => $params});
 }
 
 sub clone_transaction {
     my ($self, $id, $params) = @_;
+    confess "NotFoundError" unless validate_id($id);
     confess "ArgumentError" unless verify_params($params, clone_transaction_signature);
     $self->_make_request("/transactions/$id/clone", "post", {transaction_clone => $params});
 }
@@ -84,26 +102,52 @@ sub search {
 
 sub hold_in_escrow {
     my ($self, $id) = @_;
+    confess "NotFoundError" unless validate_id($id);
     $self->_make_request("/transactions/$id/hold_in_escrow", "put", undef);
 }
 
 sub release_from_escrow {
     my ($self, $id) = @_;
+    confess "NotFoundError" unless validate_id($id);
     $self->_make_request("/transactions/$id/release_from_escrow", "put", undef);
 }
 
 sub cancel_release {
     my ($self, $id) = @_;
+    confess "NotFoundError" unless validate_id($id);
     $self->_make_request("/transactions/$id/cancel_release", "put", undef);
 }
 
 sub update_details {
     my ($self, $id, $params) = @_;
+
+    confess "NotFoundError" unless validate_id($id);
+    confess "ArgumentError" unless verify_params($params, {
+        amount => 1,
+        order_id => 1,
+        description => {
+            name => 1,
+            phone => 1,
+            url => 1,
+        },
+    });
+
     $self->_make_request("/transactions/$id/update_details", "put", { transaction => $params });
 }
 
 sub submit_for_partial_settlement {
     my ($self, $id, $amount, $params) = @_;
+
+    confess "NotFoundError" unless validate_id($id);
+    confess "ArgumentError" unless verify_params($params, {
+        order_id => 1,
+        description => {
+            name => 1,
+            phone => 1,
+            url => 1,
+        },
+    });
+
     $self->_make_request("/transactions/$id/submit_for_partial_settlement", "post", { transaction => {%$params, amount => $amount}});
 }
 

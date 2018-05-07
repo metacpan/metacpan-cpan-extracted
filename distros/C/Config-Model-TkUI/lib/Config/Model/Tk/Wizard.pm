@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2017 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Tk::Wizard;
-$Config::Model::Tk::Wizard::VERSION = '1.365';
+$Config::Model::Tk::Wizard::VERSION = '1.366';
 use strict;
 use warnings;
 use Carp;

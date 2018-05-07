@@ -5,7 +5,7 @@ extends 'Search::Tools::Object';
 use Text::Aspell;
 use Search::Tools::QueryParser;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 has 'query_parser' =>
     ( is => 'rw', default => sub { Search::Tools::QueryParser->new() } );

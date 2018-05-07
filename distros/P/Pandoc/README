@@ -1,79 +1,86 @@
 NAME
+
     Pandoc - wrapper for the mighty Pandoc document converter
 
 SYNOPSIS
+
       use Pandoc;             # check at first use
       use Pandoc 1.12;        # check at compile time
       Pandoc->require(1.12);  # check at run time
-
+    
       # execute pandoc
       pandoc 'input.md', -o => 'output.html';
       pandoc -f => 'html', -t => 'markdown', { in => \$html, out => \$md };
-
+    
       # alternative syntaxes
       pandoc->run('input.md', -o => 'output.html');
       pandoc [ -f => 'html', -t => 'markdown' ], in => \$html, out => \$md;
       pandoc [ -f => 'html', -t => 'markdown' ], { in => \$html, out => \$md };
-
+    
       # check executable
       pandoc or die "pandoc executable not found";
-
+    
       # check minimum version
       pandoc->version > 1.12 or die "pandoc >= 1.12 required";
-
+    
       # access properties
       say pandoc->bin." ".pandoc->version;
       say "Default user data directory: ".pandoc->data_dir;
       say "Compiled with: ".join(", ", keys %{ pandoc->libs });
       say pandoc->libs->{'highlighting-kate'};
-
+    
       # create a new instance with default arguments
       my $md2latex = Pandoc->new(qw(-f markdown -t latex --number-sections));
       $md2latex->run({ in => \$markdown, out => \$latex });
-
+    
       # create a new instance with selected executable
       my $pandoc = Pandoc->new('bin/pandoc');
       my $pandoc = Pandoc->new('2.1'); # use ~/.pandoc/bin/pandoc-2.1 if available
-
+    
       # set default arguments on compile time
       use Pandoc qw(-t latex);
       use Pandoc qw(/usr/bin/pandoc --number-sections);
       use Pandoc qw(1.16 --number-sections);
-
+    
       # utility method to convert from string
       $latex = pandoc->convert( 'markdown' => 'latex', '*hello*' );
-
+    
       # utility methods to parse abstract syntax tree (requires Pandoc::Elements)
       $doc = pandoc->parse( markdown => '*hello* **world!**' );
       $doc = pandoc->file( 'example.md' );
       $doc = pandoc->file;  # read Markdown from STDIN
 
 DESCRIPTION
+
     This module provides a Perl wrapper for John MacFarlane's Pandoc
     <http://pandoc.org> document converter.
 
-  IMPORTING
+ IMPORTING
+
     The utility function pandoc is exported, unless the module is imported
-    with an empty list ("use Pandoc ();").
+    with an empty list (use Pandoc ();).
 
     Importing this module with a version number or a more complex version
-    requirenment (e.g. "use Pandoc 1.13;" or "use Pandoc '>= 1.6, !=1.7")
-    will check version number of pandoc executable instead of version number
-    of this module (see $Pandoc::VERSION for the latter). Additional import
+    requirenment (e.g. use Pandoc 1.13; or use Pandoc '>= 1.6, !=1.7) will
+    check version number of pandoc executable instead of version number of
+    this module (see $Pandoc::VERSION for the latter). Additional import
     arguments can be passed to set the executable location and default
     arguments of the global Pandoc instance used by function pandoc.
 
 FUNCTIONS
-  pandoc
-    If called without parameters, this function returns a global instance of
-    class Pandoc to execute methods, or "undef" if no pandoc executable was
-    found. The location and/or name of pandoc executable can be set with
-    environment variable "PANDOC_PATH" (set to the string "pandoc" by
+
+ pandoc
+
+    If called without parameters, this function returns a global instance
+    of class Pandoc to execute methods, or undef if no pandoc executable
+    was found. The location and/or name of pandoc executable can be set
+    with environment variable PANDOC_PATH (set to the string pandoc by
     default).
 
-  pandoc( ... )
+ pandoc( ... )
+
     If called with parameters, this functions runs the pandoc executable
-    configured at the global instance of class Pandoc ("pandoc->bin").
+    configured at the global instance of class Pandoc (pandoc->bin).
     Arguments are passed as command line arguments and options control
     input, output, and error stream as described below. Returns 0 on
     success. Otherwise returns the the exit code of pandoc executable or -1
@@ -85,90 +92,109 @@ FUNCTIONS
       pandoc \@arguments, \%options;    # ok
       pandoc @arguments;                # ok, if first of @arguments starts with '-'
       pandoc %options;                  # ok, if %options is not empty
-
+    
       pandoc @arguments, %options;      # not ok!
 
-   Options
+ pandoc_data_dir( [ @subdirs ] [ $file ] )
+
+    Returns the default pandoc data directory which is directory .pandoc in
+    the home directory. Optional arguments can be given to refer to a
+    specific subdirectory or file.
+
+  Options
+
     in / out / err
-        These options correspond to arguments $stdin, $stdout, and $stderr
-        of IPC::Run3, see there for details.
+
+      These options correspond to arguments $stdin, $stdout, and $stderr of
+      IPC::Run3, see there for details.
 
     binmode_stdin / binmode_stdout / binmode_stderr
-        These options correspond to the like-named options to IPC::Run3, see
-        there for details.
+
+      These options correspond to the like-named options to IPC::Run3, see
+      there for details.
 
     binmode
-        If defined any binmode_stdin/binmode_stdout/binmode_stderr option
-        which is undefined will be set to this value.
+
+      If defined any binmode_stdin/binmode_stdout/binmode_stderr option
+      which is undefined will be set to this value.
 
     return_if_system_error
-        Set to true by default to return the exit code of pandoc executable.
 
-    For convenience the "pandoc" function (*after* checking the "binmode"
-    option) checks the contents of any scalar references passed to the
-    in/out/err options with utf8::is_utf8() and sets the
-    binmode_stdin/binmode_stdout/binmode_stderr options to
-    ":encoding(UTF-8)" if the corresponding scalar is marked as UTF-8 and
-    the respective option is undefined. Since all pandoc executable
-    input/output must be UTF-8 encoded this is convenient if you run with
-    use utf8, as you then don't need to set the binmode options at all
-    (encode nor decode) when passing input/output scalar references.
+      Set to true by default to return the exit code of pandoc executable.
+
+    For convenience the pandoc function (after checking the binmode option)
+    checks the contents of any scalar references passed to the in/out/err
+    options with utf8::is_utf8() and sets the
+    binmode_stdin/binmode_stdout/binmode_stderr options to :encoding(UTF-8)
+    if the corresponding scalar is marked as UTF-8 and the respective
+    option is undefined. Since all pandoc executable input/output must be
+    UTF-8 encoded this is convenient if you run with use utf8, as you then
+    don't need to set the binmode options at all (encode nor decode) when
+    passing input/output scalar references.
 
 METHODS
-  new( [ $executable | $version ] [, @arguments ] )
-    Create a new instance of class Pandoc or throw an exception if no pandoc
-    executable was found. The first argument, if given and not starting with
-    "-", can be used to set the pandoc executable ("pandoc" by default). If
-    a version is specified the executable is also searched in
-    "~/.pandoc/bin", e.g. "~/.pandoc/bin/pandoc-2.0" for version 2.0.
+
+ new( [ $executable | $version ] [, @arguments ] )
+
+    Create a new instance of class Pandoc or throw an exception if no
+    pandoc executable was found. The first argument, if given and not
+    starting with -, can be used to set the pandoc executable (pandoc by
+    default). If a version is specified the executable is also searched in
+    ~/.pandoc/bin, e.g. ~/.pandoc/bin/pandoc-2.0 for version 2.0.
     Additional arguments are passed to the executable on each run.
 
     Repeated use of this constructor with same arguments is not recommended
-    because "pandoc --version" is called for every new instance.
+    because pandoc --version is called for every new instance.
 
-  run( ... )
+ run( ... )
+
     Execute the pandoc executable with default arguments and optional
     additional arguments and options. See function pandoc for usage.
 
-  convert( $from => $to, $input [, @arguments ] )
+ convert( $from => $to, $input [, @arguments ] )
+
     Convert a string in format $from to format $to. Additional pandoc
-    options such as "-N" and "--standalone" can be passed. The result is
-    returned in same utf8 mode ("utf8::is_unicode") as the input. To convert
-    from file to string use method "pandoc"/"run" like this and set
-    input/output format via standard pandoc arguments "-f" and "-t":
+    options such as -N and --standalone can be passed. The result is
+    returned in same utf8 mode (utf8::is_unicode) as the input. To convert
+    from file to string use method pandoc/run like this and set
+    input/output format via standard pandoc arguments -f and -t:
 
       pandoc->run( $filename, @arguments, { out => \$string } );
 
-  parse( $from => $input [, @arguments ] )
+ parse( $from => $input [, @arguments ] )
+
     Parse a string in format $from to a Pandoc::Document object. Additional
-    pandoc options such as "-N" and "--normalize" can be passed. This method
+    pandoc options such as -N and --normalize can be passed. This method
     requires at least pandoc version 1.12.1 and the Perl module
     Pandoc::Elements.
 
-    The reverse action is possible with method "to_pandoc" of
-    Pandoc::Document. Additional shortcut methods such as "to_html" are
+    The reverse action is possible with method to_pandoc of
+    Pandoc::Document. Additional shortcut methods such as to_html are
     available:
 
       $html = pandoc->parse( 'markdown' => '# A *section*' )->to_html;
 
-    Method "convert" should be preferred for simple conversions unless you
+    Method convert should be preferred for simple conversions unless you
     want to modify or inspect the parsed document in between.
 
-  file( [ $filename [, @arguments ] ] )
+ file( [ $filename [, @arguments ] ] )
+
     Parse from a file (or STDIN) to a Pandoc::Document object. Additional
     pandoc options can be passed, for instance use HTML input format
-    ("@arguments = qw(-f html)") instead of default markdown. This method
+    (@arguments = qw(-f html)) instead of default markdown. This method
     requires at least pandoc version 1.12.1 and the Perl module
     Pandoc::Elements.
 
-  require( $version_requirement )
+ require( $version_requirement )
+
     Return the Pandoc instance if its version number fulfills a given
     version requirement. Throw an error otherwise. Can also be called as
-    constructor: "Pandoc->require(...)" is equivalent to "pandoc->require"
-    but throws a more meaningful error message if no pandoc executable was
+    constructor: Pandoc->require(...) is equivalent to pandoc->require but
+    throws a more meaningful error message if no pandoc executable was
     found.
 
-  version( [ $version_requirement ] )
+ version( [ $version_requirement ] )
+
     Return the pandoc version as Pandoc::Version object. If a version
     requirement is given, the method returns undef if the pandoc version
     does not fulfill this requirement. To check whether pandoc is available
@@ -177,42 +203,54 @@ METHODS
       Pandoc->require( $minimum_version)                # true or die
       pandoc and pandoc->version( $minimum_version )    # true or false
 
-  bin( [ $executable ] )
-    Return or set the pandoc executable. Setting an new executable also
-    updates version and data_dir by calling "pandoc --version".
+ bin( [ $executable ] )
 
-  arguments( [ @arguments | \@arguments )
+    Return or set the pandoc executable. Setting an new executable also
+    updates version and data_dir by calling pandoc --version.
+
+ arguments( [ @arguments | \@arguments )
+
     Return or set a list of default arguments.
 
-  data_dir
-    Return the default data directory (only available since Pandoc 1.11).
+ data_dir( [ @subdirs ] [ $file ] )
 
-  input_formats
+    Return the stated default data directory, introduced with Pandoc 1.11.
+    Use function pandoc_data_dir alternatively to get the expected
+    directory without calling Pandoc executable.
+
+ input_formats
+
     Return a list of supported input formats.
 
-  output_formats
+ output_formats
+
     Return a list of supported output formats.
 
-  highlight_languages
+ highlight_languages
+
     Return a list of programming languages which syntax highlighting is
     supported for (via Haskell library highlighting-kate).
 
-  extensions( [ $format ] )
+ extensions( [ $format ] )
+
     Return a hash of extensions mapped to whether they are enabled by
     default. This method is only available since Pandoc 1.18 and the
     optional format argument since Pandoc 2.0.6.
 
-  libs
+ libs
+
     Return a hash mapping the names of Haskell libraries compiled into the
     pandoc executable to Pandoc::Version objects.
 
 SEE ALSO
-    This package includes Pandoc::Version to compare Pandoc version numbers,
-    Pandoc::Release to get Pandoc releases from GitHub, and
-    App::Prove::Plugin::andoc to run tests with selected Pandoc executables.
 
-    See Pandoc::Elements for a Perl interface to the abstract syntax tree of
-    Pandoc documents for more elaborate document processing.
+    This package includes Pandoc::Version to compare Pandoc version
+    numbers, Pandoc::Release to get Pandoc releases from GitHub, and
+    App::Prove::Plugin::andoc to run tests with selected Pandoc
+    executables.
+
+    See Pandoc::Elements for a Perl interface to the abstract syntax tree
+    of Pandoc documents for more elaborate document processing.
 
     See Pod::Pandoc to parse Plain Old Documentation format (perlpod) for
     processing with Pandoc.
@@ -226,11 +264,14 @@ SEE ALSO
     Orze::Sources::Pandoc and App::PDoc.
 
 AUTHOR
+
     Jakob Voß
 
 CONTRIBUTORS
+
     Benct Philip Jonsson
 
 LICENSE
+
     GNU General Public License, Version 2
 

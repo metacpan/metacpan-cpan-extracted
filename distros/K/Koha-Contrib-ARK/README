@@ -1,0 +1,36 @@
+    What processing? One of those values: check, clear, update. By default,
+    'check'.
+
+    Is the process effective?
+
+    Operate in verbose mode
+
+    Logging level. The usual suspects: debug info warn error fatal.
+
+    Build ARK for biblio record $record (which has $biblionumber unique ID)
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 1:
+
+      Unknown directive: =attr
+
+    Around line 6:
+
+      Unknown directive: =attr
+
+    Around line 10:
+
+      Unknown directive: =attr
+
+    Around line 14:
+
+      Unknown directive: =attr
+
+    Around line 18:
+
+      Unknown directive: =method
+

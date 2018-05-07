@@ -11,9 +11,10 @@ use Chart::Plotly::Trace::Scatterpolargl::Line;
 use Chart::Plotly::Trace::Scatterpolargl::Marker;
 use Chart::Plotly::Trace::Scatterpolargl::Selected;
 use Chart::Plotly::Trace::Scatterpolargl::Stream;
+use Chart::Plotly::Trace::Scatterpolargl::Transform;
 use Chart::Plotly::Trace::Scatterpolargl::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The scatterpolargl trace type encompasses line charts, scatter charts, and bubble charts in polar coordinates using the WebGL plotting engine. The data visualized as scatter point or lines is set in `r` (radial) and `theta` (angular) coordinates Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -202,6 +203,9 @@ has thetaunit => (
             documentation => "Sets the unit of input *theta* values. Has an effect only when on *linear* angular axes.",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scatterpolargl::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -229,7 +233,7 @@ Chart::Plotly::Trace::Scatterpolargl - The scatterpolargl trace type encompasses
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -399,6 +403,8 @@ Sets the source reference on plot.ly for  theta .
 =item * thetaunit
 
 Sets the unit of input *theta* values. Has an effect only when on *linear* angular axes.
+
+=item * transforms
 
 =item * uid
 

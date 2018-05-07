@@ -4,24 +4,30 @@ lazy - Lazily install missing Perl modules
 
 # VERSION
 
-version 0.000001
+version 0.000003
 
 # SYNOPSIS
 
-    # Auto-install missing modules into local/.  Note local::lib needs to
+    # Auto-install missing modules globally
+    perl -Mlazy foo.pl
+
+    # Auto-install missing modules into local_foo/.  Note local::lib needs to
     # precede lazy in this scenario in order for the script to compile on the
     # first run.
-    perl -Mlocal::lib=local -Mlazy foo.pl
-
-    # Auto-install missing modules globally
-    perl -Mlocal::lib -Mlazy=--global foo.pl
+    perl -Mlocal::lib=local_foo -Mlazy foo.pl
 
     # Auto-install missing modules into local/
     use local::lib 'local';
     use lazy;
 
     # Auto-install missing modules globally
-    use lazy qw( --global );
+    use lazy;
+
+    # Same as above, but explicity auto-install missing modules globally
+    use lazy qw( -g );
+
+    # Use a local::lib and get verbose, uncolored output
+    perl -Mlocal::lib=foo -Mlazy=-v,--no-color
 
 ## DESCRIPTION
 
@@ -44,26 +50,32 @@ You can pass arguments directly to [App::cpm](https://metacpan.org/pod/App::cpm)
 
 Or
 
-    use lazy qw( --global --verbose );
+    use lazy qw( --man-pages --with-recommends --verbose );
 
 You get the idea.
 
-This module uses [App::cpm](https://metacpan.org/pod/App::cpm)'s defaults, so by default modules will be
-installed to a folder called `local` in your current working directory.  This
-folder will be created on demand.
+This module uses [App::cpm](https://metacpan.org/pod/App::cpm)'s defaults, with the exception being that we
+default to global installs rather than local.
 
 So, the default usage would be:
 
-    use local::lib 'local';
     use lazy;
 
-If you want the module available generally, use the `--global` switch.
+If you want to use a local lib:
 
-    use lazy qw( --global );
+    use local::lib qw( my_local_lib );
+    use lazy;
+
+Lazy will automatically pick up on your chosen local::lib and install there.
+Just make sure that you `use local::lib` before you `use lazy`.
 
 ## CAVEATS
 
-Be sure to remove `lazy` before you put your work into production.
+\* If not installing globally, `use local::lib` before you `use lazy`
+
+\* Don't pass the `-L` or `--local-lib-contained` args directly to `lazy`.  Use [local::lib](https://metacpan.org/pod/local::lib) directly to get the best (and least confusing) results.
+
+\* Remove `lazy` before you put your work into production.
 
 ## SEE ALSO
 

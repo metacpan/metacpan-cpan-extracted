@@ -1,0 +1,51 @@
+NAME
+
+    Alien::libvas - Perl distribution for libvas
+
+VERSION
+
+    version 0.215
+
+INSTALL
+
+        cpan Alien::libvas
+
+DESCRIPTION
+
+    See Proc::Memory for a Perl wrapper that makes use of this
+    distribution.
+
+PLATFORMS
+
+    libvas claims compatiblity with WinAPI's
+    ReadProcessMemory/WriteProcessMeory, macOS/GNU Hurd Mach API, Linux
+    procfs /proc/pid/mem, ptrace (2), and
+    process_vm_readv/process_vm_writev, SunOS procfs /proc/pid/as and
+    finally BSD with ptrace (2) or procfs.
+
+    I don't have all these systems to verify this. So please report bugs
+    you might run into, preferably on Github. :-)
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Alien-libvas
+
+SEE ALSO
+
+    libvas <http://github.com/a3f/libvas>
+
+    Proc::Memory
+
+    Alien
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

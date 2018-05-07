@@ -1,5 +1,5 @@
 package JSON::Path::Evaluator;
-$JSON::Path::Evaluator::VERSION = '0.411';
+$JSON::Path::Evaluator::VERSION = '0.420';
 use strict;
 use warnings;
 use 5.008;
@@ -120,7 +120,7 @@ sub evaluate {
     }
 
     my @ret = $self->_evaluate( $json_object, $token_stream, $args{want_ref} );
-    return wantarray ? @ret : $ret[0];
+    return @ret;
 }
 
 sub _reftable_walker {
@@ -643,7 +643,7 @@ JSON::Path::Evaluator - A module that recursively evaluates JSONPath expressions
 
 =head1 VERSION
 
-version 0.411
+version 0.420
 
 =head1 SYNOPSIS
 

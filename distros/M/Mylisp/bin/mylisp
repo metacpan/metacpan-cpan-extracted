@@ -1,103 +1,36 @@
 #!/usr/bin/perl
 
 use 5.012;
-no warnings "experimental";
+use experimental 'switch';
 
-use Spp::Builtin;
-use Spp::Tools;
-use Mylisp qw(mylisp_repl mylisp_to_ast);
-use Mylisp::LintAst qw(lint_mylisp_ast);
-use Mylisp::ToPerl qw(ast_to_perl);
+use Mylisp;
+use Mylisp::LintMyAst;
+use Mylisp::ToPerl;
 
-my $action = $ARGV[0];
-my $file   = $ARGV[1];
-given ($action) {
-   when ('--repl')   { mylisp_repl() }
-   when ('--lint')   { lint($file) }
-   when ('--toperl') { to_perl($file) }
-   when ('--togo')   { to_go($file) }
-   default {
-      say "
-      ## transfer mylisp file/dir to Ast Json file.
-      mylisp --togo  file-or-dir
+my $mylisp_file = $ARGV[0];
 
-      ## transfer mylisp file/dir to perl.file
-      mylisp --toperl file-or-dir
-
-      ## check mylisp file or dir syntax error.
-      mylisp -lint file-or-dir";
-      mylisp_repl();      
-   }
+sub MyToPerl {
+  my $file     = shift;
+  my $code     = read_file($file);
+  my $ast      = MyToAst($code);
+  my $lint     = LintMyAst($ast);
+  my $perl_str = AstToPerl( $lint, $ast );
+  return $perl_str;
 }
 
-sub lint {
-   my $dir = shift;
-   if (-d $dir) {
-      my @files = find_wanted(sub {/\.spp$/}, $dir);
-      for my $file (@files) {
-         lint_file($file);
-      }
-   } elsif (-e $dir) {
-      lint_file($dir);
-   }
-}      
-
-sub lint_file {
-   my $file = shift;
-   say "lint $file ...";
-   my $text = read_file($file);
-   my $ast  = mylisp_to_ast($text);
-   lint_mylisp_ast($ast);
-}
-
-sub to_perl {
-   my $dir = shift;
-   if (-d $dir) {
-      my @files = find_wanted(sub {/\.spp$/}, $dir);
-      for my $file (@files) {
-         to_perl_file($file);
-      }
-   } elsif (-e $dir) {
-      to_perl_file($dir);
-   }
-}
-
-sub to_perl_file {
-  my $file = shift;
-  say "to perl $file ...";
-  my $perl_file = change_sufix($file,'spp','pm');
-  if (-e $perl_file) {
-    next if is_update($file, $perl_file);
+my $flag = $ARGV[0];
+my $file = $ARGV[1];
+given ($flag) {
+  when ('-repl') { SppRepl() }
+  when ('-update') { UpdateSppAst() }
+  when ('-spp') { Spp($file) }
+  when ('-toperl') { say MyToPerl($file) }
+  when ('-parse') {
+    my $target = $ARGV[2];
+    say Parse($file, $target);
   }
-  my $text = read_file($file);
-  my $ast  = mylisp_to_ast($text);
-  $ast = clean_ast($ast);
-  my $perl_str = ast_to_perl($ast);
-  write_file($perl_file, $perl_str);
-}
-
-sub to_perl {
-   my $dir = shift;
-   if (-d $dir) {
-      my @files = find_wanted(sub {/\.spp$/}, $dir);
-      for my $file (@files) {
-         to_go_file($file);
-      }
-   } elsif (-e $dir) {
-      to_go_file($dir);
-   }
-}
-
-sub to_go_file {
-  my $file = shift;
-  say "to go $file ...";
-  my $go_file = change_sufix($file,'spp','go');
-  if (-e $go_file) {
-    next if is_update($file, $go_file);
+  default {
+    say 'mylisp -repl';
   }
-  my $text = read_file($file);
-  my $ast  = mylisp_to_ast($text);
-  $ast = clean_ast($ast);
-  my $go_str = ast_to_go($ast);
-  write_file($go_file, $go_str);
 }
+

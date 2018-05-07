@@ -6,15 +6,13 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use vars qw(@ISA @EXPORT_OK);
-use Exporter qw(import);
+use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(
     hash_to_query_string
     to_instance_array
-    difference_arrays
-    validate_id
+    is_not_empty validate_id
     is_arrayref is_hashref
 );
 
@@ -49,16 +47,6 @@ sub __add_namespace {
     return "${namespace}[${key}]";
 }
 
-# USED only in AdvancedSearchNodes in MultipleValuesNode->in() for validation
-sub difference_arrays {
-    my ($array1, $array2) = @_;
-    my @diff;
-    foreach my $element (@$array1) {
-        push(@diff, $element) unless grep { $element eq $_ } @$array2;
-    }
-    return \@diff;
-}
-
 sub to_instance_array {
     my ($attrs, $class) = @_;
     my @result = ();
@@ -72,11 +60,17 @@ sub to_instance_array {
     return \@result;
 }
 
+sub is_not_empty {
+    my $content = shift;
+    return if ! defined $content or length($content) == 0;
+    return 1;
+}
+
 sub validate_id {
     my $id = shift;
 
-    return if ! defined($id);
-    return if $id !~ /\S/;
+    return if ! is_not_empty($id);
+    return if $id =~ /\s/;
 
     return 1;
 }

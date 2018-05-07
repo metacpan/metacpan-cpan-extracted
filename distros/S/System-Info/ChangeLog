@@ -1,3 +1,11 @@
+0.058	- 2018-05-01,  H.Merijn Brand
+    * Include Windows build number in OS version
+    * Git repo has CSV with summary from distrowatch
+    * Add openSUSE TumbleWeed 2018-04
+    * AUTHOR cannot be a list in old(er) EU::MM
+    * Tested on FreeBSD
+    * Hostname can be empty
+
 0.057	- 2018-02-11,  H.Merijn Brand
     * Add VERSION_ID to distroname if set
     * Add DragonFly (PR#2 - xenu)

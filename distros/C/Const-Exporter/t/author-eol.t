@@ -18,7 +18,6 @@ my @files = (
     'lib/Const/Exporter.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/01-compile.t',
     't/10-basic.t',
     't/11-tags.t',
     't/12-blessed.t',
@@ -32,12 +31,18 @@ my @files = (
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/empty-with-const.t',
+    't/enums.t',
     't/etc/perlcritic.rc',
+    't/lib/Test/Const/Exporter/Empty.pm',
+    't/lib/Test/Const/Exporter/Enums.pm',
+    't/lib/Test/Const/Exporter/Strictures.pm',
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-minimum-version.t',
-    't/release-trailing-space.t'
+    't/release-trailing-space.t',
+    't/strictures.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

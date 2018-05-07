@@ -41,11 +41,31 @@ sub new ($$%) {
 	return $self;
 }
 
+sub abort_pack ($$) {
+	my $self = shift;
+	my $packer = shift;
+	my $status = shift;
+
+	$self->set_status($status);
+	$packer
+		->jump('status')->uint32($status)
+		->jump('command-start')->uint16(9)
+	;
+
+	return $self;
+}
+
 sub prepare_response ($) {
 	my $self = shift;
 
 	$self->header->{flags} |= SMB::v2::Header::FLAGS_RESPONSE;
 	$self->header->credits(31) if $self->header->credits > 31;
+}
+
+sub has_next_in_chain ($) {
+	my $self = shift;
+
+	return $self->header->chain_offset ? 1 : 0;
 }
 
 1;

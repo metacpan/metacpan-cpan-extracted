@@ -175,7 +175,7 @@ sub _can_release ($self) {
 
         say qq[Docker base image is "@{[$self->dist->docker->{from}]}".];
 
-        if ( $self->dist->docker->{from_tag} !~ /\Av\d+[.]\d+[.]\d+\z/sm ) {
+        if ( !$self->dist->is_pcore && $self->dist->docker->{from_tag} !~ /\Av\d+[.]\d+[.]\d+\z/sm ) {
             say q[Docker base image tag must be set to "vx.x.x". Use "pcore docker --from <TAG>" to set needed tag.];
 
             return;

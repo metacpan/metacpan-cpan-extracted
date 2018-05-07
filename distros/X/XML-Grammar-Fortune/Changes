@@ -1,3 +1,9 @@
+0.0701  2018-05-02
+    - Convert to Dist-Zilla.
+
+0.0700  2014-10-24
+        - Add an optional href attribute to the <author /> tag.
+
 0.0600  2014-09-24
         - Implement the <facts> top-level tag with grammar for factoids.
             - See t/data/xml/facts-fort-4-from-shlomifish.org.xml

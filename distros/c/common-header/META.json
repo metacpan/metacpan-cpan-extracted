@@ -28,11 +28,6 @@
          "requires" : {
             "Test::Pod" : "v1.51.0"
          }
-      },
-      "runtime" : {
-         "requires" : {
-            "multidimensional" : "v0.14.0"
-         }
       }
    },
    "release_status" : "stable",
@@ -47,6 +42,6 @@
          "web" : "https://bitbucket.org/softvisio/common-header/overview"
       }
    },
-   "version" : "v0.1.5",
+   "version" : "v0.1.6",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

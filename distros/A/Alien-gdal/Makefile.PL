@@ -4,11 +4,13 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %common_reqs = (
-    "Alien::Build" => "0.32",
+    "Alien::Build" => "1.41",
     "ExtUtils::MakeMaker" => "6.52",
-    "Alien::Build::MM" => "0.32",
+    "Alien::Build::MM" => "1.41",
     "Alien::patch" => 0,
     "File::Find::Rule" => 0,
+    "parent" => 0,
+    "PkgConfig" => 0.19026,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
 );
 
@@ -26,7 +28,7 @@ my %WriteMakefileArgs = (
         %common_reqs,
     },
     "TEST_REQUIRES" => {
-        "Test::CChecker" => 0,
+        "Test::Alien" => 0,
     },
     "PREREQ_PM" => {
         "Alien::Base" => "0.038",

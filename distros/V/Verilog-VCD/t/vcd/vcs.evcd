@@ -1,0 +1,72 @@
+$date
+    Wed May  2 16:13:42 2018
+$end
+$version
+    Chronologic Simulation VCS Release N-2017.12-1
+    $dumpports(tb.dut, "trace.vcd")
+$end
+$timescale
+    1ns
+$end
+$comment Csum: 1 4db1f6174ef0adc6 $end
+
+
+$scope module tb.dut $end
+$var port       1 <0            in $end
+$var port   [7:0] <1           in2 $end
+$var port   [7:0] <2          out2 $end
+$var port   [3:0] <3          outa $end
+$var port   [1:0] <4            io $end
+$var port       1 <5           out $end
+$upscope $end
+
+$enddefinitions $end
+
+#0
+$dumpports
+pD	6	0	<0
+pNNNNNNNN	66666666	66666666	<1
+pXXXXXXXX	66666666	66666666	<2
+pLLLL	6666	0000	<3
+pLH	60	06	<4
+pH	0	6	<5
+$end
+#6
+pDDUUNNZZ	66006600	00666600	<1
+pLLHHXXTT	66006600	00666600	<2
+#9
+pLLLH	6660	0006	<3
+pLL	66	00	<4
+#12
+pUUUUUUUU	00000000	66666666	<1
+pHHHHHHHH	00000000	66666666	<2
+#18
+pDUDUDDUU	60606600	06060066	<1
+pLHLHLLHH	60606600	06060066	<2
+pLLHL	6606	0060	<3
+pLH	60	06	<4
+$dumpportsoff
+pX	6	6	<0
+pXXXXXXXX	66666666	66666666	<1
+pXXXXXXXX	66666666	66666666	<2
+pXXXX	6666	6666	<3
+pXX	66	66	<4
+pX	6	6	<5
+$end
+#22
+$dumpportson
+pD	6	0	<0
+pDUDUDDUU	60606600	06060066	<1
+pLHLHLLHH	60606600	06060066	<2
+pLLHL	6606	0060	<3
+pLH	60	06	<4
+pH	0	6	<5
+$end
+#27
+pLLHH	6600	0066	<3
+pLL	66	00	<4
+#36
+pLHLL	6066	0600	<3
+pLH	60	06	<4
+
+$vcdclose #42 $end

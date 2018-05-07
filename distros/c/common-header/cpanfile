@@ -1,1 +1,1 @@
-requires 'multidimensional', v0.14.0
+# no deps

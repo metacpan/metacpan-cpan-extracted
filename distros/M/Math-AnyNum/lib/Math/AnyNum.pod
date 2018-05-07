@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =head1 SYNOPSIS
 
@@ -1027,8 +1027,17 @@ The n-th Lucas number. Returns NaN when C<n> is negative.
 =head2 fibonacci
 
     fibonacci(n)                                  #=> Int | NaN
+    fibonacci(n, k)                               #=> Int | NaN
 
 The n-th Fibonacci number. Returns NaN when C<n> is negative.
+
+When C<k> is specified, it returns the k-th order Fibonacci number.
+
+Example:
+
+    say fibonacci(100, 3);        # 100th Tribonacci number
+    say fibonacci(100, 4);        # 100th Tetranacci number
+    say fibonacci(100, 5);        # 100th Pentanacci number
 
 =head2 factorial
 
@@ -1811,6 +1820,22 @@ Example:
     digits(12345)      = (5, 4, 3, 2, 1)
     digits(12345, 100) = (45, 23, 1)
 
+=head2 sumdigits
+
+    sumdigits(n)                                  #=> Int | NaN
+    sumdigits(n, b)                               #=> Int | NaN
+
+Sum the digits of C<n> in a given base. When no base is specified, it defaults to base 10.
+
+Only the absolute integer part of C<n> is considered.
+
+The value of C<b> must be greater than C<1>. Returns NaN otherwise.
+
+Example:
+
+    sumdigits(12345)      = 15
+    sumdigits(12345, 100) = 69
+
 =head1 * Comparisons
 
 =head2 eq
@@ -1865,13 +1890,24 @@ Comparing anything to NaN (including NaN itself), returns C<undef>.
 
 =head2 acmp
 
-    acmp(x, y)
+    acmp(x, y)                                    #=> Scalar
 
 Absolute comparison of C<x> and C<y>.
 
 Defined as:
 
     acmp(x, y) = abs(x) <=> abs(y)
+
+=head2 approx_cmp
+
+    approx_cmp(x, y)                              #=> Scalar
+    approx_cmp(x, y, k)                           #=> Scalar
+
+Approximate comparison, by rounding the values of C<x> and C<y> at a given number of decimal places.
+
+A negative value for C<k> rounds that many digits after the decimal point, while a positive value rounds before the decimal point.
+
+When no value is given for C<k>, it uses the default precision - 1.
 
 =head1 PERFORMANCE
 

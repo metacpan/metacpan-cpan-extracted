@@ -12,6 +12,13 @@ use Test::Most;
 }
 
 {
+  ok my $res = request '/test_404';
+  is $res->code, 404;
+  is $res->content_type, 'text/plain';
+  like $res->content,qr/package MyApp;/;
+}
+
+{
   ok my $res = request '/static/a/a.txt';
   is $res->code, 200;
   is $res->content_type, 'text/plain';

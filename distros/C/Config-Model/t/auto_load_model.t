@@ -1,26 +1,17 @@
 # -*- cperl -*-
 
 use ExtUtils::testlib;
-use Test::More tests => 6;
+use Test::More;
 use Test::Memory::Cycle;
 use Config::Model;
+use Config::Model::Tester::Setup qw/init_test/;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
+
 use lib "t/lib";
 
-my $arg = shift || '';
-my $trace = $arg =~ /t/ ? 1 : 0;
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init( $arg =~ /l/ ? $TRACE : $WARN );
-
-my $model = Config::Model->new( legacy => 'ignore', );
-
-ok( 1, "compiled" );
+my ($model, $trace) = init_test();
 
 my $inst = $model->instance(
     root_class_name => 'Master',
@@ -47,4 +38,6 @@ my $inst2 = $model2->instance(
     instance_name   => 'test1'
 );
 ok( $inst2, "created dummy instance 2" );
-memory_cycle_ok($model);
+memory_cycle_ok($model, "memory cycles");
+
+done_testing;

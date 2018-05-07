@@ -4,7 +4,7 @@ Const::Exporter - Declare constants for export.
 
 # VERSION
 
-version v0.3.1
+version v0.4.0
 
 # SYNOPSIS
 
@@ -278,6 +278,13 @@ The `:default` tag is the same as not specifying any exports.
 The `:all` tag exports all symbols.
 
 # KNOWN ISSUES
+
+## Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+["SOURCE"](#source).
 
 ## Exporting Functions
 

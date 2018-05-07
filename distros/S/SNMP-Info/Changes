@@ -1,3 +1,34 @@
+Version 3.60 (2018-05-06)
+
+  [ENHANCEMENTS]
+
+  * #263 detect Aerohive ap250 & ap230 models (inphobia)
+
+  [BUG FIXES]
+
+  * #140 LLDP fixes - treat remote port type of 'local' as an interface name if
+    the remote port id doesn't look like an index
+  * Fix potential issue in enumeration of LLDP reported system capabilities
+    supported by the remote system due to the 'lldpRemSysCapSupported' leaf
+    name being defined in multiple MIBs
+
+Version 3.59 (2018-05-01)
+
+  [NEW FEATURES]
+
+  * #214 SNMP::Info Device models Genua, ATMedia, Liebert
+
+  [ENHANCEMENTS]
+
+  * Capture base MAC in L3::Huawei
+  * Change _lldp_addr_index to a method so it can be properly overridden in
+    subclasses
+
+  [BUG FIXES]
+
+  * Capture fan ans power supply status in L3::Huawei when description is
+    not available
+
 Version 3.58 (2018-04-29)
 
   [NEW FEATURES]

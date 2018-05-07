@@ -1,0 +1,87 @@
+## -*- mode: perl -*-
+# https://github.com/ebiggers/libdeflate/archive/v1.0.tar.gz
+
+use strict;
+use warnings;
+use alienfile;
+use Path::Tiny qw{path};
+use Alien::Build::CommandSequence;
+
+our $deflate_version = '1.0';
+
+## default helper deps Alien::MSYS for all systems?
+meta->interpolator->replace_helper(install => sub {
+  return 'install';
+});
+
+plugin 'Probe::CBuilder' => (
+  cflags => join(' ', grep { defined && length } $ENV{ALIEN_LIBDEFLATE_PROBE_CFLAGS}),
+  libs   => join(' ', grep { defined && length } $ENV{ALIEN_LIBDEFLATE_PROBE_LDFLAGS}, '-ldeflate'),
+  program => <<'END_OF_CODE');
+#include <libdeflate.h>
+int main(int argc, char *argv[]) { return 0; }
+END_OF_CODE
+
+share {
+  ## *bsd make is incompatible
+  requires 'Alien::gmake' => 0;
+
+  start_url "https://github.com/ebiggers/libdeflate/archive/v${deflate_version}.tar.gz";
+
+  plugin Download => ( version => qr/([0-9\.]+)/, bootstrap_ssl => 1 );
+
+  plugin Extract => ( format => 'tar.gz' );
+
+  meta_prop->{destdir} = 1;
+
+  # Available targets:
+  # ------------------
+  # -e libdeflate.a
+  # -e libdeflate.so
+  # -e gzip
+  # -e gunzip
+  # -e benchmark
+  # -e test_checksums
+  # -e checksum
+
+  build [
+    '%{gmake} libdeflate.a gzip gunzip checksum CFLAGS=-fPIC',
+    sub {
+      my $build = shift;
+      my @dirs;
+      my %fileset = (
+        (map { $_ => path('include')->child($_)->stringify } qw{libdeflate.h}),
+        (map { $_ => path('lib')->child($_)->stringify } qw{libdeflate.a}),
+        (map { $_ => path('bin')->child($_)->stringify } qw{checksum gzip gunzip}),
+      );
+
+      $build->log("copy stuff to $ENV{DESTDIR}");
+      my $destdir     = $ENV{DESTDIR};
+      my $destdir_abs = path($destdir)->child($build->install_prop->{prefix});
+
+      push @dirs, $destdir_abs->child($_)->stringify
+        for (qw{include lib bin});
+
+      Alien::Build::CommandSequence->new(
+        (map { join ' ', '%{install} -d', $_ } @dirs),
+        (map {
+          join ' ', '%{install} -c', $_, $destdir_abs->child($fileset{$_})->stringify
+        } keys %fileset),
+      )->execute($build);
+    }
+  ];
+
+  after gather => sub {
+    my $build = shift;
+    my $prefix = path($build->install_prop->{prefix})->absolute;
+    my @dirs;
+    push @dirs, $prefix->child($_)->stringify for (qw{include lib});
+
+    $build->runtime_prop->{version} = $deflate_version;
+    $build->runtime_prop->{cflags} = $build->runtime_prop->{cflags_static}
+      = "-I$dirs[0]";
+    $build->runtime_prop->{libs} = $build->runtime_prop->{libs_static}
+      = "-L$dirs[1] -ldeflate";
+  };
+
+};

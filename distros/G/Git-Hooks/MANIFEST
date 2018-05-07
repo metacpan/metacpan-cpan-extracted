@@ -25,6 +25,7 @@ lib/Git/Hooks/Test.pm
 lib/Git/Hooks/Tutorial.pod
 lib/Git/Message.pm
 lib/Git/Repository/Plugin/GitHooks.pm
+perlcritic.rc
 script/githooks.pl
 t/00-load.t
 t/01-setup.t
@@ -41,9 +42,14 @@ t/02-gerrit-change-id.t
 t/02-noplugin.t
 t/02-notify.t
 t/02-prepare-log.t
+t/author-critic.t
+t/author-no-tabs.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/author-portability.t
 t/make-debug-environment.sh
 t/release-kwalitee.t
+t/release-minimum-version.t
+t/release-unused-vars.t
 t/setup-vagrant-environment.sh
 tidyall.ini

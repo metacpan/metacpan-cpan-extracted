@@ -15,8 +15,7 @@ lib/System/Info/Solaris.pm
 lib/System/Info/VMS.pm
 lib/System/Info/Windows.pm
 Makefile.PL
-MANIFEST			This list of files
-MANIFEST.SKIP
+MANIFEST
 README
 examples/sysinfo.pl
 t/distname.t
@@ -355,6 +354,18 @@ t/etc/suse-TW-201710/lsb-release.d/graphics-3.2-noarch
 t/etc/suse-TW-201710/lsb-release.d/graphics-4.0-amd64
 t/etc/suse-TW-201710/lsb-release.d/graphics-4.0-noarch
 t/etc/suse-TW-201710/os-release
+t/etc/suse-TW-201804/DISTNAME
+t/etc/suse-TW-201804/issue
+t/etc/suse-TW-201804/lsb-release
+t/etc/suse-TW-201804/lsb-release.d/desktop-4.0-amd64
+t/etc/suse-TW-201804/lsb-release.d/desktop-4.0-noarch
+t/etc/suse-TW-201804/lsb-release.d/graphics-2.0-amd64
+t/etc/suse-TW-201804/lsb-release.d/graphics-2.0-noarch
+t/etc/suse-TW-201804/lsb-release.d/graphics-3.2-amd64
+t/etc/suse-TW-201804/lsb-release.d/graphics-3.2-noarch
+t/etc/suse-TW-201804/lsb-release.d/graphics-4.0-amd64
+t/etc/suse-TW-201804/lsb-release.d/graphics-4.0-noarch
+t/etc/suse-TW-201804/os-release
 t/etc/ubuntu-10.04/debian_version
 t/etc/ubuntu-10.04/DISTNAME
 t/etc/ubuntu-10.04/issue

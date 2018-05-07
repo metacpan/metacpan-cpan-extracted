@@ -1,0 +1,290 @@
+---
+id: 0
+method: Clear
+---
+command: '*CLS'
+id: 1
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV -30
+id: 2
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV?
+id: 3
+method: Query
+retval: '-3.000000E+01
+
+'
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV -10
+id: 4
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV?
+id: 5
+method: Query
+retval: '-1.000000E+01
+
+'
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV -20
+id: 6
+method: Write
+---
+command: :DISP:WIN:TRACe:Y:SCALe:RLEV?
+id: 7
+method: Query
+retval: '-2.000000E+01
+
+'
+---
+command: SENS:BAND 3000
+id: 8
+method: Write
+---
+command: SENS:BAND?
+id: 9
+method: Query
+retval: '3000
+
+'
+---
+command: SENS:BAND 30000
+id: 10
+method: Write
+---
+command: SENS:BAND?
+id: 11
+method: Query
+retval: '30000
+
+'
+---
+command: SENS:BAND 300000
+id: 12
+method: Write
+---
+command: SENS:BAND?
+id: 13
+method: Query
+retval: '300000
+
+'
+---
+command: SENS:BAND:VIDEO 1000
+id: 14
+method: Write
+---
+command: SENS:BAND:VIDEO?
+id: 15
+method: Query
+retval: '1000
+
+'
+---
+command: SENS:BAND:VIDEO 10000
+id: 16
+method: Write
+---
+command: SENS:BAND:VIDEO?
+id: 17
+method: Query
+retval: '10000
+
+'
+---
+command: SENS:BAND:VIDEO 100000
+id: 18
+method: Write
+---
+command: SENS:BAND:VIDEO?
+id: 19
+method: Query
+retval: '100000
+
+'
+---
+command: SENS:FREQ:STAR 1000000
+id: 20
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 21
+method: Query
+retval: '1000000
+
+'
+---
+command: SENS:FREQ:STAR 10000000
+id: 22
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 23
+method: Query
+retval: '10000000
+
+'
+---
+command: SENS:FREQ:STAR 100000000
+id: 24
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 25
+method: Query
+retval: '100000000
+
+'
+---
+command: SENS:FREQ:STOP 110000000
+id: 26
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 27
+method: Query
+retval: '110000000
+
+'
+---
+command: SENS:FREQ:STOP 210000000
+id: 28
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 29
+method: Query
+retval: '210000000
+
+'
+---
+command: SENS:FREQ:STOP 310000000
+id: 30
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 31
+method: Query
+retval: '310000000
+
+'
+---
+command: SENS:POW:RF:ATT 20
+id: 32
+method: Write
+---
+command: SENS:POW:RF:ATT?
+id: 33
+method: Query
+retval: '20
+
+'
+---
+command: SENS:POW:RF:ATT 10
+id: 34
+method: Write
+---
+command: SENS:POW:RF:ATT?
+id: 35
+method: Query
+retval: '10
+
+'
+---
+command: SENS:POW:RF:ATT 0
+id: 36
+method: Write
+---
+command: SENS:POW:RF:ATT?
+id: 37
+method: Query
+retval: '0
+
+'
+---
+command: SENS:SWE:TIME 0.1
+id: 38
+method: Write
+---
+command: SENS:SWE:TIME?
+id: 39
+method: Query
+retval: '1.000000E-01
+
+'
+---
+command: SENS:SWE:TIME 0.4
+id: 40
+method: Write
+---
+command: SENS:SWE:TIME?
+id: 41
+method: Query
+retval: '4.000000E-01
+
+'
+---
+command: SENS:SWE:TIME 0.8
+id: 42
+method: Write
+---
+command: SENS:SWE:TIME?
+id: 43
+method: Query
+retval: '8.000000E-01
+
+'
+---
+command: UNIT:POWer DBMV
+id: 44
+method: Write
+---
+command: UNIT:POWer?
+id: 45
+method: Query
+retval: "DBMV\n"
+---
+command: UNIT:POWer V
+id: 46
+method: Write
+---
+command: UNIT:POWer?
+id: 47
+method: Query
+retval: "V\n"
+---
+command: UNIT:POWer DBM
+id: 48
+method: Write
+---
+command: UNIT:POWer?
+id: 49
+method: Query
+retval: "DBM\n"
+---
+command: FORM?
+id: 50
+method: Query
+retval: "REAL,32\n"
+---
+command: TRAC? TRACE1
+id: 51
+method: Query
+retval: 2339303030303032343034f2c0a0c2f233a2c27c659dc2f151a0c28e1f9dc206aca1c27e5d9fc27482a1c21198a3c22d2aa0c2ede89fc278669bc2f57c9fc2aa3ea2c256439fc24f219ec242f99dc2528f9bc251e99ec28135a1c2684da0c2f1ec9fc29f9e9ec21ece9cc2acec9ac24550a2c25c80a0c2804c9fc237d49fc2f7939ec2b4759fc22c57a1c2ddc0a1c26a00a2c22a36a0c2880da3c2e2f49fc26b7aa1c2f53da1c258e6a0c2b0b79fc267239fc2bd3da1c29053a4c2a6baa0c28f5ca3c28a87a0c295d3a1c2f5b89fc2d35ca0c21906a1c2bde79bc2e830a2c234129fc2791ea2c2affca2c2e62ca1c2827da0c2b66da0c214c99fc2c259a2c2ce369fc2c8d0a2c26324a2c22ccd9dc2357aa3c2d788a1c2f8bea0c2b7a89cc25080a2c28e2e9ec2f0019fc2e5f69ec271239ac24fc89dc28874a1c2b5b19ec27c679fc2234a9bc25f7d99c20c7a9bc298e69ec22534a2c27ddea1c2dd909bc2743c9bc245d599c2e56d99c2566c9cc2b5089cc27f199cc28c4d9ac213c591c26b0f99c28d11a2c25118a3c2aa309fc2a4d597c2525e99c2a89a9dc26deda2c2340ba2c230b59dc2d60f9fc29acb9dc266459dc26a7ca0c2c20ca3c2db6ba4c2ac08a1c27d5aa0c2217fa0c2df1fa0c2a34ba2c2d9c4a0c228a6a1c28a22a1c2b6a79fc26c68a0c29fdea0c200b4a1c29586a3c23834a1c247eda0c240fd9fc2cfe1a2c2cb479fc2bb7da3c2bc6da1c2a4baa2c21e289fc21dd9a0c2f24ba2c2dcaf9cc220d5a1c2f166a1c26bcba1c205afa2c2351ba3c2509a9fc28250a3c28a249fc2be5aa0c2c52ea1c2eedaa1c2a5f19fc24128a0c2b813a2c2c502a1c2cc38a1c26adba0c23d8aa2c29b11a2c2b6bba1c29381a2c20465a2c26688a3c265e0a1c22cfca1c288dea2c248d6a1c2dab4a1c2cccaa3c2b044a2c239d6a2c294c6a3c2d81ba2c2442ea0c2f04fa2c28861a4c2a441a2c24043a1c2c9e29fc227d89fc2073ea2c2bb55a3c21b81a0c23203a3c2ddd1a1c2ea51a1c2aab79ec222baa2c2d6d1a0c297b8a0c22ce99ec2a5ffa0c2737f9ec23544a1c2e881a2c2e61fa3c2e1eea0c20318a2c21eaaa1c2cabf9dc2e7ada1c2e878a1c2ce9fa1c2502a9fc2553da2c2536ba0c21e70a0c2a859a1c250119fc2f630a1c25c0ea1c2a199a1c2a7c79fc2c047a1c2f252a3c27c12a2c2a9d5a0c22f949ec2cb30a3c275b4a3c272889dc2d4db9fc25e7c9fc239d5a2c22485a0c20f79a1c2af3e9fc23ae69fc29323a0c21e86a1c2e122a2c20ab09fc22ce1a1c2f345a1c2584ca1c2328fa2c246fd9fc212c1a2c2405da4c20ccaa4c27c06a1c200a0a2c28dc2a0c22bdba3c22d65a0c2b00aa4c2dec3a3c29480a2c26ec4a1c24601a1c27eeea1c25569a3c2fa32a3c2dd6ba2c2b487a0c2f24aa2c2e8eea2c238dca2c2245aa3c2827da2c24129a5c2e1a9a1c255a5a4c2c991a4c2f08ca4c27e3ca6c2e61fa3c2e22ca3c2de1ea4c2db3da6c2f4eba3c26373a1c29186a4c27e51a1c2924aa2c23aefa2c25431a3c24632a6c226d7a3c23b23a1c2a456a1c2c707a4c26ac2a3c20bc6a3c23ba6a4c2ea4ca3c23a5ca4c29fd5a5c252cda3c25f87a4c219eca4c29cb8a3c20e60a4c2da7fa4c2f48da6c247fba3c2fcd7a1c27dd0a2c2d583a1c24441a3c29a81a5c2a5f7a3c28964a5c2cf76a4c262a4a4c20680a4c2512aa4c25d44a5c2b5faa5c23b16a4c21a47a4c222f6a3c2da3aa4c2f643a5c2397aa4c20432a0c2208ca4c2c41ea4c2f0d7a5c2f405a4c2c0f3a2c27b9ea5c2a5dba4c2b8eba3c28b46a5c28438a7c2740ea4c27ae3a4c26eb2a5c221fea3c27525a1c23e86a3c258c6a5c26e99a4c2bbafa5c22682a3c248eba3c27f80a4c25ab3a5c2bd4ca2c29929a4c200cca4c2771ea4c2c332a6c2792da6c2b443a6c2503ba6c2a148a4c25413a5c29876a6c21f81a3c21d3da5c2616ca6c2d9fea3c2f768a5c2e71aa6c2fecaa3c20393a6c2d532a4c2dd6aa5c29c25a5c227d9a4c2b2f2a4c2d6e4a4c28246a5c24228a4c226c8a5c2f23aa4c2cc47a4c2a855a1c23663a2c2eec1a5c2f296a5c2d431a5c2f244a6c224a6a5c2e1e6a2c26ff3a3c23c4ca4c2cc15a4c26d47a4c2fa6aa4c208f8a6c20fc9a7c2c868a5c2f14da1c2b1dea4c2a7d0a1c20781a5c2bad0a7c2cdd1a6c20650a1c23efba4c22881a5c2972fa5c25e2da4c24391a4c26f15a4c252daa2c21e74a5c2d6f7a3c22c3aa6c24fb8a4c2988da5c2ded8a5c24e90a4c20612a3c2469ca5c23c21a7c27ef9a3c23f95a3c2d0cfa2c21c2ca5c2dabea5c28e9da7c2b086a4c2bdbea6c27f2ba4c2443aa3c289a2a6c2b4b3a4c22dc6a5c278baa5c2af49a7c29ed8a2c22e9ca4c24eb3a7c2a433a4c21e62a6c237caa2c25f86a4c2ee77a3c2d26aa6c26998a3c2954ba2c21927a5c273e0a2c2418fa2c2206ca7c2f023a6c2fc4fa6c2e016a5c213c1a7c2e53ca7c2e30ca4c2d2e9a2c2f33fa6c2d5b2a6c21887a5c246cea5c2fe63a5c28c44a8c2d292a5c29c87a7c2f8d4a5c2a427a5c2dac7a6c2de9da4c219baa5c2ded6a4c2bc84a4c2a377a4c235b1a6c2ef25a7c26914a7c20183a7c2bdc5a6c2acc7a7c2ec9ea5c2102ca6c25dcaa6c22a3ea4c28274a5c25e99a6c2da4ea6c2840ba6c2e08da7c2df9da5c2affda5c2e93ba5c2b4aea5c2b636a6c2a6aca6c2d0daa5c24537a6c23a7aa7c2486da6c2bde9a5c23835a7c28450a7c2824fa4c2994aa7c27f54a4c26104a6c2ab80a6c2515ca5c26836a6c22e53a7c25282a7c2ca10a4c28333a5c27c65a4c200d2a3c228eea5c2f92ba5c28cc0a4c2746aa7c2f150a6c2f9afa5c2c417a4c27e32a7c23817a3c2d24ba6c281efa4c2408fa4c2ee07a4c20674a6c2c631a7c285b6a6c20a37a5c2176ca2c2d2ffa7c2de49a8c2f702a4c2a8d8a5c21da2a5c2cb8da6c23fc7a5c2e090a5c25405a7c2a3b6a4c23caea6c2cdcfa6c2da3ca5c27fbaa2c2875da4c249f8a4c20ea2a8c24ca1a6c245e7a3c21f2aa5c2ad84a8c250a5a3c25cb5a6c2ea71a6c2f436a8c2c45aa6c26194a5c2b544a5c2b0cfa4c20789a5c23a4ea6c2b869a6c26901a6c21a55a4c249a4a4c2695fa6c20a49a7c2fd95a3c280c2a5c2ad97a5c20a5e9fc295509ec21fd1a6c27130a4c2b037a7c28ac2a5c2f202a5c2494ca4c27b7ba5c27e2ca4c28db4a6c2fdf3a4c202a1a4c26f45a5c24f19a5c2df2aa5c27164a5c29d30a6c20307a6c2461da4c2be33a5c27d4ca5c23e49a6c2ea46a5c2077ba5c26869a5c21400a8c2a21fa2c25e3fa6c244f1a8c2d900a6c2b2c5a7c27570a5c26e48a5c217e9a4c220f0a6c276f4a7c25fefa6c236aaa7c2404fa5c2cccca7c2980ba5c27638a4c28d38a4c28ba3a5c2b6aaa6c20a
+retval_enc: hex
+---
+command: SENS:FREQ:STAR?
+id: 52
+method: Query
+retval: '100000000
+
+'
+---
+command: SENS:FREQ:STOP?
+id: 53
+method: Query
+retval: '310000000
+
+'

@@ -1,7 +1,7 @@
 ---
-abstract: unknown
+abstract: 'A foreign function interface to GDAL'
 author:
-  - unknown
+  - 'Ari Jolma <ari.jolma at gmail.com>'
 build_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
@@ -11,7 +11,7 @@ configure_requires:
   Alien::gdal: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -26,5 +26,5 @@ requires:
   PDL: '0'
 resources:
   repository: git://github.com/ajolma/Geo-GDAL-FFI.git
-version: 0.03
+version: 0.04
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

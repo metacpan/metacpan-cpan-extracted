@@ -7,8 +7,7 @@ use AnyEvent::Impl::Perl;
 use AnyEvent::Socket;  
 use AnyEvent::Handle;  
   
-use MYDan::API::Agent;
-use MYDan::Agent::Query;
+use MYDan::Agent::Client;
 use MYDan::Util::OptConf;
 use IO::Socket;
 use Term::ReadKey;
@@ -43,9 +42,10 @@ my $listen = $o{listen};
 
 unless( $listen )
 {
-    my $scan = `nc -z localhost 65111-65333`;
-    my %open = map{ $_ => 1 }my @open = $scan =~ / (\d+) /g;
-    ( $listen ) = grep{ ! $open{$_} }65111 .. 65333 ;
+    my $scan = `netstat  -tun|awk '{print \$4}'|awk -F: '{print \$2}'`;
+    my %open = map{ $_ => 1 }my @open = $scan =~ /(\d+)/g;
+    my %port = map{ $_ => 1 }65112 .. 65535;
+    ( $listen ) = grep{ ! $open{$_} }keys %port;
 }
 
 my $socket = IO::Socket::INET->new (
@@ -68,37 +68,12 @@ my %query = (
     map{ $_ => $o{$_} }qw( user sudo )
 );
 
-my $isc = $o{role} && $o{role} eq 'client' ? 1 : 0;
-$query{node} = [ $o{host} ] if $isc;
-my $query = MYDan::Agent::Query->dump( \%query );
+my $host = delete $o{host};
+my %result = MYDan::Agent::Client->new( 
+    $host 
+)->run( %o, query => \%query ); 
 
-eval{ $query = MYDan::API::Agent->new()->encryption( $query ) if $isc };
-die "encryption fail:$@" if $@;
-
-my $call='';
-tcp_connect $o{host}, $o{port}, sub {  
-   my ( $fh ) = @_  or die "tcp_connect: $!";  
-   my $hdl; $hdl = new AnyEvent::Handle( 
-       fh => $fh,
-       on_read => sub {
-           my $self = shift;
-           $self->unshift_read (
-               chunk => length $self->{rbuf},
-               sub { $call .= $_[1]}
-           );
-       },
-       on_eof => sub{
-           undef $hdl;
-           $cv->send;  
-       }
-   );  
-
-   $hdl->push_write($query);  
-   $hdl->push_shutdown;
-};  
-
-$cv->recv;  
-
+my $call = $result{$host};
 die "call fail:$call\n" 
     unless $call && $call =~ /--- 0\n$/;
 

@@ -185,7 +185,12 @@ say '                      @{$is_singular}{keys %{$classical_plural_of} } = ();'
 say '';
 
 # Emit preposition pattern...
-say 'my $PREP_PAT = qr{ about | above | across | after | among | around | at | athwart | before | behind | below | beneath | beside | besides | between | betwixt | beyond | but | by | during | except | for | from | in | into | near | of | off | on | onto | out | over | since | till | to | under | until | unto | upon | with }xms;';
+say 'my $PREP_PAT = qr{ about | above | across | after | among | around | athwart | at | before |
+    behind | below | beneath | besides? | between | betwixt | beyond | but | by | during | except |
+    for | from | into | in | near | off | of | onto | on | out | over | since | till | to | under | until | unto | upon | with }xms;';
+say '';
+
+say 'sub prep_pat { $PREP_PAT }';
 say '';
 
 # Emit pattern-based inflection subroutines...

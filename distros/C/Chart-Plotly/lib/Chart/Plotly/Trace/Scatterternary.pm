@@ -12,9 +12,10 @@ use Chart::Plotly::Trace::Scatterternary::Marker;
 use Chart::Plotly::Trace::Scatterternary::Selected;
 use Chart::Plotly::Trace::Scatterternary::Stream;
 use Chart::Plotly::Trace::Scatterternary::Textfont;
+use Chart::Plotly::Trace::Scatterternary::Transform;
 use Chart::Plotly::Trace::Scatterternary::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Provides similar functionality to the *scatter* type but on a ternary phase diagram. The data is provided by at least two arrays out of `a`, `b`, `c` triplets.
 
@@ -269,6 +270,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scatterternary::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -296,7 +300,7 @@ Chart::Plotly::Trace::Scatterternary - Provides similar functionality to the *sc
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -484,6 +488,8 @@ Sets the source reference on plot.ly for  textposition .
 =item * textsrc
 
 Sets the source reference on plot.ly for  text .
+
+=item * transforms
 
 =item * uid
 

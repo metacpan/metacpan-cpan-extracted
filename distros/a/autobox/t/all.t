@@ -63,6 +63,7 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 
+use Test::Fatal qw(exception);
 use Test::More tests => 302;
 
 $| = 1;
@@ -77,10 +78,11 @@ my $array           = [ 0 .. 9 ];
 my $hash            = { 0 .. 9 };
 my $code            = \&add;
 my $test            = 'test';
-my $error           = qr{Can't (call|locate object) method "test" (without a|via) package\b};
-my $string_error    = qr{Can't locate object method "test" via package "Hello, world!"};
-my $unblessed_error = qr{Can't call method "test" on unblessed reference};
-my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
+my $error           = qr{^Can't (call|locate object) method "test" (without a|via) package\b};
+my $isa_error       = qr{^Can't (call|locate object) method "autobox_class" (without a|via) package\b};
+my $string_error    = qr{^Can't locate object method "test" via package "Hello, world!"};
+my $unblessed_error = qr{^Can't call method "test" on unblessed reference};
+my $undef_error     = qr{^Can't call method "[^"]+" on an undefined value};
 
 # test no args
 {
@@ -246,23 +248,12 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
 {
     use autobox DEFAULT => undef;
 
-    eval { $int->test() };
-    ok(($@ && ($@ =~ /^$error/)), 'default undef: $int');
-
-    eval { $float->test() };
-    ok(($@ && ($@ =~ /^$error/)), 'default undef: $float');
-
-    eval { $string->test() };
-    ok(($@ && ($@ =~ /^$string_error/)), 'default undef: $string');
-
-    eval { $array->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'default undef: $array');
-
-    eval { $hash->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'default undef: $hash');
-
-    eval { $code->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'default undef: $code');
+    like(exception { $int->test() }, $error, 'default undef: $int');
+    like(exception { $float->test() }, $error, 'default undef: $float');
+    like(exception { $string->test() }, $string_error, 'default undef: $string');
+    like(exception { $array->test() }, $unblessed_error, 'default undef: $array');
+    like(exception { $hash->test() }, $unblessed_error, 'default undef: $hash');
+    like(exception { $code->test() }, $unblessed_error, 'default undef: $code');
 }
 
 # test all 1
@@ -293,8 +284,11 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
     is("Hello, world"->test(), 'MyScalar', 'test all 1: double quoted string literal');
     is($string->test(),        'MyScalar', 'test all 1: $string');
 
-    eval { ({ 0 .. 9 })->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 1: HASH ref: not autoboxed');
+    like(
+        exception { ({ 0 .. 9 })->test() },
+        $unblessed_error,
+        'test all 1: HASH ref: not autoboxed'
+    );
 
     is((\&add)->test(), 'MyNamespace::CODE', 'test all 1: CODE ref');
     is(sub { $_[0] + $_[1] }->test(), 'MyNamespace::CODE', 'test all 1: ANON sub');
@@ -329,8 +323,11 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
     is("Hello, world"->test(), 'MyScalar', 'test all 2: double quoted string literal');
     is($string->test(),        'MyScalar', 'test all 2: $string');
 
-    eval { ({ 0 .. 9 })->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 2: HASH ref: not autoboxed');
+    like(
+        exception { ({ 0 .. 9 })->test() },
+        $unblessed_error,
+        'test all 2: HASH ref: not autoboxed'
+    );
 
     is((\&add)->test(), 'MyDefault', 'test all 2: CODE ref');
     is(sub { $_[0] + $_[1] }->test(), 'MyDefault', 'test all 2: ANON sub');
@@ -365,8 +362,11 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
     is("Hello, world"->test(), 'MyScalar', 'test all 3: double quoted string literal');
     is($string->test(),        'MyScalar', 'test all 3: $string');
 
-    eval { ({ 0 .. 9 })->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 3: HASH ref: not autoboxed');
+    like(
+        exception { ({ 0 .. 9 })->test() },
+        $unblessed_error,
+        'test all 3: HASH ref: not autoboxed'
+    );
 
     is((\&add)->test(), 'CODE', 'test all 3: CODE ref');
     is(sub { $_[0] + $_[1] }->test(), 'CODE', 'test all 3: ANON sub');
@@ -400,38 +400,39 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
     is("Hello, world"->test(), 'MyScalar', 'test all 4: double quoted string literal');
     is($string->test(),        'MyScalar', 'test all 4: $string');
 
-    eval { ({ 0 .. 9 })->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 4: HASH ref: not autoboxed');
+    like(
+        exception { ({ 0 .. 9 })->test() },
+        $unblessed_error,
+        'test all 4: HASH ref: not autoboxed'
+    );
 
-    eval { (\&add)->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 4: CODE ref: not autoboxed');
+    like(
+        exception { (\&add)->test() },
+        $unblessed_error,
+        'test all 4: CODE ref: not autoboxed'
+    );
 
-    eval { sub { $_[0] + $_[1] }->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 4: ANON sub: not autoboxed');
+    like(
+        exception { sub { $_[0] + $_[1] } ->test() },
+        $unblessed_error,
+        'test all 4: ANON sub: not autoboxed'
+    );
 
-    eval { $code->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'test all 4: $code: not autoboxed');
+    like(
+        exception { $code->test() },
+        $unblessed_error,
+        'test all 4: $code: not autoboxed'
+    );
 }
 
 # test autobox not used
 {
-    eval { $int->test() };
-    ok(($@ && ($@ =~ /^$error/)), 'autobox not used: $int');
-
-    eval { $float->test() };
-    ok(($@ && ($@ =~ /^$error/)), 'autobox not used: $float');
-
-    eval { $string->test() };
-    ok(($@ && ($@ =~ /^$string_error/)), 'autobox not used: $string');
-
-    eval { $array->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'autobox not used: $array');
-
-    eval { $hash->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'autobox not used: $hash');
-
-    eval { $code->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'autobox not used: $code');
+    like(exception { $int->test() }, $error, 'autobox not used: $int');
+    like(exception { $float->test() }, $error, 'autobox not used: $float');
+    like(exception { $string->test() }, $string_error, 'autobox not used: $string');
+    like(exception { $array->test() }, $unblessed_error, 'autobox not used: $array');
+    like(exception { $hash->test() }, $unblessed_error, 'autobox not used: $hash');
+    like(exception { $code->test() }, $unblessed_error, 'autobox not used: $code');
 }
 
 # test no autobox
@@ -440,23 +441,12 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
 
     no autobox;
 
-    eval { $int->test() };
-    ok(($@ && ($@ =~ /^$error/)), 'no autobox: $int');
-
-    eval { $float->test() };
-    ok(($@ && ($@ =~ /^$error/)), 'no autobox: $float');
-
-    eval { $string->test() };
-    ok(($@ && ($@ =~ /^$string_error/)), 'no autobox: $string');
-
-    eval { $array->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'no autobox: $array');
-
-    eval { $hash->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'no autobox: $hash');
-
-    eval { $code->test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), 'no autobox: $code');
+    like(exception { $int->test() }, $error, 'no autobox: $int');
+    like(exception { $float->test() }, $error, 'no autobox: $float');
+    like(exception { $string->test() }, $string_error, 'no autobox: $string');
+    like(exception { $array->test() }, $unblessed_error, 'no autobox: $array');
+    like(exception { $hash->test() }, $unblessed_error, 'no autobox: $hash');
+    like(exception { $code->test() }, $unblessed_error, 'no autobox: $code');
 }
 
 # test nested
@@ -622,46 +612,82 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
 {
     use autobox;
 
-    eval { undef->test() };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef: undef->test()');
+    like(
+        exception { undef->test() },
+        $undef_error,
+        'undef: undef->test()'
+    );
 
-    eval { $undef->test() };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef: $undef->test()');
+    like(
+        exception { $undef->test() },
+        $undef_error,
+        'undef: $undef->test()'
+    );
 
-    eval { undef->autobox_class->isa('SCALAR') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef: undef->autobox_class->isa(...)');
+    like(
+        exception { undef->autobox_class->isa('SCALAR') },
+        $undef_error,
+        'undef: undef->autobox_class->isa(...)'
+    );
 
-    eval { $undef->autobox_class->isa('SCALAR') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef: $undef->autobox_class->isa(...)');
+    like(
+        exception { $undef->autobox_class->isa('SCALAR') },
+        $undef_error,
+        'undef: $undef->autobox_class->isa(...)'
+    );
 
-    eval { undef->autobox_class->can('test') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef: undef->autobox_class->can(...)');
+    like(
+        exception { undef->autobox_class->can('test') },
+        $undef_error,
+        'undef: undef->autobox_class->can(...)'
+    );
 
-    eval { $undef->autobox_class->can('test') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef: $undef->autobox_class->can(...)');
+    like(
+        exception { $undef->autobox_class->can('test') },
+        $undef_error,
+        'undef: $undef->autobox_class->can(...)'
+    );
 }
 
 # test undef 2: not even if DEFAULT is specified
 {
     use autobox DEFAULT => 'SCALAR';
 
-    eval { undef->test() };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef with DEFAULT: undef->test()');
+    like(
+        exception { undef->test() },
+        $undef_error,
+        'undef with DEFAULT: undef->test()'
+    );
 
-    eval { $undef->test() };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef with DEFAULT: $undef->test()');
+    like(
+        exception { $undef->test() },
+        $undef_error,
+        'undef with DEFAULT: $undef->test()'
+    );
 
-    eval { undef->autobox_class->isa('SCALAR') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef with DEFAULT: undef->autobox_class->isa(...)');
+    like(
+        exception { undef->autobox_class->isa('SCALAR') },
+        $undef_error,
+        'undef with DEFAULT: undef->autobox_class->isa(...)'
+    );
 
-    eval { $undef->autobox_class->isa('SCALAR') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef with DEFAULT: $undef->autobox_class->isa(...)');
+    like(
+        exception { $undef->autobox_class->isa('SCALAR') },
+        $undef_error,
+        'undef with DEFAULT: $undef->autobox_class->isa(...)'
+    );
 
-    eval { undef->autobox_class->can('test') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef with DEFAULT: undef->autobox_class->can(...)');
+    like(
+        exception { undef->autobox_class->can('test') },
+        $undef_error,
+        'undef with DEFAULT: undef->autobox_class->can(...)'
+    );
 
-    eval { $undef->autobox_class->can('test') };
-    ok(($@ && ($@ =~ /^$undef_error/)), 'undef with DEFAULT: $undef->autobox_class->can(...)');
+    like(
+        exception { $undef->autobox_class->can('test') },
+        $undef_error,
+        'undef with DEFAULT: $undef->autobox_class->can(...)'
+    );
 }
 
 # test undef: but undef support can be enabled
@@ -674,21 +700,34 @@ my $undef_error     = qr{Can't call method "[^"]+" on an undefined value};
 # verify expected behaviour when autobox isn't enabled (workaround for a %^H bug)
 {
     use autobox_scope_1;
-    eval { autobox_scope_1::test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), '[]->test() raises an exception in a required module when autobox is not used');
+
+    like(
+        exception { autobox_scope_1::test() },
+        $unblessed_error,
+        '[]->test() raises an exception in a required module when autobox is not used'
+    );
 }
 
 # make sure behaviour is the same when autobox is enabled (workaround for a %^H bug)
 {
     use autobox;
     use autobox_scope_2;
-    eval { autobox_scope_2::test() };
-    ok(($@ && ($@ =~ /^$unblessed_error/)), '[]->test() raises an exception in a required module when autobox is used');
+
+    like(
+        exception { autobox_scope_2::test() },
+        $unblessed_error,
+        '[]->test() raises an exception in a required module when autobox is used'
+    );
 }
 
-# make sure enterscope/leavescope have popped the stack back so that the default op_method_named is restored
-(my $isa_error = $error) =~ s/test/autobox_class/;
-eval { 3->autobox_class->isa('SCALAR') };
-ok(($@ && ($@ =~ /^$isa_error/)), "3->autobox_class->isa('SCALAR') raises an exception outside a lexical scope in which autobox is loaded");
+# make sure enterscope/leavescope have popped the stack back so that the
+# default op_method_named is restored
+
+like(
+    exception { 3->autobox_class->isa('SCALAR') },
+    $isa_error,
+    "3->autobox_class->isa('SCALAR') raises an exception outside a" .
+        "lexical scope in which autobox is loaded"
+);
 
 1;

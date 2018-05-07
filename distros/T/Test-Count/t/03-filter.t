@@ -9,15 +9,17 @@ use File::Spec;
 use Test::Count::Filter;
 use IO::Scalar;
 
-my $mytest = "T". "E" . "S" . "T";
+my $mytest = "T" . "E" . "S" . "T";
 {
-    open my $in, "<", File::Spec->catfile("t", "sample-data", "test-scripts", "01-parser.t");
+    open my $in, "<",
+        File::Spec->catfile( "t", "sample-data", "test-scripts",
+        "01-parser.pl" );
     my $buffer = "";
-    my $out = IO::Scalar->new(\$buffer);
+    my $out    = IO::Scalar->new( \$buffer );
 
     my $filter = Test::Count::Filter->new(
         {
-            'input_fh' => $in,
+            'input_fh'  => $in,
             'output_fh' => $out,
         }
     );
@@ -25,7 +27,7 @@ my $mytest = "T". "E" . "S" . "T";
     $filter->process();
 
     # TEST
-    is ($buffer, <<"EOF", "Testing for expected");
+    is( $buffer, <<"EOF", "Testing for expected" );
 #!/usr/bin/perl
 
 use strict;
@@ -123,23 +125,25 @@ EOF
 }
 
 {
-    open my $in, "<", File::Spec->catfile("t", "sample-data", "test-scripts", "basic.arc");
+    open my $in, "<",
+        File::Spec->catfile( "t", "sample-data", "test-scripts", "basic.arc" );
     my $buffer = "";
-    my $out = IO::Scalar->new(\$buffer);
+    my $out    = IO::Scalar->new( \$buffer );
 
     my $filter = Test::Count::Filter->new(
         {
-            'input_fh' => $in,
-            'output_fh' => $out,
+            'input_fh'            => $in,
+            'output_fh'           => $out,
             'assert_prefix_regex' => qr{; TEST},
-            'plan_prefix_regex' => qr{\(plan\s+},
+            'plan_prefix_regex'   => qr{\(plan\s+},
         }
     );
 
     $filter->process();
 
     # TEST
-    is ($buffer, <<"EOF", "Testing for expected in Lisp Code with customisations");
+    is( $buffer,
+        <<"EOF", "Testing for expected in Lisp Code with customisations" );
 ;;; basic.arc.t - test some basic arc features.
 ;;;
 ;;; This is an example for a Lisp/Scheme/Arc file that should be processed
@@ -211,13 +215,15 @@ EOF
 }
 
 {
-    open my $in, "<", File::Spec->catfile("t", "sample-data", "test-scripts", "with-indented-plan.t");
+    open my $in, "<",
+        File::Spec->catfile( "t", "sample-data", "test-scripts",
+        "with-indented-plan.pl" );
     my $buffer = "";
-    my $out = IO::Scalar->new(\$buffer);
+    my $out    = IO::Scalar->new( \$buffer );
 
     my $filter = Test::Count::Filter->new(
         {
-            'input_fh' => $in,
+            'input_fh'  => $in,
             'output_fh' => $out,
         }
     );
@@ -225,7 +231,7 @@ EOF
     $filter->process();
 
     # TEST
-    is ($buffer, <<"EOF", "Testing for expected");
+    is( $buffer, <<"EOF", "Testing for expected" );
 #!/usr/bin/perl
 
 use strict;

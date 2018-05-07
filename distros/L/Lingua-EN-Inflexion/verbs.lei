@@ -13,11 +13,12 @@
 
     can                can               could             _                 _
     could              could             _                 _                 _
-    may                may               _                 _                 _
+    may                may               might             _                 _
     might              might             _                 _                 _
     must               must              _                 _                 _
     ought              ought             _                 _                 _
-    shall              shall             _                 _                 _
+    will               will              would             _                 _
+    shall              shall             should            _                 _
     should             should            _                 _                 _
     would              would             _                 _                 _
 
@@ -232,7 +233,6 @@
     weeps              weep              wept              weeping           wept
     wends              wend              wended            wending           wended
    *wets              *wet              *wet              *wetting          *wetted
-    will               will              willed            willing           willed
    *winds             *wind             *wound            *winding          *wound
     wins               win               won               winning           won
     withdraws          withdraw          withdrew          withdrawing       withdrawn

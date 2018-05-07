@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Koha-Contrib-Tamil",
   "EXE_FILES" => [
+    "bin/koha-ark",
     "bin/koha-auth",
     "bin/koha-authoritize",
     "bin/koha-claim",
@@ -96,7 +97,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.055",
+  "VERSION" => "0.057",
   "test" => {
     "TESTS" => "t/*.t"
   }

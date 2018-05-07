@@ -1,5 +1,17 @@
 Revision history for Math-AnyNum
 
+0.24    2018-05-06
+
+        [ADDITIONS]
+
+        - Added the `sumdigits(n, b)` function, to sum the digits of `n` in base `b`.
+        - Added the `approx_cmp(x, y, [k])` function, to compare two numbers by first rounding them to k-th decimal places.
+        - Extended the `fibonacci()` function to accept an optional argument specifying the order of the Fibonacci numbers (2 = Fibonacci, 3 = Tribonacci, 4 = Tetranacci, ...).
+
+        [IMPROVEMENTS]
+
+        - Minor optimization in `ipow(n,k)` when `k` is an object and `n` is a native unsigned integer.
+
 0.23    2018-04-09
 
         [ADDITIONS]

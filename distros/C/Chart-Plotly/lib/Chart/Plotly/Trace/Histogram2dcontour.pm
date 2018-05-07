@@ -12,10 +12,11 @@ use Chart::Plotly::Trace::Histogram2dcontour::Hoverlabel;
 use Chart::Plotly::Trace::Histogram2dcontour::Line;
 use Chart::Plotly::Trace::Histogram2dcontour::Marker;
 use Chart::Plotly::Trace::Histogram2dcontour::Stream;
+use Chart::Plotly::Trace::Histogram2dcontour::Transform;
 use Chart::Plotly::Trace::Histogram2dcontour::Xbins;
 use Chart::Plotly::Trace::Histogram2dcontour::Ybins;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` and `y` (where `x` and `y` represent marginal distributions, binning is set in `xbins` and `ybins` in this case) or `z` (where `z` represent the 2D distribution and binning set, binning is set by `x` and `y` in this case). The resulting distribution is visualized as a contour plot.
 
@@ -209,6 +210,9 @@ has showscale => ( is            => "rw",
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Histogram2dcontour::Stream", );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Histogram2dcontour::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -254,7 +258,7 @@ has y => ( is            => "rw",
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ybins => ( is  => "rw",
@@ -322,7 +326,7 @@ Chart::Plotly::Trace::Histogram2dcontour - The sample data from which statistics
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -481,6 +485,8 @@ Determines whether or not a colorbar is displayed for this trace.
 
 =item * stream
 
+=item * transforms
+
 =item * uid
 
 =item * visible
@@ -511,7 +517,7 @@ Sets the sample data to be binned on the y axis.
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ybins
 

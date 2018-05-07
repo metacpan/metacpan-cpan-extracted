@@ -1,43 +1,27 @@
 =head1 NAME
 
-Mylisp - my love Lisp
+Mylisp - My favorite Lisp.
 
 =head1 VERSION
 
-Version 2.03
+Version 3.00
 
 =head1 SYNOPSIS
 
 Mylisp is a programming language like lisp.
 
-    > mylisp --repl
+    > mylisp -lint spp-grammar.file
+    > mylisp -parse spp-grammar.file target.code
+    > mylisp -toperl spp-code.my
 
-then shell would ouput:
-
-    This is Mylisp REPL. type 'exit' to exit.
-    >>>
-    
-Lint mylisp.file:
-
-    > mylisp --lint mylisp.file
-
-transfer mylisp.file to Perl code.
-
-    > mylisp --toperl mylisp.file
-
-Mylisp also could transfer to Golang:
-
-    > mylisp --togo mylisp.spp
-    
 Mylisp also could use as Module:
 
     use 5.012;
-    use Mylisp qw(mylisp_to_ast get_mylisp_parser);
+    use Mylisp qw(Parse LintSpp MyToPerl);
 
 =head1 EXPORT
 
-   mylisp_to_ast
-   get_mylisp_parser
+   Parse LintSpp MyToPerl
 
 =head1 AUTHOR
 

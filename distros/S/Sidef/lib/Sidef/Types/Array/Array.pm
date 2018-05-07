@@ -357,8 +357,8 @@ package Sidef::Types::Array::Array {
     sub xor {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $endx = $#x;
         my $endy = $#y;
@@ -402,8 +402,8 @@ package Sidef::Types::Array::Array {
     sub and {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $i = 0;
         my $j = 0;
@@ -442,8 +442,8 @@ package Sidef::Types::Array::Array {
     sub sub {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $i = 0;
         my $j = 0;
@@ -478,8 +478,8 @@ package Sidef::Types::Array::Array {
     sub diff {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $i = 0;
         my $j = 0;
@@ -745,25 +745,28 @@ package Sidef::Types::Array::Array {
     }
 
     sub _min_max {
-        my ($self, $value) = @_;
+        my ($self, $order) = @_;
 
         @$self || return undef;
 
         my $item = $self->[0];
+
         foreach my $i (1 .. $#$self) {
-            my $val = $self->[$i];
-            $item = $val if (CORE::int($val cmp $item) == $value);
+            my $value = $self->[$i];
+            $item = $value if (CORE::int($value cmp $item) == $order);
         }
 
         $item;
     }
 
     sub max {
-        $_[0]->_min_max(1);
+        @_ = ($_[0], 1);
+        goto &_min_max;
     }
 
     sub min {
-        $_[0]->_min_max(-1);
+        @_ = ($_[0], -1);
+        goto &_min_max;
     }
 
     sub minmax {
@@ -865,18 +868,24 @@ package Sidef::Types::Array::Array {
     }
 
     sub _min_max_by {
-        my ($self, $block, $value) = @_;
+        my ($self, $block, $order) = @_;
 
         @$self || return undef;
 
-        my @pairs = map { [$_, scalar $block->run($_)] } @$self;
-        my $item = $pairs[0];
+        my $minmax  = $self->[0];
+        my $old_key = $block->run($minmax);
 
-        foreach my $i (1 .. $#pairs) {
-            $item = $pairs[$i] if (CORE::int($pairs[$i][1] cmp $item->[1]) == $value);
+        foreach my $i (1 .. $#$self) {
+            my $value   = $self->[$i];
+            my $new_key = $block->run($value);
+
+            if (CORE::int($new_key cmp $old_key) == $order) {
+                $minmax  = $value;
+                $old_key = $new_key;
+            }
         }
 
-        $item->[0];
+        $minmax;
     }
 
     sub max_by {
@@ -1662,8 +1671,9 @@ package Sidef::Types::Array::Array {
           : Sidef::Types::Number::Number::MONE;
     }
 
-    *index_by    = \&index;
-    *first_index = \&index;
+    *index_by       = \&index;
+    *first_index    = \&index;
+    *first_index_by = \&index;
 
     sub rindex {
         my ($self, $obj) = @_;
@@ -1689,8 +1699,9 @@ package Sidef::Types::Array::Array {
         $self->end;
     }
 
-    *rindex_by  = \&rindex;
-    *last_index = \&rindex;
+    *rindex_by     = \&rindex;
+    *last_index    = \&rindex;
+    *last_index_by = \&rindex;
 
     sub pairmap {
         my ($self, $obj) = @_;
@@ -2177,7 +2188,7 @@ package Sidef::Types::Array::Array {
         sub {
             my ($hash) = @_;
 
-            foreach my $key (my @keys = CORE::sort keys %{$hash}) {
+            foreach my $key (my @keys = CORE::sort(keys(%{$hash}))) {
                 next if $key eq $tail;
                 __SUB__->($hash->{$key});
 
@@ -2376,7 +2387,8 @@ package Sidef::Types::Array::Array {
 
     sub sort_by {
         my ($self, $block) = @_;
-        bless [map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $block->run($_)] } @$self], __PACKAGE__;
+        my @keys = map { scalar $block->run($_) } @$self;
+        bless [@{$self}[CORE::sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], __PACKAGE__;
     }
 
     # Inserts an object between each element
@@ -2535,6 +2547,12 @@ package Sidef::Types::Array::Array {
     }
 
     *nth_perm = \&nth_permutation;
+
+    sub perm2num {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->_set_str('int',
+                                            Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self]) // return undef);
+    }
 
     sub det_bareiss {
         my ($self) = @_;

@@ -1,13 +1,13 @@
 
 use warnings;
 use strict;
-use Test::More tests => 39;
+use Test::More tests => 47;
 
 # Check if module loads ok
 BEGIN { use_ok('Verilog::VCD', qw(:all)) }
 
 # Check module version number
-BEGIN { use_ok('Verilog::VCD', '0.07') }
+BEGIN { use_ok('Verilog::VCD', '0.08') }
 
 
 my $vcd;
@@ -63,6 +63,12 @@ $expected = [(
     '0'
 )];
 is_deeply(\@vs, $expected, 'values');
+
+my $i = 0;
+for (@{ $vcd->{$code}{tv} }) {
+    is(scalar @{ $_ }, '2', "number of elements in tv array $i");
+    $i++;
+}
 
 is(get_endtime(), '84', 'end time');
 

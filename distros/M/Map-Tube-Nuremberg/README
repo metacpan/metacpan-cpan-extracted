@@ -1,0 +1,7 @@
+Map::Tube::Nuremberg
+
+It currently provides functionality to find the shortest route between
+the two given stations. The map contains currently only (U-Bahn) subway stations.
+
+This software is Copyright (c) 2018 by Stefan Limbacher.
+This is free software, licensed under: The Artistic License 2.0 (GPL Compatible)

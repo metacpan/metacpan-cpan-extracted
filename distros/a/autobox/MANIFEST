@@ -12,7 +12,9 @@ ppport.h
 ptable.h
 README
 t/all.t
+t/autoload.t
 t/autoref.t
+t/can.t
 t/coderef.t
 t/debugger.pl
 t/debugger.t
@@ -26,7 +28,6 @@ t/lib/autobox_scope_2.pm
 t/lib/Versioned.pm
 t/merge.t
 t/name.t
-t/pod.t
 t/rt_46814.t
 t/rt_55652.t
 t/rt_71777.t

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Fstab;
-$Config::Model::Backend::Fstab::VERSION = '2.122';
+$Config::Model::Backend::Fstab::VERSION = '2.123';
 use Mouse;
 use Carp;
 use Log::Log4perl qw(get_logger :levels);
@@ -35,13 +35,12 @@ sub read {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
-    return 0 unless defined $args{io_handle};    # no file to read
+    return 0 unless $args{file_path}->exists;    # no file to read
     my $check = $args{check} || 'yes';
 
-    my @lines = $args{io_handle}->getlines;
+    my @lines = $args{file_path}->lines_utf8;
 
     # try to get global comments (comments before a blank line)
     $self->read_global_comments( \@lines, '#' );
@@ -97,15 +96,13 @@ sub write {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
-    my $ioh  = $args{io_handle};
     my $node = $args{object};
 
-    croak "Undefined file handle to write" unless defined $ioh;
+    croak "Undefined file handle to write" unless defined $args{file_path};
 
-    $self->write_global_comment( $ioh, '#' );
+    my $res = $self->write_global_comment( '#' );
 
     # Using Config::Model::ObjTreeScanner would be overkill
     foreach my $line_obj ( $node->fetch_element('fs')->fetch_all ) {
@@ -115,10 +112,11 @@ sub write {
             $self->option_string( $line_obj->fetch_element('fs_mntopts') ),
             map ( $line_obj->fetch_element_value($_), qw/fs_freq fs_passno/ ),
         );
-        $self->write_data_and_comments( $ioh, '#', $d, $line_obj->annotation );
+        $res .= $self->write_data_and_comments( '#', $d, $line_obj->annotation );
 
     }
 
+    $args{file_path}->spew_utf8($res);
     return 1;
 }
 
@@ -162,7 +160,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 
@@ -191,21 +189,17 @@ L<Config::Model>. You don't need to read it to write a model.
 Inherited from L<Config::Model::Backend::Any>. The constructor is
 called by L<Config::Model::BackendMgr>.
 
-=head2 read ( io_handle => ... )
+=head2 read
 
-Of all parameters passed to this read call-back, only C<io_handle> is
-used. This parameter must be L<IO::File> object already opened for
-read. 
-
-It can also be undef. In this case, C<read()> returns 0.
+Of all parameters passed to this read call-back, only C<file_path> is
+used. This parameter must be a L<Path::Tiny> object.
 
 When a file is read,  C<read()> returns 1.
 
-=head2 write ( io_handle => ... )
+=head2 write
 
-Of all parameters passed to this write call-back, only C<io_handle> is
-used. This parameter must be L<IO::File> object already opened for
-write. 
+Of all parameters passed to this write call-back, only C<file_path> is
+used.
 
 C<write()> returns 1.
 

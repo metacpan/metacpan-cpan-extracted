@@ -5,11 +5,11 @@ Use [issues](https://github.com/Tux/System-Info/issues)
 
 # Style
 
-I will never accept pull request that do not strictly conform to my
+I will never accept pull requests that do not strictly conform to my
 style, however you might hate it. You can read the reasoning behind
 my [preferences](http://tux.nl/style.html).
 
-I really do not care about mixed spaces and tabs in (leading) whitespace
+I really do not care about mixed spaces and tabs in (leading) whitespace.
 
 Perl::Tidy will help getting the code in shape, but as all software, it
 is not perfect. You can find my preferences for these in

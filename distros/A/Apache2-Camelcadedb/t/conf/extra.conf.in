@@ -1,0 +1,12 @@
+PerlSwitches -I@ServerRoot@/app
+
+PerlModule LoadCamelcade
+PerlModule HelloWorld
+
+PerlPostReadRequestHandler Apache2::Camelcadedb::start_debug_handler
+PerlCleanupHandler Apache2::Camelcadedb::stop_debug_handler
+
+<Location /hello>
+    SetHandler modperl
+    PerlResponseHandler HelloWorld
+</Location>

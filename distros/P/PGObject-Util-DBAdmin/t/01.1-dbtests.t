@@ -7,7 +7,7 @@ use PGObject::Util::DBAdmin;
 use File::Temp;
 
 plan skip_all => 'DB_TESTING not set' unless $ENV{DB_TESTING};
-plan tests => 70;
+plan tests => 75;
 
 # Constructor
 
@@ -113,3 +113,16 @@ foreach my $format ((undef, 'p', 'c')) {
     $dbh->disconnect;
     unlink $backup;
 }
+
+# Test backing up to compressed auto-generated temp file
+my $backup;
+my $fh;
+ok($backup = $db->backup(
+    tempdir => 't/var/',
+    compress => 9,
+), "Made backup, compressed");
+ok(-f $backup, "backup, compressed output file exists");
+cmp_ok(-s $backup, '>', 0, "backup, compressed output file has size > 0");
+ok(open ($fh, '<', $backup), "backup, compressed output file opened successfully");
+like(<$fh>, qr/^\x1F\x8B/, 'backup, compressed output file is gzip format');
+unlink $backup;

@@ -1,6 +1,9 @@
 Revision history for Perl module Verilog::VCD
 
 
+0.08  May 4 2018
+      - added support for Extended VCD format (evcd)
+
 0.07  Aug 27 2015 
       - fixed typo in POD
 

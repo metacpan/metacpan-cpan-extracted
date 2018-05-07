@@ -8,3 +8,7 @@ Revision history for Perl module Comodo::DCV
 
 0.03 Tue Dec 20 2016
     - Fix pre-5.14 compatibility
+
+0.04 Mon Jul 10 2017
+    - BREAKING CHANGE in response to Comodo’s DCV logic change
+    - add tools/parse_csr.pl

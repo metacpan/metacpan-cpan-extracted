@@ -261,7 +261,7 @@ assist you in porting PDL to a new system.
 
 PDL is available as source distribution in the 
 I<Comprehensive Perl Archive Network> (or CPAN) and from the
-sourceforge.net project page at L<https://sourceforge.net/projects/pdl/files/>.
+GitHub project page at L<https://github.com/PDLPorters/pdl>.
 The CPAN archives contains not only the PDL distribution but
 also just about everything else that is Perl-related.  CPAN is
 mirrored by dozens of sites all over the world.  The main site
@@ -367,29 +367,33 @@ pages).
 
 =back
 
-If you are interested in PDL in general you can join the PDL mailing
-list pdl-general@lists.sourceforge.net. This is a forum to discuss programming
-issues in PDL, report bugs, seek assistance with PDL related problems,
-etc. To subscribe, fill out the form at
-L<http://lists.sourceforge.net/lists/listinfo/pdl-general> .
-
-A searchable archive and a hypertext version of the traffic on this
-list (1997-2004) can be found at
-L<http://www.xray.mpe.mpg.de/mailing-lists/perldl/> . More recent
-messages (since June 2005) can be found at TBD.
+If you are interested in PDL in general you can join the pdl-general mailing
+list. This is a forum to discuss programming issues in PDL, report bugs, seek
+assistance with PDL related problems, etc.
 
 If you are interested in all the technical details of the ongoing PDL
-development you can join the PDL developers mailing list
-pdl-devel@lists.sourceforge.net . To subscribe, fill out the form at
-L<http://lists.sourceforge.net/lists/listinfo/pdl-devel> .
+development you can join the pdl-devel mailing list.
 
-A searchable archive and a hypertext version
-of the traffic on this list (1997-2004) can be found at 
-L<http://www.xray.mpe.mpg.de/mailing-lists/pdl-porters/> . More recent messages 
-(since June 2005) can be found at TBD
+Subscription and current archive links to both mailing lists can be
+found at L<http://pdl.perl.org/?page=mailing-lists>.
 
 Cross-posting between these lists should be avoided unless there is a
 I<very> good reason for doing that.
+
+The PDL project, begun in the late 1990s, has undergone considerable evolution
+since that time, and the support for it has as well. Thus mailing-list
+archives are in several places.  Originally pdl-general was called 'perldl',
+and pdl-devel was called 'pdl-porters'.
+
+|Time Period | URL                                                   |
+|------------|-------------------------------------------------------|
+|1996 - 2004 | http://www.xray.mpe.mpg.de/mailing-lists/perldl/      |
+|1997 - 2004 | http://www.xray.mpe.mpg.de/mailing-lists/pdl-porters/ |
+|2005 - 2015 | http://perldl.jach.hawaii.narkive.com/                |
+|2005 - 2015 | http://pdl-porters.jach.hawaii.narkive.com/           |
+|2015 -      | https://sourceforge.net/p/pdl/mailman/pdl-general/    |
+|2015 -      | https://sourceforge.net/p/pdl/mailman/pdl-devel/      |
+|--------------------------------------------------------------------|
 
 
 =head2 Q: 3.3    What is the current version of PDL ?  
@@ -601,24 +605,31 @@ Assume you have Git installed on your system and want to download the
 project source code into the directory C<PDL>. To get read-only access
 to the repository, you type at the command line
 
-   git clone git://git.code.sf.net/p/pdl/code pdl-code
+   git clone git://github.com/PDLPorters/pdl
+
+If you wish to submit changes to PDL, you should "fork" the repository
+from L<https://github.com/PDLPorters/pdl>, then clone your fork in the
+normal fashion.
+
+To become an official PDL developer, you will need to be added to the
+GitHub "PDLPorters" organisation.
 
 For official PDL developers, to get read/write access to the repository
 type at the command line
 
-   git clone ssh://USERNAME@git.code.sf.net/p/pdl/code pdl-code
+   git clone git://github.com/PDLPorters/pdl
 
+They can still use their own fork; at least one active developer uses
+that model rather than branches on the main repository.
 
 =head2 Q: 4.10   I had a problem with the Git version, how do I check if someone has submitted a patch?  
 
 
-The Sourceforge system contains a patch-manager which contains patches
-that have not yet been applied to the distribution. This can be
-accessed via the Tickets menu at PDL's Sourceforge project page
-L<http://sourceforge.net/projects/pdl> .
+The best way is to check L<https://github.com/PDLPorters/pdl/pulls> to see if
+somebody has submitted a pull request related to your problem.
 
 In addition, if you are not subscribing to the mailing list,
-check the archive of the C<pdl-porters> and C<perldl> mailing lists.
+check the archive of the C<pdl-devel> and C<pdl-general> mailing lists.
 See L<Question 3.2|"Q: 3.2 Are there other PDL information sources on the Internet?"> for details.
 
 
@@ -627,32 +638,46 @@ See L<Question 3.2|"Q: 3.2 Are there other PDL information sources on the Intern
 
 The first thing you should do is to read the Git documentation and
 learn the basics about Git. There are many sources available online.
-But here are the basics:
+It is very important that you use Git "best practice", with branches,
+but fortunately this is very easy! Here are the basics.
 
-Before you upload your changes, commit them to YOUR repository
+Make sure your copy is up to date with the main repo:
+
+   git checkout master
+   git pull --rebase # rebase in case you wrongly changed your own master
+
+Make a branch:
+
+   git checkout -b mybranch-name
+
+Commit your changes locally:
 
    git add <file1> <file2> ...
    git commit
 
-or combine these two with 
+or combine these two with:
 
    git commit -a
 
-Then pull in any changes others have made
-
-   git pull origin
-
 Test the PDL before you push it to the main repository.  If the
-code is broken for you, then it is most likely broken for others
-and they won't be happy to have their recent PDL fail to build!
-NOTE: git makes it very easy to maintain a separate branch of
-development.  [ TBD, provide information on how ].
+code is broken for you, then it is most likely broken for others.
+Luckily, the rest of this process will test that automatically to help
+you catch such errors.
 
-Then update the shared repository (at SF.net) with your changes
+Then update the shared repository with your changes:
 
-   git push origin master
+   git push -u origin mybranch-name
 
+This will still leave your changes on a branch, but this is good. Now
+go to the GitHub page, L<https://github.com/PDLPorters/pdl>. It will
+ask you whether you want to make a "pull request" - you do. Follow the
+prompts. This will then initiate the automated "continuous integration"
+tests, on Linux and Windows, with various versions of Perl, with various
+compilers. You will also want to get at least one other developer to
+review your changes.
 
+Once this review process is successfully completed, you can merge your
+changes to the master branch!
 
 =head1 PDL JARGON
 

@@ -14,8 +14,9 @@ use Chart::Plotly::Trace::Parcoords::Line;
 use Chart::Plotly::Trace::Parcoords::Rangefont;
 use Chart::Plotly::Trace::Parcoords::Stream;
 use Chart::Plotly::Trace::Parcoords::Tickfont;
+use Chart::Plotly::Trace::Parcoords::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Parallel coordinates for multidimensional exploratory data analysis. The samples are specified in `dimensions`. The colors are set in `line.color`.
 
@@ -137,6 +138,9 @@ has stream => ( is  => "rw",
 has tickfont => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Tickfont", );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Parcoords::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -161,7 +165,7 @@ Chart::Plotly::Trace::Parcoords - Parallel coordinates for multidimensional expl
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -299,6 +303,8 @@ Determines whether or not an item corresponding to this trace is shown in the le
 =item * stream
 
 =item * tickfont
+
+=item * transforms
 
 =item * uid
 

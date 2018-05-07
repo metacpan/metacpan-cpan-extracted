@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -71,7 +71,7 @@
       },
       "test" : {
          "requires" : {
-            "Config::Model::Tester" : "2.062",
+            "Config::Model::Tester" : "3.006",
             "Config::Model::Tester::Setup" : "0",
             "File::Copy" : "0",
             "IO::File" : "0",
@@ -98,7 +98,7 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.122",
+   "version" : "2.123",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

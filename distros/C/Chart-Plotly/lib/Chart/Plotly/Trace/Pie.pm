@@ -13,8 +13,9 @@ use Chart::Plotly::Trace::Pie::Marker;
 use Chart::Plotly::Trace::Pie::Outsidetextfont;
 use Chart::Plotly::Trace::Pie::Stream;
 use Chart::Plotly::Trace::Pie::Textfont;
+use Chart::Plotly::Trace::Pie::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
@@ -233,6 +234,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Pie::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -268,7 +272,7 @@ Chart::Plotly::Trace::Pie - A data visualized by the sectors of the pie is set i
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -451,6 +455,8 @@ Sets the source reference on plot.ly for  textposition .
 =item * textsrc
 
 Sets the source reference on plot.ly for  text .
+
+=item * transforms
 
 =item * uid
 

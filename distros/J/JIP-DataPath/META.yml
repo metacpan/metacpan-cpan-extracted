@@ -23,9 +23,9 @@ requires:
   English: '0'
   Exporter: '0'
   JIP::ClassField: '0.051'
-  perl: '5.006'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/outtaspace/jip_datapath/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/outtaspace/jip_datapath.git
-version: '0.01'
+version: '0.02'

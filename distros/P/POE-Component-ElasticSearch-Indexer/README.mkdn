@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.002
+version 0.004
 
 # SYNOPSIS
 
@@ -50,6 +50,20 @@ following parameters.
     A list of Elasticsearch hosts for connections.  Maybe in the form of
     `hostname` or `hostname:port`.
 
+- **MaxConnsPerServer**
+
+    Maximum number of simultaneous connections to an Elasticsearch node.  Used in
+    the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
+
+    Defaults to **3**.
+
+- **MaxConnsTotal**
+
+    Maximum number of simultaneous connections to all servers.  Used in
+    the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
+
+    Defaults to **MaxConnsPerServer \* number of Servers**.
+
 - **LoggingConfig**
 
     The [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) configuration file for the indexer to use.  Defaults to
@@ -94,10 +108,10 @@ following parameters.
 
     You may specify either as absolute bytes or using shortcuts:
 
-        BathDiskSpace => 500kb,
-        BathDiskSpace => 100mb,
-        BathDiskSpace => 10gb,
-        BathDiskSpace => 1tb,
+        BatchDiskSpace => 500kb,
+        BatchDiskSpace => 100mb,
+        BatchDiskSpace => 10gb,
+        BatchDiskSpace => 1tb,
 
 - **StatsHandler**
 
@@ -108,19 +122,6 @@ following parameters.
 - **StatsInterval**
 
     Run the `StatsHandler` every `StatsInterval` seconds.  Default to **60**.
-
-- **Templates**
-
-    If configured, this will ensure the [Dynamic
-    Templates](https://www.elastic.co/guide/en/elasticsearch/reference/master/dynamic-templates.html)
-    specified exist and are up-to-date with your specifications.
-
-        my $idx = POE::Component::ElasticSearch::Indexer->spawn(
-                ...
-                Templates => {
-                    base_settings => { template => '*', settings => { 'index.number_of_shards' => 6 } },
-                },
-        );
 
 ## EVENTS
 
@@ -227,7 +228,7 @@ The events provided by this component.
 
 # AUTHOR
 
-Brad Lhotsky &lt;brad@divisionbyzero.net>
+Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 

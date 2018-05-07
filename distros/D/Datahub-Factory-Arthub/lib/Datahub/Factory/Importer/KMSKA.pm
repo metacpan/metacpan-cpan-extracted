@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::KMSKA;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 use Moo;
 use Catmandu;

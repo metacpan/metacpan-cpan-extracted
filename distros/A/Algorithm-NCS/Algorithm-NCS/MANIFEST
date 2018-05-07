@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-NCS.xs
 README
 t/Algorithm-NCS.t
+t/02_NCS.t
 lib/Algorithm/NCS.pm

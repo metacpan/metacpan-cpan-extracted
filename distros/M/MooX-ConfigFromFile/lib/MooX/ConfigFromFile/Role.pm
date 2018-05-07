@@ -3,7 +3,7 @@ package MooX::ConfigFromFile::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use FindBin qw/$Script/;
 
@@ -122,15 +122,29 @@ sub _build_raw_loaded_config
     defined $params->{config_files} or $params->{config_files} = $class->_build_config_files($params);
     return [] if !@{$params->{config_files}};
 
+    Config::Any->load_files(
+        {
+            files   => $params->{config_files},
+            use_ext => 1
+        }
+    );
+
+}
+
+has sorted_loaded_config => (
+    is      => 'lazy',
+    clearer => 1
+);
+
+sub _build_sorted_loaded_config
+{
+    my ($class, $params) = @_;
+
+    defined $params->{raw_loaded_config} or $params->{raw_loaded_config} = $class->_build_raw_loaded_config($params);
+    return [] if !@{$params->{raw_loaded_config}};
     [
         ## no critic (BuiltinFunctions::RequireSimpleSortBlock)
-        sort { my @a = %{$a}; my @b = %{$b}; $a[0] cmp $b[0]; } @{Config::Any->load_files(
-                {
-                    files   => $params->{config_files},
-                    use_ext => 1
-                }
-            )
-        }
+        sort { my @a = %{$a}; my @b = %{$b}; $a[0] cmp $b[0]; } @{$params->{raw_loaded_config}}
     ];
 }
 
@@ -143,10 +157,10 @@ sub _build_loaded_config
 {
     my ($class, $params) = @_;
 
-    defined $params->{raw_loaded_config} or $params->{raw_loaded_config} = $class->_build_raw_loaded_config($params);
+    defined $params->{sorted_loaded_config} or $params->{sorted_loaded_config} = $class->_build_sorted_loaded_config($params);
 
     my $config_merged = {};
-    for my $c (map { values %$_ } @{$params->{raw_loaded_config}})
+    for my $c (map { values %$_ } @{$params->{sorted_loaded_config}})
     {
         %$config_merged = (%$config_merged, %$c);
     }
@@ -221,13 +235,20 @@ I<config_prefix> . I<config_extensions>.  Search is operated by L<File::Find::Ru
 =head2 raw_loaded_config
 
 This attribute contains the config as loaded from file system in an array of
-C<< filename => \%content >>.  The result from L<Config::Any> is sorted by
-filename (C<< '-' < '.' >>).
+C<< filename => \%content >>.
+
+=head2 sorted_loaded_config
+
+This attribute contains the loaded files from filesystem sorted by string
+in the same format as L<raw_loaded_config|/raw_loaded_config> (array of
+C<< filename => \%content >>).
+
+The default algorithm is sorted by filename (B<mind>: C<< '-' < '.' >>).
 
 =head2 loaded_config
 
 This attribute contains the config loaded and transformed while constructing
-the instance. Construction is done from I<raw_loaded_config>, ignoring the
+the instance. Construction is done from I<sorted_loaded_config>, ignoring the
 filename part.
 
 For classes set up using
@@ -248,7 +269,7 @@ creation with nasty hacks. He also taught me a bit more how Moo(se) works.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Jens Rehsack.
+Copyright 2013-2018 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

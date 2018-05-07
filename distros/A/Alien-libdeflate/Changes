@@ -1,0 +1,10 @@
+Revision history for perl distribution Alien-libdeflate
+
+0.02 2018-05-06T21:12:47+1200
+ - Use gmake to build
+ - Support system install using cbuilder probe and correctly test
+
+0.01 2018-05-05T11:58:08+1200
+ - Started project
+ - Working implementation
+ - Testing with Travis

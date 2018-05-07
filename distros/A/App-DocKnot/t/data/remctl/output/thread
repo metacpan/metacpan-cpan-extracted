@@ -1,0 +1,334 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[remctl][software]
+
+\h1[remctl]
+
+\quote(short)[
+
+    Small deeds done are better than great deeds planned.
+
+][Peter Marshall][]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[remctl][remctl]
+        [kerberos/remctl-\version[remctl]]
+
+    \link[https://packages.debian.org/source/sid/remctl]
+         [Debian packages] \break
+    \link[https://archives.eyrie.org/software/ARCHIVE/remctl/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[remctl.html][remctl manual page] \break
+    \link[remctl-shell.html][remctl-shell manual page] \break
+    \link[remctld.html][remctld manual page] \break
+    \link[java-readme.html][Java client and server README] \break
+    \link[php-readme.html][PHP bindings README] \break
+    \link[python-readme.html][Python bindings README] \break
+    \link[ruby-readme.html][Ruby bindings README] \break
+    \link[thanks.html][Thanks and credits]
+
+    \h2[Security Advisories]
+
+    \link[security/2018-04-01.html]
+        [2018-04-01]: remctl 3.12 and 3.13\break
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/remctl]
+         [GitHub] \break
+    \link[https://github.com/rra/remctl/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=kerberos/remctl.git]
+         [Git repository] \break
+    \link[https://travis-ci.org/rra/remctl]
+         [Travis-CI] \break
+    \link[https://www.openhub.net/p/remctl]
+         [Open HUB code analysis] \break
+    \link[https://tracker.debian.org/pkg/remctl]
+         [Debian package tracker]
+]
+
+\h2[Blurb]
+
+remctl is a client/server application that supports remote execution of
+specific commands, using Kerberos GSS-API for authentication.
+Authorization is controlled by a configuration file and ACL files and can
+be set separately for each command, unlike with rsh.  remctl is like a
+Kerberos-authenticated simple CGI server, or a combination of Kerberos ssh
+and sudo without most of the features and complexity of either.
+
+\h2[Description]
+
+remctl is a client/server application that supports remote execution of
+specific commands, using Kerberos GSS-API for authentication and
+confidentiality.  The commands a given user can execute are controlled by
+a configuration file and ACL files and can easily be tightly limited,
+unlike with rsh.  The mapping of command to backend program is done by the
+configuration file, which allows some additional flexibility compared to
+ssh command restrictions and works with Kerberos authentications rather
+than being limited to public key authentications.
+
+remctld is very similar to a CGI server that uses a different network
+protocol than HTTP, always does strong authentication before executing the
+desired command, and guarantees the data is encrypted on the network.
+Alternately, you can think of it as a very simple combination of Kerberos
+ssh and sudo, without most of the features of both but with simpler
+authorization.
+
+There are a lot of different client/server systems that do something
+similar, including regular rsh, CGI, IBM's sysctl (not to be confused with
+the Linux kernel call and configuration file of the same name), CERN's
+arc, and more elaborate systems like MIT's Moira.  remctl has the
+advantage over many of these schemes of using GSS-API and being about as
+simple as it possibly can be while still being useful.  It doesn't require
+any particular programming language, builds self-contained binaries, and
+uses as minimal of a protocol as possible.
+
+Both C and Java clients and servers are provided, as well as Perl, PHP,
+and Python bindings for the C client library.  For more information about
+the Java client, see \code[java/README].  For more information about the
+PHP bindings, see \code[php/README].  For more information about the
+Python bindings, see \code[python/README].
+
+Also included in the remctl package is an alternate way of running the
+remctl server: remctl-shell.  This program is designed to be run as either
+a shell or a forced command under ssh, using ssh for authentication and
+communicating the authentication information to remctl-shell via either
+environment variables or command-line arguments via the forced command
+configuration.  This version of the server uses simple ssh clients, rather
+than using the remctl client program or libraries.
+
+remctl was originally written by Anton Ushakov as a replacement for IBM's
+sysctl, a client/server application with Kerberos v4 authentication that
+allowed the client to run Tcl code on the server, protected by ACLs.  At
+Stanford, we used sysctl extensively, but mostly only to run external
+programs, so remctl was developed as a Kerberos v5 equivalent that did
+only the portions we needed.
+
+Complete protocol documentation is available in \code[docs/protocol.html].
+Also present, as \code[docs/design.html], is the original design document
+(now somewhat out of date).
+
+\h2[Requirements]
+
+The remctld server and the standard client are written in C and require a
+C compiler and GSS-API libraries to build.  Both will build against either
+MIT Kerberos or Heimdal of any reasonable vintage.  remctl will also build
+against the Kerberos GSS-API implementation shipped with AIX 5.2 (and
+possibly later versions) and the Solaris 10 generic GSS-API library (and
+possibly later versions).  The \code[remctl_set_ccache] implementation is
+improved by building with Kerberos libraries and a GSS-API library that
+supports \code[gss_krb5_import_cred].
+
+The remctld server requires libevent 1.4.x or later.  It's only been
+tested with libevent 1.4.13-stable and later, but should work with 1.4.4
+or later.  It is now only tested with libevent 2.x, so moving to a later
+version of libevent if possible is recommended.
+
+The remctl server will support regex ACLs if the system supports the POSIX
+regex API.  The remctl server also optionally supports PCRE regular
+expressions in ACLs.  To include that support, the PCRE library is
+required.
+
+To build the remctl client for Windows, the Microsoft Windows SDK for
+Windows Vista and the MIT Kerberos for Windows SDK are required, along
+with a Microsoft Windows build environment (probably Visual Studio).
+remctl has only been tested with the 3.2.1 MIT Kerberos for Windows SDK.
+To run the resulting binary, MIT Kerberos for Windows must be installed
+and configured.  The client was tested on Windows XP and Vista and should
+work on Windows 2000 and up; however, the primary maintainer does not use
+or test Windows, so it's always possible Windows support has broken.  The
+server is not supported on Windows.
+
+To build the Perl bindings for the C client library, you will need Perl
+5.8 or later.
+
+To build the PHP bindings for the C client library, you will need PHP 5.x
+or later and phpize, plus any other programs that phpize requires.  PHP
+5.x support has only been tested on 5.2 and 5.3, and PHP support is now
+only tested on PHP 7.x and later.
+
+To build the Python bindings for the C client library, you will need
+Python 2.3 or later (primarily tested with Python 2.7).  Python 3 is not
+(yet) supported.
+
+To build the Ruby bindings for the C client library, you will need Ruby
+1.8 or later (primarily tested with 2.5 and later).
+
+None of the language bindings have been tested on Windows.
+
+A Java client and Java server are available in the java subdirectory, but
+they are not integrated into the normal build or built by default.  There
+is a basic Makefile in that directory that may require some tweaking.  It
+currently requires the Sun Java JDK (1.4.2, 5, or 6) or OpenJDK 6 or
+later.  A considerably better Java client implementation is available on
+the \code[java] branch in the Git repository but has not yet been merged.
+
+To bootstrap from a Git checkout, or if you change the Automake files and
+need to regenerate Makefile.in, you will need Automake 1.11 or later.  For
+bootstrap or if you change configure.ac or any of the m4 files it includes
+and need to regenerate configure or config.h.in, you will need Autoconf
+2.64 or later.  Perl is also required to generate manual pages from a
+fresh Git checkout.  You will also need pkg-config installed to regenerate
+configure and xml2rfc to build the formatted protocol documentation.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[remctl][remctl]
+        [kerberos/remctl-\version[remctl]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/remctl/] [archive of
+older releases] is also available.  \class(alert)[Versions older than 3.14
+have known security vulnerabilities and should not be used.]
+
+Debian packages are available from Debian as of Debian 3.1 (sarge).  For
+Debian 4.0 (etch) and later, install remctl-server for the server and
+remctl-client for the client.  (The sarge release had a single remctl
+package that contained both.)
+
+The Net::Remctl Perl module is available in Debian 5.0 (lenny) and newer;
+install libnet-remctl-perl for it.  The PHP bindings (php5-remctl), Python
+bindings (python-remctl), and Ruby bindings (ruby-remctl) are available in
+Debian 6.0 (squeeze) and newer.  The Ruby bindings package is named
+libremctl-ruby in Debian versions before 7.0 (wheezy).
+
+See the \link[https://tracker.debian.org/pkg/remctl][Debian package
+tracker] for more information.
+
+For those using Puppet, there is a
+\link[https://forge.puppetlabs.com/ccin2p3/remctl][Puppet module]
+available for installing the remctl server and managing server
+configurations.  This was written and is maintained by the IN2P3 Computing
+Centre; see that page for more information.
+
+remctl is maintained using the Git version control system.  To check out
+the current development tree, see
+\link[https://github.com/rra/remctl][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/kerberos/remctl.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=kerberos/remctl.git][browse the current
+development source].
+
+\h2[Documentation]
+
+\div(left)[
+    \class(first)[User documentation:]
+
+    \doc[readme.html][README]
+    \doc[news.html][Change summary]
+    \doc[remctl.html][remctl manual page]
+    \doc[remctl-shell.html][remctl-shell manual page]
+    \doc[remctld.html][remctld manual page]
+    \doc[java-readme.html][Java client and server README]
+    \doc[php-readme.html][PHP bindings README]
+    \doc[python-readme.html][Python bindings README]
+    \doc[ruby-readme.html][Ruby bindings README]
+    \doc[thanks.html][Thanks and credits]
+    \doc[license.html][License and copyright]
+
+    Security advisories:
+
+    \doc[security/2018-04-01.html]
+        [2018-04-01: 3.12 and 3.13]
+
+    Developer documentation:
+
+    \doc[todo.html][To-do list]
+    \doc[https://github.com/rra/remctl]
+        [GitHub]
+    \doc[https://github.com/rra/remctl/issues]
+        [Bug tracker]
+    \doc[https://travis-ci.org/rra/remctl]
+        [Travis-CI]
+    \doc[https://www.openhub.net/p/remctl]
+        [Open HUB code analysis]
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+
+    \doc[remctl-api.html][remctl and remctl_free_result]
+    \doc[remctl_new.html][remctl_new]
+    \doc[remctl_open.html][remctl_open]
+    \doc[remctl_command.html][remctl_command and remctl_commandv]
+    \doc[remctl_output.html][remctl_output]
+    \doc[remctl_noop.html][remctl_noop]
+    \doc[remctl_close.html][remctl_close]
+    \doc[remctl_error.html][remctl_error]
+    \doc[remctl_set_ccache.html][remctl_set_ccache]
+    \doc[remctl_set_source_ip.html][remctl_set_source_ip]
+    \doc[remctl_set_timeout.html][remctl_set_timeout]
+    \doc[net-remctl.html][Net::Remctl Perl module]
+    \doc[net-remctl-backend.html][Net::Remctl::Backend Perl module]
+]
+
+\h2(after)[License]
+
+The remctl package as a whole is covered by the following copyright and
+license:
+
+\block[
+
+    Copyright 2015-2016, 2018
+        Russ Allbery <eagle@eyrie.org>
+
+    Copyright 2002-2014
+        The Board of Trustees of the Leland Stanford Junior University
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the remctl source distribution.
+
+\signature

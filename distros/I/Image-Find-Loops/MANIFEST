@@ -1,0 +1,6 @@
+Build.PL
+lib/Image/Find/Loops.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

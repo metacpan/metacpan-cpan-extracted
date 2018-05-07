@@ -18,14 +18,7 @@ DESCRIPTION
 REQUIREMENTS
 
 [% indent(to_text(requirements), 2) %]
-[% IF build.lancaster %]
-  To enable tests that don't detect functionality problems but are used to
-  sanity-check the release, set the environment variable RELEASE_TESTING
-  to a true value.  To enable tests that may be sensitive to the local
-  environment or that produce a lot of false positives without uncovering
-  many problems, set the environment variable AUTHOR_TESTING to a true
-  value.
-[% END %][% IF build.autotools %]
+[% IF build.autotools %]
 
   To bootstrap from a Git checkout, or if you change the Automake files
   and need to regenerate Makefile.in, you will need Automake
@@ -33,8 +26,8 @@ REQUIREMENTS
   configure.ac or any of the m4 files it includes and need to regenerate
   configure or config.h.in, you will need Autoconf [% build.autoconf %] or
   later.[% IF build.manpages %]  Perl is also required to generate manual
-  pages from a fresh Git checkout.
-  [% END %][% IF bootstrap %][% indent(to_text(bootstrap), 2) %][% END %]
+  pages from a fresh Git checkout.[% END %][% IF bootstrap %]
+[% indent(to_text(bootstrap), 2) %][% END %]
 [% END %][% IF build.type == 'Module::Build' %]
 BUILDING AND INSTALLATION
 
@@ -48,7 +41,14 @@ BUILDING AND INSTALLATION
 
   You will have to run the last command as root unless you're installing
   into a local Perl module tree in your home directory.
-[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+[% IF build.lancaster %]
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+[% END %][% ELSIF build.type == 'ExtUtils::MakeMaker' %]
 BUILDING AND INSTALLATION
 
   [% name %] uses ExtUtils::MakeMaker and can be installed using the same
@@ -61,7 +61,14 @@ BUILDING AND INSTALLATION
 
   You'll probably need to do the last as root unless you're installing
   into a local Perl module tree in your home directory.
-[% ELSIF build.type == 'Autoconf' %][% IF build.install %]
+[% IF build.lancaster %]
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+[% END %][% ELSIF build.type == 'Autoconf' %][% IF build.install %]
 BUILDING AND INSTALLATION
 
   You can build and install [% name %] with the standard commands:
@@ -158,6 +165,13 @@ TESTING
   ensure that necessary environment variables are set up.
 [% IF test.suffix %]
 [% indent(to_text(test.suffix), 2) %]
+[% END %][% IF build.lancaster %]
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
 [% END %][% END %][% END %]
 [% FOREACH section IN readme.sections %][% section.title FILTER upper %]
 

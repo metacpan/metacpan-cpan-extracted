@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::TransactionSearch;
-$WebService::Braintree::TransactionSearch::VERSION = '1.2';
+$WebService::Braintree::TransactionSearch::VERSION = '1.3';
 use 5.010_001;
 use strictures 1;
 

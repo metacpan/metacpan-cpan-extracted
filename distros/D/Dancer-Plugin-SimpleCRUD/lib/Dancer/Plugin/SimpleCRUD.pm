@@ -39,7 +39,7 @@ use HTML::Entities;
 use URI::Escape;
 use List::MoreUtils qw( first_index uniq );
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 =encoding utf8
 
@@ -573,19 +573,21 @@ sub simple_crud {
         = sub { _create_add_edit_route(\%args, $table_name, $key_column); };
 
     if ($args{editable}) {
-        _ensure_auth('edit', $handler, \%args);
         for ('/edit/:id') {
             my $url = _construct_url($args{prefix}, $_);
             Dancer::Logger::debug("Setting up route for $url");
-            any ['get', 'post'] => $url => $handler;
+            any ['get', 'post'] => $url => _ensure_auth(
+                'edit', $handler, \%args,
+            );
         }
     }
     if ($args{addable}) {
-        _ensure_auth('edit', $handler, \%args);
         for ('/add') {
             my $url = _construct_url($args{prefix}, $_);
             Dancer::Logger::debug("Setting up route for $url");
-            any ['get', 'post'] => $url => $handler;
+            any ['get', 'post'] => $url => _ensure_auth(
+                'edit', $handler, \%args
+            );
         }
     }
 
@@ -656,8 +658,9 @@ CONFIRMDELETE
 
             redirect _external_url($args{dancer_prefix}, $args{prefix});
         };
-        _ensure_auth('edit', $delete_handler, \%args);
-        post qr[$del_url_stub/?(.+)?$] => $delete_handler;
+        post qr[$del_url_stub/?(.+)?$] => _ensure_auth(
+            'edit', $delete_handler, \%args
+        );
     }
     my $view_url_stub = _construct_url(
         $args{prefix}, '/view'
@@ -725,7 +728,7 @@ sub _create_add_edit_route {
         $values_from_database
             = $dbh->quick_select($table_name, $where);
         if (!$values_from_database) {
-            send_error "$params->{title} $id not found", 404;
+            send_error "$args->{record_title} $id not found", 404;
 
         }
     }

@@ -1,7 +1,7 @@
 
 use warnings;
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 # Check if module loads ok
 BEGIN { use_ok('Verilog::VCD', qw(:all)) }
@@ -42,4 +42,6 @@ $expected = [(
     {time => 611, comment => "manually added two lines\nand here is the 2nd"},
 )];
 is_deeply(\@comms, $expected, 'simulation comments');
+
+is(get_closetime(), undef, 'undefined closetime');
 

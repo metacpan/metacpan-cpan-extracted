@@ -11,10 +11,11 @@ extends 'WebService::Braintree::PaymentMethodGatewayBase';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
-use WebService::Braintree::Validations qw(verify_params credit_card_signature);
-use WebService::Braintree::Util qw(validate_id);
-use WebService::Braintree::Result;
+use Scalar::Util qw(blessed);
 use Try::Tiny;
+
+use WebService::Braintree::Util qw(validate_id);
+use WebService::Braintree::Validations qw(verify_params credit_card_signature);
 
 use WebService::Braintree::_::CreditCard;
 
@@ -28,6 +29,7 @@ sub create {
 
 sub delete {
     my ($self, $token) = @_;
+    confess "NotFoundError" unless validate_id($token);
     $self->_make_request("/payment_methods/credit_card/$token", "delete", undef);
 }
 
@@ -70,6 +72,8 @@ sub expired {
 
 sub expiring_between {
     my ($self, $start, $end) = @_;
+    confess "ArgumentError" unless $start && blessed($start) && $start->isa('DateTime');
+    confess "ArgumentError" unless $end && blessed($end) && $end->isa('DateTime');
 
     $start = $start->strftime('%m%Y');
     $end   = $end->strftime('%m%Y');

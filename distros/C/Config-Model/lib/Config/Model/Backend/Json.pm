@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Json;
-$Config::Model::Backend::Json::VERSION = '2.122';
+$Config::Model::Backend::Json::VERSION = '2.123';
 use Carp;
 use strict;
 use warnings;
@@ -31,13 +31,12 @@ sub read {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
-    return 0 unless defined $args{io_handle};    # no file to read
+    return 0 unless defined $args{file_path}->exists;    # no file to read
 
     # load Json file
-    my $json = join( '', $args{io_handle}->getlines );
+    my $json = $args{file_path}->slurp_utf8;
 
     # convert to perl data
     my $perl_data = decode_json $json ;
@@ -61,16 +60,12 @@ sub write {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
-
-    croak "Undefined file handle to write"
-        unless defined $args{io_handle};
 
     my $perl_data = $self->{node}->dump_as_data( full_dump => $args{full_dump} );
     my $json = to_json( $perl_data, { pretty => 1 } );
 
-    $args{io_handle}->print($json);
+    $args{file_path}->spew_utf8($json);
 
     return 1;
 }
@@ -91,7 +86,7 @@ Config::Model::Backend::Json - Read and write config as a JSON data structure
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 
@@ -162,21 +157,17 @@ contains C<'a','b'>.
 Inherited from L<Config::Model::Backend::Any>. The constructor is
 called by L<Config::Model::BackendMgr>.
 
-=head2 read ( io_handle => ... )
+=head2 read
 
-Of all parameters passed to this read call-back, only C<io_handle> is
-used. This parameter must be an L<IO::File> object already opened for
-read.
-
-It can also be undef. In which case C<read()> returns 0.
+Of all parameters passed to this read call-back, only C<file_path> is
+used. This parameter must be a L<Path::Tiny>.
 
 When a file is read,  C<read()> returns 1.
 
-=head2 write ( io_handle => ... )
+=head2 write
 
-Of all parameters passed to this write call-back, only C<io_handle> is
-used. This parameter must be L<IO::File> object already opened for
-write.
+Of all parameters passed to this write call-back, only C<file_path> is
+used. This parameter must be L<Path::Tiny> object.
 
 C<write()> returns 1.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 51;
+use Test::More tests => 65;
 
 use lib '../lib', 'lib';
 
@@ -44,3 +44,27 @@ is($parser->bytes($parser->size), $parser->data, "bytes(all)");
 is($parser->offset, $parser->size, "offset end");
 is($parser->uint32, undef,       "uint32");
 is($parser->bytes(2000), '',     "bytes(2000)");
+
+$parser->set("2018-04-18 22:40:35");
+$parser->skip(2);
+is($parser->offset, 2,           "offset after skip(2)");
+$parser->align;
+is($parser->bytes(2), "-0",      "bytes(2) after skip(2) + align");
+$parser->align(5, 3);
+is($parser->bytes(3), "18 ",     "bytes(3) after align(5, 3)");
+$parser->align(2);
+is($parser->bytes(3), "40:",     "bytes(3) after align(2)");
+$parser->align(0, 1);  # void
+is($parser->bytes(3), "35",      "bytes(3) near the end");
+$parser->reset(11)->cut(5);
+is($parser->offset, 6,           "offset after reset(11) + cut(5)");
+is($parser->data, "04-18 22:40:35", "data after reset(11) + cut(5)");
+is($parser->size, 14,            "size after reset(11) + cut(5)");
+$parser->cut;
+is($parser->offset, 0,           "offset after cut");
+is($parser->data, "22:40:35",    "data after cut");
+is($parser->size, 8,             "size after cut");
+$parser->cut(20);
+is($parser->offset, 0,           "offset after cut(20)");
+is($parser->data, '',            "data after cut(20)");
+is($parser->size, 0,             "size after cut(20)");

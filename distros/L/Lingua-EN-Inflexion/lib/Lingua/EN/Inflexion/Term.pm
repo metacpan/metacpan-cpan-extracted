@@ -22,8 +22,8 @@ sub new {
 my $encase = sub {
     my ($original, $target) = @_;
 
-    # Special case for 'I' <-> 'we'...
-    return $target if $original =~ /\A(?:I|we)\Z/i;
+    # Special case for 'I'
+    return $target if $original eq 'I' || $target eq 'I';
 
     # Construct word-by-word case transformations...
     my @transforms
@@ -120,21 +120,146 @@ sub is_singular {
 sub is_noun { 1 }
 
 # Return plural and singular forms of the noun...
-sub plural   {
-    my ($self) = @_;
-    return $encase->(
-        $term_of{$self},
-        Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term_of{$self} )
+
+my %noun_inflexion_of = (
+  # CASE    TERM                            0TH      1ST     2ND     3RD
+    nominative => {
+            i       => { singular => [qw<   I        I       you     it       >],
+                         plural   => [qw<   we       we      you     they     >],
+                    },
+            you     => { singular => [qw<   you      I       you     it       >],
+                         plural   => [qw<   you      we      you     they     >],
+                    },
+            she     => { singular => [qw<   she      I       you     she      >],
+                         plural   => [qw<   they     we      you     they     >],
+                    },
+            he      => { singular => [qw<   he       I       you     he       >],
+                         plural   => [qw<   they     we      you     they     >],
+                    },
+            it      => { singular => [qw<   it       I       you     it       >],
+                         plural   => [qw<   they     we      you     they     >],
+                    },
+            we      => { singular => [qw<   I        I       you     it       >],
+                         plural   => [qw<   we       we      you     they     >],
+                    },
+            they    => { singular => [qw<   it       I       you     it       >],
+                         plural   => [qw<   they     we      you     they     >],
+                    },
+        },
+    accusative => {
+            me      => { singular => [qw<   me       me      you     it       >],
+                         plural   => [qw<   us       us      you     them     >],
+                    },
+            you     => { singular => [qw<   you      me      you     it       >],
+                         plural   => [qw<   you      us      you     them     >],
+                    },
+            her     => { singular => [qw<   her      me      you     her      >],
+                         plural   => [qw<   them     us      you     them     >],
+                    },
+            him     => { singular => [qw<   him      me      you     him      >],
+                         plural   => [qw<   them     us      you     them     >],
+                    },
+            it      => { singular => [qw<   it       I       you     it       >],
+                         plural   => [qw<   them     us      you     them     >],
+                    },
+            us      => { singular => [qw<   me       me      you     it       >],
+                         plural   => [qw<   us       us      you     them     >],
+                    },
+            them    => { singular => [qw<   it       me      you     it       >],
+                         plural   => [qw<   them     us      you     them     >],
+                    },
+        },
+    possessive => {
+            mine    => { singular => [qw<   mine     mine    yours   its      >],
+                         plural   => [qw<   ours     ours    yours   theirs   >],
+                    },
+            yours   => { singular => [qw<   yours    mine    yours   its      >],
+                         plural   => [qw<   yours    ours    yours   theirs   >],
+                    },
+            hers    => { singular => [qw<   hers     mine    yours   hers     >],
+                         plural   => [qw<   theirs   ours    yours   theirs   >],
+                    },
+            his     => { singular => [qw<   his      mine    yours   his      >],
+                         plural   => [qw<   theirs   ours    yours   theirs   >],
+                    },
+            its     => { singular => [qw<   its      mine    yours   its      >],
+                         plural   => [qw<   theirs   ours    yours   theirs   >],
+                    },
+            ours    => { singular => [qw<   mine     mine    yours   its      >],
+                         plural   => [qw<   ours     ours    yours   theirs   >],
+                    },
+            theirs  => { singular => [qw<   its      mine    yours   its      >],
+                         plural   => [qw<   theirs   ours    yours   theirs   >],
+                    },
+        },
+);
+
+my $PREP_PAT = qr{ about   | above   | across  | after  | among   | around   | athwart
+                 | at      | before  | behind  | below  | beneath | besides?
+                 | between | betwixt | beyond  | but    | by      | during 
+                 | except  | for     | from    | into   | in      | near     | off
+                 | of      | onto    | on      | out    | over    | since    | till
+                 | to      | under   | until   | unto   | upon    | within   | without | with
+                 }xmsi;
+
+sub singular {
+    my $self   = shift;
+    my $person = shift // 0;
+
+    my $term = $term_of{$self};
+
+    # Prepositions imply accusative or possessive (or dative)...
+    my $preposition = $term =~ s{ \A ( \s* $PREP_PAT \s+ ) }{}xi ? $1 : q{};
+    if ($preposition) {
+        return $preposition
+            . $encase->( $term,
+                    $noun_inflexion_of{accusative}{lc $term}{singular}[$person]
+                 // $noun_inflexion_of{possessive}{lc $term}{singular}[$person]
+                 // $noun_inflexion_of{nominative}{lc $term}{singular}[$person]
+                 // Lingua::EN::Inflexion::Nouns::convert_to_singular( $term, $person )
+            );
+    }
+
+    return $encase->( $term,
+                $noun_inflexion_of{nominative}{lc $term}{singular}[$person]
+             // $noun_inflexion_of{accusative}{lc $term}{singular}[$person]
+             // $noun_inflexion_of{possessive}{lc $term}{singular}[$person]
+             // Lingua::EN::Inflexion::Nouns::convert_to_singular( $term, $person )
+           );
+}
+
+
+sub plural {
+    my $self   = shift;
+    my $person = shift // 0;
+
+    my $term = $term_of{$self};
+
+    # Prepositions imply accusative or possessive (or dative)...
+    my $preposition = $term =~ s{ \A ( \s* $PREP_PAT \s+ ) }{}xi ? $1 : q{};
+    if ($preposition) {
+        return $preposition
+            . $encase->( $term,
+                    $noun_inflexion_of{accusative}{lc $term}{plural}[$person]
+                 // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
+                 // $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
+                 // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term, $person )
+            );
+    }
+
+    return $encase->( $term,
+                $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
+             // $noun_inflexion_of{accusative}{lc $term}{plural}[$person]
+             // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
+             // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term, $person )
+           );
+    return $preposition
+         . $encase->( $term,
+           $noun_inflexion_of{lc $term}{plural}[$person]
+        // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term, $person)
     );
 }
 
-sub singular {
-    my ($self) = @_;
-    return $encase->(
-        $term_of{$self},
-        Lingua::EN::Inflexion::Nouns::convert_to_singular( $term_of{$self} )
-    );
-}
 
 sub indef_article {
     my ($self) = @_;
@@ -253,7 +378,12 @@ sub new {
 
     my $new_object = bless do{ \my $scalar }, $class;
 
-    $term_of{$new_object} = $orig_object->singular;
+    # Special case of "them" (because "it" -> "they" and "it -> "them" are ambiguous)...
+    $term_of{$new_object}
+        = $term_of{$orig_object} eq 'them' ? $term_of{$orig_object}
+        :                                    $orig_object->singular;
+
+    # Otherwise...
 
     return $new_object;
 }
@@ -263,10 +393,14 @@ sub classical { return shift }
 
 # Classical plurals are different...
 sub plural {
-    my ($self) = @_;
+    my $self   = shift;
+    my $person = shift // 0;
+    my $term = $term_of{$self};
+
     return $encase->(
-        $term_of{$self},
-        Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term_of{$self})
+        $term,
+           $noun_inflexion_of{lc $term}{plural}[$person]
+        // Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term, $person)
     );
 }
 
@@ -337,13 +471,30 @@ sub is_verb { 1 }
 # Conversions...
 
 sub singular {
-    my ($self) = @_;
+    my $self   = shift;
+    my $person = shift // 0;
 
-    # Is it a known inflexion???
-    my $inflexion = Lingua::EN::Inflexion::Verbs::convert_to_singular( $term_of{$self} );
+    # "To be" is special...
+    if ($self =~ m{ \A (?: is | am | are ) \Z }x) {
+        return $person == 0                         ? $term_of{$self}
+             : $person == 2 || !$self->is_singular  ? 'are'
+             : $person == 1                         ? 'am'
+             :                                        'is'
+    }
 
-    # Return with case-following...
-    return $encase->( $term_of{$self}, $inflexion eq '_' ? $term_of{$self} : $inflexion );
+    # Third person uses the "notional" singular inflexion...
+    if ($person == 3 || $person == 0) {
+        # Is it a known inflexion???
+        my $inflexion = Lingua::EN::Inflexion::Verbs::convert_to_singular( $term_of{$self} );
+
+        # Return with case-following...
+        return $encase->( $term_of{$self}, $inflexion eq '_' ? $term_of{$self} : $inflexion );
+    }
+
+    # First and second person always use the uninflected (i.e. "notional "plural" form)...
+    else {
+        return plural($self);
+    }
 }
 
 sub plural {
@@ -419,6 +570,17 @@ sub indefinite {
                        : $self->plural;
 }
 
+sub as_regex {
+    my ($self) = @_;
+    my %seen;
+    my $pattern = join '|', map { quotemeta } reverse sort grep { !$seen{$_}++ }
+                  ($self->singular, $self->plural,
+                   $self->past, $self->past_part, $self->classical->pres_part);
+    return qr{$pattern}i;
+}
+
+
+
 
 package Lingua::EN::Inflexion::Adjective;
 our @ISA = 'Lingua::EN::Inflexion::Term';
@@ -451,6 +613,31 @@ while (my ($sing, $plur) = splice @adjectives, 0, 2) {
     $adj_plural_of{$sing} //= $plur;
 }
 
+my %adj_possessive_inflexion = (
+  # Term                             0TH    1ST   2ND    3RD
+    'my'     =>  { singular => [qw<  my     my    your   its    >],
+                   plural   => [qw<  our    our   your   their  >],
+                 },
+    'your'   =>  { singular => [qw<  your   my    your   its    >],
+                   plural   => [qw<  your   our   your   their  >],
+                 },
+    'her'    =>  { singular => [qw<  her    my    your   her    >],
+                   plural   => [qw<  their  our   your   their  >],
+                 },
+    'his'    =>  { singular => [qw<  his    my    your   his    >],
+                   plural   => [qw<  their  our   your   their  >],
+                 },
+    'its'    =>  { singular => [qw<  its    my    your   its    >],
+                   plural   => [qw<  their  our   your   their  >],
+                 },
+    'our'    =>  { singular => [qw<  my     my    your   its    >],
+                   plural   => [qw<  our    our   your   their  >],
+                 },
+    'their'  =>  { singular => [qw<  its    my    your   its    >],
+                   plural   => [qw<  their  our   your   their  >],
+                 },
+);
+
 
 # Report part-of-speech...
 sub is_adj { 1 }
@@ -475,27 +662,32 @@ sub is_singular   {
 # Conversions...
 
 sub singular {
-    my ($self) = @_;
-    my $term = $term_of{$self};
-    my $singular = $term;;
+    my $self = shift;
+    my $person = shift // 0;
 
-    # Is it a possessive form???
+    my $term = $term_of{$self};
+
+    # Is it a composite possessive form???
     if ($term =~ m{ \A (.*) 's? \Z }ixms) {
         $singular = Lingua::EN::Inflexion::Noun->new($1)->singular . q{'s};
     }
 
     # Otherwise, it's either a known inflexion, or uninflected...
     else {
-        $singular = $adj_singular_of{$term} // $adj_singular_of{lc $term} // $term;
+        $singular = $adj_possessive_inflexion{lc $term}{singular}[$person]
+                 // $adj_singular_of{$term}
+                 // $adj_singular_of{lc $term}
+                 // $term;
     }
 
     return $encase->($term, $singular);
 }
 
 sub plural {
-    my ($self) = @_;
+    my $self = shift;
+    my $person = shift // 0;
     my $term = $term_of{$self};
-    my $plural = $term;;
+    my $plural = $term;
 
     # Is it a possessive form???
     if ($term =~ m{ \A (.*) 's? \Z }ixms) {
@@ -505,7 +697,10 @@ sub plural {
 
     # Otherwise, it's either a known inflexion, or uninflected...
     else {
-        $plural = $adj_plural_of{$term} // $adj_plural_of{lc $term} // $term;
+        $plural = $adj_possessive_inflexion{lc $term}{plural}[$person]
+               // $adj_plural_of{$term}
+               // $adj_plural_of{lc $term}
+               // $term;
     }
 
     return $encase->($term, $plural);
@@ -566,4 +761,3 @@ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
 FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
-

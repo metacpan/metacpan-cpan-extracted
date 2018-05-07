@@ -117,6 +117,10 @@ Suffix magic:
   $pdl = rfits('file.fits.gz[3]'); # Read 3rd extension
   @pdls = rfits('file.fits');      # Read primary data and extensions
 
+Tilde expansion:
+  #expand leading ~ to home directory (using glob())
+  $pdl = rfits '~/filename.fits';
+
   $hdr = rfits('file.fits',{data=>0});  # Options hash changes behavior
 
 In list context, C<rfits> reads the primary image and all possible
@@ -342,7 +346,9 @@ sub PDL::rfits {
   # indicator which cancelled the check for empty primary data array at the end.
   my $explicit_extension = ($file =~ m/\[\d+\]$/ ? 1 : 0);
   $extnum = ( ($file =~ s/\[(\d+)\]$//) ? $1 : 0 );
-  
+
+  $file =~ s/^(~)/glob($1)/e; #tilde expansion.
+
   $file = "gunzip -c $file |" if $file =~ /\.gz$/;    # Handle compression
   $file = "uncompress -c $file |" if $file =~ /\.Z$/;
   
@@ -1562,6 +1568,10 @@ Suffix magic:
   # Automatically compress through pipe to compress 
   wfits $pdl, 'filename.fits.Z';  
 
+Tilde expansion:
+  #expand leading ~ to home directory (using glob())
+  wfits $pdl, '~/filename.fits';
+
 =over 3
 
 =item * Ordinary (PDL) data handling: 
@@ -1862,7 +1872,9 @@ sub PDL::wfits {
   }
 
   my ($k, $buff, $off, $ndims, $sz);
-  
+
+  $file =~ s/^(~)/glob($1)/e; # tilde expansion
+
   local $SIG{PIPE};
 
   if ($file =~ /\.gz$/) {            # Handle suffix-style compression

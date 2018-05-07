@@ -9,10 +9,12 @@ dan/agent/argv/apps
 dan/agent/argv/check
 dan/agent/argv/deploy
 dan/agent/argv/dump
+dan/agent/argv/edump
 dan/agent/argv/mrsync
 dan/agent/argv/scripts
 dan/agent/argv/sdump
 dan/agent/bin/agent
+dan/agent/bin/filecache
 dan/agent/bin/keyupdate
 dan/agent/code/access
 dan/agent/code/apps
@@ -22,6 +24,7 @@ dan/agent/code/collector
 dan/agent/code/deploy
 dan/agent/code/download
 dan/agent/code/dump
+dan/agent/code/edump
 dan/agent/code/exec
 dan/agent/code/load
 dan/agent/code/mrsync
@@ -177,6 +180,7 @@ lib/MYDan/Agent.pm
 lib/MYDan/Agent/Auth.pm
 lib/MYDan/Agent/Client.pm
 lib/MYDan/Agent/Client/Proxy.pm
+lib/MYDan/Agent/FileCache.pm
 lib/MYDan/Agent/Grsync.pm
 lib/MYDan/Agent/Grsync/V12.pm
 lib/MYDan/Agent/Grsync/V3.pm

@@ -1,6 +1,36 @@
 use Test::More;
 use Lingua::EN::Inflexion;
 
+for my $term (qw< am are is >) {
+    subtest qq{"$term", singular and plural} => sub {
+        my $verb = verb($term);
+
+        is $verb->singular,    $term => "sing->sing:        $term -> $term";
+        is $verb->plural,      'are' => "sing->plural:      $term -> are";
+        is $verb->singular(1), 'am'  => "sing->sing   1st:  $term -> I am";
+        is $verb->plural(1),   'are' => "sing->plural 1st:  $term -> We are";
+        is $verb->singular(2), 'are' => "sing->sing   2nd:  $term -> You are";
+        is $verb->plural(2),   'are' => "sing->plural 2nd:  $term -> Y'all are";
+        is $verb->singular(3), 'is'  => "sing->sing   3rd:  $term -> It is";
+        is $verb->plural(3),   'are' => "sing->plural 3rd:  $term -> They are";
+    }
+}
+
+for my $modal (qw< can could may might must ought will shall should would >) {
+    subtest qq{modal "$modal", singular and plural} => sub {
+        my $verb = verb($modal);
+
+        is $verb->singular,    $modal => "sing->sing:        $modal -> $modal";
+        is $verb->plural,      $modal => "sing->plural:      $modal -> $modal";
+        is $verb->singular(1), $modal => "sing->sing   1st:  $modal -> I $modal";
+        is $verb->plural(1),   $modal => "sing->plural 1st:  $modal -> We $modal";
+        is $verb->singular(2), $modal => "sing->sing   2nd:  $modal -> You $modal";
+        is $verb->plural(2),   $modal => "sing->plural 2nd:  $modal -> Y'all $modal";
+        is $verb->singular(3), $modal => "sing->sing   3rd:  $modal -> It $modal";
+        is $verb->plural(3),   $modal => "sing->plural 3rd:  $modal -> They $modal";
+    }
+}
+
 for my $line (<DATA>) {
     chomp $line;
 
@@ -22,6 +52,16 @@ for my $line (<DATA>) {
         is $v_sing->plural,   $plural   =>  "sing->plur: $singular -> $plural";
         is $v_plur->singular, $singular =>  "plur->sing: $plural -> $singular";
         is $v_plur->plural,   $plural   =>  "plur->plur: $plural -> $plural";
+        for my $person (1..2) {
+            is $v_sing->singular($person), $plural  =>  "sing$person->sing: $singular -> $plural";
+            is $v_sing->plural($person),   $plural  =>  "sing$person->plur: $singular -> $plural";
+            is $v_plur->singular($person), $plural  =>  "plur$person->sing: $plural -> $plural";
+            is $v_plur->plural($person),   $plural  =>  "plur$person->plur: $plural -> $plural";
+        }
+        is $v_sing->singular(3), $singular =>  "sing3->sing: $singular -> $singular";
+        is $v_sing->plural(3),   $plural   =>  "sing3->plur: $singular -> $plural";
+        is $v_plur->singular(3), $singular =>  "plur3->sing: $plural -> $singular";
+        is $v_plur->plural(3),   $plural   =>  "plur3->plur: $plural -> $plural";
         done_testing();
     };
 
@@ -75,6 +115,7 @@ __DATA__
     fulfils       fulfil        fulfilled        fulfilling         fulfilled
     graffitis     graffiti      graffitied       graffitiing        graffitied
     graphs        graph         graphed          graphing           graphed
+    has           have          had              having             had
     jams          jam           jammed           jamming            jammed
     japes         jape          japed            japing             japed
     kings         king          kinged           kinging            kinged

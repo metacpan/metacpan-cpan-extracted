@@ -6,12 +6,15 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use MIME::Base64;
-use POSIX qw(strftime);
-use WebService::Braintree::Digest qw(hexdigest);
-use WebService::Braintree::WebhookNotification::Kind;
 use Moose;
 
+use MIME::Base64;
+use POSIX qw(strftime);
+
+use WebService::Braintree::Digest qw(hexdigest);
+use WebService::Braintree::WebhookNotification::Kind;
+
+# This does not use Role::MakeRequest which provides the gateway attribute.
 has 'gateway' => (is => 'ro');
 
 sub sample_notification {

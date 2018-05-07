@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '0.43';
+$Test::Map::Tube::VERSION   = '0.44';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Interface to test Map::Tube features.
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 
@@ -217,8 +217,10 @@ sub _ok_map_functions {
     ($@) and carp($@) and return 0;
 
     # get_name()
-    ($object->name eq $actual->{name})
-        or (carp('name() returns incorrect map name') and return 0);
+    if (exists $actual->{name} && defined $actual->{name}) {
+        ($object->name eq $actual->{name})
+            or (carp('name() returns incorrect map name') and return 0);
+    }
 
     # get_lines()
     my $lines_count = scalar(@{$actual->{lines}->{line}});

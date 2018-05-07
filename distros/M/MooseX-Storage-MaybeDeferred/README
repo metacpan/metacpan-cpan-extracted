@@ -1,0 +1,77 @@
+NAME
+    MooseX::Storage::MaybeDeferred - A role for the less indecisive
+    programmers
+
+VERSION
+    0.0.4
+
+SYNOPSIS
+        package Point;
+        use Moose;
+        use MooseX::Storage;
+
+        with MooseX::Storage::MaybeDeferred => {
+            default_format => 'JSON',
+            default_io     => 'File',
+        };
+
+        has 'x' => (is => 'rw', isa => 'Int');
+        has 'y' => (is => 'rw', isa => 'Int');
+
+        1;
+
+        my $p = Point->new();
+        $p->freeze();
+        # or
+        $p->freeze({format => 'Storable'});
+
+        ...
+
+        $p->store($filename);
+        $p->store($filename, {format => 'Storable', io => 'AtomicFile'});
+
+        ...
+
+        my $another_point;
+        $another_point = Point->load($filename);
+        # or
+        $another_point = Point->load($filename, {format => 'JSON', io => 'File'});
+
+DESCRIPTION
+    With the module MooseX::Storage you are hard coding the definition of
+    the "format" and maybe "io" layer in the classes you want to serialize.
+    Whenever the methods "freeze" or "store" are called, it is not possible
+    to to change their behaviour. You always get what you have declared.
+
+    If you need to serialize into different formats you can use
+    MooseX::Storage::Deferred. Now, whenever you call "freeze" or "store"
+    you must provide parameters which define the format and the io layer.
+
+    This module should give you the benefits of both worlds. You need to
+    provide the "default_format" and "default_io" layers in the definitions
+    of the classes which you want to serialize. So classes that used to use
+    MooseX::Storage should still behave as before. But if you need to
+    serialize into a different format you have the flexibility of
+    MooseX::Storage::Deferred. Now you can provide the "format" and "io"
+    setting at runtime.
+
+SEE ALSO
+    MooseX::Storage
+    MooseX::Storage::Deferred
+
+ACKNOWLEDGEMENTS
+    Thanks www.netdescribe.com.
+
+CHANGES
+    version 0.0.5
+        Fixed tests so it is now able to run on Perl 5.8.x
+
+LICENSE AND COPYRIGHT
+    Copyright 2018 Martin Barth.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <http://dev.perl.org/licenses/> for more information.
+

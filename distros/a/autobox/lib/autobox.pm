@@ -11,7 +11,9 @@ use Scalar::Util;
 use Scope::Guard;
 use Storable;
 
-our $VERSION = '2.86';
+# XXX this declaration must be on a single line
+# https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
+use version 0.77; our $VERSION = version->declare('v3.0.1');
 
 XSLoader::load 'autobox', $VERSION;
 
@@ -257,7 +259,7 @@ sub import {
     # sanity check %args, expand the namespace prefixes into class names,
     # and copy values to the $bindings hash
 
-    my %synthetic = reverse (%$CLASS_CACHE); # synthetic class name => bool - see _pretty_print
+    my %synthetic = reverse(%$CLASS_CACHE); # synthetic class name => bool - see _pretty_print
 
     for my $type (keys %args) {
         # we've handled the virtual types, so we only need to check that this is a valid (real) type

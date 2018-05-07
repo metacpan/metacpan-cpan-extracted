@@ -1,12 +1,13 @@
 package Var::Pairs;
 
-our $VERSION = '0.003004';
+our $VERSION = '0.003005';
 
 use 5.014;
 use warnings;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Carp;
 use Devel::Callsite;
+use Scope::Upper qw<reap UP>;
 
 # Check for autoboxing, and set up pairs() method if applicable..
 my $autoboxing;
@@ -145,6 +146,9 @@ sub each_pair (+) {
     # Build an iterator...
     $iterator_for{$ID} //= [ &pairs ];
 
+    # Install a destructor for it at the send of the caller's block...
+    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP;
+
     # Iterate...
     return _get_each_pair($ID);
 }
@@ -186,6 +190,9 @@ sub each_kv (+) {
 
     # Build an iterator...
     $iterator_for{$ID} //= [ &kvs ];
+
+    # Install a destructor for it at the send of the caller's block...
+    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP;
 
     # Iterate...
     return _get_each_kv($ID);
@@ -291,7 +298,7 @@ Var::Pairs - OO iterators and pair constructors for variables
 
 =head1 VERSION
 
-This document describes Var::Pairs version 0.003004
+This document describes Var::Pairs version 0.003005
 
 
 =head1 SYNOPSIS
@@ -406,6 +413,10 @@ to C<each()>).
 
 When the iterator is exhausted, the next call to C<each_pair()> returns
 C<undef> or an empty list (depending on context), and resets the iterator.
+The iterator is also reset when execution leaves the block in which
+C<each_pair()> is called. This means, for example, that C<last>-ing out
+of the middle of an iterated loop does the right thing (by resetting the
+iterator).
 
 The typical usage is:
 
@@ -441,7 +452,8 @@ container variable can be nested without interacting with each other
 
 When the iterator is exhausted, the next call to C<each_kv()> returns
 C<undef> in scalar context or an empty list in list context, and resets
-the iterator.
+the iterator. The iterator is also reset when execution leaves the block
+in which C<each_kv()> is called.
 
 The typical list usage is:
 

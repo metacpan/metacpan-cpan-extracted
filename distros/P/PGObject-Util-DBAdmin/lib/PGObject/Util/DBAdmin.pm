@@ -19,11 +19,11 @@ PGObject
 
 =head1 VERSION
 
-Version 0.120.0
+Version 0.130.0
 
 =cut
 
-our $VERSION = '0.120.0';
+our $VERSION = '0.130.0';
 
 
 =head1 SYNOPSIS
@@ -52,11 +52,15 @@ utilities.
 
 =head2 username
 
+The username used to authenticate with the PostgreSQL server.
+
 =cut
 
 has username => (is => 'ro');
 
 =head2 password
+
+The password used to authenticate with the PostgreSQL server.
 
 =cut
 
@@ -81,6 +85,8 @@ has port => (is => 'ro');
 
 =head2 dbname
 
+The database name to create or connect to.
+
 =cut
 
 has dbname => (is => 'ro');
@@ -88,7 +94,8 @@ has dbname => (is => 'ro');
 =head2 stderr
 
 When applicable, the stderr output captured from any external commands (for
-example createdb or pg_restore) run during the previous method call.
+example createdb or pg_restore) run during the previous method call. See
+notes in L</"CAPTURING">.
 
 =cut
 
@@ -97,7 +104,8 @@ has stderr => (is => 'ro');
 =head2 stdout
 
 When applicable, the stdout output captured from any external commands (for
-example createdb or pg_restore) run during the previous method call.
+example createdb or pg_restore) run during the previous method call. See
+notes in L</"CAPTURING">.
 
 =cut
 
@@ -106,8 +114,11 @@ has stdout => (is => 'ro');
 
 sub _run_command {
     my ($self, %args) = @_;
-
     my $exit_code;
+
+    # Any files created should be accessible only by the current user
+    my $original_umask = umask 0077;
+
     ($self->{stdout}, $self->{stderr}, $exit_code) = capture {
         system @{$args{command}};
     };
@@ -116,33 +127,11 @@ sub _run_command {
         $self->_write_log_files(%args);
     }
 
-    if($exit_code != 0) {
-        croak 'error running command';
-    }
+    # Reset original umask
+    umask $original_umask;
 
-    return 1;
-}
-
-
-sub _run_command_to_file {
-    my ($self, $output_fh, $output_filename, @command) = @_;
-
-    my $exit_code;
-    (undef, $self->{stderr}, $exit_code) = capture {
-        system @command;
-    } stdout => $output_fh;
-
-    close $output_fh or $self->_unlink_file_and_croak(
-        $output_filename,
-        "Failed to close output file after writing $!"
-    );
-
-    ($exit_code == 0) or $self->_unlink_file_and_croak(
-        $output_filename,
-        'error running command'
-    );
-
-    return 1;
+    # Return true if system command is successful
+    return ($exit_code == 0);
 }
 
 
@@ -154,24 +143,12 @@ sub _unlink_file_and_croak {
 }
 
 
-sub _open_output_filehandle {
+sub _generate_output_filename {
     my ($self, %args) = @_;
 
     # If caller has supplied a file path, use that
     # rather than generating our own temp file.
-    if(defined $args{file}) {
-        # If file already exists, we don't alter its permissions,
-        # but new files are created with a mask of 0600 so they are
-        # only readable and writeable by the user that creates them.
-        #
-        # capture requires that the file be seekable.
-        #
-        # Use sysopen so we can set permissions at time of creation.
-        sysopen(my $fh, $args{file}, O_RDWR|O_CREAT, 0600)
-            or croak "couldn't open file $args{file} for writing $!";
-
-        return ($fh, $args{file});
-    }
+    defined $args{file} and return $args{file};
 
     my %file_options = (UNLINK => 0);
 
@@ -185,7 +162,7 @@ sub _open_output_filehandle {
     my $fh = File::Temp->new(%file_options)
         or croak "could not create temp file: $@, $!";
 
-    return ($fh, $fh->filename);
+    return $fh->filename;
 }
 
 
@@ -336,7 +313,10 @@ sub create {
     defined $self->port     and push(@command, '-p', $self->port);
     defined $self->dbname   and push(@command, $self->dbname);
 
-    return $self->_run_command(command => [@command]);
+    $self->_run_command(command => [@command])
+        or croak 'error running command';
+
+    return 1;
 }
 
 
@@ -393,7 +373,7 @@ sub run_file {
         command    => [@command],
         errlog     => $args{errlog},
         stdout_log => $args{stdout_log},
-    );
+    ) or croak 'error running command';
 
     return $result;
 }
@@ -403,8 +383,9 @@ sub run_file {
 
 Creates a database backup file.
 
-After calling this method, STDERR output from the external pg_dump
-utility is available as property $db->stderr.
+After calling this method, STDOUT and STDERR output from the external
+utility which runs the file on the database are available as properties
+$db->stdout and $db->stderr respectively.
 
 Unlinks the output file and croaks on error.
 
@@ -431,6 +412,11 @@ If undefined, a file will be created using File::Temp having umask 0600.
 The directory in which to write the backup file. Optional parameter.  Uses
 File::Temp default if not defined.  Ignored if file paramter is given.
 
+=item compress
+
+Optional parameter. Specifies the compression level to use and is passed to
+the underlying pg_dump command. Default is no compression.
+
 =back
 
 =cut
@@ -441,20 +427,18 @@ sub backup {
     $self->{stdout} = undef;
 
     local $ENV{PGPASSWORD} = $self->password if defined $self->password;
-    my ($output_fh, $output_filename) = $self->_open_output_filehandle(%args);
+    my $output_filename = $self->_generate_output_filename(%args);
 
-    my @command = ('pg_dump');
+    my @command = ('pg_dump', '-f', $output_filename);
     defined $self->username and push(@command, '-U', $self->username);
     defined $self->host     and push(@command, '-h', $self->host);
     defined $self->port     and push(@command, '-p', $self->port);
+    defined $args{compress} and push(@command, '-Z', $args{compress});
     defined $args{format}   and push(@command, "-F$args{format}");
     defined $self->dbname   and push(@command, $self->dbname);
 
-    $self->_run_command_to_file(
-        $output_fh,
-        $output_filename,
-        @command
-    );
+    $self->_run_command(command => [@command])
+        or $self->_unlink_file_and_croak($output_filename, 'error running pg_dump command');
 
     return $output_filename;
 }
@@ -498,18 +482,15 @@ sub backup_globals {
     $self->{stdout} = undef;
 
     local $ENV{PGPASSWORD} = $self->password if defined $self->password;
-    my ($output_fh, $output_filename) = $self->_open_output_filehandle(%args);
+    my $output_filename = $self->_generate_output_filename(%args);
 
-    my @command = ('pg_dumpall', '-g');
+    my @command = ('pg_dumpall', '-g', '-f', $output_filename);
     defined $self->username and push(@command, '-U', $self->username);
     defined $self->host     and push(@command, '-h', $self->host);
     defined $self->port     and push(@command, '-p', $self->port);
 
-    $self->_run_command_to_file(
-        $output_fh,
-        $output_filename,
-        @command
-    );
+    $self->_run_command(command => [@command])
+        or $self->_unlink_file_and_croak($output_filename, 'error running pg_dumpall command');
 
     return $output_filename;
 }
@@ -563,7 +544,10 @@ sub restore {
     defined $args{format}   and push(@command, "-F$args{format}");
     push(@command, $args{file});
 
-    return $self->_run_command(command => [@command]);
+    $self->_run_command(command => [@command])
+        or croak 'error running command';
+
+    return 1;
 }
 
 
@@ -587,9 +571,26 @@ sub drop {
     defined $self->port     and push(@command, '-p', $self->port);
     push(@command, $self->dbname);
 
-    return $self->_run_command(command => [@command]);
+    $self->_run_command(command => [@command])
+        or croak 'error running command';
+
+    return 1;
 }
 
+
+=head1 CAPTURING
+
+This module uses C<Capture::Tiny> to run extenal commands and capture their
+output, which is made available through the C<stderr> and C<stdout>
+properties.
+
+This capturing does not work if Perl's standard C<STDOUT> or
+C<STDERR> filehandles have been localized. In this situation, the localized
+filehandles are captured, but external system calls are not
+affected by the localization, so their output is sent to the original
+filehandles and is not captured.
+
+See the C<Capture::Tiny> documentation for more details.
 
 =head1 AUTHOR
 

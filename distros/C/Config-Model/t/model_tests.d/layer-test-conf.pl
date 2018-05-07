@@ -26,8 +26,7 @@ $model->create_config_class(
         'choice' => [ 'a' .. 'g' ]
       },
     ],
-    'read_config' => [
-      {
+    'rw_config' => {
         'backend' => 'perl_file',
         'config_dir' => '~/foo',
         'file' => 'config.pl',
@@ -35,8 +34,7 @@ $model->create_config_class(
             'config_dir' => '/etc',
             'file' => 'foo-config.pl'
         }
-      }
-    ]
+    }
 );
 
 $model_to_test = "LayeredClass" ;

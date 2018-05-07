@@ -20,7 +20,7 @@ $MYDan::Util::OptConf::ARGC = -1;
  $0 -r range [--sudo sudoer ] [--verbose] cmd ..
 
      [--user username (default `id -un`)]
-     [--timeout seconds (default 500)] 
+     [--timeout seconds (default 60)] 
      [--max number ( default 128 )]
      [--port number ( default from .config )]
      [--env "A=123;B=abc" ]
@@ -29,7 +29,7 @@ $MYDan::Util::OptConf::ARGC = -1;
 
 =cut
 my $option = MYDan::Util::OptConf->load();
-my %o = $option->get(
+my %o = $option->set( timeout => 60 )->get(
      qw( range=s sudo=s timeout=i max=i verbose env=s user=s port=s version secret=s )
 )->dump();
 
@@ -42,7 +42,11 @@ $o{version} = 1 if $code eq 'version';
 
 $o{user} = `id -un` and chop $o{user} unless $o{user};
 
+my $time = time;
 my %query = ( code => $code, argv => argv( $code ), map{ $_ => $o{$_} }qw( user sudo ) );
+my $use = int ( time - $time );
+$o{timeout} -= $use if $use;
+$o{timeout} = 3 if $o{timeout} <= 0;
 
 map{ 
     $query{"__$1"} = $2 if $_ =~ /^([^=]+)=(.+)$/  

@@ -9,8 +9,9 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Pointcloud::Hoverlabel;
 use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
+use Chart::Plotly::Trace::Pointcloud::Transform;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
@@ -141,6 +142,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Pointcloud::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -198,7 +202,7 @@ has y => ( is            => "rw",
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 has ybounds => (
@@ -233,7 +237,7 @@ Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -352,6 +356,8 @@ Sets text elements associated with each (x,y) pair. If a single string, the same
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * uid
 
 =item * visible
@@ -392,7 +398,7 @@ Sets the y coordinates.
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =item * ybounds
 

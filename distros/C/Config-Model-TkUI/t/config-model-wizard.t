@@ -1,48 +1,29 @@
 # -*- cperl -*-
 
-use warnings FATAL => qw(all);
 
 use ExtUtils::testlib;
 use Test::More ;
 use Tk;
 use Config::Model::TkUI;
 use Config::Model ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Config::Model::Value ;
-use Log::Log4perl qw(get_logger :levels) ;
 use Test::Memory::Cycle;
 
 use strict;
+use warnings;
 use lib 't/lib';
 
-my $arg = shift || '';
+my ($model, $trace, $args) = init_test('show');
 
-my ($log,$show) = (0) x 2 ;
+note("You can play with the widget if you run the test with 's' argument");
 
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /s|i/;
-
-print "You can play with the widget if you run the test with 's' argument\n";
-
-my $home = $ENV{HOME} || '';
-my $log4perl_user_conf_file = "$home/.log4config-model";
-if (-r $log4perl_user_conf_file) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init($log ? $TRACE: $WARN);
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok(1,"Compilation done");
-
-my $model = Config::Model -> new () ;
+my $wr_root = setup_test_dir;
 
 my $inst = $model->instance (
     root_class_name => 'Master',
     instance_name => 'test1',
-    root_dir   => 'wr_data',
+    root_dir   => $wr_root,
 );
 
 ok($inst,"created dummy instance") ;
@@ -117,7 +98,7 @@ SKIP: {
     }
 
 
-    unless ($show) {
+    unless ($args->{show}) {
         foreach my $t (@test) {
             $mw->after($delay, $t);
             inc_d ;
@@ -128,7 +109,7 @@ SKIP: {
 
     ok(1,"wizard done") ;
 
-    memory_cycle_ok($cmw);
+    memory_cycle_ok($cmw, "memory cycle");
 }
 
 done_testing;

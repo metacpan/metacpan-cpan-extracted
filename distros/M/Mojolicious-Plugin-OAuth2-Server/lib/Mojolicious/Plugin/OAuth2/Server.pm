@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.41
+0.42
 
 =head1 SYNOPSIS
 
@@ -97,11 +97,11 @@ use base qw/ Mojolicious::Plugin /;
 
 use Mojo::URL;
 use Mojo::Parameters;
-use Mojo::Util qw/ b64_decode /;
+use Mojo::Util qw/ b64_decode url_unescape /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -386,7 +386,7 @@ sub _maybe_generate_access_token {
      )
   );
 
-  $mojo_url->fragment( $params->to_string );
+  $mojo_url->fragment( url_unescape( $params->to_string ) );
   return $is_helper ? $mojo_url : $self->redirect_to( $mojo_url );
 }
 

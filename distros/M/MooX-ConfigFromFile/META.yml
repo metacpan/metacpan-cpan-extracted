@@ -33,6 +33,6 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-ConfigFromFile
   homepage: https://metacpan.org/release/MooX-ConfigFromFile
   license: http://dev.perl.org/licenses/
-  repository: https://github.com:rehsack/MooX-ConfigFromFile.git
-version: '0.008'
+  repository: https://github.com/rehsack/MooX-ConfigFromFile.git
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

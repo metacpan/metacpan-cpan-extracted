@@ -18,10 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Net::Statsd::Tiny",
   "PREREQ_PM" => {
     "Class::Accessor::Fast" => 0,
-    "IO::Socket" => "1.18",
-    "base" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "IO::Socket" => "1.18"
   },
   "TEST_REQUIRES" => {
     "Devel::StrictMode" => 0,
@@ -38,7 +35,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.3.0",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,12 +55,9 @@ my %FallbackPrereqs = (
   "Test::Roo::DataDriven" => 0,
   "Test::Roo::Role" => 0,
   "Test::TCP" => "2.19",
-  "base" => 0,
   "if" => 0,
   "lib" => 0,
-  "strict" => 0,
-  "utf8" => 0,
-  "warnings" => 0
+  "utf8" => 0
 );
 
 

@@ -39,6 +39,7 @@ use MYDan::API::Agent;
 use Fcntl qw(:flock SEEK_END);
 use MYDan::Agent::Proxy;
 use MYDan::Util::Hosts;
+use MYDan::Agent::FileCache;
 
 sub new
 {
@@ -57,6 +58,8 @@ sub run
 
     my ( $node, $sp, $dp, $query ) = @$this{qw( node sp dp )};
 
+    my $filecache = MYDan::Agent::FileCache->new();
+
     my $path = "$MYDan::PATH/tmp";
     unless( -d $path ){ mkdir $path;chmod 0777, $path; }
     $path .= '/load.data.';
@@ -69,6 +72,13 @@ sub run
 
     my $temp = sprintf "$dp.%stmp", $run{continue} ? '' : time.'.'.$$.'.';
     $temp  = $path. Digest::MD5->new->add( $temp )->hexdigest;
+
+
+    $SIG{INT} = $SIG{TERM} = sub
+    {
+        unlink $temp if !$run{continue} && $temp && -f $temp;
+        die "killed.\n";
+    };
 
     my $position = -f $temp ? ( stat $temp )[7] : 0;
 
@@ -99,7 +109,7 @@ sub run
         {
             my %rquery = ( 
                 code => 'proxy', 
-                single => 1,
+                proxyload => 1,
                 argv => [ $node, +{ query => $query, map{ $_ => $run{$_} }grep{ $run{$_} }qw( timeout max port ) } ],
 	        map{ $_ => $run{$_} }grep{ $run{$_} }qw( user sudo env ) 
             );
@@ -143,6 +153,13 @@ sub run
                        {
                            $keepalive{cont} .= $_[1];
                            $keepalive{cont} =~ s/^\*+//g;
+
+			   if( length $keepalive{cont} > 1024000 )
+			   {
+				   undef $hdl;
+				   $cv->send;
+			   }
+
                            if( $keepalive{cont} =~ s/\**#\*MYDan_\d+\*#(\d+):([a-z0-9]+):(\w+):(\d+):// )
                            {
                                ( $size, $filemd5, $own, $mode ) = ( $1, $2, $3, $4 );
@@ -150,6 +167,13 @@ sub run
 			       {
                                    $run{chown} ||= $own;
 				   $run{chmod} ||= $mode;
+			       }
+
+			       if( $filecache->check( $filemd5 ) && ! -e $dp  )
+			       {
+				       print "get data from filecache\n";
+				       eval{ $filecache->get( $dp, $filemd5) };
+				       warn "get filecache fail: $@" if $@;
 			       }
 
 			       if( -f $dp )
@@ -205,7 +229,9 @@ sub run
     unless( $end =~ /^--- 0\n$/  )
     {
         unlink $temp;
-        die "status error $end\n";
+	my $err = $keepalive{cont} || '';
+	$err =~ s/\**#\*MYDan_\d+\*#//;
+        die "status error $err $end\n";
     }
     truncate $TEMP, $size;
     seek $TEMP, 0, 0;
@@ -225,6 +251,8 @@ sub run
     }
 
     die "rename temp file\n" if system "mv '$temp' '$dp'";
+    eval{ $filecache->save( $dp ); };
+    warn "save filecache fail: $@" if $@;
 }
 
 1;

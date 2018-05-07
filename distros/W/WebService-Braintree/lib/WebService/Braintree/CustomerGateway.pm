@@ -11,14 +11,12 @@ with 'WebService::Braintree::Role::MakeRequest';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
-use WebService::Braintree::Validations qw(verify_params customer_signature);
+
 use WebService::Braintree::Util qw(validate_id);
-use WebService::Braintree::Result;
+use WebService::Braintree::Validations qw(verify_params customer_signature);
 
 use WebService::Braintree::_::Customer;
 use WebService::Braintree::CustomerSearch;
-
-has 'gateway' => (is => 'ro');
 
 sub create {
     my ($self, $params) = @_;
@@ -66,6 +64,7 @@ sub all {
 
 sub transactions {
     my ($self, $customer_id) = @_;
+    confess "NotFoundError" unless validate_id($customer_id);
 
     return $self->resource_collection({
         ids_url => "/customers/${customer_id}/transaction_ids",

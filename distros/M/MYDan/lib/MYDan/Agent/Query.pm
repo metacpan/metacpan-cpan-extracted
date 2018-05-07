@@ -46,7 +46,7 @@ Returns a scalar dumped from input HASH.
 our ( %o, @myip );
 BEGIN{ 
     %o = MYDan::Util::OptConf->load()->dump( 'agent' );
-    @myip = grep{ /\d/ }split /\s+/, `hostname -I 2>/dev/null;hostname 2>/dev/null`;
+    @myip = grep{ /^[a-zA-Z0-9\._\-]+$/ }split /\s+/, `hostname -I 2>/dev/null;hostname 2>/dev/null;cat '$MYDan::PATH/etc/ips' 2>/dev/null`;
 };
 
 sub dump

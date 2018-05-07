@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package JSON::Path;
-$JSON::Path::VERSION = '0.411';
+$JSON::Path::VERSION = '0.420';
 # VERSION
 
 use Exporter::Tiny ();
@@ -111,7 +111,7 @@ sub map {
     my ( $self, $object, $coderef ) = @_;
     my $count;
     foreach my $path ( $self->paths( $object ) ) {
-        my $ref = JSON::Path::Evaluator::evaluate_jsonpath( $object, $path, want_ref => 1 );
+        my ($ref) = JSON::Path::Evaluator::evaluate_jsonpath( $object, $path, want_ref => 1 );
         ++$count;
         my $value = do {
             no warnings 'numeric';
@@ -138,7 +138,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 0.411
+version 0.420
 
 =head1 SYNOPSIS
 
@@ -379,6 +379,8 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 Kit Peters E<lt>popefelix@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
+
+Szymon Nieznański E<lt>s.nez@member.fsf.orgE<gt> 
 
 Kit Peters E<lt>popefelix@cpan.orgE<gt>
 

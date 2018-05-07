@@ -45,7 +45,11 @@
     \link[https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot]
          [Bug tracker] \break
     \link[https://git.eyrie.org/?p=devel/docknot.git]
-         [Git repository]
+         [Git repository] \break
+    \link[https://travis-ci.org/rra/docknot]
+         [Travis-CI] \break
+    \link[https://metacpan.org/release/App-DocKnot]
+         [MetaCPAN]
 ]
 
 \h2[Blurb]
@@ -92,7 +96,7 @@ web publishing framework, time permitting.
 
 \h2[Requirements]
 
-Perl 5.18 or later and Module::Build are required to build this module.
+Perl 5.24 or later and Module::Build are required to build this module.
 The following additional Perl modules are required to use it:
 
 \bullet(packed)[File::BaseDir]
@@ -131,6 +135,10 @@ An \link[https://archives.eyrie.org/software/ARCHIVE/App-DocKnot/]
 A Debian package is available from my \link[../debian.html][personal
 repository].
 
+DocKnot is available from CPAN as the
+\link[https://metacpan.org/release/App-DocKnot] [App-DocKnot
+distribution].
+
 DocKnot is maintained using the Git version control system.  To check out
 the current development tree, see
 \link[https://github.com/rra/docknot][GitHub] or clone:
@@ -156,6 +164,8 @@ Developer documentation:
 \doc[todo.html][To-do list]
 \doc[https://github.com/rra/docknot]
     [GitHub]
+\doc[https://travis-ci.org/rra/docknot]
+    [Travis-CI]
 
 \h2[License]
 

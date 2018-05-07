@@ -1,0 +1,45 @@
+---
+abstract: 'ARK Management'
+author:
+  - 'Frédéric Demians <f.demians@tamil.fr>'
+build_requires:
+  File::Find: '0'
+  File::Temp: '0'
+  Koha::Schema: '0'
+  MARC::Moose::Field: '0'
+  MARC::Moose::Field::Control: '0'
+  MARC::Moose::Field::Std: '0'
+  MARC::Moose::Parser::Marcxml: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Koha-Contrib-ARK
+requires:
+  AnyEvent::Processor::Conversion: '0'
+  AnyEvent::Processor::Converter: '0'
+  DateTime: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  Log::Dispatch: '0'
+  Log::Dispatch::File: '0'
+  Log::Dispatch::Screen: '0'
+  MARC::Moose::Record: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  MooseX::RW::Reader: '0'
+  MooseX::RW::Writer: '0'
+  Pod::Usage: '0'
+  Try::Tiny: '0'
+  YAML: '0'
+resources:
+  repository: http://git.tamil.fr/git/Koha-Contrib-ARK
+version: 1.0.0

@@ -1,3 +1,20 @@
+v0.63.4 2018-05-06T01:59:41Z
+ - old dist.perl fixed
+
+v0.63.3 2018-05-05T03:26:07Z
+ - typo in Dockerfile
+
+v0.63.2 2018-05-05T03:15:09Z
+ - Dockerfile updated
+ - link statically to libidn2 on linux
+
+v0.63.1 2018-05-04T12:00:44Z
+ - remove perl version deps from Build.PL gen
+ - toml support removed
+ - b85 removed
+ - use direct centos deps
+ - add exclusion for docker from for pcore
+
 v0.63.0 2018-04-28T00:31:02Z
  - docker wrapper tmpl updated
  - pcore deploy --develop options changed to --devel

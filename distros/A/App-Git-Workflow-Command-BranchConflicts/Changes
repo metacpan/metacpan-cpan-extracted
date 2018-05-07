@@ -1,5 +1,9 @@
 Revision history for module
 
+0.6   2018-05-07
+        Updating for release of version 0.6
+        Fixing typo in Capture::Tiny version (Ivan Wills)
+
 0.5   2018-04-23
         Updating for release of version 0.5
         Updated date (Ivan Wills)

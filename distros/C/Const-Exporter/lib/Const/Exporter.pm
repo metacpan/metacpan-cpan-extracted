@@ -7,13 +7,14 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.4.0';
 
 use Carp;
 use Const::Fast;
 use Exporter ();
+use List::AllUtils '0.10' => qw/ pairs zip /;
 use Package::Stash;
-use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_ref /;
+use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_hashref is_ref /;
 
 # RECOMMEND PREREQ: Package::Stash::XS
 # RECOMMEND PREREQ: Ref::Util::XS
@@ -22,8 +23,11 @@ use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_ref /;
 sub import {
     my $pkg = shift;
 
-    my ($caller) = caller;
-    my $stash = Package::Stash->new($caller);
+    strict->import;
+    warnings->import;
+
+    my $caller = caller;
+    my $stash  = Package::Stash->new($caller);
 
     # Create @EXPORT, @EXPORT_OK, %EXPORT_TAGS and import if they
     # don't yet exist.
@@ -40,11 +44,12 @@ sub import {
     _add_symbol( $stash, 'const', \&Const::Fast::const );
     _export_symbol( $stash, 'const' );
 
-    while ( my $tag = shift ) {
+    foreach my $set ( pairs @_ ) {
 
+        my $tag = $set->key;
         croak "'${tag}' is reserved" if $tag eq 'all';
 
-        my $defs = shift;
+        my $defs = $set->value;
 
         croak "An array reference required for tag '${tag}'"
           unless is_arrayref($defs);
@@ -60,16 +65,20 @@ sub import {
                     my @enums = @{$item};
                     my $start = shift @{$defs};
 
-                    my @values = ( ref $start ) ? @{$start} : ($start);
+                    my @values = is_arrayref($start) ? @{$start} : ($start);
 
-                    my $value = 0;
+                    my $last = $values[0] // 0;
+                    my $fn = sub { $_[0] + 1 };
 
-                    while ( my $symbol = shift @enums ) {
+                    if ( is_coderef $values[1] ) {
+                        $fn = $values[1];
+                        $values[1] = undef;
+                    }
 
-                        croak "${symbol} already exists"
-                          if ( $stash->has_symbol($symbol) );
-
-                        $value = @values ? ( shift @values ) : ++$value;
+                    foreach my $pair ( pairs zip @enums, @values ) {
+                        my $value = $pair->value // $fn->($last);
+                        $last = $value;
+                        my $symbol = $pair->key // next;
 
                         _add_symbol( $stash, $symbol, $value );
                         _export_symbol( $stash, $symbol, $tag );
@@ -136,9 +145,19 @@ sub import {
     push @{ $export_tags->{all} }, @{$export_ok};
 
     _uniq( $export_tags->{$_} ) for keys %{$export_tags};
+
 }
 
 # Add a symbol to the stash
+
+sub _check_sigil_against_value {
+    my ($sigil, $value) = @_;
+
+    return 0 if $sigil eq '@' && !is_arrayref($value);
+    return 0 if $sigil eq '%' && !is_hashref($value);
+
+    return 1;
+}
 
 sub _add_symbol {
     my ( $stash, $symbol, $value ) = @_;
@@ -153,6 +172,10 @@ sub _add_symbol {
 
         }
         else {
+
+            croak "Invalid type for $symbol"
+                unless _check_sigil_against_value($sigil, $value);
+
             $stash->add_symbol( $symbol, $value );
             Const::Fast::_make_readonly( $stash->get_symbol($symbol) => 1 );
         }
@@ -191,22 +214,6 @@ sub _get_sigil {
     return $1 // '&';
 }
 
-# Function to convert a sigil into the corresponding reftype.
-
-{
-    const my %_reftype => (
-        '$' => 'SCALAR',
-        '&' => 'CODE',
-        '@' => 'ARRAY',
-        '%' => 'HASH',
-    );
-
-    sub _get_reftype {
-        my ($sigil) = @_;
-        return $_reftype{$sigil};
-    }
-}
-
 # Function to take a list reference and prune duplicate elements from
 # it.
 
@@ -233,7 +240,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -481,6 +488,13 @@ The C<:default> tag is the same as not specifying any exports.
 The C<:all> tag exports all symbols.
 
 =head1 KNOWN ISSUES
+
+=head2 Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+L</SOURCE>.
 
 =head2 Exporting Functions
 

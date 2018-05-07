@@ -1,7 +1,7 @@
 ---
 abstract: 'A Mojo User-Agent that can record and play back requests without Internet connectivity, similar to LWP::UserAgent::Mockable'
 author:
-  - 'Kit Peters <kit.peters@broadbean.com>'
+  - 'Kit Peters <popefelix@gmail.com>'
 build_requires:
   Array::Compare: '0'
   Exporter: '0'
@@ -36,7 +36,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,16 +45,16 @@ name: Mojo-UserAgent-Mockable
 provides:
   Mojo::UserAgent::Mockable:
     file: lib/Mojo/UserAgent/Mockable.pm
-    version: '1.53'
+    version: '1.54'
   Mojo::UserAgent::Mockable::Proxy:
     file: lib/Mojo/UserAgent/Mockable/Proxy.pm
-    version: '1.53'
+    version: '1.54'
   Mojo::UserAgent::Mockable::Request::Compare:
     file: lib/Mojo/UserAgent/Mockable/Request/Compare.pm
-    version: '1.53'
+    version: '1.54'
   Mojo::UserAgent::Mockable::Serializer:
     file: lib/Mojo/UserAgent/Mockable/Serializer.pm
-    version: '1.53'
+    version: '1.54'
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -76,5 +76,6 @@ resources:
   bugtracker: https://github.com/popefelix/Mojo-UserAgent-Mockable/issues
   homepage: https://github.com/popefelix/Mojo-UserAgent-Mockable
   repository: https://github.com/popefelix/Mojo-UserAgent-Mockable.git
-version: '1.53'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.54'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

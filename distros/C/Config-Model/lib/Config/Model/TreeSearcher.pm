@@ -8,10 +8,11 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::TreeSearcher;
-$Config::Model::TreeSearcher::VERSION = '2.122';
+$Config::Model::TreeSearcher::VERSION = '2.123';
 use Mouse;
 use Mouse::Util::TypeConstraints;
 
+use List::MoreUtils qw/any/;
 use Log::Log4perl qw(get_logger :levels);
 use Config::Model::Exception;
 use Config::Model::ObjTreeScanner;
@@ -75,7 +76,7 @@ sub search {
         if ( $need_search->{help} ) {
             my $help_ref = $leaf_object->get_help;
             $data_ref->($loc)
-                if grep { $_ =~ $reg; } values %$help_ref;
+                if any { $_ =~ $reg; } values %$help_ref;
         }
     };
 
@@ -147,7 +148,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 

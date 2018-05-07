@@ -32,7 +32,7 @@ xs_ok {xs => $xs, verbose => 1}, with_subtest {
 
     isnt $module->xs_deref($module->xs_val(0)), 42;
     is $module->xs_deref($module->xs_val(0)), 1337, "Reading vas_written int";
-    
+
     $module->xs_vas_close($handle);
 };
 

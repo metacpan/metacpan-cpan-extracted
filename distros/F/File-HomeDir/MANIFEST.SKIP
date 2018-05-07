@@ -22,6 +22,7 @@ _Inline/.*
 ^testdata/
 ^blib/
 ^sandbox/
+^cover_db/
 ^pm_to_blib$
 ^_build/.*
 ~$

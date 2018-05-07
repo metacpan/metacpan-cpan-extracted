@@ -161,6 +161,12 @@
         <element name="info">
             <optional>
                 <element name="author">
+                    <optional>
+                        <attribute name="href">
+                            <!-- TODO: perhaps add a URL datatype.-->
+                            <text />
+                        </attribute>
+                    </optional>
                     <text />
                 </element>
             </optional>

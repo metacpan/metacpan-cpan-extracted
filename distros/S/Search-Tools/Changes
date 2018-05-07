@@ -1,5 +1,8 @@
 Revision history for Perl extension Search::HiLiter.
 
+1.007 1 May 2018
+ - Fix test to reflect latest Perl removes '.' from @INC
+
 1.006 24 March 2018
  - Apparently toLOWER_utf8_safe is not present before Perl 5.26
 

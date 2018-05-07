@@ -12,9 +12,10 @@ use Chart::Plotly::Trace::Scattermapbox::Marker;
 use Chart::Plotly::Trace::Scattermapbox::Selected;
 use Chart::Plotly::Trace::Scattermapbox::Stream;
 use Chart::Plotly::Trace::Scattermapbox::Textfont;
+use Chart::Plotly::Trace::Scattermapbox::Transform;
 use Chart::Plotly::Trace::Scattermapbox::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point, lines or marker symbols on a Mapbox GL geographic map is provided by longitude/latitude pairs in `lon` and `lat`.
 
@@ -223,6 +224,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scattermapbox::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -250,7 +254,7 @@ Chart::Plotly::Trace::Scattermapbox - The data visualized as scatter point, line
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -446,6 +450,8 @@ Sets the positions of the `text` elements with respects to the (x,y) coordinates
 =item * textsrc
 
 Sets the source reference on plot.ly for  text .
+
+=item * transforms
 
 =item * uid
 

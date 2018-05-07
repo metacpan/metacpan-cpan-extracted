@@ -1,0 +1,12 @@
+\.appveyor.cmd
+\.appveyor.yml
+\.gitignore
+\.perltidyrc
+\.travis.yml
+cpanfile
+\.git/
+^MANIFEST.bak
+^MYMETA.json
+^MYMETA.yml
+^Makefile$
+

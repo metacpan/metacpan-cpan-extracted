@@ -4,7 +4,7 @@ use 5.012;
 use Encode();
 use Time::HiRes();
 
-our $VERSION = '1.3.7';
+our $VERSION = '1.3.8';
 
 use Panda::Export
     MERGE_ARRAY_CONCAT => 1,

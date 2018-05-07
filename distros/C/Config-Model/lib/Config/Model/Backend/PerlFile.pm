@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PerlFile;
-$Config::Model::Backend::PerlFile::VERSION = '2.122';
+$Config::Model::Backend::PerlFile::VERSION = '2.123';
 use 5.10.1;
 use Carp;
 use strict;
@@ -31,7 +31,6 @@ sub read {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $file_path = $args{file_path};
@@ -54,7 +53,6 @@ sub write {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $file_path = $args{file_path};
@@ -67,7 +65,7 @@ sub write {
     my $dumper = Data::Dumper->new( [$p_data] );
     $dumper->Terse(1);
 
-    $args{io_handle}->print( $dumper->Dump, ";\n" );
+    $args{file_path}->spew_utf8( $dumper->Dump, ";\n" );
 
     return 1;
 }
@@ -88,7 +86,7 @@ Config::Model::Backend::PerlFile - Read and write config as a Perl data structur
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 
@@ -190,9 +188,8 @@ When a file is read,  C<read()> returns 1.
 
 =head2 write
 
-Of all parameters passed to this write call-back, only C<io_handle> is
-used. This parameter must be L<IO::File> object already opened for
-write.
+Of all parameters passed to this write call-back, only C<file_path> is
+used. This parameter must be a L<Path::Tiny> object.
 
 C<write()> returns 1.
 

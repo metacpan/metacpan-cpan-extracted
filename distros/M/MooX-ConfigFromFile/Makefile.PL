@@ -35,7 +35,7 @@ WriteMakefile1(
         resources   => {
             homepage   => 'https://metacpan.org/release/MooX-ConfigFromFile',
             repository => {
-                url  => 'https://github.com:rehsack/MooX-ConfigFromFile.git',
+                url  => 'https://github.com/rehsack/MooX-ConfigFromFile.git',
                 web  => 'https://github.com/rehsack/MooX-ConfigFromFile',
                 type => 'git',
             },

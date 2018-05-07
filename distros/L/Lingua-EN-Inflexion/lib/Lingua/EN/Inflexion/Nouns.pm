@@ -7,7 +7,7 @@ package Lingua::EN::Inflexion::Nouns;
 use 5.010; use strict; use warnings; use re q{eval};
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20171008.084303;
+our $VERSION = 20180505.223032;
 
 my $modern_plural_of = {
   " ox"                    => " oxen",
@@ -1095,8 +1095,8 @@ my $modern_plural_of = {
   "mare"                   => "mares",
   "maremma"                => "maremme",
   "marquis"                => "marquises",
-  "Mary"                   => "Marys",
   "mary"                   => "maries",
+  "Mary"                   => "Marys",
   "mater lectionis"        => "matres lectionis",
   "math"                   => "maths",
   "matin"                  => "matins",
@@ -1339,8 +1339,8 @@ my $modern_plural_of = {
   "osteoma"                => "osteomata",
   "ostium"                 => "ostia",
   "oto"                    => "otos",
-  "otomi"                  => "otomies",
   "Otomi"                  => "Otomies",
+  "otomi"                  => "otomies",
   "ottoman"                => "ottomans",
   "ovarium"                => "ovaria",
   "ovolo"                  => "ovoli",
@@ -1617,8 +1617,8 @@ my $modern_plural_of = {
   "punto blanco"           => "puntos blancos",
   "pupa"                   => "pupae",
   "purlieu"                => "purlieus",
-  "purum"                  => "purums",
   "Purum"                  => "Purums",
+  "purum"                  => "purums",
   "putto"                  => "putti",
   "puttony"                => "puttonys",
   "pycnidium"              => "pycnidia",
@@ -2543,13 +2543,13 @@ my $classical_plural_of = {
   "asylum"                 => "asyla",
   "asyndeton"              => "asyndeta",
   "ataman"                 => "atamans",
-  "Atlas"                  => "Atlantes",
   "atlas"                  => "atlantes",
+  "Atlas"                  => "Atlantes",
   "atman"                  => "atmas",
   "aureus"                 => "aurei",
   "aurora"                 => "aurorae",
-  "auslese"                => "auslesen",
   "Auslese"                => "Auslesen",
+  "auslese"                => "auslesen",
   "auspex"                 => "auspices",
   "auto"                   => "autos",
   "auto de fe"             => "autos de fes",
@@ -3078,8 +3078,8 @@ my $classical_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "galla"                  => "galla",
   "Galla"                  => "Galla",
+  "galla"                  => "galla",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglia",
@@ -3307,8 +3307,8 @@ my $classical_plural_of = {
   "Japanese"               => "Japanese",
   "Javanese"               => "Javanese",
   "jazz"                   => "jazzes",
-  "Jerry"                  => "Jerrys",
   "jerry"                  => "jerries",
+  "Jerry"                  => "Jerrys",
   "jeu"                    => "jeux",
   "jo"                     => "joes",
   "joe"                    => "joes",
@@ -3352,8 +3352,8 @@ my $classical_plural_of = {
   "laika"                  => "laiki",
   "lamella"                => "lamellae",
   "lamina"                 => "laminae",
-  "lapith"                 => "lapithae",
   "Lapith"                 => "Lapithae",
+  "lapith"                 => "lapithae",
   "Lapponese"              => "Lapponese",
   "lar"                    => "lares",
   "larnax"                 => "larnakes",
@@ -3657,8 +3657,8 @@ my $classical_plural_of = {
   "nebula"                 => "nebulae",
   "nectocalyx"             => "nectocalyces",
   "nemathecium"            => "nemathecia",
-  "Nenets"                 => "Nentsi",
   "nenets"                 => "nentsy",
+  "Nenets"                 => "Nentsi",
   "Nepalese"               => "Nepalese",
   "nephridium"             => "nephridia",
   "nerita"                 => "neritae",
@@ -3765,8 +3765,8 @@ my $classical_plural_of = {
   "palpus"                 => "palpi",
   "palus"                  => "pali",
   "Panaman"                => "Panamans",
-  "pangasinan"             => "pangasinanes",
   "Pangasinan"             => "Pangasinanes",
+  "pangasinan"             => "pangasinanes",
   "panino"                 => "panini",
   "panorpa"                => "panorpae",
   "pant"                   => "pants",
@@ -4980,8 +4980,8 @@ my $singular_of = {
   "asylums"               => "asylum",
   "asyndeta"              => "asyndeton",
   "atamans"               => "ataman",
-  "atlantes"              => "atlas",
   "Atlantes"              => "Atlas",
+  "atlantes"              => "atlas",
   "atlases"               => "atlas",
   "atmas"                 => "atman",
   "aurei"                 => "aureus",
@@ -5650,8 +5650,8 @@ my $singular_of = {
   "Gabunese"              => "Gabunese",
   "Galla"                 => "Galla",
   "galla"                 => "galla",
-  "gallas"                => "galla",
   "Gallas"                => "Galla",
+  "gallas"                => "galla",
   "gallows"               => "gallows",
   "gametangia"            => "gametangium",
   "ganglia"               => "ganglion",
@@ -6352,8 +6352,8 @@ my $singular_of = {
   "nectocalyces"          => "nectocalyx",
   "nemathecia"            => "nemathecium",
   "Nenets"                => "Nenets",
-  "Nentsi"                => "Nenets",
   "nentsi"                => "nenets",
+  "Nentsi"                => "Nenets",
   "nentsy"                => "nenets",
   "Nepalese"              => "Nepalese",
   "nephridia"             => "nephridium",
@@ -6458,8 +6458,8 @@ my $singular_of = {
   "osteoclastomata"       => "osteoclastoma",
   "osteomata"             => "osteoma",
   "ostia"                 => "ostium",
-  "otomi"                 => "otomi",
   "Otomi"                 => "Otomi",
+  "otomi"                 => "otomi",
   "otomies"               => "otomi",
   "Otomies"               => "Otomi",
   "otos"                  => "oto",
@@ -6486,8 +6486,8 @@ my $singular_of = {
   "palpebrae"             => "palpebra",
   "palpi"                 => "palpus",
   "Panamans"              => "Panaman",
-  "Pangasinanes"          => "Pangasinan",
   "pangasinanes"          => "pangasinan",
+  "Pangasinanes"          => "Pangasinan",
   "pangasinans"           => "pangasinan",
   "Pangasinans"           => "Pangasinan",
   "panini"                => "panino",
@@ -6798,8 +6798,8 @@ my $singular_of = {
   "pupae"                 => "pupa",
   "purlieus"              => "purlieu",
   "purlieux"              => "purlieu",
-  "purum"                 => "purum",
   "Purum"                 => "Purum",
+  "purum"                 => "purum",
   "Purums"                => "Purum",
   "purums"                => "purum",
   "putti"                 => "putto",
@@ -7444,16 +7444,16 @@ my $singular_of = {
   "thaumaturgi"           => "thaumaturgus",
   "thebe"                 => "thebe",
   "thecae"                => "theca",
-  "theirs"                => "theirs",
+  "theirs"                => "its",
   "thelyca"               => "thelycum",
-  "them"                  => "them",
+  "them"                  => "it",
   "themata"               => "thema",
-  "themselves"            => "themself",
+  "themselves"            => "itself",
   "theologoumena"         => "theologoumenon",
   "thesauri"              => "thesaurus",
   "thesauruses"           => "thesaurus",
   "these"                 => "this",
-  "they"                  => "they",
+  "they"                  => "it",
   "thieves"               => "thief",
   "thoes"                 => "thos",
   "tholi"                 => "tholus",
@@ -7802,7 +7802,11 @@ my $is_singular = {}; @{$is_singular}{values %{$singular_of} } = ();
                       @{$is_singular}{keys %{$modern_plural_of} } = ();
                       @{$is_singular}{keys %{$classical_plural_of} } = ();
 
-my $PREP_PAT = qr{ about | above | across | after | among | around | at | athwart | before | behind | below | beneath | beside | besides | between | betwixt | beyond | but | by | during | except | for | from | in | into | near | of | off | on | onto | out | over | since | till | to | under | until | unto | upon | with }xms;
+my $PREP_PAT = qr{ about | above | across | after | among | around | athwart | at | before |
+    behind | below | beneath | besides? | between | betwixt | beyond | but | by | during | except |
+    for | from | into | in | near | off | of | onto | on | out | over | since | till | to | under | until | unto | upon | with }xms;
+
+sub prep_pat { $PREP_PAT }
 
 sub convert_to_modern_plural {
     my ($word) = @_;
@@ -7877,6 +7881,7 @@ sub convert_to_modern_plural {
         when (m{\A(.+)star general$}i) { return "${1}star generals"; }
         when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-general"; }
         when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1} general"; }
+        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
         when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
         when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_modern_plural($1) : \$1}"; }
         when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_modern_plural($1) : \$1}-$2-$3"; }
@@ -7991,6 +7996,7 @@ sub convert_to_classical_plural {
         when (m{\A(.+)star general$}i) { return "${1}star generals"; }
         when (m{\A(.*?)-general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-general"; }
         when (m{\A(.*?) general$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1} general"; }
+        when (m{\A($PREP_PAT) it$}i) { return "$1 them"; }
         when (m{\Ason-of-a-(.*?)$}i) { return "sons-of-${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
         when (m{\Ason of a (.*?)$}i) { return "sons of ${is_singular($1) ? \convert_to_classical_plural($1) : \$1}"; }
         when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_singular($1) ? \convert_to_classical_plural($1) : \$1}-$2-$3"; }
@@ -8124,6 +8130,7 @@ sub convert_to_singular {
         when (m{\A(.+)star generals$}i) { return "${1}star general"; }
         when (m{\A(.*?)-general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-general"; }
         when (m{\A(.*?) general$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1} general"; }
+        when (m{\A($PREP_PAT) them$}i) { return "$1 it"; }
         when (m{\Asons-of-(.*?)$}i) { return "son-of-a-${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
         when (m{\Asons of (.*?)$}i) { return "son of a ${is_plural($1) ? \convert_to_singular($1) : \$1}"; }
         when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { return "${is_plural($1) ? \convert_to_singular($1) : \$1}-$2-$3"; }
@@ -8259,6 +8266,7 @@ sub is_plural {
         when (m{\A(.*)wildebeest$}i) { return 1 }
         when (m{\A(.*)craft$}i) { return 1 }
         when (m{\A(.+)star generals$}i) { return 1 }
+        when (m{\A($PREP_PAT) them$}i) { return 1 }
         when (m{\Asons-of-(.*?)$}i) { continue if !is_plural($1);return 1 }
         when (m{\Asons of (.*?)$}i) { continue if !is_plural($1);return 1 }
         when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { continue if !is_plural($1);return 1 }
@@ -8372,6 +8380,7 @@ sub is_singular {
         when (m{\A(.*)wildebeest$}i) { return 1 }
         when (m{\A(.*)craft$}i) { return 1 }
         when (m{\A(.+)star general$}i) { return 1 }
+        when (m{\A($PREP_PAT) it$}i) { return 1 }
         when (m{\Ason-of-a-(.*?)$}i) { continue if !is_singular($1);return 1 }
         when (m{\Ason of a (.*?)$}i) { continue if !is_singular($1);return 1 }
         when (m{\A(.*?)-($PREP_PAT)-(.*?)$}i) { continue if !is_singular($1);return 1 }

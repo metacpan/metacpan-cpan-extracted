@@ -10,7 +10,7 @@
 # which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
 #
 # Written by Russ Allbery <eagle@eyrie.org>
-# Copyright 2011-2013
+# Copyright 2011-2013, 2018
 #     The Board of Trustees of the Leland Stanford Junior University
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -77,6 +77,10 @@ lines = 25
 # off.
 [-RegularExpressions::ProhibitComplexRegexes]
 
+# Produces false positives currently with postfix dereferencing (introduced in
+# Perl 5.20).  See https://github.com/Perl-Critic/Perl-Critic/issues/578.
+[-References::ProhibitDoubleSigils]
+
 # I generally don't want to require Readonly as a prerequisite for all my Perl
 # modules.
 [-ValuesAndExpressions::ProhibitConstantPragma]
@@ -91,9 +95,10 @@ lines = 25
 [ValuesAndExpressions::RequireNumberSeparators]
 min_value = 100000
 
+# IO::Uncompress::Gunzip puts the error message in a package variable.
 # Text::Wrap has a broken interface that requires use of package variables.
 [Variables::ProhibitPackageVars]
-add_packages = Text::Wrap
+add_packages = IO::Uncompress::Gunzip Text::Wrap
 
 # use English was one of the worst ideas in the history of Perl.  It makes the
 # code slightly more readable for amateurs at the cost of confusing

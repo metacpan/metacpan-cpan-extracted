@@ -27,6 +27,15 @@ DESCRIPTION
         This will return the prefix corresponding to the supplied URI string
         or `undef` if it is not registered.
 
+    `qname($uri)`
+        This will return the qualified name corresponding to the supplied URI
+        string or `undef` if it is not registered. In scalar context, it will
+        return the prefix and local name with a colon, and list context, a
+        two-element array containing prefix and local name.
+
+        For example `http://purl.org/dc/terms/name` will return `dc:name` in
+        scalar context and `('dc', 'name')` in list context.
+
     `all`
         This will return a hashref with all prefix and URI pairs.
 
@@ -39,6 +48,9 @@ SEE ALSO
 
 AUTHOR
     Kjetil Kjernsmo <kjetilk@cpan.org>.
+
+CONTRIBUTORS
+    Harald Jörg
 
 COPYRIGHT AND LICENCE
     This software is copyright (c) 2015, 2017, 2018 by Kjetil Kjernsmo.

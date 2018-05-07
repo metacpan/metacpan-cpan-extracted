@@ -3,7 +3,7 @@ abstract: 'Create tools to validate, migrate and edit configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
-  Config::Model::Tester: '2.062'
+  Config::Model::Tester: '3.006'
   Config::Model::Tester::Setup: '0'
   File::Copy: '0'
   IO::File: '0'
@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -69,5 +69,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.122'
+version: '2.123'
 x_serialization_backend: 'YAML::Tiny version 1.73'

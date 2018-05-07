@@ -259,7 +259,12 @@ say '1;';
 
 
 # Generate test files...
+# But not for "to be"...
+delete @singular_word{ qw< am is are > };
+delete @plural_word{ qw< am is are > };
+
 {
+
     # 1. is_singular()
 
     open my $test_file_fh, '>', 't/verb_is_singular.t';

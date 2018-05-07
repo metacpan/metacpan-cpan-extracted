@@ -15,6 +15,7 @@ lib/SMB/Client.pm
 lib/SMB/Command.pm
 lib/SMB/Connection.pm
 lib/SMB/Crypt.pm
+lib/SMB/DCERPC.pm
 lib/SMB/File.pm
 lib/SMB/Header.pm
 lib/SMB/OpenFile.pm
@@ -31,6 +32,7 @@ lib/SMB/v1/Header.pm
 lib/SMB/v2/Command.pm
 lib/SMB/v2/Command/Close.pm
 lib/SMB/v2/Command/Create.pm
+lib/SMB/v2/Command/Ioctl.pm
 lib/SMB/v2/Command/Negotiate.pm
 lib/SMB/v2/Command/QueryDirectory.pm
 lib/SMB/v2/Command/QueryInfo.pm
@@ -50,6 +52,7 @@ t/2-packer.t
 t/3-nttime.t
 t/auth.t
 t/crypt.t
+t/dcerpc.t
 t/file-find.t
 t/file-opens.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

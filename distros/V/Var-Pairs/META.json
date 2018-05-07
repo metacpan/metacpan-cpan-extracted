@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Var-Pairs",
    "no_index" : {
@@ -35,11 +35,12 @@
             "Data::Alias" : "1.16",
             "Devel::Callsite" : "0.06",
             "PadWalker" : "1.93",
+            "Scope::Upper" : "0",
             "Test::More" : "0",
             "experimental" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.003004"
+   "version" : "0.003005"
 }

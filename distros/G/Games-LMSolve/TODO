@@ -1,7 +1,5 @@
 * Document the Games::LMSolve interface.
 
-* Put on CPAN
-
 * Implement other scans such as A*, etc.
 
 * Implement support for No U-Turn and Changing Rules Number Mazes.

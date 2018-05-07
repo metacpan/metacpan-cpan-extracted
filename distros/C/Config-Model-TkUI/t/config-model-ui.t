@@ -1,16 +1,15 @@
 # -*- cperl -*-
 
-use warnings FATAL => qw(all);
-
 use ExtUtils::testlib;
 use Test::More ;
 use Test::Warn 0.11;
 use Tk;
 use Config::Model::TkUI;
 use Config::Model ;
-use Log::Log4perl qw(:easy) ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
 use strict;
+use warnings;
 
 use lib 't/lib';
 
@@ -21,37 +20,17 @@ sub test_all {
     $mw->after($delay, sub { test_all($mw, $delay,$test_ref) } ) if @$test_ref;
 }
 
-my $arg = shift || '';
+my ($model, $trace, $args) = init_test('show');
 
-my ($log,$show) = (0) x 2 ;
+note("You can play with the widget if you run the test with 's' argument");
 
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /s|i/;
-
-print "You can play with the widget if you run the test with 's' argument\n";
-
-my $home = $ENV{HOME} || '';
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ($log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init($log ? $WARN: $ERROR);
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok(1,"Compilation done");
-
-my $model = Config::Model -> new () ;
+my $wr_root = setup_test_dir;
 my $cmu ;
 
 my $inst = $model->instance (
     root_class_name => 'Master',
     instance_name => 'test1',
-    root_dir   => 'wr_data',
+    root_dir   => $wr_root,
     on_message_cb => sub { $cmu->show_message(@_) ;}
 );
 
@@ -124,12 +103,11 @@ SKIP: {
     my $widget ; # ugly global variable. Use with care
     my $idx = 1 ;
 
-    my @test 
-      = (
+    my @test = (
 	 sub { $cmu->reload ; ok(1,"forced test: reload") } ,
 	) ;
 
-    push @test,  
+    push @test,
      sub { $cmu->create_element_widget('edit','test1'); ok(1,"test ".$idx++)},
      sub { $inst->show_message("Hello World")},
 	 sub { $cmu->force_element_display($root->grab('std_id:dd DX')) ; ok(1,"test ".$idx++)},
@@ -208,8 +186,7 @@ SKIP: {
          sub { $cmu ->show_changes ; ok(1,"test show_changes ".$idx++)} ,
 
 	 sub { $mw->destroy; },
-        unless $show;
-
+        unless $args->{show};
 
     test_all($mw , $delay, \@test) ; 
 

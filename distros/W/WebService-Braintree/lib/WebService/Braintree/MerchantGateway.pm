@@ -9,8 +9,6 @@ use strictures 1;
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
-has 'gateway' => (is => 'ro');
-
 use WebService::Braintree::_::Merchant;
 
 sub provision_raw_apple_pay {

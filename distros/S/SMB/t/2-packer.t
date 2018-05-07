@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 83;
+use Test::More tests => 105;
 
 use lib '../lib', 'lib';
 
@@ -64,10 +64,33 @@ is($packer->offset, $packer->size, "offset at end");
 $packer->reset;
 ok($packer->str('Hello'),        "str('Hello')");
 is($packer->size, 10,            "size +10");
+ok($packer->mark('a'),           "mark('a')");
 ok($packer->str('OK', 'ascii'),  "str('OK', 'C')");
 is($packer->size, 12,            "size +2");
+ok($packer->mark('b'),           "mark('b')");
 ok($packer->stub('', 'uint8'),   "stub('', 'uint8')");
 ok($packer->utf16('OK'),         "utf16('OK')");
 is($packer->offset, $packer->size, "offset at end");
 ok($packer->fill('', 0x77),      "fill('', 0x77)");
 is($packer->data, "H\0e\0l\0l\0o\0OK\x77O\0K\0", "data");
+
+ok($packer->jump('b'),           "jump('b')");
+is($packer->size, 17,            "size is 17");
+is($packer->offset, 12,          "offset is 12");
+ok($packer->skip(1),             "skip(1)");
+is($packer->data, "H\0e\0l\0l\0o\0OK\x77O\0K\0", "data still the same");
+ok($packer->align,               "align");
+is($packer->size, 17,            "size is still 17");
+is($packer->offset, 16,          "offset is 16");
+ok($packer->align,               "align again");
+is($packer->size, 17,            "size is again 17");
+is($packer->offset, 16,          "offset is still 16");
+ok($packer->mark('b'),           "mark('b') again");
+ok($packer->uint8(0321),         "uint8(0321)");
+ok($packer->align('a'),          "align('a')");
+is($packer->size, 18,            "size is 18");
+is($packer->offset, 18,          "offset is 18");
+is($packer->data, "H\0e\0l\0l\0o\0OK\x77O\0K\321\0", "new data");
+ok($packer->jump('b'),           "jump('b') again");
+ok($packer->skip(3),             "skip(3)");
+is($packer->data, "H\0e\0l\0l\0o\0OK\x77O\0K\321\0\0", "another new data");

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcoords.
 
@@ -37,7 +37,7 @@ has constraintrange => (
     is  => "rw",
     isa => "ArrayRef|PDL",
     documentation =>
-      "The domain range to which the filter on the dimension is constrained. Must be an array of `[fromValue, toValue]` with finite numbers as elements.",
+      "The domain range to which the filter on the dimension is constrained. Must be an array of `[fromValue, toValue]` with `fromValue <= toValue`, or if `multiselect` is not disabled, you may give an array of arrays, where each inner array is `[fromValue, toValue]`.",
 );
 
 has description => (
@@ -48,6 +48,11 @@ has description => (
 has label => ( is            => "rw",
                isa           => "Str",
                documentation => "The shown name of the dimension.",
+);
+
+has multiselect => ( is            => "rw",
+                     isa           => "Bool",
+                     documentation => "Do we allow multiple selection ranges or just a single range?",
 );
 
 has range => (
@@ -121,7 +126,7 @@ Chart::Plotly::Trace::Parcoords::Dimension - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -186,13 +191,17 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * constraintrange
 
-The domain range to which the filter on the dimension is constrained. Must be an array of `[fromValue, toValue]` with finite numbers as elements.
+The domain range to which the filter on the dimension is constrained. Must be an array of `[fromValue, toValue]` with `fromValue <= toValue`, or if `multiselect` is not disabled, you may give an array of arrays, where each inner array is `[fromValue, toValue]`.
 
 =item * description
 
 =item * label
 
 The shown name of the dimension.
+
+=item * multiselect
+
+Do we allow multiple selection ranges or just a single range?
 
 =item * range
 

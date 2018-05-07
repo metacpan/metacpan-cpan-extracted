@@ -12,9 +12,10 @@ use Chart::Plotly::Trace::Scatterpolar::Marker;
 use Chart::Plotly::Trace::Scatterpolar::Selected;
 use Chart::Plotly::Trace::Scatterpolar::Stream;
 use Chart::Plotly::Trace::Scatterpolar::Textfont;
+use Chart::Plotly::Trace::Scatterpolar::Transform;
 use Chart::Plotly::Trace::Scatterpolar::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: The scatterpolar trace type encompasses line charts, scatter charts, text charts, and bubble charts in polar coordinates. The data visualized as scatter point or lines is set in `r` (radial) and `theta` (angular) coordinates Text (appearing either on the chart or on hover only) is via `text`. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -252,6 +253,9 @@ has thetaunit => (
             documentation => "Sets the unit of input *theta* values. Has an effect only when on *linear* angular axes.",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scatterpolar::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -279,7 +283,7 @@ Chart::Plotly::Trace::Scatterpolar - The scatterpolar trace type encompasses lin
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -478,6 +482,8 @@ Sets the source reference on plot.ly for  theta .
 =item * thetaunit
 
 Sets the unit of input *theta* values. Has an effect only when on *linear* angular axes.
+
+=item * transforms
 
 =item * uid
 

@@ -34,22 +34,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.19'
+    version: '1.20'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.19'
+    version: '1.20'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.19'
+    version: '1.20'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.19'
+    version: '1.20'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.19'
+    version: '1.20'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.19'
+    version: '1.20'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -68,10 +68,10 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: http://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.19'
+version: '1.20'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.026002'
   plugins:
     -
       class: Dist::Zilla::Plugin::MakeMaker
@@ -142,7 +142,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@DROLSKY/VersionFromMainModule'
       version: '0.04'
     -
@@ -189,7 +189,7 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@DROLSKY/MetaProvides::Package'
       version: '2.004003'
     -
@@ -1039,7 +1039,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.032'
+      version: '0.034'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -1180,7 +1180,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::RepoFileInjector:
           allow_overwrite: 1
           repo_root: .
-          version: '0.007'
+          version: '0.009'
       name: '@DROLSKY/Generate CONTRIBUTING.md'
       version: '0.013'
     -
@@ -1207,7 +1207,7 @@ x_Dist_Zilla:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@DROLSKY/CheckSelfDependency'
       version: '0.011'
     -
@@ -1290,7 +1290,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.19
+          tag: v1.20
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -1322,7 +1322,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
       name: '@DROLSKY/BumpVersionAfterRelease'
-      version: '0.017'
+      version: '0.018'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -1376,7 +1376,7 @@ x_Dist_Zilla:
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
     -
@@ -1444,5 +1444,5 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Sergey Leschenko <Sergey.Leschenko@portaone.com>'
   - 'yasu47b <nakayamayasuhiro1986@gmail.com>'
-x_generated_by_perl: v5.26.1
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

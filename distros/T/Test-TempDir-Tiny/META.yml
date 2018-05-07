@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006002'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,13 +29,13 @@ no_index:
 provides:
   Test::TempDir::Tiny:
     file: lib/Test/TempDir/Tiny.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   B: '0'
   Carp: '0'
   Cwd: '0'
   Exporter: '5.57'
-  File::Path: '2.01'
+  File::Path: '2.07'
   File::Spec::Functions: '0'
   File::Temp: '0'
   perl: '5.006002'
@@ -45,10 +45,12 @@ resources:
   bugtracker: https://github.com/dagolden/Test-TempDir-Tiny/issues
   homepage: https://github.com/dagolden/Test-TempDir-Tiny
   repository: https://github.com/dagolden/Test-TempDir-Tiny.git
-version: '0.016'
+version: '0.017'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Christian Walde <walde.christian@googlemail.com>'
-  - 'David Golden <xdg@xdg.me>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

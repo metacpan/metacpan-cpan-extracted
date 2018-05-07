@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::ParseXS: '3.01'
   File::Path: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -59,6 +59,8 @@ requires:
   Text::Balanced: '1.89'
   perl: '5.010'
 resources:
-  bugtracker: http://sourceforge.net/p/pdl/bugs/
   homepage: http://pdl.perl.org/
-version: '2.018'
+  repository: git://github.com/PDLPorters/pdl.git
+version: '2.019'
+x_IRC: irc://irc.perl.org/#pdl
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

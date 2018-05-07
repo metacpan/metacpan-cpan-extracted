@@ -1,6 +1,7 @@
-use 5.006;
+use 5.010001;
 use strict;
 use warnings FATAL => 'all';
+
 use ExtUtils::MakeMaker;
 
 my %write_makefile_param = (
@@ -10,7 +11,7 @@ my %write_makefile_param = (
     ABSTRACT_FROM    => 'lib/JIP/DataPath.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => '5.010001',
     META_MERGE       => {
         'meta-spec'    => {version => 2},
         resources      => {
@@ -50,6 +51,10 @@ unless (eval { ExtUtils::MakeMaker->VERSION(6.63_03); }) {
 
 unless (eval { ExtUtils::MakeMaker->VERSION(6.52) }) {
     delete $write_makefile_param{'CONFIGURE_REQUIRES'};
+}
+
+unless (eval { ExtUtils::MakeMaker->VERSION(6.48) }) {
+    delete $write_makefile_param{'MIN_PERL_VERSION'};
 }
 
 WriteMakefile(%write_makefile_param);

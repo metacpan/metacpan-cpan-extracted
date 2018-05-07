@@ -3,13 +3,14 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use DBI;
+use File::Spec::Functions 'file_name_is_absolute';
 use Mojo::mysql::Database;
 use Mojo::mysql::Migrations;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 has abstract => sub { SQL::Abstract->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
@@ -56,7 +57,7 @@ sub from_string {
   my $dsn = 'dbi:mysql:dbname=' . $url->path->parts->[0];
 
   # Host and port
-  if (my $host = $url->host) { $dsn .= ";host=$host" }
+  if (my $host = $url->host) { $dsn .= file_name_is_absolute($host) ? ";mysql_socket=$host" : ";host=$host" }
   if (my $port = $url->port) { $dsn .= ";port=$port" }
 
   # Username and password
@@ -72,7 +73,9 @@ sub from_string {
   return $self->dsn($dsn);
 }
 
-sub new { @_ == 2 ? shift->SUPER::new->from_string(@_) : shift->SUPER::new(@_) }
+sub new {
+  @_ > 2 || ref $_[-1] eq 'HASH' ? shift->SUPER::new(@_) : shift->SUPER::new->from_string(@_);
+}
 
 sub strict_mode {
   my $self = ref $_[0] ? shift : shift->new(@_);

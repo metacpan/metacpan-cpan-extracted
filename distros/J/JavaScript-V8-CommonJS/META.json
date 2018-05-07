@@ -1,0 +1,83 @@
+{
+   "abstract" : "Modules/1.0 for JavaScript::V8",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.14",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaScript-V8-CommonJS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec::Functions" : "0",
+            "JavaScript::V8" : "0.07"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JavaScript::V8::CommonJS" : {
+         "file" : "lib/JavaScript/V8/CommonJS.pm",
+         "version" : "0.02"
+      },
+      "JavaScript::V8::CommonJS::Exception" : {
+         "file" : "lib/JavaScript/V8/CommonJS/Exception.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/javascript-v8-commonjs/issues"
+      },
+      "homepage" : "https://github.com/cafe01/javascript-v8-commonjs",
+      "repository" : {
+         "url" : "git://github.com/cafe01/javascript-v8-commonjs.git",
+         "web" : "https://github.com/cafe01/javascript-v8-commonjs"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:CAFEGRATZ",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

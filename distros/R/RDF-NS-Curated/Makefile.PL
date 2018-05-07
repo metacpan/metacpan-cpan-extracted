@@ -7,7 +7,7 @@ my $meta = {
   "abstract"         => "A curated set of RDF prefixes",
   "author"           => ["Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>"],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "generated_by"     => "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
   "keywords"         => [],
   "license"          => ["perl_5"],
   "meta-spec"        => {
@@ -30,7 +30,7 @@ my $meta = {
                           test      => { requires => { "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => "0.100" },
+                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => "1.000" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -45,7 +45,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => "0.100",
+  "version"          => "1.000",
   "x_static_install" => 1,
 };
 

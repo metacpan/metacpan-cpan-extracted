@@ -6,7 +6,7 @@ use warnings;
 use Digest::MD5 ();
 use Digest::SHA ();
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 =pod
 
@@ -36,6 +36,21 @@ B<NOTE>: This module works on DER-formatted (binary) CSRs. If you need to work w
 PEM-formatted (text/Base64) CSRs, first convert them via C<Crypt::Format> or similar
 logic.
 
+=head1 BREAKING CHANGE: 20 JULY 2017 UPDATE
+
+As of 20 July 2017, Comodo will no longer look for SHA-1 hashes in DCV files;
+the new format is to use SHA-256 hashes. There is also a change of path for
+the DCV check, from F<$document_root/$MD5.txt> to
+F<$document_root/.well-known/pki-validation/$MD5.txt>. Any services that might
+interact with Comodo’s DCV thus need to stop using the old logic and start
+using the new.
+
+Comodo has their new logic is in place as of 10 July 2017.
+
+Note that this means you’ll need to ensure that
+F<$document_root/.well-known/pki-validation> exists. That’s something that
+this module will B<NOT> do for you.
+
 =cut
 
 sub get_filename_and_contents {
@@ -50,7 +65,7 @@ sub get_filename_and_contents {
 
     my $contents = join(
         $/,
-        Digest::SHA::sha1_hex($csr_der),
+        Digest::SHA::sha256_hex($csr_der),
         'comodoca.com',
     );
 

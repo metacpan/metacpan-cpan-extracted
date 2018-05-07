@@ -1214,6 +1214,27 @@ is_deeply \@e, ['J'], 'found only child';
 $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(J K)], 'found only child';
 
+# Links
+$dom = Mojo::DOM->new(<<EOF);
+<a>A</a>
+<a href=/>B</a>
+<link rel=C>
+<link href=/ rel=D>
+<area alt=E>
+<area href=/ alt=F>
+<div href=borked>very borked</div>
+EOF
+is $dom->find(':link')->map(sub { $_->tag })->join(','), 'a,link,area',
+  'right tags';
+is $dom->find(':visited')->map(sub { $_->tag })->join(','), 'a,link,area',
+  'right tags';
+is $dom->at('a:link')->text,    'B', 'right result';
+is $dom->at('a:visited')->text, 'B', 'right result';
+is $dom->at('link:link')->{rel},    'D', 'right result';
+is $dom->at('link:visited')->{rel}, 'D', 'right result';
+is $dom->at('area:link')->{alt},    'F', 'right result';
+is $dom->at('area:visited')->{alt}, 'F', 'right result';
+
 # Sibling combinator
 $dom = Mojo::DOM->new(<<EOF);
 <ul>
@@ -2346,6 +2367,8 @@ is $dom->find('a[accesskey~=0]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey~=0]')->[1], undef, 'no result';
 is $dom->find('a[accesskey*=0]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey*=0]')->[1], undef, 'no result';
+is $dom->find('a[accesskey|=0]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey|=0]')->[1], undef, 'no result';
 is $dom->find('a[accesskey=1]')->[0]->text, 'O&gTn>e', 'right text';
 is $dom->find('a[accesskey=1]')->[1], undef, 'no result';
 is $dom->find('a[accesskey^=1]')->[0]->text, 'O&gTn>e', 'right text';
@@ -2356,6 +2379,8 @@ is $dom->find('a[accesskey~=1]')->[0]->text, 'O&gTn>e', 'right text';
 is $dom->find('a[accesskey~=1]')->[1], undef, 'no result';
 is $dom->find('a[accesskey*=1]')->[0]->text, 'O&gTn>e', 'right text';
 is $dom->find('a[accesskey*=1]')->[1], undef, 'no result';
+is $dom->find('a[accesskey|=1]')->[0]->text, 'O&gTn>e', 'right text';
+is $dom->find('a[accesskey|=1]')->[1], undef, 'no result';
 is $dom->at('a[accesskey*="."]'), undef, 'no result';
 
 # Empty attribute value
@@ -2387,6 +2412,7 @@ $dom = Mojo::DOM->new(<<EOF);
 <p class="foo">A</p>
 <p class="foo bAr">B</p>
 <p class="FOO">C</p>
+<p class="foo-bar">D</p>
 EOF
 is $dom->find('.foo')->map('text')->join(','),            'A,B', 'right result';
 is $dom->find('.FOO')->map('text')->join(','),            'C',   'right result';
@@ -2399,12 +2425,17 @@ is $dom->find('[class="foo bar" i]')->map('text')->join(','), 'B',
 is $dom->find('[class~=foo]')->map('text')->join(','), 'A,B', 'right result';
 is $dom->find('[class~=foo i]')->map('text')->join(','), 'A,B,C',
   'right result';
-is $dom->find('[class*=f]')->map('text')->join(','),   'A,B',   'right result';
-is $dom->find('[class*=f i]')->map('text')->join(','), 'A,B,C', 'right result';
-is $dom->find('[class^=F]')->map('text')->join(','),   'C',     'right result';
-is $dom->find('[class^=F i]')->map('text')->join(','), 'A,B,C', 'right result';
-is $dom->find('[class$=O]')->map('text')->join(','),   'C',     'right result';
-is $dom->find('[class$=O i]')->map('text')->join(','), 'A,C',   'right result';
+is $dom->find('[class*=f]')->map('text')->join(','), 'A,B,D', 'right result';
+is $dom->find('[class*=f i]')->map('text')->join(','), 'A,B,C,D',
+  'right result';
+is $dom->find('[class^=F]')->map('text')->join(','), 'C', 'right result';
+is $dom->find('[class^=F i]')->map('text')->join(','), 'A,B,C,D',
+  'right result';
+is $dom->find('[class$=O]')->map('text')->join(','),   'C',   'right result';
+is $dom->find('[class$=O i]')->map('text')->join(','), 'A,C', 'right result';
+is $dom->find('[class|=foo]')->map('text')->join(','), 'A,D', 'right result';
+is $dom->find('[class|=foo i]')->map('text')->join(','), 'A,C,D',
+  'right result';
 
 # Nested description lists
 $dom = Mojo::DOM->new(<<EOF);
@@ -2543,5 +2574,86 @@ my $huge = ('<a>' x 100) . 'works' . ('</a>' x 100);
 $dom = Mojo::DOM->new($huge);
 is $dom->all_text, 'works', 'right text';
 is "$dom", $huge, 'right result';
+
+# Namespace
+$dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
+<tag xmlns:myns="coolns">
+  <this>foo</this>
+  <myns:this>bar</myns:this>
+</tag>
+EOF
+my %ns = (cool => 'coolns');
+is_deeply $dom->find('cool|this', %ns)->map('text'), ['bar'], 'right result';
+is_deeply $dom->find('cool|*',    %ns)->map('text'), ['bar'], 'right result';
+is_deeply $dom->find('|this',     %ns)->map('text'), ['foo'], 'right result';
+is_deeply $dom->find('*|this', %ns)->map('text'), ['foo', 'bar'],
+  'right result';
+ok !$dom->at('foo|*'), 'no result';
+
+# Namespace declaration on the same tag
+$dom = Mojo::DOM->new->xml(1)->parse('<x:tag xmlns:x="ns" foo="bar" />');
+is $dom->at('ns|tag', ns => 'ns')->{foo}, 'bar', 'right result';
+
+# Explicit no namespace
+$dom = Mojo::DOM->new->xml(1)->parse('<foo xmlns=""><bar /></foo>');
+ok $dom->at('|bar'), 'result';
+
+# Nested namespaces
+$dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
+<foo xmlns="ns:foo">
+  <tag val="1" />
+  <bar xmlns="ns:bar">
+    <tag val="2" />
+    <baz />
+    <yada hreflang="en-US">YADA</yada>
+  </bar>
+</foo>
+EOF
+%ns = (foons => 'ns:foo', barns => 'ns:bar');
+ok $dom->at('foons|foo',                   %ns), 'result';
+ok $dom->at('foons|foo:not(barns|*)',      %ns), 'result';
+ok $dom->at('foo:not(|foo)',               %ns), 'result';
+ok $dom->at('foons|foo:root',              %ns), 'result';
+ok $dom->at('foo:matches(:root, foons|*)', %ns), 'result';
+ok !$dom->at('foons|foo:not(:root)', %ns), 'no result';
+is $dom->at('foons|tag',       %ns)->{val}, 1, 'right value';
+is $dom->at('foons|tag:empty', %ns)->{val}, 1, 'right value';
+ok $dom->at('foons|tag[val="1"]',             %ns), 'result';
+ok $dom->at('foons|tag[val="1"]:empty',       %ns), 'result';
+ok $dom->at('foo > foons|tag[val="1"]',       %ns), 'result';
+ok $dom->at('foons|foo > foons|tag[val="1"]', %ns), 'result';
+ok $dom->at('foo foons|tag[val="1"]',         %ns), 'result';
+ok $dom->at('foons|foo foons|tag[val="1"]',   %ns), 'result';
+ok $dom->at('barns|bar',                      %ns), 'result';
+ok $dom->at('barns|bar:not(foons|*)',         %ns), 'result';
+ok $dom->at('bar:not(|bar)',                  %ns), 'result';
+ok $dom->at('bar:matches(barns|*)',           %ns), 'result';
+ok !$dom->at('barns|bar:root', %ns), 'no result';
+ok $dom->at('barns|bar:not(:root)',              %ns), 'result';
+ok $dom->at('bar:matches(barns|*, :not(:root))', %ns), 'result';
+ok $dom->at('foons|foo barns|bar',               %ns), 'result';
+is $dom->at('barns|tag',       %ns)->{val}, 2, 'right value';
+is $dom->at('barns|tag:empty', %ns)->{val}, 2, 'right value';
+ok $dom->at('barns|tag[val="2"]',                           %ns), 'result';
+ok $dom->at('barns|tag[val="2"]:empty',                     %ns), 'result';
+ok $dom->at('bar > barns|tag[val="2"]',                     %ns), 'result';
+ok $dom->at('barns|bar > barns|tag[val="2"]',               %ns), 'result';
+ok $dom->at('bar barns|tag[val="2"]',                       %ns), 'result';
+ok $dom->at('barns|bar barns|tag[val="2"]',                 %ns), 'result';
+ok $dom->at('foons|foo barns|bar baz',                      %ns), 'result';
+ok $dom->at('foons|foo barns|bar barns|baz',                %ns), 'result';
+ok $dom->at('foons|foo barns|bar barns|tag[val="2"] + baz', %ns), 'result';
+ok $dom->at('foons|foo barns|bar barns|tag[val="2"] + barns|baz', %ns),
+  'result';
+ok $dom->at('foons|foo barns|bar barns|tag[val="2"] ~ baz', %ns), 'result';
+ok $dom->at('foons|foo barns|bar barns|tag[val="2"] ~ barns|baz', %ns),
+  'result';
+ok !$dom->at('foons|bar', %ns), 'no result';
+ok !$dom->at('foons|baz', %ns), 'no result';
+ok $dom->at('baz')->matches('barns|*', %ns), 'match';
+is $dom->at('barns|bar [hreflang|=en]',    %ns)->text, 'YADA', 'right text';
+is $dom->at('barns|bar [hreflang|=en-US]', %ns)->text, 'YADA', 'right text';
+ok !$dom->at('barns|bar [hreflang|=en-US-yada]', %ns), 'no result';
+ok !$dom->at('barns|bar [hreflang|=e]',          %ns), 'no result';
 
 done_testing();

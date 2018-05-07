@@ -11,7 +11,7 @@ Pandoc::Version - version number of pandoc and its libraries
 
 =cut
 
-our $VERSION = '0.8.0';
+our $VERSION = '0.8.1';
 
 use overload '""' => 'string', '0+' => 'number', 
     cmp => 'cmp', '<=>' => 'cmp', fallback => 1;

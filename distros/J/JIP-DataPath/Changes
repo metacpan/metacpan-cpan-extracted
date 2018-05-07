@@ -1,4 +1,9 @@
 Revision history for JIP-DataPath
 
+0.02         2018-05-01
+        Increased Perl version requirement to 5.10.1.
+        Improved documentation.
+
+
 0.01         2018-04-29
         First version, released on an unsuspecting world.

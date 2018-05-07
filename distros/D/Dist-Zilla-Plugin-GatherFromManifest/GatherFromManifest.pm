@@ -1,12 +1,12 @@
 package Dist::Zilla::Plugin::GatherFromManifest;
 
-# $Id: GatherFromManifest.pm 23 2010-09-25 12:01:20Z stro $
+# $Id: GatherFromManifest.pm 57 2018-05-07 06:10:28Z stro $
 
 use strict;
 use warnings;
 
 BEGIN {
-  $Dist::Zilla::Plugin::GatherFromManifest::VERSION = '1.001';
+  $Dist::Zilla::Plugin::GatherFromManifest::VERSION = '1.003';
 }
 
 =head1 NAME
@@ -15,7 +15,7 @@ Dist::Zilla::Plugin::GatherFromManifest - gather all files from MANIFEST
 
 =head1 VERSION
 
-version 1.001
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,9 @@ directory.  See the L<description block in GatherDir documentation|Dist::Zilla::
 
 use Moose;
 use Moose::Autobox;
-use MooseX::Types::Path::Class qw(Dir File);
+#use MooseX::Types::Path::Class qw(Dir File);
+use Dist::Zilla::Types qw(Path);
+
 with 'Dist::Zilla::Role::FileGatherer';
 
 use ExtUtils::Manifest;
@@ -75,7 +77,7 @@ use namespace::autoclean;
 
 has root => (
     is   => 'ro',
-    isa  => Dir,
+    isa  => Path,
     lazy => 1,
     coerce   => 1,
     required => 1,
@@ -154,7 +156,7 @@ Some parts of code is borrowed from L<Dist::Zilla::Plugin::GatherDir> and L<Dist
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010 by Serguei Trouchelle
+Copyright (c) 2010-2018 by Serguei Trouchelle
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

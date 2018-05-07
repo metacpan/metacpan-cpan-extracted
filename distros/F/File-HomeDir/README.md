@@ -29,30 +29,12 @@ File::HomeDir - Find your home and other directories on any platform
 # DESCRIPTION
 
 **File::HomeDir** is a module for locating the directories that are "owned"
-by a user (typicaly your user) and to solve the various issues that arise
+by a user (typically your user) and to solve the various issues that arise
 trying to find them consistently across a wide variety of platforms.
 
 The end result is a single API that can find your resources on any platform,
 making it relatively trivial to create Perl software that works elegantly
 and correctly no matter where you run it.
-
-This module provides two main interfaces.
-
-The first is a modern [File::Spec](https://metacpan.org/pod/File::Spec)-style interface with a consistent
-OO API and different implementation modules to support various
-platforms. You are **strongly** recommended to use this interface.
-
-The second interface is for legacy support of the original 0.07 interface
-that exported a `home()` function by default and tied the `%~` variable.
-
-It is generally not recommended that you use this interface, but due to
-back-compatibility reasons they will remain supported until at least 2010.
-
-The `%~` interface has been deprecated. Documentation was removed in 2009,
-Unit test were removed in 2011, usage will issue warnings from 2012, and the
-interface will be removed entirely in 2015  (in line with the general Perl
-toolchain convention of a 10 year support period for legacy APIs that
-are potentially or actually in common use).
 
 ## Platform Neutrality
 
@@ -117,7 +99,7 @@ does not have a home directory, or dies on error.
 The `my_desktop` method takes no arguments and returns the "desktop"
 directory for the current user.
 
-Due to the diversity and complexity of implementions required to deal with
+Due to the diversity and complexity of implementations required to deal with
 implementing the required functionality fully and completely, the
 `my_desktop` method may or may not be implemented on each platform.
 
@@ -177,7 +159,7 @@ does not have a suitable directory, or dies on error.
 ## my\_data
 
 The `my_data` method takes no arguments and returns the directory where
-local applications should stored their internal data for the current
+local applications should store their internal data for the current
 user.
 
 Generally an application would create a subdirectory such as `.foo`,
@@ -281,6 +263,34 @@ does not have a documents directory, or dies on error.
 Returns the directory path as a string, `undef` if that user
 does not have a data directory, or dies on error.
 
+## users\_desktop
+
+    $docs = File::HomeDir->users_desktop('foo');
+
+Returns the directory path as a string, `undef` if that user
+does not have a desktop directory, or dies on error.
+
+## users\_music
+
+    $docs = File::HomeDir->users_music('foo');
+
+Returns the directory path as a string, `undef` if that user
+does not have a music directory, or dies on error.
+
+## users\_pictures
+
+    $docs = File::HomeDir->users_pictures('foo');
+
+Returns the directory path as a string, `undef` if that user
+does not have a pictures directory, or dies on error.
+
+## users\_videos
+
+    $docs = File::HomeDir->users_videos('foo');
+
+Returns the directory path as a string, `undef` if that user
+does not have a videos directory, or dies on error.
+
 # FUNCTIONS
 
 ## home
@@ -343,13 +353,13 @@ and then donated a Mac OS X license to allow it to be maintained properly.
 
 # AUTHORS
 
-Adam Kennedy &lt;adamk@cpan.org>
+Adam Kennedy <adamk@cpan.org>
 
-Sean M. Burke &lt;sburke@cpan.org>
+Sean M. Burke <sburke@cpan.org>
 
-Chris Nandor &lt;cnandor@cpan.org>
+Chris Nandor <cnandor@cpan.org>
 
-Stephen Steneker &lt;stennie@cpan.org>
+Stephen Steneker <stennie@cpan.org>
 
 # SEE ALSO
 

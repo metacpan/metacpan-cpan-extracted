@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Authority::FromFile;
 # ABSTRACT: Find Koha authorities from an ISO2709 file
-$Koha::Contrib::Tamil::Authority::FromFile::VERSION = '0.055';
+$Koha::Contrib::Tamil::Authority::FromFile::VERSION = '0.057';
 
 use Moose;
 
@@ -413,7 +413,7 @@ Koha::Contrib::Tamil::Authority::FromFile - Find Koha authorities from an ISO270
 
 =head1 VERSION
 
-version 0.055
+version 0.057
 
 =head1 ATTRIBUTES
 

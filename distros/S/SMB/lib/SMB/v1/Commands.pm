@@ -289,8 +289,15 @@ sub parse ($$) {
 	my $class = shift;
 	my $parser = shift || die;
 
+	$parser->cut;  # skip any previous data
+
 	if ($parser->size < $MIN_MESSAGE_SIZE) {
 		warn sprintf "Too short message to parse (%d, should be at least %d)\n", $parser->size, $MIN_MESSAGE_SIZE;
+		return;
+	}
+
+	if ($parser->bytes(4) ne $header_stamp) {
+		warn "Expected SMB1 stamp not found, stopping\n";
 		return;
 	}
 

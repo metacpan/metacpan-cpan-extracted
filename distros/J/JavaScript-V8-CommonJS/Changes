@@ -1,0 +1,12 @@
+Revision history for Perl extension JavaScript-V8-CommonJS
+
+0.02 2018-05-07T00:15:42Z
+
+    - implemented partial stacktrace handling
+      - compile exceptions are properly reported
+      - runtime exceptions module files reported as <anonymous>
+
+0.01 2018-05-05T23:32:49Z
+
+    - first public version
+      * all Modules/1.0 unit test passing

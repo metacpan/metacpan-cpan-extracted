@@ -53,6 +53,7 @@ sub dummysource {
         measurement => $meas,
         datafile    => $datafile,
         folder      => $dir,
+        date_prefix => 1,
 
         # use default datafile_dim and point_dim
     );
@@ -66,6 +67,11 @@ sub dummysource {
 0.4\t4
 0.5\t5
 EOF
+    my $foldername = $sweep->foldername;
+    like(
+        $foldername, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}_/,
+        "foldername contains date"
+    );
     my $path = catfile( $sweep->foldername, 'data.dat' );
     file_ok( $path, $expected, "basic 1D sweep: datafile" );
 }

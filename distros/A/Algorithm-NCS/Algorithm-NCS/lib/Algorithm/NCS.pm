@@ -27,9 +27,9 @@ our @EXPORT = qw(
 	ncs
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-use Inline C => config => auto_include => '#include "../../cncs.h"';
+# use Inline C => config => auto_include => '#include "../../cncs.h"';
 use Inline C => <<'ENDC';
 unsigned int xs_ncs(AV* a, AV* b){
 	unsigned long int xl = 1+av_len(a);
@@ -44,6 +44,38 @@ unsigned int xs_ncs(AV* a, AV* b){
 		y[i] = SvUVx(av_shift(b));
 		
 	return c_ncs(&x, &y, xl, yl);
+}
+int c_ncs(
+	unsigned short int *x, 
+	unsigned short int *y, 
+	unsigned long int xl, 
+	unsigned long int yl
+	){	
+    unsigned long int i;
+    unsigned long int j;
+    unsigned long int k;
+	
+	xl+=1; yl+=1;
+	
+	unsigned short int **c = (unsigned short int**) malloc (xl * sizeof(unsigned short int*));
+	for(i=0; i<xl; ++i) 
+		c[i] = malloc (yl * sizeof(unsigned short int));
+	for(i=0; i<xl; i++)
+		for(j=0; j<yl; j++)
+			c[i][j] = 0;
+
+    for(i=1; i<xl; i++)
+		for(j=1; j<yl; j++){
+			c[i][j] = c[i-1][j] > c[i][j-1] ? 
+			c[i-1][j] : c[i][j-1]; 
+			for(k=1; k<i+1  &&  k<j+1  &&  x[i-k] == y[j-k] ; k++)
+				if(c[i][j] < c[i-k][j-k] + (k+1)*k/2 ) 
+					c[i][j] = c[i-k][j-k] + (k+1)*k/2;}
+					
+	unsigned short int result = c[xl-1][yl-1];
+	for(i=0; i<xl; i++) free (c[i]);
+	free(c);
+    return result;
 }
 ENDC
 

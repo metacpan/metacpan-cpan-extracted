@@ -6,16 +6,12 @@ BEGIN                                                                           
    {print "OS Unsupported\n";
     exit 1;
    }
-  unless(eval q{ use 5.016; 1}) 
-   {print "Perl v5.16 or better required\n";
-    exit 1;
-   }
  }
 
 my $b = Module::Build->new
  (module_name   => 'Image::Find::Paths',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Locate the longest line in an image.',
+  dist_abstract => 'Find paths in an image.',
   license       => 'perl',
   requires      =>
    {'Carp'             =>0,

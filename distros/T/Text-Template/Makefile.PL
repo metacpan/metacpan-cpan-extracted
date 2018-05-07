@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Text::Template",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Encode" => 0,
     "Exporter" => 0,
     "base" => 0,
     "strict" => 0,
@@ -27,11 +28,13 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Safe" => 0,
     "Test::More" => 0,
+    "Test::More::UTF8" => 0,
     "Test::Warnings" => 0,
     "lib" => 0,
+    "utf8" => 0,
     "vars" => 0
   },
-  "VERSION" => "1.52",
+  "VERSION" => "1.53",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,14 +43,17 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Encode" => 0,
   "Exporter" => 0,
   "File::Temp" => 0,
   "Safe" => 0,
   "Test::More" => 0,
+  "Test::More::UTF8" => 0,
   "Test::Warnings" => 0,
   "base" => 0,
   "lib" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "vars" => 0,
   "warnings" => 0
 );

@@ -11,8 +11,15 @@ my $alien = Alien::gdal->new;
 SKIP: {
     skip "system libs may not need -I or -L", 2
         if $alien->install_type('system');
-    like( $alien->cflags, qr/-I/ );
-    like( $alien->libs,   qr/-L/ );
+    like( $alien->cflags, qr/-I/ , 'cflags');
+    like( $alien->libs,   qr/-L/ , 'libs');
+}
+
+TODO: {
+    local $TODO = 'data_dir does not work across all platforms yet';
+    my $data_dir = eval {$alien->data_dir};
+    diag $@ if $@;;
+    ok ($data_dir && -d $data_dir, "data dir exists (" . ($data_dir // '') . ")");
 }
 
 done_testing();

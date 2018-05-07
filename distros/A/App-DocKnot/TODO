@@ -17,7 +17,7 @@ Metadata required for web pages:
 Metadata required for release:
 
 * Path to Git repository
-* Path to AFS publication directory (from URL?)
+* Path to publication directory (from URL?)
 * GPG key IDs for package signing
 * License overrides for build-license
 * Default license for build-license
@@ -40,6 +40,6 @@ DocKnot itself:
 * Incorporate faq2html into this package (and rewrite as a Perl module)
 * Incorporate release into this package
 * Incorporate check-dist into release and automatically run it
-* Automatically run build-license during the release process
 * Incorporate build-license into this package (and rewrite as a Perl module)
+* Automatically run build-license during the release process
 * Add metadata files and overrides to build-license

@@ -1,5 +1,8 @@
 Revision history for Command-Runner
 
+0.101  2018-05-02 18:12:25 JST
+    - Read stdout/stderr pipes after sending signals
+
 0.100  2018-04-30 23:58:23 JST
     - BREAKING CHANGE: introduce Format and Quote classes (#3)
 

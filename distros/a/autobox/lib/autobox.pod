@@ -45,7 +45,7 @@ autobox - call methods on native types
 
 =head1 DESCRIPTION
 
-The C<autobox> pragma allows methods to be called on integers, floats, strings, arrays,
+The autobox pragma allows methods to be called on integers, floats, strings, arrays,
 hashes, and code references in exactly the same manner as blessed references.
 
 Autoboxing is transparent: values are not blessed into their (user-defined)
@@ -101,7 +101,7 @@ Thus:
     use autobox SCALAR => 'Foo';
     use autobox SCALAR => 'Bar';
 
-- associates SCALAR types with a synthetic class whose C<@ISA> includes both C<Foo> and C<Bar> (in that order).
+- associates SCALAR types with a synthetic class whose C<@ISA> includes both Foo and Bar (in that order).
 
 Likewise:
 
@@ -114,9 +114,9 @@ and
     use autobox SCALAR => [ 'Foo', 'Bar' ];
     use autobox ARRAY  => 'Baz';
 
-- bind SCALAR types to the C<Foo> and C<Bar> classes and ARRAY types to C<Baz>.
+- bind SCALAR types to the Foo and Bar classes and ARRAY types to Baz.
 
-C<autobox> is lexically scoped, and bindings for an outer scope
+autobox is lexically scoped, and bindings for an outer scope
 can be extended or countermanded in a nested scope:
 
     {
@@ -431,9 +431,9 @@ inheritance and delegation. For instance:
 
 would result in the following bindings:
 
-    42->foo             -> [ MyInteger, MyNumber, MyScalar ]
-    3.1415927->bar      -> [ MyNumber, MyScalar ]
-    "Hello, world!->baz -> [ MyScalar ]
+    42->foo              -> [ MyInteger, MyNumber, MyScalar ]
+    3.1415927->bar       -> [ MyNumber, MyScalar ]
+    "Hello, world!"->baz -> [ MyScalar ]
 
 Note that DEFAULT bindings take precedence over virtual type bindings i.e.
 
@@ -451,15 +451,14 @@ is equivalent to:
 
 =head2 DEBUG
 
-C<DEBUG> exposes the current bindings for the scope in which C<use autobox> is called by means
-of a callback, or a static debugging function.
-
+C<DEBUG> allows the autobox bindings for the current scope to be inspected,
+either by dumping them to the console or passing them to a callback function.
 This allows the computed bindings to be seen in "longhand".
 
 The option is ignored if the value corresponding to the C<DEBUG> key is false.
 
-If the value is a CODE ref, then this sub is called with a reference to
-the hash containing the computed bindings for the current scope.
+If the value is a CODE ref, it is called with a reference to the hash
+containing the computed bindings for the current scope.
 
 Finally, if C<DEBUG> is true but not a CODE ref, the bindings are dumped
 to STDERR.
@@ -485,12 +484,12 @@ or
 
 =head2 import
 
-This method sets up C<autobox> bindings for the current lexical scope. It can be used to implement
-C<autobox> extensions i.e. lexically-scoped modules that provide C<autobox> bindings for one or more
+This method sets up autobox bindings for the current lexical scope. It can be used to implement
+autobox extensions i.e. lexically-scoped modules that provide autobox bindings for one or more
 native types without requiring calling code to C<use autobox>.
 
-This is done by subclassing C<autobox> and overriding C<import>. This allows extensions to effectively
-translate C<use MyModule> into a bespoke C<use autobox> call. e.g.:
+This is done by subclassing autobox and overriding C<import>. This allows extensions to effectively
+translate C<use MyModule> into a bespoke C<use autobox> call e.g.:
 
     package String::Trim;
 
@@ -498,6 +497,7 @@ translate C<use MyModule> into a bespoke C<use autobox> call. e.g.:
 
     sub import {
         my $class = shift;
+
         $class->SUPER::import(
             STRING => 'String::Trim::String'
         );
@@ -514,11 +514,11 @@ translate C<use MyModule> into a bespoke C<use autobox> call. e.g.:
 
     1;
 
-Note that C<trim> is defined in an auxiliary class rather than in C<String::Trim> itself to prevent
-C<String::Trim>'s own methods (i.e. the methods it inherits from C<autobox>) being exposed to C<STRING> types.
+Note that C<trim> is defined in an auxiliary class rather than in String::Trim itself to prevent
+String::Trim's own methods (i.e. the methods it inherits from autobox) being exposed to C<STRING> types.
 
 This module can now be used without a C<use autobox> statement to enable the C<trim> method in the current
-lexical scope. e.g.:
+lexical scope e.g.:
 
     #!/usr/bin/env perl
 
@@ -530,29 +530,27 @@ lexical scope. e.g.:
 
 =head2 autobox_class
 
-C<autobox> adds a single method to all autoboxed types: C<autobox_class>. This can be used to
-call C<can>, C<isa>, C<VERSION>, C<import> and C<unimport>. e.g.
+autobox adds a single method to all autoboxed types: C<autobox_class>. This can be used to
+call L<UNIVERSAL|UNIVERSAL> methods i.e. C<can>, C<DOES>, C<import>, C<isa>, C<unimport> and C<VERSION> e.g.
 
     if (sub { ... }->autobox_class->can('curry')) ...
     if (42->autobox_class->isa('SCALAR')) ...
 
-Note: C<autobox_class> should B<always> be used when calling these methods. The behaviour when
-these methods are called directly on the native type e.g.:
+Note: C<autobox_class> must B<always> be used when calling these methods. Calling them
+directly on native types produces the same results as calling them with autobox disabled
+e.g.:
 
-    42->can('foo')
-    42->isa('Bar')
-    42->VERSION
-
-- is undefined.
+    42->isa('NUMBER') # "" (interpeted as "42"->isa("NUMBER"))
+    []->can('push')   # Error: Can't call method "can" on unblessed reference
 
 =head1 EXPORTS
 
 =head2 type
 
-C<autobox> includes an additional module, C<autobox::universal>, which exports a single subroutine, C<type>.
+autobox includes an additional module, autobox::universal, which exports a single subroutine, C<type>.
 
-This sub returns the type of its argument within C<autobox> (which is essentially longhand for the type names
-used within perl). This value is used by C<autobox> to associate a method invocant with its designated classes. e.g.
+This sub returns the type of its argument within autobox (which is essentially longhand for the type names
+used within perl). This value is used by autobox to associate a method invocant with its designated classes e.g.
 
     use autobox::universal qw(type);
 
@@ -561,7 +559,7 @@ used within perl). This value is used by C<autobox> to associate a method invoca
     type(42.0)  # FLOAT
     type(undef) # UNDEF
 
-C<autobox::universal> is loaded automatically by C<autobox>, and, as its name suggests, can be used to install
+autobox::universal is loaded automatically by autobox, and, as its name suggests, can be used to install
 a universal C<type> method for autoboxed values e.g.
 
     use autobox UNIVERSAL => 'autobox::universal';
@@ -650,7 +648,7 @@ to C<print()>:
 
 =head3 eval EXPR
 
-Like most pragmas, C<autobox> performs operations at compile time, and,
+Like most pragmas, autobox performs operations at compile time, and,
 as a result, runtime string C<eval>s are not executed within its scope i.e. this
 doesn't work:
 
@@ -658,7 +656,7 @@ doesn't work:
 
     eval "42->foo";
 
-The workaround is to use C<autobox> within the C<eval> e.g.
+The workaround is to use autobox within the C<eval> e.g.
 
     eval <<'EOS';
         use autobox;
@@ -674,13 +672,13 @@ Note that the C<eval BLOCK> form works as expected:
 =head3 Operator Overloading
 
 Operator overloading via the L<overload> pragma doesn't (automatically) work.
-C<autobox> works by lexically overriding the L<arrow operator|perlop/"The Arrow Operator">.
+autobox works by lexically overriding the L<arrow operator|perlop/"The Arrow Operator">.
 It doesn't bless native types into objects, so overloading - or any other kind of "magic"
 which depends on values being blessed - doesn't apply.
 
 =head1 VERSION
 
-2.86
+3.0.1
 
 =head1 SEE ALSO
 

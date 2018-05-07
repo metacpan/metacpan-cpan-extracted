@@ -63,4 +63,10 @@ sub is_signed ($) {
 		($self->flags2 & FLAGS2_SECURITY_SIGNATURE) != 0;
 }
 
+sub is_chained ($) {
+	my $self = shift;
+
+	return 0;
+}
+
 1;

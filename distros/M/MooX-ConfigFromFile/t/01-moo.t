@@ -11,10 +11,11 @@ our $OO = "Moo";
 
 unshift @INC, "." unless grep { "." eq $_ } @INC;
 
-do 't/testerr.pm';
-do 't/testlib.pm';
-eval "use MooX::Cmd 0.012;" and do 't/testmxcmd.pm';
-eval "{package MooX::ConfigFromFile::Test::Availability::Of::MooX::Options; use Moo; use MooX::Options 4.001; };"
-  and do 't/testmxopt.pm';
+ok(do 't/testerr.pm', "do 't/testerr.pm'");
+ok(do 't/testlib.pm', "do 't/testlib.pm'");
+$@ and diag($@);
+eval "use MooX::Cmd 0.012; 1" and ok(do 't/testmxcmd.pm', "do 't/testmxcmd.pm'");
+eval "{package MooX::ConfigFromFile::Test::Availability::Of::MooX::Options; use Moo; use MooX::Options 4.001; }; 1"
+  and ok(do 't/testmxopt.pm', "do 't/testmxopt.pm'");
 
 done_testing;

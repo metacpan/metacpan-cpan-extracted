@@ -1,12 +1,11 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Test::MerchantAccount;
-$WebService::Braintree::Test::MerchantAccount::VERSION = '1.2';
+$WebService::Braintree::Test::MerchantAccount::VERSION = '1.3';
 use 5.010_001;
 use strictures 1;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
-use Exporter qw(import);
+use Exporter;
 our @ISA = qw(Exporter);
 
 use constant Approve => "approve_me";

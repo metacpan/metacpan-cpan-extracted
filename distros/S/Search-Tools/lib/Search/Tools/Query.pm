@@ -14,7 +14,7 @@ use Search::Tools::XML;
 
 use namespace::autoclean;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 has 'terms'   => ( is => 'ro' );
 has 'fields'  => ( is => 'ro' );

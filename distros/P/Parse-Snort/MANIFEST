@@ -12,3 +12,4 @@ t/90_parse_text_rule_abuse.t
 t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

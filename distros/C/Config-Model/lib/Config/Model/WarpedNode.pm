@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::WarpedNode;
-$Config::Model::WarpedNode::VERSION = '2.122';
+$Config::Model::WarpedNode::VERSION = '2.123';
 use Mouse;
 
 use Carp qw(cluck croak);
@@ -313,7 +313,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 
@@ -338,13 +338,14 @@ version 2.122
 
         'a_warped_node' => {
             type   => 'warped_node',
-            follow => { ms => '! master_switch' },
-            rules  => [
-                '$ms eq "cX"' => { config_class_name => 'ClassX' },
-                '$ms eq "cY"' => { config_class_name => 'ClassY' },
-            ]
+            warp => }
+               follow => { ms => '! master_switch' },
+               rules  => [
+                   '$ms eq "cX"' => { config_class_name => 'ClassX' },
+                   '$ms eq "cY"' => { config_class_name => 'ClassY' },
+               ]
+            }
         },
-
     ],
  );
 

@@ -5,7 +5,7 @@ use warnings;
 package Test::TempDir::Tiny;
 # ABSTRACT: Temporary directories that stick around when tests fail
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Exporter 5.57 qw/import/;
 our @EXPORT = qw/tempdir in_tempdir/;
@@ -15,7 +15,7 @@ use Cwd qw/abs_path/;
 use Errno qw/EEXIST ENOENT/;
 {
     no warnings 'numeric'; # loading File::Path has non-numeric warnings on 5.8
-    use File::Path 2.01 qw/remove_tree/;
+    use File::Path 2.07 qw/remove_tree/;
 }
 use File::Spec::Functions qw/catdir/;
 use File::Temp;
@@ -241,7 +241,7 @@ Test::TempDir::Tiny - Temporary directories that stick around when tests fail
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -404,7 +404,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christian Walde David Golden Kent Fredric Shawn Laffan
+=for stopwords Christian Walde Kent Fredric Shawn Laffan Sven Kirmess
 
 =over 4
 
@@ -414,15 +414,15 @@ Christian Walde <walde.christian@googlemail.com>
 
 =item *
 
-David Golden <xdg@xdg.me>
-
-=item *
-
 Kent Fredric <kentfredric@gmail.com>
 
 =item *
 
 Shawn Laffan <shawnlaffan@gmail.com>
+
+=item *
+
+Sven Kirmess <sven.kirmess@kzone.ch>
 
 =back
 

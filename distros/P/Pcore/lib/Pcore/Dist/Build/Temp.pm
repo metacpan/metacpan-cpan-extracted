@@ -155,15 +155,12 @@ PERL
 sub _generate_build_pl ( $self, $tree ) {
     my $reqs = $self->prereqs->merged_requirements( [qw[configure build test runtime]], ['requires'] );
 
-    my $perl_version = $reqs->requirements_for_module('perl') || $^V->normal;
-
     my $mbt_version = $self->module_build_tiny_ver;
 
     my $template = <<"BUILD_PL";
 use strict;
 use warnings;
 
-use $perl_version;
 use Module::Build::Tiny $mbt_version;
 Build_PL();
 BUILD_PL
@@ -282,7 +279,7 @@ PERL
 ## |======+======================+================================================================================================================|
 ## |    3 | 51                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (21)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 202                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 199                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -3,7 +3,7 @@ package MooX::ConfigFromFile;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 my %loaded_configs;
 
@@ -23,7 +23,8 @@ sub import
         return if $target->can('_initialize_from_config');
         my $with = $target->can('with');
         $with->('MooX::ConfigFromFile::Role');
-        $import_options{config_hashmergeloaded} and $with->('MooX::ConfigFromFile::Role::HashMergeLoaded');
+        $import_options{config_sortedbyfilename} and $with->('MooX::ConfigFromFile::Role::SortedByFilename');
+        $import_options{config_hashmergeloaded}  and $with->('MooX::ConfigFromFile::Role::HashMergeLoaded');
     };
     $apply_modifiers->();
 
@@ -64,6 +65,13 @@ sub import
 =head1 NAME
 
 MooX::ConfigFromFile - Moo eXtension for initializing objects from config file
+
+=begin html
+
+<a href="https://travis-ci.org/perl5-utils/MooX-ConfigFromFile"><img src="https://travis-ci.org/perl5-utils/MooX-ConfigFromFile.svg?branch=master" alt="Travis CI"/></a>
+<a href='https://coveralls.io/github/perl5-utils/MooX-ConfigFromFile?branch=master'><img src='https://coveralls.io/repos/github/perl5-utils/MooX-ConfigFromFile/badge.svg?branch=master' alt='Coverage Status'/></a>
+
+=end html
 
 =head1 SYNOPSIS
 
@@ -236,7 +244,7 @@ L<http://search.cpan.org/dist/MooX-ConfigFromFile/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Jens Rehsack.
+Copyright 2013-2018 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

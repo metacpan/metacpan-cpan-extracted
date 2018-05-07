@@ -63,6 +63,7 @@ requires:
   MooseX::StrictConstructor: '0'
   PDL: '2.007'
   PDL::Core: '0'
+  PDL::NiceSlice: '0'
   POSIX: '0'
   Role::Tiny: '1.003004'
   Role::Tiny::With: '0'
@@ -97,5 +98,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/lab-measurement/issues
   homepage: https://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/lab-measurement.git
-version: '3.631'
+version: '3.641'
 x_serialization_backend: 'YAML::Tiny version 1.73'

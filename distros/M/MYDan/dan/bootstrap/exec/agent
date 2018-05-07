@@ -1,4 +1,7 @@
 #!/bin/bash
+
+export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 os=$(uname)
 _exit () { echo $1; sleep 60; exit 1; }
 

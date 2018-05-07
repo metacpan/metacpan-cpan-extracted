@@ -4,7 +4,7 @@ use Pcore -inline;
 use Encode qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 use Inline(
-    C => <<'CPP',
+    C => <<'C',
 void* get_std_handle(U32 std_handle) {
     return GetStdHandle(std_handle);
 }
@@ -20,8 +20,8 @@ bool write_console(void* handle, wchar_t* buff) {
 
     return WriteConsoleW(handle, buff, wcslen(buff), &write_size, NULL);
 }
-CPP
-    ccflagsex => '-Wall -Wextra -O3',
+C
+    ccflagsex => '-Wall -Wextra -Ofast',
 );
 
 my $ANSI_RE           = qr/\e.+?m/sm;

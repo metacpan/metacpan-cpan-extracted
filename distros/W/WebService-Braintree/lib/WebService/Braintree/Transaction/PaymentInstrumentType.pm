@@ -1,11 +1,10 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Transaction::PaymentInstrumentType;
-$WebService::Braintree::Transaction::PaymentInstrumentType::VERSION = '1.2';
+$WebService::Braintree::Transaction::PaymentInstrumentType::VERSION = '1.3';
 use 5.010_001;
 use strictures 1;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(PAYPAL_ACCOUNT SEPA_BANK_ACCOUNT CREDIT_CARD ANY UNKNOWN);

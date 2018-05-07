@@ -9,7 +9,7 @@ use Clone 'clone';
 use Carp;
 use Hash::Merge;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub _default_prop_map{
     return {       
@@ -505,7 +505,8 @@ sub _print_block{
     while (@$items){
 
         my $line = [];
-        my $chars_left = $self->globals->{max_cols} - $block->{indent};
+        my $max_chars = $self->globals->{max_cols} - $block->{indent};
+        my $chars_left = $max_chars;
 
         confess "Attempt to print block with an indent >= the maximum number of columns" if $chars_left < 1;
                 
@@ -525,7 +526,7 @@ sub _print_block{
                 } else {
 
                     my $q_item;
-                    ($item,$q_item) = $self->_break_item( $item, $chars_left );
+                    ($item,$q_item) = $self->_break_item( $item, $chars_left, $max_chars );
 
                     if ( $item ){
                         push @$line, $item;
@@ -610,7 +611,7 @@ sub _print_verbatim{
 
 
 sub _break_item{
-    my ($self,$item,$chars_left) = @_;
+    my ($self,$item,$chars_left, $max_chars) = @_;
 
     my $text = $item->{text};
     my $start_length = length( $text );
@@ -623,6 +624,11 @@ sub _break_item{
 
         $clipped = $1;
 
+    }
+
+    if (! $clipped && $chars_left == $max_chars ){
+        $text =~ s/^(.{$chars_left})//s;
+        $clipped = $1;
     }
 
     my $inc_item = undef;

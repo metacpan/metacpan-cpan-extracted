@@ -45,12 +45,17 @@ cmp_ok($self->base_url,'eq',$self->PROTO.'://'.$self->SERVER.':'.$self->PORT,'Ma
 
 SKIP: {
   skip "The following env variables were not set: ".join(', ',@missing),1 unless $run_extended==0;
+  ok($self->resolve('business_transactions','login'),'should resolve our transaction');
+}
+SKIP: {
+  skip "The following env variables were not set: ".join(', ',@missing),1 unless $run_extended==0;
   $self->agent->max_que_count(100);
   {
     my $result=$self->walk_all;
     ok($result,'should get a result without an error');
   }
   my $cv=AnyEvent->condvar;
+  my $t=AnyEvent->timer(after=>60,cb=>sub { $cv->send });
 
   $self->que_check_cache(sub {
     my ($self,$id,$result)=@_;
@@ -80,10 +85,10 @@ SKIP: {
   $cv->begin;
   $self->agent->run_next;
 
-
   $cv->recv;
   my $result=$self->walk_all;
   ok($result,'should get a result without an error');
+
 }
 
 done_testing;

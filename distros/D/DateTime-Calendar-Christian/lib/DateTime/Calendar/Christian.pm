@@ -5,7 +5,7 @@ use 5.008004;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use DateTime 0.1402;
 use DateTime::Calendar::Julian 0.04;
@@ -871,7 +871,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2003 Eugene van der Pijll. All rights reserved.
 
-Copyright (C) 2016 Thomas R. Wyant, III
+Copyright (C) 2016-2018 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself; either the GNU General Public

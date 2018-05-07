@@ -22,15 +22,15 @@ File::ConfigDir - Get directories of configuration files
 
 This module is a helper for installing, reading and finding configuration
 file locations. It's intended to work in every supported Perl5 environment
-and will always try to Do The Right Thing(tm).
+and will always try to Do The Right Thing(TM).
 
 `File::ConfigDir` is a module to help out when perl modules (especially
 applications) need to read and store configuration files from more than
 one location. Writing user configuration is easy thanks to
 [File::HomeDir](https://metacpan.org/pod/File::HomeDir), but what when the system administrator needs to place
 some global configuration or there will be system related configuration
-(in `/etc` on UNIX(tm) or `$ENV{windir}` on Windows(tm)) and some
-network configuration in nfs mapped `/etc/p5-app` or
+(in `/etc` on UNIX(TM) or `$ENV{windir}` on Windows(TM)) and some
+network configuration in NFS mapped `/etc/p5-app` or
 `$ENV{ALLUSERSPROFILE} . "\\Application Data\\p5-app"`, respectively.
 
 `File::ConfigDir` has no "do what I mean" mode - it's entirely up to the
@@ -44,7 +44,7 @@ tag `:ALL`.
 # SUBROUTINES/METHODS
 
 All functions can take one optional argument as application specific
-configuration directory. If given, it will be embedded at the right (tm)
+configuration directory. If given, it will be embedded at the right (TM)
 place of the resulting path.
 
 ## system\_cfg\_dir
@@ -84,22 +84,22 @@ base directory of `$Config{vendorlib}` and `$Config{vendorbin}`.
 
 ## singleapp\_cfg\_dir
 
-Returns the configuration file for standalone installed applications. In
+Returns the configuration file for stand-alone installed applications. In
 Unix speak, installing JRE to `/usr/local/jre-<version>` means there is
 a `/usr/local/jre-<version>/bin/java` and going from it's directory
 name one above and into `etc` there is the _singleapp\_cfg\_dir_. For a
 Perl module it means, we're assuming that `$FindBin::Bin` is installed as
-a standalone package somewhere, eg. into `/usr/pkg` - as recommended for
+a stand-alone package somewhere, e.g. into `/usr/pkg` - as recommended for
 [pkgsrc](http://www.pkgsrc.org/).
 
 ## vendorapp\_cfg\_dir
 
-Returns the configuration file for vendot installed applications. In Unix
+Returns the configuration file for vendor installed applications. In Unix
 speak, installing bacula to `/opt/${vendor}` means there is
 a `/opt/${vendor}/bin/bacula` and going from it's directory
 name one above and into `etc` there is the _vendorapp\_cfg\_dir_. For a
 Perl module it means, we're assuming that `$FindBin::Bin` is installed as
-a standalone package somewhere, eg. into `/usr/pkg` - as recommended for
+a stand-alone package somewhere, e.g. into `/usr/pkg` - as recommended for
 [pkgsrc](http://www.pkgsrc.org/).
 
 ## local\_cfg\_dir
@@ -150,7 +150,7 @@ Registers more sources to ask for suitable directories to check or search
 for config files. Each ["config\_dirs"](#config_dirs) will traverse them in subsequent
 invocations, too.
 
-Returns the number of directory sources in case of succes. Returns nothing
+Returns the number of directory sources in case of success. Returns nothing
 when `$dir_src` is not a code ref.
 
 # AUTHOR

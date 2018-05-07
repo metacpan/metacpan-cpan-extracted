@@ -1,0 +1,6 @@
+name = "JavaScript-V8-CommonJS"
+# badges = ["travis"]
+authority="cpan:CAFEGRATZ"
+
+module_maker="ModuleBuildTiny"
+

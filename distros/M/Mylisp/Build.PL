@@ -1,6 +1,6 @@
 #!perl
 
-use 5.020;
+use 5.012;
 use Module::Build;
 
 my $build = Module::Build->new(
@@ -14,10 +14,9 @@ my $build = Module::Build->new(
   configure_requires => { 'Module::Build' => 0.42 },
   requires => { 
     'perl' => 5.012,
-    'Spp'  => 2.03,
   },
   add_to_cleanup  => [ 'Mylisp-*' ],
-  script_files    => ['bin/mylisp'],
+  script_files    => [ 'bin/mylisp' ],
   create_makefile_pl => 'traditional',
 );
 

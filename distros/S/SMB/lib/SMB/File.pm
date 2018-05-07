@@ -85,7 +85,7 @@ sub new ($%) {
 	my %options = @_;
 
 	my $name = delete $options{name} // die "No name in constructor";
-	$name =~ s!\\!\/!g;
+	$name =~ s!\\!/!g;
 	$name =~ s!/{2,}!/!g;
 	$name =~ s!/$!!;
 	my $is_directory = delete $options{is_directory};
@@ -98,13 +98,15 @@ sub new ($%) {
 		$filename =~ s!/{2,}!/!g;
 		$filename = '.' if $filename eq '';
 	}
+	$name =~ s!/!\\!g;
 	my $is_ipc = $options{is_ipc} ||= 0;
 	my @stat = !$is_ipc && $filename && -e $filename ? stat($filename) : ();
-	my $is_srv = $is_ipc && $name =~ /^(?:srvsvc|wkssvc)$/;
+	my $is_svc = $is_ipc && $name =~ /^(?:srvsvc|wkssvc)$/;
 
 	my $self = $class->SUPER::new(
 		name             => $name,
 		filename         => $filename,  # server-side file only
+		id               => @stat ? $stat[ 1]             : 0,
 		creation_time    => @stat ? to_nttime($stat[10])  : 0,
 		last_access_time => @stat ? to_nttime($stat[ 8])  : 0,
 		last_write_time  => @stat ? to_nttime($stat[ 9])  : 0,
@@ -112,7 +114,8 @@ sub new ($%) {
 		allocation_size  => @stat ? ($stat[12] || 0) * 512: 0,
 		end_of_file      => @stat ? $stat[ 7]             : 0,
 		attributes       => @stat ? to_ntattr($stat[ 2])  : $is_directory ? ATTR_DIRECTORY : 0,
-		exists           => @stat || $is_srv ? 1 : 0,
+		exists           => @stat || $is_svc ? 1 : 0,
+		is_svc           => $is_svc,
 		opens            => 0,
 		%options,
 	);
@@ -158,6 +161,22 @@ sub ctime_string { time_to_string($_[0]->ctime, $_[1]) }
 sub atime_string { time_to_string($_[0]->atime, $_[1]) }
 sub wtime_string { time_to_string($_[0]->wtime, $_[1]) }
 sub mtime_string { time_to_string($_[0]->mtime, $_[1]) }
+
+use constant {
+	KILO => 1024 ** 1,
+	MEGA => 1024 ** 2,
+	GIGA => 1024 ** 3,
+	TERA => 1024 ** 4,
+};
+
+sub size { $_[0]->end_of_file }
+sub size_string {
+	my $size = $_[0]->size;
+	$size < 1e10 ? $size :
+	$size < 1e13 ? sprintf "%.3f G", $size / GIGA :
+	$size < 1e16 ? sprintf "%.3f T", $size / TERA :
+	substr($size, 0, 6) . "e" . (length($size) - 5);
+}
 
 sub add_openfile ($$$) {
 	my $self = shift;
@@ -228,7 +247,9 @@ sub open ($) {
 sub create ($) {
 	my $self = shift;
 
-	sysopen(my $fh, $self->filename, from_ntattr($self->attributes) | O_CREAT | O_EXCL)
+	($self->is_directory
+		? mkdir($self->filename, 0777)  # respect umask
+		: sysopen(my $fh, $self->filename, from_ntattr($self->attributes) | O_CREAT | O_EXCL))
 		or return $self->_fail_exists(-e $self->filename ? 1 : 0);
 
 	$self->add_openfile($fh, ACTION_CREATED);
@@ -304,23 +325,25 @@ sub find_files ($%) {
 	return unless $self->is_directory;
 
 	my $pattern = $params{pattern} || '*';
-	my $want_all = $pattern eq '*';
 	my $start_idx = $params{start_idx} || 0;
-	my $files = $self->{files};  # cached for fragmented queries
 	my $name = $self->name;
+
+	$self->{files} ||= {};
+	# cached for fragmented queries
+	my $files = $params{reopen} ? undef : $self->{files}{pattern};
 
 	# fix pattern if needed
 	my $pattern0 = $pattern;
 	$pattern0 =~ s/^\*/{.*,*}/;
 
-	if (!$files || $start_idx == 0) {
+	if (!$files) {
 		my @filenames = map { -e $_ && basename($_) } bsd_glob($self->filename . "/$pattern0", GLOB_NOCASE | GLOB_BRACE);
 		$self->msg("Find [$self->{filename}/$pattern] - " . scalar(@filenames) . " files");
 		$files = [ map { SMB::File->new(
-			name => $name eq '' ? $_ : "$name/$_",
-			share_root => $self->share_root,
+			name => $_,
+			share_root => $self->share_root . ($name eq '' ? '' : "/$name"),
 		) } @filenames ];
-		$self->{files} = $files if $want_all;
+		$self->{files}{$pattern} = $files;
 	}
 
 	return $start_idx ? [ @{$files}[$start_idx .. (@$files - 1)] ] : $files;
@@ -483,6 +506,16 @@ Returns file last_write_time as string using function B<time_to_string>.
 =item mtime_string [FORMAT]
 
 Returns file change_time as string using function B<time_to_string>.
+
+=item size
+
+Returns file size in bytes. This is just an alias to B<end_of_file>.
+
+=item size_string
+
+Returns file size in human readable form that is always not longer
+than 9 characters, like: "314159265", "34.567 G", "234.567 T" or
+"785634e12".
 
 =item add_openfile HANDLE ACTION
 

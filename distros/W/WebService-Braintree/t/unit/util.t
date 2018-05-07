@@ -8,7 +8,6 @@ use Test::More;
 use lib qw(lib t/lib);
 
 use WebService::Braintree::Util qw(
-    difference_arrays
     to_instance_array
     validate_id
 );
@@ -27,12 +26,13 @@ subtest "Flatten Hashes" => sub {
     is_deeply($flatten->({"a" => {"b" => {"c" => "1"}}}), {"a[b][c]" => "1"}, "Vertical merging");
 };
 
-subtest "difference arrays" => sub {
-    cmp_deeply(difference_arrays(['a', 'b'], ['a', 'b']), []);
-    cmp_deeply(difference_arrays(['a', 'b'], ['a']), ['b']);
-    cmp_deeply(difference_arrays(['a', 'b'], ['b']), ['a']);
-    cmp_deeply(difference_arrays(['a'], ['a', 'b']), []);
-};
+# difference_arrays is now moved to AdvancedSearchNodes::MultipleValuesNode
+#subtest "difference arrays" => sub {
+#    cmp_deeply(difference_arrays(['a', 'b'], ['a', 'b']), []);
+#    cmp_deeply(difference_arrays(['a', 'b'], ['a']), ['b']);
+#    cmp_deeply(difference_arrays(['a', 'b'], ['b']), ['a']);
+#    cmp_deeply(difference_arrays(['a'], ['a', 'b']), []);
+#};
 
 {
     package Testing::Object;

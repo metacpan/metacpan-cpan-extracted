@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Plack/Middleware/Camelcadedb.pm
+MANIFEST
+META.yml
+META.json
+t/001_load.t
+t/010_sanity.t
+t/apps/base.psgi
+t/apps/lib/App/Base.pm
+t/lib/Test.pm
+t/scripts/curl.pl
+t/scripts/plackup.pl

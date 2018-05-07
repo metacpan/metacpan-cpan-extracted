@@ -1,10 +1,11 @@
 package Test::MockModule;
+use warnings;
 use strict qw/subs vars/;
 use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 my %mocked;
 sub new {
@@ -52,6 +53,14 @@ sub redefine {
 	while ( my ($name, $value) = splice @mocks, 0, 2 ) {
 		my $sub_name = $self->_full_name($name);
 		my $coderef = *{$sub_name}{'CODE'};
+		next if 'CODE' eq ref $coderef;
+
+		if ( $sub_name =~ qr{^(.+)::([^:]+)$} ) {
+			my ( $pkg, $sub ) = ( $1, $2 );
+			my $object = bless {}, $pkg;
+			next if $object->can( $sub );
+		}
+
 		if ('CODE' ne ref $coderef) {
 			croak "$sub_name does not exist!";
 		}
@@ -333,7 +342,7 @@ you can instead mock it in the module you are testing:
 
 	my $mymodule = Test::MockModule->new("MyModule", no_auto => 1);
 	$mymodule->mock("strftime", "Yesterday");
-	is MyModule::minus_twentyfour(), "Yesterday", "`minus-tewntyfour` got mocked"; # suceeds
+	is MyModule::minus_twentyfour(), "Yesterday", "`minus-tewntyfour` got mocked"; # succeeds
 
 =item redefine($subroutine)
 
@@ -341,6 +350,9 @@ The same behavior as C<mock()>, but this will preemptively check to be
 sure that all passed subroutines actually exist. This is useful to ensure that
 if a mocked module's interface changes the test doesn't just keep on testing a
 code path that no longer behaves consistently with the mocked behavior.
+
+Note that redefine is also now checking if one of the parent provides the sub
+and will not die if it's available in the chain.
 
 =item original($subroutine)
 

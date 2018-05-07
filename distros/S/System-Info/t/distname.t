@@ -1,17 +1,12 @@
-#!perl
+#!/usr/bin/perl
 
 use strict;
-use strict;
+use warnings;
 
 use Test::More;
 use System::Info;
 
-my @etc = glob "t/etc/*/DISTNAME";
-
-#plan $^O eq "linux"
-#    ? (tests => scalar @etc)
-#    : (skip_all => "$^O is not Linux");
-plan "no_plan";
+my @etc = sort glob "t/etc/*/DISTNAME";
 
 local $^O = "linux";
 
@@ -24,7 +19,7 @@ foreach my $dnf (@etc) {
     $ENV{SMOKE_USE_ETC} = $etc;
 
     my $si = System::Info->new;
-    is $si->_distro, $dn, "Distribution\t$dn";
+    is ($si->_distro, $dn, "Distribution\t$dn");
 
     # Helper line :)
     $si->{__distro} eq $dn and next;
@@ -32,3 +27,5 @@ foreach my $dnf (@etc) {
     #use DP;diag (DDumper ($si->{__X__}));
     #print "echo '$si->{__distro}' >$etc/DISTNAME\n";
     }
+
+done_testing ();

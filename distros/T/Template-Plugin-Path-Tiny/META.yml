@@ -1,0 +1,36 @@
+---
+abstract: 'use Path::Tiny objects from within templates'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Template: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Path-Tiny
+provides:
+  Template::Plugin::Path::Tiny:
+    file: lib/Template/Plugin/Path/Tiny.pm
+    version: v0.1.0
+requires:
+  Moo: '0'
+  Path::Tiny: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://github.com/robrwo/Template-Plugin-Path-Tiny/issues
+  repository: git://github.com/robrwo/Template-Plugin-Path-Tiny.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,23 @@
 Changes for Perl extension File-HomeDir
 
+1.004	2018-05-02
+    - release 1.003_002 without further changes
+
+1.003_002	2018-03-13
+    - build distribution on Linux
+    - add debug message because of RT#65301
+    - run author tests with installed spell-checker
+
+1.003_001	2018-03-10
+    - skip root homedir test for cygwin (RT#104661)
+    - document even undocumented fetchers for FreeDesktop implementation
+      (RT#103305) and status quo (RT#88681)
+    - Fix several typos (RT#86426, RT#67093, PR#1)
+    - play with https://coveralls.io/
+    - remove tie interface (PR#4, Thanks Yanick)
+    - determine ->my_home when $ENV{HOME} is empty (based on PR#3)
+    - relocate repository
+
 1.002	2017-04-06
     - regenerate README.md with correct encoding settings
 
@@ -208,7 +226,7 @@ Changes for Perl extension File-HomeDir
 
 0.60_11 2017-01-01
 	- Reduced the basic version dependencies on Mac OS because they
-	  were unnecesary on that platform, and now Mac users don't need
+	  were unnecessary on that platform, and now Mac users don't need
 	  to upgrade PathTools.
 
 0.60_10 2017-01-01
@@ -224,7 +242,7 @@ Changes for Perl extension File-HomeDir
 	  suite. Don't ask me WHY people might need to install
 	  a module as nobody. I don't know.
 
-	  But now the test suite accomodates that.
+	  But now the test suite accommodates that.
 
 	- On Unix, if the home directory does not exist, for
 	  example /nonexistant, it means the user does NOT have

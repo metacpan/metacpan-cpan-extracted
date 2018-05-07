@@ -1,5 +1,14 @@
 Revision history for Test::Count
 
+0.0902   2018-05-02
+    - Convert to dist zilla.
+
+0.0901  2013-05-21
+
+    - Get rid of Makefile.PL .
+        - Use Build.PL to build.
+    - Add t/cpan-changes.t
+
 0.0900  2013-05-18
     - Implement the +=, -= and *= operators.
 

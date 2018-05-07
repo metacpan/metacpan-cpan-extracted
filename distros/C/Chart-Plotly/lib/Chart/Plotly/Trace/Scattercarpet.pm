@@ -12,9 +12,10 @@ use Chart::Plotly::Trace::Scattercarpet::Marker;
 use Chart::Plotly::Trace::Scattercarpet::Selected;
 use Chart::Plotly::Trace::Scattercarpet::Stream;
 use Chart::Plotly::Trace::Scattercarpet::Textfont;
+use Chart::Plotly::Trace::Scattercarpet::Transform;
 use Chart::Plotly::Trace::Scattercarpet::Unselected;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Plots a scatter trace on either the first carpet axis or the carpet axis with a matching `carpet` attribute.
 
@@ -232,6 +233,9 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has transforms => ( is  => "rw",
+                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Scattercarpet::Transform]", );
+
 has uid => ( is  => "rw",
              isa => "Str", );
 
@@ -253,7 +257,7 @@ has xaxis => (
 has yaxis => (
     is => "rw",
     documentation =>
-      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -271,7 +275,7 @@ Chart::Plotly::Trace::Scattercarpet - Plots a scatter trace on either the first 
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -459,6 +463,8 @@ Sets the source reference on plot.ly for  textposition .
 
 Sets the source reference on plot.ly for  text .
 
+=item * transforms
+
 =item * uid
 
 =item * unselected
@@ -473,7 +479,7 @@ Sets a reference between this trace's x coordinates and a 2D cartesian x axis. I
 
 =item * yaxis
 
-Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.yaxis2`, and so on.
 
 =back
 

@@ -32,7 +32,7 @@ lib/Search/Tools/XML.pm
 Makefile.PL
 MANIFEST
 ppport.h
-README
+README.pod
 search-tools.c
 search-tools.h
 t/00-load.t

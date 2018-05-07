@@ -1,6 +1,5 @@
 /*
- * $Id: TEA.xs,v 1.25 2001/05/21 17:32:59 ams Exp $
- * Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
+ * Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
  */
 
 #include "EXTERN.h"
@@ -55,8 +54,8 @@ tea_crypt(self, input, output, decrypt)
             output = sv_newmortal();
         outlen = 8;
 
-        if (SvREADONLY(output) || !SvUPGRADE(output, SVt_PV))
-            croak("cannot use output as lvalue");
+        if (SvREADONLY(output))
+            SvUPGRADE(output, SVt_PV);
 
         tea_crypt(self,
                   (unsigned char *)input,

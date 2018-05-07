@@ -1,92 +1,157 @@
-_:rb084bf43e108340a4a9765d78f6d8a736r0 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Bugfix> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Fix a typo bug in dc11 URI."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Added csvw prefix."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Added sosa prefix."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Add an all method."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Add author test to check the RDFa Initial Context."@en
-	] .
-_:rb8c08c9c8b4914eceb96db00b0c71a356r0 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb8c08c9c8b4914eceb96db00b0c71a356r1 <http://ontologi.es/doap-deps#on> "perl 5.006000"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb8c08c9c8b4914eceb96db00b0c71a356r2 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb8c08c9c8b4914eceb96db00b0c71a356r3 <http://ontologi.es/doap-deps#on> "RDF::Trine"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb8c08c9c8b4914eceb96db00b0c71a356r4 <http://ontologi.es/doap-deps#on> "Test::Exception"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb8c08c9c8b4914eceb96db00b0c71a356r5 <http://ontologi.es/doap-deps#on> "List::Util 1.43"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rbaaee3e85b92e4550886d0ab9352b99ffr0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-rdf-ns-curated> ;
-	a <http://usefulinc.com/ns/doap#GitRepository> ;
-	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#> .
-<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rb8c08c9c8b4914eceb96db00b0c71a356r2, _:rb8c08c9c8b4914eceb96db00b0c71a356r3, _:rb8c08c9c8b4914eceb96db00b0c71a356r4, _:rb8c08c9c8b4914eceb96db00b0c71a356r5 ;
-	<http://ontologi.es/doap-deps#runtime-requirement> _:rb8c08c9c8b4914eceb96db00b0c71a356r1 ;
-	<http://ontologi.es/doap-deps#test-requirement> _:rb8c08c9c8b4914eceb96db00b0c71a356r0 ;
-	<http://purl.org/dc/terms/contributor> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/p5-rdf-ns-curated/issues> ;
-	<http://usefulinc.com/ns/doap#created> "2015-07-27"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#developer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://usefulinc.com/ns/doap#download-page> <https://metacpan.org/release/RDF-NS-Curated> ;
-	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/release/RDF-NS-Curated> ;
-	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
-	<http://usefulinc.com/ns/doap#maintainer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://usefulinc.com/ns/doap#name> "RDF-NS-Curated" ;
-	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
-	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100> ;
-	<http://usefulinc.com/ns/doap#repository> _:rbaaee3e85b92e4550886d0ab9352b99ffr0 ;
-	<http://usefulinc.com/ns/doap#shortdesc> "A curated set of RDF prefixes" ;
-	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
-	a <http://usefulinc.com/ns/doap#Project> .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-NS-Curated-0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2015-07-27"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.001.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Initial release" .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-NS-Curated-0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2015-09-01"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.002.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Trivial bug fixes" .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-NS-Curated-0.003"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2017-01-16"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.003.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.003"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Add more prefixes." .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-NS-Curated-0.004"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2017-01-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.004.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.004"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Remove duv prefix, spec unreliable." .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-NS-Curated-0.005"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2017-01-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.005.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.005"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Correct duv prefix." .
-<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100> <http://ontologi.es/doap-changeset#changeset> _:rb084bf43e108340a4a9765d78f6d8a736r0 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-NS-Curated-0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2018-02-05"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.100.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/person/kjetilk> a <http://xmlns.com/foaf/0.1/Person> ;
-	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
-	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
-	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" ;
-	<http://xmlns.com/foaf/0.1/nick> "KJETILK" ;
-	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/KJETILK> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix types: <http://rdfs.org/sioc/types#> .
+@prefix wot:   <http://xmlns.com/wot/0.1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	rdfs:comment         "the same terms as the Perl 5 programming language system itself"@en.
+
+<http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Harald-J\u00F6rg>
+	foaf:name            "Harald Jörg".
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.43"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-rdf-ns-curated/issues>;
+	doap:created         "2015-07-27"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/RDF-NS-Curated>;
+	doap:helper          <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Harald-J\u00F6rg>;
+	doap:homepage        <https://metacpan.org/release/RDF-NS-Curated>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "RDF-NS-Curated";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-rdf-ns-curated>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#>;
+	];
+	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:shortdesc       "A curated set of RDF prefixes";
+	doap:support-forum   <irc://irc.perl.org/#perlrdf>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "RDF-NS-Curated-0.001"^^xsd:string;
+	dc:issued            "2015-07-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Trivial bug fixes";
+	dc:identifier        "RDF-NS-Curated-0.002"^^xsd:string;
+	dc:issued            "2015-09-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Add more prefixes.";
+	dc:identifier        "RDF-NS-Curated-0.003"^^xsd:string;
+	dc:issued            "2017-01-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "Remove duv prefix, spec unreliable.";
+	dc:identifier        "RDF-NS-Curated-0.004"^^xsd:string;
+	dc:issued            "2017-01-23"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "Correct duv prefix.";
+	dc:identifier        "RDF-NS-Curated-0.005"^^xsd:string;
+	dc:issued            "2017-01-23"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>
+	a                    doap:Version;
+	dc:identifier        "RDF-NS-Curated-0.100"^^xsd:string;
+	dc:issued            "2018-02-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix a typo bug in dc11 URI."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Added csvw prefix."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Added sosa prefix."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add an all method."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add author test to check the RDFa Initial Context."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>
+	a                    doap:Version;
+	dc:identifier        "RDF-NS-Curated-1.000"^^xsd:string;
+	dc:issued            "2018-05-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Added qname method. Many thanks to Harald Jörg for a bugfix in my implementation."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.000.tar.gz>;
+	doap:revision        "1.000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK", "KjetilK";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:homepage        <http://kjetil.kjernsmo.net/>;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<irc://irc.perl.org/#perlrdf>
+	a                    types:ChatChannel;
+	dc:title             "The Perl and RDF IRC channel"@en.
+
+_:B1
+	a                    wot:PubKey;
+	wot:fingerprint      "0ECC8BC6D0A2E9B93BA417267FBEE8DF3A9E4AA5".
+

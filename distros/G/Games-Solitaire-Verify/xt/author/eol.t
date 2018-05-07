@@ -1,0 +1,61 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
+
+use Test::More 0.88;
+use Test::EOL;
+
+my @files = (
+    'bin/expand-solitaire-multi-card-moves',
+    'bin/verify-solitaire-solution',
+    'lib/Games/Solitaire/Verify.pm',
+    'lib/Games/Solitaire/Verify/App/CmdLine.pm',
+    'lib/Games/Solitaire/Verify/App/CmdLine/Expand.pm',
+    'lib/Games/Solitaire/Verify/App/CmdLine/From_Patsolve.pm',
+    'lib/Games/Solitaire/Verify/Base.pm',
+    'lib/Games/Solitaire/Verify/Card.pm',
+    'lib/Games/Solitaire/Verify/Column.pm',
+    'lib/Games/Solitaire/Verify/Exception.pm',
+    'lib/Games/Solitaire/Verify/Foundations.pm',
+    'lib/Games/Solitaire/Verify/Freecells.pm',
+    'lib/Games/Solitaire/Verify/KlondikeTalon.pm',
+    'lib/Games/Solitaire/Verify/Move.pm',
+    'lib/Games/Solitaire/Verify/Solution.pm',
+    'lib/Games/Solitaire/Verify/Solution/Base.pm',
+    'lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves.pm',
+    'lib/Games/Solitaire/Verify/Solution/ExpandMultiCardMoves/Lax.pm',
+    'lib/Games/Solitaire/Verify/State.pm',
+    'lib/Games/Solitaire/Verify/State/LaxParser.pm',
+    'lib/Games/Solitaire/Verify/VariantParams.pm',
+    'lib/Games/Solitaire/Verify/VariantsMap.pm',
+    't/00-compile.t',
+    't/00-load.t',
+    't/base-class.t',
+    't/card.t',
+    't/column.t',
+    't/data/boards/338741497.board',
+    't/data/sample-solutions/fcs-bakers-game-24.txt',
+    't/data/sample-solutions/fcs-eight-off-200-l-gi.txt',
+    't/data/sample-solutions/fcs-eight-off-200.txt',
+    't/data/sample-solutions/fcs-forecell-24.txt',
+    't/data/sample-solutions/fcs-freecell-24-wrong-1.txt',
+    't/data/sample-solutions/fcs-freecell-24-wrong-2.txt',
+    't/data/sample-solutions/fcs-freecell-24.txt',
+    't/data/sample-solutions/fcs-freecell-9-expanded.txt',
+    't/data/sample-solutions/fcs-freecell-9-orig.txt',
+    't/data/sample-solutions/fcs-larrysan-kings-only-0-freecells-unlimited-move.txt',
+    't/data/sample-solutions/fcs-relaxed-freecell-11982.txt',
+    't/data/sample-solutions/fcs-seahaven-towers-1977.txt',
+    't/data/sample-solutions/fcs-simple-simon-24.txt',
+    't/data/sample-solutions/patsolve-338741497-win-solution.txt',
+    't/expand-solution.t',
+    't/from-patsolve.t',
+    't/move.t',
+    't/solution.t',
+    't/state.t',
+    't/verify-moves.t'
+);
+
+eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;
+done_testing;

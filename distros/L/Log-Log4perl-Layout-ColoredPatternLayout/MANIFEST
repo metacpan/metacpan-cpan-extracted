@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_Layout.t
+t/00_Layout-Rr.t
+t/01_Colored.t
+lib/Log/Log4perl/Layout/ColoredPatternLayout.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

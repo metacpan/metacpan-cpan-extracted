@@ -13,7 +13,7 @@ Lab::Moose::Developer - Lab::Moose developer tutorial
 
 =head1 VERSION
 
-version 3.631
+version 3.641
 
 =head1 Writing drivers
 
@@ -242,9 +242,9 @@ this:
 First thing, we need to run the test with the I<real> instrument, to create the
 connection log file F<t/Moose/Instrument/SR830.yml>:
 
-C<< $ perl -Ilib t/Moose/Instrument/SR830.t --connection=LinuxGPIB --connection_options='{pad: 1}'  >>
+C<< $ perl -Ilib t/Moose/Instrument/SR830.t --connection=LinuxGPIB --connection-options='{pad: 1}'  >>
 
-where the argument of C<--connection_options> is given as a YAML hash.
+where the argument of C<--connection-options> is given as a YAML hash.
 
 You can always print a help screen of command line options supported by the
 test:
@@ -271,6 +271,40 @@ File comparison, including basic filtering options.
 
 =back
 
+=head2 git pre-commit hook: run tests for each commit
+
+The file F<xt/pre-commit.pl> provides a L<git
+pre-commit hook|https://git-scm.com/book/uz/v2/Customizing-Git-Git-Hooks>.
+
+The hook is enabled by creating a link to F<.git/hooks/pre-commit>:
+
+ ln -s xt/pre-commit.pl .git/hooks/pre-commit
+
+The hook performs the following actions before a commit is finished:
+
+=over
+
+=item *
+
+Run perltidy with our configuration F<perltityrc> on all changed files.
+
+=item * 
+
+Run all tests in F<t/> with B<prove>.
+
+=item *
+
+Run Perl::Critic tests in F<xt/critic>.
+
+=item *
+
+Run F<xt/pod-manual-coverage.t>, which ensures that
+L<Lab::Measurement::Manual> contains links to all modules in the distribution.
+
+=back
+
+If a tests fails, the commit is stopped.
+
 =head2 Roles for SCPI instruments
 
 TODO
@@ -288,6 +322,7 @@ TODO
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

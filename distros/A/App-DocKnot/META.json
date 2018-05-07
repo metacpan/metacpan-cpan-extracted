@@ -26,7 +26,7 @@
             "JSON" : "0",
             "Perl6::Slurp" : "0",
             "Template" : "0",
-            "perl" : "5.018"
+            "perl" : "5.024"
          }
       },
       "test" : {
@@ -38,16 +38,25 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-DocKnot@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot"
+      },
       "homepage" : "https://www.eyrie.org/~eagle/software/docknot",
       "license" : [
          "http://www.opensource.org/licenses/mit-license.php"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rra/docknot.git",
+         "web" : "https://github.com/rra/docknot"
+      }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

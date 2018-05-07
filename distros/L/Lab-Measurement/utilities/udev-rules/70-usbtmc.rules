@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="usb", KERNEL=="usbtmc[0-9]", GROUP="plugdev", MODE="0660" 
+

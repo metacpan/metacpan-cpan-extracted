@@ -1,0 +1,37 @@
+---
+abstract: 'A module to access the Pokémon data through RESTful API from http://pokeapi.co.'
+author:
+  - 'Kian Meng, Ang.'
+build_requires:
+  Dist::Zilla::App::Command::cover: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Pokemon
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Web::API: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kianmeng/webservice-pokemon/issues
+  homepage: https://github.com/kianmeng/webservice-pokemon
+  repository: https://github.com/kianmeng/webservice-pokemon.git
+version: '0.03'
+x_contributors:
+  - 'Kian-Meng, Ang <kianmeng@users.noreply.github.com>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 0

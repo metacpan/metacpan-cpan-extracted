@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.050";
+our $VERSION = "0.051";
 
 =head1 NAME
 
@@ -47,9 +47,19 @@ sub prepare_os {
     $@ and return;
 
     my $os = $self->_os;
+    # ("Win7", "Windows 7 Professional (64-bit) Service Pack 1")
     $os = "$^O - " . join " " => Win32::GetOSName ();
     $os =~ s/Service\s+Pack\s+/SP/;
     $self->{__os} = $os;
+
+    # Windows 7 Professional (64-bit) Service Pack 1
+    $self->{__osname} = Win32::GetOSDisplayName ();
+
+    # https://metacpan.org/pod/Win32#Win32::GetOSVersion()
+    # ("Service Pack 1", 6, 1, 7601, 2,   1, 0, 0x100, 1)
+    my ($name, $major, $minor, $build, $id,
+	$spmaj, $spmin, $suitemask, $producttype) = Win32::GetOSVersion ();
+    $self->{__osvers} = join "." => $major, $minor, $build;
     } # prepare_os
 
 sub __get_registry_sysinfo {

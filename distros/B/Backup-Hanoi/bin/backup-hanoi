@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# Autor: Boris Däppen, 2018
+# No guarantee given, use at own risk and will
+
+# PODNAME: backup-hanoi
+# ABSTRACT: predict on which device to put next backup
+
+use feature 'say';
+                                                               
+use Backup::Hanoi;  
+
+my $help = <<'END_MESSAGE';
+
+  backup-hanoi tells you where to write your next backup
+
+  You need to list your devices in a text file, separated by newline
+
+  example usages:
+
+    # list repeatable pattern
+    backup-hanoi device-list.txt
+
+    # list which device should be used for backup number 40
+    backup-hanoi device-list.txt 40
+
+    # create a device-list for the backups 40 up to 60
+    backup-hanoi device-list.txt 40 60
+END_MESSAGE
+unless (@ARGV) {
+    say $help;
+    exit 0;
+}
+
+
+my $devices_file = shift @ARGV;
+my $cycle        = shift @ARGV;
+my $cycle_top    = shift @ARGV;
+
+open my $file_handle, '<', $devices_file;
+chomp(my @devices = <$file_handle>);
+close $file_handle;
+
+my $backup = Backup::Hanoi->new(\@devices);
+
+if (defined $cycle_top and ($cycle_top or $cycle_top == 0)) {
+
+	for ($cycle .. $cycle_top) {
+		say $backup->get_device_for_cycle($_);
+	}
+}
+elsif (defined $cycle and ($cycle or $cycle == 0)) {
+	say $backup->get_device_for_cycle($cycle);
+}
+else {
+	for (0 .. ((2**(scalar @devices))/2)-1)  {
+		say $backup->get_device_for_cycle($_);
+	}
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+backup-hanoi - predict on which device to put next backup
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+This is an early release.
+This code is currently not used in production by the author.
+Use it with care!
+
+L<backup-hanoi> tells you where to write your next backup.
+You need to list your devices in a text file, separated by newline.
+
+ # list repeatable pattern
+ backup-hanoi device-list.txt
+
+ # list wich device should be used for backup number 40
+ backup-hanoi device-list.txt 40
+
+ # create a device-list for the backups 40 up to 60
+ backup-hanoi device-list.txt 40 60
+
+ # if you have 5 devices in the list
+ # create a plan for initilisation and overwriting
+ # for one year of daily backups
+ backup-hanoi device-list.txt -4 360
+
+=head1 AUTHOR
+
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Boris Däppen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,5 +1,5 @@
 package CPAN::Upload::Tiny;
-$CPAN::Upload::Tiny::VERSION = '0.007';
+$CPAN::Upload::Tiny::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use MIME::Base64 ();
 use HTTP::Tiny;
 use HTTP::Tiny::Multipart;
 
-my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI} || 'https://pause.perl.org/pause/authenquery';
+my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI} || 'https://pause.perl.org/pause/authenquery?ACTION=add_uri';
 
 sub new {
 	my ($class, $user, $password) = @_;
@@ -101,7 +101,7 @@ CPAN::Upload::Tiny - A tiny CPAN uploader
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

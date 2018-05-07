@@ -87,7 +87,8 @@ sub run
 
     my ( @work, $stop );
 
-    $SIG{TERM} = $SIG{INT} = my $tocb = sub
+    
+    my $tocb = sub
     {
         $stop = 1;
         for my $w ( @work )
@@ -99,6 +100,21 @@ sub run
 
         map{ $cv->end; } 1 .. $cv->{_ae_counter}||0;
     };
+
+    $SIG{TERM} = $SIG{INT} = sub{ warn "sigaction exit.\n"; &$tocb();};
+    my $w = AnyEvent->timer ( after => $run{timeout},  cb => sub{ warn "timeout.\n";&$tocb(); });
+
+    my ( $md5, $aim, $efsize );
+    if( my $ef = $ENV{MYDanExtractFile} )
+    {
+        open my $TEMP, "<$ef" or die "open ef fail:$!";
+        $md5 = Digest::MD5->new()->addfile( $TEMP )->hexdigest();
+        close $TEMP;
+        my $efa =  $ENV{MYDanExtractFileAim};
+        $aim = $efa && $efa =~ /^[a-zA-Z0-9\/\._\-]+$/ ? $efa : '.';
+        $efsize = ( stat $ef )[7];
+    }
+
 
     my %hosts = MYDan::Util::Hosts->new()->match( @node );
 
@@ -127,6 +143,9 @@ sub run
              push @work, \$hdl;
              $hdl = new AnyEvent::Handle(
                  fh => $fh,
+                 rbuf_max => 10240000,
+                 wbuf_max => 10240000,
+                 autocork => 1,
                  on_read => sub {
                      my $self = shift;
                      $self->unshift_read (
@@ -137,7 +156,45 @@ sub run
                                  $cut{$node} = $_[1]; return; 
                              }
                              
-                             $result{$node} .= $_[1] unless ! $result{$node} && $_[1] eq '*';
+			     if( $result{$node} )
+			     {
+				  $result{$node} .= $_[1];
+			     }
+			     else
+			     {
+				     $_[1] =~ s/^\*+//;
+
+				     if( $_[1] =~ s/^MH_:(\d+):_MH// )
+				     {
+                                         if( $1 )
+                                         {
+                                             my $ef = $ENV{MYDanExtractFile};
+                                             open my $EF, "<$ef" or die "open $ef fail:$!";
+                                             my ( $n, $buf );
+        
+                                             $hdl->on_drain(sub {
+                                                     my ( $n, $buf );
+                                                     $n = sysread( $EF, $buf, 102400 );
+                                                     if( $n )
+                                                     {
+                                                         $hdl->push_write($buf);
+                                                     }
+                                                     else
+                                                     {
+                                                         $hdl->on_drain(undef);
+                                                         close $EF;
+                                                         $hdl->push_shutdown;
+                                                     }
+                                                 });
+                                         }
+                                         else
+                                         {
+                                             $hdl->push_shutdown;
+                                         }
+				         $_[1] =~ s/^\*+//;
+				     }
+				     $result{$node} = $_[1] if $_[1];
+			     }
                          }
                      );
                   },
@@ -148,9 +205,18 @@ sub run
                       $cv->end;
                   }
              );
-             $hdl->push_write($query);
-             $hdl->push_shutdown;
-          }, sub{ return 3; };
+             if( my $ef = $ENV{MYDanExtractFile} )
+             {
+                 my $size = length $query;
+                 $hdl->push_write("MYDanExtractFile_::${size}:${efsize}:${md5}:${aim}::_MYDanExtractFile");
+                 $hdl->push_write($query);
+             }
+             else
+             {
+                 $hdl->push_write($query);
+                 $hdl->push_shutdown;
+             }
+         }, sub{ return 3; };
     };
 
     my $max = scalar @node > $run{max} ? $run{max} : scalar @node;
@@ -200,11 +266,58 @@ sub run
              push @work, \$hdl;
              $hdl = new AnyEvent::Handle(
                  fh => $fh,
+                 rbuf_max => 10240000,
+                 wbuf_max => 10240000,
+                 autocork => 1,
                  on_read => sub {
                      my $self = shift;
                      $self->unshift_read (
                          chunk => length $self->{rbuf},
-                         sub { $rresult{$node} .= $_[1] unless ! $rresult{$node} && $_[1] eq '*'; }
+                         sub { 
+
+			     if( $rresult{$node} )
+			     {
+                                 $rresult{$node} .= $_[1];
+			     }
+			     else
+			     {
+				     $_[1] =~ s/^\*+//;
+
+				     if( $_[1] =~ s/^MH_:(\d+):_MH// )
+				     {
+
+                                         if( $1 )
+                                         {
+                                             my $ef = $ENV{MYDanExtractFile};
+                                             open my $EF, "<$ef" or die "open $ef fail:$!";
+                                             my ( $n, $buf );
+        
+                                             $hdl->on_drain(sub {
+                                                     my ( $n, $buf );
+                                                     $n = sysread( $EF, $buf, 102400 );
+                                                     if( $n )
+                                                     {
+                                                         $hdl->push_write($buf);
+                                                     }
+                                                     else
+                                                     {
+                                                         $hdl->on_drain(undef);
+                                                         close $EF;
+                                                         $hdl->push_shutdown;
+                                                     }
+                                                 });
+                                         }
+                                         else
+                                         {
+                                             $hdl->push_shutdown;
+                                         }
+				         $_[1] =~ s/^\*+//;
+				     }
+				     $rresult{$node} .= $_[1] if $_[1];
+			     }
+
+
+                         }
                      );
                   },
                   on_eof => sub{
@@ -246,16 +359,25 @@ sub run
                       close $fh;
                       map { $result{$_} = "no_error by proxy $node"; } @node;
                   }
-             );
-             $hdl->push_write($rquery);
-             $hdl->push_shutdown;
+              );
+
+
+             if( my $ef = $ENV{MYDanExtractFile} )
+             {
+                 my $size = length $rquery;
+                 $hdl->push_write("MYDanExtractFile_::${size}:${efsize}:${md5}:${aim}::_MYDanExtractFile");
+                 $hdl->push_write($rquery);
+             }
+             else
+             {
+                 $hdl->push_write($rquery);
+                 $hdl->push_shutdown;
+             }
           }, sub{ return 3; };
-    };
+      };
 
     #Don't change it to map
     foreach( keys %node ) { $rwork->( $_ ); }
-
-    my $w = AnyEvent->timer ( after => $run{timeout},  cb => $tocb );
 
     $cv->recv;
     undef $w;

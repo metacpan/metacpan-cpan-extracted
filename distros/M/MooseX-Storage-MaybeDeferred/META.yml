@@ -1,0 +1,25 @@
+---
+abstract: 'A role for the less indecisive programmers'
+author:
+  - 'Martin Barth <martin@senfdax.de>'
+build_requires:
+  Test::More: '1.0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Storage-MaybeDeferred
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MooseX::Role::Parameterized: '1.04'
+  MooseX::Storage: '0.52'
+  perl: '5.008'
+version: v0.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

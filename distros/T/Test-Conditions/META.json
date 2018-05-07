@@ -1,0 +1,42 @@
+{
+   "abstract" : "test multiple conditions across a large data structure or list in a simple and compact way",
+   "author" : [
+      "Michael McClennen <mmcclenn@geology.wisc.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Conditions",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Conditions" : {
+         "file" : "lib/Test/Conditions.pm",
+         "version" : "0.81"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.81",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1110,9 +1110,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
-              . $self->deparse_script($obj->{cond}) . '?' . 'do'
-              . $self->deparse_bare_block($obj->{true}) . ':' . 'do'
-              . $self->deparse_bare_block($obj->{false}) . ')';
+              . $self->deparse_script($obj->{cond}) . '?'
+              . $self->deparse_args($obj->{true}) . ':'
+              . $self->deparse_args($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
             $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ', ' . $self->deparse_args(@{$obj->[1]}) . ')';
@@ -1127,7 +1127,7 @@ HEADER
                     map {
                         $self->_dump_string($_) . '=>'
                           . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                    } sort keys(%{$obj})
+                    } sort(keys(%{$obj}))
                   )
                   . ')';
             }

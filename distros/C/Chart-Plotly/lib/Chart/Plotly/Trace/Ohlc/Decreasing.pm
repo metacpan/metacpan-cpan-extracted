@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Ohlc::Decreasing::Line;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace ohlc.
 
@@ -38,17 +38,6 @@ sub TO_JSON {
 has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Decreasing::Line", );
 
-has name => ( is            => "rw",
-              isa           => "Str",
-              documentation => "Sets the segment name. The segment name appear as the legend item and on hover.",
-);
-
-has showlegend => (
-             is            => "rw",
-             isa           => "Bool",
-             documentation => "Determines whether or not an item corresponding to this segment is shown in the legend.",
-);
-
 __PACKAGE__->meta->make_immutable();
 1;
 
@@ -64,7 +53,7 @@ Chart::Plotly::Trace::Ohlc::Decreasing - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -107,14 +96,6 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 =over
 
 =item * line
-
-=item * name
-
-Sets the segment name. The segment name appear as the legend item and on hover.
-
-=item * showlegend
-
-Determines whether or not an item corresponding to this segment is shown in the legend.
 
 =back
 
