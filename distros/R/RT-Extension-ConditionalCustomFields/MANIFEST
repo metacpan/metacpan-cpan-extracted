@@ -49,6 +49,7 @@ xt/asset_modify_list.t
 xt/asset_modify_selectbox.t
 xt/data/firstcf
 xt/data/initialdata
+xt/external_customfield_values.t.in
 xt/group_modify_dropdown.t
 xt/group_modify_list.t
 xt/group_modify_selectbox.t
@@ -64,4 +65,3 @@ xt/user_modify_dropdown.t
 xt/user_modify_list.t
 xt/user_modify_selectbox.t
 xt/user_summary.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

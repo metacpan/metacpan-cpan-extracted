@@ -1,3 +1,13 @@
+0.059		2018-05-08	T. R. Wyant
+    Install @CARP_NOT everywhere so that warnings and exceptions
+    generated in the bowels of the system appear to come from the point
+    where the system is entered.
+
+    Further deprecate string (versus regexp) parsing. The first use of
+    the 'parse' argument to new() will result in a warning.  If the
+    value of the argument is 'guess' or 'string', the warning refers to
+    PPIx::QuoteLike.
+
 0.058		2018-04-26	T. R. Wyant
     Prefer /[0-9]/ over /\d/ for numeric checks. The latter can match
     non-ASCII digits.

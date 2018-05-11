@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.07 2018-05-08
+ - Extend condition to handle multiple values
+ - Complete redesign of ConditionalCustomFields storage and API
+
 0.06 2017-11-09
  - Upgrade Module::Install and cie
  - Add patch for RT 4.4.2 (no need anymore to add callback for Group Modify)

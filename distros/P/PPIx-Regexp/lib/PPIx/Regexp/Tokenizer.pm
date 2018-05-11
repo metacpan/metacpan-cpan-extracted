@@ -14,6 +14,7 @@ use PPIx::Regexp::Constant qw{
     REGEXP_REF
     TOKEN_LITERAL
     TOKEN_UNKNOWN
+    @CARP_NOT
 };
 use PPIx::Regexp::Token::Assertion		();
 use PPIx::Regexp::Token::Backreference		();
@@ -45,10 +46,10 @@ use PPIx::Regexp::Token::Recursion		();
 use PPIx::Regexp::Token::Structure		();
 use PPIx::Regexp::Token::Unknown		();
 use PPIx::Regexp::Token::Whitespace		();
-use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
+use PPIx::Regexp::Util qw{ __is_ppi_regexp_element __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -156,10 +157,7 @@ defined $DEFAULT_POSTDEREF
 	};
 
 	if ( __instance( $re, 'PPI::Element' ) ) {
-	    defined( my $tokenizer_class = __choose_tokenizer_class(
-		    $re, { parse => 'guess' } ) )
-		or return __set_errstr( ref $re, 'not supported' );
-	    $class eq $tokenizer_class
+	    __is_ppi_regexp_element( $re )
 		or return __set_errstr( ref $re, 'not supported by', $class );
 	    # TODO conditionalizstion on PPI class does not really
 	    # belong here, but at the moment I have no other idea of

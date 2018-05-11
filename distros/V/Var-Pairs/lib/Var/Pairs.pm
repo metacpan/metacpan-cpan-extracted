@@ -1,13 +1,14 @@
 package Var::Pairs;
-
-our $VERSION = '0.003005';
-
 use 5.014;
+
+our $VERSION = '0.004001';
+
 use warnings;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Carp;
 use Devel::Callsite;
-use Scope::Upper qw<reap UP>;
+use Scope::Upper qw< reap UP >;
+use PadWalker qw< var_name >;
 
 # Check for autoboxing, and set up pairs() method if applicable..
 my $autoboxing;
@@ -20,6 +21,7 @@ BEGIN {
         *Var::Pairs::autobox::kvs          = \&Var::Pairs::kvs;
         *Var::Pairs::autobox::each_pair    = \&Var::Pairs::each_pair;
         *Var::Pairs::autobox::each_kv      = \&Var::Pairs::each_kv;
+        *Var::Pairs::autobox::each_value   = \&Var::Pairs::each_value;
         *Var::Pairs::autobox::invert       = \&Var::Pairs::invert;
         *Var::Pairs::autobox::invert_pairs = \&Var::Pairs::invert_pairs;
     }
@@ -27,7 +29,7 @@ BEGIN {
 
 # API...
 my %EXPORTABLE;
-@EXPORTABLE{qw< pairs kvs each_pair each_kv to_kv to_pair invert invert_pairs >} = ();
+@EXPORTABLE{qw< pairs kvs each_pair each_kv each_value to_kv to_pair invert invert_pairs >} = ();
 
 sub import {
     my ($class, @exports) = @_;
@@ -65,37 +67,20 @@ state %iterator_for;
 # Convert one or more vars into a ('varname', $varname,...) list...
 
 sub to_kv (\[$@%];\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]) {
-    require PadWalker;
-
-    # Grab caller vars...
-    my ($lexvars, $packvars)  = (PadWalker::peek_my(1), PadWalker::peek_our(1));
-
-    # Reverse them (creating addr --> name mapping)
-    my %varname = (reverse(%$packvars), reverse(%$lexvars));
-
-    # Remove the name sigils...
-    s/^.// for values %varname;
 
     # Take each var ref and convert to 'name' => 'ref_or_val' pairs...
-    return map { $varname{$_} => (ref($_) =~ /SCALAR|REF/ ? $$_ : $_) } @_;
+    return map { my $name = var_name(1, $_); $name =~ s/^.//;
+                 $name => (ref($_) =~ /SCALAR|REF/ ? $$_ : $_)
+               } @_;
 }
 
 # Convert one or more vars into 'varname' => $varname pairs...
 
 sub to_pair (\[$@%];\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]\[$@%]) {
-    require PadWalker;
 
-    # Grab caller vars...
-    my ($lexvars, $packvars)  = (PadWalker::peek_my(1), PadWalker::peek_our(1));
-
-    # Reverse them (creating addr --> name mapping)
-    my %varname = (reverse(%$packvars), reverse(%$lexvars));
-
-    # Remove the name sigils...
-    s/^.// for values %varname;
-
-    # Take each var ref and convert to 'name' => 'ref_or_val' pairs...
-    return map { Var::Pairs::Pair->new($varname{$_} => (ref($_) =~ /SCALAR|REF/ ? $$_ : $_), 'none') } @_;
+    return map { my $name = var_name(1, $_); $name =~ s/^.//;
+                 Var::Pairs::Pair->new($name => (ref($_) =~ /SCALAR|REF/ ? $$_ : $_), 'none')
+               } @_;
 }
 
 
@@ -141,13 +126,20 @@ sub each_pair (+) {
     my ($container_ref) = @_;
 
     # Uniquely identify this call, according to its lexical context...
-    my $ID = callsite() . context() . $container_ref;
-
-    # Build an iterator...
-    $iterator_for{$ID} //= [ &pairs ];
+    my $ID = callsite() . context() . (ref($_[0]) && var_name(1,$_[0]) ? $container_ref : q{});
 
     # Install a destructor for it at the send of the caller's block...
-    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP;
+    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP
+        if !$iterator_for{$ID};
+
+    # Build an iterator...
+    $iterator_for{$ID} //= ref($container_ref) eq 'CODE'
+                                ? sub {
+                                    state $n=0;
+                                    my ($next) = $container_ref->() or return;
+                                    return ($n++, $next);
+                                  }
+                                : [ &pairs ];
 
     # Iterate...
     return _get_each_pair($ID);
@@ -186,19 +178,47 @@ sub each_kv (+) {
     my ($container_ref) = @_;
 
     # Uniquely identify this call, according to its lexical context and iteration target...
-    my $ID = callsite() . context() . $container_ref;
-
-    # Build an iterator...
-    $iterator_for{$ID} //= [ &kvs ];
+    my $ID = callsite() . context() . (ref($_[0]) && var_name(1,$_[0]) ? $container_ref : q{});
 
     # Install a destructor for it at the send of the caller's block...
-    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP;
+    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP
+        if !$iterator_for{$ID};
+
+    $iterator_for{$ID} //= ref($container_ref) eq 'CODE'
+                                ? sub {
+                                    state $n=0;
+                                    my ($next) = $container_ref->() or return;
+                                    return ($n++, $next);
+                                  }
+                                : [ &kvs ];
 
     # Iterate...
     return _get_each_kv($ID);
 }
 
+# Iterate just the values of a container...
+sub each_value (+) {
+    my ($container_ref) = @_;
 
+    # Uniquely identify this call, according to its lexical context and iteration target...
+    my $ID = callsite() . context() . (ref($_[0]) && var_name(1,$_[0]) ? $container_ref : q{});
+
+    # Install a destructor for it at the send of the caller's block...
+    reap { delete $iterator_for{$ID} if exists $iterator_for{$ID} } UP UP
+        if !$iterator_for{$ID};
+
+    $iterator_for{$ID} //= ref($container_ref) eq 'CODE'
+                                ? sub {
+                                    state $n=0;
+                                    my ($next) = $container_ref->() or return;
+                                    return ($n++, $next);
+                                  }
+                                : [ &kvs ];
+
+    # Iterate...
+    my @next = _get_each_kv($ID) or return;
+    return $next[1];
+}
 
 # Invert the key=>values of a hash or array...
 
@@ -258,8 +278,16 @@ sub _invert {
 sub _get_each_pair {
     my $ID = shift;
 
-    # Iterator the requested iterator...
-    my $each_pair = shift @{$iterator_for{$ID}};
+    # Iterate the requested iterator...
+    my $iterator = $iterator_for{$ID};
+    my $each_pair;
+    if (ref($iterator) eq 'CODE') {
+        my @kv = $iterator->();
+        $each_pair = Var::Pairs::Pair->new(@kv, 'none') if @kv;
+    }
+    else {
+        $each_pair = shift @{$iterator};
+    }
 
     # If nothing was left to iterate, clean up the empty iterator...
     if (!defined $each_pair) {
@@ -272,8 +300,11 @@ sub _get_each_pair {
 sub _get_each_kv {
     my $ID = shift;
 
-    # Iterator the requested iterator...
-    my @each_kv = splice @{$iterator_for{$ID}}, 0, 2;
+    # Iterate the requested iterator...
+    my $iterator = $iterator_for{$ID};
+    my @each_kv = ref($iterator) eq 'CODE'
+                    ? $iterator->()
+                    : splice @{$iterator}, 0, 2;
 
     # If nothing was left to iterate, clean up the empty iterator...
     if (!@each_kv) {
@@ -298,7 +329,7 @@ Var::Pairs - OO iterators and pair constructors for variables
 
 =head1 VERSION
 
-This document describes Var::Pairs version 0.003005
+This document describes Var::Pairs version 0.004001
 
 
 =head1 SYNOPSIS
@@ -403,6 +434,8 @@ The most typical use is to populate a hash from an array:
 
 =item C<each_pair $hash_or_array_ref>
 
+=item C<each_pair $subroutine_ref>
+
 In all contexts, C<each_pair()> returns a single "pair" object,
 containing the key/index and value of the next element in the argument.
 
@@ -431,7 +464,34 @@ the preferred idiom:
         # ...do something with $pair->key and $pair->value
     }
 
+The C<each_pair()> subroutine can also be passed a reference
+to a subroutine, in which case that subroutine is used directly
+as the iterator.
+
+When iterated, this iterator subroutine is called in list context and is
+expected to return a single value on each call (i.e. the next value to
+be iterated), or else an empty list when the iterator is exhausted.
+
+For example:
+
+    # Calling this sub returns a reference to an anonymous iterator sub...
+    sub count_down {
+        my ($from, $to) = @_;
+
+        return sub {
+            return () if $from < $to;  # End of iterator
+            return $from--;            # Next iterated value
+        }
+    }
+
+    # Build a 10-->1 countdown and iterate it...
+    while (my $next = each_pair count_down(10, 1)) {
+        say $next->value;
+    }
+
+
 =back
+
 
 =over
 
@@ -441,7 +501,10 @@ the preferred idiom:
 
 =item C<each_kv $hash_or_array_ref>
 
-In list contexts, C<each_kv()> returns a list of two elements: the
+=item C<each_kv $subroutine_ref>
+
+This subroutine is very similar to C<each_pair()>, except
+that in list contexts, <each_kv()> returns a list of two elements: the
 key/index and the value of the next element in the argument.
 In scalar contexts, just the next key is returned.
 
@@ -482,6 +545,41 @@ when you call the C<keys> function on the hash you're iterating.
 
 =over
 
+=item C<each_value %hash>
+
+=item C<each_value @array>
+
+=item C<each_value $hash_or_array_ref>
+
+=item C<each_value $subroutine_ref>
+
+The C<each_value()> subroutine works exactly like C<each_kv()>,
+except that in all contexts it just returns the value being iterated,
+not the key or key/value combination.
+
+For example:
+
+    # Build a 10-->1 countdown and iterate it...
+    while (my ($next) = each_value count_down(10, -10)) {
+        say $next;
+    }
+
+    while (my $value1 = each_value %container) {
+        while (my $value2 = each_value %container) {
+            # ...do something with the two values
+        }
+    }
+
+Note that, if your iterator can return a false value, such as
+0 from the C<count_down()> iterator in the previous example,
+then you should call C<each_value()> in list context (as in
+the C<count_down()> example) so that the false value does not
+prematurely terminate the C<while> loop.
+
+=back
+
+=over
+
 =item C<< %hash->pairs >>
 
 =item C<< @array->pairs >>
@@ -505,6 +603,12 @@ when you call the C<keys> function on the hash you're iterating.
 =item C<< @array->each_kv >>
 
 =item C<< $hash_or_array_ref->each_kv >>
+
+=item C<< %hash->each_value >>
+
+=item C<< @array->each_value >>
+
+=item C<< $hash_or_array_ref->each_value >>
 
 If you have the C<autobox> module installed, you can use this OO syntax
 as well. Apart from their call syntax, these OO forms are exactly the

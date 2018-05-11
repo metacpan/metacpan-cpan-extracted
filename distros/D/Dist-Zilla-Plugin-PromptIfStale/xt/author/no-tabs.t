@@ -39,6 +39,7 @@ my @files = (
     't/26-command-missing-module.t',
     't/27-travis.t',
     't/99-placeholder.t',
+    't/corpus/StaleModule.pm',
     't/corpus/Unindexed.pm',
     't/corpus/Unindexed0.pm',
     't/corpus/Unindexed1.pm',
@@ -53,12 +54,13 @@ my @files = (
     't/lib/Dist/Zilla/Plugin/Broken.pm',
     't/lib/EnsureStdinTty.pm',
     't/lib/NoNetworkHits.pm',
-    't/lib/StaleModule.pm',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
+    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
+    'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-coverage.t',
@@ -71,8 +73,7 @@ my @files = (
     'xt/author/unindexed-core-modules.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/minimum-version.t'
+    'xt/release/distmeta.t'
 );
 
 notabs_ok($_) foreach @files;

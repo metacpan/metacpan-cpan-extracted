@@ -56,9 +56,9 @@ or
 so that you can say ’cdheute’ on the command line and your working
 directory will be changed to the choosen directory.
 
-Version v0.9.9
+Version v1.0.0
 
-Copyright (c) 2009 Mathias Weidner (mathias@weidner.in-bad-schmiedeberg.de).
+Copyright (c) 2009-2018 Mathias Weidner (mamawe@cpan.org).
 All rights reserved.
 
 This module is free software; you can redistribute and/or modify it

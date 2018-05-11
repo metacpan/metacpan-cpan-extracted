@@ -2,7 +2,7 @@ package Model::Envoy::Set;
 
 use Moose::Role;
 
-our $VERSION = '0.1';
+our $VERSION = '0.1.1';
 
 =head1 Model::Envoy::Set
 
@@ -51,7 +51,7 @@ sub m {
 
     $name =~ s/^$namespace\:://;
 
-    return $class->new( model => "$namespace::$name" );
+    return $class->new( model => "$namespace\::$name" );
 }
 
 =head3 build(%params)

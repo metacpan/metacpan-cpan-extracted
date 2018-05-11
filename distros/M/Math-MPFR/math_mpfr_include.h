@@ -174,21 +174,12 @@ typedef __float128 float128;
 #define REQUIRED_LDBL_MANT_DIG LDBL_MANT_DIG
 #endif
 
-#if defined(MPFR_VERSION_MAJOR) && MPFR_VERSION_MAJOR >= 3
 #define MAXIMUM_ALLOWABLE_BASE 62
-#else
-#define MAXIMUM_ALLOWABLE_BASE 36
-#endif
 
 /* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV      *
  * (as this function's "round" arg is "unsigned int", not SV*) */
 
-#if MPFR_VERSION_MAJOR < 3
-#define CHECK_ROUNDING_VALUE \
- if((mp_rnd_t)SvUV(round) > 3) \
-  croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
-
-#elif MPFR_VERSION_MAJOR < 4
+#if MPFR_VERSION_MAJOR < 4
 #define CHECK_ROUNDING_VALUE \
  if((mp_rnd_t)SvUV(round) > 4) \
   croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);

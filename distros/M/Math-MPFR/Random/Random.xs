@@ -110,7 +110,7 @@ SV * Rmpfr_randinit_lc_2exp_size(pTHX_ SV * size) {
      gmp_randstate_t * state;
      SV * obj_ref, * obj;
 
-     if(SvUV(size) > 128) croak("The argument supplied to Rmpfr_randinit_lc_2exp_size function (%u) needs to be in the range [1..128]", SvUV(size));
+     if(SvUV(size) > 128) croak("The argument supplied to Rmpfr_randinit_lc_2exp_size function is too large - ie greater than 128");
 
      Newx(state, 1, gmp_randstate_t);
      if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_lc_2exp_size function");

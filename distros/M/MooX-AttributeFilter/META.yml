@@ -3,9 +3,12 @@ abstract: "Implements 'filter' option for Moo-class attributes"
 author:
   - 'Vadim Belman <vrurg@cpan.org>'
 build_requires:
-  List::Util: '0'
+  List::Util: '1.029000'
   Moo: '0'
+  Pod::Coverage::TrustPod: '0'
   Test2::V0: '0.000060'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
   strict: '0'
   warnings: '0'
 configure_requires:
@@ -17,6 +20,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooX-AttributeFilter
+provides:
+  MooX::AttributeFilter:
+    file: lib/MooX/AttributeFilter.pm
+    version: '0.001005'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '0'
@@ -24,7 +31,11 @@ requires:
   Method::Generate::Accessor: '0'
   Scalar::Util: '0'
   Sub::Quote: '0'
+  perl: '5.010000'
   strictures: '1'
-version: '0.001002'
+resources:
+  bugtracker: https://github.com/vrurg/MooX-AttributeFilter/issues
+  repository: git://github.com/vrurg/MooX-AttributeFilter.git
+version: '0.001005'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -115,7 +115,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.41",
+  "VERSION" => "1.42",
   "test"    => {
     "TESTS" => "t/*.t"
     }
@@ -139,12 +139,12 @@ my %FallbackPrereqs = (
   "Text::ParseWords"       => "3.26"
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
 if ( !do { require File::Which; ( $ENV{PKG_CONFIG} && File::Which::which( $ENV{PKG_CONFIG} ) ) || File::Which::which('pkgconf') || File::Which::which('pkg-config') } ) {
   requires( 'PkgConfig' => '0.14026' );    # for static cflags support
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
 if ( do { use Config; $^O eq 'solaris' && $Config{ptrsize} == 8 } ) {
   requires( 'PkgConfig' => '0.14026' );    # for using the wrong libraries support
 }
@@ -160,7 +160,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
 sub _add_prereq {
   my ( $mm_key, $module, $version_or_range ) = @_;
   $version_or_range ||= 0;

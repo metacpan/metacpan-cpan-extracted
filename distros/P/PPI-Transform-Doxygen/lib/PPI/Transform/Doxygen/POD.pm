@@ -7,6 +7,8 @@ use parent qw(Pod::POM::View::HTML);
 
 our $VERSION = '0.1';
 
+our $PREFIX = '';
+
 sub view_pod {
     my ($self, $pod) = @_;
     return $pod->content->present($self);
@@ -17,7 +19,7 @@ sub view_head1 {
     my $title = $head1->title->present($self);
     my $name = $title;
     $name =~ s/\s/_/g;
-    return "\n\@section $name $title\n" . $head1->content->present($self);
+    return "\n\@section ${PREFIX}_$name $title\n" . $head1->content->present($self);
 }
 
 sub view_head2 {
@@ -30,13 +32,22 @@ sub view_head2 {
 
 sub view_seq_code {
     my ($self, $text) = @_;
+    _unquote($text);
     return "\n\@code\n$text\n\@endcode\n";
 }
 
 sub view_verbatim {
     my ($self, $text) = @_;
-    return "<pre>$text</pre>\n\n";
+    _unquote($text);
+    return "\n\@code\n$text\n\@endcode\n";
 }
+
+my %HTML = ( '&amp;' => '&', '&lt;' => '<', '&gt;' => '>');
+sub _unquote {
+    $_[0] =~ s!\Q$_!$HTML{$_}!g for keys %HTML;
+    $_[0] =~ s!\\(\@|\\|\%|#)!$1!g;
+}
+
 
 1;
 

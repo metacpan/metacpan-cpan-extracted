@@ -49,7 +49,7 @@ $dbman->start;
 
 =head1 VERSION
  
-0.45
+0.46
  
 =head1 LICENSE
 
@@ -71,7 +71,7 @@ Report bugs directly to sorm@is4u.cz.
  
 =head1 LAST MODIFIED
  
-Tue Mar  6 13:43:35 CET 2018
+Thu May 10 11:11:01 CEST 2018
 
 =head1 SEE ALSO
  

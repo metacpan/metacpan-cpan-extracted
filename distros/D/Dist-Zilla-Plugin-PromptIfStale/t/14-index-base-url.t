@@ -67,7 +67,6 @@ my $http_url;
                 ),
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
             },
-            also_copy => { 't/corpus' => 't/lib' },
         },
     );
 
@@ -81,9 +80,9 @@ my $http_url;
         Dist::Zilla::Plugin::PromptIfStale::__clear_already_checked();
     }
 
-    # ensure we find the library, not in a local directory, before we change directories
+    # ensure we find the library in @INC, but not local to the build
     local @INC = @INC;
-    unshift @INC, path($tzil->tempdir, qw(t lib))->stringify;
+    unshift @INC, path(qw(t corpus))->absolute->stringify;
 
     $tzil->chrome->logger->set_debug(1);
 

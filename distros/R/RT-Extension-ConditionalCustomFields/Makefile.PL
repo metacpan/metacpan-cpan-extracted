@@ -31,7 +31,7 @@ substitute(
            {
         sufix => '.in'
     },
-           qw(lib/RT/Extension/ConditionalCustomFields/Test.pm),
+           qw(lib/RT/Extension/ConditionalCustomFields/Test.pm xt/external_customfield_values.t),
 );
 
 auto_install;

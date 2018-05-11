@@ -3,51 +3,51 @@ NAME
     attributes
 
 VERSION
-    version 0.001002
+    version 0.001005
 
 SYNOPSIS
-        package My::Class {
-            use Moo;
-            use MooX::AttributeFilter;
-        
-            has field => (
-                is     => 'rw',
-                filter => 'filterField',
-            );
-        
-            has lazyField => (
-                is      => 'rw',
-                lazy    => 1,
-                builder => sub { [1, 2, 3 ] },
-                filter  => 1,
-            );
-        
-            has incremental => (
-                is => 'rw',
-                filter => sub {
-                    my $this = shift;
-                    my ($val, $oldVal) = @_;
-                    if ( @_ > 1 && defined $oldVal ) {
-                        die "incremental attribute value may only increase"
-                            unless $val > $oldVal;
-                    }
-                    return $_[0];
+        package My::Class;
+        use Moo;
+        use MooX::AttributeFilter;
+    
+        has field => (
+            is     => 'rw',
+            filter => 'filterField',
+        );
+    
+        has lazyField => (
+            is      => 'rw',
+            lazy    => 1,
+            builder => sub { [1, 2, 3 ] },
+            filter  => 1,
+        );
+    
+        has incremental => (
+            is => 'rw',
+            filter => sub {
+                my $this = shift;
+                my ($val, $oldVal) = @_;
+                if ( @_ > 1 && defined $oldVal ) {
+                    die "incremental attribute value may only increase"
+                        unless $val > $oldVal;
                 }
-            );
-        
-            sub filterField {
-                my $this = shift;
-                return "filtered($_[0])";
+                return $_[0];
             }
-        
-            sub _filter_lazyField {
-                my $this = shift;
-                my @a = @{$_[0]};
-                push @a, -1;
-                return \@a;
-            }
+        );
+    
+        sub filterField {
+            my $this = shift;
+            return "filtered($_[0])";
         }
     
+        sub _filter_lazyField {
+            my $this = shift;
+            my @a = @{$_[0]};
+            push @a, -1;
+            return \@a;
+        }
+    
+        package main;
         my $obj = My::Class->new( field => "initial" );
         ($obj->field eq "filtered(initial)")  # True!
         $obj->lazyField;                      # [ 1, 2, 3, -1 ]
@@ -118,27 +118,27 @@ DESCRIPTION
     attribute but the result might be changed depending on the current
     environment. For example:
 
-        package ChDir {
-            use File::Spec;
-            use Moo;
-            extends qw<Project::BaseClass>;
-            use MooX::AttributeFilter;
+        package ChDir;
+        use File::Spec;
+        use Moo;
+        extends qw<Project::BaseClass>;
+        use MooX::AttributeFilter;
+    
+        has curDir => (
+            is => 'rw',
+            filter => 'fullPath',
+        );
+    
+        sub fullPath {
+            my $this = shift;
+            my ( $subdir ) = @_;
         
-            has curDir => (
-                is => 'rw',
-                filter => 'fullPath',
+            return File::Spec->catdir(
+                $this->testMode ? $this->baseTestDir : $this->baseDir,
+                $subdir
             );
-        
-            sub fullPath {
-                my $this = shift;
-                my ( $subdir ) = @_;
-            
-                return File::Spec->catdir(
-                    $this->testMode ? $this->baseTestDir : $this->baseDir,
-                    $subdir
-                );
-            }
         }
+    }
 
 CAVEATS
     * This module doesn't inflate into Moose.

@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/norbu09/Store-CouchDB/issues
   homepage: https://github.com/norbu09/Store-CouchDB/wiki
   repository: git://github.com/norbu09/Store-CouchDB.git
-version: '4.1'
+version: '4.2'
 x_serialization_backend: 'YAML::Tiny version 1.70'

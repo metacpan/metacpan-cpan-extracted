@@ -25,6 +25,7 @@ do { my $x = {
                       'requires' => {
                                       'Cache::FastMmap' => '0',
                                       'Class::Method::Modifiers' => '0',
+                                      'Exporter::Tiny' => '0',
                                       'Object::Signature' => '0',
                                       'perl' => 'v5.10.1'
                                     }

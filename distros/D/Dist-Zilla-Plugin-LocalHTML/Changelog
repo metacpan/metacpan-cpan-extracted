@@ -1,10 +1,94 @@
 ==================================================
-Changes from 2016-09-02 00:00:00 +0000 to present.
+Changes from 2017-05-09 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v0.1.1 at 2017-09-02 01:05:31 +0000
+version v0.2.4 at 2018-05-09 21:59:21 +0000
 -------------------------------------------
+
+  Change: a560c0a4bb5709fd08bf6264ecf27202b80a82a1
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-08 09:28:21 +0000
+
+    Removed /n regex modifier 
+
+------------------------------------------
+version 0.2.3 at 2018-05-07 23:19:41 +0000
+------------------------------------------
+
+  Change: 38bc8f53d2342fcb309e71f8f10f4ed37164070b
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 19:19:41 +0000
+
+    Made Perl 5.10 minimum required version 
+
+  Change: 802b1f73ecdf95b8a7fea90c24d0e73d429d4c60
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 19:07:08 +0000
+
+    Added test prerequsites 
+
+  Change: fdfd441054b8a31d2dadb640bdb962d54d64c5f4
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:31:26 +0000
+
+    Added minium perl version 5.10 
+
+------------------------------------------
+version 0.2.1 at 2018-05-07 16:55:08 +0000
+------------------------------------------
+
+  Change: 0247ac081da911af94b1d79bc7be1b18a6f80fec
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 12:52:54 +0000
+
+    Added pod tests and fixed pod errors 
+
+  Change: 7baca3ecee2ee767b314ce84788ec741a873c69f
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 10:49:08 +0000
+
+    Fixed kwalitee complain about empty L<> tag 
+
+--------------------------------------------
+version 0.1.902 at 2018-05-07 13:48:46 +0000
+--------------------------------------------
+
+  Change: a6e1c008e9aeef22570d2b59491babc2c9430a53
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 09:48:46 +0000
+
+    Removed dependency on /n regex modifier and perl 5.24 
+
+  Change: 9eb0d715835f9171e7523163fe28e0df5f0cd1ae
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 09:48:31 +0000
+
+    Added support for META 'provides' and 'repository' 
+
+  Change: b833dc5d607b4d77aa0cc0715bb78882272fcd3a
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-01 21:01:26 +0000
+
+    Determine link type by checking if it maps into project files.
+
+    Override default search.cpan.org with metacpan.org 
+
+  Change: 1951936abac23444d39264a258a2681e925d7f26
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-01 14:05:45 +0000
+
+    Fixed L<name/section> links. 
+
+  Change: 2d622a7f62a1e002bf47de5f9016db2cd02c12ad
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 22:04:52 +0000
+
+    Support for section links. 
+
+------------------------------------------
+version 0.1.1 at 2017-09-02 01:04:27 +0000
+------------------------------------------
 
   Change: a118aa96f4565dbbd0ef16410107ddc5368dcc62
   Author: Vadim Belman <vrurg@lflat.org>
@@ -23,6 +107,36 @@ version v0.1.1 at 2017-09-02 01:05:31 +0000
   Change: e05d2b2be89620eeb50155fc84e6ad9de95c0cf8
   Author: Vadim Belman <vrurg@lflat.org>
   Date : 2017-08-30 22:05:22 +0000
+
+    Support for section links. 
+
+  Change: df28af0ec0c38b18d387459f9dc6f029749d5eb4
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 17:03:46 +0000
+
+    vv0.1.0 
+
+--------------------------------------------
+version 0.1.901 at 2017-09-02 01:01:26 +0000
+--------------------------------------------
+
+  Change: b833dc5d607b4d77aa0cc0715bb78882272fcd3a
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-01 21:01:26 +0000
+
+    Determine link type by checking if it maps into project files.
+
+    Override default search.cpan.org with metacpan.org 
+
+  Change: 1951936abac23444d39264a258a2681e925d7f26
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-01 14:05:45 +0000
+
+    Fixed L<name/section> links. 
+
+  Change: 2d622a7f62a1e002bf47de5f9016db2cd02c12ad
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 22:04:52 +0000
 
     Support for section links. 
 

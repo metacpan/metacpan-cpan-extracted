@@ -1,0 +1,11 @@
+---
+'false': false
+list:
+- true
+- false
+- true
+- false
+same:
+  'false': false
+  'true': true
+'true': true

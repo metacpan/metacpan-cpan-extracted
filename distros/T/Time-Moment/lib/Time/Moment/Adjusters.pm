@@ -5,7 +5,7 @@ use warnings;
 use Carp qw[];
 
 BEGIN {
-    our $VERSION    = '0.43';
+    our $VERSION    = '0.44';
     our @EXPORT_OK  = qw[ NextDayOfWeek
                           NextOrSameDayOfWeek
                           PreviousDayOfWeek
@@ -14,7 +14,7 @@ BEGIN {
                           LastDayOfWeekInMonth
                           NthDayOfWeekInMonth
                           WesternEasterSunday
-                          OthodoxEasterSunday
+                          OrthodoxEasterSunday
                           NearestMinuteInterval ];
 
     our %EXPORT_TAGS = (
@@ -60,7 +60,7 @@ sub PreviousDayOfWeek {
 
     return sub {
         my ($tm) = @_;
-        return $tm->minus_days(($tm->day_of_week - $day + 6) % 7 - 1);
+        return $tm->minus_days(($tm->day_of_week - $day + 6) % 7 + 1);
     };
 }
 

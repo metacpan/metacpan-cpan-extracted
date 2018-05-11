@@ -7,7 +7,8 @@ build_requires:
   JSON::XS: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Apache::TestMM: '0'
+  mod_perl2: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
 license: perl
@@ -26,4 +27,4 @@ requires:
 resources:
   bugtracker: https://github.com/mbarbon/apache2-camelcadedb/issues
   repository: https://github.com/mbarbon/apache2-camelcadedb
-version: '0.01'
+version: '0.02'

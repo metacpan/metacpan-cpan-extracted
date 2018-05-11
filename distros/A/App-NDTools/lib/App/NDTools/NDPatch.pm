@@ -6,9 +6,9 @@ use parent 'App::NDTools::NDTool';
 
 use App::NDTools::Slurp qw(s_dump);
 use Log::Log4Cli;
-use Struct::Diff qw();
+use Struct::Diff 0.96 qw();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub arg_opts {
     my $self = shift;

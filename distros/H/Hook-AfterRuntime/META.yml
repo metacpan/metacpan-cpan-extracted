@@ -3,25 +3,28 @@ abstract: "Run code at the end of the compiling scope's runtime."
 author:
   - 'Chad Granum <exodist7@gmail.com>'
 build_requires:
-  Test::More: 0.88
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Hook-AfterRuntime
 provides:
   Hook::AfterRuntime:
     file: lib/Hook/AfterRuntime.pm
-    version: 0.005
+    version: '0.006'
 requires:
-  B::Hooks::Parser: 0.09
-  Exporter: 5.57
+  B::Hooks::Parser: '0.09'
+  Exporter: '5.57'
+  perl: '5.006'
 resources:
   bugtracker: http://github.com/exodist/Hook-AfterRuntime/issues
-  homepage: http://open-exodus.net/projects/Hook-AfterRuntime
+  homepage: http://github.com/exodist/Hook-AfterRuntime
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Hook-AfterRuntime
-version: 0.005
+version: '0.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

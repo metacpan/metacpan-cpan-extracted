@@ -28,8 +28,9 @@ my $build = Module::Build->new(
     dist_author   => 'Dominique Dumont (ddumont at cpan dot org)',
 
   'build_requires' => {
-    'Config::Model' => '2.118',
-    'Config::Model::Tester' => '2.054',
+    'Config::Model' => '2.123',
+    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester::Setup' => '0',
     'Module::Build' => '0.34',
     'Test::File::Contents' => '0',
     'Test::More' => '0'
@@ -42,7 +43,7 @@ my $build = Module::Build->new(
     'Config::Model::TkUI' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.118',
+    'Config::Model' => '2.123',
     'Config::Model::Backend::Any' => '0',
     'Config::Model::Backend::IniFile' => '0',
     'Log::Log4perl' => '0',

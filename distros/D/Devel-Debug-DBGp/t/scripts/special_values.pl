@@ -16,6 +16,7 @@
 }
 
 my $scalar = \"a";
+my $ref = \$scalar;
 my $code = sub { 1 };
 my $rx = qr/abc/;
 my $obj = Object->new;

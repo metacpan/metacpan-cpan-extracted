@@ -1,11 +1,12 @@
 package Hook::AfterRuntime;
 use strict;
 use warnings;
+use 5.006;
 
 use B::Hooks::Parser;
 use base 'Exporter';
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 our @EXPORT = qw/after_runtime/;
 our @IDS;
 our $HOOK_ID = 'AAAAAAAA';
@@ -21,7 +22,7 @@ sub run {
     $IDS[$id]->();
 }
 
-sub after_runtime(&) {
+sub after_runtime(&) {  ## no critic
     my ( $code ) = @_;
     my $id = get_id( $code );
 
@@ -53,7 +54,7 @@ Useful for creating modules that need a behavior to be added when a module that
 uses them completes its runtime. Like L<B::Hooks::EndOfScope> except it
 triggers for run-time instead of compile-time.
 
-Example where it might be handy:
+An example where it might be handy:
 
     #!/usr/bin/perl
     use strict;
@@ -93,11 +94,11 @@ t/mytest.t
     ....
 
     #EOF
-    # Package is now immutable autamatically
+    # Package is now immutable automatically
 
 =head1 CAVEATS
 
-It is important to understand how Hook::AfterRuntime works n order to know its
+It is important to understand how Hook::AfterRuntime works in order to know its
 limitations. When you use a module that calls after_runtime() in its import()
 method, after_runtime() will inject code directly after your import statement:
 
@@ -107,7 +108,7 @@ becomes:
 
     import MooseX::AutoImmute; my $__ENDRUNXXXXXXXX = Hook::AfterRuntime->new($id);
 
-This creates a Hook::AfterRuntime object in the corrunt scope. This object's id
+This creates a Hook::AfterRuntime object in the current scope. This object's id
 is used to reference the code provided to after_runtime() in
 MooseX::AutoImmute()'s import() method. When the object falls out of scope the
 DESTROY() method kicks in and calls the referenced code. This occurs at the end
@@ -121,8 +122,8 @@ of the file when 'use' is called at the package level.
 
 If you use the 'use' directive on a level other than the package level, the
 behavior will trigger when the end of the scope is reached. If that is a
-subroutine than it will trigger at the end of EVERY call to that subroutine.
-B<You really should not import a class using Hook::AfterRuntime outside tha
+subroutine then it will trigger at the end of EVERY call to that subroutine.
+B<You really should not import a class using Hook::AfterRuntime outside the
 package level scope.>
 
     package XXX;
@@ -131,7 +132,7 @@ package level scope.>
         # Happens at compile time
         use Object::Using::AfterRuntime;
 
-        # At run time the hook behavior triggers here!
+        # At runtime the hook behavior triggers here!
     }
 
     # hook behavior has not triggered
@@ -149,7 +150,7 @@ package level scope.>
 
 =item class->import
 
-    The hook effects the code that is currently compiling. calling
+    The hook affects the code that is currently compiling. calling
     class->import happens after the compilation phase. You must wrap the
     statement in a BEGIN {} to call import manually. Failure to do this will
     result in the hook triggering in the wrong class, or not at all.
@@ -180,12 +181,12 @@ of run-time.
 =head1 FENNEC PROJECT
 
 This module is part of the Fennec project. See L<Fennec> for more details.
-Fennec is a project to develop an extendable and powerful testing framework.
+Fennec is a project to develop an extensible and powerful testing framework.
 Together the tools that make up the Fennec framework provide a potent testing
 environment.
 
 The tools provided by Fennec are also useful on their own. Sometimes a tool
-created for Fennec is useful outside the greator framework. Such tools are
+created for Fennec is useful outside the creator framework. Such tools are
 turned into their own projects. This is one such project.
 
 =over 2
@@ -200,11 +201,12 @@ The primary Fennec project that ties them all together.
 
 Chad Granum L<exodist7@gmail.com>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 Chad Granum
+Copyright (C) 2010-2018 Chad Granum
 
-Hook-AfterRuntime is free software; Standard perl licence.
+Hook-AfterRuntime is free software, you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 
 Hook-AfterRuntime is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

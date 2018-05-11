@@ -40,9 +40,13 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::NoOp };
 
-use PPIx::Regexp::Constant qw{ COOKIE_REGEX_SET MINIMUM_PERL };
+use PPIx::Regexp::Constant qw{
+    COOKIE_REGEX_SET
+    MINIMUM_PERL
+    @CARP_NOT
+};
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;

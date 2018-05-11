@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin to filter out known bad versions
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 has '+filter' => sub { Carp::croak("The filter property is required for the Prefer::BadVersion plugin") };
@@ -75,7 +75,7 @@ Alien::Build::Plugin::Prefer::BadVersion - Plugin to filter out known bad versio
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -197,6 +197,8 @@ José Joaquín Atria (JJATRIA)
 Duke Leto (LETO)
 
 Shoichi Kaji (SKAJI)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

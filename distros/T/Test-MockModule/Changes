@@ -1,5 +1,8 @@
 Revision history for Test::MockModule
 
+v0.15
+    - Fixes a minor bug in the release tarball
+
 v0.14
     - Fixes a bug where the `redefine()` function was dying when attempting to
       mock a function that was defined further up a module's inheritance chain.

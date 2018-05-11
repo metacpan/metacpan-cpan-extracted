@@ -30,7 +30,7 @@
             "Cwd" : "3.730",
             "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
-            "File::Copy::Recursive::Reduced" : "0.200",
+            "File::Copy::Recursive::Reduced" : "0.600",
             "List::Util" : "0",
             "strict" : "0",
             "version" : "0"
@@ -54,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.018000",
+   "version" : "2.019000",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

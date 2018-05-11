@@ -54,7 +54,7 @@
    "provides" : {
       "Mojolicious::Plugin::Facets" : {
          "file" : "lib/Mojolicious/Plugin/Facets.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -68,11 +68,12 @@
          "web" : "https://github.com/cafe01/mojolicious-plugin-facets"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_authority" : "cpan:CAFEGRATZ",
    "x_contributors" : [
       "Carlos Fernando Avila Gratz <cafe@q1software.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
 }

@@ -70,21 +70,20 @@ __PACKAGE__->might_have(unique_value =>
 
 return 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpusVL::Preferences::Schema::Result::PrfPreference
-
-=head1 VERSION
-
-version 0.27
 
 =head1 DESCRIPTION
+
+This table actually contains the preference values; there is one row per field, per owner.
+
+The owner_id column and owner_type_id column do the exact same thing as the
+PrfOwner table, except here, they're a foreign key into the PrfOwner table.
+
+That is to say, the prf_owner_id relates to an arbitrary table defined by the
+host schema, and prf_owner_type_id refers to the prf_owner_types table, which
+maps a number to the tables defined by the host schema.
+
+For literally no reason whatsoever, the prf_owners table *also* encodes this
+association, in a completely redundant fashion.
 
 =head1 METHODS
 
@@ -102,21 +101,11 @@ version 0.27
 
 =head2 value
 
+
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2012 OpusVL.
 
 This software is licensed according to the "IP Assignment Schedule" provided with the development project.
-
-=head1 AUTHOR
-
-OpusVL - www.opusvl.com
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by OpusVL - www.opusvl.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

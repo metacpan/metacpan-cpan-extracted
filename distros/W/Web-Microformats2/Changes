@@ -1,5 +1,15 @@
 Revision history for Web::Microformats2
 
+0.3 2018-05-10T04:16:50Z
+
+    - Miscellaneous minor documentation and testing improvements.
+
+    - Improved working with UTF-8 documents.
+
+    - Improved parsing of implied name properties.
+
+    - Better handling of HTML documents that define multiple top-level Microformats2 items.
+
 0.02 2018-04-20T19:59:48Z
 
     - Changing the public method used for returning a item's types. (New, flexible "all_types" method, removing blunt "types" from POD.)

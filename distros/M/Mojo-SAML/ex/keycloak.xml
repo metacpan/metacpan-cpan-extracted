@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016 Red Hat, Inc. and/or its affiliates
+  ~ and other contributors as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<EntitiesDescriptor Name="urn:keycloak" xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+					xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+	<EntityDescriptor entityID="https://keycloak.jberger.pl/auth/realms/master">
+		<IDPSSODescriptor WantAuthnRequestsSigned="true"
+			protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                        <KeyDescriptor use="signing">
+                          <dsig:KeyInfo>
+                            <dsig:KeyName>0YIcWa_W28bfw1-oqCAdXjaaTtuDnT5IP479TczorkA</dsig:KeyName>
+                            <dsig:X509Data>
+                              <dsig:X509Certificate>MIICmzCCAYMCBgFjK9MhljANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDDAZtYXN0ZXIwHhcNMTgwNTA0MTU0MjI3WhcNMjgwNTA0MTU0NDA3WjARMQ8wDQYDVQQDDAZtYXN0ZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDB1+O+mmRKBJfHbHAlu5pYVX6MLfxd/G4EjE+vyAG5NmfOrnAbaJ5hvI0IXN13mjCqM8h0MWvL+uuCqI3EVvBMT4L7sll916ng1eG5DqqKiwRsnSo4YVp0SfybTspKe1Dfq2FsRm04CNg1bYKGmafTnx7yvI58qUUINqkAGqHXAxqaBzeSAH6dN0sWzPhODTi20lDfdWgrcUzE89IGxLGXwiQjvfYBhjvx+vi5FjaWKGMZYXAmDyb+Ovd/QIDV2eGUQP6iDfI3+1HuC/NM8wSh/GMgpReWyuBAIj8GCvtgdDsPSgJWbw1RU7Pvh/cxfeh0Iv8KSNdUJOuhzvSgphf5AgMBAAEwDQYJKoZIhvcNAQELBQADggEBAMENd+mkkCqCgfIS0sKnH5ChBc9TiYW2qkhgTq6d2M+RE14gxv5YZlKLuFnAO2Yrz4ih2jPbR/ZMp0p9isjy/5Bn57hS53cSDarzlIVQ35GzCXT0oKeO5YgILeo7quHTfi8sUo56awfN9IqE9S9ggkBbW5fgNHZsCFKLSA71NCX4J/lae9hBOfZZ+IYbvyJsvRaGAY3MdlALmud8x6sNqZxkma3ym+Lr4PlLnD4hPrfe3ftCqoKFxCuBU2zSgzL6P53rAkUud55+wpYWwj0Id25FfcQMHFirj6GjFPg7qMDopLrMK3vund+QMXXiNNXpOFpqn4crwMtgRb/qHKQ3o5s=</dsig:X509Certificate>
+                            </dsig:X509Data>
+                          </dsig:KeyInfo>
+                        </KeyDescriptor>
+
+			<SingleLogoutService
+					Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+					Location="https://keycloak.jberger.pl/auth/realms/master/protocol/saml" />
+			<SingleLogoutService
+					Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+					Location="https://keycloak.jberger.pl/auth/realms/master/protocol/saml" />
+			<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+			<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+			<NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
+			<NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+			<SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+				Location="https://keycloak.jberger.pl/auth/realms/master/protocol/saml" />
+			<SingleSignOnService
+				Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+				Location="https://keycloak.jberger.pl/auth/realms/master/protocol/saml" />
+			<SingleSignOnService
+				Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+				Location="https://keycloak.jberger.pl/auth/realms/master/protocol/saml" />
+		</IDPSSODescriptor>
+	</EntityDescriptor>
+</EntitiesDescriptor>

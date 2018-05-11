@@ -33,25 +33,13 @@ my %WriteMakefileArgs = (
     "MooseX::RW::Reader" => 0,
     "MooseX::RW::Writer" => 0,
     "Pod::Usage" => 0,
+    "Term::ProgressBar" => 0,
     "Try::Tiny" => 0,
     "YAML" => 0
   },
-  "TEST_REQUIRES" => {
-    "File::Find" => 0,
-    "File::Temp" => 0,
-    "Koha::Schema" => 0,
-    "MARC::Moose::Field" => 0,
-    "MARC::Moose::Field::Control" => 0,
-    "MARC::Moose::Field::Std" => 0,
-    "MARC::Moose::Parser::Marcxml" => 0,
-    "Test::MockModule" => 0,
-    "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
-  },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.2",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => ""
   }
 );
 
@@ -60,30 +48,20 @@ my %FallbackPrereqs = (
   "AnyEvent::Processor::Conversion" => 0,
   "AnyEvent::Processor::Converter" => 0,
   "DateTime" => 0,
-  "File::Find" => 0,
-  "File::Temp" => 0,
   "Getopt::Long" => 0,
   "JSON" => 0,
-  "Koha::Schema" => 0,
   "Log::Dispatch" => 0,
   "Log::Dispatch::File" => 0,
   "Log::Dispatch::Screen" => 0,
-  "MARC::Moose::Field" => 0,
-  "MARC::Moose::Field::Control" => 0,
-  "MARC::Moose::Field::Std" => 0,
-  "MARC::Moose::Parser::Marcxml" => 0,
   "MARC::Moose::Record" => 0,
   "Modern::Perl" => 0,
   "Moose" => 0,
   "MooseX::RW::Reader" => 0,
   "MooseX::RW::Writer" => 0,
   "Pod::Usage" => 0,
-  "Test::MockModule" => 0,
-  "Test::More" => 0,
+  "Term::ProgressBar" => 0,
   "Try::Tiny" => 0,
-  "YAML" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "YAML" => 0
 );
 
 

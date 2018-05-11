@@ -5,7 +5,7 @@
       "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -91,7 +91,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.41",
+   "version" : "1.42",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -117,8 +117,10 @@
       "Ahmad Fatoum (a3f, ATHREEF)",
       "Jos\u00e9 Joaqu\u00edn Atria (JJATRIA)",
       "Duke Leto (LETO)",
-      "Shoichi Kaji (SKAJI)"
+      "Shoichi Kaji (SKAJI)",
+      "Shawn Laffan (SLAFFAN)"
    ],
+   "x_generated_by_perl" : "v5.27.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_use_unsafe_inc" : 0
 }

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99014  May 8 2018 Alexander Nalobin
+    - whois.unitedtld.com is no longer a whois server (https://github.com/regru/Net-Whois-Raw/issues/16)
+
 2.99013  Dec 13 2017 Alexander Nalobin
     - Added "notfound" and "strip" patterns for whois.registry.ripn.net
 

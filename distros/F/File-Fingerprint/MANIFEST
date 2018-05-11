@@ -1,0 +1,17 @@
+Changes
+examples/file_fingerprint.pl
+INSTALL.SKIP
+lib/File/Fingerprint.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/roll.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -67,20 +67,6 @@ sub for_report
 
 return 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpusVL::Preferences::Schema::ResultSet::PrfDefault
-
-=head1 VERSION
-
-version 0.27
-
 =head1 DESCRIPTION
 
 =head1 METHODS
@@ -109,15 +95,5 @@ Returns a resultset ordered and filtered for use on the transaction report.
 
 =head1 ATTRIBUTES
 
-=head1 AUTHOR
-
-OpusVL - www.opusvl.com
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by OpusVL - www.opusvl.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

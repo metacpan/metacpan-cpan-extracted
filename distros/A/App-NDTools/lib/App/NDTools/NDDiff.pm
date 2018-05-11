@@ -8,12 +8,12 @@ use Algorithm::Diff qw(compact_diff);
 use JSON qw();
 use App::NDTools::Slurp qw(s_dump);
 use Log::Log4Cli 0.18;
-use Struct::Diff 0.94 qw();
+use Struct::Diff 0.96 qw();
 use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(color);
 
-our $VERSION = '0.43';
+our $VERSION = '0.46';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 my %COLOR;
@@ -103,11 +103,11 @@ sub defaults {
                 '@' => 'magenta',
             },
             'sign' => {
-                'A' => '+',
-                'D' => '!',
-                'U' => ' ',
-                'R' => '-',
-                '@' => ' ',
+                'A' => '+ ',
+                'D' => '! ',
+                'U' => '  ',
+                'R' => '- ',
+                '@' => '  ',
             },
         },
         'ofmt' => 'term',
@@ -374,14 +374,11 @@ sub load {
 sub print_brief_block {
     my ($self, $path, $status) = @_;
 
-    return unless (@{$path}); # nothing to show
-
     $status = 'D' if ($status eq 'N');
 
-    my $line = $self->{OPTS}->{term}->{sign}->{$status} . " " .
+    my $line = $self->{OPTS}->{term}->{sign}->{$status} .
         $COLOR{U} . path2str([splice @{$path}, 0, -1]) . $COLOR{reset};
-    $line .= $COLOR{"B$status"} . path2str($path) . $COLOR{reset}
-        if (@{$path});
+    $line .= $COLOR{"B$status"} . path2str($path) . $COLOR{reset};
 
     print $line . "\n";
 }
@@ -402,7 +399,7 @@ sub print_term_block {
 
             my $line = "  " x $s . path2str([$path->[$s]]);
             if (($status eq 'A' or $status eq 'R') and $s == $#{$path}) {
-                $line = $COLOR{"B$status"} . "$dsign $line" . $COLOR{reset};
+                $line = $COLOR{"B$status"} . $dsign . $line . $COLOR{reset};
             } else {
                 $line = "  $line";
             }
@@ -420,12 +417,11 @@ sub print_term_block {
 sub print_term_header {
     my ($self, @names) = @_;
 
-    return if (!$self->{TTY} or $self->{OPTS}->{quiet});
-
-    my $header = @names == 1 ? $names[0] :
-        "--- a: $names[0] \n+++ b: $names[1]";
-
-    print $COLOR{head} . $header . $COLOR{reset}. "\n";
+    if ($self->{TTY} and not $self->{OPTS}->{quiet}) {
+        print $COLOR{head} .
+            (@names == 1 ? "!!! $names[0]" : "--- $names[0]\n+++ $names[1]") .
+            $COLOR{reset}. "\n";
+    }
 }
 
 sub term_value_diff {
@@ -445,7 +441,7 @@ sub term_value_diff_default {
         if (ref $value or not defined $value);
 
     for my $line (split($/, $value)) {
-        substr($line, 0, 0, $self->{OPTS}->{term}->{sign}->{$status} . $indent . " ");
+        substr($line, 0, 0, $self->{OPTS}->{term}->{sign}->{$status} . $indent);
         push @out, $COLOR{$status} . $line . $COLOR{reset};
     }
 
@@ -462,7 +458,7 @@ sub term_value_diff_text {
         ($status, $lines) = splice @{$diff}, 0, 2;
 
         $pfx = $COLOR{$status} . $self->{OPTS}->{term}->{sign}->{$status} .
-            " " . $indent;
+            $indent;
 
         if ($status eq '@') {
             @hdr = splice @{$lines};

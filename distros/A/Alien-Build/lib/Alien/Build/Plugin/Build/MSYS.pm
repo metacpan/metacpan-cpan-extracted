@@ -7,7 +7,7 @@ use File::Which ();
 use Env qw( @PATH );
 
 # ABSTRACT: MSYS plugin for Alien::Build
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 has msys_version   => '0.07';
@@ -80,7 +80,7 @@ Alien::Build::Plugin::Build::MSYS - MSYS plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -171,6 +171,8 @@ José Joaquín Atria (JJATRIA)
 Duke Leto (LETO)
 
 Shoichi Kaji (SKAJI)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

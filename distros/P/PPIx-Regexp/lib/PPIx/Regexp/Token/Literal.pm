@@ -42,9 +42,10 @@ use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_REMOVED_PHASE_3
     MINIMUM_PERL MSG_PROHIBITED_BY_STRICT
     TOKEN_UNKNOWN
+    @CARP_NOT
 };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };

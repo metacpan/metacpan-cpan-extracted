@@ -1,5 +1,27 @@
 Revision history for Perl extension BSD::Getfsent.
 
+0.18  2018-05-09  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.17_01  2018-05-06  <schubiger@cpan.org>
+
+ - Use the boolean pragma for true/false values.
+
+ - Amend diagnostic when opening fstab fails.
+
+ - Add metadata repository link.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove the testing diagnostic.
+
+ - Update license link.
+
+ - Eliminate trailing whitespace in INSTALL.
+
 0.17 Sun Feb 10 19:14:33 CET 2008
 
  - Reworded documentation and clarified the code.

@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,21 +21,37 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0"
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.0001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/tie-stringarray/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/tie-stringarray",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/tie-stringarray.git",
+         "web" : "https://github.com/briandfoy/tie-stringarray"
+      }
+   },
+   "version" : "1.101",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

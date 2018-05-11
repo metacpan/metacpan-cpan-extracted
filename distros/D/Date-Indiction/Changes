@@ -1,0 +1,6 @@
+Revision history for Perl extension Date::Indiction.
+
+0.01  Sun Mar  6 10:21:13 2016
+	- original version; created by h2xs 1.23 with options
+		-XAn Date::Indiction
+

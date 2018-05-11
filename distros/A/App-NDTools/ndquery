@@ -44,8 +44,9 @@ Print a help message and exit.
 
 =item B<--ifmt> E<lt>JSON|YAMLE<gt>
 
-Force specified input format usage. Automatically choosed (using file
-extension) if omitted.
+Force specified input format usage. Will be selected automatically (using
+file name extension) if omitted. L<YAML::XS> should be installed for YAML
+support.
 
 =item B<--keys>
 
@@ -58,6 +59,12 @@ List structure's paths.
 =item B<--md5>
 
 Calculate MD5 sum for structure.
+
+=item B<--ofmt> E<lt>JSON|YAMLE<gt>
+
+Force specified output format usage. JSON is used by default; L<YAML::XS>
+should be installed for YAML support, see L<App::NDTools/LIMITATIONS> for
+more info.
 
 =item B<--path|-p> E<lt>pathE<gt>
 

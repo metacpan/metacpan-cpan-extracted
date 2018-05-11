@@ -4,7 +4,11 @@ RT::Extension::ConditionalCustomFields - CF conditionned by the value of another
 
 # DESCRIPTION
 
-Provide the ability to display/edit a custom field conditioned by the value of another (select) custom field for the same object, which can be anything that can have custom fields ([ticket](https://metacpan.org/pod/RT::Ticket), [queue](https://metacpan.org/pod/RT::Queue), [user](https://metacpan.org/pod/RT::User), [group](https://metacpan.org/pod/RT::Group), [article](https://metacpan.org/pod/RT::Article) or [asset](https://metacpan.org/pod/RT::Asset)).
+Provide the ability to display/edit a [custom field](https://metacpan.org/pod/RT::CustomField) conditioned by the value of another (select) [custom field](https://metacpan.org/pod/RT::CustomField) for the same object, which can be anything that can have custom fields ([ticket](https://metacpan.org/pod/RT::Ticket), [queue](https://metacpan.org/pod/RT::Queue), [user](https://metacpan.org/pod/RT::User), [group](https://metacpan.org/pod/RT::Group), [article](https://metacpan.org/pod/RT::Article) or [asset](https://metacpan.org/pod/RT::Asset)). If a [custom field](https://metacpan.org/pod/RT::CustomField) is based on another (parent) [custom field](https://metacpan.org/pod/RT::CustomField) which is conditioned by, this (child) [custom field](https://metacpan.org/pod/RT::CustomField) will of course also be conditioned by (with the same condition as its parent).
+
+From version 0.07, the condition can be multivalued, that is: the conditioned custom field can be displayed/edited if the condition custom field has one of these values (In other words: there is an `OR` bewteen the values of the condition). The condition custom field can be a select custom field with values defined by [CustomFieldValues](https://metacpan.org/pod/RT::CustomFieldValues) or an [external custom field](https://metacpan.org/pod/RT::CustomFieldValues::External).
+
+_Note that version 0.07 is a complete redesign: the API described below has changed; also, the way that ConditionedBy property is store has changed. If you upgrade from a previous version, you have to reconfigure the custom fields which are conditionned by._
 
 # RT VERSION
 
@@ -20,17 +24,22 @@ Works with RT 4.2 or greater
 
 - Patch your RT
 
-    ConditionalCustomFields requires a small patch to add necessary Callbacks on versions of RT prior to 4.2.3.
+    ConditionalCustomFields requires a small patch to add necessary Callbacks on versions of RT superior to 4.2.3. (The patch has been submitted to BestPractical in order to be included in future RT releases, as of RT 4.4.2, some parts of the patch are already included, but some other parts still required to apply this patch.)
 
     For RT 4.2, apply the included patch:
 
         cd /opt/rt4 # Your location may be different
         patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.2-add-callbacks-to-extend-customfields-capabilities.patch
 
-    For RT 4.4, apply the included patch:
+    For RT 4.4.1, apply the included patch:
 
         cd /opt/rt4 # Your location may be different
-        patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4-add-callbacks-to-extend-customfields-capabilities.patch
+        patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4.1-add-callbacks-to-extend-customfields-capabilities.patch
+
+    For RT 4.4.2, apply the included patch:
+
+        cd /opt/rt4 # Your location may be different
+        patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4.2-add-callbacks-to-extend-customfields-capabilities.patch
 
 - Edit your `/opt/rt4/etc/RT_SiteConfig.pm`
 
@@ -52,27 +61,15 @@ Works with RT 4.2 or greater
 
 # METHODS
 
-ConditionalCustomFields adds a ConditionedBy property, along with the following methods, to [RT::CustomField](https://metacpan.org/pod/RT::CustomField) objets:
+ConditionalCustomFields adds a ConditionedBy property, that is a [CustomField](https://metacpan.org/pod/RT::CustomField) and a value, along with the following methods, to [RT::CustomField](https://metacpan.org/pod/RT::CustomField) objets:
 
-## SetConditionedBy VALUE
+## SetConditionedBy CF, VALUE
 
-Set ConditionedBy for this [CustomField](https://metacpan.org/pod/RT::CustomField) object to VALUE. If VALUE is numerical, it should be the id of an existing [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) object. Otherwise, VALUE should be an existing [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) object. Current user should have SeeCustomField and ModifyCustomField rights for this CustomField and SeeCustomField right for the CustomField which this CustomField is conditionned by. Returns (1, 'Status message') on success and (0, 'Error Message') on failure.
+Set the ConditionedBy property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object to [CustomFieldValue](https://metacpan.org/pod/RT::CustomField) `CF` with value set to `VALUE`. `CF` should be an existing [CustomField](https://metacpan.org/pod/RT::CustomField) object or the id of an existing [CustomField](https://metacpan.org/pod/RT::CustomField) object, or the name of an unambiguous existing [CustomField](https://metacpan.org/pod/RT::CustomField) object. `VALUE` should be a string. Current user should have `SeeCustomField` and `ModifyCustomField` rights for this [CustomField](https://metacpan.org/pod/RT::CustomField) and `SeeCustomField` right for the [CustomField](https://metacpan.org/pod/RT::CustomField) which this [CustomField](https://metacpan.org/pod/RT::CustomField) is conditionned by. Returns (1, 'Status message') on success and (0, 'Error Message') on failure.
 
-## ConditionedByObj
+## ConditionedBy
 
-Returns the current value as a [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) object of the ConditionedBy property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object. If this [CustomField](https://metacpan.org/pod/RT::CustomField) object is not conditioned by another one, that is: if its ConditionedBy property is not defined, returns an empty [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) object (without id). Current user should have SeeCustomField right for both this CustomField and the CustomField which this CustomField is conditionned by.
-
-## ConditionedByAsString
-
-Returns the current value as a `string` of the ConditionedBy property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object. If this [CustomField](https://metacpan.org/pod/RT::CustomField) object is not conditioned by another one, that is: if its ConditionedBy property is not defined, returns undef. Current user should have SeeCustomField right for both this CustomField and the CustomField which this CustomField is conditionned by.
-
-## ConditionedByCustomField
-
-Returns the  [CustomField](https://metacpan.org/pod/RT::CustomField) object that this CustomField is recursively conditionned by. "Recursively" means that this method will search for a ConditionedBy property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object, then for the Customfield this one is BasedOn, and so on until it find an acestor category with a ConditionedBy property or, the Customfield which is being looked up, is not based on any ancestor category. If neither this [CustomField](https://metacpan.org/pod/RT::CustomField) object nor one of its ancestor is conditioned by another one, that is: if their ConditionedBy property is (recursively) not defined, returns undef. Current user should have SeeCustomField right for both this CustomField and the CustomField which this CustomField is conditionned by.
-
-## ConditionedByCustomFieldValue
-
-Returns the current value as a [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) object that this CustomField is recursively conditionned by. "Recursively" means that this method will search for a ConditionedBy property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object, then for the Customfield this one is BasedOn, and so on until it find an acestor category with a ConditionedBy property or, the Customfield which is being looked up, is not based on any ancestor category. If neither this [CustomField](https://metacpan.org/pod/RT::CustomField) object nor one of its ancestor is conditioned by another one, that is: if their ConditionedBy property is (recursively) not defined, returns an empty [CustomField](https://metacpan.org/pod/RT::CustomField) object (without id). Current user should have SeeCustomField right for both this CustomField and the CustomField which this CustomField is conditionned by.
+Returns the current `ConditionedBy` property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object as a hash with keys `CF` containing the id of the [CustomField](https://metacpan.org/pod/RT::CustomField) which this  [CustomField](https://metacpan.org/pod/RT::CustomField) is recursively conditionned by, and `val` containing the value as string. If neither this [CustomField](https://metacpan.org/pod/RT::CustomField) object nor one of its ancestor is conditioned by another one, that is: if their `ConditionedBy` property is not (recursively) defined, returns `undef`. Current user should have `SeeCustomField` right for both this [CustomField](https://metacpan.org/pod/RT::CustomField) and the [CustomField](https://metacpan.org/pod/RT::CustomField) which this [CustomField](https://metacpan.org/pod/RT::CustomField) is conditionned recursively by. _"Recursively"_ means that this method will search for a `ConditionedBy` property for this [CustomField](https://metacpan.org/pod/RT::CustomField) object, then for the [CustomField](https://metacpan.org/pod/RT::CustomField) this one is `BasedOn`, and so on until it find an acestor `Category` with a `ConditionedBy` property or, the [CustomField](https://metacpan.org/pod/RT::CustomField) which is being looked up, is not based on any ancestor `Category`.
 
 # INITIALDATA
 
@@ -93,7 +90,7 @@ Also, ConditionalCustomFields allows to set the ConditionedBy property when crea
             DefaultValues => [ 'Failed' ],
         },
         {
-            Name => 'Conditioned with cf and value',
+            Name => 'Conditioned with cf name and value',
             Type => 'FreeformSingle',
             Queue => [ 'General' ],
             LookupType => 'RT::Queue-RT::Ticket',
@@ -108,26 +105,19 @@ Also, ConditionalCustomFields allows to set the ConditionedBy property when crea
             ConditionedByCF => 66,
             ConditionedBy => 'Passed',
         },
-        {
-            Name => 'Conditioned with cf value id',
-            Type => 'FreeformSingle',
-            Queue => [ 'General' ],
-            LookupType => 'RT::Queue-RT::Ticket',
-            ConditionedBy => 52,
-        },
     );
 
-This examples creates a select CustomField `Condition` which should have the value `Passed`, for CustomFields `Conditioned with cf and value` and `Conditioned with cf id and value` to be displayed or edited. It also created a CustomField `Conditioned with cf value id` that is conditionned by another CustomField for the current object ([ticket](https://metacpan.org/pod/RT::Ticket), [queue](https://metacpan.org/pod/RT::Queue), [user](https://metacpan.org/pod/RT::User|), [group](https://metacpan.org/pod/RT::Group), or [article](https://metacpan.org/pod/RT::Article)) having a `CustomFieldValue` with `id = 52`.
+This examples creates a select CustomField `Condition` which should have the value `Passed`, for CustomFields `Conditioned with cf name and value` and `Conditioned with cf id and value` to be displayed or edited.
 
 Additional fields for an element of `@CustomFields` are:
-
-- `ConditonedBy`
-
-    The [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) that this new [CustomField](https://metacpan.org/pod/RT::CustomField) should conditionned by. It can be either the `id` of an existing [CustomFieldValue](https://metacpan.org/pod/RT::CustomFieldValue) object (in which case attribute `ConditionedByCF` is ignored), or the value as a `string` of the [CustomField](https://metacpan.org/pod/RT::CustomField) attribute (which is then mandatory).
 
 - `ConditonedByCF`
 
     The [CustomField](https://metacpan.org/pod/RT::CustomField) that this new [CustomField](https://metacpan.org/pod/RT::CustomField) should conditionned by. It can be either the `id` or the `Name` of a previously created [CustomField](https://metacpan.org/pod/RT::CustomField). This implies that this [CustomField](https://metacpan.org/pod/RT::CustomField) should be declared before this one in the `initialdata` file, or it should already exist. When `ConditionedByCF` attribute is set, `ConditionedBy` attribute should always also be set.
+
+- `ConditonedBy`
+
+    The value as a `string` of the [CustomField](https://metacpan.org/pod/RT::CustomField) defined by the `ConditionedByCF` attribute (which is mandatory).
 
 # AUTHOR
 

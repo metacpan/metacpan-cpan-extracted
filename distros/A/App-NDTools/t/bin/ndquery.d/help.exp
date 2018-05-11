@@ -20,8 +20,9 @@ Options:
         Print a help message and exit.
 
     --ifmt <JSON|YAML>
-        Force specified input format usage. Automatically choosed (using
-        file extension) if omitted.
+        Force specified input format usage. Will be selected automatically
+        (using file name extension) if omitted. YAML::XS should be installed
+        for YAML support.
 
     --keys
         List keys for hash maps and indexes for arrays, others printed as
@@ -32,6 +33,11 @@ Options:
 
     --md5
         Calculate MD5 sum for structure.
+
+    --ofmt <JSON|YAML>
+        Force specified output format usage. JSON is used by default;
+        YAML::XS should be installed for YAML support, see "LIMITATIONS" in
+        App::NDTools for more info.
 
     --path|-p <path>
         Path in the structure to deal with.

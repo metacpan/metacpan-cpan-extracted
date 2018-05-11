@@ -41,6 +41,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Path::Iterator::Rule' => '0',
+                                   'Path::Tiny' => '0',
                                    'Test::More' => '0',
                                    'Test::RequiresInternet' => '0',
                                    'Test::TempDir::Tiny' => '0',

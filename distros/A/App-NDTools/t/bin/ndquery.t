@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use File::Copy qw(copy);
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 44;
+use Test::More tests => 50;
 
 use App::NDTools::Test;
 
@@ -129,6 +129,27 @@ $test = "ifmt_yaml_ofmt_yaml";
 run_ok(
     name => $test,
     cmd => [ @cmd, '--ifmt', 'yaml', '--ofmt', 'yaml', "$test.data" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
+$test = "ifmt_yaml_number_nonref";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ifmt', 'yaml', "$test.data" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
+$test = "ifmt_yaml_string_nonref";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ifmt', 'yaml', "$test.data" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
+$test = "ifmt_yaml_numbers";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ifmt', 'yaml', "$test.data" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 
@@ -274,6 +295,33 @@ run_ok(
     name => $test,
     cmd => [ @cmd, '--ofmt', 'yaml', "_cfg.alpha.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+);
+
+$test = "ofmt_yaml_bool";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ofmt', 'yaml', "_bool.a.json" ],
+    stdout => sub { file_contents_eq_or_diff(
+        ($YAML::XS::VERSION < 0.67 ? "$test.num.exp" : "$test.exp"), shift, $test
+    )},
+);
+
+$test = "ofmt_yaml_bool_nonref_false";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ofmt', 'yaml', "$test.json" ],
+    stdout => sub { file_contents_eq_or_diff(
+        ($YAML::XS::VERSION < 0.67 ? "$test.num.exp" : "$test.exp"), shift, $test
+    )},
+);
+
+$test = "ofmt_yaml_bool_nonref_true";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ofmt', 'yaml', "$test.json" ],
+    stdout => sub { file_contents_eq_or_diff(
+        ($YAML::XS::VERSION < 0.67 ? "$test.num.exp" : "$test.exp"), shift, $test
+    )},
 );
 
 $test = "raw_output_object";

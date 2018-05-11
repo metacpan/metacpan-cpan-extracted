@@ -38,19 +38,45 @@
          }
       }
    },
+   "provides" : {
+      "Pod::Man" : {
+         "file" : "lib/Pod/Man.pm",
+         "version" : "4.11"
+      },
+      "Pod::ParseLink" : {
+         "file" : "lib/Pod/ParseLink.pm",
+         "version" : "4.11"
+      },
+      "Pod::Text" : {
+         "file" : "lib/Pod/Text.pm",
+         "version" : "4.11"
+      },
+      "Pod::Text::Color" : {
+         "file" : "lib/Pod/Text/Color.pm",
+         "version" : "4.11"
+      },
+      "Pod::Text::Overstrike" : {
+         "file" : "lib/Pod/Text/Overstrike.pm",
+         "version" : "4.11"
+      },
+      "Pod::Text::Termcap" : {
+         "file" : "lib/Pod/Text/Termcap.pm",
+         "version" : "4.11"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-podlators@rt.cpan.org",
          "web" : "https://rt.cpan.org/Dist/Display.html?Name=podlators"
       },
-      "homepage" : "http://www.eyrie.org/~eagle/software/podlators/",
+      "homepage" : "https://www.eyrie.org/~eagle/software/podlators/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rra/podlators.git",
+         "url" : "https://github.com/rra/podlators.git",
          "web" : "https://github.com/rra/podlators"
       }
    },
-   "version" : "4.10",
+   "version" : "4.11",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

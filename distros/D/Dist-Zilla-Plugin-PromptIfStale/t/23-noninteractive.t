@@ -53,12 +53,11 @@ my $tzil = Builder->from_config(
             ),
             path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
         },
-        also_copy => { 't/lib' => 't/lib' },
     },
 );
 
-# ensure we find the library, not in a local directory, before we change directories
-unshift @INC, path($tzil->tempdir, qw(t lib))->stringify;
+# ensure we find the libraries in @INC, but not local to the build
+unshift @INC, path(qw(t corpus))->absolute->stringify;
 
 {
     my $wd = pushd $tzil->root;

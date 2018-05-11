@@ -17,6 +17,11 @@ my %test_requires = (
     'JSON::XS'                  => 0,
 );
 
+my %configure_requires = (
+    'mod_perl2'                 => 0,
+    'Apache::TestMM'            => 0,
+);
+
 # configure tests based on incoming arguments
 Apache::TestMM::filter_args();
 
@@ -37,6 +42,8 @@ ModPerl::MM::WriteMakefile(
                             () ),
     ( $mm_ver >= 6.64 ?     ( TEST_REQUIRES     => \%test_requires ) :
       $mm_ver >= 6.5503 ?   ( BUILD_REQUIRES    => \%test_requires ) :
+                            () ),
+    ( $mm_ver >= 6.52 ?     ( CONFIGURE_REQUIRES  => \%configure_requires ) :
                             () ),
     ( $mm_ver >= 6.31 ?     ( LICENSE           => 'perl' ) :
                             () ),

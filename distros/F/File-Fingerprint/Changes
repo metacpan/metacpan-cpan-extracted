@@ -1,0 +1,9 @@
+Revision history for Perl module File::Fingerprint
+
+0.101 2018-05-09T21:55:47Z
+	* Clarify that it's the Artistic License 2.0
+
+0.10_01 - 2008-10-15
+	* Initial release of a file to collect certain file meta-data
+	so it can check if two files are the same
+

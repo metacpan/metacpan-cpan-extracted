@@ -21,12 +21,13 @@
 # ABSTRACT: Gettext Support For the Template Toolkit Version 2
 
 package Template::Plugin::Gettext;
-$Template::Plugin::Gettext::VERSION = '0.5';
+$Template::Plugin::Gettext::VERSION = '0.6';
 use strict;
 
 use Locale::TextDomain 1.20 qw(com.cantanea.Template-Plugin-Gettext);
 use Locale::Messages;
 use Locale::Util qw(web_set_locale);
+use Encode;
 
 use Cwd qw(abs_path);
 

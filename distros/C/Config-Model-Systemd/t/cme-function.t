@@ -6,45 +6,21 @@ use Path::Tiny;
 use Test::More;
 use Test::File::Contents;
 use Config::Model qw/cme/;
-use Log::Log4perl qw(:easy :levels);
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-$log  = 1 if $arg =~ /l/;
-$show = 1 if $arg =~ /s/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
-my $wr_root = path('wr_root');
+my $wr_root = setup_test_dir;
 
-# cleanup before tests
-$wr_root->remove_tree;
-$wr_root->mkpath;
-
-my $from_scratch_dir = $wr_root->child('from-scratch');
-$from_scratch_dir->mkpath;
-
-my $systemd_file = $from_scratch_dir->child('test.service');
+my $systemd_file = $wr_root->child('test.service');
 
 subtest 'create file from scratch' => sub {
 
     my $instance = cme(
         application => 'systemd-service',
         config_file => $systemd_file->basename,
-        root_dir => $from_scratch_dir->stringify
+        root_dir => $wr_root->stringify
     );
 
     ok($instance, "systemd-service instance created");
@@ -61,7 +37,7 @@ subtest 'read file' => sub {
     my $instance = cme(
         application => 'systemd-service',
         config_file => $systemd_file->basename,
-        root_dir => $from_scratch_dir->stringify
+        root_dir => $wr_root->stringify
     );
 
     is($instance->grab_value('Unit Description'),"test single unit","read file ok");

@@ -6,9 +6,9 @@
 
 WWW::FBX - Freebox v6 OS Perl Interface
 
-# FREEBOX SDK API 3.0
+# FREEBOX SDK API 3.0 and 4.0
 
-This version provides the API 3.0 support through the APIv3 role but other version can be provided by creating a new role.
+This version provides the API 3.0 and 4.0 support through the APIv3 role but other version can be provided by creating a new role.
 
 # AUTHENTICATION
 
@@ -74,7 +74,7 @@ When track\_id and app\_token are also provided, they will be used to authentica
 Otherwise, new track\_id and app\_token will be given by the freebox. These can be then used for later access.
 base\_url defaults to http://mafreebox.free.fr which is the base uri when accessing the freebox from the LAN side.
 
-Note that adding the _settings_ or _parental_ permissions is only possible through the web interface (Paramètres de la Freebox -> Gestion des accès -> Applications)
+Note that adding the _settings_ or _parental_ permissions is only possible through the web interface (ParamÃ¨tres de la Freebox -> Gestion des accÃ¨s -> Applications)
 
 The constructor takes care of detecting the API version and authentication.
 

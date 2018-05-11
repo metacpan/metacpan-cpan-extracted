@@ -1,5 +1,6 @@
 package Web::Microformats2::Document;
 use Moose;
+use Encode qw(encode_utf8);
 use JSON qw(decode_json);
 
 use Web::Microformats2::Item;
@@ -69,7 +70,7 @@ sub new_from_json {
 
     my ( $json ) = @_;
 
-    my $data_ref = decode_json ($json);
+    my $data_ref = decode_json (encode_utf8($json));
 
     my $document = $class->new;
     for my $deflated_item ( @{ $data_ref->{items} } ) {
@@ -108,7 +109,7 @@ sub _inflate_item {
             if ( ref( $property_value ) ) {
                 $property_value = $class->_inflate_item( $property_value );
             }
-            $item->add_property( $property, $property_value );
+            $item->add_base_property( $property, $property_value );
         }
     }
 

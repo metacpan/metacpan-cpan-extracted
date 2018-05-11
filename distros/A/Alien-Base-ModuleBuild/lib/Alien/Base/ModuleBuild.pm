@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use parent 'Module::Build';
 
@@ -639,7 +639,6 @@ sub alien_create_repositories {
     }
 
     $repo->{platform} = 'src' unless defined $repo->{platform};
-    $repo->{protocol} || 'default';
 
     foreach my $var (@env_overrides) {
         my $var_tail = lc substr($var, length($env_prefix));
@@ -650,7 +649,7 @@ sub alien_create_repositories {
         }
     }
 
-    push @repos, $self->alien_repository_class($repo->{protocol})->new( $repo );
+    push @repos, $self->alien_repository_class($repo->{protocol} || 'default')->new( $repo );
   }
 
   # check validation, including c compiler for src type

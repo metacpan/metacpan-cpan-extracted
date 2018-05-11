@@ -6,7 +6,7 @@ use base qw( Alien::Build::Interpolate );
 use File::chdir;
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 sub _config
 {
@@ -112,7 +112,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 CONSTRUCTOR
 
@@ -306,6 +306,8 @@ José Joaquín Atria (JJATRIA)
 Duke Leto (LETO)
 
 Shoichi Kaji (SKAJI)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

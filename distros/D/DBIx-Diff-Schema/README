@@ -2,8 +2,8 @@ NAME
     DBIx::Diff::Schema - Compare schema of two DBI databases
 
 VERSION
-    This document describes version 0.090 of DBIx::Diff::Schema (from Perl
-    distribution DBIx-Diff-Schema), released on 2017-08-13.
+    This document describes version 0.091 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2018-05-10.
 
 SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
@@ -203,7 +203,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 has '+format' => 'tar';
@@ -304,7 +304,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -421,6 +421,8 @@ José Joaquín Atria (JJATRIA)
 Duke Leto (LETO)
 
 Shoichi Kaji (SKAJI)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

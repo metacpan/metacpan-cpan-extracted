@@ -1,3 +1,9 @@
+0.091   2018-05-10 (PERLANCAR)
+
+	- Handle mysql driver's table_info() which returns database name as
+	  schema name.
+
+
 0.090   2017-08-13 (PERLANCAR)
 
 	- No functional changes.

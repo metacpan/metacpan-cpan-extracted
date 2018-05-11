@@ -4,72 +4,73 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "a native attribute trait for enums",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "MooseX-Enumeration",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                        runtime   => {
-                                       recommends => { "match::simple::XS" => 0, "Type::Tiny::Enum" => "0.030" },
-                                       requires   => {
-                                                       "match::simple" => 0,
-                                                       "Module::Runtime" => 0,
-                                                       "Moose" => 1.15,
-                                                       "perl" => 5.008001,
-                                                     },
-                                     },
-                        test      => {
-                                       requires => { "Test::Fatal" => 0, "Test::More" => 0.92, "Test::Requires" => 0.006 },
-                                     },
-                      },
-  "provides"       => {
-                        "Moose::Meta::Attribute::Custom::Trait::Enum" => {
-                          file => "lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm",
-                          version => 0.005,
+  "abstract"         => "a native attribute trait for enums",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        "Moose::Meta::Attribute::Custom::Trait::Enumeration" => {
-                          file => "lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm",
-                          version => 0.005,
+  "name"             => "MooseX-Enumeration",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                          runtime   => {
+                                         recommends => { "match::simple::XS" => 0, "Type::Tiny::Enum" => "0.030" },
+                                         requires   => {
+                                                         "match::simple" => 0,
+                                                         "Module::Runtime" => 0,
+                                                         "Moose" => 1.15,
+                                                         "perl" => 5.008001,
+                                                       },
+                                       },
+                          test      => {
+                                         requires => { "Test::Fatal" => 0, "Test::More" => 0.92, "Test::Requires" => 0.006 },
+                                       },
                         },
-                        "MooseX::Enumeration" => { file => "lib/MooseX/Enumeration.pm", version => 0.005 },
-                        "MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration" => {
-                          file => "lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm",
-                          version => 0.005,
+  "provides"         => {
+                          "Moose::Meta::Attribute::Custom::Trait::Enum" => {
+                            file => "lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm",
+                            version => 0.006,
+                          },
+                          "Moose::Meta::Attribute::Custom::Trait::Enumeration" => {
+                            file => "lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm",
+                            version => 0.006,
+                          },
+                          "MooseX::Enumeration" => { file => "lib/MooseX/Enumeration.pm", version => 0.006 },
+                          "MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration" => {
+                            file => "lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm",
+                            version => 0.006,
+                          },
+                          "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign" => {
+                            file => "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm",
+                            version => 0.006,
+                          },
+                          "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is" => {
+                            file => "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm",
+                            version => 0.006,
+                          },
                         },
-                        "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign" => {
-                          file => "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm",
-                          version => 0.005,
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration",
+                                          },
+                          homepage     => "https://metacpan.org/release/MooseX-Enumeration",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-moosex-enumeration.git",
+                                            web  => "https://github.com/tobyink/p5-moosex-enumeration",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project",
                         },
-                        "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is" => {
-                          file => "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm",
-                          version => 0.005,
-                        },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration",
-                                        },
-                        homepage     => "https://metacpan.org/release/MooseX-Enumeration",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-moosex-enumeration.git",
-                                          web  => "https://github.com/tobyink/p5-moosex-enumeration",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project",
-                      },
-  "version"        => 0.005,
+  "version"          => 0.006,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

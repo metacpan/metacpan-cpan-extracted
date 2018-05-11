@@ -1,0 +1,17 @@
+{
+   "float_num" : 3.14,
+   "float_str" : "3.14",
+   "int_num" : 42,
+   "int_str" : "42",
+   "list" : [
+      0,
+      "0",
+      3.14,
+      "3.14",
+      42,
+      "42"
+   ],
+   "string" : "abc",
+   "zero_num" : 0,
+   "zero_str" : "0"
+}

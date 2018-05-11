@@ -1,0 +1,80 @@
+NAME
+    App::GnuplotUtils - Utilities related to plotting data using gnuplot
+
+VERSION
+    This document describes version 0.001 of App::GnuplotUtils (from Perl
+    distribution App-GnuplotUtils), released on 2018-05-07.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities. They
+    are mostly simple/convenience wrappers for gnuplot:
+
+    *   xyplot
+
+FUNCTIONS
+  xyplot
+    Usage:
+
+     xyplot(%args) -> [status, msg, result, meta]
+
+    Plot XY data using gnuplot.
+
+    Example "input.txt":
+
+     1 1
+     2 3
+     3 5.5
+     4 7.9
+     6 11.5
+
+    Example using "xyplot":
+
+     % xyplot < input.txt
+
+    Keywords: xychart, XY chart, XY plot
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   delimiter => *str*
+
+        Supply field delimiter character instead of the default
+        whitespace(s).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-GnuplotUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-GnuplotUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

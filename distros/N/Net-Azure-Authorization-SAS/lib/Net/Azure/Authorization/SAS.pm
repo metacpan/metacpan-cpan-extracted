@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 our $DEFAULT_TOKEN_EXPIRE = 3600;
 
 use Carp;
@@ -19,15 +19,22 @@ use Class::Accessor::Lite (
         endpoint 
         shared_access_key_name 
         shared_access_key 
+        entity_path 
         expire
     ]],
 );
 
 sub new {
     my ($class, %param) = @_;
-    croak 'connection_string is required' if !defined $param{connection_string};
     $param{expire}  ||= $DEFAULT_TOKEN_EXPIRE;
-    %param = (%param, $class->_parse_connection_string($param{connection_string}));
+    if (defined($param{connection_string})) {
+        %param = (%param, $class->_parse_connection_string($param{connection_string}));
+    }
+    for my $key (qw(endpoint shared_access_key_name shared_access_key)) {
+        if (!defined($param{$key})) {
+            croak "$key was not specified. Please specify $key or connection_string.";
+        }
+    }
     bless {%param}, $class;
 }
 
@@ -81,6 +88,15 @@ If you want to know about SAS, please see L<https://azure.microsoft.com/en-us/do
 The constructor method.
 
 connection_string parameter that is a "CONNECTION STRING" of "Access Policy" from azure portal is required. 
+
+If you want to specify `endpoint`, `shared_access_key_name`, `shared_access_key`, and `entity_path` manually, you can it like as following.
+
+    my $sas = Net::Azure::Authorization::SAS->new(
+        endpoint               => 'sb://...',
+        shared_access_key_name => 'application',
+        shared_access_key      => 'YourSharedAccessKey.....',
+        entity_path            => 'myentity' ### -> optional
+    )
 
 =head2 token
 

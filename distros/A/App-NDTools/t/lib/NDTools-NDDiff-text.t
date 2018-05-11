@@ -1,7 +1,6 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Test::File::Contents;
 use Test::More tests => 6;
 
 use App::NDTools::Test;

@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 62;
+use Test::More tests => 65;
 
 use App::NDTools::Test;
 
@@ -128,6 +128,14 @@ run_ok(
     exit => 8,
 );
 
+$test = "json_omitted_index";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--json', "_omitted_index.a.json", "_omitted_index.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
 $test = "ofmt_yaml";
 run_ok(
     name => $test,
@@ -172,6 +180,14 @@ $test = "term_brief";
 run_ok(
     name => $test,
     cmd => [ @cmd, '--brief', "_menu.a.json", "_menu.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_brief_nonref";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--brief', "$test.a.data", "$test.b.data" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );
@@ -301,6 +317,14 @@ $test = "term_nopretty";
 run_ok(
     name => $test,
     cmd => [ @cmd, '--nopretty', "_menu.a.json", "_menu.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_omitted_index";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, "_omitted_index.a.json", "_omitted_index.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );

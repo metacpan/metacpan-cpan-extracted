@@ -1,5 +1,40 @@
                       User-Visible podlators Changes
 
+podlators 4.11 (2018-05-07)
+
+    [Pod::Text] The default value of the sentence option is false, not
+    true, and has been since at least 2.0.0.  Fix the documentation to
+    match.  Thanks, eponymous alias.  (#124461)
+
+    [Pod::Text::Termcap] Correctly honor the width option, which was being
+    ignored due to a bug in interpreting user-supplied options.  Thanks,
+    eponymous alias.  (#124447)
+
+    [Pod::Text::Color, Pod::Text::Termcap] Fix a subtle wrapping bug with
+    long =item text that would cause lines to be wrapped when they didn't
+    need to be.  Thanks, eponymous alias.
+
+    [Pod::Text::Color, Pod::Text::Termcap] Clear any text attributes at
+    the end of each line and reinstate them at the start of the next line,
+    since some pagers (less -R in particular) clear all text attributes at
+    the end of each line and were therefore not correctly showing
+    attributes in wrapped text.  Thanks, eponymous alias.
+
+    [Pod::Text::Termcap] Correctly get the terminal width from Term::Cap
+    information when COLUMNS isn't set, instead of getting a string value
+    that later cannot be used numerically.
+
+    Specifying "none" for the errors option of Pod::Man and Pod::Text no
+    longer results in an errata section in the generated documentation,
+    matching the documented behavior.  Thanks, Olly Betts.
+
+    Fix order of SEE ALSO section in manual pages to match the
+    recommendation of perlpodstyle.
+
+    Use https for all eyrie.org URLs.
+
+    Add SPDX-License-Identifier headers to all substantial source files.
+
 podlators 4.10 (2017-12-25)
 
     [Pod::Man] Change man page references and function names to bold

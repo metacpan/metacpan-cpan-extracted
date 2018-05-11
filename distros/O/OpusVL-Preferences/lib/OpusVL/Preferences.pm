@@ -5,7 +5,7 @@ use strict;
 
 # ABSTRACT: Generic DBIC preferences module
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 
 
@@ -23,7 +23,7 @@ OpusVL::Preferences - Generic DBIC preferences module
 
 =head1 VERSION
 
-version 0.27
+version 0.29
 
 =head1 SYNOPSIS
 

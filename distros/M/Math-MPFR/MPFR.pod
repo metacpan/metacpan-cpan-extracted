@@ -862,7 +862,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     When built against mpfr-3.0.0 or later, this function returns the
     usual ternary value. (If $op is NaN or Inf, then the erange flag
     will be set.) When built against earlier versions of mpfr,
-    return zero if no error occurred.In particular a non-zero value
+    return zero if no error occurred. In particular a non-zero value
     is returned if $op is NaN or Inf. which do not exist in 'mpf'.
 
    Rmpfr_get_q ($q, $op); # $q is a Math::GMPq object.
@@ -2134,7 +2134,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      $M ** $G;
 
     In each of the above, a Math::MPFR object containing the result
-    of the operation is returned.It is also now permissible to do:
+    of the operation is returned. It is also now permissible to do:
 
      $M += $G;
      $M -= $G;

@@ -62,6 +62,10 @@ routes, template rendering and static files works as if you were on that facet.
     # Example: get backoffice facet session when the facet shares the same host (i.e. path-based facet)
     my $backoffice_session = $c->facet_do(backoffice => sub { shift->session });
 
+## has\_facet
+
+    if ($c->has_facet('foo')) { ... }
+
 # LICENSE
 
 Copyright (C) Carlos Fernando Avila Gratz.

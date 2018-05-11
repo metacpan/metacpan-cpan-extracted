@@ -2,8 +2,10 @@ Changes
 DB/CGI/Util.pm
 DB/Data/Dump.pm
 DB/DbgrCommon.pm
+DB/DbgrContext.pm
 DB/DbgrProperties.pm
 DB/DbgrURI.pm
+DB/DbgrXS.pm
 DB/MIME/Base64.pm
 DB/OSType.pm
 DB/RedirectStdOutput.pm

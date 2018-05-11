@@ -70,7 +70,7 @@ has 'grammar' => (
 
            <rule: For> for <Token> DO <Statement>
 
-           <token: Operator> NE | EQ | GTR | ==
+           <token: Operator> NEQ | EQU | GTR | == | LSS | LEQ | GEQ
 
            <token: Path> [^:\n\s]+
 

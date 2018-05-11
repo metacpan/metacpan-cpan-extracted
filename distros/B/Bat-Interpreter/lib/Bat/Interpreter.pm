@@ -10,7 +10,7 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.004';    # VERSION
+our $VERSION = '0.005';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -249,12 +249,20 @@ sub _handle_condition {
         $left_operand  = $self->_variable_substitution( $left_operand,  $context );
         $right_operand = $self->_variable_substitution( $right_operand, $context );
 
-        if ( $operator eq '==' ) {
+        if ( $operator eq '==' || $operator eq 'EQU' ) {
 
             #print "$left_operand == $right_operand\n";
             return $left_operand eq $right_operand;
+        } elsif ( $operator eq 'NEQ' ) {
+            return $left_operand != $right_operand;
+        } elsif ( $operator eq 'LSS' ) {
+            return $left_operand < $right_operand;
+        } elsif ( $operator eq 'LEQ' ) {
+            return $left_operand <= $right_operand;
         } elsif ( $operator eq 'GTR' ) {
             return $left_operand > $right_operand;
+        } elsif ( $operator eq 'GEQ' ) {
+            return $left_operand >= $right_operand;
         }
 
         else {
@@ -379,7 +387,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

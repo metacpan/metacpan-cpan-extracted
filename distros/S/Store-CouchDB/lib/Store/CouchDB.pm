@@ -4,7 +4,7 @@ use Moo;
 
 # ABSTRACT: Store::CouchDB - a simple CouchDB driver
 
-our $VERSION = '4.1'; # VERSION
+our $VERSION = '4.2'; # VERSION
 
 use MooX::Types::MooseLike::Base qw(:all);
 use experimental 'smartmatch';
@@ -487,6 +487,14 @@ sub get_view_array {
         return;
     }
 
+    # this is stupid behaviour where the result values are hashrefs we skip the
+    # keys. with this flag it can be turned off without affecting the default
+    my $parse_value_hash = 1;
+    if (exists $data->{do_not_parse_result}) {
+        $parse_value_hash = 0 if $data->{do_not_parse_result};
+        delete $data->{do_not_parse_result};
+    }
+
     $self->_check_db($data);
 
     my $path = $self->_make_path($data);
@@ -509,8 +517,9 @@ sub get_view_array {
         }
         else {
             next unless exists $doc->{value};
-            if (ref($doc->{value}) eq 'HASH') {
-                $doc->{value}->{id} = $doc->{id};
+            if (ref($doc->{value}) eq 'HASH' and $parse_value_hash) {
+                $doc->{value}->{id} = $doc->{id}
+                    unless ($data->{opts}->{reduce} eq 'true');
                 push(@result, $doc->{value});
             }
             else {
@@ -525,45 +534,7 @@ sub get_view_array {
 
 sub get_array_view {
     my ($self, $data) = @_;
-
-    unless ($data->{view}) {
-        carp "View not defined";
-        return;
-    }
-
-    $self->_check_db($data);
-
-    my $path = $self->_make_path($data);
-    $self->method('GET');
-    my $res = $self->_call($path, 'accept_stale');
-
-    # fallback lookup for broken data consistency due to the way earlier
-    # versions of this module where handling (or not) input data that had been
-    # stringified by dumpers or otherwise internally
-    # e.g. numbers were stored as strings which will be used as keys eventually
-    unless ($res->{rows}->[0]) {
-        $path = $self->_make_path($data, 'compat');
-        $res = $self->_call($path, 'accept_stale');
-    }
-
-    my $result;
-    foreach my $doc (@{ $res->{rows} }) {
-        if ($doc->{doc}) {
-            push(@{$result}, $doc->{doc});
-        }
-        else {
-            next unless exists $doc->{value};
-            if (ref($doc->{value}) eq 'HASH') {
-                $doc->{value}->{id} = $doc->{id};
-                push(@{$result}, $doc->{value});
-            }
-            else {
-                push(@{$result}, $doc);
-            }
-        }
-    }
-
-    return $result;
+    return [ $self->get_view_array($data) ];
 }
 
 
@@ -1043,7 +1014,7 @@ Store::CouchDB - Store::CouchDB - a simple CouchDB driver
 
 =head1 VERSION
 
-version 4.1
+version 4.2
 
 =head1 SYNOPSIS
 
@@ -1253,13 +1224,8 @@ handy for getting a hash structure for several documents in the DB.
 
 =head2 get_view_array
 
-Same as get_array_view only returns a real array. Use either one
-depending on your use case and convenience.
-
-=head2 get_array_view
-
-The get_array_view uses GET to call the view and returns an array
-reference of matched documents. This view functions is the one I use
+The get_view_array uses GET to call the view and returns an array
+of matched documents. This view functions is the one I use
 most and has the best support for corner cases.
 
     my @docs = @{ $sc->get_array_view({
@@ -1271,6 +1237,11 @@ A normal response hash would be the "value" part of the document with
 the _id moved in as "id". If the response is not a HASH (the request was
 resulting in key/value pairs) the entire doc is returned resulting in a
 hash of key/value/id per document.
+
+=head2 get_array_view
+
+Same as get_view_array only returns a real array. Use either one
+depending on your use case and convenience.
 
 =head2 list_view
 

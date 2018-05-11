@@ -1,3 +1,10 @@
+libdr-tnt-perl (0.21-1) nowtaxi; urgency=medium
+
+  * Pack big numbers properly. Scalar::Util::looks_like_number returns
+    true for +-Inf, so there was an exception for the cases.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 May 2018 14:54:04 +0300
+
 libdr-tnt-perl (0.20-1) nowtaxi; urgency=medium
 
   * Pack \0 \1 as true/false (JSON::XS/JSON compatible);

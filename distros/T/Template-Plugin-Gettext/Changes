@@ -1,3 +1,9 @@
+0.6  2018-05-09
+        - Re-allow relative paths (was broken in 0.5).  Otherwise common
+          POTFILES files cannot be read.
+        - Allow argument to --plug-in to be empty so that you can extract
+          arguments from functions in the TT2 root namespace. 
+
 0.5  2018-03-27
         - Template::Plugin::Gettext now automatically sets the utf8 flag
           on translated strings, when the original string (the msgid) had

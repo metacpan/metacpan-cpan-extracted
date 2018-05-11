@@ -118,3 +118,34 @@ Revision history for Var-Pairs
     at the end of their caller's block, to solve the
     "last of out a loop messes up the iterator" problem.
     (Thanks, Rolf!)
+
+
+0.004000  Mon May  7 15:44:52 2018
+
+    Allowed each_pair() and each_kv() to take a subroutine
+    as an iterator.
+
+    Added each_value() to return just the value iterated
+    without returning the key.
+
+    INCOMPATIBLE CHANGE:
+    Improved behaviour of each_pair() and each_kv().
+    Now they differentiate between:
+
+        while (my $pair = each_pair $NAMED_CONTAINER) {...}
+    and:
+        while (my $pair = each_pair EXPRESSION_PRODUCING_CONTAINER_REF) {...}
+
+    If the container is NOT passed in a named variable (i.e. as a simple
+    scalar, array, or hash variable), then the iteration is NOT specific
+    to the container, only to the location. In other words, when the argument
+    is an expression, the value of that expression is only significant 
+    at the beginning of the iteration loop; if it changes during the loop,
+    the changes are ignored. This produces a lot more "do-what-I-mean"-ness.
+
+
+
+
+0.004001  Wed May  9 18:01:58 2018
+
+    POD fix (thanks, Salvatore)

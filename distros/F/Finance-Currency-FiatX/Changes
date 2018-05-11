@@ -1,0 +1,15 @@
+0.002   2018-05-10 (PERLANCAR)
+
+	- [Bugfix] Fix SQL that caused us to always query from remote
+	  source.
+
+	- Update DB schema: rename column currency1 -> from_currency,
+	  currency2 -> to_currency.
+
+	- [test] Use MySQL for schema migration test because SQLite doesn't
+	  support column renames/changes.
+
+
+0.001   2018-05-09 (PERLANCAR)
+
+        - First release.

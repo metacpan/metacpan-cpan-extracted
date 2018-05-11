@@ -179,7 +179,7 @@ $defines .= " -DMPFR_WANT_DECIMAL_FLOATS" if $have_decimal64;
 $defines .= " -DMPFR_WANT_FLOAT128" if $have_float128;
 
 print "\nThis module requires the following C libraries:\n";
-print " gmp-4.2.0 (or later)\n mpfr-2.4.0 (or later)\n\n";
+print " gmp-4.2.0 (or later)\n mpfr-3.0.0 (or later)\n\n";
 $defines =~ /\-DMATH_MPFR_NEED_LONG_LONG_INT/ ? print "Building with 'long long' support\n" :
                                  print "Building without 'long long' support\n";
 

@@ -1,0 +1,35 @@
+---
+abstract: 'Booleans as objects for Perl'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-Bool
+provides:
+  Types::Bool:
+    file: lib/Types/Bool.pm
+    version: '2.98009'
+requires:
+  Exporter: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  overload: '0'
+  perl: '5.005'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-Types-Bool/issues
+  homepage: https://github.com/aferreira/cpan-Types-Bool
+  repository: https://github.com/aferreira/cpan-Types-Bool.git
+version: '2.98009'
+x_serialization_backend: 'YAML::Tiny version 1.70'

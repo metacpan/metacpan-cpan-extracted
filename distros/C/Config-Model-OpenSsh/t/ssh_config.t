@@ -4,8 +4,7 @@ use ExtUtils::testlib;
 use Test::More ;
 use Config::Model ;
 use Config::Model::BackendMgr; # required for tests
-use Log::Log4perl qw(:easy) ;
-use File::Path ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use English;
 use Test::Differences ;
 use Test::Warn ;
@@ -13,49 +12,20 @@ use Test::Warn ;
 use warnings;
 use strict;
 
-my $arg = shift || '';
-
-my ($log,$show) = (0) x 2 ;
-
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /s/;
-
-my $log4perl_user_conf_file = $ENV{HOME}.'/.log4config-model' ;
-
-if ($log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init($log ? $DEBUG: $ERROR);
-}
-
-my $model = Config::Model -> new ( ) ;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok(1,"compiled");
+my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
-my $wr_root = 'wr_test';
+my $wr_root = setup_test_dir;
 
-my $testdir = 'ssh_test' ;
-
-my $ssh_path = $^O eq 'darwin' ? '/etc'
+my $ssh_subdir = $^O eq 'darwin' ? '/etc'
                :                 '/etc/ssh' ;
-
-# cleanup before tests
-rmtree($wr_root);
+my $ssh_path = $wr_root->child($ssh_subdir);
 
 my @orig = <DATA> ;
 
-my $wr_dir = $wr_root.'/'.$testdir ;
-mkpath($wr_dir.$ssh_path, { mode => 0755 })
-  || die "can't mkpath: $!";
-open(SSHD,"> $wr_dir$ssh_path/ssh_config")
-  || die "can't open file: $!";
-print SSHD @orig ;
-close SSHD ;
+$ssh_path->mkpath;
+my $ssh_file = $ssh_path->child('ssh_config');
+$ssh_file->spew(@orig);
 
 # special global variable used only for tests
 my $joe_home = $^O eq 'darwin' ? '/Users/joe'
@@ -63,30 +33,29 @@ my $joe_home = $^O eq 'darwin' ? '/Users/joe'
 Config::Model::BackendMgr::_set_test_home($joe_home) ;
 
 # set up Joe's environment
-my $joe_ssh = $wr_dir.$joe_home.'/.ssh';
-mkpath($joe_ssh, { mode => 0755 }) || die "can't mkpath $joe_ssh: $!";
-open(JOE,"> $joe_ssh/config") || die "can't open file: $!";
-print JOE "Host mine.bar\n\nIdentityFile ~/.ssh/mine\n" ;
-close JOE ;
+my $joe_ssh = $wr_root->child($joe_home.'/.ssh');
+$joe_ssh->mkpath;
+
+my $joe_config = $joe_ssh->child('config');
+$joe_config->spew("Host mine.bar\n\nIdentityFile ~/.ssh/mine\n") ;
 
 sub read_user_ssh {
     my $file = shift ;
-    open(IN, $file)||die "can't read $file:$!";
-    my @res = grep {/\w/} map { chomp; s/\s+/ /g; $_ ;} grep { not /##/ } <IN> ;
-    close (IN);
+    my @res = grep {/\w/} map { chomp; s/\s+/ /g; $_ ;} grep { not /##/ } $file->lines ;
     return @res ;
 }
 
-print "Test from directory $testdir\n" if $trace ;
+print "Test from directory $wr_root\n" if $trace ;
 
 note "Running test like root (no layered config)" ;
 
-my $root_inst = $model->instance (root_class_name   => 'SystemSsh',
-				  instance_name     => 'root_ssh_instance',
-				  root_dir          => $wr_dir,
-				 );
+my $root_inst = $model->instance (
+    root_class_name   => 'SystemSsh',
+    instance_name     => 'root_ssh_instance',
+    root_dir          => $wr_root,
+);
 
-ok($root_inst,"Read $wr_dir$ssh_path/ssh_config and created instance") ;
+ok($root_inst,"Read $ssh_file and created instance") ;
 
 my $root_cfg = $root_inst -> config_root ;
 $root_cfg->init ;
@@ -107,12 +76,13 @@ like($dump,qr/host=2001:0db8:85a3:0000:0000:8a2e:0370:7334/,
 
 $root_inst->write_back() ; 
 
-ok(1,"wrote ssh_config data in $wr_dir") ;
+ok(1,"wrote ssh_config data in $wr_root") ;
 
-my $inst2 = $model->instance (root_class_name   => 'SystemSsh',
-			      instance_name     => 'root_ssh_instance2',
-			      root_dir          => $wr_dir,
-			     );
+my $inst2 = $model->instance (
+    root_class_name   => 'SystemSsh',
+    instance_name     => 'root_ssh_instance2',
+    root_dir          => $wr_root,
+);
 
 my $root2 = $inst2 -> config_root ;
 my $dump2 = $root2 -> dump_tree ();
@@ -127,14 +97,15 @@ SKIP: {
 
     note "Running test like user with layered config";
 
-    my $user_inst = $model->instance (root_class_name   => 'Ssh',
-				      instance_name     => 'user_ssh_instance',
-				      root_dir          => $wr_dir,
-				     );
+    my $user_inst = $model->instance (
+        root_class_name   => 'Ssh',
+        instance_name     => 'user_ssh_instance',
+        root_dir          => $wr_root,
+    );
 
     ok($user_inst,"Read user .ssh/config and created instance") ;
 
-    my @joe_orig    = read_user_ssh($wr_dir.$joe_home.'/.ssh/config') ;
+    my @joe_orig    = read_user_ssh($joe_config) ;
 
     my $user_cfg = $user_inst -> config_root ;
 
@@ -145,20 +116,19 @@ SKIP: {
     like($dump,qr/Host:"?mine.bar"?/,"check user Host pattern") ;
 
     $user_inst->write_back() ;
-    my $joe_file = $wr_dir.$joe_home.'/.ssh/config' ;
-    ok(1,"wrote user .ssh/config data in $joe_file") ;
+    ok(1,"wrote user .ssh/config data in $joe_config") ;
 
-    ok(-e $joe_file,"Found $joe_file") ;
+    ok($joe_config->is_file,"Found $joe_config") ;
 
     # compare original and written file
-    my @joe_written = read_user_ssh($joe_file) ;
+    my @joe_written = read_user_ssh($joe_config) ;
     eq_or_diff(\@joe_written,\@joe_orig,"check user .ssh/config files") ;
 
     # write some data
     $user_cfg->load('EnableSSHKeysign=1') ;
     $user_inst->write_back() ;
     unshift @joe_orig,'EnableSSHKeysign yes';
-    @joe_written = read_user_ssh($joe_file) ;
+    @joe_written = read_user_ssh($joe_config) ;
     eq_or_diff(\@joe_written,\@joe_orig,"check user .ssh/config files after modif") ;
 
     # run test on tricky element

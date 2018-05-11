@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-DeploymentHandler-VersionStorage-WithSchema
 
+0.002     2018-05-08 21:29:42 BST
+
+  - Fixed issues with getting version numbers
+
 0.001     2017-06-13 14:29:14 BST
 
   - Created entire dist

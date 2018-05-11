@@ -34,7 +34,7 @@ SCHEMA1: {
   ok($handler, 'DBIx::Class::DeploymentHandler w/1.0 instantiates correctly');
 
   my $version = $s->schema_version();
-  $handler->prepare_install();
+  $handler->prepare_install(core => 1);
 
   dies_ok {
     $s->resultset('Foo')->create({
@@ -84,7 +84,12 @@ SCHEMA2: {
   dies_ok {
     $handler->install({ version => '1.0' });
   } "Can't install again: version table already exists";
-  $handler->deploy();
+
+  my $ddl = $handler->deploy();
+  $handler->add_database_version({
+    version => $handler->to_version,
+    ddl => $ddl,
+  });
   lives_ok {
     $s->resultset('Bar')->create({
       bar => 'frew',

@@ -36,9 +36,10 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
+    @CARP_NOT
 };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 sub can_be_quantified {
     return;

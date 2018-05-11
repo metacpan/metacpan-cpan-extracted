@@ -1,7 +1,7 @@
 #
-use v5.24;
-
 package TestPW;
+use strict;
+use warnings;
 use File::Spec;
 use Exporter;
 
@@ -122,8 +122,6 @@ sub run {
         $outStr = $this->munge_perl_string( $this->inSource, $this->args );
     }
     
-    #say STDERR $outStr;
-
     compare_pod_ok(
         $outStr,
         $this->expected,

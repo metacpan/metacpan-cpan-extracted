@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.41'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 sub new
@@ -87,7 +87,7 @@ sub mm_args
         unless($@)
         {
           $self->build->install_prop->{old}->{runtime} = $old_runtime;
-          $self->build->install_prop->{old}->{preifx}  = $old_prefix;
+          $self->build->install_prop->{old}->{prefix}  = $old_prefix;
         }
       }
     }
@@ -353,7 +353,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -506,6 +506,8 @@ José Joaquín Atria (JJATRIA)
 Duke Leto (LETO)
 
 Shoichi Kaji (SKAJI)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

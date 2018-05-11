@@ -1,0 +1,66 @@
+---
+abstract: 'A SAML2 toolkit using the Mojo toolkit'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.022, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-SAML
+provides:
+  Mojo::SAML:
+    file: lib/Mojo/SAML.pm
+    version: '0.02'
+  Mojo::SAML::Document:
+    file: lib/Mojo/SAML/Document.pm
+  Mojo::SAML::Document::AssertionConsumerService:
+    file: lib/Mojo/SAML/Document/AssertionConsumerService.pm
+  Mojo::SAML::Document::AttributeConsumingService:
+    file: lib/Mojo/SAML/Document/AttributeConsumingService.pm
+  Mojo::SAML::Document::AuthnRequest:
+    file: lib/Mojo/SAML/Document/AuthnRequest.pm
+  Mojo::SAML::Document::ContactPerson:
+    file: lib/Mojo/SAML/Document/ContactPerson.pm
+  Mojo::SAML::Document::EntityDescriptor:
+    file: lib/Mojo/SAML/Document/EntityDescriptor.pm
+  Mojo::SAML::Document::KeyDescriptor:
+    file: lib/Mojo/SAML/Document/KeyDescriptor.pm
+  Mojo::SAML::Document::KeyInfo:
+    file: lib/Mojo/SAML/Document/KeyInfo.pm
+  Mojo::SAML::Document::NameIDPolicy:
+    file: lib/Mojo/SAML/Document/NameIDPolicy.pm
+  Mojo::SAML::Document::Organization:
+    file: lib/Mojo/SAML/Document/Organization.pm
+  Mojo::SAML::Document::RequestedAttribute:
+    file: lib/Mojo/SAML/Document/RequestedAttribute.pm
+  Mojo::SAML::Document::SPSSODescriptor:
+    file: lib/Mojo/SAML/Document/SPSSODescriptor.pm
+  Mojo::SAML::Document::Signature:
+    file: lib/Mojo/SAML/Document/Signature.pm
+  Mojo::SAML::IdP:
+    file: lib/Mojo/SAML/IdP.pm
+  Mojo::SAML::Names:
+    file: lib/Mojo/SAML/Names.pm
+  Mojo::SAML::TemplateSandbox:
+    file: lib/Mojo/SAML/Document.pm
+  Mojo::XMLSig:
+    file: lib/Mojo/XMLSig.pm
+requires:
+  Compress::Raw::Zlib: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Crypt::OpenSSL::X509: '0'
+  Data::GUID: '0'
+  Digest::SHA: '0'
+  Mojolicious: '7.77'
+  XML::CanonicalizeXML: '0'
+resources:
+  bugtracker: http://github.com/jberger/Mojo-SAML/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojo-SAML
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

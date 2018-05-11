@@ -1,104 +1,78 @@
 # -*- cperl -*-
 
 use ExtUtils::testlib;
-use Test::More tests => 5;
+use Test::More;
 use Config::Model ;
-use Log::Log4perl qw(:easy) ;
-use File::Path ;
-use File::Copy ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
+use Path::Tiny;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
 
-my $arg = shift @ARGV || '';
-
-my ($log,$show) = (0) x 2 ;
-
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /s/;
-
-my $log4perl_user_conf_file = $ENV{HOME}.'/.log4config-model' ;
-
-if ($log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init($log ? $DEBUG: $ERROR);
-}
-
-my $model = Config::Model -> new ( ) ;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok(1,"compiled");
+my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
-my $wr_root = 'wr_test';
+my $wr_root = setup_test_dir;
 
-my $testdir = 'custom_sshd' ;
-
-my $ssh_path = $^O eq 'darwin' ? '/etc'
+my $wr_dir1 = $wr_root->child('a');
+my $ssh_subdir = $^O eq 'darwin' ? '/etc'
                :                 '/etc/ssh' ;
-
-# cleanup before tests
-rmtree($wr_root);
+my $ssh_path1 = $wr_dir1->child($ssh_subdir);
 
 my @orig = <DATA> ;
 
-my $wr_dir = $wr_root.'/'.$testdir ;
-mkpath($wr_dir.$ssh_path, { mode => 0755 })
-  || die "can't mkpath: $!";
-open(SSHD,"> $wr_dir$ssh_path/sshd_config")
-  || die "can't open file: $!";
-print SSHD @orig ;
-close SSHD ;
+$ssh_path1->mkpath;
+my $ssh_file1 = $ssh_path1->child('sshd_config');
+$ssh_file1->spew(@orig);
 
-my $inst = $model->instance (root_class_name   => 'Sshd',
-			     instance_name     => 'sshd_instance',
-			     root_dir          => $wr_dir,
-			     backend => 'OpenSsh::Sshd',
-			    );
+my $inst = $model->instance (
+    root_class_name   => 'Sshd',
+    instance_name     => 'sshd_instance',
+    root_dir          => $wr_dir1,
+    backend => 'OpenSsh::Sshd',
+);
 
-ok($inst,"Read $wr_dir$ssh_path/sshd_config and created instance") ;
+ok($inst,"Read $ssh_file1 and created instance") ;
 
 my $root = $inst -> config_root ;
 
 my $dump =  $root->dump_tree ();
-print "First $testdir dump:\n",$dump if $trace ;
+print "First $wr_dir1 dump:\n",$dump if $trace ;
 
 #like($dump,qr/Match:0/, "check Match section") if $testdir =~ /match/;
 
-$root -> load("Port=2222") ; 
+$root -> load("Port=2222") ;
 
 
 $inst->write_back() ;
-ok(1,"wrote data in $wr_dir") ;
+ok(1,"wrote data in $wr_dir1") ;
 
 
 # copy data in wr_dir2
-my $wr_dir2 = $wr_dir.'b/' ;
-mkpath($wr_dir2.$ssh_path, { mode => 0755 }) ;
-copy($wr_dir.$ssh_path.'/sshd_config',$wr_dir2.$ssh_path) ;
+my $wr_dir2 = $wr_root->child('b') ;
+my $ssh_dir2 = $wr_dir2->child($ssh_subdir);
+$ssh_dir2->mkpath;
+my $ssh_file2 = $ssh_dir2->child('sshd_config');
+$ssh_file1->copy($ssh_dir2) ;
 
-my $inst2 = $model->instance (root_class_name   => 'Sshd',
-			      instance_name     => 'sshd_instance2',
-			      root_dir          => $wr_dir2,
-			      backend => 'OpenSsh::Sshd',
-			     );
+my $inst2 = $model->instance (
+    root_class_name   => 'Sshd',
+    instance_name     => 'sshd_instance2',
+    root_dir          => $wr_dir2,
+    backend => 'OpenSsh::Sshd',
+);
 
-ok($inst2,"Read $wr_dir2$ssh_path/sshd_config and created instance") ;
+ok($inst2,"Read $ssh_file2 and created instance") ;
 
 my $root2 = $inst2 -> config_root ;
 my $dump2 = $root2 -> dump_tree ();
-print "Second $testdir dump:",$dump2 if $trace ;
+print "Second $wr_dir2 dump:",$dump2 if $trace ;
 
 my @mod = split /\n/,$dump ;
 $mod[17] =~ s/221/2222/;
 is_deeply([split /\n/,$dump2],\@mod, "check if both dumps are consistent") ;
 
+done_testing;
 
 __DATA__
 

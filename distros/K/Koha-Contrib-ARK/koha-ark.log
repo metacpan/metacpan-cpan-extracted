@@ -1,0 +1,107 @@
+
+--------------------------------------------------------------------------------
+koha-ark: start check -- 2018-05-08 09:13:32
+** TEST MODE **
+Reading ARK_CONF
+ARK_CONF=
+{
+   "ark" : {
+      "koha" : {
+         "id" : {
+            "tag" : "001"
+         },
+         "ark" : {
+            "letter" : "z",
+            "tag" : "090"
+         }
+      },
+      "NAAN" : "12345",
+      "NMHA" : "myspecial.test.fr",
+      "ARK" : "http://{NMHA}/ark:/{NAAN}/catalog{id}"
+   }
+}
+
+field_query = ExtractValue(metadata, '//datafield[@tag="090"]/subfield[@code="z"]')
+Number of records to process = 1569
+No koha.id field. Use biblionumber instead
+
+--------------------------------------------------------------------------------
+koha-ark: start check -- 2018-05-08 09:13:32
+** TEST MODE **
+Reading ARK_CONF
+ARK_CONF=
+{
+   "ark" : {
+      "koha" : {
+         "id" : {
+            "tag" : "009"
+         },
+         "ark" : {
+            "letter" : "z",
+            "tag" : "090"
+         }
+      },
+      "NAAN" : "12345",
+      "NMHA" : "myspecial.test.fr",
+      "ARK" : "http://{NMHA}/ark:/{NAAN}/catalog{id}"
+   }
+}
+
+field_query = ExtractValue(metadata, '//datafield[@tag="090"]/subfield[@code="z"]')
+Number of records to process = 1569
+No koha.id field. Use biblionumber instead
+
+--------------------------------------------------------------------------------
+koha-ark: start check -- 2018-05-08 09:13:32
+** TEST MODE **
+Reading ARK_CONF
+ARK_CONF=
+{
+   "ark" : {
+      "koha" : {
+         "id" : {
+            "tag" : "942",
+            "letter" : "a"
+         },
+         "ark" : {
+            "letter" : "z",
+            "tag" : "090"
+         }
+      },
+      "NAAN" : "12345",
+      "NMHA" : "myspecial.test.fr",
+      "ARK" : "http://{NMHA}/ark:/{NAAN}/catalog{id}"
+   }
+}
+
+field_query = ExtractValue(metadata, '//datafield[@tag="090"]/subfield[@code="z"]')
+Number of records to process = 1569
+Generated ARK: http://myspecial.test.fr/ark:/12345/catalogbib777
+Remove ARK field
+
+--------------------------------------------------------------------------------
+koha-ark: start check -- 2018-05-08 09:13:32
+** TEST MODE **
+Reading ARK_CONF
+ARK_CONF=
+{
+   "ark" : {
+      "koha" : {
+         "id" : {
+            "tag" : "942",
+            "letter" : "a"
+         },
+         "ark" : {
+            "tag" : "003"
+         }
+      },
+      "NAAN" : "12345",
+      "NMHA" : "myspecial.test.fr",
+      "ARK" : "http://{NMHA}/ark:/{NAAN}/catalog{id}"
+   }
+}
+
+field_query = ExtractValue(metadata, '//controlfield[@tag="003"]')
+Number of records to process = 127730
+Generated ARK: http://myspecial.test.fr/ark:/12345/catalogbib777
+Remove ARK field

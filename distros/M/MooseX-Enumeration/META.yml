@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -27,22 +27,22 @@ optional_features: {}
 provides:
   Moose::Meta::Attribute::Custom::Trait::Enum:
     file: lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
-    version: '0.005'
+    version: '0.006'
   Moose::Meta::Attribute::Custom::Trait::Enumeration:
     file: lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
-    version: '0.005'
+    version: '0.006'
   MooseX::Enumeration:
     file: lib/MooseX/Enumeration.pm
-    version: '0.005'
+    version: '0.006'
   MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration:
     file: lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
-    version: '0.005'
+    version: '0.006'
   MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign:
     file: lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
-    version: '0.005'
+    version: '0.006'
   MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is:
     file: lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
-    version: '0.005'
+    version: '0.006'
 recommends:
   Type::Tiny::Enum: '0.030'
   match::simple::XS: '0'
@@ -52,9 +52,11 @@ requires:
   match::simple: '0'
   perl: '5.008001'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project
+  Identifier: http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration
   homepage: https://metacpan.org/release/MooseX-Enumeration
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moosex-enumeration.git
-version: '0.005'
+version: '0.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

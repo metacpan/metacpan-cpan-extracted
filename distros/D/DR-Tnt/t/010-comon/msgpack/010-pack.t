@@ -6,13 +6,14 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib);
 
-use Test::More tests    => 87;
+use Test::More tests    => 88;
 use Encode qw(decode encode);
 
 
 BEGIN {
     use_ok 'DR::Tnt::Msgpack';
     use_ok 'DR::Tnt::Dumper';
+    use Scalar::Util 'looks_like_number';
 }
 
 
@@ -151,3 +152,19 @@ subtest 'Types::Serialiser' => sub {
     is msgpack(Types::Serialiser::false()), msgpack(\0), 'false as \\0';
 };
 
+
+subtest 'Inf/etc' => sub {
+    plan tests => 4;
+
+    for ('96732e19263652001268197944207186', '28446744073709551615.99') {
+        ok looks_like_number $_, 'looks_like_number ' . $_;
+        my $r = pack('CCa*', 0xD9, length $_, $_);
+
+        $r = pack 'Ca*', (0xA0 | length $_), $_ if length $_ < 0x1F;
+        is
+            msgpack($_), 
+            $r,
+            "pack as string";
+
+    }
+};

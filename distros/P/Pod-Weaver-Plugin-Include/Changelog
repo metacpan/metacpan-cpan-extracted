@@ -1,10 +1,319 @@
 ==================================================
-Changes from 2016-09-06 00:00:00 +0000 to present.
+Changes from 2017-05-09 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v0.1.5 at 2017-09-06 23:28:40 +0000
+version v0.1.9 at 2018-05-09 02:12:49 +0000
 -------------------------------------------
+
+  Change: b2c17bedbca2b3148f876034850ef185ceca85a8
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-08 22:07:13 +0000
+
+    Fixed compatibility issues with older versions of Perl. 
+
+  Change: 357f87c34b7d8fc520cb01d9b10c4079c420026d
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-08 22:05:06 +0000
+
+    Raised minimal Perl version to 5.14 
+
+  Change: 67af5799e66e960887570b2891911d0827b0e405
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-08 09:33:59 +0000
+
+    Removed /n regex modifier 
+
+------------------------------------------
+version 0.1.8 at 2018-05-07 23:18:39 +0000
+------------------------------------------
+
+  Change: ab451e2f8b1b71d0ad63e661113de86cdbd67b30
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 19:18:39 +0000
+
+    Made Perl 5.10 minium required version 
+
+  Change: 1d9f8ddc331bbba924038d7e76571bc2dc65c8dc
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 19:10:53 +0000
+
+    Added test prerequsites 
+
+------------------------------------------
+version 0.1.7 at 2018-05-07 17:25:52 +0000
+------------------------------------------
+
+  Change: 77b488692503026acd4838b0f82dbc6fa0ccc95a
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:25:52 +0000
+
+    Added additional Test::Pod prereq as it's not picked up by AutoPrereqs 
+
+--------------------------------------------
+version 0.1.905 at 2018-05-07 17:21:51 +0000
+--------------------------------------------
+
+  Change: 1145e9edeaec07fd7bfe97503b878bf7b9a87841
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:21:51 +0000
+
+    Merge branch 'v0.1'
+
+    * v0.1:
+
+    Added pod coverage testing and fixed coverage errors
+
+    Minor: version bump 
+
+  Change: 82208a424c11f1bbda5bc63916af848199060927
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:19:24 +0000
+
+    Added pod coverage testing and fixed coverage errors 
+
+  Change: f611d235bca372c094ba85eedaa8dabff2e427a7
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 10:41:39 +0000
+
+    Merge commit '18b7ba0dbce441cce875cc31771b24ae4cd6b7c2'
+
+    * commit '18b7ba0dbce441cce875cc31771b24ae4cd6b7c2':
+
+    Minor: added META 'repository' and 'provides' support
+
+    Minor: added extra tests
+
+    Removed dependency on Perl v5.24
+
+    Minor: version bump
+
+    Minor: Added missing test dependency
+
+    Fix for different filesystems support
+
+    Reduced amount of log messages
+
+    Minor: version bump
+
+    Resolved a problem with terminating =cut
+
+    Made all classes immutable.
+
+    Fixed a bug with adding content without template opened. 
+
+  Change: 0fb83801bdf64eacb27b735707bbe3543b039d1e
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 10:31:55 +0000
+
+    Removed dependency on Perl v5.24 
+
+  Change: 5486b33b30ecfc742bed05bc11e9ef5cb29e13a0
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-06 10:36:54 +0000
+
+    Fix for different filesystems support 
+
+  Change: 4f845dbaade4b7f770a677edcbc516343b4f3553
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-05 12:08:52 +0000
+
+    Reduced amount of log messages 
+
+  Change: 5d963dd2c47ae92146f4bbac9cf24e96c61562b2
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-05 09:32:11 +0000
+
+    Resolved a problem with terminating =cut
+
+    not considering it as a terminator anymore. It's only =tmpl to be used
+    for the purpose.
+
+    Rewrote TestPW to accept .pm as input too. 
+
+  Change: 7f2feb23186445bf2a45c341a0bb9a2552d02016
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 21:31:26 +0000
+
+    Fixed a bug with adding content without template opened.
+
+    More debug. 
+
+  Change: 5cf5314595f5503333ecc05e9a9a1b3e45934a22
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 21:15:50 +0000
+
+    Merge commit 'cc5850f626b34def11d3ca7701d95e5dcb7bbd2e'
+
+    * commit 'cc5850f626b34def11d3ca7701d95e5dcb7bbd2e':
+
+    Fixed hidden templates being not hidden at all. 
+
+  Change: d5e8ca9991857a47804a02d7c25cf4c16dc9b43d
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 20:06:31 +0000
+
+    Fixed hidden templates being not hidden at all.
+
+    - Fixed Include::Finder logging in a test 
+
+  Change: d95203212c46fbc17f2dfac754bac9f04d2f29d7
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 19:12:02 +0000
+
+    Added more logging. 
+
+  Change: 15ada3e89e6f946653de6544d156725c6647a8f5
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 19:57:53 +0000
+
+    Merge branch 'v0.1'
+
+    * v0.1:
+
+    Documentation fixes.
+
+    Version bump to 0.1.1 
+
+  Change: e7984463142b512a729ac2f1bf0139c76f10f03f
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 19:51:31 +0000
+
+    Made all classes immutable. 
+
+------------------------------------------
+version 0.1.6 at 2018-05-07 14:37:50 +0000
+------------------------------------------
+
+  Change: af5c92a29d78f9b5fc04485071714c08af4426e6
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 10:35:59 +0000
+
+    Removed dependency on Perl v5.24 
+
+  Change: a5fb829b3797200f1f53fb4c2920fa5dc1b961ba
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-06 19:27:47 +0000
+
+    Fix for different filesystems support 
+
+  Change: 3bc897a8da9e479405a070ee2afa2b723cfe88cb
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-06 19:27:46 +0000
+
+    Reduced amount of log messages 
+
+  Change: ecb5e73116cffb14b073c0da0b7e30113c4ebf65
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-05 09:42:48 +0000
+
+    Resolved a problem with terminating =cut
+
+    not considering it as a terminator anymore. It's only =tmpl to be used
+    for the purpose.
+
+    Rewrote TestPW to accept .pm as input too. 
+
+  Change: 00d8cbe77a045765d473746326e7555696259166
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-05 09:42:24 +0000
+
+    Made all classes immutable. 
+
+  Change: 295703bb15d3606451217c6bda209aed96a16d9e
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 21:13:10 +0000
+
+    Fixed a bug with adding content without template opened.
+
+    More debug. 
+
+--------------------------------------------
+version 0.1.904 at 2018-05-07 14:32:15 +0000
+--------------------------------------------
+
+  Change: 0fb83801bdf64eacb27b735707bbe3543b039d1e
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 10:31:55 +0000
+
+    Removed dependency on Perl v5.24 
+
+  Change: 5486b33b30ecfc742bed05bc11e9ef5cb29e13a0
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-06 10:36:54 +0000
+
+    Fix for different filesystems support 
+
+  Change: 4f845dbaade4b7f770a677edcbc516343b4f3553
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-05 12:08:52 +0000
+
+    Reduced amount of log messages 
+
+  Change: 5d963dd2c47ae92146f4bbac9cf24e96c61562b2
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-05 09:32:11 +0000
+
+    Resolved a problem with terminating =cut
+
+    not considering it as a terminator anymore. It's only =tmpl to be used
+    for the purpose.
+
+    Rewrote TestPW to accept .pm as input too. 
+
+  Change: 7f2feb23186445bf2a45c341a0bb9a2552d02016
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 21:31:26 +0000
+
+    Fixed a bug with adding content without template opened.
+
+    More debug. 
+
+  Change: 5cf5314595f5503333ecc05e9a9a1b3e45934a22
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 21:15:50 +0000
+
+    Merge commit 'cc5850f626b34def11d3ca7701d95e5dcb7bbd2e'
+
+    * commit 'cc5850f626b34def11d3ca7701d95e5dcb7bbd2e':
+
+    Fixed hidden templates being not hidden at all. 
+
+  Change: d5e8ca9991857a47804a02d7c25cf4c16dc9b43d
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 20:06:31 +0000
+
+    Fixed hidden templates being not hidden at all.
+
+    - Fixed Include::Finder logging in a test 
+
+  Change: d95203212c46fbc17f2dfac754bac9f04d2f29d7
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 19:12:02 +0000
+
+    Added more logging. 
+
+  Change: 15ada3e89e6f946653de6544d156725c6647a8f5
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 19:57:53 +0000
+
+    Merge branch 'v0.1'
+
+    * v0.1:
+
+    Documentation fixes.
+
+    Version bump to 0.1.1 
+
+  Change: e7984463142b512a729ac2f1bf0139c76f10f03f
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 19:51:31 +0000
+
+    Made all classes immutable. 
+
+------------------------------------------
+version 0.1.5 at 2017-09-06 23:27:47 +0000
+------------------------------------------
 
   Change: a5fb829b3797200f1f53fb4c2920fa5dc1b961ba
   Author: Vadim Belman <vrurg@lflat.org>

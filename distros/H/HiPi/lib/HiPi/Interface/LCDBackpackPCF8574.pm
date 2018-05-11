@@ -19,7 +19,7 @@ use HiPi::RaspberryPi;
 use HiPi::Interface::PCF8574;
 use Time::HiRes;
 
-our $VERSION ='0.69';
+our $VERSION ='0.70';
 
 __PACKAGE__->create_accessors( qw( address devicename backend _backlight ) );
 

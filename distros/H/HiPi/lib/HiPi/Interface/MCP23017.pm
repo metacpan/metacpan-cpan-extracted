@@ -17,7 +17,7 @@ use HiPi qw( :rpi :mcp23x17 );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.69';
+our $VERSION ='0.70';
 
 # compatibility
 

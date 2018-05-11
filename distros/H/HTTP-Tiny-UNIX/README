@@ -3,8 +3,8 @@ NAME
     over Unix socket
 
 VERSION
-    This document describes version 0.04 of HTTP::Tiny::UNIX (from Perl
-    distribution HTTP-Tiny-UNIX), released on 2014-07-04.
+    This document describes version 0.051 of HTTP::Tiny::UNIX (from Perl
+    distribution HTTP-Tiny-UNIX), released on 2018-05-08.
 
 SYNOPSIS
      use HTTP::Tiny::UNIX;
@@ -30,19 +30,13 @@ DESCRIPTION
 
     Proxy is currently not supported.
 
-SEE ALSO
-    HTTP::Tiny
-
-    To use LWP to connect over Unix sockets, see
-    LWP::protocol::http::SocketUnixAlt.
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/HTTP-Tiny-UNIX>.
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-HTTP-Tiny-UNIX>.
+    <https://github.com/perlancar/perl-HTTP-Tiny-UNIX>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -51,11 +45,17 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    HTTP::Tiny
+
+    To use LWP to connect over Unix sockets, see
+    LWP::Protocol::http::SocketUnixAlt.
+
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Steven Haryanto.
+    This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

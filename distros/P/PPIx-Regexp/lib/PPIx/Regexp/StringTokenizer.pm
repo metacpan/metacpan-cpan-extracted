@@ -10,9 +10,10 @@ use base qw{ PPIx::Regexp::Tokenizer };
 use Carp;
 use PPIx::Regexp::Constant qw{
     TOKEN_UNKNOWN
+    @CARP_NOT
 };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 {
     # Names of classes containing tokenization machinery. There are few

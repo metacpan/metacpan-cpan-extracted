@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::OpenSsh ;
-$Config::Model::OpenSsh::VERSION = '1.238';
+$Config::Model::OpenSsh::VERSION = '1.239';
 use Config::Model 2.111;
 
 1;
@@ -27,7 +27,7 @@ Config::Model::OpenSsh - OpenSSH config editor
 
 =head1 VERSION
 
-version 1.238
+version 1.239
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2008-2014 by Dominique Dumont.
+This software is Copyright (c) 2008-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 
@@ -160,7 +160,7 @@ L<http://cpants.cpanauthors.org/dist/Config-Model-OpenSsh>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/C/Config-Model-OpenSsh>
 

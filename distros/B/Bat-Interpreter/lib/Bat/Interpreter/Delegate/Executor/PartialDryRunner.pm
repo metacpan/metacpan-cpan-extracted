@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::Executor';
 
-our $VERSION = '0.004';    # VERSION
+our $VERSION = '0.005';    # VERSION
 
 has 'commands_executed' => ( is      => 'ro',
                              isa     => 'ArrayRef',
@@ -45,7 +45,7 @@ Bat::Interpreter::Delegate::Executor::PartialDryRunner
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

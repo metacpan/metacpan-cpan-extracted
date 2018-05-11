@@ -25,6 +25,15 @@ The constructor method.
 
 connection\_string parameter that is a "CONNECTION STRING" of "Access Policy" from azure portal is required. 
 
+If you want to specify \`endpoint\`, \`shared\_access\_key\_name\`, \`shared\_access\_key\`, and \`entity\_path\` manually, you can it like as following.
+
+    my $sas = Net::Azure::Authorization::SAS->new(
+        endpoint               => 'sb://...',
+        shared_access_key_name => 'application',
+        shared_access_key      => 'YourSharedAccessKey.....',
+        entity_path            => 'myentity' ### -> optional
+    )
+
 ## token
 
     my $token = $sas->token($url);

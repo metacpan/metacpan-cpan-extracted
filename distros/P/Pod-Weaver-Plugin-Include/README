@@ -3,7 +3,7 @@ NAME
     from other files
 
 VERSION
-    version v0.1.5
+    version v0.1.9
 
 SYNOPSIS
         # weaver.ini
@@ -227,13 +227,32 @@ DESCRIPTION
     insert_errors
         Insert some error message into the resulting Pod.
 
+ATTRIBUTES
+  pod_path
+    List of directories to look for pods in.
+
+  insert_errors
+    Set to *true* if some errors are to be included into the output.
+
+METHODS
+  prepare_input
+    See "IMPLEMENTING" in Pod::Weaver::Role::Preparer.
+
+  translate_dialect
+    See "IMPLEMENTING" in Pod::Weaver::Role::Dialect.
+
+  init_pod_path
+    Initializer for pod_path attribute.
+
+  init_insert_errors
+    Initializer for insert_errors attribute.
+
 AUTHOR
     Vadim Belman <vrurg@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Vadim Belman.
+    This software is copyright (c) 2017 by Vadim Belman.
 
-    This is free software, licensed under:
-
-      The (three-clause) BSD License
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

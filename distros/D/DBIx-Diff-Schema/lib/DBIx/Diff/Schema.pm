@@ -1,12 +1,11 @@
 package DBIx::Diff::Schema;
 
-our $DATE = '2017-08-13'; # DATE
-our $VERSION = '0.090'; # VERSION
+our $DATE = '2018-05-10'; # DATE
+our $VERSION = '0.091'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use List::Util qw(first);
@@ -77,22 +76,31 @@ sub _list_tables {
     my @res;
     my $sth = $dbh->table_info(undef, undef, undef, undef);
     while (my $row = $sth->fetchrow_hashref) {
-        next if $row->{TABLE_TYPE} eq 'VIEW';
-        next if $row->{TABLE_TYPE} eq 'INDEX';
-        next if $row->{TABLE_SCHEM} =~ /^(information_schema)$/;
+        my $name  = $row->{TABLE_NAME};
+        my $type  = $row->{TABLE_TYPE};
+        my $schem = $row->{TABLE_SCHEM};
+
+        if ($driver eq 'mysql') {
+            # mysql driver returns database name as schema, so that's useless
+            $schem = '';
+        }
+
+        next if $type eq 'VIEW';
+        next if $type eq 'INDEX';
+        next if $schem =~ /^(information_schema)$/;
 
         if ($driver eq 'Pg') {
-            next if $row->{TABLE_SCHEM} =~ /^(pg_catalog)$/;
+            next if $schem =~ /^(pg_catalog)$/;
         } elsif ($driver eq 'SQLite') {
-            next if $row->{TABLE_SCHEM} =~ /^(temp)$/;
-            next if $row->{TABLE_NAME} =~ /^(sqlite_master|sqlite_temp_master)$/;
+            next if $schem =~ /^(temp)$/;
+            next if $name =~ /^(sqlite_master|sqlite_temp_master)$/;
         }
 
         push @res, join(
             "",
-            $row->{TABLE_SCHEM},
-            length($row->{TABLE_SCHEM}) ? "." : "",
-            $row->{TABLE_NAME},
+            $schem,
+            length($schem) ? "." : "",
+            $name,
         );
     }
     sort @res;
@@ -102,7 +110,13 @@ sub _list_columns {
     my ($dbh, $table) = @_;
 
     my @res;
-    my ($schema, $utable) = split /\./, $table;
+    my ($schema, $utable);
+    if ($table =~ /\./) {
+        ($schema, $utable) = split /\./, $table;
+    } else {
+        $schema = undef;
+        $utable = $table;
+    }
     my $sth = $dbh->column_info(undef, $schema, $utable, undef);
     while (my $row = $sth->fetchrow_hashref) {
         push @res, $row;
@@ -292,19 +306,19 @@ sub diff_db_schema {
     log_trace("tables2: %s ...", \@tables2);
 
     my (@added, @deleted, %modified);
-    for (@tables1) {
-        if ($_ ~~ @tables2) {
+    for my $t (@tables1) {
+        if (grep {$_ eq $t} @tables2) {
             #$log->tracef("Comparing table %s ...", $_);
-            my $tres = _diff_table_schema($dbh1, $dbh2, $_, $_);
-            $modified{$_} = $tres if %$tres;
+            my $tres = _diff_table_schema($dbh1, $dbh2, $t, $t);
+            $modified{$t} = $tres if %$tres;
         } else {
-            push @deleted, $_;
+            push @deleted, $t;
         }
     }
-    for (@tables2) {
-        if ($_ ~~ @tables1) {
+    for my $t (@tables2) {
+        if (grep {$_ eq $t} @tables1) {
         } else {
-            push @added, $_;
+            push @added, $t;
         }
     }
 
@@ -353,7 +367,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.090 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2017-08-13.
+This document describes version 0.091 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2018-05-10.
 
 =head1 SYNOPSIS
 
@@ -580,7 +594,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

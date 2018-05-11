@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.238.1';
+$Config::Model::Backend::Systemd::VERSION = '0.238.2';
 use strict;
 use warnings;
 use 5.010;
@@ -20,6 +20,7 @@ extends 'Config::Model::Backend::Any';
 with 'Config::Model::Backend::Systemd::Layers';
 
 my $logger = get_logger("Backend::Systemd");
+my $user_logger = get_logger("User");
 
 has config_dir => (
     is => 'rw',
@@ -67,7 +68,6 @@ sub read_systemd_files {
     # config_dir => /etc/foo',    # absolute path
     # config_file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     #use Tk::ObjScanner; Tk::ObjScanner::scan_object(\%args) ;
@@ -79,7 +79,7 @@ sub read_systemd_files {
         );
     }
 
-    $logger->warn( "Loading unit file '$file'");
+    $user_logger->warn( "Loading unit file '$file'");
     my ($service_name, $unit_type) =  split /\./, path($file)->basename;
 
     my @to_create = $unit_type ? ($unit_type) : @service_types;
@@ -112,15 +112,17 @@ sub read_systemd_units {
     }
 
     if ($select_unit ne '*') {
-        $logger->warn( "Loading unit matching '$select_unit'");
+        $user_logger->warn( "Loading unit matching '$select_unit'");
     } else {
-        $logger->warn("Loading all units...")
+        $user_logger->warn("Loading all units...")
     }
+
+    my $root_path = $args{root} || path('/');
 
     # load layers. layered mode is handled by Unit backend. Only a hash
     # key is created here, so layered mode does not matter
     foreach my $layer ($self->default_directories) {
-        my $dir = path ($args{root}.$layer);
+        my $dir = $root_path->child($layer);
         next unless $dir->is_dir;
         $self->config_dir($dir);
 
@@ -138,7 +140,7 @@ sub read_systemd_units {
         }
     }
 
-    my $dir = path($args{root}.$args{config_dir});
+    my $dir = $root_path->child($args{config_dir});
 
     if (not $dir->is_dir) {
         $logger->debug("skipping missing directory $dir");
@@ -188,13 +190,13 @@ sub write {
     # config_dir => /etc/foo',    # absolute path
     # file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     # file write is handled by Unit backend
     return 1 if $self->instance->application =~ /file/;
 
-    my $dir = path($args{root}.$args{config_dir});
+    my $root_path = $args{root} || path('/');
+    my $dir = $args{root}->path($args{config_dir});
     die "Unknown directory $dir" unless $dir->is_dir;
 
     my $select_unit = $self->get_backend_arg;
@@ -208,7 +210,7 @@ sub write {
 
         my $unit_collection = $self->node->fetch_element($unit_type);
         if (not $unit_collection->defined($unit_name)) {
-            $logger->warn("removing file $file of deleted service");
+            $user_logger->warn("removing file $file of deleted service");
             $file->remove;
         }
     }
@@ -235,7 +237,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.238.1
+version 0.238.2
 
 =head1 SYNOPSIS
 

@@ -37,4 +37,4 @@ my $e = exception {
 	);
 };
 
-like($e, qr{^Value "baz" did not pass type constraint});
+like($e, qr{baz});

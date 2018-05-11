@@ -47,10 +47,10 @@ use warnings;
 use base qw{ PPIx::Regexp::Token };
 
 use PPI::Document;
-use PPIx::Regexp::Constant qw{ COOKIE_REGEX_SET };
+use PPIx::Regexp::Constant qw{ COOKIE_REGEX_SET @CARP_NOT };
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 use constant VERSION_WHEN_IN_REGEX_SET => undef;

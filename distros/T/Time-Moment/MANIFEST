@@ -76,6 +76,7 @@ t/200_compare.t
 t/300_strftime.t
 t/400_with.t
 t/410_with_offset.t
+t/411_with_adjusters.t
 t/415_precision.t
 t/420_at.t
 t/430_length.t

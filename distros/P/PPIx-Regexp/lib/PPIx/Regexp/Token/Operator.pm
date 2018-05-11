@@ -39,10 +39,11 @@ use PPIx::Regexp::Constant qw{
     COOKIE_CLASS COOKIE_REGEX_SET
     LITERAL_LEFT_CURLY_ALLOWED
     TOKEN_LITERAL
+    @CARP_NOT
 };
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 

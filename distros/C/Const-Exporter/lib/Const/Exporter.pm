@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 use Carp;
 use Const::Fast;
@@ -153,10 +153,12 @@ sub import {
 sub _check_sigil_against_value {
     my ($sigil, $value) = @_;
 
-    return 0 if $sigil eq '@' && !is_arrayref($value);
-    return 0 if $sigil eq '%' && !is_hashref($value);
+    return 1 if $sigil eq '@' && is_arrayref($value);
+    return 1 if $sigil eq '%' && is_hashref($value);
+    return 1 if $sigil eq '&' && is_coderef($value);
+    return 1 if $sigil eq '$';
 
-    return 1;
+    return 0;
 }
 
 sub _add_symbol {
@@ -210,8 +212,8 @@ sub _export_symbol {
 
 sub _get_sigil {
     my ($symbol) = @_;
-    $symbol =~ /^(\W)/;
-    return $1 // '&';
+    my ($sigil) = $symbol =~ /^(\W)/;
+    return $sigil // '&';
 }
 
 # Function to take a list reference and prune duplicate elements from
@@ -240,7 +242,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 

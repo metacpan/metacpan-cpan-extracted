@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '1.0.0';
+$Main::VERSION = '1.0.2';
 # PODNAME: koha-ark
 # ABSTRACT: Manage ARK identifiers in a Koha Catalog
 
@@ -12,11 +12,12 @@ use Koha::Contrib::ARK;
 
 binmode(STDOUT, ':encoding(UTF8)');
 
-my ($help, $verbose, $doit) = (0, 0, 0);
+my ($help, $verbose, $doit, $log) = (0, 1, 0, 'info');
 GetOptions( 
-    'verbose|v' => \$verbose,
-    'doit'      => \$doit,
-    'help|h'    => \$help,
+    'verbose!' => \$verbose,
+    'doit'     => \$doit,
+    'help|h'   => \$help,
+    'log=s'    => \$log,
 );
 
 sub usage {
@@ -33,6 +34,7 @@ usage() if $cmd !~ /clear|update|check/;
 my $ark = Koha::Contrib::ARK->new(
     cmd          => $cmd,
     log_filename => 'koha-ark.log',
+    loglevel     => $log,
     verbose      => $verbose,
     doit         => $doit,
 );
@@ -50,7 +52,7 @@ koha-ark - Manage ARK identifiers in a Koha Catalog
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 DESCRIPTION
 
@@ -128,7 +130,8 @@ C<9877> biblionumber will have this in 003 field:
 =head1 SYNOPSYS
 
  koha-ark clear --doit
- koha-ark update --verbose --doit
+ koha-ark update --noverbose --doit
+ koha-ark update --log debug
 
 =head1 USAGE
 
@@ -146,10 +149,18 @@ C<9877> biblionumber will have this in 003 field:
 
 Without this parameter biblio records are not modified in Koha Catalog.
 
-=item B<--verbose|-v>
+=item B<--verbose>
 
-Enable script verbose mode. Biblio records are displayed before/after
-processing.
+Enable script verbose mode. Verbose by default. --noverbose disable verbosity.
+In verbose mode, a progress bar is displayed.
+
+=item B<--log>
+
+The log level. Info about processing is sent to a file named 'koha-ark.log' in
+the current directory. This parameter controls the log level of the info sent
+to this file. Values: debug, info, error. By default, 'info'. With 'error',
+nothing is logged except fatal errors, like ARK_CONF bad syntax. With 'debug',
+a lot of information is produced, like biblio records before/after processing.
 
 =item B<--help|-h>
 

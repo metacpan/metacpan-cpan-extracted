@@ -1,0 +1,85 @@
+NAME
+    App::fiatx - Convert two currencies using current rate
+
+VERSION
+    This document describes version 0.002 of App::fiatx (from Perl
+    distribution App-fiatx), released on 2018-05-10.
+
+SYNOPSIS
+    See the included script fiatx.
+
+FUNCTIONS
+  convert
+    Usage:
+
+     convert(%args) -> [status, msg, result, meta]
+
+    Convert two currencies using current rate.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   amount => *num* (default: 1)
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   from* => *currency::code*
+
+    *   max_age_cache => *posint* (default: 14400)
+
+        Above this age (in seconds), we retrieve rate from remote source
+        again.
+
+    *   max_age_current => *posint* (default: 86400)
+
+        Above this age (in seconds), we no longer consider the rate to be
+        "current" but "historical".
+
+    *   to* => *currency::code*
+
+    *   type => *str* (default: "sell")
+
+        Which rate is wanted? e.g. sell, buy.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-fiatx>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-fiatx>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-fiatx>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Finance::Currency::FiatX
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -4,7 +4,7 @@
       "Stephen Howard <stephen@enterity.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "mit"
    ],
@@ -36,20 +36,20 @@
    "provides" : {
       "Model::Envoy" : {
          "file" : "lib/Model/Envoy.pm",
-         "version" : "0.1"
+         "version" : "v0.1.1"
       },
       "Model::Envoy::Meta::Attribute::Trait::Envoy" : {
          "file" : "lib/Model/Envoy.pm"
       },
       "Model::Envoy::Set" : {
          "file" : "lib/Model/Envoy/Set.pm",
-         "version" : "0.1"
+         "version" : "v0.1.1"
       },
       "Model::Envoy::Storage::DBIC" : {
          "file" : "lib/Model/Envoy/Storage/DBIC.pm",
-         "version" : "0.1"
+         "version" : "v0.1.1"
       },
-      "Moose::Meta::Attribute::Custom::Trait::DBIC" : {
+      "Moose::Meta::Attribute::Custom::Trait::EDBIC" : {
          "file" : "lib/Model/Envoy/Storage/DBIC.pm"
       },
       "Moose::Meta::Attribute::Custom::Trait::Envoy" : {
@@ -60,5 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1"
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

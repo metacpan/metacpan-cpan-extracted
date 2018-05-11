@@ -53,11 +53,12 @@ use PPIx::Regexp::Constant qw{
     ARRAY_REF
     HASH_REF
     STRUCTURE_UNKNOWN
+    @CARP_NOT
 };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use constant ELEMENT_UNKNOWN => STRUCTURE_UNKNOWN;
 

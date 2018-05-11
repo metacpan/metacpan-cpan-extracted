@@ -58,10 +58,11 @@
 #!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
 
-\.releaserc$
-\.lwpcookies$
-\.svnignore$
-\.travis.yml$
+\.travis\.yml
+\.?appveyor.yml
+\.releaserc
+\.lwpcookies
+
 \.tgz$
 \.tar\.gz
 Tie-.*

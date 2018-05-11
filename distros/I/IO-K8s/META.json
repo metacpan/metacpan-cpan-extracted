@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -59,8 +59,8 @@
          "web" : "https://github.com/pplu/io-k8s-p5.git"
       }
    },
-   "version" : "0.01",
-   "x_generated_by_perl" : "v5.22.1",
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.20.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

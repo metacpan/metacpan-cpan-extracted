@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.69';
+our $VERSION ='0.70';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -876,6 +876,20 @@ my $const = {
         
         PCA_9685_SERVO_DIRECTION_CW => 1,
         PCA_9685_SERVO_DIRECTION_AC => 2,
+    },
+    
+    oled => {
+        SSD1306_128_X_64_I2C  => 0x01 + 0x04 + 0x08 + 0x20,
+        SSD1306_128_X_32_I2C  => 0x01 + 0x04 + 0x10 + 0x20,
+        
+        SH1106_128_X_64_I2C   => 0x02 + 0x04 + 0x08 + 0x20,
+        SH1106_128_X_32_I2C   => 0x02 + 0x04 + 0x10 + 0x20,
+        
+        SSD1306_128_X_64_SPI  => 0x01 + 0x04 + 0x08 + 0x40,
+        SSD1306_128_X_32_SPI  => 0x01 + 0x04 + 0x10 + 0x40,
+        
+        SH1106_128_X_64_SPI   => 0x02 + 0x04 + 0x08 + 0x40,
+        SH1106_128_X_32_SPI   => 0x02 + 0x04 + 0x10 + 0x40,
     },
 };
 

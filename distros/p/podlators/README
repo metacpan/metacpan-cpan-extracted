@@ -1,8 +1,8 @@
-                              podlators 4.10
+                              podlators 4.11
              (format POD source into various output formats)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1999-2010, 2012-2017 Russ Allbery <rra@cpan.org>.  This
+  Copyright 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>.  This
   software is distributed under the same terms as Perl itself.  Please see
   the section LICENSE below for more information.
 
@@ -80,13 +80,6 @@ REQUIREMENTS
   All are available on CPAN.  Those tests will be skipped if the modules
   are not available.
 
-  To enable tests that don't detect functionality problems but are used to
-  sanity-check the release, set the environment variable RELEASE_TESTING
-  to a true value.  To enable tests that may be sensitive to the local
-  environment or that produce a lot of false positives without uncovering
-  many problems, set the environment variable AUTHOR_TESTING to a true
-  value.
-
 BUILDING AND INSTALLATION
 
   podlators uses ExtUtils::MakeMaker and can be installed using the same
@@ -99,6 +92,13 @@ BUILDING AND INSTALLATION
 
   You'll probably need to do the last as root unless you're installing
   into a local Perl module tree in your home directory.
+
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
 
 SUPPORT
 
@@ -143,7 +143,7 @@ LICENSE
   The podlators package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 1999-2010, 2012-2017 Russ Allbery <rra@cpan.org>
+    Copyright 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>
 
     This program is free software; you may redistribute it and/or modify
     it under the same terms as Perl itself.  This means that you may
@@ -156,6 +156,11 @@ LICENSE
   package license but which may require preservation of additional
   notices.  All required notices, and detailed information about the
   licensing of each file, are recorded in the LICENSE file.
+
+  Files covered by a license with an assigned SPDX License Identifier
+  include SPDX-License-Identifier tags to enable automated processing of
+  license information.  See https://spdx.org/licenses/ for more
+  information.
 
   For any copyright range specified by files in this package as YYYY-ZZZZ,
   the range specifies every single year in that closed interval.

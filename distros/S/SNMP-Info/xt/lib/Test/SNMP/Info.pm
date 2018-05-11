@@ -457,6 +457,111 @@ sub i_speed_raw : Tests(3) {
     $expected, 'Munges restored after i_speed_raw() call');
 }
 
+sub ip_index : Tests(4) {
+  my $test = shift;
+
+  can_ok($test->{info}, 'ip_index');
+
+  my $cache_data = {
+    '_old_ip_index' => 1,    
+    '_new_ip_index' => 1,
+    '_new_ip_type'  => 1,
+    'store'        => {
+      'old_ip_index' =>
+        {'2.3.4.5' => 7, '2.2.2.2' => 11},
+      'new_ip_index' =>
+        {'1.4.1.2.3.4' => 6, '1.4.10.255.255.255' => 8, '1.4.8.8.8.8' => 10},
+      'new_ip_type' =>
+        {'1.4.1.2.3.4' => 'unicast', '1.4.10.255.255.255' => 'broadcast', '1.4.8.8.8.8' => 'unicast'},
+    }
+  };
+  $test->{info}->cache($cache_data);
+
+  my $expected = {'2.3.4.5' => 7, '2.2.2.2' => 11};
+
+  cmp_deeply($test->{info}->ip_index(),
+    $expected, q(IP addresses mapped to 'ifIndex' using old 'ipAddrTable'));
+
+  delete $test->{info}{_old_ip_index};
+  $expected = {'1.2.3.4' => 6, '8.8.8.8' => 10};
+
+  cmp_deeply($test->{info}->ip_index(),
+    $expected, q(IP addresses mapped to 'ifIndex' using new 'ipAddressTable'));
+
+  $test->{info}->clear_cache();
+  cmp_deeply($test->{info}->ip_index(), {}, q(No data returns empty hash));
+}
+
+sub ip_table : Tests(4) {
+  my $test = shift;
+
+  can_ok($test->{info}, 'ip_table');
+
+  my $cache_data = {
+    '_old_ip_table' => 1,    
+    '_new_ip_index' => 1,
+    '_new_ip_type'  => 1,
+    'store'        => {
+      'old_ip_table' =>
+        {'2.3.4.5' => '2.3.4.5', '2.2.2.2' => '2.2.2.2'},
+      'new_ip_index' =>
+        {'1.4.1.2.3.4' => 6, '1.4.10.255.255.255' => 8, '1.4.8.8.8.8' => 10},
+      'new_ip_type' =>
+        {'1.4.1.2.3.4' => 'unicast', '1.4.10.255.255.255' => 'broadcast', '1.4.8.8.8.8' => 'unicast'},
+    }
+  };
+  $test->{info}->cache($cache_data);
+
+  my $expected = {'2.3.4.5' => '2.3.4.5', '2.2.2.2' => '2.2.2.2'};
+
+  cmp_deeply($test->{info}->ip_table(),
+    $expected, q(IP addresses using old 'ipAddrTable'));
+
+  delete $test->{info}{_old_ip_table};
+  $expected = {'1.2.3.4' => '1.2.3.4', '8.8.8.8' => '8.8.8.8'};
+
+  cmp_deeply($test->{info}->ip_table(),
+    $expected, q(IP addresses using new 'ipAddressTable'));
+
+  $test->{info}->clear_cache();
+  cmp_deeply($test->{info}->ip_table(), {}, q(No data returns empty hash));
+}
+
+sub ip_netmask : Tests(4) {
+  my $test = shift;
+
+  can_ok($test->{info}, 'ip_netmask');
+
+  my $cache_data = {
+    '_old_ip_netmask' => 1,    
+    '_new_ip_prefix' => 1,
+    '_new_ip_type'  => 1,
+    'store'        => {
+      'old_ip_netmask' =>
+        {'2.3.4.5' => '255.255.255.0', '2.2.2.2' => '255.255.0.0'},
+      'new_ip_prefix' =>
+        {'1.4.1.2.3.4' => 'IP-MIB::ipAddressPrefixOrigin.2.ipv4."1.2.3.0".24', '1.4.10.2.3.4' => '.1.3.6.1.2.1.4.32.1.5.6.1.4.10.0.0.0.8', '1.4.8.8.8.8' => '.0.0'},
+      'new_ip_type' =>
+        {'1.4.1.2.3.4' => 'unicast', '1.4.10.2.3.4' => 'unicast', '1.4.8.8.8.8' => 'unicast'},
+    }
+  };
+  $test->{info}->cache($cache_data);
+
+  my $expected = {'2.3.4.5' => '255.255.255.0', '2.2.2.2' => '255.255.0.0'};
+
+  cmp_deeply($test->{info}->ip_netmask(),
+    $expected, q(IP netmask using old 'ipAddrTable'));
+
+  delete $test->{info}{_old_ip_netmask};
+  $expected = {'1.2.3.4' => '255.255.255.0', '10.2.3.4' => '255.0.0.0'};
+
+  cmp_deeply($test->{info}->ip_netmask(),
+    $expected, q(IP netmask using new 'ipAddressTable'));
+
+  $test->{info}->clear_cache();
+  cmp_deeply($test->{info}->ip_netmask(), {}, q(No data returns empty hash));
+}
+
 # Topo routines will need to be tested in sub classes for conditionals
 sub has_topo : Tests(2) {
   my $test = shift;
@@ -779,6 +884,32 @@ sub munge_e_type : Tests(3) {
   # Bogus OID
   is(SNMP::Info::munge_e_type('.100.3.6.1.2.1.11.4'),
     '.100.3.6.1.2.1.11.4', 'OID returned when unable to translate');
+}
+
+sub resolve_desthost : Tests(6) {
+  my $test = shift;
+
+  can_ok($test->{info}, 'resolve_desthost');
+
+  is(SNMP::Info::resolve_desthost('1.2.3.4'),
+    '1.2.3.4', 'IPv4 address returns unchanged');
+
+  is(SNMP::Info::resolve_desthost('::1.2.3.4'),
+    'udp6:0:0:0:0:0:0:102:304', q(IPv6 address returns with 'udp6:' prefix));
+
+  is(
+    SNMP::Info::resolve_desthost('udp6:fe80::2d0:b7ff:fe21:c6c0'),
+    'udp6:fe80:0:0:0:2d0:b7ff:fe21:c6c0',
+    q(Net-SNMP example with 'udp6:' prefix returns expected string)
+  );
+
+  is(
+    SNMP::Info::resolve_desthost('fe80::2d0:b7ff:fe21:c6c0'),
+    'udp6:fe80:0:0:0:2d0:b7ff:fe21:c6c0',
+    q(Net-SNMP example IPv6 address returns with 'udp6:' prefix)
+  );
+  
+  dies_ok { SNMP::Info::resolve_desthost('1.2.3.4.5') } 'Bad IP dies';
 }
 
 sub init : Tests(3) {
@@ -1299,10 +1430,10 @@ sub private_load_attr : Tests(18) {
     'IF-MIB::ifCounterDiscontinuityTime' => {0 => 'NOSUCHINSTANCE'},
     'IF-MIB::ifHCOutOctets' =>
       {1 => 0, 2 => 1828306359704, 3 => 1002545943585, 4 => 'ENDOFMIBVIEW'},
-    
+
     # Tables to test partial and full OIDs
-    '.1.3.6.1.4.1.171.12.1.1.12' => {1 => 'partial', 2 => 'oid', 3 => 'data'},
-    '.100.3.6.1.4.1.171.12.1.1.12' => {2 => 'full', 3 => 'oid', 4 => 'leaf'},
+    '.1.3.6.1.4.1.171.12.1.1.12'   => {1 => 'partial', 2 => 'oid', 3 => 'data'},
+    '.100.3.6.1.4.1.171.12.1.1.12' => {2 => 'full',    3 => 'oid', 4 => 'leaf'},
   };
 
   # Load cache with data to for initial tests
@@ -1418,13 +1549,13 @@ sub private_load_attr : Tests(18) {
 
   cmp_deeply($test->{info}->cache(),
     $expected_cache, 'Cache contains expected data');
-  
+
   # Test OID based table fetches
   # This is from Layer3::DLink will only partially resolve
   $test->{info}{funcs}{partial_oid} = '.1.3.6.1.4.1.171.12.1.1.12';
 
   my $expected_p_oid_data = {1 => 'partial', 2 => 'oid', 3 => 'data'};
-  
+
   cmp_deeply($test->{info}->partial_oid(),
     $expected_p_oid_data, 'Partial translated OID leaf returns expected data');
 
@@ -1432,7 +1563,7 @@ sub private_load_attr : Tests(18) {
   $test->{info}{funcs}{full_oid} = '.100.3.6.1.4.1.171.12.1.1.12';
 
   my $expected_f_oid_data = {2 => 'full', 3 => 'oid', 4 => 'leaf'};
-  
+
   cmp_deeply($test->{info}->full_oid(),
     $expected_f_oid_data, 'Full OID leaf returns expected data');
 }

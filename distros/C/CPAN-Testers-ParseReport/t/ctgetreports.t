@@ -725,7 +725,7 @@ sub reportedvariableis ($$$$) {
 
 {
     BEGIN {
-        $plan += 8;
+        $plan += 10;
     }
     my $id = 94682624;
     my %Opt = (
@@ -751,6 +751,8 @@ sub reportedvariableis ($$$$) {
     reportedvariableis $extract, $id, 'conf:d_sfio', 'undef';
     reportedvariableis $extract, $id, 'conf:bincompat5005', 'undef';
     reportedvariableis $extract, $id, 'mod:File::Path', '2.15';
+    reportedvariableis $extract, $id, 'meta:from', 'Chris Williams (BINGOS)';
+    reportedvariableis $extract, $id, 'meta:date', '2018-04-28T01:07:29';
 }
 
 unlink "ctgetreports.out";

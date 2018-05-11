@@ -11,7 +11,7 @@ use Getopt::Long qw(GetOptionsFromArray :config bundling noignore_case);
 use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 sub arg_opts {
     my $self = shift;
@@ -106,7 +106,7 @@ sub load_struct {
     my ($self, $uri, $fmt) = @_;
 
     log_trace { ref $uri ? "Reading from STDIN" : "Loading '$uri'" };
-    s_load($uri, $fmt) or return undef;
+    s_load($uri, $fmt);
 }
 
 sub new {

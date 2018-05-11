@@ -337,3 +337,12 @@ currently doesn't have E<> escapes for.
 .    ds oe oe
 .    ds Oe OE
 .\}
+
+                      ------------------------------
+
+Copyright 2001, 2003, 2016, 2018 Russ Allbery <rra@cpan.org>
+
+This file is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl

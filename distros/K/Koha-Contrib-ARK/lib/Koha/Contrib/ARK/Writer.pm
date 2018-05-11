@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Writer;
-$Koha::Contrib::ARK::Writer::VERSION = '1.0.0';
-# ABSTRACT: Read Koha biblio records with/without ARK
+$Koha::Contrib::ARK::Writer::VERSION = '1.0.2';
+# ABSTRACT: Write biblio records into Koha Catalog
 use Moose;
 
 with 'MooseX::RW::Writer';
@@ -22,7 +22,7 @@ sub write {
         my $fc = GetFrameworkCode($biblionumber);
         ModBiblio( $record->as('Legacy'), $biblionumber, $fc );
     }
-    $self->ark->log->info("BIBLIO AFTER PROCESSING:\n", $record->as('Text'));
+    $self->ark->log->debug("BIBLIO AFTER PROCESSING:\n", $record->as('Text'));
 }
 
 
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-Koha::Contrib::ARK::Writer - Read Koha biblio records with/without ARK
+Koha::Contrib::ARK::Writer - Write biblio records into Koha Catalog
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 ATTRIBUTES
 

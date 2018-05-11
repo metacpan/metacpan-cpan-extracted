@@ -1,7 +1,7 @@
 package IO::K8s;
   use Moose;
 
-  our $VERSION = '0.01';
+  our $VERSION = '0.02';
 
   use Moose::Util qw/find_meta/;
   use Module::Runtime qw/require_module/;
@@ -34,7 +34,7 @@ package IO::K8s;
     foreach my $class_att ($class_meta->get_all_attributes) {
       my $att_name = $class_att->name;
 
-      next if (not exists $params->{ $att_name });
+      next if (not defined $params->{ $att_name });
 
       if ($class_att->type_constraint->is_a_type_of('ArrayRef')) {
         my $inner_type = $class_att->type_constraint->type_parameter;

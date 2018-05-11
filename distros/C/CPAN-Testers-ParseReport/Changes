@@ -1,3 +1,8 @@
+0.4.4 2018-05-09  k  <andk@cpan.org>
+
+	* Repair more impacts of the recently changed formatting of the
+	reports coming from cpantesters (meta:from and meta:date)
+
 0.4.3 2018-04-28  k  <andk@cpan.org>
 
 	* Add missing new test file to MANIFEST, so that it gets included.

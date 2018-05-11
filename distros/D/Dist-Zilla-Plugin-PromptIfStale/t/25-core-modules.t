@@ -66,7 +66,6 @@ my $tzil = Builder->from_config(
             ),
             path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
         },
-        also_copy => { 't/lib' => 't/lib' },
     },
 );
 

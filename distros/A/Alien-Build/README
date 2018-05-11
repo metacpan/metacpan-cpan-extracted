@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.41
+    version 1.42
 
 SYNOPSIS
 
@@ -280,7 +280,8 @@ PROPERTIES
 
       prefix
 
-	The prefix for the previous install.
+	The prefix for the previous install. Versions prior to 1.42
+	unfortunately had this in typo form of preifx.
 
       runtime
 
@@ -840,6 +841,8 @@ AUTHOR
     Duke Leto (LETO)
 
     Shoichi Kaji (SKAJI)
+
+    Shawn Laffan (SLAFFAN)
 
 COPYRIGHT AND LICENSE
 

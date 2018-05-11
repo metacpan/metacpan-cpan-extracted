@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2008-2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -59,12 +59,14 @@ my $build = $class->new
    dist_author   => "Dominique Dumont (ddumont at cpan dot org)",
    dist_abstract => "OpenSsh configuration files graphical editor",
    appli_files   => \%appli_files ,
- 
+
   'build_requires' => {
     'Config::Model::BackendMgr' => '0',
-    'Config::Model::Tester' => '2.042',
+    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester::Setup' => '0',
     'English' => '0',
     'Module::Build' => '0.34',
+    'Path::Tiny' => '0',
     'Test::Differences' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0'
@@ -78,7 +80,7 @@ my $build = $class->new
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.111',
+    'Config::Model' => '2.123',
     'Config::Model::Backend::Any' => '0',
     'File::Copy' => '0',
     'File::HomeDir' => '0',
@@ -89,7 +91,7 @@ my $build = $class->new
     'perl' => '5.010'
   },
 
-   add_to_cleanup => [qw/wr_test/] ,
+   add_to_cleanup => [qw/wr_root/] ,
   );
 
 

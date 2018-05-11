@@ -17,14 +17,25 @@ Plack::Middleware::Camelcadedb - interactive debugging for Plack applications
         $app;
     };
 
-=back
+You will also need to configure remote debugging in IntelliJ as described in the
+L<Debugging|https://github.com/Camelcade/Perl5-IDEA/wiki/Perl-Debugger>
+section of the L<Camelcade plugin|https://github.com/Camelcade/Perl5-IDEA/wiki>
+wiki.
+
+=head1 DESCRIPTION
+
+This module provides a thin integration layer on top of L<Devel::Camelcadedb>.
+
+At the beginning of each request, the middleware connects to IntelliJ to
+allow remote debugging. If IntelliJ is not running or not set up for debugging,
+execution continues as normal.
 
 =cut
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
     DEBUG_SINGLE_STEP_ON        =>  0x20,

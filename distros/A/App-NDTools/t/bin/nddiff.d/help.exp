@@ -33,14 +33,20 @@ Options:
         Print a help message and exit.
 
     --ifmt <JSON|YAML>
-        Force specified input format usage. Automatically choosed (using
-        file extension) if omitted.
+        Force specified input format usage. Will be selected automatically
+        (using file name extension) if omitted. YAML::XS should be installed
+        for YAML support.
 
     --ignore <path>
         Ignore substructure. May be used several times.
 
     --json
         Use JSON as output diff format.
+
+    --ofmt <JSON|YAML>
+        Force specified output format usage. JSON is used by default;
+        YAML::XS should be installed for YAML support, see "LIMITATIONS" in
+        App::NDTools for more info.
 
     --[no]pretty
         On/Off pretty-print for JSON. Enabled by default.

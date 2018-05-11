@@ -100,7 +100,6 @@ sub do_tests
                 ),
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
             },
-            also_copy => { 't/corpus' => 't/lib' },
         },
     );
 
@@ -113,9 +112,9 @@ sub do_tests
     my $prompt1 = 'Unindexed6 is not indexed. Continue anyway?';
     $tzil->chrome->set_response_for($prompt1, 'n');
 
-    # ensure we find the library, not in a local directory, before we change directories
+    # ensure we find the libraries in @INC, but not local to the build
     local @INC = @INC;
-    unshift @INC, path($tzil->tempdir, qw(t lib))->stringify;
+    unshift @INC, path(qw(t corpus))->absolute->stringify;
 
     if (not $checked_app++)
     {

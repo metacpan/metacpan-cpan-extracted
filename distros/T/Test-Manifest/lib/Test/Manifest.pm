@@ -4,16 +4,15 @@ use strict;
 use warnings;
 no warnings;
 
-use base qw(Exporter);
-use vars qw(@EXPORT_OK @EXPORT $VERSION);
+use Exporter qw(import);
 
 use Carp qw(carp);
 use File::Spec::Functions qw(catfile);
 
-@EXPORT    = qw(run_t_manifest);
-@EXPORT_OK = qw(get_t_files make_test_manifest manifest_name);
+our @EXPORT    = qw(run_t_manifest);
+our @EXPORT_OK = qw(get_t_files make_test_manifest manifest_name);
 
-$VERSION = '2.02';
+our $VERSION = '2.021';
 
 my %SeenInclude = ();
 my %SeenTest = ();
@@ -28,6 +27,8 @@ sub MY::test_via_harness {
 		   qq|'\$(INST_ARCHLIB)', \$(TEST_LEVEL) )"\n|;
 	};
 
+=encoding utf8
+
 =head1 NAME
 
 Test::Manifest - interact with a t/test_manifest file
@@ -39,7 +40,7 @@ Test::Manifest - interact with a t/test_manifest file
 
 	# in Build.PL
 	my $class = do {
-		if( eval "Test::Manifest 2.00" ) {
+		if( eval 'use Test::Manifest 2.00; 1' ) {
 			Test::Manifest->get_module_build_subclass;
 			}
 		else {
@@ -78,9 +79,9 @@ files to run and it will issue a warning.
 Optionally, you can add a number after the test name in test_manifest
 to define sets of tests. See C<get_t_files> for more information.
 
-=head2 ExtUtils::Makemaker
+=head2 ExtUtils::MakeMaker
 
-To override the test order behaviour in C<Makemaker>, C<Test::Manifest>
+To override the test order behaviour in C<MakeMaker>, C<Test::Manifest>
 inserts itself in the C<test_via_harness> step by providing its own
 test runner. In C<Makefile.PL>, all you have to do is load C<Test::Manifest>
 before you call C<WriteMakefile>. To make it optional, load it in an eval:
@@ -95,7 +96,7 @@ can load C<Test::Manifest> (version 2.00 or later), C<Test::Manifest> can
 create the subclass for you.
 
 	my $class = do {
-		if( eval 'Test::Manifest 2.00; 1' ) {
+		if( eval 'use Test::Manifest 2.00; 1' ) {
 			Test::Manifest->get_module_build_subclass;
 			}
 		else {
@@ -110,7 +111,7 @@ This is a bit of a problem when you already have your own subclass.
 C<Test::Manifest> overrides C<find_test_files>, so you can get just
 that code to add to your own subclass code string:
 
-	my $code = eval 'Test::Manifest 2.00; 1'
+	my $code = eval 'use Test::Manifest 2.00; 1'
 			?
 		Test::Manifest->get_module_build_code_string
 			:
@@ -194,7 +195,7 @@ sub get_module_build_code_string {
 
 =item run_t_manifest( TEST_VERBOSE, INST_LIB, INST_ARCHLIB, TEST_LEVEL )
 
-For C<Makemaker> only. You don't have to mess with this at the user
+For C<MakeMaker> only. You don't have to mess with this at the user
 level.
 
 Run all of the files in F<t/test_manifest> through C<Test::Harness:runtests>
@@ -314,7 +315,7 @@ sub _load_test_manifest {
 
 		next unless $_;
 
-		my( $command, $arg ) = split/\s+/, $_, 2;
+		my( $command, $arg ) = split /\s+/, $_, 2;
 		if( ';' eq substr( $command, 0, 1 ) ) {
 			if( $command eq ';include' ) {
 				my $result = _include_file( $arg, $., $upper_bound );
@@ -340,9 +341,10 @@ sub _load_test_manifest {
 			unless $level =~ m/^\d+(?:.\d+)?$/;
 		carp( "test file begins with t/ [$test]" ) if m|^t/|;
 
-		$test = catfile( "t", $test ) if -e catfile( "t", $test );
-
-		unless( -e $test ) {
+		if( -e catfile( "t", $test ) ) {
+			$test = catfile( "t", $test )
+			}
+		else {
 			carp( "test file [$test] does not exist! Skipping!" );
 			next;
 			}
@@ -435,16 +437,18 @@ This source is in Github:
 Matt Vanderpol suggested and supplied a patch for the C<;include>
 feature.
 
+Olivier Mengué supplied a documentation patch.
+
 =head1 AUTHOR
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2014 brian d foy. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

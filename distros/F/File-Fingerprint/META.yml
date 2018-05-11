@@ -1,0 +1,32 @@
+---
+abstract: 'Identify a file by its checksums and other attributes'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.95'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Fingerprint
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::CRC: '0'
+  File::MMagic: '0'
+  MD5: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/file-fingerprint/issues
+  homepage: https://github.com/briandfoy/file-fingerprint
+  repository: https://github.com/briandfoy/file-fingerprint.git
+version: '0.101'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

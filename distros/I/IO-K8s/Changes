@@ -1,2 +1,6 @@
+0.02 2018-05-08
+ - Kubernetes API sometimes returns key => undef. We handle this not initializing the attribute to undef,
+   since it's functionally the same to initialize it to undef or not initialize it
+
 0.01 2018-05-04
  - Initial release to an unsupecting world

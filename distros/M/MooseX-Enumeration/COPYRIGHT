@@ -6,14 +6,13 @@ Source: https://metacpan.org/release/MooseX-Enumeration
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
  lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
  lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
  lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
  lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: README
@@ -33,29 +32,32 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
 Copyright: Unknown
 License: Unknown
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/rt96312.t
 Copyright: This software is copyright (c) 2014 by Jason McIntosh.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

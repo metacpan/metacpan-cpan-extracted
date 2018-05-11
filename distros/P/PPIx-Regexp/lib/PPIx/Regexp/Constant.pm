@@ -3,9 +3,12 @@ package PPIx::Regexp::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '0.058';
-
 use base qw{ Exporter };
+
+# CAVEAT: do not include any other PPIx-Regexp modules in this one, or
+# you will end up with a circular dependency.
+
+our $VERSION = '0.059';
 
 our @EXPORT_OK = qw{
     ARRAY_REF
@@ -31,6 +34,76 @@ our @EXPORT_OK = qw{
     TOKEN_LITERAL
     TOKEN_UNKNOWN
     TRUE
+    @CARP_NOT
+};
+
+our @CARP_NOT = qw{
+    PPIx::Regexp
+    PPIx::Regexp::Constant
+    PPIx::Regexp::Dumper
+    PPIx::Regexp::Element
+    PPIx::Regexp::Lexer
+    PPIx::Regexp::Node
+    PPIx::Regexp::Node::Range
+    PPIx::Regexp::Node::Unknown
+    PPIx::Regexp::StringTokenizer
+    PPIx::Regexp::Structure
+    PPIx::Regexp::Structure::Assertion
+    PPIx::Regexp::Structure::Atomic_Script_Run
+    PPIx::Regexp::Structure::BranchReset
+    PPIx::Regexp::Structure::Capture
+    PPIx::Regexp::Structure::CharClass
+    PPIx::Regexp::Structure::Code
+    PPIx::Regexp::Structure::Main
+    PPIx::Regexp::Structure::Modifier
+    PPIx::Regexp::Structure::NamedCapture
+    PPIx::Regexp::Structure::Quantifier
+    PPIx::Regexp::Structure::RegexSet
+    PPIx::Regexp::Structure::Regexp
+    PPIx::Regexp::Structure::Replacement
+    PPIx::Regexp::Structure::Script_Run
+    PPIx::Regexp::Structure::Subexpression
+    PPIx::Regexp::Structure::Switch
+    PPIx::Regexp::Structure::Unknown
+    PPIx::Regexp::Support
+    PPIx::Regexp::Token
+    PPIx::Regexp::Token::Assertion
+    PPIx::Regexp::Token::Backreference
+    PPIx::Regexp::Token::Backtrack
+    PPIx::Regexp::Token::CharClass
+    PPIx::Regexp::Token::CharClass::POSIX
+    PPIx::Regexp::Token::CharClass::POSIX::Unknown
+    PPIx::Regexp::Token::CharClass::Simple
+    PPIx::Regexp::Token::Code
+    PPIx::Regexp::Token::Comment
+    PPIx::Regexp::Token::Condition
+    PPIx::Regexp::Token::Control
+    PPIx::Regexp::Token::Delimiter
+    PPIx::Regexp::Token::Greediness
+    PPIx::Regexp::Token::GroupType
+    PPIx::Regexp::Token::GroupType::Assertion
+    PPIx::Regexp::Token::GroupType::Atomic_Script_Run
+    PPIx::Regexp::Token::GroupType::BranchReset
+    PPIx::Regexp::Token::GroupType::Code
+    PPIx::Regexp::Token::GroupType::Modifier
+    PPIx::Regexp::Token::GroupType::NamedCapture
+    PPIx::Regexp::Token::GroupType::Script_Run
+    PPIx::Regexp::Token::GroupType::Subexpression
+    PPIx::Regexp::Token::GroupType::Switch
+    PPIx::Regexp::Token::Interpolation
+    PPIx::Regexp::Token::Literal
+    PPIx::Regexp::Token::Modifier
+    PPIx::Regexp::Token::NoOp
+    PPIx::Regexp::Token::Operator
+    PPIx::Regexp::Token::Quantifier
+    PPIx::Regexp::Token::Recursion
+    PPIx::Regexp::Token::Reference
+    PPIx::Regexp::Token::Structure
+    PPIx::Regexp::Token::Unknown
+    PPIx::Regexp::Token::Unmatched
+    PPIx::Regexp::Token::Whitespace
+    PPIx::Regexp::Tokenizer
+    PPIx::Regexp::Util
 };
 
 use constant COOKIE_CLASS	=> ']';
@@ -115,6 +188,10 @@ to the C<PPIx::Regexp> system, and the author reserves the right to
 change them without notice.
 
 This module exports the following manifest constants:
+
+=head2 @CARP_NOT
+
+This global variable contains the names of all modules in the package.
 
 =head2 ARRAY_REF
 

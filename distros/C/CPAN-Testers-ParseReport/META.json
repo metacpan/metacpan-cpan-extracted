@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,7 @@
             "DateTime::Format::Strptime" : "0",
             "ExtUtils::MakeMaker" : "6.48",
             "File::Path" : "1.08",
-            "File::Spec" : "3.74",
+            "File::Spec" : "3.67",
             "Getopt::Long" : "0",
             "HTML::Entities" : "0",
             "Hash::Util" : "0",
@@ -56,14 +56,14 @@
             "Test::Pod" : "0",
             "Time::Local" : "1.11",
             "perl" : "5.008",
-            "version" : "0.99"
+            "version" : "0.9917"
          }
       }
    },
    "provides" : {
       "CPAN::Testers::ParseReport" : {
-         "file" : "lib/CPAN/Testers/ParseReport.pm",
-         "version" : "v0.4.3"
+         "file" : "./lib/CPAN/Testers/ParseReport.pm",
+         "version" : "v0.4.4"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "url" : "git://repo.or.cz/cpan-testers-parsereport.git"
       }
    },
-   "version" : "0.4.3",
+   "version" : "0.4.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,0 +1,28 @@
+---
+abstract: 'Parse and create Snort rules'
+author:
+  - 'Richard <perl-cpan@richardharman.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.55_02, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-Snort
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  List::Util: '1.33'
+  Sub::Util: '1.4'
+  Test::Exception: '0'
+  Test::More: '0'
+version: '0.6'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

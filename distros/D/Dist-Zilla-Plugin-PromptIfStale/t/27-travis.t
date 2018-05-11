@@ -42,17 +42,17 @@ subtest "run_under_travis = $_" => sub {
                 path(qw(source dist.ini)) => simple_ini(
                     [ GatherDir => ],
                     [ 'PromptIfStale' => {
-                            modules => [ 'StaleModule' ],
+                            modules => [ 'DoesNotExist' ],
                             phase => 'build',
                             run_under_travis => $run_under_travis,
                         } ],
                 ),
                 path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
             },
-            also_copy => { 't/lib' => 't/lib' },        },
+        },
     );
 
-    my $prompt = 'StaleModule is not installed. Continue anyway?';
+    my $prompt = 'DoesNotExist is not installed. Continue anyway?';
     $tzil->chrome->set_response_for($prompt, 'y') if $run_under_travis;
 
     $tzil->chrome->logger->set_debug(1);

@@ -4,8 +4,8 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $DATE = '2014-07-04'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2018-05-08'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 # issue: port must be numeric to avoid warning
 # put everything in path_query
@@ -91,12 +91,12 @@ sub connect {
 }
 
 sub write_request_header {
-    my ($self, $method, $request_uri, $headers) = @_;
+    my ($self, $method, $request_uri, $headers, $header_case) = @_;
 
-    return $self->write_request_header($method, $request_uri, $headers)
+    return $self->SUPER::write_request_header(@_)
         unless $self->{_unix};
 
-    return $self->write_header_lines($headers, "$method $self->{_tiny}{_path_query} HTTP/1.1\x0D\x0A");
+    return $self->write_header_lines($headers, $header_case, "$method $self->{_tiny}{_path_query} HTTP/1.1\x0D\x0A");
 }
 
 1;
@@ -114,7 +114,7 @@ HTTP::Tiny::UNIX - A subclass of HTTP::Tiny to connect to HTTP server over Unix 
 
 =head1 VERSION
 
-This document describes version 0.04 of HTTP::Tiny::UNIX (from Perl distribution HTTP-Tiny-UNIX), released on 2014-07-04.
+This document describes version 0.051 of HTTP::Tiny::UNIX (from Perl distribution HTTP-Tiny-UNIX), released on 2018-05-08.
 
 =head1 SYNOPSIS
 
@@ -142,20 +142,13 @@ pattern will be passed to HTTP::Tiny.
 
 Proxy is currently not supported.
 
-=head1 SEE ALSO
-
-L<HTTP::Tiny>
-
-To use L<LWP> to connect over Unix sockets, see
-L<LWP::protocol::http::SocketUnixAlt>.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/HTTP-Tiny-UNIX>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-HTTP-Tiny-UNIX>.
+Source repository is at L<https://github.com/perlancar/perl-HTTP-Tiny-UNIX>.
 
 =head1 BUGS
 
@@ -165,13 +158,20 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<HTTP::Tiny>
+
+To use L<LWP> to connect over Unix sockets, see
+L<LWP::Protocol::http::SocketUnixAlt>.
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

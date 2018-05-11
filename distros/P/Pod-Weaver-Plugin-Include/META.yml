@@ -9,6 +9,7 @@ build_requires:
   File::Spec: '0'
   File::Spec::Unix: '0'
   PPI: '0'
+  Pod::Coverage::TrustPod: '0'
   Pod::Elemental: '0.103004'
   Pod::Elemental::PerlMunger: '0'
   Pod::Weaver: '4.000'
@@ -16,17 +17,28 @@ build_requires:
   Test::Differences: '0.500'
   Test::MockObject: '1.09'
   Test::More: '0.96'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
   lib: '0'
-  perl: v5.24.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
-license: bsd
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Pod-Weaver-Plugin-Include
+provides:
+  Pod::Weaver::Plugin::Include:
+    file: lib/Pod/Weaver/Plugin/Include.pm
+    version: v0.1.9
+  Pod::Weaver::Plugin::Include::Finder:
+    file: lib/Pod/Weaver/Plugin/Include/Finder.pm
+    version: v0.1.9
+  Pod::Weaver::Plugin::Include::Transformer:
+    file: lib/Pod/Weaver/Plugin/Include.pm
+    version: v0.1.9
 requires:
   File::Find::Rule: '0'
   Log::Dispatchouli: '0'
@@ -39,7 +51,12 @@ requires:
   Pod::Weaver::Role::Dialect: '0'
   Pod::Weaver::Role::Preparer: '0'
   namespace::autoclean: '0'
+  perl: '5.014000'
   strict: '0'
   warnings: '0'
-version: v0.1.5
-x_serialization_backend: 'YAML::Tiny version 1.70'
+resources:
+  bugtracker: https://github.com/vrurg/Pod-Weaver-Plugin-Include/issues
+  repository: git://github.com/vrurg/Pod-Weaver-Plugin-Include.git
+version: v0.1.9
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

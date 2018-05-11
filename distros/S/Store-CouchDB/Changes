@@ -1,9 +1,32 @@
 ==================================================
-Changes from 2016-10-25 00:00:00 +0000 to present.
+Changes from 2017-05-08 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.1 at 2017-10-25 08:14:49 +0000
+version 4.2 at 2018-05-08 02:11:40 +0000
+----------------------------------------
+
+  Change: ecf63b02203efe2ff8e12148af2e542d524b2c35
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-05-08 14:11:16 +0000
+
+    satisfy perl critic 
+
+  Change: 3f20239101070e4b1f7f6c597dc64769c212f5bc
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-05-08 14:06:52 +0000
+
+    version bump 
+
+  Change: 75c87ae035c99630bf70e652ee0e3235ac87a7b9
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-05-08 14:06:40 +0000
+
+    added flag to prevent result parsing when view returns an object/hash
+    as value 
+
+----------------------------------------
+version 4.1 at 2017-10-25 08:04:58 +0000
 ----------------------------------------
 
   Change: cff66745417109263ebc53647a3162cb53a43c78
@@ -38,5 +61,5 @@ version 4.1 at 2017-10-25 08:14:49 +0000
     protocols on linux 
 
 =================================================
-Plus 36 releases after 2016-10-25 00:00:00 +0000.
+Plus 36 releases after 2017-05-08 00:00:00 +0000.
 =================================================

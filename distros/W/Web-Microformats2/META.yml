@@ -29,7 +29,7 @@ no_index:
 provides:
   Web::Microformats2:
     file: lib/Web/Microformats2.pm
-    version: '0.02'
+    version: '0.3'
   Web::Microformats2::Document:
     file: lib/Web/Microformats2/Document.pm
   Web::Microformats2::Item:
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/jmacdotorg/microformats2-perl/issues
   homepage: https://github.com/jmacdotorg/microformats2-perl
   repository: git://github.com/jmacdotorg/microformats2-perl.git
-version: '0.02'
+version: '0.3'
 x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

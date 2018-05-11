@@ -1,3 +1,6 @@
+2018-05-07 19:32 CEST (mathias) v1.0.0
+	- minor corrections in documentation
+
 2018-04-27 19:38 CEST (mathias) v0.9.9
 	- t/script-mkdir_heute: disable Term::ReadKey for tests
 

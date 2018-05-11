@@ -8,14 +8,30 @@ use lib 'lib';
 
 use Test::More tests => 6;
 
-use List::Util qw(any none);
+use List::Util;
 
-use Test::Conditions;
+# In older Perl installations, the List::Util module may not include the functions 'any' and
+# 'none'. In that case, we will just skip the tests that use these.
+
+our $has_reduction;
+
+BEGIN {
+    require Test::Conditions;
+    eval {
+	List::Util->import('any', 'none');
+	$has_reduction = 1;
+    }
+}
 
 
 # First check that we can actually instantiate this module.
 
 my $tc = new_ok( 'Test::Conditions' ) || BAIL_OUT;
+
+
+# See if we can import 'any' and 'none' from List::Util.
+
+my $a = 1;
 
 
 # Now try setting, clearing, flagging, and decrementing some conditions and check that the proper
@@ -246,6 +262,14 @@ subtest 'positive conditions' => sub {
 
 subtest 'keys' => sub {
     
+    # If we don't have the list reduction functions from List::Util, just skip this subtest.
+
+    unless ( $has_reduction )
+    {
+	pass('skipped subtest because no list reduction functions were available');
+	return;
+    }
+    
     $tc = Test::Conditions->new;
     
     $Test::Conditions::TEST_DIAG = '';
@@ -288,6 +312,14 @@ subtest 'keys' => sub {
 # Now make sure that ok_condition and ok_all work properly together.
 
 subtest 'ok_condition' => sub {
+    
+    # If we don't have the list reduction functions from List::Util, just skip this subtest.
+
+    unless ( $has_reduction )
+    {
+	pass('skipped subtest because no list reduction functions were available');
+	return;
+    }
     
     $tc = Test::Conditions->new;
 

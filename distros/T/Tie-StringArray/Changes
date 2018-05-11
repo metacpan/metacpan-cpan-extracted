@@ -1,3 +1,8 @@
-1.01 - Fri Jan  2 16:42:34 2015
+Revision history for Perl module Tie::StringArray
+
+1.101 2018-05-09T18:19:48Z
+	* Clarify that it's the Artistic License 2.0.
+
+1.01 - 2015-01-02
 	* First release of a module that appears in Mastering Perl
 

@@ -1,0 +1,46 @@
+
+Release history for Types-Bool
+
+2.98009   2018-05-09 14:34:09-07:00 America/Los_Angeles
+
+    - Fix generated t/after-*.t tests
+
+2.98008   2018-05-09 13:42:03-07:00 America/Los_Angeles
+
+    - Better cooperation with JSON::PP
+    - Make modules needed for tests soft dependencies
+
+2.98007   2018-05-09 10:52:48-07:00 America/Los_Angeles
+
+    - Add generated tests loading JSON::PP, Types::Serialiser,
+      and Cpanel::JSON::XS before and after Types::Bool
+
+2.98006   2018-05-09 09:09:24-07:00 America/Los_Angeles
+
+    - First non-development release
+
+2.98005   2018-05-08 17:02:14-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix warning about masked "my" variables
+    - More tests
+
+2.98004   2018-05-08 10:40:57-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Documentation: "COMPATIBILITY" section
+
+2.98003   2018-05-07 18:32:43-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Documentation: overloaded operations are part of interface
+
+2.98002   2018-05-07 17:30:14-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Get rid of unwanted files in last tarball
+
+2.98001   2018-05-07 14:29:29-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Bump version - greater than current JSON::PP::Boolean version
+    - Fix SYNOPSIS
+
+0.1.0     2018-05-07 11:19:11-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Initial version

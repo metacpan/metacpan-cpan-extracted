@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.053-7-g31c70ff
+package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.054-8-g735317d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Check at build/release time if modules are out of date
 # KEYWORDS: prerequisites upstream dependencies modules metadata update stale
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeBuild',
@@ -17,7 +17,6 @@ use List::Util 1.45 qw(none any uniq);
 use version;
 use Moose::Util 'find_meta';
 use Path::Tiny;
-use Cwd;
 use CPAN::DistnameInfo;
 use HTTP::Tiny;
 use YAML::Tiny;
@@ -183,8 +182,8 @@ sub stale_modules
     require Module::CoreList;
     Module::CoreList->VERSION('5.20151213');
 
-    my $cwd = getcwd();
-    my $cwd_volume = path($cwd)->volume;
+    my $root = $self->zilla->root;
+    my $root_volume = path($root)->volume;
 
     my (@stale_modules, @errors);
     foreach my $module (sort(uniq(@modules)))
@@ -211,10 +210,10 @@ sub stale_modules
 
         $module_to_filename{$module} = $path;
 
-        # ignore modules in the dist currently being built
-        if (path($path)->volume eq $cwd_volume)
+        # ignore modules in the distribution currently being built
+        if (path($path)->volume eq $root_volume)
         {
-            my $relative_path = path($path)->relative($cwd);
+            my $relative_path = path($path)->relative($root);
             if ($relative_path !~ m/^\.\./)
             {
                 $already_checked{$module}++;
@@ -314,7 +313,7 @@ has _authordeps => (
             grep { my $module = $_; none { $module eq $_ } @skip }
             uniq(
                 map { (%$_)[0] }
-                    @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps('.') }
+                    @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps($self->zilla->root) }
             )
         ];
     },
@@ -330,9 +329,9 @@ has _modules_plugin => (
         my @skip = $self->skip;
         [
             grep { my $module = $_; none { $module eq $_ } @skip }
-            uniq(
-                map { find_meta($_)->name } @{ $self->zilla->plugins }
-            )
+            uniq
+            map { find_meta($_)->name }
+            eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->plugins : @{ $self->zilla->plugins }
         ];
     },
 );
@@ -374,8 +373,8 @@ sub _is_duallifed
     # Module::CoreList doesn't tell us this information at all right now - for
     # blead-upstream dual-lifed modules, and non-dual-lifed modules, it
     # returns all the same data points. :(  Right now all we can do is query
-    # the index and see what dist it belongs to -- luckily, it still lists the
-    # cpan dist for dual-lifed modules that are more recent in core than on
+    # the index and see what distribution it belongs to -- luckily, it still lists the
+    # cpan distribution for dual-lifed modules that are more recent in core than on
     # CPAN (e.g. Carp in June 2014 is 1.34 in 5.20.0 but 1.3301 on cpan).
 
     my $url = 'http://cpanmetadb.plackperl.org/v1.0/package/' . $module;
@@ -497,7 +496,7 @@ Dist::Zilla::Plugin::PromptIfStale - Check at build/release time if modules are 
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 SYNOPSIS
 
@@ -519,7 +518,7 @@ C<[PromptIfStale]> is a C<BeforeBuild> or C<BeforeRelease> plugin that compares 
 locally-installed version of a module(s) with the latest indexed version,
 prompting to abort the build process if a discrepancy is found.
 
-Note that there is no effect on the built dist -- all actions are taken at
+Note that there is no effect on the built distribution -- all actions are taken at
 build time.
 
 =head1 CONFIGURATION OPTIONS

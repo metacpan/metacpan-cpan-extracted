@@ -6,7 +6,7 @@ use base qw(Class::Accessor);
 use List::Util qw(first);
 use Carp qw(carp);
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 =head1 NAME
 
@@ -45,7 +45,6 @@ Version 0.07
 
 =cut 
 
-our @RULE_ACTIONS           = qw/ alert pass drop sdrop log activate dynamic reject /;
 our @RULE_ELEMENTS_REQUIRED = qw/ action proto src src_port direction dst dst_port /;
 our @RULE_ELEMENTS = ( @RULE_ELEMENTS_REQUIRED, 'opts' );
 
@@ -57,7 +56,7 @@ __PACKAGE__->mk_accessors(@RULE_ELEMENTS_REQUIRED);
 
 These are the object methods that can be used to read or modify any part of a Snort rule.  B<Please note: None of these methods provide any sort of input validation to make sure that the rule makes sense, or can be parsed at all by Snort.>  
 
-=for comment If input validation is required, check out the L<Parse::Snort::Strict> module.
+If input validation is required, check out the L<Parse::Snort::Strict> module.
 
 =over 4
 
@@ -150,16 +149,50 @@ sub parse {
     $rule =~ s/^\s+//;
     $rule =~ s/\s+$//;
 
-    # 20090823 RGH: m/\s+/ instead of m/ /; bug reported by Leon Ward
-    my @values = split( m/\s+/, $rule, scalar @RULE_ELEMENTS );    # no critic
+    # Rules are distributed without being enabled
+    if ($rule =~ /^#/) {
+        $rule =~ s/^#+\s*//g;
+        $self->state(0);
+    }
+    else {
+        $self->state(1);
+    }
 
-    for my $i ( 0 .. $#values ) {
-        my $meth = $RULE_ELEMENTS[$i];
-        $self->$meth( $values[$i] );
+    # 20090823 RGH: m/\s+/ instead of m/ /; bug reported by Leon Ward
+    my @values = split(m/\s+/, $rule, scalar @RULE_ELEMENTS);    # no critic
+
+    # Support for 'Decoder and Preprocessor Rules'
+    if ($values[1] eq '(') {
+        $self->{preprocessed} = 1;
+        $self->action($values[0]);
+        shift @values;
+        $self->opts(join(' ', @values));
+    }
+    # Regular rules
+    else {
+        for my $i ( 0 .. $#values ) {
+            my $meth = $RULE_ELEMENTS[$i];
+            $self->$meth( $values[$i] );
+        }
     }
 }
 
 =back
+
+=head2 state
+
+The state of the rule: active (1) or commented (0)
+
+=cut
+
+sub state {
+    my ($self, $state) = @_;
+
+    if (defined $state) {
+        $self->{state} = $state;
+    }
+    return $self->{state} // 1;
+}
 
 =head2 METHODS FOR ACCESSING RULE ELEMENTS
 
@@ -372,15 +405,17 @@ To modify references, use the C<opts> method to grab all the rule options, modif
 
 sub references {
     my ($self) = shift;
-    my @references =
-      map { [ split( m/,/, $_->[1], 2 ) ] }
-      grep { $_->[0] eq "reference" } @{ $self->get('opts') };
-    return \@references;
+    return [
+        map { [split(m/,/, $_->[1], 2)] }
+        grep { $_->[0] eq "reference" } @{ $self->get('opts') }
+    ];
 }
 
 =item as_string
 
 The C<as_string> method returns a string that matches the normal Snort rule form of the object.  This is what you want to use to write a rule to an output file that will be read by Snort.
+
+=back
 
 =cut
 
@@ -393,18 +428,24 @@ sub as_string {
     @missing = grep { $_ } map { exists( $self->{$_} ) ? undef : $_ } @RULE_ELEMENTS_REQUIRED;
 
     # stitch together the required bits
-    if (! scalar @missing)
-    { $ret .= sprintf( "%s %s %s %s %s %s %s", @$self{@RULE_ELEMENTS_REQUIRED} ); }
+    if (!scalar @missing) {
+        $ret .= sprintf("%s %s %s %s %s %s %s",
+            @$self{@RULE_ELEMENTS_REQUIRED});
+    }
 
     # tack on opts if they exist
-    if ( defined $self->get('opts') )
-    { $ret .= sprintf( " (%s)", join( " ", map { defined($_->[1]) ? "$_->[0]:$_->[1];" : "$_->[0];" } @{ $self->get('opts') } )); }
+    if (defined $self->get('opts')) {
+        $ret .= sprintf(
+            " (%s)",
+            join(" ",
+                map { defined($_->[1]) ? "$_->[0]:$_->[1];" : "$_->[0];" }
+                    @{ $self->get('opts') })
+        );
+    }
 
-    #carp sprintf( "Missing required rule element(s): %s", join( " ", @missing )) if (scalar @missing);
-    return ! scalar @missing ? $ret : undef;
+    return undef if @missing && !$self->{preprocessed};
+    return $self->state ? $ret : "# $ret";
 }
-
-=back
 
 =head1 AUTHOR
 

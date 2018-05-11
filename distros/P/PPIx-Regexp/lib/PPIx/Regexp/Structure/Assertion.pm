@@ -34,10 +34,11 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Structure };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
+    @CARP_NOT
 };
 
 # An un-escaped literal left curly bracket can always follow this

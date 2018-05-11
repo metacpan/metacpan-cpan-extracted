@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/mbarbon/perl-remote-debugging-client/issues
   license: http://dev.perl.org/licenses/artistic.html
   repository: https://github.com/mbarbon/perl-remote-debugging-client
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

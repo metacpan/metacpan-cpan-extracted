@@ -4,7 +4,7 @@
       "Paul Miller <jettero@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "imap",
       "simple"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-IMAP-Simple",
    "no_index" : {
@@ -49,6 +49,6 @@
          "url" : "http://github.com/jettero/net--imap--simple"
       }
    },
-   "version" : "1.2209",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.2210",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

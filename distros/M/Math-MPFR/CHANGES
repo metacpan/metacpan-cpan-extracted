@@ -1,3 +1,9 @@
+4.04
+ - Support only mpfr-3.0.0 and later
+ - Check that first arg given to atonv() is of correct precision.
+ - In MPFR.xs - replace NULL FILE* arguments with stdout/stdout in
+   mpfr_out_str/mpfr_inp_str. (Thanks Vincent Lefevre.)
+
 4.03
  - Values less than DENORM_MIN were automatically denormalized to 0 ... but should have been
    denormalized to DENORM_MIN when greater than DENORM_MIN/2.

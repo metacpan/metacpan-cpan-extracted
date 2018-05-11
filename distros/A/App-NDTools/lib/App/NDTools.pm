@@ -17,11 +17,11 @@ App::NDTools - command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.5.4
+Version 0.5.5
 
 =cut
 
-our $VERSION = "0.5.4";
+our $VERSION = "0.5.5";
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Process structure using rules and modules.
 
 =item B<L<ndquery>>
 
-Examine structure with ease.
+Examine structure and dump it's parts.
 
 =back
 
@@ -59,15 +59,21 @@ Build and install deb package:
 
     git clone https://github.com/mr-mixas/NDTools.git
     cd NDTools
-    vim dist/debian/changelog # change sign for last version
-    make -C dist deb
-    sudo dpkg -i ndtools_*.deb
+    DEBUILD_OPTS="--no-lintian -uc -us -b" make -C dist veryclean deb
 
-Play without installation:
+Use without installation:
 
     git clone https://github.com/mr-mixas/NDTools.git
     cd NDTools
     source ./SOURCEME # install depends to the current directory and set ENV
+
+=head1 LIMITATIONS
+
+L<YAML::XS> should be additionally installed for YAML support.
+
+L<YAML::XS> 0.67 or later required for correct booleans dump support
+(L<JSON::PP> required as well), C<1> for true and C<0> for false used
+in earlear versions.
 
 =head1 AUTHOR
 
@@ -79,7 +85,8 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<jq|https://stedolan.github.io/jq/>
+L<jq|https://stedolan.github.io/jq/>,
+L<json-delta|https://json-delta.readthedocs.io/en/latest/>
 
 L<Struct::Diff>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 

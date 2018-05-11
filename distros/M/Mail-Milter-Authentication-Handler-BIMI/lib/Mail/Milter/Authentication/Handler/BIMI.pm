@@ -1,14 +1,17 @@
 package Mail::Milter::Authentication::Handler::BIMI;
 use strict;
 use warnings;
+use Mail::Milter::Authentication 2.20180510;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
-
+our $VERSION = '2.20180510'; # VERSION
 # ABSTRACT: BIMI handler for authentication milter
 
 use English qw{ -no_match_vars };
 use Mail::BIMI;
 use Sys::Syslog qw{:standard :macros};
+use Mail::AuthenticationResults::Header::Entry;
+use Mail::AuthenticationResults::Header::SubEntry;
+use Mail::AuthenticationResults::Header::Comment;
 
 sub default_config {
     return {
@@ -36,6 +39,7 @@ sub envfrom_callback {
     my ( $self, $env_from ) = @_;
     delete $self->{'bimi_header_index'};
     delete $self->{'remove_bimi_headers'};
+    $self->{ 'header_added' } = 0;
     return;
 }
 
@@ -69,8 +73,11 @@ sub header_callback {
     if ( lc $header eq 'bimi-selector' ) {
         if ( exists $self->{'selector'} ) {
             $self->dbgout( 'BIMIFail', 'Multiple BIMI-Selector fields', LOG_INFO );
-            $self->add_auth_header( 'bimi=fail (multiple BIMI-Selector fields in message)' );
+            my $header = Mail::AuthenticationResults::Header::Entry->new()->set_key( 'bimi' )->safe_set_value( 'fail' );
+            $header->add_child( Mail::AuthenticationResults::Header::Comment->new()->safe_set_value( 'multiple BIMI-Selector fields in message' ) );
+            $self->add_auth_header( $header );
             $self->metric_count( 'bimi_total', { 'result' => 'fail', 'reason' => 'bad_selector_header' } );
+            $self->{ 'header_added' } = 1;
             $self->{'failmode'} = 1;
             return;
         }
@@ -79,8 +86,11 @@ sub header_callback {
     if ( lc $header eq 'from' ) {
         if ( exists $self->{'from_header'} ) {
             $self->dbgout( 'BIMIFail', 'Multiple RFC5322 from fields', LOG_INFO );
-            $self->add_auth_header( 'bimi=fail (multiple RFC5322 from fields in message)' );
+            my $header = Mail::AuthenticationResults::Header::Entry->new()->set_key( 'bimi' )->safe_set_value( 'fail' );
+            $header->add_child( Mail::AuthenticationResults::Header::Comment->new()->safe_set_value( 'multiple RFC5322 from fields in message' ) );
+            $self->add_auth_header( $header );
             $self->metric_count( 'bimi_total', { 'result' => 'fail', 'reason' => 'bad_from_header' } );
+            $self->{ 'header_added' } = 1;
             $self->{'failmode'} = 1;
             return;
         }
@@ -108,6 +118,7 @@ sub eom_callback {
         }
     }
 
+    return if ( $self->{ 'header_added' } );
     return if ( $self->is_local_ip_address() );
     return if ( $self->is_trusted_ip_address() );
     return if ( $self->is_authenticated() );
@@ -118,40 +129,52 @@ sub eom_callback {
         $Selector = lc $Selector;
         my $BIMI = Mail::BIMI->new();
 
+        # Rework this to allow for multiple dmarc_result objects as per new DMARC handler
         my $DMARCResult = $self->get_object( 'dmarc_result' );
 
         if ( ! $DMARCResult ) {
+
             $self->log_error( 'BIMI Error No DMARC Results object');
-            $self->add_auth_header('bimi=temperror (Internal DMARC error)');
-            return;
+            my $header = Mail::AuthenticationResults::Header::Entry->new()->set_key( 'bimi' )->safe_set_value( 'temperror' );
+            $header->add_child( Mail::AuthenticationResults::Header::Comment->new()->safe_set_value( 'Internal DMARC error' ) );
+            $self->add_auth_header( $header );
+            $self->{ 'header_added' } = 1;
+
         }
+        else {
 
-        $BIMI->set_resolver( $self->get_object( 'resolver' ) );
-        $BIMI->set_dmarc_object( $DMARCResult );
-        $BIMI->set_from_domain( $Domain );
-        $BIMI->set_selector( $Selector );
-        $BIMI->validate();
+            $BIMI->set_resolver( $self->get_object( 'resolver' ) );
+            $BIMI->set_dmarc_object( $DMARCResult );
+            $BIMI->set_from_domain( $Domain );
+            $BIMI->set_selector( $Selector );
+            $BIMI->validate();
 
-        my $Result = $BIMI->result();
-        my $AuthResults = $Result->get_authentication_results();
+            my $Result = $BIMI->result();
+            my $AuthResults = $Result->get_authentication_results_object();
+            $self->add_auth_header( $AuthResults );
+            $self->{ 'header_added' } = 1;
+            my $Record = $BIMI->record();
+            my $URLList = $Record->url_list();
+            if ( $Result->result() eq 'pass' ) {
+                $self->prepend_header( 'BIMI-Location', join( "\n",
+                    'v=BIMI1;',
+                    '    l=' . join( ',', @$URLList ) ) );
+            }
 
-        $self->add_auth_header( $AuthResults );
-        my $Record = $BIMI->record();
-        my $URLList = $Record->url_list();
-        if ( $Result->result() eq 'pass' ) {
-            $self->prepend_header( 'BIMI-Location', join( "\n",
-                'v=BIMI1;',
-                '    l=' . join( ',', @$URLList ) ) );
+            $self->metric_count( 'bimi_total', { 'result' => $Result->result() } );
         }
-
-        $self->metric_count( 'bimi_total', { 'result' => $Result->result() } );
 
     };
     if ( my $error = $@ ) {
+        $self->handle_exception( $error );
         $self->log_error( 'BIMI Error ' . $error );
-        $self->add_auth_header('bimi=temperror');
-        return;
+        if ( ! $self->{ 'header_added' } ) {
+            my $header = Mail::AuthenticationResults::Header::Entry->new()->set_key( 'bimi' )->safe_set_value( 'temperror' );
+            $self->add_auth_header( $header );
+            $self->{ 'header_added' } = 1;
+        }
     }
+
     return;
 }
 
@@ -162,6 +185,7 @@ sub close_callback {
     delete $self->{'failmode'};
     delete $self->{'remove_bimi_headers'};
     delete $self->{'bimi_header_index'};
+    delete $self->{ 'header_added' };
     return;
 }
 
@@ -193,24 +217,8 @@ Marc Bradshaw E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2017
+Copyright 2018
 
 This library is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.
-
-
-
-
-
-        my $dmarc = $self->get_dmarc_object();
-        return if ( $self->{'failmode'} );
-        my $header_domain = $self->get_domain_from( $value );
-        eval { $dmarc->header_from( $header_domain ) };
-        if ( my $error = $@ ) {
-            $self->log_error( 'DMARC Header From Error ' . $error );
-            $self->add_auth_header('dmarc=temperror');
-            $self->metric_count( 'dmarc_total', { 'result' => 'temperror' } );
-            $self->{'failmode'} = 1;
-            return;
-        }
 

@@ -1,4 +1,4 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Comment: This file documents the copyright statements and licenses for
  every file in this package in a machine-readable format.  For a less
  detailed, higher-level overview, see README.
@@ -7,7 +7,7 @@ Comment: This file documents the copyright statements and licenses for
  range specifies every single year in that closed interval.
 
 Files: *
-Copyright: 1999-2010, 2012-2017 Russ Allbery <rra@cpan.org>
+Copyright: 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>
   2000 Joe Smith <Joe.Smith@inwap.com>
   2016 Niko Tyni <ntyni@iki.fi>
 License: Perl
@@ -17,8 +17,10 @@ License: Perl
  Artistic License.  Please see your Perl distribution for the details and
  copies of the licenses.
 
-Files: pod/perlpodstyle.pod t/data/snippets/README
-Copyright: 1999-2001, 2004, 2006, 2008, 2010, 2015
+Files: pod/perlpodstyle.pod t/data/basic.cap t/data/basic.clr
+ t/data/basic.man t/data/basic.ovr t/data/basic.pod t/data/basic.txt
+ t/data/snippets/README
+Copyright: 1999-2001, 2004, 2006, 2008, 2010, 2015-2016, 2018
     Russ Allbery <rra@cpan.org>
 License: all-permissive
  Copying and distribution of this file, with or without modification, are
@@ -26,12 +28,13 @@ License: all-permissive
  this notice are preserved.  This file is offered as-is, without any
  warranty.
 
-Files: t/docs/pod-spelling.t t/docs/pod.t t/docs/synopsis.t
- t/lib/Test/RRA.pm t/lib/Test/RRA/Config.pm t/lib/Test/RRA/ModuleVersion.pm
- t/style/minimum-version.t t/style/module-version.t t/style/strict.t
+Files: t/docs/pod-spelling.t t/docs/pod.t t/docs/spdx-license.t
+ t/docs/synopsis.t t/docs/urls.t t/lib/Test/RRA.pm t/lib/Test/RRA/Config.pm
+ t/lib/Test/RRA/ModuleVersion.pm t/style/minimum-version.t
+ t/style/module-version.t t/style/strict.t
 Copyright: 2012-2014
     The Board of Trustees of the Leland Stanford Junior University
-  2014-2016 Russ Allbery <eagle@eyrie.org>
+  2014-2016, 2018 Russ Allbery <eagle@eyrie.org>
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the
@@ -51,3 +54,4 @@ License: Expat
  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
  OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

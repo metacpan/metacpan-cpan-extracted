@@ -1,3 +1,10 @@
+1.239 2018-05-08
+
+    * OpenSsh backend: fix backend (broke with Config::Model 2.123,
+      requires Config::Model 2.123. Sorry about the mess).
+    * added t/README.md
+    * remove deprecated suffix method
+
 1.238 2017-10-08
 
     * udpated models to use new rw_config parameter

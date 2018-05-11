@@ -16,8 +16,8 @@ name: Test-Conditions
 provides:
   Test::Conditions:
     file: lib/Test/Conditions.pm
-    version: '0.81'
+    version: '0.83'
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
-version: '0.81'
+version: '0.83'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

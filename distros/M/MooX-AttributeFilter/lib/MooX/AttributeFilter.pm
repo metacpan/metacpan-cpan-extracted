@@ -2,9 +2,10 @@
 
 
 package MooX::AttributeFilter;
+use v5.10;
 use strictures 1;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001005';
 
 use Carp;
 use Scalar::Util qw<looks_like_number>;
@@ -92,7 +93,7 @@ install_modifier "Method::Generate::Accessor", 'around', 'generate_method',
         #say STDERR "--- Installing filter into ${into}::${name}";
 
         croak "Incompatibe 'is' option '$spec->{is}': can't install filter"
-          unless $spec->{is} =~ /^rwp?$/n;
+          unless $spec->{is} =~ /^rwp?$/;
 
         my $filterSub;
         if ( $spec->{filter} eq 1 ) {
@@ -139,52 +140,52 @@ MooX::AttributeFilter - Implements 'filter' option for Moo-class attributes
 
 =head1 VERSION
 
-version 0.001002
+version 0.001005
 
 =head1 SYNOPSIS
 
-    package My::Class {
-        use Moo;
-        use MooX::AttributeFilter;
-        
-        has field => (
-            is     => 'rw',
-            filter => 'filterField',
-        );
-        
-        has lazyField => (
-            is      => 'rw',
-            lazy    => 1,
-            builder => sub { [1, 2, 3 ] },
-            filter  => 1,
-        );
-        
-        has incremental => (
-            is => 'rw',
-            filter => sub {
-                my $this = shift;
-                my ($val, $oldVal) = @_;
-                if ( @_ > 1 && defined $oldVal ) {
-                    die "incremental attribute value may only increase"
-                        unless $val > $oldVal;
-                }
-                return $_[0];
+    package My::Class;
+    use Moo;
+    use MooX::AttributeFilter;
+    
+    has field => (
+        is     => 'rw',
+        filter => 'filterField',
+    );
+    
+    has lazyField => (
+        is      => 'rw',
+        lazy    => 1,
+        builder => sub { [1, 2, 3 ] },
+        filter  => 1,
+    );
+    
+    has incremental => (
+        is => 'rw',
+        filter => sub {
+            my $this = shift;
+            my ($val, $oldVal) = @_;
+            if ( @_ > 1 && defined $oldVal ) {
+                die "incremental attribute value may only increase"
+                    unless $val > $oldVal;
             }
-        );
-        
-        sub filterField {
-            my $this = shift;
-            return "filtered($_[0])";
+            return $_[0];
         }
-        
-        sub _filter_lazyField {
-            my $this = shift;
-            my @a = @{$_[0]};
-            push @a, -1;
-            return \@a;
-        }
+    );
+    
+    sub filterField {
+        my $this = shift;
+        return "filtered($_[0])";
     }
     
+    sub _filter_lazyField {
+        my $this = shift;
+        my @a = @{$_[0]};
+        push @a, -1;
+        return \@a;
+    }
+    
+    package main;
     my $obj = My::Class->new( field => "initial" );
     ($obj->field eq "filtered(initial)")  # True!
     $obj->lazyField;                      # [ 1, 2, 3, -1 ]
@@ -256,27 +257,27 @@ pass validation. Or it could be soft: by storing a value calling code I<suggest>
 what it would like to see in the attribute but the result might be changed
 depending on the current environment. For example:
 
-    package ChDir {
-        use File::Spec;
-        use Moo;
-        extends qw<Project::BaseClass>;
-        use MooX::AttributeFilter;
+    package ChDir;
+    use File::Spec;
+    use Moo;
+    extends qw<Project::BaseClass>;
+    use MooX::AttributeFilter;
+    
+    has curDir => (
+        is => 'rw',
+        filter => 'fullPath',
+    );
+    
+    sub fullPath {
+        my $this = shift;
+        my ( $subdir ) = @_;
         
-        has curDir => (
-            is => 'rw',
-            filter => 'fullPath',
+        return File::Spec->catdir(
+            $this->testMode ? $this->baseTestDir : $this->baseDir,
+            $subdir
         );
-        
-        sub fullPath {
-            my $this = shift;
-            my ( $subdir ) = @_;
-            
-            return File::Spec->catdir(
-                $this->testMode ? $this->baseTestDir : $this->baseDir,
-                $subdir
-            );
-        }
     }
+}
 
 =head1 CAVEATS
 

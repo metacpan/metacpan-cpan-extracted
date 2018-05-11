@@ -76,11 +76,10 @@ eval {
     #List wifi stations
     my $wifi = $fbx->wifi_ap("0/stations");
     for my $host ( sort {$a->{hostname} cmp $b->{hostname} } @{ $wifi }) {
-      my $ip="N/A";
       for my $l3c (@{$host->{host}{l3connectivities}}) {
-          $ip = $l3c->{addr} if $l3c->{active};
-        }
-      printf "%16.16s\t%s\t%15.15s\t%6.6sdB\t%6.6sMbps\t%6.6sMbps\n", $host->{hostname}, $host->{mac}, $ip, $host->{signal}, 10*$host->{last_rx}{bitrate}, 10*$host->{last_tx}{bitrate};
+          next unless $l3c->{active};
+          printf "%16.16s\t%s\t%15.15s\t%6.6sdB\t%6.6sMbps\t%6.6sMbps\n", $host->{hostname}, $host->{mac}, $l3c->{addr}, $host->{signal}, 10*$host->{last_rx}{bitrate}, 10*$host->{last_tx}{bitrate};
+      }
     }
   } else {
     #Execute given command (JSON or not)

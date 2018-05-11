@@ -162,6 +162,7 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Node };
 
+use PPIx::Regexp::Constant qw{ @CARP_NOT };
 use PPIx::Regexp::Lexer ();
 use PPIx::Regexp::StringTokenizer;
 use PPIx::Regexp::Token::Modifier ();	# For its modifier manipulations.
@@ -169,7 +170,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 =head2 new
 

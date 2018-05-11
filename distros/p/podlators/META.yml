@@ -17,13 +17,32 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Pod::Man:
+    file: lib/Pod/Man.pm
+    version: '4.11'
+  Pod::ParseLink:
+    file: lib/Pod/ParseLink.pm
+    version: '4.11'
+  Pod::Text:
+    file: lib/Pod/Text.pm
+    version: '4.11'
+  Pod::Text::Color:
+    file: lib/Pod/Text/Color.pm
+    version: '4.11'
+  Pod::Text::Overstrike:
+    file: lib/Pod/Text/Overstrike.pm
+    version: '4.11'
+  Pod::Text::Termcap:
+    file: lib/Pod/Text/Termcap.pm
+    version: '4.11'
 requires:
   Encode: '0'
   Pod::Simple: '3.06'
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=podlators
-  homepage: http://www.eyrie.org/~eagle/software/podlators/
-  repository: git://github.com/rra/podlators.git
-version: '4.10'
+  homepage: https://www.eyrie.org/~eagle/software/podlators/
+  repository: https://github.com/rra/podlators.git
+version: '4.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

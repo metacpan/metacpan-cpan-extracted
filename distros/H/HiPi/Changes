@@ -1,4 +1,9 @@
-version 0.69  - 17 March 2018
+Version 0.70  - 08 May 2018
+                Added HiPi::Interface::MonoOLED for monochrome OLED's
+                that use SSD1306 and SH1106 controllers.
+                Added HiPi::Interface::PCA9544 for the I2C multiplexer.
+
+Version 0.69  - 17 March 2018
                 updates for Raspberry Pi 3 Plus
 
 Version 0.68  - 29 November 2017

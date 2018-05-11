@@ -1,26 +1,29 @@
 ---
-name: BSD-Getfsent
-version: 0.17
+abstract: 'Get file system descriptor file entry'
 author:
   - 'Steven Schubiger <schubiger@cpan.org>'
-abstract: Get file system descriptor file entry
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Carp: 0
-  Exporter: 0
-  IO::File: 0
 build_requires:
-  Test::More: 0
-recommends:
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BSD-Getfsent
 provides:
   BSD::Getfsent:
     file: lib/BSD/Getfsent.pm
-    version: 0.17
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '0.18'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::File: '0'
+  boolean: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/stsc/BSD-Getfsent
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,30 @@
+Date-Indiction version 0.01
+===========================
+
+Compute a year's indiction as used in old Russian
+chronicles. Christian and Byzantine (with epoch on March 1, 5508 BCE)
+aerae are supported.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Exporter
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016-2018 Roman Pavlov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

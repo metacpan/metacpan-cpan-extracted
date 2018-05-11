@@ -1,5 +1,6 @@
 Changes
 examples/README
+INSTALL.SKIP
 lib/Test/Manifest.pm
 LICENSE
 Makefile.PL
@@ -7,7 +8,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
-README
+README.pod
 t/00load.t
 t/01get_test_files.t
 t/01make_test_manifest.t
@@ -21,3 +22,4 @@ t/trailing_space.t
 test_manifest
 test_manifest_levels
 test_manifest_with_include
+xt/changes.t

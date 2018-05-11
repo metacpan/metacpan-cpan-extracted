@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::SQLOutputPlain;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 1;
 
-sub IDENTIFICATION { return "000001-000027-000008"; }
+sub IDENTIFICATION { return "000001-000027-000009"; }
 
 sub preference { return 0; }
 
@@ -23,7 +23,7 @@ sub done {
 	$obj->{-mempool}->deregister('output_format','plain');
 	if ($obj->{-mempool}->get('output_format') eq 'plain') {
 		my @all_formats = $obj->{-mempool}->get_register('output_format');
-		$obj->{-mempool}->set('output_format',$all_formats ? $all_formats[0] : '');
+		$obj->{-mempool}->set('output_format', @all_formats ? $all_formats[0] : '');
 	}
 }
 	

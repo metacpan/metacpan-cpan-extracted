@@ -1,3 +1,11 @@
+0.238.2 2018-05-07
+
+  Bug fix:
+    * Fix file_path usage in Systemd* backends (Debian #897963)
+      This requires Config::Model 2.123
+    * Show user message with User logger
+    * added t/README.md
+
 0.238.1 2018-03-29
 
   Model update:

@@ -30,8 +30,8 @@ lib/PPIx/Regexp/Structure/Main.pm
 lib/PPIx/Regexp/Structure/Modifier.pm
 lib/PPIx/Regexp/Structure/NamedCapture.pm
 lib/PPIx/Regexp/Structure/Quantifier.pm
-lib/PPIx/Regexp/Structure/Regexp.pm
 lib/PPIx/Regexp/Structure/RegexSet.pm
+lib/PPIx/Regexp/Structure/Regexp.pm
 lib/PPIx/Regexp/Structure/Replacement.pm
 lib/PPIx/Regexp/Structure/Script_Run.pm
 lib/PPIx/Regexp/Structure/Subexpression.pm
@@ -91,6 +91,7 @@ t/string_unit.t
 t/unit.t
 t/version.t
 t/xplain.t
+xt/author/carp_not.t
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t

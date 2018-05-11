@@ -43,6 +43,7 @@ use PPIx::Regexp::Constant qw{
     COOKIE_REGEX_SET
     MINIMUM_PERL
     TOKEN_LITERAL
+    @CARP_NOT
 };
 
 # Tokens we are responsible for making, under at least some
@@ -53,7 +54,7 @@ use PPIx::Regexp::Token::Backreference	();
 use PPIx::Regexp::Token::Backtrack	();
 use PPIx::Regexp::Token::Recursion	();
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 # Return true if the token can be quantified, and false otherwise
 

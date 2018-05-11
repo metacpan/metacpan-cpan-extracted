@@ -9,9 +9,9 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Structure };
 
-use Carp;
+use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 
 1;

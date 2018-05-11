@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/chansen/p5-time-moment/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/chansen/p5-time-moment
-version: '0.43'
+version: '0.44'

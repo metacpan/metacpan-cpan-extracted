@@ -1,5 +1,8 @@
 Revision history for lazy
 
+0.000004  2018-05-07 17:22:04Z
+    - Add more debugging to test
+
 0.000003  2018-05-05 04:38:01Z
     - local::lib is now a required dependency
 

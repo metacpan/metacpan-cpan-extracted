@@ -43,11 +43,12 @@ use Scalar::Util qw{ blessed looks_like_number };
 use PPIx::Regexp;
 use PPIx::Regexp::Constant qw{
     ARRAY_REF
+    @CARP_NOT
 };
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 =head2 new
 

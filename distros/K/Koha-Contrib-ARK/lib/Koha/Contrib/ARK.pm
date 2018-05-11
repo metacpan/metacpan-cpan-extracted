@@ -1,9 +1,7 @@
 package Koha::Contrib::ARK;
-$Koha::Contrib::ARK::VERSION = '1.0.0';
+$Koha::Contrib::ARK::VERSION = '1.0.2';
 # ABSTRACT: ARK Management
 use Moose;
-
-extends 'AnyEvent::Processor::Conversion';
 
 use Modern::Perl;
 use JSON;
@@ -12,8 +10,10 @@ use Try::Tiny;
 use Log::Dispatch;
 use Log::Dispatch::Screen;
 use Log::Dispatch::File;
+use C4::Context;
 use Koha::Contrib::ARK::Updater;
 use Koha::Contrib::ARK::Clearer;
+use Term::ProgressBar;
 
 
 
@@ -64,6 +64,11 @@ has log => (
 );
 
 
+has reader => (is => 'rw');
+has writer => (is => 'rw');
+has converter => (is => 'rw');
+
+
 sub fatal {
     my ($self, $msg) = @_;
     $self->log->error( "$msg\n" );
@@ -75,7 +80,10 @@ sub BUILD {
     my $self = shift;
 
     my $dt = DateTime->now();
-    $self->log->info("\n" . ('-' x 80) . "\nkoha-ark: start -- " . $dt->ymd . " " . $dt->hms . "\n");
+    $self->log->info(
+        "\n" . ('-' x 80) . "\nkoha-ark: start ".
+        $self->cmd . " -- " . $dt->ymd . " " . $dt->hms . "\n"
+    );
     $self->log->info("** TEST MODE **\n") unless $self->doit;
     $self->log->debug("Reading ARK_CONF\n");
     my $c = C4::Context->preference("ARK_CONF");
@@ -152,17 +160,21 @@ sub build_ark {
 }
 
 
-override 'start_message' => sub {
+sub run {
     my $self = shift;
-    say "ARK processing: ", $self->cmd;
-};
 
-
-override 'end_message' => sub {
-    my $self = shift;
-    say "Number of biblio records processed: ", $self->count;
-};
-
+    my $progress;
+    $progress = Term::ProgressBar->new({ count => $self->reader->total })
+        if $self->verbose;
+    my $next_update = 0;
+    while ( my $record = $self->reader->read() ) {
+        $record = $self->converter->convert($record);
+        $self->writer->write($record);
+        my $count = $self->reader->count;
+        next unless $progress;
+        $next_update = $progress->update($count) if $count >= $next_update;
+    }
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -179,7 +191,7 @@ Koha::Contrib::ARK - ARK Management
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 ATTRIBUTES
 

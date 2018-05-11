@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -58,32 +58,31 @@
    "provides" : {
       "Moose::Meta::Attribute::Custom::Trait::Enum" : {
          "file" : "lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Moose::Meta::Attribute::Custom::Trait::Enumeration" : {
          "file" : "lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "MooseX::Enumeration" : {
          "file" : "lib/MooseX/Enumeration.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration" : {
          "file" : "lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign" : {
          "file" : "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is" : {
          "file" : "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration"
       },
@@ -95,7 +94,10 @@
          "type" : "git",
          "url" : "git://github.com/tobyink/p5-moosex-enumeration.git",
          "web" : "https://github.com/tobyink/p5-moosex-enumeration"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project"
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

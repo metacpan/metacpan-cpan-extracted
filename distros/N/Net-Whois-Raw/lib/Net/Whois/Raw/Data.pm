@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99013';
+$Net::Whois::Raw::Data::VERSION = '2.99014';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -415,37 +415,37 @@ our %servers = qw(
     VOTO            whois.afilias.net
     XN--6FRZ82G     whois.afilias.net
 
-    ACTOR           whois.unitedtld.com
-    AIRFORCE        whois.unitedtld.com
-    ARMY            whois.unitedtld.com
-    ATTORNEY        whois.unitedtld.com
-    AUCTION         whois.unitedtld.com
-    CONSULTING      whois.unitedtld.com
-    DANCE           whois.unitedtld.com
-    DEGREE          whois.unitedtld.com
-    DEMOCRAT        whois.unitedtld.com
-    DENTIST         whois.unitedtld.com
-    ENGINEER        whois.unitedtld.com
-    FORSALE         whois.unitedtld.com
-    FUTBOL          whois.unitedtld.com
-    GIVES           whois.unitedtld.com
-    HAUS            whois.unitedtld.com
-    IMMOBILIEN      whois.unitedtld.com
-    KAUFEN          whois.unitedtld.com
-    LAWYER          whois.unitedtld.com
-    MARKET          whois.unitedtld.com
-    MODA            whois.unitedtld.com
-    MORTGAGE        whois.unitedtld.com
-    NAVY            whois.unitedtld.com
-    NINJA           whois.unitedtld.com
-    PUB             whois.unitedtld.com
-    REHAB           whois.unitedtld.com
-    REPUBLICAN      whois.unitedtld.com
-    REVIEWS         whois.unitedtld.com
-    ROCKS           whois.unitedtld.com
-    SOCIAL          whois.unitedtld.com
-    SOFTWARE        whois.unitedtld.com
-    VET             whois.unitedtld.com
+    ACTOR           whois.nic.actor
+    AIRFORCE        whois.nic.airforce
+    ARMY            whois.nic.army
+    ATTORNEY        whois.nic.attorney
+    AUCTION         whois.nic.auction
+    CONSULTING      whois.nic.consulting
+    DANCE           whois.nic.dance
+    DEGREE          whois.nic.degree
+    DEMOCRAT        whois.nic.democrat
+    DENTIST         whois.nic.dentist
+    ENGINEER        whois.nic.engineer
+    FORSALE         whois.nic.forsale
+    FUTBOL          whois.nic.futbol
+    GIVES           whois.nic.gives
+    HAUS            whois.nic.haus
+    IMMOBILIEN      whois.nic.immobilien
+    KAUFEN          whois.nic.kaufen
+    LAWYER          whois.nic.lawyer
+    MARKET          whois.nic.market
+    MODA            whois.nic.moda
+    MORTGAGE        whois.nic.mortgage
+    NAVY            whois.nic.navy
+    NINJA           whois.nic.ninja
+    PUB             whois.nic.pub
+    REHAB           whois.nic.rehab
+    REPUBLICAN      whois.nic.republican
+    REVIEWS         whois.nic.reviews
+    ROCKS           whois.nic.rocks
+    SOCIAL          whois.nic.social
+    SOFTWARE        whois.nic.software
+    VET             whois.nic.vet
 
     BAND            whois.rightside.co
     FAMILY          whois.rightside.co
@@ -2069,7 +2069,6 @@ our %notfound = (
     'whois.nic.kiwi'             => 'Status\: Not Registered',
     'whois.nic.build'            => 'No Data Found',
     'whois.nic.club'             => '^No Data Found',
-    'whois.unitedtld.com'        => 'Domain not found',
     'whois.nic.luxury'           => 'No Data Found',
     'whois.nic.wien'             => 'No match',
 
@@ -4049,12 +4048,6 @@ our %strip = (
         '^[^A-Z]',
     ],
 
-    'whois.unitedtld.com' => [
-        '^>>> Last update of WHOIS database',
-        '^[^A-Z]',
-        '^Terms of Use'
-    ],
-
     'whois.nic.ht' => [
         '^TERMS OF USE: You are not authorized',
         '^database through the use of electronic',
@@ -4287,7 +4280,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99013
+version 2.99014
 
 =head1 AUTHOR
 

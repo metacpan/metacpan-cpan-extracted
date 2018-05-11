@@ -277,7 +277,7 @@ Rmpfr_set_str($fr_breaker, '1.1', 10, MPFR_RNDN);
 
 eval {Math::MPFR::_d_bytes_fr($fr_breaker, 53);};
 
-if($@ =~ /^Precision of 1st arg supplied to _d_bytes_fr must be 53, not 200/) {print "ok 14\n"}
+if($@ =~ /^Precision of 1st arg supplied to _d_bytes_fr must be 53/) {print "ok 14\n"}
 else {
   warn "\$\@: $@\n";
   print "not ok 14\n";
@@ -285,7 +285,7 @@ else {
 
 eval {Math::MPFR::_dd_bytes_fr($fr_breaker, 106);};
 
-if($@ =~ /^Precision of 1st arg supplied to _dd_bytes_fr must be 2098, not 200/) {print "ok 15\n"}
+if($@ =~ /^Precision of 1st arg supplied to _dd_bytes_fr must be 2098/) {print "ok 15\n"}
 else {
   warn "\$\@: $@\n";
   print "not ok 15\n";
@@ -294,7 +294,7 @@ else {
 eval {Math::MPFR::_ld_bytes_fr($fr_breaker, 64);};
 
 
-if($@ =~ /^Precision of 1st arg \(200\) supplied to _ld_bytes_fr must match 2nd arg \(64\)/) {print "ok 16\n"}
+if($@ =~ /^Precision of 1st arg supplied to _ld_bytes_fr must match 2nd arg \(64\)/) {print "ok 16\n"}
 else {
   warn "\$\@: $@\n";
   print "not ok 16\n";
@@ -302,7 +302,7 @@ else {
 
 eval {Math::MPFR::_f128_bytes_fr($fr_breaker, 113);};
 
-if($@ =~ /^Precision of 1st arg supplied to _f128_bytes_fr must be 113, not 200/ ||
+if($@ =~ /^Precision of 1st arg supplied to _f128_bytes_fr must be 113/ ||
    $@ =~ /^__float128 support not built into this Math::MPFR/) {print "ok 17\n"}
 else {
   warn "\$\@: $@\n";
@@ -377,7 +377,7 @@ my $h;
 
 eval{$h = Math::MPFR::bytes($d_fr, 'Long Double');};
 
-if($@ =~ /^Precision of 1st arg \(53\) supplied to _ld_bytes_fr must match 2nd arg \(64\)/) {print "ok 22\n"}
+if($@ =~ /^Precision of 1st arg supplied to _ld_bytes_fr must match 2nd arg \(64\)/) {print "ok 22\n"}
 else {
   warn "\$\@: $@";
   print "not ok 22\n";

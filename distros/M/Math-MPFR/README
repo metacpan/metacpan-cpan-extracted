@@ -26,7 +26,7 @@ For the MPFR library see:
 http://www.mpfr.org
 
 Minimum required version of gmp is gmp-4.2.0.
-Minimum required version of mpfr is mpfr-2.4.0.
+Minimum required version of mpfr is mpfr-3.0.0.
 Some features of Math::MPFR require later versions
 of the gmp and mpfr libraries.
 

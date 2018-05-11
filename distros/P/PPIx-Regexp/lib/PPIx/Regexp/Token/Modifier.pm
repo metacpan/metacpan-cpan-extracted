@@ -102,9 +102,10 @@ use Carp;
 use PPIx::Regexp::Constant qw{
     MINIMUM_PERL
     MODIFIER_GROUP_MATCH_SEMANTICS
+    @CARP_NOT
 };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 # Define modifiers that are to be aggregated internally for ease of
 # computation.

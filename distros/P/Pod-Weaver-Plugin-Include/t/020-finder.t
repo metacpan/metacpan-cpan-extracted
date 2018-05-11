@@ -1,6 +1,7 @@
 #
 
-use v5.24;
+use strict;
+use warnings;
 use Test::More;
 use Data::Dumper;
 use File::Spec;

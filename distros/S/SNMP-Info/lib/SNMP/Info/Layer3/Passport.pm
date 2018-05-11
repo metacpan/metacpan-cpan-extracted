@@ -43,7 +43,7 @@ use SNMP::Info::Layer3;
 
 use vars qw/$VERSION %GLOBALS %FUNCS %MIBS %MUNGE/;
 
-$VERSION = '3.60';
+$VERSION = '3.61';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS, %SNMP::Info::RapidCity::MIBS,
@@ -450,7 +450,7 @@ sub ip_index {
     my $partial  = shift;
 
     my $model = $passport->model();
-    my $ip_index = $passport->orig_ip_index($partial) || {};
+    my $ip_index = $passport->SUPER::ip_index($partial) || {};
 
     my %ip_index;
     foreach my $ip ( keys %$ip_index ) {
@@ -492,7 +492,7 @@ sub ip_netmask {
     my $partial  = shift;
 
     my $model = $passport->model();
-    my $ip_mask = $passport->orig_ip_netmask($partial) || {};
+    my $ip_mask = $passport->SUPER::ip_netmask($partial) || {};
 
     my %ip_index;
     foreach my $iid ( keys %$ip_mask ) {

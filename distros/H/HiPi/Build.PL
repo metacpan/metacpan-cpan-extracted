@@ -7,7 +7,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.69';
+our $VERSION ='0.70';
 
 my $requires = {
         'Try::Tiny'             => '0',
@@ -16,6 +16,7 @@ my $requires = {
         'File::Copy::Recursive' => '0',
         'JSON'                  => '0',
         'Getopt::Long'          => '0',
+        'Image::Imlib2'         => '0',
 };
 
 if( $^O =~ /^linux$/i ) {

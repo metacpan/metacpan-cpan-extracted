@@ -9,7 +9,7 @@ use IO::Socket;
 use IO::Select;
 use Net::IMAP::Simple::PipeSocket;
 
-our $VERSION = "1.2209";
+our $VERSION = "1.2210";
 
 BEGIN {
     # I'd really rather the pause/cpan indexers miss this "package"
@@ -676,7 +676,8 @@ sub search_body    { my $self = shift; my $t = _process_qstring(shift); return $
 sub get {
     my ( $self, $number, $part ) = @_;
     my $arg = $part ? "BODY[$part]" : 'RFC822';
-	return $self->fetch( $number, $part );
+
+    return $self->fetch( $number, $arg );
 }
 
 sub fetch {

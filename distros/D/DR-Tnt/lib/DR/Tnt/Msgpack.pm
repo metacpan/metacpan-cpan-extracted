@@ -265,6 +265,22 @@ sub msgunpack_safely_utf8($) {
     goto \&_msgunpack;
 }
 
+sub looks_like_number($) {
+    my ($v) = @_;
+    return 0 unless Scalar::Util::looks_like_number($v);
+
+
+    state $MAX_INT = unpack('J', pack('j', -1));
+
+    return 0 if $v == 'Infinity';
+    return 0 if $v == '-Infinity';
+
+    if ($v == int $v) {
+        return 0 unless $v <= $MAX_INT;
+    }
+    return 1;
+}
+
 sub msgpack($);
 sub msgpack($) {
     my ($v) = @_;
@@ -337,7 +353,7 @@ sub msgpack($) {
         }
     } else {
         # numbers
-        if (Scalar::Util::looks_like_number $v) {
+        if (looks_like_number $v) {
             if ($v == int $v) {
                 if ($v >= 0) {
                     if ($v <= 0x7F) {

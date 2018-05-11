@@ -16,6 +16,10 @@ t/authorship_test_cases/h-entry_with_rel-author.html
 t/authorship_test_cases/h-entry_with_u-author.html
 t/authorship_test_cases/h-feed_with_p-author_h-card.html
 t/authorship_test_cases/h-feed_with_u-author.html
+t/content.t
+t/sending.t
+t/sources/content_property.html
+t/sources/escaped.html
 t/sources/invalid.html
 t/sources/valid.html
 t/webmention.t

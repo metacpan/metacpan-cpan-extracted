@@ -16,9 +16,11 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
+        'JSON::PP'              => 0, # required by YAML::XS
         'Storable'              => 0,
-        'Test::File::Contents'  => 0,
+        'Test::File::Contents'  => 0.23,
         'Test::More'            => 0,
+        'YAML::XS'              => 0, # optional (lazy loaded)
     },
     EXE_FILES => [
         'nddiff',
@@ -42,7 +44,6 @@ WriteMakefile(
         'Struct::Diff'              => 0.96,
         'Struct::Path'              => 0.81,
         'Struct::Path::PerlStyle'   => 0.80,
-        'YAML::XS'                  => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-NDTools-* cover_db' },

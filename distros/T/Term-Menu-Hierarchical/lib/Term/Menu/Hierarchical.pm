@@ -12,9 +12,10 @@ $|++;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(menu);
 
-our $VERSION = '0.95';
+our $VERSION = '0.99';
 
 # Set up the terminal handling
+$ENV{TERM} = 'linux' if !defined $ENV{TERM} or $ENV{TERM} eq '';
 my $ti = POSIX::Termios->new();
 $ti->getattr;
 my $t = Term::Cap->Tgetent({ TERM => undef, OSPEED => $ti->getospeed||38400 });
@@ -31,7 +32,7 @@ sub menu {
 
 	{
 		# Refresh size info to catch term resize events
-		($max_width, $max_height) = GetTerminalSize "STDOUT";
+		($max_width, $max_height) = GetTerminalSize \*STDOUT;
 		$t->Tputs("cl", 1, *STDOUT);
 		if (ref($data->{content}) eq 'HASH'){
 			$data = _display($data);

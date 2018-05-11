@@ -54,3 +54,10 @@ Revision history for Perl extension Term::Menu::Hierarchical.
 	- Added 'LICENSE' line to Makefile.PL
 	- Using 'make dist', so now we have a META.yml
 
+0.96 Wed May 9 11:14:03 MDT 2018
+    - Revised the STDOUT to be passed as a GLOBREF (thanks to Markus Mueller for
+      the report and the patch!)
+
+0.99 Wed May 9 17:39:01 MDT 2018
+    - Set term to a default value ('linux') if $ENV{TERM} is unset
+

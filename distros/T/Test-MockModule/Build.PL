@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 	module_name         => 'Test::MockModule',
 	create_license      => 1,
-	license             => 'GPL_3',
+	license             => 'perl',
 	dist_author         => [q{Current Maintainer: Geoff Franks <gfranks@cpan.org>}, q{Original Author: Simon Flack <simonflk _AT_ cpan.org>}],
 	dist_version_from   => 'lib/Test/MockModule.pm',
 	meta_merge => {

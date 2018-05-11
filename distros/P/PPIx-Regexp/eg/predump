@@ -13,7 +13,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.058';
+$VERSION = '0.059';
 
 my %opt = (
     default_modifiers => [],
@@ -162,14 +162,20 @@ foreach my $re ( process_args( \%opt, @ARGV ) ) {
     }
 }
 
-sub set_parse {
-    my ( $opt, $assert ) = @_;
-    if ( $assert ) {
-	$opt{parse} = "$opt";
-    } else {
-	delete $opt{parse};
+{
+    my $deprecate;
+
+    sub set_parse {
+	my ( $opt, $assert ) = @_;
+	if ( $assert && 'regex' ne $opt ) {
+	    $deprecate++
+		or warn "The -$opt option is deprecated, and will be removed\n";
+	    $opt{parse} = "$opt";
+	} else {
+	    delete $opt{parse};
+	}
+	return;
     }
-    return;
 }
 
 __END__
@@ -218,6 +224,11 @@ regular expressions are to be analyzed. If this options is asserted,
 C<-objectify> and C<-unescape> are ignored.
 
 =item -guess
+
+This option is deprecated, and will be retracted in a future release
+when the string-parsing functionality is removed from
+L<PPIx::Regexp|PPIx::Regexp>.  L<PPIx::QuoteLike|PPIx::QuoteLike> is
+prefered.
 
 If true, this option specifies that the parser guess whether the
 argument is to be parsed as a regex or a string. If false, it specifies
@@ -287,6 +298,11 @@ The default is false. This is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 
 =item -string
+
+This option is deprecated, and will be retracted in a future release
+when the string-parsing functionality is removed from
+L<PPIx::Regexp|PPIx::Regexp>.  L<PPIx::QuoteLike|PPIx::QuoteLike> is
+prefered.
 
 If true, this option specifies that the argument be parsed as a string,
 not a regex. If false, it specifies the default parse, which is as a

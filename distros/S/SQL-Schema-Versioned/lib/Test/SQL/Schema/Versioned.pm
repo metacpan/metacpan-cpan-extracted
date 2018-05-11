@@ -1,7 +1,9 @@
 package Test::SQL::Schema::Versioned;
 
-our $DATE = '2017-06-24'; # DATE
-our $VERSION = '0.22'; # VERSION
+## no critic (Modules::ProhibitAutomaticExportation)
+
+our $DATE = '2018-05-10'; # DATE
+our $VERSION = '0.234'; # VERSION
 
 use 5.010001;
 use strict;
@@ -75,7 +77,7 @@ Test::SQL::Schema::Versioned - Test SQL::Schema::Versioned spec
 
 =head1 VERSION
 
-This document describes version 0.22 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-24.
+This document describes version 0.234 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
 
 =head1 FUNCTIONS
 
@@ -90,7 +92,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-SQL-Schema>.
+Source repository is at L<https://github.com/perlancar/perl-SQL-Schema-Versioned>.
 
 =head1 BUGS
 
@@ -106,7 +108,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

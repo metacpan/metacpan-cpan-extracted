@@ -1,0 +1,78 @@
+NAME
+    Finance::Currency::FiatX - Convert fiat currency using current rate
+
+VERSION
+    This document describes version 0.002 of Finance::Currency::FiatX (from
+    Perl distribution Finance-Currency-FiatX), released on 2018-05-10.
+
+SYNOPSIS
+    See fiatx from App::fiatx for an example on how to use this module.
+
+DESCRIPTION
+    FiatX is a library/application to convert one fiat currency to another
+    using several backend modules ("Finance::Currency::Convert::*") and
+    store the rates in DBI database.
+
+FUNCTIONS
+  convert_fiat_currency
+    Usage:
+
+     convert_fiat_currency(%args) -> [status, msg, result, meta]
+
+    Convert fiat currency using current rate.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   amount => *num* (default: 1)
+
+    *   dbh => *obj*
+
+    *   from* => *currency::code*
+
+    *   max_age_cache => *posint* (default: 14400)
+
+        Above this age (in seconds), we retrieve rate from remote source
+        again.
+
+    *   max_age_current => *posint* (default: 86400)
+
+        Above this age (in seconds), we no longer consider the rate to be
+        "current" but "historical".
+
+    *   table_prefix => *str* (default: "fiatx_")
+
+    *   to* => *currency::code*
+
+    *   type => *str* (default: "sell")
+
+        Which rate is wanted? e.g. sell, buy.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+BUGS
+    Please report all bug reports or feature requests to
+    <mailto:stevenharyanto@gmail.com>.
+
+SEE ALSO
+    "Finance::Currency::Convert::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

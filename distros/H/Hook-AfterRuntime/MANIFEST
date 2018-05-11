@@ -1,8 +1,10 @@
 Build.PL
+Changes
 lib/Hook/AfterRuntime.pm
 MANIFEST			This list of files
+META.json
 META.yml
-README
+README.md
 t/Acceptance1.t
 t/Acceptance2.t
 t/AutoDone.pm

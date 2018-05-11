@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Path::Iterator::Rule ();
+use Path::Tiny qw( path );
 use Test::TempDir::Tiny qw( tempdir );
 
 my $dir;
@@ -13,7 +14,7 @@ BEGIN {
 use local::lib qw( --no-create );
 
 # Install in local lib even if it's already installed elsewhere
-use lazy ( '-L', $dir, '--reinstall' );
+use lazy ( '-L', $dir, '--reinstall', '-v' );
 
 use Capture::Tiny qw( capture );
 use Test::More;
@@ -39,6 +40,9 @@ ok( $found, 'file installed locally' );
 if ( !$found ) {
     diag 'STDERR: ' . $stderr;
     diag 'STDOUT: ' . $stdout;
+    if ( $stderr =~ m{See (.*) for details} ) {
+        diag path($1)->slurp;
+    }
 }
 
 done_testing();

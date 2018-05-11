@@ -57,8 +57,9 @@ Print a help message and exit.
 
 =item B<--ifmt> E<lt>JSON|YAMLE<gt>
 
-Force specified input format usage. Automatically choosed (using file
-extension) if omitted.
+Force specified input format usage. Will be selected automatically (using
+file name extension) if omitted. L<YAML::XS> should be installed for YAML
+support.
 
 =item B<--list-modules|-l>
 
@@ -67,6 +68,12 @@ List available modules.
 =item B<--module|-m> E<lt>nameE<gt>
 
 Process structure using specified module.
+
+=item B<--ofmt> E<lt>JSON|YAMLE<gt>
+
+Force specified output format usage. JSON is used by default; L<YAML::XS>
+should be installed for YAML support, see L<App::NDTools/LIMITATIONS> for
+more info.
 
 =item B<--rules> E<lt>fileE<gt>
 

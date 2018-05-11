@@ -4,7 +4,7 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.302052",
+            "Test::More" : "1.001002",
             "Test::Pod" : "1.51"
          }
       }
@@ -67,6 +67,6 @@
          "web" : "https://github.com/ronsavage/Genealogy-Gedcom-Date"
       }
    },
-   "version" : "2.09",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "2.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -19,7 +19,7 @@
 # USA.
 
 package Locale::XGettext::TT2;
-$Locale::XGettext::TT2::VERSION = '0.5';
+$Locale::XGettext::TT2::VERSION = '0.6';
 use strict;
 
 use Locale::TextDomain qw(Template-Plugin-Gettext);
@@ -102,7 +102,9 @@ sub readFile {
     my ($self, $filename) = @_;
 
     my %options = (
-        ABSOLUTE => 1
+        ABSOLUTE => 1,
+        # Needed for reading from POTFILES
+        RELATIVE => 1
     );
 
     my $parser = Locale::XGettext::TT2::Parser->new(\%options);
@@ -122,7 +124,7 @@ sub readFile {
 }
 
 package Locale::XGettext::TT2::Parser;
-$Locale::XGettext::TT2::Parser::VERSION = '0.5';
+$Locale::XGettext::TT2::Parser::VERSION = '0.6';
 use strict;
 
 use Locale::TextDomain qw(Template-Plugin-Gettext);

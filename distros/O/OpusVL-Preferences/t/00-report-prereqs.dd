@@ -16,7 +16,6 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
                                       'DBIx::Class::Core' => '0',
                                       'DBIx::Class::ResultSet' => '0',
                                       'DBIx::Class::Schema' => '0',

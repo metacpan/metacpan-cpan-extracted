@@ -6,6 +6,7 @@ $ENV{DBGP_PERL_IGNORE_PADWALKER} = 1;
 
 run_debugger('t/scripts/special_values.pl');
 
+send_command('feature_set', '-n', 'max_depth', '-v', '5');
 send_command('run');
 
 command_is(['property_get', '-n', '$code'], {
@@ -42,6 +43,41 @@ command_is(['property_get', '-n', '$scalar'], {
                 numchildren => '0',
                 value       => 'a',
             },
+        ],
+    },
+});
+
+command_is(['property_get', '-n', '$ref'], {
+    command  => 'property_get',
+    property => {
+        name        => '$ref',
+        fullname    => '$ref',
+        type        => 'REF',
+        numchildren => '1',
+        page        => 0,
+        pagesize    => 10,
+        value       => undef,
+        childs      => [
+            {
+                name        => '->',
+                fullname    => '${$ref}',
+                type        => 'SCALAR',
+                numchildren => '1',
+                page        => 0,
+                pagesize    => 10,
+                value       => undef,
+                childs      => [
+                    {
+                        name        => '->',
+                        fullname    => '${${$ref}}',
+                        type        => 'string',
+                        constant    => '0',
+                        children    => '0',
+                        numchildren => '0',
+                        value       => 'a',
+                    },
+                ],
+            }
         ],
     },
 });

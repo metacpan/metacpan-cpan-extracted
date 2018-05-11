@@ -18,9 +18,6 @@ my %TODO_TESTS =
           'h-recipe' => [
                           'all'
                         ],
-          'h-entry' => [
-                         'impliedvalue-nested'
-                       ],
           'h-product' => [
                            'simpleproperties',
                            'aggregate'
@@ -86,8 +83,9 @@ sub handle_file {
     my $target = decode_json($json_file->slurp);
 
     if ( first { $_ eq $main } @{ $TODO_TESTS{ $file->parent->basename } } ) {
+        my $parent = $file->parent->basename;
         local $TODO = "This Microformat2 parser doesn't support the "
-                      . "'$main' test yet.";
+                      . "'$parent/$main' test yet.";
 
         TODO: { is_deeply( $candidate, $target ) }
     }

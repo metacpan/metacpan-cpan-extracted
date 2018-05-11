@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Apache::TestMM" : "0",
+            "mod_perl2" : "0"
          }
       },
       "runtime" : {
@@ -54,5 +55,5 @@
          "web" : "https://github.com/mbarbon/apache2-camelcadedb"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02"
 }

@@ -17,7 +17,7 @@ use Carp qw(croak);
 use Test::More;
 use Scalar::Util qw(reftype);
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 
 # If the variable $TEST_INVERT is set, then invert all tests. If either $TEST_INVERT or
@@ -95,7 +95,7 @@ sub limit_max {
     
     else
     {
-	$condition //= '';
+	$condition ||= '';
 	croak "invalid condition key '$condition'" unless defined $condition && $condition ne '' && $condition !~ /^\d+$/;
 	croak "the limit value must be a nonnegative integer" unless defined $limit && $limit =~ /^\d+$/;
 	
@@ -159,7 +159,7 @@ sub expect_min {
     
     else
     {
-	$condition //= '';
+	$condition ||= '';
 	croak "invalid condition key '$condition'" unless defined $condition && $condition ne '' && $condition !~ /^\d+$/;
 	croak "the limit value must be a nonnegative integer" unless defined $limit && $limit =~ /^\d+$/;
 	
@@ -289,7 +289,7 @@ sub flag {
     $tc->set($key);
     
     $tc->{count}{$key}++;
-    $tc->{label}{$key} //= $label if defined $label && $label ne '';
+    $tc->{label}{$key} = $label if ! defined $tc->{label}{$key} && defined $label && $label ne '';
 }
 
 
@@ -415,7 +415,7 @@ sub get_label {
 
     my ($tc, $key) = @_;
     
-    return $tc->{label}{$key} // '';
+    return defined $tc->{label}{$key} ? $tc->{label}{$key} : '';
 }
 
 
@@ -448,7 +448,7 @@ sub ok_all {
  KEY:
     foreach my $k ( $tc->active_conditions )
     {
-	my $count = $tc->get_count($k) // 0;
+	my $count = $tc->get_count($k) || 0;
 	my $limit = $tc->get_limit($k);
 	my $expected = $tc->get_expect($k);
 	my $label = $tc->get_label($k);
@@ -584,7 +584,7 @@ sub ok_condition {
     
     my $set = $tc->is_set($key);
     my $expected = $tc->get_expect($key);
-    my $count = $tc->get_count($key) // 0;
+    my $count = $tc->get_count($key) || 0;
     my $limit = $tc->get_limit($key);
     my $label = $tc->get_label($key);
     my $tested = $tc->is_tested($key);

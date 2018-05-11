@@ -1,5 +1,13 @@
 Revision history for OpusVL-Preferences
 
+0.29      2018-05-09 15:35:17+01:00 Europe/London
+
+  * Fix curiously deleted lines that made it not work
+
+0.28      2018-05-09 14:35:46+01:00 Europe/London
+
+  * [T13511] GDPR defautls added
+
 0.27      2017-09-12 14:40:12+01:00 Europe/London
 
   * Fields are no longer masked if the mask happens to be the empty string

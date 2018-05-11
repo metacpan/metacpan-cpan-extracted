@@ -10,7 +10,7 @@ my %data2 = ( 1 => 'aa', 2 => 'bb' );
 
 my $next_ref = \%data1;
 
-while (my ($key, $value) = each_kv %{$next_ref}) {
+while (my ($key, $value) = each_kv $next_ref) {
     ok exists $next_ref->{$key}   => 'Valid key returned';
     is $next_ref->{$key}, $value => 'Correct value returned';
 
@@ -21,7 +21,7 @@ while (my ($key, $value) = each_kv %{$next_ref}) {
 $next_ref = \%data1;
 
 my $next_expected = 0;
-while (my $pair = each_pair %{$next_ref}) {
+while (my $pair = each_pair $next_ref) {
     ok exists $next_ref->{$pair->key}        => 'Valid key returned';
     is $next_ref->{$pair->key}, $pair->value => 'Correct value returned';
 

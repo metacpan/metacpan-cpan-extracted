@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-PromptIfStale
 
+0.055     2018-05-08 03:09:35Z
+          - fix for Dist::Zilla 7: ensure that the proper directory is used
+            for determining authordeps and local modules
+
 0.054     2017-08-17 00:47:23Z
           - switch to a different environment variable to control
             functionality in tests, especially travis, to allow installing on

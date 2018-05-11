@@ -12,8 +12,8 @@ Web::Microformats2 - Read Microformats2 metadata from HTML or JSON
 
     for my $item ( $mf2_doc->all_top_level_items ) {
        # Each $item is a Web::Microformats2::Item object.
-       my $types_ref = $item->types;
-       say "I see an MF2 item with these types set: @$types_ref";
+       my @types = $item->all_types;
+       say "I see an MF2 item with these types set: @types";
 
        my $name = $item->get_property( 'name' );
        say "The value of the item's 'name' property is: '$name'";

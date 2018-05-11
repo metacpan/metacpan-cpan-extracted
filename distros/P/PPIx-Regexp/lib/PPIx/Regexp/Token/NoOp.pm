@@ -8,9 +8,9 @@ use warnings;
 use base qw{ PPIx::Regexp::Token };
 
 use Carp;
-use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
+use PPIx::Regexp::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 {
     my %when_removed = (

@@ -52,15 +52,22 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
            . "so it is not verified.";
     }
 
-    # Manually buidling a webmention:
+    # Manually buidling and sending a webmention:
 
     $wm = Web::Mention->new(
        source => $url_of_the_thing_that_got_mentioned,
        target => $url_of_the_thing_that_did_the_mentioning
     );
 
-    # Sending a webmention:
-    # ...watch this space.
+    my $success = $wm->send;
+    if ( $success ) {
+        say "Webmention sent successfully!";
+    }
+    else {
+        say "The webmention wasn't sent successfully.";
+        say "Here's the response we got back..."
+        say $wm->response;
+    }
 
 # DESCRIPTION
 
@@ -87,7 +94,9 @@ string.
 
 Per the Webmention protocol, the **source** URL represents the location
 of the document that made the mention described here, and **target**
-describes the location of the document that got mentioned.
+describes the location of the document that got mentioned. The two
+arguments cannot refer to the same URL (disregarding the `#fragment`
+part of either, if present).
 
 ### new\_from\_request
 
@@ -106,17 +115,35 @@ or if it does but does not define both required HTTP parameters.
 
 ## Object Methods
 
-### source
+### author
 
-    $source_url = $wm->source;
+    $author = $wm->author;
 
-Returns the webmention's source URL, as a [URI](https://metacpan.org/pod/URI) object.
+A Web::Mention::Author object representing the author of this
+webmention's source document, if we're able to determine it. If not,
+this returns undef.
 
-### target
+### content
 
-    $target_url = $wm->target;
+    $content = $wm->content;
 
-Returns the webmention's target URL, as a [URI](https://metacpan.org/pod/URI) object.
+The content of this webmention, if its source document exists and
+defines its content using Microformats2. If not, then it returns the content
+of the source document's &lt;title> element, if it has one.
+
+**CAUTION:** Spec-compliant implementation of this method is incomplete,
+and its API may change in near-future updates to this module.
+
+### endpoint
+
+    my $uri = $wm->endpoint;
+
+Attempts to determine the webmention endpoint URL of this webmention's
+target. On success, returns a [URI](https://metacpan.org/pod/URI) object. On failure, returns undef.
+
+(If the endpoint is set to localhost or a loopback IP, will return undef
+and also emit a warning, because that's terribly rude behavior on the
+target's part.)
 
 ### is\_verified
 
@@ -129,25 +156,47 @@ The first time this is called on a given webmention object, it will try
 to fetch the source document at its designated URL. If it cannot fetch
 the document on this first attempt, this method returns 0.
 
-### type
+### original\_source
 
-    $type = $wm->type;
+    $original_url = $wm->original_source;
 
-The type of webmention this is. One of:
+If the document fetched from the source URL seems to point at yet
+another URL as its original source, then this returns that URL. If not,
+this has the same return value as `source()`.
 
-- mention _(default)_
-- reply
-- like
-- repost
-- quotation
+(It makes this determination based on the possible presence a `u-url`
+property in an `h-entry` found within the source document.)
 
-### author
+### response
 
-    $author = $wm->author;
+    my $response = $wm->response;
 
-A Web::Mention::Author object representing the author of this
-webmention's source document, if we're able to determine it. If not,
-this returns undef.
+Returns the [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object representing the response received
+by this webmention instance during its most recent attempt to send
+itself.
+
+Returns undef if this webmention instance hasn't tried to send itself.
+
+### send
+
+    my $bool = $wm->send;
+
+Attempts to send an HTTP-request representation of this webmention to
+its target's designated webmention endpoint. This involves querying the
+target URL to discover said endpoint's URL (via the `endpoint` object
+method), and then sending the actual webmention request via HTTP to that
+endpoint.
+
+If that whole process goes through successfully and the endpoint returns
+a success response (meaning that it has acknowledged the webmention, and
+most likely queued it for later processing), then this method returns
+true. Otherwise, it returns false.
+
+### source
+
+    $source_url = $wm->source;
+
+Returns the webmention's source URL, as a [URI](https://metacpan.org/pod/URI) object.
 
 ### source\_html
 
@@ -164,23 +213,23 @@ The [Web::Microformats2::Document](https://metacpan.org/pod/Web::Microformats2::
 source document for Microformats2 metadata. If no such result, returns
 undef.
 
-### content
+### target
 
-    $content = $wm->content;
+    $target_url = $wm->target;
 
-The content of this webmention, if its source document exists and
-defines its content using Microformats2. If not, this returns undef.
+Returns the webmention's target URL, as a [URI](https://metacpan.org/pod/URI) object.
 
-### original\_source
+### type
 
-    $original_url = $wm->original_source;
+    $type = $wm->type;
 
-If the document fetched from the source URL seems to point at yet
-another URL as its original source, then this returns that URL. If not,
-this has the same return value as `source()`.
+The type of webmention this is. One of:
 
-(It makes this determination based on the possible presence a `u-url`
-property in an `h-entry` found within the source document.)
+- mention _(default)_
+- reply
+- like
+- repost
+- quotation
 
 # NOTES AND BUGS
 
@@ -188,9 +237,6 @@ This software is **alpha**; its author is still determining how it wants
 to work, and its interface might change dramatically.
 
 Implementation of the content-fetching method is incomplete.
-
-The author plans to add webmention-sending functionality to this module.
-But, it isn't there yet.
 
 # SUPPORT
 

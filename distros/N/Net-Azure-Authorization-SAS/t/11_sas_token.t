@@ -9,7 +9,7 @@ use Net::Azure::Authorization::SAS;
 my $sas;
 
 subtest 'new - no connection_string' => sub {
-    throws_ok {$sas = Net::Azure::Authorization::SAS->new;} qr/\Aconnection_string is required/;
+    throws_ok {$sas = Net::Azure::Authorization::SAS->new;} qr/\Aendpoint was not specified/;
     is $sas, undef;
 };
 
@@ -18,6 +18,19 @@ subtest 'new - normal' => sub {
         connection_string => 'Endpoint=sb://mysvc.servicebus.windows.net/;SharedAccessKeyName=mykey;SharedAccessKey=AexamplekeyAEXAMPLEKEYAexamplekeyAEXAMPLEKEY=;EntityPath=myentity',
     );
     isa_ok $sas, 'Net::Azure::Authorization::SAS';
+};
+
+subtest 'new - without connection_string' => sub {
+    my $sas_nostr = Net::Azure::Authorization::SAS->new(
+        endpoint               => 'sb://mysvc.servicebus.windows.net/',
+        shared_access_key_name => 'mykey',
+        shared_access_key      => 'AexamplekeyAEXAMPLEKEYAexamplekeyAEXAMPLEKEY=',
+        entity_path            => 'myentity'
+    );
+    isa_ok $sas_nostr, 'Net::Azure::Authorization::SAS';
+    for my $key (qw(endpoint shared_access_key_name shared_access_key entity_path)) {
+        is $sas_nostr->$key, $sas->$key, "specify $key manually is succeded";
+    }
 };
 
 subtest 'token - normal' => sub {

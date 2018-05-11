@@ -22,6 +22,27 @@ subtest 'sessions' => sub {
 };
 
 
+subtest 'add_facet' => sub {
+    my $app = $t->app;
+    $app->add_facet( foo => {
+        path => 'foo',
+        setup => sub {
+            shift->routes->get('/' => { text => 'on foo facet' })
+        }
+    });
+
+
+    $t->get_ok('/foo/')->status_is(200)->content_is('on foo facet');
+};
+
+
+subtest 'has_facet' => sub {
+    ok !$t->app->has_facet('unknown');
+    ok $t->app->has_facet('backoffice');
+    ok $t->app->has_facet('foo');
+};
+
+
 done_testing;
 
 

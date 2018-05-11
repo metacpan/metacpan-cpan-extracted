@@ -12,7 +12,7 @@ use Astro::Coord::ECI::Utils qw{ __default_station
 use Exporter ();
 use POSIX qw{ floor };
 
-our $VERSION = '0.094';
+our $VERSION = '0.095';
 
 our @EXPORT_OK = qw{
     almanac almanac_hash

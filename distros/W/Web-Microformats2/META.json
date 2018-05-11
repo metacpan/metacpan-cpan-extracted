@@ -65,7 +65,7 @@
    "provides" : {
       "Web::Microformats2" : {
          "file" : "lib/Web/Microformats2.pm",
-         "version" : "0.02"
+         "version" : "0.3"
       },
       "Web::Microformats2::Document" : {
          "file" : "lib/Web/Microformats2/Document.pm"
@@ -88,7 +88,7 @@
          "web" : "https://github.com/jmacdotorg/microformats2-perl"
       }
    },
-   "version" : "0.02",
+   "version" : "0.3",
    "x_contributors" : [
       "Jason McIntosh <jmac@jmac.org>"
    ],

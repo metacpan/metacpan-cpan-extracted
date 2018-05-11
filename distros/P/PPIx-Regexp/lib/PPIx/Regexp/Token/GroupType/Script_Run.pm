@@ -9,9 +9,9 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-use Carp;
+use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 {
     my $expl = 'All characters must be in same script';

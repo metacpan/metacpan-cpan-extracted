@@ -6,16 +6,18 @@ use strict;
 use warnings;
 
 use Carp;
+use PPIx::Regexp::Constant qw{ @CARP_NOT };
 use Scalar::Util qw{ blessed };
 
 use base qw{ Exporter };
 
 our @EXPORT_OK = qw{
     __choose_tokenizer_class __instance
+    __is_ppi_regexp_element
     __ns_can __to_ordinal_en
 };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 {
 
@@ -34,6 +36,16 @@ our $VERSION = '0.058';
 	[ 'PPI::Token::HereDoc',
 	    'PPIx::Regexp::StringTokenizer' ],
     );
+
+    sub __is_ppi_regexp_element {
+	my ( $elem ) = @_;
+	foreach ( @ppi_zoo ) {
+	    $elem->isa( $_->[0] )
+		or next;
+	    return 'PPIx::Regexp::Tokenizer' eq $_->[1];
+	}
+	return;
+    }
 
     my %parse_type = (
 	guess	=> sub {
@@ -61,8 +73,20 @@ our $VERSION = '0.058';
 	},
     );
 
+    my $deprecate_parse;
+
     sub __choose_tokenizer_class {
 	my ( $content, $arg ) = @_;
+	if ( defined $arg->{parse} &&
+	    warnings::enabled( 'deprecated' ) &&
+	    ! $deprecate_parse++
+	) {
+	    my $warning = q<The 'parse' argument is deprecated.>;
+	    { guess => 1, string => 1 }->{$arg->{parse}}
+		and $warning = join ' ', $warning,
+		    q<You should use PPIx::QuoteLike on quotish things>;
+	    carp $warning;
+	}
 	my $parse = defined $arg->{parse} ? $arg->{parse} : 'regex';
 	my $code = $parse_type{$parse}
 	    or return PPIx::Regexp::Tokenizer->__set_errstr(
@@ -138,6 +162,15 @@ This module can export the following subroutines:
 This subroutine returns true if its first argument is an instance of the
 class specified by its second argument. Unlike C<UNIVERSAL::isa>, the
 result is always false unless the first argument is a reference.
+
+=head2 __is_ppi_regexp_element
+
+ __is_ppi_regexp_element( $elem )
+   and print "$elem is a regexp of some sort\n";
+
+This subroutine takes as its argument a L<PPI::Element|PPI::Element>. It
+returns a true value if the argument represents a regular expression of
+some sort, and a false value otherwise.
 
 =head2 __ns_can
 

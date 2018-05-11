@@ -1,15 +1,19 @@
+.mailmap
 Changes
 lib/Parse/Snort.pm
+lib/Parse/Snort/Strict.pm
 Makefile.PL
 MANIFEST
 META.yml			# Will be created by "make dist"
 README
-t/00-load.t
+t/01_parse_text_rule.t
+t/02_parse_and_modify.t
 t/10_parse_text_rule.t
 t/20_parse_hash_rule.t
 t/30_parse_hash_rule.t
+t/40_preprocessed_rules.t
+t/50_methods.t
+t/80_strict_validation.t
 t/90_parse_text_rule_abuse.t
-t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
-META.json                                Module JSON meta-data (added by MakeMaker)

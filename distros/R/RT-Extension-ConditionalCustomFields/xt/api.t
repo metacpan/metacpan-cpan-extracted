@@ -1,12 +1,13 @@
 use strict;
 use warnings;
 
-use RT::Extension::ConditionalCustomFields::Test tests => 19;
+use RT::Extension::ConditionalCustomFields::Test tests => 14;
 
 my $cf_condition = RT::CustomField->new(RT->SystemUser);
 $cf_condition->Create(Name => 'Condition', Type => 'SelectSingle', Queue => 'General');
 $cf_condition->AddValue(Name => 'Passed', SortOder => 0);
 $cf_condition->AddValue(Name => 'Failed', SortOrder => 1);
+$cf_condition->AddValue(Name => 'Schrödingerized', SortOrder => 2);
 my $cf_values = $cf_condition->Values->ItemsArrayRef;
 
 my $cf_conditioned_by = RT::CustomField->new(RT->SystemUser);
@@ -15,24 +16,21 @@ $cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'FreeformSingle', Qu
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by_child->Create(Name => 'Child', Type => 'FreeformSingle', Queue => 'General', BasedOn => $cf_conditioned_by->id);
 
-my ($rv, $msg) = $cf_conditioned_by->SetConditionedBy($cf_values->[0]->id);
+my ($rv, $msg) = $cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 ok($rv, "SetConditionedBy: $msg");
 
-is(ref($cf_condition->ConditionedByObj), 'RT::CustomFieldValue', 'Not ConditionedByObj returns empty RT::CustomFieldValue');
-is($cf_condition->ConditionedByObj->id, undef, 'Not ConditionedByObj');
-is($cf_conditioned_by->ConditionedByObj->Name, 'Passed', 'ConditionedByObj');
-is(ref($cf_conditioned_by_child->ConditionedByObj), 'RT::CustomFieldValue', 'Not recursive ConditionedByObj returns empty RT::CustomFieldValue');
-is($cf_conditioned_by_child->ConditionedByObj->id, undef, 'Not recursive ConditionedByObj');
+my $cf_condition_conditioned_by = $cf_condition->ConditionedBy;
+is($cf_condition_conditioned_by, undef, 'Not ConditionedBy returns undef');
+my $cf_conditioned_by_conditioned_by = $cf_conditioned_by->ConditionedBy;
+is($cf_conditioned_by_conditioned_by->{CF}, $cf_condition->id, 'ConditionedBy returns CF id');
+is(scalar(@{$cf_conditioned_by_conditioned_by->{vals}}), 2, 'ConditionedBy returns two vals');
+is($cf_conditioned_by_conditioned_by->{vals}->[0], $cf_values->[0]->Name, 'ConditionedBy returns first val');
+is($cf_conditioned_by_conditioned_by->{vals}->[1], $cf_values->[2]->Name, 'ConditionedBy returns second val');
+my $cf_conditioned_by_child_conditioned_by = $cf_conditioned_by_child->ConditionedBy;
+is($cf_conditioned_by_child_conditioned_by->{CF}, $cf_condition->id, 'Recursive ConditionedBy returns CF id');
+is(scalar(@{$cf_conditioned_by_child_conditioned_by->{vals}}), 2, 'Recursive ConditionedBy returns two vals');
+is($cf_conditioned_by_child_conditioned_by->{vals}->[0], $cf_values->[0]->Name, 'Recursive ConditionedBy returns first val');
+is($cf_conditioned_by_child_conditioned_by->{vals}->[1], $cf_values->[2]->Name, 'Recursive ConditionedBy returns second val');
 
-is($cf_condition->ConditionedByAsString, undef, 'Not ConditionedByAsString');
-is($cf_conditioned_by->ConditionedByAsString, 'Passed', 'ConditionedByAsString');
-is($cf_conditioned_by_child->ConditionedByAsString, undef, 'Not recursive ConditionedByAsString');
-
-is($cf_condition->ConditionedByCustomField, undef, 'Not ConditionedByCustomField');
-is($cf_conditioned_by->ConditionedByCustomField->Name, 'Condition', 'ConditionedByCustomField');
-is($cf_conditioned_by_child->ConditionedByCustomField->Name, 'Condition', 'Recursive ConditionedByCustomField');
-
-is(ref($cf_condition->ConditionedByCustomFieldValue), 'RT::CustomFieldValue', 'Not ConditionedByCustomFieldValue returns empty RT::CustomFieldValue');
-is($cf_condition->ConditionedByCustomFieldValue->id, undef, 'Not ConditionedByCustomFieldValue');
-is($cf_conditioned_by->ConditionedByCustomFieldValue->Name, 'Passed', 'ConditionedByCustomFieldValue');
-is($cf_conditioned_by_child->ConditionedByCustomFieldValue->Name, 'Passed', 'Recursive ConditionedByCustomFieldValue');
+($rv, $msg) = $cf_conditioned_by->SetConditionedBy(undef, undef);
+is($msg, 'ConditionedBy deleted', 'Delete SetConditionedBy');

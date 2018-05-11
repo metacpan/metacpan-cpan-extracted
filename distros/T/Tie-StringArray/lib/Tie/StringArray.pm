@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw(croak);
 
-$VERSION = '1.0001';
+$VERSION = '1.101';
 
 
 =encoding utf8
@@ -24,7 +24,7 @@ Tie::StringArray - use a tied string as an array of chars
 
 The C<Tie::StringArray> module is a demonstration from I<Mastering
 Perl>. It stores integers between 0 and 255 as a single character
-in a string that acts like an array through C<tie>. Behind the C<tie>, 
+in a string that acts like an array through C<tie>. Behind the C<tie>,
 the array is a single string, so there's only one scalar to store.
 
 I don't think this is particularly useful for anything real.
@@ -39,8 +39,8 @@ I don't think this is particularly useful for anything real.
 sub _null { "\x00" }
 sub _last () { $_[0]->FETCHSIZE - 1 }
 
-sub _normalize_index { 
-	$_[1] == abs $_[1] ? $_[1] : $_[0]->_last + 1 - abs $_[1] 
+sub _normalize_index {
+	$_[1] == abs $_[1] ? $_[1] : $_[0]->_last + 1 - abs $_[1]
 	}
 
 sub _store  { chr $_[1] }
@@ -149,8 +149,8 @@ sub SPLICE {
 		}
 
 	my $replacement = join '', map { chr } @list;
-	
-	my @removed = 
+
+	my @removed =
 		map { ord }
 		split //,
 		substr $$self, $offset, $length;
@@ -186,9 +186,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2013, brian d foy, All Rights Reserved.
+Copyright © 2005-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

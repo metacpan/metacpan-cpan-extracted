@@ -1,5 +1,8 @@
 Revision history for Test-Conditions
 
 0.8     2018-05-02
-        Uploaded to CPAN for the first time
+        Uploaded to CPAN for the first time.
+
+0.83	2018-05-07
+	Versions 0.81-0.83 include minor changes in order to work with older perls.
 

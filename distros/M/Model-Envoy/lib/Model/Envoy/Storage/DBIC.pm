@@ -1,6 +1,6 @@
 package Model::Envoy::Storage::DBIC;
 
-our $VERSION = '0.1';
+our $VERSION = '0.1.1';
 
 =head1 Model::Envoy::Storage::DBIC
 
@@ -310,7 +310,7 @@ has primary_key => (
     predicate => 'is_primary_key'
 );
 
-package Moose::Meta::Attribute::Custom::Trait::DBIC;
+package Moose::Meta::Attribute::Custom::Trait::EDBIC;
     sub register_implementation { 
         'MooseX::Meta::Attribute::Trait::DBIC'
     };

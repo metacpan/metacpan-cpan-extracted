@@ -64,6 +64,17 @@ sub run
         map{ $cv->end; } 1 .. $cv->{_ae_counter}||0;
     };
 
+    my ( $md5, $aim, $efsize );
+    if( my $ef = $ENV{MYDanExtractFile} )
+    {
+        open my $TEMP, "<$ef" or die "open ef fail:$!";
+        $md5 = Digest::MD5->new()->addfile( $TEMP )->hexdigest();
+        close $TEMP;
+        my $efa =  $ENV{MYDanExtractFileAim};
+        $aim = $efa && $efa =~ /^[a-zA-Z0-9\/\._\-]+$/ ? $efa : '.';
+        $efsize = ( stat $ef )[7];
+    }
+
     my $percent =  MYDan::Util::Percent->new( scalar @node, 'run ..' );
     my %cut;
     my $work;$work = sub{
@@ -100,7 +111,45 @@ sub run
                                  $cut{$node} = $_[1]; return; 
                              }
                              
-                             $result{$node} .= $_[1] unless ! $result{$node} && $_[1] eq '*';
+			     if( $result{$node} )
+			     {
+				  $result{$node} .= $_[1];
+			     }
+			     else
+			     {
+				     $_[1] =~ s/^\*+//;
+
+				     if( $_[1] =~ s/^MH_:(\d+):_MH// )
+				     {
+                                         if( $1 )
+                                         {
+                                             my $ef = $ENV{MYDanExtractFile};
+                                             open my $EF, "<$ef" or die "open $ef fail:$!";
+                                             my ( $n, $buf );
+        
+                                             $hdl->on_drain(sub {
+                                                     my ( $n, $buf );
+                                                     $n = sysread( $EF, $buf, 102400 );
+                                                     if( $n )
+                                                     {
+                                                         $hdl->push_write($buf);
+                                                     }
+                                                     else
+                                                     {
+                                                         $hdl->on_drain(undef);
+                                                         close $EF;
+                                                         $hdl->push_shutdown;
+                                                     }
+                                                 });
+                                         }
+                                         else
+                                         {
+                                             $hdl->push_shutdown;
+                                         }
+				         $_[1] =~ s/^\*+//;
+				     }
+				     $result{$node} = $_[1] if $_[1];
+			     }
                          }
  
                      );
@@ -111,8 +160,17 @@ sub run
                       $work->();
                   }
              );
-             $hdl->push_write($query);
-             $hdl->push_shutdown;
+             if( my $ef = $ENV{MYDanExtractFile} )
+             {
+                 my $size = length $query;
+                 $hdl->push_write("MYDanExtractFile_::${size}:${efsize}:${md5}:${aim}::_MYDanExtractFile");
+                 $hdl->push_write($query);
+             }
+             else
+             {
+                 $hdl->push_write($query);
+                 $hdl->push_shutdown;
+             }
           }, sub{ return 3; };
     };
 

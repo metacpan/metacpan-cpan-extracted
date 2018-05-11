@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,6 +34,8 @@ requires:
   utf8: 0
   warnings: 0
 resources:
-  repository: git://github.com/nalobin/Net-Whois-Raw.git
-version: 2.99013
+  bugtracker: https://github.com/regru/Net-Whois-Raw/issues
+  repository: git://github.com/regru/Net-Whois-Raw.git
+version: 2.99014
+x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.56'

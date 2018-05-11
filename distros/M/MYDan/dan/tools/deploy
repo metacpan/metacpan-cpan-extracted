@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MYDan::Util::OptConf;
+use MYDan::Util::Deploy;
+
+$MYDan::Util::OptConf::THIS = 'null';
+
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 [--repo /my/repo ] [--link /my/link] [--version release-x.x.x]
+
+    [--path /my/path ( default $repo/data ) ]
+    [--keep 10 (default 10)]
+
+    Version 'release-x.x.x' and 'rollback:release-x.x.x' are the same
+    Version backup refers to the $link.backup
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->set( keep => 10 )->get(
+     qw( repo=s link=s version=s path=s keep=i )
+)->dump();
+
+$option->assert( qw( repo link version ) );
+
+$o{path} = "$o{repo}/data" unless defined  $o{path};
+$o{version} =~ s/^rollback://;
+
+MYDan::Util::Deploy->new( %o )->deploy();

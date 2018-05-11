@@ -1,6 +1,22 @@
 Revision history for Web::Mention
 
+0.4 2018-05-10T04:34:13Z
+
+    - Adding support for webmention sending. (Passes all create / update / delete tests on http://webmention.rocks, as of May 9, 2018.)
+    
+    - Tidier construction of author objects.
+    
+    - Recognize a URI-escaped version of a the target URL on the source document as a valid mention.
+    
+    - Improved handling of source documents lacking any MF2 markup.
+    
+    - Improved handling of relative URLs found in source docs' MF2 markup.
+
 0.3 2018-04-23T14:19:45Z
+
+    - The internal author-object constructor no longer chokes if it
+    encounters author metadata that doesn't define every possible
+    property.
 
     - Constructor throws an exception if the source and target URLs are
     too similar. (Thanks to Christian Weiske for the heads-up.)

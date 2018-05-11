@@ -1,4 +1,17 @@
-Revision history for HTTP-Tiny-UNIX
+0.051   2018-05-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix regression in dependency: dependency to
+	  HTTP::Tiny::Handle should not be specified.
+
+
+0.050   2018-05-08 (PERLANCAR)
+
+        - Update to HTTP::Tiny 0.57+ (changed interface of
+          write_request_header() and write_header_lines()). Thanks Moritz
+          Grosch.
+
 
 0.04    2014-07-04 (SHARYANTO)
 

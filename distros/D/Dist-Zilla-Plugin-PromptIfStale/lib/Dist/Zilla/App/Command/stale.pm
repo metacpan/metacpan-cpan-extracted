@@ -4,7 +4,7 @@ package Dist::Zilla::App::Command::stale;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: print your distribution's prerequisites and plugins that are out of date
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use Dist::Zilla::App -command;
 
@@ -12,6 +12,7 @@ sub abstract { "print your distribution's stale prerequisites and plugins" }
 
 sub opt_spec
 {
+    [ 'root=s' => 'the root of the distribution; defaults to .' ],
     [ 'all'   , 'check all plugins and prerequisites, regardless of plugin configuration' ]
     # TODO?
     # [ 'plugins', 'check all plugins' ],
@@ -22,7 +23,11 @@ sub stale_modules
 {
     my ($self, $zilla, $all) = @_;
 
-    my @plugins = grep { $_->isa('Dist::Zilla::Plugin::PromptIfStale') } @{ $zilla->plugins };
+    my $dzil7 = eval { Dist::Zilla::App->VERSION('7.000') };
+
+    my @plugins = grep { $_->isa('Dist::Zilla::Plugin::PromptIfStale') }
+        $dzil7 ? $zilla->plugins : @{ $zilla->plugins };
+
     if (not @plugins)
     {
         require Dist::Zilla::Plugin::PromptIfStale;
@@ -37,12 +42,12 @@ sub stale_modules
     if ($all or do { require List::Util; List::Util->VERSION('1.33'); List::Util::any(sub { $_->check_all_prereqs }, @plugins) })
     {
         $_->before_build for grep { not $_->isa('Dist::Zilla::Plugin::PromptIfStale') }
-            @{ $zilla->plugins_with(-BeforeBuild) };
-        $_->gather_files for @{ $zilla->plugins_with(-FileGatherer) };
-        $_->set_file_encodings for @{ $zilla->plugins_with(-EncodingProvider) };
-        $_->prune_files  for @{ $zilla->plugins_with(-FilePruner) };
-        $_->munge_files  for @{ $zilla->plugins_with(-FileMunger) };
-        $_->register_prereqs for @{ $zilla->plugins_with(-PrereqSource) };
+            $dzil7 ? $zilla->plugins_with(-BeforeBuild) : @{ $zilla->plugins_with(-BeforeBuild) };
+        $_->gather_files for $dzil7 ? $zilla->plugins_with(-FileGatherer) : @{ $zilla->plugins_with(-FileGatherer) };
+        $_->set_file_encodings for $dzil7 ? $zilla->plugins_with(-EncodingProvider) : @{ $zilla->plugins_with(-EncodingProvider) };
+        $_->prune_files  for $dzil7 ? $zilla->plugins_with(-FilePruner) : @{ $zilla->plugins_with(-FilePruner) };
+        $_->munge_files  for $dzil7 ? $zilla->plugins_with(-FileMunger) : @{ $zilla->plugins_with(-FileMunger) };
+        $_->register_prereqs for $dzil7 ? $zilla->plugins_with(-PrereqSource) : @{ $zilla->plugins_with(-PrereqSource) };
 
         push @modules, map {
             ( $all || $_->check_all_prereqs ? $_->_modules_prereq : () ),
@@ -103,7 +108,7 @@ sub execute
                 or m/ version \(.+\) (does )?not match required version: /m;
         }
 
-        push @authordeps, $self->_missing_authordeps;
+        push @authordeps, $self->_missing_authordeps($opt->root // '.');
 
         $self->app->chrome->logger->unmute;
         $self->log(join("\n", sort(List::Util::uniq(@authordeps))));
@@ -130,7 +135,7 @@ sub execute
 
         # if there was an error during the build, fall back to fetching
         # authordeps, in the hopes that we can report something helpful
-        $self->_missing_authordeps;
+        $self->_missing_authordeps($opt->root // '.');
     };
 
     $self->app->chrome->logger->unmute;
@@ -141,13 +146,13 @@ sub execute
 # as in Dist::Zilla::App::Command::alldeps
 sub _missing_authordeps
 {
-    my $self = shift;
+    my ($self, $root) = @_;
 
     require Dist::Zilla::Util::AuthorDeps;
     Dist::Zilla::Util::AuthorDeps->VERSION(5.021);
     my @authordeps = map { (%$_)[0] }
         @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps(
-            '.',            # repository root
+            $root,          # repository root
             1,              # --missing
           )
         };
@@ -167,7 +172,7 @@ Dist::Zilla::App::Command::stale - print your distribution's prerequisites and p
 
 =head1 VERSION
 
-version 0.054
+version 0.055
 
 =head1 SYNOPSIS
 

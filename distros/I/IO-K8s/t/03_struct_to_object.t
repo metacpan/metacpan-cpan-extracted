@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use Test::More;
+use Test::Exception;
 use IO::K8s;
 
 my $io = IO::K8s->new;
@@ -145,6 +146,22 @@ my $io = IO::K8s->new;
 
 }
 
+
+
+{
+  lives_ok(sub {
+    my $obj = $io->struct_to_object(
+      'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta',
+      {
+        creationTimestamp => undef,
+        labels => {
+          label1 => 'value1'
+        },
+      }
+    );
+  }, 'ObjectMeta with creationTimestamp undef');
+}
+ 
 {
   my $obj = $io->json_to_object(
     'IO::K8s::Api::Core::V1::Service',

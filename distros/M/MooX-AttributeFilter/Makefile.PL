@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MooX-AttributeFilter",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "MooX::AttributeFilter",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -25,13 +26,16 @@ my %WriteMakefileArgs = (
     "strictures" => 1
   },
   "TEST_REQUIRES" => {
-    "List::Util" => 0,
+    "List::Util" => "1.029000",
     "Moo" => 0,
+    "Pod::Coverage::TrustPod" => 0,
     "Test2::V0" => "0.000060",
+    "Test::Pod" => 0,
+    "Test::Pod::Coverage" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001002",
+  "VERSION" => "0.001005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,12 +46,15 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Method::Modifiers" => 0,
   "Data::Dumper" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.029000",
   "Method::Generate::Accessor" => 0,
   "Moo" => 0,
+  "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
   "Sub::Quote" => 0,
   "Test2::V0" => "0.000060",
+  "Test::Pod" => 0,
+  "Test::Pod::Coverage" => 0,
   "strict" => 0,
   "strictures" => 1,
   "warnings" => 0

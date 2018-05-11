@@ -6,30 +6,30 @@ use Test2::V0;
 plan 3;
 
 eval {
-    package BadAttr {
-        use Moo;
-        use MooX::AttributeFilter;
+    package BadAttr;
+    use Moo;
+    use MooX::AttributeFilter;
 
-        has attr => (
-            is     => 'ro',
-            filter => sub { },
-        );
-    }
+    has attr => (
+        is     => 'ro',
+        filter => sub { },
+    );
+    1;
 };
 
 like( $@, qr/Incompatibe 'is' option 'ro': can't install filter/,
     "is => 'ro'" );
 
 eval {
-    package BadRef {
-        use Moo;
-        use MooX::AttributeFilter;
+    package BadRef;
+    use Moo;
+    use MooX::AttributeFilter;
 
-        has attr => (
-            is     => 'rw',
-            filter => {},
-        );
-    }
+    has attr => (
+        is     => 'rw',
+        filter => {},
+    );
+    1;
 };
 like(
     $@,
@@ -38,15 +38,15 @@ like(
 );
 
 eval {
-    package BadMethod {
-        use Moo;
-        use MooX::AttributeFilter;
+    package BadMethod;
+    use Moo;
+    use MooX::AttributeFilter;
 
-        has attr => (
-            is     => 'rw',
-            filter => 'noFilter',
-        );
-    }
+    has attr => (
+        is     => 'rw',
+        filter => 'noFilter',
+    );
+    1;
 };
 like(
     $@,

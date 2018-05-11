@@ -3,15 +3,16 @@ abstract: 'Editor and validator for systemd configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
-  Config::Model: '2.118'
-  Config::Model::Tester: '2.054'
+  Config::Model: '2.123'
+  Config::Model::Tester: '3.006'
+  Config::Model::Tester::Setup: '0'
   Module::Build: '0.34'
   Test::File::Contents: '0'
   Test::More: '0'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +22,7 @@ recommends:
   App::Cme: '0'
   Config::Model::TkUI: '0'
 requires:
-  Config::Model: '2.118'
+  Config::Model: '2.123'
   Config::Model::Backend::Any: '0'
   Config::Model::Backend::IniFile: '0'
   Log::Log4perl: '0'
@@ -33,5 +34,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-systemd/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-systemd.git
-version: 0.238.1
+version: 0.238.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

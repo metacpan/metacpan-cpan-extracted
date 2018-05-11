@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 46;
 
 BEGIN { use_ok('Store::CouchDB'); }
 
@@ -19,7 +19,7 @@ my $cleanup = 0;
 $sc->delete_db($db);
 
 SKIP: {
-    skip 'needs admin party CouchDB on localhost:5984', 43
+    skip 'needs admin party CouchDB on localhost:5984', 45
         if ($sc->has_error and $sc->error !~ m/Object Not Found/);
 
     # operate on test DB from now on
@@ -87,8 +87,9 @@ SKIP: {
                 },
                 views => {
                     view => {
-                        map    => 'function(doc) { emit(doc.key, 2); }',
-                        reduce => '_count',
+                        map => 'function(doc) { emit(doc.key, 2); }',
+                        reduce =>
+                            'function(keys, values, rereduce) { return { "object": 1 }; }',
                     }
                 },
                 shows => {
@@ -152,7 +153,7 @@ SKIP: {
             } });
     ok((!defined($fid) and !defined($frev)), "update document (no rev)");
 
-    # update doc (with rev)
+    # update doc (with invalid rev)
     ($fid, $frev) = $sc->update_doc({
             doc => {
                 _id   => $id,
@@ -198,7 +199,7 @@ SKIP: {
         view => 'test/view',
         opts => { reduce => 'true', group => 'true' },
     });
-    is_deeply($result, { 42 => 1 }, 'get view (reduce)');
+    is_deeply($result, { 42 => { object => 1 } }, 'get view (reduce)');
 
     # list view
     $result = $sc->list_view({
@@ -227,6 +228,25 @@ SKIP: {
         \@result,
         [ { id => $id, key => 42, value => 2 } ],
         'get view array'
+    );
+
+    # get view array (reduce)
+    @result = $sc->get_view_array({
+        view => 'test/view',
+        opts => { reduce => 'true', group => 'true' },
+    });
+    is_deeply(\@result, [ { object => 1 } ], 'get view array (reduce)');
+
+    # get view array (reduce, do not parse)
+    @result = $sc->get_view_array({
+        view                => 'test/view',
+        opts                => { reduce => 'true', group => 'true' },
+        do_not_parse_result => 1,
+    });
+    is_deeply(
+        \@result,
+        [ { key => 42, value => { object => 1 } } ],
+        'get view array (reduce, do not parse)'
     );
 
     # purge

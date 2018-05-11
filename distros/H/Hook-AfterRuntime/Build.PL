@@ -8,10 +8,13 @@ my $build = Module::Build->new(
     module_name => 'Hook::AfterRuntime',
     license     => 'perl',
     dist_author => 'Chad Granum <exodist7@gmail.com>',
-    create_readme => 1,
     requires => {
+        'perl' => '5.006',
         'Exporter' => 5.57,
         'B::Hooks::Parser' => '0.09',
+    },
+    configure_requires => {
+	'Module::Build'   => 0,
     },
     build_requires => {
         'Test::More'      => 0.88,
@@ -20,7 +23,7 @@ my $build = Module::Build->new(
         resources => {
             repository => 'http://github.com/exodist/Hook-AfterRuntime',
             bugtracker => 'http://github.com/exodist/Hook-AfterRuntime/issues',
-            homepage   => 'http://open-exodus.net/projects/Hook-AfterRuntime'
+            homepage   => 'http://github.com/exodist/Hook-AfterRuntime'
         },
     }
 );

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 $ExtUtils::MakeMaker::VERSION =~ s/_//g;
 my @sign = (MM->can("signature_target") ? (SIGN => 1) : ());
 my $version_diff = 0; # we'll have to die if this becomes true
-$::version_from = 'lib/CPAN/Testers/ParseReport.pm';
+$::version_from = './lib/CPAN/Testers/ParseReport.pm';
 my $mmgenereatedversionfrom = MM->parse_version($::version_from);
 if ($ARGV[0] && $ARGV[0] eq "--setversion") {
     die "Your perl is a bit dated[$]].\nDo not make a release with it\n" if $] < 5.008;

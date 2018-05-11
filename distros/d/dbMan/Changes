@@ -1,5 +1,11 @@
 Revision history for Perl extension dbMan
 
+0.46 <20180510>
+    - extension SQLOutputCube typo
+    - extension SQLOutputHTML typo
+    - extension SQLOutputInsert typo
+    - extension SQLOutputPlain typo
+
 0.45 <20180306>
     - extension SQLOutputTable supports colortable format
     - config: tablecolor_head, tablecolor_content and tablecolor_lines options for colortable colors

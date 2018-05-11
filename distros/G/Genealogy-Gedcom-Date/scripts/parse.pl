@@ -88,8 +88,6 @@ canonocal_date() is called on each element in the result from parser), on separa
 
 Default: 0.
 
-=back
-
 Try these:
 
 	perl scripts/parse.pl -max debug -d 'From 21 Jun 1950 to @#dGerman@ 05.Dez.2015'
@@ -137,5 +135,7 @@ See the Log::handler docs.
 Default: 'error'.
 
 No lower levels are used.
+
+=back
 
 =cut

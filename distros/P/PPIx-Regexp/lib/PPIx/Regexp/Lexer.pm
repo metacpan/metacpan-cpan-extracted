@@ -43,6 +43,7 @@ use PPIx::Regexp::Constant qw{
     ARRAY_REF
     TOKEN_LITERAL
     TOKEN_UNKNOWN
+    @CARP_NOT
 };
 use PPIx::Regexp::Node::Range				();
 use PPIx::Regexp::Node::Unknown				();
@@ -68,7 +69,7 @@ use PPIx::Regexp::Token::Unmatched			();
 use PPIx::Regexp::Tokenizer				();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 =head2 new
 

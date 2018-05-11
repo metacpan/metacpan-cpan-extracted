@@ -6,5 +6,5 @@
       "/etc/resolv.conf" : "nameserver 8.8.8.8"
    },
    "fqdn" : "beta.example.org",
-   "mtime" : "1462431002"
+   "mtime" : 1462431002
 }

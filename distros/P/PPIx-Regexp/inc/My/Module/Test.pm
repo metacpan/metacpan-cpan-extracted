@@ -9,11 +9,11 @@ use PPIx::Regexp;
 use PPIx::Regexp::Dumper;
 use PPIx::Regexp::Element;
 use PPIx::Regexp::Tokenizer;
-use PPIx::Regexp::Util qw{ __instance };
+use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -289,8 +289,7 @@ sub tokenize {		## no critic (RequireArgUnpacking)
     my ( $opt, $regexp, @args ) = _parse_constructor_args(
 	{ test => 1, tokens => 1 }, @_ );
     my %args = @args;
-    $initial_class = ( defined $args{parse} && $args{parse} eq 'string') ?
-	'PPIx::Regexp::StringTokenizer' : 'PPIx::Regexp::Tokenizer';
+    $initial_class = __choose_tokenizer_class( $regexp, \%args );
     $kind = 'token';
     $obj = $initial_class->new( $regexp, @args );
     if ( $obj && $opt->{tokens} ) {

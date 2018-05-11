@@ -5,7 +5,9 @@ author:
 build_requires:
   Path::Class::Dir: '0'
   Test::Exception: '0'
+  Test::LWP::UserAgent: '0'
   Test::More: '0'
+  Test::Warn: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -28,13 +30,15 @@ no_index:
 provides:
   Web::Mention:
     file: lib/Web/Mention.pm
-    version: '0.3'
+    version: '0.4'
   Web::Mention::Author:
     file: lib/Web/Mention/Author.pm
 requires:
   DateTime: '0'
+  HTTP::Link: '0'
   LWP: '0'
   List::Util: '0'
+  Mojo::DOM58: '0'
   Moose: '0'
   MooseX::ClassAttribute: '0'
   MooseX::Enumeration: '0'
@@ -43,13 +47,14 @@ requires:
   Scalar::Util: '0'
   Try::Tiny: '0'
   Types::Standard: '0'
-  Web::Microformats2::Parser: '0'
+  URI::Escape: '0'
+  Web::Microformats2: '0.3'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/jmacdotorg/webmention-perl/issues
   homepage: https://github.com/jmacdotorg/webmention-perl
   repository: git://github.com/jmacdotorg/webmention-perl.git
-version: '0.3'
+version: '0.4'
 x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

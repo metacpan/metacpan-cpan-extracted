@@ -1,10 +1,8 @@
-use v5.24;
-
 package Dist::Zilla::Plugin::LocalHTML::Pod2HTML;
 
 # ABSTRACT: Pod::Simple::HTML wrapper to generate local links for project modules.
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.4';
 
 use File::Spec;
 use Data::Dumper;
@@ -57,7 +55,11 @@ around do_pod_link => sub {
             my $lpRx   = $this->prefixRx;
             my $to     = "" . $link->attr('to');
             my $toFile = $this->_mod2file($to);
-            if ( ( defined($lpRx) && $to =~ /^$lpRx/n )
+            $this->log_debug("'$to' matches local prefix")
+              if defined($lpRx) && $to =~ /^$lpRx/;
+            $this->log_debug("'$toFile' is in local_files map")
+              if $this->local_files->{$toFile};
+            if ( ( defined($lpRx) && $to =~ /^$lpRx/ )
                 || $this->local_files->{$toFile} )
             {
                 # Local link
@@ -118,7 +120,7 @@ Dist::Zilla::Plugin::LocalHTML::Pod2HTML - Pod::Simple::HTML wrapper to generate
 
 =head1 VERSION
 
-version v0.1.1
+version v0.2.4
 
 =head1 ATTRIBUTES
 
@@ -130,6 +132,10 @@ Points back to the parent plugin object.
 
 Contains regexp for matching local modules.
 
+=head2 local_files
+
+List of files to build docs for.
+
 =head1 METHODS
 
 =head2 C<do_pod_link>
@@ -140,6 +146,10 @@ Inherited from L<Pod::Simple::HTML>
 
 Builder for C<prefixRx> attribute. Generates regexp from caller plugin
 C<local_prefix> attribute.
+
+=head2 C<init_local_files>
+
+Builder for C<local_files> attribute. Records local files to be processed.
 
 =head1 AUTHOR
 

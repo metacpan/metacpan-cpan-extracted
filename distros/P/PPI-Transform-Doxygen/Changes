@@ -1,6 +1,11 @@
-0.1 2017-01-11
-  - first public release
+0.3 2018-05-09
+  - support for subroutine signatures
+  - support sub pod documentation in sub body
+  - support for accessors declared by 'has'
 
 0.2 2017-01-12
   - fixed script installation
   - fixed missing pod errors
+
+0.1 2017-01-11
+  - first public release

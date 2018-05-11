@@ -99,7 +99,7 @@ is(
     undef,
     'build succeeded when checking for a module that is not stale',
 );
-$_->before_release('Foo.tar.gz') for @{ $tzil->plugins_with(-BeforeRelease) };
+$_->before_release('Foo.tar.gz') for eval { Dist::Zilla->VERSION('7.000') } ? $tzil->plugins_with(-BeforeRelease) : @{ $tzil->plugins_with(-BeforeRelease) };
 
 cmp_deeply(
     \@prompts,

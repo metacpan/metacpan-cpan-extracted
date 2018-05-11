@@ -49,21 +49,12 @@ __PACKAGE__->meta->make_immutable();
 
 1;
 
-__END__
 
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpusVL::Preferences::Schema::Result::PrfDefaultValues
-
-=head1 VERSION
-
-version 0.27
 
 =head1 DESCRIPTION
+
+Helpfully, this stores the actual default values for fields. Redundantly,
+because prf_defaults already has a default_value column.
 
 =head1 METHODS
 
@@ -79,21 +70,11 @@ version 0.27
 
 =head2 name
 
+
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2012 OpusVL.
 
 This software is licensed according to the "IP Assignment Schedule" provided with the development project.
-
-=head1 AUTHOR
-
-OpusVL - www.opusvl.com
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by OpusVL - www.opusvl.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

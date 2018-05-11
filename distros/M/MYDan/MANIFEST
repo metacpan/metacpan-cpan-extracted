@@ -105,6 +105,7 @@ dan/tools/alarm
 dan/tools/alias
 dan/tools/bigest
 dan/tools/config
+dan/tools/deploy
 dan/tools/diskSpaceControl
 dan/tools/expect
 dan/tools/fileupdate
@@ -260,6 +261,7 @@ lib/MYDan/Sync.pm
 lib/MYDan/Util/Alias.pm
 lib/MYDan/Util/Command.pm
 lib/MYDan/Util/Contact.pm
+lib/MYDan/Util/Deploy.pm
 lib/MYDan/Util/DirConf.pm
 lib/MYDan/Util/DiskSpaceControl.pm
 lib/MYDan/Util/ExpSSH.pm

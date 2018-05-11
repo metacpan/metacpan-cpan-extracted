@@ -1,0 +1,12 @@
+Revision history for Perl distribution Mojo-SAML
+
+0.02 2018-05-09
+  - Fix several documentation problems
+  - Add insert_xml_declaration to Document class
+  - Added AttributeConsumingService Document class
+  - Added RequestedAttribute Document class
+  - Added attrname_format to Mojo::SAML::Names
+
+0.01 2018-05-08
+  - Initial release
+

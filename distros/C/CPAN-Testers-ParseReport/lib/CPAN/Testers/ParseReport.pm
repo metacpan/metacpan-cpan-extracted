@@ -27,7 +27,7 @@ CPAN::Testers::ParseReport - parse reports to www.cpantesters.org from various s
 
 =cut
 
-use version; our $VERSION = qv('0.4.3');
+use version; our $VERSION = qv('0.4.4');
 
 =head1 SYNOPSIS
 
@@ -589,6 +589,8 @@ sub parse_report {
             } elsif ($isHTML ?
                      m|<div class="h_name">From:</div> <b>(.+?)</b><br/>| :
                      m|^From:\s*(.+)|
+                     or
+                     m|^From:\s*(.+)|
                     ) {
                 my $f = $1;
                 $f = $1 if $f =~ m{<strong>(.+)</strong>};
@@ -600,6 +602,8 @@ sub parse_report {
             if (0) {
             } elsif ($isHTML ?
                      m|<div class="h_name">Date:</div> (.+?)<br/>| :
+                     m|^Date:\s*(.+)|
+                     or
                      m|^Date:\s*(.+)|
                     ) {
                 my $date = $1;

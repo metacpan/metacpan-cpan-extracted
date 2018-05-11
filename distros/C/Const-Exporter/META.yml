@@ -22,7 +22,7 @@ name: Const-Exporter
 provides:
   Const::Exporter:
     file: lib/Const/Exporter.pm
-    version: v0.4.0
+    version: v0.4.1
 recommends:
   Package::Stash::XS: '0'
   Ref::Util::XS: '0'
@@ -35,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Const-Exporter/issues
   repository: git://github.com/robrwo/Const-Exporter.git
-version: v0.4.0
+version: v0.4.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'B. Estrade <estrabd@gmail.com>'

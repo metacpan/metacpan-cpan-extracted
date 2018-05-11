@@ -1,5 +1,12 @@
 #!/usr/bin/env perl
 
+=head1 DESCRIPTION
+
+Doxygen Input Filter Script for Perl. Add it to your Doxyfile
+under B<INPUT_FILTER>.
+
+=cut
+
 use strict;
 use warnings;
 

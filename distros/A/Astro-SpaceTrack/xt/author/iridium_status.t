@@ -50,6 +50,7 @@ my %known_inconsistent = (
     24969 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
 				# SpaceTrack: Decayed 08-Jan-2018
     25042 => { sladen => 1 },	# 19-Aug-2016: Sladen - Failed on station?
+    25106 => { sladen => 1 },	# 06-May 2018: Sladen - Failed
 #   25108 => { sladen => 1 },	# 26-Jan-2018: Kelso - Partly operational.
     25263 => { sladen => 1 },	# Sladen: operational; others: spare.
 				# Sladen: failed 09-Dec-2017 (Kelso: operational)
@@ -62,6 +63,7 @@ my %known_inconsistent = (
     25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
     25577 => { sladen => 1 },	# 14-Apr-2018: Sladen failed
     25578 => { sladen => 1 },	# 26-Apr-2018: Sladen failed
+    25778 => { sladen => 1 },	# 04-May-2018: Sladen failed
     27373 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
     27374 => { sladen => 1 },	# 02-Mar-2018 Kelso: partly operationsl
     27376 => { sladen => 1 },	# Sladen: failed 22-Dec-2017
@@ -214,7 +216,6 @@ KELSO
  24836   Iridium 914    [-]      Plane 5
  24837   Iridium 12     [-]      Plane 5
  24839   Iridium 10     [+]      Plane 5
- 24840   Iridium 13     [-]      Plane 5 - Failed on station?
  24841   Iridium 16     [-]      Plane 5
  24842   Iridium 911    [-]      Plane 5
  24869   Iridium 15     [-]      Plane 6
@@ -244,7 +245,7 @@ KELSO
  25078   Iridium 44     [-]      Plane 6
  25104   Iridium 45     [+]      Plane 3
  25105   Iridium 24     [-]      Plane 2
- 25106   Iridium 47     [+]      Plane 2
+ 25106   Iridium 47     [-]      Plane 2
  25169   Iridium 52     [+]      Plane 5
  25170   Iridium 56     [+]      Plane 5
  25171   Iridium 54     [+]      Plane 5
@@ -267,7 +268,7 @@ KELSO
  25319   Iridium 69     [-]      Plane 2
  25320   Iridium 71     [-]      Plane 2
  25342   Iridium 70     [+]      Plane 1
- 25343   Iridium 72     [+]      Plane 1
+ 25343   Iridium 72     [-]      Plane 1 - Failed on station?
  25344   Iridium 73     [-]      Plane 1
  25346   Iridium 75     [+]      Plane 1
  25432   Iridium 76     [-]      Plane 2
@@ -281,7 +282,7 @@ KELSO
  25577   Iridium 20     [-]      Plane 2
  25578   Iridium 11     [-]      Plane 2
  25777   Iridium 14     [+]      Plane 1
- 25778   Iridium 21     [+]      Plane 1
+ 25778   Iridium 21     [-]      Plane 1 - Failed on station?
  27372   Iridium 91     [+]      Plane 3
  27373   Iridium 90     [-]      Plane 5 - Failed on station?
  27375   Iridium 95     [+]      Plane 3
@@ -301,7 +302,7 @@ SLADEN
  24837   Iridium 12     [?]      SpaceTrack
  24838   Iridium 09     [D]      Decayed 2003-03-11
  24839   Iridium 10     [?]      SpaceTrack
- 24840   Iridium 13     [?]      SpaceTrack
+ 24840   Iridium 13     [D]      Decayed 2018-04-29
  24841   Iridium 16     [?]      SpaceTrack
  24842   Iridium 911    [?]      SpaceTrack
  24869   Iridium 15     [?]      SpaceTrack

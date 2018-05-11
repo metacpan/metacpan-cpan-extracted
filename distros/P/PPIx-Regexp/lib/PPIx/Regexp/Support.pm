@@ -35,9 +35,10 @@ package PPIx::Regexp::Support;
 use strict;
 use warnings;
 
+use PPIx::Regexp::Constant qw{ @CARP_NOT };
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 =head2 close_bracket
 

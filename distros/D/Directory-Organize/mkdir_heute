@@ -23,7 +23,7 @@ use Directory::Organize;
 use Getopt::Long;
 use Term::ReadKey;
 
-use version; our $VERSION = qv('v0.9.9');
+use version; our $VERSION = qv('v1.0.0');
 
 $|++;
 
@@ -205,7 +205,7 @@ mkdir_heute - create and find directories interactive
 
 =head1 VERSION
 
-This documentation refers to version v0.9.9.
+This documentation refers to version v1.0.0.
 
 =head1 USAGE
 
@@ -297,7 +297,8 @@ This should be 4 lines less than your screen provides.
 
 The size of the screen is determined by C<Term::ReadKey::GetTerminalSize()>.
 If your system has no functioning module I<Term::ReadKey>, you can switch
-this of and the programs defaults to 80 columns and 21 listlines.
+this off and the programs defaults to 80 columns and 21 listlines.
+Off course you set other limits with C<-c> or C<-l> instead.
 
 =back
 
@@ -330,7 +331,7 @@ Mathias Weidner
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009 Mathias Weidner (mathias@weidner.in-bad-schmiedeberg.de).
+Copyright (c) 2009-2018 Mathias Weidner (mamawe@cpan.org).
 All rights reserved.
 
 This module is free software; you can redistribute and/or modify it

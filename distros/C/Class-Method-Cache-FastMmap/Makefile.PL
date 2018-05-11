@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Cache::FastMmap" => 0,
     "Class::Method::Modifiers" => 0,
+    "Exporter::Tiny" => 0,
     "Object::Signature" => 0
   },
   "TEST_REQUIRES" => {
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Time::Piece" => "1.16",
     "Time::Seconds" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.3.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Cache::FastMmap" => 0,
   "Class::Method::Modifiers" => 0,
+  "Exporter::Tiny" => 0,
   "File::Spec" => 0,
   "JSON::PP" => "2.00",
   "Module::Metadata" => 0,

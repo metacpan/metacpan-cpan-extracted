@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Camelcadedb
 
+0.03      2018-05-09 19:31:37 CEST
+
+    - Test fixes
+
 0.02      2018-05-06 20:49:53 CEST
 
     - First public release

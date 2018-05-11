@@ -1,20 +1,63 @@
 package SQL::Schema::Versioned;
 
-our $DATE = '2017-06-24'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2018-05-10'; # DATE
+our $VERSION = '0.234'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
 our @EXPORT_OK = qw(
                        create_or_update_db_schema
                );
 
 our %SPEC;
+
+sub _sv_key {
+    my $comp = $_[0] // 'main';
+    $comp =~ /\A\w+\z/
+        or die "Invalid component '$comp', please stick to ".
+        "letters/numbers/underscores";
+    "schema_version" . ($comp eq 'main' ? '' : ".$comp");
+}
+
+sub _extract_created_tables_from_sql_statements {
+    my @sql = @_;
+
+    my @res;
+    for my $sql (@sql) {
+        if ($sql =~ /\A\s*
+                     create\s+table(?:\s+if\s+not\s+exists)?\s+
+                     (?:
+                         `([^`]+)` |
+                         "([^"]+)" |
+                         (\S+)
+                     )
+                    /isx) {
+            push @res, ($1 // $2 // $3);
+        }
+    }
+    @res;
+}
+
+sub _get_provides_from_db {
+    my ($dbh) = @_;
+
+    my %provides;
+
+    my $sth = $dbh->prepare(
+        "SELECT name, value FROM meta WHERE name LIKE 'table.%'");
+    $sth->execute;
+    while (my @row = $sth->fetchrow_array) {
+        my ($table) = $row[0] =~ /table\.(.+)/;
+        my ($provcomp, $provver) = $row[1] =~ /\A(\w+):(\d*)\z/
+            or return [500, "Corrupt information in `meta` table: $row[0] -> $row[1]"];
+        $provides{$table} = [$provcomp, $provver];
+    }
+    %provides;
+}
 
 $SPEC{create_or_update_db_schema} = {
     v => 1.1,
@@ -68,11 +111,98 @@ because it can do transactional DDL (a failed upgrade in the middle will not
 cause the database schema state to be inconsistent, e.g. in-between two
 versions).
 
+### Modular schema (components)
+
+This routine supports so-called modular schema, where you can separate your
+database schema into several *components* (sets of tables) and then declare
+dependencies among them.
+
+For example, say you are writing a stock management application. You divide your
+application into several components: `quote` (component that deals with
+importing stock quotes and querying stock prices), `portfolio` (component that
+deals with computing the market value of your portfolio, calculating
+gains/losses), `trade` (component that connects to your broker API and perform
+trading by submitting buy/sell orders).
+
+The `quote` application component manages these tables: `daily_price`,
+`spot_price`. The `portfolio` application component manages these tables:
+`account` (list of accounts in stock brokerages), `balance` (list of balances),
+`tx` (list of transactions). The `trade` application component manages these
+tables: `order` (list of buy/sell orders).
+
+The `portfolio` application component requires price information to be able to
+calculate unrealized gains/losses. The `trade` component also needs information
+from the `daily_price` e.g. to calculate 52-week momentum, and writes to the
+`spot_price` to record intraday prices, and reads/writes from the `account` and
+`balance` tables. Here are the `spec`s for each component:
+
+    # spec for the price application component
+    {
+        component_name => 'price',
+        latest_v => 1,
+        provides => ['daily_price', 'spot_price'],
+        install => [...],
+        ...
+    }
+
+    # spec for the portfolio application component
+    {
+        component_name => 'portfolio',
+        latest_v => 1,
+        provides => ['account', 'balance', 'tx'],
+        deps => {
+            'daily_price' => 1,
+            'spot_price'  => 1,
+        },
+        install => [...],
+        ...
+    }
+
+    # spec for the trade application component
+    {
+        component_name => 'trade',
+        latest_v => 1,
+        provides => ['order'],
+        deps => {
+            'daily_price' => 1,
+            'spot_price'  => 1,
+            'account'     => 1,
+            'balance'     => 1,
+        },
+        install => [...],
+        ...
+    }
+
+You'll notice that the three keys new here are the `component_name`, `provides`,
+and `deps`.
+
+When `component_name` is set, then instead of the `schema_version` key in the
+`meta` table, your component will use the `schema_version.<COMPONENT_NAME>` key.
+When `component_name` is not set, it is assumed to be `main` and the
+`schema_version` key is used in the `meta` table.
+
+`provides` is an array of tables to help this routine know which table(s) your
+component create and maintain. If unset, this routine will try to guess from
+looking at "CREATE TABLE" SQL statements. It is recommended that you supply
+`provides` to makes things easier.
+
+This routine will create `table.<TABLE_NAME>` keys in the `meta` table to record
+which components currently maintain which tables. The value of the key is
+`<COMPONENT_NAME>:<VERSION>`. When a component no longer maintain a table in the
+newest version, the corresponding `table.<TABLE_NAME>` row in the `meta` will
+also be removed.
+
+`deps` is a hash. The keys are table names that your component requires. The
+values are integers, meaning the minimum version of the required table (=
+component version). In the future, more complex dependency relationship and
+version requirement will be supported.
+
 _
     args => {
         spec => {
             schema => ['hash*'], # XXX require 'install' & 'latest_v' keys
-            summary => 'SQL statements to create and update schema',
+            summary => 'Schema specification, e.g. SQL statements '.
+                'to create and update the schema',
             req => 1,
             description => <<'_',
 
@@ -147,6 +277,9 @@ sub create_or_update_db_schema {
     my $dbh    = $args{dbh};
     my $from_v = $args{create_from_version};
 
+    my $comp   = $spec->{component_name} // 'main';
+    my $sv_key = _sv_key($comp);
+
     local $dbh->{RaiseError};
 
     # first, check current schema version
@@ -157,15 +290,82 @@ sub create_or_update_db_schema {
     my @has_meta_table = $dbh->tables("", undef, "meta");
     if (@has_meta_table) {
         ($current_v) = $dbh->selectrow_array(
-            "SELECT value FROM meta WHERE name='schema_version'");
+            "SELECT value FROM meta WHERE name='$sv_key'");
     }
     $current_v //= 0;
+
+    my %provides; # list of tables provided by all components
+    if (@has_meta_table) {
+        %provides = _get_provides_from_db($dbh);
+    }
+
+    # list of tables provided by this component
+    my @provides;
+  GET_PROVIDES:
+    {
+        if ($spec->{provides}) {
+            @provides = @{ $spec->{provides} };
+        } elsif ($spec->{install}) {
+            @provides = _extract_created_tables_from_sql_statements(
+                @{ $spec->{install} });
+        } else {
+            if ($comp ne 'main') {
+                return [
+                    412, "Both `provides` and `install` spec are not ".
+                        "specified, can't get list of tables managed by ".
+                        "this component"];
+            }
+        }
+    }
+
+  CHECK_DEPS:
+    {
+        my $deps = $spec->{deps} or last;
+
+        for my $table (sort keys %$deps) {
+            my $reqver = $deps->{$table};
+            my $prov = $provides{$table};
+            defined $prov or return [
+                412,
+                "Dependency fails: ".
+                    "This component ('$comp') requires table '$table' ".
+                    "(version $reqver) which has not been provided by ".
+                    "any other component. Perhaps you should install the ".
+                    "missing component first."
+                ];
+            my ($provcomp, $provver) = @$prov;
+            $provver >= $reqver or return [
+                412,
+                "Dependency fails: ".
+                    "This component ('$comp') requires table '$table' ".
+                    "version $reqver but the database currently only has ".
+                    "version $provver (from component '$provcomp'). Perhaps ".
+                    "you should upgrade the '$provcomp' component first."
+                ];
+        }
+    } # CHECK_DEPS
+
+  CHECK_PROVIDES:
+    {
+        for my $t (@provides) {
+            my $prov = $provides{$t};
+            next unless $prov;
+            my ($provcomp, $provver) = @$prov;
+            $provcomp eq $comp or return [
+                412,
+                "Component conflict: ".
+                    "This component ('$comp') provides table '$t' ".
+                    "but another component ($provcomp version $provver) also ".
+                    "provides this table. Perhaps you should update ".
+                    "either one or both components first?"
+            ];
+        }
+    } # CHECK_PROVIDES
 
     my $orig_v = $current_v;
 
     # perform schema upgrade atomically per version (at least for db that
     # supports atomic DDL like postgres)
-    my $err;
 
     my $latest_v = $spec->{latest_v};
     if (!defined($latest_v)) {
@@ -176,100 +376,165 @@ sub create_or_update_db_schema {
         }
     }
 
-    # sanity check, if current database schema version is newer then the spec,
-    # then the code is probably older
     if ($current_v > $latest_v) {
         die "Database schema version ($current_v) is newer than the spec's ".
             "latest version ($latest_v), you probably need to upgrade ".
             "the application first\n";
     }
 
-  STEP:
+    my $code_update_provides = sub {
+        my @k;
+        for my $t (sort keys %provides) {
+            my $prov = $provides{$t};
+            next unless $prov->[0] eq $comp;
+            delete $provides{$t};
+            push @k, "table.$t";
+        }
+        if (@k) {
+            $dbh->do("DELETE FROM meta WHERE name IN (".
+                         join(",", map { $dbh->quote($_) } @k).")")
+                or return $dbh->errstr;
+        }
+        for my $t (@provides) {
+            $provides{$t} = [$comp, $latest_v];
+            $dbh->do("INSERT INTO meta (name, value) VALUES (?, ?)",
+                     {},
+                     "table.$t",
+                     "$comp:$latest_v",
+                 ) or return $dbh->errstr;
+        }
+        # success
+        "";
+    };
+
+    my $begun;
+    my $res;
+
+    my $db_state = 'committed';
+
+  SETUP:
     while (1) {
         last if $current_v >= $latest_v;
 
+        # we should only begin writing to the database from this step, because
+        # we want to do things atomically (when the database supports it). when
+        # we want to bail out, we don't return() directly but set $res and last
+        # SETUP so we can rollback.
         $dbh->begin_work;
+        $db_state = 'begun';
 
         # install
         if ($current_v == 0) {
             # create 'meta' table if not exists
             unless (@has_meta_table) {
                 $dbh->do("CREATE TABLE meta (name VARCHAR(64) NOT NULL PRIMARY KEY, value VARCHAR(255))")
-                    or do { $err = $dbh->errstr; last STEP };
-                $dbh->do("INSERT INTO meta (name,value) VALUES ('schema_version',0)")
-                    or do { $err = $dbh->errstr; last STEP };
+                    or do { $res = [500, "Couldn't create meta table: ".$dbh->errstr]; last SETUP };
+            }
+            my $sv_row = $dbh->selectrow_hashref("SELECT * FROM meta WHERE name='$sv_key'");
+            unless ($sv_row) {
+                $dbh->do("INSERT INTO meta (name,value) VALUES ('$sv_key',0)")
+                    or do { $res = [500, "Couldn't insert to meta table: ".$dbh->errstr]; last SETUP };
             }
 
             if ($from_v) {
                 # install from a specific version
                 if ($spec->{"install_v$from_v"}) {
                     log_debug("Creating version $from_v of database schema ...");
+                    my $i = 0;
                     for my $step (@{ $spec->{"install_v$from_v"} }) {
+                        $i++;
                         if (ref($step) eq 'CODE') {
-                            eval { $step->($dbh) }; if ($@) { $err = $@; last STEP }
+                            eval { $step->($dbh) }; if ($@) { $res = [500, "Died when executing code from install_v$from_v\'s step #$i: $@"]; last SETUP }
                         } else {
-                            $dbh->do($step) or do { $err = $dbh->errstr; last STEP };
+                            $dbh->do($step) or do { $res = [500, "Failed executing SQL statement from install_v$from_v\'s step #$i: ".$dbh->errstr." (SQL statement: $step)"]; last SETUP };
                         }
                     }
-                    $dbh->do("UPDATE meta SET value=$from_v WHERE name='schema_version'")
-                        or do { $err = $dbh->errstr; last STEP };
-                    $dbh->commit or do { $err = $dbh->errstr; last STEP };
                     $current_v = $from_v;
-                    next STEP;
+                    $dbh->do("UPDATE meta SET value=$from_v WHERE name='$sv_key'")
+                        or do { $res = [500, "Couldn't set $sv_key in meta table: ".$dbh->errstr]; last SETUP };
+
+                    if ($current_v == $latest_v) {
+                        if (my $up_res = $code_update_provides->()) { $res = [500, "Couldn't update provides information: $up_res"]; last SETUP }
+                    }
+
+                    $dbh->commit or do { $res = [500, "Couldn't commit: ".$dbh->errstr]; last SETUP };
+                    $db_state = 'committed';
+
+                    next SETUP;
                 } else {
-                    $err = "Error in spec: Can't find 'install_v$from_v' key in spec";
-                    last STEP;
+                    $res = [400, "Error in spec: Can't find 'install_v$from_v' key in spec"];
+                    last SETUP;
                 }
             } else {
                 # install directly the latest version
                 if ($spec->{install}) {
                     log_debug("Creating latest version of database schema ...");
+                    my $i = 0;
                     for my $step (@{ $spec->{install} }) {
+                        $i++;
                         if (ref($step) eq 'CODE') {
-                            eval { $step->($dbh) }; if ($@) { $err = $@; last STEP }
+                            eval { $step->($dbh) }; if ($@) { $res = [500, "Died when executing code from install's step #$i: $@"]; last SETUP }
                         } else {
-                            $dbh->do($step) or do { $err = $dbh->errstr; last STEP };
+                            $dbh->do($step) or do { $res = [500, "Failed executing SQL statement from install's step #$i: ".$dbh->errstr." (SQL statement: $step)"]; last SETUP };
                         }
                     }
-                    $dbh->do("UPDATE meta SET value=$latest_v WHERE name='schema_version'")
-                        or do { $err = $dbh->errstr; last STEP };
-                    $dbh->commit or do { $err = $dbh->errstr; last STEP };
-                    last STEP;
+                    $dbh->do("UPDATE meta SET value=$latest_v WHERE name='$sv_key'")
+                        or do { $res = [500, "Couldn't update $sv_key in meta table: ".$dbh->errstr]; last SETUP };
+
+                    if (my $up_res = $code_update_provides->()) { $res = [500, "Couldn't update provides information: $up_res"]; last SETUP }
+
+                    $dbh->commit or do { $res = [500, "Couldn't commit: ".$dbh->errstr]; last SETUP };
+                    $db_state = 'committed';
+
+                    last SETUP;
                 } elsif ($spec->{upgrade_to_v1}) {
                     # there is no 'install' but 'upgrade_to_v1', so we upgrade
                     # from v1 to latest
                     goto UPGRADE;
                 } else {
-                    $err = "Error in spec: Can't find 'install' key in spec";
-                    last STEP;
+                    $res = [400, "Error in spec: Can't find 'install' key in spec"];
+                    last SETUP;
                 }
             }
-        }
+        } # install
 
       UPGRADE:
         my $next_v = $current_v + 1;
         log_debug("Updating database schema from version $current_v to $next_v ...");
         $spec->{"upgrade_to_v$next_v"}
-            or do { $err = "Error in spec: upgrade_to_v$next_v not specified"; last STEP };
+            or do { $res = [400, "Error in spec: upgrade_to_v$next_v not specified"]; last SETUP };
+        my $i = 0;
         for my $step (@{ $spec->{"upgrade_to_v$next_v"} }) {
+            $i++;
             if (ref($step) eq 'CODE') {
-                eval { $step->($dbh) }; if ($@) { $err = $@; last STEP }
+                eval { $step->($dbh) }; if ($@) { $res = [500, "Died when executing code from upgrade_to_v$next_v\'s step #$i: $@"]; last SETUP }
             } else {
-                $dbh->do($step) or do { $err = $dbh->errstr; last STEP };
+                $dbh->do($step) or do { $res = [500, "Failed executing SQL statement from upgrade_to_v$next_v\'s step #$i: ".$dbh->errstr." (SQL statement: $step)"]; last SETUP };
             }
         }
-        $dbh->do("UPDATE meta SET value=$next_v WHERE name='schema_version'")
-            or do { $err = $dbh->errstr; last STEP };
-        $dbh->commit or do { $err = $dbh->errstr; last STEP };
         $current_v = $next_v;
-    }
-    if ($err) {
-        log_error("Can't upgrade schema (from version $orig_v): $err");
-        $dbh->rollback;
-        return [500, "Can't upgrade schema (from version $orig_v): $err"];
+        $dbh->do("UPDATE meta SET value=$next_v WHERE name='$sv_key'")
+            or do { $res = [500, "Couldn't set $sv_key in meta table: ".$dbh->errstr]; last SETUP };
+
+        if ($current_v == $latest_v) {
+            if (my $up_res = $code_update_provides->()) { $res = [500, "Couldn't update provides information: $up_res"]; last SETUP }
+        }
+
+        $dbh->commit or do { $res = [500, "Couldn't commit: ".$dbh->errstr]; last SETUP };
+        $db_state = 'committed';
+
+    } # SETUP
+
+    $res //= [200, "OK (upgraded from version $orig_v to $latest_v)", {version=>$latest_v}];
+
+    if ($res->[0] != 200) {
+        log_error("Failed creating/upgrading schema: %s", $res);
+        $dbh->rollback unless $db_state eq 'committed';
     } else {
-        return [200, "OK (upgraded from version $orig_v to $latest_v)", {version=>$latest_v}];
+        $dbh->commit unless $db_state eq 'committed';
     }
+
+    $res;
 }
 
 1;
@@ -287,12 +552,12 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.22 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-24.
+This document describes version 0.234 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
 
 =head1 DESCRIPTION
 
-To use this module, you typically run the create_or_update_db_schema() routine
-at the start of your program/script, e.g.:
+To use this module, you typically run the L</"create_or_update_db_schema">()
+routine at the start of your program/script, e.g.:
 
  use DBI;
  use SQL::Schema::Versioned qw(create_or_update_db_schema);
@@ -368,6 +633,92 @@ because it can do transactional DDL (a failed upgrade in the middle will not
 cause the database schema state to be inconsistent, e.g. in-between two
 versions).
 
+=head3 Modular schema (components)
+
+This routine supports so-called modular schema, where you can separate your
+database schema into several I<components> (sets of tables) and then declare
+dependencies among them.
+
+For example, say you are writing a stock management application. You divide your
+application into several components: C<quote> (component that deals with
+importing stock quotes and querying stock prices), C<portfolio> (component that
+deals with computing the market value of your portfolio, calculating
+gains/losses), C<trade> (component that connects to your broker API and perform
+trading by submitting buy/sell orders).
+
+The C<quote> application component manages these tables: C<daily_price>,
+C<spot_price>. The C<portfolio> application component manages these tables:
+C<account> (list of accounts in stock brokerages), C<balance> (list of balances),
+C<tx> (list of transactions). The C<trade> application component manages these
+tables: C<order> (list of buy/sell orders).
+
+The C<portfolio> application component requires price information to be able to
+calculate unrealized gains/losses. The C<trade> component also needs information
+from the C<daily_price> e.g. to calculate 52-week momentum, and writes to the
+C<spot_price> to record intraday prices, and reads/writes from the C<account> and
+C<balance> tables. Here are the C<spec>s for each component:
+
+ # spec for the price application component
+ {
+     component_name => 'price',
+     latest_v => 1,
+     provides => ['daily_price', 'spot_price'],
+     install => [...],
+     ...
+ }
+ 
+ # spec for the portfolio application component
+ {
+     component_name => 'portfolio',
+     latest_v => 1,
+     provides => ['account', 'balance', 'tx'],
+     deps => {
+         'daily_price' => 1,
+         'spot_price'  => 1,
+     },
+     install => [...],
+     ...
+ }
+ 
+ # spec for the trade application component
+ {
+     component_name => 'trade',
+     latest_v => 1,
+     provides => ['order'],
+     deps => {
+         'daily_price' => 1,
+         'spot_price'  => 1,
+         'account'     => 1,
+         'balance'     => 1,
+     },
+     install => [...],
+     ...
+ }
+
+You'll notice that the three keys new here are the C<component_name>, C<provides>,
+and C<deps>.
+
+When C<component_name> is set, then instead of the C<schema_version> key in the
+C<meta> table, your component will use the C<< schema_version.E<lt>COMPONENT_NAMEE<gt> >> key.
+When C<component_name> is not set, it is assumed to be C<main> and the
+C<schema_version> key is used in the C<meta> table.
+
+C<provides> is an array of tables to help this routine know which table(s) your
+component create and maintain. If unset, this routine will try to guess from
+looking at "CREATE TABLE" SQL statements. It is recommended that you supply
+C<provides> to makes things easier.
+
+This routine will create C<< table.E<lt>TABLE_NAMEE<gt> >> keys in the C<meta> table to record
+which components currently maintain which tables. The value of the key is
+C<< E<lt>COMPONENT_NAMEE<gt>:E<lt>VERSIONE<gt> >>. When a component no longer maintain a table in the
+newest version, the corresponding C<< table.E<lt>TABLE_NAMEE<gt> >> row in the C<meta> will
+also be removed.
+
+C<deps> is a hash. The keys are table names that your component requires. The
+values are integers, meaning the minimum version of the required table (=
+component version). In the future, more complex dependency relationship and
+version requirement will be supported.
+
 This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
@@ -391,7 +742,7 @@ DBI database handle.
 
 =item * B<spec>* => I<hash>
 
-SQL statements to create and update schema.
+Schema specification, e.g. SQL statements to create and update the schema.
 
 Example:
 
@@ -466,7 +817,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-SQL-Schema>.
+Source repository is at L<https://github.com/perlancar/perl-SQL-Schema-Versioned>.
 
 =head1 BUGS
 
@@ -507,7 +858,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

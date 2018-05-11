@@ -260,7 +260,7 @@ sub _getFullPropertyInfoByValue {
 	    } elsif ($reftype eq 'ARRAY') {
 		$variableGroup = VARIABLE_GROUP_ARRAY;
 		$numChildren = @$val;
-	    } elsif (defined $className || $reftype eq 'SCALAR') {
+	    } elsif (defined $className || $reftype eq 'SCALAR' || $reftype eq 'REF') {
 		# object but not array/hash: it's a scalar
 		$numChildren = 1;
 	    }

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4211'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,16 +17,16 @@ name: Model-Envoy
 provides:
   Model::Envoy:
     file: lib/Model/Envoy.pm
-    version: '0.1'
+    version: v0.1.1
   Model::Envoy::Meta::Attribute::Trait::Envoy:
     file: lib/Model/Envoy.pm
   Model::Envoy::Set:
     file: lib/Model/Envoy/Set.pm
-    version: '0.1'
+    version: v0.1.1
   Model::Envoy::Storage::DBIC:
     file: lib/Model/Envoy/Storage/DBIC.pm
-    version: '0.1'
-  Moose::Meta::Attribute::Custom::Trait::DBIC:
+    version: v0.1.1
+  Moose::Meta::Attribute::Custom::Trait::EDBIC:
     file: lib/Model/Envoy/Storage/DBIC.pm
   Moose::Meta::Attribute::Custom::Trait::Envoy:
     file: lib/Model/Envoy.pm
@@ -36,4 +36,5 @@ requires:
   DBIx::Class: '0.082840'
   Moose: '2.2010'
   perl: v5.18.2
-version: '0.1'
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,9 +1,7 @@
 #
 package Pod::Weaver::Plugin::Include::Finder;
 
-our $VERSION = 'v0.1.5';
-
-our $VERSION = 'v0.1.901';
+our $VERSION = 'v0.1.9';
 
 # ABSTRACT: Finds source Pods in .pod files or modules.
 
@@ -142,7 +140,7 @@ sub parse_tmpl {
                 )
                 \s*$
 ## Please see file perltidy.ERR
-            /xn;
+            /x;
 
         if ( $+{name} ) {
             $attrs->{name}   = $+{name};
@@ -293,7 +291,7 @@ Pod::Weaver::Plugin::Include::Finder - Finds source Pods in .pod files or module
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.9
 
 =head1 SYNOPSIS
 
@@ -397,6 +395,23 @@ If a template is missing in the C<cache> then tries to C<load_file()>.
 
 Returns I<undef> if failed.
 
+=head2 init_cache
+
+Initializer for cache attribute.
+
+=head2 init_maps
+
+Initilizer for maps attribute.
+
+=head2 init_pod_path
+
+Initializer for pod_path attribute.
+
+=head2 init_logger
+
+Initializer for logger attribute. Takes logger object either from
+callerPlugin or creates a new one.
+
 =head1 PRIVATE ATTRIBUTES
 
 =head2 B<_tmplSource, _tmplName, _tmplContent>
@@ -415,10 +430,9 @@ Vadim Belman <vrurg@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Vadim Belman.
+This software is copyright (c) 2017 by Vadim Belman.
 
-This is free software, licensed under:
-
-  The (three-clause) BSD License
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

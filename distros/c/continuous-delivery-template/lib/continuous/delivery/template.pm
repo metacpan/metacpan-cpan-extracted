@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package continuous::delivery::template;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -34,6 +34,12 @@ lib/continuous/delivery/template.pm file and push the tag to github.
 Dist::Zilla will publish the release on CPAN, the CPAN will run
 tests under a variety of platforns and environments throught CPANTESTERS.
 
+When a new git tag is created on gitlab repository, the pipeline will
+build the stages: build -> test -> deploy. The deploy stage is executed
+only when a new tag is pushed to repository.
+
+The deploy job will upload a stable image to dockerhub Container Registry.
+
 Before you can upload Perl modules to CPAN you need to create an
 account on The [Perl programming] Authors Upload Server:
 
@@ -60,21 +66,51 @@ Your password on hub.docker.com.
 
 =back
 
-=head2 continuous-delivery-template links
+=head2 PROJECT LINKS
 
 =over
 
-=item Git Repository:
+=item Gitlab Repository:
 
 L<https://gitlab.com/joenio/continuous-delivery-template>
 
-=item Docker Container Registry:
+=item Docker Hub Container Registry:
 
 L<https://hub.docker.com/r/joenio/continuous-delivery-template>
 
 =item CPAN:
 
 L<https://metacpan.org/release/continuous::delivery::template>
+
+=item CPANTESTERS:
+
+L<http://matrix.cpantesters.org/?dist=continuous-delivery-template>
+
+=back
+
+=head2 PROJECT LAYOUT
+
+=over
+
+=item C<.gitlab-ci.yml>
+
+L<https://gitlab.com/joenio/continuous-delivery-template/blob/master/.gitlab-ci.yml>.
+
+This file configures Gitlab CI/CD pipeline for build, test and deploy.
+
+Gitlab CI/CD stages: build -> test -> deploy
+
+=item C<Dockerfile>
+
+L<https://gitlab.com/joenio/continuous-delivery-template/blob/master/Dockerfile>.
+
+Docker container file, use C<debian:stretch> as base image.
+
+=item C<dist.ini>
+
+L<https://gitlab.com/joenio/continuous-delivery-template/blob/master/dist.ini>.
+
+L<Dist::Zilla> settings for build, test and release this project.
 
 =back
 

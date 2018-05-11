@@ -4,11 +4,11 @@ use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 
-sub IDENTIFICATION { return "000001-000082-000003"; }
+sub IDENTIFICATION { return "000001-000082-000004"; }
 
 sub preference { return 0; }
 
@@ -24,7 +24,7 @@ sub done {
 	$obj->{-mempool}->deregister('output_format','cube');
 	if ($obj->{-mempool}->get('output_format') eq 'cube') {
 		my @all_formats = $obj->{-mempool}->get_register('output_format');
-		$obj->{-mempool}->set('output_format',$all_formats ? $all_formats[0] : '');
+		$obj->{-mempool}->set('output_format', @all_formats ? $all_formats[0] : '');
 	}
 }
 	

@@ -30,12 +30,13 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Path::Iterator::Rule" => 0,
+    "Path::Tiny" => 0,
     "Test::More" => 0,
     "Test::RequiresInternet" => 0,
     "Test::TempDir::Tiny" => 0,
     "local::lib" => "2.000024"
   },
-  "VERSION" => "0.000003",
+  "VERSION" => "0.000004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "Module::Loaded" => 0,
   "Path::Iterator::Rule" => 0,
+  "Path::Tiny" => 0,
   "Test::More" => 0,
   "Test::RequiresInternet" => 0,
   "Test::TempDir::Tiny" => 0,

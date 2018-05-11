@@ -1,0 +1,69 @@
+package TestSigs;
+use Mojo::Base -base, -signatures;
+
+=head1 NAME
+
+TestSigs - PPI::Transform::Doxygen Test Input
+
+=head1 DESCRIPTION
+
+Test input for subroutine signatures and inline comments
+
+=cut
+
+has attr1 => 99;
+has attr2 => sub { 'blabla' };
+
+has ['attr3', 'attr4'];
+has [qw(attr5 attr6 attr7)];
+
+sub test1 ($first, $second = 'default', @rest) {
+=for function $ok
+
+static test1
+
+=cut
+
+    print join(' ', $first, $second, @rest), "\n";
+    return 1;
+}
+
+sub new ($class, %args) {
+=for class_method $self
+
+static new
+
+=cut
+
+    my $self = bless(\%args, $class);
+    return $self;
+}
+
+sub test2 ($self, $first = 'default', $second=[], %args) {
+=for method $self
+
+method test2
+
+=cut
+
+    print join(' ', $self->{name}, $first), "\n";
+    return $self;
+}
+
+=head2 $self test3 ($self, $xxx)
+
+method test3 head2
+
+=cut
+
+sub test3 ($self, $first = 'default') {
+=for method $self
+
+method test3 inline
+
+=cut
+
+    print join(' ', $self->{name}, $first), "\n";
+    return $self;
+}
+

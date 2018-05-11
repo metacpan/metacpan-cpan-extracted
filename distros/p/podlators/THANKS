@@ -207,3 +207,11 @@ input.
 
 Zefram, for analyzing and fixing a problem with the UTF-8 layer detection
 code in Pod::Man.
+
+eponymous alias, for finding a bug in honoring the width option in
+Pod::Text::Termcap and a bug in the Pod::Text sentence option
+documentation.
+
+Olly Betts, for fixing errors=none behavior to fully suppress the POD
+errata section, even with unusual errors that still trigger with no
+whining set.

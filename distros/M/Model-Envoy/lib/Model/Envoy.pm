@@ -2,7 +2,7 @@ package Model::Envoy;
 
 use Moose::Role;
 
-our $VERSION = '0.1';
+our $VERSION = '0.1.1';
 
 =head1 Model::Envoy
 

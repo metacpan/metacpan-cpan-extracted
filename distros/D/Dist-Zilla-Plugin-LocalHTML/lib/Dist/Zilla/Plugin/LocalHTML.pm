@@ -1,10 +1,9 @@
-use v5.24;
-
+use v5.10;
 package Dist::Zilla::Plugin::LocalHTML;
 
 # ABSTRACT: create CSS-rich HTML pages from the POD-aware files for local browsing
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.4';
 
 
 use Moose::Autobox;
@@ -98,10 +97,10 @@ sub base_filename {
 
     my $file_name = ref($file) ? $file->name : $file;
     my ( $vol, $path, $basename ) = File::Spec->splitpath($file_name);
-    $basename =~ s{(\.[^.]*)?$}{}n;
+    $basename =~ s{(\.[^.]*)?$}{};
     $path = File::Spec->canonpath($path);
     my @dirs = File::Spec->splitdir($path);
-    shift @dirs if @dirs && $dirs[0] =~ /^(lib|bin|scripts)$/n;
+    shift @dirs if @dirs && $dirs[0] =~ /^(lib|bin|scripts)$/;
     return join( "-", @dirs, "$basename.html" );
 }
 
@@ -163,7 +162,7 @@ Dist::Zilla::Plugin::LocalHTML - create CSS-rich HTML pages from the POD-aware f
 
 =head1 VERSION
 
-version v0.1.1
+version v0.2.4
 
 =head1 SYNOPSIS
 
@@ -198,7 +197,7 @@ POD sections (such as I<PodWeaver>).
 The plugin overrides Pod::Simple::HTML link generation. By distinguishing local
 and remote links it generates either a simple reference to local filesystem, or
 a reference to metacpan.org. Link is conisdered local if there is a corresponding
-file for the original C<<L<>>> Pod tag. For example, of the following to links:
+file for the original C<LE<lt>E<gt>> Pod tag. For example, of the following to links:
 
     L<Local::Project::Module>
     L<Local::Project::NoModule>

@@ -47,7 +47,7 @@ sub register {
 
   # Perldoc
   $app->routes->any(
-      $root.'/(*module)' => { module => $index } => sub {
+      $root.'/*module' => { module => $index } => sub {
       my $self = shift;
 
       # Find module

@@ -2,8 +2,8 @@ NAME
     Test::WithDB - Framework for testing application using database
 
 VERSION
-    This document describes version 0.09 of Test::WithDB (from Perl
-    distribution Test-WithDB), released on 2017-07-10.
+    This document describes version 0.100 of Test::WithDB (from Perl
+    distribution Test-WithDB), released on 2018-05-10.
 
 SYNOPSIS
     In your "~/test-withdb.ini":
@@ -22,15 +22,39 @@ SYNOPSIS
      # optional: SQL statements to initialize DB by test user after created
      init_sql_user=
 
+    Or, if you want to put multiple configuration in your config file you
+    can use config profiles:
+
+     [profile=pg]
+     admin_dsn ="dbi:Pg;host=localhost"
+     admin_user="postgres"
+     admin_pass="adminpass"
+
+     user_dsn ="dbi:Pg;host=localhost"
+     user_user="someuser"
+     user_pass="somepass"
+
+     [profile=mysql]
+     admin_dsn ="dbi:mysql"
+     admin_user="root"
+     admin_pass="adminpass"
+
+     user_dsn ="dbi:mysql"
+     user_user="someuser"
+     user_pass="somepass"
+
+     ...
+
     In your test file:
 
      use Test::More;
      use Test::WithDB;
 
      my $twdb = Test::WithDB->new(
-         #config_path => '...', # defaults to TWDB_CONFIG_PATH env or ~/test-withdb.ini or ~/twdb.ini
-         #config_profile => '...', # defaults to TWDB_CONFIG_PROFILE env or undef
-         #name_pattern => '...', # defaults to TWDB_NAME_PATTERN env or 'testdb_%u'
+         #driver => '...',         # optional. preferred DBI driver, e.g. Pg, or mysql.
+         #config_path => '...',    # optional. defaults to TWDB_CONFIG_PATH env or ~/test-withdb.ini or ~/twdb.ini
+         #config_profile => '...', # optional. defaults to TWDB_CONFIG_PROFILE_<DRIVER> env (if driver is specified), or TWDB_CONFIG_PROFILE, or undef
+         #name_pattern => '...',   # optional. defaults to TWDB_NAME_PATTERN env or 'testdb_%u'
      );
 
      my $dbh = $twdb->create_db; # create db with random name
@@ -82,6 +106,13 @@ CONFIGURATION
   init_sql_user => str|array
   sqlite_db_dir => str (default: .)
 ATTRIBUTES
+  driver => str
+    Preferred DBI driver. If set, this will make Test::WithDB consult
+    TWDB_CONFIG_PROFILE_*DRIVER* environment variable before
+    "TWDB_CONFIG_PROFILE" to set default value for config_profile. For
+    example, if you set driver to "mysql", then "TWDB_CONFIG_PROFILE_MYSQL"
+    will be consulted first before "TWDB_CONFIG_PROFILE".
+
   config_path => str (default: "~/test-withdb.ini" or "~/twdb.ini").
     Path to configuration file. File will be read using Config::IOD::Reader.
 
@@ -193,7 +224,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

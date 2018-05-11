@@ -1,5 +1,13 @@
 Revision history for App-NDTools
 
+0.5.5   2018-05-09
+        - all: numbers load fixed for YAML
+        - all: booleans dump fixed for YAML
+        - all: lazy load for YAML::XS (optional now)
+        - all: nonref false values load fixed
+        - nddiff: --brief for nonrefs fixed
+        - docs and tests fixed and improved
+
 0.5.4   2018-04-22
         - nddiff: --{A,N,O,R,U} opts added, --full opt is deprecated
         - nddiff: text diff formatter refactored, header fixed

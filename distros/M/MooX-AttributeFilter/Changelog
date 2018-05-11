@@ -1,9 +1,75 @@
 ==================================================
-Changes from 2017-05-07 00:00:00 +0000 to present.
+Changes from 2017-05-09 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 0.001002 at 2018-05-07 03:00:09 +0000
+version 0.001900 at 2018-05-09 02:19:24 +0000
+---------------------------------------------
+
+  Change: f81b42ebb3a3286aaa33b717918e01f65ed72cbb
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-08 21:21:10 +0000
+
+    Added dependecy on strictures module. 
+
+  Change: ff87ae698a17185e7e523497500bfd15d2747a8c
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-08 19:09:11 +0000
+
+    Defined required List::Util version 
+
+---------------------------------------------
+version 0.001004 at 2018-05-07 23:20:08 +0000
+---------------------------------------------
+
+  Change: 62931719a5a0e1d183835d6e9553ab0c4ff231bd
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 19:20:08 +0000
+
+    Made Perl 5.10 minimum required version 
+
+  Change: 3db99559a9921a1b6fc9f936c92baf163b830650
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 19:09:15 +0000
+
+    Added test prerequsites 
+
+  Change: 020437dfc48ab5f1b3792eb54f51f97231f62dee
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:43:00 +0000
+
+    Fixed docs to reflect shift towards 5.10 backward compat. 
+
+  Change: 0e094793aa800773b4a473c29fca8aae6ddf504a
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:41:40 +0000
+
+    Set minimum Perl version to 5.10 
+
+  Change: c3569be217b3c42d79e06d0be9d710fc68fcb85a
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 13:41:15 +0000
+
+    Trying to make code compatible with Perl 5.10 
+
+  Change: 04bf558963222e2bb76e3ab0a1b1df1e7ba3ac16
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 09:43:11 +0000
+
+    Removed incompatible with old Perl versions /n regex modifier 
+
+---------------------------------------------
+version 0.001003 at 2018-05-07 13:30:37 +0000
+---------------------------------------------
+
+  Change: 10911e6f14e53029f4e04a8c86689ab775127967
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-07 09:29:20 +0000
+
+    Added support for META 'provides' and 'repository' keys 
+
+---------------------------------------------
+version 0.001002 at 2018-05-07 02:59:44 +0000
 ---------------------------------------------
 
   Change: 40f508111a1627036d2ea13e7f22ac69a8e4ad96

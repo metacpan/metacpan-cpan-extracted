@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
-license: gpl
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,7 +18,7 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Carp: '0'
   SUPER: '0'
@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://github.com/geofffranks/test-mockmodule/issues
   homepage: https://github.com/geofffranks/test-mockmodule
-  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  license: http://dev.perl.org/licenses/
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -67,7 +67,7 @@
    "provides" : {
       "Const::Exporter" : {
          "file" : "lib/Const/Exporter.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/robrwo/Const-Exporter"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "B. Estrade <estrabd@gmail.com>"

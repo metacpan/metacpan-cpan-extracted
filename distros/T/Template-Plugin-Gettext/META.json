@@ -37,6 +37,7 @@
       "runtime" : {
          "requires" : {
             "Cwd" : "0",
+            "Encode" : "0",
             "Getopt::Long" : "0",
             "Locale::Messages" : "0",
             "Locale::TextDomain" : "1.20",
@@ -70,7 +71,7 @@
          "web" : "http://github.com/gflohr/Template-Plugin-Gettext.git"
       }
    },
-   "version" : "0.5",
+   "version" : "0.6",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

@@ -13,6 +13,49 @@ has 'properties' => (
     },
 );
 
+has 'p_properties' => (
+    is => 'ro',
+    isa => 'HashRef',
+    traits => ['Hash'],
+    default => sub { {} },
+    handles => {
+        has_p_properties => 'count',
+        has_p_property   => 'get',
+    },
+);
+
+has 'u_properties' => (
+    is => 'ro',
+    isa => 'HashRef',
+    traits => ['Hash'],
+    default => sub { {} },
+    handles => {
+        has_u_properties => 'count',
+        has_u_property   => 'get',
+    },
+);
+
+has 'e_properties' => (
+    is => 'ro',
+    isa => 'HashRef',
+    traits => ['Hash'],
+    default => sub { {} },
+    handles => {
+        has_e_properties => 'count',
+        has_e_property   => 'get',
+    },
+);
+
+has 'dt_properties' => (
+    is => 'ro',
+    isa => 'HashRef',
+    traits => ['Hash'],
+    default => sub { {} },
+    handles => {
+        has_dt_properties => 'count',
+        has_dt_property   => 'get',
+    },
+);
 has 'parent' => (
     is => 'ro',
     isa => 'Maybe[Web::Microformats2::Item]',
@@ -50,9 +93,32 @@ sub add_property {
 
     my ( $key, $value ) = @_;
 
-    $self->{properties}->{$key} ||= [];
+    my ( $prefix, $base ) = $key =~ /^(\w+)-(.*)$/;
 
-    push @{ $self->{properties}->{$key} }, $value;
+    unless ( $prefix && $base ) {
+        croak "You must call add_property with the full property name, "
+              . "including its prefix. (e.g. 'p-name', not 'name' )";
+    }
+
+    my $base_method = "properties";
+    my $prefix_method = "${prefix}_properties";
+
+    foreach ($base_method, $prefix_method ) {
+        $self->$_->{$base} ||= [];
+        push @{ $self->$_->{$base} }, $value;
+    }
+}
+
+# add_base_property: Like add_property, but don't look for or insist on
+#                    prefixes. Good for inflating from JSON, which has no
+#                    prefix information.
+sub add_base_property {
+    my $self = shift;
+
+    my ( $key, $value ) = @_;
+
+    $self->properties->{$key} ||= [];
+    push @{ $self->properties->{$key} }, $value;
 }
 
 sub get_properties {

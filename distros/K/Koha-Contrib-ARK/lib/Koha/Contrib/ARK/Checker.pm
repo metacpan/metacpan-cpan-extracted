@@ -1,6 +1,6 @@
-package Koha::Contrib::ARK::Clearer;
-$Koha::Contrib::ARK::Clearer::VERSION = '1.0.0';
-# ABSTRACT: Clear Koha ARK field
+package Koha::Contrib::ARK::Checker;
+$Koha::Contrib::ARK::Checker::VERSION = '1.0.2';
+# ABSTRACT: Check Koha ARK field
 use Moose;
 
 with 'AnyEvent::Processor::Converter';
@@ -23,12 +23,11 @@ sub convert {
     my $ka = $ark->c->{ark}->{koha}->{ark};
     my ($tag, $letter) = ($ka->{tag}, $ka->{letter});
 
-    $ark->log->debug("Remove ARK field\n");
+    $ark->log->debug("Check ARK field\n");
     if ( $letter ) {
-        for my $field ( $record->field($tag) ) {
-            my @subf = grep { $_->[0] ne $letter; } @{$field->subf};
-            $field->subf( \@subf );
-        }
+        my $field = $record->field($tag);
+        my @subf = grep { $_->[0] ne $letter; } @{$field->subf};
+        $field->subf( \@subf );
         $record->fields( [ grep {
             $_->tag eq $tag && @{$_->subf} == 0 ? 0 : 1;
         } @{ $record->fields } ] );
@@ -51,11 +50,11 @@ __END__
 
 =head1 NAME
 
-Koha::Contrib::ARK::Clearer - Clear Koha ARK field
+Koha::Contrib::ARK::Checker - Check Koha ARK field
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 ATTRIBUTES
 

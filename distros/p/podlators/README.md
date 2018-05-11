@@ -1,6 +1,11 @@
-# podlators 4.10
+# podlators 4.11
 
-Copyright 1999-2010, 2012-2017 Russ Allbery <rra@cpan.org>.  This software
+[![Build
+status](https://travis-ci.org/rra/podlators.svg?branch=master)](https://travis-ci.org/rra/podlators)
+[![CPAN
+version](https://img.shields.io/cpan/v/podlators.svg)](https://metacpan.org/release/podlators)
+
+Copyright 1999-2010, 2012-2018 Russ Allbery <rra@cpan.org>.  This software
 is distributed under the same terms as Perl itself.  Please see the
 section [License](#license) below for more information.
 
@@ -78,13 +83,6 @@ present:
 All are available on CPAN.  Those tests will be skipped if the modules are
 not available.
 
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-
 ## Building and Installation
 
 podlators uses ExtUtils::MakeMaker and can be installed using the same
@@ -99,6 +97,13 @@ process as any other ExtUtils::MakeMaker module:
 
 You'll probably need to do the last as root unless you're installing into
 a local Perl module tree in your home directory.
+
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
 
 ## Support
 
@@ -134,7 +139,7 @@ Perl module issues in the same place.
 The podlators package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 1999-2010, 2012-2017
+> Copyright 1999-2010, 2012-2018
 >     Russ Allbery <rra@cpan.org>
 >
 > This program is free software; you may redistribute it and/or modify it
@@ -148,6 +153,10 @@ licenses, all of which are compatible with the above general package
 license but which may require preservation of additional notices.  All
 required notices, and detailed information about the licensing of each
 file, are recorded in the LICENSE file.
+
+Files covered by a license with an assigned SPDX License Identifier
+include SPDX-License-Identifier tags to enable automated processing of
+license information.  See https://spdx.org/licenses/ for more information.
 
 For any copyright range specified by files in this package as YYYY-ZZZZ,
 the range specifies every single year in that closed interval.

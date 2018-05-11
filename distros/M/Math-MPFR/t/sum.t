@@ -36,7 +36,7 @@ my $size = @obj + 1;
 my $max = $size - 1;
 eval {Rmpfr_sum($rop, \@obj, $size, GMP_RNDN)};
 
-if($@ =~ /2nd last arg \($size\) needs to be between 0 and $max \(inclusive\)/) {print "ok 3\n"}
+if($@ =~ /2nd last arg to Rmpfr_sum is greater than the size of the array/) {print "ok 3\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 3\n";

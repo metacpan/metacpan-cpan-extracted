@@ -19,12 +19,13 @@ my %module_build_args = (
     "Guido Flohr <guido.flohr\@cantanea.com>"
   ],
   "dist_name" => "Template-Plugin-Gettext",
-  "dist_version" => "0.5",
+  "dist_version" => "0.6",
   "license" => "lgpl",
   "module_name" => "Template::Plugin::Gettext",
   "recursive_test_files" => 1,
   "requires" => {
     "Cwd" => 0,
+    "Encode" => 0,
     "Getopt::Long" => 0,
     "Locale::Messages" => 0,
     "Locale::TextDomain" => "1.20",

@@ -7,7 +7,7 @@ if(4 > MPFR_VERSION_MAJOR) {
   print "1..1\n";
   my $rop = Math::MPFR->new();
   eval {Rmpfr_rootn_ui($rop, Math::MPFR->new(3), 7, MPFR_RNDN);};
-  if($@ =~ /Rmpfr_rootn_ui not implemented/) {print "ok 1\n"}
+  if($@ =~ /Rmpfr_rootn_ui not implemented/ || $@ =~ /Rmpfr_rec_root not implemented/) {print "ok 1\n"}
   else {
     warn "\n\$\@: $@\n";
     print "not ok 1\n";

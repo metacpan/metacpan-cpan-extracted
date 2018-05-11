@@ -12,7 +12,7 @@ use Cwd             qw( getcwd      );
 use File::Basename  qw( basename    );
 use List::Util      qw( first       );
 
-my $version = version->parse( '2.18.0' )->numify;
+my $version = version->parse( '2.19.0' )->numify;
 my $mm_v    = ExtUtils::MakeMaker->VERSION;
 
 #my @merge_spec
@@ -60,7 +60,7 @@ my @config_requires
                 }
                 (
                     [ qw( Cwd                             3.73 ) ],
-                    [ qw( File::Copy::Recursive::Reduced  0.2  ) ],
+                    [ qw( File::Copy::Recursive::Reduced  0.6  ) ],
                     [ qw( List::Util                      1.46 ) ],
                 )
             ),

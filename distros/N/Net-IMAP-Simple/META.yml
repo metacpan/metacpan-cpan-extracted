@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010'
 keywords:
   - imap
   - simple
@@ -27,5 +27,5 @@ requires:
   perl: '5.008'
 resources:
   repository: http://github.com/jettero/net--imap--simple
-version: '1.2209'
+version: '1.2210'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

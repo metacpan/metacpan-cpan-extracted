@@ -51,9 +51,9 @@ use warnings;
 use base qw{PPIx::Regexp::Element};
 
 use Carp qw{ confess };
-use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
+use PPIx::Regexp::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 0;
 

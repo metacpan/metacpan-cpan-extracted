@@ -6,7 +6,21 @@ DESCRIPTION
     Provide the ability to display/edit a custom field conditioned by the
     value of another (select) custom field for the same object, which can be
     anything that can have custom fields (ticket, queue, user, group,
-    article or asset).
+    article or asset). If a custom field is based on another (parent) custom
+    field which is conditioned by, this (child) custom field will of course
+    also be conditioned by (with the same condition as its parent).
+
+    From version 0.07, the condition can be multivalued, that is: the
+    conditioned custom field can be displayed/edited if the condition custom
+    field has one of these values (In other words: there is an OR bewteen
+    the values of the condition). The condition custom field can be a select
+    custom field with values defined by CustomFieldValues or an external
+    custom field.
+
+    *Note that version 0.07 is a complete redesign: the API described below
+    has changed; also, the way that ConditionedBy property is store has
+    changed. If you upgrade from a previous version, you have to reconfigure
+    the custom fields which are conditionned by.*
 
 RT VERSION
     Works with RT 4.2 or greater
@@ -19,17 +33,25 @@ INSTALLATION
 
     Patch your RT
         ConditionalCustomFields requires a small patch to add necessary
-        Callbacks on versions of RT prior to 4.2.3.
+        Callbacks on versions of RT superior to 4.2.3. (The patch has been
+        submitted to BestPractical in order to be included in future RT
+        releases, as of RT 4.4.2, some parts of the patch are already
+        included, but some other parts still required to apply this patch.)
 
         For RT 4.2, apply the included patch:
 
             cd /opt/rt4 # Your location may be different
             patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.2-add-callbacks-to-extend-customfields-capabilities.patch
 
-        For RT 4.4, apply the included patch:
+        For RT 4.4.1, apply the included patch:
 
             cd /opt/rt4 # Your location may be different
-            patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4-add-callbacks-to-extend-customfields-capabilities.patch
+            patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4.1-add-callbacks-to-extend-customfields-capabilities.patch
+
+        For RT 4.4.2, apply the included patch:
+
+            cd /opt/rt4 # Your location may be different
+            patch -p1 < /download/dir/RT-Extension-ConditionalCustomFields/patches/4.4.2-add-callbacks-to-extend-customfields-capabilities.patch
 
     Edit your /opt/rt4/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
@@ -49,61 +71,34 @@ INSTALLATION
     Restart your webserver
 
 METHODS
-    ConditionalCustomFields adds a ConditionedBy property, along with the
-    following methods, to RT::CustomField objets:
+    ConditionalCustomFields adds a ConditionedBy property, that is a
+    CustomField and a value, along with the following methods, to
+    RT::CustomField objets:
 
-  SetConditionedBy VALUE
-    Set ConditionedBy for this CustomField object to VALUE. If VALUE is
-    numerical, it should be the id of an existing CustomFieldValue object.
-    Otherwise, VALUE should be an existing CustomFieldValue object. Current
-    user should have SeeCustomField and ModifyCustomField rights for this
-    CustomField and SeeCustomField right for the CustomField which this
-    CustomField is conditionned by. Returns (1, 'Status message') on success
-    and (0, 'Error Message') on failure.
+  SetConditionedBy CF, VALUE
+    Set the ConditionedBy property for this CustomField object to
+    CustomFieldValue CF with value set to VALUE. CF should be an existing
+    CustomField object or the id of an existing CustomField object, or the
+    name of an unambiguous existing CustomField object. VALUE should be a
+    string. Current user should have SeeCustomField and ModifyCustomField
+    rights for this CustomField and SeeCustomField right for the CustomField
+    which this CustomField is conditionned by. Returns (1, 'Status message')
+    on success and (0, 'Error Message') on failure.
 
-  ConditionedByObj
-    Returns the current value as a CustomFieldValue object of the
-    ConditionedBy property for this CustomField object. If this CustomField
-    object is not conditioned by another one, that is: if its ConditionedBy
-    property is not defined, returns an empty CustomFieldValue object
-    (without id). Current user should have SeeCustomField right for both
-    this CustomField and the CustomField which this CustomField is
-    conditionned by.
-
-  ConditionedByAsString
-    Returns the current value as a string of the ConditionedBy property for
-    this CustomField object. If this CustomField object is not conditioned
-    by another one, that is: if its ConditionedBy property is not defined,
-    returns undef. Current user should have SeeCustomField right for both
-    this CustomField and the CustomField which this CustomField is
-    conditionned by.
-
-  ConditionedByCustomField
-    Returns the CustomField object that this CustomField is recursively
-    conditionned by. "Recursively" means that this method will search for a
-    ConditionedBy property for this CustomField object, then for the
-    Customfield this one is BasedOn, and so on until it find an acestor
-    category with a ConditionedBy property or, the Customfield which is
-    being looked up, is not based on any ancestor category. If neither this
-    CustomField object nor one of its ancestor is conditioned by another
-    one, that is: if their ConditionedBy property is (recursively) not
-    defined, returns undef. Current user should have SeeCustomField right
-    for both this CustomField and the CustomField which this CustomField is
-    conditionned by.
-
-  ConditionedByCustomFieldValue
-    Returns the current value as a CustomFieldValue object that this
-    CustomField is recursively conditionned by. "Recursively" means that
-    this method will search for a ConditionedBy property for this
-    CustomField object, then for the Customfield this one is BasedOn, and so
-    on until it find an acestor category with a ConditionedBy property or,
-    the Customfield which is being looked up, is not based on any ancestor
-    category. If neither this CustomField object nor one of its ancestor is
+  ConditionedBy
+    Returns the current ConditionedBy property for this CustomField object
+    as a hash with keys CF containing the id of the CustomField which this
+    CustomField is recursively conditionned by, and val containing the value
+    as string. If neither this CustomField object nor one of its ancestor is
     conditioned by another one, that is: if their ConditionedBy property is
-    (recursively) not defined, returns an empty CustomField object (without
-    id). Current user should have SeeCustomField right for both this
-    CustomField and the CustomField which this CustomField is conditionned
-    by.
+    not (recursively) defined, returns undef. Current user should have
+    SeeCustomField right for both this CustomField and the CustomField which
+    this CustomField is conditionned recursively by. *"Recursively"* means
+    that this method will search for a ConditionedBy property for this
+    CustomField object, then for the CustomField this one is BasedOn, and so
+    on until it find an acestor Category with a ConditionedBy property or,
+    the CustomField which is being looked up, is not based on any ancestor
+    Category.
 
 INITIALDATA
     Also, ConditionalCustomFields allows to set the ConditionedBy property
@@ -125,7 +120,7 @@ INITIALDATA
                 DefaultValues => [ 'Failed' ],
             },
             {
-                Name => 'Conditioned with cf and value',
+                Name => 'Conditioned with cf name and value',
                 Type => 'FreeformSingle',
                 Queue => [ 'General' ],
                 LookupType => 'RT::Queue-RT::Ticket',
@@ -140,29 +135,13 @@ INITIALDATA
                 ConditionedByCF => 66,
                 ConditionedBy => 'Passed',
             },
-            {
-                Name => 'Conditioned with cf value id',
-                Type => 'FreeformSingle',
-                Queue => [ 'General' ],
-                LookupType => 'RT::Queue-RT::Ticket',
-                ConditionedBy => 52,
-            },
         );
 
     This examples creates a select CustomField Condition which should have
-    the value Passed, for CustomFields Conditioned with cf and value and
-    Conditioned with cf id and value to be displayed or edited. It also
-    created a CustomField Conditioned with cf value id that is conditionned
-    by another CustomField for the current object (ticket, queue, user,
-    group, or article) having a CustomFieldValue with id = 52.
+    the value Passed, for CustomFields Conditioned with cf name and value
+    and Conditioned with cf id and value to be displayed or edited.
 
     Additional fields for an element of @CustomFields are:
-
-    ConditonedBy
-        The CustomFieldValue that this new CustomField should conditionned
-        by. It can be either the id of an existing CustomFieldValue object
-        (in which case attribute ConditionedByCF is ignored), or the value
-        as a string of the CustomField attribute (which is then mandatory).
 
     ConditonedByCF
         The CustomField that this new CustomField should conditionned by. It
@@ -171,6 +150,10 @@ INITIALDATA
         before this one in the initialdata file, or it should already exist.
         When ConditionedByCF attribute is set, ConditionedBy attribute
         should always also be set.
+
+    ConditonedBy
+        The value as a string of the CustomField defined by the
+        ConditionedByCF attribute (which is mandatory).
 
 AUTHOR
     Gérald Sédrati-Dinet <gibus@easter-eggs.com>

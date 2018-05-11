@@ -3,9 +3,11 @@ abstract: 'command line tools for nested structures'
 author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
+  JSON::PP: 0
   Storable: 0
-  Test::File::Contents: 0
+  Test::File::Contents: 0.23
   Test::More: 0
+  YAML::XS: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -30,8 +32,7 @@ requires:
   Struct::Diff: 0.96
   Struct::Path: 0.81
   Struct::Path::PerlStyle: 0.8
-  YAML::XS: 0
   perl: 5.01
 resources:
   repository: https://github.com/mr-mixas/NDTools
-version: v0.5.4
+version: v0.5.5

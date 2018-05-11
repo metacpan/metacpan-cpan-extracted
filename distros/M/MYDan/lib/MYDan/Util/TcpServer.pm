@@ -222,7 +222,11 @@ sub run
 
                    $ENV{TCPREMOTEIP} = $tip;
                    $ENV{TCPREMOTEPORT} = $port;
-		   $ENV{MYDanExtractFile} = $index{$index}{extfile} if defined $index{$index}{extfile};
+		   if( defined $index{$index}{extfile} )
+		   {
+                       $ENV{MYDanExtractFile} = $index{$index}{extfile};
+		       $ENV{MYDanExtractFileAim} = $index{$index}{aim};
+		   }
       
                    open STDIN, '<', "$tmp/$index" or die "Can't open '$tmp/$index': $!";
                    my $m = -f "$tmp/$index.out" ? '+<' : '>';
@@ -238,6 +242,7 @@ sub run
                {
                     my ( $qsize, $esize, $md5, $aim  ) = ( $1, $2, $3, $4 );
                     $index{$index}{querysize} = $qsize;
+		    $index{$index}{aim} = $aim;
 
                     my $cb = sub{
                         return unless $index{$index};

@@ -9,8 +9,6 @@ use Test::More;
 my $cwd = cwd;
 my $libPath = File::Spec->catdir( cwd, "blib", "lib" );
 
-diag("PERL5LIB=", $ENV{PERL5LIB});
-
 require_ok('Dist::Zilla::Plugin::LocalHTML');
 require_ok('Dist::Zilla::Plugin::LocalHTML::Pod2HTML');
 

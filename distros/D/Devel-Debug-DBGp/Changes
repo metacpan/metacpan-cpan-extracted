@@ -1,5 +1,9 @@
 Revision history for Devel-Debug-DBGp
 
+0.21      2018-05-10 12:59:33 CEST
+
+    - Add missing files to MANIFEST
+
 0.20      2016-09-10 15:34:09 CEST
 
     - Can now set breakpoints inside eval STRING source code

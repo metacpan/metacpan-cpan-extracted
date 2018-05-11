@@ -42,7 +42,7 @@ my(%params) =
 	TEST_REQUIRES =>
 	{
 		'Test::Pod'		=> 1.51,
-		'Test::More'	=> 1.302052,
+		'Test::More'	=> 1.001002,
 	},
 	VERSION_FROM => 'lib/Genealogy/Gedcom/Date.pm',
 );

@@ -11,10 +11,7 @@ use Moose::Util 'find_meta';
 use File::pushd 'pushd';
 use Dist::Zilla::App::Command::stale;
 
-BEGIN {
-    # dzil changes directories..
-    unshift @INC, path(qw(t lib))->absolute->stringify;
-}
+use lib 't/lib';
 use EnsureStdinTty;
 use NoNetworkHits;
 use DiagFilehandles;
@@ -66,15 +63,14 @@ my $tzil = Builder->from_config(
             ),
             path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
         },
-        also_copy => { 't/lib' => 't/lib' },
     },
 );
 
 my $prompt = 'StaleModule is indexed at version 200.0 but you only have 1.0 installed. Continue anyway?';
 $tzil->chrome->set_response_for($prompt, 'y');
 
-# ensure we find the library, not in a local directory, before we change directories
-unshift @INC, path($tzil->tempdir, qw(t lib))->stringify;
+# ensure we find the library in @INC, but not local to the build
+unshift @INC, path(qw(t corpus))->absolute->stringify;
 
 {
     my $wd = pushd $tzil->root;

@@ -4,7 +4,7 @@ Class::Method::Cache::FastMmap - Cache method results using Cache::FastMmap
 
 # VERSION
 
-version v0.1.1
+version v0.3.0
 
 # SYNOPSIS
 
@@ -41,17 +41,53 @@ This wraps the `$method` with a function that caches the return value.
 It assumes that the method returns a defined scalar value and that the
 method arguments are serialisable.
 
-The `%options` are used to configure [Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap).
+The `%options` are as follows:
 
-A special option called `key_cb` is used to provide a custom
-key-generation function.  If none is specified, then
-[Object::Signature](https://metacpan.org/pod/Object::Signature) is used.
+- `cache`
 
-The function should expect a single argument with an array reference
-corresponding to the original method call parameters:
+    is used to specify a different (shared) cache. You may use another
+    caching class, so long as it provides `get` and `set` methods.
+
+    Added v0.2.0.
+
+- `key_cb`
+
+    is used to provide a custom key-generation function.  If
+    none is specified, then [Object::Signature](https://metacpan.org/pod/Object::Signature) is used.
+
+    The function should expect a single argument with an array reference
+    corresponding to the original method call parameters:
+
+    ```perl
+    $key_cb->( [ $self, @_ ] );
+    ```
+
+- `prefix`
+
+    This is the prefix too prepend to the key. It defaults to the class
+    and method name when the ["cache"](#cache) is specified, or an empty string
+    otherwise.
+
+    Added v0.2.0.
+
+Remaining `%options` are passed to the constructor for
+[Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap).
+
+As of v0.3.0, you can import the `cache` method with a different
+namme:
 
 ```perl
-$key_cb->( [ $self, @_ ] );
+use Class::Method::Cache::FastMmap
+   "cache" => { -as => "memoize" };
+
+sub my_method {
+  ...
+}
+
+memoize 'my_method' => (
+   serializer  => 'storable',
+   expire_time => '1h',
+);
 ```
 
 # SEE ALSO

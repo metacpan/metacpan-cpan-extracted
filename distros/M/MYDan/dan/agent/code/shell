@@ -30,6 +30,12 @@ my $soc = IO::Socket::INET->new(
     Proto    => 'tcp'
 );
 
+unless( $soc )
+{
+    print "Connect $host:$port fail\n";
+    exit 1;
+}
+
 exit 0 if fork;
 
 my ( $pty, $pid ) = bash();

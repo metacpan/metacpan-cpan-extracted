@@ -7,21 +7,21 @@ jQuery( function() {
         if (cf_id) {
             jQuery.getJSON('/Helpers/SelectCondition', {CustomFieldId: cf_id}, function(values) {
                 if (values) {
-                    jQuery('select[name=ConditionedBy] option').each(function() {
+                    jQuery('span input[name=ConditionedBy]').each(function() {
                         if (jQuery(this).val()) {
-                            jQuery(this).remove();
+                            jQuery(this).parent('.ConditionedByValue').remove();
                         }
                     });
                     jQuery.each(values, function(id, val) {
-                        jQuery('select[name=ConditionedBy]').append(jQuery('<option>', {value: id, text: val}));
+                        jQuery('span[name=ConditionedBy]').append('<span class="ConditionedByValue" style="display: block;"><input type="checkbox" name="ConditionedBy" value="' + val + '" />' + val + '</span>');
                     });
                 }
             });
             jQuery('.conditional-field-condition').show();
         } else {
-            jQuery('select[name=ConditionedBy] option').each(function() {
+            jQuery('span input[name=ConditionedBy]').each(function() {
                 if (jQuery(this).val()) {
-                    jQuery(this).remove();
+                    jQuery(this).parent('.ConditionedByValue').remove();
                 }
             });
             jQuery('.conditional-field-condition').hide();
@@ -30,25 +30,33 @@ jQuery( function() {
 });
 </script>
 <tr class="conditionedby"><td class="label"><&|/l&>Customfield is conditioned by</&></td><td>
-% my $default = 0;
-% $default = $CustomField->ConditionedByObj->CustomField if $CustomField->ConditionedByObj->id;
+%   my $default = 0;
+%   my $cf = RT::CustomField->new($session{CurrentUser});
+%   my $conditioned_by = $CustomField->ConditionedBy;
+%   if ($conditioned_by && $conditioned_by->{CF}) {
+%       $cf->Load($conditioned_by->{CF});
+%       if ($cf->id) {
+%           $default = $cf->id
+%       }
+%   }
 <& /Admin/Elements/SelectCustomField,
     Name => "ConditionalCF",
     LookupType => $CustomField->LookupType,
     Default => $default,
     Not => $CustomField->id,
 &>
-<span class="conditional-field-condition"<% $CustomField->ConditionedByObj->id ? '' : 'style="display: none;"' |n%>>
+<span class="conditional-field-condition"<% $conditioned_by->{vals} ? '' : 'style="display: none;"' |n%>>
 <span class="label">is</span>
-<select name="ConditionedBy">
-% if ($CustomField->ConditionedByObj->id) {
-%   my $ConditionedBy = $CustomField->ConditionedByObj->id;
-%   my $cf_values = $CustomField->ConditionedByObj->CustomFieldObj->Values;
-%   while (my $cf_value = $cf_values->Next) {
-<option value="<% $cf_value->id %>"<% $cf_value->id == $ConditionedBy ? qq[ selected="selected"] : '' |n%>><% $cf_value->Name %></option>
+<span name="ConditionedBy">
+%   if ($cf->id) {
+%       my $ConditionedBy = $conditioned_by->{vals} || '';
+%       my @ConditionedByAry = ref($ConditionedBy) eq 'ARRAY' ? @$ConditionedBy : ($ConditionedBy);
+%       my $cf_values = $cf->Values;
+%       while (my $cf_value = $cf_values->Next) {
+    <span class="ConditionedByValue" style="display: block;"><input type="checkbox" name="ConditionedBy" value="<% $cf_value->Name %>"<% (grep {$_ eq $cf_value->Name} @ConditionedByAry) ? qq[ checked="checked"] : '' |n%> /><% $cf_value->Name %></span>
+%       }
 %   }
-% }
-</select></span></td></tr>
+</span></span></td></tr>
 % }
 <%ARGS>
 $CustomField

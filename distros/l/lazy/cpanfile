@@ -12,6 +12,7 @@ on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
   requires "Path::Iterator::Rule" => "0";
+  requires "Path::Tiny" => "0";
   requires "Test::More" => "0";
   requires "Test::RequiresInternet" => "0";
   requires "Test::TempDir::Tiny" => "0";

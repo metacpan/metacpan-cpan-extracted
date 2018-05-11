@@ -1,5 +1,5 @@
 package Koha::Contrib::ARK::Reader;
-$Koha::Contrib::ARK::Reader::VERSION = '1.0.0';
+$Koha::Contrib::ARK::Reader::VERSION = '1.0.2';
 # ABSTRACT: Read Koha biblio records with/without ARK
 use Moose;
 
@@ -20,17 +20,27 @@ has emptyark => (
     default => 0,
 );
 
+
+has total => ( is => 'rw', isa => 'Int', default => 0 );
+
+
 has sth_bn => (is => 'rw');
 
 
 sub BUILD {
     my $self = shift;
-    my $query =
-        "SELECT biblionumber FROM biblio_metadata WHERE " .
+ 
+    my $dbh = C4::Context->dbh;
+    my $fromwhere = "FROM biblio_metadata WHERE " .
         $self->ark->field_query .
         ($self->emptyark ? " =''" : " <> ''" );
-    $self->ark->log->debug("Reader, query = $query\n");
-    my $sth = C4::Context->dbh->prepare($query);
+
+    my $total = $dbh->selectall_arrayref("SELECT COUNT(*) $fromwhere");
+    $total = $total->[0][0];
+    $self->total( $total );
+    $self->ark->log->info("Number of records to process = $total\n");
+
+    my $sth = $dbh->prepare("SELECT biblionumber $fromwhere");
     $sth->execute;
     $self->sth_bn($sth);
 }
@@ -42,13 +52,22 @@ sub read {
     my ($biblionumber) = $self->sth_bn->fetchrow();
     return unless $biblionumber;
 
+    $self->count( $self->count + 1 );
+
     my $record = GetMarcBiblio({ biblionumber => $biblionumber });
     $record = MARC::Moose::Record::new_from($record, 'Legacy');
     $self->ark->log->info("Biblio #$biblionumber\n");
     $self->ark->log->debug("ORIGINAL BIBLIO:\n", $record->as('Text')) if $record;
+
     return [$biblionumber, $record];
 }
 
+
+sub percentage {
+    my $self = shift;
+    my $p = ($self->count * 100) / $self->total;
+    return sprintf("%.2f", $p);
+}
 
 1;
 
@@ -64,7 +83,7 @@ Koha::Contrib::ARK::Reader - Read Koha biblio records with/without ARK
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 ATTRIBUTES
 
@@ -76,6 +95,10 @@ L<Koha::Contrib::ARK> object.
 
 If true, read biblio record without ARK. If false, read biblio records with
 ARK. By default, false.
+
+=head2 total
+
+Total of records to read
 
 =head1 AUTHOR
 

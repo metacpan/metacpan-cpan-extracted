@@ -4,16 +4,18 @@ author:
   - 'Dominique Dumont'
 build_requires:
   Config::Model::BackendMgr: '0'
-  Config::Model::Tester: '2.042'
+  Config::Model::Tester: '3.006'
+  Config::Model::Tester::Setup: '0'
   English: '0'
   Module::Build: '0.34'
+  Path::Tiny: '0'
   Test::Differences: '0'
   Test::More: '0'
   Test::Warn: '0'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +26,7 @@ recommends:
   Config::Model::TkUI: '0'
 requires:
   Carp: '0'
-  Config::Model: '2.111'
+  Config::Model: '2.123'
   Config::Model::Backend::Any: '0'
   File::Copy: '0'
   File::HomeDir: '0'
@@ -37,5 +39,6 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-openssh/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-openssh.git
-version: '1.238'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.239'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

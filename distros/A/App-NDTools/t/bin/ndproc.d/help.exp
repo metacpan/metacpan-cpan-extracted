@@ -29,14 +29,20 @@ Options:
         Print a help message and exit.
 
     --ifmt <JSON|YAML>
-        Force specified input format usage. Automatically choosed (using
-        file extension) if omitted.
+        Force specified input format usage. Will be selected automatically
+        (using file name extension) if omitted. YAML::XS should be installed
+        for YAML support.
 
     --list-modules|-l
         List available modules.
 
     --module|-m <name>
         Process structure using specified module.
+
+    --ofmt <JSON|YAML>
+        Force specified output format usage. JSON is used by default;
+        YAML::XS should be installed for YAML support, see "LIMITATIONS" in
+        App::NDTools for more info.
 
     --rules <file>
         Load rules from specified file. May be used several times.

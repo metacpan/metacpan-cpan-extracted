@@ -317,6 +317,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
       }
       
       // Create resolved type id
+      
       SPVM_TYPE* found_type = SPVM_HASH_search(compiler->type_symtable, type->name, strlen(type->name));
       if (found_type) {
         op_type->uv.type = found_type;
@@ -340,13 +341,27 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
   // Set parent type id and element type id
   {
     int32_t i;
-    for (i = 0; i < compiler->types->length; i++) {
+    int32_t length = compiler->types->length;
+    for (i = 0; i < length; i++) {
       SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, i);
       
       char* parent_type_name = SPVM_TYPE_get_parent_name(compiler, type->name);
       SPVM_TYPE* parent_type = (SPVM_TYPE*)SPVM_HASH_search(compiler->type_symtable, parent_type_name, strlen(parent_type_name));
       if (parent_type) {
         type->parent_type_id = parent_type->id;
+      }
+      else {
+        SPVM_TYPE* new_parent_type = SPVM_TYPE_new(compiler);
+        new_parent_type->name = parent_type_name;
+        new_parent_type->dimension = type->dimension + 1;
+        new_parent_type->id = compiler->types->length;
+        new_parent_type->base_type = type;
+        new_parent_type->base_type_name = type->name;
+        new_parent_type->element_type_id = type->id;
+        new_parent_type->parent_type_id = -1;
+        
+        SPVM_LIST_push(compiler->types, new_parent_type);
+        SPVM_HASH_insert(compiler->type_symtable, new_parent_type->name, strlen(new_parent_type->name), new_parent_type);
       }
       
       // Element type id
@@ -1053,11 +1068,20 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   assert(op_cur->first);
 
                   if (op_cur->first->id == SPVM_OP_C_ID_TYPE) {
+                    // Type inference when array initialization
+                    if (op_cur->uv.any) {
+                      SPVM_OP* op_term_type_inference = (SPVM_OP*)op_cur->uv.any;
+                      SPVM_TYPE* element_type = SPVM_OP_get_type(compiler, op_term_type_inference);
+                      SPVM_TYPE* parent_type = SPVM_LIST_fetch(compiler->types, element_type->parent_type_id);
+                      op_cur->first->uv.type = parent_type;
+                    }
                     SPVM_OP* op_type = op_cur->first;
+                    
                     SPVM_TYPE* type = op_type->uv.type;
                     
                     // Array
                     if (SPVM_TYPE_is_array(compiler, type)) {
+                      
                       SPVM_OP* op_index_term = op_type->last;
 
                       SPVM_TYPE* index_type = SPVM_OP_get_type(compiler, op_index_term);
@@ -2331,9 +2355,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             }
           }
         }
-      
-        // SPVM_DUMPER_dump_ast(compiler, op_base);
-
       }
 
       assert(sub->file_name);

@@ -1,5 +1,5 @@
 package Koha::Contrib::ARK::Clearer;
-$Koha::Contrib::ARK::Clearer::VERSION = '1.0.0';
+$Koha::Contrib::ARK::Clearer::VERSION = '1.0.2';
 # ABSTRACT: Clear Koha ARK field
 use Moose;
 
@@ -55,7 +55,7 @@ Koha::Contrib::ARK::Clearer - Clear Koha ARK field
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.2
 
 =head1 ATTRIBUTES
 

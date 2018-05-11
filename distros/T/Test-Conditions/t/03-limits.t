@@ -8,8 +8,6 @@ use lib 'lib';
 
 use Test::More tests => 6;
 
-use List::Util qw(any none);
-
 use Test::Conditions;
 
 

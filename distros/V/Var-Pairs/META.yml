@@ -24,4 +24,4 @@ requires:
   Scope::Upper: '0'
   Test::More: '0'
   experimental: '0'
-version: '0.003005'
+version: '0.004001'

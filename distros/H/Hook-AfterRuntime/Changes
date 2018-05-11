@@ -1,0 +1,34 @@
+Revision history for Perl module Hook::AfterRuntime
+
+0.006 Wed May  9 20:12:47 CEST 2018
+
+ - Fixed CPANTS best practices issues
+ - Fixed typos, converted README to markdown, added installation
+   instructions to docs
+ - Added missing Changes file
+ - Specified minimum required Perl version
+ - Fix minor Perl::Critic issues
+
+0.005 Mon Aug 30 05:51:36 2010
+
+ - Added multiple hooks
+ - Extended documentation
+
+0.004 Sun Aug 29 18:18:17 2010
+
+ - Fix synopsis tests
+ - Improve documentation after input from ADAMK (see GH#1)
+
+0.003 Sun Aug 29 14:39:43 2010
+
+ - Further fixes
+ - Add missing dependency
+
+0.002 Sun Aug 29 13:30:48 2010
+
+ - Fix runtime behaviour
+ - Add acceptance tests
+
+0.001 Sun Aug 29 10:26:23 2010
+
+ - Initial release

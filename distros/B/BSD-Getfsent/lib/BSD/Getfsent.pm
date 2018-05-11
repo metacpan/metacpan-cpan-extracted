@@ -3,13 +3,14 @@ package BSD::Getfsent;
 use strict;
 use warnings;
 use base qw(Exporter);
+use boolean qw(true false);
 
 use Carp qw(croak);
 use IO::File ();
 
 our ($VERSION, @EXPORT_OK, $ENTRIES, $FSTAB);
 
-$VERSION = '0.17';
+$VERSION = '0.18';
 @EXPORT_OK = qw(getfsent);
 $ENTRIES = __PACKAGE__ . '::_fsents';
 $FSTAB = '/etc/fstab';
@@ -21,14 +22,14 @@ sub getfsent
 
         unless (${$ENTRIES}) {
             @{$ENTRIES} = @{_parse_entries()};
-            ${$ENTRIES} = 1;
+            ${$ENTRIES} = true;
         }
 
         if (@{$ENTRIES}) {
             return @{shift @{$ENTRIES}};
         }
         else {
-            ${$ENTRIES} = 0;
+            ${$ENTRIES} = false;
             return ();
         }
     }
@@ -76,7 +77,7 @@ sub _count_entries
 sub _open_fh
 {
     my $fh = IO::File->new("<$FSTAB")
-      or croak "Can't open $FSTAB: $!";
+      or croak "Cannot open $FSTAB: $!";
 
     return $fh;
 }
@@ -150,6 +151,6 @@ Steven Schubiger <schubiger@cpan.org>
 This program is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See L<http://www.perl.com/perl/misc/Artistic.html>
+See L<http://dev.perl.org/licenses/>
 
 =cut

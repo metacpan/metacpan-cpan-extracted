@@ -21,7 +21,7 @@ PPI::Transform::Doxygen - PPI::Transform class for generating Doxygen input
 
 =head1 DESCRIPTION
 
-This module is normally used by the script B<ppi_transform_doxygen> that is
+This module is normally used by the script L<ppi_transform_doxygen> that is
 part of this distribution and acts as a doxygen input filter (look for
 B<INPUT_FILTER> in the Doxygen docs).
 
@@ -82,12 +82,13 @@ C<< =head2 [<category>] [<return_value>] <name>(<parameters>) >>
 
 The category defines the type of the function definition. The values
 C<function> and C<class_method> result in the function being tagged
-as B<static> for Doxygen. Other values will be ignored.
+as B<static> for Doxygen. Other values will be ignored, which will result
+interpreting the function as method.
 
 =item return_value (optional)
 
-Since Doxygen expects C++ input a return value is mandatory and will
-default to B<void>. A gives string will be passed to Doxygen as is, so be
+Since Doxygen expects C++ input, a return value is mandatory and will
+default to B<void>. A given string will be passed to Doxygen as is, so be
 careful with non word characters.
 
 =item name
@@ -99,9 +100,14 @@ given. If your code is correctly parsable with PPI, then this should work.
 If the corresponding subroutine is not found it will be tagged as B<virtual>
 to Doxygen. This is useful for dynamically generated functions (e.g via
 AUTOLOAD). Yes this has nothing to do with the C++ virtual keyword, but so
-what?
+what? If you want to have the virtual subroutine mapped to the correct
+namespace you will have to add it to the subs name
+(e.g. C< MyClass::mysub() >)
 
-If there is no package declaration or the subroutine is created in the main
+Subroutine names with leading underscore will be tagged as B<private>
+for Doxygen.
+
+If there is no package declaration, the subroutine is created in the main
 namespace, named C<< <script_or_module_name>_main >>.
 
 =item parameters
@@ -112,10 +118,34 @@ be given as C<type name> to Doxygen e.g. C<subname(hash_ref varname)>.
 
 =back
 
+=head1 SIGNATURES
+
+If you are using subroutine signatures, they will be parsed for information
+and you can put the pod after the sub declaration like so:
+
+    sub my_sig_sub ($self, $first = 'default', $second=[], %args) {
+    =for method $self
+
+    Sub documentation.
+
+    =cut
+
+        print join(' ', $first, @$second), "\n";
+        return $self;
+    }
+
+In that case there is no redundant information you'll have to synchronize on
+each change.
+In that case the first parameter behind the B<=for> has to be C<method>,
+C<function> or C<class_method>. The second parameter specifies the return
+value.
+A conflicting B<=head2> declaration for the same subroutine will take
+precedence.
+
 =head1 DETAILS ON TOP
 
-For having the POD ducumentation at the top of the Doxygen page do the
-following:
+For having the non subroutine POD documentation at the top of the Doxygen
+page do the following:
 
 =over
 
@@ -151,9 +181,7 @@ use Pod::POM::View::Text;
 use PPI::Transform::Doxygen::POD;
 use Params::Util qw{_INSTANCE};
 
-#use YAML qw(Dump);
-
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 my %vtype = qw(% hash @ array $ scalar & func * glob);
 
@@ -231,7 +259,7 @@ sub file {
 =head2 document($ppi_doc, $preserve)
 
 This is normally called by C<file()> (see the docs for
-L<PPI::Transform::Doxygen>). It will convert a PPI::Document object
+L<PPI::Transform>). It will convert a PPI::Document object
 in place.
 
 =cut
@@ -241,29 +269,20 @@ sub document {
 
     _INSTANCE( $doc, 'PPI::Document' ) or return undef;
 
-    my($pod_txt, $sub_info) = $self->_parse_pod($doc);
-
-    my($version) = _find_first_regex(
-        $doc,
-        'PPI::Statement::Variable',
-        $self->{rx_version},
-    );
-
-    my($revision) = _find_first_regex(
-        $doc,
-        'PPI::Statement::Variable',
-        $self->{rx_revision},
-    );
-
     my $pkg_subs = $self->_parse_packages_subs($doc);
 
     my($fname, $fdir, $fext) = fileparse( $doc->{_in_fn}, qr/\..*/ );
 
-    my $dxout = _out_head($fname . $fext, $version, $revision, $pod_txt);
+    my($pod_txt, $sub_info) = $self->_parse_pod($doc, $fname);
 
     _integrate_sub_info($pkg_subs, $sub_info);
 
-    for my $pname ( sort keys %$pkg_subs ) {
+    my @packages = sort keys %$pkg_subs;
+    my $file_pod = $pod_txt if @packages == 1 and $packages[0] eq '!main';
+
+    my $dxout = _out_head($fname . $fext, $file_pod);
+
+    for my $pname ( @packages ) {
 
         my @parts     = split( /::/, $pname );
         my $short     = pop @parts;
@@ -272,7 +291,10 @@ sub document {
         $dxout .= _out_class_begin(
             $pname, $short, $namespace, $fname,
             $pkg_subs->{$pname}{inherit},
-            $pkg_subs->{$pname}{used}
+            $pkg_subs->{$pname}{used},
+            $pkg_subs->{$pname}{version},
+            $pkg_subs->{$pname}{revision},
+            $pname eq $fname ? $pod_txt : '',
         );
 
         $dxout .= _out_process_subs( $pname, $pkg_subs, $sub_info );
@@ -289,23 +311,23 @@ sub document {
     $doc->add_element($end_tok);
 }
 
+
 sub _strip { my $str = shift; $str =~ s/^ +//mg; $str }
 
-sub _out_head {
-    my($fn, $ver, $rev, $pod_txt) = @_;
 
+sub _out_head {
+    my($fn, $txt) = @_;
+
+    $txt //= '';
     my $out = _strip(qq(
         /** \@file $fn
-        \@version $ver rev:$rev
-
-        $pod_txt
+        $txt
         */
     ));
 
-    $out =~ s/\srev:\s//;
-
     return $out;
 }
+
 
 sub _get_used_modules {
     my($root) = @_;
@@ -314,11 +336,11 @@ sub _get_used_modules {
     for my $chld ( $root->schildren() ) {
         next unless $chld->isa('PPI::Statement::Include');
         next if $chld->pragma();
-        ( my $modname = $chld->module() ) =~ s/^.*:://;
-        $used{$modname} = 1;
+        $used{$chld->module()} = 1
     }
     return \%used;
 }
+
 
 sub _parse_packages_subs {
     my($self, $doc) = @_;
@@ -331,15 +353,27 @@ sub _parse_packages_subs {
 
     unless (@main_pkgs) {
         $pkg_subs{'!main'}{used} = _get_used_modules($doc);
+        my($v, $r) = $self->_get_pkg_version($doc);
+        $pkg_subs{'!main'}{version}  = $v;
+        $pkg_subs{'!main'}{revision} = $r;
     }
 
-    my $sub_nodes = $doc->find('PPI::Statement::Sub') || [];
-    for my $sub_node ( @$sub_nodes ) {
-        my $node = $sub_node;
+    my $stmt_nodes = $doc->find('PPI::Statement') || [];
+    for my $stmt_node ( @$stmt_nodes ) {
+
         my $pkg  = '!main';
+        next unless $stmt_node->class() eq 'PPI::Statement::Sub'
+            or $stmt_node->child(0) eq 'has';
+
+        my $node = $stmt_node;
         while ($node) {
             if ( $node->class() eq 'PPI::Statement::Package' ) {
                 $pkg = $node->namespace();
+                unless ( $pkg_subs{$pkg}{version} ) {
+                    my($v, $r) = $self->_get_pkg_version($node->parent());
+                    $pkg_subs{$pkg}{version}  = $v;
+                    $pkg_subs{$pkg}{revision} = $r;
+                }
                 unless ( defined $pkg_subs{$pkg}{inherit} ) {
                     my ($inherit) = _find_first_regex(
                         $node->parent(),
@@ -356,11 +390,19 @@ sub _parse_packages_subs {
             }
             $node = $node->previous_sibling() || $node->parent();
         }
-        $pkg_subs{$pkg}{subs}{ $sub_node->name } = $sub_node;
+
+        my $sub_name = $stmt_node->class() eq 'PPI::Statement::Sub'
+                     ? $stmt_node->name
+                     : $stmt_node->child(2)->content;
+
+        for my $sn ( grep { /\w/ && $_ ne 'qw' } split(/\W+/, $sub_name) ) {
+            $pkg_subs{$pkg}{subs}{ $sn } = $stmt_node;
+        }
     }
 
     return \%pkg_subs;
 }
+
 
 sub _out_process_subs {
     my($class, $pkg_subs, $sub_info) = @_;
@@ -371,7 +413,16 @@ sub _out_process_subs {
 
     my %types;
     for my $sname ( sort keys %$sub_nodes ) {
-        my $si = $sub_info->{$sname} or next;
+        my $si = $sub_info->{$sname} || {
+            type    => $sname =~ /^_/ ? 'private' : 'public',
+            rv      => 'void',
+            params  => [],
+            name    => $sname,
+            static  => 0,
+            virtual => 0,
+            class   => $class,
+            text    => '<p>Undocumented Function</p>',
+        };
         $types{ $si->{type} }{$sname} = $si;
     }
 
@@ -379,7 +430,7 @@ sub _out_process_subs {
         $out .= "$type:\n";
         for my $sname ( sort keys %{ $types{$type} } ) {
             my $si      = $types{$type}{$sname};
-            my @static  = $si->{static} ? 'static' : ();
+            my @static  = $si->{static}  ? 'static'  : ();
             my @virtual = $si->{virtual} ? 'virtual' : ();
 
             my $fstr = join( ' ', @static, @virtual, $si->{rv}, "$sname(" );
@@ -397,8 +448,9 @@ sub _out_process_subs {
     return $out;
 }
 
+
 sub _out_class_begin {
-    my($pname, $pkg_short, $namespace, $fname, $inherit, $used) = @_;
+    my($pname, $pkg_short, $namespace, $fname, $inherit, $used, $ver, $rev, $pod_txt) = @_;
 
     if ( $pname eq '!main' ) {
         $pkg_short = $pname = "${fname}_main";
@@ -409,19 +461,28 @@ sub _out_class_begin {
     $out .= "namespace $namespace {\n" if $namespace;
 
     $out .= "\n/** \@class $pname\n\n";
+    $out .= "\@version $ver" if $ver;
+    $out .= " rev:$rev" if $rev;
+    $out .= "\n\n";
+
     if ($used) {
-        $out .= "<h2>Used Modules:</h2>\n<ul>\n";
+        $out .= "\@section ${pkg_short}_USED_MODULES USED_MODULES\n";
+        $out .= "<ul>\n";
         for my $uname ( sort keys %$used ) {
             $out .= "<li>$uname</li>\n";
         }
-        $out .= "</ul>\n*/\n";
+        $out .= "</ul>\n";
     }
+
+    $out .= "$pod_txt\n*/\n\n";
+
     $out .= "class $pkg_short: public";
     $out .= " ::$inherit" if $inherit;
     $out .= " {\n\n";
 
     return $out;
 }
+
 
 sub _out_class_end {
     my($namespace) = @_;
@@ -432,18 +493,21 @@ sub _out_class_end {
     return $out;
 }
 
+
 sub _parse_pod {
-    my($self, $doc) = @_;
+    my($self, $doc, $fname) = @_;
 
     my $parser = Pod::POM->new();
 
-    my $txt;
+    my $txt = '';
     my %subs;
 
     my $pod_tokens = $doc->find('PPI::Token::Pod');
 
     return '', \%subs unless $pod_tokens;
 
+    no warnings qw(once);
+    $PPI::Transform::Doxygen::POD::PREFIX = $fname;
     for my $tok ( @$pod_tokens ) {
         ( my $quoted = $tok->content() ) =~ s/(\@|\\|\%|#)/\\$1/g;
         my $pom = $parser->parse_text($quoted);
@@ -454,36 +518,54 @@ sub _parse_pod {
     return $txt, \%subs;
 }
 
+
 sub _filter_head2 {
     my($pom, $sub_ref) = @_;
 
     my $nodes = $pom->content();
-    for my $sn (@$nodes) {
-        next unless $sn->type() =~ /^(?:head[1-4]|begin|item|over|pod)$/;
-        if ( $sn->type() eq 'head2' and $sn->title() =~ /[\w:]+\(.*\)/ ) {
-            my $sinfo = _sub_extract( $sn->title() )
-              if $sn->type() eq 'head2';
+    my $method_for = 0;
+    for my $sn ( @$nodes ) {
+        $sn = '' if $method_for;
+        next unless $sn and $sn->type() =~ /^(?:head[1-4]|begin|item|over|pod|for)$/;
+        if ( $sn->type() eq 'head2' and $sn->title() =~ /[\w:]+\s*\(.*\)/ ) {
+            my $sinfo = _sub_extract( $sn->title() );
             if ($sinfo) {
                 $sinfo->{text} = PPI::Transform::Doxygen::POD->print($sn->content());
                 $sub_ref->{$sinfo->{name}} = $sinfo;
                 $sn = '';
             }
+        } elsif ( $sn->type() eq 'for' ) {
+            if (
+                $sn->type eq 'for'
+                and
+                $sn->format =~ /^(?:function|method|class_method)$/
+            ) {
+                $sn = '';
+                $method_for = 1;
+            }
+
         } else {
             _filter_head2($sn);
         }
     }
 }
 
+
+my $rx_name_parms = qr/\s*([\w:]+)\s*\(\s*([^\)]*)\s*\)$/;
 sub _sub_extract {
     my($str) = @_;
 
-    my @parts = split(/\s+/, $str);
-    my $fstr = pop @parts;
 
-    my($long, $params) = $fstr =~ /^([\w:]+)\(([^\)]*)\)$/;
+    my($long, $params) = $str =~ /$rx_name_parms/;
     return unless $long;
 
-    my $rv  = pop(@parts) || 'void';
+    $str =~ s/$rx_name_parms//;
+
+    my @parts = split(/\s+/, $str);
+
+    my $rv = pop(@parts) || 'void';
+    $rv =~ s/(\%|\@|\&)/\\$1/g;
+
     my $cat = pop(@parts) || '';
 
     my @params = _add_type($params);
@@ -505,9 +587,15 @@ sub _sub_extract {
     };
 }
 
+
 sub _add_type {
-    my($params) = @_;
-    return unless $params;
+    return unless my $params = shift;
+
+    unless ( ref($params) ) {
+        $params =~ s/\s//g;
+        $params = [ split(/,/, $params) ];
+    }
+
     return map {
         my @sig = $_ =~ /^(.)(.)(.?)/;
         if ( $sig[0] eq '\\' ) { shift @sig }
@@ -517,8 +605,9 @@ sub _add_type {
         $typ .= '_ref' if $ref;
         s/^\W*//;
         $_ = "$typ $_";
-    } split(/\s*,\s*/, $params);
+    } @$params;
 }
+
 
 sub _find_first_regex {
     my($root, $name, $regex) = @_;
@@ -531,13 +620,31 @@ sub _find_first_regex {
     return '';
 }
 
+
+sub _get_pkg_version {
+    my($self, $root) = @_;
+    my($version) = _find_first_regex(
+        $root,
+        'PPI::Statement::Variable',
+        $self->{rx_version},
+    );
+
+    my($revision) = _find_first_regex(
+        $root,
+        'PPI::Statement::Variable',
+        $self->{rx_revision},
+    );
+    return $version, $revision;
+}
+
+
 sub _out_html_code {
     my($sname, $sub) = @_;
 
     my $html = _strip(qq(
         \@htmlonly
         <div id='codesection-$sname' class='dynheader closed' style='cursor:pointer;' onclick='return toggleVisibility(this)'>
-        	<img id='codesection-$sname-trigger' src='closed.png' style='display:inline'><b>Code:</b>
+            <img id='codesection-$sname-trigger' src='closed.png' style='display:inline'><b>Code:</b>
         </div>
         <div id='codesection-$sname-summary' class='dyncontent' style='display:block;font-size:small;'>click to view</div>
         <div id='codesection-$sname-content' class='dyncontent' style='display: none;'>
@@ -558,18 +665,90 @@ sub _out_html_code {
     return $html;
 }
 
+
+sub _sub_info_from_node {
+    my($sname, $class, $node) = @_;
+
+    return undef unless $node->class eq 'PPI::Statement::Sub';
+
+    my $parser = Pod::POM->new();
+    my %si;
+    my $txt = my $def = '';
+    my @params;
+    my($rv, $static);
+    my $type = $sname =~ /^_/ ? 'private' : 'public';
+
+    my $pod = $node->find('PPI::Token::Pod') || [];
+    for my $tok ( @$pod ) {
+        ( my $quoted = $tok ) =~ s/(\@|\\|\%|#)/\\$1/g;
+        my $pom = $parser->parse_text($quoted);
+        next unless my $for = $pom->for->[0];
+        $rv     = $for->text;
+        $static = $for->format eq 'function' || $for->format eq 'class_method';
+        $txt .= PPI::Transform::Doxygen::POD->print($pom);
+    }
+    my $proto = $node->find('PPI::Token::Prototype') || [];
+    for my $tok ( @$proto ) {
+        for my $pmt ( split(/,/, $tok->prototype) ) {
+            my($attr, $default) = split(/=/, $pmt);
+            push @params, $attr;
+            next unless $default;
+            $def .= "<p>Default value for $attr is $default.</p>\n";
+        }
+        @params = _add_type(\@params);
+    }
+    my @word_tok = $node->find('PPI::Token::Word');
+    my $last;
+    while ( my $tok = pop @word_tok ) {
+        $last = "$tok";
+        next unless $tok eq 'return';
+    }
+
+    return undef unless $txt;
+
+    $txt .= "\n$def" if $def;
+
+    return {
+        type   => $type,
+        rv     => $rv,
+        params => \@params,
+        name   => $sname,
+        static => $static,
+        class  => $class,
+        text   => $txt,
+    }
+}
+
+
 sub _integrate_sub_info {
     my($pkg_subs, $sub_info) = @_;
 
+    my %si_by_name = map { $_ => $sub_info->{$_} } keys %$sub_info;
+
     my %look;
     for my $class ( keys %$pkg_subs ) {
-        $look{$_} = 1 for keys %{ $pkg_subs->{$class}{subs} };
+        for my $subname ( keys %{ $pkg_subs->{$class}{subs} } ) {
+            if ( $si_by_name{$subname} ) {
+                # pod info exists
+                $si_by_name{$subname}{class} = $class;
+                $look{$subname} = 1;
+                next;
+            };
+            my $si = _sub_info_from_node(
+                $subname,
+                $class,
+                $pkg_subs->{$class}{subs}{$subname},
+            );
+            $sub_info->{$subname} = $si if $si;
+            $look{$subname} = 1;
+        }
     }
 
     for my $si ( values %$sub_info ) {
         next if $look{ $si->{name} };
         $si->{virtual} = 1;
-        $pkg_subs->{$si->{class}}{subs}{$si->{name}} = '<p>virtual function or method</p>';
+        $pkg_subs->{$si->{class}}{subs}{$si->{name}}
+            = '<p>virtual function or method</p>';
     }
 }
 

@@ -19,31 +19,31 @@ no_index:
 provides:
   Astro::Coord::ECI:
     file: lib/Astro/Coord/ECI.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::Mixin:
     file: lib/Astro/Coord/ECI/Mixin.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::Moon:
     file: lib/Astro/Coord/ECI/Moon.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::Star:
     file: lib/Astro/Coord/ECI/Star.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::Sun:
     file: lib/Astro/Coord/ECI/Sun.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::TLE:
     file: lib/Astro/Coord/ECI/TLE.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::TLE::Iridium:
     file: lib/Astro/Coord/ECI/TLE/Iridium.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::TLE::Set:
     file: lib/Astro/Coord/ECI/TLE/Set.pm
-    version: '0.094'
+    version: '0.095'
   Astro::Coord::ECI::Utils:
     file: lib/Astro/Coord/ECI/Utils.pm
-    version: '0.094'
+    version: '0.095'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -61,5 +61,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-Coord-ECI.git
-version: '0.094'
+version: '0.095'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

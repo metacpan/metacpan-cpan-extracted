@@ -25,10 +25,10 @@ requires:
   Config::Grammar: '1.12'
   Locale::PO: '0.27'
   Mojolicious: '7.26'
-  Mojolicious::Plugin::Qooxdoo: '0.907'
+  Mojolicious::Plugin::Qooxdoo: '0.908'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.12.8
+version: v0.12.9

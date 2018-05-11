@@ -13,6 +13,8 @@ lib/Class/Method/Cache/FastMmap.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic-timed.t
+t/02-key_cb.t
+t/03-cache.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t

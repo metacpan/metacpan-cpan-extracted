@@ -1,11 +1,88 @@
 
 package OpusVL::Preferences::RolesFor::Result::PrfOwner;
 
+=head1 DESCRIPTION
+
+If you are using DBIx::Class::Schema::Loader add the necessary link fields manually, otherwise 
+add the following line to add the fields to your result class.
+
+    __PACKAGE__->prf_owner_init;
+
+=head1 SYNOPSIS
+
+=head1 METHODS
+
+=head2 prf_owner_init
+
+Tries to add the columns and relationships for your result class.  Call it like this,
+
+    __PACKAGE__->prf_owner_init;
+
+Your mileage may vary.
+
+=head2 prf_defaults
+
+ResultSet for the defaults.
+
+=head2 prf_preferences
+
+ResultSet of the preference values.
+
+=head2 prf_get
+
+Gets the setting.  If the object doesn't have the setting specified but there is a 
+default, the default will be returned.
+
+=head2 prf_set
+
+Sets the setting for the object.
+
+=head2 prf_reset
+
+Resets the settings against the object.  prf_get may still return a value if there is a default 
+for the setting.
+
+=head2 preferences_to_array
+
+Returns an array of the current results preferences.
+
+    $object->preferences_to_array();
+    # [{
+    #     name => $_->name, 
+    #     value => $_->value,
+    #     param => # assocaited PrfDefault parameter definition.
+    # } ];
+
+=head2 safe_preferences_in_array
+
+Returns the same as preferences_to_array but instead of the param object it returns the 
+field label.  The safe refers to the fact that all the items in the hash are base types
+and therefore are trivially serializable.
+
+=head2 safe_prefs_to_hash
+
+Returns the same as safe_prefs_to_hash but converts it to a hash for easier use.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2011 OpusVL
+
+This software is licensed according to the "IP Assignment Schedule" provided with the development project.
+
+=cut
 
 use strict;
 use warnings;
 use Moose::Role;
 
+=head2 prf_id_column
+
+Provides the default column that contains the preferences identifier.
+
+If your Result doesn't have a standard integer primary key called 'id', override
+this with the name of another column that I<is> an identifying integer
+
+=cut
 
 sub prf_id_column {'id'}
 
@@ -263,104 +340,3 @@ sub prf_reset
 
 return 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpusVL::Preferences::RolesFor::Result::PrfOwner
-
-=head1 VERSION
-
-version 0.27
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-If you are using DBIx::Class::Schema::Loader add the necessary link fields manually, otherwise 
-add the following line to add the fields to your result class.
-
-    __PACKAGE__->prf_owner_init;
-
-=head1 METHODS
-
-=head2 prf_owner_init
-
-Tries to add the columns and relationships for your result class.  Call it like this,
-
-    __PACKAGE__->prf_owner_init;
-
-Your mileage may vary.
-
-=head2 prf_defaults
-
-ResultSet for the defaults.
-
-=head2 prf_preferences
-
-ResultSet of the preference values.
-
-=head2 prf_get
-
-Gets the setting.  If the object doesn't have the setting specified but there is a 
-default, the default will be returned.
-
-=head2 prf_set
-
-Sets the setting for the object.
-
-=head2 prf_reset
-
-Resets the settings against the object.  prf_get may still return a value if there is a default 
-for the setting.
-
-=head2 preferences_to_array
-
-Returns an array of the current results preferences.
-
-    $object->preferences_to_array();
-    # [{
-    #     name => $_->name, 
-    #     value => $_->value,
-    #     param => # assocaited PrfDefault parameter definition.
-    # } ];
-
-=head2 safe_preferences_in_array
-
-Returns the same as preferences_to_array but instead of the param object it returns the 
-field label.  The safe refers to the fact that all the items in the hash are base types
-and therefore are trivially serializable.
-
-=head2 safe_prefs_to_hash
-
-Returns the same as safe_prefs_to_hash but converts it to a hash for easier use.
-
-=head1 COPYRIGHT and LICENSE
-
-Copyright (C) 2011 OpusVL
-
-This software is licensed according to the "IP Assignment Schedule" provided with the development project.
-
-=head2 prf_id_column
-
-Provides the default column that contains the preferences identifier.
-
-If your Result doesn't have a standard integer primary key called 'id', override
-this with the name of another column that I<is> an identifying integer
-
-=head1 AUTHOR
-
-OpusVL - www.opusvl.com
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by OpusVL - www.opusvl.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

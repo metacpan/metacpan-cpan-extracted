@@ -4,17 +4,21 @@ use Moose;
 use MooseX::ClassAttribute;
 use MooseX::Types::URI qw(Uri);
 use LWP;
+use HTTP::Link;
 use DateTime;
 use Try::Tiny;
 use Types::Standard qw(Enum);
 use MooseX::Enumeration;
 use Scalar::Util;
+use Carp qw(carp croak);
+use Mojo::DOM58;
+use URI::Escape;
 use Carp qw(croak);
 
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 has 'source' => (
     isa => Uri,
@@ -46,6 +50,12 @@ has 'target' => (
     is => 'ro',
     required => 1,
     coerce => 1,
+);
+
+has 'endpoint' => (
+    isa => 'Maybe[URI]',
+    is => 'ro',
+    lazy_build => 1,
 );
 
 has 'is_tested' => (
@@ -91,9 +101,14 @@ has 'content' => (
     lazy_build => 1,
 );
 
+has 'response' => (
+    isa => 'HTTP::Response',
+    is => 'rw',
+);
+
 class_has 'ua' => (
     isa => 'LWP::UserAgent',
-    is => 'ro',
+    is => 'rw',
     default => sub { LWP::UserAgent->new },
 );
 
@@ -155,7 +170,14 @@ sub verify {
     $self->is_tested(1);
     my $response = $self->ua->get( $self->source );
 
-    if ($response->content =~ $self->target ) {
+    # Search for both plain and escaped ("percent-encoded") versions of the
+    # target URL in the source doc. We search for the latter to account for
+    # sites like Tumblr, who treat outgoing hyperlinks as weird internally-
+    # pointing links that pass external URLs as query-string parameters.
+    my $target = "$self->target";
+    if ( ($response->content =~ $self->target)
+         || ($response->content =~ uri_escape( $self->target ) )
+    ) {
         $self->time_verified( DateTime->now );
         $self->source_html( $response->decoded_content );
         return 1;
@@ -165,6 +187,28 @@ sub verify {
     }
 }
 
+sub send {
+    my $self = shift;
+
+    my $endpoint = $self->endpoint;
+    my $source = $self->source;
+    my $target = $self->target;
+
+    unless ( $endpoint ) {
+        return 0;
+    }
+
+    # Step three: send the webmention to the target!
+    my $request = HTTP::Request->new( POST => $endpoint );
+    $request->content_type('application/x-www-form-urlencoded');
+    $request->content("source=$source&target=$target");
+
+    my $response = $self->ua->request($request);
+    $self->response( $response );
+
+    return $response->is_success;
+}
+
 sub _build_source_mf2_document {
     my $self = shift;
 
@@ -172,7 +216,10 @@ sub _build_source_mf2_document {
     my $doc;
     try {
         my $parser = Web::Microformats2::Parser->new;
-        $doc = $parser->parse( $self->source_html );
+        $doc = $parser->parse(
+	    $self->source_html,
+	    url_context => $self->source,
+	);
     }
     catch {
         die "Error parsing source HTML: $_";
@@ -183,13 +230,22 @@ sub _build_source_mf2_document {
 sub _build_author {
     my $self = shift;
 
-    return Web::Mention::Author->new_from_mf2_document(
-        $self->source_mf2_document
-    );
+    if ( $self->source_mf2_document ) {
+        return Web::Mention::Author->new_from_mf2_document(
+            $self->source_mf2_document
+        );
+    }
+    else {
+        return;
+    }
 }
 
 sub _build_type {
     my $self = shift;
+
+    unless ( $self->source_mf2_document ) {
+        return 'mention';
+    }
 
     my $item = $self->source_mf2_document->get_first( 'h-entry' );
     return 'mention' unless $item;
@@ -213,29 +269,84 @@ sub _build_type {
 
 sub _build_content {
     my $self = shift;
+
     # XXX This is inflexible and not on-spec
+    #     Current behavior: Get an explicit content property,
+    #     or return the HTML document's title, if there is one.
 
     my $item = $self->source_mf2_document->get_first( 'h-entry' );
-    if ( $item->get_property( 'content' ) ) {
+
+    if ( $item && $item->get_property( 'content' ) ) {
         return $item->get_property( 'content' )->{value};
     }
     else {
-        return;
+        my ( $title ) = $self->source_html =~ /<\s*\btitle\b.*?>\s*(.*?)\s*</;
+        return $title;
     }
 }
 
 sub _build_original_source {
     my $self = shift;
 
-    if ( my $item = $self->source_mf2_document->get_first( 'h-entry' ) ) {
-        if ( my $url = $item->get_property( 'url' ) ) {
-            return $url;
+    if ( $self->source_mf2_document ) {
+        if ( my $item = $self->source_mf2_document->get_first( 'h-entry' ) ) {
+            if ( my $url = $item->get_property( 'url' ) ) {
+                return $url;
+            }
         }
     }
 
     return $self->source;
 }
 
+sub _build_endpoint {
+    my $self = shift;
+
+    my $endpoint;
+    my $source = $self->source;
+    my $target = $self->target;
+
+    # Is it in the Link HTTP header?
+    my $response = $self->ua->get( $target );
+    if ( $response->header( 'Link' ) ) {
+        my @header_links = HTTP::Link->parse( $response->header( 'Link' ) . '' );
+        foreach (@header_links ) {
+            if ($_->{relation} eq 'webmention') {
+                $endpoint = $_->{iri};
+            }
+        }
+    }
+
+    # Is it in the HTML?
+    unless ( $endpoint ) {
+        if ( $response->header( 'Content-type' ) =~ m{^text/html\b} ) {
+            my $dom = Mojo::DOM58->new( $response->decoded_content );
+            my $nodes_ref = $dom->find(
+                'link[rel~="webmention"], a[rel~="webmention"]'
+            );
+            for my $node (@$nodes_ref) {
+                $endpoint = $node->attr( 'href' );
+                last if defined $endpoint;
+            }
+        }
+    }
+
+    return undef unless defined $endpoint;
+
+    $endpoint = URI->new_abs( $endpoint, $response->base );
+
+    my $host = $endpoint->host;
+    if (
+        ( lc($host) eq 'localhost' ) || ( $host =~ /^127\.\d+\.\d+\.\d+$/ )
+    ) {
+        carp "Warning: $source declares an apparent loopback address "
+              . "($endpoint) as a webmention endpoint. Ignoring.";
+        return undef;
+    }
+    else {
+        return $endpoint;
+    }
+}
 
 # Called by the JSON module during JSON encoding.
 # Contrary to the (required) name, returns an unblessed reference, not JSON.
@@ -345,15 +456,22 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
         . "so it is not verified.";
  }
 
- # Manually buidling a webmention:
+ # Manually buidling and sending a webmention:
 
  $wm = Web::Mention->new(
     source => $url_of_the_thing_that_got_mentioned,
     target => $url_of_the_thing_that_did_the_mentioning
  );
 
- # Sending a webmention:
- # ...watch this space.
+ my $success = $wm->send;
+ if ( $success ) {
+     say "Webmention sent successfully!";
+ }
+ else {
+     say "The webmention wasn't sent successfully.";
+     say "Here's the response we got back..."
+     say $wm->response;
+ }
 
 =head1 DESCRIPTION
 
@@ -380,7 +498,9 @@ string.
 
 Per the Webmention protocol, the B<source> URL represents the location
 of the document that made the mention described here, and B<target>
-describes the location of the document that got mentioned.
+describes the location of the document that got mentioned. The two
+arguments cannot refer to the same URL (disregarding the C<#fragment>
+part of either, if present).
 
 =head3 new_from_request
 
@@ -399,17 +519,35 @@ or if it does but does not define both required HTTP parameters.
 
 =head2 Object Methods
 
-=head3 source
+=head3 author
 
- $source_url = $wm->source;
+ $author = $wm->author;
 
-Returns the webmention's source URL, as a L<URI> object.
+A Web::Mention::Author object representing the author of this
+webmention's source document, if we're able to determine it. If not,
+this returns undef.
 
-=head3 target
+=head3 content
 
- $target_url = $wm->target;
+ $content = $wm->content;
 
-Returns the webmention's target URL, as a L<URI> object.
+The content of this webmention, if its source document exists and
+defines its content using Microformats2. If not, then it returns the content
+of the source document's E<lt>titleE<gt> element, if it has one.
+
+B<CAUTION:> Spec-compliant implementation of this method is incomplete,
+and its API may change in near-future updates to this module.
+
+=head3 endpoint
+
+ my $uri = $wm->endpoint;
+
+Attempts to determine the webmention endpoint URL of this webmention's
+target. On success, returns a L<URI> object. On failure, returns undef.
+
+(If the endpoint is set to localhost or a loopback IP, will return undef
+and also emit a warning, because that's terribly rude behavior on the
+target's part.)
 
 =head3 is_verified
 
@@ -421,6 +559,69 @@ mention the target URL. Otherwise returns 0.
 The first time this is called on a given webmention object, it will try
 to fetch the source document at its designated URL. If it cannot fetch
 the document on this first attempt, this method returns 0.
+
+=head3 original_source
+
+ $original_url = $wm->original_source;
+
+If the document fetched from the source URL seems to point at yet
+another URL as its original source, then this returns that URL. If not,
+this has the same return value as C<source()>.
+
+(It makes this determination based on the possible presence a C<u-url>
+property in an C<h-entry> found within the source document.)
+
+=head3 response
+
+ my $response = $wm->response;
+
+Returns the L<HTTP::Response> object representing the response received
+by this webmention instance during its most recent attempt to send
+itself.
+
+Returns undef if this webmention instance hasn't tried to send itself.
+
+=head3 send
+
+ my $bool = $wm->send;
+
+Attempts to send an HTTP-request representation of this webmention to
+its target's designated webmention endpoint. This involves querying the
+target URL to discover said endpoint's URL (via the C<endpoint> object
+method), and then sending the actual webmention request via HTTP to that
+endpoint.
+
+If that whole process goes through successfully and the endpoint returns
+a success response (meaning that it has acknowledged the webmention, and
+most likely queued it for later processing), then this method returns
+true. Otherwise, it returns false.
+
+=head3 source
+
+ $source_url = $wm->source;
+
+Returns the webmention's source URL, as a L<URI> object.
+
+=head3 source_html
+
+ $html = $wm->source_html;
+
+The HTML of the document fetched from the source URL. If nothing got
+fetched successfully, returns undef.
+
+=head3 source_mf2_document
+
+ $mf2_doc = $wm->source_mf2_document;
+
+The L<Web::Microformats2::Document> object that resulted from parsing the
+source document for Microformats2 metadata. If no such result, returns
+undef.
+
+=head3 target
+
+ $target_url = $wm->target;
+
+Returns the webmention's target URL, as a L<URI> object.
 
 =head3 type
 
@@ -452,56 +653,12 @@ quotation
 
 =back
 
-=head3 author
-
- $author = $wm->author;
-
-A Web::Mention::Author object representing the author of this
-webmention's source document, if we're able to determine it. If not,
-this returns undef.
-
-=head3 source_html
-
- $html = $wm->source_html;
-
-The HTML of the document fetched from the source URL. If nothing got
-fetched successfully, returns undef.
-
-=head3 source_mf2_document
-
- $mf2_doc = $wm->source_mf2_document;
-
-The L<Web::Microformats2::Document> object that resulted from parsing the
-source document for Microformats2 metadata. If no such result, returns
-undef.
-
-=head3 content
-
- $content = $wm->content;
-
-The content of this webmention, if its source document exists and
-defines its content using Microformats2. If not, this returns undef.
-
-=head3 original_source
-
- $original_url = $wm->original_source;
-
-If the document fetched from the source URL seems to point at yet
-another URL as its original source, then this returns that URL. If not,
-this has the same return value as C<source()>.
-
-(It makes this determination based on the possible presence a C<u-url>
-property in an C<h-entry> found within the source document.)
-
 =head1 NOTES AND BUGS
 
 This software is B<alpha>; its author is still determining how it wants
 to work, and its interface might change dramatically.
 
 Implementation of the content-fetching method is incomplete.
-
-The author plans to add webmention-sending functionality to this module.
-But, it isn't there yet.
 
 =head1 SUPPORT
 

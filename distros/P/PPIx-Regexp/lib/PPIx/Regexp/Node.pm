@@ -44,11 +44,12 @@ use PPIx::Regexp::Constant qw{
     MINIMUM_PERL
     NODE_UNKNOWN
     TRUE
+    @CARP_NOT
 };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 

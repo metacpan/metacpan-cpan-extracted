@@ -1,30 +1,37 @@
-%   if ($CustomField->ConditionedByCustomField) {
+%   my $conditioned_by = $CustomField->ConditionedBy;
+%   if ($conditioned_by) {
+%       my $conditioned_by_val = $conditioned_by->{vals} || '';
+%       my @conditioned_by_vals = ref($conditioned_by_val) eq 'ARRAY' ? @$conditioned_by_val : ($conditioned_by_val);
 <script type="text/javascript">
 jQuery(function() {
 %       if ($ParentSelector eq 'id') {
-    var conditionedby_id = <% 'CF-' . $CustomField->ConditionedByCustomField->id . '-ShowRow' |h,n,j%>;
+    var conditionedby_id = <% 'CF-' . $conditioned_by->{CF} . '-ShowRow' |h,n,j%>;
     conditionedby_id = conditionedby_id.replace(/:/g,'\\:');
     var cf_id = <% 'CF-' . $CustomField->id . '-ShowRow' |h,n,j%>;
     cf_id = cf_id.replace(/:/g,'\\:');
-    var conditionedby_val = '<% $CustomField->ConditionedByCustomFieldValue->Name %>';
-    if (jQuery.trim(jQuery('#'+conditionedby_id+' td.value').text()) != conditionedby_val) {
+    var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
+    if (jQuery.inArray(jQuery.trim(jQuery('#'+conditionedby_id+' td.value').text()), conditionedby_vals) == -1) {
         jQuery('#'+cf_id).hide();
     }
     else {
         jQuery('#'+cf_id).show();
     }
 %       } else {
-    var conditionedby_class = <% '.record-field.CustomField__' . $CustomField->ConditionedByCustomField->Name . '_' |h,n,j%>;
+%           my $conditioned_by_cf = RT::CustomField->new($session{CurrentUser});
+%           $conditioned_by_cf->Load($conditioned_by->{CF});
+%           if ($conditioned_by_cf->id) {
+    var conditionedby_class = <% '.record-field.CustomField__' . $conditioned_by_cf->Name . '_' |h,n,j%>;
     conditionedby_class = conditionedby_class.replace(/:/g,'\\:');
     var cf_class = <% '.record-field.CustomField__' . $CustomField->Name . '_' |h,n,j%>;
     cf_class = cf_class.replace(/:/g,'\\:');
-    var conditionedby_val = '<% $CustomField->ConditionedByCustomFieldValue->Name %>';
-    if (jQuery.trim(jQuery(conditionedby_class+' .value').text()) != conditionedby_val) {
+    var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
+    if (jQuery.inArray(jQuery.trim(jQuery(conditionedby_class+' .value').text()), conditionedby_vals) == -1) {
         jQuery(cf_class).hide();
     }
     else {
         jQuery(cf_class).show();
     }
+%           }
 %       }
 });
 </script>

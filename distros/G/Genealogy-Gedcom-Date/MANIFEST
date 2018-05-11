@@ -11,6 +11,8 @@ scripts/compare.pl
 scripts/parse.pl
 scripts/pod2html.sh
 scripts/synopsis.pl
+t/00.versions.t
+t/00.versions.tx
 t/compare.t
 t/English.t
 t/French.t

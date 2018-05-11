@@ -1,5 +1,6 @@
-use v5.24;
 use Test::More;
+use strict;
+use warnings;
 use Data::Dumper;
 use lib 't/lib';
 use Carp;
