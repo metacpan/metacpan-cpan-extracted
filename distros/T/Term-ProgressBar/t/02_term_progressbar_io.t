@@ -1,5 +1,6 @@
 # -*- mode: cperl; -*-
 use Test::More;
+use Test::Warnings;
 
 use_ok('Term::ProgressBar::IO');
 

@@ -81,6 +81,26 @@ $control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 2, 'asdf
 # let some heartbeats go by
 ae_sleep(3);
 
+$recv->pause;
+
+ok $recv->is_paused, 'sucessfully paused';
+
+$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 3, 'frobnicate');
+
+ae_sleep(1);
+
+push @expected, (
+    'BEGIN',
+    "table public.test_tbl: INSERT: id[integer]:3 payload[text]:'frobnicate'",
+    'COMMIT',
+);
+
+$recv->unpause;
+
+ok !$recv->is_paused, 'sucessfully unpaused';
+
+ae_sleep(2);
+
 ok $end_cv->recv, 'got all messages';
 $recv->stop;
 

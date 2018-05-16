@@ -14,7 +14,7 @@ isa_ok( $bucket, Mock::Bucket->bucket_class );
 
 can_ok( $bucket, '_numeric_strictly_greater_than' );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 {
 my $sub = $bucket->_numeric_strictly_greater_than(
@@ -23,7 +23,7 @@ my $sub = $bucket->_numeric_strictly_greater_than(
 	minimum => 10,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {}, "_numeric_strictly_greater_than returns a code ref" );
 
 

@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1646 2018-03-12 12:52:45Z willem $
+# $Id: 00-load.t 1669 2018-04-27 10:17:13Z willem $
 #
 
 use strict;
@@ -8,16 +8,13 @@ my @module = qw(
 	Net::DNS::SEC
 	Net::DNS::SEC::DSA
 	Net::DNS::SEC::ECDSA
+	Net::DNS::SEC::ECCGOST
 	Net::DNS::SEC::EdDSA
 	Net::DNS::SEC::RSA
 	Net::DNS::SEC::Keyset
 	Net::DNS::SEC::Private
 	Net::DNS::SEC::libcrypto
-	Crypt::OpenSSL::Bignum
-	Crypt::OpenSSL::EC
-	Crypt::OpenSSL::ECDSA
 	Digest::GOST
-	Digest::SHA
 	File::Find
 	File::Spec
 	IO::File
@@ -25,11 +22,6 @@ my @module = qw(
 	Net::DNS
 	Test::More
 	);
-
-
-# GOST R 34.10-2001 and GOST R 34.11-94 superseded by
-# GOST R 34.10-2012 and GOST R 34.11-2012 respectively.
-push @module, qw(Net::DNS::SEC::ECCGOST) if eval 'require Digest::GOST';
 
 
 my @diag = "\nThese tests were run using:";

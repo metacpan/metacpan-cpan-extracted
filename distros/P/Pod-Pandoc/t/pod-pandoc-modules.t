@@ -6,6 +6,8 @@ use Pod::Simple::Pandoc;
 use Pod::Pandoc::Modules;
 use Test::Exception;
 
+plan skip_all => 'pandoc not available' unless pandoc;
+
 my $parser = Pod::Simple::Pandoc->new;
 
 # add

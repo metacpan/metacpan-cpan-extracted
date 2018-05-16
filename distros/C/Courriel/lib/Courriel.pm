@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Courriel::Headers;
 use Courriel::Helpers qw( unique_boundary );
@@ -16,7 +16,7 @@ use Courriel::Types qw( ArrayRef Bool Headers Maybe Part Str StringRef );
 use DateTime;
 use DateTime::Format::Mail 0.403;
 use DateTime::Format::Natural;
-use Email::Address;
+use Email::Address::XS;
 use Encode qw( encode );
 use List::AllUtils qw( uniq );
 use Params::ValidationCompiler 0.26 qw( validation_for );
@@ -59,7 +59,7 @@ has datetime => (
 
 has _to => (
     traits   => ['Array'],
-    isa      => ArrayRef ['Email::Address'],
+    isa      => ArrayRef ['Email::Address::XS'],
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_to',
@@ -70,7 +70,7 @@ has _to => (
 
 has _cc => (
     traits   => ['Array'],
-    isa      => ArrayRef ['Email::Address'],
+    isa      => ArrayRef ['Email::Address::XS'],
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_cc',
@@ -81,7 +81,7 @@ has _cc => (
 
 has from => (
     is       => 'ro',
-    isa      => Maybe ['Email::Address'],
+    isa      => Maybe ['Email::Address::XS'],
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_from',
@@ -89,7 +89,7 @@ has from => (
 
 has _participants => (
     traits   => ['Array'],
-    isa      => ArrayRef ['Email::Address'],
+    isa      => ArrayRef ['Email::Address::XS'],
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_participants',
@@ -100,7 +100,7 @@ has _participants => (
 
 has _recipients => (
     traits   => ['Array'],
-    isa      => ArrayRef ['Email::Address'],
+    isa      => ArrayRef ['Email::Address::XS'],
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_recipients',
@@ -246,7 +246,7 @@ sub _find_date_received {
 sub _build_to {
     my $self = shift;
 
-    my @addresses = map { Email::Address->parse( $_->value ) }
+    my @addresses = map { Email::Address::XS->parse( $_->value ) }
         $self->headers->get('To');
 
     return $self->_unique_addresses( \@addresses );
@@ -255,7 +255,7 @@ sub _build_to {
 sub _build_cc {
     my $self = shift;
 
-    my @addresses = map { Email::Address->parse( $_->value ) }
+    my @addresses = map { Email::Address::XS->parse( $_->value ) }
         $self->headers->get('CC');
 
     return $self->_unique_addresses( \@addresses );
@@ -264,8 +264,8 @@ sub _build_cc {
 sub _build_from {
     my $self = shift;
 
-    my @addresses = Email::Address->parse( map { $_->value }
-            $self->headers->get('From') );
+    my @addresses = map { Email::Address::XS->parse( $_->value ) }
+        $self->headers->get('From');
 
     return $addresses[0];
 }
@@ -532,7 +532,7 @@ Courriel - High level email parsing and manipulation
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -617,13 +617,13 @@ these exists, it just returns C<< DateTime->now() >>.
 
 =head2 $email->from()
 
-This returns a single L<Email::Address> object based on the From header of the
-email. If the email has no From header or if the From header is broken, it
+This returns a single L<Email::Address::XS> object based on the From header of
+the email. If the email has no From header or if the From header is broken, it
 returns C<undef>.
 
 =head2 $email->participants()
 
-This returns a list of L<Email::Address> objects, one for each unique
+This returns a list of L<Email::Address::XS> objects, one for each unique
 participant in the email. This includes any address in the From, To, or CC
 headers.
 
@@ -631,21 +631,21 @@ Just like with the From header, broken addresses will not be included.
 
 =head2 $email->recipients()
 
-This returns a list of L<Email::Address> objects, one for each unique
+This returns a list of L<Email::Address::XS> objects, one for each unique
 recipient in the email. This includes any address in the To or CC headers.
 
 Just like with the From header, broken addresses will not be included.
 
 =head2 $email->to()
 
-This returns a list of L<Email::Address> objects, one for each unique
+This returns a list of L<Email::Address::XS> objects, one for each unique
 address in the To header.
 
 Just like with the From header, broken addresses will not be included.
 
 =head2 $email->cc()
 
-This returns a list of L<Email::Address> objects, one for each unique
+This returns a list of L<Email::Address::XS> objects, one for each unique
 address in the CC header.
 
 Just like with the From header, broken addresses will not be included.
@@ -840,7 +840,7 @@ Zbigniew Łukasiak <zzbbyy@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

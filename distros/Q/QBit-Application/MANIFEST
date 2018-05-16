@@ -19,6 +19,7 @@ lib/QBit/Application/Model/RBAC.pm
 lib/QBit/Application/Part.pm
 lib/QBit/Application/_Utils/TmpLocale.pm
 lib/QBit/Application/_Utils/TmpRights.pm
+t/accessors.t
 t/application.t
 t/configs.t
 t/configs/TestApplication.cfg

@@ -1,3 +1,6 @@
+v0.0.3    Tue, 15 May 2018 18:53:31 +0900
+  - Use Clova Speech Synthesis API v2
+
 v0.0.2    Tue, 17 Oct 2017 18:48:33 +0900
   - Support File::Temp options
 

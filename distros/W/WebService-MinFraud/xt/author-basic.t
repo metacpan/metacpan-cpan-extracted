@@ -75,6 +75,11 @@ subtest 'factors' => sub {
     }
 };
 
+subtest 'chargeback' => sub {
+    my $response = $client->chargeback( { ip_address => '1.2.3.4' } );
+    isa_ok( $response, 'WebService::MinFraud::Model::Chargeback' );
+};
+
 like(
     exception {
 
@@ -88,7 +93,7 @@ like(
         );
         $test_client->score($request);
     },
-    qr/Invalid account_id or license_key provided/,
+    qr/Your user ID or license key could not be authenticated/,
     'bad account_id throws an exception'
 );
 

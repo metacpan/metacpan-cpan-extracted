@@ -71,7 +71,6 @@ The availability of prerequisites for Net::DNS::SEC is tested at
 installation time.  These are the packages that need to be
 available:
 
-	Digest::SHA
 	File::Find
 	File::Spec
 	MIME::Base64
@@ -184,4 +183,4 @@ DEALINGS IN THE SOFTWARE.
 
 
 ------------------------------------------------------------------------------
-$Id: README 1661 2018-04-04 09:51:45Z willem $
+$Id: README 1669 2018-04-27 10:17:13Z willem $

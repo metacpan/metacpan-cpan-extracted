@@ -2588,7 +2588,7 @@ OMXS30:
 OTC_AEX:
   asset: OTC_AEX
   display_name: Dutch OTC Index
-  exchange_name: EURONEXT
+  exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2601,7 +2601,7 @@ OTC_AEX:
 OTC_AS51:
   asset: OTC_AS51
   display_name: Australian OTC Index
-  exchange_name: ASX
+  exchange_name: ASX_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2611,6 +2611,45 @@ OTC_AS51:
   quoted_currency: AUD
   submarket: otc_index
   symbol: OTC_AS51
+OTC_AS51_INVAST:
+  asset: OTC_AS51_INVAST
+  display_name: Australian OTC Index
+  exchange_name: ASX_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: AUD
+  submarket: otc_index
+  symbol: OTC_AS51_INVAST
+OTC_AS51_CFH:
+  asset: OTC_AS51_CFH
+  display_name: Australian OTC Index
+  exchange_name: ASX_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: AUD
+  submarket: otc_index
+  symbol: OTC_AS51_CFH
+OTC_AS51_FXO:
+  asset: OTC_AS51_FXO
+  display_name: Australian OTC Index
+  exchange_name: ASX_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: AUD
+  submarket: otc_index
+  symbol: OTC_AS51_FXO
 OTC_BFX:
   asset: OTC_BFX
   display_name: Belgian OTC Index
@@ -2666,7 +2705,7 @@ OTC_DFMGI:
 OTC_DJI:
   asset: OTC_DJI
   display_name: Wall Street OTC Index
-  exchange_name: NYSE
+  exchange_name: NYSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2676,10 +2715,49 @@ OTC_DJI:
   quoted_currency: USD
   submarket: otc_index
   symbol: OTC_DJI
+OTC_DJI_CFH:
+  asset: OTC_DJI_CFH
+  display_name: Wall Street OTC Index
+  exchange_name: NYSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_DJI_CFH
+OTC_DJI_FXO:
+  asset: OTC_DJI_FXO
+  display_name: Wall Street OTC Index
+  exchange_name: NYSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_DJI_FXO
+OTC_DJI_GBE:
+  asset: OTC_DJI_GBE
+  display_name: Wall Street OTC Index
+  exchange_name: NYSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_DJI_GBE
 OTC_FCHI:
   asset: OTC_FCHI
   display_name: French OTC Index
-  exchange_name: EURONEXT
+  exchange_name: EURONEXT_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2689,10 +2767,49 @@ OTC_FCHI:
   quoted_currency: EUR
   submarket: otc_index
   symbol: OTC_FCHI
+OTC_FCHI_INVAST:
+  asset: OTC_FCHI_INVAST
+  display_name: French OTC Index
+  exchange_name: EURONEXT_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_FCHI_INVAST
+OTC_FCHI_CFH:
+  asset: OTC_FCHI_CFH
+  display_name: French OTC Index
+  exchange_name: EURONEXT_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_FCHI_CFH
+OTC_FCHI_FXO:
+  asset: OTC_FCHI_FXO
+  display_name: French OTC Index
+  exchange_name: EURONEXT_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_FCHI_FXO
 OTC_FTSE:
   asset: OTC_FTSE
   display_name: UK OTC Index
-  exchange_name: LSE
+  exchange_name: LSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2702,6 +2819,45 @@ OTC_FTSE:
   quoted_currency: GBP
   submarket: otc_index
   symbol: OTC_FTSE
+OTC_FTSE_INVAST:
+  asset: OTC_FTSE_INVAST
+  display_name: UK OTC Index
+  exchange_name: LSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: GBP
+  submarket: otc_index
+  symbol: OTC_FTSE_INVAST
+OTC_FTSE_CFH:
+  asset: OTC_FTSE_CFH
+  display_name: UK OTC Index
+  exchange_name: LSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: GBP
+  submarket: otc_index
+  symbol: OTC_FTSE_CFH
+OTC_FTSE_FXO:
+  asset: OTC_FTSE_FXO
+  display_name: UK OTC Index
+  exchange_name: LSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: GBP
+  submarket: otc_index
+  symbol: OTC_FTSE_FXO
 OTC_FTSEMIB:
   asset: OTC_FTSEMIB
   display_name: Italian OTC Index
@@ -2718,7 +2874,7 @@ OTC_FTSEMIB:
 OTC_GDAXI:
   asset: OTC_GDAXI
   display_name: German OTC Index
-  exchange_name: FSE
+  exchange_name: FSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2728,6 +2884,45 @@ OTC_GDAXI:
   quoted_currency: EUR
   submarket: otc_index
   symbol: OTC_GDAXI
+OTC_GDAXI_CFH:
+  asset: OTC_GDAXI_CFH
+  display_name: German OTC Index
+  exchange_name: FSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_GDAXI_CFH
+OTC_GDAXI_FXO:
+  asset: OTC_GDAXI_FXO
+  display_name: German OTC Index
+  exchange_name: FSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_GDAXI_FXO
+OTC_GDAXI_GBE:
+  asset: OTC_GDAXI_GBE
+  display_name: German OTC Index
+  exchange_name: FSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_GDAXI_GBE
 OTC_HSI:
   asset: OTC_HSI
   display_name: Hong Kong OTC Index
@@ -2741,10 +2936,36 @@ OTC_HSI:
   quoted_currency: HKD
   submarket: otc_index
   symbol: OTC_HSI
+OTC_HSI_INVAST:
+  asset: OTC_HSI_INVAST
+  display_name: Hong Kong OTC Index
+  exchange_name: HKSE
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: HKD
+  submarket: otc_index
+  symbol: OTC_HSI_INVAST
+OTC_HSI_CFH:
+  asset: OTC_HSI_CFH
+  display_name: Hong Kong OTC Index
+  exchange_name: HKSE
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: HKD
+  submarket: otc_index
+  symbol: OTC_HSI_CFH
 OTC_IBEX35:
   asset: OTC_IBEX35
   display_name: Spanish OTC Index
-  exchange_name: BM
+  exchange_name: BM_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2754,6 +2975,19 @@ OTC_IBEX35:
   quoted_currency: EUR
   submarket: otc_index
   symbol: OTC_IBEX35
+OTC_IBEX35_CFH:
+  asset: OTC_IBEX35_CFH
+  display_name: Spanish OTC Index
+  exchange_name: BM_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_IBEX35_CFH
 OTC_IBOV:
   asset: OTC_IBOV
   display_name: Brazilian OTC Index
@@ -2874,7 +3108,7 @@ OTC_N150:
 OTC_N225:
   asset: OTC_N225
   display_name: Japanese OTC Index
-  exchange_name: TSE
+  exchange_name: TSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2884,10 +3118,49 @@ OTC_N225:
   quoted_currency: JPY
   submarket: otc_index
   symbol: OTC_N225
+OTC_N225_CFH:
+  asset: OTC_N225_CFH
+  display_name: Japanese OTC Index
+  exchange_name: TSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: JPY
+  submarket: otc_index
+  symbol: OTC_N225_CFH
+OTC_N225_FXO:
+  asset: OTC_N225_FXO
+  display_name: Japanese OTC Index
+  exchange_name: TSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: JPY
+  submarket: otc_index
+  symbol: OTC_N225_FXO
+OTC_N225_GBE:
+  asset: OTC_N225_GBE
+  display_name: Japanese OTC Index
+  exchange_name: TSE_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: JPY
+  submarket: otc_index
+  symbol: OTC_N225_GBE
 OTC_NIFTY:
   asset: OTC_NIFTY
   display_name: Indian 50 OTC Index
-  exchange_name: NSE
+  exchange_name: NSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2975,10 +3248,36 @@ OTC_SHSZ300:
   quoted_currency: CNY
   submarket: otc_index
   symbol: OTC_SHSZ300
+OTC_SSMI_GBE:
+  asset: OTC_SSMI_GBE
+  display_name: Swiss OTC Index
+  exchange_name: SWX
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: CHF
+  submarket: europe_africa
+  symbol: OTC_SSMI_GBE
+OTC_STI_INVAST:
+  asset: OTC_STI_INVAST
+  display_name: Singapore OTC Index
+  exchange_name: SES
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: SGD
+  submarket: asia_oceania
+  symbol: OTC_STI_INVAST
 OTC_SPC:
   asset: OTC_SPC
   display_name: US OTC Index
-  exchange_name: NYSE_SPC
+  exchange_name: NYSE_SPC_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -2988,6 +3287,45 @@ OTC_SPC:
   quoted_currency: USD
   submarket: otc_index
   symbol: OTC_SPC
+OTC_SPC_CFH:
+  asset: OTC_SPC_CFH
+  display_name: US OTC Index
+  exchange_name: NYSE_SPC_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_SPC_CFH
+OTC_SPC_FXO:
+  asset: OTC_SPC_FXO
+  display_name: US OTC Index
+  exchange_name: NYSE_SPC_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_SPC_FXO
+OTC_SPC_GBE:
+  asset: OTC_SPC_GBE
+  display_name: US OTC Index
+  exchange_name: NYSE_SPC_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_SPC_GBE
 OTC_SPC100:
   asset: OTC_SPC100
   display_name: US 100 OTC Index
@@ -3001,10 +3339,49 @@ OTC_SPC100:
   quoted_currency: USD
   submarket: otc_index
   symbol: OTC_SPC100
+OTC_SPC100_CFH:
+  asset: OTC_SPC100_CFH
+  display_name: US 100 OTC Index
+  exchange_name: NYSE_SPC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_SPC100_CFH
+OTC_SPC100_FXO:
+  asset: OTC_SPC100_FXO
+  display_name: US 100 OTC Index
+  exchange_name: NYSE_SPC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_SPC100_FXO
+OTC_SPC100_GBE:
+  asset: OTC_SPC100_GBE
+  display_name: US 100 OTC Index
+  exchange_name: NYSE_SPC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: otc_index
+  symbol: OTC_SPC100_GBE
 OTC_SPTSX60:
   asset: OTC_SPTSX60
   display_name: Canadian OTC Index
-  exchange_name: TRSE
+  exchange_name: TRSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -3030,7 +3407,7 @@ OTC_SSECOMP:
 OTC_SX5E:
   asset: OTC_SX5E
   display_name: Euro 50 OTC Index
-  exchange_name: STOXX
+  exchange_name: STOXX_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -3038,8 +3415,47 @@ OTC_SX5E:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: EUR
-  submarket: europe_africa
+  submarket: otc_index
   symbol: OTC_SX5E
+OTC_SX5E_INVAST:
+  asset: OTC_SX5E_INVAST
+  display_name: Euro 50 OTC Index
+  exchange_name: STOXX_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_SX5E_INVAST
+OTC_SX5E_CFH:
+  asset: OTC_SX5E_CFH
+  display_name: Euro 50 OTC Index
+  exchange_name: STOXX_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_SX5E_CFH
+OTC_SX5E_FXO:
+  asset: OTC_SX5E_FXO
+  display_name: Euro 50 OTC Index
+  exchange_name: STOXX_OTC
+  instrument_type: stockindex
+  market: indices
+  market_convention:
+    delta_premium_adjusted: 0
+    delta_style: spot_delta
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: otc_index
+  symbol: OTC_SX5E_FXO
 OTC_SZSECOMP:
   asset: OTC_SZSECOMP
   display_name: Shenzhen OTC Index
@@ -3056,7 +3472,7 @@ OTC_SZSECOMP:
 OTC_TOP40:
   asset: OTC_TOP40
   display_name: South African OTC Index
-  exchange_name: JSE
+  exchange_name: JSE_OTC
   instrument_type: stockindex
   market: indices
   market_convention:
@@ -3064,7 +3480,7 @@ OTC_TOP40:
     delta_style: spot_delta
   pip_size: 0.01
   quoted_currency: ZAR
-  submarket: europe_africa
+  submarket: otc_index
   symbol: OTC_TOP40
 PSI20:
   asset: PSI20
@@ -8475,3 +8891,324 @@ frxLTCXPT:
   quoted_currency: XPT
   submarket: minor_pairs
   symbol: frxLTCXPT
+frxDAIAED:
+  asset: DAI
+  display_name: DAI/AED
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: AED
+  submarket: minor_pairs
+  symbol: frxDAIAED
+frxDAIAUD:
+  asset: DAI
+  display_name: DAI/AUD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: AUD
+  submarket: minor_pairs
+  symbol: frxDAIAUD
+frxDAIBRL:
+  asset: DAI
+  display_name: DAI/BRL
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: BRL
+  submarket: minor_pairs
+  symbol: frxDAIBRL
+frxDAICAD:
+  asset: DAI
+  display_name: DAI/CAD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CAD
+  submarket: minor_pairs
+  symbol: frxDAICAD
+frxDAICHF:
+  asset: DAI
+  display_name: DAI/CHF
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CHF
+  submarket: minor_pairs
+  symbol: frxDAICHF
+frxDAICNY:
+  asset: DAI
+  display_name: DAI/CNY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CNY
+  submarket: minor_pairs
+  symbol: frxDAICNY
+frxDAICZK:
+  asset: DAI
+  display_name: DAI/CZK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: CZK
+  submarket: minor_pairs
+  symbol: frxDAICZK
+frxDAIEGP:
+  asset: DAI
+  display_name: DAI/EGP
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: EGP
+  submarket: minor_pairs
+  symbol: frxDAIEGP
+frxDAIEUR:
+  asset: DAI
+  display_name: DAI/EUR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: EUR
+  submarket: minor_pairs
+  symbol: frxDAIEUR
+frxDAIGBP:
+  asset: DAI
+  display_name: DAI/GBP
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: GBP
+  submarket: minor_pairs
+  symbol: frxDAIGBP
+frxDAIHKD:
+  asset: DAI
+  display_name: DAI/HKD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: HKD
+  submarket: minor_pairs
+  symbol: frxDAIHKD
+frxDAIIDR:
+  asset: DAI
+  display_name: DAI/IDR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: IDR
+  submarket: minor_pairs
+  symbol: frxDAIIDR
+frxDAIINR:
+  asset: DAI
+  display_name: DAI/INR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: INR
+  submarket: minor_pairs
+  symbol: frxDAIINR
+frxDAIJPY:
+  asset: DAI
+  display_name: DAI/JPY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: JPY
+  submarket: minor_pairs
+  symbol: frxDAIJPY
+frxDAIKRW:
+  asset: DAI
+  display_name: DAI/KRW
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: KRW
+  submarket: minor_pairs
+  symbol: frxDAIKRW
+frxDAIKWD:
+  asset: DAI
+  display_name: DAI/KWD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: KWD
+  submarket: minor_pairs
+  symbol: frxDAIKWD
+frxDAIMXN:
+  asset: DAI
+  display_name: DAI/MXN
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: MXN
+  submarket: minor_pairs
+  symbol: frxDAIMXN
+frxDAINOK:
+  asset: DAI
+  display_name: DAI/NOK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: NOK
+  submarket: minor_pairs
+  symbol: frxDAINOK
+frxDAINZD:
+  asset: DAI
+  display_name: DAI/NZD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: NZD
+  submarket: minor_pairs
+  symbol: frxDAINZD
+frxDAIPLN:
+  asset: DAI
+  display_name: DAI/PLN
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: PLN
+  submarket: minor_pairs
+  symbol: frxDAIPLN
+frxDAIRUB:
+  asset: DAI
+  display_name: DAI/RUB
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: RUB
+  submarket: minor_pairs
+  symbol: frxDAIRUB
+frxDAISAR:
+  asset: DAI
+  display_name: DAI/SAR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SAR
+  submarket: minor_pairs
+  symbol: frxDAISAR
+frxDAISEK:
+  asset: DAI
+  display_name: DAI/SEK
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SEK
+  submarket: minor_pairs
+  symbol: frxDAISEK
+frxDAISGD:
+  asset: DAI
+  display_name: DAI/SGD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: SGD
+  submarket: minor_pairs
+  symbol: frxDAISGD
+frxDAITRY:
+  asset: DAI
+  display_name: DAI/TRY
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: TRY
+  submarket: minor_pairs
+  symbol: frxDAITRY
+frxDAIUSD:
+  asset: DAI
+  display_name: DAI/USD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: USD
+  submarket: minor_pairs
+  symbol: frxDAIUSD
+frxDAIXAG:
+  asset: DAI
+  display_name: DAI/XAG
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XAG
+  submarket: minor_pairs
+  symbol: frxDAIXAG
+frxDAIXAU:
+  asset: DAI
+  display_name: DAI/XAU
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XAU
+  submarket: minor_pairs
+  symbol: frxDAIXAU
+frxDAIZAR:
+  asset: DAI
+  display_name: DAI/ZAR
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: ZAR
+  submarket: minor_pairs
+  symbol: frxDAIZAR
+frxDAIBRO:
+  asset: DAI
+  display_name: DAI/BRO
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: BRO
+  submarket: minor_pairs
+  symbol: frxDAIBRO
+frxDAIXPD:
+  asset: DAI
+  display_name: DAI/XPD
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XPD
+  submarket: minor_pairs
+  symbol: frxDAIXPD
+frxDAIXPT:
+  asset: DAI
+  display_name: DAI/XPT
+  exchange_name: FOREX
+  instrument_type: forex
+  market: forex
+  pip_size: 0.01
+  quoted_currency: XPT
+  submarket: minor_pairs
+  symbol: frxDAIXPT
+

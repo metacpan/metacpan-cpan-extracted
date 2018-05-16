@@ -1,5 +1,9 @@
 Revision history for perl module File::Versions
 
+0.09 2018-05-12
+
+* Default to "numbered" if no env variable
+
 0.08 2017-01-19
 
 * Documentation

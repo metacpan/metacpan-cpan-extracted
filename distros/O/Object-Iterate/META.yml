@@ -22,6 +22,8 @@ no_index:
 requires:
   perl: '5.008'
 resources:
-  repository: https://github.com/briandfoy/Object-Iterate
-version: '1.141'
+  bugtracker: https://github.com/briandfoy/object-iterate/issues
+  homepage: https://github.com/briandfoy/object-iterate
+  repository: https://github.com/briandfoy/object-iterate.git
+version: '1.142'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

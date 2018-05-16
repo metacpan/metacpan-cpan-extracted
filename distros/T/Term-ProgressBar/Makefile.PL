@@ -26,6 +26,7 @@ WriteMakefile (
       'Capture::Tiny'   => '0.13',
       'Test::More'      => '0.80',
       'Test::Exception' => '0.31',
+      'Test::Warnings'  => 0,
       'File::Temp'      => 0,
   },
   META_MERGE => {

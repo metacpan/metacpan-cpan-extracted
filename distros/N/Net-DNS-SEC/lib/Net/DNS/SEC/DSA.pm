@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1660 2018-04-03 14:12:42Z willem $
+# $Id: DSA.pm 1672 2018-05-02 07:14:35Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1660 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1672 $)[1];
 
 
 =head1 NAME
@@ -44,56 +44,43 @@ public key resource record.
 use strict;
 use integer;
 use warnings;
-use Digest::SHA;
 use MIME::Base64;
 
 my %DSA = (
-	3 => ['Digest::SHA'],
-	6 => ['Digest::SHA'],
+	3 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
+	6 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
 	);
 
 
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $algorithm = $private->algorithm;			# digest sigdata
-	my ( $object, @param ) = @{$DSA{$algorithm} || []};
-	die 'private key not DSA' unless $object;
-	my $hash = $object->new(@param);
-	$hash->add($sigdata);
+	my $algorithm = $private->algorithm;
+	my ($evpmd) = @{$DSA{$algorithm} || []};
+	die 'private key not DSA' unless $evpmd;
 
 	my ( $p, $q, $g, $x, $y ) = map decode_base64( $private->$_ ),
 			qw(prime subprime base private_value public_value);
+	my $t = ( length($g) - 64 ) / 8;
 
 	my $dsa = Net::DNS::SEC::libcrypto::DSA_new();
 	Net::DNS::SEC::libcrypto::DSA_set0_pqg( $dsa, $p, $q, $g );
 	Net::DNS::SEC::libcrypto::DSA_set0_key( $dsa, $y, $x );
 
-	my $sig = Net::DNS::SEC::libcrypto::DSA_do_sign( $hash->digest, $dsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
+	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_DSA( $evpkey, $dsa );
 
-	Net::DNS::SEC::libcrypto::DSA_free($dsa);		# destroy private key
-
-	return unless $sig;					# uncoverable branch true
-
-	my $t = ( length($g) - 64 ) / 8;
-	my ( $r, $s ) = Net::DNS::SEC::libcrypto::DSA_SIG_get0($sig);
-	Net::DNS::SEC::libcrypto::DSA_SIG_free($sig);
-
-	# both the R and S parameters need to be 20 octets:
-	my $Rpad = 20 - length($r);
-	my $Spad = 20 - length($s);
-	pack "C x$Rpad a* x$Spad a*", $t, $r, $s;		# RFC2536, section 3
+	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, &$evpmd );
+	_ASN1decode( $asn1, $t );
 }
 
 
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $algorithm = $keyrr->algorithm;			# digest sigdata
-	my ( $object, @param ) = @{$DSA{$algorithm} || []};
-	die 'public key not DSA' unless $object;
-	my $hash = $object->new(@param);
-	$hash->add($sigdata);
+	my $algorithm = $keyrr->algorithm;
+	my ($evpmd) = @{$DSA{$algorithm} || []};
+	die 'public key not DSA' unless $evpmd;
 
 	return unless $sigbin;
 
@@ -105,16 +92,35 @@ sub verify {
 	Net::DNS::SEC::libcrypto::DSA_set0_pqg( $dsa, $p, $q, $g );
 	Net::DNS::SEC::libcrypto::DSA_set0_key( $dsa, $y, '' );
 
-	my ( $r, $s ) = unpack 'x a20 a20', $sigbin;		# RFC2536, section 3
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
+	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_DSA( $evpkey, $dsa );
 
-	my $dsasig = Net::DNS::SEC::libcrypto::DSA_SIG_new();
-	Net::DNS::SEC::libcrypto::DSA_SIG_set0( $dsasig, $r, $s );
+	my $asn1 = _ASN1encode($sigbin);
+	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, &$evpmd );
+}
 
-	my $vrfy = Net::DNS::SEC::libcrypto::DSA_do_verify( $hash->digest, $dsasig, $dsa );
 
-	Net::DNS::SEC::libcrypto::DSA_free($dsa);
-	Net::DNS::SEC::libcrypto::DSA_SIG_free($dsasig);
-	return $vrfy;
+########################################
+
+sub _ASN1encode {
+	my @part = unpack 'x a20 a20', shift;			# discard "t"
+	my $length;
+	foreach (@part) {
+		s/^[\000]+//;
+		s/^$/\000/;
+		s/^(?=[\200-\377])/\000/;
+		$_ = pack 'C2 a*', 2, length, $_;
+		$length += length;
+	}
+	pack 'C2 a* a*', 0x30, $length, @part;
+}
+
+sub _ASN1decode {
+	my ( $asn1, $t ) = @_;
+	my $n	 = unpack 'x3 C',	   $asn1;
+	my $m	 = unpack "x5 x$n C",	   $asn1;
+	my @part = unpack "x4 a$n x2 a$m", $asn1;
+	pack 'C a* a*', $t, map substr( pack( 'x20 a*', $_ ), -20 ), @part;
 }
 
 
@@ -158,7 +164,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Net::DNS>, L<Net::DNS::SEC>, L<Digest::SHA>,
+L<Net::DNS>, L<Net::DNS::SEC>,
 RFC2536,
 L<OpenSSL|http://www.openssl.org/docs>
 

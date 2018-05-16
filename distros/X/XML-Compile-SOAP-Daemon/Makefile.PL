@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '3.13';
+my $version = '3.14';
 
 my $devel   = exists $ENV{MARKOV_DEVEL};
 
@@ -46,12 +46,25 @@ unless($@ || $devel)
 }
 
 WriteMakefile
- ( NAME	 	=> 'XML::Compile::SOAP::Daemon'
- , VERSION	=> $version
- , PREREQ_PM    => \%prereq
- , AUTHOR       => 'Mark Overmeer'
- , ABSTRACT     => 'Daemon handling XML-SOAP'
- , LICENSE      => 'perl'
+ ( NAME	 	  => 'XML::Compile::SOAP::Daemon'
+ , VERSION	  => $version
+ , PREREQ_PM  => \%prereq
+ , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
+ , ABSTRACT   => 'Daemon handling XML-SOAP'
+ , LICENSE    => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+            { type => 'git'
+            , url  => 'https://github.com/markov2/perl5-XML-Compile-SOAP-Daemon.git'
+            , web  => 'https://github.com/markov2/perl5-XML-Compile-SOAP-Daemon'
+            }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
  );
 
 ### used by oodist during production of distribution
@@ -63,9 +76,8 @@ DISTDIR         = ../public_html/xml-compile-soap-daemon/source
 SKIP_LINKS      = XML::LibXML
 
 # for POD
-EXTENDSi        = ../XMLCompile:../XMLSOAP:../XMLTester:../XMLCache
+EXTENDSi        = ../XML-Compile:../XML-Compile-SOAP:../XML-Compile-SOAP12:../../perl/XMLTester:../XML-Compile-Cache
 FIRST_YEAR      = 2007
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL         = ../XML-shared-podtail
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 __POSTAMBLE

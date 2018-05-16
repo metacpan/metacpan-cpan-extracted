@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use lib '/var/www/taskpipe/main/lib';
+use TaskPipe::Tool;
+use Try::Tiny;
+use Data::Dumper;
+
+
+my $cmdh = TaskPipe::Tool->new;
+my @cmd = @ARGV;
+
+try {
+
+    $cmdh->dispatch;
+
+} catch {
+
+    my $err = $cmdh->pod_reader->format_error_message( $_ );
+    $cmdh->pod_reader->message("I<Execution of command '@cmd' failed.> Error reported was:\n\n$err");
+
+};
+
+
+=head1 NAME
+
+taskpipe - script to execute the TaskPipe Tool 
+
+=head1 DESCRIPTION
+
+The TaskPipe command line tool is used to deploy files and manage databases for TaskPipe projects. For more information type
+
+    taskpipe help
+
+at the command line, or see L<TaskPipe::Manual::Overview>, and/or L<TaskPipe::Manual::Installation>.
+
+=head1 AUTHOR
+
+Tom Gracey <tomgracey@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) Tom Gracey 2018
+
+TaskPipe is free software, licensed under
+
+    The GNU Public License Version 3
+
+
+

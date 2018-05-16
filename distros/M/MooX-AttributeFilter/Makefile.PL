@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Method::Generate::Accessor" => 0,
     "Scalar::Util" => 0,
-    "Sub::Quote" => 0,
+    "Sub::Quote" => "1.004005",
     "strictures" => 1
   },
   "TEST_REQUIRES" => {
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001005",
+  "VERSION" => "0.001006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
-  "Sub::Quote" => 0,
+  "Sub::Quote" => "1.004005",
   "Test2::V0" => "0.000060",
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => 0,

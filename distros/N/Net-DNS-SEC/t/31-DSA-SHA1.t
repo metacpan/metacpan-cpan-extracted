@@ -1,13 +1,12 @@
-# $Id: 31-DSA-SHA1.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
+# $Id: 31-DSA-SHA1.t 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Digest::SHA'  => 5.23,
-	'Net::DNS'     => 1.01,
-	'MIME::Base64' => 2.13,
+	'Net::DNS::SEC' => 1.01,
+	'MIME::Base64'	=> 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
@@ -16,6 +15,10 @@ foreach my $package ( sort keys %prerequisite ) {
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
+
+
+plan skip_all => "disabled DSA"
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA') };
 
 plan tests => 13;
 
@@ -106,28 +109,23 @@ my $signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
 
-{
-	my $verified = Net::DNS::SEC::DSA->verify( $sigdata, $key, $signature );
-	ok( $verified, 'signature verified using public key' );
-}
+my $verified = Net::DNS::SEC::DSA->verify( $sigdata, $key, $signature );
+ok( $verified, 'signature verified using public key' );
 
 
-{
-	my $corrupt = 'corrupted data';
-	my $verified = Net::DNS::SEC::DSA->verify( $corrupt, $key, $signature );
-	ok( !$verified, 'signature over corrupt data not verified' );
-}
+my $corrupt = 'corrupted data';
+my $verifiable = Net::DNS::SEC::DSA->verify( $corrupt, $key, $signature );
+ok( !$verifiable, 'signature not verifiable if data corrupted' );
 
 
 ok( !eval { Net::DNS::SEC::DSA->sign( $sigdata, $wrongprivate ) },
 	'signature not created using wrong private key' );
 
 ok( !eval { Net::DNS::SEC::DSA->verify( $sigdata, $wrongkey, $signature ) },
-	'signature not verified using wrong public key' );
+	'signature not verifiable using wrong public key' );
 
 ok( !eval { Net::DNS::SEC::DSA->verify( $sigdata, $key, undef ) },
-	'signature not verified if empty or undefined' );
-
+	'verify fails if signature undefined' );
 
 exit;
 

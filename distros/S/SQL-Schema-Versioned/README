@@ -3,7 +3,7 @@ NAME
     application's DB schema
 
 VERSION
-    This document describes version 0.234 of SQL::Schema::Versioned (from
+    This document describes version 0.235 of SQL::Schema::Versioned (from
     Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
 
 DESCRIPTION
@@ -255,9 +255,9 @@ FAQ
     files/subdirectory.
 
   How do I see each SQL statement as it is being executed?
-    Try using Log::Any::For::DBI, e.g.:
+    Try using Log::ger::DBI::Query, e.g.:
 
-     % TRACE=1 perl -MLog::Any::For::DBI -MLog::Any::App yourapp.pl ...
+     % perl -MLog::ger::DBI::Query -MLog::ger::Output=Screen -MLog::ger::Level::trace yourapp.pl ...
 
 HOMEPAGE
     Please visit the project's homepage at

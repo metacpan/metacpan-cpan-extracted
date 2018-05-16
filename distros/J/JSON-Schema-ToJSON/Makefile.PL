@@ -18,6 +18,9 @@ WriteMakefile(
         'Mojolicious'      => '7.15',
         'DateTime'         => 0,
         'Hash::Merge'      => 0,
+        'File::Slurper'    => 0,
+        'Data::Dump'       => 0,
+        'FindBin'          => 0,
     },
     TEST_REQUIRES => {
         'Test::Most'       => 0.31,
@@ -30,6 +33,9 @@ WriteMakefile(
             repository => 'https://github.com/Humanstate/json-schema-tojson'
         },
     },
+    EXE_FILES => [
+        'bin/jsonschema2json',
+    ],
     test => {
         RECURSIVE_TEST_FILES => 1,
     },

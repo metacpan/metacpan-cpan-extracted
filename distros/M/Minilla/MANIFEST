@@ -112,6 +112,7 @@ t/project/license.t
 t/project/meta.t
 t/project/meta_no_index.t
 t/project/script_files.t
+t/project/static_install.t
 t/project/unstable.t
 t/project/unsupported.t
 t/project/xsutil.t

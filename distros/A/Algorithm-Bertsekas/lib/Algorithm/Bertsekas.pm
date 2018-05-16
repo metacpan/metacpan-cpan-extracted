@@ -7,7 +7,7 @@ use diagnostics;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw( auction );
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 #Variables global to the package	
 my $maximize_total_benefit;
@@ -51,7 +51,7 @@ sub auction { #						=> default values
 
 	$target = 'auction-' . $array1_size . 'x' . $array2_size . '-output.txt' ;
 	
-	if ( $args{verbose} >= 8 ){ # print the verbose messages to $output file.
+	if ( $args{verbose} >= 8 ){
 		print "\n verbose = $args{verbose} ---> print the verbose messages to <$target> file \n";
 		if ( open ( $output, '>', $target ) ) {
 			print "\n *** Open <$target> for writing. *** \n";
@@ -109,10 +109,9 @@ sub auction { #						=> default values
 	#$max_epsilon_scaling = 20;
 	#my $factor = exp ( (log( $epsilon * (1+$min_size) )) / ($max_epsilon_scaling-1) ); print "\n \$max_epsilon_scaling = $max_epsilon_scaling ; \$factor = $factor \n";
 	
-	my $factor = 4;
+	my $factor = 4; # $factor > 1
 	$max_epsilon_scaling = 2 + int( log( (1+$min_size) * $epsilon )/log($factor) ); # print "\n \$max_epsilon_scaling = $max_epsilon_scaling \n";   
-    
-	my ( @assignment, @prices );
+
 	my $feasible_assignment_condition = 0;
 
 	# The preceding observations suggest the idea of epsilon-scaling, which consists of applying the algorithm several times, 
@@ -125,7 +124,7 @@ sub auction { #						=> default values
 		
 		%assignned_object = ();
 		%assignned_person = ();
-		%seen_person = ();		
+		%seen_person = ();	
 
 		while ( (scalar keys %assignned_person) < $max_size ){ # while there is at least one element not assigned.
          
@@ -134,14 +133,7 @@ sub auction { #						=> default values
 			
 			auctionRound( \@matrix, $epsilon, $args{verbose} );						
 		 
-			if ( $args{verbose} >= 10 ){
-				@assignment = ();
-				@prices = ();
-				foreach my $per ( sort { $a <=> $b } keys %assignned_person){ push @assignment, $assignned_person{$per}; }
-				foreach my $obj ( sort { $a <=> $b } keys %price_object    ){ push @prices, $price_object{$obj}; }
-				my $assig_count = scalar @assignment;
-				print $output " *** \$iter_count_global = $iter_count_global ; \$assig_count = $assig_count ; \$epsilon = $epsilon ; \@assignment = (@assignment) ; \@prices = (@prices) \n\n";
-			
+			if ( $args{verbose} >= 10 ){			
 				for my $i ( -1 .. $#matrix ) {
 					if ($i >= 0){ printf $output " %2s  [", $i; } else{ printf $output "object"; }
 					for my $j ( 0 .. $#{$matrix[$i]} ) {
@@ -194,7 +186,7 @@ sub auction { #						=> default values
 	}}   
    
 	if ( $args{verbose} >= 8 ){
-		printf $output "\n\$optimal_benefit = $optimal_benefit ; \$iter_count_global = $iter_count_global ; \$epsilon = %.4g ; \@output_index = (@output_index) ; \@assignment = (@assignment) ; \@prices = (@prices) \n", $epsilon; 
+		printf $output "\n\$optimal_benefit = $optimal_benefit ; \$iter_count_global = $iter_count_global ; \$epsilon = %.4g ; \@output_index = (@output_index) \n", $epsilon; 
 	}   
 	print_screen_messages( \@matrix, \@matrix_index, \@matrix_input, \@output_index, $optimal_benefit, $args{verbose}, $epsilon ) ;
        
@@ -383,7 +375,7 @@ sub print_screen_messages {
 	  
 		my $weight = ( defined $matrix_input[$index_array1] and defined $matrix_input[$index_array1]->[$index_array2] ) ? sprintf( "%${matrix_spaces}.${decimals}f", $matrix_value ) : ' ' x $matrix_spaces ;
 	  
-		printf( "   indices ( %${index_length}d, %${index_length}d ), matrix value = $weight ; sum of values = %${sum_spaces}.${decimals}f \n", $index_array1, $index_array2, $sum_matrix_value );
+		printf( "   indexes ( %${index_length}d, %${index_length}d ), matrix value = $weight ; sum of values = %${sum_spaces}.${decimals}f \n", $index_array1, $index_array2, $sum_matrix_value );
       }}
    }
 
@@ -446,8 +438,11 @@ sub auctionRound {
 	my %seen_object;
 	my %count_object;
 
-	if ( $verbose >= 8 ){
-		print $output "\n Start: Matrix Size N x M: $min_size x $max_size ; Num Iterations: $iter_count_global ; epsilon_scaling = $epsilon_scaling ; iter_count_local = $iter_count_local ; epsilon: $epsilon \n";
+	if ( $verbose >= 8 )
+	{
+		my $number_of_assignned_object = scalar keys %assignned_object;
+		print $output "\n Start: Matrix Size N x M: $min_size x $max_size ; epsilon_scaling = $epsilon_scaling ; Number of Global Iterations = $iter_count_global ; Number of Local Iterations = $iter_count_local ; epsilon = $epsilon ; \$number_of_assignned_object = $number_of_assignned_object \n";
+		
 		foreach my $person ( sort { $a <=> $b } keys %assignned_person ){
 			my $object = $assignned_person{$person};
 			printf $output " \$assignned_person{%3s} --> object %3s --> \$price_object{%3s} = $price_object{$object} \n", $person, $object, $object;
@@ -696,7 +691,7 @@ sub auctionRound {
 	my %choose_person;
 	
 	# first, choose objects that appear a few times
-    foreach my $object ( sort { $count_object{$a} <=> $count_object{$b} } keys %seen_object ){	# || $price_object{$b} <=> $price_object{$a}
+	foreach my $object ( sort { $count_object{$a} <=> $count_object{$b} } keys %seen_object ){	# || $price_object{$b} <=> $price_object{$a}
 	foreach my $person ( sort { $seen_object{$object}{$a} <=> $seen_object{$object}{$b} } keys %{$seen_object{$object}} ){ # sort { $seen_object{$object}{$a} <=> $seen_object{$object}{$b} }
 		
 		next if ( $choose_object{$object} );
@@ -743,7 +738,7 @@ sub auctionRound {
 	   
 		# Each objectJ that receives one or more bids, determines the highest of these bids, increases the price_j 
 		# to the highest bid, and gets assigned to the personI who submitted the highest bid.
-	   
+		
 		$assignned_person{$person} = $object;
 		$assignned_object{$object} = $person;
 
@@ -754,8 +749,11 @@ sub auctionRound {
 		}
 	}
 	
-	if ( $verbose >= 9 ){
-		print $output "\n Final: Matrix Size N x M: $min_size x $max_size ; Num Iterations: $iter_count_global ; epsilon_scaling = $epsilon_scaling ; iter_count_local = $iter_count_local ; epsilon: $epsilon \n";
+	if ( $verbose >= 9 )
+	{		
+		my $number_of_assignned_object = scalar keys %assignned_object;
+		print $output "\n Final: Matrix Size N x M: $min_size x $max_size ; epsilon_scaling = $epsilon_scaling ; Number of Global Iterations = $iter_count_global ; Number of Local Iterations = $iter_count_local ; epsilon = $epsilon ; \$number_of_assignned_object = $number_of_assignned_object \n";		
+		
 		foreach my $person ( sort { $a <=> $b } keys %assignned_person ){
 			my $object = $assignned_person{$person};
 			printf $output " \$assignned_person{%3s} --> object %3s --> \$price_object{%3s} = $price_object{$object} \n", $person, $object, $object;
@@ -803,8 +801,73 @@ __END__
 
 =head1 SYNOPSIS
 
- use Algorithm::Bertsekas qw(auction);
- 
+ #!/usr/bin/perl
+
+ use strict;
+ use warnings FATAL => 'all';
+ use diagnostics;
+ use Algorithm::Bertsekas qw(auction); # To install this modulus: 'cpan Algorithm::Bertsekas' or 'ppm install Algorithm-Bertsekas'
+
+ my @array1; my @array2;
+ my @input_matrix;
+
+ my $N = 10;
+ my $M = 10;
+ my $range = 1000;
+
+ for my $i (1..$N) {
+	push @array1, sprintf( "%.0f", rand($range) );
+ }
+
+ for my $i (1..$M) {
+	push @array2, sprintf( "%.0f", rand($range) );
+ }
+
+ print "\n \@array1 = ( ";
+ for my $value (@array1) { printf("%4.0f ", $value); }
+ print ")\n";
+
+ print " \@array2 = ( ";
+ for my $value (@array2) { printf("%4.0f ", $value); }
+ print ")\n";
+			
+ for my $i ( 0 .. $#array1 ){
+	my @weight_function;		   
+	for my $j ( 0 .. $#array2 ){
+		#my $weight = sprintf( "%.0f", rand($range) );
+		my $weight = abs ($array1[$i] - $array2[$j]);		  
+		push @weight_function, $weight;
+	}
+	push @input_matrix, \@weight_function;
+ }
+
+ print "\n The Nearest Neighbors and the Matrix of the weight function f(i,j) between each element of the two vectors \@array1 and \@array2.";	
+ print "\n The weight function chosen can be the modulus of the difference between two real numbers: f(i,j) = abs (\$array1[i] - \$array2[j]). \n\n \@input_matrix = \n\n ";
+ print " " x 7;			
+ printf("%4.0f ", $_ ) for @array2;			   
+ print "\n\n";			   
+ for my $i ( 0 .. $#input_matrix ) {
+	printf(" %4.0f [ ", $array1[$i] );
+	for my $j ( 0 .. $#{$input_matrix[$i]} ) {
+		printf("%4.0f ", $input_matrix[$i]->[$j] );
+	}
+	print "]\n";
+ }
+
+ my ( $optimal, $assignment_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 10 );
+
+ print "\n";
+
+ my $sum = 0;
+ for my $i ( 0 .. $#{$output_index_ref} ){
+	my $j = $output_index_ref->[$i];   
+	my $value = $input_matrix[$i]->[$j];
+	$sum += $value if (defined $value);
+	
+	$value = defined $value ? sprintf( "%6s", $value ) : ' ' x 6 ; # %6s  
+	printf " Auction Algorithm, (row, column) indexes --> \$i = %3d ; \$j = %3d ; \$value = $value ; \$sum = %8s \n", $i, $j, $sum;
+ }
+
  Example 1: Find the nearest neighbor, Minimize the total benefit.
 
  my @array1 = ( 893, 401, 902, 576, 767, 917, 76, 464, 124, 207, 125, 530 );
@@ -874,18 +937,18 @@ __END__
  [ 369    29   283    52**  74  ]
 
  Pairs (in ascending order of matrix values):
-   indices (  7,  4 ), matrix value =   8 ; sum of values =     8
-   indices (  3,  1 ), matrix value =  17 ; sum of values =    25
-   indices ( 10,  0 ), matrix value =  36 ; sum of values =    61
-   indices (  9,  2 ), matrix value =  40 ; sum of values =   101
-   indices ( 11,  3 ), matrix value =  52 ; sum of values =   153
-   indices (  0,  9 ), matrix value =     ; sum of values =   153
-   indices (  1,  8 ), matrix value =     ; sum of values =   153
-   indices (  2, 10 ), matrix value =     ; sum of values =   153
-   indices (  4,  5 ), matrix value =     ; sum of values =   153
-   indices (  5, 11 ), matrix value =     ; sum of values =   153
-   indices (  6,  7 ), matrix value =     ; sum of values =   153
-   indices (  8,  6 ), matrix value =     ; sum of values =   153
+   indexes (  7,  4 ), matrix value =   8 ; sum of values =     8
+   indexes (  3,  1 ), matrix value =  17 ; sum of values =    25
+   indexes ( 10,  0 ), matrix value =  36 ; sum of values =    61
+   indexes (  9,  2 ), matrix value =  40 ; sum of values =   101
+   indexes ( 11,  3 ), matrix value =  52 ; sum of values =   153
+   indexes (  0,  9 ), matrix value =     ; sum of values =   153
+   indexes (  1,  8 ), matrix value =     ; sum of values =   153
+   indexes (  2, 10 ), matrix value =     ; sum of values =   153
+   indexes (  4,  5 ), matrix value =     ; sum of values =   153
+   indexes (  5, 11 ), matrix value =     ; sum of values =   153
+   indexes (  6,  7 ), matrix value =     ; sum of values =   153
+   indexes (  8,  6 ), matrix value =     ; sum of values =   153
   
  Example 2: Maximize the total benefit.
  
@@ -947,33 +1010,16 @@ __END__
  [  50    80    31    90**  10    83    51    55    57    40  ]
 
  Pairs (in ascending order of matrix values):
-   indices (  8,  7 ), matrix value =  75 ; sum of values =  75
-   indices (  1,  0 ), matrix value =  76 ; sum of values = 151
-   indices (  4,  9 ), matrix value =  81 ; sum of values = 232
-   indices (  7,  4 ), matrix value =  88 ; sum of values = 320
-   indices (  3,  8 ), matrix value =  90 ; sum of values = 410
-   indices (  9,  3 ), matrix value =  90 ; sum of values = 500
-   indices (  0,  5 ), matrix value =  95 ; sum of values = 595
-   indices (  5,  6 ), matrix value =  99 ; sum of values = 694
-   indices (  6,  2 ), matrix value =  99 ; sum of values = 793
-   indices (  2,  1 ), matrix value = 100 ; sum of values = 893
-
- Common use of the solution:
-   
- foreach my $i ( sort { $a <=> $b } keys %{$assignment_ref} ){     
-   my $j = $assignment_ref->{$i};   
-   ...
- }
-
- my $sum = 0;
- for my $i ( 0 .. $#{$output_index_ref} ){
-	my $j = $output_index_ref->[$i];   
-	my $value = $input_matrix[$i]->[$j];
-	$sum += $value if (defined $value);
-	
-	$value = defined $value ? sprintf( "%6s", $value ) : ' ' x 6 ; # %6s  
-	printf " Auction Algorithm, output index --> \$i = %3d ; \$j = %3d ; \$value = $value ; \$sum = %8s \n", $i, $j, $sum;
- }
+   indexes (  8,  7 ), matrix value =  75 ; sum of values =  75
+   indexes (  1,  0 ), matrix value =  76 ; sum of values = 151
+   indexes (  4,  9 ), matrix value =  81 ; sum of values = 232
+   indexes (  7,  4 ), matrix value =  88 ; sum of values = 320
+   indexes (  3,  8 ), matrix value =  90 ; sum of values = 410
+   indexes (  9,  3 ), matrix value =  90 ; sum of values = 500
+   indexes (  0,  5 ), matrix value =  95 ; sum of values = 595
+   indexes (  5,  6 ), matrix value =  99 ; sum of values = 694
+   indexes (  6,  2 ), matrix value =  99 ; sum of values = 793
+   indexes (  2,  1 ), matrix value = 100 ; sum of values = 893
  
 =head1 OPTIONS
  
@@ -1020,7 +1066,7 @@ __END__
 =head1 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	May 4, 2018
+	May 13, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

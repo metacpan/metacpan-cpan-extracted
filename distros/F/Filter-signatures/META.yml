@@ -1,5 +1,5 @@
 ---
-abstract: 'very simplicistic signatures for Perl < 5.20'
+abstract: 'very simplistic signatures for Perl < 5.20'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires: {}
@@ -16,6 +16,6 @@ no_index:
     - inc
 resources:
   repository: git://github.com/Corion/filter-signatures.git
-version: '0.11'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

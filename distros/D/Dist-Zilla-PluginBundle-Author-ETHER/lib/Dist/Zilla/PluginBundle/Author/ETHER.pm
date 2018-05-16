@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.136-2-g684ff23
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.138-2-gd5a55c2
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.137';
+our $VERSION = '0.139';
 
 use Moose;
 with
@@ -232,6 +232,9 @@ sub BUILD
 sub configure
 {
     my $self = shift;
+
+    warn '[DZ] Building with ', blessed($self), ' ', $VERSION, "...\n"
+        if not $INC{'Test/More.pm'};
 
     warn '[@Author::ETHER] no "bash" executable found; skipping Run::AfterBuild command to update .ackrc', "\n"
         if not $INC{'Test/More.pm'} and not $self->_has_bash;
@@ -609,7 +612,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.137
+version 0.139
 
 =head1 SYNOPSIS
 

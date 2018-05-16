@@ -1,16 +1,16 @@
 {
    "abstract" : "WSDL version 1.1",
    "author" : [
-      "Mark Overmeer"
+      "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile-WSDL11",
    "no_index" : {
@@ -36,10 +36,22 @@
             "Test::More" : "0.54",
             "XML::Compile" : "1.48",
             "XML::Compile::Cache" : "1.03",
-            "XML::Compile::SOAP11" : "3.16"
+            "XML::Compile::SOAP11" : "3.23"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "3.06"
+   "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-XML-Compile-WSDL11.git",
+         "web" : "https://github.com/markov2/perl5-XML-Compile-WSDL11"
+      }
+   },
+   "version" : "3.07",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

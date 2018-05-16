@@ -19,8 +19,6 @@ my %WriteMakefileArgs = (
   "LICENSE" => "gpl",
   "NAME" => "Koha::Contrib::ARK",
   "PREREQ_PM" => {
-    "AnyEvent::Processor::Conversion" => 0,
-    "AnyEvent::Processor::Converter" => 0,
     "DateTime" => 0,
     "Getopt::Long" => 0,
     "JSON" => 0,
@@ -30,14 +28,15 @@ my %WriteMakefileArgs = (
     "MARC::Moose::Record" => 0,
     "Modern::Perl" => 0,
     "Moose" => 0,
+    "Moose::Role" => 0,
+    "Moose::Util::TypeConstraints" => 0,
     "MooseX::RW::Reader" => 0,
     "MooseX::RW::Writer" => 0,
     "Pod::Usage" => 0,
     "Term::ProgressBar" => 0,
-    "Try::Tiny" => 0,
-    "YAML" => 0
+    "Try::Tiny" => 0
   },
-  "VERSION" => "1.0.2",
+  "VERSION" => "1.0.3",
   "test" => {
     "TESTS" => ""
   }
@@ -45,8 +44,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "AnyEvent::Processor::Conversion" => 0,
-  "AnyEvent::Processor::Converter" => 0,
   "DateTime" => 0,
   "Getopt::Long" => 0,
   "JSON" => 0,
@@ -56,12 +53,13 @@ my %FallbackPrereqs = (
   "MARC::Moose::Record" => 0,
   "Modern::Perl" => 0,
   "Moose" => 0,
+  "Moose::Role" => 0,
+  "Moose::Util::TypeConstraints" => 0,
   "MooseX::RW::Reader" => 0,
   "MooseX::RW::Writer" => 0,
   "Pod::Usage" => 0,
   "Term::ProgressBar" => 0,
-  "Try::Tiny" => 0,
-  "YAML" => 0
+  "Try::Tiny" => 0
 );
 
 

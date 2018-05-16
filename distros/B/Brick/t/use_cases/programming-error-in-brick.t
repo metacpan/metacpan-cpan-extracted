@@ -31,13 +31,13 @@ isa_ok( $brick, $class );
 Let's make two constraints that I expect to work, and one that fails from
 a programming error.
 
-=cut 
+=cut
 
 sub Brick::Bucket::code_error {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{name} ||= ( caller(0) )[3];
-	
+
 	$bucket->__make_constraint(
 		$bucket->add_to_bucket( {
 			name        => 'code_error',
@@ -48,10 +48,10 @@ sub Brick::Bucket::code_error {
 					or die { message => 'Matches bad regex' };
 				}
 			} ),
-			
+
 		$setup );
 	}
-	
+
 sub Brick::Bucket::just_fine {
 	my( $bucket, $setup ) = @_;
 
@@ -66,10 +66,10 @@ sub Brick::Bucket::just_fine {
 					or die { message => 'Length is not five' };
 				}
 			} ),
-			
+
 		$setup );
 	}
-	
+
 sub Brick::Bucket::never_passes {
 	my( $bucket, $setup ) = @_;
 
@@ -80,21 +80,21 @@ sub Brick::Bucket::never_passes {
 			name        => 'never_passes',
 			description => 'Has a vowel',
 			code        => sub {
-				die { 
+				die {
 					handler => 'never_passes',
-					message => 'Length is not five' 
+					message => 'Length is not five'
 					};
 				}
 			} ),
-			
+
 		$setup );
-		
+
 	}
-	
+
 =head2 Create the profile
 
 
-=cut 
+=cut
 
 my $Profile = [
 	[ fine  => just_fine    => { name => 'foo' } ],

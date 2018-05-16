@@ -19,7 +19,7 @@ can_ok( $bucket, '_is_odd_number' );
 #
 {
 my $sub = $bucket->_is_odd_number();
-	
+
 isa_ok( $sub, ref sub {}, "_is_odd_number returns a code ref" );
 
 

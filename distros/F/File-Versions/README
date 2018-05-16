@@ -6,7 +6,7 @@
                                                                 
 
 
-This is the README for File::Versions version 0.08.
+This is the README for File::Versions version 0.09.
 
 File::Versions is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -62,11 +62,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm File::Versions
 
-To install the module from the source file, File-Versions-0.08.tar.gz,
+To install the module from the source file, File-Versions-0.09.tar.gz,
 follow this sequence of commands:
 
-    tar xfz File-Versions-0.08.tar.gz
-    cd File-Versions-0.08
+    tar xfz File-Versions-0.09.tar.gz
+    cd File-Versions-0.09
     perl Makefile.PL
     make
     make install
@@ -91,6 +91,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Jan 19 09:57:23 2017.
+This README was written on Sat May 12 10:41:05 2018.
 
 -----------------------------------------------------------------------------

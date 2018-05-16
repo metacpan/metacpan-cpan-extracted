@@ -28,22 +28,22 @@
          "requires" : {
             "Carp" : "0",
             "Const::Fast" : "0.014",
-            "Data::Dumper" : "0",
             "Exporter" : "0",
             "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0.059",
             "IO::Prompter" : "0.004014",
-            "JSON" : "2.92",
+            "JSON" : "2.59",
             "Log::Any" : "1.703",
             "Log::Any::Adapter" : "1.703",
             "Log::Any::Adapter::Screen" : "0.13",
             "Moo" : "2.003000",
             "Path::Tiny" : "0.079",
             "Pod::Usage" : "0",
-            "Role::REST::Client" : "0.22",
             "Try::Tiny" : "0.28",
             "Types::Common::Numeric" : "1.002001",
             "Types::Common::String" : "1.002001",
             "Types::Standard" : "1.002001",
+            "URI" : "1.62",
             "URI::Escape" : "1.72",
             "namespace::clean" : "0.27",
             "strictures" : "2.000003"
@@ -74,7 +74,7 @@
          "web" : "https://github.com/bluefeet/GitLab-API-v4"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

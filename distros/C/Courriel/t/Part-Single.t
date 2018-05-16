@@ -4,6 +4,7 @@ use warnings;
 use utf8;
 
 use Test::More 0.88;
+use Test::Warnings;
 
 use Courriel::Header::ContentType;
 use Courriel::Header::Disposition;

@@ -1,6 +1,6 @@
 package Lab::Connection::Trace;
 #ABSTRACT: Trace communication with instruments
-$Lab::Connection::Trace::VERSION = '3.641';
+$Lab::Connection::Trace::VERSION = '3.642';
 use 5.010;
 use warnings;
 use strict;
@@ -292,7 +292,7 @@ Lab::Connection::Trace - Trace communication with instruments
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 SYNOPSIS
 

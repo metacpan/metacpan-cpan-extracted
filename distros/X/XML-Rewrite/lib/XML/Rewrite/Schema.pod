@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 XML::Rewrite::Schema - transform schemas
@@ -23,415 +25,375 @@ specific extension.
 
 Feel invited to contribute ideas of useful features.
 
+Extends L<"DESCRIPTION" in XML::Rewrite|XML::Rewrite/"DESCRIPTION">.
+ 
 =head1 METHODS
 
+Extends L<"METHODS" in XML::Rewrite|XML::Rewrite/"METHODS">.
+ 
 =head2 Constructors
 
-XML::Rewrite::Schema-E<gt>B<new>([SCHEMA], OPTIONS)
-
+Extends L<"Constructors" in XML::Rewrite|XML::Rewrite/"Constructors">.
+ 
 =over 4
 
- Option               --Defined in     --Default
- allow_undeclared       XML::Compile::Cache  <true>
- any_attribute          XML::Compile::Cache  'ATTEMPT'
- any_element            XML::Compile::Cache  'ATTEMPT'
- attribute_form                          <undef>
- blanks_before          XML::Rewrite     'NONE'
- change                 XML::Rewrite     'TRANSFORM'
- comments               XML::Rewrite     'KEEP'
- defaults_writer        XML::Rewrite     'IGNORE'
- element_form                            <undef>
- expand_includes                         <false>
- hook                   XML::Compile::Schema  undef
- hooks                  XML::Compile::Schema  []
- ignore_unused_tags     XML::Compile::Schema  <false>
- key_rewrite            XML::Compile::Schema  []
- opts_readers           XML::Compile::Cache  []
- opts_rw                XML::Compile::Cache  []
- opts_writers           XML::Compile::Cache  []
- output_compression     XML::Rewrite     <undef>
- output_encoding        XML::Rewrite     <undef>
- output_standalone      XML::Rewrite     <undef>
- output_version         XML::Rewrite     <undef>
- prefixes               XML::Compile::Cache  <smart>
- remove_annotation                       <false>
- remove_elements        XML::Rewrite     []
- remove_id_constraints                   <false>
- schema_dirs            XML::Compile     undef
- target_namespace                        <undef>
- typemap                XML::Compile::Schema  {}
- use_default_namespace  XML::Rewrite     <false>
+=item XML::Rewrite::Schema-E<gt>B<new>( [SCHEMA], OPTIONS )
 
-. allow_undeclared => BOOLEAN
+ -Option               --Defined in          --Default
+  allow_undeclared       XML::Compile::Cache   <true>
+  any_element            XML::Compile::Cache   'ATTEMPT'
+  attribute_form                               <undef>
+  blanks_before          XML::Rewrite          'NONE'
+  block_namespace        XML::Compile::Schema  []
+  change                 XML::Rewrite          'TRANSFORM'
+  comments               XML::Rewrite          'KEEP'
+  defaults_writer        XML::Rewrite          'IGNORE'
+  element_form                                 <undef>
+  expand_includes                              <false>
+  hook                   XML::Compile::Schema  undef
+  hooks                  XML::Compile::Schema  []
+  ignore_unused_tags     XML::Compile::Schema  <false>
+  key_rewrite            XML::Compile::Schema  []
+  opts_readers           XML::Compile::Cache   []
+  opts_rw                XML::Compile::Cache   []
+  opts_writers           XML::Compile::Cache   []
+  output_compression     XML::Rewrite          <undef>
+  output_encoding        XML::Rewrite          <undef>
+  output_standalone      XML::Rewrite          <undef>
+  output_version         XML::Rewrite          <undef>
+  parser_options         XML::Compile          <many>
+  prefixes               XML::Compile::Cache   <smart>
+  remove_annotation                            <false>
+  remove_elements        XML::Rewrite          []
+  remove_id_constraints                        <false>
+  schema_dirs            XML::Compile          undef
+  target_namespace                             <undef>
+  typemap                XML::Compile::Cache   {}
+  use_default_namespace  XML::Rewrite          <false>
+  xsi_type               XML::Compile::Cache   {}
 
-. any_attribute => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'
+=over 2
 
-. any_element => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'
+=item allow_undeclared => BOOLEAN
 
-. attribute_form => 'qualified'|'unqualified'
+=item any_element => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'|'SLOPPY'
 
-. blanks_before => 'ALL'|'CONTAINERS'|'NONE'
+=item attribute_form => 'qualified'|'unqualified'
 
-. change => 'REPAIR'|'TRANSFORM'
+=item blanks_before => 'ALL'|'CONTAINERS'|'NONE'
 
-. comments => 'REMOVE'|'KEEP'
+=item block_namespace => NAMESPACE|TYPE|HASH|CODE|ARRAY
 
-. defaults_writer => 'EXTEND'|'IGNORE'|'MINIMAL'
+=item change => 'REPAIR'|'TRANSFORM'
 
-. element_form => 'qualified'|'unqualified'
+=item comments => 'REMOVE'|'KEEP'
 
-. expand_includes => BOOLEAN
+=item defaults_writer => 'EXTEND'|'IGNORE'|'MINIMAL'
 
-=over 4
+=item element_form => 'qualified'|'unqualified'
+
+=item expand_includes => BOOLEAN
 
 Include all the "include" files recursively, and merge their content
 with the main schema.
 
-=back
+=item hook => $hook|ARRAY
 
-. hook => ARRAY-WITH-HOOKDATA | HOOK
+=item hooks => ARRAY
 
-. hooks => ARRAY-OF-HOOK
+=item ignore_unused_tags => BOOLEAN|REGEXP
 
-. ignore_unused_tags => BOOLEAN|REGEXP
+=item key_rewrite => HASH|CODE|ARRAY
 
-. key_rewrite => HASH|CODE|ARRAY-of-HASH-and-CODE
+=item opts_readers => HASH|ARRAY-of-PAIRS
 
-. opts_readers => HASH|ARRAY-of-PAIRS
+=item opts_rw => HASH|ARRAY-of-PAIRS
 
-. opts_rw => HASH|ARRAY-of-PAIRS
+=item opts_writers => HASH|ARRAY-of-PAIRS
 
-. opts_writers => HASH|ARRAY-of-PAIRS
+=item output_compression => -1, 0-8
 
-. output_compression => -1, 0-8
+=item output_encoding => CHARSET
 
-. output_encoding => CHARSET
+=item output_standalone => BOOLEAN|'yes'|'no'
 
-. output_standalone => BOOLEAN|'yes'|'no'
+=item output_version => STRING
 
-. output_version => STRING
+=item parser_options => HASH|ARRAY
 
-. prefixes => HASH|ARRAY-of-PAIRS
+=item prefixes => HASH|ARRAY-of-PAIRS
 
-. remove_annotation => BOOLEAN
+=item remove_annotation => BOOLEAN
 
-. remove_elements => ARRAY
+=item remove_elements => ARRAY
 
-. remove_id_constraints => BOOLEAN
-
-=over 4
+=item remove_id_constraints => BOOLEAN
 
 Remove the identity constraints (key, keyref, and unique elements) from
 the schema.
 
+=item schema_dirs => $directory|ARRAY-OF-directories
+
+=item target_namespace => URI
+
+=item typemap => HASH|ARRAY
+
+=item use_default_namespace => BOOLEAN
+
+=item xsi_type => HASH|ARRAY
+
 =back
-
-. schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
-
-. target_namespace => URI
-
-. typemap => HASH
-
-. use_default_namespace => BOOLEAN
 
 =back
 
 =head2 Accessors
 
-$obj-E<gt>B<addHook>(HOOKDATA|HOOK|undef)
-
+Extends L<"Accessors" in XML::Rewrite|XML::Rewrite/"Accessors">.
+ 
 =over 4
 
-See L<XML::Compile::Schema/"Accessors">
+=item $obj-E<gt>B<addHook>($hook|LIST|undef)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addHooks>( $hook, [$hook, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addKeyRewrite>($predef|CODE|HASH, ...)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+=item XML::Rewrite::Schema-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+Inherited, see L<XML::Compile/"Accessors">
+
+=item $obj-E<gt>B<addSchemas>($xml, %options)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemap>(PAIR)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemaps>(PAIRS)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addXsiType>( [HASH|ARRAY|LIST] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<allowUndeclared>( [BOOLEAN] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<anyElement>('ATTEMPT'|'SLOPPY'|'SKIP_ALL'|'TAKE_ALL'|CODE)
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<blockNamespace>($ns|$type|HASH|CODE|ARRAY)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<hooks>( [<'READER'|'WRITER'>] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<typemap>( [HASH|ARRAY|PAIRS] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<useSchema>( $schema, [$schema, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
 
 =back
 
-$obj-E<gt>B<addHooks>(HOOK, [HOOK, ...])
+=head2 Prefix management
 
+Extends L<"Prefix management" in XML::Rewrite|XML::Rewrite/"Prefix management">.
+ 
 =over 4
 
-See L<XML::Compile::Schema/"Accessors">
+=item $obj-E<gt>B<addNicePrefix>(BASE, NAMESPACE)
 
-=back
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
-$obj-E<gt>B<addKeyRewrite>(CODE|HASH, CODE|HASH, ...)
+=item $obj-E<gt>B<addPrefixes>( [PAIRS|ARRAY|HASH] )
 
-=over 4
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
-See L<XML::Compile::Schema/"Accessors">
+=item $obj-E<gt>B<learnPrefixes>($node)
 
-=back
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
-$obj-E<gt>B<addSchemaDirs>(DIRECTORIES|FILENAME)
+=item $obj-E<gt>B<prefix>($prefix)
 
-XML::Rewrite::Schema-E<gt>B<addSchemaDirs>(DIRECTORIES|FILENAME)
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
-=over 4
+=item $obj-E<gt>B<prefixFor>($uri)
 
-See L<XML::Compile/"Accessors">
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
-=back
+=item $obj-E<gt>B<prefixed>( $type|<$ns,$local> )
 
-$obj-E<gt>B<addSchemas>(XML, OPTIONS)
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
-=over 4
+=item $obj-E<gt>B<prefixes>( [$params] )
 
-See L<XML::Compile::Schema/"Accessors">
-
-=back
-
-$obj-E<gt>B<addTypemap>(PAIR)
-
-=over 4
-
-See L<XML::Compile::Schema/"Accessors">
-
-=back
-
-$obj-E<gt>B<addTypemaps>(PAIRS)
-
-=over 4
-
-See L<XML::Compile::Schema/"Accessors">
-
-=back
-
-$obj-E<gt>B<allowUndeclared>([BOOLEAN])
-
-=over 4
-
-See L<XML::Compile::Cache/"Accessors">
-
-=back
-
-$obj-E<gt>B<hooks>
-
-=over 4
-
-See L<XML::Compile::Schema/"Accessors">
-
-=back
-
-$obj-E<gt>B<prefixes>([PAIRS])
-
-=over 4
-
-See L<XML::Compile::Cache/"Accessors">
+Inherited, see L<XML::Compile::Cache/"Prefix management">
 
 =back
 
 =head2 Compilers
 
-$obj-E<gt>B<compile>(('READER'|'WRITER'), TYPE, OPTIONS)
-
+Extends L<"Compilers" in XML::Rewrite|XML::Rewrite/"Compilers">.
+ 
 =over 4
 
-See L<XML::Compile::Schema/"Compilers">
+=item $obj-E<gt>B<addCompileOptions>( ['READERS'|'WRITERS'|'RW'], %options )
 
-=back
+Inherited, see L<XML::Compile::Cache/"Compilers">
 
-$obj-E<gt>B<compileAll>(['READER'|'WRITER'|'RW', [NAMESPACE]])
+=item $obj-E<gt>B<compile>( <'READER'|'WRITER'>, $type, %options )
 
-=over 4
+Inherited, see L<XML::Compile::Schema/"Compilers">
 
-See L<XML::Compile::Cache/"Compilers">
+=item $obj-E<gt>B<compileAll>( ['READERS'|'WRITERS'|'RW', [$ns]] )
 
-=back
+Inherited, see L<XML::Compile::Cache/"Compilers">
 
-$obj-E<gt>B<dataToXML>(NODE|REF-XML-STRING|XML-STRING|FILENAME|FILEHANDLE|KNOWN)
+=item $obj-E<gt>B<compileType>( <'READER'|'WRITER'>, $type, %options )
 
-=over 4
+Inherited, see L<XML::Compile::Schema/"Compilers">
 
-See L<XML::Compile/"Compilers">
+=item $obj-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
 
-=back
+=item XML::Rewrite::Schema-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
 
-$obj-E<gt>B<reader>(TYPE|NAME, OPTIONS)
+Inherited, see L<XML::Compile/"Compilers">
 
-=over 4
+=item $obj-E<gt>B<initParser>(%options)
 
-See L<XML::Compile::Cache/"Compilers">
+=item XML::Rewrite::Schema-E<gt>B<initParser>(%options)
 
-=back
+Inherited, see L<XML::Compile/"Compilers">
 
-$obj-E<gt>B<template>('XML'|'PERL', TYPE, OPTIONS)
+=item $obj-E<gt>B<reader>($type|$name, %options)
 
-=over 4
+Inherited, see L<XML::Compile::Cache/"Compilers">
 
-See L<XML::Compile::Schema/"Compilers">
+=item $obj-E<gt>B<template>( <'XML'|'PERL'|'TREE'>, $element, %options )
 
-=back
+Inherited, see L<XML::Compile::Schema/"Compilers">
 
-$obj-E<gt>B<writer>(TYPE|NAME)
+=item $obj-E<gt>B<writer>($type|$name)
 
-=over 4
-
-See L<XML::Compile::Cache/"Compilers">
+Inherited, see L<XML::Compile::Cache/"Compilers">
 
 =back
 
 =head2 Administration
 
-$obj-E<gt>B<declare>('READER'|'WRITER'|'RW', TYPE|ARRAY-of-TYPES, OPTIONS)
-
+Extends L<"Administration" in XML::Rewrite|XML::Rewrite/"Administration">.
+ 
 =over 4
 
-See L<XML::Compile::Cache/"Administration">
+=item $obj-E<gt>B<declare>( <'READER'|'WRITER'|'RW'>, <$type|ARRAY>, %options )
 
-=back
+Inherited, see L<XML::Compile::Cache/"Administration">
 
-$obj-E<gt>B<elements>
+=item $obj-E<gt>B<doesExtend>($exttype, $basetype)
 
-=over 4
+Inherited, see L<XML::Compile::Schema/"Administration">
 
-See L<XML::Compile::Schema/"Administration">
+=item $obj-E<gt>B<elements>()
 
-=back
+Inherited, see L<XML::Compile::Schema/"Administration">
 
-$obj-E<gt>B<findName>(NAME)
+=item $obj-E<gt>B<findName>($name)
 
-=over 4
+Inherited, see L<XML::Compile::Cache/"Administration">
 
-See L<XML::Compile::Cache/"Administration">
+=item $obj-E<gt>B<findSchemaFile>($filename)
 
-=back
+=item XML::Rewrite::Schema-E<gt>B<findSchemaFile>($filename)
 
-$obj-E<gt>B<findSchemaFile>(FILENAME)
+Inherited, see L<XML::Compile/"Administration">
 
-=over 4
+=item $obj-E<gt>B<importDefinitions>($xmldata, %options)
 
-See L<XML::Compile/"Administration">
+Inherited, see L<XML::Compile::Schema/"Administration">
 
-=back
+=item $obj-E<gt>B<knownNamespace>($ns|PAIRS)
 
-$obj-E<gt>B<importDefinitions>(XMLDATA, OPTIONS)
+=item XML::Rewrite::Schema-E<gt>B<knownNamespace>($ns|PAIRS)
 
-=over 4
+Inherited, see L<XML::Compile/"Administration">
 
-See L<XML::Compile::Schema/"Administration">
+=item $obj-E<gt>B<namespaces>()
 
-=back
+Inherited, see L<XML::Compile::Schema/"Administration">
 
-$obj-E<gt>B<knownNamespace>(NAMESPACE|PAIRS)
+=item $obj-E<gt>B<printIndex>( [$fh], %options )
 
-XML::Rewrite::Schema-E<gt>B<knownNamespace>(NAMESPACE|PAIRS)
+Inherited, see L<XML::Compile::Cache/"Administration">
 
-=over 4
+=item $obj-E<gt>B<types>()
 
-See L<XML::Compile/"Administration">
+Inherited, see L<XML::Compile::Schema/"Administration">
 
-=back
+=item $obj-E<gt>B<walkTree>($node, CODE)
 
-$obj-E<gt>B<namespaces>
-
-=over 4
-
-See L<XML::Compile::Schema/"Administration">
-
-=back
-
-$obj-E<gt>B<printIndex>([FILEHANDLE], OPTIONS)
-
-=over 4
-
-See L<XML::Compile::Cache/"Administration">
-
-=back
-
-$obj-E<gt>B<types>
-
-=over 4
-
-See L<XML::Compile::Schema/"Administration">
-
-=back
-
-$obj-E<gt>B<walkTree>(NODE, CODE)
-
-=over 4
-
-See L<XML::Compile/"Administration">
+Inherited, see L<XML::Compile/"Administration">
 
 =back
 
 =head2 Processing
 
-$obj-E<gt>B<buildDOM>(TYPE, DATA, OPTIONS)
-
+Extends L<"Processing" in XML::Rewrite|XML::Rewrite/"Processing">.
+ 
 =over 4
 
-See L<XML::Rewrite/"Processing">
+=item $obj-E<gt>B<buildDOM>(TYPE, DATA, OPTIONS)
 
-=back
+Inherited, see L<XML::Rewrite/"Processing">
 
-$obj-E<gt>B<process>(XMLDATA, OPTIONS)
+=item $obj-E<gt>B<process>(XMLDATA, OPTIONS)
 
-=over 4
+Inherited, see L<XML::Rewrite/"Processing">
 
-See L<XML::Rewrite/"Processing">
+=item $obj-E<gt>B<repairXML>(TYPE, XML, DETAILS)
 
-=back
+Inherited, see L<XML::Rewrite/"Processing">
 
-$obj-E<gt>B<repairXML>(TYPE, XML, DETAILS)
+=item $obj-E<gt>B<transformData>(TYPE, DATA, DETAILS)
 
-=over 4
-
-See L<XML::Rewrite/"Processing">
-
-=back
-
-$obj-E<gt>B<transformData>(TYPE, DATA, DETAILS)
-
-=over 4
-
-See L<XML::Rewrite/"Processing">
+Inherited, see L<XML::Rewrite/"Processing">
 
 =back
 
 =head1 DETAILS
 
-=head1 DIAGNOSTICS
+Extends L<"DETAILS" in XML::Rewrite|XML::Rewrite/"DETAILS">.
+ 
+=head1 DESCRIPTIONS
 
-Error: cannot find pre-installed name-space files
-
-=over 4
-
-Use C<$ENV{SCHEMA_LOCATION}> or L<new(schema_dirs)|XML::Compile/"Constructors"> to express location
-of installed name-space files, which came with the L<XML::Compile|XML::Compile>
-distribution package.
-
-=back
-
-Error: don't known how to interpret XML data
-
-=over 4
-
-=back
-
+Extends L<"DESCRIPTIONS" in XML::Rewrite|XML::Rewrite/"DESCRIPTIONS">.
+ 
 =head1 SEE ALSO
 
-This module is part of XML-Rewrite distribution version 0.10,
-built on August 11, 2008. Website: F<http://perl.overmeer.net/xml-compile/>
-
-All modules in this suite:
-L<XML::Compile>,
-L<XML::Compile::SOAP>,
-L<XML::Compile::SOAP::Daemon>,
-L<XML::Compile::Tester>,
-L<XML::Compile::Cache>,
-L<XML::Rewrite>,
-L<XML::Compile::Dumper>.
-
-Please post questions or ideas to the mailinglist at
-F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile>
-For life contact with other developers, visit the C<#xml-compile> channel
-on C<irc.perl.org>.
+This module is part of XML-Rewrite distribution version 0.11,
+built on May 11, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2008 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2008-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

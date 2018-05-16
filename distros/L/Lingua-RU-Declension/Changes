@@ -1,8 +1,12 @@
 Revision history for Lingua-RU-Declension
 
+0.004       2018-05-12
+            Add все and то to data files
+            Add Cooljugator links to the slides
+
 0.003       2018-05-09
             Fix 'wide character' error
-	    Add a script to generate Anki flashcard csv files
+            Add a script to generate Anki flashcard csv files
 
 0.002       2018-05-08
             Fix a dependency version issue. (GH#1)

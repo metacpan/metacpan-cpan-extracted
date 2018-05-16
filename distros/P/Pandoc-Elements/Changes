@@ -1,5 +1,9 @@
 Revision history for Pandoc-Elements
 
+0.37  2018-05-12 22:42:29 CEST
+    - Let multifilter find filter directory also on Windows 
+    - Support fully compliant JSON Pointers in metavalues
+
 0.36  2018-04-24 22:08:31 CEST
     - Extend ImageFromCode filter (#83)
     - Introduce Pandoc::Selector by refactoring

@@ -4,13 +4,13 @@ NAME
 
 VERSION
 
-    version 0.014
+    version 0.017
 
 USAGE
 
     Use Graphics::Raylib::XS, which wraps this in XS, instead. Otherwise,
     just use it like any other Alien distro. Currently wraps raylib
-    1.9.5-dev (and a few extra commits, see the alienfile in this
+    1.9.7-dev (and a few extra commits, see the alienfile in this
     distribution)
 
 System requirements

@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-my $min_ver = '0.40';
+my $min_ver = '0.44';
 eval "use Test::Map::Tube $min_ver tests => 2";
 plan skip_all => "Test::Map::Tube $min_ver required." if $@;
 

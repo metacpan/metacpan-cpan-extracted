@@ -1,5 +1,5 @@
 package ExtUtils::InstallPaths;
-$ExtUtils::InstallPaths::VERSION = '0.011';
+$ExtUtils::InstallPaths::VERSION = '0.012';
 use 5.006;
 use strict;
 use warnings;
@@ -16,7 +16,6 @@ my %defaults = (
 	install_base    => undef,
 	prefix          => undef,
 	verbose         => 0,
-	blib            => 'blib',
 	create_packlist => 1,
 	dist_name       => undef,
 	module_name     => undef,
@@ -329,23 +328,23 @@ sub install_types {
 }
 
 sub install_map {
-	my ($self, $blib) = @_;
-	$blib ||= $self->blib;
+	my ($self, $dirs) = @_;
+
+	my %localdir_for;
+	if ($dirs && %$dirs) {
+		%localdir_for = %$dirs;
+	}
+	else {
+		foreach my $type ($self->install_types) {
+			$localdir_for{$type} = File::Spec->catdir('blib', $type);
+		}
+	}
 
 	my (%map, @skipping);
-	foreach my $type ($self->install_types) {
-		my $localdir = File::Spec->catdir($blib, $type);
-		next unless -e $localdir;
-
-		# the line "...next if (($type eq 'bindoc'..." was one of many changes introduced for
-		# improving HTML generation on ActivePerl, see https://rt.cpan.org/Public/Bug/Display.html?id=53478
-		# Most changes were ok, but this particular line caused test failures in t/manifypods.t on windows,
-		# therefore it is commented out.
-
-		# ********* next if (($type eq 'bindoc' || $type eq 'libdoc') && not $self->is_unixish);
-
+	foreach my $type (keys %localdir_for) {
+		next if not -e $localdir_for{$type};
 		if (my $dest = $self->install_destination($type)) {
-			$map{$localdir} = $dest;
+			$map{$localdir_for{$type}} = $dest;
 		} else {
 			push @skipping, $type;
 		}
@@ -405,7 +404,7 @@ ExtUtils::InstallPaths - Build.PL install path logic made easy
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -507,10 +506,6 @@ The L<ExtUtils::Config|ExtUtils::Config> object used for this object.
 =head2 verbose
 
 The verbosity of ExtUtils::InstallPaths. It defaults to 0
-
-=head2 blib
-
-The location of the blib directory, it defaults to 'blib'.
 
 =head2 create_packlist
 

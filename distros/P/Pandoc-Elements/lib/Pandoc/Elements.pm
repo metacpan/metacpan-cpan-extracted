@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010001;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use Carp;
 use JSON qw(decode_json);
@@ -788,7 +788,8 @@ Pandoc::Elements - create and process Pandoc documents
 
 # STATUS
 
-[![Build Status](https://travis-ci.org/nichtich/Pandoc-Elements.svg)](https://travis-ci.org/nichtich/Pandoc-Elements)
+[![Unix Build Status](https://travis-ci.org/nichtich/Pandoc-Elements.svg)](https://travis-ci.org/nichtich/Pandoc-Elements)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/pb7vdd14xml9ho43?svg=true)](https://ci.appveyor.com/project/nichtich/pandoc-elements)
 [![Coverage Status](https://coveralls.io/repos/nichtich/Pandoc-Elements/badge.svg)](https://coveralls.io/r/nichtich/Pandoc-Elements)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/Pandoc-Elements.png)](http://cpants.cpanauthors.org/dist/Pandoc-Elements)
 [![Code Climate Issue Count](https://codeclimate.com/github/nichtich/Pandoc-Elements/badges/issue_count.svg)](https://codeclimate.com/github/nichtich/Pandoc-Elements)

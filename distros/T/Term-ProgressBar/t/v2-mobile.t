@@ -9,8 +9,9 @@ This package tests the moving target functionality of Term::ProgressBar.
 
 =cut
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
+use Test::Warnings;
 
 use Capture::Tiny qw(capture_stderr);
 

@@ -7,7 +7,7 @@ use Carp qw(croak);
 use List::Util qw(any);
 use Sub::Util qw(set_subname);
 
-our $VERSION = "0.8";
+our $VERSION = '0.9';
 
 # valid values for rule parts
 my $rule_parts_validation = {
@@ -133,11 +133,11 @@ You can Only have the following directions
 
 =over
 
-=item ->
+=item C<< -> >>
 
-=item <>
+=item C<< <> >>
 
-=item <-
+=item C<< <- >>
 
 =back
 

@@ -2,7 +2,7 @@ package App::EvalServerAdvanced::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 # ABSTRACT: Protocol abstraction for App::EvalServerAdvanced 
 my $protocol_version = 1;
 
@@ -71,7 +71,7 @@ fun decode_message($buffer) {
     die "Undecodable header" if ($reserved != $protocol_version);
     
     # Packet isn't ready yet
-    return (0, undef, undef) if (length($buffer) - 8 < $length);
+    return (0, undef, $buffer) if (length($buffer) - 8 < $length);
 
     my $message_bytes = substr($buffer, 8, $length);
     substr($buffer, 0, $length+8, "");

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # This example was contribute by Wesley Schwengle, MintLab NL 2015-08-22
 # It has the same license as XML::Compile::WSDL11, where it is included
 # in the bin/ directory of the distribution.
@@ -11,6 +11,7 @@ use Data::Dumper;
 
 use XML::Compile::WSDL11;
 use XML::Compile::SOAP11;
+use XML::Compile::SOAP11::Encoding;
 use XML::Compile::Transport::SOAPHTTP;
 
 my %opt = (

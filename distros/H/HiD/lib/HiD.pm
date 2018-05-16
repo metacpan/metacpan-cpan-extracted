@@ -3,7 +3,7 @@
 
 package HiD;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::VERSION = '1.991';
+$HiD::VERSION = '1.992';
 use Moose;
 use namespace::autoclean;
 # note: we also do 'with HiD::Role::DoesLogging', just later on because reasons.
@@ -1000,7 +1000,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

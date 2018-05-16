@@ -1,11 +1,11 @@
-# $Id: 61-Ed25519.t 1664 2018-04-05 10:03:14Z willem $	-*-perl-*-
+# $Id: 61-Ed25519.t 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Net::DNS::SEC' => 1.04,
+	'Net::DNS::SEC' => 1.05,
 	'MIME::Base64'	=> 2.13,
 	);
 
@@ -17,7 +17,7 @@ foreach my $package ( sort keys %prerequisite ) {
 }
 
 plan skip_all => "disabled EdDSA"
-		unless eval { Net::DNS::SEC::libcrypto->can('EdDSA_sign') };
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_private_key') };
 
 plan tests => 13;
 
@@ -90,31 +90,27 @@ my $signature = pack 'H*', join '', qw(
 		c14292cf8c28af0efe6ee30cbf9d643cba3ab56f1e1ae27b6074147ed9c55a0e
 		);
 
-my $signed = eval{ Net::DNS::SEC::EdDSA->sign( $sigdata, $private ); } || '';
+my $signed = eval { Net::DNS::SEC::EdDSA->sign( $sigdata, $private ); } || '';
 ok( $signed eq $signature, 'signature created using private key' );
 
 
-{
-	my $verified = Net::DNS::SEC::EdDSA->verify( $sigdata, $key, $signature );
-	ok( $verified, 'signature verified using public key' );
-}
+my $verified = Net::DNS::SEC::EdDSA->verify( $sigdata, $key, $signature );
+ok( $verified, 'signature verified using public key' );
 
 
-{
-	my $corrupt = 'corrupted data';
-	my $verified = Net::DNS::SEC::EdDSA->verify( $corrupt, $key, $signature );
-	ok( !$verified, 'signature over corrupt data not verified' );
-}
+my $corrupt = 'corrupted data';
+my $verifiable = Net::DNS::SEC::EdDSA->verify( $corrupt, $key, $signature );
+ok( !$verifiable, 'signature not verifiable if data corrupted' );
 
 
 ok( !eval { Net::DNS::SEC::EdDSA->sign( $sigdata, $wrongprivate ) },
 	'signature not created using wrong private key' );
 
 ok( !eval { Net::DNS::SEC::EdDSA->verify( $sigdata, $wrongkey, $signature ) },
-	'signature not verified using wrong public key' );
+	'signature not verifiable using wrong public key' );
 
 ok( !eval { Net::DNS::SEC::EdDSA->verify( $sigdata, $key, undef ) },
-	'signature not verified if empty or undefined' );
+	'verify fails if signature undefined' );
 
 exit;
 

@@ -3,10 +3,8 @@ use strict;
 use base 'DBD::File';
 use DBI;
 
-use vars qw($ATTRIBUTION $VERSION);
-
-$ATTRIBUTION = 'DBD::WMI by Max Maischein <dbd-wmi@corion.net>';
-$VERSION = '0.08';
+our $ATTRIBUTION = 'DBD::WMI by Max Maischein <dbd-wmi@corion.net>';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -38,15 +36,19 @@ The WMI
 allows you to query various tables ("namespaces"), like the filesystem,
 currently active processes and events:
 
-     SELECT * FROM Win32_Process
+    SELECT * FROM Win32_Process
 
 The driver/WMI implements two kinds of queries, finite queries like the
 query above and potentially infinite queries for events as they occur in
 the system:
 
+    my $query = q{
+    
      SELECT * FROM __instanceoperationevent
      WITHIN 1
      WHERE TargetInstance ISA 'Win32_DiskDrive'
+     
+    }
 
 This query returns one row (via ->fetchrow_arrayref() ) whenever a disk
 drive gets added to or removed from the system (think of an USB stick).
@@ -80,9 +82,7 @@ package DBD::WMI::dr;
 use strict;
 use Win32::WQL;
 
-use vars qw($imp_data_size);
-
-$imp_data_size = 0;
+our $imp_data_size = 0;
 
 sub connect {
     my ($drh, $dr_dsn, $user, $auth, $attr) = @_;
@@ -92,9 +92,15 @@ sub connect {
         or die "Invalid DSN '$dr_dsn'";
     my $machine = $1 || ".";
 
-    my $wmi = Win32::WQL->new(
-        machine => $machine
-    );
+    my @args;
+    if ( defined $user and $user ne '') {
+        my $locator = Win32::OLE->new("WbemScripting.SWbemLocator");
+        my $ole_con=$locator->ConnectServer($machine,'root/cimV2',$user,$auth);
+        @args = $ole_con;
+    } else {
+        @args = (machine => $machine);
+    }
+    my $wmi = Win32::WQL->new(@args);
 
     my ($outer, $dbh) = DBI::_new_dbh(
         $drh,
@@ -125,8 +131,7 @@ WQL
 package DBD::WMI::db;
 use strict;
 
-use vars qw($imp_data_size);
-$imp_data_size = 0;
+our $imp_data_size = 0;
 
 sub prepare {
     my ($dbh, $statement, @attribs) = @_;
@@ -210,9 +215,7 @@ package DBD::WMI::st;
 use strict;
 use Carp qw(croak);
 
-use vars qw($imp_data_size);
-
-$imp_data_size = 0;
+our $imp_data_size = 0;
 
 sub execute {
     my $sth = shift;
@@ -267,7 +270,10 @@ sub fetchrow_arrayref
     }
     return $sth->_set_fbav(\@row);
 }
+
+{ no warnings 'once';
 *fetch = \&fetchrow_arrayref; # required alias for fetchrow_arrayref
+}
 
 sub STORE
 {
@@ -433,7 +439,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2009-2015 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

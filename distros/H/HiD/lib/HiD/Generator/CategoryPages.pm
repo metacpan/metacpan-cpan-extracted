@@ -3,7 +3,7 @@
 
 package HiD::Generator::CategoryPages;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Generator::CategoryPages::VERSION = '1.991';
+$HiD::Generator::CategoryPages::VERSION = '1.992';
 use Moose;
 with 'HiD::Generator';
 
@@ -91,7 +91,7 @@ directory and modifying it directly.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

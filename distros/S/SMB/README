@@ -1,4 +1,4 @@
-Welcome to SMB-Perl 0.08.
+Welcome to SMB-Perl 0.09.
 
 This pure perl library allows to receive and send commands using SMB
 network protocol (also called CIFS - Common Internet File System).

@@ -4,7 +4,7 @@ Courriel - High level email parsing and manipulation
 
 # VERSION
 
-version 0.45
+version 0.46
 
 # SYNOPSIS
 
@@ -89,13 +89,13 @@ these exists, it just returns `DateTime->now()`.
 
 ## $email->from()
 
-This returns a single [Email::Address](https://metacpan.org/pod/Email::Address) object based on the From header of the
-email. If the email has no From header or if the From header is broken, it
+This returns a single [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) object based on the From header of
+the email. If the email has no From header or if the From header is broken, it
 returns `undef`.
 
 ## $email->participants()
 
-This returns a list of [Email::Address](https://metacpan.org/pod/Email::Address) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
 participant in the email. This includes any address in the From, To, or CC
 headers.
 
@@ -103,21 +103,21 @@ Just like with the From header, broken addresses will not be included.
 
 ## $email->recipients()
 
-This returns a list of [Email::Address](https://metacpan.org/pod/Email::Address) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
 recipient in the email. This includes any address in the To or CC headers.
 
 Just like with the From header, broken addresses will not be included.
 
 ## $email->to()
 
-This returns a list of [Email::Address](https://metacpan.org/pod/Email::Address) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
 address in the To header.
 
 Just like with the From header, broken addresses will not be included.
 
 ## $email->cc()
 
-This returns a list of [Email::Address](https://metacpan.org/pod/Email::Address) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
 address in the CC header.
 
 Just like with the From header, broken addresses will not be included.
@@ -294,7 +294,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

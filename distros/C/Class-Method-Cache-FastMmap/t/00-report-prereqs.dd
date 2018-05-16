@@ -36,14 +36,10 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'JSON::PP' => '2.00',
                                    'Module::Metadata' => '0',
                                    'Moo' => '0',
-                                   'Path::Tiny' => '0.004',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0',
-                                   'Time::Piece' => '1.16',
-                                   'Time::Seconds' => '0'
+                                   'Test::Most' => '0'
                                  }
                  }
      };

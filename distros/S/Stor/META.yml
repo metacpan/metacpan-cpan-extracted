@@ -1,0 +1,63 @@
+---
+abstract: 'Save/retrieve a file to/from primary storage'
+author:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+build_requires:
+  HTTP::Request: '0'
+  Mock::Quick: '0'
+  Test::Exception: '0'
+  Test::Mock::Cmd: '0.7'
+  Test::Mojo: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Stor
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Stor:
+    file: lib/Stor.pm
+    version: v1.0.0
+requires:
+  CHI::Driver::Memcached: '0.16'
+  Cache::Memcached::Fast: '0.25'
+  Digest::SHA: '0'
+  Guard: '1.023'
+  HTTP::Date: '6.02'
+  List::MoreUtils: '0'
+  Mojolicious: '7.77'
+  Mojolicious::Plugin::CHI: '0.09'
+  Net::Amazon::S3: '0'
+  Net::Statsite::Client: '0'
+  Path::Tiny: '0'
+  Safe::Isa: '0'
+  Syntax::Keyword::Try: '0'
+  failures: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/avast/Stor/issues
+  homepage: https://github.com/avast/Stor
+  repository: git://github.com/avast/Stor.git
+version: 1.0.0
+x_contributors:
+  - 'Jan Seidl <janseidl@volny.cz>'
+  - 'Jan Seidl <seidl@avast.com>'
+  - 'Mohelníková Lucie <mohelnikova@avast.com>'
+  - 'Rudolf Plíva <pliva@avast.com>'
+  - 'Tomas Pavlik <savlik5@gmail.com>'
+  - 'Tomas Pavlik <tomas.pavlik@avast.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

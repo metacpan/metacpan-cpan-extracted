@@ -10,10 +10,13 @@ has template => sub { shift->build_template(<<'XML') };
   % for my $desc (@{ $self->descriptors }) {
   <%= $desc %>
   % }
+  % for my $ext (@{ $self->extensions }) {
+  <%= $ext %>
+  % }
 % end
 XML
 
-has descriptors => sub { [] };
+has [qw/descriptors extensions/] => sub { [] };
 has entity_id => sub { Carp::croak 'entity_id is required' };
 has [qw/id valid_until cache_duration/];
 
@@ -75,6 +78,11 @@ Must not be empty at render time.
 Required.
 This is the identifier for the entity.
 It is often the same as the assertion consumer service location (url, see L<Mojo::SAML::Document::AssertionConsumerService/location>).
+
+=head2 extensions
+
+An array reference of strings or objects that stringify.
+These are included directly into the body of the main tag.
 
 =head2 id
 

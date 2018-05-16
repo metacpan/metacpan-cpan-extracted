@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPublished;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Role::IsPublished::VERSION = '1.991';
+$HiD::Role::IsPublished::VERSION = '1.992';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -182,7 +182,7 @@ The URL to the output path for the written file.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

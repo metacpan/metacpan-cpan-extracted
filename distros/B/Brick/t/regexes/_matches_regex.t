@@ -15,7 +15,7 @@ isa_ok( $bucket, Mock::Bucket->bucket_class );
 
 can_ok( $bucket, '_matches_regex' );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # croaks if it doesn't get a qr//
 {
 my $result = eval { $bucket->_matches_regex( { regex => '' } ) };
@@ -32,7 +32,7 @@ my $result = eval { $bucket->_matches_regex( { regex => '.*(\S+)' } ) };
 ok( $@, "croaks without a regex (string)" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # returns a sub when I give it a regex
 {
 my $result = eval { $bucket->_matches_regex( { regex => qr/.*/ } ) };

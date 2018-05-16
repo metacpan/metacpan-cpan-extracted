@@ -3,7 +3,7 @@
 
 package HiD::Plugin;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Plugin::VERSION = '1.991';
+$HiD::Plugin::VERSION = '1.992';
 use Moose;
 use namespace::autoclean;
 
@@ -43,7 +43,7 @@ Base class for plugin object
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

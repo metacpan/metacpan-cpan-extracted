@@ -3,7 +3,7 @@
 
 package HiD::Processor::IIBlog;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Processor::IIBlog::VERSION = '1.991';
+$HiD::Processor::IIBlog::VERSION = '1.992';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -127,7 +127,7 @@ C<17 Aug 2017>.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

@@ -180,7 +180,6 @@ package OxdClient;	# This is the &quot;Class&quot;
         my $lenght_jsondata = encode('UTF-8', $lenght . $jsondata);
         
         my $response_json = "";	
-	
 	if($connectionType eq 'local') {
 	    $response_json = $self->oxd_socket_request($lenght_jsondata);
 	    my $char_count = substr($response_json, 0, 4);

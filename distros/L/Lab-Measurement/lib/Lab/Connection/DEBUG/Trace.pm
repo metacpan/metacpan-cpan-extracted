@@ -1,6 +1,6 @@
 package Lab::Connection::DEBUG::Trace;
 #ABSTRACT: ???
-$Lab::Connection::DEBUG::Trace::VERSION = '3.641';
+$Lab::Connection::DEBUG::Trace::VERSION = '3.642';
 use 5.010;
 use warnings;
 use strict;
@@ -32,7 +32,7 @@ Lab::Connection::DEBUG::Trace - ???
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 COPYRIGHT AND LICENSE
 

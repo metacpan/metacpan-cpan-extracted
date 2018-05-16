@@ -47,7 +47,7 @@ if (WriteMakefile(
     ABSTRACT_FROM      => 'lib/Graphics/Framebuffer.pm',
     LICENSE            => 'Artistic_2_0',
     PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.008,
+    MIN_PERL_VERSION   => 5.008, # 5.6 is considered slow and unstable.  Upgrade
     CONFIGURE_REQUIRES => {
         'Inline::MakeMaker'   => 0.45,
         'ExtUtils::MakeMaker' => 4.52,
@@ -56,6 +56,7 @@ if (WriteMakefile(
         'Test::Most' => '0.30',
         'List::Util' => '1.20',
     },
+    PREREQ_PRINT   => 1,
     PREREQ_PM      => {
         'Math::Bezier'   => '0.01',
         'Math::Trig'     => '1.10',

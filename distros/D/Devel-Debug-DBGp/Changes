@@ -1,5 +1,9 @@
 Revision history for Devel-Debug-DBGp
 
+0.22      2018-05-14 21:10:44 CEST
+
+    - Build under (soon-to-be) Perl 5.28
+
 0.21      2018-05-10 12:59:33 CEST
 
     - Add missing files to MANIFEST

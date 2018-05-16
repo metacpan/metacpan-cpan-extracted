@@ -18,15 +18,16 @@ DESCRIPTION
 OUTLINE
 
       * pod2pandoc is a command line script to convert Pod to any format
-      supported by Pandoc
+      supported by Pandoc.
 
       * App::pod2pandoc provides functionality of pod2pandoc to be used in
-      Perl code
+      Perl code.
 
       * Pod::Simple::Pandoc converts Pod to the abstract document model of
-      Pandoc
+      Pandoc.
 
-      * Pod::Pandoc::Modules manages a set of Pod documents of Perl modules
+      * Pod::Pandoc::Modules manages a set of Pod documents of Perl
+      modules.
 
 REQUIREMENTS
 
@@ -34,10 +35,24 @@ REQUIREMENTS
     make actual use of it. See http://pandoc.org/installing.html for
     installation.
 
-EXAMPLES
+USAGE EXAMPLES
 
-    GitHub wiki and Sphinx documentation are automatically build on each
-    commit to the master branch (see script deploy.sh).
+ Replace pod2html
+
+      # pod2html --infile=input.pm --css=style.css --title=TITLE > output.html
+      pod2pandoc input.pm --css=style.css --toc --name -o output.html
+
+    Pandoc option --toc corresponds to pod2html option --index and is
+    disabled by default. pod2pandoc adds title and subtitle from NAME
+    section.
+
+ Replace pod2markdown
+
+      # pod2markdown input.pod
+      pod2pandoc input.pod -t markdown
+    
+      # pod2markdown input.pod output.md
+      pod2pandoc input.pod -o output.md
 
  GitHub wiki
 
@@ -65,7 +80,7 @@ EXAMPLES
 
 SEE ALSO
 
-    This module is basde on the wrapper module Pandoc to execute pandoc
+    This module is based on the wrapper module Pandoc to execute pandoc
     from Perl and on the module Pandoc::Elements for pandoc document
     processing.
 
@@ -79,6 +94,10 @@ SEE ALSO
 AUTHOR
 
     Jakob Voß <jakob.voss@gbv.de>
+
+CONTRIBUTORS
+
+    Benct Philip Jonsson
 
 COPYRIGHT AND LICENSE
 

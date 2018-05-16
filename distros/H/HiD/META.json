@@ -4,7 +4,7 @@
       "John SJ Anderson <genehack@genehack.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -93,7 +93,6 @@
             "Test::Routine" : "0",
             "Test::Routine::Util" : "0",
             "Test::Warn" : "0",
-            "blib" : "1.01",
             "lib" : "0",
             "perl" : "5.014"
          }
@@ -111,10 +110,10 @@
          "web" : "https://github.com/genehack/HiD"
       }
    },
-   "version" : "1.991",
+   "version" : "1.992",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.027002"
+         "version" : "5.027011"
       },
       "plugins" : [
          {
@@ -136,42 +135,42 @@
                }
             },
             "name" : "@GENEHACK/GatherDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@GENEHACK/@Filter/PruneCruft",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@GENEHACK/@Filter/ManifestSkip",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@GENEHACK/@Filter/MetaYAML",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@GENEHACK/@Filter/License",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@GENEHACK/@Filter/ExtraTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@GENEHACK/@Filter/ExecDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@GENEHACK/@Filter/ShareDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -181,27 +180,27 @@
                }
             },
             "name" : "@GENEHACK/@Filter/MakeMaker",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@GENEHACK/@Filter/Manifest",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@GENEHACK/@Filter/TestRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@GENEHACK/@Filter/ConfirmRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@GENEHACK/@Filter/UploadToCPAN",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
@@ -212,27 +211,27 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1 (Apple Git-101)",
                   "repo_root" : "."
                }
             },
             "name" : "@GENEHACK/Git::NextVersion",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@GENEHACK/AutoPrereqs",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
             "name" : "@GENEHACK/CheckChangesHasContent",
-            "version" : "0.010"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@GENEHACK/PkgVersion",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -342,12 +341,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@GENEHACK/MetaConfig",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@GENEHACK/MetaJSON",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -357,7 +356,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@GENEHACK/InstallGuide",
-            "version" : "1.200007"
+            "version" : "1.200009"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -367,22 +366,22 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@GENEHACK/NextRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@GENEHACK/ExtraTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@GENEHACK/PodCoverageTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@GENEHACK/PodSyntaxTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -421,7 +420,7 @@
                }
             },
             "name" : "@GENEHACK/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -441,7 +440,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1 (Apple Git-101)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -449,7 +448,7 @@
                }
             },
             "name" : "@GENEHACK/Git::Commit",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -458,12 +457,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.991",
+                  "tag" : "v1.992",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1 (Apple Git-101)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -471,7 +470,7 @@
                }
             },
             "name" : "@GENEHACK/Git::Tag",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -488,12 +487,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.1",
+                  "git_version" : "2.15.1 (Apple Git-101)",
                   "repo_root" : "."
                }
             },
             "name" : "@GENEHACK/Git::Push",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Twitter",
@@ -509,11 +508,11 @@
                   "run" : [
                      "rm -f Makefile.PL"
                   ],
-                  "version" : "0.046"
+                  "version" : "0.047"
                }
             },
             "name" : "@GENEHACK/Run::BeforeBuild",
-            "version" : "0.046"
+            "version" : "0.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterBuild",
@@ -525,11 +524,11 @@
                      "cp %d/Makefile.PL ./",
                      "git status --porcelain | grep 'M Makefile.PL' && git commit -m 'auto-committed by dist.ini' Makefile.PL || echo Makefile.PL up to date"
                   ],
-                  "version" : "0.046"
+                  "version" : "0.047"
                }
             },
             "name" : "@GENEHACK/Run::AfterBuild",
-            "version" : "0.046"
+            "version" : "0.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::Release",
@@ -540,11 +539,11 @@
                   "run" : [
                      "mv %a ./releases/"
                   ],
-                  "version" : "0.046"
+                  "version" : "0.047"
                }
             },
             "name" : "@GENEHACK/Run::Release",
-            "version" : "0.046"
+            "version" : "0.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -555,7 +554,7 @@
                }
             },
             "name" : "RuntimeRequires",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -566,7 +565,7 @@
                }
             },
             "name" : "DevelopRequires",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::OSPrereqs",
@@ -576,57 +575,57 @@
                }
             },
             "name" : "MSWin32",
-            "version" : "0.008"
+            "version" : "0.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          }
       ],
       "zilla" : {
@@ -634,10 +633,11 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.010"
+         "version" : "6.012"
       }
    },
    "x_authority" : "cpan:GENEHACK",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_generated_by_perl" : "v5.27.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

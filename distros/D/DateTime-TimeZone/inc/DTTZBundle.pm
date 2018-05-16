@@ -32,7 +32,7 @@ override configure => sub {
 
     $self->add_plugins(
         [
-            'OSPrereqs' => {
+            'OSPrereqs' => 'MSWin32' => {
                 'DateTime::TimeZone::Local::Win32' => $version,
             }
         ],

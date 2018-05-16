@@ -4,6 +4,8 @@ author:
   - 'Richard <perl-cpan@richardharman.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0.82'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -22,7 +24,6 @@ requires:
   Class::Accessor: '0'
   List::Util: '1.33'
   Sub::Util: '1.4'
-  Test::Exception: '0'
-  Test::More: '0'
+  perl: '5.008009'
 version: '0.6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-ToJSON
 
+0.14  2018-05-15
+        - Add script jsonshema2json for trivial use
+
 0.13  2018-01-01
         - Fix tests broken by more updates in JSON::Validator
 

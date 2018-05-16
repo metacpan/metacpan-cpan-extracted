@@ -1,0 +1,35 @@
+Revision history for Perl extension Stor
+
+
+1.0.0 2018-05-11T09:08:33Z
+    - fix & improve documentation
+    - configuration changes:
+        - get_from_hcp renamed to s3_enabled
+        - hcp_credentials renamed to s3_credentials
+0.10.2 2018-05-10T14:20:30Z
+    - Timings to statsite is now in miliseconds
+0.10.1
+    - Bugfix when zero-sized chunk is sent form hcp
+0.10.0
+    - Properly streaming files form hcp storage
+0.9.0
+    - writable_pairs_regex configuration (default all pairs)
+0.6.0
+    - Last-Modified header
+0.5.0
+    - cache support
+0.4.4
+   - lookup.attempt.[$attempt].count and lookup.time metrics added
+   - remove Cpanel::JSON::XS dependency
+
+0.4.3
+    - remove retry - clients retry is better (not blocked servers process)
+    - success.get.ok.[time/size] metrics added
+    - remove error.get.unknown.count metric (success and error mismatch)
+
+0.4.0
+    - add basic authorization for POST
+
+0.1.0
+    - original version
+

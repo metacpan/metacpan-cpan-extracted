@@ -16,5 +16,5 @@ requires:
   HTTP::Tiny: '0'
   Path::Tiny: '0'
   Try::Tiny: '0'
-version: v0.0.2
+version: v0.0.3
 x_serialization_backend: 'YAML::Tiny version 1.69'

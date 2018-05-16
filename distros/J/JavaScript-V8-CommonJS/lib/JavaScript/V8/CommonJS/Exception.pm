@@ -40,6 +40,13 @@ sub new_from_string {
 
 
     my $message = shift @lines;
+
+    # HACK compile time errors report corret source at message line, ex:
+    # Error: ReferenceError: foo is not defined at /home/cafe/workspace/JavaScript-V8-CommonJS/t/modules/notStrict.js:2 at undefined:1
+    if ($message =~ /^Error: (.*)( at \/.*) at undefined:1$/) {
+        $message = $1;
+        unshift @lines, $2;
+    }
     my @stack;
     foreach (@lines) {
         my ($source, $line, $col);
@@ -55,8 +62,11 @@ sub new_from_string {
         # at global.require (/home/cafe/workspace/JavaScript-V8-CommonJS/share/require.js:45:96)
         elsif (($source, $line, $col) = $_ =~ /^at \S+ \((.+):(\d+):(\d+)\)$/) { }
 
+        # at /home/cafe/workspace/JavaScript-V8-CommonJS/share/require.js:45
+        elsif (($source, $line) = $_ =~ /^at (\S+):(\d+)$/) { }
+
         # at test_script:1:6 at test_script:1
-        elsif (($source, $line, $col) = $_ =~ /^at (.+):(\d+):(\d+) at \S+:\d+$/) { }
+        elsif (($source, $line, $col) = $_ =~ /^at (\S+):(\d+):(\d+) at \S+:\d+$/) { }
 
         # unknown line format
         else {

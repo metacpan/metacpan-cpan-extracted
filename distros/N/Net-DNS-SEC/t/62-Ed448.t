@@ -1,11 +1,11 @@
-# $Id: 62-Ed448.t 1664 2018-04-05 10:03:14Z willem $	-*-perl-*-
+# $Id: 62-Ed448.t 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Net::DNS::SEC' => 1.04,
+	'Net::DNS::SEC' => 1.05,
 	'MIME::Base64'	=> 2.13,
 	);
 
@@ -17,7 +17,7 @@ foreach my $package ( sort keys %prerequisite ) {
 }
 
 plan skip_all => "disabled EdDSA"
-		unless eval { Net::DNS::SEC::libcrypto->can('EdDSA_sign') };
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_private_key') };
 
 plan tests => 8;
 
@@ -73,17 +73,14 @@ my $signed = eval { Net::DNS::SEC::EdDSA->sign( $sigdata, $private ) } || '';
 ok( $signed eq $signature, 'signature created using private key' );
 
 
-{
-	my $verified = Net::DNS::SEC::EdDSA->verify( $sigdata, $key, $signature );
-	ok( $verified, 'signature verified using public key' );
-}
+my $verified = Net::DNS::SEC::EdDSA->verify( $sigdata, $key, $signature );
+ok( $verified, 'signature verified using public key' );
 
 
-{
-	my $corrupt = 'corrupted data';
-	my $verified = Net::DNS::SEC::EdDSA->verify( $corrupt, $key, $signature );
-	ok( !$verified, 'signature over corrupt data not verified' );
-}
+my $corrupt = 'corrupted data';
+my $verifiable = Net::DNS::SEC::EdDSA->verify( $corrupt, $key, $signature );
+ok( !$verifiable, 'signature not verifiable if data corrupt' );
+
 
 exit;
 

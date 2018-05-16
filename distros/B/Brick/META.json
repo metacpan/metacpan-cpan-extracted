@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,28 +21,43 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "DateTime" : "0.36",
             "File::MMagic" : "0",
             "MIME::Types" : "0",
             "Storable" : "0",
+            "Time::Moment" : "0.38",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::Data" : "0",
-            "Test::Manifest" : "1.14",
-            "Test::More" : "0",
+            "Test::More" : "0.94",
             "Test::Output" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.227"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/brick/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/brick",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/brick.git",
+         "web" : "https://github.com/briandfoy/brick"
+      }
+   },
+   "version" : "0.228",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

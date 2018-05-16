@@ -13,13 +13,13 @@ isa_ok( $bucket, 'Mock::Bucket' );
 isa_ok( $bucket, Mock::Bucket->bucket_class );
 
 my $sub = $bucket->_uppercase( { filter_fields => [ qw(string string1 string2) ] } );
-	
+
 isa_ok( $sub, ref sub {}, "_uppercase returns a code ref" );
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
-my $input = { 
+my $input = {
 	string      => "Buster",
 	leave_alone => "Mimi Bean",
 	};
@@ -27,10 +27,10 @@ my $input = {
 like( $input->{string},      qr/[a-z]/, "'string' has lowercase" );
 like( $input->{leave_alone}, qr/[a-z]/, "'leave_alone' has lowercase" );
 
-my $result = eval { 
-	$sub->( $input ) 
-	}; 
-	
+my $result = eval {
+	$sub->( $input )
+	};
+
 ok( defined $result, "Result succeeds" );
 diag( "Eval error: $@" ) unless defined $result;
 
@@ -43,7 +43,7 @@ ok( ! exists $input->{string2}, "Does not create missing field" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
-my $input = { 
+my $input = {
 	string1  => "Buster Bean",
 	string2  => "Mimi Bean",
 	};
@@ -51,10 +51,10 @@ my $input = {
 like( $input->{string1}, qr/[a-z]/, "'string1' has lowercase" );
 like( $input->{string2}, qr/[a-z]/, "'string2' has lowercase" );
 
-my $result = eval { 
-	$sub->( $input ) 
-	}; 
-	
+my $result = eval {
+	$sub->( $input )
+	};
+
 ok( defined $result, "Result succeeds" );
 diag( "Eval error: $@" ) unless defined $result;
 

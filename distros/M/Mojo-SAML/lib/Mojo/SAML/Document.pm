@@ -4,9 +4,9 @@ use Mojo::Base -base;
 
 use Carp ();
 use Data::GUID ();
-use Mojolicious;
 use Mojo::ByteStream;
 use Mojo::Date;
+use Mojo::DOM::HTML;
 use Mojo::Template;
 use Mojo::XMLSig;
 
@@ -67,10 +67,9 @@ sub after_render_sign {
 sub before_render { }
 
 {
-  my $mojo = Mojolicious->new;
   package Mojo::SAML::TemplateSandbox;
   use Mojo::SAML::Names qw/binding nameid_format/;
-  sub tag { $mojo->tag(@_) }
+  sub tag { Mojo::ByteStream->new(Mojo::DOM::HTML::tag_to_html(@_)) }
 }
 
 sub build_template {

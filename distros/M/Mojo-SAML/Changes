@@ -1,5 +1,14 @@
 Revision history for Perl distribution Mojo-SAML
 
+0.04 2018-05-14
+  - Bugfix calling isa on non-references
+  - Use new Mojo::DOM::HTML::tag_to_html rather than
+    closing over a Mojolicious app instance for the helper
+  - Bump Mojolicious dependency to 7.78
+
+0.03 2018-05-10
+  - Added extensions to EntityDescriptor
+
 0.02 2018-05-09
   - Fix several documentation problems
   - Add insert_xml_declaration to Document class

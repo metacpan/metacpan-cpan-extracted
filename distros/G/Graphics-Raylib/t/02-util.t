@@ -34,7 +34,7 @@ is $vector5, $vector3;
 
 my $rect = rectangle(x=>10, y=>-12, width => 2, height => 3);
 is ref($rect), 'Graphics::Raylib::XS::Rectangle';
-is "$rect", '(x: 10, y: -12, width: 2, height: 3)';
+is "$rect", '(x: 10.000000, y: -12.000000, width: 2.000000, height: 3.000000)';
 is length $$rect, 16;
 is $rect->x, 10;
 is $rect->y, -12;
@@ -44,15 +44,15 @@ is rectangle(position => vector(10, -12), size => vector(2, 3)), $rect;
 ok rectangle(x=>10, y=> -12, width=> 1, height => 3) x $rect, 'Collision';
 ok !(rectangle(x=>10, y=> 10, width=> 1, height => 3) x $rect), 'No collision';
 
-my $cam = camera(position=>vector(4,2,0), target=>[5,6,7], up => $vector3, fovy => 3.5);
-is ref($cam), 'Graphics::Raylib::XS::Camera';
-is length $$cam, 40;
+my $cam = camera3d(position=>vector(4,2,0), target=>[5,6,7], up => $vector3, fovy => 3.5);
+is ref($cam), 'Graphics::Raylib::XS::Camera3D';
+is length $$cam, 44;
 isnt $cam->position, vector(2,2,0);
 is $cam->position, vector(4,2,0);
 is $cam->target, vector(5,6,7);
 is $cam->up, $vector3;
 is $cam->fovy, 3.5;
-is "$cam", "(position: (4, 2, 0), target: (5, 6, 7), up: $vector3, fovy: 3.5)";
+is "$cam", "(position: (4, 2, 0), target: (5, 6, 7), up: $vector3, fovy: 3.5, type: 0)";
 
-my $cam2 = ${vector(4,2,0)}.${vector(5,6,7)}.$$vector3.pack('f', 3.5);
+my $cam2 = ${vector(4,2,0)}.${vector(5,6,7)}.$$vector3.pack('f2', 3.5, 0);
 is $$cam, $cam2;

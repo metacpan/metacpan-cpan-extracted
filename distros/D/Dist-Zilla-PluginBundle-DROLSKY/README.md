@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 0.89
+version 0.90
 
 # SYNOPSIS
 
@@ -15,8 +15,8 @@ version 0.89
 
     [@DROLSKY]
     dist = My-Module
-    ; Default is MakeMaker - or set it to ModuleBuild
-    make_tool = MakeMaker
+    ; Default is DROLSKY::MakeMaker - or set it to ModuleBuild
+    make_tool = DROLSKY::MakeMaker
     ; These files won't be added to tarball
     exclude_files = ...
     ; Default is DROLSKY
@@ -54,8 +54,8 @@ configure any plugin as needed.
 
 This is more or less equivalent to the following `dist.ini`:
 
-    ; Picks one of these - defaults to MakeMaker
-    [MakeMaker]
+    ; Picks one of these - defaults to DROLSKY::MakeMaker
+    [DROLSKY::MakeMaker]
     [ModuleBuild]
 
     [Git::GatherDir]
@@ -173,7 +173,7 @@ This is more or less equivalent to the following `dist.ini`:
 
     [PodSyntaxTests]
 
-    [RunExtraTests]
+    [DROLSKY::RunExtraTests]
     [MojibakeTests]
     [Test::CleanNamespaces]
     [Test::CPAN::Changes]
@@ -311,7 +311,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

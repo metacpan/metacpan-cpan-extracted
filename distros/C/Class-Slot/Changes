@@ -1,2 +1,11 @@
-{{$NEXT}}
+0.04    2018-05-11
+-*correctly* increment MIN_PERL_VERSION and fix bugtracker metadata (credit: Dan Book)
+
+0.03    2018-05-11
+-increment MIN_PERL_VERSION to 5.82 as older perls do not support 'goto &ref'
+
+0.02    2018-05-10
+-bugfix: indexed slot types' keys may not be unique (RT #125297, credit: TOBYINK)
+
+0.01    2018-04-20
 -Initial release

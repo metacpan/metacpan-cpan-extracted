@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
@@ -22,7 +22,7 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -69,6 +69,7 @@ C<use Graphics::Raylib '+family';> can be used as a shorthand for
 
     use Graphics::Raylib::Color ':all';
     use Graphics::Raylib::Shape;
+    use Graphics::Raylib::Texture;
     use Graphics::Raylib::Text;
     use Graphics::Raylib::Mouse;
     use Graphics::Raylib::Keyboard ':all';
@@ -80,6 +81,7 @@ sub import {
         if ($_ eq '+family') {
             Graphics::Raylib::Color   ->import::into(scalar caller, ':all');
             Graphics::Raylib::Shape   ->import::into(scalar caller);
+            Graphics::Raylib::Texture ->import::into(scalar caller);
             Graphics::Raylib::Text    ->import::into(scalar caller);
             Graphics::Raylib::Mouse   ->import::into(scalar caller);
             Graphics::Raylib::Keyboard->import::into(scalar caller, ':all');
@@ -247,22 +249,23 @@ sub DESTROY {
 
     my $text = Graphics::Raylib::Text->new(color => RED, size => 20);
 
-    my $bitmap = Graphics::Raylib::Shape->bitmap(
+    my $img = Graphics::Raylib::Texture->new(
         matrix => unpdl($gen),
+        fullscreen => 1,
         # color => GOLD # commented-out, we are doing it fancy
     );
 
     my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
 
     while (!$g->exiting) {
-        $bitmap->matrix = unpdl($gen);
-        $bitmap->color = $rainbow->();
+        $img->matrix = unpdl($gen);
+        $img->color = $rainbow->();
         $text->text = "Generation " . ($i++);
 
         $g->clear(BLACK);
 
         Graphics::Raylib::draw {
-            $bitmap->draw;
+            $img->draw;
             $text->draw;
         };
 

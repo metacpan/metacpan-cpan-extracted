@@ -11,15 +11,22 @@
 
 #include "const-c.inc"
 
+typedef struct {
+    int x;
+    int y;
+    int width;
+    int height;
+} IntRectangle;
+
 static int ColorEqual(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 }
-typedef Rectangle ImageSet_t(Color*, Rectangle, Color, unsigned, unsigned);
+typedef IntRectangle ImageSet_t(Color*, IntRectangle, Color, unsigned, unsigned);
 
-static Rectangle
-TransposedImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned height)
+static IntRectangle
+TransposedImageSet(Color *dst, IntRectangle dst_rect, Color color, unsigned width, unsigned height)
 { /* FIXME height/width */
-    Rectangle ret = dst_rect;
+    IntRectangle ret = dst_rect;
     if (width > dst_rect.width-dst_rect.y || height > dst_rect.height-dst_rect.x)
         return dst_rect;
 
@@ -45,10 +52,10 @@ TransposedImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, 
     return ret;
 }
 
-static Rectangle
-ImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned height)
+static IntRectangle
+ImageSet(Color *dst, IntRectangle dst_rect, Color color, unsigned width, unsigned height)
 { /* FIXME height/width */
-    Rectangle ret = dst_rect;
+    IntRectangle ret = dst_rect;
     if (width > dst_rect.width-dst_rect.x || height > dst_rect.height-dst_rect.y)
         return dst_rect;
 
@@ -81,19 +88,19 @@ MODULE = Graphics::Raylib::XS        PACKAGE = Graphics::Raylib::XS
 INCLUDE: const-xs.inc
 
 void
-Begin2dMode(camera)
-    Camera2D    camera
-
-void
-Begin3dMode(camera)
-    Camera    camera
-
-void
 BeginBlendMode(mode)
     int    mode
 
 void
 BeginDrawing()
+
+void
+BeginMode2D(camera)
+    Camera2D    camera
+
+void
+BeginMode3D(camera)
+    Camera3D    camera
 
 void
 BeginShaderMode(shader)
@@ -105,10 +112,6 @@ BeginTextureMode(target)
 
 void
 BeginVrDrawing()
-
-BoundingBox
-MeshBoundingBox(mesh)
-    Mesh    mesh
 
 bool
 ChangeDirectory(dir)
@@ -206,8 +209,16 @@ CloseVrSimulator()
 void
 CloseWindow()
 
-float *
-ColorToFloat(color)
+Vector4
+ColorNormalize(color)
+    Color    color
+
+Vector3
+ColorToHSV(color)
+    Color    color
+
+int
+ColorToInt(color)
     Color    color
 
 void
@@ -215,7 +226,7 @@ DisableCursor()
 
 void
 DrawBillboard(camera, texture, center, size, tint)
-    Camera    camera
+    Camera3D    camera
     Texture2D    texture
     Vector3    center
     float    size
@@ -223,7 +234,7 @@ DrawBillboard(camera, texture, center, size, tint)
 
 void
 DrawBillboardRec(camera, texture, sourceRec, center, size, tint)
-    Camera    camera
+    Camera3D    camera
     Texture2D    texture
     Rectangle    sourceRec
     Vector3    center
@@ -485,6 +496,12 @@ DrawRectangleLines(posX, posY, width, height, color)
     Color    color
 
 void
+DrawRectangleLinesEx(rec, lineThick, color)
+    Rectangle    rec
+    int    lineThick
+    Color    color
+
+void
 DrawRectanglePro(rec, origin, rotation, color)
     Rectangle    rec
     Vector2    origin
@@ -526,19 +543,19 @@ DrawSphereWires(centerPos, radius, rings, slices, color)
 
 void
 DrawText(text, posX, posY, fontSize, color)
-    const char *    text
+    char *    text
     int    posX
     int    posY
     int    fontSize
     Color    color
 
 void
-DrawTextEx(spriteFont, text, position, fontSize, spacing, tint)
-    SpriteFont    spriteFont
-    const char *    text
+DrawTextEx(font, text, position, fontSize, spacing, tint)
+    Font    font
+    char *    text
     Vector2    position
     float    fontSize
-    int    spacing
+    float    spacing
     Color    tint
 
 void
@@ -596,16 +613,16 @@ void
 EnableCursor()
 
 void
-End2dMode()
-
-void
-End3dMode()
-
-void
 EndBlendMode()
 
 void
 EndDrawing()
+
+void
+EndMode2D()
+
+void
+EndMode3D()
 
 void
 EndShaderMode()
@@ -615,6 +632,16 @@ EndTextureMode()
 
 void
 EndVrDrawing()
+
+void
+ExportImage(fileName, image)
+    const char *    fileName
+    Image    image
+
+void
+ExportMesh(fileName, mesh)
+    const char *    fileName
+    Mesh    mesh
 
 Color
 Fade(color, alpha)
@@ -767,7 +794,7 @@ GenTexturePrefilter(shader, cubemap, size)
 
 Matrix
 GetCameraMatrix(camera)
-    Camera    camera
+    Camera3D    camera
 
 RayHitInfo
 GetCollisionRayGround(ray, groundHeight)
@@ -775,9 +802,9 @@ GetCollisionRayGround(ray, groundHeight)
     float    groundHeight
 
 RayHitInfo
-GetCollisionRayMesh(ray, mesh)
+GetCollisionRayModel(ray, model)
     Ray    ray
-    Mesh *    mesh
+    Model *    model
 
 RayHitInfo
 GetCollisionRayTriangle(ray, p1, p2, p3)
@@ -795,7 +822,7 @@ Color
 GetColor(hexValue)
     int    hexValue
 
-SpriteFont
+Font
 GetDefaultFont()
 
 const char *
@@ -851,12 +878,9 @@ Vector2
 GetGesturePinchVector()
 
 int
-ColorToInt(color)
-    Color    color
-
-Vector3
-ColorToHSV(color)
-    Color    color
+GetGlyphIndex(font, character)
+    Font    font
+    int    character
 
 Color *
 GetImageData(image)
@@ -874,7 +898,7 @@ GetMousePosition()
 Ray
 GetMouseRay(mousePosition, camera)
     Vector2    mousePosition
-    Camera    camera
+    Camera3D    camera
 
 int
 GetMouseWheelMove()
@@ -955,7 +979,7 @@ GetWorkingDirectory()
 Vector2
 GetWorldToScreen(position, camera)
     Vector3    position
-    Camera    camera
+    Camera3D    camera
 
 void
 HideCursor()
@@ -1028,6 +1052,13 @@ ImageDraw(dst, src, srcRec, dstRec)
     Rectangle    dstRec
 
 void
+ImageDrawRectangle(dst, position, rec, color)
+    Image *    dst
+    Vector2    position
+    Rectangle    rec
+    Color    color
+
+void
 ImageDrawText(dst, position, text, fontSize, color)
     Image *    dst
     Vector2    position
@@ -1039,10 +1070,10 @@ void
 ImageDrawTextEx(dst, position, font, text, fontSize, spacing, color)
     Image *    dst
     Vector2    position
-    SpriteFont    font
+    Font    font
     const char *    text
     float    fontSize
-    int    spacing
+    float    spacing
     Color    color
 
 void
@@ -1082,10 +1113,10 @@ ImageText(text, fontSize, color)
 
 Image
 ImageTextEx(font, text, fontSize, spacing, tint)
-    SpriteFont    font
+    Font    font
     const char *    text
     float    fontSize
-    int    spacing
+    float    spacing
     Color    tint
 
 void
@@ -1107,13 +1138,10 @@ InitVrSimulator(info)
     VrDeviceInfo    info
 
 void
-InitWindow(width, height, data)
+InitWindow(width, height, title)
     int    width
     int    height
-    const char *    data
-
-bool
-IsWindowReady()
+    char *    title
 
 bool
 IsAudioBufferProcessed(stream)
@@ -1216,9 +1244,23 @@ IsVrSimulatorReady()
 bool
 IsWindowMinimized()
 
+bool
+IsWindowReady()
+
+Font
+LoadFont(fileName)
+    const char *    fileName
+
+Font
+LoadFontEx(fileName, fontSize, charsCount, fontChars)
+    const char *    fileName
+    int    fontSize
+    int    charsCount
+    int *    fontChars
+
 Image
 LoadImage(fileName)
-    const char *    fileName
+    char *    fileName
 
 Image
 LoadImageEx(pixels, width, height)
@@ -1242,11 +1284,9 @@ LoadImageRaw(fileName, width, height, format, headerSize)
     int    headerSize
 
 Image
-LoadImageFromAV(array_ref, color_cb, width, height)
+LoadImageFromAV(array_ref, color_cb)
     SV *array_ref
     SV *color_cb
-    int width
-    int height
   ALIAS:
     LoadImageFromAV_uninitialized_mem = 1
     LoadImageFromAV_transposed = 2
@@ -1256,13 +1296,15 @@ LoadImageFromAV(array_ref, color_cb, width, height)
     AV *av;
     Color *pixels;
     Image img;
+    int literal_color = 0;
     int currwidth = 0;
-    Rectangle where = { 0, 0, 0, 0 };
+    IntRectangle where = { 0, 0, 0, 0 };
     ImageSet_t *my_ImageSet = ImageSet;
   PPCODE:
     if (!SvROK(array_ref) || SvTYPE(SvRV(array_ref)) != SVt_PVAV)
         croak("expected ARRAY ref as first argument");
-    if (!SvROK(color_cb) || SvTYPE(SvRV(color_cb)) != SVt_PVCV)
+    literal_color = !SvOK(color_cb);
+    if (!literal_color && (!SvROK(color_cb) || SvTYPE(SvRV(color_cb)) != SVt_PVCV))
         croak("expected CODE ref as second argument");
 
     av = (AV*)SvRV(array_ref);
@@ -1294,25 +1336,29 @@ LoadImageFromAV(array_ref, color_cb, width, height)
                 /* do something ? */
             }
 
-            PUSHMARK(SP);
-            PUSHs(pixel ? *pixel : &PL_sv_undef);
-            PUSHs(sv_2mortal(newSViv(j)));
-            PUSHs(sv_2mortal(newSViv(i)));
-            PUTBACK;
-
             Color color = BLANK;
-            call_sv(color_cb, G_SCALAR);
-            SPAGAIN;
-            ret = POPs;
-            if (sv_isa(ret, "Graphics::Raylib::XS::Color"))
-                color = *(Color *)SvPV_nolen(SvRV(ret));
+            if (literal_color && pixel) {
+                // No check! stay safe
+                color = *(Color *)SvPV_nolen(SvRV(*pixel));
+            } else {
+                PUSHMARK(SP);
+                PUSHs(pixel ? *pixel : &PL_sv_undef);
+                PUSHs(sv_2mortal(newSViv(j)));
+                PUSHs(sv_2mortal(newSViv(i)));
+                PUTBACK;
+
+                call_sv(color_cb, G_SCALAR);
+                SPAGAIN;
+                SV *ret = POPs;
+                if (sv_isa(ret, "Graphics::Raylib::XS::Color"))
+                    color = *(Color *)SvPV_nolen(SvRV(ret));
+            }
 
             where = my_ImageSet(pixels, where, color, 1, 1);
 
         }
     }
     RETVAL = LoadImageEx(pixels, where.width, where.height);
-    ImageResizeNN(&RETVAL, width, height);
     Safefree(pixels);
     {
         SV * RETVALSV;
@@ -1353,8 +1399,13 @@ LoadRenderTexture(width, height)
 
 Shader
 LoadShader(vsFileName, fsFileName)
-    char *    vsFileName
-    char *    fsFileName
+    const char *    vsFileName
+    const char *    fsFileName
+
+Shader
+LoadShaderCode(vsCode, fsCode)
+    char *    vsCode
+    char *    fsCode
 
 Sound
 LoadSound(fileName)
@@ -1363,17 +1414,6 @@ LoadSound(fileName)
 Sound
 LoadSoundFromWave(wave)
     Wave    wave
-
-SpriteFont
-LoadSpriteFont(fileName)
-    const char *    fileName
-
-SpriteFont
-LoadSpriteFontEx(fileName, fontSize, charsCount, fontChars)
-    const char *    fileName
-    int    fontSize
-    int    charsCount
-    int *    fontChars
 
 char *
 LoadText(fileName)
@@ -1405,11 +1445,23 @@ MeasureText(text, fontSize)
     int    fontSize
 
 Vector2
-MeasureTextEx(spriteFont, text, fontSize, spacing)
-    SpriteFont    spriteFont
+MeasureTextEx(font, text, fontSize, spacing)
+    Font    font
     const char *    text
     float    fontSize
-    int    spacing
+    float    spacing
+
+void
+MeshBinormals(mesh)
+    Mesh *    mesh
+
+BoundingBox
+MeshBoundingBox(mesh)
+    Mesh    mesh
+
+void
+MeshTangents(mesh)
+    Mesh *    mesh
 
 void
 PauseAudioStream(stream)
@@ -1448,11 +1500,6 @@ ResumeSound(sound)
     Sound    sound
 
 void
-SaveImageAs(fileName, image)
-    const char *    fileName
-    Image    image
-
-void
 SetAudioStreamPitch(stream, pitch)
     AudioStream    stream
     float    pitch
@@ -1468,7 +1515,7 @@ SetCameraAltControl(altKey)
 
 void
 SetCameraMode(camera, mode)
-    Camera    camera
+    Camera3D    camera
     int    mode
 
 void
@@ -1515,6 +1562,10 @@ SetMatrixProjection(proj)
 void
 SetMousePosition(position)
     Vector2    position
+
+void
+SetMouseScale(scale)
+    float    scale
 
 void
 SetMusicLoopCount(music, count)
@@ -1602,6 +1653,11 @@ SetWindowPosition(x, y)
     int    y
 
 void
+SetWindowSize(width, height)
+    int    width
+    int    height
+
+void
 SetWindowTitle(title)
     const char *    title
 
@@ -1654,6 +1710,10 @@ TraceLog(logType, text, ...)
     const char *    text
 
 void
+UnloadFont(font)
+    Font    font
+
+void
 UnloadImage(image)
     Image    image
 
@@ -1686,10 +1746,6 @@ UnloadSound(sound)
     Sound    sound
 
 void
-UnloadSpriteFont(spriteFont)
-    SpriteFont    spriteFont
-
-void
 UnloadTexture(texture)
     Texture2D    texture
 
@@ -1705,7 +1761,7 @@ UpdateAudioStream(stream, data, samplesCount)
 
 void
 UpdateCamera(camera)
-    Camera *    camera
+    Camera3D *    camera
 
 void
 UpdateMusicStream(music)
@@ -1729,10 +1785,9 @@ UpdateTextureFromImage(texture, image)
   CODE:
     UpdateTexture(texture, GetImageData(image));
 
-
 void
 UpdateVrTracking(camera)
-    Camera *    camera
+    Camera3D *    camera
 
 Wave
 WaveCopy(wave)

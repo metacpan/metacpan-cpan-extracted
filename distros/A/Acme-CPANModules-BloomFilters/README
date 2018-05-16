@@ -1,0 +1,86 @@
+NAME
+    Acme::CPANModules::BloomFilters - Bloom filter modules on CPAN
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::BloomFilters
+    (from Perl distribution Acme-CPANModules-BloomFilters), released on
+    2018-05-12.
+
+DESCRIPTION
+    Bloom filter modules on CPAN.
+
+    My default, go-to choice is Algorithm::BloomFilter, unless there's a
+    specific feature I need from other implementations.
+
+INCLUDED MODULES
+    *   Bloom::Filter
+
+        Does not provide mehods to save/load to/from strings/files, although
+        you can just take a peek at the source code or the hash object and
+        get the filter there. Performance might not be stellar since it's
+        pure-Perl.
+
+    *   Bloom16
+
+        An Inline::C module. Barely documented. Also does not provide filter
+        saving/loading methods.
+
+    *   Algorithm::BloomFilter
+
+        XS, made by SMUELLER. Can merge other bloom filters. Provides
+        serialize and deserialize methods.
+
+    *   Bloom::Scalable
+
+        Pure-perl module. A little weird, IMO, e.g. with hardcoded
+        filenames. The distribution also provides Bloom::Simple.
+
+    *   Bloom::Simple
+
+        Pure-perl module. A little weird, IMO, e.g. with hardcoded
+        filenames. The distribution also provides Bloom::Simple.
+
+    *   Bloom::Faster
+
+        XS module. Serialize/deserialize directly to/from files, no string
+        (de)serialization provided.
+
+    *   Text::Bloom
+
+        Pure-Perl module, part of Text-Document distribution. Uses
+        Bit::Vector.
+
+    *   App::BloomUtils
+
+    *   Bencher::Scenarios::BloomFilters
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-BloomFilters>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-BloomFilters>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Bloo
+    mFilters>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

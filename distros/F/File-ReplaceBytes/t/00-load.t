@@ -11,4 +11,3 @@ BEGIN {
 }
 
 diag("Testing File::ReplaceBytes $File::ReplaceBytes::VERSION, Perl $], $^X");
-

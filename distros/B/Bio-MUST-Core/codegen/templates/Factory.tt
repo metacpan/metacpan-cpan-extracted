@@ -10,7 +10,9 @@ use autodie;
 use feature qw(say);
 
 use Carp;
+use Const::Fast;
 use File::Spec;
+use List::AllUtils qw(uniq);
 use LWP::Simple qw(get);
 use Path::Class qw(file);
 use Try::Tiny;
@@ -93,13 +95,11 @@ sub _build_code_for {
 
         # build translation table for current code
         my %aa_for = map {
-            join( '', $bases1[$_], $bases2[$_], $bases3[$_] ) => $aas[$_]
+            join( q{}, $bases1[$_], $bases2[$_], $bases3[$_] ) => $aas[$_]
         } 0..$#aas;
 
-        # add gap 'codons' to code
-        $aa_for{'***'} = q{*};
-        $aa_for{'---'} = q{*};
-        $aa_for{'   '} = q{ };
+        # augment code using ambiguous nucleotides and gap codons
+        %aa_for = _augment_code(%aa_for);
 
         # store translation table under its various id and names
         $code_for{$_} = GeneticCode->new(
@@ -109,6 +109,62 @@ sub _build_code_for {
     }
 
     return \%code_for;
+}
+
+const my %BASES_FOR => (
+    A => q{A},
+    C => q{C},
+    G => q{G},
+    T => q{T},
+    U => q{T},
+    M => q{[AC]},
+    R => q{[AG]},
+    W => q{[AT]},
+    S => q{[CG]},
+    Y => q{[CT]},
+    K => q{[GT]},
+    V => q{[ACG]},
+    H => q{[ACT]},
+    D => q{[AGT]},
+    B => q{[CGT]},
+    N => q{[ACGT]},
+    X => q{[ACGT]},
+);
+
+sub _augment_code {
+    my %aa_for = @_;
+
+    my %amb_aa_for;
+
+    # Note: each cannot be used here because of the nested loops
+    my @amb_bases = sort keys %BASES_FOR;
+    for my $ab1 (@amb_bases) {
+        for my $ab2 (@amb_bases) {
+
+            BASE:
+            for my $ab3 (@amb_bases) {
+
+                # build regex for ambiguous codon
+                my $codon = join q{},                        $ab1, $ab2, $ab3;
+                next BASE if exists $aa_for{$codon};
+                my $regex = join q{}, map { $BASES_FOR{$_} } $ab1, $ab2, $ab3;
+
+                # fetch corresponding aas
+                my @aas   = uniq map { $aa_for{$_}  }
+                                grep { m/$regex/xms } keys %aa_for;
+
+                # add ambiguous codon to code if all aas are the same
+                $amb_aa_for{$codon} = shift @aas if @aas == 1;
+            }
+        }
+    }
+
+    # add gap 'codons' to code
+    $amb_aa_for{'***'} = q{*};
+    $amb_aa_for{'---'} = q{*};
+    $amb_aa_for{'   '} = q{ };
+
+    return (%aa_for, %amb_aa_for);
 }
 
 ## use critic

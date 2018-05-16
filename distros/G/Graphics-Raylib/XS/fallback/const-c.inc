@@ -451,7 +451,8 @@ static int
 constant_7 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     DEG2RAD KEY_F10 KEY_F11 KEY_F12 KEY_ONE KEY_SIX KEY_TWO RAD2DEG */
+     DEG2RAD KEY_END KEY_F10 KEY_F11 KEY_F12 KEY_ONE KEY_SIX KEY_TAB KEY_TWO
+     RAD2DEG */
   /* Offset 6 gives the best switch position.  */
   switch (name[6]) {
   case '0':
@@ -487,11 +488,31 @@ constant_7 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'B':
+    if (memEQ(name, "KEY_TA", 6)) {
+    /*                     B     */
+#ifdef KEY_TAB
+      *iv_return = KEY_TAB;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'D':
     if (memEQ(name, "DEG2RA", 6)) {
     /*                     D     */
 #ifdef DEG2RAD
       *iv_return = DEG2RAD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "KEY_EN", 6)) {
+    /*                     D     */
+#ifdef KEY_END
+      *iv_return = KEY_END;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -550,40 +571,13 @@ static int
 constant_8 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     KEY_BACK KEY_DOWN KEY_FIVE KEY_FOUR KEY_LEFT KEY_MENU KEY_NINE KEY_ZERO
-     LOG_INFO MAP_BRDF */
-  /* Offset 7 gives the best switch position.  */
-  switch (name[7]) {
-  case 'E':
-    if (memEQ(name, "KEY_FIV", 7)) {
-    /*                      E     */
-#ifdef KEY_FIVE
-      *iv_return = KEY_FIVE;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    if (memEQ(name, "KEY_NIN", 7)) {
-    /*                      E     */
-#ifdef KEY_NINE
-      *iv_return = KEY_NINE;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    break;
-  case 'F':
-    if (memEQ(name, "MAP_BRD", 7)) {
-    /*                      F     */
-      *iv_return = MAP_BRDF;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'K':
-    if (memEQ(name, "KEY_BAC", 7)) {
-    /*                      K     */
+     KEY_BACK KEY_DOWN KEY_FIVE KEY_FOUR KEY_HOME KEY_LEFT KEY_MENU KEY_NINE
+     KEY_ZERO LOG_INFO MAP_BRDF */
+  /* Offset 6 gives the best switch position.  */
+  switch (name[6]) {
+  case 'C':
+    if (memEQ(name, "KEY_BACK", 8)) {
+    /*                     ^       */
 #ifdef KEY_BACK
       *iv_return = KEY_BACK;
       return PERL_constant_ISIV;
@@ -592,20 +586,63 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'N':
-    if (memEQ(name, "KEY_DOW", 7)) {
-    /*                      N     */
-#ifdef KEY_DOWN
-      *iv_return = KEY_DOWN;
+  case 'D':
+    if (memEQ(name, "MAP_BRDF", 8)) {
+    /*                     ^       */
+      *iv_return = MAP_BRDF;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'F':
+    if (memEQ(name, "KEY_LEFT", 8)) {
+    /*                     ^       */
+#ifdef KEY_LEFT
+      *iv_return = KEY_LEFT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "LOG_INFO", 8)) {
+    /*                     ^       */
+      *iv_return = LOG_INFO;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'M':
+    if (memEQ(name, "KEY_HOME", 8)) {
+    /*                     ^       */
+#ifdef KEY_HOME
+      *iv_return = KEY_HOME;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'O':
-    if (memEQ(name, "KEY_ZER", 7)) {
-    /*                      O     */
+  case 'N':
+    if (memEQ(name, "KEY_MENU", 8)) {
+    /*                     ^       */
+#ifdef KEY_MENU
+      *iv_return = KEY_MENU;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "KEY_NINE", 8)) {
+    /*                     ^       */
+#ifdef KEY_NINE
+      *iv_return = KEY_NINE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "KEY_ZERO", 8)) {
+    /*                     ^       */
 #ifdef KEY_ZERO
       *iv_return = KEY_ZERO;
       return PERL_constant_ISIV;
@@ -613,15 +650,10 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
-    if (memEQ(name, "LOG_INF", 7)) {
-    /*                      O     */
-      *iv_return = LOG_INFO;
-      return PERL_constant_ISIV;
-    }
     break;
-  case 'R':
-    if (memEQ(name, "KEY_FOU", 7)) {
-    /*                      R     */
+  case 'U':
+    if (memEQ(name, "KEY_FOUR", 8)) {
+    /*                     ^       */
 #ifdef KEY_FOUR
       *iv_return = KEY_FOUR;
       return PERL_constant_ISIV;
@@ -630,22 +662,22 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'T':
-    if (memEQ(name, "KEY_LEF", 7)) {
-    /*                      T     */
-#ifdef KEY_LEFT
-      *iv_return = KEY_LEFT;
+  case 'V':
+    if (memEQ(name, "KEY_FIVE", 8)) {
+    /*                     ^       */
+#ifdef KEY_FIVE
+      *iv_return = KEY_FIVE;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'U':
-    if (memEQ(name, "KEY_MEN", 7)) {
-    /*                      U     */
-#ifdef KEY_MENU
-      *iv_return = KEY_MENU;
+  case 'W':
+    if (memEQ(name, "KEY_DOWN", 8)) {
+    /*                     ^       */
+#ifdef KEY_DOWN
+      *iv_return = KEY_DOWN;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -660,10 +692,21 @@ static int
 constant_9 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     KEY_EIGHT KEY_ENTER KEY_RIGHT KEY_SEVEN KEY_SPACE KEY_THREE LOG_DEBUG
-     LOG_ERROR LOG_OTHER */
+     KEY_EIGHT KEY_ENTER KEY_GRAVE KEY_PAUSE KEY_RIGHT KEY_SEVEN KEY_SLASH
+     KEY_SPACE KEY_THREE LOG_DEBUG LOG_ERROR LOG_OTHER */
   /* Offset 5 gives the best switch position.  */
   switch (name[5]) {
+  case 'A':
+    if (memEQ(name, "KEY_PAUSE", 9)) {
+    /*                    ^         */
+#ifdef KEY_PAUSE
+      *iv_return = KEY_PAUSE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'E':
     if (memEQ(name, "KEY_SEVEN", 9)) {
     /*                    ^         */
@@ -711,6 +754,17 @@ constant_9 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'L':
+    if (memEQ(name, "KEY_SLASH", 9)) {
+    /*                    ^         */
+#ifdef KEY_SLASH
+      *iv_return = KEY_SLASH;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'N':
     if (memEQ(name, "KEY_ENTER", 9)) {
     /*                    ^         */
@@ -734,6 +788,15 @@ constant_9 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'R':
+    if (memEQ(name, "KEY_GRAVE", 9)) {
+    /*                    ^         */
+#ifdef KEY_GRAVE
+      *iv_return = KEY_GRAVE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "LOG_ERROR", 9)) {
     /*                    ^         */
       *iv_return = LOG_ERROR;
@@ -755,12 +818,41 @@ static int
 constant_10 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     KEY_ESCAPE MAP_ALBEDO MAP_HEIGHT MAP_NORMAL WRAP_CLAMP */
-  /* Offset 9 gives the best switch position.  */
-  switch (name[9]) {
-  case 'E':
-    if (memEQ(name, "KEY_ESCAP", 9)) {
-    /*                        E     */
+     KEY_DELETE KEY_ESCAPE KEY_INSERT MAP_ALBEDO MAP_HEIGHT MAP_NORMAL
+     WRAP_CLAMP */
+  /* Offset 8 gives the best switch position.  */
+  switch (name[8]) {
+  case 'A':
+    if (memEQ(name, "MAP_NORMAL", 10)) {
+    /*                       ^        */
+      *iv_return = MAP_NORMAL;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "MAP_ALBEDO", 10)) {
+    /*                       ^        */
+      *iv_return = MAP_ALBEDO;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'H':
+    if (memEQ(name, "MAP_HEIGHT", 10)) {
+    /*                       ^        */
+      *iv_return = MAP_HEIGHT;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'M':
+    if (memEQ(name, "WRAP_CLAMP", 10)) {
+    /*                       ^        */
+      *iv_return = WRAP_CLAMP;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'P':
+    if (memEQ(name, "KEY_ESCAPE", 10)) {
+    /*                       ^        */
 #ifdef KEY_ESCAPE
       *iv_return = KEY_ESCAPE;
       return PERL_constant_ISIV;
@@ -769,32 +861,26 @@ constant_10 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'L':
-    if (memEQ(name, "MAP_NORMA", 9)) {
-    /*                        L     */
-      *iv_return = MAP_NORMAL;
+  case 'R':
+    if (memEQ(name, "KEY_INSERT", 10)) {
+    /*                       ^        */
+#ifdef KEY_INSERT
+      *iv_return = KEY_INSERT;
       return PERL_constant_ISIV;
-    }
-    break;
-  case 'O':
-    if (memEQ(name, "MAP_ALBED", 9)) {
-    /*                        O     */
-      *iv_return = MAP_ALBEDO;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'P':
-    if (memEQ(name, "WRAP_CLAM", 9)) {
-    /*                        P     */
-      *iv_return = WRAP_CLAMP;
-      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'T':
-    if (memEQ(name, "MAP_HEIGH", 9)) {
-    /*                        T     */
-      *iv_return = MAP_HEIGHT;
+    if (memEQ(name, "KEY_DELETE", 10)) {
+    /*                       ^        */
+#ifdef KEY_DELETE
+      *iv_return = KEY_DELETE;
       return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   }
@@ -805,8 +891,8 @@ static int
 constant_11 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BLEND_ALPHA CAMERA_FREE GESTURE_TAP LOG_WARNING MAP_CUBEMAP MAP_DIFFUSE
-     WRAP_MIRROR WRAP_REPEAT */
+     BLEND_ALPHA CAMERA_FREE GESTURE_TAP KEY_PAGE_UP LOG_WARNING MAP_CUBEMAP
+     MAP_DIFFUSE WRAP_MIRROR WRAP_REPEAT */
   /* Offset 8 gives the best switch position.  */
   switch (name[8]) {
   case 'E':
@@ -867,6 +953,17 @@ constant_11 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case '_':
+    if (memEQ(name, "KEY_PAGE_UP", 11)) {
+    /*                       ^         */
+#ifdef KEY_PAGE_UP
+      *iv_return = KEY_PAGE_UP;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   }
   return PERL_constant_NOTFOUND;
 }
@@ -876,7 +973,7 @@ constant_12 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      FILTER_POINT GESTURE_DRAG GESTURE_HOLD GESTURE_NONE KEY_LEFT_ALT
-     LOC_MAP_BRDF MAP_EMISSION MAP_SPECULAR */
+     KEY_NUM_LOCK LOC_MAP_BRDF MAP_EMISSION MAP_SPECULAR */
   /* Offset 8 gives the best switch position.  */
   switch (name[8]) {
   case 'B':
@@ -898,6 +995,17 @@ constant_12 (pTHX_ const char *name, IV *iv_return) {
     /*                       ^          */
       *iv_return = GESTURE_HOLD;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "KEY_NUM_LOCK", 12)) {
+    /*                       ^          */
+#ifdef KEY_NUM_LOCK
+      *iv_return = KEY_NUM_LOCK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'N':
@@ -951,8 +1059,9 @@ static int
 constant_13 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CAMERA_CUSTOM HMD_OCULUS_GO HMD_SONY_PSVR KEY_BACKSPACE KEY_RIGHT_ALT
-     KEY_VOLUME_UP MAP_METALNESS MAP_OCCLUSION MAP_PREFILTER MAP_ROUGHNESS */
+     CAMERA_CUSTOM HMD_OCULUS_GO HMD_SONY_PSVR KEY_BACKSLASH KEY_BACKSPACE
+     KEY_CAPS_LOCK KEY_PAGE_DOWN KEY_RIGHT_ALT KEY_VOLUME_UP MAP_METALNESS
+     MAP_OCCLUSION MAP_PREFILTER MAP_ROUGHNESS */
   /* Offset 7 gives the best switch position.  */
   switch (name[7]) {
   case 'A':
@@ -967,6 +1076,17 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
     /*                      ^            */
       *iv_return = CAMERA_CUSTOM;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'E':
+    if (memEQ(name, "KEY_PAGE_DOWN", 13)) {
+    /*                      ^            */
+#ifdef KEY_PAGE_DOWN
+      *iv_return = KEY_PAGE_DOWN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'F':
@@ -995,6 +1115,15 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'K':
+    if (memEQ(name, "KEY_BACKSLASH", 13)) {
+    /*                      ^            */
+#ifdef KEY_BACKSLASH
+      *iv_return = KEY_BACKSLASH;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "KEY_BACKSPACE", 13)) {
     /*                      ^            */
 #ifdef KEY_BACKSPACE
@@ -1015,6 +1144,17 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
     /*                      ^            */
       *iv_return = MAP_OCCLUSION;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'S':
+    if (memEQ(name, "KEY_CAPS_LOCK", 13)) {
+    /*                      ^            */
+#ifdef KEY_CAPS_LOCK
+      *iv_return = KEY_CAPS_LOCK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'U':
@@ -1125,8 +1265,9 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      FILTER_BILINEAR FLAG_VSYNC_HINT GAMEPAD_PLAYER1 GAMEPAD_PLAYER2
-     GAMEPAD_PLAYER3 GAMEPAD_PLAYER4 KEY_RIGHT_SHIFT KEY_VOLUME_DOWN
-     LOC_MAP_CUBEMAP LOC_MAP_DIFFUSE LOC_MATRIX_VIEW LOC_VECTOR_VIEW */
+     GAMEPAD_PLAYER3 GAMEPAD_PLAYER4 KEY_RIGHT_SHIFT KEY_SCROLL_LOCK
+     KEY_VOLUME_DOWN LOC_MAP_CUBEMAP LOC_MAP_DIFFUSE LOC_MATRIX_VIEW
+     LOC_VECTOR_VIEW */
   /* Offset 14 gives the best switch position.  */
   switch (name[14]) {
   case '1':
@@ -1178,6 +1319,17 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
     /*                             E      */
 #ifdef LOC_MAP_DIFFUSE
       *iv_return = LOC_MAP_DIFFUSE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'K':
+    if (memEQ(name, "KEY_SCROLL_LOC", 14)) {
+    /*                             K      */
+#ifdef KEY_SCROLL_LOCK
+      *iv_return = KEY_SCROLL_LOCK;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -1250,7 +1402,7 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      BLEND_MULTIPLIED FILTER_TRILINEAR GESTURE_PINCH_IN GESTURE_SWIPE_UP
-     KEY_LEFT_CONTROL LOC_MAP_EMISSION LOC_MAP_OCCLUSION LOC_MAP_SPECULAR
+     KEY_LEFT_CONTROL KEY_PRINT_SCREEN LOC_MAP_EMISSION LOC_MAP_SPECULAR
      LOC_MATRIX_MODEL LOC_VERTEX_COLOR MAX_TOUCH_POINTS UNCOMPRESSED_R32 */
   /* Offset 12 gives the best switch position.  */
   switch (name[12]) {
@@ -1305,15 +1457,21 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_ISIV;
     }
     break;
+  case 'R':
+    if (memEQ(name, "KEY_PRINT_SCREEN", 16)) {
+    /*                           ^          */
+#ifdef KEY_PRINT_SCREEN
+      *iv_return = KEY_PRINT_SCREEN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'S':
     if (memEQ(name, "LOC_MAP_EMISSION", 16)) {
     /*                           ^          */
       *iv_return = LOC_MAP_EMISSION;
-      return PERL_constant_ISIV;
-    }
-    if (memEQ(name, "LOC_MAP_OCCLUSION", 16)) {
-    /*                           ^          */
-      *iv_return = LOC_MAP_OCCLUSION;
       return PERL_constant_ISIV;
     }
     break;
@@ -1355,8 +1513,9 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      FLAG_MSAA_4X_HINT GESTURE_DOUBLETAP GESTURE_PINCH_OUT KEY_RIGHT_CONTROL
-     LOC_COLOR_AMBIENT LOC_COLOR_DIFFUSE LOC_MAP_METALNESS LOC_MAP_PREFILTER
-     LOC_MAP_ROUGHNESS LOC_VERTEX_NORMAL MAX_MATERIAL_MAPS MOUSE_LEFT_BUTTON */
+     LOC_COLOR_AMBIENT LOC_COLOR_DIFFUSE LOC_MAP_METALNESS LOC_MAP_OCCLUSION
+     LOC_MAP_PREFILTER LOC_MAP_ROUGHNESS LOC_VERTEX_NORMAL MAX_MATERIAL_MAPS
+     MOUSE_LEFT_BUTTON */
   /* Offset 11 gives the best switch position.  */
   switch (name[11]) {
   case 'A':
@@ -1411,6 +1570,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'L':
+    if (memEQ(name, "LOC_MAP_OCCLUSION", 17)) {
+    /*                          ^            */
+      *iv_return = LOC_MAP_OCCLUSION;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "MAX_MATERIAL_MAPS", 17)) {
     /*                          ^            */
 #ifdef MAX_MATERIAL_MAPS
@@ -1465,42 +1629,28 @@ static int
 constant_18 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     GESTURE_SWIPE_DOWN GESTURE_SWIPE_LEFT HMD_DEFAULT_DEVICE
-     HMD_VALVE_HTC_VIVE LOC_COLOR_SPECULAR LOC_MAP_IRRADIANCE
-     LOC_VERTEX_TANGENT MOUSE_RIGHT_BUTTON */
-  /* Offset 14 gives the best switch position.  */
-  switch (name[14]) {
-  case 'A':
-    if (memEQ(name, "LOC_MAP_IRRADIANCE", 18)) {
-    /*                             ^          */
-      *iv_return = LOC_MAP_IRRADIANCE;
+     CAMERA_PERSPECTIVE GESTURE_SWIPE_DOWN GESTURE_SWIPE_LEFT
+     HMD_DEFAULT_DEVICE HMD_VALVE_HTC_VIVE LOC_COLOR_SPECULAR
+     LOC_MAP_IRRADIANCE LOC_VERTEX_TANGENT MOUSE_RIGHT_BUTTON */
+  /* Offset 4 gives the best switch position.  */
+  switch (name[4]) {
+  case 'C':
+    if (memEQ(name, "LOC_COLOR_SPECULAR", 18)) {
+    /*                   ^                    */
+      *iv_return = LOC_COLOR_SPECULAR;
       return PERL_constant_ISIV;
     }
     break;
   case 'D':
-    if (memEQ(name, "GESTURE_SWIPE_DOWN", 18)) {
-    /*                             ^          */
-      *iv_return = GESTURE_SWIPE_DOWN;
+    if (memEQ(name, "HMD_DEFAULT_DEVICE", 18)) {
+    /*                   ^                    */
+      *iv_return = HMD_DEFAULT_DEVICE;
       return PERL_constant_ISIV;
     }
     break;
-  case 'G':
-    if (memEQ(name, "LOC_VERTEX_TANGENT", 18)) {
-    /*                             ^          */
-      *iv_return = LOC_VERTEX_TANGENT;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'L':
-    if (memEQ(name, "GESTURE_SWIPE_LEFT", 18)) {
-    /*                             ^          */
-      *iv_return = GESTURE_SWIPE_LEFT;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'T':
+  case 'E':
     if (memEQ(name, "MOUSE_RIGHT_BUTTON", 18)) {
-    /*                             ^          */
+    /*                   ^                    */
 #ifdef MOUSE_RIGHT_BUTTON
       *iv_return = MOUSE_RIGHT_BUTTON;
       return PERL_constant_ISIV;
@@ -1509,22 +1659,41 @@ constant_18 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'M':
+    if (memEQ(name, "LOC_MAP_IRRADIANCE", 18)) {
+    /*                   ^                    */
+      *iv_return = LOC_MAP_IRRADIANCE;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "CAMERA_PERSPECTIVE", 18)) {
+    /*                   ^                    */
+      *iv_return = CAMERA_PERSPECTIVE;
+      return PERL_constant_ISIV;
+    }
+    break;
   case 'U':
-    if (memEQ(name, "LOC_COLOR_SPECULAR", 18)) {
-    /*                             ^          */
-      *iv_return = LOC_COLOR_SPECULAR;
+    if (memEQ(name, "GESTURE_SWIPE_DOWN", 18)) {
+    /*                   ^                    */
+      *iv_return = GESTURE_SWIPE_DOWN;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "GESTURE_SWIPE_LEFT", 18)) {
+    /*                   ^                    */
+      *iv_return = GESTURE_SWIPE_LEFT;
       return PERL_constant_ISIV;
     }
     break;
   case 'V':
-    if (memEQ(name, "HMD_DEFAULT_DEVICE", 18)) {
-    /*                             ^          */
-      *iv_return = HMD_DEFAULT_DEVICE;
+    if (memEQ(name, "HMD_VALVE_HTC_VIVE", 18)) {
+    /*                   ^                    */
+      *iv_return = HMD_VALVE_HTC_VIVE;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "HMD_VALVE_HTC_VIVE", 18)) {
-    /*                             ^          */
-      *iv_return = HMD_VALVE_HTC_VIVE;
+    if (memEQ(name, "LOC_VERTEX_TANGENT", 18)) {
+    /*                   ^                    */
+      *iv_return = LOC_VERTEX_TANGENT;
       return PERL_constant_ISIV;
     }
     break;
@@ -1536,11 +1705,12 @@ static int
 constant_19 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CAMERA_FIRST_PERSON CAMERA_THIRD_PERSON COMPRESSED_DXT1_RGB
-     COMPRESSED_ETC1_RGB COMPRESSED_ETC2_RGB COMPRESSED_PVRT_RGB
-     GAMEPAD_PS3_AXIS_L2 GAMEPAD_PS3_AXIS_R2 GESTURE_SWIPE_RIGHT
-     HMD_OCULUS_RIFT_CV1 HMD_OCULUS_RIFT_DK2 LOC_VERTEX_POSITION
-     MOUSE_MIDDLE_BUTTON UNCOMPRESSED_R5G6B5 UNCOMPRESSED_R8G8B8 */
+     CAMERA_FIRST_PERSON CAMERA_ORTHOGRAPHIC CAMERA_THIRD_PERSON
+     COMPRESSED_DXT1_RGB COMPRESSED_ETC1_RGB COMPRESSED_ETC2_RGB
+     COMPRESSED_PVRT_RGB GAMEPAD_PS3_AXIS_L2 GAMEPAD_PS3_AXIS_R2
+     GESTURE_SWIPE_RIGHT HMD_OCULUS_RIFT_CV1 HMD_OCULUS_RIFT_DK2
+     LOC_VERTEX_POSITION MOUSE_MIDDLE_BUTTON UNCOMPRESSED_R5G6B5
+     UNCOMPRESSED_R8G8B8 */
   /* Offset 16 gives the best switch position.  */
   switch (name[16]) {
   case '6':
@@ -1575,6 +1745,13 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "GESTURE_SWIPE_RIGHT", 19)) {
     /*                               ^         */
       *iv_return = GESTURE_SWIPE_RIGHT;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'H':
+    if (memEQ(name, "CAMERA_ORTHOGRAPHIC", 19)) {
+    /*                               ^         */
+      *iv_return = CAMERA_ORTHOGRAPHIC;
       return PERL_constant_ISIV;
     }
     break;
@@ -2336,15 +2513,18 @@ my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
 	       GAMEPAD_XBOX_BUTTON_RB GAMEPAD_XBOX_BUTTON_RIGHT
 	       GAMEPAD_XBOX_BUTTON_SELECT GAMEPAD_XBOX_BUTTON_START
 	       GAMEPAD_XBOX_BUTTON_UP GAMEPAD_XBOX_BUTTON_X
-	       GAMEPAD_XBOX_BUTTON_Y KEY_A KEY_B KEY_BACK KEY_BACKSPACE KEY_C
-	       KEY_D KEY_DOWN KEY_E KEY_EIGHT KEY_ENTER KEY_ESCAPE KEY_F KEY_F1
+	       GAMEPAD_XBOX_BUTTON_Y KEY_A KEY_B KEY_BACK KEY_BACKSLASH
+	       KEY_BACKSPACE KEY_C KEY_CAPS_LOCK KEY_D KEY_DELETE KEY_DOWN
+	       KEY_E KEY_EIGHT KEY_END KEY_ENTER KEY_ESCAPE KEY_F KEY_F1
 	       KEY_F10 KEY_F11 KEY_F12 KEY_F2 KEY_F3 KEY_F4 KEY_F5 KEY_F6
-	       KEY_F7 KEY_F8 KEY_F9 KEY_FIVE KEY_FOUR KEY_G KEY_H KEY_I KEY_J
-	       KEY_K KEY_L KEY_LEFT KEY_LEFT_ALT KEY_LEFT_CONTROL
-	       KEY_LEFT_SHIFT KEY_M KEY_MENU KEY_N KEY_NINE KEY_O KEY_ONE KEY_P
-	       KEY_Q KEY_R KEY_RIGHT KEY_RIGHT_ALT KEY_RIGHT_CONTROL
-	       KEY_RIGHT_SHIFT KEY_S KEY_SEVEN KEY_SIX KEY_SPACE KEY_T
-	       KEY_THREE KEY_TWO KEY_U KEY_UP KEY_V KEY_VOLUME_DOWN
+	       KEY_F7 KEY_F8 KEY_F9 KEY_FIVE KEY_FOUR KEY_G KEY_GRAVE KEY_H
+	       KEY_HOME KEY_I KEY_INSERT KEY_J KEY_K KEY_L KEY_LEFT
+	       KEY_LEFT_ALT KEY_LEFT_CONTROL KEY_LEFT_SHIFT KEY_M KEY_MENU
+	       KEY_N KEY_NINE KEY_NUM_LOCK KEY_O KEY_ONE KEY_P KEY_PAGE_DOWN
+	       KEY_PAGE_UP KEY_PAUSE KEY_PRINT_SCREEN KEY_Q KEY_R KEY_RIGHT
+	       KEY_RIGHT_ALT KEY_RIGHT_CONTROL KEY_RIGHT_SHIFT KEY_S
+	       KEY_SCROLL_LOCK KEY_SEVEN KEY_SIX KEY_SLASH KEY_SPACE KEY_T
+	       KEY_TAB KEY_THREE KEY_TWO KEY_U KEY_UP KEY_V KEY_VOLUME_DOWN
 	       KEY_VOLUME_UP KEY_W KEY_X KEY_Y KEY_Z KEY_ZERO LOC_MAP_DIFFUSE
 	       LOC_MAP_SPECULAR MAP_DIFFUSE MAP_SPECULAR MAX_MATERIAL_MAPS
 	       MAX_SHADER_LOCATIONS MAX_TOUCH_POINTS MOUSE_LEFT_BUTTON
@@ -2356,6 +2536,8 @@ my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
             {name=>"CAMERA_FIRST_PERSON", type=>"IV", macro=>"1"},
             {name=>"CAMERA_FREE", type=>"IV", macro=>"1"},
             {name=>"CAMERA_ORBITAL", type=>"IV", macro=>"1"},
+            {name=>"CAMERA_ORTHOGRAPHIC", type=>"IV", macro=>"1"},
+            {name=>"CAMERA_PERSPECTIVE", type=>"IV", macro=>"1"},
             {name=>"CAMERA_THIRD_PERSON", type=>"IV", macro=>"1"},
             {name=>"COMPRESSED_ASTC_4x4_RGBA", type=>"IV", macro=>"1"},
             {name=>"COMPRESSED_ASTC_8x8_RGBA", type=>"IV", macro=>"1"},

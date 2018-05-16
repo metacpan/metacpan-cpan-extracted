@@ -21,7 +21,7 @@ my $die_sub   = sub { die {
 	message => 'I die for no good reason other than I like it',
 	} };
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my $sub = $bucket->__compose_satisfy_N_to_M( 0, 1, $true_sub );
 isa_ok( $sub, ref sub {}, "_value_length_is_equal_to_less_than returns a hash ref" );
@@ -30,7 +30,7 @@ my $result = eval { $sub->({}) };
 is( $result, 1, "Satisfied zero or one true test" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my $sub = $bucket->__compose_satisfy_N_to_M( 1, 1, $true_sub );
 isa_ok( $sub, ref sub {}, "'code' key has a sub reference in it" );
@@ -39,7 +39,7 @@ my $result = eval { $sub->({}) };
 is( $result, 1, "Satisfied exactly one true test" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my $sub = $bucket->__compose_satisfy_N_to_M( 2, 2, $true_sub );
 isa_ok( $sub, ref sub {}, "_value_length_is_equal_to_less_than returns a code ref" );
@@ -59,7 +59,7 @@ is( scalar @{$at->{errors}}, 0, "'errors' key is an anonymous array with no elem
 }
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my $sub = $bucket->__compose_satisfy_N_to_M( 2, 2, $true_sub, $false_sub );
 isa_ok( $sub, ref sub {}, "_value_length_is_equal_to_less_than returns a code ref" );
@@ -70,7 +70,7 @@ my $at = $@;
 is( $result, 1, "Satisfied exactly one true test" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my @subs = ( $die_sub, $true_sub, $false_sub  );
 

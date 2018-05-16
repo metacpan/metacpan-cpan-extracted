@@ -4,7 +4,7 @@
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,6 +39,8 @@
       },
       "test" : {
          "requires" : {
+            "Encode" : "0",
+            "Test::Deep" : "0",
             "Test::More" : "0.88",
             "Test::YAML" : "1.05"
          }
@@ -56,7 +58,7 @@
          "web" : "https://github.com/ingydotnet/yaml-pm"
       }
    },
-   "version" : "1.24",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.25",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

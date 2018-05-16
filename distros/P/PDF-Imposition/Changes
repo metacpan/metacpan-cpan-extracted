@@ -1,5 +1,9 @@
 Revision history for perl module PDF-Imposition
 
+0.25 2018-05-12
+
+ - New schema, 2x4x1, contributed by @drennanelawar
+
 0.24 2017-03-12
 
  - Add supported options (in module and script) for PDF::Cropmarks

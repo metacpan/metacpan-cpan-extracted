@@ -17,7 +17,7 @@ package SOAP::Lite;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 package SOAP::XMLSchemaApacheSOAP::Deserializer;
 
@@ -2480,7 +2480,7 @@ package SOAP::Client;
 
 use SOAP::Lite::Utils;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 sub BEGIN {
     __PACKAGE__->__mk_accessors(qw(endpoint code message
         is_success status options));

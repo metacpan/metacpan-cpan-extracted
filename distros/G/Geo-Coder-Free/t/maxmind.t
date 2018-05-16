@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 71;
+use Test::Most tests => 72;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -74,9 +74,12 @@ LOOKUP: {
 	# $location = $geocoder->geocode('Wokingham, Berkshire, Scotland');
 	# ok(!defined($location));
 
-	does_croak(sub {
-		$location = $geocoder->geocode('Minster, Thanet, Kent, England');
-	});
+	$location = $geocoder->geocode('Minster, Thanet, Kent, England');
+	TODO: {
+		local $TODO = 'Minster, Thanet not yet supported';
+
+		ok(!defined($location));
+	}
 
 	$location = $geocoder->geocode('Silver Spring, Maryland, USA');
 	ok(defined($location));
@@ -111,9 +114,11 @@ LOOKUP: {
 	delta_within($location->{latitude}, 51.35, 1e-2);
 	delta_within($location->{longitude}, 1.25, 1e-2);
 
-	does_croak(sub {
-		$location = $geocoder->geocode('Rockville Pike, Rockville, Montgomery County, MD, USA');
-	});
+	$location = $geocoder->geocode('Rockville Pike, Rockville, Montgomery County, MD, USA');
+	TODO: {
+		local $TODO = "Don't know how to parse counties in the USA";
+		ok(!defined($location));
+	}
 
 	# FIXME:  this actually does a look up that fails
 	$location = $geocoder->geocode('Rockville Pike, Rockville, MD, USA');

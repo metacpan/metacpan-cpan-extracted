@@ -564,7 +564,7 @@ package OxdSetupClient;	# This is the &quot;Class&quot;
     # 
     # *Example response from getResponseObject:*
     # --- Code
-    # { "status": "ok", "data": { "oxd_id": "c73134c8-c4ca-4bab-9baa-2e0ca20cc433", "op_host": "https://idp-hostname", "client_id": "@!4116.DF7C.62D4.D0CF!0001!D420.A5E5!0008!616C.398A.1380.1F45", "client_secret": "f996649f-b027-4537-abe5-71b7cb71ebae", "client_registration_access_token": "67e957b8-823e-412d-8e89-616c45b2db62", "client_registration_client_uri": "https://idp-hostname/oxauth/restv1/register?client_id=@!4116.DF7C.62D4.D0CF!0001!D420.A5E5!0008!616C.398A.1380.1F45", "client_id_issued_at": 1513857463, "client_secret_expires_at": 1513943863 } }
+    # { "status": "ok", "data": { "oxd_id": "c73134c8-c4ca-4bab-9baa-2e0ca20cc433", "client_id_of_oxd_id": "@!1736.179E.AA60.16B2!0001!8F7C.B9AB!0008!A2BB.9AE6.AAA4", "op_host": "https://idp-hostname", "setup_client_oxd_id": "<setup client oxd_id>", "client_id": "@!4116.DF7C.62D4.D0CF!0001!D420.A5E5!0008!616C.398A.1380.1F45", "client_secret": "f996649f-b027-4537-abe5-71b7cb71ebae", "client_registration_access_token": "67e957b8-823e-412d-8e89-616c45b2db62", "client_registration_client_uri": "https://idp-hostname/oxauth/restv1/register?client_id=@!4116.DF7C.62D4.D0CF!0001!D420.A5E5!0008!616C.398A.1380.1F45", "client_id_issued_at": 1513857463, "client_secret_expires_at": 1513943863 } }
     # ---
     #
     sub setParams{

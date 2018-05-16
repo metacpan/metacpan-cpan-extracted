@@ -10,30 +10,30 @@ $ENV{DEBUG} ||= 0;
 
 use_ok( 'Brick::Dates' );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my @profile = (
-	[ now => _date_is_after => { 
-		start_date_field  => 'last_year', 
+	[ now => _date_is_after => {
+		start_date_field  => 'last_year',
 		input_date_field  => 'today',
-		} 
+		}
 	],
-	[ next_year => _date_is_after => { 
-		start_date        => 20070501, 
+	[ next_year => _date_is_after => {
+		start_date        => 20070501,
 		input_date_field  => 'unix_birthdate',
-		} 
+		}
 	],
-	[ between_fails => date_within_range => { 
-		start_date        => 20070501, 
+	[ between_fails => date_within_range => {
+		start_date        => 20070501,
 		end_date_field    => 'end_of_time',
 		input_date_field  => 'unix_birthdate',
-		} 
+		}
 	],
-	[ between_passes => date_within_range => { 
-		start_date        => 19631122, 
+	[ between_passes => date_within_range => {
+		start_date        => 19631122,
 		end_date_field    => 'end_of_time',
 		input_date_field  => 'unix_birthdate',
-		} 
+		}
 	],
 	);
 
@@ -48,7 +48,7 @@ my %input = (
 	today          => 20070129,
 	end_of_time    => 20380714,
 	);
-	
+
 my( $lint ) = $brick->profile_class->lint( \@profile );
 is( keys %$lint, 0, "Profile is formatted correctly\n" );
 #	print STDERR Data::Dumper->Dump( [$lint], [qw(lint)] ) if $ENV{DEBUG};
@@ -61,12 +61,12 @@ if( $ENV{DEBUG} )
 	{
 	print STDERR $profile->explain;
 	}
-	
+
 my $result = $brick->apply( $profile, \%input );
 
 isa_ok( $result, ref [], "apply() returns an array reference" );
 
-is( scalar @$result, scalar @profile, 
+is( scalar @$result, scalar @profile,
 	"Results have the same number of elements as the profile" );
 
 
@@ -74,14 +74,14 @@ if( $ENV{DEBUG } )
 	{
 	#print STDERR Data::Dumper->Dump( [$result], [qw(result)] );
 	use Data::Dumper;
-	
+
 	foreach my $index ( 0 .. $#$result )
 		{
 		my $entry = $result->[$index];
-		
+
 		my $message = $entry->[2] ? 'passed' :
 			ref $entry->[3] ? $entry->[3]->{message} : $entry->[3];
-			
+
 		print STDERR "$entry->[0] checked by $entry->[1] which returned:\n\t$message\n";
 		}
 	}

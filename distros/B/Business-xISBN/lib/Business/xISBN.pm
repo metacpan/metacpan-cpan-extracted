@@ -37,7 +37,13 @@ send a pull request!
 
 =cut
 
-$VERSION = "1.003";
+$VERSION = "1.004";
+
+=head1 Methods
+
+Loading this module adds these methods to the C<Business::ISBN> class:
+
+=over 4
 
 =item xisbn
 
@@ -103,6 +109,8 @@ sub _xisbn_url {
 
 __END__
 
+=back
+
 =head1 SOURCE AVAILABILITY
 
 This source is in Github:
@@ -112,6 +120,10 @@ This source is in Github:
 =head1 AUTHOR
 
 brian d foy C<< <bdfoy@cpan.org> >>
+
+=head2 Contributors
+
+Mohammad S Anwar (manwar)
 
 =head1 COPYRIGHT AND LICENSE
 

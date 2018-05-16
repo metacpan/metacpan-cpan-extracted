@@ -1,0 +1,66 @@
+---
+abstract: 'A task management framework for building web scrapers and crawlers'
+author:
+  - 'Tom Gracey <tomgracey@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TaskPipe
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Array::Utils: '0'
+  Carp: '0'
+  Clone: '0'
+  Cwd: '0'
+  DBIx::Class: '0'
+  DBIx::Class::Schema::Loader: '0'
+  DBIx::Error: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  File::Basename: '0'
+  File::Inplace: '0'
+  File::Path: '0'
+  File::Save::Home: '0'
+  File::Spec: '0'
+  Hash::Merge: '0'
+  IO::Socket::INET: '0'
+  LWP::UserAgent: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Layout::ColoredPatternLayout: '0.01'
+  Module::Runtime: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::ConfigCascade: '0.02'
+  MooseX::RelClassTypes: '0.03'
+  Net::EmptyPort: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Pod::POM: '0'
+  Pod::Term: '0.02'
+  Proc::Background: '0'
+  Proc::ProcessTable: '0'
+  String::CamelCase: '0'
+  Template::Nest: '0.03'
+  Term::ANSIColor: '0'
+  Text::Table::TinyColor: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  TryCatch: '0'
+  URI::Escape: '0'
+  WWW::Mechanize::PhantomJS: '0.18'
+  Web::Scraper: '0'
+  YAML::XS: '0'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -13,45 +13,45 @@ my $bucket = Mock::Bucket->new;
 isa_ok( $bucket, 'Mock::Bucket' );
 isa_ok( $bucket, Mock::Bucket->bucket_class );
 
-my $sub = $bucket->_is_defined( 
+my $sub = $bucket->_is_defined(
 	{
 	field         => 'one',
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {}, "_defined_fields returns a code ref" );
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Field is there, and true
 {
 my $input = { one => 1 };
 
-my $result = eval {  $sub->( $input )  }; 
-	
+my $result = eval {  $sub->( $input )  };
+
 ok( defined $result, "Result succeeds for defined field, true" );
 diag( "Eval error: $@" ) unless defined $result;
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Field is there, and false
 {
 my $input = { one => 0 };
 
-my $result = eval {  $sub->( $input )  }; 
-	
+my $result = eval {  $sub->( $input )  };
+
 ok( defined $result, "Result succeeds for defined field, false" );
 diag( "Eval error: $@" ) unless defined $result;
 }
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # An undef field triggers die
 {
 my $input = { one => undef };
 
-my $result = eval {  $sub->( $input )  }; 
-	
+my $result = eval {  $sub->( $input )  };
+
 my $at = $@;
 print STDERR Data::Dumper->Dump( [$at], [qw(at)] ) if $ENV{DEBUG};
 
@@ -61,6 +61,6 @@ isa_ok( $at, ref {}, "death returns a hash ref in \$@" );
     ok( exists $at->{message}, "hash ref has a 'message' key" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

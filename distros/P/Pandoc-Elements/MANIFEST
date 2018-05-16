@@ -67,6 +67,7 @@ t/pandoc-version.t
 t/pandoc/filters/caps
 t/pandoc/filters/empty.pl
 t/pandoc_filter.t
+t/pointer.t
 t/release-pod-syntax.t
 t/scalar-types.t
 t/selector.t

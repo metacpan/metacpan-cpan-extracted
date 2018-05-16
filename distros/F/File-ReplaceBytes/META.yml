@@ -9,8 +9,8 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   strict: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,8 +20,9 @@ no_index:
     - t
     - inc
 requires:
+  perl: '5.014000'
   strict: '0'
-version: '1.00'
+version: '1.01'
 x_homepageresources:
   repository:
     type: git

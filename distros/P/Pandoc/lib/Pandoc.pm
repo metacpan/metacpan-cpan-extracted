@@ -11,12 +11,12 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.8.2';
+our $VERSION = '0.8.3';
 
 use Pandoc::Version;
 use Carp 'croak';
 use File::Which;
-use File::Spec;
+use File::Spec::Functions 'catdir';
 use IPC::Run3;
 use parent 'Exporter';
 our @EXPORT = qw(pandoc pandoc_data_dir);
@@ -217,13 +217,15 @@ sub version {
 }
 
 sub data_dir {
-    File::Spec->catdir(shift->{data_dir}, @_);
+    catdir(shift->{data_dir}, @_);
 }
 
 sub pandoc_data_dir {
-    my $home = $ENV{HOME} || $ENV{USERPROFILE}
-        || File::Spec->catpath($ENV{HOMEDRIVE}, $ENV{HOMEPATH}, '');
-    File::Spec->catdir($home, '.pandoc', @_);
+    if ($^O eq 'MSWin32') {
+        catdir($ENV{APPDATA}, 'pandoc', @_);
+    } else {
+        catdir($ENV{HOME}, '.pandoc', @_);
+    }
 }
 
 sub bin {
@@ -382,8 +384,6 @@ __END__
 This module provides a Perl wrapper for John MacFarlane's
 L<Pandoc|http://pandoc.org> document converter.
 
-=head2 IMPORTING
-
 The utility function L<pandoc|/pandoc> is exported, unless the module is
 imported with an empty list (C<use Pandoc ();>).
 
@@ -421,13 +421,7 @@ the following ways:
 
   pandoc @arguments, %options;      # not ok!
 
-=head2 pandoc_data_dir( [ @subdirs ] [ $file ] )
-
-Returns the default pandoc data directory which is directory C<.pandoc> in the
-home directory. Optional arguments can be given to refer to a specific
-subdirectory or file.
-
-=head3 Options
+The following options are recognized:
 
 =over
 
@@ -463,6 +457,12 @@ input/output must be UTF-8 encoded this is convenient if you run with
 L<use utf8|utf8>, as you then don't need to set the binmode options at
 all (L<encode nor decode|Encode>) when passing input/output scalar
 references.
+
+=head2 pandoc_data_dir( [ @subdirs ] [ $file ] )
+
+Returns the default pandoc data directory which is directory C<.pandoc> in the
+home directory for Unix or C<pandoc> directory in C<%APPDATA%> for Windows.
+Optional arguments can be given to refer to a specific subdirectory or file.
 
 =head1 METHODS
 

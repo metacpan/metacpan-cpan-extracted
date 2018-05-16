@@ -21,17 +21,17 @@ can_ok( $bucket, 'at_most_N_days_between' );
 # Specify end date
 # Specify number of days
 {
-my $sub = $bucket->at_most_N_days_between( 
+my $sub = $bucket->at_most_N_days_between(
 	{
 	start_date     => '20070205',
 	end_date       => '20070314',
 	number_of_days => 60,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
-	
+
 my $result = eval { $sub->( {} ) };
 is( $result, 1, "Good date works" );
 
@@ -41,21 +41,21 @@ is( $result, 1, "Good date works" );
 # Specify start date
 # Specify end date field
 {
-my $sub = $bucket->at_most_N_days_between( 
+my $sub = $bucket->at_most_N_days_between(
 	{
 	start_date     => '20070101',
 	end_date_field => 'last_date',
 	number_of_days => 10,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
 # should work with near date
 {
 my $input = {
 	last_date => 20070108,
-	};	
+	};
 my $result = eval { $sub->( $input ) };
 is( $result, 1, "Good date works" );
 }
@@ -92,8 +92,8 @@ my $at = $@;
 isa_ok( $at, ref {}, "death returns a hash ref in $@" );
     ok( exists $at->{handler}, "hash ref has a 'handler' key" );
     ok( exists $at->{message}, "hash ref has a 'message' key" );
-    
-=cut 
+
+=cut
 
 }
 
@@ -103,14 +103,14 @@ isa_ok( $at, ref {}, "death returns a hash ref in $@" );
 # Specify end date
 # Specify start date field
 {
-my $sub = $bucket->at_most_N_days_between( 
+my $sub = $bucket->at_most_N_days_between(
 	{
 	end_date         => '20070101',
 	start_date_field => 'first_date',
 	number_of_days   => 10,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
 # should work with near date
@@ -142,14 +142,14 @@ isa_ok( $at, ref {}, "death returns a hash ref in $@" );
 # Specify start date field
 # Specify end date field
 {
-my $sub = $bucket->at_most_N_days_between( 
+my $sub = $bucket->at_most_N_days_between(
 	{
 	end_date_field   => 'last_date',
 	start_date_field => 'first_date',
 	number_of_days   => 15,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
 # should work with near dates

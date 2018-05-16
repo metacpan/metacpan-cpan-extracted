@@ -7,6 +7,7 @@ build_requires:
   File::Temp: '0'
   Test::Exception: '0.31'
   Test::More: '0.80'
+  Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -29,5 +30,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Term-ProgressBar
-version: '2.21'
+version: '2.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

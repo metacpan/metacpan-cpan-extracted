@@ -1,7 +1,7 @@
 package App::cryp::Exchange::gdax;
 
-our $DATE = '2018-04-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-05-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -99,7 +99,7 @@ App::cryp::Exchange::gdax - Interact with Bitcoin Indonesia
 
 =head1 VERSION
 
-This document describes version 0.002 of App::cryp::Exchange::gdax (from Perl distribution App-cryp-exchange), released on 2018-04-12.
+This document describes version 0.003 of App::cryp::Exchange::gdax (from Perl distribution App-cryp-exchange), released on 2018-05-10.
 
 =for Pod::Coverage ^(.+)$
 

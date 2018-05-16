@@ -1,3 +1,6 @@
+0.000052    2018-05-09
+            * Mark Perl strings as UTF-8 always.
+
 0.000051    2018-04-25
             * Add test-time dependencies.
 

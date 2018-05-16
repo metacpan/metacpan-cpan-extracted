@@ -23,14 +23,6 @@ subtest 'resolveModule - relative' => sub {
 };
 
 
-subtest 'readFile' => sub {
-
-    my $content = $js->eval("readFile('$FindBin::Bin/modules/simpleMath.js')");
-    like $content, qr/module.exports/;
-    is $js->eval("readFile('inexistent') === undefined ? 'ok' : 'notok'"), 'ok';
-};
-
-
 subtest 'require' => sub {
     is $js->eval("var module = require('simpleMath'); module.foo = 'bar'; module.add(2, 3)", "test"), 5;
     is $js->eval("require('simpleMath').foo"), 'bar', 'cached';

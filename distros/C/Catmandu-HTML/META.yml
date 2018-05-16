@@ -1,0 +1,40 @@
+---
+abstract: 'Modules for handling HTML data within the Catmandu framework'
+author:
+  - 'Patrick Hochstenbach'
+build_requires:
+  Test::Deep: '0.112'
+  Test::Exception: '0.43'
+  Test::More: '0.99'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-HTML
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Catmandu: '0'
+  HTML::TokeParser: '0'
+  Moo: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-HTML/issues
+  homepage: https://github.com/LibreCat/Catmandu-HTML
+  repository: https://github.com/LibreCat/Catmandu-HTML.git
+version: '0.02'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

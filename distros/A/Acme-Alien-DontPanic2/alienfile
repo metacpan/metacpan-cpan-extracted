@@ -10,7 +10,7 @@ plugin 'Probe::CommandLine' => (
 share {
 
   plugin Download => (
-    url     => 'https://perl5-alien.github.io/page/dontpanic.html',
+    url     => 'https://alienfile.org/dontpanic/',
     version => qr/([0-9\.]+)\.tar\.gz$/,
   );
   plugin Extract => 'tar.gz';

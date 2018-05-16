@@ -5,7 +5,7 @@ to process requests. This makes it unfriendly to event-driven
 systems and cooperative multitasking system such as Coro.
 
 This module makes LWP more friendly to these systems
-by plugging in an HTTP and HTTPS protocol implementor
+by plugging in an HTTP, HTTPS and SOCKS protocol implementor
 powered by AnyEvent and AnyEvent::HTTP.
 
 In short, it allows AnyEvent callbacks and Coro threads
@@ -31,10 +31,10 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Module::Build    (For installation only)
-    Test::More       (For testing only)
+    Module::Build           (For installation only)
+    Test::More              (For testing only)
     AnyEvent
-    AnyEvent::HTTP
+    AnyEvent::HTTP::Socks
     HTTP::Response
     LWP::Protocol
     version

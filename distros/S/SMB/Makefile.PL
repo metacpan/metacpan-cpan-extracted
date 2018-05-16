@@ -5,6 +5,8 @@ use 5.010;
 
 use ExtUtils::MakeMaker;
 
+my $need_bigint = 1 << 32 == 1;
+
 WriteMakefile(
 	NAME => 'SMB',
 	DISTNAME => 'SMB',
@@ -21,6 +23,7 @@ WriteMakefile(
 	MIN_PERL_VERSION => 5.010,  # mainly to use '//'
 	PREREQ_PM => {
 		# usually distributed with perl
+		'parent' => 0,
 		'Exporter' => 0,
 		'Fcntl' => 0,
 		'File::Basename' => 0,
@@ -29,6 +32,7 @@ WriteMakefile(
 		'IO::Socket' => 0,
 		'POSIX' => 0,
 		'Sys::Hostname' => 0,
+		($need_bigint ? ('bigint' => 0) : ()),
 		# less standard
 		'Time::HiRes' => 0,
 	},

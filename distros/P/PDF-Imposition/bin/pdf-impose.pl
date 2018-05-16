@@ -108,7 +108,7 @@ about the options.
 
 =item  --schema
 
-Available schemas: C<2up> C<2down> C<2x4x2> C<2side>
+Available schemas: C<2up> C<2down> C<2x4x2> C<2x4x1> C<2side>
 C<1x4x2cutfoldbind> C<4up> C<1repeat2top> C<1repeat2side> C<1repeat4>
 C<ae4x4> C<1x8x2>
 

@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,4 +39,5 @@ requires:
 resources:
   homepage: https://github.com/skington/lwp-json-tiny
   repository: https://github.com/skington/lwp-json-tiny.git
-version: '0.013'
+version: '0.014'
+x_serialization_backend: 'YAML::Tiny version 1.70'

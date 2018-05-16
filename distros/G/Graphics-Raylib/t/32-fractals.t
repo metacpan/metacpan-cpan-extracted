@@ -12,12 +12,12 @@ use Graphics::Raylib '+family';
 my $g = Graphics::Raylib->window($SIZE*4, $SIZE*2);
 plan skip_all => 'No graphic device' if !$g or defined $ENV{NO_GRAPHICAL_TEST} or defined $ENV{NO_GRAPHICAL_TESTS};
 
-my @julia      = map [(0)x$SIZE], 0..$SIZE-1;
-my @mandelbrot = map [(0)x$SIZE], 0..$SIZE-1;
+my @julia      = map [(WHITE)x$SIZE], 0..$SIZE-1;
+my @mandelbrot = map [(WHITE)x$SIZE], 0..$SIZE-1;
 # coloring in the callback is reaaaaally slow, so we don't do it TODO find out why
-my @args = (color => sub { shift }, width => $SIZE * 2, height => $SIZE * 2);
-my $julia      = Graphics::Raylib::Shape->bitmap(matrix => \@julia,      x => -$SIZE*2, @args);
-my $mandelbrot = Graphics::Raylib::Shape->bitmap(matrix => \@mandelbrot, x =>  $SIZE*2, @args);
+my @args = (color => undef, width => $SIZE * 2, height => $SIZE * 2, y => 0);
+my $julia      = Graphics::Raylib::Texture->new(matrix => \@julia,      x => 0, @args);
+my $mandelbrot = Graphics::Raylib::Texture->new(matrix => \@mandelbrot, x => $SIZE*2, @args);
 $g->fps(50);
 
 for (my $y = 0; $y <= $SIZE; $y += $STEP) {

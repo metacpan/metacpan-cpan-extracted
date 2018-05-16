@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Graphics/Raylib.pm',
@@ -16,6 +16,7 @@ my @module_files = (
     'Graphics/Raylib/Mouse.pm',
     'Graphics/Raylib/Shape.pm',
     'Graphics/Raylib/Text.pm',
+    'Graphics/Raylib/Texture.pm',
     'Graphics/Raylib/Util.pm'
 );
 

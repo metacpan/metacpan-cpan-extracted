@@ -27,7 +27,7 @@ no_index:
 provides:
   App::EvalServerAdvanced::Protocol:
     file: lib/App/EvalServerAdvanced/Protocol.pm
-    version: '0.104'
+    version: '0.105'
 requires:
   Data::Dumper: '0'
   Encode: '0'
@@ -42,9 +42,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/perlbot/evalserver-async-protocol/issues
-  repository: git://github.com/perlbot/evalserver-async-protocol.git
-version: '0.104'
+  bugtracker: https://github.com/perlbot/App-EvalServerAdvanced-Protocol/issues
+  repository: git://github.com/perlbot/App-EvalServerAdvanced-Protocol.git
+version: '0.105'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -195,11 +195,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.104
+          tag: v0.105
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: 2.17.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -217,7 +217,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: 2.17.0
           repo_root: .
       name: Git::Push
       version: '2.042'

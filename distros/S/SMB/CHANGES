@@ -1,5 +1,16 @@
 Releases of SMB-Perl library and main changes.
 
+0.09 - 2018-05-13
+
+* Added support for QueryInfo FILE and FS requests in server.
+* Added support for anonymous user in server (enabled in config).
+* Added support for cifs-utils client (mount on GNU/Linux).
+* Added support for Windows 7 Explorer as a client.
+* Added support for chained commands from client with the first Create.
+* Fixed code to work on 32-bit architectures again.
+* Fixed Read responses in server.
+* Fixed Find responses in server.
+
 0.08 - 2018-05-03
 
 * Added support for chained SMB v2 commands from client.

@@ -1,3 +1,9 @@
+libqbit-application-perl (0.017) raring; urgency=low
+
+  * cached accessors, added set_accessors and init_accessors
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 May 2018 16:24:54 +0300
+
 libqbit-application-perl (0.016) raring; urgency=low
 
   * documentations

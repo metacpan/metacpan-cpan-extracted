@@ -5,6 +5,13 @@ todo:
   - update ::WSDL on handling Faults using $trace
   - #t/76wsdl11enc.t
 
+version 3.07: Fri May 11 00:42:08 CEST 2018
+
+	Improvements:
+	- wsdl-explain also loads ::Encoding
+	- add pod tester
+	- convert to GIT and GitHub
+
 version 3.06: Wed 11 Jan 10:01:56 CET 2017
 
 	Improvements:

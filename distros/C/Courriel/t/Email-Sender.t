@@ -7,6 +7,7 @@ use Test::Requires {
 
 use Test::Fatal;
 use Test::More 0.88;
+use Test::Warnings;
 
 use Courriel::Builder;
 

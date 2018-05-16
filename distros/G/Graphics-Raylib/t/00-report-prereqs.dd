@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::raylib' => '0.014'
+                                    'Alien::raylib' => '0.015'
                                   }
                   },
        'configure' => {
@@ -27,7 +27,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::raylib' => '0.014',
+                                      'Alien::raylib' => '0.015',
                                       'Convert::Color' => '0',
                                       'Import::Into' => '0',
                                       'perl' => '5.010'

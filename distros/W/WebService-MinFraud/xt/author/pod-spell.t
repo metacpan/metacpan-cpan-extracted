@@ -24,12 +24,18 @@ Address
 Alders
 Alders'
 Andy
+BR
+
+Base
 BillingAddress
+Bothwell
 CCToken
 CN
 
 CVV
 
+Chargeback
+Christopher
 Client
 Country
 CreditCard
@@ -51,6 +57,9 @@ Example
 Factors
 Florian
 Fowler
+FraudService
+FraudServices
+
 GEONAMES
 
 Generic
@@ -95,6 +104,8 @@ Location
 MAXMIND
 MAXMIND's
 Mark
+MasterCard
+
 Mateu
 MaxMind
 MaxMind
@@ -154,9 +165,12 @@ YYYY
 
 YYYZZZ
 
+Yahoo
+
 ajack
 chargeback
 
+christopher
 contentDeliveryNetwork
 
 cpanm
@@ -171,6 +185,8 @@ drolsky
 en
 
 ergument
+
+es
 
 fr
 

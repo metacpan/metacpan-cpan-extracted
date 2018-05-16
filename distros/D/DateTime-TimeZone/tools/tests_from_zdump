@@ -12,7 +12,7 @@ use File::Spec;
 use Getopt::Long;
 use Parallel::ForkManager;
 
-my %opts = ( jobs => 6 );
+my %opts = ( jobs => 12 );
 GetOptions(
     'jobs:i'     => \$opts{jobs},
     'name:s'     => \@{ $opts{name} },

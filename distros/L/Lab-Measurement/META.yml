@@ -3,9 +3,9 @@ abstract: 'Test and measure with Perl'
 author:
   - 'Andreas K. Hüttel <mail@akhuettel.de>'
   - 'Christian Butschkow <christian.butschkow@physik.uni-r.de>'
-  - 'Alexei Iankilevitch <alexei.iankilevitch@physik.uni-r.de>'
   - 'Simon Reinhardt <simon.reinhardt@physik.uni-r.de>'
   - 'Charles E. Lane <lane@duphy4.physics.drexel.edu>'
+  - 'Eugeniy E. Mikhailov <evgmik@gmail.com>'
 build_requires:
   File::Find: '0'
   File::Glob: '0'
@@ -98,5 +98,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/lab-measurement/issues
   homepage: https://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/lab-measurement.git
-version: '3.641'
+version: '3.642'
 x_serialization_backend: 'YAML::Tiny version 1.73'

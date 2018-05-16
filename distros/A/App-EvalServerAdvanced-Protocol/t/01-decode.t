@@ -10,6 +10,8 @@ my $saved = path(__FILE__)->parent->child("test.packet");
 my $data = $saved->slurp_raw;
 my $alldata = $saved->slurp_raw;
 
+my $partialdata = substr($data, 0, 10); # make an incomplete packet
+
 my ($res, $message);
 my @msgs;
 
@@ -18,6 +20,13 @@ do {
   ($res, $message, $data) = decode_message($data);
   push @msgs, $message if $res;
 } while($res);
+
+do {
+  my ($suc, $message, $copy) = decode_message($partialdata);
+  is($suc, 0, "Dont parse partial messages");
+  is($message, undef, "Dont get a message from partial data");
+  is($copy, $partialdata, "Partial messages dont drop data");
+};
 
 is_deeply(\@msgs, [
 bless( {

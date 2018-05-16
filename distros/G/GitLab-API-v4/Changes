@@ -1,5 +1,29 @@
 Revision history for Perl extension GitLab::API::v4.
 
+0.08 2018-05-14
+
+- Many API endpoints which return lists and did not support parameters now do
+  in order for pagination arguments, and the paginator, to be used with them.
+- Add project_languages method.
+- Remove upload_file_to_project since it doesn't work.  Will re-add when
+  it is made to work later.
+
+0.07 2018-05-10
+
+- Completely overhaul ::RestClient to use HTTP::Tiny instead of
+  Role::REST::Client.  This change will make it much easier to alter the
+  behavior of the HTTP communication.
+- ::RestClient now supports the ability to decode non-ref JSON, such as
+  unblock_user which returns just a JSON boolean.
+- block_user and unblock_user now return their decoded response.
+- delete_user is no longer expected to return anything.
+- Response decoding will now only be attempted for methods which are
+  expected to return something.  Slight optimization.
+- A 404 on a non-returning method throws an exception now, matching the docs.
+- The *_token arguments are now stored in a closure to help users avoid
+  accidentally dumping them somewhere such as logs.
+- Added all methods for the TODO API.
+
 0.06 2018-04-09
 
 - Add the project_service method.

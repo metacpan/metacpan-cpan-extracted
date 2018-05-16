@@ -5,7 +5,7 @@
 
     Operate in verbose mode
 
-    Logging level. The usual suspects: debug info warn error fatal.
+    In debug mode, there is more info produces. By default, false.
 
     Build ARK for biblio record $record (which has $biblionumber unique ID)
 

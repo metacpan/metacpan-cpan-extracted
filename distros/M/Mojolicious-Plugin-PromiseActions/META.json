@@ -1,0 +1,56 @@
+{
+   "abstract" : "Automatic async and error handling for Promises",
+   "author" : [
+      "Marcus Ramberg <marcus.ramberg@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-PromiseActions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marcus/mojolicious-plugin-promiseactions/issues"
+      },
+      "homepage" : "https://github.com/marcus/mojolicious-plugin-promiseactions",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/marcusramberg/mojolicious-plugin-promiseactions.git",
+         "web" : "https://github.com/marcus/mojolicious-plugin-promiseactions"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

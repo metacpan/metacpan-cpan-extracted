@@ -1,5 +1,12 @@
 Revision history for Geo-Coder-Free
 
+0.10	Fri 11 May 18:30:54 EDT 2018
+	Street numbers were not being indexed
+	Add data that I know with the GPS program on my phone
+	Support "DR" for "Drive"
+	Import GB data from whosonfirst.org data
+	Maxmind - no longer croak for bad args
+
 0.09	Tue Apr 17 21:34:01 EDT 2018
 	Consolidated date in createdatabase
 	Load Australian data

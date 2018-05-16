@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 use File::Spec::Functions;
 use Test::Output;
@@ -46,5 +46,9 @@ stderr_like
 	"Fails for missing file"
 	;
 
+stderr_like
+	{ eval{ $class->$method($file) } }
+	qr/does not exist/,
+	"File $file does not exist"
+	;
 }
-

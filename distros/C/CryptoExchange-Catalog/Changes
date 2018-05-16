@@ -1,4 +1,49 @@
+20180510  2018-05-10 (PERLANCAR)
+
+          - Exchanges are now given codes (unique 1-10 letters). Not all
+            exchanges have codes yet. Also these methods are added: by_code(),
+            all_codes().
+
+          - Update catalog to CMC 2018-05-10.
+
+          - New exchanges:
+            + B2BX
+            + BitForex
+            + CoinEgg
+            + CoinEx Market
+            + Coinhub
+            + Coinsuper
+            + DragonEX
+            + fex
+            + Hotbit
+            + Indodax (previously Bitcoin Indonesia)
+            + Kyber Network
+            + Novaexchange
+            + Orionx
+            + Switcheo Network
+
+          - Removed exchanges:
+            + AEX
+            + Altcoin Trader
+            + Bitcoin Indonesia
+            + BITHOLIC
+            + Burst Asset Exchange
+            + Coinhouse
+            + Coinsecure
+            + CryptoDerivatives
+            + DC-Ex
+            + GetBTC
+            + Lendconnect
+            + NIX-E
+            + Rippex
+            + Stellarport
+
+          - Total exchanges now 213 (from 213)
+
+
 20180403  2018-01-30 (PERLANCAR)
+
+          - Update to CMC 2018-04-03.
 
           - New exchanges:
             + Bitbns

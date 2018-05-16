@@ -15,12 +15,9 @@ use PDL;
 use PDL::Matrix;
 
 use Graphics::Raylib;
-use Graphics::Raylib::Shape;
+use Graphics::Raylib::Texture;
 use Graphics::Raylib::Color qw(:all);
 use Graphics::Raylib::Text;
-
-use PDL;
-use PDL::Matrix;
 
 sub rotations { ($_->rotate(-1), $_, $_->rotate(1)) }
 
@@ -42,21 +39,22 @@ my $text = Graphics::Raylib::Text->new(color => RED, size => 20);
 
 my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
 
-my $bitmap = Graphics::Raylib::Shape->bitmap(
+my $img = Graphics::Raylib::Texture->new(
     matrix => unpdl($gen),
+    fullscreen => 1,
     # uninitialized => 1 # It's fun. Try it :)
 );
 
 my $i = 0;
 while (!$g->exiting && $i < $GENERATIONS)
 {
-    $bitmap->matrix = unpdl($gen);
-    $bitmap->color = $rainbow->();
+    $img->matrix = unpdl($gen);
+    #    $img->color = $rainbow->();
     $text->text = "Generation " . ($i++);
 
     $g->clear(BLACK);
     Graphics::Raylib::draw {
-        $bitmap->draw;
+        $img->draw;
         $text->draw;
     };
 

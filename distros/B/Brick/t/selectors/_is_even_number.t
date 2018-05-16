@@ -19,7 +19,7 @@ can_ok( $bucket, '_is_even_number' );
 #
 {
 my $sub = $bucket->_is_even_number();
-	
+
 isa_ok( $sub, ref sub {}, "_is_even_number returns a code ref" );
 
 

@@ -12,14 +12,35 @@ $|++;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(menu);
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 # Set up the terminal handling
+my $plain_mode = 0;
 $ENV{TERM} = 'linux' if !defined $ENV{TERM} or $ENV{TERM} eq '';
 my $ti = POSIX::Termios->new();
 $ti->getattr;
-my $t = Term::Cap->Tgetent({ TERM => undef, OSPEED => $ti->getospeed||38400 });
-$t->Trequire(qw/ce cl/);
+my $t = eval { Term::Cap->Tgetent({ TERM => undef, OSPEED => $ti->getospeed||38400 }); };
+$plain_mode = 1 if $@;
+$t->Trequire(qw/cl md me so se/) unless $plain_mode;
+
+sub tput {
+    my $arg = shift;
+    if ($arg eq 'cl'){
+        if ($plain_mode){
+            my $clear = $^O =~ /darwin|linux|bsd/ ? qx/clear/ :
+                        $^O =~ /MSWin32/          ? qx/cls/   :
+                        "\033[2J";  # That's a Hail Mary pass if there ever was one...
+            print $clear;
+        }
+        else {
+            $t->Tputs("cl", 1, *STDOUT);
+        }
+    }
+    else {
+        $t->Tputs($arg, 1, *STDOUT) unless $plain_mode;
+    }
+}
+
 my($max_width, $max_height);
 
 ########################################################################################
@@ -33,7 +54,8 @@ sub menu {
 	{
 		# Refresh size info to catch term resize events
 		($max_width, $max_height) = GetTerminalSize \*STDOUT;
-		$t->Tputs("cl", 1, *STDOUT);
+		# $t->Tputs("cl", 1, *STDOUT);
+        tput("cl");
 		if (ref($data->{content}) eq 'HASH'){
 			$data = _display($data);
 		}
@@ -59,25 +81,32 @@ sub _more {
 
   	my $prompt = ' [ <space|Enter>=page down  <b>=back  <q>=quit ]   ';
 	{
-		$t->Tputs("cl", 1, *STDOUT);
+		# $t->Tputs("cl", 1, *STDOUT);
+        tput("cl");
 		for (@{$pages[$pos]}){
 			# (Crude) long line handling. You should format your data...
 			if (length($_) > $max_width){
 				print substr($_, 0, $max_width - 1);
-				$t->Tputs("so", 1, *STDOUT);
+				# $t->Tputs("so", 1, *STDOUT);
+                tput("so");
 				print ">\n";
-				$t->Tputs("se", 1, *STDOUT);
+				# $t->Tputs("se", 1, *STDOUT);
+                tput("se");
 			}
 			else {
 				print "$_\n";
 			}
 		}
 
-		$t->Tputs("so", 1, *STDOUT);
-		$t->Tputs("md", 1, *STDOUT);
+		# $t->Tputs("so", 1, *STDOUT);
+		# $t->Tputs("md", 1, *STDOUT);
+        tput("so");
+        tput("md");
 		print "\n", $prompt, ' ' x ($max_width - length($prompt));
-		$t->Tputs("me", 1, *STDOUT);
-		$t->Tputs("se", 1, *STDOUT);
+		# $t->Tputs("me", 1, *STDOUT);
+		# $t->Tputs("se", 1, *STDOUT);
+        tput("me");
+        tput("se");
 
 		ReadMode 4;
 		my $key;
@@ -120,7 +149,8 @@ sub _display {
 	my($answer, %list);
 	{
 		my $count;
-		$t->Tputs("cl", 1, *STDOUT);
+		# $t->Tputs("cl", 1, *STDOUT);
+        tput("cl");
 		print "." . "-" x $width . ".\n";
 		for my $item (keys %{$ref->{content}}){
 			# Create a number-to-entry lookup table

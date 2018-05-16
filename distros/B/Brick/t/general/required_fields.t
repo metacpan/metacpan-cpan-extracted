@@ -10,31 +10,31 @@ $ENV{DEBUG} ||= 0;
 
 use_ok( 'Brick::General' );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my @profile = (
-	[ 'defined' => defined_fields => { 
-		fields  => [ qw(in_number ex_number not_a_number blank_field) ], 
-		} 
+	[ 'defined' => defined_fields => {
+		fields  => [ qw(in_number ex_number not_a_number blank_field) ],
+		}
 	],
-	[ true => true_fields => { 
-		fields  => [ qw(in_number not_a_number) ], 
-		} 
+	[ true => true_fields => {
+		fields  => [ qw(in_number not_a_number) ],
+		}
 	],
-	[ false => false_fields => { 
-		fields  => [ qw(ex_number blank_field undef_field) ], 
-		} 
+	[ false => false_fields => {
+		fields  => [ qw(ex_number blank_field undef_field) ],
+		}
 	],
-	[ blank => blank_fields => { 
-		fields  => [ qw(blank_field undef_field) ], 
-		} 
+	[ blank => blank_fields => {
+		fields  => [ qw(blank_field undef_field) ],
+		}
 	],
-	[ some_not_blank => blank_fields => { 
-		fields  => [ qw(in_number blank_field true_field undef_field) ], 
-		} 
+	[ some_not_blank => blank_fields => {
+		fields  => [ qw(in_number blank_field true_field undef_field) ],
+		}
 	],
-	[ bad_row => true_fields => { 
-		fields  => [ qw(ex_number blank_field in_number) ], 
-		} 
+	[ bad_row => true_fields => {
+		fields  => [ qw(ex_number blank_field in_number) ],
+		}
 	],
 
 	);
@@ -46,22 +46,22 @@ my %input = (
 	blank_field  => '',
 	undef_field  => undef,
 	);
-	
-my( $lint ) = $brick->lint( \@profile );
+
+my( $lint ) = $brick->profile_class->lint( \@profile );
 is( keys %$lint, 0, "Profile is formatted correctly\n" );
-#print STDERR Data::Dumper->Dump( [$lint], [qw(lint)] );
 use Data::Dumper;
+#print STDERR "\n", Data::Dumper->Dump( [$lint], [qw(lint)] );
 
 if( $ENV{DEBUG} )
 	{
 	print STDERR $brick->explain( \@profile );
 	}
-	
-my $result = $brick->apply( \@profile, \%input );
+
+my $result = $brick->apply( Brick::Profile->new($brick, \@profile), \%input );
 
 isa_ok( $result, ref [], "apply() returns an array reference" );
 
-is( scalar @$result, scalar @profile, 
+is( scalar @$result, scalar @profile,
 	"Results have the same number of elements as the profile" );
 
 
@@ -73,11 +73,11 @@ print STDERR "\n"  if $ENV{DEBUG};
 foreach my $index ( 0 .. $#$result )
 	{
 	my $entry = $result->[$index];
-	
+
 	print STDERR "----- $entry->[0] ----------------------------\n" if $ENV{DEBUG};
-	
+
 	do { print STDERR "\tpassed\n\n" if $ENV{DEBUG}; next } if $entry->[2];
-	
+
 	my @data = ( $entry->[3] );
 	my @errors = ();
 	my $iterations = 0;
@@ -90,21 +90,21 @@ foreach my $index ( 0 .. $#$result )
 			push @data, @{ $error->{errors} };
 			next;
 			}
-		
+
 		push @errors, $error;
 		}
-		
+
 	print STDERR Data::Dumper->Dump( [\@errors], [qw(errors)] ) if $ENV{DEBUG};
 
 	#print STDERR "$entry->[0] checked by $entry->[1] which returned:\n\t$message\n";
-	
+
 	next unless ref $entry->[3] and @{ $entry->[3]{errors} } > 0;
-	
+
 	foreach my $error ( @errors )
 		{
 		print STDERR "$error->{handler}: $error->{message}\n" if $ENV{DEBUG};
 		}
-	
+
 	print STDERR "\n" if $ENV{DEBUG};
 	}
 

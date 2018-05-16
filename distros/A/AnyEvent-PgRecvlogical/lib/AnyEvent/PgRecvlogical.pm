@@ -1,5 +1,5 @@
 package AnyEvent::PgRecvlogical;
-$AnyEvent::PgRecvlogical::VERSION = '0.004';
+$AnyEvent::PgRecvlogical::VERSION = '1.01';
 # ABSTRACT: perl port of pg_recvlogical
 
 =pod
@@ -49,6 +49,7 @@ use Promises 0.99 backend => ['AnyEvent'], qw(deferred);
 use Types::Standard ':all';
 use Try::Tiny;
 use Carp 'croak';
+use curry;
 
 use constant {
     AWAIT_INTERVAL    => 1,
@@ -311,8 +312,8 @@ has flushed_lsn  => (is => 'rwp', isa => $LSN, default => 0, clearer => 1, init_
 has on_message => (is => 'ro', isa => CodeRef, required => 1);
 has on_error => (is => 'ro', isa => CodeRef, default => sub { \&croak });
 
-has _fh_watch => (is => 'lazy', isa => Ref, clearer => 1);
-has _timer    => (is => 'lazy', isa => Ref, clearer => 1);
+has _fh_watch => (is => 'lazy', isa => Ref,  clearer => 1, predicate => 1);
+has _timer    => (is => 'lazy', isa => Ref,  clearer => 1);
 
 =head1 CONSTRUCTOR
 
@@ -352,12 +353,12 @@ sub _build_dbh {
 
 sub _build__fh_watch {
     my $self = shift;
-    return AE::io $self->dbh->{pg_socket}, 0, sub { $self->_read_copydata };
+    return AE::io $self->dbh->{pg_socket}, 0, $self->curry::weak::_read_copydata;
 }
 
 sub _build__timer {
     my $self = shift;
-    return AE::timer $self->heartbeat, $self->heartbeat, sub { $self->_heartbeat };
+    return AE::timer $self->heartbeat, $self->heartbeat, $self->curry::weak::_heartbeat;
 }
 
 =head1 METHODS
@@ -395,7 +396,7 @@ sub start {
 
     $self->_post_init(
         deferred {
-            shift->chain(sub { $self->identify_system }, sub { $self->create_slot }, sub { $self->start_replication });
+            shift->chain($self->curry::identify_system, $self->curry::create_slot, $self->curry::start_replication);
         }
     );
 }
@@ -489,6 +490,34 @@ sub start_replication {
     );
 }
 
+=item pause
+
+Pauses reading from the database. Useful for throttling the inbound flow of data so as to not overwhelm your
+application. It is safe, albeit redundant, to call this method multiple time in a row without unpausing.
+
+=cut
+
+sub pause { shift->_clear_fh_watch; return; }
+
+=item unpause
+
+Resume reading from the database. After a successful L</pause>, this will pick right back reciving data and sending it
+to the provided L</callback>. It is safe, albeit redundant, to call this method multiple time in a row without pausing.
+
+=cut
+
+sub unpause { shift->_fh_watch; return; }
+
+=item is_paused
+
+Returns the current pause state.
+
+Returns: boolean
+
+=cut
+
+sub is_paused { return !shift->_has_fh_watch }
+
 sub _read_copydata {
     my $self = shift;
 
@@ -557,11 +586,14 @@ sub _read_copydata {
 
     $self->_set_received_lsn($startlsn) if $startlsn > $self->received_lsn;
 
-    my $guard = guard {
-        $self->_set_flushed_lsn($startlsn) if $startlsn > $self->flushed_lsn;
-    };
+    my $guard = $self->$curry::weak(
+        sub {
+            my $self = shift;
+            $self->_set_flushed_lsn($startlsn) if $startlsn > $self->flushed_lsn;
+        }
+    );
 
-    $self->on_message->($record, $guard);
+    $self->on_message->($record, guard(\&$guard));
 
     return;
 }

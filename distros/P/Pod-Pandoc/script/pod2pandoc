@@ -42,7 +42,7 @@ directory as first input and an optional output directory as second.
 
 =item --help|-h|-?
 
-Print out usage information and exit
+Print out usage information and exit.
 
 =item --parse FORMATS
 
@@ -50,31 +50,37 @@ Parse and include data sections. Use C<*> for all.
 
 =item --podurl URL
 
-Base URL to Perl modules. Default: C<https://metacpan.org/pod/>
+Base URL to Perl modules. Default: C<https://metacpan.org/pod/>. A false value
+such as C<0> or C<""> will disable linking to external modules.
 
 =item --ext EXT
 
-Output file extension when processing a directory. Default: C<html>
+Output file extension when processing a directory. Default: C<html>.
 
 =item --index NAME
 
-Index file name when processing a directory. Disable with C<0>
+Index file (e.g. C<index.html>) name when processing a directory. Can be
+disabled with C<0>.
+
+=item --name
+
+Include C<NAME> section which is removed by default.
 
 =item --wiki
 
-Create wikilinks when processing a directory
+Create wikilinks when processing a directory.
 
 =item --update
 
-Only process when input file is newer then output file
+Only process when input file is newer then output file.
 
 =item --default-meta FILE
 
-Read default metadata from given file
+Read default metadata from given file.
 
 =item --quiet
 
-Don't emit warnings and status information
+Don't emit warnings and status information.
 
 =item ...
 

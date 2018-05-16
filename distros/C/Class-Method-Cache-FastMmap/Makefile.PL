@@ -24,16 +24,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "JSON::PP" => "2.00",
     "Module::Metadata" => 0,
     "Moo" => 0,
-    "Path::Tiny" => "0.004",
     "Test::More" => 0,
-    "Test::Most" => 0,
-    "Time::Piece" => "1.16",
-    "Time::Seconds" => 0
+    "Test::Most" => 0
   },
-  "VERSION" => "v0.3.0",
+  "VERSION" => "v0.3.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,15 +41,11 @@ my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
   "Exporter::Tiny" => 0,
   "File::Spec" => 0,
-  "JSON::PP" => "2.00",
   "Module::Metadata" => 0,
   "Moo" => 0,
   "Object::Signature" => 0,
-  "Path::Tiny" => "0.004",
   "Test::More" => 0,
-  "Test::Most" => 0,
-  "Time::Piece" => "1.16",
-  "Time::Seconds" => 0
+  "Test::Most" => 0
 );
 
 

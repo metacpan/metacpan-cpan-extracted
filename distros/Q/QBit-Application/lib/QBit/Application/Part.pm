@@ -1,5 +1,5 @@
 package QBit::Application::Part;
-$QBit::Application::Part::VERSION = '0.016';
+$QBit::Application::Part::VERSION = '0.017';
 use qbit;
 
 use base qw(QBit::Class);
@@ -22,27 +22,28 @@ sub model_accessors {
 
     my $pkg_stash = package_stash($class);
 
-    while (my ($aname, $aclass) = each(%accessors)) {
-        no strict 'refs';
+    no strict 'refs';
+    while (my ($acc_name, $acc_class) = each(%accessors)) {
+        my $accessor_from_app = $pkg_stash->{'__MODEL_ACCESSORS__'}{$acc_name} || $acc_name;
 
-        *{"${class}::${aname}"} = sub {
-            my $self = shift;
-            my $app_accessor = $pkg_stash->{'__MODEL_ACCESSORS__'}{$aname} || $aname;
-            unless ($self->app->can($app_accessor)) {
-                my $models = $self->app->get_models();
-                while (my ($maccessor, $mclass) = each(%$models)) {
-                    if ($mclass->isa($class)) {
-                        if (exists(package_stash($mclass)->{'__MODEL_ACCESSORS__'}{$aname})) {
-                            $app_accessor = package_stash($mclass)->{'__MODEL_ACCESSORS__'}{$aname};
-                            last;
-                        }
-                    }
-                }
-            }
-            my $model = $self->app->$app_accessor;
-            throw gettext('Model "%s" must be "%s" descendant', $aname, $aclass) unless $model->isa($aclass);
+        *{"${class}::${acc_name}"} = sub {
+            $_[0]->{'__ACCESSORS__'}{$acc_name} //= do {
+                my $model = $_[0]->app->$accessor_from_app;
 
-            return $model;
+                throw gettext(
+'Class "%s" expects application accessor "%s" used through model accessor "%s" to be "%s" descendant but got %s',
+                    $class,
+                    $accessor_from_app,
+                    $acc_name,
+                    $acc_class,
+                    ref($model)
+                  )
+                  unless ref($model) && $model->isa($acc_class);
+
+                weaken($model);
+
+                return $model;
+            };
         };
     }
 }
@@ -72,11 +73,14 @@ sub import {
 
     $pkg_stash->{'__MODEL_ACCESSORS__'} = $opts{'models'} || {};
 
-    my $app_pkg;
-    my $i = 1;
-    while ($app_pkg = caller($i++)) {
-        last if $app_pkg->isa('QBit::Application');
+    my $app_pkg = $opts{'app_pkg'};
+    unless ($app_pkg) {
+        my $i = 1;
+        while ($app_pkg = caller($i++)) {
+            last if $app_pkg->isa('QBit::Application');
+        }
     }
+
     throw gettext('Use only in QBit::Application descendant')
       unless $app_pkg && $app_pkg->isa('QBit::Application');
 

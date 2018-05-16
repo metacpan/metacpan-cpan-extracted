@@ -4,17 +4,23 @@ package LWP::Protocol::AnyEvent::http;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.10.0');
+use version; our $VERSION = qv('v1.14.0');
 
 use AnyEvent            qw( );
-use AnyEvent::HTTP      qw( http_request );
+use AnyEvent::HTTP      qw( );
 use HTTP::Response      qw( );
 use LWP::Protocol       qw( );
 use LWP::Protocol::http qw( );
 
+BEGIN {
+   local $^W = 0;  # AnyEvent::HTTP::Socks warns when used with -w
+   require AnyEvent::HTTP::Socks;
+}
+
+
 our @ISA = 'LWP::Protocol';
 
-LWP::Protocol::implementor($_, __PACKAGE__) for qw( http https );
+LWP::Protocol::implementor($_, __PACKAGE__) for qw( http https socks socks5 socks4a socks4 );
 
 
 # This code was based on _extra_sock_opts in LWP::Protocol::https
@@ -62,8 +68,7 @@ sub _set_response_headers {
 
    my %headers = %$headers;
 
-   $response->protocol( "HTTP/".delete($headers{ HTTPVersion }) )
-      if $headers{ HTTPVersion };
+   $response->protocol( "HTTP/".delete($headers{ HTTPVersion }) ) if $headers{ HTTPVersion };
    $response->code(             delete($headers{ Status      }) );
    $response->message(          delete($headers{ Reason      }) );
 
@@ -129,17 +134,24 @@ sub request {
    $opts{body}    = $$body   if defined($body);
    $opts{timeout} = $timeout if defined($timeout);
 
-   if ($url->scheme eq 'https') {
+   if (( $proxy || $url )->scheme eq 'https') {
       $opts{tls_ctx} = $self->_get_tls_ctx();
    }
 
-   if ($proxy) {
-      my $proxy_uri = URI->new($proxy);
-      $opts{proxy} = [ $proxy_uri->host, $proxy_uri->port, $proxy_uri->scheme ];
+   if (!$proxy) {
+      $opts{proxy} = undef;
+   }
+   elsif ($proxy =~ /^socks/) {
+      $proxy =~ s{socks://}{socks5://}gi;
+      $opts{proxy} = undef;
+      $opts{socks} = $proxy;
+   }
+   else {
+      $opts{proxy} = [ $proxy->host, $proxy->port, $proxy->scheme ];
    }
 
    # Let LWP handle redirects and cookies.
-   http_request(
+   AnyEvent::HTTP::Socks::http_request(
       $method => $url,
       headers => \%headers,
       %opts,
@@ -198,12 +210,12 @@ __END__
 
 =head1 NAME
 
-LWP::Protocol::AnyEvent::http - Event loop friendly HTTP and HTTPS backend for LWP
+LWP::Protocol::AnyEvent::http - Event loop friendly HTTP/HTTPS/SOCKS backend for LWP
 
 
 =head1 VERSION
 
-Version 1.10.0
+Version 1.14.0
 
 
 =head1 SYNOPSIS
@@ -225,7 +237,7 @@ Version 1.10.0
             process( $ua->get($url) );
         };
     }
-    
+
 
 
     # Using a worker pool model to fetch web pages in parallel.
@@ -266,7 +278,7 @@ to process requests. This makes it unfriendly to event-driven
 systems and cooperative multitasking system such as L<Coro>.
 
 This module makes LWP more friendly to these systems
-by plugging in an HTTP and HTTPS protocol implementor
+by plugging in an HTTP, HTTPS and SOCKS protocol implementor
 powered by L<AnyEvent> and L<AnyEvent::HTTP>.
 
 In short, it allows AnyEvent callbacks and Coro threads
@@ -276,6 +288,27 @@ so I can add tests and add a mention.)
 
 All LWP features and configuration options should still be
 available when using this module.
+
+
+=head1 SUPPORTED PROTOCOLS
+
+The following protocols are supported:
+
+=over 4
+
+=item * C<https>: request and proxy
+
+=item * C<http>: request and proxy
+
+=item * C<socks>: alias for C<socks5>
+
+=item * C<socks5>: proxy only
+
+=item * C<socks4a>: proxy only
+
+=item * C<socks4>: proxy only
+
+=back
 
 
 =head1 SSL SUPPORT
@@ -288,7 +321,7 @@ Only the following C<ssl_opts> are currently supported:
 
 =item * C<SSL_verify_mode>
 
-Only partially supported. Unspecified or VERIFY_NONE disables verification, anything else enables it.
+Only partially supported. Unspecified or C<VERIFY_NONE> disables verification, anything else enables it.
 
 =item * C<SSL_verifycn_scheme>
 
@@ -326,7 +359,7 @@ These two modules are developed in parallel.
 
 An excellent cooperative multitasking library assisted by this module.
 
-=item * L<AnyEvent>, L<AnyEvent::HTTP>
+=item * L<AnyEvent>, L<AnyEvent::HTTP>, L<AnyEvent::HTTP::Socks>
 
 Powers this module.
 
@@ -341,7 +374,9 @@ in problems in some unrelated code. Doesn't support HTTPS. Supports FTP and NTTP
 
 =item * L<AnyEvent::HTTP::LWP::UserAgent>
 
-An alternative to this module. Doesn't help code that uses L<LWP::Simple> or L<LWP::UserAgent> directly.
+An alternative to this module that attempts to provide the same interface as
+L<LWP::UserAgent>, but falls short in many ways. Unlike L<AnyEvent::HTTP::LWP::UserAgent>,
+this module only replaces the back end of L<LWP::UserAgent>, offering a much more faithful experience.
 
 =back
 

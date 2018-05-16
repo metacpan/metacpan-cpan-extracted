@@ -22,6 +22,7 @@ use parent 'SMB::v2::Command';
 
 use constant {
 	FSCTL_DFS_GET_REFERRALS => 0x00060194,
+	FSCTL_PIPE_WAIT         => 0x00110018,
 	FSCTL_PIPE_TRANSCEIVE   => 0x0011c017,
 };
 

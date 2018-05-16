@@ -7,7 +7,6 @@ use warnings;
 no warnings 'uninitialized';
 
 use FindBin;
-use HTTP::Request::Common;
 use Test::More;
 
 use LWP::UserAgent::JSON;
@@ -266,18 +265,14 @@ sub post_encoding {
 }
 
 sub put {
-    SKIP: {
-        if (!HTTP::Request::Common->can('request_type_with_data')) {
-            skip q{Can't test PUT with this version of LWP}, 1;
-        }
-        my $user_agent = $tested_class->new(agent => 'TestStuff');
+    my $user_agent = $tested_class->new(agent => 'TestStuff');
 
-        response_matches(
-            'put_json with simple arguments is JSON-encoded',
-            sub {
-                $user_agent->put_json('record::updatethis.wtf/', ['things']);
-            },
-            <<FORM_RESPONSE
+    response_matches(
+        'put_json with simple arguments is JSON-encoded',
+        sub {
+            $user_agent->put_json('record::updatethis.wtf/', ['things']);
+        },
+        <<FORM_RESPONSE
 PUT record::updatethis.wtf/
 Accept: application/json
 User-Agent: TestStuff
@@ -286,25 +281,18 @@ Content-Type: application/json
 
 ["things"]
 FORM_RESPONSE
-        );
-    }
+    );
 }
 
 sub patch {
-    SKIP: {
-        if (!HTTP::Request::Common->can('request_type_with_data')) {
-            skip q{Can't test PATCH with this version of LWP}, 1;
-        }
+    my $user_agent = $tested_class->new(agent => 'TestStuff');
 
-        my $user_agent = $tested_class->new(agent => 'TestStuff');
-
-        response_matches(
-            'patch_json with simple arguments is JSON-encoded',
-            sub {
-                $user_agent->patch_json('record::fancy.ooo/',
-                    { better => 'yes' });
-            },
-            <<FORM_RESPONSE
+    response_matches(
+        'patch_json with simple arguments is JSON-encoded',
+        sub {
+            $user_agent->patch_json('record::fancy.ooo/', {better => 'yes'});
+        },
+        <<FORM_RESPONSE
 PATCH record::fancy.ooo/
 Accept: application/json
 User-Agent: TestStuff
@@ -313,8 +301,7 @@ Content-Type: application/json
 
 {"better":"yes"}
 FORM_RESPONSE
-        );
-    }
+    );
 }
 
 sub response_matches {

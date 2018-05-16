@@ -1,0 +1,71 @@
+{
+   "abstract" : "Set the size of the console for Term::Table",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Prove-Plugin-TermTable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::Size::Any" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Mock" : "0.000060",
+            "Test2::V0" : "0.000060",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/App-Prove-Plugin-TermTable/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/App::Prove::Plugin::TermTable",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/App-Prove-Plugin-TermTable.git",
+         "web" : "https://github.com/plicease/App-Prove-Plugin-TermTable"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.27.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
+}
+

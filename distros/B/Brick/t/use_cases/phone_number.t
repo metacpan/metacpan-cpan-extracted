@@ -38,18 +38,18 @@ isa_ok( $brick, $class );
 
 =back
 
-=cut 
+=cut
 
 sub Brick::Bucket::is_US_local_phone_number
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length} = 7; # without separator
 
 	$setup->{filter_fields}        = [ $setup->{field} ];
-	
+
 	$setup->{regex}         = qr/
-		\A 
+		\A
 		(?:\d\d\d)   # prefix
 		(?:\d\d\d\d) # number
 		\z
@@ -57,17 +57,17 @@ sub Brick::Bucket::is_US_local_phone_number
 
 	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_remove_non_digits( $setup ),
-		$bucket->_value_length_is_exactly( $setup ),		
+		$bucket->_value_length_is_exactly( $setup ),
 		$bucket->_matches_regex( $setup ),
 		);
-	
+
 	$bucket->__make_constraint( $composed, $setup );
 	}
-	
+
 =head2 Create the profile
 
 
-=cut 
+=cut
 
 my $Profile = [
 	[ phone        => is_US_local_phone_number => { field => 'phone',       } ],
@@ -77,7 +77,7 @@ my $Profile = [
 	[ long_phone   => is_US_local_phone_number => { field => 'long_phone'   } ],
 	[ letter_phone => is_US_local_phone_number => { field => 'letter_phone' } ],
 	];
-	
+
 =head2 Test the profile with lint()
 
 This isn't a necessary step, but it's nice to know that the profile
@@ -107,7 +107,7 @@ it on for debugging.
 
 =cut
 
-print STDERR "\nExplaining zip code profile:\n", 
+diag "\nExplaining zip code profile:\n",
 	$profile->explain if $ENV{DEBUG};
 
 =head2 Get some input data
@@ -118,14 +118,14 @@ values are the hash values.
 =cut
 
 my $Input = {
-	phone        => 5551234,
-	space_phone  => "555 1234",
-	dot_phone    => "555.1234",
-	short_phone  => 555123,
-	long_phone   => 8005551212,
-	letter_phone => '1234567',
+	phone        => 5551234,     # fine, plenty of characters
+	space_phone  => "555 1234",  # fine, after munging
+	dot_phone    => "555.1234",  # fine, after munging
+	short_phone  => 555123,      # Oops, not enough characters
+	long_phone   => 8005551212,  # Oops, too many (for this test)
+	letter_phone => 'abcdefg',   # Oops, non-digits
 	};
-	
+
 =head2 Validate the data with apply()
 
 This isn't a necessary step, but it's nice to know that the profile
@@ -149,17 +149,18 @@ it on for debugging.
 #print STDERR Data::Dumper->Dump( [$result], [qw(result)] ) ; #if $ENV{DEBUG};
 use Data::Dumper;
 
-print STDERR "\n"  if $ENV{DEBUG};
+diag "\n" if $ENV{DEBUG};
 
 foreach my $index ( 0 .. $#$result )
 	{
 	my $entry = $result->[$index];
-	
-	print STDERR "----- $entry->[0] ----------------------------\n" if $ENV{DEBUG};
-	
-	do { print STDERR "\tpassed\n\n" if $ENV{DEBUG}; next } if $entry->[2];
-	
-	my @data = ( $entry->[3] );
+
+	diag '-----' . $entry->get_label .  "----------------------------\n"
+		if $ENV{DEBUG};
+
+	do { diag "\tpassed\n\n" if $ENV{DEBUG}; next } if $entry->get_result;
+
+	my @data = ( $entry->get_messages );
 	my @errors = ();
 	my $iterations = 0;
 	while( my $error = shift @data )
@@ -171,32 +172,32 @@ foreach my $index ( 0 .. $#$result )
 			push @data, @{ $error->{errors} };
 			next;
 			}
-		
+
 		push @errors, $error;
 		}
-		
+
 	#print STDERR Data::Dumper->Dump( [\@errors], [qw(errors)] ) ; #if $ENV{DEBUG};
 
 	#print STDERR "$entry->[0] checked by $entry->[1] which returned:\n\t$message\n";
-	
-	next unless ref $entry->[3] and @{ $entry->[3]{errors} } > 0;
-	
+
+	next unless eval {  @{ $entry->get_messages->{errors} } > 0 };
+
 	foreach my $error ( @errors )
 		{
-		print STDERR "$error->{handler}: $error->{message}\n" if $ENV{DEBUG};
+		diag "$error->{handler}: $error->{message}\n" if $ENV{DEBUG};
 		}
-	
-	print STDERR "\n" if $ENV{DEBUG};
+
+	diag "\n" if $ENV{DEBUG};
 	}
 
+# the first three results should pass
 foreach my $row ( splice @$result, 0, 3 )
 	{
-	is( $row->[2], 1, "$row->[0] passes" );
+	is( $row->get_result, 1, $row->get_label . ' passes' );  # the name
 	}
 
-exit;
-
+# the rest of the results should fail
 foreach my $row ( @$result )
 	{
-	is( $row->[2], 0, "$row->[0] fails (as expected)" );
+	is( $row->get_result, 0, $row->get_label . ' fails (as expected)' );
 	}

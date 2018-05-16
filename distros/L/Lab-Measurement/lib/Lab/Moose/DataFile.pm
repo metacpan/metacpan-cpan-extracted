@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-$Lab::Moose::DataFile::VERSION = '3.641';
+$Lab::Moose::DataFile::VERSION = '3.642';
 #ABSTRACT: Base class for data file types
 
 use 5.010;
@@ -122,7 +122,7 @@ Lab::Moose::DataFile - Base class for data file types
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 METHODS
 

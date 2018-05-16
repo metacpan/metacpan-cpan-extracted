@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.181180';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.181310';
 use Moose;
 use namespace::autoclean;
 
@@ -617,7 +617,7 @@ sub get_taxonomy_from_seq_id {
 
         # case 1: stringified lineage that must be split on semicolons
         'Bio::MUST::Core::Types::Lineage' => sub {
-            my @taxonomy = split q{; }, $seq_id;
+            my @taxonomy = split qr{;\ *}xms, $seq_id;      # q{;} or q{; }
             wantarray ? @taxonomy : \@taxonomy;
         },
 
@@ -1639,7 +1639,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.181180
+version 0.181310
 
 =head1 SYNOPSIS
 
@@ -1653,7 +1653,7 @@ version 0.181180
 
 =head2 get_taxid_from_seq_id
 
-=head2 get_taxonomy_from_legacy_seq_id
+=head2 get_taxid_from_legacy_seq_id
 
 =head2 get_taxonomy_from_seq_id
 

@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2017-05-09 00:00:00 +0000 to present.
+Changes from 2017-05-10 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 0.001900 at 2018-05-09 02:19:24 +0000
+version 0.001901 at 2018-05-10 16:46:54 +0000
+---------------------------------------------
+
+  Change: e08afd088f135c6dd8f32a7d253194327304e622
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-10 12:46:54 +0000
+
+    Merge branch 'v0.1'
+
+    * v0.1:
+
+    Sub::Quote 1.004005 requirement added
+
+    Minor: version bump 
+
+  Change: 4b262331cee2d38a8ca7815f2182507eefb07629
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2018-05-09 19:39:49 +0000
+
+    Sub::Quote 1.004005 requirement added 
+
+---------------------------------------------
+version 0.001005 at 2018-05-09 01:21:10 +0000
 ---------------------------------------------
 
   Change: f81b42ebb3a3286aaa33b717918e01f65ed72cbb

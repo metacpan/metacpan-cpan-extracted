@@ -50,6 +50,7 @@ t/0-use.t
 t/1-parser.t
 t/2-packer.t
 t/3-nttime.t
+t/64bit.t
 t/auth.t
 t/crypt.t
 t/dcerpc.t

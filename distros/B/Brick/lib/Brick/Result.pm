@@ -5,7 +5,7 @@ use vars qw($VERSION);
 
 use Carp qw(carp croak);
 
-$VERSION = '0.227';
+$VERSION = '0.228';
 
 =encoding utf8
 
@@ -301,9 +301,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
+Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

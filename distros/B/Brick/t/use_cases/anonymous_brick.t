@@ -35,14 +35,14 @@ my $unnamed_sub = $bucket->add_to_bucket( {
 	name        => "FooSub",
 	unique      => 1,
 	description => "This is a brick that isn't attached to a sub name",
-	code        => sub { 
+	code        => sub {
 		$_[0]->{number} == 3 ? 1 : die {
 			handler => 'FooSub',
 			message => "Number wasn't 3",
 			}
 		},
 	} );
-	
+
 isa_ok( $unnamed_sub, ref sub {} );
 
 =pod
@@ -59,7 +59,7 @@ is( $foo_sub, $unnamed_sub, "I get the same sub back" );
 
 =pod
 
-Now that I have my code reference for C<FooSub>, I can use it in a 
+Now that I have my code reference for C<FooSub>, I can use it in a
 composition (or even inside another subroutine).
 
 =cut
@@ -78,15 +78,15 @@ other brick:
 sub Brick::Bucket::_bar_sub
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	my( $foo_sub ) = $bucket->get_brick_by_name( 'FooSub' );
 	isa_ok( $foo_sub, ref sub {} );
-	
+
 	my $this_sub = $bucket->add_to_bucket( {
 		name        => "_bar_sub",
 		unique      => 1,
 		description => "This is a brick I made in _bar_sub",
-		code        => sub { 
+		code        => sub {
 			$_[0]->{number} == 3 ? 1 : die {
 				handler => 'FooSub',
 				message => "Number wasn't 3",

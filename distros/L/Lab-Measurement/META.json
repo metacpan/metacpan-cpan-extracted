@@ -3,9 +3,9 @@
    "author" : [
       "Andreas K. H\u00fcttel <mail@akhuettel.de>",
       "Christian Butschkow <christian.butschkow@physik.uni-r.de>",
-      "Alexei Iankilevitch <alexei.iankilevitch@physik.uni-r.de>",
       "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>",
-      "Charles E. Lane <lane@duphy4.physics.drexel.edu>"
+      "Charles E. Lane <lane@duphy4.physics.drexel.edu>",
+      "Eugeniy E. Mikhailov <evgmik@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
@@ -133,7 +133,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.641",
+   "version" : "3.642",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

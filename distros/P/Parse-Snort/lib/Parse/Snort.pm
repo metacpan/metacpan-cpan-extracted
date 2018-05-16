@@ -6,7 +6,7 @@ use base qw(Class::Accessor);
 use List::Util qw(first);
 use Carp qw(carp);
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Parse::Snort - Parse and create Snort rules
 
 =head1 VERSION
 
-Version 0.07
+Version 0.9
 
 =head1 SYNOPSIS
 
@@ -25,16 +25,16 @@ Version 0.07
       proto => 'tcp',
       src => '$HOME_NET', src_port => 'any',
       direction => '->'
-      dst =>'$EXTERNAL_NET', dst_port => 'any'
+      dst => '$EXTERNAL_NET', dst_port => 'any'
     );
 
     $rule->action("pass");
 
     $rule->opts(
-	[ 'depth' => 50 ],
-	[ 'offset' => 0 ],
-	[ 'content' => "perl6" ],
-	[ "nocase" ]
+      [ 'depth' => 50 ],
+      [ 'offset' => 0 ],
+      [ 'content' => "perl6" ],
+      [ "nocase" ]
     );
 
     my $rule = Parse::Snort->new();
@@ -43,7 +43,7 @@ Version 0.07
     my $rule_string = $rule->as_string;
 );
 
-=cut 
+=cut
 
 our @RULE_ELEMENTS_REQUIRED = qw/ action proto src src_port direction dst dst_port /;
 our @RULE_ELEMENTS = ( @RULE_ELEMENTS_REQUIRED, 'opts' );
@@ -58,9 +58,7 @@ These are the object methods that can be used to read or modify any part of a Sn
 
 If input validation is required, check out the L<Parse::Snort::Strict> module.
 
-=over 4
-
-=item new ()
+=head2 new ()
 
 Create a new C<Parse::Snort> object, and return it.  There are a couple of options when creating the object:
 
@@ -68,7 +66,7 @@ Create a new C<Parse::Snort> object, and return it.  There are a couple of optio
 
 =item new ( )
 
-Create an unpopulated object, that can be filled in using the individual rule element methods, or can be populated with the L<< parse|/"PARSE" >> method.
+Create an unpopulated object, that can be filled in using the individual rule element methods, or can be populated with the L<< parse|Parse::Snort/"PARSE" >> method.
 
 =item new ( $rule_string )
 
@@ -81,21 +79,22 @@ Create an object based on a plain text Snort rule, all on one line.  This module
 
 Create an object baesd on a prepared hash reference similar to the internal strucutre of the L<Parse::Snort> object.
 
-  $rule_element_hashref = {
-    action => 'alert',
-    proto => 'tcp',
-    src => '$EXTERNAL_NET', src_port => 'any',
-    direction => '->',
-    dst => '$HOME_NET', dst_port => 'any',
-    opts => [
-    	[ 'msg' => '"perl 6 download detected\; may the world rejoice!"' ],
-    	[ 'depth' => 150 ],
-    	[ 'offset' => 0 ].
-    	[ 'content' => 'perl-6.0.0' ],
-    	[ 'nocase' ],
-    ],
-      
-  };
+    $rule_element_hashref = {
+        action    => 'alert',
+        proto     => 'tcp',
+        src       => '$EXTERNAL_NET',
+        src_port  => 'any',
+        direction => '->',
+        dst       => '$HOME_NET',
+        dst_port  => 'any',
+        opts      => [
+            ['msg'     => '"perl 6 download detected\; may the world rejoice!"'],
+            ['depth'   => 150],
+            ['offset'  => 0],
+            ['content' => 'perl-6.0.0'],
+            ['nocase'],
+        ],
+    };
 
 =back
 
@@ -110,12 +109,6 @@ sub new {
     bless $self, $class;
     $self->_init($data);
 }
-
-=for comment
-The _init method is called by the new method, to figure out what sort of data was passed to C<new()>.  If necessary, it calls $self->parse(), individual element accessor methods, or simply returns $self.
-
-=cut
-
 
 sub _init {
     my ( $self, $data ) = @_;
@@ -134,7 +127,7 @@ sub _init {
     return $self;
 }
 
-=item parse( $rule_string )
+=head2 parse( $rule_string )
 
 The parse method is what interprets a plain text rule, and populates the rule object.  Beacuse this module does not support the UNIX style line-continuations (backslash at the end of a line) the rule must be all on one line, otherwise the parse will fail in unpredictably interesting and confusing ways.  The parse method tries to interpret the rule from left to right, calling the individual accessor methods for each rule element.  This will overwrite the contents of the object (if any), so if you want to parse multiple rules at once, you will need multiple objects.
 
@@ -177,8 +170,6 @@ sub parse {
     }
 }
 
-=back
-
 =head2 state
 
 The state of the rule: active (1) or commented (0)
@@ -191,14 +182,15 @@ sub state {
     if (defined $state) {
         $self->{state} = $state;
     }
-    return $self->{state} // 1;
+    if (!defined $self->{state}) {
+        return 1;
+    }
+    return $self->{state};
 }
 
 =head2 METHODS FOR ACCESSING RULE ELEMENTS
 
 You can access the core parts of a rule (action, protocol, source IP, etc) with the method of their name.  These are read/write L<Class::Accessor> accessors.  If you want to read the value, don't pass an argument.  If you want to set the value, pass in the new value.  In either case it returns the current value, or undef if the value has not been set yet.
-
-=for comment Need to figure out "truth" again in perl sense, do I simply "return;" or "return undef" if the value doesn't exist?  For Parse::Snort::Strict, I need to have two things: 1) make it known to the user that the rule failed to parse, 2) which (may?) be a different meaning than the rule element being empty/undefined.
 
 =over 4
 
@@ -220,7 +212,7 @@ The source port for the rule.  Generally a static port, or a contigious range of
 
 =item direction
 
-The direction of the rule.  One of the following: C<->> C<<>> or C<<->.
+The direction of the rule.  One of the following: C<< -> >> C<< <> >> or C<< <- >>.
 
 =item dst
 
@@ -243,7 +235,7 @@ The opts method can be used to read existing options of a parsed rule, or set th
   $opts_array_ref = [
        [ 'msg' => '"perl 6 download detected\; may the world rejoice!"' ],
        [ 'depth' => 150 ],
-       [ 'offset' => 0 ].
+       [ 'offset' => 0 ],
        [ 'content' => 'perl-6.0.0' ],
        [ 'nocase' ],
   ]
@@ -399,7 +391,7 @@ To modify references, use the C<opts> method to grab all the rule options, modif
 
 
   $references = $rule->references(); # just the references
-  $no_references = grep { $_->[0] != "reference" } @{ $rule->opts() }; # everything but the references
+  $no_references = grep { $_->[0] ne "reference" } @{ $rule->opts() }; # everything but the references
 
 =cut 
 
@@ -415,7 +407,6 @@ sub references {
 
 The C<as_string> method returns a string that matches the normal Snort rule form of the object.  This is what you want to use to write a rule to an output file that will be read by Snort.
 
-=back
 
 =cut
 
@@ -445,6 +436,44 @@ sub as_string {
 
     return undef if @missing && !$self->{preprocessed};
     return $self->state ? $ret : "# $ret";
+}
+
+=pod
+
+=item clone
+
+Returns a clone of the current rule object.
+
+=cut
+
+# poor man's deep cloning.  This will have to be maintained if the internal structure ever changes.
+sub clone {
+    my $self = shift;
+
+    # initial shallow copy
+    my $copy = bless { %$self }, ref $self;
+
+    # deeper copy, for opts
+    if ($self->opts()) {
+      $copy->opts( [ map { [ @$_ ] } @{ $self->opts } ]);
+    }
+    return $copy;
+}
+
+=pod
+
+=item reset
+
+Resets the internal state (deletes it!) of the current rule object, and returns the rule object itself.  Useful for parsing multiple rules, one after another.  Just call C<< $rule->reset() >> after you're done with the current rule, and before you C<< $rule->parse() >> or set new values via the accessor methods.
+
+=back
+
+=cut
+
+sub reset {
+  my $self = shift;
+  delete $self->{$_} for keys %$self;
+  return $self;
 }
 
 =head1 AUTHOR
@@ -488,7 +517,7 @@ L<http://search.cpan.org/dist/Parse-Snort>
 
 =head1 DEPENDENCIES
 
-L<Test::More>, L<Class::Accessor>, L<List::Util>
+L<Class::Accessor>, L<List::Util>, L<Sub::Util>, L<Carp>
 
 =head1 ACKNOWLEDGEMENTS
 

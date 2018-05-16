@@ -43,11 +43,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/object-iterate/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/object-iterate",
       "repository" : {
          "type" : "git",
-         "web" : "https://github.com/briandfoy/Object-Iterate"
+         "url" : "https://github.com/briandfoy/object-iterate.git",
+         "web" : "https://github.com/briandfoy/object-iterate"
       }
    },
-   "version" : "1.141",
+   "version" : "1.142",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

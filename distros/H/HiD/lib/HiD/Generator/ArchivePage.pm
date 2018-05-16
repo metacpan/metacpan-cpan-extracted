@@ -3,7 +3,7 @@
 
 package HiD::Generator::ArchivePage;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Generator::ArchivePage::VERSION = '1.991';
+$HiD::Generator::ArchivePage::VERSION = '1.992';
 use Moose;
 with 'HiD::Generator';
 
@@ -85,7 +85,7 @@ published to, or let it default to the site-wide destination. Finally,
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

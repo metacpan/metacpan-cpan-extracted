@@ -4,6 +4,10 @@ use Test::More tests => 8;
 use Data::Dumper;
 
 require Filter::signatures;
+# Mimic parts of the setup of Filter::Simple
+my $extractor =
+$Filter::Simple::placeholder = $Filter::Simple::placeholder
+    = qr/\Q$;\E(.{4})\Q$;\E/s;
 
 if( $^V >= 5.20 ) {
   require warnings; warnings->unimport('experimental::signatures');

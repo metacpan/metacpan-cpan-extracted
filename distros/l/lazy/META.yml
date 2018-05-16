@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/oalders/lazy/issues
   homepage: https://github.com/oalders/lazy
   repository: https://github.com/oalders/lazy.git
-version: '0.000004'
+version: '0.000005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -58,7 +58,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::OALDERS/stale modules, build'
-      version: '0.054'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -70,7 +70,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::OALDERS/stale modules, release'
-      version: '0.054'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
@@ -428,7 +428,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000004
+          tag: v0.000005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

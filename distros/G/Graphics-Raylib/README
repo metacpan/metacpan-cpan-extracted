@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.017
+    version 0.018
 
 SYNOPSIS
 
@@ -60,6 +60,7 @@ AUTOMATIC IMPORT
 
         use Graphics::Raylib::Color ':all';
         use Graphics::Raylib::Shape;
+        use Graphics::Raylib::Texture;
         use Graphics::Raylib::Text;
         use Graphics::Raylib::Mouse;
         use Graphics::Raylib::Keyboard ':all';
@@ -132,22 +133,23 @@ EXAMPLES
       
           my $text = Graphics::Raylib::Text->new(color => RED, size => 20);
       
-          my $bitmap = Graphics::Raylib::Shape->bitmap(
+          my $img = Graphics::Raylib::Texture->new(
               matrix => unpdl($gen),
+              fullscreen => 1,
               # color => GOLD # commented-out, we are doing it fancy
           );
       
           my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
       
           while (!$g->exiting) {
-              $bitmap->matrix = unpdl($gen);
-              $bitmap->color = $rainbow->();
+              $img->matrix = unpdl($gen);
+              $img->color = $rainbow->();
               $text->text = "Generation " . ($i++);
       
               $g->clear(BLACK);
       
               Graphics::Raylib::draw {
-                  $bitmap->draw;
+                  $img->draw;
                   $text->draw;
               };
       

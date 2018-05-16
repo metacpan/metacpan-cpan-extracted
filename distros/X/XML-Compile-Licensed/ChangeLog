@@ -4,6 +4,9 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 0.02: Fri May 11 01:24:55 CEST 2018
+	- convert to GIT and GitHub
+
 version 0.01: Mon 21 Mar 13:57:26 CET 2016
 
 	Initial release, split from XML::Compile::SOAP

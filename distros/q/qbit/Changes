@@ -1,49 +1,31 @@
 ==================================================
-Changes from 2016-04-01 00:00:00 +0000 to present.
+Changes from 2017-05-13 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.4 at 2017-04-01 19:41:59 +0000
+version 2.5 at 2018-05-13 08:45:28 +0000
 ----------------------------------------
 
-  Change: d3be470e882790904662b26e7e4296c687351c7b
+  Change: f0b530e4a7bbf7ffc43fc5ac0921a24c32574e82
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-04-01 22:39:36 +0000
+  Date : 2018-05-13 11:44:42 +0000
 
-    Merge pull request #24 from Madskill/fix_warnings
+    Merge pull request #25 from Madskill/use_sys_func
 
-    fix warnings 
+    use sysopen 
 
-  Change: 9d5248e4413f81bed954f0afdb77e90309b2ef14
+  Change: a2e20d4b0b08efbdaa0877b6f5c99ecbd6dc9c65
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-04-01 22:37:47 +0000
+  Date : 2018-05-13 11:42:35 +0000
 
-    fix warnings 
+    return ($$;%) 
 
-----------------------------------------
-version 2.3 at 2016-12-01 18:31:03 +0000
-----------------------------------------
-
-  Change: f6408a0f69ffdaf292e7aed992f54d25795d8bb2
+  Change: 2bb8d8356d04e68a52c1bd6a014c05ffb6e20e18
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 21:31:03 +0000
+  Date : 2018-05-13 11:40:35 +0000
 
-    Version 2.3 
-
-  Change: 1092d69139aa76fa9be089e3e6b3723841ed5b70
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-01 21:29:50 +0000
-
-    Merge pull request #23 from Madskill/die_handler
-
-    added die_handler 
-
-  Change: 161e89ba8bdd591b03b2d30b4fe7e039d49590dd
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-26 20:38:09 +0000
-
-    added die_handler 
+    use sysopen 
 
 =================================================
-Plus 22 releases after 2016-04-01 00:00:00 +0000.
+Plus 24 releases after 2017-05-13 00:00:00 +0000.
 =================================================

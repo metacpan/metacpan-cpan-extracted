@@ -6,13 +6,13 @@ use 5.010;
 our $VERSION = '0.346.0';
 
 use Pod::Simple::SimpleTree;
+use Pod::Perldoc;
 use Pandoc::Elements;
 use Pandoc::Filter::HeaderIdentifiers;
 use Pod::Pandoc::Modules;
 use Pandoc;
 use File::Find ();
 use File::Spec;
-use IPC::Run3;
 use Carp;
 use utf8;
 
@@ -73,12 +73,9 @@ sub parse_file {
 sub parse_module {
     my ( $self, $name ) = @_;
 
-    # map module name to name
-    run3 [ 'perldoc', '-lm', $name ], undef, \$name;
-    croak $? if $?;
-    chomp $name;
+    my ($file) = Pod::Perldoc->new->grand_search_init( [$name] );
 
-    $self->parse_file($name);
+    $self->parse_file($file);
 }
 
 sub parse_string {
@@ -97,6 +94,32 @@ sub parse_tree {
         my ( $title, $subtitle ) = $text =~ m{^\s*([^ ]+)\s*[:-]*\s*(.+)};
         $doc->meta->{title}    = MetaString($title)    if $title;
         $doc->meta->{subtitle} = MetaString($subtitle) if $subtitle;
+    }
+
+    # remove header sections (TODO: move into Pandoc::Elements range filter)
+    unless ( ref $_[0] and $_[0]->{name} ) {
+        my $skip;
+        $doc->content(
+            [
+                map {
+                    if ( defined $skip ) {
+                        if ( $_->name eq 'Header' && $_->level <= $skip ) {
+                            $skip = 0;
+                        }
+                        $skip ? () : $_;
+                    }
+                    else {
+                        if ( $_->name eq 'Header' && $_->string eq 'NAME' ) {
+                            $skip = $_->level;
+                            ();
+                        }
+                        else {
+                            $_;
+                        }
+                    }
+                } @{ $doc->content }
+            ]
+        );
     }
 
     $doc;
@@ -134,7 +157,7 @@ sub parse_and_merge {
 sub is_perl_file {
     my $file = shift;
     return 1 if $file =~ /\.(pm|pod)$/;
-    if ( -x $file ) {
+    if ( -f $file ) {
         open( my $fh, '<', $file ) or return;
         return 1 if $fh and ( <$fh> // '' ) =~ /^#!.*perl/;
     }
@@ -315,7 +338,7 @@ sub _pod_link {
         }
     }
     elsif ( $type eq 'pod' ) {
-        if ($to) {
+        if ( $to && $self->{podurl} ) {
             $url = $self->{podurl} . $to;
         }
         if ($section) {
@@ -324,7 +347,13 @@ sub _pod_link {
         }
     }
 
-    return Link attributes {}, [ _pod_content( $self, $link ) ], [ $url, '' ];
+    my $content = [ _pod_content( $self, $link ) ];
+    if ($url) {
+        Link attributes { class => 'perl-module' }, $content, [ $url, '' ];
+    }
+    else {
+        Span attributes { class => 'perl-module' }, $content;
+    }
 }
 
 # map data section
@@ -348,10 +377,16 @@ sub _pod_data {
     }
 
     # parse and insert known formats if requested
-    my $format = $target eq 'tex' ? 'latex' : $target;
+    my $format_arg = my $format = $target eq 'tex' ? 'latex' : $target;
+    if ( pandoc->version ge 2 ) {
+        $format_arg .= '+smart';
+    }
     if ( grep { $format eq $_ } @{ $self->{parse} } ) {
         utf8::decode($content);
-        my $doc = pandoc->parse( $format => $content, '--smart' );
+        my $doc =
+          ( pandoc->version ge 2 )
+          ? pandoc->parse( $format_arg => $content )
+          : pandoc->parse( $format => $content, '--smart' );
         return @{ $doc->content };
     }
 
@@ -447,7 +482,9 @@ otherwise.
 =item podurl
 
 Base URL to link Perl module names to. Set to L<https://metacpan.org/pod/> by
-default.
+default. A false value disables linking external modules and wraps module names
+in C<Span> elements instead. All module names are marked up with class
+C<perl-module>.
 
 =back
 
@@ -462,7 +499,7 @@ C<subtitle>.
 
 =head2 parse_module( $module )
 
-Reads Pod from a module given by name such as C<"Pod::Pandoc">.
+Reads Pod from a module given by name such as C<"Pod::Pandoc"> or by URL.
 
 =head2 parse_string( $string )
 
@@ -486,7 +523,7 @@ warnings for skipped files.
 
 =head2 parse_and_merge( @files_or_modules )
 
-Reads Pod from files or modules given by name and merges them into one 
+Reads Pod from files or modules given by name and merges them into one
 L<Pandoc::Document> by concatenation.
 
 =head1 MAPPING
@@ -525,8 +562,6 @@ L<hell itself!|crontab(5)>
 Link text can contain formatting codes:
 
 L<the C<pod2pandoc> script|pod2pandoc>
-
-Internal links are not supported yet:
 
 L</"MAPPING">
 

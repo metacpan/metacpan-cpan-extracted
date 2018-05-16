@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.08 2018-05-13
+ - Fix editing by when condition CF and conditioned_by CF are not in the same CF grouping
+
 0.07 2018-05-08
  - Extend condition to handle multiple values
  - Complete redesign of ConditionalCustomFields storage and API

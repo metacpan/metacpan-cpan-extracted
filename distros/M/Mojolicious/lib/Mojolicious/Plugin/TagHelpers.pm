@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
-use Mojo::DOM::HTML;
+use Mojo::DOM::HTML 'tag_to_html';
 use Scalar::Util 'blessed';
 
 sub register {
@@ -166,21 +166,7 @@ sub _submit_button {
   return _tag('input', value => $value, @_, type => 'submit');
 }
 
-sub _tag {
-  my $tree = ['tag', shift, undef, undef];
-
-  # Content
-  if (ref $_[-1] eq 'CODE') { push @$tree, ['raw', pop->()] }
-  elsif (@_ % 2) { push @$tree, ['text', pop] }
-
-  # Attributes
-  my $attrs = $tree->[2] = {@_};
-  if (ref $attrs->{data} eq 'HASH' && (my $data = delete $attrs->{data})) {
-    @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
-  }
-
-  return Mojo::ByteStream->new(Mojo::DOM::HTML::_render($tree));
-}
+sub _tag { Mojo::ByteStream->new(tag_to_html(@_)) }
 
 sub _tag_with_error {
   my ($c, $tag) = (shift, shift);
@@ -496,7 +482,7 @@ Generate C<label> tag.
   %= link_to Contact => 'mailto:sri@example.com'
   <%= link_to index => begin %>Home<% end %>
   <%= link_to '/file.txt' => begin %>File<% end %>
-  <%= link_to 'http://mojolicious.org' => begin %>Mojolicious<% end %>
+  <%= link_to 'https://mojolicious.org' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
 Generate portable C<a> tag with L<Mojolicious::Controller/"url_for">, defaults
@@ -510,7 +496,7 @@ to using the capitalized link target as content.
   <a href="mailto:sri@example.com">Contact</a>
   <a href="/path/to/index">Home</a>
   <a href="/path/to/file.txt">File</a>
-  <a href="http://mojolicious.org">Mojolicious</a>
+  <a href="https://mojolicious.org">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
 =head2 month_field
@@ -666,16 +652,15 @@ Alias for L</"tag">.
   %= tag 'br'
   %= tag 'div'
   %= tag 'div', id => 'foo', hidden => undef
-  %= tag div => 'test & 123'
-  %= tag div => (id => 'foo') => 'test & 123'
-  %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
+  %= tag 'div', 'test & 123'
+  %= tag 'div', id => 'foo', 'test & 123'
+  %= tag 'div', data => {my_id => 1, Name => 'test'}, 'test & 123'
   %= tag div => begin
     test & 123
   % end
   <%= tag div => (id => 'foo') => begin %>test & 123<% end %>
 
-HTML tag generator, the C<data> attribute may contain a hash reference with
-key/value pairs to generate attributes from.
+Alias for L<Mojo::DOM/"new_tag">.
 
   <br>
   <div></div>
@@ -692,8 +677,8 @@ Very useful for reuse in more specific tag helpers.
 
   my $output = $c->tag('meta');
   my $output = $c->tag('meta', charset => 'UTF-8');
-  my $output = $c->tag(div => '<p>This will be escaped</p>');
-  my $output = $c->tag(div => sub { '<p>This will not be escaped</p>' });
+  my $output = $c->tag('div', '<p>This will be escaped</p>');
+  my $output = $c->tag('div', sub { '<p>This will not be escaped</p>' });
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping in C<ep> templates.
@@ -767,15 +752,15 @@ get picked up and shown as default.
 =head2 url_field
 
   %= url_field 'address'
-  %= url_field address => 'http://mojolicious.org'
-  %= url_field address => 'http://mojolicious.org', id => 'foo'
+  %= url_field address => 'https://mojolicious.org'
+  %= url_field address => 'https://mojolicious.org', id => 'foo'
 
 Generate C<input> tag of type C<url>. Previous input values will automatically
 get picked up and shown as default.
 
   <input name="address" type="url">
-  <input name="address" type="url" value="http://mojolicious.org">
-  <input id="foo" name="address" type="url" value="http://mojolicious.org">
+  <input name="address" type="url" value="https://mojolicious.org">
+  <input id="foo" name="address" type="url" value="https://mojolicious.org">
 
 =head2 week_field
 
@@ -803,6 +788,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

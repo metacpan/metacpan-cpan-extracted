@@ -179,8 +179,8 @@ AddHandler cgi-script .cgi .pl
 
 - With the oxd-server and Apache Server running, navigate to the URL's below to run Sample Client Application. To register a client in the oxd-server use the Setup client URL. Upon successful registration of the client application, oxd ID will be displayed in the UI. Next, navigate to the Login URL for authentication.
 
-    - Setup Client URL: https://client.example.com:8090/cgi-bin/settings.cgi
-    - Login URL: https://client.example.com:8090/cgi-bin/index.cgi
-    - UMA URL: https://client.example.com:8090/cgi-bin/uma.cgi
+    - Setup Client URL: https://client.example.com/cgi-bin/settings.cgi
+    - Login URL: https://client.example.com/cgi-bin/index.cgi
+    - UMA URL: https://client.example.com/cgi-bin/uma.cgi
 
 - The input values used during Setup Client are stored in the configuration file (oxd-settings.json).

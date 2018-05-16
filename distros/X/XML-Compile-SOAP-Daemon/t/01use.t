@@ -17,6 +17,7 @@ my @show_versions =
     XML::Compile::SOAP::WSA
     XML::LibXML
     Net::Server
+	Log::Report
     LWP
    /;
 

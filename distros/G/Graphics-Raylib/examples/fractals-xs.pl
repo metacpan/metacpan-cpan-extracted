@@ -18,8 +18,8 @@ my @julia      = map [(0)x$SIZE], 0..$SIZE-1;
 my @mandelbrot = map [(0)x$SIZE], 0..$SIZE-1;
 # coloring in the callback is reaaaaally slow, so we don't do it TODO find out why
 my @args = (color => sub { shift }, width => $SIZE * 1, height => $SIZE * 1);
-my $julia      = Graphics::Raylib::Shape->bitmap(matrix => \@julia,      x => -$SIZE*1, @args);
-my $mandelbrot = Graphics::Raylib::Shape->bitmap(matrix => \@mandelbrot, x =>  $SIZE*1, @args);
+my $julia      = Graphics::Raylib::Image->new(matrix => \@julia,      x => -$SIZE*1, @args);
+my $mandelbrot = Graphics::Raylib::Image->new(matrix => \@mandelbrot, x =>  $SIZE*1, @args);
 $g->fps(50);
 
 for (my $y = 0; $y <= $SIZE; $y += $STEP) {

@@ -42,85 +42,85 @@ isa_ok( $brick, $class );
 Most bricks that come with this module simply use their subroutine name
 for the brick they add to the bucket.
 
-To get around this, supply a C<name> parameter to the 
+To get around this, supply a C<name> parameter to the
 
 =back
 
-=cut 
+=cut
 
 sub Brick::Bucket::three_digit_odd_number
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length} = 3;
 	$setup->{filter_fields} = [ qw(just_right) ];
-	
+
 	$setup->{name} = "Remove non-digits";
 	my $filter = $bucket->_remove_non_digits( $setup );
-	
+
 	$setup->{regex} = qr/
-		[13579]          
+		[13579]
 		\z
 		/x;
-	
-	my $regex = $bucket->_matches_regex( 
+
+	my $regex = $bucket->_matches_regex(
 		{ %$setup, name => 'Odd-Even regex test'}
 		);
-	
+
 
 	$setup->{name} = "Length is three characters";
-	my $length = $bucket->_value_length_is_exactly( 
+	my $length = $bucket->_value_length_is_exactly(
 		$setup
 		);
 
 	$setup->{name} = "Three digit odd number";
-	my $composed = $bucket->__compose_satisfy_all( 
-		$filter, $regex, $length 
+	my $composed = $bucket->__compose_satisfy_all(
+		$filter, $regex, $length
 		);
-		
+
 	$bucket->__make_constraint( $composed, $setup );
 	}
-	
+
 sub Brick::Bucket::twofer
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length}  = 3;
 	$setup->{filter_fields} = $setup->{fields};
-	
+
 	$setup->{name} = "Remove non-digits";
 	my $filter = $bucket->_remove_non_digits( $setup );
-	
+
 	$setup->{regex} = qr/
-		[13579]          
+		[13579]
 		\z
 		/x;
-	
-	my $regex = $bucket->_matches_regex( 
-		{ %$setup, 
+
+	my $regex = $bucket->_matches_regex(
+		{ %$setup,
 			name => 'Odd-Even regex test',
 			field => 'even_number',
 			}
 		);
-	
+
 
 	$setup->{name} = "Length is three characters";
-	my $length = $bucket->_value_length_is_exactly( 
+	my $length = $bucket->_value_length_is_exactly(
 		{ %$setup, field => 'short_number' }
 		);
 
 	$setup->{name} = "Three digit odd number";
-	my $composed = $bucket->__compose_satisfy_all( 
-		$filter, $regex, $length 
+	my $composed = $bucket->__compose_satisfy_all(
+		$filter, $regex, $length
 		);
-		
+
 	$bucket->__make_constraint( $composed, $setup );
 	}
-	
+
 =head2 Create the profile
 
 
-=cut 
+=cut
 
 my $Profile = [
 	[ just_right  => three_digit_odd_number => { field => 'just_right'   } ],
@@ -129,7 +129,7 @@ my $Profile = [
 	[ even_number => three_digit_odd_number => { field => 'even_number'  } ],
 	[ two_fields  => twofer                 => { fields => [ qw(even_number short_number) ] } ],
 	];
-	
+
 =head2 Test the profile with lint()
 
 This isn't a necessary step, but it's nice to know that the profile
@@ -143,7 +143,7 @@ my $lint = $brick->profile_class->lint( $Profile );
 unless( is( $lint, 0, "Profile has no errors" ) )
 	{
 	my %lint = $brick->profile_class->lint( $Profile );
-	
+
  	diag( Data::Dumper->Dumper( \%lint ) );
  	}
 
@@ -183,7 +183,7 @@ my %Input = (
 
 
 =cut
-	
+
 my $result =  $brick->apply( $profile, \%Input );
 ok( $result, Brick->result_class );
 

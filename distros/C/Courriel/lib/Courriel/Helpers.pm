@@ -3,7 +3,7 @@ package Courriel::Helpers;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Encode qw( decode );
 use Exporter qw( import );

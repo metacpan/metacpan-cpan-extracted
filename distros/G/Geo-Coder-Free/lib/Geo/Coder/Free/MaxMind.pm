@@ -170,7 +170,7 @@ sub geocode {
 		Carp::carp(__PACKAGE__, ": can't parse and handle $location");
 		return;
 	} else {
-		Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
+		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
 		return;
 	}
 	if($country) {

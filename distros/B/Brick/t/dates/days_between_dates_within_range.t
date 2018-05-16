@@ -23,17 +23,17 @@ can_ok( $bucket, 'days_between_dates_within_range' );
 # Specify input date in range
 # SHOULD WORK
 {
-my $sub = $bucket->days_between_dates_within_range( 
+my $sub = $bucket->days_between_dates_within_range(
 	{
 	start_date     => '20070205',
 	end_date       => '20070314',
 	input_date     => '20070214',
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
-	
+
 my $result = eval { $sub->( {} ) };
 is( $result, 1, "Good date works" );
 
@@ -46,14 +46,14 @@ is( $result, 1, "Good date works" );
 # Specify input date out of range
 # SHOULD FAIL
 {
-my $sub = $bucket->days_between_dates_within_range( 
+my $sub = $bucket->days_between_dates_within_range(
 	{
 	start_date     => '20070205',
 	end_date       => '20070314',
 	input_date     => '20080214',
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
 my $result = eval { $sub->( {} ) };
@@ -72,17 +72,17 @@ isa_ok( $at, ref {}, "death returns a hash ref in $@" );
 # Specify input date field
 # SHOULD WORK
 {
-my $sub = $bucket->days_between_dates_within_range( 
+my $sub = $bucket->days_between_dates_within_range(
 	{
 	start_date       => '20060606',
 	end_date         => '20070314',
 	input_date_field => 'foo_date',
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
-	
+
 my $result = eval { $sub->( { foo_date => 20070101 } ) };
 is( $result, 1, "Good date works" );
 
@@ -112,17 +112,17 @@ isa_ok( $at, ref {}, "death returns a hash ref in $@" );
 # Specify input date
 # SHOULD WORK
 {
-my $sub = $bucket->days_between_dates_within_range( 
+my $sub = $bucket->days_between_dates_within_range(
 	{
 	start_date       => '20060606',
 	end_date_field   => 'end_date',
 	input_date       => '20070101',
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
-	
+
 my $result = eval { $sub->( { end_date => 20081111 } ) };
 is( $result, 1, "Good date works" );
 
@@ -152,17 +152,17 @@ isa_ok( $at, ref {}, "death returns a hash ref in $@" );
 # Specify input date
 # SHOULD WORK
 {
-my $sub = $bucket->days_between_dates_within_range( 
+my $sub = $bucket->days_between_dates_within_range(
 	{
 	start_date_field => 'start_date',
 	end_date         => '20091020',
 	input_date       => '20070101',
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {} );
 
-	
+
 my $result = eval { $sub->( { start_date => 20061111 } ) };
 is( $result, 1, "Good date works" );
 

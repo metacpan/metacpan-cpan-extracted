@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.08 May 11, 2018
+
+	Internal reorganisation to use OpenSSL EVP interface
+
+
 **** 1.07 April 5, 2018
 
 Fix: rt.cpan.org #124880
@@ -578,4 +583,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1666 2018-04-05 12:39:01Z willem $
+$Id: Changes 1676 2018-05-11 11:56:04Z willem $

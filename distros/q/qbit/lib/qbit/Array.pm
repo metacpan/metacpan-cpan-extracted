@@ -5,7 +5,7 @@ qbit::Array - Functions to manipulate arrays.
 =cut
 
 package qbit::Array;
-$qbit::Array::VERSION = '2.4';
+$qbit::Array::VERSION = '2.5';
 use strict;
 use warnings;
 use utf8;

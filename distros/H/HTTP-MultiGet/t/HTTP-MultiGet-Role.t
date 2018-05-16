@@ -22,6 +22,7 @@ my $self=$class->new;
 
 isa_ok($self,$class);
 
+
   {
     
     my $result=$self->fail;
@@ -146,6 +147,51 @@ SKIP: {
   }
 }
 
+{
+  my $sub=$self->can('pass');
+  ok($sub,'Should return a code refrence');
+  my $result=$sub->($self);
+  isa_ok($result,'Data::Result');
+  ok($result,'result should be true');
+  ok(!$self->can('bad_function_should_not_exist'),'Should fail to return a function that does not exist');
+
+  $sub=$self->can('que_google');
+  cmp_ok($sub,'eq',\&SomeTestClass::que_google,'Validate $self->SUPER::can($method)');
+
+}
+
+{
+  my $test="this is a test";
+  ok($self->json->get_allow_nonref,'non ref mode should be enabled');
+  my $in=qq{"$test"};
+  cmp_ok($self->json->decode($in),'eq',$test,'should now decode non refs');
+}
+
+for my $code (200 .. 299 ){
+  {
+    my $response=HTTP::Response->new($code,'ok',[],q{{"test": "testing"}});
+    my $result=$self->parse_response(undef,$response);
+    ok($result,'Should get true as a response, code: '.$code);
+    is_deeply($result->get_data,{test=>"testing"},'parse a json hash with a code $code');
+  }
+  {
+    my $response=HTTP::Response->new($code,'ok',[],q{["test", "testing"]});
+    my $result=$self->parse_response(undef,$response);
+    ok($result,'Should get true as a response, code: '.$code);
+    is_deeply($result->get_data,[test=>"testing"],'parse a json array with a code $code');
+  }
+  {
+    my $response=HTTP::Response->new($code,'ok',[],q{"test"});
+    my $result=$self->parse_response(undef,$response);
+    ok($result,'Should get true as a response, code: '.$code);
+    cmp_ok($result->get_data,'eq','test','parse a json string with a code $code');
+  }
+}
+for my $code (199,400,401,300,500,501,595) {
+    my $response=HTTP::Response->new($code,'fail',[],q{{"test": "testing"}});
+    my $result=$self->parse_response(undef,$response);
+    ok(!$result,'Should fail a code: '.$code);
+}
 
 BEGIN {
   package 
@@ -206,3 +252,4 @@ BEGIN {
     return $self->queue_result($cb,$self->new_true({}));
   }
 }
+

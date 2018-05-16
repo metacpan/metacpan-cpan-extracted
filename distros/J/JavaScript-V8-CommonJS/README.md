@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/cafe01/javascript-v8-commonjs.svg?branch=master)](https://travis-ci.org/cafe01/javascript-v8-commonjs) [![Coverage Status](https://img.shields.io/coveralls/cafe01/javascript-v8-commonjs/master.svg?style=flat)](https://coveralls.io/r/cafe01/javascript-v8-commonjs?branch=master)
 # NAME
 
 JavaScript::V8::CommonJS - Modules/1.0 for JavaScript::V8

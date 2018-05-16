@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.007000';
+our $VERSION = '1.008000';
 
 1;
 
@@ -22,7 +22,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 =head1 VERSION
 
-version 1.007000
+version 1.008000
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ version 1.007000
       license_key => 'abcdef123456',
   );
 
-  # Request HashRef must contain a 'device' key, with a value that is a
+  # For the fraud services, the request HashRef must contain a 'device' key, with a value that is a
   # HashRef containing an 'ip_address' key with a valid IPv4 or IPv6 address.
   # All other keys/values are optional; see other modules in minFraud Perl API
   # distribution for details.
@@ -57,10 +57,26 @@ version 1.007000
   my $factors = $client->factors( $request );
   say $factors->subscores->ip_tenure;
 
+  # For the chargeback service, the request HashRef must contain an 'ip_address' key
+  # with a valid IPv4 or IPv6 address.
+  # All other keys/values are optional; see other modules in minFraud Perl API
+  # distribution for details.
+
+  $request = { ip_address => '24.24.24.24' };
+
+  # Use the 'chargeback' method. The chargeback api does not return
+  # any content from the server.
+
+  my $chargeback = $client->chargeback( $request );
+  if ($chargeback->isa('WebService::MinFraud::Model::Chargeback')) {
+    say 'Successfully submitted chargeback';
+  }
+
 =head1 DESCRIPTION
 
 This distribution provides an API for the
-L<MaxMind minFraud Score, Insights, and Factors web services|https://dev.maxmind.com/minfraud/>.
+L<MaxMind minFraud Score, Insights, and Factors web services|https://dev.maxmind.com/minfraud/>
+and the L<MaxMind minFraud Chargeback web service|https://dev/maxmind.com/minfraud/chargeback/>.
 
 See L<WebService::MinFraud::Client> for details on using the web service client
 API.
@@ -102,13 +118,17 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Dave Rolsky Florian Ragwitz Greg Oschwald Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro William Storey
+=for stopwords Andy Jack Christopher Bothwell Dave Rolsky Florian Ragwitz Greg Oschwald Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro William Storey
 
 =over 4
 
 =item *
 
 Andy Jack <ajack@maxmind.com>
+
+=item *
+
+Christopher Bothwell <christopher.bothwell@endurance.com>
 
 =item *
 

@@ -18,6 +18,8 @@ const my @msgs => (
     q|<134>Jan 1 11:28:13 filer-201.example.com [filer-201: scsitarget.ispfct.targetReset:notice]: FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)|,
     q|2016-11-19T20:50:01.749659+01:00 janus CROND[14400]: (root) CMD (/usr/lib64/sa/sa1 1 1)|,
     q|2015 Nov 13 13:40:01 ether rsyslogd-2177: imuxsock begins to drop messages from pid 17840 due to rate-limit|,
+    q|2015 Nov 13 13:40:01 ether application: JSON log is: {"src_ip":"1.2.3.4","src_port":35235}|,
+    q|2015 Nov 13 13:40:01 ether application: this is words with some splunk k/v at the end: k1=v1, k2=v2, k3=v3|,
 );
 
 my $last = '';
@@ -53,6 +55,19 @@ my $results = timethese(50_000, {
     'No Dates' => sub {
         local $Parse::Syslog::Line::DateParsing     = 0;
         $stub->('No Dates');
+    },
+    'JSON' => sub {
+        local $Parse::Syslog::Line::AutoDetectJSON = 1;
+        $stub->('JSON');
+    },
+    'KV' => sub {
+        local $Parse::Syslog::Line::AutoDetectKeyValues = 1;
+        $stub->('KV');
+    },
+    'SDATA' => sub {
+        local $Parse::Syslog::Line::AutoDetectJSON = 1;
+        local $Parse::Syslog::Line::AutoDetectKeyValues = 1;
+        $stub->('SDATA');
     },
 });
 

@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Motor;
 #ABSTRACT: Stepper motor sweep
-$Lab::XPRESS::Sweep::Motor::VERSION = '3.641';
+$Lab::XPRESS::Sweep::Motor::VERSION = '3.642';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -126,7 +126,7 @@ Lab::XPRESS::Sweep::Motor - Stepper motor sweep
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 SYNOPSIS
 

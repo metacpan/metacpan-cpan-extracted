@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Term-Menu-Hierarchical
-version:            0.99
+version:            1.00
 abstract:           Perl extension for creating hierarchical menus
 author:
     - Ben Okopnik <ben@okopnik.com>

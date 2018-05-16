@@ -9,7 +9,7 @@ isa_ok( $brick, $class );
 
 use Brick::Profile;
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my @profile = ();
 my %input   = ();
@@ -24,22 +24,22 @@ my $result = $brick->apply( $profile, \%input || {} );
 isa_ok( $result, $class->result_class );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my @profile = (
-	[ in_number => number_within_range => { 
-		minimum   => 0, 
-		maximum   => 10, 
-		field     => 'in_number', 
-		inclusive => 1 
-		} 
+	[ in_number => number_within_range => {
+		minimum   => 0,
+		maximum   => 10,
+		field     => 'in_number',
+		inclusive => 1
+		}
 	],
-	[ ex_number => number_within_range => { 
-		minimum   => 0, 
-		maximum   => 10, 
-		field     => 'ex_number', 
-		inclusive => 0 
-		} 
+	[ ex_number => number_within_range => {
+		minimum   => 0,
+		maximum   => 10,
+		field     => 'ex_number',
+		inclusive => 0
+		}
 	],
 
 	);
@@ -48,7 +48,7 @@ my %input = (
 	in_number => 5,
 	ex_number => 0,
 	);
-	
+
 my( $lint ) = $brick->profile_class->lint( \@profile );
 is( keys %$lint, 0, "Profile is formatted correctly" );
 

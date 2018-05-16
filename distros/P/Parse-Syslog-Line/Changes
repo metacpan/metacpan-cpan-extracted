@@ -1,9 +1,38 @@
 ==================================================
-Changes from 2015-11-28 00:00:00 +0000 to present.
+Changes from 2016-05-11 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.2 at 2017-11-27 00:11:24 +0000
+version 4.3 at 2018-05-11 23:44:08 +0000
+----------------------------------------
+
+  Change: a2601667283958a3ac28200573c931363afedac8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-11 16:43:58 +0000
+
+    Format POD for 4.3 Release 
+
+  Change: 26a63b5830a91b2b9b90527c2f10a0e9fd0f5ca5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-11 16:36:17 +0000
+
+    Auto Detect Structured Data in Messages
+
+    Disabled by default, but via the toggles:
+
+    $Parse::Syslog::Line::AutoDetectJSON = 1;
+
+    $Parse::Syslog::Line::AutoDetectKeyValues = 1;
+
+    The content of the message will be checked for JSON or Splunk style
+    key/values pairs. If found, they'll be extracted into the SDATA element of
+    the returned HashReference.
+
+    Also added the --sdata flag to parse-syslog-line.pl and an --manual flag
+    too. 
+
+----------------------------------------
+version 4.2 at 2017-11-26 23:49:10 +0000
 ----------------------------------------
 
   Change: 24ce203cfebfd5ee8c185f697c6166da2414d33c
@@ -329,62 +358,6 @@ version 3.4 at 2016-11-19 20:08:46 +0000
 
     Dist::Zilla and Pod::Weaver config updates. 
 
-----------------------------------------
-version 3.3 at 2016-01-24 21:09:02 +0000
-----------------------------------------
-
-  Change: c76a1d98960c06b0af86a0ed1ff804992e528797
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-01-24 21:09:02 +0000
-
-    Parse logs with year prefix Fix broken year roll-over bug for new sample
-    logs. 
-
-  Change: edb732c10e8f6c6796c38e27d04a2657ceac10a7
-  Author: Keedi Kim <keedi.k@gmail.com>
-  Date : 2016-01-08 21:27:11 +0000
-
-    Fix the failed test caused by entered the new year 
-
-  Change: 85b781ec4e2624e0555f96816de4a18cb988b7dd
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-11-14 01:55:00 +0000
-
-    Some folks combat the weirdness of lack of a year in the syslog messaging
-    by simply prepending the year to the messages. This patch allows that
-    format to be parsed without a penalty on the rest of the infrastructure. 
-
-  Change: 7b13bea422d0e4ee5af17c09e779a33f8e7e9d40
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 22:53:40 +0000
-
-    Remove date_str from the test suite as it's no longer valid. 
-
-  Change: 8222c41563f492684d1c858d1b3338512dbbdaa6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 22:49:29 +0000
-
-    TravisCI Needs a helper for a Dist::Zilla controlled build. 
-
-  Change: 0cd9b1f97a2a1acca2b5dececb7253ff710872ae
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 22:44:45 +0000
-
-    Added Travis-CI Testing. 
-
-  Change: 6d6d53139a6cb96914ca2982de28621723d392a8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 22:44:45 +0000
-
-    Remove duplicate field 'date_str', use 'datetime_str' instead. Clean up
-    typos in the documentation 
-
-  Change: b54e5d8e0f4c768044f15b65dcd1fa1cf05a7ab5
-  Author: Mateu X Hunter <mhunter@maxmind.com>
-  Date : 2015-10-07 09:24:32 +0000
-
-    Parse microseconds 
-
 =================================================
-Plus 23 releases after 2015-11-28 00:00:00 +0000.
+Plus 24 releases after 2016-05-11 00:00:00 +0000.
 =================================================

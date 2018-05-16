@@ -68,7 +68,7 @@ sub print_html_body_section_top {
     print '<body>'."\n";
     print '<div class="container">'."\n";
     print '<div class="jumbotron"><h1>Gluu oxd Perl Application</h1></div>'."\n";
-    print '<h2>User Info</h2>'."\n";
+    print '<h2>User Details</h2>'."\n";
    
 }
 

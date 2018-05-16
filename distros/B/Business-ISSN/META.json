@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl extension for International Standard Serial Numbers",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-ISSN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0",
+            "strict" : "0",
+            "subs" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/business-issn/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/business-issn",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/business-issn.git",
+         "web" : "https://github.com/briandfoy/business-issn"
+      }
+   },
+   "version" : "1.003",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

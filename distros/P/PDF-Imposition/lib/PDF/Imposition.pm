@@ -24,11 +24,11 @@ PDF::Imposition - Perl module to manage the PDF imposition
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 sub version {
     return "PDF::Imposition $VERSION PDF::Cropmarks "
@@ -90,6 +90,10 @@ See L<PDF::Imposition::Schema2up>
 =item 2down
 
 See L<PDF::Imposition::Schema2down>
+
+=item 2x4x1
+
+See L<PDF::Imposition::Schema2x4x1>
 
 =item 2x4x2
 
@@ -335,6 +339,7 @@ E.g.
 
 sub available_schemas {
     return qw/2up 2down 2side 2x4x2 1x4x2cutfoldbind
+              2x4x1
               4up 1repeat2top 1repeat2side 1repeat4 ea4x4
               1x8x2 1x1/
 }

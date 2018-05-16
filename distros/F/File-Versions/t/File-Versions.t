@@ -1,14 +1,14 @@
 use warnings;
 use strict;
 use Test::More tests => 10;
-use FindBin;
+use FindBin '$Bin';
 use Cwd;
 
 use File::Path 'rmtree';
 use File::Versions qw/make_backup backup_name/;
 
 my $start_dir = getcwd;
-my $tempdir = "$FindBin::Bin/temp";
+my $tempdir = "$Bin/temp";
 if (-d $tempdir) {
     rmtree ($tempdir);
 }

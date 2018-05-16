@@ -4,7 +4,7 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Joel A Berger <joel.a.berger@gmail.com>'
 build_requires:
-  Alien::Build: '1.29'
+  Alien::Build: '1.41'
   Alien::Build::MB: '0.05'
   Module::Build: '0.28'
   Test2::V0: '0.000060'
@@ -16,7 +16,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,5 +30,22 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Acme-Alien-DontPanic2/issues
   homepage: https://metacpan.org/pod/Acme::Alien::DontPanic2
   repository: git://github.com/Perl5-Alien/Acme-Alien-DontPanic2.git
-version: '1.2900'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.4100'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.27.11
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

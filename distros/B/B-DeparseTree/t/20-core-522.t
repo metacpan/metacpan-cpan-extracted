@@ -25,7 +25,6 @@
 # Note that tests for prefixing feature.pm-enabled keywords with CORE:: when
 # feature.pm is not enabled are in deparse.t, as they fit that format better.
 
-
 BEGIN {
     require Config;
     if (($Config::Config{extensions} !~ /\bB\b/) ){
@@ -46,13 +45,14 @@ use feature (sprintf(":%vd", $^V)); # to avoid relying on the feature
                                     # logic to add CORE::
 
 no warnings 'experimental::autoderef';
+
 use B::DeparseTree;
 my $deparse = new B::DeparseTree;
-# use B::Deparse;
-# my $deparse = new B::Deparse;
+use B::Deparse;
+my $deparse_orig = new B::Deparse;
 
 my %SEEN;
-my %SEEN_STRENGH;
+my %SEEN_STRENGTH;
 
 # for a given keyword, create a sub of that name, then
 # deparse "() = $expr", and see if it matches $expected_expr
@@ -98,22 +98,26 @@ sub testit {
 	}
 
 	my $got_text = $deparse->coderef2text($code_ref);
+	my $got_text_orig = $deparse_orig->coderef2text($code_ref);
 
-	unless ($got_text =~ /^{
+	if ($got_text ne $got_text_orig) {
+
+	    unless ($got_text =~ /^{
     package test;
     BEGIN \{\$\{\^WARNING_BITS} = "[^"]*"}
     use strict 'refs', 'subs';
     use feature [^\n]+
     \Q$vars\E\(\) = (.*)
 }/s) {
-	    ::fail($desc);
-	    ::diag("couldn't extract line from boilerplate\n");
-	    ::diag($got_text);
-	    return;
-	}
+		::fail($desc);
+		::diag("couldn't extract line from boilerplate\n");
+		::diag($got_text);
+		return;
+	    }
 
-	my $got_expr = $1;
-	is $got_expr, $expected_expr, $desc;
+	    my $got_expr = $1;
+	    is $got_expr, $expected_expr, $desc;
+	}
     }
 }
 
@@ -128,7 +132,7 @@ my %infix_map = qw(and && or ||);
 
 sub do_infix_keyword {
     my ($keyword, $parens, $strong) = @_;
-    $SEEN_STRENGH{$keyword} = $strong;
+    $SEEN_STRENGTH{$keyword} = $strong;
     my $expr = "(\$a $keyword \$b)";
     my $nkey = $infix_map{$keyword} // $keyword;
     my $expr = "(\$a $keyword \$b)";
@@ -154,7 +158,7 @@ sub do_infix_keyword {
 sub do_std_keyword {
     my ($keyword, $narg, $parens, $dollar, $strong) = @_;
 
-    $SEEN_STRENGH{$keyword} = $strong;
+    $SEEN_STRENGTH{$keyword} = $strong;
 
     for my $core (0,1) { # if true, add CORE:: to keyword being deparsed
 	my @code;
@@ -171,7 +175,6 @@ sub do_std_keyword {
 	testit $keyword, @code; # code[0]: to run; code[1]: expected
     }
 }
-
 
 while (<DATA>) {
     chomp;
@@ -361,7 +364,7 @@ SKIP:
 		diag("keyword '$key' seen in $file, but not tested here!!");
 		$pass = 0;
 	    }
-	    if (exists $SEEN_STRENGH{$key} and $SEEN_STRENGH{$key} != $strength) {
+	    if (exists $SEEN_STRENGTH{$key} and $SEEN_STRENGTH{$key} != $strength) {
 		diag("keyword '$key' strengh as seen in $file doen't match here!!");
 		$pass = 0;
 	    }

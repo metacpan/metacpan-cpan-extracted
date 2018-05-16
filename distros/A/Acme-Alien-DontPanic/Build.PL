@@ -17,7 +17,7 @@ my $builder = Alien::Base::ModuleBuild->new(
   module_name => 'Acme::Alien::DontPanic',
   license => 'perl',
   configure_requires => {
-    'Alien::Base::ModuleBuild' => '0.044',
+    'Alien::Base::ModuleBuild' => '1.03',
     'Module::Build' => 0.38,
   },
   test_requires => {
@@ -30,7 +30,7 @@ my $builder = Alien::Base::ModuleBuild->new(
   },
   requires => {
     'perl' => '5.008001',
-    'Alien::Base' => '1.01',
+    'Alien::Base' => '1.41',
   },
   dist_author => [
     'Graham Ollis <plicease@cpan.org>',
@@ -40,8 +40,8 @@ my $builder = Alien::Base::ModuleBuild->new(
   alien_isolate_dynamic => 1,
   alien_repository => {
     protocol => 'https',
-    host     => 'perl5-alien.github.io',
-    location => '/page/dontpanic.html',
+    host     => 'alienfile.org',
+    location => '/dontpanic/',
     pattern  => qr/\/([\d\.]+)\.tar\.gz$/,
   },
   alien_inline_auto_include => [ 'libdontpanic.h' ],

@@ -1,5 +1,5 @@
 package YAML;
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 use YAML::Mo;
 
@@ -13,8 +13,10 @@ our (
     $UseHeader, $UseVersion, $UseBlock, $UseFold, $UseAliases,
     $Indent, $SortKeys, $Preserve,
     $AnchorPrefix, $CompressSeries, $InlineSeries, $Purity,
-    $Stringify, $Numify
+    $Stringify, $Numify, $LoadBlessed,
 );
+
+$LoadBlessed = 1;
 
 
 use YAML::Node; # XXX This is a temp fix for Module::Build

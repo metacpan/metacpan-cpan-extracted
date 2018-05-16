@@ -40,19 +40,14 @@ Currently supported are "BEA" and "SharePoint".
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-Licensed distribution version 0.01,
-built on March 21, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
-
-Please post questions or ideas to the mailinglist at
-F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
-For live contact with other developers, visit the C<#xml-compile> channel
-on C<irc.perl.org>.
+This module is part of XML-Compile-Licensed distribution version 0.02,
+built on May 11, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2016-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

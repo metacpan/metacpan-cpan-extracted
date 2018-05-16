@@ -30,4 +30,4 @@ requires:
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/JavaScript-Duktape-XS
-version: '0.000051'
+version: '0.000052'

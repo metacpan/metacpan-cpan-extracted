@@ -1,3 +1,4 @@
+
 =encoding UTF-8
 
 =head1 Name
@@ -11,7 +12,7 @@ It union all project models.
 =cut
 
 package QBit::Application;
-$QBit::Application::VERSION = '0.016';
+$QBit::Application::VERSION = '0.017';
 use qbit;
 
 use base qw(QBit::Class);
@@ -53,15 +54,19 @@ Read all configs
 
 =item
 
+Install die handler if needed
+
+=item
+
 Set default locale
 
 =item
 
-Preload accessors if needed
+Initialization accessors (see "set_accessors")
 
 =item
 
-Install die handler if needed
+Preload accessors if needed
 
 =back
 
@@ -110,6 +115,10 @@ sub init {
         __PACKAGE__
     );
 
+    if ($self->get_option('install_die_handler')) {
+        $SIG{__DIE__} = \&qbit::Exceptions::die_handler;
+    }
+
     my $locales = $self->get_option('locales', {});
     if (%$locales) {
         my ($locale) = grep {$locales->{$_}{'default'}} keys(%$locales);
@@ -118,15 +127,178 @@ sub init {
         $self->set_app_locale($locale);
     }
 
+    $self->init_accessors();
+
     if ($self->get_option('preload_accessors')) {
         $self->$_ foreach keys(%{$self->get_models()});
     }
 
-    if ($self->get_option('install_die_handler')) {
-        $SIG{__DIE__} = \&qbit::Exceptions::die_handler;
-    }
-
     delete($self->{'__OPTIONS__'});    # Options initializing in pre_run
+}
+
+=head2 set_accessors
+
+Set accessors. Initialization accessors - one of the steps in sub "init".
+If you used B<set_accessors> after B<init>, call sub B<init_accessors>.
+
+You can use standard way for set accessors
+
+  use Application::Model::Users accessor => 'users';
+  use QBit::Application::Model::RBAC::DB accessor => 'rbac', models => {db => 'app_db'};
+
+B<But use this method preferable.>
+
+B<Reserved keys:>
+
+=over
+
+=item
+
+accessor
+
+=item
+
+package
+
+=item
+
+models
+
+=item
+
+init
+
+=item
+
+app_pkg
+
+=back
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<%accessors> - Accessors (type: hash). Keys is accessor name, values is options for import.
+
+=back
+
+B<Example:>
+
+  __PACKAGE__->set_accessors(
+      app_db => {
+          package => 'Application::Model::DB',             # key "package" required (Package name)
+      },
+      rbac => {
+          package => 'QBit::Application::Model::RBAC::DB',
+          models => {                                      # key "models" redefine accessors into rbac
+              db => 'app_db'
+          },
+      },
+  );
+
+  # or run time
+
+  $app->set_accessors(...);
+  $app->init_accessors();
+
+  #after
+
+  $app->app_db; # returns object of a class "Application::Model::DB"
+  $app->rbac;   # returns object of a class "QBit::Application::Model::RBAC::DB"
+
+  $app->rbac->db; # returns object of a class "Application::Model::DB", but into package used "QBit::Application::Model::DB::RBAC"
+
+=cut
+
+sub set_accessors {
+    my ($self, %accessors) = @_;
+
+    my $package = ref($self) || $self;
+
+    my $app_stash = package_stash($package);
+    my $models = $app_stash->{'__MODELS__'} //= {};
+
+    my $all_models = $self->get_models();
+
+    foreach my $accessor (sort keys(%accessors)) {
+        throw gettext(
+            'Accessor "%s" with class "%s" is exists, try set this accessor for class "%s" in package "%s"',
+            $accessor,
+            $all_models->{$accessor}{'package'},
+            $accessors{$accessor}->{'package'}, $package
+          )
+          if exists($all_models->{$accessor});
+
+        $accessors{$accessor}->{'app_pkg'}  = $package;
+        $accessors{$accessor}->{'accessor'} = $accessor;
+
+        $models->{$accessor} = $accessors{$accessor};
+    }
+}
+
+=head2 init_accessors
+
+Initialization accessors. Used after calling B<set_accessors> in run time a code
+
+B<No arguments.>
+
+B<Example:>
+
+  $app->set_accessors(...);
+  $app->init_accessors();
+
+=cut
+
+sub init_accessors {
+    my ($self) = @_;
+
+    no strict 'refs';
+    package_merge_isa_data(
+        ref($self) || $self,
+        undef,
+        sub {
+            my ($package) = @_;
+
+            my $models = package_stash($package)->{'__MODELS__'} || {};
+
+            foreach my $accessor (sort keys(%$models)) {
+                next if $models->{$accessor}{'init'};
+
+                throw gettext('Accessor cannot have name "%s", it is name of method', $accessor)
+                  if $self->can($accessor);
+
+                my %import_args = %{$models->{$accessor}};
+                my $app_pkg     = $import_args{'app_pkg'};
+                my $package     = $import_args{'package'};
+
+                *{"${app_pkg}::${accessor}"} = sub {
+                    $_[0]->{$accessor} //= do {
+                        my $file_path = "$package.pm";
+                        $file_path =~ s/::/\//g;
+
+                        unless ($INC{$file_path}) {
+                            try {
+                                require $file_path;
+                            }
+                            catch {
+                                throw gettext('Failed require "%s": %s', $file_path, shift->message);
+                            };
+
+                            $package->import(%import_args);
+                        }
+
+                        $package->new(app => $_[0], accessor => $accessor);
+                    };
+                };
+
+                $models->{$accessor}{'init'} = TRUE;
+            }
+
+        },
+        __PACKAGE__
+    );
 }
 
 =head2 config_opts
@@ -512,7 +684,7 @@ sub _fix_cur_user {
                     fields  => {right => {distinct => ['right']}},
                     role_id => [keys(%{$cur_user->{'roles'}})]
                 )
-              }
+            }
         ];
 
         $self->set_cur_user_rights($cur_user->{'rights'});
@@ -618,8 +790,7 @@ sub get_models {
     my $models = {};
 
     package_merge_isa_data(
-        ref($self),
-        $models,
+        ref($self) || $self, $models,
         sub {
             my ($package, $res) = @_;
 
@@ -747,8 +918,8 @@ sub check_rights {
     foreach (@rights) {
         return FALSE
           unless ref($_)
-            ? scalar(grep($self->{'__CURRENT_USER_RIGHTS__'}{$_}, @$_))
-            : $self->{'__CURRENT_USER_RIGHTS__'}{$_};
+          ? scalar(grep($self->{'__CURRENT_USER_RIGHTS__'}{$_}, @$_))
+          : $self->{'__CURRENT_USER_RIGHTS__'}{$_};
     }
 
     return TRUE;

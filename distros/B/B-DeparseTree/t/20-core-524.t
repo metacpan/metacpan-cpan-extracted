@@ -92,7 +92,6 @@ sub testit {
 	    package test;
 	    use subs ();
 	    import subs $keyword;
-	    # use Enbugger; Enbugger->stop;
 	    $code_ref = eval "no strict 'vars'; sub { ${vars}() = $expr }"
 			    or die "$@ in $expr";
 	}

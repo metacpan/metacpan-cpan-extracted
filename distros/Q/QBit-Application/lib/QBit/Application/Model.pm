@@ -1,5 +1,5 @@
 package QBit::Application::Model;
-$QBit::Application::Model::VERSION = '0.016';
+$QBit::Application::Model::VERSION = '0.017';
 use qbit;
 
 use base qw(QBit::Application::Part);
@@ -33,32 +33,26 @@ sub import {
 
     throw gettext('Required accessor') unless $opts{'accessor'};
 
-    my $app_pkg;
-    my $i = 0;
-    while ($app_pkg = caller($i++)) {
-        last if $app_pkg->isa('QBit::Application');
+    my $app_pkg = $opts{'app_pkg'};
+    unless ($app_pkg) {
+        my $i = 0;
+        while ($app_pkg = caller($i++)) {
+            last if $app_pkg->isa('QBit::Application');
+        }
     }
+
     throw gettext('Use only in QBit::Application descendant')
       unless $app_pkg && $app_pkg->isa('QBit::Application');
 
+    $opts{'app_pkg'} //= $app_pkg;
+
     my $app_pkg_stash = package_stash($app_pkg);
-    $app_pkg_stash->{'__MODELS__'} = {}
-      unless exists($app_pkg_stash->{'__MODELS__'});
+    $app_pkg_stash->{'__MODELS__'} //= {};
 
     throw gettext("Model with accessor \"%s\" is exists (class: \"%s\")", $opts{'accessor'}, $package)
       if exists($app_pkg_stash->{'__MODELS__'}{$opts{'accessor'}});
 
-    throw gettext("Accessor cannot have name \"%s\", it is name of method", $opts{'accessor'})
-      if $app_pkg->can($opts{'accessor'});
-
-    $app_pkg_stash->{'__MODELS__'}{$opts{'accessor'}} = $package;
-
-    {
-        no strict 'refs';
-        *{"${app_pkg}::$opts{'accessor'}"} = sub {
-            return $_[0]->{$opts{'accessor'}} //= $package->new(app => $_[0], accessor => $opts{'accessor'});
-        };
-    };
+    $app_pkg_stash->{'__MODELS__'}{$opts{'accessor'}} = {%opts, package => $package};
 }
 
 TRUE;

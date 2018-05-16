@@ -1,17 +1,22 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP-Daemon.  Meta-POD
+# processed with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP::Daemon::CGI;
 use vars '$VERSION';
-$VERSION = '3.13';
+$VERSION = '3.14';
 
 use parent 'XML::Compile::SOAP::Daemon';
 
+use warnings;
+use strict;
+
 use Log::Report 'xml-compile-soap-daemon';
+
 use CGI 3.53, ':cgi';
 use Encode;
 

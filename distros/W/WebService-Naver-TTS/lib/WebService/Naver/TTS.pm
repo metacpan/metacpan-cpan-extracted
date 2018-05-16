@@ -1,5 +1,5 @@
 package WebService::Naver::TTS;
-$WebService::Naver::TTS::VERSION = 'v0.0.2';
+$WebService::Naver::TTS::VERSION = 'v0.0.3';
 use utf8;
 use strict;
 use warnings;
@@ -13,6 +13,8 @@ use Path::Tiny;
 
 WebService::Naver::TTS - Perl interface to Naver TTS API
 
+Clova Speech Synthesis(CSS)
+
 =head1 SYNOPSIS
 
     my $client = WebService::Naver::TTS->new(id => 'xxxx', secret => 'xxxx');
@@ -22,7 +24,7 @@ WebService::Naver::TTS - Perl interface to Naver TTS API
 
 =head2 new( id => $id, secret => $secret, \%options )
 
-L<API 권한 설정 및 호출 방법|https://developers.naver.com/docs/common/apicall/>
+L<CSS API 란?|http://docs.ncloud.com/ko/naveropenapi_v2/naveropenapi-4-2.html>
 
     my $client = WebService::Naver::TTS->new(id => $client_id, secret => $client_secret);
 
@@ -57,9 +59,9 @@ sub new {
         speed   => $args{speed} // 0,
         http    => HTTP::Tiny->new(
             default_headers => {
-                agent                   => 'WebService::Naver::TTS - Perl interface to Naver TTS API',
-                'X-Naver-Client-Id'     => $args{id},
-                'X-Naver-Client-Secret' => $args{secret},
+                agent                    => 'WebService::Naver::TTS - Perl interface to Naver Clova Speech Synthesis API',
+                'X-NCP-APIGW-API-KEY-ID' => $args{id},
+                'X-NCP-APIGW-API-KEY'    => $args{secret},
             }
         ),
     };
@@ -100,6 +102,18 @@ B<shinji> 신지(일본어, 남성)
 
 B<meimei> 메이메이(중국어, 여성)
 
+=item *
+
+B<liangliang> 중국어, 남성
+
+=item *
+
+B<jose> 스페인어, 남성
+
+=item *
+
+B<carmen> 스페인어, 여성
+
 =back
 
 =cut
@@ -114,6 +128,8 @@ sub speaker {
 =head2 tts($text, %tmp_opts?)
 
     my $mp3 = $client->tts('안녕하세요');
+
+C<$text> 음성 합성할 문장. UTF-8 인코딩된 텍스트만 지원합니다. CSS API 는 최대 5000 자의 텍스트까지 음성 합성을 지원합니다.
 
 C<$mp3> is L<Path::Tiny/"tempfile, tempdir"> obj.
 
@@ -141,7 +157,7 @@ default is C<1>
 
 =cut
 
-our $URL = "https://openapi.naver.com/v1/voice/tts.bin";
+our $URL = "https://naveropenapi.apigw.ntruss.com/voice/v1/tts";
 
 sub tts {
     my ( $self, $text, %tmp_opts ) = @_;
@@ -149,7 +165,7 @@ sub tts {
 
     my $res = $self->{http}->post_form( $URL, { speaker => $self->{speaker}, speed => $self->{speed}, text => $text } );
 
-    die "Failed to convert text($text) to speech file: $res->{reason}\n" unless $res->{success};
+    die "Failed to convert text($text) to speech file: $res->{reason}\n\n$res->{content}\n" unless $res->{success};
 
     my $temp = Path::Tiny->tempfile(%tmp_opts);
     $temp->spew_raw( $res->{content} );
@@ -162,9 +178,8 @@ __END__
 
 The MIT License (MIT)
 
-Copyright (c) 2017 Hyungsuk Hong
+Copyright (c) 2018 Hyungsuk Hong
 
 =cut
-
 
 1;

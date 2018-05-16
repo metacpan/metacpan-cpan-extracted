@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 
 use utf8;
 use open ':utf8';
@@ -1890,16 +1890,28 @@ sub add_ufeatures
             my $ufeature = $1;
             my $uvalue = $2;
             my $feature = $map->{$ufeature};
-            next if(!defined($feature));
-            my $value = lc($uvalue);
-            # Universal Features use comma to join multi-values but we use the vertical bar.
-            $value =~ s/,/\|/g;
-            # Backward compatibility: if this is an old value that has been renamed, get the new value.
-            # If the value has never been known, we will get back an undefined value.
-            $value = $self->_get_compatible_value($feature, $value);
-            if(defined($feature) && defined($value))
+            if(defined($feature))
             {
-                $self->set($feature, $value);
+                my $value = lc($uvalue);
+                # Universal Features use comma to join multi-values but we use the vertical bar.
+                $value =~ s/,/\|/g;
+                # Backward compatibility: if this is an old value that has been renamed, get the new value.
+                # If the value has never been known, we will get back an undefined value.
+                $value = $self->_get_compatible_value($feature, $value);
+                if(defined($feature) && defined($value))
+                {
+                    $self->set($feature, $value);
+                }
+                else # other
+                {
+                    $self->set_tagset('mul::uposf');
+                    $self->set_other_subfeature($ufeature, $uvalue);
+                }
+            }
+            else # other
+            {
+                $self->set_tagset('mul::uposf');
+                $self->set_other_subfeature($ufeature, $uvalue);
             }
         }
     }
@@ -1934,6 +1946,16 @@ sub get_ufeatures
         # Some values of some features became obsolete because the distinction was moved to the POS tag level.
         next if($pair =~ m/^(PronType=Prn|ConjType=(Coor|Sub)|NounType=(Com|Prop)|VerbType=Aux|Variant=[0-9])$/);
         push(@pairs, $pair);
+    }
+    # Check whether there are language-specific features or values that Interset
+    # does not know and that thus had to be stored in the 'other' feature.
+    my $other = $self->get_other_for_tagset ('mul::uposf');
+    if(defined($other) && ref($other) eq 'HASH')
+    {
+        my @ufeatures = keys(%{$other});
+        my @upairs = map {"$_=$other->{$_}"} (@ufeatures);
+        push(@pairs, @upairs);
+        @pairs = sort {lc($a) cmp lc($b)} (@pairs);
     }
     return @pairs;
 }
@@ -2950,7 +2972,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.011
+version 3.012
 
 =head1 SYNOPSIS
 
@@ -3231,7 +3253,7 @@ Sets our feature values accordingly.
 Values of our features that are not mentioned in the input list will be left untouched.
 
 This method does not complain about unknown features or values.
-They will be silently ignored.
+They will be stored as subfeatures of the C<other> feature.
 Hence it is possible to read the input even if it contains language-specific
 extensions that are not yet known to Interset.
 

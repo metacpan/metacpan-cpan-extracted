@@ -12,7 +12,8 @@ and is intended to test compatibility with that version.
 
 # Utility -----------------------------
 
-use Test::More tests => 9;
+use Test::More tests => 10;
+use Test::Warnings;
 
 use Term::ProgressBar;
 use POSIX qw<floor ceil>;

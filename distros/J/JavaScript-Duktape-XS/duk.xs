@@ -15,13 +15,18 @@
 #include "c_eventloop.h"
 #include "duk_console.h"
 
-#define DUK_SLOT_CALLBACK "_perl_.callback"
+#define DUK_NAME_ROOT                  "_perl_"
+#define DUK_NAME_GENERIC_CALLBACK      "generic_callback"
 
-#define DUK_OPT_NAME_GATHER_STATS "gather_stats"
-#define DUK_OPT_NAME_SAVE_MESSAGES "save_messages"
+#define DUK_SLOT_CREATE(name)          (DUK_NAME_ROOT "." #name)
 
-#define DUK_OPT_FLAG_GATHER_STATS 0x01
-#define DUK_OPT_FLAG_SAVE_MESSAGES 0x02
+#define DUK_SLOT_GENERIC_CALLBACK      DUK_SLOT_CREATE(DUK_NAME_GENERIC_CALLBACK)
+
+#define DUK_OPT_NAME_GATHER_STATS      "gather_stats"
+#define DUK_OPT_NAME_SAVE_MESSAGES     "save_messages"
+
+#define DUK_OPT_FLAG_GATHER_STATS      0x01
+#define DUK_OPT_FLAG_SAVE_MESSAGES     0x02
 
 /*
  * This is our internal data structure.  For now it only contains a pointer to
@@ -146,13 +151,13 @@ static duk_ret_t perl_caller(duk_context* ctx)
 
     // get actual Perl CV stored as a function property
     duk_push_current_function(ctx);
-    if (!duk_get_prop_lstring(ctx, -1, DUK_SLOT_CALLBACK, sizeof(DUK_SLOT_CALLBACK) - 1)) {
+    if (!duk_get_prop_lstring(ctx, -1, DUK_SLOT_GENERIC_CALLBACK, sizeof(DUK_SLOT_GENERIC_CALLBACK) - 1)) {
         croak("Calling Perl handler for a non-Perl function\n");
     }
     SV* func = (SV*) duk_get_pointer(ctx, -1);
     duk_pop_2(ctx);  /* pop pointer and function */
     if (func == 0) {
-        croak("Could not get value for property %s\n", DUK_SLOT_CALLBACK);
+        croak("Could not get value for property %s\n", DUK_SLOT_GENERIC_CALLBACK);
     }
 
     // prepare Perl environment for calling the CV
@@ -209,13 +214,14 @@ static SV* duk_to_perl(pTHX_ duk_context* ctx, int pos)
             duk_size_t clen = 0;
             const char* cstr = duk_get_lstring(ctx, pos, &clen);
             ret = newSVpvn(cstr, clen);
+            SvUTF8_on(ret); // yes, always
             break;
         }
         case DUK_TYPE_OBJECT: {
             if (duk_is_c_function(ctx, pos)) {
                 // if the JS function has a slot with the Perl callback,
                 // then we know we created it, so we return that
-                if (!duk_get_prop_lstring(ctx, -1, DUK_SLOT_CALLBACK, sizeof(DUK_SLOT_CALLBACK) - 1)) {
+                if (!duk_get_prop_lstring(ctx, -1, DUK_SLOT_GENERIC_CALLBACK, sizeof(DUK_SLOT_GENERIC_CALLBACK) - 1)) {
                     croak("JS object is an unrecognized function\n");
                 }
                 ret = (SV*) duk_get_pointer(ctx, -1);
@@ -351,7 +357,7 @@ static int perl_to_duk(pTHX_ SV* value, duk_context* ctx)
                 croak("Could not create copy of Perl callback\n");
             }
             duk_push_pointer(ctx, func);
-            if (! duk_put_prop_lstring(ctx, -2, DUK_SLOT_CALLBACK, sizeof(DUK_SLOT_CALLBACK) - 1)) {
+            if (! duk_put_prop_lstring(ctx, -2, DUK_SLOT_GENERIC_CALLBACK, sizeof(DUK_SLOT_GENERIC_CALLBACK) - 1)) {
                 croak("Could not associate C dispatcher and Perl callback\n");
             }
         } else {

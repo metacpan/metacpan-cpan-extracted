@@ -65,7 +65,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.77';
+our $VERSION  = '7.79';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -931,6 +931,8 @@ Dan Book
 
 Daniel Kimsey
 
+Daniel Mantovani
+
 Danijel Tasov
 
 Danny Thomas
@@ -1167,6 +1169,6 @@ the terms of the Artistic License version 2.0.
 =head1 SEE ALSO
 
 L<https://github.com/kraih/mojo>, L<Mojolicious::Guides>,
-L<http://mojolicious.org>.
+L<https://mojolicious.org>.
 
 =cut

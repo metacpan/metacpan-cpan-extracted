@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Acme::Alien::DontPanic" : "0.044",
+            "Acme::Alien::DontPanic" : "1.03",
             "Module::Build" : "0.38"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Acme::Ford::Prefect" : {
          "file" : "lib/Acme/Ford/Prefect.pm",
-         "version" : "0.044"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.044",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

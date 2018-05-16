@@ -9,8 +9,9 @@ This package tests the zero-progress handling of progress bar.
 
 =cut
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Exception;
+use Test::Warnings;
 
 use Capture::Tiny qw(capture_stderr);
 

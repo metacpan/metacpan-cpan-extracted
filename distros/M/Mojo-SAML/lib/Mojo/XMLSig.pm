@@ -59,7 +59,7 @@ sub format_cert {
 sub has_signature {
   my $dom = shift;
   $dom = _dom($dom)
-    unless $dom->isa('Mojo::DOM');
+    unless $dom->$isa('Mojo::DOM');
   return !!$dom->at('ds|Signature ds|SignatureValue:not(:empty)', %ns);
 }
 
@@ -98,7 +98,7 @@ my $set_algo = sub {
 sub _digest {
   my ($verify, $dom) = @_;
   $dom = _dom($dom)
-    unless $dom->isa('Mojo::DOM');
+    unless $dom->$isa('Mojo::DOM');
   Carp::croak 'No Signature section found'
     unless my $sig = $dom->at('ds|Signature', %ns);
 

@@ -3,7 +3,7 @@
 
 package HiD::Generator::RSSFeed;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Generator::RSSFeed::VERSION = '1.991';
+$HiD::Generator::RSSFeed::VERSION = '1.992';
 use Moose;
 with 'HiD::Generator';
 
@@ -117,7 +117,7 @@ the feed. It defaults to 20.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

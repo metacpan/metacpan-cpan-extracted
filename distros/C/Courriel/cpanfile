@@ -4,8 +4,7 @@ requires "DateTime::Format::Mail" => "0.403";
 requires "DateTime::Format::Natural" => "0";
 requires "Devel::PartialDump" => "0";
 requires "Email::Abstract::Plugin" => "0";
-requires "Email::Address" => "0";
-requires "Email::Address::List" => "0";
+requires "Email::Address::XS" => "0";
 requires "Email::MIME::Encodings" => "0";
 requires "Email::MessageID" => "0";
 requires "Encode" => "0";
@@ -42,6 +41,7 @@ on 'test' => sub {
   requires "Test::Fatal" => "0";
   requires "Test::More" => "0.96";
   requires "Test::Requires" => "0";
+  requires "Test::Warnings" => "0";
   requires "utf8" => "0";
 };
 

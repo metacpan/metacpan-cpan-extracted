@@ -3,7 +3,7 @@
 
 package HiD::VirtualPage;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::VirtualPage::VERSION = '1.991';
+$HiD::VirtualPage::VERSION = '1.992';
 use Moose;
 use namespace::autoclean;
 
@@ -81,7 +81,7 @@ Publish -- write out to disk -- this data from this object.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

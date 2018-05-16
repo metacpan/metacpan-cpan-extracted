@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
 #
-# $Id: ECDSA.pm 1660 2018-04-03 14:12:42Z willem $
+# $Id: ECDSA.pm 1672 2018-05-02 07:14:35Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1660 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1672 $)[1];
 
 
 =head1 NAME
@@ -44,95 +44,78 @@ public key resource record.
 use strict;
 use integer;
 use warnings;
-use Digest::SHA;
 use MIME::Base64;
 
+
 my %ECDSA = (
-	13 => [415, 'Digest::SHA', 256],
-	14 => [715, 'Digest::SHA', 384],
+	13 => [415, 32, sub { Net::DNS::SEC::libcrypto::EVP_sha256() }],
+	14 => [715, 48, sub { Net::DNS::SEC::libcrypto::EVP_sha384() }],
 	);
 
 
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $algorithm = $private->algorithm;			# digest sigdata
-	my ( $NID, $object, @param ) = @{$ECDSA{$algorithm} || []};
-	die 'private key not ECDSA' unless $object;
-	my $hash = $object->new(@param);
-	$hash->add($sigdata);
-	my $digest = $hash->digest;
+	my $algorithm = $private->algorithm;
+	my ( $nid, $keylen, $evpmd ) = @{$ECDSA{$algorithm} || []};
+	die 'private key not ECDSA' unless $nid;
 
-	my $key = decode_base64( $private->PrivateKey );	# private key
-	my $len = length $key;
+	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
 
-	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_dup( _curve($NID) );
-	Net::DNS::SEC::libcrypto::EC_KEY_set_private_key( $eckey, $key );
+	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_new_by_curve_name($nid);
+	Net::DNS::SEC::libcrypto::EC_KEY_set_private_key( $eckey, $rawkey );
 
-	my $sig = Net::DNS::SEC::libcrypto::ECDSA_sign( $digest, $eckey );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
+	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_EC_KEY( $evpkey, $eckey );
 
-	Net::DNS::SEC::libcrypto::EC_KEY_free($eckey);		# destroy private key
-
-	return unless $sig;					# uncoverable branch true
-
-	my ( $r, $s ) = Net::DNS::SEC::libcrypto::ECDSA_SIG_get0($sig);
-	Net::DNS::SEC::libcrypto::ECDSA_SIG_free($sig);
-
-	# both the R and S parameters need to be zero padded:
-	my $Rpad = $len - length($r);
-	my $Spad = $len - length($s);
-	pack "x$Rpad a* x$Spad a*", $r, $s;
+	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, &$evpmd );
+	_ASN1decode( $asn1, $keylen );
 }
 
 
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $algorithm = $keyrr->algorithm;			# digest sigdata
-	my ( $NID, $object, @param ) = @{$ECDSA{$algorithm} || []};
-	die 'public key not ECDSA' unless $object;
-	my $hash = $object->new(@param);
-	$hash->add($sigdata);
-	my $digest = $hash->digest;
+	my $algorithm = $keyrr->algorithm;
+	my ( $nid, $keylen, $evpmd ) = @{$ECDSA{$algorithm} || []};
+	die 'private key not ECDSA' unless $nid;
 
 	return unless $sigbin;
 
-	my $key = $keyrr->keybin;				# public key
-	my $len = length($key) >> 1;
-	my ( $x, $y ) = unpack "a$len a*", $key;
-
-	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_dup( _curve($NID) );
+	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_new_by_curve_name($nid);
+	my ( $x, $y ) = unpack "a$keylen a$keylen", $keyrr->keybin;
 	Net::DNS::SEC::libcrypto::EC_KEY_set_public_key_affine_coordinates( $eckey, $x, $y );
 
-	my ( $r, $s ) = unpack( "a$len a*", $sigbin );		# signature
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
+	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_EC_KEY( $evpkey, $eckey );
 
-	my $sig = Net::DNS::SEC::libcrypto::ECDSA_SIG_new();
-	Net::DNS::SEC::libcrypto::ECDSA_SIG_set0( $sig, $r, $s );
-
-	my $vrfy = Net::DNS::SEC::libcrypto::ECDSA_verify( $digest, $sig, $eckey );
-
-	Net::DNS::SEC::libcrypto::EC_KEY_free($eckey);
-	Net::DNS::SEC::libcrypto::ECDSA_SIG_free($sig);
-	return $vrfy;
+	my $asn1 = _ASN1encode( $sigbin, $keylen );
+	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, &$evpmd );
 }
 
 
 ########################################
 
-{
-	my %ECkey;
-
-	sub _curve {
-		my $nid = shift;
-		return $ECkey{$nid} if $ECkey{$nid};
-		$ECkey{$nid} = Net::DNS::SEC::libcrypto::EC_KEY_new_by_curve_name($nid);
+sub _ASN1encode {
+	my ( $sig, $size ) = @_;
+	my @part = unpack "a$size a$size", $sig;
+	my $length;
+	foreach (@part) {
+		s/^[\000]+//;
+		s/^$/\000/;
+		s/^(?=[\200-\377])/\000/;
+		$_ = pack 'C2 a*', 2, length, $_;
+		$length += length;
 	}
+	pack 'C2 a* a*', 0x30, $length, @part;
+}
 
-	END {
-		foreach ( grep defined, values %ECkey ) {
-			Net::DNS::SEC::libcrypto::EC_KEY_free($_);
-		}
-	}
+sub _ASN1decode {
+	my ( $asn1, $size ) = @_;
+	my $n	 = unpack 'x3 C',	   $asn1;
+	my $m	 = unpack "x5 x$n C",	   $asn1;
+	my @part = unpack "x4 a$n x2 a$m", $asn1;
+	pack 'a* a*', map substr( pack( "x$size a*", $_ ), -$size ), @part;
 }
 
 
@@ -176,7 +159,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Net::DNS>, L<Net::DNS::SEC>, L<Digest::SHA>,
+L<Net::DNS>, L<Net::DNS::SEC>,
 RFC6090, RFC6605,
 L<OpenSSL|http://www.openssl.org/docs>
 

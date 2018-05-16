@@ -6,16 +6,12 @@ qbit::File - Functions to manipulate files.
 =cut
 
 package qbit::File;
-$qbit::File::VERSION = '2.4';
+$qbit::File::VERSION = '2.5';
 use strict;
 use warnings;
 use utf8;
 
-require qbit::StringUtils;
-
 use base qw(Exporter);
-
-use Data::Dumper;
 
 BEGIN {
     our (@EXPORT, @EXPORT_OK);
@@ -26,6 +22,12 @@ BEGIN {
       );
     @EXPORT_OK = @EXPORT;
 }
+
+use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_APPEND);
+
+use qbit::StringUtils;
+use qbit::Exceptions;
+use qbit::GetText;
 
 =head1 Functions
 
@@ -60,12 +62,30 @@ B<Return value:> string, file content.
 sub readfile($;%) {
     my ($filename, %opts) = @_;
 
-    open(my $fh, '<', $filename) || die "Cannot open file \"$filename\": " . qbit::StringUtils::fix_utf($!);
-    $opts{'binary'} ? binmode($fh) : binmode($fh, ':utf8');
-    my $data = join('', <$fh>);
-    close($fh);
+    my $fh = local *FH;
+    unless (sysopen($fh, $filename, O_RDONLY)) {
+        throw Exception gettext('Cannot open file "%s": %s', $filename, qbit::StringUtils::fix_utf($!));
+    }
 
-    return $data;
+    $opts{'binary'} ? binmode $fh : binmode $fh, ':utf8';
+
+    my $size_left = -s $filename;
+
+    my $content = '';
+    while (1) {
+        my $read_cnt = sysread($fh, $content, $size_left, length $content);
+
+        unless (defined $read_cnt) {
+            throw Exception gettext('Cannot read file "%s": %s', $filename, qbit::StringUtils::fix_utf($!));
+        }
+
+        last if $read_cnt == 0;
+
+        $size_left -= $read_cnt;
+        last if $size_left <= 0;
+    }
+
+    return $content;
 }
 
 =head2 writefile
@@ -103,11 +123,19 @@ B<append> - boolean
 sub writefile($$;%) {
     my ($filename, $data, %opts) = @_;
 
-    my $mode = $opts{'append'} ? '>>' : '>';
+    my $fh = local *FH;
 
-    open(my $fh, $mode, $filename) || die "Cannot open file \"$filename\" for write: " . qbit::StringUtils::fix_utf($!);
-    $opts{'binary'} ? binmode($fh) : binmode($fh, ':utf8');
+    my $mode = O_WRONLY | O_CREAT;
+    $mode |= O_APPEND if $opts{'append'};
+
+    unless (sysopen($fh, $filename, $mode)) {
+        throw Exception gettext('Cannot open file "%s" for write: %s', $filename, qbit::StringUtils::fix_utf($!));
+    }
+
+    $opts{'binary'} ? binmode $fh : binmode $fh, ':utf8';
+
     print $fh $data;
+
     close($fh);
 }
 

@@ -2,21 +2,21 @@ NAME
     CryptoExchange::Catalog - Catalog of cryptoexchanges
 
 VERSION
-    This document describes version 20180403 of CryptoExchange::Catalog
-    (from Perl distribution CryptoExchange-Catalog), released on 2018-04-03.
+    This document describes version 20180510 of CryptoExchange::Catalog
+    (from Perl distribution CryptoExchange-Catalog), released on 2018-05-10.
 
 SYNOPSIS
      use CryptoExchange::Catalog;
 
      my $cat = CryptoExchange::Catalog->new;
 
-     my $record = $cat->by_name("BX Thailand");     # note: case-insensitive. => {name=>"BX Thailand", safename=>"bx-thailand"}
+     my $record = $cat->by_name("BX Thailand");     # note: case-insensitive. => {name=>"BX Thailand", safename=>"bx-thailand", code=>"BX"}
      my $record = $cat->by_safename("bx-thailand");
      my $record = $cat->by_slug("bx-thailand");     # alias for by_safename(), mixed case also works
 
      my @names = $cat->all_names(); # => ("Binance", "Bithumb", ...)
 
-     my @data = $cat->all_data; # => ({name=>"Binance", safename=>"binance"}, {...}, ...)
+     my @data = $cat->all_data; # => ({name=>"Binance", safename=>"binance", code=>"BINANCE"}, {...}, ...)
 
 DESCRIPTION
     This class attempts to provide a list/catalog of cryptocurrency
@@ -28,10 +28,12 @@ METHODS
   new
   by_name
   by_safename
+  by_code
   by_slug
     Alias for "by_safename".
 
   all_names
+  all_codes
   all_data
 HOMEPAGE
     Please visit the project's homepage at

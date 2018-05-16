@@ -30,7 +30,7 @@ my @exprs = $deparse->coderef2info(\&bar);
 # import Data::Printer colored => 0;
 # Data::Printer::p(@exprs);
 
-while (my($key, $value) = each $deparse->{optree}) {
+while (my($key, $value) = each @{$deparse->{optree}}) {
     printf "0x%x %s | %s", $key, $value->{op}->name, $value->{text};
     printf " [%s]\n", $value->{cop} ? $value->{cop}->line : 'undef';
     print '-' x 30, "\n";

@@ -21,11 +21,16 @@ our @EXPORT_OK = qw(pod2pandoc parse_arguments);
 sub parse_arguments {
     my %opt;
     Getopt::Long::GetOptionsFromArray(
-        \@_,              \%opt,    'help|h|?', 'parse=s',
-        'podurl=s',       'ext=s',  'index=s',  'wiki',
-        'default-meta=s', 'update', 'quiet'
+        \@_,       \%opt,            'help|h|?', 'version',
+        'parse=s', 'podurl=s',       'ext=s',    'index=s',
+        'wiki',    'default-meta=s', 'update',   'quiet',
+        'name',
     ) or exit 1;
-    pod2usage(1) if delete $opt{help};
+    pod2usage(1) if $opt{help};
+    if ( $opt{version} ) {
+        say "$0 $VERSION";
+        exit 0;
+    }
 
     my @input = @_ ? () : '-';
 
@@ -53,32 +58,6 @@ sub _add_default_meta {
     $doc->meta->{$_} //= $meta->{$_} for keys %$meta;
 }
 
-sub _plain2meta {
-    my $value = shift;
-    if ( !ref $value ) {
-        MetaString $value;
-    }
-    elsif ( JSON::is_bool($value) ) {
-        MetaBool $value;
-    }
-    elsif ( blessed($value) ) {
-        if ( $value->can('is_meta') and $value->is_meta ) {
-            $value;
-        }
-        else {
-            MetaString "$value";
-        }
-    }
-    elsif ( reftype $value eq 'ARRAY' ) {
-        MetaList [ map { _plain2meta($_) } @$value ];
-    }
-    else {
-        MetaMap {
-            map { $_ => _plain2meta( $value->{$_} ) } keys %$value
-        }
-    }
-}
-
 sub _default_meta {
     my $meta = shift || {};
     return $meta if ref $meta;
@@ -90,7 +69,7 @@ sub _default_meta {
         local $/;
         $meta = decode_json(<$fh>);
         for ( keys %$meta ) {
-            $meta->{$_} = _plain2meta( $meta->{$_} );
+            $meta->{$_} = metadata( $meta->{$_} );
         }
         return $meta;
     }
@@ -155,7 +134,7 @@ App::pod2pandoc - implements pod2pandoc command line script
   use App::pod2pandoc;
 
   # pod2pandoc command line script
-  my ($input, $opt, @args) = parse_arguments(@ARGV); 
+  my ($input, $opt, @args) = parse_arguments(@ARGV);
   pod2pandoc($input, $opt, @args);
 
   # parse a Perl/Pod file and print its JSON serialization

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '1.0.2';
+$Main::VERSION = '1.0.3';
 # PODNAME: koha-ark
 # ABSTRACT: Manage ARK identifiers in a Koha Catalog
 
@@ -12,12 +12,12 @@ use Koha::Contrib::ARK;
 
 binmode(STDOUT, ':encoding(UTF8)');
 
-my ($help, $verbose, $doit, $log) = (0, 1, 0, 'info');
+my ($help, $verbose, $doit, $debug) = (0, 1, 0, 0);
 GetOptions( 
     'verbose!' => \$verbose,
     'doit'     => \$doit,
     'help|h'   => \$help,
-    'log=s'    => \$log,
+    'debug'    => \$debug,
 );
 
 sub usage {
@@ -33,8 +33,7 @@ usage() if $cmd !~ /clear|update|check/;
 
 my $ark = Koha::Contrib::ARK->new(
     cmd          => $cmd,
-    log_filename => 'koha-ark.log',
-    loglevel     => $log,
+    debug        => $debug,
     verbose      => $verbose,
     doit         => $doit,
 );
@@ -52,7 +51,7 @@ koha-ark - Manage ARK identifiers in a Koha Catalog
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 DESCRIPTION
 
@@ -111,7 +110,12 @@ entirely.
 
 =back
 
-There are two commands: clear and update
+There are three commands: check, clear, and update
+
+=head2 check
+
+Process all biblio records, and check them for: bad ARK, correct ARK in the
+wrong field.
 
 =head2 clear
 
@@ -127,19 +131,20 @@ C<9877> biblionumber will have this in 003 field:
 
  http://myspecial.institution.fr/ark:/12345/biblio9877
 
-=head1 SYNOPSYS
-
- koha-ark clear --doit
- koha-ark update --noverbose --doit
- koha-ark update --log debug
-
 =head1 USAGE
 
 =over
 
-=item koha-ark clear|update [--doit] [--verbose] [--help]
+=item koha-ark check|clear|update [--doit] [--verbose] [--debug] [--help]
 
 =back
+
+=head1 SYNOPSYS
+
+ koha-ark clear --doit
+ koha-ark update --noverbose --doit
+ koha-ark update --debug
+ koha-ark check
 
 =head1 PARAMETERS
 
@@ -154,19 +159,85 @@ Without this parameter biblio records are not modified in Koha Catalog.
 Enable script verbose mode. Verbose by default. --noverbose disable verbosity.
 In verbose mode, a progress bar is displayed.
 
-=item B<--log>
+=item B<--debug>
 
-The log level. Info about processing is sent to a file named 'koha-ark.log' in
-the current directory. This parameter controls the log level of the info sent
-to this file. Values: debug, info, error. By default, 'info'. With 'error',
-nothing is logged except fatal errors, like ARK_CONF bad syntax. With 'debug',
-a lot of information is produced, like biblio records before/after processing.
+Info about processing is sent to a file named 'koha-ark.json' in the current
+directory. In 'debug' mode, more information is produced.
 
 =item B<--help|-h>
 
 Print this help page.
 
 =back
+
+=head1 RESULT
+
+The result of this script is a JSON file C<koha-ark.log> which reports what has
+been done.
+
+For exemple, if ARK_CONF is missing, the file will report the issue:
+
+ {
+   "action" : "check"
+   "timestamp" : "\"2018-05-11 16:02:15\"",
+   "error" : {
+      "err_pref_missing" : {
+         "msg" : "ARK_CONF preference is missing",
+         "id" : "err_pref_missing"
+      }
+   },
+ }
+
+C<koha-ark clear> contains something like this:
+
+ {
+   "timestamp" : "2018-05-11 17:18:42",
+   "action" : "clear",
+   "result" : {
+      "count" : "1569",
+      "records" : [
+         {
+            "biblionumber" : "1",
+            "what" : {
+               "clear" : {
+                  "id" : "clear",
+                  "msg" : "Clear ARK field"
+               }
+            }
+         },
+         ...
+   }
+ }
+
+C<koha-ark update --debug> contains something like this:
+
+ {
+   "timestamp" : "2018-05-11 17:21:02",
+   "action" : "update",
+   "testmode": 1,
+   "result" : {
+      "count" : "145282",
+      "records" : [
+         {         
+            "biblionumber" : "1570",
+            "what" : {
+               "generated" : {
+                  "id" : "generated"
+                  "msg" : "ARK generated",
+                  "more" : "http://myspecial.institution.fr/ark:/12345/catalog1573",
+               },
+               "add" : {
+                  "id" : "add",
+                  "msg" : "Add ARK field"
+               }
+            },
+            "record": [ ... ],
+            "after": [ ... ]
+         },
+         ...
+      ]
+   }
+ }
 
 =head1 AUTHOR
 

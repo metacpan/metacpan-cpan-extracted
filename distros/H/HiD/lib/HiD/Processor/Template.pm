@@ -3,7 +3,7 @@
 
 package HiD::Processor::Template;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Processor::Template::VERSION = '1.991';
+$HiD::Processor::Template::VERSION = '1.992';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -94,7 +94,7 @@ Display the template error message.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

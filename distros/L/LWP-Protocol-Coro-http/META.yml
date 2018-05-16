@@ -1,5 +1,5 @@
 ---
-abstract: 'Coro-friendly HTTP and HTTPS backend for LWP'
+abstract: 'Coro-friendly HTTP/HTTPS/SOCKS backend for LWP'
 author:
   - 'Eric Brine <ikegami@adaelis.com>'
 build_requires:
@@ -28,9 +28,10 @@ name: LWP-Protocol-Coro-http
 provides:
   LWP::Protocol::Coro::http:
     file: lib/LWP/Protocol/Coro/http.pm
-    version: v1.10.0
+    version: v1.14.0
 requires:
   AnyEvent::HTTP: '2'
+  AnyEvent::HTTP::Socks: '0'
   Coro::Channel: '0'
   HTTP::Response: '0'
   LWP::Protocol: '0'
@@ -39,5 +40,5 @@ requires:
   version: '0'
 resources:
   repository: http://github.com/ikegami/perl-LWP-Protocol-Coro-http
-version: v1.10.0
+version: v1.14.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -24,3 +24,4 @@ t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/spelling.t
+TODO.md

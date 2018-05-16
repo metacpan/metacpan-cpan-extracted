@@ -3,7 +3,7 @@
 
 package HiD::Generator::AtomFeed;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Generator::AtomFeed::VERSION = '1.991';
+$HiD::Generator::AtomFeed::VERSION = '1.992';
 use Moose;
 with 'HiD::Generator';
 
@@ -164,7 +164,7 @@ See the documentation above to understand what each key controls.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

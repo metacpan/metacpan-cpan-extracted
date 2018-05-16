@@ -139,6 +139,7 @@ sub test_via_harness {
     my $cmd = $self->SUPER::test_via_harness($perl, $tests);
 
     # use our own test harness wrapper
+    $cmd =~ s{(FULLPERLRUN\S+)\s}{$1 -I. };
     $cmd =~ s{-MExtUtils::Command::MM}{-Mt::lib::Harness};
     $cmd =~ s{(test_harness\s*\()}{${1}DBGP_RUN_PP, };
 

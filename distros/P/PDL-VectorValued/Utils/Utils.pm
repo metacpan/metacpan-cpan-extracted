@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::VectorValued::Utils::VERSION = 1.0.7;
+   $PDL::VectorValued::Utils::VERSION = 1.0.8;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
@@ -240,7 +240,7 @@ Run-length encode a vector of subsequences.
 
 Given a vector of $c() of concatenated variable-length, variable-offset subsequences,
 generate a vector $a containing the length of each subsequence
-and a vector $b containg the subsequence offsets.
+and a vector $b containing the subsequence offsets.
 As for rle(), only the elements up to the first instance of 0 in $a should be considered.
 
 See also PDL::Slices::rle.
@@ -642,7 +642,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 The following functions are provided for set operations on
 flat sorted PDLs with unique values.  They may be more efficient to compute
-than the corresponding implenentations via PDL::Primitive::setops().
+than the corresponding implementations via PDL::Primitive::setops().
 
 =cut
 
@@ -830,7 +830,7 @@ You can use PDL threading to batch-compute distances for multiple $b() vectors s
 =for bad
 
 vv_vcos() will set the bad status flag on the output piddle $vcos() if it is set on either of the input
-piddles $a() or $b(), but BAD values will otherwise be ignored for computing the cosine similary.
+piddles $a() or $b(), but BAD values will otherwise be ignored for computing the cosine similarity.
 
 
 =cut

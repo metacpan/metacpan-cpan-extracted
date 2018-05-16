@@ -1,3 +1,12 @@
+-   2.19.2 Mon May 14 15:23:26 UTC 2018
+
+    Push version out of package declaration since 
+    5.8 cannot handle it.
+
+-   2.19.1 Thu May 10 08:12:08 CDT 2018
+
+    Replace the 'v' on v-strings.
+
 -   2.19 Wed May  9 14:21:47 CDT 2018
 
     Include dummy lib/FindBin/libs.pm in filesystem

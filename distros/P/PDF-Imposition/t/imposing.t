@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 149;
+use Test::More tests => 153;
 use File::Temp;
 use File::Spec::Functions;
 use File::Basename;
@@ -581,6 +581,22 @@ test_is_deeply($imp, [
                       [ 7, 10, 11, 6,
                         2, 15, 14, 3 ],
                      ], "1x8x2", 16);
+
+
+$pdffile = create_pdf("2x4x1", 1..18);
+
+$imp = PDF::Imposition->new(file => $pdffile, schema => '2x4x1');
+$imp->impose;
+
+test_is_deeply($imp, [
+                      [ 5, 4, 8, 1 ],
+                      [ 3, 6, 2, 7 ],
+                      [ 13, 12, 16, 9 ],
+                      [ 11, 14, 10, 15 ],
+                      [ 17 ],
+                      [ 18 ],
+                     ], "2x4x1", 18);
+
 
 
 sub create_pdf {

@@ -1,4 +1,8 @@
-See the git repository, or also here, as there are by now notable changes.
+See also the git repository.
+
+1.01    May 2018
+        * test tied scalars
+        * relicense under BSD license
 
 1.00    September 2016
         * Fix (I hope) bugs reported in [rt.cpan.org #118117] and

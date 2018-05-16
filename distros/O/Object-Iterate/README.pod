@@ -2,6 +2,16 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/object-iterate"><img src="https://travis-ci.org/briandfoy/object-iterate.svg?branch=master" /></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/object-iterate'><img src='https://ci.appveyor.com/api/projects/status/13haowmvlhq996ec' /></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/object-iterate?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/object-iterate/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/object-iterate/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Object-Iterate.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Object::Iterate"><img src="https://img.shields.io/cpan/v/Object-Iterate.svg" /></A>
+
 =head1 The Object::Iterate module
 
 This is the I<README> for the L<Object::Iterate> Perl module. You're
@@ -75,16 +85,16 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/Object-Iterate>
+=item *	L<https://github.com/briandfoy/object-iterate>
 
 =back
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/Object-Iterate/issues>:
+tracker|https://github.com/briandfoy/object-iterate/issues>:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/Object-Iterate/issues>
+=item *	L<https://github.com/briandfoy/object-iterate/issues>
 
 =back
 

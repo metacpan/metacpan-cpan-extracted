@@ -1,3 +1,25 @@
+1.008000 2018-05-14
+
+[ENHANCEMENTS]
+
+- Added a new model for WebService::MinFraud::Chargebacks
+- Updated WebService::MinFraud::Client to support API calls to
+   chargebacks
+  - Added chargeback subroutine
+- Updated How WebService::MinFraud::Validator works
+  - Validation for individual API end points moved to
+    WebService::MinFraud::Validator::*
+  - Added validators for existing fraud services
+  - Added validation for chargebacks
+  - Validator now checks for the endpoint it needs to validate
+  - Validator interface preserved
+
+[ BUGFIXES ]
+
+- Corrected autovivification bug in WebService::MinFraud::Client->_fix_booleans
+- Fixed test exception in xt/author-basic.t
+
+
 1.007000 2018-04-11
 
 - Renamed the WebService::MinFraud::Client constructor argument user_id
@@ -13,6 +35,7 @@
 - Added the /device/local_time output.
 - Added the /credit_card/is_virtual output.
 
+
 1.006000 2018-01-18
 
 - Updated GeoIP2 dependency to GeoIP2 2.005000. This adds the
@@ -23,6 +46,7 @@
   - cybersource
   - transact_pro
   - wirecard
+
 
 1.005001 2017-10-30
 

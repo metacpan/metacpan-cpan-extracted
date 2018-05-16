@@ -61,7 +61,7 @@
          "web" : "https://github.com/nichtich/Pandoc-Wrapper"
       }
    },
-   "version" : "0.8.2",
+   "version" : "0.8.3",
    "x_contributors" : [
       "Benct Philip Jonsson <bpjonsson@gmail.com>",
       "Edward Betts <edward@4angle.com>",

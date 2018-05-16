@@ -1,4 +1,4 @@
-6.09 April 6, 2018
+6.10 May 14, 2018
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -572,7 +572,7 @@ If true, it shows images as they load, and displays benchmark informtion in the 
 
 When the object is created, it automatically creates a simple signal handler for B<INT> and B<QUIT> to run B<exec('reset')> as a clean way of exiting your script and restoring the screen to defaults.
 
-Also, when the object is destroyed, it is assumed you are exiting your script.  This causes Graphics::Framebuffer to execute C<exec('reset')> as its method of exiting instead of having you use C<exit>.
+Also, when the object is destroyed, it is assumed you are exiting your script.  This causes Graphics::Framebuffer to execute "exec('reset')" as its method of exiting instead of having you use "exit".
 
 You can disable this behavior by setting this to 0.
 
@@ -584,6 +584,10 @@ Instead of returning one framebuffer object, it returns two.  The first is the r
 
  # $FB is the physical framebuffer
  # $VFB is the virtual 32 bit framebuffer.
+
+ ###  SOMETHING NEW
+
+ If you set DOUBLE_BUFFER to 16, it will act conditionally, and only double buffer if the physical framebuffer is 16 bits.
 
 To use B<blit_flip> just do this:
 
@@ -638,6 +642,7 @@ sub new {
     my $this;
     my $self = {
         'SCREEN'        => '',            # The all mighty framebuffer
+
         'DOUBLE_BUFFER' => FALSE,
         'RESET'         => TRUE,
         'VERSION'       => $VERSION,      # Helps with debugging for people sending me dumps
@@ -1023,7 +1028,7 @@ sub new {
                 $self->{'vscreeninfo'}->{'vmode'},
                 $self->{'vscreeninfo'}->{'rotate'},
             ) = (c_get_screen_info($self->{'FB_DEVICE'}));
-        } else {
+        } else { # Fallback if not accelerated.  Do it the old way
             # Make the IOCTL call to get info on the virtual (viewable) screen (Sometimes different than physical)
             (
                 $self->{'vscreeninfo'}->{'xres'},                                                                                                                     # (32)
@@ -1179,6 +1184,13 @@ sub new {
             $self->{'YRES'} = $self->{'SIMULATED_Y'};
             $self->{'YOFFSET'} += ($h - $self->{'SIMULATED_Y'}) / 2;
         }
+        if ($self->{'DOUBLE_BUFFER'} == 16) { # Conditional double buffer if set to 16.  Only double buffer if hardware framebuffer is 16 bits.
+            if ($self->{'BITS'} == 16) {
+                $self->{'DOUBLE_BUFFER'} = TRUE;
+            } else {
+                $self->{'DOUBLE_BUFFER'} = FALSE;
+            }
+        }
         %{$this} = %{$self} if ($self->{'DOUBLE_BUFFER'});    # A copy
         bless($self, $class);
         $self->_color_order();                                # Automatically determine color mode
@@ -1311,7 +1323,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         }
     }
 
-    if ($self->{'SPLASH'}) {
+    if ($self->{'SPLASH'} > 0) {
         $self->splash($VERSION);
         sleep $self->{'SPLASH'};
     }
@@ -3177,9 +3189,6 @@ sub circle {
     } elsif (exists($params->{'hatch'})) {
         $pattern = $self->_generate_fill($wdth, $hgth, undef, $params->{'hatch'});
         $gradient = 2;
-    } elsif ($filled && $x0 == $x1 && $y0 == $y1 && $self->{'ACCELERATED'}) {
-        c_filled_circle($self->{'SCREEN'}, $x0, $y0, $r, $self->{'DRAW_MODE'}, $self->{'INT_COLOR'}, $self->{'INT_B_COLOR'}, $self->{'BYTES'}, $self->{'BYTES_PER_LINE'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $self->{'COLOR_ALPHA'},);
-        return;
     }    # end if ($gradient)
     my ($ymy, $lymy, $ymx, $lymx, $ypy, $lypy, $ypx, $lypx, $xmy, $xmx, $xpy, $xpx);
     while ($x >= ($y - 1)) {
@@ -7075,7 +7084,7 @@ This is almost always caused by the module incorrectly calculating the framebuff
 
 Try running the "primitives.pl" in the "examples" directory in the following way (assuming your screen is larger than 640x480):
 
-   C<perl examples/primitives.pl --x=640 --y=480>
+   perl examples/primitives.pl --x=640 --y=480
 
 This forces the module to pretend it is rendering for a smaller resolution (by placing this screen in the middle of the actual one).  If it works fine, then try changing the "x" value back to your screen's actual width, but still make the "y" value slightly smaller.  Keep decreasing this value until it works.
 
@@ -7089,13 +7098,13 @@ How does that suddenly fix things?  Calculating the screen size involves complex
 
 Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous item).
 
-First, make sure your system has a framebuffer by seeing if F</dev/fb0> (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev", then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with C<modprobe -a drivername> (replacing "drivername" with the actual driver name).
+First, make sure your system has a framebuffer by seeing if F</dev/fb0> (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev", then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with "modprobe -a drivername" (replacing "drivername" with the actual driver name).
 
 Second, ok, you have a framebuffer driver, but nothing is showing, or it's all funky looking.  Now make sure you have the program F<fbset> installed.  It's used as a last resort by this module to figure out how to draw on the screen when all else fails.  To see if you have "fbset" installed, just type "fbset -i" and it should show you information about the framebuffer.  If you get an error, then you need to install "fbset".
 
 Third, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "sparky", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "sparky" to the "video" group:
 
- C<sudo usermod -a -G video sparky>
+   sudo usermod -a -G video sparky
 
 Once that is run (changing "sparky" to whatever your username is), log out, then log back in, and it should work.
 
@@ -7135,7 +7144,7 @@ Plain and simple, your device just may be too slow for some CPU intensive operat
 
 If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the F<dump.pl> script inside the "examples" directory inside this module's package:
 
- C<perl dump.pl 2> dump.txt>
+   perl dump.pl 2> dump.txt
 
 Please include this dump file as an attachment to your email.  Please do not include it inline as part of the message text.
 

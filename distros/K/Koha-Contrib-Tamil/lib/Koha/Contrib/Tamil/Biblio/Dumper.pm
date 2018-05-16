@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Biblio::Dumper;
 # ABSTRACT: Class dumping a Koha Catalog
-$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.057';
+$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.058';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -172,7 +172,7 @@ Koha::Contrib::Tamil::Biblio::Dumper - Class dumping a Koha Catalog
 
 =head1 VERSION
 
-version 0.057
+version 0.058
 
 =head1 SYNOPSIS
 

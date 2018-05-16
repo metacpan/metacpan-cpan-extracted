@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
     license           => 'perl',
     configure_requires => {
       'Module::Build' => '0.38',
-      'Acme::Alien::DontPanic' => '0.044',
+      'Acme::Alien::DontPanic' => '1.03',
     },
     test_requires => {
       'Test2::V0'    => 0,

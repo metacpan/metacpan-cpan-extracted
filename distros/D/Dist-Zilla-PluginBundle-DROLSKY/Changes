@@ -1,3 +1,9 @@
+0.90     2018-05-13
+
+- Added some hackish plugins to make tests run in parallel by default,
+  including during the release phase.
+
+
 0.89     2017-12-24
 
 - The generated perlcriticrc now does a better job of selecting themes.

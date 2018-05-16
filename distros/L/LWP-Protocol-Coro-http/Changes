@@ -1,8 +1,15 @@
 Revision history for LWP-Protocol-Coro-http
 
+1.14.0  2018-05-13
+        - Support for socks 5/4a/4 proxies.
+        - Honour SSL settings when requesting an HTTP URL via a HTTPS proxy.
+
+1.12.0  2018-05-12
+        - Attempt to support for socks 5/4a/4 proxies.
+
 1.10.0  2018-02-19
-        - Added support for SSL_cert_file, SSL_cert, SSL_key_file and SSL_key.
-        - Documented supported ssl_opts.
+        - Support SSL_cert_file, SSL_cert, SSL_key_file and SSL_key.
+        - Document supported ssl_opts.
 
 1.8.0   2013-08-05
         - Imitate LWP::Protocol::http's removal of newlines from request headers.

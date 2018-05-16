@@ -13,7 +13,7 @@ my $bucket = Mock::Bucket->new;
 isa_ok( $bucket, 'Mock::Bucket' );
 isa_ok( $bucket, Mock::Bucket->bucket_class );
 
-my $sub = $bucket->_fields_are_defined_and_not_null_string( 
+my $sub = $bucket->_fields_are_defined_and_not_null_string(
 	{
 	fields => [ qw(one two red blue false) ],
 	}
@@ -21,10 +21,10 @@ my $sub = $bucket->_fields_are_defined_and_not_null_string(
 isa_ok( $sub, ref sub {}, "_fields_are_defined_and_not_null_string returns a code ref" );
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # All the fields have values. Zero field is okay.
 {
-my $sub = $bucket->_fields_are_defined_and_not_null_string( 
+my $sub = $bucket->_fields_are_defined_and_not_null_string(
 	{
 	fields => [ qw(one two red blue false) ],
 	}
@@ -35,7 +35,7 @@ my $input = { map { $_, 1 } qw(one two red blue) };
 $input->{false} = 0;
 
 
-my $result = eval {  $sub->( $input )  }; 
+my $result = eval {  $sub->( $input )  };
 my $at = $@;
 #print STDERR Data::Dumper->Dump( [$result], [qw(result)] );
 
@@ -43,10 +43,10 @@ ok( $result, "Result passes (as expected)" );
 diag( "Eval error: $at" ) unless defined $result;
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Extra fields are there
 {
-my $sub = $bucket->_fields_are_defined_and_not_null_string( 
+my $sub = $bucket->_fields_are_defined_and_not_null_string(
 	{
 	fields => [ qw(one two red blue empty undefined) ],
 	}
@@ -59,7 +59,7 @@ $input->{empty}     = '';
 $input->{undefined} = undef;
 #print STDERR Data::Dumper->Dump( [$input], [qw(input)] );
 
-my $result = eval { $sub->( $input ) }; 
+my $result = eval { $sub->( $input ) };
 my $at = $@;
 
     ok( ! defined $result, "Result fails (as expected)" );

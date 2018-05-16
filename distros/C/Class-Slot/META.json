@@ -34,7 +34,8 @@
          "requires" : {
             "Carp" : "0",
             "Filter::Simple" : "0",
-            "perl" : "5.008"
+            "Scalar::Util" : "0",
+            "perl" : "5.008002"
          }
       },
       "test" : {
@@ -46,8 +47,16 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/sysread/slot"
+      "bugtracker" : {
+         "web" : "https://github.com/sysread/slot/issues"
+      },
+      "homepage" : "https://github.com/sysread/slot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sysread/slot.git",
+         "web" : "https://github.com/sysread/slot"
+      }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,3 +1,17 @@
+0.13 20180511
+    + Support (well, ignore) comments in signatures
+      This comes at the cost of erasing those comments from the source code.
+      If you stack source filters and a source filters expects to extract value
+      from the comments, this won't work anymore.
+    ! More robustness when parsing the formal signature argument list. Too many
+      strings in your source code could make the module behave erratically
+
+0.12 20180510
+    ! Make subroutines with empty body return C<undef>
+      Pointed out in discussion at
+      https://www.nntp.perl.org/group/perl.perl5.porters/2014/02/msg212580.html
+    . Documentation fix by MANWAR, many thanks!
+
 0.11 20180228
     + Support parentheses in default assignments on Perl 5.10 onwards
 	    sub foo( $now = time() ) {

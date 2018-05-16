@@ -26,14 +26,17 @@
 		[% IF description %]
 			<meta name="description" content="[% description %]" />
 		[% ELSE %]
-			<meta name="description" content="Coming Soon - an openaddresses.io, Maxmind and Geonames based geocoding website" />
+			<meta name="description" content="Coming Soon - an openaddresses.io, whosonfirst.org, Maxmind and Geonames based geocoding website" />
 		[% END %]
 		<link rel="stylesheet" href="/css/style.css">
 	</head>
 	<body onload="document.Filter.q.focus()">
 		<h1>Free Geocoding Website - alpha test</h1>
 		<p>Enter the Location to Search For</p>
-		<p>Only Australia, US and Canada are currently supported.</p>
+		<p>
+			Only Australia, US and Canada are currently supported,
+			along with some from Great Britain.
+		</p>
 		<p>Try "1600 Pennsylvania Avenue NW Washington DC USA"</p>
 		<p>Fork me at <a href="https://github.com/nigelhorne/Geo-Coder-Free">GitHub</a>
 		<form method="post" action="/cgi-bin/page.fcgi?page=query" onsubmit="return isNotEmpty(this.q)" name="Filter">
@@ -52,6 +55,7 @@
 			<a href="http://www.maxmind.com">http://www.maxmind.com</a>.
 			Also thanks to
 			<a href="http://www.geonames.org">geonames</a>,
+			<a href="https://whosonfirst.org/">whosonfirst</a> and
 			<a href="https://openaddresses.io/">openaddresses</a> and
 			<a href="https://github.com/openvenues/libpostal">libpostal</a>.
 		</p>

@@ -1,5 +1,5 @@
 package Exception::BadArguments::InvalidJSON;
-$Exception::BadArguments::InvalidJSON::VERSION = '2.4';
+$Exception::BadArguments::InvalidJSON::VERSION = '2.5';
 use base qw(Exception::BadArguments);
 
 =head1 Name
@@ -9,7 +9,7 @@ qbit::StringUtils - Functions to manipulate strings.
 =cut
 
 package qbit::StringUtils;
-$qbit::StringUtils::VERSION = '2.4';
+$qbit::StringUtils::VERSION = '2.5';
 use strict;
 use warnings;
 use utf8;

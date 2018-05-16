@@ -18,10 +18,12 @@ my %WriteMakefileArgs = (
   "NAME" => "YAML",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
+    "Encode" => 0,
+    "Test::Deep" => 0,
     "Test::More" => "0.88",
     "Test::YAML" => "1.05"
   },
-  "VERSION" => "1.24",
+  "VERSION" => "1.25",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,6 +31,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Encode" => 0,
+  "Test::Deep" => 0,
   "Test::More" => "0.88",
   "Test::YAML" => "1.05"
 );

@@ -1,7 +1,7 @@
 package SQL::Schema::Versioned;
 
 our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.234'; # VERSION
+our $VERSION = '0.235'; # VERSION
 
 use 5.010001;
 use strict;
@@ -552,7 +552,7 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.234 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
+This document describes version 0.235 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2018-05-10.
 
 =head1 DESCRIPTION
 
@@ -807,9 +807,9 @@ having to put SQL in separate files/subdirectory.
 
 =head2 How do I see each SQL statement as it is being executed?
 
-Try using L<Log::Any::For::DBI>, e.g.:
+Try using L<Log::ger::DBI::Query>, e.g.:
 
- % TRACE=1 perl -MLog::Any::For::DBI -MLog::Any::App yourapp.pl ...
+ % perl -MLog::ger::DBI::Query -MLog::ger::Output=Screen -MLog::ger::Level::trace yourapp.pl ...
 
 =head1 HOMEPAGE
 

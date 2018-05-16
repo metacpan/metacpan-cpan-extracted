@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::NL::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 
 use utf8;
 use open ':utf8';
@@ -917,7 +917,7 @@ Lingua::Interset::Tagset::NL::Conll - Driver for the Dutch tagset of the CoNLL 2
 
 =head1 VERSION
 
-version 3.011
+version 3.012
 
 =head1 SYNOPSIS
 

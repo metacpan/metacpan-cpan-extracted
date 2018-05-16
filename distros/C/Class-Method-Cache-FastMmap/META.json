@@ -51,21 +51,17 @@
          },
          "requires" : {
             "File::Spec" : "0",
-            "JSON::PP" : "2.00",
             "Module::Metadata" : "0",
             "Moo" : "0",
-            "Path::Tiny" : "0.004",
             "Test::More" : "0",
-            "Test::Most" : "0",
-            "Time::Piece" : "1.16",
-            "Time::Seconds" : "0"
+            "Test::Most" : "0"
          }
       }
    },
    "provides" : {
       "Class::Method::Cache::FastMmap" : {
          "file" : "lib/Class/Method/Cache/FastMmap.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.3.2"
       }
    },
    "release_status" : "stable",
@@ -79,7 +75,7 @@
          "web" : "https://github.com/robrwo/Class-Method-Cache-FastMmap"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.3.2",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

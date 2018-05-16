@@ -199,6 +199,7 @@ test/get_taxid_from_seq_id.test
 test/get_taxonomy_from_gca.test
 test/gi_mapper.fasta
 test/gi_mapper.idm
+test/leaf_4_fra_bact.list
 test/life.cls
 test/life_html.cls
 test/lifemrch.fra

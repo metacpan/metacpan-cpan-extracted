@@ -1,9 +1,5 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
-0.057 2018-05-04
-
-  - New script: koha-ark
-
 0.055 2018-04-17
 
   - Update koha-overdue. Fix a bug with locales on some Ubuntu server.

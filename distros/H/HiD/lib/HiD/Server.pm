@@ -3,7 +3,7 @@
 
 package HiD::Server;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Server::VERSION = '1.991';
+$HiD::Server::VERSION = '1.992';
 use 5.014; # strict, unicode_strings
 use warnings;
 
@@ -141,7 +141,7 @@ to put in alternate http response codes
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

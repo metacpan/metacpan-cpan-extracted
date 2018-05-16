@@ -4,14 +4,10 @@ author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
   File::Spec: '0'
-  JSON::PP: '2.00'
   Module::Metadata: '0'
   Moo: '0'
-  Path::Tiny: '0.004'
   Test::More: '0'
   Test::Most: '0'
-  Time::Piece: '1.16'
-  Time::Seconds: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -24,7 +20,7 @@ name: Class-Method-Cache-FastMmap
 provides:
   Class::Method::Cache::FastMmap:
     file: lib/Class/Method/Cache/FastMmap.pm
-    version: v0.3.0
+    version: v0.3.2
 requires:
   Cache::FastMmap: '0'
   Class::Method::Modifiers: '0'
@@ -34,6 +30,6 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Class-Method-Cache-FastMmap/issues
   repository: git://github.com/robrwo/Class-Method-Cache-FastMmap.git
-version: v0.3.0
+version: v0.3.2
 x_authority: cpan:RRWO
 x_serialization_backend: 'YAML::Tiny version 1.70'

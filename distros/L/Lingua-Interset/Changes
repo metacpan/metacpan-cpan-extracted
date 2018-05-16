@@ -1,4 +1,13 @@
-3.011
+3.012
+
+Interface:
+* FS methods add_ufeatures() and get_ufeatures() now store unknown language-
+  specific features or values in the 'other' feature (and set tagset to
+  'mul::uposf').
+
+
+
+3.011     2018-02-18 14:17:13+01:00 Europe/Prague
 
 Features:
 * Feature 'case': added values 'per' (perlative) and 'cns' (considerative).

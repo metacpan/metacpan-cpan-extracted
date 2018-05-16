@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Clipper.
 
+1.27  Sun May 13 17:46:00 2018
+
+  - Fix integerize bug introduced in 1.26 for 32 bit Perl (ivsize < 8)
+
 1.26  Tue May 1 02:47:00 2018
 
   - Harmonize differences in float multiplication results found on

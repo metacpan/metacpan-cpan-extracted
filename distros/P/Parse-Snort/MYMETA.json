@@ -36,8 +36,13 @@
             "Class::Accessor" : "0",
             "List::Util" : "1.33",
             "Sub::Util" : "1.4",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.82"
          }
       }
    },

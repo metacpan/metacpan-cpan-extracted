@@ -10,7 +10,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw/pread pwrite replacebytes/;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load( 'File::ReplaceBytes', $VERSION );
@@ -122,9 +122,9 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2016 by Jeremy Mates
+Copyright (C) 2013-2016,2018 by Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
 
 =cut

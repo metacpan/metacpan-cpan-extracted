@@ -20,18 +20,18 @@ ok( defined &Brick::Bucket::is_mime_type, "is_mime_type sub is there");
 
 ok( $bucket->can( 'is_mime_type' ), "can is_mime_type" );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-my $sub = $bucket->is_mime_type( 
-	{ 
-	file_field   => "filename", 
+my $sub = $bucket->is_mime_type(
+	{
+	file_field   => "filename",
 	mime_types => [ 'application/vnd.ms-excel' ],
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {}, "returns a code ref" );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # this one should work
 {
 my $file = "t/files/files_to_test/excel.xls";
@@ -41,7 +41,7 @@ my $result = eval { $sub->( { filename => $file } ) };
 is( $result, 1, "Excel file is an excel file" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # this one should fail because it's not the right type
 {
 my $file = "t/files/files_to_test/word.doc";
@@ -55,7 +55,7 @@ ok( defined $at, "\$\@ is defined" );
 isa_ok( $at, ref {}, "\$\@ is a hash ref" );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # this one should fail because the file is not there
 {
 my $file = "t/files/files_to_test/not_there.txt";

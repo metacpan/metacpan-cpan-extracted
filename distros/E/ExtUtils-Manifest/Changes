@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Manifest
 
+1.71  2018-05-15
+  - also skip .travis.yml (thanks, Jerome Eteve!)
+  - also skip .appveyor.yml (thanks, James E Keenan!)
+
 1.70  2014-12-31
   - also skip _eumm, an artifact of ExtUtils::MakeMaker 7.05*
   - avoid unreliable permissions tests on cygwin

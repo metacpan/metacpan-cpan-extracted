@@ -25,6 +25,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	CAMERA_FIRST_PERSON
 	CAMERA_FREE
 	CAMERA_ORBITAL
+	CAMERA_ORTHOGRAPHIC
+	CAMERA_PERSPECTIVE
 	CAMERA_THIRD_PERSON
 	COMPRESSED_ASTC_4x4_RGBA
 	COMPRESSED_ASTC_8x8_RGBA
@@ -115,12 +117,16 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_A
 	KEY_B
 	KEY_BACK
+	KEY_BACKSLASH
 	KEY_BACKSPACE
 	KEY_C
+	KEY_CAPS_LOCK
 	KEY_D
+	KEY_DELETE
 	KEY_DOWN
 	KEY_E
 	KEY_EIGHT
+	KEY_END
 	KEY_ENTER
 	KEY_ESCAPE
 	KEY_F
@@ -139,8 +145,11 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_FIVE
 	KEY_FOUR
 	KEY_G
+	KEY_GRAVE
 	KEY_H
+	KEY_HOME
 	KEY_I
+	KEY_INSERT
 	KEY_J
 	KEY_K
 	KEY_L
@@ -152,9 +161,14 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_MENU
 	KEY_N
 	KEY_NINE
+	KEY_NUM_LOCK
 	KEY_O
 	KEY_ONE
 	KEY_P
+	KEY_PAGE_DOWN
+	KEY_PAGE_UP
+	KEY_PAUSE
+	KEY_PRINT_SCREEN
 	KEY_Q
 	KEY_R
 	KEY_RIGHT
@@ -162,10 +176,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	KEY_RIGHT_CONTROL
 	KEY_RIGHT_SHIFT
 	KEY_S
+	KEY_SCROLL_LOCK
 	KEY_SEVEN
 	KEY_SIX
+	KEY_SLASH
 	KEY_SPACE
 	KEY_T
+	KEY_TAB
 	KEY_THREE
 	KEY_TWO
 	KEY_U
@@ -245,14 +262,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	WRAP_REPEAT
 	false
 	true
-	Begin2dMode
-	Begin3dMode
 	BeginBlendMode
 	BeginDrawing
+	BeginMode2D
+	BeginMode3D
 	BeginShaderMode
 	BeginTextureMode
 	BeginVrDrawing
-	MeshBoundingBox
 	ChangeDirectory
 	CheckCollisionBoxSphere
 	CheckCollisionBoxes
@@ -272,7 +288,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	CloseAudioStream
 	CloseVrSimulator
 	CloseWindow
-	ColorToFloat
+	ColorNormalize
+	ColorToHSV
+	ColorToInt
 	DisableCursor
 	DrawBillboard
 	DrawBillboardRec
@@ -312,6 +330,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	DrawRectangleGradientH
 	DrawRectangleGradientV
 	DrawRectangleLines
+	DrawRectangleLinesEx
 	DrawRectanglePro
 	DrawRectangleRec
 	DrawRectangleV
@@ -328,13 +347,15 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	DrawTriangle
 	DrawTriangleLines
 	EnableCursor
-	End2dMode
-	End3dMode
 	EndBlendMode
 	EndDrawing
+	EndMode2D
+	EndMode3D
 	EndShaderMode
 	EndTextureMode
 	EndVrDrawing
+	ExportImage
+	ExportMesh
 	Fade
 	FormatText
 	GenImageCellular
@@ -361,7 +382,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GenTexturePrefilter
 	GetCameraMatrix
 	GetCollisionRayGround
-	GetCollisionRayMesh
+	GetCollisionRayModel
 	GetCollisionRayTriangle
 	GetCollisionRec
 	GetColor
@@ -381,8 +402,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetGestureHoldDuration
 	GetGesturePinchAngle
 	GetGesturePinchVector
-	ColorToInt
-        ColorToHSV
+	GetGlyphIndex
 	GetImageData
 	GetKeyPressed
 	GetMatrixModelview
@@ -424,6 +444,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	ImageCrop
 	ImageDither
 	ImageDraw
+	ImageDrawRectangle
 	ImageDrawText
 	ImageDrawTextEx
 	ImageFlipHorizontal
@@ -439,7 +460,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	InitAudioStream
 	InitVrSimulator
 	InitWindow
-	IsWindowReady
 	IsAudioBufferProcessed
 	IsAudioDeviceReady
 	IsAudioStreamPlaying
@@ -465,6 +485,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	IsSoundPlaying
 	IsVrSimulatorReady
 	IsWindowMinimized
+	IsWindowReady
+	LoadFont
+	LoadFontEx
 	LoadImage
 	LoadImageEx
 	LoadImagePro
@@ -481,10 +504,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LoadMusicStream
 	LoadRenderTexture
 	LoadShader
+	LoadShaderCode
 	LoadSound
 	LoadSoundFromWave
-	LoadSpriteFont
-	LoadSpriteFontEx
 	LoadText
 	LoadTexture
 	LoadTextureFromImage
@@ -492,6 +514,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LoadWaveEx
 	MeasureText
 	MeasureTextEx
+	MeshBinormals
+	MeshBoundingBox
+	MeshTangents
 	PauseAudioStream
 	PauseMusicStream
 	PauseSound
@@ -501,7 +526,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	ResumeAudioStream
 	ResumeMusicStream
 	ResumeSound
-	SaveImageAs
 	SetAudioStreamPitch
 	SetAudioStreamVolume
 	SetCameraAltControl
@@ -516,6 +540,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	SetMatrixModelview
 	SetMatrixProjection
 	SetMousePosition
+	SetMouseScale
 	SetMusicLoopCount
 	SetMusicPitch
 	SetMusicVolume
@@ -533,6 +558,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	SetWindowMinSize
 	SetWindowMonitor
 	SetWindowPosition
+	SetWindowSize
 	SetWindowTitle
 	ShowCursor
 	ShowLogo
@@ -546,6 +572,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	ToggleFullscreen
 	ToggleVrMode
 	TraceLog
+	UnloadFont
 	UnloadImage
 	UnloadMaterial
 	UnloadMesh
@@ -554,7 +581,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	UnloadRenderTexture
 	UnloadShader
 	UnloadSound
-	UnloadSpriteFont
 	UnloadTexture
 	UnloadWave
 	UpdateAudioStream
@@ -580,6 +606,8 @@ our @EXPORT = qw(
 	CAMERA_FIRST_PERSON
 	CAMERA_FREE
 	CAMERA_ORBITAL
+	CAMERA_ORTHOGRAPHIC
+	CAMERA_PERSPECTIVE
 	CAMERA_THIRD_PERSON
 	COMPRESSED_ASTC_4x4_RGBA
 	COMPRESSED_ASTC_8x8_RGBA
@@ -670,12 +698,16 @@ our @EXPORT = qw(
 	KEY_A
 	KEY_B
 	KEY_BACK
+	KEY_BACKSLASH
 	KEY_BACKSPACE
 	KEY_C
+	KEY_CAPS_LOCK
 	KEY_D
+	KEY_DELETE
 	KEY_DOWN
 	KEY_E
 	KEY_EIGHT
+	KEY_END
 	KEY_ENTER
 	KEY_ESCAPE
 	KEY_F
@@ -694,8 +726,11 @@ our @EXPORT = qw(
 	KEY_FIVE
 	KEY_FOUR
 	KEY_G
+	KEY_GRAVE
 	KEY_H
+	KEY_HOME
 	KEY_I
+	KEY_INSERT
 	KEY_J
 	KEY_K
 	KEY_L
@@ -707,9 +742,14 @@ our @EXPORT = qw(
 	KEY_MENU
 	KEY_N
 	KEY_NINE
+	KEY_NUM_LOCK
 	KEY_O
 	KEY_ONE
 	KEY_P
+	KEY_PAGE_DOWN
+	KEY_PAGE_UP
+	KEY_PAUSE
+	KEY_PRINT_SCREEN
 	KEY_Q
 	KEY_R
 	KEY_RIGHT
@@ -717,10 +757,13 @@ our @EXPORT = qw(
 	KEY_RIGHT_CONTROL
 	KEY_RIGHT_SHIFT
 	KEY_S
+	KEY_SCROLL_LOCK
 	KEY_SEVEN
 	KEY_SIX
+	KEY_SLASH
 	KEY_SPACE
 	KEY_T
+	KEY_TAB
 	KEY_THREE
 	KEY_TWO
 	KEY_U
@@ -852,7 +895,6 @@ See L<Graphics::Raylib> for a Perlish wrapper. This XS wrapper wraps version 1.9
 
 =head2 EXPORT
 
-
 None by default.
 
 =head2 Exportable constants
@@ -864,6 +906,8 @@ None by default.
   CAMERA_FIRST_PERSON
   CAMERA_FREE
   CAMERA_ORBITAL
+  CAMERA_ORTHOGRAPHIC
+  CAMERA_PERSPECTIVE
   CAMERA_THIRD_PERSON
   COMPRESSED_ASTC_4x4_RGBA
   COMPRESSED_ASTC_8x8_RGBA
@@ -954,12 +998,16 @@ None by default.
   KEY_A
   KEY_B
   KEY_BACK
+  KEY_BACKSLASH
   KEY_BACKSPACE
   KEY_C
+  KEY_CAPS_LOCK
   KEY_D
+  KEY_DELETE
   KEY_DOWN
   KEY_E
   KEY_EIGHT
+  KEY_END
   KEY_ENTER
   KEY_ESCAPE
   KEY_F
@@ -978,8 +1026,11 @@ None by default.
   KEY_FIVE
   KEY_FOUR
   KEY_G
+  KEY_GRAVE
   KEY_H
+  KEY_HOME
   KEY_I
+  KEY_INSERT
   KEY_J
   KEY_K
   KEY_L
@@ -991,9 +1042,14 @@ None by default.
   KEY_MENU
   KEY_N
   KEY_NINE
+  KEY_NUM_LOCK
   KEY_O
   KEY_ONE
   KEY_P
+  KEY_PAGE_DOWN
+  KEY_PAGE_UP
+  KEY_PAUSE
+  KEY_PRINT_SCREEN
   KEY_Q
   KEY_R
   KEY_RIGHT
@@ -1001,10 +1057,13 @@ None by default.
   KEY_RIGHT_CONTROL
   KEY_RIGHT_SHIFT
   KEY_S
+  KEY_SCROLL_LOCK
   KEY_SEVEN
   KEY_SIX
+  KEY_SLASH
   KEY_SPACE
   KEY_T
+  KEY_TAB
   KEY_THREE
   KEY_TWO
   KEY_U
@@ -1087,14 +1146,13 @@ None by default.
 
 =head2 Exportable functions
 
-  void Begin2dMode(Camera2D camera)
-  void Begin3dMode(Camera camera)
   void BeginBlendMode(int mode)
   void BeginDrawing(void)
+  void BeginMode2D(Camera2D camera)
+  void BeginMode3D(Camera3D camera)
   void BeginShaderMode(Shader shader)
   void BeginTextureMode(RenderTexture2D target)
   void BeginVrDrawing(void)
-  BoundingBox MeshBoundingBox(Mesh mesh)
   bool ChangeDirectory(const char *dir)
   bool CheckCollisionBoxSphere(BoundingBox box, Vector3 centerSphere, float radiusSphere)
   bool CheckCollisionBoxes(BoundingBox box1, BoundingBox box2)
@@ -1105,8 +1163,7 @@ None by default.
   bool CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3)
   bool CheckCollisionRayBox(Ray ray, BoundingBox box)
   bool CheckCollisionRaySphere(Ray ray, Vector3 spherePosition, float sphereRadius)
-  bool CheckCollisionRaySphereEx(Ray ray, Vector3 spherePosition, float sphereRadius,
-                                     Vector3 *collisionPoint)
+  bool CheckCollisionRaySphereEx(Ray ray, Vector3 spherePosition, float sphereRadius, Vector3 *collisionPoint)
   bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2)
   bool CheckCollisionSpheres(Vector3 centerA, float radiusA, Vector3 centerB, float radiusB)
   void ClearBackground(Color color)
@@ -1115,11 +1172,12 @@ None by default.
   void CloseAudioStream(AudioStream stream)
   void CloseVrSimulator(void)
   void CloseWindow(void)
-  float *ColorToFloat(Color color)
+  Vector4 ColorNormalize(Color color)
+  Vector3 ColorToHSV(Color color)
+  int ColorToInt(Color color)
   void DisableCursor(void)
-  void DrawBillboard(Camera camera, Texture2D texture, Vector3 center, float size, Color tint)
-  void DrawBillboardRec(Camera camera, Texture2D texture, Rectangle sourceRec,
-                            Vector3 center, float size, Color tint)
+  void DrawBillboard(Camera3D camera, Texture2D texture, Vector3 center, float size, Color tint)
+  void DrawBillboardRec(Camera3D camera, Texture2D texture, Rectangle sourceRec, Vector3 center, float size, Color tint)
   void DrawBoundingBox(BoundingBox box, Color color)
   void DrawCircle(int centerX, int centerY, float radius, Color color)
   void DrawCircle3D(Vector3 center, float radius, Vector3 rotationAxis, float rotationAngle, Color color)
@@ -1141,11 +1199,9 @@ None by default.
   void DrawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color)
   void DrawLineV(Vector2 startPos, Vector2 endPos, Color color)
   void DrawModel(Model model, Vector3 position, float scale, Color tint)
-  void DrawModelEx(Model model, Vector3 position, Vector3 rotationAxis,
-                       float rotationAngle, Vector3 scale, Color tint)
+  void DrawModelEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint)
   void DrawModelWires(Model model, Vector3 position, float scale, Color tint)
-  void DrawModelWiresEx(Model model, Vector3 position, Vector3 rotationAxis,
-                            float rotationAngle, Vector3 scale, Color tint)
+  void DrawModelWiresEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint)
   void DrawPixel(int posX, int posY, Color color)
   void DrawPixelV(Vector2 position, Color color)
   void DrawPlane(Vector3 centerPos, Vector2 size, Color color)
@@ -1158,6 +1214,7 @@ None by default.
   void DrawRectangleGradientH(int posX, int posY, int width, int height, Color color1, Color color2)
   void DrawRectangleGradientV(int posX, int posY, int width, int height, Color color1, Color color2)
   void DrawRectangleLines(int posX, int posY, int width, int height, Color color)
+  void DrawRectangleLinesEx(Rectangle rec, int lineThick, Color color)
   void DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color)
   void DrawRectangleRec(Rectangle rec, Color color)
   void DrawRectangleV(Vector2 position, Vector2 size, Color color)
@@ -1165,24 +1222,24 @@ None by default.
   void DrawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color)
   void DrawSphereWires(Vector3 centerPos, float radius, int rings, int slices, Color color)
   void DrawText(const char *text, int posX, int posY, int fontSize, Color color)
-  void DrawTextEx(SpriteFont spriteFont, const char* text, Vector2 position,
-                float fontSize, int spacing, Color tint)
+  void DrawTextEx(Font font, const char* text, Vector2 position, float fontSize, float spacing, Color tint)
   void DrawTexture(Texture2D texture, int posX, int posY, Color tint)
   void DrawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint)
-  void DrawTexturePro(Texture2D texture, Rectangle sourceRec, Rectangle destRec, Vector2 origin,
-                    float rotation, Color tint)
+  void DrawTexturePro(Texture2D texture, Rectangle sourceRec, Rectangle destRec, Vector2 origin, float rotation, Color tint)
   void DrawTextureRec(Texture2D texture, Rectangle sourceRec, Vector2 position, Color tint)
   void DrawTextureV(Texture2D texture, Vector2 position, Color tint)
   void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
   void DrawTriangleLines(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
   void EnableCursor(void)
-  void End2dMode(void)
-  void End3dMode(void)
   void EndBlendMode(void)
   void EndDrawing(void)
+  void EndMode2D(void)
+  void EndMode3D(void)
   void EndShaderMode(void)
   void EndTextureMode(void)
   void EndVrDrawing(void)
+  void ExportImage(const char *fileName, Image image)
+  void ExportMesh(const char *fileName, Mesh mesh)
   Color Fade(Color color, float alpha)
   const char *FormatText(const char *text, ...)
   Image GenImageCellular(int width, int height, int tileSize)
@@ -1207,13 +1264,13 @@ None by default.
   Texture2D GenTextureIrradiance(Shader shader, Texture2D cubemap, int size)
   void GenTextureMipmaps(Texture2D *texture)
   Texture2D GenTexturePrefilter(Shader shader, Texture2D cubemap, int size)
-  Matrix GetCameraMatrix(Camera camera)
+  Matrix GetCameraMatrix(Camera3D camera)
   RayHitInfo GetCollisionRayGround(Ray ray, float groundHeight)
-  RayHitInfo GetCollisionRayMesh(Ray ray, Mesh *mesh)
+  RayHitInfo GetCollisionRayModel(Ray ray, Model *model)
   RayHitInfo GetCollisionRayTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3)
   Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2)
   Color GetColor(int hexValue)
-  SpriteFont GetDefaultFont(void)
+  Font GetDefaultFont(void)
   const char *GetDirectoryPath(const char *fileName)
   const char *GetExtension(const char *fileName)
   int GetFPS(void)
@@ -1229,13 +1286,12 @@ None by default.
   float GetGestureHoldDuration(void)
   float GetGesturePinchAngle(void)
   Vector2 GetGesturePinchVector(void)
-  int ColorToInt(Color color)
-  Vector3 ColorToHSV(Color color)
+  int GetGlyphIndex(Font font, int character)
   Color *GetImageData(Image image)
   int GetKeyPressed(void)
   Matrix GetMatrixModelview()
   Vector2 GetMousePosition(void)
-  Ray GetMouseRay(Vector2 mousePosition, Camera camera)
+  Ray GetMouseRay(Vector2 mousePosition, Camera3D camera)
   int GetMouseWheelMove(void)
   int GetMouseX(void)
   int GetMouseY(void)
@@ -1257,7 +1313,7 @@ None by default.
   VrDeviceInfo GetVrDeviceInfo(int vrDeviceType)
   float *GetWaveData(Wave wave)
   const char *GetWorkingDirectory(void)
-  Vector2 GetWorldToScreen(Vector3 position, Camera camera)
+  Vector2 GetWorldToScreen(Vector3 position, Camera3D camera)
   void HideCursor(void)
   void ImageAlphaClear(Image *image, Color color, float threshold)
   void ImageAlphaCrop(Image *image, float threshold)
@@ -1272,9 +1328,9 @@ None by default.
   void ImageCrop(Image *image, Rectangle crop)
   void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
   void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec)
+  void ImageDrawRectangle(Image *dst, Vector2 position, Rectangle rec, Color color)
   void ImageDrawText(Image *dst, Vector2 position, const char *text, int fontSize, Color color)
-  void ImageDrawTextEx(Image *dst, Vector2 position, SpriteFont font, const char *text,
-                           float fontSize, int spacing, Color color)
+  void ImageDrawTextEx(Image *dst, Vector2 position, Font font, const char *text, float fontSize, float spacing, Color color)
   void ImageFlipHorizontal(Image *image)
   void ImageFlipVertical(Image *image)
   void ImageFormat(Image *image, int newFormat)
@@ -1282,14 +1338,12 @@ None by default.
   void ImageResize(Image *image, int newWidth, int newHeight)
   void ImageResizeNN(Image *image,int newWidth,int newHeight)
   Image ImageText(const char *text, int fontSize, Color color)
-  Image ImageTextEx(SpriteFont font, const char *text, float fontSize, int spacing, Color tint)
+  Image ImageTextEx(Font font, const char *text, float fontSize, float spacing, Color tint)
   void ImageToPOT(Image *image, Color fillColor)
   void InitAudioDevice(void)
-  AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize,
-                                  unsigned int channels)
+  AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize, unsigned int channels)
   void InitVrSimulator(VrDeviceInfo info)
-  void InitWindow(int width, int height, const char *data)
-  bool IsWindowReady(void)
+  void InitWindow(int width, int height, const char *title)
   bool IsAudioBufferProcessed(AudioStream stream)
   bool IsAudioDeviceReady(void)
   bool IsAudioStreamPlaying(AudioStream stream)
@@ -1315,14 +1369,17 @@ None by default.
   bool IsSoundPlaying(Sound sound)
   bool IsVrSimulatorReady(void)
   bool IsWindowMinimized(void)
+  bool IsWindowReady(void)
+  Font LoadFont(const char *fileName)
+  Font LoadFontEx(const char *fileName, int fontSize, int charsCount, int *fontChars)
   Image LoadImage(const char *fileName)
   Image LoadImageEx(Color *pixels, int width, int height)
   Image LoadImagePro(void *data, int width, int height, int format)
   Image LoadImageRaw(const char *fileName, int width, int height, int format, int headerSize)
-  Image LoadImageFromAV(SV *array_ref, SV *color_cb, int width, int height)
-  Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
-  Image LoadImageFromAV_transposed(SV *array_ref, SV *color_cb, int width, int height)
-  Image LoadImageFromAV_transposed_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
+  Image LoadImageFromAV(SV *array_ref, SV *color_cb)
+  Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb)
+  Image LoadImageFromAV_transposed(SV *array_ref, SV *color_cb)
+  Image LoadImageFromAV_transposed_uninitialized_mem(SV *array_ref, SV *color_cb)
   Material LoadMaterial(const char *fileName)
   Material LoadMaterialDefault(void)
   Mesh LoadMesh(const char *fileName)
@@ -1330,18 +1387,20 @@ None by default.
   Model LoadModelFromMesh(Mesh mesh)
   Music LoadMusicStream(const char *fileName)
   RenderTexture2D LoadRenderTexture(int width, int height)
-  Shader LoadShader(char *vsFileName, char *fsFileName)
+  Shader LoadShader(const char *vsFileName, const char *fsFileName)
+  Shader LoadShaderCode(char *vsCode, char *fsCode)
   Sound LoadSound(const char *fileName)
   Sound LoadSoundFromWave(Wave wave)
-  SpriteFont LoadSpriteFont(const char *fileName)
-  SpriteFont LoadSpriteFontEx(const char *fileName, int fontSize, int charsCount, int *fontChars)
   char *LoadText(const char *fileName)
   Texture2D LoadTexture(const char *fileName)
   Texture2D LoadTextureFromImage(Image image)
   Wave LoadWave(const char *fileName)
   Wave LoadWaveEx(void *data, int sampleCount, int sampleRate, int sampleSize, int channels)
   int MeasureText(const char *text, int fontSize)
-  Vector2 MeasureTextEx(SpriteFont spriteFont, const char *text, float fontSize, int spacing)
+  Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing)
+  void MeshBinormals(Mesh *mesh)
+  BoundingBox MeshBoundingBox(Mesh mesh)
+  void MeshTangents(Mesh *mesh)
   void PauseAudioStream(AudioStream stream)
   void PauseMusicStream(Music music)
   void PauseSound(Sound sound)
@@ -1351,14 +1410,11 @@ None by default.
   void ResumeAudioStream(AudioStream stream)
   void ResumeMusicStream(Music music)
   void ResumeSound(Sound sound)
-  void SaveImageAs(const char *fileName, Image image)
   void SetAudioStreamPitch(AudioStream stream, float pitch)
   void SetAudioStreamVolume(AudioStream stream, float volume)
   void SetCameraAltControl(int altKey)
-  void SetCameraMode(Camera camera, int mode)
-  void SetCameraMoveControls(int frontKey, int backKey,
-                                 int rightKey, int leftKey,
-                                 int upKey, int downKey)
+  void SetCameraMode(Camera3D camera, int mode)
+  void SetCameraMoveControls(int frontKey, int backKey, int rightKey, int leftKey, int upKey, int downKey)
   void SetCameraPanControl(int panKey)
   void SetCameraSmoothZoomControl(int szKey)
   void SetConfigFlags(unsigned char flags)
@@ -1368,6 +1424,7 @@ None by default.
   void SetMatrixModelview(Matrix view)
   void SetMatrixProjection(Matrix proj)
   void SetMousePosition(Vector2 position)
+  void SetMouseScale(float scale)
   void SetMusicLoopCount(Music music, int count)
   void SetMusicPitch(Music music, float pitch)
   void SetMusicVolume(Music music, float volume)
@@ -1385,6 +1442,7 @@ None by default.
   void SetWindowMinSize(int width, int height)
   void SetWindowMonitor(int monitor)
   void SetWindowPosition(int x, int y)
+  void SetWindowSize(int width, int height)
   void SetWindowTitle(const char *title)
   void ShowCursor(void)
   void ShowLogo(void)
@@ -1398,6 +1456,7 @@ None by default.
   void ToggleFullscreen(void)
   void ToggleVrMode(void)
   void TraceLog(int logType, const char *text, ...)
+  void UnloadFont(Font font)
   void UnloadImage(Image image)
   void UnloadMaterial(Material material)
   void UnloadMesh(Mesh *mesh)
@@ -1406,21 +1465,19 @@ None by default.
   void UnloadRenderTexture(RenderTexture2D target)
   void UnloadShader(Shader shader)
   void UnloadSound(Sound sound)
-  void UnloadSpriteFont(SpriteFont spriteFont)
   void UnloadTexture(Texture2D texture)
   void UnloadWave(Wave wave)
   void UpdateAudioStream(AudioStream stream, const void *data, int samplesCount)
-  void UpdateCamera(Camera *camera)
+  void UpdateCamera(Camera3D *camera)
   void UpdateMusicStream(Music music)
   void UpdateSound(Sound sound, const void *data, int samplesCount)
   void UpdateTexture(Texture2D texture, const void *pixels)
   void UpdateTextureFromImage(Texture2D texture, Image image)
-  void UpdateVrTracking(Camera *camera)
+  void UpdateVrTracking(Camera3D *camera)
   Wave WaveCopy(Wave wave)
   void WaveCrop(Wave *wave, int initSample, int finalSample)
   void WaveFormat(Wave *wave, int sampleRate, int sampleSize, int channels)
   bool WindowShouldClose(void)
-
 
 
 

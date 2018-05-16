@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Device;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.007000';
+our $VERSION = '1.008000';
 
 use Types::UUID;
 use WebService::MinFraud::Types qw( Num Str );
@@ -48,7 +48,7 @@ WebService::MinFraud::Record::Device - Contains data for the device associated w
 
 =head1 VERSION
 
-version 1.007000
+version 1.008000
 
 =head1 SYNOPSIS
 

@@ -2,8 +2,8 @@ use strict;
 use warnings;
 package Graphics::Raylib::Util;
 
-# ABSTRACT: Utility functions for use With Graphics::Raylib::XS
-our $VERSION = '0.017'; # VERSION
+# ABSTRACT: Utility functions for use with Graphics::Raylib::XS
+our $VERSION = '0.018'; # VERSION
 
 use List::Util qw(reduce);
 use Graphics::Raylib::XS qw(:all);
@@ -12,12 +12,19 @@ use Carp;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our %EXPORT_TAGS = (objects => [qw(vector rectangle camera)]);
+our %EXPORT_TAGS = (objects => [qw(vector rectangle camera3d image)]);
 Exporter::export_ok_tags(qw(objects));
 {
     my %seen;
     push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS;
 }
+use Config;
+
+our $PTR_PACK_FMT = $Config{ptrsize} == $Config{longsize}     ? 'L!'
+                  : $Config{ptrsize} == $Config{intsize}      ? 'I!'
+                  : $Config{ptrsize} == $Config{longlongsize} ? 'Q!'
+                  : croak "Strange pointer size of $Config{ptrsize} not supported (yet!). ".
+                  __PACKAGE__."'s author would be curious to learn about the weird system you got there.";
 
 =pod
 
@@ -30,7 +37,7 @@ Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib::XS
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -140,21 +147,21 @@ sub rectangle {
     ($p{x}, $p{y}) = ($p{position}->x, $p{position}->y) if defined $p{position};
     ($p{width}, $p{height}) = ($p{size}->x, $p{size}->y) if defined $p{size};
 
-    return bless \pack("i4", $p{x}, $p{y}, $p{width}, $p{height}), 'Graphics::Raylib::XS::Rectangle'
+    return bless \pack("f4", $p{x}, $p{y}, $p{width}, $p{height}), 'Graphics::Raylib::XS::Rectangle'
 }
 
 {
     package Graphics::Raylib::XS::Rectangle;
-    sub x      { return unpack(      "i", ${$_[0]}) }
-    sub y      { return unpack("x[i]  i", ${$_[0]}) }
-    sub width  { return unpack("x[ii] i", ${$_[0]}) }
-    sub height { return unpack("x[iii]i", ${$_[0]}) }
+    sub x      { return unpack(      "f", ${$_[0]}) }
+    sub y      { return unpack("x[f]  f", ${$_[0]}) }
+    sub width  { return unpack("x[ff] f", ${$_[0]}) }
+    sub height { return unpack("x[fff]f", ${$_[0]}) }
     sub components {
-        my ($x,$y,$w,$h) = unpack("i4", ${$_[0]}); return { x=>$x,y=>$y,width=>$w,height=>$h }
+        my ($x,$y,$w,$h) = unpack("f4", ${$_[0]}); return { x=>$x,y=>$y,width=>$w,height=>$h }
     }
     sub stringify {
         my ($p) = $_[0]->components;
-        return sprintf '(x: %d, y: %d, width: %d, height: %d)', $p->{x}, $p->{y}, $p->{width}, $p->{height};
+        return sprintf '(x: %f, y: %f, width: %f, height: %f)', $p->{x}, $p->{y}, $p->{width}, $p->{height};
     }
     sub collides {
         Graphics::Raylib::XS::CheckCollisionRecs(shift, shift)
@@ -162,43 +169,118 @@ sub rectangle {
     use overload fallback => 1, '""' => 'stringify', 'x' => 'collides';
 }
 
-=item camera(position => $pos3d, target => $target3d, up => $up3d, fovy => $fovy)
+=item camera3d(position => $pos3d, target => $target3d, up => $up3d, fovy => $fovy)
 
-Constructs a C<Graphics::Raylib::XS::Camera>.
+Constructs a C<Graphics::Raylib::XS::Camera3D>.
 
-    typedef struct Camera {
+    typedef struct Camera3D {
         Vector3 position;
         Vector3 target;
         Vector3 up;
         float fovy;
-    } Camera;
+        int type;
+    } Camera3D;
 
 =cut
 
-sub camera {
+sub camera3d {
     use constant ZERO => Graphics::Raylib::XS::Vector3::Zero;
-    my %p = (position => ZERO, target => ZERO, up => ZERO, fovy => 0, @_);
+    my %p = (position => ZERO, target => ZERO, up => ZERO, fovy => 0, type => 0, @_);
     ($p{position}, $p{target}, $p{up})
         = map { Graphics::Raylib::Util::vector($_) } $p{position}, $p{target}, $p{up};
 
-    my $camera = ${$p{position}}.${$p{target}}.${$p{up}}.pack('f', $p{fovy});
-    return bless \$camera, 'Graphics::Raylib::XS::Camera';
+    my $camera = ${$p{position}}.${$p{target}}.${$p{up}}.pack('f2', $p{fovy}, $p{type});
+    return bless \$camera, 'Graphics::Raylib::XS::Camera3D';
 }
 
 {
-    package Graphics::Raylib::XS::Camera;
-    sub position { return Graphics::Raylib::Util::vector(unpack(      "f3", ${$_[0]})) }
-    sub target   { return Graphics::Raylib::Util::vector(unpack("x[f3] f3", ${$_[0]})) }
-    sub up       { return Graphics::Raylib::Util::vector(unpack("x[f6] f3", ${$_[0]})) }
-    sub fovy     { return                                unpack("x[f9] f",  ${$_[0]})  }
+    package Graphics::Raylib::XS::Camera3D;
+    sub position { return Graphics::Raylib::Util::vector(unpack(       "f3", ${$_[0]})) }
+    sub target   { return Graphics::Raylib::Util::vector(unpack("x[f3]  f3", ${$_[0]})) }
+    sub up       { return Graphics::Raylib::Util::vector(unpack("x[f6]  f3", ${$_[0]})) }
+    sub fovy     { return                                unpack("x[f9]  f",  ${$_[0]})  }
+    sub type     { return                                unpack("x[f10] f",  ${$_[0]})  }
     sub components {
         my $self = shift;
-        return {position=>$self->position, target=>$self->target, up=>$self->up, fovy=>$self->fovy}
+        return {position=>$self->position, target=>$self->target, up=>$self->up, fovy=>$self->fovy, type=>$self->type}
     }
     sub stringify {
         my ($c) = $_[0]->components;
-        return sprintf '(position: %s, target: %s, up: %s, fovy: %s)',
-                        $c->{position}, $c->{target}, $c->{up}, $c->{fovy};
+        return sprintf '(position: %s, target: %s, up: %s, fovy: %s, type: %s)',
+                        $c->{position}, $c->{target}, $c->{up}, $c->{fovy}, $c->{type};
+    }
+    use overload fallback => 1, '""' => 'stringify';
+}
+
+=item image(data => $str, size => [$width, $height], [ mipmaps => 1, format => UNCOMPRESSED_R8G8B8A8 ])
+
+Constructs a C<Graphics::Raylib::XS::Image>.
+
+    typedef struct Image {
+        void *data;             // Image raw data
+        int width;              // Image base width
+        int height;             // Image base height
+        int mipmaps;            // Mipmap levels, 1 by default
+        int format;             // Data format (PixelFormat type)
+    } Image;
+
+=cut
+
+sub image {
+    my %i = (mipmaps => 1, format => Graphics::Raylib::XS::UNCOMPRESSED_R8G8B8A8, @_);
+
+    defined $i{data} && defined $i{width} && defined $i{height} or croak '(data, height, width) may not be undef';
+
+    my $image = pack('Pi4', $i{data}, $i{width}, $i{height}, $i{mipmaps}, $i{format});
+    return bless \$image, 'Graphics::Raylib::XS::Image';
+}
+
+{
+    package Graphics::Raylib::XS::Image;
+    #sub bytes   { goto &data }
+    sub data    {
+        my ($self, $len) = @_;
+        return unpack(defined $len ? "P$len" : $PTR_PACK_FMT, $$self)
+    }
+    sub width   { return  unpack("x[Pi0]i", ${$_[0]})  }
+    sub height  { return  unpack("x[Pi1]i", ${$_[0]})  }
+    sub size    { return [unpack("x[P]ii",  ${$_[0]})] }
+    sub mipmaps { return  unpack("x[Pi2]i", ${$_[0]})  }
+    sub format  { return  unpack("x[Pi3]i", ${$_[0]})  }
+    sub stringify {
+        return sprintf '(Image: %x [%dx%d], mipmaps: %d, format: %d)',
+                        $_[0]->data, $_[0]->width, $_[0]->height, $_[0]->mipmaps, $_[0]->format
+    }
+    use overload fallback => 1, '""' => 'stringify';
+}
+
+=begin comment
+
+Constructs a C<Graphics::Raylib::XS::Image>.
+
+    typedef struct Texture2D {
+        unsigned int id;        // OpenGL texture id
+        int width;              // Texture base width
+        int height;             // Texture base height
+        int mipmaps;            // Mipmap levels, 1 by default
+        int format;             // Data format (PixelFormat type)
+    } Texture2D;
+
+=end comment
+
+=cut
+
+{
+    package Graphics::Raylib::XS::Texture2D;
+    sub id      { return  unpack("      I", ${$_[0]})  }
+    sub width   { return  unpack("x[I]  i", ${$_[0]})  }
+    sub height  { return  unpack("x[Ii] i", ${$_[0]})  }
+    sub size    { return [unpack("x[I] ii",  ${$_[0]})] }
+    sub mipmaps { return  unpack("x[Ii2]i", ${$_[0]})  }
+    sub format  { return  unpack("x[Ii3]i", ${$_[0]})  }
+    sub stringify {
+        return sprintf '(Texture2D id:%d [%dx%d], mipmaps: %d, format: %d)',
+                        $_[0]->id, $_[0]->width, $_[0]->height, $_[0]->mipmaps, $_[0]->format
     }
     use overload fallback => 1, '""' => 'stringify';
 }

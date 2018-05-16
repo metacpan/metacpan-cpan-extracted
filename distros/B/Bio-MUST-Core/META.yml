@@ -64,5 +64,5 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.181180'
+version: '0.181310'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,5 +1,12 @@
 Revision history for Parse-Snort
 
+0.9 May 9 2018
+
+    * Fixes from @waterkip for errors fond during smoketesting
+    * Moved testing prereqs out of runtime requirements
+    * Fixed != v.s. ne in example code for working with rule references
+    * Added clone and reset methods to clone and reset the object internal state
+
 0.8 May 8 2018
 
     * Add support for preprocessed rule parsing

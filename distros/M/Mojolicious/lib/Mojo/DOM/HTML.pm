@@ -1,8 +1,11 @@
 package Mojo::DOM::HTML;
 use Mojo::Base -base;
 
+use Exporter 'import';
 use Mojo::Util qw(html_attr_unescape html_unescape xml_escape);
 use Scalar::Util 'weaken';
+
+our @EXPORT_OK = ('tag_to_html');
 
 has tree => sub { ['root'] };
 has 'xml';
@@ -166,6 +169,10 @@ sub parse {
 
 sub render { _render($_[0]->tree, $_[0]->xml) }
 
+sub tag { shift->tree(['root', _tag(@_)]) }
+
+sub tag_to_html { _render(_tag(@_), undef) }
+
 sub _end {
   my ($end, $xml, $current) = @_;
 
@@ -194,12 +201,43 @@ sub _node {
 sub _render {
   my ($tree, $xml) = @_;
 
-  # Text (escaped)
+  # Tag
   my $type = $tree->[0];
+  if ($type eq 'tag') {
+
+    # Start tag
+    my $tag    = $tree->[1];
+    my $result = "<$tag";
+
+    # Attributes
+    for my $key (sort keys %{$tree->[2]}) {
+      my $value = $tree->[2]{$key};
+      $result .= $xml ? qq{ $key="$key"} : " $key" and next
+        unless defined $value;
+      $result .= qq{ $key="} . xml_escape($value) . '"';
+    }
+
+    # No children
+    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
+      unless $tree->[4];
+
+    # Children
+    no warnings 'recursion';
+    $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
+
+    # End tag
+    return "$result</$tag>";
+  }
+
+  # Text (escaped)
   return xml_escape $tree->[1] if $type eq 'text';
 
   # Raw text
   return $tree->[1] if $type eq 'raw';
+
+  # Root
+  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
+    if $type eq 'root';
 
   # DOCTYPE
   return '<!DOCTYPE' . $tree->[1] . '>' if $type eq 'doctype';
@@ -213,31 +251,8 @@ sub _render {
   # Processing instruction
   return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
-  # Root
-  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
-    if $type eq 'root';
-
-  # Start tag
-  my $tag    = $tree->[1];
-  my $result = "<$tag";
-
-  # Attributes
-  for my $key (sort keys %{$tree->[2]}) {
-    my $value = $tree->[2]{$key};
-    $result .= $xml ? qq{ $key="$key"} : " $key" and next unless defined $value;
-    $result .= qq{ $key="} . xml_escape($value) . '"';
-  }
-
-  # No children
-  return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
-    unless $tree->[4];
-
-  # Children
-  no warnings 'recursion';
-  $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
-
-  # End tag
-  return "$result</$tag>";
+  # Everything else
+  return '';
 }
 
 sub _start {
@@ -265,6 +280,21 @@ sub _start {
   $$current = $new;
 }
 
+sub _tag {
+  my $tree = ['tag', shift, undef, undef];
+
+  # Content
+  push @$tree, ref $_[-1] eq 'CODE' ? ['raw', pop->()] : ['text', pop]
+    if @_ % 2;
+
+  # Attributes
+  my $attrs = $tree->[2] = {@_};
+  return $tree unless exists $attrs->{data} && ref $attrs->{data} eq 'HASH';
+  my $data = delete $attrs->{data};
+  @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
+  return $tree;
+}
+
 1;
 
 =encoding utf8
@@ -287,6 +317,19 @@ Mojo::DOM::HTML - HTML/XML engine
 L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>, based on the
 L<HTML Living Standard|https://html.spec.whatwg.org> and the
 L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>.
+
+=head1 FUNCTIONS
+
+L<Mojo::DOM::HTML> implements the following functions, which can be imported
+individually.
+
+=head2 tag_to_html
+
+  my $str = tag_to_html 'div', id => 'foo', 'safe content';
+
+Generate HTML/XML tag and render it right away. This is a significantly faster
+alternative to L</"tag"> for template systems that have to generate a lot of
+tags. Note that this function is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 
@@ -325,8 +368,15 @@ Parse HTML/XML fragment.
 
 Render DOM to HTML/XML.
 
+=head2 tag
+
+  $html = $html->tag('div', id => 'foo', 'safe content');
+
+Generate HTML/XML tag. Note that this method is EXPERIMENTAL and might change
+without warning!
+
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

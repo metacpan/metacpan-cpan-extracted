@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 87;
+use Test::Most tests => 91;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -21,10 +21,20 @@ OPENADDR: {
 
 			my $geocoder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
 
-			my $location = $geocoder->geocode('Indianapolis, Indiana, USA');
+			my $location = $geocoder->geocode('Medlars Drive, Bethesda, MD, USA');
 			ok(defined($location));
-			delta_within($location->{latitude}, 39.77, 1e-2);
-			delta_within($location->{longitude}, -86.29, 1e-2);
+			delta_within($location->{latitude}, 39.00, 1e-2);
+			delta_within($location->{longitude}, -77.10, 1e-2);
+
+			$location = $geocoder->geocode('Indianapolis, Indiana, USA');
+			ok(defined($location));
+			if($ENV{'WHOSONFIRST_HOME'}) {
+				delta_within($location->{latitude}, 39.77, 1e-2);
+				delta_within($location->{longitude}, -86.29, 1e-2);
+			} else {
+				delta_within($location->{latitude}, 39.81, 1e-2);
+				delta_within($location->{longitude}, -86.10, 1e-2);
+			}
 
 			# $location = $geocoder->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
 			# delta_ok($location->{latt}, 46.67);
@@ -35,7 +45,7 @@ OPENADDR: {
 
 				eval {
 					$location = $geocoder->geocode({ location => 'Osceola, Polk, Nebraska, USA' });
-					ok(defined($location));
+					ok(!defined($location));
 				};
 			}
 
@@ -90,17 +100,21 @@ OPENADDR: {
 
 			$location = $geocoder->geocode(location => 'Edmonton, Alberta, Canada');
 			ok(defined($location));
-			delta_within($location->{latitude}, 53.55, 1e-2);
-			delta_within($location->{longitude}, -113.53, 1e-2);
-
-			TODO: {
-				local $TODO = "Don't know how to parse 'London, England'";
-
-				eval {
-					$location = $geocoder->geocode('London, England');
-					ok(defined($location));
-				};
+			if($ENV{'WHOSONFIRST_HOME'}) {
+				delta_within($location->{latitude}, 53.48, 1e-2);
+				delta_within($location->{longitude}, -113.66, 1e-2);
+			} else {
+				delta_within($location->{latitude}, 53.55, 1e-2);
+				delta_within($location->{longitude}, -113.53, 1e-2);
 			}
+
+			$location = $geocoder->geocode('London, England');
+			TODO: {
+				local $TODO = "Can't parse 'London, England'";
+
+				ok(!defined($location));
+			}
+
 
 			$location = $geocoder->geocode('Silver Spring, Maryland, USA');
 			ok(defined($location));
@@ -191,7 +205,9 @@ OPENADDR: {
 
 			$location = $geocoder->geocode(location => 'Caboolture, Queensland, Australia');
 			delta_within($location->{latitude}, -27.09, 1e-2);
-			delta_within($location->{longitude}, 152.98, 1e-2);
+			delta_within($location->{longitude}, 152.95, 1e-2);
+
+			$location = $geocoder->geocode(location => 'Whitley, Indiana, USA');
 
 			# my $address = $geocoder->reverse_geocode(latlng => '51.50,-0.13');
 			# like($address->{'city'}, qr/^London$/i, 'test reverse');
@@ -209,7 +225,7 @@ OPENADDR: {
 			});
 		} else {
 			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
-			skip 'OPENADDR_HOME not defined', 86;
+			skip 'OPENADDR_HOME not defined', 90;
 		}
 	}
 }

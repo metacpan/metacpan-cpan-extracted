@@ -1,16 +1,19 @@
-# Copyrights 2008-2012 by [Mark Overmeer].
+# Copyrights 2008-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.00.
-
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-Compile-Tester.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Tester;
 use vars '$VERSION';
-$VERSION = '0.90';
+$VERSION = '0.91';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
 
 our @EXPORT = qw/
  set_compile_defaults
@@ -124,7 +127,7 @@ sub writer_error($$$)
 
     my $error
        = ref $@ && $@->exceptions
-       ? join("\n", map {$_->message} $@->exceptions)
+       ? join("\n", map $_->message, $@->exceptions)
        : '';
     undef $node if $error;   # there is output if only warnings are produced
 
@@ -136,6 +139,7 @@ sub writer_error($$$)
     $error;
 }
 
+#--------------
 
 sub templ_xml($$@)
 {   my ($schema, $test, @opts) = @_;

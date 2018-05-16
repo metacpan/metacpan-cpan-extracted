@@ -33,13 +33,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Digest::SHA" : "5.23",
             "DynaLoader" : "1.04",
             "File::Find" : "1.05",
             "File::Spec" : "0.86",
             "IO::File" : "1.08",
             "MIME::Base64" : "2.13",
-            "Net::DNS" : "1.01",
+            "Net::DNS" : "1.08",
             "Test::More" : "0.47",
             "perl" : "5.006"
          }
@@ -49,6 +48,6 @@
    "resources" : {
       "X_type" : "cpan"
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

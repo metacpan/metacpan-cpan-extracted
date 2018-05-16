@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CryptoExchange-Catalog
   homepage: https://metacpan.org/release/CryptoExchange-Catalog
   repository: git://github.com/perlancar/perl-CryptoExchange-Catalog.git
-version: '20180403'
+version: '20180510'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

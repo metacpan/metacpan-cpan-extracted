@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use List::AllUtils qw( all );
 use Scalar::Util qw( blessed );
@@ -36,7 +36,7 @@ subtype EmailAddressStr,
     as NonEmptyStr;
 
 coerce EmailAddressStr,
-    from class_type('Email::Address'),
+    from class_type('Email::Address::XS'),
     via { $_->format };
 
 my $_check_header_array = sub {

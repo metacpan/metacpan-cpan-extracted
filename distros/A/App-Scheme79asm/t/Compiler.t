@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Data::Dump::Sexp;
-use Test::More tests => 31;
+use Test::More tests => 32;
 
 BEGIN { use_ok('App::Scheme79asm::Compiler') };
 
@@ -28,6 +28,7 @@ sub is_toplevel {
 }
 
 is_sexp new->process_quoted(to_sexp '5'), '(SYMBOL 3)', 'process_quoted 5';
+is_sexp new->process_quoted(to_sexp 'NIL'), '(LIST 0)', 'process_quoted NIL';
 is_sexp new->process_quoted(to_sexp '()'), '(LIST 0)', 'process_quoted ()';
 is_sexp new->process_quoted(to_sexp '(5 foo)'), '(LIST (LIST (LIST 0) (SYMBOL 3)) (SYMBOL 4))', 'process_quoted (5 foo)';
 is_sexp new->process_quoted(to_sexp '(((5)))'), '(LIST (LIST 0) (LIST (LIST 0) (LIST (LIST 0) (SYMBOL 3))))', 'process_quoted (((5)))';

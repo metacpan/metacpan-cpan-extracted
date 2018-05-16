@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Test Module for Alien::Base + Alien::Build
-our $VERSION = '1.2902'; # VERSION
+our $VERSION = '1.4100'; # VERSION
 
 require DynaLoader;
 our @ISA = 'DynaLoader';
@@ -25,18 +25,18 @@ Acme::Ford::Prefect2 - Test Module for Alien::Base + Alien::Build
 
 =head1 VERSION
 
-version 1.2902
+version 1.4100
 
 =head1 SYNOPSIS
 
- use strict;
- use warnings;
+ use Test2::V0;
  use Acme::Ford::Prefect2;
- use Test::More tests => 1;
 
  is Acme::Ford::Prefect2::answer(), 42;
  # if 42 is returned then Acme::Alien::DontPanic2
  # properly provided the C library
+ 
+ done_testing;
 
 =head1 DESCRIPTION
 

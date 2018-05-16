@@ -3,7 +3,7 @@
 
 package HiD::App;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::App::VERSION = '1.991';
+$HiD::App::VERSION = '1.992';
 use Moose;
 extends 'MooseX::App::Cmd';
 use namespace::autoclean;
@@ -36,7 +36,7 @@ See C<perldoc hid> for usage information.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

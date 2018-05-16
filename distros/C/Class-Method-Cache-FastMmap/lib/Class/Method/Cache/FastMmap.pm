@@ -13,7 +13,7 @@ use Cache::FastMmap;
 use Class::Method::Modifiers qw/ install_modifier /;
 use Object::Signature ();
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.2';
 
 our @EXPORT    = qw/ cache /;
 our @EXPORT_OK = @EXPORT;
@@ -60,7 +60,7 @@ Class::Method::Cache::FastMmap - Cache method results using Cache::FastMmap
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,9 @@ namme:
      expire_time => '1h',
   );
 
+Undefined results are not cached. So if your method returns C<undef>
+on failure, then it never cache that result.
+
 =head1 SEE ALSO
 
 L<Cache::FastMmap>
@@ -165,6 +168,9 @@ feature.
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+Some development of this module was sponsored by Science Photo Library
+L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 

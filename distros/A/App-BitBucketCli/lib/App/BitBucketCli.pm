@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::BitBucketCli::Core;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 has core => (
     is      => 'ro',
@@ -118,8 +118,28 @@ sub pull_requests {
         }
         $self->core->pull_requests($self->opt->{project}, $self->opt->{repository});
 
+    my @prs;
+    my %max;
     for my $pull_request (@pull_requests) {
-        print $pull_request->id . ' - ' . $pull_request->title . "\n";
+        push @prs, {
+            id     => $pull_request->id,
+            title  => $pull_request->title,
+            author => $pull_request->author->{user}{displayName},
+            from   => $pull_request->fromRef->{displayId},
+            to     => $pull_request->toRef->{displayId},
+            tasks  => $pull_request->{openTasks}->[0] || 0,
+        };
+        chomp $prs[-1]{title};
+        for my $key (keys %{ $prs[-1] }) {
+            $max{$key} = length $prs[-1]{$key} if ! $max{$key} || $max{$key} < length $prs[-1]{$key};
+        }
+    }
+
+    for my $pr (@prs) {
+        printf "%-$max{id}s ", $pr->{id};
+        printf "%-$max{author}s ", $pr->{author};
+        printf "%-$max{tasks}s ", $pr->{tasks};
+        print "$pr->{title}\n";
     }
 }
 
@@ -146,7 +166,7 @@ App::BitBucketCli - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli version 0.003
+This documentation refers to App::BitBucketCli version 0.004
 
 =head1 SYNOPSIS
 

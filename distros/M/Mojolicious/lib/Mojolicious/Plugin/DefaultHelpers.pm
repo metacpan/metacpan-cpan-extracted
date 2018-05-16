@@ -1,11 +1,12 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Mojo::Asset::File;
 use Mojo::ByteStream;
 use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
-use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
+use Mojo::Util qw(deprecated dumper hmac_sha1_sum steady_time);
 use Time::HiRes qw(gettimeofday tv_interval);
 use Scalar::Util 'blessed';
 
@@ -31,13 +32,24 @@ sub register {
   $app->helper(content_for  => sub { _content(1, 0, @_) });
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
+  # DEPRECATED!
+  $app->helper(
+    delay => sub {
+      deprecated 'delay helper is DEPRECATED';
+      my $c  = shift;
+      my $tx = $c->render_later->tx;
+      Mojo::IOLoop->delay(@_)
+        ->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
+    }
+  );
+
   $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route delay inactivity_timeout is_fresh url_with);
+    for qw(csrf_token current_route inactivity_timeout is_fresh url_with);
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
 
-  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset static);
+  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
 
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
@@ -81,13 +93,6 @@ sub _csrf_token {
 sub _current_route {
   return '' unless my $route = shift->match->endpoint;
   return @_ ? $route->name eq shift : $route->name;
-}
-
-sub _delay {
-  my $c  = shift;
-  my $tx = $c->render_later->tx;
-  Mojo::IOLoop->delay(@_)
-    ->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
 }
 
 sub _development {
@@ -136,6 +141,8 @@ sub _fallbacks {
   delete @$stash{qw(extends layout)};
   return $c->render_maybe($bundled, %$options, handler => 'ep');
 }
+
+sub _file { _asset(shift, Mojo::Asset::File->new(path => shift)) }
 
 sub _inactivity_timeout {
   my ($c, $timeout) = @_;
@@ -323,33 +330,6 @@ Get CSRF token from L</"session">, and generate one if none exists.
 
 Check or get name of current route.
 
-=head2 delay
-
-  $c->delay(sub {...}, sub {...});
-
-Disable automatic rendering and use L<Mojo::IOLoop/"delay"> for flow-control.
-Also keeps a reference to L<Mojolicious::Controller/"tx"> in case the underlying
-connection gets closed early, and calls L</"reply-E<gt>exception"> if an
-exception gets thrown in one of the steps, breaking the chain.
-
-  # Longer version
-  $c->render_later;
-  my $tx    = $c->tx;
-  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...})
-  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
-
-  # Non-blocking request
-  $c->delay(
-    sub {
-      my $delay = shift;
-      $c->ua->get('http://mojolicious.org' => $delay->begin);
-    },
-    sub {
-      my ($delay, $tx) = @_;
-      $c->render(json => {title => $tx->result->dom->at('title')->text});
-    }
-  );
-
 =head2 dumper
 
   %= dumper {some => 'data'}
@@ -447,6 +427,23 @@ C<exception.$format.*> and set the response status code to C<500>. Also sets
 the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot> to
 a copy of the L</"stash"> for use in the templates.
 
+=head2 reply->file
+
+  $c->reply->file('/etc/passwd');
+
+Reply with a static file from an absolute path anywhere on the file system using
+L<Mojolicious/"static">.
+
+  # Longer version
+  $c->reply->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+
+  # Serve file from an absolute path with a custom content type
+  $c->res->headers->content_type('application/myapp');
+  $c->reply->file('/home/sri/foo.txt');
+
+  # Serve file from a secret application directory
+  $c->reply->file($c->app->home->child('secret', 'file.txt'));
+
 =head2 reply->not_found
 
   $c = $c->reply->not_found;
@@ -466,7 +463,7 @@ C<public> directories or C<DATA> sections of your application. Note that this
 helper uses a relative path, but does not protect from traversing to parent
 directories.
 
-  # Serve file with a custom content type
+  # Serve file from a relative path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->static('foo.txt');
 
@@ -598,6 +595,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

@@ -9,9 +9,9 @@ use Test::More;
 plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/cryp/Exchange/bitcoin_indonesia.pm',
     'App/cryp/Exchange/cryptopia.pm',
     'App/cryp/Exchange/gdax.pm',
+    'App/cryp/Exchange/indodax.pm',
     'App/cryp/Role/Exchange.pm',
     'App/cryp/exchange.pm'
 );

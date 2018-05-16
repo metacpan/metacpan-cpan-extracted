@@ -18,6 +18,13 @@ $cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'FreeformSingle', Qu
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by_child->Create(Name => 'Child', Type => 'FreeformSingle', Queue => 'General', BasedOn => $cf_conditioned_by->id);
 
+RT->Config->Set('CustomFieldGroupings',
+    'RT::Ticket' => [
+        'Group one' => ['Condition'],
+        'Group two' => ['ConditionedBy'],
+    ],
+);
+
 my $ticket = RT::Ticket->new(RT->SystemUser);
 $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');
 $ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[0]->Name);

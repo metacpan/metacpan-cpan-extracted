@@ -19,7 +19,7 @@ can_ok( $bucket, '_is_tuesday' );
 # WORKS - overriding localtime
 {
 my $sub = $bucket->_is_tuesday();
-	
+
 isa_ok( $sub, ref sub {}, "_is_tuesday returns a code ref" );
 
 {
@@ -46,7 +46,7 @@ ok( $result, "Passed" );
 # FAILS - overriding localtime
 {
 my $sub = $bucket->_is_tuesday();
-	
+
 isa_ok( $sub, ref sub {}, "_is_tuesday returns a code ref" );
 
 {

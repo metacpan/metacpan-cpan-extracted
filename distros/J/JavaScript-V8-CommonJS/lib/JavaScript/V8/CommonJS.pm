@@ -13,7 +13,7 @@ use Data::Dumper;
 # use Data::Printer;
 use Carp qw' croak confess ';
 
-our $VERSION = "0.02";
+our $VERSION = "0.04";
 
 my $scripts_dir = realpath catdir(dirname(rel2abs(__FILE__)), '../../../share');
 $scripts_dir = catdir(dist_dir('JavaScript-V8-CommonJS'))
@@ -45,7 +45,7 @@ sub _build_ctx {
     my $c = JavaScript::V8::Context->new;
 
     # global functions
-    for my $name (qw/ readFile resolveModule requireNative /) {
+    for my $name (qw/ resolveModule requireNative evalModuleFile /) {
 
         $c->bind($name => sub {
             $self->can("_$name")->($self, @_);
@@ -118,7 +118,7 @@ sub _readFile {
 
 sub _log {
     my (@lines) = @_;
-    @lines = map { defined ? $_ : 'undef' } map { ref ? Dumper($_) : $_ } @lines;
+    @lines = map { defined $_ ? $_ : 'undef' } map { ref $_ ? Dumper($_) : $_ } @lines;
     printf STDERR "# [console.log] @lines\n";
 }
 
@@ -128,6 +128,48 @@ sub eval_file {
     $self->eval(_slurp($file), $file);
 }
 
+sub _evalModuleFile {
+    my ($self, $file) = @_;
+    croak "module '$file' do not exist" unless -f $file;
+    my $module_code = _slurp($file);
+
+    my $wrapper = qq!
+
+        require.__modules["$file"] = {
+            exports: {},
+            __filename: "$file"
+        };
+
+        try {
+            require.__callStack.push(require.__modules["$file"]);
+            (function (require, module, exports, __filename, __dirname) { "use strict"; \%s })(require, require.__modules["$file"], require.__modules["$file"].exports, "$file");
+            require.__modules["$file"].__is_compiled = true;
+        }
+        finally{
+            require.__callStack.pop();
+            if (require.__modules["$file"].__is_compiled) {
+                delete require.__modules["$file"].__is_compiled;
+            } else {
+                delete require.__modules["$file"];
+            }
+        }
+
+        1;
+    !;
+
+    # make oneline
+    $wrapper =~ s/\n//g;
+
+    # eval
+    my $rv = $self->c->eval(sprintf($wrapper, $module_code), $file);
+
+    if (!defined $rv && $@) {
+        $@ =~ s/^Error: //;
+        die $@
+    }
+
+    $rv;
+}
 
 sub eval {
     my $self = shift;
@@ -137,9 +179,13 @@ sub eval {
 sub _eval {
     my ($c, $code, $source) = @_;
     local $@ = undef;
-    my $rv = $c->eval("try {$code} catch(e) { throw e.stack }", $source || ());
+    my $rv = $c->eval("try {$code} catch(e) {throw e.stack}", $source || ());
     if (!defined $rv && $@) {
-        die JavaScript::V8::CommonJS::Exception->new_from_string($@)
+        # warn "# eval error((($@)))";
+        my $exception =  JavaScript::V8::CommonJS::Exception->new_from_string($@);
+        my $ourStackCall = $exception->stack->[-1];
+        $ourStackCall->{column} = $ourStackCall->{column} - 5 if ref $ourStackCall eq 'HASH'; # subtract "try {" length
+        die $exception;
     }
     $rv;
 };

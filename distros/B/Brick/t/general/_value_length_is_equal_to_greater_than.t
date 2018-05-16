@@ -12,28 +12,28 @@ my $bucket = Mock::Bucket->new;
 isa_ok( $bucket, 'Mock::Bucket' );
 isa_ok( $bucket, Mock::Bucket->bucket_class );
 
-my $sub = $bucket->_value_length_is_equal_to_greater_than( 
+my $sub = $bucket->_value_length_is_equal_to_greater_than(
 	{
 	field          => 'string',
 	minimum_length => 5,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {}, "_value_length_is_equal_to_less_than returns a code ref" );
 
 {
-my $result = eval { 
-	$sub->( { string => "Buster" } ) 
-	}; 
-	
+my $result = eval {
+	$sub->( { string => "Buster" } )
+	};
+
 ok( defined $result, "Result succeeds" );
 diag( "Eval error: $@" ) unless defined $result;
 }
 
 {
-my $result = eval { 
-	$sub->( { string => "Mimi" } ) 
-	}; 
+my $result = eval {
+	$sub->( { string => "Mimi" } )
+	};
 
 my $at = $@;
 

@@ -2,6 +2,9 @@
 # Format of lines is USERNAME:LM_PASSWORD_HASH+NTLM_PASSWORD_HASH
 # To generate a required line, possibly run this from the shell:
 # perl -MSMB::Auth -E 'say SMB::Auth::get_user_passwd_line("USER", "PASS")'
+#
+# To allow anonymous logon, add a line consisting of mere colon.
 
 test:aebd4de384c7ec43aad3b435b51404ee7a21990fcd3d759941e45c490f143d5f
 migo:74fd716ec4318e62aad3b435b51404eeca2eb839850ec7c5c4a69b0b63b8c019
+:

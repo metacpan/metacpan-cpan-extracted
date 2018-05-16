@@ -12,7 +12,7 @@ isa_ok( $brick, $class );
 
 $ENV{DEBUG} ||= 0;
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
 my @profile = ();
 
@@ -26,23 +26,23 @@ my $str = $profile->explain;
 print STDERR "\n", "-" x 50, "\n", $str, "-" x 50,  "\n"  if $ENV{DEBUG};
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # SHOULD WORK
 {
 my @profile = (
-	[ in_number => number_within_range => { 
-		minimum   => 0, 
-		maximum   => 10, 
-		field     => 'in_number', 
-		inclusive => 1 
-		} 
+	[ in_number => number_within_range => {
+		minimum   => 0,
+		maximum   => 10,
+		field     => 'in_number',
+		inclusive => 1
+		}
 	],
-	[ ex_number => number_within_range => { 
-		minimum   => 0, 
-		maximum   => 10, 
-		field     => 'ex_number', 
-		inclusive => 0 
-		} 
+	[ ex_number => number_within_range => {
+		minimum   => 0,
+		maximum   => 10,
+		field     => 'ex_number',
+		inclusive => 0
+		}
 	],
 
 	);
@@ -58,24 +58,24 @@ my $str = $profile->explain;
 print STDERR "\n", "-" x 50, "\n", $str, "-" x 50,  "\n"  if $ENV{DEBUG};
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # SHOULD FAIL
 {
 my @profile = (
-	[ in_number => number_within_range => { 
-		minimum   => 0, 
-		maximum   => 10, 
-		field     => 'in_number', 
-		inclusive => 1 
-		} 
+	[ in_number => number_within_range => {
+		minimum   => 0,
+		maximum   => 10,
+		field     => 'in_number',
+		inclusive => 1
+		}
 	],
 	{},
-	[ ex_number => number_within_range => { 
-		minimum   => 0, 
-		maximum   => 10, 
-		field     => 'ex_number', 
-		inclusive => 0 
-		} 
+	[ ex_number => number_within_range => {
+		minimum   => 0,
+		maximum   => 10,
+		field     => 'ex_number',
+		inclusive => 0
+		}
 	],
 
 	);
@@ -85,9 +85,9 @@ is( $lint, 1, "Profile is formatted correctly" );
 
 my $str;
 
-stderr_like 
-	{ $str = eval { 
-		$brick->profile_class->new( $brick, \@profile ) } 
+stderr_like
+	{ $str = eval {
+		$brick->profile_class->new( $brick, \@profile ) }
 		}
 	qr/did not validate/,
 	"Bad profile carps";

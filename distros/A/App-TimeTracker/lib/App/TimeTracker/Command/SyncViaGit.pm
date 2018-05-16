@@ -48,7 +48,7 @@ App::TimeTracker::Command::SyncViaGit - App::TimeTracker SyncViaGit plugin
 
 =head1 VERSION
 
-version 2.024
+version 2.025
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Thomas Klausner.
+This software is copyright (c) 2011 - 2018 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

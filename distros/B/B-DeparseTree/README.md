@@ -5,7 +5,7 @@ SYNOPSIS
 
 Perl's B::Deparse but we save abstract tree information and associate
 that with Perl text fragments.  These are fragments accessible by OP
-address. With this, in Perl you can determine get exactly where you in
+address. With this, you can determine get exactly where you inside Perl in
 a program with granularity finer that at a line number boundary.
 
 Uses for this could be in stack trace routines like _Carp_. It is used
@@ -30,4 +30,4 @@ To install this Devel::Trepan, run the following commands:
 LICENSE AND COPYRIGHT
 ---------------------
 
-Copyright (C) 2015 Rocky Bernstein <rocky@cpan.org>
+Copyright (C) 2015, 2017, 2018 Rocky Bernstein <rocky@cpan.org>

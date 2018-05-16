@@ -1,3 +1,11 @@
+0.235   2018-05-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to update FAQ on using Log::Any::For::DBI to
+	  Log::ger::DBI::Query.
+
+
 0.234   2018-05-10 (PERLANCAR)
 
 	- No functional changes.

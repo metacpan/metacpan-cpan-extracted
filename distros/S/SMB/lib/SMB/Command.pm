@@ -115,6 +115,20 @@ sub has_next_in_chain ($) {
 	return 0;
 }
 
+sub is_fid_unset ($$) {
+	my $self = shift;
+	my $fid = shift;
+
+	return 0;
+}
+
+sub is_fid_null ($$) {
+	my $self = shift;
+	my $fid = shift;
+
+	return 0;
+}
+
 sub init ($) {
 }
 

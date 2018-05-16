@@ -1,3 +1,10 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution PDL::VectorValued
+
+v1.0.8 Tue, 15 May 2018 08:55:00 +0200 moocow
+	* fixed some typos in POD documentation (RT ticket #125314)
+
 v1.0.7 Tue, 06 Jun 2017 10:21:58 +0200 moocow
 	* added 'use lib "."' to Makefile.PL (RT bug #121661)
 
@@ -11,7 +18,7 @@ v1.0.5 Thu, 17 Dec 2015 10:02:25 +0100 moocow
 	* added vector-cosine similarity vv_vcos()
 
 v1.0.4 Mon, 23 Nov 2015 12:10:32 +0100 moocow
-	* shared $VERSION now via perl-revision script from Perl::Version (debian libperl-version-perl)
+	* shared $VERSION now via perl-reversion script from Perl::Version (debian libperl-version-perl)
 	  as suggested by Corion in thread http://www.perlmonks.org/?node_id=1148116
 	* may or may not help with weird errors building PDL::Ngrams with stale PDL::VectorValued,
 	  - new version of PDL::VectorValued will probably mask that bug anyways

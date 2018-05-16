@@ -1,0 +1,2 @@
+- Expose stbi_load_from_memory, either through an Image::STB or via raylib proper
+- GD::Image integration

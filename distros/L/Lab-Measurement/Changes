@@ -4,6 +4,13 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.642 2018-05-11
+
+  * Add generic Stabilizer role, waiting for something to converge
+  * Factor out Oxford Instruments pseudo-SCPI support in separate role
+  * Add temperature step sweep
+  * Add Oxford Instruments Triton temperature control
+
 3.641 2018-05-05
 
   * When PDL::Graphics::Gnuplot is not installed, skip tests that need it

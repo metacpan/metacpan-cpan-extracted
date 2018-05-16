@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Data::Dumper;
 BEGIN{ $ENV{FORCE_FILTER_SIGNATURES} = 1; };
 use Filter::signatures;
@@ -65,4 +65,13 @@ sub foo7 ($foo, $, $bar) {
 };
 
 is foo7('Hello','you','World'), "Hello => World", "A subroutine with unnamed parameter still compiles";
+
+# Comments in the signature
+sub foo_comment ($foo, # foo
+          $bar  # $bar
+        ) {
+        return "$foo => $bar"
+};
+
+is foo_comment('Hello','World'), "Hello => World", "We (well, Filter::Simple) supports ignoring comments";
 

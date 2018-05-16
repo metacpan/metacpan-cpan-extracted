@@ -38,26 +38,26 @@ isa_ok( $brick, $class );
 
 =back
 
-=cut 
+=cut
 
 sub Brick::Bucket::is_US_zip_code
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length} = 5;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
-		$bucket->_value_length_is_exactly( $setup ),		
+
+	my $composed = $bucket->__compose_satisfy_all(
+		$bucket->_value_length_is_exactly( $setup ),
 		$bucket->_is_only_decimal_digits( $setup ),
 		);
-	
+
 	$bucket->__make_constraint( $composed, $setup );
 	}
-	
+
 =head2 Create the profile
 
 
-=cut 
+=cut
 
 my $Profile = [
 	[ zip_code        => is_US_zip_code => { field => 'zip_code',       } ],
@@ -65,7 +65,7 @@ my $Profile = [
 	[ long_zip_code   => is_US_zip_code => { field => 'long_zip_code'   } ],
 	[ letter_zip_code => is_US_zip_code => { field => 'letter_zip_code' } ],
 	];
-	
+
 =head2 Test the profile with lint()
 
 This isn't a necessary step, but it's nice to know that the profile
@@ -95,7 +95,7 @@ it on for debugging.
 
 =cut
 
-print STDERR "\nExplaining zip code profile:\n", 
+print STDERR "\nExplaining zip code profile:\n",
 	$profile->explain if $ENV{DEBUG};
 
 =head2 Get some input data
@@ -111,7 +111,7 @@ my $Input = {
 	long_zip_code   => 123456,
 	letter_zip_code => 'Grover',
 	};
-	
+
 =head2 Validate the data with apply()
 
 This isn't a necessary step, but it's nice to know that the profile
@@ -140,11 +140,11 @@ print STDERR "\n" if $ENV{DEBUG};
 foreach my $index ( 0 .. $#$result )
 	{
 	my $entry = $result->[$index];
-	
+
 	print STDERR "----- $entry->[0] ----------------------------\n" if $ENV{DEBUG};
-	
+
 	do { print STDERR "\tpassed\n\n" if $ENV{DEBUG}; next } if $entry->passed;
-	
+
 	my @data = ( $entry->get_messages );
 	my @errors = ();
 	my $iterations = 0;
@@ -157,21 +157,21 @@ foreach my $index ( 0 .. $#$result )
 			push @data, @{ $error->{errors} };
 			next;
 			}
-		
+
 		push @errors, $error;
 		}
-		
+
 	#print STDERR Data::Dumper->Dump( [\@errors], [qw(errors)] ) ; #if $ENV{DEBUG};
 
 	#print STDERR "$entry->[0] checked by $entry->[1] which returned:\n\t$message\n";
-	
+
 	next unless ref $entry->get_messages and @{ $entry->get_messages->{errors} } > 0;
-	
+
 	foreach my $error ( @errors )
 		{
 		print STDERR "$error->{handler}: $error->{message}\n" if $ENV{DEBUG};
 		}
-	
+
 	print STDERR "\n" if $ENV{DEBUG};
 	}
 

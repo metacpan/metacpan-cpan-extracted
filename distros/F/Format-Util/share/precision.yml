@@ -9,6 +9,7 @@ price:
   LTC: 8
   ETH: 8
   ETC: 8
+  DAI: 2
 amount:
   USD: 2
   EUR: 2
@@ -20,3 +21,4 @@ amount:
   LTC: 8
   ETH: 8
   ETC: 8
+  DAI: 2

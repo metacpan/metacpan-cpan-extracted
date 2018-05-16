@@ -2,7 +2,7 @@ package Brick::Dates;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.227';
+$VERSION = '0.228';
 
 package Brick::Bucket;
 use strict;
@@ -10,7 +10,7 @@ use strict;
 use subs qw();
 
 use Carp qw(carp croak);
-use DateTime;
+use Time::Moment;
 
 =encoding utf8
 
@@ -68,8 +68,8 @@ sub _is_valid_date
 				$_[0]->{$setup->{field}} =~ m/(\d\d\d\d)(\d\d)(\d\d)/g )
 				{
 				$eval_error = '';
-				my $dt = eval {
-					DateTime->new(
+				my $tm = eval {
+					Time::Moment->new(
 						year  => $year,
 						month => $month,
 						day   => $day,
@@ -80,9 +80,9 @@ sub _is_valid_date
 				}
 
 			my $date_error = do {
-				if( $eval_error =~ /^The 'month' parameter/ )
+				if( $eval_error =~ /^Parameter 'month'/ )
 					{ 'The month is not right' }
-				elsif( $eval_error =~ /^Invalid day of month/ )
+				elsif( $eval_error =~ /^Parameter 'day'/ )
 					{ 'The day of the month is not right' }
 				else
 					{ 'Could not parse YYYYMMMDD date' }
@@ -429,22 +429,11 @@ sub _get_days_between
 	{
 	my( $bucket, $start, $stop ) = @_;
 
-	my @dates;
+	my @dates =
+		map { Time::Moment->new(%{$bucket->__get_ymd_as_hashref($_)}) }
+		$start, $stop;
 
-	foreach my $date ( $start, $stop )
-		{
-		my( $year, $month, $day ) = $bucket->__get_ymd_as_hashref( $date );
-
-		push @dates, DateTime->new(
-			$bucket->__get_ymd_as_hashref( $date )
-			);
-		}
-
-	my $duration = $dates[1]->delta_days( $dates[0] );
-
-	$duration *= -1 if $dates[1] < $dates[0];
-
-	my $days = $duration->delta_days;
+	my $days = $dates[0]->delta_days( $dates[1] );
 	}
 
 =item __get_ymd_as_hashref( YYYYMMDD );
@@ -472,9 +461,12 @@ sub __get_ymd_as_hashref
 			\z
 			/x;
 
-		my $dt = DateTime->new( year => $1, month => $2, day => $3 );
-
-		map { $_, $dt->$_ } qw( year month day );
+		my $tm = Time::Moment->new( year => $1, month => $2, day => $3 );
+		(
+			year  => $tm->year,
+			month => $tm->month,
+			day	  => $tm->day_of_month,
+		);
 		};
 
 	if( $@ )
@@ -509,9 +501,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
+Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

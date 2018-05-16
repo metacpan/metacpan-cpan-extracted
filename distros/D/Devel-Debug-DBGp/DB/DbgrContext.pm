@@ -171,7 +171,9 @@ sub _hasActiveArrayIterator {
     for (my $magic = $b->MAGIC ; $magic; $magic = $magic->MOREMAGIC) {
         next if $magic->TYPE ne '@';
         # undocumented internals? which undocumented internals?
-        return $Config::Config{ivsize} == 4 ?
+        return $Config::Config{ivsize} == 4 ||
+                 ($] >= 5.027006 &&
+                  $Config::Config{sizesize} == $Config::Config{ivsize}) ?
             $magic->LENGTH :
             unpack('j', $magic->PTR) != 0;
     }

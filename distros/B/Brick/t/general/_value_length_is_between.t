@@ -12,29 +12,29 @@ my $bucket = Mock::Bucket->new;
 isa_ok( $bucket, 'Mock::Bucket' );
 isa_ok( $bucket, Mock::Bucket->bucket_class );
 
-my $sub = $bucket->_value_length_is_between( 
+my $sub = $bucket->_value_length_is_between(
 	{
 	field          => 'string',
 	minimum_length =>  5,
 	maximum_length => 10,
 	}
 	);
-	
+
 isa_ok( $sub, ref sub {}, "_value_length_is_equal_to_less_than returns a code ref" );
 
 {
-my $result = eval { 
-	$sub->( { string => "Buster" } ) 
-	}; 
-	
+my $result = eval {
+	$sub->( { string => "Buster" } )
+	};
+
 ok( defined $result, "Result succeeds" );
 diag( "Eval error: $@" ) unless defined $result;
 }
 
 {
-my $result = eval { 
-	$sub->( { string => "Mimi" } ) 
-	}; 
+my $result = eval {
+	$sub->( { string => "Mimi" } )
+	};
 
 #print STDERR Data::Dumper->Dump( [$result], [qw(result)] );
 use Data::Dumper;

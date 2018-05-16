@@ -20,6 +20,11 @@ use warnings;
 
 use parent 'SMB::v2::Command';
 
+use SMB::Packer;
+use SMB::Time;
+
+our $start_time = time();
+
 use constant {
 	TYPE_FILE       => 1,
 	TYPE_FILESYSTEM => 2,
@@ -34,6 +39,7 @@ use constant {
 	FILE_LEVEL_INTERNAL        => 6,
 	FILE_LEVEL_EA              => 7,
 	FILE_LEVEL_ACCESS          => 8,
+	FILE_LEVEL_NAME            => 9,
 	FILE_LEVEL_NAMES           => 12,
 	FILE_LEVEL_POSITION        => 14,
 	FILE_LEVEL_FULLEA          => 15,
@@ -61,6 +67,8 @@ use constant {
 	FS_LEVEL_OBJECTIDINFORMATION   => 8,
 	FS_LEVEL_SECTORSIZEINFORMATION => 11,
 };
+
+my @type_names = (undef, "FILE", "FS", "SECURITY", "QUOTA");
 
 sub init ($) {
 	$_[0]->set(
@@ -126,6 +134,148 @@ sub pack ($$) {
 			->bytes($buffer // '')
 		;
 	}
+}
+
+sub prepare_info ($%) {
+	my $self = shift;
+	my %params = @_;
+
+	my $type = $self->type;
+	my $level = $self->level;
+
+	my $openfile = $self->openfile
+		or return $self->msg("Called prepare_fs_response without openfile");
+	my $file = $openfile->file
+		or return $self->msg("Called prepare_fs_response without file");
+
+	my $filename = $file->filename // "IPC\$\\$file->{name}";
+	my $packer = SMB::Packer->new;
+
+	my $type_name = $type_names[$type] || "UNKNOWN";
+	$self->msg("Info $type_name level=$level for $filename")
+		unless $params{quiet};
+
+	if ($type == TYPE_FILE) {
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_BASIC) {
+			$packer
+				->uint64($file->creation_time)
+				->uint64($file->last_access_time)
+				->uint64($file->last_write_time)
+				->uint64($file->change_time)
+				->uint32($file->attributes)
+				->uint32(0)  # reserved
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_STANDARD) {
+			$packer
+				->uint64($file->allocation_size)
+				->uint64($file->end_of_file)
+				->uint32(1)  # number of links
+				->uint8($openfile->delete_on_close)  # delete pending
+				->uint8($file->is_directory)
+				->uint16(0)  # reserved
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_INTERNAL) {
+			$packer
+				->uint64($file->id)
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_EA) {
+			$packer
+				->uint32(0)  # ea (external attributes) size
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_ACCESS) {
+			$packer
+				->uint32(0x00000080)  # access flags (READ ATTRIBUTES)
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_POSITION) {
+			$packer
+				->uint64(0)  # current byte offset
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_MODE) {
+			$packer
+				->uint32(0)  # mode
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_ALIGNMENT) {
+			$packer
+				->uint32(0)  # alignment requirement
+			;
+		}
+		if ($level == FILE_LEVEL_ALL || $level == FILE_LEVEL_NAME) {
+			my $filename = $file->name;
+
+			$packer
+				->uint32(length($filename) * 2)
+				->utf16($filename)
+			;
+		}
+
+		if ($level == FILE_LEVEL_NETWORKOPEN) {
+			$packer
+				->uint64($file->creation_time)
+				->uint64($file->last_access_time)
+				->uint64($file->last_write_time)
+				->uint64($file->change_time)
+				->uint64($file->allocation_size)
+				->uint64($file->end_of_file)
+				->uint32($file->attributes)
+				->uint32(0)  # reserved
+			;
+		}
+
+		if ($packer->size == 0) {
+			$self->err('Ignoring unsupported FILE level $level, expect problems');
+		}
+	}
+	elsif ($type == TYPE_FILESYSTEM) {
+		if ($level == FS_LEVEL_VOLUMEINFORMATION) {
+			my $name = "SMB.pm";
+			$packer
+				->uint64(to_nttime($start_time))  # created time
+				->uint32($file->id)  # volume serial number
+				->uint32(length($name) * 2)
+				->utf16($name)
+				->uint16(0x017f)  # reserved
+			;
+		}
+		elsif ($level == FS_LEVEL_ATTRIBUTEINFORMATION) {
+			my $fs_type = (split(/\n/, `LANG=C df --output=fstype $filename 2>/dev/null`))[1] || "unknown";
+			$packer
+				->uint32(0x00007)  # attributes
+				->uint32(255)  # max filename length
+				->uint32(length($fs_type) * 2)
+				->utf16($fs_type)
+			;
+		}
+		elsif ($level == FS_LEVEL_DEVICEINFORMATION) {
+			$packer
+				->uint32(0x7)  # device type (Disk)
+				->uint32(0x20)  # characterictics
+			;
+		}
+		elsif ($level == FS_LEVEL_FULLSIZEINFORMATION) {
+			$packer
+				->uint64(0x0)  # allocation size
+				->uint64(0x0)  # caller free units
+				->uint64(0x0)  # actual free units
+				->uint32(0x0)  # sectors per unit
+				->uint32(0x0)  # bytes per sector
+			;
+		}
+		else {
+			$self->err('Ignoring unsupported FS level $level, expect problems');
+		}
+	}
+	else {
+		$self->err('Ignoring unsupported INFO type $type, expect problems');
+	}
+
+	$self->buffer($packer->data);
 }
 
 1;

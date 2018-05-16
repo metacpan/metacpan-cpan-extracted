@@ -18,6 +18,13 @@ $cf_conditioned_by->Create(Name => 'ConditionedBy', Type => 'FreeformSingle', Qu
 my $cf_conditioned_by_child = RT::CustomField->new(RT->SystemUser);
 $cf_conditioned_by_child->Create(Name => 'Child', Type => 'FreeformSingle', Queue => 'General', BasedOn => $cf_conditioned_by->id);
 
+RT->Config->Set('CustomFieldGroupings',
+    'RT::Ticket' => [
+        'Group one' => ['Condition'],
+        'Group two' => ['ConditionedBy'],
+    ],
+);
+
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
@@ -29,17 +36,17 @@ $ticket->AddCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?
 $ticket->AddCustomFieldValue(Field => $cf_conditioned_by_child->id , Value => 'See me too?');
 
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
-my $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by->id . '-Value', single => 1);
+my $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when no condition is set");
 my $ticket_cf_conditioned_by_child = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by_child->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when no condition is set");
 
-my $ticket_cf_condition_passed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_condition->id . '-Value-' . $cf_values->[0]->id, single => 1);
+my $ticket_cf_condition_passed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_condition->id . '-Value-' . $cf_values->[0]->id, single => 1);
 $mjs->click($ticket_cf_condition_passed);
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Condition is changed to be met but no condition is set");
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when Condition is changed to be met but no condition is set");
 
-my $ticket_cf_condition_failed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_condition->id . '-Value-' . $cf_values->[1]->id, single => 1);
+my $ticket_cf_condition_failed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_condition->id . '-Value-' . $cf_values->[1]->id, single => 1);
 $mjs->click($ticket_cf_condition_failed);
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Condition is changed to be not met but no condition is set");
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when Condition is changed to be not met but no condition is set");
@@ -47,12 +54,12 @@ ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when Condition is 
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, [$cf_values->[0]->Name, $cf_values->[2]->Name]);
 
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
-$ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by->id . '-Value', single => 1);
+$ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when condition is met by first val");
 $ticket_cf_conditioned_by_child = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by_child->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when condition is met by first val");
 
-$ticket_cf_condition_failed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_condition->id . '-Value-' . $cf_values->[1]->id, single => 1);
+$ticket_cf_condition_failed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_condition->id . '-Value-' . $cf_values->[1]->id, single => 1);
 $mjs->click($ticket_cf_condition_failed);
 ok($ticket_cf_conditioned_by->is_hidden, "Hide ConditionalCF when Condition is changed to be not met");
 ok($ticket_cf_conditioned_by_child->is_hidden, "Hide Child when Condition is changed to be not met");
@@ -60,12 +67,12 @@ ok($ticket_cf_conditioned_by_child->is_hidden, "Hide Child when Condition is cha
 $ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[1]->Name);
 
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
-$ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by->id . '-Value', single => 1);
+$ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, "Hide ConditionalCF when condition is not met");
 $ticket_cf_conditioned_by_child = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_conditioned_by_child->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by_child->is_hidden, "Hide Child when condition is not met");
 
-$ticket_cf_condition_passed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField-' . $cf_condition->id . '-Value-' . $cf_values->[2]->id, single => 1);
+$ticket_cf_condition_passed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_condition->id . '-Value-' . $cf_values->[2]->id, single => 1);
 $mjs->click($ticket_cf_condition_passed);
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Condition is changed to be met by second val");
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when Condition is changed to be met by second val");

@@ -12,6 +12,7 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 CheckFor
 Contributors
+CoreCounter
 CorrectBranch
 DROLSKY
 DROLSKY's
@@ -20,13 +21,16 @@ Dist
 Fowler
 Git
 License
+MakeMaker
 Mark
 PayPal
 Plugin
 PluginBundle
 Pod
+Role
 Rolsky
 Rolsky's
+RunExtraTests
 TidyAll
 Weaver
 WeaverConfig

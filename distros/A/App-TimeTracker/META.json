@@ -4,13 +4,13 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-TimeTracker",
    "prereqs" : {
@@ -90,6 +90,7 @@
          "web" : "https://github.com/domm/App-TimeTracker"
       }
    },
-   "version" : "2.024"
+   "version" : "2.025",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

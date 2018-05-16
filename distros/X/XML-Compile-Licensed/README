@@ -1,5 +1,5 @@
-=== README for XML-Compile-Licensed version 0.01
-=   Generated on Mon Mar 21 13:56:19 2016 by OODoc 2.02
+=== README for XML-Compile-Licensed version 0.02
+=   Generated on Fri May 11 01:21:49 2018 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-Compile-Licensed-0.01.tar.gz
-       tar -xf XML-Compile-Licensed-0.01.tar
-       cd XML-Compile-Licensed-0.01
+       gzip -d XML-Compile-Licensed-0.02.tar.gz
+       tar -xf XML-Compile-Licensed-0.02.tar
+       cd XML-Compile-Licensed-0.02
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-Compile-Licensed-0.01/
+    http://search.cpan.org/dist/XML-Compile-Licensed-0.02/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-Licensed

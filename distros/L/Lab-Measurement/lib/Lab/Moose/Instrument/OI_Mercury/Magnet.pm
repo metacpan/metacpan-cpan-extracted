@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.641';
-#ABSTRACT: Oxford Instruments Mercury Cryocontrol magnet power supply
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.642';
+#ABSTRACT: Oxford Instruments Mercury magnet power supply
 
 use 5.010;
 use Moose;
@@ -37,37 +37,12 @@ around default_connection_options => sub {
     return $options;
 };
 
-
-sub _parse_setter_retval {
-    my $self = shift;
-    my ( $header, $retval ) = @_;
-
-    $header = 'STAT:' . $header;
-    if ( $retval !~ /^\Q$header\E:([^:]+):VALID$/ ) {
-        croak "Invalid return value of setter for header $header:\n $retval";
-    }
-    return $1;
-}
-
-sub _parse_getter_retval {
-    my $self = shift;
-    my ( $header, $retval ) = @_;
-
-    $header =~ s/^READ:/STAT:/;
-
-    if ( $retval !~ /^\Q$header\E:(.+)/ ) {
-        croak "Invalid return value of getter for header $header:\n $retval";
-    }
-    return $1;
-}
+with 'Lab::Moose::Instrument::OI_Common';
 
 
 sub get_catalogue {
     my ( $self, %args ) = validated_getter( \@_ );
-
-    my $cmd = "READ:SYS:CAT";
-    my $rv = $self->query( command => $cmd, %args );
-    return $self->_parse_getter_retval( $cmd, $rv );
+    return $self->oi_getter( cmd => "READ:SYS:CAT", %args );
 }
 
 
@@ -77,15 +52,7 @@ sub get_temperature {
         channel => { isa => 'Str', default => 'MB1.T1' }
     );
 
-    my $channel = delete $args{channel};
-
-    my $cmd = "READ:DEV:$channel:TEMP:SIG:TEMP";
-    my $rv = $self->query( command => $cmd, %args );
-
-    $rv = $self->_parse_getter_retval( $cmd, $rv );
-
-    $rv =~ s/K.*$//;
-    return $rv;
+    return $self->get_temperature_channel(%args);
 }
 
 
@@ -96,10 +63,8 @@ sub get_he_level {
     );
     my $channel = delete $args{channel};
 
-    my $cmd = "READ:DEV:$channel:LVL:SIG:HEL";
-    my $rv = $self->query( command => $cmd, %args );
-
-    $rv = $self->_parse_getter_retval( $cmd, $rv );
+    my $rv
+        = $self->oi_getter( cmd => "READ:DEV:$channel:LVL:SIG:HEL", %args );
     $rv =~ s/^LEV://;
     $rv =~ s/%.*$//;
     return $rv;
@@ -113,11 +78,9 @@ sub get_he_level_resistance {
     );
     my $channel = delete $args{channel};
 
-    my $cmd = "READ:DEV:$channel:LVL:SIG:HEL";
-    my $res = $self->query( command => $cmd, %args );
-    $res = $self->_parse_getter_retval( $cmd, $res );
+    my $res
+        = $self->oi_getter( cmd => "READ:DEV:$channel:LVL:SIG:HEL", %args );
     $res =~ s/^.*:RES://;
-
     $res =~ s/O$//;
     return $res;
 }
@@ -130,10 +93,8 @@ sub get_n2_level {
     );
     my $channel = delete $args{channel};
 
-    my $cmd = "READ:DEV:$channel:LVL:SIG:NIT";
-    my $level = $self->query( command => $cmd, %args );
-
-    $level = $self->_parse_getter_retval( $cmd, $level );
+    my $level
+        = $self->oi_getter( cmd => "READ:DEV:$channel:LVL:SIG:NIT", %args );
     $level =~ s/^.*:LEV://;
     $level =~ s/%.*$//;
     return $level;
@@ -146,9 +107,8 @@ sub get_n2_level_frequency {
         channel => { isa => 'Str', default => 'DB5.L1' }
     );
     my $channel = delete $args{channel};
-    my $cmd     = "READ:DEV:$channel:LVL:SIG:NIT";
-    my $level   = $self->query( command => $cmd, %args );
-    $level = $self->_parse_getter_retval( $cmd, $level );
+    my $level
+        = $self->oi_getter( cmd => "READ:DEV:$channel:LVL:SIG:NIT", %args );
     $level =~ s/^.*:FREQ://;
     $level =~ s/:.*$//;
     return $level;
@@ -161,9 +121,8 @@ sub get_n2_level_counter {
     );
     my $channel = delete $args{channel};
 
-    my $cmd = "READ:DEV:$channel:LVL:SIG:NIT";
-    my $level = $self->query( command => $cmd, %args );
-    $level = $self->_parse_getter_retval( $cmd, $level );
+    my $level
+        = $self->oi_getter( cmd => "READ:DEV:$channel:LVL:SIG:NIT", %args );
     $level =~ s/^COUN://;
     $level =~ s/n:.*$//;
     return $level;
@@ -204,9 +163,8 @@ sub validated_magnet_setter {
 sub oim_get_current {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:$channel:PSU:SIG:CURR";
-    my $current = $self->query( command => $cmd, %args );
-    $current = $self->_parse_getter_retval( $cmd, $current );
+    my $current
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:CURR", %args );
     $current =~ s/A$//;
     return $current;
 }
@@ -215,9 +173,8 @@ sub oim_get_current {
 sub oim_get_field {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:$channel:PSU:SIG:FLD";
-    my $field = $self->query( command => $cmd, %args );
-    $field = $self->_parse_getter_retval( $cmd, $field );
+    my $field
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:FLD", %args );
     $field =~ s/T$//;
     return $field;
 }
@@ -225,9 +182,7 @@ sub oim_get_field {
 
 sub oim_get_heater {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
-    my $cmd = "READ:DEV:$channel:PSU:SIG:SWHT";
-    my $heater = $self->query( command => $cmd, %args );
-    return $self->_parse_getter_retval( $cmd, $heater );
+    return $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:SWHT", %args );
 }
 
 
@@ -237,11 +192,11 @@ sub oim_set_heater {
         value => { isa => enum( [qw/ON OFF/] ) },
     );
 
-    my $cmd = "SET:DEV:$channel:PSU:SIG:SWHT";
-
-    my $rv = $self->query( command => "$cmd:$value", %args );
-
-    return $self->_parse_setter_retval( $cmd, $rv );
+    return $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:SIG:SWHT",
+        value => $value,
+        %args
+    );
 }
 
 
@@ -251,19 +206,18 @@ sub oim_force_heater {
         value => { isa => enum( [qw/ON OFF/] ) },
     );
 
-    my $cmd = "SET:DEV:$channel:PSU:SIG:SWHN";
-    my $heater = $self->query( command => "$cmd:$value", %args );
-
-    return $self->_parse_setter_retval( $cmd, $heater );
+    return $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:SIG:SWHN",
+        value => $value, %args
+    );
 }
 
 
 sub oim_get_current_sweeprate {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:$channel:PSU:SIG:RCST";
-    my $sweeprate = $self->query( command => $cmd, %args );
-    $sweeprate = $self->_parse_getter_retval( $cmd, $sweeprate );
+    my $sweeprate
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:RCST", %args );
     $sweeprate =~ s/A\/m$//;
     return $sweeprate;
 }
@@ -272,11 +226,10 @@ sub oim_get_current_sweeprate {
 sub oim_set_current_sweeprate {
     my ( $self, $value, $channel, %args ) = validated_magnet_setter( \@_ );
 
-    my $cmd = "SET:DEV:$channel:PSU:SIG:RCST";
-
-    my $rv = $self->query( command => "$cmd:$value", %args );
-
-    $rv = $self->_parse_setter_retval( $cmd, $rv );
+    my $rv = $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:SIG:RCST",
+        value => $value, %args
+    );
 
     # this returns amps per minute
     $rv =~ s/A\/m$//;
@@ -287,9 +240,8 @@ sub oim_set_current_sweeprate {
 sub oim_get_field_sweeprate {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:$channel:PSU:SIG:RFST";
-    my $sweeprate = $self->query( command => $cmd, %args );
-    $sweeprate = $self->_parse_getter_retval( $cmd, $sweeprate );
+    my $sweeprate
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:RFST", %args );
     $sweeprate =~ s/T\/m$//;
     return $sweeprate;
 }
@@ -298,11 +250,10 @@ sub oim_get_field_sweeprate {
 sub oim_set_field_sweeprate {
     my ( $self, $value, $channel, %args ) = validated_magnet_setter( \@_ );
 
-    my $cmd = "SET:DEV:$channel:PSU:SIG:RFST";
-
-    my $rv = $self->query( command => "$cmd:$value", %args );
-
-    $rv = $self->_parse_setter_retval( $cmd, $rv );
+    my $rv = $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:SIG:RFST",
+        value => $value, %args
+    );
 
     # this returns tesla per minute
     $rv =~ s/T\/m$//;
@@ -312,10 +263,7 @@ sub oim_set_field_sweeprate {
 
 sub oim_get_activity {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
-
-    my $cmd = "READ:DEV:$channel:PSU:ACTN";
-    my $action = $self->query( command => $cmd, %args );
-    return $self->_parse_getter_retval( $cmd, $action );
+    return $self->oi_getter( cmd => "READ:DEV:$channel:PSU:ACTN", %args );
 }
 
 
@@ -324,10 +272,10 @@ sub oim_set_activity {
         \@_,
         value => { isa => enum( [qw/HOLD RTOS RTOZ CLMP/] ) },
     );
-
-    my $cmd = "SET:DEV:$channel:PSU:ACTN";
-    my $rv = $self->query( command => "$cmd:$value", %args );
-    return $self->_parse_setter_retval( $cmd, $rv );
+    return $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:ACTN",
+        value => $value, %args
+    );
 }
 
 
@@ -337,9 +285,10 @@ sub oim_set_current_setpoint {
         value => { isa => 'Num' },
     );
 
-    my $cmd = "SET:DEV:$channel:PSU:SIG:CSET";
-    my $rv = $self->query( command => "$cmd:$value", %args );
-    $rv = $self->_parse_setter_retval( $cmd, $rv );
+    my $rv = $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:SIG:CSET",
+        value => $value, %args
+    );
     $rv =~ s/A$//;
     return $rv;
 }
@@ -347,9 +296,9 @@ sub oim_set_current_setpoint {
 
 sub oim_get_current_setpoint {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
-    my $cmd = "READ:DEV:$channel:PSU:SIG:CSET";
-    my $result = $self->query( command => $cmd, %args );
-    $result = $self->_parse_getter_retval( $cmd, $result );
+
+    my $result
+        = $self->oi_getter( cmd => "READ:DEV:$channel:PSU:SIG:CSET", %args );
     $result =~ s/A$//;
     return $result;
 }
@@ -361,10 +310,10 @@ sub oim_set_field_setpoint {
         value => { isa => 'Num' },
     );
 
-    my $cmd = "SET:DEV:$channel:PSU:SIG:FSET";
-    my $rv = $self->query( command => "$cmd:$value", %args );
-
-    $rv = $self->_parse_setter_retval( $cmd, $rv );
+    my $rv = $self->oi_setter(
+        cmd   => "SET:DEV:$channel:PSU:SIG:FSET",
+        value => $value, %args
+    );
     $rv =~ s/T$//;
     return $rv;
 }
@@ -373,9 +322,10 @@ sub oim_set_field_setpoint {
 sub oim_get_field_setpoint {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:$channel:PSU:SIG:FSET";
-    my $result = $self->query( command => $cmd, %args );
-    $result = $self->_parse_getter_retval( $cmd, $result );
+    my $result = $self->oi_getter(
+        cmd => "READ:DEV:$channel:PSU:SIG:FSET",
+        %args
+    );
     $result =~ s/T$//;
     return $result;
 }
@@ -383,9 +333,7 @@ sub oim_get_field_setpoint {
 
 sub oim_get_fieldconstant {
     my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
-    my $cmd = "READ:DEV:$channel:PSU:ATOB";
-    my $result = $self->query( command => $cmd, %args );
-    return $self->_parse_getter_retval( $cmd, $result );
+    return $self->oi_getter( cmd => "READ:DEV:$channel:PSU:ATOB", %args );
 }
 
 ############### XPRESS interface #####################
@@ -535,11 +483,11 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury Cryocontrol magnet power supply
+Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury magnet power supply
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 SYNOPSIS
 
@@ -549,7 +497,7 @@ version 3.641
      type => 'OI_Mercury::Magnet',
      connection_type => 'Socket',
      connection_options => {host => '192.168.3.15'},
-     magnet => 'X', # 'X', 'Y' or 'Z'. default is 'Z'
+     magnet => 'X',    # 'X', 'Y' or 'Z'. default is 'Z'
  );
 
  say "He level (%): ", $magnet->get_he_level();
@@ -604,7 +552,7 @@ In this case, we obtain for example:
    DEV:GRPY:PSU     |- a 3-axis magnet power supply unit
    DEV:GRPZ:PSU     |
    DEV:MB1.T1:TEMP  -- a temperature sensor
-   DEV:DB5.L1:LVL   -- a cryogen level sensor
+   DEV:DB5.L1:LVL   -- a cryoliquid level sensor
 
 In each of these blocks, the second component after "DEV:" is the UID of the device;
 it can be used in other commands such as get_level to address it.
@@ -620,31 +568,31 @@ Read out the designated temperature channel. Result is in Kelvin.
 
    $level = $m->get_he_level(channel => 'DB5.L1');
 
-Read out the designated liquid helium level meter channel. Result is in percent as calibrated.
+Read out the designated liquid helium level meter. Result is in percent as calibrated.
 
 =head2 get_he_level_resistance
 
    $res = $m->get_he_level_resistance(channel => 'DB5.L1');
 
-Read out the designated liquid helium level meter channel. Result is the raw sensor resistance.
+Read out the designated liquid helium level meter. Result is the raw sensor resistance.
 
 =head2 get_n2_level
 
    $level = $m->get_n2_level(channel => 'DB5.L1');
 
-Read out the designated liquid nitrogen level meter channel. Result is in percent as calibrated.
+Read out the designated liquid nitrogen level meter. Result is in percent as calibrated.
 
 =head2 get_n2_level_frequency
 
    $frq = $m->get_n2_level_frequency(channel => 'DB5.L1');
 
-Read out the designated liquid nitrogen level meter channel. Result is the raw internal frequency value.
+Read out the designated liquid nitrogen level meter. Result is the raw internal frequency value.
 
 =head2 oim_get_current
 
   $curr = $m->oim_get_current();
 
-Reads out the momentary current of the PSU in Ampere. Only Z for now. 
+Reads out the momentary current of the PSU in Ampere.
 
 TODO: what happens if we're in persistent mode?
 
@@ -749,7 +697,8 @@ Returns the current to field factor (A/T)
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017-2018  Simon Reinhardt
+  Copyright 2017       Simon Reinhardt
+            2018       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

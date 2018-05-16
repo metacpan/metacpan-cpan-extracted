@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 TODO
 examples/any-daemon/server.pl
 examples/mod_perl/README

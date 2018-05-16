@@ -41,7 +41,7 @@ my $brick = bless {}, 'Brick';
 
 ok( ! exists $brick->{external_packages} );
 ok( ! exists $brick->{buckets} );
-stderr_like 
+stderr_like
 	{ $brick->init( { external_packages => 'Mock::FooValidator' } ) }
 	qr/must be an anonymous array/,
 	"String value for external_packages carps"

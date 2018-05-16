@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/briandfoy/file-fingerprint/issues
   homepage: https://github.com/briandfoy/file-fingerprint
   repository: https://github.com/briandfoy/file-fingerprint.git
-version: '0.101'
+version: '0.102'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

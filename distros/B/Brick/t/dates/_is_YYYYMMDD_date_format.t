@@ -15,7 +15,7 @@ isa_ok( $bucket, Mock::Bucket->bucket_class );
 
 can_ok( $bucket, '_is_YYYYMMDD_date_format' );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # With good date
 # SHOULD WORK, returns true
 
@@ -28,10 +28,10 @@ ok(
 	eval { $sub->( { date => 20070415 } ) },
 	"Good date returns true"
 	);
-	
+
 ok(
 	! eval { $sub->( { date => 2007045 } ) },
 	"Bad date returns false"
 	);
-	
+
 }

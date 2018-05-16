@@ -1,8 +1,7 @@
 use ExtUtils::MakeMaker;
 
 #@MY::pdpm = qw(Utils/Utils.pm);
-use lib '.'; ##-- fix RT bug #121661?
-require "pdlmaker.plm";
+require "./pdlmaker.plm";
 pdlmaker_init();
 
 WriteMakefile(

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 XML::Compile::Tester - support XML::Compile related regression testing
@@ -46,15 +48,15 @@ which simplify writing tests for XML::Compile related distributions.
 
 =over 4
 
-=item B<reader_create>(SCHEMA, COMMENT, TYPE, OPTIONS)
+=item B<reader_create>($schema, $comment, $type, %options)
 
-Create a reader for TYPE.  One test is created, reporting
+Create a reader for $type.  One test is created, reporting
 success or failure of the creation.
 
 Of course, XML::Compile::Schema subroutine compile is being called, with some
 options.  By default, C<check_values> is true, and C<include_namespaces>
 is false.  These values can be overruled using L<set_compile_defaults()|XML::Compile::Tester/"Helpers">,
-and with the OPTIONS parameter list.
+and with the %options parameter list.
 
 example: reader_create
 
@@ -71,9 +73,9 @@ example: reader_create
  my $reader = reader_create($schema, 'my test', 'localName'
    , check_occurs => 0, @other_options);
 
-=item B<reader_error>(SCHEMA, TYPE, XML)
+=item B<reader_error>($schema, $type, $xml)
 
-Parsing the XML to interpret the TYPE should return an error.  The
+Parsing the $xml to interpret the $type should return an error.  The
 error text is returned.
 
 example: reader_error
@@ -91,15 +93,15 @@ example: reader_error
 
 =over 4
 
-=item B<writer_create>(SCHEMA, COMMENT, TYPE, OPTIONS)
+=item B<writer_create>($schema, $comment, $type, %options)
 
-Create a writer for TYPE.  One test (in the Test::More sense) is created,
+Create a writer for $type.  One test (in the Test::More sense) is created,
 reporting success or failure of the creation.
 
 Of course, XML::Compile::Schema subroutine compile is being called, with some
 options.  By default, C<check_values> and C<use_default_namespace> are true,
 and C<include_namespaces> is false.  These values can be overruled using
-L<set_compile_defaults()|XML::Compile::Tester/"Helpers">, and with the OPTIONS parameter list.
+L<set_compile_defaults()|XML::Compile::Tester/"Helpers">, and with the %options parameter list.
 
 example: writer_create
 
@@ -115,9 +117,9 @@ example: writer_create
  # implicit creation of $doc
  my $xml    = writer_test($writer, $data);
 
-=item B<writer_error>(SCHEMA, TYPE, DATA)
+=item B<writer_error>($schema, $type, $data)
 
-Translating the Perl DATA into the XML type should return a validation
+Translating the Perl $data into the XML type should return a validation
 error, which is returned.
 
 example: writer_error
@@ -127,10 +129,10 @@ example: writer_error
  is($error, 'error text', 'my test');
  like($error, qr/error pattern/, 'my test');
 
-=item B<writer_test>(WRITER, DATA, [DOC])
+=item B<writer_test>( $writer, $data, [$doc] )
 
-Run the test with a compiled WRITER, which was created with L<writer_create()|XML::Compile::Tester/"Writer checks">.
-When no DOC (XML::LibXML::Document object) was specified, then one will
+Run the test with a compiled $writer, which was created with L<writer_create()|XML::Compile::Tester/"Writer checks">.
+When no $doc (XML::LibXML::Document object) was specified, then one will
 be created for you.
 
 =back
@@ -139,12 +141,12 @@ be created for you.
 
 =over 4
 
-=item B<templ_perl>(SCHEMA, TYPE, OPTIONS)
+=item B<templ_perl>($schema, $type, %options)
 
-=item B<templ_xml>(SCHEMA, TYPE, OPTIONS)
+=item B<templ_xml>($schema, $type, %options)
 
-Create an example template for TYPE, as XML message.
-The OPTIONS are passed to XML::Compile::Schema subroutine template.
+Create an example template for $type, as XML message.
+The %options are passed to XML::Compile::Schema subroutine template.
 
 example: templ_xml
 
@@ -157,10 +159,10 @@ example: templ_xml
 
 =over 4
 
-=item B<compare_xml>(XML, EXPECTED, [COMMENT])
+=item B<compare_xml>( $created, $expected, [$comment] )
 
-Compare the XML (either a string or an XML::LibXML::Element) with
-the EXPECTED string.  Both sources are stripped from layout before
+Compare the $created XML (either a string or an XML::LibXML::Element)
+with the $expected string.  Both sources are stripped from layout before
 comparing.
 
 In a future release, this algorithm will get improved to compare
@@ -172,10 +174,10 @@ example: compare_xml
    <test1>...</test1>
  _XML
 
-=item B<set_compile_defaults>(OPTIONS)
+=item B<set_compile_defaults>(%options)
 
 Each call to create a reader or writer (also indirectly) with
-XML::Compile::Schema subroutine compile will get these OPTIONS passed, on top
+XML::Compile::Schema subroutine compile will get these %options passed, on top
 (and overruling) the usual settings.
 
 example: 
@@ -186,7 +188,7 @@ example:
 
  set_compile_defaults();   # reset
 
-=item B<set_default_namespace>(TESTNS)
+=item B<set_default_namespace>($testns)
 
 Defined which namespace to use when a relative (only localName) type
 is provided.  By default, this is C<undef> (an error when used)
@@ -195,36 +197,14 @@ is provided.  By default, this is C<undef> (an error when used)
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-Tester distribution version 0.90,
-built on August 16, 2012. Website: F<http://perl.overmeer.net/xml-compile/>
-
-Other distributions in this suite:
-L<XML::Compile>,
-L<XML::Compile::SOAP>,
-L<XML::Compile::SOAP12>,
-L<XML::Compile::SOAP::Daemon>,
-L<XML::Compile::SOAP::WSA>,
-L<XML::Compile::C14N>,
-L<XML::Compile::WSS>,
-L<XML::Compile::Tester>,
-L<XML::Compile::Cache>,
-L<XML::Compile::Dumper>,
-L<XML::Compile::RPC>,
-L<XML::Rewrite>,
-L<XML::eXistDB>,
-and
-L<XML::LibXML::Simple>.
-
-Please post questions or ideas to the mailinglist at
-F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile>
-For live contact with other developers, visit the C<#xml-compile> channel
-on C<irc.perl.org>.
+This module is part of XML-Compile-Tester distribution version 0.91,
+built on May 11, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2008-2012 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2008-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

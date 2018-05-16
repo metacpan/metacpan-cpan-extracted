@@ -23,19 +23,19 @@ name: MooX-AttributeFilter
 provides:
   MooX::AttributeFilter:
     file: lib/MooX/AttributeFilter.pm
-    version: '0.001005'
+    version: '0.001006'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '0'
   Data::Dumper: '0'
   Method::Generate::Accessor: '0'
   Scalar::Util: '0'
-  Sub::Quote: '0'
+  Sub::Quote: '1.004005'
   perl: '5.010000'
   strictures: '1'
 resources:
   bugtracker: https://github.com/vrurg/MooX-AttributeFilter/issues
   repository: git://github.com/vrurg/MooX-AttributeFilter.git
-version: '0.001005'
+version: '0.001006'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

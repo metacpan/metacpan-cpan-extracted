@@ -1,5 +1,5 @@
 ---
-abstract: 'Event loop friendly HTTP and HTTPS backend for LWP'
+abstract: 'Event loop friendly HTTP/HTTPS/SOCKS backend for LWP'
 author:
   - 'Eric Brine <ikegami@adaelis.com>'
 build_requires:
@@ -27,10 +27,11 @@ name: LWP-Protocol-AnyEvent-http
 provides:
   LWP::Protocol::AnyEvent::http:
     file: lib/LWP/Protocol/AnyEvent/http.pm
-    version: v1.10.0
+    version: v1.14.0
 requires:
   AnyEvent: '0'
   AnyEvent::HTTP: '2'
+  AnyEvent::HTTP::Socks: '0'
   HTTP::Response: '0'
   LWP::Protocol: '0'
   LWP::Protocol::http: '0'
@@ -38,5 +39,5 @@ requires:
   version: '0'
 resources:
   repository: http://github.com/ikegami/perl-LWP-Protocol-AnyEvent-http
-version: v1.10.0
+version: v1.14.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

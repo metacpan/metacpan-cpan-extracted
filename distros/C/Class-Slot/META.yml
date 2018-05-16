@@ -22,8 +22,11 @@ no_index:
 requires:
   Carp: '0'
   Filter::Simple: '0'
-  perl: '5.008'
+  Scalar::Util: '0'
+  perl: '5.008002'
 resources:
+  bugtracker: https://github.com/sysread/slot/issues
   homepage: https://github.com/sysread/slot
-version: '0.01'
+  repository: https://github.com/sysread/slot.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

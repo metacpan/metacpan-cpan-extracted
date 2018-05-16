@@ -9,6 +9,7 @@ use parent 'Pandoc::Filter';
 our @EXPORT_OK = (qw(find_filter apply_filter));
 
 use Pandoc::Elements 'pandoc_json';
+use Pandoc;
 use IPC::Cmd 'can_run';
 use IPC::Run3;
 
@@ -50,7 +51,7 @@ our %SCRIPTS = (
 
 sub find_filter {
     my $name = shift;
-    my $data_dir = shift // $ENV{HOME} . '/.pandoc';
+    my $data_dir = shift // pandoc_data_dir;
     $data_dir =~ s|/$||;
 
     foreach my $filter ("$data_dir/filters/$name", $name) {
@@ -112,11 +113,11 @@ Apply all filters specified in document metadata field C<metafilters>.
 
 =head1 FUNCTIONS
 
-=head2 find_filter( $name [, $DATA_DIR ] )
+=head2 find_filter( $name [, $DATADIR ] )
 
-Find a filter by its name an an optional Pandoc C<$DATA_DIR> (C<~/.pandoc> by
-default). Returns a list of command line arguments to execute the filter or
-throw an exception.
+Find a filter by its name in C<$DATADIR/filters>, where C<$DATADIR> is the user
+data directory (L<~/.pandoc> or L<%appdata%\pandoc>), and in L<$PATH>. Returns
+a list of command line arguments to execute the filter or throw an exception.
 
 =head2 apply_filter( $doc, $format, @filter )
 

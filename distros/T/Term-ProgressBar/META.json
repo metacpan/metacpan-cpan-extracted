@@ -25,7 +25,8 @@
             "Capture::Tiny" : "0.13",
             "File::Temp" : "0",
             "Test::Exception" : "0.31",
-            "Test::More" : "0.80"
+            "Test::More" : "0.80",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
@@ -50,6 +51,6 @@
          "url" : "https://github.com/manwar/Term-ProgressBar"
       }
    },
-   "version" : "2.21",
+   "version" : "2.22",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

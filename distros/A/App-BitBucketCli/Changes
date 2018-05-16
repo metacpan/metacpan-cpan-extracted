@@ -1,5 +1,15 @@
 Revision history for App-bitbucket-cli
 
+0.004   2018-05-15
+        Updating for release of version 0.004
+        Adding latest perl version to travis builds (Ivan Wills)
+        Adding missing file to manifest (Ivan Wills)
+        Fixing display of PRs (Ivan Wills)
+        New task (Ivan Wills)
+        Adding reminder of tasks (Ivan Wills)
+        Fixing https repository defaulting (Ivan Wills)
+        Improving documentation for command (Ivan Wills)
+
 0.003   2018-01-07
         Updating for release of version 0.003
         Added new dependency (Ivan Wills)

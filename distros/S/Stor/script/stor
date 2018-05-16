@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Mojolicious::Lite;
+use Mojo::JSON qw(decode_json);
+use Path::Tiny;
+use Net::Statsite::Client;
+
+use Stor;
+
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 524288000;    #the size of message: 500 MB
+
+my $cfg = load_config();
+my $statsite = Net::Statsite::Client->new(%{ $cfg->{statsite} });
+
+my $stor = Stor->new(
+    storage_pairs        => $cfg->{storage_pairs},
+    statsite             => $statsite,
+    basic_auth           => $cfg->{basic_auth},
+    s3_credentials       => $cfg->{s3_credentials},
+    s3_enabled           => $cfg->{s3_enabled},
+    writable_pairs_regex => $cfg->{writable_pairs_regex} // '.*',
+);
+
+app->plugin(
+    CHI => {
+        default => {
+            driver   => 'Memcached::Fast',
+            servers  => $cfg->{memcached_servers},
+            l1_cache => { driver => 'Memory', global => 1, max_size => 1024 * 1024 }
+        }
+    }
+);
+
+app->config(hypnotoad => { clients => $ENV{HYPNOTOAD_CLIENTS} // 100 });
+
+get  '/'       => sub { $stor->about(@_)  };
+get  '/status' => sub { $stor->status(@_) };
+get  '/:sha'   => sub { $stor->get(@_)    };
+post '/:sha'   => sub { $stor->post(@_)   };
+
+app->secrets([$cfg->{secret}]);
+app->start;
+
+
+sub load_config {
+    die 'CONFIG_FILE environment variable not set'
+        if !defined $ENV{CONFIG_FILE};
+
+    return decode_json(path($ENV{CONFIG_FILE})->slurp())
+}

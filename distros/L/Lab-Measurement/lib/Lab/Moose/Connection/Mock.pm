@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Mock;
-$Lab::Moose::Connection::Mock::VERSION = '3.641';
+$Lab::Moose::Connection::Mock::VERSION = '3.642';
 #ABSTRACT: Mock connection
 
 use 5.010;
@@ -121,7 +121,7 @@ Lab::Moose::Connection::Mock - Mock connection
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 SYNOPSIS
 

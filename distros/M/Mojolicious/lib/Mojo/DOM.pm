@@ -12,11 +12,12 @@ use overload
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
+use Storable 'dclone';
 
 sub all_text { _text(_nodes(shift->tree), 1) }
 
-sub ancestors { _select($_[0]->_collect([$_[0]->_ancestors]), $_[1]) }
+sub ancestors { _select($_[0]->_collect([_ancestors($_[0]->tree)]), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 sub append_content { shift->_content(1, 0, @_) }
@@ -71,8 +72,8 @@ sub find {
   return $self->_collect($self->_css->select(@_));
 }
 
-sub following { _select($_[0]->_collect($_[0]->_siblings(1, 1)), $_[1]) }
-sub following_nodes { $_[0]->_collect($_[0]->_siblings(0, 1)) }
+sub following { _select($_[0]->_collect(_siblings($_[0]->tree, 1, 1)), $_[1]) }
+sub following_nodes { $_[0]->_collect(_siblings($_[0]->tree, 0, 1)) }
 
 sub matches { shift->_css->matches(@_) }
 
@@ -83,7 +84,7 @@ sub namespace {
 
   # Extract namespace prefix and search parents
   my $ns = $tree->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
-  for my $node ($tree, $self->_ancestors) {
+  for my $node ($tree, _ancestors($tree)) {
 
     # Namespace for prefix
     my $attrs = $node->[2];
@@ -102,8 +103,16 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next      { $_[0]->_maybe($_[0]->_siblings(1, 1, 0)) }
-sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 1, 0)) }
+sub new_tag {
+  my $self = shift;
+  my $new  = $self->new;
+  $$new->tag(@_);
+  $$new->xml($$self->xml) if ref $self;
+  return $new;
+}
+
+sub next      { $_[0]->_maybe(_siblings($_[0]->tree, 1, 1, 0)) }
+sub next_node { $_[0]->_maybe(_siblings($_[0]->tree, 0, 1, 0)) }
 
 sub parent {
   my $self = shift;
@@ -111,16 +120,16 @@ sub parent {
   return $self->_build(_parent($tree), $self->xml);
 }
 
-sub parse { shift->_delegate(parse => @_) }
+sub parse { ${$_[0]}->parse($_[1]) and return $_[0] }
 
-sub preceding { _select($_[0]->_collect($_[0]->_siblings(1, 0)), $_[1]) }
-sub preceding_nodes { $_[0]->_collect($_[0]->_siblings(0)) }
+sub preceding { _select($_[0]->_collect(_siblings($_[0]->tree, 1, 0)), $_[1]) }
+sub preceding_nodes { $_[0]->_collect(_siblings($_[0]->tree, 0)) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous      { $_[0]->_maybe($_[0]->_siblings(1, 0, -1)) }
-sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, 0, -1)) }
+sub previous      { $_[0]->_maybe(_siblings($_[0]->tree, 1, 0, -1)) }
+sub previous_node { $_[0]->_maybe(_siblings($_[0]->tree, 0, 0, -1)) }
 
 sub remove { shift->replace('') }
 
@@ -132,8 +141,15 @@ sub replace {
 
 sub root {
   my $self = shift;
-  return $self unless my $tree = $self->_ancestors(1);
+  return $self unless my $tree = _ancestors($self->tree, 1);
   return $self->_build($tree, $self->xml);
+}
+
+sub selector {
+  return undef unless (my $tree = shift->tree)->[0] eq 'tag';
+  return join ' > ',
+    reverse map { $_->[1] . ':nth-child(' . (@{_siblings($_, 1)} + 1) . ')' }
+    $tree, _ancestors($tree);
 }
 
 sub strip {
@@ -154,9 +170,9 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { _text(_nodes(shift->tree), 0) }
 
-sub to_string { shift->_delegate('render') }
+sub to_string { ${shift()}->render }
 
-sub tree { shift->_delegate(tree => @_) }
+sub tree { @_ > 1 ? (${$_[0]}->tree($_[1]) and return $_[0]) : ${$_[0]}->tree }
 
 sub type { shift->tree->[0] }
 
@@ -185,7 +201,7 @@ sub with_roles { shift->Mojo::Base::with_roles(@_) }
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
 
-sub xml { shift->_delegate(xml => @_) }
+sub xml { @_ > 1 ? (${$_[0]}->xml($_[1]) and return $_[0]) : ${$_[0]}->xml }
 
 sub _add {
   my ($self, $offset, $new) = @_;
@@ -206,9 +222,9 @@ sub _all {
 }
 
 sub _ancestors {
-  my ($self, $root) = @_;
+  my ($tree, $root) = @_;
 
-  return () unless my $tree = _parent($self->tree);
+  return () unless $tree = _parent($tree);
   my @ancestors;
   do { push @ancestors, $tree }
     while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
@@ -241,13 +257,6 @@ sub _content {
 
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
 
-sub _delegate {
-  my ($self, $method) = (shift, shift);
-  return $$self->$method unless @_;
-  $$self->$method(@_);
-  return $self;
-}
-
 sub _link {
   my ($parent, $children) = @_;
 
@@ -278,7 +287,11 @@ sub _offset {
 
 sub _parent { $_[0]->[$_[0][0] eq 'tag' ? 3 : 2] }
 
-sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
+sub _parse {
+  my ($self, $input) = @_;
+  return dclone $input->tree if blessed $input && $input->isa('Mojo::DOM');
+  return Mojo::DOM::HTML->new(xml => $self->xml)->parse($input)->tree;
+}
 
 sub _replace {
   my ($self, $parent, $child, $nodes) = @_;
@@ -289,9 +302,9 @@ sub _replace {
 sub _select { $_[1] ? $_[0]->grep(matches => $_[1]) : $_[0] }
 
 sub _siblings {
-  my ($self, $tags, $tail, $i) = @_;
+  my ($tree, $tags, $tail, $i) = @_;
 
-  return defined $i ? undef : [] if (my $tree = $self->tree)->[0] eq 'root';
+  return defined $i ? undef : [] if $tree->[0] eq 'root';
 
   my $nodes = _nodes(_parent($tree));
   my $match = -1;
@@ -381,6 +394,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->find('div p')->last->append('<p id="c">456</p>');
+  $dom->at('#c')->prepend($dom->new_tag('p', id => 'd', '789'));
   $dom->find(':not(p)')->map('strip');
 
   # Render
@@ -472,6 +486,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 =head2 append
 
   $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->append(Mojo::DOM->new);
 
 Append HTML/XML fragment to this node (for all node types other than C<root>).
 
@@ -486,6 +501,7 @@ Append HTML/XML fragment to this node (for all node types other than C<root>).
 =head2 append_content
 
   $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->append_content(Mojo::DOM->new);
 
 Append HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to this
 node's content.
@@ -569,6 +585,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   my $str = $dom->content;
   $dom    = $dom->content('<p>I ♥ Mojolicious!</p>');
+  $dom    = $dom->content(Mojo::DOM->new);
 
 Return this node's content or replace it with HTML/XML fragment (for C<root>
 and C<tag> nodes) or raw content.
@@ -700,6 +717,46 @@ Find this element's namespace, or return C<undef> if none could be found.
 Construct a new scalar-based L<Mojo::DOM> object and L</"parse"> HTML/XML
 fragment if necessary.
 
+=head2 new_tag
+
+  my $tag = Mojo::DOM->new_tag('div');
+  my $tag = $dom->new_tag('div');
+  my $tag = $dom->new_tag('div', id => 'foo', hidden => undef);
+  my $tag = $dom->new_tag('div', 'safe content');
+  my $tag = $dom->new_tag('div', id => 'foo', 'safe content');
+  my $tag = $dom->new_tag('div', data => {mojo => 'rocks'}, 'safe content');
+  my $tag = $dom->new_tag('div', id => 'foo', sub { 'unsafe content' });
+
+Construct a new L<Mojo::DOM> object for an HTML/XML tag with or without
+attributes and content. The C<data> attribute may contain a hash reference with
+key/value pairs to generate attributes from. Note that this method is
+EXPERIMENTAL and might change without warning!
+
+  # "<br>"
+  $dom->new_tag('br');
+
+  # "<div></div>"
+  $dom->new_tag('div');
+
+  # "<div id="foo" hidden></div>"
+  $dom->new_tag('div', id => 'foo', hidden => undef);
+
+  # "<div>test &amp; 123</div>"
+  $dom->new_tag('div', 'test & 123');
+
+  # "<div id="foo">test &amp; 123</div>"
+  $dom->new_tag('div', id => 'foo', 'test & 123');
+
+  # "<div data-foo="1" data-bar="test">test &amp; 123</div>""
+  $dom->new_tag('div', data => {foo => 1, Bar => 'test'}, 'test & 123');
+
+  # "<div id="foo">test & 123</div>"
+  $dom->new_tag('div', id => 'foo', sub { 'test & 123' });
+
+  # "<div>Hello<b>Mojo!</b></div>"
+  $dom->parse('<div>Hello</div>')->at('div')
+    ->append_content($dom->new_tag('b', 'Mojo!'))->root;
+
 =head2 next
 
   my $sibling = $dom->next;
@@ -769,6 +826,7 @@ node as L<Mojo::DOM> objects.
 =head2 prepend
 
   $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->prepend(Mojo::DOM->new);
 
 Prepend HTML/XML fragment to this node (for all node types other than C<root>).
 
@@ -783,6 +841,7 @@ Prepend HTML/XML fragment to this node (for all node types other than C<root>).
 =head2 prepend_content
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
+  $dom = $dom->prepend_content(Mojo::DOM->new);
 
 Prepend HTML/XML fragment (for C<root> and C<tag> nodes) or raw content to this
 node's content.
@@ -839,6 +898,7 @@ Remove this node and return L</"root"> (for C<root> nodes) or L</"parent">.
 =head2 replace
 
   my $parent = $dom->replace('<div>I ♥ Mojolicious!</div>');
+  my $parent = $dom->replace(Mojo::DOM->new);
 
 Replace this node with HTML/XML fragment and return L</"root"> (for C<root>
 nodes) or L</"parent">.
@@ -855,6 +915,19 @@ nodes) or L</"parent">.
   my $root = $dom->root;
 
 Return L<Mojo::DOM> object for C<root> node.
+
+=head2 selector
+
+  my $selector = $dom->selector;
+
+Get a unique CSS selector for this element. Note that this method is
+EXPERIMENTAL and might change without warning!
+
+  # "ul:nth-child(1) > li:nth-child(2)"
+  $dom->parse('<ul><li>Test</li><li>123</li></ul>')->find('li')->last->selector;
+
+  # "p:nth-child(1) > b:nth-child(1) > i:nth-child(1)"
+  $dom->parse('<p><b><i>Test</i></b></p>')->at('i')->selector;
 
 =head2 strip
 
@@ -982,6 +1055,7 @@ Alias for L<Mojo::Base/"with_roles">.
 =head2 wrap
 
   $dom = $dom->wrap('<div></div>');
+  $dom = $dom->wrap(Mojo::DOM->new);
 
 Wrap HTML/XML fragment around this node (for all node types other than C<root>),
 placing it as the last child of the first innermost element.
@@ -1001,6 +1075,7 @@ placing it as the last child of the first innermost element.
 =head2 wrap_content
 
   $dom = $dom->wrap_content('<div></div>');
+  $dom = $dom->wrap_content(Mojo::DOM->new);
 
 Wrap HTML/XML fragment around this node's content (for C<root> and C<tag>
 nodes), placing it as the last children of the first innermost element.
@@ -1055,6 +1130,6 @@ Alias for L</"to_string">.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

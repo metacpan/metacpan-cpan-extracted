@@ -60,7 +60,9 @@ WriteMakefile(
 	  : ()),
 	BUILD_REQUIRES => {	# For bin/createdatabase
 		'App::csv2sqlite' => 0,
+		'File::Basename' => 0,
 		'File::Copy' => 0,
+		'File::Spec' => 0,
 		'autodie' => 0,
 		'IPC::System::Simple' => 0,
 		'JSON' => 0,
@@ -91,6 +93,7 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'CHI' => 0,
 		'Storable' => 0,
+		'Text::CSV' => 0,
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean		=> { FILES => 'Geo-Coder-Free-*' },

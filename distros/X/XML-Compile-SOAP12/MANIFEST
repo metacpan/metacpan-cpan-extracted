@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/XML/Compile/SOAP12.pm
 lib/XML/Compile/SOAP12.pod
 lib/XML/Compile/SOAP12/Client.pm

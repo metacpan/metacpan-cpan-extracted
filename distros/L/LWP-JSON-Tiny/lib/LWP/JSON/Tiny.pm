@@ -11,7 +11,7 @@ use LWP;
 use LWP::UserAgent::JSON;
 
 # Have you updated the version number in the POD below?
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -20,7 +20,7 @@ LWP::JSON::Tiny - use JSON natively with LWP objects
 
 =head1 VERSION
 
-This is version 0.013.
+This is version 0.014.
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ best place to look for suggestions and feedback.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015-2017 Sam Kington.
+Copyright (c) 2015-2018 Sam Kington.
 
 =head1 LICENSE
 

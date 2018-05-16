@@ -1,9 +1,11 @@
 Changes
+CONTRIBUTING.md
 dev_hints/error_message_hints
 examples/apply_constraints.pl
 examples/brick_from_config.ini
 examples/brick_from_config.pl
 examples/placeholder.pl
+INSTALL.SKIP
 lib/Brick.pm
 lib/Brick/Bucket.pm
 lib/Brick/Composers.pm
@@ -27,7 +29,7 @@ MANIFEST			This list of files
 perf/brick_hash.t
 perf/bucket_memory.t
 perf/get_brick_by_name.t
-README
+README.pod
 t/apply.t
 t/bucket/add_to_bucket.t
 t/bucket/get_brick_by_name.t
@@ -110,5 +112,6 @@ t/use_cases/phone_number.t
 t/use_cases/programming-error-in-brick.t
 t/use_cases/top-level-errors.t
 t/use_cases/zip_code.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

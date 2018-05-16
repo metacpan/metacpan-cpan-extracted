@@ -1,0 +1,76 @@
+=head1 NAME
+
+Test2::Tools::SkipUntil - skip tests until a date is reached
+
+=head1 SYNOPSIS
+
+  use Test2::Bundle::More
+  use Test2::Tools::SkipUntil;
+
+  SKIP: {
+    skip_until "known fail see issue #213", '2018-06-01';
+    ...
+  }
+
+  ...
+
+  done_testing;
+
+=head1 DESCRIPTION
+
+Exports two functions for skipping tests until a datetime is reached. Dates are
+evaluated in C<localtime>. These might be useful when you have known exceptions
+in your test suite which are temporary.
+
+=head1 FUNCTIONS
+
+=head2 skip_until ($why, $count, $datetime)
+
+Skips all tests in a C<SKIP> block, registering C<$count> skipped tests until
+C<localtime> is greater than or equal to C<$datetime>. Just like with
+L<skip|https://metacpan.org/pod/Test2::Tools::Basic#skip($why)>, C<$count> is
+optional, and defaults to 1.
+
+C<$datetime> must be a scalar in one of the following formats:
+
+=over 4
+
+=item *
+
+  YYYY-MM-DDTHH:MM:SS - e.g. "2017-05-01T13:24:58"
+
+=item *
+
+  YYYY-MM-DD - e.g. "2017-05-01"
+
+=back
+
+=head2 skip_all_until ($why, $datetime)
+
+Skips all tests by setting the test plan to zero, and exiting succesfully
+unless C<localtime> is greater than or equal to C<$datetime>. Behaves like
+L<skip_all|https://metacpan.org/pod/Test2::Tools::Basic#skip_all($reason)>.
+
+See the L</"skip_until ($why, $count, $datetime)"> for the accepted C<$datetime> formats.
+
+=head1 SOURCE
+
+The source code repository for Test2-Tools-SkipUntil can be found on L<GitHub|https://github.com/dnmfarrell/Test2-Tools-SkipUntil>.
+
+=head1 AUTHORS
+
+David Farrell <dfarrell@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2018 David Farrell <dfarrell@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+See L<licenses|http://dev.perl.org/licenses/>.
+
+
+=cut
+

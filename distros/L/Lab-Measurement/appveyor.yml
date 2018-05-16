@@ -9,14 +9,10 @@ environment:
 install:
   - choco install --allowemptychecksum strawberryperl --version %strawberry_version%
   - path C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;C:\strawberry\c\bin;%PATH%
-  - choco install gnuplot
-  - path C:\Program Files\gnuplot\bin;%PATH%
   - perl -V
   - cpanm %installdeps_options% --skip-satisfied Dist::Zilla
   - dzil authordeps --missing | cpanm %installdeps_options%
   - dzil listdeps --missing | cpanm %installdeps_options%
   
-  - cpanm %installdeps_options% PDL::Graphics::Gnuplot
-
 build_script:
   - prove --verbose -l -s -r t

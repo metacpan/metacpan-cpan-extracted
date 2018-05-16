@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Minilla:
     file: lib/Minilla.pm
-    version: v3.0.17
+    version: v3.1.0
   Minilla::CLI:
     file: lib/Minilla/CLI.pm
   Minilla::CLI::Build:
@@ -169,13 +169,14 @@ resources:
   bugtracker: https://github.com/tokuhirom/Minilla/issues
   homepage: https://github.com/tokuhirom/Minilla
   repository: git://github.com/tokuhirom/Minilla.git
-version: v3.0.17
+version: v3.1.0
 x_authority: cpan:TOKUHIROM
 x_contributors:
   - 'Alex Kapranoff <alex@kapranoff.ru>'
   - 'Alex Kapranoff <kappa@yandex.ru>'
   - 'Daisuke Maki <lestrrat+github@gmail.com>'
   - 'Daisuke Murase <typester@cpan.org>'
+  - 'Dan Book <grinnz@gmail.com>'
   - 'Fitz Elliott <felliott@fiskur.org>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'GeJ <geraud@hyaku.nijuu.nana>'
@@ -218,3 +219,4 @@ x_contributors:
   - 'tokuhirom <tokuhirom@gmail.com>'
   - 'ysasaki <aloelight@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

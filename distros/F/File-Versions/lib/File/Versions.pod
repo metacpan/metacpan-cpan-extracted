@@ -17,8 +17,8 @@ File::Versions - Emacs-like versioned file names
 
 =head1 VERSION
 
-This documents File::Versions version 0.08
-corresponding to git commit L<a1de1abf7bf5abc9470a40b564891bcf9a98ae0b|https://github.com/benkasminbullock/File-Versions/commit/a1de1abf7bf5abc9470a40b564891bcf9a98ae0b> released on Thu Jan 19 09:57:04 2017 +0900.
+This documents File::Versions version 0.09
+corresponding to git commit L<7d641410d8d898ad7292d9eaf531614fea033e59|https://github.com/benkasminbullock/File-Versions/commit/7d641410d8d898ad7292d9eaf531614fea033e59> released on Sat May 12 10:40:28 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,7 @@ tag C<:all> exports everything.
 =back
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -82,7 +83,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2010-2017
+2010-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

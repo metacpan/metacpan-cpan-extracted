@@ -1,0 +1,281 @@
+=head1 NAME
+
+TaskPipe::Manual::Installation - how to install and setup TaskPipe
+
+=head1 TASKPIPE INSTALLATION AND SETUP INSTRUCTIONS
+
+Instructions are presented here for installing TaskPipe on CentOS 7, using MySQL (or MariaDB), PhantomJS and TOR. 
+
+=head2 Get TaskPipe Third Party Prerequisites (MySQL, PhantomJS, TOR)
+
+=over
+
+=item 1. 
+
+Install MySQL
+
+    yum install mysql
+
+(Actually strictly speaking this will install MariaDB on CentOS 7).
+
+=item 2. 
+
+Install PhantomJS
+
+Working in your home directory: 
+
+=over
+
+=item *
+
+Install phantom prerequisites:
+
+    yum install fontconfig freetype freetype-devel fontconfig-devel libstdc++
+
+=item * 
+
+Get the bz2 file
+
+    wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.8-linux-x86_64.tar.bz2
+
+=item * 
+
+Unpack it
+
+    tar -xjvf phantomjs-1.9.8-linux-x86_64.tar.bz2
+
+=item * 
+
+Create a directory to keep phantomjs
+
+    mkdir -p /opt/phantomjs
+
+=item * 
+
+Copy the files in
+
+    cp -r phantomjs-1.9.8-linux-x86_64/* /opt/phantomjs
+
+=item *
+
+Remove installation directory
+
+    rm -rf phantomjs-1.9.8-linux-x86_64
+
+=item * 
+
+Create symlink to the phantomjs executable
+
+    ln -s /opt/phantomjs/bin/phantomjs /usr/bin/phantomjs
+
+=item *
+
+Test phantomjs
+
+    phantomjs /opt/phantomjs/examples/hello.js
+
+(Should result in "Hello world!" being printed to the terminal.)
+
+=back
+
+=item *
+
+Install TOR
+
+    yum install tor
+
+Edit the tor configuration file which should appear at C</etc/tor/torrc>
+
+    nano /etc/tor/torrc
+
+Almost all of this file is already commented out. The simplest way to use TOR with L<TaskPipe> is to comment out everything that is not already commented out! ie you will let TaskPipe send config options to TOR when it is launching and stopping instances. 
+
+This may just be a section in C</etc/tor/torrc> which looks like this:
+
+    ControlSocket /run/tor/control
+    ControlSocketsGroupWritable 1
+    CookieAuthentication 1
+    CookieAuthFile /run/tor/control.authcookie
+    CookieAuthFileGroupReadable 1
+
+Having commented these lines out, save the file.
+
+B<NOTE> There is no need to start TOR. C<TaskPipe> will launch TOR instances as and when are needed.
+
+
+=head2 Install L<TaskPipe>
+
+You can install TaskPipe using any of the usual methods available for intalling Perl modules. For example:
+
+=over
+
+=item *
+
+You can get TaskPipe from CPAN using the C<cpan> shell. If you don't have this already type
+
+    yum install cpan
+
+Then to launch the C<cpan> prompt:
+
+    cpan
+
+And at the prompt type:
+
+    install TaskPipe
+
+=item *
+
+You can use C<cpanp> or C<cpanm>. E.g.
+
+    cpanm -i TaskPipe
+
+=item *
+
+You can download L<archive file|http://search.cpan.org/CPAN/authors/id/T/TO/TOMGRACEY/TaskPipe-0.01.tar.gz> directly and install via C<make>.
+
+    tar -xzvf TaskPipe-0.01.tar.gz
+    cd TaskPipe-0.01
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=back
+
+Once you have installed TaskPipe, test the command line tool works. At the command line, type
+
+    taskpipe help
+
+=head2 Setup Global L<TaskPipe> Directories
+
+The first thing you should do is run C<taskpipe setup>. Before doing this, you need to choose a location to install L<TaskPipe> global files. We will assume you are going to install it in the subdirectory C<taskpipe> inside your home directory, but adjust the directory in the commands provided to suit your setup.
+
+Also, before proceeding, make sure your home directory is writeable, because L<TaskPipe> will create a file C<.taskpipe> in your home directory.
+
+Then type
+
+    taskpipe setup --root_dir=/home/myusername/taskpipe
+
+adjusting C</home/myusername/taskpipe> to suit your system. You should use an absolute path when executing this command.
+
+Note you will get a warning message:
+
+    Could not register job as database is unavailable. Proceeding without job_id...
+
+TaskPipe is complaining it can't find the global database. You can ignore this warning because we haven't set the database up yet - and we're just about to do that.
+
+Have a look at the files that were created. You should find the following structure:
+
+    /home/myusername/taskpipe
+        /global
+            /conf
+                /global.yml
+                /system.yml
+            /lib
+            /logs
+        /projects
+
+=head2 Create the Global L<TaskPipe> Database
+
+L<TaskPipe> complained about the missing global database, so let's set that up. 
+
+=over
+
+=item 1.
+
+In a MySQL shell, type
+
+    create database taskpipe;
+
+- assuming you will call the global taskpipe database C<taskpipe> (but just change C<taskpipe> in the above command if not).
+
+=item 2.
+
+Create a username that taskpipe can use to interface with the database
+
+    create user taskpipe_user@localhost identified by 'somedatabasepassword';
+
+=item 3.
+
+Give your user permissions to the database C<taskpipe>:
+
+    grant all privileges on taskpipe.* to taskpipe_user@localhost;
+
+
+=item 4.
+
+Tell L<TaskPipe> the details of your database. To do this, edit the global config file C<taskpipe setup> created earlier:
+
+    vi /home/myusername/taskpipe/global/conf/global.yml
+
+C<global.yml> is important because it contains global L<TaskPipe> settings. There are lots of important settings in this file - but right now you just need to ensure the settings related to the global database are correct.
+
+C<TaskPipe> uses L<MooseX::ConfigCascade> to load variables from config files (see the docs for that module for more information) - which means config variables are listed under the modules that they load to. You are looking for the module C<TaskPipe::SchemaManager::Settings_Global>. 
+
+Find this module and look at the settings underneath. You need to make sure these settings are correct for your database. Specifically you should replace the tilde C<~> that appears next to C<username>, C<password> and C<database> - but also check C<database>, C<host> and C<method> are correct.
+
+=item 5.
+
+Deploy the global tables:
+
+    taskpipe deploy tables --scope=global
+
+Also, L<TaskPipe> uses the L<DBIx::Class> ORM to talk to the database, so you need to generate the L<DBIx::Class> schema files. You should just be able to type
+
+    taskpipe generate schema --scope=global
+
+You'll get that warning again when issuing both of these commands - but this should be the last time, because the database is now set up.
+
+=back
+
+=head2 Create a L<TaskPipe> Project
+
+The fastest way to get a L<TaskPipe> project up and running is to deploy the built-in sample project. (At the time of writing TaskPipe has only one built-in sample project, but more may be included later). This can be accomplished by adding C<--sample=SP500> to each of the installation commands. (The sample project scrapes quotes for the companies on the S&P500 list, and is called C<SP500>)
+
+If you intend to create a bare project, then omit the C<--sample> parameter from the commands that follow, and change the project name from C<SP500> to whatever you are going to call your new project.
+
+    taskpipe deploy files --project=SP500 --sample=SP500
+
+You should find a new entry under your C</projects> directory with the following structure:
+
+        /projects
+            /SP500
+                /conf
+                    /project.yml
+                /lib
+                    # some Perl modules here
+                /logs
+                /plans
+                    /plan.yml
+                /sources
+
+Again, the next step is to tell your project about the database. L<TaskPipe> uses a one database per project philosophy, with each project database being separate from the global database. So again, in MySQL you need to create a database:
+
+    create database SP500;
+
+Grant privileges to the mysql user you created earlier
+
+    grant all privileges on SP500.* to taskpipe_user@localhost;
+
+And now (back at the command line):
+
+    taskpipe deploy tables --project=SP500 --sample=SP500
+
+Generate the L<DBIx::Class> schema files associated with the tables you just created:
+
+    taskpipe generate schema --project=SP500
+
+If all went without complaint, you can now go right ahead and run the plan:
+
+    taskpipe run plan --project=SP500
+
+This project uses C<PhantomJS> to render the the page. This is necessary for this particular scrape, because the pages which contain the quote information get their values via ajax.
+
+You may note a pause of 10 - 20 seconds or so near the beginning of the run, as PhantomJS initialises. Then the process should proceed to gather the S&P500 company information and quotes quite quickly.
+
+In a MySQL shell you can type
+
+    use SP500;
+    select * from company;
+
+to see the data being gathered.

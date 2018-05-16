@@ -1,7 +1,7 @@
 package App::cryp::Role::Exchange;
 
-our $DATE = '2018-04-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-05-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -77,7 +77,7 @@ App::cryp::Role::Exchange - Role for interacting with an exchange
 
 =head1 VERSION
 
-This document describes version 0.002 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-04-12.
+This document describes version 0.003 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-05-10.
 
 =head1 DESCRIPTION
 
@@ -182,7 +182,7 @@ C<_reverse_canonical_currencies> key. Driver can provide its own implementation.
 
 Usage:
 
- $xchg->list_pairs => [$status, $reason, $payload, \%resmeta]
+ $xchg->list_pairs(%args) => [$status, $reason, $payload, \%resmeta]
 
 List all pairs available for trading.
 
@@ -194,7 +194,7 @@ Pair names must be in the form of I<< <currency1>/<currency2> >> where I<<
 <currency2> >> is the base currency code. Currency codes must follow list in
 L<CryptoCurrency::Catalog>. Some example pair names: BTC/USD, ETH/BTC.
 
-Known options:
+Known arguments:
 
 =over
 
@@ -217,7 +217,7 @@ additional keys.
 
 Usage:
 
- $xchg->get_order_book => [$status, $reason, $payload, \%resmeta]
+ $xchg->get_order_book(%args) => [$status, $reason, $payload, \%resmeta]
 
 Method should return this payload:
 
@@ -237,7 +237,7 @@ Method should return this payload:
 Buy (bid, purchase) records must be sorted from highest price to lowest price.
 Sell (ask, offer) records must be sorted from lowest price to highest.
 
-Known options:
+Known arguments:
 
 =over
 

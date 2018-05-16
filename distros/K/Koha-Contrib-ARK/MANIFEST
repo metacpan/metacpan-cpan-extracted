@@ -8,12 +8,12 @@ Makefile.PL
 README
 bin/koha-ark
 dist.ini
-koha-ark.log
 lib/Koha/Contrib/ARK.pm
-lib/Koha/Contrib/ARK/Checker.pm
-lib/Koha/Contrib/ARK/Clearer.pm
+lib/Koha/Contrib/ARK/Action.pm
+lib/Koha/Contrib/ARK/Check.pm
+lib/Koha/Contrib/ARK/Clear.pm
 lib/Koha/Contrib/ARK/Reader.pm
-lib/Koha/Contrib/ARK/Updater.pm
+lib/Koha/Contrib/ARK/Update.pm
 lib/Koha/Contrib/ARK/Writer.pm
 weaver.ini
 xt/00-compile.t

@@ -8,13 +8,17 @@ our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 use Carp;
 use List::Util qw/max/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # Get the type of version control. Not exported.
 
 sub get_version_control
 {
-    return $ENV{VERSION_CONTROL};
+    my $vc = $ENV{VERSION_CONTROL};
+    if (! $vc) {
+	$vc = 'numbered';
+    }
+    return $vc;
 }
 
 sub get_file_max_version_number

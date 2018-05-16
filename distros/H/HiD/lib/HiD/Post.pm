@@ -3,7 +3,7 @@
 
 package HiD::Post;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::Post::VERSION = '1.991';
+$HiD::Post::VERSION = '1.992';
 use Moose;
 with
   'HiD::Role::IsConverted',
@@ -150,7 +150,7 @@ disk -- this data from this object.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

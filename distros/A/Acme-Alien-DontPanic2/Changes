@@ -1,5 +1,9 @@
 Revision history for Perl Acme-Alien-DontPanic2
 
+1.4100    2018-05-14 15:58:21 -0400
+  - Require Alien::Build 1.41 Alien::Build::MB 0.05
+  - Use new alienfile.org URL to fetch libdontpanic
+
 1.2900    2017-10-30 10:01:57 -0400
   - Require Alien::Build 1.29 Alien::Build::MB 0.05
   - Skip FFI tests if no DLLs available

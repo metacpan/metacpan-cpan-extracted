@@ -89,7 +89,7 @@
          "web" : "https://github.com/redhotpenguin/perl-soaplite"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

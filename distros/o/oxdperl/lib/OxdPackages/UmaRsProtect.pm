@@ -238,7 +238,7 @@ use Data::Dumper;
     # 
     # *Example response from getResponseObject:*
     # --- Code
-    # { "status": "ok" }
+    # { "status":"ok", "data": { "oxd_id": "bcad760f-91ba-46e1-a020-05e4281d91b6" } }
     # ---
     #
     sub setParams{

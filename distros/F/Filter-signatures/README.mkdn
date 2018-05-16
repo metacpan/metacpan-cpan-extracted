@@ -3,7 +3,7 @@
 
 # NAME
 
-Filter::signatures - very simplicistic signatures for Perl < 5.20
+Filter::signatures - very simplistic signatures for Perl < 5.20
 
 # SYNOPSIS
 
@@ -29,8 +29,8 @@ signatures that were introduced to the Perl core with Perl 5.20.
 
 # CAVEATS
 
-The technique used is a very simplicistic transform to allow for using very
-simplicistic named formal arguments in subroutine declarations. This module
+The technique used is a very simplistic transform to allow for using very
+simplistic named formal arguments in subroutine declarations. This module
 does not implement warning if more or fewer parameters than expected are
 passed in.
 
@@ -78,20 +78,6 @@ versions, line numbers may get out of sync if you use here documents.
 If you spread your formal signatures across multiple lines, the line numbers
 may also go out of sync with the original document.
 
-## Comments within signatures
-
-The module does not support comments within signatures
-
-    sub invalid (
-        $name,     # use this as the name
-        $location, # use this as the location
-    ) {
-        "This is an example"
-    }
-
-The workaround is to not do that or to upgrade to Perl 5.20 or higher
-and use the native signatures support there.
-
 ## `eval`
 
 [Filter::Simple](https://metacpan.org/pod/Filter::Simple) does not trigger when using
@@ -127,7 +113,15 @@ imported.
 [signatures](https://metacpan.org/pod/signatures) - a module that doesn't use a source filter but optree
 modification instead
 
-[Sub::Signatures](https://metacpan.org/pod/Sub::Signatures)
+[Sub::Signatures](https://metacpan.org/pod/Sub::Signatures) - uses signatures to dispatch to different subroutines
+based on which subroutine matches the signature
+
+[Method::Signatures](https://metacpan.org/pod/Method::Signatures) - this module implements subroutine signatures
+closer to Perl 6, but requires [PPI](https://metacpan.org/pod/PPI) and [Devel::Declare](https://metacpan.org/pod/Devel::Declare)
+
+[Function::Parameters](https://metacpan.org/pod/Function::Parameters) - adds two new keywords for declaring subroutines and
+parses their signatures. It supports more features than core Perl, closer to
+Perl 6, but requires a C compiler and Pelr 5.14+.
 
 # REPOSITORY
 

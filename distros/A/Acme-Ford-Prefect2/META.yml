@@ -4,18 +4,18 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Joel A Berger <joel.a.berger@gmail.com>'
 build_requires:
-  Acme::Alien::DontPanic2: '1.2900'
-  Alien::Base::Wrapper: '1.29'
+  Acme::Alien::DontPanic2: '1.4100'
+  Alien::Base::Wrapper: '1.41'
   Data::Dumper: '0'
   Test2::V0: '0.000060'
   perl: '5.006'
 configure_requires:
-  Acme::Alien::DontPanic2: '1.2900'
-  Alien::Base::Wrapper: '1.29'
+  Acme::Alien::DontPanic2: '1.4100'
+  Alien::Base::Wrapper: '1.41'
   ExtUtils::MakeMaker: '6.64'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +29,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect2/issues
   homepage: https://metacpan.org/pod/Acme::Ford::Prefect2
   repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect2.git
-version: '1.2902'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.4100'
+x_generated_by_perl: v5.27.11
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

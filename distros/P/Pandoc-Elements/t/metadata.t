@@ -42,8 +42,8 @@ foreach (0, '', 'false', 'FALSE', undef) {
     is '{"c":false,"t":"MetaBool"}', $m->to_json, "false: $_";
 }
 
-is_deeply $doc->value('true', boolean => 'JSON::PP'), JSON::PP::true, 'JSON::PP::true'; 
-is_deeply $doc->value('false', boolean => 'JSON::PP'), JSON::PP::false, 'JSON::PP::false'; 
+is_deeply $doc->value('/true', boolean => 'JSON::PP'), JSON::PP::true, 'JSON::PP::true'; 
+is_deeply $doc->value('/false', boolean => 'JSON::PP'), JSON::PP::false, 'JSON::PP::false'; 
 
 # MetaString
 
@@ -79,21 +79,30 @@ is_deeply $doc->value, {
   }, 'value';
 
 is $doc->value('false'), 0, 'value("false")';
+is $doc->value('/false'), 0, 'value("/false")';
 is $doc->value('true'), 1, 'value("true")';
-is $doc->value('map/string'), "0", 'value("map/string")';
-is $doc->value('map/list/0'), "a", 'value("map/list/0")';
-is $doc->value('map/list/2'), "0", 'value("map/list/2")';
+is $doc->value('/true'), 1, 'value("/true")';
+is $doc->value('/map/string'), "0", 'value("/map/string")';
+is $doc->value('/map/list/0'), "a", 'value("/map/list/0")';
+is $doc->value('/map/list/2'), "0", 'value("/map/list/2")';
 is $doc->value('string'), "hello\nworld", 'value("string")';
-is_deeply $doc->value('map/~1~0', boolean => 'JSON::PP'),
-    JSON::PP::true, 'value("map/~1~0")';
+is $doc->value('/string'), "hello\nworld", 'value("/string")';
+is_deeply $doc->value('/map/~1~0', boolean => 'JSON::PP'),
+    JSON::PP::true, 'value("/map/~1~0")';
 is_deeply $doc->value('string', element => 'keep'),
     $doc->meta->{string}->content, 'value("string", elements => keep)';
+is_deeply $doc->value('/string', element => 'keep'),
+    $doc->meta->{string}->content, 'value("/string", elements => keep)';
 is $doc->value('blocks'), "x\n\ny", 'value("blocks")';
+is $doc->value('/blocks'), "x\n\ny", 'value("/blocks")';
 is_deeply $doc->value('blocks', element => 'keep'),
     $doc->meta->{blocks}->content, 'value("blocks", elements => keep)';
+is_deeply $doc->value('/blocks', element => 'keep'),
+    $doc->meta->{blocks}->content, 'value("/blocks", elements => keep)';
 
 foreach (qw(x map/x true/x blocks/x map/list/x map/list/3)) {
     is $doc->value($_), undef, "value('$_')";
+    is $doc->value($_), undef, "value('/$_')";
 }
 
 my $doc = do {

@@ -10,15 +10,20 @@ my $js = JavaScript::V8::CommonJS->new(paths => ["$FindBin::Bin/modules"]);
 
 
 subtest 'compile exception' => sub {
-    my $error = dies { $js->eval("require('exception')", "test_script") };
+    my $error = dies { $js->eval(" require('exception')", "test_script") };
     isa_ok $error, 'JavaScript::V8::CommonJS::Exception';
     # diag Dumper $error->stack;
     like $error->message, 'ReferenceError: foo is not defined', 'message';
     like $error->line, 2, 'line';
-    like $error->column, 5, 'column';
-    like $error->source, "$FindBin::Bin/modules/notStrict.js", 'source';
-    like $error->stack->[0]{source}, $error->source, 'stack top item';
-    ok @{$error->stack} > 1, 'stack length';
+    like $error->column, '?', 'column';
+    is $error->source, "$FindBin::Bin/modules/notStrict.js", 'source';
+    is $error->stack->[0]{source}, $error->source, 'stack top item';
+    is @{$error->stack}, 4, 'stack length';
+    is $error->stack->[-1], {
+        source => 'test_script',
+        line => 1,
+        column => 2
+    };
 };
 
 subtest 'runtime exception' => sub {
@@ -26,13 +31,22 @@ subtest 'runtime exception' => sub {
     # diag Dumper $error->stack;
     isa_ok $error, 'JavaScript::V8::CommonJS::Exception';
     is $error->message, 'ReferenceError: invalidVar is not defined', 'message';
-    like $error->line, 4, 'line';
-    like $error->column, 16, 'column';
-
-    # TODO report correct source file for runtime errors
-    # like $error->source, "$FindBin::Bin/modules/runtime_exception.js", 'source';
+    is $error->line, 4, 'line';
+    is $error->column, 16, 'column';
+    like $error->source, "$FindBin::Bin/modules/runtime_exception.js", 'source';
+    is $error->stack, [
+        {
+        'source' => "$FindBin::Bin/modules/runtime_exception.js",
+        'line' => '4',
+        'column' => '16'
+        },
+        {
+        'column' => '30',
+        'line' => '1',
+        'source' => 'test_script'
+        }
+    ], 'stack';
 };
-
 
 
 

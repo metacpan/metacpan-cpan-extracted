@@ -3,36 +3,37 @@ abstract: 'Pragma qbit'
 author:
   - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
 build_requires:
-  File::Temp: 0
-  FindBin: 0
-  Test::More: 0
-  lib: 0
+  File::Temp: '0'
+  FindBin: '0'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: qbit
 requires:
-  Clone: 0
-  Data::Dumper: 0
-  Date::Calc: 0
-  Exporter: 0
-  HTML::Entities: 0
-  JSON::XS: 0
-  Locale::Messages: 0
-  Net::LibIDN: 0
-  POSIX: 0
-  Scalar::Util: 0
-  Time::Local: 0
-  URI::Escape: 0
-  base: 0
-  open: 0
-  overload: 0
-  strict: 0
-  utf8: 0
-  warnings: 0
-version: 2.4
+  Clone: '0'
+  Data::Dumper: '0'
+  Date::Calc: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  HTML::Entities: '0'
+  JSON::XS: '0'
+  Locale::Messages: '0'
+  Net::LibIDN: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  URI::Escape: '0'
+  base: '0'
+  open: '0'
+  overload: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '2.5'

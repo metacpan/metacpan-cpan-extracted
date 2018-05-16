@@ -1,0 +1,45 @@
+---
+abstract: 'MooX::AttributeFilter with cute antlers OwO'
+author:
+  - 'Little Princess Kitten <kitten@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+  Test::Moose: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-AttributeFilter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::AttributeFilter:
+    file: lib/MooseX/AttributeFilter.pm
+    version: '0.06'
+  MooseX::AttributeFilter::Trait::Attribute:
+    file: lib/MooseX/AttributeFilter/Trait/Attribute.pm
+    version: '0.06'
+  MooseX::AttributeFilter::Trait::Attribute::Role:
+    file: lib/MooseX/AttributeFilter/Trait/Attribute/Role.pm
+    version: '0.06'
+requires:
+  Moose: '2.1210'
+  perl: '5.008009'
+resources:
+  homepage: https://github.com/icklekitten/MooseX-AttributeFilter
+  repository: git://github.com/icklekitten/MooseX-AttributeFilter.git
+version: '0.06'
+x_authority: cpan:KITTEN
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

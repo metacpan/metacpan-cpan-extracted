@@ -13,8 +13,6 @@ meta-spec:
   version: '1.4'
 name: Koha-Contrib-ARK
 requires:
-  AnyEvent::Processor::Conversion: '0'
-  AnyEvent::Processor::Converter: '0'
   DateTime: '0'
   Getopt::Long: '0'
   JSON: '0'
@@ -24,12 +22,13 @@ requires:
   MARC::Moose::Record: '0'
   Modern::Perl: '0'
   Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
   MooseX::RW::Reader: '0'
   MooseX::RW::Writer: '0'
   Pod::Usage: '0'
   Term::ProgressBar: '0'
   Try::Tiny: '0'
-  YAML: '0'
 resources:
   repository: http://git.tamil.fr/git/Koha-Contrib-ARK
-version: 1.0.2
+version: 1.0.3

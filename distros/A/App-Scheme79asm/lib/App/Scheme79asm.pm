@@ -10,7 +10,7 @@ use Data::Dumper qw/Dumper/;
 use Data::SExpression qw/consp scalarp/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.005001';
+our $VERSION = '1.000';
 
 our %TYPES = (
 	LIST => 0,
@@ -121,9 +121,9 @@ sub print_binary16 {
 	die "addr_bits + type_bits >= 16\n"if $self->{addr_bits} + $self->{type_bits} > 16;
 
 	my $length = @{$self->{memory}};
-	print $fh pack 'n', $length or croak "Failed to print memory size: $!";
+	print $fh pack 'n', $length or croak "Failed to print memory size: $!"; # uncoverable branch true
 	for (@{$self->{memory}}) {
-		print $fh pack 'n', $_ or croak "Failed to print memory: $!"
+		print $fh pack 'n', $_ or croak "Failed to print memory: $!" # uncoverable branch true
 	}
 }
 
@@ -147,7 +147,7 @@ sub print_verilog {
 
 		my $string = "mem[$index] <= $val;";
 		$string .= "$spaces // $comment" if defined $comment;
-		say $fh $string or croak "Failed to print verilog: $!";
+		say $fh $string or croak "Failed to print verilog: $!"; # uncoverable branch true
 	}
 
 }

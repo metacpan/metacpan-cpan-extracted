@@ -1257,3 +1257,12 @@ Revision history for Graphics-Framebuffer
 6.09   April 6, 2018
 
        Installation instructions update.
+
+6.10   May 14, 2018
+
+       Removed the C version of the circle fill routine.  It had bugs, and the
+       Perl version was just as quick.  Go figure.
+       
+       Improvements made to the examples scripts.
+
+       The 32 bit alpha routines have been optimized.

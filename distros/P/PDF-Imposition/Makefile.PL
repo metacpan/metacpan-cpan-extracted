@@ -4,7 +4,10 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'PDF::Imposition',
-    AUTHOR           => q{Marco Pessotto <melmothx@gmail.com>},
+    AUTHOR           => [
+                         q{Marco Pessotto <melmothx@gmail.com>},
+                         q{Daniel Drennan ElAwar <drennan@panix.com>},
+                        ],
     VERSION_FROM     => 'lib/PDF/Imposition.pm',
     ABSTRACT_FROM    => 'lib/PDF/Imposition.pm',
     LICENSE          => 'Perl_5',

@@ -1,11 +1,10 @@
-# $Id: 22-RSA-SHA1.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
+# $Id: 22-RSA-SHA1.t 1669 2018-04-27 10:17:13Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Digest::SHA'  => 5.23,
 	'Net::DNS'     => 1.01,
 	'MIME::Base64' => 2.13,
 	);
@@ -75,17 +74,13 @@ my $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
 
-{
-	my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
-	ok( $verified, 'signature verified using public key' );
-}
+my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
+ok( $verified, 'signature verified using public key' );
 
 
-{
-	my $corrupt = 'corrupted data';
-	my $verified = Net::DNS::SEC::RSA->verify( $corrupt, $key, $signature );
-	ok( !$verified, 'signature over corrupt data not verified' );
-}
+my $corrupt = 'corrupted data';
+my $verifiable = Net::DNS::SEC::RSA->verify( $corrupt, $key, $signature );
+ok( !$verifiable, 'signature not verifiable if data corrupted' );
 
 
 # The following tests are not replicated for other RSA/SHA flavours
@@ -128,10 +123,10 @@ ok( !eval { Net::DNS::SEC::RSA->sign( $sigdata, $wrongprivate ) },
 	'signature not created using wrong private key' );
 
 ok( !eval { Net::DNS::SEC::RSA->verify( $sigdata, $wrongkey, $signature ) },
-	'signature not verified using wrong public key' );
+	'signature not verifiable using wrong public key' );
 
 ok( !eval { Net::DNS::SEC::RSA->verify( $sigdata, $key, undef ) },
-	'signature not verified if empty or not defined' );
+	'verify fails if signature undefined' );
 
 
 # test detection of invalid private key descriptors

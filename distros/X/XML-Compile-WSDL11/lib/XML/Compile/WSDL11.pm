@@ -1,17 +1,21 @@
-# Copyrights 2014-2017 by [Mark Overmeer].
+# Copyrights 2014-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-WSDL11.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::WSDL11;
 use vars '$VERSION';
-$VERSION = '3.06';
+$VERSION = '3.07';
 
 use base 'XML::Compile::Cache';
 
-use Log::Report 'xml-compile-soap', syntax => 'SHORT';
+use warnings;
+use strict;
+
+use Log::Report 'xml-compile-soap';
 
 use XML::Compile             ();      
 use XML::Compile::Util       qw/pack_type unpack_type/;

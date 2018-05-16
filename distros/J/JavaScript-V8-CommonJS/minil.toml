@@ -1,6 +1,5 @@
 name = "JavaScript-V8-CommonJS"
-# badges = ["travis"]
+badges = ["travis", "coveralls"]
 authority="cpan:CAFEGRATZ"
 
 module_maker="ModuleBuildTiny"
-

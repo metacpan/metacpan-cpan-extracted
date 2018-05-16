@@ -41,7 +41,7 @@ isa_ok( $brick, $class );
 
 =back
 
-=cut 
+=cut
 
 {
 package Brick::Bucket;
@@ -49,56 +49,56 @@ package Brick::Bucket;
 sub value_format_by_field_name
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	my @subs = ();
-	
+
 	foreach my $field ( @{ $setup->{allowed_fields} } )
 		{
 		my $method = "_${field}_format";
 		do { carp("Cannot [$method]"); next } unless $bucket->can( $method );
-		
+
 		my $blank = $bucket->_is_blank( { field => $field } );
-		
+
 		my $sub = $bucket->$method( { %$setup, field => $field } );
-		
+
 		my $either = $bucket->__compose_satisfy_any( $blank, $sub );
-		
+
 		push @subs, $either;
 		}
-		
+
 	my $composed = $bucket->__compose_satisfy_all( @subs );
-	
+
 	$bucket->__make_constraint( $composed, $setup );
 	}
-	
+
 sub _postal_code_format
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length} = 5;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
-		$bucket->_value_length_is_exactly( $setup ),		
+
+	my $composed = $bucket->__compose_satisfy_all(
+		$bucket->_value_length_is_exactly( $setup ),
 		$bucket->_is_only_decimal_digits( $setup ),
 		);
 	}
-	
+
 sub _whole_number_format
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length} = 5;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
+
+	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_is_only_decimal_digits( $setup ),
 		);
 	}
-	
+
 sub _birthday_format
 	{
 	my( $bucket, $setup ) = @_;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
+
+	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_is_YYYYMMDD_date_format( $setup ),
 		$bucket->_is_valid_date( $setup ),
 		);
@@ -107,8 +107,8 @@ sub _birthday_format
 sub _anniversary_format
 	{
 	my( $bucket, $setup ) = @_;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
+
+	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_is_YYYYMMDD_date_format( $setup ),
 		$bucket->_is_valid_date( $setup ),
 		);
@@ -117,8 +117,8 @@ sub _anniversary_format
 sub _city_format
 	{
 	my( $bucket, $setup ) = @_;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
+
+	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_is_true( $setup ),
 		);
 	}
@@ -126,10 +126,10 @@ sub _city_format
 sub _state_format
 	{
 	my( $bucket, $setup ) = @_;
-	
+
 	$setup->{exact_length} = 2;
 
-	my $composed = $bucket->__compose_satisfy_all( 
+	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_value_length_is_exactly( $setup ),
 		$bucket->_is_valid_date( $setup ),
 		);
@@ -138,8 +138,8 @@ sub _state_format
 sub _country_format
 	{
 	my( $bucket, $setup ) = @_;
-	
-	my $composed = $bucket->__compose_satisfy_all( 
+
+	my $composed = $bucket->__compose_satisfy_all(
 		$bucket->_is_true( $setup ),
 		);
 	}
@@ -166,7 +166,7 @@ my $Input = {
 	_super_bowl     => 'Da Bears!',
 	};
 
-	
+
 =head2 Create the profile
 
 =over 4
@@ -189,22 +189,22 @@ my @required = qw(birthday country state city postal_code);
 
 =back
 
-=cut 
+=cut
 
 my $setup = {
 	allowed_fields  => \@allowed,
 	required_fields => \@required,
 	};
-	
+
 my $Profile = [
 	[ allowed_fields   => allowed_fields             => $setup ],
-	
+
 	[ required_fields  => required_fields            => $setup ],
-	
+
 	[ format_of_values => value_format_by_field_name => $setup ],
 
 	];
-	
+
 =head2 Test the profile with lint()
 
 This isn't a necessary step, but it's nice to know that the profile
@@ -236,11 +236,11 @@ it on for debugging.
 
 {
 my $string = $profile->explain;
-#stderr_like { $string = $profile->explain } qr/Cannot/, 
+#stderr_like { $string = $profile->explain } qr/Cannot/,
 #	"Error message for input lacking format brick";
 ok( $string, "explain() returns something" );
 
-print STDERR "\nExplaining $0 profile:\n", 
+print STDERR "\nExplaining $0 profile:\n",
 	$string if $ENV{DEBUG};
 }
 
@@ -280,11 +280,11 @@ print STDERR "\n" if $ENV{DEBUG};
 foreach my $index ( 0 .. $#$result )
 	{
 	my $entry = $result->[$index];
-	
+
 	print STDERR "----- $entry->[0] ----------------------------\n" if $ENV{DEBUG};
-	
+
 	do { print STDERR "\tpassed\n\n" if $ENV{DEBUG}; next } if $entry->[2];
-	
+
 	my @data = ( $entry->[3] );
 	my @errors = ();
 	my $iterations = 0;
@@ -297,21 +297,21 @@ foreach my $index ( 0 .. $#$result )
 			push @data, @{ $error->{errors} };
 			next;
 			}
-		
+
 		push @errors, $error;
 		}
-		
+
 	#print STDERR Data::Dumper->Dump( [\@errors], [qw(errors)] ) ; #if $ENV{DEBUG};
 
 	#print STDERR "$entry->[0] checked by $entry->[1] which returned:\n\t$message\n";
-	
+
 	next unless ref $entry->[3] and @{ $entry->[3]{errors} } > 0;
-	
+
 	foreach my $error ( @errors )
 		{
 		print STDERR "$error->{handler}: $error->{message}\n" if $ENV{DEBUG};
 		}
-	
+
 	print STDERR "\n" if $ENV{DEBUG};
 	}
 

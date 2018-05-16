@@ -51,6 +51,7 @@ t/strict.t
 t/unused.t
 t/used.t
 t/vars.t
+t/whosonfirst.t
 templates/Geo/Coder/Free/Display/index.tmpl
 templates/Geo/Coder/Free/Display/query.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)

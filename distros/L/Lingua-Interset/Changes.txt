@@ -1,3 +1,12 @@
+3.012     2018-05-15 11:11:11+02:00 Europe/Prague
+
+Interface:
+* FS methods add_ufeatures() and get_ufeatures() now store unknown language-
+  specific features or values in the 'other' feature (and set tagset to
+  'mul::uposf').
+
+
+
 3.011     2018-02-18 14:17:13+01:00 Europe/Prague
 
 Features:

@@ -1,0 +1,28 @@
+Revision history for Perl extension MooseX-AttributeFilter
+
+0.06
+
+    - fix NAME for MooseX::AttributeFilter::Trait::Attribute::Role docs
+
+0.05
+
+    - better docs
+
+0.04
+
+    - tests for filtered attributes in roles
+    - tests for meta
+    - documentation for meta
+    - ily
+
+0.03
+
+    - bump required Moose version even more D:
+
+0.02
+
+    - bump required Moose version
+
+0.01
+
+    - original version

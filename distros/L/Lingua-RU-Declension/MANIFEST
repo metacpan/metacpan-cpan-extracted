@@ -8,6 +8,7 @@ Makefile.PL
 bin/mkflash.pl
 bin/mksent.pl
 dist.ini
+gen_flash.csv
 lib/Lingua/RU/Declension.pm
 share/adjectives_utf8.csv
 share/nouns_utf8.csv

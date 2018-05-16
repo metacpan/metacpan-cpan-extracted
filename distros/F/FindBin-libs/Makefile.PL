@@ -12,37 +12,8 @@ use Cwd             qw( getcwd      );
 use File::Basename  qw( basename    );
 use List::Util      qw( first       );
 
-my $version = version->parse( '2.19.0' )->numify;
+my $version = version->parse( '2.19.2' )->numify;
 my $mm_v    = ExtUtils::MakeMaker->VERSION;
-
-#my @merge_spec
-#= do
-#{
-#    if( $mm_v < 6.46 )
-#    {
-#        ()
-#    }
-#    else
-#    {
-#        META_MERGE =>
-#        {
-#            'meta-spec' =>
-#            {
-#                version => 2
-#            }
-#
-#            dynamic_config => 1,
-#
-#            configure_requires =>
-#            {
-#                qw
-#                (
-#                    Module::FromPerlVer 0.004,
-#                )
-#            },
-#        }
-#    }
-#};
 
 my @config_requires
 = $mm_v < 6.52
@@ -59,9 +30,9 @@ my @config_requires
                     )
                 }
                 (
-                    [ qw( Cwd                             3.73 ) ],
-                    [ qw( File::Copy::Recursive::Reduced  0.6  ) ],
-                    [ qw( List::Util                      1.46 ) ],
+                    [ qw( Cwd                             v3.73 ) ],
+                    [ qw( File::Copy::Recursive::Reduced  v0.6  ) ],
+                    [ qw( List::Util                      v1.46 ) ],
                 )
             ),
             (
@@ -97,10 +68,10 @@ WriteMakefile
         # are unlikely to cause pain.
 
         'Cwd'
-        => version->parse( '3.73'  )->numify,
+        => version->parse( 'v3.73'  )->numify,
 
         'File::Copy::Recursive::Reduced'
-        => version->parse( '0.002' )->numify,
+        => version->parse( 'v0.002' )->numify,
 
 		qw
         (
@@ -124,11 +95,18 @@ WriteMakefile
 my $perl_v
 = eval
 {
-    ref $^V
-    ? version->parse( $^V )->numify
-    : sprintf '%vd' => $^V
+    my $text    = sprintf '%vd' => $^V;
+
+    print "\n# Parsing perl version: '$text'\n";
+
+    version->parse( $text )->numify
 }
 or die "Un-parsable perl version: '$^V'";
+
+print "\n# Running perl version: '$perl_v'\n";
+
+my @v_dirz = glob "./version/*"
+or die "Unable to locate version dirs: './version/*'";
 
 my $found
 = first
@@ -156,25 +134,26 @@ map
     }
     else
     {
-        print "Ignoring Un-parsable version: '$base'";
+        print "Ignoring Un-parsable version: '$base' ($_), $@";
         ()
     }
 }
-glob "version/*"
+@v_dirz
 or
 die "Unable to install with Perl version '$perl_v'";
 
-require File::Copy::Recursive::Reduced;
+my $src_d   = $found->[ -1 ];
 
-my $src_d   = $found->[1];
-
-print "\n# Version directory: $src_d ($perl_v).\n";
+print "\n# Version directory: $src_d <= $perl_v.\n";
 
 # don't validate the count, just give up
-# if it fails entirely. not that the behavior
-# is returning undef on failure, but in this
-# case we know there should be files copied so
-# any false value is fatal.
+# if it fails entirely.
+#
+# note that the behavior is returning undef on failure, 
+# but in this case we know there should be files copied 
+# so any false value is fatal.
+
+require File::Copy::Recursive::Reduced;
 
 File::Copy::Recursive::Reduced::dircopy( $src_d => '.' )
 or die "Failed copy from $src_d.\n";

@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2017-05-06 00:00:00 +0000 to present.
+Changes from 2017-05-13 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2018-05-06 13:59:12 +0000
+version 0.017 at 2018-05-13 13:24:54 +0000
 ------------------------------------------
+
+  Change: d452db260b0613a31951ca0a3a1b3c70e1227cd7
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-05-13 16:24:01 +0000
+
+    Merge pull request #12 from Madskill/speed_up_accessors
+
+    cached accessors, added set_accessors and init_accessors 
+
+  Change: 2ab96b10ef160c8e77d695b9d5f556ba2964c9fd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-13 16:20:09 +0000
+
+    cached accessors, added set_accessors and init_accessors 
+
+------------------------------------------
+version 0.016 at 2018-05-06 13:59:41 +0000
+------------------------------------------
+
+  Change: c8b3245fadb2b1591738ccbaee68999ea8535313
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-06 16:59:41 +0000
+
+    Version 0.016 
 
   Change: 85ea071398b48f2ec3c8bb46ee3727b1ca2e121e
   Author: Igor <igor-sverdlov@mail.ru>
@@ -57,5 +81,5 @@ version 0.015 at 2017-07-30 22:04:38 +0000
     speed up accessors and post_run 
 
 =================================================
-Plus 14 releases after 2017-05-06 00:00:00 +0000.
+Plus 14 releases after 2017-05-13 00:00:00 +0000.
 =================================================

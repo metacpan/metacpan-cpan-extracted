@@ -1,5 +1,8 @@
 Revision history for PGObject-Util-AsyncPool
 
+0.03	2018-05-11
+	Fixed a rare double free on exit crash
+
 0.02	2018-04-11
 	Fixed packaging bug regarding test dependency on Test::Exception
 	Added additional precondition checks to constructor

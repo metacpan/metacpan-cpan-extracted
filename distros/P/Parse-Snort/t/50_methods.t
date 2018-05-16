@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 
 use Parse::Snort;
+use Scalar::Util qw(refaddr);
 
 my $rule
     = q{action proto src sport -> dst dport (msg:"the message";sid:42;gid:666;content:foo;rev:1;content:bar;metadata:my metadata;classtype:some class;priority:high;)};
@@ -39,5 +40,9 @@ foreach (sort keys %expect) {
 }
 
 is($object->state, 1, "active rule");
+
+my $clone = $object->clone();
+is_deeply($clone,$object,"clone is a proper deep copy");
+isnt(refaddr($object),refaddr($clone),"original and clone are not the same ref");
 
 done_testing;

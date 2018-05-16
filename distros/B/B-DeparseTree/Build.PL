@@ -39,7 +39,7 @@ my $builder = Module::Build->new(
 	'Text::Diff' => 0,
     },
     requires => {
-	'perl'                              => '5.018000',
+	'perl'                              => '5.016000',
         'rlib'                              => '0.02',
         'version'                           => 0,
     },

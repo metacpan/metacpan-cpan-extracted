@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2017-03-21 00:00:00 +0000 to present.
+Changes from 2017-05-11 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.017 at 2018-03-21 22:10:48 +0000
+version 0.018 at 2018-05-11 01:06:00 +0000
+------------------------------------------
+
+  Change: 65fbefef82925f555b5659381e39ae89c9bb5094
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-11 03:05:53 +0000
+
+    Add Imager integration to G::R::Texture 
+
+  Change: a0eed75cfc3dc50eb43b4be972340cbd9a7976fa
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-11 03:01:15 +0000
+
+    Refactor Graphics::Raylib::{Shape::Bitmap->Texture} 
+
+  Change: d6b77703af8f434cfb3d342b3879c5d8a6444603
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-05-11 03:01:11 +0000
+
+    Bump to newest raylib version 
+
+------------------------------------------
+version 0.017 at 2018-03-21 22:07:22 +0000
 ------------------------------------------
 
   Change: e82253d61ef56ea2c9b9d0d250131404dcf8d57d
@@ -359,5 +381,5 @@ version 0.003 at 2017-10-04 14:27:50 +0000
     Bigger bitmaps ran into size limits before. 
 
 ================================================
-Plus 2 releases after 2017-03-21 00:00:00 +0000.
+Plus 2 releases after 2017-05-11 00:00:00 +0000.
 ================================================

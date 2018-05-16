@@ -1,5 +1,5 @@
-App-Scheme79asm version 0.005001
-================================
+App-Scheme79asm version 1.000
+=============================
 
 SIMPLE is a LISP processor defined in the 1979
 B<Design of LISP-Based Processors> paper by Steele and Sussman.

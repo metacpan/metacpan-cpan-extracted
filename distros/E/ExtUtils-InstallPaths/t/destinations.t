@@ -1,14 +1,21 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 105;
+use Test::More tests => 111;
 
 use Config;
-use File::Temp ();
+use File::Temp 'tempdir';
 
 use File::Spec::Functions 0.83 ':ALL';
-my $tmp = File::Temp::tempdir('EIP-XXXXXXXX', CLEANUP => 1, DIR => tmpdir);
+
+my $tmp = tempdir('EIP-XXXXXXXX', CLEANUP => 1, DIR => tmpdir);
+my $source = tempdir('EIP-XXXXXXXX', CLEANUP => 1, DIR => tmpdir);
+chdir $source;
+mkdir 'blib';
+for my $subdir (qw/lib arch bin script man1 man3/) {
+	mkdir catdir('blib', $subdir);
+}
 
 use ExtUtils::Config;
 use ExtUtils::InstallPaths;
@@ -144,6 +151,20 @@ isa_ok(get_ei, 'ExtUtils::InstallPaths');
 		catdir('blib', 'bin')     => catdir($install_base, 'bin'),
 		catdir('blib', 'script')  => catdir($install_base, 'bin'),
 	}, 'install_base');
+
+	test_install_map($ei, {
+		read                       => '',
+		write                      => catfile($ei->install_destination('arch'), qw/auto ExtUtils InstallPaths .packlist/),
+		catdir('blib', 'lib')     => catdir($install_base, 'lib', 'perl5'),
+		catdir('blib', 'arch')    => catdir($install_base, 'lib', 'perl5', $Config{archname}),
+		catdir('blib', 'bin')     => catdir($install_base, 'bin'),
+		catdir('blib', 'script')  => catdir($install_base, 'bin'),
+	}, 'install_base', {
+		lib    => catdir(qw/blib lib/),
+		arch   => catdir(qw/blib arch/),
+		bin    => catdir(qw/blib bin/),
+		script => catdir(qw/blib script/),
+	});
 }
 
 
@@ -273,11 +294,11 @@ sub test_install_destinations {
 }
 
 sub test_install_map {
-	my ($paths, $expect, $case) = @_;
+	my ($paths, $expect, $case, @args) = @_;
 
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	my $map = $paths->install_map;
+	my $map = $paths->install_map(@args);
 	while(my ($type, $expect) = each %$expect) {
 		is($map->{$type}, $expect, "$type destination for $case");
 	}

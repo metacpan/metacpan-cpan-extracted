@@ -1,0 +1,5 @@
+name = "MooseX-AttributeFilter"
+authority="cpan:KITTEN"
+module_maker="ModuleBuildTiny"
+no_github_issues=true
+

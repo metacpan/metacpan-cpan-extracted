@@ -36,12 +36,12 @@ my $result = eval { $sub->({}) };
 my $at = $@;
 print STDERR Data::Dumper->Dump( [$at], [qw(at)] ) if $ENV{DEBUG};
 
-TODO: { 
+TODO: {
 	local $TODO = "Should this return undef?";
-	
+
 	ok( ! defined $at, "\$@ is undef" );
 	}
-	
+
 	is( $result, 0, "Satisfied none" );
 }
 
@@ -51,10 +51,10 @@ TODO: {
 # Will it get past something that returns die with a reference?
 # It shouldn't
 {
-my $undef_sub = sub { 
-	die { 
-		message => "Validation error!", 
-		handler => "undef_sub" 
+my $undef_sub = sub {
+	die {
+		message => "Validation error!",
+		handler => "undef_sub"
 		}
 	};
 my $pass_sub  = sub { 1 };
@@ -74,18 +74,18 @@ ok( exists $at->{handler}, "Key 'handler' exists in die ref" );
 
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Two selectors that will work with the right input data
 {
 
-my $cat_selector = sub { 
+my $cat_selector = sub {
 	#print STDERR "\nRunning cat selector\n" if $ENV{DEBUG};
-	return unless $_[0]->{animal} eq 'cat'; return 1 
+	return unless $_[0]->{animal} eq 'cat'; return 1
 	};
 
-my $dog_selector = sub { 
+my $dog_selector = sub {
 	#print STDERR "\nRunning dog selector\n" if $ENV{DEBUG};
-	return unless $_[0]->{animal} eq 'dog'; return 1 
+	return unless $_[0]->{animal} eq 'dog'; return 1
 	};
 
 my $sub = $bucket->__compose_pass_or_skip( $cat_selector, $dog_selector );
@@ -112,13 +112,13 @@ foreach my $animal ( qw(llama camel) )
 }
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Two selectors with sub conditions
 {
 
-my $cat_selector = sub { 
+my $cat_selector = sub {
 	print STDERR "Running cat selector with $_[0]->{animal}\n" if $ENV{DEBUG};
-	return unless $_[0]->{animal} eq 'cat'; print "Still here!\n"; return 1 
+	return unless $_[0]->{animal} eq 'cat'; print "Still here!\n"; return 1
 	};
 
 my $cat_sound = sub {
@@ -128,14 +128,14 @@ my $cat_sound = sub {
 		handler => 'cat_sound',
 		} unless $_[0]->{sound} eq 'meow';
 	# print STDERR "Still here!\n";
-	return 1 
+	return 1
 	};
 
 my $cat_composed = $bucket->__compose_pass_or_stop( $cat_selector, $cat_sound );
-	
-my $dog_selector = sub { 
+
+my $dog_selector = sub {
 	print STDERR "Running dog selector with $_[0]->{animal}\n" if $ENV{DEBUG};
-	return unless $_[0]->{animal} eq 'dog'; return 1 
+	return unless $_[0]->{animal} eq 'dog'; return 1
 	};
 
 my $dog_sound = sub {
@@ -143,8 +143,8 @@ my $dog_sound = sub {
 	die {
 		message => "Dogs don't go '$_[0]->{sound}'",
 		handler => 'dog_sound',
-		} unless $_[0]->{sound} eq 'bark'; 
-	return 1 
+		} unless $_[0]->{sound} eq 'bark';
+	return 1
 	};
 
 my $dog_composed = $bucket->__compose_pass_or_stop( $dog_selector, $dog_sound );
@@ -157,8 +157,8 @@ foreach my $animal ( qw(dog cat dog) )
 	print STDERR "\n-----------------\nTrying animal ==> $animal, sound => meow\n" if $ENV{DEBUG};
 	my $result = eval { $sub->( { animal => $animal, sound => 'meow' } ) };
 	#print STDERR Data::Dumper->Dump( [$result], [qw(result)] );
-	is( !! $result, 'cat' eq $animal, 
-		"Animal '$animal' with 'meow' " .  
+	is( !! $result, 'cat' eq $animal,
+		"Animal '$animal' with 'meow' " .
 			('cat' eq $animal ? "passed" : "failed")
 			);
 	}

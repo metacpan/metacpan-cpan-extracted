@@ -25,6 +25,7 @@ use SMB::Tree;
 use SMB::DCERPC;
 use SMB::v2::Command::Negotiate;
 use SMB::v2::Command::Create;
+use SMB::v2::Command::QueryInfo;
 use SMB::v2::Command::QueryDirectory;
 use SMB::v2::Command::Ioctl;
 
@@ -136,7 +137,15 @@ sub on_command ($$$) {
 		elsif ($command->is('Ioctl') && $command->function == SMB::v2::Command::Ioctl::FSCTL_DFS_GET_REFERRALS) {
 			$error = SMB::STATUS_NOT_FOUND;
 		}
+		elsif ($command->is('Ioctl') && $command->function == SMB::v2::Command::Ioctl::FSCTL_PIPE_WAIT) {
+			$error = SMB::STATUS_OBJECT_NAME_NOT_FOUND;
+		}
 		elsif ($fid) {
+			if ($command->header->is_chained) {
+				$fid = $connection->chain_fid if $connection->chain_fid && $command->is_fid_unset($fid);
+			} else {
+				$connection->chain_fid(undef);
+			}
 			$openfile = $connection->{openfiles}{$fid->[0], $fid->[1]}
 				or $error = SMB::STATUS_FILE_CLOSED;
 			$command->openfile($openfile);
@@ -190,6 +199,7 @@ sub on_command ($$$) {
 					$openfile->{dcerpc} = SMB::DCERPC->new(name => $file->name)
 						if $file->is_svc;
 					$fid = [ ++$connection->{last_fid}, 0 ];
+					$connection->chain_fid($fid) if $command->has_next_in_chain;
 					$connection->{openfiles}{$fid->[0], $fid->[1]} = $openfile;
 					$command->fid($fid);
 					$command->openfile($openfile);
@@ -208,6 +218,9 @@ sub on_command ($$$) {
 			}
 			$openfile->close;
 			delete $connection->{openfiles}{$fid->[0], $fid->[1]};
+		}
+		elsif ($command->is('QueryInfo')) {
+			$command->prepare_info(quiet => $self->quiet);
 		}
 		elsif ($command->is('SetInfo')) {
 			my $rename_info = $command->requested_rename_info;
@@ -232,6 +245,7 @@ sub on_command ($$$) {
 					offset => $command->{offset},
 					minlen => $command->{minimum_count},
 					remain => $command->{remaining_bytes},
+					quiet  => $self->quiet,
 				);
 				$error = SMB::STATUS_END_OF_FILE unless defined $command->{buffer};
 			}
@@ -263,10 +277,12 @@ sub on_command ($$$) {
 				pattern => $command->file_pattern,
 				start_idx => $start_idx,
 				reopen => $command->is_reopen,
+				quiet => $self->quiet,
 			);
 			$error = SMB::STATUS_INVALID_PARAMETER unless defined $command->{files};
 		}
 		elsif ($command->is('ChangeNotify')) {
+			$command->header->aid(++$connection->{last_aid});
 			$error = SMB::STATUS_PENDING;
 		}
 		elsif ($command->is('Cancel')) {
@@ -295,7 +311,9 @@ sub run ($) {
 				my $connection = $self->add_connection(
 					$client_socket, ++$self->{client_id},
 					trees     => [],
+					last_aid  => 0,
 					last_fid  => 0,
+					chain_fid => undef,
 					openfiles => {},
 				);
 				unless ($connection) {

@@ -1,0 +1,30 @@
+---
+abstract: 'validates links in HTML emails sent by Email::Stuffer>send_or_die()'
+author:
+  - 'binary.com <BINARY@cpan.org>'
+build_requires:
+  Email::Sender::Transport::Test: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Builder::Tester: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Stuffer-TestLinks
+requires:
+  Class::Method::Modifiers: '0'
+  Email::Stuffer: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '6.00'
+  Test::Most: '0'
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.66'

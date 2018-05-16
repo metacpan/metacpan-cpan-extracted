@@ -91,6 +91,13 @@ Run Time State Settings ( modify at your own risk!! )
   result_map: hash ref that contains the inbound result objects
   jobs: anonymous hash, used to keep our results that never hit IO
 
+Success Range for parsing json
+
+As of version 1.017 a range of codes can now be set to validate if the response should be parsed as json
+
+ code_parse_start: 199 # if the response code is greater than
+ code_parse_end: 300 # if the response code is less than
+
 =cut
 
 has agent=>(
@@ -129,7 +136,10 @@ has json =>(
   isa=>Object,
   required=>1,
   lazy=>1,
-  default=>sub { JSON->new->allow_nonref->utf8 },
+  default=>sub { 
+    my $json=JSON->new->allow_nonref(&JSON::true)->utf8->relaxed(&JSON::true);
+    return $json;
+  },
 );
 
 has pending=>(
@@ -146,6 +156,18 @@ has result_map=>(
   required=>1,
   default=>sub { {} },
   lazy=>1,
+);
+
+has code_parse_start=>(
+  is=>'rw',
+  isa=>Int,
+  default=>199
+);
+
+has code_parse_end=>(
+  is=>'rw',
+  isa=>Int,
+  default=>300
 );
 
 =head1 OO Methods
@@ -186,7 +208,7 @@ sub cb {
 
 =item * my $result=$self->parse_response($request,$response);
 
-Returns a Data::Result object, if true it contains the parsed result object, if false it contains why it failed.  If you are doing anything other than parsing json on a 200 response you will need to overload this method.
+Returns a Data::Result object, if true it contains the parsed result object, if false it contains why it failed.  If you are doing anything other than parsing json on a 200 to 299 response you will need to overload this method.
 
 =cut
 
@@ -195,8 +217,8 @@ sub parse_response {
 
   my $content=$response->decoded_content;
   $content='' unless defined($content);
-  if($response->is_success) {
-    if(length($content)!=0 and $content=~ /^\s*[\[\{]/s) {
+  if($response->code >$self->code_parse_start && $response->code <$self->code_parse_end) {
+    if(length($content)!=0 and $content=~ /^\s*[\[\{\"]/s) {
       my $data=eval {$self->json->decode($content)};
       if($@) {
         return $self->new_false("Code: [".$response->code."] JSON Decode error [$@] Content:  $content");
@@ -459,6 +481,23 @@ sub AUTOLOAD {
 
   $self->is_blocking(0);
   return $result;
+}
+
+sub can {
+  my ($self,$method)=@_;
+  my $sub=$self->SUPER::can($method);
+
+  return $sub if $sub;
+
+  my $que_method="que_$method";
+  return undef unless $self->SUPER::can($que_method);
+
+  $sub=sub {
+    $AUTOLOAD=$method;
+    $self->AUTOLOAD(@_);
+  };
+
+  return $sub;
 }
 
 sub DEMOLISH { }

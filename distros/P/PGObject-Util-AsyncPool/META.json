@@ -4,7 +4,7 @@
       "Chris Travers <chris.travers@adjust.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "freebsd"
    ],
@@ -39,6 +39,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.03"
 }

@@ -15,7 +15,7 @@ name: Mojo-SAML
 provides:
   Mojo::SAML:
     file: lib/Mojo/SAML.pm
-    version: '0.02'
+    version: '0.04'
   Mojo::SAML::Document:
     file: lib/Mojo/SAML/Document.pm
   Mojo::SAML::Document::AssertionConsumerService:
@@ -56,11 +56,11 @@ requires:
   Crypt::OpenSSL::X509: '0'
   Data::GUID: '0'
   Digest::SHA: '0'
-  Mojolicious: '7.77'
+  Mojolicious: '7.78'
   XML::CanonicalizeXML: '0'
 resources:
   bugtracker: http://github.com/jberger/Mojo-SAML/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-SAML
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

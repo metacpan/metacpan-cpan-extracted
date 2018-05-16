@@ -117,4 +117,4 @@ is( $st, -1, 'pwrite negative len' );
 $st = File::ReplaceBytes::pwrite( $fh, "cat", 0, -1 );
 is( $st, -1, 'pwrite negative offset' );
 
-plan tests => 19;
+done_testing(19);

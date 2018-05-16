@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree::Forest;
 # ABSTRACT: Collection of (bootstrap) trees
-$Bio::MUST::Core::Tree::Forest::VERSION = '0.181180';
+$Bio::MUST::Core::Tree::Forest::VERSION = '0.181310';
 use Moose;
 use namespace::autoclean;
 
@@ -81,7 +81,7 @@ Bio::MUST::Core::Tree::Forest - Collection of (bootstrap) trees
 
 =head1 VERSION
 
-version 0.181180
+version 0.181310
 
 =head1 SYNOPSIS
 

@@ -19,7 +19,7 @@ name: Types-Bool
 provides:
   Types::Bool:
     file: lib/Types/Bool.pm
-    version: '2.98009'
+    version: '2.98011'
 requires:
   Exporter: '0'
   Scalar::Util: '0'
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Types-Bool/issues
   homepage: https://github.com/aferreira/cpan-Types-Bool
   repository: https://github.com/aferreira/cpan-Types-Bool.git
-version: '2.98009'
+version: '2.98011'
 x_serialization_backend: 'YAML::Tiny version 1.70'

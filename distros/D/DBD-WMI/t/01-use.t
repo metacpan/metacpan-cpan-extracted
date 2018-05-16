@@ -3,11 +3,17 @@ use strict;
 use Test::More;
 use DBI;
 
-if ($^O !~ /Win32/i) {
-    plan skip_all => "DBD::WMI only works on Win32 so far";
-} else {
-    plan tests => 1;
+my $have_win32_ole = eval {
+    require Win32::OLE;
+    1;
 };
 
-my $dbh = DBI->connect('dbi:WMI:');
-isa_ok $dbh, 'DBI::db';
+plan tests => 1;
+
+if (! $have_win32_ole) {
+    pass "(not applicable on this system)";
+} else {
+
+    my $dbh = DBI->connect('dbi:WMI:');
+    isa_ok $dbh, 'DBI::db';
+}

@@ -1,5 +1,11 @@
 Revision history for AnyEvent-PgRecvlogical
 
+1.01      2018-05-13 08:07:41-04:00 America/New_York
+    - fix dependencies to move Dist::Zilla::App::Command::cover to develop phase
+
+1.0       2018-05-12 09:49:29-04:00 America/New_York
+    - add pause/unpause methods to provide so flow control to end users
+
 0.004     2018-01-28 18:49:54-05:00 America/New_York
     - explicit dependency on Promises 0.99; <= 0.94 won't work
 

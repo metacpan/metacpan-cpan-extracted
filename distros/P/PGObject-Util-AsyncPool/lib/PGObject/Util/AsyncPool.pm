@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Carp;
 
+use Scalar::Util qw(weaken);
+
 use DBD::Pg ':async';
 
 =head1 NAME
@@ -13,11 +15,11 @@ PGObject::Util::AsyncPool - An Async Connection Pooler for PGObject
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -167,6 +169,7 @@ sub _finish {
     eval { $cnx->{conn}->pg_result };
     $cnx->{active} = 0;
     $cnx->{callback}->($cnx->{sth});
+    weaken $cnx->{sth};
 }
 
 

@@ -689,14 +689,16 @@ sub oxd_introspectAccessToken {
 
 sub oxd_delete {
 	
+	setup_config('', '', '');
+	
 	my $ophost_ui = $cgi->param("ophost");
 	
-	use TryCatch;
+	use Try::Tiny;
 	try {
-		#my $protection_access_token = getClientToken_authentication($ophost_ui, $client_id, $client_secret);#Test2
+		#my $protection_access_token = getClientToken_authentication($ophost_ui, $client_id, $client_secret);
 		$oxd_remove = new OxdRemove();
 		$oxd_remove->setRequestOxdId($oxd_id);
-		#$oxd_remove->setRequestProtectionAccessToken($protection_access_token);#Test2
+		#$oxd_remove->setRequestProtectionAccessToken($protection_access_token);
 		$oxd_remove->request();
 	} catch {
 		print "Error!"
@@ -707,19 +709,9 @@ sub oxd_delete {
 	# $oxd_remove->setRequestProtectionAccessToken($protection_access_token);
 	# $oxd_remove->request();
 	
-	
-	$ophost_ui = '';
-	my $is_dynamic_op = '';
-	my $auth_redirect_uri_ui = '';
-	my $post_logout_uri_ui = '';
-	my $connection_type = '';
-	my $oxd_port_ui = '';
-	my $web_url = '';
-	my $clientName = '';
-	
-	update_config_file($ophost_ui, $is_dynamic_op, $auth_redirect_uri_ui, $post_logout_uri_ui, $connection_type, $oxd_port_ui, $web_url, $clientName);
-	setup_config('', '', '');
+	update_config_file('', '', '', '', '', '', '', '');
 	$session->clear(["clientId_visible", "client_id", "client_secret"]);
+	
 	print_html_form('Client removed successfully.');
 }
 

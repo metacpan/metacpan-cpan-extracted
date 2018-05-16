@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 4.2
+version 4.3
 
 # SYNOPSIS
 
@@ -15,6 +15,7 @@ parsed out.
     use Parse::Syslog::Line qw(parse_syslog_line);
 
     $Parse::Syslog::Line::DateTimeCreate = 1;
+    $Parse::Syslog::Line::AutoDetectJSON = 1;
 
     my $href = parse_syslog_line( $msg );
     #
@@ -42,6 +43,7 @@ parsed out.
     #       message         => 'program[pid]: the rest of the message',
     #       message_raw     => 'The message as it was passed',
     #       ntp             => 'ok',           # Only set for Cisco messages
+    #       SDATA           => { ... },  # Decoded JSON or K/V Pairs in the message
     # };
     ...
 
@@ -143,6 +145,23 @@ in your wanted format.
 Default is `%0.6f`, or microsecond resolution.  This variable only comes into
 play when the syslog date string contains a high resolution timestamp.  It
 defaults to using microsecond resolution.
+
+## AutoDetectJSON
+
+Default is false.  If true, we'll autodetect the presence of JSON in the syslog
+message and use [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) to decode it.  The detection/decoding is
+simple.  If a '{' is detected, everything until the end of the message is
+assumed to be JSON.  The decoded JSON will be added to the `SDATA` field.
+
+    $Parse::Syslog::Line::AutoDetectJSON = 1;
+
+## AutoDetectKeyValues
+
+Default is false.  If true, we'll autodetect the presence of Splunk style
+key/value pairds in the message stream.  That format is `k1=v1, k2=v2`.
+Resulting K/V pairs will be added to the `SDATA` field.
+
+    $Parse::Syslog::Line::AutoDetectKeyValues = 1;
 
 ## PruneRaw
 
@@ -264,7 +283,7 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/Parse-Syslog-Line](http://metacpan.org/release/Parse-Syslog-Line)
+    [https://metacpan.org/release/Parse-Syslog-Line](https://metacpan.org/release/Parse-Syslog-Line)
 
 - RT: CPAN's Bug Tracker
 

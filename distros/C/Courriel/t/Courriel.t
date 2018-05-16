@@ -4,10 +4,12 @@ use warnings;
 use Test::Differences;
 use Test::Fatal;
 use Test::More 0.88;
+use Test::Warnings;
 
 use Courriel;
 use Courriel::Builder;
 use Courriel::Helpers;
+use Email::Address::XS;
 use Encode qw( encode is_utf8 );
 use Scalar::Util qw( blessed );
 
@@ -191,7 +193,7 @@ EOF
             minute    => 22,
             second    => 22,
             time_zone => '-0500',
-            )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
+        )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
         'email datetime is parsed from Date header correctly'
     );
 
@@ -250,7 +252,7 @@ EOF
             minute    => 24,
             second    => 44,
             time_zone => '-0500',
-            )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
+        )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
         'email datetime is parsed from Received header correctly'
     );
 }
@@ -281,7 +283,7 @@ EOF
             minute    => 22,
             second    => 23,
             time_zone => '-0500',
-            )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
+        )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
         'email datetime is parsed from Resent-Date header correctly'
     );
 }
@@ -483,7 +485,7 @@ EOF
             minute    => 1,
             second    => 2,
             time_zone => '-0500',
-            )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
+        )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
         'got creation_datetime from content disposition'
     );
 
@@ -498,7 +500,7 @@ EOF
             minute    => 1,
             second    => 3,
             time_zone => '-0500',
-            )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
+        )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
         'got modification_datetime from content disposition'
     );
 
@@ -512,7 +514,7 @@ EOF
             minute    => 1,
             second    => 4,
             time_zone => '-0500',
-            )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
+        )->set_time_zone('UTC')->strftime('%{datetime} %Z'),
         'got read_datetime from content disposition'
     );
 }
@@ -869,8 +871,12 @@ EOF
     my $email = build_email(
         subject('Test Subject'),
         from('autarch@urth.org'),
-        to( 'autarch@urth.org', Email::Address->parse('bob@example.com') ),
-        cc( 'jane@example.com', Email::Address->parse('joe@example.com') ),
+        to(
+            'autarch@urth.org', Email::Address::XS->parse('bob@example.com')
+        ),
+        cc(
+            'jane@example.com', Email::Address::XS->parse('joe@example.com')
+        ),
         header( 'X-Foo' => 42 ),
         header( 'X-Bar' => 84 ),
         plain_body('The body of the message')

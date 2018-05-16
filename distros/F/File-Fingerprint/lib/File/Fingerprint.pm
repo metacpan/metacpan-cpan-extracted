@@ -6,7 +6,7 @@ no warnings;
 
 use Carp;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 =encoding utf8
 

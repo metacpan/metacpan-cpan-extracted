@@ -1,3 +1,20 @@
+1.25 Fri May 11 19:58:58 CEST 2018
+ - Applied several pull requests by tinita
+ - Support trailing comments (PR#189, PR#190, PR#191)
+ - Remove unused code (PR#192)
+ - Use Test::Deep to actually test correctly for class names (PR#193)
+ - Fix loading of mapping key which starts with `= ` (PR#194)
+ - Fix loading strings with multiple spaces (PR#172)
+ - Allow more characters in anchor name (PR#196)
+ - Add $YAML::LoadBlessed for disabling loading objects (PR#197)
+ - Applied several pull requests by tinita
+ - Disable test with long string under certain conditions (PR#201)
+ - Quote scalar if it equals '=' (PR#202)
+ - Multiple regexp roundtrip does not grow (PR#203)
+ - Add support for compact nested block sequences (PR#204)
+ - Support reverse order of block scalar indicators (PR#205)
+ - Support nested mappings in sequences (PR#206)
+
 1.24 Mon Oct 30 20:31:53 CET 2017
  - Fix $LoadCode (PR#180, PR#181, PR#182 by @mohawk2++)
 
@@ -8,59 +25,54 @@
  - Add $YAML::Numify @perlpunk++
 
 1.21 Fri Dec 23 21:19:15 CET 2016
- - Apply PR/171 (fixes issue/109) @perlpunk++
- - No more "used only once" warnings for $YAML::Indent etc.
- - Apply PR/170 (fixes issue/131) hiratara@cpan.org++
+ - No more "used only once" warnings for $YAML::Indent etc. PR#171,
+   Issue#109 @perlpunk++
  - Empty mapping value at the end resolves to null (was becoming empty
-   string)
- - Apply PR/169 (PR/119) patrick.allen.higgins@gmail.com++
- - Output key in warning when duplicate key was found
- - Apply PR/157 and PR/168 (@lameventanas++ @perlpunk++)
- - Allow reading and writing to IO::Handle
+   string) PR#170, Issue#131 hiratara@cpan.org++
+ - Output key in warning when duplicate key was found PR#169, PR#119
+   patrick.allen.higgins@gmail.com++
+ - Allow reading and writing to IO::Handle PR#157, PR#168 @lameventanas++
+   @perlpunk++
 
 1.20 Fri Dec  2 13:20:33 PST 2016
- - Apply and amend PR/146 (quoted map keys) @preaction++
+ - Apply and amend PR#146 (quoted map keys) @preaction++
  - B::Deparse is loaded at runtime now
- - New Feature $YAML::Preserve (Apply PR/9 @fmenabe++)
+ - New Feature $YAML::Preserve (Apply PR#9 @fmenabe++)
 
 1.19 Fri Nov 18 19:46:44 CET 2016
- - Apply PR/164 pod (link to YAML::Shell)
- - Apply PR/151 Fix infinite loop for aliases without a name @bubaflub++
- - Apply PR/142 Improve error messages @werekraken++
- - Apply PR/162 Improve error messages
- - Apply PR/163 Trailing spaces after inline seq/map work now
- - Apply PR/154 Add test case for trailing comments @Varadinsky++
+ - Apply PR#164 pod (link to YAML::Shell)
+ - Apply PR#151 Fix infinite loop for aliases without a name @bubaflub++
+ - Apply PR#142 Improve error messages @werekraken++
+ - Apply PR#162 Improve error messages
+ - Apply PR#163 Trailing spaces after inline seq/map work now
+ - Apply PR#154 Add test case for trailing comments @Varadinsky++
 
 1.18 Fri Jul  8 14:52:26 UTC 2016
- - Apply PR/161 @perlpunk++
+ - List Test::More as a prereq PR#161 @perlpunk++
 
 1.17 Tue Jul  5 20:20:55 UTC 2016
  - Use Mo 0.40
 
 1.16 Sun Jul  3 10:53:06 PDT 2016
- - Apply PR/158 by @bgruening++
- - Fix VERSION issue
+ - Fix VERSION issue. PR#158 by @bgruening++
 
 1.15 Sat Apr 18 17:03:09 CEST 2015
- - Fix Issue 149.
- - Don't require newlines at end of YAML.
+ - Don't require newlines at end of YAML. Issue#149
 
 1.14 Sat Jan 17 15:32:18 PST 2015
- - Apply PR/145 from @kentnl++
- - Support for QuoteNumericStrings Global Setting
+ - Support for QuoteNumericStrings Global Setting. PR#145 @kentnl++
 
 1.13 Sat Oct 11 18:05:45 CEST 2014
- - Apply PR/140 from @nfg++
- - Disable some warnings in YAML::Any
+ - Disable some warnings in YAML::Any. PR#140 @nfg++
 
 1.12 Mon Sep 22 08:24:43 PDT 2014
  - Fix https://rt.cpan.org/Ticket/Display.html?id=97870
 
 1.11 Fri Aug 29 20:08:20 PDT 2014
- - Apply PR/139. @ehuelsmann++
+ - Remove unreachable code. PR#139. @ehuelsmann++
 
 1.10 Thu Aug 28 22:53:26 PDT 2014
- - Apply PR/138. @ehuelsmann++
+ - Improve error message about indendation. PR#138. @ehuelsmann++
 
 1.09 Tue Aug 19 16:41:13 PDT 2014
  - Replace tabs with spaces
@@ -69,7 +81,7 @@
  - Dep on Test::YAML 1.05
 
 1.07 Mon Aug 18 08:40:01 PDT 2014
- - Apply PR/8 from shlomif++. Add doc examples for YAML::Any.
+ - Add doc examples for YAML::Any. PR#8 from shlomif++
 
 1.06 Sat Aug 16 16:51:08 PDT 2014
  - Change testdir to t
@@ -343,7 +355,7 @@
  - YAC-012. Handled all Throwaway Issues. Blank lines and comments can be
    used anywhere, and they will work appropriately.
  - Converted Changes file (this file) to use YAML
- - AC-016. Support "assumed header" (---
+ - AC-016. Support "assumed header" (--- #YAML:1.0) if no header.
  - Added $YAML::UseBlock option
  - YAC-015. Support Top Level Inline nodes
  - Added testing for Store to test suite. (Now there's no excuse not to
@@ -355,7 +367,7 @@
  - Proofed documentation
  - Fix ysh doc. Document flags in the pod.
  - Move test code out of YAML.pm and into testlib
- - Change directives to use
+ - Change directives to use #
  - Parse regexes
  - YAC-017. Change !perl/ syntax
  - Emit regexes

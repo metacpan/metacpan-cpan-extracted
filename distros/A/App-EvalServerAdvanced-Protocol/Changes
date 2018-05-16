@@ -1,3 +1,6 @@
+0.105 - May 10th 2018
+ * Fix bug with partial/large packets.
+
 0.104 - June 3rd 2017
  * More encoding rework.  use ->get_contents instead of decoding ourselves.
 

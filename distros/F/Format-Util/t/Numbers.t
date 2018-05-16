@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::NoWarnings;
 
-use Format::Util::Numbers qw(roundnear roundcommon commas to_monetary_number_format formatnumber financialrounding);
+use Format::Util::Numbers qw(roundnear roundcommon commas to_monetary_number_format formatnumber financialrounding get_min_unit);
 
 subtest 'roundnear' => sub {
     is(roundnear(0,    345.56789), 345.56789, 'No rounding is correct.');
@@ -111,6 +111,7 @@ subtest 'financialrounding' => sub {
     cmp_ok financialrounding('amount', 'USD', 10.000001),        '==', 10,        'USD 10.000001 -> 10.00';
     cmp_ok financialrounding('amount', 'EUR', 10.000001),        '==', 10,        'EUR 10.000001 -> 10.00';
     cmp_ok financialrounding('amount', 'JPY', 10.000001),        '==', 10,        'JPY 10.000001 -> 10.00';
+    cmp_ok financialrounding('amount', 'AUD', 10.000001),        '==', 10,        'AUD 10.000001 -> 10.00';
     cmp_ok financialrounding('amount', 'BTC', 10),               '==', 10,        'BTC 10 -> 10.00000000';
     cmp_ok financialrounding('amount', 'BTC', 10.000001),        '==', 10.000001, 'BTC 10.000001 -> 10.00000100';
     cmp_ok financialrounding('amount', 'BTC', 10.0000000000001), '==', 10,        'BTC 10.0000000000001 -> 10.00000000';
@@ -138,6 +139,20 @@ subtest 'regression' => sub {
         my $j = rand() * rand(-100000);
         cmp_ok(roundnear(1 / $i, $j), '<=', 0, 'roundnear runs for (' . 1 / $i . ',' . $j . ')');
     }
+};
+
+subtest 'get_min_unit' => sub {
+# Test minimum units
+    is get_min_unit('USD'), formatnumber('price', 'USD', 0.01),       'Correct minimum unit for USD';
+    is get_min_unit('EUR'), formatnumber('price', 'EUR', 0.01),       'Correct minimum unit for EUR';
+    is get_min_unit('GBP'), formatnumber('price', 'GBP', 0.01),       'Correct minimum unit for GBP';
+    is get_min_unit('AUD'), formatnumber('price', 'AUD', 0.01),       'Correct minimum unit for AUD';
+    is get_min_unit('JPY'), formatnumber('price', 'JPY', 1),          'Correct minimum unit for JPY';
+    is get_min_unit('BTC'), formatnumber('price', 'BTC', 0.00000001), 'Correct minimum unit for BTC';
+    is get_min_unit('LTC'), formatnumber('price', 'LTC', 0.00000001), 'Correct minimum unit for LTC';
+    is get_min_unit('ETH'), formatnumber('price', 'ETH', 0.00000001), 'Correct minimum unit for ETH';
+    is get_min_unit('ETC'), formatnumber('price', 'ETC', 0.00000001), 'Correct minimum unit for ETC';
+    dies_ok { get_min_unit('nonexistent_currency') }, qr(Currency nonexistent_currency and/or its precision is not defined.), 'Incorrect currency';
 };
 
 subtest 'precision' => sub {

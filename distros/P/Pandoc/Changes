@@ -1,5 +1,8 @@
 Revision history for Pandoc Perl module
 
+0.8.3  2018-05-12 09:19:48 CEST
+    - Fix pandoc_data_dir for Windows
+
 0.8.2  2018-05-06 15:37:34 CEST
     - Add function pandoc_data_dir and extend method data_dir
 

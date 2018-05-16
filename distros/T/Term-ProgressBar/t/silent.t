@@ -10,8 +10,9 @@ This package tests the basic functionality of Term::ProgressBar.
 
 =cut
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Test::Exception;
+use Test::Warnings;
 
 use Capture::Tiny qw(capture_stderr);
 

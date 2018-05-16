@@ -1,6 +1,8 @@
 
 /* Copyright 2018 Richard Kelsch, All Rights Reserved
  * See the Perl documentation for Graphics::Framebuffer for licensing information.
+ * 
+ * Version:  5.00
 */
 
 #include <stdlib.h>
@@ -31,10 +33,10 @@
 #define GBR           4
 #define GRB           5
 
-#define ipart_(X) ((int)(X))
+#define integer_(X) ((int)(X))
 #define round_(X) ((int)(((double)(X))+0.5))
-#define fpart_(X) (((double)(X))-(double)ipart_(X))
-#define rfpart_(X) (1.0-fpart_(X))
+#define decimal_(X) (((double)(X))-(double)integer_(X))
+#define rdecimal_(X) (1.0-decimal_(X))
 #define swap_(a, b) do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
 
 /* Global Structures */
@@ -50,6 +52,9 @@ void c_get_screen_info(char *fb_file) {
     ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
     close(fbfd);
 
+   /*
+    * This monstrosity pushes the needed values on Perl's stack, like "return" does.
+    */
     Inline_Stack_Vars;
     Inline_Stack_Reset;
 
@@ -105,34 +110,6 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Done;
 }
 
-/* Draws a filled circle fast */
-void c_filled_circle(
-    char *framebuffer,
-    short x, short y, unsigned short r,
-    unsigned char draw_mode,
-    unsigned int color,
-    unsigned int bcolor,
-    unsigned char bytes_per_pixel,
-    unsigned int bytes_per_line,
-    unsigned short x_clip,  unsigned short y_clip,
-    unsigned short xx_clip, unsigned short yy_clip,
-    unsigned short xoffset, unsigned short yoffset,
-    unsigned char alpha)
-{
-    short r2   = r * r;
-    short area = r2 << 2;
-    short rr   = r  << 1;
-    short i;
-
-    for (i = 0; i < area; i++) {
-        short tx = (i % rr) - r;
-        short ty = (i / rr) - r;
-
-        if (tx * tx + ty * ty <= r2)
-          c_plot(framebuffer,x + tx, y + ty, draw_mode, color, bcolor, bytes_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
-    }
-}
-
 /* The other routines call this.  It handles all draw modes */
 void c_plot(
     char *framebuffer,
@@ -153,194 +130,285 @@ void c_plot(
         unsigned int index = (x * bytes_per_pixel) + (y * bytes_per_line);
         switch(draw_mode) {
             case NORMAL_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) = color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     = color         & 255;
-                  *(framebuffer + index + 1) = (color >> 8)  & 255;
-                  *(framebuffer + index + 2) = (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) = (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 : 
+                        {
+                           *((unsigned int*)(framebuffer + index)) = color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     = color         & 255;
+                            *(framebuffer + index + 1) = (color >> 8)  & 255;
+                            *(framebuffer + index + 2) = (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) = (short) color;
+                        }
+                        break;
+                }
             break;
             case XOR_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) ^= color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     ^= color         & 255;
-                  *(framebuffer + index + 1) ^= (color >> 8)  & 255;
-                  *(framebuffer + index + 2) ^= (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) ^= (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) ^= color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     ^= color         & 255;
+                            *(framebuffer + index + 1) ^= (color >> 8)  & 255;
+                            *(framebuffer + index + 2) ^= (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) ^= (short) color;
+                        }
+                        break;
+                }
             break;
             case OR_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) |= color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     |= color         & 255;
-                  *(framebuffer + index + 1) |= (color >> 8)  & 255;
-                  *(framebuffer + index + 2) |= (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) |= (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) |= color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     |= color         & 255;
+                            *(framebuffer + index + 1) |= (color >> 8)  & 255;
+                            *(framebuffer + index + 2) |= (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                           *((unsigned short*)(framebuffer + index)) |= (short) color;
+                        }
+                        break;
+                }
             break;
             case AND_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) &= color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     &= color         & 255;
-                  *(framebuffer + index + 1) &= (color >> 8)  & 255;
-                  *(framebuffer + index + 2) &= (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) &= (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) &= color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     &= color         & 255;
+                            *(framebuffer + index + 1) &= (color >> 8)  & 255;
+                            *(framebuffer + index + 2) &= (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) &= (short) color;
+                        }
+                        break;
+                }
             break;
             case MASK_MODE :
-              if (bytes_per_pixel == 4) {
-                  unsigned int rgb = *((unsigned int*)(framebuffer + index ));
-                  if ((rgb & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                        *((unsigned int*)(framebuffer + index )) = color;
-                  }
-              } else if (bytes_per_pixel == 3) {
-                  unsigned int rgb = *((unsigned int*)(framebuffer + index )) & 0xFFFFFF00;
-                  if (rgb != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                        *(framebuffer + index )     = color         & 255;
-                      *(framebuffer + index  + 1) = (color >> 8)  & 255;
-                      *(framebuffer + index  + 2) = (color >> 16) & 255;
-                  }
-              } else {
-                  unsigned short rgb = *((unsigned short*)(framebuffer + index));
-                  if (rgb != (bcolor & 0xFFFF)) {
-                      *((unsigned short*)(framebuffer + index )) = color;
-                  }
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            if ((*((unsigned int*)(framebuffer + index )) & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                *((unsigned int*)(framebuffer + index )) = color;
+                            }
+                        }
+                        break;
+                    case 3 :
+                        {
+                            if ((*((unsigned int*)(framebuffer + index )) & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                *(framebuffer + index )     = color         & 255;
+                                *(framebuffer + index  + 1) = (color >> 8)  & 255;
+                                *(framebuffer + index  + 2) = (color >> 16) & 255;
+                            }
+                        }
+                        break;
+                    default :
+                        {
+                            if (*((unsigned short*)(framebuffer + index)) != (bcolor & 0xFFFF)) {
+                                *((unsigned short*)(framebuffer + index )) = color;
+                            }
+                        }
+                        break;
+                }
             break;
             case UNMASK_MODE :
-              if (bytes_per_pixel == 4) {
-                  unsigned int rgb = *((unsigned int*)(framebuffer + index ));
-                  if ((rgb & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                        *((unsigned int*)(framebuffer + index )) = color;
-                  }
-              } else if (bytes_per_pixel == 3) {
-                  unsigned int rgb = *((unsigned int*)(framebuffer + index )) & 0xFFFFFF00;
-                  if (rgb == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                      *(framebuffer + index )     = color         & 255;
-                      *(framebuffer + index  + 1) = (color >> 8)  & 255;
-                      *(framebuffer + index  + 2) = (color >> 16) & 255;
-                  }
-              } else {
-                  unsigned short rgb = *((unsigned short*)(framebuffer + index));
-                  if (rgb == (bcolor & 0xFFFF)) {
-                      *((unsigned short*)(framebuffer + index )) = color;
-                  }
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            if ((*((unsigned int*)(framebuffer + index )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                *((unsigned int*)(framebuffer + index )) = color;
+                            }
+                        }
+                        break;
+                     case 3 :
+                         {
+                             if ((*((unsigned int*)(framebuffer + index )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                 *(framebuffer + index )     = color         & 255;
+                                 *(framebuffer + index  + 1) = (color >> 8)  & 255;
+                                 *(framebuffer + index  + 2) = (color >> 16) & 255;
+                             }
+                         }
+                         break;
+                     default :
+                         {
+                             if (*((unsigned short*)(framebuffer + index)) == (bcolor & 0xFFFF)) {
+                                 *((unsigned short*)(framebuffer + index )) = color;
+                             }
+                         }
+                         break;
+                }
             break;
             case ALPHA_MODE :
-              if (bytes_per_pixel == 4) {
-                  unsigned char fb_r = *(framebuffer + index);
-                  unsigned char fb_g = *(framebuffer + index + 1);
-                  unsigned char fb_b = *(framebuffer + index + 2);
-                  unsigned char R     = color         & 255;
-                  unsigned char G     = (color >> 8)  & 255;
-                  unsigned char B     = (color >> 16) & 255;
-                  unsigned char A     = (color >> 24) & 255;
-                  unsigned char invA  = (255 - A);
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            unsigned int fb_rgb = *((unsigned int*)(framebuffer + index));
+                            unsigned char fb_r  = fb_rgb & 255;
+                            unsigned char fb_g  = (fb_rgb >> 8) & 255;
+                            unsigned char fb_b  = (fb_rgb >> 16) & 255;
+                            unsigned char R     = color         & 255;
+                            unsigned char G     = (color >> 8)  & 255;
+                            unsigned char B     = (color >> 16) & 255;
+                            unsigned char A     = (color >> 24) & 255;
+                            unsigned char invA  = (255 - A);
 
-                  fb_r = ((R * A) + (fb_r * invA)) >> 8;
-                  fb_g = ((G * A) + (fb_g * invA)) >> 8;
-                  fb_b = ((B * A) + (fb_b * invA)) >> 8;
+                            fb_r = ((R * A) + (fb_r * invA)) >> 8;
+                            fb_g = ((G * A) + (fb_g * invA)) >> 8;
+                            fb_b = ((B * A) + (fb_b * invA)) >> 8;
 
-                  *(framebuffer + index)     = fb_r;
-                  *(framebuffer + index + 1) = fb_g;
-                  *(framebuffer + index + 2) = fb_b;
-                  *(framebuffer + index + 3) = A;
-              } else if (bytes_per_pixel == 3) {
-                  unsigned char fb_r = *(framebuffer + index);
-                  unsigned char fb_g = *(framebuffer + index + 1);
-                  unsigned char fb_b = *(framebuffer + index + 2);
-                  unsigned char invA  = (255 - alpha);
-                  unsigned char R     = color         & 255;
-                  unsigned char G     = (color >> 8)  & 255;
-                  unsigned char B     = (color >> 16) & 255;
+                            *((unsigned int*)(framebuffer + index)) = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
+                        }
+                        break;
+                    case 3 :
+                        {
+                            unsigned char fb_r  = *(framebuffer + index);
+                            unsigned char fb_g  = *(framebuffer + index + 1);
+                            unsigned char fb_b  = *(framebuffer + index + 2);
+                            unsigned char invA  = (255 - alpha);
+                            unsigned char R     = color         & 255;
+                            unsigned char G     = (color >> 8)  & 255;
+                            unsigned char B     = (color >> 16) & 255;
 
-                  fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-                  fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-                  fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+                            fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                            fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                            fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
 
-                  *(framebuffer + index)     = fb_r;
-                  *(framebuffer + index + 1) = fb_g;
-                  *(framebuffer + index + 2) = fb_b;
-              } else {
-                  unsigned short rgb565 = *((unsigned short*)(framebuffer + index));
-                  unsigned short fb_r   = rgb565;
-                  unsigned short fb_g   = rgb565;
-                  unsigned short fb_b   = rgb565;
-                  fb_b >>= 11;
-                  fb_g >>= 5;
-                  fb_r  &= 31;
-                  fb_g  &= 63;
-                  fb_b  &= 31;
-                  unsigned short R = color;
-                  unsigned short G = color;
-                  unsigned short B = color;
-                  B >>= 11;
-                  G >>= 5;
-                  R  &= 31;
-                  G  &= 63;
-                  B  &= 31;
-                  unsigned char invA = (255 - alpha);
-                  fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-                  fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-                  fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-                  rgb565 = 0;
-                  rgb565 = (fb_b << 11) | (fb_g << 5) | fb_r;
-                  *((unsigned short*)(framebuffer + index)) = rgb565;
-              }
+                            *(framebuffer + index)     = fb_r;
+                            *(framebuffer + index + 1) = fb_g;
+                            *(framebuffer + index + 2) = fb_b;
+                        }
+                        break;
+                    default :
+                        {
+                            unsigned short rgb565 = *((unsigned short*)(framebuffer + index));
+                            unsigned short fb_r   = rgb565 & 31;
+                            unsigned short fb_g   = (rgb565 >> 5) & 63;
+                            unsigned short fb_b   = (rgb565 >> 11) & 31;
+                            unsigned short R = color & 31;
+                            unsigned short G = (color >> 5) & 63;
+                            unsigned short B = (color >> 11) & 31;
+                            unsigned char invA = (255 - alpha);
+                            fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                            fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                            fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+                            rgb565 = (fb_b << 11) | (fb_g << 5) | fb_r;
+                            *((unsigned short*)(framebuffer + index)) = rgb565;
+                        }
+                        break;
+                }
             break;
             case ADD_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) += color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     += color         & 255;
-                  *(framebuffer + index + 1) += (color >> 8)  & 255;
-                  *(framebuffer + index + 2) += (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) += (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) += color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     += color         & 255;
+                            *(framebuffer + index + 1) += (color >> 8)  & 255;
+                            *(framebuffer + index + 2) += (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) += (short) color;
+                        }
+                        break;
+                }
             break;
             case SUBTRACT_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) -= color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     -= color         & 255;
-                  *(framebuffer + index + 1) -= (color >> 8)  & 255;
-                  *(framebuffer + index + 2) -= (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) -= (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) -= color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     -= color         & 255;
+                            *(framebuffer + index + 1) -= (color >> 8)  & 255;
+                            *(framebuffer + index + 2) -= (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) -= (short) color;
+                        }
+                        break;
+                }
             break;
             case MULTIPLY_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) *= color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     *= color         & 255;
-                  *(framebuffer + index + 1) *= (color >> 8)  & 255;
-                  *(framebuffer + index + 2) *= (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) *= (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) *= color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     *= color         & 255;
+                            *(framebuffer + index + 1) *= (color >> 8)  & 255;
+                            *(framebuffer + index + 2) *= (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) *= (short) color;
+                        }
+                        break;
+                }
             break;
             case DIVIDE_MODE :
-              if (bytes_per_pixel == 4) {
-                  *((unsigned int*)(framebuffer + index)) /= color;
-              } else if (bytes_per_pixel == 3) {
-                  *(framebuffer + index)     /= color         & 255;
-                  *(framebuffer + index + 1) /= (color >> 8)  & 255;
-                  *(framebuffer + index + 2) /= (color >> 16) & 255;
-              } else {
-                  *((unsigned short*)(framebuffer + index)) /= (short) color;
-              }
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(framebuffer + index)) /= color;
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(framebuffer + index)     /= color         & 255;
+                            *(framebuffer + index + 1) /= (color >> 8)  & 255;
+                            *(framebuffer + index + 2) /= (color >> 16) & 255;
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(framebuffer + index)) /= (short) color;
+                        }
+                        break;
+                }
             break;
         }
     }
@@ -362,7 +430,7 @@ void c_line(
 {
     short shortLen = y2 - y1;
     short longLen  = x2 - x1;
-    int yLonger  = false;
+    int yLonger    = false;
 
     if (abs(shortLen) > abs(longLen)) {
         short swap = shortLen;
@@ -497,218 +565,793 @@ void c_blit_write(
             dest += bytes_per_line;
         }
     } else {
-        for (vertical = 0; vertical < h; vertical++) {
-            unsigned int vbl  = vertical * bline;
-            unsigned short yv = fb_y + vertical;
-            unsigned int yvbl = yv * bytes_per_line;
-            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
-                for (horizontal = 0; horizontal < w; horizontal++) {
-                    unsigned short xh = fb_x + horizontal;
-                    unsigned int xhbp = xh * bytes_per_pixel;
-                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
-                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
-                        unsigned int vhz       = vbl + hzpixel;
-                        unsigned int yvhz      = yvbl + hzpixel;
-                        unsigned int xhbp_yvbl = xhbp + yvbl;
-                        switch(draw_mode) {
-                            case NORMAL_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl)) = *((unsigned int*)(blit_data + vhz));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) = *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case XOR_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) ^= *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     ^= *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) ^= *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) ^= *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) ^= *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case OR_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) |= *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     |= *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) |= *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) |= *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) |= *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case AND_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) &= *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     &= *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) &= *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) &= *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) &= *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case MASK_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  unsigned int rgb = *((unsigned int*)(blit_data + vhz ));
-                                  if ((rgb & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                                        *((unsigned int*)(framebuffer + xhbp_yvbl )) = rgb;
-                                  }
-                              } else if (bytes_per_pixel == 3) {
-                                  unsigned int rgb = *((unsigned int*)(blit_data + vhz )) & 0xFFFFFF00;
-                                  if (rgb != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                                        *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
-                                      *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
-                                      *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
-                                  }
-                              } else {
-                                  unsigned short rgb = *((unsigned short*)(blit_data + vhz ));
-                                  if (rgb != (bcolor & 0xFFFF)) {
-                                      *((unsigned short*)(framebuffer + xhbp_yvbl )) = rgb;
-                                  }
-                              }
-                            break;
-                            case UNMASK_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  unsigned int rgb = *((unsigned int*)(framebuffer + xhbp_yvbl ));
-                                  if ((rgb & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                                        *((unsigned int*)(framebuffer + xhbp_yvbl )) = *((unsigned int*)(blit_data + vhz ));
-                                  }
-                              } else if (bytes_per_pixel == 3) {
-                                  unsigned int rgb = *((unsigned int*)(framebuffer + xhbp + yvhz ));
-                                  if (rgb == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
-                                        *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
-                                      *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
-                                      *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
-                                  }
-                              } else {
-                                  unsigned short rgb = *((unsigned short*)(framebuffer + xhbp + yvhz ));
-                                  if (rgb == (bcolor & 0xFFFF)) {
-                                      *((unsigned short*)(framebuffer + xhbp_yvbl )) = *((unsigned short*)(blit_data + vhz ));
-                                  }
-                              }
-                            break;
-                            case ALPHA_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  unsigned char fb_r = *(framebuffer + xhbp_yvbl );
-                                  unsigned char fb_g = *(framebuffer + xhbp_yvbl + 1);
-                                  unsigned char fb_b = *(framebuffer + xhbp_yvbl + 2);
-                                  unsigned char R    = *(blit_data + vhz );
-                                  unsigned char G    = *(blit_data + vhz  + 1);
-                                  unsigned char B    = *(blit_data + vhz  + 2);
-                                  unsigned char A    = *(blit_data + vhz  + 3);
-                                  unsigned char invA = (255 - A);
-
-                                  fb_r = ((R * A) + (fb_r * invA)) >> 8;
-                                  fb_g = ((G * A) + (fb_g * invA)) >> 8;
-                                  fb_b = ((B * A) + (fb_b * invA)) >> 8;
-
-                                  *(framebuffer + xhbp_yvbl )     = fb_r;
-                                  *(framebuffer + xhbp_yvbl  + 1) = fb_g;
-                                  *(framebuffer + xhbp_yvbl  + 2) = fb_b;
-                                  *(framebuffer + xhbp_yvbl  + 3) = A;
-                              } else if (bytes_per_pixel == 3) {
-                                  unsigned char fb_r = *(framebuffer + xhbp_yvbl );
-                                  unsigned char fb_g = *(framebuffer + xhbp_yvbl  + 1);
-                                  unsigned char fb_b = *(framebuffer + xhbp_yvbl  + 2);
-                                  unsigned char R    = *(blit_data + vhz );
-                                  unsigned char G    = *(blit_data + vhz + 1);
-                                  unsigned char B    = *(blit_data + vhz + 2);
-                                  unsigned char invA = (255 - alpha);
-
-                                  fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-                                  fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-                                  fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-
-                                  *(framebuffer + xhbp_yvbl )     = fb_r;
-                                  *(framebuffer + xhbp_yvbl  + 1) = fb_g;
-                                  *(framebuffer + xhbp_yvbl  + 2) = fb_b;
-                              } else {
-                                  unsigned short rgb565 = *((unsigned short*)(framebuffer + xhbp_yvbl ));
-
-                                  unsigned short fb_r = rgb565;
-                                  unsigned short fb_g = rgb565;
-                                  unsigned short fb_b = rgb565;
-                                  fb_b >>= 11;
-                                  fb_g >>= 5;
-                                  fb_r &= 31;
-                                  fb_g &= 63;
-                                  fb_b &= 31;
-                                  rgb565 = *((unsigned short*)(blit_data + vhz ));
-                                  unsigned short R = rgb565;
-                                  unsigned short G = rgb565;
-                                  unsigned short B = rgb565;
-                                  B >>= 11;
-                                  G >>= 5;
-                                  R &= 31;
-                                  G &= 63;
-                                  B &= 31;
-                                  unsigned char invA = (255 - alpha);
-                                  fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-                                  fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-                                  fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-                                  rgb565 = 0;
-                                  rgb565 = (fb_b << 11) | (fb_g << 5) | fb_r;
-
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) = rgb565;
-                              }
-                            break;
-                            case ADD_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) += *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     += *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) += *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) += *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) += *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case SUBTRACT_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) -= *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     -= *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) -= *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) -= *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) -= *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case MULTIPLY_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) *= *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     *= *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) *= *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) *= *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) *= *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
-                            case DIVIDE_MODE :
-                              if (bytes_per_pixel == 4) {
-                                  *((unsigned int*)(framebuffer + xhbp_yvbl )) /= *((unsigned int*)(blit_data + vhz ));
-                              } else if (bytes_per_pixel == 3) {
-                                  *(framebuffer + xhbp_yvbl )     /= *(blit_data + vhz );
-                                  *(framebuffer + xhbp_yvbl  + 1) /= *(blit_data + vhz  + 1);
-                                  *(framebuffer + xhbp_yvbl  + 2) /= *(blit_data + vhz  + 2);
-                              } else {
-                                  *((unsigned short*)(framebuffer + xhbp_yvbl )) /= *((unsigned short*)(blit_data + vhz ));
-                              }
-                            break;
+        switch(draw_mode) {
+            case NORMAL_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) = *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
                         }
-                    }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) = *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
                 }
-            }
-        }
+                break;
+            case XOR_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) ^= *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     ^= *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) ^= *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) ^= *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) ^= *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case OR_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) |= *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     |= *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) |= *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) |= *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) |= *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case AND_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) &= *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     &= *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) &= *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) &= *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) &= *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case MASK_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        unsigned int rgb       = *((unsigned int*)(blit_data + vhz ));
+                                        if (( rgb & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                            *((unsigned int*)(framebuffer + xhbp_yvbl )) = rgb;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        if ((*((unsigned int*)(blit_data + vhz )) & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                            *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
+                                            *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
+                                            *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        unsigned int rgb       = *((unsigned short*)(blit_data + vhz ));
+                                        if (rgb != (bcolor & 0xFFFF)) {
+                                            *((unsigned short*)(framebuffer + xhbp_yvbl )) = rgb;
+                                        }
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case UNMASK_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        if ((*((unsigned int*)(framebuffer + xhbp_yvbl )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                            *((unsigned int*)(framebuffer + xhbp_yvbl )) = *((unsigned int*)(blit_data + vhz ));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        if (*((unsigned int*)(framebuffer + xhbp + yvhz )) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                            *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
+                                            *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
+                                            *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        if (*((unsigned short*)(framebuffer + xhbp + yvhz )) == (bcolor & 0xFFFF)) {
+                                            *((unsigned short*)(framebuffer + xhbp_yvbl )) = *((unsigned short*)(blit_data + vhz ));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case ALPHA_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+
+                                        unsigned int fb_rgb = *((unsigned int*)(framebuffer + xhbp_yvbl));
+                                        unsigned char fb_r  = fb_rgb & 255;
+                                        unsigned char fb_g  = (fb_rgb >> 8) & 255;
+                                        unsigned char fb_b  = (fb_rgb >> 16) & 255;
+
+                                        unsigned int blit_rgb = *((unsigned int*)(blit_data + vhz));
+                                        unsigned char R       = blit_rgb & 255;
+                                        unsigned char G       = (blit_rgb >> 8) & 255;
+                                        unsigned char B       = (blit_rgb >> 16) & 255;
+                                        unsigned char A       = (blit_rgb >> 24) & 255;
+                                        unsigned char invA    = (255 - A);
+
+                                        fb_r = ((R * A) + (fb_r * invA)) >> 8;
+                                        fb_g = ((G * A) + (fb_g * invA)) >> 8;
+                                        fb_b = ((B * A) + (fb_b * invA)) >> 8;
+
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+
+                                        unsigned char fb_r = *(framebuffer + xhbp_yvbl );
+                                        unsigned char fb_g = *(framebuffer + xhbp_yvbl  + 1);
+                                        unsigned char fb_b = *(framebuffer + xhbp_yvbl  + 2);
+                                        unsigned char R    = *(blit_data + vhz );
+                                        unsigned char G    = *(blit_data + vhz + 1);
+                                        unsigned char B    = *(blit_data + vhz + 2);
+                                        unsigned char invA = (255 - alpha);
+
+                                        fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                                        fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                                        fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+
+                                        *(framebuffer + xhbp_yvbl )     = fb_r;
+                                        *(framebuffer + xhbp_yvbl  + 1) = fb_g;
+                                        *(framebuffer + xhbp_yvbl  + 2) = fb_b;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        unsigned short rgb565  = *((unsigned short*)(framebuffer + xhbp_yvbl ));
+
+                                        unsigned short fb_r = rgb565 & 31;
+                                        unsigned short fb_g = (rgb565 >> 5) & 63;
+                                        unsigned short fb_b = (rgb565 >> 11) & 31;
+                                        rgb565 = *((unsigned short*)(blit_data + vhz ));
+                                        unsigned short R   = rgb565 & 31;
+                                        unsigned short G   = (rgb565 >> 5) & 63;
+                                        unsigned short B   = (rgb565 >> 11) & 31;
+                                        unsigned char invA = (255 - alpha);
+                                        fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                                        fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                                        fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) = (fb_b << 11) | (fb_g << 5) | fb_r;
+
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case ADD_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) += *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     += *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) += *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) += *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) += *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case SUBTRACT_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) -= *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     -= *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) -= *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) -= *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) -= *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case MULTIPLY_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) *= *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     *= *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) *= *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) *= *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) *= *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+            case DIVIDE_MODE :
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned int*)(framebuffer + xhbp_yvbl)) /= *((unsigned int*)(blit_data + vhz));
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 3 :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *(framebuffer + xhbp_yvbl )     /= *(blit_data + vhz );
+                                        *(framebuffer + xhbp_yvbl  + 1) /= *(blit_data + vhz  + 1);
+                                        *(framebuffer + xhbp_yvbl  + 2) /= *(blit_data + vhz  + 2);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default :
+                        for (vertical = 0; vertical < h; vertical++) {
+                            unsigned int vbl  = vertical * bline;
+                            unsigned short yv = fb_y + vertical;
+                            unsigned int yvbl = yv * bytes_per_line;
+                            if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+                                for (horizontal = 0; horizontal < w; horizontal++) {
+                                    unsigned short xh = fb_x + horizontal;
+                                    unsigned int xhbp = xh * bytes_per_pixel;
+                                    if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                                        unsigned int hzpixel   = horizontal * bytes_per_pixel;
+                                        unsigned int vhz       = vbl + hzpixel;
+                                        unsigned int yvhz      = yvbl + hzpixel;
+                                        unsigned int xhbp_yvbl = xhbp + yvbl;
+                                        *((unsigned short*)(framebuffer + xhbp_yvbl )) /= *((unsigned short*)(blit_data + vhz ));
+                                   }
+                                }
+                            }
+                        }
+                        break;
+                }
+                break;
+        }       
     }
 }
 
@@ -722,13 +1365,13 @@ void c_rotate(
     double degrees,
     unsigned char bytes_per_pixel)
 {
-    unsigned int hwh    = floor(wh / 2 + 0.5);
-    unsigned int bbline = wh * bytes_per_pixel;
-    unsigned int bline  = width * bytes_per_pixel;
-    unsigned short hwidth        = floor(width / 2 + 0.5);
-    unsigned short hheight       = floor(height / 2 + 0.5);
-    double sinma        = sin((degrees * M_PI) / 180);
-    double cosma        = cos((degrees * M_PI) / 180);
+    unsigned int hwh        = floor(wh / 2 + 0.5);
+    unsigned int bbline     = wh * bytes_per_pixel;
+    unsigned int bline      = width * bytes_per_pixel;
+    unsigned short hwidth   = floor(width / 2 + 0.5);
+    unsigned short hheight  = floor(height / 2 + 0.5);
+    double sinma            = sin((degrees * M_PI) / 180);
+    double cosma            = cos((degrees * M_PI) / 180);
     short x;
     short y;
 
@@ -739,14 +1382,24 @@ void c_rotate(
             short xs = ((cosma * xt - sinma * yt) + hwidth);
             short ys = ((sinma * xt + cosma * yt) + hheight);
             if (xs >= 0 && xs < width && ys >= 0 && ys < height) {
-                if (bytes_per_pixel == 4) {
-                    *((unsigned int*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned int*)(image + (xs * bytes_per_pixel) + (ys * bline)));
-                } else if (bytes_per_pixel == 3) {
-                    *(new_img + (x * bytes_per_pixel) + (y * bbline))     = *(image + (xs * bytes_per_pixel) + (ys * bline));
-                    *(new_img + (x * bytes_per_pixel) + (y * bbline) + 1) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 1);
-                    *(new_img + (x * bytes_per_pixel) + (y * bbline) + 2) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 2);
-                } else {
-                    *((unsigned short*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned short*)(image + (xs * bytes_per_pixel) + (ys * bline)));
+                switch(bytes_per_pixel) {
+                    case 4 :
+                        {
+                            *((unsigned int*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned int*)(image + (xs * bytes_per_pixel) + (ys * bline)));
+                        }
+                        break;
+                    case 3 :
+                        {
+                            *(new_img + (x * bytes_per_pixel) + (y * bbline))     = *(image + (xs * bytes_per_pixel) + (ys * bline));
+                            *(new_img + (x * bytes_per_pixel) + (y * bbline) + 1) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 1);
+                            *(new_img + (x * bytes_per_pixel) + (y * bbline) + 2) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 2);
+                        }
+                        break;
+                    default :
+                        {
+                            *((unsigned short*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned short*)(image + (xs * bytes_per_pixel) + (ys * bline)));
+                        }
+                        break;
                 }
             }
         }
@@ -840,9 +1493,8 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned ch
         unsigned char r8 = (r5 * 527 + 23) >> 6;
         unsigned char g8 = (g6 * 259 + 33) >> 6;
         unsigned char b8 = (b5 * 527 * 23) >> 6;
-        *((unsigned char*)(buf32 + loc32++)) = r8;
-        *((unsigned char*)(buf32 + loc32++)) = g8;
-        *((unsigned char*)(buf32 + loc32++)) = b8;
+        *((unsigned int*)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
+        loc32 += 3;
         if (r8 == 0 && g8 == 0 && b8 ==0) {
             *((unsigned char*)(buf32 + loc32++)) = 0;
         } else {
@@ -874,14 +1526,15 @@ void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned cha
 }
 
 void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned char color_order) {
-    unsigned int loc16 = 0;
-    unsigned int loc32 = 0;
+    unsigned int loc16    = 0;
+    unsigned int loc32    = 0;
     unsigned short rgb565 = 0;
     while(loc32 < size32) {
-        unsigned char r8 = *(buf32 + loc32++);
-        unsigned char g8 = *(buf32 + loc32++);
-        unsigned char b8 = *(buf32 + loc32++);
-        unsigned char a8 = *(buf32 + loc32++); // This is not used, but is needed
+        unsigned int crgb = *((unsigned int*)(buf32 + loc32));
+        unsigned char r8 = crgb & 255;
+        unsigned char g8 = (crgb >> 8) & 255;
+        unsigned char b8 = (crgb >> 16) & 255;
+//        unsigned char a8 = (crgb >> 24) & 255; // This is not used, but is needed
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
@@ -914,9 +1567,8 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
         unsigned char r = *(buf24 + loc24++);
         unsigned char g = *(buf24 + loc24++);
         unsigned char b = *(buf24 + loc24++);
-        *(buf32 + loc32++) = r;
-        *(buf32 + loc32++) = g;
-        *(buf32 + loc32++) = b;
+        *((unsigned int*)(buf32 + loc32++)) = r | (g << 8) | (b << 16);
+        loc32 += 3;
         if (r == 0 && g == 0 && b == 0) {
             *(buf32 + loc32++) = 0;
         } else {

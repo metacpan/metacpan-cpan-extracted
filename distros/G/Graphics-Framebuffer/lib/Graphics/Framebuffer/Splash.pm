@@ -12,7 +12,7 @@ use constant {
 use List::Util qw(min max);
 
 BEGIN {
-    our $VERSION = 1.05;
+    our $VERSION = 1.06;
 }
 
 sub _perl_logo {
@@ -68,6 +68,7 @@ sub _perl_logo {
 sub splash {
     my $self    = shift;
     my $version = shift;
+    return if ($self->{'SPLASH'} == 0);
 
     my $X = $self->{'X_CLIP'};
     my $Y = $self->{'Y_CLIP'};
@@ -268,11 +269,11 @@ sub splash {
                 'radius'   => 200  * min($hf, $vf),
                 'filled'   => TRUE,
                 'gradient' => {
-                    'direction' => 'vertical',
+                    'direction' => 'horizontal',
                     'colors'    => {
-                        'red'   => [255, 64, 255],
-                        'green' => [255, 255, 64],
-                        'blue'  => [64, 255, 255],
+                        'red'   => [255, 255, 255],
+                        'green' => [192, 96, 228],
+                        'blue'  => [0, 0, 0],
                     },
                 }
             }

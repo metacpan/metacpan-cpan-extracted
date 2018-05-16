@@ -13,7 +13,7 @@ ok( defined &Brick::Bucket::_file_magic_type, "_file_magic_type sub is there");
 
 my $bucket = 'Brick::Bucket';
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # These things should work, even if they have the wrong extension
 {
 my %files = qw(
@@ -24,7 +24,7 @@ my %files = qw(
 	text		text/plain
 	text.xls	text/plain
 	);
-	
+
 foreach my $file ( sort keys %files )
 	{
 	my $path = File::Spec->catfile( qw( t files files_to_test ), $file );
@@ -34,15 +34,15 @@ foreach my $file ( sort keys %files )
 	is( $mime_type, $files{$file}, "Magic type for $file is right" );
 	}
 }
-	
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # These things should work but don't
 
 my %files = qw(
 	excel		application/vnd.ms-excel
 	excel.txt 	application/vnd.ms-excel
 	);
-	
+
 foreach my $file ( sort keys %files )
 	{
 	my $path = File::Spec->catfile( qw( t files files_to_test ), $file );
@@ -59,20 +59,20 @@ foreach my $file ( sort keys %files )
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # These things should not work
 {
 my %files = qw(
 	excel.abc	application/vnd.ms-excel
 	excel.xls	application/vnd.ms-excel
 	);
-	
+
 foreach my $file ( sort keys %files )
 	{
 	my $path = File::Spec->catfile( qw( t files files_to_test ), $file );
 	ok( ! -e $file, "File $file doesn't exist ( good )" );
 
 	my $mime_type = $bucket->_file_magic_type( $file );
-	ok( ! defined $mime_type );	
+	ok( ! defined $mime_type );
 	}
 }

@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 bin/xmlrewrite
 example/dimap/README
 example/dimap/horrible.zip
@@ -11,5 +12,6 @@ lib/XML/Rewrite.pod
 lib/XML/Rewrite/Schema.pm
 lib/XML/Rewrite/Schema.pod
 t/01use.t
-t/pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

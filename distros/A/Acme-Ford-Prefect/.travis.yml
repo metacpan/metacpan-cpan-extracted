@@ -1,8 +1,8 @@
 language: perl
 
 install:
-  - curl https://perl5-alien.github.io/static/travis/install-system-dontpanic.sh | bash -
-  - curl https://perl5-alien.github.io/static/travis/install-system-acme-alien-dontpanic.sh | bash -
+  - curl https://alienfile.org/travis/install-system-dontpanic.sh | bash -
+  - curl https://alienfile.org/travis/install-system-acme-alien-dontpanic.sh | bash -
   - cpanm --installdeps -n .
 
 perl:

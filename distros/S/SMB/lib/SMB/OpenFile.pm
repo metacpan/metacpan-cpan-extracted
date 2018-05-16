@@ -53,14 +53,17 @@ sub read ($%) {
 	my %params = @_;  # length offset minlen remain
 
 	my $fh = $self->{handle} or return '';
-	sysseek($fh, $params{offset} || 0, SEEK_SET) or return;
+	my $offset = $params{offset} || 0;
+	sysseek($fh, $offset, SEEK_SET) // return;
 
 	my $length = $params{length} // return;
 	my $minlen = $params{minlen} || 0;
 
 	my $buffer;
+	$self->msg("Read $self->{file}{filename} - $length bytes offset=$offset")
+		unless $params{quiet};
 	sysread($fh, $buffer, $length) // return;
-	return unless length($buffer) < $minlen;
+	return if length($buffer) < $minlen;
 
 	return $buffer;
 }

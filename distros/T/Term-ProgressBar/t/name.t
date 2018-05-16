@@ -9,8 +9,9 @@ This package tests the name functionality of Term::ProgressBar.
 
 =cut
 
-use Test::More tests => 20;
+use Test::More tests => 21;
 use Test::Exception;
+use Test::Warnings;
 
 use Capture::Tiny qw(capture_stderr);
 
@@ -123,7 +124,7 @@ Use v1 mode
   my $barexpect = $length * 0.3;
   cmp_ok length($bar), '>', $barexpect -1;
   cmp_ok length($bar), '<', $barexpect+1;
-  
+
   $err = capture_stderr {
     lives_ok { $p->message($MESSAGE1)    }  'Count 1-10 ( 5)';
     lives_ok { $p->update($_) for 6..10 }  'Count 1-10 ( 6)';

@@ -25,13 +25,14 @@ my $build = Module::Build->new(
       'URI::URL'     => 0,
    },
    requires => {
-      'AnyEvent'            => 0,
-      'AnyEvent::HTTP'      => 2.0,
-      'HTTP::Response'      => 0,
-      'LWP::Protocol'       => 0,
-      'LWP::Protocol::http' => 0,
-      'LWP::Simple'         => 5.827, # Not strictly required, but ensures that LWP::Simple will actually use LWP::Protocol.
-      'version'             => 0,
+      'AnyEvent'              => 0,
+      'AnyEvent::HTTP'        => 2.0,
+      'AnyEvent::HTTP::Socks' => 0,
+      'HTTP::Response'        => 0,
+      'LWP::Protocol'         => 0,
+      'LWP::Protocol::http'   => 0,
+      'LWP::Simple'           => 5.827, # Not strictly required, but ensures that LWP::Simple will actually use LWP::Protocol.
+      'version'               => 0,
    },
    add_to_cleanup => [ 'LWP-Protocol-AnyEvent-http-*' ],
    meta_merge     => {

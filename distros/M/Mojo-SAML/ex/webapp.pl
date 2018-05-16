@@ -61,7 +61,7 @@ my $attr_srv = AttributeConsumingService->new(
   requested_attributes => [
     RequestedAttribute->new(
       name => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7',
-      nameid_format => 'uri',
+      name_format => 'uri',
       friendly_name => 'entitlement',
       is_required => 0,
     ),

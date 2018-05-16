@@ -13,13 +13,13 @@ isa_ok( $bucket, 'Mock::Bucket' );
 isa_ok( $bucket, Mock::Bucket->bucket_class );
 
 my $sub = $bucket->_remove_whitespace( { filter_fields => [ qw(string string1 string2) ] } );
-	
+
 isa_ok( $sub, ref sub {}, "_remove_whitespace returns a code ref" );
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
-my $input = { 
+my $input = {
 	string      => "Buster Bean",
 	leave_alone => "Mimi Bean",
 	};
@@ -27,10 +27,10 @@ my $input = {
 like( $input->{string},      qr/\s/, "'string' has whitespace" );
 like( $input->{leave_alone}, qr/\s/, "'leave_alone' has whitespace" );
 
-my $result = eval { 
-	$sub->( $input ) 
-	}; 
-	
+my $result = eval {
+	$sub->( $input )
+	};
+
 ok( defined $result, "Result succeeds" );
 diag( "Eval error: $@" ) unless defined $result;
 
@@ -43,7 +43,7 @@ ok( ! exists $input->{string2}, "Does not create missing field" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 {
-my $input = { 
+my $input = {
 	string1  => "Buster Bean",
 	string2  => "Mimi Bean",
 	};
@@ -51,10 +51,10 @@ my $input = {
 like( $input->{string1}, qr/\s/, "'string1' has whitespace" );
 like( $input->{string2}, qr/\s/, "'string2' has whitespace" );
 
-my $result = eval { 
-	$sub->( $input ) 
-	}; 
-	
+my $result = eval {
+	$sub->( $input )
+	};
+
 ok( defined $result, "Result succeeds" );
 diag( "Eval error: $@" ) unless defined $result;
 

@@ -1,5 +1,9 @@
 Revision history for ExtUtils-InstallPaths
 
+0.012     2018-05-10 21:03:33+02:00 Europe/Amsterdam
+          - Allow a argument to install_map with source dirs
+          - Make tests prove and 5.6 friendly
+
 0.011     2015-02-16 00:47:54+01:00 Europe/Amsterdam
           Make EU::IP compatible with perl 5.6
           Declare dependency on File::Spec 0.83 for case_sensitive

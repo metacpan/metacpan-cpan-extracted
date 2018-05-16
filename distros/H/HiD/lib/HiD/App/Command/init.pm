@@ -3,7 +3,7 @@
 
 package HiD::App::Command::init;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::App::Command::init::VERSION = '1.991';
+$HiD::App::Command::init::VERSION = '1.992';
 use Moose;
 extends 'HiD::App::Command';
 use namespace::autoclean;
@@ -148,7 +148,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

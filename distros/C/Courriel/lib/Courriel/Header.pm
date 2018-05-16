@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Courriel::Helpers qw( fold_header );
 use Courriel::Types qw( NonEmptyStr Str Streamable );
-use Email::Address::List;
+use Email::Address::XS qw( parse_email_groups );
 use Encode qw( encode find_encoding );
 use MIME::Base64 qw( encode_base64 );
 use Params::ValidationCompiler qw( validation_for );
@@ -94,31 +94,33 @@ sub _encoded_address_list {
     my $self    = shift;
     my $charset = shift;
 
-    my @elements;
-    my @group;
-    for my $parsed ( Email::Address::List->parse( $self->value ) ) {
-        my $push_to = @group ? \@group : \@elements;
-        ## no critic (ControlStructures::ProhibitCascadingIfElse)
-        if ( $parsed->{type} eq 'group start' ) {
-            @group = $parsed->{value} . ':';
+    my @parsed = parse_email_groups( $self->value );
+    my @list;
+
+    ## no critic (ControlStructures::ProhibitCStyleForLoops)
+    for ( my $i = 0; $i < @parsed; $i += 2 ) {
+        my $group     = $parsed[$i];
+        my $addresses = $parsed[ $i + 1 ];
+
+        if ( defined $group ) {
+            my $g = "$group:";
+            if ( @{$addresses} ) {
+                $g .= q{ };
+                $g .= join ', ',
+                    map { $self->_maybe_encoded_address( $_, $charset ) }
+                    @{$addresses};
+            }
+            $g .= ';';
+            push @list, $g;
         }
-        elsif ( $parsed->{type} eq 'group end' ) {
-            my $group = join ', ', @group;
-            $group .= ';';
-            push @elements, $group;
-            @group = ();
-        }
-        elsif ( $parsed->{type} eq 'unknown' ) {
-            push @{$push_to},
-                $self->_encode_string( $parsed->{value}, $charset );
-        }
-        elsif ( $parsed->{type} eq 'mailbox' ) {
-            push @{$push_to},
-                $self->_maybe_encoded_address( $parsed->{value}, $charset );
+        else {
+            push @list,
+                map { $self->_maybe_encoded_address( $_, $charset ) }
+                @{$addresses};
         }
     }
 
-    return join ', ', @elements;
+    return join ', ', @list;
 }
 
 sub _maybe_encoded_address {
@@ -194,7 +196,7 @@ sub _maybe_encoded_address {
             else {
                 push @encoded,
                     ( $chunks[$i]{ascii} // q{} )
-                    . ( $chunks[$i]{ws}  // q{} );
+                    . ( $chunks[$i]{ws} // q{} );
             }
         }
 
@@ -253,7 +255,7 @@ Courriel::Header - A single header's name and value
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -318,7 +320,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

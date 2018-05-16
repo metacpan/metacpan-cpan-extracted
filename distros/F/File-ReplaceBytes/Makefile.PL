@@ -1,4 +1,4 @@
-use 5.006;
+use 5.14.0;
 
 use strict;
 use warnings;
@@ -24,17 +24,19 @@ my %params = (
     AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
     VERSION_FROM => 'lib/File/ReplaceBytes.pm',
 
-    LICENSE  => 'artistic_2',
-    PL_FILES => {},
+    MIN_PERL_VERSION => '5.14.0',
 
+    LICENSE  => 'bsd',
+
+    PL_FILES => {},
     CONFIGURE_REQUIRES => {
         'strict'              => 0,
         'ExtUtils::MakeMaker' => '6.48',
     },
     BUILD_REQUIRES => {},
     TEST_REQUIRES  => {
-        'lib'        => 0,
-        'Test::Most' => 0,
+        'lib'         => 0,
+        'Test::Most'  => 0,
     },
     PREREQ_PM => { 'strict' => 0, },
 

@@ -1,4 +1,4 @@
-#  Copyright (C) 2011, 2013 Rocky Bernstein <rocky@cpan.org>
+#  Copyright (C) 2011, 2013, 2018 Rocky Bernstein <rocky@cpan.org>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -109,12 +109,23 @@ pure_install:
 skipcheck :
 	perl Build --makefile_env_macros 1 skipcheck
 
+#: "check" but stop after 1st error, and add -v option
+check-cautious:
+	(cd t; for t in *.t; do \
+	if ! prove -w $$t; then \
+	   break; \
+	fi; done)
+
+#: Run all tests
+check-short:
+	perl Build --makefile_env_macros 1 test
+
 #: Same as "test". "check" is the usual autoconf name
 check: test
 
-#: Run all unit tests
-test:
-	perl Build --makefile_env_macros 1 test
+#: Run all tests
+test: check-short
+	cd scripts && make test
 
 #: Check code coverage
 testcover:
@@ -143,4 +154,4 @@ versioninstall:
 
 .EXPORT: INC PREFIX DESTDIR VERBINST INSTALLDIRS TEST_VERBOSE LIB UNINST INSTALL_BASE POLLUTE
 
-.PHONY: all realclean build clean check test testcover testdb testpod testpodcoverage
+.PHONY: all realclean build clean check check-cautious test testcover testdb testpod testpodcoverage

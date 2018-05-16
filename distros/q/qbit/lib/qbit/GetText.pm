@@ -14,7 +14,7 @@ qbit::GetText use pure perl version of gettext by default. If you need to use XS
 =cut
 
 package qbit::GetText;
-$qbit::GetText::VERSION = '2.4';
+$qbit::GetText::VERSION = '2.5';
 use strict;
 use warnings;
 use utf8;

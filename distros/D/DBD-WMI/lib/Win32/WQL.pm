@@ -33,8 +33,7 @@ is a compatibility layer over this module.
 
 =cut
 
-use vars qw($VERSION);
-$VERSION = '0.08';
+our $VERSION = '0.10';
 
 Win32::OLE->Option(Warn => 3);
 
@@ -242,7 +241,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2009-2015 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -95,6 +95,12 @@ package OxdRegister;	# This is the &quot;Class&quot;
 			# @var string _request_client_secret     OpenID provider client secret
 			_request_client_secret => shift,
 			
+			# @var string _request_client_registration_access_token
+			_request_client_registration_access_token => shift,
+			
+			# @var string _request_client_registration_client_uri
+			_request_client_registration_client_uri => shift,
+			
 			
 			# @var string _request_client_jwks_uri
 			_request_client_jwks_uri => shift,
@@ -167,6 +173,32 @@ package OxdRegister;	# This is the &quot;Class&quot;
         my ( $self, $request_client_secret ) = @_;
 		$self->{_request_client_secret} = $request_client_secret if defined($request_client_secret);
 		return $self->{_request_client_secret};
+    }
+    
+    # Parameters: string $request_client_registration_access_token
+    sub getRequestClientRegistrationAccessToken {
+        my( $self ) = @_;
+		return $self->{_request_client_registration_access_token};
+    }
+
+    # Parameters: string $request_client_registration_access_token
+    sub setRequestClientRegistrationAccessToken {
+        my ( $self, $request_client_registration_access_token ) = @_;
+		$self->{_request_client_registration_access_token} = $request_client_registration_access_token if defined($request_client_registration_access_token);
+		return $self->{_request_client_registration_access_token};
+    }
+    
+    # Parameters: string $request_client_registration_client_uri
+    sub getRequestClientRegistrationClientUri {
+        my( $self ) = @_;
+		return $self->{_request_client_registration_client_uri};
+    }
+
+    # Parameters: string $request_client_registration_client_uri
+    sub setRequestClientRegistrationClientUri {
+        my ( $self, $request_client_registration_client_uri ) = @_;
+		$self->{_request_client_registration_client_uri} = $request_client_registration_client_uri if defined($request_client_registration_client_uri);
+		return $self->{_request_client_registration_client_uri};
     }
     
     # @return string
@@ -520,6 +552,10 @@ package OxdRegister;	# This is the &quot;Class&quot;
     #
     #	array $claims_redirect_uri - (Optional) Claims Redirect URI.
     #
+    #	string $client_registration_access_token - (Optional) Access token of existing client
+    #
+    #	string $client_registration_client_uri - (Optional) URI of existing client
+    #
     #	string $protection_access_token - Protection Acccess Token. OPTIONAL for `oxd-server` but REQUIRED for `oxd-https-extension`
     #
     # Returns:
@@ -558,6 +594,8 @@ package OxdRegister;	# This is the &quot;Class&quot;
             "client_secret" => $self->getRequestClientSecret(),
             "protection_access_token"=> $self->getRequestProtectionAccessToken(),
             "claims_redirect_uri" => $self->getRequestClaimsRedirectUri(),
+            "client_registration_access_token" => $self->getRequestClientRegistrationAccessToken(),
+            "client_registration_client_uri" => $self->getRequestClientRegistrationClientUri(),
             "oxd_rp_programming_language" => 'perl'
         };
        

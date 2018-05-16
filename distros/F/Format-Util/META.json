@@ -77,7 +77,7 @@
          "web" : "https://github.com/binary-com/perl-Format-Util"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

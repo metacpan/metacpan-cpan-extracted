@@ -42,3 +42,6 @@
   -- Fixeed inifiniate loop bug, fake jobs are now working as intended
 1.016
   -- added missing unit tests to the distro
+1.017
+  -- added can support for HTTP::Multiget::Role
+  -- added support for parsing JSON strings as a result

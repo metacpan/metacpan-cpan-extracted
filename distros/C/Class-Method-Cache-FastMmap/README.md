@@ -4,7 +4,7 @@ Class::Method::Cache::FastMmap - Cache method results using Cache::FastMmap
 
 # VERSION
 
-version v0.3.0
+version v0.3.2
 
 # SYNOPSIS
 
@@ -90,6 +90,9 @@ memoize 'my_method' => (
 );
 ```
 
+Undefined results are not cached. So if your method returns `undef`
+on failure, then it never cache that result.
+
 # SEE ALSO
 
 [Cache::FastMmap](https://metacpan.org/pod/Cache::FastMmap)
@@ -113,6 +116,9 @@ feature.
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+Some development of this module was sponsored by Science Photo Library
+[https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 

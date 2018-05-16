@@ -1,5 +1,7 @@
 package GitLab::API::v4::Paginator;
-$GitLab::API::v4::Paginator::VERSION = '0.06';
+$GitLab::API::v4::Paginator::VERSION = '0.08';
+=encoding utf8
+
 =head1 NAME
 
 GitLab::API::v4::Paginator - Iterate through paginated GitLab v4 API records.

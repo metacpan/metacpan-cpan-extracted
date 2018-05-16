@@ -27,6 +27,7 @@ requires:
   POSIX: '0'
   Sys::Hostname: '0'
   Time::HiRes: '0'
+  parent: '0'
   perl: '5.01'
-version: 0.08
+version: 0.09
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -160,100 +160,100 @@ sub geocode {
 		}
 	}
 
+	# ::diag($location);
 	if($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
 		my $l = $1;
 		$l =~ s/,/ /g;
 		$l =~ s/\s\s+/ /g;
-		if(my $href = Geo::StreetAddress::US->parse_address($l)) {
-			# print Data::Dumper->new([$href])->Dump();
-			$state = $href->{'state'};
-			if(length($state) > 2) {
-				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
-					$state = $twoletterstate;
-				}
-			}
-			my $city;
-			if($href->{city}) {
-				$city = uc($href->{city});
-			}
-			if($street = $href->{street}) {
-				if(my $type = $self->_normalize($href->{'type'})) {
-					$street .= " $type";
-				}
-				if($href->{suffix}) {
-					$street .= ' ' . $href->{suffix};
-				}
-			}
-			if($street) {
-				if(my $prefix = $href->{prefix}) {
-					$street = "$prefix $street";
-				}
-				my $rc;
-				if($href->{'number'}) {
-					if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
-						return $rc;
+		if(my $href = (Geo::StreetAddress::US->parse_location($l) || Geo::StreetAddress::US->parse_address($l))) {
+			if($state = $href->{'state'}) {
+				if(length($state) > 2) {
+					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+						$state = $twoletterstate;
 					}
 				}
-				if($rc = $self->_get("$street$city$state" . 'US')) {
-					return $rc;
+				my $city;
+				if($href->{city}) {
+					$city = uc($href->{city});
+				}
+				if($street = $href->{street}) {
+					if($href->{'type'} && (my $type = $self->_normalize($href->{'type'}))) {
+						$street .= " $type";
+					}
+					if($href->{suffix}) {
+						$street .= ' ' . $href->{suffix};
+					}
+				}
+				if($street) {
+					if(my $prefix = $href->{prefix}) {
+						$street = "$prefix $street";
+					}
+					my $rc;
+					if($href->{'number'}) {
+						if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
+							return $rc;
+						}
+					}
+					if($rc = $self->_get("$street$city$state" . 'US')) {
+						return $rc;
+					}
 				}
 			}
 		}
 	}
 
-	if($libpostal_is_installed) {
-		if(my %addr = Geo::libpostal::parse_address($location)) {
-			# print Data::Dumper->new([\%addr])->Dump();
-			if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
-				if($street = $addr{'road'}) {
-					$street = uc($street);
-					if($street =~ /(.+)\s+STREET$/) {
-						$street = "$1 ST";
-					} elsif($street =~ /(.+)\s+ROAD$/) {
-						$street = "$1 RD";
-					} elsif($street =~ /(.+)\s+AVENUE$/) {
-						$street = "$1 AVE";
-					} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-						$street = "$1 AVE $2";
-					} elsif($street =~ /(.+)\s+CT$/) {
-						$street = "$1 COURT";
-					} elsif($street =~ /(.+)\s+CIRCLE$/) {
-						$street = "$1 CIR";
-					}
-					$street =~ s/^0+//;	# Turn 04th St into 4th St
-					$addr{'road'} = $street;
+	if($libpostal_is_installed && (my %addr = Geo::libpostal::parse_address($location))) {
+		# print Data::Dumper->new([\%addr])->Dump();
+		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
+			if($street = $addr{'road'}) {
+				$street = uc($street);
+				if($street =~ /(.+)\s+STREET$/) {
+					$street = "$1 ST";
+				} elsif($street =~ /(.+)\s+ROAD$/) {
+					$street = "$1 RD";
+				} elsif($street =~ /(.+)\s+AVENUE$/) {
+					$street = "$1 AVE";
+				} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
+					$street = "$1 AVE $2";
+				} elsif($street =~ /(.+)\s+CT$/) {
+					$street = "$1 COURT";
+				} elsif($street =~ /(.+)\s+CIRCLE$/) {
+					$street = "$1 CIR";
+				} elsif($street =~ /(.+)\s+DRIVE$/) {
+					$street = "$1 DR";
+				} elsif($street =~ /(.+)\s+PARKWAY$/) {
+					$street = "$1 PKWY";
 				}
-				if($addr{'country'} =~ /Canada/i) {
-					$addr{'country'} = 'CA';
-					if(length($addr{'state'}) > 2) {
-						if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($addr{'state'})}) {
-							$addr{'state'} = $twoletterstate;
-						}
-					}
-				} else {
-					$addr{'country'} = 'US';
-					if(length($addr{'state'}) > 2) {
-						if(my $twoletterstate = Locale::US->new()->{state2code}{uc($addr{'state'})}) {
-							$addr{'state'} = $twoletterstate;
-						}
+				$street =~ s/^0+//;	# Turn 04th St into 4th St
+				$addr{'road'} = $street;
+			}
+			if($addr{'country'} =~ /Canada/i) {
+				$addr{'country'} = 'CA';
+				if(length($addr{'state'}) > 2) {
+					if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($addr{'state'})}) {
+						$addr{'state'} = $twoletterstate;
 					}
 				}
+			} else {
+				$addr{'country'} = 'US';
+				if(length($addr{'state'}) > 2) {
+					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($addr{'state'})}) {
+						$addr{'state'} = $twoletterstate;
+					}
+				}
+			}
+			if($addr{'state_district'}) {
+				$addr{'state_district'} =~ s/^(.+)\s+COUNTY/$1/i;
 				if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state_district', 'state', 'country'))) {
 					return $rc;
 				}
-				if($addr{'state_district'}) {
-					if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
-						return $rc;
-					}
-					if($addr{'house_number'}) {
-						if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
-							return $rc;
-						}
-					}
-				} elsif($addr{'house_number'}) {
-					if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
-						return $rc;
-					}
+			}
+			if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
+				return $rc;
+			}
+			if($addr{'house_number'}) {
+				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
+					return $rc;
 				}
 			}
 		}
@@ -265,13 +265,13 @@ sub geocode {
 		$country = $3;
 		$state =~ s/\s$//g;
 		$country =~ s/\s$//g;
-		$openaddr_db = $self->{openaddr_db} ||
-			Geo::Coder::Free::DB::openaddresses->new(
-				directory => $self->{openaddr},
-				cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {})
-			);
-		$self->{openaddr_db} = $openaddr_db;
-		if($openaddr_db && (my $c = country2code($country))) {
+
+		if((uc($country) eq 'ENGLAND') ||
+		   (uc($country) eq 'SCOTLAND') ||
+		   (uc($country) eq 'WALES')) {
+			$country = 'Great Britain';
+		}
+		if(my $c = country2code($country)) {
 			if($c eq 'us') {
 				if(length($state) > 2) {
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
@@ -282,8 +282,13 @@ sub geocode {
 
 				if($city !~ /,/) {
 					$city = uc($city);
-					# Simple case looking up a city in a state in the US
-					if($city !~ /^\sCOUNTY$/) {
+					if($city =~ /^(.+)\sCOUNTY$/) {
+						# Simple case looking up a county in a state in the US
+						if($rc = $self->_get("$1$state" . 'US')) {
+							return $rc;
+						}
+					} else {
+						# Simple case looking up a city in a state in the US
 						if($rc = $self->_get("$city$state" . 'US')) {
 							return $rc;
 						}
@@ -329,7 +334,7 @@ sub geocode {
 					warn "Fast lookup of US location' $location' failed";
 				} else {
 					if($city =~ /^(\d.+),\s*([\w\s]+),\s*([\w\s]+)/) {
-						if(my $href = Geo::StreetAddress::US->parse_address("$1, $2, $state")) {
+						if(my $href = (Geo::StreetAddress::US->parse_address("$1, $2, $state") || Geo::StreetAddress::US->parse_location("$1, $2, $state"))) {
 							# Street, City, County
 							# 105 S. West Street, Spencer, Owen, Indiana, USA
 							# ::diag(Data::Dumper->new([\$href])->Dump());
@@ -469,11 +474,46 @@ sub geocode {
 				}
 			} else {
 				# Currently only handles Town, Region, Country
-				# FIXME: add addresses support
-				my $sc = Locale::SubCountry->new(uc($c));
-				if(my $abbrev = $sc->code(ucfirst(lc($state)))) {
-					if($abbrev ne 'unknown') {
-						$state = $abbrev;
+				# TODO: add addresses support
+				if($c eq 'au') {
+					my $sc = Locale::SubCountry->new(uc($c));
+					if(my $abbrev = $sc->code(ucfirst(lc($state)))) {
+						if($abbrev ne 'unknown') {
+							$state = $abbrev;
+						}
+					}
+				}
+				if($city =~ /^(\w[\w\s]+),\s*([\w\s]+)/) {
+					# City includes a street name
+					my $street = uc($1);
+					$city = uc($2);
+					if($street =~ /(.+)\s+STREET$/) {
+						$street = "$1 ST";
+					} elsif($street =~ /(.+)\s+ROAD$/) {
+						$street = "$1 RD";
+					} elsif($street =~ /(.+)\s+AVENUE$/) {
+						$street = "$1 AVE";
+					} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
+						$street = "$1 AVE $2";
+					} elsif($street =~ /(.+)\s+CT$/) {
+						$street = "$1 COURT";
+					} elsif($street =~ /(.+)\s+CIRCLE$/) {
+						$street = "$1 CIR";
+					} elsif($street =~ /(.+)\s+DRIVE$/) {
+						$street = "$1 DR";
+					} elsif($street =~ /(.+)\s+PARKWAY$/) {
+						$street = "$1 PKWY";
+					}
+					$street =~ s/^0+//;	# Turn 04th St into 4th St
+					if($street =~ /^(\d+)\s+(.+)/) {
+						my $number = $1;
+						$street = $2;
+						if(my $rc = $self->_get("$number$street$city$state$c")) {
+							return $rc;
+						}
+					}
+					if(my $rc = $self->_get("$street$city$state$c")) {
+						return $rc;
 					}
 				}
 				if(my $rc = $self->_get("$city$state$c")) {
@@ -506,6 +546,8 @@ sub geocode {
 	}
 }
 
+# $data is a hashref to data such as returned by Geo::libpostal::parse_address
+# @columns is the key names to use in $data
 sub _search {
 	my ($self, $data, @columns) = @_;
 
@@ -524,7 +566,8 @@ sub _get {
 	my ($self, $location) = @_;
 
 	$location =~ s/,\s*//g;
-	my $digest = Digest::MD5::md5_base64(uc($location));
+	my $digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
+	# ::diag("$location: $digest");
 	if(my $cache = $self->{'cache'}) {
 		if(my $rc = $cache->get_object($digest)) {
 			return Storable::thaw($rc->value());
@@ -536,20 +579,26 @@ sub _get {
 			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {})
 		);
 	$self->{openaddr_db} = $openaddr_db;
-	# print "$location: $digest\n";
-	# ::diag("$location: $digest");
-	# my @call_details = caller(0);
-	# print "line " . $call_details[2], "\n";
+	my @call_details = caller(0);
+	# print "line ", $call_details[2], "\n";
+	# ::diag("line " . $call_details[2]);
 	# print("$location: $digest\n");
 	my $rc = $openaddr_db->fetchrow_hashref(md5 => $digest);
 	if($rc && defined($rc->{'lat'})) {
 		$rc->{'latitude'} = delete $rc->{'lat'};
 		$rc->{'longitude'} = delete $rc->{'lon'};
+	}
+	if($rc && defined($rc->{'latitude'})) {
+		if(my $city = $rc->{'city'}) {
+			if(my $rc2 = $openaddr_db->fetchrow_hashref(sequence => $city, table => 'cities')) {
+				$rc = { %$rc, %$rc2 };
+			}
+		}
 		# ::diag(Data::Dumper->new([\$rc])->Dump());
 		if(my $cache = $self->{'cache'}) {
 			$cache->set($digest, Storable::freeze($rc), '1 week');
 		}
-			
+
 		return $rc;
 	}
 }
@@ -573,10 +622,16 @@ sub _normalize {
 		return 'FORT';
 	} elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
 		return 'CENTER';
+	} elsif(($type eq 'PARKWAY') || ($type eq 'PKWY')) {
+		return 'PKWY';
 	} elsif($type eq 'BLVD') {
 		return 'BLVD';
 	} elsif($type eq 'PIKE') {
 		return 'PIKE';
+	} elsif(($type eq 'DRIVE') || ($type eq 'DR')) {
+		return 'DR';
+	} elsif($type eq 'SPG') {
+		return 'SPRING';
 	}
 
 	warn("Add type $type");

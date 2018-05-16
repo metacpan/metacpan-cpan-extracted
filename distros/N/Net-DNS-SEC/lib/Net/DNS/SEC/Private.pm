@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Private;
 
 #
-# $Id: Private.pm 1644 2018-03-05 20:58:58Z willem $
+# $Id: Private.pm 1667 2018-04-20 10:01:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1644 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1667 $)[1];
 
 
 =head1 NAME
@@ -41,7 +41,6 @@ use warnings;
 use Carp;
 use File::Spec;
 use IO::File;
-use MIME::Base64;
 
 
 sub new { scalar(@_) > 2 ? &_new_params : &_new_keyfile }

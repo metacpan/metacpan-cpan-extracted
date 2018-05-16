@@ -2,7 +2,6 @@
 # Created by Ben Okopnik on Tue Jun  8 22:47:05 EDT 2010
 use warnings;
 use strict;
-# use Term::Menu::Hierarchical;
 use Term::Menu::Hierarchical;
 use Tie::IxHash;	# Keep the top-level menu items in order
 

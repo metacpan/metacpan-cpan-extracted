@@ -1,0 +1,199 @@
+
+[![Build Status](https://travis-ci.org/Corion/dbd-wmi.svg?branch=master)](https://github.com/Corion/dbd-wmi)
+
+# NAME
+
+DBD::WMI - interface to the Windows WMI
+
+# ABSTRACT
+
+This module allows you to issue WQL queries
+through the DBI.
+
+# SYNOPSIS
+
+    use DBI;
+    my $dbh = DBI->connect('dbi:WMI:');
+
+    my $sth = $dbh->prepare(<<WQL);
+      SELECT * FROM Win32_Process
+    WQL
+
+    $sth->execute();
+    while (my @row = $sth->fetchrow) {
+      my $proc = $row[0];
+      print join "\t", $proc->{Caption}, $proc->{ExecutablePath} || "<system>";
+      # $proc->Terminate();
+      print "\n";
+    }
+
+The WMI
+allows you to query various tables ("namespaces"), like the filesystem,
+currently active processes and events:
+
+    SELECT * FROM Win32_Process
+
+The driver/WMI implements two kinds of queries, finite queries like the
+query above and potentially infinite queries for events as they occur in
+the system:
+
+    my $query = q{
+    
+     SELECT * FROM __instanceoperationevent
+     WITHIN 1
+     WHERE TargetInstance ISA 'Win32_DiskDrive'
+     
+    }
+
+This query returns one row (via ->fetchrow\_arrayref() ) whenever a disk
+drive gets added to or removed from the system (think of an USB stick).
+
+There is currently no support for selecting specific
+columns instead of `*`. Support for selecting columns that
+then get returned as plain Perl scalars is planned.
+
+## `DBD::WMI::db::parse_columns STATEMENT`
+
+This routine parses out the requested columns
+from the WQL statement and returns an array reference
+with the names of the columns.
+
+Currently, this only works for `SELECT` statements.
+All other statements get an implicit column
+of `*`, meaning that the Win32::OLE objects
+will be returned.
+
+# HANDLING OF QUERY COLUMNS
+
+The WMI and WQL return full objects instead of single columns. The specification
+of columns is merely a hint to the object what properties to preload. The
+DBD interface deviates from that approach in that it returns objects
+for queries of the form `SELECT *` and the values of the object
+properties when columns are specified. These columns are then case sensitive.
+
+# FUN QUERIES
+
+## List all printers
+
+    SELECT * FROM Win32_Printer
+
+## List all print jobs on a printer
+
+    SELECT * FROM Win32_PrintJob
+      WHERE DriverName = 'HP Deskjet 6122'
+
+## Return a new row whenever a new print job is started
+
+    SELECT * FROM __InstanceCreationEvent
+      WITHIN 10
+      WHERE
+        TargetInstance ISA 'Win32_PrintJob'
+
+## Finding the default printer
+
+    SELECT * FROM Win32_Printer
+      WHERE Default = TRUE
+
+## Setting the default printer (untested, WinXP, Win2003)
+
+    use DBI;
+    my $dbh = DBI->connect('dbi:WMI:');
+    my $sth = $dbh->prepare(<<WQL);
+        SELECT * FROM Win32_Printer
+    WQL
+
+    $sth->execute;
+    while (my @row = $sth->fetchrow) {
+        # We get Win32::OLE objects back:
+        my $printer = $row[0];
+        printf "Making %s the default printer\n", $printer->{Name};
+        $printer->SetDefaultPrinter;
+    };
+
+## Find all network adapters with IP enabled
+
+    SELECT * from Win32_NetworkAdapterConfiguration
+      WHERE IPEnabled = True
+
+## Find files in a directory
+
+    ASSOCIATORS OF {Win32_Directory.Name='C:\WINNT'}
+      WHERE ResultClass = CIM_DataFile
+
+## Find printers on a remote machine
+
+    use DBI;
+    my $machine = 'dawn';
+    my $dbh = DBI->connect('dbi:WMI:'.$machine);
+    my $sth = $dbh->prepare(<<WQL);
+        SELECT * FROM Win32_Printer
+    WQL
+
+    $sth->execute;
+    while (my @row = $sth->fetchrow) {
+        my $printer = $row[0];
+        printf "Making %s the default printer on %s\n", $printer->{Name}, $machine;
+        $printer->SetDefaultPrinter;
+    };
+
+## Get method names of objects
+
+    use Win32::OLE qw(in);
+    ...
+
+    SELECT * FROM Win32_Process
+
+    $sth->execute;
+
+    while (my @row = $sth->fetchrow) {
+        for my $method (in $row[0]->Methods_) {
+            print "Can call $method() on the object\n"
+        };
+    };
+
+# TODO
+
+- Implement placeholders and proper interpolation of values
+- Need to implement DSN parameters for remote computers, credentials
+
+# SEE ALSO
+
+WMI is Microsofts implementation of the WBEM standard ([http://www.dmtf.org/standards/wbem/](http://www.dmtf.org/standards/wbem/)) except that it uses DCOM and not CIM-XML as the transport medium.
+
+The MS WMI main page at [http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wmisdk/wmi/wmi\_start\_page.asp](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wmisdk/wmi/wmi_start_page.asp)
+
+The WQL documentation at [http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wmisdk/wmi/wql\_sql\_for\_wmi.asp](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wmisdk/wmi/wql_sql_for_wmi.asp)
+
+The "Hey Scripting Guy" column at [http://www.microsoft.com/technet/scriptcenter/resources/qanda/default.mspx](http://www.microsoft.com/technet/scriptcenter/resources/qanda/default.mspx)
+
+Wikipedia on WMI at [http://en.wikipedia.org/wiki/Windows\_Management\_Instrumentation](http://en.wikipedia.org/wiki/Windows_Management_Instrumentation)
+
+List of available Win32 WMI classes at [http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wmisdk/wmi/win32\_classes.asp](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wmisdk/wmi/win32_classes.asp)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/dbd-wmi](https://github.com/Corion/dbd-wmi).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-WMI](https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-WMI)
+or via mail to [dbd-wmi-Bugs@rt.cpan.org](https://metacpan.org/pod/dbd-wmi-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2009-2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

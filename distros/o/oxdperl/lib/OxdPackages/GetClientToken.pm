@@ -70,6 +70,12 @@ package GetClientToken;	# This is the &quot;Class&quot;
 			
 			_request_op_discovery_path => shift,
 			
+			_request_authentication_method => shift,
+			
+			_request_algorithm => shift,
+			
+			_request_key_id=> shift,
+			
 			
 			
 			# Response parameter from oxd-server
@@ -135,18 +141,60 @@ package GetClientToken;	# This is the &quot;Class&quot;
 		return $self->{_request_op_host};
 	}
     
-    # @return array
+    # @return string
     sub getRequestOpDiscoveryPath{
         my( $self ) = @_;
 		return $self->{_request_op_discovery_path};
     }
 
-    # @param array $request_op_discovery_path
+    # @param string $request_op_discovery_path
     # @return void
     sub setRequestOpDiscoveryPath{
         my ( $self, $request_op_discovery_path ) = @_;
 		$self->{_request_op_discovery_path} = $request_op_discovery_path if defined($request_op_discovery_path);
 		return $self->{_request_op_discovery_path};
+    }
+    
+    # @return string
+    sub getRequestAuthenticationMethod {
+        my( $self ) = @_;
+		return $self->{_request_authentication_method};
+    }
+
+    # @param string $request_authentication_method
+    # @return void
+    sub setRequestAuthenticationMethod {
+        my ( $self, $request_authentication_method ) = @_;
+		$self->{_request_authentication_method} = $request_authentication_method if defined($request_authentication_method);
+		return $self->{_request_authentication_method};
+    }
+    
+    # @return string
+    sub getRequestAlgorithm {
+        my( $self ) = @_;
+		return $self->{_request_algorithm};
+    }
+
+    # @param string $request_algorithm
+    # @return void
+    sub setRequestAlgorithm {
+        my ( $self, $request_algorithm ) = @_;
+		$self->{_request_algorithm} = $request_algorithm if defined($request_algorithm);
+		return $self->{_request_algorithm};
+    }
+    
+    # @return string
+    sub getRequestKeyId {
+        my( $self ) = @_;
+		return $self->{_request_key_id};
+    }
+
+    # @param string $request_key_id
+    # @return void
+    sub setRequestKeyId {
+        my ( $self, $request_key_id ) = @_;
+		$self->{_request_key_id} = $request_key_id if defined($request_key_id);
+		return $self->{_request_key_id};
     }
     
     # @return array
@@ -227,6 +275,12 @@ package GetClientToken;	# This is the &quot;Class&quot;
     #
     #	array $scope - (Optional) Scope
     #
+    #	string $authentication_method - (Optional) If value is missed then basic authentication is used. Otherwise it's possible to set `private_key_jwt` value for Private Key authentication.
+    #
+    #	string $algorithm - (Optional) Required if authentication_method=private_key_jwt. Valid values are none, HS256, HS384, HS512, RS256, RS384, RS512, ES256, ES384, ES512
+    #
+    #	string $key_id - (Optional) Required if authentication_method=private_key_jwt. It has to be valid key id from key store.
+    #
     # Returns:
     #	void
     #
@@ -246,7 +300,10 @@ package GetClientToken;	# This is the &quot;Class&quot;
             "client_secret"=> $self->getRequestClientSecret(),
             "op_host" => $self->getRequestOpHost(),
             "op_discovery_path" => $self->getRequestOpDiscoveryPath(),
-            "scope" => $self->getRequestScope()
+            "scope" => $self->getRequestScope(),
+            "authentication_method" => $self->getRequestAuthenticationMethod(),
+            "algorithm" => $self->getRequestAlgorithm(),
+            "key_id" => $self->getRequestKeyId()
         };
        
 		$self->{_params} = $paramsArray;

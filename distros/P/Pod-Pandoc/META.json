@@ -37,9 +37,9 @@
       },
       "runtime" : {
          "requires" : {
-            "IPC::Run3" : "0",
+            "Getopt::Long" : "0",
             "Pandoc" : "v0.6.0",
-            "Pandoc::Elements" : "0.29",
+            "Pandoc::Elements" : "0.33",
             "Pod::Simple" : "3.08",
             "Pod::Usage" : "0",
             "perl" : "5.014"
@@ -47,6 +47,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.96",
             "Test::Output" : "0"
@@ -65,8 +66,9 @@
          "web" : "https://github.com/nichtich/Pod-Pandoc"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.5.0",
    "x_contributors" : [
+      "Benct Philip Jonsson <bpjonsson@gmail.com>",
       "Jakob Voß <jakob.voss@gbv.de>"
    ]
 }

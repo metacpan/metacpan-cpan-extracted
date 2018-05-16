@@ -1,5 +1,9 @@
 Revision history for Perl module Business::xISBN
 
+1.004 2018-05-14T22:56:15Z
+	* Mohammad S Anwar (manwar) found a pod issue so I added a Pod
+	test and fixed that.
+
 1.003 2018-04-23T21:50:29Z
 	* Clarify that it's the Artistic License 2.0.
 

@@ -1,6 +1,7 @@
 use strict;
 use lib -e 't' ? 't' : 'test';
-use TestYAML tests => 30;
+use TestYAML tests => 37;
+use Test::Deep;
 
 run {
     my $block = shift;
@@ -18,7 +19,7 @@ run {
               . $errors);
         next;
     }
-    is_deeply(
+    cmp_deeply(
         \@result,
         \@expect,
         $block->description,
@@ -211,14 +212,14 @@ foo                  :        bar
 - >
  # Not a comment;
 # Is a comment
- #Not a comment
+ #Another comment
 --- 42
           #Final
          #Comment
 +++ perl
 ([2,3,4,5],
  {foo => 'bar', boo => 'far'},
- ["# Not a comment; #Not a comment\n"],
+ ["# Not a comment;\n"],
  42)
 === several docs, some empty
 +++ yaml
@@ -410,3 +411,76 @@ bless(do { my $x = 1; \$x}, "moose")
   "test \\": 23
 +++ perl
 [{ 'test - ' => 23, "test ' " => 23, 'test \\' => 23 }]
+=== Plain string with multiple spaces
++++ yaml
+--- A       B
++++ perl
+'A       B'
+=== Plain string with multiple spaces at the beginning
++++ yaml
+--- "   ABC"
++++ perl
+'   ABC'
+=== Allowed characters in anchors
++++ yaml
+---
+- &a.1 a
+- &b/2 b
+- &c_3 c
+- &d-4 d
++++ perl
+['a', 'b', 'c', 'd']
+
+=== Compact nested block sequences
++++ yaml
+- - a
+  -  b
+  - - 1
+  -  - 2
+     - 3
+- - [c]
++++ perl
+[
+    ['a', 'b', [1], [2,3] ],
+    [ ['c'] ],
+]
+
+=== Combined block scalar indicators
++++ yaml
+---
+a: |-2
+    1
+  2
+b: |2-
+    1
+  2
+c: >+2
+    1
+  2
+d: >2+
+    1
+  2
++++ perl
+{
+    a => "  1\n2",
+    b => "  1\n2",
+    c => "  1\n2\n",
+    d => "  1\n2\n",
+}
+
+=== Nested explicit key
++++ yaml
+---
+- ? a
+  : b
++++ perl
+[{ a => 'b' }]
+
+=== Nested mappings with non \w keys
++++ yaml
+---
+- .: a
+  <: b
+  -: c
++++ perl
+[ { '.' => 'a', '<' => 'b', '-' => 'c' } ]

@@ -1,3 +1,16 @@
+3.0.0 2018 05 11
+
+Greatly revised in preparation for YAPC Glasgow
+
+More aggressing refactoring, DRY'ing code. More aggressive
+about creating a parallel deparse tree with its own node structure.
+
+Add better API to extract text placing in the context of its parent.
+
+This is just the first step though. A lot more work is planned
+for better test coverage, tree structuring and tagging.
+
+
 2.1.5 2017 07 18
 
 - Botched release: was missing module: B:DeparseTree:P526

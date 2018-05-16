@@ -1,5 +1,8 @@
 Revision history for Perl extension Term::ProgressBar
 
+2.22  2018-05-12 MANWAR
+      - Merged PR #10: Amend to prevent uninitialised warning error, thanks @lharey.
+
 2.21  2017-08-02 MANWAR
       - Added key 'clean' to Makefile.PL script.
 

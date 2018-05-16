@@ -8,8 +8,6 @@ README
 README.pod
 cpanfile
 ex/idp.pl
-ex/keycloak.xml
-ex/webapp.conf
 ex/webapp.pl
 lib/Mojo/SAML.pm
 lib/Mojo/SAML/Document.pm

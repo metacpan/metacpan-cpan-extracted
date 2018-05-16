@@ -130,7 +130,7 @@ L<Mojo::SAML::IdP> inherits all of the attributes from L<Mojo::Base> and impleme
 =head2 entity_id
 
 The entity id (C<entityID>) of the entity to be inspected.
-If the L</metdata> contains only one entity descriptor, it will default to that id.
+If the L</metadata> contains only one entity descriptor, it will default to that id.
 Otherwise, it must be specified manually otherwise it will throw an exception.
 
 =head2 metadata

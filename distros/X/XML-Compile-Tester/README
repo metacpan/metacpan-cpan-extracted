@@ -1,5 +1,5 @@
-=== README for XML-Compile-Tester version 0.90
-=   Generated on Thu Aug 16 00:05:36 2012 by OODoc 2.00
+=== README for XML-Compile-Tester version 0.91
+=   Generated on Fri May 11 01:51:18 2018 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-Compile-Tester-0.90.tar.gz
-       tar -xf XML-Compile-Tester-0.90.tar
-       cd XML-Compile-Tester-0.90
+       gzip -d XML-Compile-Tester-0.91.tar.gz
+       tar -xf XML-Compile-Tester-0.91.tar
+       cd XML-Compile-Tester-0.91
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-Compile-Tester-0.90/
+    http://search.cpan.org/dist/XML-Compile-Tester-0.91/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-Tester

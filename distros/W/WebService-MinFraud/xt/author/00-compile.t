@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 39;
+plan tests => 46;
 
 my @module_files = (
     'WebService/MinFraud.pm',
@@ -22,6 +22,7 @@ my @module_files = (
     'WebService/MinFraud/Error/Generic.pm',
     'WebService/MinFraud/Error/HTTP.pm',
     'WebService/MinFraud/Error/WebService.pm',
+    'WebService/MinFraud/Model/Chargeback.pm',
     'WebService/MinFraud/Model/Factors.pm',
     'WebService/MinFraud/Model/Insights.pm',
     'WebService/MinFraud/Model/Score.pm',
@@ -46,7 +47,13 @@ my @module_files = (
     'WebService/MinFraud/Role/Record/Address.pm',
     'WebService/MinFraud/Role/Record/HasRisk.pm',
     'WebService/MinFraud/Types.pm',
-    'WebService/MinFraud/Validator.pm'
+    'WebService/MinFraud/Validator.pm',
+    'WebService/MinFraud/Validator/Base.pm',
+    'WebService/MinFraud/Validator/Chargeback.pm',
+    'WebService/MinFraud/Validator/Factors.pm',
+    'WebService/MinFraud/Validator/FraudService.pm',
+    'WebService/MinFraud/Validator/Insights.pm',
+    'WebService/MinFraud/Validator/Score.pm'
 );
 
 

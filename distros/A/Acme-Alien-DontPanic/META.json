@@ -15,15 +15,21 @@
    },
    "name" : "Acme-Alien-DontPanic",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "0.044",
+            "Alien::Base::ModuleBuild" : "1.03",
             "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "1.01",
+            "Alien::Base" : "1.41",
             "perl" : "5.008001"
          }
       },
@@ -41,7 +47,7 @@
    "provides" : {
       "Acme::Alien::DontPanic" : {
          "file" : "lib/Acme/Alien/DontPanic.pm",
-         "version" : "0.044"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -58,6 +64,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.044",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

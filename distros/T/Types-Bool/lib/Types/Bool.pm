@@ -1,57 +1,81 @@
 
-BEGIN {
-
-    # For historical reasons, alias *Types::Bool with JSON::PP::Boolean
-    *Types::Bool:: = *JSON::PP::Boolean::;
-
-    # JSON/PP/Boolean.pm is redundant
-    $INC{'JSON/PP/Boolean.pm'} ||= __FILE__
-      unless $ENV{TYPES_BOOL_LOUD};
-}
+use 5.005;
 
 package Types::Bool;
+$Types::Bool::VERSION = '2.98011';
 
 # ABSTRACT: Booleans as objects for Perl
 
-use 5.005;
+BEGIN {
+
+    # For historical reasons, alias *Types::Bool::Impl with JSON::PP::Boolean
+    *Types::Bool::Impl:: = *JSON::PP::Boolean::;
+
+    # JSON/PP/Boolean.pm is redundant
+    $INC{'JSON/PP/Boolean.pm'} ||= __FILE__
+      unless $ENV{TYPES_BOOL_NICE};
+}
+
+package    #
+  Types::Bool::Impl;
 
 BEGIN {
     require overload;
+    if ( $ENV{TYPES_BOOL_LOUD} ) {
+        my @o = grep __PACKAGE__->overload::Method($_), qw(0+ ++ --);
+        my @s = grep __PACKAGE__->can($_), qw(new);
+        push @s, '$VERSION' if $Types::Bool::VERSION;
+        if ( @o || @s ) {
+            my $p = ref do { bless \( my $dummy ), __PACKAGE__ };
+            my @f;
+            push @f, join( ', ', @s ) if @s;
+            push @f, 'overloads on ' . join( ', ', @o ) if @o;
+            warn join( ' and ', @f ), qq{ defined for $p elsewhere};
+        }
+    }
+
     overload->import(
         '0+' => sub { ${ $_[0] } },
         '++' => sub { $_[0] = ${ $_[0] } + 1 },
         '--' => sub { $_[0] = ${ $_[0] } - 1 },
         fallback => 1,
-    ) unless overload::Method( Types::Bool, '0+' );
+    ) unless __PACKAGE__->overload::Method('0+');
 
-    require constant;
-    constant->import( true => do { bless \( my $dummy = 1 ), 'Types::Bool' } )
-      unless Types::Bool->can('true');
-    constant->import( false => do { bless \( my $dummy = 0 ), 'Types::Bool' } )
-      unless Types::Bool->can('false');
+    *new = sub { bless \( my $dummy = $_[1] ? 1 : 0 ), $_[0] }
+      unless __PACKAGE__->can('new');
 
-    unless ( Types::Bool->can('is_bool') ) {
-        require Scalar::Util;
-        *is_bool = sub ($) { Scalar::Util::blessed( $_[0] ) and $_[0]->isa('Types::Bool') };
-    }
-
-    $Types::Bool::VERSION = '2.98009'
-      unless $Types::Bool::VERSION;
-
-    $Types::Bool::ALT_VERSION = '2.98009';
+    $Types::Bool::Impl::VERSION = '2.98011'
+      unless $Types::Bool::Impl::VERSION;
 }
+
+package Types::Bool;
+
+use Scalar::Util ();
+
+use constant true  => Types::Bool::Impl->new(1);
+use constant false => Types::Bool::Impl->new(0);
+
+use constant BOOL_CORE => ref true;
+
+sub is_bool ($) { Scalar::Util::blessed( $_[0] ) and $_[0]->isa(BOOL_CORE) }
 
 sub to_bool ($) { $_[0] ? true : false }
 
 @Types::Bool::EXPORT_OK = qw(true false is_bool to_bool);
 
-sub import {    # Load Exporter only if needed
+BEGIN {
+    if ( "$]" < 5.008003 ) {    # Inherit from Exporter (if needed)
+        require Exporter;
+        my $EXPORTER_VERSION = Exporter->VERSION;
+        $EXPORTER_VERSION =~ tr/_//d;
+        push @Types::Bool::ISA, qw(Exporter) if $EXPORTER_VERSION < 5.57;
+    }
+}
+
+sub import {                    # Load Exporter only if needed
     return unless @_ > 1;
 
     require Exporter;
-    my $EXPORTER_VERSION = Exporter->VERSION;
-    $EXPORTER_VERSION =~ tr/_//d;
-    push @ISA, qw(Exporter) if $EXPORTER_VERSION < 5.57;
 
     no warnings 'redefine';
     *import = sub {

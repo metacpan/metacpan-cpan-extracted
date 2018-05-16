@@ -1,6 +1,21 @@
 
 Release history for Types-Bool
 
+2.98011   2018-05-14 18:19:25-07:00 America/Los_Angeles
+
+    - Detach Types::Bool and the implementation package for booleans
+    - Types::Bool::BOOL_CORE ≡ JSON::PP::Boolean
+    - Only overloads and new() at implementation package
+
+    [others]
+    - Test fix for Perl < 5.8.3
+    - new() method for booleans
+
+2.98010   2018-05-10 10:12:20-07:00 America/Los_Angeles
+
+    - TYPES_BOOL_LOUD=1
+    - TYPES_BOOL_NICE=1
+
 2.98009   2018-05-09 14:34:09-07:00 America/Los_Angeles
 
     - Fix generated t/after-*.t tests

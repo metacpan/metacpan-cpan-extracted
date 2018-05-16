@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Warning;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.007000';
+our $VERSION = '1.008000';
 
 use Types::Standard qw( ArrayRef Str );
 
@@ -40,7 +40,7 @@ WebService::MinFraud::Record::Warning - A warning record returned from a web ser
 
 =head1 VERSION
 
-version 1.007000
+version 1.008000
 
 =head1 SYNOPSIS
 

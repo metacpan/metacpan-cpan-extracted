@@ -10,7 +10,7 @@ XML::Compile::SOAP::Daemon::AnyDaemon - SOAP server based on Any::Daemon
    is a XML::Compile::SOAP::Daemon
 
  XML::Compile::SOAP::Daemon::AnyDaemon
-   is a Any::Daemon
+   is an Any::Daemon
 
 =head1 SYNOPSIS
 
@@ -320,17 +320,12 @@ Assuming that the certificates are in 'certs/', the program looks like this:
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP-Daemon distribution version 3.13,
-built on November 02, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
-
-Please post questions or ideas to the mailinglist at
-F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
-For live contact with other developers, visit the C<#xml-compile> channel
-on C<irc.perl.org>.
+This module is part of XML-Compile-SOAP-Daemon distribution version 3.14,
+built on May 11, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -26,5 +26,6 @@ t/pod-pandoc-modules.t
 t/pod-pandoc.t
 t/pod-simple-pandoc-parse-modules.t
 t/pod-simple-pandoc.t
+t/pod2pandoc.t
 t/release-pod-syntax.t
 t/template.html

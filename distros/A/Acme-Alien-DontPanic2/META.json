@@ -5,7 +5,7 @@
       "Joel A Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "1.29",
+            "Alien::Build" : "1.41",
             "Alien::Build::MB" : "0.05",
             "Module::Build" : "0.28"
          }
@@ -73,7 +73,27 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.2900",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "1.4100",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.27.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_use_unsafe_inc" : 0
 }
 

@@ -1,0 +1,12 @@
+.ship.conf
+.vstags
+Changes
+cpanfile
+lib/Mojolicious/Plugin/PromiseActions.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-basic.t
+t/app.t
+t/reject.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,11 +3,11 @@ use strict;
 use Filter::Simple;
 
 use vars '$VERSION';
-$VERSION = '0.11';
+$VERSION = '0.13';
 
 =head1 NAME
 
-Filter::signatures - very simplicistic signatures for Perl < 5.20
+Filter::signatures - very simplistic signatures for Perl < 5.20
 
 =head1 SYNOPSIS
 
@@ -33,8 +33,8 @@ signatures that were introduced to the Perl core with Perl 5.20.
 
 =head1 CAVEATS
 
-The technique used is a very simplicistic transform to allow for using very
-simplicistic named formal arguments in subroutine declarations. This module
+The technique used is a very simplistic transform to allow for using very
+simplistic named formal arguments in subroutine declarations. This module
 does not implement warning if more or fewer parameters than expected are
 passed in.
 
@@ -82,20 +82,6 @@ versions, line numbers may get out of sync if you use here documents.
 If you spread your formal signatures across multiple lines, the line numbers
 may also go out of sync with the original document.
 
-=head2 Comments within signatures
-
-The module does not support comments within signatures
-
-  sub invalid (
-      $name,     # use this as the name
-      $location, # use this as the location
-  ) {
-      "This is an example"
-  }
-
-The workaround is to not do that or to upgrade to Perl 5.20 or higher
-and use the native signatures support there.
-
 =head2 C<< eval >>
 
 L<Filter::Simple> does not trigger when using
@@ -132,10 +118,24 @@ my $have_signatures = eval {
     1
 };
 
+sub kill_comment {
+    my( $str ) = @_;
+    my @strings = ($str =~ /$Filter::Simple::placeholder/g);
+    for my $ph (@strings) {
+        my $index = unpack('N',$ph);
+        if( ref $Filter::Simple::components[$index] and ${ $Filter::Simple::components[$index] } =~ /^#/ ) {
+            #warn ">> $str contains comment ${$Filter::Simple::components[$index]}";
+            $str =~ s!\Q$;$ph$;\E!!g;
+        };
+    }
+    $str
+}
+
 sub parse_argument_list {
     my( $name, $arglist, $whitespace ) = @_;
     (my $args=$arglist) =~ s!^\(\s*(.*)\s*\)!$1!s;
-    my @args = map { s!^\s*!!; s!\s*$!!; $_} split /\s*,\s*/, $args; # a most simple argument parser
+    my @args = map { kill_comment($_) } map { s!^\s*!!; s!\s*$!!; $_}
+        $args =~ m!((?:[^,$;]+|\Q$;\E.{4}\Q$;\E)+)!sg; # a most simple argument parser
     my $res;
     # Adjust how man newlines we gobble
     $whitespace ||= '';
@@ -147,10 +147,15 @@ sub parse_argument_list {
             # Keep everything on one line
             $args[$_] =~ s/\n/ /g;
 
-            # Named argument
+            # Named argument with default
             if( $args[$_] =~ /^\s*([\$\%\@]\s*\w+)\s*=/ ) {
                 my $named = "$1";
                 push @defaults, "$args[$_] if \@_ <= $_;";
+                $args[$_] = $named;
+
+            # Named argument
+            } elsif( $args[$_] =~ /^\s*([\$\%\@]\s*\w+)\s*$/ ) {
+                my $named = "$1";
                 $args[$_] = $named;
 
             # Slurpy discard
@@ -160,13 +165,23 @@ sub parse_argument_list {
             # Slurpy discard (at the end)
             } elsif( $args[$_] =~ /^\s*[\%\@]\s*$/ ) {
                 $args[$_] = 'undef';
-            }
+            } else {
+                #use Data::Dumper;
+                #warn Dumper \@Filter::Simple::components;
+                #die "Weird, unparsed argument '$args[$_]'";
+            };
+
         };
+
+        # Make sure we return undef as the last statement of our initialization
+        # See t/07*
+        push @defaults, "();" if @defaults;
+
         $res = sprintf 'sub %s { my (%s)=@_;%s%s', $name, join(",", @args), join( "" , @defaults), "\n" x $padding;
         # die sprintf("Too many arguments for subroutine at %s line %d.\n", (caller)[1, 2]) unless @_ <= 2
         # die sprintf("Too few arguments for subroutine at %s line %d.\n", (caller)[1, 2]) unless @_ >= 2
     } else {
-        $res = sprintf 'sub %s { @_==0 or warn "Subroutine %s called with parameters.";', $name, $name;
+        $res = sprintf 'sub %s { @_==0 or warn "Subroutine %s called with parameters.";();', $name, $name;
     };
 
     return $res
@@ -226,7 +241,7 @@ PERL_5010_onwards
 
 if( (! $have_signatures) or $ENV{FORCE_FILTER_SIGNATURES} ) {
 FILTER_ONLY
-    code => \&transform_arguments,
+    code_no_comments => \&transform_arguments,
     executable => sub {
             s!^(use\s+feature\s*(['"])signatures\2;)!#$1!mg;
             s!^(no\s+warnings\s*(['"])experimental::signatures\2;)!#$1!mg;
@@ -252,7 +267,15 @@ L<perlsub/Signatures>
 L<signatures> - a module that doesn't use a source filter but optree
 modification instead
 
-L<Sub::Signatures>
+L<Sub::Signatures> - uses signatures to dispatch to different subroutines
+based on which subroutine matches the signature
+
+L<Method::Signatures> - this module implements subroutine signatures
+closer to Perl 6, but requires L<PPI> and L<Devel::Declare>
+
+L<Function::Parameters> - adds two new keywords for declaring subroutines and
+parses their signatures. It supports more features than core Perl, closer to
+Perl 6, but requires a C compiler and Pelr 5.14+.
 
 =head1 REPOSITORY
 

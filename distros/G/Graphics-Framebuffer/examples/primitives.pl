@@ -22,22 +22,26 @@ my $new_x;
 my $new_y;
 our $F;
 our $FR;
-my $DIRTY   = 1;
-my $dev     = 0;
-my $psize   = 1;
-my $noaccel = 0;
+my $DIRTY    = 1;
+my $dev      = 0;
+my $psize    = 1;
+my $noaccel  = 0;
+my $nosplash = 0;
 
 GetOptions(
-    'x=i'     => \$new_x,
-    'y=i'     => \$new_y,
-    'dev=i'   => \$dev,
-    'pixel=i' => \$psize,
-    'noaccel' => \$noaccel,
+    'x=i'      => \$new_x,
+    'y=i'      => \$new_y,
+    'dev=i'    => \$dev,
+    'pixel=i'  => \$psize,
+    'noaccel'  => \$noaccel,
+    'nosplash' => \$nosplash,
 );
 
 $noaccel = ($noaccel) ? 1 : 0; # Only 1 or 0 please
 
 my $images_path = (-e 'images/RWBY_White.jpg') ? 'images' : 'examples/images';
+
+my $splash = ($nosplash) ? 0 : 2;
 
 print "\n\nGathering images...\n";
 opendir(my $DIR, $images_path);
@@ -50,9 +54,9 @@ our $DB = 0;
 our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) {
-    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'DOUBLE_BUFFER' => 1, 'ACCELERATED' => ! $noaccel);
+    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'DOUBLE_BUFFER' => 16, 'ACCELERATED' => ! $noaccel, 'SPLASH' => $splash);
 } else {
-    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0,'DOUBLE_BUFFER'=>1, 'ACCELERATED' => ! $noaccel);
+    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0,'DOUBLE_BUFFER' => 16, 'ACCELERATED' => ! $noaccel, 'SPLASH' => $splash);
 }
 # warn "PHYSICAL: " . $FR->{'COLOR_ORDER'} . "\nVIRTUAL: " . $F->{'COLOR_ORDER'} . "\n\n";sleep 10;
 $FR->cls('OFF');
@@ -207,6 +211,7 @@ blit_move();
 rotate();
 # flipping();
 monochrome();
+
 foreach my $m (1 .. 9) {    # We skip divide mode because it's stupid and I should never have added it
     if ($m == MASK_MODE) {
         mask_drawing();

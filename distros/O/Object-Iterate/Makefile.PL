@@ -50,7 +50,7 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
-	'LICENSE'       => 'artistic2',
+	'LICENSE'       => 'artistic_2',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -80,17 +80,6 @@ my %WriteMakefile = (
 				web    => "$github/issues",
 				},
 			homepage => $github,
-			},
-		},
-
-	'META_MERGE' => {
-        'meta-spec' => { version => 2 },
-		resources => {
-			repository => {
-				type => 'git',
-				url  => 'git@github.com:briandfoy/Object-Iterate.git',
-				web  => 'https://github.com/briandfoy/Object-Iterate',
-				},
 			},
 		},
 

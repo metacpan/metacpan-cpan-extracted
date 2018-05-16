@@ -30,7 +30,7 @@ sub slurp { local ( @ARGV, $/ ) = @_; <> }
 
     # convert and emit to STDOUT
     $stdout = stdout_from { pod2pandoc( \@source, '-t', 'rst' ) };
-    like $stdout, qr/^NAME/, 'convert to STDOUT';
+    like $stdout, qr/^DESCRIPTION/m, 'convert to STDOUT';
 }
 
 # convert multiple files

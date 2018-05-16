@@ -4,6 +4,11 @@
 TODO:
   . trace incoming and outgoing messages server-side
 
+version 3.14: Fri May 11 01:04:19 CEST 2018
+
+	Improvements:
+	- convert to GIT and GitHub
+
 version 3.13: Thu  2 Nov 09:14:23 CET 2017
 
 	Fixes:
@@ -13,6 +18,7 @@ version 3.12: Fri 13 May 21:21:11 CEST 2016
 
 	Fixes:
 	- test for availability of CGI.pm [cpantesters]
+	  rt.cpan.org#114366 [Slaven Rezic]
 
 	Improvements:
 	- add example of basic-auth in Plack to ::PSGI

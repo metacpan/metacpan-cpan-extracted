@@ -1015,11 +1015,6 @@ my @x;
 @x = ($#{<}, $#{.}, $#{>}, $#{/}, $#{?}, $#{=}, $#+, $#{\}, $#{|}, $#-);
 @x = ($#{;}, $#{:}, $#{1}), $#_;
 ####
-# ${#} interpolated
-# It's a known TODO that warnings are deparsed as bits, not textually.
-no warnings;
-() = "${#}a";
-####
 # [perl #86060] $( $| $) in regexps need braces
 /${(}/;
 /${|}/;
@@ -1338,40 +1333,6 @@ $a x= $b;
 ####
 # @_ with padrange
 my($a, $b, $c) = @_;
-####
-# SKIP ?$] < 5.017004 && "lexical subs not implemented on this Perl version"
-# lexical subroutine
-use feature 'lexical_subs';
-no warnings "experimental::lexical_subs";
-my sub f {}
-print f();
->>>>
-use feature 'lexical_subs';
-BEGIN {${^WARNING_BITS} = "\x54\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x54\x55\x55\x55\x55\x01"}
-my sub f {
-    BEGIN {${^WARNING_BITS} = "\x54\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x54\x55\x55\x55\x01"}
-
-}
-BEGIN {${^WARNING_BITS} = "\x54\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x54\x55\x55\x55\x01"}
-print f();
-####
-# SKIP ?$] < 5.017004 && "lexical subs not implemented on this Perl version"
-# lexical "state" subroutine
-use feature 'state', 'lexical_subs';
-no warnings 'experimental::lexical_subs';
-state sub f {}
-print f();
->>>>
-use feature 'lexical_subs';
-BEGIN {${^WARNING_BITS} = "\x54\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x54\x55\x55\x55\x55\x01"}
-CORE::state sub f {
-    BEGIN {${^WARNING_BITS} = "\x54\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x54\x55\x55\x55\x01"}
-    use feature 'state';
-
-}
-BEGIN {${^WARNING_BITS} = "\x54\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x54\x55\x55\x55\x01"}
-use feature 'state';
-print f();
 ####
 # SKIP ?$] < 5.017004 && "lexical subs not implemented on this Perl version"
 # lexical subroutine scoping

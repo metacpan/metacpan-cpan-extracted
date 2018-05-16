@@ -6,24 +6,12 @@
  *  https://developer.mozilla.org/en/docs/Web/API/console
  */
 
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-/* #include "ppport.h" */
-
 #include <stdio.h>
 #include "util.h"
 #include "duktape.h"
 #include "duk_console.h"
 
-/* set this to non-zero to send all console ouput to stderr */
-#define CONSOLE_USE_STDERR_ALWAYS 0
-
 /* XXX: Add some form of log level filtering. */
-
-/* XXX: For now logs everything to stdout, V8/Node.js logs debug/info level
- * to stdout, warn and above to stderr.  Should this extra do the same?
- */
 
 /* XXX: Should all output be written via e.g. console.write(formattedMsg)?
  * This would make it easier for user code to redirect all console output
@@ -57,20 +45,10 @@ void duk_console_register_handler(ConsoleHandler* handler, void* data)
     console_config.data = data;
 }
 
-static duk_ret_t duk__console_log_helper(duk_context *ctx, int to_stderr, const char *error_name) {
-	duk_idx_t i, n;
-	duk_uint_t flags;
-
-#if defined(CONSOLE_USE_STDERR_ALWAYS) && CONSOLE_USE_STDERR_ALWAYS > 0
-    to_stderr = 1;
-#endif
-
-	flags = (duk_uint_t) duk_get_current_magic(ctx);
-    if (to_stderr) {
-        flags |= DUK_CONSOLE_TO_STDERR;
-    }
-
-	n = duk_get_top(ctx);
+static duk_ret_t duk__console_log_helper(duk_context *ctx, const char *error_name) {
+    duk_uint_t flags = (duk_uint_t) duk_get_current_magic(ctx);
+    duk_idx_t n = duk_get_top(ctx);
+    duk_idx_t i;
 
 	duk_get_global_string(ctx, "console");
 	duk_get_prop_string(ctx, -1, "format");
@@ -109,32 +87,32 @@ static duk_ret_t duk__console_assert(duk_context *ctx) {
 	}
 	duk_remove(ctx, 0);
 
-	return duk__console_log_helper(ctx, 1, "AssertionError");
+	return duk__console_log_helper(ctx, "AssertionError");
 }
 
 static duk_ret_t duk__console_log(duk_context *ctx) {
-	return duk__console_log_helper(ctx, 0, NULL);
+	return duk__console_log_helper(ctx, NULL);
 }
 
 static duk_ret_t duk__console_trace(duk_context *ctx) {
-	return duk__console_log_helper(ctx, 0, "Trace");
+	return duk__console_log_helper(ctx, "Trace");
 }
 
 static duk_ret_t duk__console_info(duk_context *ctx) {
-	return duk__console_log_helper(ctx, 0, NULL);
+	return duk__console_log_helper(ctx, NULL);
 }
 
 static duk_ret_t duk__console_warn(duk_context *ctx) {
-	return duk__console_log_helper(ctx, 1, NULL);
+	return duk__console_log_helper(ctx, NULL);
 }
 
 static duk_ret_t duk__console_error(duk_context *ctx) {
-	return duk__console_log_helper(ctx, 1, "Error");
+	return duk__console_log_helper(ctx, "Error");
 }
 
 static duk_ret_t duk__console_dir(duk_context *ctx) {
 	/* For now, just share the formatting of .log() */
-	return duk__console_log_helper(ctx, 0, 0);
+	return duk__console_log_helper(ctx, 0);
 }
 
 static void duk__console_reg_vararg_func(duk_context *ctx, duk_c_function func, const char *name, duk_uint_t flags) {
@@ -147,6 +125,17 @@ static void duk__console_reg_vararg_func(duk_context *ctx, duk_c_function func, 
 }
 
 void duk_console_init(duk_context *ctx, duk_uint_t flags) {
+    duk_uint_t flags_orig;
+
+	/* If both DUK_CONSOLE_TO_STDOUT and DUK_CONSOLE_TO_STDERR where specified,
+	 * just turn off DUK_CONSOLE_TO_STDOUT and keep DUK_CONSOLE_TO_STDERR. */
+	if ((flags & DUK_CONSOLE_TO_STDOUT) &&
+	    (flags & DUK_CONSOLE_TO_STDERR)) {
+	    flags &= ~DUK_CONSOLE_TO_STDOUT;
+	}
+	/* Remember the (possibly corrected) flags we received. */
+	flags_orig = flags;
+
 	duk_push_object(ctx);
 
 	/* Custom function to format objects; user can replace.
@@ -165,11 +154,24 @@ void duk_console_init(duk_context *ctx, duk_uint_t flags) {
 		"})(Duktape.enc)");
 	duk_put_prop_string(ctx, -2, "format");
 
+	flags = flags_orig;
+	if (!(flags & DUK_CONSOLE_TO_STDOUT) &&
+	    !(flags & DUK_CONSOLE_TO_STDERR)) {
+	    /* No output indicators were specified; these levels go to stdout. */
+	    flags |= DUK_CONSOLE_TO_STDOUT;
+	}
 	duk__console_reg_vararg_func(ctx, duk__console_assert, "assert", flags);
 	duk__console_reg_vararg_func(ctx, duk__console_log, "log", flags);
 	duk__console_reg_vararg_func(ctx, duk__console_log, "debug", flags);  /* alias to console.log */
 	duk__console_reg_vararg_func(ctx, duk__console_trace, "trace", flags);
 	duk__console_reg_vararg_func(ctx, duk__console_info, "info", flags);
+
+	flags = flags_orig;
+	if (!(flags & DUK_CONSOLE_TO_STDOUT) &&
+	    !(flags & DUK_CONSOLE_TO_STDERR)) {
+	    /* No output indicators were specified; these levels go to stderr. */
+	    flags |= DUK_CONSOLE_TO_STDERR;
+	}
 	duk__console_reg_vararg_func(ctx, duk__console_warn, "warn", flags);
 	duk__console_reg_vararg_func(ctx, duk__console_error, "error", flags);
 	duk__console_reg_vararg_func(ctx, duk__console_error, "exception", flags);  /* alias to console.error */

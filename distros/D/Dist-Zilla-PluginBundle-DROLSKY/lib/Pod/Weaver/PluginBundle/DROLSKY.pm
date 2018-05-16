@@ -3,7 +3,7 @@ package Pod::Weaver::PluginBundle::DROLSKY;
 use strict;
 use warnings;
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 use namespace::autoclean -also => ['_exp'];
 
@@ -57,9 +57,9 @@ sub configure {
     my @weaver_config = (
         '@CorePrep',
         [ '-SingleEncoding' => { encoding => 'UTF-8' } ],
-        [ '-Transformer' => List     => { transformer => 'List' } ],
-        [ '-Transformer' => Verbatim => { transformer => 'Verbatim' } ],
-        [ 'Region'       => 'header' ],
+        [ '-Transformer'    => List => { transformer => 'List' } ],
+        [ '-Transformer'    => Verbatim => { transformer => 'Verbatim' } ],
+        [ 'Region'          => 'header' ],
         'Name',
         'Version',
         [ 'Region'  => 'prelude' ],
@@ -308,7 +308,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -500,7 +500,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

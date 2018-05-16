@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::DOM;
+use Mojo::DOM::HTML 'tag_to_html';
 
 # Empty
 is(Mojo::DOM->new,                     '',    'right result');
@@ -2655,5 +2656,138 @@ is $dom->at('barns|bar [hreflang|=en]',    %ns)->text, 'YADA', 'right text';
 is $dom->at('barns|bar [hreflang|=en-US]', %ns)->text, 'YADA', 'right text';
 ok !$dom->at('barns|bar [hreflang|=en-US-yada]', %ns), 'no result';
 ok !$dom->at('barns|bar [hreflang|=e]',          %ns), 'no result';
+
+# Reusing fragments
+my $fragment = Mojo::DOM->new('<a><b>C</b></a>');
+$dom = Mojo::DOM->new('<div></div>');
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom->at('div')->append($fragment);
+$dom->at('div')->append($fragment);
+is $dom, '<div></div><a><b>C</b></a><a><b>C</b></a>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->append_content($fragment);
+$dom->at('div')->append_content($fragment);
+is $dom, '<div><a><b>C</b></a><a><b>C</b></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->content($fragment);
+$dom->at('div a')->content($fragment);
+is $dom, '<div><a><a><b>C</b></a></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->prepend($fragment);
+$dom->at('div')->prepend($fragment);
+is $dom, '<a><b>C</b></a><a><b>C</b></a><div></div>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->prepend_content($fragment);
+$dom->at('div')->prepend_content($fragment);
+is $dom, '<div><a><b>C</b></a><a><b>C</b></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->replace($fragment);
+$dom->at('b')->replace($fragment);
+is $dom,      '<a><a><b>C</b></a></a>', 'right result';
+is $fragment, '<a><b>C</b></a>',        'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->wrap($fragment);
+$dom->at('b')->wrap($fragment);
+is $dom, '<a><a><b>C<b>C<div></div></b></b></a></a>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+$dom = Mojo::DOM->new('<div></div>');
+$dom->at('div')->wrap_content($fragment);
+$dom->at('b')->wrap_content($fragment);
+is $dom, '<div><a><b><a><b>CC</b></a></b></a></div>', 'right result';
+is $fragment, '<a><b>C</b></a>', 'right result';
+
+# Generate tags
+is(Mojo::DOM->new_tag('br')->to_string,  '<br>',        'right result');
+is(Mojo::DOM->new_tag('div')->to_string, '<div></div>', 'right result');
+is(
+  Mojo::DOM->new_tag('div', id => 'foo', hidden => undef)->to_string,
+  '<div hidden id="foo"></div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', 'safe & content'),
+  '<div>safe &amp; content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', id => 'foo', 'safe & content'),
+  '<div id="foo">safe &amp; content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag(
+    'div',
+    id   => 'foo',
+    data => {foo => 0, Bar => 'test'},
+    'safe & content'
+  ),
+  '<div data-bar="test" data-foo="0" id="foo">safe &amp; content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', sub {'unsafe & content'}),
+  '<div>unsafe & content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new_tag('div', id => 'foo', sub {'unsafe & content'}),
+  '<div id="foo">unsafe & content</div>',
+  'right result'
+);
+is(
+  Mojo::DOM->new->new_tag('foo', hidden => undef),
+  '<foo hidden></foo>',
+  'right result'
+);
+is(
+  Mojo::DOM->new->xml(1)->new_tag('foo', hidden => undef),
+  '<foo hidden="hidden" />',
+  'right result'
+);
+$dom = Mojo::DOM->new('<div>Test</div>');
+my $br = $dom->new_tag('br');
+$dom->at('div')->append_content($br)->append_content($br);
+is $dom, '<div>Test<br><br></div>', 'right result';
+is tag_to_html('div', id => 'foo', 'bar'), '<div id="foo">bar</div>',
+  'right result';
+
+# Generate selector
+$dom = Mojo::DOM->new(<<EOF);
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+    <p id="a">A</p>
+    <p id="b">B</p>
+    <p id="c">C</p>
+    <p id="d">D</p>
+  </body>
+<html>
+EOF
+is $dom->selector, undef, 'not a tag';
+is $dom->at('#a')->child_nodes->first->selector, undef, 'not a tag';
+is $dom->at('#a')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(1)', 'right selector';
+is $dom->at($dom->at('#a')->selector)->text, 'A', 'right text';
+is $dom->at('#b')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(2)', 'right selector';
+is $dom->at($dom->at('#b')->selector)->text, 'B', 'right text';
+is $dom->at('#c')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(3)', 'right selector';
+is $dom->at($dom->at('#c')->selector)->text, 'C', 'right text';
+is $dom->at('#d')->selector,
+  'html:nth-child(1) > body:nth-child(2) > p:nth-child(4)', 'right selector';
+is $dom->at($dom->at('#d')->selector)->text, 'D', 'right text';
+is $dom->at('title')->selector,
+  'html:nth-child(1) > head:nth-child(1) > title:nth-child(1)',
+  'right selector';
+is $dom->at($dom->at('title')->selector)->text, 'Test', 'right text';
+is $dom->at('html')->selector, 'html:nth-child(1)', 'right selector';
 
 done_testing();

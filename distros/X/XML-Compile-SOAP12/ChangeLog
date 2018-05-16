@@ -4,6 +4,11 @@
 explain differences in WSDL
 http://schemas.xmlsoap.org/wsdl/soap12/soap12WSDL.html
 
+version 3.06: Fri May 11 00:29:18 CEST 2018
+
+	Improvements:
+	- convert to GIT and GitHub
+
 version 3.05: Wed  8 Nov 10:21:12 CET 2017
 
 	Fixes:

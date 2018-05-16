@@ -4,55 +4,50 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 0.91: Fri May 11 01:51:33 CEST 2018
+
+	Improvements:
+	- change documentation style.
+	- convert to GIT and GitHub
+
 version 0.90: Thu Aug 16 00:06:24 CEST 2012
 
 	Improvements:
-
 	- add templ_tree()
 	
 version 0.06: Tue Jun 15 14:49:28 CEST 2010
 
 	Fixes:
-
 	- templ_xml should default include_namespaces to <true>
 
 version 0.05: Wed Feb 11 11:07:24 CET 2009
 
 	Fixes:
-
 	- do not use /bin/pwd in t/99pod.t
-
 	- use 'use_default_namespace' i.s.o 'use_default_prefix' in
 	  writer.
-
 	- do not complain if default_namespace is not set.
 
 	Improvements:
-
 	- removed superfluous '$' before 'templ*' in SYNOPSIS
 
 version 0.04: Wed Oct  1 22:12:59 CEST 2008
 
 	Fixes:
-
 	- dependency with XML::Compile::Util.  [cpantesters]
 
 version 0.03: Wed Oct  1 09:50:53 CEST 2008
 
 	Changes:
-
 	- create_reader --> reader_create, create_writer --> writer_create
 
 	Improvements:
-
 	- much more documentation.
 
 version 0.02: Tue Apr 29 19:01:14 CEST 2008
 
 	Improvements:
-
 	- does not depend on XML::Compile.
-
 	- Add ChangeLog file to package.
 
 version 0.01: Mon Apr 21 17:09:08 CEST 2008

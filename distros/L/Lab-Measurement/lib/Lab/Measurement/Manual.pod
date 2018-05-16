@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.641
+version 3.642
 
 =head1 OVERVIEW
 
@@ -93,6 +93,8 @@ folder structure.
 =item * L<Lab::Moose::Sweep::Step::Frequency>
 
 =item * L<Lab::Moose::Sweep::Step::Magnet>
+
+=item * L<Lab::Moose::Sweep::Step::Temperature>
 
 =item * L<Lab::Moose::Sweep::Continuous>
 
@@ -200,6 +202,14 @@ contains support for temperature sensor and He/N2 level meters.
 
 =back
 
+=head3 Temperature control devices
+
+=over
+
+=item * L<Lab::Moose::Instrument::OI_Triton>
+
+=back
+
 =head2 Moose::Instrument Roles
 
 =over
@@ -215,6 +225,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::VNASweep>
 
 =item * L<Lab::Moose::Instrument::SpectrumAnalyzer>
+
+=item * L<Lab::Moose::Instrument::OI_Common>
 
 =item * L<Lab::Moose::Instrument::DisplayXY>
 
@@ -367,6 +379,8 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =item * L<Lab::XPRESS::Sweep>
 
 =item * L<Lab::XPRESS::Sweep::Frame>
+
+=item * L<Lab::Moose::Stabilizer>
 
 =back
 

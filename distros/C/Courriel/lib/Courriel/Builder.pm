@@ -3,7 +3,7 @@ package Courriel::Builder;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Carp qw( croak );
 use Courriel;
@@ -452,7 +452,7 @@ Courriel::Builder - Build emails with sugar
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -504,17 +504,17 @@ an empty string, but not C<undef>.
 =head2 from($from)
 
 This sets the From header of the email. It expects a single string or
-L<Email::Address> object.
+an object with a C<format()> method like C<Email::Address::XS>.
 
 =head2 to($from)
 
-This sets the To header of the email. It expects a list of string and/or
-L<Email::Address> objects.
+This sets the To header of the email. It expects a list of strings and/or
+objects with a C<format()> method like C<Email::Address::XS>.
 
 =head2 cc($from)
 
-This sets the Cc header of the email. It expects a list of string and/or
-L<Email::Address> objects.
+This sets the Cc header of the email. It expects a list of strings and/or
+objects with a C<format()> method like C<Email::Address::XS>.
 
 =head2 header( $name => $value )
 
@@ -720,7 +720,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

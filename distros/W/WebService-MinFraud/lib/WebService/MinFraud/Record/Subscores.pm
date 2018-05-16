@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Subscores;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.007000';
+our $VERSION = '1.008000';
 
 use WebService::MinFraud::Types qw( Num );
 
@@ -48,7 +48,7 @@ WebService::MinFraud::Record::Subscores - Contains minFraud Factors subscores
 
 =head1 VERSION
 
-version 1.007000
+version 1.008000
 
 =head1 SYNOPSIS
 

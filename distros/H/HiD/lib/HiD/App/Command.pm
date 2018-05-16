@@ -3,7 +3,7 @@
 
 package HiD::App::Command;
 our $AUTHORITY = 'cpan:GENEHACK';
-$HiD::App::Command::VERSION = '1.991';
+$HiD::App::Command::VERSION = '1.992';
 use Moose;
 extends 'MooseX::App::Cmd::Command';
 use namespace::autoclean;
@@ -133,7 +133,7 @@ stored configuration information, and return it.
 
 =head1 VERSION
 
-version 1.991
+version 1.992
 
 =head1 AUTHOR
 

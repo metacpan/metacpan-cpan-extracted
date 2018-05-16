@@ -30,7 +30,7 @@ resources:
   bugtracker: https://github.com/nichtich/Pandoc-Wrapper/issues
   homepage: https://github.com/nichtich/Pandoc-Wrapper
   repository: https://github.com/nichtich/Pandoc-Wrapper.git
-version: 0.8.2
+version: 0.8.3
 x_contributors:
   - 'Benct Philip Jonsson <bpjonsson@gmail.com>'
   - 'Edward Betts <edward@4angle.com>'

@@ -1,4 +1,4 @@
-requires 'Mojolicious', '7.77'; # namespace selectors
+requires 'Mojolicious', '7.78'; # tag_to_html
 requires 'Crypt::OpenSSL::RSA';
 requires 'Crypt::OpenSSL::X509';
 requires 'Data::GUID';

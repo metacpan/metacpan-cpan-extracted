@@ -1,9 +1,9 @@
 package Net::DNS::SEC::RSA;
 
 #
-# $Id: RSA.pm 1660 2018-04-03 14:12:42Z willem $
+# $Id: RSA.pm 1667 2018-04-20 10:01:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1660 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1667 $)[1];
 
 
 =head1 NAME
@@ -44,68 +44,59 @@ public key resource record.
 use strict;
 use integer;
 use warnings;
-use Digest::SHA;
 use MIME::Base64;
 
-eval { require Digest::MD5 };		## deprecated ##
-
 my %RSA = (
-	1  => [4,	'Digest::MD5'],
-	5  => [64,	'Digest::SHA'],
-	7  => [64,	'Digest::SHA'],
-	8  => [672,	'Digest::SHA', 256],
-	10 => [674,	'Digest::SHA', 512],
+	1  => [sub { Net::DNS::SEC::libcrypto::EVP_md5() }],
+	5  => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
+	7  => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
+	8  => [sub { Net::DNS::SEC::libcrypto::EVP_sha256() }],
+	10 => [sub { Net::DNS::SEC::libcrypto::EVP_sha512() }],
 	);
 
 
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $algorithm = $private->algorithm;			# digest sigdata
-	my ( $nid, $object, @param ) = @{$RSA{$algorithm} || []};
-	die 'public key not RSA' unless $object;
-	my $hash = $object->new(@param);
-	$hash->add($sigdata);
-
-	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
+	my $algorithm = $private->algorithm;
+	my ($evpmd) = @{$RSA{$algorithm} || []};
+	die 'private key not RSA' unless $evpmd;
 
 	my ( $n, $e, $d, $p, $q ) = map decode_base64( $private->$_ ),
 			qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
 
+	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 	Net::DNS::SEC::libcrypto::RSA_set0_factors( $rsa, $p, $q );
 	Net::DNS::SEC::libcrypto::RSA_set0_key( $rsa, $n, $e, $d );
 
-	my $sig = Net::DNS::SEC::libcrypto::RSA_sign( $nid, $hash->digest, $rsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
+	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_RSA( $evpkey, $rsa );
 
-	Net::DNS::SEC::libcrypto::RSA_free($rsa);		# destroy private key
-	return $sig;
+	Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, &$evpmd );
 }
 
 
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $algorithm = $keyrr->algorithm;			# digest sigdata
-	my ( $nid, $object, @param ) = @{$RSA{$algorithm} || []};
-	die 'public key not RSA' unless $object;
-	my $hash = $object->new(@param);
-	$hash->add($sigdata);
+	my $algorithm = $keyrr->algorithm;
+	my ($evpmd) = @{$RSA{$algorithm} || []};
+	die 'public key not RSA' unless $evpmd;
 
 	return unless $sigbin;
-
-	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 
 	my $keybin = $keyrr->keybin;				# public key
 	my ( $short, $long ) = unpack( 'Cn', $keybin );		# RFC3110, section 2
 	my $keyfmt = $short ? "x a$short a*" : "x3 a$long a*";
 	my ( $exponent, $modulus ) = unpack( $keyfmt, $keybin );
 
+	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 	Net::DNS::SEC::libcrypto::RSA_set0_key( $rsa, $modulus, $exponent, '' );
 
-	my $vrfy = Net::DNS::SEC::libcrypto::RSA_verify( $nid, $hash->digest, $sigbin, $rsa );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
+	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_RSA( $evpkey, $rsa );
 
-	Net::DNS::SEC::libcrypto::RSA_free($rsa);
-	return $vrfy;
+	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey, &$evpmd );
 }
 
 

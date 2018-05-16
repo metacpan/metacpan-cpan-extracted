@@ -10,7 +10,7 @@ use Graphics::Raylib '+family';
 my $g = Graphics::Raylib->window($SIZE, $SIZE);
 plan skip_all => 'No graphic device' if !$g or defined $ENV{NO_GRAPHICAL_TEST} or defined $ENV{NO_GRAPHICAL_TESTS};
 
-my $bitmap = Graphics::Raylib::Shape->bitmap(
+my $img = Graphics::Raylib::Texture->new(
     matrix => [([(0)x$SIZE]) x $SIZE], # We don't care for the actual values, so it's ok they alias
     color => sub {
         my (undef, $x, $y) = @_;
@@ -21,12 +21,14 @@ my $bitmap = Graphics::Raylib::Shape->bitmap(
             $y /= 3;
         }
         return
-    });
+    },
+    fullscreen => 1
+);
 $g->fps(1);
 
 $g->clear;
 Graphics::Raylib::draw {
-    $bitmap->draw;
+    $img->draw;
 };
 
 sleep($ENV{RAYLIB_TEST_SLEEP_SECS} // 1);

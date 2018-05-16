@@ -1,3 +1,9 @@
+0.181310  2018-05-11 23:52:11+02:00 Europe/Brussels
+    - Additions
+      - GeneticCode::Factory: codes now accept ambiguous codons in translation
+    - Changes
+      - Taxonomy: splitting of lineages should be more robust
+
 0.181180  2018-04-28 13:43:41+02:00 Europe/Brussels
     - Fixes
       - ColorScheme: fixed bug #125225 (rt.cpan.org): depends on module not on CPAN

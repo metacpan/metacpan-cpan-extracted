@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1660 2018-04-03 14:12:42Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1668 2018-04-23 13:36:44Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -25,13 +25,12 @@ my %metadata = (
 
 
 my %prerequisite = (
-	'Digest::SHA'  => 5.23,
 	'DynaLoader'   => 1.04,
 	'File::Find'   => 1.05,
 	'File::Spec'   => 0.86,
 	'IO::File'     => 1.08,
 	'MIME::Base64' => 2.13,
-	'Net::DNS'     => 1.01,
+	'Net::DNS'     => 1.08,
 	'Test::More'   => 0.47,
 	);
 

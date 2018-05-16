@@ -1,5 +1,5 @@
 package Koha::Contrib::ARK;
-$Koha::Contrib::ARK::VERSION = '1.0.2';
+$Koha::Contrib::ARK::VERSION = '1.0.3';
 # ABSTRACT: ARK Management
 use Moose;
 
@@ -11,10 +11,40 @@ use Log::Dispatch;
 use Log::Dispatch::Screen;
 use Log::Dispatch::File;
 use C4::Context;
-use Koha::Contrib::ARK::Updater;
-use Koha::Contrib::ARK::Clearer;
+use Koha::Contrib::ARK::Reader;
+use Koha::Contrib::ARK::Writer;
+use Koha::Contrib::ARK::Update;
+use Koha::Contrib::ARK::Clear;
+use Koha::Contrib::ARK::Check;
 use Term::ProgressBar;
 
+
+# Action id / message
+my $raw_actions = <<EOS;
+found_right_field      ARK found in the right field
+found_wrong_field      ARK found in the wrong field
+not_found              ARK not found
+build                  ARK Build
+clear                  Clear ARK field
+add                    Add ARK field
+remove_existing        Remove existing field while adding ARK field
+generated              ARK generated
+use_biblionumber       No koha.id field, use biblionumber to generate ARK
+err_pref_missing       ARK_CONF preference is missing
+err_pref_decoding      Can't decode ARK_CONF
+err_pref_ark_missing   Invalid ARK_CONF preference: 'ark' variable is missing
+err_pref_var_missing   A variable is missing
+err_pref_nothash       Variable is not a HASH
+err_pref_var_tag       Tag invalid
+err_pref_var_letter    Letter missing
+EOS
+
+my $what = { map {
+    /^(\w*) *(.*)$/;
+    { $1 => { id => $1, msg => $2 } }
+} split /\n/, $raw_actions };
+
+$Koha::Contrib::ARK::what = $what;
 
 
 has c => ( is => 'rw', isa => 'HashRef' );
@@ -25,7 +55,7 @@ has cmd => (
     isa => 'Str',
     trigger => sub {
         my ($self, $cmd) = @_;
-        $self->fatal("Invalid command: $cmd\n")
+        $self->error("Invalid command: $cmd\n")
             if $cmd !~ /check|clear|update/;
         return $cmd;
     },
@@ -37,42 +67,56 @@ has doit => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has verbose => ( is => 'rw', isa => 'Bool', default => 0 );
 
-has loglevel => (
-    is => 'rw',
-    isa => 'Str',
-    default => 'debug',
-);
+has debug => ( is => 'rw', isa => 'Bool', default => 0 );
+
 
 has field_query => ( is => 'rw', isa => 'Str' );
 
-has log => (
+has reader => (is => 'rw');
+has writer => (is => 'rw');
+has action => (is => 'rw', isa => 'Koha::Contrib::ARK::Action' );
+
+
+has explain => (
     is => 'rw',
-    isa => 'Log::Dispatch',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        my $log = Log::Dispatch->new();
-        $log->add( Log::Dispatch::File->new(
-            name      => 'file1',
-            min_level => $self->loglevel,
-            filename  => './koha-ark.log',
-            mode      => '>>',
-            binmode   => ':encoding(UTF-8)',
-        ) );
-        return $log;
-    }
+    isa => 'HashRef',
+);
+
+has current => (
+    is => 'rw',
+    isa => 'HashRef',
 );
 
 
-has reader => (is => 'rw');
-has writer => (is => 'rw');
-has converter => (is => 'rw');
+sub set_current {
+    my ($self, $biblionumber, $record) = @_;
+    my $current = { biblionumber => $biblionumber };
+    $current->{ record } = tojson($record) if $self->debug;
+    $self->current($current);
+}
+    
+
+sub error {
+    my ($self, $id, $more) = @_;
+    my %r = %{$what->{$id}};
+    $r{more} = $more if $more;
+    $self->explain->{error}->{$id} = \%r;
+}
 
 
-sub fatal {
-    my ($self, $msg) = @_;
-    $self->log->error( "$msg\n" );
-    exit;
+sub what_append {
+    my ($self, $id, $more) = @_;
+    my %r = %{$what->{$id}};
+    $r{more} = $more if $more;
+    $self->current->{what}->{$id} = \%r;
+}
+
+
+sub dump_explain {
+    my $self = shift;
+
+    open my $fh, '>:encoding(utf8)', 'koha-ark.json';
+    print $fh to_json($self->explain, { pretty => 1 });
 }
 
 
@@ -80,33 +124,50 @@ sub BUILD {
     my $self = shift;
 
     my $dt = DateTime->now();
-    $self->log->info(
-        "\n" . ('-' x 80) . "\nkoha-ark: start ".
-        $self->cmd . " -- " . $dt->ymd . " " . $dt->hms . "\n"
-    );
-    $self->log->info("** TEST MODE **\n") unless $self->doit;
-    $self->log->debug("Reading ARK_CONF\n");
+    my $explain = {
+        action => $self->cmd,
+        timestamp => '"' . $dt->ymd . " " . $dt->hms . '"',
+        testmode => $self->doit ? 0 : 1,
+    };
+    $self->explain($explain);
+
     my $c = C4::Context->preference("ARK_CONF");
-    $self->fatal("ARK_CONF Koha system preference is missing") unless $c;
-    $self->log->debug("ARK_CONF=\n$c\n");
+    unless ($c) {
+        $self->error('err_pref_missing');
+        return;
+    }
 
     try {
         $c = decode_json($c);
     } catch {
-        $self->fatal("Error while decoding json ARK_CONF preference: $_");
+        $self->error('err_pref_decoding', $_);
+        return;
     };
 
     my $a = $c->{ark};
-    $self->fatal("Invalid ARK_CONF preference: 'ark' variable is missing") unless $a;
+    unless ($a) {
+        $self->error('err_pref_ark_missing');
+        return;
+    }
 
     # Check koha fields
     for my $name ( qw/ id ark / ) {
         my $field = $a->{koha}->{$name};
-        $self->fatal("Missing: koha.$name") unless $field;
-        $self->fatal("koha.$name is not a hash") if ref $field ne "HASH";
-        $self->fatal("Missing: koha.$name.tag") unless $field->{tag};
-        $self->fatal("Invalid koha.$name.tag") if $field->{tag} !~ /^[0-9]{3}$/;
-        $self->fatal("Missing koha.$name.letter")
+        unless ($field) {
+            $self->error('err_pref_var_missing', "koha.$name");
+            next;
+        }
+        if ( ref $field ne "HASH" ) {
+            $self->error('err_pref_nothash', "koha.$name");
+            next;
+        }
+        if ( $field->{tag} ) {
+            $self->error('err_pref_var_tag', "koha.$name.tag") if $field->{tag} !~ /^[0-9]{3}$/;
+        }
+        else {
+            $self->error('err_pref_var_missing', "koha.$name.tag");
+        }
+        $self->error('err_pref_var_letter', "koha.$name.letter")
             if $field->{tag} !~ /^00[0-9]$/ && ! $field->{letter};
     }
 
@@ -117,7 +178,6 @@ sub BUILD {
           $id->{letter} . '"]'
         : '//controlfield[@tag="' . $id->{tag} . '"]';
     $field_query = "ExtractValue(metadata, '$field_query')";
-    $self->log->debug("field_query = $field_query\n");
     $self->field_query( $field_query );
 
     $self->c($c);
@@ -125,12 +185,19 @@ sub BUILD {
     # Instanciation reader/writer/converter
     $self->reader( Koha::Contrib::ARK::Reader->new(
         ark => $self,
-        emptyark => $self->cmd eq 'update',
+        select => $self->cmd eq 'update' ? 'WithoutArk' :
+                  $self->cmd eq 'clear'  ? 'WithArk' : 'All',
     ) );
+    $explain->{result} = {
+        count => $self->reader->total,
+        records => [],
+    };
+    $self->explain($explain);
     $self->writer( Koha::Contrib::ARK::Writer->new( ark => $self ) );
-    $self->converter( $self->cmd eq 'update'
-        ? Koha::Contrib::ARK::Updater->new( ark => $self )
-        : Koha::Contrib::ARK::Clearer->new( ark => $self )
+    $self->action(
+        $self->cmd eq 'check'  ? Koha::Contrib::ARK::Check->new( ark => $self ) :
+        $self->cmd eq 'update' ? Koha::Contrib::ARK::Update->new( ark => $self ) :
+                                 Koha::Contrib::ARK::Clear->new( ark => $self )
     );
 }
 
@@ -152,28 +219,59 @@ sub build_ark {
             : $id->value;
     }
     unless ($id) {
-        $self->log->warning("No koha.id field. Use biblionumber instead\n");
+        $self->what_append('use_biblionumber');
         $id = $biblionumber;
     }
     $ark =~ s/{id}/$id/;
+    $self->what_append('generated', $ark);
     return $ark;
+}
+
+
+sub tojson {
+    my $record = shift;
+    my $rec = {
+        leader => $record->leader,
+        fields => [ map {
+            my @values = ( $_->tag );
+            if ( ref($_) eq 'MARC::Moose::Field::Control' ) {
+                push @values, $_->value;
+            }
+            else {
+                push @values, $_->ind1 . $_->ind2;
+                for (@{$_->subf}) {
+                    push @values, $_->[0], $_->[1];
+                }
+            }
+            \@values;
+        } @{ $record->fields } ],
+    };
+    return $rec;
 }
 
 
 sub run {
     my $self = shift;
 
-    my $progress;
-    $progress = Term::ProgressBar->new({ count => $self->reader->total })
-        if $self->verbose;
-    my $next_update = 0;
-    while ( my $record = $self->reader->read() ) {
-        $record = $self->converter->convert($record);
-        $self->writer->write($record);
-        my $count = $self->reader->count;
-        next unless $progress;
-        $next_update = $progress->update($count) if $count >= $next_update;
+    unless ( $self->explain->{error} ) { 
+        my $progress;
+        $progress = Term::ProgressBar->new({ count => $self->reader->total })
+            if $self->verbose;
+        my $next_update = 0;
+        while ( my $br = $self->reader->read() ) {
+            my ($biblionumber, $record) = @$br;
+            $self->action->action($biblionumber, $record);
+            if ( $self->cmd ne 'check' ) {
+                $self->writer->write($biblionumber, $record);
+            }
+            push @{$self->explain->{result}->{records}}, $self->current;
+            my $count = $self->reader->count;
+            next unless $progress;
+            $next_update = $progress->update($count) if $count >= $next_update;
+            last if $self->reader->count == 1000000;
+        }
     }
+    $self->dump_explain();
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -191,7 +289,7 @@ Koha::Contrib::ARK - ARK Management
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 ATTRIBUTES
 
@@ -208,9 +306,9 @@ Is the process effective?
 
 Operate in verbose mode
 
-=head2 loglevel
+=head2 debug
 
-Logging level. The usual suspects: debug info warn error fatal.
+In debug mode, there is more info produces. By default, false.
 
 =head1 METHODS
 

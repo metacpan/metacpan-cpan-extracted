@@ -17,25 +17,25 @@ name: Map-Tube-Delhi
 provides:
   Map::Tube::Delhi:
     file: lib/Map/Tube/Delhi.pm
-    version: 0.69
+    version: 0.70
   Map::Tube::Delhi::Line::Blue:
     file: lib/Map/Tube/Delhi/Line/Blue.pm
-    version: 0.69
+    version: 0.70
   Map::Tube::Delhi::Line::Green:
     file: lib/Map/Tube/Delhi/Line/Green.pm
-    version: 0.69
+    version: 0.70
   Map::Tube::Delhi::Line::Orange:
     file: lib/Map/Tube/Delhi/Line/Orange.pm
-    version: 0.69
+    version: 0.70
   Map::Tube::Delhi::Line::Red:
     file: lib/Map/Tube/Delhi/Line/Red.pm
-    version: 0.69
+    version: 0.70
   Map::Tube::Delhi::Line::Violet:
     file: lib/Map/Tube/Delhi/Line/Violet.pm
-    version: 0.69
+    version: 0.70
   Map::Tube::Delhi::Line::Yellow:
     file: lib/Map/Tube/Delhi/Line/Yellow.pm
-    version: 0.69
+    version: 0.70
 requires:
   Data::Dumper: 0
   File::Share: 0
@@ -48,5 +48,5 @@ requires:
 resources:
   homepage: https://github.com/manwar/Map-Tube-Delhi
   repository: https://github.com/manwar/Map-Tube-Delhi.git
-version: 0.69
+version: 0.70
 x_serialization_backend: 'YAML::Tiny version 1.56'

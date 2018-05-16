@@ -1,7 +1,7 @@
 ## -*- Mode: CPerl -*-
 ##  + CPerl pukes on '/esg'-modifiers.... bummer
 ##
-## $Id: Dev.pm 8882 2017-06-06 08:09:55Z moocow $
+## $Id: Dev.pm 9576 2018-05-15 06:59:23Z moocow $
 ##
 ## File: PDL::VectorValued::Dev.pm
 ## Author: Bryan Jurish <moocow@cpan.org>
@@ -16,7 +16,7 @@ use strict;
 #use PDL::PP; ##-- do NOT do this!
 use Exporter;
 
-our $VERSION = '1.0.7'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
+our $VERSION = '1.0.8'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
 our @ISA = qw(Exporter);
 our @EXPORT_OK =
   (
@@ -252,7 +252,7 @@ sub vvpp_pdlvar_basename {
 
 Returns PDL::PP code for lexicographically comparing two vectors
 C<$vec1> and C<$vec2> along the dimension named C<$dim>, storing the
-comparsion result in the C variable C<$retvar>,
+comparison result in the C variable C<$retvar>,
 similar to what:
 
  $retvar = ($vec1 <=> $vec2);
@@ -352,7 +352,7 @@ sub vvpp_cmpvec_code {
 
 Returns PDL::PP expression code for lexicographically comparing two values
 C<$val1> and C<$val2>, storing the
-comparsion result in the C variable C<$retvar>,
+comparison result in the C variable C<$retvar>,
 similar to what:
 
  ($vec1 <=> $vec2);

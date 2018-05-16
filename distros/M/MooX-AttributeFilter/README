@@ -3,7 +3,7 @@ NAME
     attributes
 
 VERSION
-    version 0.001005
+    version 0.001006
 
 SYNOPSIS
         package My::Class;

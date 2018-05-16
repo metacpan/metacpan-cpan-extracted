@@ -3,7 +3,7 @@ package mymm;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use Alien::Base::Wrapper 1.29 qw( Acme::Alien::DontPanic2 !export );
+use Alien::Base::Wrapper 1.41 qw( Acme::Alien::DontPanic2 !export );
 
 sub myWriteMakefile_as_configure_requires
 {

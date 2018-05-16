@@ -12,14 +12,12 @@ $eumm_version =~ s/_//;
 
 my $module = 'Filter::signatures';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
+(my $distbase = $module) =~ s!::!-!g;
 
-# I should maybe use something like Shipwright...
-regen_README($main_file);
-#regen_EXAMPLES();
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
-WriteMakefile1(
+my %module = (
     NAME                => $module,
     AUTHOR              => q{Max Maischein <corion@cpan.org>},
     VERSION_FROM        => $main_file,
@@ -53,6 +51,7 @@ WriteMakefile1(
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
+        'Text::Balanced' => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -60,6 +59,19 @@ WriteMakefile1(
 
     test            => { TESTS => join( ' ', @tests ) },
 );
+
+# This is so that we can do
+#     require 'Makefile.PL'
+# and then call get_module_info
+
+sub get_module_info { %module }
+
+if( ! caller ) {
+    # I should maybe use something like Shipwright...
+    regen_README($main_file);
+    #regen_EXAMPLES();
+    WriteMakefile1(get_module_info);
+};
 
 1;
 

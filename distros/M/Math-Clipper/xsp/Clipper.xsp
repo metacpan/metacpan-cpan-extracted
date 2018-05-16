@@ -280,11 +280,11 @@ simplify_polygons(polygons, fillType)
   OUTPUT:
     RETVAL
 
-IV
+SV*
 _floor(x)
     SV * x
   CODE:
-    RETVAL = SvNOK(x) ? Perl_floor(SvNV(x)) : SvIV(x);
+    RETVAL = SvNOK(x) ? newSVnv(Perl_floor(SvNV(x))) : newSViv(SvIV(x));
   OUTPUT:
     RETVAL
 

@@ -20,8 +20,7 @@
 # housekeeping
 ########################################################################
 
-package         # hak to avoid indexing the extra module
-FindBin::libs;
+package FindBin::libs;
 
 use v5.8;
 use strict;

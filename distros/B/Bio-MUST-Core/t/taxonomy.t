@@ -627,6 +627,77 @@ my @lcas = (
     }
 }
 
+my @eq_tests = (
+
+    [ 'GCF_000005825.2',
+    'cellular organisms; Bacteria; Firmicutes; Bacilli; Bacillales; Bacillaceae; Bacillus',
+    'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Bacilli; Bacillales; Bacillaceae; Bacillus; Bacillus pseudofirmus; Bacillus pseudofirmus OF4',
+    ],
+    [ 'GCF_000006625.1',
+    'cellular organisms; Bacteria; Tenericutes; Mollicutes; Mycoplasmatales; Mycoplasmataceae; Ureaplasma',
+    'cellular organisms; Bacteria; Terrabacteria group; Tenericutes; Mollicutes; Mycoplasmatales; Mycoplasmataceae; Ureaplasma; Ureaplasma parvum; Ureaplasma parvum serovar 3 str. ATCC 700970',
+    ],
+    [ 'GCF_000007405.1',
+    'cellular organisms; Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales; Enterobacteriaceae; Escherichia-Shigella',
+    'cellular organisms; Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales; Enterobacteriaceae; Shigella; Shigella flexneri; Shigella flexneri 2a str. 2457T',
+    ],
+    [ 'GCF_000007325.1',
+    'cellular organisms; Bacteria; Fusobacteria; Fusobacteriia; Fusobacteriales; Fusobacteriaceae; Fusobacterium',
+    'cellular organisms; Bacteria; Fusobacteria; Fusobacteriia; Fusobacteriales; Fusobacteriaceae; Fusobacterium; Fusobacterium nucleatum; Fusobacterium nucleatum subsp. nucleatum ATCC 25586',
+    ],
+    [ 'GCF_000007205.1',
+    'cellular organisms; Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Chlamydiaceae; Chlamydia',
+    'cellular organisms; Bacteria; PVC group; Chlamydiae; Chlamydiia; Chlamydiales; Chlamydiaceae; Chlamydia/Chlamydophila group; Chlamydia; Chlamydia pneumoniae; Chlamydophila pneumoniae TW-183',
+    ],
+
+    # note the lack of space after the semicolons and the trailing semicolons
+    [ 'GCF_000006665.1',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Escherichia-Shigella;',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Enterobacteriaceae;Escherichia;Escherichia coli;Escherichia coli O157:H7 str. EDL933;',
+    ],
+    [ 'GCF_000006725.1',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Xanthomonadaceae;Xylella;',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Xanthomonadaceae;Xylella;Xylella fastidiosa;Xylella fastidiosa 9a5c;',
+    ],
+    [ 'GCF_000006865.1',
+    'cellular organisms;Bacteria;Firmicutes;Bacilli;Lactobacillales;Streptococcaceae;Lactococcus;',
+    'cellular organisms;Bacteria;Terrabacteria group;Firmicutes;Bacilli;Lactobacillales;Streptococcaceae;Lactococcus;Lactococcus lactis;Lactococcus lactis subsp. lactis Il1403;',
+    ],
+    [ 'GCF_000007725.1',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Buchnera;',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Erwiniaceae;Buchnera;Buchnera aphidicola;Buchnera aphidicola str. Bp (Baizongia pistaciae);',
+    ],
+
+    # must fail!
+#   [ 'GCF_000008625.1',
+#   'cellular organisms;Bacteria;Aquificae;Aquificae;Aquificales;Aquificaceae;Aquifex;',
+#   'cellular organisms;Archaea;Euryarchaeota;Thermoplasmata;Thermoplasmatales;Picrophilaceae;Picrophilus;Picrophilus torridus;Picrophilus torridus DSM 9790;',
+#   ],
+
+    [ 'GCF_000008885.1',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Wigglesworthia;',
+    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Erwiniaceae;Wigglesworthia;Wigglesworthia glossinidia;Wigglesworthia glossinidia endosymbiont of Glossina brevipalpis;',
+    ],
+    [ 'GCF_000009625.1',
+    'cellular organisms;Bacteria;Proteobacteria;Alphaproteobacteria;Rhizobiales;Rhizobiaceae;Mesorhizobium;',
+    'cellular organisms;Bacteria;Proteobacteria;Alphaproteobacteria;Rhizobiales;Phyllobacteriaceae;Mesorhizobium;Mesorhizobium loti;Mesorhizobium loti MAFF303099;',
+    ],
+);
+
+{
+    my $infile = file('test', 'leaf_4_fra_bact.list');
+    my $classifier = $tax->tax_labeler_from_list($infile);
+
+    for my $exp_row (@eq_tests) {
+        my ($gca, $sina_lineage, $ncbi_lineage) = @{$exp_row};
+        ### $gca
+        ### $sina_lineage
+        ### $ncbi_lineage
+        my $got = $tax->eq_tax($sina_lineage, $ncbi_lineage, $classifier);
+        ok $got, "got expected result for eq_tax for $gca";
+    }
+}
+
 
 # color schemes and tree annotation
 

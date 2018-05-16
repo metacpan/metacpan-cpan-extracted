@@ -1,0 +1,17 @@
+Build.PL
+Changes
+Dockerfile
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Stor.pm
+minil.toml
+script/stor
+t/00_compile.t
+t/01_upload_download.t
+t/02_status.t
+t/03_get.t
+t/04_read_only_regex.t
+META.yml
+MANIFEST

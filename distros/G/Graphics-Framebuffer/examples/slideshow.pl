@@ -16,6 +16,8 @@ my $auto       = 0;
 my $fullscreen = 0;
 my $showall    = 0;
 my $help       = 0;
+my $delay      = 3;
+my $nosplash   = 0;
 
 GetOptions(
     'auto'        => \$auto,
@@ -23,6 +25,8 @@ GetOptions(
     'full'        => \$fullscreen,
     'showall|all' => \$showall,
     'help'        => \$help,
+    'delay=i'     => \$delay,
+    'nosplash'    => \$nosplash,
 );
 
 if (scalar(@ARGV) && ! $help) {
@@ -35,14 +39,21 @@ if ($help) {
     pod2usage('-exitstatus' => 0,'-verbose' => $help);
 }
 
+my $splash = ($nosplash) ? 0 : 2;
+
 my $FB = Graphics::Framebuffer->new(
     'SHOW_ERRORS' => $errors,
     'RESET'       => 1,
+    'SPLASH'      => $splash,
 );
-my $p = gather($FB,$path);
 
 system('clear');
 $FB->cls('OFF');
+
+my $p = gather($FB,$path);
+
+$FB->cls();
+
 
 show($FB, $p);
 
@@ -80,6 +91,8 @@ sub show {
     my @pics = shuffle(@{$ps});
     my $p = scalar(@pics);
     my $idx = 0;
+    my $halfw = int($FB->{'XRES'} / 2);
+    my $halfh = int($FB->{'YRES'} / 2);
 
     while ($idx < $p) {
         my $name = $pics[$idx];
@@ -109,14 +122,30 @@ sub show {
         if (defined($image)) {
             $FB->cls();
             if (ref($image) eq 'ARRAY') {
-                my $s = time + 8;
+                my $s = time + ($delay * 2);
                 while (time <= $s) {
                     $FB->play_animation($image,1);
                 } ## end while (time <= $s)
             } else {
                 $FB->cls();
-                $FB->blit_write($image);
-                sleep 3;
+                if ($fullscreen) {
+                    if ($image->{'width'} <= $halfw) {
+                        $image->{'x'} = int(($halfw - $image->{'width'}) / 2);
+                        $FB->blit_write($image);
+                        $image->{'x'} += $halfw;
+                        $FB->blit_write($image);
+                    } elsif ($image->{'height'} <= $halfh) {
+                        $image->{'y'} = int(($halfh - $image->{'height'}) / 2);
+                        $FB->blit_write($image);
+                        $image->{'y'} += $halfh;
+                        $FB->blit_write($image);
+                    } else {
+                        $FB->blit_write($image);
+                    }
+                } else {
+                    $FB->blit_write($image);
+                }
+                sleep $delay;
             }
         } ## end if (defined($image))
         $idx++;
@@ -168,17 +197,27 @@ This automatically detects all of the framebuffer devices in your system, and sh
 
 =over 2
 
-=item C<--auto>
+=item B<--auto>
 
 Turns on auto color level mode.  Sometimes this yields great results... and sometimes it totally ugly's things up
 
-=item C<--errors>
+=item B<--errors>
 
 Allows the module to print errors to STDERR
 
-=item C<--full>
+=item B<--full>
 
 Scales all images (and animations) to full screen (proportionally).  Images are always scaled down, if they are too big for the screen, regardless of this option.
+
+=item B<--delay>=seconds
+
+Number of seconds to wait before loading the next image.  It can take longer to load animated GIFs.
+
+Default is 3 seconds.
+
+=item B<--showall>
+
+Ignores any ".nomedia" files in subdirectories, and shows the images in them anyway.
 
 =back
 

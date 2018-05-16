@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-Types::Bool - Booleans as objects for Perl
+Types::Bool - An interface to booleans as objects for Perl
 
 =head1 VERSION
 
-version 2.98009
+version 2.98011
 
 =head1 SYNOPSIS
 
@@ -23,8 +23,6 @@ version 2.98009
     to_bool('');       # Types::Bool::false()
 
 =head1 DESCRIPTION
-
-I<This is meant as a standard interface to boolean objects for Perl.>
 
 Perl has no native representation for booleans.
 Most of the time the Perl concept of truth is enough.
@@ -51,22 +49,24 @@ Marc Lehmann's L<Types::Serialiser> approached this problem
 by creating a common interface used by L<JSON::XS> and L<CBOR::XS>
 modules. This module lifts this core concept (including
 idea, implementation and documentation) into an isolated treatment
-for booleans only – so this can be proposed as the common
+for booleans only – so this may work as a common
 ground for interoperability on booleans as objects for Perl modules.
 
-The implementation keeps the compatibility
-with the previous agreement on C<JSON::PP::Boolean>
-by making the C<Types::Bool> stash an alias for C<JSON::PP::Boolean>.
+The implementation keeps the compatibility with the
+previous agreement on C<JSON::PP::Boolean> by making
+the C<Types::Bool> implementation stash an alias for
+C<JSON::PP::Boolean>.
+
 That means
 
     Types::Bool::true->isa('JSON::PP::Boolean');
 
 but also
 
-    Types::Bool::true->isa('Types::Bool');
+    Types::Bool::true->isa(Types::Bool::BOOL_CORE);
 
-This also allows an optimization to an isa test
-by direct comparison of stash pointers.
+This also allows the optimization of an isa test
+to a direct comparison of stash pointers.
 
 =head2 INTERFACE
 
@@ -87,17 +87,22 @@ L<Types::Bool> false values are represented as a reference
 to a scalar containing C<0> – implementations are allowed
 to directly test for this.
 
-One can test if a value is a L<Types::Bool> with
+One can test if a value is a L<Types::Bool> boolean with
 
     Types::Bool::is_bool($value);
 
-Converting from a Perl true or false value into L<Types::Bool> can
-be done with
+Converting from a Perl true or false value into L<Types::Bool>
+booleans can be done with
 
     Types::Bool::to_bool($value);
 
+Independent boolean objects may be produced from a Perl true
+or false value by using
+
+    Types::Bool->new($value);
+
 Also part of this interface is a few overloaded
-operators for L<Type::Bool> objects.
+operators for L<Type::Bool> booleans.
 
     # bool
     true  ? 'yes' : 'no';    # 'yes'
@@ -111,22 +116,15 @@ operators for L<Type::Bool> objects.
     true . '';     # 1
     false . '';    # 0
 
-This minimum set of functionality allows for easy and efficient
-implementation of other operations, like negating booleans:
-
-    Types::Bool::to_bool( !$value );
-
 =head2 CORE CODE
 
 The code of this module would look as below, if not
 for the efforts to play nice with L<JSON::PP>, L<Types::Serialiser>
 and L<Cpanel::JSON::XS> modules.
 
-    package Types::Bool;
+    package Types::Bool::Impl;
 
     use 5.006;
-    use Exporter 1.57 'import';
-    use Scalar::Util ();
 
     use overload (
         '0+' => sub { ${ $_[0] } },
@@ -135,12 +133,22 @@ and L<Cpanel::JSON::XS> modules.
         fallback => 1,
     );
 
+    sub new { bless \( my $dummy = $_[1] ? 1 : 0 ), $_[0] }
+
+    package Types::Bool;
+
+    use 5.006;
+    use Exporter 1.57 'import';
+    use Scalar::Util ();
+
     our @EXPORT_OK = qw(true false is_bool to_bool);
 
-    use constant true  => do { bless \( my $dummy = 1 ), 'Types::Bool' };
-    use constant false => do { bless \( my $dummy = 0 ), 'Types::Bool' };
+    use constant true  => Types::Bool::Impl->new(1);
+    use constant false => Types::Bool::Impl->new(0);
 
-    sub is_bool ($) { Scalar::Util::blessed( $_[0] ) and $_[0]->isa('Types::Bool') }
+    use constant BOOL_CORE => ref true;
+
+    sub is_bool ($) { Scalar::Util::blessed( $_[0] ) and $_[0]->isa(BOOL_CORE) }
 
     sub to_bool ($) { $_[0] ? true : false }
 
@@ -219,28 +227,41 @@ to deal with booleans.
 
 Those issues mainly stem from the lack
 of a consensus on ownership of C<JSON::PP::Boolean>.
-With the advent of L<Types::Bool>, this may or
-may not be mitigated depending on the adoption
-of a unified treatment of sorts.
 
 When L<Types::Bool> gets added to this list as yet another
 module playing with C<JSON::PP::Boolean>,
 it takes the most conservative approach: it does not touch a function
 or overloaded method which is already there.
-That means it will still provide all of the interface described
+That means it will still provide the entire interface described
 before, because it will implement anything that is missing.
 But it may suboptimally accept what has been defined before
 by a previous module. And it does not fight with modules which
 get loaded after either.
 
-Ideally, the best scenario will be if / when the main JSON modules
-start depending on L<Types::Bool>. Even if that does not happen,
-this module still stands as a compatible alternative to
-support booleans as objects for Perl.
+The best scenario would be if / when the main JSON modules
+delegated the content of the boolean implementation
+to a distribution containing L<JSON::PP::Boolean>.
+Even if that does not happen,
+this module still offers as a compatible and sane interface
+to booleans as objects for Perl.
 
 =head1 FUNCTIONS
 
-L<Types::Bool> implements the following functions, which can be imported individually.
+L<Types::Bool> implements the following functions, which
+can be imported individually (except for C<BOOL_CORE>).
+
+=head2 BOOL_CORE
+
+    $package = Types::Bool::BOOL_CORE;
+
+The implementation package of the boolean objects.
+
+It is recommended to always use this instead of
+C<'JSON::PP::Boolean'> or C<'Types::Bool::Impl'> for maximum
+compatibility. It works correctly with C<ref $bool> comparisons
+or isa checks.
+
+This is not exported. It is meant to be used as a fully qualified name.
 
 =head2 false
 
@@ -278,6 +299,20 @@ Return the canonical "true" value.
 This function has a C<()> prototype and works as a constant
 (suitable for inlining by the Perl interpreter).
 
+=head1 METHODS
+
+L<Types::Bool> implements the following methods.
+
+=head2 new
+
+    $bool = Types::Bool->new($value);
+
+Creates a new L<Types::Bool> object from a true or false Perl value.
+
+This is similar to C<Types::Bool::to_bool($value)>, but L</new>
+produces independent boolean objects while L</to_bool>
+returns the shared L</true> and L</false> instances.
+
 =head1 BUGS
 
 The use of L<overload> makes this module heavier.
@@ -288,7 +323,25 @@ See L<Types::Serializer/"BUGS">.
 Original idea and code came from L<JSON::XS::Boolean> written by Marc Lehmann.
 
 Tina Müller inspired me to create this distribution after reading her
-L<PTS 2018 report|http://blogs.perl.org/users/tinita/2018/05/my-report-of-the-perl-toolchain-summit-2018-in-oslo.html>.
+L<report on PTS 2018|http://blogs.perl.org/users/tinita/2018/05/my-report-of-the-perl-toolchain-summit-2018-in-oslo.html>.
+
+=head1 DEBUGGING
+
+When L<Types::Bool> gets loaded, it stops L<JSON::PP::Boolean>
+module from being loaded, since they are redundant.
+This prevents subroutines to be redefined and the
+corresponding warnings.
+You can set the C<TYPES_BOOL_NICE> environment variable to
+avoid that behavior.
+
+    TYPES_BOOL_NICE=1
+
+You can set the C<TYPES_BOOL_LOUD> environment variable to
+produce explicit warnings on subroutines found on
+L<JSON::PP::Boolean> package that L<Types::Bool> will skip
+and accept as they are.
+
+    TYPES_BOOL_LOUD=1
 
 =head1 SEE ALSO
 

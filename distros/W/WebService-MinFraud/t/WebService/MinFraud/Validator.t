@@ -8,6 +8,82 @@ use WebService::MinFraud::Validator ();
 
 my $validator = WebService::MinFraud::Validator->new;
 
+subtest 'minium chargeback request' => sub {
+    my $good_request = { ip_address => '24.24.24.24' };
+    ok(
+        $validator->validate_request( $good_request, 'chargeback' ),
+        'good request validates'
+    );
+};
+
+subtest 'good chargeback request with optional fields' => sub {
+    my $good_request = {
+        ip_address      => '24.24.24.24',
+        chargeback_code => 'Test Chargeback Code',
+        tag             => 'spam_or_abuse',
+        maxmind_id      => 'a' x 8,
+        minfraud_id     => 'b' x 36,
+        transaction_id  => 'Test-transaction-id'
+    };
+    ok(
+        $validator->validate_request( $good_request, 'chargeback' ),
+        'good request with optional fields validates'
+    );
+};
+
+subtest 'bad chargeback tag' => sub {
+    my $bad_request = {
+        ip_address => '24.24.24.24',
+        tag        => 'suspended_account'
+    };
+    like(
+        exception {
+            $validator->validate_request( $bad_request, 'chargeback' );
+        },
+        qr/matched none of the available alternative/,
+        'bad tag type throws an exception'
+    );
+};
+
+subtest 'bad chargeback maxmind_id' => sub {
+    my $bad_request = {
+        ip_address => '24.24.24.24',
+        maxmind_id => 'b' x 9
+    };
+    like(
+        exception {
+            $validator->validate_request( $bad_request, 'chargeback' );
+        },
+        qr/length of value is outside allowed range/,
+        'bad maxmind_id throws an exception'
+    );
+};
+
+subtest 'bad chargeback minfraud_id' => sub {
+    my $bad_request = {
+        ip_address  => '24.24.24.24',
+        minfraud_id => 'a' x 37
+    };
+    like(
+        exception {
+            $validator->validate_request( $bad_request, 'chargeback' );
+        },
+        qr/length of value is outside allowed range/,
+        'bad minfraud_id throws an exception'
+    );
+};
+
+subtest 'empty chargeback request' => sub {
+    my $empty_request = {};
+    like(
+        exception {
+            $validator->validate_request( $empty_request, 'chargeback' );
+        },
+        qr/no value given for required entry/,
+        'empty request throws an exception'
+    );
+};
+
 subtest 'minimum request' => sub {
     my $good_request = { device => { ip_address => '24.24.24.24' } };
     ok(

@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Scheme79asm.
 
+1.000 2018-05-11T22:20+01:00
+ - First stable release
+ - Obtain 100% code coverage again
+
 0.005001 2018-04-28T17:41+01:00
  - Use Data::Dump::Sexp instead of a custom dump_sexp function
  - Make the compiler output contain proper symbols instead of strings

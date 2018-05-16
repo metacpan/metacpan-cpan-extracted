@@ -59,8 +59,8 @@ sub get_system_boot_time () {
 
 sub init ($) {
 	$_[0]->set(
-		dialects          => [ 0x0202 ],
-		dialect           => 0x0202,
+		dialects          => [ 0x0202, 0x0210, 0x02ff ],
+		dialect           => 0x0210,
 		security_mode     => 0,
 		capabilities      => 0x7,
 		guid              => "\5" x 16,

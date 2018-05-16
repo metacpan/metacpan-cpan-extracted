@@ -3,8 +3,13 @@ abstract: 'A module to access the Pokémon data through RESTful API from http://
 author:
   - 'Kian Meng, Ang.'
 build_requires:
+  Carp: '0'
   Dist::Zilla::App::Command::cover: '0'
-  Test::More: '0.96'
+  File::Find: '0'
+  File::Temp: '0'
+  Module::Build: '0.28'
+  Scalar::Util: '0'
+  Test::More: '0.94'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -23,15 +28,20 @@ no_index:
     - t
     - xt
 requires:
+  Mouse: '0'
+  Types::Standard: '0'
   Web::API: '0'
-  perl: '5.008005'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/kianmeng/webservice-pokemon/issues
   homepage: https://github.com/kianmeng/webservice-pokemon
   repository: https://github.com/kianmeng/webservice-pokemon.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'Kian-Meng, Ang <kianmeng@users.noreply.github.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 0

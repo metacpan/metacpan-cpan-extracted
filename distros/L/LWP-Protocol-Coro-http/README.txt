@@ -5,7 +5,7 @@ it requires some amount of cooperation on the part of
 user code in order to provide parallelism.
 
 This module makes LWP more cooperative by plugging in
-an HTTP and HTTPS protocol implementor powered by
+an HTTP, HTTPS and SOCKS protocol implementor powered by
 AnyEvent::HTTP.
 
 In short, it allows AnyEvent callbacks and Coro threads
@@ -31,9 +31,9 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Module::Build    (For installation only)
-    Test::More       (For testing only)
-    AnyEvent::HTTP
+    Module::Build           (For installation only)
+    Test::More              (For testing only)
+    AnyEvent::HTTP::Socks
     Coro::Channel
     HTTP::Response
     LWP::Protocol

@@ -194,7 +194,9 @@ lib/Lab/Moose/Instrument/HP8596E.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
+lib/Lab/Moose/Instrument/OI_Common.pm
 lib/Lab/Moose/Instrument/OI_Mercury/Magnet.pm
+lib/Lab/Moose/Instrument/OI_Triton.pm
 lib/Lab/Moose/Instrument/RS_FSV.pm
 lib/Lab/Moose/Instrument/RS_SMB.pm
 lib/Lab/Moose/Instrument/RS_ZVA.pm
@@ -228,6 +230,7 @@ lib/Lab/Moose/Instrument/ZI_MFIA.pm
 lib/Lab/Moose/Instrument/ZI_MFLI.pm
 lib/Lab/Moose/Instrument/Zhinst.pm
 lib/Lab/Moose/Plot.pm
+lib/Lab/Moose/Stabilizer.pm
 lib/Lab/Moose/Sweep.pm
 lib/Lab/Moose/Sweep/Continuous.pm
 lib/Lab/Moose/Sweep/Continuous/Magnet.pm
@@ -237,6 +240,7 @@ lib/Lab/Moose/Sweep/DataFile.pm
 lib/Lab/Moose/Sweep/Step.pm
 lib/Lab/Moose/Sweep/Step/Frequency.pm
 lib/Lab/Moose/Sweep/Step/Magnet.pm
+lib/Lab/Moose/Sweep/Step/Temperature.pm
 lib/Lab/Moose/Sweep/Step/Voltage.pm
 lib/Lab/Moose/Tutorial.pod
 lib/Lab/MultiChannelInstrument.pm

@@ -4,9 +4,11 @@ use warnings;
 use Test::Differences;
 use Test::Fatal;
 use Test::More 0.88;
+use Test::Warnings;
 
 use Courriel::Builder;
 use Courriel::Helpers;
+use Email::Address::XS;
 use List::AllUtils qw( all );
 use Sys::Hostname qw( hostname );
 
@@ -14,8 +16,12 @@ use Sys::Hostname qw( hostname );
     my $email = build_email(
         subject('Test Subject'),
         from('autarch@urth.org'),
-        to( 'autarch@urth.org', Email::Address->parse('bob@example.com') ),
-        cc( 'jane@example.com', Email::Address->parse('joe@example.com') ),
+        to(
+            'autarch@urth.org', Email::Address::XS->parse('bob@example.com')
+        ),
+        cc(
+            'jane@example.com', Email::Address::XS->parse('joe@example.com')
+        ),
         header( 'X-Foo' => 42 ),
         header( 'X-Bar' => 84 ),
         plain_body('The body of the message')

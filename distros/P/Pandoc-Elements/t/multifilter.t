@@ -34,11 +34,11 @@ my ($PANDOC_SYMLINK) = grep { -d $_ } ('t/.pandoc');
             (
             {   input    => ['empty.pl'],
                 expected => [ 'perl', 't/.pandoc/filters/empty.pl' ],
-                name     => 'known extension in DATA_DIR',
+                name     => 'known extension in DATADIR',
             },
             {   input    => ['caps'],
                 expected => ['t/.pandoc/filters/caps'],
-                name     => 'executable in DATA_DIR',
+                name     => 'executable in DATADIR',
                 skip     => 'MSWin32',
             },
             );

@@ -46,7 +46,7 @@ $opts{help} = 1
 
 $opts{version} ||= 'test';
 
-$opts{jobs} ||= 4;
+$opts{jobs} ||= 12;
 
 if ( $opts{help} ) {
     print <<'EOF';

@@ -1,7 +1,10 @@
 use strict;
 use Test::More;
 use Pod::Simple::Pandoc;
+use Pandoc;
 use Test::Output;
+
+plan skip_all => 'pandoc not available' unless pandoc;
 
 my $modules;
 

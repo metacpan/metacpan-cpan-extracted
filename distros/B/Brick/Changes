@@ -1,70 +1,80 @@
-0.220 - Mon Mar 26 01:57:57 2007
+Revision history for Perl module Brick
+
+0.228 2018-05-14T12:42:32Z
+	* Clarify that it's the Artistic License 2.0
+	* Bump to user release
+
+0.220 - 2007-03-26
 	* made __and, __or, __none aliases for composers
 
-0.227 - Tue Sep  9 07:16:25 2014
+0.227_01 - 2014-09-10
+	* Fix up the use_case/phone_number.t test which had a bad input
+
+
+0.227 - 2014-09-09
 	* Update for 8 years later, with modern cleanups
 
-0.226 - Tue May 29 20:39:32 2007
+0.226 - 2007-05-29
 	* Added is_clamav_clean to Brick::File
 
-0.226 - Fri May 25 04:40:54 2007
+0.226 - 2007-05-25
 	* Added is_mime_test to Brick::Files. Check that a file is a particular
 	type.
 	* Brick now requires 5.8 because I don't want to fix the FAILs from
 	5.6.
 
-0.225 - Wed May 16 15:21:31 2007
+0.225 - 2007-05-16
 	* fix to Brick::Profile to allow subclassing. For the quick
 	prototyping I had some __PACKAGE__s laying around, and those
 	are now gone since the interface has evolved.
 
-0.224 - Thu May 10 14:26:15 2007
+0.224 - 2007-05-10
 	* Result.pm: check for handler key before using it
 
-0.24 - Wed May  9 11:53:22 2007
+0.24 - 2007-05-09
 	* Added a Brick::Result::Item class to provide methods to query
 	the results
 	* Programming errors caught by eval are now full-fledged errors,
 	instead of silently ignoring. You can ask the result item if the
 	error is a validation or programming error.
-	* There are some broken composer things now that I've made these 
+	* There are some broken composer things now that I've made these
 	changes, but I'm working on those.
 
-0.223 - Tue May  1 17:48:27 2007
+0.223 - 2007-05-01
 	* croak if we can't find a validator package, instead of just croaking
 
-0.222 - Tue Apr 17 13:12:19 2007
+0.222 - 2007-04-17
 	* The validation profile stuff now lives in it's own module,
 	Brick::Profile. The methods that work on the profile (lint,
 	explain) aren't in the Brick class anymore, so you need to
 	either call them on a Profile object or use the Profile
 	class name ( probably $brick->profile_class->lint( ... )
-	* lint() still just takes an Array of Arrays because you 
+	* lint() still just takes an Array of Arrays because you
 	can't make a Profile object without passing lint. explain()
 	still works with an object or an array.
 
-0.221 - Mon Mar 26 02:04:40 2007
+0.221 - 2007-03-26
 
-0.220 - Sun Mar 25 23:34:19 2007
+0.220 - 2007-03-25
 	* Added a feature to set field labels and allow bricks to access
 	them
 	* Added the start of a module for bricks to deal with Files
 
-0.2195 - Thu Mar 15 17:37:33 2007
+0.2195 - 2007-03-15
 	Added Brick::Result to handle methods to transform and format the
 	data structure that comes back from apply()
 	* Cleansed many tests to capture intentionally triggered warnings
 
-0.2193 - Wed Mar 14 23:43:20 2007
+0.2193 - 2007-03-14
 	* Trying out some ways to extract the interesting error messages
 	* Added failed_field and failed_value to die() hashes
 	* Check out ./t/use_cases/top-level-errors.t for interface options
 	for reporting errors.
 
-0.2191 - Tue Mar  6 11:38:06 2007
+0.2191 - 2007-03-06
 	* Updated docs
 
-0.2183 - Tue Feb 27 17:25:43 2007
+0.2183 - 2007-02-27
 	* The first CPAN release. Not much to say yet, but its easier for
 	clients to grab this off CPAN than off Subversion.
 	* This is alpha-software. Don't use it for anything because its

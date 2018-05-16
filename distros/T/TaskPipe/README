@@ -1,0 +1,73 @@
+TaskPipe version 0.02
+=====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    MooseX::ConfigCascade v0.02
+    MooseX::RelClassTypes v0.03
+    Pod::Term v0.02
+    Template::Nest v0.03
+    Log::Log4perl::Layout::ColoredPatternLayout v0.01
+    WWW::Mechanize::PhantomJS v0.18
+    Log::Log4perl v1.49
+    Moose
+    Module::Runtime
+    DBIx::Class
+    Data::Dumper
+    Log::Log4perl
+    File::Basename
+    Web::Scraper
+    File::Spec
+    DBIx::Class::Schema::Loader
+    DBIx::Error
+    File::Path
+    Try::Tiny
+    Digest::MD5
+    Time::HiRes
+    MooseX::ClassAttribute
+    Proc::ProcessTable
+    File::Save::Home
+    Pod::POM
+    LWP::UserAgent
+    URI::Escape
+    IO::Socket::INET
+    Net::EmptyPort
+    Path::Tiny
+    Proc::Background
+    File::Inplace
+    Text::Table::TinyColor
+    Term::ANSIColor
+    Moose::Util::TypeConstraints
+    Hash::Merge
+    Array::Utils
+    String::CamelCase
+    Term::ANSIColor
+    YAML::XS
+    TryCatch
+    Carp
+    Clone
+    Cwd
+    POSIX
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2018 by Tom Gracey
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, Version 3.0.
+
+

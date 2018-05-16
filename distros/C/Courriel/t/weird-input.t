@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
+use Test::Warnings;
 
 use Test::Requires (
     'Path::Class' => '0',

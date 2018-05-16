@@ -1,9 +1,8 @@
-# $Id$
 $|++;
 
 BEGIN {
 	@classes = qw(Brick);
-	
+
 	push @classes, map { "Brick::$_" } qw(
 		Bucket Composers Dates Filters
 		Profile Result

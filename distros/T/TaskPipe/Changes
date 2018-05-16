@@ -1,0 +1,8 @@
+Revision history for Perl extension TaskPipe.
+
+0.01  Mon May 14 00:57:17 2018
+	- original version; created by h2xs 1.23 with options
+		-AX TaskPipe
+
+0.02  Tue May 15 00:42:16 2018
+	- swap erroneous TaskPipe::Task module. Edit docs

@@ -10,7 +10,7 @@ Provides a geocoding functionality using free databases
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -20,7 +20,7 @@ Version 0.09
     my $location = $geocoder->geocode(location => 'Ramsgate, Kent, UK');
 
     # Use a local download of http://results.openaddresses.io/
-    my $openaddr_geocoder = Geo::Coder::Freee->new(openaddr => $ENV{'OPENADDR_HOME'});
+    my $openaddr_geocoder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
     $location = $openaddr_geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
 # DESCRIPTION
@@ -40,6 +40,8 @@ The cgi-bin directory contains a simple DIY geocoding website:
 
 Takes one optional parameter, openaddr, which is the base directory of
 the OpenAddresses data downloaded from [http://results.openaddresses.io](http://results.openaddresses.io).
+
+The database also will include data from Who's On First [https://whosonfirst.org](https://whosonfirst.org).
 
 Takes one optional parameter, directory,
 which tells the library where to find the MaxMind and GeoNames files admin1db, admin2.db and cities.\[sql|csv.gz\].
@@ -108,3 +110,6 @@ must apply in writing for a licence for use from Nigel Horne at \`&lt;njh at nig
 
 This product includes GeoLite2 data created by MaxMind, available from
 [http://www.maxmind.com](http://www.maxmind.com).
+
+This product includes data from Who's on First.
+See [https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md](https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md) for licensing information.
