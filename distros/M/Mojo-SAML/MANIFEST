@@ -23,9 +23,11 @@ lib/Mojo/SAML/Document/Organization.pm
 lib/Mojo/SAML/Document/RequestedAttribute.pm
 lib/Mojo/SAML/Document/SPSSODescriptor.pm
 lib/Mojo/SAML/Document/Signature.pm
+lib/Mojo/SAML/Entity.pm
 lib/Mojo/SAML/IdP.pm
 lib/Mojo/SAML/Names.pm
 lib/Mojo/XMLSig.pm
+lib/Mojolicious/Plugin/SAML.pm
 metamerge.json
 t/00-use.t
 t/build_xmlsig_test.pl

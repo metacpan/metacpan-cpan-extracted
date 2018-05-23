@@ -95,7 +95,7 @@ MySQL::Workbench::Parser::Index - An index of the ER model
 
 =head1 VERSION
 
-version 0.06
+version 1
 
 =for Pod::Coverage BUILD
 
@@ -113,13 +113,29 @@ returns
         type          => 'INDEX', # 'UNIQUE'
     )
 
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * id
+
+=item * name
+
+=item * node
+
+=item * table
+
+=item * type
+
+=back
+
 =head1 AUTHOR
 
 Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

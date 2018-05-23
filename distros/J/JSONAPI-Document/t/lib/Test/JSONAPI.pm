@@ -8,17 +8,17 @@ use Test::DBIx::Class qw(:resultsets);
 use File::Spec;
 
 has schema => (
-    is => 'ro',
+    is  => 'ro',
     isa => sub {
         die "$_[0] is not an instance of 'Test::JSONAPI::Schema'" unless ref($_[0]) eq 'Test::JSONAPI::Schema';
     },
-    lazy => 1,
+    lazy    => 1,
     builder => '_build_schema'
 );
 
 has '+data_dir' => (
     required => 0,
-    is => 'lazy',
+    is       => 'lazy',
 );
 
 sub _build_data_dir {
@@ -34,8 +34,8 @@ sub _build_schema {
 }
 
 sub DESTROY {
-	my ($self) = @_;
-	$self->chi->clear();
+    my ($self) = @_;
+    $self->chi->clear();
 }
 
 __PACKAGE__->meta->make_immutable();

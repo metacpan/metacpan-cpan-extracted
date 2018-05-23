@@ -86,12 +86,14 @@ SSDP_SEARCH_MSG
 			next;
 		}		
 		$dev_location = $1;
-		unless ($dev_location =~ m/http:\/\/([0-9a-z.]+)[:]*([0-9]*)\/(.*)/i) {
+		print "dev_location=$dev_location\n" if ($Net::UPnP::DEBUG);
+                unless ($dev_location =~ m{http://([0-9a-z.-]+)(?::(\d+))?/(.*)}i) {
 			next;
 		}
 		$dev_addr = $1;
-		$dev_port = $2;
+		$dev_port = $2 || 80;
 		$dev_path = '/' . $3;
+		print "dev_addr=$dev_addr dev_port=$dev_port dev_path=$dev_path\n" if ($Net::UPnP::DEBUG);
 		
 		$http_req = Net::UPnP::HTTP->new();
 		$post_res = $http_req->post($dev_addr, $dev_port, "GET", $dev_path, "", "");

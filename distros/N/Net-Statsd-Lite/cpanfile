@@ -2,16 +2,11 @@ requires "Devel::StrictMode" => "0";
 requires "IO::Socket" => "1.18";
 requires "Moo" => "1.000000";
 requires "MooX::TypeTiny" => "0";
-requires "Scalar::Util" => "0";
 requires "Sub::Quote" => "0";
 requires "Sub::Util" => "1.40";
-requires "Type::Library" => "0";
-requires "Type::Utils" => "0";
 requires "Types::Standard" => "0";
 requires "namespace::autoclean" => "0";
 requires "perl" => "v5.10.0";
-requires "strict" => "0";
-requires "warnings" => "0";
 recommends "Type::Tiny::XS" => "0";
 
 on 'test' => sub {

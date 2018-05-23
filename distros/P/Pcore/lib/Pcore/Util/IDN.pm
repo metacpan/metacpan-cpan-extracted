@@ -1,12 +1,13 @@
 package Pcore::Util::IDN;
 
-use Pcore -const, -inline,
-  -export => {
-    ALL   => [qw[domain_to_ascii domain_to_utf8 ]],
-    CONST => [qw[$IDN2_NFC_INPUT $IDN2_ALABEL_ROUNDTRIP $IDN2_TRANSITIONAL $IDN2_NONTRANSITIONAL $IDN2_ALLOW_UNASSIGNED $IDN2_USE_STD3_ASCII_RULES]],
-  };
+use Pcore -const, -inline, -export;
 
 # https://libidn.gitlab.io/libidn2/manual/libidn2.html
+
+our $EXPORT = {
+    ALL   => [qw[domain_to_ascii domain_to_utf8 ]],
+    CONST => [qw[$IDN2_NFC_INPUT $IDN2_ALABEL_ROUNDTRIP $IDN2_TRANSITIONAL $IDN2_NONTRANSITIONAL $IDN2_ALLOW_UNASSIGNED $IDN2_USE_STD3_ASCII_RULES]],
+};
 
 const our $IDN2_NFC_INPUT            => 1;    # apply NFC normalization on input
 const our $IDN2_ALABEL_ROUNDTRIP     => 2;    # apply additional round-trip conversion of A-label inputs

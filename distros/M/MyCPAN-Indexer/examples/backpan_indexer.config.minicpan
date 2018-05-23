@@ -1,12 +1,12 @@
 # where to find the distributions
 # this doesn't have to be an actual backpan.
-backpan_dir /MINICPAN/authors/id
+backpan_dir /Users/brian/Desktop/Dists
 
 # where to store the distribution reports
 report_dir  /Users/brian/Desktop/minicpan-catalog
 
 # where to unpack the dists or create any temporary files
-temp_dir    /Users/brian/Desktop/minicpan-catalog
+temp_dir    /Users/brian/Desktop/minicpan-tmp
 
 # the maximum amont of time allowed to index a distribution, in seconds
 alarm       15

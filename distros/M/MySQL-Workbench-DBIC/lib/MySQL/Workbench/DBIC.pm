@@ -4,14 +4,16 @@ use warnings;
 use strict;
 
 use Carp;
+use Data::Dumper;
 use File::Spec;
+use JSON;
 use List::Util qw(first);
 use Moo;
 use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '0.08';
+our $VERSION = '1.00';
 
 has output_path    => ( is => 'ro', required => 1, default => sub { '.' } );
 has file           => ( is => 'ro', required => 1 );
@@ -22,6 +24,7 @@ has version_add    => ( is => 'ro', required => 1, default => sub { 0.01 } );
 has column_details => ( is => 'ro', required => 1, default => sub { 0 } );
 has use_fake_dbic  => ( is => 'ro', required => 1, default => sub { 0 } );
 has skip_indexes   => ( is => 'ro', required => 1, default => sub { 0 } );
+has table_comments => ( is => 'ro', required => 1, default => sub { 0 } );
 
 has belongs_to_prefix   => ( is => 'ro', required => 1, default => sub { '' } );
 has has_many_prefix     => ( is => 'ro', required => 1, default => sub { '' } );
@@ -65,12 +68,40 @@ sub create_schema{
     
     my @files;
     for my $table ( @tables ){
-        push @files, $self->_class_template( $table, $relations{$table->name} );
+        my $custom_code = $self->_custom_code( $table );
+        push @files, $self->_class_template( $table, $relations{$table->name}, $custom_code );
     }
     
     push @files, @scheme;
     
     $self->_write_files( @files );
+}
+
+sub _custom_code {
+    my ($self, $table) = @_;
+
+    my $path = File::Spec->catfile(
+        $self->output_path || (),
+        (split /::/, $self->namespace),
+        $self->schema_name, 'Result',
+        $table->name . '.pm'
+    );
+
+    return '' if !-f $path;
+
+    my $content = do { local (@ARGV, $/) = $path; <> };
+
+    my ($code) = $content =~ m{
+^[#] \s+ --- \s*
+^[#] \s+ Put \s+ your \s+ own \s+ code \s+ below \s+ this \s+ comment \s*
+^[#] \s+ --- \s*
+(.*?)
+^[#] \s+ --- \s*
+    }xms;
+
+    $code //= '';
+
+    return $code;
 }
 
 sub _write_files{
@@ -196,7 +227,7 @@ __PACKAGE__->belongs_to($temp_field => '$package',
 }
 
 sub _class_template{
-    my ($self,$table,$relations) = @_;
+    my ($self, $table, $relations, $custom_code) = @_;
     
     my $name    = $table->name;
     my $class   = $name;
@@ -208,6 +239,17 @@ sub _class_template{
        $package =~ s/^:://;
     
     my ($has_many, $belongs_to) = ('','');
+
+    my $comment = $table->comment // '{}';
+
+    my $data;
+    eval {
+        $data = JSON->new->utf8(1)->decode( $comment );
+    };
+
+    my $components = ( $data && $data->{components} ) ?
+        join( ' ', '', @{ $data->{components} } ) :
+        '';
 
     my %foreign_keys;
     
@@ -258,6 +300,19 @@ sub _class_template{
             push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
             push @options, "is_foreign_key     => 1," if $foreign_keys{$name};
 
+            if ( $data && $data->{column_info}->{$name} ) {
+                local $Data::Dumper::Sortkeys = 1;
+                local $Data::Dumper::Indent   = 1;
+                local $Data::Dumper::Pad      = '      ';
+
+                my $dump = Dumper( $data->{column_info}->{$name} );
+                $dump    =~ s{\$VAR1 \s+ = \s* \{ \s*? $}{}xms;
+                $dump    =~ s{\A\s+\n\s{8}}{}xms;
+                $dump    =~ s{\n[ ]+\};\s*\z}{}xms;
+
+                push @options, $dump;
+            }
+
             my $option_string = join "\n        ", @options;
 
             $column_string .= <<"            COLUMN";
@@ -282,7 +337,7 @@ use base qw(DBIx::Class);
 
 our \$VERSION = $version;
 
-__PACKAGE__->load_components( qw/PK::Auto Core/ );
+__PACKAGE__->load_components( qw/PK::Auto Core$components/ );
 __PACKAGE__->table( '$name' );
 __PACKAGE__->add_columns(
 $column_string
@@ -293,6 +348,12 @@ $has_many
 $belongs_to
 
 $indexes_hook
+
+# ---
+# Put your own code below this comment
+# ---
+$custom_code
+# ---
 
 1;~;
 
@@ -408,7 +469,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 0.08
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -543,13 +604,35 @@ I<groups>, the package names would be I<*::User>, I<*::UserGroups> and I<*::Grou
 
 When C<skip_indexes> is true, the sub C<sqlt_deploy_hook> that adds the indexes to the table is not created
 
+=head2 belongs_to_prefix
+
+=head2 has_many_prefix
+
+=head2 has_one_prefix
+
+=head2 many_to_many_prefix
+
+=head2 version
+
+=head2 use_fake_dbic
+
+=head2 classes
+
+=head2 file
+
+=head2 table_comments
+
+When this flag is used, C<MySQL::Workbench::DBIC> assumes that (some) tables
+have stored extra information for columns in the table comments. This must
+be in JSON format.
+
 =head1 AUTHOR
 
 Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

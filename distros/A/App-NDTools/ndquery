@@ -24,7 +24,7 @@ Get specified by path parts from nested data structure
 
 =item B<--[no]colors>
 
-On/Off colors in --list mode.
+On/Off colors in C<--list> mode.
 
 =item B<--delete|--ignore> E<lt>pathE<gt>
 
@@ -88,11 +88,11 @@ Fail if unexisted path specified. Enabled by default.
 
 =item B<--values|--vals>
 
-Values will be printed if combined with --list opt.
+Values will be printed if combined with C<--list> opt.
 
 =item B<--verbose|-v> [int]
 
-Increase verbosity, max level - 4.
+Increase verbosity, max level is 4.
 
 =item B<--version|-V>
 

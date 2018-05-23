@@ -1,13 +1,13 @@
 package File::Spec::VMS;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use Cwd ();
 require File::Spec::Unix;
 
-$VERSION = '3.62';
+our $VERSION = '3.74';
 $VERSION =~ tr/_//d;
 
-@ISA = qw(File::Spec::Unix);
+our @ISA = qw(File::Spec::Unix);
 
 use File::Basename;
 use VMS::Filespec;
@@ -39,7 +39,10 @@ via the C<DECC$FILENAME_UNIX_REPORT> CRTL feature.
 
 my $use_feature;
 BEGIN {
-    if (eval { local $SIG{__DIE__}; require VMS::Feature; }) {
+    if (eval { local $SIG{__DIE__};
+               local @INC = @INC;
+               pop @INC if $INC[-1] eq '.';
+               require VMS::Feature; }) {
         $use_feature = 1;
     }
 }
@@ -94,7 +97,7 @@ sub canonpath {
 						# [-.-.		==> [--.
 						# .-.-]		==> .--]
 						# [-.-]		==> [--]
-    1 while ($path =~ s/(?<!\^)([\[\.])[^\]\.]+\.-(-+)([\]\.])/$1$2$3/);
+    1 while ($path =~ s/(?<!\^)([\[\.])(?:\^.|[^\]\.])+\.-(-+)([\]\.])/$1$2$3/);
 						# That loop does the following
 						# with any amount (minimum 2)
 						# of dashes:
@@ -105,11 +108,11 @@ sub canonpath {
 						#
 						# And then, the remaining cases
     $path =~ s/(?<!\^)\[\.-/[-/;		# [.-		==> [-
-    $path =~ s/(?<!\^)\.[^\]\.]+\.-\./\./g;	# .foo.-.	==> .
-    $path =~ s/(?<!\^)\[[^\]\.]+\.-\./\[/g;	# [foo.-.	==> [
-    $path =~ s/(?<!\^)\.[^\]\.]+\.-\]/\]/g;	# .foo.-]	==> ]
+    $path =~ s/(?<!\^)\.(?:\^.|[^\]\.])+\.-\./\./g;	# .foo.-.	==> .
+    $path =~ s/(?<!\^)\[(?:\^.|[^\]\.])+\.-\./\[/g;	# [foo.-.	==> [
+    $path =~ s/(?<!\^)\.(?:\^.|[^\]\.])+\.-\]/\]/g;	# .foo.-]	==> ]
 						# [foo.-]       ==> [000000]
-    $path =~ s/(?<!\^)\[[^\]\.]+\.-\]/\[000000\]/g;
+    $path =~ s/(?<!\^)\[(?:\^.|[^\]\.])+\.-\]/\[000000\]/g;
 						# []		==>
     $path =~ s/(?<!\^)\[\]// unless $path eq '[]';
     return $unix_rpt ? unixify($path) : $path;
@@ -437,15 +440,13 @@ Attempt to convert an absolute file specification to a relative specification.
 
 sub abs2rel {
     my $self = shift;
-    return vmspath(File::Spec::Unix::abs2rel( $self, @_ ))
-        if ((grep m{/}, @_) && !(grep m{(?<!\^)[\[<:]}, @_));
-
     my($path,$base) = @_;
-    $base = $self->_cwd() unless defined $base and length $base;
+
+    $base = Cwd::getcwd() unless defined $base and length $base;
 
     # If there is no device or directory syntax on $base, make sure it
     # is treated as a directory.
-    $base = VMS::Filespec::vmspath($base) unless $base =~ m{(?<!\^)[\[<:]};
+    $base = vmspath($base) unless $base =~ m{(?<!\^)[\[<:]};
 
     for ($path, $base) { $_ = $self->rel2abs($_) }
 
@@ -461,7 +462,7 @@ sub abs2rel {
     
     my ($path_volume, $path_directories, $path_file) = $self->splitpath($path);
     my ($base_volume, $base_directories, $base_file) = $self->splitpath($base);
-    return $path unless lc($path_volume) eq lc($base_volume);
+    return $self->canonpath( $path ) unless lc($path_volume) eq lc($base_volume);
 
     # Now, remove all leading components that are the same
     my @pathchunks = $self->splitdir( $path_directories );
@@ -513,7 +514,7 @@ sub rel2abs {
     if ( ! $self->file_name_is_absolute( $path ) ) {
         # Figure out the effective $base and clean it up.
         if ( !defined( $base ) || $base eq '' ) {
-            $base = $self->_cwd;
+            $base = Cwd::getcwd();
         }
         elsif ( ! $self->file_name_is_absolute( $base ) ) {
             $base = $self->rel2abs( $base ) ;

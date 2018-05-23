@@ -1,5 +1,5 @@
 package Starch::Plugin::CookieArgs;
-$Starch::Plugin::CookieArgs::VERSION = '0.06';
+$Starch::Plugin::CookieArgs::VERSION = '0.07';
 use Moo;
 use strictures 2;
 use namespace::clean;

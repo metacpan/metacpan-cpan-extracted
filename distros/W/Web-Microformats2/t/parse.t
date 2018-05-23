@@ -78,10 +78,10 @@ sub handle_file {
     );
 
     my $html = $file->slurp(iomode => '<:encoding(UTF-8)');
+    my $target_json = $json_file->slurp;
 
     my $candidate = decode_json($parser->parse( $html )->as_json);
-    my $target = decode_json($json_file->slurp);
-
+    my $target = decode_json($target_json);
     if ( first { $_ eq $main } @{ $TODO_TESTS{ $file->parent->basename } } ) {
         my $parent = $file->parent->basename;
         local $TODO = "This Microformat2 parser doesn't support the "

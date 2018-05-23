@@ -69,7 +69,10 @@ $VERSION = '1.0.0';
     pp_i_negate
     pp_i_predec
     pp_i_preinc
-    pp_leave pp_lineseq
+    pp_leave
+    pp_leaveloop
+    pp_lineseq
+    pp_list
     pp_mapstart
     pp_mapwhile
     pp_negate
@@ -84,6 +87,7 @@ $VERSION = '1.0.0';
     pp_preinc
     pp_print
     pp_prtf
+    pp_rand
     pp_ref
     pp_repeat
     pp_say
@@ -94,8 +98,11 @@ $VERSION = '1.0.0';
     pp_sgrent
     pp_sort
     pp_spwent
+    pp_srand
     pp_stub
     pp_study
+    pp_substr
+    pp_symlink
     pp_time
     pp_tms
     pp_undef
@@ -134,7 +141,103 @@ sub pp_gpwent { baseop(@_, "getpwent") }
 sub pp_grepstart { baseop(@_, "grep") }
 sub pp_gservent { baseop(@_, "getservent") }
 sub pp_leave { scopeop(1, @_); }
+sub pp_leaveloop { shift->loop_common(@_, undef); }
 sub pp_lineseq { scopeop(0, @_); }
+
+sub pp_list
+{
+    my($self, $op, $cx) = @_;
+    my($expr, @exprs);
+
+    my $other_op = $op->first;
+    my $kid = $op->first->sibling; # skip a pushmark
+
+    if (class($kid) eq 'NULL') {
+	return info_from_text($op, $self, '', 'list_null',
+			      {other_ops => [$other_op]});
+    }
+    my $lop;
+    my $local = "either"; # could be local(...), my(...), state(...) or our(...)
+    for ($lop = $kid; !null($lop); $lop = $lop->sibling) {
+	# This assumes that no other private flags equal 128, and that
+	# OPs that store things other than flags in their op_private,
+	# like OP_AELEMFAST, won't be immediate children of a list.
+	#
+	# OP_ENTERSUB and OP_SPLIT can break this logic, so check for them.
+	# I suspect that open and exit can too.
+	# XXX This really needs to be rewritten to accept only those ops
+	#     known to take the OPpLVAL_INTRO flag.
+
+	if (!($lop->private & (B::Deparse::OPpLVAL_INTRO|B::Deparse::OPpOUR_INTRO)
+		or $lop->name eq "undef")
+	    or $lop->name =~ /^(?:entersub|exit|open|split)\z/)
+	{
+	    $local = ""; # or not
+	    last;
+	}
+	if ($lop->name =~ /^pad[ash]v$/) {
+	    if ($lop->private & B::Deparse::OPpPAD_STATE) { # state()
+		($local = "", last) if $local =~ /^(?:local|our|my)$/;
+		$local = "state";
+	    } else { # my()
+		($local = "", last) if $local =~ /^(?:local|our|state)$/;
+		$local = "my";
+	    }
+	} elsif ($lop->name =~ /^(gv|rv2)[ash]v$/
+			&& $lop->private & B::Deparse::OPpOUR_INTRO
+		or $lop->name eq "null" && $lop->first->name eq "gvsv"
+			&& $lop->first->private & B::Deparse::OPpOUR_INTRO) { # our()
+	    ($local = "", last) if $local =~ /^(?:my|local|state)$/;
+	    $local = "our";
+	} elsif ($lop->name ne "undef"
+		# specifically avoid the "reverse sort" optimisation,
+		# where "reverse" is nullified
+		&& !($lop->name eq 'sort' && ($lop->flags & B::Deparse::OPpSORT_REVERSE)))
+	{
+	    # local()
+	    ($local = "", last) if $local =~ /^(?:my|our|state)$/;
+	    $local = "local";
+	}
+    }
+    $local = "" if $local eq "either"; # no point if it's all undefs
+    if (B::Deparse::null $kid->sibling and not $local) {
+	my $info = $self->deparse($kid, $cx, $op);
+	my @other_ops = $info->{other_ops} ? @{$info->{other_ops}} : ();
+	push @other_ops, $other_op;
+	$info->{other_ops} = \@other_ops;
+	return $info;
+    }
+
+    for (; !null($kid); $kid = $kid->sibling) {
+	if ($local) {
+	    if (class($kid) eq "UNOP" and $kid->first->name eq "gvsv") {
+		$lop = $kid->first;
+	    } else {
+		$lop = $kid;
+	    }
+	    $self->{'avoid_local'}{$$lop}++;
+	    $expr = $self->deparse($kid, 6, $op);
+	    delete $self->{'avoid_local'}{$$lop};
+	} else {
+	    $expr = $self->deparse($kid, 6, $op);
+	}
+	push @exprs, $expr;
+    }
+
+    if ($local) {
+	return $self->info_from_template("$local list", $op,
+					 "$local(%C)", [[0, $#exprs, ', ']],
+					 \@exprs);
+
+    } else {
+	return $self->info_from_template("list", $op,
+					 "%C", [[0, $#exprs, ', ']],
+					 \@exprs,
+					 {maybe_parens => [$self, $cx, 6]});
+    }
+}
+
+
 sub pp_mapstart { baseop(@_, "map") }
 sub pp_ref { unop(@_, "ref") }
 sub pp_schomp { maybe_targmy(@_, \&unop, "chomp") }
@@ -142,6 +245,7 @@ sub pp_schop { maybe_targmy(@_, \&unop, "chop") }
 sub pp_scope { scopeop(0, @_); }
 sub pp_sgrent { baseop(@_, "setgrent") }
 sub pp_spwent { baseop(@_, "setpwent") }
+sub pp_srand { unop(@_, "srand") }
 sub pp_study { unop(@_, "study") }
 sub pp_tms { baseop(@_, "times") }
 sub pp_undef { unop(@_, "undef") }
@@ -154,20 +258,23 @@ sub pp_nextstate {
     my($op, $cx) = @_;
     $self->{'curcop'} = $op;
     my @texts;
+    my $opts = {};
+    my @args_spec = ();
+    my $fmt = '%;';
     push @texts, $self->cop_subs($op);
     if (@texts) {
 	# Special marker to swallow up the semicolon
-	push @texts, "\cK";
+	$opts->{'omit_next_semicolon'} = 1;
     }
 
     my $stash = $op->stashpv;
     if ($stash ne $self->{'curstash'}) {
-	push @texts, $self->keyword("package") . " $stash;\n";
+	push @texts, $self->keyword("package") . " $stash;";
 	$self->{'curstash'} = $stash;
     }
 
     if (OPpCONST_ARYBASE && $self->{'arybase'} != $op->arybase) {
-	push @texts, '$[ = '. $op->arybase .";\n";
+	push @texts, '$[ = '. $op->arybase .";";
 	$self->{'arybase'} = $op->arybase;
     }
 
@@ -188,15 +295,20 @@ sub pp_nextstate {
 
     if (defined ($warning_bits) and
        !defined($self->{warnings}) || $self->{'warnings'} ne $warning_bits) {
-    	push @texts,
-    	    $self->declare_warnings($self->{'warnings'}, $warning_bits);
+	my @warnings = $self->declare_warnings($self->{'warnings'}, $warning_bits);
+	foreach my $warning (@warnings) {
+	    push @texts, $warning;
+	}
     	$self->{'warnings'} = $warning_bits;
     }
 
     my $hints = $] < 5.008009 ? $op->private : $op->hints;
     my $old_hints = $self->{'hints'};
     if ($self->{'hints'} != $hints) {
-	push @texts, $self->declare_hints($self->{'hints'}, $hints);
+	my @hints = $self->declare_hints($self->{'hints'}, $hints);
+	foreach my $hint (@hints) {
+	    push @texts, $hint;
+	}
 	$self->{'hints'} = $hints;
     }
 
@@ -224,17 +336,19 @@ sub pp_nextstate {
 		    $feature::hint_bundles[$to >> $feature::hint_shift];
 		$bundle =~ s/(\d[13579])\z/$1+1/e; # 5.11 => 5.12
 		push @texts,
-		    $self->keyword("no") . " feature ':all';\n",
-		    $self->keyword("use") . " feature ':$bundle';\n";
+		    $self->keyword("no") . " feature ':all'",
+		    $self->keyword("use") . " feature ':$bundle'";
 	    }
 	}
     }
 
     if ($] > 5.009) {
-	push @texts, $self->declare_hinthash(
-	    $self->{'hinthash'}, $newhh,
-	    $self->{indent_size}, $self->{hints},
-	);
+	# FIXME use format specifiers
+	my @hints = $self->declare_hinthash(
+	    $self->{'hinthash'}, $newhh, 0, $self->{hints});
+	foreach my $hint (@hints) {
+	    push @texts, $hint;
+	}
 	$self->{'hinthash'} = $newhh;
     }
 
@@ -245,18 +359,21 @@ sub pp_nextstate {
     if ($self->{'linenums'} && $cx != .5) { # $cx == .5 means in a format
 	my $line = sprintf("\n# line %s '%s'", $op->line, $op->file);
 	$line .= sprintf(" 0x%x", $$op) if $self->{'opaddr'};
-	push @texts, $line . "\cK\n";
+	$opts->{'omit_next_semicolon'} = 1;
+	push @texts, $line;
     }
 
-    push @texts, $op->label . ": " if $op->label;
+    if ($op->label) {
+	$fmt .= "%|%c\n";
+	push @args_spec, scalar(@args_spec);
+	push @texts, $op->label . ": " ;
+    }
 
-    my $info = B::DeparseTree::Node->new($op, $self->{deparse},
-					 \@texts, '', 'pp_nextstate', {});
-    return $info;
+    return $self->info_from_template("nextstate", $op, $fmt,
+				     \@args_spec, \@texts, $opts);
 }
 
 sub pp_and { logop(@_, "and", 3, "&&", 11, "if") }
-
 
 sub pp_cond_expr
 {
@@ -266,23 +383,28 @@ sub pp_cond_expr
     my $true = $cond->sibling;
     my $false = $true->sibling;
     my $cuddle = $self->{'cuddle'};
+    my $type = 'if';
     unless ($cx < 1 and (is_scope($true) and $true->name ne "null") and
 	    (is_scope($false) || is_ifelse_cont($false))
 	    and $self->{'expand'} < 7) {
+	# FIXME: turn into template
 	my $cond_info = $self->deparse($cond, 8, $op);
 	my $true_info = $self->deparse($true, 6, $op);
 	my $false_info = $self->deparse($false, 8, $op);
-	my @texts = ($cond_info, '?', $true_info, ':', $false_info);
-	return info_from_list($op, $self, \@texts, ' ', 'ternary ?',
-				  {maybe_parens => [$self, $cx, 8]});
+	return $self->info_from_template('ternary ?', $op, "%c ? %c : %c",
+					 [0, 1, 2],
+					 [$cond_info, $true_info, $false_info],
+					 {maybe_parens => [$self, $cx, 8]});
     }
 
     my $cond_info = $self->deparse($cond, 1, $op);
     my $true_info = $self->deparse($true, 0, $op);
-    my @head = ('if ', '(', $cond_info, ') ', "{\n\t", $true_info, "\n\b}");
-    my @elsifs;
+    my $fmt = "%|if (%c) {\n%+%c\n%-}";
+    my @exprs = ($cond_info, $true_info);
+    my @args_spec = (0, 1);
 
-    while (!null($false) and is_ifelse_cont($false)) {
+    my $i;
+    for ($i=0; !null($false) and is_ifelse_cont($false); $i++) {
 	my $newop = $false->first;
 	my $newcond = $newop->first;
 	my $newtrue = $newcond->sibling;
@@ -295,24 +417,20 @@ sub pp_cond_expr
 	}
 	my $newcond_info = $self->deparse($newcond, 1, $op);
 	my $newtrue_info = $self->deparse($newtrue, 0, $op);
-	push @elsifs, ('', "elsif (", $newcond_info, ")",
-		       "{\n\t",
-		       $newtrue_info,
-		       "\n\b}");
+	push @args_spec, scalar(@args_spec), scalar(@args_spec)+1;
+	push @exprs, $newcond_info, $newtrue_info;
+	$fmt .= " elsif ( %c ) {\n%+%c\n\%-}";
     }
+    $type .= " elsif($i)" if $i;
     my $false_info;
-    my $type;
     if (!null($false)) {
 	$false_info = $self->deparse($false, 0, $op);
-	$false_info->{text} = $cuddle . "else {\n\t" . $false_info->{text} . "\n\b}\cK";
-	$type = 'if else';
-    } else {
-	$false_info->{text} = "\cK";
-	$type = 'if';
+	$fmt .= "${cuddle}else {\n%+%c\n%-}";
+	push @args_spec, scalar(@args_spec);
+	push @exprs, $false_info;
+	$type .= ' else';
     }
-    my @texts = (@head, @elsifs, $false_info->{text});
-    my $text = join('', @head) . join($cuddle, @elsifs) . $false_info->{text};
-    return info_from_list($op, $self, \@texts, '', $type, {});
+    return $self->info_from_template($type, $op, $fmt, \@args_spec, \@exprs);
 }
 
 sub pp_const {
@@ -457,7 +575,7 @@ sub pp_entersub
 	$subname_info->{text} =~ s/^CORE::GLOBAL:://;
 	my $dproto = defined($proto) ? $proto : "undefined";
         if (!$declared) {
-	    $type = 'call undefined';
+	    $type = 'undeclared call';
 	    @texts = dedup_parens_func($self, $subname_info, \@body);
 	} elsif ($dproto =~ /^\s*\z/) {
 	    $type = 'call no protype';
@@ -477,7 +595,7 @@ sub pp_entersub
 	    @texts = dedup_parens_func($self, $subname_info, \@body);
 	}
     }
-    my $info = B::DeparseTree::Node->new($op, $self->{deparse}, \@texts,
+    my $info = B::DeparseTree::Node->new($op, $self, \@texts,
 					 '', $type,
 					 {other_ops => $other_ops});
     return $info;
@@ -494,6 +612,8 @@ sub pp_once
 
 sub pp_print { indirop(@_, "print") }
 sub pp_prtf { indirop(@_, "printf") }
+
+sub pp_rand { maybe_targmy(@_, \&unop, "rand") }
 
 # 'x' is weird when the left arg is a list
 sub pp_repeat {
@@ -534,11 +654,9 @@ sub pp_repeat {
 }
 
 sub pp_say  { indirop(@_, "say") }
-
+sub pp_srand { unop(@_, "srand") }
 sub pp_setstate { pp_nextstate(@_) }
-
 sub pp_sort { indirop(@_, "sort") }
-
 
 sub pp_or  { logop(@_, "or",  2, "||", 10, "unless") }
 sub pp_dor { logop(@_, "//", 10) }
@@ -562,13 +680,25 @@ sub pp_predec { pfixop(@_, "--", 23) }
 sub pp_i_preinc { pfixop(@_, "++", 23) }
 sub pp_i_predec { pfixop(@_, "--", 23) }
 
+sub pp_substr {
+    my ($self,$op,$cx) = @_;
+    if ($op->private & B::Deparse::OPpSUBSTR_REPL_FIRST) {
+	my $left = listop($self, $op, 7, "substr", $op->first->sibling->sibling);
+	my $right = $self->deparse($op->first->sibling, 7, $op);
+	return info_from_list($op, $self,[$left, '=', $right], ' ',
+			      'substr_repl_first', {});
+    }
+    return maybe_local(@_, listop(@_, "substr"))
+}
 # FIXME:
 # Different between 5.20 and 5.20. We've used 5.22 tough
 # Go over and make sure this is okay.
 sub pp_stub {
     my ($self, $op) = @_;
-    info_from_list($op, $self, ["(", ")"], '', 'stub', {})
+    info_from_text($op, $self, "()", 'stub', {})
 };
+
+sub pp_symlink { maybe_targmy(@_, \&listop, "symlink") }
 
 sub pp_exists
 {
@@ -578,15 +708,15 @@ sub pp_exists
     if ($op->private & OPpEXISTS_SUB) {
 	# Checking for the existence of a subroutine
 	$info = $self->pp_rv2cv($op->first, 16);
-	$type = 'exists_sub';
+	$type = 'exists sub';
     } elsif ($op->flags & OPf_SPECIAL) {
 	# Array element, not hash helement
 	$info = $self->pp_aelem($op->first, 16);
-	$type = 'info_array';
+	$type = 'exists array';
     } else {
 	$info = $self->pp_helem($op->first, 16);
-	$type = 'info_hash';
+	$type = 'exists hash';
     }
     my @texts = $self->maybe_parens_func($name, $info->{text}, $cx, 16);
-    return info_from_list($op, $self, \@texts, '', $type, {body=>[$info]});
+    return info_from_list($op, $self, \@texts, '', $type, {});
 }

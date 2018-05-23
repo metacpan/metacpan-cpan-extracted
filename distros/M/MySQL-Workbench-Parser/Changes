@@ -1,6 +1,11 @@
 Change history for MySQL::Workbench::Parser
 ===========================================
 
+1.00 2018-05-15 18:56:00
+
+  [IMPROVEMENTS]
+  * save table comments
+
 0.05 2014-12-23
 
   [IMPROVEMENTS]

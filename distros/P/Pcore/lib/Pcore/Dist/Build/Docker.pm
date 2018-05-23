@@ -112,7 +112,7 @@ sub set_from_tag ( $self, $tag ) {
                 die "$res" if !$res;
             }
 
-            $self->dist->clear_docker;
+            delete $self->dist->{docker};
 
             say qq[Docker base image changed from "$1$2" to "$1:$tag"];
         }

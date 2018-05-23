@@ -1,4 +1,4 @@
-TaskPipe version 0.02
+TaskPipe version 0.03
 =====================
 
 INSTALLATION
@@ -59,6 +59,7 @@ This module requires these other modules and libraries:
     Clone
     Cwd
     POSIX
+    SQL::Translator
 
 
 COPYRIGHT AND LICENCE

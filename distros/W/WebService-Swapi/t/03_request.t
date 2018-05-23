@@ -19,4 +19,7 @@ $response = $swapi->_request(undef, undef, {format => 'wookiee'});
 ok(exists $response->{akwoooakanwo}, 'expect Wookiee key');
 is($response->{akwoooakanwo}, qq|acaoaoakc://cohraakah.oaoo/raakah/akwoooakanwo/|, 'expect Wookiee value');
 
+$response = $swapi->_request('foobar', '1');
+is($response, undef, 'expect undef result');
+
 done_testing;

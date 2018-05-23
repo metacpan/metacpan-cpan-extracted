@@ -129,6 +129,13 @@ OTHER MODULES
     that it is possible that this module could be spun out into its own
     distribution at some point. If it does, this module will depend on it.
 
+ Mojolicious::Plugin::SAML
+
+    Mojolicious::Plugin::SAML attempts to be a turn-key SAML Service
+    Provider (SP) implementation. This is useful for interacting with a
+    single Identity Provider (IdP) under simple circumstances. This is (as
+    with all the rest) still highly experimental.
+
 SOURCE REPOSITORY
 
     http://github.com/jberger/Mojo-SAML

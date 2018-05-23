@@ -1,3 +1,9 @@
+libqbit-webinterface-perl (0.031) raring; urgency=low
+
+  * fix post params
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 19 May 2018 07:47:27 +0300
+
 libqbit-webinterface-perl (0.030) raring; urgency=low
 
   * fix json

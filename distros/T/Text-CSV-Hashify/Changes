@@ -1,5 +1,13 @@
 Revision history for Perl module Text::CSV::Hashify
 
+0.11 Tue May 22 18:56:32 EDT 2018
+    - If format requested is hash-of-hashes ('hoh', which is default),
+      constructor now verifies the value provided for 'key' element
+      is a non-zero-length string and is found in the header row of the CSV
+      file; dies otherwise.  (RTC 125384)
+    - Emphasize that Text::CSV options must be used selectively in new().
+      (RTC 125385)
+
 0.10 Sun Jan 21 19:12:27 EST 2018
     - Provide support for .psv and .tsv (pipe- and tab-separated input)
       in functional interface.

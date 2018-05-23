@@ -3,7 +3,7 @@ package Pcore::Dist::CLI::Docker::Create;
 use Pcore -class;
 use Pcore::API::DockerHub qw[:DOCKERHUB_SOURCE_TYPE];
 
-with qw[Pcore::Dist::CLI];
+extends qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
     return {

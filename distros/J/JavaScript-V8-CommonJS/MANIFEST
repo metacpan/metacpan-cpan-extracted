@@ -50,9 +50,11 @@ t/modules/1.0/transitive/c.js
 t/modules/1.0/transitive/program.js
 t/modules/1.0/transitive/test.js
 t/modules/exception.js
+t/modules/json/file.json
 t/modules/notStrict.js
 t/modules/runtime_exception.js
 t/modules/simpleMath.js
 t/require.t
+t/v8params.t
 META.yml
 MANIFEST

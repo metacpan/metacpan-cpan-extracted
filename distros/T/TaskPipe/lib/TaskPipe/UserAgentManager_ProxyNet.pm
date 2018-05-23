@@ -2,7 +2,6 @@ package TaskPipe::UserAgentManager_ProxyNet;
 
 use Moose;
 with 'MooseX::ConfigCascade';
-with 'TaskPipe::Role::RunInfo';
 extends 'TaskPipe::UserAgentManager';
 use Carp;
 

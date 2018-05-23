@@ -1,5 +1,5 @@
 package Gtk3;
-$Gtk3::VERSION = '0.033';
+$Gtk3::VERSION = '0.034';
 =encoding utf8
 
 =head1 NAME
@@ -507,14 +507,26 @@ sub import {
 
 # - Overrides --------------------------------------------------------------- #
 
-=item * For backwards compatibility, C<Gtk3::CHECK_VERSION>,
-C<Gtk3::check_version>, C<Gtk3::init>, C<Gtk3::init_check>, C<Gtk3::main>,
-C<Gtk3::main_level> and C<Gtk3::main_quit> can be called as class-static or as
-normal functions: for example, C<< Gtk3->main_quit >> and C<< Gtk3::main_quit
->> are both supported.  Additionally, C<Gtk3::init> and C<Gtk3::init_check>
-automatically handle passing and updating C<@ARGV> as appropriate.
+=item * For backwards compatibility, the functions C<Gtk3::get_version_info>
+and C<Gtk3::GET_VERSION_INFO> are provided, and the functions
+C<Gtk3::CHECK_VERSION>, C<Gtk3::check_version>, C<Gtk3::init>,
+C<Gtk3::init_check>, C<Gtk3::main>, C<Gtk3::main_level> and C<Gtk3::main_quit>
+can be called as class-static or as normal functions: for example, C<<
+Gtk3->main_quit >> and C<< Gtk3::main_quit >> are both supported.
+Additionally, C<Gtk3::init> and C<Gtk3::init_check> automatically handle
+passing and updating C<@ARGV> as appropriate.
 
 =cut
+
+sub Gtk3::get_version_info {
+  return Gtk3::get_major_version (),
+         Gtk3::get_minor_version (),
+         Gtk3::get_micro_version ();
+}
+
+sub Gtk3::GET_VERSION_INFO {
+  return Gtk3->MAJOR_VERSION, Gtk3->MINOR_VERSION, Gtk3->MICRO_VERSION;
+}
 
 sub Gtk3::CHECK_VERSION {
   return not defined Gtk3::check_version(@_ == 4 ? @_[1..3] : @_);
@@ -1565,6 +1577,21 @@ sub Gtk3::StyleContext::get {
   return @values[0..$#values];
 }
 
+=item * An override for C<Gtk3::TargetEntry::new> is provided that
+automatically handles the conversion of the C<flags> argument.
+
+=cut
+
+sub Gtk3::TargetEntry::new {
+  my ($class, $target, $flags, $info) = @_;
+  if ($flags !~ /^\d+$/) {
+    $flags = Glib::Object::Introspection->convert_sv_to_flags (
+      "Gtk3::TargetFlags", $flags)
+  }
+  return Glib::Object::Introspection->invoke (
+    $_GTK_BASENAME, 'TargetEntry', 'new', $class, $target, $flags, $info);
+}
+
 =item * A Perl reimplementation of C<Gtk3::TextBuffer::create_tag> is provided.
 
 =cut
@@ -2345,7 +2372,7 @@ sub _rest_to_ref {
 }
 
 package Gtk3::Gdk::EventMask;
-$Gtk3::Gdk::EventMask::VERSION = '0.033';
+$Gtk3::Gdk::EventMask::VERSION = '0.034';
 use overload
   '==' => \&eq,
   '>=' => \&ge;

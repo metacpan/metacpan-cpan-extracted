@@ -6,7 +6,6 @@ use Web::Scraper;
 use Data::Dumper;
 use Module::Runtime 'require_module';
 with 'MooseX::ConfigCascade';
-with 'TaskPipe::Role::RunInfo';
 extends 'TaskPipe::OpenProxyManager::IPList';
 
 

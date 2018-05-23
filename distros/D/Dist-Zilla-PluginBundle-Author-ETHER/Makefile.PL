@@ -176,7 +176,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::TestRelease" => 0,
     "Dist::Zilla::Plugin::UploadToCPAN" => 0,
     "Dist::Zilla::Plugin::UseUnsafeInc" => 0,
-    "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.001",
+    "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007",
     "Dist::Zilla::Role::MintingProfile" => "5.047",
     "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
@@ -236,7 +236,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.139",
+  "VERSION" => "0.141",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -326,7 +326,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::UploadToCPAN" => 0,
   "Dist::Zilla::Plugin::UseUnsafeInc" => 0,
   "Dist::Zilla::PluginBundle::Basic" => 0,
-  "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.001",
+  "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007",
   "Dist::Zilla::Role::MetaProvider" => 0,
   "Dist::Zilla::Role::MintingProfile" => "5.047",
   "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,

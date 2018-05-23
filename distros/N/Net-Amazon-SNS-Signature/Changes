@@ -1,99 +1,33 @@
 ==================================================
-Changes from 2015-06-15 00:00:00 +0000 to present.
+Changes from 2017-05-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2016-06-14 14:34:34 +0000
+version 0.007 at 2018-05-22 16:45:53 +0000
 ------------------------------------------
 
-  Change: 6d6845df303ddfdd9e3506d60eb50c3cfeb20f02
+  Change: f56d1cdaa7ce4d7a5e3da969285e8b398218347e
+  Author: Patrick Mooney <patmooney@users.noreply.github.com>
+  Date : 2018-05-22 17:10:49 +0000
+
+    Merge pull request #1 from patmooney/remake-sig-for-perl-26
+
+    updating the signature using 5.26.1, the original made in 16.3
+    doesntâ¦ 
+
+  Change: 288e79f772621c445ecc85d6b33cea4952f9d3e7
   Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-06-14 15:34:18 +0000
+  Date : 2018-05-22 16:52:43 +0000
 
-    update to readme 
+    test on new perl 
 
-  Change: b1dd390eb9530398e56ebd502319e14c4aca1b43
+  Change: eebaa0be9e59a5a087c90d794dba3c0bb47ccf31
   Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-06-14 15:29:15 +0000
+  Date : 2018-05-22 16:36:55 +0000
 
-    update doc 
+    updating the signature using 5.26.1, the original made in 16.3 doesnt
+    seem to be compatible 
 
-------------------------------------------
-version 0.005 at 2016-04-05 13:40:41 +0000
-------------------------------------------
-
-  Change: 91a86336fd941a725fa0cecc5d410342e8531057
-  Author: Patrick <patrick@broadbean.com>
-  Date : 2016-04-05 13:40:41 +0000
-
-    subscription messages also have the URL as part of the signature 
-
-------------------------------------------
-version 0.004 at 2016-03-21 11:11:11 +0000
-------------------------------------------
-
-  Change: 9623c30bc9ed14c3e6659884d04fb20968289dfb
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-21 11:11:11 +0000
-
-    path class is a test dependency 
-
-------------------------------------------
-version 0.003 at 2016-03-17 17:27:19 +0000
-------------------------------------------
-
-  Change: 9746f1f0192bf520cde76cb96b71d5cbd4d62524
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 17:27:19 +0000
-
-    new README 
-
-  Change: 0c4eeb97f0432eaab6a809e8531288ee582fe243
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 17:26:35 +0000
-
-    updating doc 
-
-------------------------------------------
-version 0.001 at 2016-03-17 15:44:34 +0000
-------------------------------------------
-
-  Change: 7988ccf747dc9b8fda62f29d1cafd8624e2912c0
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 15:44:34 +0000
-
-    adding README and private key used in testing 
-
-  Change: 4252c5affa4ec1e16a0554b2644638e0c7203793
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 15:32:51 +0000
-
-    add abstract 
-
-  Change: 0b880f52cc5e84e9b552446ccd761b740275778b
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 15:29:32 +0000
-
-    sprucing up dist ini file 
-
-  Change: 65e7206d08864be9ef03c712f30c291f6732e88f
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 15:24:51 +0000
-
-    change of license 
-
-  Change: 840aec5ef2aecbb8fa269a07c90e6c9275a49051
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 15:19:34 +0000
-
-    adding travis file 
-
-  Change: 806123f5fb502ff02cf4437cd564598b66d94536
-  Author: Patrick Mooney <patrick@broadbean.com>
-  Date : 2016-03-17 13:28:11 +0000
-
-    sns signature checking and test 
-
-================
-End of releases.
-================
+================================================
+Plus 6 releases after 2017-05-22 00:00:00 +0000.
+================================================

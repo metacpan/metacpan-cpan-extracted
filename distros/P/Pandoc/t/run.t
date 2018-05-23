@@ -4,7 +4,6 @@ use Test::Exception;
 use Pandoc;
 
 plan skip_all => 'pandoc executable required' unless pandoc;
-# XXX: does Test::More/IPC::Run3 lack write permissions?
 
 my $args = ['-t' => 'markdown'];
 
@@ -63,14 +62,14 @@ subtest '->run(\@args, qw[odd length list])' => sub {
     my $in = 'foo';
     my %opts = ( in => \$in, out => \my($out), err => \my($err) );
     throws_ok { pandoc->run( $args, %opts, 'foo' ) } 
-        qr!^\QToo many or ambiguous arguments!, 'run';
+        qr!^Too many or ambiguous arguments!, 'run';
 };
 
 subtest '->run(\@args, ..., \%opts)' => sub {
     my $in = 'foo';
     my %opts = ( in => \$in, out => \my($out), err => \my($err) );
     throws_ok { pandoc->run( $args, qw[foo, bar], \%opts ) } 
-        qr!^\QToo many or ambiguous arguments!, 'run';
+        qr!^Too many or ambiguous arguments!, 'run';
 };
 
 done_testing;

@@ -21,17 +21,17 @@ package MongoDB::Op::_Update;
 # Encapsulate an update operation; returns a MongoDB::UpdateResult
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 
 use MongoDB::UpdateResult;
 use MongoDB::_Protocol;
 use MongoDB::_Types qw(
+    Boolish
     Document
 );
 use Types::Standard qw(
-    Bool
     Maybe
 );
 use Tie::IxHash;
@@ -53,13 +53,13 @@ has update => (
 has is_replace => (
     is       => 'ro',
     required => 1,
-    isa      => Bool,
+    isa      => Boolish,
 );
 
 has multi => (
     is       => 'ro',
     required => 1,
-    isa      => Bool,
+    isa      => Boolish,
 );
 
 has upsert => (

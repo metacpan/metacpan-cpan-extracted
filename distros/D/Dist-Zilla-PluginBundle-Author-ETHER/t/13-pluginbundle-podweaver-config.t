@@ -132,12 +132,12 @@ diag 'got log messages: ', explain $tzil->log_messages
 
 # If we specified a :version in weaver configs,
 # - we want to see a runtime prereq in our own dist
-# - TODO: we want to see an injected plugin_prereq on the target dist ([PodWeaver] should do this)
+# - TODO: we want to see an injected plugin_prereq on the target distribution ([PodWeaver] should do this)
 # Many things come in via [@Default], so look in there as well.
 
 subtest 'all plugins in use are specified as required runtime prerequisites by the plugin bundle' => sub {
 SKIP: {
-    skip('this test requires a built dist', 1) if not -f 'META.json';
+    skip('this test requires a built distribution', 1) if not -f 'META.json';
 
     my $pluginbundle_meta = decode_json(path('META.json')->slurp_raw);
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Lingua::EN::Tagger
 
+0.29            Aaron Coburn            5/18/18
+        Add an add_tags_incrementally method for a more
+        stream-based parsing mechanism. Updated email address.
+
 0.28            Aaron Coburn            12/23/16
         Changed the generation of the part-of-speech
         lexicon to use nstore instead of store. Based on a

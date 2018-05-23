@@ -104,6 +104,9 @@ sub run
             last unless keys %dump;
             my $argv = sub
             {
+                delete $ENV{MYDanExtractFile};
+                delete $ENV{MYDanExtractFileAim};
+
                 my $code = File::Spec->join( $this->{agent}{argv}, shift );
                 return -f $code && ( $code = do $code ) && ref $code eq 'CODE'
                     ? &$code( @_ ) : \@_;
@@ -133,6 +136,8 @@ sub run
             }keys %dump;
         }
     }
+
+    unlink $load if $load && -f $load;
 
     if( $task{todo} )
     {

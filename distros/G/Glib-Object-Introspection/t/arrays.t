@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-plan tests => 68;
+plan tests => 72;
 
 ok (Regress::test_strv_in ([ '1', '2', '3' ]));
 
@@ -162,4 +162,18 @@ SKIP: {
     unless check_gi_version (0, 12, 0);
   is_deeply (GI::bytearray_full_return (), $byte_array_ref);
   GI::bytearray_none_in ($byte_array_ref);
+}
+
+# -----------------------------------------------------------------------------
+
+{
+  my $obj = Regress::TestObj->constructor ();
+  $obj->signal_connect ('sig-with-array-len-prop' => sub {
+    my ($self, $array, $len, $data) = @_;
+    is ($self, $obj);
+    is_deeply ($array, [0, 1, 2, 3, 4]);
+    is ($len, 5);
+    is ($data, 'user23');
+  }, 'user23');
+  $obj->emit_sig_with_array_len_prop ();
 }

@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceSpec;
   use Moose;
+  use IO::K8s;
 
   has 'clusterIP' => (is => 'ro', isa => 'Str'  );
   has 'externalIPs' => (is => 'ro', isa => 'ArrayRef[Str]'  );
@@ -14,4 +15,6 @@ package IO::K8s::Api::Core::V1::ServiceSpec;
   has 'sessionAffinity' => (is => 'ro', isa => 'Str'  );
   has 'sessionAffinityConfig' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::SessionAffinityConfig'  );
   has 'type' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

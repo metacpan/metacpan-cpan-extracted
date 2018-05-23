@@ -1,5 +1,5 @@
 package QBit::WebInterface::Controller;
-$QBit::WebInterface::Controller::VERSION = '0.030';
+$QBit::WebInterface::Controller::VERSION = '0.031';
 use qbit;
 
 use base qw(QBit::Application::Part);

@@ -2,14 +2,14 @@ package Pcore::Handle;
 
 use Pcore -role;
 
-has uri => ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );
+has uri => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );
 
 sub new ( $self, $uri, %args ) {
     $uri = P->uri($uri) if !ref $uri;
 
     my $class = P->class->load( $uri->scheme, ns => 'Pcore::Handle' );
 
-    return $class->new( { uri => $uri, %args } );
+    return $class->new( { %args, uri => $uri } );    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
 }
 
 1;

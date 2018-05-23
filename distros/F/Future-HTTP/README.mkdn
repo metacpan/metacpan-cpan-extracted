@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://github.com/Corion/Filter-signatures)
+
 # NAME
 
 Future::HTTP - provide the most appropriate HTTP client with a Future API
@@ -103,8 +106,8 @@ like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
 
 # REPOSITORY
 
-The public repository of this module is 
-[http://github.com/Corion/future-http](http://github.com/Corion/future-http).
+The public repository of this module is
+[https://github.com/Corion/future-http](https://github.com/Corion/future-http).
 
 # SUPPORT
 
@@ -123,7 +126,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2016-2017 by Max Maischein `corion@cpan.org`.
+Copyright 2016-2018 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

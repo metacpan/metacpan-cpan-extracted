@@ -1,6 +1,8 @@
 package Pcore::Util::Hash::LRU::_CONST;
 
-use Pcore -const, -export => { CONST => [qw[$HASH $TIED_HASH $FIRST $LAST $ATTRS $KEY $VAL $PREV $LAST]] };
+use Pcore -const, -export;
+
+our $EXPORT = { CONST => [qw[$HASH $TIED_HASH $FIRST $LAST $ATTRS $KEY $VAL $PREV $LAST]] };
 
 const our $HASH      => 0;
 const our $TIED_HASH => 1;
@@ -383,7 +385,7 @@ sub SCALAR {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 55                   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 57                   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

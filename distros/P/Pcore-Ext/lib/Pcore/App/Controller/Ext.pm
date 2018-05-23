@@ -1,6 +1,6 @@
 package Pcore::App::Controller::Ext;
 
-use Pcore -const, -role;
+use Pcore -role, -const;
 use Pcore::Ext;
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
@@ -11,14 +11,14 @@ with qw[Pcore::App::Controller];
 
 require Pcore::Share::Ext_v6_2_0;
 
-requires qw[ext_app ext_app_title];
+has ext_app_title             => 'ExtJS Application';
+has ext_app                   => undef;
+has ext_default_theme_classic => 'triton';              # { is => 'ro', isa => Str, default => 'triton' };
+has ext_default_theme_modern  => 'triton';              # { is => 'ro', isa => Str, default =>  };
+has ext_default_locale        => 'en';                  # { is => 'ro', isa => Str, default =>  };
+has ext_resources             => sub { [] };            # is => 'ro', isa => ArrayRef
 
-has ext_default_theme_classic => ( is => 'ro', isa => Str,      default => 'triton' );
-has ext_default_theme_modern  => ( is => 'ro', isa => Str,      default => 'triton' );
-has ext_default_locale        => ( is => 'ro', isa => Str,      default => 'en' );
-has ext_resources             => ( is => 'ro', isa => ArrayRef, default => sub { [] } );
-
-has cache => ( is => 'ro', isa => ScalarRef, init_arg => undef );
+has cache => ();                                        # => ( is => 'ro', isa => ScalarRef, init_arg => undef );
 
 our $EXT_VER       = 'v6.2.0';
 our $EXT_FRAMEWORK = 'classic';
@@ -29,21 +29,7 @@ const our $DEFAULT_LOCALE => 'en';
 sub BUILD ( $self, $args ) {
     Pcore::Ext->SCAN( $self->{app}, $ext_framework->get_cfg, $EXT_FRAMEWORK );
 
-    die qq[Ext app "$self->{ext_app}" not found] if !$Pcore::Ext::CFG->{app}->{ $self->ext_app };
-
-    return;
-}
-
-# this method can be overrided in the child class
-sub run ( $self, $req ) {
-    if ( $req->{path_tail} && $req->{path_tail}->is_file ) {
-
-        # try to return static content
-        $self->return_static($req);
-    }
-    else {
-        $req->(404)->finish;
-    }
+    die qq[Ext app "$self->{ext_app}" not found] if !$Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
 
     return;
 }
@@ -90,13 +76,26 @@ around run => sub ( $orig, $self, $req ) {
     return;
 };
 
+sub run ( $self, $req ) {
+    if ( $req->{path_tail} && $req->{path_tail}->is_file ) {
+
+        # try to return static content
+        $self->return_static($req);
+    }
+    else {
+        $req->(404)->finish;
+    }
+
+    return;
+}
+
 sub _return_html ( $self, $req ) {
 
     # get locale
     my $locale = $self->_get_locale($req);
 
     if ( !$self->{cache}->{app}->{$locale}->{html} ) {
-        my $resources = [ $self->ext_resources->@* ];
+        my $resources = [ $self->{ext_resources}->@* ];
 
         # pcoreApi
         push $resources->@*, q[<script src="/static/pcore-api.js" integrity="" crossorigin="anonymous"></script>];
@@ -115,7 +114,7 @@ sub _return_html ( $self, $req ) {
 
         # fallback to the default theme
         if ( !$ext_resources ) {
-            my $theme = $EXT_FRAMEWORK eq 'classic' ? $self->ext_default_theme_classic : $self->ext_default_theme_modern;
+            my $theme = $EXT_FRAMEWORK eq 'classic' ? $self->{ext_default_theme_classic} : $self->{ext_default_theme_modern};
 
             $ext_resources = $ext_framework->ext( $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
         }
@@ -133,7 +132,7 @@ sub _return_html ( $self, $req ) {
         $self->{cache}->{app}->{$locale}->{html} = P->tmpl->render(
             'ext/index.html',
             {   INDEX => {    #
-                    title => $self->ext_app_title
+                    title => $self->{ext_app_title}
                 },
                 resources => $resources,
             }
@@ -276,7 +275,7 @@ sub _get_locale ( $self, $req ) {
     # validate locale
     my $locales = $ext_framework->get_locale;
 
-    $locale = defined $locale && exists $locales->{$locale} ? $locale : exists $locales->{ $self->ext_default_locale } ? $self->ext_default_locale : $DEFAULT_LOCALE;
+    $locale = defined $locale && exists $locales->{$locale} ? $locale : exists $locales->{ $self->{ext_default_locale} } ? $self->{ext_default_locale} : $DEFAULT_LOCALE;
 
     return $locale;
 }
@@ -464,7 +463,7 @@ sub _prepare_js ( $self, $js ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 376                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 375                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

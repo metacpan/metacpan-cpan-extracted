@@ -13,7 +13,7 @@ Moose::Manual::BestPractices - Get the most out of Moose
 
 =head1 VERSION
 
-version 2.2010
+version 2.2011
 
 =head1 RECOMMENDATIONS
 

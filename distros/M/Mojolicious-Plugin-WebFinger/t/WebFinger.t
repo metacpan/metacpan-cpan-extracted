@@ -27,7 +27,6 @@ $app->hook(
     }
   });
 
-
 is($c->hostmeta->link('lrdd')->attr('template'),
    'http://'.$webfinger_host.'/.well-known/webfinger?resource={uri}',
    'Correct uri');
@@ -135,7 +134,6 @@ sub _rev {
   return $_;
 };
 
-
 done_testing(29);
 exit;
 
@@ -145,9 +143,12 @@ is($wf->subject, 'acct:' . _rev('es.rettiuq!norka'), 'Subject');
 is($wf->link('http://webfinger.net/rel/profile-page')->attr('href'),
  'https://quitter.se/akron', 'Profile');
 
+# Mastodon example
+ok($wf = $c->webfinger(_rev('laicos.nodotsam!norgrag')), 'Fetch from mastodon');
+is($wf->subject, 'acct:' . _rev('laicos.nodotsam!norgraG'), 'subject is as expected');
 
+# Gmail
 $wf = $c->webfinger(_rev('moc.liamg!dlaweid.slin'));
-
 is($wf->subject, 'acct:' . _rev('moc.liamg!dlaweid.slin'), 'Subject');
 
 is($wf->link('http://portablecontacts.net/spec/1.0')->attr('href'),
@@ -174,6 +175,7 @@ $c->delay(
     is($fediverse_wf->subject, 'acct:' . _rev('moc.esrevidef!nakre'), 'Fediverse (in Parallel)');
   }
 );
+
 
 done_testing;
 exit;

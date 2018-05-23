@@ -21,10 +21,10 @@ SYNOPSIS
                 [ '999', undef, undef, '_', 'not a standard field']
             ]
         };
-        
+    
         # load default schema
         my $schema = MARC::Schema->new();
-        
+    
         # load custom schema from file
         my $schema = MARC::Schema->new({ file => share/marc-schema.json });
     
@@ -91,6 +91,10 @@ METHODS
 AUTHOR
 
     Johann Rolschewski <jorol@cpan.org>
+
+CONTRIBUTORS
+
+    Patrick Hochstenbach <patrick.hochstenbach@ugent.be<gt>
 
 COPYRIGHT
 

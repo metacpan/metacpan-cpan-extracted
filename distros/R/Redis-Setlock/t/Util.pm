@@ -11,6 +11,8 @@ use Time::HiRes qw/ sleep gettimeofday tv_interval /;
 use Exporter 'import';
 our @EXPORT_OK = qw/ redis_server redis_setlock /;
 
+$Redis::Setlock::WAIT_QUEUE = $ENV{WAIT_QUEUE};
+
 sub redis_server {
     my $redis_server;
     my $port = empty_port();

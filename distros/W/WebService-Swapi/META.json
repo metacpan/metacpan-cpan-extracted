@@ -37,7 +37,6 @@
             "App::CISetup" : "0",
             "App::Software::License" : "0",
             "Dist::Milla" : "v1.0.20",
-            "Minilla" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
@@ -55,6 +54,7 @@
             "REST::Client" : "0",
             "Role::REST::Client" : "0",
             "Types::Standard" : "0",
+            "namespace::clean" : "0",
             "perl" : "5.008001"
          }
       },
@@ -83,7 +83,7 @@
          "web" : "https://github.com/kianmeng/webservice-swapi"
       }
    },
-   "version" : "0.1.6",
+   "version" : "0.1.7",
    "x_contributors" : [
       "Kian-Meng, Ang <kianmeng@users.noreply.github.com>"
    ],

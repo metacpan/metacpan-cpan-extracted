@@ -5,10 +5,20 @@ use strict; use warnings;
 package B::DeparseTree::Node;
 use Carp;
 
-our($VERSION, @EXPORT, @ISA);
-$VERSION = '1.0.0';
-@ISA = qw(Exporter);
-@EXPORT = qw(new($$$$ from_str($$$) from_list($$$) parens_test($$$)));
+use Hash::Util qw[ lock_hash ];
+
+# Set of unary precedences
+our %UNARY_PRECEDENCES = (
+         4 => 1,  # right not
+        16 => 'sub, %, @',   # "sub", "%", "@'
+        21 => '~', # steal parens (see maybe_parens_unop)
+);
+lock_hash %UNARY_PRECEDENCES;
+
+
+our $VERSION = '1.0.0';
+our @ISA = qw(Exporter);
+our @EXPORT = qw(new($$$$ parens_test($$$)) %UNARY_PRECEDENCES);
 
 =head2 Node structure
 
@@ -36,11 +46,6 @@ to help out with statement boundaries.
 A reference to a list containing either strings, a Node references, or Hash references
 containing the keys I<sep> and a I<body>.
 
-* item B<body>
-
-A reference to a list of a Node references. Eventually this will this and
-texts will be merged.
-
 * item B<text>
 
 Text representation of the node until. Eventually this will diasppear
@@ -55,16 +60,18 @@ The keys is a hash ref hash reference
 
 =item B<context>
 
-A number passed from the parent indicating its precidence context
+A number passed from the parent indicating its precedence context
 
-=item B<precidence>
+=item B<precedence>
 
 A number as determined by the operator at this level.
 
 =item B<parens>
 
 'true' if we should to add parenthesis based on I<context> and
-I<precidence> values; '' if not.
+I<precedence> values; '' if not. We don't nest equal precedence
+for unuary ops. The unary op precedence is given by
+UNARY_OP_PRECEDENCE
 
 =back
 
@@ -75,10 +82,9 @@ I<precidence> values; '' if not.
 sub parens_test($$$)
 {
     my ($obj, $cx, $prec) = @_;
-    return ($prec < $cx or
-	    $obj->{'parens'} or
-	    # unary ops nest just fine
-	    $prec == $cx and $cx != 4 and $cx != 16 and $cx != 21)
+    # Unary ops which nest just fine
+    return 1 if ($prec == $cx && !exists $UNARY_PRECEDENCES{$cx});
+    return ($prec < $cx || $obj->{'parens'});
 }
 
 sub new($$$$$)
@@ -103,78 +109,35 @@ sub new($$$$$)
 	sep => $sep,
     }, $class;
 
-    $self->{text} = $self->combine($sep, $texts);
+    if (ref($texts)) {
+	# Passed in a ref ARRAY
+	$self->{text} = $deparse->combine2str($sep, $texts) if defined $sep;
+    } elsif (defined $texts) {
+	# Passed in a string
+	$self->{text} = $texts;
+    } else {
+	# Leave {texts} uninitialized
+    }
 
-    foreach my $optname (qw(other_ops body parent_ops child_pos)) {
+    foreach my $optname (qw(other_ops parent_ops child_pos maybe_parens
+                            omit_next_semicolon)) {
 	$self->{$optname} = $opts->{$optname} if $opts->{$optname};
     }
     if ($opts->{maybe_parens}) {
-	my ($obj, $context, $precidence) = @{$opts->{maybe_parens}};
-	my $parens = parens_test($obj, $context, $precidence);
+	my ($obj, $context, $precedence) = @{$opts->{maybe_parens}};
+	my $parens = parens_test($obj, $context, $precedence);
 	$self->{maybe_parens} = {
 	    context => $context,
-	    precidence => $precidence,
+	    precedence => $precedence,
 	    force => $obj->{'parens'},
 	    parens => $parens ? 'true' : ''
 	};
+	$self->{text} = "($self->{text})" if exists $self->{text} and $parens;
     }
     return $self;
 }
 
-# Simplified class constructors
-sub from_str($$$$$)
-{
-    my ($op, $self, $str, $type, $opts) = @_;
-    __PACKAGE__->new({body=>[$str]}, '', $type, $opts);
-}
-
-sub from_list($$$$$$)
-{
-    my ($op, $self, $list, $sep, $type, $opts) = @_;
-    __PACKAGE__->new({body=>$list}, $sep, $type, $opts);
-}
-
-sub combine($$$)
-{
-    my ($self, $sep, $items) = @_;
-    # FIXME: loop over $item, testing type.
-    return $items unless ref $items;
-    Carp::confess("should be a reference to a hash: is $items") unless
-	ref $items eq 'ARRAY';
-    my $result = '';
-    foreach my $item (@{$items}) {
-	my $add;
-	if (ref $item) {
-	    if (ref $item eq 'ARRAY' and scalar(@$item) == 2) {
-		# First item is text and second item is op address.
-		$add = $item->[0];
-	    } elsif (eval{$item->isa("B::DeparseTree::Node")}) {
-		$add = $item->{text};
-		# First item is text and second item is op address.
-	    } else {
-		$add = $self->combine($item->{sep}, $item->{texts});
-	    }
-	} else {
-	    $add = $item;
-	}
-	if ($result) {
-	    $result .= ($sep . $add);
-	} else {
-	    $result = $add;
-	}
-    }
-    return $result;
-}
-
-# FIXME: replace with routines to build text on from the tree
-#
-sub text($)
-{
-    return shift()->{text};
-}
-
-
-# Possibly add () around $text depending on precidence $prec and
+# Possibly add () around $text depending on precedence $prec and
 # context $cx. We return a string.
 sub maybe_parens($$$$)
 {
@@ -197,15 +160,18 @@ sub maybe_parens($$$$)
 
 # Demo code
 unless(caller) {
-    my $deparse = undef;
-    *fs = \&B::DeparseTree::Node::from_str;
-    *fl = \&B::DeparseTree::Node::from_list;
-    my @list = ();
-    push @list, fs('root', undef, "X", 'string', {}),
-	fl('root', undef, ['A', 'B'], ':', 'simple-list', {});
-    push @list, fl('root', undef, \@list, '||', 'compound-list', {});
-    foreach my $item (@list) {
-	print $item->text, "\n";
+    my $old_pkg = __PACKAGE__;
+    package B::DeparseTree::NodeDemo;
+    sub new($) {
+	my ($class) = @_;
+	bless {}, $class;
     }
+    sub combine2str($$$) {
+	my ($self, $sep, $texts) = @_;
+	join($sep, @$texts);
+    }
+    my $deparse = __PACKAGE__->new();
+    my $node = $old_pkg->new('op', $deparse, ['X'], 'test', {});
+    print $node->{text}, "\n";
 }
 1;

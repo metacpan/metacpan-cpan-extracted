@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureDiode::RO600;
 #ABSTRACT: RO600 (????)
-$Lab::Instrument::TemperatureDiode::RO600::VERSION = '3.642';
+$Lab::Instrument::TemperatureDiode::RO600::VERSION = '3.651';
 use strict;
 use Math::Complex;
 use Lab::Instrument::TemperatureDiode;
@@ -50,7 +50,7 @@ Lab::Instrument::TemperatureDiode::RO600 - RO600 (????)
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 COPYRIGHT AND LICENSE
 

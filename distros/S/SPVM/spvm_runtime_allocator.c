@@ -13,16 +13,17 @@
 #include "spvm_runtime.h"
 #include "spvm_api.h"
 #include "spvm_object.h"
+#include "spvm_hash.h"
 
 #include "spvm_package.h"
 #include "spvm_sub.h"
 #include "spvm_package.h"
-#include "spvm_type.h"
 #include "spvm_field.h"
 #include "spvm_compiler.h"
 #include "spvm_my.h"
 #include "spvm_op.h"
 #include "spvm_list.h"
+#include "spvm_basic_type.h"
 
 SPVM_RUNTIME_ALLOCATOR* SPVM_RUNTIME_ALLOCATOR_new(SPVM_RUNTIME* runtime) {
   (void)runtime;
@@ -125,28 +126,13 @@ void* SPVM_RUNTIME_ALLOCATOR_malloc_zero(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* 
 
 void SPVM_RUNTIME_ALLOCATOR_free_object(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_OBJECT* object) {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime(api);
-  SPVM_COMPILER* compiler = runtime->compiler;
   
   if (object == NULL) {
     return;
   }
   else {
     // Byte size
-    int64_t byte_size;
-    switch (object->object_type_id) {
-      case SPVM_OBJECT_C_OBJECT_TYPE_CODE_OBJECT: {
-        // Runtime
-        SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, object->type_id);
-
-        SPVM_PACKAGE* package = type->op_package->uv.package;
-
-        byte_size = sizeof(SPVM_OBJECT) + package->byte_size;
-        break;
-      }
-      default: {
-        byte_size = sizeof(SPVM_OBJECT) + object->length * object->element_byte_size;
-      }
-    }
+    int64_t byte_size = sizeof(SPVM_OBJECT) + object->units_length * object->unit_byte_size;
     
     assert(byte_size > 0);
     

@@ -1,9 +1,9 @@
 package File::ContentStore;
-$File::ContentStore::VERSION = '1.000';
+$File::ContentStore::VERSION = '1.001';
 use 5.014;
 
 use Carp qw( croak );
-use Types::Standard qw( slurpy Object Bool Str ArrayRef CodeRef );
+use Types::Standard qw( slurpy Object Bool Str ArrayRef HashRef CodeRef );
 use Types::Path::Tiny qw( Dir File );
 use Type::Params qw( compile );
 use Digest;
@@ -51,6 +51,32 @@ has file_callback => (
     predicate => 1,
 );
 
+has inode => (
+    is       => 'lazy',
+    isa      => HashRef,
+    init_arg => undef,
+    builder  => sub {
+        my ($self) = @_;
+        my $re = qr{
+            ^
+            ${ \( '[a-f0-9][a-f0-9]/' x $self->parts ) }
+            ${ \( '[a-f0-9]'
+                  x ( length( Digest->new( $self->digest )->hexdigest )
+                      - 2 * $self->parts ) ) }
+            $
+        }x;
+        $self->path->visit(
+            sub {
+                my ( $path, $inode ) = @_;
+                my $rel = $path->relative( $self->path )->stringify;
+                $inode->{ $path->stat->ino } = $rel
+                  if -f && $rel =~ $re;
+            },
+            { recurse => 1 }
+        );
+    },
+);
+
 # if a single non-hashref argument is given, assume it's 'path'
 sub BUILDARGS {
     my $class = shift;
@@ -75,15 +101,32 @@ sub link_file {
     state $check = compile( Object, File );
     my ( $self, $file ) = $check->(@_);
 
+    # skip non-files and symbolic links
+    return unless -f $file && !-l $file;
+
+    my ( $digest, $content, $done );
+
+    # check if the file's inode is in the cache
+    if ( $content = $self->inode->{ $file->stat->ino } ) {
+        $digest  = $content =~ s{/}{}gr;
+        $content = $self->path->child($content);
+        $done    = 1;
+    }
+
     # compute content file name
-    my $digest = $file->digest( $DIGEST_OPTS, $self->digest );
-    my $content =
-      $self->path->child(
-        map( { substr $digest, 2 * $_, 2 } 0 .. $self->parts - 1 ),
-        substr( $digest, 2 * $self->parts ) );
+    else {
+        $digest = $file->digest( $DIGEST_OPTS, $self->digest );
+        $content =
+          $self->path->child(
+            map( { substr $digest, 2 * $_, 2 } 0 .. $self->parts - 1 ),
+            substr( $digest, 2 * $self->parts ) );
+    }
 
     $self->file_callback->( $file, $digest, $content )
        if $self->has_file_callback;
+
+    # if the inode is already in our store, there's nothing left to do
+    return if $done;
 
     # check for collisions
     if( -e $content && $self->check_for_collisions ) {
@@ -104,9 +147,16 @@ sub link_file {
     my ( $old, $new ) = -e $content ? ( $content, $file ) : ( $file, $content );
 
     return if $old eq $new;    # do not link a file to itself
-    unlink $new if -e $new;
-    link $old, $new or croak "Failed linking $new to to $old: $!";
-    chmod 0444, $old if $self->make_read_only;
+    $new->remove;
+    link $old, $new or croak "Failed linking $new to $old: $!";
+
+    # optionally remove the write permissions
+    $old->chmod( $old->stat->mode & 07777 | 0222 ^ 0222 )
+      if $self->make_read_only;
+
+    # add the inode to the cache
+    $self->inode->{ $content->stat->ino } =
+      $content->relative( $self->path )->stringify;
 
     return $content;
 }
@@ -129,6 +179,9 @@ sub fsck {
 
                 # empty directory
                 push @{ $state->{empty} }, $path unless $path->children;
+            }
+            elsif( -l $path ) {
+                push @{ $state->{symlink} }, $path;
             }
             else {
 
@@ -161,7 +214,7 @@ File::ContentStore - A store for file content built with hard links
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -228,6 +281,11 @@ If the goal is deduplication and hard-linking of identical files, once
 all the files have been linked through the content store, the content
 store is not needed any more, and can be deleted.
 
+Note that since permissions are attached to the inode (and not the
+individual files), this implies that, when linking a file with the content
+store, it will set the initial permissions of the content file if it
+does not exist, and otherwise inherit the permissions of the content file.
+
 =head1 ATTRIBUTES
 
 =head2 path
@@ -293,8 +351,8 @@ stronger one.
 
 =head2 make_read_only
 
-When this attribute is set to a true value, a L<perlfunc/chmod> to
-read-only permissions is performed on the content files (and therefore
+When this attribute is set to a true value, a L<chmod|perlfunc/chmod> to remove
+the write permissions is performed on the content files (and therefore
 the linked files, since permissions are an attribute of the inode).
 
 The default is true, to avoid unwittingly modifying linked files that
@@ -306,6 +364,7 @@ This optional coderef is called by L</link_file> when linking a file into
 the store. This is useful for providing user feedback when processing
 large directories. The callback receives three arguments: the file, its
 digest and the content file (files are passed as L<Path::Tiny> objects).
+It is run right after obtaining the file digest, before doing anything else.
 
 Usage example:
 
@@ -357,8 +416,12 @@ content store).
 
 =item corrupted
 
-An arrary reference of all content files for which the name does not
+An array reference of all content files for which the name does not
 match the digest of their content.
+
+=item symlink
+
+An array reference of all symbolic links under L<path>.
 
 =back
 

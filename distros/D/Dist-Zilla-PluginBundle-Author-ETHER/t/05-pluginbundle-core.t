@@ -60,7 +60,7 @@ use NoPrereqChecks;
         'max_target_perl option defaults to 5.006 (when not overridden with a slice)',
     );
 
-    ok(!-e "build/$_", "no $_ was created in the dist") foreach qw(Makefile.PL Build.PL);
+    ok(!-e "build/$_", "no $_ was created in the distribution") foreach qw(Makefile.PL Build.PL);
 
     diag 'got log messages: ', explain $tzil->log_messages
         if not Test::Builder->new->is_passing;

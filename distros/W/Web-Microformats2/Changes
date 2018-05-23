@@ -1,5 +1,11 @@
 Revision history for Web::Microformats2
 
+0.4 2018-05-18T13:10:37Z
+
+    - Tests should now pass with older Perl versions. (GitHub issue #1; thanks to Slaven Rezić for the bug report.)
+    
+    - Adding Travis config.
+
 0.3 2018-05-10T04:16:50Z
 
     - Miscellaneous minor documentation and testing improvements.

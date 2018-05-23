@@ -2,7 +2,7 @@ package Pcore::Dist::CLI::Docker;
 
 use Pcore -class;
 
-with qw[Pcore::Dist::CLI];
+extends qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
     return {

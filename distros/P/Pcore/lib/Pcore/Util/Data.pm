@@ -1,7 +1,14 @@
 package Pcore::Util::Data;
 
-use Pcore -const, -export,
-  { ALL   => [qw[encode_data decode_data]],
+use Pcore -const, -export;
+use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
+use Pcore::Util::List qw[pairs];
+use Sort::Naturally qw[nsort];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_scalarref is_plain_arrayref];
+use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
+
+our $EXPORT = {
+    ALL   => [qw[encode_data decode_data]],
     PERL  => [qw[to_perl from_perl]],
     JSON  => [qw[to_json from_json]],
     CBOR  => [qw[to_cbor from_cbor]],
@@ -13,12 +20,7 @@ use Pcore -const, -export,
     XOR   => [qw[to_xor from_xor]],
     CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
     TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI]],
-  };
-use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
-use Pcore::Util::List qw[pairs];
-use Sort::Naturally qw[nsort];
-use Pcore::Util::Scalar qw[is_blessed_ref is_plain_scalarref is_plain_arrayref];
-use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
+};
 
 const our $DATA_TYPE_PERL => 1;
 const our $DATA_TYPE_JSON => 2;
@@ -771,14 +773,14 @@ sub to_xor ( $buf, $mask ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 47                   | * Subroutine "encode_data" with high complexity score (26)                                                     |
-## |      | 158                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
+## |      | 49                   | * Subroutine "encode_data" with high complexity score (26)                                                     |
+## |      | 160                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 363, 416             | * Postfix control "for" used                                                                                   |
-## |      | 757                  | * Postfix control "while" used                                                                                 |
+## |      | 365, 418             | * Postfix control "for" used                                                                                   |
+## |      | 759                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 621                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 623                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

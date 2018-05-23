@@ -123,6 +123,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.022',
                                       'Dist::Zilla::Plugin::TestRelease' => '0',
                                       'Dist::Zilla::Plugin::UploadToCPAN' => '0',
+                                      'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
                                       'Dist::Zilla::Plugin::lib' => '0',
                                       'Dist::Zilla::Util::AuthorDeps' => '5.021',
                                       'Eval::Closure' => '0.04',

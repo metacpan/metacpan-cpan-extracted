@@ -1,5 +1,5 @@
 package Moose::Meta::TypeConstraint;
-our $VERSION = '2.2010';
+our $VERSION = '2.2011';
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ use Scalar::Util qw(refaddr);
 use Sub::Name qw(subname);
 use Try::Tiny;
 
-use base 'Class::MOP::Object';
+use parent 'Class::MOP::Object';
 
 use Moose::Util 'throw_exception';
 
@@ -378,7 +378,7 @@ Moose::Meta::TypeConstraint - The Moose Type Constraint metaclass
 
 =head1 VERSION
 
-version 2.2010
+version 2.2011
 
 =head1 DESCRIPTION
 

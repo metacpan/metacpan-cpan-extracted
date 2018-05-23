@@ -4,7 +4,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # SYNOPSIS
 
@@ -128,7 +128,7 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/WWW-Subsonic](http://metacpan.org/release/WWW-Subsonic)
+    [https://metacpan.org/release/WWW-Subsonic](https://metacpan.org/release/WWW-Subsonic)
 
 - RT: CPAN's Bug Tracker
 

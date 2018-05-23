@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token::Separator;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180328'; # VERSION
+our $VERSION = '1.20180518'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -46,7 +46,7 @@ Mail::AuthenticationResults::Token::Separator - Class for modelling Authenticati
 
 =head1 VERSION
 
-version 1.20180328
+version 1.20180518
 
 =head1 DESCRIPTION
 

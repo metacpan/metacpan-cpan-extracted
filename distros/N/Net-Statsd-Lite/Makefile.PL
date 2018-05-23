@@ -21,15 +21,10 @@ my %WriteMakefileArgs = (
     "IO::Socket" => "1.18",
     "Moo" => "1.000000",
     "MooX::TypeTiny" => 0,
-    "Scalar::Util" => 0,
     "Sub::Quote" => 0,
     "Sub::Util" => "1.40",
-    "Type::Library" => 0,
-    "Type::Utils" => 0,
     "Types::Standard" => 0,
-    "namespace::autoclean" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Carp" => 0,
@@ -45,7 +40,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.4.2",
+  "VERSION" => "v0.4.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,23 +56,18 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Moo" => "1.000000",
   "MooX::TypeTiny" => 0,
-  "Scalar::Util" => 0,
   "Sub::Quote" => 0,
   "Sub::Util" => "1.40",
   "Test::More" => 0,
   "Test::Roo" => 0,
   "Test::Roo::DataDriven" => 0,
   "Test::Roo::Role" => 0,
-  "Type::Library" => 0,
-  "Type::Utils" => 0,
   "Types::Standard" => 0,
   "curry" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
-  "strict" => 0,
-  "utf8" => 0,
-  "warnings" => 0
+  "utf8" => 0
 );
 
 

@@ -19,7 +19,7 @@ use Cwd;
 use File::Basename;
 
 use vars qw($VERSION);
-$VERSION = '0.61';
+$VERSION = '0.62';
 
 =head1 NAME
 
@@ -294,6 +294,15 @@ sub local {
 
 =head1 URLs implemented by the server
 
+=head2 arbitrary content C<< $server->content($html) >>
+
+  $server->content(<<'HTML');
+      <script>alert("Hello World");</script>
+  HTML
+
+The URL will contain the HTML as supplied. This is convenient for supplying
+Javascript or special URL to your user agent.
+
 =head2 download C<< $server->download($name) >>
 
 This URL will send a file with a C<Content-Disposition> header and indicate
@@ -362,6 +371,12 @@ for (keys %urls) {
         $self->url . sprintf $urls{ $name }, @_;
     };
 };
+
+sub content {
+    my( $self, $html ) = @_;
+    (my $encoded = $html) =~ s!([^\w])!sprintf '%%%02x',$1!ge;
+    $self->url . $encoded;
+}
 
 =head1 EXPORT
 

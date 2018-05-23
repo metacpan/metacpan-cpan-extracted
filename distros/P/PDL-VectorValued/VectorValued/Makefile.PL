@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 ##-- put 'realclean_files' in a variable: avoid MakeMaker puking with:
 ##     ERROR from evaluation of .../ccsutils/Makefile.PL:
 ##     Modification of a read-only value attempted at /usr/share/perl/5.8/Carp/Heavy.pm line 45.
-our $realclean_files = '*~ *.tmp README.txt';
+our $realclean_files = '*~ *.tmp';
 our $has_readme_pod  = grep {-e $_ } (<README.pod>, <README.POD>, <README.rpod>);
 our $has_pdlpp       = grep {-e $_ } (<*.pd>);
 WriteMakefile(

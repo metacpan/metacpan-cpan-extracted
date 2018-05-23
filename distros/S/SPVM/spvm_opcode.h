@@ -225,6 +225,7 @@ enum {
   SPVM_OPCODE_C_ID_NEW_OBJECT,
   SPVM_OPCODE_C_ID_NEW_STRING,
   SPVM_OPCODE_C_ID_NEW_OBJECT_ARRAY,
+  SPVM_OPCODE_C_ID_NEW_MULTI_ARRAY,
   SPVM_OPCODE_C_ID_ARRAY_LOAD_BYTE,
   SPVM_OPCODE_C_ID_ARRAY_LOAD_SHORT,
   SPVM_OPCODE_C_ID_ARRAY_LOAD_INT,
@@ -348,7 +349,7 @@ enum {
 extern const char* const SPVM_OPCODE_C_ID_NAMES[];
 
 struct SPVM_opcode {
-  uint16_t id;
+  int32_t id;
   int32_t operand0;
   int32_t operand1;
   int32_t operand2;

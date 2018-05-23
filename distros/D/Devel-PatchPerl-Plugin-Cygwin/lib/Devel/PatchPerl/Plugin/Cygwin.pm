@@ -4,10 +4,12 @@ use strict;
 use warnings;
 
 # ABSTRACT: Devel::PatchPerl plugin for Cygwin
-our $VERSION = 'v0.0.1'; # VERSION
+our $VERSION = 'v0.1.0'; # VERSION
 
 use File::pushd qw[pushd];
 use File::Spec;
+
+use Devel::PatchPerl::Hints;
 
 my @patch = (
 	{
@@ -26,6 +28,34 @@ my @patch = (
 	{
 		perl => [ qr/^5\.8\.[0-8]$/ ],
 		subs => [ [ \&_patch_cygwin_ld2 ] ],
+	},
+# After Devel::PatchPerl::Hints fixed, it is not necessary to apply the following entry.
+	{
+		perl => [ 
+#			qr/^5\.6\.2$/,
+#			qr/^5\.8\.[0-9]$/,
+#			qr/^5\.10\.[01]$/,
+#			qr/^5\.12\.[0-5]$/,
+#			qr/^5\.14\.[0-4]$/,
+#			qr/^5\.16\.[0-3]$/,
+#			qr/^5\.18\.[0-4]$/,
+#			qr/^5\.20\.[0-3]$/,
+#			qr/^5\.22\.[0-4]$/,
+#			qr/^5\.24\.[0-2]$/,
+#			qr/^5\.26\.0$/,
+			qr/.*/,
+		],
+		subs => [ [ \&_patch_cygwin_GNU_SOURCE ] ], # required after libcrypt-devel-2.0-1 but always applying
+	},
+	{
+		perl => [ 
+			qr/^5\.8\.[0-9]$/,
+			qr/^5\.10\.[01]$/,
+			qr/^5\.12\.[0-5]$/,
+			qr/^5\.14\.[0-4]$/,
+			qr/^5\.16\.[0-3]$/,
+		],
+		subs => [ [ \&_patch_cygwin_PATH_quote ] ],
 	},
 );
 
@@ -458,7 +488,7 @@ sub _patch_cygwin_ld2
 			$_[0] =~ s/\@\@ -22,72/@@ -22,71/;
 			$_[0] =~ s/these ones are mandatory/this one is pretty mandatory/;
 			$_[0] =~ s/-VERSION = '\$version'\n//;
-			$_[0] =~ s/ -e s,\@VERSION\@,\\\${VERSION},g//;
+			$_[0] =~ s/ -e s,\@VERSION\@,\\\$\{VERSION},g//;
 		} ],
 		[ qr/^5\.8\.0$/, sub {
 		# Makefile.SH
@@ -839,6 +869,80 @@ END
 	}
 }
 
+sub _patch_cygwin_GNU_SOURCE
+{
+	# Override Devel::PatchPerl::Hints until it is fixed
+	Devel::PatchPerl::_patch(<<'END') if Devel::PatchPerl::Hints->hint_file("cygwin") =~ /ccflags="\$ccflags -DPERL_USE_SAFE_PUTENV -U__STRICT_ANSI__"/;
+--- hints/cygwin.sh.orig        2018-05-16 17:14:35.085980800 +0900
++++ hints/cygwin.sh     2018-05-16 18:32:34.356348000 +0900
+@@ -31,7 +31,7 @@
+ man3ext='3pm'
+ test -z "$use64bitint" && use64bitint='define'
+ test -z "$useithreads" && useithreads='define'
+-ccflags="$ccflags -DPERL_USE_SAFE_PUTENV -U__STRICT_ANSI__"
++ccflags="$ccflags -DPERL_USE_SAFE_PUTENV -U__STRICT_ANSI__ -D_GNU_SOURCE"
+ # - otherwise i686-cygwin
+ archname='cygwin'
+
+END
+}
+
+sub _patch_cygwin_PATH_quote
+{
+	my @adjust = (
+		[ [
+			qr/^5\.8\.[0-9]$/,
+			qr/^5\.10\.[01]$/,
+		  ], sub {
+			$_[0] =~ s|\@\@ -1,3 \+1,12 @@|@@ -1,4 +1,13 @@\n #! /bin/sh|;
+		  } ],
+	);
+	my $patch = <<'END'; $_->[1]->($patch) for grep { Devel::PatchPerl::_is( $_->[0], $_[0] ) } @adjust; Devel::PatchPerl::_patch($patch);
+--- Makefile.SH.orig	2013-03-05 00:16:21.000000000 +0900
++++ Makefile.SH	2018-05-17 14:35:26.914781400 +0900
+@@ -1,3 +1,12 @@
++# quote() - Creates a shell literal
++# Usage:  echo "...` quote "..." `..."
++quote() {
++	case "$1" in
++	'') echo "''" ;;
++	*)  echo "$1" | sed 's/\([^a-zA-Z0-9.:_\-\/]\)/\\\1/g' ;;
++	esac
++}
++
+ case $PERL_CONFIG_SH in
+ '')
+ 	if test -f config.sh
+@@ -119,7 +128,13 @@
+ 	        ldlibpth=''
+ 	        ;;
+ 	    *)
+-		eval "ldlibpth=\"$ldlibpthname=`pwd`:\$$ldlibpthname\""
++		eval "ldlibpthval=\"\$$ldlibpthname\""
++
++		case "$ldlibpthval" in
++		'')  ldlibpth="$ldlibpthname=` quote "$pwd" `" ;;
++		*)   ldlibpth="$ldlibpthname=` quote "$pwd" `:` quote "$ldlibpthval" `" ;;
++		esac
++
+ 		;;
+ 	    esac
+ 	    # Strip off any trailing :'s
+@@ -127,11 +142,6 @@
+ 	    ;;
+         esac
+ 
+-	case "$ldlibpth" in
+-	# Protect any spaces
+-	*" "*) ldlibpth=`echo $ldlibpth|sed 's/ /\\\\ /g'` ;;
+-	esac
+-
+ 	case "$osname" in
+ 	linux)
+ 	    # If there is a pre-existing $libperl from a previous
+END
+}
+
 1
 
 __END__
@@ -851,7 +955,7 @@ Devel::PatchPerl::Plugin::Cygwin - Devel::PatchPerl plugin for Cygwin
 
 =head1 VERSION
 
-version v0.0.1
+version v0.1.0
 
 =head1 SYNOPSIS
 
@@ -870,7 +974,31 @@ It might be better to be included in original because it is not for variant but 
 The Cygwin environment is, however, relatively minor and tricky environment.
 So, this module is provided as a plugin in order to try patches unofficially and experimentally.
 
-All stable releases on and after 5.8 serires are compilable.
+As of this writing, it is confirmed that the following versions are compilable with Cygwin 2.10.0.
+
+=over 4
+
+=item * 5.8.9
+
+=item * 5.10.1
+
+=item * 5.12.5
+
+=item * 5.14.4
+
+=item * 5.16.3
+
+=item * 5.18.4
+
+=item * 5.20.3
+
+=item * 5.22.4
+
+=item * 5.24.4
+
+=item * 5.26.2
+
+=back
 
 =head1 METHODS
 
@@ -921,7 +1049,7 @@ Yasutaka ATARASHI <yakex@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Yasutaka ATARASHI.
+This software is copyright (c) 2018 by Yasutaka ATARASHI.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

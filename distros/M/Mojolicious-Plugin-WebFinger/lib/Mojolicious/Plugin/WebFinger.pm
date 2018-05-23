@@ -6,9 +6,17 @@ use Mojo::URL;
 # Todo:
 # - Make callback non-blocking aware
 # - Support 307 Temporary Redirect as described in the spec
+# - Support simple startup defintion, like
+#   plugin WebFinger => {
+#     'akron@sojolicious' => {
+#       describedby => {
+#	  type => 'application/rdf+xml',
+#	  href => 'http://sojolicio.us/akron.foaf'
+#       }
+#     }
+#   };
 
-
-our $VERSION = 0.08;
+our $VERSION = "0.10";
 
 
 my $WK_PATH = '/.well-known/webfinger';
@@ -332,8 +340,6 @@ sub _fetch_webfinger {
       sub {
 	my $delay = shift;
 
-	# Todo: Change this to ($secure ? '-secure' : undef) for hostmeta 0.10
-
 	my @param = (
 	  $host,
 	  $header,
@@ -552,14 +558,14 @@ Mojolicious::Plugin::WebFinger - Serve and Retrieve WebFinger Documents
   # Mojolicious::Lite
   plugin 'WebFinger';
 
-  # Serves XRD or JRD from /.well-known/webfinger
+  # Will serve XRD or JRD from /.well-known/webfinger
 
   # Discover WebFinger resources the blocking ...
   print $c->webfinger('acct:bob@example.com')
           ->link('describedby')
           ->attr('href');
 
-  # ... or non-blocking way
+  # ... or the non-blocking way
   $c->webfinger('acct:bob@example.com' => sub {
     my ($xrd, $header) = @_;
     # ...
@@ -569,11 +575,9 @@ Mojolicious::Plugin::WebFinger - Serve and Retrieve WebFinger Documents
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::WebFinger> provides several functions for the
-L<WebFinger Protocol|https://datatracker.ietf.org/doc/draft-ietf-appsawg-webfinger/>.
+L<WebFinger Protocol|https://webfinger.net/>.
 It supports C<.well-known/webfinger> discovery as well as Host-Meta
 and works with both XRD and JRD.
-
-B<This module is an early release! There may be significant changes in the future.>
 
 
 =head1 METHODS
@@ -591,7 +595,7 @@ B<This module is an early release! There may be significant changes in the futur
 
 Called when registering the plugin.
 Accepts the optional parameters C<secure>, which is a boolean value
-which indicates that only secure transactions are allowed,
+indicating that only secure transactions are allowed,
 and C<expires>, which is the number of seconds the served WebFinger
 document should be cached by the fetching client (defaults to 10 days).
 These parameters can be either set on registration or
@@ -613,12 +617,12 @@ as part of the configuration file with the key C<WebFinger>.
     'sojolicio.us' => 'http://sojolicio.us/me.html', -secure
   );
 
-  # Use rel parameters
+  # Use 'rel' parameters
   my $xrd = $self->webfinger(
     'acct:me@sojolicio.us' => ['describedBy'], -secure
   );
 
-  # Use non-blocking
+  # Use non-blocking discovery
   $self->webfinger(
     'acct:me@sojolicio.us' => [qw/describedBy author/] => sub {
       my $xrd = shift;
@@ -632,7 +636,7 @@ Returns the WebFinger resource as an L<XRD|XML::Loy::XRD> object.
 Accepts the WebFinger resource, an optional array reference
 of relations, and an optional callback for non-blocking requests.
 The appended flag indicates, how the discovery should be done.
-C<-secure> indicates, that discovery is allowed only over C<https>.
+C<-secure> indicates, that discovery is allowed only via C<https>.
 C<-modern> indicates, that only C</.well-known/webfinger> is
 discovered over C<https>.
 C<-old> indicates, that only L<Host-Meta|Mojolicious::Plugin::HostMeta>
@@ -648,9 +652,8 @@ and lrdd discovery is used.
     fetch_webfinger=> sub {
       my ($c, $host, $res, $header) = @_;
 
-      # Get cached document
-      my $doc = $c->chi->get("webfinger-$host-$res");
-      return unless $doc;
+      # Get cached document using M::P::CHI
+      my $doc = $c->chi->get("webfinger-$host-$res") or return;
 
       # Get cached headers
       my $headers = $c->chi->get("webfinger-$host-$res-headers");
@@ -671,10 +674,10 @@ the retrieval will stop.
 
 This can be used for caching.
 
-The callback can be established with the
+The callback can be established using the
 L<callback|Mojolicious::Plugin::Util::Callback/callback>
 helper or on registration.
-Callbacks may be changed for non-blocking requests.
+Callbacks may be improved for non-blocking requests in the future.
 
 
 =head2 prepare_webfinger
@@ -703,7 +706,7 @@ hook.
 The callback can be either set using the
 L<callback helper|Mojolicious::Plugin::Util::Callback/callback>
 or on registration.
-Callbacks may be changed for non-blocking requests.
+Callbacks may be improved for non-blocking requests in the future.
 
 
 =head1 HOOKS
@@ -729,7 +732,7 @@ the resource name and the L<XRD|XML::Loy::XRD> object.
     after_fetching_webfinger => sub {
       my ($c, $host, $res, $xrd, $headers) = @_;
 
-      # Store document in cache
+      # Store document in cache using M::P::CHI
       $c->chi->set("webfinger-$host-$res" => $xrd->to_pretty_xml);
 
       # Store headers in cache
@@ -789,7 +792,7 @@ This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

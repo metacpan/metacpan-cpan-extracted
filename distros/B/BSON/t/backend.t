@@ -9,6 +9,7 @@ binmode( Test::More->builder->$_, ":utf8" )
   for qw/output failure_output todo_output/;
 
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 
 $ENV{PERL_BSON_BACKEND} = "PPSubclass";
@@ -36,7 +37,7 @@ done_testing;
 #
 # This file is part of BSON
 #
-# This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+# This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

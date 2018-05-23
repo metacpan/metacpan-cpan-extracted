@@ -47,7 +47,8 @@ WriteMakefile(
         'Carp' => 0,
         'Clone' => 0,
         'Cwd' => 0,
-        'POSIX' => 0
+        'POSIX' => 0,
+	'SQL::Translator' => 0
     },
     EXE_FILES => ['scripts/taskpipe'],
     TEST_REQUIRES => {

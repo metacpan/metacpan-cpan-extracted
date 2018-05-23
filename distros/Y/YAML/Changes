@@ -1,3 +1,8 @@
+1.26 Fri May 18 21:57:20 CEST 2018
+ - Fix bug introduced in 1.25 - loading of quoted string with colon as
+   sequence element (tinita, fixes issue#208)
+ - Support zero indented block sequences (PR#207 tinita)
+
 1.25 Fri May 11 19:58:58 CEST 2018
  - Applied several pull requests by tinita
  - Support trailing comments (PR#189, PR#190, PR#191)
@@ -7,13 +12,13 @@
  - Fix loading strings with multiple spaces (PR#172)
  - Allow more characters in anchor name (PR#196)
  - Add $YAML::LoadBlessed for disabling loading objects (PR#197)
- - Applied several pull requests by tinita
  - Disable test with long string under certain conditions (PR#201)
  - Quote scalar if it equals '=' (PR#202)
  - Multiple regexp roundtrip does not grow (PR#203)
  - Add support for compact nested block sequences (PR#204)
  - Support reverse order of block scalar indicators (PR#205)
  - Support nested mappings in sequences (PR#206)
+ - Fix parsing of quoted strings (PR#188)
 
 1.24 Mon Oct 30 20:31:53 CET 2017
  - Fix $LoadCode (PR#180, PR#181, PR#182 by @mohawk2++)

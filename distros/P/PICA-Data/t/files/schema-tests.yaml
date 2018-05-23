@@ -1,0 +1,228 @@
+---
+# sample schemas to reference in tests
+schemas:
+  021A:
+    fields:
+      021A:
+        required: 1
+        subfields:
+          a:
+            required: 1
+            order: 1
+          d:
+            order: 2
+          x: {}
+  021A-repeatable:
+    fields:
+      021A:
+        repeatable: 1
+  021A-empty-subfields:
+    fields:
+      021A:
+        subfields: {}
+  occurrences:
+    fields:
+      028C/01:
+        required: 1
+      222X:
+        required: 0
+  pattern:
+    fields:
+      021A:
+        subfields:
+          a:
+            pattern: x
+  positions:
+    fields:
+      099X:
+        subfields:
+          x:
+            positions:
+              01: {}
+              1-01:
+                codes:
+                  y: {}
+              2-3:
+                codes:
+                  zz: {}
+
+# sample records to reference in tests
+records:
+  021A: "021A $atitle"
+  021A-repeated: "021A $atitle\n021A $atitle"
+  021A-repeated-subfield: "021A $atitle$atitle"
+  021A-missing-subfield: "021A $dsubtitle"
+  021A-ordered-subfields: "021A $atitle$dsubtitle"
+  021A-unordered-subfields: "021A $dsubtitle$atitle"
+  021A-subfield: "021A $atitle$atitle"
+  099X: "099X $xyzz"
+  099X-short: "099X $xy"
+  099X-wrong: "099X $xyaa"
+  occurrences: "028C/01 $dEmma$aGoldman\n222X/123 $x23"
+  occurrences-missing: "028C $dEmma$aGoldman"
+
+# actual tests with schema, record, options, and expected errors
+tests:
+
+- check: valid record
+  schema: 021A
+  record: 021A
+
+- check: valid record with repeatable field
+  schema: 021A-repeatable
+  record: 021A-repeated
+
+- check: valid record with ordered subfields
+  schema: 021A
+  record: 021A-ordered-subfields
+
+- check: non-repeatbale field repeated
+  schema: 021A
+  record: 021A-repeated
+  errors:
+  - message: field 021A is not repeatable
+    repeated: 1
+    tag: 021A
+
+- check: multiple errors
+  schema: 021A
+  record: 099X
+  errors:
+  - message: unknown field 099X
+    tag: 099X
+  - message: missing field 021A
+    required: 1
+    tag: 021A
+
+- check: unknown field ignored
+  schema: 021A-repeatable
+  record: 099X
+  options:
+    ignore_unknown_fields: 1
+
+- check: unknown fields and subfields ignored
+  schema: 021A-repeatable
+  record: 099X
+  options:
+    ignore_unknown: 1
+
+- check: unknown subfield
+  schema: 021A-empty-subfields
+  record: 021A
+  errors:
+  - message: invalid subfield 021A$a
+    tag: 021A
+    subfields:
+      a:
+        code: a
+        message: unknown subfield 021A$a
+
+- check: unknown subfield ignored
+  schema: 021A-empty-subfields
+  record: 021A
+  options:
+    ignore_unknown_subfields: 1
+
+- check: non-repeatable subfield repeated
+  schema: 021A
+  record: 021A-repeated-subfield
+  errors:
+  - message: invalid subfield 021A$a
+    tag: 021A
+    subfields:
+      a:
+        code: a
+        message: subfield 021A$a is not repeatable
+        repeated: 1
+
+- check: missing subfield
+  schema: 021A
+  record: 021A-missing-subfield
+  errors:
+  - message: invalid subfield 021A$a
+    tag: 021A
+    subfields:
+      a:
+        code: a
+        message: missing subfield 021A$a
+        required: 1
+
+- check: wrong subfield order
+  schema: 021A
+  record: 021A-unordered-subfields
+  errors:
+  - message: invalid subfield 021A$a
+    tag: 021A
+    subfields:
+      a:
+        code: a
+        order: 1
+        message: wrong subfield order of 021A$a
+
+- check: subfield order ignored
+  schema: 021A
+  record: 021A-unordered-subfields
+  options:
+    ignore_subfield_order: 1
+
+- check: occurrence missing
+  schema: occurrences
+  record: occurrences-missing
+  errors:
+  - tag: 028C
+    message: unknown field 028C
+  - tag: 028C
+    occurrence: '01'
+    message: missing field 028C/01
+    required: 1
+
+- check: occurrence not missing
+  schema: occurrences
+  record: occurrences
+
+- check: subfield does not match pattern
+  schema: pattern
+  record: 021A
+  errors:
+  - message: invalid subfield 021A$a
+    tag: 021A
+    subfields:
+      a:
+        code: a
+        value: title
+        pattern: x
+        message: value of subfield 021A$a does not match pattern x
+
+- check: positions match
+  schema: positions
+  record: 099X
+
+- check: positions do not match (value too short)
+  schema: positions
+  record: 099X-short
+  errors:
+  - message: invalid subfield 099X$x
+    tag: 099X
+    subfields:
+      x:
+        code: x
+        value: y
+        position: 2-3
+        message: invalid value at position 2-3 of subfield 099X$x
+
+- check: positions do not match
+  schema: positions
+  record: 099X-wrong
+  errors:
+  - message: invalid subfield 099X$x
+    tag: 099X
+    subfields:
+      x:
+        code: x
+        value: yaa
+        position: 2-3
+        message: invalid value at position 2-3 of subfield 099X$x
+
+# TODO:
+# - check fields in level 1 and level 2 (uniqueness per local copy!)
+

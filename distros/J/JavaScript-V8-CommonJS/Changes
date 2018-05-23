@@ -1,5 +1,13 @@
 Revision history for Perl extension JavaScript-V8-CommonJS
 
+0.06 2018-05-18T20:52:49Z
+
+    - require() can now load json files
+
+0.05 2018-05-16T14:02:28Z
+
+    - constructor now accepts v8_params hashref value
+
 0.04 2018-05-14T17:54:58Z
 
     - fixed eval() first stack item line manipulation

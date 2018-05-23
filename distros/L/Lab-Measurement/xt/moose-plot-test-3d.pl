@@ -28,16 +28,16 @@ sub dummysource {
 my $gate = dummysource();
 my $bias = dummysource();
 
-my $size   = 100;
+my $size   = 300;
 my $center = $size / 2;
 
 my $gate_sweep = sweep(
     type => 'Step::Voltage', instrument => $gate, from => 0,
-    to   => 10,              step       => 1
+    to   => $size,           step       => 1
 );
 my $bias_sweep = sweep(
     type => 'Step::Voltage', instrument => $bias, from => 0,
-    to   => 10000,           step       => 1
+    to   => $size,           step       => 1
 );
 
 my $datafile_3d = sweep_datafile( columns => [qw/gate bias current/] );

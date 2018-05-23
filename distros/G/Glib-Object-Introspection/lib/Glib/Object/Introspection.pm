@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Glib;
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
@@ -526,6 +526,21 @@ example:
 
   my $button = Gtk3::Button->new;
   Gtk3::WidgetClass::find_style_property ($button, 'image-spacing')
+
+=head2 Overriding virtual functions
+
+When subclassing a gtk+ class or when implementing a gtk+ interface with
+L<Glib::Object::Subclass>, you can override any virtual functions that the
+class has by simply defining sub routines with names obtained by capitalizing
+the original names of the virtual functions.  So, for example, if you implement
+a custom subclass of C<Gtk3::CellRenderer> and want to override its virtual
+function C<render>, you provide a sub routine with the name C<RENDER> in your
+package.
+
+  sub RENDER {
+    my ($cell, $cr, $widget, $background_area, $cell_area, $flags) = @_;
+    # do something
+  }
 
 =head1 DESCRIPTION FOR LIBRARY BINDING AUTHORS
 

@@ -1,0 +1,40 @@
+---
+abstract: 'A client for talking to Docker Registries'
+author:
+  - 'Jose Luis Martínez <joseluis.martinez@capside.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Docker-Registry
+optional_features:
+  ecr-registry:
+    description: 'Support for ECR'
+    requires:
+      Paws: '0'
+  gcr-registry:
+    description: 'Support for GCR'
+    requires:
+      Crypt::JWT: '0'
+      Path::Class: '0'
+requires:
+  HTTP::Headers: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
+  Moose: '0'
+  Throwable::Error: '0'
+  perl: '5.014001'
+resources:
+  bugtracker: https://github.com/pplu/docker-registry/issues
+  repository: https://github.com/pplu/docker-registry.git
+version: '0.03'
+x_generated_by_perl: v5.20.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

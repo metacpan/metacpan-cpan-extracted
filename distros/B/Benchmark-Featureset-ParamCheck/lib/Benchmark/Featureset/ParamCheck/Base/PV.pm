@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Base::PV;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 # Give Params::Validate a fighting chance.
 BEGIN { $ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'XS' };

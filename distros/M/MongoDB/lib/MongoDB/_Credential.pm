@@ -20,13 +20,14 @@ use warnings;
 package MongoDB::_Credential;
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use MongoDB::Error;
 use MongoDB::Op::_Command;
 use MongoDB::_Types qw(
   AuthMechanism
+  Boolish
   NonEmptyStr
 );
 
@@ -36,7 +37,6 @@ use MIME::Base64 qw/encode_base64 decode_base64/;
 use Tie::IxHash;
 use Try::Tiny;
 use Types::Standard qw(
-  Bool
   HashRef
   InstanceOf
   Str
@@ -70,7 +70,7 @@ has password => (
 
 has pw_is_digest => (
     is  => 'ro',
-    isa => Bool,
+    isa => Boolish,
 );
 
 has mechanism_properties => (
@@ -96,7 +96,7 @@ sub _build__scram_client {
     # loaded only demand as it has a long load time relative to other
     # modules
     require Authen::SCRAM::Client;
-    Authen::SCRAM::Client->VERSION(0.003);
+    Authen::SCRAM::Client->VERSION(0.009);
     return Authen::SCRAM::Client->new(
         username      => $self->username,
         password      => $self->_digested_password,
@@ -163,7 +163,8 @@ sub BUILD {
     my $mech = $self->mechanism;
 
     # validate attributes for given mechanism
-    while ( my ( $key, $validator ) = each %{ $CONSTRAINTS{$mech} } ) {
+    for my $key ( sort keys %{ $CONSTRAINTS{$mech} } ) {
+        my $validator = $CONSTRAINTS{$mech}{$key};
         local $_ = $self->$key;
         unless ( $validator->() ) {
             MongoDB::UsageError->throw("invalid field $key in $mech credential");

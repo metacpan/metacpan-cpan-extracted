@@ -80,7 +80,7 @@ SERVERLOOP: {
         $log .= "Request:\n" . $r->as_string . "\n";
         if ($location =~ m!^/redirect/(.*)$!) {
             $res = HTTP::Response->new(302);
-            $res->header('location', $d->url . $1);
+            $res->header('location', $url . $1);
 
         } elsif ($location =~ m!^/local/(.*)$!) {
             my $rbody= do { open my $fh, '<', $1; binmode $fh; local $/; <$fh> };
@@ -164,6 +164,18 @@ SERVERLOOP: {
                 "\277_[\373\325\336|\252\356\334\230#\265\177\275\1771\27\304\f\206\3\363\275_",
                 "\357]Ww\361\351\355\247o\370\241b\26\aj\336\316?\34\242\224\27a\347\24\270",
                 "\336\236\201\1\0!\203w\217s\0\0\0",
+                ;
+            $res = HTTP::Response->new(200, "OK", $headers, $body);
+
+        } elsif ($location =~ m!^/content/(.*)$!) {
+            my $headers = HTTP::Headers->new(
+                Content_Type => "text/html",
+            );
+		    (my $html = $1) =~ s!%([a-fA-F0-9]{2})!chr(hex($1))!ge;
+            $body = join "",
+                "<html>",
+                "$html",
+                "</html>",
                 ;
             $res = HTTP::Response->new(200, "OK", $headers, $body);
 

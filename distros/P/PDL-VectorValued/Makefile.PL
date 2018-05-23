@@ -18,6 +18,6 @@ WriteMakefile(
 				     PDL => 0,
 				    },
 	      realclean => {
-			    FILES => '*~ *.tmp README.txt',
+			    FILES => join(' ', qw(*~ *.tmp),(-e 'README.rpod' ? 'README.txt' : qw())),
 			   },
 	     );

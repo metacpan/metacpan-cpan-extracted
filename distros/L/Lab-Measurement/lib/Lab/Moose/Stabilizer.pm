@@ -1,11 +1,12 @@
 package Lab::Moose::Stabilizer;
-$Lab::Moose::Stabilizer::VERSION = '3.642';
+$Lab::Moose::Stabilizer::VERSION = '3.651';
 #ABSTRACT: Sensor stabilizers role
 
 use 5.010;
 use Moose::Role;
 use MooseX::Params::Validate 'validated_list';
 use Time::HiRes qw/time sleep/;
+use Lab::Moose::Countdown;
 use Lab::Moose              ();
 use Statistics::Descriptive ();
 use Scalar::Util 'looks_like_number';
@@ -96,7 +97,13 @@ sub stabilize {
                 );
             }
         }
-        sleep($measurement_interval);
+        
+        if ($measurement_interval > 5) {
+            countdown($measurement_interval, "Measurement interval: Sleeping for ");
+        }
+        else {
+            sleep ($measurement_interval);
+        }
 
         if ( defined $max_stabilization_time ) {
             if ( time() - $start_time > $max_stabilization_time ) {
@@ -126,7 +133,7 @@ Lab::Moose::Stabilizer - Sensor stabilizers role
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 DESCRIPTION
 

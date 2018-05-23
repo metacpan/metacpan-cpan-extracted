@@ -1,7 +1,9 @@
 package Pcore::API::Proxy;
 
-use Pcore -const, -class, -res, -export => { PROXY_TYPE => [qw[$PROXY_TYPE_HTTP $PROXY_TYPE_HTTPS $PROXY_TYPE_SOCKS4 $PROXY_TYPE_SOCKS4A $PROXY_TYPE_SOCKS5]] };
+use Pcore -const, -class, -res, -export;
 use Pcore::Util::Scalar qw[is_ref];
+
+our $EXPORT = { PROXY_TYPE => [qw[$PROXY_TYPE_HTTP $PROXY_TYPE_HTTPS $PROXY_TYPE_SOCKS4 $PROXY_TYPE_SOCKS4A $PROXY_TYPE_SOCKS5]] };
 
 has uri        => ( is => 'ro', isa => Str | InstanceOf ['Pcore::Util::URI'], required => 1 );
 has is_http    => ( is => 'ro', isa => Bool );
@@ -443,11 +445,11 @@ sub finish_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 202, 275, 280, 297,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 347, 350, 353        |                                                                                                                |
+## |    2 | 204, 277, 282, 299,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 349, 352, 355        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 207, 347, 350, 353,  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
-## |      | 359                  |                                                                                                                |
+## |    1 | 209, 349, 352, 355,  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |      | 361                  |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

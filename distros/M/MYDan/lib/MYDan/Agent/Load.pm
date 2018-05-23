@@ -40,6 +40,7 @@ use Fcntl qw(:flock SEEK_END);
 use MYDan::Agent::Proxy;
 use MYDan::Util::Hosts;
 use MYDan::Agent::FileCache;
+use File::Basename;
 
 sub new
 {
@@ -195,7 +196,7 @@ sub run
 			       }
 
 			       $percent->renew( $size )->add( length $keepalive{cont}  );
-                               print $TEMP delete $keepalive{cont};
+                               syswrite( $TEMP, delete $keepalive{cont} );
                                $keepalive{save} = 1;
                            }
                        }
@@ -215,8 +216,9 @@ sub run
 
     $cv->recv;
 
-    if( $ok )
+    if( defined $ok )
     {
+
 	$percent->add( $ok );
 	$percent->print('Load ..') if $run{verbose};
         unlink $temp;
@@ -250,6 +252,14 @@ sub run
 	die "chown fail\n" unless chown @pw[2,3], $temp;
     }
 
+    my $dir = File::Basename::dirname( $dp );
+    unless( -d $dir )
+    {
+        die "mkdir dir fail\n" if system "mkdir -p '$dir'";
+    }
+    
+    die "dst path error\n"  if -e $dp && ! -f $dp;
+ 
     die "rename temp file\n" if system "mv '$temp' '$dp'";
     eval{ $filecache->save( $dp ); };
     warn "save filecache fail: $@" if $@;

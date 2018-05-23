@@ -40,8 +40,8 @@ use overload    #
   },
   fallback => undef;
 
-has _buf => ( is => 'ro', isa => ArrayRef, required => 1 );
-has _is_not_empty => ( is => 'lazy', isa => Bool );
+has _buf => ();                           # ( is => 'ro', isa => ArrayRef, required => 1 );
+has _is_not_empty => ( is => 'lazy' );    # ( is => 'lazy', isa => Bool );
 
 const our $SQL_COMPARISON_OPERATOR => {
     '<'      => '<',

@@ -13,6 +13,7 @@ do { my $x = {
                       'requires' => {
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
+                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -20,8 +21,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Sub::Delete' => '1.00002',
-                                      'perl' => '5.010001',
-                                      'strict' => '0'
+                                      'perl' => '5.010001'
                                     }
                     },
        'test' => {
@@ -32,6 +32,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::More' => '0.96',
+                                   'strict' => '0',
                                    'warnings' => '0'
                                  }
                  }

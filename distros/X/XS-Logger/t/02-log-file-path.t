@@ -63,7 +63,7 @@ note "Testing object";
 
     foreach my $id ( 1 .. 2 ) {
         my $logfile = $tmpdir . "/to-log-$id.txt";
-        my $args = $id == 1 ? { logfile => $logfile } : { path => $logfile };
+        my $args = $id == 1 ? { logfile => $logfile, quiet => 1 } : { path => $logfile, quiet => 1 };
 
         my $log = XS::Logger->new($args);
         ok !-e $logfile, "logfile $id not created";

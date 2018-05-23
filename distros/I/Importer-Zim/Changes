@@ -1,7 +1,12 @@
 
 Release history for Importer-Zim
 
-0.9.1     2018-01-26 16:57:03-08:00 America/Los_Angeles
+0.9.2     2018-05-18 13:46:48-07:00 America/Los_Angeles
+
+    - Require +EndOfScope 0.5.0+
+    - Require +Unit 0.6.0+
+
+v0.9.1     2018-01-26 16:57:03-08:00 America/Los_Angeles
 
     - Require +Base 0.12.1+
 

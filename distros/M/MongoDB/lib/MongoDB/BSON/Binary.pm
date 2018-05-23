@@ -20,7 +20,7 @@ package MongoDB::BSON::Binary;
 # ABSTRACT: MongoDB binary type
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use Types::Standard qw(
@@ -83,7 +83,7 @@ MongoDB::BSON::Binary - MongoDB binary type
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

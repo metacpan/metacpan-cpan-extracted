@@ -1,3 +1,13 @@
+3.1.0 2018 05 19 Rocket Scientist
+
+Add template formatting mechanism use that many places. (More work is
+needed though.
+
+Go over mechanism for marking child/parent text.
+
+DRY code a more and expand tests, but  more refactoring, DRY, and more tests are
+needed.
+
 3.0.0 2018 05 11
 
 Greatly revised in preparation for YAPC Glasgow

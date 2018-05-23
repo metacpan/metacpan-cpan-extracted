@@ -36,11 +36,11 @@ we prefer [hypnotoad](https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad) ser
 ## configuration example
 
     {
-        "statsite": {                                                                 
-            "host": "STATSITE_HOST",                                       
+        "statsite": {
+            "host": "STATSITE_HOST",
             "prefix": "stor.dev",
             "sample_rate": 0.1
-        },  
+        },
         "storage_pairs": [
             ["/mnt/data1", "/mnt/data2"],
             ["/mnt/data3", "/mnt/data4"]
@@ -55,7 +55,7 @@ we prefer [hypnotoad](https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad) ser
         "memcached_servers": ["MEMCACHED_SERVER1"],
         "secret": "https://mojolicious.org/perldoc/Mojolicious/Guides/FAQ#What-does-Your-secret-passphrase-needs-to-be-changed-mean",
         "basic_auth": "writer:writer_pass"
-    } 
+    }
 
 ## Service Responsibility
 

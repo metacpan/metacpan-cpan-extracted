@@ -1,0 +1,10 @@
+Revision history for Mojolicious-Plugin-NoReferrer
+==================================================
+
+0.02  2018-05-21 19:38:00
+
+  * fix POD (#1, Thanks to @manwar)
+
+0.01  2018-05-21 13:51:00
+
+  * initial release

@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Glib::Object::Introspection" => "0.043",
     "Test::Simple" => "0.96"
   },
-  "VERSION" => "0.033",
+  "VERSION" => "0.034",
   "test" => {
     "TESTS" => "t/*.t"
   }

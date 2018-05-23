@@ -43,7 +43,7 @@
             "Data::UUID" : "0",
             "Data::Validate::URI" : "0",
             "LWP::Simple" : "0",
-            "WWW::ORCID" : "0",
+            "WWW::ORCID" : "0.0401",
             "perl" : "v5.10.1"
          }
       },
@@ -70,7 +70,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Identifier"
       }
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_contributors" : [
       "brian d foy <brian.d.foy@gmail.com>",
       "Ere Maijala <ere.maijala@helsinki.fi>",

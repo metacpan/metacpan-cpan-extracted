@@ -4,9 +4,9 @@
       "Alan Berndt <alan@eatabrick.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "mit"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.18",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
@@ -65,7 +65,8 @@
          "web" : "https://github.com/bentglasstube/perl-app-sybil"
       }
    },
-   "version" : "0.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.5",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_static_install" : 1
 }
 

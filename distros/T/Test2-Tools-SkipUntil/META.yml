@@ -25,7 +25,9 @@ requires:
   Test2::Tools::Compare: '0'
   Test2::Tools::Exception: '0'
   Time::Piece: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/dnmfarrell/Test2-Tools-SkipUntil.git
-version: 0.03
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

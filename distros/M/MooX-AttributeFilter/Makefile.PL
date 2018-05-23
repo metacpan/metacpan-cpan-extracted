@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "strictures" => 1
   },
   "TEST_REQUIRES" => {
-    "List::Util" => "1.029000",
+    "List::Util" => "1.29",
     "Moo" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test2::V0" => "0.000060",
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001006",
+  "VERSION" => "0.001007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Method::Modifiers" => 0,
   "Data::Dumper" => 0,
-  "List::Util" => "1.029000",
+  "List::Util" => "1.29",
   "Method::Generate::Accessor" => 0,
   "Moo" => 0,
   "Pod::Coverage::TrustPod" => 0,

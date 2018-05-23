@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -16,6 +16,17 @@ our $VERSION = '1.004';
 #pod     use Mojo::SQLite;
 #pod     plugin Yancy => {
 #pod         backend => { Sqlite => Mojo::SQLite->new( 'sqlite:data.db' ) },
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### Hashref
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => {
+#pod         backend => {
+#pod             Sqlite => {
+#pod                 dsn => 'sqlite:data.db',
+#pod             },
+#pod         },
 #pod         read_schema => 1,
 #pod     };
 #pod
@@ -95,7 +106,7 @@ our $VERSION = '1.004';
 #pod =cut
 
 use Mojo::Base '-base';
-use Scalar::Util qw( looks_like_number );
+use Scalar::Util qw( looks_like_number blessed );
 use Text::Balanced qw( extract_bracketed );
 BEGIN {
     eval { require Mojo::SQLite; Mojo::SQLite->VERSION( 3 ); 1 }
@@ -110,6 +121,13 @@ sub new {
     if ( !ref $backend ) {
         my ( $connect ) = ( defined $backend && length $backend ) ? $backend =~ m{^[^:]+:(.+)$} : undef;
         $backend = Mojo::SQLite->new( defined $connect ? "sqlite:$connect" : () );
+    }
+    elsif ( !blessed $backend ) {
+        my $attr = $backend;
+        $backend = Mojo::SQLite->new;
+        for my $method ( keys %$attr ) {
+            $backend->$method( $attr->{ $method } );
+        }
     }
     my %vars = (
         sqlite => $backend,
@@ -285,7 +303,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -301,6 +319,17 @@ version 1.004
     use Mojo::SQLite;
     plugin Yancy => {
         backend => { Sqlite => Mojo::SQLite->new( 'sqlite:data.db' ) },
+        read_schema => 1,
+    };
+
+    ### Hashref
+    use Mojolicious::Lite;
+    plugin Yancy => {
+        backend => {
+            Sqlite => {
+                dsn => 'sqlite:data.db',
+            },
+        },
         read_schema => 1,
     };
 

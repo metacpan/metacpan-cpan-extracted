@@ -1,0 +1,37 @@
+---
+abstract: 'More utilities and a summary for Software::License'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Software-LicenseMoreUtils
+requires:
+  Carp: '0'
+  List::Util: '0'
+  Path::Tiny: '0'
+  Software::License: '0'
+  Software::LicenseUtils: '0'
+  Text::Template: '0'
+  Try::Tiny: '0'
+  YAML::Tiny: '0'
+  base: '0'
+  parent: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dod38fr/Software-LicenseMoreUtils/issues
+  homepage: https://github.com/dod38fr/Software-LicenseMoreUtils
+  repository: git://github.com/dod38fr/Software-LicenseMoreUtils.git
+version: '0.002'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

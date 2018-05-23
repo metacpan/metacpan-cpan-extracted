@@ -27,7 +27,7 @@ sub as_string{
 
 =head1 NAME
 
-TaskPipe::Role::RunInfo - information about the run (of the current plan)
+TaskPipe::RunInfo - information about the run (of the current plan)
 
 =head1 DESCRIPTION
 

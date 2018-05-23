@@ -20,7 +20,7 @@ package MongoDB::GridFSBucket::UploadStream;
 # ABSTRACT: File handle abstraction for uploading
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use Encode;
@@ -31,13 +31,13 @@ use MongoDB::BSON::Binary;
 use Time::HiRes qw/time/;
 use Types::Standard qw(
   Str
-  Bool
   Maybe
   HashRef
   ArrayRef
   InstanceOf
 );
 use MongoDB::_Types qw(
+  Boolish
   NonNegNum
 );
 use MongoDB::_Constants;
@@ -150,7 +150,7 @@ sub _build_id {
 
 has _closed => (
     is      => 'rwp',
-    isa     => Bool,
+    isa     => Boolish,
     default => 0,
 );
 
@@ -457,7 +457,7 @@ MongoDB::GridFSBucket::UploadStream - File handle abstraction for uploading
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

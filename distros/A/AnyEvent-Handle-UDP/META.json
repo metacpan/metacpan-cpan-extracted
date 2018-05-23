@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,6 @@
             "Scalar::Util" : "0",
             "Socket" : "0",
             "Symbol" : "0",
-            "namespace::clean" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -63,7 +62,7 @@
    "provides" : {
       "AnyEvent::Handle::UDP" : {
          "file" : "lib/AnyEvent/Handle/UDP.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       }
    },
    "release_status" : "stable",
@@ -78,7 +77,7 @@
          "web" : "https://github.com/Leont/anyevent-handle-udp"
       }
    },
-   "version" : "0.048",
+   "version" : "0.049",
    "x_contributors" : [
       "Leon Timmermans <fawaka@gmail.com>",
       "Sergey Leschenko <sergle.ua@gmail.com>"

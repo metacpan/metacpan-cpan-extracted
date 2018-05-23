@@ -2,6 +2,7 @@ package Pcore::Core::Const;
 
 use common::header;
 use Const::Fast qw[const];
+use Pcore::Core::Exporter;
 
 # <<<
 const our $ANSI => {
@@ -38,18 +39,15 @@ for my $name ( keys $ANSI->%* ) {
     eval qq[const our \$$name => "\e\[$ANSI->{$name}m"];    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
 }
 
-require Pcore::Core::Exporter;
-Pcore::Core::Exporter->import(
-    -export => {
-        CORE    => [qw[$MSWIN $CRLF $LF]],
-        DEFAULT => [':CORE'],
-        ANSI    => [ map { '$' . $_ } keys $ANSI->%* ],
-    }
-);
+our $EXPORT = {
+    CORE    => [qw[$MSWIN $CRLF $LF]],
+    DEFAULT => [':CORE'],
+    ANSI    => [ map { '$' . $_ } keys $ANSI->%* ],
+};
 
 const our $MSWIN => $^O =~ /MSWin/sm ? 1 : 0;
-const our $CRLF  => qq[\x0D\x0A];               ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
-const our $LF    => qq[\x0A];                   ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
+const our $CRLF  => qq[\x0D\x0A];                           ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
+const our $LF    => qq[\x0A];                               ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
 
 const our $DIST_CFG_TYPE => 'yaml';
 
@@ -60,7 +58,7 @@ const our $DIST_CFG_TYPE => 'yaml';
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 38                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 39                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

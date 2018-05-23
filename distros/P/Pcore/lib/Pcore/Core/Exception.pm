@@ -1,10 +1,12 @@
 package Pcore::Core::Exception;
 
-use Pcore -export => {    #
-    DEFAULT => [qw[croak cluck]],
-};
+use Pcore -export;
 use Carp qw[];
 use Pcore::Core::Exception::Object;
+
+our $EXPORT = {    #
+    DEFAULT => [qw[croak cluck]],
+};
 
 our $IGNORE_ERRORS = 1;    # do not write errors to error log channel by default
 
@@ -181,10 +183,10 @@ sub cluck {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 29, 44, 64, 97, 108, | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
-## |      |  121                 |                                                                                                                |
+## |    3 | 31, 46, 66, 99, 110, | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |      |  123                 |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 31, 46, 66, 99, 110  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 33, 48, 68, 101, 112 | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

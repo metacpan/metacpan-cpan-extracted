@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-Auth-SSO/issues
   homepage: https://github.com/LibreCat/Plack-Auth-SSO
   repository: https://github.com/LibreCat/Plack-Auth-SSO.git
-version: '0.0134'
+version: '0.0135'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Nicolas Franck <njfranck@auster0.ugent.be>'

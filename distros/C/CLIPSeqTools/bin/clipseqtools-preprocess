@@ -2,7 +2,7 @@
 
 
 package clipseqtools::preprocess;
-$clipseqtools::preprocess::VERSION = '0.1.7';
+$clipseqtools::preprocess::VERSION = '0.1.8';
 
 ##############################################
 # Import external libraries

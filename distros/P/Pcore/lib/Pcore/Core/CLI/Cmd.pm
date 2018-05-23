@@ -1,6 +1,6 @@
 package Pcore::Core::CLI::Cmd;
 
-use Pcore -role;
+use Pcore -class;
 
 sub CLI ($self) {
     return;

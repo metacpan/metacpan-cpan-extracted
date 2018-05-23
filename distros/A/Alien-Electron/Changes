@@ -1,3 +1,8 @@
+0.200   2018-05-17
+  * Upgrade to electron 2.0.1
+  * Add strict to module stub package (thanks Mohammad S Anwar)
+  * POD typo fixes and links (thanks Mohammad S Anwar)
+
 0.103   2016-09-22
   * Upgrade to electron 1.4.1
   * Document required X11 environment variable on linux (thanks dtoso-skymesh)

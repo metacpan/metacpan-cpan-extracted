@@ -17,6 +17,7 @@ t/forms.t
 t/good_upload.txt
 t/large_file_upload.txt
 t/mime_upload.txt
+t/other_boundary.txt
 t/post_stdin.txt
 t/post_text.txt
 t/upload_no_files.txt

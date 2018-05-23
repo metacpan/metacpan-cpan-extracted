@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 extends 'Future::HTTP::Tiny';
 
@@ -25,6 +25,16 @@ Future::HTTP::Tiny - synchronous HTTP client with a Future interface
 This is the default backend. It is chosen if no supported event loop could
 be detected. It will execute the requests synchronously as they are
 made in C<< ->http_request >> .
+
+=head1 Whitelist / Blacklist
+
+You can set up the whitelist and blacklist through the global accessors:
+
+  # Allow access to localhost
+  HTTP::Tiny::Paranoid->whitelisted_hosts([ 'localhost', '127.0.0.1' ]);
+
+  # Deny access to localhost
+  HTTP::Tiny::Paranoid->blacklisted_hosts([ 'localhost', '127.0.0.1' ]);
 
 =cut
 
@@ -122,7 +132,7 @@ L<AnyEvent::HTTP> for the details of the API
 =head1 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/future-http>.
+L<https://github.com/Corion/future-http>.
 
 =head1 SUPPORT
 
@@ -141,7 +151,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

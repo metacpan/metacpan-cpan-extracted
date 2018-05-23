@@ -45,16 +45,11 @@
             "IO::Socket" : "1.18",
             "Moo" : "1.000000",
             "MooX::TypeTiny" : "0",
-            "Scalar::Util" : "0",
             "Sub::Quote" : "0",
             "Sub::Util" : "1.40",
-            "Type::Library" : "0",
-            "Type::Utils" : "0",
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "v5.10.0",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -80,11 +75,11 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "Net::Statsd::Lite::Types" : {
          "file" : "lib/Net/Statsd/Lite/Types.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       }
    },
    "release_status" : "stable",
@@ -98,7 +93,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.4.2",
+   "version" : "v0.4.3",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

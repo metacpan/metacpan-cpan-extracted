@@ -1,0 +1,87 @@
+{
+   "abstract" : "parse .mwb files created with MySQL Workbench",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MySQL-Workbench-Parser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "1.30",
+            "Carp" : "0",
+            "File::Basename" : "2.82",
+            "File::Spec" : "3.40",
+            "List::MoreUtils" : "0.33",
+            "Moo" : "1.003001",
+            "Scalar::Util" : "1.32",
+            "XML::LibXML" : "2.0019",
+            "YAML::Tiny" : "1.64"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LongString" : "0.16"
+         }
+      }
+   },
+   "provides" : {
+      "MySQL::Workbench::Parser" : {
+         "file" : "lib/MySQL/Workbench/Parser.pm",
+         "version" : "1"
+      },
+      "MySQL::Workbench::Parser::Column" : {
+         "file" : "lib/MySQL/Workbench/Parser/Column.pm",
+         "version" : "1"
+      },
+      "MySQL::Workbench::Parser::Index" : {
+         "file" : "lib/MySQL/Workbench/Parser/Index.pm",
+         "version" : "1"
+      },
+      "MySQL::Workbench::Parser::Table" : {
+         "file" : "lib/MySQL/Workbench/Parser/Table.pm",
+         "version" : "1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/MySQL-Workbench-Parser/issues"
+      },
+      "homepage" : "http://github.com/reneeb/MySQL-Workbench-Parser",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/MySQL-Workbench-Parser.git",
+         "web" : "http://github.com/reneeb/MySQL-Workbench-Parser"
+      }
+   },
+   "version" : "1",
+   "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

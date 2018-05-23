@@ -1,5 +1,5 @@
 package Starch::Plugin::Bundle;
-$Starch::Plugin::Bundle::VERSION = '0.06';
+$Starch::Plugin::Bundle::VERSION = '0.07';
 =head1 NAME
 
 Starch::Plugin::Bundle - Base role for Starch plugin bundles.

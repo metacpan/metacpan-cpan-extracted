@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Courriel::HeaderAttribute;
 use Courriel::Helpers qw( quote_and_escape_attribute_value );
@@ -189,7 +189,7 @@ Courriel::HeaderAttribute - A single attribute belonging to a header
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -269,7 +269,7 @@ This class does the C<Courriel::Role::Streams> role.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel> or via email to L<bug-courriel@rt.cpan.org|mailto:bug-courriel@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Courriel/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

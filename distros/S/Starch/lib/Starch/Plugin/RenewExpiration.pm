@@ -1,5 +1,5 @@
 package Starch::Plugin::RenewExpiration;
-$Starch::Plugin::RenewExpiration::VERSION = '0.06';
+$Starch::Plugin::RenewExpiration::VERSION = '0.07';
 use Moo;
 use strictures 2;
 use namespace::clean;

@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Generate.
 
+1.16    2018-05-22
+        - Convert to dzil .
+
 1.15    2015-04-22
         - Fix tests on perl-5.20.1 (and wherever Text::Soundex is absent)
             - https://rt.cpan.org/Ticket/Display.html?id=103875

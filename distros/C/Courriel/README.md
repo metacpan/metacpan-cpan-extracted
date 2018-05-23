@@ -4,7 +4,7 @@ Courriel - High level email parsing and manipulation
 
 # VERSION
 
-version 0.46
+version 0.47
 
 # SYNOPSIS
 
@@ -257,7 +257,7 @@ through the web interface at [http://rt.cpan.org](http://rt.cpan.org).  I will b
 then you'll automatically be notified of progress on your bug as I make
 changes.
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel](http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel) or via email to [bug-courriel@rt.cpan.org](mailto:bug-courriel@rt.cpan.org).
+Bugs may be submitted at [https://github.com/houseabsolute/Courriel/issues](https://github.com/houseabsolute/Courriel/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 

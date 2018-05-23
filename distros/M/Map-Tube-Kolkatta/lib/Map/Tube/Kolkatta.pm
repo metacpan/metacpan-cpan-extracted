@@ -1,6 +1,6 @@
 package Map::Tube::Kolkatta;
 
-$Map::Tube::Kolkatta::VERSION   = '0.17';
+$Map::Tube::Kolkatta::VERSION   = '0.18';
 $Map::Tube::Kolkatta::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Kolkatta - Interface to the Kolkatta Metro Map.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -94,7 +94,8 @@ base64 encoded string of the entire map.
 
     my $metro = Map::Tube::Kolkatta->new;
     my $map   = $metro->name;
-    open(my $IMAGE, ">$map.png");
+    open(my $IMAGE, ">", "$map.png")
+       or die "ERROR: Can't open [$map.png]: $!";
     binmode($IMAGE);
     print $IMAGE decode_base64($metro->as_image);
     close($IMAGE);

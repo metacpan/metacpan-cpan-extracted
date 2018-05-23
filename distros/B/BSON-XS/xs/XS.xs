@@ -130,8 +130,6 @@ const char * maybe_append_first_key(bson_t *bson, HV *opts, stackette *stack);
 static void append_binary(bson_t * bson, const char * key, bson_subtype_t subtype, SV * sv);
 static void append_regex(bson_t * bson, const char *key, REGEXP *re, SV * sv);
 static void append_decomposed_regex(bson_t *bson, const char *key, const char *pattern, const char *flags);
-static void append_string_or_number(bson_t * bson, const char *key, SV * sv, bool is_string);
-static void append_number_or_string(bson_t * bson, const char *key, SV * sv);
 static void append_fit_int(bson_t * bson, const char *key, SV * sv);
 static void append_utf8(bson_t * bson, const char *key, SV * sv);
 
@@ -1071,29 +1069,12 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
       }
     }
   } else {
+    /* Value is a defined, non-reference scalar */
     SV *tempsv;
-    bool is_string = false;
+    bool prefer_numeric;
 
-#if PERL_REVISION==5 && PERL_VERSION<=10
-    /* Flags usage changed in Perl 5.10.1.  In Perl 5.8, there is no way to
-       tell from flags whether something is a string or an int!
-       Therefore, for 5.8, we check:
-
-       if (isString(sv) and number(sv) == 0 and string(sv) != '0') {
-       return string;
-       }
-       else {
-       return number;
-       }
-
-       This will incorrectly return '0' as a number in 5.8.
-    */
-    if (SvPOK(sv) && ((SvNOK(sv) && SvNV(sv) == 0) ||
-                      (SvIOK(sv) && SvIV(sv) == 0)) &&
-        strcmp(SvPV_nolen(sv), "0") != 0) {
-      is_string = 1;
-    }
-#endif
+    tempsv = _hv_fetchs_sv(opts, "prefer_numeric");
+    prefer_numeric = SvTRUE(tempsv);
 
 #if PERL_REVISION==5 && PERL_VERSION<=18
     /* Before 5.18, get magic would clear public flags. This restores them
@@ -1105,11 +1086,24 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
     }
 #endif
 
-    if ( (tempsv = _hv_fetchs_sv(opts, "prefer_numeric")) && SvTRUE (tempsv) ) {
-      append_number_or_string(bson, key, sv);
+    I32 is_number = looks_like_number(sv);
+
+    if ( SvNOK(sv) ) {
+      bson_append_double(bson, key, -1, (double)SvNV(sv));
+    } else if ( SvIOK(sv) ) {
+      append_fit_int(bson, key, sv);
+    } else if ( prefer_numeric && is_number )  {
+      /* copy to avoid modifying flags of the original */
+      tempsv = sv_2mortal(newSVsv(sv));
+      if (is_number & IS_NUMBER_NOT_INT) { /* double */
+        bson_append_double(bson, key, -1, (double)SvNV(tempsv));
+      } else {
+        append_fit_int(bson, key, tempsv);
+      }
     } else {
-      append_string_or_number(bson, key, sv, is_string);
+      append_utf8(bson, key, sv);
     }
+
   }
 }
 
@@ -1209,39 +1203,6 @@ append_utf8(bson_t * bson, const char *key, SV * sv) {
   }
 
   bson_append_utf8(bson, key, -1, str, len);
-  return;
-}
-
-static void
-append_number_or_string(bson_t * bson, const char *key, SV * sv) {
-  I32 is_number = looks_like_number(sv);
-
-  if ( SvNOK(sv) || (is_number & IS_NUMBER_NOT_INT) ) { /* double */
-    bson_append_double(bson, key, -1, (double)SvNV(sv));
-  } else if ( SvIOK(sv) || is_number ) { /* integer */
-    append_fit_int(bson, key, sv);
-  } else  {
-    append_utf8(bson, key, sv);
-  }
-
-  return;
-}
-
-static void
-append_string_or_number(bson_t * bson, const char *key, SV * sv, bool is_string) {
-  I32 is_number = looks_like_number(sv);
-
-  if ( SvPOK(sv) || is_string ) {
-    append_utf8(bson, key, sv);
-  } else if ( SvNOK(sv) ) {
-    bson_append_double(bson, key, -1, (double)SvNV(sv));
-  } else if ( SvIOK(sv) ) {
-    append_fit_int(bson, key, sv);
-  } else {
-    /* string as last resort */
-    append_utf8(bson, key, sv);
-  }
-
   return;
 }
 

@@ -1,6 +1,7 @@
 use utf8;
 package Document::OOXML::Document;
 use Moose;
+use namespace::autoclean;
 
 # ABSTRACT: Base class for the different OOXML document types
 
@@ -143,7 +144,7 @@ Document::OOXML::Document - Base class for the different OOXML document types
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 SYNOPSIS
 

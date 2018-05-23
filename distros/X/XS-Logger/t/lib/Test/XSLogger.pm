@@ -18,6 +18,7 @@ our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 our $TIMESTAMP = qr{[0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{1,2}:[0-9]{2}:[0-9]{2}};
 our $TIMEZONE  = qr{[+-][0-9]{4}};
 our $PID       = qr{[0-9]+};
+our $LEVEL     = qr{[A-Z]+};
 
 sub count_lines {
     my ($f) = @_;
@@ -39,23 +40,24 @@ sub logfile_last_line_like {
     my $last_line = get_logfile_last_line($f);
     note $last_line;
 
-    my $prefix = qr{^\[$TIMESTAMP $TIMEZONE\]\s$PID\s};
-    $last_line =~ $prefix or fail("[timestamp tz] pid");
+    my $prefix = qr{^\[$TIMESTAMP $TIMEZONE\]\s+};
+    $last_line =~ $prefix or return fail("[timestamp tz] not found from last line");
     my $content = $last_line;
     $content =~ s{$prefix}{};
 
-    my ( $front, $end ) = split( ':', $content, 2 );
+    my ( $front, $end ) = split( ']', $content, 2 );
+
     $end =~ s{^\s}{};    # remove the first space after :
     if ( my $level = $opts{level} ) {
         if ( $opts{color} ) {
-            $front =~ qr{^\x1b\[(1;)?[0-9]{2}m$level\s*\x1b\[0m$} or fail "colored level should be $level - got '$front'";
+            $front =~ qr{^\x1b\[(1;)?[0-9]{2}m$level\s*\x1b\[0m} or return fail "colored level should be $level - got '$front'";
         }
         else {
-            $front =~ qr{^$level\s*$} or fail "level should be $level - got '$front'";
+            $front =~ qr{^$level\s*} or return fail "level should be $level - got '$front'";
         }
 
     }
-    chomp($end) or fail 'line ends with a \n';
+    chomp($end) or return fail 'line ends with a \n';
     if ( defined $opts{msg} ) {
         my $msg = $opts{msg};
         is $end, $msg, $opts{test} // $opts{msg} // "message";

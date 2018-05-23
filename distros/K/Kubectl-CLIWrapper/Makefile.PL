@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Kubectl-CLIWrapper",
   "LICENSE" => "apache",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Kubectl::CLIWrapper",
   "PREREQ_PM" => {
     "IPC::Open3" => 0,
@@ -23,7 +24,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

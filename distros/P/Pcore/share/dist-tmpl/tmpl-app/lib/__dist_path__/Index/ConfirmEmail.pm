@@ -4,7 +4,7 @@ use Pcore -class, -l10n => 'Lcom';
 
 with qw[Pcore::App::Controller];
 
-has '+path' => ( is => 'ro', isa => Str, default => '/confirm-email/', init_arg => undef );
+has path => '/confirm-email/', init_arg => undef;
 
 sub run ( $self, $req ) {
     my $token;

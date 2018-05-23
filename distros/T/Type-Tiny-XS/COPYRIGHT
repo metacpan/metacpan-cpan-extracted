@@ -8,7 +8,6 @@ Files: README
  lib/Type/Tiny/XS/Util.pm
  t/01basic.t
  t/02int.t
- t/03positiveint.t
  t/04positiveorzeroint.t
  t/05nonemptystr.t
  t/06map.t
@@ -19,8 +18,7 @@ Files: README
 Copyright: This software is copyright (c) 2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
  Makefile.PL
  Util.xs
@@ -37,9 +35,8 @@ License: Unknown
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -48,15 +45,27 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/03positiveint.t
+Copyright: This software is copyright (c) 2014, 2018 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/10bool.t
+Copyright: This software is copyright (c) 2018 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

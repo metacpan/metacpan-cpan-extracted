@@ -2,6 +2,8 @@ package Net::Statsd::Lite::Types;
 
 # ABSTRACT: A type library for Net::Statsd::Lite
 
+# RECOMMEND PREREQ: Type::Tiny::XS
+
 use strict;
 use warnings;
 
@@ -10,7 +12,7 @@ use Type::Utils -all;
 
 BEGIN { extends "Types::Standard" }
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 declare "PosInt", as Int,
@@ -48,7 +50,7 @@ Net::Statsd::Lite::Types - A type library for Net::Statsd::Lite
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =head1 DESCRIPTION
 

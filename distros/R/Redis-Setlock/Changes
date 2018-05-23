@@ -1,5 +1,9 @@
 Revision history for Perl extension Redis-Setlock
 
+0.09 2018-05-23T07:33:17Z
+    - Add $WAIT_QUEUE package variable. (#3)
+      When $WAIT_QUEUE is true, wait for a lock released using BLPOP command instead of polling
+
 0.08 2017-05-31T01:36:25Z
     - fix tests (#2)
 

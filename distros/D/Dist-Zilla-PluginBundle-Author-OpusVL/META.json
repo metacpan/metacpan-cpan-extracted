@@ -39,10 +39,10 @@
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
-            "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
             "Dist::Zilla::Plugin::Repository" : "0",
             "Dist::Zilla::Plugin::RewriteVersion" : "0",
+            "Dist::Zilla::Plugin::SurgicalPodWeaver" : "0",
             "Dist::Zilla::Plugin::Test::Compile" : "0",
             "Dist::Zilla::Plugin::Test::PAUSE::Permissions" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
@@ -68,11 +68,11 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::OpusVL" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/OpusVL.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Dist::Zilla::PluginBundle::Author::OpusVL::ToCPAN" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/OpusVL/ToCPAN.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/Altreus/Dist-Zilla-PluginBundle-Author-OpusVL"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -276,7 +276,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.014",
+                  "tag" : "v0.015",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

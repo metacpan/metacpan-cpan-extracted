@@ -3,7 +3,7 @@ package Test::mysqld;
 use strict;
 use warnings;
 
-use 5.008;
+use 5.008_001;
 use Class::Accessor::Lite;
 use Cwd;
 use DBI;
@@ -12,7 +12,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(SIGTERM WNOHANG);
 use Time::HiRes qw(sleep);
 
-our $VERSION = '0.21';
+our $VERSION = '1.0000';
 
 our $errstr;
 our @SEARCH_PATHS = qw(/usr/local/mysql);
@@ -227,7 +227,7 @@ sub setup {
                 my $base = File::Basename::dirname($mysql_base_dir);
                 $mysql_base_dir = File::Spec->rel2abs(readlink($mysql_base_dir), $base);
             }
-            if ($mysql_base_dir =~ s|/[^/]+/mysql_install_db$||) {
+            if ($mysql_base_dir =~ s{/(?:bin|extra)/mysql_install_db$}{}) {
                 $cmd .= " --basedir='$mysql_base_dir'";
             }
         }
@@ -332,6 +332,10 @@ sub stop_mysqlds {
 
 "lestrrat-san he";
 __END__
+
+=encoding utf-8
+
+=for stopwords DESTROYed mysqld dsn dbname
 
 =head1 NAME
 

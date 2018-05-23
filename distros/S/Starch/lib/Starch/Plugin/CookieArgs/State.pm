@@ -1,6 +1,5 @@
-package # hide from PAUSE
-    Starch::Plugin::CookieArgs::State;
-
+package Starch::Plugin::CookieArgs::State;
+$Starch::Plugin::CookieArgs::State::VERSION = '0.07';
 use Moo::Role;
 use strictures 2;
 use namespace::clean;

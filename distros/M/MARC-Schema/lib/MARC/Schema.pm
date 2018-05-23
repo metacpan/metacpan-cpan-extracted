@@ -3,7 +3,7 @@ package MARC::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Cpanel::JSON::XS;
 use File::Share ':all';
@@ -102,6 +102,36 @@ sub check_field {
         }
     }
 
+    if ($spec->{indicator1}) {
+        my (undef, $code, @other) = @$field;
+        $code //= ' ';
+        my (@matches)
+            = grep {$code =~ /^[$_]/} keys %{$spec->{indicator1}->{codes}};
+
+        if (@matches > 0) {
+
+            # everything is ok
+        }
+        else {
+            $errors{ind1} = {message => "unknown indicator1 value `$code'"};
+        }
+    }
+
+    if ($spec->{indicator2}) {
+        my (undef, undef, $code, @other) = @$field;
+        $code //= ' ';
+        my (@matches)
+            = grep {$code =~ /^[$_]/} keys %{$spec->{indicator2}->{codes}};
+
+        if (@matches > 0) {
+
+            # everything is ok
+        }
+        else {
+            $errors{ind2} = {message => "unknown indicator2 value `$code'"};
+        }
+    }
+
     return %errors ? _error($field, subfields => \%errors) : ();
 }
 
@@ -142,10 +172,10 @@ MARC::Schema - Specification of the MARC21 format
             [ '999', undef, undef, '_', 'not a standard field']
         ]
     };
-    
+
     # load default schema
     my $schema = MARC::Schema->new();
-    
+
     # load custom schema from file
     my $schema = MARC::Schema->new({ file => share/marc-schema.json });
 
@@ -179,36 +209,40 @@ MARC::Schema defines a set of MARC21 fields and subfields to validate Catmandu::
 For a more detailed description of the (default) schema see L<MARC21 structure in JSON|https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
 
 =head1 METHODS
- 
+
 =head2 check( $record [, %options ] )
- 
+
 Check whether a given L<"Catmandu::Importer::MARC"|Catmandu::Importer::MARC/"EXAMPLE ITEM"> or L<"MARC::Parser::*"|https://metacpan.org/search?q=%22MARC%3A%3AParser%22> record confirms to the schema and return a list of detected violations. Possible options include:
- 
+
 =over
- 
+
 =item ignore_unknown_fields
- 
+
 Don't report fields not included in the schema.
- 
+
 =item ignore_unknown_subfields
- 
+
 Don't report subfields not included in the schema.
- 
+
 =back
- 
-Errors are given as list of hash reference with keys C<label>, C<message>, 
+
+Errors are given as list of hash reference with keys C<label>, C<message>,
 C<repeatable>, C<subfields> and C<tag> of the violated field. If key
-C<subfields> is set, the field contained invalid subfields. The error field 
-C<message> contains a human-readable error message which for each violated 
+C<subfields> is set, the field contained invalid subfields. The error field
+C<message> contains a human-readable error message which for each violated
 field and/or subfield;
- 
+
 =head2 check_field( $field [, %options ] )
- 
+
 Check whether a MARC21 field confirms to the schema. Use same options as method C<check>.
 
 =head1 AUTHOR
 
 Johann Rolschewski E<lt>jorol@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+Patrick Hochstenbach E<lt>patrick.hochstenbach@ugent.be<gt>
 
 =head1 COPYRIGHT
 

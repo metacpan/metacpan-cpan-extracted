@@ -1,5 +1,10 @@
 Revision history for MARC-Schema
 
+0.06  2018-05-17 20:12:02 CEST
+  - Suporting validation of indicators
+  - Pass alternative location schema file
+  - Allow passing file name as first argument
+
 0.05  2018-02-25 15:20:54 CET
   - Modify schema format to align with Avram
 

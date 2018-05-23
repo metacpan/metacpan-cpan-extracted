@@ -295,6 +295,8 @@ sub rt_file {
     eval {
 	ok ($sth->execute, "execute");
 	ok (!$@, "no error");
+	is (scalar @{$sth->fetchall_arrayref}, 2, # not part of 80078
+	    "empty col_names treat skip_first_row as false");
 	};
 
     ok ($dbh->do ("drop table $tbl"),		"drop");

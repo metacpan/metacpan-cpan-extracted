@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 
 BEGIN {
 	$MooseX::XSAccessor::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::XSAccessor::VERSION   = '0.008';
+	$MooseX::XSAccessor::VERSION   = '0.009';
 }
 
 our $LVALUE;
@@ -139,6 +139,10 @@ Returns a boolean indicating whether a sub is an XSUB.
 
 C<< $sub >> may be a coderef, L<Class::MOP::Method> object, or a qualified
 sub name as a string (e.g. C<< "MyClass::foo" >>).
+
+This function doesn't just work with accessors, but should be able to detect
+the difference between Perl and XS subs in general. (It may not be 100%
+reliable though.)
 
 =back
 

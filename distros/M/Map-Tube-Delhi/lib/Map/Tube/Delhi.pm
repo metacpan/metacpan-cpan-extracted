@@ -1,13 +1,13 @@
 package Map::Tube::Delhi;
 $Map::Tube::Delhi::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::VERSION = '0.70';
+$Map::Tube::Delhi::VERSION = '0.72';
 =head1 NAME
 
 Map::Tube::Delhi - Interface to the Delhi Metro Map.
 
 =head1 VERSION
 
-version 0.70
+version 0.72
 
 =cut
 
@@ -85,7 +85,8 @@ base64 encoded string of the entire map.
 
     my $metro = Map::Tube::Delhi->new;
     my $map   = $metro->name;
-    open(my $IMAGE, ">$map.png");
+    open(my $IMAGE, ">", "$map.png")
+       or die "ERROR: Can't open [$map.png]: $!";
     binmode($IMAGE);
     print $IMAGE decode_base64($metro->as_image);
     close($IMAGE);

@@ -4,6 +4,20 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.651 2018-05-22
+
+  * OI_Triton: Make maximum T setpoint configurable
+  * Add pretty print countdown function
+  * Push deprecation of non-Moose code further in the future and
+    make Lab::Measurement message more of a friendly recommendation
+
+3.650 2018-05-18
+
+  * Gnuplot: Allow multiple curves per plot
+  * Documentation cleanup and updates
+  * Add a deprecation warning in the legacy Lab::Measurement module
+  * Add functions parsing *IDN? output
+
 3.642 2018-05-11
 
   * Add generic Stabilizer role, waiting for something to converge

@@ -1,6 +1,6 @@
 package Map::Tube::NYC;
 
-$Map::Tube::NYC::VERSION   = '0.53';
+$Map::Tube::NYC::VERSION   = '0.54';
 $Map::Tube::NYC::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::NYC - Interface to the NYC Subway Map.
 
 =head1 VERSION
 
-Version 0.53
+Version 0.54
 
 =cut
 
@@ -95,7 +95,8 @@ base64 encoded string of the entire map.
 
     my $subway = Map::Tube::NYC->new;
     my $map    = $subway->name;
-    open(my $IMAGE, ">$map.png");
+    open(my $IMAGE, ">", "$map.png")
+       or die "ERROR: Can't open [$map.png]: $!";
     binmode($IMAGE);
     print $IMAGE decode_base64($subway->as_image);
     close($IMAGE);

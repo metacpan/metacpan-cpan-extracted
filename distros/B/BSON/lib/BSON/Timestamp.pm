@@ -6,7 +6,7 @@ package BSON::Timestamp;
 # ABSTRACT: BSON type wrapper for timestamps
 
 use version;
-our $VERSION = 'v1.4.0';
+our $VERSION = 'v1.6.1';
 
 use Carp ();
 
@@ -29,6 +29,8 @@ has [qw/seconds increment/] => (
 );
 
 use namespace::clean -except => 'meta';
+
+my $max_int32 = 2147483647;
 
 # Support back-compat 'secs' and inc' and legacy constructor shortcut
 sub BUILDARGS {
@@ -55,9 +57,24 @@ sub BUILDARGS {
     return \%args;
 }
 
+sub BUILD {
+    my ($self) = @_;
+
+    for my $attr (qw/seconds increment/) {
+        my $v = $self->$attr;
+        Carp::croak("BSON::Timestamp 'seconds' must be uint32")
+          unless $v >= 0 && $v <= $max_int32;
+    }
+
+    return;
+}
+
 # For backwards compatibility
-*sec = \&seconds;
-*inc = \&increment;
+{
+    no warnings 'once';
+    *sec = \&seconds;
+    *inc = \&increment;
+}
 
 #pod =method TO_JSON
 #pod
@@ -80,6 +97,17 @@ sub TO_JSON {
     Carp::croak( "The value '$_[0]' is illegal in JSON" );
 }
 
+sub _cmp {
+    my ( $l, $r ) = @_;
+    return ( $l->{seconds} <=> $r->{seconds} )
+      || ( $l->{increment} <=> $r->{increment} );
+}
+
+use overload (
+    '<=>'     => \&_cmp,
+    fallback => 1,
+);
+
 1;
 
 =pod
@@ -92,7 +120,7 @@ BSON::Timestamp - BSON type wrapper for timestamps
 
 =head1 VERSION
 
-version v1.4.0
+version v1.6.1
 
 =head1 SYNOPSIS
 
@@ -133,7 +161,7 @@ format, which represents it as a document as follows:
 If the C<BSON_EXTJSON> option is false, an error is thrown, as this value
 can't otherwise be represented in JSON.
 
-=for Pod::Coverage BUILDARGS sec inc
+=for Pod::Coverage BUILD BUILDARGS sec inc
 
 =head1 AUTHORS
 
@@ -151,7 +179,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

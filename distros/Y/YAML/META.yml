@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/ingydotnet/yaml-pm/issues
   homepage: https://github.com/ingydotnet/yaml-pm
   repository: https://github.com/ingydotnet/yaml-pm.git
-version: '1.25'
+version: '1.26'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 package Starch::Manager;
-$Starch::Manager::VERSION = '0.06';
+$Starch::Manager::VERSION = '0.07';
 =head1 NAME
 
 Starch::Manager - Entry point for accessing Starch state objects.
@@ -37,7 +37,7 @@ use namespace::clean;
 
 with qw(
     Starch::Role::Log
-    Starch::Role::MethodProxy
+    MooX::MethodProxyArgs
 );
 
 # Declare BUILD so roles can apply method modifiers to it.

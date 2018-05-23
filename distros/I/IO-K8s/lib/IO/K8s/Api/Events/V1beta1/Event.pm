@@ -1,5 +1,6 @@
 package IO::K8s::Api::Events::V1beta1::Event;
   use Moose;
+  use IO::K8s;
 
   has 'action' => (is => 'ro', isa => 'Str'  );
   has 'apiVersion' => (is => 'ro', isa => 'Str'  );
@@ -18,4 +19,6 @@ package IO::K8s::Api::Events::V1beta1::Event;
   has 'reportingInstance' => (is => 'ro', isa => 'Str'  );
   has 'series' => (is => 'ro', isa => 'IO::K8s::Api::Events::V1beta1::EventSeries'  );
   has 'type' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

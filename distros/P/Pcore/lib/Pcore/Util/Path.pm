@@ -1,7 +1,7 @@
 package Pcore::Util::Path;
 
 use Pcore -class;
-use Storable qw[];
+use Clone qw[];
 use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref];
 use Pcore::Util::URI;
 
@@ -390,7 +390,7 @@ sub _build_canonpath ($self) {
 }
 
 sub clone ($self) {
-    return Storable::dclone($self);
+    return Clone::clone($self);
 }
 
 sub realpath ($self) {

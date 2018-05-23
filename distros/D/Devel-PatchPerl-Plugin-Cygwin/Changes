@@ -1,4 +1,8 @@
 Revision history for Devel-PatchPerl-Plugin-Cygwin
 
+v0.1.0    2018-05-19 01:26:08+09:00 Asia/Tokyo
+    - Reflect regex restriction changed by perl-5.26 (RT-117267, GH-2).
+    - Enable to compile stable releases from 5.8.9 to 5.26.2 with Cygwin 2.10.0.
+
 v0.0.1    2014-05-13 08:05:58JST+0900 Asia/Tokyo
     - Initial release.

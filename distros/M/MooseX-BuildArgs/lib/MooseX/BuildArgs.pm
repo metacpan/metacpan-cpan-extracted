@@ -1,7 +1,5 @@
 package MooseX::BuildArgs;
-{
-  $MooseX::BuildArgs::VERSION = '0.04';
-}
+$MooseX::BuildArgs::VERSION = '0.05';
 use Moose ();
 use Moose::Exporter;
 

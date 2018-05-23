@@ -4,7 +4,6 @@ use warnings;
 use Data::Dumper;
 
 use Test::More;
-use lib 'inc';
 use Test::HTTP::LocalServer;
 
 use Future::HTTP::Tiny;

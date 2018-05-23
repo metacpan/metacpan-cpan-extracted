@@ -1,7 +1,7 @@
 package IO::K8s;
   use Moose;
 
-  our $VERSION = '0.02';
+  our $VERSION = '0.03';
 
   use Moose::Util qw/find_meta/;
   use Module::Runtime qw/require_module/;
@@ -152,6 +152,12 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 This module is the set of objects and serialization / deserialization methods that represent
 the structures found inside the Kubernetes API L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/>
+
+Kubernetes API is very strict about the input it accepts. When a value is expected to be an integer, 
+if it's sent as a string with a number inside, it won't get accepted by the API. This module helps you
+get the correct value types in the JSON that can later be sent to Kubernetes.
+
+Another use case is inflating the JSON returned by Kubernetes into objects.
 
 =head1 SEE ALSO
 

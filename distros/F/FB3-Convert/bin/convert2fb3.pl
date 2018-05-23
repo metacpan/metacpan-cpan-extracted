@@ -18,6 +18,10 @@ GetOptions(
   'name|n:1' => \$OPT{'showname'},
   'b:1' => \$OPT{'b'},
   'bf:s' => \$OPT{'bf'},
+  'phantomjs|phjs=s' => \$OPT{'phjs'},
+  'euristic|e' => \$OPT{'eur'},
+  'euristic_debug|ed=s' => \$OPT{'eur_deb'},
+
 
   'meta_id=s' => \$OPT{'meta_id'},
   'meta_lang|meta_language=s' => \$OPT{'meta_lang'},
@@ -59,6 +63,9 @@ my $Obj = new FB3::Convert(
   'showname' => $OPT{'showname'},
   'bench' => $OPT{'b'},
   'bench2file' => $OPT{'bf'},
+  'phantom_js_path' => $OPT{'phjs'},
+  'euristic' => $OPT{'eur'},
+  'euristic_debug' => $OPT{'eur_deb'},
 
   'meta' => {
     'id' => $OPT{'meta_id'},
@@ -102,7 +109,7 @@ $Obj->_bf();
 sub help {
   print <<_END
   
-  USAGE: convert2fb3.pl --source|s= <input.file> [--verbose|v] [--help|h] [(--destination_dir|dd <dest.fb3>) | (--destination_file|df)]  [(--name|n)] [--validate|vl=]
+  USAGE: convert2fb3.pl --source|s= <input.file> [--verbose|v] [--help|h] [(--destination_dir|dd <dest.fb3>) | (--destination_file|df)]  [(--name|n)] [--validate|vl=] [--euristic|e] [--euristic_debug|ed] [--phantomjs|phjs]
   
   --help : print this text
   --verbose : print processing status. Show parsing warnings if Verbose > 1
@@ -112,7 +119,10 @@ sub help {
   --metadata : XML meta description file
   --name : show name of reaped epub file
   --validate : don't convert, only validate fb3 file from path
-  
+  --euristic : try euristic analize for detect strange titles
+  --euristic_debug : path to dir for euristica debug
+  --phantomjs|phjs : path to binary 'phantomjs'. Must be installed for euristica analize titles <http://phantomjs.org/> (with --e opt)
+
   META:
   --meta_id
   --meta_lang

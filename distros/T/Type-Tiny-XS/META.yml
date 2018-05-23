@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 1
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -25,10 +25,10 @@ optional_features: {}
 provides:
   Type::Tiny::XS:
     file: lib/Type/Tiny/XS.pm
-    version: '0.012'
+    version: '0.014'
   Type::Tiny::XS::Util:
     file: lib/Type/Tiny/XS/Util.pm
-    version: '0.012'
+    version: '0.014'
 requires:
   perl: '5.010001'
 resources:
@@ -37,4 +37,5 @@ resources:
   homepage: https://metacpan.org/release/Type-Tiny-XS
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-type-tiny-xs.git
-version: '0.012'
+version: '0.014'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

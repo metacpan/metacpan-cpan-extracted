@@ -1,5 +1,16 @@
 Revision history for Perl distribution Mojo-SAML
 
+0.06 2018-05-18
+  - Bugfix in both saml.response_status and saml.response_success helpers
+
+0.05 2018-05-15
+  - Add Mojo::SAML::Entity class from IdP class
+  - IdP class now inherits from Entity class
+  - Add "from" method to Entity class
+  - Add "role" method to Entity class
+  - Add "role_type" attribte to Entity class
+  - Add Mojolicious::Plugin::SAML
+
 0.04 2018-05-14
   - Bugfix calling isa on non-references
   - Use new Mojo::DOM::HTML::tag_to_html rather than
@@ -12,9 +23,9 @@ Revision history for Perl distribution Mojo-SAML
 0.02 2018-05-09
   - Fix several documentation problems
   - Add insert_xml_declaration to Document class
-  - Added AttributeConsumingService Document class
-  - Added RequestedAttribute Document class
-  - Added attrname_format to Mojo::SAML::Names
+  - Add AttributeConsumingService Document class
+  - Add RequestedAttribute Document class
+  - Add attrname_format to Mojo::SAML::Names
 
 0.01 2018-05-08
   - Initial release

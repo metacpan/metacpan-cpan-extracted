@@ -44,7 +44,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooseX-XSAccessor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-008>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-009>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moosex-xsaccessor>;
@@ -209,6 +209,22 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.008.tar.gz>;
 	doap:revision        "0.008"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.009"^^xsd:string;
+	dc:issued            "2018-05-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Remove a test which fails on Perl below 5.20.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/124835>;
+			rdfs:comment "It's a hard to track down syntax error and doesn't impact the module's functionality. If anyone knows how to fix it, I'll add it back.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/flora>
 	a                    foaf:Person;
 	foaf:name            "Florian Ragwitz";
@@ -234,6 +250,11 @@
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
 
+<http://purl.org/NET/cpan-uri/rt/ticket/124835>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "124835"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=124835>.
+
 <http://purl.org/NET/cpan-uri/rt/ticket/86127>
 	a                    doap-bugs:Issue;
 	doap-bugs:id         "86127"^^xsd:string;
@@ -250,6 +271,56 @@
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "CREDITS".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "Changes".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "LICENSE".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "doap.ttl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "Makefile.PL";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "README".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "examples/bench.pl";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/changes.pret".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/doap.pret".
 
 []
 	a                    nfo:FileDataObject;
@@ -316,12 +387,6 @@
 	nfo:fileName         "t/moose_accessor_overwrite_warning.t".
 
 []
-	a                    nfo:FileDataObject, nfo:TextDocument;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "Changes".
-
-[]
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
@@ -382,12 +447,6 @@
 	nfo:fileName         "t/moose_attribute_required.t".
 
 []
-	a                    nfo:FileDataObject, nfo:TextDocument;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "LICENSE".
-
-[]
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
@@ -446,12 +505,6 @@
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
 	nfo:fileName         "t/moose_chained_coercion.t".
-
-[]
-	a                    nfo:FileDataObject;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "doap.ttl".
 
 []
 	a                    nfo:FileDataObject, nfo:SourceCode;
@@ -516,13 +569,6 @@
 []
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "Makefile.PL";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
 	nfo:fileName         "t/moose_misc_attribute_coerce_lazy.t".
 
@@ -567,29 +613,4 @@
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
 	nfo:fileName         "t/moose_trigger_and_coerce.t".
-
-[]
-	a                    nfo:FileDataObject, nfo:TextDocument;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "README".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "examples/bench.pl";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "meta/changes.pret".
-
-[]
-	a                    nfo:FileDataObject;
-	dc:license           <http://dev.perl.org/licenses/>;
-	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
-	nfo:fileName         "meta/doap.pret".
 

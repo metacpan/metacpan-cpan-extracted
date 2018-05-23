@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Implementation::PVC::TypeTiny;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base::PVC);
 use Params::ValidationCompiler 0.24 qw(validation_for);
@@ -15,7 +15,7 @@ use Types::Standard 1.001_009 -types;
 use Type::Tiny::XS 0.012 ();
 use namespace::autoclean;
 
-use constant long_name => 'Params::ValidateCompiler with Type::Tiny';
+use constant long_name => 'Params::ValidationCompiler with Type::Tiny';
 use constant short_name => 'PVC-TT';
 
 sub get_named_check {

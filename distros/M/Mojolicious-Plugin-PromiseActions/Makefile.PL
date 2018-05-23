@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
+  'Mojolicious' => '7.75',
   'perl' => 'v5.10.0'
 }
 ,
@@ -21,12 +22,12 @@ my %WriteMakefileArgs = (
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
     'resources'      => {
-      bugtracker => {web => 'https://github.com/marcus/mojolicious-plugin-promiseactions/issues'},
-      homepage   => 'https://github.com/marcus/mojolicious-plugin-promiseactions',
+      bugtracker => {web => 'https://github.com/marcusramberg/mojolicious-plugin-promiseactions/issues'},
+      homepage   => 'https://github.com/marcusramberg/mojolicious-plugin-promiseactions',
       repository => {
         type => 'git',
         url  => 'https://github.com/marcusramberg/mojolicious-plugin-promiseactions.git',
-        web  => 'https://github.com/marcus/mojolicious-plugin-promiseactions',
+        web  => 'https://github.com/marcusramberg/mojolicious-plugin-promiseactions',
       },
     },
   },

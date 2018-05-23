@@ -4,7 +4,7 @@ package MongoDB::BSON::Regexp;
 # ABSTRACT: Regular expression type
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use MongoDB::Error;
@@ -103,7 +103,7 @@ MongoDB::BSON::Regexp - Regular expression type
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 ATTRIBUTES
 

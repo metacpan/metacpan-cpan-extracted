@@ -5,7 +5,7 @@ package MooX::AttributeFilter;
 use v5.10;
 use strictures 1;
 
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 
 use Carp;
 use Scalar::Util qw<looks_like_number>;
@@ -140,7 +140,7 @@ MooX::AttributeFilter - Implements 'filter' option for Moo-class attributes
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 SYNOPSIS
 

@@ -12,6 +12,8 @@ WriteMakefile(
     'Test2::Tools::Compare' => 0,
     'Test2::Tools::Exception' => 0,
     'Time::Piece' => 0,
+    'strict' => 0,
+    'warnings' => 0,
   },
   ABSTRACT_FROM  => 'lib/Test2/Tools/SkipUntil.pm',
   AUTHOR         => 'David Farrell',

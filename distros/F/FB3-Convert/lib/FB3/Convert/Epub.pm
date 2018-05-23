@@ -5,6 +5,7 @@ use base 'FB3::Convert';
 use XML::LibXML;
 use File::Basename;
 use Clone qw(clone);
+use FB3::Euristica;
 use utf8;
 
 my %NS = (
@@ -14,12 +15,23 @@ my %NS = (
   'dc' => 'http://purl.org/dc/elements/1.1/',
 );
 
+sub FindFile {
+  my $FileName = shift;
+  my $Dirs = shift;
+
+  foreach (@$Dirs) {
+    my $Path = $_.'/'.$FileName;
+    return $Path if -f $Path;
+  }
+  return undef;
+}
+
 sub Reaper {
   my $self = shift;
   my $X = shift;
 
   my %Args = @_;
-  my $Source = $Args{'source'} || die "Source path not defined";
+  my $Source = $Args{'source'} || $X->Error("Source path not defined");
   my $XC = XML::LibXML::XPathContext->new();
 
   $XC->registerNs('container', $NS{'container'});
@@ -77,7 +89,7 @@ sub Reaper {
   
 ##### где хранится содержимое книги
   my $ContainerFile = $Source."/META-INF/container.xml";
-  die $self." ".$ContainerFile." not found!" unless -f $ContainerFile;
+  $X->Error($self." ".$ContainerFile." not found!") unless -f $ContainerFile;
 
   $X->Msg("Parse container ".$ContainerFile."\n");
   my $CtDoc = XML::LibXML->load_xml(
@@ -85,18 +97,39 @@ sub Reaper {
     expand_entities => 0,
     no_network => 1,
     load_ext_dtd => 0
-  ) || die "Can't parse file ".$ContainerFile;
+  ) || $X->Error("Can't parse file ".$ContainerFile);
   
   my $RootFile = $XC->findnodes('/container:container/container:rootfiles/container:rootfile',$CtDoc)->[0]->getAttribute('full-path');
-  die "Can't find full-path attribute in Container [".$NS{'container'}." space]" unless $RootFile;
+  $X->Error("Can't find full-path attribute in Container [".$NS{'container'}." space]") unless $RootFile;
 
 #### root-файл с описанием контента
   $RootFile = $Source."/".$RootFile;
-  die "Can't find root (full-path attribute) file ".$RootFile unless -f $RootFile;
+  $X->Error("Can't find root (full-path attribute) file ".$RootFile) unless -f $RootFile;
 
   #Директория, относительно которой лежит контент. Нам с ней еще работать
   $X->{'ContentDir'} = $RootFile;
   $X->{'ContentDir'} =~ s/\/?[^\/]+$//;
+
+  if ($X->{'euristic'}) {
+    $X->Msg("Euristica enabled\n",'w');
+
+    my $PhantomJS = $X->{'phantom_js_path'} || FindFile('phantomjs', [split /:/,$ENV{'PATH'}]);
+
+    if (-e $PhantomJS) {
+      my $EuristicaObj = new FB3::Euristica(
+        'verbose' => $X->{verbose},
+        'phjs' => $PhantomJS,
+        'ContentDir' => $X->{'ContentDir'},
+        'DestinationDir' => $X->{'DestinationDir'},
+        'DebugPath' => $X->{'euristic_debug'},
+        'DebugPrefix' => $X->{'SourceFileName'},
+      );
+      $X->{'EuristicaObj'} = $EuristicaObj;
+    } else {
+      $X->Msg("[SKIP EURISTIC] PhantomJS binary not found. Try --phantomjs=PATH-TO-FILE, --euristic_skip options.\nPhantomJS mus be installed for euristic analize of titles <http://phantomjs.org/>\n",'e');
+    }
+ 
+  }
 
   $X->Msg("Parse rootfile ".$RootFile."\n");
   
@@ -105,7 +138,7 @@ sub Reaper {
     expand_entities => 0,
     no_network => 1,
     load_ext_dtd => 0
-  ) || die "Can't parse file ".$RootFile;
+  ) || $X->Error("Can't parse file ".$RootFile);
   $RootDoc->setEncoding('utf-8');
 
   # список файлов с контентом
@@ -194,7 +227,7 @@ sub Reaper {
     $Description->{'TITLE-INFO'}->{'AUTHORS'} = \@Authors;
   }
 
-  #print Data::Dumper::Dumper($AC);
+  ##print Data::Dumper::Dumper($AC);
 
   #КОНТЕНТ
 
@@ -401,11 +434,12 @@ sub Reaper {
         && exists $Sec->{'section'}->{'value'}->[0]->{'title'}
       ) {
 
+        my $ValNode = $Sec->{'section'}->{'value'}->[0]->{'title'}->{'value'}->[0];
         $Sec->{'section'}->{'value'} = 
           [
            {
             'subtitle' => {
-             'value' => $Sec->{'section'}->{'value'}->[0]->{'title'}->{'value'}->[0]->{'p'}->{'value'}
+             'value' => (ref $ValNode eq 'HASH' ? $ValNode->{'p'}->{'value'} : $ValNode),
             }
            }
           ];
@@ -595,6 +629,8 @@ sub AnaliseIdEmptyHref {
    $First = 1;
   }
 
+  $Data->{'value'} = [$Data->{'value'}] unless ref $Data->{'value'} eq 'ARRAY';
+
   foreach my $Item (@{$Data->{'value'}}) {
 
     if (ref $Item eq '') { # это голый текст
@@ -701,7 +737,6 @@ sub AssembleContent {
   foreach my $Item (@$Manifest) {
     $Ind++;
     $ReverseManifest{$Item->{'id'}} = $Item;
-
     # !! Стили пока не трогаем !!
     #if ($Item->{'type'} =~ /^text\/css$/) { # В манифесте css 
     #  push @{$X->{'STRUCTURE'}->{'CSS_LIST'}}, {
@@ -710,11 +745,27 @@ sub AssembleContent {
     #    'id' => $Item->{'id'},
     #  };
     #}
+  }
 
+  my @Files4Eur;
+  if ($X->{'EuristicaObj'}) { #придется собрать файлы для эвристики отдельно. нужно будет объединить с обработкой
+    for my $ItemID (@$Spine) {
+      my $Item = $ReverseManifest{$ItemID};
+      if ($Item->{'type'} =~ /^application\/xhtml/) {
+        my $ContentFile = $X->{'ContentDir'}.'/'.$Item->{'href'};
+        $ContentFile =~ s/%20/ /g;
+        push @Files4Eur, $ContentFile;
+      }
+    }
+    $X->Msg("Calculate all links for euristica\n");
+    $X->_bs('EuristicLinks','Калькуляция всех локальных ссылок для эвристики');
+    $X->{'EuristicaObj'}->CalculateLinks('files'=>\@Files4Eur);
+    $X->_be('EuristicLinks');
   }
 
   #бежим по списку, составляем скелет контекстной части
   for my $ItemID (@$Spine) {
+    my $Item = $ReverseManifest{$ItemID};
 
     if (!exists $ReverseManifest{$ItemID}) {
       $X->Msg("id ".$ItemID." not exists in Manifest list\n",'i');
@@ -725,21 +776,43 @@ sub AssembleContent {
     if ($Item->{'type'} =~ /^application\/xhtml/) { # Видимо, текст
 
       my $ContentFile = $X->{'ContentDir'}.'/'.$Item->{'href'};
+      $ContentFile =~ s/%20/ /g;
+
+      $X->Msg("Fix strange text\n");
+      $X->_bs('Strange', 'Зачистка странностей');
+      $X->ShitFixFile($ContentFile);
+      $X->_be('Strange');
+
+      if ($X->{'EuristicaObj'}) {
+        $X->Msg("Euristic analize ".$ContentFile."\n");
+        $X->_bs('euristic','Эвристический анализ заголовка');
+        my $Euristica = $X->{'EuristicaObj'}->ParseFile('file'=>$ContentFile);
+        #print Data::Dumper::Dumper($Euristica);
+        
+        #пишем контент из эвристики на место
+        ##if ($Euristica->{'CHANGED'}
+        ##) {
+          open my $FS,">:utf8",$ContentFile;
+          print $FS $Euristica->{'CONTENT'};
+          close $FS;
+        ##} 
+        $X->_be('euristic');
+
+      }
 
       $X->Msg("Parse content file ".$ContentFile."\n");
 
       $X->_bs('parse_epub_xhtml', 'xml-парсинг файлов epub [Открытие, первичные преобразования, парсинг]');
       my $Content;
-      open F,"<".$ContentFile;
-      map {$Content.=$_} <F>;
-      close F;
-
+      open my $FO,"<".$ContentFile;
+      map {$Content.=$_} <$FO>;
+      close $FO;
+ 
       $X->_bs('Entities', 'Преобразование Entities');
       $Content = $X->qent(Encode::decode_utf8($Content));
       $X->_be('Entities');
 
-      $X->Msg("Fix strange text\n");
-      $Content = $X->ShitFix($Content);
+      $Content = $X->MetaFix($Content) if $X->{'EuristicaObj'}; #phantomjs нам снова наследил 
 
       $X->Msg("Parse XML\n");
       my $ContentDoc = XML::LibXML->load_xml(
@@ -952,7 +1025,14 @@ sub TransformH2Title {
 
   my $Wrap = XML::LibXML::Element->new("p"); #wrapper
   foreach my $Child ($Node->getChildnodes) {
-    $Wrap->addChild($Child->cloneNode(1));
+    my $Excl = $X->{'allow_elements'}->{'p'}->{'exclude_if_inside'};
+    if ( grep {$Child->nodeName eq $_} @$Excl ) {
+      foreach my $ChildIns ($Child->getChildnodes) {
+        $Wrap->addChild($ChildIns->cloneNode(1));
+      }
+    } else {
+      $Wrap->addChild($Child->cloneNode(1));
+    }
   }
  
   $NewNode->addChild($Wrap);

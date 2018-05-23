@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -16,6 +16,21 @@ our $VERSION = '1.004';
 #pod     use My::Schema;
 #pod     plugin Yancy => {
 #pod         backend => { Dbic => My::Schema->connect( 'dbi:SQLite:myapp.db' ) },
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### Arrayref
+#pod     use Mojolicious::Lite;
+#pod     use My::Schema;
+#pod     plugin Yancy => {
+#pod         backend => {
+#pod             Dbic => [
+#pod                 'My::Schema',
+#pod                 'dbi:SQLite:mysql.db',
+#pod                 undef, undef,
+#pod                 { PrintError => 1 },
+#pod             ],
+#pod         },
 #pod         read_schema => 1,
 #pod     };
 #pod
@@ -88,7 +103,7 @@ our $VERSION = '1.004';
 #pod =cut
 
 use Mojo::Base '-base';
-use Scalar::Util qw( looks_like_number );
+use Scalar::Util qw( looks_like_number blessed );
 use Mojo::Loader qw( load_class );
 
 has collections => ;
@@ -102,6 +117,13 @@ sub new {
             die ref $e ? "Could not load class $dbic_class: $e" : "Could not find class $dbic_class";
         }
         $backend = $dbic_class->connect( $dsn );
+    }
+    elsif ( !blessed $backend ) {
+        my $dbic_class = shift @$backend;
+        if ( my $e = load_class( $dbic_class ) ) {
+            die ref $e ? "Could not load class $dbic_class: $e" : "Could not find class $dbic_class";
+        }
+        $backend = $dbic_class->connect( @$backend );
     }
     my %vars = (
         collections => $collections,
@@ -267,7 +289,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -283,6 +305,21 @@ version 1.004
     use My::Schema;
     plugin Yancy => {
         backend => { Dbic => My::Schema->connect( 'dbi:SQLite:myapp.db' ) },
+        read_schema => 1,
+    };
+
+    ### Arrayref
+    use Mojolicious::Lite;
+    use My::Schema;
+    plugin Yancy => {
+        backend => {
+            Dbic => [
+                'My::Schema',
+                'dbi:SQLite:mysql.db',
+                undef, undef,
+                { PrintError => 1 },
+            ],
+        },
         read_schema => 1,
     };
 

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-YAKEX
 
+v0.2.0    2018-05-19 21:04:40+09:00 Asia/Tokyo
+    - Add dependencies required by author tests.
+
 v0.1.5    2014-05-03 15:38:57JST+0900 Asia/Tokyo
     - Disable build_prereq_matches_use in Test::Kwalitee::Extra again.
 

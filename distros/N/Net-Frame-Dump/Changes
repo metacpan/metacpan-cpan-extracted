@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Frame::Dump.
 
+1.16 Thu 17 May 13:57:30 CEST 2018
+   - bugfix: RT#125315, typos in pod and code.
+
 1.15 Tue  1 May 09:16:32 CEST 2018
    - BUGFIX: Dump::Online2: yes, again. Since some newer version of libpcap 
              and changes in pcap_dispatch(), we have to call can_read() on the 

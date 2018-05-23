@@ -21,7 +21,7 @@ package MongoDB::BulkWrite;
 # ABSTRACT: MongoDB bulk write interface
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use MongoDB::Error;
 use MongoDB::Op::_BulkWrite;
@@ -30,11 +30,11 @@ use MongoDB::BulkWriteView;
 
 use Moo;
 use MongoDB::_Types qw(
+    Boolish
     to_WriteConcern
 );
 use Types::Standard qw(
     ArrayRef
-    Bool
     InstanceOf
 );
 use namespace::clean -except => 'meta';
@@ -60,7 +60,7 @@ has 'collection' => (
 
 has 'ordered' => (
     is       => 'ro',
-    isa      => Bool,
+    isa      => Boolish,
     required => 1,
 );
 
@@ -73,12 +73,12 @@ has 'ordered' => (
 
 has 'bypassDocumentValidation' => (
     is       => 'ro',
-    isa      => Bool,
+    isa      => Boolish,
 );
 
 has '_executed' => (
     is       => 'rw',
-    isa      => Bool,
+    isa      => Boolish,
     init_arg => undef,
     default  => 0,
 );
@@ -290,7 +290,7 @@ MongoDB::BulkWrite - MongoDB bulk write interface
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

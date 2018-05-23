@@ -1,7 +1,5 @@
 package Pcore::Util::URI;
 
-use Pcore -class;
-
 use Pcore -class, -const;
 use Pcore::Util::URI::Path;
 use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
@@ -42,10 +40,10 @@ has hostport     => ( is => 'lazy', init_arg => undef );    # punycoded, ASCII
 
 has scheme_is_valid => ( is => 'lazy', init_arg => undef );
 
-has is_http   => ( is => 'lazy', default => 0, init_arg => undef );
-has is_secure => ( is => 'lazy', default => 0, init_arg => undef );
+has is_http   => 0, is => 'lazy';                           # init_arg => undef );
+has is_secure => 0, is => 'lazy';                           # init_arg => undef );
 
-has default_port => ( is => 'lazy', default  => 0, init_arg => undef );
+has default_port => 0, is => 'lazy';                        # init_arg => undef );
 has connect_port => ( is => 'lazy', init_arg => undef );
 has connect      => ( is => 'lazy', init_arg => undef );
 
@@ -345,10 +343,10 @@ sub TO_DUMP ( $self, $dumper, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 111, 114, 121, 131,  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
-## |      | 142, 147, 150        |                                                                                                                |
+## |    3 | 109, 112, 119, 129,  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |      | 140, 145, 148        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 95                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 93                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

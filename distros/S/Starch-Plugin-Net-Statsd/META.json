@@ -1,0 +1,66 @@
+{
+   "abstract" : "Record store timing information to statsd.",
+   "author" : [
+      "Aran Deltac <bluefeet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Starch-Plugin-Net-Statsd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2",
+            "Net::Statsd" : "0.11",
+            "Starch" : "0.01",
+            "Type::Tiny" : "1.000005",
+            "namespace::clean" : "0.24",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Package::Stash" : "0.37",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd.git",
+         "web" : "https://github.com/bluefeet/Starch-Plugin-Net-Statsd"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

@@ -1,6 +1,8 @@
 package Alien::Electron;
 
-our $VERSION = '0.103';
+use strict;
+
+our $VERSION = '0.200';
 
 use File::ShareDir;
 

@@ -1,0 +1,72 @@
+NAME
+
+    Mojolicious::Plugin::SecurityHeader
+
+VERSION
+
+    version 0.03
+
+SYNOPSIS
+
+      # Mojolicious
+      $self->plugin('SecurityHeader');
+    
+      # define which security headers should be used
+      $self->plugin('SecurityHeader' => [
+          'Strict-Transport-Security' => -1,
+          'X-Xss-Protection',
+          'X-Content-Type-Options' => 'nosniff',
+      ]);
+    
+      # Mojolicious::Lite
+      plugin 'SecurityHeader';
+
+DESCRIPTION
+
+    Mojolicious::Plugin::SecurityHeader is a Mojolicious plugin.
+
+NAME
+
+    Mojolicious::Plugin::SecurityHeader - Mojolicious Plugin
+
+SECURITY HEADER
+
+      * Strict-Transport-Security
+
+      * Public-Key-Pins
+
+      * Referrer-Policy
+
+      * X-Content-Type-Options
+
+      * X-Frame-Options
+
+      * X-Xss-Protection
+
+METHODS
+
+    Mojolicious::Plugin::SecurityHeader inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+ register
+
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+SEE ALSO
+
+    Mojolicious, Mojolicious::Guides, http://mojolicious.org.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

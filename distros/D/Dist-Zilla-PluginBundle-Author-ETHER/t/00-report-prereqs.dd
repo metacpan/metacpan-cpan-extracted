@@ -10,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.139',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.141',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -143,7 +143,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::TestRelease' => '0',
                                       'Dist::Zilla::Plugin::UploadToCPAN' => '0',
                                       'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
-                                      'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.001',
+                                      'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
                                       'Dist::Zilla::Role::MintingProfile' => '5.047',
                                       'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
@@ -287,7 +287,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::UploadToCPAN' => '0',
                                            'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
                                            'Dist::Zilla::PluginBundle::Author::ETHER' => '0.103',
-                                           'Dist::Zilla::PluginBundle::Git::VersionManager' => '0',
+                                           'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
                                            'Software::License::Perl_5' => '0'
                                          }
                          }

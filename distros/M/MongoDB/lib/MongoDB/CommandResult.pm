@@ -21,7 +21,7 @@ package MongoDB::CommandResult;
 # ABSTRACT: MongoDB generic command result document
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use MongoDB::Error;
@@ -170,7 +170,7 @@ MongoDB::CommandResult - MongoDB generic command result document
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 DESCRIPTION
 

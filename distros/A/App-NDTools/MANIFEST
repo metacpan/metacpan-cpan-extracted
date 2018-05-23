@@ -13,6 +13,7 @@ lib/App/NDTools/NDQuery.pm
 lib/App/NDTools/NDTool.pm
 lib/App/NDTools/Slurp.pm
 lib/App/NDTools/Test.pm
+lib/App/NDTools/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

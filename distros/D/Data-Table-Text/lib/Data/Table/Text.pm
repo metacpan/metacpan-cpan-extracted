@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Write data in tabular text format
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180431';
+our $VERSION = '20180510';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -157,9 +157,9 @@ sub firstFileThatExists(@)                                                      
   for(@files)
    {return $_ if -e $_;
    }
-  undef                                                                         # No such file 
+  undef                                                                         # No such file
  }
-  
+
 #2 Components                                                                   # Create file names from file name components
 
 sub denormalizeFolderName($)                                                    #P Remove any trailing folder separator from a folder name component.
@@ -261,7 +261,7 @@ sub currentDirectoryAbove                                                       
 
 sub parseFileName($)                                                            # Parse a file name into (path, name, extension)
  {my ($file) = @_;                                                              # File name to parse
-  return ($file) if $file =~ m{\/\Z}s;                                          # Its a folder
+  return ($file) if $file =~ m{\/\Z}s or $file =~ m/\.\.\Z/s;                   # Its a folder
   if ($file =~ m/\.[^\/]+\Z/s)                                                  # The file name has an extension
    {if ($file =~ m/\A.+[\/]/s)                                                  # The file name has a preceding path
      {my @f = $file =~ m/(\A.+[\/])([^\/]+)\.([^\/]+)\Z/s;                      # File components
@@ -276,6 +276,13 @@ sub parseFileName($)                                                            
    {if ($file =~ m/\A.+[\/]/s)                                                  # The file name has a preceding path
      {my @f = $file =~ m/(\A.+\/)([^\/]+)\Z/s;                                  # File components
       return @f;
+     }
+    elsif ($file =~ m/\A[\/]./s)                                                # The file name has a single preceding /
+     {return (q(/), substr($file, 1));
+     }
+    elsif ($file =~ m/\A[\/]\Z/s)                                               # The file name is a single /
+     {my @f = $file =~ m/(\A.+\/)([^\/]+)\Z/s;                                  # File components
+      return (q(/));
      }
     else                                                                        # There is no preceding path
      {return (undef, $file)
@@ -299,6 +306,60 @@ sub fullFileName                                                                
 sub printFullFileName                                                           # Print a file name on a separate line with escaping so it can be used easily from the command line.
  {my ($file) = @_;                                                              # File name
   "\n\'".dump(fullFileName($file))."\'\n'"
+ }
+
+sub absFromAbsPlusRel($$)                                                       # Create an absolute file from a an absolute file and a following relative file.
+ {my ($a, $f) = @_;                                                             # Absolute file name, relative file name
+
+  defined $a or confess "Specify an absolute file name for the first parameter";
+  defined $f or confess "Specify a relative file name for the second parameter";
+
+  $a =~ m(\A/)s or confess "$a is not an absolute file name";
+
+  my ($ap, $af, $ax) = parseFileName($a);
+  my ($fp, $ff, $fx) = parseFileName($f);
+
+  return $ap if defined($f) and $f eq q();                                      # Blank file name relative to
+  return fpf($ap, $f) if defined($ap) and !defined($fp);                        # Short file name relative to
+
+  my @a = split m(/), $ap;
+  my @f = split m(/), $fp;
+  shift @f while @f and $f[0] eq q(.);                                          # Remove leading ./
+  while(@a and @f and $f[0] eq q(..)) {pop @a; shift @f};                       # Remove leading ../
+  @f && $f[0] eq q(..) and confess "$f has too many leading ../";
+  return q(/).fpe(grep {$_ and m/\S/} @a, @f, $ff, $fx) if defined $fx;
+
+  my @A = grep {$_ and m/\S/} @a, @f, $ff, $fx;                                          # Components of new file
+  return q(/).fpe(@A)    if @A >  1 and  defined($fx);
+  return q(/).fpf(@A)    if @A >  1 and !defined($fx) and  defined($ff);
+  return q(/).fpd(@A)    if @A >  1 and !defined($fx) and !defined($ff);
+  return q(/).$A[0].q(/) if @A == 1 and !defined($ff);
+  return q(/).$A[0]      if @A == 1 and  defined($ff);
+  q(/)
+ }
+
+sub relFromAbsAgainstAbs($$)                                                    # Derive a relative file name for the first absolute file relative to the second absolute file name.
+ {my ($f, $a) = @_;                                                             # Absolute file to be made relative, absolute file to compare against
+  defined $f or confess "Specify an absolute file name for the first parameter";
+  defined $a or confess "Specify an absolute file name for the second parameter";
+  $f =~ m(\A/)s or confess "$f is not an absolute file name";
+  $a =~ m(\A/)s or confess "$a is not an absolute file name";
+
+  my ($fp, $ff, $fx) = parseFileName($f);
+  my ($ap, $af, $ax) = parseFileName($a);
+
+  my @a = $ap ? split m(/), $ap : q(/);
+  my @f = $fp ? split m(/), $fp : q(/);
+
+  while(@a and @f and $a[0] eq $f[0]) {shift @a; shift @f};
+  my @l = (q(..)) x scalar(@a);
+  pop @l if $fp && $fp eq "/";
+  push @l, q(..) if $ap && $ap eq "/" and defined $af;
+  return fpe(@l, @f, grep{$_ and m/\S/} $ff, $fx) if  defined($fx);
+  return fpf(@l, @f, grep{$_ and m/\S/} $ff)      if !defined($fx) and  defined($ff);
+  my $s = fpd(@l, @f, grep{$_ and m/\S/} $ff);
+  return "./" unless $s;
+  $s;
  }
 
 #2 Temporary                                                                    # Temporary files and folders
@@ -378,7 +439,7 @@ sub matchPath($)                                                                
   ''                                                                            # Nothing matches
  } # matchPath
 
-sub findFileWithExtension($@)                                                   # Find the first extension from teh specified extensions that produces a file that exists when appended to the specified file
+sub findFileWithExtension($@)                                                   # Find the first extension from the specified extensions that produces a file that exists when appended to the specified file
  {my ($file, @ext) = @_;                                                        # File name minus extensions, possible extensions
   for my $ext(@ext)
    {my $f = fpe($file, $ext);
@@ -914,7 +975,7 @@ sub checkKeys($$)                                                               
    "",
  }
 
-#1 LVALUE methods                                                               # Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelt correctly.
+#1 LVALUE methods                                                               # Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelled correctly.
 sub genLValueScalarMethods(@)                                                   # Generate LVALUE scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.  Example: $a->value = 1;
  {my (@names) = @_;                                                             # List of method names
   my ($package) = caller;                                                       # Package
@@ -982,7 +1043,7 @@ sub pad($$)                                                                     
   $string .= ' ' x $p;
  }
 
-sub nws($)                                                                      # Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of whitespace in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
+sub nws($)                                                                      # Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of white space in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
  {my ($string) = @_;                                                            # String to normalize
   $string =~ s/\A\s+//r =~ s/\s+\Z//r =~ s/\s+/ /gr
  }
@@ -1070,7 +1131,7 @@ END
 
 sub extractTest($)                                                              #P Extract a line of a test.
  {my ($string) = @_;                                                            # String containing test line
-  $string =~ s/\A\s*{?(.+?)\s*#.*\Z/$1/;                                        # Remove any initial whitespace and possible { and any trailing whitespace and comments
+  $string =~ s/\A\s*{?(.+?)\s*#.*\Z/$1/;                                        # Remove any initial white space and possible { and any trailing white space and comments
   $string
  }
 
@@ -1088,13 +1149,8 @@ sub updateDocumentation(;$)                                                     
   my %static;                                                                   # Static methods
   my %exported;                                                                 # Exported methods
   my %userFlags;                                                                # User flags
-  my @doc = (<<END);                                                            # Documentation
-`head1 Description
-
-The following sections describe the methods in each functional area of this
-module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
-
-END
+  my $oneLineDescription = qq(\n);                                              # One line description from =head1 Name
+  my @doc;                                                                      # Documentation
   my @private;                                                                  # Documentation of private methods
   my $level = 0; my $off = 0;                                                   # Header levels
 
@@ -1109,6 +1165,21 @@ END
          ($1$v$3)gs;
      }
    }
+
+  if ($source =~ m(\n=head1\s+Name\s+(?:\w|:)+\s+(.+?)\n)s)                     # Extract one line description from =head1 Name ... Module name ... one line description
+   {my $s = $1;
+    $s =~ s(\A\s*-\s*) ();                                                      # Remove optional leading -
+    $s =~ s(\s+\Z)     ();                                                      # Remove any trailing spaces
+    $oneLineDescription = "\n$s\n";                                             # Save description
+   }
+
+  push @doc, <<"END";                                                           # Documentation
+`head1 Description
+$oneLineDescription
+The following sections describe the methods in each functional area of this
+module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
+
+END
 
   my @lines = split /\n/, $source;                                              # Split source into lines
 
@@ -1491,7 +1562,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(
-addCertificate appendFile
+absFromAbsPlusRel addCertificate appendFile
 binModeAllUtf8
 checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
@@ -1501,7 +1572,7 @@ dateStamp dateTimeStamp decodeJson decodeBase64
 encodeJson encodeBase64
 fileList fileModTime fileOutOfDate
 filePath filePathDir filePathExt fileSize findDirs findFiles
-findFileWithExtension 
+findFileWithExtension
 firstFileThatExists
 formatTableBasic fpd fpe fpf fullFileName
 genLValueArrayMethods genLValueHashMethods
@@ -1516,7 +1587,7 @@ makePath matchPath max microSecondsSinceEpoch min
 nws
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
 quoteFile
-readBinaryFile readFile removeFilePrefix
+readBinaryFile readFile relFromAbsAgainstAbs removeFilePrefix
 saveToS3 searchDirectoryTreesForMatchingFiles
 setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords
 temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
@@ -1536,7 +1607,7 @@ zzz);
 
 =head1 Name
 
-Data::Table::Text - Write data in tabular text format
+Data::Table::Text - Write data in tabular text format.
 
 =head1 Synopsis
 
@@ -1615,6 +1686,8 @@ Print a hash of scalars:
  # cc  C
 
 =head1 Description
+
+Write data in tabular text format.
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
@@ -1843,6 +1916,22 @@ Full name of a file.
 Print a file name on a separate line with escaping so it can be used easily from the command line.
 
 
+=head3 absFromAbsPlusRel($$)
+
+Create an absolute file from a an absolute file and a following relative file.
+
+     Parameter  Description         
+  1  $a         Absolute file name  
+  2  $f         Relative file name  
+
+=head3 relFromAbsAgainstAbs($$)
+
+Derive a relative file name for the first absolute file relative to the second absolute file name.
+
+     Parameter  Description                        
+  1  $f         Absolute file to be made relative  
+  2  $a         Absolute file to compare against   
+
 =head2 Temporary
 
 Temporary files and folders
@@ -1905,7 +1994,7 @@ Given an absolute path find out how much of the path actually exists.
 
 =head3 findFileWithExtension($@)
 
-Find the first extension from teh specified extensions that produces a file that exists when appended to the specified file
+Find the first extension from the specified extensions that produces a file that exists when appended to the specified file
 
      Parameter  Description                 
   1  $file      File name minus extensions  
@@ -2195,7 +2284,7 @@ Check the keys in a hash.
 
 =head1 LVALUE methods
 
-Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelt correctly.
+Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelled correctly.
 
 =head2 genLValueScalarMethods(@)
 
@@ -2277,7 +2366,7 @@ Pad a string with blanks to a multiple of a specified length.
 
 =head2 nws($)
 
-Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of whitespace in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
+Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of white space in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
 
      Parameter  Description          
   1  $string    String to normalize  
@@ -2484,205 +2573,209 @@ Extract a line of a test.
 =head1 Index
 
 
-1 L<addCertificate|/addCertificate>
+1 L<absFromAbsPlusRel|/absFromAbsPlusRel>
 
-2 L<appendFile|/appendFile>
+2 L<addCertificate|/addCertificate>
 
-3 L<binModeAllUtf8|/binModeAllUtf8>
+3 L<appendFile|/appendFile>
 
-4 L<checkFile|/checkFile>
+4 L<binModeAllUtf8|/binModeAllUtf8>
 
-5 L<checkFilePath|/checkFilePath>
+5 L<checkFile|/checkFile>
 
-6 L<checkFilePathDir|/checkFilePathDir>
+6 L<checkFilePath|/checkFilePath>
 
-7 L<checkFilePathExt|/checkFilePathExt>
+7 L<checkFilePathDir|/checkFilePathDir>
 
-8 L<checkKeys|/checkKeys>
+8 L<checkFilePathExt|/checkFilePathExt>
 
-9 L<clearFolder|/clearFolder>
+9 L<checkKeys|/checkKeys>
 
-10 L<containingFolder|/containingFolder>
+10 L<clearFolder|/clearFolder>
 
-11 L<containingPowerOfTwo|/containingPowerOfTwo>
+11 L<containingFolder|/containingFolder>
 
-12 L<containingPowerOfTwoX|/containingPowerOfTwo>
+12 L<containingPowerOfTwo|/containingPowerOfTwo>
 
-13 L<contains|/contains>
+13 L<containingPowerOfTwoX|/containingPowerOfTwo>
 
-14 L<convertImageToJpx|/convertImageToJpx>
+14 L<contains|/contains>
 
-15 L<convertImageToJpx2|/convertImageToJpx2>
+15 L<convertImageToJpx|/convertImageToJpx>
 
-16 L<convertUnicodeToXml|/convertUnicodeToXml>
+16 L<convertImageToJpx2|/convertImageToJpx2>
 
-17 L<createEmptyFile|/createEmptyFile>
+17 L<convertUnicodeToXml|/convertUnicodeToXml>
 
-18 L<currentDirectory|/currentDirectory>
+18 L<createEmptyFile|/createEmptyFile>
 
-19 L<currentDirectoryAbove|/currentDirectoryAbove>
+19 L<currentDirectory|/currentDirectory>
 
-20 L<dateStamp|/dateStamp>
+20 L<currentDirectoryAbove|/currentDirectoryAbove>
 
-21 L<dateTimeStamp|/dateTimeStamp>
+21 L<dateStamp|/dateStamp>
 
-22 L<decodeBase64|/decodeBase64>
+22 L<dateTimeStamp|/dateTimeStamp>
 
-23 L<decodeJson|/decodeJson>
+23 L<decodeBase64|/decodeBase64>
 
-24 L<denormalizeFolderName|/denormalizeFolderName>
+24 L<decodeJson|/decodeJson>
 
-25 L<encodeBase64|/encodeBase64>
+25 L<denormalizeFolderName|/denormalizeFolderName>
 
-26 L<encodeJson|/encodeJson>
+26 L<encodeBase64|/encodeBase64>
 
-27 L<extractTest|/extractTest>
+27 L<encodeJson|/encodeJson>
 
-28 L<fileList|/fileList>
+28 L<extractTest|/extractTest>
 
-29 L<fileModTime|/fileModTime>
+29 L<fileList|/fileList>
 
-30 L<fileOutOfDate|/fileOutOfDate>
+30 L<fileModTime|/fileModTime>
 
-31 L<filePath|/filePath>
+31 L<fileOutOfDate|/fileOutOfDate>
 
-32 L<filePathDir|/filePathDir>
+32 L<filePath|/filePath>
 
-33 L<filePathExt|/filePathExt>
+33 L<filePathDir|/filePathDir>
 
-34 L<fileSize|/fileSize>
+34 L<filePathExt|/filePathExt>
 
-35 L<findDirs|/findDirs>
+35 L<fileSize|/fileSize>
 
-36 L<findFiles|/findFiles>
+36 L<findDirs|/findDirs>
 
-37 L<findFileWithExtension|/findFileWithExtension>
+37 L<findFiles|/findFiles>
 
-38 L<firstFileThatExists|/firstFileThatExists>
+38 L<findFileWithExtension|/findFileWithExtension>
 
-39 L<formatTable|/formatTable>
+39 L<firstFileThatExists|/firstFileThatExists>
 
-40 L<formatTableA|/formatTableA>
+40 L<formatTable|/formatTable>
 
-41 L<formatTableAA|/formatTableAA>
+41 L<formatTableA|/formatTableA>
 
-42 L<formatTableAH|/formatTableAH>
+42 L<formatTableAA|/formatTableAA>
 
-43 L<formatTableBasic|/formatTableBasic>
+43 L<formatTableAH|/formatTableAH>
 
-44 L<formatTableH|/formatTableH>
+44 L<formatTableBasic|/formatTableBasic>
 
-45 L<formatTableHA|/formatTableHA>
+45 L<formatTableH|/formatTableH>
 
-46 L<formatTableHH|/formatTableHH>
+46 L<formatTableHA|/formatTableHA>
 
-47 L<fullFileName|/fullFileName>
+47 L<formatTableHH|/formatTableHH>
 
-48 L<genLValueArrayMethods|/genLValueArrayMethods>
+48 L<fullFileName|/fullFileName>
 
-49 L<genLValueHashMethods|/genLValueHashMethods>
+49 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-50 L<genLValueScalarMethods|/genLValueScalarMethods>
+50 L<genLValueHashMethods|/genLValueHashMethods>
 
-51 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+51 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-52 L<hostName|/hostName>
+52 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-53 L<htmlToc|/htmlToc>
+53 L<hostName|/hostName>
 
-54 L<imageSize|/imageSize>
+54 L<htmlToc|/htmlToc>
 
-55 L<indentString|/indentString>
+55 L<imageSize|/imageSize>
 
-56 L<isBlank|/isBlank>
+56 L<indentString|/indentString>
 
-57 L<javaPackage|/javaPackage>
+57 L<isBlank|/isBlank>
 
-58 L<javaPackageAsFileName|/javaPackageAsFileName>
+58 L<javaPackage|/javaPackage>
 
-59 L<keyCount|/keyCount>
+59 L<javaPackageAsFileName|/javaPackageAsFileName>
 
-60 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+60 L<keyCount|/keyCount>
 
-61 L<loadArrayFromLines|/loadArrayFromLines>
+61 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-62 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+62 L<loadArrayFromLines|/loadArrayFromLines>
 
-63 L<loadHashFromLines|/loadHashFromLines>
+63 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-64 L<makePath|/makePath>
+64 L<loadHashFromLines|/loadHashFromLines>
 
-65 L<matchPath|/matchPath>
+65 L<makePath|/makePath>
 
-66 L<max|/max>
+66 L<matchPath|/matchPath>
 
-67 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
+67 L<max|/max>
 
-68 L<min|/min>
+68 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
 
-69 L<nws|/nws>
+69 L<min|/min>
 
-70 L<pad|/pad>
+70 L<nws|/nws>
 
-71 L<parseCommandLineArguments|/parseCommandLineArguments>
+71 L<pad|/pad>
 
-72 L<parseFileName|/parseFileName>
+72 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-73 L<perlPackage|/perlPackage>
+73 L<parseFileName|/parseFileName>
 
-74 L<powerOfTwo|/powerOfTwo>
+74 L<perlPackage|/perlPackage>
 
-75 L<powerOfTwoX|/powerOfTwo>
+75 L<powerOfTwo|/powerOfTwo>
 
-76 L<printFullFileName|/printFullFileName>
+76 L<powerOfTwoX|/powerOfTwo>
 
-77 L<printQw|/printQw>
+77 L<printFullFileName|/printFullFileName>
 
-78 L<quoteFile|/quoteFile>
+78 L<printQw|/printQw>
 
-79 L<readBinaryFile|/readBinaryFile>
+79 L<quoteFile|/quoteFile>
 
-80 L<readFile|/readFile>
+80 L<readBinaryFile|/readBinaryFile>
 
-81 L<removeFilePrefix|/removeFilePrefix>
+81 L<readFile|/readFile>
 
-82 L<renormalizeFolderName|/renormalizeFolderName>
+82 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs>
 
-83 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+83 L<removeFilePrefix|/removeFilePrefix>
 
-84 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
+84 L<renormalizeFolderName|/renormalizeFolderName>
 
-85 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
+85 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-86 L<temporaryDirectory|/temporaryDirectory>
+86 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-87 L<temporaryFile|/temporaryFile>
+87 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-88 L<temporaryFolder|/temporaryFolder>
+88 L<temporaryDirectory|/temporaryDirectory>
 
-89 L<timeStamp|/timeStamp>
+89 L<temporaryFile|/temporaryFile>
 
-90 L<trackFiles|/trackFiles>
+90 L<temporaryFolder|/temporaryFolder>
 
-91 L<trim|/trim>
+91 L<timeStamp|/timeStamp>
 
-92 L<updateDocumentation|/updateDocumentation>
+92 L<trackFiles|/trackFiles>
 
-93 L<userId|/userId>
+93 L<trim|/trim>
 
-94 L<versionCode|/versionCode>
+94 L<updateDocumentation|/updateDocumentation>
 
-95 L<writeBinaryFile|/writeBinaryFile>
+95 L<userId|/userId>
 
-96 L<writeFile|/writeFile>
+96 L<versionCode|/versionCode>
 
-97 L<writeFiles|/writeFiles>
+97 L<writeBinaryFile|/writeBinaryFile>
 
-98 L<xxx|/xxx>
+98 L<writeFile|/writeFile>
 
-99 L<yyy|/yyy>
+99 L<writeFiles|/writeFiles>
 
-100 L<zzz|/zzz>
+100 L<xxx|/xxx>
+
+101 L<yyy|/yyy>
+
+102 L<zzz|/zzz>
 
 =head1 Installation
 
@@ -2749,7 +2842,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 146;
+use Test::More tests => 234;
 
 #Test::More->builder->output("/dev/null");
 my $windows = $^O =~ m(MSWin32)is;
@@ -2813,7 +2906,7 @@ if (1)                                                                          
   is_deeply [parseFileName "phil/"],                [qw(phil/)];
   is_deeply [parseFileName "/var/www/html/translations/"], [qw(/var/www/html/translations/)];
  }
-  
+
 if (1)                                                                          # Unicode
  {use utf8;
   my $z = "𝝰 𝝱 𝝲";
@@ -3234,3 +3327,95 @@ if (1)
   ok $d eq firstFileThatExists($d);
   ok $d eq firstFileThatExists("$d/$d", $d);
  }
+
+# Relative and absolute files
+ok "../../../"              eq relFromAbsAgainstAbs("/",                    "/home/la/perl/bbb.pl");
+ok "../../../home"          eq relFromAbsAgainstAbs("/home",                "/home/la/perl/bbb.pl");
+ok "../../"                 eq relFromAbsAgainstAbs("/home/",               "/home/la/perl/bbb.pl");
+ok "aaa.pl"                 eq relFromAbsAgainstAbs("/home/la/perl/aaa.pl", "/home/la/perl/bbb.pl");
+ok "aaa"                    eq relFromAbsAgainstAbs("/home/la/perl/aaa",    "/home/la/perl/bbb.pl");
+ok "./"                     eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/la/perl/bbb.pl");
+ok "aaa.pl"                 eq relFromAbsAgainstAbs("/home/la/perl/aaa.pl", "/home/la/perl/bbb");
+ok "aaa"                    eq relFromAbsAgainstAbs("/home/la/perl/aaa",    "/home/la/perl/bbb");
+ok "./"                     eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/la/perl/bbb");
+ok "../java/aaa.jv"         eq relFromAbsAgainstAbs("/home/la/java/aaa.jv", "/home/la/perl/bbb.pl");
+ok "../java/aaa"            eq relFromAbsAgainstAbs("/home/la/java/aaa",    "/home/la/perl/bbb.pl");
+ok "../java/"               eq relFromAbsAgainstAbs("/home/la/java/",       "/home/la/perl/bbb.pl");
+ok "../../la/perl/aaa.pl"   eq relFromAbsAgainstAbs("/home/la/perl/aaa.pl", "/home/il/perl/bbb.pl");
+ok "../../la/perl/aaa"      eq relFromAbsAgainstAbs("/home/la/perl/aaa",    "/home/il/perl/bbb.pl");
+ok "../../la/perl/"         eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/il/perl/bbb.pl");
+ok "../../la/perl/aaa.pl"   eq relFromAbsAgainstAbs("/home/la/perl/aaa.pl", "/home/il/perl/bbb");
+ok "../../la/perl/aaa"      eq relFromAbsAgainstAbs("/home/la/perl/aaa",    "/home/il/perl/bbb");
+ok "../../la/perl/"         eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/il/perl/bbb");
+ok "../../la/perl/"         eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/il/perl/bbb");
+ok "../../la/perl/aaa"      eq relFromAbsAgainstAbs("/home/la/perl/aaa",    "/home/il/perl/");
+ok "../../la/perl/"         eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/il/perl/");
+ok "../../la/perl/"         eq relFromAbsAgainstAbs("/home/la/perl/",       "/home/il/perl/");
+ok "home/la/perl/bbb.pl"    eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/");
+ok "../home/la/perl/bbb.pl" eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home");
+ok "la/perl/bbb.pl"         eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/");
+ok "bbb.pl"                 eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/perl/aaa.pl");
+ok "bbb.pl"                 eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/perl/aaa");
+ok "bbb.pl"                 eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/perl/");
+ok "bbb"                    eq relFromAbsAgainstAbs("/home/la/perl/bbb",    "/home/la/perl/aaa.pl");
+ok "bbb"                    eq relFromAbsAgainstAbs("/home/la/perl/bbb",    "/home/la/perl/aaa");
+ok "bbb"                    eq relFromAbsAgainstAbs("/home/la/perl/bbb",    "/home/la/perl/");
+ok "../perl/bbb.pl"         eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/java/aaa.jv");
+ok "../perl/bbb.pl"         eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/java/aaa");
+ok "../perl/bbb.pl"         eq relFromAbsAgainstAbs("/home/la/perl/bbb.pl", "/home/la/java/");
+ok "../../il/perl/bbb.pl"   eq relFromAbsAgainstAbs("/home/il/perl/bbb.pl", "/home/la/perl/aaa.pl");
+ok "../../il/perl/bbb.pl"   eq relFromAbsAgainstAbs("/home/il/perl/bbb.pl", "/home/la/perl/aaa");
+ok "../../il/perl/bbb.pl"   eq relFromAbsAgainstAbs("/home/il/perl/bbb.pl", "/home/la/perl/");
+ok "../../il/perl/bbb"      eq relFromAbsAgainstAbs("/home/il/perl/bbb",    "/home/la/perl/aaa.pl");
+ok "../../il/perl/bbb"      eq relFromAbsAgainstAbs("/home/il/perl/bbb",    "/home/la/perl/aaa");
+ok "../../il/perl/bbb"      eq relFromAbsAgainstAbs("/home/il/perl/bbb",    "/home/la/perl/");
+ok "../../il/perl/bbb"      eq relFromAbsAgainstAbs("/home/il/perl/bbb",    "/home/la/perl/");
+ok "../../il/perl/"         eq relFromAbsAgainstAbs("/home/il/perl/",       "/home/la/perl/aaa");
+ok "../../il/perl/"         eq relFromAbsAgainstAbs("/home/il/perl/",       "/home/la/perl/");
+ok "../../il/perl/"         eq relFromAbsAgainstAbs("/home/il/perl/",       "/home/la/perl/");
+
+ok "/"                      eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../../..");
+ok "/home"                  eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../../../home");
+ok "/home/"                 eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../..");
+ok "/home/la/perl/aaa.pl"   eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "aaa.pl");
+ok "/home/la/perl/aaa"      eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "aaa");
+ok "/home/la/perl/"         eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "");
+ok "/home/la/perl/aaa.pl"   eq absFromAbsPlusRel("/home/la/perl/bbb",      "aaa.pl");
+ok "/home/la/perl/aaa"      eq absFromAbsPlusRel("/home/la/perl/bbb",      "aaa");
+ok "/home/la/perl/"         eq absFromAbsPlusRel("/home/la/perl/bbb",      "");
+ok "/home/la/java/aaa.jv"   eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../java/aaa.jv");
+ok "/home/la/java/aaa"      eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../java/aaa");
+ok "/home/la/java"          eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../java");
+ok "/home/la/java/"         eq absFromAbsPlusRel("/home/la/perl/bbb.pl",   "../java/");
+ok "/home/la/perl/aaa.pl"   eq absFromAbsPlusRel("/home/il/perl/bbb.pl",   "../../la/perl/aaa.pl");
+ok "/home/la/perl/aaa"      eq absFromAbsPlusRel("/home/il/perl/bbb.pl",   "../../la/perl/aaa");
+ok "/home/la/perl"          eq absFromAbsPlusRel("/home/il/perl/bbb.pl",   "../../la/perl");
+ok "/home/la/perl/"         eq absFromAbsPlusRel("/home/il/perl/bbb.pl",   "../../la/perl/");
+ok "/home/la/perl/aaa.pl"   eq absFromAbsPlusRel("/home/il/perl/bbb",      "../../la/perl/aaa.pl");
+ok "/home/la/perl/aaa"      eq absFromAbsPlusRel("/home/il/perl/bbb",      "../../la/perl/aaa");
+ok "/home/la/perl"          eq absFromAbsPlusRel("/home/il/perl/bbb",      "../../la/perl");
+ok "/home/la/perl/"         eq absFromAbsPlusRel("/home/il/perl/bbb",      "../../la/perl/");
+ok "/home/la/perl/aaa"      eq absFromAbsPlusRel("/home/il/perl/",         "../../la/perl/aaa");
+ok "/home/la/perl"          eq absFromAbsPlusRel("/home/il/perl/",         "../../la/perl");
+ok "/home/la/perl/"         eq absFromAbsPlusRel("/home/il/perl/",         "../../la/perl/");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/",                      "home/la/perl/bbb.pl");
+#ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home",                  "../home/la/perl/bbb.pl");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/",                 "la/perl/bbb.pl");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/perl/aaa.pl",   "bbb.pl");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/perl/aaa",      "bbb.pl");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/perl/",         "bbb.pl");
+ok "/home/la/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/aaa.pl",   "bbb");
+ok "/home/la/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/aaa",      "bbb");
+ok "/home/la/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "bbb");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/java/aaa.jv",   "../perl/bbb.pl");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/java/aaa",      "../perl/bbb.pl");
+ok "/home/la/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/java/",         "../perl/bbb.pl");
+ok "/home/il/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/perl/aaa.pl",   "../../il/perl/bbb.pl");
+ok "/home/il/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl/bbb.pl");
+ok "/home/il/perl/bbb.pl"   eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/bbb.pl");
+ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/aaa.pl",   "../../il/perl/bbb");
+ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl/bbb");
+ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/bbb");
+ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/bbb");
+ok "/home/il/perl"         eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl");
+ok "/home/il/perl/"         eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/");

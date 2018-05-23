@@ -219,16 +219,16 @@ backend for an HTTP session.
 
 Starch is meant to be as fast as possible while still being flexible.
 Due to Starch avoiding dependencies, and having zero non-core XS dependencies,
-there are still same areas which could be slightly faster.  At this time there
+there are still some areas which could be slightly faster.  At this time there
 is one plugin which will provide a small performance gain L<Starch::Plugin::Sereal>.
 Even then, the gain using this plugin will be in the order of a fraction of a
 millisecond per each HTTP request.
 
-Starch has gone through the wringer performance wise and there just are
-not many performance gains to be eked out of Starch.  Instead you'll
+Starch has gone through the wringer with respect to performance and there just are
+not many performance gains to be eked out of Starch.  Instead, you'll
 likely find that your time in Starch is primarily spent in your store.
 So, when setting up Starch, picking a store is the most important
-decision you can make performance wise.
+decision you can make with respect to performance.
 
 =head1 STORES
 
@@ -324,6 +324,10 @@ L<Starch::Plugin::Trace>
 These plugins are distributed separately on CPAN:
 
 =over
+
+=item *
+
+L<Starch::Plugin::Net::Statsd>
 
 =item *
 

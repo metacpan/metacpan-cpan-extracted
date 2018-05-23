@@ -1,0 +1,79 @@
+{
+   "abstract" : "create DBIC scheme for MySQL workbench .mwb files",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MySQL-Workbench-DBIC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::Spec" : "3.40",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Moo" : "1.003001",
+            "MySQL::Workbench::Parser" : "1.00",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "FindBin" : "0",
+            "Test::LongString" : "0.16"
+         }
+      }
+   },
+   "provides" : {
+      "MySQL::Workbench::DBIC" : {
+         "file" : "lib/MySQL/Workbench/DBIC.pm",
+         "version" : "1.00"
+      },
+      "MySQL::Workbench::DBIC::FakeDBIC" : {
+         "file" : "lib/MySQL/Workbench/DBIC/FakeDBIC.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC/issues"
+      },
+      "homepage" : "http://github.com/reneeb/MySQL-Workbench-DBIC",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/MySQL-Workbench-DBIC.git",
+         "web" : "http://github.com/reneeb/MySQL-Workbench-DBIC"
+      }
+   },
+   "version" : "1.00",
+   "x_contributors" : [
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

@@ -1,5 +1,5 @@
-package # Hide from the indexer for now until docs are added later.
-    MooseX::BuildArgs::Meta::ToClass;
+package MooseX::BuildArgs::Meta::ToClass;
+$MooseX::BuildArgs::Meta::ToClass::VERSION = '0.05';
 use Moose::Role;
 
 around apply => sub {

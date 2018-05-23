@@ -1,3 +1,7 @@
+0.19 2018-05-17
+        - Upgrade dependency to recent version of XML::Loy
+          to be compatible with recent version of Mojolicious.
+
 0.18 2017-04-09
         - Removed deprecated is_status_class() method.
 

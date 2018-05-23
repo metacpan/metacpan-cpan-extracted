@@ -1,9 +1,36 @@
-package Exception::DBManager::Grammar;
-$Exception::DBManager::Grammar::VERSION = '0.019';
-use base qw(Exception);
+
+=encoding utf8
+
+=head1 Name
+
+QBit::Application::Model::DBManager - Class for smart working with DB.
+
+=head1 GitHub
+
+https://github.com/QBitFramework/QBit-Application-Model-DBManager
+
+=head1 Install
+
+=over
+
+=item *
+
+cpanm QBit::Application::Model::DBManager
+
+=item *
+
+apt-get install libqbit-application-model-dbmanager-perl (http://perlhub.ru/)
+
+=back
+
+For more information. please, see code.
+
+=head1 Package methods
+
+=cut
 
 package QBit::Application::Model::DBManager;
-$QBit::Application::Model::DBManager::VERSION = '0.019';
+$QBit::Application::Model::DBManager::VERSION = '0.020';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -13,15 +40,228 @@ use QBit::Application::Model::DBManager::Filter;
 
 use Parse::Eyapp;
 
+use Exception::DBManager::Grammar;
+
 __PACKAGE__->abstract_methods(qw(query add));
+
+=head2 init
+
+Initialization model.
+
+B<It is done:>
+
+=over
+
+=item
+
+Init fields
+
+=back
+
+B<No arguments.>
+
+B<Example:>
+
+  my $model = Application::Model->new(); # Application::Model based on QBit::Application::Model
+
+  # but usually this is used so
+
+  package Application;
+
+  use base qw(QBit::Application);
+
+  __Package__->set_accessors(model => {package => 'Application::Model'});
+
+  ...
+
+  # after
+
+  my $model = $app->model;
+
+=cut
+
+sub init {
+    my ($self) = @_;
+
+    $self->SUPER::init();
+
+    $self->init_fields();
+}
+
+=head2 model_fields
+
+Set model fields. Save into package stash with key __MODEL_FIELDS__
+
+B<Arguments:>
+
+=over
+
+=item *
+
+B<%fields> - Fields (type: hash)
+
+=back
+
+B<Example:>
+
+  package Sellers;
+
+  use base qw(QBit::Application::Model::DBManager);
+
+  __PACKAGE__->model_accessors(
+      db    => 'Application::Model::DB',    # your DB model, see QBit::Application::Model::DB
+      items => 'Application::Model::Items', # your model (base from QBit::Application::Model::DBManager)
+  );
+
+  __PACKAGE__->model_fields(
+      id => {
+          pk      => TRUE,      # primary key for this model
+          db      => 'sellers', # this field is from the table
+          default => TRUE,      # this field returns if fields were not requested
+      },
+      caption => {
+          db           => 'sellers', # this field is from the table
+          default      => TRUE,      # this field returns if fields were not requested
+          i18n         => TRUE,      # this field depends on current locale, (in DB this field i18n too)
+          check_rights => 'sellers_view_field__caption',
+          # your right for "caption", see check_rights from QBit::Application
+          # Try not to use this key.
+      },
+      id_with_caption => {
+          depends_on => [qw(id caption)], # this field depends on "id" and "caption"
+          get => sub {
+              my $fields = shift; # object QBit::Application::Model::DBManager::_Utils::Fields
+              # access to model: $fields->model
+
+              my $row = shift; # hash from db: {id => 1, caption => 'Happy Milkman'}
+
+              return $row->{'id'} . ': ' . $row->{'caption'};
+          }
+      },
+      id_with_caption_db => {
+          db => 'sellers',
+          db_expr => {CONCAT => ['id', \': ', 'caption']}, # see QBit::Application::Model::DB::Query
+      },
+      name => {
+          # relation "one to one". Use it if you want use join
+          db => 'users', # this field is from the table, but the tables are different
+      },
+      items => {
+          # relation "one to one", "one to many" or "many to many"
+          depends_on => [qw(id)],
+          get => sub {
+              my $fields = shift; # object QBit::Application::Model::DBManager::_Utils::Fields
+              my $row = shift; # hash from db: {id => 1}
+
+              # $fields->{'__ITEMS__'} created in pre_process_fields
+              return $fields->{'__ITEMS__'}{$row->{'id'}} // [];
+          }
+      }
+  );
+
+  # returns query (class: QBit::Application::Model::DB::Query)
+  sub query {
+      my ($self, %opts) = @_;
+
+      my $filter = $self->db->filter($opts{'filter'});
+
+      unless ($self->check_rights('sellers_view_all')) {
+          my $cur_user = $self->cur_user();
+
+          $filter->and({user_id => $cur_user->{'id'}};
+      }
+
+      my $query = $self->db->query->select(
+          table  => $self->db->sellers,
+          fields => $opts{'fields'}->get_db_fields('sellers'), # returns db expression for fields with "db" = 'sellers'
+          filter => $filter
+      );
+
+      my $users_fields = $opts{'fields'}->get_db_fields('users');
+
+      # join users only if needed (field "name" was requested)
+      $query->join(
+          table  => $self->db->users,
+          fields => $users_fields,
+      ) if %$users_fields;
+
+      return $query;
+  }
+
+  # used for dictionaries
+  sub pre_process_fields {
+      my $self   = shift; # model
+      my $fields = shift; # object QBit::Application::Model::DBManager::_Utils::Fields
+      my $result = shift; # data from db
+
+      if ($fields->need('items')) {
+          # gets items only if needed (field "items" was requested)
+
+          my $items = $self->items->get_all(
+              fields => [qw(id seller_id caption)],
+              filter => {seller_id => [map {$_->{'id'}} @$result]}, # key "id" exists because fields "items" depends on "id"
+          );
+
+          # create dictionaries {<SELLER_ID> => <ITEM>}
+          $fields->{'__ITEMS__'} = {map {$_->{'seller_id'} => $_} @$items};
+      }
+  }
+
+  TRUE;
+
+  # in your code
+
+  my $sellers = $app->sellers->get_all(fields => [qw(id id_with_caption_db name items)]);
+
+  #$sellers = [
+  #    {
+  #        id => 1,
+  #        id_with_caption_db => '1: Happy Milkman',
+  #        name  => 'Petr Ivanovich',
+  #        items => [
+  #            {
+  #                id        => 1,
+  #                seller_id => 1,
+  #                caption   => 'milk'
+  #            },
+  #            {
+  #                id        => 2,
+  #                seller_id => 1,
+  #                caption   => 'cheese'
+  #            },
+  #        ],
+  #    }
+  #]
+
+=cut
 
 sub model_fields {
     my ($class, %fields) = @_;
 
-    my $fields = \%fields;
-    my $inited_fields;
+    package_stash($class)->{'__MODEL_FIELDS__'} = \%fields;
+}
 
-    package_stash($class)->{'__MODEL_FIELDS__'} = $fields;
+=head2 init_fields
+
+Initialization fields. Used after calling B<model_fields> in run time a code
+
+B<No arguments.>
+
+B<Example:>
+
+  $model->model_fields(...);
+  $model->init_fields();
+
+=cut
+
+sub init_fields {
+    my ($self) = @_;
+
+    my $class = ref($self) || $self;
+
+    my $fields = package_stash($class)->{'__MODEL_FIELDS__'};
+
+    my $inited_fields;
 
     package_stash($class)->{'__MODEL_FIELDS_INITIALIZED__'} = $inited_fields =
       QBit::Application::Model::DBManager::_Utils::Fields->init_fields($fields);
@@ -29,6 +269,108 @@ sub model_fields {
     package_stash($class)->{'__MODEL_FIELDS_SORT_ORDERS__'} =
       QBit::Application::Model::DBManager::_Utils::Fields->init_field_sort($inited_fields);
 }
+
+=head2 model_filter
+
+Set model filters. Save into package stash with key __DB_FILTER__
+
+B<Types:> namespace (QBit::Application::Model::DBManager::Filter)
+
+=over
+
+=item
+
+boolean
+
+=item
+
+dictionary
+
+=item
+
+multistate
+
+=item
+
+number
+
+=item
+
+subfilter
+
+=item
+
+text
+
+=back
+
+B<Arguments:>
+
+=over
+
+=item *
+
+B<%opts> - Options (type: hash)
+
+=over
+
+=item
+
+db_accessor - name db accessor
+
+=item
+
+fields - filter fields
+
+=back
+
+=back
+
+B<Example:>
+
+  __PACKAGE__->model_filter(
+      db_accessor => 'db', # your db accessor
+      fields      => {
+          id      => {type => 'number'},
+          caption => {type => 'text'},
+          active  => {type => 'boolean'},
+          product => {
+              type   => 'dictionary',
+              values => sub {
+                  [
+                      {id => 1, label => gettext('Milk')},
+                      {id => 2, label => gettext('Cheese')},
+                  ];
+              },
+          }
+          multistate => {type => 'multistate'},
+          # you can filtered by field from other model
+          user       => {
+              type           => 'subfilter',
+              model_accessor => 'users',   # accessor related model
+              field          => 'user_id', # field from this model
+              fk_field       => 'id',      # field from model "users"
+          },
+      },
+  );
+
+  # in your code
+
+  my $items = $app->model->get_all(
+      filter => [
+          'OR',
+          [
+              ['id',      '=',    1],
+              ['caption', 'LIKE', 'Nike'],
+              ['active',  '=',    1],
+              ['product', '=', [1, 2]],
+              ['multistate', '=', 'approved and working'],
+              ['user', 'MATCH', ['login', '=', 'ChuckNorris']] # login is a filter in model "users"
+          ]
+      ]
+  );
+
+=cut
 
 sub model_filter {
     my ($class, %opts) = @_;
@@ -42,6 +384,20 @@ sub model_filter {
       unless $class->can($pkg_stash->{'__DB_FILTER_DBACCESSOR__'});
 
 }
+
+=head2 get_model_fields
+
+Returns a model fields.
+
+B<No arguments.>
+
+B<Return value:> $model_fields (type: ref of a hash)
+
+B<Example:>
+
+  my $model_fields = $app->model->get_model_fields(); # getter for method "model_fields"
+
+=cut
 
 sub get_model_fields {
     my ($self) = @_;
@@ -113,6 +469,136 @@ sub get_db_filter_simple_fields {
     return \@res;
 }
 
+=head2 get_all
+
+Returns model items.
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<%opts> - Options (type: hash)
+
+=over
+
+=item
+
+fields
+
+  returns "id" and "caption"
+  my $data = $app->model->get_all(fields => [qw(id caption)]);
+
+  # returns fields with key "default"
+  my $data = $app->model->get_all();
+
+  # return all fields
+  my $data = $app->model->get_all(fields => ['*']);
+
+=item
+
+filter - see QBit::Application::Model::DB::Query. Unlike filters from the database, model filters can not use field names and scalars are used without reference.
+
+  # mysql: name = caption
+  # db:    ['name', '=', 'caption']
+  # model: no way
+
+  # mysql: id = 12
+  # db:    ['id', '=', \12]
+  # model: ['id', '=', 12]
+
+  my $data = $app->model->get_all(filter => {id => 1});
+
+=item
+
+distinct - unique rows from table
+
+  my $data = $app->model->get_all(fields => [qw(caption)], distinct => TRUE);
+
+=item
+
+for_update - get lock
+
+  # get
+  my $data = $app->model->get_all(fields => [qw(id)], filter => ["caption", "LIKE", "milk"]}, for_update => TRUE);
+
+  # update
+  $app->db->table->edit($app->db->filter({id => [map {$_->{'id'}} @$data]}), {caption => 'Milk'});
+
+=item
+
+order_by - set order
+
+  my $data = $app->model->get_all(
+      fields => [qw(caption)],
+      order_by => [
+          'caption', # asc
+          [
+            'price', # field
+            1        # order: 0 - asc, 1 - desc
+          ]
+      ]
+  );
+
+=item
+
+limit
+
+  my $data = $app->model->get_all(limit => 100);
+
+=item
+
+offset
+
+  my $data = $app->model->get_all(limit => 100, offset => 1000);
+
+=item
+
+calc_rows
+
+  my $data = $app->model->get_all(limit => 100, calc_rows => TRUE);
+
+  my $all_data = $app->model->found_rows(); # 1_000_000
+
+=item
+
+all_locales
+
+  my $data = $app->model->get_all(fields => [qw(id caption)], all_locales => TRUE);
+
+  #$data = [
+  #    {
+  #        id      => 1,
+  #        caption => {
+  #            ru => 'Веселый молочник',
+  #            en => 'Happy Milkman',
+  #        },
+  #    },
+  #    ...
+  #]
+
+=back
+
+=back
+
+B<Return value:> Data (type: ref of a array)
+
+B<Example:>
+
+  my $data = $app->model->get_all(
+      fields => [qw(id caption)],
+      filter => ['OR', [
+        ['id', '=', 10],
+        ['caption', '=', 'milk']
+      ]],
+      limit    => 100,
+      offset   => 10_000,
+      order_by => ['caption']
+  );
+
+=cut
+
 sub get_all {
     my ($self, %opts) = @_;
 
@@ -170,11 +656,48 @@ sub get_all {
     return $result;
 }
 
+=head2 found_rows
+
+Returns count of a rows.
+
+B<No arguments.>
+
+B<Return value:> $found_rows (type: scalar or undef)
+
+B<Example:>
+
+  my $data = $app->model->get_all(limit => 3, calc_rows => TRUE);
+
+  my $found_rows = $app->model->found_rows();
+
+=cut
+
 sub found_rows {
     my ($self) = @_;
 
     return $self->{'__FOUND_ROWS__'};
 }
+
+=head2 last_fields
+
+Returns a last fields was requested.
+
+B<No arguments.>
+
+B<Return value:> $last_fields (type: scalar or undef)
+
+B<Example:>
+
+  my $data = $app->model->get_all(fields => [qw(id caption)]);
+
+  my $last_fields = $app->model->last_fields();
+
+  # $last_fields = {
+  #     id      => '',
+  #     caption => '',
+  # };
+
+=cut
 
 sub last_fields {
     my ($self) = @_;
@@ -200,6 +723,35 @@ sub get_all_with_meta {
     };
 }
 
+=head2 get
+
+Returns row by primary key.
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<$pk> - primary key (type: scalar or hash)
+
+=item
+
+B<%opts> - options (type: hash; see get_all)
+
+=back
+
+B<Return value:> Row (type: ref of a hash or undef)
+
+B<Example:>
+
+  my $item = $app->model->get(1, fields => [qw(id caption)]);
+
+  # or
+  my $item = $app->model->get({id => 1}, fields => [qw(id caption)]);
+
+=cut
+
 sub get {
     my ($self, $pk, %opts) = @_;
 
@@ -214,6 +766,20 @@ sub get {
 
     return $self->get_all(%opts, filter => [AND => [map {[$_ => '=' => $pk->{$_}]} @$pk_fields]])->[0];
 }
+
+=head2 get_pk_fields
+
+Returns primary keys.
+
+B<No arguments.>
+
+B<Return value:> fields (type: ref of a array)
+
+B<Example:>
+
+  my $pk = $app->model->get_pk_fields(); # ['id']
+
+=cut
 
 sub get_pk_fields {
     my ($self) = @_;
@@ -230,6 +796,21 @@ sub get_db_filter {
 
     return ref($data) ? $self->_get_db_filter_from_data($data, %opts) : $self->_get_db_filter_from_text($data, %opts);
 }
+
+=head2 pre_process_fields
+
+used for dictionaries.
+
+B<No arguments.>
+
+B<Return value:> undef
+
+B<Example:>
+
+  # see method: model_fields
+  $app->model->pre_process_fields();
+
+=cut
 
 sub pre_process_fields { }
 
@@ -268,7 +849,8 @@ sub _get_db_filter_from_data {
           unless in_array(uc($data->[0]), [qw(OR AND)]);
 
         return ($opts{'type'} || '') eq 'text'
-          ? '(' . join(' ' . uc($data->[0]) . ' ', map {$self->_get_db_filter_from_data($_, %opts)} @{$data->[1]}) . ')'
+          ? '('
+          . join(' ' . uc($data->[0]) . ' ', map {$self->_get_db_filter_from_data($_, %opts)} @{$data->[1]}) . ')'
           : $self->_db()
           ->filter([uc($data->[0]) => [map {$self->_get_db_filter_from_data($_, %opts)->expression()} @{$data->[1]}]]);
     } elsif (ref($data) eq 'ARRAY' && @$data == 3) {
@@ -434,33 +1016,3 @@ sub _grammar_expr {
 }
 
 TRUE;
-
-__END__
-
-=encoding utf8
-
-=head1 Name
- 
-QBit::Application::Model::DBManager - Class for smart working with DB.
- 
-=head1 GitHub
-
-https://github.com/QBitFramework/QBit-Application-Model-DBManager
-
-=head1 Install
-
-=over
- 
-=item *
-
-cpanm QBit::Application::Model::DBManager
-
-=item *
-
-apt-get install libqbit-application-model-dbmanager-perl (http://perlhub.ru/)
-
-=back
-
-For more information. please, see code.
-
-=cut

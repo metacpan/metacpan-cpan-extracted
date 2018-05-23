@@ -2,8 +2,6 @@ package Net::Statsd::Lite;
 
 # ABSTRACT: A lightweight StatsD client that supports multimetric packets
 
-# RECOMMEND PREREQ: Type::Tiny::XS
-
 use v5.10;
 
 use Moo 1.000000;
@@ -18,7 +16,7 @@ use Net::Statsd::Lite::Types -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 has host => (
@@ -214,7 +212,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =head1 SYNOPSIS
 
@@ -393,7 +391,7 @@ is any data in the buffer.
 =head1 STRICT MODE
 
 If this module is first loaded in C<STRICT> mode, then the values and
-rate arguments will be checked that thet are the correct type.
+rate arguments will be checked that they are the correct type.
 
 See L<Devel::StrictMode> for more information.
 

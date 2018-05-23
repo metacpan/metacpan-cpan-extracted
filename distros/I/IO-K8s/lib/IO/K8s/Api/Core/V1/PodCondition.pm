@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::PodCondition;
   use Moose;
+  use IO::K8s;
 
   has 'lastProbeTime' => (is => 'ro', isa => 'Str'  );
   has 'lastTransitionTime' => (is => 'ro', isa => 'Str'  );
@@ -7,4 +8,6 @@ package IO::K8s::Api::Core::V1::PodCondition;
   has 'reason' => (is => 'ro', isa => 'Str'  );
   has 'status' => (is => 'ro', isa => 'Str'  );
   has 'type' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

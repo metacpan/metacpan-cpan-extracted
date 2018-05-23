@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 How to read the documentation
 
@@ -42,7 +42,7 @@ This tutorial.
 =back
 
 A separate tutorial for the historical interfaces L<Lab::Instrument> and
-L<Lab::XPRESS> is provided in L<Lab::Measurement::OldTutorial>. These
+L<Lab::XPRESS> is provided in L<Lab::Measurement::Legacy::Tutorial>. These
 interfaces as well as the tutorial are not updated anymore, and included for
 compatibility with existing measurement scripts. They will be removed with
 Lab::Measurement release 4.
@@ -574,6 +574,18 @@ C<hard_copy> option:
      x         => 'voltage',
      y         => 'current',
      hard_copy => 'data.png',
+ );
+
+The C<hard_copy> attribute is mandatory if you add multiple plots to one datafile.
+
+=head3 Multiple curves per plot
+
+We can draw multiple curves in a single plot window:
+
+ $datafile->add_plot(
+     curves => [{x => 'voltage', y => 'current1'}, {x => 'voltage', y =>
+     'current2'}],
+     hard_copy_ => 'data.png'
  );
 
 =head3 Color maps (3D plots)

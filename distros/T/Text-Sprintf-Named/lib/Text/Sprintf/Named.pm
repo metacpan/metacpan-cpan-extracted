@@ -1,5 +1,5 @@
 package Text::Sprintf::Named;
-
+$Text::Sprintf::Named::VERSION = '0.0403';
 use warnings;
 use strict;
 
@@ -14,61 +14,6 @@ use vars qw(@EXPORT_OK);
 
 @EXPORT_OK = (qw( named_sprintf ));
 
-=encoding utf8
-
-=head1 NAME
-
-Text::Sprintf::Named - sprintf-like function with named conversions
-
-=head1 VERSION
-
-Version 0.0402
-
-=cut
-
-our $VERSION = '0.0402';
-
-=head1 SYNOPSIS
-
-    use Text::Sprintf::Named;
-
-    my $formatter =
-        Text::Sprintf::Named->new(
-            {fmt => "Hello %(name)s! Today is %(day)s!"}
-        );
-
-    # Returns "Hello Ayeleth! Today is Sunday!"
-    $formatter->format({args => {'name' => "Ayeleth", 'day' => "Sunday"}});
-
-    # Returns "Hello John! Today is Thursday!"
-    $formatter->format({args => {'name' => "John", 'day' => "Thursday"}});
-
-    # Or alternatively using the non-OOP interface:
-
-    use Text::Sprintf::Named qw(named_sprintf);
-
-    # Prints "Hello Sophie!" (and a newline).
-    print named_sprintf("Hello %(name)s!\n", { name => 'Sophie' });
-
-    # Same, but with a flattened parameter list (not inside a hash reference)
-    print named_sprintf("Hello %(name)s!\n", name => 'Sophie');
-
-=head1 DESCRIPTION
-
-Text::Sprintf::Named provides a sprintf equivalent with named conversions.
-Named conversions are sprintf field specifiers (like C<"%s"> or C<"%4d>")
-only they are associated with the key of an associative array of
-parameters. So for example C<"%(name)s"> will emit the C<'name'> parameter
-as a string, and C<"%(num)4d"> will emit the C<'num'> parameter
-as a variable with a width of 4.
-
-=head1 FUNCTIONS
-
-=head2 my $formatter = Text::Sprintf::Named->new({fmt => $format})
-
-Creates a new object which formats according to the C<$format> format.
-
-=cut
 
 sub new
 {
@@ -105,12 +50,6 @@ sub _fmt
     return $self->{_fmt};
 }
 
-=head2 $formatter->format({args => \%bindings})
-
-Returns the formatting string as formatted using the named parameters
-pointed to by the C<args> parameter.
-
-=cut
 
 sub format
 {
@@ -140,28 +79,6 @@ sub format
     return $format;
 }
 
-=head2 $self->calc_param({%args})
-
-This method is used to calculate the parameter for the conversion. It
-can be over-rided by subclasses so it will behave differently. An example
-can be found in C<t/02-override-param-retrieval.t> where it is used to
-call the accessors of an object for values.
-
-%args contains:
-
-=over 4
-
-=item * named_params
-
-The named paramters.
-
-=item * name
-
-The name of the conversion.
-
-=back
-
-=cut
 
 sub calc_param
 {
@@ -197,15 +114,6 @@ sub _sprintf
     return sprintf($format, @args);
 }
 
-=head2 named_sprintf($format, {%parameters})
-
-=head2 named_sprintf($format, %parameters)
-
-This is a convenience function to directly format a string with the named
-parameters, which can be specified inside a (non-blessed) hash reference or
-as a flattened hash. See the synopsis for an example.
-
-=cut
 
 sub named_sprintf
 {
@@ -229,6 +137,101 @@ sub named_sprintf
         Text::Sprintf::Named->new({ fmt => $format})
                             ->format({args => $params});
 }
+
+
+1; # End of Text::Sprintf::Named
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Text::Sprintf::Named - sprintf-like function with named conversions
+
+=head1 VERSION
+
+version 0.0403
+
+=head1 SYNOPSIS
+
+    use Text::Sprintf::Named;
+
+    my $formatter =
+        Text::Sprintf::Named->new(
+            {fmt => "Hello %(name)s! Today is %(day)s!"}
+        );
+
+    # Returns "Hello Ayeleth! Today is Sunday!"
+    $formatter->format({args => {'name' => "Ayeleth", 'day' => "Sunday"}});
+
+    # Returns "Hello John! Today is Thursday!"
+    $formatter->format({args => {'name' => "John", 'day' => "Thursday"}});
+
+    # Or alternatively using the non-OOP interface:
+
+    use Text::Sprintf::Named qw(named_sprintf);
+
+    # Prints "Hello Sophie!" (and a newline).
+    print named_sprintf("Hello %(name)s!\n", { name => 'Sophie' });
+
+    # Same, but with a flattened parameter list (not inside a hash reference)
+    print named_sprintf("Hello %(name)s!\n", name => 'Sophie');
+
+=head1 DESCRIPTION
+
+Text::Sprintf::Named provides a sprintf equivalent with named conversions.
+Named conversions are sprintf field specifiers (like C<"%s"> or C<"%4d>")
+only they are associated with the key of an associative array of
+parameters. So for example C<"%(name)s"> will emit the C<'name'> parameter
+as a string, and C<"%(num)4d"> will emit the C<'num'> parameter
+as a variable with a width of 4.
+
+=head1 VERSION
+
+version 0.0403
+
+=head1 FUNCTIONS
+
+=head2 my $formatter = Text::Sprintf::Named->new({fmt => $format})
+
+Creates a new object which formats according to the C<$format> format.
+
+=head2 $formatter->format({args => \%bindings})
+
+Returns the formatting string as formatted using the named parameters
+pointed to by the C<args> parameter.
+
+=head2 $self->calc_param({%args})
+
+This method is used to calculate the parameter for the conversion. It
+can be over-rided by subclasses so it will behave differently. An example
+can be found in C<t/02-override-param-retrieval.t> where it is used to
+call the accessors of an object for values.
+
+%args contains:
+
+=over 4
+
+=item * named_params
+
+The named paramters.
+
+=item * name
+
+The name of the conversion.
+
+=back
+
+=head2 named_sprintf($format, {%parameters})
+
+=head2 named_sprintf($format, %parameters)
+
+This is a convenience function to directly format a string with the named
+parameters, which can be specified inside a (non-blessed) hash reference or
+as a flattened hash. See the synopsis for an example.
 
 =head1 AUTHOR
 
@@ -312,6 +315,132 @@ This program is released under the following license: MIT/X11:
 
 L<http://www.opensource.org/licenses/mit-license.php>
 
-=cut
+=head1 AUTHOR
 
-1; # End of Text::Sprintf::Named
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/text-sprintf-named/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc Text::Sprintf::Named
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Text-Sprintf-Named>
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/Text-Sprintf-Named>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Sprintf-Named>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/Text-Sprintf-Named>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/Text-Sprintf-Named>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/Text-Sprintf-Named>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/T/Text-Sprintf-Named>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Text-Sprintf-Named>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Text::Sprintf::Named>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-text-sprintf-named at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Text-Sprintf-Named>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/text-sprintf-named>
+
+  git clone https://bitbucket.org/shlomif/perl-text-sprintf
+
+=cut

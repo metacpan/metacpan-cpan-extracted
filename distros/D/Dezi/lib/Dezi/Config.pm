@@ -46,7 +46,7 @@ has 'index_server' => (
 has 'authenticator' => ( is => 'rw', isa => Maybe [CodeRef] );
 has 'server_config' => ( is => 'rw', isa => HashRef );
 
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 
 sub init_ui {
     my $self = shift;
@@ -184,8 +184,12 @@ Dezi::Config - Dezi server configuration
 =head1 SYNOPSIS
 
  use Dezi::Config;
- use CHI;
- my $dezi_config = Dezi::Config({
+ use CHI;         # optional, see cache below
+ use Dezi::UI;    # optional, see ui_class and ui below
+ use Dezi::Admin; # optional, see admin_class and admin below
+ use Dezi::Stats; # optional, see stats_logger below
+
+ my $dezi_config = Dezi::Config->new({
  
     search_path     => '/search',
     index_path      => '/index',
@@ -245,7 +249,7 @@ Dezi::Config - Dezi server configuration
         indexer_config => {
         
             # see Dezi::Indexer::Config
-            # and http://swish-e.org/docs/swish-config.html
+            # and https://dezi.org/swish-e-docs/SWISH-CONFIG.pod.html
             config => { 
 
                 # searchable fields
@@ -452,7 +456,7 @@ L<http://search.cpan.org/dist/Dezi/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012 Peter Karman.
+Copyright 2012-2018 Peter Karman.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

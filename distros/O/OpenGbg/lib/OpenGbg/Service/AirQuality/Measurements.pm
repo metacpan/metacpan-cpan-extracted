@@ -6,7 +6,7 @@ package OpenGbg::Service::AirQuality::Measurements;
 
 # ABSTRACT: A list of air quality measurements
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use XML::Rabbit;
 
@@ -37,7 +37,7 @@ OpenGbg::Service::AirQuality::Measurements - A list of air quality measurements
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SYNOPSIS
 

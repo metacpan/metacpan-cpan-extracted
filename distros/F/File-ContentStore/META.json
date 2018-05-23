@@ -38,6 +38,7 @@
             "Digest" : "0",
             "Digest::SHA" : "0",
             "Moo" : "0",
+            "Path::Tiny" : "0.062",
             "Type::Params" : "0",
             "Types::Path::Tiny" : "0",
             "Types::Standard" : "0",
@@ -55,7 +56,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.062",
             "Test::More" : "0.88",
             "strict" : "0",
             "warnings" : "0"
@@ -74,7 +75,7 @@
          "web" : "http://github.com/book/File-ContentStore"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

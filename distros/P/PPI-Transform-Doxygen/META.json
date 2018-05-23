@@ -52,6 +52,6 @@
          "url" : "https://github.com/tomk3003/ppi-transform-doxygen"
       }
    },
-   "version" : "0.3",
+   "version" : "0.32",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

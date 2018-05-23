@@ -6,29 +6,29 @@ use Pcore::Util::Scalar qw[is_plain_coderef is_plain_scalarref];
 
 with qw[Pcore::Util::Result::Status];
 
-has url => ( is => 'ro', isa => Str | Object );
-has buf_size => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );    # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
+has url      => ();    # ( is => 'ro', isa => Str | Object );
+has buf_size => 0;     # ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );    # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
 
-has version => ( is => 'ro', isa => Num, init_arg => undef );
-has headers => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Headers'], init_arg => undef );
-has body    => ( is => 'ro', isa => Ref,                                 init_arg => undef );
-has path    => ( is => 'ro', isa => Str,                                 init_arg => undef );
+has version => ();     # ( is => 'ro', isa => Num, init_arg => undef );
+has headers => ();     # ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Headers'], init_arg => undef );
+has body    => ();     # ( is => 'ro', isa => Ref,                                 init_arg => undef );
+has path    => ();     # ( is => 'ro', isa => Str,                                 init_arg => undef );
 
-has content_length => ( is => 'rwp', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
+has content_length   => 0;                   # ( is => 'ro', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
+has redirect         => ();                  # ( is => 'ro', isa => ArrayRef, init_arg => undef );
+has is_connect_error => 0;                   # ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
+has decoded_body     => ( is => 'lazy' );    # , isa => Maybe [ScalarRef], init_arg => undef );
+has tree             => ( is => 'lazy' );    # , isa => Maybe [ InstanceOf ['HTML::TreeBuilder::LibXML'] ], init_arg => undef );
 
-has redirect => ( is => 'ro', isa => ArrayRef, init_arg => undef );
-has decoded_body => ( is => 'lazy', isa => Maybe [ScalarRef], init_arg => undef );
-has is_connect_error => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
-has tree => ( is => 'lazy', isa => Maybe [ InstanceOf ['HTML::TreeBuilder::LibXML'] ], init_arg => undef );
+sub BUILDARGS ( $self, $args ) {
+    if ( $args->{headers} ) {
+        $args->{headers} = Pcore::HTTP::Headers->new( $args->{headers} );
+    }
+    else {
+        $args->{headers} = Pcore::HTTP::Headers->new;
+    }
 
-sub BUILD ( $self, $args ) {
-    $self->{headers} = Pcore::HTTP::Headers->new;
-
-    $self->{headers}->add( $args->{headers} ) if $args->{headers};
-
-    $self->{body} = $args->{body} if $args->{body};
-
-    return;
+    return $args;
 }
 
 sub _build_decoded_body ($self) {

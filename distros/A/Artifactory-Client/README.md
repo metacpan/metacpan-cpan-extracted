@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.5.3
+Version 1.6.0
 
 # SYNOPSIS
 
@@ -297,6 +297,10 @@ Enables/disables multiple replication tasks by repository or Artifactory server 
 ## get\_global\_system\_replication\_configuration
 
 Returns the global system replication configuration status, i.e. if push and pull replications are blocked or unblocked.
+
+## get\_remote\_repositories\_registered\_for\_replication
+
+Returns a list of all the listeners subscribed for event-based pull replication on the specified repository.
 
 ## block\_system\_replication( push => 'false', pull => 'true' )
 

@@ -86,6 +86,10 @@ int
 typetiny_tc_Bool(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     assert(sv);
 
+    if (SvROK(sv)) {
+        return FALSE;
+    }
+
     if(sv_true(sv)){
         if(SvPOKp(sv)){ /* "1" */
             return SvCUR(sv) == 1 && SvPVX(sv)[0] == '1';
@@ -190,6 +194,7 @@ typetiny_tc_PositiveInt(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     char* i;
     STRLEN len;
     assert(sv);
+    int j;
     if ((!SvOK(sv)) || SvROK(sv) || isGV(sv)) {
         return FALSE;
     }
@@ -210,6 +215,14 @@ typetiny_tc_PositiveInt(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     i = SvPVx(sv, len);
     if (len == 1 && i[0] == '0') {
         return FALSE;
+    }
+    else if (i[0] == '0') {
+        for (j = 0; j < len; j++) {
+            if (i[j] != '0') {
+                return TRUE; // "01", "001", etc
+            }
+        }
+        return FALSE; // "00", "000", etc
     }
     return ((len > 0 && i[0] != '-') ? TRUE : FALSE);
 }

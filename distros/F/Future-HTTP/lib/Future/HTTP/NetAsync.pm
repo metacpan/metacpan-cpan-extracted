@@ -9,7 +9,7 @@ use feature 'signatures';
 use HTTP::Request;
 use IO::Async::Future;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 with 'Future::HTTP::Handler';
 
@@ -201,7 +201,7 @@ L<Mojo::UserAgent> for the backend
 =head1 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/future-http>.
+L<https://github.com/Corion/future-http>.
 
 =head1 SUPPORT
 
@@ -220,7 +220,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

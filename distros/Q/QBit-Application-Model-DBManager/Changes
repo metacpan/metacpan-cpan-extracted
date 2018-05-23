@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2016-12-16 00:00:00 +0000 to present.
+Changes from 2017-05-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.019 at 2017-12-16 11:38:18 +0000
+version 0.020 at 2018-05-19 08:22:03 +0000
 ------------------------------------------
+
+  Change: ca17abaf74171d1a959efff3d83feaecd54c60b3
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-05-19 11:20:58 +0000
+
+    Merge pull request #27 from Madskill/init_fields_in_model_init
+
+    move exception 
+
+  Change: 8dab53f6aced02c76cc1172da103729d7e1208ea
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-19 11:18:49 +0000
+
+    move exception 
+
+------------------------------------------
+version 0.019 at 2017-12-16 11:39:00 +0000
+------------------------------------------
+
+  Change: 3d861bd9eeeaf22bee73a2b13df074452f9d79a9
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-12-16 14:39:00 +0000
+
+    Version 0.019 
 
   Change: 92f8a558d99b4b588fc4ff29a81e7982ae047977
   Author: Igor <igor-sverdlov@mail.ru>
@@ -45,5 +69,5 @@ version 0.018 at 2017-11-04 18:21:33 +0000
     use '*' as all fields 
 
 =================================================
-Plus 17 releases after 2016-12-16 00:00:00 +0000.
+Plus 17 releases after 2017-05-19 00:00:00 +0000.
 =================================================

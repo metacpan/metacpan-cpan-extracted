@@ -19,7 +19,7 @@ use File::stat;
 use Path::Tiny;
 use App::watchdo;
 
-our $VERSION = version->new('0.0.7');
+our $VERSION = version->new('0.1.0');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -46,6 +46,7 @@ sub main {
         'watch|w=s@',
         'dir|d=s@',
         'git|g',
+        'exclude|e=s@',
         'sleep|s=i',
         'test|t!',
         'verbose|v+',
@@ -74,11 +75,12 @@ sub main {
 
     # do stuff here
     my $watch = App::watchdo->new(
-        dirs  => $option{dir} || [],
-        files => $option{watch} || [],
-        git   => $option{git},
-        wait  => $option{sleep},
-        run   => \&run,
+        dirs    => $option{dir} || [],
+        files   => $option{watch} || [],
+        git     => $option{git},
+        exclude => $option{exclude} || [],
+        wait    => $option{sleep},
+        run     => \&run,
     );
 
     run() if $option{first};
@@ -114,18 +116,25 @@ watch-do - Run a command when watched files change
 
 =head1 VERSION
 
-This documentation refers to watch-do version 0.0.7
+This documentation refers to watch-do version 0.1.0
 
 =head1 SYNOPSIS
 
-   watch-do [option]
-   watch-do -w file1 [-w file2 ...] [--] cmd
+   watch-do -w file1 [-w file2 ...] [(-e|--exclude) regexp] [-f|--first] [(-s|--sleep) seconds] [--] [cmd]
+   watch-do (-g|--git) [(-e|--exclude) regexp] [-f|--first] [(-s|--sleep) seconds] [--] [cmd]
+   watch-do --help
+   watch-do --man
+   watch-do --version
 
  OPTIONS:
-  cmd               Command to run when file changes
+  cmd               Command to run when watched file(s) change. If not
+                    supplied this will just show the changed files.
   -w --watch[=]file File or Directory to be watched for changes
   -g --git          Use git to find what to watch (i.e. monitor git status to
                     see files have changed and add them to the watch)
+  -e --exclude[=]regexp
+                    Exclude changes in files that match is regeular expression
+                    You can specify multiple times for more regexps.
   -f --first        Execute the cmd on the first run as well as when files
                     change.
   -s --sleep[=]int  Time in seconds to sleep between checking for changes
@@ -140,6 +149,9 @@ This documentation refers to watch-do version 0.0.7
      --man          Prints the full documentation for watch-do
 
 =head1 DESCRIPTION
+
+C<watch-do> watches for file changes and runs a supplied command or prints
+those files that have changed.
 
 =head1 SUBROUTINES/METHODS
 

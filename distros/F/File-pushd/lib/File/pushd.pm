@@ -4,7 +4,7 @@ use warnings;
 package File::pushd;
 # ABSTRACT: change directory temporarily for a limited scope
 
-our $VERSION = '1.014';
+our $VERSION = '1.016';
 
 our @EXPORT = qw( pushd tempd );
 our @ISA    = qw( Exporter );
@@ -87,6 +87,7 @@ sub tempd {
     eval { $dir = pushd( File::Temp::tempdir( CLEANUP => 0 ), $options ) };
     croak $@ if $@;
     $dir->{_tempd} = 1;
+    $dir->{_owner} = $$;
     return $dir;
 }
 
@@ -116,6 +117,7 @@ sub DESTROY {
     my $orig = $self->{_original};
     chdir $orig if $orig; # should always be so, but just in case...
     if ( $self->{_tempd}
+        && $self->{_owner} == $$
         && !$self->{_preserve} )
     {
         # don't destroy existing $@ if there is no error.
@@ -140,7 +142,7 @@ File::pushd - change directory temporarily for a limited scope
 
 =head1 VERSION
 
-version 1.014
+version 1.016
 
 =head1 SYNOPSIS
 
@@ -298,7 +300,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Diab Jerius Graham Ollis Olivier Mengué
+=for stopwords Diab Jerius Graham Ollis Olivier Mengué Shoichi Kaji
 
 =over 4
 
@@ -314,11 +316,15 @@ Graham Ollis <plicease@cpan.org>
 
 Olivier Mengué <dolmen@cpan.org>
 
+=item *
+
+Shoichi Kaji <skaji@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by David A Golden.
+This software is Copyright (c) 2018 by David A Golden.
 
 This is free software, licensed under:
 

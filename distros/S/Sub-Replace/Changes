@@ -1,7 +1,13 @@
 
 Release history for Sub-Replace
 
-0.1.0     2017-09-22 19:19:37-07:00 America/Los_Angeles
+0.2.0     2018-05-17 20:54:50-07:00 America/Los_Angeles
+
+    - Bug fix: Test sub with "exists &$subname"
+    - Declare "sub_replace" as exportable
+    - Add a more complete test
+
+v0.1     2017-09-22 19:19:37-07:00 America/Los_Angeles
 
     - Initial version
 

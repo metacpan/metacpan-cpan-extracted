@@ -5,7 +5,9 @@ use warnings;
 
 use Test::More;
 
-BEGIN { use_ok ("DBI") }
+$ENV{AUTOMATED_TESTING} and plan skip_all => "No folder scanning during automated tests";
+
+use_ok ("DBI");
 require "./t/lib.pl";
 
 my $tstdir = DbDir ();
@@ -24,7 +26,7 @@ my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
     RaiseError       => 1,
     PrintError       => 1,
     FetchHashKeyName => "NAME_lc",
-    }) or die "$DBI::errstr\n";
+    }) or die $DBI::errstr || $DBI::errstr || "", "\n";
 
 my @dsn = $dbh->data_sources;
 my %dir = map {

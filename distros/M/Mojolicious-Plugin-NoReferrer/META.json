@@ -1,0 +1,54 @@
+{
+   "abstract" : "add meta tag to HTML output to define a referrer policy",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-NoReferrer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.67",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::NoReferrer" : {
+         "file" : "lib/Mojolicious/Plugin/NoReferrer.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-NoReferrer/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-NoReferrer",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-NoReferrer.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-NoReferrer"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

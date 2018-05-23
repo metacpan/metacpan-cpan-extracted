@@ -75,7 +75,7 @@ my @whitelist = qw/
     Lab::Connection::LinuxGPIB::Trace
     Lab::Connection::LinuxGPIB::Log
 
-    Lab::Measurement::Developer::Write-A-Source-Driver
+    Lab::Measurement::Legacy::Developer::Write-A-Source-Driver
     Lab::Measurement::KeyboardHandling
     Lab::MultiChannelInstrument::DeviceCache
 

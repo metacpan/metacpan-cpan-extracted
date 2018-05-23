@@ -1,7 +1,5 @@
 package TaskPipe::Tool;
 
-our $VERSION = 0.02;
-
 use Moose;
 use Getopt::Long;
 use TaskPipe::PathSettings;
@@ -27,6 +25,9 @@ use Term::ANSIColor 'colored';
 use POSIX qw(isatty);
 
 with 'MooseX::ConfigCascade';
+
+our $VERSION = '0.03';
+
 
 has cmd => (is => 'rw', isa => 'ArrayRef');
 

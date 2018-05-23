@@ -1,0 +1,86 @@
+{
+   "abstract" : "Index a Perl distribution",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MyCPAN-Indexer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "inc",
+         "corpus",
+         "test-corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Extract::Libarchive" : "0",
+            "Archive::Zip" : "0",
+            "CPAN::Checksums" : "0",
+            "CPAN::PackageDetails" : "0.21",
+            "ConfigReader::Simple" : "0",
+            "Data::Structure::Util" : "0",
+            "Data::UUID" : "0",
+            "Digest::MD5" : "0",
+            "Distribution::Guess::BuildSystem" : "0.11",
+            "ExtUtils::MakeMaker" : "6.48",
+            "File::Find" : "0",
+            "File::Find::Closures" : "0",
+            "File::Which" : "0",
+            "List::Util" : "0",
+            "Log::Log4perl" : "0",
+            "Module::Extract::Namespaces" : "0.14",
+            "Module::Extract::Use" : "0.13",
+            "Module::Extract::VERSION" : "0.13",
+            "Parallel::ForkManager" : "0",
+            "Probe::Perl" : "0",
+            "Proc::ProcessTable" : "0",
+            "YAML" : "0",
+            "YAML::Syck" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.014002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Output" : "0.13"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/mycpan-indexer/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/mycpan-indexer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/mycpan-indexer.git",
+         "web" : "https://github.com/briandfoy/mycpan-indexer"
+      }
+   },
+   "version" : "1.282",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

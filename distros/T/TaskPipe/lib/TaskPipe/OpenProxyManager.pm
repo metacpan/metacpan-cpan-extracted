@@ -10,7 +10,6 @@ use TaskPipe::UserAgentManager;
 use Parallel::ForkManager;
 use TaskPipe::ThreadManager;
 with 'MooseX::ConfigCascade';
-with 'TaskPipe::Role::RunInfo';
 
 
 has gm => (is => 'rw', isa => 'TaskPipe::SchemaManager');

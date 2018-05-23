@@ -21,15 +21,16 @@
       },
       "runtime" : {
          "requires" : {
-            "feature" : "0",
+            "perl" : "v5.6.0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Script" : "0"
+            "Test::Script" : "1.10"
          }
       }
    },
@@ -42,7 +43,7 @@
          "web" : "https://github.com/borisdaeppen/Backup-Hanoi.git"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

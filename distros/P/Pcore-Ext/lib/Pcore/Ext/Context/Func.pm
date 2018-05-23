@@ -9,7 +9,7 @@ has func_name => ( is => 'ro', isa => Maybe [Str] );
 has func_args => ( is => 'ro', isa => Maybe [ArrayRef] );
 has func_body => ( is => 'ro', isa => Str, required => 1 );
 
-sub TO_JSON ( $self, @ ) {
+sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
     $self->{ext}->{js_gen_cache}->{$id} = $self->to_js;

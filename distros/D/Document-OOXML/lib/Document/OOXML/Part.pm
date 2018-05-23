@@ -64,7 +64,7 @@ Document::OOXML::Part - Role for OOXML document parts
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 SYNOPSIS
 

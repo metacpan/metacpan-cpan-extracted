@@ -12,14 +12,17 @@ use MARC::Schema;
 use DDP;
 
 GetOptions(
-    'file|f=s' => \my $file,
-    'type|t=s' => \( my $type = 'RAW' ),
-    'help|h'   => sub { HelpMessage(0) },
+    'file|f=s'   => \my $file,
+    'type|t=s'   => \( my $type = 'RAW' ),
+    'schema|s=s' => \my $schema_file,
+    'help|h'     => sub { HelpMessage(0) },
 ) or HelpMessage(1);
 
-die "file not found" unless defined $file and -e $file;
+$file = shift unless defined($file);
 
-my $schema = MARC::Schema->new();
+usage() unless defined $file and -e $file;
+
+my $schema = MARC::Schema->new({file => $schema_file});
 
 my $parser;
 if ( $type eq 'RAW' ) {
@@ -55,15 +58,30 @@ sub print_error {
     }
 }
 
+sub usage {
+    print STDERR <<"EOF";
+usage: $0 [options] file
+
+options:
+    --type,-t         Type of MARC21 serialization (RAW|XML, default: RAW)
+    --schema,-s       Location MARC JSON schema
+    --help            Print this help
+EOF
+    exit(1);
+}
+
 =head1 NAME
 
 marcvalidate - Validate a file with MARC21 records
 
 =head1 SYNOPSIS
 
-  --file,-f   Path to MARC21 file
-  --type,-t   Type of MARC21 serialization (RAW|XML, default: RAW)
-  --help,-h   Print this help
+  $ marcvalidate [options] FILE
+
+  options:
+  --type,-t         Type of MARC21 serialization (RAW|XML, default: RAW)
+  --schema,-s       Location MARC JSON schema
+  --help,-h         Print this help
 
 =head1 AUTHOR
 

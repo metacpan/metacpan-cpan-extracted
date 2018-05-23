@@ -1,10 +1,10 @@
-requires 'strict';
 requires 'utf8';
-requires 'warnings';
+requires 'strictures';
 
 requires 'Mouse';
 requires 'Types::Standard';
 requires 'Web::API';
+requires 'namespace::clean';
 
 on build => sub {
     requires 'Module::Build', '0.28';

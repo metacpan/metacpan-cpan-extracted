@@ -1,5 +1,8 @@
 Revision history for Task-BeLike-SHLOMIF
 
+0.0.3      2018-05-21
+    - Fix deps on bleadperl.
+
 0.0.2      2018-03-04
     - Convert to [@SHLOMIF]
 

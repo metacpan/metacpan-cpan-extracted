@@ -1,6 +1,6 @@
 package Pcore::AE::Handle;
 
-use Pcore -const, -export => { TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]] };
+use Pcore -const, -export;
 use parent qw[AnyEvent::Handle];
 use AnyEvent::Socket qw[];
 use Pcore::AE::DNS::Cache;
@@ -8,6 +8,8 @@ use Pcore::HTTP::Headers;
 use HTTP::Parser::XS qw[HEADERS_AS_ARRAYREF HEADERS_NONE];
 use Pcore::AE::Handle::Cache;
 use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
+
+our $EXPORT = { TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]] };
 
 const our $TLS_CTX_LOW  => 0;
 const our $TLS_CTX_HIGH => 1;

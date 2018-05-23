@@ -1,0 +1,9 @@
+name = Math-GrahamFunction
+version = 0.02002
+author = Shlomi Fish <shlomif@cpan.org>
+license = MIT
+copyright_holder = Shlomi Fish
+
+[@SHLOMIF]
+dist = Math-GrahamFunction
+repository_url = https://bitbucket.org/shlomif/perl-math-grahamfunction/

@@ -1,6 +1,6 @@
 use strict;
 use lib -e 't' ? 't' : 'test';
-use TestYAML tests => 37;
+use TestYAML tests => 38;
 use Test::Deep;
 
 run {
@@ -482,5 +482,38 @@ d: >2+
 - .: a
   <: b
   -: c
+- 'not: a map'
+- "not: a map"
 +++ perl
-[ { '.' => 'a', '<' => 'b', '-' => 'c' } ]
+[ { '.' => 'a', '<' => 'b', '-' => 'c' }, 'not: a map', 'not: a map' ]
+
+=== Zero indented block sequence
++++ yaml
+a:
+  b:
+  -
+  -
+c:
+ -
+ -
+d:
+- 1
+- 2
+e:
+  - 3
+  - 4
+  - f:
+    - 5
+    - 6
+    g: 7
++++ perl
+{
+    a => { b => [ undef, undef ] },
+    c => [undef, undef],
+    d => [1, 2],
+    e => [3, 4, {
+        f => [5, 6],
+        g => 7,
+    }],
+}
+

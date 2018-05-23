@@ -21,15 +21,15 @@ package MongoDB::BulkWriteView;
 # ABSTRACT: Bulk write operations against a query document
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 
 use MongoDB::Error;
 use MongoDB::_Types qw(
+    Boolish
     Document
     IxHash
-    Booleanpm
 );
 use Types::Standard qw(
     Maybe
@@ -61,8 +61,8 @@ has _collation => (
 
 has _upsert => (
     is      => 'ro',
-    isa     => Booleanpm,
-    default => sub { false },
+    isa     => Boolish,
+    default => 0,
 );
 
 with $_ for qw(
@@ -199,7 +199,7 @@ MongoDB::BulkWriteView - Bulk write operations against a query document
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

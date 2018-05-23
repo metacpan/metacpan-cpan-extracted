@@ -22,7 +22,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Math::Business::BlackScholes::Binaries' => '0',
+                                      'Math::Business::BlackScholesMerton' => '0',
                                       'Math::CDF' => '0',
                                       'perl' => '5.014000'
                                     }
@@ -39,7 +39,8 @@ do { my $x = {
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0.94',
-                                   'Test::Most' => '0'
+                                   'Test::Most' => '0',
+                                   'Test::NoWarnings' => '0'
                                  }
                  }
      };

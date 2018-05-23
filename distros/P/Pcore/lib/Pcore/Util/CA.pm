@@ -12,15 +12,12 @@ sub update ($cb = undef) {
         sub ($res) {
             my $status;
 
+            say $res;
+
             if ($res) {
                 $ENV->{share}->write( 'Pcore', 'data/ca_file.pem', $res->{body} );
 
                 $status = 1;
-
-                say 'done';
-            }
-            else {
-                say 'error';
             }
 
             $rouse_cb ? $cb ? $rouse_cb->( $cb->($status) ) : $rouse_cb->($status) : $cb ? $cb->($status) : ();

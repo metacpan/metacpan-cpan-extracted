@@ -20,18 +20,18 @@ package MongoDB::GridFSBucket::DownloadStream;
 # ABSTRACT: File handle abstraction for downloading
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use Types::Standard qw(
   Str
-  Bool
   Maybe
   HashRef
   InstanceOf
   FileHandle
 );
 use MongoDB::_Types qw(
+  Boolish
   NonNegNum
 );
 use List::Util qw(max min);
@@ -92,7 +92,7 @@ has _offset => (
 
 has _closed => (
     is      => 'rwp',
-    isa     => Bool,
+    isa     => Boolish,
     default => 0,
 );
 
@@ -438,7 +438,7 @@ MongoDB::GridFSBucket::DownloadStream - File handle abstraction for downloading
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

@@ -45,7 +45,7 @@ On/Off pretty-print for JSON. Enabled by default.
 
 =item B<--verbose|-v> [int]
 
-Increase verbosity, max level - 4.
+Increase verbosity, max level is 4.
 
 =item B<--version|-V>
 

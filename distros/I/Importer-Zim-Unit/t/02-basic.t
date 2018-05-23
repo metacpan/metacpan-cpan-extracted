@@ -16,8 +16,8 @@ sub f4 { }
 package main;
 
 UNITCHECK {
-    ok( !defined &f1, 'f1 is gone (by UNITCHECK time)' );
-    ok( !defined &f2, 'f2 is gone (by UNITCHECK time)' );
+    ok( !__PACKAGE__->can('f1'), 'f1 is gone (by UNITCHECK time)' );
+    ok( !__PACKAGE__->can('f2'), 'f2 is gone (by UNITCHECK time)' );
 }
 
 use Importer::Zim::Unit 'M1' => qw(f1 f2);

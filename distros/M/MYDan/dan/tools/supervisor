@@ -15,11 +15,13 @@ $| ++;
 
  $0 --cmd ./myserver --log /tmp/mylog/path --http http://127.0.0.1:8080 --check OK
 
+     --count 10
+
 =cut
 
 my $option = MYDan::Util::OptConf->load();
 
-my %o = $option->get( qw( cmd=s log=s http=s check=s size=i keep=i name=s ) )->dump();
+my %o = $option->get( qw( cmd=s log=s http=s check=s size=i keep=i name=s count=i ) )->dump();
 
 $option->assert( 'cmd', 'log' );
 

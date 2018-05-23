@@ -7,8 +7,8 @@ my $range = join ',', @ARGV;
 my $verbose = 1;
 
 my @releases = $range =~ /^(==v?)?(\d+(\.\d)*)$/
-    ? Pandoc::Release->get($2, verbose => $verbose)
-    : Pandoc::Release->list(range => $range, verbose => $verbose);
+    ? get($2, verbose => $verbose)
+    : list(range => $range, verbose => $verbose);
 
 foreach (@releases) {
     $_->download( dir => 'xt/deb', bin => 'xt/bin', verbose => $verbose );

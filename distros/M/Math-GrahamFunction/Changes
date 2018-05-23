@@ -1,5 +1,8 @@
 Revision history for Math::GrahamFunction
 
+0.02002     2018-05-19
+    - Convert to Dist-Zilla.
+
 0.02001     2014-01-31
     - Update the link to the repository to the bitbucket.org one.
     - Minimum version of perl (CPANTS).

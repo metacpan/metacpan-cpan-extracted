@@ -1,0 +1,2645 @@
+=encoding utf8
+
+=head1 NAME
+
+L<HTML5::DOM|https://metacpan.org/pod/HTML5::DOM> - Super fast html5 DOM library with css selectors (based on Modest/MyHTML)
+
+=for html <a href="https://travis-ci.org/Azq2/perl-html5-dom"><img src="https://travis-ci.org/Azq2/perl-html5-dom.svg?branch=master"></a>
+
+=head1 SYNOPSIS
+
+ use warnings;
+ use strict;
+ use HTML5::DOM;
+
+ # create parser object
+ my $parser = HTML5::DOM->new;
+
+ # parse some html
+ my $tree = $parser->parse('
+  <label>Some list of OS:</lbnel>
+  <ul class="list" data-what="os" title="OS list">
+     <li>UNIX</li>
+     <li>Linux</li>
+     <!-- comment -->
+     <li>OSX</li>
+     <li>Windows</li>
+     <li>FreeBSD</li>
+  </ul>
+ ');
+
+ # find one element by CSS selector
+ my $ul = $tree->at('ul.list');
+
+ # prints tag
+ print $ul->tag."\n"; # ul
+
+ # check if <ul> has class list
+ print "<ul> has class .list\n" if ($ul->classList->has('list'));
+
+ # add some class
+ $ul->classList->add('os-list');
+
+ # prints <ul> classes
+ print $ul->className."\n"; # list os-list
+
+ # prints <ul> attribute title
+ print $ul->attr("title")."\n"; # OS list
+
+ # changing <ul> attribute title
+ $ul->attr("title", "OS names list");
+
+ # find all os names
+ $ul->find('li')->each(sub {
+  my ($node, $index) = @_;
+  print "OS #$index: ".$node->text."\n";
+ });
+
+ # we can use precompiled selectors
+ my $css_parser = HTML5::DOM::CSS->new;
+ my $selector = $css_parser->parseSelector('li');
+
+ # remove OSX from OS
+ $ul->find($selector)->[2]->remove();
+
+ # serialize tree
+ print $tree->html."\n";
+ 
+ # TODO: more examples in SYNOPSIS
+ # But you can explore API documentation.
+ # My lib have simple API, which is intuitively familiar to anyone who used the DOM.
+ # Sorry, if my english is very bad, in future, i may be fix this. 
+ # Or you can help me with this, by sending pull request.
+
+=head1 DESCRIPTION
+
+L<HTML5::DOM|https://metacpan.org/pod/HTML5::DOM> is a fast HTML5 parser and DOM manipulatin library with CSS4 selectors, fully conformant with the HTML5 specification.
+
+It based on  L<https://github.com/lexborisov/Modest> as selector engine and L<https://github.com/lexborisov/myhtml> as HTML5 parser. 
+
+=head3 Key features
+
+=over
+
+=item *
+
+Really fast HTML parsing, can use threads (by default).
+
+=item *
+
+Supports async parsing.
+
+=item *
+
+Supports parsing by chunks.
+
+=item *
+
+Fully conformant with the HTML5 specification.
+
+=item *
+
+Fast CSS4 selectors.
+
+=item *
+
+Any manipulations using DOM-like API.
+
+=item *
+
+Auto-detect input encoding.
+
+=item *
+
+Fully integration in perl and memory management. You don't care about "free" or "destroy".
+
+=back
+
+=head1 HTML5::DOM
+
+HTML5 parser object.
+
+=head2 new
+
+ # with default options
+ my $parser = HTML5::DOM->new;
+ 
+ # override some options, if you need
+ my $parser = HTML5::DOM->new({
+    threads                 => 2,
+    async                   => 0, 
+    ignore_whitespace       => 0, 
+    ignore_doctype          => 0, 
+    scripts                 => 0, 
+    encoding                => "auto", 
+    default_encoding        => "UTF-8", 
+    encoding_use_meta       => 1, 
+    encoding_use_bom        => 1, 
+    encoding_prescan_limit  => 1024
+ });
+
+Creates new parser object with options. See L<"PARSER OPTIONS"> for details. 
+
+=head3 parse
+
+ my $html = '<div>Hello world!</div>';
+ 
+ # parsing with options defined in HTML5::DOM->new
+ my $tree = $parser->parse($html);
+ 
+ # parsing with custom options (extends options defined in HTML5::DOM->new)
+ my $tree = $parser->parse($html, {
+     scripts     => 0, 
+ });
+
+Parse html string and return L<HTML5::DOM::Tree|/"HTML5::DOM::Tree"> object.
+
+=head3 parseChunkStart
+
+ # start chunked parsing with options defined in HTML5::DOM->new
+ # call parseChunkStart without options is useless, 
+ # because first call of parseChunk automatically call parseChunkStart. 
+ $parser->parseChunkStart();
+ 
+ # start chunked parsing with custom options (extends options defined in HTML5::DOM->new)
+ $parser->parseChunkStart({
+    scripts     => 0, 
+ });
+
+Init chunked parsing. See L<"PARSER OPTIONS"> for details. 
+
+=head3 parseChunk
+
+ $parser->parseChunkStart()->parseChunk('<')->parseChunk('di')->parseChunk('v>');
+
+Parse chunk of html stream.
+
+=head3 parseChunkEnd
+
+ # start some chunked parsing
+ $parser->parseChunk('<')->parseChunk('di')->parseChunk('v>');
+ 
+ # end parsing and get tree
+ my $tree = $parser->parseChunkEnd();
+
+Completes chunked parsing and return L<HTML5::DOM::Tree|/"HTML5::DOM::Tree"> object.
+
+
+
+=head1 HTML5::DOM::Tree
+
+DOM tree object.
+
+=head3 createElement
+
+ # create new node with tag "div"
+ my $node = $tree->createElement("div");
+ 
+ # create new node with tag "g" with namespace "svg"
+ my $node = $tree->createElement("div", "svg");
+
+Create new L<HTML5::DOM::Element|/"HTML5::DOM::Element"> with specified tag and namespace.
+
+=head3 createComment
+
+ # create new comment
+ my $node = $tree->createComment(" ololo ");
+ 
+ print $node->html; # <!-- ololo -->
+
+Create new L<HTML5::DOM::Comment|/"HTML5::DOM::Comment"> with specified value.
+
+=head3 createTextNode
+
+ # create new text node
+ my $node = $tree->createTextNode("psh psh ololo i am driver of ufo >>>");
+ 
+ print $node->html; # psh psh ololo i am driver of ufo &gt;&gt;&gt;
+
+Create new L<HTML5::DOM::Text|/"HTML5::DOM::Text"> with specified value.
+
+=head3 parseFragment
+
+ my $fragment = $tree->parseFragment($html);
+ my $fragment = $tree->parseFragment($html, $context);
+ my $fragment = $tree->parseFragment($html, $context, $context_ns);
+ my $fragment = $tree->parseFragment($html, $context, $context_ns, $options);
+
+Parse fragment html and create new L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment">.
+For more details about fragments: L<https://html.spec.whatwg.org/multipage/parsing.html#parsing-html-fragments>
+
+=over
+
+=item *
+
+C<$html> - html fragment string
+
+=item *
+
+C<$context> - context tag name, default C<div>
+
+=item *
+
+C<$context_ns> - context tag namespace, default C<html>
+
+=item *
+
+C<$options> - parser options
+
+See L<"PARSER OPTIONS"> for details. 
+
+=back
+
+ # simple create new fragment
+ my $node = $tree->parseFragment("some <b>bold</b> and <i>italic</i> text");
+
+ # create new fragment node with custom context tag/namespace and options
+ my $node = $tree->parseFragment("some <b>bold</b> and <i>italic</i> text", "div", "html", {
+    # some options override
+    encoding => "windows-1251"
+ });
+ 
+ print $node->html; # some <b>bold</b> and <i>italic</i> text
+
+=head3 document
+
+ my $node = $tree->document;
+
+Return L<HTML5::DOM::Document|/"HTML5::DOM::Document"> node of current tree;
+
+=head3 root
+
+ my $node = $tree->root;
+
+Return root node of current tree. (always <html>)
+
+=head3 head
+
+ my $node = $tree->head;
+
+Return <head> node of current tree. 
+
+=head3 body
+
+ my $node = $tree->body;
+
+Return <body> node of current tree. 
+
+=head3 at
+
+=head3 querySelector
+
+ my $node = $tree->at($selector);
+ my $node = $tree->querySelector($selector); # alias
+
+Find one element node in tree using L<CSS Selectors Level 4|https://www.w3.org/TR/selectors-4/>
+
+Return node, or C<undef> if not find.
+
+=over
+
+=item *
+
+C<$selector> - selector query as plain text or precompiled as L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector> or 
+L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector::Entry>.
+
+=back
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
+ my $node = $tree->at('body > div.red');
+ print $node->html; # <div class="red">red</div>
+
+=head3 find
+
+=head3 querySelectorAll
+
+ my $collection = $tree->find($selector);
+ my $collection = $tree->querySelectorAll($selector); # alias
+
+Find all element nodes in tree using L<CSS Selectors Level 4|https://www.w3.org/TR/selectors-4/>
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+=over
+
+=item *
+
+C<$selector> - selector query as plain text or precompiled as L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector> or 
+L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector::Entry>.
+
+=back
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
+ my $collection = $tree->at('body > div.red, body > div.blue');
+ print $collection->[0]->html; # <div class="red">red</div>
+ print $collection->[1]->html; # <div class="red">blue</div>
+
+=head3 findId
+
+=head3 getElementById
+
+ my $collection = $tree->findId($tag);
+ my $collection = $tree->getElementById($tag); # alias
+
+Find element node with specified id.
+
+Return L<HTML5::DOM::Node|/"HTML5::DOM::Node"> or C<undef>.
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue" id="test">blue</div>')
+ my $node = $tree->findId('test');
+ print $node->html; # <div class="blue" id="test">blue</div>
+
+=head3 findTag
+
+=head3 getElementsByTagName
+
+ my $collection = $tree->findTag($tag);
+ my $collection = $tree->getElementsByTagName($tag); # alias
+
+Find all element nodes in tree with specified tag name.
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
+ my $collection = $tree->findTag('div');
+ print $collection->[0]->html; # <div class="red">red</div>
+ print $collection->[1]->html; # <div class="red">blue</div>
+
+=head3 findClass
+
+=head3 getElementsByClassName
+
+ my $collection = $tree->findClass($class);
+ my $collection = $tree->getElementsByClassName($class); # alias
+
+Find all element nodes in tree with specified class name.
+This is more fast equivalent to [class~="value"] selector.
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+ my $tree = HTML5::DOM->new
+    ->parse('<div class="red color">red</div><div class="blue color">blue</div>');
+ my $collection = $tree->findClass('color');
+ print $collection->[0]->html; # <div class="red color">red</div>
+ print $collection->[1]->html; # <div class="red color">blue</div>
+
+=head3 findAttr
+
+=head3 getElementByAttribute
+ 
+ # Find all elements with attribute
+ my $collection = $tree->findAttr($attribute);
+ my $collection = $tree->getElementByAttribute($attribute); # alias
+ 
+ # Find all elements with attribute and mathcing value
+ my $collection = $tree->findAttr($attribute, $value, $case = 0, $cmp = '=');
+ my $collection = $tree->getElementByAttribute($attribute, $value, $case = 0, $cmp = '='); # alias
+
+Find all element nodes in tree with specified attribute and optional matching value.
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+ my $tree = HTML5::DOM->new
+    ->parse('<div class="red color">red</div><div class="blue color">blue</div>');
+ my $collection = $tree->findAttr('class', 'CoLoR', 1, '~');
+ print $collection->[0]->html; # <div class="red color">red</div>
+ print $collection->[1]->html; # <div class="red color">blue</div>
+ 
+CSS selector analogs:
+ 
+ # [$attribute=$value]
+ my $collection = $tree->findAttr($attribute, $value, 0, '=');
+ 
+ # [$attribute=$value i]
+ my $collection = $tree->findAttr($attribute, $value, 1, '=');
+ 
+ # [$attribute~=$value]
+ my $collection = $tree->findAttr($attribute, $value, 0, '~');
+ 
+ # [$attribute|=$value]
+ my $collection = $tree->findAttr($attribute, $value, 0, '|');
+ 
+ # [$attribute*=$value]
+ my $collection = $tree->findAttr($attribute, $value, 0, '*');
+
+ # [$attribute^=$value]
+ my $collection = $tree->findAttr($attribute, $value, 0, '^');
+
+ # [$attribute$=$value]
+ my $collection = $tree->findAttr($attribute, $value, 0, '$');
+
+=head3 encoding
+
+=head3 encodingId
+
+ print "encoding: ".$tree->encoding."\n"; # UTF-8
+ print "encodingId: ".$tree->encodingId."\n"; # 0
+
+Return current tree encoding. See L<"ENCODINGS"> for details. 
+
+=head3 tag2id
+
+ print "tag id: ".HTML5::DOM->TAG_A."\n"; # tag id: 4
+ print "tag id: ".$tree->tag2id("a")."\n"; # tag id: 4
+
+Convert tag name to id. Return 0 (HTML5::DOM->TAG__UNDEF), if tag not exists in tree.
+See L<"TAGS"> for tag constants list. 
+
+=head3 id2tag
+
+ print "tag name: ".$tree->id2tag(4)."\n"; # tag name: a
+ print "tag name: ".$tree->id2tag(HTML5::DOM->TAG_A)."\n"; # tag name: a
+
+Convert tag id to name. Return C<undef>, if tag id not exists in tree.
+See L<"TAGS"> for tag constants list. 
+
+=head3 namespace2id
+
+ print "ns id: ".HTML5::DOM->NS_HTML."\n"; # ns id: 1
+ print "ns id: ".$tree->namespace2id("html")."\n"; # ns id: 1
+
+Convert namespace name to id. Return 0 (HTML5::DOM->NS_UNDEF), if namespace not exists in tree.
+See L<"NAMESPACES"> for namespace constants list. 
+
+=head3 id2namespace
+
+ print "ns name: ".$tree->id2namespace(1)."\n"; # ns name: html
+ print "ns name: ".$tree->id2namespace(HTML5::DOM->NS_HTML)."\n"; # ns name: html
+
+Convert namespace id to name. Return C<undef>, if namespace id not exists.
+See L<"NAMESPACES"> for namespace constants list. 
+
+=head3 wait
+
+ my $parser = HTML5::DOM->new({async => 1});
+ my $tree = $parser->parse($some_big_html_file);
+ # ...some your work...
+ $tree->wait; # wait before parsing threads done
+
+Blocking wait for tree parsing done. Only for async mode.
+
+=head3 parsed
+
+ my $parser = HTML5::DOM->new({async => 1});
+ my $tree = $parser->parse($some_big_html_file);
+ # ...some your work...
+ while (!$tree->parsed); # wait before parsing threads done
+
+Non-blocking way for check if tree parsing done. Only for async mode.
+
+=head3 parser
+
+ my $parser = $tree->parser;
+
+Return parent L<HTML5::DOM|/"HTML5::DOM">.
+
+
+
+=head1 HTML5::DOM::Node
+
+DOM node object.
+
+=head3 tag
+
+=head3 nodeName
+
+ my $tag_name = $node->tag;
+ my $tag_name = $node->nodeName; # uppercase
+ my $tag_name = $node->tagName;  # uppercase
+
+Return node tag name (eg. div or span)
+
+ $node->tag($tag);
+ $node->nodeName($tag); # alias
+ $node->tagName($tag);  # alias
+
+Set new node tag name. Allow only for L<HTML5::DOM::Element|/"HTML5::DOM::Element"> nodes.
+
+ print $node->html; # <div></div>
+ $node->tag('span');
+ print $node->html; # <span></span>
+ print $node->tag; # span
+ print $node->tag; # SPAN
+
+=head3 tagId
+
+ my $tag_id = $node->tagId;
+
+Return node tag id. See L<"TAGS"> for tag constants list.
+
+ $node->tagId($tag_id);
+
+Set new node tag id. Allow only for L<HTML5::DOM::Element|/"HTML5::DOM::Element"> nodes.
+
+ print $node->html; # <div></div>
+ $node->tagId(HTML5::DOM->TAG_SPAN);
+ print $node->html; # <span></span>
+ print $node->tagId; # 117
+
+=head3 namespace
+
+ my $tag_ns = $node->namespace;
+
+Return node namespace (eg. html or svg)
+
+ $node->namespace($namespace);
+
+Set new node namespace name. Allow only for L<HTML5::DOM::Element|/"HTML5::DOM::Element"> nodes.
+
+ print $node->namespace; # html
+ $node->namespace('svg');
+ print $node->namespace; # svg
+
+=head3 namespaceId
+
+ my $tag_ns_id = $node->namespaceId;
+
+Return node namespace id. See L<"NAMESPACES"> for tag constants list.
+
+ $node->namespaceId($tag_id);
+
+Set new node namespace by id. Allow only for L<HTML5::DOM::Element|/"HTML5::DOM::Element"> nodes.
+
+ print $node->namespace; # html
+ $node->namespaceId(HTML5::DOM->NS_SVG);
+ print $node->namespaceId; # 3
+ print $node->namespace; # svg
+
+=head3 tree
+
+ my $tree = $node->tree;
+ 
+Return parent L<HTML5::DOM::Tree|/"HTML5::DOM::Tree">.
+
+=head3 nodeType
+
+ my $type = $node->nodeType;
+ 
+Return node type. All types:
+
+ HTML5::DOM->ELEMENT_NODE                   => 1, 
+ HTML5::DOM->ATTRIBUTE_NODE                 => 2,   # not supported
+ HTML5::DOM->TEXT_NODE                      => 3, 
+ HTML5::DOM->CDATA_SECTION_NODE             => 4,   # not supported
+ HTML5::DOM->ENTITY_REFERENCE_NODE          => 5,   # not supported
+ HTML5::DOM->ENTITY_NODE                    => 6,   # not supported
+ HTML5::DOM->PROCESSING_INSTRUCTION_NODE    => 7,   # not supported
+ HTML5::DOM->COMMENT_NODE                   => 8, 
+ HTML5::DOM->DOCUMENT_NODE                  => 9, 
+ HTML5::DOM->DOCUMENT_TYPE_NODE             => 10, 
+ HTML5::DOM->DOCUMENT_FRAGMENT_NODE         => 11, 
+ HTML5::DOM->NOTATION_NODE                  => 12   # not supported
+
+Compatible with: L<https://developer.mozilla.org/ru/docs/Web/API/Node/nodeType>
+
+=head3 next
+
+=head3 nextElementSibling
+
+ my $node2 = $node->next;
+ my $node2 = $node->nextElementSibling; # alias
+
+Return next sibling element node
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $li = $tree->at('ul li');
+ print $li->text;               # Linux
+ print $li->next->text;         # OSX
+ print $li->next->next->text;   # Windows
+
+=head3 prev
+
+=head3 previousElementSibling
+
+ my $node2 = $node->prev;
+ my $node2 = $node->previousElementSibling; # alias
+
+Return previous sibling element node
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li class="win">Windows</li>
+    </ul>
+ ');
+ my $li = $tree->at('ul li.win');
+ print $li->text;               # Windows
+ print $li->prev->text;         # OSX
+ print $li->prev->prev->text;   # Linux
+
+=head3 nextNode
+
+=head3 nextSibling
+
+ my $node2 = $node->nextNode;
+ my $node2 = $node->nextSibling; # alias
+
+Return next sibling node
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $li = $tree->at('ul li');
+ print $li->text;                       # Linux
+ print $li->nextNode->text;             # <!-- comment -->
+ print $li->nextNode->nextNode->text;   # OSX
+
+=head3 prevNode
+
+=head3 previousSibling
+
+ my $node2 = $node->prevNode;
+ my $node2 = $node->previousSibling; # alias
+
+Return previous sibling node
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li class="win">Windows</li>
+    </ul>
+ ');
+ my $li = $tree->at('ul li.win');
+ print $li->text;                       # Windows
+ print $li->prevNode->text;             # OSX
+ print $li->prevNode->prevNode->text;   # <!-- comment -->
+
+=head3 first
+
+=head3 firstElementChild
+
+ my $node2 = $node->first;
+ my $node2 = $node->firstElementChild; # alias
+
+Return first children element
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <!-- comment -->
+        <li>Linux</li>
+        <li>OSX</li>
+        <li class="win">Windows</li>
+    </ul>
+ ');
+ my $ul = $tree->at('ul');
+ print $ul->first->text; # Linux
+
+=head3 last
+
+=head3 lastElementChild
+
+ my $node2 = $node->last;
+ my $node2 = $node->lastElementChild; # alias
+
+Return last children element
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <li>OSX</li>
+        <li class="win">Windows</li>
+        <!-- comment -->
+    </ul>
+ ');
+ my $ul = $tree->at('ul');
+ print $ul->last->text; # Windows
+
+=head3 firstNode
+
+=head3 firstChild
+
+ my $node2 = $node->firstNode;
+ my $node2 = $node->firstChild; # alias
+
+Return first children node
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <!-- comment -->
+        <li>Linux</li>
+        <li>OSX</li>
+        <li class="win">Windows</li>
+    </ul>
+ ');
+ my $ul = $tree->at('ul');
+ print $ul->firstNode->html; # <!-- comment -->
+
+=head3 lastNode
+
+=head3 lastChild
+
+ my $node2 = $node->lastNode;
+ my $node2 = $node->lastChild; # alias
+
+Return last children node
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <li>OSX</li>
+        <li class="win">Windows</li>
+        <!-- comment -->
+    </ul>
+ ');
+ my $ul = $tree->at('ul');
+ print $ul->lastNode->html; # <!-- comment -->
+
+=head3 html
+
+Universal html serialization and fragment parsing acessor, for single human-friendly api.
+
+ my $html = $node->html();
+ my $node = $node->html($new_html);
+
+=over
+
+=item *
+
+As getter this similar to L<outerText|/outerText>
+
+=item *
+
+As setter this similar to L<innerText|/innerText>
+
+=item *
+
+As setter for non-element nodes this similar to L<nodeValue|/nodeValue>
+
+=back
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some   text <b>bold</b></div>');
+ 
+ # get text content for element
+ my $node = $tree->at('#test');
+ print $node->html;                     # <div id="test">some   text <b>bold</b></div>
+ $comment->html('<b>new</b>');
+ print $comment->html;                  # <div id="test"><b>new</b></div>
+ 
+ my $comment = $tree->createComment(" comment text ");
+ print $comment->html;                  # <!-- comment text -->
+ $comment->html(' new comment text ');
+ print $comment->html;                  # <!-- new comment text -->
+ 
+ my $text_node = $tree->createTextNode("plain text >");
+ print $text_node->html;                # plain text &gt;
+ $text_node->html('new>plain>text');
+ print $text_node->html;                # new&gt;plain&gt;text
+
+=head3 innerHTML
+
+=head3 outerHTML
+
+=over
+
+=item *
+
+HTML serialization of the node's descendants. 
+
+ my $html = $node->html;
+ my $html = $node->outerHTML;
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some <b>bold</b> test</div>');
+ print $tree->outerHTML;                         # <div id="test">some <b>bold</b> test</div>
+ print $tree->createComment(' test ')->outerHTML;  # <!-- test -->
+ print $tree->createTextNode('test')->outerHTML; # test
+
+=item *
+
+HTML serialization of the node and its descendants.
+
+ # serialize descendants, without node
+ my $html = $node->innerHTML;
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some <b>bold</b> test</div>');
+ print $tree->innerHTML;                         # some <b>bold</b> test
+ print $tree->createComment(' test ')->innerHTML;  # <!-- test -->
+ print $tree->createTextNode('test')->innerHTML; # test
+
+=item *
+
+Removes all of the element's descendants and replaces them with nodes constructed by parsing the HTML given in the string B<$new_html>.
+
+ # parse fragment and replace child nodes with it
+ my $html = $node->html($new_html);
+ my $html = $node->innerHTML($new_html);
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some <b>bold</b> test</div>');
+ print $tree->at('#test')->innerHTML('<i>italic</i>');
+ print $tree->body->innerHTML;  # <div id="test"><i>italic</i></div>
+
+=item *
+
+Replaces the element and all of its descendants with a new DOM tree constructed by parsing the specified B<$new_html>.
+
+ # parse fragment and node in parent node childs with it
+ my $html = $node->outerHTML($new_html);
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some <b>bold</b> test</div>');
+ print $tree->at('#test')->outerHTML('<i>italic</i>');
+ print $tree->body->innerHTML;  # <i>italic</i>
+
+=back
+
+See, for more info:
+
+L<https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML>
+
+L<https://developer.mozilla.org/en-US/docs/Web/API/Element/outerHTML>
+
+=head3 text
+
+Universal text acessor, for single human-friendly api. 
+
+ my $text = $node->text();
+ my $node = $node->text($new_text);
+
+=over
+
+=item *
+
+For L<HTML5::DOM::Text|/"HTML5::DOM::Text"> is similar to L<nodeValue|/nodeValue> (as setter/getter)
+
+=item *
+
+For L<HTML5::DOM::Comment|/"HTML5::DOM::Comment"> is similar to L<nodeValue|/nodeValue> (as setter/getter)
+
+=item *
+
+For L<HTML5::DOM::DocType|/"HTML5::DOM::DocType"> is similar to L<nodeValue|/nodeValue> (as setter/getter)
+
+=item *
+
+For L<HTML5::DOM::Element|/"HTML5::DOM::Element"> is similar to L<textContent|/textContent> (as setter/getter)
+
+=back
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some   text <b>bold</b></div>');
+ 
+ # get text content for element
+ my $node = $tree->at('#test');
+ print $node->text;                     # some   text bold
+ $comment->text('<new node content>');
+ print $comment->html;                  # &lt;new node conten&gt;
+ 
+ my $comment = $tree->createComment("comment text");
+ print $comment->text;                  # comment text
+ $comment->text(' new comment text ');
+ print $comment->html;                  # <!-- new comment text -->
+ 
+ my $text_node = $tree->createTextNode("plain text");
+ print $text_node->text;                # plain text
+ $text_node->text('new>plain>text');
+ print $text_node->html;                # new&gt;plain&gt;text
+
+=head3 innerText
+
+=head3 outerText
+
+=head3 textContent
+
+=over
+
+=item *
+
+Represents the "rendered" text content of a node and its descendants. 
+Using default CSS "display" property for tags based on Firefox user-agent style. 
+
+Only works for elements, for other nodes return C<undef>.
+
+ my $text = $node->innerText;
+ my $text = $node->outerText; # alias
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('
+    <div id="test">
+        some       
+        <b>      bold     </b>       
+        test
+        <script>alert()</script>
+    </div>
+ ');
+ print $tree->body->innerText; # some bold test
+
+See, for more info: L<https://html.spec.whatwg.org/multipage/dom.html#the-innertext-idl-attribute>
+
+=item *
+
+Removes all of its children and replaces them with a text nodes and <br> with the given value.
+Only works for elements, for other nodes throws exception.
+
+=over
+
+=item *
+
+All new line chars (\r\n, \r, \n) replaces to <br />
+
+=item *
+
+All other text content replaces to text nodes
+
+=back
+
+ my $node = $node->innerText($text);
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some text <b>bold</b></div>');
+ $tree->at('#test')->innerText("some\nnew\ntext >");
+ print $tree->at('#test')->html;    # <div id="test">some<br />new<br />text &gt;</div>
+
+See, for more info: L<https://html.spec.whatwg.org/multipage/dom.html#the-innertext-idl-attribute>
+
+=item *
+
+Removes the current node and replaces it with the given text.
+Only works for elements, for other nodes throws exception.
+
+=over
+
+=item *
+
+All new line chars (\r\n, \r, \n) replaces to <br />
+
+=item *
+
+All other text content replaces to text nodes
+
+=item *
+
+Similar to innerText($text), but removes current node
+
+=back
+
+ my $node = $node->outerText($text);
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some text <b>bold</b></div>');
+ $tree->at('#test')->outerText("some\nnew\ntext >");
+ print $tree->body->html;   # <body>some<br />new<br />text &gt;</body>
+
+See, for more info: L<https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/outerText>
+
+=item *
+
+Represents the text content of a node and its descendants.
+
+Only works for elements, for other nodes return C<undef>.
+
+ my $text = $node->text;
+ my $text = $node->textContent; # alias
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<b>    test      </b><script>alert()</script>');
+ print $tree->body->text; #     test      alert()
+
+See, for more info: L<https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent>
+
+=item *
+
+Removes all of its children and replaces them with a single text node with the given value.
+
+ my $node = $node->text($new_text);
+ my $node = $node->textContent($new_text);
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some <b>bold</b> test</div>');
+ print $tree->at('#test')->text('<bla bla bla>');
+ print $tree->at('#test')->html;  # <div id="test">&lt;bla bla bla&gt;</div>
+
+See, for more info: L<https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent>
+
+=back
+
+=head3 nodeHtml
+
+ my $html = $node->nodeHtml();
+
+Serialize to html, without descendants and closing tag.
+
+ my $tree = HTML5::DOM->new->parse('<div id="test">some <b>bold</b> test</div>');
+ print $tree->at('#test')->nodeHtml(); # <div id="test">
+
+=head3 nodeValue
+
+=head3 data
+
+ my $value = $node->nodeValue();
+ my $value = $node->data(); # alias
+
+ my $node = $node->nodeValue($new_value);
+ my $node = $node->data($new_value); # alias
+
+Get or set value of node. Only works for non-element nodes, such as  L<HTML5::DOM::Element|/"HTML5::DOM::Text">,  L<HTML5::DOM::Element|/"HTML5::DOM::DocType">, 
+L<HTML5::DOM::Element|/"HTML5::DOM::Comment">. Return C<undef> for other.
+
+ my $tree = HTML5::DOM->new->parse('');
+ my $comment = $tree->createComment("comment text");
+ print $comment->nodeValue;                 # comment text
+ $comment->nodeValue(' new comment text ');
+ print $comment->html;                      # <!-- new comment text -->
+
+=head3 isConnected
+
+ my $flag = $node->isConnected;
+
+Return true, if node has parent.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div id="test"></div>
+ ');
+ print $tree->at('#test')->isConnected;             # 1
+ print $tree->createElement("div")->isConnected;    # 0
+
+=head3 parent
+
+=head3 parentElement
+
+ my $node = $node->parent;
+ my $node = $node->parentElement; # alias
+
+Return parent node. Return C<undef>, if node detached.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div id="test"></div>
+ ');
+ print $tree->at('#test')->parent->tag; # body
+
+=head3 document
+
+=head3 ownerDocument
+
+ my $doc = $node->document;
+ my $doc = $node->ownerDocument; # alias
+
+Return parent L<HTML5::DOM::Document|/"HTML5::DOM::Document">. 
+
+ my $tree = HTML5::DOM->new->parse('
+    <div id="test"></div>
+ ');
+ print ref($tree->at('#test')->document);   # HTML5::DOM::Document
+
+=head3 append
+
+=head3 appendChild
+
+ my $node = $node->append($child);
+ my $child = $node->appendChild($child); # alias
+
+Append node to child nodes.
+
+B<append> - returned value is the self node, for chain calls
+
+B<appendChild> - returned value is the appended child except when the given child is a L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment">, 
+in which case the empty L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment"> is returned.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ $tree->at('div')
+    ->append($tree->createElement('br'))
+    ->append($tree->createElement('br'));
+ print $tree->at('div')->html; # <div>some <b>bold</b> text<br /><br /></div>
+
+=head3 prepend
+
+=head3 prependChild
+
+ my $node = $node->prepend($child);
+ my $child = $node->prependChild($child); # alias
+
+Prepend node to child nodes.
+
+B<prepend> - returned value is the self node, for chain calls
+
+B<prependChild> - returned value is the prepended child except when the given child is a L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment">, 
+in which case the empty L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment"> is returned.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ $tree->at('div')
+    ->prepend($tree->createElement('br'))
+    ->prepend($tree->createElement('br'));
+ print $tree->at('div')->html; # <div><br /><br />some <b>bold</b> text</div>
+
+=head3 replace
+
+=head3 replaceChild
+
+ my $old_node = $old_node->replace($new_node);
+ my $old_node = $old_node->parent->replaceChild($new_node, $old_node); # alias
+
+Replace node in parent child nodes.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ my $old = $tree->at('b')->replace($tree->createElement('br'));
+ print $old->html;              # <b>bold</b>
+ print $tree->at('div')->html;  # <div>some <br /> text</div>
+
+=head3 before
+
+=head3 insertBefore
+
+ my $node = $node->before($new_node);
+ my $new_node = $node->parent->insertBefore($new_node, $node); # alias
+
+Insert new node before current node.
+
+B<before> - returned value is the self node, for chain calls
+
+B<insertBefore> - returned value is the added child except when the given child is a L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment">, 
+in which case the empty L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment"> is returned.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ $tree->at('b')->before($tree->createElement('br'));
+ print $tree->at('div')->html; # <div>some <br /><b>bold</b> text</div>
+
+=head3 after
+
+=head3 insertAfter
+
+ my $node = $node->after($new_node);
+ my $new_node = $node->parent->insertAfter($new_node, $node); # alias
+
+Insert new node after current node.
+
+B<after> - returned value is the self node, for chain calls
+
+B<insertAfter> - returned value is the added child except when the given child is a L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment">, 
+in which case the empty L<HTML5::DOM::Fragment|/"HTML5::DOM::Fragment"> is returned.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ $tree->at('b')->after($tree->createElement('br'));
+ print $tree->at('div')->html; # <div>some <b>bold</b><br /> text</div>
+
+=head3 remove
+
+=head3 removeChild
+
+ my $node = $node->remove;
+ my $node = $node->parent->removeChild($node); # alias
+
+Remove node from parent. Return removed node.
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ print $tree->at('b')->remove->html;    # <b>bold</b>
+ print $tree->at('div')->html;          # <div>some  text</div>
+
+=head3 clone
+
+=head3 cloneNode
+
+ # clone node to current tree
+ my $node = $node->clone($deep = 0);
+ my $node = $node->cloneNode($deep = 0); # alias
+
+ # clone node to foreign tree
+ my $node = $node->clone($deep, $new_tree);
+ my $node = $node->cloneNode($deep, $new_tree); # alias
+
+Clone node. 
+
+B<deep> = 0 - only specified node, without childs. 
+
+B<deep> = 1 - deep copy with all child nodes.
+
+B<new_tree> - destination tree (if need copy to foreign tree)
+
+ my $tree = HTML5::DOM->new->parse('
+    <div>some <b>bold</b> text</div>
+ ');
+ print $tree->at('b')->clone(0)->html; # <b></b>
+ print $tree->at('b')->clone(1)->html; # <b>bold</b>
+
+=head3 void
+
+ my $flag = $node->void;
+
+Return true if node is void. For more details: L<http://w3c.github.io/html-reference/syntax.html#void-elements>
+
+ print $tree->createElement('br')->void; # 1
+
+=head3 selfClosed
+
+ my $flag = $node->selfClosed;
+
+Return true if node self closed. 
+
+ print $tree->createElement('br')->selfClosed; # 1
+
+=head3 position
+
+ my $position = $node->position;
+
+Return offsets in input buffer.
+
+ print Dumper($node->position);
+ # $VAR1 = {'raw_length' => 3, 'raw_begin' => 144, 'element_begin' => 143, 'element_length' => 5}
+
+=head3 isSameNode
+
+ my $flag = $node->isSameNode($other_node);
+
+Tests whether two nodes are the same, that is if they reference the same object.
+ 
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>test</li>
+        <li>not test</li>
+        <li>test</li>
+    </ul>
+ ');
+ my $li = $tree->find('li');
+ print $li->[0]->isSameNode($li->[0]); # 1
+ print $li->[0]->isSameNode($li->[1]); # 0
+ print $li->[0]->isSameNode($li->[2]); # 0
+
+=head3 wait
+
+ my $parser = HTML5::DOM->new({async => 1});
+ my $tree = $parser->parse($some_big_html_file);
+ # ...some your work...
+ $tree->body->wait; # wait before parsing for <body> is done
+
+Blocking wait for node parsing done. Only for async mode.
+
+=head3 parsed
+
+ my $parser = HTML5::DOM->new({async => 1});
+ my $tree = $parser->parse($some_big_html_file);
+ # ...some your work...
+ while (!$tree->body->parsed); # wait before parsing for <body> is done
+
+Non-blocking way for check if node parsing done. Only for async mode.
+
+
+=head1 HTML5::DOM::Element
+
+DOM node object for elements. Inherit all methods from L<HTML5::DOM::Node|/HTML5::DOM::Node>.
+
+=head3 children
+
+ my $collection = $node->children;
+
+Returns all child elements of current node in L<HTML5::DOM::Collection|/HTML5::DOM::Collection>.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Perl</li>
+        <!-- comment -->
+        <li>PHP</li>
+        <li>C++</li>
+    </ul>
+ ');
+ my $collection = $tree->at('ul')->children;
+ print $collection->[0]->html; # <li>Perl</li>
+ print $collection->[1]->html; # <li>PHP</li>
+ print $collection->[2]->html; # <li>C++</li>
+
+=head3 childrenNode
+
+=head3 childNodes
+
+ my $collection = $node->childrenNode;
+ my $collection = $node->childNodes; # alias
+
+Returns all child nodes of current node in L<HTML5::DOM::Collection|/HTML5::DOM::Collection>.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Perl</li>
+        <!-- comment -->
+        <li>PHP</li>
+        <li>C++</li>
+    </ul>
+ ');
+ my $collection = $tree->at('ul')->childrenNode;
+ print $collection->[0]->html; # <li>Perl</li>
+ print $collection->[1]->html; # <!-- comment -->
+ print $collection->[2]->html; # <li>PHP</li>
+ print $collection->[3]->html; # <li>C++</li>
+
+=head3 attr
+
+=head3 removeAttr
+
+Universal attributes accessor, for single human-friendly api.
+
+ # attribute get
+ my $value = $node->attr($key);
+ 
+ # attribute set
+ my $node = $node->attr($key, $value);
+ my $node = $node->attr($key => $value);
+ 
+ # attribute remove
+ my $node = $node->attr($key, undef);
+ my $node = $node->attr($key => undef);
+ my $node = $node->removeAttr($key);
+ 
+ # bulk attributes set
+ my $node = $node->attr({$key => $value, $key2 => $value2});
+ 
+ # bulk attributes remove
+ my $node = $node->attr({$key => undef, $key2 => undef});
+ 
+ # bulk get all attributes in hash
+ my $hash = $node->attr;
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('
+    <div id="test" data-test="test value" data-href="#"></div>
+ ');
+ my $div = $tree->at('ul');
+ $div->attr("data-new", "test");
+ print $div->attr("data-test");     # test value
+ print $div->{"data-test"};         # test value
+ print $div->attr->{"data-test"};   # test value
+ 
+ # {id => "test", "data-test" => "test value", "data-href" => "#", "data-new" => "test"}
+ print $div->attr;
+ 
+ $div->removeAttr("data-test");
+ 
+ # {id => "test", "data-href" => "#", "data-new" => "test"}
+ print $div->attr;
+
+=head3 getAttribute
+
+ my $value = $node->getAttribute($key);
+ my $value = $node->attr($key); # alias
+
+Get attribute value by key.
+
+=head3 setAttribute
+
+ my $node = $node->setAttribute($key, $value);
+ my $node = $node->attr($key, $value); # alias
+
+Set new value or create new attibute. 
+
+=head3 removeAttribute
+
+ my $node = $node->removeAttribute($key);
+ my $node = $node->removeAttr($key); # alias
+
+Remove attribute.
+
+=head3 className
+
+ my $classes = $node->className;
+ # alias for
+ my $classes = $node->attr("class");
+
+=head3 classList
+
+ my $class_list = $node->classList;
+ 
+ # has class
+ my $flag = $class_list->has($class_name);
+ my $flag = $class_list->contains($class_name);
+ 
+ # add class
+ my $class_list = $class_list->add($class_name);
+ my $class_list = $class_list->add($class_name, $class_name1, $class_name2, ...);
+
+ # add class
+ my $class_list = $class_list->remove($class_name);
+ my $class_list = $class_list->remove($class_name, $class_name1, $class_name2, ...);
+
+ # toggle class
+ my $state = $class_list->toggle($class_name);
+ my $state = $class_list->toggle($class_name, $force_state);
+
+Manipulations with classes. Returns L<HTML5::DOM::TokenList|/HTML5::DOM::TokenList>.
+
+Similar to L<https://developer.mozilla.org/en-US/docs/Web/API/Element/classList>
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div>')
+ my $node = $tree->body->at('.red');
+ print $node->has('red');                       # 1
+ print $node->has('blue');                      # 0
+ $node->add('blue', 'red', 'yellow', 'orange');
+ print $node->className;                        # red blue yellow orange
+ $node->remove('blue', 'orange');
+ print $node->className;                        # red yellow
+ print $node->toggle('blue');                   # 1
+ print $node->className;                        # red yellow blue
+ print $node->toggle('blue');                   # 0
+ print $node->className;                        # red yellow
+
+=head3 at
+
+=head3 querySelector
+
+ my $node = $node->at($selector);
+ my $node = $node->at($selector, $combinator);
+ my $node = $node->querySelector($selector); # alias
+ my $node = $node->querySelector($selector, $combinator); # alias
+
+Find one element node in current node descendants using L<CSS Selectors Level 4|https://www.w3.org/TR/selectors-4/>
+
+Return node, or C<undef> if not find.
+
+=over
+
+=item *
+
+C<$selector> - selector query as plain text or precompiled as L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector> or 
+L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector::Entry>.
+
+=item *
+
+C<$combinator> - custom selector combinator, applies to current node
+
+=over
+
+=item *
+
+C<E<gt>E<gt>> - descendant selector (default)
+
+=item *
+
+C<E<gt>> - child selector
+
+=item *
+
+C<+> - adjacent sibling selector
+
+=item *
+
+C<~> - general sibling selector
+
+=item *
+
+C<||> - column combinator
+
+=back
+
+=back
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
+ my $node = $tree->body->at('body > div.red');
+ print $node->html; # <div class="red">red</div>
+
+=head3 find
+
+=head3 querySelectorAll
+
+ my $collection = $node->find($selector);
+ my $collection = $node->find($selector, $combinator);
+ my $collection = $node->querySelectorAll($selector); # alias
+ my $collection = $node->querySelectorAll($selector, $combinator); # alias
+
+Find all element nodes in current node descendants using L<CSS Selectors Level 4|https://www.w3.org/TR/selectors-4/>
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+=over
+
+=item *
+
+C<$selector> - selector query as plain text or precompiled as L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector> or 
+L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector::Entry>.
+
+=item *
+
+C<$combinator> - custom selector combinator, applies to current node
+
+=over
+
+=item *
+
+C<E<gt>E<gt>> - descendant selector (default)
+
+=item *
+
+C<E<gt>> - child selector
+
+=item *
+
+C<+> - adjacent sibling selector
+
+=item *
+
+C<~> - general sibling selector
+
+=item *
+
+C<||> - column combinator
+
+=back
+
+=back
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
+ my $collection = $tree->body->at('body > div.red, body > div.blue');
+ print $collection->[0]->html; # <div class="red">red</div>
+ print $collection->[1]->html; # <div class="red">blue</div>
+
+=head3 findId
+
+=head3 getElementById
+
+ my $node = $node->findId($tag);
+ my $node = $node->getElementById($tag); # alias
+
+Find element node with specified id in current node descendants.
+
+Return L<HTML5::DOM::Node|/"HTML5::DOM::Node"> or C<undef>.
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue" id="test">blue</div>')
+ my $node = $tree->body->findId('test');
+ print $node->html; # <div class="blue" id="test">blue</div>
+
+=head3 findTag
+
+=head3 getElementsByTagName
+
+ my $node = $node->findTag($tag);
+ my $node = $node->getElementsByTagName($tag); # alias
+
+Find all element nodes in current node descendants with specified tag name.
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+ my $tree = HTML5::DOM->new->parse('<div class="red">red</div><div class="blue">blue</div>')
+ my $collection = $tree->body->findTag('div');
+ print $collection->[0]->html; # <div class="red">red</div>
+ print $collection->[1]->html; # <div class="red">blue</div>
+
+=head3 findClass
+
+=head3 getElementsByClassName
+
+ my $collection = $node->findClass($class);
+ my $collection = $node->getElementsByClassName($class); # alias
+
+Find all element nodes in current node descendants with specified class name.
+This is more fast equivalent to [class~="value"] selector.
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+ my $tree = HTML5::DOM->new
+    ->parse('<div class="red color">red</div><div class="blue color">blue</div>');
+ my $collection = $tree->body->findClass('color');
+ print $collection->[0]->html; # <div class="red color">red</div>
+ print $collection->[1]->html; # <div class="red color">blue</div>
+
+=head3 findAttr
+
+=head3 getElementByAttribute
+ 
+ # Find all elements with attribute
+ my $collection = $node->findAttr($attribute);
+ my $collection = $node->getElementByAttribute($attribute); # alias
+ 
+ # Find all elements with attribute and mathcing value
+ my $collection = $node->findAttr($attribute, $value, $case = 0, $cmp = '=');
+ my $collection = $node->getElementByAttribute($attribute, $value, $case = 0, $cmp = '='); # alias
+
+Find all element nodes in tree with specified attribute and optional matching value.
+
+Return L<HTML5::DOM::Collection|/"HTML5::DOM::Collection">.
+
+ my $tree = HTML5::DOM->new
+    ->parse('<div class="red color">red</div><div class="blue color">blue</div>');
+ my $collection = $tree->body->findAttr('class', 'CoLoR', 1, '~');
+ print $collection->[0]->html; # <div class="red color">red</div>
+ print $collection->[1]->html; # <div class="red color">blue</div>
+
+CSS selector analogs:
+
+ # [$attribute=$value]
+ my $collection = $node->findAttr($attribute, $value, 0, '=');
+ 
+ # [$attribute=$value i]
+ my $collection = $node->findAttr($attribute, $value, 1, '=');
+ 
+ # [$attribute~=$value]
+ my $collection = $node->findAttr($attribute, $value, 0, '~');
+ 
+ # [$attribute|=$value]
+ my $collection = $node->findAttr($attribute, $value, 0, '|');
+ 
+ # [$attribute*=$value]
+ my $collection = $node->findAttr($attribute, $value, 0, '*');
+
+ # [$attribute^=$value]
+ my $collection = $node->findAttr($attribute, $value, 0, '^');
+
+ # [$attribute$=$value]
+ my $collection = $node->findAttr($attribute, $value, 0, '$');
+
+=head3 getDefaultBoxType
+
+ my $display = $node->getDefaultBoxType;
+
+Get default CSS "display" property for tag (useful for functions like a L<innerText|/innerText>).
+
+ my $tree = HTML5::DOM->new
+    ->parse('<div class="red color">red</div><script>alert()</script><b>bbb</b>');
+ print $tree->at('div')->getDefaultBoxType();       # block
+ print $tree->at('script')->getDefaultBoxType();    # none
+ print $tree->at('b')->getDefaultBoxType();         # inline
+
+=head1 HTML5::DOM::Document
+
+DOM node object for document. Inherit all methods from L<HTML5::DOM::Element|/HTML5::DOM::Element>.
+
+
+=head1 HTML5::DOM::Fragment
+
+DOM node object for fragments. Inherit all methods from L<HTML5::DOM::Element|/HTML5::DOM::Element>.
+
+
+=head1 HTML5::DOM::Text
+
+DOM node object for text. Inherit all methods from L<HTML5::DOM::Node|/HTML5::DOM::Node>.
+
+
+=head1 HTML5::DOM::Comment
+
+DOM node object for comments. Inherit all methods from L<HTML5::DOM::Node|/HTML5::DOM::Node>.
+
+
+=head1 HTML5::DOM::DocType
+
+DOM node object for document type. Inherit all methods from L<HTML5::DOM::Node|/HTML5::DOM::Node>.
+
+
+=head1 HTML5::DOM::Collection
+
+CSS Parser object
+
+=head3 new
+
+ my $collection = HTML5::DOM::Collection->new($nodes);
+
+Creates new collection from C<$nodes> (reference to array with L<HTML5::DOM::Node|/HTML5::DOM::Node>).
+
+=head3 add
+
+ my $collection = $collection->add($node);
+
+Add new item to collection.
+
+=head3 length
+
+ my $length = $collection->length;
+
+Items count in collection.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print $collection->length; # 3
+
+=head3 first
+
+=head3 last
+
+ my $node = $collection->first;
+ my $node = $collection->last;
+
+Get first or last item in collection.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print $collection->first->html;        #  <li>Linux</li>
+ print $collection->last->html;         #  <li>Windows</li>
+
+=head3 item
+
+ my $node = $collection->item($index);
+ my $node = $collection->[$index];
+
+Get item by C<$index> in collection.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print $collection->item(1)->html;      # <li>OSX</li>
+ print $collection->[1]->html;          # <li>OSX</li>
+
+=head3 array
+
+ my $node = $collection->array();
+
+Get collection items as array.
+
+=head3 html
+
+ my $html = $collection->html;
+
+Concat <outerHTML|/outerHTML> from all items.
+
+=head3 text
+
+ my $text = $collection->text;
+
+Concat <textContent|/textContent> from all items.
+
+=head1 HTML5::DOM::TokenList
+
+Similar to L<https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList>
+
+=head3 has
+
+=head3 contains
+
+ my $flag = $tokens->has($token);
+ my $flag = $tokens->contains($token); # alias
+
+Check if token contains in current tokens list.
+
+=head3 add
+
+ my $tokens = $tokens->add($token);
+ my $tokens = $tokens->add($token, $token2, ...);
+
+Add new token (or tokens) to current tokens list. Returns self.
+
+=head3 remove
+
+ my $tokens = $tokens->add($token);
+ my $tokens = $tokens->add($token, $token2, ...);
+
+Remove one or more tokens from current tokens list. Returns self.
+
+=head3 toggle
+
+ my $state = $tokens->toggle($token);
+ my $state = $tokens->toggle($token, $force_state);
+
+=over
+
+=item *
+
+C<$token> - specified token name
+
+=item *
+
+C<$force_state> - optional force state.
+
+If 1 - similar to L<add>
+
+If 0 - similar to L<remove>
+
+=back
+
+Toggle specified token in current tokens list.
+
+=over
+
+=item *
+
+If token exists - remove it
+
+=item *
+
+If token not exists - add it
+
+=back
+
+=head3 length
+
+ my $length = $tokens->length;
+
+Returns tokens count in current list.
+
+=head3 item
+
+ my $token = $tokens->item($index);
+ my $token = $tokens->[$index];
+
+Return token by index.
+
+=head3 each
+
+ my $token = $tokens->each(sub {
+    my ($token, $index) = @_;
+    print "tokens[$index] is a '$token'\n";
+ });
+
+Forach all tokens in list.
+
+=head1 HTML5::DOM::CSS
+
+CSS Parser object
+
+=head3 new
+
+ my $css = HTML5::DOM::CSS->new;
+
+Create new css parser object.
+
+=head3 parseSelector
+
+ my $selector = HTML5::DOM::CSS->parseSelector($selector_text);
+
+Parse C<$selector_text> and return L<HTML5::DOM::CSS::Selector|/HTML5::DOM::CSS::Selector>.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+
+=head1 HTML5::DOM::CSS::Selector
+
+CSS Selector object (precompiled selector)
+
+=head3 new
+
+ my $selector = HTML5::DOM::CSS::Selector->new($selector_text);
+
+Parse C<$selector_text> and create new css selector object. 
+If your need parse many selectors, more efficient way using
+single instance of parser L<HTML5::DOM::CSS|/HTML5::DOM::CSS> and 
+L<parseSelector|/parseSelector> method.
+
+=head3 text
+
+ my $selector_text = $selector->text;
+
+Serialize selector to text.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+ print $selector->text."\n"; # body div.red, body span.blue
+
+=head3 ast
+
+ my $ast = $entry->ast;
+
+Serialize selector to very simple AST format.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('div > .red');
+ print Dumper($selector->ast);
+ 
+ # $VAR1 = [[
+ #     {
+ #         'value' => 'div',
+ #         'type' => 'tag'
+ #     },
+ #     {
+ #         'type'  => 'combinator',
+ #         'value' => 'child'
+ #     },
+ #     {
+ #         'type' => 'class',
+ #         'value' => 'red'
+ #     }
+ # ]];
+
+=head3 length
+
+ my $length = $selector->length;
+
+Get selector entries count (selectors separated by "," combinator)
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+ print $selector->length."\n"; # 2
+
+=head3 entry
+
+ my $entry = $selector->entry($index);
+
+Get selector entry by C<$index> end return L<HTML5::DOM::CSS::Selector::Entry|/HTML5::DOM::CSS::Selector::Entry>.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+ print $selector->entry(0)->text."\n"; # body div.red
+ print $selector->entry(1)->text."\n"; # body span.blue
+
+
+=head1 HTML5::DOM::CSS::Selector::Entry
+
+CSS selector entry object (precompiled selector)
+
+=head3 text
+
+ my $selector_text = $entry->text;
+
+Serialize entry to text.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+ my $entry = $selector->entry(0);
+ print $entry->text."\n"; # body div.red
+
+=head3 pseudoElement
+
+ my $pseudo_name = $entry->pseudoElement;
+
+Return pseudo-element name for entry.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('div::after');
+ my $entry = $selector->entry(0);
+ print $entry->pseudoElement."\n"; # after
+
+=head3 ast
+
+ my $ast = $entry->ast;
+
+Serialize entry to very simple AST format.
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('div > .red');
+ my $entry = $selector->entry(0);
+ print Dumper($entry->ast);
+ 
+ # $VAR1 = [
+ #     {
+ #         'value' => 'div',
+ #         'type' => 'tag'
+ #     },
+ #     {
+ #         'type'  => 'combinator',
+ #         'value' => 'child'
+ #     },
+ #     {
+ #         'type' => 'class',
+ #         'value' => 'red'
+ #     }
+ # ];
+
+=head3 specificity
+
+ my $specificity = $entry->specificity;
+
+Get specificity in hash C<{a, b, c}>
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+ my $entry = $selector->entry(0);
+ print Dumper($entry->specificity); # {b => 0, a => 1, c => 2}
+
+=head3 specificityArray
+
+ my $specificity = $entry->specificityArray;
+
+Get specificity in array C<[b, a, c]> (ordered by weight)
+
+ my $css = HTML5::DOM::CSS->new;
+ my $selector = $css->parseSelector('body div.red, body span.blue');
+ my $entry = $selector->entry(0);
+ print Dumper($entry->specificityArray); # [0, 1, 2]
+
+
+=head1 HTML5::DOM::Encoding
+
+Encoding detection.
+
+See for available encodings: L</ENCODINGS>
+
+=head3 id2name
+
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+
+Get encoding name by id.
+
+ print HTML5::DOM::Encoding::id2name(HTML5::DOM::Encoding->UTF_8); # UTF-8
+
+=head3 name2id
+
+ my $encoding_id = HTML5::DOM::Encoding::name2id($encoding);
+
+Get id by name.
+ 
+ print HTML5::DOM::Encoding->UTF_8;             # 0
+ print HTML5::DOM::Encoding::id2name("UTF-8");  # 0
+
+=head3 detectAuto
+
+ my ($encoding_id, $new_text) = HTML5::DOM::Encoding::detectAuto($text, $max_length = 0);
+
+Auto detect text encoding using (in this order):
+
+=over
+
+=item *
+
+L<detectByPrescanStream|/detectByPrescanStream>
+
+=item *
+
+L<detectBomAndCut|/detectBomAndCut>
+
+=item *
+
+L<detect|/detect>
+
+=back
+
+Returns array with encoding id and new text without BOM, if success. 
+
+If fail, then encoding id equal HTML5::DOM::Encoding->NOT_DETERMINED.
+
+ my ($encoding_id, $new_text) = HTML5::DOM::Encoding::detectAuto("ололо");
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+ print $encoding; # UTF-8
+
+=head3 detect
+
+ my $encoding_id = HTML5::DOM::Encoding::detect($text, $max_length = 0);
+
+Detect text encoding. Single method for both L<detectRussian|/detectRussian> and L<detectUnicode|/detectUnicode>.
+
+Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
+
+ my $encoding_id = HTML5::DOM::Encoding::detect("ололо");
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+ print $encoding; # UTF-8
+
+=head3 detectRussian
+
+ my $encoding_id = HTML5::DOM::Encoding::detectRussian($text, $max_length = 0);
+
+Detect russian text encoding (using lowercase B<trigrams>), such as C<windows-1251>, C<koi8-r>, C<iso-8859-5>, C<x-mac-cyrillic>, C<ibm866>.
+
+Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
+
+=head3 detectUnicode
+
+ my $encoding_id = HTML5::DOM::Encoding::detectRussian($text, $max_length = 0);
+
+Detect unicode family text encoding, such as C<UTF-8>, C<UTF-16LE>, C<UTF-16BE>.
+
+Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
+
+ # get UTF-16LE data for test
+ my $str = "ололо";
+ Encode::from_to($str, "UTF-8", "UTF-16LE");
+ 
+ my $encoding_id = HTML5::DOM::Encoding::detectUnicode($str);
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+ print $encoding; # UTF-16LE
+
+=head3 detectByPrescanStream
+
+ my $encoding_id = HTML5::DOM::Encoding::detectByPrescanStream($text, $max_length = 0);
+
+Detect encoding by parsing C<E<lt>metaE<gt>> tags in html.
+
+Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
+
+See for more info: L<https://html.spec.whatwg.org/multipage/syntax.html#prescan-a-byte-stream-to-determine-its-encoding>
+
+ my $encoding_id = HTML5::DOM::Encoding::detectByPrescanStream('
+    <meta http-equiv="content-type" content="text/html; charset=windows-1251">
+ ');
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+ print $encoding; # WINDOWS-1251
+
+=head3 detectByCharset
+
+ my $encoding_id = HTML5::DOM::Encoding::detectByCharset($text, $max_length = 0);
+
+Extracting character encoding from string. Find "charset=" and see encoding. Return found raw data.
+
+For example: "text/html; charset=windows-1251". Return HTML5::DOM::Encoding->WINDOWS_1251
+
+And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
+
+See for more info: L<https://html.spec.whatwg.org/multipage/infrastructure.html#algorithm-for-extracting-a-character-encoding-from-a-meta-element>
+
+ my $encoding_id = HTML5::DOM::Encoding::detectByPrescanStream('
+    <meta http-equiv="content-type" content="text/html; charset=windows-1251">
+ ');
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+ print $encoding; # WINDOWS-1251
+
+=head3 detectBomAndCut
+
+ my ($encoding_id, $new_text) = HTML5::DOM::Encoding::detectBomAndCut($text, $max_length = 0);
+
+Returns array with encoding id and new text without BOM. 
+
+If fail, then encoding id equal HTML5::DOM::Encoding->NOT_DETERMINED.
+
+ my ($encoding_id, $new_text) = HTML5::DOM::Encoding::detectBomAndCut("\xEF\xBB\xBFололо");
+ my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
+ print $encoding; # UTF-8
+ print $new_text; # ололо
+
+=head1 NAMESPACES
+
+=head3 Supported namespace names
+
+ html, matml, svg, xlink, xml, xmlns
+
+=head3 Supported namespace id constants
+
+ HTML5::DOM->NS_UNDEF
+ HTML5::DOM->NS_HTML
+ HTML5::DOM->NS_MATHML
+ HTML5::DOM->NS_SVG
+ HTML5::DOM->NS_XLINK
+ HTML5::DOM->NS_XML
+ HTML5::DOM->NS_XMLNS
+ HTML5::DOM->NS_ANY
+ HTML5::DOM->NS_LAST_ENTRY
+
+=head1 TAGS
+
+ HTML5::DOM->TAG__UNDEF
+ HTML5::DOM->TAG__TEXT
+ HTML5::DOM->TAG__COMMENT
+ HTML5::DOM->TAG__DOCTYPE
+ HTML5::DOM->TAG_A
+ HTML5::DOM->TAG_ABBR
+ HTML5::DOM->TAG_ACRONYM
+ HTML5::DOM->TAG_ADDRESS
+ HTML5::DOM->TAG_ANNOTATION_XML
+ HTML5::DOM->TAG_APPLET
+ HTML5::DOM->TAG_AREA
+ HTML5::DOM->TAG_ARTICLE
+ HTML5::DOM->TAG_ASIDE
+ HTML5::DOM->TAG_AUDIO
+ HTML5::DOM->TAG_B
+ HTML5::DOM->TAG_BASE
+ HTML5::DOM->TAG_BASEFONT
+ HTML5::DOM->TAG_BDI
+ HTML5::DOM->TAG_BDO
+ HTML5::DOM->TAG_BGSOUND
+ HTML5::DOM->TAG_BIG
+ HTML5::DOM->TAG_BLINK
+ HTML5::DOM->TAG_BLOCKQUOTE
+ HTML5::DOM->TAG_BODY
+ HTML5::DOM->TAG_BR
+ HTML5::DOM->TAG_BUTTON
+ HTML5::DOM->TAG_CANVAS
+ HTML5::DOM->TAG_CAPTION
+ HTML5::DOM->TAG_CENTER
+ HTML5::DOM->TAG_CITE
+ HTML5::DOM->TAG_CODE
+ HTML5::DOM->TAG_COL
+ HTML5::DOM->TAG_COLGROUP
+ HTML5::DOM->TAG_COMMAND
+ HTML5::DOM->TAG_COMMENT
+ HTML5::DOM->TAG_DATALIST
+ HTML5::DOM->TAG_DD
+ HTML5::DOM->TAG_DEL
+ HTML5::DOM->TAG_DETAILS
+ HTML5::DOM->TAG_DFN
+ HTML5::DOM->TAG_DIALOG
+ HTML5::DOM->TAG_DIR
+ HTML5::DOM->TAG_DIV
+ HTML5::DOM->TAG_DL
+ HTML5::DOM->TAG_DT
+ HTML5::DOM->TAG_EM
+ HTML5::DOM->TAG_EMBED
+ HTML5::DOM->TAG_FIELDSET
+ HTML5::DOM->TAG_FIGCAPTION
+ HTML5::DOM->TAG_FIGURE
+ HTML5::DOM->TAG_FONT
+ HTML5::DOM->TAG_FOOTER
+ HTML5::DOM->TAG_FORM
+ HTML5::DOM->TAG_FRAME
+ HTML5::DOM->TAG_FRAMESET
+ HTML5::DOM->TAG_H1
+ HTML5::DOM->TAG_H2
+ HTML5::DOM->TAG_H3
+ HTML5::DOM->TAG_H4
+ HTML5::DOM->TAG_H5
+ HTML5::DOM->TAG_H6
+ HTML5::DOM->TAG_HEAD
+ HTML5::DOM->TAG_HEADER
+ HTML5::DOM->TAG_HGROUP
+ HTML5::DOM->TAG_HR
+ HTML5::DOM->TAG_HTML
+ HTML5::DOM->TAG_I
+ HTML5::DOM->TAG_IFRAME
+ HTML5::DOM->TAG_IMAGE
+ HTML5::DOM->TAG_IMG
+ HTML5::DOM->TAG_INPUT
+ HTML5::DOM->TAG_INS
+ HTML5::DOM->TAG_ISINDEX
+ HTML5::DOM->TAG_KBD
+ HTML5::DOM->TAG_KEYGEN
+ HTML5::DOM->TAG_LABEL
+ HTML5::DOM->TAG_LEGEND
+ HTML5::DOM->TAG_LI
+ HTML5::DOM->TAG_LINK
+ HTML5::DOM->TAG_LISTING
+ HTML5::DOM->TAG_MAIN
+ HTML5::DOM->TAG_MAP
+ HTML5::DOM->TAG_MARK
+ HTML5::DOM->TAG_MARQUEE
+ HTML5::DOM->TAG_MENU
+ HTML5::DOM->TAG_MENUITEM
+ HTML5::DOM->TAG_META
+ HTML5::DOM->TAG_METER
+ HTML5::DOM->TAG_MTEXT
+ HTML5::DOM->TAG_NAV
+ HTML5::DOM->TAG_NOBR
+ HTML5::DOM->TAG_NOEMBED
+ HTML5::DOM->TAG_NOFRAMES
+ HTML5::DOM->TAG_NOSCRIPT
+ HTML5::DOM->TAG_OBJECT
+ HTML5::DOM->TAG_OL
+ HTML5::DOM->TAG_OPTGROUP
+ HTML5::DOM->TAG_OPTION
+ HTML5::DOM->TAG_OUTPUT
+ HTML5::DOM->TAG_P
+ HTML5::DOM->TAG_PARAM
+ HTML5::DOM->TAG_PLAINTEXT
+ HTML5::DOM->TAG_PRE
+ HTML5::DOM->TAG_PROGRESS
+ HTML5::DOM->TAG_Q
+ HTML5::DOM->TAG_RB
+ HTML5::DOM->TAG_RP
+ HTML5::DOM->TAG_RT
+ HTML5::DOM->TAG_RTC
+ HTML5::DOM->TAG_RUBY
+ HTML5::DOM->TAG_S
+ HTML5::DOM->TAG_SAMP
+ HTML5::DOM->TAG_SCRIPT
+ HTML5::DOM->TAG_SECTION
+ HTML5::DOM->TAG_SELECT
+ HTML5::DOM->TAG_SMALL
+ HTML5::DOM->TAG_SOURCE
+ HTML5::DOM->TAG_SPAN
+ HTML5::DOM->TAG_STRIKE
+ HTML5::DOM->TAG_STRONG
+ HTML5::DOM->TAG_STYLE
+ HTML5::DOM->TAG_SUB
+ HTML5::DOM->TAG_SUMMARY
+ HTML5::DOM->TAG_SUP
+ HTML5::DOM->TAG_SVG
+ HTML5::DOM->TAG_TABLE
+ HTML5::DOM->TAG_TBODY
+ HTML5::DOM->TAG_TD
+ HTML5::DOM->TAG_TEMPLATE
+ HTML5::DOM->TAG_TEXTAREA
+ HTML5::DOM->TAG_TFOOT
+ HTML5::DOM->TAG_TH
+ HTML5::DOM->TAG_THEAD
+ HTML5::DOM->TAG_TIME
+ HTML5::DOM->TAG_TITLE
+ HTML5::DOM->TAG_TR
+ HTML5::DOM->TAG_TRACK
+ HTML5::DOM->TAG_TT
+ HTML5::DOM->TAG_U
+ HTML5::DOM->TAG_UL
+ HTML5::DOM->TAG_VAR
+ HTML5::DOM->TAG_VIDEO
+ HTML5::DOM->TAG_WBR
+ HTML5::DOM->TAG_XMP
+ HTML5::DOM->TAG_ALTGLYPH
+ HTML5::DOM->TAG_ALTGLYPHDEF
+ HTML5::DOM->TAG_ALTGLYPHITEM
+ HTML5::DOM->TAG_ANIMATE
+ HTML5::DOM->TAG_ANIMATECOLOR
+ HTML5::DOM->TAG_ANIMATEMOTION
+ HTML5::DOM->TAG_ANIMATETRANSFORM
+ HTML5::DOM->TAG_CIRCLE
+ HTML5::DOM->TAG_CLIPPATH
+ HTML5::DOM->TAG_COLOR_PROFILE
+ HTML5::DOM->TAG_CURSOR
+ HTML5::DOM->TAG_DEFS
+ HTML5::DOM->TAG_DESC
+ HTML5::DOM->TAG_ELLIPSE
+ HTML5::DOM->TAG_FEBLEND
+ HTML5::DOM->TAG_FECOLORMATRIX
+ HTML5::DOM->TAG_FECOMPONENTTRANSFER
+ HTML5::DOM->TAG_FECOMPOSITE
+ HTML5::DOM->TAG_FECONVOLVEMATRIX
+ HTML5::DOM->TAG_FEDIFFUSELIGHTING
+ HTML5::DOM->TAG_FEDISPLACEMENTMAP
+ HTML5::DOM->TAG_FEDISTANTLIGHT
+ HTML5::DOM->TAG_FEDROPSHADOW
+ HTML5::DOM->TAG_FEFLOOD
+ HTML5::DOM->TAG_FEFUNCA
+ HTML5::DOM->TAG_FEFUNCB
+ HTML5::DOM->TAG_FEFUNCG
+ HTML5::DOM->TAG_FEFUNCR
+ HTML5::DOM->TAG_FEGAUSSIANBLUR
+ HTML5::DOM->TAG_FEIMAGE
+ HTML5::DOM->TAG_FEMERGE
+ HTML5::DOM->TAG_FEMERGENODE
+ HTML5::DOM->TAG_FEMORPHOLOGY
+ HTML5::DOM->TAG_FEOFFSET
+ HTML5::DOM->TAG_FEPOINTLIGHT
+ HTML5::DOM->TAG_FESPECULARLIGHTING
+ HTML5::DOM->TAG_FESPOTLIGHT
+ HTML5::DOM->TAG_FETILE
+ HTML5::DOM->TAG_FETURBULENCE
+ HTML5::DOM->TAG_FILTER
+ HTML5::DOM->TAG_FONT_FACE
+ HTML5::DOM->TAG_FONT_FACE_FORMAT
+ HTML5::DOM->TAG_FONT_FACE_NAME
+ HTML5::DOM->TAG_FONT_FACE_SRC
+ HTML5::DOM->TAG_FONT_FACE_URI
+ HTML5::DOM->TAG_FOREIGNOBJECT
+ HTML5::DOM->TAG_G
+ HTML5::DOM->TAG_GLYPH
+ HTML5::DOM->TAG_GLYPHREF
+ HTML5::DOM->TAG_HKERN
+ HTML5::DOM->TAG_LINE
+ HTML5::DOM->TAG_LINEARGRADIENT
+ HTML5::DOM->TAG_MARKER
+ HTML5::DOM->TAG_MASK
+ HTML5::DOM->TAG_METADATA
+ HTML5::DOM->TAG_MISSING_GLYPH
+ HTML5::DOM->TAG_MPATH
+ HTML5::DOM->TAG_PATH
+ HTML5::DOM->TAG_PATTERN
+ HTML5::DOM->TAG_POLYGON
+ HTML5::DOM->TAG_POLYLINE
+ HTML5::DOM->TAG_RADIALGRADIENT
+ HTML5::DOM->TAG_RECT
+ HTML5::DOM->TAG_SET
+ HTML5::DOM->TAG_STOP
+ HTML5::DOM->TAG_SWITCH
+ HTML5::DOM->TAG_SYMBOL
+ HTML5::DOM->TAG_TEXT
+ HTML5::DOM->TAG_TEXTPATH
+ HTML5::DOM->TAG_TREF
+ HTML5::DOM->TAG_TSPAN
+ HTML5::DOM->TAG_USE
+ HTML5::DOM->TAG_VIEW
+ HTML5::DOM->TAG_VKERN
+ HTML5::DOM->TAG_MATH
+ HTML5::DOM->TAG_MACTION
+ HTML5::DOM->TAG_MALIGNGROUP
+ HTML5::DOM->TAG_MALIGNMARK
+ HTML5::DOM->TAG_MENCLOSE
+ HTML5::DOM->TAG_MERROR
+ HTML5::DOM->TAG_MFENCED
+ HTML5::DOM->TAG_MFRAC
+ HTML5::DOM->TAG_MGLYPH
+ HTML5::DOM->TAG_MI
+ HTML5::DOM->TAG_MLABELEDTR
+ HTML5::DOM->TAG_MLONGDIV
+ HTML5::DOM->TAG_MMULTISCRIPTS
+ HTML5::DOM->TAG_MN
+ HTML5::DOM->TAG_MO
+ HTML5::DOM->TAG_MOVER
+ HTML5::DOM->TAG_MPADDED
+ HTML5::DOM->TAG_MPHANTOM
+ HTML5::DOM->TAG_MROOT
+ HTML5::DOM->TAG_MROW
+ HTML5::DOM->TAG_MS
+ HTML5::DOM->TAG_MSCARRIES
+ HTML5::DOM->TAG_MSCARRY
+ HTML5::DOM->TAG_MSGROUP
+ HTML5::DOM->TAG_MSLINE
+ HTML5::DOM->TAG_MSPACE
+ HTML5::DOM->TAG_MSQRT
+ HTML5::DOM->TAG_MSROW
+ HTML5::DOM->TAG_MSTACK
+ HTML5::DOM->TAG_MSTYLE
+ HTML5::DOM->TAG_MSUB
+ HTML5::DOM->TAG_MSUP
+ HTML5::DOM->TAG_MSUBSUP
+ HTML5::DOM->TAG__END_OF_FILE
+ HTML5::DOM->TAG_LAST_ENTRY
+
+=head1 ENCODINGS
+
+=head3 Supported encoding names
+
+ AUTO, NOT-DETERMINED, X-USER-DEFINED, 
+ BIG5, EUC-JP, EUC-KR, GB18030, GBK, IBM866, MACINTOSH, X-MAC-CYRILLIC, SHIFT_JIS, 
+ ISO-2022-JP, ISO-8859-10, ISO-8859-13, ISO-8859-14, ISO-8859-15, ISO-8859-16, ISO-8859-2, 
+ ISO-8859-3, ISO-8859-4, ISO-8859-5, ISO-8859-6, ISO-8859-7, ISO-8859-8, ISO-8859-8-I, 
+ WINDOWS-1250, WINDOWS-1251, WINDOWS-1252, WINDOWS-1253, WINDOWS-1254, 
+ WINDOWS-1255, WINDOWS-1256, WINDOWS-1257, WINDOWS-1258, WINDOWS-874, 
+ UTF-8, UTF-16BE, UTF-16LE, KOI8-R, KOI8-U
+
+=head3 Supported encoding id consts
+
+ HTML5::DOM::Encoding->DEFAULT
+ HTML5::DOM::Encoding->AUTO
+ HTML5::DOM::Encoding->NOT_DETERMINED
+ HTML5::DOM::Encoding->UTF_8
+ HTML5::DOM::Encoding->UTF_16LE
+ HTML5::DOM::Encoding->UTF_16BE
+ HTML5::DOM::Encoding->X_USER_DEFINED
+ HTML5::DOM::Encoding->BIG5
+ HTML5::DOM::Encoding->EUC_JP
+ HTML5::DOM::Encoding->EUC_KR
+ HTML5::DOM::Encoding->GB18030
+ HTML5::DOM::Encoding->GBK
+ HTML5::DOM::Encoding->IBM866
+ HTML5::DOM::Encoding->ISO_2022_JP
+ HTML5::DOM::Encoding->ISO_8859_10
+ HTML5::DOM::Encoding->ISO_8859_13
+ HTML5::DOM::Encoding->ISO_8859_14
+ HTML5::DOM::Encoding->ISO_8859_15
+ HTML5::DOM::Encoding->ISO_8859_16
+ HTML5::DOM::Encoding->ISO_8859_2
+ HTML5::DOM::Encoding->ISO_8859_3
+ HTML5::DOM::Encoding->ISO_8859_4
+ HTML5::DOM::Encoding->ISO_8859_5
+ HTML5::DOM::Encoding->ISO_8859_6
+ HTML5::DOM::Encoding->ISO_8859_7
+ HTML5::DOM::Encoding->ISO_8859_8
+ HTML5::DOM::Encoding->ISO_8859_8_I
+ HTML5::DOM::Encoding->KOI8_R
+ HTML5::DOM::Encoding->KOI8_U
+ HTML5::DOM::Encoding->MACINTOSH
+ HTML5::DOM::Encoding->SHIFT_JIS
+ HTML5::DOM::Encoding->WINDOWS_1250
+ HTML5::DOM::Encoding->WINDOWS_1251
+ HTML5::DOM::Encoding->WINDOWS_1252
+ HTML5::DOM::Encoding->WINDOWS_1253
+ HTML5::DOM::Encoding->WINDOWS_1254
+ HTML5::DOM::Encoding->WINDOWS_1255
+ HTML5::DOM::Encoding->WINDOWS_1256
+ HTML5::DOM::Encoding->WINDOWS_1257
+ HTML5::DOM::Encoding->WINDOWS_1258
+ HTML5::DOM::Encoding->WINDOWS_874
+ HTML5::DOM::Encoding->X_MAC_CYRILLIC
+ HTML5::DOM::Encoding->LAST_ENTRY
+
+=head1 PARSER OPTIONS
+
+Options for:
+
+=over
+
+=item *
+
+L<HTML5::DOM::new|/new>
+
+=item *
+
+L<HTML5::DOM::parse|/parse>
+
+=item *
+
+L<HTML5::DOM::parseChunkEnd|/parseChunkEnd>
+
+=item *
+
+L<HTML5::DOM::Tree::parseFragment|/parseFragment>
+
+=back
+
+=head4 threads
+
+Threads count, if 0 - parsing in single mode without threads (default 2)
+
+This option affects only for L<HTML5::DOM::new|/new>.
+
+=head4 async
+
+If async 0 (default), then some parsing functions
+(such as L<HTML5::DOM::parse|/parse>, L<HTML5::DOM::parseChunkEnd|/parseChunkEnd>, L<HTML5::DOM::Tree::parseFragment|/parseFragment>)
+waiting for parsing done.
+
+If async 1, you must manualy call C<$tree-E<gt>wait> and C<$node-E<gt>wait> for waiting parsing done.
+
+Or use non-blocking C<$tree-E<gt>parsed> and C<$node-E<gt>parsed> to determine parsing state.
+
+This options works only if C<threads> > 0
+
+=head4 ignore_whitespace
+
+Ignore whitespace tokens (default 0)
+
+=head4 ignore_doctype
+
+Do not parse DOCTYPE (default 0)
+
+=head4 scripts
+
+If 1 - <noscript> contents parsed to single text node (default)
+
+If 0 - <noscript> contents parsed to child nodes
+
+=head4 encoding
+
+Encoding of input HTML, if C<auto> - library can tree to automaticaly determine encoding. (default "auto")
+
+Allowed both encoding name or id. 
+
+=head4 default_encoding
+
+Default encoding, this affects only if C<encoding> set to C<auto> and encoding not determined. (default "UTF-8")
+
+Allowed both encoding name or id. 
+
+See for available encodings: L</ENCODINGS>
+
+=head4 encoding_use_meta
+
+Allow use C<E<lt>metaE<gt>> tags to determine input HTML encoding. (default 1)
+
+See L<detectByPrescanStream|/detectByPrescanStream>.
+
+=head4 encoding_prescan_limit
+
+Limit string length to determine encoding by C<E<lt>metaE<gt>> tags. (default 1024, from spec)
+
+See L<detectByPrescanStream|/detectByPrescanStream>.
+
+=head4 encoding_use_bom
+
+Allow use detecding BOM to determine input HTML encoding. (default 1)
+
+See L<detectBomAndCut|/detectBomAndCut>.
+
+=head1 BUGS
+
+L<https://github.com/Azq2/perl-html5-dom/issues>
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<HTML::MyHTML|https://metacpan.org/pod/HTML::MyHTML> - more low-level myhtml bindings.
+
+=item *
+
+L<Mojo::DOM|https://metacpan.org/pod/Mojo::DOM> - pure perl HTML5 DOM library with CSS selectors. 
+
+=back
+
+=head1 AUTHOR
+
+Kirill Zhumarin <kirill.zhumarin@gmail.com>
+
+=head1 LICENSE
+
+=over
+
+=item *
+
+HTML5::DOM - L<MIT|https://github.com/Azq2/perl-html5-dom/blob/master/LICENSE>
+
+=item *
+
+Modest - L<LGPL 2.1|https://github.com/lexborisov/Modest/blob/master/LICENSE>
+
+=item *
+
+MyHTML - L<LGPL 2.1|https://github.com/lexborisov/myhtml/blob/master/LICENSE>
+
+=item *
+
+MyCSS - L<LGPL 2.1|https://github.com/lexborisov/mycss/blob/master/LICENSE>
+
+=back

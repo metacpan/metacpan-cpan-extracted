@@ -4,7 +4,7 @@ use Pcore -class;
 
 extends qw[Pcore::Util::URI];
 
-has '+default_port' => ( default => 21 );
+has default_port => 21;
 
 1;
 __END__

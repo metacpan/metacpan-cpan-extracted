@@ -8,10 +8,10 @@ META.yml
 Makefile.PL
 README
 cpanfile
+dev-bin/cpanm
 lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm
 t/00-compile.t
 t/author.t
-xt/author/critic.t
 xt/author/eol.t
 xt/author/mojibake.t
 xt/author/no-tabs.t

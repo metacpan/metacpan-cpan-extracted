@@ -54,6 +54,7 @@ subtest "set expires and keep lock" => sub {
 subtest "wait for lock expired" => sub {
     my ($code, $elapsed) = redis_setlock(
         "--redis"   => "127.0.0.1:$port",
+        "--expires" => 4,
         $lock_key,
         "perl", "-e", "exit 0",
     );

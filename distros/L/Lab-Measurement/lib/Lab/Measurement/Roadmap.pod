@@ -1,0 +1,51 @@
+#DistZilla: +PodWeaver
+#PODNAME: Lab::Measurement::Roadmap
+#ABSTRACT: Some notes and speculations on future L::M development
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Measurement::Roadmap - Some notes and speculations on future L::M development
+
+=head1 VERSION
+
+version 3.651
+
+=head1 Immediately
+
+Old instrument or xpress code prints an informative message about the new Moose
+framework.
+
+=head1 3.800: legacy code deprecation
+
+Old instrument or xpress code prints a deprecation warning.
+
+=head1 3.900: legacy code removal
+
+The old code is completely removed. Old scripts stop working.
+
+=head1 3.990: move Lab::Moose and friends to Lab::Measurement
+
+Lab::Moose -> Lab::Measurement, Lab::Moose::Instrument -> Lab::Instrument,
+...
+
+More directory cleanup is possible, e.g. introducing a Lab::Role:: subdir...
+
+=head1 4.000: party!
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+
+  Copyright 2018       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

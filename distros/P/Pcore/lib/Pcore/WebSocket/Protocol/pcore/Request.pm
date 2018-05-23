@@ -13,10 +13,8 @@ has _cb => ( is => 'ro', isa => Maybe [CodeRef] );
 
 has _responded => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );    # already responded
 
-P->init_demolish(__PACKAGE__);
-
-sub DEMOLISH ( $self, $global ) {
-    if ( !$global && !$self->{_responded} && $self->{_cb} ) {
+sub DESTROY ( $self ) {
+    if ( ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) && !$self->{_responded} && $self->{_cb} ) {
 
         # API request object destroyed without return any result, this is possible run-time error in AE callback
         _respond( $self, 500 );

@@ -85,7 +85,7 @@
          "web" : "https://github.com/LibreCat/Plack-Auth-SSO"
       }
    },
-   "version" : "0.0134",
+   "version" : "0.0135",
    "x_contributors" : [
       "Nicolas Franck <nicolas.franck@ugent.be>",
       "Nicolas Franck <njfranck@auster0.ugent.be>",

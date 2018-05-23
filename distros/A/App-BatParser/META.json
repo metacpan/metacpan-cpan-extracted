@@ -1,0 +1,74 @@
+{
+   "abstract" : "Parse DOS .bat and .cmd files",
+   "author" : [
+      "Pablo Rodr\u00edguez Gonz\u00e1lez <pablo.rodriguez.gonzalez@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-BatParser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Regexp::Grammars" : "1.000",
+            "namespace::autoclean" : "0",
+            "perl" : "5.012",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "Path::Tiny" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pablrod/App-BatParser/issues"
+      },
+      "homepage" : "https://github.com/pablrod/App-BatParser",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pablrod/App-BatParser.git",
+         "web" : "https://github.com/pablrod/App-BatParser"
+      }
+   },
+   "version" : "0.005",
+   "x_contributors" : [
+      "eva.dominguez <eva.dominguez@meteologica.com>"
+   ],
+   "x_generated_by_perl" : "v5.22.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

@@ -166,6 +166,17 @@ _check_site_bin();
                     } $su->list_enabled_features
                 );
 
+    my $buildclean;
+    if ( $prereq{'CPANPLUS::Dist::Build'} ) {
+      delete $prereq{'CPANPLUS::Dist::Build'};
+      $prereq{'Module::Build'} = '0.32';
+      require File::Path; require File::Copy;
+      File::Path::mkpath( File::Spec->catdir(qw[lib CPANPLUS Dist Build]) ) or die "$!\n";
+      File::Copy::copy( File::Spec->catfile('bundled', 'Build.pm'), File::Spec->catfile(qw[lib CPANPLUS Dist], 'Build.pm') );
+      File::Copy::copy( File::Spec->catfile('bundled', 'Constants.pm'), File::Spec->catfile(qw[lib CPANPLUS Dist Build], 'Constants.pm' ) );
+      $buildclean = ' lib/CPANPLUS/Dist/Build*';
+    }
+
     my @scripts = _scripts();
     my $extraclean .= join ' ', grep { /\d$/ } @scripts;
 
@@ -177,7 +188,7 @@ _check_site_bin();
     abstract        ('Ameliorated interface to the CPAN');
     version_from    ('lib/CPANPLUS/Internals.pm');
     license         ('perl');
-    no_index        ( directory => 'lib/CPANPLUS/inc' );
+    no_index        ( directory => 'bundled' );
     installdirs     ( $] >= 5.009005 && $] < 5.012 ? 'perl' : 'site' ),
     install_script  ($_) for @scripts;
     #install_script  ($_) for grep { $_ !~ /cpanp-boxed/ } glob('bin/*');
@@ -189,7 +200,8 @@ _check_site_bin();
                         't/dummy-localmirror/* ' . 't/dummy-perl/arch ' .
                         't/dummy-perl/bin/* ' . 't/dummy-perl/lib/* ' .
                         't/dummy-perl/man/man1/* ' . 't/dummy-perl/man/man3/*'.
-                        ( $extraclean ? " $extraclean" : '' )
+                        ( $extraclean ? " $extraclean" : '' ) .
+                        ( $buildclean ? $buildclean : '' )
                     } );
     repository      ('https://github.com/jib/cpanplus-devel');
 

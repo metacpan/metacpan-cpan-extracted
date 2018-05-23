@@ -3,7 +3,7 @@ package Pcore::Handle::DBI::Query::SQL;
 use Pcore -class;
 use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref];
 
-has _buf => ( is => 'ro', isa => ArrayRef, required => 1 );
+has _buf => ();    # ( is => 'ro', isa => ArrayRef, required => 1 );
 
 sub get_query ( $self, $dbh, $final, $i ) {
     my ( @sql, @bind );

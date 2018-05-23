@@ -8,7 +8,7 @@ use parent qw/Exporter/;
 our @EXPORT = qw/unbro/;
 our @EXPORT_OK = @EXPORT;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.004001';
 
 require XSLoader;
 XSLoader::load('IO::Compress::Brotli', $VERSION);
@@ -26,8 +26,8 @@ IO::Uncompress::Brotli - Read Brotli buffers/streams
 
   use IO::Uncompress::Brotli;
 
-  # uncompress a buffer
-  my $decoded = unbro $encoded;
+  # uncompress a buffer (yielding at most 10MB)
+  my $decoded = unbro $encoded, 10_000_000;
 
   # uncompress a stream
   my $bro = IO::Uncompress::Brotli->create;
@@ -51,13 +51,12 @@ function.
 
 =over
 
-=item B<unbro>(I<$input>)
+=item B<unbro>(I<$input>, I<$maximum_decoded_size>)
 
 Takes a whole compressed buffer as input and returns the decompressed
-data. This function relies on the BrotliDecompressedSize function. In
-other words, it only works if the buffer has a single meta block or
-two meta-blocks where the first is uncompressed and the second is
-empty.
+data. It allocates a buffer of size I<$maximum_decoded_size> to store
+the decompressed data, if this is not sufficient (or there is another
+error) this function will croak.
 
 Exported by default.
 
@@ -106,9 +105,11 @@ clean up of the overall project were contributed by:
 
 =item Mattia Barbon, E<lt>mattia@barbon.orgE<gt>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Marius Gavrilescu
+Copyright (C) 2015-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,

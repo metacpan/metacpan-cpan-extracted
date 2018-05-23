@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.46';
+our $VERSION = '0.48';
 
 our @EXPORT = qw{
   one_row
@@ -1249,7 +1249,7 @@ sub setup_row {
         # means this is just one simple table
         $connector->run(
             sub {
-                my $ssth = $_->prepare('select * from ' . $_->quote_identifier($table) . ' where 0 == 1');
+                my $ssth = $_->prepare('select * from ' . $_->quote_identifier($table) . ' where 0 = 1');
                 error_message {
                     result  => 'SQLERR',
                     message => "Unknown table $table",
@@ -1278,7 +1278,7 @@ sub setup_row {
                     if ($chr->{TYPE_NAME} =~ /^json/i) {
                         $json_fields{$chr->{COLUMN_NAME}} = undef;
                     }
-                    $chr->{COLUMN_DEF} ||= $chr->{mysql_is_auto_increment};
+                    $chr->{COLUMN_DEF} //= $chr->{mysql_is_auto_increment};
                     if ($chr->{NULLABLE} == 0 && !defined($chr->{COLUMN_DEF})) {
                         push @required, $chr->{COLUMN_NAME};
                     }

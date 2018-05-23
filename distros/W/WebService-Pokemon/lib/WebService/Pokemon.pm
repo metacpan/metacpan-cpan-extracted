@@ -11,7 +11,7 @@ with 'Web::API';
 use constant DEFAULT_BASE_API_URL => 'http://pokeapi.co/api/';
 use constant DEFAULT_API_VERSION => 'v2';
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 
 has 'api_version' => (
@@ -115,13 +115,29 @@ from http://pokeapi.co.
 
 =head1 SYNOPSIS
 
-  use WebService::Pokemon;
+    use WebService::Pokemon;
+
+    my $pokemon_api = WebService::Pokemon->new;
+    my $pokemon = $pokemon_api->pokemon(id => 1);
 
 =head1 DESCRIPTION
 
 WebService::Pokemon is a Perl client helper library for the Pokemon API (pokeapi.co).
 
 =head1 DEVELOPMENT
+
+Source repo at L<https://github.com/kianmeng/webservice-pokemon|https://github.com/kianmeng/webservice-pokemon>.
+
+=head2 Docker
+
+If you have Docker installed, you can build your Docker container for this
+project.
+
+    $ docker build -t webservice-pokemon .
+    $ docker run -it -v $(pwd):/root webservice-pokemon bash
+    # cpanm --installdeps --notest .
+
+=head2 Milla
 
 Setting up the required packages.
 

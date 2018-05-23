@@ -1,6 +1,5 @@
-package # hide from PAUSE
-    Starch::Plugin::RenewExpiration::State;
-
+package Starch::Plugin::RenewExpiration::State;
+$Starch::Plugin::RenewExpiration::State::VERSION = '0.07';
 use Moo::Role;
 use strictures 2;
 use namespace::clean;

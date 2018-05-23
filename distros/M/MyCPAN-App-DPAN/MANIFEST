@@ -1,17 +1,26 @@
 Changes
-lib/AsYAML.pm
-lib/DPAN.pm
-lib/Indexer.pm
-lib/Minimal.pm
-lib/SkipQueue.pm
+examples/dpan.log4perl
+INSTALL.SKIP
+lib/MyCPAN/App/DPAN.pm
+lib/MyCPAN/App/DPAN/CPANUtils.pm
+lib/MyCPAN/App/DPAN/Indexer.pm
+lib/MyCPAN/App/DPAN/NullPostFlight.pm
+lib/MyCPAN/App/DPAN/Reporter/AsYAML.pm
+lib/MyCPAN/App/DPAN/Reporter/Minimal.pm
+lib/MyCPAN/App/DPAN/SkipQueue.pm
+lib/MyCPAN/App/DPAN/SVNPostFlight.pm
+lib/MyCPAN/App/DPAN/UserManual.pm
 LICENSE
 Makefile.PL
-MANIFEST
-README
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
 script/backpan_indexer.config.dpan
+script/backpan_indexer.log4perl
 script/dpan
 t/app/dpan.t
 t/compile.t
+t/cpan/get_cpan_mirrors.t
 t/create_index_files.t
 t/get_latest_module_reports.t
 t/indexer.t
@@ -19,5 +28,7 @@ t/load.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest
+xt/changes.t
 xt/dpan-corpus.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

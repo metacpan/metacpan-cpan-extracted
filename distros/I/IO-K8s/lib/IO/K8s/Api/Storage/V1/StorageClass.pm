@@ -1,5 +1,6 @@
 package IO::K8s::Api::Storage::V1::StorageClass;
   use Moose;
+  use IO::K8s;
 
   has 'allowVolumeExpansion' => (is => 'ro', isa => 'Bool'  );
   has 'apiVersion' => (is => 'ro', isa => 'Str'  );
@@ -10,4 +11,6 @@ package IO::K8s::Api::Storage::V1::StorageClass;
   has 'provisioner' => (is => 'ro', isa => 'Str'  );
   has 'reclaimPolicy' => (is => 'ro', isa => 'Str'  );
   has 'volumeBindingMode' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

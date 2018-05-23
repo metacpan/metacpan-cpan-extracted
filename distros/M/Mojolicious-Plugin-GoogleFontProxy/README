@@ -1,0 +1,57 @@
+NAME
+
+    Mojolicious::Plugin::GoogleFontProxy - a small proxy that can be useful
+    when you embed gists in your website
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+      # Mojolicious
+      $self->plugin('GoogleFontProxy');
+    
+      # Mojolicious::Lite
+      plugin 'GoogleFontProxy';
+
+DESCRIPTION
+
+    Mojolicious::Plugin::GoogleFontProxy is a Mojolicious plugin.
+
+METHODS
+
+    Mojolicious::Plugin::GoogleFontProxy inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+ register
+
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+ HOOKS INSTALLED
+
+    This plugin adds one after_render hook to rewrite all links related to
+    Google webfonts to use the proxy routes.
+
+ ROUTES INSTALLED
+
+      * /google/font/*file
+
+SEE ALSO
+
+    Mojolicious, Mojolicious::Guides, http://mojolicious.org.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

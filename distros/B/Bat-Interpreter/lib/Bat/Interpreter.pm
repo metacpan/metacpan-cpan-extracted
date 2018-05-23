@@ -3,14 +3,14 @@ package Bat::Interpreter;
 use utf8;
 
 use Moose;
-use App::BatParser;
+use App::BatParser 0.005;
 use Carp;
 use Data::Dumper;
 use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.005';    # VERSION
+our $VERSION = '0.008';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -188,15 +188,22 @@ sub _handle_special_command {
         if ( $token =~ /^:/ ) {
             $self->_goto_label( $token, $context );
         } else {
+            ( my $first_word ) = $token =~ /\A([^:\s]+)/;
+            if ( $first_word =~ /(\.[^.]+)$/ ) {
+                ( my $extension ) = $first_word =~ /(\.[^.]+)$/;
+                if ( $extension eq '.exe' ) {
+                    $self->_execute_command( $token, $context );
+                } elsif ( $extension eq '.bat' || $extension eq '.cmd' ) {
 
-            # Must be a file
-            #print "Calling file: $token\n";
-            my $stdout = $self->run( $token, $context->{ENV} );
-            if ( !defined $context->{STDOUT} ) {
-                $context->{STDOUT} = [];
-            }
-            if ( defined $stdout ) {
-                push @{ $context->{STDOUT} }, @$stdout;
+                    #print "Calling file: $token\n";
+                    my $stdout = $self->run( $token, $context->{ENV} );
+                    if ( !defined $context->{STDOUT} ) {
+                        $context->{STDOUT} = [];
+                    }
+                    if ( defined $stdout ) {
+                        push @{ $context->{STDOUT} }, @$stdout;
+                    }
+                }
             }
         }
     }
@@ -212,7 +219,7 @@ sub _handle_special_command {
         my $token = $special_command_line->{'For'}{'Token'};
 
         # Handle only simple cases
-        if ( $token =~ /\s*?\/F\s*?"delims="\s*%%(?<variable_bucle>[A-Z0-9]+?)\s*?in\s*?\('(?<comando>.+)'\)/ ) {
+        if ( $token =~ /\s*?\/F\s*?"delims="\s*%%(?<variable_bucle>[A-Z0-9]+?)\s*?in\s*?\('(?<comando>.+)'\)/i ) {
             my $comando        = $+{'comando'};
             my $parameter_name = $+{'variable_bucle'};
             $comando = $self->_variable_substitution( $comando, $context );
@@ -231,6 +238,18 @@ sub _handle_special_command {
             #print Dumper($context->{'PARAMETERS'});
             $self->_handle_statement( $statement, $context );
             delete $context->{'PARAMETERS'}{$parameter_name};
+        } elsif ( $token =~ /\s*?%%(?<variable_bucle>[A-Z0-9]+?)\s*?in\s*?(\([\d]+(?:,[^,\s]+)+\))/i ) {
+            my $statement      = $special_command_line->{'For'}{'Statement'};
+            my $parameter_name = $+{'variable_bucle'};
+            my $value_list     = $2;
+            $value_list =~ s/(\(|\))//g;
+            my @values = split( /,/, $value_list );
+            for my $value (@values) {
+                $context->{'PARAMETERS'}->{$parameter_name} = $value;
+                $self->_handle_statement( $statement, $context );
+                delete $context->{'PARAMETERS'}{$parameter_name};
+            }
+
         }
     }
 }
@@ -387,7 +406,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 

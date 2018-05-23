@@ -51,7 +51,7 @@ Output (4 files): counts.gene.tab, counts.transcript.tab, counts.exon.tab, count
 
 
 package CLIPSeqTools::App::count_reads_on_genic_elements;
-$CLIPSeqTools::App::count_reads_on_genic_elements::VERSION = '0.1.7';
+$CLIPSeqTools::App::count_reads_on_genic_elements::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

@@ -1,5 +1,8 @@
 Revision history for Catmandu-Identifier
 
+0.09  2018-05-16 13:13:59 CEST
+    - update dependencies
+
 0.07  2018-01-24 07:39:34 CET
     - new fix isb_versions (@EreMaijala)
     - don't crash if ISBN is not convertable (@EreMaijala)

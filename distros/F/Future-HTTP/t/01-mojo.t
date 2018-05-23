@@ -4,7 +4,6 @@ use warnings;
 use Data::Dumper;
 
 use Test::More;
-use lib 'inc';
 use Test::HTTP::LocalServer;
 
 my $ok = eval {
@@ -49,6 +48,26 @@ ok exists $headers->{Redirect}, "We were redirected here";
 is $headers->{Redirect}->[1]->{Redirect}->[1]->{URL}, $u, "... twice, starting from $u"
   or diag Dumper $headers->{Redirect}->[1];
 
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub {
+        push @warnings, $_[0];
+        diag $_[0];
+    };
+    my $ua = Future::HTTP::Mojo->new();
+
+    my $f = $ua->http_head(
+      $url,
+    )->then(sub {
+      my $body = shift;
+      Future->done($body);
+    });
+
+    my $result = $f->get;
+
+    is 0+@warnings, 0, "No warnings when running"
+        or diag Dumper \@warnings;
+}
 $server->stop;
 
 done_testing;

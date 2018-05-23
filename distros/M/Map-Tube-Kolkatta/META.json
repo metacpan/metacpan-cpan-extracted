@@ -44,31 +44,31 @@
    "provides" : {
       "Map::Tube::Kolkatta" : {
          "file" : "lib/Map/Tube/Kolkatta.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Map::Tube::Kolkatta::Line::L1" : {
          "file" : "lib/Map/Tube/Kolkatta/Line/L1.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Map::Tube::Kolkatta::Line::L2" : {
          "file" : "lib/Map/Tube/Kolkatta/Line/L2.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Map::Tube::Kolkatta::Line::L3" : {
          "file" : "lib/Map/Tube/Kolkatta/Line/L3.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Map::Tube::Kolkatta::Line::L4" : {
          "file" : "lib/Map/Tube/Kolkatta/Line/L4.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Map::Tube::Kolkatta::Line::L5" : {
          "file" : "lib/Map/Tube/Kolkatta/Line/L5.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Map::Tube::Kolkatta::Line::L6" : {
          "file" : "lib/Map/Tube/Kolkatta/Line/L6.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Kolkatta"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

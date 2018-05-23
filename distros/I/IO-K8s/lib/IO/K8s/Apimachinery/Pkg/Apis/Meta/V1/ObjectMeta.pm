@@ -1,5 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta;
   use Moose;
+  use IO::K8s;
 
   has 'annotations' => (is => 'ro', isa => 'HashRef[Str]'  );
   has 'clusterName' => (is => 'ro', isa => 'Str'  );
@@ -17,4 +18,6 @@ package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta;
   has 'resourceVersion' => (is => 'ro', isa => 'Str'  );
   has 'selfLink' => (is => 'ro', isa => 'Str'  );
   has 'uid' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

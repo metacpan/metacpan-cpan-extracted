@@ -5,7 +5,7 @@ use warnings;
 package OpenGbg::Exceptions;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use Throwable::SugarFactory;
 
@@ -31,7 +31,7 @@ OpenGbg::Exceptions
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SOURCE
 

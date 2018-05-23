@@ -5,8 +5,6 @@ use Pandoc;
 
 plan skip_all => 'pandoc executable >= 1.12.1 required'
     unless pandoc and pandoc->version('1.12.1');
-plan skip_all => 'pandoc executable < 1.18 required' # FIXME in Pandoc::Elements
-    if pandoc->version('1.18');
 plan skip_all => 'Pandoc::Elements required'
     unless eval { require Pandoc::Elements; 1 }; 
 
@@ -19,13 +17,18 @@ is $doc->content->[0]->to_json, $expect, 'parse markdown';
 $doc = pandoc->parse( html => '<p><em>--&auml;</em></p>', '--normalize' );
 is $doc->content->[0]->to_json, $expect, 'parse html';
 
-$doc = pandoc->parse( markdown => "*--ä*", '--smart' );
-is $doc->string, "\x{2013}\x{00E4}", 'parse with addition arguments';
+SKIP: {
+    skip 'pandoc executable < 1.18 required' # FIXME in Pandoc::Elements
+        if pandoc->version('1.18');
 
-is_deeply $doc, pandoc->parse( json => $doc->to_json ), 'parse json';
+    $doc = pandoc->parse( markdown => "*--ä*", '--smart' );
+    is $doc->string, "\x{2013}\x{00E4}", 'parse with addition arguments';
 
-my $ex = pandoc->file('t/example.md', '--smart');
-is_deeply $ex, $doc, 'parse_file';
+    is_deeply $doc, pandoc->parse( json => $doc->to_json ), 'parse json';
+
+    my $ex = pandoc->file('t/example.md', '--smart');
+    is_deeply $ex, $doc, 'parse_file';
+}
 
 if ($Pandoc::Elements::VERSION >= 0.29) {
     my $html = pandoc->parse( 'markdown' => '# A *section*' )->to_html;

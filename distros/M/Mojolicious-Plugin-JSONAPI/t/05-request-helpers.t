@@ -8,7 +8,7 @@ use_ok('Mojolicious::Plugin::JSONAPI');
 
 plugin 'JSONAPI', { data_dir => 't/share' };
 
-my $test = []; # modified in each subtest for different scenarios
+my $test = [];    # modified in each subtest for different scenarios
 
 get '/' => sub {
     my ($c) = @_;

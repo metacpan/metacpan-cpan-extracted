@@ -20,12 +20,13 @@ package MongoDB::GridFSBucket;
 # ABSTRACT: A file storage abstraction
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use MongoDB::GridFSBucket::DownloadStream;
 use MongoDB::GridFSBucket::UploadStream;
 use MongoDB::_Types qw(
+  Boolish
   ReadPreference
   WriteConcern
   ReadConcern
@@ -34,7 +35,6 @@ use MongoDB::_Types qw(
 );
 use Scalar::Util qw/reftype/;
 use Types::Standard qw(
-  Bool
   Int
   Str
   InstanceOf
@@ -168,7 +168,7 @@ has max_time_ms => (
 # determines whether or not to attempt index creation
 has _tried_indexing => (
     is => 'rwp',
-    isa => Bool,
+    isa => Boolish,
 );
 
 has _files => (
@@ -573,7 +573,7 @@ MongoDB::GridFSBucket - A file storage abstraction
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

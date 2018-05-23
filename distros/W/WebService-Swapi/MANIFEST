@@ -8,7 +8,6 @@ META.json
 META.yml
 README
 cpanfile
-cpanfile.snapshot
 dist.ini
 lib/WebService/Swapi.pm
 t/00-compile.t

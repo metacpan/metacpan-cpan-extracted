@@ -11,12 +11,12 @@ WriteMakefile(
 	SIGN             => 1,
 	EXE_FILES        => [ 'bin/bro-perl' ],
 	PREREQ_PM        => {
-		'File::Slurp'  => '0',
-		'Getopt::Long' => '0',
-		'Time::HiRes'  => '0',
+		'File::Slurper' => '0',
+		'Getopt::Long'  => '0',
+		'Time::HiRes'   => '0',
 	},
 	BUILD_REQUIRES   => {},
-	INC              => '-Ibrotli',
+	INC              => '-Ibrotli/c/include',
 	MYEXTLIB         => 'brotli/libbrotli$(LIB_EXT)',
 	clean            => { FILES => 'brotli/libbrotli$(LIB_EXT)' },
 	META_ADD         => {

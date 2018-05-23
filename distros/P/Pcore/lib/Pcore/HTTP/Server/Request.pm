@@ -11,18 +11,18 @@ use overload    #
   },
   fallback => undef;
 
-has _server => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], required => 1 );
-has _h      => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'],   required => 1 );
-has env => ( is => 'ro', isa => HashRef, required => 1 );
+has _server => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], required => 1 );
+has _h      => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'],   required => 1 );
+has env     => ();    # ( is => 'ro', isa => HashRef, required => 1 );
 
-has is_websocket_connect_request => ( is => 'lazy', isa => Bool, init_arg => undef );
-has _use_keepalive               => ( is => 'lazy', isa => Bool, init_arg => undef );
+has is_websocket_connect_request => ( is => 'lazy' );    # ( is => 'lazy', isa => Bool, init_arg => undef );
+has _use_keepalive               => ( is => 'lazy' );    # ( is => 'lazy', isa => Bool, init_arg => undef );
 
-has _response_status => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
-has _auth => ( is => 'ro', isa => Object, init_arg => undef );    # request authentication result
+has _response_status => 0;                               # ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
+has _auth            => ();                              # ( is => 'ro', isa => Object, init_arg => undef );    # request authentication result
 
-const our $HTTP_SERVER_RESPONSE_STARTED  => 1;    # headers written
-const our $HTTP_SERVER_RESPONSE_FINISHED => 2;    # body written
+const our $HTTP_SERVER_RESPONSE_STARTED  => 1;           # headers written
+const our $HTTP_SERVER_RESPONSE_FINISHED => 2;           # body written
 
 # const our $CONTENT_TYPE_HTML       => 1;
 # const our $CONTENT_TYPE_TEXT       => 2;
@@ -41,10 +41,8 @@ const our $HTTP_SERVER_RESPONSE_FINISHED => 2;    # body written
 #     $CONTENT_TYPE_CSV        => 'text/csv; charset=UTF-8; header=present',    # http://www.iana.org/assignments/media-types/text/csv
 # };
 
-P->init_demolish(__PACKAGE__);
-
-sub DEMOLISH ( $self, $global ) {
-    if ( !$global && $self->{_response_status} != $HTTP_SERVER_RESPONSE_FINISHED ) {
+sub DESTROY ( $self ) {
+    if ( ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) && $self->{_response_status} != $HTTP_SERVER_RESPONSE_FINISHED ) {
 
         # request is destroyed without ->finish call, possible unhandled error in AE callback
         $self->return_xxx(500);

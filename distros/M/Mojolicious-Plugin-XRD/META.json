@@ -4,7 +4,7 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Mojolicious" : "7.13",
             "Mojolicious::Plugin::XML::Loy" : "0.13",
-            "XML::Loy" : "0.4",
+            "XML::Loy" : "0.47",
             "perl" : "5.010001"
          }
       }
@@ -48,6 +48,6 @@
          "url" : "https://github.com/Akron/Mojolicious-Plugin-XRD"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

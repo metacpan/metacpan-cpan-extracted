@@ -1,9 +1,16 @@
+Overview of changes in Glib 1.327 (stable)
+============================================
+
+* Fix typo in pod: s/atomical/atomic/ (Bugzilla #784155)
+
 Overview of changes in Glib 1.326 (stable)
 ============================================
+
 * lib/Glib/GenPod.pm: Allow overriding of current time in generated man-pages
 
 Overview of changes in Glib 1.325 (stable)
 ============================================
+
 * Try to avoid a possible hang in t/9.t
 * Handle removing '.' in @INC for perl-5.26.0 compatibility
 

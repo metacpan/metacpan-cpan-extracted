@@ -8,14 +8,14 @@ use overload    #
   },
   fallback => undef;
 
-has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
-has hosts => ( is => 'ro', isa => HashRef, required => 1 );
+has app   => ( required => 1 );    # ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
+has hosts => ( required => 1 );    # ( is => 'ro', isa => HashRef, required => 1 );
 
-has map           => ( is => 'ro', isa => HashRef, init_arg => undef );    # router path -> class name
-has host_api_path => ( is => 'ro', isa => HashRef, init_arg => undef );
+has map           => ();           # ( is => 'ro', isa => HashRef, init_arg => undef );    # router path -> class name
+has host_api_path => ();           # ( is => 'ro', isa => HashRef, init_arg => undef );
 
-has _path_class_cache     => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # router path -> sigleton cache
-has _class_instance_cache => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # class name -> sigleton cache
+has _path_class_cache     => ();   # ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # router path -> sigleton cache
+has _class_instance_cache => ();   # ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # class name -> sigleton cache
 
 sub init ($self) {
     my $map;
@@ -83,7 +83,7 @@ sub _get_host_map ( $self, $host, $ns ) {
     for my $module ( sort keys $modules->%* ) {
         my $class = P->class->load($module);
 
-        die qq["$class" is not a consumer of "Pcore::App::Controller"] if !$class->does('Pcore::App::Controller');
+        die qq["$class" is not a consumer of "Pcore::App::Controller"] if !$class->can('does') || !$class->does('Pcore::App::Controller');
 
         # generate route path
         my $route = lc( ( $class . '::' ) =~ s[\A$index_class:*][/]smr );
@@ -97,7 +97,7 @@ sub _get_host_map ( $self, $host, $ns ) {
         } );
 
         # get obj route
-        $route = $obj->path;
+        $route = $obj->{path};
 
         die qq[Route "$route" is not unique] if exists $self->{_path_class_cache}->{$host}->{$route};
 

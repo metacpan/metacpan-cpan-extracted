@@ -11,11 +11,12 @@ my $b = Module::Build->new(
   perl                 => '5.8.0',
   requires             => {
      Carp              => 0,
-    'Data::Table::Text'=> '20170901',
+    'Data::Table::Text'=> '20180510',
      Storable          => 0,
     'Test::More'       => 0,
     'Test2::API'       => 0,
     'XML::Parser'      => 0,
+     utf8              => 0,
    },
  );
 

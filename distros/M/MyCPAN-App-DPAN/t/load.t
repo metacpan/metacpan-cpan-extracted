@@ -4,6 +4,7 @@ BEGIN {
 		MyCPAN::App::DPAN::Reporter::AsYAML
 		MyCPAN::App::DPAN::Reporter::Minimal
 		MyCPAN::App::DPAN::Indexer
+		MyCPAN::App::DPAN::CPANUtils
 		);
 	}
 

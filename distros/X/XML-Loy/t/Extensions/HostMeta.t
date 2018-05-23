@@ -2,9 +2,7 @@
 use strict;
 use warnings;
 
-use lib '../../lib';
-
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Warn;
 use Mojo::DOM;
 
@@ -21,6 +19,9 @@ ok(my $xrd = XML::Loy::XRD->new, 'Constructor');
 ok($xrd->extension('XML::Loy::HostMeta'), 'Extend with hostmeta');
 
 ok($xrd->subject('http://sojolicio.us/'), 'Add subject');
+
+ok(!$xrd->host, 'No host');
+
 ok($xrd->host('sojolicio.us'), 'Add host');
 
 is($xrd->host, 'sojolicio.us', 'Get host');

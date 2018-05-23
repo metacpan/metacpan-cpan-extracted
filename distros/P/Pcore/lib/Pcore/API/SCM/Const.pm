@@ -1,11 +1,12 @@
 package Pcore::API::SCM::Const;
 
-use Pcore -const,
-  -export => {
+use Pcore -const, -export;
+
+our $EXPORT = {
     SCM_TYPE     => [qw[$SCM_TYPE_HG $SCM_TYPE_GIT]],
     SCM_URL_TYPE => [qw[$SCM_URL_TYPE_SSH $SCM_URL_TYPE_HTTPS]],
     SCM_HOSTING  => [qw[$SCM_HOSTING_BITBUCKET $SCM_HOSTING_GITHUB $SCM_HOSTING_HOST]],
-  };
+};
 
 const our $SCM_TYPE_HG  => 'hg';
 const our $SCM_TYPE_GIT => 'git';

@@ -1,0 +1,41 @@
+---
+abstract: 'Object-oriented, Java-like enum type declaration based on Mouse'
+author:
+  - 'Naoto Ikeno <ikenox@gmail.com>'
+build_requires:
+  Test::Exception: '0.42'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MouseX-Types-Enum
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MouseX::Types::Enum:
+    file: lib/MouseX/Types/Enum.pm
+    version: '1.03'
+  MouseX::Types::Enum::Base:
+    file: lib/MouseX/Types/Enum.pm
+requires:
+  Mouse: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ikenox/perl-enum/issues
+  homepage: https://github.com/ikenox/perl-enum
+  repository: git://github.com/ikenox/perl-enum.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -87,6 +87,8 @@ sub _set_flag {
 	}
 }
 
+=encoding utf8
+
 =head1 NAME
 
 Pod::TOC - Extract a table of contents from a Pod file
@@ -128,7 +130,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2013, brian d foy, All Rights Reserved.
+Copyright © 2006-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

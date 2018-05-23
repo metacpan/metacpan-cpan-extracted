@@ -1,6 +1,6 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.9.1';
+$Importer::Zim::VERSION = '0.9.2';
 # ABSTRACT: Import functions à la Invader Zim
 
 use 5.010001;
@@ -31,8 +31,8 @@ sub _import {
 my %MIN_VERSION = do {
     my %v = (
         '+Lexical'    => '0.10.0',
-        '+EndOfScope' => '0.4.0',
-        '+Unit'       => '0.5.0',
+        '+EndOfScope' => '0.5.0',
+        '+Unit'       => '0.6.0',
         '+Bogus'      => '0.12.0',
     );
     /^\+/ and $v{ backend_class($_) } = $v{$_} for keys %v;
@@ -182,7 +182,7 @@ Importer::Zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 
@@ -277,7 +277,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,6 +13,9 @@ requires 'CHI::Driver::Memcached', '0.16';
 requires 'Cache::Memcached::Fast', '0.25';
 requires 'HTTP::Date', '6.02';
 requires 'Net::Amazon::S3';
+requires 'Log::Dispatch';
+requires 'Log::Dispatch::Gelf';
+requires 'MojoX::Log::Dispatch::Simple';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

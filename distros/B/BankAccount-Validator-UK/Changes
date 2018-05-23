@@ -1,5 +1,8 @@
 Revision history for BankAccount::Validator::UK
 
+0.39  2018-05-22T11:55:00:+01:00
+      - Updated the valacdos.txt (v4.90)
+
 0.38  2018-03-16T18:11:00:+01:00
       - Updated pod with regard to the changes to valacdos.txt v4.80.
 

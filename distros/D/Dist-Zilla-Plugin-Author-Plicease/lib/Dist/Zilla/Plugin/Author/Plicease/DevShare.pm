@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.25 {
+package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.26 {
 
   use 5.014;
   use Moose;
@@ -27,6 +27,16 @@ package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.25 {
     });
   
     $self->add_file($file);
+    
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
+    $self->log("Please use File::ShareDir::Dist instead");
   
     Path::Tiny->($filename)->spew($content);
   }
@@ -48,7 +58,7 @@ Dist::Zilla::Plugin::Author::Plicease::DevShare - Plugin to deal with dev/projec
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 AUTHOR
 

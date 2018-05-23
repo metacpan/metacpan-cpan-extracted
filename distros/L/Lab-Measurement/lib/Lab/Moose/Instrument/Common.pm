@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::Common;
 #ABSTRACT: Role for common commands declared mandatory by IEEE 488.2
-$Lab::Moose::Instrument::Common::VERSION = '3.642';
+$Lab::Moose::Instrument::Common::VERSION = '3.651';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -23,6 +23,38 @@ sub cls {
 sub idn {
     my ( $self, %args ) = validated_getter( \@_ );
     return $self->query( command => '*IDN?', %args );
+}
+
+
+sub idn_manufacturer {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $i=$self->query( command => '*IDN?', %args );
+    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    return $man;
+}
+
+
+sub idn_model {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $i=$self->query( command => '*IDN?', %args );
+    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    return $mod;
+}
+
+
+sub idn_serial {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $i=$self->query( command => '*IDN?', %args );
+    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    return $ser;
+}
+
+
+sub idn_firmware {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $i=$self->query( command => '*IDN?', %args );
+    my ($man, $mod, $ser, $fir) = split /,/, $i, 4;
+    return $fir;
 }
 
 
@@ -73,7 +105,7 @@ Lab::Moose::Instrument::Common - Role for common commands declared mandatory by 
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 METHODS
 
@@ -84,6 +116,22 @@ Send I<*CLS> command.
 =head2 idn
 
 Return result of I<*IDN?> query.
+
+=head2 idn_manufacturer
+
+Returns the manufacturer field from an  I<*IDN?> query.
+
+=head2 idn_model
+
+Returns the model field from an  I<*IDN?> query.
+
+=head2 idn_serial
+
+Returns the serial number field from an  I<*IDN?> query.
+
+=head2 idn_firmware
+
+Returns the firmware version field from an  I<*IDN?> query.
 
 =head2 opc
 
@@ -112,6 +160,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

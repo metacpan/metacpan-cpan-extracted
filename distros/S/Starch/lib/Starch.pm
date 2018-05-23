@@ -1,5 +1,5 @@
 package Starch;
-$Starch::VERSION = '0.06';
+$Starch::VERSION = '0.07';
 use Starch::Factory;
 use Moo::Object qw();
 
@@ -38,7 +38,7 @@ Starch - Implementation independent persistent statefulness.
     ); # Returns a Starch::Manager object.
     
     my $new_state = $starch->state();
-    my $existing_state = $starch->sate( $id );
+    my $existing_state = $starch->state( $id );
 
 =head1 DESCRIPTION
 
@@ -58,6 +58,14 @@ Aran Clary Deltac <bluefeetE<64>gmail.com>
 =item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpanE<64>gmail.com>
+
+=item *
+
+Jonathan Scott Duff <duffE<64>pobox.com>
+
+=item *
+
+Ismail Kerim <ismail.kerim<64>assurant.com>
 
 =back
 

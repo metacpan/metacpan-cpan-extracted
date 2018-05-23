@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.26      2018-05-22 13:22:22 -0400
+  - Dist::Zilla::Plugin::Author::Plicease::DevShare is deprecated and should not be used for new code
+  - rm test dependency on Path::Class
+  - optionally upload to site-dist for non-CPAN releases
+
 2.25      2017-11-29 14:47:41 -0500
   - Add [Author::Plicease::NoUnsafeInc]
   - travis template Set PERL_USE_UNSAFE_INC=0

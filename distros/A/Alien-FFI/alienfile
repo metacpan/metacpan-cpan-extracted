@@ -9,7 +9,7 @@ plugin 'PkgConfig' => 'libffi';
 share {
 
   plugin Download => (
-    url     => 'ftp://sourceware.org/pub/libffi/',
+    url     => 'https://sourceware.org/pub/libffi/',
     version => qr/^libffi-([0-9\.]+)\.tar\.gz$/,
   );
   

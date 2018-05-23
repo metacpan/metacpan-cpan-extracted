@@ -8,17 +8,12 @@ use warnings;
 use Test::More tests => 1;
 
 my @commits = split /\n/, <<'EOC';
-8c82a43a PERL-803 Fix Kerberos authentication
-0b3d40eb PERL-803 Make kerberos test configurable from env vars
-cf7bc0d0 PERL-844 Bump IO::Socket::IP prereq to 0.32
-6fa53042 PERL-832 Skip threaded cursor test on Windows with SASL
-425a2317 PERL-770 Prevent short reads from throwing a protocol error
-0ae4745f PERL-800 CI: Stop testing 2.4 on Evergreen
-37508847 PERL-828 Stop sending maxAwaitTimeMS if not set
-ac887869 PERL-825 Fix insert_many exception for unack'd writes
-c2f9e545 (shadowcat/maint-v1.x) PERL-798 Update Tutorial.pod to fix typos
-803e068a PERL-796 Improve resolution of GridFS uploadDate
-3928f760 PERL-795 Document GridFS uniqueness constraints
+83440506 (sandbox/maint-v1.x, origin/maint-v1.x, dagolden/maint-v1.x) PERL-906 Relax Bool type constraint
+82fc51e4 PERL-882 Document how to use the latest TLS protocols
+1bb01768 PERL-880 Use only a single host type per variant in Evergreen
+f3cb744e PERL-879 Skip snapshot testing on MongoDB 3.7+
+fb2d431a PERL-878 Bump Authen::SCRAM prereq to 0.009 for Unicode encoding bug
+02aba7a1 PERL-870 Fix repeated credential validation
 
 EOC
 

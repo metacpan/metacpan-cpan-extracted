@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,43 +14,42 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
-SHA1 28d792dc16b0e222c56f75e399e2fdbb1cc1bf7e COPYRIGHT
-SHA1 b8670723b1997368f8f576b3ecb33725ea2d2608 CREDITS
-SHA1 a288d5cf4188437574893d81aefac31b485f4037 Changes
+SHA1 fd047f6d4d1937317af677e1756f88bddcd74f94 COPYRIGHT
+SHA1 2a47442d6a20e587c93f0e31538ef2b7f48eb03e CREDITS
+SHA1 a6fd58d8ca4819bee38ed0807ef2fedbd5cebd92 Changes
 SHA1 c6ba0e141d83810a36e8d60c5e200e3cf55e09f1 INSTALL
-SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
-SHA1 af1aa625f56bee4d376d7266ec7098eeee6efb3f MANIFEST
-SHA1 b603d6cc40c12dfcdfa29d6fcd947150590de8c5 META.json
-SHA1 c9981153974550299b0d0744601541196e70c31f META.yml
-SHA1 83bdd70a0df0c0db7622e00e0f6011dd839fb87f Makefile.PL
-SHA1 be95ea3a5a3b14cbb5bbc73b170f84f3b2254cbf README
+SHA1 4b7ceb6d8f98b8e378a50f11d2feb4e205aa68d8 LICENSE
+SHA1 332ed1a703919bd5c7a794fc5705ed64fb35b274 MANIFEST
+SHA1 cc725394b5d3c361074300a4e3f300be2d64dd45 META.json
+SHA1 9d7ce24ed2e29cbeeb15da52ff14b3e8dbbfbc6f META.yml
+SHA1 1f8b3d352aaf3c3bec32eeab34193353ab39bf6a Makefile.PL
+SHA1 92ffe407819635d87846967d3bcb229f29cc7612 README
 SHA1 e4074458cfbb76a63f513a8c6ed2114db0392837 Util.xs
-SHA1 3f5d8edd85f99634d0c726acf0c50465c180bf9e XS.xs
+SHA1 e5bacb6228aa35e76534f2ea22aab1629345ad0c XS.xs
 SHA1 02dcc1a9d27b1e752da56dfddcc493265de5257e dist.ini
-SHA1 8679e4e43dd520ef3bb518c92b5edb30ccf237ac doap.ttl
+SHA1 5f6ef836f0aa1df764fb39166341027c66be49ba doap.ttl
 SHA1 da08522868c6aee973f264755c49df4e8fee45e1 fallback/const-c.inc
 SHA1 aa632befa3b4feada95851f4c974ce5dcfdb9983 fallback/const-xs.inc
-SHA1 250d36338550ab6040c77d94dfe79717a0820372 lib/Type/Tiny/XS.pm
-SHA1 665fce6df5d5c43b963e70389bc6ba4401e464f8 lib/Type/Tiny/XS/Util.pm
+SHA1 b8746156daf70e67248996a11f5ba999c0f8796b lib/Type/Tiny/XS.pm
+SHA1 68efc27e3fc1239bf9afd00f177e839aa7fd0026 lib/Type/Tiny/XS/Util.pm
 SHA1 e47c5d1952f8ea23ef8be37dfcc448e308e08b24 ppport.h
 SHA1 9459a384d32f6ae48ec19d6fd9060d4802d3d4b5 t/01basic.t
-SHA1 8c9a289f6ea7e6cc189f7421aae0e60e16e4edbf t/02int.t
-SHA1 a7c99b395969b8d02634a87404409291285b6d3a t/03positiveint.t
+SHA1 dfdae26f9a6288745856610a7487f544a7b1ea26 t/02int.t
+SHA1 a208ef829c54a44446b733fb22da8f938133c7a8 t/03positiveint.t
 SHA1 a6d4a41ae2b6947aaef6c99018550c0ac0d73d78 t/04positiveorzeroint.t
 SHA1 efbf149ec84f1735e1501077409c1b1e4a991cfc t/05nonemptystr.t
 SHA1 171a50052da53abe856f6dedd1711b1a88f798ec t/06map.t
 SHA1 b51f95cb71cebf3b7d2d28bedb5c98195c76f609 t/07tuple.t
 SHA1 a9427b08d76f029b6a29454118db13167913599d t/08enum.t
 SHA1 7e561da89db81f071192f22c3a3ffa5b12bd309e t/09anyof_allof.t
+SHA1 3db0c60d78e43a1ba6e765334f56ded325185e9b t/10bool.t
 SHA1 5f98fb69f4842a38c2447cef380346d3bdc5ef94 t/99parsing.t
 SHA1 901f863cc645327cc1fb9118d891b98e571ad61e typetiny.h
 SHA1 ece1528a9df23184072a703bd725adef3526eecc xs_version.h
 SHA1 9a4553967c29e58307745f32a267df38af4fad42 xshelper.h
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlQZHq0ACgkQzr+BKGoqfTlkVQCfWPwYGVqpeBS/JMwIq5GVbYww
-3EAAn3GDLdveN+xlN8JL7bfKpVC9gyjn
-=xsC1
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCWwHIAAAKCRDOv4Eoaip9
+ORyUAKCnLtLXsuoPkFkWU6Z4SGkbz7/TZQCfZddoQabuBHYx/ku3nsZH7M8Zyng=
+=8O5B
 -----END PGP SIGNATURE-----

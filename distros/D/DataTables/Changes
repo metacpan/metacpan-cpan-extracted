@@ -1,5 +1,8 @@
 Revision history for Perl extension DataTables.
 
+0.06 May 18, 2018 11:08 CST
+    - Fix CPANTESTER fail and documentation error.
+
 0.05 May 2, 2018 13:36 PST
     - Added SQL::Abstract::Limit as a dependency.
 

@@ -1,5 +1,5 @@
 ##++
-##     CGI Lite v3.01
+##     CGI Lite v3.02
 ##
 ##     see separate CHANGES file for detailed history
 ##
@@ -592,7 +592,7 @@ BEGIN {
 	our @EXPORT = qw/browser_escape url_encode url_decode is_dangerous/;
 }
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 ##++
 ##  Start
@@ -1149,7 +1149,9 @@ sub _parse_multipart_data
 {
 	my ($self, $total_bytes, $boundary) = @_;
 	my $files = {};
-	$boundary = quotemeta ($boundary);
+	my $boundary_re = qr/(.*?)((?:\015?\012)?-*
+		\Q$boundary\E
+		-*[\015\012]*)(?=(.*))/xs;
 
 	eval {
 
@@ -1167,10 +1169,10 @@ sub _parse_multipart_data
 		$platform    = $self->{platform};
 		$eol         = $self->{eol}->{$platform};
 		$directory   = $self->{multipart_dir};
+		$bytes_left  = $total_bytes;
 
-		while (1) {
-			if (   ($byte_count < $total_bytes)
-				&& (length ($current_buffer || '') < ($buffer_size * 2))) {
+		while ($bytes_left) {
+			if ($byte_count < $total_bytes) {
 
 				$bytes_left = $total_bytes - $byte_count;
 				$buffer_size = $bytes_left if ($bytes_left < $buffer_size);
@@ -1204,8 +1206,7 @@ sub _parse_multipart_data
 			##  value that has the first two characters ("--") missing.
 			##--
 
-			if ($current_buffer =~
-				/(.*?)((?:\015?\012)?-*$boundary-*[\015\012]*)(?=(.*))/os) {
+			if ($current_buffer =~ $boundary_re) {
 
 				($store, $this_boundary, $old_data) = ($1, $2, $3);
 
@@ -1284,10 +1285,6 @@ sub _parse_multipart_data
 			} elsif ($old_data) {
 				$store    = $old_data;
 				$old_data = $new_data;
-
-			} else {
-				$store          = $current_buffer;
-				$current_buffer = $new_data;
 			}
 
 			unless ($changed) {
@@ -1313,7 +1310,7 @@ sub _store
 	if ($file) {
 		if ($convert) {
 			if ($platform eq 'PC') {
-				$$info =~ s/\015(?=[^\012])|(?<=[^\015])\012/$eol/og;
+				$$info =~ s/\015(?!\012)|(?<!\015)\012/$eol/og;
 			} else {
 				$$info =~ s/\015\012/$eol/og;
 				$$info =~ s/\015/$eol/og if ($platform ne 'Mac');

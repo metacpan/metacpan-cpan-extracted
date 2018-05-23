@@ -529,6 +529,7 @@ lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceList.pm
 lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceSpec.pm
 lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/APIServiceStatus.pm
 lib/IO/K8s/KubeAggregator/Pkg/Apis/Apiregistration/V1beta1/ServiceReference.pm
+t/01_load.t
 t/02_serialize_to_json.t
 t/03_struct_to_object.t
 xt/author/pod-syntax.t

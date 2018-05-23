@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2016-11-03 00:00:00 +0000 to present.
+Changes from 2017-05-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.030 at 2017-11-03 20:30:37 +0000
+version 0.031 at 2018-05-19 04:47:26 +0000
 ------------------------------------------
+
+  Change: 15d4a02ad0845f087d65acf8dc795784638d467d
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-05-19 07:46:32 +0000
+
+    Merge pull request #27 from Madskill/parametrs
+
+    fix post params 
+
+  Change: 4b161928eb59345a8780ffff352f1ae6c13c98b1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-19 07:41:57 +0000
+
+    fix post params 
+
+------------------------------------------
+version 0.030 at 2017-11-03 20:31:00 +0000
+------------------------------------------
+
+  Change: 43ecfad841d7a606427d8dd331882bd104a0ad64
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-03 23:31:00 +0000
+
+    Version 0.030 
 
   Change: adf8a4b877eaa20a7b8c8cb4b39e951567ec66cc
   Author: Igor <igor-sverdlov@mail.ru>
@@ -26,62 +50,6 @@ version 0.030 at 2017-11-03 20:30:37 +0000
 
     fix json 
 
-------------------------------------------
-version 0.029 at 2017-04-23 14:18:38 +0000
-------------------------------------------
-
-  Change: 2e22abc209f39d05ac666a47c49dded9283588e7
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 17:18:38 +0000
-
-    Version 0.029
-
-    fix debian/changelog 
-
-  Change: 44fcf93dda63b76e592177a2381937dc9274be9d
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 17:12:48 +0000
-
-    Version 0.029 
-
-  Change: 6dec34f48eddef5e98fbc81e88457775d5dd3e5d
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 17:01:44 +0000
-
-    Merge pull request #25 from Madskill/fix_dumper
-
-    fix dumper 
-
-  Change: ce27d9fc1ca36de0ea7bd78bf0def0f3d67a127a
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 17:00:32 +0000
-
-    fix dumper 
-
-------------------------------------------
-version 0.028 at 2016-12-20 04:54:15 +0000
-------------------------------------------
-
-  Change: 77b572b177664a7ada298ed8fbc2a3aa91708377
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-20 07:54:15 +0000
-
-    Version 0.028 
-
-  Change: 15d32d7e301811d9d16b6069bb62ea86c00f44ac
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-20 07:53:08 +0000
-
-    Merge pull request #24 from Madskill/exceptions
-
-    exceptions 
-
-  Change: 5417c1d77e682462aa420b1d397aee640a0f6109
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-20 07:48:57 +0000
-
-    exceptions 
-
 =================================================
-Plus 27 releases after 2016-11-03 00:00:00 +0000.
+Plus 29 releases after 2017-05-19 00:00:00 +0000.
 =================================================

@@ -12,8 +12,8 @@ sub new {
         stack   => $args->{stack}   || [],
         message => $args->{message} || '',
         source  => $args->{source}  || '?',
-        line    => $args->{line}    || '?',
-        column  => $args->{column}  || '?',
+        line    => $args->{line}    // '?',
+        column  => $args->{column}  // '?',
     }, $class;
 }
 
@@ -97,6 +97,10 @@ sub source { shift->{source} }
 sub line { shift->{line} }
 sub column { shift->{column} }
 
+sub is_time_limit {
+    my $self = shift;
+    $self->{message} eq 'null' && $self->{source} eq 'eval' && $self->{line} eq '0';
+}
 
 sub to_string {
     my $self = shift;

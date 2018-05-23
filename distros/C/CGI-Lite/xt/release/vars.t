@@ -18,9 +18,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Vars;
+use Test::Vars 0.012;
 
-if ($] >= 5.022) {
-	plan skip_all => "Test::Vars is buggy on 5.22";
-}
 all_vars_ok ();

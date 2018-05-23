@@ -1,6 +1,7 @@
 use utf8;
 package Document::OOXML::PartParser;
 use Moose;
+use namespace::autoclean;
 
 # ABSTRACT: OOXML document part parser
 
@@ -60,7 +61,7 @@ Document::OOXML::PartParser - OOXML document part parser
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 SYNOPSIS
 

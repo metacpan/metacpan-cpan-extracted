@@ -1,16 +1,17 @@
 package Pcore::Handle::pgsql;
 
-use Pcore -class, -const, -res,
-  -export => {
-    STATE     => [qw[$STATE_CONNECT $STATE_READY $STATE_BUSY $STATE_DISCONNECTED]],
-    TX_STATUS => [qw[$TX_STATUS_IDLE $TX_STATUS_TRANS $TX_STATUS_ERROR]],
-  };
+use Pcore -class, -const, -res, -export;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref is_plain_coderef];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Data qw[to_json];
 
 with qw[Pcore::Handle::DBI];
+
+our $EXPORT = {
+    STATE     => [qw[$STATE_CONNECT $STATE_READY $STATE_BUSY $STATE_DISCONNECTED]],
+    TX_STATUS => [qw[$TX_STATUS_IDLE $TX_STATUS_TRANS $TX_STATUS_ERROR]],
+};
 
 const our $STATE_CONNECT      => 1;
 const our $STATE_READY        => 2;
@@ -23,18 +24,18 @@ const our $TX_STATUS_ERROR => 'E';    # in a failed transaction block (queries w
 
 require Pcore::PgSQL::DBH;
 
-has max_dbh => ( is => 'ro', isa => PositiveInt, default => 3 );
-has backlog  => ( is => 'ro',   isa => Maybe [PositiveInt], default => 1_000 );
-has host     => ( is => 'lazy', isa => Str );
-has port     => ( is => 'ro',   isa => PositiveOrZeroInt, default => 5432 );
-has username => ( is => 'lazy', isa => Str );
-has password => ( is => 'lazy', isa => Str );
-has database => ( is => 'lazy', isa => Str );
+has max_dbh  => 3;                    # ( is => 'ro', isa => PositiveInt );
+has backlog  => 1_000;                # ( is => 'ro',   isa => Maybe [PositiveInt] );
+has host     => ( is => 'lazy' );     # isa => Str
+has port     => 5432;                 # ( is => 'ro', isa => PositiveOrZeroInt );
+has username => ( is => 'lazy' );     # isa => Str
+has password => ( is => 'lazy' );     # isa => Str
+has database => ( is => 'lazy' );     # isa => Str
 
-has is_pgsql   => ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
-has active_dbh => ( is => 'ro', isa => Int,  default => 0, init_arg => undef );
-has _dbh_pool => ( is => 'ro', isa => ArrayRef, init_arg => undef );
-has _get_dbh_queue => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
+has is_pgsql       => 1;              # ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
+has active_dbh     => 0;              # ( is => 'ro', isa => Int,  default => 0, init_arg => undef );
+has _dbh_pool      => ();             # ( is => 'ro', isa => ArrayRef, init_arg => undef );
+has _get_dbh_queue => sub { [] };     # ( is => 'ro', isa => ArrayRef, init_arg => undef );
 
 sub _build_host ($self) {
     return $self->{uri}->path eq q[/] ? q[] . $self->{uri}->host : q[] . $self->{uri}->path;
@@ -274,8 +275,6 @@ for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref 
     no strict qw[refs];
 
     *$method = eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
-        use Pcore::Util::Scalar qw[is_plain_coderef];
-
         sub ( \$self, \@args ) {
             my \$cb = is_plain_coderef \$args[-1] ? \$args[-1] : undef;
 
@@ -348,7 +347,7 @@ sub begin_work ( $self, @args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 154                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 155                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

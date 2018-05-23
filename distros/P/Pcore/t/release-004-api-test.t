@@ -12,20 +12,25 @@ BEGIN {
 
 use Pcore;
 use Test::More;
-use Pcore::App;
 use Pcore::App::API;
 
 our $TESTS = 5;
 
 plan tests => $TESTS;
 
-{
-    no warnings qw[once];
+package App {
 
-    $Pcore::App::APP_API_ROLES = [ 'admin', 'user' ];
+    use Pcore -class;
+
+    with qw[Pcore::App];
+
+    our $APP_API_ROLES = [ 'admin', 'user' ];
+
+    sub run { }
+
 }
 
-my $app = bless { app_cfg => { api => { connect => 'sqlite:', rpc => { workers => 1 } } } }, 'Pcore::App';
+my $app = bless { app_cfg => { api => { connect => 'sqlite:', rpc => { workers => 1 } } } }, 'App';
 
 my $api = Pcore::App::API->new($app);
 

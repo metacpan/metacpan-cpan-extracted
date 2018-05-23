@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 df4c3b905308a6a89b6438d2e959c40a48856c1d COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 1b420527c48f8970cdd55973aa7d4dd9d8e5cf9d Changes
+SHA1 488ce930693d87810dac66fd0edbc37836b84ab3 INSTALL
+SHA1 4b7ceb6d8f98b8e378a50f11d2feb4e205aa68d8 LICENSE
+SHA1 f905c530bf6362f8fd84bee4b2e0ce677bee8c28 MANIFEST
+SHA1 2ae873f462e721a31fec6e1964b50f2b5a1cbfe6 META.json
+SHA1 46dd7dde361d58195019b2f8d33f24368f212872 META.yml
+SHA1 ab9a822e7c0ae00c687961dc1164dd7934bcc7c7 Makefile.PL
+SHA1 ff876e7dcd928abc3f08a03076a88c90e29f4cda README
+SHA1 74ef92616638d5597382c1d0e20db6eb0c7d8e73 dist.ini
+SHA1 979afcfcac67098934c5eebfe001d1ba8785f534 doap.ttl
+SHA1 051534cf051e6521a5b3ef18eee2a5878008afd5 lib/Acme/UNIVERSAL/can/t.pm
+SHA1 4facf707dd496d926a572f6b7ac2e04df85adb21 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCWwFYjgAKCRDOv4Eoaip9
+OX87AKCO5CPNin/5B91B2Lqi5yvocHoSEACgsHOupn0zRt/pDt1M7w1E5nQMx5E=
+=0bbg
+-----END PGP SIGNATURE-----

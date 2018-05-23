@@ -1,7 +1,9 @@
 package Pcore::Util::PM;
 
-use Pcore -export, [qw[is_superuser run_proc run_rpc connect_rpc]];
+use Pcore -export;
 use POSIX qw[];
+
+our $EXPORT = [qw[is_superuser run_proc run_rpc connect_rpc]];
 
 sub change_priv {
     my %args = (

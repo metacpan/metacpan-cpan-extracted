@@ -5,7 +5,10 @@ NAME
 
 SYNOPSIS
 
-      use WebService::Pokemon;
+        use WebService::Pokemon;
+    
+        my $pokemon_api = WebService::Pokemon->new;
+        my $pokemon = $pokemon_api->pokemon(id => 1);
 
 DESCRIPTION
 
@@ -13,6 +16,19 @@ DESCRIPTION
     (pokeapi.co).
 
 DEVELOPMENT
+
+    Source repo at https://github.com/kianmeng/webservice-pokemon.
+
+ Docker
+
+    If you have Docker installed, you can build your Docker container for
+    this project.
+
+        $ docker build -t webservice-pokemon .
+        $ docker run -it -v $(pwd):/root webservice-pokemon bash
+        # cpanm --installdeps --notest .
+
+ Milla
 
     Setting up the required packages.
 

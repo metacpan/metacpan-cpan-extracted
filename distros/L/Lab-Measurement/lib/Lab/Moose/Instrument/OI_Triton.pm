@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.642';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.651';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use 5.010;
@@ -19,6 +19,12 @@ has verbose => (
     is      => 'ro',
     isa     => 'Bool',
     default => 1
+);
+
+has max_temperature => (
+    is      => 'ro',
+    isa     => 'Lab::Moose::PosNum',
+    default => 0.7
 );
 
 # default connection options:
@@ -96,10 +102,11 @@ sub disable_temp_pid {
 
 
 sub get_max_current {
-    my ($self, %args) = validated_getter(\@_);
-    my $range = $self->oi_getter(cmd => "READ:DEV:T5:TEMP:LOOP:RANGE", %args);
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $range
+        = $self->oi_getter( cmd => "READ:DEV:T5:TEMP:LOOP:RANGE", %args );
     $range =~ s/mA$//;
-    return $range / 1000; # return Amps, not mA
+    return $range / 1000;    # return Amps, not mA
 }
 
 
@@ -118,10 +125,9 @@ sub set_max_current {
     );
 }
 
-
 sub t_get {
-    my ($self, %args) = validated_getter(\@_);
-    my $t = $self->oi_getter(cmd   => "READ:DEV:T5:TEMP:LOOP:TSET", %args);
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $t = $self->oi_getter( cmd => "READ:DEV:T5:TEMP:LOOP:TSET", %args );
     $t =~ s/K$//;
     return $t;
 }
@@ -141,8 +147,9 @@ sub t_set {
 
 sub set_T {
     my ( $self, $value, %args ) = validated_setter( \@_ );
-    if ( $value > 0.7 ) {
-        croak "setting temperatures above 0.7K is forbidden\n";
+    my $max_temperature = $self->max_temperature;
+    if ( $value > $max_temperature ) {
+        croak "setting temperatures above $max_temperature K is forbidden\n";
     }
 
     # Adjust heater setting.
@@ -200,7 +207,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 SYNOPSIS
 
@@ -210,6 +217,8 @@ version 3.642
      type => 'OI_Triton',
      connection_type => 'Socket',
      connection_options => {host => 'triton'},
+     max_temperature => 1.1, # Maximum temperature setpoint.
+                             # Defaults to 0.7 K.
  );
 
  my $temp = $oi_triton->get_T();

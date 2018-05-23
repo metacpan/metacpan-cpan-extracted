@@ -67,6 +67,8 @@ has primary_key => (
     default => sub { [] },
 );
 
+has comment => (is => 'rwp');
+
 has name => ( is => 'rwp' );
 
 has column_mapping => (
@@ -114,6 +116,8 @@ sub as_hash {
         primary_key  => $self->primary_key,
     );
 
+    $info{comment} = $self->comment if $self->comment;
+
     return \%info;
 }
 
@@ -132,6 +136,9 @@ sub _parse {
         push @columns, $column_obj;
     }
     $self->_set_columns( \@columns );
+
+    my $comment = $node->findvalue( './value[@key="comment"]' );
+    $self->_set_comment( $comment ) if $comment;
 
     my $name = $node->findvalue( './value[@key="name"]' );
     $self->_set_name( $name );
@@ -232,7 +239,7 @@ MySQL::Workbench::Parser::Table - A table of the ER model
 
 =head1 VERSION
 
-version 0.06
+version 1
 
 =for Pod::Coverage BUILD
 
@@ -276,13 +283,31 @@ returns the MySQL name of the datatype
 
     MEDIUMTEXT
 
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * comment
+
+=item * foreign_keys
+
+=item * name
+
+=item * node
+
+=item * parser
+
+=item * primary_key
+
+=back
+
 =head1 AUTHOR
 
 Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

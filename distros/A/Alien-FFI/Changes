@@ -1,5 +1,14 @@
 Revision history for Alien-FFI
 
+0.19      2018-05-19 09:40:13 -0400
+  - Identical to 0.18_01 release except for the hardcoded RC0
+  - Moved git repository to
+    https://github.com/Perl5-FFI/Alien-FFI
+
+0.18_01   2018-04-09 07:51:52 -0400
+  - hardcode RC0 for this DEV release only
+  - switch from ftp to https, which sourceware seems to provide now
+
 0.17      2017-08-08 15:06:21 -0400
   - Require Alien::Build 0.73 for bug fixes
 

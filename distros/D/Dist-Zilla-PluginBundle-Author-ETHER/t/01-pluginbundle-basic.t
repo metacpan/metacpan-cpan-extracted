@@ -266,7 +266,7 @@ cmp_deeply(
             }),
         }),
     }),
-    "a -remove'd plugin does not have a prereq injected into the dist",
+    "a -remove'd plugin does not have a prereq injected into the distribution",
 );
 
 subtest "a -remove'd plugin should not be loaded" => sub {
@@ -295,7 +295,7 @@ my $version = Dist::Zilla::PluginBundle::Author::ETHER->VERSION;
 like(
     $contributing,
     qr/^template file originating in Dist-Zilla-PluginBundle-Author-ETHER-$version\.$/m,
-    'name of this bundle dist and its version properly inserted into CONTRIBUTING',
+    'name of this bundle distribution and its version properly inserted into CONTRIBUTING',
 );
 
 like(

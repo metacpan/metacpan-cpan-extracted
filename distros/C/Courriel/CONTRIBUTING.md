@@ -96,8 +96,8 @@ instructions for doing that is available here:
 https://help.github.com/articles/creating-a-pull-request
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
-can submit an issue report [via the web](http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel)
-or [via email](bug-courriel@rt.cpan.org.
+can submit an issue report [via the web](https://github.com/houseabsolute/Courriel/issues)
+).
 This is a good place to send your questions about the usage of this distribution.
 
 ## Travis

@@ -1,5 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResource;
   use Moose;
+  use IO::K8s;
 
   has 'categories' => (is => 'ro', isa => 'ArrayRef[Str]'  );
   has 'group' => (is => 'ro', isa => 'Str'  );
@@ -10,4 +11,6 @@ package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResource;
   has 'singularName' => (is => 'ro', isa => 'Str'  );
   has 'verbs' => (is => 'ro', isa => 'ArrayRef[Str]'  );
   has 'version' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

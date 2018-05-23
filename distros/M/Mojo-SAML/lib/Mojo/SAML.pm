@@ -2,7 +2,7 @@ package Mojo::SAML;
 
 use Mojo::Base -strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 use constant ();
@@ -154,6 +154,12 @@ L<Mojo::SAML::IdP> is a tool for examining the entity metadata returned from an 
 L<Mojo::XMLSig> is a tool for signing and verifying XML documents.
 Note that it is possible that this module could be spun out into its own distribution at some point.
 If it does, this module will depend on it.
+
+=head2 Mojolicious::Plugin::SAML
+
+L<Mojolicious::Plugin::SAML> attempts to be a turn-key SAML Service Provider (SP) implementation.
+This is useful for interacting with a single Identity Provider (IdP) under simple circumstances.
+This is (as with all the rest) still highly experimental.
 
 =head1 SOURCE REPOSITORY
 

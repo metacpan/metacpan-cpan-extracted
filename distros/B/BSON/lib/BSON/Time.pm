@@ -6,7 +6,7 @@ package BSON::Time;
 # ABSTRACT: BSON type wrapper for date and time
 
 use version;
-our $VERSION = 'v1.4.0';
+our $VERSION = 'v1.6.1';
 
 use Carp qw/croak/;
 use Config;
@@ -97,7 +97,7 @@ sub BUILDARGS {
 #pod =cut
 
 sub epoch {
-    return int( $_[0]->value / 1000 );
+    return $_[0]->value / 1000;
 }
 
 #pod =method as_iso8601
@@ -230,7 +230,7 @@ BSON::Time - BSON type wrapper for date and time
 
 =head1 VERSION
 
-version v1.4.0
+version v1.6.1
 
 =head1 SYNOPSIS
 
@@ -317,7 +317,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

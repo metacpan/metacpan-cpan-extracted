@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "0.46",
+  "VERSION" => "0.48",
   "test"    => {
     "TESTS" => "t/*.t"
     }
@@ -62,9 +62,9 @@ my %FallbackPrereqs = (
   "URI::ws"                => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
 if ( can_use('Crypt::Random::Source') ) {
-  requires( 'Crypt::Random::Source', '0.08' )
+  requires( 'Crypt::Random::Source', '0.08' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -78,7 +78,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
 sub _add_prereq {
   my ( $mm_key, $module, $version_or_range ) = @_;
   $version_or_range ||= 0;

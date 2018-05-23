@@ -1,0 +1,96 @@
+=pod
+
+README for PDL::VectorValued
+
+=head1 ABSTRACT
+
+PDL::VectorValued - Assorted PDL utilities treating vectors as values
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * PDL
+
+Tested versions 2.4.3, 2.4.7_001, 2.4.9, 2.4.9_015.
+
+=back
+
+=head1 DESCRIPTION
+
+PDL::VectorValued provides some generalizations of builtin PDL
+functions to higher order PDLs which treat vectors in the source
+PDLs as "data values".
+
+=head1 BUILDING
+
+Build this module as you would any perl module, by doing something
+akin to the following:
+
+ gzip -dc distname-XX.YY.tar.gz | tar -xof -
+ cd distname-XX.YY/
+ perl Makefile.PL
+ make
+ make test                                     # optional
+ make install
+
+See L<perlmodinstall>(1) for details.
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item *
+
+Perl by Larry Wall
+
+=item *
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=item *
+
+Code for rlevec() and rldvec() derived from the PDL builtin functions
+rle() and rld() in $PDL_SRC_ROOT/Basic/Slices/slices.pd
+
+=item *
+
+Code for vv_qsortvec() copied nearly verbatim from the builtin PDL functions
+in $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd, with Chris Marshall's "uniqsortvec" patch.
+Code for vv_qsortveci() based on the same.
+
+=back
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT
+
+=over 4
+
+=item *
+
+Code for qsortvec() copyright (C) Tuomas J. Lukka 1997.
+Contributions by Christian Soeller (c.soeller@auckland.ac.nz)
+and Karl Glazebrook (kgb@aaoepp.aao.gov.au).  All rights
+reserved. There is no warranty. You are allowed to redistribute this
+software / documentation under certain conditions. For details, see
+the file COPYING in the PDL distribution. If this file is separated
+from the PDL distribution, the copyright notice should be included in
+the file.
+
+
+=item *
+
+All other parts copyright (c) 2007-2011, Bryan Jurish.  All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=back
+
+=cut

@@ -2,11 +2,15 @@ package Pcore::App::Controller;
 
 use Pcore -role;
 
-has app  => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
-has host => ( is => 'ro', isa => Str,                       required => 1 );    # HTTP controller host
-has path => ( is => 'ro', isa => Str,                       required => 1 );    # HTTP controller url path, always finished with "/"
+has app  => ( required => 1, isa => q[ConsumerOf ['Pcore::App']] );
+has host => ( required => 1, isa => 'Str' );                          # HTTP controller host
+has path => ( required => 1, isa => 'Str' );                          # HTTP controller url path, always finished with "/"
 
-requires qw[run];
+sub run ( $self, $req ) {
+    $req->(404)->finish;
+
+    return;
+}
 
 sub get_nginx_cfg ($self) {
     return;

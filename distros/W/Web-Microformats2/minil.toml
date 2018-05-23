@@ -1,4 +1,4 @@
 name = "Web-Microformats2"
-# badges = ["travis"]
+badges = ["travis"]
 module_maker="ModuleBuildTiny"
 

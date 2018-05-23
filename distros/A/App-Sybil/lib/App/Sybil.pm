@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.12;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 use App::Cmd::Setup -app;
 

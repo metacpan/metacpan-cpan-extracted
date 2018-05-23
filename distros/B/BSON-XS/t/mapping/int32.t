@@ -7,6 +7,7 @@ use Math::BigInt;
 use JSON::MaybeXS;
 
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 use TestUtils;
 
@@ -19,8 +20,8 @@ my $bigpos = Math::BigInt->new("2147483648");
 my $bigneg = Math::BigInt->new("-2147483649");
 
 # test constructor
-packed_is( "l", bson_int32(), 0, "empty bson_int32() is 0" );
-packed_is( "l", BSON::Int32->new, 0, "empty constructor is 0" );
+packed_is( INT32, bson_int32(), 0, "empty bson_int32() is 0" );
+packed_is( INT32, BSON::Int32->new, 0, "empty constructor is 0" );
 
 # test constructor errors; these will wind up doubles on 32-bit platforms
 eval { bson_int32(2**31) };
@@ -35,27 +36,27 @@ eval { bson_int32($bigneg) };
 like( $@, qr/can't fit/, "bson_int32(-big BigInt) fails" );
 
 # test overloading
-packed_is( "l", bson_int32(314159), 314159, "overloading correct" );
+packed_is( INT32, bson_int32(314159), 314159, "overloading correct" );
 
 subtest 'native' => sub {
     # int32 -> int32
     $bson = $expect = encode( { A => 314159 } );
     $hash = decode( $bson );
     is( sv_type( $hash->{A} ), 'IV', "int32->int32" );
-    packed_is( "l", $hash->{A}, 314159, "value correct" );
+    packed_is( INT32, $hash->{A}, 314159, "value correct" );
 
     # BSON::Int32 -> int32
     $bson = encode( { A => bson_int32(314159) } );
     $hash = decode( $bson );
     is( sv_type( $hash->{A} ), 'IV', "BSON::Int32->int32" );
-    packed_is( "l", $hash->{A}, 314159, "value correct" );
+    packed_is( INT32, $hash->{A}, 314159, "value correct" );
     is( $bson, $expect, "BSON correct" );
 
     # BSON::Int32(string) -> int32
     $bson = encode( { A => bson_int32("314159") } );
     $hash = decode( $bson );
     is( sv_type( $hash->{A} ), 'IV', "BSON::Int32->int32" );
-    packed_is( "l", $hash->{A}, 314159, "value correct" );
+    packed_is( INT32, $hash->{A}, 314159, "value correct" );
     is( $bson, $expect, "BSON correct" );
 };
 
@@ -64,20 +65,20 @@ subtest 'wrapped' => sub {
     $bson = $expect = encode( { A => 314159 } );
     $hash = decode( $bson, wrap_numbers => 1 );
     is( ref( $hash->{A} ), 'BSON::Int32', "int32->BSON::Int32" );
-    packed_is( "l", $hash->{A}, 314159, "value correct" );
+    packed_is( INT32, $hash->{A}, 314159, "value correct" );
 
     # BSON::Int32 -> BSON::Int32
     $bson = encode( { A => bson_int32(314159) } );
     $hash = decode( $bson, wrap_numbers => 1 );
     is( ref( $hash->{A} ), 'BSON::Int32', "int32->BSON::Int32" );
-    packed_is( "l", $hash->{A}, 314159, "value correct" );
+    packed_is( INT32, $hash->{A}, 314159, "value correct" );
     is( $bson, $expect, "BSON correct" );
 
     # BSON::Int32(string) -> BSON::Int32
     $bson = encode( { A => bson_int32("314159") } );
     $hash = decode( $bson, wrap_numbers => 1 );
     is( ref( $hash->{A} ), 'BSON::Int32', "int32->BSON::Int32" );
-    packed_is( "l", $hash->{A}, 314159, "value correct" );
+    packed_is( INT32, $hash->{A}, 314159, "value correct" );
     is( $bson, $expect, "BSON correct" );
 };
 
@@ -104,7 +105,7 @@ done_testing;
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2016 by MongoDB, Inc.
+# This software is Copyright (c) 2018 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

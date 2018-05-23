@@ -27,5 +27,5 @@ requires:
   perl: '5.008'
 resources:
   repository: http://github.com/jettero/net--imap--simple
-version: '1.2210'
+version: '1.2211'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

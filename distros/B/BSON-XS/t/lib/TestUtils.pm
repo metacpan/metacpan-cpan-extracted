@@ -1,4 +1,4 @@
-use 5.008001;
+use 5.010001;
 use strict;
 use warnings;
 use Test::More 0.96;
@@ -9,7 +9,14 @@ use Config;
 use JSON::MaybeXS;
 
 use base 'Exporter';
-our @EXPORT = qw/sv_type packed_is bytes_are to_extjson to_myjson try_or_fail/;
+our @EXPORT =
+  qw/sv_type packed_is bytes_are to_extjson to_myjson try_or_fail INT64 INT32 FLOAT/;
+
+use constant {
+    INT64 => 'q<',
+    INT32 => 'l<',
+    FLOAT => 'd<',
+};
 
 my $json_codec = JSON::MaybeXS->new(
     ascii => 1,
@@ -44,10 +51,10 @@ sub packed_is {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $ok;
-    if ( $template eq 'q' && ! $Config{use64bitint} ) {
+    if ( $template eq INT64 && ! $Config{use64bitint} ) {
         if ( !ref($got) && !ref($exp) ) {
             # regular scalar will fit in 32 bits, so downgrade the template
-            $template = 'l';
+            $template = INT32;
         }
         else {
             # something is a reference, so must be BigInt or equivalent
@@ -93,7 +100,7 @@ sub try_or_fail {
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2016 by MongoDB, Inc.
+# This software is Copyright (c) 2018 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

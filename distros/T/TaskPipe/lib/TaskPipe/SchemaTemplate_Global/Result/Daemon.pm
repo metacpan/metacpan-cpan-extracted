@@ -28,7 +28,7 @@ __PACKAGE__->set_primary_key("name");
 
 =head1 NAME
 
-TaskPipe::SchemaTemplate_Global::Result::Daemon;
+TaskPipe::SchemaTemplate_Global::Result::Daemon - schema template for the global daemon table
 
 =head1 DESCRIPTION
 

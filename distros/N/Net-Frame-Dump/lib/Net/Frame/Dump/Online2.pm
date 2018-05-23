@@ -1,5 +1,5 @@
 #
-# $Id: Online2.pm,v 453864a37ab6 2018/05/01 07:25:03 gomor $
+# $Id: Online2.pm,v c07e2f6c705b 2018/05/17 11:57:52 gomor $
 #
 package Net::Frame::Dump::Online2;
 use strict;
@@ -296,7 +296,7 @@ sub next {
       return;
    }
 
-   # We fetch new awaiting frames, if no timeout occured yet.
+   # We fetch new awaiting frames, if no timeout occurred yet.
    # can_read will return as soon as there is something to read,
    # or will block if nothing to read for timeoutOnNext seconds.
    my $sel = $self->_sel;
@@ -326,7 +326,7 @@ sub next {
    #print STDERR "*** diff [$diff] received [$some_received] thisTime [$thisTime] endTime [$endTime]\n";
 
    if ($self->_timeWithoutReceiving > $self->timeoutOnNext) {
-      #print STDERR "*** Timeout occured\n";
+      #print STDERR "*** Timeout occurred\n";
       $self->timeout(1);
    }
 
@@ -399,7 +399,7 @@ The network interface to listen on. No default value.
 
 =item B<timeoutOnNext>
 
-Each time you call B<next> method, an internal counter is updated. This counter tells you if you have not received any data since B<timeoutOnNext> seconds. When a timeout occure, B<timeout> is set to true.
+Each time you call B<next> method, an internal counter is updated. This counter tells you if you have not received any data since B<timeoutOnNext> seconds. When a timeout occurred, B<timeout> is set to true.
 
 =item B<timeout>
 

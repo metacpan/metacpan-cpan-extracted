@@ -83,6 +83,7 @@
             "Thread::Semaphore" : "0",
             "Tie::Hash" : "0",
             "Time::HiRes" : "0",
+            "Time::Seconds" : "0",
             "Try::Tiny" : "0.22",
             "YAML::XS" : "0.41",
             "autodie" : "0",
@@ -133,7 +134,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.642",
+   "version" : "3.651",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

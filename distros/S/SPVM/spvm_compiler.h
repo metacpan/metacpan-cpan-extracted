@@ -7,41 +7,47 @@
 
 // Parser information
 struct SPVM_compiler {
-  
-  // Opcodes
-  SPVM_OPCODE_ARRAY* opcode_array;
+  // Current parsed file name
+  const char* cur_file;
 
-  // Entry point package name
-  const char* entry_point_package_name;
-  
-  // Entry point subroutine name
-  const char* entry_point_sub_name;
+  // Current parsed source
+  char* cur_src;
 
+  // Current line number
+  int32_t cur_line;
+  
   // Allocator
   SPVM_COMPILER_ALLOCATOR* allocator;
-  
-  // Before buffer position
-  char* befbufptr;
   
   // Current buffer position
   char* bufptr;
   
-  // Current file name
-  const char* cur_file;
+  // Before buffer position
+  char* befbufptr;
+
+  // Expect subroutine name
+  _Bool expect_sub_name;
   
-  const char* cur_package_name;
+  // Current enum value
+  int32_t current_enum_value;
   
-  // Source base_object
-  char* cur_src;
+  // Temporary variable length
+  int32_t tmp_var_length;
   
-  // AST grammar
-  SPVM_OP* op_grammar;
+  // Current case statements in switch statement
+  SPVM_LIST* cur_op_cases;
+
+  // Include pathes
+  SPVM_LIST* module_include_pathes;
+
+  // OP name symtable
+  SPVM_HASH* name_symtable;
+
+  // Class loading stack
+  SPVM_LIST* op_use_stack;
   
   // Constants
   SPVM_LIST* op_constants;
-  
-  int64_t enum_default_value;
-  int32_t enum_default_type_id;
 
   // Packages
   SPVM_LIST* op_packages;
@@ -49,14 +55,23 @@ struct SPVM_compiler {
   // OP package symtable
   SPVM_HASH* op_package_symtable;
   
+  // Anonimous package length
+  int32_t anon_package_length;
+  
+  // Single types
+  SPVM_LIST* basic_types;
+  
+  // Resolved type symbol table
+  SPVM_HASH* basic_type_symtable;
+  
+  // Types
+  SPVM_LIST* op_types;
+
   // OP our symtable
   SPVM_HASH* op_our_symtable;
-  
-  // Class loading stack
-  SPVM_LIST* op_use_stack;
-  
-  // Include pathes
-  SPVM_LIST* include_pathes;
+
+  // Package Variable length
+  int32_t package_var_length;
   
   // Subroutine ops
   SPVM_LIST* op_subs;
@@ -64,62 +79,31 @@ struct SPVM_compiler {
   // Subroutine absolute name symbol table
   SPVM_HASH* op_sub_symtable;
 
-  // use symbol table
-  SPVM_HASH* op_use_symtable;
-  
-  // Types(This is all type ops in source id)
-  SPVM_LIST* op_types;
-
-  // Subroutine names
+  // Method signature
   SPVM_LIST* method_signatures;
 
-  // Subroutine name symtable
+  // Method signature symbol table
   SPVM_HASH* method_signature_symtable;
   
-  // Types(This is unique types)
-  SPVM_LIST* types;
-  
-  // Resolved type symbol table
-  SPVM_HASH* type_symtable;
-  
-  // Current case statements in switch statement
-  SPVM_LIST* cur_op_cases;
+  // AST grammar
+  SPVM_OP* op_grammar;
   
   // Entry point subroutine name
   const char* start_sub_name;
   
-  SPVM_LIST* cur_template_args;
-
-  // Use module pathes
-  SPVM_HASH* package_load_path_symtable;
-  
-  // Current line number
-  int32_t cur_line;
-  
   // Syntax error count
   int32_t error_count;
-  
-  // Package Variable id
-  int32_t package_var_length;
-  
-  int32_t tmp_var_length;
   
   // Error is fatal
   _Bool fatal_error;
   
-  // Before is camma
-  _Bool before_is_comma;
+  // Temporary buffer
+  char tmp_buffer[UINT16_MAX];
   
-  // Before is package
-  _Bool before_is_package;
+  // Operation codes
+  SPVM_OPCODE_ARRAY* opcode_array;
   
-  // Expect name
-  _Bool expect_name;
-  
-  SPVM_OP* cur_op_use;
-  
-  int32_t anon_package_length;
-  
+  // Enable JIT
   _Bool enable_jit;
 };
 
@@ -127,5 +111,6 @@ SPVM_COMPILER* SPVM_COMPILER_new();
 int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
+void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
 
 #endif

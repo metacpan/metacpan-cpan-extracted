@@ -25,7 +25,7 @@ package MongoDB::Error;
 
 use version;
 
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use Carp;
@@ -304,7 +304,7 @@ MongoDB::Error - MongoDB Driver Error classes
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

@@ -78,8 +78,6 @@ Test phantomjs
 
 =back
 
-=item *
-
 Install TOR
 
     yum install tor

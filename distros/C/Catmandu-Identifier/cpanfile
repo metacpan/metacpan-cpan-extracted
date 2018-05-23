@@ -15,5 +15,5 @@ requires 'Business::ISSN', '0.91';
 requires 'Business::ISBN', '2.010';
 requires 'Data::UUID',0;
 requires 'LWP::Simple',0;
-requires 'WWW::ORCID',0;
+requires 'WWW::ORCID', '>=0.0401';
 requires 'Data::Validate::URI',0;

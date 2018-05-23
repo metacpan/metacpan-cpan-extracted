@@ -1,57 +1,16 @@
 package Assert::Conditional::Utils;
 
-=encoding utf8
-
-=head1 NAME
-
-Assert::Conditional::Utils - Utility functions for conditionally compiling assertions
-
-=head1 SYNOPSIS
-
-    use Assert::Conditional::Utils qw(panic NOT_REACHED);
-
-    $big > $little
-        || panic("Impossible for $big > $little");
-
-    chdir("/")  
-        || panic("Your root filesystem is corrupt: $!");
-
-    if    ($x) { ...  }
-    elsif ($y) { ...  }
-    elsif ($z) { ...  } 
-    else       { NOT_REACHED }
-
-=head1 DESCRIPTION
-
-This module is used by the L<Assert::Conditional> module for most of the
-non-assert functions it needs.  Because this module is still in alpha 
-release, the two examples above should be the only guaranteed serviceable
-parts.
-
-It is possible (but in alpha release, not necessarily advised) to use the
-C<botch> function to write your own assertions that work like those in
-L<Assert::Conditional>.
-
-The C<panic> function is for internal errors that should never 
-happen.  Unlike its cousin C<botch>, it is not controllable through
-the C<ASSERT_CONDITIONAL> variable.
-
-Use C<NOT_REACHED> for some case that can "never" happen.
-
-=cut
-
-
-use v5.10;
+use v5.12;
 use utf8;
 use strict;
 use warnings;
 
-use parent 'Exporter';
-
-use Carp qw(carp cluck croak confess shortmess longmess);
+use B::Deparse;
+use Carp                qw(carp cluck croak confess shortmess longmess);
+use Cwd                 qw(cwd abs_path);
+use Exporter            qw(import);
+use File::Basename      qw(basename dirname);
 use File::Spec;
-use File::Basename qw(basename dirname);
-use Cwd qw(cwd abs_path);
 
 #################################################################
 
@@ -62,6 +21,10 @@ sub  botch_false             (     ) ;
 sub  botch_have_thing_wanted (  @  ) ;
 sub  botch_undef             (     ) ;
 sub  code_of_coderef         (  $  ) ;
+sub  commify_and                     ;
+sub  commify_but                     ;
+sub  commify_nor                     ;
+sub  commify_or                      ;
 sub  commify_series                  ;
 sub  dump_exports            (  @  ) ;
 sub  dump_package_exports    (  $@ ) ;
@@ -83,6 +46,11 @@ sub _init_public_vars        (     ) ;
 sub  name_of_coderef         (  $  ) ;
 sub  NOT_REACHED             (     ) ;
 sub  panic                   (  $  ) ;
+sub  quotify_and                     ;
+sub  quotify_but                     ;
+sub  quotify_nor                     ;
+sub  quotify_or                      ;
+sub  serialize_conjunction   (  $@ ) ;
 sub  sig_name2num            (  $  ) ;
 sub  sig_num2longname        (  $  ) ;
 sub  sig_num2name            (  $  ) ;
@@ -106,7 +74,6 @@ our $VERSION = 0.001_000;
 
 our %EXPORT_TAGS;
 
-
 push our @EXPORT_OK, do {
     my %seen;
     grep { !$seen{$_}++ } map { @$_ } values %EXPORT_TAGS;
@@ -122,13 +89,13 @@ $EXPORT_TAGS{all} = \@EXPORT_OK;
 
 #################################################################
 
+use Attribute::Handlers;
+
 # The following attribute handler handler for subs saves
 # us a lot of bookkeeping trouble by letting us declare
 # which export tag groups a particular assert belongs to
 # at the point of declaration where it belongs, and so
 # that it is all handled automatically.
-#
-use Attribute::Handlers;
 
 sub Export : ATTR(BEGIN)
 {
@@ -167,11 +134,13 @@ sub Export : ATTR(BEGIN)
     }
 }
 
+# Yes, you can actually export these that way too.
 our($Assert_Debug, $Assert_Always, $Assert_Carp, $Assert_Never, $Allow_Handlers)
     :Export( qw[vars] );
 
 our $Pod_Generation;
 
+# Let's not talk about these ones.
 our(%PLURAL, %N_PLURAL)
     :Export( qw[acme_plurals] );
 
@@ -199,7 +168,7 @@ sub _init_envariables() {
             if ( /\b never    \b/x ) { $Assert_Never   ||= 1 }
             if ( /\b handlers \b/x ) { $Allow_Handlers ||= 1 }
         }
-    } 
+    }
 
     $Assert_Always ||= 1 unless $Assert_Carp || $Assert_Never;
 
@@ -218,13 +187,634 @@ sub _init_public_vars() {
 BEGIN     { _init_envariables() }
 UNITCHECK { _init_public_vars() }
 
+sub botch($)
+    :Export( qw[botch] )
+{
+    return if $Assert_Never;
 
-=pod
+    my($msg) = @_;
+    my $sub = his_assert;
+
+    local @SIG{<__{DIE,WARN}__>} unless $Allow_Handlers;
+
+    my $botch = "$0\[$$]: botched assertion $sub: \u$msg";
+
+    if ($Assert_Carp) {
+        Carp::carp($botch)
+    }
+
+    if ($Assert_Always) {
+        $botch = shortmess("$botch, bailing out");
+        Carp::confess("$botch\n   Beginning stack dump from failed $sub");
+    }
+}
+
+sub botch_false()
+    :Export( qw[botch] )
+{
+    panic "value should not be false";
+}
+
+sub botch_undef()
+    :Export( qw[botch] )
+{
+    panic "value should not be undef";
+}
+
+#################################################################
+#
+# A few stray utility functions that are a bit too intimate with
+# the assertions in this file to deserve being made public
+
+sub botch_argc($$)
+    :Export( qw[botch] )
+{
+    my($have, $want) = @_;
+    botch_have_thing_wanted(HAVE => $have, THING => "argument", WANTED => $want);
+}
+
+sub botch_array_length($$)
+    :Export( qw[botch] )
+{
+    my($have, $want) = @_;
+    botch_have_thing_wanted(HAVE => $have, THING => "array element", WANTED => $want);
+}
+
+sub botch_have_thing_wanted(@)
+    :Export( qw[botch] )
+{
+    my(%param) = @_;
+    my $have   = $param{HAVE}   // botch_undef;
+    my $thing  = $param{THING}  // botch_undef;
+    my $wanted = $param{WANTED} // botch_undef;
+    botch "have $N_PLURAL{$thing => $have} but wanted $wanted";
+}
+
+#################################################################
+
+sub panic($)
+    :Export( qw[lint botch] )
+{
+    my($msg) = @_;
+    local @SIG{<__{DIE,WARN}__>} unless $Allow_Handlers;
+    Carp::confess("Panicking on internal error: $msg");
+}
+
+sub FIXME()
+    :Export( qw[lint] )
+{
+    panic "Unimplemented code reached; you forgot to code up a TODO section";
+}
+
+sub NOT_REACHED()
+    :Export( qw[lint] )
+{
+    panic "Logically unreachable code somehow reached";
+}
+
+#################################################################
+
+# Find the highest assert_ on the stack so that we don't misreport
+# failures. For example this next one illustrated below should be
+# reporting that assert_hash_keys_required botched because that's the
+# one we called; it shouldn't say that it was assert_min_keys or
+# assert_hashref_keys_required that botched, even thought the nearest
+# assert that called botch was actually assert_min_keys.
+
+## perl -Ilib -MAssert::Conditional=:all -e 'assert_hash_keys_required %ENV, "snap"'
+## -e[92241]: botched assertion assert_hash_keys_required: Key 'snap' missing from hash, bailing out at -e line 1.
+##
+##    Beginning stack dump from failed assert_hash_keys_required at lib/Assert/Conditional/Utils.pm line 391.
+## 	Assert::Conditional::Utils::botch("key 'snap' missing from hash") called at lib/Assert/Conditional.pm line 1169
+## 	Assert::Conditional::assert_min_keys(REF(0x7fe6196ec3f0), "snap") called at lib/Assert/Conditional.pm line 1135
+## 	Assert::Conditional::assert_hashref_keys_required called at lib/Assert/Conditional.pm line 1104
+## 	Assert::Conditional::assert_hash_keys_required(HASH(0x7fe619028f70), "snap") called at -e line 1
+
+# But if we can't find as assert_\w+ on the stack, just use the name of the
+# the thing that called the thing that called us, so presumably whatever
+# called botch.
+sub his_assert()
+    :Export( qw[frame] )
+{
+    my $assert_rx = qr/::assert_\w+\z/x;
+    my $i;
+    my $sub = q();
+    for ($i = 1; $sub !~ $assert_rx; $i++)  {
+        $sub = his_sub($i) // last;
+    }
+    $sub //= his_sub(2); # in case we couldn't find an assert_\w+ sub
+    while ((his_sub($i+1) // "") =~ $assert_rx) {
+        $sub = his_sub(++$i);
+    }
+    $sub =~ s/.*:://;
+    return $sub;
+}
+
+sub his_args(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    do { package DB; () = caller($frames+2); };
+    return @DB::args;
+}
+
+sub his_frame(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    return caller($frames+2);
+}
+
+BEGIN {
+
+    # Stealing lovely "iota" magic from the
+    # Go language construct of the same name.
+    my      $iota;
+    BEGIN { $iota = 0 }
+    use constant {
+        CALLER_PACKAGE     =>  $iota++,
+        CALLER_FILENAME    =>  $iota++,
+        CALLER_LINE        =>  $iota++,
+        CALLER_SUBROUTINE  =>  $iota++,
+        CALLER_HASARGS     =>  $iota++,
+        CALLER_WANTARRAY   =>  $iota++,
+        CALLER_EVALTEXT    =>  $iota++,
+        CALLER_IS_REQUIRE  =>  $iota++,
+        CALLER_HINTS       =>  $iota++,
+        CALLER_BITMASK     =>  $iota++,
+        CALLER_HINTHASH    =>  $iota++,
+    };
+
+    my @caller_consts = qw(
+        CALLER_PACKAGE
+        CALLER_FILENAME
+        CALLER_LINE
+        CALLER_SUBROUTINE
+        CALLER_HASARGS
+        CALLER_WANTARRAY
+        CALLER_EVALTEXT
+        CALLER_IS_REQUIRE
+        CALLER_HINTS
+        CALLER_BITMASK
+        CALLER_HINTHASH
+    );
+
+    push @{ $EXPORT_TAGS{CALLER} }, @caller_consts;
+
+    push @{ $EXPORT_TAGS{frame}  },
+         @{ $EXPORT_TAGS{CALLER} };
+
+}
+
+sub his_package(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    (his_frame($frames+1))[CALLER_PACKAGE]
+}
+
+sub his_filename(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    (his_frame($frames+1))[CALLER_FILENAME]
+}
+
+sub his_line(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    (his_frame($frames+1))[CALLER_LINE]
+}
+
+sub his_subroutine(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    (his_frame($frames+1))[CALLER_SUBROUTINE]
+}
+
+sub his_sub(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    his_subroutine($frames + 1);
+}
+
+sub his_context(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    (his_frame($frames+1))[CALLER_WANTARRAY]
+}
+
+sub his_is_require(;$)
+    :Export( qw[frame] )
+{
+    my $frames = @_ && $_[0];
+    (his_frame($frames+1))[CALLER_IS_REQUIRE]
+}
+
+#################################################################
+
+my ($hint_bits, $warning_bits);
+BEGIN {($hint_bits, $warning_bits) = ($^H, ${^WARNING_BITS})}
+
+sub code_of_coderef($)
+    :Export( qw[code] )
+{
+    my($coderef) = @_;
+
+    my $deparse = B::Deparse->new(
+        "-P",
+        "-sC",
+       #"-x9",
+       #"-q",
+       #"-q",
+    );
+    $deparse->ambient_pragmas(
+       warnings => 'all',
+       strict => 'all',
+       hint_bits => $hint_bits,
+       warning_bits => $warning_bits,
+    ) if 0;
+    my $body = $deparse->coderef2text($coderef);
+
+    #return $body;
+
+    for ($body) {
+        s/^\h+(?:use|no) (?:strict|warnings|feature|integer|utf8|bytes|re)\b[^\n]*\n//gm;
+        s/^\h+package [^\n]*;\n//gm;
+        s/\A\{\n\h+([^\n;]*);\n\}\z/{ $1 }/;
+    }
+
+    return $body;
+
+}
+
+sub name_of_coderef($)
+    :Export( qw[code] )
+{
+    require B;
+    my($coderef) = @_;
+    my $cv = B::svref_2object($coderef);
+    return unless $cv->isa("B::CV");
+    my $gv = $cv->GV;
+    return if $gv->isa("B::SPECIAL");
+    my $subname  = $gv->NAME;
+    my $packname = $gv->STASH->NAME;
+    return $packname . "::" . $subname;
+}
+
+sub subname_or_code($)
+    :Export( qw[code] )
+{
+    my($coderef) = @_;
+    my $name = name_of_coderef($coderef);
+    if ($name =~ /__ANON__/) {
+        return code_of_coderef($coderef);
+    } else {
+        return "$name()";
+    }
+}
+
+#################################################################
+
+sub serialize_conjunction($@) {
+    my $conj = shift;
+    (@_ == 0) ? ''                                      :
+    (@_ == 1) ? $_[0]                                   :
+    (@_ == 2) ? join(" $conj ", @_)                     :
+                join(", ", @_[0 .. ($#_-1)], "$conj $_[-1]");
+}
+
+sub commify_series
+    :Export( qw[list] )
+{
+    &commify_and;
+}
+
+sub commify_and
+    :Export( qw[list] )
+{
+    serialize_conjunction and => @_;
+}
+
+sub commify_or
+    :Export( qw[list] )
+{
+    serialize_conjunction or => @_;
+}
+
+sub commify_but
+    :Export( qw[list] )
+{
+    serialize_conjunction but => @_;
+}
+
+sub commify_nor
+    :Export( qw[list] )
+{
+    serialize_conjunction nor => @_;
+}
+
+sub quotify_and
+    :Export( qw[list] )
+{
+    commify_and map { "'$_'" } @_;
+}
+
+sub quotify_or
+    :Export( qw[list] )
+{
+    commify_or map { "'$_'" } @_;
+}
+
+sub quotify_nor
+    :Export( qw[list] )
+{
+    commify_nor map { "'$_'" } @_;
+}
+
+sub quotify_but
+    :Export( qw[list] )
+{
+    commify_but map { "'$_'" } @_;
+}
+
+sub dump_exports(@)
+    :Export( qw[exports] )
+{
+    my $caller_package = caller;
+    dump_package_exports($caller_package, @_);
+}
+
+sub dump_package_exports($@)
+    :Export( qw[exports] )
+{
+    my($pkg, @exports) = @_;
+    my %tag2aref = do { no strict 'refs'; %{$pkg . "::EXPORT_TAGS"} };
+    delete $tag2aref{asserts};
+    my %seen; # for the all repetition
+    my @taglist = @exports ? @exports : ('all', uca_sort(keys %tag2aref));
+    my $errors = 0;
+    print "=head2 Export Tags\n\n=over\n\n" if $Pod_Generation;
+    for my $tag (@taglist)  {
+        next if $seen{$tag}++;
+        my $aref = $tag2aref{$tag};
+        unless ($aref) {
+            print STDERR ":$tag is not an export tag in $pkg.\n";
+            $errors++;
+            next;
+        }
+        if ($Pod_Generation) {
+            print "=item C<:$tag>\n\n", commify_series(map { "L</$_>" } uca_sort @$aref), ".\n\n";
+        }
+        else {
+            print "Conditional export tag :$tag exports ", commify_series(uca_sort @$aref), ".\n";
+        }
+    }
+    print "=back\n\n" if $Pod_Generation;
+    return $errors == 0;
+}
+
+#################################################################
+
+sub UCA (_)             :Export( qw[unicode] );
+sub UCA1(_)             :Export( qw[unicode] );
+sub UCA2(_)             :Export( qw[unicode] );
+sub UCA3(_)             :Export( qw[unicode] );
+sub UCA4(_)             :Export( qw[unicode] );
+sub uca_cmp ($$)        :Export( qw[unicode] );
+sub uca1_cmp($$)        :Export( qw[unicode] );
+sub uca2_cmp($$)        :Export( qw[unicode] );
+sub uca3_cmp($$)        :Export( qw[unicode] );
+sub uca4_cmp($$)        :Export( qw[unicode] );
+
+{
+    my @Comparitor;
+
+    sub _get_comparitor($) {
+        my($level) = @_;
+        panic "invalid level $level" unless $level =~ /^[1-4]$/;
+        return $Comparitor[$level] if $Comparitor[$level];
+
+        require Unicode::Collate;
+        my $class = Unicode::Collate:: ;
+        # need to discount the other ones altogether
+        my @args = (level => $level); #, variable => "Non-Ignorable");
+    #   if ($Opt{locale}) {
+    #       require Unicode::Collate::Locale;
+    #       $class = Unicode::Collate::Locale:: ;
+    #       push @args, locale => $Opt{locale};
+    #   }
+        my $coll = $class->new(@args);
+        $Comparitor[$level] = $coll;
+    }
+
+    for my $strength ( 1 .. 4 ) {
+        no strict "refs";
+        *{ "UCA$strength" } = sub(_) {
+            state $coll = _get_comparitor($strength);
+            return $coll->getSortKey($_[0]);
+        };
+
+        *{ "uca${strength}_cmp" } = sub($$) {
+            my($this, $that) = @_;
+            "UCA$strength"->($this)
+                cmp
+            "UCA$strength"->($that)
+
+        };
+    }
+
+    no warnings "once";
+    *UCA     = \&UCA1;
+    *uca_cmp = \&uca1_cmp;
+}
+
+sub uca_sort(@)
+    :Export( qw[unicode list] )
+{
+     state $collator = _get_comparitor(4);
+     return $collator->sort(@_);
+}
+
+{
+    sub _uniq {
+        my %seen;
+        my @out;
+        for (@_) { push @out, $_ unless $seen{$_}++ }
+        return @out;
+    }
+
+    @EXPORT_OK = _uniq(@EXPORT_OK);
+    for my $tag (keys %EXPORT_TAGS) {
+        my @exports = _uniq @{ $EXPORT_TAGS{$tag} };
+        $EXPORT_TAGS{$tag} = [@exports];
+    }
+}
+
+#################################################################
+
+{   # Private scope for sig mappers
+
+    our %Config;  # constrains in-file lexical visibility
+    use  Config;
+
+    my $sig_count      = $Config{sig_size}     || botch_undef;
+    my $sig_name_list  = $Config{sig_name}     || botch_undef;
+    my $sig_num_list   = $Config{sig_num}      || botch_undef;
+
+    my @sig_nums       = split " ", $sig_num_list;
+    my @sig_names      = split " ", $sig_name_list;
+
+    my $have;
+    $have =  @sig_nums;
+    $have == $sig_count                 || panic "expected $sig_count signums, not $have";
+
+    $have =  @sig_names;
+    $have == $sig_count                 || panic "expected $sig_count signames, not $have";
+
+    my(%_Map_num2name, %_Map_name2num);
+
+    @_Map_num2name {@sig_nums } = @sig_names;
+    @_Map_name2num {@sig_names} = @sig_nums;
+
+    sub sig_num2name($)
+        :Export( sigmappers )
+    {
+        my($num) = @_;
+        $num =~ /^\d+$/                 || botch "$num doesn't look like a signal number";
+        return $_Map_num2name{$num}     // botch_undef;
+    }
+
+    sub sig_num2longname($)
+        :Export( sigmappers )
+    {
+        return q(SIG) . &sig_num2name;
+    }
+
+    sub sig_name2num($)
+        :Export( sigmappers )
+    {
+        my($name) = @_;
+        $name =~ /^\p{upper}+$/         || botch "$name doesn't look like a signal name";
+        $name =~ s/^SIG//;
+        return $_Map_name2num{$name}    // botch_undef;
+    }
+
+}
+
+#################################################################
+
+# You really don't want to be looking here.
+
+BEGIN {
+    package # so PAUSE doesn't index this
+        Acme::Plural::pl_simple;
+    require Tie::Hash;
+    our @ISA = qw(Acme::Plural Tie::StdHash);
+
+    sub TIEHASH {
+        my($class, @args) = @_;
+        my $self = { };
+        bless $self, $class;
+        return $self;
+    }
+
+    sub FETCH {
+        my($self, $key) = @_;
+        my($noun, $count) = (split($; => $key), 2);
+        return $noun if $count eq '1';
+        $self->{$noun} ||= $self->_lame_plural($noun);
+    }
+
+}
+
+BEGIN {
+    package  # so PAUSE doesn't index this
+        Acme::Plural::pl_count;
+    our @ISA = 'Acme::Plural::pl_simple';
+
+    sub FETCH {
+        my($self, $key) = @_;
+        my $several = $self->SUPER::FETCH($key);
+        my($noun, $count) = (split($; => $key), 2);
+        return "$count $several";
+    }
+
+}
+
+BEGIN {
+    package # so PAUSE doesn't index this
+        Acme::Plural;
+
+    use Exporter 'import';
+
+    our @EXPORT = qw(
+        %PLURAL
+        %N_PLURAL
+    );
+
+    # TODO: replace with the Lingua::EN::Inflect
+    sub _lame_plural($$) {
+        my($self, $str) = @_;
+        return $str if $str =~ s/(?<! [aeiou] ) y  $/ies/x;
+        return $str if $str =~ s/ (?: [szx] | [sc]h ) \K $/es/x;
+        return $str . "s";
+    }
+
+    tie our %PLURAL    => "Acme::Plural::pl_simple";
+    tie our %N_PLURAL  => "Acme::Plural::pl_count";
+}
+
+1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Assert::Conditional::Utils - Utility functions for conditionally-compiled assertions
+
+=head1 SYNOPSIS
+
+    use Assert::Conditional::Utils qw(panic NOT_REACHED);
+
+    $big > $little
+        || panic("Impossible for $big > $little");
+
+    chdir("/")
+        || panic("Your root filesystem is corrupt: $!");
+
+    if    ($x) { ...  }
+    elsif ($y) { ...  }
+    elsif ($z) { ...  }
+    else       { NOT_REACHED }
+
+=head1 DESCRIPTION
+
+This module is used by the L<Assert::Conditional> module for most of the
+non-assert functions it needs.  Because this module is still in alpha
+release, the two examples above should be the only guaranteed serviceable
+parts.
+
+It is possible (but in alpha release, not necessarily advised) to use the
+C<botch> function to write your own assertions that work like those in
+L<Assert::Conditional>.
+
+The C<panic> function is for internal errors that should never
+happen.  Unlike its cousin C<botch>, it is not controllable through
+the C<ASSERT_CONDITIONAL> variable.
+
+Use C<NOT_REACHED> for some case that can "never" happen.
 
 =head2 Exported Variables
 
 Here is the list of the support global variables, available for import,
-which are normally controlled by the C<ASSERT_CONDITIONAL> environment 
+which are normally controlled by the C<ASSERT_CONDITIONAL> environment
 variable.
 
 =over
@@ -300,6 +890,9 @@ Here is the list of all exported functions with their prototypes:
  uca_cmp                 (  $$ ) ;
  uca_sort                (  @  ) ;
 
+=for reproduction
+ASSERT_CONDITIONAL_BUILD_POD=1 perl -Ilib -MAssert::Conditional -e 'Assert::Conditional::Utils->dump_package_exports' | fmt
+
 =head2 Export Tags
 
 Available exports are grouped by the following tags:
@@ -308,55 +901,90 @@ Available exports are grouped by the following tags:
 
 =item C<:all>
 
-C<%N_PLURAL>, C<%PLURAL>, C<$Assert_Always>, C<$Assert_Carp>, C<$Assert_Debug>, C<$Assert_Never>, C<botch>, C<botch_argc>, C<botch_array_length>, C<botch_false>, C<botch_have_thing_wanted>, C<botch_undef>, C<CALLER_BITMASK>, C<CALLER_EVALTEXT>, C<CALLER_FILENAME>, C<CALLER_HASARGS>, C<CALLER_HINTHASH>, C<CALLER_HINTS>, C<CALLER_IS_REQUIRE>, C<CALLER_LINE>, C<CALLER_PACKAGE>, C<CALLER_SUBROUTINE>, C<CALLER_WANTARRAY>, C<code_of_coderef>, C<commify_series>, C<dump_exports>, C<dump_package_exports>, C<FIXME>, C<his_args>, C<his_assert>, C<his_context>, C<his_filename>, C<his_frame>, C<his_is_require>, C<his_line>, C<his_package>, C<his_sub>, C<his_subroutine>, C<name_of_coderef>, C<NOT_REACHED>, C<panic>, C<sig_name2num>, C<sig_num2longname>, C<sig_num2name>, C<subname_or_code>, C<UCA>, C<uca_cmp>, C<uca_sort>, C<UCA1>, C<uca1_cmp>, C<UCA2>, C<uca2_cmp>, C<UCA3>, C<uca3_cmp>, C<UCA4>, and C<uca4_cmp>.
+L</$Allow_Handlers>, L</$Assert_Always>, L</$Assert_Carp>,
+L</$Assert_Debug>, L</$Assert_Never>, L</botch>, L</botch_argc>,
+L</botch_array_length>, L</botch_false>, L</botch_have_thing_wanted>,
+L</botch_undef>, L</CALLER_BITMASK>, L</CALLER_EVALTEXT>,
+L</CALLER_FILENAME>, L</CALLER_HASARGS>, L</CALLER_HINTHASH>,
+L</CALLER_HINTS>, L</CALLER_IS_REQUIRE>, L</CALLER_LINE>,
+L</CALLER_PACKAGE>, L</CALLER_SUBROUTINE>, L</CALLER_WANTARRAY>,
+L</code_of_coderef>, L</commify_and>, L</commify_but>, L</commify_nor>,
+L</commify_or>, L</commify_series>, L</dump_exports>,
+L</dump_package_exports>, L</FIXME>, L</his_args>, L</his_assert>,
+L</his_context>, L</his_filename>, L</his_frame>, L</his_is_require>,
+L</his_line>, L</his_package>, L</his_sub>, L</his_subroutine>,
+L</name_of_coderef>, L</NOT_REACHED>, L</%N_PLURAL>, L</panic>,
+L</%PLURAL>, L</quotify_and>, L</quotify_but>, L</quotify_nor>,
+L</quotify_or>, L</sig_name2num>, L</sig_num2longname>, L</sig_num2name>,
+L</subname_or_code>, L</UCA>, L</UCA1>, L</uca1_cmp>, L</UCA2>,
+L</uca2_cmp>, L</UCA3>, L</uca3_cmp>, L</UCA4>, L</uca4_cmp>,
+L</uca_cmp>, and L</uca_sort>.
 
 =item C<:acme_plurals>
 
-C<%N_PLURAL> and C<%PLURAL>.
+L</%N_PLURAL> and L</%PLURAL>.
 
 =item C<:botch>
 
-C<botch>, C<botch_argc>, C<botch_array_length>, C<botch_false>, C<botch_have_thing_wanted>, C<botch_undef>, and C<panic>.
+L</botch>, L</botch_argc>, L</botch_array_length>, L</botch_false>,
+L</botch_have_thing_wanted>, L</botch_undef>, and L</panic>.
 
 =item C<:CALLER>
 
-C<CALLER_BITMASK>, C<CALLER_EVALTEXT>, C<CALLER_FILENAME>, C<CALLER_HASARGS>, C<CALLER_HINTHASH>, C<CALLER_HINTS>, C<CALLER_IS_REQUIRE>, C<CALLER_LINE>, C<CALLER_PACKAGE>, C<CALLER_SUBROUTINE>, and C<CALLER_WANTARRAY>.
+L</CALLER_BITMASK>, L</CALLER_EVALTEXT>, L</CALLER_FILENAME>,
+L</CALLER_HASARGS>, L</CALLER_HINTHASH>, L</CALLER_HINTS>,
+L</CALLER_IS_REQUIRE>, L</CALLER_LINE>, L</CALLER_PACKAGE>,
+L</CALLER_SUBROUTINE>, and L</CALLER_WANTARRAY>.
 
 =item C<:code>
 
-C<code_of_coderef>, C<name_of_coderef>, and C<subname_or_code>.
+L</code_of_coderef>, L</name_of_coderef>, and L</subname_or_code>.
 
 =item C<:exports>
 
-C<dump_exports> and C<dump_package_exports>.
+L</dump_exports> and L</dump_package_exports>.
 
 =item C<:frame>
 
-C<CALLER_BITMASK>, C<CALLER_EVALTEXT>, C<CALLER_FILENAME>, C<CALLER_HASARGS>, C<CALLER_HINTHASH>, C<CALLER_HINTS>, C<CALLER_IS_REQUIRE>, C<CALLER_LINE>, C<CALLER_PACKAGE>, C<CALLER_SUBROUTINE>, C<CALLER_WANTARRAY>, C<his_args>, C<his_assert>, C<his_context>, C<his_filename>, C<his_frame>, C<his_is_require>, C<his_line>, C<his_package>, C<his_sub>, and C<his_subroutine>.
+L</CALLER_BITMASK>, L</CALLER_EVALTEXT>, L</CALLER_FILENAME>,
+L</CALLER_HASARGS>, L</CALLER_HINTHASH>, L</CALLER_HINTS>,
+L</CALLER_IS_REQUIRE>, L</CALLER_LINE>, L</CALLER_PACKAGE>,
+L</CALLER_SUBROUTINE>, L</CALLER_WANTARRAY>, L</his_args>,
+L</his_assert>, L</his_context>, L</his_filename>, L</his_frame>,
+L</his_is_require>, L</his_line>, L</his_package>, L</his_sub>, and
+L</his_subroutine>.
 
 =item C<:lint>
 
-C<FIXME>, C<NOT_REACHED>, and C<panic>.
+L</FIXME>, L</NOT_REACHED>, and L</panic>.
 
 =item C<:list>
 
-C<commify_series> and C<uca_sort>.
+L</commify_and>, L</commify_but>, L</commify_nor>, L</commify_or>,
+L</commify_series>, L</quotify_and>, L</quotify_but>, L</quotify_nor>,
+L</quotify_or>, and L</uca_sort>.
 
 =item C<:sigmappers>
 
-C<sig_name2num>, C<sig_num2longname>, and C<sig_num2name>.
+L</sig_name2num>, L</sig_num2longname>, and L</sig_num2name>.
 
 =item C<:unicode>
 
-C<UCA>, C<uca_cmp>, C<uca_sort>, C<UCA1>, C<uca1_cmp>, C<UCA2>, C<uca2_cmp>, C<UCA3>, C<uca3_cmp>, C<UCA4>, and C<uca4_cmp>.
+L</UCA>, L</UCA1>, L</uca1_cmp>, L</UCA2>, L</uca2_cmp>, L</UCA3>,
+L</uca3_cmp>, L</UCA4>, L</uca4_cmp>, L</uca_cmp>, and L</uca_sort>.
 
 =item C<:vars>
 
-C<$Assert_Always>, C<$Assert_Carp>, C<$Assert_Debug>, and C<$Assert_Never>.
+L</$Allow_Handlers>, L</$Assert_Always>, L</$Assert_Carp>,
+L</$Assert_Debug>, and L</$Assert_Never>.
 
 =back
 
 =head2 Exported Functions
+
+About the only thing here that's "public" is L</botch>
+and the C<sig*> name-to-number mapping functions.
+The rest are internal and shouldn't be relied on.
 
 =over
 
@@ -367,99 +995,23 @@ by calling C<Carp::confess>, but this can be controlled using the
 C<ASSERT_CONDITIONAL> environment variable or its associated package
 variables as previously described.
 
-
-=cut
-
-sub botch($)
-    :Export( qw[botch] )
-{
-    return if $Assert_Never;
-
-    my($msg) = @_;
-    my $sub = his_assert;
-
-    local @SIG{<__{DIE,WARN}__>} unless $Allow_Handlers;
-
-    my $botch = "$0\[$$]: botched assertion $sub: \u$msg";
-
-    if ($Assert_Carp) { 
-        Carp::carp($botch) 
-    }
-
-    if ($Assert_Always) {
-        $botch = shortmess("$botch, bailing out");
-        Carp::confess("$botch\n   Beginning stack dump from failed $sub");
-    }
-}
+We crawl up the stack to find the I<highest> function named C<assert_*> to
+use for the message. That way when an assertion calls another assertion and that
+second one fails, the reported message uses the name of the first one.
 
 =item C<botch_false()>
 
 A way to panic if something is false but shouldn't be.
 
-=cut
-
-sub botch_false()
-    :Export( qw[botch] )
-{
-    panic "value should not be false";
-}
-
 =item C<botch_undef()>
 
 A way to panic if something is undef but shouldn't be.
 
-=cut
-
-sub botch_undef()
-    :Export( qw[botch] )
-{
-    panic "value should not be undef";
-}
-
-
-#################################################################
-#
-# A few stray utility functions that are a bit too intimate with
-# the assertions in this file to deserve being made public
-
 =item C<botch_argc($$)>
-
-=cut
-
-sub botch_argc($$)
-    :Export( qw[botch] )
-{
-    my($have, $want) = @_;
-    botch_have_thing_wanted(HAVE => $have, THING => "argument", WANTED => $want);
-}
 
 =item C<botch_array_length($$)>
 
-=cut
-
-sub botch_array_length($$)
-    :Export( qw[botch] )
-{
-    my($have, $want) = @_;
-    botch_have_thing_wanted(HAVE => $have, THING => "array element", WANTED => $want);
-}
-
 =item C<botch_have_thing_wanted(@)>
-
-=cut
-
-sub botch_have_thing_wanted(@)
-    :Export( qw[botch] )
-{
-    my(%param) = @_;
-    my $have   = $param{HAVE}  // botch_undef;
-    my $thing  = $param{THING}  // botch_undef;
-    my $wanted = $param{WANTED} // botch_undef;
-    botch "have $N_PLURAL{$thing => $have} but wanted $wanted";
-}
-
-
-#################################################################
 
 =item C<panic(I<MESSAGE>)>
 
@@ -467,601 +1019,90 @@ This function is used for internal errors that should never happen.
 It calls C<Carp::confess> with a prefix indicating that it is an
 internal error.
 
-=cut
-
-sub panic($)
-    :Export( qw[lint botch] )
-{
-    my($msg) = @_;
-    local @SIG{<__{DIE,WARN}__>} unless $Allow_Handlers;
-    Carp::confess("Panicking on internal error: $msg");
-}
-
 =item C<FIXME>
 
 Code you haven't gotten to yet.
-
-=cut
-
-sub FIXME()
-    :Export( qw[lint] )
-{
-    panic "Unimplemented code reached; you forgot to code up a TODO section";
-}
 
 =item C<NOT_REACHED>
 
 Put this in places that you think you can never reach in your code.
 
-=cut
-
-sub NOT_REACHED()
-    :Export( qw[lint] )
-{
-    panic "Logically unreachable code somehow reached";
-}
-
-#################################################################
-
 =item C<his_assert()>
-
-=cut
-
-sub his_assert()
-    :Export( qw[frame] )
-{
-    my $sub = q();
-    for (my $i = 1; $sub !~ /\b_*assert/; $i++)  {
-        $sub = his_sub($i) // last;
-    }
-    $sub //= his_sub(2);
-    $sub =~ s/.*:://;
-    return $sub;
-}
 
 =item C<his_args(;$)>
 
-=cut
-
-sub his_args(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    do { package DB; () = caller($frames+2); };
-    return @DB::args;
-}
-
 =item C<his_frame(;$)>
-
-=cut
-
-sub his_frame(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    return caller($frames+2);
-}
-
-BEGIN {
-
-    # Stealing lovely "iota" magic from the
-    # Go language construct of the same name.
-    my      $iota;
-    BEGIN { $iota = 0 }
-    use constant {
-        CALLER_PACKAGE     =>  $iota++,
-        CALLER_FILENAME    =>  $iota++,
-        CALLER_LINE        =>  $iota++,
-        CALLER_SUBROUTINE  =>  $iota++,
-        CALLER_HASARGS     =>  $iota++,
-        CALLER_WANTARRAY   =>  $iota++,
-        CALLER_EVALTEXT    =>  $iota++,
-        CALLER_IS_REQUIRE  =>  $iota++,
-        CALLER_HINTS       =>  $iota++,
-        CALLER_BITMASK     =>  $iota++,
-        CALLER_HINTHASH    =>  $iota++,
-    };
-
-    my @caller_consts = qw(
-        CALLER_PACKAGE
-        CALLER_FILENAME
-        CALLER_LINE
-        CALLER_SUBROUTINE
-        CALLER_HASARGS
-        CALLER_WANTARRAY
-        CALLER_EVALTEXT
-        CALLER_IS_REQUIRE
-        CALLER_HINTS
-        CALLER_BITMASK
-        CALLER_HINTHASH
-    );
-
-    push @{ $EXPORT_TAGS{CALLER} }, @caller_consts;
-
-    push @{ $EXPORT_TAGS{frame}  },
-         @{ $EXPORT_TAGS{CALLER} };
-
-}
 
 =item C<his_package(;$)>
 
-=cut
-
-sub his_package(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    (his_frame($frames+1))[CALLER_PACKAGE]
-}
-
 =item C<his_filename(;$)>
-
-=cut
-
-sub his_filename(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    (his_frame($frames+1))[CALLER_FILENAME]
-}
 
 =item C<his_line(;$)>
 
-=cut
-
-sub his_line(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    (his_frame($frames+1))[CALLER_LINE]
-}
-
 =item C<his_subroutine(;$)>
-
-=cut
-
-sub his_subroutine(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    (his_frame($frames+1))[CALLER_SUBROUTINE]
-}
 
 =item C<his_sub(;$)>
 
-=cut
-
-sub his_sub(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    his_subroutine($frames + 1);
-}
-
 =item C<his_context(;$)>
 
-=cut
-
-sub his_context(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    (his_frame($frames+1))[CALLER_WANTARRAY]
-}
-
 =item C<his_is_require(;$)>
-
-=cut
-
-sub his_is_require(;$)
-    :Export( qw[frame] )
-{
-    my $frames = @_ && $_[0];
-    (his_frame($frames+1))[CALLER_IS_REQUIRE]
-}
-
-#################################################################
 
 =item C<code_of_coderef(I<CODEREF>)>
 
 Return the code but not the name of the code reference passed.
 
-=cut
-
-sub code_of_coderef($)
-    :Export( qw[code] )
-{
-    require Data::Dumper;
-    my($coderef) = @_;
-    my $dobj = Data::Dumper->new([$coderef])->Deparse(1)->Terse(1);
-    my $block = $dobj->Dump();
-    for ($block) {
-        s/^sub.*?(?=\{)//;
-        s/^\s+use (?:strict|warnings);\n//gm;
-        s/^\s+package .*?;\n//gm;
-        s/\A\{\n    (.*);\n\}\n\z/$1/s;
-
-        chomp;
-    }
-    return $block;
-}
-
 =item C<name_of_coderef(I<CODEREF>)>
 
 Return the name of the code reference passed.
-
-=cut
-
-sub name_of_coderef($)
-    :Export( qw[code] )
-{
-    require B;
-    my($coderef) = @_;
-    my $cv = B::svref_2object($coderef);
-    return unless $cv->isa("B::CV");
-    my $gv = $cv->GV;
-    return if $gv->isa("B::SPECIAL");
-    my $subname  = $gv->NAME;
-    my $packname = $gv->STASH->NAME;
-    return $packname . "::" . $subname;
-}
 
 =item C<subname_or_code(I<CODEREF>)>
 
 Return the name of the code reference passed if it is not anonymous;
 otherwise return its code.
 
-=cut
-
-sub subname_or_code($)
-    :Export( qw[code] )
-{
-    my($coderef) = @_;
-    my $name = name_of_coderef($coderef);
-    if ($name =~ /__ANON__/) {
-        return code_of_coderef($coderef);
-    } else {
-        return "$name()";
-    }
-}
-
-#################################################################
-
 =item C<commify_series>
-
-=cut
-
-sub commify_series
-    :Export( qw[list] )
-{
-    (@_ == 0) ? ''                                      :
-    (@_ == 1) ? $_[0]                                   :
-    (@_ == 2) ? join(" and ", @_)                       :
-                join(", ", @_[0 .. ($#_-1)], "and $_[-1]");
-}
 
 =item C<dump_exports(@)>
 
-=cut
-
-sub dump_exports(@)
-    :Export( qw[exports] )
-{
-    my $caller_package = caller;
-    dump_package_exports($caller_package, @_);
-}
-
 =item C<dump_package_exports($@)>
-
-=cut
-
-sub dump_package_exports($@)
-    :Export( qw[exports] )
-{
-    my($pkg, @exports) = @_;
-    my %tag2aref = do { no strict 'refs'; %{$pkg . "::EXPORT_TAGS"} };
-    delete $tag2aref{asserts};
-    my %seen; # for the all repetition
-    my @taglist = @exports ? @exports : ('all', uca_sort(keys %tag2aref));
-    my $errors = 0;
-    print "=head2 Export Tags\n\n=over\n\n" if $Pod_Generation;
-    for my $tag (@taglist)  {
-        next if $seen{$tag}++;
-        my $aref = $tag2aref{$tag};
-        unless ($aref) {
-            print STDERR ":$tag is not an export tag in $pkg.\n";
-            $errors++;
-            next;
-        }
-        if ($Pod_Generation) {
-            print "=item C<:$tag>\n\n", commify_series(map { "C<$_>" } uca_sort @$aref), ".\n\n";
-        }
-        else {
-            print "Conditional export tag :$tag exports ", commify_series(uca_sort @$aref), ".\n";
-        }
-    }
-    print "=back\n\n" if $Pod_Generation;
-    return $errors == 0;
-}
-
-
-#################################################################
 
 =item C<UCA(_)>
 
-=cut
-
-sub UCA (_)             :Export( qw[unicode] );
-
 =item C<UCA1(_)>
-
-=cut
-
-sub UCA1(_)             :Export( qw[unicode] );
 
 =item C<UCA2(_)>
 
-=cut
-
-sub UCA2(_)             :Export( qw[unicode] );
-
 =item C<UCA3(_)>
-
-=cut
-
-sub UCA3(_)             :Export( qw[unicode] );
 
 =item C<UCA4(_)>
 
-=cut
-
-sub UCA4(_)             :Export( qw[unicode] );
-
 =item C<uca_cmp($$)>
-
-=cut
-
-sub uca_cmp ($$)        :Export( qw[unicode] );
 
 =item C<uca1_cmp($$)>
 
-=cut
-
-sub uca1_cmp($$)        :Export( qw[unicode] );
-
 =item C<uca2_cmp($$)>
-
-=cut
-
-sub uca2_cmp($$)        :Export( qw[unicode] );
 
 =item C<uca3_cmp($$)>
 
-=cut
-
-sub uca3_cmp($$)        :Export( qw[unicode] );
-
 =item C<uca4_cmp($$)>
-
-=cut
-
-sub uca4_cmp($$)        :Export( qw[unicode] );
-
-{
-
-    my @Comparitor;
-
-    sub _get_comparitor($) {
-        my($level) = @_;
-        panic "invalid level $level" unless $level =~ /^[1-4]$/;
-        return $Comparitor[$level] if $Comparitor[$level];
-
-        require Unicode::Collate;
-        my $class = Unicode::Collate:: ;
-        # need to discount the other ones altogether 
-        my @args = (level => $level); #, variable => "Non-Ignorable");
-    #   if ($Opt{locale}) {
-    #       require Unicode::Collate::Locale;
-    #       $class = Unicode::Collate::Locale:: ;
-    #       push @args, locale => $Opt{locale};
-    #   }
-        my $coll = $class->new(@args);
-        $Comparitor[$level] = $coll;
-    }
-
-    for my $strength ( 1 .. 4 ) {
-        no strict "refs";
-        *{ "UCA$strength" } = sub(_) {
-            state $coll = _get_comparitor($strength);
-            return $coll->getSortKey($_[0]);
-        };
-
-        *{ "uca${strength}_cmp" } = sub($$) {
-            my($this, $that) = @_;
-            "UCA$strength"->($this)
-                cmp
-            "UCA$strength"->($that)
-
-        };
-    }
-
-    no warnings "once";
-    *UCA     = \&UCA1;
-    *uca_cmp = \&uca1_cmp;
-}
 
 =item C<uca_sort(@)>
 
 Return its argument list sorted alphabetically.
 
-=cut
-
-sub uca_sort(@)
-    :Export( qw[unicode list] )
-{
-     state $collator = _get_comparitor(4);
-     return $collator->sort(@_);
-}
-
-{
-    sub _uniq {
-        my %seen;
-        my @out;
-        for (@_) { push @out, $_ unless $seen{$_}++ }
-        return @out;
-    }
-
-    @EXPORT_OK = _uniq(@EXPORT_OK);
-    for my $tag (keys %EXPORT_TAGS) {
-        my @exports = _uniq @{ $EXPORT_TAGS{$tag} };
-        $EXPORT_TAGS{$tag} = [@exports];
-    }
-}
-
-
-#################################################################
-
-{   # Private scope for sig mappers
-
-    our %Config;  # constrains in-file lexical visibility
-    use  Config;
-
-    my $sig_count      = $Config{sig_size}     || botch_undef;
-    my $sig_name_list  = $Config{sig_name}     || botch_undef;
-    my $sig_num_list   = $Config{sig_num}      || botch_undef;
-
-    my @sig_nums       = split " ", $sig_num_list;
-    my @sig_names      = split " ", $sig_name_list;
-
-    my $have;
-    $have =  @sig_nums;
-    $have == $sig_count                 || panic "expected $sig_count signums, not $have";
-
-    $have =  @sig_names;
-    $have == $sig_count                 || panic "expected $sig_count signames, not $have";
-
-    my(%_Map_num2name, %_Map_name2num);
-
-    @_Map_num2name {@sig_nums } = @sig_names;
-    @_Map_name2num {@sig_names} = @sig_nums;
-
 =item C<sig_num2name(I<NUMBER>)>
 
 Returns the name of the signal number, like C<HUP>, C<INT>, etc.
-
-=cut
-
-    sub sig_num2name($)
-        :Export( sigmappers )
-    {
-        my($num) = @_;
-        $num =~ /^\d+$/                 || botch "$num doesn't look like a signal number";
-        return $_Map_num2name{$num}     // botch_undef;
-    }
 
 =item C<sig_num2longname($)>
 
 Returns the long name of the signal number, like C<SIGHUP>, C<SIGINT>, etc.
 
-=cut
-
-    sub sig_num2longname($)
-        :Export( sigmappers )
-    {
-        return q(SIG) . &sig_num2name;
-    }
-
 =item sub C<sig_name2num(I<NAME>)>
 
 Returns the signal number corresponding to the passed in name.
 
-=cut
-
-    sub sig_name2num($)
-        :Export( sigmappers )
-    {
-        my($name) = @_;
-        $name =~ /^\p{upper}+$/         || botch "$name doesn't look like a signal name";
-        $name =~ s/^SIG//;
-        return $_Map_name2num{$name}    // botch_undef;
-    }
-
-}
-
 =back
-
-=cut
-
-
-#################################################################
-
-=for tricking the declarator
-__END__
-
-=cut
-
-# You really don't want to be looking here.
-
-BEGIN {
-    package # so PAUSE doesn't index this
-        Acme::Plural::pl_simple;
-    require Tie::Hash;
-    our @ISA = qw(Acme::Plural Tie::StdHash);
-
-    sub TIEHASH {
-        my($class, @args) = @_;
-        my $self = { };
-        bless $self, $class;
-        return $self;
-    }
-
-    sub FETCH {
-        my($self, $key) = @_;
-        my($noun, $count) = (split($; => $key), 2);
-        return $noun if $count eq '1';
-        $self->{$noun} ||= $self->_lame_plural($noun);
-    }
-
-}
-
-BEGIN {
-    package  # so PAUSE doesn't index this
-        Acme::Plural::pl_count;
-    our @ISA = 'Acme::Plural::pl_simple';
-
-    sub FETCH {
-        my($self, $key) = @_;
-        my $several = $self->SUPER::FETCH($key);
-        my($noun, $count) = (split($; => $key), 2);
-        return "$count $several";
-    }
-
-}
-
-BEGIN {
-    package # so PAUSE doesn't index this
-        Acme::Plural;
-
-    use Exporter 'import';
-
-    our @EXPORT = qw(
-        %PLURAL
-        %N_PLURAL
-    );
-
-    # TODO: replace with the Lingua::EN::Inflect
-    sub _lame_plural($$) {
-        my($self, $str) = @_;
-        return $str if $str =~ s/(?<! [aeiou] ) y  $/ies/x;
-        return $str if $str =~ s/ (?: [szx] | [sc]h ) \K $/es/x;
-        return $str . "s";
-    }
-
-    tie our %PLURAL    => "Acme::Plural::pl_simple";
-    tie our %N_PLURAL  => "Acme::Plural::pl_count";
-}
-
-1;
 
 =head1 ENVIRONMENT
 
@@ -1069,15 +1110,17 @@ The C<ASSERT_CONDITIONAL> variable controls the behavior
 of the C<botch> function, and also of the the conditional
 importing itself.
 
+The C<ASSERT_CONDITIONAL_BUILD_POD> variable is used internally.
+
 =head1 SEE ALSO
 
 The L<Assert::Conditional> module that uses these utilities
-and 
+and
 the L<Exporter::ConditionalSubs> module which that module is based on.
 
 =head1 BUGS AND LIMITATIONS
 
-Probably many.  This is an alpha release.
+Probably many.  This is an beta release.
 
 =head1 AUTHOR
 
@@ -1085,11 +1128,8 @@ Tom Christiansen C<< <tchrist@perl.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2015, Tom Christiansen C<< <tchrist@perl.com> >>.
+Copyright (c) 2015-2018 Tom Christiansen C<< <tchrist@perl.com> >>.
 All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
-
-
-__DATA__

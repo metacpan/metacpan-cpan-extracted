@@ -1,5 +1,5 @@
-package # Hide from the indexer for now until docs are added later.
-    MooseX::BuildArgs::Meta::Object;
+package MooseX::BuildArgs::Meta::Object;
+$MooseX::BuildArgs::Meta::Object::VERSION = '0.05';
 use Moose::Role;
 
 has build_args => (

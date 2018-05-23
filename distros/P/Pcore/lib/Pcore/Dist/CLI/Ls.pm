@@ -2,7 +2,7 @@ package Pcore::Dist::CLI::Ls;
 
 use Pcore -class, -ansi;
 
-with qw[Pcore::Dist::CLI];
+extends qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
     return { abstract => 'list installed distributions' };

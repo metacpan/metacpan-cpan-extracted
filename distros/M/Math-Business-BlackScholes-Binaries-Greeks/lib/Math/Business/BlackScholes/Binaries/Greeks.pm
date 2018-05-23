@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: calculate the sensitivity of the price of binary options
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
@@ -238,7 +238,7 @@ These can be called for each of the six Greeks modules
 
 =item L<Math::Trig>
 
-=item L<Math::Business::BlackScholes::Binaries>
+=item L<Math::Business::BlackScholesMerton>
 
 =back
 

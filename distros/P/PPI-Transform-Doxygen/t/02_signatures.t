@@ -19,14 +19,12 @@ open(my $out, '>', \my $buf);
 
 $tr->file("$Bin/TestSigs.txt" => $out);
 
-diag $buf;
-
 my $fhead = quotemeta('/** @file TestSigs.txt');
 my($fcontent) = $buf =~ m!$fhead\n(.+?)\*/!s;
 
 unlike($fcontent, qr/\w/, 'file section');
 
-my $hhead = quotemeta('** @class TestSigs');
+my $hhead = quotemeta('** @class My::TestSigs');
 my($hcontent) = $buf =~ m!$hhead\n(.+?)\*/!s;
 
 isnt($hcontent, undef, 'class header section');

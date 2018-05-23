@@ -1,4 +1,11 @@
 Revision history for File-ContentStore
 
+1.001 2018-05-19 BOOK
+    - Protect against symlinks entering the content store
+    - Skip already linked files using an inode-digest mapping
+    - Add minimum version requirements for Path::Tiny
+    - Check for more error conditions
+    - Minor documentation updates
+
 1.000 2018-04-06 BOOK
     - First release of File::ContentStore

@@ -8,7 +8,7 @@ use Pod::TOC;
 use warnings;
 no warnings;
 
-$VERSION = '1.12';
+$VERSION = '1.121';
 
 sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
@@ -23,6 +23,8 @@ sub parse_from_file {
 
 	$parser->parse_file( $file );
 	}
+
+=encoding utf8
 
 =head1 NAME
 
@@ -66,9 +68,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2013, brian d foy, All Rights Reserved.
+Copyright © 2006-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

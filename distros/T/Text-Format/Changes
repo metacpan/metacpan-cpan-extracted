@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Format.
 
+0.61    2018-05-21
+    - Convert to Dist-Zilla .
+
 0.60    2016-08-22
     - Apply a patch to correct a spelling error:
         - https://rt.cpan.org/Ticket/Display.html?id=117100

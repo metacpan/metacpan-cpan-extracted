@@ -5,9 +5,8 @@ use Sub::Util qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 sub load ( $class, @ ) {
     my %args = (
-        ns   => undef,
-        isa  => undef,    # InstanceOf
-        does => undef,    # ConsumerOf
+        ns  => undef,
+        isa => undef,    # InstanceOf
         splice @_, 1,
     );
 
@@ -29,8 +28,6 @@ sub load ( $class, @ ) {
     require $module;
 
     die qq[Error loading class "$class". Class must be instance of "$args{isa}"] if $args{isa} && !$class->isa( $args{isa} );
-
-    die qq[Error loading class "$class". Class must be consumer of "$args{does}"] if $args{does} && !$class->does( $args{does} );
 
     return $class;
 }

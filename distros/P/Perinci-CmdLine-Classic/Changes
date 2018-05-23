@@ -1,3 +1,9 @@
+1.812   2018-05-20 (PERLANCAR)
+
+	- Adjust to Perinci::CmdLine::Base 1.812 (add hook:
+	  before_parse_argv). Synchronize version number with ::Base.
+
+
 1.770   2017-07-31 (PERLANCAR)
 
 	- [Incompatible change] Change per_arg_yaml default from 1 to 0 to

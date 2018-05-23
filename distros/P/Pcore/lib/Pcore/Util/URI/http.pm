@@ -6,8 +6,8 @@ extends qw[Pcore::Util::URI];
 
 with qw[Pcore::Util::URI::Web2];
 
-has '+is_http'      => ( default => 1 );
-has '+default_port' => ( default => 80 );
+has is_http      => 1;
+has default_port => 80;
 
 1;
 __END__

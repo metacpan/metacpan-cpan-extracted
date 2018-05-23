@@ -1,5 +1,5 @@
 package QBit::WebInterface::Controller::Form::Field::textarea;
-$QBit::WebInterface::Controller::Form::Field::textarea::VERSION = '0.030';
+$QBit::WebInterface::Controller::Form::Field::textarea::VERSION = '0.031';
 use qbit;
 
 use base qw(QBit::WebInterface::Controller::Form::Field);

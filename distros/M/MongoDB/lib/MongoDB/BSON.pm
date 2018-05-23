@@ -22,7 +22,7 @@ package MongoDB::BSON;
 # ABSTRACT: Tools for serializing and deserializing data in BSON form
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 
 use XSLoader;
@@ -36,11 +36,11 @@ use DateTime;
 use MongoDB::Error;
 use Moo;
 use MongoDB::_Types qw(
+    Boolish
     NonNegNum
     SingleChar
 );
 use Types::Standard qw(
-    Bool
     CodeRef
     Maybe
     Str
@@ -179,7 +179,7 @@ has op_char => (
 
 has prefer_numeric => (
     is => 'ro',
-    isa => Bool,
+    isa => Boolish,
 );
 
 #--------------------------------------------------------------------------#
@@ -309,7 +309,7 @@ MongoDB::BSON - Tools for serializing and deserializing data in BSON form
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

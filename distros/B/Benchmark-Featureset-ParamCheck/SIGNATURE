@@ -14,48 +14,47 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 9ab33a8c1fee95364463e3f5ae37f168997ce3a2 COPYRIGHT
+SHA1 e1f95a5e06266ad26727673af865e4665450e54f COPYRIGHT
 SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
-SHA1 c1375ed719452d8ecc026285d9800927d5a1ef5f Changes
+SHA1 b062a3d26466d34474e810b3f1ebedbea1564c41 Changes
 SHA1 a9d088f6fca77e7e410ac5aeea4053abd470ed4d INSTALL
-SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 4b7ceb6d8f98b8e378a50f11d2feb4e205aa68d8 LICENSE
 SHA1 d29b68d019e5415bd67febd0e1800684f0aa76f8 MANIFEST
-SHA1 f19772ca7f6f9d6f746736045b222e0e0b55f87f META.json
-SHA1 842167e059db06ea51a71fc792d7416fbb23511f META.yml
-SHA1 58a4be46d65071211a1eccac39b97e7e3b77c1bf Makefile.PL
-SHA1 95e001b468ce7ed7bc1978ba966468fc8c157dae README
+SHA1 f99f944bc0608550022a174cd011f9b08ea52985 META.json
+SHA1 ee3e35ec86b3541247975d8c3d622413cc5657d2 META.yml
+SHA1 be3be118951a217d4867ef30d833cd5f75213e3a Makefile.PL
+SHA1 263cd8581ac7154b257d957cd040059ad771957d README
 SHA1 e40d807a9b36b3db37fd87a2edb10c52e405b8bb dist.ini
-SHA1 040deabbb6242e000cb2a3402b5b2a5a1132cdf9 doap.ttl
-SHA1 b0b3737be57349752855b750eca278e2682b4ce8 lib/Benchmark/Featureset/ParamCheck.pm
-SHA1 b26234366cbdd5878a9a3836d2187217e8770423 lib/Benchmark/Featureset/ParamCheck/Base.pm
-SHA1 0c6fc109f107f44aeab14928a449faf33825dd49 lib/Benchmark/Featureset/ParamCheck/Base/DataValidator.pm
-SHA1 7c25ca1682edd0192bde64c4cc70131f831ad21f lib/Benchmark/Featureset/ParamCheck/Base/MXPV.pm
-SHA1 d729eef9be89e1bda044e9f62e71bbc270dc14d5 lib/Benchmark/Featureset/ParamCheck/Base/PV.pm
-SHA1 e86980884e4bfb229e202d35b6dbee2f2788dff1 lib/Benchmark/Featureset/ParamCheck/Base/PVC.pm
-SHA1 6bb5e9222fc0544391c04152b195a58aa743deb1 lib/Benchmark/Featureset/ParamCheck/Base/ParamsCheck.pm
-SHA1 720de88eaa263597dbb238114acd57a60df779d4 lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Moose.pm
-SHA1 de692a4c60bc1d52594bfcb285b7923bad791156 lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Mouse.pm
-SHA1 5b87a2f473be1cb725da0e18758a86a6248e7f6b lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/TypeTiny.pm
-SHA1 ed73ff80bd5abb5d2f38b9faebbde85c507317de lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/Moose.pm
-SHA1 a3a70bf931a55d6e1c8e75c6bd7533bf34e9e5a8 lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/TypeTiny.pm
-SHA1 1bb89c9217bedfd180725213ad87cf23ab685799 lib/Benchmark/Featureset/ParamCheck/Implementation/PV.pm
-SHA1 0b248a9e840d475f75bd41ffac57f3c8fbaecc84 lib/Benchmark/Featureset/ParamCheck/Implementation/PV/TypeTiny.pm
-SHA1 c6a98f63e6e821280d6e8a45c0626082ff82b0f6 lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Moose.pm
-SHA1 aef8fd1302ca4ae04d375dcb53444cc4da527dbe lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Specio.pm
-SHA1 1469d26bd0b6a6fcecbffa402d73ee1ed5b1d100 lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/TypeTiny.pm
-SHA1 0209dec59f9e7805ad435cd820337f59c498ffd8 lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/Perl.pm
-SHA1 2e4c6779daab94b9270401f8ad5dfe324c24839a lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm
-SHA1 2a4f7ef868414e133cafebca706db0f254657f69 lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
-SHA1 da45576ce5ac313e02221de97c4a5104661e5b2e lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
-SHA1 2f583812aa1767d287aeeebe50598fe8cb21d928 lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
+SHA1 8bb4e2e24e9fca5e8d5b567187b0ad065cb6ecac doap.ttl
+SHA1 006c9d7476c77b279296b7f202c384f8d9b0d4d3 lib/Benchmark/Featureset/ParamCheck.pm
+SHA1 22631d8b8a1a1f17390d3a4eaf642121ce25a4f2 lib/Benchmark/Featureset/ParamCheck/Base.pm
+SHA1 04a89056ef1f4f009c091fd64553c6635f65a58d lib/Benchmark/Featureset/ParamCheck/Base/DataValidator.pm
+SHA1 367f52d7ec846874941d47e3b875b307b313a925 lib/Benchmark/Featureset/ParamCheck/Base/MXPV.pm
+SHA1 70957358d1848c0fe45f8f4c27e66fd4da79102b lib/Benchmark/Featureset/ParamCheck/Base/PV.pm
+SHA1 0342094a43aa0f5049a58e3edd5c383685468dea lib/Benchmark/Featureset/ParamCheck/Base/PVC.pm
+SHA1 8b4253105761a658b542bb299b1ec72bbed9c719 lib/Benchmark/Featureset/ParamCheck/Base/ParamsCheck.pm
+SHA1 02b9e0acc64f7fcfd8a5e8f75a4afc0f7f3fec8c lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Moose.pm
+SHA1 c809a5f802131d42e797a659ecdebd47a93fb1bc lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Mouse.pm
+SHA1 c3f7656d3a8b5d16509b06e82ba14b4694ca3d6c lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/TypeTiny.pm
+SHA1 ae925ce0f2c6ae81cd016013ca6ef1ce71c51b04 lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/Moose.pm
+SHA1 50d3d6e92e30edea06dfc7462fcf35b642b99c57 lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/TypeTiny.pm
+SHA1 94e7de7441e49fa6fb35e72f80cac9e644d4317f lib/Benchmark/Featureset/ParamCheck/Implementation/PV.pm
+SHA1 7f5172ca3712fb9fbf17f48b50179bfafa4ecc6c lib/Benchmark/Featureset/ParamCheck/Implementation/PV/TypeTiny.pm
+SHA1 d3c2e059bb65ac5dfa3ef4524c2033f4a468d8f9 lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Moose.pm
+SHA1 023cc6f18c47e530341d7eb11c03a518083e7003 lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Specio.pm
+SHA1 d977157a5ea78937d474b40e682e97f724d7907a lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/TypeTiny.pm
+SHA1 86bf459718cd3e73315f52d9c491115f47e290d4 lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/Perl.pm
+SHA1 93dcd0f8d8b45ed20f419de49af5978831c638da lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm
+SHA1 797295ee1b2d392524bd1d92031a52abb198e885 lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
+SHA1 dcb7b62a712a366535ceef2969220afe14ba6709 lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
+SHA1 1231f151212fcb1b17dc312a1231357b32adfd14 lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
 SHA1 81ff179e2ed7677828b5fcc05177e1b86397b43d t/01-named-correctness.t
 SHA1 d38658a3d0b794e875295b002270b28d83bb1a3e t/02-named-benchmark.t
 SHA1 bd8b34393cfcd1fd19e7f220255a9c38bceadf6f t/03-positional-correctness.t
 SHA1 d58fa4824f31c7efe82429e9f020c9064aef87c0 t/04-positional-benchmark.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlkcK0YACgkQzr+BKGoqfTndLgCgkv66JxBWZD+6ENLzgo5I3RXh
-oIsAn3FfLQEDLUk6qM5TL4p5O8joPY8d
-=jmN0
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCWvwrXQAKCRDOv4Eoaip9
+OWSuAJ47+lIg0XW9DKRTE+y2/iPSiQg6FQCfY3J04u5nJE4wh2kW71pKGZD0HuQ=
+=02ww
 -----END PGP SIGNATURE-----

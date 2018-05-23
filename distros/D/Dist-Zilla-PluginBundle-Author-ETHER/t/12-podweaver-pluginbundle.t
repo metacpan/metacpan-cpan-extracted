@@ -21,7 +21,7 @@ use NoPrereqChecks;
     sub metadata { +{ x_contributors => [ 'Anon Y. Moose <anon@null.com>' ] } }
 }
 
-# we need to test in a dist with weaver.ini and without,
+# we need to test in a distribution with weaver.ini and without,
 # to see that the same thing happens in each case --
 # the config_plugins config is used, and
 # we do not die from trying to use a broken weaver.ini.

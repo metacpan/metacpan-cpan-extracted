@@ -1,0 +1,63 @@
+{
+   "abstract" : "More utilities and a summary for Software::License",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Software-LicenseMoreUtils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
+            "Path::Tiny" : "0",
+            "Software::License" : "0",
+            "Software::LicenseUtils" : "0",
+            "Text::Template" : "0",
+            "Try::Tiny" : "0",
+            "YAML::Tiny" : "0",
+            "base" : "0",
+            "parent" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/Software-LicenseMoreUtils/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/Software-LicenseMoreUtils",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dod38fr/Software-LicenseMoreUtils.git",
+         "web" : "http://github.com/dod38fr/Software-LicenseMoreUtils"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

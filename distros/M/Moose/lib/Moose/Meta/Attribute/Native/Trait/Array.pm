@@ -1,5 +1,5 @@
 package Moose::Meta::Attribute::Native::Trait::Array;
-our $VERSION = '2.2010';
+our $VERSION = '2.2011';
 
 use Moose::Role;
 with 'Moose::Meta::Attribute::Native::Trait';
@@ -24,7 +24,7 @@ Moose::Meta::Attribute::Native::Trait::Array - Helper trait for ArrayRef attribu
 
 =head1 VERSION
 
-version 2.2010
+version 2.2011
 
 =head1 SYNOPSIS
 
@@ -88,10 +88,13 @@ This method does not accept any arguments.
 
 =item * B<elements>
 
-Returns all of the elements of the array as an array (not an array reference).
+In list context, returns all of the elements of the array as a list.
 
-  my @option = $stuff->all_options;
-  print "@options\n";    # prints "foo bar baz boo"
+In scalar context, returns the number of elements in the array.
+
+  my @options = $stuff->all_options;
+  print "@options";    # prints "foo bar baz boo"
+  print scalar $stuff->all_options; # prints 4
 
 This method does not accept any arguments.
 

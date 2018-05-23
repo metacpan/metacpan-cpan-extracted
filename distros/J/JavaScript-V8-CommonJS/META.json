@@ -60,7 +60,7 @@
    "provides" : {
       "JavaScript::V8::CommonJS" : {
          "file" : "lib/JavaScript/V8/CommonJS.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "JavaScript::V8::CommonJS::Exception" : {
          "file" : "lib/JavaScript/V8/CommonJS/Exception.pm"
@@ -77,7 +77,7 @@
          "web" : "https://github.com/cafe01/javascript-v8-commonjs"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_authority" : "cpan:CAFEGRATZ",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

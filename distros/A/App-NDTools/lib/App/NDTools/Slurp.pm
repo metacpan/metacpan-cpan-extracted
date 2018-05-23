@@ -9,9 +9,10 @@ use open qw(:std :utf8);
 
 use File::Basename qw(basename);
 use JSON qw();
-use Scalar::Util qw(isdual readonly);
+use Scalar::Util qw(readonly);
 
 use App::NDTools::INC;
+use App::NDTools::Util qw(is_number);
 use Log::Log4Cli;
 
 our @EXPORT_OK = qw(
@@ -58,7 +59,7 @@ sub _decode_yaml($) {
                     push @stack, \${$ref}->[$_];
                 } elsif (readonly ${$ref}->[$_]) {
                     splice @{${$ref}}, $_, 1, (${$ref}->[$_] ? TRUE : FALSE);
-                } elsif (isdual ${$ref}->[$_]) {
+                } elsif (is_number ${$ref}->[$_]) {
                     ${$ref}->[$_] += 0;
                 }
             }
@@ -68,11 +69,11 @@ sub _decode_yaml($) {
                     push @stack, \${$ref}->{$_};
                 } elsif (readonly ${$ref}->{$_}) {
                     ${$ref}->{$_} = delete ${$ref}->{$_} ? TRUE : FALSE;
-                } elsif (isdual ${$ref}->{$_}) {
+                } elsif (is_number ${$ref}->{$_}) {
                     ${$ref}->{$_} += 0;
                 }
             }
-        } elsif (isdual ${$ref}) {
+        } elsif (is_number ${$ref}) {
             ${$ref} += 0;
         }
     }

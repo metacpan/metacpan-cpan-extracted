@@ -4,10 +4,11 @@ author:
   - 'David Golden <david@mongodb.com>'
 build_requires:
   B: '0'
-  BSON: '1.002001'
+  BSON: '1.006001'
   BSON::Types: '0'
   Carp: '0'
   Data::Dumper: '0'
+  Devel::Peek: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -15,13 +16,14 @@ build_requires:
   MIME::Base64: '0'
   Math::BigInt: '0'
   Path::Tiny: '0.054'
+  Scalar::Util: '0'
   Test::Deep: '0'
   Test::More: '0.96'
   Tie::IxHash: '0'
   base: '0'
   constant: '0'
   lib: '0'
-  perl: '5.008001'
+  perl: '5.010001'
   utf8: '0'
 configure_requires:
   Config::AutoConf: '0.22'
@@ -29,7 +31,7 @@ configure_requires:
   Path::Tiny: '0.052'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,12 +48,12 @@ no_index:
 provides:
   BSON::XS:
     file: lib/BSON/XS.pm
-    version: v0.2.2
+    version: v0.4.0
 requires:
-  BSON: '1.002001'
+  BSON: '1.006001'
   XSLoader: '0'
   boolean: '0'
-  perl: '5.008001'
+  perl: '5.010001'
   strict: '0'
   version: '0'
   warnings: '0'
@@ -59,6 +61,7 @@ resources:
   bugtracker: https://jira.mongodb.org/browse/PERL
   homepage: https://github.com/mongodb/mongo-perl-bson-xs
   repository: https://github.com/mongodb/mongo-perl-bson-xs.git
-version: v0.2.2
+version: v0.4.0
 x_authority: cpan:MONGODB
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -36,7 +36,6 @@ Files: t/moose_accessor_context.t
  t/moose_inherit_lazy_build.t
  t/moose_lazy_no_default.t
  t/moose_method_generation_rules.t
- t/moose_misc_attribute_coerce_lazy.t
  t/moose_misc_attribute_tests.t
  t/moose_more_attr_delegation.t
  t/moose_no_init_arg.t
@@ -45,15 +44,6 @@ Files: t/moose_accessor_context.t
  t/moose_numeric_defaults.t
  t/moose_trigger_and_coerce.t
 Copyright: Copyright 2013 Infinity Interactive, Inc.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: CREDITS
- Changes
- LICENSE
- Makefile.PL
- README
- doap.ttl
-Copyright: Copyright 1970 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/MooseX/XSAccessor.pm
@@ -65,6 +55,15 @@ Files: lib/MooseX/XSAccessor.pm
 Copyright: This software is copyright (c) 2013, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: CREDITS
+ Changes
+ LICENSE
+ Makefile.PL
+ README
+ doap.ttl
+Copyright: Copyright 1970 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: dist.ini
  examples/bench.pl
  t/lib/MyMoose.pm
@@ -74,35 +73,36 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: META.json
  META.yml
-Copyright: Copyright 2017 Toby Inkster.
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ t.disabled/moose_misc_attribute_coerce_lazy.t
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  SIGNATURE
 Copyright: None
 License: public-domain
 
-Files: lib/MooseX/XSAccessor/Trait/Attribute.pm
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/moose_accessor_overwrite_warning.t
 Copyright: Copyright 2017 Infinity Interactive, Inc.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
-Copyright: Unknown
-License: Unknown
+Files: lib/MooseX/XSAccessor/Trait/Attribute.pm
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

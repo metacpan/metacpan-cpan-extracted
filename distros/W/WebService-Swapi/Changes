@@ -1,5 +1,9 @@
 Revision history for Perl extension Webservice-Swapi
 
+0.1.7  2018-05-19 18:13:23 +08
+
+    - Remove redudant HTTP request code
+
 0.1.6  2018-05-06 18:48:39 +08
 
     - Switch module building to Dist::Milla

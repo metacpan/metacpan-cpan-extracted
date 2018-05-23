@@ -1,4 +1,4 @@
-requires 'Math::Business::BlackScholes::Binaries';
+requires 'Math::Business::BlackScholesMerton';
 requires 'Math::CDF';
 requires 'perl', '5.006';
 
@@ -10,4 +10,5 @@ on test => sub {
     requires 'Test::Exception';
     requires 'Test::More';
     requires 'Test::Most';
+    requires 'Test::NoWarnings';
 };

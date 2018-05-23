@@ -1,15 +1,16 @@
 use strict;
 use warnings;
-package Plack::Middleware::LogErrors;
-# git description: v0.001-13-g28c86df
-$Plack::Middleware::LogErrors::VERSION = '0.002';
+package Plack::Middleware::LogErrors; # git description: v0.002-21-g414ec0a
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Map psgi.errors to psgix.logger or other logger
 # KEYWORDS: plack middleware errors logging environment I/O handle
+
+our $VERSION = '0.003';
 
 use parent 'Plack::Middleware';
 
 use Plack::Util::Accessor 'logger';
-use Scalar::Util 'reftype';
+use Scalar::Util ();
 
 sub prepare_app
 {
@@ -36,13 +37,12 @@ sub call
 sub __isa_coderef
 {
     ref $_[0] eq 'CODE'
-        or (reftype($_[0]) || '') eq 'CODE'
+        or (Scalar::Util::reftype($_[0]) || '') eq 'CODE'
         or overload::Method($_[0], '&{}')
 }
 
-package Plack::Middleware::LogErrors::LogHandle;
-# git description: v0.001-13-g28c86df
-$Plack::Middleware::LogErrors::LogHandle::VERSION = '0.002';
+package # hide from PAUSE
+    Plack::Middleware::LogErrors::LogHandle;
 # ABSTRACT: convert psgix.logger-like logger into an IO::Handle-like object
 
 sub new
@@ -74,7 +74,7 @@ Plack::Middleware::LogErrors - Map psgi.errors to psgix.logger or other logger
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ Using an explicitly defined logger:
 
 =for stopwords psgi psgix middlewares
 
-C<psgi.errors> defaults to C<stderr> in most backends, which results in
+C<psgi.errors> defaults to C<STDERR> in most backends, which results in
 content going somewhere unhelpful like the server console.
 
 This middleware simply remaps the C<psgi.errors> stream to the
@@ -129,14 +129,6 @@ A code reference for logging messages, that conforms to the
 L<psgix.logger|PSGI::Extensions/SPECIFICATION> specification.
 If not provided, C<psgix.logger> is used, or the application will generate an
 error at runtime if there is no such logger configured.
-
-=head1 SUPPORT
-
-=for stopwords irc
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-LogErrors>
-(or L<bug-Plack-Middleware-LogErrors@rt.cpan.org|mailto:bug-Plack-Middleware-LogErrors@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 SEE ALSO
 
@@ -172,11 +164,24 @@ L<Plack::Middleware::SimpleLogger> - essentially the opposite of this module!
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-LogErrors>
+(or L<bug-Plack-Middleware-LogErrors@rt.cpan.org|mailto:bug-Plack-Middleware-LogErrors@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<https://groups.google.com/forum/#!forum/psgi-plack>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#plack> on C<irc.perl.org>|irc://irc.perl.org/#plack>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Karen Etheridge.
 

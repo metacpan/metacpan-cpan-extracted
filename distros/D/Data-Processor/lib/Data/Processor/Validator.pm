@@ -197,7 +197,13 @@ sub _check_mandatory_keys{
             my $error_msg = '';
             $error_msg = $self->{schema}->{$key}->{error_msg}
                 if $self->{schema}->{$key}->{error_msg};
-            $self->error("mandatory key '$key' missing. Error msg: '$error_msg'");
+
+            my $error_clause = '';
+            if( $error_msg ){
+                $error_clause = " Error msg: '$error_msg'";
+            }
+
+            $self->error("mandatory key '$key' missing.".$error_clause);
         }
         else{
             $self->explain("false\n");

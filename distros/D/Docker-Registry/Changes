@@ -1,0 +1,11 @@
+0.03 2018-05-16
+ - Add test dependencies
+ - Declare minimum Perl version
+ - Make ECR Auth module load only if needed
+
+0.02 2018-05-15
+ - Public release
+
+0.01 2018-04-24
+ - Initial internal release
+

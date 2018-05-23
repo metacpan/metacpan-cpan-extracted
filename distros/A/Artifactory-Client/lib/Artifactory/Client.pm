@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.5.3
+Version 1.6.0
 
 =cut
 
-our $VERSION = 'v1.5.3';
+our $VERSION = 'v1.6.0';
 
 =head1 SYNOPSIS
 
@@ -966,6 +966,20 @@ Returns the global system replication configuration status, i.e. if push and pul
 sub get_global_system_replication_configuration {
     my $self = shift;
     my $url  = $self->_api_url() . "/system/replications";
+    return $self->get($url);
+}
+
+=head2 get_remote_repositories_registered_for_replication
+
+Returns a list of all the listeners subscribed for event-based pull replication on the specified repository.
+
+=cut
+
+sub get_remote_repositories_registered_for_replication {
+    my ( $self, $repo ) = @_;
+    my $repository = $repo || $self->repository();
+
+    my $url  = $self->_api_url() . "/replications/$repository";
     return $self->get($url);
 }
 

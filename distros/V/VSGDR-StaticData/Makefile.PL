@@ -14,6 +14,7 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     EXE_FILES => [ "genStaticData.pl", 
+                   "genTestData.pl",     
                    "tableDependencies.pl",     
                    "allTableDependencies.pl",     
                  ],

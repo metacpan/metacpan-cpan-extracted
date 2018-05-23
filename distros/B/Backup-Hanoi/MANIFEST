@@ -10,6 +10,7 @@ README.md
 bin/backup-hanoi
 dist.ini
 lib/Backup/Hanoi.pm
-t/bin/backup-hanoi.t
-t/bin/example_devices.txt
-t/lib/get_device_for_cycle.t
+t/5_lib/0_init.t
+t/5_lib/get_device_for_cycle.t
+t/8_bin/backup-hanoi.t
+t/8_bin/example_devices.txt

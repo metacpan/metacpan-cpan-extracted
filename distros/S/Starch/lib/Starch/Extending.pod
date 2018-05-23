@@ -54,7 +54,7 @@ as anything meaningful to the store, since stores can have their
 L<Starch::Store/max_expires> argument set which will automatically
 change the value of the C<expiration> argument passed to C<set>.
 
-=head2 REQUIRED METHODS
+=head2 Required Methods
 
 Stores must implement three methods for setting, getting, and removing
 state data.  These methods receive a state ID and a namespace array ref
@@ -82,13 +82,15 @@ C<undef> is returned.
 Deletes the data for the key.  If the data does not exist then
 this is just a no-op.
 
-=head2 EXCEPTIONS
+=head2 Loud Exceptions
 
 Stores should detect issues and throw exceptions loudly.  If the user
 would like to automatically turn store exceptions into log messages
 they can use the L<Starch::Plugin::LogStoreExceptions> plugin.
 
-=head2 REAPING EXPIRED STATES
+See L</THROWING EXCEPTIONS> for how to throw exceptions for known errors.
+
+=head2 Reaping Expired States
 
 Stores may choose to support an interface for deleting old state data
 suitable for a cronjob.  To do this two methods must be declared,
@@ -111,7 +113,7 @@ a secondary global index to do the scan on.
 All plugin and store modules should use L<Test::Starch> to ensure that
 they have not broken the core functionality of Starch.
 
-=head1 EXCEPTIONS
+=head1 THROWING EXCEPTIONS
 
 Exceptions for known issues should be thrown using L<Starch::Util/croak>
 which automatically internalizes all core Starch packages so that the
@@ -137,8 +139,8 @@ plugin's code to be reported at the source of the known error.
 =head1 EXTENDING BUILD
 
 The L<Moo> BUILD method doesn't play well with roles.  If a role provides
-provides a BUILD method and then the class which consumes the role also
-defines a BUILD method the class will win and the role's BUILD method will
+a BUILD method and then the class which consumes the role also defines a
+BUILD method the class will win and the role's BUILD method will
 never be called.  To get around this the L<Starch::Manager> class, the
 L<Starch::State> class, and the L<Starch::Store> role declare BUILD methods.
 Any plugin or store which wishes to extend the BUILD method should do so
@@ -186,9 +188,9 @@ classes and roles.
 =item 3.
 
 B<store> - The store does all of the backend heavy-lifting.  It holds a
-weak reference to the manager so that it can, primarily, get at the factory
-object and create sub-stores.  The L<Starch::Store::Layered> store depends
-on this functionality to create the inner and outer sub-stores.
+weak reference to the manager so that it can get at configuration and
+the factory object.  In the case of stores with sub-stores they may hold
+references to other stores.
 
 =item 4.
 

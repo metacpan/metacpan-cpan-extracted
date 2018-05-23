@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc 2.25 {
+package Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc 2.26 {
 
   use 5.014;
   use Moose;
@@ -7,7 +7,7 @@ package Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc 2.25 {
 
 
   # Similar to [UseUnsafeInc], except, we don't require a recent Perl
-  # for releases without a environment variable.  Risky!  By not at
+  # for releases without a environment variable.  Risky!  But at
   # least not annoying.  We also don't provide an interface to setting
   # to 1.  Code should instead be fixed.
 
@@ -46,7 +46,7 @@ Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc - Set x_use_unsafe_inc = 0
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 SYNOPSIS
 

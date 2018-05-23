@@ -26,7 +26,7 @@ use overload    #
 
 const our $TMPL => [ 0 .. 9, 'a' .. 'z', 'A' .. 'Z' ];
 
-sub DEMOLISH ( $self, $global ) {
+sub DESTROY ( $self ) {
 
     # do not unlink files, created by others processes
     return if $self->owner_pid ne $$;

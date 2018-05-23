@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step;
-$Lab::Moose::Sweep::Step::VERSION = '3.642';
+$Lab::Moose::Sweep::Step::VERSION = '3.651';
 #ABSTRACT: Base class for step/list sweeps
 
 
@@ -167,7 +167,7 @@ Lab::Moose::Sweep::Step - Base class for step/list sweeps
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 SYNOPSIS
 

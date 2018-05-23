@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.36
+Version 0.38
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.38';
 
 
 sub databaseName {
@@ -121,14 +121,10 @@ sub generateScript {
     my $database                        = databaseName($dbh);
 
     no warnings;
-    no warnings;
     my $userName                        = $OSNAME eq 'MSWin32' ? Win32::LoginName : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
-    use warnings;
-    
     use warnings;                      
+
     my $date                            = strftime "%d/%m/%Y", localtime;
-
-
 
     my $hasId                   = has_idCols($dbh,$schema,$table) ;
     my $idCol                   = undef ;
@@ -281,7 +277,7 @@ EOF
         do { local $" = "";   $insertclause             .= "[$l->[0]]" ; $insertclause .= ", "} ;    
         do { local $" = "";   $valuesclause             .= "[$l->[0]]" ; $valuesclause .= ", "} ;    
 #        do { local $" = "";   $flatcolumnlist           .= "[$l->[0]]" ; $flatcolumnlist .= ", "} ;
-        do { local $" = "";   $flatExtractColumnList    .= $l->[1] =~ m{\A(?:date|datetime|smalldatetime)\z}i  ? "convert(varchar(30),[$l->[0]],120)" :  "[$l->[0]]" ; $flatExtractColumnList .= ", "} ;
+        do { local $" = "";   $flatExtractColumnList    .= $l->[1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i  ? "convert(varchar(30),[$l->[0]],120)" :  "[$l->[0]]" ; $flatExtractColumnList .= ", "} ;
 #        do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
 
         do { local $" = "";   $printStatement           .= "'  $$l[0]: ' " ; } ;
@@ -354,7 +350,7 @@ EOF
                 $outVals[$i] = $ra_row->[$i]  ;  
             }
             if ( ( $IsColumnNumeric[$i] == 0 ) and (     ( defined ($ra_row->[$i]) ) ) ) {
-                if (${$ra_columns}[$i][1] =~ m{\A(?:date|datetime|smalldatetime)\z}i) {
+                if (${$ra_columns}[$i][1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i) {
                     $outVals[$i] = "convert(". ${$ra_columns}[$i][1] ."," . $dbh->quote($ra_row->[$i]) . ",120)"   ;
                 }
                 else {
@@ -527,8 +523,8 @@ begin try
     ; with src as 
     (
     select * 
-    from(  ${valuesClause}
-        ) AS vtable 
+    from    ( ${valuesClause}
+            ) AS vtable 
     ( $flatcolumnlist)
     )
     insert  into
@@ -615,6 +611,218 @@ EOF
 
 }
 
+sub generateTestDataScript {
+
+    local $_                            = undef;
+            
+    my $dbh                             = shift ;
+    my $schema                          = shift ;
+    my $table                           = shift ;
+    my $sql                             = shift ;
+    my $use_MinimalForm                 = shift ;
+
+    croak "bad arg dbh"                 unless defined $dbh;
+    croak "bad arg schema"              unless defined $schema;
+    croak "bad arg table"               unless defined $table;
+    croak "bad arg sql"                 unless defined $sql;
+    croak "bad arg minimal form"        unless defined $use_MinimalForm;
+
+    $schema = substr $schema, 1, -1     if $schema =~ m/\A \[ .+ \] \Z /msix;
+    $table  = substr $table,  1, -1     if $table  =~ m/\A \[ .+ \] \Z /msix;
+    my $combinedName                    = "${schema}.${table}"; 
+    my $quotedCombinedName              = "[${schema}].[${table}]"; 
+
+    my $quotedSchema                    = "[${schema}]"; 
+    my $quotedTable                     = "[${table}]"; 
+       
+    my $database                        = databaseName($dbh);
+
+    my $hasId                           = has_idCols($dbh,$schema,$table) ;
+    my $idCol                           = undef ;
+    if ($hasId) {       
+        $idCol                          = idCols($dbh,$schema,$table) ;
+    }
+#warn Dumper $idCol ;    
+    my $set_IDENTITY_INSERT_ON  = "";
+    my $set_IDENTITY_INSERT_OFF = "";
+    $set_IDENTITY_INSERT_ON     = "set IDENTITY_INSERT ${quotedCombinedName} ON"  if $hasId;
+    $set_IDENTITY_INSERT_OFF    = "set IDENTITY_INSERT ${quotedCombinedName} OFF" if $hasId;
+
+
+    my $ra_columns              = columns($dbh,$schema,$table);
+    croak "${quotedCombinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
+    
+
+    my @IsColumnNumeric         = map { $_->[1] =~ m{char|text|date}i ? 0 : 1 ;  } @{$ra_columns} ;
+    my @nonKeyColumns           = () ;
+
+    my $widest_column_name_len      = max ( map { length ($_->[0]); } @{$ra_columns} ) ;
+    my $widest_column_name_padding  = int($widest_column_name_len/4) + 4;
+
+    my $flatvariablelist        = "" ;
+    foreach my $l (@{$ra_columns}) {
+        do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
+    }    
+    $flatvariablelist           =~ s{ ,\s? \z }{}msx;
+
+    foreach my $l (@{$ra_columns}) {
+        my $varlen  = length($l->[0]) ;
+        my $colpadding = $widest_column_name_padding - (int(($varlen)/4));
+        my $varpadding = $widest_column_name_padding - (int(($varlen+1)/4));
+    }
+
+    my $flatExtractColumnList   = "" ;
+
+    foreach my $l (@{$ra_columns}) {
+        my $varlen      = length($l->[0]) ;
+        my $colpadding  = $widest_column_name_padding - (int(($varlen)/4));
+        my $varpadding  = $widest_column_name_padding - (int(($varlen+1)/4));
+        do { local $" = "";   $flatExtractColumnList    .= $l->[1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i  ? "convert(varchar(30),[$l->[0]],120)" :  "[$l->[0]]" ; $flatExtractColumnList .= ", "} ;
+
+    }
+
+    $flatExtractColumnList    =~ s{ ,\s? \z }{}msx;
+
+    my $ra_metadata = describeTestDataForTable($dbh,$sql);
+    my @cols = map { $$_[0] } @$ra_metadata ;
+    my $colList = do { local $" = "," ; "@cols" } ;
+
+    my $ra_data     = getTestDataForTable($dbh,$quotedCombinedName,$flatExtractColumnList,$sql);
+    
+#need to over lay tables with columns aprt from those whihc are 'hidden'    
+    my @valuesTable     ;
+    my $valuesClause    = "values\n\t\t\t";
+
+    my $lno             = 1;
+    foreach my $ra_row (@{$ra_data}){
+        my @outVals = undef ;
+        for ( my $i = 0; $i < scalar @{$ra_row}; $i++ ) {
+            
+            if ( not ( defined ($ra_row->[$i]) ) ) {
+                $outVals[$i] = 'null' ;  
+            }
+            else {
+                if (${$ra_metadata}[$i][1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i) {
+                    $outVals[$i] = "convert(". ${$ra_columns}[$i][1] ."," . $dbh->quote($ra_row->[$i]) . ",120)"   ;
+                }
+                elsif ( ${$ra_metadata}[$i][1] =~ m{(?:char|text|date)}i)  {
+                    $outVals[$i] = $dbh->quote($ra_row->[$i])  ;  
+                }
+                else {
+                    $outVals[$i] = $ra_row->[$i] ;  
+                }
+            }
+        }
+        push @valuesTable, \@outVals ;
+        my $line = do{ local $" = ", "; "@outVals" } ;
+        $lno++;
+    }
+
+    my @maxWidth;
+    my $maxCol;
+    
+    if ( scalar @valuesTable ) {
+        my @tmp = @{$valuesTable[0]};
+        $maxCol = scalar @tmp -1 ;
+        for ( my $i = 0; $i <= $maxCol; $i++ ) {
+            push @maxWidth, 0;
+        }     
+        for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
+            my @tmp = @{$valuesTable[$i]};
+            for ( my $i = 0; $i <= $maxCol; $i++ ) {
+                if (length($tmp[$i]) > $maxWidth[$i] ) {
+                    $maxWidth[$i] = length($tmp[$i]) ;
+                }
+            }
+        }
+    }
+    
+    #warn Dumper @maxWidth ;
+    
+    for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
+        my @tmp             = @{$valuesTable[$i]};
+        my $line            = "";
+        for ( my $j = 0; $j <= $maxCol; $j++ ) {
+            my $val         = $tmp[$j];
+            my $valWidth    = length($val);
+            my $PadLength   = $maxWidth[$j]-$valWidth;
+            my $padding     = " "x$PadLength;
+            $line           .= ", ${padding}${val}";
+        }
+        $line               =~ s{ ^,\s}{}msx;
+        $valuesClause       .= "(\t" . $line . ")" . "\n\t\t,\t" ;
+    }
+
+    $valuesClause           =~ s{ \n\t\t,\t \z }{}msx;
+    
+    if ( ! $use_MinimalForm) {
+return <<"EOF";
+
+    ${set_IDENTITY_INSERT_ON}
+    ; with src as 
+    (
+    select  * 
+    from    ( ${valuesClause}
+            ) AS vtable 
+    ( ${colList})
+    )
+    insert  into
+            ${quotedCombinedName}
+    (       ${colList}
+    )
+    select  ${colList}
+    from    src ;
+    ${set_IDENTITY_INSERT_OFF}
+
+EOF
+    }
+    else {
+        ${valuesClause} =~ s{\A values\n\t\t\t }{\t\t,\t}msx;
+return <<"EOF";
+${valuesClause}
+EOF
+        
+    }
+}
+
+sub describeTestDataForTable {
+
+    local $_ = undef ;
+    
+    my $dbh          = shift or croak 'no dbh' ;
+    my $sql          = shift or croak 'no sql' ;
+
+    ( my $quoted_sql    = $sql ) =~ s{'}{''}g;
+    
+    my $metadata_sql    = "exec sp_describe_first_result_set N'${quoted_sql}'" ;
+
+    my $sth2            = $dbh->prepare($metadata_sql);
+    my $rs              = $sth2->execute();
+    my $res             = $sth2->fetchall_arrayref() ;
+
+    my @ret_res         = map { [($$_[2],$$_[5],$$_[3],$$_[1])] } @$res;
+
+    return \@ret_res ;
+    
+}
+
+sub getTestDataForTable {
+
+    local $_ = undef ;
+    
+    my $dbh          = shift or croak 'no dbh' ;
+    my $combinedName = shift or croak 'no table' ;
+    my $cols         = shift or croak 'no cols list' ;
+    my $sql          = shift or croak 'no sql' ;
+#warn Dumper getCurrentTableDataSQL($combinedName,$pkCol,$cols);
+
+    my $sth2 = $dbh->prepare($sql);
+    my $rs   = $sth2->execute();
+    my $res  = $sth2->fetchall_arrayref() ;
+
+    return $res ;
+    
+}
 
 sub getCurrentTableData {
 
@@ -823,6 +1031,8 @@ where   1=1
 and     TABLE_SCHEMA        = ?
 and     TABLE_NAME          = ?
 and     COLUMNPROPERTY(object_id(?+'.'+?) , COLUMN_NAME,'IsComputed') != 1
+--order by ORDINAL_POSITION
+
 EOF
 
 }

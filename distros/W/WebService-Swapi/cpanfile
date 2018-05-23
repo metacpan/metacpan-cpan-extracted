@@ -1,11 +1,12 @@
 requires 'perl', '5.008001';
 
+requires 'Data::Serializer';
 requires 'Moo';
 requires 'JSON';
 requires 'REST::Client';
 requires 'Role::REST::Client';
-requires 'Data::Serializer';
 requires 'Types::Standard';
+requires 'namespace::clean';
 
 on 'test' => sub {
     requires 'Devel::Cover';
@@ -21,6 +22,6 @@ on 'test' => sub {
 on 'develop' => sub {
     requires 'App::CISetup';
     requires 'App::Software::License';
-    requires 'Minilla';
+    requires 'Dist::Milla';
     recommends 'Devel::NYTProf';
 };

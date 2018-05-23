@@ -8,12 +8,6 @@ sub module {
     return Pcore::Util::Perl::Module->new(@_);
 }
 
-sub moo {
-    state $init = !!require Pcore::Util::Perl::Moo;
-
-    return 'Pcore::Util::Perl::Moo';
-}
-
 1;
 __END__
 =pod

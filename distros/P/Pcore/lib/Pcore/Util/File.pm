@@ -23,7 +23,7 @@ sub chdir ($path) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
 
         state $init = !!require Pcore::Util::File::ChdirGuard;
 
-        return Pcore::Util::File::ChdirGuard->new( { dir => $cwd } )->scope_guard;
+        return Pcore::Util::File::ChdirGuard->new( { dir => $cwd } );
     }
     elsif ( chdir $path ) {
         return;

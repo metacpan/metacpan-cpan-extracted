@@ -6,6 +6,7 @@ use Test::More 0.96;
 use Path::Tiny;
 
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 use CorpusTest;
 
@@ -16,7 +17,7 @@ done_testing;
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2016 by MongoDB, Inc.
+# This software is Copyright (c) 2018 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

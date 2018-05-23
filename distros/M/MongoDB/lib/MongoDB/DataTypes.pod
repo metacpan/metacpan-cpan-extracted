@@ -30,7 +30,7 @@ MongoDB::DataTypes - The data types used with MongoDB
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 DESCRIPTION
 

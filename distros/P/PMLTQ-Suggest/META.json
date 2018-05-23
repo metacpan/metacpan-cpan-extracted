@@ -28,8 +28,11 @@
       "runtime" : {
          "requires" : {
             "HTTP::Server::Simple::CGI" : "0",
+            "List::MoreUtils" : "0",
             "PMLTQ" : "v1.4.0",
-            "Treex::PML" : "2.18"
+            "Treex::PML" : "2.18",
+            "URI" : "0",
+            "URI::file" : "0"
          }
       },
       "test" : {
@@ -44,19 +47,19 @@
    "provides" : {
       "PMLTQ::Command::suggest" : {
          "file" : "lib/PMLTQ/Command/suggest.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "PMLTQ::Suggest" : {
          "file" : "lib/PMLTQ/Suggest.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "PMLTQ::Suggest::Server" : {
          "file" : "lib/PMLTQ/Suggest/Server.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "PMLTQ::Suggest::Utils" : {
          "file" : "lib/PMLTQ/Suggest/Utils.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -71,7 +74,7 @@
          "web" : "https://github.com/ufal/pmltq-suggest-server"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.2",
    "x_authority" : "cpan:MATY",
    "x_authority_from_module" : "PMLTQ::Suggest",
    "x_permissions_from_module" : "PMLTQ::Suggest",

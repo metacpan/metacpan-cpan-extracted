@@ -111,16 +111,17 @@ is_deeply (\@ref, [' foo ', 'b a z'],
 
 
 SKIP: {
-	skip "No file created for stdout", 2 unless open my $tmp, '>', 'tmpout';
+	my $tmpfile = 'tmpout-cookie';
+	skip "No file created for stdout", 2 unless open my $tmp, '>', $tmpfile;
 	select $tmp;
 	$cgi->print_data;
 	close $tmp;
-	open $tmp, '<', 'tmpout';
+	open $tmp, '<', $tmpfile;
 	chomp (my $printed = <$tmp>);
 	is ($printed, q# foo  =  bar #, 'print_data first cookie');
 	chomp ($printed = <$tmp>);
 	is ($printed, q#b a z = qu ux#, 'print_data second cookie');
-	close $tmp and unlink 'tmpout';
+	close $tmp and unlink $tmpfile;
 }
 
 # Other url-escaped chars here

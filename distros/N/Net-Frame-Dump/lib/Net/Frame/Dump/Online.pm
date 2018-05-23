@@ -1,5 +1,5 @@
 #
-# $Id: Online.pm,v 453864a37ab6 2018/05/01 07:25:03 gomor $
+# $Id: Online.pm,v c07e2f6c705b 2018/05/17 11:57:52 gomor $
 #
 package Net::Frame::Dump::Online;
 use strict;
@@ -399,7 +399,7 @@ sub _nextTimeoutHandle {
       if (($thisTime - $self->_firstTime) > $self->timeoutOnNext) {
          $self->timeout(1);
          $self->_firstTime(0);
-         $self->cgDebugPrint(1, "Timeout occured");
+         $self->cgDebugPrint(1, "Timeout occurred");
          return;
       }
    }
@@ -507,7 +507,7 @@ The network interface to listen on. No default value.
 
 =item B<timeoutOnNext>
 
-Each time you call B<next> method, an internal counter is updated. This counter tells you if you have not received any data since B<timeoutOnNext> seconds. When a timeout occure, B<timeout> is set to true.
+Each time you call B<next> method, an internal counter is updated. This counter tells you if you have not received any data since B<timeoutOnNext> seconds. When a timeout occurred, B<timeout> is set to true.
 
 =item B<timeout>
 

@@ -4,19 +4,19 @@
       "Emmanouil \"Manolis\" Maragkakis <mns.marag@gmail.com>, Panagiotis Alexiou <pan.alexiou@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CLIPSeqTools",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -64,6 +64,6 @@
          "web" : "https://github.com/mnsmar/clipseqtools"
       }
    },
-   "version" : "0.1.7"
+   "version" : "0.1.8"
 }
 

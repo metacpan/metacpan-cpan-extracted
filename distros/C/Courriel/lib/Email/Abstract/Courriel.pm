@@ -3,7 +3,7 @@ package Email::Abstract::Courriel;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Courriel;
 
@@ -59,7 +59,7 @@ Email::Abstract::Courriel - Email::Abstract wrapper for Courriel
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,7 @@ L<Email::Abstract>, L<Courriel>.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel> or via email to L<bug-courriel@rt.cpan.org|mailto:bug-courriel@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Courriel/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

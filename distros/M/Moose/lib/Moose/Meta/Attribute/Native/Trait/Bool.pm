@@ -1,5 +1,5 @@
 package Moose::Meta::Attribute::Native::Trait::Bool;
-our $VERSION = '2.2010';
+our $VERSION = '2.2011';
 
 use Moose::Role;
 with 'Moose::Meta::Attribute::Native::Trait';
@@ -24,7 +24,7 @@ Moose::Meta::Attribute::Native::Trait::Bool - Helper trait for Bool attributes
 
 =head1 VERSION
 
-version 2.2010
+version 2.2011
 
 =head1 SYNOPSIS
 

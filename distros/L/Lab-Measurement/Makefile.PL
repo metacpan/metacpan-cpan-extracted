@@ -63,6 +63,7 @@ my %WriteMakefileArgs = (
     "Thread::Semaphore" => 0,
     "Tie::Hash" => 0,
     "Time::HiRes" => 0,
+    "Time::Seconds" => 0,
     "Try::Tiny" => "0.22",
     "YAML::XS" => "0.41",
     "autodie" => 0,
@@ -94,7 +95,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.642",
+  "VERSION" => "3.651",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -159,6 +160,7 @@ my %FallbackPrereqs = (
   "Thread::Semaphore" => 0,
   "Tie::Hash" => 0,
   "Time::HiRes" => 0,
+  "Time::Seconds" => 0,
   "Try::Tiny" => "0.22",
   "YAML::XS" => "0.41",
   "aliased" => 0,

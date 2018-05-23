@@ -1,6 +1,6 @@
 package PMLTQ::Suggest::Server;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Suggest::Server::VERSION = '0.0.1';
+$PMLTQ::Suggest::Server::VERSION = '0.0.2';
 use base qw(HTTP::Server::Simple::CGI);
 use URI;
 use URI::file;

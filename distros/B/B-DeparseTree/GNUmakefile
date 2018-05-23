@@ -23,7 +23,7 @@ GIT2CL ?= git2cl
 
 #: Build everything
 all:
-	perl Build --makefile_env_macros 1
+	perl ./Build --makefile_env_macros 1
 
 #: Build program, e.g. copy to blib
 build:
@@ -40,23 +40,23 @@ config_data:
 	perl Build --makefile_env_macros 1 config_data
 
 diff:
-	perl Build --makefile_env_macros 1 diff
+	perl ./Build --makefile_env_macros 1 diff
 
 #: Create distribution tarball
 dist:
-	perl Build --makefile_env_macros 1 dist
+	perl ./Build --makefile_env_macros 1 dist
 
 distcheck:
-	perl Build --makefile_env_macros 1 distcheck
+	perl ./Build --makefile_env_macros 1 distcheck
 
 distclean:
-	perl Build --makefile_env_macros 1 distclean
+	perl ./Build --makefile_env_macros 1 distclean
 
 distdir:
-	perl Build --makefile_env_macros 1 distdir
+	perl ./Build --makefile_env_macros 1 distdir
 
 distmeta:
-	perl Build --makefile_env_macros 1 distmeta
+	perl ./Build --makefile_env_macros 1 distmeta
 
 distsign:
 	perl Build --makefile_env_macros 1 distsign
@@ -109,22 +109,30 @@ pure_install:
 skipcheck :
 	perl Build --makefile_env_macros 1 skipcheck
 
+#: Same as "test". "check" is the usual autoconf name
+
+check: test
+
+#: Same as test-unit
+check-unit: test-unit
+
 #: "check" but stop after 1st error, and add -v option
-check-cautious:
+check-cautious: test-unit
 	(cd t; for t in *.t; do \
 	if ! prove -w $$t; then \
 	   break; \
 	fi; done)
 
-#: Run all tests
-check-short:
-	perl Build --makefile_env_macros 1 test
+#: Run just the tests in the t/ directory
+check-t: test-unit
+	perl Build --makefile_env_macros 1 test --test_files t
 
-#: Same as "test". "check" is the usual autoconf name
-check: test
+#: Run just the unit tests
+test-unit:
+	perl Build --makefile_env_macros 1 test --test_files t/unit
 
-#: Run all tests
-test: check-short
+#: Run all tests (t and scripts)
+test: check-t
 	cd scripts && make test
 
 #: Check code coverage

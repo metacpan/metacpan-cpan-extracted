@@ -10,7 +10,6 @@ use Test::NoWarnings;
 use Test::MockModule;
 
 use File::Spec;
-use JSON qw(decode_json);
 
 use VolSurface::Utils qw(
     get_delta_for_strike

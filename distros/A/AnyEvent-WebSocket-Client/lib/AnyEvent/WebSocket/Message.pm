@@ -6,7 +6,7 @@ use Moo;
 use Encode ();
 
 # ABSTRACT: WebSocket message for AnyEvent
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 has body => ( is => 'ro', required => 1 );
@@ -39,7 +39,7 @@ AnyEvent::WebSocket::Message - WebSocket message for AnyEvent
 
 =head1 VERSION
 
-version 0.46
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -151,6 +151,8 @@ José Joaquín Atria (JJATRIA)
 Kivanc Yazan (KYZN)
 
 Yanick Champoux (YANICK)
+
+Fayland Lam (FAYLAND)
 
 =head1 COPYRIGHT AND LICENSE
 

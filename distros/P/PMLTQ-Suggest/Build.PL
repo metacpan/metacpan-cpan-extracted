@@ -18,14 +18,17 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ-Suggest",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.0.2",
   "license" => "perl",
   "module_name" => "PMLTQ::Suggest",
   "recursive_test_files" => 1,
   "requires" => {
     "HTTP::Server::Simple::CGI" => 0,
+    "List::MoreUtils" => 0,
     "PMLTQ" => "v1.4.0",
-    "Treex::PML" => "2.18"
+    "Treex::PML" => "2.18",
+    "URI" => 0,
+    "URI::file" => 0
   },
   "script_files" => [
     "script/pmltq-suggest-server"

@@ -34,8 +34,8 @@ has _is_http => ( is => 'lazy', isa => Bool, required => 1 );
 has _get_ws_cb => ( is => 'ro', isa => ArrayRef, init_arg => undef );
 has _ws => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::WebSocket'], init_arg => undef );
 
-sub DEMOLISH ( $self, $global ) {
-    if ( !$global ) {
+sub DESTROY ( $self ) {
+    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
         $self->{_ws}->disconnect if $self->{_ws};
     }
 

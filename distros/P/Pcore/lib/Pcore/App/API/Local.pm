@@ -9,9 +9,9 @@ use Pcore::Util::UUID qw[uuid_v4 looks_like_uuid];
 
 with qw[Pcore::App::API];
 
-has dbh         => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::DBI'],         init_arg => undef );
-has _hash_cache => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Hash::RandKey'], init_arg => undef );
-has _hash_cache_size => ( is => 'ro', isa => PositiveInt, default => 10_000 );
+has dbh              => ();        # ( isa => InstanceOf ['Pcore::Handle::DBI'],         init_arg => undef );
+has _hash_cache      => ();        # ( isa => InstanceOf ['Pcore::Util::Hash::RandKey'], init_arg => undef );
+has _hash_cache_size => 10_000;    # isa => PositiveInt;
 
 sub init ( $self ) {
     $self->{_hash_cache} = P->hash->limited( $self->{_hash_cache_size} );

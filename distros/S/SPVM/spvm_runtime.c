@@ -30,6 +30,7 @@
 #include "spvm_opcode_array.h"
 #include "spvm_constant.h"
 #include "spvm_hash.h"
+#include "spvm_basic_type.h"
 
 SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args) {
   (void)api;
@@ -74,8 +75,9 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_jit(SPVM_API* api, int32_t sub_id, SPVM_API
   // Subroutine return type
   SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
   
-  // Subroutine return type id
-  int32_t sub_return_type_id = sub_return_type->id;
+  int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
+  
+  int32_t sub_return_type_dimension = sub_return_type->dimension;
   
   // Return value
   SPVM_API_VALUE return_value;
@@ -85,41 +87,47 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_jit(SPVM_API* api, int32_t sub_id, SPVM_API
   
   void* sub_jit_address = sub->jit_address;
   
-  
   // Call JIT subroutine
-  if (sub_return_type_id == SPVM_TYPE_C_ID_VOID) {
-    void (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    (*jit_address)(api, (SPVM_API_VALUE*)args);
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_BYTE) {
-    SPVM_API_byte (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    SPVM_API_byte return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_byte*)&return_value = return_value_jit;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_SHORT) {
-    SPVM_API_short (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    SPVM_API_short return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_short*)&return_value = return_value_jit;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_INT) {
-    SPVM_API_int (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    SPVM_API_int return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_int*)&return_value = return_value_jit;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_LONG) {
-    SPVM_API_long (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    SPVM_API_long return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_long*)&return_value = return_value_jit;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_FLOAT) {
-    float (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    float return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
-    *(float*)&return_value = return_value_jit;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_DOUBLE) {
-    double (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
-    double return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
-    *(double*)&return_value = return_value_jit;
+  if (sub_return_type_dimension == 0) {
+    if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_VOID) {
+      void (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      (*jit_address)(api, (SPVM_API_VALUE*)args);
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+      SPVM_API_byte (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      SPVM_API_byte return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_byte*)&return_value = return_value_jit;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+      SPVM_API_short (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      SPVM_API_short return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_short*)&return_value = return_value_jit;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_INT) {
+      SPVM_API_int (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      SPVM_API_int return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_int*)&return_value = return_value_jit;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_LONG) {
+      SPVM_API_long (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      SPVM_API_long return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_long*)&return_value = return_value_jit;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+      float (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      float return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(float*)&return_value = return_value_jit;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+      double (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      double return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(double*)&return_value = return_value_jit;
+    }
+    else {
+      SPVM_API_OBJECT* (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
+      SPVM_API_OBJECT* return_value_jit = (*jit_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_OBJECT**)&return_value = return_value_jit;
+    }
   }
   else {
     SPVM_API_OBJECT* (*jit_address)(SPVM_API*, SPVM_API_VALUE*) = sub_jit_address;
@@ -147,8 +155,9 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_native(SPVM_API* api, int32_t sub_id, SPVM_
   // Subroutine return type
   SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
   
-  // Subroutine return type id
-  int32_t sub_return_type_id = sub_return_type->id;
+  int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
+  
+  int32_t sub_return_type_dimension = sub_return_type->dimension;
   
   // Return value
   SPVM_API_VALUE return_value;
@@ -158,46 +167,54 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_native(SPVM_API* api, int32_t sub_id, SPVM_
   
   // Native address
   void* sub_native_address = sub->native_address;
-
-  if (sub_return_type_id == SPVM_TYPE_C_ID_VOID) {
-    void (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    (*native_address)(api, (SPVM_API_VALUE*)args);
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_BYTE) {
-    SPVM_API_byte (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    SPVM_API_byte return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_byte*)&return_value = return_value_native;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_SHORT) {
-    SPVM_API_short (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    SPVM_API_short return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_short*)&return_value = return_value_native;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_INT) {
-    SPVM_API_int (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    SPVM_API_int return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_int*)&return_value = return_value_native;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_LONG) {
-    SPVM_API_long (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    SPVM_API_long return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
-    *(SPVM_API_long*)&return_value = return_value_native;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_FLOAT) {
-    float (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    float return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
-    *(float*)&return_value = return_value_native;
-  }
-  else if (sub_return_type_id == SPVM_TYPE_C_ID_DOUBLE) {
-    double (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
-    double return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
-    *(double*)&return_value = return_value_native;
+  
+  if (sub_return_type_dimension == 0) {
+    if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_VOID) {
+      void (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      (*native_address)(api, (SPVM_API_VALUE*)args);
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+      SPVM_API_byte (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      SPVM_API_byte return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_byte*)&return_value = return_value_native;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+      SPVM_API_short (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      SPVM_API_short return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_short*)&return_value = return_value_native;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_INT) {
+      SPVM_API_int (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      SPVM_API_int return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_int*)&return_value = return_value_native;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_LONG) {
+      SPVM_API_long (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      SPVM_API_long return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_long*)&return_value = return_value_native;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+      float (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      float return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(float*)&return_value = return_value_native;
+    }
+    else if (sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+      double (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      double return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(double*)&return_value = return_value_native;
+    }
+    else {
+      SPVM_API_OBJECT* (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
+      SPVM_API_OBJECT* return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
+      *(SPVM_API_OBJECT**)&return_value = return_value_native;
+    }
   }
   else {
     SPVM_API_OBJECT* (*native_address)(SPVM_API*, SPVM_API_VALUE*) = sub_native_address;
     SPVM_API_OBJECT* return_value_native = (*native_address)(api, (SPVM_API_VALUE*)args);
     *(SPVM_API_OBJECT**)&return_value = return_value_native;
   }
+  
   return return_value;
 }
 
@@ -215,8 +232,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
   // Subroutine return type
   SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
   
-  // Subroutine return type id
-  int32_t sub_return_type_id = sub_return_type->id;
+  int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
+  int32_t sub_return_type_dimension = sub_return_type->dimension;
   
   // Return value
   SPVM_API_VALUE return_value;
@@ -392,9 +409,10 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
       case SPVM_OPCODE_C_ID_ISA:
       {
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
-        int32_t type_id = opcode->operand1;
+        int32_t basic_type_id = opcode->operand1;
+        int32_t dimension = opcode->operand2;
         
-        condition_flag = (*(int32_t*)(object + SPVM_RUNTIME_C_OBJECT_TYPE_ID_BYTE_OFFSET) == type_id);
+        condition_flag = (*(int32_t*)(object + SPVM_RUNTIME_C_OBJECT_BASIC_TYPE_ID_BYTE_OFFSET) == basic_type_id && *(int32_t*)(object + SPVM_RUNTIME_C_OBJECT_DIMENSION_BYTE_OFFSET) == dimension);
         
         break;
       }
@@ -411,8 +429,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* string1_object = *(SPVM_API_OBJECT**)((intptr_t)string1 + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
         SPVM_API_OBJECT* string2_object = *(SPVM_API_OBJECT**)((intptr_t)string2 + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
 
-        int32_t string1_length = *(SPVM_API_int*)((intptr_t)string1_object + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET);
-        int32_t string2_length = *(SPVM_API_int*)((intptr_t)string2_object + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET);
+        int32_t string1_length = *(SPVM_API_int*)((intptr_t)string1_object + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET);
+        int32_t string2_length = *(SPVM_API_int*)((intptr_t)string2_object + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET);
         
         SPVM_API_byte* string1_bytes = (SPVM_API_byte*)((intptr_t)string1_object + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
         SPVM_API_byte* string2_bytes = (SPVM_API_byte*)((intptr_t)string2_object + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
@@ -786,9 +804,9 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          int32_t length = *(SPVM_API_int*)((intptr_t)*(SPVM_API_OBJECT**)&vars[opcode->operand1] + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET);
+          int32_t length = *(SPVM_API_int*)((intptr_t)*(SPVM_API_OBJECT**)&vars[opcode->operand1] + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET);
           
-          SPVM_API_OBJECT* string_array = api->new_object_array(api, SPVM_TYPE_C_ID_STRING, length);
+          SPVM_API_OBJECT* string_array = api->new_object_array(api, SPVM_BASIC_TYPE_C_ID_STRING, length);
           
           switch (opcode->id) {
             case SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING_ARRAY: {
@@ -894,7 +912,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -914,7 +932,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -935,7 +953,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -955,7 +973,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -975,7 +993,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -995,7 +1013,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1015,7 +1033,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1038,7 +1056,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1058,7 +1076,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1078,7 +1096,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1098,7 +1116,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1118,7 +1136,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1138,7 +1156,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1159,7 +1177,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1183,7 +1201,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
+          if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET), 0)) {
             SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
@@ -1244,12 +1262,12 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT: {
         // Get subroutine ID
-        int32_t type_id = opcode->operand1;
+        int32_t basic_type_id = opcode->operand1;
         
-        SPVM_API_OBJECT* object = api->new_object(api, type_id);
+        SPVM_API_OBJECT* object = api->new_object(api, basic_type_id);
         
         // Push object
-         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], object);
+        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], object);
         
         break;
       }
@@ -1320,15 +1338,28 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT_ARRAY: {
-        int32_t element_type_id = opcode->operand1;
+        int32_t basic_type_id = opcode->operand1;
         
         // length
         int32_t length = *(SPVM_API_int*)&vars[opcode->operand2];
         
-        SPVM_API_OBJECT* object = api->new_object_array(api, element_type_id, length);
+        SPVM_API_OBJECT* object = api->new_object_array(api, basic_type_id, length);
         
         // Set object
          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], object);
+        break;
+      }
+      case SPVM_OPCODE_C_ID_NEW_MULTI_ARRAY: {
+        int32_t basic_type_id = (uint32_t)opcode->operand1 & 0xFFFFFF;
+        int32_t dimension  = (uint32_t)opcode->operand1 >> 24;
+        
+        // length
+        int32_t length = *(SPVM_API_int*)&vars[opcode->operand2];
+        
+        SPVM_API_OBJECT* object = api->new_multi_array(api, basic_type_id, dimension, length);
+        
+        // Set object
+        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], object);
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_STRING: {
@@ -1351,7 +1382,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           croak_flag = 1;
         }
         else {
-          *(SPVM_API_int*)&vars[opcode->operand0] = *(SPVM_API_int*)((intptr_t)*(SPVM_API_OBJECT**)&vars[opcode->operand1] + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET);
+          *(SPVM_API_int*)&vars[opcode->operand0] = *(SPVM_API_int*)((intptr_t)*(SPVM_API_OBJECT**)&vars[opcode->operand1] + SPVM_RUNTIME_C_OBJECT_UNITS_LENGTH_BYTE_OFFSET);
         }
         break;
       case SPVM_OPCODE_C_ID_GET_FIELD_BYTE: {
@@ -1733,22 +1764,18 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       case SPVM_OPCODE_C_ID_CHECK_CAST: {
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
-        int32_t object_type_id = *(int32_t*)(object + SPVM_RUNTIME_C_OBJECT_TYPE_ID_BYTE_OFFSET);
-        int32_t cast_type_id = opcode->operand2;
+
+        int32_t cast_basic_type_id = (uint32_t)opcode->operand2 & 0xFFFFFF;
+        int32_t cast_type_dimension  = (uint32_t)opcode->operand2 >> 24;
         
-        if (object_type_id == cast_type_id) {
+        _Bool can_assign = api->check_cast(api, cast_basic_type_id, cast_type_dimension, object);
+        if (can_assign) {
           SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], object);
         }
         else {
-          _Bool can_assign = api->check_cast(api, cast_type_id, object);
-          if (can_assign) {
-            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], object);
-          }
-          else {
-            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Can't cast uncompatible type.");
-            api->set_exception(api, exception);
-            croak_flag = 1;
-          }
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Can't cast uncompatible type.");
+          api->set_exception(api, exception);
+          croak_flag = 1;
         }
         
         break;
@@ -1765,8 +1792,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         // Declare subroutine return type
         SPVM_TYPE* decl_sub_return_type = decl_sub->op_return_type->uv.type;
         
-        // Declare subroutine return type id
-        int32_t decl_sub_return_type_id = decl_sub_return_type->id;
+        int32_t decl_sub_return_basic_type_id = decl_sub_return_type->basic_type->id;
+        int32_t decl_sub_return_return_dimension = decl_sub_return_type->dimension;
         
         // Declare subroutine argument length
         int32_t decl_sub_args_length = decl_sub->op_args->length;
@@ -1787,64 +1814,75 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         call_sub_arg_stack_top -= decl_sub_args_length;
         
         // Call subroutine
-        if (decl_sub_return_type_id == SPVM_TYPE_C_ID_VOID) {
-          api->call_void_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
+        if (decl_sub_return_return_dimension == 0) {
+          if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_VOID) {
+            api->call_void_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
           }
-        }
-        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_BYTE) {
-          SPVM_API_byte value = api->call_byte_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
+          else if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+            SPVM_API_byte value = api->call_byte_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              *(SPVM_API_byte*)&vars[opcode->operand0] = value;
+            }
+          }
+          else if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+            SPVM_API_short value = api->call_short_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              *(SPVM_API_short*)&vars[opcode->operand0] = value;
+            }
+          }
+          else if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_INT) {
+            SPVM_API_int value = api->call_int_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              *(SPVM_API_int*)&vars[opcode->operand0] = value;
+            }
+          }
+          else if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_LONG) {
+            SPVM_API_long value = api->call_long_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              *(SPVM_API_long*)&vars[opcode->operand0] = value;
+            }
+          }
+          else if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+            SPVM_API_float value = api->call_float_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              *(SPVM_API_float*)&vars[opcode->operand0] = value;
+            }
+          }
+          else if (decl_sub_return_basic_type_id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+            SPVM_API_double value = api->call_double_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              *(SPVM_API_double*)&vars[opcode->operand0] = value;
+            }
           }
           else {
-            *(SPVM_API_byte*)&vars[opcode->operand0] = value;
-          }
-        }
-        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_SHORT) {
-          SPVM_API_short value = api->call_short_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
-          }
-          else {
-            *(SPVM_API_short*)&vars[opcode->operand0] = value;
-          }
-        }
-        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_INT) {
-          SPVM_API_int value = api->call_int_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
-          }
-          else {
-            *(SPVM_API_int*)&vars[opcode->operand0] = value;
-          }
-        }
-        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_LONG) {
-          SPVM_API_long value = api->call_long_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
-          }
-          else {
-            *(SPVM_API_long*)&vars[opcode->operand0] = value;
-          }
-        }
-        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_FLOAT) {
-          SPVM_API_float value = api->call_float_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
-          }
-          else {
-            *(SPVM_API_float*)&vars[opcode->operand0] = value;
-          }
-        }
-        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_DOUBLE) {
-          SPVM_API_double value = api->call_double_sub(api, call_sub_id, call_sub_args);
-          if (api->get_exception(api)) {
-            croak_flag = 1;
-          }
-          else {
-            *(SPVM_API_double*)&vars[opcode->operand0] = value;
+            SPVM_API_OBJECT* value = api->call_object_sub(api, call_sub_id, call_sub_args);
+            if (api->get_exception(api)) {
+              croak_flag = 1;
+            }
+            else {
+              SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_API_OBJECT**)&vars[opcode->operand0], value);
+            }
           }
         }
         else {
@@ -2023,7 +2061,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
   // Croak
   if (!croak_flag) {
     // Decrement ref count of return value
-    if (sub_return_type_id > SPVM_TYPE_C_ID_DOUBLE) {
+    if (sub_return_type_dimension > 0 || sub_return_basic_type_id > SPVM_BASIC_TYPE_C_ID_DOUBLE) {
       if (*(SPVM_API_OBJECT**)&return_value != NULL) {
         SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(SPVM_API_OBJECT**)&return_value);
       }

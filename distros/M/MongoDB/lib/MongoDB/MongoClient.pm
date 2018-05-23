@@ -21,7 +21,7 @@ package MongoDB::MongoClient;
 # ABSTRACT: A connection to a MongoDB server or multi-server deployment
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use MongoDB;
@@ -52,6 +52,7 @@ use Try::Tiny;
 use MongoDB::_Types qw(
     ArrayOfHashRef
     AuthMechanism
+    Boolish
     BSONCodec
     HeartbeatFreq
     MaxStalenessNum
@@ -60,7 +61,6 @@ use MongoDB::_Types qw(
     ReadPreference
 );
 use Types::Standard qw(
-    Bool
     HashRef
     InstanceOf
     Undef
@@ -354,7 +354,7 @@ sub _build_heartbeat_frequency_ms {
 
 has j => (
     is      => 'lazy',
-    isa     => Bool,
+    isa     => Boolish,
     builder => '_build_j',
 );
 
@@ -662,7 +662,7 @@ sub _build_server_selection_timeout_ms {
 
 has server_selection_try_once => (
     is      => 'lazy',
-    isa     => Bool,
+    isa     => Boolish,
     builder => '_build_server_selection_try_once',
 );
 
@@ -778,7 +778,7 @@ sub _build_socket_timeout_ms {
 
 has ssl => (
     is      => 'lazy',
-    isa     => Bool|HashRef,
+    isa     => Boolish|HashRef,
     builder => '_build_ssl',
 );
 
@@ -986,7 +986,7 @@ has query_timeout => (
 
 has sasl => (
     is      => 'ro',
-    isa     => Bool,
+    isa     => Boolish,
     default => 0
 );
 
@@ -1672,7 +1672,7 @@ MongoDB::MongoClient - A connection to a MongoDB server or multi-server deployme
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 
@@ -2556,6 +2556,25 @@ When catching an exception, users must determine whether or not their
 application should retry an operation based on the specific operation
 attempted and other use-case-specific considerations.  For automating
 retries despite exceptions, consider using the L<Try::Tiny::Retry> module.
+
+=head1 TRANSPORT LAYER SECURITY
+
+B<Warning>: industry best practices, and some regulations, require the use
+of TLS 1.1 or newer.
+
+Some operating systems or versions may not provide an OpenSSL version new
+enough to support the latest TLS protocols.  If your OpenSSL library
+version number is less than 1.0.1, then support for TLS 1.1 or newer is not
+available. Contact your operating system vendor for a solution or upgrade
+to a newer operating system distribution.
+
+See also the documentation for L<Net::SSLeay> for details on installing and
+compiling against OpenSSL.
+
+TLS connnections in the driver rely on the default settings provided by
+L<IO::Socket::SSL>, but allow you to pass custom configuration to it.
+Please read its documentation carefully to see how to control your TLS
+configuration.
 
 =head1 AUTHENTICATION
 

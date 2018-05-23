@@ -99,7 +99,7 @@ MySQL::Workbench::Parser::Column - A column of the ER model
 
 =head1 VERSION
 
-version 0.06
+version 1
 
 =for Pod::Coverage BUILD
 
@@ -121,13 +121,39 @@ returns
         default_value => '',
     )
 
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * autoincrement
+
+=item * datatype
+
+=item * default_value
+
+=item * id
+
+=item * length
+
+=item * name
+
+=item * node
+
+=item * not_null
+
+=item * precision
+
+=item * table
+
+=back
+
 =head1 AUTHOR
 
 Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

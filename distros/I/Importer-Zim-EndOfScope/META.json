@@ -37,7 +37,7 @@
             "B::Hooks::EndOfScope" : "0",
             "Importer::Zim::Base" : "v0.12.0",
             "Importer::Zim::Utils" : "v0.8.0",
-            "Sub::Replace" : "0",
+            "Sub::Replace" : "v0.2.0",
             "perl" : "5.010001"
          }
       },
@@ -57,7 +57,7 @@
    "provides" : {
       "Importer::Zim::EndOfScope" : {
          "file" : "lib/Importer/Zim/EndOfScope.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/aferreira/cpan-Importer-Zim-EndOfScope"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.5.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

@@ -1,6 +1,24 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.2011   2018-05-16
+
+  [BUG FIXES]
+
+  - Various native trait methods would refuse "0" where they expected a
+    string.  They have been fixed to allow all defined, non-reference values,
+    and all objects with string, number, or boolean overloads.
+
+  [DOCUMENTATION]
+
+  - Moose::Manual::Construction now notes that roles can modify the BUILD sub.
+    (thanks, E. Choroba!)
+
+  [OTHER]
+
+  - adjustments have been made to the Makefile for 'bmake', so it now works
+    when not run in compatibility mode (Leon Timmermans).
+
 2.2010   2018-02-16
 
   [OTHER]

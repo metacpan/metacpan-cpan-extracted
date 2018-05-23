@@ -29,7 +29,7 @@ no_index:
 provides:
   Redis::Setlock:
     file: lib/Redis/Setlock.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Getopt::Long: '2.42'
   Guard: '0'
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://github.com/fujiwara/Redis-Setlock/issues
   homepage: https://github.com/fujiwara/Redis-Setlock
   repository: git://github.com/fujiwara/Redis-Setlock.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

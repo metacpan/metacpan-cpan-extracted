@@ -1,6 +1,7 @@
 Changes
 lib/VSGDR/StaticData.pm
 genStaticData.pl
+genTestData.pl
 tableDependencies.pl
 allTableDependencies.pl
 Makefile.PL

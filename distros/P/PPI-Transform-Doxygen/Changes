@@ -1,3 +1,9 @@
+0.32 2018-05-22
+  - remove debugging code
+
+0.31 2018-05-22
+  - fix normal pod in nested modules
+
 0.3 2018-05-09
   - support for subroutine signatures
   - support sub pod documentation in sub body

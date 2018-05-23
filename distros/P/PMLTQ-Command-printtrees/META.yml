@@ -1,0 +1,40 @@
+---
+abstract: 'generate svg trees for given treebank'
+author:
+  - 'Matyáš Kopp <matyas.kopp@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PMLTQ-Command-printtrees
+no_index: {}
+provides:
+  PMLTQ::Command::printtrees:
+    file: lib/PMLTQ/Command/printtrees.pm
+    version: v0.0.1
+requires:
+  File::Basename: '0'
+  File::Path: '0'
+  File::ShareDir: '1.102'
+  File::Which: '1.22'
+  Hash::Merge: '0'
+  PMLTQ: v1.4.0
+resources:
+  bugtracker: https://github.com/ufal/pmltq-command-print-trees/issues
+  homepage: http://ufal.mff.cuni.cz/pmltq/
+  repository: https://github.com/ufal/pmltq-command-print-trees.git
+version: 0.0.1
+x_authority: cpan:MATY
+x_authority_from_module: PMLTQ::Command::printtrees
+x_permissions_from_module: PMLTQ::Command::printtrees
+x_serialization_backend: 'YAML::Tiny version 1.70'

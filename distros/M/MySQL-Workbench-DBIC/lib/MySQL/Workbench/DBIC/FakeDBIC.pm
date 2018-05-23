@@ -31,7 +31,7 @@ MySQL::Workbench::DBIC::FakeDBIC - provide some DBIx::Class method stubs when DB
 
 =head1 VERSION
 
-version 0.08
+version 1.00
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

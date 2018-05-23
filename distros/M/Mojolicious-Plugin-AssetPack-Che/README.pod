@@ -3,7 +3,6 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack';
 use Mojolicious::Plugin::AssetPack::Util qw( checksum );
 use Mojo::URL;
 
-
 has [qw(app config)];
 has revision => sub { my $app = shift->app; $app->config('revision') // $app->config('version') // $app->config('версия') // ''; };
 
@@ -17,6 +16,8 @@ sub register {
   # Patch the asset route
   $self->route;
   $app->routes->find('assetpack')->pattern->defaults->{cb} = $self->serve_cb();
+  
+  $self->store->_types->type(html => ['text/html;charset=UTF-8']);# Restore deleted Jan
   
   my $process = $config->{process};
   $self->process(ref eq 'ARRAY' ? @$_ : $_) #($_->[0], map Mojo::URL->new($_), @$_[1..$#$_])
@@ -32,9 +33,6 @@ sub process {# redefine for nested topics
   $self->route unless $self->{route_added}++;
   return $self->_process_from_def($topic) unless @input;
  
-  # TODO: The idea with blessed($_) is that maybe the user can pass inn
-  # Mojolicious::Plugin::AssetPack::Sprites object, with images to generate
-  # CSS from?
   my $assets = Mojo::Collection->new;
   for my $url (@input) {
     utf8::encode($url);
@@ -51,30 +49,24 @@ sub process {# redefine for nested topics
   return $self->_process($topic => $assets);
 }
 
+#!!! me frozen at parent version 2.02
+sub processed { $_[0]->{by_topic}{$_[1]} }
+
 sub serve_cb {
   my $self= shift;
   return sub {
     my $c = shift;
     my $checksum = $c->stash('checksum');
-    my $topic_checksum = checksum Mojo::Util::encode 'UTF-8', $c->stash('topic').$self->revision;
-    my $topic_checksum_gzip = checksum Mojo::Util::encode 'UTF-8', $c->stash('topic').$self->revision.'.gzip';
-    if ((my $asset = $self->{by_checksum}{$topic_checksum_gzip}) && ($c->req->headers->accept_encoding // '') =~ /gzip/i) {# 
-      #~ warn "serve_cb", $c->dumper($asset);
-      #~ my $cfconfig=$self->config->{CombineFile} || {};
-      #~ $self->app->log->debug($c->dumper($asset));
-      #~ my $checksum_gzip = checksum(Mojo::Util::encode 'UTF-8', $asset->url.$self->revision.'.gzip');#
-      #~ $asset = $self->{by_checksum}{$checksum_gzip}
-      $c->res->headers->content_encoding('gzip');
-      $self->store->serve_asset($c, $asset);
-      return $c->rendered;
-    } elsif ($asset = $self->{by_checksum}{$checksum} || $self->{by_checksum}{$topic_checksum}) {
-      $self->store->serve_asset($c, $asset);
-      return $c->rendered;
-      
+    if (($c->req->headers->accept_encoding // '') =~ /gzip/i && (my $asset = $self->{by_checksum}{$checksum})) {
+      my $checksum_gzip = checksum($asset->url.$self->revision.'.gzip');
+      $asset = $self->{by_checksum}{$checksum_gzip}
+        and $c->res->headers->content_encoding('gzip')
+        and $self->store->serve_asset($c, $asset)
+        and return $c->rendered;
     }
     Mojolicious::Plugin::AssetPack::_serve($c, @_);
   };
-  
+   
 }
 
 
@@ -104,11 +96,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.023 (test on base Mojolicious::Plugin::AssetPack v2.02)
+Version 2.031 (test on base Mojolicious::Plugin::AssetPack v2.02+)
 
 =cut
 
-our $VERSION = '2.023';
+our $VERSION = '2.031';
 
 
 =head1 SYNOPSIS

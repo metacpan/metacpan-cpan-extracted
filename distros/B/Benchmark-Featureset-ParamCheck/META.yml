@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -26,70 +26,70 @@ optional_features: {}
 provides:
   Benchmark::Featureset::ParamCheck:
     file: lib/Benchmark/Featureset/ParamCheck.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Base:
     file: lib/Benchmark/Featureset/ParamCheck/Base.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Base::DataValidator:
     file: lib/Benchmark/Featureset/ParamCheck/Base/DataValidator.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Base::MXPV:
     file: lib/Benchmark/Featureset/ParamCheck/Base/MXPV.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Base::PV:
     file: lib/Benchmark/Featureset/ParamCheck/Base/PV.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Base::PVC:
     file: lib/Benchmark/Featureset/ParamCheck/Base/PVC.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Base::ParamsCheck:
     file: lib/Benchmark/Featureset/ParamCheck/Base/ParamsCheck.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::DataValidator::Moose:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Moose.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::DataValidator::Mouse:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Mouse.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::DataValidator::TypeTiny:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/TypeTiny.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::MXPV::Moose:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/Moose.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::MXPV::TypeTiny:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/TypeTiny.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::PV:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/PV.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::PV::TypeTiny:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/PV/TypeTiny.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::PVC::Moose:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Moose.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::PVC::Specio:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Specio.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::PVC::TypeTiny:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/TypeTiny.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::ParamsCheck::Perl:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/Perl.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::ParamsCheck::TypeTiny:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::Perl:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::RefUtilXS:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
-    version: '0.004'
+    version: '0.005'
   Benchmark::Featureset::ParamCheck::Implementation::TypeParams:
     file: lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Data::Validator: '1.07'
   IO::String: '0'
@@ -116,6 +116,6 @@ resources:
   homepage: https://metacpan.org/release/Benchmark-Featureset-ParamCheck
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-benchmark-featureset-paramcheck.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -26,8 +26,8 @@ package main;
         is( \&f2, \&M1::f2, 'f2 comes from M1' );
     }
 
-    ok( !defined &f1, 'f1 is gone' );
-    ok( !defined &f2, 'f2 is gone' );
+    ok( !__PACKAGE__->can('f1'), 'f1 is gone' );
+    ok( !__PACKAGE__->can('f2'), 'f2 is gone' );
 }
 
 {

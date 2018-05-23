@@ -1,5 +1,9 @@
 Revision history for Task::Calendar
 
+0.35  2018-05-15
+      - Updated dependency on Calendar::Gregorian v0.16.
+      - Updated dependency on Calendar::Hebrew v0.05.
+
 0.34  2018-01-30
       - Tidied up Changes file as per CPAN::Changes::Spec.
       - Added test script t/changes.t.

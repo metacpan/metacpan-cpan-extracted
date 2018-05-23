@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.46
+    version 0.48
 
 SYNOPSIS
 
@@ -128,6 +128,11 @@ ATTRIBUTES
     The maximum payload size for received frames. Currently defaults to
     whatever Protocol::WebSocket defaults to.
 
+ max_fragments
+
+    The maximum number of fragments for received frames. Currently defaults
+    to whatever Protocol::WebSocket defaults to.
+
  env_proxy
 
     If you set true to this boolean attribute, it loads proxy settings from
@@ -235,6 +240,8 @@ AUTHOR
     Kivanc Yazan (KYZN)
 
     Yanick Champoux (YANICK)
+
+    Fayland Lam (FAYLAND)
 
 COPYRIGHT AND LICENSE
 

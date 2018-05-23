@@ -1,33 +1,37 @@
+Revision history for Perl module Pod::Perldoc::ToToc
 
-1.12 - Tue Dec 17 10:23:48 2013
+1.121 2018-05-21T13:34:52Z
+	* Clarify that it's the Artistic License 2.0
+
+1.12 - 2013-12-17
 	* Another MANIFEST fix
 
-1.11 - Tue Dec 17 10:20:11 2013
+1.11 - 2013-12-17
 	* Update MANIFEST to kick out MYMETA files
 
-1.10 - Wed Jun 12 22:19:15 2013
+1.10 - 2013-06-12
 	* Move everything into Git and update for Mastering Perl, 2e
 
-1.09 - Mon Jul 28 16:06:59 2008
-	* Fixing RT #37979, where a -> sequence in a head element 
+1.09 - 2008-07-28
+	* Fixing RT #37979, where a -> sequence in a head element
 	messed up everything
 	* The fix was to handle the indention and line ending as part
 	of the =head processing, not the etxt processing
 
-1.08 - Fri Jan 18 04:26:40 2008
+1.08 - 2008-01-18
 	* Distro cleanups. No big whoop.
 	* Requires 5.006 now.
 
-1.08 - Sat Dec 15 18:32:43 2007
+1.08 - 2007-12-15
 	* updated for the move from CVS to SVN
 	* No need to upgrade
 
-1.05 - Wed Sep 27 13:54:07 CDT 2006
+1.05 - 2006-09-27
 	* distro changes to zap Mac extended atrribute files
 
-1.04 - Tue Sep 26 16:36:24 CDT 2006
+1.04 - 2006-09-26
 	* updated description in the docs
 	* no code changes
 
-1.01 - Sat Sep  9 09:33:56 CDT 2006
+1.01 - 2006-09-09
 	* initial release

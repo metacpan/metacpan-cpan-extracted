@@ -2,13 +2,12 @@ package <: $module_name ~ "::Index::Admin" :>;
 
 use Pcore -class;
 
-has ext_app       => ( is => 'ro', isa => Str, default => 'Billing', init_arg => undef );
-has ext_app_title => ( is => 'ro', isa => Str, default => 'Billing', init_arg => undef );
-
 with qw[Pcore::App::Controller::Ext];
 
-has '+ext_default_locale' => ( default => 'ru' );
-has '+ext_resources' => ( default => sub { ['<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>'] } );
+has ext_app            => 'Ext';
+has ext_app_title      => l10n('App Title');
+has ext_default_locale => 'ru';
+has ext_resources      => sub { ['<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>'] };
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -19,7 +18,7 @@ has '+ext_resources' => ( default => sub { ['<script type="text/javascript" src=
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 27                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 31 does not match the package declaration       |
+## |    1 | 26                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 30 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

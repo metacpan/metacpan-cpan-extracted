@@ -13,6 +13,7 @@
 #include "spvm_var.h"
 #include "spvm_op.h"
 #include "spvm_type.h"
+#include "spvm_basic_type.h"
 
 void SPVM_yyerror_format(SPVM_COMPILER* compiler, const char* message_template, ...) {
   
@@ -27,7 +28,7 @@ void SPVM_yyerror_format(SPVM_COMPILER* compiler, const char* message_template, 
   
   // Messsage template with prefix
   int32_t message_template_with_prefix_length = prefix_length + message_template_length;
-  char* message_template_with_prefix = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, message_template_with_prefix_length);
+  char* message_template_with_prefix = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, message_template_with_prefix_length);
   strncpy(message_template_with_prefix, prefix, prefix_length);
   strncpy(message_template_with_prefix + prefix_length, message_template, message_template_length);
   message_template_with_prefix[message_template_with_prefix_length] = '\0';
@@ -61,7 +62,7 @@ void SPVM_yyerror_format(SPVM_COMPILER* compiler, const char* message_template, 
   }
   va_end(args);
   
-  char* message = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, message_length);
+  char* message = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, message_length);
   
   va_start(args, message_template);
   vsprintf(message, message_template_with_prefix, args);
@@ -119,27 +120,27 @@ void SPVM_yyprint (FILE *file, int type, YYSTYPE yylval) {
     case CONSTANT: {
       SPVM_CONSTANT* constant = yylval.opval->uv.constant;
       
-      switch(constant->type->id) {
-        case SPVM_TYPE_C_ID_BYTE:
+      switch(constant->type->basic_type->id) {
+        case SPVM_BASIC_TYPE_C_ID_BYTE:
           fprintf(file, "int %" PRId8, constant->value.byte_value);
           break;
-        case SPVM_TYPE_C_ID_SHORT:
+        case SPVM_BASIC_TYPE_C_ID_SHORT:
           fprintf(file, "int %" PRId16, constant->value.short_value);
           break;
-        case SPVM_TYPE_C_ID_INT:
+        case SPVM_BASIC_TYPE_C_ID_INT:
           fprintf(file, "int %" PRId32, constant->value.int_value);
           break;
-        case SPVM_TYPE_C_ID_LONG:
+        case SPVM_BASIC_TYPE_C_ID_LONG:
           fprintf(file, "long %" PRId64, constant->value.long_value);
           break;
-        case SPVM_TYPE_C_ID_FLOAT:
+        case SPVM_BASIC_TYPE_C_ID_FLOAT:
           fprintf(file, "float %f", constant->value.float_value);
           break;
-        case SPVM_TYPE_C_ID_DOUBLE:
+        case SPVM_BASIC_TYPE_C_ID_DOUBLE:
           fprintf(file, "double %f", constant->value.double_value);
           break;
-        case SPVM_TYPE_C_ID_BYTE_ARRAY:
-          fprintf(file, "byte[] %s", constant->value.string_value);
+        case SPVM_BASIC_TYPE_C_ID_STRING:
+          fprintf(file, "String %s", constant->value.string_value);
           break;
       }
     }

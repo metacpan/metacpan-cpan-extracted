@@ -1,9 +1,11 @@
 package Pcore::Core::L10N;
 
-use Pcore -export => {    #
+use Pcore -export;
+use Pcore::Util::Scalar qw[is_plain_hashref];
+
+our $EXPORT = {    #
     DEFAULT => [qw[l10n l10np l10n_ l10np_ $l10n]],
 };
-use Pcore::Util::Scalar qw[is_plain_hashref];
 
 our $PACKAGE_DOMAIN     = {};
 our $DEFAULT_LOCALE     = undef;
@@ -161,10 +163,10 @@ package Pcore::Core::L10N::_deferred {
       },
       fallback => undef;
 
-    has is_plural => ( is => 'ro', isa => Bool, required => 1 );
-    has msgid     => ( is => 'ro', isa => Str,  required => 1 );
-    has domain    => ( is => 'ro', isa => Str,  required => 1 );
-    has msgid_plural => ( is => 'ro', isa => Maybe [Str] );
+    has is_plural => ( isa => 'Bool', required => 1 );
+    has msgid     => ( isa => 'Str',  required => 1 );
+    has domain    => ( isa => 'Str',  required => 1 );
+    has msgid_plural => ( isa => 'Maybe [Str]' );
 }
 
 package Pcore::Core::L10N::_l10n {
@@ -202,12 +204,12 @@ package Pcore::Core::L10N::_l10n {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 103                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 105                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 13                   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 15                   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 93, 108, 138, 148,   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
-## |      | 193                  |                                                                                                                |
+## |    1 | 95, 110, 140, 150,   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |      | 195                  |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

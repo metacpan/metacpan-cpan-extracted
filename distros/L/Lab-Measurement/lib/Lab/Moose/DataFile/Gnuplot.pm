@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.642';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.651';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -201,25 +201,55 @@ sub log_comment {
 }
 
 
+sub _add_plot_handle {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        plot    => { isa => 'Lab::Moose::Plot' },
+        type    => { isa => enum( [qw/2d pm3d/] ) },
+        curves  => { isa => 'ArrayRef[HashRef]' },
+        refresh => { isa => 'Str' },
+    );
+
+    my $plots = $self->plots();
+
+    push @{$plots}, {%args};
+}
+
 sub _add_2d_plot {
     my ( $self, %args ) = validated_hash(
         \@_,
-        x                => { isa => 'Str' },
-        y                => { isa => 'Str' },
-        terminal         => { isa => 'Str', optional => 1 },
-        terminal_options => { isa => 'HashRef', optional => 1 },
-        plot_options     => { isa => 'HashRef', default => {} },
-        curve_options    => { isa => 'HashRef', default => {} },
-        refresh          => { isa => 'Str', default => 'point' },
+        x                => { isa => 'Str',               optional => 1 },
+        y                => { isa => 'Str',               optional => 1 },
+        curves           => { isa => 'ArrayRef[HashRef]', optional => 1 },
+        terminal         => { isa => 'Str',               optional => 1 },
+        terminal_options => { isa => 'HashRef',           optional => 1 },
+        plot_options     => { isa => 'HashRef',           default  => {} },
+        curve_options    => { isa => 'HashRef',           default  => {} },
+        refresh => { isa => 'Str', default => 'point' },
     );
 
-    my $x_column = delete $args{x};
-    my $y_column = delete $args{y};
-    my $refresh  = delete $args{refresh};
+    my $error_msg = "Provide either 'x/y' or 'curves' arguments";
+    my $x_column  = delete $args{x};
+    my $y_column  = delete $args{y};
+    my $curves    = delete $args{curves};
+
+    if ( defined $x_column ) {
+        if ( not defined $y_column ) {
+            croak $error_msg;
+        }
+        $curves = [ { x => $x_column, y => $y_column } ];
+    }
+    else {
+        if ( not defined $curves ) {
+            croak $error_msg;
+        }
+    }
+
+    my $refresh = delete $args{refresh};
 
     my %default_plot_options = (
-        xlabel => $x_column,
-        ylabel => $y_column,
+        xlabel => $curves->[0]->{x},
+        ylabel => $curves->[0]->{y},
         title  => $self->path(),
         grid   => 1,
     );
@@ -228,47 +258,61 @@ sub _add_2d_plot {
     my %default_curve_options = (
         with => 'points',
     );
+
     $args{curve_options}
         = { %default_curve_options, %{ $args{curve_options} } };
 
-    for my $column ( $x_column, $y_column ) {
-        if ( not any { $column eq $_ } @{ $self->columns } ) {
-            croak "column $column does not exist";
+    for my $curve ( @{$curves} ) {
+        for my $column ( $curve->{x}, $curve->{y} ) {
+            if ( not any { $column eq $_ } @{ $self->columns } ) {
+                croak "column $column does not exist";
+            }
         }
-    }
-
-    if ( $x_column eq $y_column ) {
-        croak "need different columns for x and y";
     }
 
     my $plot = Lab::Moose::Plot->new(%args);
 
-    my $plots = $self->plots();
-    push @{$plots}, {
+    $self->_add_plot_handle(
         plot    => $plot,
-        x       => $x_column,
-        y       => $y_column,
-        refresh => $refresh
-    };
+        type    => '2d',
+        curves  => $curves,
+        refresh => $refresh,
+    );
 }
 
 sub _add_pm3d_plot {
     my ( $self, %args ) = validated_hash(
         \@_,
-        x                => { isa => 'Str' },
-        y                => { isa => 'Str' },
-        z                => { isa => 'Str' },
-        terminal         => { isa => 'Str', optional => 1 },
-        terminal_options => { isa => 'HashRef', optional => 1 },
-        plot_options     => { isa => 'HashRef', default => {} },
-        curve_options    => { isa => 'HashRef', default => {} },
-        refresh          => { isa => 'Str', default => 'block' },
+        x                => { isa => 'Str',               optional => 1 },
+        y                => { isa => 'Str',               optional => 1 },
+        z                => { isa => 'Str',               optional => 1 },
+        curves           => { isa => 'ArrayRef[HashRef]', optional => 1 },
+        terminal         => { isa => 'Str',               optional => 1 },
+        terminal_options => { isa => 'HashRef',           optional => 1 },
+        plot_options     => { isa => 'HashRef',           default  => {} },
+        curve_options    => { isa => 'HashRef',           default  => {} },
+        refresh => { isa => 'Str', default => 'block' },
     );
 
-    my $x_column = delete $args{x};
-    my $y_column = delete $args{y};
-    my $z_column = delete $args{z};
-    my $refresh  = delete $args{refresh};
+    my $error_msg = "Provide either 'x/y/z' or 'curves' arguments";
+    my $x_column  = delete $args{x};
+    my $y_column  = delete $args{y};
+    my $z_column  = delete $args{z};
+    my $curves    = delete $args{curves};
+
+    if ( defined $x_column ) {
+        if ( not defined $y_column or not defined $z_column ) {
+            croak $error_msg;
+        }
+        $curves = [ { x => $x_column, y => $y_column, z => $z_column } ];
+    }
+    else {
+        if ( not defined $curves ) {
+            croak $error_msg;
+        }
+    }
+
+    my $refresh = delete $args{refresh};
 
     my %default_plot_options = (
         pm3d    => 'implicit map corners2color c1',
@@ -287,25 +331,20 @@ sub _add_pm3d_plot {
     $args{curve_options}
         = { %default_curve_options, %{ $args{curve_options} } };
 
-    for my $column ( $x_column, $y_column, $z_column ) {
-        if ( not any { $column eq $_ } @{ $self->columns } ) {
-            croak "column $column does not exist";
+    for my $curve ( @{$curves} ) {
+        for my $column ( $curve->{x}, $curve->{y}, $curve->{z} ) {
+            if ( not any { $column eq $_ } @{ $self->columns } ) {
+                croak "column $column does not exist";
+            }
         }
-    }
-
-    my %col_unequal_test
-        = map { $_ => 1 } ( $x_column, $y_column, $z_column );
-    if ( ( keys %col_unequal_test ) != 3 ) {
-        croak "columns $x_column, $y_column, $z_column must not be equal";
     }
 
     my $plot  = Lab::Moose::Plot->new(%args);
     my $plots = $self->plots();
     push @{$plots}, {
         plot    => $plot,
-        x       => $x_column,
-        y       => $y_column,
-        z       => $z_column,
+        type    => 'pm3d',
+        curves  => $curves,
         refresh => $refresh,
     };
 }
@@ -403,43 +442,70 @@ sub _refresh_plot {
         croak "no plot with name at index $index";
     }
 
+    my $type         = $plot->{type};
+    my @curves       = @{ $plot->{curves} };
     my $column_names = $self->columns();
-    my ( $x, $y, $z ) = ( $plot->{x}, $plot->{y}, $plot->{z} );
+    my $num_columns  = @{ $self->columns() };
 
-    my ($x_index) = grep { $column_names->[$_] eq $x } 0 .. $#{$column_names};
-
-    my ($y_index) = grep { $column_names->[$_] eq $y } 0 .. $#{$column_names};
-
-    my $num_columns = @{ $self->columns() };
-    if ( defined $z ) {
-        if ( $self->num_blocks < 2 ) {
-            return;
-        }
-        my ($z_index)
-            = grep { $column_names->[$_] eq $z } 0 .. $#{$column_names};
-        my @pixel_fields = read_gnuplot_format(
-            type        => 'maps',
-            fh          => $self->filehandle(),
-            num_columns => $num_columns,
-        );
-        $plot->{plot}->splot(
-            data => [ @pixel_fields[ $x_index, $y_index, $z_index ] ],
-        );
+    if ( $self->num_data_rows() < 2 ) {
+        return;
     }
-    else {
-        if ( $self->num_data_rows() < 2 ) {
-            return;
-        }
+
+    my @data;
+
+    if ( $type eq '2d' ) {
         my @columns = read_gnuplot_format(
             type        => 'columns',
             fh          => $self->filehandle(),
             num_columns => $num_columns
         );
 
-        $plot->{plot}->plot(
-            data => [ $columns[$x_index], $columns[$y_index] ],
-        );
+        for my $curve (@curves) {
+            my $x             = $curve->{x};
+            my $y             = $curve->{y};
+            my $curve_options = $curve->{curve_options} // {};
+            my ($x_index)
+                = grep { $column_names->[$_] eq $x } 0 .. $#{$column_names};
+            my ($y_index)
+                = grep { $column_names->[$_] eq $y } 0 .. $#{$column_names};
+            push @data,
+                ( $curve_options, $columns[$x_index], $columns[$y_index] );
+        }
+        $plot->{plot}->plot( data => \@data );
     }
+    elsif ( $type eq 'pm3d' ) {
+        if ( $self->num_blocks < 2 ) {
+            return;
+        }
+        my @pixel_fields = read_gnuplot_format(
+            type        => 'maps',
+            fh          => $self->filehandle(),
+            num_columns => $num_columns,
+        );
+        for my $curve (@curves) {
+            my $x             = $curve->{x};
+            my $y             = $curve->{y};
+            my $z             = $curve->{z};
+            my $curve_options = $curve->{curve_options} // {};
+            my ($x_index)
+                = grep { $column_names->[$_] eq $x } 0 .. $#{$column_names};
+            my ($y_index)
+                = grep { $column_names->[$_] eq $y } 0 .. $#{$column_names};
+            my ($z_index)
+                = grep { $column_names->[$_] eq $z } 0 .. $#{$column_names};
+
+            push @data,
+                (
+                $curve_options,
+                @pixel_fields[ $x_index, $y_index, $z_index ]
+                );
+        }
+        $plot->{plot}->splot( data => \@data );
+    }
+    else {
+        croak "unknown plot type '$type'";
+    }
+
 }
 
 
@@ -488,7 +554,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 SYNOPSIS
 
@@ -517,6 +583,14 @@ version 3.642
       y => 'temp',
       hard_copy => 'gnuplot-file-time-temp.png'
   );
+
+ # or both curves in one plot
+ $file->add_plot(
+     curves => [
+         {x => 'time', y => 'voltage'},
+         {x => 'time', y => 'temp', curve_options => {axes => 'x1y2'}}
+     ]
+ );
 
  $file->log(time => 1, voltage => 2, temp => 3);
 

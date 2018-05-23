@@ -1,5 +1,5 @@
 package QBit::WebInterface::Request;
-$QBit::WebInterface::Request::VERSION = '0.030';
+$QBit::WebInterface::Request::VERSION = '0.031';
 use qbit;
 
 use base qw(QBit::Class);
@@ -82,9 +82,7 @@ sub _parse_params {
 
     my @pairs;
 
-    if ($self->method eq 'GET' || $self->method eq 'HEAD') {
-        push(@pairs, map {[split('=', $_, 2)]} split('&', $self->query_string));
-    } elsif ($self->method eq 'POST') {
+    if ($self->method ne 'GET') {
         my ($buffer, $tmp, $size) = ('', '', 0);
         while (my $cnt = $self->_read_from_stdin(\$tmp, 1024 * 1024)) {
             $size += $cnt;
@@ -117,14 +115,14 @@ sub _parse_params {
                     push(@pairs, [$header{'name'}, \$content]);
                 }
             }
-        } elsif ($self->http_header('content-type') =~ /application\/json/) {
-            push(@pairs, ['', $buffer]);
-        } else {
+        } elsif ($self->http_header('content-type') =~ /^application\/x\-www\-form\-urlencoded/) {
             push(@pairs, map {[split('=', $_, 2)]} split('&', $buffer));
+        } else {
+            push(@pairs, ['', \$buffer]);
         }
-    } else {
-        throw Exception::Request::UnknownMethod gettext('Unknown method %s', $self->method);
     }
+
+    push(@pairs, map {[split('=', $_, 2)]} split('&', $self->query_string));
 
     foreach (@pairs) {
         my ($pname, $pvalue) = @$_;

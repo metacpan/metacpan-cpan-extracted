@@ -21,7 +21,7 @@ package MongoDB::Op::_Query;
 # Encapsulate a query operation; returns a MongoDB::QueryResult object
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use boolean;
 use Moo;
@@ -32,6 +32,7 @@ use MongoDB::QueryResult::Filtered;
 use MongoDB::_Constants;
 use MongoDB::_Protocol;
 use MongoDB::_Types qw(
+    Boolish
     Document
     CursorType
     IxHash
@@ -41,7 +42,6 @@ use Types::Standard qw(
     HashRef
     InstanceOf
     Maybe
-    Bool
     Num
     Str
 );
@@ -87,7 +87,7 @@ has modifiers => (
 
 has allowPartialResults => (
     is       => 'rw',
-    isa      => Bool,
+    isa      => Boolish,
     required => 1,
 );
 
@@ -129,7 +129,7 @@ has maxTimeMS => (
 
 has noCursorTimeout => (
     is       => 'rw',
-    isa      => Bool,
+    isa      => Boolish,
     required => 1,
 );
 

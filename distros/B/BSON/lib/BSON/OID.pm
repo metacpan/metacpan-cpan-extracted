@@ -6,7 +6,7 @@ package BSON::OID;
 # ABSTRACT: BSON type wrapper for Object IDs
 
 use version;
-our $VERSION = 'v1.4.0';
+our $VERSION = 'v1.6.1';
 
 use Carp;
 use Config;
@@ -51,7 +51,7 @@ use namespace::clean -except => 'meta';
     sub _packed_oid {
         my $time = defined $_[0] ? $_[0] : time;
         return pack(
-            'Na3na3', $time, $_host, $$ % 0xFFFF,
+            'Na3na3', $time, $_host, $$ & 0xFFFF,
             substr( pack( 'N', do { lock($_inc); $_inc++; $_inc %= 0xFFFFFF }), 1, 3)
         );
     }
@@ -219,8 +219,16 @@ sub TO_JSON {
 *to_string = \&hex;
 *value = \&hex;
 
+sub _cmp {
+    my ($left, $right, $swap) = @_;
+    ($left, $right) = ($right, $left) if $swap;
+    return "$left" cmp "$right";
+}
+
 use overload (
     '""'     => \&hex,
+    "<=>"    => \&_cmp,
+    "cmp"    => \&_cmp,
     fallback => 1,
 );
 
@@ -236,7 +244,7 @@ BSON::OID - BSON type wrapper for Object IDs
 
 =head1 VERSION
 
-version v1.4.0
+version v1.6.1
 
 =head1 SYNOPSIS
 
@@ -349,6 +357,11 @@ format, which represents it as a document as follows:
 The string operator is overloaded so any string operations will actually use
 the 24-character hex value of the OID.  Fallback overloading is enabled.
 
+Both numeric comparison (C<< <=> >>) and string comparison (C<cmp>) are
+overloaded to do string comparison of the 24-character hex value of the
+OID.  If used with a non-BSON::OID object, be sure to provide a
+24-character hex string or the results are undefined.
+
 =head1 THREADS
 
 This module is thread safe.
@@ -369,7 +382,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

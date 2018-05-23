@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.9 Fri, 18 May 2018 09:44:25 +0200 moocow
+	* added README.rpod to MANIFEST
+	* only include README.txt in "realclean" targets if README.rpod is present
+
 v1.0.8 Tue, 15 May 2018 08:55:00 +0200 moocow
 	* fixed some typos in POD documentation (RT ticket #125314)
 

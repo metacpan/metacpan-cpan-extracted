@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More tests => 8;
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 
 use BSON;

@@ -6,7 +6,7 @@ use utf8;
 use Carp;
 use Scalar::Util qw( reftype looks_like_number );
 use Text::CSV::Hashify;
-use Test::More tests => 26;
+use Test::More tests => 29;
 
 my ($obj, $source, $key, $k, $limit);
 
@@ -69,6 +69,34 @@ my ($obj, $source, $key, $k, $limit);
 
 {
     $source = "./t/data/names.csv";
+    $key = '';
+    local $@;
+    eval {
+        $obj = Text::CSV::Hashify->new( {
+            file    => $source,
+            key     => $key,
+        } );
+    };
+    like($@, qr/Value for 'key' must be non-empty string/,
+        "'new()' died due to non-Perl-true value assigned to 'key' element");
+}
+
+{
+    $source = "./t/data/names.csv";
+    $key = undef;
+    local $@;
+    eval {
+        $obj = Text::CSV::Hashify->new( {
+            file    => $source,
+            key     => $key,
+        } );
+    };
+    like($@, qr/Value for 'key' must be non-empty string/,
+        "'new()' died due to non-Perl-true value assigned to 'key' element");
+}
+
+{
+    $source = "./t/data/names.csv";
     $key = 'id';
     local $@;
     eval {
@@ -76,7 +104,6 @@ my ($obj, $source, $key, $k, $limit);
             file    => $source,
         } );
     };
-    $k = 'key';
     like($@, qr/^Argument to 'new\(\)' must have 'key' element unless 'format' element is 'aoh'/,
         "'new()' died to lack of 'key' element in hashref argument when 'format' element was not 'aoh'");
 }
@@ -155,8 +182,24 @@ my ($obj, $source, $key, $k, $limit);
         } );
     };
     $k = 'ssn';
-    like($@, qr/^/,
+    like($@,
+        qr/^Duplicate field '$k' observed in '$source'/,
         "'new()' died due to duplicate field '$k' in '$source'");
+}
+
+{
+    $source = "./t/data/names.csv";
+    $key = 'idi';
+    local $@;
+    eval {
+        $obj = Text::CSV::Hashify->new( {
+            file    => $source,
+            key     => $key,
+        } );
+    };
+    like($@,
+        qr/^Key '$key' not found in header row/,
+        "'new()' died because key '$key' was not found in header row");
 }
 
 {

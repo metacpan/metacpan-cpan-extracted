@@ -1,6 +1,22 @@
 package Pcore::Util::Text;
 
-use Pcore -ansi, -export, [
+use Pcore -ansi, -export;
+use Encode qw[];    ## no critic qw[Modules::ProhibitEvilModules]
+use Text::Xslate qw[mark_raw unmark_raw];
+
+our $ENC_CACHE = {};
+
+our %ESC_ANSI_CTRL = (
+    qq[\a] => q[\a],
+    qq[\b] => q[\b],
+    qq[\t] => q[\t],
+    qq[\n] => q[\n],
+    qq[\f] => q[\f],
+    qq[\r] => q[\r],
+    qq[\e] => q[\e],
+);
+
+our $EXPORT = [
     qw[
       cut
       cut_all
@@ -36,20 +52,6 @@ use Pcore -ansi, -export, [
       wrap
       ]
 ];
-use Encode qw[];    ## no critic qw[Modules::ProhibitEvilModules]
-use Text::Xslate qw[mark_raw unmark_raw];
-
-our $ENC_CACHE = {};
-
-our %ESC_ANSI_CTRL = (
-    qq[\a] => q[\a],
-    qq[\b] => q[\b],
-    qq[\t] => q[\t],
-    qq[\n] => q[\n],
-    qq[\f] => q[\f],
-    qq[\r] => q[\r],
-    qq[\e] => q[\e],
-);
 
 # TODO
 # - crunch - ?;
@@ -574,18 +576,18 @@ sub to_camel_case {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 203                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 205                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 227, 415             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 229, 417             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 293                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
+## |    3 | 295                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | NamingConventions::ProhibitAmbiguousNames                                                                      |
-## |      | 399, 400             | * Ambiguously named variable "left"                                                                            |
-## |      | 400                  | * Ambiguously named variable "right"                                                                           |
+## |      | 401, 402             | * Ambiguously named variable "left"                                                                            |
+## |      | 402                  | * Ambiguously named variable "right"                                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 45, 46, 47, 48, 49,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
-## |      | 50, 51               |                                                                                                                |
+## |    1 | 10, 11, 12, 13, 14,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |      | 15, 16               |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

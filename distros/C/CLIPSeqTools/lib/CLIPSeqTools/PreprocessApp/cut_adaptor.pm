@@ -29,7 +29,7 @@ Uses cutadapt to remove the adaptor which is usually ligated at the 3'end of rea
 =cut
 
 package CLIPSeqTools::PreprocessApp::cut_adaptor;
-$CLIPSeqTools::PreprocessApp::cut_adaptor::VERSION = '0.1.7';
+$CLIPSeqTools::PreprocessApp::cut_adaptor::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

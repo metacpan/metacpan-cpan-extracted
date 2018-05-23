@@ -10,7 +10,7 @@ use IO::Uncompress::Brotli;
 our @EXPORT = qw/bro/;
 our @EXPORT_OK = @EXPORT;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.004001';
 
 my %BROTLI_ENCODER_MODE = ( generic => 0, text => 1, font => 2 );
 sub mode {
@@ -149,7 +149,7 @@ clean up of the overall project were contributed by:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Marius Gavrilescu
+Copyright (C) 2015-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,

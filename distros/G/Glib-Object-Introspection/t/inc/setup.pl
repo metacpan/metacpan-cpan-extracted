@@ -34,7 +34,10 @@ Glib::Object::Introspection->setup(
   basename => 'Regress',
   version => '1.0',
   package => 'Regress',
-  search_path => 'build');
+  search_path => 'build',
+  use_generic_signal_marshaller_for => [
+    ['Regress::TestObj', 'sig-with-array-len-prop'],
+  ]);
 
 Glib::Object::Introspection->setup(
   basename => 'GIMarshallingTests',

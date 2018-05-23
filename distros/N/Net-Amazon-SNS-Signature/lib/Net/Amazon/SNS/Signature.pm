@@ -1,5 +1,5 @@
 package Net::Amazon::SNS::Signature;
-$Net::Amazon::SNS::Signature::VERSION = '0.006';
+$Net::Amazon::SNS::Signature::VERSION = '0.007';
 use strict; use warnings;
 
 use Carp;

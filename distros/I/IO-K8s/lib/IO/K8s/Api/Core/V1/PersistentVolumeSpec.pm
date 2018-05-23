@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeSpec;
   use Moose;
+  use IO::K8s;
 
   has 'accessModes' => (is => 'ro', isa => 'ArrayRef[Str]'  );
   has 'awsElasticBlockStore' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::AWSElasticBlockStoreVolumeSource'  );
@@ -31,4 +32,6 @@ package IO::K8s::Api::Core::V1::PersistentVolumeSpec;
   has 'storageos' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::StorageOSPersistentVolumeSource'  );
   has 'volumeMode' => (is => 'ro', isa => 'Str'  );
   has 'vsphereVolume' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::VsphereVirtualDiskVolumeSource'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

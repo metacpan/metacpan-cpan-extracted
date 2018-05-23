@@ -14,6 +14,7 @@ BEGIN {
 use Config;
 use Test::More tests => 45;
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 
 use BSON;

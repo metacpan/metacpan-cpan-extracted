@@ -32,7 +32,7 @@ Removes N nucleotides from the start and/or end of each sequence.
 =cut
 
 package CLIPSeqTools::PreprocessApp::trim_fastq;
-$CLIPSeqTools::PreprocessApp::trim_fastq::VERSION = '0.1.7';
+$CLIPSeqTools::PreprocessApp::trim_fastq::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

@@ -42,6 +42,8 @@ package Test::Pod;
 
 use strict;
 
+=encoding utf8
+
 =head1 NAME
 
 Test::Pod - check for POD errors in files

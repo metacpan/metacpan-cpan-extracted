@@ -34,7 +34,7 @@ Create scatterplot for the given column for two tables.
 =cut
 
 package CLIPSeqTools::PlotApp::scatterplot;
-$CLIPSeqTools::PlotApp::scatterplot::VERSION = '0.1.7';
+$CLIPSeqTools::PlotApp::scatterplot::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

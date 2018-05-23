@@ -1,5 +1,16 @@
 Revision history for Perl module File::pushd
 
+1.016     2018-05-20 13:31:17-04:00 America/New_York
+
+    - No changes from 1.015-TRIAL
+
+1.015     2018-05-13 19:26:26-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Directories created with tempd will only be cleaned up by the
+      PID that created them, not by forked children.
+
 1.014     2016-10-09 23:26:19-04:00 America/New_York
 
     - No changes from 1.013-TRIAL.

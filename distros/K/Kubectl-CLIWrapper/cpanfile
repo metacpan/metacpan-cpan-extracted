@@ -1,3 +1,4 @@
+requires 'perl', '5.014';
 requires 'Moose';
 requires 'JSON::MaybeXS';
 requires 'IPC::Open3';

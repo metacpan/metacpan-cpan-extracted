@@ -55,13 +55,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.139'
+    version: '0.141'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.139'
+    version: '0.141'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.139'
+    version: '0.141'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -167,7 +167,7 @@ requires:
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
   Dist::Zilla::Plugin::UseUnsafeInc: '0'
-  Dist::Zilla::PluginBundle::Git::VersionManager: '0.001'
+  Dist::Zilla::PluginBundle::Git::VersionManager: '0.007'
   Dist::Zilla::Role::MintingProfile: '5.047'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
@@ -207,7 +207,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.139'
+version: '0.141'
 x_Dist_Zilla:
   perl:
     version: '5.027011'
@@ -355,6 +355,7 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - INSTALL
             - LICENCE
+            - META.json
             - README.pod
           exclude_match: []
           follow_symlinks: 0
@@ -975,7 +976,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.139
+          tag: v0.141
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

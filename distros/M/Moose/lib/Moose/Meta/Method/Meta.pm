@@ -1,5 +1,5 @@
 package Moose::Meta::Method::Meta;
-our $VERSION = '2.2010';
+our $VERSION = '2.2011';
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ Moose::Meta::Method::Meta - A Moose Method metaclass for C<meta> methods
 
 =head1 VERSION
 
-version 2.2010
+version 2.2011
 
 =head1 DESCRIPTION
 

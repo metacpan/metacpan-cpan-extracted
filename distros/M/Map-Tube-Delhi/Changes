@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Delhi
 
+0.72  Sat May 19 05:10:00 2018
+      - Fixed typo in code in the pod.
+
+0.71  Thu May 17 13:10:00 2018
+      - Tidied up code in the pod.
+
 0.70  Mon May 14 16:20:00 2018
       - Built dist with latest Dist::Zilla::Plugin::Test::Map::Tube.
 

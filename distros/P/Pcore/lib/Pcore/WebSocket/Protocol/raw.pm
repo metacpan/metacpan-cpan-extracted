@@ -4,8 +4,8 @@ use Pcore -class;
 
 has protocol => ( is => 'ro', isa => Str, default => q[], init_arg => undef );
 
-has on_text   => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );
-has on_binary => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );
+has on_text   => ( isa => Maybe [CodeRef] );
+has on_binary => ( isa => Maybe [CodeRef] );
 
 with qw[Pcore::WebSocket::Handle];
 

@@ -22,13 +22,13 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                      'IO::Socket::IP' => '0.32',
-                                      'IO::Socket::SSL' => '1.42',
-                                      'Mozilla::CA' => '20130114',
-                                      'Net::SSLeay' => '1.49'
-                                    },
+                                        'IO::Socket::IP' => '0.32',
+                                        'IO::Socket::SSL' => '1.42',
+                                        'Mozilla::CA' => '20130114',
+                                        'Net::SSLeay' => '1.49'
+                                      },
                       'requires' => {
-                                      'Authen::SCRAM::Client' => '0.003',
+                                      'Authen::SCRAM::Client' => '0.009',
                                       'BSON::Decimal128' => '0',
                                       'BSON::Types' => '0',
                                       'Carp' => '0',
@@ -68,16 +68,16 @@ do { my $x = {
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                    'IO::Socket::SSL' => '1.56'
-                                  }
+                                      'IO::Socket::SSL' => '1.56'
+                                    }
                     },
        'test' => {
                    'recommends' => {
-                                   'CPAN::Meta' => '2.120900',
-                                   'DateTime::Tiny' => '1',
-                                   'Test::Harness' => '3.31',
-                                   'Time::Moment' => '0.22'
-                                 },
+                                     'CPAN::Meta' => '2.120900',
+                                     'DateTime::Tiny' => '1',
+                                     'Test::Harness' => '3.31',
+                                     'Time::Moment' => '0.22'
+                                   },
                    'requires' => {
                                    'Data::Dumper' => '0',
                                    'ExtUtils::MakeMaker' => '0',

@@ -1,3 +1,23 @@
+* v3.02 - 19th May 2018
+
+No changes from v3.01_02
+
+* v3.01_02 - 8th May 2018
+
+BUG FIX: Uploads on MSWin32 were not correctly converted if the first
+    character of a buffer was LF. Changed regex to negative lookarounds.
+
+* v3.01_01 - 4th May 2018
+
+BUG FIX: Uploads could fail if n * buffer_size fell inside the boundary
+    marker. Thanks pru-mike (PR 1). (possibly fixes issue 116670)
+
+BUG FIX: Changing the boundary marker for second and subsequent uploads
+    causes errors. Thanks pru-mike (PR 1). (issue 125130)
+
+Test suite enhanced: now with Test::Vars (0.12) and fix of tmp filename
+    race condition.
+
 * v3.01 - 10th December 2015
 
 No changes from v3.00_02

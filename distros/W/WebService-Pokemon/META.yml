@@ -31,16 +31,16 @@ requires:
   Mouse: '0'
   Types::Standard: '0'
   Web::API: '0'
-  strict: '0'
+  namespace::clean: '0'
+  strictures: '0'
   utf8: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/kianmeng/webservice-pokemon/issues
   homepage: https://github.com/kianmeng/webservice-pokemon
   repository: https://github.com/kianmeng/webservice-pokemon.git
-version: '0.04'
+version: '0.06'
 x_contributors:
-  - 'Kian-Meng, Ang <kianmeng@users.noreply.github.com>'
+  - 'Kian Meng Ang <kianmeng@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

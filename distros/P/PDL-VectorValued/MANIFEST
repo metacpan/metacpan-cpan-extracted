@@ -1,6 +1,7 @@
 ChangeLog
 MANIFEST
 MANIFEST.SKIP
+README.rpod
 README.txt
 Makefile.PL
 pdlmaker.plm

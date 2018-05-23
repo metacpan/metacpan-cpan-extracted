@@ -2,7 +2,7 @@ NAME
     File::pushd - change directory temporarily for a limited scope
 
 VERSION
-    version 1.014
+    version 1.016
 
 SYNOPSIS
      use File::pushd;
@@ -148,8 +148,10 @@ CONTRIBUTORS
 
     *   Olivier Mengué <dolmen@cpan.org>
 
+    *   Shoichi Kaji <skaji@cpan.org>
+
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2016 by David A Golden.
+    This software is Copyright (c) 2018 by David A Golden.
 
     This is free software, licensed under:
 

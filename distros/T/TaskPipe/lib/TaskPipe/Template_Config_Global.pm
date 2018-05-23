@@ -19,8 +19,12 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
     },
     'TaskPipe::PathSettings::Project',
     'TaskPipe::SchemaManager::Settings_Global',
-    'TaskPipe::JobManager::Settings',
-    'TaskPipe::TorManager::Settings',
+    'TaskPipe::JobManager::Settings', {
+        module => 'TaskPipe::TorManager::Settings',
+        exclude => [
+            'protocols'
+        ]
+    },
     'TaskPipe::OpenProxyManager::IPList_PremProxy::Settings',
     'TaskPipe::OpenProxyManager::IPList_Xroxy::Settings',
     'TaskPipe::OpenProxyManager::IPList_ProxyNova::Settings'

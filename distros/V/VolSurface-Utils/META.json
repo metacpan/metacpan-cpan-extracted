@@ -41,10 +41,9 @@
          "requires" : {
             "Carp" : "0",
             "File::Spec" : "0",
-            "JSON" : "0",
-            "List::MoreUtils" : "0",
-            "Math::Business::BlackScholes::Binaries" : "0",
+            "List::Util" : "0",
             "Math::Business::BlackScholes::Binaries::Greeks::Delta" : "0",
+            "Math::Business::BlackScholesMerton" : "0",
             "Math::CDF" : "0",
             "POSIX" : "0",
             "base" : "0",
@@ -81,7 +80,7 @@
          "web" : "https://github.com/binary-com/perl-VolSurface-Utils"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

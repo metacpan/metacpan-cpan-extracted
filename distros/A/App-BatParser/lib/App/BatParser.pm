@@ -1,31 +1,14 @@
-use strict;
-use warnings;
-
 package App::BatParser;
+
+use utf8;
 
 use Regexp::Grammars;
 use Moose;
 use namespace::autoclean;
 
-=encoding utf-8
+our $VERSION = '0.005';    # VERSION
 
-=head1 NAME
-
-App::BatParser - Parse DOS .bat and .cmd files
-
-=head1 SYNOPSYS
-
-    use App::BatParser;
-    use Path::Tiny;
-    use Data::Dumper;
-
-    my $parser = App::BatParser->new;
-    my $bat_string = Path::Tiny::path('t/cmd/simple.cmd')->slurp;
-
-    say Dumper($parser->parse($bat_string));
-    
-
-=cut
+# ABSTRACT: Parse DOS .bat and .cmd files
 
 has 'grammar' => (
     is      => 'ro',
@@ -82,22 +65,6 @@ has 'grammar' => (
     }
 );
 
-=head1 METHODS
-
-=cut
-
-=head2 parse
-
-Parses the text as a bat/cmd file
-
-=head3 Returns
-
-Hash representation of file on success, empty list on fail
-
-TODO: Exception on fail
-
-=cut
-
 sub parse {
     my $self = shift;
     my $text = shift;
@@ -124,3 +91,63 @@ sub parse {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+App::BatParser - Parse DOS .bat and .cmd files
+
+=head1 VERSION
+
+version 0.005
+
+=head1 DESCRIPTION
+
+Parse DOS .bat and .cmd files
+
+=head1 SYNOPSYS
+
+    use App::BatParser;
+    use Path::Tiny;
+    use Data::Dumper;
+
+    my $parser = App::BatParser->new;
+    my $bat_string = Path::Tiny::path('t/cmd/simple.cmd')->slurp;
+
+    say Dumper($parser->parse($bat_string));
+
+=head1 METHODS
+
+=head2 parse
+
+Parses the text as a bat/cmd file
+
+=head3 Returns
+
+Hash representation of file on success, empty list on fail
+
+Exception on fail
+
+=head1 AUTHOR
+
+Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Pablo Rodríguez González.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 CONTRIBUTOR
+
+=for stopwords eva.dominguez
+
+eva.dominguez <eva.dominguez@meteologica.com>
+
+=cut

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.138-2-gd5a55c2
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.140-2-g352c56d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.139';
+our $VERSION = '0.141';
 
 use Moose;
 with
@@ -433,7 +433,9 @@ sub configure
 
     # plugins to do with calculating, munging, incrementing versions
     $self->add_bundle('@Git::VersionManager' => {
-        # no minimum version needed yet
+        # Take care! runtime-requires prereqs needs to be updated in dist.ini when this is changed.
+        ':version' => '0.007',
+
         'RewriteVersion::Transitional.global' => 1,
         'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
         'RewriteVersion::Transitional.version_regexp' => '^v([\d._]+)(-TRIAL)?$',
@@ -612,7 +614,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.139
+version 0.141
 
 =head1 SYNOPSIS
 

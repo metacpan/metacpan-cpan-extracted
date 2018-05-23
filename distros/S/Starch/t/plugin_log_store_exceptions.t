@@ -35,7 +35,7 @@ my $die_store = $die_starch->store();
 
 foreach my $method (qw( set get remove )) {
 
-    $log_store->$method();
+    $log_store->$method( 1234, [] );
     my $uc_method = uc( $method );
 
     $log->category_contains_ok(
@@ -46,7 +46,7 @@ foreach my $method (qw( set get remove )) {
     log_empty_ok();
 
     like(
-        exception { $die_store->$method() },
+        exception { $die_store->$method( 1234, [] ) },
         qr{$uc_method FAIL},
         "$method exception thrown",
     );

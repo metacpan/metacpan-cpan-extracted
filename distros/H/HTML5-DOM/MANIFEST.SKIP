@@ -1,0 +1,16 @@
+#!install_default
+
+third_party/.*?\.pm$
+third_party/.*?\.pl$
+\.git
+third_party/modest/utils/
+third_party/modest/test/
+third_party/modest/examples/
+third_party/modest/devel/
+Makefile$
+MYMETA
+MANIFEST.bak
+.gz
+.tar
+.md
+

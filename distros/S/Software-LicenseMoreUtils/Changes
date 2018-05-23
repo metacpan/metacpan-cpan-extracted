@@ -1,0 +1,8 @@
+0.002 2018-05-21
+
+  * fix tests for non-Debian distributions. Tx Slaven (gh #1)
+  * avoid undef warning when distro file does not exist
+
+0.001 2018-05-20
+
+  First version

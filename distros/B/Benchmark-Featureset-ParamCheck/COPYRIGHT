@@ -6,7 +6,6 @@ Source: https://metacpan.org/release/Benchmark-Featureset-ParamCheck
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/Benchmark/Featureset/ParamCheck/Base.pm
  lib/Benchmark/Featureset/ParamCheck/Base/DataValidator.pm
@@ -29,12 +28,10 @@ Files: Changes
  lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
  lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
  lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
-Copyright: Copyright 2017 Toby Inkster.
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- lib/Benchmark/Featureset/ParamCheck.pm
- t/01-named-correctness.t
+Files: t/01-named-correctness.t
  t/02-named-benchmark.t
  t/03-positional-correctness.t
  t/04-positional-benchmark.t
@@ -47,6 +44,11 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: README
+ lib/Benchmark/Featureset/ParamCheck.pm
+Copyright: This software is copyright (c) 2017, 2018 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
 Copyright: Unknown
@@ -56,15 +58,19 @@ Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

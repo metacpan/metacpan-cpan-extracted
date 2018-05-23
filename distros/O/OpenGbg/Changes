@@ -1,6 +1,17 @@
 Revision history for OpenGbg
 
-0.1403 2018-03-14 18:26:16 UTC
+0.1404 2018-05-19 14:44:40 UTC
+ [API Changes]
+ - Updated ::TrafficCamera to API version 0.2, which adds lat/long
+   information to the camera devices.
+
+ [Stats & Dependency Changes]
+ - 23 files changed, 41 insertions(+), 25 deletions(-)
+ - (dev req) ~ Dist::Zilla 6.010 --> 6.012
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.041 --> 2.043
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0320 --> 0.0321
+
+0.1403 2018-03-14T18:26:16Z UTC
  [New Features]
  - Added a couple of shortcut methods in the traffic camera service.
 

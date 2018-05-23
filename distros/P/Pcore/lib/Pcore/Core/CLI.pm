@@ -62,7 +62,7 @@ sub _build_cmd ($self) {
 
             $class = P->class->load($class);
 
-            if ( $class->can('does') && $class->does('Pcore::Core::CLI::Cmd') ) {
+            if ( $class->isa('Pcore::Core::CLI::Cmd') ) {
                 push $cmd->@*, $class;
             }
         }
@@ -619,7 +619,7 @@ Pcore::Core::CLI
     }
 
     # CLI command class
-    with qw[Pcore::Core::CLI::Cmd];
+    extends qw[Pcore::Core::CLI::Cmd];
 
     sub CLI ($self) {
         return {
@@ -641,7 +641,7 @@ Pcore::Core::CLI
 
 =head1 DESCRIPTION
 
-CLI class can be either a CLI "commands hub" or "command". Command hub - only keep other CLI commands together, it doesn't do anything else. CLI command must be a consumer of Pcore::Core::CLI::Cmd role.
+CLI class can be either a CLI "commands hub" or "command". Command hub - only keep other CLI commands together, it doesn't do anything else. CLI command must be a instance of Pcore::Core::CLI::Cmd role.
 
 =head1 METHODS
 

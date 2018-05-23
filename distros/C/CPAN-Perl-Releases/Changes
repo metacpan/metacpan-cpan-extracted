@@ -1,6 +1,16 @@
 ==================================================
-Changes from 2013-04-21 00:00:00 +0000 to present.
+Changes from 2013-05-22 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 3.58 at 2018-05-21 13:21:57 +0000
+-----------------------------------------
+
+  Change: 9c2d1a38ad555ec8f3bf1afacb5da13ccd8387d2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-05-21 14:21:57 +0000
+
+    Updated for v5.28.0-RC1 
 
 -----------------------------------------
 version 3.56 at 2018-04-20 15:42:01 +0000
@@ -1253,72 +1263,6 @@ version 1.24 at 2013-06-21 07:01:12 +0000
     add perl_versions function returning list of perl versions known to
     the module 
 
------------------------------------------
-version 1.22 at 2013-05-20 13:25:00 +0000
------------------------------------------
-
-  Change: ed957be9c3111676ffb25194a8531928032b2746
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-20 14:25:00 +0000
-
-    Fixing distribution 
-
-  Change: 6582aa42e3fe2769ed1588c75f1f3ee9362593f0
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-20 14:24:10 +0000
-
-    Updated for v5.19.0 
-
------------------------------------------
-version 1.20 at 2013-05-18 13:57:11 +0000
------------------------------------------
-
-  Change: 031e41245d08267e244c8446e8085d695e8956c7
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-18 14:57:11 +0000
-
-    Updated for v5.18.0 \o/ 
-
------------------------------------------
-version 1.16 at 2013-05-16 06:55:41 +0000
------------------------------------------
-
-  Change: bfc7cb272a3854f5a61aed2f40591e74f01d5f29
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-16 07:55:41 +0000
-
-    Updated for v5.18.0-RC4 
-
------------------------------------------
-version 1.14 at 2013-05-13 21:59:54 +0000
------------------------------------------
-
-  Change: 3882ae87524c944ef1c63ead804c583e9165a43b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-13 22:59:54 +0000
-
-    Updated for v5.18.0-RC3 
-
------------------------------------------
-version 1.12 at 2013-05-13 07:11:33 +0000
------------------------------------------
-
-  Change: 625b20e9dee61f43d054f0e798399611c70f1bce
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-13 08:11:33 +0000
-
-    Updated for v5.18.0-RC1/RC2 
-
------------------------------------------
-version 1.10 at 2013-04-21 08:23:41 +0000
------------------------------------------
-
-  Change: d369eb6b8a337a0365e74f79af7c1b7cca5a0f3e
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-21 09:23:41 +0000
-
-    Updated for v5.17.11 
-
 =================================================
-Plus 53 releases after 2013-04-21 00:00:00 +0000.
+Plus 60 releases after 2013-05-22 00:00:00 +0000.
 =================================================

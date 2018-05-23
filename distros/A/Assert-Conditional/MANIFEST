@@ -1,16 +1,21 @@
 Changes
-lib/Assert/Conditional.pm
-lib/Assert/Conditional/Utils.pm
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+Makefile.PL
 README
-t/00-load.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
 demo/all-tests
 demo/test-assert
+etc/generate-exporter-pod 
+lib/Assert/Conditional.pm
+lib/Assert/Conditional/Utils.pm
+t/00-load.t
 t/asserts.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/lib/Alien/Snatch.pm
+t/lib/Other/ProbeRapper.pm
+t/lib/Some/TestRapper.pm
+t/manifest.t
+t/moose.t
+t/pod-coverage.t
+t/pod.t

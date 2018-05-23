@@ -1,5 +1,11 @@
 Revision history for DBM::Deep (ordered by revision number).
 
+2.0016 May 20 15:50:00 2018 PDT
+    - Fix mistake in the previous release that prevented indexing.
+
+2.0015 May 20 14:45:00 2018 PDT
+    - Fix for tests failing on 5.28 (Thanks, Slaven!)
+
 2.0014 Jul 27 22:15:00 2017 EDT
     - Fix for tests failing on 5.26 (Thanks, DrHyde!)
 

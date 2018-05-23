@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11280;
+use Test::More tests => 14268;
 
 use lib './lib';
 
@@ -89,7 +89,7 @@ is ($res->[0], 'text/plain', 'Duplicate fields have correct upload types');
 my @sizes = qw/0 896 1656/;
 for my $i (0..2) {
 	my $file = "$uploaddir/$form->{$files[$i]}";
-	ok (-e "$file", "Uploaded file exists ($i)") or warn "Name = '$file'\n" . $cgi->get_error_message;
+	ok (-e $file, "Uploaded file exists ($i)") or warn "Name = '$file'\n" . $cgi->get_error_message;
 	is ((stat($file))[7], $sizes[$i], "File size check ($i)") or
 		warn_tail ($file);
 }
@@ -239,7 +239,7 @@ for my $buf_size (256 .. 1500) {
 
 	for my $i (0..3) {
 		my $file = "$uploaddir/$form->{$files[$i]}";
-		ok (-e "$file", "Uploaded file exists ($i - buffer size $buf_size") or
+		ok (-e $file, "Uploaded file exists ($i - buffer size $buf_size") or
 			warn "Name = '$file'\n" . $cgi->get_error_message;
 		is ((stat($file))[7], $sizes[$i],
 			"File size check ($i - buffer size $buf_size)") or
@@ -255,14 +255,6 @@ is ($cgi->deny_uploads (1), 1, 'Set deny_uploads true');
 ($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);
 is ($cgi->is_error, 1, "Upload successfully denied");
 
-#$datafile = 't/post_text.txt';
-#$ENV{CONTENT_LENGTH}  = (stat ($datafile))[7];
-#($cgi, $form) = post_data ($datafile);
-#is ($cgi->is_error, 1, 'Parsing bad data with POST');
-#warn $cgi->get_error_message if $cgi->is_error;
-##use Data::Dumper;
-##warn Dumper ($form);
-
 # Upload but no files
 $datafile = 't/upload_no_files.txt';
 $ENV{CONTENT_LENGTH}  = (stat ($datafile))[7];
@@ -275,15 +267,45 @@ $ENV{CONTENT_LENGTH}  = (stat ($datafile))[7];
 ($cgi, $form) = post_data ($datafile, $uploaddir);
 is ($cgi->is_error, 0, 'Parsing upload data with no trailling files');
 
+
 $datafile = 't/large_file_upload.txt';
 $ENV{CONTENT_LENGTH}  = (stat ($datafile))[7];
-$cgi->set_buffer_size (256);
-($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);
-is ($cgi->is_error, 0, 'Parsing upload data with a large file');
+@sizes = (1027);
+@sizes = (1049) if $^O eq 'MSWin32';
+for my $buf_size (256 .. 1250) {
+	$cgi->set_buffer_size ($buf_size);
+	($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);
+	is ($cgi->is_error, 0,
+		"Parsing upload data with a large file - buffer size $buf_size");
+	my $file = "$uploaddir/$form->{plain_txt}";
+	ok (-e $file, "Uploaded file exists ($file - buffer size $buf_size") or
+	            warn "Name = '$file'\n" . $cgi->get_error_message;
+	is ((stat($file))[7], $sizes[0],
+		"File size check ($file - buffer size $buf_size)") or
+		warn_tail ($file);
+	unlink ($file);
+}
 
 $ENV{CONTENT_LENGTH} += 500; 
 ($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);
 is ($cgi->is_error, 1, 'Parsing upload data with over large content length');
+
+{
+	$datafile = 't/other_boundary.txt';
+	local $ENV{CONTENT_TYPE}    = q#multipart/form-data; boundary=otherstring#;
+	($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);
+	$ENV{CONTENT_LENGTH} = (stat ($datafile))[7];
+	($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);
+	is ($cgi->is_error, 0, 'Parsing upload data with different boundary');
+	ok (exists $form->{other_file}, 'Parsing of different boundary complete');
+	my $file = "$uploaddir/$form->{other_file}";
+	ok (-e $file, "Uploaded file exists for different boundary ($file)") or
+	            warn "Name = '$file'\n" . $cgi->get_error_message;
+	is ((stat($file))[7], $sizes[0],
+		"File size check for different boundary ($file)") or
+		warn_tail ($file);
+	unlink ($file);
+}
 
 # Use Test::Trap where available to test lack of wanrings
 SKIP: {
@@ -329,6 +351,6 @@ sub warn_tail {
 	close $file;
 	my $lastn = substr ($contents, 0 - $n);
 	foreach (split (//, $lastn, $n)) {
-		print $n-- . " chars from the end: " . ord ($_) . "\n";
+		diag ($n-- . " chars from the end: " . ord ($_) . "\n");
 	}
 }

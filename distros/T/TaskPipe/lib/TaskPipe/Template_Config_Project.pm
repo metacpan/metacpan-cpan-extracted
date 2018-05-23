@@ -17,8 +17,12 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
     'TaskPipe::Task::TestSettings',
     'TaskPipe::SchemaManager::Settings_Project',
     'TaskPipe::LoggerManager::Settings',
-    'TaskPipe::UserAgentManager::Settings',
-    'TaskPipe::UserAgentManager::UserAgentHandler::Settings',
+    'TaskPipe::UserAgentManager::Settings', {
+        module => 'TaskPipe::UserAgentManager::UserAgentHandler::Settings',
+        exclude => [
+            'request_methods'
+        ]
+    },
     'TaskPipe::UserAgentManager::CheckIPSettings',
     'TaskPipe::Task_Scrape::Settings',
     'TaskPipe::Plan::Settings'

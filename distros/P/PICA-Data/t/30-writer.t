@@ -50,7 +50,7 @@ note 'PICA::Writer::Plain';
 PLAIN
 
     my $out = do { local (@ARGV,$/)=$filename; <> };
-    is $out, $PLAIN, 'Plain writer'; 
+    is $out, $PLAIN, 'Plain writer';
 
     (undef, $filename) = tempfile(OPEN => 0);
     pica_writer('plain', fh => $filename);
@@ -81,7 +81,20 @@ note 'PICA::Writer::XML';
 
 {
     my ($fh, $filename) = tempfile();
-    my $writer = PICA::Writer::XML->new( fh => $fh );
+    my $schema = {
+        fields => {
+            '003@' => {
+                label => 'PPN',
+                url => 'http://example.org/'
+            },
+            '028C/01' => {
+                subfields => {
+                    d => { pica3 => ', ' }
+                }
+            }
+        }
+    };
+    my $writer = PICA::Writer::XML->new( fh => $fh, schema => $schema );
 
     foreach my $record (@pica_records) {
         $writer->write($record);
@@ -96,7 +109,7 @@ note 'PICA::Writer::XML';
 
 <collection xmlns="info:srw/schema/5/picaXML-v1.0">
   <record>
-    <datafield tag="003@">
+    <datafield tag="003@" label="PPN" url="http://example.org/">
       <subfield code="0">1041318383</subfield>
     </datafield>
     <datafield tag="021A">
@@ -105,7 +118,7 @@ note 'PICA::Writer::XML';
   </record>
   <record>
     <datafield tag="028C" occurrence="01">
-      <subfield code="d">Emma</subfield>
+      <subfield code="d" pica3=", ">Emma</subfield>
       <subfield code="a">Goldman</subfield>
     </datafield>
   </record>
@@ -116,9 +129,9 @@ XML
 }
 
 {
-    { 
+    {
       package MyStringWriter;
-      sub print { $_[0]->{out} .= $_[1] } 
+      sub print { $_[0]->{out} .= $_[1] }
     }
 
     my $string = bless { }, 'MyStringWriter';
@@ -167,7 +180,7 @@ note 'PICA::Writer::Generic';
 
 PLUS
 
-    is $out, $PLUS, 'Generic Writer'; 
+    is $out, $PLUS, 'Generic Writer';
 }
 
 {

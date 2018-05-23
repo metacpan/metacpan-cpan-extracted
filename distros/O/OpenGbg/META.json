@@ -4,7 +4,7 @@
       "Erik Carlsson <info@code301.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Iller version 0.1408, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Iller version 0.1408, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "Badge::Depot::Plugin::Kwalitee" : "0",
             "Badge::Depot::Plugin::Perl" : "0",
             "Badge::Depot::Plugin::Travis" : "0",
-            "Dist::Zilla" : "6.010",
+            "Dist::Zilla" : "6.012",
             "Dist::Zilla::Plugin::Authority" : "1.009",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.008",
             "Dist::Zilla::Plugin::ChangeStats::Dependencies::Git" : "0.0200",
@@ -47,7 +47,7 @@
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.170880",
             "Dist::Zilla::Plugin::DistIller::MetaGeneratedBy" : "0",
             "Dist::Zilla::Plugin::ExecDir" : "0",
-            "Dist::Zilla::Plugin::Git" : "2.041",
+            "Dist::Zilla::Plugin::Git" : "2.043",
             "Dist::Zilla::Plugin::Git::Check" : "0",
             "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0.014",
             "Dist::Zilla::Plugin::Git::Commit" : "0",
@@ -110,7 +110,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0320"
+            "Dist::Iller::Config::Author::CSSON" : "0.0321"
          }
       },
       "runtime" : {
@@ -151,95 +151,95 @@
    "provides" : {
       "OpenGbg" : {
          "file" : "lib/OpenGbg.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Elk" : {
          "file" : "lib/OpenGbg/Elk.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Exceptions" : {
          "file" : "lib/OpenGbg/Exceptions.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::AirQuality" : {
          "file" : "lib/OpenGbg/Service/AirQuality.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::AirQuality::GetLatestMeasurement" : {
          "file" : "lib/OpenGbg/Service/AirQuality/GetLatestMeasurement.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::AirQuality::GetMeasurements" : {
          "file" : "lib/OpenGbg/Service/AirQuality/GetMeasurements.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::AirQuality::Measurement" : {
          "file" : "lib/OpenGbg/Service/AirQuality/Measurement.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::AirQuality::Measurements" : {
          "file" : "lib/OpenGbg/Service/AirQuality/Measurements.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::Bridge" : {
          "file" : "lib/OpenGbg/Service/Bridge.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::Bridge::BridgeOpening" : {
          "file" : "lib/OpenGbg/Service/Bridge/BridgeOpening.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::Bridge::BridgeOpenings" : {
          "file" : "lib/OpenGbg/Service/Bridge/BridgeOpenings.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::Bridge::GetIsCurrentlyOpen" : {
          "file" : "lib/OpenGbg/Service/Bridge/GetIsCurrentlyOpen.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::Bridge::GetOpenedStatus" : {
          "file" : "lib/OpenGbg/Service/Bridge/GetOpenedStatus.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::Getter" : {
          "file" : "lib/OpenGbg/Service/Getter.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::StyrOchStall" : {
          "file" : "lib/OpenGbg/Service/StyrOchStall.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::StyrOchStall::GetBikeStation" : {
          "file" : "lib/OpenGbg/Service/StyrOchStall/GetBikeStation.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::StyrOchStall::GetBikeStations" : {
          "file" : "lib/OpenGbg/Service/StyrOchStall/GetBikeStations.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::StyrOchStall::Station" : {
          "file" : "lib/OpenGbg/Service/StyrOchStall/Station.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::TrafficCamera" : {
          "file" : "lib/OpenGbg/Service/TrafficCamera.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::TrafficCamera::CameraDevice" : {
          "file" : "lib/OpenGbg/Service/TrafficCamera/CameraDevice.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::TrafficCamera::CameraDevices" : {
          "file" : "lib/OpenGbg/Service/TrafficCamera/CameraDevices.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::TrafficCamera::GetCameraImage" : {
          "file" : "lib/OpenGbg/Service/TrafficCamera/GetCameraImage.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       },
       "OpenGbg::Service::TrafficCamera::GetTrafficCameras" : {
          "file" : "lib/OpenGbg/Service/TrafficCamera/GetTrafficCameras.pm",
-         "version" : "0.1403"
+         "version" : "0.1404"
       }
    },
    "release_status" : "stable",
@@ -254,7 +254,7 @@
          "web" : "https://github.com/Csson/p5-OpenGbg"
       }
    },
-   "version" : "0.1403",
+   "version" : "0.1404",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -282,7 +282,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -291,7 +291,7 @@
                   "check_all_plugins" : 1,
                   "check_all_prereqs" : 0,
                   "modules" : [],
-                  "phase" : "release",
+                  "phase" : "build",
                   "run_under_travis" : 0,
                   "skip" : []
                }
@@ -324,7 +324,7 @@
                "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "RewriteVersion::Transitional",
-            "version" : "0.008"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::ChangeStats::Dependencies::Git",
@@ -475,7 +475,7 @@
                }
             },
             "name" : "Git::Check",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -485,7 +485,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "Readme",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -495,7 +495,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
             "name" : "MetaNoIndex",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -505,17 +505,17 @@
                }
             },
             "name" : "MakeMaker",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "MetaConfig",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "MetaJSON",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -525,7 +525,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.010"
+                        "version" : "6.012"
                      }
                   ],
                   "include_underscores" : 0
@@ -634,7 +634,7 @@
                }
             },
             "name" : "Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -644,17 +644,17 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "PodSyntaxTests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "MetaYAML",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "License",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -669,27 +669,27 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "ShareDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "ExecDir",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "Manifest",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "ManifestSkip",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
             "name" : "CheckChangesHasContent",
-            "version" : "0.010"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
@@ -705,17 +705,17 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "TestRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "ConfirmRelease",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "UploadToCPAN",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::TravisYML",
@@ -748,7 +748,7 @@
                }
             },
             "name" : "CommitBeforeTag",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -757,7 +757,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.1403",
+                  "tag" : "0.1404",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },
@@ -770,7 +770,7 @@
                }
             },
             "name" : "Git::Tag",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -791,7 +791,7 @@
                "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : {}
             },
             "name" : "BumpVersionAfterRelease::Transitional",
-            "version" : "0.008"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -819,7 +819,7 @@
                }
             },
             "name" : "CommitAfterRelease",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -836,7 +836,7 @@
                }
             },
             "name" : "Git::Push",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Clean",
@@ -852,7 +852,7 @@
                }
             },
             "name" : "DevelopRequires",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -863,7 +863,7 @@
                }
             },
             "name" : "DevelopSuggests",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -874,7 +874,7 @@
                }
             },
             "name" : "RuntimeRequires",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -885,62 +885,62 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.010"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.010"
+            "version" : "6.012"
          }
       ],
       "zilla" : {
@@ -948,10 +948,11 @@
          "config" : {
             "is_trial" : "0"
          },
-         "version" : "6.010"
+         "version" : "6.012"
       }
    },
    "x_authority" : "cpan:CSSON",
+   "x_generated_by_perl" : "v5.20.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0114"
 }
 

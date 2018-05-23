@@ -1,7 +1,7 @@
 ---
 abstract: 'Part-of-speech tagger for English natural language processing.'
 author:
-  - 'Maciej Ceglowski and Aaron Coburn <maciej@ceglowski.com>, <aaron@coburncuadrado.com>'
+  - 'Maciej Ceglowski and Aaron Coburn <maciej@ceglowski.com>, <acoburn@apache.org>'
 build_requires:
   ExtUtils::MakeMaker: 0
 configure_requires:
@@ -26,4 +26,4 @@ requires:
   Memoize::ExpireLRU: 0.55
   Storable: 2.10
   perl: 5.008001
-version: 0.28
+version: 0.29

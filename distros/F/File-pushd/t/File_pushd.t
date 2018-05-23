@@ -8,6 +8,7 @@ use File::Basename 'dirname';
 use Cwd 'abs_path';
 use File::Spec::Functions qw( catdir curdir updir canonpath rootdir );
 use File::Temp;
+use Config '%Config';
 
 # abs_path necessary to pick up the volume on Win32, e.g. C:\
 sub absdir { canonpath( abs_path( shift || curdir() ) ); }
@@ -224,5 +225,22 @@ undef $new_dir;
 is( absdir(), $original_dir, "revert directory when variable goes out of scope" );
 
 ok( -e $expected_dir, "original directory not removed" );
+
+#--------------------------------------------------------------------------#
+# Test removing temp directory by owner process
+#--------------------------------------------------------------------------#
+if ( $Config{d_fork} ) {
+    my $new_dir = tempd();
+    my $temp_dir = "$new_dir";
+    my $pid = fork;
+    die "Can't fork: $!" unless defined $pid;
+    if ($pid == 0) {
+        exit;
+    }
+    wait;
+    ok( -e $temp_dir, "temporary directory not removed by child process" );
+    undef $new_dir;
+    ok( !-e $temp_dir, "temporary directory removed by owner process" );
+}
 
 done_testing;

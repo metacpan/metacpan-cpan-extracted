@@ -9,6 +9,7 @@ binmode( Test::More->builder->$_, ":utf8" )
   for qw/output failure_output todo_output/;
 
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 use TestUtils;
 
@@ -70,7 +71,7 @@ done_testing;
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2016 by MongoDB, Inc.
+# This software is Copyright (c) 2018 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

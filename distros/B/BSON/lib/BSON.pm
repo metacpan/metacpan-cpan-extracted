@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.4.0';
+our $VERSION = 'v1.6.1';
 
 use Carp;
 use Config;
@@ -17,6 +17,7 @@ use Scalar::Util qw/blessed/;
 
 use Moo 2.002004; # safer generated code
 use boolean;
+use BSON::OID;
 
 use constant {
     HAS_INT64 => $Config{use64bitint},
@@ -64,6 +65,7 @@ BEGIN {
 
     *_encode_bson = $class->can("_encode_bson");
     *_decode_bson = $class->can("_decode_bson");
+    *_backend_class = sub { $class }; # for debugging
 }
 
 # LOAD AFTER XS/PP, so that modules can pick up right version of helpers
@@ -162,10 +164,14 @@ has ordered => (
 
 #pod =attr prefer_numeric
 #pod
-#pod If set to true, scalar values that look like a numeric value will be
-#pod encoded as a BSON numeric type.  When false, if the scalar value was ever
-#pod used as a string, it will be encoded as a BSON UTF-8 string, otherwise
-#pod it will be encoded as a numeric type.
+#pod When false, scalar values will be encoded as a number if they were
+#pod originally a number or were ever used in a numeric context.  However, a
+#pod string that looks like a number but was never used in a numeric context
+#pod (e.g. "42") will be encoded as a string.
+#pod
+#pod If C<prefer_numeric> is set to true, the encoder will attempt to coerce
+#pod strings that look like a number into a numeric value.  If the string
+#pod doesn't look like a double or integer, it will be encoded as a string.
 #pod
 #pod B<IMPORTANT CAVEAT>: the heuristics for determining whether something is a
 #pod string or number are less accurate on older Perls.  See L<BSON::Types>
@@ -384,6 +390,19 @@ sub clone {
 #--------------------------------------------------------------------------#
 # public class methods
 #--------------------------------------------------------------------------#
+
+#pod =method create_oid
+#pod
+#pod     $oid = BSON->create_oid;
+#pod
+#pod This class method returns a new L<BSON::OID>.  This abstracts OID
+#pod generation away from any specific Object ID class and makes it an interface
+#pod on a BSON codec.  Alternative BSON codecs should define a similar class
+#pod method that returns an Object ID of whatever type is appropriate.
+#pod
+#pod =cut
+
+sub create_oid { return BSON::OID->new }
 
 #pod =method inflate_extjson
 #pod
@@ -641,7 +660,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.4.0
+version v1.6.1
 
 =head1 SYNOPSIS
 
@@ -770,10 +789,14 @@ The default is false.
 
 =head2 prefer_numeric
 
-If set to true, scalar values that look like a numeric value will be
-encoded as a BSON numeric type.  When false, if the scalar value was ever
-used as a string, it will be encoded as a BSON UTF-8 string, otherwise
-it will be encoded as a numeric type.
+When false, scalar values will be encoded as a number if they were
+originally a number or were ever used in a numeric context.  However, a
+string that looks like a number but was never used in a numeric context
+(e.g. "42") will be encoded as a string.
+
+If C<prefer_numeric> is set to true, the encoder will attempt to coerce
+strings that look like a number into a numeric value.  If the string
+doesn't look like a double or integer, it will be encoded as a string.
 
 B<IMPORTANT CAVEAT>: the heuristics for determining whether something is a
 string or number are less accurate on older Perls.  See L<BSON::Types>
@@ -915,6 +938,15 @@ wrap_strings - overrides codec default
 
 Constructs a copy of the original codec, but allows changing
 attributes in the copy.
+
+=head2 create_oid
+
+    $oid = BSON->create_oid;
+
+This class method returns a new L<BSON::OID>.  This abstracts OID
+generation away from any specific Object ID class and makes it an interface
+on a BSON codec.  Alternative BSON codecs should define a similar class
+method that returns an Object ID of whatever type is appropriate.
 
 =head2 inflate_extjson
 
@@ -1181,7 +1213,7 @@ Oleg Kostyuk <cub@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

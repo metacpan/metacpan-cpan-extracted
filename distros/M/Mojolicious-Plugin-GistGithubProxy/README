@@ -1,0 +1,64 @@
+NAME
+
+    Mojolicious::Plugin::GistGithubProxy -
+    Mojolicious::Plugin::GistGithubProxy - a small proxy that can be useful
+    when you embed gists in your website
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+      # Mojolicious
+      $self->plugin('GistGithubProxy');
+    
+      # Mojolicious::Lite
+      plugin 'GistGithubProxy';
+    
+      # a default for the github user
+      # useful when you usually embed gists from one person
+      plugin 'GistGithubProxy' => { user => 'reneeb' };
+
+DESCRIPTION
+
+    Mojolicious::Plugin::GistGithubProxy is a Mojolicious plugin.
+
+METHODS
+
+    Mojolicious::Plugin::GistGithubProxy inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+ register
+
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+ HOOKS INSTALLED
+
+    This plugin adds one after_render hook to rewrite all links to
+    gist.github.com to use the proxy routes.
+
+ ROUTES INSTALLED
+
+      * /github/gist/:user/:id/*file
+
+      * /github/gist/assets/:id
+
+SEE ALSO
+
+    Mojolicious, Mojolicious::Guides, http://mojolicious.org.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

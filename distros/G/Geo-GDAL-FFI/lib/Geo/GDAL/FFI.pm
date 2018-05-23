@@ -4,6 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 use Carp;
+use PkgConfig;
 use Alien::gdal;
 use PDL;
 use FFI::Platypus;
@@ -23,7 +24,7 @@ use Geo::GDAL::FFI::GeomFieldDefn;
 use Geo::GDAL::FFI::Feature;
 use Geo::GDAL::FFI::Geometry;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05_01;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(@errors);
 
@@ -355,6 +356,12 @@ sub new {
     eval{$ffi->attach('CSLAddString' => ['opaque', 'string'] => 'opaque');};
     eval{$ffi->attach('CSLCount' => ['opaque'] => 'int');};
     eval{$ffi->attach('CSLGetField' => ['opaque', 'int'] => 'string');};
+    eval{$ffi->attach(CPLGetConfigOption => ['string', 'string']  => 'string');};
+    eval{$ffi->attach(CPLSetConfigOption => ['string', 'string']  => 'void');};
+    eval{$ffi->attach(CPLFindFile => ['string', 'string']  => 'string');};
+    eval{$ffi->attach(CPLPushFinderLocation => ['string'] => 'string');};
+    eval{$ffi->attach(CPLPopFinderLocation => [] => 'void');};
+    eval{$ffi->attach(CPLFinderClean => [] => 'void');};
 
     # from ogr_core.h
     eval{$ffi->attach( 'OGR_GT_Flatten' => ['unsigned int'] => 'unsigned int');};
@@ -1159,6 +1166,22 @@ eval{$ffi->attach('GDALBuildVRTOptionsFree' => [qw/opaque/] => 'void');};
 eval{$ffi->attach('GDALBuildVRTOptionsSetProgress' => [qw/opaque GDALProgressFunc opaque/] => 'void');};
 eval{$ffi->attach('GDALBuildVRT' => [qw/string int uint64* opaque opaque int*/] => 'opaque');};
 
+    # we do not use Alien::gdal->data_dir since it issues warnings due to GDAL bug
+    my $pc = PkgConfig->find('gdal');
+    if ($pc->errmsg) {
+        my $dir = Alien::gdal->dist_dir;
+        my %options = (search_path_override => [$dir . '/lib/pkgconfig']);
+        $pc = PkgConfig->find('gdal', %options);
+    }
+    if ($pc->errmsg) {
+        warn $pc->errmsg;
+    } else {
+        my $dir = $pc->get_var('datadir');
+        # this gdal.pc bug was fixed in GDAL 2.3.1
+        # we just hope the one configuring GDAL did not change it to something that ends '/data'
+        $dir =~ s/\/data$//;
+        CPLSetConfigOption(GDAL_DATA => $dir);
+    }
 
     my $self = {};
     $self->{ffi} = $ffi;
@@ -1288,6 +1311,38 @@ sub HaveGEOS {
     } else {
         return 1;
     }
+}
+
+sub SetConfigOption {
+    my ($self, $key, $default) = @_;
+    CPLSetConfigOption($key, $default);
+}
+
+sub GetConfigOption {
+    my ($self, $key, $default) = @_;
+    return CPLGetConfigOption($key, $default);
+}
+
+sub FindFile {
+    my $self = shift;
+    my ($class, $basename) = @_ == 2 ? @_ : ('', @_);
+    $class //= '';
+    $basename //= '';
+    return CPLFindFile($class, $basename);
+}
+
+sub PushFinderLocation {
+    my ($self, $location) = @_;
+    $location //= '';
+    CPLPushFinderLocation($location);
+}
+
+sub PopFinderLocation {
+    CPLPopFinderLocation();
+}
+
+sub FinderClean {
+    CPLFinderClean();
 }
 
 1;

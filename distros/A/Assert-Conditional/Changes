@@ -4,8 +4,8 @@ Revision history for Assert-Conditional
          Initial alpha release
 
 0.002    7 June 2015 22:35 MDT 
-          MONGOLIAN VOWEL SEPARATOR is no longer whitespace in Unicode,
-          so removed from test.
+         MONGOLIAN VOWEL SEPARATOR is no longer whitespace in Unicode,
+         so removed from test.
 
 0.003    30 June 2015 06:31 MDT
          Bump perl requirement to v5.12
@@ -20,4 +20,23 @@ Revision history for Assert-Conditional
          If ASSERT_CONDITIONAL contains "handlers", don't block @SIG{__{WARN,DIE}__}.
          Don't let assert_isa die prematurely on an unblessed ref.
 
+0.005    Sun May 20 20:40:25 CDT 2018
+         Initial beta release.
+	 Reworked the hash key checkers into a simpler set: assert_keys, assert_min_keys, assert_max_keys, assert_minmax_keys.
+         Added invocant-specific assertions: assert_{object,class}_{isa,ainta,can,cant}.
+         Added assertions for ties, overloads, and locked hashes.
+         Made assert_private_method work despite Moose wrappers.
+         Added assert_protected_method that works despite Moose wrappers and roles.
+         Improved the looks of the uncompiled code for assert_happy_code.
+         Improved the reporting of some assertion failures.
 
+0.006    Mon May 21 07:45:43 CDT 2018
+         Use hash_{,un}locked not hashref_{,un}locked to support pre-5.16 perls.
+         Unhid assert_unblessed_ref swallowed up by stray pod.
+
+0.007    Mon May 21 19:13:58 CDT 2018
+         Add missing Hash::Util version requirement for old perls to get hashref_unlock imported
+
+0.008    Tue May 22 11:51:37 CDT 2018
+         Rewrite hash_unlocked missing till 5.16 as !hash_locked
+         Add omitted etc/generate-exporter-pod to MANIFEST

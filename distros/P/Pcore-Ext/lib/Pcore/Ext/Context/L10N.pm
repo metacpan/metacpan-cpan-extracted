@@ -16,7 +16,7 @@ use overload    #
   },
   fallback => undef;
 
-sub TO_JSON ( $self, @ ) {
+sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
     $self->{ext}->{js_gen_cache}->{$id} = $self->to_js;

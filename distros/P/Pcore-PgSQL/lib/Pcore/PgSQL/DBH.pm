@@ -9,23 +9,23 @@ use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[from_json];
 use Pcore::AE::Handle;
 
-has handle     => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
-has password   => ( is => 'ro', isa => Str );
-has on_connect => ( is => 'ro', isa => CodeRef, required => 1 );
+has handle     => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
+has password   => ();    # ( is => 'ro', isa => Str );
+has on_connect => ();    # ( is => 'ro', isa => CodeRef, required => 1 );
 
-has is_pgsql => ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
+has is_pgsql => 1;       # ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
 
-has state => ( is => 'ro', isa => Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BUSY, $STATE_DISCONNECTED ], default => $STATE_CONNECT, init_arg => undef );
-has h => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
-has parameter => ( is => 'ro', isa => HashRef, init_arg => undef );
-has key_data  => ( is => 'ro', isa => HashRef, init_arg => undef );
-has tx_status    => ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], init_arg => undef );    # current transaction status
-has wbuf         => ( is => 'ro', isa => ArrayRef,                                                     init_arg => undef );    # outgoing messages buffer
-has sth          => ( is => 'ro', isa => HashRef,                                                      init_arg => undef );    # currently executed sth
-has prepared_sth => ( is => 'ro', isa => HashRef,                                                      init_arg => undef );
-has query        => ( is => 'ro', isa => ScalarRef,                                                    init_arg => undef );    # ref to the last query
+has state        => $STATE_CONNECT;    # ( is => 'ro', isa => Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BUSY, $STATE_DISCONNECTED ], init_arg => undef );
+has h            => ();                # ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
+has parameter    => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );
+has key_data     => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );
+has tx_status    => ();                # ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], init_arg => undef );    # current transaction status
+has wbuf         => ();                # ( is => 'ro', isa => ArrayRef, init_arg => undef );     # outgoing messages buffer
+has sth          => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );      # currently executed sth
+has prepared_sth => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );
+has query        => ();                # ( is => 'ro', isa => ScalarRef, init_arg => undef );    # ref to the last query
 
-const our $PROTOCOL_VER => "\x00\x03\x00\x00";                                                                                 # v3
+const our $PROTOCOL_VER => "\x00\x03\x00\x00";    # v3
 
 # FRONTEND
 const our $PG_MSG_BIND             => 'B';
@@ -97,10 +97,8 @@ const our $ERROR_STRING_TYPE => {
     V => 'text',
 };
 
-P->init_demolish(__PACKAGE__);
-
-sub DEMOLISH ( $self, $global ) {
-    $self->{handle}->push_dbh($self) if !$global && defined $self->{handle};
+sub DESTROY ( $self ) {
+    $self->{handle}->push_dbh($self) if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) && defined $self->{handle};
 
     return;
 }
@@ -1073,20 +1071,20 @@ sub encode_json ( $self, $var ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 181                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
+## |    3 | 179                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 535                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
+## |    3 | 533                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 625, 954             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 623, 952             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 28, 151, 359, 526,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 592, 602, 618, 623,  |                                                                                                                |
-## |      | 637, 642, 651, 658,  |                                                                                                                |
-## |      | 662, 666, 670, 673   |                                                                                                                |
+## |    2 | 28, 149, 357, 524,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 590, 600, 616, 621,  |                                                                                                                |
+## |      | 635, 640, 649, 656,  |                                                                                                                |
+## |      | 660, 664, 668, 671   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 763, 954             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 761, 952             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 802                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 800                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

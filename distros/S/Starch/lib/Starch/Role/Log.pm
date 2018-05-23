@@ -1,5 +1,5 @@
 package Starch::Role::Log;
-$Starch::Role::Log::VERSION = '0.06';
+$Starch::Role::Log::VERSION = '0.07';
 =head1 NAME
 
 Starch::Role::Log - Logging capabilities used internally by Starch.

@@ -1,10 +1,12 @@
 package Pcore::Core::Dump;
 
-use Pcore -export => {
+use Pcore -export;
+use Pcore::Core::Dump::Dumper;
+
+our $EXPORT = {
     CORE    => [qw[dump]],
     DEFAULT => [qw[dump]],
 };
-use Pcore::Core::Dump::Dumper;
 
 sub dump {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my %args = (
@@ -24,7 +26,7 @@ sub dump {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 17                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 19                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

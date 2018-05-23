@@ -1,4 +1,4 @@
-package TestSigs;
+package My::TestSigs;
 use Mojo::Base -base, -signatures;
 
 =head1 NAME

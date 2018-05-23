@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::ISCSIPersistentVolumeSource;
   use Moose;
+  use IO::K8s;
 
   has 'chapAuthDiscovery' => (is => 'ro', isa => 'Bool'  );
   has 'chapAuthSession' => (is => 'ro', isa => 'Bool'  );
@@ -12,4 +13,6 @@ package IO::K8s::Api::Core::V1::ISCSIPersistentVolumeSource;
   has 'readOnly' => (is => 'ro', isa => 'Bool'  );
   has 'secretRef' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::SecretReference'  );
   has 'targetPortal' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

@@ -1,5 +1,8 @@
 Revision history for Text::Sprintf::Named
 
+0.0403  2018-05-20
+        * Convert to Dist-Zilla .
+
 0.0402  2014-02-01
         * Add t/cpan-changes.t and t/style-trailing-space.t .
         * Remove Makefile.PL.

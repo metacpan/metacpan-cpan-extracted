@@ -83,10 +83,10 @@ sub assert_no_git
     cmp_deeply(\@git_plugins, [], 'no git-based plugins are running here');
 }
 
-# checks that all plugins in use are in the plugin bundle dist's runtime
-# requires list
+# checks that all plugins in use are in this plugin bundle distribution's
+# runtime requires list
 # - some plugins can be marked 'additional' - must be in recommended prereqs
-#   AND the built dist's plugin prereqs list
+#   AND the built distribution's plugin prereqs list
 # - some plugins can be explicitly exempted (added manually to facilitate
 #   testing)
 # TODO: move into its own distribution
@@ -94,7 +94,7 @@ sub all_plugins_in_prereqs
 { SKIP: {
     my ($tzil, %options) = @_;
 
-    my $bundle_name = $options{bundle_name} // '@Author::ETHER';    # TODO: default to dist we are in
+    my $bundle_name = $options{bundle_name} // '@Author::ETHER';    # TODO: default to distribution we are in
     my %additional = map { $_ => undef } @{ $options{additional} // [] };
     my %exempt = map { $_ => undef } @{ $options{exempt} // [] };
     my $prereq_plugin_phase = $options{prereq_plugin_phase} // $PREREQ_PHASE_DEFAULT;
@@ -135,7 +135,7 @@ sub all_plugins_in_prereqs
                 cmp_deeply(
                     $pluginbundle_meta->{prereqs}{runtime}{recommends},
                     superhashof({ $plugin => $required_version }),
-                    $plugin . ' is a runtime recommendation of the plugin bundle',
+                    $plugin . ' is a runtime recommendation of this plugin bundle',
                 ) if $pluginbundle_meta;
             }
             else
@@ -144,7 +144,7 @@ sub all_plugins_in_prereqs
                 cmp_deeply(
                     $pluginbundle_meta->{prereqs}{runtime}{requires},
                     superhashof({ $plugin => $required_version }),
-                    $plugin . ' is a runtime prereq of the plugin bundle',
+                    $plugin . ' is a runtime prereq of this plugin bundle',
                 ) if $pluginbundle_meta;
             }
         }
@@ -153,7 +153,7 @@ sub all_plugins_in_prereqs
 
         if (not Test::Builder->new->is_passing)
         {
-            diag 'got dist metadata: ', explain $dist_meta;
+            diag 'got distribution metadata: ', explain $dist_meta;
             diag 'got plugin bundle metadata: ', explain $pluginbundle_meta;
         }
     }

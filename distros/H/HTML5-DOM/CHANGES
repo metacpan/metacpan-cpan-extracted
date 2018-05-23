@@ -1,0 +1,4 @@
+2018-05-22	1.00	- initial release
+2018-05-22	1.01	- fix can package (remove trash files)
+2018-05-22	1.02	- fix Kwalitee and packaging issues
+2018-05-23	1.03	- fix fragments insertion, add Selector::pseudoElement and allow delete $node->{attr} to remove attribute.

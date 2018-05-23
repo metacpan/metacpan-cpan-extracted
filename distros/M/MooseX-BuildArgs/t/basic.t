@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-BEGIN { use_ok('MooseX::BuildArgs') }
+use MooseX::BuildArgs;
 
 {
     package MyClass;
@@ -30,7 +30,7 @@ BEGIN { use_ok('MooseX::BuildArgs') }
 {
     my $obj = MyClass->new();
 
-    is_deeply(
+    is(
         $obj->build_args(),
         {},
         'build_args is empty with no arguments passed',
@@ -40,13 +40,13 @@ BEGIN { use_ok('MooseX::BuildArgs') }
 {
     my $obj = MyClass->new( foo=>32, bar=>'blue' );
 
-    is_deeply(
+    is(
         $obj->build_args(),
         { foo=>32, bar=>'blue' },
         'build_args recorded arguments and pre-coercion values',
     );
 
-    is_deeply(
+    is(
         $obj->bar(),
         { bar=>'blue' },
         'coercion is working (sanity check)',
@@ -67,7 +67,7 @@ BEGIN { use_ok('MooseX::BuildArgs') }
 
 {
     my $obj = MyClass2->new( foo=>55, bar=>'baz' );
-    is_deeply(
+    is(
         $obj->build_args(),
         { foo=>55, bar=>'baz' },
         'works with roles too',

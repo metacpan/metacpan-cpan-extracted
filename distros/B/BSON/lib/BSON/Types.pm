@@ -6,7 +6,7 @@ package BSON::Types;
 # ABSTRACT: Helper functions to wrap BSON type classes
 
 use version;
-our $VERSION = 'v1.4.0';
+our $VERSION = 'v1.6.1';
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -335,7 +335,7 @@ BSON::Types - Helper functions to wrap BSON type classes
 
 =head1 VERSION
 
-version v1.4.0
+version v1.6.1
 
 =head1 SYNOPSIS
 
@@ -525,7 +525,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

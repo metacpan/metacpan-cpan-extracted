@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.141     2018-05-21 19:12:49Z
+          - still more fixes to $TODO in xt/author/changes_has_content.t
+
+0.140     2018-05-16 04:30:10Z
+          - and even more fixes to $TODO in xt/author/changes_has_content.t
+          - bump minimum required version of [@Git::VersionManager] to avoid
+            test failures
+
 0.139     2018-05-15 05:56:41Z
           - yet more fixes to $TODO in xt/author/changes_has_content.t
 

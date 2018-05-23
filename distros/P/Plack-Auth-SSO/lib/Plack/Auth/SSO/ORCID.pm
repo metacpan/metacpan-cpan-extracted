@@ -13,7 +13,7 @@ use WWW::ORCID;
 use JSON;
 use Plack::Auth::SSO::ResponseParser::ORCID;
 
-our $VERSION = "0.0134";
+our $VERSION = "0.0135";
 
 with "Plack::Auth::SSO";
 
@@ -191,11 +191,15 @@ sub to_app {
                 return $self->redirect_to_error();
 
             }
+
+            #request person data..
+            my $res2 = $orcid->person( token => $res->{access_token}, orcid => $res->{orcid} );
+
             $self->set_auth_sso(
                 $session,
                 {
                     %{
-                        $response_parser->parse( $res )
+                        $response_parser->parse( $res, $res2 )
                     },
                     package    => __PACKAGE__,
                     package_id => $self->id,
@@ -269,7 +273,15 @@ Plack::Auth::SSO::ORCID - implementation of Plack::Auth::SSO for ORCID
             #    },
             #    uid => "0000-0002-5268-9669",
             #    info => {
-            #        name => "Nicolas Franck"
+            #        name => "Nicolas Franck",
+            #        first_name => "Nicolas",
+            #        last_name => "Franck",
+            #        email => "nicolas.franck@nowhere.com",
+            #        location => "BE",
+            #        description => "my biography",
+            #        other_names => [ "njfranck" ],
+            #        urls => [ { mysite => "https://mysite.com" } ],
+            #        external_identifiers => []
             #    },
             #    extra => {}
             #}
@@ -313,15 +325,41 @@ Remember that this module only performs these steps:
 
 * redirect to ORCID authorize url
 
-* exchange authorization code for access token
+* exchange 1: exchange authorization code for access token ( orcid and name known )
+
+  This delivers a hash containing orcid, name, access_token and a refresh_token.
+
+* exchange 2: exchange access_token for person information
+
+  This delivers a hash containing detailed information.
+
+So we actually retrieved two hashes.
 
 Those steps provide the following information:
 
-* uid: derived from "orcid"
+* uid: derived from "orcid" from the first hash
 
-* info.name: derived from "name"
+* info.name: derived from "name" from the first hash
 
-* extra: everything else is that was returned in the hash response from ORCID
+* other keys in "info" are extracted from the second hash
+
+    * info.first_name: string
+
+    * info.last_name: string
+
+    * info.other_names: array of strings
+
+    * info.email: first primary and verified email
+
+    * info.description: string. Retrieved from "biography".
+
+    * info.location: country code
+
+    * info.url: array of objects
+
+    * info.external_identifiers: array of objects
+
+* extra: both hashes from the first and second call to ORCID are merged. For obvious reasons "orcid" is not present, and neither is "name" because it has a conflicting format between the two responses.
 
 extra.access_token contains a code that conforms to the scope requested (see below).
 

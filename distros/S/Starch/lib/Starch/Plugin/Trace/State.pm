@@ -1,6 +1,5 @@
-package # hide from PAUSE
-    Starch::Plugin::Trace::State;
-
+package Starch::Plugin::Trace::State;
+$Starch::Plugin::Trace::State::VERSION = '0.07';
 use Moo::Role;
 use strictures 2;
 use namespace::clean;

@@ -94,9 +94,16 @@ sub run
 
             if ( ( ! $wbuf || ( $wbuf && $size <= $wbuf ) ) && open my $tmp_handle, '<', "$tmp/$index.out" )
             {
+                my $finish;
                 $data->{fh} = $tmp_handle;
                 $data->{handle}->on_drain(
                     sub{
+                        if( $finish )
+                        {
+                            $data->{handle}->on_drain(undef);
+                            $data->{handle}->push_shutdown;
+                            return;
+                        }
                         my ( $n, $buf );
                         if( $n = sysread( $data->{fh}, $buf, 102400 ) )
                         {
@@ -130,9 +137,8 @@ sub run
                                 }
                             }
 
-                            $data->{handle}->on_drain(undef);
                             $data->{handle}->push_write("--- $code\n");
-                            $data->{handle}->push_shutdown;
+                            $finish = 1;
                         }
                     }
                 );

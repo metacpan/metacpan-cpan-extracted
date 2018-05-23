@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.180750",
+  "VERSION" => "0.181410",
   "test" => {
     "TESTS" => "t/*.t"
   }

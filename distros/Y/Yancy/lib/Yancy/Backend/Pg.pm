@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -16,6 +16,19 @@ our $VERSION = '1.004';
 #pod     use Mojo::Pg;
 #pod     plugin Yancy => {
 #pod         backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### Hashref
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => {
+#pod         backend => {
+#pod             Pg => {
+#pod                 dsn => 'dbi:Pg:dbname',
+#pod                 username => 'fry',
+#pod                 password => 'b3nd3r1sgr34t',
+#pod             },
+#pod         },
 #pod         read_schema => 1,
 #pod     };
 #pod
@@ -99,7 +112,7 @@ our $VERSION = '1.004';
 #pod =cut
 
 use Mojo::Base '-base';
-use Scalar::Util qw( looks_like_number );
+use Scalar::Util qw( looks_like_number blessed );
 BEGIN {
     eval { require Mojo::Pg; Mojo::Pg->VERSION( 3 ); 1 }
         or die "Could not load Pg backend: Mojo::Pg version 3 or higher required\n";
@@ -113,6 +126,13 @@ sub new {
     if ( !ref $backend ) {
         my ( $connect ) = $backend =~ m{^[^:]+://(.+)$};
         $backend = Mojo::Pg->new( "postgresql://$connect" );
+    }
+    elsif ( !blessed $backend ) {
+        my $attr = $backend;
+        $backend = Mojo::Pg->new;
+        for my $method ( keys %$attr ) {
+            $backend->$method( $attr->{ $method } );
+        }
     }
     my %vars = (
         pg => $backend,
@@ -286,7 +306,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -302,6 +322,19 @@ version 1.004
     use Mojo::Pg;
     plugin Yancy => {
         backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
+        read_schema => 1,
+    };
+
+    ### Hashref
+    use Mojolicious::Lite;
+    plugin Yancy => {
+        backend => {
+            Pg => {
+                dsn => 'dbi:Pg:dbname',
+                username => 'fry',
+                password => 'b3nd3r1sgr34t',
+            },
+        },
         read_schema => 1,
     };
 

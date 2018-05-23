@@ -1,4 +1,4 @@
-## $Id: VectorValued.pm 9576 2018-05-15 06:59:23Z moocow $
+## $Id: VectorValued.pm 9589 2018-05-18 07:47:27Z moocow $
 ##
 ## File: PDL::VectorValued.pm
 ## Author: Bryan Jurish <moocow@cpan.org>
@@ -27,7 +27,7 @@ our %EXPORT_TAGS =
   );
 
 ## VERSION was formerly set by PDL::VectorValued::Version, now use perl-reversion from Perl::Version instead
-our $VERSION = '1.0.8';
+our $VERSION = '1.0.9';
 
 ##======================================================================
 ## pod: header

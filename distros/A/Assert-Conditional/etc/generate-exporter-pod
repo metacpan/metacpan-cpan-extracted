@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+# generate-exporter-pod - build tool to generate pod to stick in main docs
+
+# TIP: Pipe this script's through the fmt program 
+
+use v5.12;
+use strict;
+use warnings;
+
+use Cwd         qw(abs_path);
+use Env         qw(ASSERT_CONDITIONAL_BUILD_POD);
+use FindBin     qw($Bin);
+
+my $mod_lib    =  abs_path("$Bin/../lib") || die;
+my $pm_file    = "Assert/Conditional.pm";
+my $mod_script = "$mod_lib/$pm_file";
+
+-e $mod_script || die;
+
+$ASSERT_CONDITIONAL_BUILD_POD = 1;
+
+exec $^X, 
+     -I => $mod_lib, 
+     $mod_script, @ARGV;

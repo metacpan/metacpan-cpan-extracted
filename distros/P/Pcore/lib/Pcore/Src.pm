@@ -1,7 +1,9 @@
 package Pcore::Src;
 
-use Pcore -class, -ansi, -const, -export => { CONST => [qw[$SRC_DECOMPRESS $SRC_COMPRESS $SRC_OBFUSCATE $SRC_COMMIT]] };
+use Pcore -class, -ansi, -const, -export;
 use Pcore::Util::Text qw[decode_utf8];
+
+our $EXPORT = { CONST => [qw[$SRC_DECOMPRESS $SRC_COMPRESS $SRC_OBFUSCATE $SRC_COMMIT]] };
 
 const our $SRC_DECOMPRESS => 'decompress';
 const our $SRC_COMPRESS   => 'compress';

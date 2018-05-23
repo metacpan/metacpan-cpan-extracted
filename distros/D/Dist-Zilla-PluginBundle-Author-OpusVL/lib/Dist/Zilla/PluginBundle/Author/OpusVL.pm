@@ -10,7 +10,7 @@ with (
     'Dist::Zilla::Role::PluginBundle::Config::Slicer',
 );
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
  
 sub configure {
     my ($self) = @_;
@@ -37,7 +37,7 @@ sub configure {
         ],
     qw(
         Prereqs::FromCPANfile
-        PodWeaver
+        SurgicalPodWeaver
     ));
     $self->add_bundle('@Starter', {
         '-remove' => [ 'GatherDir', 'UploadToCPAN', 'TestRelease', @$remove ],

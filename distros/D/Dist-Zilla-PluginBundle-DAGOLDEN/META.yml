@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150009'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,10 +31,10 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::DAGOLDEN:
     file: lib/Dist/Zilla/PluginBundle/DAGOLDEN.pm
-    version: '0.078'
+    version: '0.079'
   Pod::Weaver::PluginBundle::DAGOLDEN:
     file: lib/Pod/Weaver/PluginBundle/DAGOLDEN.pm
-    version: '0.078'
+    version: '0.079'
 requires:
   Dist::Zilla: '5.014'
   Dist::Zilla::Plugin::Authority: '1.006'
@@ -90,7 +90,7 @@ resources:
   bugtracker: https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN/issues
   homepage: https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN
   repository: https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN.git
-version: '0.078'
+version: '0.079'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Christian Walde <walde.christian@googlemail.com>'
@@ -99,4 +99,5 @@ x_contributors:
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Sergey Romanov <complefor@rambler.ru>'
   - '김도형 - Keedi Kim <keedi@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

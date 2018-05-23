@@ -5,8 +5,9 @@ use PICA::Data qw(pica_parser pica_writer pica_value);
 use PICA::Parser::Plain;
 use PICA::Parser::Plus;
 use PICA::Parser::XML;
-use Test::More;
 use Test::Exception;
+use Test::More;
+use Test::Warn;
 
 foreach my $type (qw(Plain Plus XML Binary)) {
     my $module = "PICA::Parser::$type";
@@ -78,18 +79,19 @@ is_deeply $record->{record}, [ [ '003@', '', '0', '1234€' ] ],
     'xml from string';
 
 note 'error handling';
+{
+    my $plus = "X01A \x{1F}01\x{1E}001A/0 \x{1F}01\x{1E}001A/AB \x{1F}01\x{1E}";
+    warnings_exist {PICA::Parser::Plus->new( \$plus )->next} [qr{no valid PICA field structure},qr{no valid PICA field structure},qr{no valid PICA field structure}], 'skip faulty fields with warnings';
+    dies_ok { PICA::Parser::Plus->new( \$plus, strict => 1 )->next } 'die on faulty fields with option strict';
+    my $plain = "X01@ \$01\n\n001@/0 \$01\n\n001@/AB \$01";
+    warnings_exist { PICA::Parser::Plain->new( \$plain )->next } [qr{no valid PICA field structure},qr{no valid PICA field structure},qr{no valid PICA field structure}], 'skip faulty fields with warnings';
+    dies_ok { PICA::Parser::Plain->new( \$plain, strict => 1 )->next } 'die on faulty fields with option strict';
 
-my $plus = "X01A \x{1F}01\x{1E}001A/0 \x{1F}01\x{1E}001A/AB \x{1F}01\x{1E}";
-lives_ok { PICA::Parser::Plus->new( \$plus )->next } 'skip faulty fields with warnings';
-dies_ok { PICA::Parser::Plus->new( \$plus, strict => 1 )->next } 'die on faulty fields with option strict';
-my $plain = "X01@ \$01\n\n001@/0 \$01\n\n001@/AB \$01";
-lives_ok { PICA::Parser::Plain->new( \$plain )->next } 'skip faulty fields with warnings';
-dies_ok { PICA::Parser::Plain->new( \$plain, strict => 1 )->next } 'die on faulty fields with option strict';
-
-dies_ok { pica_parser('doesnotexist') } 'unknown parser';
-dies_ok { pica_parser( xml => '' ) } 'invalid handle';
-dies_ok { pica_parser( plus => [] ) } 'invalid handle';
-dies_ok { pica_parser( plain => bless( {}, 'MyFooBar' ) ) } 'invalid handle';
+    dies_ok { pica_parser('doesnotexist') } 'unknown parser';
+    dies_ok { pica_parser( xml => '' ) } 'invalid handle';
+    dies_ok { pica_parser( plus => [] ) } 'invalid handle';
+    dies_ok { pica_parser( plain => bless( {}, 'MyFooBar' ) ) } 'invalid handle';
+}
 
 note '3-digit occurrence';
 {

@@ -15,7 +15,7 @@ use Helper;
 
 # we need the profiles dir to have gone through file munging first (for
 # profile.ini), as well as get installed into a sharedir
-plan skip_all => 'this test requires a built dist'
+plan skip_all => 'this test requires a built distribution'
     unless -d 'blib/lib/auto/share/dist/Dist-Zilla-PluginBundle-Author-ETHER/profiles';
 
 plan skip_all => 'minting requires perl 5.014' unless "$]" >= 5.013002;
@@ -129,7 +129,7 @@ unlike($dist_ini, qr/\n\n\z/, 'file does not end with a blank line');
 like(
     path($mint_dir, '.gitignore')->slurp_utf8,
     qr'^/My-New-Dist-\*/$'ms,
-    '.gitignore file is created properly, with dist name correctly inserted',
+    '.gitignore file is created properly, with distribution name correctly inserted',
 );
 
 is(
@@ -140,7 +140,7 @@ Revision history for My-New-Dist
 {{$NEXT}}
           - Initial release.
 CHANGES
-    'Changes file is created properly, with dist name filled in but version template and whitespace preserved',
+    'Changes file is created properly, with distribution name filled in but version template and whitespace preserved',
 );
 
 is(

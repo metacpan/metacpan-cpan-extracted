@@ -46,6 +46,13 @@ use XML::Loy with => (
   prefix => 'anim'
 );
 
+package Nothing;
+use XML::Loy 'hui';
+
+package Nothing2;
+use XML::Loy 'with';
+
+
 package main;
 use lib '../lib';
 

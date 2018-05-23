@@ -1,13 +1,11 @@
 package Pcore::App::API::Role;
 
-use Pcore -role;
+use Pcore -class;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
-requires qw[_build_api_map];
+has app => ( isa => q[ConsumerOf ['Pcore::App']], required => 1 );
 
-has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
-
-has api_map => ( is => 'lazy', isa => HashRef, init_arg => undef );
+has api_map => ( is => 'lazy', isa => 'HashRef', init_arg => undef );
 
 1;
 __END__

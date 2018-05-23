@@ -1,5 +1,5 @@
 package Starch::Plugin::DisableStore;
-$Starch::Plugin::DisableStore::VERSION = '0.06';
+$Starch::Plugin::DisableStore::VERSION = '0.07';
 =head1 NAME
 
 Starch::Plugin::DisableStore - Disable store read and/or write operations.

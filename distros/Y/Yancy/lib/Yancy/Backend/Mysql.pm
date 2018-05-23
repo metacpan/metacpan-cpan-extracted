@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -16,6 +16,19 @@ our $VERSION = '1.004';
 #pod     use Mojo::mysql;
 #pod     plugin Yancy => {
 #pod         backend => { Mysql => Mojo::mysql->new( 'mysql:///mydb' ) },
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### Hash reference
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => {
+#pod         backend => {
+#pod             Mysql => {
+#pod                 dsn => 'dbi:mysql:dbname',
+#pod                 username => 'fry',
+#pod                 password => 'b3nd3r1sgr34t',
+#pod             },
+#pod         },
 #pod         read_schema => 1,
 #pod     };
 #pod
@@ -98,7 +111,7 @@ our $VERSION = '1.004';
 #pod =cut
 
 use Mojo::Base '-base';
-use Scalar::Util qw( looks_like_number );
+use Scalar::Util qw( blessed looks_like_number );
 BEGIN {
     eval { require Mojo::mysql; Mojo::mysql->VERSION( 1 ); 1 }
         or die "Could not load Mysql backend: Mojo::mysql version 1 or higher required\n";
@@ -112,6 +125,9 @@ sub new {
     if ( !ref $backend ) {
         my ( $connect ) = $backend =~ m{^[^:]+://(.+)$};
         $backend = Mojo::mysql->new( "mysql://$connect" );
+    }
+    elsif ( !blessed $backend ) {
+        $backend = Mojo::mysql->new( %$backend );
     }
     my %vars = (
         mysql => $backend,
@@ -266,7 +282,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -282,6 +298,19 @@ version 1.004
     use Mojo::mysql;
     plugin Yancy => {
         backend => { Mysql => Mojo::mysql->new( 'mysql:///mydb' ) },
+        read_schema => 1,
+    };
+
+    ### Hash reference
+    use Mojolicious::Lite;
+    plugin Yancy => {
+        backend => {
+            Mysql => {
+                dsn => 'dbi:mysql:dbname',
+                username => 'fry',
+                password => 'b3nd3r1sgr34t',
+            },
+        },
         read_schema => 1,
     };
 

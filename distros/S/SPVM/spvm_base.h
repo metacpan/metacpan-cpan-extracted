@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// spvm_basic_type.h
+struct SPVM_basic_type;
+typedef struct SPVM_basic_type SPVM_BASIC_TYPE;
+
 // spvm_call_stack_info.h
 struct SPVM_call_stack_info;
 typedef struct SPVM_call_stack_info SPVM_CALL_STACK_INFO;
@@ -100,10 +104,6 @@ typedef struct SPVM_dumper SPVM_DUMPER;
 struct SPVM_vmcodes;
 typedef struct SPVM_vmcodes SPVM_VMCODES;
 
-// spvm_constant_pool.h
-struct SPVM_constant_pool;
-typedef struct SPVM_constant_pool SPVM_CONSTANT_POOL;
-
 // spvm_vmcode.h
 struct SPVM_vmcode;
 typedef struct SPVM_vmcode SPVM_VMCODE;
@@ -117,8 +117,8 @@ struct SPVM_package;
 typedef struct SPVM_package SPVM_PACKAGE;
 
 // spvm_type.h
-struct SPVM_call_field;
-typedef struct SPVM_call_field SPVM_CALL_FIELD;
+struct SPVM_field_access;
+typedef struct SPVM_field_access SPVM_FIELD_ACCESS;
 
 // spvm_type.h
 struct SPVM_type;
@@ -169,8 +169,8 @@ struct SPVM_sub;
 typedef struct SPVM_sub SPVM_SUB;
 
 // spvm_list_element.h
-struct SPVM_array_element;
-typedef struct SPVM_array_element SPVM_LIST_ELEMENT;
+struct SPVM_array_accessent;
+typedef struct SPVM_array_accessent SPVM_LIST_ELEMENT;
 
 // spvm_list.h
 struct SPVM_list;

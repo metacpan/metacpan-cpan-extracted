@@ -1,5 +1,6 @@
 package IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSONSchemaProps;
   use Moose;
+  use IO::K8s;
 
   has '$ref' => (is => 'ro', isa => 'Str'  );
   has '$schema' => (is => 'ro', isa => 'Str'  );
@@ -37,4 +38,6 @@ package IO::K8s::ApiExtensionsApiServer::Pkg::Apis::Apiextensions::V1beta1::JSON
   has 'title' => (is => 'ro', isa => 'Str'  );
   has 'type' => (is => 'ro', isa => 'Str'  );
   has 'uniqueItems' => (is => 'ro', isa => 'Bool'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

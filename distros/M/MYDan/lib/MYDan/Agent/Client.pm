@@ -84,6 +84,7 @@ sub run
 
     my $cv = AE::cv;
     AnyEvent::Loop::now_update();
+    my $now_update = time;
 
     my ( @work, $stop );
 
@@ -123,6 +124,7 @@ sub run
         return unless my $node = shift @node;
         $result{$node} = '';
         
+        my $now_update_time = time - $now_update;
         $cv->begin;
         tcp_connect $hosts{$node}, $run{port}, sub {
              my ( $fh ) = @_;
@@ -216,7 +218,7 @@ sub run
                  $hdl->push_write($query);
                  $hdl->push_shutdown;
              }
-         }, sub{ return 3; };
+         }, sub{ return $now_update_time + 5; };
     };
 
     my $max = scalar @node > $run{max} ? $run{max} : scalar @node;
@@ -225,6 +227,7 @@ sub run
     my %rresult;
     my $rwork = sub{
         my $node = shift;
+        my $now_update_time = time - $now_update;
         $cv->begin;
 
         my @node = @{$node{$node}};
@@ -373,7 +376,7 @@ sub run
                  $hdl->push_write($rquery);
                  $hdl->push_shutdown;
              }
-          }, sub{ return 3; };
+          }, sub{ return $now_update_time + 5; };
       };
 
     #Don't change it to map

@@ -1,5 +1,9 @@
 Revision history for Getopt-Config-FromPod
 
+v0.0.4    2018-05-19 01:33:47+09:00 Asia/Tokyo
+    [Non-functional change]
+        - Adapt a test to Getopt::Long::Descriptive variations.
+
 v0.0.3    2015-02-27 01:34:54JST+0900 Asia/Tokyo
     [Non-functional change]
         - Adapt a test to Getopt::Long::Descriptive 0.99.

@@ -1,10 +1,10 @@
 {
-   "abstract" : "conditionally compile assertions",
+   "abstract" : "conditionally-compiled code assertions",
    "author" : [
       "Tom Christiansen <tchrist@perl.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,9 +22,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Carp::Always" : "0",
+            "Hash::Util" : "0.12",
             "IO::File" : "0",
             "IO::Handle" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
             "Pod::Coverage" : "0.18",
+            "Test2::Tools::Exception" : "0.000114",
             "Test::CheckManifest" : "0.9",
             "Test::Exception" : "0.38",
             "Test::More" : "1.001014",
@@ -39,7 +44,10 @@
       "runtime" : {
          "requires" : {
             "Attribute::Handlers" : "0",
-            "Exporter" : "5.54",
+            "B::Deparse" : "0",
+            "Cwd" : "0",
+            "Env" : "0",
+            "Exporter" : "5.57",
             "Exporter::ConditionalSubs" : "1.01",
             "File::Basename" : "0",
             "File::Spec" : "0",
@@ -48,11 +56,14 @@
             "Tie::Hash" : "0",
             "Unicode::Collate" : "0",
             "Unicode::Normalize" : "0",
+            "namespace::autoclean" : "0",
+            "namespace::clean" : "0",
             "parent" : "0",
             "perl" : "5.012"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.004"
+   "version" : 0.008,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

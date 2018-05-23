@@ -26,7 +26,7 @@ Create plots for script nucleotide_composition.
 =cut
 
 package CLIPSeqTools::PlotApp::nucleotide_composition;
-$CLIPSeqTools::PlotApp::nucleotide_composition::VERSION = '0.1.7';
+$CLIPSeqTools::PlotApp::nucleotide_composition::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

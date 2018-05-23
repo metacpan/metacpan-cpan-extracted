@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Math::Business::BlackScholes::Binaries::Greeks",
   "PREREQ_PM" => {
-    "Math::Business::BlackScholes::Binaries" => 0,
+    "Math::Business::BlackScholesMerton" => 0,
     "Math::CDF" => 0
   },
   "TEST_REQUIRES" => {
@@ -28,9 +28,10 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::Exception" => 0,
     "Test::More" => "0.94",
-    "Test::Most" => 0
+    "Test::Most" => 0,
+    "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,12 +43,13 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Math::Business::BlackScholes::Binaries" => 0,
+  "Math::Business::BlackScholesMerton" => 0,
   "Math::CDF" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::Exception" => 0,
   "Test::More" => "0.94",
-  "Test::Most" => 0
+  "Test::Most" => 0,
+  "Test::NoWarnings" => 0
 );
 
 

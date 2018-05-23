@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::VNASweep;
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.642';
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.651';
 #ABSTRACT: Role for network analyzer sweeps
 
 # Some default exports like 'inner' would collide with PDL
@@ -201,7 +201,7 @@ Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 METHODS
 

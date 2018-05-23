@@ -17,13 +17,13 @@ use App::perlbrew;
 
 my $temp = File::Temp->newdir();
 File::Path::mkpath($_) for map { $temp->dirname.'/'.$_ } qw(dists build);
-my @stable = grep { /perl-5\.(\d+)/; $1 % 2 == 0 && $1 >= 8 && $_ !~ /TRIAL|RC/;  } App::perlbrew->new('--all')->available_perls();
+my @stable = grep { /perl-5\.(\d+)/; $1 % 2 == 0 && $1 >= 8 && $_ !~ /TRIAL|RC/;  } grep { /^perl/ } map { s/^\s+//; $_; } App::perlbrew->new('--all')->available_perls();
 plan tests => 2 * @stable;
 $ENV{PERL5_PATCHPERL_PLUGIN} = 'Cygwin';
 for my $stable (@stable) {
     my $pb = App::perlbrew->new('--root' => $temp->dirname);
     my $dist_version = $stable; $dist_version =~ s/perl-//;
-    my ($dist_tarball, $dist_tarball_url) = $pb->perl_release($dist_version);
+    my $dist_tarball = $pb->release_detail($stable)->{tarball_name};
     my $dist_tarball_path = $App::perlbrew::PERLBREW_ROOT.'/dists/'.$dist_tarball;
     if(! -f $dist_tarball_path) {
         $pb->run_command_download($stable);

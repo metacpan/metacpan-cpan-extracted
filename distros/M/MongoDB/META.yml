@@ -28,7 +28,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Path::Tiny: '0.052'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,170 +43,170 @@ no_index:
 provides:
   MongoDB:
     file: lib/MongoDB.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::AuthError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::BSON:
     file: lib/MongoDB/BSON.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::BSON::Binary:
     file: lib/MongoDB/BSON/Binary.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::BSON::Regexp:
     file: lib/MongoDB/BSON/Regexp.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::BulkWrite:
     file: lib/MongoDB/BulkWrite.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::BulkWriteResult:
     file: lib/MongoDB/BulkWriteResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::BulkWriteView:
     file: lib/MongoDB/BulkWriteView.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::Code:
     file: lib/MongoDB/Code.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::Collection:
     file: lib/MongoDB/Collection.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::CommandResult:
     file: lib/MongoDB/CommandResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::ConnectionError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::Cursor:
     file: lib/MongoDB/Cursor.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::CursorNotFoundError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::DBRef:
     file: lib/MongoDB/DBRef.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::Database:
     file: lib/MongoDB/Database.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::DatabaseError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::DecodingError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::DeleteResult:
     file: lib/MongoDB/DeleteResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::DocumentError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::DuplicateKeyError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::Error:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::ExecutionTimeout:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::GridFS:
     file: lib/MongoDB/GridFS.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::GridFS::File:
     file: lib/MongoDB/GridFS/File.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::GridFSBucket:
     file: lib/MongoDB/GridFSBucket.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::GridFSBucket::DownloadStream:
     file: lib/MongoDB/GridFSBucket/DownloadStream.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::GridFSBucket::UploadStream:
     file: lib/MongoDB/GridFSBucket/UploadStream.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::GridFSError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::HandshakeError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::IndexView:
     file: lib/MongoDB/IndexView.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::InsertManyResult:
     file: lib/MongoDB/InsertManyResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::InsertOneResult:
     file: lib/MongoDB/InsertOneResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::InternalError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::MongoClient:
     file: lib/MongoDB/MongoClient.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::NetworkError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::NetworkTimeout:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::NotMasterError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::OID:
     file: lib/MongoDB/OID.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::ProtocolError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::QueryResult:
     file: lib/MongoDB/QueryResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::QueryResult::Filtered:
     file: lib/MongoDB/QueryResult/Filtered.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::ReadConcern:
     file: lib/MongoDB/ReadConcern.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::ReadPreference:
     file: lib/MongoDB/ReadPreference.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::SelectionError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::TimeoutError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::Timestamp:
     file: lib/MongoDB/Timestamp.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::UnacknowledgedResult:
     file: lib/MongoDB/UnacknowledgedResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::UpdateResult:
     file: lib/MongoDB/UpdateResult.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::UsageError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::WriteConcern:
     file: lib/MongoDB/WriteConcern.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::WriteConcernError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
   MongoDB::WriteError:
     file: lib/MongoDB/Error.pm
-    version: v1.8.1
+    version: v1.8.2
 recommends:
   IO::Socket::IP: '0.32'
   IO::Socket::SSL: '1.42'
   Mozilla::CA: '20130114'
   Net::SSLeay: '1.49'
 requires:
-  Authen::SCRAM::Client: '0.003'
+  Authen::SCRAM::Client: '0.009'
   BSON::Decimal128: '0'
   BSON::Types: '0'
   Carp: '0'
@@ -248,7 +248,7 @@ resources:
   bugtracker: https://jira.mongodb.org/browse/PERL
   homepage: https://github.com/mongodb/mongo-perl-driver
   repository: https://github.com/mongodb/mongo-perl-driver.git
-version: v1.8.1
+version: v1.8.2
 x_contributors:
   - 'Andrew Page <andrew@infosiftr.com>'
   - 'Andrey Khozov <avkhozov@gmail.com>'
@@ -309,4 +309,5 @@ x_contributors:
   - 'Whitney Jackson <whjackson@gmail.com>'
   - 'Xtreak <tirkarthi@users.noreply.github.com>'
   - 'Zhihong Zhang <zzh_621@yahoo.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

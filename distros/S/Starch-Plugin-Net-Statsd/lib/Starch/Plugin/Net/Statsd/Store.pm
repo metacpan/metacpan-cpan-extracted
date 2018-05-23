@@ -1,6 +1,5 @@
-package # hide from PAUSE
-    Starch::Plugin::Net::Statsd::Store;
-
+package Starch::Plugin::Net::Statsd::Store;
+$Starch::Plugin::Net::Statsd::Store::VERSION = '0.02';
 use Net::Statsd;
 use Types::Common::String -types;
 use Time::HiRes qw( gettimeofday tv_interval );
@@ -43,6 +42,8 @@ sub _build_statsd_full_path {
 foreach my $method (qw( set get remove )) {
     around $method => sub{
         my ($orig, $self, @args) = @_;
+
+        local $Carp::Internal{ (__PACKAGE__) } = 1;
 
         return $self->$orig( @args ) if $self->isa('Starch::Store::Layered');
 

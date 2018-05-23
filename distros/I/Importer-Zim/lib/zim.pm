@@ -5,7 +5,7 @@ BEGIN {
 }
 
 package zim;
-$zim::VERSION = '0.9.1';
+$zim::VERSION = '0.9.2';
 # ABSTRACT: Import functions à la Invader Zim
 
 1;
@@ -44,7 +44,7 @@ zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

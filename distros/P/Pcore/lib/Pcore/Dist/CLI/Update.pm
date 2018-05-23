@@ -2,7 +2,7 @@ package Pcore::Dist::CLI::Update;
 
 use Pcore -class;
 
-with qw[Pcore::Dist::CLI];
+extends qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
     return { abstract => 'update README.md and LICENSE', };

@@ -14,7 +14,7 @@ use AnyEvent::WebSocket::Connection;
 use PerlX::Maybe qw( maybe provided );
 
 # ABSTRACT: WebSocket client for AnyEvent
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 has timeout => (
@@ -68,6 +68,10 @@ has max_payload_size => (
   is => 'ro',
 );
 
+
+has max_fragments => (
+  is => 'ro',
+);
 
 
 has env_proxy => (
@@ -166,10 +170,11 @@ sub connect
         undef $handshake;
         $done->send(
           AnyEvent::WebSocket::Connection->new(
-                  handle           => $hdl,
-                  masked           => 1,
-            maybe subprotocol      => $sb,
-            maybe max_payload_size => $self->max_payload_size,
+                  handle               => $hdl,
+                  masked               => 1,
+            maybe subprotocol          => $sb,
+            maybe max_payload_size     => $self->max_payload_size,
+            maybe max_fragments        => $self->max_fragments,
           )
         );
         undef $hdl;
@@ -219,7 +224,7 @@ AnyEvent::WebSocket::Client - WebSocket client for AnyEvent
 
 =head1 VERSION
 
-version 0.46
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -340,6 +345,11 @@ Although, the order cannot be guaranteed when using the hash style.
 =head2 max_payload_size
 
 The maximum payload size for received frames.  Currently defaults to whatever
+L<Protocol::WebSocket> defaults to.
+
+=head2 max_fragments
+
+The maximum number of fragments for received frames.  Currently defaults to whatever
 L<Protocol::WebSocket> defaults to.
 
 =head2 env_proxy
@@ -474,6 +484,8 @@ José Joaquín Atria (JJATRIA)
 Kivanc Yazan (KYZN)
 
 Yanick Champoux (YANICK)
+
+Fayland Lam (FAYLAND)
 
 =head1 COPYRIGHT AND LICENSE
 

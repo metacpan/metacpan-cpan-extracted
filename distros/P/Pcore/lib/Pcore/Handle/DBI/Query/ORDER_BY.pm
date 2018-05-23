@@ -3,7 +3,7 @@ package Pcore::Handle::DBI::Query::ORDER_BY;
 use Pcore -const, -class;
 use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
 
-has _buf => ( is => 'ro', isa => ArrayRef, required => 1 );
+has _buf => ();    # ( is => 'ro', isa => ArrayRef, required => 1 );
 
 const our $SQL_SORT_ORDER => {
     asc  => 'ASC',

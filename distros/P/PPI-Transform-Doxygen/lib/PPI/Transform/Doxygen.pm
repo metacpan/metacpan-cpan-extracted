@@ -181,7 +181,7 @@ use Pod::POM::View::Text;
 use PPI::Transform::Doxygen::POD;
 use Params::Util qw{_INSTANCE};
 
-our $VERSION = '0.3';
+our $VERSION = '0.32';
 
 my %vtype = qw(% hash @ array $ scalar & func * glob);
 
@@ -294,7 +294,7 @@ sub document {
             $pkg_subs->{$pname}{used},
             $pkg_subs->{$pname}{version},
             $pkg_subs->{$pname}{revision},
-            $pname eq $fname ? $pod_txt : '',
+            $short eq $fname ? $pod_txt : '',
         );
 
         $dxout .= _out_process_subs( $pname, $pkg_subs, $sub_info );

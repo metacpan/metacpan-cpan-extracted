@@ -10,12 +10,12 @@ VolSurface::Utils - A class that handles several volatility related methods
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Carp;
-use List::MoreUtils qw(notall);
+use List::Util qw(notall);
 use Math::CDF qw(pnorm qnorm);
-use Math::Business::BlackScholes::Binaries;
+use Math::Business::BlackScholesMerton::NonBinaries;
 use Math::Business::BlackScholes::Binaries::Greeks::Delta;
 use base qw( Exporter );
 
@@ -166,11 +166,11 @@ sub _calculate_strike_for_vanilla_put {
         my $k1 = $k;
 
         # Step 2: Calculate option price and the corresponding delta
-        my $option_price_1 = Math::Business::BlackScholes::Binaries::vanilla_put($S, $k1, $time_in_years, $r, $r - $d, $sigma);
+        my $option_price_1 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $k1, $time_in_years, $r, $r - $d, $sigma);
         my $delta_1 = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_put($S, $k1, $time_in_years, $r, $r - $d, $sigma);
 
         # Step 3: Numerically evaluate option at slightly different strike and calculate its corresponding delta
-        my $option_price_2 = Math::Business::BlackScholes::Binaries::vanilla_put($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
+        my $option_price_2 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
         my $delta_2 = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_put($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
         # Option's premium adjusted delta derivatives with respect to strike
         my $d_delta = ($delta_2 - $option_price_2 / $S - $delta_1 + $option_price_1 / $S) / ($k1 * 0.000001);
@@ -204,11 +204,11 @@ sub _calculate_strike_for_vanilla_call {
         my $k1 = $k;
 
         # Step 2: Calculate option price and the corresponding delta
-        my $option_price_1 = Math::Business::BlackScholes::Binaries::vanilla_call($S, $k1, $time_in_years, $r, $r - $d, $sigma);
+        my $option_price_1 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $k1, $time_in_years, $r, $r - $d, $sigma);
         my $delta_1 = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_call($S, $k1, $time_in_years, $r, $r - $d, $sigma);
 
         # Step 3: Numerically evaluate option at slightly different strike and calculate its corresponding delta
-        my $option_price_2 = Math::Business::BlackScholes::Binaries::vanilla_call($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
+        my $option_price_2 = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
         my $delta_2 = Math::Business::BlackScholes::Binaries::Greeks::Delta::vanilla_call($S, $k1 * 1.000001, $time_in_years, $r, $r - $d, $sigma);
 
         # Option's premium adjusted delta derivatives with respect to strike
@@ -508,18 +508,17 @@ sub _strangle_difference {
         $consistent_put_strike, $strike_atm, $consistent_call_strike, $put_sigma, $atm, $call_sigma, $d, $r);
 
     # 5.2: Strangle struck at market traded butterfly strikes (ie those obtained on step 4) with smile volatility builds with market quoted volatilities
-    my $call_with_consistent_vol =
-        Math::Business::BlackScholes::Binaries::vanilla_call($S, $market_conventional_call_strike, $tiy, $r, $r - $d,
-        $market_conventional_call_sigma);
+    my $call_with_consistent_vol = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $market_conventional_call_strike,
+        $tiy, $r, $r - $d, $market_conventional_call_sigma);
 
-    my $put_with_consistent_vol =
-        Math::Business::BlackScholes::Binaries::vanilla_put($S, $market_conventional_put_strike, $tiy, $r, $r - $d, $market_conventional_put_sigma);
+    my $put_with_consistent_vol = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $market_conventional_put_strike,
+        $tiy, $r, $r - $d, $market_conventional_put_sigma);
     my $strangle_with_consistent_vol = $call_with_consistent_vol + $put_with_consistent_vol;
     # 5.3: Strangle struck at market traded butterfly strikes (ie those obtained on step 4) with market coventional volatility of butterfly.
-    my $call_with_market_conventional_bf =
-        Math::Business::BlackScholes::Binaries::vanilla_call($S, $market_conventional_call_strike, $tiy, $r, $r - $d, $market_conventional_bf);
+    my $call_with_market_conventional_bf = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $market_conventional_call_strike,
+        $tiy, $r, $r - $d, $market_conventional_bf);
     my $put_with_market_conventional_bf =
-        Math::Business::BlackScholes::Binaries::vanilla_put($S, $market_conventional_put_strike, $tiy, $r, $r - $d, $market_conventional_bf);
+        Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $market_conventional_put_strike, $tiy, $r, $r - $d, $market_conventional_bf);
     my $strangle_with_market_conventional_bf = $call_with_market_conventional_bf + $put_with_market_conventional_bf;
 
     # 5.4: Calculate differences between strangle from 5.2 and 5.3
@@ -593,10 +592,10 @@ sub _implied_vol {
     while (abs($esc) > 0.000001) {
         return 0 if ($i > 35);
         if ($type eq 'VANILLA_CALL') {
-            $option_price = Math::Business::BlackScholes::Binaries::vanilla_call($S, $k, $tiy, $r, $r - $d, $vol);
+            $option_price = Math::Business::BlackScholesMerton::NonBinaries::vanilla_call($S, $k, $tiy, $r, $r - $d, $vol);
             $vega = Math::Business::BlackScholes::Binaries::Greeks::Vega::vanilla_call($S, $k, $tiy, $r, $r - $d, $vol);
         } else {
-            $option_price = Math::Business::BlackScholes::Binaries::vanilla_put($S, $k, $tiy, $r, $r - $d, $vol);
+            $option_price = Math::Business::BlackScholesMerton::NonBinaries::vanilla_put($S, $k, $tiy, $r, $r - $d, $vol);
             $vega = Math::Business::BlackScholes::Binaries::Greeks::Vega::vanilla_put($S, $k, $tiy, $r, $r - $d, $vol);
         }
 

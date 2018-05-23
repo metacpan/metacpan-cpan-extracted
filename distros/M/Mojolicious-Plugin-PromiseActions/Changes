@@ -1,4 +1,16 @@
 Revision history for perl distribution Mojolicious-Plugin-PromiseActions
 
+0.05 2018-05-23T10:47:41+0200
+- Update required Mojolicious version
+
+0.04 2018-05-22T11:14:57+0200
+- Add explicit use of Mojo::Promise to fix test failures in smokers
+
+0.03 2018-05-21T20:08:40+0200
+- Add missing requires on Mojolicious
+
+0.02 2018-05-16T15:55:20+0200
+- Fix indirect use of blessed;
+
 0.01 2018-05-14T11:40:11+0200
  - Started project

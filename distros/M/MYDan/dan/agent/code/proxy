@@ -95,7 +95,7 @@ eval
                         sub {
                             if( $keepalive{save} )
                             {
-                                print $TEMP $_[1];
+                                syswrite $TEMP, $_[1];
                             }
                             else
                             {
@@ -117,7 +117,7 @@ eval
                                         undef $hdl; $cv->send; $ok = $size;
                                     }
 
-                                    print $TEMP delete $keepalive{cont};
+                                    syswrite $TEMP, delete $keepalive{cont};
                                     $keepalive{save} = 1;
                                 }
                             }
@@ -137,7 +137,7 @@ eval
         };
         $cv->recv;
 
-		unless( $ok )
+		unless( defined $ok )
 		{
 			seek $TEMP, -6, SEEK_END;
 			sysread $TEMP, my $end, 6;
@@ -163,16 +163,9 @@ eval
 		eval{ $filecache->save( $temp ); };
 		warn "save filecache fail: $@" if $@;
 
-        print "$size:$filemd5:$own:$mode:";
-
-        my $file = $filecache->check( $filemd5 );
-        open my $X, "<$file" or die "load from proxy, open $file fail: $!";
-        while(<$X>)
-        {
-         print $_;   
-        };
-        close $X;
-
+        return unless my $file = $filecache->check( $filemd5 );
+        syswrite( \*STDOUT, "MYDanExtractFile_::${file}::_MYDanExtractFile" );
+        syswrite \*STDOUT, "$size:$filemd5:$own:$mode:";
     }
 
     else

@@ -55,35 +55,35 @@
    "provides" : {
       "Document::OOXML" : {
          "file" : "lib/Document/OOXML.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::ContentTypes" : {
          "file" : "lib/Document/OOXML/ContentTypes.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::Document" : {
          "file" : "lib/Document/OOXML/Document.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::Document::Wordprocessor" : {
          "file" : "lib/Document/OOXML/Document/Wordprocessor.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::Part" : {
          "file" : "lib/Document/OOXML/Part.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::Part::WordprocessingML" : {
          "file" : "lib/Document/OOXML/Part/WordprocessingML.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::PartParser" : {
          "file" : "lib/Document/OOXML/PartParser.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       },
       "Document::OOXML::Rels" : {
          "file" : "lib/Document/OOXML/Rels.pm",
-         "version" : "0.180750"
+         "version" : "0.181410"
       }
    },
    "release_status" : "stable",
@@ -97,7 +97,7 @@
          "web" : "https://gitlab.com/martijnvds/Document-OOXML"
       }
    },
-   "version" : "0.180750",
+   "version" : "0.181410",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

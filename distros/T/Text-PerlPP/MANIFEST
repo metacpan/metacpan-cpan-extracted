@@ -21,5 +21,7 @@ t/a.txt
 t/b.txt
 t/c.txt
 t/included.txt
+t/multiline.txt
+t/unclosed.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

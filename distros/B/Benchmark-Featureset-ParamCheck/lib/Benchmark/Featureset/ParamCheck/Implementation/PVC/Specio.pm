@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Implementation::PVC::Specio;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base::PVC);
 use Params::ValidationCompiler 0.24 qw(validation_for);
@@ -15,7 +15,7 @@ use Specio::Declare 0.37;
 use Specio::Library::Builtins 0.37;
 use namespace::autoclean;
 
-use constant long_name  => 'Params::ValidateCompiler with Specio';
+use constant long_name  => 'Params::ValidationCompiler with Specio';
 use constant short_name => 'PVC-Specio';
 
 sub get_named_check {

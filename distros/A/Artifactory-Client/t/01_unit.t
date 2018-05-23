@@ -916,6 +916,15 @@ subtest 'get_global_system_replication_configuration', sub {
     is( $resp->code, 200, 'got 200 back' );
 };
 
+subtest 'get_remote_repositories_registered_for_replication', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::get'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->get_remote_repositories_registered_for_replication('repository');
+    is( $resp->code, 200, 'got 200 back' );
+};
+
 subtest 'block_system_replication', sub {
     my $client = setup();
 

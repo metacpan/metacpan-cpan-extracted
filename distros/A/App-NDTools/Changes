@@ -1,5 +1,9 @@
 Revision history for App-NDTools
 
+0.5.6   2018-05-16
+        - fix crashes when Scalar::Util < 1.26 installed
+        - dist and docs improvements
+
 0.5.5   2018-05-09
         - all: numbers load fixed for YAML
         - all: booleans dump fixed for YAML

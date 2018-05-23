@@ -1,7 +1,8 @@
-package Dist::Zilla::Plugin::Author::Plicease::Upload 2.25 {
+package Dist::Zilla::Plugin::Author::Plicease::Upload 2.26 {
 
   use 5.014;
   use Moose;
+  use Path::Tiny ();
 
   # ABSTRACT: Upload a dist to CPAN
 
@@ -15,7 +16,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.25 {
   
   has scp_dest => (
     is      => 'ro',
-    default => sub { 'ollisg@ratbat.wdlabs.com:web/sites/dist' },
+    default => sub { 'ollisg@ratbat.wdlabs.com:web/sites/dist/docs/' },
   );
   
   has url => (
@@ -34,6 +35,11 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.25 {
   around release => sub {
     my $orig = shift;
     my $self = shift;
+    my($archive) = @_;
+    
+    my $local_release_dir = Path::Tiny->new("~/dev/site-dist/docs");
+    
+    my @cmd;
     
     if($self->cpan && $self->zilla->chrome->prompt_yn("upload to CPAN?"))
     {
@@ -47,21 +53,29 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.25 {
         $self->zilla->log("error uploading to cpan: $error");
         $self->zilla->log("you will have to manually upload the dist");
       }
+      return;
+    }
+    elsif(-d "$local_release_dir")
+    {
+      @cmd = ('cp', $archive, "$local_release_dir");
     }
     else
     {
-      my($archive) = @_;
       use autodie qw( :system );
-      my @cmd = ('scp', '-q', $archive, $self->scp_dest);
+      @cmd = ('scp', '-q', $archive, $self->scp_dest);
+    }
+    
+    {
       $self->zilla->log("% @cmd");
       eval { system @cmd };
       if(my $error = $@)
       {
-        $self->zilla->log("NOTE SCP FAILED: $error");
+        $self->zilla->log("NOTE COPY FAILED: $error");
         $self->zilla->log("manual upload will be required");
       }
       else
       {
+        $self->zilla->log("don't forget to commit and push to site-dist");
         $self->zilla->log("download URL: " . $self->url . "$archive");
       }
     }
@@ -87,7 +101,7 @@ Dist::Zilla::Plugin::Author::Plicease::Upload - Upload a dist to CPAN
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 SYNOPSIS
 

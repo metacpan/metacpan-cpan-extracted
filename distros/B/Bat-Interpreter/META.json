@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::BatParser" : "0",
+            "App::BatParser" : "0.005",
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Moose" : "0",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/pablrod/p5-Bat-Interpreter"
       }
    },
-   "version" : "0.005",
+   "version" : "0.008",
    "x_contributors" : [
       "eva.dominguez <eva.dominguez@meteologica.com>",
       "pablo.rodriguez <pablo.rodriguez@meteologica.com>"

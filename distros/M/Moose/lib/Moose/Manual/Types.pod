@@ -13,7 +13,7 @@ Moose::Manual::Types - Moose's type system
 
 =head1 VERSION
 
-version 2.2010
+version 2.2011
 
 =head1 TYPES IN PERL?
 

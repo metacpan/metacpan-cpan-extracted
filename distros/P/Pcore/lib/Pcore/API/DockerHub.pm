@@ -1,7 +1,9 @@
 package Pcore::API::DockerHub;
 
-use Pcore -const, -class, -res, -export => { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERHUB_SOURCE_TYPE_BRANCH]] };
+use Pcore -const, -class, -res, -export;
 use Pcore::Util::Scalar qw[is_plain_coderef];
+
+our $EXPORT = { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERHUB_SOURCE_TYPE_BRANCH]] };
 
 has username => ( is => 'ro', isa => Str, required => 1 );
 has password => ( is => 'ro', isa => Str, required => 1 );
@@ -595,12 +597,12 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 81, 186, 314, 324,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 340, 366, 370, 403,  |                                                                                                                |
-## |      | 471, 490, 494, 536,  |                                                                                                                |
-## |      | 549                  |                                                                                                                |
+## |    3 | 83, 188, 316, 326,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 342, 368, 372, 405,  |                                                                                                                |
+## |      | 473, 492, 496, 538,  |                                                                                                                |
+## |      | 551                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 164                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 166                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

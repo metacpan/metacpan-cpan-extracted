@@ -67,8 +67,11 @@ sub subject {
 
     # Put in correct order - maybe not effective
     my $clone = $self->at('Subject');
+
     $self->at('Subject')->remove;
-    return $np->prepend($clone);
+
+    # return $np->prepend($clone);
+    return $np->prepend($clone->to_string);
   };
 
   # Set subject
@@ -186,7 +189,7 @@ sub expires {
     # Put in correct order - maybe not effective
     my $clone = $self->at('Expires');
     $self->at('Expires')->remove;
-    return $np->prepend($clone);
+    return $np->prepend($clone->to_string);
   };
 
   # Return new node
@@ -677,7 +680,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

@@ -6,7 +6,7 @@ package OpenGbg::Service::Bridge::BridgeOpening;
 
 # ABSTRACT: A change in status for Göta Älvbron
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use XML::Rabbit;
 use DateTime::Format::HTTP;
@@ -55,7 +55,7 @@ OpenGbg::Service::Bridge::BridgeOpening - A change in status for Göta Älvbron
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SYNOPSIS
 

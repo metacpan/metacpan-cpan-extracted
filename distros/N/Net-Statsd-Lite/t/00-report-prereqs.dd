@@ -30,16 +30,11 @@ do { my $x = {
                                       'IO::Socket' => '1.18',
                                       'Moo' => '1.000000',
                                       'MooX::TypeTiny' => '0',
-                                      'Scalar::Util' => '0',
                                       'Sub::Quote' => '0',
                                       'Sub::Util' => '1.40',
-                                      'Type::Library' => '0',
-                                      'Type::Utils' => '0',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => 'v5.10.0'
                                     }
                     },
        'test' => {

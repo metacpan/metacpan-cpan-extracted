@@ -6,7 +6,7 @@ package OpenGbg::Service::StyrOchStall;
 
 # ABSTRACT: Entry point to the StyrOchStall bike rental service
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use OpenGbg::Elk;
 with 'OpenGbg::Service::Getter';
@@ -69,7 +69,7 @@ OpenGbg::Service::StyrOchStall - Entry point to the StyrOchStall bike rental ser
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SYNOPSIS
 

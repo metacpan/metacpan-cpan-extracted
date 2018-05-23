@@ -25,19 +25,18 @@
 # Note that tests for prefixing feature.pm-enabled keywords with CORE:: when
 # feature.pm is not enabled are in deparse.t, as they fit that format better.
 
+use rlib '.'; use helper;
+use warnings; use strict;
+
 
 BEGIN {
-    require Config;
-    my $is_cperl = $Config::Config{usecperl};
-    if (($Config::Config{extensions} !~ /\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-    use Test::More;
     if ($] < 5.026 || $] > 5.0269) {
 	plan skip_all => 'Customized to version 5.26 interpreter';
     }
+    require Config;
+    my $is_cperl = $Config::Config{usecperl};
     plan skip_all => 'Customized to CPerl interpreter' unless $is_cperl;
+    plan skip_all => 'Needs going over';
 }
 
 use rlib '../lib';
@@ -147,11 +146,6 @@ sub testit {
     }
 }
 
-
-# Deparse can't distinguish 'and' from '&&' etc
-my %infix_map = qw(and && or ||);
-
-
 # test a keyword that is a binary infix operator, like 'cmp'.
 # $parens - "$a op $b" is deparsed as "($a op $b)"
 # $strong - keyword is strong
@@ -161,7 +155,6 @@ sub do_infix_keyword {
     $SEEN_STRENGH{$keyword} = $strong;
     my $expr = "(\$a $keyword \$b)";
     my $nkey = $infix_map{$keyword} // $keyword;
-    my $expr = "(\$a $keyword \$b)";
     my $exp = "\$a $nkey \$b";
     $exp = "($exp)" if $parens;
     $exp .= ";";
@@ -237,7 +230,7 @@ while (<DATA>) {
     my $invert1 = $flags =~ s/1//;
     my $dollar  = $flags =~ s/\$//;
     my $strong  = $flags =~ s/\+//;
-    die "unrecognised flag(s): '$flags'" unless $flags =~ /^-?$/;
+    die "unrecognized flag(s): '$flags'" unless $flags =~ /^-?$/;
 
     if ($args eq 'B') { # binary infix
 	die "$keyword: binary (B) op can't have '\$' flag\\n" if $dollar;

@@ -25,6 +25,7 @@
 #include "spvm_package_var.h"
 #include "spvm_opcode_array.h"
 #include "spvm_block.h"
+#include "spvm_basic_type.h"
 
 void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
   int32_t depth = 0;
@@ -45,27 +46,27 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     printf("%s", SPVM_OP_C_ID_NAMES[id]);
     if (op_cur->id == SPVM_OP_C_ID_CONSTANT) {
       SPVM_CONSTANT* constant = op_cur->uv.constant;
-      printf(" %s", SPVM_TYPE_C_ID_NAMES[constant->type->id]);
-      switch (constant->type->id) {
-        case SPVM_TYPE_C_ID_BYTE:
+      printf(" %s", SPVM_BASIC_TYPE_C_ID_NAMES[constant->type->basic_type->id]);
+      switch (constant->type->basic_type->id) {
+        case SPVM_BASIC_TYPE_C_ID_BYTE:
           printf(" %" PRId8, constant->value.byte_value);
           break;
-        case SPVM_TYPE_C_ID_SHORT:
+        case SPVM_BASIC_TYPE_C_ID_SHORT:
           printf(" %" PRId16, constant->value.short_value);
           break;
-        case SPVM_TYPE_C_ID_INT:
+        case SPVM_BASIC_TYPE_C_ID_INT:
           printf(" %" PRId32, constant->value.int_value);
           break;
-        case SPVM_TYPE_C_ID_LONG:
+        case SPVM_BASIC_TYPE_C_ID_LONG:
           printf(" %" PRId64, constant->value.long_value);
           break;
-        case SPVM_TYPE_C_ID_FLOAT:
+        case SPVM_BASIC_TYPE_C_ID_FLOAT:
           printf(" %f", constant->value.float_value);
           break;
-        case SPVM_TYPE_C_ID_DOUBLE:
+        case SPVM_BASIC_TYPE_C_ID_DOUBLE:
           printf(" %f", constant->value.double_value);
           break;
-        case SPVM_TYPE_C_ID_BYTE_ARRAY:
+        case SPVM_BASIC_TYPE_C_ID_STRING:
           printf(" \"%s\"", constant->value.string_value);
           break;
       }
@@ -95,7 +96,12 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
       printf(" \"%s\"", op_cur->uv.name);
     }
     else if (id == SPVM_OP_C_ID_TYPE) {
-      printf(" \"%s\"", op_cur->uv.type->name);
+      if (op_cur->uv.type) {
+        SPVM_TYPE_fprint_type_name(compiler, stdout, op_cur->uv.type->basic_type->id, op_cur->uv.type->dimension);
+      }
+      else {
+        printf(" \"Unknown\"");
+      }
     }
     else if (id == SPVM_OP_C_ID_PACKAGE) {
       if (strcmp(op_cur->uv.package->op_name->uv.name, "Std") == 0) {
@@ -169,8 +175,8 @@ void SPVM_DUMPER_dump_all(SPVM_COMPILER* compiler) {
   printf("\n[AST]\n");
   SPVM_DUMPER_dump_ast(compiler, compiler->op_grammar);
   
-  printf("\n[Types]\n");
-  SPVM_DUMPER_dump_types(compiler, compiler->types);
+  printf("\n[Basic types]\n");
+  SPVM_DUMPER_dump_basic_types(compiler, compiler->basic_types);
   
   printf("\n[Packages]\n");
   SPVM_DUMPER_dump_packages(compiler, compiler->op_packages);
@@ -211,7 +217,12 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_LIST* op_packages) 
       SPVM_OP* op_package = SPVM_LIST_fetch(op_packages, i);
       SPVM_PACKAGE* package = op_package->uv.package;
       
-      printf("  name => \"%s\"\n", package->op_name->uv.name);
+      if (package->op_name) {
+        printf("  name => \"%s\"\n", package->op_name->uv.name);
+      }
+      else {
+        printf("  name => \"ANON\"\n");
+      }
       
       printf("  byte_size => %" PRId32 "\n", package->op_fields->length);
       
@@ -231,16 +242,15 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_LIST* op_packages) 
   }
 }
 
-void SPVM_DUMPER_dump_types(SPVM_COMPILER* compiler, SPVM_LIST* types) {
+void SPVM_DUMPER_dump_basic_types(SPVM_COMPILER* compiler, SPVM_LIST* basic_types) {
   (void)compiler;
   
   {
     int32_t i;
-    for (i = 0; i < types->length; i++) {
-      printf("type[%" PRId32 "]\n", i);
-      SPVM_TYPE* type = SPVM_LIST_fetch(types, i);
-      printf("    name => \"%s\"\n", type->name);
-      printf("    id => \"%" PRId32 "\"\n", type->id);
+    for (i = 0; i < basic_types->length; i++) {
+      printf("basic_type[%" PRId32 "]\n", i);
+      SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(basic_types, i);
+      printf("    name => %s", basic_type->name);
     }
   }
 }
@@ -326,27 +336,27 @@ void SPVM_DUMPER_dump_opcode_array(SPVM_COMPILER* compiler, SPVM_OPCODE_ARRAY* o
 void SPVM_DUMPER_dump_constant(SPVM_COMPILER* compiler, SPVM_CONSTANT* constant) {
   (void)compiler;
   
-  switch(constant->type->id) {
-    case SPVM_TYPE_C_ID_BYTE:
+  switch(constant->type->basic_type->id) {
+    case SPVM_BASIC_TYPE_C_ID_BYTE:
       printf("      int %" PRId8 "\n", constant->value.byte_value);
       break;
-    case SPVM_TYPE_C_ID_SHORT:
+    case SPVM_BASIC_TYPE_C_ID_SHORT:
       printf("      int %" PRId16 "\n", constant->value.short_value);
       break;
-    case SPVM_TYPE_C_ID_INT:
+    case SPVM_BASIC_TYPE_C_ID_INT:
       printf("      int %" PRId32 "\n", constant->value.int_value);
       break;
-    case SPVM_TYPE_C_ID_LONG:
+    case SPVM_BASIC_TYPE_C_ID_LONG:
       printf("      long %" PRId64 "\n", constant->value.long_value);
       break;
-    case SPVM_TYPE_C_ID_FLOAT:
+    case SPVM_BASIC_TYPE_C_ID_FLOAT:
       printf("      float %f\n", constant->value.float_value);
       break;
-    case SPVM_TYPE_C_ID_DOUBLE:
+    case SPVM_BASIC_TYPE_C_ID_DOUBLE:
       printf("      double %f\n", constant->value.double_value);
       break;
-    case SPVM_TYPE_C_ID_BYTE_ARRAY:
-      printf("      byte[] \"%s\"\n", constant->value.string_value);
+    case SPVM_BASIC_TYPE_C_ID_STRING:
+      printf("      String \"%s\"\n", constant->value.string_value);
       break;
   }
   printf("      address => %" PRId32 "\n", constant->id);
@@ -359,7 +369,9 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
     
     printf("      abs_name => \"%s\"\n", sub->abs_name);
     printf("      name => \"%s\"\n", sub->op_name->uv.name);
-    printf("      return_type => \"%s\"\n", sub->op_return_type->uv.type->name);
+    printf("      return_type => ");
+    SPVM_TYPE_fprint_type_name(compiler, stdout, sub->op_return_type->uv.type->basic_type->id, sub->op_return_type->uv.type->dimension);
+    printf("\n");
     printf("      is_enum => %d\n", sub->is_enum);
     printf("      is_native => %d\n", sub->is_native);
     
@@ -405,13 +417,15 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
   if (field) {
     printf("      name => \"%s\"\n", field->op_name->uv.name);
     
-    printf("      index => \"%" PRId32 "\"\n", field->index);
+    printf("      index => \"%" PRId32 "\"\n", field->id);
     
     SPVM_TYPE* type = field->op_type->uv.type;
-    printf("      type => \"%s\"\n", type->name);
+    printf("      type => ");
+    SPVM_TYPE_fprint_type_name(compiler, stdout, type->basic_type->id, type->dimension);
+    printf("\n");
     printf("      byte_size => \"%" PRId32 "\"\n", SPVM_FIELD_get_byte_size(compiler, field));
     
-    printf("      id => \"%" PRId32 "\"\n", field->id);
+    printf("      index => \"%" PRId32 "\"\n", field->id);
   }
   else {
     printf("        None\n");
@@ -439,8 +453,9 @@ void SPVM_DUMPER_dump_my(SPVM_COMPILER* compiler, SPVM_MY* my) {
     printf("          name => \"%s\"\n", my->op_name->uv.name);
     
     SPVM_TYPE* type = my->op_type->uv.type;
-    printf("          type => \"%s\"\n", type->name);
-    
+    printf("          type => ");
+    SPVM_TYPE_fprint_type_name(compiler, stdout, type->basic_type->id, type->dimension);
+    printf("\n");
   }
   else {
     printf("          None\n");

@@ -5,6 +5,7 @@ use Net::Frame::Layer qw(:consts :subs);
 
 my $host = 'gomor.org';
 my $ip6 = '2001:41d0:2:1a47::2';
+my $ip6v4mapping = '::ffff:94.23.25.71';
 my $ip4 = '94.23.25.71';
 
 #
@@ -58,7 +59,7 @@ ok(
 ok(
    sub {
       my $ip = getHostIpv6Addr($host);
-      if ($ip eq $ip6) {
+      if ($ip eq $ip6 || $ip eq $ip6v4mapping) {
          print "[+] $ip\n";
          return 1;  # OK
       }

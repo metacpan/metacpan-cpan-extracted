@@ -38,7 +38,7 @@
    "provides" : {
       "Alien::Electron" : {
          "file" : "lib/Alien/Electron.pm",
-         "version" : "0.103"
+         "version" : "0.200"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "git://github.com/hoytech/Alien-Electron.git"
       }
    },
-   "version" : "0.103",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.200",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

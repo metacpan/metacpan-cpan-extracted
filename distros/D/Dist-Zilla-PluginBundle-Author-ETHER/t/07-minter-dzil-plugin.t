@@ -15,7 +15,7 @@ use Helper;
 
 # we need the profiles dir to have gone through file munging first (for
 # profile.ini), as well as get installed into a sharedir
-plan skip_all => 'this test requires a built dist'
+plan skip_all => 'this test requires a built distribution'
     unless -d 'blib/lib/auto/share/dist/Dist-Zilla-PluginBundle-Author-ETHER/profiles';
 
 plan skip_all => 'minting requires perl 5.014' unless "$]" >= 5.013002;

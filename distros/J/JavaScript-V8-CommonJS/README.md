@@ -32,6 +32,10 @@ All arguments are optional.
 
     Hashref of native modules. Default: {}.
 
+- v8\_params
+
+    Hashref passed directly to ["new" in JavaScript::V8::Context](https://metacpan.org/pod/JavaScript::V8::Context#new). Default: undef.
+
 # METHODS
 
 ## add\_module(name => module)

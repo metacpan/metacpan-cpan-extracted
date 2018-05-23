@@ -8,7 +8,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.062'
   Test::More: '0.88'
   strict: '0'
   warnings: '0'
@@ -30,6 +30,7 @@ requires:
   Digest: '0'
   Digest::SHA: '0'
   Moo: '0'
+  Path::Tiny: '0.062'
   Type::Params: '0'
   Types::Path::Tiny: '0'
   Types::Standard: '0'
@@ -38,5 +39,5 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-ContentStore
   repository: http://github.com/book/File-ContentStore.git
-version: '1.000'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.001'
+x_serialization_backend: 'YAML::Tiny version 1.73'

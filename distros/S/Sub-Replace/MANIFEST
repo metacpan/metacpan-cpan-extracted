@@ -12,6 +12,7 @@ lib/Sub/Replace.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-load.t
+t/02-basic.t
 t/03-synopsis.t
 xt/author/pod-syntax.t
 xt/release/changes_has_content.t

@@ -2,14 +2,10 @@ package Pcore::Util::File::ChdirGuard;
 
 use Pcore -class;
 
-with qw[Pcore::Core::Guard];
+has dir => ( isa => 'Str', required => 1 );
 
-has dir => ( is => 'ro', isa => Str, required => 1 );
-
-sub ON_DESTROY {
-    my $self = shift;
-
-    chdir $self->dir or die;
+sub DESTROY ( $self ) {
+    chdir $self->{dir} or die;
 
     return;
 }
@@ -21,7 +17,7 @@ sub ON_DESTROY {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 29                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 33 does not match the package declaration       |
+## |    1 | 25                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 29 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -2,11 +2,11 @@ package App::Prove::Plugin::andoc;
 use strict;
 use warnings;
 
+our $VERSION = '0.8.4';
+
 use Pandoc;
 use File::Temp qw(tempdir);
 use Cwd qw(realpath);
-
-our $VERSION = '0.8.1';
 
 sub load {
     my ($class, $p) = @_;

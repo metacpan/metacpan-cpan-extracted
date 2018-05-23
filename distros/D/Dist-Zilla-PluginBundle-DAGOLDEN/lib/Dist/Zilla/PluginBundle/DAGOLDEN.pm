@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::PluginBundle::DAGOLDEN;
 # ABSTRACT: Dist::Zilla configuration the way DAGOLDEN does it
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 # Dependencies
 use Moose 0.99;
@@ -232,13 +232,6 @@ sub configure {
         # version number
         ( $self->auto_version ? 'AutoVersion' : 'RewriteVersion' ),
 
-        # contributors
-        (
-            $self->no_git
-            ? ()
-            : 'Git::Contributors'
-        ),
-
         # gather and prune
         (
             $self->no_git
@@ -355,6 +348,12 @@ sub configure {
               )
             : ()
         ),
+        # contributors
+        (
+            $self->no_git
+            ? ()
+            : 'Git::Contributors'
+        ),
 
         'Prereqs::AuthorDeps',
         'MetaYAML', # core
@@ -464,7 +463,7 @@ __PACKAGE__->meta->make_immutable;
 #
 # This file is part of Dist-Zilla-PluginBundle-DAGOLDEN
 #
-# This software is Copyright (c) 2016 by David Golden.
+# This software is Copyright (c) 2018 by David Golden.
 #
 # This is free software, licensed under:
 #
@@ -483,7 +482,7 @@ Dist::Zilla::PluginBundle::DAGOLDEN - Dist::Zilla configuration the way DAGOLDEN
 
 =head1 VERSION
 
-version 0.078
+version 0.079
 
 =head1 SYNOPSIS
 
@@ -497,9 +496,6 @@ following dist.ini:
 
   ; version provider
   [RewriteVersion] ; also munges
-
-  ; collect contributors list
-  [Git::Contributors]
 
   ; choose files to include
   [Git::GatherDir]         ; everything from git ls-files
@@ -565,6 +561,8 @@ following dist.ini:
 
   [MetaProvides::Package] ; add 'provides' to META files
   meta_noindex = 1        ; respect prior no_index directives
+
+  [Git::Contributors]     ; collect contributors list
 
   [Prereqs::AuthorDeps]   ; add authordeps as develop/requires
   [MetaYAML]              ; generate META.yml (v1.4)
@@ -802,7 +800,7 @@ Sergey Romanov <complefor@rambler.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by David Golden.
+This software is Copyright (c) 2018 by David Golden.
 
 This is free software, licensed under:
 

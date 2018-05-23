@@ -45,57 +45,59 @@ sub run
     $logH->autoflush;
 
 
-    $SIG{'CHLD'} = sub {
-        while((my $pid = waitpid(-1, WNOHANG)) >0)
+    my ( $count, $cb ) = ( 0 );
+    $cb = sub {
+        if( defined $RUN{count} && $count >= $RUN{count} )
         {
-            %proc = () if $proc{pid} && $proc{pid} == $pid;
+            syswrite( $logH, unixtai64n(time), " [CLOSE]\n" );
+            exit;
         }
+
+        my ( $err, $wtr, $rdr ) = gensym;
+        my $pid = IPC::Open3::open3( undef, $rdr, $err, "$cmd" );
+       
+
+        $proc{child} = AnyEvent->child ( pid => $pid, cb => $cb );
+        $count ++;
+
+        syswrite( $logH, unixtai64n(time). " [START:$count]\n" );
+
+
+        $proc{pid} = $pid;
+        $proc{rdr} = AnyEvent->io (
+            fh => $rdr, poll => "r",
+            cb => sub {
+                my $input;my $n = sysread $rdr, $input, 102400;
+                delete $proc{rdr} and return unless $n;
+                chomp $input;
+                syswrite( $logH, unixtai64n(time). " [STDOUT] $input\n" );
+            }
+        );
+        $proc{err} = AnyEvent->io (
+            fh => $err, poll => "r", 
+            cb => sub {
+                my $input;my $n = sysread $err, $input, 102400;
+                delete $proc{err} and return unless $n;
+                chomp $input;
+
+                syswrite( $logH, unixtai64n(time). " [STDERR] $input\n" ); 
+            }
+        );
     };
 
-    my $t = AnyEvent->timer(
-        after => 2,
-        interval => 3,
-        cb => sub {
-                return if %proc;
-
-                my ( $err, $wtr, $rdr ) = gensym;
-                my $pid = IPC::Open3::open3( undef, $rdr, $err, "$cmd" );
-           
-                print $logH unixtai64n(time), " [START]\n";
-
-                $proc{pid} = $pid;
-                $proc{rdr} = AnyEvent->io (
-                    fh => $rdr, poll => "r",
-                    cb => sub {
-                        my $input = <$rdr>; 
-                        delete $proc{rdr} and return unless $input;
-                        chomp $input;
-                        print $logH unixtai64n(time), " [STDOUT] $input\n";
-                    }
-                );
-                $proc{err} = AnyEvent->io (
-                    fh => $err, poll => "r", 
-                    cb => sub {
-                        my $input = <$err>;
-                        delete $proc{err} and return unless $input;
-
-                        chomp $input;
-                        print $logH unixtai64n(time), " [STDERR] $input\n"; 
-                    }
-                );
-
-        }
-    );
+    &$cb;
 
     my $tt = AnyEvent->timer(
         after => 30,
         interval => 60,
         cb => sub {
             my $size = ( stat "$log/current" )[7];
-            return unless $size > $RUN{size};
-            my $num = $this->_num();
-            system "mv '$log/current' '$log/log.$num'";
-            
+            return if defined $size && $size < $RUN{size};
+            if( -f "$log/current" )
+            {
+                my $num = $this->_num();
+                system "mv '$log/current' '$log/log.$num'";
+            }
 	        confess "open log: $!" unless open $logH, ">>$logf"; 
 	        $logH->autoflush;
         }

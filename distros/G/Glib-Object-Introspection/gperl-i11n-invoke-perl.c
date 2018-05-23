@@ -358,8 +358,10 @@ _prepare_perl_invocation_info (GPerlI11nPerlInvocationInfo *iinfo,
 		if (arg_tag == GI_TYPE_TAG_ARRAY) {
 			gint pos = g_type_info_get_array_length (arg_type);
 			if (pos >= 0) {
-				GITypeInfo *length_arg_type = &(iinfo->base.arg_types[pos]);
-				raw_to_arg (args[pos], &iinfo->base.aux_args[pos], length_arg_type);
+				GITypeInfo *length_arg_type;
+				guint args_pos = iinfo->base.is_signal ? pos+1 : pos;
+				length_arg_type = &(iinfo->base.arg_types[pos]);
+				raw_to_arg (args[args_pos], &iinfo->base.aux_args[pos], length_arg_type);
 				dwarn ("  pos %d is array length => %"G_GSIZE_FORMAT"\n",
 				       pos, iinfo->base.aux_args[pos].v_size);
 			}

@@ -125,7 +125,7 @@ unless( keys %SongsByArtist ) {
 debug_var(\%SongsByArtist);
 
 my ($section,%song,%TRACKS);
-while(<<>>) {
+while(<>) {
     chomp;
     next unless /^\t/;
     if( my ($capture) = m{^\t<key>(\w+(?:\s+\w+)*)<\/key>$} ) {
@@ -209,7 +209,7 @@ subsonic_import_ratings.pl - Import Ratings from an iTunes Library XML Export to
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

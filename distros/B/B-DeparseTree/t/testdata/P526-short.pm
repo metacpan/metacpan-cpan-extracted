@@ -13,6 +13,7 @@ __DATA__
 }
 ####
 # List of constants in void context
+# SKIP ?1
 # CONTEXT no warnings;
 (1,2,3);
 0;
@@ -27,6 +28,7 @@ my $test;
 my $test;
 $test /= 2 if ++$test;
 ####
+# SKIP ?1
 # list x
 -((1, 2) x 2);
 ####
@@ -59,8 +61,10 @@ glob $foo;
 glob $foo;
 ####
 # block
+# SKIP ?1
 { my $x; }
 ####
+# SKIP ?1
 # while 1
 while (1) { my $k; }
 ####
@@ -252,6 +256,7 @@ pop();
 # shift optimisation
 pop @_;
 ####
+# SKIP ?1
 #[perl #20444]
 "foo" =~ (1 ? /foo/ : /bar/);
 "foo" =~ (1 ? y/foo// : /bar/);
@@ -271,6 +276,7 @@ my @s;
 print /$s[1]/;
 ####
 # all the flags (tr///)
+# SKIP
 tr/X/Y/c;
 tr/X//d;
 tr/X//s;
@@ -293,6 +299,7 @@ $b::a[0] = 1;
 my @a;
 $a[0] = 1;
 ####
+# SKIP ?1
 # $#- $#+ $#{%} etc.
 my @x;
 @x = ($#{`}, $#{~}, $#{!}, $#{@}, $#{$}, $#{%}, $#{^}, $#{&}, $#{*});
@@ -319,6 +326,7 @@ print sort(foo('bar'));
 print sort(foo('bar'));
 ####
 # substr assignment
+# SKIP $?
 substr(my $a, 0, 0) = (foo(), bar());
 $a++;
 # ####
@@ -353,6 +361,7 @@ $a++;
 # print $_;
 ####
 # Precedence conundrums with argument-less function calls
+# SKIP ?1
 () = (eof) + 1;
 () = (return) + 1;
 () = (return, 1);
@@ -368,6 +377,7 @@ pipe local *FH, local *FH;
 require 'a' . $1;
 ####
 # 'my' works with padrange op
+# SKIP ?1
 my($z, @z);
 my $m1;
 $m1 = 1;
@@ -382,6 +392,7 @@ my($m7, undef, $m8) = (1, 2, 3);
 ($m7, undef, $m8) = (1, 2, 3);
 ####
 # 'state' works with padrange op
+# SKIP ?1
 # CONTEXT no strict; use feature 'state';
 state($z, @z);
 state $s1;
@@ -448,4 +459,5 @@ tr/X//s;
 tr/X//r;
 ####
 use feature 'unicode_strings';
+# SKIP ?1
 s/X//d;

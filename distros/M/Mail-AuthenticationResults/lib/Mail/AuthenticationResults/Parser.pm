@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Parser;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180328'; # VERSION
+our $VERSION = '1.20180518'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header;
@@ -55,6 +55,7 @@ sub tokenise {
     my @tokenised;
 
     $header =~ s/\n/ /g;
+    $header =~ s/\r/ /g;
     $header =~ s/^\s+//;
 
     # Remove Header part if present
@@ -317,7 +318,7 @@ Mail::AuthenticationResults::Parser - Class for parsing Authentication Results H
 
 =head1 VERSION
 
-version 1.20180328
+version 1.20180518
 
 =head1 DESCRIPTION
 

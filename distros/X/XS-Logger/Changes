@@ -1,6 +1,15 @@
+0.005     2018-05-21 16:55:35-06:00 America/Denver
+
+* fix DESTROY which was not correctly plugged
+* use typemap to simplify XS subs
+* update croak format on fatal/panic
+* implement quiet mode for object code
+* log on stderr in addition to the logfile unless quiet mode enabled
+* update log format
+
 0.004     2018-01-23 09:09:03-07:00 America/Denver
 
-fix unit tests to avoid double lock from File::Temp
+* fix unit tests to avoid double lock from File::Temp
 
 0.003     2018-01-22 17:34:38-06:00 America/Chicago
 
@@ -12,5 +21,4 @@ fix unit tests to avoid double lock from File::Temp
 
 0.001     2018-01-19 10:20:43-06:00 America/Chicago
 
-
-	* very first alpha implementation
+* very first alpha implementation

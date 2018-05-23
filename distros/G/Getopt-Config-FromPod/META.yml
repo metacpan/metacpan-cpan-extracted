@@ -3,25 +3,29 @@ abstract: 'Extract getopt configuration from POD'
 author:
   - 'Yasutaka ATARASHI <yakex@cpan.org>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::Exception: 0
-  Test::More: 0
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.008'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Getopt-Config-FromPod
 requires:
-  Pod::Simple: 0
-  parent: 0
-  perl: 5.008
+  Pod::Simple: '0'
+  parent: '0'
+  perl: '5.008'
 resources:
   homepage: https://github.com/yak1ex/Getopt-Config-FromPod
   repository: https://github.com/yak1ex/Getopt-Config-FromPod.git
-version: v0.0.3
+version: v0.0.4
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

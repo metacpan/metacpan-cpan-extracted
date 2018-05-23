@@ -14,75 +14,72 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b5b689f9c82840f054633f553baab24e2290a949 Build.PL
-SHA1 92836ab074efabf2973c4e608ccf4d7e57fc58ef ChangeLog
-SHA1 b0cc842cacf35d75914708b81b84b29e7a9db2b2 GNUmakefile
-SHA1 82e9e30db9168343fa80af749708ef473a0a6a75 MANIFEST
-SHA1 361227e9ee654daba8e20b6b95c7983d10bb390d META.json
-SHA1 1f85e366d57e16fa010ab054ab11c6cdc1191d47 META.yml
+SHA1 133b0063e27763fcc3657934f7f96ac5187d3312 Build.PL
+SHA1 b016675a3fdebf2fabff23dc245270c0f47f5cdd ChangeLog
+SHA1 f313e0341a76920e411b6c4cdc59217a78ca9d2f GNUmakefile
+SHA1 51dc06fa891c7bb9e2d08bf3b8a62efb91e6acf3 MANIFEST
+SHA1 dd6bc1d04fc78ae4654182a67def17718fbfdcf8 META.json
+SHA1 21924c1837d5089162133a313566b9a5a4611391 META.yml
 SHA1 d3d1e30ca851bed8503cf0b951651a840e6efaf7 Makefile.PL
-SHA1 52332d255a2e8499b3bd802e146cc58bb6778dc1 NEWS
+SHA1 58cc50feb4800093be833c648ec158b5391e3ccd NEWS
 SHA1 cdb52caf7af6c49559a46fe32751f397c8e14fc9 README.md
 SHA1 84ac0838050be76f8603f5bb53c9607f832d7ffe TODO
 SHA1 ae6956317767d3dda1873f2204ca9368746878d7 example/fib.pl
 SHA1 0973a5a713321739c0b8b1e592f615a827dc0a28 example/five.pl
 SHA1 a6b82a88e68d9e0bd337c784051000007c78b974 example/multiline.pl
-SHA1 ab5124ee20404418bdf868013a2e14734694b318 lib/B/DeparseTree.pm
+SHA1 6ebc6c90dad1913cab73b7bd40cc80fdecce02f5 lib/B/DeparseTree.pm
 SHA1 4580e75b06623b6862036dc9ee9904055b5361d2 lib/B/DeparseTree.pod
-SHA1 fda895fb20d7bada2e770626f375c9e69772cfb5 lib/B/DeparseTree/Common.pm
-SHA1 25e5b04d98ce05c28ad26d35e7e1d4c172db6e9e lib/B/DeparseTree/Fragment.pm
-SHA1 d127d9e47bcbb524ce358f4e9672f61b26ccf49d lib/B/DeparseTree/Node.pm
-SHA1 8395cfaa6ffb697c8c5ef470d37fa03c06baf226 lib/B/DeparseTree/P518.pm
-SHA1 17f5e62ac74bdf8571003f30bb38310ebf893e5f lib/B/DeparseTree/P520.pm
-SHA1 a9909d24d7f316b7f882c1891627892ccce2709b lib/B/DeparseTree/P522.pm
-SHA1 2ffa0cde5f545f6f97eb7152f8bf7b72b4d80402 lib/B/DeparseTree/P524.pm
-SHA1 e268a1f6aa7b7bd1a0bcb220fd25147acd7dffdf lib/B/DeparseTree/P526.pm
-SHA1 c5cc71082d2999a9c9e8297334cffe94c338ce55 lib/B/DeparseTree/P526c.pm
-SHA1 7cf504ae4b28ca0478d742818584b5b537bcf66e lib/B/DeparseTree/PP.pm
-SHA1 41f78769670b0cad1f28f4ff3488d805539c63b2 lib/B/DeparseTree/Printer.pm
+SHA1 4a4742e552aeb0fa504368afd6702d7fb52e7f23 lib/B/DeparseTree/Common.pm
+SHA1 71eec771a41e3f00254662b3e2eea4a6cbb796c0 lib/B/DeparseTree/Fragment.pm
+SHA1 83185430cb5c9aba0071e4b1825ee8793f8c7cc9 lib/B/DeparseTree/Node.pm
+SHA1 62dae840ab2b8e7c4c178b8d3d4776c9ab489eba lib/B/DeparseTree/P518.pm
+SHA1 5c6a46d370bdd4781b5d3a112b04fe5deb120283 lib/B/DeparseTree/P520.pm
+SHA1 4d879e4711b7a2c09443679cc0e080da278340e2 lib/B/DeparseTree/P522.pm
+SHA1 26239ec22c3cee4f2969f35ec12cc26f61a5109c lib/B/DeparseTree/P524.pm
+SHA1 f2a92318532870c478a3fce52fd02c6fd69bf2b7 lib/B/DeparseTree/P526.pm
+SHA1 3da88d085e9c9b407c7df7136a8effbe7ddb1971 lib/B/DeparseTree/P526c.pm
+SHA1 61c9d34203fbcfd1e127eea05d54d734f569f349 lib/B/DeparseTree/PP.pm
+SHA1 5d818b7a600eef0bad245cda3f4a14708f5eb866 lib/B/DeparseTree/Printer.pm
 SHA1 ad33729c0b3f51654755e9334b4ffc4fab7495d0 scripts/Makefile
 SHA1 1a9dc2929a78d3e81ae62ea312e0b49efc0d842c scripts/README.md
 SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 scripts/base/cond.t
 SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 scripts/base/if.t
-SHA1 8586bae9ee20938c1d428686f2e890b48b76be65 scripts/base/pat.t
+SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 scripts/base/translate.t
 SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 scripts/base/while.t
 SHA1 1ffb4d3c985c6f717d6b07bbe8ffd7ffa97938e4 scripts/benchtests.pl
 SHA1 8c8b02fc1fff96dec723f2d407c32d8d75640f39 scripts/bug-sample.pm
 SHA1 648248445a0a636e26ab092f19ad340823fe75c1 scripts/deparse.sh
 SHA1 aa39a9798cec0f2db4ab28c490b0dfbc2b1148ca scripts/fib.pl
-SHA1 479b1174e05b368ff37d1be5de87822e3cab01e6 scripts/frag.pl
-SHA1 9070e008aab7ae1a036a3e7992241830c486dd31 scripts/opbasic/qq.t
+SHA1 cedaeab8bc0df91843e2131b2f312d80e56aaf86 scripts/frag.pl
 SHA1 451bc0e3d41684d129bc72d7202e9bc972d48779 scripts/runtests.pl
-SHA1 f3f0f22ea5210d37d9f01ad108b9dc210590df54 t/10subclass.t
-SHA1 7ec0661b24418940ade8dc8a96a9117655a49e9e t/20-core-516.t
-SHA1 7c9c56a4da26101b530525840cb7cac895a787ef t/20-core-518.t
-SHA1 348917f8580c318f934e2876dc2a2087217532fa t/20-core-520.t
-SHA1 e8b8a79e6a2333b4e9f8054b0d9b44601813e0ca t/20-core-522.t
-SHA1 048c0b0fe966997fcd01046b353e9d2275983584 t/20-core-524.t
-SHA1 ffe6f28bf03bf2a92138a3d8551d27b1fa8c6648 t/20-deparse-516.small.t
-SHA1 7e013f97a08167ffb598f1edafe3f71db5aa98a7 t/20-deparse-518.small.t
-SHA1 ed8d1b62615021008d2f11ff4ceaa4b6e4f2f096 t/20-deparse-520.t
-SHA1 9504d37a4d88c0f113116714dd5dbf659aaef0c5 t/20-deparse-522-small.t
-SHA1 8b931f2b58be285ba6cbcdf57abcb1f14a540111 t/20-deparse-522.t
-SHA1 388d8f11215f28fa31bdb3e4207f015725d73f64 t/20-deparse-524-small.t
-SHA1 4da90b9a066bd851308f8f77161947b60d9c6c88 t/20-deparse-524.t
-SHA1 e2f2ac24436451326db871d4baf0bc32dc7ca753 t/20-deparse-526-small.t
-SHA1 bef2e491d87b78445b62195323461dfd90030b81 t/20-deparse-526.t
-SHA1 fc80c8063272a5d007aad30a9e384a29702c00d0 t/20-deparse-526c.t
+SHA1 978382ff7710411bd53c89a7e88b2d94072ae6ae t/10-core.t
+SHA1 af8abd3b5d4c5c952d21d8625ca3968a8adb9886 t/20-core-516.t
+SHA1 ff3567076ae30b181d120662ff8f5c57e0fa9e36 t/20-deparse-526c.t
+SHA1 efe99c7924f388d97779410ac8627a92655390eb t/20-deparse-small.t
+SHA1 438469d0699f07dfbf362aa45e0cbc907cfd3457 t/helper.pm
+SHA1 38bba8852706c56915970fc5022acecc870bad8e t/testdata/P516-core.pm
 SHA1 e2604ec51951815abeab17132bda590c6973a0ee t/testdata/P518-short.pm
+SHA1 1a917aee2ec99c83799f4133a6285ff45582e6bc t/testdata/P520-core.pm
 SHA1 d9162f66fc48478cce435e8ec86b3691a8085b3b t/testdata/P520.pm
 SHA1 07c9b9832465dbc03c25c1dc01d305802912dfca t/testdata/P522-short.pm
 SHA1 cb745cfea171db2c368a683327265eaf4f775b0c t/testdata/P522.pm
-SHA1 c3d659f45520cb52ada84cede6cee95a63974b36 t/testdata/P524-short.pm
+SHA1 0565d3999a47be73ec871719b7a62bd480e52920 t/testdata/P524-short.pm
 SHA1 6526094ba55ae5e3a6292308266f22dd275b72e2 t/testdata/P524.pm
-SHA1 5d7554baaa987a96ae47d66ab13b9f471dbd1219 t/testdata/P526-short.pm
+SHA1 b4fbb5a2ef9e4f92c37ebd0879555c7c6ffee546 t/testdata/P526-core.pm
+SHA1 ab8caf096cb094667d1b7ef2e958b5539d528dd8 t/testdata/P526-short.pm
 SHA1 52a33d7959d086209cb88a00bacb44c19dc89f58 t/testdata/P526.pm
 SHA1 3f79bff634bf24b8b58688e68c1823075696d8de t/testdata/README.md
 SHA1 b4042ff0c90d54a811028590aa64d2fca585efbe t/testdata/README.pod
 SHA1 4690fb94f45914ea2345f8e5c8e51ea317c94dc8 t/testdata/bug-sample.pm
+SHA1 f6efe6111e9137f1df4c7ff6b2e77105634e4d5b t/testdata/core-base.pm
+SHA1 8df64e1b9bafe4e4b795fe69ffbc74a82e69a5d0 t/unit/01-test-pod.t
+SHA1 a5966ec6442f5201ef980e63ce5d598148d27a1a t/unit/02-node.t
+SHA1 e7148c011af94d5b99a229123e845e35cb77954c t/unit/03-common.t
+SHA1 6b7559435defb6db081e870fb7e6adf90c6ebc7f t/unit/03-fragment.t
+SHA1 ce32bcca7a9ae449421b925bf4a9d3e9a7c8107c t/unit/04-load.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlr2c/EACgkQGo3lAIJ17CFppwCePAzPIBkc4nII9iNubk/y+UKU
-Z+YAn2VsoysJKrwpw9zzsQqwI+IKjI1P
-=3e2p
+iEYEARECAAYFAlsAxa0ACgkQGo3lAIJ17CGfkQCdE1zI6j8jy6LwcNT3pt8gsoRM
+QcwAnR3ScsNz8bmr0pqXp39p3QkX8exE
+=G8RQ
 -----END PGP SIGNATURE-----

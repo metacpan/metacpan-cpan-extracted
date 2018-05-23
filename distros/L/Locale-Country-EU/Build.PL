@@ -18,7 +18,7 @@ my %module_build_args = (
     "Matthew Green <matt\@mattsizzle.com>"
   ],
   "dist_name" => "Locale-Country-EU",
-  "dist_version" => "0.002",
+  "dist_version" => "0.004",
   "license" => "perl",
   "module_name" => "Locale::Country::EU",
   "recursive_test_files" => 1,

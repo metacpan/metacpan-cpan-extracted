@@ -3,13 +3,16 @@ abstract: 'Record store timing information to statsd.'
 author:
   - 'Aran Deltac <bluefeet@gmail.com>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Package::Stash: '0.37'
   Test::Fatal: '0'
+  Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,5 +27,7 @@ requires:
   strictures: '2'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues
-  repository: git://github.com/bluefeet/Starch-Plugin-Net-Statsd.git
-version: '0.01'
+  homepage: https://github.com/bluefeet/Starch-Plugin-Net-Statsd
+  repository: https://github.com/bluefeet/Starch-Plugin-Net-Statsd.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

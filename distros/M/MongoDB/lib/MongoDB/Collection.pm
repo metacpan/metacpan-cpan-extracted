@@ -22,7 +22,7 @@ package MongoDB::Collection;
 # ABSTRACT: A MongoDB Collection
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use MongoDB::Error;
 use MongoDB::IndexView;
@@ -1937,7 +1937,7 @@ MongoDB::Collection - A MongoDB Collection
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

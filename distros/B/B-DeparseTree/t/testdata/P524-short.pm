@@ -6,11 +6,20 @@ __DATA__
 1;
 ####
 # Constants in a block
+# CONTEXT no warnings;
 {
-    no warnings;
     '???';
     2;
 }
+####
+# List of constants in void context
+# SKIP ?1
+# CONTEXT no warnings;
+(1,2,3);
+0;
+>>>>
+'???', '???', '???';
+0;
 ####
 # Lexical and simple arithmetic
 my $test;
@@ -19,49 +28,264 @@ my $test;
 my $test;
 $test /= 2 if ++$test;
 ####
-# method
-{
-    my $test = sub : method {
-	my $x;
-    };
-}
+# SKIP ?1
+# list x
+-((1, 2) x 2);
+####
 ####
 # lexical and package scalars
 my $x;
 print $main::x;
 ####
-# lexical and package arrays
-my @x;
-print $main::x[1];
-####
+# # FIXME:
+# # lexical and package arrays
+# my @x;
+# print $main::x[1];
+# print \my @a;
+# ####
 # lexical and package hashes
 my %x;
 $x{warn()};
 ####
+# SKIP NOTE This is a regression from 5.26 which works
+# <>
+my $foo;
+$_ .= <> . <ARGV> . <$foo>;
+<$foo>;
+<${foo}>;
+<$ foo>;
+>>>>
+my $foo;
+$_ .= readline(ARGV) . readline(ARGV) . readline($foo);
+readline $foo;
+glob $foo;
+glob $foo;
+####
 # block
+# SKIP ?1
 { my $x; }
 ####
+# SKIP ?1
 # while 1
 while (1) { my $k; }
 ####
-# reverse sort
-my @x;
-print reverse sort(@x);
+# constants as method names
+'Foo'->bar('orz');
+####
+# constants as method names without ()
+'Foo'->bar;
+####
+# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
+# CONTEXT use feature ':5.10';
+# say
+say 'foo';
+####
+# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
+# CONTEXT use 5.10.0;
+# say in the context of use 5.10.0
+say 'foo';
+####
+# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
+# say with use 5.10.0
+use 5.10.0;
+say 'foo';
+>>>>
+no feature ':all';
+use feature ':5.10';
+say 'foo';
+####
+# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
+# say with use feature ':5.10';
+use feature ':5.10';
+say 'foo';
+>>>>
+use feature 'say', 'state', 'switch';
+say 'foo';
+####
+# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
+# CONTEXT use feature ':5.10';
+# say with use 5.10.0 in the context of use feature
+use 5.10.0;
+say 'foo';
+>>>>
+no feature ':all';
+use feature ':5.10';
+say 'foo';
+####
+# SKIP ?$] < 5.010 && "say not implemented on this Perl version"
+# CONTEXT use 5.10.0;
+# say with use feature ':5.10' in the context of use 5.10.0
+use feature ':5.10';
+say 'foo';
+>>>>
+say 'foo';
+####
+# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# CONTEXT use feature ':5.15';
+# __SUB__
+__SUB__;
+####
+# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# CONTEXT use 5.15.0;
+# __SUB__ in the context of use 5.15.0
+__SUB__;
+####
+# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# __SUB__ with use 5.15.0
+use 5.15.0;
+__SUB__;
+>>>>
+no feature ':all';
+use feature ':5.16';
+__SUB__;
+####
+# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# __SUB__ with use feature ':5.15';
+use feature ':5.15';
+__SUB__;
+>>>>
+use feature 'current_sub', 'evalbytes', 'fc', 'say', 'state', 'switch', 'unicode_strings', 'unicode_eval';
+__SUB__;
+####
+# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# CONTEXT use feature ':5.15';
+# __SUB__ with use 5.15.0 in the context of use feature
+use 5.15.0;
+__SUB__;
+>>>>
+no feature ':all';
+use feature ':5.16';
+__SUB__;
+####
+# SKIP ?$] < 5.015 && "__SUB__ not implemented on this Perl version"
+# CONTEXT use 5.15.0;
+# __SUB__ with use feature ':5.15' in the context of use 5.15.0
+use feature ':5.15';
+__SUB__;
+>>>>
+__SUB__;
+####
+# SKIP ?$] < 5.010 && "state vars not implemented on this Perl version"
+# CONTEXT use feature ':5.10';
+# state vars
+state $x = 42;
+####
+# tests with not, not optimized
+my $c;
+x() unless $a;
+x() if not $a and $b;
+x() if $a and not $b;
+x() unless not $a and $b;
+x() unless $a and not $b;
+x() if not $a or $b;
+x() if $a or not $b;
+x() unless not $a or $b;
+x() unless $a or not $b;
+x() if $a and not $b and $c;
+x() if not $a and $b and not $c;
+x() unless $a and not $b and $c;
+x() unless not $a and $b and not $c;
+x() if $a or not $b or $c;
+x() if not $a or $b or not $c;
+x() unless $a or not $b or $c;
+x() unless not $a or $b or not $c;
+####
+# tests with not, optimized
+my $c;
+x() if not $a;
+x() unless not $a;
+x() if not $a and not $b;
+x() unless not $a and not $b;
+x() if not $a or not $b;
+x() unless not $a or not $b;
+x() if not $a and not $b and $c;
+x() unless not $a and not $b and $c;
+x() if not $a or not $b or $c;
+x() unless not $a or not $b or $c;
+x() if not $a and not $b and not $c;
+x() unless not $a and not $b and not $c;
+x() if not $a or not $b or not $c;
+x() unless not $a or not $b or not $c;
+x() unless not $a or not $b or not $c;
+>>>>
+my $c;
+x() unless $a;
+x() if $a;
+x() unless $a or $b;
+x() if $a or $b;
+x() unless $a and $b;
+x() if $a and $b;
+x() if not $a || $b and $c;
+x() unless not $a || $b and $c;
+x() if not $a && $b or $c;
+x() unless not $a && $b or $c;
+x() unless $a or $b or $c;
+x() if $a or $b or $c;
+x() unless $a and $b and $c;
+x() if $a and $b and $c;
+x() unless not $a && $b && $c;
+####
+# no attribute list
+my $pi = 4;
+####
+# SKIP ?$] > 5.013006 && ":= is now a syntax error"
+# := treated as an empty attribute list
+no warnings;
+my $pi := 4;
+>>>>
+no warnings;
+my $pi = 4;
+####
+# : = empty attribute list
+my $pi : = 4;
+>>>>
+my $pi = 4;
+####
+# shift optimisation
+shift;
+>>>>
+shift();
+####
+# shift optimisation
+shift @_;
+####
+# shift optimisation
+pop;
+>>>>
+pop();
+####
+# shift optimisation
+pop @_;
+####
+# SKIP ?1
+#[perl #20444]
+"foo" =~ (1 ? /foo/ : /bar/);
+"foo" =~ (1 ? y/foo// : /bar/);
+"foo" =~ (1 ? y/foo//r : /bar/);
+"foo" =~ (1 ? s/foo// : /bar/);
+>>>>
+'foo' =~ ($_ =~ /foo/);
+'foo' =~ ($_ =~ tr/fo//);
+'foo' =~ ($_ =~ tr/fo//r);
+'foo' =~ ($_ =~ s/foo//);
+# ####
+# # The fix for [perl #20444] broke this.
+# 'foo' =~ do { () };
 ####
 # [perl #81424] match against aelemfast_lex
 my @s;
 print /$s[1]/;
 ####
-# SKIP ROCKY fixme
-# /$#a/
-print /$main::a/;
+# all the flags (tr///)
+# SKIP
+tr/X/Y/c;
+tr/X//d;
+tr/X//s;
+tr/X//r;
 ####
-# y///r
-tr/a/b/r;
-####
-# SKIP ROCKY fixme
 # [perl #91008]
-# CONTEXT no warnings';
+# SKIP ?$] < 5.19 || $] >= 5.023 && "autoderef deleted in this Perl version"
+# CONTEXT no warnings 'experimental::autoderef';
 each $@;
 keys $~;
 values $!;
@@ -76,12 +300,20 @@ $b::a[0] = 1;
 my @a;
 $a[0] = 1;
 ####
+# SKIP ?1
 # $#- $#+ $#{%} etc.
 my @x;
 @x = ($#{`}, $#{~}, $#{!}, $#{@}, $#{$}, $#{%}, $#{^}, $#{&}, $#{*});
 @x = ($#{(}, $#{)}, $#{[}, $#{{}, $#{]}, $#{}}, $#{'}, $#{"}, $#{,});
 @x = ($#{<}, $#{.}, $#{>}, $#{/}, $#{?}, $#{=}, $#+, $#{\}, $#{|}, $#-);
-@x = ($#{;}, $#{:});
+@x = ($#{;}, $#{:}, $#{1}), $#_;
+# ####
+# # [perl #86060] $( $| $) in regexps need braces
+# /${(}/;
+# /${|}/;
+# /${)}/;
+# /${(}${|}${)}/;
+# /@{+}@{-}/;
 ####
 # ()[...]
 my(@a) = ()[()];
@@ -95,10 +327,42 @@ print sort(foo('bar'));
 print sort(foo('bar'));
 ####
 # substr assignment
+# SKIP $?
 substr(my $a, 0, 0) = (foo(), bar());
 $a++;
+# ####
+# # This following line works around an unfixed bug that we are not trying to
+# # test for here:
+# # CONTEXT BEGIN { $^H{a} = "b"; delete $^H{a} } # make %^H localised
+# # hint hash
+# BEGIN { $^H{'foo'} = undef; }
+# {
+#  BEGIN { $^H{'bar'} = undef; }
+#  {
+#   BEGIN { $^H{'baz'} = undef; }
+#   {
+#    print $_;
+#   }
+#   print $_;
+#  }
+#  print $_;
+# }
+# BEGIN { $^H{q[']} = '('; }
+# print $_;
+# ####
+# # This following line works around an unfixed bug that we are not trying to
+# # test for here:
+# # CONTEXT BEGIN { $^H{a} = "b"; delete $^H{a} } # make %^H localised
+# # hint hash changes that serialise the same way with sort %hh
+# BEGIN { $^H{'a'} = 'b'; }
+# {
+#  BEGIN { $^H{'b'} = 'a'; delete $^H{'a'}; }
+#  print $_;
+# }
+# print $_;
 ####
 # Precedence conundrums with argument-less function calls
+# SKIP ?1
 () = (eof) + 1;
 () = (return) + 1;
 () = (return, 1);
@@ -114,6 +378,7 @@ pipe local *FH, local *FH;
 require 'a' . $1;
 ####
 # 'my' works with padrange op
+# SKIP ?1
 my($z, @z);
 my $m1;
 $m1 = 1;
@@ -127,31 +392,9 @@ my($m7, undef, $m8) = (1, 2, 3);
 @z = ($m7, undef, $m8);
 ($m7, undef, $m8) = (1, 2, 3);
 ####
-# 'our/local' works with padrange op
-no strict;
-our($z, @z);
-our $o1;
-local $o11;
-$o1 = 1;
-local $o1 = 1;
-$z = $o1;
-$z = local $o1;
-our $o2 = 2;
-our($o3, $o4);
-($o3, $o4) = (1, 2);
-local($o3, $o4) = (1, 2);
-@z = ($o3, $o4);
-@z = local($o3, $o4);
-our($o5, $o6) = (1, 2);
-our($o7, undef, $o8) = (1, 2, 3);
-@z = ($o7, undef, $o8);
-@z = local($o7, undef, $o8);
-($o7, undef, $o8) = (1, 2, 3);
-local($o7, undef, $o8) = (1, 2, 3);
-####
 # 'state' works with padrange op
-no strict;
-use feature 'state';
+# SKIP ?1
+# CONTEXT no strict; use feature 'state';
 state($z, @z);
 state $s1;
 $s1 = 1;
@@ -172,5 +415,50 @@ my(@x, %y);
 @x = @x[$a, $b];
 @x = @y{$a, $b};
 ####
+# binops with padrange
+my($a, $b, $c);
+$c = $a cmp $b;
+$c = $a + $b;
+$a += $b;
+$c = $a - $b;
+$a -= $b;
+$c = my $a1 cmp $b;
+$c = my $a2 + $b;
+$a += my $b1;
+$c = my $a3 - $b;
+$a -= my $b2;
+####
 # @_ with padrange
 my($a, $b, $c) = @_;
+####
+# Elements of %# should not be confused with $#{ array }
+() = ${#}{'foo'};
+####
+# coderef2text and prototyped sub calls [perl #123435]
+is 'foo', 'oo';
+####
+# exists $a[0]
+our @a;
+exists $a[0];
+####
+# my @a; exists $a[0]
+my @a;
+exists $a[0];
+####
+# delete $a[0]
+our @a;
+delete $a[0];
+####
+# my @a; delete $a[0]
+my @a;
+delete $a[0];
+####
+# all the flags (tr///)
+tr/X/Y/c;
+tr/X//d;
+tr/X//s;
+tr/X//r;
+####
+use feature 'unicode_strings';
+# SKIP ?1
+s/X//d;

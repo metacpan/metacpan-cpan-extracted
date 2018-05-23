@@ -1,7 +1,7 @@
 package Stor;
 use v5.20;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.2.0';
 
 use Mojo::Base -base, -signatures;
 use Syntax::Keyword::Try;
@@ -113,11 +113,17 @@ sub get_from_s3 ($self, $c, $sha) {
         $tx->req->headers->header($header_key => $http_request->headers->header($header_key));
     }
 
-    $tx->res->content->on(
+    $tx->res->content->unsubscribe('read')->on(
         read => sub {
             my (undef, $chunk) = @_;
             if ($chunk) {
-                $c->write($chunk);
+                try {
+                    $c->write($chunk);
+                }
+                catch{
+                    $c->app->log->warning("Writing chunk failed: $@");
+                    $tx->res->content->unsubscribe('read');
+                }
             }
         }
     );
@@ -138,6 +144,9 @@ sub get_from_s3 ($self, $c, $sha) {
 
 sub get ($self, $c) {
     my $sha = $c->param('sha');
+
+    $self->statsite->increment('request.get.count');
+
     try {
         failure::stor::filenotfound->throw({
             msg     => "Given hash '$sha' isn't SHA256",
@@ -151,7 +160,6 @@ sub get ($self, $c) {
         }
     }
     catch {
-        $c->app->log->debug("$@");
         if ($@->$_isa('failure::stor::filenotfound')) {
             $c->render(status => 404, text => "$@");
         }
@@ -159,16 +167,21 @@ sub get ($self, $c) {
             $self->statsite->increment('error.get.500.count');
             $c->render(status => 500, text => "$@");
         }
-    }
-    finally {
+
         if ($@->$_isa('failure::stor')) {
             $self->statsite->increment($@->payload->{statsite_key});
+            $c->app->log->warning($@->msg);
+        }
+        else {
+            $c->app->log->error("$@");
         }
     }
 }
 
 sub post ($self, $c) {
     my $sha  = $c->param('sha');
+
+    $self->statsite->increment('request.post.count');
 
     if ($sha !~ /^[A-Fa-f0-9]{64}$/) {
         $self->statsite->increment('error.post.malformed_sha.count');
@@ -193,8 +206,7 @@ sub post ($self, $c) {
     my $content_sha = sha256_hex($file->slurp());
     if (lc($sha) ne lc($content_sha)) {
         $self->statsite->increment('error.post.bad_sha.count');
-        $c->render(status => 412, text =>
-            "Content sha256 $content_sha doesn't match given sha256 $sha");
+        $self->_render_and_log($c, 412, "Content sha256 $content_sha doesn't match given sha256 $sha");
         return
     }
 
@@ -207,11 +219,11 @@ sub post ($self, $c) {
     catch {
         if ($@->$_isa('failure::stor')) {
             $self->statsite->increment($@->payload->{statsite_key});
-            $c->render(status => 507, text => "$@");
+            $self->_render_and_log($c, 507, "$@");
             return
         }
         $self->statsite->increment('error.post.unknown.count');
-        $c->render(status => 500, text => "$@");
+        $self->_render_and_log($c, 500, "$@");
         return
     }
 }
@@ -273,6 +285,11 @@ sub save_file ($self, $file, $sha, $storage_pair) {
     $file->move_to($first_path);
     $first_path->copy($_) for @paths;
     return \@all_paths;
+}
+
+sub _render_and_log($self, $c, $status, $text) {
+    $c->render(status => $status, text => $text);
+    $c->app->log->warning("$status $text");
 }
 
 sub _lookup ($self, $sha, $return_all_paths = '') {
@@ -385,11 +402,11 @@ we prefer L<hypnotoad|https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad> ser
 =head2 configuration example
 
     {
-        "statsite": {                                                                 
-            "host": "STATSITE_HOST",                                       
+        "statsite": {
+            "host": "STATSITE_HOST",
             "prefix": "stor.dev",
             "sample_rate": 0.1
-        },  
+        },
         "storage_pairs": [
             ["/mnt/data1", "/mnt/data2"],
             ["/mnt/data3", "/mnt/data4"]
@@ -404,7 +421,7 @@ we prefer L<hypnotoad|https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad> ser
         "memcached_servers": ["MEMCACHED_SERVER1"],
         "secret": "https://mojolicious.org/perldoc/Mojolicious/Guides/FAQ#What-does-Your-secret-passphrase-needs-to-be-changed-mean",
         "basic_auth": "writer:writer_pass"
-    } 
+    }
 
 =head2 Service Responsibility
 

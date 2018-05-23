@@ -22,7 +22,7 @@ use overload    #
   fallback => undef;
 
 has status => ( is => 'ro', isa => PositiveOrZeroInt, required => 1 );
-has reason => ( is => 'ro', isa => Str, writer => 'set_reason', required => 1 );
+has reason => ( is => 'ro', isa => Str, required => 1 );
 
 has status_reason => ( is => 'ro', isa => Maybe [HashRef] );
 

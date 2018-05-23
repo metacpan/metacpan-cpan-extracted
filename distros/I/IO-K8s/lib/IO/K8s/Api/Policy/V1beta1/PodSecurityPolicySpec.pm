@@ -1,5 +1,6 @@
 package IO::K8s::Api::Policy::V1beta1::PodSecurityPolicySpec;
   use Moose;
+  use IO::K8s;
 
   has 'allowedCapabilities' => (is => 'ro', isa => 'ArrayRef[Str]'  );
   has 'allowedFlexVolumes' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Policy::V1beta1::AllowedFlexVolume]'  );
@@ -19,4 +20,6 @@ package IO::K8s::Api::Policy::V1beta1::PodSecurityPolicySpec;
   has 'seLinux' => (is => 'ro', isa => 'IO::K8s::Api::Policy::V1beta1::SELinuxStrategyOptions'  );
   has 'supplementalGroups' => (is => 'ro', isa => 'IO::K8s::Api::Policy::V1beta1::SupplementalGroupsStrategyOptions'  );
   has 'volumes' => (is => 'ro', isa => 'ArrayRef[Str]'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

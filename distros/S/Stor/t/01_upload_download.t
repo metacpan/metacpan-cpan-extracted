@@ -30,6 +30,7 @@ my $cfg = {
         host       => 'host',
     },
     s3_enabled => 0,
+    log => []
 };
 
 my $cfg_file = Path::Tiny->tempfile();

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Dist::Zilla configuration the way YAKEX does it
-our $VERSION = 'v0.1.5'; # VERSION
+our $VERSION = 'v0.2.0'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -30,7 +30,7 @@ sub configure
 			location => 'root',
 		} ],
 		qw[
-			GithubMeta MetaJSON PodWeaver OurPkgVersion CheckVersionIncrement MinimumPerl
+			GithubMeta Git::Contributors MetaJSON PodWeaver OurPkgVersion CheckVersionIncrement MinimumPerl
 			PodSyntaxTests PodCoverageTests Test::Perl::Critic Test::Compile
 		],
 		[ 'Test::Kwalitee::Extra' => { arg => ['!has_example'] } ],
@@ -53,7 +53,7 @@ Dist::Zilla::PluginBundle::Author::YAKEX - Dist::Zilla configuration the way YAK
 
 =head1 VERSION
 
-version v0.1.5
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,7 @@ This is a L<Dist::Zilla> PluginBundle used by YAKEX's distribution. It is equiva
   location = root
   
   [GithubMeta]
+  [Git::Contributors]
   [MetaJSON]
   [PodWeaver]
   [OurPkgVersion]
@@ -118,7 +119,7 @@ Yasutaka ATARASHI <yakex@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yasutaka ATARASHI.
+This software is copyright (c) 2018 by Yasutaka ATARASHI.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

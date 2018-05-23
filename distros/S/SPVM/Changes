@@ -1,3 +1,13 @@
+0.0336 2018-05-19
+  - fix hash insert and search bug
+  - name string is shared intenally
+  - only support NetBSD 7+, not support NetBSD 6
+0.0335 2018-05-18
+  - support multi dimension array initialization
+    my $nums = [
+      [1, 2, 3],
+      [4, 5, 6]
+    ];
 0.0334 2018-05-07
   - add new array init syntax.
     my $nums = [3, 4, 5];

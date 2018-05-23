@@ -2,8 +2,8 @@ package TaskPipe::Template_Config;
 
 use Moose;
 use YAML::XS 'Dump';
-use Hash::Merge;
 use TaskPipe::Tool::Options;
+use Hash::Merge;
 extends 'TaskPipe::Template';
 
 has options => (is => 'rw', isa => 'TaskPipe::Tool::Options', default => sub{

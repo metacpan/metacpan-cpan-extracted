@@ -1,0 +1,86 @@
+{
+   "abstract" : "A client for talking to Docker Registries",
+   "author" : [
+      "Jose Luis Mart\u00ednez <joseluis.martinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Docker-Registry",
+   "optional_features" : {
+      "ecr-registry" : {
+         "description" : "Support for ECR",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Paws" : "0"
+               }
+            }
+         }
+      },
+      "gcr-registry" : {
+         "description" : "Support for GCR",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Crypt::JWT" : "0",
+                  "Path::Class" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Headers" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moose" : "0",
+            "Throwable::Error" : "0",
+            "perl" : "5.014001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/docker-registry/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/docker-registry.git",
+         "web" : "https://github.com/pplu/docker-registry"
+      }
+   },
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

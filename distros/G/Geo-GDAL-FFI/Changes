@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::GDAL::FFI
 
+0.05 May 16, 2018
+     - Explitly set GDAL_DATA
+
 0.04 May 2, 2018
      - HaveGEOS method for tests.
 

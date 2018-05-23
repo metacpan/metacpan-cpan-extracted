@@ -52,7 +52,7 @@ sub format_info_short($$)
     }
     if (exists $i{maybe_parens}) {
 	my %mp = %{$i{maybe_parens}};
-	if (B::DeparseTree::Common::parens_test($mp{cx}, $mp{prec})) {
+	if (B::DeparseTree::Node::parens_test($info, $mp{cx}, $mp{prec})) {
 	    $text .= ' - parens';
 	}
     }
@@ -116,8 +116,8 @@ EOF
 	    $text .= sprintf "%s: %g\n", $key, $maybe_parens{$key};
 	}
 	$text .= sprintf("need parens: %s\n",
-			 B::DeparseTree::Common::parens_test($maybe_parens{context},
-							     $maybe_parens{precidence}) ?
+			 B::DeparseTree::Node::parens_test($info, $maybe_parens{context},
+							     $maybe_parens{precedence}) ?
 			 'yes' : 'no');
     }
     return $text;

@@ -1,6 +1,7 @@
 use utf8;
 package Document::OOXML::Document::Wordprocessor;
 use Moose;
+use namespace::autoclean;
 
 extends 'Document::OOXML::Document';
 
@@ -33,7 +34,7 @@ Document::OOXML::Document::Wordprocessor - Wordprocessor file (".docx")
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 DESCRIPTION
 

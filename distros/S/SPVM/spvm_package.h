@@ -8,15 +8,14 @@ struct SPVM_package {
   SPVM_LIST* op_subs;
   SPVM_LIST* op_fields;
   SPVM_HASH* op_field_symtable;
+  SPVM_LIST* object_field_ids;
   SPVM_HASH* op_our_symtable;
   SPVM_HASH* method_signature_symtable;
   SPVM_HASH* has_interface_cache_symtable;
   SPVM_OP* op_sub_destructor;
-  char* load_path;
+  const char* load_path;
+  SPVM_OP* op_type;
   int32_t id;
-  int32_t byte_size;
-  int32_t object_field_byte_offsets_base;
-  int32_t object_field_byte_offsets_length;
   _Bool is_interface;
   _Bool is_private;
   _Bool is_anon;

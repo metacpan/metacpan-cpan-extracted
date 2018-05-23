@@ -1,0 +1,30 @@
+---
+abstract: 'add meta tag to HTML output to define a referrer policy'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-NoReferrer
+provides:
+  Mojolicious::Plugin::NoReferrer:
+    file: lib/Mojolicious/Plugin/NoReferrer.pm
+    version: '0.02'
+requires:
+  Mojolicious: '5.67'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/reneeb/Mojolicious-Plugin-NoReferrer/issues
+  homepage: http://github.com/reneeb/Mojolicious-Plugin-NoReferrer
+  repository: http://github.com/reneeb/Mojolicious-Plugin-NoReferrer.git
+version: '0.02'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

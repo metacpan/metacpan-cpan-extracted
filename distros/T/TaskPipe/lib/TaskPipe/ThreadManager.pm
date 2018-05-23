@@ -9,7 +9,6 @@ use TaskPipe::LoggerManager;
 use TaskPipe::SchemaManager;
 use TryCatch;
 with 'MooseX::ConfigCascade';
-#with 'TaskPipe::Role::RunInfo';
 
 has logger_manager => (is => 'ro', isa => 'TaskPipe::LoggerManager', default => sub{
     TaskPipe::LoggerManager->new;
@@ -19,11 +18,8 @@ has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
     TaskPipe::RunInfo->new
 });
 
-#has job_id => (is => 'rw', isa => 'Str');
 has max_threads => (is => 'rw', isa => 'Str');
-#has thread_id => (is => 'rw', isa => 'Str');
 has forks => (is => 'rw', isa => 'Int');
-#with 'TaskPipe::Role::RunInfo';
 
 has gm => (is => 'rw', isa => 'TaskPipe::SchemaManager', required => 1);
 

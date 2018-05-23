@@ -1,11 +1,18 @@
 Revision history for WebService-Pokemon
 
+0.06  2018-05-16 22:56:23 +08
+    - Remove unused Makefile.PL
+    - Build and test using Docker
+
+0.05  2018-05-16 21:09:02 +08
+    - Fix missing strictures
+    - Update synopsis
+
 0.04  2018-05-14 21:54:16 +08
     - Add berry, berry_firmness, berry_flavor endpoints
     - Enable switching between v1 and v2 API version
 
 0.03  2018-05-06 00:52:52 +08
-
     - Fix module name mismatch
 
 0.02  2018-05-06 00:42:34 +08

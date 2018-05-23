@@ -4,7 +4,8 @@ use strict;
 use warnings;
 
 use Test::More tests => 21;
-use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
+use Test::Trap
+    qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
 use App::XML::DocBook::Docmake;
 
@@ -16,7 +17,7 @@ use parent 'App::XML::DocBook::Docmake';
 
 sub _exec_command
 {
-    my ($self, $cmd) = @_;
+    my ( $self, $cmd ) = @_;
 
     push @commands_executed, [@$cmd];
 }
@@ -42,7 +43,7 @@ use vars qw($should_update);
 
 use vars qw(@ISA);
 
-@ISA=('MyTest::DocmakeAppDebug');
+@ISA = ('MyTest::DocmakeAppDebug');
 
 sub _should_update_output
 {
@@ -52,47 +53,54 @@ sub _should_update_output
 package main;
 
 {
-    my $docmake = App::XML::DocBook::Docmake->new({argv => ["help"]});
+    my $docmake = App::XML::DocBook::Docmake->new( { argv => ["help"] } );
 
     # TEST
-    ok ($docmake, "Testing that docmake was initialized");
+    ok( $docmake, "Testing that docmake was initialized" );
 }
 
 {
-    my $docmake = App::XML::DocBook::Docmake->new({argv => ["help"]});
+    my $docmake = App::XML::DocBook::Docmake->new( { argv => ["help"] } );
 
     trap { $docmake->run(); };
 
     # TEST
-    like ($trap->stdout(),
-          qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available commands:\n}ms,
-          "Testing output of help"
+    like(
+        $trap->stdout(),
+qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available commands:\n}ms,
+        "Testing output of help"
     );
 }
 
 {
-    my $docmake = MyTest::DocmakeAppDebug->new({argv => [
-            "-v",
-            "--stringparam",
-            "chunk.section.depth=2",
-            "-o", "my-output-dir",
-            "xhtml",
-            "input.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",                    "--stringparam",
+                "chunk.section.depth=2", "-o",
+                "my-output-dir",         "xhtml",
+                "input.xml",
+            ]
+        }
+    );
 
     # TEST
-    ok ($docmake, "Docmake was constructed successfully");
+    ok( $docmake, "Docmake was constructed successfully" );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
         [
             [
                 "xsltproc",
-                "-o", "my-output-dir/",
-                "--stringparam", "chunk.section.depth", "2",
-                "http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl",
+                "-o",
+                "my-output-dir/",
+                "--stringparam",
+                "chunk.section.depth",
+                "2",
+"http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl",
                 "input.xml",
             ]
         ],
@@ -106,49 +114,48 @@ package main;
         my $self = shift;
         my $args = shift;
         push @should_update,
-            [ map { $_ => $args->{$_} }
-             sort { $a cmp $b }
-             keys(%$args)
-            ]
-            ;
+            [
+            map { $_ => $args->{$_} }
+                sort { $a cmp $b }
+                keys(%$args)
+            ];
         return 1;
     };
-    my $docmake = MyTest::DocmakeAppDebug::Newer->new({argv => [
-            "-v",
-            "--make",
-            "-o", "GOTO-THE-output.pdf",
-            "pdf",
-            "MYMY-input.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug::Newer->new(
+        {
+            argv => [
+                "-v",  "--make", "-o", "GOTO-THE-output.pdf",
+                "pdf", "MYMY-input.xml",
+            ]
+        }
+    );
 
     # TEST
-    ok ($docmake, "Docmake was constructed successfully");
+    ok( $docmake, "Docmake was constructed successfully" );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
         [
             [
                 "xsltproc",
-                "-o", "GOTO-THE-output.fo",
-                "http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl",
+                "-o",
+                "GOTO-THE-output.fo",
+"http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl",
                 "MYMY-input.xml",
             ],
-            [
-                "fop",
-                "-pdf",
-                "GOTO-THE-output.pdf",
-                "GOTO-THE-output.fo",
-            ],
+            [ "fop", "-pdf", "GOTO-THE-output.pdf", "GOTO-THE-output.fo", ],
         ],
         "Making sure all commands got run",
     );
 
     # TEST
-    is_deeply(\@should_update,
+    is_deeply(
+        \@should_update,
         [
-            [ "input", "MYMY-input.xml", "output", "GOTO-THE-output.fo"],
+            [ "input", "MYMY-input.xml",     "output", "GOTO-THE-output.fo" ],
             [ "input", "GOTO-THE-output.fo", "output", "GOTO-THE-output.pdf" ],
         ],
         "should update is OK.",
@@ -161,37 +168,38 @@ package main;
         my $self = shift;
         my $args = shift;
         push @should_update,
-            [ map { $_ => $args->{$_} }
-             sort { $a cmp $b }
-             keys(%$args)
-            ]
-            ;
+            [
+            map { $_ => $args->{$_} }
+                sort { $a cmp $b }
+                keys(%$args)
+            ];
         return 0;
     };
-    my $docmake = MyTest::DocmakeAppDebug::Newer->new({argv => [
-            "-v",
-            "--make",
-            "-o", "GOTO-THE-output.pdf",
-            "pdf",
-            "MYMY-input.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug::Newer->new(
+        {
+            argv => [
+                "-v",  "--make", "-o", "GOTO-THE-output.pdf",
+                "pdf", "MYMY-input.xml",
+            ]
+        }
+    );
 
     # TEST
-    ok ($docmake, "Docmake was constructed successfully");
+    ok( $docmake, "Docmake was constructed successfully" );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
-        [
-        ],
-        "No commands got run because of should_update",
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
+        [], "No commands got run because of should_update",
     );
 
     # TEST
-    is_deeply(\@should_update,
+    is_deeply(
+        \@should_update,
         [
-            [ "input", "MYMY-input.xml", "output", "GOTO-THE-output.fo"],
+            [ "input", "MYMY-input.xml",     "output", "GOTO-THE-output.fo" ],
             [ "input", "GOTO-THE-output.fo", "output", "GOTO-THE-output.pdf" ],
         ],
         "should update is OK.",
@@ -199,91 +207,96 @@ package main;
 }
 
 {
-    my $docmake = MyTest::DocmakeAppDebug->new({argv => [
-            "-v",
-            "-o", "my-output",
-            "pdf",
-            "input.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        { argv => [ "-v", "-o", "my-output", "pdf", "input.xml", ] } );
 
     # TEST
-    ok ($docmake, "Docmake was constructed successfully");
+    ok( $docmake, "Docmake was constructed successfully" );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
         [
             [
                 "xsltproc",
-                "-o", "my-output.fo",
-                "http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl",
+                "-o",
+                "my-output.fo",
+"http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl",
                 "input.xml",
             ],
-            [
-                "fop",
-                "-pdf",
-                "my-output",
-                "my-output.fo",
-            ],
+            [ "fop", "-pdf", "my-output", "my-output.fo", ],
         ],
-        "testing that .fo is added if the pdf filename does not contain a prefix",
+"testing that .fo is added if the pdf filename does not contain a prefix",
     );
 }
 
 {
-    my $docmake = MyTest::DocmakeAppDebug->new({argv => [
-            "-v",
-            "--stringparam",
-            "empty.param=",
-            "-o", "my-output-dir",
-            "xhtml",
-            "input.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",            "--stringparam",
+                "empty.param=",  "-o",
+                "my-output-dir", "xhtml",
+                "input.xml",
+            ]
+        }
+    );
 
     # TEST
-    ok ($docmake, "Docmake was constructed successfully");
+    ok( $docmake, "Docmake was constructed successfully" );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
         [
             [
                 "xsltproc",
-                "-o", "my-output-dir/",
-                "--stringparam", "empty.param", "",
-                "http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl",
+                "-o",
+                "my-output-dir/",
+                "--stringparam",
+                "empty.param",
+                "",
+"http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl",
                 "input.xml",
             ]
         ],
-        "an empty stringparam is accepted and propagated to the xsltproc command",
+"an empty stringparam is accepted and propagated to the xsltproc command",
     );
 }
 
 {
-    my $docmake = MyTest::DocmakeAppDebug->new({argv => [
-            "-v",
-            "--stringparam",
-            "empty.param=",
-            "-o", "my-output-dir",
-            "xhtml-1_1",
-            "input.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",            "--stringparam",
+                "empty.param=",  "-o",
+                "my-output-dir", "xhtml-1_1",
+                "input.xml",
+            ]
+        }
+    );
 
     # TEST
-    ok ($docmake, "xhtml-1_1 docmake was constructed successfully");
+    ok( $docmake, "xhtml-1_1 docmake was constructed successfully" );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
         [
             [
                 "xsltproc",
-                "-o", "my-output-dir/",
-                "--stringparam", "empty.param", "",
-                "http://docbook.sourceforge.net/release/xsl/current/xhtml-1_1/docbook.xsl",
+                "-o",
+                "my-output-dir/",
+                "--stringparam",
+                "empty.param",
+                "",
+"http://docbook.sourceforge.net/release/xsl/current/xhtml-1_1/docbook.xsl",
                 "input.xml",
             ]
         ],
@@ -292,31 +305,39 @@ package main;
 }
 
 {
-    my $docmake = MyTest::DocmakeAppDebug->new({argv => [
-            "-v",
-            "--stringparam", "root.filename=lib/docbook/5/essays/foss-and-other-beasts-v3/all-in-one.xhtml.temp.xml",
-            "--basepath", "/home/shlomif/Download/unpack/file/docbook/docbook-xsl-ns-snapshot",
-            "--stylesheet", "lib/sgml/shlomif-docbook/xsl-5-stylesheets/shlomif-essays-5-xhtml-onechunk.xsl",
-            "xhtml-1_1",
-            "lib/docbook/5/xml/foss-and-other-beasts-v3.xml",
-            ]});
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",
+                "--stringparam",
+"root.filename=lib/docbook/5/essays/foss-and-other-beasts-v3/all-in-one.xhtml.temp.xml",
+                "--basepath",
+"/home/shlomif/Download/unpack/file/docbook/docbook-xsl-ns-snapshot",
+                "--stylesheet",
+"lib/sgml/shlomif-docbook/xsl-5-stylesheets/shlomif-essays-5-xhtml-onechunk.xsl",
+                "xhtml-1_1",
+                "lib/docbook/5/xml/foss-and-other-beasts-v3.xml",
+            ]
+        }
+    );
 
     # TEST
-    ok ($docmake, "DocBook 5 (with --basepath) was initialized.");
+    ok( $docmake, "DocBook 5 (with --basepath) was initialized." );
 
     $docmake->run();
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
         [
             [
                 "xsltproc",
                 "--stringparam",
-                    "root.filename",
-                    "lib/docbook/5/essays/foss-and-other-beasts-v3/all-in-one.xhtml.temp.xml",
+                "root.filename",
+"lib/docbook/5/essays/foss-and-other-beasts-v3/all-in-one.xhtml.temp.xml",
                 "--path",
-                    "/home/shlomif/Download/unpack/file/docbook/docbook-xsl-ns-snapshot/xhtml-1_1",
-                "lib/sgml/shlomif-docbook/xsl-5-stylesheets/shlomif-essays-5-xhtml-onechunk.xsl",
+"/home/shlomif/Download/unpack/file/docbook/docbook-xsl-ns-snapshot/xhtml-1_1",
+"lib/sgml/shlomif-docbook/xsl-5-stylesheets/shlomif-essays-5-xhtml-onechunk.xsl",
                 "lib/docbook/5/xml/foss-and-other-beasts-v3.xml",
             ]
         ],
@@ -325,13 +346,11 @@ package main;
 }
 
 {
-    my $docmake = MyTest::DocmakeAppDebug->new({argv => [
-            "pdf",
-            "input.xml",
-            ]});
+    my $docmake =
+        MyTest::DocmakeAppDebug->new( { argv => [ "pdf", "input.xml", ] } );
 
     # TEST
-    ok ($docmake, "Docmake was constructed successfully");
+    ok( $docmake, "Docmake was constructed successfully" );
 
     trap
     {
@@ -339,15 +358,16 @@ package main;
     };
 
     # TEST
-    like ($trap->die(),
+    like(
+        $trap->die(),
         qr/No -o flag was specified/,
         "Testing that an exception was thrown on pdf without the -o flag",
     );
 
     # TEST
-    is_deeply(MyTest::DocmakeAppDebug->debug_commands(),
-        [],
-        "Testing that no commands were run on pdf without the -o flag",
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
+        [], "Testing that no commands were run on pdf without the -o flag",
     );
 
 }

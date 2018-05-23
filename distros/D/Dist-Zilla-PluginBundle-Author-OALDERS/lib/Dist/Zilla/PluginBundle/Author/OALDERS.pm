@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use feature qw( say );
 
@@ -80,7 +80,7 @@ sub configure {
 
         'Prereqs',
 
-        'ExecDir',
+        [ 'ExecDir' => { dir => 'script' } ],
 
         [ 'Test::PodSpelling' => { stopwords => $self->_all_stopwords } ],
         'PodCoverageTests',
@@ -170,7 +170,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000018
+version 0.000019
 
 =head2 configure
 

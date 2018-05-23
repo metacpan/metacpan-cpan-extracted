@@ -3,7 +3,7 @@ package Pcore::Util::Hash::Multivalue;
 use Pcore;
 use Pcore::Util::Scalar qw[is_arrayref is_hashref is_plain_arrayref];
 use Pcore::Util::List qw[pairkeys];
-use Storable qw[dclone];
+use Clone qw[];
 use Tie::Hash;
 use base qw[Tie::StdHash];
 
@@ -34,7 +34,7 @@ sub FETCH {
 }
 
 sub clone ($self) {
-    return Storable::dclone($self);
+    return Clone::clone($self);
 }
 
 # return untied $hash->{$key} as ArrayRef

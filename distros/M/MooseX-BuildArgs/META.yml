@@ -3,19 +3,24 @@ abstract: 'Save the original constructor arguments for later use.'
 author:
   - 'Aran Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Simple: 0.94
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::V0: '0.000094'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MooseX-BuildArgs
 requires:
-  Moose: 1.23
+  Moose: '1.23'
 resources:
   bugtracker: https://github.com/bluefeet/MooseX-BuildArgs/issues
-  repository: git://github.com/bluefeet/MooseX-BuildArgs.git
-version: 0.04
+  homepage: https://github.com/bluefeet/MooseX-BuildArgs
+  repository: https://github.com/bluefeet/MooseX-BuildArgs.git
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.69'

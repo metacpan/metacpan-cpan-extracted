@@ -9,6 +9,7 @@ binmode( Test::More->builder->$_, ":utf8" )
   for qw/output failure_output todo_output/;
 
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 use TestUtils;
 
@@ -34,6 +35,17 @@ is( BSON::Timestamp->new( seconds => $seconds )->seconds, $seconds, "BSON::Times
 is( BSON::Timestamp->new( seconds => $seconds )->increment, 0, "BSON::Timestamp->new(seconds)->increment" );
 is( BSON::Timestamp->new( seconds => $seconds, increment => $increment )->seconds, $seconds, "BSON::Timestamp->new(seconds, increment)->seconds" );
 is( BSON::Timestamp->new( seconds => $seconds, increment => $increment )->increment  , $increment, "BSON::Timestamp->new(seconds, increment)->increment" );
+
+# test constructor range errors
+eval { bson_timestamp(2**31, $increment) };
+like( $@, qr/must be uint32/, "bson_timestamp(2**31, 42) fails" );
+eval { bson_timestamp(-1, $increment) };
+like( $@, qr/must be uint32/, "bson_timestamp(-1, 42) fails" );
+
+eval { bson_timestamp($seconds, 2**31) };
+like( $@, qr/must be uint32/, "bson_timestamp(<time>, 2**31) fails" );
+eval { bson_timestamp($seconds, -1) };
+like( $@, qr/must be uint32/, "bson_timestamp(<time>, -1) fails" );
 
 # BSON::Timestamp -> BSON::Timestamp
 $bson = $expect = encode( { A => bson_timestamp($seconds, $increment) } );
@@ -66,13 +78,25 @@ is(
     'extjson: bson_timestamp(<secs>,<inc>)'
 );
 
+# test overloading
+my @cmp_cases = (
+    [ [0,1], [0,1], 0 ],
+    [ [0,2], [0,1], 1 ],
+    [ [1,0], [0,1], 1 ],
+    [ [0,0], [0,1], -1 ],
+    [ [0,0], [1,0], -1 ],
+);
+for my $c (@cmp_cases) {
+    my ($l, $r, $exp) = @$c;
+    is( bson_timestamp(@$l) <=> bson_timestamp(@$r), $exp, "(@$l) <=> (@$r) == $exp" );
+}
 
 done_testing;
 
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2016 by MongoDB, Inc.
+# This software is Copyright (c) 2018 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

@@ -6,6 +6,8 @@ use Mojolicious::Lite;
 use Mojo::JSON qw(decode_json);
 use Path::Tiny;
 use Net::Statsite::Client;
+use Log::Dispatch;
+use MojoX::Log::Dispatch::Simple;
 
 use Stor;
 
@@ -13,6 +15,11 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = 524288000;    #the size of message: 500 MB
 
 my $cfg = load_config();
 my $statsite = Net::Statsite::Client->new(%{ $cfg->{statsite} });
+
+my $logger = MojoX::Log::Dispatch::Simple->new(
+    dispatch => Log::Dispatch->new(outputs => $cfg->{log}),
+    level    => 'debug'
+);
 
 my $stor = Stor->new(
     storage_pairs        => $cfg->{storage_pairs},
@@ -34,6 +41,8 @@ app->plugin(
 );
 
 app->config(hypnotoad => { clients => $ENV{HYPNOTOAD_CLIENTS} // 100 });
+app->log($logger);
+
 
 get  '/'       => sub { $stor->about(@_)  };
 get  '/status' => sub { $stor->status(@_) };
@@ -50,3 +59,4 @@ sub load_config {
 
     return decode_json(path($ENV{CONFIG_FILE})->slurp())
 }
+

@@ -1,7 +1,9 @@
 package Pcore::Util::Random;
 
-use Pcore -export => { ALL => [qw[random_bytes random_bytes_hex]] };
+use Pcore -export;
 use Net::SSLeay qw[];
+
+our $EXPORT = { ALL => [qw[random_bytes random_bytes_hex]] };
 
 our $PASSWORD_LENGTH = 16;
 

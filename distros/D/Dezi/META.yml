@@ -8,8 +8,8 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
-license: http://dev.perl.org/licenses/
+generated_by: 'Module::Install version 1.19'
+license: perl_5
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/karpet/Dezi
   license: http://opensource.org/licenses/gpl-license.php
   repository: http://github.com/karpet/Dezi
-version: '0.004002'
+version: '0.004003'

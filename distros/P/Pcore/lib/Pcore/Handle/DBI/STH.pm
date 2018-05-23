@@ -2,15 +2,12 @@ package Pcore::Handle::DBI::STH;
 
 use Pcore -class;
 
-has id    => ( is => 'ro', isa => Str, required => 1 );
-has query => ( is => 'ro', isa => Str, required => 1 );
+has id    => ();    # ( is => 'ro', isa => Str, required => 1 );
+has query => ();    # ( is => 'ro', isa => Str, required => 1 );
+has dbh   => ();    # ( is => 'ro', isa => ArrayRef, init_arg => undef );
 
-has dbh => ( is => 'ro', isa => ArrayRef, init_arg => undef );
-
-P->init_demolish(__PACKAGE__);
-
-sub DEMOLISH ( $self, $global ) {
-    if ( !$global ) {
+sub DESTROY ( $self ) {
+    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
         for my $dbh ( $self->{dbh}->@* ) {
             my $id = $self->{id};
 

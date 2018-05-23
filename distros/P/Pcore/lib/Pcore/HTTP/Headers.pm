@@ -1,7 +1,7 @@
 package Pcore::HTTP::Headers;
 
-use Pcore -class;
-extends qw[Pcore::Util::Hash::Multivalue];
+use Pcore;
+use base qw[Pcore::Util::Hash::Multivalue];
 
 sub to_string ($self) {
     my $hash = $self->get_hash;

@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::Volume;
   use Moose;
+  use IO::K8s;
 
   has 'awsElasticBlockStore' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::AWSElasticBlockStoreVolumeSource'  );
   has 'azureDisk' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::AzureDiskVolumeSource'  );
@@ -29,4 +30,6 @@ package IO::K8s::Api::Core::V1::Volume;
   has 'secret' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::SecretVolumeSource'  );
   has 'storageos' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::StorageOSVolumeSource'  );
   has 'vsphereVolume' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::VsphereVirtualDiskVolumeSource'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

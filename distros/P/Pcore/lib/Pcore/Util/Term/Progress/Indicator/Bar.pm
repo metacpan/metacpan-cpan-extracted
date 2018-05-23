@@ -42,7 +42,7 @@ sub _draw ($self) {
 
     # speed
     if ( $self->show_speed ) {
-        my ( $speed, $speed_unit ) = $self->_format_speed->( $self, $self->speed );
+        my ( $speed, $speed_unit ) = $self->_format_speed->( $self, $self->{speed} );
 
         $info .= q[  ] . $speed;
 
@@ -62,8 +62,8 @@ sub _draw ($self) {
     if ( $self->show_time ) {
         $info .= q[  ];
 
-        if ( $self->is_finished ) {
-            $info .= $self->_format_time->( $self, $self->total_time );
+        if ( $self->{is_finished} ) {
+            $info .= $self->_format_time->( $self, $self->{total_time} );
         }
         elsif ( $self->total ) {
             $info .= $self->_format_time->( $self, $self->eta );

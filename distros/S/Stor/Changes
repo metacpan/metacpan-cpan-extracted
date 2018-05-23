@@ -1,6 +1,10 @@
 Revision history for Perl extension Stor
 
 
+1.2.0 2018-05-21T11:47:58Z
+    - Recurring cleanup task for old mojo temp files
+1.1.0
+    - Added logging
 1.0.0 2018-05-11T09:08:33Z
     - fix & improve documentation
     - configuration changes:

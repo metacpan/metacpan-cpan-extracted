@@ -49,6 +49,6 @@
          "url" : "http://github.com/jettero/net--imap--simple"
       }
    },
-   "version" : "1.2210",
+   "version" : "1.2211",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

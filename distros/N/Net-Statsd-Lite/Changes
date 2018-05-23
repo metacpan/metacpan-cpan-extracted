@@ -1,5 +1,12 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.3    2018-05-21 21:55:30+01:00 Europe/London
+  [Documentation]
+  - Fixed minor typo in POD.
+
+  [Toolchain]
+  - Removed core and redundant prereqs.
+
 v0.4.2    2018-02-14 00:38:33+00:00 Europe/London
   [Tests]
   - Remove the use of Test::TCP in an attempt to work around Windows

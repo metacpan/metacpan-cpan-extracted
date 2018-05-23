@@ -1,18 +1,18 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '1.2';
+$JSONAPI::Document::VERSION = '1.3';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
 
-use Carp                  ();
+use Carp ();
 use CHI;
 use Lingua::EN::Inflexion ();
 use Lingua::EN::Segment;
+use List::Util;
 
 has kebab_case_attrs => (
     is      => 'ro',
-    default => sub { 0 }
-);
+    default => sub { 0 });
 
 has attributes_via => (
     is      => 'ro',
@@ -28,17 +28,13 @@ has api_url => (
 );
 
 has data_dir => (
-    is => 'ro',
+    is       => 'ro',
     required => 1,
 );
 
-has chi => (
-    is => 'lazy',
-);
+has chi => (is => 'lazy',);
 
-has segmenter => (
-    is => 'lazy',
-);
+has segmenter => (is => 'lazy',);
 
 sub _build_chi {
     my ($self) = @_;
@@ -50,22 +46,22 @@ sub _build_segmenter {
 }
 
 sub compound_resource_document {
-    my ( $self, $row, $options ) = @_;
+    my ($self, $row, $options) = @_;
 
     my @relationships = $row->result_source->relationships();
-    if ( $options->{includes} ) {
-        @relationships = @{$options->{includes}};
+    if ($options->{includes}) {
+        @relationships = @{ $options->{includes} };
     }
 
-    my $document = $self->resource_document( $row, { with_relationships => 1, includes => \@relationships } );
+    my $document = $self->resource_document($row, { with_relationships => 1, includes => \@relationships });
 
     my @included;
-    foreach my $relation ( sort @relationships ) {
-        my $result = $self->_related_resource_documents( $row, $relation, { with_attributes => 1 } );
+    foreach my $relation (sort @relationships) {
+        my $result = $self->_related_resource_documents($row, $relation, { with_attributes => 1 });
         if (my $related_docs = $result->{data}) {
-            if (ref($related_docs) eq 'ARRAY') { # plural relations
+            if (ref($related_docs) eq 'ARRAY') {    # plural relations
                 push @included, @$related_docs;
-            } else { # singular relations
+            } else {                                # singular relations
                 push @included, $related_docs;
             }
         }
@@ -78,15 +74,15 @@ sub compound_resource_document {
 }
 
 sub resource_documents {
-    my ( $self, $resultset, $options ) = @_;
+    my ($self, $resultset, $options) = @_;
     $options //= {};
 
     my @results = $resultset->all();
-    return { data => [ map { $self->resource_document( $_, $options ) } @results ], };
+    return { data => [map { $self->resource_document($_, $options) } @results], };
 }
 
 sub resource_document {
-    my ( $self, $row, $options ) = @_;
+    my ($self, $row, $options) = @_;
     Carp::confess('No row provided') unless $row;
 
     $options //= {};
@@ -95,24 +91,27 @@ sub resource_document {
     my $with_attributes    = $options->{with_attributes};
     my $with_relationships = $options->{with_relationships};
     my $includes           = $options->{includes};
+    my $fields             = [grep { $_ } @{ $options->{fields} // [] }];
 
-    my $type = lc( $row->result_source->source_name() );
+    $options->{related_fields} //= {};
+
+    my $type = lc($row->result_source->source_name());
     my $noun = Lingua::EN::Inflexion::noun($type);
 
-    my %columns = $row->$attrs_method();
+    my %columns = $row->$attrs_method($fields);
     my $id      = delete $columns{id} // $row->id;
 
-    unless ( $type && $id ) {
-        return undef; # Document is not valid without a type and id.
+    unless ($type && $id) {
+        return undef;    # Document is not valid without a type and id.
     }
 
     my %relationships;
     if ($with_relationships) {
         my @relations = $includes ? @$includes : $row->result_source->relationships();
         foreach my $rel (@relations) {
-            if ( $row->has_relationship($rel) ) {
+            if ($row->has_relationship($rel)) {
                 if ($with_attributes) {
-                    $relationships{$rel} = $self->_related_resource_documents( $row, $rel, $options );
+                    $relationships{$rel} = $self->_related_resource_documents($row, $rel, $options);
                 } else {
                     $relationships{$rel} = $self->_related_resource_links($row, $noun, $rel, $options);
                 }
@@ -122,18 +121,25 @@ sub resource_document {
 
     if ($with_kebab_case) {
         %columns = _kebab_case(%columns);
-        if ( values(%relationships) ) {
+        if (values(%relationships)) {
             %relationships = _kebab_case(%relationships);
         }
     }
 
-    my $resource_type = $self->chi->compute(__PACKAGE__ . ':' . $noun->plural, undef, sub {
-        my @words = $self->segmenter->segment($noun->plural);
-        unless ( @words > 0 ) {
-            @words = ($noun->plural);
-        }
-        return join('-', @words);
-    });
+    my $resource_type = $self->chi->compute(
+        __PACKAGE__ . ':' . $noun->plural,
+        undef,
+        sub {
+            my @words = $self->segmenter->segment($noun->plural);
+            unless (@words > 0) {
+                @words = ($noun->plural);
+            }
+            return join('-', @words);
+        });
+
+    if (scalar(@$fields)) {
+        %columns = %{ $self->_sparse_attributes({%columns}, $fields) };
+    }
 
     my %document;
 
@@ -141,7 +147,7 @@ sub resource_document {
     $document{type}       = $resource_type;
     $document{attributes} = \%columns;
 
-    if ( values(%relationships) ) {
+    if (values(%relationships)) {
         $document{relationships} = \%relationships;
     }
 
@@ -160,7 +166,7 @@ sub _related_resource_links {
 
     my $data;
     my $rel_info = $row->result_source->relationship_info($relation);
-    if ( $rel_info->{attrs}->{accessor} eq 'multi' ) {
+    if ($rel_info->{attrs}->{accessor} eq 'multi') {
         $data = [];
         my @rs = $relation_row->all();
         foreach my $rel_row (@rs) {
@@ -168,14 +174,14 @@ sub _related_resource_links {
         }
     } else {
         $data = {
-            id      => $relation_row->id,
-            type    => Lingua::EN::Inflexion::noun( lc($relation) )->plural,
+            id   => $relation_row->id,
+            type => Lingua::EN::Inflexion::noun(lc($relation))->plural,
         };
     }
 
     return {
         links => {
-            self => $self->api_url . '/' . $row_noun->plural . '/' . $row->id . "/relationships/$relation_type",
+            self    => $self->api_url . '/' . $row_noun->plural . '/' . $row->id . "/relationships/$relation_type",
             related => $self->api_url . '/' . $row_noun->plural . '/' . $row->id . "/$relation_type",
         },
         data => $data,
@@ -183,25 +189,21 @@ sub _related_resource_links {
 }
 
 sub _related_resource_documents {
-    my ( $self, $row, $relation, $options ) = @_;
+    my ($self, $row, $relation, $options) = @_;
     $options //= {};
 
     my @results;
 
     my $rel_info = $row->result_source->relationship_info($relation);
-    if ( $rel_info->{attrs}->{accessor} eq 'multi' ) {
+    if ($rel_info->{attrs}->{accessor} eq 'multi') {
         my @rs = $row->$relation->all();
         foreach my $rel_row (@rs) {
-            push @results, $self->_relation_with_attributes($rel_row, { %$options, relation => $relation, is_multi => 1, });
+            push @results,
+                $self->_relation_with_attributes($rel_row, { %$options, relation => $relation, is_multi => 1, });
         }
-        return {
-            data => \@results,
-        }
-    }
-    else {
-        return {
-            data => $self->_relation_with_attributes($row->$relation, { %$options, relation => $relation, })
-        }
+        return { data => \@results, };
+    } else {
+        return { data => $self->_relation_with_attributes($row->$relation, { %$options, relation => $relation, }) };
     }
 }
 
@@ -210,9 +212,10 @@ sub _relation_with_attributes {
     my $with_kebab_case = $options->{kebab_case_attrs} // $self->kebab_case_attrs;
     my $attrs_method    = $options->{attributes_via} // $self->attributes_via;
     my $type            = $options->{relation};
+    my $fields          = $options->{related_fields}->{$type} // [];
 
-    if ( !$options->{is_multi} ) {
-        $type = Lingua::EN::Inflexion::noun( lc( $type ) )->plural;
+    if (!$options->{is_multi}) {
+        $type = Lingua::EN::Inflexion::noun(lc($type))->plural;
     }
 
     my %attributes = $row->$attrs_method();
@@ -221,17 +224,33 @@ sub _relation_with_attributes {
         $type =~ s/_/-/g;
     }
 
+    if (scalar(@$fields)) {
+        %attributes = %{ $self->_sparse_attributes({%attributes}, $fields) };
+    }
+
     return {
-        id   => delete $attributes{id} // $row->id,
-        type => $type,
+        id         => delete $attributes{id} // $row->id,
+        type       => $type,
         attributes => \%attributes,
     };
+}
+
+sub _sparse_attributes {
+    my ($self, $attributes, $fields) = @_;
+    my @delete;
+    for my $field (keys(%$attributes)) {
+        unless (List::Util::first { $_ eq $field } @$fields) {
+            push @delete, $field;
+        }
+    }
+    delete $attributes->{$_} for @delete;
+    return $attributes;
 }
 
 sub _kebab_case {
     my (%row) = @_;
     my %new_row;
-    foreach my $column ( keys(%row) ) {
+    foreach my $column (keys(%row)) {
         my $value = $row{$column};
         $column =~ s/_/-/g;
         $new_row{$column} = $value;
@@ -251,7 +270,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 
@@ -276,6 +295,12 @@ version 1.2
 
     # Multiple resource documents
     my $docs = $jsonapi->resource_documents($schema->resultset('User'));
+
+    # With sparse fieldsets
+    my $doc = $jsonapi->resource_document($user, { fields => [qw/name email/] });
+
+    # Relationships with sparse fieldsets
+    my $doc = $jsonapi->resource_document($user, { related_fields => { author => [qw/name expertise/] } });
 
 =head1 DESCRIPTION
 
@@ -393,6 +418,22 @@ If this option is true, links object will be replaced with attributes.
 
 If C<with_relationships> is true, this optional array ref can be
 provided to include a subset of relations instead of all of them.
+
+=item C<fields> I<ArrayRef>
+
+An optional list of attributes to include for the given resource. Implements
+L<sparse fieldsets|http://jsonapi.org/format/#fetching-sparse-fieldsets> in the specification.
+
+Will pass the array reference to the C<attributes_via> method, which should make use
+of the reference and return B<only> those attributes that were requested.
+
+=item C<related_fields> I<HashRef>
+
+Behaves the same as the C<fields> option but for relationships, returning only those fields
+for the related resource that were requested.
+
+Not specifying sparse fieldsets for a resource implies requesting all attributes for
+that relationship.
 
 =back
 

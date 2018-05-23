@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jmacdotorg/microformats2-perl.svg?branch=master)](https://travis-ci.org/jmacdotorg/microformats2-perl)
 # NAME
 
 Web::Microformats2 - Read Microformats2 metadata from HTML or JSON
@@ -61,9 +62,9 @@ be interesting to you.
 # STATUS
 
 These modules are **alpha**. Their developer is still figuring out how
-they want to be used, and their interface may change dramatically. It's
-not ready for CPAN just yet. This software is currently being
-"dogfooded" on an experimental branch of the author's own essay blog.
+they want to be used, and their interface may change dramatically. This
+software is currently being "dogfooded" on an experimental branch of the
+author's own essay blog.
 
 Further, the parser implementation is incomplete. The HTML and JSON
 documents found in t/microformats-v2 include the full Microformats2

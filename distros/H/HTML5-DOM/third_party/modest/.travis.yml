@@ -1,0 +1,6 @@
+language: c
+compiler:
+  - clang
+  - gcc
+install: false
+script: make -j4

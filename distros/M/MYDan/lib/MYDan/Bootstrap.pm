@@ -45,18 +45,13 @@ sub run
     confess "open log: $!" unless open $logH, ">>$logf"; 
     $logH->autoflush;
 
-    $SIG{TERM} = $SIG{INT} = sub
-    {
+    my $excb = sub{
         map{ kill( 9, $_->{pid} ) if $_->{pid}; }values %proc;
-        exit 1;
+        die "kill.\n";
     };
 
-    $SIG{'CHLD'} = sub {
-        while((my $pid = waitpid(-1, WNOHANG)) >0)
-        {
-            map{ delete $proc{$_} if $proc{$_}{pid} == $pid }keys %proc;
-        }
-    };
+    my $term = AnyEvent->signal (signal => "TERM", cb => $excb );
+    my $ints = AnyEvent->signal (signal => "INT",  cb => $excb );
 
     my ( $rand, %time, %rand ) = int rand time;
     my $t = AnyEvent->timer(
@@ -89,24 +84,27 @@ sub run
                 my ( $err, $wtr, $rdr ) = gensym;
                 my $pid = IPC::Open3::open3( undef, $rdr, $err, "$exec/$name" );
            
-		$proc{$name}{pid} = $pid;
+     		    $proc{$name}{pid} = $pid;
+                $proc{$name}{child} = AnyEvent->child ( pid => $pid, cb => sub{
+                    map{ delete $proc{$_} if $proc{$_}{pid} == $pid }keys %proc;
+                    } );
                 $proc{$name}{rdr} = AnyEvent->io (
                     fh => $rdr, poll => "r",
                     cb => sub {
-                        my $input = <$rdr>; 
-                        delete $proc{$name}{rdr} and return unless $input;
+                        my $input;my $n = sysread $rdr, $input, 102400;
+                        delete $proc{$name}{rdr} and return unless $n;
                         chomp $input;
-                        print $logH unixtai64n(time), " [$name] [STDOUT] $input\n";
+                        syswrite( $logH, unixtai64n(time). " [$name] [STDOUT] $input\n" );
                     }
                 );
                 $proc{$name}{err} = AnyEvent->io (
                     fh => $err, poll => "r", 
                     cb => sub {
-                        my $input = <$err>;
-                        delete $proc{$name}{err} and return unless $input;
+                        my $input;my $n = sysread $err, $input, 102400;
+                        delete $proc{$name}{err} and return unless $n;
 
                         chomp $input;
-                        print $logH unixtai64n(time), " [$name] [STDERR] $input\n"; 
+                        syswrite( $logH, unixtai64n(time). " [$name] [STDERR] $input\n" ); 
                     }
                 );
             }

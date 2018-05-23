@@ -69,7 +69,7 @@ analyses used a common o_prefix for each library.
 =cut
 
 package CLIPSeqTools::CompareApp::all;
-$CLIPSeqTools::CompareApp::all::VERSION = '0.1.7';
+$CLIPSeqTools::CompareApp::all::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

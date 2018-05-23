@@ -1,18 +1,20 @@
 package Backup::Hanoi;
 # ABSTRACT: select backup according to algo
-$Backup::Hanoi::VERSION = '0.003';
+$Backup::Hanoi::VERSION = '0.005';
 use strict;
 use warnings;
 
+use v5.6.0;
+
 sub new {
     my $class   = shift;
-    my $devices = shift // [];
-
-    die "You need at least three devices, for this to work.\n"
-        if ($devices < 3);
+    my $devices = shift;
+    $devices = [] unless ($devices); # // operator needs v5.10
 
     # the number of devices predicts the size of the cycles
     my $device_count = scalar @{$devices};
+
+    die "three devices needed.\n" if ($device_count < 3);
 
     # half a hanoi cycle is just what we need for backup
     my $hanoi_cycles_half = (2**$device_count) / 2;
@@ -29,7 +31,9 @@ sub new {
 sub get_device_for_cycle {
 
     my $self  = shift;
-    my $cycle = shift // 0;
+    my $cycle = shift;
+
+    $cycle = 0 unless ($cycle); # // operator needs v5.10
 
     # treat negative numbers as normal FIFO
     # e.g. index -1 gives the second last element
@@ -92,7 +96,7 @@ Backup::Hanoi - select backup according to algo
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 

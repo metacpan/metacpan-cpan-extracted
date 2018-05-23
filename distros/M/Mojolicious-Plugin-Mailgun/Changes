@@ -1,5 +1,16 @@
 Revision history for perl distribution Mojolicious-Plugin-Mailgun
 
+0.07 2018-05-22T15:36:15+0200
+ - Promise version needs to return a promise.
+ - Add test for promise
+
+0.06 2018-05-22T14:49:46+0200
+ - Set a id in test mode
+ - Add promise support
+
+0.05 2018-05-21T20:35:30+0200
+ - Fix metadata urls
+
 0.04 2017-05-23T14:29:49+0200
  - Fix missing dependency on Mojolicious
 

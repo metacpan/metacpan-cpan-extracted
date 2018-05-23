@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  Mojolicious: '7.75'
   perl: v5.10.0
 resources:
-  bugtracker: https://github.com/marcus/mojolicious-plugin-promiseactions/issues
-  homepage: https://github.com/marcus/mojolicious-plugin-promiseactions
+  bugtracker: https://github.com/marcusramberg/mojolicious-plugin-promiseactions/issues
+  homepage: https://github.com/marcusramberg/mojolicious-plugin-promiseactions
   repository: https://github.com/marcusramberg/mojolicious-plugin-promiseactions.git
-version: '0.01'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

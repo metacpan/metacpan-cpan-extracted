@@ -20,8 +20,8 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Calendar::Bahai'     => '0.46',
-        'Calendar::Gregorian' => '0.15',
-        'Calendar::Hebrew'    => '0.02',
+        'Calendar::Gregorian' => '0.16',
+        'Calendar::Hebrew'    => '0.05',
         'Calendar::Hijri'     => '0.33',
         'Calendar::Julian'    => '0.07',
         'Calendar::Persian'   => '0.35',

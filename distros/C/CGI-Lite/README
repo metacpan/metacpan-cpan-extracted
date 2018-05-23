@@ -1,7 +1,7 @@
-CGI::Lite v3.01
-------------------
+CGI::Lite v3.02
+---------------
 
-Released: 10th December 2015
+Released: 19th May 2018
 
 This is a new release of the 3.x branch. Please be aware of the API
 changes from 2.x with particular reference to the deprecated and obsolete
@@ -21,13 +21,18 @@ This makes it well suited to a non-persistent CGI scenario.
 NEW IN THIS VERSION
 -------------------
 
-These are the changes since the last general release (3.00).
+These are the changes since the last general release (3.01).
 
-Dual subs/methods have improved detection of how they have been called.
+BUG FIX: Uploads on MSWin32 were not correctly converted if the first
+    character of a buffer was LF. Changed regex to negative lookarounds.
 
-BUG FIX: Uploads with enctype "multipart/form-data" and at least one
-    non-file param now process without warnings. (issue 107570)
+BUG FIX: Uploads could fail if n * buffer_size fell inside the boundary
+    marker. Thanks pru-mike (PR 1). (possibly fixes issue 116670)
 
-Misc small documentation improvements.
+BUG FIX: Changing the boundary marker for second and subsequent uploads
+    causes errors. Thanks pru-mike (PR 1). (issue 125130)
+
+Test suite enhanced: now with Test::Vars (0.12) and fix of tmp filename
+    race condition.
 
 See the CHANGES file for full history.

@@ -1,7 +1,9 @@
 package Pcore::Util::List;
 
-use Pcore -export, [qw[pairs pairkeys pairvalues]];
+use Pcore -export;
 use List::AllUtils qw[:all];    ## no critic qw[Modules::ProhibitEvilModules]
+
+our $EXPORT = [qw[pairs pairkeys pairvalues]];
 
 1;
 __END__

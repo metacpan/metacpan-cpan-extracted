@@ -2,7 +2,7 @@ NAME
     BSON - BSON serialization and deserialization
 
 VERSION
-    version v1.4.0
+    version v1.6.1
 
 SYNOPSIS
         use BSON;
@@ -109,10 +109,14 @@ ATTRIBUTES
     The default is false.
 
   prefer_numeric
-    If set to true, scalar values that look like a numeric value will be
-    encoded as a BSON numeric type. When false, if the scalar value was ever
-    used as a string, it will be encoded as a BSON UTF-8 string, otherwise
-    it will be encoded as a numeric type.
+    When false, scalar values will be encoded as a number if they were
+    originally a number or were ever used in a numeric context. However, a
+    string that looks like a number but was never used in a numeric context
+    (e.g. "42") will be encoded as a string.
+
+    If "prefer_numeric" is set to true, the encoder will attempt to coerce
+    strings that look like a number into a numeric value. If the string
+    doesn't look like a double or integer, it will be encoded as a string.
 
     IMPORTANT CAVEAT: the heuristics for determining whether something is a
     string or number are less accurate on older Perls. See BSON::Types for
@@ -215,6 +219,14 @@ METHODS
 
     Constructs a copy of the original codec, but allows changing attributes
     in the copy.
+
+  create_oid
+        $oid = BSON->create_oid;
+
+    This class method returns a new BSON::OID. This abstracts OID generation
+    away from any specific Object ID class and makes it an interface on a
+    BSON codec. Alternative BSON codecs should define a similar class method
+    that returns an Object ID of whatever type is appropriate.
 
   inflate_extjson
         use JSON::MaybeXS;
@@ -430,7 +442,7 @@ CONTRIBUTORS
     *   Oleg Kostyuk <cub@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by Stefan G. and MongoDB, Inc.
+    This software is Copyright (c) 2018 by Stefan G. and MongoDB, Inc.
 
     This is free software, licensed under:
 

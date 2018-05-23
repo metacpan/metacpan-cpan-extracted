@@ -18,7 +18,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Importer::Zim::EndOfScope' => 'v0.4.0'
+                                        'Importer::Zim::EndOfScope' => 'v0.5.0'
                                       },
                       'requires' => {
                                       'Importer::Zim::Base' => 'v0.12.1',
@@ -29,7 +29,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Importer::Zim::Lexical' => 'v0.10.0',
-                                      'Importer::Zim::Unit' => 'v0.5.0'
+                                      'Importer::Zim::Unit' => 'v0.6.0'
                                     }
                     },
        'test' => {

@@ -17,6 +17,12 @@ subtest 'resolveModule - id' => sub {
     is $js->_resolveModule('invalid'), undef, 'invalid';
 };
 
+subtest 'resolveModule - json' => sub {
+
+    my $file = $js->_resolveModule('json/file');
+    is $file, "$FindBin::Bin/modules/json/file.json", 'relative';
+};
+
 
 subtest 'resolveModule - relative' => sub {
     is $js->eval("typeof require('1.0/relative/submodule/a').foo"), 'function';
@@ -24,11 +30,15 @@ subtest 'resolveModule - relative' => sub {
 
 
 subtest 'require' => sub {
-    is $js->eval("var module = require('simpleMath'); module.foo = 'bar'; module.add(2, 3)", "test"), 5;
+    is $js->eval("var module = require('simpleMath'); module.foo = 'bar'; module.add(2, 3)"), 5;
     is $js->eval("require('simpleMath').foo"), 'bar', 'cached';
     ok dies { $js->eval("require('invalid')") }, 'invalid module exception';
     like dies { $js->eval("require('notStrict')") }, qr/ReferenceError/, 'use strict';
     like dies { $js->eval("require('notStrict')") }, qr/ReferenceError/, 'dont cache bad modules';
+};
+
+subtest 'require json' => sub {
+    is $js->eval("require('json/file').foo"), 'bar';
 };
 
 

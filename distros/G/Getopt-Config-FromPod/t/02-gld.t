@@ -13,11 +13,11 @@ my @arg = ('my-program %o <some-arg>', Getopt::Config::FromPod->new->array);
 my ($opt, $usage) = describe_options(@arg);
 
 my $help = qr/my-program \[-psv\] \[long options\.\.\.\] <some-arg>
-\t-s( STR)? --server( STR)?\s* the server to connect to
-\t-p( INT)? --port( INT)?\s* the port to connect to
-\t\s*
-\t-v --verbose\s* print extra stuff
-\t--help\s* print usage message and exit/;
+\t-s(\s+STR)?\s+--server(\s+STR)?\s+the server to connect to
+\t-p(\s+INT)?\s+--port(\s+INT)?\s+the port to connect to
+\s*
+\t-v\s+--verbose\s+print extra stuff
+\t--help\s+print usage message and exit/;
 like($usage->text, $help, 'usage text');
 is($opt->{help}, 1, 'help with --help');
 is($opt->{port}, 79, 'port with --help');

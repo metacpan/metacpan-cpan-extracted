@@ -27,7 +27,7 @@
          "web" : "https://github.com/Corion/Test-HTTP-LocalServer"
       }
    },
-   "version" : "0.61",
+   "version" : "0.62",
    "x_serialization_backend" : "JSON::PP version 2.27202",
    "x_static_install" : 1
 }

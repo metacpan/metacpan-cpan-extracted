@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Implementation::DataValidator::TypeTiny;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base::DataValidator);
 use Ref::Util 0.203 ();

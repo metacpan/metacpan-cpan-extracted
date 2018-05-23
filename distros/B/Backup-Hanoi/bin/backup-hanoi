@@ -7,9 +7,13 @@ use warnings;
 # PODNAME: backup-hanoi
 # ABSTRACT: predict on which device to put next backup
 
-use feature 'say';
-                                                               
-use Backup::Hanoi;  
+use v5.6.0;
+use Backup::Hanoi;
+
+# we fake say, to support older perl
+sub say {
+    print "$_[0]\n";
+}
 
 my $help = <<'END_MESSAGE';
 
@@ -27,6 +31,10 @@ my $help = <<'END_MESSAGE';
 
     # create a device-list for the backups 40 up to 60
     backup-hanoi device-list.txt 40 60
+
+    # first initialise all backups (fifo), then replace 40 times (hanoi)
+    backup-hanoi device-list.txt init 40
+
 END_MESSAGE
 unless (@ARGV) {
     say $help;
@@ -45,6 +53,9 @@ close $file_handle;
 my $backup = Backup::Hanoi->new(\@devices);
 
 if (defined $cycle_top and ($cycle_top or $cycle_top == 0)) {
+
+    # start with negative number for FIFO
+    $cycle = 1 - (scalar @devices) if ($cycle eq 'init');
 
 	for ($cycle .. $cycle_top) {
 		say $backup->get_device_for_cycle($_);
@@ -71,7 +82,7 @@ backup-hanoi - predict on which device to put next backup
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -85,7 +96,7 @@ You need to list your devices in a text file, separated by newline.
  # list repeatable pattern
  backup-hanoi device-list.txt
 
- # list wich device should be used for backup number 40
+ # list which device should be used for backup number 40
  backup-hanoi device-list.txt 40
 
  # create a device-list for the backups 40 up to 60
@@ -95,6 +106,9 @@ You need to list your devices in a text file, separated by newline.
  # create a plan for initilisation and overwriting
  # for one year of daily backups
  backup-hanoi device-list.txt -4 360
+
+ # same, but easier
+ backup-hanoi device-list.txt init 360
 
 =head1 AUTHOR
 

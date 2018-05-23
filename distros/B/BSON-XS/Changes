@@ -1,5 +1,17 @@
 Revision history for BSON-XS
 
+v0.4.0    2018-05-17 16:35:23-04:00 America/New_York
+
+    [!!! Incompatible Changes !!!]
+
+    - PERL-742 Requires Perl 5.10.1 or later
+
+    [Fixes]
+
+    - PERL-894 Fix bug coercing strings to number
+
+    - PERL-894 apply prefer_numeric only to pure strings
+
 v0.2.2    2016-10-27 17:55:25-04:00 America/New_York
 
     [Fixes]

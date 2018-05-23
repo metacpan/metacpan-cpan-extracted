@@ -1,3 +1,6 @@
+0.0405  2018-05-22
+        - Convert to dzil.
+
 0.0404  2016-02-09
         - Fix an obscure and unhelpful run on "docmake pdf" without an "-o"
         flag.

@@ -1,5 +1,32 @@
 Revision history for BSON
 
+v1.6.1    2018-05-17 13:41:11-04:00 America/New_York
+
+    [Bugs]
+
+    - [PERL-893] Fix 'prefer_numeric' handling of dual-vars to apply
+      the heuristic only when no numeric form already exists.
+
+    - [PERL-896] The 'epoch' method on BSON::Time was truncating to
+      integers; it's now a floating point value as documented.
+
+    - [PERL-896] Fixed PID generation within OIDs
+
+v1.6.0    2018-05-15 09:41:21-04:00 America/New_York
+
+    [Bugs]
+
+    - [PERL-739] Validate Uint32 range on BSON::Timestamp components
+
+    [New Feature]
+
+    - [PERL-593] Add comparison overloading to BSON::OID  (HEAD -> master,
+      sandbox/master, origin/master)
+
+    - [PERL-688] Add create_oid class method 
+
+    - [PERL-868] Add comparison overloading to BSON::Timestamp 
+
 v1.4.0    2017-03-16 18:00:04-04:00 America/New_York
 
     [!!! Incompatible Changes !!!]

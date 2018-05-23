@@ -1,0 +1,29 @@
+---
+abstract: 'A structured return value for failure or success'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ReturnValue
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Hash::AsObject: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/briandfoy/returnvalue/issues
+  homepage: https://github.com/briandfoy/returnvalue
+  repository: https://github.com/briandfoy/returnvalue.git
+version: '0.112'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

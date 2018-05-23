@@ -1,0 +1,67 @@
+{
+   "abstract" : "Create a CPAN-like structure out of some dists",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MyCPAN-App-DPAN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Checksums" : "0",
+            "CPAN::PackageDetails" : "0.24",
+            "IPC::Cmd" : "0",
+            "IPC::Run" : "0",
+            "IPC::System::Simple" : "0",
+            "LWP::Simple" : "0",
+            "Log::Log4perl" : "0",
+            "MyCPAN::Indexer" : "1.282",
+            "Test::Output" : "0.13",
+            "perl" : "5.014",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/mycpan-app-dpan/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/mycpan-app-dpan",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/mycpan-app-dpan.git",
+         "web" : "https://github.com/briandfoy/mycpan-app-dpan"
+      }
+   },
+   "version" : "1.281",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

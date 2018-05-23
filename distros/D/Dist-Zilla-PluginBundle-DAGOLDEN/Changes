@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-DAGOLDEN
 
+0.079     2018-05-16 19:38:12-04:00 America/New_York
+
+    [CHANGED]
+
+    - Moved Git::Contributors later in the plugin bundle so it
+      can detect a minimum Perl prereqs and stop warning about
+      Perl <= 5.8.6 and non-ascii characters.
+
 0.078     2016-08-09 15:14:28-04:00 America/New_York
 
     [ADDED]

@@ -22,8 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
             "JSON::PP" : "0",
-            "Storable" : "0",
             "Test::File::Contents" : "0.23",
             "Test::More" : "0",
             "YAML::XS" : "0"
@@ -36,16 +37,27 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
             "Encode::Locale" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
             "Hash::Merge" : "0",
             "Hash::Merge::Extra" : "0.06",
             "IPC::Run3" : "0",
             "JSON" : "0",
+            "List::MoreUtils" : "0",
             "Log::Log4Cli" : "0.21",
             "Module::Find" : "0",
+            "Pod::Find" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
             "Struct::Diff" : "0.96",
             "Struct::Path" : "0.81",
             "Struct::Path::PerlStyle" : "0.8",
+            "Term::ANSIColor" : "0",
             "perl" : "5.01"
          }
       }
@@ -56,5 +68,5 @@
          "url" : "https://github.com/mr-mixas/NDTools"
       }
    },
-   "version" : "v0.5.5"
+   "version" : "v0.5.6"
 }

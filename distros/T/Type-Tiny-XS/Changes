@@ -6,6 +6,21 @@ Home page:    <https://metacpan.org/release/Type-Tiny-XS>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.014	2018-05-20
+
+ [ Bug Fixes ]
+ - Bool was letting overloaded blessed objects pass the type constraint. It
+   shouldn't.
+   Gregory Oschwald++
+   <https://github.com/tobyink/p5-type-tiny-xs/issues/5>
+
+0.013	2018-05-15
+
+ [ Bug Fixes ]
+ - Strings like '00' and '000' shouldn't be accepted as PositiveInt.
+   Will Storey++
+   <https://github.com/tobyink/p5-type-tiny-xs/issues/7>
+
 0.012	2014-09-17
 
  [ Packaging ]

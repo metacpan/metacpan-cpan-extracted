@@ -1,0 +1,164 @@
+==================================================
+Changes from 2017-05-17 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2018-05-17 17:53:04 +0000
+------------------------------------------
+
+  Change: 717f34a6ccb1f3a808349aaabee07cf1e34d1aa0
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 11:53:00 +0000
+
+    pod version bump 
+
+  Change: b1317fbe46a76eb5cd646f992dd379409a0daa8c
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2018-05-17 11:48:59 +0000
+
+    Merge pull request #3 from manwar/tidy-up-abstract
+
+    Tidied up abstract. 
+
+  Change: d7314b13fc3e8a3fc6abed97715905369e381644
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-05-17 11:31:07 +0000
+
+    Tidied up abstract. 
+
+------------------------------------------
+version 0.005 at 2018-05-17 17:46:38 +0000
+------------------------------------------
+
+  Change: 6e32a79d632e726e559459d36548f3a0bb5f019c
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 11:46:38 +0000
+
+    perlcritic/perltidy cleanup 
+
+------------------------------------------
+version 0.004 at 2018-05-17 16:45:52 +0000
+------------------------------------------
+
+  Change: 243c643be48a69069d6e84eeb0bf30974a0908a1
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 10:45:52 +0000
+
+    allow smarter code results 
+
+------------------------------------------
+version 0.003 at 2018-05-17 16:40:13 +0000
+------------------------------------------
+
+  Change: 90fc9b60d6447534e5f5735522c5c78fa2bdf5fb
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 10:40:13 +0000
+
+    lots of POD, and support mocking most/all fields 
+
+  Change: 6c681e021b946bcc44f4660f1fdcadd2e20e6f87
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 10:39:38 +0000
+
+    version bump 
+
+------------------------------------------
+version 0.002 at 2018-05-17 16:15:33 +0000
+------------------------------------------
+
+  Change: 926313fd7980270bd4e61339e606b4791885b688
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 10:15:33 +0000
+
+    readme version bump 
+
+  Change: bbb717302638a91085a819002156a40042ce7cb7
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-17 10:05:09 +0000
+
+    add Test::Kwalitee to build reqs for kwalitee 
+
+------------------------------------------
+version 0.001 at 2018-05-16 22:29:55 +0000
+------------------------------------------
+
+  Change: a6d705c530302800775f938c316a17545604f697
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-16 16:29:55 +0000
+
+    minor pod update 
+
+  Change: 3ebaf0038c790679e8fdd431f4e47fcbc9bb3af6
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2018-05-16 16:16:27 +0000
+
+    Merge pull request #2 from KristopherPaulsen/master
+
+    Get all the sweet changes 
+
+  Change: 788683a1087135c1fb52e258076542a738a378f0
+  Author: Kristopher Paulsen <kpaulsen@bluehost.com>
+  Date : 2018-05-15 14:15:07 +0000
+
+    More unit test coverage 
+
+  Change: 152292192bd4b16baef8a81fee7e7e9b4acc57b5
+  Author: Kristopher Paulsen <kpaulsen@bluehost.com>
+  Date : 2018-05-15 13:02:47 +0000
+
+    Test WIP 
+
+  Change: 2296aedb8c25979b0634864756ba6b7205169771
+  Author: Kristopher Paulsen <kpaulsen@bluehost.com>
+  Date : 2018-05-15 13:02:26 +0000
+
+    Wip 
+
+  Change: cde872852f1ddbb47a5db8dfcee250749bb19fea
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2018-05-14 12:32:38 +0000
+
+    Merge pull request #1 from csjewell/master
+
+    Add the Test::ReportPrereqs plugin 
+
+  Change: c9badda9e5b45ab879a2ba3d6d9a89a68ca04b60
+  Author: Curtis Jewell <swordsman@curtisjewell.name>
+  Date : 2018-05-14 11:54:19 +0000
+
+    Add the Test::ReportPrereqs plugin
+
+    This plugin creates a test that reports the versions of all
+    prerequisite modules.
+
+    This is useful when searching out errors reported via users or
+    failing tests on CPANTesters because the error may be in a
+    prerequisite module. 
+
+  Change: 2ef458a18160c8d60bf237a4e83aef4fd52316f5
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-14 10:51:34 +0000
+
+    oops forgot to run dzil build before commit 
+
+  Change: 194bb588b8ced395576f201ab2480e9bd555b2ab
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-14 10:16:49 +0000
+
+    start building out support for certain actions by card number 
+
+  Change: ac83482e2f62c9260e50436cc562b34dcbbc78b2
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-14 10:16:09 +0000
+
+    initial commit 
+
+  Change: 5960cda19f515fd23535734d726671ea2e0cf4ca
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2018-05-03 10:28:07 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

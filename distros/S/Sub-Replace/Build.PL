@@ -18,20 +18,20 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Sub-Replace",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.2.0",
   "license" => "perl",
   "module_name" => "Sub::Replace",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
     "Sub::Delete" => "1.00002",
-    "perl" => "5.010001",
-    "strict" => 0
+    "perl" => "5.010001"
   },
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => "0.96",
+    "strict" => 0,
     "warnings" => 0
   }
 );
@@ -42,6 +42,7 @@ my %fallback_build_requires = (
   "File::Spec" => 0,
   "Module::Build" => "0.28",
   "Test::More" => "0.96",
+  "strict" => 0,
   "warnings" => 0
 );
 

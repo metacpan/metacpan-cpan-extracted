@@ -18,10 +18,10 @@ use AnyEvent::Loop;
 use AnyEvent::Filesys::Notify;
 use Path::Tiny;
 
-our $VERSION = version->new('0.0.7');
+our $VERSION = version->new('0.1.0');
 
-has [qw/dirs files git run done/] => ( is => 'rw' );
-has changed => (
+has [qw/git run done/] => ( is => 'rw' );
+has [qw/dirs files exclude changed/] => (
     is      => 'rw',
     default => sub {[]},
 );
@@ -66,10 +66,17 @@ sub doit {
     my @monitored;
     for my $changed (@{ $self->changed() }) {
         my $path = $changed->path;
-        push @monitored, $changed if !$seen{$path}++ || $files{$path} || $dirs{$path};
+        push @monitored, $changed if (
+            !$seen{$path}++
+            || $files{$path}
+            || $dirs{$path}
+        ) && (
+            ! @{ $self->exclude }
+            || ! grep { $path =~ /$_/ } @{ $self->exclude }
+        );
     }
 
-    $self->run()->(@monitored);
+    $self->run()->(@monitored) if @monitored;
     $self->done(undef);
     $self->changed([]);
 }
@@ -137,7 +144,7 @@ App::watchdo - Run a command when watched files change
 
 =head1 VERSION
 
-This documentation refers to App::watchdo version 0.0.7
+This documentation refers to App::watchdo version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -182,19 +189,37 @@ Runs the event loop to watch for changes in files.
 
 =over 4
 
-=item C<changed ()>
+=item C<changed>
 
-=item C<done ()>
+Array of changed files
 
-=item C<dirs ()>
+=item C<done>
 
-=item C<files ()>
+Stores callback method for alerting of changed files
 
-=item C<git ()>
+=item C<dirs>
 
-=item C<run ()>
+Stores the directories that are being monitored
 
-=item C<wait ()>
+=item C<files>
+
+Stores the files that are being monitored
+
+=item C<exclude>
+
+Stores a list of regexps of files that should not trigger changed events
+
+=item C<git>
+
+Flag for using git to find files that should be monitored
+
+=item C<run>
+
+The function to be called when file are changed
+
+=item C<wait>
+
+Time to wait for changes to settle to changed events are not filed too quickly
 
 =back
 

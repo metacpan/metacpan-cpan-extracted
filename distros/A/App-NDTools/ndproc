@@ -24,7 +24,7 @@ Process nested data structures according provided rules
 
 =item B<--builtin-format> <""|JSON>
 
-Format for builtin things (--builtin-rules, --embed-rules). Raw structure
+Format for builtin things (C<--builtin-rules>, C<--embed-rules>). Raw structure
 will be used if omitted or empty.
 
 =item B<--builtin-rules> E<lt>pathE<gt>
@@ -81,7 +81,7 @@ Load rules from specified file. May be used several times.
 
 =item B<--verbose|-v> [int]
 
-Increase verbosity, max level - 4.
+Increase verbosity, max level is 4.
 
 =item B<--version|-V>
 

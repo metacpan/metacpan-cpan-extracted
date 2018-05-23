@@ -1,4 +1,4 @@
-IO-Compress-Brotli version 0.002001
+IO-Compress-Brotli version 0.004001
 ===================================
 
 Brotli is a data compression format primarily used in web fonts and
@@ -23,13 +23,13 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-* File::Slurp
+* File::Slurper
 
 Additionally, it requires a C compiler.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2015-2016 by Marius Gavrilescu
+Copyright (C) 2015-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,

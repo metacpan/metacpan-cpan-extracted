@@ -21,12 +21,19 @@ use Test::XSLogger qw{:all};
 
 my $log = XS::Logger->new();
 is $log->get_level, 0, "default level is 0";
+is $log->get_quiet, 0, "default quiet is 0";
 
 $log = XS::Logger->new( { level => 1 } );
 is $log->get_level, 1, "can set the log level to a custom value";
 
 $log->set_level(4);
 is $log->get_level, 4, "level updated to 4";
+
+$log = XS::Logger->new( { quiet => 1 } );
+is $log->get_quiet, 1, "can set the quiet option to true";
+
+$log->set_quiet(0);
+is $log->get_quiet, 0, "can update quiet value";
 
 is XS::Logger::DEBUG_LOG_LEVEL(), 0, "debug level is 0";
 is XS::Logger::INFO_LOG_LEVEL(),  1, "info level is 1";
@@ -65,10 +72,10 @@ sub check_lines_for_level {
 
     my $log;
     if ( defined $level ) {
-        $log = XS::Logger->new( { level => $level } );
+        $log = XS::Logger->new( { level => $level, quiet => 1 } );
     }
     else {
-        $log = XS::Logger->new();
+        $log = XS::Logger->new( { quiet => 1 } );
     }
 
     # call all levels once

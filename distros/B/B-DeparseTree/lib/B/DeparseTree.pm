@@ -1,10 +1,13 @@
 package B::DeparseTree;
 
-use rlib '.';
-use strict;
-use vars qw(@ISA $VERSION);
+use warnings; use strict;
 
-$VERSION = '3.0.0';
+our $VERSION = '3.1.0';
+
+use rlib '.';
+use vars qw(@ISA);
+
+use base 'Exporter';
 
 use Config;
 my $is_cperl = $Config::Config{usecperl};
@@ -31,8 +34,6 @@ $module .= 'c' if $is_cperl;
 
 require "B/DeparseTree/${module}.pm";
 *compile = \&B::DeparseTree::Common::compile;
-
-require Exporter;
 
 @ISA = ("Exporter", "B::DeparseTree::$module");
 our @EXPORT = qw(is_cperl);

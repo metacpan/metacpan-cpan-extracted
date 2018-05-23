@@ -1,0 +1,97 @@
+severity = 1
+verbose = 9
+
+; eventually we will want to replace anything excluded with our own tests
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = perltidy.rc
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 10
+
+[ControlStructures::ProhibitDeepNests]
+max_nests = 7
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = abstract close contract left no record right set
+
+[Subroutines::ProhibitExcessComplexity]                  ; the default implementation seems to estimate mccabe a bit higher
+max_mccabe = 35
+[-Subroutines::ProhibitExplicitReturnUndef]              ; could theoretically check if sub is intended to only do success or failure
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[ValuesAndExpressions::RequireNumberSeparators]
+min_value = 100_000
+
+[ValuesAndExpressions::ProhibitMagicNumbers]
+allowed_values = -1 0..31 60 100 300 1900 3600 86400 32 255 all_integers
+
+[-Variables::ProhibitPackageVars]
+
+[Variables::ProhibitPunctuationVars]
+allow = $@ $! $0 $$ $/ $|
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV
+
+; only whine about backticks in void context
+[InputOutput::ProhibitBacktickOperators]
+only_in_void_context = 1
+
+[-BuiltinFunctions::ProhibitSleepViaSelect]
+
+; no useless double quotes (but do allow doubles to avoid escaping singles)
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+allow_if_string_contains_single_quote = 1
+
+; we generally know what we're doing
+[-ControlStructures::ProhibitPostfixControls]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+; only require basic POD documentation, not more
+[Documentation::RequirePodSections]
+lib_sections    = NAME | DESCRIPTION
+script_sections = NAME
+
+; no longer required now that git is standard
+[-Miscellanea::RequireRcsKeywords]
+
+; we like to have our pod at the beginning and then interspersed
+[-Documentation::RequirePodAtEnd]
+
+; this needs to be replaced by our own - we'd like to limit noise - but in a smart way
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+; we do these a lot and know what we're doing
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+; TODO - write one that checks for single line
+[-Subroutines::RequireFinalReturn]
+
+; requiring x and m and s is silly for most cases
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::ProhibitFixedStringMatches]
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 1
+
+; local vars are bad, local hash keys are good, this can't distinguish
+[-Variables::ProhibitLocalVars]
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV
+
+; generally preferred to keep map {} as a single statement but there are a few good exceptions so allow 2 statements
+[BuiltinFunctions::ProhibitComplexMappings]
+max_statements = 2
+
+[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+max_chain_length = 4
+
+[-ErrorHandling::RequireCarping]

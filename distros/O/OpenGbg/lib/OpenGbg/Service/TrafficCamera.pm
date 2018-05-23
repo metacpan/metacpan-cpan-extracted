@@ -6,7 +6,7 @@ package OpenGbg::Service::TrafficCamera;
 
 # ABSTRACT: Entry point to the Traffic Camera service
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use OpenGbg::Elk;
 
@@ -24,7 +24,7 @@ has handler => (
 has service_base => (
     is => 'rw',
     isa => Str,
-    default => 'TrafficCamera/v0.1/',
+    default => 'TrafficCamera/v0.2/',
 );
 
 sub get_camera_image {
@@ -69,7 +69,7 @@ OpenGbg::Service::TrafficCamera - Entry point to the Traffic Camera service
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SYNOPSIS
 

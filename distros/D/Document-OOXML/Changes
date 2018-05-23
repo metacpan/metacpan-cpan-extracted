@@ -1,5 +1,9 @@
 Revision history for perl distribution Document-OOXML
 
+0.181410  2018-05-21 19:17:33+02:00 Europe/Amsterdam
+
+ - Make ->style_text return the number of applied changes.
+
 0.180750  2018-03-16 19:04:46+01:00 Europe/Amsterdam
 
  - Remove "theme color" attributes when setting an explicit color.

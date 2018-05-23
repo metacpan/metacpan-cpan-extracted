@@ -1,11 +1,11 @@
-package WebService::S3::Tiny 0.001;
+package WebService::S3::Tiny 0.002;
 
 use strict;
 use warnings;
 
 use Carp;
 use Digest::SHA qw/hmac_sha256 hmac_sha256_hex sha256_hex/;
-use HTTP::Tiny;
+use HTTP::Tiny 0.014;
 
 my %url_enc = map { chr, sprintf '%%%02X', $_ } 0..255;
 

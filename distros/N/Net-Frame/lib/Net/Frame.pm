@@ -1,11 +1,11 @@
 #
-# $Id: Frame.pm,v 7609c9d085d3 2018/03/15 15:17:19 gomor $
+# $Id: Frame.pm,v e0c446e27ca9 2018/05/17 11:59:58 gomor $
 #
 package Net::Frame;
 use strict;
 use warnings;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 1;
 

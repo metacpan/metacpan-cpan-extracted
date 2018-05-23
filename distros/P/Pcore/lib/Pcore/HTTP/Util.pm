@@ -56,10 +56,10 @@ sub http_request ($args) {
 
                 if ($persistent) {
                     if ( $runtime->{res}->{version} == 1.1 ) {    # HTTP/1.1
-                        $persistent = 0 if $runtime->{res}->headers->{CONNECTION} && $runtime->{res}->headers->{CONNECTION} =~ /\bclose\b/smi;
+                        $persistent = 0 if $runtime->{res}->{headers}->{CONNECTION} && $runtime->{res}->{headers}->{CONNECTION} =~ /\bclose\b/smi;
                     }
                     elsif ( $runtime->{res}->{version} == 1.0 ) {    # HTTP/1.0
-                        $persistent = 0 if !$runtime->{res}->headers->{CONNECTION} || $runtime->{res}->headers->{CONNECTION} !~ /\bkeep-?alive\b/smi;
+                        $persistent = 0 if !$runtime->{res}->{headers}->{CONNECTION} || $runtime->{res}->{headers}->{CONNECTION} !~ /\bkeep-?alive\b/smi;
                     }
                     else {
                         $persistent = 0;
@@ -352,7 +352,7 @@ sub _read_headers ( $args, $runtime, $cb ) {
                 if ( my $cl = delete $res->{headers}->{CONTENT_LENGTH} ) {
                     $cl->[0] =~ s/\s//smg;
 
-                    eval { $runtime->{res}->_set_content_length( $cl->[0] ) } if $cl->[0];
+                    $runtime->{res}->{content_length} = $cl->[0] if $cl->[0];
                 }
 
                 # fill response object with HTTP response headers data
@@ -375,9 +375,9 @@ sub _read_headers ( $args, $runtime, $cb ) {
 sub _read_body ( $args, $runtime, $cb ) {
 
     # detect chunked transfer, not quite correct...
-    my $chunked = $runtime->{res}->headers->{TRANSFER_ENCODING} && $runtime->{res}->headers->{TRANSFER_ENCODING} =~ /\bchunked\b/smi;
+    my $chunked = $runtime->{res}->{headers}->{TRANSFER_ENCODING} && $runtime->{res}->{headers}->{TRANSFER_ENCODING} =~ /\bchunked\b/smi;
 
-    $runtime->{content_length} = $chunked ? 0 : $runtime->{res}->content_length;
+    $runtime->{content_length} = $chunked ? 0 : $runtime->{res}->{content_length};
 
     # call "on_progress" callback, not called during redirects
     $args->{on_progress}->( $runtime->{res}, $runtime->{content_length}, 0 ) if !$runtime->{redirect} && $args->{on_progress};
@@ -404,7 +404,7 @@ sub _read_body ( $args, $runtime, $cb ) {
 
         # HTTP/1.1 and no "Connection: close" is present - connection is persistent - no content body is expected
         if ( $runtime->{res}->{version} == 1.1 ) {
-            $persistent = 0 if $runtime->{res}->headers->{CONNECTION} && $runtime->{res}->headers->{CONNECTION} =~ /\bclose\b/smi;
+            $persistent = 0 if $runtime->{res}->{headers}->{CONNECTION} && $runtime->{res}->{headers}->{CONNECTION} =~ /\bclose\b/smi;
         }
 
         # HTTP/1.0 and "Connection: keep-alive" is present - connection is persistent - no content body is expected
@@ -413,7 +413,7 @@ sub _read_body ( $args, $runtime, $cb ) {
             # in HTTP/1.0 connection is not persistent by default
             $persistent = 0;
 
-            $persistent = 1 if $runtime->{res}->headers->{CONNECTION} && $runtime->{res}->headers->{CONNECTION} =~ /\bkeep-?alive\b/smi;
+            $persistent = 1 if $runtime->{res}->{headers}->{CONNECTION} && $runtime->{res}->{headers}->{CONNECTION} =~ /\bkeep-?alive\b/smi;
         }
 
         # return and do not read body if connection is persistent
@@ -426,7 +426,7 @@ sub _read_body ( $args, $runtime, $cb ) {
 
     my $decode;
 
-    if ( $args->{decompress} && $runtime->{res}->headers->{CONTENT_ENCODING} && $runtime->{res}->headers->{CONTENT_ENCODING} =~ /\bgzip\b/smi ) {
+    if ( $args->{decompress} && $runtime->{res}->{headers}->{CONTENT_ENCODING} && $runtime->{res}->{headers}->{CONTENT_ENCODING} =~ /\bgzip\b/smi ) {
         $decode = sub ( $in_buf_ref, $out_buf_ref ) {
             state $x = Compress::Raw::Zlib::Inflate->new( -AppendOutput => 1, -WindowBits => WANT_GZIP_OR_ZLIB );
 
@@ -481,7 +481,7 @@ sub _read_body ( $args, $runtime, $cb ) {
 
                 # process callbacks
                 if ( defined $content_ref ) {
-                    $runtime->{res}->_set_content_length($total_decoded_bytes_readed);
+                    $runtime->{res}->{content_length} = $total_decoded_bytes_readed;
 
                     return 1;    # continue reading
                 }
@@ -522,7 +522,7 @@ sub _read_body ( $args, $runtime, $cb ) {
 
                 # process callbacks
                 if ( defined $content_ref ) {
-                    $runtime->{res}->_set_content_length($total_decoded_bytes_readed);
+                    $runtime->{res}->{content_length} = $total_decoded_bytes_readed;
 
                     $args->{on_progress}->( $runtime->{res}, $runtime->{content_length}, $total_bytes_readed ) if $args->{on_progress};
 
@@ -601,7 +601,7 @@ sub _read_body ( $args, $runtime, $cb ) {
                         }
                     }
 
-                    $runtime->{res}->_set_content_length($total_decoded_bytes_readed);
+                    $runtime->{res}->{content_length} = $total_decoded_bytes_readed;
 
                     $args->{on_progress}->( $runtime->{res}, $runtime->{content_length}, $total_bytes_readed ) if $args->{on_progress};
 
@@ -621,7 +621,7 @@ sub _read_body ( $args, $runtime, $cb ) {
 
     # read chunked body
     if ($chunked) {
-        $runtime->{h}->read_http_body( $on_read, chunked => 1, headers => $runtime->{res}->headers );
+        $runtime->{h}->read_http_body( $on_read, chunked => 1, headers => $runtime->{res}->{headers} );
     }
 
     # read body with known content length
@@ -648,8 +648,6 @@ sub _read_body ( $args, $runtime, $cb ) {
 ## |      | 26                   | * Subroutine "http_request" with high complexity score (26)                                                    |
 ## |      | 251                  | * Subroutine "_write_request" with high complexity score (28)                                                  |
 ## |      | 375                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 355                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 587                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

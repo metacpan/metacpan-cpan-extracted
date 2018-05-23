@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://github.com/lskatz/mashtree"
       }
    },
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }

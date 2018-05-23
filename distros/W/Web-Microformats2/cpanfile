@@ -11,6 +11,6 @@ on 'test' => sub {
     requires "Test::Deep";
     requires "Test::More";
 
-    requires "List::Util";
+    requires "List::Util", 1.45;
     requires "Path::Class::Dir";
 };

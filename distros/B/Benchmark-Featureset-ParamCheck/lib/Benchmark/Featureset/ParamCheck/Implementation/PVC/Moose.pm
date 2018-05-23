@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Implementation::PVC::Moose;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base::PVC);
 use Params::ValidationCompiler 0.24 qw(validation_for);
@@ -14,7 +14,7 @@ use namespace::autoclean;
 
 my $t = \&Moose::Util::TypeConstraints::find_or_parse_type_constraint;
 
-use constant long_name => 'Params::ValidateCompiler with Moose';
+use constant long_name => 'Params::ValidationCompiler with Moose';
 use constant short_name => 'PVC-Moose';
 
 sub get_named_check {

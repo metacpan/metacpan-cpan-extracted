@@ -1,9 +1,12 @@
-Tests in the 'corpus' and 'mapping' folders and the top-level 'corpus'
-directory are copied verbatim from the BSON distribution on CPAN.  Because
-they invoke BSON.pm for encoding and decoding, they will pick up BSON::XS
-and use it for tests.
+Tests in the 'common', 'corpus', 'lib', and 'mapping' folders and the
+top-level 'corpus' directory are copied verbatim from the BSON distribution
+on CPAN.  Because they invoke BSON.pm for encoding and decoding, they will
+pick up BSON::XS and use it for tests.
 
-The t/lib/CleanEnv.pm module in the *BSON* distribution blocks BSON::XS.
-The t/lib/CleanEnv.pm module in *this* distribution blocks BSON::PP.  This
+The t/pvtlib/CleanEnv.pm module in the *BSON* distribution blocks BSON::XS.
+The t/pvtlib/CleanEnv.pm module in *this* distribution blocks BSON::PP.  This
 way, we can use the same set of tests for both distributions, ensuring
 backend compatibility.
+
+See the devel/sync-bson-tests.pl file to automatically update files from
+the BSON distribution.

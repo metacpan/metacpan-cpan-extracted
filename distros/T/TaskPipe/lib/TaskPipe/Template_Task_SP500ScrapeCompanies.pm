@@ -55,7 +55,7 @@ has ws => (is => 'ro', isa => 'Web::Scraper', default => sub {
 
 =head1 NAME
 
-TaskPipe::Task_Task_SP500Scrape_Companies - template for the Scrape_Companies task in the SP500 sample project
+TaskPipe::Template_Task_SP500Scrape_Companies - template for the Scrape_Companies task in the SP500 sample project
 
 =head1 DESCRIPTION
 

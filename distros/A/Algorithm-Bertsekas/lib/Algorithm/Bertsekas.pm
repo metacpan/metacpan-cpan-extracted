@@ -7,7 +7,7 @@ use diagnostics;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw( auction );
-our $VERSION = '0.85';
+our $VERSION = '0.87';
 
 #Variables global to the package	
 my $maximize_total_benefit;
@@ -17,7 +17,7 @@ my ( $array1_size, $array2_size, $min_size, $max_size, $original_max_size );
 my ( $need_transpose, $inicial_price, $iter_count_global, $iter_count_local );
 my ( $epsilon_scaling, $max_epsilon_scaling, $max_matrix_value, $target, $output );
 my ( %index_correlation, %assignned_object, %assignned_person, %price_object );
-my ( %objects_desired_by_this, %locked_list, %seen_person );
+my ( %objects_desired_by_this, %locked_list, %seen_person, %seen_assignned_objects );
 
 sub auction { #						=> default values
 	my %args = ( matrix_ref				=> undef,     # reference to array: matrix N x M			                                     
@@ -124,7 +124,9 @@ sub auction { #						=> default values
 		
 		%assignned_object = ();
 		%assignned_person = ();
-		%seen_person = ();	
+		%seen_person = ();
+
+		$seen_assignned_objects{$_} = 0 for ( 0 .. $max_size - 1 );
 
 		while ( (scalar keys %assignned_person) < $max_size ){ # while there is at least one element not assigned.
          
@@ -432,15 +434,14 @@ sub get_matrix_info {
 sub auctionRound {
 	my ( $matrix_ref, $epsilon, $verbose ) = @_;
 	my @matrix = @$matrix_ref;
+	my ( %info, %choose_object, %count_object, %choose_person );
 	my %this_person_can_choose_n_different_objects;
-	my %choose_object;
-	my %info;
-	my %seen_object;
-	my %count_object;
+	my %objects_with_the_same_values;
+	
+	my $number_of_assignned_object = scalar keys %assignned_object;	
 
 	if ( $verbose >= 8 )
 	{
-		my $number_of_assignned_object = scalar keys %assignned_object;
 		print $output "\n Start: Matrix Size N x M: $min_size x $max_size ; epsilon_scaling = $epsilon_scaling ; Number of Global Iterations = $iter_count_global ; Number of Local Iterations = $iter_count_local ; epsilon = $epsilon ; \$number_of_assignned_object = $number_of_assignned_object \n";
 		
 		foreach my $person ( sort { $a <=> $b } keys %assignned_person ){
@@ -493,7 +494,7 @@ sub auctionRound {
 				my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object];
 				$current_value{$object} = $matrix_value - $price_object{$object};
 				
-				push @updated_price, $object if ( $objects_desired_by_this{$person}{$object} == $current_value{$object} );				
+				push @updated_price, $object if ( $objects_desired_by_this{$person}{$object} == $current_value{$object} );								
 				
 				if ( $current_value{$object} > $Opt01ValForPersonI ) # search for the best 3 objects
 				{
@@ -520,7 +521,7 @@ sub auctionRound {
 				}								
 				
 				if ( $verbose >= 8 ){
-					printf $output " personI = %3s ; objectJ = %3s ; Current Value %20.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f <old list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
+					printf $output " personI = %3s ; objectJ = %3s ; Current Value %20.5f = \$matrix[%3s][%3s] %12.0f - \$price_object{%3s} %20.5f <old list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
 					$person, $object, $current_value{$object}, $person, $object, $matrix_value, $object, $price_object{$object}, 
 					$Opt01ValForPersonI, defined $Opt01ObjForPersonI ? $Opt01ObjForPersonI : '', 
 					$Opt02ValForPersonI, defined $Opt02ObjForPersonI ? $Opt02ObjForPersonI : '', 
@@ -560,7 +561,7 @@ sub auctionRound {
 					}
 
 					if ( $verbose >= 8 ){
-						printf $output " personI = %3s ; objectJ = %3s ; Current Value %20.5f = \$matrix[%3s][%3s] %3.0f - \$price_object{%3s} %10.5f <new list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
+						printf $output " personI = %3s ; objectJ = %3s ; Current Value %20.5f = \$matrix[%3s][%3s] %12.0f - \$price_object{%3s} %20.5f <new list> Max01_CurVal = %12.5f (%3s), Max02_CurVal = %12.5f (%3s), Max03_CurVal = %12.5f (%3s)\n", 
 						$person, $object, $current_value{$object}, $person, $object, $matrix_value, $object, $price_object{$object}, 
 						$Opt01ValForPersonI_new_list, defined $Opt01ObjForPersonI_new_list ? $Opt01ObjForPersonI_new_list : '', 
 						$Opt02ValForPersonI_new_list, defined $Opt02ObjForPersonI_new_list ? $Opt02ObjForPersonI_new_list : '', 
@@ -609,8 +610,7 @@ sub auctionRound {
 				{
 					$Opt03ValForPersonI = $Opt03ValForPersonI_new_list;
 					$Opt03ObjForPersonI = $Opt03ObjForPersonI_new_list;
-				}				
-
+				}
 			}
 			
 			$bidForPersonI = $Opt01ValForPersonI - $Opt02ValForPersonI + $epsilon;
@@ -620,7 +620,7 @@ sub auctionRound {
 			if ( $Opt01ValForPersonI == $Opt02ValForPersonI ) # this person can choose different objects that have the same values = $Opt01ValForPersonI
 			{
 				@objects_with_same_values = grep { $current_value{$_} == $Opt01ValForPersonI } keys %current_value;
-				$seen_object{$_}{$person} = $Opt01ValForPersonI for (@objects_with_same_values);
+				$objects_with_the_same_values{$_}{$person} = $Opt01ValForPersonI for (@objects_with_same_values);
 				$count_object{$_}++ for (@objects_with_same_values);
 				
 				if ( not @updated_price and defined $Opt01ValForPersonI_old_list ){
@@ -644,7 +644,7 @@ sub auctionRound {
 				}
 			}
 			
-			if ( $epsilon_scaling >= 6 and $epsilon_scaling % 3 == 0 and not $seen_person{$person}++ ) # filter the old list
+			if ( $epsilon_scaling >= 6 and $epsilon_scaling % 2 == 0 and not $seen_person{$person}++ ) # filter the old list
 			{					
 				for my $object ( @objects_with_greater_benefits ){ # frequently check the quality of objects in the old list
 					next if ( $current_value{$object} >= $Opt03ValForPersonI );
@@ -665,8 +665,8 @@ sub auctionRound {
 				$objects_desired_by_this{$person}{$Opt02ObjForPersonI} = $current_value{$Opt02ObjForPersonI} if (defined $Opt02ObjForPersonI);
 				$objects_desired_by_this{$person}{$Opt03ObjForPersonI} = $current_value{$Opt03ObjForPersonI} if (defined $Opt03ObjForPersonI);				
 
-				$locked_list{$person} = 1 if ( $epsilon_scaling > (1/5) * $max_epsilon_scaling and ($Opt03ValForPersonI - $Opt01ValForPersonI_new_list) > $min_size * $epsilon );
-				$locked_list{$person} = 1 if ( $epsilon_scaling > (2/5) * $max_epsilon_scaling ); # Lock the old list. Is this the minimum value to find a possible solution?
+				$locked_list{$person} = 1 if ( $epsilon_scaling > (1/10) * $max_epsilon_scaling and ($Opt03ValForPersonI - $Opt01ValForPersonI_new_list) > $min_size * $epsilon );
+				$locked_list{$person} = 1 if ( $epsilon_scaling > (3/10) * $max_epsilon_scaling ); # Lock the old list. Is this the minimum value to find a possible solution?
 				delete $locked_list{$person} if ( $epsilon == 1/(1+$min_size) ); # Otherwise unlock the person's old list in the last $epsilon_scaling round.
 			}
 			
@@ -687,23 +687,21 @@ sub auctionRound {
 			}
 		}
 	}
-	
-	my %choose_person;
-	
+
 	# first, choose objects that appear a few times
-	foreach my $object ( sort { $count_object{$a} <=> $count_object{$b} } keys %seen_object ){	# || $price_object{$b} <=> $price_object{$a}
-	foreach my $person ( sort { $seen_object{$object}{$a} <=> $seen_object{$object}{$b} } keys %{$seen_object{$object}} ){ # sort { $seen_object{$object}{$a} <=> $seen_object{$object}{$b} }
+	foreach my $object ( sort { $count_object{$a} <=> $count_object{$b} || $seen_assignned_objects{$a} <=> $seen_assignned_objects{$b} } keys %objects_with_the_same_values ){ # sort { $price_object{$b} <=> $price_object{$a} }
+	foreach my $person ( keys %{$objects_with_the_same_values{$object}} ){ # sort { $objects_with_the_same_values{$object}{$a} <=> $objects_with_the_same_values{$object}{$b} }
 		
 		next if ( $choose_object{$object} );
 		next if ( $choose_person{$person} );
 	
-		my $CurVal = $seen_object{$object}{$person}; # $CurVal = $current_value{$object} = $Opt01ValForPersonI.
+		my $CurVal = $objects_with_the_same_values{$object}{$person}; # $CurVal = $current_value{$object} = $Opt01ValForPersonI.
 		my $Opt01ObjForPersonI = $object;
 			
 		$info{$Opt01ObjForPersonI}{'bid'   } = $epsilon;
 		$info{$Opt01ObjForPersonI}{'person'} = $person;
 			
-		$objects_desired_by_this{$person}{$object} = $CurVal;								
+		$objects_desired_by_this{$person}{$object} = $CurVal;							
 		
 		if ( $verbose >= 8 ){
 		
@@ -714,14 +712,14 @@ sub auctionRound {
 		}
 		
 		$choose_object{$object}++;
-		$choose_person{$person}++;		
+		$choose_person{$person}++;
 	}}
 	
 	foreach my $object ( keys %info ) # sort { $a <=> $b } or sort { $info{$a}{'person'} <=> $info{$b}{'person'} }
 	{
 		my $bid    = $info{$object}{'bid'   };
 		my $person = $info{$object}{'person'};
-		
+
 		my $other_person = $assignned_object{$object}; # Find the other person who has objectJ and make them unassigned
 	   	   	   
 		if ( defined $other_person ) {
@@ -738,6 +736,8 @@ sub auctionRound {
 	   
 		# Each objectJ that receives one or more bids, determines the highest of these bids, increases the price_j 
 		# to the highest bid, and gets assigned to the personI who submitted the highest bid.
+
+		$seen_assignned_objects{$object}++;
 		
 		$assignned_person{$person} = $object;
 		$assignned_object{$object} = $person;
@@ -745,13 +745,13 @@ sub auctionRound {
 		$price_object{$object} += $bid;				
 	   
 		if ( $verbose >= 8 ){
-			printf $output " --> Assigning to personI = %3s the objectJ = %3s with highestBidForJ = %10.5f and update the price vector ; \$assignned_person{%3s} = %3s ; \$price_object{%3s} = %.5f \n", $person, $object, $bid, $person, $assignned_person{$person}, $object, $price_object{$object};	
+			printf $output " --> Assigning to personI = %3s the objectJ = %3s with highestBidForJ = %20.5f and update the price vector ; \$assignned_person{%3s} = %3s ; \$price_object{%3s} = %.5f \n", $person, $object, $bid, $person, $assignned_person{$person}, $object, $price_object{$object};	
 		}
 	}
 	
 	if ( $verbose >= 9 )
 	{		
-		my $number_of_assignned_object = scalar keys %assignned_object;
+		$number_of_assignned_object = scalar keys %assignned_object;
 		print $output "\n Final: Matrix Size N x M: $min_size x $max_size ; epsilon_scaling = $epsilon_scaling ; Number of Global Iterations = $iter_count_global ; Number of Local Iterations = $iter_count_local ; epsilon = $epsilon ; \$number_of_assignned_object = $number_of_assignned_object \n";		
 		
 		foreach my $person ( sort { $a <=> $b } keys %assignned_person ){
@@ -800,6 +800,9 @@ __END__
  
 
 =head1 SYNOPSIS
+
+ ### --- simple and direct application --- ###
+ ### ---            start              --- ###
 
  #!/usr/bin/perl
 
@@ -867,6 +870,9 @@ __END__
 	$value = defined $value ? sprintf( "%6s", $value ) : ' ' x 6 ; # %6s  
 	printf " Auction Algorithm, (row, column) indexes --> \$i = %3d ; \$j = %3d ; \$value = $value ; \$sum = %8s \n", $i, $j, $sum;
  }
+ 
+ ### ---            final              --- ###
+ ### --- simple and direct application --- ###
 
  Example 1: Find the nearest neighbor, Minimize the total benefit.
 
@@ -1066,7 +1072,7 @@ __END__
 =head1 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	May 13, 2018
+	May 21, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

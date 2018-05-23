@@ -1,3 +1,9 @@
+0.48 Sun May 22 10:38:00 CEST 2018
+         - Fixes of MySQL fixes
+
+0.47 Sun May 17 12:58:00 CEST 2018
+         - Fixes of SQLite fixes
+
 0.46 Sun Apr 22 19:21:00 CEST 2018
          - SQLite table_info fixes
 

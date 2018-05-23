@@ -28,7 +28,7 @@ Column values will be NOT NULL if an alignment is contained in the corresponding
                            Syntax: column_name="pattern"
                            e.g. keep reads with deletions AND not repeat
                                 masked AND longer than 31
-                                --filter deletion="def" 
+                                --filter deletion="def"
                                 --filter rmsk="undef" .
                                 --filter query_length=">31".
                            Operators: >, >=, <, <=, =, !=, def, undef
@@ -47,7 +47,7 @@ Column values will be NOT NULL if an alignment is contained in the corresponding
 =cut
 
 package CLIPSeqTools::PreprocessApp::annotate_with_genic_elements;
-$CLIPSeqTools::PreprocessApp::annotate_with_genic_elements::VERSION = '0.1.7';
+$CLIPSeqTools::PreprocessApp::annotate_with_genic_elements::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;
@@ -76,7 +76,7 @@ option 'drop' => (
 #######################################################################
 ##########################   Consume Roles   ##########################
 #######################################################################
-with 
+with
 	"CLIPSeqTools::Role::Option::Library" => {
 		-alias    => { validate_args => '_validate_args_for_library' },
 		-excludes => 'validate_args',
@@ -92,16 +92,16 @@ with
 #######################################################################
 sub validate_args {
 	my ($self) = @_;
-	
+
 	$self->_validate_args_for_library;
 	$self->_validate_args_for_transcripts;
 }
 
 sub run {
 	my ($self) = @_;
-	
+
 	warn "Starting: annotate_with_genic_elements\n";
-	
+
 	warn "Validating arguments\n" if $self->verbose;
 	$self->validate_args();
 
@@ -120,8 +120,9 @@ sub run {
 			$reads_collection->schema->storage->dbh_do( sub {
 				my ($storage, $dbh, @cols) = @_;
 				$dbh->do( "ALTER TABLE $table DROP COLUMN transcript" );
-				$dbh->do( "ALTER TABLE $table DROP COLUMN exon" );
 				$dbh->do( "ALTER TABLE $table DROP COLUMN coding_transcript" );
+				$dbh->do( "ALTER TABLE $table DROP COLUMN noncoding_transcript" );
+				$dbh->do( "ALTER TABLE $table DROP COLUMN exon" );
 				$dbh->do( "ALTER TABLE $table DROP COLUMN utr5" );
 				$dbh->do( "ALTER TABLE $table DROP COLUMN cds" );
 				$dbh->do( "ALTER TABLE $table DROP COLUMN utr3" );
@@ -135,6 +136,7 @@ sub run {
 			my ($storage, $dbh, @cols) = @_;
 			$dbh->do( "ALTER TABLE $table ADD COLUMN transcript INT(1)" );
 			$dbh->do( "ALTER TABLE $table ADD COLUMN coding_transcript INT(1)" );
+			$dbh->do( "ALTER TABLE $table ADD COLUMN noncoding_transcript INT(1)" );
 			$dbh->do( "ALTER TABLE $table ADD COLUMN exon INT(1)" );
 			$dbh->do( "ALTER TABLE $table ADD COLUMN utr5 INT(1)" );
 			$dbh->do( "ALTER TABLE $table ADD COLUMN cds INT(1)" );
@@ -149,25 +151,25 @@ sub run {
 	$reads_collection->schema->txn_do(sub {
 		$transcript_collection->foreach_record_do( sub {
 			my ($transcript) = @_;
-			
+
 			my $transcript_reads_rs = $reads_rs->search({
 				strand => $transcript->strand,
 				rname  => $transcript->rname,
 				start  => { '-between' => [$transcript->start, $transcript->stop] },
 				stop   => { '-between' => [$transcript->start, $transcript->stop] },
 			});
-			
+
 			$transcript_reads_rs->update({transcript => 1});
-			
+
 			foreach my $exon (@{$transcript->exons}) {
 				my $exon_reads_rs = $transcript_reads_rs->search([
 					start => { '-between' => [$exon->start, $exon->stop] },
 					stop  => { '-between' => [$exon->start, $exon->stop] },
 				]);
-				
+
 				$exon_reads_rs->update({exon => 1});
 			}
-			
+
 			if ($transcript->is_coding) {
 				foreach my $part_type ('utr5', 'cds', 'utr3') {
 					my $part = $transcript->$part_type() or next;
@@ -175,15 +177,16 @@ sub run {
 						start => { '-between' => [$part->start, $part->stop] },
 						stop  => { '-between' => [$part->start, $part->stop] },
 					]);
-					
+
 					$part_reads_rs->update({$part_type => 1});
 				}
-				
+
 				$transcript_reads_rs->update({coding_transcript => 1});
+			} else {
+				$transcript_reads_rs->update({noncoding_transcript => 1});
 			}
 		});
 	});
-
 }
 
 

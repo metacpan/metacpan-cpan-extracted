@@ -30,6 +30,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Mojolicious" : "7.75",
             "perl" : "v5.10.0"
          }
       },
@@ -42,15 +43,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/marcus/mojolicious-plugin-promiseactions/issues"
+         "web" : "https://github.com/marcusramberg/mojolicious-plugin-promiseactions/issues"
       },
-      "homepage" : "https://github.com/marcus/mojolicious-plugin-promiseactions",
+      "homepage" : "https://github.com/marcusramberg/mojolicious-plugin-promiseactions",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/marcusramberg/mojolicious-plugin-promiseactions.git",
-         "web" : "https://github.com/marcus/mojolicious-plugin-promiseactions"
+         "web" : "https://github.com/marcusramberg/mojolicious-plugin-promiseactions"
       }
    },
-   "version" : "0.01",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

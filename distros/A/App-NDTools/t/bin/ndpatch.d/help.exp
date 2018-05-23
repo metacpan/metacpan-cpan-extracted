@@ -20,7 +20,7 @@ Options:
         On/Off pretty-print for JSON. Enabled by default.
 
     --verbose|-v [int]
-        Increase verbosity, max level - 4.
+        Increase verbosity, max level is 4.
 
     --version|-V
         Print version and exit.

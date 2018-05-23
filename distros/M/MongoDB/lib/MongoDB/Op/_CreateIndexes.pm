@@ -22,7 +22,7 @@ package MongoDB::Op::_CreateIndexes;
 # or a MongoDB::InsertManyResult, depending on the server version
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 
@@ -30,7 +30,6 @@ use MongoDB::Op::_Command;
 use MongoDB::Op::_BatchInsert;
 use Types::Standard qw(
     ArrayRef
-    Bool
     HashRef
 );
 

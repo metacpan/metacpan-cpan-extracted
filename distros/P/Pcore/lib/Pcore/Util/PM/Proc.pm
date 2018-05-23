@@ -32,7 +32,7 @@ has _sigchild => ( is => 'ro', isa => Object, init_arg => undef );
 
 our $CACHE = {};
 
-sub DEMOLISH ( $self, $global ) {
+sub DESTROY ( $self ) {
     if ( $self->{pid} ) {
 
         if ($MSWIN) {
@@ -59,7 +59,7 @@ sub DEMOLISH ( $self, $global ) {
         }
     }
 
-    $self->_on_exit( 128 + 9 ) if !$global;
+    $self->_on_exit( 128 + 9 ) if ${^GLOBAL_PHASE} ne 'DESTRUCT';
 
     return;
 }

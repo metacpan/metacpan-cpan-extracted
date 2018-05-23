@@ -1,5 +1,6 @@
 package IO::K8s::Api::Apps::V1::StatefulSetStatus;
   use Moose;
+  use IO::K8s;
 
   has 'collisionCount' => (is => 'ro', isa => 'Int'  );
   has 'conditions' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Apps::V1::StatefulSetCondition]'  );
@@ -10,4 +11,6 @@ package IO::K8s::Api::Apps::V1::StatefulSetStatus;
   has 'replicas' => (is => 'ro', isa => 'Int'  );
   has 'updatedReplicas' => (is => 'ro', isa => 'Int'  );
   has 'updateRevision' => (is => 'ro', isa => 'Str'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

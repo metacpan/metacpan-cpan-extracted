@@ -6,13 +6,11 @@ feature windows => sub {
     requires 'Win32::Console::ANSI';
 };
 
-requires 'Import::Into';
 requires 'Variable::Magic';
 requires 'B::Hooks::AtRuntime';
 requires 'B::Hooks::EndOfScope::XS';
 requires 'Const::Fast';
 requires 'Clone';
-requires 'Package::Stash';
 requires 'Package::Stash::XS';
 
 # Pcore::Core::Dump
@@ -20,9 +18,7 @@ requires 'PerlIO::Layers';
 requires 'Sort::Naturally';
 
 # OOP
-requires 'Moo';
-requires 'MooX::TypeTiny';
-requires 'Class::XSAccessor';    # optional
+requires 'Class::XSAccessor';
 requires 'Type::Tiny';
 requires 'Type::Tiny::XS';
 
@@ -63,7 +59,7 @@ on develop => sub {
 
     # PAR
     requires 'PAR::Packer';
-    requires 'Filter::Crypto';
+    suggests 'Filter::Crypto';    # TODO make requires, after it will build undef FC28
 };
 
 # Pcore::HTTP

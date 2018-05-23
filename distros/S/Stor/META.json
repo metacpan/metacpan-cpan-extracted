@@ -50,6 +50,9 @@
             "Guard" : "1.023",
             "HTTP::Date" : "6.02",
             "List::MoreUtils" : "0",
+            "Log::Dispatch" : "0",
+            "Log::Dispatch::Gelf" : "0",
+            "MojoX::Log::Dispatch::Simple" : "0",
             "Mojolicious" : "7.77",
             "Mojolicious::Plugin::CHI" : "0.09",
             "Net::Amazon::S3" : "0",
@@ -75,7 +78,7 @@
    "provides" : {
       "Stor" : {
          "file" : "lib/Stor.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
@@ -89,7 +92,7 @@
          "web" : "https://github.com/avast/Stor"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.2.0",
    "x_contributors" : [
       "Jan Seidl <janseidl@volny.cz>",
       "Jan Seidl <seidl@avast.com>",

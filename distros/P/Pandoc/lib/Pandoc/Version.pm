@@ -3,20 +3,12 @@ use strict;
 use warnings;
 use 5.010;
 
-use utf8;
-
-=head1 NAME
-
-Pandoc::Version - version number of pandoc and its libraries
-
-=cut
-
 our $VERSION = '0.8.1';
 
 use overload '""' => 'string', '0+' => 'number', 
     cmp => 'cmp', '<=>' => 'cmp', fallback => 1;
-use Carp qw(croak);
 use Scalar::Util qw(reftype blessed);
+use Pandoc::Error;
 
 our @CARP_NOT = ('Pandoc');
 
@@ -28,7 +20,10 @@ sub new {
     my @nums = 
         map {
             my $num = $_;
-            $num =~ /^\d+$/ or croak 'invalid version number';
+            $num =~ /^\d+$/ or Pandoc::Error->throw(
+                message => 'invalid version number',
+                version => $num
+            );
             $num =~ s/^0+(?=\d)//; # ensure decimal interpretation
             $num = 0+ $num;
             $num 
@@ -37,7 +32,7 @@ sub new {
         map { 'ARRAY' CORE::eq (reftype $_ // "") ? @$_ : $_ }
         map { $_ // '' } @_;
 
-    croak 'invalid version number' unless @nums;
+    Pandoc::Error->throw('invalid version number') unless @nums;
 
     return bless \@nums => $class;
 }
@@ -86,7 +81,12 @@ sub fulfills {
     my @parts = split qr{\s*,\s*}, $req;
     for my $part (@parts) {
         my ($op, $ver) = $part =~ m{^\s*(==|>=|>|<=|<|!=)?\s*v?(\d+(\.\d+)*)$};
-        croak "invalid version requirement: $req" unless defined $ver;
+        if (!defined $ver) {
+            Pandoc::Error->throw(
+               message => "invalid version requirement: $req",
+               require => $req,
+            )
+        }
         
         my $cmp = $self->cmp($ver) + 1; # will be 0 for <, 1 for ==, 2 for >
         return unless $cmp_truth_table{$op || '>='}->[$cmp];
@@ -103,6 +103,10 @@ sub TO_JSON {
 1;
 
 __END__
+
+=head1 NAME
+
+Pandoc::Version - version number of pandoc and its libraries
 
 =head1 SYNOPSIS
 

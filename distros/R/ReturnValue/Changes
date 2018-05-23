@@ -1,0 +1,8 @@
+Revision history for Perl module ReturnValue
+
+0.112 2018-05-17T14:38:45Z
+	* Clarify that it's the Artistic License 2.0.
+
+0.10_01 - 2013-10-03
+	* Initial release of a module to do structured return values
+

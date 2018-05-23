@@ -1,5 +1,9 @@
 Revision history for Perl extension MooseX::BuildArgs.
 
+0.05 2018-05-17
+
+ - Stop hiding packages from indexing.
+
 0.04      2012-04-16
  - Minor doc edits.
  - Use Moose's meta traits more effectively so that single args may be

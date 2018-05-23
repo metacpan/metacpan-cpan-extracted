@@ -3,7 +3,7 @@ package Pcore::Handle::DBI::Query::GROUP_BY;
 use Pcore -const, -class;
 use Pcore::Util::Scalar qw[is_ref];
 
-has _buf => ( is => 'ro', isa => ArrayRef, required => 1 );
+has _buf => ();    # ( is => 'ro', isa => ArrayRef, required => 1 );
 
 sub get_query ( $self, $dbh, $final, $i ) {
     my @sql;

@@ -261,7 +261,7 @@ sub style_text {
         }
     }
 
-    return;
+    return scalar @$text_nodes;
 }
 
 sub _check_color_syntax {
@@ -533,7 +533,7 @@ Document::OOXML::Part::WordprocessingML - WordprocessingML document part handlin
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 ATTRIBUTES
 

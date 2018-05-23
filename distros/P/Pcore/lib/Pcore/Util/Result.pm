@@ -1,6 +1,6 @@
 package Pcore::Util::Result;
 
-use Pcore -export => [qw[res]];
+use Pcore -export;
 use Pcore::Util::Result::Status;
 use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 use Pcore::Util::Result::Status;
@@ -16,6 +16,8 @@ use overload    #
     return $_[0]->{status} . q[ ] . $_[0]->{reason};
   },
   fallback => 1;
+
+our $EXPORT = [qw[res]];
 
 # CONSTRUCTOR
 sub res ( $status, @args ) {

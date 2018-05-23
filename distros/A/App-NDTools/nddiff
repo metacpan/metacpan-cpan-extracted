@@ -16,8 +16,8 @@ nddiff - diff tool for nested data structures
 
 =head1 DESCRIPTION
 
-Diff for nested data structures with human friendly (colored)
-and machine-readable (JSON) output format.
+Diff for nested data structures with human friendly and machine-readable
+output formats.
 
 =head1 OPTIONS
 
@@ -31,7 +31,7 @@ L<Struct::Diff/DIFF FORMAT> for more info about nested diff format.
 
 =item B<--brief>
 
-Show where differences has happend, but don't show what exactly changed.
+Show where differences occured, but don't show what exactly changed.
 
 =item B<--[no]colors>
 
@@ -40,11 +40,6 @@ On/Off colors for diff.
 =item B<--ctx-text> [int]
 
 Amount of lines for multiline values context. Default is 3.
-
-=item B<--full>
-
-Don't suppress common items in JSON mode. Deprecated, C<--U> should be used
-instead.
 
 =item B<--full-headers>
 
@@ -93,11 +88,11 @@ Dump diff as rules for L<ndproc>.
 
 =item B<--show>
 
-Visualize diff (JSON formatted diff file must be provided as argument).
+Visualize diff (JSON/YAML formatted diff expected for argument).
 
 =item B<--verbose|-v> [int]
 
-Increase verbosity, max level - 4.
+Increase verbosity, max level is 4.
 
 =item B<--version|-V>
 

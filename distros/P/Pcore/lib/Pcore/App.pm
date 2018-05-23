@@ -7,12 +7,12 @@ use Pcore::App::Router;
 use Pcore::App::API;
 use Pcore::RPC::Hub;
 
-has app_cfg => ( is => 'ro', isa => HashRef, required => 1 );
-has devel   => ( is => 'ro', isa => Bool,    default  => 0 );
+has app_cfg => ( required => 1, isa => HashRef );
+has devel   => ( default  => 0, isa => Bool );
 
-has server => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], init_arg => undef );
-has router => ( is => 'ro', isa => InstanceOf ['Pcore::App::Router'],  init_arg => undef );
-has api => ( is => 'ro', isa => Maybe [ ConsumerOf ['Pcore::App::API'] ], init_arg => undef );
+has server => ( isa => InstanceOf ['Pcore::HTTP::Server'], init_arg => undef );
+has router => ( isa => InstanceOf ['Pcore::App::Router'],  init_arg => undef );
+has api => ( isa => Maybe [ ConsumerOf ['Pcore::App::API'] ], init_arg => undef );
 has rpc => ( is => 'lazy', isa => InstanceOf ['Pcore::RPC::Hub'], init_arg => undef );
 
 sub BUILD ( $self, $args ) {

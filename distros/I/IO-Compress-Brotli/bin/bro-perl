@@ -6,7 +6,7 @@ use 5.014;
 
 use bytes ();
 
-use File::Slurp;
+use File::Slurper qw/read_binary/;
 use Getopt::Long;
 use Time::HiRes qw/ gettimeofday tv_interval /;
 
@@ -14,7 +14,6 @@ use IO::Compress::Brotli;
 use IO::Uncompress::Brotli;
 
 GetOptions(
-    'c|custom-dictionary=s' => \(my $DICTIONARY),
     'd|decompress'          => \(my $DECOMPRESS),
     'f|force'               => \(my $FORCE),
     'h|help'                => \(my $HELP),
@@ -29,7 +28,7 @@ GetOptions(
 
 if( $HELP ) {
     say "Usage: $0 [--force] [--quality n] [--decompress] [--input filename] [--output filename]".
-        " [--repeat iters] [--verbose] [--window n] [--custom-dictionary filename] [--stream size]";
+        " [--repeat iters] [--verbose] [--window n] [--stream size]";
     exit 1;
 }
 
@@ -62,19 +61,12 @@ for ( 1..$REPEAT ) {
     binmode $ofh;
 
     if( $DECOMPRESS ) {
-        if( $STREAM ) {
-            my $bro = IO::Uncompress::Brotli->create();
-            while( read $ifh, (my $buf), $STREAM ) {
-                $decoded = $bro->decompress($buf);
-                $total_size += bytes::length( $decoded );
-                print $ofh $decoded;
-            }
-        }
-        else {
-            $encoded = read_file( $ifh );
-            $decoded = unbro( $encoded );
+        $STREAM //= 4 * 1024 * 1024;
+        my $bro = IO::Uncompress::Brotli->create();
+        while( read $ifh, (my $buf), $STREAM ) {
+            $decoded = $bro->decompress($buf);
             $total_size += bytes::length( $decoded );
-            write_file( $ofh, $decoded );
+            print $ofh $decoded;
         }
     }
     else {
@@ -91,7 +83,7 @@ for ( 1..$REPEAT ) {
             print $ofh $encoded;
         }
         else {
-            my $decoded = read_file( $ifh );
+            my $decoded = read_binary( $ifh );
             my $encoded = bro( $decoded, $QUALITY, $WINDOW );
             $total_size += bytes::length( $decoded );
             write_file( $ofh, $encoded );

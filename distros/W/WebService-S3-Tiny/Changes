@@ -1,2 +1,4 @@
+#0.002 2018-05-16
+#    - Bump HTTP::Tiny because of using www_form_urlencode().
 0.001 2018-04-04
     - Initial release.

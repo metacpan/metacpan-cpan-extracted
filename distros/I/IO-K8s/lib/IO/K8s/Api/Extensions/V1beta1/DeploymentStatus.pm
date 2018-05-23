@@ -1,5 +1,6 @@
 package IO::K8s::Api::Extensions::V1beta1::DeploymentStatus;
   use Moose;
+  use IO::K8s;
 
   has 'availableReplicas' => (is => 'ro', isa => 'Int'  );
   has 'collisionCount' => (is => 'ro', isa => 'Int'  );
@@ -9,4 +10,6 @@ package IO::K8s::Api::Extensions::V1beta1::DeploymentStatus;
   has 'replicas' => (is => 'ro', isa => 'Int'  );
   has 'unavailableReplicas' => (is => 'ro', isa => 'Int'  );
   has 'updatedReplicas' => (is => 'ro', isa => 'Int'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

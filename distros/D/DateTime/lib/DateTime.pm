@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 use Carp;
 use DateTime::Duration;
@@ -2348,7 +2348,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

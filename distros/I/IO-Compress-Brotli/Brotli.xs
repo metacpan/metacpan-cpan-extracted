@@ -5,9 +5,8 @@
 
 #include "ppport.h"
 
-#include <dec/decode.h>
-#include <enc/encode.h>
-#include <common/dictionary.h>
+#include <brotli/decode.h>
+#include <brotli/encode.h>
 
 #define BUFFER_SIZE 1048576
 
@@ -24,24 +23,20 @@ MODULE = IO::Compress::Brotli		PACKAGE = IO::Uncompress::Brotli
 PROTOTYPES: ENABLE
 
 SV*
-unbro(buffer)
+unbro(buffer, decoded_size)
     SV* buffer
+    size_t decoded_size
   PREINIT:
-    size_t decoded_size;
     STRLEN encoded_size;
     uint8_t *encoded_buffer, *decoded_buffer;
   CODE:
     encoded_buffer = (uint8_t*) SvPV(buffer, encoded_size);
-    if(!BrotliDecompressedSize(encoded_size, encoded_buffer, &decoded_size)){
-        croak("Error in BrotliDecompressedSize");
-    }
-    Newx(decoded_buffer, decoded_size+1, uint8_t);
-    decoded_buffer[decoded_size]=0;
+    Newx(decoded_buffer, decoded_size, uint8_t);
     if(!BrotliDecoderDecompress(encoded_size, encoded_buffer, &decoded_size, decoded_buffer)){
         croak("Error in BrotliDecoderDecompress");
     }
     RETVAL = newSV(0);
-    sv_usepvn_flags(RETVAL, decoded_buffer, decoded_size, SV_HAS_TRAILING_NUL);
+    sv_usepvn(RETVAL, decoded_buffer, decoded_size);
   OUTPUT:
     RETVAL
 
@@ -73,8 +68,8 @@ decompress(self, in)
     next_in = (uint8_t*) SvPV(in, available_in);
     Newx(buffer, BUFFER_SIZE, uint8_t);
     RETVAL = newSVpv("", 0);
-    result = BROTLI_RESULT_NEEDS_MORE_OUTPUT;
-    while(result == BROTLI_RESULT_NEEDS_MORE_OUTPUT) {
+    result = BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT;
+    while(result == BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT) {
         next_out = buffer;
         available_out=BUFFER_SIZE;
         result = BrotliDecoderDecompressStream( self->decoder,
@@ -92,17 +87,6 @@ decompress(self, in)
     Safefree(buffer);
   OUTPUT:
     RETVAL
-
-void
-set_dictionary(self, dict)
-    IO::Uncompress::Brotli self
-    SV* dict
-  PREINIT:
-    size_t size;
-    uint8_t *data;
-  CODE:
-    data = SvPV(dict, size);
-    BrotliDecoderSetCustomDictionary(self->decoder, size, data);
 
 
 MODULE = IO::Compress::Brotli		PACKAGE = IO::Compress::Brotli
@@ -122,7 +106,7 @@ bro(buffer, quality=BROTLI_DEFAULT_QUALITY, lgwin=BROTLI_DEFAULT_WINDOW)
     if( quality < BROTLI_MIN_QUALITY || quality > BROTLI_MAX_QUALITY ) {
         croak("Invalid quality value");
     }
-    if( lgwin < kBrotliMinWindowBits || lgwin > kBrotliMaxWindowBits ) {
+    if( lgwin < BROTLI_MIN_WINDOW_BITS || lgwin > BROTLI_MAX_WINDOW_BITS ) {
         croak("Invalid window value");
     }
     decoded_buffer = (uint8_t*) SvPV(buffer, decoded_size);
@@ -172,7 +156,7 @@ bool BrotliEncoderSetParameter(self, value)
         croak("BrotliEncoderSetParameter may not be called directly");
         break;
     case 1:
-        if( value < kBrotliMinWindowBits || value > kBrotliMaxWindowBits ) {
+        if( value < BROTLI_MIN_WINDOW_BITS || value > BROTLI_MAX_WINDOW_BITS ) {
             croak("Invalid window value");
         }
         param = BROTLI_PARAM_LGWIN;
@@ -266,14 +250,3 @@ DESTROY(self)
   CODE:
     BrotliEncoderDestroyInstance(self->encoder);
     Safefree(self);
-
-void
-set_dictionary(self, dict)
-    IO::Compress::Brotli self
-    SV* dict
-  PREINIT:
-    size_t size;
-    uint8_t *data;
-  CODE:
-    data = SvPV(dict, size);
-    BrotliEncoderSetCustomDictionary(self->encoder, size, data);

@@ -1,5 +1,5 @@
 package Starch::Store;
-$Starch::Store::VERSION = '0.06';
+$Starch::Store::VERSION = '0.07';
 =head1 NAME
 
 Starch::Store - Base role for Starch stores.
@@ -31,7 +31,7 @@ use namespace::clean;
 
 with qw(
     Starch::Role::Log
-    Starch::Role::MethodProxy
+    MooX::MethodProxyArgs
 );
 
 requires qw(

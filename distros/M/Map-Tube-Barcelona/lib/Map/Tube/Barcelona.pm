@@ -1,6 +1,6 @@
 package Map::Tube::Barcelona;
 
-$Map::Tube::Barcelona::VERSION   = '0.59';
+$Map::Tube::Barcelona::VERSION   = '0.60';
 $Map::Tube::Barcelona::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Barcelona - Interface to the Barcelona Metro Map.
 
 =head1 VERSION
 
-Version 0.59
+Version 0.60
 
 =cut
 
@@ -96,7 +96,8 @@ base64 encoded string of the entire map.
 
     my $metro = Map::Tube::Barcelona->new;
     my $map   = $metro->name;
-    open(my $IMAGE, ">$map.png");
+    open(my $IMAGE, ">", "$map.png")
+       or die "ERROR: Can't open [$map.png]: $!";
     binmode($IMAGE);
     print $IMAGE decode_base64($metro->as_image);
     close($IMAGE);

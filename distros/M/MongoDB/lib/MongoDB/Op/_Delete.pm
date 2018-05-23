@@ -21,17 +21,17 @@ package MongoDB::Op::_Delete;
 # Encapsulate a delete operation; returns a MongoDB::DeleteResult
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 
 use MongoDB::DeleteResult;
 use MongoDB::_Protocol;
 use MongoDB::_Types qw(
+    Boolish
     Document
 );
 use Types::Standard qw(
-    Bool
     Maybe
 );
 
@@ -46,7 +46,7 @@ has filter => (
 has just_one => (
     is       => 'ro',
     required => 1,
-    isa      => Bool,
+    isa      => Boolish,
 );
 
 has collation => (

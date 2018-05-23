@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -28,6 +27,7 @@ t/06map.t
 t/07tuple.t
 t/08enum.t
 t/09anyof_allof.t
+t/10bool.t
 t/99parsing.t
 typetiny.h
 xs_version.h

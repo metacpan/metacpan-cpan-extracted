@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'lib/XS/Logger.pm',
     't/00-compile.t',
+    't/00-object.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/02-log-file-path.t',
@@ -17,7 +18,7 @@ my @files = (
     't/levels.t',
     't/lib/Test/XSLogger.pm',
     't/log-level.t',
-    't/object.t'
+    't/object-file-path.t'
 );
 
 notabs_ok($_) foreach @files;

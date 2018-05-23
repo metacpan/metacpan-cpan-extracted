@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.25 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.26 {
 
   use 5.014;
   use Moose;
@@ -188,7 +188,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 SYNOPSIS
 
@@ -575,8 +575,6 @@ BEGIN {
       1
     };
 
-  plan skip_all => "test requires Path::Class" 
-    unless eval q{ use Path::Class qw( file dir ); 1 };
   plan skip_all => 'test requires YAML'
     unless eval q{ use YAML; 1; };
 }
@@ -584,10 +582,6 @@ BEGIN {
 use YAML qw( LoadFile );
 use FindBin;
 use File::Spec;
-
-plan skip_all => "test not built yet (run dzil test)"
-  unless -e dir( $FindBin::Bin)->parent->parent->file('Makefile.PL')
-  ||     -e dir( $FindBin::Bin)->parent->parent->file('Build.PL');
 
 my $config_filename = File::Spec->catfile(
   $FindBin::Bin, File::Spec->updir, File::Spec->updir, 'author.yml'

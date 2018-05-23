@@ -3,6 +3,8 @@ bin/cpanp
 bin/cpanp-boxed
 bin/cpanp-run-perl
 ChangeLog
+bundled/Build.pm
+bundled/Constants.pm
 inc/bundle/Archive/Extract.pm
 inc/bundle/Archive/Tar.pm
 inc/bundle/Archive/Tar/Constant.pm

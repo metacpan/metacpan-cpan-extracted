@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::PodSpec;
   use Moose;
+  use IO::K8s;
 
   has 'activeDeadlineSeconds' => (is => 'ro', isa => 'Int'  );
   has 'affinity' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::Affinity'  );
@@ -28,4 +29,6 @@ package IO::K8s::Api::Core::V1::PodSpec;
   has 'terminationGracePeriodSeconds' => (is => 'ro', isa => 'Int'  );
   has 'tolerations' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Core::V1::Toleration]'  );
   has 'volumes' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Core::V1::Volume]'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

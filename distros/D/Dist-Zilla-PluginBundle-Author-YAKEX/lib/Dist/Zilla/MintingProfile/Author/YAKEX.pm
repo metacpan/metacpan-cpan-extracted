@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Dist::Zilla minting profile the way YAKEX does it
-our $VERSION = 'v0.1.5'; # VERSION
+our $VERSION = 'v0.2.0'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
@@ -24,7 +24,7 @@ Dist::Zilla::MintingProfile::Author::YAKEX - Dist::Zilla minting profile the way
 
 =head1 VERSION
 
-version v0.1.5
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,7 @@ version v0.1.5
 This is a L<Dist::Zilla> MintingProfile used by YAKEX's distribution. It setups the following files:
 
   .gitignore
+  .mailmap
   Changes
   MANIFEST.SKIP
   dist.ini
@@ -63,7 +64,7 @@ Yasutaka ATARASHI <yakex@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yasutaka ATARASHI.
+This software is copyright (c) 2018 by Yasutaka ATARASHI.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

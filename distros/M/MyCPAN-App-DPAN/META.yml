@@ -1,27 +1,38 @@
---- #YAML:1.0
-name:               MyCPAN-App-DPAN
-version:            1.28
-abstract:           Create a custom, private DarkPAN repository that looks just like a real CPAN
+---
+abstract: 'Create a CPAN-like structure out of some dists'
 author:
-    - brian d foy <bdfoy@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    CPAN::Checksums:      0
-    CPAN::PackageDetails:  0.24
-    Log::Log4perl:        0
-    MyCPAN::Indexer:      1.28
-    Test::Output:         0.13
-    version:              0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.50
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MyCPAN-App-DPAN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPAN::Checksums: '0'
+  CPAN::PackageDetails: '0.24'
+  IPC::Cmd: '0'
+  IPC::Run: '0'
+  IPC::System::Simple: '0'
+  LWP::Simple: '0'
+  Log::Log4perl: '0'
+  MyCPAN::Indexer: '1.282'
+  Test::Output: '0.13'
+  perl: '5.014'
+  version: '0'
+resources:
+  bugtracker: https://github.com/briandfoy/mycpan-app-dpan/issues
+  homepage: https://github.com/briandfoy/mycpan-app-dpan
+  repository: https://github.com/briandfoy/mycpan-app-dpan.git
+version: '1.281'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

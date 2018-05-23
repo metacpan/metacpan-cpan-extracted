@@ -1,0 +1,472 @@
+#!btred -e TredMacro::print_trees_cmdline() --no-save --allow-switch-context
+# -*- cperl -*-
+
+#define TRED
+
+package TredMacro;
+
+sub GUI { $grp }
+sub ToplevelFrame { $grp->{framegroup}{top} }
+sub Redraw {}
+sub Redraw_FSFile {}
+sub Redraw_FSFile_Tree {}
+sub Redraw_All {}
+sub RedrawStatusLine {}
+
+package TredMacro;
+use Tk;
+use File::Spec;
+require TrEd::Utils;
+require TrEd::TreeView;
+require TrEd::Print;
+TrEd::Utils::find_win_home();
+
+my %opts =
+    map {
+      local $_=$_;
+      s/^--/-/;
+      $_;
+    } @ARGV;
+my $output_dirname = delete $opts{'-out-dir'};
+
+# fake GUI
+{
+  my $gui = {
+    top => MainWindow->new,
+    focusedWindow => $grp,
+    StylesheetMenu => {},
+    valueLine => {}
+  };
+  bless $gui->{StylesheetMenu}, 'BTrEd::Fake::StylesheetMenu'; # fixing some calls
+  bless $gui->{valueLine}, 'BTrEd::Fake::ValueLine';
+  $grp->{framegroup} = $gui;
+  $grp->{treeView} = { };
+  bless $grp->{treeView}, 'BTrEd::Fake::TreeView'; # fake TreeView
+  $TrEd::Config::noCheckLocks = 1; # prevents from asking whether to lock
+  $main::insideEval = 1; # won't call stuff that isn't initialized
+  if (ref($grp) eq 'HASH') {
+    bless $grp, 'BTrEd::Print::Window';
+  }
+
+  package main;
+  import TrEd::Utils ':all';
+
+  TrEd::Stylesheet::init_stylesheet_paths([split($Treex::PML::resourcePathSplit,$opts{'stylesheet-paths'},-1)]);
+  TrEd::Stylesheet::load_stylesheets($gui);
+
+  sub __run_hook {
+    my $treeview = shift;
+    my $win = shift;
+    TredMacro::GotoTree(1 + $win->{treeNo}) if $win->{FSFile};
+    local $win->{treeView} = $treeview;
+    my $context = $win->{macroContext} || 'TredMacro';
+    my $ret = TrEd::Macros::do_eval_hook($win,$context,@_);
+    warn $@ if $@;
+    return $ret;
+  }
+  sub onGetNodeStyle {
+    my ($treeview,$node,$styles,$win)=@_;
+    __run_hook($treeview,$win,"node_style_hook",$node,$styles);
+  }
+  sub onGetRootStyle {
+    my ($treeview,$node,$styles,$opts,$win)=@_;
+    __run_hook($treeview,$win,"root_style_hook",$node,$styles,$opts);
+  }
+  sub onRedrawDone {
+    my ($treeview,$win)=@_;
+    __run_hook($treeview,$win,"after_redraw_hook",$treeview);
+  }
+  sub grp_win {
+    my ($gw)=@_;
+    my ($gui,$win);
+    if ($gw->{framegroup}) {
+      $win=$gw;
+      $gui=$gw->{framegroup};
+    } else {
+      $gui=$gw;
+      $win=$gw->{focusedWindow};
+    }
+    return ($gui,$win);
+  }
+  sub cast_to_grp {
+      my ($gw) = @_;
+      return ( $gw->{framegroup} ) ? $gw->{framegroup} : $gw;
+  }
+  sub switchStylesheet {
+    my ($grp_win,$stylesheet)=@_;
+    my ($gui,$win)=grp_win($grp_win);
+    return unless ref($win);
+    my $prevstylesheet=$win->{stylesheet};
+    return if $prevstylesheet eq $stylesheet;
+    return 0 if __run_hook(undef,$win,"pre_switch_stylesheet_hook",
+                           $prevstylesheet,$stylesheet) eq 'stop';
+    $win->{stylesheet}=$stylesheet;
+    __run_hook(undef,$win,"switch_stylesheet_hook",$prevstylesheet,$stylesheet);
+    return 1;
+  }
+  sub printGetNodesCallback { # passed to TrEd::Print::print_trees by Print
+    my ($win,$treeview,$fsfile,$tree_no,$current)=@_;
+    local $TrEd::TreeView::on_get_nodes = [\&onGetNodes,$win];
+    $win->{treeNo}=$tree_no;
+    $win->{root}=$fsfile->treeList->[$tree_no];
+    return (($win->{Nodes},$win->{currentNode}) = $treeview->nodes($fsfile,
+                                                                   $tree_no,
+                                                                   $current));
+  }
+  sub redraw_stylesheet {
+    return;
+  }
+  sub onGetNodes {
+    my ($treeview,$fsfile,$tree_no,$current,$win)=@_;
+    my $l = __run_hook($treeview,
+               $win,
+               "get_nodelist_hook",
+               $fsfile,
+               $tree_no,
+               $current,
+               $treeview->get_showHidden());
+    return $l;
+  }
+  sub DeclareMinorMode { }
+  sub EnableMinorMode { }
+  sub DisableMinorMode { }
+  sub autosave_filename { }
+  sub updatePostponed { }
+  sub update_title_and_buttons { }
+  sub unhide_current_node { }
+  sub filePartOfADisplayedFile { 0 }
+  sub fsfileDisplayingWindows { 0 }
+  sub findToplevelFileFor { return $_[1]; }
+  sub __debug { }
+}
+
+sub print_trees_cmdline {
+  print_trees(\%opts);
+}
+
+sub print_trees {
+  my ($opts)=@_;
+  local $TrEd::Convert::support_unicode=1;
+  local $TrEd::Print::QUIET = 1 if $opts->{-quiet};
+  $opts->{-psMedia}||='A4';
+
+  unless ($opts->{'-no-hooks'}) {
+    SetCurrentStylesheet(STYLESHEET_FROM_FILE());
+    TredMacro->file_opened_hook() if UNIVERSAL::can('TredMacro','file_opened_hook');
+    TredMacro->guess_context_hook() if UNIVERSAL::can('TredMacro','guess_context_hook');
+  }
+  SwitchContext($opts->{-context}) if defined $opts->{-context};
+  delete $opts->{-context};
+  SetCurrentStylesheet($opts->{-stylesheet}) if defined $opts->{-stylesheet};
+  print STDERR "Context: ",CurrentContext(),"\n" unless $opts->{-quiet};
+  print STDERR "Stylesheet: ", GetCurrentStylesheet(),"\n" unless $opts->{-quiet};
+ if ($opts->{-sentenceInfo} and
+        (UNIVERSAL::can(CurrentContext(),'get_value_line_hook') or
+         UNIVERSAL::can('TredMacro','get_value_line_hook'))) {
+   $opts->{-sentenceInfo} = sub {
+     main::__run_hook(undef,$grp,"get_value_line_hook",@_);
+   }
+ }
+
+  local $main::append_suffix = '.'.lc($opts->{-format}||'PDF') unless defined $main::append_suffix;
+  my $range = $opts->{-range};
+  if (!defined $range) {
+    $range = '1-';
+  } elsif ($range eq '.') {
+    $range = CurrentTreeNumber()+1;
+  }
+  my $out_file = main::save_transform_filename(FileName());
+  if (defined $output_dirname) {
+    use File::Spec;
+    $out_file = File::Spec->catfile($output_dirname,FilePart($out_file));
+  }
+  Print(
+    (exists($opts->{-toFile}) ? () : (-to => 'file')),
+    -toplevel => undef,
+    -canvas => ToplevelFrame()->Canvas(),
+    -filename =>  $out_file,
+    -format => 'PDF',
+    -noRotate => 1,
+    -colors => 1,
+    -extraOptions => {
+      use_svg_desc_and_title => (($opts->{-sentenceInfo} || $opts->{-fileInfo}) ? 1 : 0),
+    },
+    ($opts->{-psMedia} eq 'BBox') ?
+      (-hMargin => 0, -vMargin => 0) : (),
+    %$opts,
+    -range => $range,
+   );
+  ChangingFile(0);
+}
+
+package BTrEd::Print::Window;
+
+sub is_focused { return 1 }
+sub treeView { return $_[0]->{treeView} }
+sub FSFile { return $_[0]->{FSFile} }
+sub treeNo { return $_[0]->{treeNo} }
+sub currentNode { return $_[0]->{currentNode} }
+sub keepfiles { return $_[0]->{keepfiles} }
+sub set_current_file {
+    my ( $self, $fsfile ) = @_;
+    $self->{FSFile} = $fsfile;
+    if ( defined $fsfile ) {
+        $self->{treeNo} = $fsfile->currentTreeNo() || 0;
+        $self->{currentNode} = $fsfile->currentNode();
+    }
+    else {
+        $self->{treeNo}      = undef;
+        $self->{currentNode} = undef;
+    }
+    return;
+}
+sub get_nodes {
+}
+
+
+sub toplevel {
+  my ($self)=@_;
+  Carp::confess "No canvas" unless $self->canvas();
+
+  return $self->canvas()->toplevel();
+}
+sub canvas {
+  my ($self) = @_;
+  return undef unless (ref($self) and ref($self->{treeView}));
+  return $self->{treeView}->canvas();
+}
+
+package BTrEd::Fake::StylesheetMenu;
+
+sub update { }
+
+package BTrEd::Fake::TreeView;
+
+sub clear_pinfo { }
+sub rightToLeft { }
+
+package BTrEd::Fake::ValueLine;
+
+sub set_value { }
+
+__END__
+
+
+=head1 print.btred
+
+Print trees according to given printing options.
+
+=head2 USAGE
+
+btred -qm print.btred -j '*' [<btred-options>] -o <print-options> -- <file(s)>
+
+=head2 DESCRIPTION
+
+This script similar functionality as the Print dialog in TrEd.
+
+By default the script creates an A4 PDF file consisting of all trees
+of the current file.
+
+The resulting files are named based on the input filename using the
+usual btred file-renaming flags (-r, -s, -p, -a). Unless -a flag is
+given to btred, the extension '.format' (where format is the lowercase
+name of the output format) is used (e.g. '.pdf' or '.eps').
+
+The default behavior can be changed by many options.
+
+=head2 IMPORTANT
+
+=over 3
+
+=item *
+
+The script uses Tk which on UNIX, requires that the DISPLAY
+environment variable is set and points to a running X server.
+
+=item *
+
+All options must always be given in pairs of the form
+B<--name value>.
+
+=item *
+
+On the btred command line, the print options go between -o and --.
+
+=back
+
+=head2 PRINT OPTIONS
+
+=over 3
+
+=item B<--out-dir> directory
+
+Save all resulting files to a given directory.
+
+=item B<--quiet> 1|0
+
+Be more quiet.
+
+=item B<--context> context
+
+Context to use for drawing trees (node_style_hook, root_style_hook,
+and possibly other hooks are called from this context).
+
+=item B<--stylesheet> stylesheet
+
+Name of the stylesheet to use.
+
+=item B<--stylesheet-paths> path(s)
+
+A colon- (semicolon- or Windows) separated list of paths to look for
+stylesheet files.
+
+=item B<--range> range
+
+Lists trees to be printed (e.g. C<5,-3,9-12,15-> prints trees
+5,1,2,3,9,10,11,12,15,16,...). Use C<.> (dot) as range to print only
+the current tree from each file (i.e. the tree specified using
+tree-number suffix of the file URL).
+
+=item B<--command> command
+
+System command to send the output to (e.g. C<lpr> to print on the
+default printer on UNIX platform).
+
+=item B<--toFile> 1|0
+
+If set to 1, the output is saved to a file specified in B<--filename>.
+
+=item B<--filename> filename
+
+Output filename (only when printing to file). This option is useful
+only when printing a single file.
+
+If converting several files, it is recommended to use btred options
+B<--strip-prefix>, B<--add-prefix>, B<--strip-suffix>, B<--add-suffix>
+which this script obeys.
+
+=item B<--format> PS|PDF|SVG|EPS|ImageMagick
+
+Target format. Default is PDF.
+
+=item B<--noRotate> 1|0
+
+If 1, disables automatic landscape rotation of trees which are wider
+than taller.
+
+=item B<--sentenceInfo> 1|0
+
+If set to 1, this command prints also the text associated with the
+tree.
+
+=item B<--fileInfo> 1|0
+
+If set to 1, this command prints the filename and tree number
+below each tree.
+
+=item B<--imageMagickResolution> density
+
+This value is passed to the command C<convert> of the ImageMagick
+toolkit as B<--density>. It specifies the horizontal and vertical
+resolution in pixels of the image.
+
+=item B<--colors> 1|0
+
+Set to 1 for colour output. Default is 1.
+
+=item B<--hidden> 1|0
+
+Set to 1 to print hidden nodes.
+
+=item B<--psFontFile> font.pfa
+
+Specifies the PostScript font file to be used instead of the default
+one.
+
+=item B<---psFontAFMFile> font.afm
+
+Specifies the PostScript ASCII metric font file to be used instead of
+the default one.
+
+=item B<--ttFont> font.ttf
+
+Specifies the TrueType font file to be used when printing via PDF.
+
+=item B<--fontSize> size
+
+Font size.
+
+=item B<--fmtWidth> width
+
+Page width.
+
+=item  B<--fmtHeight> height
+
+Page height.
+
+=item B<--hMargin> dimension
+
+The size of the left and right horizontal margins.
+
+=item B<--vMargin> dimension
+
+The size of the top and bottom margins.
+
+=item B<--maximize> 1|0
+
+Expand small trees to fit the whole page size. (Shrinking is done
+automatically).
+
+=item B<--psMedia> media
+
+Specifies target given media size (used for PostScript, PDF, and SVG).
+Possible values:
+
+User (dimensions specified in B<--fmtHeight> and B<--fmtWidth>), BBox
+(bounding box of the tree with only B<--hMargin> and B<--vMargin> added),
+Letter, LetterSmall, Legal, Statement, Tabloid, Ledger, Folio, Quarto,
+Executive, A0, A1, A2, A3, A4, A4Small, A5, A6, A7, A8, A9, A10, B0,
+B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, ISOB0, ISOB1, ISOB2, ISOB3,
+ISOB4, ISOB5, ISOB6, ISOB7, ISOB8, ISOB9, ISOB10, C0, C1, C2, C3, C4,
+C5, C6, C7, 7x9, 9x11, 9x12, 10x13, 10x14
+
+=back
+
+=head2 BTRED OPTIONS
+
+The following options of C<btred> can be useful:
+
+=over 3
+
+=item B<--strip-prefix|-p> regexp
+
+Remove strings matching a given regexp from the beginning of filenames
+before saving.
+
+=item B<--add-prefix|-r> prefix
+
+Prepend output filenames with a given prefix.
+
+=item B<--strip-suffix|-s> regexp
+
+Strip strings matching a given regexp from the end of filenames.
+
+=item B<--add-suffix|-a> suffix
+
+Append a given suffix to the filenames.
+
+=back
+
+=head1 LICENSE
+
+This software is distributed under GPL - The General Public Licence.
+Full text of the GPL can be found in the LICENSE file distributed with
+this program and also on-line at http://www.gnu.org/copyleft/gpl.html.
+
+=head1 AUTHOR
+
+Petr Pajas <pajas@matfyz.cz>
+
+Copyright 2007 Petr Pajas, All rights reserved.
+
+=cut

@@ -8,7 +8,7 @@ require Pcore::Src;
 has action => ( is => 'ro', isa => Enum [ $Pcore::Src::SRC_DECOMPRESS, $Pcore::Src::SRC_COMPRESS, $Pcore::Src::SRC_OBFUSCATE ], required => 1 );
 has path => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Path'], required => 1 );
 has is_realpath => ( is => 'lazy', isa => Bool );
-has in_buffer   => ( is => 'lazy', isa => ScalarRef, predicate => 1 );
+has in_buffer   => ( is => 'lazy', isa => ScalarRef );
 has decode      => ( is => 'ro',   isa => Bool, default => 0 );
 has dry_run     => ( is => 'ro',   isa => Bool, default => 0 );
 has filter_args => ( is => 'ro',   isa => HashRef );
@@ -144,7 +144,7 @@ sub _build__out_md5 ($self) {
 sub _build_out_buffer ($self) {
     my $buffer;
 
-    if ( $self->has_in_buffer ) {
+    if ( exists $self->{has_in_buffer} ) {
         $buffer = $self->in_buffer->$*;
     }
     else {

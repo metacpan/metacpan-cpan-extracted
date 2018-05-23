@@ -45,15 +45,15 @@ sub can
 	my @methods = @_;
 
 	my $method_hash = blessed $thingy ? \%object_methods : \%class_methods ;
-	
+
 	foreach my $method ( @methods )
 		{
 		return unless exists $method_hash->{ $method };
 		}
-		
+
 	return 1;
 	}
-	
+
 sub _add_object_method # everyone gets it
 	{
 	$object_methods{ $_[1] } = 1;
@@ -69,7 +69,7 @@ $debug = 0;
 
 $Default_language = $Languages{'English'};
 
-	
+
 %names =
 (
   1 => [ qw( Ydrogenhai Hydrogen ) ],
@@ -193,7 +193,7 @@ foreach my $Z ( keys %names )
 #	print STDERR "Got names [@names] for $Z\n";
 	@names_to_Z{@names} = ($Z) x @names;
 	}
-	
+
 #print STDERR Dumper( \%names_to_symbol ); use Data::Dumper;
 }
 
@@ -332,10 +332,10 @@ sub new
 sub Z
 	{
 	my $self = shift;
-	
+
 	return $self->{'Z'} unless @_;
 	my $data = shift;
-	
+
 	unless( _is_Z $data )
 		{
 		$self->error('$data is not a valid proton number');
@@ -352,10 +352,10 @@ sub Z
 sub name
 	{
 	my $self = shift;
-	
+
 	return $self->{'name'} unless @_;
 	my $data = shift;
-	
+
 	unless( _is_name $data )
 		{
 		$self->error('$data is not a valid element name');
@@ -372,10 +372,10 @@ sub name
 sub symbol
 	{
 	my $self = shift;
-	
+
 	return $self->{'symbol'} unless @_;
 	my $data = shift;
-	
+
 	unless( _is_symbol $data )
 		{
 		$self->error('$data is not a valid element symbol');
@@ -408,12 +408,12 @@ sub get_symbol
 sub _get_symbol_by_name
 	{
 	my $name = lc shift;
-	
+
 	return unless _is_name $name;
 
 	my $Z = $names_to_Z{$name};
 
-	$elements{$Z}; 
+	$elements{$Z};
 	}
 
 sub _get_symbol_by_Z
@@ -427,7 +427,7 @@ sub get_name
 	{
 	my $thingy   = shift;
 	my $language = defined $_[0] ? $_[0] : $Default_language;
-	
+
 	#since we were asked for a name, we'll suppose that we were passed
 	#either a chemical symbol or a Z.
 	return _get_name_by_symbol( $thingy, $language ) if _is_symbol $thingy;
@@ -450,11 +450,11 @@ sub _get_name_by_symbol
 	my $symbol   = shift;
 
 	return unless _is_symbol $symbol;
-	
+
 	my $language = defined $_[0] ? $_[0] : $Default_language;
 
 	my $Z = _get_Z_by_symbol($symbol);
-	
+
 	return _get_name_by_Z( $Z, $language );
 	}
 
@@ -462,7 +462,7 @@ sub _get_name_by_Z
 	{
 	my $Z        = shift;
 	my $language = defined $_[0] ? $_[0] : $Default_language;
-	
+
 	return unless _is_Z $Z;
 
 	#not much we can do if they don't pass a proper number
@@ -475,7 +475,7 @@ sub get_Z
 	my $thingy = shift;
 
 	croak "Can't call get_Z on object. Use Z instead" if ref $thingy;
-			
+
 	#since we were asked for a name, we'll suppose that we were passed
 	#either a chemical symbol or a Z.
 	return _get_Z_by_symbol( $thingy ) if _is_symbol( $thingy );
@@ -518,7 +518,7 @@ sub _is_name { exists $names_to_Z{ lc shift } ? 1 : 0	}
 sub _is_symbol
 	{
 	my $symbol = _format_symbol( $_[0] );
-	
+
 	exists $elements{$symbol} ? 1 : ();
 	}
 
@@ -551,7 +551,7 @@ sub _format_symbol { $_[0] =~ m/^[a-z]/i && ucfirst lc $_[0] }
 sub _format_name
 	{
 	my $data = shift;
-	
+
 	$data =~ s/^(.)(.*)/uc($1).lc($2)/e;
 
 	return $data;
@@ -569,9 +569,9 @@ sub AUTOLOAD
 
 	$method_name =~ s/.*:://;
 
-	if( $data )                         
+	if( $data )
 		{ # only add new method if they add data
-	   	$self->{$method_name} = $data; 
+	   	$self->{$method_name} = $data;
 	   	$self->_add_object_method( $method_name );
 	   	}
 	elsif( defined $self->{$method_name} ) { return $self->{$method_name}  }
@@ -582,6 +582,8 @@ sub AUTOLOAD
 1;
 
 __END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -715,7 +717,7 @@ will try its best despite the case of the input data).
 		{
 		#stuff
 		}
-	
+
 You can modify the symbols (e.g. you work for UCal ;) ) by changing
 the data at the end of this module.
 

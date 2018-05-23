@@ -101,7 +101,7 @@ Document::OOXML::Rels - Class representing ".rels" (relationships) files in OOXM
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 SYNOPSIS
 

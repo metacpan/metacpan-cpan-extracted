@@ -10,8 +10,6 @@ lib/Pcore.pm
 lib/Pcore/AE/DNS/Cache.pm
 lib/Pcore/AE/Handle.pm
 lib/Pcore/AE/Handle/Cache.pm
-lib/Pcore/AE/Handle/Cache2.pm
-lib/Pcore/AE/Handle/Cache2/Storage.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/BitBucket.pm
 lib/Pcore/API/Client.pm
@@ -42,7 +40,6 @@ lib/Pcore/App/Controller/API.pm
 lib/Pcore/App/Controller/Index.pm
 lib/Pcore/App/Controller/Static.pm
 lib/Pcore/App/Router.pm
-lib/Pcore/Core/Autoload.pm
 lib/Pcore/Core/CLI.pm
 lib/Pcore/Core/CLI/Arg.pm
 lib/Pcore/Core/CLI/Cmd.pm
@@ -63,9 +60,10 @@ lib/Pcore/Core/Event/Listener/Pipe/stderr.pm
 lib/Pcore/Core/Exception.pm
 lib/Pcore/Core/Exception/Object.pm
 lib/Pcore/Core/Exporter.pm
-lib/Pcore/Core/Guard.pm
 lib/Pcore/Core/Inline.pm
 lib/Pcore/Core/L10N.pm
+lib/Pcore/Core/OOP/Class.pm
+lib/Pcore/Core/OOP/Role.pm
 lib/Pcore/Core/PerlIOviaWinUniCon.pm
 lib/Pcore/Core/Types.pm
 lib/Pcore/Dist.pm
@@ -165,7 +163,6 @@ lib/Pcore/Util/PM/Proc.pm
 lib/Pcore/Util/Path.pm
 lib/Pcore/Util/Perl.pm
 lib/Pcore/Util/Perl/Module.pm
-lib/Pcore/Util/Perl/Moo.pm
 lib/Pcore/Util/Random.pm
 lib/Pcore/Util/Regexp.pm
 lib/Pcore/Util/Result.pm

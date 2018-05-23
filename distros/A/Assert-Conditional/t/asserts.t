@@ -6,41 +6,71 @@ use v5.10;
 use utf8;
 use charnames qw(:full);
 
+#use Carp::Always;
+
+use Cwd qw(abs_path);
+use FindBin qw($Bin);
+
 $| = 1;
 
-use lib qw(
-    ../blib/lib 
-    ../lib
-    blib/lib 
-    lib
-);
+use lib abs_path("$Bin/../lib");
+
+use Config qw(%Config); # because it's tied
+use Math::BigInt; # for overloads
+use Env qw($PATH @PATH); # because they're tied
 
 use Test::More;
-use Test::Exception;
+use Test2::Tools::Exception qw(dies lives);
 
 use IO::File;
 use IO::Handle;
+use Hash::Util qw(lock_keys unlock_keys);
 
 use Assert::Conditional qw(:all -if 1);
 
 my($junk, @junk) ;
 
 my $undef;
-my $zero = 0;
-my $true = 1;
-my $one = 1;
-my $two = 2;
+my $zero      = 0;
+my $true      = 1;
+my $one       = 1;
+my $two       = 2;
 my $minus_two = -2;
-my $float = 3.14;
-my $string = "string";
-my @stuff = ("a" .. "z");
-my @ten = (1..10);
-my @empty = ();
+my $float     = 3.14;
+my $string    = "string";
+my @empty     = ();
 my %empty;
-my $class = "IO::File";
-my $obj = $class->new();
+my @stuff     = ("a" .. "z");
+my @ten       = (1 .. 10);
+my $class     = "IO::File";
+my $obj       = $class->new();
 
-my %primary_color = map { $_ => 1 } qw(red blue green);
+my @primary_colors    = qw(red green blue);
+my @all_colors        = (@primary_colors, qw(orange yellow cyan violet));
+my @not_colors        = qw(black white pink purple);
+my %primary_color     = map { $_ => 1 } @primary_colors;
+my $primary_color_ref = \%primary_color;
+
+my %locked_hash       =  %primary_color;
+my $locked_hashref    = \%locked_hash;
+lock_keys %locked_hash;
+my %unlocked_hash     =  %primary_color;
+my $unlocked_hashref  = \%unlocked_hash;
+
+my %hash_of_hashes = (
+    LOCKED  => $locked_hashref,
+    UNLOCKED => $unlocked_hashref,
+);
+
+my $hashref_of_hashes        =  \%hash_of_hashes;
+my $ref_of_hashref_of_hashes = \\%hash_of_hashes;
+
+my $bignum = Math::BigInt->new("1000");
+
+my $tied_object = do { 
+    no warnings "once"; 
+    tie *Tied_FH, "TieOut";
+};
 
 sub  void_context     {  assert_void_context()     }
 sub  nonvoid_context  {  assert_nonvoid_context()  }
@@ -86,6 +116,7 @@ my @good_tests = (
     q{assert_numeric($one)},
     q{assert_numeric($float)},
     q{assert_numeric($minus_two)},
+    q{assert_nonnumeric("stuff")},
     q{assert_negative($minus_two)},
     q{assert_positive($two)},
     q{assert_nonnegative($zero)},
@@ -224,11 +255,13 @@ my @good_tests = (
     q{assert_full_perl_ident("ni\N{LATIN SMALL LETTER N WITH TILDE}o")},
     q{assert_qualified_ident("main::ni\N{LATIN SMALL LETTER N WITH TILDE}o")},
     q{assert_ascii_ident("nino")},
+
     q{assert_regex(qr/foo/)},
     q{assert_like("foo", qr/f/)},
     q{assert_unlike("foo", qr/z/)},
     q{assert_latin1("ni\N{LATIN SMALL LETTER N WITH TILDE}o")},
     q{assert_latinish("Henry \N{ROMAN NUMERAL EIGHT}")},
+
     q{assert_astral("\x{012345}")},
     q{assert_nonastral("fred")},
     q{assert_bmp("ni\x{223}o")},
@@ -269,25 +302,65 @@ my @good_tests = (
     q{assert_array_length_max(@ten, 10)},
     q{assert_array_length_minmax(@ten, 5, 20)},
 
-    # Something is wrong with the test frameowrk, and I don't know what. These
-    # tests are failing and shoudln't be, since they work fine normally.  
-    # The DB::args stack contents have been wiped out, which seems to be the problem.
-    # Really strange.
-    #q{ no warnings 'redefine'; sub fn1 { warn "got args @_"; Carp::confess("OH NOES"); assert_argc() }  fn1(localtime()) },
-    #q{ no warnings 'redefine'; sub fn2 { warn "got args @_"; assert_argc(2) }  fn2(1, 2, 3) },
-    #assert_argc_min($)
-    #assert_argc_max($)
-    #assert_argc_minmax($$)
+    q{ no warnings 'redefine'; sub fn0    {  assert_argc_min(5) }  fn0(localtime()) },
+    q{ no warnings 'redefine'; sub fn1($) {  assert_argc(1) }      fn1(localtime()) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc(3) }      fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc    }      fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_max(3) }      fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_max(5) }      fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_minmax(1,5) }      fn2(1, 2, 3) },
 
     q{assert_hash_nonempty(%primary_color)},
     q{assert_hashref_nonempty(\%primary_color)},
+    
     q{assert_hash_keys(%primary_color, qw<red blue green>)},
     q{assert_hashref_keys(\%primary_color, qw<red blue green>)},
 
     q{assert_hash_keys_required(%primary_color, qw<red blue green>)},
     q{assert_hash_keys_allowed(%primary_color, qw<red blue green>)},
-    q{assert_hashref_keys_required(\%primary_color, qw<red blue green>)},
-    q{assert_hashref_keys_allowed(\%primary_color, qw<red blue green>)},
+
+    q{assert_hash_keys_required_and_allowed(%primary_color, ["red"], [qw<red blue green>])},
+    q{assert_hashref_keys_required_and_allowed(\\%primary_color, ["red"], [qw<red blue green>])},
+    q{assert_hashref_keys_required_and_allowed($primary_color_ref, ["red"], [qw<red blue green>])},
+    q{assert_hash_keys_allowed_and_required(%primary_color, [qw<red blue green>], ["red"])},
+    q{assert_hashref_keys_allowed_and_required(\\%primary_color, [qw<red blue green>], ["red"])},
+    q{assert_hashref_keys_allowed_and_required($primary_color_ref, [qw<red blue green>], ["red"])},
+
+    q{assert_hashref_keys_required(\\%primary_color, qw<red blue green>)},
+    q{assert_hashref_keys_allowed(\\%primary_color, qw<red blue green>)},
+    q{assert_hashref_keys_required($primary_color_ref, qw<red blue green>)},
+    q{assert_hashref_keys_allowed($primary_color_ref, qw<red blue green>)},
+
+    q{assert_keys(%primary_color, qw<red blue green>)},
+    q{assert_keys(%primary_color, @primary_colors)},
+    q{assert_keys($primary_color_ref, qw<red blue green>)},
+    q{assert_keys($primary_color_ref, @primary_colors)},
+
+    q{assert_min_keys(%primary_color, qw<red blue green>)},
+    q{assert_min_keys(%primary_color, @primary_colors)},
+    q{assert_min_keys($primary_color_ref, qw<red blue green>)},
+    q{assert_min_keys($primary_color_ref, @primary_colors)},
+
+    q{assert_max_keys(%primary_color, qw<red orange yellow green blue violet>)},
+    q{assert_max_keys(%primary_color, @all_colors)},
+    q{assert_max_keys($primary_color_ref, qw<red orange yellow green blue violet>)},
+    q{assert_max_keys($primary_color_ref, @all_colors)},
+
+    q{assert_minmax_keys(%primary_color, @primary_colors, @all_colors)},
+    q{assert_minmax_keys($primary_color_ref, @primary_colors, @all_colors)},
+
+    q{assert_locked(%locked_hash)},
+    q{assert_locked($locked_hashref)},
+    q{assert_locked($hash_of_hashes{LOCKED})},
+    q{assert_locked($hashref_of_hashes->{LOCKED})},
+    q{assert_locked($$ref_of_hashref_of_hashes->{LOCKED})},
+
+    q{assert_unlocked(%unlocked_hash)},
+    q{assert_unlocked($unlocked_hashref)},
+    q{assert_unlocked($$ref_of_hashref_of_hashes)},
+    q{assert_unlocked($hash_of_hashes{UNLOCKED})},
+    q{assert_unlocked($hashref_of_hashes->{UNLOCKED})},
+    q{assert_unlocked($$ref_of_hashref_of_hashes->{UNLOCKED})},
 
     q{assert_anyref( \"string" )},
     q{assert_anyref( \0 )},
@@ -299,7 +372,7 @@ my @good_tests = (
     q{assert_anyref( \%ENV )},
     q{assert_anyref( { }  )},
     q{assert_anyref( sub { }  )},
-    q{assert_anyref( \&lives_ok  )},
+    q{assert_anyref( \&lives  )},
     q{assert_anyref( \time()  )},
     q{assert_anyref( \*ENV )},
     q{assert_anyref( *STDIN{IO} )},
@@ -317,7 +390,7 @@ my @good_tests = (
     q{assert_reftype( HASH    =>  \%ENV                    )},
     q{assert_reftype( HASH    =>  {  }                     )},
     q{assert_reftype( CODE    =>  sub  {    }              )},
-    q{assert_reftype( CODE    =>  \&lives_ok               )},
+    q{assert_reftype( CODE    =>  \&lives               )},
     q{assert_reftype( SCALAR  =>  \time()                  )},
     q{assert_reftype( GLOB    =>  \*ENV                    )},
     q{assert_reftype( IO      =>  *STDIN{IO}               )},
@@ -335,52 +408,153 @@ my @good_tests = (
     q{assert_hashref(    \%ENV        )},
     q{assert_hashref(    { }          )},
     q{assert_coderef(    sub {    }   )},
-    q{assert_coderef(    \&lives_ok   )},
+    q{assert_coderef(    \&lives   )},
     q{assert_scalarref(  \time()      )},
     q{assert_globref(    \*ENV        )},
     q{assert_ioref(      *STDIN{IO}   )},
     q{assert_arrayref(   *ARGV{ARRAY}             )},
     q{assert_arrayref(   *{$main::{ARGV}}{ARRAY}  )},
 
+    q{assert_unblessed_ref(  \"string"    )},
+    q{assert_unblessed_ref(  \0           )},
+    q{assert_unblessed_ref(  \$0          )},
+    q{assert_unblessed_ref(  *0{SCALAR}   )},
+    q{assert_unblessed_ref(     \\\$0        )},
+    q{assert_unblessed_ref(   \\\\\\@ARGV       )},
+    q{assert_unblessed_ref(   \@ARGV       )},
+    q{assert_unblessed_ref(   [ ]          )},
+    q{assert_unblessed_ref(    \%ENV        )},
+    q{assert_unblessed_ref(    { }          )},
+    q{assert_unblessed_ref(    sub {    }   )},
+    q{assert_unblessed_ref(    \&lives   )},
+    q{assert_unblessed_ref(  \time()      )},
+    q{assert_unblessed_ref(    \*ENV        )},
+    q{assert_unblessed_ref(   *ARGV{ARRAY}             )},
+    q{assert_unblessed_ref(   *{$main::{ARGV}}{ARRAY}  )},
+
     q{assert_known_package("IO::File")},
     q{assert_known_package(IO::File::)},
     q{assert_object($obj)},
     q{assert_nonobject($class)},
     q{assert_nonobject(ref $obj)},
-    q{assert_can($class, qw(isa can VERSION))},
-    q{assert_can($obj, qw(isa can VERSION))},
-    q{assert_can($obj, qw(UNIVERSAL::isa))},
-    q{assert_can($class, qw(new))},
-    q{assert_can($obj, qw(new))},
-    q{assert_can($obj, qw(IO::Handle::new))},
-    q{assert_can($obj, qw(close open))},
+
+    q{sub { assert_class_method() }->($class) },
+    q{sub { assert_object_method() }->($obj) },
+
+    q{sub { assert_method() }->($class) },
+    q{sub { assert_method() }->($obj) },
+
     q{assert_can($class, qw(close open))},
+    q{assert_can($class, qw(isa can VERSION))},
+    q{assert_can($class, qw(new))},
+
+    q{assert_class_can($class, qw(close open))},
+    q{assert_class_can($class, qw(isa can VERSION))},
+    q{assert_class_can($class, qw(new))},
+
+    q{assert_can($obj, qw(IO::Handle::new))},
+    q{assert_can($obj, qw(UNIVERSAL::isa))},
+    q{assert_can($obj, qw(close open))},
+    q{assert_can($obj, qw(isa can VERSION))},
+    q{assert_can($obj, qw(new))},
+
+    q{assert_object_can($obj, qw(IO::Handle::new))},
+    q{assert_object_can($obj, qw(UNIVERSAL::isa))},
+    q{assert_object_can($obj, qw(close open))},
+    q{assert_object_can($obj, qw(isa can VERSION))},
+    q{assert_object_can($obj, qw(new))},
+
     q{assert_cant($class, "dlk s lkd l slkds" )},
     q{assert_cant($class, 23 )},
     q{assert_cant($class, 3.14 )},
     q{assert_cant($obj, "dlk s lkd l slkds" )},
     q{assert_cant($obj, 23 )},
     q{assert_cant($obj, 3.14 )},
-    q{assert_isa($obj, $class)},
+
     q{assert_ainta($class, $obj)},
-    q{assert_isa($obj, "IO::File")},
-    q{assert_isa($obj, "IO::Handle")},
-    q{assert_isa($class, $class)},
-    q{assert_ainta($obj, $obj)},
-    q{assert_isa($class, "IO::File")},
-    q{assert_isa($obj, qw<IO::Handle IO::File> )},
-    q{assert_isa($obj,   <IO::{Handle,File}  > )},
-    q{assert_isa($class, qw<IO::Handle IO::File >)},
-    q{assert_isa($class, "IO::Handle")},
-    q{assert_isa($obj, "UNIVERSAL")},
-    q{assert_isa($obj, UNIVERSAL::)},
-    q{assert_isa($class, "UNIVERSAL")},
-    q{assert_isa($class, UNIVERSAL::)},
     q{assert_ainta($obj, "IO")},
     q{assert_ainta($obj, "Regexp")},
+    q{assert_ainta($obj, $obj)},
 
-#assert_does($@)
-#assert_doesnt($@)
+    q{assert_isa($class, "IO::File")},
+    q{assert_isa($class, "IO::Handle")},
+    q{assert_isa($class, "UNIVERSAL")},
+    q{assert_isa($class, $class)},
+    q{assert_isa($class, UNIVERSAL::)},
+    q{assert_isa($class, qw<IO::Handle IO::File>)},
+
+    q{assert_class_isa($class, "IO::File")},
+    q{assert_class_isa($class, "IO::Handle")},
+    q{assert_class_isa($class, "UNIVERSAL")},
+    q{assert_class_isa($class, $class)},
+    q{assert_class_isa($class, UNIVERSAL::)},
+    q{assert_class_isa($class, qw<IO::Handle IO::File>)},
+
+    q{assert_class_ainta($class, qw<IO Regexp>)},
+
+    q{assert_object_isa($obj,  <IO::{Handle,File}>)},
+    q{assert_object_isa($obj, "IO::File")},
+    q{assert_object_isa($obj, "IO::Handle")},
+    q{assert_object_isa($obj, "UNIVERSAL")},
+    q{assert_object_isa($obj, $class)},
+    q{assert_object_isa($obj, UNIVERSAL::)},
+    q{assert_object_isa($obj, qw<IO::Handle IO::File> )},
+
+    q{assert_object_isa($bignum, qw<Math::BigInt> )},
+
+    q{assert_object_cant($bignum, qw<Math  BigInt> )},
+    q{assert_object_can($bignum, qw<bround fround is_even is_odd> )},
+
+    q{ assert_tied($PATH) },
+    q{ assert_tied(%Config) },
+    q{ assert_tied(@PATH) },
+    q{ assert_tied(*Tied_FH) },
+
+    q{ assert_tied_referent(\\$PATH) },
+    q{ assert_tied_referent(\\%Config) },
+    q{ assert_tied_referent(\\@PATH) },
+    q{ assert_tied_referent(\\*Tied_FH) },
+
+    q{ assert_tied_scalar($PATH) },
+    q{ assert_tied_scalarref(\\$PATH) },
+
+    q{ assert_tied_array(@PATH) },
+    q{ assert_tied_arrayref(\\@PATH) },
+
+    q{ assert_tied_hash(%Config) },
+    q{ assert_tied_hashref(\\%Config) },
+
+    q{ assert_tied_glob(*Tied_FH) },
+    q{ assert_tied_globref(\\*Tied_FH) },
+
+    q{assert_untied($0)},
+    q{assert_untied(@ARGV)},
+    q{assert_untied(%ENV)},
+    q{assert_untied(*STDIN)},
+
+    q{assert_untied_referent(\\$0)},
+    q{assert_untied_referent(\\@ARGV)},
+    q{assert_untied_referent(\\%ENV)},
+    q{assert_untied_referent(\\*STDIN)},
+
+    q{assert_untied_scalar($0)},
+    q{assert_untied_array(@ARGV)},
+    q{assert_untied_hash(%ENV)},
+    q{assert_untied_glob(*STDIN)},
+
+    q{assert_untied_scalarref(\\$0)},
+    q{assert_untied_arrayref(\\@ARGV)},
+    q{assert_untied_hashref(\\%ENV)},
+    q{assert_untied_globref(\\*STDIN)},
+
+    q{assert_object_overloads($bignum)},
+    q{assert_object_overloads($bignum, qw[+ ++ - += * **])},
+
+    q{assert_object_nummifies($bignum)},
+    q{assert_object_stringifies($bignum)},
+    q{assert_object_boolifies($bignum)},
+
+    q{assert_object_stringifies($tied_object)},
 
     q[assert_happy_code { time() > 1 }],
     q[assert_unhappy_code { time() > time()+6 }],  
@@ -410,6 +584,7 @@ my @bad_tests = (
     q{assert_array_nonempty()},
     q{assert_arrayref()},
     q{assert_arrayref_nonempty()},
+    q{assert_arrayref_nonempty([])},
     q{assert_ascii()},
     q{assert_ascii_ident()},
     q{assert_astral()},
@@ -433,6 +608,7 @@ my @bad_tests = (
     q{assert_even_number()},
     q{assert_false()},
     q{assert_fractional()},
+    q{assert_fractional($one)},
     q{assert_full_perl_ident()},
     q{assert_globref()},
     q{assert_happy_code()},
@@ -467,6 +643,7 @@ my @bad_tests = (
     q{assert_nonascii()},
     q{assert_nonastral()},
     q{assert_nonblank()},
+    q{assert_nonblank(" ")},
     q{assert_nonbytes()},
     q{assert_nonempty()},
     q{assert_nonnegative()},
@@ -490,6 +667,7 @@ my @bad_tests = (
     q{assert_regular_file()},
     q{assert_scalarref()},
     q{assert_signed_number()},
+    q{assert_signed_number(42)},
     q{assert_simple_perl_ident()},
     q{assert_single_line()},
     q{assert_single_paragraph()},
@@ -534,6 +712,7 @@ my @bad_tests = (
     q{assert_false(1) },
     q{assert_false(1,1) },
     q{assert_numeric($string)},
+    q{assert_nonnumeric(42)},
     q{assert_nonnumeric($one)},
     q{assert_nonnumeric($float)},
     q{assert_nonnumeric($minus_two)},
@@ -542,10 +721,13 @@ my @bad_tests = (
     q{assert_positive($zero,3)},
     q{assert_negative($zero)},
     q{assert_zero($string)},
+    q{assert_zero($one)},
     q{assert_zero(4,$string)},
     q{assert_zero(0,$string)},
     q{assert_nonzero($string)},
+    q{assert_nonzero(0)},
     q{assert_nonnegative($minus_two)},
+    q{assert_nonpositive($one)},
     q{assert_integer($float)},
     q{assert_whole_number($float)},
     q{assert_whole_number($string)},
@@ -586,6 +768,9 @@ my @bad_tests = (
     q{assert_odd_number($undef)},
     q{assert_odd_number($undef)},
     q{assert_in_numeric_range(-5,1,10)},
+    q{assert_in_numeric_range(15,1,10)},
+    q{assert_in_numeric_range(5,8,10)},
+    q{assert_in_numeric_range(-5,10,1)},
     q{assert_in_numeric_range(-5,$string,10)},
     q{assert_in_numeric_range(1,5,1,10)},
     q{assert_in_numeric_range($string)},
@@ -617,7 +802,11 @@ my @bad_tests = (
     q{assert_single_paragraph("abc\x{2029} ")},
     q{assert_single_line("")},
     q{assert_single_line(undef)},
+    q{assert_single_line("\n\n")},
+    q{assert_single_line("\r\n")},
     q{assert_multi_line("")},
+    q{assert_multi_line("foo")},
+    q{assert_multi_line("foo\r\n")},
     q{assert_multi_line(undef)},
     q{assert_single_paragraph("one\f" x 5)},
     q{assert_single_paragraph("one\r\n" x 5)},
@@ -643,10 +832,11 @@ my @bad_tests = (
     q{assert_ascii_ident("ni\N{LATIN SMALL LETTER N WITH TILDE}o")},
     q{assert_regex(q/foo/)},
     q{assert_like("foo", q/f/)},
+    q{assert_like("foo", qr/z/)},
     q{assert_unlike("foo", qr/f/)},
-    q{assert_unlike("foo", q/z/)},
     q{assert_latin1("\x{189}")},
     q{assert_latin1("Henry \x{2167}")},
+    q{assert_latinish("\x{F0FF}")},
     q{assert_astral("\x{F0FF}")},
     q{assert_nonastral("\x{12345}")},
     q{assert_bmp("ni\x{12223}o")},
@@ -661,6 +851,21 @@ my @bad_tests = (
     q{assert_nfkd("\x{bc}")},
     q{assert_eq("ni\N{LATIN SMALL LETTER N WITH TILDE}o", "nin\x{304}o")},
     q{assert_eq_letters("one, tow", "ONE")},
+
+    q{assert_isnt($one, $one)},
+    q{assert_isnt($bignum, $bignum)},
+    q{assert_isnt($tied_object, $tied_object)},
+
+    q{ no warnings 'redefine'; sub fn0    {  assert_argc_min(15) }      fn0(localtime()) },
+    q{ no warnings 'redefine'; sub fn1($) {  assert_argc(0) }           fn1(localtime()) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc(2) }           fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc  }           fn2() },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_max(2) }       fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_max(2) }       fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_minmax(10,25) }fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_minmax(2,1) }fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_minmax(25,10) }fn2(1, 2, 3) },
+    q{ no warnings 'redefine'; sub fn2    {  assert_argc_minmax(1,2) }fn2(1, 2, 3) },
 
     q{assert_in_list("red", qw(one fish two fish fish blue fish))},
     q{assert_in_list(5, 6 .. 10)},
@@ -684,8 +889,12 @@ my @bad_tests = (
     q{assert_array_length(@empty)},
     q{assert_array_length(@empty, 10)},
     q{assert_array_length_min(@empty, 5)},
-    q{assert_array_length_max(@empty, -5)},
+    q{assert_array_length_max(@primary_colors, 1)},
     q{assert_array_length_minmax(@empty, 5, 20)},
+    q{assert_array_length_minmax(@empty, -5, -2)},
+    q{assert_array_length_minmax(@empty, -5, 20)},
+    q{assert_array_length_minmax(@empty, 25, 5)},
+    q{assert_array_length_minmax(@primary_colors, 1, 2)},
 
     q{assert_hash_nonempty(%empty)},
     q{assert_hashref_nonempty(\%empty)},
@@ -693,13 +902,74 @@ my @bad_tests = (
     q{assert_hashref_keys(\%empty, qw<HOME PATH USER>)},
 
     q{assert_hash_keys_required(@junk, qw<yellow violet cyan>)},
+    q{assert_hash_keys_required(%primary_color, @empty)},
     q{assert_hash_keys_required(%primary_color, qw<yellow violet cyan>)},
+    q{assert_hash_keys_required(%primary_color, qw<pink purple>)},
     q{assert_hash_keys_allowed(%primary_color, qw<yellow violet cyan>)},
+    q{assert_hash_keys_allowed(%primary_color, qw<pink purple>)},
     q{assert_hash_keys_allowed(%primary_color, qw<red>)},
+    q{assert_hash_keys_allowed(%primary_color, @empty)},
     q{assert_hashref_keys_required(%primary_color, qw<yellow violet cyan>)},
     q{assert_hashref_keys_allowed(%primary_color, qw<yellow violet cyan>)},
     q{assert_hashref_keys_required(\%primary_color, qw<yellow violet cyan>)},
     q{assert_hashref_keys_allowed(\%primary_color, qw<yellow violet cyan>)},
+
+    q{assert_hash_keys_required_and_allowed(%primary_color, [qw<red blue green>], ["red"])},
+    q{assert_hash_keys_required_and_allowed(%primary_color, [qw<red blue green>], [])},
+    q{assert_hash_keys_required_and_allowed(%primary_color, [], [])},
+    q{assert_hashref_keys_required_and_allowed(\\%primary_color, [qw<red blue green>], ["red"])},
+    q{assert_hashref_keys_required_and_allowed($primary_color_ref, [qw<red blue green>], ["red"])},
+    q{assert_hash_keys_allowed_and_required(%primary_color, ["red"], [qw<red blue green>])},
+    q{assert_hash_keys_allowed_and_required(%primary_color, [], [qw<red blue green>])},
+    q{assert_hash_keys_allowed_and_required(%primary_color, [], [])},
+    q{assert_hashref_keys_allowed_and_required(\\%primary_color,, ["red"] [qw<red blue green>])},
+    q{assert_hashref_keys_allowed_and_required($primary_color_ref, ["red"], [qw<red blue green>])},
+
+    q{assert_hashref_keys_required(\\%primary_color, qw<red pink green>)},
+    q{assert_hashref_keys_allowed(\\%primary_color, qw<red pink green>)},
+    q{assert_hashref_keys_required($primary_color_ref, qw<red pink green>)},
+    q{assert_hashref_keys_allowed($primary_color_ref, qw<red pink green>)},
+
+    q{assert_keys(%primary_color, qw<red pink green>)},
+    q{assert_keys(%primary_color, @all_colors)},
+    q{assert_keys(%primary_color, @not_colors)},
+    q{assert_keys(%primary_color, @empty)},
+    q{assert_keys($primary_color_ref, qw<red pink green>)},
+    q{assert_keys($primary_color_ref, @all_colors)},
+    q{assert_keys($primary_color_ref, @not_colors)},
+    q{assert_keys($primary_color_ref, @empty)},
+
+    q{assert_min_keys(%primary_color, qw<red pink green>)},
+    q{assert_min_keys(%primary_color, @empty)},
+    q{assert_min_keys(%primary_color, @all_colors)},
+    q{assert_min_keys(%primary_color, @not_colors)},
+    q{assert_min_keys($primary_color_ref, qw<red pink green>)},
+    q{assert_min_keys($primary_color_ref, @all_colors)},
+    q{assert_min_keys($primary_color_ref, @not_colors)},
+
+    q{assert_max_keys(%primary_color, qw<orange yellow violet>)},
+    q{assert_max_keys(%primary_color, @not_colors)},
+    q{assert_max_keys(%primary_color, @empty)},
+    q{assert_max_keys($primary_color_ref, qw<orange yellow violet>)},
+    q{assert_max_keys($primary_color_ref, @not_colors)},
+
+    q{assert_minmax_keys(%primary_color, @all_colors, @primary_color)},
+    q{assert_minmax_keys($primary_color_ref, @all_colors, @primary_colors)},
+    q{assert_minmax_keys(%primary_color, @empty, @empty)},
+    q{assert_minmax_keys($primary_color_ref, @empty, @empty)},
+
+    q{assert_unlocked(%locked_hash)},
+    q{assert_unlocked($locked_hashref)},
+    q{assert_unlocked($hash_of_hashes{LOCKED})},
+    q{assert_unlocked($hashref_of_hashes->{LOCKED})},
+    q{assert_unlocked($$ref_of_hashref_of_hashes->{LOCKED})},
+
+    q{assert_locked(%unlocked_hash)},
+    q{assert_locked($unlocked_hashref)},
+    q{assert_locked($$ref_of_hashref_of_hashes)},
+    q{assert_locked($hash_of_hashes{UNLOCKED})},
+    q{assert_locked($hashref_of_hashes->{UNLOCKED})},
+    q{assert_locked($$ref_of_hashref_of_hashes->{UNLOCKED})},
 
     q{assert_anyref( "string" )},
     q{assert_anyref( 0 )},
@@ -708,7 +978,7 @@ my @bad_tests = (
     q{assert_anyref( @ARGV )},
     q{assert_anyref( )},
     q{assert_anyref( %ENV )},
-    q{assert_anyref( defined &lives_ok  )},
+    q{assert_anyref( defined &lives  )},
     q{assert_anyref( time()  )},
     q{assert_anyref( localtime()  )},
     q{assert_anyref( *STDIN )},
@@ -744,28 +1014,58 @@ my @bad_tests = (
     q{assert_arrayref(    \%ENV        )},
     q{assert_arrayref(    { }          )},
     q{assert_hashref(    sub {    }   )},
-    q{assert_hashref(    \&lives_ok   )},
+    q{assert_hashref(    \&lives   )},
     q{assert_hashref(  \time()      )},
     q{assert_refref(    \*ENV        )},
     q{assert_scalarref(      *STDIN{IO}   )},
     q{assert_globref(   *ARGV{ARRAY}             )},
     q{assert_hashref(   *{$main::{ARGV}}{ARRAY}  )},
 
+    q{assert_unblessed_ref(      *STDIN{IO}   )},
+    q{assert_unblessed_ref(      *Tied_FH   )},
+    q{assert_unblessed_ref(      $bignum   )},
+    q{assert_unblessed_ref(      $tied_object   )},
+
     q{assert_known_package("IO::Fil")},
     q{assert_known_package(IO::Fil::)},
     q{assert_object($class)},
+    q{assert_object([])},
+    q{assert_object(2)},
     q{assert_nonobject($obj)},
+    q{assert_nonobject(bless [])},
+    q{assert_can($class, @empty)},
     q{assert_can($class, qw(isa can take-off-hoser VERSION))},
+    q{assert_can($class, qw(isa can take off hoser VERSION))},
     q{assert_can($obj, qw(isa take-off-hoser can VERSION))},
     q{assert_can($class, qw(parola-nuda))},
     q{assert_can($obj, qw(parola-nuda))},
     q{assert_can($obj, qw(close open-sesame))},
     q{assert_can($class, qw(close-your-face open))},
     q{assert_cant($class, qw(close) )},
+    q{assert_cant($class, @empty )},
     q{assert_cant($class, qw(new) )},
     q{assert_cant($obj, qw(open) )},
-    q{assert_aintaa($obj, $class)},
+    q{assert_ainta($obj, $class)},
+    q{assert_ainta($obj, @empty)},
     q{assert_isa($class, $obj)},
+    q{assert_isa($class, @empty)},
+    q{assert_does($class, @empty)},
+    q{assert_does($class, "What::Ever")},
+    q{assert_does($class, "What::Ever", "You::Please")},
+    q{assert_does($class, @primary_colors)},
+    q{assert_doesnt($class, "IO::Handle")},
+    q{assert_doesnt($class, @empty)},
+
+    q{sub { assert_method() }->() },
+    q{sub { assert_public_method() }->() },
+    q{sub { assert_private_method() }->() },
+    q{sub { assert_protected_method() }->() },
+
+    q{sub { assert_class_method() }->($obj) },
+    q{sub { assert_class_method() }->() },
+    q{sub { assert_object_method() }->($class) },
+    q{sub { assert_object_method() }->() },
+    q{sub { assert_object_method() }->([ ]) },
 
     q{assert_isa($obj, "IO::Socket")},
     q{assert_isa($obj, "Regexp")},
@@ -778,6 +1078,94 @@ my @bad_tests = (
     q{assert_isa($class, "IO::Socket")},
     q{assert_ainta($obj, "IO::Handle")},
     q{assert_ainta($obj, "UNIVERSAL")},
+
+    q{assert_object_can($class, qw(close open))},
+    q{assert_object_can($class, qw(isa can VERSION))},
+    q{assert_object_can($class, qw(new))},
+
+    q{assert_object_can($bignum, qw<Math::BigInt> )},
+    q{assert_object_cant($bignum, qw<bround fround is_even is_odd> )},
+
+    q{assert_class_can($obj, qw(IO::Handle::new))},
+    q{assert_class_can($obj, qw(UNIVERSAL::isa))},
+    q{assert_class_can($obj, qw(close open))},
+    q{assert_class_can($obj, qw(isa can VERSION))},
+    q{assert_class_can($obj, qw(new))},
+    q{assert_class_cant($class, qw(new) )},
+
+    q{assert_object_isa($class, "IO::File")},
+    q{assert_object_isa($class, "IO::Handle")},
+    q{assert_object_isa($class, "UNIVERSAL")},
+    q{assert_object_isa($class, $class)},
+    q{assert_object_isa($class, UNIVERSAL::)},
+    q{assert_object_isa($class, qw<IO::Handle IO::File >)},
+
+    q{assert_object_ainta($obj,   <IO::{Handle,File}  > )},
+
+    q{assert_class_isa($obj,   <IO::{Handle,File}  > )},
+    q{assert_class_isa($obj, "IO::File")},
+    q{assert_class_isa($obj, "IO::Handle")},
+    q{assert_class_isa($obj, "UNIVERSAL")},
+    q{assert_class_isa($obj, $class)},
+    q{assert_class_isa($obj, UNIVERSAL::)},
+    q{assert_class_isa($obj, qw<IO::Handle IO::File> )},
+
+    q{assert_class_ainta($class, qw<IO::Handle IO::File> )},
+
+    q{assert_tied(0)},
+    q{assert_tied(\0)},
+    q{assert_tied($0)},
+    q{assert_tied(@ARGV)},
+    q{assert_tied(%ENV)},
+    q{assert_tied(*STDIN)},
+
+    q{assert_tied_referent({%Config})},
+    q{assert_tied_referent(\\substr($0, 5))}, # Invalid reftype to check for ties: 'LVALUE'
+    q{assert_tied_referent(\\\\%Config)},
+
+    q{assert_tied_scalar($0)},
+    q{assert_tied_scalarref($0)},
+    q{assert_tied_array(%Config)},
+    q{assert_tied_array(@ARGV)},
+    q{assert_tied_arrayref(@ARGV)},
+    q{assert_tied_hash(%Env)},
+    q{assert_tied_hashref(%Config)},
+    q{assert_tied_glob(*STDIN)},
+    q{assert_tied_globref(\*STDIN)},
+
+    q{ assert_untied($PATH) },
+    q{ assert_untied(%Config) },
+    q{ assert_untied(@PATH) },
+    q{ assert_untied(*Tied_FH) },
+
+    q{ assert_untied_referent(\\$PATH) },
+    q{ assert_untied_referent(\\%Config) },
+    q{ assert_untied_referent(\\@PATH) },
+    q{ assert_untied_referent(\\*Tied_FH) },
+    q{ assert_untied_referent(\\qr/foo/) },
+
+    q{ assert_untied_scalar($PATH) },
+    q{ assert_untied_scalarref(\\$PATH) },
+
+    q{ assert_untied_array(@PATH) },
+    q{ assert_untied_arrayref(\\@PATH) },
+
+    q{ assert_untied_hash(%Config) },
+    q{ assert_untied_hashref(\\%Config) },
+
+    q{ assert_untied_glob(*Tied_FH) },
+    q{ assert_untied_globref(\\*Tied_FH) },
+
+    q{assert_object_overloads($0)},
+    q{assert_object_overloads($obj)},
+    q{assert_object_overloads($obj, "+")},
+    q{assert_object_nummifies($obj)},
+    q{assert_object_stringifies($obj)},
+    q{assert_object_boolifies($obj)},
+    q{assert_object_overloads($tied_object, qw[+ ++ - += * **])},
+
+    q{assert_object_nummifies($tied_object)},
+    q{assert_object_boolifies($tied_object)},
 
     q[assert_happy_code { time() < 1 }],
     q[assert_unhappy_code { time() < time()+6 }],  
@@ -828,6 +1216,7 @@ my @bad_posix = (
     q{assert_exited(1 << 0)},
     q{assert_happy_exit(17)},
     q{assert_happy_exit(131)},
+    q{assert_happy_exit(512)},
     q{assert_sad_exit(0)},
 );
 
@@ -839,18 +1228,56 @@ if (eval "POSIX::WIFEXITED(0); 1") {
 
 for my $good (@good_tests) {
     use warnings qw(FATAL all);
-    my $code = eval "sub { $good }"; die if $@;
+    local $@;
+    my $code = eval "sub { $good }"; 
+    is($@, "", "COMPILED: $good") 
+        || die "go fix your good test to compile";
     local $ENV{PATH} = "/bin:/usr/bin" if $good =~ /system/;
-    &lives_ok($code, "lives ok: $good");
+    ok(lives { &$code }, "lives ok: $good")
+       || diag "BOTCHED: $good: $@";
 }
 
 for my $bad (@bad_tests) {
+    local $@;
     # these might not compile, so don't check eval result
     my $code = eval "sub { $bad }";  
     local $ENV{PATH} = "/bin:/usr/bin" if $bad =~ /system/;
-    &dies_ok($code, "dies ok: $bad");
+    ok(dies { &$code }, "dies ok: $bad")
+        || diag "assertion unexpectedly lived: $bad";
 }
 
 done_testing();
+
+{
+    package TieOut;
+
+    use Carp;
+
+    sub never_stringifies { confess "don't stringify me" }
+
+    use overload (
+        q("") => \&never_stringifies,
+        fallback => 1,
+    );
+
+    sub TIEHANDLE {
+        bless(\(my $scalar), $_[0]);
+    }
+
+    sub PRINT {
+        my $self = shift;
+        $$self .= join '', @_;
+    }
+
+    sub WRITE {
+        my ($self, $msg, $length) = @_;
+        $$self .= $msg;
+    }
+
+    sub read {
+        my $self = shift;
+        substr($$self, 0, length($$self), '');
+    }
+}
 
 __DATA__

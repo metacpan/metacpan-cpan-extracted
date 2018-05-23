@@ -4,7 +4,7 @@ DBM::Deep - A pure perl multi-level hash/array DBM that supports transactions
 
 =head1 VERSION
 
-2.0013
+2.0016
 
 =head1 SYNOPSIS
 

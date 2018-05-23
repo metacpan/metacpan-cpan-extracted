@@ -10,8 +10,8 @@ use open qw( :encoding(UTF-8) :std );
 
 BEGIN {
     use Exporter ();
-    use vars qw($VERSION @ISA @EXPORT);
-    $VERSION     = '0.10';
+    our ($VERSION, @ISA, @EXPORT);
+    $VERSION     = '0.11';
     @ISA         = qw(Exporter);
     @EXPORT      = qw( hashify );
 }
@@ -22,8 +22,8 @@ Text::CSV::Hashify - Turn a CSV file into a Perl hash
 
 =head1 VERSION
 
-This document refers to version 0.10 of Text::CSV::Hashify.  This version was
-released Janaury 21 2018.
+This document refers to version 0.11 of Text::CSV::Hashify.  This version was
+released May 22 2018.
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ released Janaury 21 2018.
         format      => 'hoh', # hash of hashes, which is default
         key         => 'id',  # needed except when format is 'aoh'
         max_rows    => 20,    # number of records to read; defaults to all
-        ... # other key-value pairs possible for Text::CSV
+        ... # other key-value pairs as appropriate from Text::CSV
     } );
 
     # all records requested
@@ -141,7 +141,12 @@ the CSV file.  This includes:
 =item * Text::CSV options
 
 Access to any of the options available to Text::CSV, such as use of a
-separator character other than a comma.
+separator character other than a comma.  B<Note:>  Much of the time you will
+not need any of the Text::CSV options.  Text::CSV::Hashify is focused on
+B<reading> CSV files, whereas Text::CSV is focused on both reading and
+B<writing> CSV files.  Some Text::CSV options, such as C<eol>, are unlikely to
+be needed when using Text::CSV::Hashify.  Hence, you should be very selective
+in your use of Text::CSV options.
 
 =item * Limit number of records
 
@@ -225,7 +230,7 @@ Text::CSV::Hashify constructor.
         format      => 'hoh', # hash of hashes, which is default
         key         => 'id',  # needed except when format is 'aoh'
         max_rows    => 20,    # number of records to read; defaults to all
-        ... # other key-value pairs possible for Text::CSV
+        ... # other key-value pairs as appropriate from Text::CSV
     } );
 
 Single hash reference.  Required element is:
@@ -269,7 +274,8 @@ greater than or equal to the number of data records in the CSV file.)
 
 =item * Any option available to Text::CSV
 
-See documentation for either Text::CSV or Text::CSV_XS.
+See documentation for either Text::CSV or Text::CSV_XS, but see discussion of
+"Text::CSV options" above.
 
 =back
 
@@ -299,9 +305,15 @@ sub new {
     }
     $data{format} = delete $args->{format} || 'hoh';
 
+    if (exists $args->{key}) {
+        croak "Value for 'key' must be non-empty string"
+            unless defined $args->{key} and length($args->{key});
+    }
+
     if (! exists $args->{key} and $data{format} ne 'aoh') {
         croak "Argument to 'new()' must have 'key' element unless 'format' element is 'aoh'";
     }
+
     $data{key}  = delete $args->{key};
 
     if (defined($args->{max_rows})) {
@@ -337,6 +349,11 @@ sub new {
             $header_fields_seen{$_}++;
         }
     }
+    if ($data{format} eq 'hoh') {
+        croak "Key '$data{key}' not found in header row"
+            unless $header_fields_seen{$data{key}};
+    }
+
     $data{fields} = $header_ref;
     $csv->column_names(@{$header_ref});
 

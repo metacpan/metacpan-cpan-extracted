@@ -6,7 +6,7 @@ package OpenGbg;
 
 # ABSTRACT: An interface to the Open Data API of Gothenburg
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use OpenGbg::Elk;
 
@@ -124,8 +124,8 @@ OpenGbg - An interface to the Open Data API of Gothenburg
 <p>
 <img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
 <a href="https://travis-ci.org/Csson/p5-OpenGbg"><img src="https://api.travis-ci.org/Csson/p5-OpenGbg.svg?branch=master" alt="Travis status" /></a>
-<a href="http://cpants.cpanauthors.org/release/CSSON/OpenGbg-0.1403"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/OpenGbg/0.1403" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=OpenGbg%200.1403"><img src="http://badgedepot.code301.com/badge/cpantesters/OpenGbg/0.1403" alt="CPAN Testers result" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/OpenGbg-0.1404"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/OpenGbg/0.1404" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=OpenGbg%200.1404"><img src="http://badgedepot.code301.com/badge/cpantesters/OpenGbg/0.1404" alt="CPAN Testers result" /></a>
 <img src="https://img.shields.io/badge/coverage-75.9%-orange.svg" alt="coverage 75.9%" />
 </p>
 
@@ -133,7 +133,7 @@ OpenGbg - An interface to the Open Data API of Gothenburg
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SYNOPSIS
 

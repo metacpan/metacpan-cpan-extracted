@@ -9,18 +9,13 @@ Options:
         diff format.
 
     --brief
-        Show where differences has happend, but don't show what exactly
-        changed.
+        Show where differences occured, but don't show what exactly changed.
 
     --[no]colors
         On/Off colors for diff.
 
     --ctx-text [int]
         Amount of lines for multiline values context. Default is 3.
-
-    --full
-        Don't suppress common items in JSON mode. Deprecated, "--U" should
-        be used instead.
 
     --full-headers
         Print full headers (delta printed by default).
@@ -58,11 +53,10 @@ Options:
         Dump diff as rules for ndproc.
 
     --show
-        Visualize diff (JSON formatted diff file must be provided as
-        argument).
+        Visualize diff (JSON/YAML formatted diff expected for argument).
 
     --verbose|-v [int]
-        Increase verbosity, max level - 4.
+        Increase verbosity, max level is 4.
 
     --version|-V
         Print version and exit.

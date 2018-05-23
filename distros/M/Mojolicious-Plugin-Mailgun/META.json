@@ -3,7 +3,7 @@
    "author" : [
       "Marcus Ramberg <marcus.ramberg@gmail.com>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -35,18 +33,25 @@
             "Mojolicious" : "7.0",
             "perl" : "v5.10.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/marcus/mojolicious-plugin-mailgun/issues"
+         "web" : "https://github.com/marcusramberg/mojolicious-plugin-mailgun/issues"
       },
-      "homepage" : "https://github.com/marcus/mojolicious-plugin-mailgun",
+      "homepage" : "https://github.com/marcusramberg/mojolicious-plugin-mailgun",
       "repository" : {
-         "url" : "https://github.com/marcusramberg/mojolicious-plugin-mailgun.git"
+         "type" : "git",
+         "url" : "https://github.com/marcusramberg/mojolicious-plugin-mailgun.git",
+         "web" : "https://github.com/marcusramberg/mojolicious-plugin-mailgun"
       }
    },
-   "version" : "0.04",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

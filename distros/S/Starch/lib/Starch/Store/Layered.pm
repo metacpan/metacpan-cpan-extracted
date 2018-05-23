@@ -1,5 +1,5 @@
 package Starch::Store::Layered;
-$Starch::Store::Layered::VERSION = '0.06';
+$Starch::Store::Layered::VERSION = '0.07';
 =head1 NAME
 
 Starch::Store::Layered - Layer multiple Starch stores.

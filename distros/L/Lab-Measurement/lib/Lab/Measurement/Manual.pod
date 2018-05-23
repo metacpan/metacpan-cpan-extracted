@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 OVERVIEW
 
@@ -46,17 +46,15 @@ folder structure.
 
 =item * L<Lab::Measurement::Backends>
 
+=item * L<Lab::Measurement::Developer>
+
 =item * L<Lab::Measurement::Developer::Testing>
 
-=back
+=item * L<Lab::Measurement::Examples::Example1_Simple_IV>
 
-=head1 Lab::Moose
+=item * L<Lab::Measurement::Examples::Example2_Gate_IV_scan>
 
-=over
-
-=item * L<Lab::Moose::Tutorial>
-
-=item * L<Lab::Moose::Developer>
+=item * L<Lab::Measurement::Roadmap>
 
 =back
 
@@ -77,6 +75,8 @@ folder structure.
 =item * L<Lab::Moose::DataFile::Read>
 
 =item * L<Lab::Moose::Plot>
+
+=item * L<Lab::Moose::Countdown>
 
 =back
 
@@ -336,11 +336,11 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 
 =back
 
-=head1 Old Lab::Measurement API
+=head1 Legacy Lab::Measurement API
 
 =over
 
-=item * L<Lab::Measurement::OldTutorial>
+=item * L<Lab::Measurement::Legacy::Tutorial>
 
 =back
 
@@ -361,10 +361,6 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =head3 Examples
 
 =over
-
-=item * L<Lab::XPRESS::Examples::Example1_Simple_IV>
-
-=item * L<Lab::XPRESS::Examples::Example2_Gate_IV_scan>
 
 =item * L<Lab::XPRESS::Examples::Example3_2samples_2files>
 
@@ -622,7 +618,8 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017-2018  Simon Reinhardt
+  Copyright 2017       Simon Reinhardt
+            2018       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

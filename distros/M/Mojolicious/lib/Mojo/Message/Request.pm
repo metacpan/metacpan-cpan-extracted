@@ -2,12 +2,17 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode);
+use Mojo::Util qw(b64_encode b64_decode sha1_sum);
 use Mojo::URL;
+
+my ($SEED, $COUNTER) = (rand, int rand 0xffffff);
 
 has env => sub { {} };
 has method => 'GET';
 has [qw(proxy reverse_proxy)];
+has request_id => sub {
+  substr sha1_sum($SEED . $$ . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 8;
+};
 has url => sub { Mojo::URL->new };
 has via_proxy => 1;
 
@@ -314,6 +319,13 @@ Proxy URL for request.
   $req     = $req->reverse_proxy($bool);
 
 Request has been performed through a reverse proxy.
+
+=head2 request_id
+
+  my $id = $req->request_id;
+  $req   = $req->request_id('aee7d5d8');
+
+Request ID, defaults to a reasonably unique value.
 
 =head2 url
 

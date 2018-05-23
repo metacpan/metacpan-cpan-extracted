@@ -254,7 +254,7 @@ sub scan_deps ($self) {
     return;
 }
 
-sub DEMOLISH ( $self, $global ) {
+sub DESTROY ( $self ) {
     if ( $self->{SCAN_DEPS} ) {
         my ( $fh, $index );
 
@@ -346,7 +346,7 @@ sub DEMOLISH ( $self, $global ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 249                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 257                  | Subroutines::ProhibitExcessComplexity - Subroutine "DEMOLISH" with high complexity score (22)                  |
+## |    3 | 257                  | Subroutines::ProhibitExcessComplexity - Subroutine "DESTROY" with high complexity score (22)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 266                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

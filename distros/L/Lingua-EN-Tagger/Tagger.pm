@@ -1,6 +1,6 @@
 package Lingua::EN::Tagger;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use warnings;
 use strict;
@@ -187,6 +187,24 @@ Examine the string provided and return it fully tagged (XML style)
 sub add_tags {
     my ($self, $text) = @_;
 
+    my $tags = $self->add_tags_incrementally($text);
+    $self->_reset;
+    return $tags;
+}
+
+######################################################################
+
+=item add_tags_incrementally TEXT
+
+Examine the string provided and return it fully tagged (XML style) but
+do not reset the internal part-of-speech state between invocations.
+
+=cut
+
+######################################################################
+sub add_tags_incrementally {
+    my ($self, $text) = @_;
+
     return unless $self->_valid_text($text);
 
     my @text = $self->_clean_text($text);
@@ -198,10 +216,8 @@ sub add_tags {
            "<$t>$_</$t>"
         } @text;
     $self->{'current_tag'} = $t;
-    $self->_reset;
     return join ' ', @tags;
 }
-
 
 ######################################################################
 
@@ -922,7 +938,7 @@ __END__
 
 =head1 AUTHORS
 
-    Aaron Coburn <aaron@coburncuadrado.com>
+    Aaron Coburn <acoburn@apache.org>
 
 =head1 CONTRIBUTORS
 
@@ -931,7 +947,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-    Copyright 2003-2010 Aaron Coburn <aaron@coburncuadrado.com>
+    Copyright 2003-2010 Aaron Coburn <acoburn@apache.org>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of version 3 of the GNU General Public License as

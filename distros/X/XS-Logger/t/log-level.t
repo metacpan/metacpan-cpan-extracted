@@ -72,7 +72,7 @@ my $logfile;
 {
     note "Testing object XS::Logger->new->log_something";
 
-    my $logger = XS::Logger->new( { color => 0 } );
+    my $logger = XS::Logger->new( { color => 0, quiet => 1 } );
 
     $logfile = $XS::Logger::PATH_FILE = $tmpdir . '/second-test.log';    # // default_value
 
@@ -115,7 +115,7 @@ my $logfile;
 
 {
     $logfile = $tmpdir . '/custom-path.log';
-    my $logger = XS::Logger->new( { color => 1, logfile => $logfile } );
+    my $logger = XS::Logger->new( { color => 1, logfile => $logfile, quiet => 1 } );
 
     $logger->info("one info no newline");
     like get_logfile_last_line($logfile), qr{one info no newline\n$}, "one info no newline";

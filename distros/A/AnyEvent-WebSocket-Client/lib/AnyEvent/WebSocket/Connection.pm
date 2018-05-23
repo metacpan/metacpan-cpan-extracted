@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 has handle => (
@@ -33,6 +33,11 @@ has subprotocol => (
 
 
 has max_payload_size => (
+  is => 'ro',
+);
+
+
+has max_fragments => (
   is => 'ro',
 );
 
@@ -102,7 +107,10 @@ sub BUILD
   $self->handle->on_error($finish);
   $self->handle->on_eof($finish);
 
-  my $frame = Protocol::WebSocket::Frame->new( maybe max_payload_size => $self->max_payload_size );
+  my $frame = Protocol::WebSocket::Frame->new(
+    maybe max_payload_size => $self->max_payload_size,
+    maybe max_fragments_amount => $self->max_fragments,
+  );
 
   my $read_cb = sub {
     my ($handle) = @_;
@@ -326,7 +334,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.46
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -392,6 +400,11 @@ may be C<undef>.
 =head2 max_payload_size
 
 The maximum payload size for received frames.  Currently defaults to whatever
+L<Protocol::WebSocket> defaults to.
+
+=head2 max_fragments
+
+The maximum number of fragments for received frames.  Currently defaults to whatever
 L<Protocol::WebSocket> defaults to.
 
 =head2 close_code
@@ -529,6 +542,8 @@ José Joaquín Atria (JJATRIA)
 Kivanc Yazan (KYZN)
 
 Yanick Champoux (YANICK)
+
+Fayland Lam (FAYLAND)
 
 =head1 COPYRIGHT AND LICENSE
 

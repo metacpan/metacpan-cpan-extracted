@@ -1,32 +1,74 @@
-# Changes for MyCPAN::Indexer
+Revision history for Perl module MyCPAN::Indexer
 
-1.28 - Fri Nov 20 05:38:26 2009
+1.282 2018-05-16T17:44:07Z
+	* Fix the manifest file
+
+1.281 2018-05-16T17:41:58Z
+	* Change to the Artistic License 2.0.
+	* Various distro updates - no change to the code
+
+1.28_12 - 2013-06-27
+	* Adjust no index (RT #86051)
+
+1.28_11 - 2013-06-26
+	* Update Makefile.PL with no_index to ignore the test modules
+
+1.28_10 - 2010-02-23
+	* Fix the file MD5 comparison stuff
+
+1.28_07 - 2010-02-18
+	* Use the configuration directive merge_dirs to specify extra
+	directories to find distros in
+	* organize_dists now copies instead of renames, to work across
+	mounts and partitions.
+
+1.28_06 - 2010-02-18
+	* Added prefer_bin configuration so you can use /bin/tar over Archive::Tar
+	* Made the -c config dump output a little nicer.
+	* The Reporter final_words stuff is now handled by a new Collator
+	component. It's not a special case anymore.
+	* The error messages from Worker.pm are slightly more friendly.
+
+1.28_05 - 2009-12-09
+	* Set up Log::Log4perl with MYCPAN_LOG4PERL_FILE and MYCPAN_LOGLEVEL
+
+1.28_02 - 2009-11-30
+	* Added a temporary module finding technique - look_in_cwd_and_lib
+	to handle things like DBI and HTML::Parser that have XS and Pure
+	Perl bits. This is just a stopgap until I come up with something
+	better.
+
+1.28_01 - 2009-11-29
+	* Fix the path inspection in Queue.pm. In a fit of
+	laziness I didn't use portable paths.
+
+1.28 - 2009-11-20
 	* With organize_dists, reorganize in backpan_dir instead of the
 	current working directory. The index files show up in there,
 	so the dists need to be there too.
 
-1.27 - Sun Nov  8 02:23:12 2009
+1.27 - 2009-11-08
 	* Set the Log4perl config file with the MYCPAN_LOG4PERL_FILE
 	environment variable
 
-1.26 - Mon Aug 17 02:28:10 CDT 2009
+1.26 - 2009-08-17
 	* More heuristics to guess the primary package in a distro
 	* Some files have private packages that start with _, so those should
 	stay hidden
 	* Refactored the bits to guess the primary package
 
-1.25 - Wed Jul 15 02:27:11 2009
+1.25 - 2009-07-15
 	* Minor updates to docs, fixes to method names, etc.
 	* Sync to changes with MyCPAN::App::DPAN
 
-1.24 - Wed Jun 17 13:33:47 2009
+1.24 - 2009-06-17
 	* I made lots of changes to the internals to make it
 	much easier for the components talk to each other.
 	There isn't any improvement in the actual indexing,
 	but it's easier to write application and specialized
 	components now.
 
-1.21 - Wed May 20 14:24:05 2009
+1.21 - 2009-05-20
 	* Refactored a bit of the examine_dist stuff to move the
 	actual indexing steps into examine_dist_steps
 	* Various small cleanups, especially dealing with _exit
@@ -34,56 +76,54 @@
 	bit tricky when various parts of the program want to
 	install END blocks.
 
-1.18_03 - Fri May  8 15:50:34 2009
+1.18_03 - 2009-05-08
 	* Cleanup the MANIFEST for the files I removed
 
-1.18_01 - Fri May  8 15:43:42 2009
+1.18_01 - 2009-05-08
 	* Removed the vestiges of the DPAN stuff, which is now in
 	its own module, MyCPAN::Indexder::DPAN
 	* Separated the cleanup and exit steps in MyCPAN::App::Indexer.
 	The exit() shouldn't be called from an embedded use.
 
-1.17_09 - Thu Nov 13 06:29:41 2008
-	* Fixed a problem where the final processing in dpan started 
-	before the last child process was finished - this left a 
+1.17_09 - 2008-11-13
+	* Fixed a problem where the final processing in dpan started
+	before the last child process was finished - this left a
 	module out of 02packages
 
-1.17_08 - Tue Nov 11 20:53:03 2008
-	* Fixups to config processing and lots of refactoring. 
+1.17_08 - 2008-11-11
+	* Fixups to config processing and lots of refactoring.
 
-1.17_04 - Fri Oct 31 07:49:42 2008
+1.17_04 - 2008-10-31
 	* Fixes to the chdir and tempdir mess, and many fixes for Windows
 
-1.17_02 - Wed Oct 29 16:48:30 2008
+1.17_02 - 2008-10-29
 	* Fixed the missing UUIDs in the reports. It was just a
-	programming mixup. 
-
-1.17_01
+	programming mixup.
 	* It's easier to write applications now. You can override
 	find_modules_techniques and examine_dist_techniques to
 	return just the part of the process that you want to do.
 	For instance, if you don't want to run build files, don't
 	return an item for 'run_build_files'.
-	
-1.16_02 - Wed Oct 15 17:12:58 2008
+
+1.16_02 - 2008-10-15
 	* Broke out the logging into categories so that you can
 	target the components that you want to inspect.
 
-0.15_01 - Mon Sep  8 23:25:15 2008
+0.15_01 - 2008-09-08
 	* Big changes to where everything is. I've decouple several
-	components into separate, pluggable classes. If you don't 
+	components into separate, pluggable classes. If you don't
 	like the classes that backpan_indexer.pl uses, change them
 	in the config file. Look in MyCPAN::Indexer::Tutorial for
 	an explanation of the different classes. Docs are weak at
 	the moment, but getting better.
-	* This version also uses a Tk interface. That's fine for 
+	* This version also uses a Tk interface. That's fine for
 	right now, but eventually that should be an optional thing.
 
-0.11_01 - Fri Aug 29 10:26:47 2008
+0.11_01 - 2008-08-29
 	* Added parallelism. You can now index things in parallel. In
 	the backpan_indexer.pl config, add a directive for parallel_jobs
 	* Adds more run info for operating system, perl version,
 	and so on
 
-0.10_02 - Fri Aug 15 15:52:32 2008
+0.10_02 - 2008-08-15
 	* Initial release of my BackPAN Indexer

@@ -1,3 +1,10 @@
+Overview of changes in Glib::Object::Introspection 0.045
+
+* Correctly marshal arrays with length arguments in signal callbacks
+* Add some docs about overriding virtual functions
+
+========================================================
+
 Overview of changes in Glib::Object::Introspection 0.044
 ========================================================
 

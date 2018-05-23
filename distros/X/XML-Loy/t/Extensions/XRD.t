@@ -15,7 +15,6 @@ use_ok('XML::Loy::XRD');
 ok(my $xrd = XML::Loy::XRD->new, 'Empty Constructor');
 ok($xrd->subject('http://sojolicio.us/'), 'Add subject');
 ok($xrd->alias('https://sojolicio.us/'), 'Add alias');
-
 ok($xrd->link('lrdd' => { template => '/.well-known/webfinger?resource={uri}'}),
      'Add link');
 ok($xrd->property('describedby' => '/me.foaf'), 'Add property');
@@ -34,6 +33,7 @@ is($xrd->to_pretty_xml, << 'XRD', 'Pretty Print');
             xsi:nil="true" />
 </XRD>
 XRD
+
 
 is($xrd->at('*')->attr('xmlns:xsi'), 'http://www.w3.org/2001/XMLSchema-instance', 'xsi');
 
@@ -102,11 +102,10 @@ ok($xrd->link('lrdd3')->remove, 'Remove link');
 ok($xrd->link('lrdd'), 'Get link');
 ok($xrd->link('lrdd2'), 'Get link');
 ok(!$xrd->link('lrdd3'), 'Get link');
-
 ok($xrd->expires('1264843800'), 'Set expiration');
 is($xrd->expires, '2010-01-30T09:30:00Z', 'Expiration date');
 
-is ($xrd->expires->epoch, '1264843800', 'Expiration date');
+is($xrd->expires->epoch, '1264843800', 'Expiration date');
 
 ok($xrd->expired, 'Document has expired');
 

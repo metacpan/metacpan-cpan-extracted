@@ -1,0 +1,561 @@
+stepback: true
+
+command_type: system
+
+exec_timeout_secs: 600
+
+timeout:
+  -
+    command: shell.exec
+    params:
+      script: 'ls -la'
+
+functions:
+  "buildModule" :
+    command: shell.exec
+    type: test
+    params:
+      script: |
+        ${prepare_shell}
+        $PERL ${repo_directory}/.evergreen/testing/build.pl
+
+  "cleanUp":
+    command: shell.exec
+    params:
+      script: |
+        ${prepare_shell}
+        rm -rf perl5
+        rm -rf ${repo_directory}
+
+  "downloadBuildArtifacts" :
+    command: shell.exec
+    params:
+      script: |
+        ${prepare_shell}
+        cd ${repo_directory}
+        curl https://s3.amazonaws.com/mciuploads/${aws_artifact_prefix}/${repo_directory}/${build_id}/build.tar.gz -o build.tar.gz --fail --show-error --silent --max-time 240
+        tar -zxmf build.tar.gz
+
+  "downloadPerl5Lib" :
+    command: shell.exec
+    params:
+      script: |
+        ${prepare_shell}
+        curl https://s3.amazonaws.com/mciuploads/${aws_toolchain_prefix}/${os}/${perlver}/perl5lib.tar.gz -o perl5lib.tar.gz --fail --show-error --silent --max-time 240
+        tar -zxf perl5lib.tar.gz
+
+  "dynamicVars":
+    - command: shell.exec
+      params:
+        script: |
+            set -o errexit
+            set -o xtrace
+            cat <<EOT > expansion.yml
+            prepare_shell: |
+                export PATH="${addpaths}:$PATH"
+                export PERL="${perlpath}"
+                export REPO_DIR="${repo_directory}"
+                set -o errexit
+                set -o xtrace
+            EOT
+            cat expansion.yml
+    - command: expansions.update
+      params:
+        file: expansion.yml
+
+  "fetchSource" :
+    command: git.get_project
+    params:
+      directory: mongo-perl-bson
+
+  "testModule" :
+    command: shell.exec
+    type: test
+    params:
+      script: |
+        ${prepare_shell}
+        $PERL ${repo_directory}/.evergreen/testing/test.pl
+
+  "uploadBuildArtifacts":
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: ${repo_directory}/build.tar.gz
+        remote_file: ${aws_artifact_prefix}/${repo_directory}/${build_id}/build.tar.gz
+        bucket: mciuploads
+        permissions: public-read
+        content_type: application/x-gzip
+
+  "whichPerl":
+    command: shell.exec
+    type: test
+    params:
+      script: |
+        ${prepare_shell}
+        $PERL -v
+
+pre:
+  -
+    func: dynamicVars
+  -
+    func: cleanUp
+  -
+    func: fetchSource
+  -
+    func: downloadPerl5Lib
+
+post:
+  -
+    func: cleanUp
+
+tasks:
+  -
+    commands:
+      -
+        func: whichPerl
+      -
+        func: buildModule
+      -
+        func: uploadBuildArtifacts
+    name: build
+  -
+    commands:
+      -
+        func: whichPerl
+      -
+        func: downloadBuildArtifacts
+      -
+        func: testModule
+    depends_on:
+      -
+        name: build
+    name: test
+
+buildvariants:
+  -
+    display_name: 'Ubuntu 16.04 Perl 10.1'
+    expansions:
+      addpaths: /opt/perl/10.1/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/10.1/bin/perl
+      perlver: '10.1'
+    name: os_ubuntu1604_perl_10.1
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 10.1t'
+    expansions:
+      addpaths: /opt/perl/10.1t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/10.1t/bin/perl
+      perlver: 10.1t
+    name: os_ubuntu1604_perl_10.1t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 10.1ld'
+    expansions:
+      addpaths: /opt/perl/10.1ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/10.1ld/bin/perl
+      perlver: 10.1ld
+    name: os_ubuntu1604_perl_10.1ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 12.5'
+    expansions:
+      addpaths: /opt/perl/12.5/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/12.5/bin/perl
+      perlver: '12.5'
+    name: os_ubuntu1604_perl_12.5
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 12.5t'
+    expansions:
+      addpaths: /opt/perl/12.5t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/12.5t/bin/perl
+      perlver: 12.5t
+    name: os_ubuntu1604_perl_12.5t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 12.5ld'
+    expansions:
+      addpaths: /opt/perl/12.5ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/12.5ld/bin/perl
+      perlver: 12.5ld
+    name: os_ubuntu1604_perl_12.5ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 14.4'
+    expansions:
+      addpaths: /opt/perl/14.4/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/14.4/bin/perl
+      perlver: '14.4'
+    name: os_ubuntu1604_perl_14.4
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 14.4t'
+    expansions:
+      addpaths: /opt/perl/14.4t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/14.4t/bin/perl
+      perlver: 14.4t
+    name: os_ubuntu1604_perl_14.4t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 14.4ld'
+    expansions:
+      addpaths: /opt/perl/14.4ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/14.4ld/bin/perl
+      perlver: 14.4ld
+    name: os_ubuntu1604_perl_14.4ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 16.3'
+    expansions:
+      addpaths: /opt/perl/16.3/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/16.3/bin/perl
+      perlver: '16.3'
+    name: os_ubuntu1604_perl_16.3
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 16.3t'
+    expansions:
+      addpaths: /opt/perl/16.3t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/16.3t/bin/perl
+      perlver: 16.3t
+    name: os_ubuntu1604_perl_16.3t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 16.3ld'
+    expansions:
+      addpaths: /opt/perl/16.3ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/16.3ld/bin/perl
+      perlver: 16.3ld
+    name: os_ubuntu1604_perl_16.3ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 18.4'
+    expansions:
+      addpaths: /opt/perl/18.4/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/18.4/bin/perl
+      perlver: '18.4'
+    name: os_ubuntu1604_perl_18.4
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 18.4t'
+    expansions:
+      addpaths: /opt/perl/18.4t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/18.4t/bin/perl
+      perlver: 18.4t
+    name: os_ubuntu1604_perl_18.4t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 18.4ld'
+    expansions:
+      addpaths: /opt/perl/18.4ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/18.4ld/bin/perl
+      perlver: 18.4ld
+    name: os_ubuntu1604_perl_18.4ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 20.3'
+    expansions:
+      addpaths: /opt/perl/20.3/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/20.3/bin/perl
+      perlver: '20.3'
+    name: os_ubuntu1604_perl_20.3
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 20.3t'
+    expansions:
+      addpaths: /opt/perl/20.3t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/20.3t/bin/perl
+      perlver: 20.3t
+    name: os_ubuntu1604_perl_20.3t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 20.3ld'
+    expansions:
+      addpaths: /opt/perl/20.3ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/20.3ld/bin/perl
+      perlver: 20.3ld
+    name: os_ubuntu1604_perl_20.3ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 22.2'
+    expansions:
+      addpaths: /opt/perl/22.2/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/22.2/bin/perl
+      perlver: '22.2'
+    name: os_ubuntu1604_perl_22.2
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 22.2t'
+    expansions:
+      addpaths: /opt/perl/22.2t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/22.2t/bin/perl
+      perlver: 22.2t
+    name: os_ubuntu1604_perl_22.2t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 22.2ld'
+    expansions:
+      addpaths: /opt/perl/22.2ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/22.2ld/bin/perl
+      perlver: 22.2ld
+    name: os_ubuntu1604_perl_22.2ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 24.0'
+    expansions:
+      addpaths: /opt/perl/24.0/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/24.0/bin/perl
+      perlver: '24.0'
+    name: os_ubuntu1604_perl_24.0
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 24.0t'
+    expansions:
+      addpaths: /opt/perl/24.0t/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/24.0t/bin/perl
+      perlver: 24.0t
+    name: os_ubuntu1604_perl_24.0t
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Ubuntu 16.04 Perl 24.0ld'
+    expansions:
+      addpaths: /opt/perl/24.0ld/bin
+      os: ubuntu1604
+      perlpath: /opt/perl/24.0ld/bin/perl
+      perlver: 24.0ld
+    name: os_ubuntu1604_perl_24.0ld
+    run_on:
+      - ubuntu1604-test
+      - ubuntu1604-build
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Win64 Perl 14.4'
+    expansions:
+      addpaths: /cygdrive/c/perl/14.4/perl/bin:/cygdrive/c/perl/14.4/c/bin
+      os: windows64
+      perlpath: /cygdrive/c/perl/14.4/perl/bin/perl
+      perlver: '14.4'
+    name: os_windows64_perl_14.4
+    run_on:
+      - windows-64-vs2015-compile
+      - windows-64-vs2015-test
+      - windows-64-vs2015-large
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Win64 Perl 16.3'
+    expansions:
+      addpaths: /cygdrive/c/perl/16.3/perl/bin:/cygdrive/c/perl/16.3/c/bin
+      os: windows64
+      perlpath: /cygdrive/c/perl/16.3/perl/bin/perl
+      perlver: '16.3'
+    name: os_windows64_perl_16.3
+    run_on:
+      - windows-64-vs2015-compile
+      - windows-64-vs2015-test
+      - windows-64-vs2015-large
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Win64 Perl 18.4'
+    expansions:
+      addpaths: /cygdrive/c/perl/18.4/perl/bin:/cygdrive/c/perl/18.4/c/bin
+      os: windows64
+      perlpath: /cygdrive/c/perl/18.4/perl/bin/perl
+      perlver: '18.4'
+    name: os_windows64_perl_18.4
+    run_on:
+      - windows-64-vs2015-compile
+      - windows-64-vs2015-test
+      - windows-64-vs2015-large
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Win64 Perl 20.3'
+    expansions:
+      addpaths: /cygdrive/c/perl/20.3/perl/bin:/cygdrive/c/perl/20.3/c/bin
+      os: windows64
+      perlpath: /cygdrive/c/perl/20.3/perl/bin/perl
+      perlver: '20.3'
+    name: os_windows64_perl_20.3
+    run_on:
+      - windows-64-vs2015-compile
+      - windows-64-vs2015-test
+      - windows-64-vs2015-large
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Win64 Perl 22.2'
+    expansions:
+      addpaths: /cygdrive/c/perl/22.2/perl/bin:/cygdrive/c/perl/22.2/c/bin
+      os: windows64
+      perlpath: /cygdrive/c/perl/22.2/perl/bin/perl
+      perlver: '22.2'
+    name: os_windows64_perl_22.2
+    run_on:
+      - windows-64-vs2015-compile
+      - windows-64-vs2015-test
+      - windows-64-vs2015-large
+    tasks:
+      - build
+      - test
+  -
+    display_name: 'Win64 Perl 24.0'
+    expansions:
+      addpaths: /cygdrive/c/perl/24.0/perl/bin:/cygdrive/c/perl/24.0/c/bin
+      os: windows64
+      perlpath: /cygdrive/c/perl/24.0/perl/bin/perl
+      perlver: '24.0'
+    name: os_windows64_perl_24.0
+    run_on:
+      - windows-64-vs2015-compile
+      - windows-64-vs2015-test
+      - windows-64-vs2015-large
+    tasks:
+      - build
+      - test

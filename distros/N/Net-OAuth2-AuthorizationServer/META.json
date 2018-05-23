@@ -58,6 +58,6 @@
          "url" : "https://github.com/Humanstate/net-oauth2-authorizationserver"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

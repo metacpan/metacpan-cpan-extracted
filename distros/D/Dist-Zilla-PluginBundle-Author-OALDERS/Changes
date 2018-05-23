@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000019  2018-05-15 13:51:44Z
+    - Default ExecDir to /script
+
 0.000018  2018-01-31 16:26:50Z
     - Add fallback_version_provider for RewriteVersion::Transitional
 

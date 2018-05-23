@@ -1,4 +1,4 @@
-use 5.008001;
+use 5.010001;
 use strict;
 use warnings;
 use Test::More 0.96;
@@ -262,7 +262,7 @@ sub _parse_error_tests {
 #
 # This file is part of BSON-XS
 #
-# This software is Copyright (c) 2016 by MongoDB, Inc.
+# This software is Copyright (c) 2018 by MongoDB, Inc.
 #
 # This is free software, licensed under:
 #

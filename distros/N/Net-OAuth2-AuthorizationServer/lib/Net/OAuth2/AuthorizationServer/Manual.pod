@@ -223,7 +223,7 @@ B<response type> will be present.
 The callback should return a list with three elements. The first element is 
 either 1 or 0 to say that the client is allowed or disallowed, the second 
 element should be the error message in the case of the client being 
-disallowed and the third should be the ammended scopes_ref denoting the 
+disallowed and the third should be the amended scopes_ref denoting the 
 allowed scopes after filtering by the client allowed scopes:
 
   my $verify_client_sub = sub {
@@ -350,7 +350,7 @@ be a user identifier:
     }
 
     # scopes are those that were requested in the authorization request, not
-    # those stored in the client (i.e. what the auth request restriced scopes
+    # those stored in the client (i.e. what the auth request restricted scopes
     # to and not everything the client is capable of)
     my $scope = $ac->{scope};
 

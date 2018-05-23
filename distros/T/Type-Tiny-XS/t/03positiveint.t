@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Toby Inkster.
+This software is copyright (c) 2014, 2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -21,12 +21,14 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 24;
 
 use_ok('Type::Tiny::XS');
 
 ok !Type::Tiny::XS::PositiveInt(0)        => 'no 0';
 ok !Type::Tiny::XS::PositiveInt("0")      => 'no "0"';
+ok !Type::Tiny::XS::PositiveInt("00")     => 'no "00"';
+ok !Type::Tiny::XS::PositiveInt("000")    => 'no "000"';
 ok  Type::Tiny::XS::PositiveInt(123)      => 'yes 123';
 ok  Type::Tiny::XS::PositiveInt("123")    => 'yes "123"';
 ok !Type::Tiny::XS::PositiveInt(-123)     => 'no -123';
@@ -40,6 +42,8 @@ ok !Type::Tiny::XS::PositiveInt("1.2")    => 'no "1.2"';
 ok !Type::Tiny::XS::PositiveInt("1.0")    => 'no "1.0"';
 ok !Type::Tiny::XS::PositiveInt("123\n")  => 'no "123\\n"';
 ok !Type::Tiny::XS::PositiveInt("\n123")  => 'no "\\n123"';
+ok !Type::Tiny::XS::PositiveInt("2.3")    => 'no "2.3"';
+ok !Type::Tiny::XS::PositiveInt( 2.3 )    => 'no 2.3';
 
 ok  Type::Tiny::XS::PositiveInt(   2 ** 30  ) => 'large positive int';
 ok  Type::Tiny::XS::PositiveInt(   2 ** 31  ) => 'very large positive int';

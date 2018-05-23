@@ -94,6 +94,15 @@ program.
 
 # URLs implemented by the server
 
+## arbitrary content `$server->content($html)`
+
+    $server->content(<<'HTML');
+        <script>alert("Hello World");</script>
+    HTML
+
+The URL will contain the HTML as supplied. This is convenient for supplying
+Javascript or special URL to your user agent.
+
 ## download `$server->download($name)`
 
 This URL will send a file with a `Content-Disposition` header and indicate

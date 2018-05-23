@@ -5,11 +5,14 @@ use Carp qw/croak carp/;
 use Scalar::Util qw/blessed weaken/;
 use Mojo::Base 'Mojo::DOM';
 
-our $VERSION = '0.45';
+our $VERSION = '0.47';
 
 sub DESTROY;
 
-# Todo:
+# TODO:
+#   - Support Mojolicious version > 7.77
+#     - "ns|*" namespace selector
+#
 #  - Add ->clone
 #    (Maybe via JSON serialisation of ->tree or using Storable or Dumper)
 #
@@ -39,7 +42,6 @@ sub DESTROY;
 #
 # - closest() (jQuery)
 
-
 our @CARP_NOT;
 
 # Import routine, run when calling the class properly
@@ -48,32 +50,31 @@ sub import {
 
   return unless my $flag = shift;
 
-  if ($flag =~ /^-?(?i:base|with)$/) {
+  return unless $flag =~ /^-?(?i:base|with)$/;
 
-    # Allow for manipulating the symbol table
-    no strict 'refs';
-    no warnings 'once';
+  # Allow for manipulating the symbol table
+  no strict 'refs';
+  no warnings 'once';
 
-    # The caller is the calling (inheriting) class
-    my $caller = caller;
-    push @{"${caller}::ISA"}, __PACKAGE__;
+  # The caller is the calling (inheriting) class
+  my $caller = caller;
+  push @{"${caller}::ISA"}, __PACKAGE__;
 
-    if (@_) {
+  if (@_) {
 
-      # Get class variables
-      my %param = @_;
+    # Get class variables
+    my %param = @_;
 
-      # Set class variables
-      foreach (qw/namespace prefix mime/) {
-	if (exists $param{$_}) {
-	  ${ "${caller}::" . uc $_ } = delete $param{$_};
-	};
+    # Set class variables
+    foreach (qw/namespace prefix mime/) {
+      if (exists $param{$_}) {
+        ${ "${caller}::" . uc $_ } = delete $param{$_};
       };
+    };
 
-      # Set class hook
-      if (exists $param{on_init}) {
-	*{"${caller}::ON_INIT"} = delete $param{on_init};
-      };
+    # Set class hook
+    if (exists $param{on_init}) {
+      *{"${caller}::ON_INIT"} = delete $param{on_init};
     };
   };
 
@@ -1442,7 +1443,7 @@ L<Renée Bäcker|https://github.com/reneeb>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

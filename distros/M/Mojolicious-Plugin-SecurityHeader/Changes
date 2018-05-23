@@ -1,0 +1,15 @@
+Revision history for Mojolicious-Plugin-SecurityHeader
+======================================================
+
+0.03 2018-05-22 17:11:00
+
+    * Fix default value for Strict-Transport-Security
+
+0.02 2018-05-22 07:35:00
+
+    * Fix header name in one test
+    * Fix default value for Strict-Transport-Security
+
+0.01 2018-05-21 19:35:00
+
+    * initial release

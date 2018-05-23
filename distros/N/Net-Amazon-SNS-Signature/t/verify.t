@@ -6,7 +6,7 @@ use_ok('Net::Amazon::SNS::Signature');
 my $message = {
     'Message' => 'I am a message',
     'SignatureVersion' => '1',
-    'Signature' => 'JhYKG76+i5nzYJ4YJhrXJWQhaBb8SwDeESscpzdCGZ4SBMrscoTLKjigsJawqN98/GiyJI+rpNXnNIahX/PlE7xZ/l48T4DCC097wtgOjcvqRqPer2pH4sRjM/pWkpyg4gGOiQY6a1kqo71FkzsjLI6hBsr6btn3ryNv0C6LiCna3MojLep/dd4x6wwJpAPLFMkMnDVCGW7UX75mw08Aup1Jum5ACn19be09CEREAh6ZH18/Nachesx7hnTZr8NsBdh5IjcJi6ot3VzeK96Hbm+OIN5iSXfKma4ypTBAL+6O8hnUQXFz1zxVsMAYZs8VX2/GpRkW/7SvtUr0d+HoTA==',
+    'Signature' => 'IdWLjL+8QsLnm4zMEM6JMRcPyPNE4OxLbMxI8JUgjpLML4Ady2CnzLjBHEZgQzLd/SMbE2o0QSyB38qYeYU0OWdqdAsh6lBWggDLfTCBapmnVLavs2aMqCjR3lWVoMT+Q4iYVCLrUvvMtgH+7W5937hIxVi3PWpgJM1xuRb5jH/aQiGSpaKpzsc+6ENMpDQzJ7v94yX94fM6A8R0o8WGI+AH1/8C6dktJjoJ6mnZbaoRMLm4R+3YRdHFJ5OTYF11/aDhoYLmpJoqPTLNY/TPSCAdwVrR/SssjCC81NPINJ0LO8rrkI7OOJxc74kykgWs+YFwEhBSs4LslBDYtMpU+g==',
     'Timestamp' => '2016-03-15T12:08:48.856Z',
     'TopicArn' => 'arn:aws:sns:eu-west-1:12345:test',
     'Subject' => 'This is the subject',

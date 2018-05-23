@@ -33,9 +33,9 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-sub TO_DATA ($self) {
+*TO_JSON = *TO_CBOR = sub ($self) {
     return { settings => $self->{settings} };
-}
+};
 
 # DBH
 sub build_dbh ( $self, $db ) {

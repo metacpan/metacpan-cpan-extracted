@@ -1,0 +1,18 @@
+Revision history for Perl extension MouseX-Types-Enum
+
+1.03 2018-05-19T13:16:02Z
+
+    - update document
+
+1.02 2018-05-19T05:21:16Z
+
+    - require explicitly use Mouse when use with attributes
+
+1.01 2018-05-18T15:45:15Z
+
+    - fix synopsis
+
+1.00 2018-05-18T15:39:48Z
+
+    - original version
+

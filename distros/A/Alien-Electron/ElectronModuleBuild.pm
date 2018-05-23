@@ -10,7 +10,7 @@ use File::Path qw(mkpath);
 use parent 'Module::Build';
 
 
-my $electron_version = '1.4.1';
+my $electron_version = '2.0.1';
 my $electron_archive = 'electron.zip';
 
 
@@ -115,19 +115,19 @@ sub extract_zip_file {
 
 =pod
 
-IO::Uncompress::Unzip works great to process zip files; but, it doesn't include a routine to actually
+L<IO::Uncompress::Unzip> works great to process zip files; but, it doesn't include a routine to actually
 extract an entire zip file.
 
-Other modules like Archive::Zip include their own unzip routines, which aren't as robust as IO::Uncompress::Unzip;
-eg. they don't work on zip64 archive files.
+Other modules like L<Archive::Zip> include their own unzip routines, which aren't as robust as L<IO::Uncompress::Unzip>;
+e.g. they don't work on zip64 archive files.
 
-So, the following is code to actually use IO::Uncompress::Unzip to extract a zip file.
+So, the following code uses L<IO::Uncompress::Unzip> to extract a zip file.
 
 =cut
 
 =head2 unzip
 
-Extract a zip file, using IO::Uncompress::Unzip.
+Extract a zip file, using L<IO::Uncompress::Unzip>.
 
 Arguments: file to extract, destination path
 

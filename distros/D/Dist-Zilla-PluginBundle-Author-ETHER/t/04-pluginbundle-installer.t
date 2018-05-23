@@ -143,7 +143,7 @@ subtest 'installer = MakeMaker, ModuleBuildTiny' => sub {
             'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
         }),
         'installer prereq version is added',
-    ) or diag 'got dist metadata: ', explain $tzil->distmeta;
+    ) or diag 'got distribution metadata: ', explain $tzil->distmeta;
 
     cmp_deeply(
         [
@@ -285,7 +285,7 @@ subtest 'installer = ModuleBuildTiny, StaticInstall.mode = off' => sub {
             'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
         }),
         'installer prereq version is added',
-    ) or diag 'got dist metadata: ', explain $tzil->distmeta;
+    ) or diag 'got distribution metadata: ', explain $tzil->distmeta;
 
     cmp_deeply(
         [

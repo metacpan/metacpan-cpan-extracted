@@ -16,7 +16,7 @@ has schema_templates => (is => 'rw', isa => 'ArrayRef', default => sub{[
 
 =head1 NAME
 
-TaskPipe::Sample_Stubs- the default sample that is used when deploying files/db tables
+TaskPipe::Sample_Stubs - the default sample that is used when deploying files/db tables
 
 =head1 DESCRIPTION
 

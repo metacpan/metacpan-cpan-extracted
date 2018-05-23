@@ -1,0 +1,12 @@
+Revision history for Mojolicious-Plugin-NoIndex
+===============================================
+
+0.02  2018-05-22 15:51:00
+
+  * add more config stuff for NoIndex (to set meta tag for routes with specific param values)
+  * remove existing meta tags for robots
+  * add more tests
+
+0.01  2018-05-22 11:14:00
+
+  * initial release

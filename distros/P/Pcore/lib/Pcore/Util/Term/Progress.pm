@@ -10,7 +10,7 @@ sub get_indicator (%args) {
     my $all_finished = 1;
 
     for my $id ( sort keys $INDICATOR->%* ) {
-        if ( defined $INDICATOR->{$id} && !$INDICATOR->{$id}->is_finished ) {
+        if ( defined $INDICATOR->{$id} && !$INDICATOR->{$id}->{is_finished} ) {
             $all_finished = 0;
 
             last;

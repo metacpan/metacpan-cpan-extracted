@@ -1,6 +1,6 @@
 package Lab::Connection::Log;
 #ABSTRACT: Role adding logging capability to connections
-$Lab::Connection::Log::VERSION = '3.642';
+$Lab::Connection::Log::VERSION = '3.651';
 use 5.010;
 use warnings;
 use strict;
@@ -89,7 +89,7 @@ Lab::Connection::Log - Role adding logging capability to connections
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 COPYRIGHT AND LICENSE
 

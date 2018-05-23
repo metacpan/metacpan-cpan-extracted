@@ -4,7 +4,7 @@ use Pcore -class;
 use Pcore::App::API qw[:CONST];
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
-with qw[Pcore::App::API::Role];
+extends qw[Pcore::App::API::Role];
 
 our $API_MAP = {    #
     app_init => { permissions => undef, desc => 'get ext app init settings' },

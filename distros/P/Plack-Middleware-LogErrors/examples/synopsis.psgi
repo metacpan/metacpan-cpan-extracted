@@ -1,5 +1,5 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 # try this out with:
 #   plackup examples/synopsis.psgi &

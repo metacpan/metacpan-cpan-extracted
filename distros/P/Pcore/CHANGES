@@ -1,3 +1,87 @@
+v0.65.1 2018-05-17T18:20:35Z
+ - docker moved to dnf
+
+v0.65.0 2018-05-17T15:50:41Z
+ - cpanfile
+ - switched to fedora
+
+v0.64.0 2018-05-16T07:18:18Z
+ - Pcore::AE::Handle::Cache2 removed
+ - apply_roles removed
+ - Pcore::Core::Guard removed
+ - Core::OOP added
+ - OOP BUILDARGS - get raw @args
+ - OOP has required added
+ - OOP DEMOLISH handler added
+ - pcore -base pragma added
+ - dumper ported to the PP class system
+ - env ported to the PP class system
+ - exception object ported to the PP class system
+ - l10n ported to the PP class system
+ - core cli ported to the PP class system
+ - core event ported to the PP class system
+ - cli ported to the PP class system
+ - Variable::Magic removed
+ - UID, GID, DAEMONIZE removed
+ - classes ported to the pure perl oo
+ - Handle::Cache2 removed
+ - classes ported to the pure perl oop
+ - DEMOLISH replaced with DESTROY
+ - closed
+ - OOP updated
+ - OOP - do not apply default value in constructor for lazy attr
+ - OOP - lazy, use default values, if exists
+ - OOP role removed
+ - OOP - DEMOLISH removed
+ - OOP - simple attribute redefine
+ - OOP DEMOLISH replaced with DESTROY
+ - OOP - classes ported
+ - Moo util removed
+ - OOP ->does replaced with ->isa
+ - OOP app controllers ported
+ - OOP CLI ported
+ - OOP role added
+ - OOP multiple inheritance is disabled
+ - OOP class merge attrs is improved
+ - OOP install does method
+ - OOP with method
+ - OOP export role methods
+ - OOP methods modifiers
+ - OOP role requires added
+ - OOP role restored for HTTP controllers
+ - OOP role restored for CLI
+ - OOP has parsing improved
+ - OOP serialize default attr
+ - OOP core ported
+ - OOP uri fixed
+ - OOP defer sub correctly
+ - Moo removed from cpanfile
+ - switched to intrnal OOP
+ - clearer attr property removed
+ - writer attr property removed
+ - reader attr property removed
+ - rwp attr property removed
+ - Import::Into removed
+ - use Package::Stash::XS to get list of methods
+ - namespace clean removed
+ - autoload pragma removed
+ - export pragma accept no value
+ - exporter usages fixes
+ - OOP role export only own methods
+ - OOP do not use eval for install methods
+ - typo
+ - use Clone for objects
+ - optimizations
+ - App classes attrs is refactored
+ - OOP init_arg added
+ - OOP attrs updated
+ - OOP fixes
+ - OOP HTTP ported
+ - TO_DATA removed
+ - TODO
+ - term indicator fixed
+ - release tests fixed
+
 v0.63.4 2018-05-06T01:59:41Z
  - old dist.perl fixed
 

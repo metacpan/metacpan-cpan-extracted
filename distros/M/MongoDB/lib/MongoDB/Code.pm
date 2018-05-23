@@ -22,7 +22,7 @@ package MongoDB::Code;
 # ABSTRACT: JavaScript Code
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 #pod =head1 NAME
 #pod
@@ -78,7 +78,7 @@ MongoDB::Code - JavaScript Code
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 NAME
 

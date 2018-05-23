@@ -1,12 +1,12 @@
 
 package Importer::Zim::Unit;
-$Importer::Zim::Unit::VERSION = '0.5.0';
+$Importer::Zim::Unit::VERSION = '0.6.0';
 # ABSTRACT: Import functions with compilation unit scope
 
 use 5.010001;
 
-use Devel::Hook  ();
-use Sub::Replace ();
+use Devel::Hook ();
+use Sub::Replace 0.2.0 ();
 
 use Importer::Zim::Utils 0.8.0 qw(DEBUG );
 
@@ -141,7 +141,7 @@ Importer::Zim::Unit - Import functions with compilation unit scope
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -234,7 +234,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

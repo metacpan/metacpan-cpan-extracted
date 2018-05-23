@@ -11,10 +11,10 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.8.3';
+our $VERSION = '0.8.4';
 
 use Pandoc::Version;
-use Carp 'croak';
+use Pandoc::Error;
 use File::Which;
 use File::Spec::Functions 'catdir';
 use IPC::Run3;
@@ -27,13 +27,13 @@ our $PANDOC_PATH ||= $ENV{PANDOC_PATH} || 'pandoc';
 sub import {
     shift;
 
-    if (@_ and $_[0] =~ /^[v0-9.<>=!, ]+$/) {
+    if ( @_ and $_[0] =~ /^[v0-9.<>=!, ]+$/ ) {
         $PANDOC //= Pandoc->new;
         $PANDOC->require(shift);
     }
     $PANDOC //= Pandoc->new(@_) if @_;
 
-    Pandoc->export_to_level(1, 'pandoc');
+    Pandoc->export_to_level( 1, 'pandoc' );
 }
 
 sub VERSION {
@@ -44,58 +44,64 @@ sub VERSION {
 }
 
 sub new {
-    my $pandoc = bless { }, shift;
+    my $pandoc = bless {}, shift;
 
-    my $bin = (@_ and $_[0] !~ /^-./) ? shift : $PANDOC_PATH;
+    my $bin = ( @_ and $_[0] !~ /^-./ ) ? shift : $PANDOC_PATH;
 
-    my $bin_from_version = pandoc_data_dir("bin","pandoc-$bin");
-    if (!-x $bin && $bin =~ /^\d+(\.\d+)*$/ && -x $bin_from_version) {
+    my $bin_from_version = pandoc_data_dir( "bin", "pandoc-$bin" );
+    if ( !-x $bin && $bin =~ /^\d+(\.\d+)*$/ && -x $bin_from_version ) {
         $pandoc->{bin} = $bin_from_version;
-    } else {
+    }
+    else {
         $pandoc->{bin} = which($bin);
     }
 
     $pandoc->{arguments} = [];
     $pandoc->arguments(@_) if @_;
 
-    my ($in, $out);
+    my ( $in, $out, $err );
 
-    if ($pandoc->{bin}) {
-        run3 [ $pandoc->{bin},'-v'], \$in, \$out, \undef,
-            { return_if_system_error => 1 };
+    if ( $pandoc->{bin} ) {
+        run3 [ $pandoc->{bin}, '-v' ], \$in, \$out, \$err,
+          { return_if_system_error => 1 };
     }
-    croak "pandoc executable not found\n" unless
-        $out and $out =~ /^[^ ]+ (\d+(\.\d+)+)/;
+    unless ( $out and $out =~ /^[^ ]+ (\d+(\.\d+)+)/ ) {
+        Pandoc::Error->throw(
+            message => "pandoc executable not found",
+            out     => $out,
+            err     => $err,
+        );
+    }
 
     $pandoc->{version} = Pandoc::Version->new($1);
     $pandoc->{data_dir} = $1 if $out =~ /^Default user data directory: (.+)$/m;
 
     # before pandoc supported --list-highlight-languages
     if ( $out =~ /^Syntax highlighting is supported/m ) {
-        $pandoc->{highlight_languages} = [
-            map { split /\s*,\s*/, $_ } ($out =~ /^    (.+)$/mg)
-        ];
+        $pandoc->{highlight_languages} =
+          [ map { split /\s*,\s*/, $_ } ( $out =~ /^    (.+)$/mg ) ];
     }
 
-	my %libs;
-	my $LIBRARY_VERSION = qr/\s+(\pL\w*(?:-\pL\w*)*)\s+(\d+(?:\.\d+)*),?/;
-	if ( $out =~ /^Compiled with($LIBRARY_VERSION+)/m ) {
+    my %libs;
+    my $LIBRARY_VERSION = qr/\s+(\pL\w*(?:-\pL\w*)*)\s+(\d+(?:\.\d+)*),?/;
+    if ( $out =~ /^Compiled with($LIBRARY_VERSION+)/m ) {
         %libs = $1 =~ /$LIBRARY_VERSION/g;
         for my $name ( keys %libs ) {
             $libs{$name} = Pandoc::Version->new( $libs{$name} );
         }
-	}
+    }
     $pandoc->{libs} = \%libs;
 
     return $pandoc;
 }
 
-sub pandoc(@) { ## no critic
+sub pandoc(@) {    ## no critic
     $PANDOC //= eval { Pandoc->new } // 0;
 
     if (@_) {
         return $PANDOC ? $PANDOC->run(@_) : -1;
-    } else {
+    }
+    else {
         return $PANDOC;
     }
 }
@@ -103,45 +109,62 @@ sub pandoc(@) { ## no critic
 sub run {
     my $pandoc = shift;
 
-    my $args = 'ARRAY' eq ref $_[0] ? \@{shift @_} : undef; # \@args [ ... ]
-    my $opts = 'HASH' eq ref $_[-1] ? \%{pop @_} : undef;   # [ ... ] \%opts
+    my $args = 'ARRAY' eq ref $_[0] ? \@{ shift @_ } : undef;   # \@args [ ... ]
+    my $opts = 'HASH' eq ref $_[-1] ? \%{ pop @_ }   : undef;   # [ ... ] \%opts
 
-    if ( @_ ) {
-        if ( !$args ) {                                     # @args
-            if ($_[0] =~ /^-/ or $opts or @_ % 2) {
+    if (@_) {
+        if ( !$args ) {                                         # @args
+            if ( $_[0] =~ /^-/ or $opts or @_ % 2 ) {
                 $args = \@_;
-            } else {                                        # %opts
-                $opts = { @_ };
+            }
+            else {                                              # %opts
+                $opts = {@_};
             }
         }
-        elsif ( $args and !$opts and (@_ % 2 == 0) ) {      # \@args [, %opts ]
-            $opts = { @_ };
+        elsif ( $args and !$opts and ( @_ % 2 == 0 ) ) {    # \@args [, %opts ]
+            $opts = {@_};
         }
         else {
             # passed both the args and opts by ref,
             # so other arguments don't make sense;
             # or passed args by ref and an odd-length list
-            croak 'Too many or ambiguous arguments';
+            Pandoc::Error->throw('Too many or ambiguous arguments');
         }
     }
 
     $args //= [];
     $opts //= {};
 
-    for my $io ( qw(in out err) ) {
+    for my $io (qw(in out err)) {
         $opts->{"binmode_std$io"} //= $opts->{binmode} if $opts->{binmode};
         if ( 'SCALAR' eq ref $opts->{$io} ) {
-            next unless utf8::is_utf8(${$opts->{$io}});
+            next unless utf8::is_utf8( ${ $opts->{$io} } );
             $opts->{"binmode_std$io"} //= ':encoding(UTF-8)';
         }
     }
 
-    $opts->{return_if_system_error} //= 1;
-    $args = [ $pandoc->{bin}, @{$pandoc->{arguments}}, @$args ];
+    my $throw = $opts->{throw} || !( $opts->{return_if_system_error} // 1 );
+    $opts->{out} //= \( my $out );
+    $opts->{err} //= \( my $err );
 
-    run3 $args, $opts->{in}, $opts->{out}, $opts->{err}, $opts;
+    $opts->{return_if_system_error} = 1;
+    run3 [ $pandoc->{bin}, @{ $pandoc->{arguments} }, @$args ],
+      $opts->{in}, $opts->{out}, $opts->{err}, $opts;
 
-    return $? == -1 ? -1 : $? >> 8;
+    my $status = $? == -1 ? -1 : $? >> 8;
+
+    if ( $status && $throw ) {
+        Pandoc::Error->throw(
+            system  => $!,
+            out     => ${ $opts->{out} },
+            err     => ${ $opts->{err} },
+            status  => $status,
+            message => ${ $opts->{err} } || 'pandoc execution failed'
+        );
+    }
+    else {
+        $status;
+    }
 }
 
 sub convert {
@@ -150,15 +173,13 @@ sub convert {
     my $to     = shift;
     my $in     = shift;
     my $out    = "";
-    my $err    = "";
 
     my $utf8 = utf8::is_utf8($in);
 
-    my %opts = (in => \$in, out => \$out, err => \$err);
-    my @args = (@_, '-f' => $from, '-t' => $to, '-o' => '-');
-    my $status = $pandoc->run( \@args, \%opts );
-
-    croak($err || "pandoc failed with exit code $status") if $status;
+    $pandoc->run(
+        [ @_, '-f' => $from, '-t' => $to, '-o' => '-' ],
+        { in => \$in, out => \$out, throw => 1 }
+    );
 
     utf8::decode($out) if $utf8;
 
@@ -171,9 +192,10 @@ sub parse {
     my $format = shift;
     my $json   = "";
 
-    if ($format eq 'json') {
+    if ( $format eq 'json' ) {
         $json = shift;
-    } else {
+    }
+    else {
         $pandoc->require('1.12.1');
         $json = $pandoc->convert( $format => 'json', @_ );
     }
@@ -186,12 +208,8 @@ sub file {
     my $pandoc = shift;
     $pandoc->require('1.12.1');
 
-    my ($json, $err);
-    my @args = (@_, '-t' => 'json', '-o' => '-');
-    my $status = $pandoc->run( \@args, out => \$json, err => \$err );
-    croak($err || "pandoc failed with exit code $status") if $status;
-
-    #utf8::decode($out) if $utf8;
+    my @args = ( @_, '-t' => 'json', '-o' => '-' );
+    $pandoc->run( \@args, out => \( my $json ), throw => 1 );
 
     require Pandoc::Elements;
     Pandoc::Elements::pandoc_json($json);
@@ -200,8 +218,13 @@ sub file {
 sub require {
     my $pandoc = shift;
     $pandoc = do { $PANDOC //= Pandoc->new } if $pandoc eq 'Pandoc';
-    unless ($pandoc->version(@_)) {
-        croak "pandoc $_[0] required, only found ".$pandoc->{version}."\n"
+    unless ( $pandoc->version(@_) ) {
+        Pandoc::Error->throw(
+            message => "pandoc $_[0] required, only found "
+              . $pandoc->{version},
+            version => $pandoc->{version},
+            require => $_[0],
+        );
     }
     return $pandoc;
 }
@@ -217,14 +240,15 @@ sub version {
 }
 
 sub data_dir {
-    catdir(shift->{data_dir}, @_);
+    catdir( shift->{data_dir}, @_ );
 }
 
 sub pandoc_data_dir {
-    if ($^O eq 'MSWin32') {
-        catdir($ENV{APPDATA}, 'pandoc', @_);
-    } else {
-        catdir($ENV{HOME}, '.pandoc', @_);
+    if ( $^O eq 'MSWin32' ) {
+        catdir( $ENV{APPDATA}, 'pandoc', @_ );
+    }
+    else {
+        catdir( $ENV{HOME}, '.pandoc', @_ );
     }
 }
 
@@ -241,34 +265,35 @@ sub arguments {
     my $pandoc = shift;
     if (@_) {
         my $args = 'ARRAY' eq ref $_[0] ? shift : \@_;
-        croak "first default argument must be an -option"
-            if @$args and $args->[0] !~ /^-./;
+        Pandoc::Error->throw("first default argument must be an -option")
+          if @$args and $args->[0] !~ /^-./;
         $pandoc->{arguments} = $args;
     }
-    @{$pandoc->{arguments}};
+    @{ $pandoc->{arguments} };
 }
 
 sub _list {
-    my ($pandoc, $which) = @_;
-    if (!$pandoc->{$which}) {
-        if ($pandoc->version('1.18')) {
-            my $list = "";
+    my ( $pandoc, $which ) = @_;
+    if ( !$pandoc->{$which} ) {
+        if ( $pandoc->version('1.18') ) {
+            my $list    = "";
             my $command = $which;
             $command =~ s/_/-/g;
-            $pandoc->run("--list-$command", { out => \$list });
-	        $pandoc->{$which} = [ split /\n/, $list ];
-        } elsif (!defined $pandoc->{help}) {
+            $pandoc->run( "--list-$command", { out => \$list } );
+            $pandoc->{$which} = [ split /\n/, $list ];
+        }
+        elsif ( !defined $pandoc->{help} ) {
             my $help;
-            $pandoc->run('--help', { out => \$help });
+            $pandoc->run( '--help', { out => \$help } );
             for my $inout (qw(Input Output)) {
                 $help =~ /^$inout formats:\s+([a-z_0-9,\+\s*]+)/m or next;
-                $pandoc->{lc($inout).'_formats'} =
-                    [ split /\*?,\s+|\*?\s+/, $1 ];
+                $pandoc->{ lc($inout) . '_formats' } =
+                  [ split /\*?,\s+|\*?\s+/, $1 ];
             }
             $pandoc->{help} = $help;
         }
     }
-    @{$pandoc->{$which} // []};
+    @{ $pandoc->{$which} // [] };
 }
 
 sub input_formats {
@@ -286,24 +311,26 @@ sub highlight_languages {
 sub extensions {
     my $pandoc = shift;
     my $format = shift // '';
-    my $out = "";
+    my $out    = "";
     my %ext;
 
-    if ($pandoc->version < 1.18) {
+    if ( $pandoc->version < 1.18 ) {
         warn "pandoc >= 1.18 required for --list-extensions\n";
-    } else {
+    }
+    else {
         if ($format) {
-            if ($format =~ /^[a-z0-9_]$/ and $pandoc->version >= '2.0.6') {
+            if ( $format =~ /^[a-z0-9_]$/ and $pandoc->version >= '2.0.6' ) {
                 $format = "=$format";
-            } else {
+            }
+            else {
                 warn "ignoring format argument to Pandoc->extensions\n";
                 $format = '';
             }
         }
-        $pandoc->run("--list-extensions$format", { out => \$out });
+        $pandoc->run( "--list-extensions$format", { out => \$out } );
         %ext = map {
-          $_ =~ /^([+-]?)\s*([^-+ ]+)\s*([+-]?)$/;
-          ($2 => ($1 || $3) eq '+' ? 1 : 0);
+            $_ =~ /^([+-]?)\s*([^-+ ]+)\s*([+-]?)$/;
+            ( $2 => ( $1 || $3 ) eq '+' ? 1 : 0 );
         } split /\n/, $out;
     }
 
@@ -382,7 +409,9 @@ __END__
 =head1 DESCRIPTION
 
 This module provides a Perl wrapper for John MacFarlane's
-L<Pandoc|http://pandoc.org> document converter.
+L<Pandoc|http://pandoc.org> document converter. See L<Installing
+pandoc|http://pandoc.org/installing.html> or L<Pandoc::Release> for
+installation of pandoc executables.
 
 The utility function L<pandoc|/pandoc> is exported, unless the module is
 imported with an empty list (C<use Pandoc ();>).
@@ -406,12 +435,10 @@ environment variable C<PANDOC_PATH> (set to the string C<pandoc> by default).
 =head2 pandoc( ... )
 
 If called with parameters, this functions runs the pandoc executable configured
-at the global instance of class Pandoc (C<< pandoc->bin >>). Arguments are
-passed as command line arguments and options control input, output, and error
-stream as described below. Returns C<0> on success.  Otherwise returns the the
-exit code of pandoc executable or C<-1> if execution failed.  Arguments and
-options can be passed as plain array/hash or as (possibly empty) reference in
-the following ways:
+at the global instance of class Pandoc (C<< pandoc->bin >>). Arguments (given
+as array or array reference) are passed as pandoc command line arguments.
+Additional options (given as hash or has reference) can control input, output,
+and error stream:
 
   pandoc @arguments, \%options;     # ok
   pandoc \@arguments, %options;     # ok
@@ -421,7 +448,9 @@ the following ways:
 
   pandoc @arguments, %options;      # not ok!
 
-The following options are recognized:
+Returns C<0> on success. On error returns the exit code of pandoc executable or
+C<-1> if execution failed. If option C<throw> is set, a L<Pandoc::Error> is
+thrown instead. The following options are recognized:
 
 =over
 
@@ -440,9 +469,14 @@ there for details.
 If defined any binmode_stdin/binmode_stdout/binmode_stderr option which
 is undefined will be set to this value.
 
+=item throw
+
+Throw a L<Pandoc::Error> instead returning the exit code on error. Disabled by
+default.
+
 =item return_if_system_error
 
-Set to true by default to return the exit code of pandoc executable.
+Set to negation of option C<throw> by default.
 
 =back
 
@@ -481,7 +515,7 @@ C<pandoc --version> is called for every new instance.
 =head2 run( ... )
 
 Execute the pandoc executable with default arguments and optional additional
-arguments and options. See L<function pandoc|/FUNCTIONS> for usage.
+arguments and options. See L<function pandoc|/pandoc> for usage.
 
 =head2 convert( $from => $to, $input [, @arguments ] )
 

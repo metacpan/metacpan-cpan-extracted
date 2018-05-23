@@ -2,7 +2,9 @@ package Mojolicious::Plugin::PromiseActions;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.01';
+use Scalar::Util 'blessed';
+
+our $VERSION = '0.05';
 
 sub register {
   my ($elf, $app, $config) = @_;
@@ -10,7 +12,7 @@ sub register {
     around_action => sub {
       my ($next, $c) = @_;
       my $res = $next->();
-      if (blessed $res && $res->can('then')) {
+      if (blessed($res) && $res->can('then')) {
         my $tx = $c->render_later;
         $res->then(undef, sub { $c->reply->exception(pop) and undef $tx });
       }

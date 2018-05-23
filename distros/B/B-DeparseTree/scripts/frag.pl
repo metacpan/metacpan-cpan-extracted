@@ -10,8 +10,6 @@ use B::DeparseTree::Fragment;
 use File::Basename qw(dirname basename); use File::Spec;
 use strict; use warnings;
 
-
-
 use constant data_dir => File::Spec->catfile(dirname(__FILE__));
 
 my $short_name = $ARGV[0] || 'bug.pm';
@@ -35,27 +33,5 @@ if ($tree_text eq $orig_text) {
 
 my $show_fragments = 1;
 if ($show_fragments) {
-    # $deparse->coderef2info(\&get_addr_info);
-    my @addrs = sort keys %{$deparse_tree->{optree}}, "\n";
-    use Data::Printer;
-    # for (my $i=9; $i<=15; $i++) {
-    for (my $i=0; $i < $#addrs; $i++) {
-	print $i, '-' x 50, "\n";
-	my $info = get_addr_info($deparse_tree, $addrs[$i]);
-	if ($info) {
-	    printf "0x%0x\n", $addrs[$i];
-	    p $info ;
-	}
-	if ($info->{parent}) {
-	    my $parent = get_parent_addr_info($info);
-	    if ($parent) {
-		p $parent ;
-		my $texts = extract_node_info($info);
-		if ($texts) {
-		    print join("\n", @$texts), "\n";
-		}
-	    }
-	}
-	print $i, '-' x 50, "\n";
-    }
+    B::DeparseTree::Fragment::dump($deparse_tree);
 }

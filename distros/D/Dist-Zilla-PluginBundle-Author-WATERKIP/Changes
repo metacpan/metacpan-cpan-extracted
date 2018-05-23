@@ -1,12 +1,18 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+1.7       2018-05-20 13:50:38Z
+
+    * Disable Test::Perl::Critic from @TestingMania
+
+1.6       2018-05-16 21:40:40Z
+
+    * Add Dockerfile for building and testing the package on a clean box
+    * Add copy_files_after_build logic
+
 1.5       2017-09-24 10:25:08Z
 
     * Allow uploading to Stratopan (requires patch to stratopan plugin
       module).
-
-1.5       2017-09-18 20:19:45Z
-
     * Add Gitlab CI yaml
 
 1.4       2017-09-03 11:40:28Z

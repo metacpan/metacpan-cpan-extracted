@@ -1,16 +1,17 @@
 package Pcore::HTTP;
 
-use Pcore -const,
-  -export => {
-    METHODS => [qw[http_acl http_baseline_control http_bind http_checkin http_checkout http_connect http_copy http_delete http_get http_head http_label http_link http_lock http_merge http_mkactivity http_mkcalendar http_mkcol http_mkredirectref http_mkworkspace http_move http_options http_orderpatch http_patch http_post http_pri http_propfind http_proppatch http_put http_rebind http_report http_search http_trace http_unbind http_uncheckout http_unlink http_unlock http_update http_updateredirectref http_version_control]],
-    TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]],
-  };
+use Pcore -const, -export;
 use Pcore::Util::Scalar qw[is_ref is_blessed_ref is_glob is_coderef is_plain_hashref];
 use Pcore::AE::Handle qw[:TLS_CTX];
 use Pcore::HTTP::Util;
 use Pcore::HTTP::Headers;
 use Pcore::HTTP::Response;
 use Pcore::HTTP::Cookies;
+
+our $EXPORT = {
+    METHODS => [qw[http_acl http_baseline_control http_bind http_checkin http_checkout http_connect http_copy http_delete http_get http_head http_label http_link http_lock http_merge http_mkactivity http_mkcalendar http_mkcol http_mkredirectref http_mkworkspace http_move http_options http_orderpatch http_patch http_post http_pri http_propfind http_proppatch http_put http_rebind http_report http_search http_trace http_unbind http_uncheckout http_unlink http_unlock http_update http_updateredirectref http_version_control]],
+    TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]],
+};
 
 # 594 - errors during proxy handshake.
 # 595 - errors during connection establishment.
@@ -303,11 +304,11 @@ sub _get_on_progress_cb (%args) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 106                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 107                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 170                  | Subroutines::ProhibitExcessComplexity - Subroutine "request" with high complexity score (34)                   |
+## |    3 | 171                  | Subroutines::ProhibitExcessComplexity - Subroutine "request" with high complexity score (34)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 156                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 157                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

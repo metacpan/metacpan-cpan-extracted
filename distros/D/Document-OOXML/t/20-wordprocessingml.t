@@ -216,18 +216,24 @@ EOX
         1,
     );
 
-    $part->style_text(qr/part(?:ial)?/, bold => 1);
-    $part->style_text(qr/This/, italic => 1);
-    $part->style_text(qr/looking/, color => 'ABCDEF');
-    $part->style_text(
+    my $count1 = $part->style_text(qr/part(?:ial)?/, bold => 1);
+    my $count2 = $part->style_text(qr/This/, italic => 1);
+    my $count3 = $part->style_text(qr/looking/, color => 'ABCDEF');
+    my $count4 = $part->style_text(
         qr/contains/,
         underline_style => 'dotDash',
         underline_color => 'ABCDEF',
     );
-    $part->style_text(
+    my $count5 = $part->style_text(
         qr/several/,
         underline_style => 'wave'
     );
+
+    is($count1, 3, 'One bolded');
+    is($count2, 1, 'One italicized');
+    is($count3, 1, 'One given a colour');
+    is($count4, 1, 'One given an underline');
+    is($count5, 1, 'One given a wavy underline');
 
     my @txt = $part->xpc->findnodes('//w:t', $part->xml);
     is(@txt, 14, "Text nodes were split correctly for styling");

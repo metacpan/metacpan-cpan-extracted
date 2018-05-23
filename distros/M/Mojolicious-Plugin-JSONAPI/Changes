@@ -1,4 +1,7 @@
+1.4       2018-05-19 13:23:34+01:00 Europe/London
+
 1.3       2018-05-14 00:05:46+01:00 Europe/London
+- Fixed errors in error helper (type check of ARRAY and hash de-referencing)
 
 1.2       2018-04-14 12:58:02+00:00 UTC
 - Add license

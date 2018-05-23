@@ -1,0 +1,41 @@
+---
+abstract: 'A backend for mocking fake results in the Business::OnlinePayment environment'
+author:
+  - 'Jason Terry <oaxlin@gmail.com>'
+build_requires:
+  Archive::Any::Lite: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::CPANTS::Analyse: '0'
+  Module::Runtime: '0'
+  Test::Deep: '0'
+  Test::Kwalitee: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-Mock
+requires:
+  Business::OnlinePayment: '0'
+  Business::OnlinePayment::HTTPS: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/oaxlin/Business-OnlinePayment-Mock/issues
+  repository: git://github.com/oaxlin/Business-OnlinePayment-Mock.git
+version: '0.006'
+x_contributors:
+  - 'Curtis Jewell <swordsman@curtisjewell.name>'
+  - 'Jason Terry <jterry@bluehost.com>'
+  - 'Kristopher Paulsen <kpaulsen@bluehost.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

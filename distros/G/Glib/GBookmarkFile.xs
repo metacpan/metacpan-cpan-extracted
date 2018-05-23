@@ -198,7 +198,7 @@ g_bookmark_file_to_data (bookmark_file)
 
 =for apidoc __gerror__
 Saves the contents of a bookmark file into a file.  The write operation
-is guaranteed to be atomical by writing the contents of the bookmark file
+is guaranteed to be atomic by writing the contents of the bookmark file
 to a temporary file and then moving the file to the target file.
 =cut
 void

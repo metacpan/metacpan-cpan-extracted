@@ -1,10 +1,11 @@
 
 package Sub::Replace;
-$Sub::Replace::VERSION = '0.1.0';
+$Sub::Replace::VERSION = '0.2.0';
 # ABSTRACT: Replace subroutines in packages with controlled effects
 
 use 5.010001;
-no strict 'refs';
+
+our @EXPORT_OK = qw(sub_replace);
 
 use Carp ();
 use Sub::Delete 1.00002 ();
@@ -29,8 +30,8 @@ sub _sub_replace {
 
         my $fullname = "${stashname}${name}";
 
-        my $old = $old{$fullname} = \&{$fullname};
-        Sub::Delete::delete_sub $fullname if defined $old;
+        $old{$fullname} = exists &$fullname ? \&$fullname : undef;
+        Sub::Delete::delete_sub $fullname;
         *{$fullname} = $sub if defined $sub;
     }
 
@@ -89,6 +90,8 @@ sub _sub_replace {
 #pod
 #pod =head1 FUNCTIONS
 #pod
+#pod L<Sub::Replace> implements the following functions, which are exportable.
+#pod
 #pod =head2 sub_replace
 #pod
 #pod     $old = Sub::Replace::sub_replace($name, $code);
@@ -128,7 +131,7 @@ Sub::Replace - Replace subroutines in packages with controlled effects
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -178,6 +181,8 @@ This module provides a C<sub_replace> function to address that.
 
 =head1 FUNCTIONS
 
+L<Sub::Replace> implements the following functions, which are exportable.
+
 =head2 sub_replace
 
     $old = Sub::Replace::sub_replace($name, $code);
@@ -209,7 +214,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

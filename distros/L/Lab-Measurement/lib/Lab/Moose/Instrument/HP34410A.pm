@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34410A;
-$Lab::Moose::Instrument::HP34410A::VERSION = '3.642';
+$Lab::Moose::Instrument::HP34410A::VERSION = '3.651';
 #ABSTRACT: HP 34410A digital multimeter.
 
 use 5.010;
@@ -63,7 +63,7 @@ Lab::Moose::Instrument::HP34410A - HP 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.642
+version 3.651
 
 =head1 SYNOPSIS
 

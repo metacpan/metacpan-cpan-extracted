@@ -7,7 +7,7 @@ has ext => ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 
 
 has js => ( is => 'ro', isa => Str, required => 1 );
 
-sub TO_JSON ( $self, @ ) {
+sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
     $self->{ext}->{js_gen_cache}->{$id} = $self->to_js;

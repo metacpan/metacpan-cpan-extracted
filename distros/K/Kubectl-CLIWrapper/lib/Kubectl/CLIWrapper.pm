@@ -4,7 +4,7 @@ package Kubectl::CLIWrapper {
   use IPC::Open3;
   use Kubectl::CLIWrapper::Result;
 
-  our $VERSION = '0.01';
+  our $VERSION = '0.02';
 
   has server => (is => 'ro', isa => 'Str');
   has username => (is => 'ro', isa => 'Str');

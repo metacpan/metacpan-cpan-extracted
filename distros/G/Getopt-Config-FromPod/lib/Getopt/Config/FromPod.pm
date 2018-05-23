@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Extract getopt configuration from POD
-our $VERSION = 'v0.0.3'; # VERSION
+our $VERSION = 'v0.0.4'; # VERSION
 
 package Getopt::Config::FromPod::Extractor;
 
@@ -148,7 +148,7 @@ Getopt::Config::FromPod - Extract getopt configuration from POD
 
 =head1 VERSION
 
-version v0.0.3
+version v0.0.4
 
 =head1 SYNOPSIS
 
@@ -344,7 +344,7 @@ Yasutaka ATARASHI <yakex@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yasutaka ATARASHI.
+This software is copyright (c) 2018 by Yasutaka ATARASHI.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

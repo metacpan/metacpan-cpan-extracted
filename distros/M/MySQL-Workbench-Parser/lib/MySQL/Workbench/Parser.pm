@@ -15,7 +15,7 @@ use YAML::Tiny;
 
 use MySQL::Workbench::Parser::Table;
 
-our $VERSION = 0.06;
+our $VERSION = 1.00;
 
 has file   => (
     is       => 'ro',
@@ -129,7 +129,7 @@ MySQL::Workbench::Parser - parse .mwb files created with MySQL Workbench
 
 =head1 VERSION
 
-version 0.06
+version 1
 
 =head1 SYNOPSIS
 
@@ -171,13 +171,21 @@ returns the MySQL name of the datatype
 
     MEDIUMTEXT
 
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * file
+
+=back
+
 =head1 AUTHOR
 
 Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

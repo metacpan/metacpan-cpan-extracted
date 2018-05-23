@@ -20,5 +20,5 @@ no_index:
 requires:
   PDL: '0'
   Test::More: '0'
-version: v1.0.8
+version: v1.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

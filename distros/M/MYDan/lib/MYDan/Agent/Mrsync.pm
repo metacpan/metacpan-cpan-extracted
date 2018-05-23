@@ -102,7 +102,7 @@ sub new
 
 	        %result = MYDan::Agent::Client->new(
 	                $dst
-	            )->run( %agent, query => \%query, queryx => $download );
+	            )->run( %agent, query => \%query, queryx => $download, timeout => $param{timeout} );
 	    }
 	    else
 	    {
@@ -126,7 +126,7 @@ sub new
 
 	        %result = MYDan::Agent::Client->new(
 	                $dst
-	            )->run( %agent, query => \%query );
+	            )->run( %agent, query => \%query, timeout => $param{timeout} );
 
             }
 

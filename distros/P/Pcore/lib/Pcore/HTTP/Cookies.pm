@@ -3,7 +3,7 @@ package Pcore::HTTP::Cookies;
 use Pcore -class;
 use Pcore::Util::Scalar qw[is_ref];
 
-has cookies => ( is => 'ro', isa => HashRef, default => sub { {} } );
+has cookies => sub { {} };    # ( is => 'ro', isa => HashRef );
 
 # https://tools.ietf.org/html/rfc6265#section-4.1.1
 sub parse_cookies ( $self, $url, $set_cookie_header ) {

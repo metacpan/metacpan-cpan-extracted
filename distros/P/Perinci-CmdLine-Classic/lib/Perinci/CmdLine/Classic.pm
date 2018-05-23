@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2017-07-31'; # DATE
-our $VERSION = '1.770'; # VERSION
+our $DATE = '2018-05-20'; # DATE
+our $VERSION = '1.812'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -74,7 +74,7 @@ has riap_client => (
 has action_metadata => (
     is => 'rw',
     default => sub {
-        +{
+        return {
             clear_history => {
             },
             help => {
@@ -113,7 +113,7 @@ sub BUILD {
                          ruby phpserialization)];
 
     if (!$self->{default_prompt_template}) {
-        $self->{default_prompt_template} = N__("Enter %s:") . " ",
+        $self->{default_prompt_template} = N__("Enter %s:") . " ";
     }
 
     if (!$self->{actions}) {
@@ -452,6 +452,9 @@ sub hook_before_run {
     $r->{orig_argv} = [@ARGV];
 }
 
+sub hook_before_parse_argv {
+}
+
 sub hook_after_parse_argv {
 }
 
@@ -514,7 +517,8 @@ sub hook_display_result {
             $utf8 = 0; last;
         }
 
-        my $am = $self->action_metadata->{$r->{action}}
+        my $am;
+        $am = $self->action_metadata->{$r->{action}}
             if $r->{action};
         last if defined($utf8 = $am->{use_utf8});
 
@@ -524,7 +528,7 @@ sub hook_display_result {
 
         $utf8 = $self->use_utf8;
     }
-    binmode($handle, ":utf8") if $utf8;
+    binmode($handle, ":encoding(utf8)") if $utf8;
 
     $self->display_result($r);
 }
@@ -754,7 +758,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.770 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-31.
+This document describes version 1.812 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2018-05-20.
 
 =head1 SYNOPSIS
 
@@ -1015,7 +1019,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

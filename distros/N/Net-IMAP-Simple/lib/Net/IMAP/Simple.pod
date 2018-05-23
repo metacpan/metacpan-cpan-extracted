@@ -235,7 +235,9 @@ optional.  This is also an alias for the status call like C<uidnext()> above.
 
 =item uid
 
-    my $uid = $imap->uid($msgno);
+This function is actually an alias for C<< $imap->uidsearch($msg_range) >>.
+
+    my($uid)= $imap->uid($msgno);
     my @uid = $imap->uid($msg_range); # eg 4:14  or 15,4,14
 
 Return the C<UID> value(s) for a message.  These unique IDs "I<must>" stay the
@@ -249,7 +251,10 @@ also, so it all maches up.
 
     my ($uid4, $uid14, $uid15) = $imap->uid("15,4,14"); # warning
 
-This function is actually an alias for C<< $imap->uidsearch($msg_range) >>.
+One final note, this gives the size of the search match, not the uid like you
+might expect:
+
+    my $uid_search_result_list_size = $imap->uid('3'); # probably always 1
 
 =item seq
 

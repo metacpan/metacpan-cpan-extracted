@@ -2,10 +2,6 @@ package Pcore::Core::Exporter;
 
 use common::header;
 
-our $EXPORT_PRAGMA = {    #
-    export => 1,
-};
-
 our $CACHE;
 
 sub import {
@@ -16,53 +12,6 @@ sub import {
 
     # find caller
     my $caller = $import->{pragma}->{caller} // caller( $import->{pragma}->{level} // 0 );
-
-    # process -export pragma
-    if ( !exists $CACHE->{$caller} ) {
-        $import->{pragma}->{export} = { ALL => $import->{pragma}->{export} } if ref $import->{pragma}->{export} eq 'ARRAY';
-
-        my $tags;    # 0 - processing, 1 - done
-
-        my $process_tag = sub ($tag) {
-
-            # tag is already processed
-            return if $tags->{$tag};
-
-            die qq[Cyclic reference found whils processing export tag "$tag"] if exists $tags->{$tag} && !$tags->{$tag};
-
-            $tags->{$tag} = 0;
-
-            for ( $import->{pragma}->{export}->{$tag}->@* ) {
-                my $sym = $_;
-
-                my $type = $sym =~ s/\A([:&\$@%*])//sm ? $1 : q[];
-
-                if ( $type ne q[:] ) {
-                    $type = q[] if $type eq q[&];
-
-                    $CACHE->{$caller}->{$tag}->{ $type . $sym } = 1;
-
-                    $CACHE->{$caller}->{ALL}->{ $type . $sym } = [ $sym, $type ];
-                }
-                else {
-                    die qq["ALL" export tag can not contain references to the other tags in package "$caller"] if $tag eq 'ALL';
-
-                    __SUB__->($sym);
-
-                    $CACHE->{$caller}->{$tag}->@{ keys $CACHE->{$caller}->{$sym}->%* } = values $CACHE->{$caller}->{$sym}->%*;
-                }
-            }
-
-            # mark tag as processed
-            $tags->{$tag} = 1;
-
-            return;
-        };
-
-        for my $tag ( keys $import->{pragma}->{export}->%* ) {
-            $process_tag->($tag);
-        }
-    }
 
     # export import method
     {
@@ -88,7 +37,7 @@ sub parse_import {
 
     while ( my $arg = shift ) {
         if ( ref $arg ) {
-            die q[Invalid value in the import specification. References are not supported.];
+            die qq[Invalid value in the import specification in the package "$caller". References are not supported.];
         }
         elsif ( substr( $arg, 0, 1 ) eq q[-] ) {
             substr $arg, 0, 1, q[];
@@ -112,24 +61,84 @@ sub parse_import {
 }
 
 sub _import {
-    my $self = shift;
+    my $from = shift;
 
     # parse tags and pragmas
-    my $import = parse_import( $self, @_ );
+    my $import = parse_import( $from, @_ );
 
     # find caller
-    my $caller = $import->{pragma}->{caller} // caller( $import->{pragma}->{level} // 0 );
+    my $to = $import->{pragma}->{caller} // caller( $import->{pragma}->{level} // 0 );
 
-    # protection from re-exporting to myself
-    return if $caller eq $self;
+    # protection from re-export to myself
+    return if $to eq $from;
 
-    _export_tags( $self, $caller, $import->{import} );
+    if ( !exists $CACHE->{$to} ) {
+        my $export = do {
+            no strict qw[refs];
+
+            ${"$from\::EXPORT"};
+        };
+
+        $CACHE->{$from} = defined $export ? _parse_export( $from, $export ) : undef;
+    }
+
+    _export_tags( $from, $to, $import->{import} ) if defined $CACHE->{$from};
 
     return;
 }
 
-sub _export_tags ( $self, $caller, $import ) {
-    my $export = $CACHE->{$self};
+sub _parse_export ( $from, $export ) {
+    my $res;
+
+    $export = { ALL => $export } if ref $export eq 'ARRAY';
+
+    my $tags;    # 0 - processing, 1 - done
+
+    my $process_tag = sub ($tag) {
+
+        # tag is already processed
+        return if $tags->{$tag};
+
+        die qq[Cyclic reference found whils processing export tag "$tag"] if exists $tags->{$tag} && !$tags->{$tag};
+
+        $tags->{$tag} = 0;
+
+        for ( $export->{$tag}->@* ) {
+            my $sym = $_;
+
+            my $type = $sym =~ s/\A([:&\$@%*])//sm ? $1 : q[];
+
+            if ( $type ne q[:] ) {
+                $type = q[] if $type eq q[&];
+
+                $res->{$tag}->{ $type . $sym } = 1;
+
+                $res->{ALL}->{ $type . $sym } = [ $sym, $type ];
+            }
+            else {
+                die qq["ALL" export tag can not contain references to the other tags in package "$from"] if $tag eq 'ALL';
+
+                __SUB__->($sym);
+
+                $res->{$tag}->@{ keys $res->{$sym}->%* } = values $res->{$sym}->%*;
+            }
+        }
+
+        # mark tag as processed
+        $tags->{$tag} = 1;
+
+        return;
+    };
+
+    for my $tag ( keys $export->%* ) {
+        $process_tag->($tag);
+    }
+
+    return $res;
+}
+
+sub _export_tags ( $from, $to, $import ) {
+    my $export = $CACHE->{$from};
 
     if ( !$import ) {
         if ( !exists $export->{DEFAULT} ) {
@@ -140,7 +149,7 @@ sub _export_tags ( $self, $caller, $import ) {
         }
     }
     else {
-        die qq[Package "$self" doesn't export anything] if !$export;
+        die qq[Package "$from" doesn't export anything] if !$export;
     }
 
     # gather symbols to export
@@ -163,7 +172,7 @@ sub _export_tags ( $self, $caller, $import ) {
         }
 
         if ($is_tag) {
-            die qq[Unknown tag ":$sym" to import from "$self"] if !exists $export->{$sym};
+            die qq[Unknown tag ":$sym" to import from "$from"] if !exists $export->{$sym};
 
             if ($no_export) {
                 delete $symbols->@{ keys $export->{$sym}->%* };
@@ -181,7 +190,7 @@ sub _export_tags ( $self, $caller, $import ) {
 
             ( $sym, $alias ) = $sym =~ /(.+)=(.+)/sm if index( $sym, q[=] ) > 0;
 
-            die qq[Unknown symbol "$sym" to import from package "$self"] if !exists $export->{ALL}->{$sym};
+            die qq[Unknown symbol "$sym" to import from package "$from"] if !exists $export->{ALL}->{$sym};
 
             if ($no_export) {
                 delete $symbols->{$sym};
@@ -199,7 +208,7 @@ sub _export_tags ( $self, $caller, $import ) {
         for my $sym ( keys $symbols->%* ) {
 
             # skip symbol if it is not exists in symbol table
-            next if !defined *{"$self\::$export_all->{$sym}->[0]"};
+            next if !defined *{"$from\::$export_all->{$sym}->[0]"};
 
             my $type = $export_all->{$sym}->[1];
 
@@ -210,12 +219,12 @@ sub _export_tags ( $self, $caller, $import ) {
 
                 no warnings qw[once];
 
-                *{"$caller\::$alias"}
-                  = $type eq q[]  ? \&{"$self\::$export_all->{$sym}->[0]"}
-                  : $type eq q[$] ? \${"$self\::$export_all->{$sym}->[0]"}
-                  : $type eq q[@] ? \@{"$self\::$export_all->{$sym}->[0]"}
-                  : $type eq q[%] ? \%{"$self\::$export_all->{$sym}->[0]"}
-                  : $type eq q[*] ? *{"$self\::$export_all->{$sym}->[0]"}
+                *{"$to\::$alias"}
+                  = $type eq q[]  ? \&{"$from\::$export_all->{$sym}->[0]"}
+                  : $type eq q[$] ? \${"$from\::$export_all->{$sym}->[0]"}
+                  : $type eq q[@] ? \@{"$from\::$export_all->{$sym}->[0]"}
+                  : $type eq q[%] ? \%{"$from\::$export_all->{$sym}->[0]"}
+                  : $type eq q[*] ? *{"$from\::$export_all->{$sym}->[0]"}
                   :                 die;
             }
         }
@@ -231,10 +240,10 @@ sub _export_tags ( $self, $caller, $import ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 31, 48, 91, 103,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 143, 166, 184, 219   |                                                                                                                |
+## |    3 | 40, 52, 102, 119,    | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 152, 175, 193, 228   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 131                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
+## |    3 | 140                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

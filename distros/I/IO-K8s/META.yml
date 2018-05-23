@@ -3,11 +3,13 @@ abstract: 'Objects representing things found in the Kubernetes API'
 author:
   - 'Jose Luis Martinez <jlmartinez@capside.com>'
 build_requires:
+  Test::Class::Moose::Load: '0'
+  Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +22,6 @@ requires:
 resources:
   bugtracker: https://github.com/pplu/io-k8s-p5/issues
   repository: https://github.com/pplu/io-k8s-p5
-version: '0.02'
-x_generated_by_perl: v5.20.2
+version: '0.03'
+x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

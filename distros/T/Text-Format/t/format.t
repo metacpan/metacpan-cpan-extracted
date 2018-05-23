@@ -12,7 +12,7 @@ use Test::More tests => 5;
 use Text::Format;
 
 # TEST
-ok(1, "Text::Format loaded.");
+ok( 1, "Text::Format loaded." );
 
 ######################### End of black magic.
 
@@ -23,23 +23,26 @@ ok(1, "Text::Format loaded.");
 {
     my $text = Text::Format->new;
 
-    my @results = $text->paragraphs("hello world","cool");
-    # TEST
-    is (scalar(@results), 2, "2 results.");
+    my @results = $text->paragraphs( "hello world", "cool" );
 
-    @results = $text->format("hello world","cool");
     # TEST
-    is (scalar(@results), 1, "formatting as one line.");
+    is( scalar(@results), 2, "2 results." );
 
-    @results = $text->center("hello world","cool");
+    @results = $text->format( "hello world", "cool" );
+
     # TEST
-    is (scalar(@results), 2, "center()");
+    is( scalar(@results), 1, "formatting as one line." );
+
+    @results = $text->center( "hello world", "cool" );
+
+    # TEST
+    is( scalar(@results), 2, "center()" );
 
     $text->columns(10);
     $text->bodyIndent(8);
 
-    @results = $text->format("hello world","cool");
+    @results = $text->format( "hello world", "cool" );
 
     # TEST
-    is (scalar(@results), 3, "columns and bodyIndent");
+    is( scalar(@results), 3, "columns and bodyIndent" );
 }

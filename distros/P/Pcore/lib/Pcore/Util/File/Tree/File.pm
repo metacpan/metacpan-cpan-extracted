@@ -4,8 +4,8 @@ use Pcore -class;
 
 has tree => ( is => 'ro', isa => InstanceOf ['Pcore::Util::File::Tree'], required => 1, weak_ref => 1 );
 has path => ( is => 'ro', isa => Str, required => 1 );
-has source_path => ( is => 'ro', isa => Str );
-has content => ( is => 'lazy', isa => ScalarRef, predicate => 1 );
+has source_path => ( is => 'ro',   isa => Str );
+has content     => ( is => 'lazy', isa => ScalarRef );
 
 sub _build_content ($self) {
     return P->file->read_bin( $self->source_path );
@@ -36,7 +36,7 @@ sub write_to ( $self, $target_path ) {
 
     P->file->mkpath( $target_path->dirname );
 
-    if ( $self->has_content ) {
+    if ( exists $self->{content} ) {
         P->file->write_bin( $target_path, P->text->encode_utf8( $self->content->$* ) );
     }
     else {

@@ -1,5 +1,8 @@
 Revision history for Perl extension String::Random:
 
+0.30    2018-05-22
+    - Convert to Dist-Zilla.
+
 0.29    2015-12-24
      - Add a dependency on the 'parent' module:
         - This caused some CPAN Testers failures on perl-5.8.x.

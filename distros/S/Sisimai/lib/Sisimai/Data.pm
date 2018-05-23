@@ -3,7 +3,6 @@ use feature ':5.10';
 use strict;
 use warnings;
 use Class::Accessor::Lite;
-use Module::Load '';
 use Sisimai::Address;
 use Sisimai::RFC5322;
 use Sisimai::SMTP::Error;
@@ -248,6 +247,7 @@ sub make {
 
                 # Check space character in each value and get the first element
                 $p->{ $v } = (split(' ', $p->{ $v }, 2))[0] if rindex($p->{ $v }, ' ') > -1;
+                $p->{ $v } =~ s/[.]\z//;    # Remove "." at the end of the value
             }
 
             # Subject: header of the original message
@@ -461,8 +461,9 @@ sub dump {
 
     my $dumpeddata = '';
     my $referclass = 'Sisimai::Data::'.uc($type);
+    my $modulepath = 'Sisimai/Data/'.uc($type).'.pm';
 
-    eval { Module::Load::load $referclass };
+    require $modulepath;
     $dumpeddata = $referclass->dump($self);
 
     return $dumpeddata;
@@ -514,7 +515,7 @@ option to make() method like the following:
 
     my $data = Sisimai::Data->make('data' => $mesg, 'delivered' => 1);
 
-Beggining from v4.19.0, `hook` argument is available to callback user defined
+Beginning from v4.19.0, `hook` argument is available to callback user defined
 method like the following codes:
 
     my $call = sub {

@@ -15,7 +15,7 @@ done_testing;
 #
 # This file is part of File-pushd
 #
-# This software is Copyright (c) 2016 by David A Golden.
+# This software is Copyright (c) 2018 by David A Golden.
 #
 # This is free software, licensed under:
 #

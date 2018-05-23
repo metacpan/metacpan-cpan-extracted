@@ -1,5 +1,5 @@
 package MooseX::SingleArg;
-$MooseX::SingleArg::VERSION = '0.07';
+$MooseX::SingleArg::VERSION = '0.08';
 use Moose ();
 use Moose::Exporter;
 

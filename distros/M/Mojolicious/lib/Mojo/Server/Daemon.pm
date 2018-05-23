@@ -53,7 +53,10 @@ sub start {
   }
 
   # Start listening
-  elsif (!@{$self->acceptors}) { $self->_listen($_) for @{$self->listen} }
+  elsif (!@{$self->acceptors}) {
+    $self->app->server($self);
+    $self->_listen($_) for @{$self->listen};
+  }
 
   return $self;
 }
@@ -437,8 +440,7 @@ Only accept one connection at a time.
 
   verify=0x00
 
-TLS verification mode, defaults to C<0x03> if a certificate authority file has
-been provided, or C<0x00>.
+TLS verification mode.
 
 =item version
 

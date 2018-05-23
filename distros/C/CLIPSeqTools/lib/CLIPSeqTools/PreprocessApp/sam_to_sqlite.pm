@@ -30,7 +30,7 @@ Store alignments from a SAM file into and SQLite database. If SAM tag XC:i exist
 =cut
 
 package CLIPSeqTools::PreprocessApp::sam_to_sqlite;
-$CLIPSeqTools::PreprocessApp::sam_to_sqlite::VERSION = '0.1.7';
+$CLIPSeqTools::PreprocessApp::sam_to_sqlite::VERSION = '0.1.8';
 
 # Make it an app command
 use MooseX::App::Command;

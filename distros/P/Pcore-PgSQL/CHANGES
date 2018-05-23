@@ -1,3 +1,21 @@
+v0.17.1 2018-05-17T16:44:56Z
+ - postgres path fixed
+
+v0.17.0 2018-05-17T16:26:46Z
+ - wrapper updated
+ - Docker base image changed from "softvisio/pcore:v0.64.0" to
+   "softvisio/pcore:v0.65.0"
+ - docker moved to dnf
+
+v0.16.0 2018-05-16T08:27:24Z
+ - OOP DEMOLISH replaced with DESTROY
+ - DEMOLISH replaced with DESTROY
+ - close
+ - export pragma accept no value
+ - OOP attrs updated
+ - Docker base image changed from "softvisio/pcore:v0.63.4" to
+   "softvisio/pcore:v0.64.0"
+
 v0.15.2 2018-05-06T04:09:32Z
  - generate passwd improved
 

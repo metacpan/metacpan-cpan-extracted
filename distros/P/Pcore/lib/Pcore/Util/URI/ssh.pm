@@ -4,8 +4,8 @@ use Pcore -class;
 
 extends qw[Pcore::Util::URI];
 
-has '+is_secure'    => ( default => 1 );
-has '+default_port' => ( default => 22 );
+has is_secure    => 1;
+has default_port => 22;
 
 1;
 __END__

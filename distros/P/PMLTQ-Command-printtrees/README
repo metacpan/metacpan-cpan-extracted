@@ -1,0 +1,47 @@
+SYNOPSIS
+
+      pmltq printtrees 
+
+DESCRIPTION
+
+    Generate svg trees for given treebank. It works on local PML files.
+
+OPTIONS
+
+    --printtrees-btred
+
+      Path to btred script. If not set path in $BTRED variable is used. If
+      neither of previous is set script seeks for btred in $PATH.
+
+    --printtrees-btred_rc
+
+      Path to btred configuration. The most important settings is path to
+      extensions.
+
+    --printtrees-extensions
+
+      Comma separated list with extensions. Defaultly are used the same
+      ones as in TrEd (list in extensions.lst optained with `btred
+      --very-quiet --list-extensions`).
+
+    --printtrees-tree_dir
+
+      Directory where sould be images stored. Default value is 'svg'.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 21:
+
+      '=item' outside of any '=over'
+
+    Around line 27:
+
+      '=item' outside of any '=over'
+
+    Around line 33:
+
+      '=item' outside of any '=over'
+

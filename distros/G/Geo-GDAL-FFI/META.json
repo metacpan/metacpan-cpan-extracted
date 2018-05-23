@@ -34,7 +34,8 @@
          "requires" : {
             "Alien::gdal" : "0",
             "FFI::Platypus" : "0",
-            "PDL" : "0"
+            "PDL" : "0",
+            "PkgConfig" : "0"
          }
       },
       "test" : {
@@ -53,6 +54,6 @@
          "web" : "https://github.com/ajolma/Geo-GDAL-FFI"
       }
    },
-   "version" : 0.04,
+   "version" : 0.0501,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

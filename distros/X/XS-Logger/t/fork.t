@@ -18,13 +18,12 @@ use Test::XSLogger qw{:all};
 
 $| = 1;
 
-my $tmp =
-  File::Temp->newdir( 'DIR' => '/tmp', 'TEMPLATE' => 'xslogger-test.XXXXX' );
+my $tmp = File::Temp->newdir( 'DIR' => '/tmp', 'TEMPLATE' => 'xslogger-test.XXXXX' );
 
 {
     my $logfile = $tmp->dirname() . '/a-file.log';
 
-    my $logger = XS::Logger->new( { path => $logfile } );
+    my $logger = XS::Logger->new( { path => $logfile, quiet => 1 } );
     ok !-e $logfile;
 
     $logger->info("1. before fork...");

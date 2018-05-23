@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2016-04-13 00:00:00 +0000 to present.
+Changes from 2016-05-18 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2018-04-13 04:06:12 +0000
+version 0.006 at 2018-05-18 22:58:33 +0000
+------------------------------------------
+
+  Change: 1cf1f8d0aec69c9c878f19f40ec20cef8ad86ce4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-18 15:57:23 +0000
+
+    Remove 5.22+ requirement Double Diamond 
+
+  Change: f1e5920b7972331b7ba1adb9adb8cd3893ed4f58
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-04-12 23:26:18 +0000
+
+    Release regenerated README 
+
+------------------------------------------
+version 0.005 at 2018-04-13 04:02:26 +0000
 ------------------------------------------
 
   Change: c745a2cd80b7f5172acec642d0a5ca97a80d79f3

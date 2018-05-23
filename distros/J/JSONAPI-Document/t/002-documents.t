@@ -7,14 +7,14 @@ use Test::JSONAPI;
 
 my $t = Test::JSONAPI->new({ api_url => 'http://example.com/api' });
 
-ok( $t->can('resource_document'),          'provides resource_document method' );
-ok( $t->can('resource_documents'),         'provides resource_documents method' );
-ok( $t->can('compound_resource_document'), 'provides compound_resource_document method' );
+ok($t->can('resource_document'),          'provides resource_document method');
+ok($t->can('resource_documents'),         'provides resource_documents method');
+ok($t->can('compound_resource_document'), 'provides compound_resource_document method');
 
 my $post = $t->schema->resultset('Post')->find(1);
 
 is_deeply(
-    $t->resource_document( $post, { with_relationships => 1 } ),
+    $t->resource_document($post, { with_relationships => 1 }),
     {
         id         => 1,
         type       => 'posts',
@@ -26,19 +26,17 @@ is_deeply(
         relationships => {
             author => {
                 links => {
-                    self => 'http://example.com/api/posts/1/relationships/author',
+                    self    => 'http://example.com/api/posts/1/relationships/author',
                     related => 'http://example.com/api/posts/1/author'
                 },
                 data => { type => 'authors', id => 1, }
             },
             comments => {
                 links => {
-                    self => 'http://example.com/api/posts/1/relationships/comments',
+                    self    => 'http://example.com/api/posts/1/relationships/comments',
                     related => 'http://example.com/api/posts/1/comments'
                 },
-               data => [ { type => 'comments', id => 1, }, { type => 'comments', id => 2, }, ]
-            }
-        }
+                data => [{ type => 'comments', id => 1, }, { type => 'comments', id => 2, },] } }
     },
     'created document with relationships'
 );
@@ -57,22 +55,19 @@ is_deeply(
             relationships => {
                 author => {
                     links => {
-                        self => 'http://example.com/api/posts/1/relationships/author',
+                        self    => 'http://example.com/api/posts/1/relationships/author',
                         related => 'http://example.com/api/posts/1/author'
                     },
                     data => { type => 'authors', id => 1, }
                 },
                 comments => {
                     links => {
-                        self => 'http://example.com/api/posts/1/relationships/comments',
+                        self    => 'http://example.com/api/posts/1/relationships/comments',
                         related => 'http://example.com/api/posts/1/comments'
                     },
-                    data => [ { type => 'comments', id => 1, }, { type => 'comments', id => 2, }, ]
-                }
-            }
+                    data => [{ type => 'comments', id => 1, }, { type => 'comments', id => 2, },] } }
         },
-        included => [
-            {
+        included => [{
                 type       => 'authors',
                 id         => 1,
                 attributes => {
@@ -106,10 +101,9 @@ is_deeply(
 );
 
 is_deeply(
-    $t->resource_documents( $t->schema->resultset('Comment') ),
+    $t->resource_documents($t->schema->resultset('Comment')),
     {
-        data => [
-            {
+        data => [{
                 type       => 'comments',
                 id         => 1,
                 attributes => {
@@ -148,15 +142,14 @@ is_deeply(
             relationships => {
                 author => {
                     links => {
-                        self => 'http://example.com/api/posts/1/relationships/author',
+                        self    => 'http://example.com/api/posts/1/relationships/author',
                         related => 'http://example.com/api/posts/1/author'
                     },
                     data => { type => 'authors', id => 1, }
                 },
             }
         },
-        included => [
-            {
+        included => [{
                 type       => 'authors',
                 id         => 1,
                 attributes => {
@@ -172,12 +165,12 @@ is_deeply(
 is_deeply(
     $t->resource_document($t->schema->resultset('EmailTemplate')->find(1)),
     {
-        id => 1,
-        type => 'email-templates',
+        id         => 1,
+        type       => 'email-templates',
         attributes => {
             author_id => 1,
-            name => 'Test Template',
-            body => 'Test template body',
+            name      => 'Test Template',
+            body      => 'Test template body',
         }
     },
     'resource with dashes'

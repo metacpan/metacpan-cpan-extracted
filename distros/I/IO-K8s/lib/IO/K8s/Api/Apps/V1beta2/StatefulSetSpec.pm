@@ -1,5 +1,6 @@
 package IO::K8s::Api::Apps::V1beta2::StatefulSetSpec;
   use Moose;
+  use IO::K8s;
 
   has 'podManagementPolicy' => (is => 'ro', isa => 'Str'  );
   has 'replicas' => (is => 'ro', isa => 'Int'  );
@@ -9,4 +10,6 @@ package IO::K8s::Api::Apps::V1beta2::StatefulSetSpec;
   has 'template' => (is => 'ro', isa => 'IO::K8s::Api::Core::V1::PodTemplateSpec'  );
   has 'updateStrategy' => (is => 'ro', isa => 'IO::K8s::Api::Apps::V1beta2::StatefulSetUpdateStrategy'  );
   has 'volumeClaimTemplates' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Core::V1::PersistentVolumeClaim]'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

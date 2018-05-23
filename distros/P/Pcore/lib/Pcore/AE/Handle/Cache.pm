@@ -3,8 +3,8 @@ package Pcore::AE::Handle::Cache;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has handle     => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
-has connection => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has handle     => ();    # ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has connection => ();    # ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 
 sub clear ($self) {
     $self->{handle}->%* = ();

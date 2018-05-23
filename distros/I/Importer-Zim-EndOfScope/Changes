@@ -1,7 +1,11 @@
 
 Release history for Importer-Zim-EndOfScope
 
-0.4.0     2017-11-09 11:38:45-08:00 America/Los_Angeles
+0.5.0     2018-05-18 08:40:38-07:00 America/Los_Angeles
+
+    - Require Sub::Replace 0.2.0+ - fixes cleanup step
+
+v0.4     2017-11-09 11:38:45-08:00 America/Los_Angeles
 
     - Lift dependency on Importer::Zim::Base to runtime
     - Depend on Importer::Zim::Base 0.12.0+

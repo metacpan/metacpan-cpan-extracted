@@ -1,6 +1,5 @@
-package # hide from PAUSE
-    Starch::Plugin::RenewExpiration::Manager;
-
+package Starch::Plugin::RenewExpiration::Manager;
+$Starch::Plugin::RenewExpiration::Manager::VERSION = '0.07';
 use Types::Common::String -types;
 use Types::Common::Numeric -types;
 

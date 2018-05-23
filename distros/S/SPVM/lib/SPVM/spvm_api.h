@@ -72,7 +72,6 @@ struct SPVM_api {
   float (*call_float_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
   double (*call_double_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
   SPVM_API_OBJECT* (*call_object_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
-  int32_t (*get_type_id)(SPVM_API*, const char*);
   SPVM_API_OBJECT* (*new_object)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_byte_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_short_array)(SPVM_API*, int32_t);
@@ -81,6 +80,7 @@ struct SPVM_api {
   SPVM_API_OBJECT* (*new_float_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_double_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_object_array)(SPVM_API*, int32_t, int32_t);
+  SPVM_API_OBJECT* (*new_multi_array)(SPVM_API*, int32_t, int32_t, int32_t);
   SPVM_API_OBJECT* (*new_string)(SPVM_API* api, int8_t* bytes, int32_t length);
   SPVM_API_OBJECT* (*new_string_chars)(SPVM_API* api, const char* chars);
   int32_t (*get_string_length)(SPVM_API* api, SPVM_API_OBJECT*);
@@ -101,6 +101,6 @@ struct SPVM_api {
   void (*weaken_object_field)(SPVM_API* api, SPVM_API_OBJECT* object, int32_t field_id);
   SPVM_API_OBJECT* (*create_exception_stack_trace)(SPVM_API* api, SPVM_API_OBJECT* excetpion, int32_t sub_id, int32_t current_line);
   int32_t (*compile_jit_sub)(SPVM_API* api, int32_t sub_id);
-  int32_t (*check_cast)(SPVM_API* api, int32_t cast_type_id, SPVM_API_OBJECT* object);
+  int32_t (*check_cast)(SPVM_API* api, int32_t cast_basic_type_id, int32_t cast_type_dimension, SPVM_API_OBJECT* object);
 };
 #endif

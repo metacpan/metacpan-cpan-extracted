@@ -21,21 +21,21 @@ package MongoDB::WriteConcern;
 # ABSTRACT: Encapsulate and validate a write concern
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.8.2';
 
 use Moo;
 use MongoDB::Error;
 use MongoDB::_Types qw(
-    Booleanpm
+    Boolish
 );
 use Types::Standard qw(
-    Bool
     ArrayRef
     Num
     Str
     Maybe
 );
 use Scalar::Util qw/looks_like_number/;
+use boolean;
 use namespace::clean -except => 'meta';
 
 #pod =attr w
@@ -76,14 +76,13 @@ has wtimeout => (
 
 has j => (
     is        => 'ro',
-    isa       => Booleanpm,
-    coerce    => Booleanpm->coercion,
+    isa       => Boolish,
     predicate => '_has_j',
 );
 
 has _is_acknowledged => (
     is      => 'lazy',
-    isa     => Bool,
+    isa     => Boolish,
     reader  => 'is_acknowledged',
     builder => '_build_is_acknowledged',
 );
@@ -106,7 +105,7 @@ sub _build_as_args {
     my $wc = {
         ( $self->_has_w        ? ( w        => $self->w )           : () ),
         ( $self->_has_wtimeout ? ( wtimeout => 0+ $self->wtimeout ) : () ),
-        ( $self->_has_j        ? ( j        => $self->j )           : () ),
+        ( $self->_has_j        ? ( j        => boolean($self->j) )           : () ),
     };
 
     return ( (defined $self->w || defined $self->j) ? [writeConcern => $wc] : [] );
@@ -142,7 +141,7 @@ MongoDB::WriteConcern - Encapsulate and validate a write concern
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

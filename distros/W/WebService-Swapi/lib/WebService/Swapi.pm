@@ -1,16 +1,16 @@
 package WebService::Swapi;
 
-use 5.008001;
-use strict;
-use warnings;
 use utf8;
 
 use Moo;
 use Types::Standard qw(Str);
 
+use strictures 2;
+use namespace::clean;
+
 with 'Role::REST::Client';
 
-our $VERSION = '0.1.6';
+our $VERSION = '0.1.7';
 
 has api_url => (
     isa     => Str,
@@ -75,28 +75,17 @@ sub _request {
 
     # In case the api_url was updated.
     $self->server($self->api_url);
+    $self->type(qq|application/json|);
 
     my @paths;
     push @paths, $object if (defined $object);
     push @paths, $id     if (defined $id);
 
-    my ($url_paths, $url_queries) = (q||, q||);
+    my $endpoint = q||;
+    $endpoint = join q|/|, @paths;
 
-    $url_paths = join q|/|, @paths;
-
-    if (defined $queries) {
-        my @pairs;
-        foreach my $k (keys %{$queries}) {
-            push @pairs, $k . q|=| . $queries->{$k};
-        }
-
-        $url_queries .= ($url_paths eq q||) ? q|?| : q|/?|;
-        $url_queries .= join q|&|, @pairs;
-    }
-
-    my $url = $url_paths . $url_queries;
-
-    my $response = $self->get($url);
+    my $response;
+    $response = $self->get($endpoint, $queries);
 
     return $response->data if ($response->code eq '200');
 
@@ -149,6 +138,7 @@ project.
 
     $ docker build -t webservice-swapi .
     $ docker run -it -v $(pwd):/root webservice-swapi bash
+    # cpanm --installdeps --notest .
 
 =head2 Milla
 

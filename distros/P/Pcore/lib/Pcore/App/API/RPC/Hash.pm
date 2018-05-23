@@ -6,9 +6,9 @@ use Crypt::Argon2;
 # http://argon2-cffi.readthedocs.io/en/stable/parameters.html
 # https://pthree.org/2016/06/29/further-investigation-into-scrypt-and-argon2-password-hashing/
 
-has argon2_time        => ( is => 'ro', isa => PositiveInt, default => 3 );
-has argon2_memory      => ( is => 'ro', isa => Str,         default => '64M' );
-has argon2_parallelism => ( is => 'ro', isa => PositiveInt, default => 1 );
+has argon2_time        => 3;        # ( is => 'ro', isa => PositiveInt, default => 3 );
+has argon2_memory      => '64M';    # ( is => 'ro', isa => Str,         default => '64M' );
+has argon2_parallelism => 1;        # ( is => 'ro', isa => PositiveInt, default => 1 );
 
 sub API_create_hash ( $self, $cb, $str ) {
     my $salt = P->random->bytes(32);

@@ -10,6 +10,7 @@ my $KEYS = 20;     # Number of keys per hash
 use Config;
 use Test::More 0.86;
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 
 plan tests => $RUNS;

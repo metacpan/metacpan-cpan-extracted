@@ -86,7 +86,7 @@ BEGIN {
 use Log::Log4perl;
 
 Log::Log4perl->init( \ '
-    log4perl.category.Reporter          = FATAL, String
+    log4perl.category.Collator        = FATAL, String
 
     log4perl.appender.String          = Log::Log4perl::Appender::String
     log4perl.appender.String.layout   = Log::Log4perl::Layout::PatternLayout
@@ -100,7 +100,7 @@ use File::Spec::Functions;
 sub new { bless {}, $_[0] };
 
 sub get_config  { $_[0] }
-sub backpan_dir { catfile( qw(test-corpus authors id) ) };
+sub dpan_dir { catfile( qw(test-corpus authors id) ) };
 sub i_ignore_errors_at_my_peril { 0 }
 
 sub get_note {
@@ -109,6 +109,7 @@ sub get_note {
 
 sub create_modlist   { 1 };
 sub create_checksums { 1 };
+sub update_whois     { 1 };
 
 package Mock::CPAN::PackageDetails;
 use Carp qw(croak);

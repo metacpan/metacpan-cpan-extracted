@@ -510,12 +510,33 @@ var app = new Vue({
                 }
             ).done(
                 function ( data, status, jqXHR ) {
-                    self.items.unshift( data );
-                    self.cancelAddItem();
-                    self.$set( self.info, 'addItem', true );
-                    setTimeout( function () {
-                        self.$set( self.info, 'addItem', false );
-                    }, 5000 );
+                    $.ajax(
+                        {
+                            url: self.fillUrl( coll.operations['get'].url, { id: data } ),
+                            method: 'GET',
+                            dataType: 'json'
+                        }
+                    ).done(
+                        function ( data, status, jqXHR ) {
+                            self.items.unshift( data );
+                            self.total++;
+                            self.cancelAddItem();
+                            self.$set( self.info, 'addItem', true );
+                            setTimeout( function () {
+                                self.$set( self.info, 'addItem', false );
+                            }, 5000 );
+                        }
+                    ).fail(
+                        function ( jqXHR, textStatus, errorThrown ) {
+                            if ( jqXHR.responseJSON ) {
+                                self.parseErrorResponse( jqXHR.responseJSON );
+                                self.$set( self.error, 'addItem', 'Could not fetch new item' );
+                            }
+                            else {
+                                self.$set( self.error, 'addItem', jqXHR.responseText );
+                            }
+                        }
+                    );
                 }
             ).fail(
                 function ( jqXHR, textStatus, errorThrown ) {
@@ -661,8 +682,8 @@ var app = new Vue({
                 return pages;
             }
             var minPage = currentPage > 4 ? currentPage - 4 : 1,
-                maxPage = minPage + 9 < totalPages ? minPage + 9 : totalPages;
-            for ( var i = minPage; i < maxPage; i++ ) {
+                maxPage = minPage + 8 < totalPages ? minPage + 8 : totalPages;
+            for ( var i = minPage; i <= maxPage; i++ ) {
                 pages.push( i );
             }
             return pages;
@@ -684,6 +705,7 @@ var app = new Vue({
             this.fetching = false;
             this.sortColumn = null;
             this.sortDirection = 1;
+            this.filters = [];
             this.fetchPage();
         },
         currentPage: function () {

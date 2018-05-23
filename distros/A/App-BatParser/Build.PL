@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "App-BatParser",
-  "dist_version" => "0.004",
+  "dist_version" => "0.005",
   "license" => "perl",
   "module_name" => "App::BatParser",
   "recursive_test_files" => 1,
@@ -26,15 +26,16 @@ my %module_build_args = (
     "Moose" => 0,
     "Regexp::Grammars" => "1.000",
     "namespace::autoclean" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "perl" => "5.012",
+    "utf8" => 0
   },
   "test_requires" => {
     "English" => 0,
     "Path::Tiny" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "utf8" => 0
+    "strict" => 0,
+    "warnings" => 0
   }
 );
 
@@ -45,7 +46,8 @@ my %fallback_build_requires = (
   "Path::Tiny" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "utf8" => 0
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

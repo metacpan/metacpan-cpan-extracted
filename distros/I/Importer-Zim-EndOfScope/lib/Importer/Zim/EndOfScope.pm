@@ -1,12 +1,12 @@
 
 package Importer::Zim::EndOfScope;
-$Importer::Zim::EndOfScope::VERSION = '0.4.0';
+$Importer::Zim::EndOfScope::VERSION = '0.5.0';
 # ABSTRACT: Import functions with compilation block scope
 
 use 5.010001;
 
 use B::Hooks::EndOfScope ();
-use Sub::Replace         ();
+use Sub::Replace 0.2.0 ();
 
 use Importer::Zim::Utils 0.8.0 qw(DEBUG );
 
@@ -138,7 +138,7 @@ Importer::Zim::EndOfScope - Import functions with compilation block scope
 
 =head1 VERSION
 
-version 0.4.0
+version 0.5.0
 
 =head1 SYNOPSIS
 
@@ -228,7 +228,7 @@ Adriano Ferreira <ferreira@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

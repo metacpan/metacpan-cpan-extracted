@@ -6,7 +6,7 @@ use JSON;
 use Search::Tools::XML;
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 
 sub new {
     my $class       = shift;
@@ -289,7 +289,7 @@ L<http://search.cpan.org/dist/Dezi/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012 Peter Karman.
+Copyright 2012-2018 Peter Karman.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

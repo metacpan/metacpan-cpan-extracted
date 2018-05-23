@@ -1,4 +1,4 @@
-package Pcore v0.63.4;
+package Pcore v0.65.1;
 
 use v5.26.0;
 use common::header;
@@ -8,13 +8,12 @@ use Pcore::Core::Const qw[:CORE];
 # define %EXPORT_PRAGMA for exporter
 our $EXPORT_PRAGMA = {
     ansi     => 0,    # export ANSI color variables
-    autoload => 0,    # export AUTOLOAD
     class    => 0,    # package is a Moo class
     config   => 0,    # mark package as perl config, used automatically during .perl config evaluation, do not use directly!!!
     const    => 0,    # export "const" keyword
     dist     => 0,    # mark package aas Pcore dist main module
     embedded => 0,    # run in embedded mode
-    export   => 1,    # install standart import method
+    export   => 0,    # install standart import method
     inline   => 0,    # package use Inline
     l10n     => 1,    # register package L10N domain
     res      => 0,    # export Pcore::Util::Result qw[res]
@@ -76,12 +75,13 @@ sub import {
         # store -embedded pragma
         $EMBEDDED = 1 if $import->{pragma}->{embedded};
 
-        require Import::Into;
         require B::Hooks::AtRuntime;
         require B::Hooks::EndOfScope::XS;
         require EV;
         require AnyEvent;
         require Coro;
+        require Pcore::Core::OOP::Class;
+        require Pcore::Core::OOP::Role;
 
         # install run-time hook to caller package
         B::Hooks::AtRuntime::at_runtime( \&Pcore::_CORE_RUN );
@@ -152,7 +152,7 @@ sub import {
         Pcore::Core::Dump->import( -caller => $caller );
 
         # process -export pragma
-        Pcore::Core::Exporter->import( -caller => $caller, -export => $import->{pragma}->{export} ) if $import->{pragma}->{export};
+        Pcore::Core::Exporter->import( -caller => $caller ) if $import->{pragma}->{export};
 
         # process -inline pragma
         if ( $import->{pragma}->{inline} ) {
@@ -163,7 +163,11 @@ sub import {
         $ENV->register_dist($caller) if $import->{pragma}->{dist};
 
         # process -const pragma
-        Const::Fast->import::into( $caller, 'const' ) if $import->{pragma}->{const};
+        if ( $import->{pragma}->{const} ) {
+            no strict qw[refs];
+
+            *{"$caller\::const"} = \&Const::Fast::const;
+        }
 
         # process -ansi pragma
         if ( $import->{pragma}->{ansi} ) {
@@ -187,114 +191,20 @@ sub import {
             Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY] );
         }
 
-        # re-export Moo
+        # re-export OOP
         if ( $import->{pragma}->{class} || $import->{pragma}->{role} ) {
-
-            # install universal serializer methods
-            B::Hooks::EndOfScope::XS::on_scope_end( sub {
-                _namespace_clean($caller);
-
-                no strict qw[refs];
-
-                if ( my $ref = $caller->can('TO_DATA') ) {
-                    *{"$caller\::TO_JSON"} = $ref unless $caller->can('TO_JSON');
-
-                    *{"$caller\::TO_CBOR"} = $ref unless $caller->can('TO_CBOR');
-                }
-
-                return;
-            } );
-
             $import->{pragma}->{types} = 1;
 
             if ( $import->{pragma}->{class} ) {
-                _import_moo( $caller, 0 );
+                Pcore::Core::OOP::Class->import($caller);
             }
-            elsif ( $import->{pragma}->{role} ) {
-                _import_moo( $caller, 1 );
+            else {
+                Pcore::Core::OOP::Role->import($caller);
             }
-
-            # reconfigure warnings, after Moo exported
-            common::header->import;
-
-            # apply default roles
-            # _apply_roles( $caller, qw[Pcore::Core::Autoload::Role] );
         }
 
         # export types
         _import_types($caller) if $import->{pragma}->{types};
-
-        # process -autoload pragma, should be after the -role to support AUTOLOAD in Moo roles
-        # NOTE !!!WARNING!!! AUTOLOAD should be exported after Moo::Role, so Moo::Role can re-export this method
-        if ( $import->{pragma}->{autoload} ) {
-            state $init = !!require Pcore::Core::Autoload;
-
-            Pcore::Core::Autoload->import( -caller => $caller );
-        }
-    }
-
-    return;
-}
-
-sub _namespace_clean ($class) {
-    state $EXCEPT = do {
-        require Sub::Util;
-        require Package::Stash;
-
-        {   import   => 1,
-            AUTOLOAD => 1,
-        };
-    };
-
-    my $stash = Package::Stash->new($class);
-
-    for my $subname ( $stash->list_all_symbols('CODE') ) {
-        my $fullname = Sub::Util::subname( $stash->get_symbol("&$subname") );
-
-        if ( "$class\::$subname" ne $fullname && !exists $EXCEPT->{$subname} && substr( $subname, 0, 1 ) ne q[(] ) {
-            my @symbols = map {
-                my $name = $_ . $subname;
-
-                my $def = $stash->get_symbol($name);
-
-                defined($def) ? [ $name, $def ] : ()
-            } qw[$ @ %], q[];
-
-            $stash->remove_glob($subname);
-
-            $stash->add_symbol( $_->@* ) for @symbols;
-        }
-    }
-
-    return;
-}
-
-sub _import_moo ( $caller, $role ) {
-    if ($role) {
-        Moo::Role->import::into($caller);
-    }
-    else {
-        Moo->import::into($caller);
-
-        MooX::TypeTiny->import::into($caller);
-    }
-
-    # install "has" hook
-    {
-        no strict qw[refs];
-
-        my $has = *{"$caller\::has"}{CODE};
-
-        no warnings qw[redefine];
-
-        *{"$caller\::has"} = sub {
-            my ( $name_proto, %spec ) = @_;
-
-            # auto add builder if lazy and builder or default is not specified
-            $spec{builder} = 1 if $spec{lazy} && !exists $spec{default} && !exists $spec{builder};
-
-            $has->( $name_proto, %spec );
-        };
     }
 
     return;
@@ -323,19 +233,6 @@ sub _import_types ($caller) {
     Types::Common::Numeric->import( { into => $caller }, ':types' );
 
     Pcore::Core::Types->import( { into => $caller }, ':types' );
-
-    return;
-}
-
-sub _apply_roles ( $caller, @roles ) {
-    Moo::Role->apply_roles_to_package( $caller, @roles );
-
-    if ( Moo::Role->is_role($caller) ) {
-        Moo::Role->_maybe_reset_handlemoose($caller);    ## no critic qw[Subroutines::ProtectPrivateSubs]
-    }
-    else {
-        Moo->_maybe_reset_handlemoose($caller);          ## no critic qw[Subroutines::ProtectPrivateSubs]
-    }
 
     return;
 }
@@ -538,31 +435,6 @@ PERL
     goto &{$util};
 }
 
-sub init_demolish ( $self, $class ) {
-    state $init = do {
-        require Method::Generate::DemolishAll;
-
-        # avoid to call Method::Generate::DemolishAll->generate_method again from Moo ->new method
-        my $generate_method = \&Method::Generate::DemolishAll::generate_method;
-
-        no warnings qw[redefine];
-
-        *Method::Generate::DemolishAll::generate_method = sub {
-            my ( $self, $into ) = @_;
-
-            return if *{ Moo::_Utils::_getglob("$into\::DEMOLISHALL") }{CODE};
-
-            return $generate_method->(@_);
-        };
-    };
-
-    # install DEMOLISH to make it works, when object is instantiated with direct "bless" call
-    # https://rt.cpan.org/Ticket/Display.html?id=116590
-    Method::Generate::DemolishAll->new->generate_method($class) if $class->can('DEMOLISH') && $class->isa('Moo::Object');
-
-    return;
-}
-
 # EVENT
 sub _init_ev {
     state $broker = do {
@@ -643,25 +515,15 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 65                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (23)                    |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 87                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 255                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 259, 288, 291, 295,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 326, 329, 334, 337,  |                                                                                                                |
+## |      | 362, 388, 499        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 330                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 447                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |    3 | 344                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 362, 391, 394, 398,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 429, 432, 437, 440,  |                                                                                                                |
-## |      | 465, 491, 627        |                                                                                                                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 553                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 265                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 366                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 263                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -2,7 +2,7 @@ package Math::Business::BlackScholes::Binaries::Greeks::Delta;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';    ## VERSION
+our $VERSION = '0.06';    ## VERSION
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ See L<Math::Business::BlackScholes::Binaries::Greeks>
 use List::Util qw(max);
 use Math::CDF qw(pnorm);
 use Math::Trig;
-use Math::Business::BlackScholes::Binaries;
+use Math::Business::BlackScholesMerton::Binaries;
 use Math::Business::BlackScholes::Binaries::Greeks::Math qw( dgauss );
 
 sub vanilla_call {
@@ -99,7 +99,7 @@ sub onetouch {
     my $theta_ = ($mu / $vol) - (0.5 * $vol);
 
     # Floor v_ squared near zero in case negative interest rates push it negative.
-    my $v_ = sqrt(max($Math::Business::BlackScholes::Binaries::SMALL_VALUE_MU, ($theta_ * $theta_) + (2 * (1 - $w) * $r_q)));
+    my $v_ = sqrt(max($Math::Business::BlackScholesMerton::Binaries::SMALL_VALUE_MU, ($theta_ * $theta_) + (2 * (1 - $w) * $r_q)));
 
     my $e = (log($S / $U) - ($vol * $v_ * $t)) / ($vol * $sqrt_t);
 
@@ -155,15 +155,15 @@ sub x_common_function_pelsser_1997 {
 
     my $mu_new = $mu - (0.5 * $vol * $vol);
     my $mu_dash =
-        sqrt(max($Math::Business::BlackScholes::Binaries::SMALL_VALUE_MU, ($mu_new * $mu_new) + (2 * $vol * $vol * $r_q * (1 - $w))));
+        sqrt(max($Math::Business::BlackScholesMerton::Binaries::SMALL_VALUE_MU, ($mu_new * $mu_new) + (2 * $vol * $vol * $r_q * (1 - $w))));
 
     my $series_part = 0;
     my $hyp_part    = 0;
 
     my $stability_constant =
-        Math::Business::BlackScholes::Binaries::get_stability_constant_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, $eta, 2);
+        Math::Business::BlackScholesMerton::Binaries::get_stability_constant_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, $eta, 2);
 
-    my $iterations_required = Math::Business::BlackScholes::Binaries::get_min_iterations_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w);
+    my $iterations_required = Math::Business::BlackScholesMerton::Binaries::get_min_iterations_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w);
 
     for (my $k = 1; $k < $iterations_required; $k++) {
         my $lambda_k_dash = (0.5 * (($mu_dash * $mu_dash) / ($vol * $vol) + ($k * $k * $pi * $pi * $vol * $vol) / ($h * $h)));
@@ -183,9 +183,9 @@ sub x_common_function_pelsser_1997 {
     }
 
     # Need to take care when $mu goes to zero
-    if (abs($mu_new) < $Math::Business::BlackScholes::Binaries::SMALL_VALUE_MU) {
+    if (abs($mu_new) < $Math::Business::BlackScholesMerton::Binaries::SMALL_VALUE_MU) {
         my $sign = ($mu_new >= 0) ? 1 : -1;
-        $mu_new = $sign * $Math::Business::BlackScholes::Binaries::SMALL_VALUE_MU;
+        $mu_new = $sign * $Math::Business::BlackScholesMerton::Binaries::SMALL_VALUE_MU;
         $mu_dash = sqrt(($mu_new * $mu_new) + (2 * $vol * $vol * $r_q * (1 - $w)));
     }
 
@@ -204,7 +204,8 @@ sub ot_up_ko_down_pelsser_1997 {
     my $x      = log($S / $D);
 
     my $dVu_dx =
-        -(($mu_new / ($vol * $vol)) * Math::Business::BlackScholes::Binaries::common_function_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, 1));
+        -(($mu_new / ($vol * $vol)) *
+            Math::Business::BlackScholesMerton::Binaries::common_function_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, 1));
 
     $dVu_dx += x_common_function_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, 1);
     $dVu_dx *= exp($mu_new * ($h - $x) / ($vol * $vol));
@@ -220,7 +221,8 @@ sub ot_down_ko_up_pelsser_1997 {
     my $x = log($S / $D);
 
     my $dVl_dx =
-        -(($mu_new / ($vol * $vol)) * Math::Business::BlackScholes::Binaries::common_function_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, 0));
+        -(($mu_new / ($vol * $vol)) *
+            Math::Business::BlackScholesMerton::Binaries::common_function_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, 0));
 
     $dVl_dx -= x_common_function_pelsser_1997($S, $U, $D, $t, $r_q, $mu, $vol, $w, 0);
     $dVl_dx *= exp(-$mu_new * $x / ($vol * $vol));

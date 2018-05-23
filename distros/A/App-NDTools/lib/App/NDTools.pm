@@ -17,11 +17,11 @@ App::NDTools - command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.5.5
+Version 0.5.6
 
 =cut
 
-our $VERSION = "0.5.5";
+our $VERSION = "0.5.6";
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,7 @@ Diff, patch, process and query nested structures with ease.
 
 =item B<L<nddiff>>
 
-Human friendly (colored, brief) and machine readable (JSON) diff.
+Human friendly and machine readable diffs.
 
 =item B<L<ndpatch>>
 
@@ -55,7 +55,7 @@ From CPAN:
 
     cpanm App::NDTools
 
-Build and install deb package:
+Build deb package:
 
     git clone https://github.com/mr-mixas/NDTools.git
     cd NDTools
@@ -69,11 +69,9 @@ Use without installation:
 
 =head1 LIMITATIONS
 
-L<YAML::XS> should be additionally installed for YAML support.
-
-L<YAML::XS> 0.67 or later required for correct booleans dump support
-(L<JSON::PP> required as well), C<1> for true and C<0> for false used
-in earlear versions.
+L<YAML::XS> should be additionally installed for YAML support. L<YAML::XS>
+C<0.67> or later and L<JSON::PP> required for correct booleans dump, C<1> for
+true and C<0> for false used in earlear L<YAML::XS> versions.
 
 =head1 AUTHOR
 
@@ -81,7 +79,7 @@ Michael Samoglyadov, C<< <mixas at cpan.org> >>
 
 =head1 BUGS
 
-Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
+Sure, report them using L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
@@ -94,15 +92,14 @@ L<Struct::Diff>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 
 Copyright 2016-2018 Michael Samoglyadov
 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later
+ version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see L<http://www.gnu.org/licenses/>.

@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use lib 't/lib';
+use lib 't/pvtlib';
 use CleanEnv;
 
 if ( eval("use Test::Exception; 1") ) {

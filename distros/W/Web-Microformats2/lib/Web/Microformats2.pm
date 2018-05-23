@@ -3,7 +3,7 @@ package Web::Microformats2;
 use Web::Microformats2::Parser;
 use Web::Microformats2::Document;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 1;
 
@@ -76,9 +76,9 @@ of properties, and possibly a parent item and a list of child items.
 =head1 STATUS
 
 These modules are B<alpha>. Their developer is still figuring out how
-they want to be used, and their interface may change dramatically. It's
-not ready for CPAN just yet. This software is currently being
-"dogfooded" on an experimental branch of the author's own essay blog.
+they want to be used, and their interface may change dramatically. This
+software is currently being "dogfooded" on an experimental branch of the
+author's own essay blog.
 
 Further, the parser implementation is incomplete. The HTML and JSON
 documents found in t/microformats-v2 include the full Microformats2

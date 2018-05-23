@@ -1,0 +1,330 @@
+#PODNAME: Lab::Measurement::Developer
+#ABSTRACT: Lab::Measurement developer tutorial
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Measurement::Developer - Lab::Measurement developer tutorial
+
+=head1 VERSION
+
+version 3.651
+
+=head1 Writing drivers
+
+The driver infrastructure is based on L<Moose>.
+For Moose basics see e.g.
+
+=over
+
+=item *
+
+The L<Modern Perl book|http://modernperlbooks.com/> by chromatic, available
+online for free, contains a chapter on Moose.
+
+=item *
+
+For full details, see the very well written L<Moose::Manual>.
+
+=back
+
+=head2 Code example
+
+We start with a section of code from the L<Lab::Moose::Instrument::SR830>
+LIA driver and discuss the most important steps. This explains the most
+important parts of a driver, i.e. initialization, getters, setters, caching,
+...
+
+ package Lab::Moose::Instrument::SR830;
+ 
+ use 5.010;
+ use Moose;
+ use MooseX::Params::Validate;
+ use Lab::Moose::Instrument qw/validated_getter validated_setter/;
+ use Lab::Moose::Instrument::Cache;
+ use Carp;
+ use namespace::autoclean;
+
+ our $VERSION = '3.520';
+
+ # (1)
+ extends 'Lab::Moose::Instrument';
+
+ # (2)
+ with qw/Lab::Moose::Instrument::Common/;
+
+ # (3)
+ sub BUILD {
+     my $self = shift;
+     $self->clear();
+     $self->cls();
+ }
+
+ # (4)
+ cache amplitude => (getter => 'get_amplitude');
+
+ # (5)
+ sub get_amplitude {
+     my ($self, %args) = validated_getter(\@_);
+
+     # (6)
+     return $self->cached_amplitude(
+         $self->query( command => 'SLVL?', %args ) );
+ }
+
+ sub set_amplitude {
+     # (7)
+     my ( $self, $value, %args ) = validated_setter(
+         \@_,
+         value => { isa => 'Num' }
+     );
+     
+     # (8)
+     $self->write( command => "SLVL $value", %args );
+     $self->cached_amplitude($value);
+ }
+
+ # (9)
+ __PACKAGE__->meta()->make_immutable();
+ 1;
+
+=head2 Explanations
+
+=over
+
+=item
+
+ extends 'Lab::Moose::Instrument';
+
+All drivers inherit from L<Lab::Moose::Instrument>. This base class provides
+the access to the underlying connection via methods like C<write>, C<query> and
+C<clear>.
+
+=item
+
+ with qw/Lab::Moose::Instrument::Common/;
+
+The L<Lab::Moose::Instrument::Common> role contains methods for GPIB common
+commands like I<*IDN>, I<*RST>, I<*CLS>, ...
+
+=item
+
+ sub BUILD {
+     my $self = shift;
+     $self->clear();
+     $self->cls();
+ }
+
+This C<BUILD> method (see L<Moose::Manual::Construction>) executes a device
+clear and clears the error status.
+
+=item
+
+ cache amplitude => (getter => 'get_amplitude');
+
+Accessing instruments settings by querying them from the device can be slow. It
+is mutch faster if the setters and getters store the setting in an object
+attribute (See L<Moose::Manual::Attributes>). This line creates an attribute
+for storing the amplitude value of the LIA's reference output.
+
+The attribute can then be accessed with the C<cached_amplitude> method.
+
+If the getter is called while the attributes is unset, the C<get_amplitude>
+method will be called under the hood to initialize the attribute.
+
+What if the initialization should call the get_amplitude method with additional
+arguments, say C<< timeout => 10 >>? This can be done by overwriting the
+builder method of the attribute in your driver:
+
+ sub cached_amplitude_builder {
+     my $self = shift;
+     return $self->get_amplitude( timeout => 10 );
+ }
+
+See L<Lab::Moose::Instrument::Cache> for full details.
+
+=item
+
+ sub get_amplitude {
+     my ($self, %args) = validated_getter(\@_);
+
+We come to the getter function, which queries the amplitude from the LIA.
+The C<validated_getter> function (from L<Lab::Moose::Instrument>) allows the
+user to pass additional options, like a timeout, to the underlying connection:
+
+ my $amplitude = $self->get_amplitude(timeout => 10);
+ my $amplitude = $self->get_amplitude(); # Use default timeout.
+
+=item
+
+ return $self->cached_amplitude(
+         $self->query( command => 'SLVL?', %args ) );
+
+We read the amplitude from the instrument and store it's value into the cache.
+Don't forget the C<%args> argument to C<query>!
+
+=item
+
+ sub set_amplitude {
+     my ( $self, $value, %args ) = validated_setter(
+         \@_,
+         value => { isa => 'Num' }
+     );
+
+The C<validated_setter> function parses the arguments of the setter method.
+We require that the value argument is a number.
+
+=item
+
+ $self->write( command => "SLVL $value", %args );
+ $self->cached_amplitude($value);
+
+We pass the new amplitude to the instrument and update the cache.
+
+=item
+
+ __PACKAGE__->meta()->make_immutable();
+
+Every Moose class shell end this way. See L<Moose::Manual::BestPractices>.
+
+=back
+
+=head2 Building automated instrument tests
+
+Lab::Moose has extensive support to build automated tests for instrument
+drivers and this is what enables long-term maintainability of the code base.
+
+If you are new to automated testing with Perl, consider the L<Modern Perl book|http://modernperlbooks.com/>, which covers all of the basics.
+
+A test file F<t/Moose/Instrument/SR830.t> for the above driver could look like
+this:
+
+ #!perl
+ 
+ use warnings;
+ use strict;
+ 
+ use lib 't';
+ 
+ use Lab::Test import => [qw/set_get_test/];
+ use Moose::Instrument::MockTest qw/mock_instrument/;
+ use MooseX::Params::Validate;
+ 
+ use File::Spec::Functions 'catfile';
+ my $log_file = catfile(qw/t Moose Instrument SR830.yml/);
+ 
+ my $lia = mock_instrument(
+     type     => 'SR830',
+     log_file => $log_file,
+ );
+ 
+ isa_ok( $lia, 'Lab::Moose::Instrument::SR830' );
+ 
+ $lia->rst( timeout => 10 );
+
+ # Test the amplitude getter and setter
+ set_get_test(
+     instr  => $lia,
+     values => [qw/0.004 1 2 3 5/],
+     getter => 'get_amplitude',
+     setter => 'set_amplitude',
+     cache  => 'cached_amplitude',
+ );
+
+ $lia->rst();
+ done_testing();
+
+First thing, we need to run the test with the I<real> instrument, to create the
+connection log file F<t/Moose/Instrument/SR830.yml>:
+
+C<< $ perl -Ilib t/Moose/Instrument/SR830.t --connection=LinuxGPIB --connection-options='{pad: 1}'  >>
+
+where the argument of C<--connection-options> is given as a YAML hash.
+
+You can always print a help screen of command line options supported by the
+test:
+
+C<< $ perl -Ilib t/Moose/Instrument/SR830.t --help >>
+
+Now with the connection log in place, you can run the test without the real
+instrument connected:
+
+C<< $ prove -lv t/Moose/Instrument/SR830.t >>
+
+If C<set_get_test> is not enough for you, take a look at the other test
+routines in F<t/Lab/Test.pm> which offer
+
+=over
+
+=item *
+
+Floating point number comparison (absolute error, relative error, ...)
+
+=item *
+
+File comparison, including basic filtering options.
+
+=back
+
+=head2 git pre-commit hook: run tests for each commit
+
+The file F<xt/pre-commit.pl> provides a L<git
+pre-commit hook|https://git-scm.com/book/uz/v2/Customizing-Git-Git-Hooks>.
+
+The hook is enabled by creating a link to F<.git/hooks/pre-commit>:
+
+ ln -s xt/pre-commit.pl .git/hooks/pre-commit
+
+The hook performs the following actions before a commit is finished:
+
+=over
+
+=item *
+
+Run perltidy with our configuration F<perltityrc> on all changed files.
+
+=item * 
+
+Run all tests in F<t/> with B<prove>.
+
+=item *
+
+Run Perl::Critic tests in F<xt/critic>.
+
+=item *
+
+Run F<xt/pod-manual-coverage.t>, which ensures that
+L<Lab::Measurement::Manual> contains links to all modules in the distribution.
+
+=back
+
+If a tests fails, the commit is stopped.
+
+=head2 Roles for SCPI instruments
+
+TODO
+
+=head2 Writing connections
+
+TODO
+
+=head1 Data files and plotting
+
+TODO
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+
+  Copyright 2017-2018  Andreas K. Huettel, Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,53 @@
+{
+   "abstract" : "a small proxy that can be useful when you embed gists in your website",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-GoogleFontProxy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.67",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::GoogleFontProxy" : {
+         "file" : "lib/Mojolicious/Plugin/GoogleFontProxy.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-GoogleFontProxy/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-GoogleFontProxy",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-GoogleFontProxy.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-GoogleFontProxy"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 use Net::UPnP::ControlPoint;
 use Net::UPnP::AV::MediaServer;

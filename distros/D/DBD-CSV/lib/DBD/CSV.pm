@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.52";
+$VERSION     = "0.53";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -346,10 +346,10 @@ sub _csv_diag {
 sub fetch_row {
     my ($self, $data) = @_;
 
-    exists $self->{cached_row} and
-	return $self->{row} = delete $self->{cached_row};
-
     my $tbl = $self->{meta};
+
+    exists $tbl->{cached_row} and
+	return $self->{row} = delete $tbl->{cached_row};
 
     my $csv = $self->{csv_csv_in} or
 	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
@@ -489,7 +489,7 @@ This module is used to read and write rows in a CSV file.
 Installing this module (and the prerequisites from above) is quite simple.
 The simplest way is to install the bundle:
 
-    $ cpan Bundle::CSV
+    $ cpan Bundle::DBD::CSV
 
 Alternatively, you can name them all
 

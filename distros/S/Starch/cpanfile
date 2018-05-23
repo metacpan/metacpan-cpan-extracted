@@ -9,6 +9,7 @@ requires 'Carp'             => 0;
 requires 'Scalar::Util'     => 0;
 requires 'Storable'         => 0;
 requires 'Digest::SHA'      => 0;
+requires 'MooX::BuildArgs'  => 0.02;
 
 on test => sub {
    requires 'Test::Simple' => 0.96;

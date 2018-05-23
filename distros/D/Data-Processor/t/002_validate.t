@@ -75,6 +75,28 @@ ok ($error_collection->any_error_contains(
     'correct error msg'
 );
 
+subtest 'Errors with no error message drop the error message clause' => sub{
+    my $nem_schema = {
+        x => {
+            value => qr{x},
+        },
+        y => {
+            value => qr{y},
+            error_msg => 'Oh dear',
+        },
+    };
+    my $nem_processor = Data::Processor->new(
+        $nem_schema
+    );
+    my $ec = $nem_processor->validate({});
+    is( $ec->count, 2, 'Get two errors');
+    my @nem_errors = $ec->as_array;
+    my ($xerr) = grep{/\'x\'/} @nem_errors;
+    my ($yerr) = grep{/\'y\'/} @nem_errors;
+    unlike($xerr, qr{Error msg:}, 'No error message clause on the x error');
+    like($yerr, qr{Error msg:}, 'Error message clause on the y error');
+};
+
 done_testing;
 
 sub data {

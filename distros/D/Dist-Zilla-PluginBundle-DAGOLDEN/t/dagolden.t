@@ -19,7 +19,7 @@ done_testing;
 #
 # This file is part of Dist-Zilla-PluginBundle-DAGOLDEN
 #
-# This software is Copyright (c) 2016 by David Golden.
+# This software is Copyright (c) 2018 by David Golden.
 #
 # This is free software, licensed under:
 #

@@ -6,6 +6,7 @@ use MYDan;
 use YAML::XS;
 use Digest::MD5;
 use MYDan::Agent::FileCache;
+use File::Basename;
 
 local $/ = undef;
 
@@ -20,33 +21,65 @@ my $unlink = sub { unlink shift; print shift; exit 1 };
 
 &$idie( "MYDanExtractFile undef" ) unless my $MYDanExtractFile = $ENV{MYDanExtractFile};
 
-my $tmp = "$MYDan::PATH/tmp";
-unless( -d $tmp ){ mkdir $tmp;chmod 0777, $tmp; }
-$tmp .= '/dump.data.';
-for my $f ( grep{ -f } glob "$tmp*" )
+my $do = 1;
+if( -f $path )
 {
-    my $t = ( stat $f )[9];
-    unlink $f if $t && $t < time - 3600;
+    open my $fh, "<$path" or &$idie( "Open file fail: $!" );
+    my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
+    close $fh;
+
+    if( $md5 eq $conf->{md5} )
+    {
+        $do = 0;
+        $do = 1 if $conf->{chmod}
+             && ! chmod oct $conf->{chmod}, $path;
+        $do = 1 if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
+        $do = 1 if @pw && ! chown @pw[2,3], $path;
+    }
 }
 
-my $temp = $tmp. Digest::MD5->new->add( sprintf "$path.%d.%stmp",  time, $$ )->hexdigest;
+if( $do )
+{
+    my $tmp = "$MYDan::PATH/tmp";
+    unless( -d $tmp ){ mkdir $tmp;chmod 0777, $tmp; }
+    $tmp .= '/dump.data.';
+    for my $f ( grep{ -f } glob "$tmp*" )
+    {
+        my $t = ( stat $f )[9];
+        unlink $f if $t && $t < time - 3600;
+    }
 
-&$idie( 'param error' ) unless defined $conf->{md5} && $path;
-&$idie( "get $conf->{chown} uid fail" ) if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
+    my $temp = $tmp. Digest::MD5->new->add( sprintf "$path.%d.%stmp",  time, $$ )->hexdigest;
 
-&$unlink( $temp, "copy fail: $!" ) if system "cp '$MYDanExtractFile' '$temp'";
-open my $fh, "<$temp" or &$idie( "Open MYDanExtractFile fail: $!" );
-my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
-close $fh;
+    &$idie( 'param error' ) unless defined $conf->{md5} && $path;
+    &$idie( "get $conf->{chown} uid fail" ) if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
 
-&$unlink( $temp, 'chomd fail' ) if $conf->{chmod}
-     && ! chmod oct $conf->{chmod}, $temp;
-&$unlink( $temp, 'chown fail' ) if @pw && ! chown @pw[2,3], $temp;
+    &$unlink( $temp, "copy fail: $!" ) if system "cp '$MYDanExtractFile' '$temp'";
+    open my $fh, "<$temp" or &$idie( "Open MYDanExtractFile fail: $!" );
+    my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
+    close $fh;
 
-&$unlink( $temp, 'md5 nomatch' ) if $md5 ne $conf->{md5};
-&$unlink( $temp, 'rename fail' ) if system "mv '$temp' '$path'";
+    &$unlink( $temp, 'chomd fail' ) if $conf->{chmod}
+         && ! chmod oct $conf->{chmod}, $temp;
+    &$unlink( $temp, 'chown fail' ) if @pw && ! chown @pw[2,3], $temp;
 
-eval{ MYDan::Agent::FileCache->new()->save( $path ); };
-print "filecache save fail:$@" if $@;
+    &$unlink( $temp, 'md5 nomatch' ) if $md5 ne $conf->{md5};
+
+    my $dir = File::Basename::dirname( $path );
+    unless( -d $dir )
+    {
+        &$unlink( $temp, 'mkdir dir fail' ) if system "mkdir -p '$dir'";
+    }
+    
+    &$unlink( $temp, 'dst path error' )  if -e $path && ! -f $path;
+    &$unlink( $temp, 'rename fail' ) if system "mv '$temp' '$path'";
+
+    eval{ 
+        my $filecache = MYDan::Agent::FileCache->new();
+        $filecache->save( $path ) unless $filecache->check( $md5 ); 
+    };
+    print "filecache save fail:$@" if $@;
+}
+
 print "ok\n";
 exit 0;

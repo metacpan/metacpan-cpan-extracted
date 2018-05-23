@@ -17,7 +17,7 @@ L<Starch::Store::DBI> store:
 
     store => {
         class => '::DBI',
-        dbh => [ $dbn, $user, $pass ],
+        dbh => [ $dsn, $user, $pass ],
     },
 
 Which you'd like to put Memcached in front of:
@@ -33,7 +33,7 @@ Which you'd like to put Memcached in front of:
         },
         inner => {
             class => '::DBI',
-            dbh => [ $dbn, $user, $pass ],
+            dbh => [ $dsn, $user, $pass ],
         },
     },
 
@@ -53,7 +53,7 @@ store instead.  Your DBI store currently looks something like:
 
     store => {
         class => '::DBI',
-        dbh => [ $dbn, $user, $pass ],
+        dbh => [ $dsn, $user, $pass ],
     },
 
 To migrate your data to DynamoDB you'd set it up like this:
@@ -66,7 +66,7 @@ To migrate your data to DynamoDB you'd set it up like this:
         },
         inner => {
             class => '::DBI',
-            dbh => [ $dbn, $user, $pass ],
+            dbh => [ $dsn, $user, $pass ],
         },
     },
 
@@ -82,7 +82,7 @@ so change the above to use L<Starch::Plugin::DisableStore>:
         },
         inner => {
             class => '::DBI',
-            dbh => [ $dbn, $user, $pass ],
+            dbh => [ $dsn, $user, $pass ],
             disable_set => 1,
         },
     },
@@ -96,7 +96,7 @@ The behavior of this configuration is:
 
 =item *
 
-Every requests for state data will first be made agains the outer
+Every request for state data will first be made agains the outer
 (DynamoDB) store.
 
 =item *
@@ -138,10 +138,9 @@ And your migration is complete.
 
 If your session expiration is very long, weeks, months, or even years, you may
 find that you want to retire your old store sooner than later.  In this case
-you'll want to run a background process (such as a cron job) to migrate all
-states not yet migrated to the new store.  You can use starch to do this for
-you by retrieving all the state IDs from your old store and then loading it
-into starch.  For example:
+you'll want to run a script to migrate all states not yet migrated to the new
+store.  You can use starch to do this for you by retrieving all the state IDs
+from your old store and then loading it into starch.  For example:
 
     my $state_ids = $dbh->selectcol_arrayref(...);
     foreach my $state_id (@$state_ids) {

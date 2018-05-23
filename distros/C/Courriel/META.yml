@@ -24,52 +24,52 @@ name: Courriel
 provides:
   Courriel:
     file: lib/Courriel.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Builder:
     file: lib/Courriel/Builder.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Header:
     file: lib/Courriel/Header.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Header::ContentType:
     file: lib/Courriel/Header/ContentType.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Header::Disposition:
     file: lib/Courriel/Header/Disposition.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::HeaderAttribute:
     file: lib/Courriel/HeaderAttribute.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Headers:
     file: lib/Courriel/Headers.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Helpers:
     file: lib/Courriel/Helpers.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Part::Multipart:
     file: lib/Courriel/Part/Multipart.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Part::Single:
     file: lib/Courriel/Part/Single.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Role::HeaderWithAttributes:
     file: lib/Courriel/Role/HeaderWithAttributes.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Role::Part:
     file: lib/Courriel/Role/Part.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Role::Streams:
     file: lib/Courriel/Role/Streams.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Types:
     file: lib/Courriel/Types.pm
-    version: '0.46'
+    version: '0.47'
   Courriel::Types::Internal:
     file: lib/Courriel/Types/Internal.pm
-    version: '0.46'
+    version: '0.47'
   Email::Abstract::Courriel:
     file: lib/Email/Abstract/Courriel.pm
-    version: '0.46'
+    version: '0.47'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -106,10 +106,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Courriel
+  bugtracker: https://github.com/houseabsolute/Courriel/issues
   homepage: http://metacpan.org/release/Courriel
   repository: git://github.com/houseabsolute/Courriel.git
-version: '0.46'
+version: '0.47'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -686,7 +686,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.46
+          tag: v0.47
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

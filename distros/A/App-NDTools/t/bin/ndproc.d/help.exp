@@ -3,7 +3,7 @@ Usage:
 
 Options:
     --builtin-format <""|JSON>
-        Format for builtin things (--builtin-rules, --embed-rules). Raw
+        Format for builtin things ("--builtin-rules", "--embed-rules"). Raw
         structure will be used if omitted or empty.
 
     --builtin-rules <path>
@@ -48,7 +48,7 @@ Options:
         Load rules from specified file. May be used several times.
 
     --verbose|-v [int]
-        Increase verbosity, max level - 4.
+        Increase verbosity, max level is 4.
 
     --version|-V
         Print version and exit.

@@ -4,15 +4,15 @@ use Pcore -class;
 use Config;
 
 has name => ( is => 'lazy', isa => Maybe [Str] );    # Module/Name.pm
-has content => ( is => 'lazy', isa => ScalarRef, clearer => 1 );
+has content => ( is => 'lazy', isa => ScalarRef );
 
 has path => ( is => 'lazy', isa => Maybe [Str] );    # /absolute/path/to/lib/Module/Name.pm
 has lib  => ( is => 'lazy', isa => Maybe [Str] );    # /absolute/path/to/lib/
 
-has is_cpan_module => ( is => 'lazy', isa => Bool, init_arg => undef );              # module has lib and lib is a part of pcore dist
-has is_crypted => ( is => 'lazy', isa => Bool, clearer => 1, init_arg => undef );    # module is crypted with Filter::Crypto
-has abstract => ( is => 'lazy', isa => Maybe [Str], clearer => 1, init_arg => undef );    # abstract from POD
-has version => ( is => 'lazy', isa => Maybe [ InstanceOf ['version'] ], clearer => 1, init_arg => undef );    # parsed version
+has is_cpan_module => ( is => 'lazy', isa => Bool, init_arg => undef );    # module has lib and lib is a part of pcore dist
+has is_crypted     => ( is => 'lazy', isa => Bool, init_arg => undef );    # module is crypted with Filter::Crypto
+has abstract => ( is => 'lazy', isa => Maybe [Str], init_arg => undef );   # abstract from POD
+has version => ( is => 'lazy', isa => Maybe [ InstanceOf ['version'] ], init_arg => undef );    # parsed version
 has auto_deps => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );
 
 around new => sub ( $orig, $self, $module, @inc ) {
@@ -194,13 +194,13 @@ sub _build_auto_deps ($self) {
 }
 
 sub clear ($self) {
-    $self->clear_content;
+    delete $self->{content};
 
-    $self->clear_is_crypted;
+    delete $self->{is_crypted};
 
-    $self->clear_version;
+    delete $self->{version};
 
-    $self->clear_abstract;
+    delete $self->{abstract};
 
     return;
 }

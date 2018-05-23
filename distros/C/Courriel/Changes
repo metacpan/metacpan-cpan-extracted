@@ -1,3 +1,8 @@
+0.47     2018-05-20
+
+- Switched to using GitHub for issue tracking.
+
+
 0.46     2018-05-13
 
 - Replaced all use of Email::Address with Email::Address::XS, as the former is

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::XRD;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/quote deprecated/;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Todo: Support
 #  $self->reply->xrd( $xrd => {
@@ -439,7 +439,7 @@ L<Mojolicious::Plugin::XML::Loy>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.22.5
+    version: v4.22.6
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -253,6 +253,8 @@ provides:
     file: lib/Sisimai/Rhost/GoDaddy.pm
   Sisimai::Rhost::GoogleApps:
     file: lib/Sisimai/Rhost/GoogleApps.pm
+  Sisimai::Rhost::KDDI:
+    file: lib/Sisimai/Rhost/KDDI.pm
   Sisimai::SMTP:
     file: lib/Sisimai/SMTP.pm
   Sisimai::SMTP::Error:
@@ -276,7 +278,7 @@ resources:
   bugtracker: https://github.com/sisimai/p5-Sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-Sisimai.git
-version: v4.22.5
+version: v4.22.6
 x_contributors:
   - 'jcbf <underspell@gmail.com>'
   - 'Jonathan Leroy <jonathan@inikup.com>'
@@ -287,5 +289,6 @@ x_contributors:
   - 'Jon Jensen <jon@endpoint.com>'
   - 'Adrian Yee <adrian@gt.net>'
   - 'root <root@bwt-1.squaremx.com>'
+  - 'batarian71 <36008612+batarian71@users.noreply.github.com>'
   - 'azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>'
   - 'azumakuniyuki <azumakuniyuki@gmail.com>'

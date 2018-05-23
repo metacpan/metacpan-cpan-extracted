@@ -6,3 +6,6 @@ Revision history for Perl extension TaskPipe.
 
 0.02  Tue May 15 00:42:16 2018
 	- swap erroneous TaskPipe::Task module. Edit docs
+
+0.03  Thu May 17 01:48:01 2018
+	- some installation bug fixes

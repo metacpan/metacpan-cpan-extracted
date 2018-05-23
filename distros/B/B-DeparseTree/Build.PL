@@ -36,6 +36,7 @@ my $builder = Module::Build->new(
     },
     test_requires  => {
         'Test::Simple' => '0.81',
+        'Data::Printer' => '0.40',
 	'Text::Diff' => 0,
     },
     requires => {

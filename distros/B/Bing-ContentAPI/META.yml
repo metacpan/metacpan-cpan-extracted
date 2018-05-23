@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'Bill Gerrard <bill@gerrard.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bing-ContentAPI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  HTML::Entities: '0'
+  JSON: '0'
+  REST::Client: '0'
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/billgerrard/bing-content-api.git
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

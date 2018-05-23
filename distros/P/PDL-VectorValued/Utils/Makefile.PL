@@ -13,6 +13,6 @@ $hash{PREREQ_PM}{PDL} = $hash{CONFIGURE_REQUIRES}{PDL} = 0;
 #$hash{INC} .= '';
 #$hash{OBJECT} .= '';
 $hash{DIR} = [];
-$hash{realclean}{FILES} .= '*~ *.tmp README.txt';
+$hash{realclean}{FILES} .= '*~ *.tmp';
 
 WriteMakefile(%hash);

@@ -10,10 +10,10 @@ use File::Basename 'dirname';
 use File::Spec::Functions qw' rel2abs catdir catfile ';
 use Cwd qw' getcwd realpath ';
 use Data::Dumper;
-# use Data::Printer;
+use Data::Printer;
 use Carp qw' croak confess ';
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 my $scripts_dir = realpath catdir(dirname(rel2abs(__FILE__)), '../../../share');
 $scripts_dir = catdir(dist_dir('JavaScript-V8-CommonJS'))
@@ -29,6 +29,7 @@ sub new {
     bless my $self = {
         paths   => $args->{paths}   || [getcwd()],
         modules => $args->{modules} || {},
+        v8_params => $args->{v8_params},
     }, $class;
 
     $self->{c} = $self->_build_ctx;
@@ -42,7 +43,7 @@ sub paths { shift->{paths} }
 
 sub _build_ctx {
     my $self = shift;
-    my $c = JavaScript::V8::Context->new;
+    my $c = JavaScript::V8::Context->new($self->{v8_params} ? %{$self->{v8_params}} : ());
 
     # global functions
     for my $name (qw/ resolveModule requireNative evalModuleFile /) {
@@ -101,8 +102,9 @@ sub _resolveModule {
 
     # module id
     foreach my $path (@{$self->paths}) {
-        my $file = catfile($path, $id.".js");
-        return "$file" if -f $file;
+        for my $file (catfile($path, $id.".js"), catfile($path, $id.".json")) {
+            return $file if -f $file;
+        }
     }
 
     return undef;
@@ -133,6 +135,33 @@ sub _evalModuleFile {
     croak "module '$file' do not exist" unless -f $file;
     my $module_code = _slurp($file);
 
+    # JSON
+    if ($file =~ /\.json$/) {
+        
+        # validate json
+        my $json = _slurp($file);
+
+        # inject as module
+        my $rv = $self->c->eval(qq!
+
+            require.__modules["$file"] = {
+                exports: null,
+                __filename: "$file"
+            };
+
+            (function (module) { "use strict"; module.exports = $json; })(require.__modules["$file"]);
+
+        !, $file);
+
+        if (!defined $rv && $@) {
+            $@ =~ s/^Error: //;
+            die $@
+        }
+
+        return;
+    }
+
+    # js module
     my $wrapper = qq!
 
         require.__modules["$file"] = {
@@ -242,6 +271,10 @@ Arrayref of paths to search for modules. Default: [getcwd()].
 =item modules
 
 Hashref of native modules. Default: {}.
+
+=item v8_params
+
+Hashref passed directly to L<JavaScript::V8::Context/new>. Default: undef.
 
 =back
 

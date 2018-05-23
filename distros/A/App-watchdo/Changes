@@ -1,5 +1,24 @@
 Revision history for App-watchdo
 
+0.1.0   2018-05-21
+        Updating for release of version 0.1.0
+        Updating for release of version 0.1.0 (Ivan Wills)
+        Fixing attribute documentation (Ivan Wills)
+        More documentation updates (Ivan Wills)
+        Adding better documentation (Ivan Wills)
+        Making sure that any files matching the exclude regex[es] are ignored (Ivan Wills)
+        Adding the exclude option for files to watch (Ivan Wills)
+        Updating minimum perl version (Ivan Wills)
+
+0.1.0   2018-05-21
+        Updating for release of version 0.1.0
+        Fixing attribute documentation (Ivan Wills)
+        More documentation updates (Ivan Wills)
+        Adding better documentation (Ivan Wills)
+        Making sure that any files matching the exclude regex[es] are ignored (Ivan Wills)
+        Adding the exclude option for files to watch (Ivan Wills)
+        Updating minimum perl version (Ivan Wills)
+
 0.0.7   2017-10-29
         Updating for release of version 0.0.7
         Adding build/test (Ivan Wills)

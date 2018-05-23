@@ -1,0 +1,55 @@
+NAME
+
+    Mojolicious::Plugin::NoIndex - add meta tag to HTML output to define a
+    policy for robots
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+      # Mojolicious
+      $self->plugin('NoIndex');
+    
+      # Mojolicious::Lite
+      plugin 'NoIndex';
+    
+      # to allow sending referrer information to the origin
+      plugin 'NoIndex' => { content => 'same-origin' };
+
+DESCRIPTION
+
+    Mojolicious::Plugin::NoIndex is a Mojolicious plugin.
+
+METHODS
+
+    Mojolicious::Plugin::NoIndex inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+ register
+
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+ HOOKS INSTALLED
+
+    This plugin adds one after_render hook to add the <meta> tag.
+
+SEE ALSO
+
+    Mojolicious, Mojolicious::Guides, http://mojolicious.org.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

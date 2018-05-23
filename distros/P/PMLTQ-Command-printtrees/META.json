@@ -1,0 +1,79 @@
+{
+   "abstract" : "generate svg trees for given treebank",
+   "author" : [
+      "Maty\u00e1\u0161 Kopp <matyas.kopp@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PMLTQ-Command-printtrees",
+   "no_index" : {},
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Archive::Unzip::Burst" : "0",
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
+            "LWP::Simple" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "1.102",
+            "File::Which" : "1.22",
+            "Hash::Merge" : "0",
+            "PMLTQ" : "v1.4.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PMLTQ::Command::printtrees" : {
+         "file" : "lib/PMLTQ/Command/printtrees.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ufal/pmltq-command-print-trees/issues"
+      },
+      "homepage" : "http://ufal.mff.cuni.cz/pmltq/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ufal/pmltq-command-print-trees.git",
+         "web" : "https://github.com/ufal/pmltq-command-print-trees"
+      }
+   },
+   "version" : "0.0.1",
+   "x_authority" : "cpan:MATY",
+   "x_authority_from_module" : "PMLTQ::Command::printtrees",
+   "x_permissions_from_module" : "PMLTQ::Command::printtrees",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

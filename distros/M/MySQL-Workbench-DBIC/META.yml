@@ -2,25 +2,42 @@
 abstract: 'create DBIC scheme for MySQL workbench .mwb files'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  File::Copy: '0'
+  File::Path: '0'
+  FindBin: '0'
+  Test::LongString: '0.16'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MySQL-Workbench-DBIC
+provides:
+  MySQL::Workbench::DBIC:
+    file: lib/MySQL/Workbench/DBIC.pm
+    version: '1.00'
+  MySQL::Workbench::DBIC::FakeDBIC:
+    file: lib/MySQL/Workbench/DBIC/FakeDBIC.pm
+    version: '1.00'
 requires:
   Carp: '0'
+  Data::Dumper: '0'
   File::Spec: '3.40'
+  JSON: '0'
+  List::Util: '0'
   Moo: '1.003001'
-  MySQL::Workbench::Parser: '0.04'
-  Test::LongString: '0.16'
+  MySQL::Workbench::Parser: '1.00'
   perl: '5.010001'
 resources:
   bugtracker: http://github.com/reneeb/MySQL-Workbench-DBIC/issues
   homepage: http://github.com/reneeb/MySQL-Workbench-DBIC
   repository: git://github.com/reneeb/MySQL-Workbench-DBIC.git
-version: '0.08'
+version: '1.00'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

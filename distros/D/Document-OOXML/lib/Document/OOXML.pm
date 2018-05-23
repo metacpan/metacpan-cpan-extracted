@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 
 # ABSTRACT: Manipulation of Office Open XML files
-our $VERSION = '0.180750'; # VERSION
+our $VERSION = '0.181410'; # VERSION
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use Carp;
@@ -110,7 +110,7 @@ Document::OOXML - Manipulation of Office Open XML files
 
 =head1 VERSION
 
-version 0.180750
+version 0.181410
 
 =head1 SYNOPSIS
 

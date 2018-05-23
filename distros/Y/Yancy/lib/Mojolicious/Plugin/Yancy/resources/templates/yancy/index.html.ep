@@ -8,6 +8,13 @@
             margin-top: 10px;
         }
 
+        .clickable {
+            cursor: pointer;
+        }
+        th.clickable:hover {
+            background: #dee2e6;
+        }
+
         .sidebar {
             position: fixed;
             padding: 0;
@@ -89,6 +96,10 @@
             padding: 20px;
         }
 
+        .filters .filter-desc {
+            vertical-align: middle;
+        }
+
         /* Fix Bootstrap 4 problem: https://github.com/twbs/bootstrap/issues/23454 */
         .is-invalid + .invalid-feedback {
             display: block;
@@ -149,7 +160,7 @@
 
 <main id="app" class="container-fluid">
 
-    <div class="sidebar col-sm-3 col-md-3 col-lg-2">
+    <div v-if="hasCollections" class="sidebar col-sm-3 col-md-3 col-lg-2">
         <div class="bg-dark p-2 justify-content-between sidebar-top">
             <button class="btn btn-outline-light" type="button"
                 data-toggle="collapse" data-target="#sidebar-collapse"
@@ -265,7 +276,7 @@
                     </span>
                 </form>
                 <div v-for="( filter, i ) in filters">
-                    Filter: <code>{{ filter.field }}</code> matches <code>{{ filter.value }}</code>
+                    <span class="filter-desc">Filter: <code>{{ filter.field }}</code> matches <code>{{ filter.value }}</code></span>
                     <button class="btn btn-outline-danger" @click="removeFilter(i)">Remove</button>
                 </div>
             </div>
@@ -275,6 +286,7 @@
                     <tr>
                         <th></th>
                         <th v-for="( col, i ) in columns"
+                            class="clickable"
                             @click="toggleSort( col )"
                         >
                             <i class="fa" :class="sortClass( col )"></i>

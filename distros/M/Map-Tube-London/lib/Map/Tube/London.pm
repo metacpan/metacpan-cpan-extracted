@@ -1,6 +1,6 @@
 package Map::Tube::London;
 
-$Map::Tube::London::VERSION   = '1.02';
+$Map::Tube::London::VERSION   = '1.03';
 $Map::Tube::London::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::London - Interface to the London Tube Map.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -123,7 +123,8 @@ base64 encoded string of the entire map.
 
     my $tube = Map::Tube::London->new;
     my $map  = $tube->name;
-    open(my $IMAGE, ">$map.png");
+    open(my $IMAGE, ">", "$map.png");
+       or die "ERROR: Can't open [$map.png]: $!";
     binmode($IMAGE);
     print $IMAGE decode_base64($tube->as_image);
     close($IMAGE);

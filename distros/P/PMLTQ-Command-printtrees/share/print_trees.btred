@@ -1,0 +1,128 @@
+#!btred -i generate_trees --no-save --allow-switch-context
+# -*- cperl -*-
+
+#include "pmltq-print-server/print.btred"
+
+{
+package TredMacro;
+
+use warnings;
+use strict;
+use File::Find::Rule;
+# use File::Path qw/make_path/;
+# use File::Basename qw/fileparse/;
+use Encode;
+use Getopt::Long qw/GetOptionsFromArray/;
+
+my %opts;
+
+GetOptionsFromArray(\@ARGV, \%opts,
+  'file-in|i=s',
+  'file-out|o=s',
+  'format|f=s',
+  )  || die "invalid options";
+
+#my $data_dir = $opts{'data-dir'};
+#my $output_dir = $opts{'output-dir'} || $data_dir;
+my $file_in = $opts{'file-in'};
+my $file_out = $opts{'file-out'};
+my $format = $opts{'format'} || 'SVG';
+#my $file_pattern = $opts{'file-pattern'} || '*';
+
+
+
+#($data_dir && (-d $data_dir)) or die "Data directory must exist!";
+
+#make_path($output_dir) if ($output_dir && !(-d $output_dir));
+#!$output_dir or (-d $output_dir) or die "Output directory $output_dir must exist!\n";
+
+# my @files = File::Find::Rule->file->name($file_pattern)->in( $data_dir );
+
+main::cast_to_grp($grp)->{noOpenFileError} = 1; # Report no errors
+$TrEd::Error::Message::on_error = sub { # add error hook here
+    my ( $win_ref, $msg, $nobug ) = @_;
+    print STDERR "$msg\n";
+};
+
+sub generate_trees {
+  my $opts = shift;
+  make_svg($file_in,
+        -filename => $file_out,
+        -range => '1-',
+        -sentenceInfo => 1,
+        -fileInfo => 1,
+        -extraOptions => {
+          use_svg_desc_and_title => 1,
+        }
+      );
+}
+
+=TODO 
+######
+###TODO loop throw files - avoid reloading extensions
+######
+
+for my $file (@files) {
+  my ($img_name,$img_dir) = fileparse($file,qr/\.[^\.]*/);
+  $img_dir =~ s/$data_dir/$output_dir/;
+  make_path($img_dir) if ($img_dir && !(-d $img_dir));
+  !$img_dir or (-d $img_dir) or warn "Output directory $img_dir must exist!\n";
+  print STDERR "$data_dir\t$img_dir\t$img_name\n";
+
+  make_svg($file,
+          -filename => "$img_dir/$img_name",
+          -range => '1-',
+          -sentenceInfo => 1,
+          -fileInfo => 1,
+          -extraOptions => {
+            use_svg_desc_and_title => 1,
+          }
+        )
+}
+=cut
+
+
+
+
+
+
+
+
+sub on_get_node_style {
+  my ($treeview,$node,$styles,$win)=@_;
+  my $ret = &main::onGetNodeStyle;
+
+  # append the ID as a -tag to every node
+  my $tag = GetStyles($styles,'Node','-tag');
+  $tag.=',' if $tag;
+  my $type = $node->type;
+  my ($id_attr) = $type && $type->find_members_by_role('#ID');
+  my $id = $id_attr && $node->{ $id_attr->get_name };
+  if ($id) {
+    $tag .= qq{#$id};
+    AddStyle($styles,'Node',-tag=>$tag);
+  }
+  return $ret;
+}
+
+sub make_svg {
+  my ($f,%opts)=@_;
+#  CurrentFile();
+  SetCurrentStylesheet(STYLESHEET_FROM_FILE());
+  Open($f, { '-keep' => 1, '-noredraw' => 1 }) || return;
+  print_trees({
+    '-no-hooks' => 1,
+    -format => $format,
+    -toFile => 1,
+    -onGetNodeStyle => \&on_get_node_style,
+    %opts,
+  });
+  CloseFile();
+  return 1;
+}
+
+
+
+
+}
+1;

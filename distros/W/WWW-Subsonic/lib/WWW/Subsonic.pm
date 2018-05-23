@@ -18,7 +18,7 @@ use version 0.77;
 # Clean Up the Namespace
 use namespace::autoclean;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 has 'protocol' => (
@@ -174,7 +174,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/WWW-Subsonic>
+L<https://metacpan.org/release/WWW-Subsonic>
 
 =item *
 

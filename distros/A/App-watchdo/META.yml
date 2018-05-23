@@ -17,7 +17,7 @@ name: App-watchdo
 provides:
   App::watchdo:
     file: lib/App/watchdo.pm
-    version: v0.0.7
+    version: v0.1.0
 requires:
   AnyEvent: '7.0'
   AnyEvent::Filesys::Notify: '1.21'
@@ -26,11 +26,11 @@ requires:
   Moo: '2.0'
   Path::Tiny: '0.068'
   VCS::Which: v0.6.1
-  perl: '5.006'
+  perl: '5.010'
   version: '0.9912'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::watchdo
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-watch-do.git
-version: v0.0.7
+version: v0.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

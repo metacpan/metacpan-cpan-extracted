@@ -6,7 +6,7 @@ package OpenGbg::Service::StyrOchStall::GetBikeStations;
 
 # ABSTRACT: Get data on all bike stations
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1403';
+our $VERSION = '0.1404';
 
 use XML::Rabbit::Root;
 use DateTime::Format::HTTP;
@@ -69,7 +69,7 @@ OpenGbg::Service::StyrOchStall::GetBikeStations - Get data on all bike stations
 
 =head1 VERSION
 
-Version 0.1403, released 2018-03-14.
+Version 0.1404, released 2018-05-19.
 
 =head1 SYNOPSIS
 

@@ -54,7 +54,7 @@ SYNOPSIS
 DESCRIPTION
 
     PICA::Data provides methods, classes, and functions to process PICA+
-    records in Perl.
+    records <http://format.gbv.de/pica> in Perl.
 
     PICA+ is the internal data format of the Local Library System (LBS) and
     the Central Library System (CBS) of OCLC, formerly PICA. Similar
@@ -211,7 +211,7 @@ CONTRIBUTORS
 
     Johann Rolschewski, <jorol@cpan.org>
 
-    Jakob Voss <voss@gbv.de>
+    Jakob Voß <voss@gbv.de>
 
     Carsten Klee <klee@cpan.org>
 

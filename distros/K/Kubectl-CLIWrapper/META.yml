@@ -17,9 +17,10 @@ requires:
   IPC::Open3: '0'
   JSON::MaybeXS: '0'
   Moose: '0'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/pplu/kubectl-cliwrapper/issues
   repository: https://github.com/pplu/kubectl-cliwrapper
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

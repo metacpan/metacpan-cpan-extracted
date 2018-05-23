@@ -1,5 +1,5 @@
 package Starch::Plugin::ForStore;
-$Starch::Plugin::ForStore::VERSION = '0.06';
+$Starch::Plugin::ForStore::VERSION = '0.07';
 =head1 NAME
 
 Starch::Plugin::ForStore - Base role for Starch::Store plugins.

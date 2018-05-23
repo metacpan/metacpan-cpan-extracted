@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.006000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,27 +17,28 @@ my %WriteMakefileArgs = (
     "bin/backup-hanoi"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.006000",
   "NAME" => "Backup::Hanoi",
   "PREREQ_PM" => {
-    "feature" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
     "Test::More" => 0,
-    "Test::Script" => 0
+    "Test::Script" => "1.10"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
-    "TESTS" => "t/bin/*.t t/lib/*.t"
+    "TESTS" => "t/5_lib/*.t t/8_bin/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
+  "Test::Exception" => 0,
   "Test::More" => 0,
-  "Test::Script" => 0,
-  "feature" => 0,
+  "Test::Script" => "1.10",
   "strict" => 0,
   "warnings" => 0
 );

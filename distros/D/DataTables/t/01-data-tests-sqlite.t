@@ -5,6 +5,9 @@ use DBI;
 use Data::Compare qw/Compare/;
 use FindBin qw/$Bin/;
 
+eval "use DBD::SQLite";
+plan skip_all => "DBD::SQLite required for this test script." if $@;
+
 my @tests = (
     {
         expected => {

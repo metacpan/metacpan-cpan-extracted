@@ -11,9 +11,11 @@ use Time::HiRes qw/ sleep /;
 use Carp;
 use Guard ();
 
-our $VERSION         = "0.08";
-our $DEFAULT_EXPIRES = 86400;
-our $RETRY_INTERVAL  = 0.5;
+our $VERSION             = "0.09";
+our $DEFAULT_EXPIRES     = 86400;
+our $RETRY_INTERVAL      = 0.5;
+our $BLOCKING_KEY_PREFIX = "wait:";
+our $WAIT_QUEUE          = 0;
 
 use constant {
     EXIT_CODE_ERROR => 111,
@@ -27,7 +29,22 @@ else
     return 0
 end
 END_OF_SCRIPT
-;
+    ;
+
+use constant BLOCKING_UNLOCK_LUA_SCRIPT_TMPL => <<'END_OF_SCRIPT'
+if redis.call("get",KEYS[1]) == ARGV[1]
+then
+    redis.call("del",KEYS[1],"%s"..KEYS[1])
+    return redis.call("lpush","%s"..KEYS[1],ARGV[1])
+else
+    return 0
+end
+END_OF_SCRIPT
+    ;
+
+sub BLOCKING_UNLOCK_LUA_SCRIPT {
+    sprintf BLOCKING_UNLOCK_LUA_SCRIPT_TMPL, $BLOCKING_KEY_PREFIX, $BLOCKING_KEY_PREFIX;
+}
 
 sub parse_options {
     my (@argv) = @_;
@@ -158,8 +175,11 @@ sub try_get_lock {
             debugf "no delay mode. exit";
             last GET_LOCK;
         }
+        debugf "unable to lock. waiting for release";
+        if ($WAIT_QUEUE) {
+            $redis->blpop("${BLOCKING_KEY_PREFIX}$key", $opt->{expires});
+        }
         else {
-            debugf "unable to lock. retry after %f sec.", $RETRY_INTERVAL;
             sleep $RETRY_INTERVAL;
         }
     }
@@ -173,7 +193,12 @@ sub release_lock {
     }
     else {
         debugf "Release lock key %s", $key;
-        $redis->eval(UNLOCK_LUA_SCRIPT, 1, $key, $token);
+        if ($WAIT_QUEUE) {
+            $redis->eval(BLOCKING_UNLOCK_LUA_SCRIPT, 1, $key, $token);
+        }
+        else {
+            $redis->eval(UNLOCK_LUA_SCRIPT, 1, $key, $token);
+        }
     }
 }
 

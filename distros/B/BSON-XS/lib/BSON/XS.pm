@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-use 5.008001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ package BSON::XS;
 # ABSTRACT: XS implementation of MongoDB's BSON serialization
 
 use version;
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.4.0';
 
 # cached for efficiency during decoding
 # XXX eventually move this into XS
@@ -51,7 +51,7 @@ BSON::XS - XS implementation of MongoDB's BSON serialization
 
 =head1 VERSION
 
-version v0.2.2
+version v0.4.0
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,7 @@ David Golden <david@mongodb.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by MongoDB, Inc.
+This software is Copyright (c) 2018 by MongoDB, Inc.
 
 This is free software, licensed under:
 

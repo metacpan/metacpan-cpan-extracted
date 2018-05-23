@@ -3,7 +3,7 @@ NAME
     DAGOLDEN does it
 
 VERSION
-    version 0.078
+    version 0.079
 
 SYNOPSIS
       # in dist.ini
@@ -15,9 +15,6 @@ DESCRIPTION
 
       ; version provider
       [RewriteVersion] ; also munges
-
-      ; collect contributors list
-      [Git::Contributors]
 
       ; choose files to include
       [Git::GatherDir]         ; everything from git ls-files
@@ -83,6 +80,8 @@ DESCRIPTION
 
       [MetaProvides::Package] ; add 'provides' to META files
       meta_noindex = 1        ; respect prior no_index directives
+
+      [Git::Contributors]     ; collect contributors list
 
       [Prereqs::AuthorDeps]   ; add authordeps as develop/requires
       [MetaYAML]              ; generate META.yml (v1.4)
@@ -261,7 +260,7 @@ CONTRIBUTORS
     *   김도형 - Keedi Kim <keedi@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2016 by David Golden.
+    This software is Copyright (c) 2018 by David Golden.
 
     This is free software, licensed under:
 

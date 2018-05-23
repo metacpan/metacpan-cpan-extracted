@@ -28,6 +28,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Printer" : "0.40",
             "Test::Simple" : "0.81",
             "Text::Diff" : "0"
          }
@@ -36,11 +37,11 @@
    "provides" : {
       "B::DeparseTree" : {
          "file" : "lib/B/DeparseTree.pm",
-         "version" : "v3.0.0"
+         "version" : "v3.1.0"
       },
       "B::DeparseTree::Common" : {
          "file" : "lib/B/DeparseTree/Common.pm",
-         "version" : "v1.1.0"
+         "version" : "v3.0.0"
       },
       "B::DeparseTree::Fragment" : {
          "file" : "lib/B/DeparseTree/Fragment.pm"
@@ -49,13 +50,16 @@
          "file" : "lib/B/DeparseTree/Node.pm",
          "version" : "v1.0.0"
       },
+      "B::DeparseTree::NodeDemo" : {
+         "file" : "lib/B/DeparseTree/Node.pm"
+      },
       "B::DeparseTree::P518" : {
          "file" : "lib/B/DeparseTree/P518.pm",
          "version" : "v3.0.0"
       },
       "B::DeparseTree::P520" : {
          "file" : "lib/B/DeparseTree/P520.pm",
-         "version" : "2.0"
+         "version" : "v3.0.0"
       },
       "B::DeparseTree::P522" : {
          "file" : "lib/B/DeparseTree/P522.pm",
@@ -85,9 +89,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
       ]
    },
-   "version" : "v3.0.0",
+   "version" : "v3.1.0",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

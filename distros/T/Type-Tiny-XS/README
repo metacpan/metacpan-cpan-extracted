@@ -11,7 +11,7 @@ DESCRIPTION
     has only core dependencies, and does not depend on Type::Tiny, so other
     data validation frameworks might also consider using it!)
 
-    Only the following two functions should be considered part of the
+    Only the following three functions should be considered part of the
     supported API:
 
     `Type::Tiny::XS::get_coderef_for($type)`

@@ -1,10 +1,10 @@
 {
    "abstract" : "PICA record processing",
    "author" : [
-      "Jakob Vo\u00df"
+      "Jakob Voß"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -15,23 +15,23 @@
    "name" : "PICA-Data",
    "no_index" : {
       "directory" : [
-         "eg",
-         "examples",
+         "t",
+         "xt",
          "inc",
          "share",
-         "t",
-         "xt"
+         "eg",
+         "examples"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.15",
             "Test::Pod" : "1.41"
          }
       },
@@ -52,10 +52,13 @@
          "requires" : {
             "File::Temp" : "0.2304",
             "IO::File" : "1.14",
+            "Test::Deep" : "0.119",
             "Test::Exception" : "0.43",
             "Test::More" : "1.001003",
             "Test::Pod" : "0",
-            "Test::XML" : "0.08"
+            "Test::Warn" : "0",
+            "Test::XML" : "0.08",
+            "YAML::Tiny" : "1.46"
          }
       }
    },
@@ -71,7 +74,7 @@
          "web" : "https://github.com/gbv/PICA-Data"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -79,7 +82,6 @@
       "Jakob Voss <voss@gbv.de>",
       "Johann Rolschewski <jorol@cpan.org>",
       "Johann Rolschewski <rolschewski@gmail.com>"
-   ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
+   ]
 }
 

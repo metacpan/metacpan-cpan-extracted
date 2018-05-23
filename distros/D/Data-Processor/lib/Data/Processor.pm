@@ -2,7 +2,7 @@ package Data::Processor;
 
 use strict;
 use 5.010_001;
-our $VERSION = '0.4.3';
+our $VERSION = '1.0.0';
 
 use Carp;
 use Data::Processor::Error::Collection;
@@ -374,6 +374,236 @@ sub pod_write{
         "=head1 Schema Description\n\n"
     );
 }
+
+=head1 SCHEMA REFERENCE
+
+
+=head2 Top-level keys and members
+
+The schema is described by a nested hash. At the top level, and within a
+members definition, the keys are the same as the structure you are
+describing. So for example:
+
+ my $schema = {
+     coordinates => {
+         members => {
+             x => {
+                 description => "the x coordinate",
+             },
+             y => {
+                 description => "the y coordinate",
+             },
+         }
+     }
+ };
+
+
+This schema describes a structure which might look like this:
+
+ { coordinates => { x => 1, y => 2} }
+
+Obviously this can be nested all the way down:
+
+  my $schema = {
+     house => {
+        members => {
+            bungalow => {
+                members => {
+                    rooms => {
+                      #...
+                    }
+                }
+            }
+        }
+     }
+  };
+
+=head2 array
+
+ To have a key point to an array of things, simply use the array key. So:
+
+ my $schema = {
+    houses => {
+       array => 1,
+    }
+ };
+
+ Would describe a structure like:
+
+ { houses => [] }
+
+ And of course you can nest within here so:
+
+ my $schema = {
+    houses => {
+       array => 1,
+       members => {
+           name => {},
+           windows => {
+               array => 1,
+           }
+       },
+    },
+ };
+
+ Might describe:
+
+ {
+   houses => [
+      { name => 'bob',
+        windows => []},
+      { name => 'harry',
+        windows => []},
+   ]
+ }
+
+=head2 description
+
+The description key within a definition describes that value:
+
+ my $schema = {
+     x => { description => 'The x coordinate' },
+ };
+
+=head2 error_msg
+
+The error_msg key can be set to provide extra context for when a value is not
+found or fails the L<value|/"value"> test.
+
+=head2 optional
+
+Most values are required by default. To reverse this use the "optional" key:
+
+ my $schema = {
+     x => {
+       optional => 1,
+     },
+     y => {
+       # required
+     },
+ };
+
+=head2 regex
+
+B<Treating regular expressions as keys>
+
+If you set "regex" within a definition then it's key will be treated as a
+regular expression.
+
+ my $schema = {
+    'color_.+' => {
+       regex => 1
+    },
+ };
+ my $data = { color_red => 'red', color_blue => 'blue'};
+ Data::Processor->new($schema)->validate($data);
+
+=head2 transformer
+
+B<transform the data for further processing>
+
+Transformer maps to a sub ref which will be passed the value and the containing
+structure. Your return value provides the new value.
+
+ my $schema = {
+    x => {
+        transformer => sub{
+           my( $value, $section ) = @_;
+           $value = $value + 1;
+           return $value;
+        }
+    }
+ };
+ my $data = { x => 1 };
+ my $p = Data::Processor->new($schema);
+ my $val = Data::Processor::Validator->new( $schema, data => $data);
+ $p->transform_data('x', 'x', $val);
+ say $data->{x}; #will print 2
+
+If you wish to provide an error from the transformer you should die with a
+hash reference with a key of "msg" mapping to your error:
+
+
+ my $schema = {
+    x => {
+         transformer => sub{
+             die { msg => "SOMETHING IS WRONG" };
+         }
+    },
+ };
+
+ my $p = Data::Processor->new($schema);
+ my $data = { x => 1 };
+ my $val = Data::Processor::Validator->new( $schema, data => $data);
+ my $error = $p->transform_data('x', 'x', $val);
+
+ say $error; # will print: error transforming 'x': SOMETHING IS WRONG
+
+
+The transformer is called before any validator, so:
+
+ my $schema = {
+    x => {
+        transformer => sub{
+           my( $value, $section ) = @_;
+           return $value + 1;
+        },
+        validator => sub{
+           my( $value ) = @_;
+           if( $value < 2 ){
+              return "too low"
+           }
+        },
+    },
+ };
+ my $p = Data::Processor->new( $schema );
+ my $data = { x => 1 };
+ my $errors = $p->validate();
+ say $errors->count; # will print 0
+ say $data->{x}; # will print 2
+
+=head2 value
+
+B<checking against regular expression>
+
+To check a value against a regular expression you can use the I<value> key
+within a definition, mapped to a quoted regex:
+
+ my $schema = {
+     x => {
+        value => qr{\d+}
+     }
+ };
+
+=head2 validator
+
+B<checking more complex values using a callback>
+
+To conduct extensive checks you can use I<validator> and provide a
+callback. Your sub will be passed the value and it's container. If you return
+anything it will be regarded as an error message, so to indicate a valid
+value you return nothing:
+
+ my $schema = {
+    bob => {
+      validator => sub{
+         my( $value, $section ) = @_;
+         if( $value ne 'bob' ){
+            return "Bob must equal bob!";
+         }
+         return;
+      },
+    },
+ };
+ my $p = Data::Processor->new($schema);
+ # would validate:
+ $p->validate({ bob => "bob" });
+ # would fail:
+ $p->validate({ bob => "harry"});
+
+See also L<Data::Processor::ValidatorFactory>
+
+
 
 =head1 AUTHOR
 

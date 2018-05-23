@@ -15,8 +15,8 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-sub DEMOLISH ( $self, $global ) {
-    $self->remove if !$global;
+sub DESTROY ( $self ) {
+    $self->remove if ${^GLOBAL_PHASE} ne 'DESTRUCT';
 
     return;
 }

@@ -1,5 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeStatus;
   use Moose;
+  use IO::K8s;
 
   has 'addresses' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Core::V1::NodeAddress]'  );
   has 'allocatable' => (is => 'ro', isa => 'HashRef[Str]'  );
@@ -11,4 +12,6 @@ package IO::K8s::Api::Core::V1::NodeStatus;
   has 'phase' => (is => 'ro', isa => 'Str'  );
   has 'volumesAttached' => (is => 'ro', isa => 'ArrayRef[IO::K8s::Api::Core::V1::AttachedVolume]'  );
   has 'volumesInUse' => (is => 'ro', isa => 'ArrayRef[Str]'  );
+
+  sub to_json { IO::K8s->new->object_to_json(shift) }
 1;

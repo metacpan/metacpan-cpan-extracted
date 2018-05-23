@@ -1,8 +1,8 @@
 package Pcore::Dist::CLI;
 
-use Pcore -role;
+use Pcore -class;
 
-with qw[Pcore::Core::CLI::Cmd];
+extends qw[Pcore::Core::CLI::Cmd];
 
 sub get_dist ($self) {
     require Pcore::Dist;

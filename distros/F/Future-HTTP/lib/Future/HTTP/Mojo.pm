@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 with 'Future::HTTP::Handler';
 
@@ -68,11 +68,12 @@ sub _request($self, $method, $url, %options) {
     # Munge the parameters from AnyEvent::HTTP to Mojolicious::UserAgent
     # we should handle on_body parts here with the 'on read' callback
     
+    my $body = defined $options{ body } ? $options{ body } : '';
     # Execute the request (asynchronously)
     my $_tx = $self->ua->build_tx(
         $method => $url,
         $options{ headers } || {},
-        $options{ body},
+        $body,
     );
     
     my $res = Future::Mojo->new();
@@ -213,7 +214,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2017 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

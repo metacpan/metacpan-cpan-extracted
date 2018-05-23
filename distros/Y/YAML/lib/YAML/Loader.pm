@@ -43,6 +43,7 @@ sub _parse {
     $self->_parse_throwaway_comments();
     $self->document(0);
     $self->documents([]);
+    $self->zero_indent([]);
     # Add an "assumed" header if there is no header and the stream is
     # not empty (after initial throwaways).
     if (not $self->eos) {
@@ -127,7 +128,6 @@ sub _parse_node {
     }
     $self->inline('');
     while (length $preface) {
-        my $line = $self->line - 1;
         if ($preface =~ s/^($FOLD_CHAR|$LIT_CHAR_RX)//) {
             $indicator = $1;
             if ($preface =~ s/^([+-])[0-9]*//) {
@@ -225,7 +225,6 @@ sub _parse_qualifiers {
     my ($anchor, $alias, $explicit, $implicit, $token) = ('') x 5;
     $self->inline('');
     while ($preface =~ /^[&*!]/) {
-        my $line = $self->line - 1;
         if ($preface =~ s/^\!(\S+)\s*//) {
             $self->die('YAML_PARSE_ERR_MANY_EXPLICIT') if $explicit;
             $explicit = $1;
@@ -362,9 +361,15 @@ sub _parse_mapping {
             $self->die('YAML_LOAD_ERR_BAD_MAP_ELEMENT');
         }
         $self->preface($self->content);
-        my $line = $self->line;
+        my $level = $self->level;
+
+        # we can get a zero indented sequence, possibly
+        my $zero_indent = $self->zero_indent;
+        $zero_indent->[ $level ] = 0;
         $self->_parse_next_line(COLLECTION);
         my $value = $self->_parse_node();
+        $#$zero_indent = $level;
+
         if (exists $mapping->{$key}) {
             $self->warn('YAML_LOAD_WARN_DUPLICATE_KEY', $key);
         }
@@ -386,6 +391,9 @@ sub _parse_seq {
             $self->preface(defined($1) ? $1 : '');
         }
         else {
+            if ($self->zero_indent->[ $self->level ]) {
+                last;
+            }
             $self->die('YAML_LOAD_ERR_BAD_SEQ_ELEMENT');
         }
 
@@ -408,7 +416,7 @@ sub _parse_seq {
              $preface =~ /^ (\s*) ((') (?:''|[^'])*? ' \s* \: (?:\ |$).*) $/x or
              $preface =~ /^ (\s*) ((") (?:\\\\|[^"])*? " \s* \: (?:\ |$).*) $/x or
              $preface =~ /^ (\s*) (\?.*$)/x or
-             $preface =~ /^ (\s*) ([^\s:#&!\[\]\{\},*|>].*\:(\ .*|$))/x
+             $preface =~ /^ (\s*) ([^'"\s:#&!\[\]\{\},*|>].*\:(\ .*|$))/x
            ) {
             $self->indent($self->offset->[$self->level] + 2 + length($1));
             $self->content($2);
@@ -720,9 +728,21 @@ sub _parse_next_line {
     elsif ($type == COLLECTION and
            $self->preface =~ /^(\s*(\!\S*|\&\S+))*\s*$/) {
         $self->_parse_throwaway_comments();
+        my $zero_indent = $self->zero_indent;
         if ($self->eos) {
             $self->offset->[$level+1] = $offset + 1;
             return;
+        }
+        elsif (
+            defined $zero_indent->[ $level ]
+            and not $zero_indent->[ $level ]
+            and $self->lines->[0] =~ /^( {$offset,})-(?: |$)/
+        ) {
+            my $new_offset = length($1);
+            $self->offset->[$level+1] = $new_offset;
+            if ($new_offset == $offset) {
+                $zero_indent->[ $level+1 ] = 1;
+            }
         }
         else {
             $self->lines->[0] =~ /^( *)\S/ or
